@@ -1,0 +1,50 @@
+{
+    "name": "vscode-languageserver-extension",
+    "displayName": "Language Server extension for VS Code",
+    "description": "Language Server extension for VS Code",
+    "author": "Broadcom PTC",
+    "license": "EPL-2.0",
+    "version": "0.0.1",
+    "preview": true,
+    "publisher": "Broadcom",
+    "engines": {
+        "vscode": "^1.30.0"
+    },
+    "repository": {},
+    "categories": [
+        "Programming Languages",
+        "Linters"
+    ],
+    "activationEvents": [
+        "onLanguage:COBOL"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "languages": [
+            {
+                "id": "COBOL",
+                "extensions": [
+                    ".cbl",
+                    ".cpy",
+                    ".cob"
+                ]
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "dependencies": {
+        "vscode-languageclient": "^5.2.1"
+    },
+    "devDependencies": {
+        "@types/node": "^12.6.2",
+        "tslint": "^5.18.0",
+        "tslint-sonarts": "^1.9.0",
+        "typescript": "^3.5.3",
+        "vscode": "^1.1.35"
+    }
+}

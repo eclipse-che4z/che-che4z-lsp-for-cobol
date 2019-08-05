@@ -1,0 +1,41 @@
+/*
+ * Copyright (c) 2019 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Broadcom, Inc. - initial API and implementation
+ */
+
+{
+    "rules": {
+        "no-string-throw": true,
+        "no-unused-expression": true,
+        "no-duplicate-variable": true,
+        "curly": true,
+        "class-name": true,
+        "semicolon": [
+            true,
+            "always"
+        ],
+        "triple-equals": true,
+        "interface-name": [
+            true,
+            "never-prefix"
+        ],
+        "arrow-parens": [
+            true,
+            "ban-single-arg-parens"
+        ]
+    },
+    "defaultSeverity": "warning",
+    "extends": [
+        "tslint:recommended",
+        "tslint-sonarts"
+    ]
+}

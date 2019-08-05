@@ -1,0 +1,98 @@
+/*
+ * Copyright (c) 2019 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Broadcom, Inc. - initial API and implementation
+ */
+package com.ca.lsp.core.cobol.preprocessor.sub.copybook.impl;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.apache.commons.io.FileUtils;
+
+import com.ca.lsp.core.cobol.params.CobolParserParams;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.FilenameContext;
+import com.ca.lsp.core.cobol.preprocessor.sub.copybook.FilenameCopyBookFinder;
+
+public class FilenameCopyBookFinderImpl implements FilenameCopyBookFinder {
+
+  @Override
+  public File findCopyBook(final CobolParserParams params, final FilenameContext ctx) {
+    if (params.getCopyBookFiles() != null) {
+      for (final File copyBookFile : params.getCopyBookFiles()) {
+        if (isMatchingCopyBook(copyBookFile, null, ctx)) {
+          return copyBookFile;
+        }
+      }
+    }
+
+    if (params.getCopyBookDirectories() != null) {
+      for (final File copyBookDirectory : params.getCopyBookDirectories()) {
+        final File validCopyBook = findCopyBookInDirectory(copyBookDirectory, ctx);
+
+        if (validCopyBook != null) {
+          return validCopyBook;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  protected File findCopyBookInDirectory(final File copyBooksDirectory, final FilenameContext ctx) {
+    for (final File copyBookCandidate : FileUtils.listFiles(copyBooksDirectory, null, true)) {
+      if (isMatchingCopyBook(copyBookCandidate, copyBooksDirectory, ctx)) {
+        return copyBookCandidate;
+      }
+    }
+
+    return null;
+  }
+
+  protected boolean isMatchingCopyBook(
+      final File copyBookCandidate, final File cobolCopyDir, final FilenameContext ctx) {
+    final String copyBookIdentifier = ctx.getText();
+    final boolean result;
+
+    if (cobolCopyDir == null) {
+      result = isMatchingCopyBookRelative(copyBookCandidate, copyBookIdentifier);
+    } else {
+      result = isMatchingCopyBookAbsolute(copyBookCandidate, cobolCopyDir, copyBookIdentifier);
+    }
+
+    return result;
+  }
+
+  protected boolean isMatchingCopyBookAbsolute(
+      final File copyBookCandidate, final File cobolCopyDir, final String copyBookIdentifier) {
+    final Path copyBookCandidateAbsolutePath =
+        Paths.get(copyBookCandidate.getAbsolutePath()).normalize();
+    final Path copyBookIdentifierAbsolutePath =
+        Paths.get(cobolCopyDir.getAbsolutePath(), copyBookIdentifier).normalize();
+    return copyBookIdentifierAbsolutePath
+        .toString()
+        .equalsIgnoreCase(copyBookCandidateAbsolutePath.toString());
+  }
+
+  protected boolean isMatchingCopyBookRelative(
+      final File copyBookCandidate, final String copyBookIdentifier) {
+    final Path copyBookCandidateAbsolutePath =
+        Paths.get(copyBookCandidate.getAbsolutePath()).normalize();
+    final Path copyBookIdentifierRelativePath =
+        Paths.get(File.separator + copyBookIdentifier).normalize();
+
+    return copyBookCandidateAbsolutePath
+        .toString()
+        .toLowerCase()
+        .endsWith(copyBookIdentifierRelativePath.toString().toLowerCase());
+  }
+}
