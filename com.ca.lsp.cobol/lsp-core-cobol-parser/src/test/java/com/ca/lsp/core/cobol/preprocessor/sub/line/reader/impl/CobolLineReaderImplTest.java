@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.ca.lsp.core.cobol.AbstractCobolLinePreprocessorTest;
-import com.ca.lsp.core.cobol.parser.error.SyntaxError;
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 
 /**

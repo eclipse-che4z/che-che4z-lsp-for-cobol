@@ -13,36 +13,39 @@
  */
 package com.ca.lsp.core.cobol.engine;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
 import com.ca.lsp.core.cobol.parser.CobolLexer;
 import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.parser.error.SyntaxError;
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.listener.FormatListener;
 import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
+import com.ca.lsp.core.cobol.semantics.LanguageContext;
+import com.ca.lsp.core.cobol.semantics.CobolParagraphContext;
+import com.ca.lsp.core.cobol.semantics.CobolVariableContext;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategy;
 import com.ca.lsp.core.cobol.visitor.CobolVisitor;
 import com.google.common.collect.Lists;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 
 @Slf4j
 @RequiredArgsConstructor
 public class CobolLanguageEngine {
 
   private final CobolPreprocessor.CobolSourceFormatEnum sourceFormat;
-  private List<SyntaxError> generalErrors = new ArrayList<>();
+  @Getter private List<SyntaxError> errors = new ArrayList<>();
+  @Getter private LanguageContext variables = new CobolVariableContext();
+  @Getter private LanguageContext paragraphs = new CobolParagraphContext();
 
   @SuppressWarnings("unused")
   private CobolParserParams createDefaultParams(final File cobolFile) {
@@ -52,33 +55,34 @@ public class CobolLanguageEngine {
     return result;
   }
 
-  public List<SyntaxError> check(String in) {
+  public void run(String in) {
     CobolPreprocessorImpl preprocessor = new CobolPreprocessorImpl();
-    preprocessor.setFormatErrors(new FormatListener(generalErrors));
+    preprocessor.setFormatErrors(new FormatListener(errors));
     final String preProcessedInput = preprocessor.process(in, sourceFormat);
     doParse(preProcessedInput);
-
-    return generalErrors;
   }
 
   private void doParse(String preProcessedInput) {
     final CobolLexer lexer = new CobolLexer(CharStreams.fromString(preProcessedInput));
 
     lexer.removeErrorListeners();
-    lexer.addErrorListener(new VerboseListener(generalErrors));
+    lexer.addErrorListener(new VerboseListener(errors));
 
     final CommonTokenStream tokens = new CommonTokenStream(lexer);
     final CobolParser parser = new CobolParser(tokens);
 
     parser.removeErrorListeners();
-    parser.addErrorListener(new VerboseListener(generalErrors));
+    parser.addErrorListener(new VerboseListener(errors));
 
     CobolErrorStrategy strategy = new CobolErrorStrategy();
     parser.setErrorHandler(strategy);
     CobolParser.StartRuleContext tree = parser.startRule();
+
     CobolVisitor tourist = new CobolVisitor();
-    tourist.setSemanticErrors(new SemanticListener(generalErrors));
+    tourist.setSemanticErrors(new SemanticListener(errors));
+    tourist.setVariableContext((CobolVariableContext) variables);
+    tourist.setParagraphContext((CobolParagraphContext) paragraphs);
     tourist.visit(tree);
-    generalErrors.forEach(errors -> LOG.debug(errors.printSyntaxError()));
+    errors.forEach(errs -> LOG.debug(errs.printSyntaxError()));
   }
 }

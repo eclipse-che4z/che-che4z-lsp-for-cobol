@@ -33,16 +33,16 @@ import static org.junit.Assert.fail;
 public class KeywordsTest {
 
   private static final String PATH_TO_KEYWORDS_FILE =
-      "src/main/resources/com/ca/lsp/cobol/service/LanguageKeywords.txt";
+      "src/main/resources/com/ca/lsp/cobol/service/delegates/completions/LanguageKeywords.txt";
 
   @Test
   public void testAllLexerWordsAreMapped() {
-    List<String> expected = retriveExpectedWords();
+    List<String> expected = retrieveExpectedWords();
     List<String> actual = retrieveActualWords();
     assertAllTheWordsArePresent(expected, actual);
   }
 
-  private List<String> retriveExpectedWords() {
+  private List<String> retrieveExpectedWords() {
     final CobolLexer lexer = new CobolLexer(null);
     List<String> ruleNames = Arrays.asList(lexer.getRuleNames());
 

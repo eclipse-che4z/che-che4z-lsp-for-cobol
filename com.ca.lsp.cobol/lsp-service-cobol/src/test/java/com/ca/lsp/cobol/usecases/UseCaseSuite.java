@@ -31,6 +31,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestEndPerformCausesError.class,
   TestExtraneousInputEOFExpecting.class,
   TestNoErrorOnCompilerDirectives.class,
+  TestVariablesAreCaseInsensitive.class,
   TestCorrectErrorUnderscorePosition.class,
   TestExtraSymbolsNotCauseErrorOnNextLine.class,
   TestCobolStringWithContinuationLineConcatenatedCorrectly.class

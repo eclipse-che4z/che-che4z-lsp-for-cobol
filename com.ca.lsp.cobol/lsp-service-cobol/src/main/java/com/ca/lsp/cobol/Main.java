@@ -15,8 +15,7 @@ package com.ca.lsp.cobol;
 
 import com.ca.lsp.cobol.service.IMyLanguageServer;
 import com.ca.lsp.cobol.service.MyLanguageServerImpl;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -28,8 +27,8 @@ import java.net.Socket;
 import java.util.concurrent.*;
 
 /** @author zacan01 */
+@Slf4j
 public class Main {
-  private static final Logger LOG = LogManager.getLogger(Main.class);
   private static final Integer LSP_PORT = 1044;
   private static final String PIPE_ARGM = "pipeEnabled";
 
@@ -58,7 +57,7 @@ public class Main {
         () -> {
           while (true) {
             try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
-              LOG.info("LS started using socket communication on port [{}]", LSP_PORT);
+              log.info("LS started using socket communication on port [{}]", LSP_PORT);
 
               // wait for clients to connect
               Socket socket = serverSocket.accept();

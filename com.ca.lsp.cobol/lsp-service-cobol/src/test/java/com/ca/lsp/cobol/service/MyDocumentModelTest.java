@@ -13,13 +13,13 @@
  */
 package com.ca.lsp.cobol.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
+import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Position;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /** @author teman02 */
 public class MyDocumentModelTest {
@@ -41,7 +41,7 @@ public class MyDocumentModelTest {
 
   @Before
   public void createModel() {
-    model = new MyDocumentModel(TEXT);
+    model = new MyDocumentModel(TEXT, AnalysisResult.empty());
   }
 
   @Test
@@ -77,29 +77,36 @@ public class MyDocumentModelTest {
   @Test
   public void testGetTokenEmptyPosition() {
     Position pos = new Position();
-    assertEquals("", model.getToken(pos));
+    assertEquals("", model.getTokenBeforePosition(pos));
   }
 
   @Test
   public void testGetTokenInvalidPosition() {
     Position pos = new Position(-1, -1);
-    assertEquals("", model.getToken(pos));
+    assertEquals("", model.getTokenBeforePosition(pos));
+  }
+
+  @Test
+  public void testPositionAtDelimiter()
+  {
+    Position pos = new Position(1, 19);
+    assertEquals("", model.getTokenBeforePosition(pos));
   }
 
   @Test
   public void testGetTokenInvalid() {
     Position pos = new Position(0, -1);
-    assertEquals("", model.getToken(pos));
+    assertEquals("", model.getTokenBeforePosition(pos));
   }
 
   @Test
   public void testTokenRetrieving() {
-    MyDocumentModel model = new MyDocumentModel("a bc\r\nde");
-    assertEquals("", model.getToken(new Position(0, 0)));
-    assertEquals("a", model.getToken(new Position(0, 1)));
-    assertEquals("bc", model.getToken(new Position(0, 4)));
-    assertEquals("d", model.getToken(new Position(1, 1)));
-    assertEquals("de", model.getToken(new Position(1, 2)));
+    MyDocumentModel model = new MyDocumentModel("a bc\r\nde", AnalysisResult.empty());
+    assertEquals("", model.getTokenBeforePosition(new Position(0, 0)));
+    assertEquals("a", model.getTokenBeforePosition(new Position(0, 1)));
+    assertEquals("bc", model.getTokenBeforePosition(new Position(0, 4)));
+    assertEquals("d", model.getTokenBeforePosition(new Position(1, 1)));
+    assertEquals("de", model.getTokenBeforePosition(new Position(1, 2)));
   }
 
   private String retrieveFirstTextLine() {

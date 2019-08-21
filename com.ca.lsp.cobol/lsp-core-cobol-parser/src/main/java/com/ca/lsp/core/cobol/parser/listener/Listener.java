@@ -13,15 +13,14 @@
  */
 package com.ca.lsp.core.cobol.parser.listener;
 
+import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.model.Position;
 import java.util.List;
 import java.util.Optional;
 
-import com.ca.lsp.core.cobol.parser.error.SyntaxError;
-import com.ca.lsp.core.cobol.parser.error.objects.ErrorPosition;
-
 public abstract class Listener {
-  protected List<SyntaxError> errorsPipe;
   protected static final int PREPROCESSING_ERROR_INDEX = -1;
+  protected List<SyntaxError> errorsPipe;
 
   public Listener(List<SyntaxError> errorsPipe) {
     this.errorsPipe = errorsPipe;
@@ -35,7 +34,7 @@ public abstract class Listener {
       int line, int charPositionInLine, String msg, int errorLength, int severity) {
     registerError(
         msg,
-        new ErrorPosition(
+        new Position(
             PREPROCESSING_ERROR_INDEX,
             charPositionInLine,
             (charPositionInLine + errorLength),
@@ -48,7 +47,7 @@ public abstract class Listener {
       int line, int charPositionInLine, int charEndingIndex, String msg, int severity) {
     registerError(
         msg,
-        new ErrorPosition(
+        new Position(
             PREPROCESSING_ERROR_INDEX,
             charPositionInLine,
             charEndingIndex,
@@ -63,7 +62,7 @@ public abstract class Listener {
     error.ifPresent(err -> getErrorsPipe().remove(err));
   }
 
-  protected void registerError(String msg, ErrorPosition position, int severity) {
+  protected void registerError(String msg, Position position, int severity) {
     if (getErrorsPipe() != null) {
       getErrorsPipe()
           .add(

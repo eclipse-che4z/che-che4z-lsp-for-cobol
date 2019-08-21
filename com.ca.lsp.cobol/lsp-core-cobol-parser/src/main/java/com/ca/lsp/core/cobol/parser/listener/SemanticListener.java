@@ -13,9 +13,8 @@
  */
 package com.ca.lsp.core.cobol.parser.listener;
 
-import com.ca.lsp.core.cobol.parser.error.SyntaxError;
-import com.ca.lsp.core.cobol.parser.error.objects.ErrorPosition;
-
+import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.model.Position;
 import java.util.List;
 
 /** @author ilise01 */
@@ -40,7 +39,7 @@ public class SemanticListener extends Listener {
     super.syntaxError(line, charPositionInLine, charEndingIndex, msg, WARNING_SEVERITY);
   }
 
-  protected void registerError(String msg, ErrorPosition position) {
+  protected void registerError(String msg, Position position) {
     super.registerError(msg, position, WARNING_SEVERITY);
   }
 }

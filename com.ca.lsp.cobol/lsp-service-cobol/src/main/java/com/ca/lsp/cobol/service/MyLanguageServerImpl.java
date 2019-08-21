@@ -38,10 +38,10 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
     capabilities.setTextDocumentSync(TextDocumentSyncKind.Full);
     capabilities.setCompletionProvider(new CompletionOptions(true, new ArrayList<>()));
     capabilities.setSignatureHelpProvider(null);
-    capabilities.setDefinitionProvider(Boolean.FALSE);
+    capabilities.setDefinitionProvider(Boolean.TRUE);
     capabilities.setHoverProvider(Boolean.FALSE);
     capabilities.setCodeActionProvider(Boolean.FALSE);
-    capabilities.setReferencesProvider(Boolean.FALSE);
+    capabilities.setReferencesProvider(Boolean.TRUE);
     capabilities.setDocumentSymbolProvider(Boolean.FALSE);
     capabilities.setCodeLensProvider(null);
     capabilities.setDocumentFormattingProvider(Boolean.TRUE);
