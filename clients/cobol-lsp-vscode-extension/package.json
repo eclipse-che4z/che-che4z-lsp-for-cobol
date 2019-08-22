@@ -1,10 +1,10 @@
 {
-    "name": "vscode-languageserver-extension",
+    "name": "LSP for Cobol",
     "displayName": "Language Server extension for VS Code",
     "description": "Language Server extension for VS Code",
     "author": "Broadcom PTC",
     "license": "EPL-2.0",
-    "version": "0.0.1",
+    "version": "0.8.0",
     "preview": true,
     "publisher": "BroadcomMFD",
     "engines": {
@@ -12,8 +12,7 @@
     },
     "repository": {},
     "categories": [
-        "Programming Languages",
-        "Linters"
+        "Programming Languages"
     ],
     "activationEvents": [
         "onLanguage:COBOL"
