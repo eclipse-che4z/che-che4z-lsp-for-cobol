@@ -15,7 +15,6 @@
  */
 package com.ca.lsp.core.cobol.model;
 
-import com.ca.lsp.core.cobol.model.Position;
 import java.util.List;
 import lombok.Builder;
 import lombok.Value;

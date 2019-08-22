@@ -24,7 +24,7 @@ import org.junit.Test;
  *
  * @author teman02
  */
-public class FormatLitenerTest {
+public class FormatListenerTest {
 
   @Test
   public void testSyntaxErrorWithRange() {
