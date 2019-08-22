@@ -69,18 +69,6 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-    <repositories>
-        <repository>
-            <id>artifactory_release</id>
-            <name>Artifactory</name>
-            <url>http://czprapd-jenkins.mcl.broadcom.net:8081/artifactory/libs-release</url>
-        </repository>
-        <repository>
-            <id>artifactory_snapshot</id>
-            <name>Artifactory</name>
-            <url>http://czprapd-jenkins.mcl.broadcom.net:8081/artifactory/libs-snapshot</url>
-        </repository>
-    </repositories>
 
     <build>
         <plugins>
