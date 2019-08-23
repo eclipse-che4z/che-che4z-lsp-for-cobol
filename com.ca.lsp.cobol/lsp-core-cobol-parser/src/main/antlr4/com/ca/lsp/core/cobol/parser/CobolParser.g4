@@ -951,15 +951,15 @@ dataDescriptionEntry
    ;
 
 dataDescriptionEntryFormat1
-   : otherLevel (FILLER | dataName)? (dataGroupUsageClause | dataRedefinesClause | dataIntegerStringClause | dataExternalClause | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataPictureClause | dataCommonOwnLocalClause | dataTypeClause | dataUsingClause | dataUsageClause | dataValueClause | dataReceivedByClause | dataOccursClause | dataSignClause | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause | dataWithLowerBoundsClause | dataAlignedClause | dataRecordAreaClause)* (DOT_FS|DOT_FS2)
+   : otherLevel (FILLER | dataName1)? (dataGroupUsageClause | dataRedefinesClause | dataIntegerStringClause | dataExternalClause | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataPictureClause | dataCommonOwnLocalClause | dataTypeClause | dataUsingClause | dataUsageClause | dataValueClause | dataReceivedByClause | dataOccursClause | dataSignClause | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause | dataWithLowerBoundsClause | dataAlignedClause | dataRecordAreaClause)* (DOT_FS|DOT_FS2)
    ;
    
 dataDescriptionEntryFormat2
-   : LEVEL_NUMBER_66 dataName dataRenamesClause DOT_FS
+   : LEVEL_NUMBER_66 dataName1 dataRenamesClause DOT_FS
    ;
 
 dataDescriptionEntryFormat3
-   : LEVEL_NUMBER_88 conditionName dataValueClause DOT_FS
+   : LEVEL_NUMBER_88 dataName1 dataValueClause DOT_FS
    ;
 
 dataDescriptionEntryExecSql
@@ -2406,7 +2406,7 @@ identifier
    ;
 
 tableCall
-   : qualifiedDataName (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
+   : dataName2 (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
    ;
 
 functionCall
@@ -2462,7 +2462,7 @@ qualifiedInData
 // in ----------------------------------
 
 inData
-   : (IN | OF) dataName
+   : (IN | OF) dataName2
    ;
 
 inFile
@@ -2495,10 +2495,6 @@ assignmentName
    : systemName
    ;
 
-basisName
-   : programName
-   ;
-
 cdName
    : cobolWord
    ;
@@ -2516,6 +2512,14 @@ conditionName
    ;
 
 dataName
+   : cobolWord
+   ;
+
+dataName1
+   : cobolWord
+   ;
+
+dataName2
    : cobolWord
    ;
 
@@ -2559,8 +2563,12 @@ paragraphName
    : cobolWord | integerLiteral
    ;
 
+paragraphNameDefinition
+   : cobolWord | integerLiteral
+   ;
+
 procedureName
-   : paragraphName inSection? | sectionName
+   : paragraphNameDefinition inSection? | sectionName
    ;
 
 programName
@@ -2573,10 +2581,6 @@ recordName
 
 reportName
    : qualifiedDataName
-   ;
-
-routineName
-   : cobolWord
    ;
 
 screenName

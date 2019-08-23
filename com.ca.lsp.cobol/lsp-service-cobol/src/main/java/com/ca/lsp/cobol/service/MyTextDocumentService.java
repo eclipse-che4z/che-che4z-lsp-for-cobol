@@ -13,12 +13,14 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.ca.lsp.cobol.service.delegates.Completions;
 import com.ca.lsp.cobol.service.delegates.Formations;
+import com.ca.lsp.cobol.service.delegates.Communications;
+import com.ca.lsp.cobol.service.delegates.completions.Completions;
+import com.ca.lsp.cobol.service.delegates.references.References;
+import com.ca.lsp.cobol.service.delegates.validations.Analysis;
+import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngines;
-import com.ca.lsp.cobol.service.delegates.validations.Validation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -30,15 +32,13 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /** @author zacan01 */
+@Slf4j
 public class MyTextDocumentService implements TextDocumentService {
-  private static final Logger LOG = LogManager.getLogger(MyTextDocumentService.class);
-  private static final Keywords KEYWORDS = new Keywords();
-
   private final Map<String, MyDocumentModel> docs = Collections.synchronizedMap(new HashMap<>());
-  private final IMyLanguageServer myServer;
+  private final Communications communications;
 
-  public MyTextDocumentService(IMyLanguageServer myServer) {
-    this.myServer = myServer;
+  public MyTextDocumentService(IMyLanguageServer server) {
+    this.communications = new Communications(server);
   }
 
   Map<String, MyDocumentModel> getDocs() {
@@ -49,19 +49,15 @@ public class MyTextDocumentService implements TextDocumentService {
   public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
       CompletionParams params) {
     Completions.checkCompletionParams(params);
-    MyDocumentModel model = docs.get(params.getTextDocument().getUri());
-    String token = model.getToken(params.getPosition());
-    LOG.info("Invoked completion for token [{}]", token);
 
-    return Completions.collectFor(token, KEYWORDS);
+    return Completions.collectFor(docs.get(params.getTextDocument().getUri()), params);
   }
 
   @Override
   public CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem unresolved) {
-    LOG.info("Invoked resolving completion for [{}]", unresolved.getLabel());
+    log.info("Invoked resolving completion for [{}]", unresolved.getLabel());
 
-    return CompletableFuture.supplyAsync(
-        () -> Completions.resolveDocumentationFor(unresolved, KEYWORDS));
+    return CompletableFuture.supplyAsync(() -> Completions.resolveDocumentationFor(unresolved));
   }
 
   @Override
@@ -77,12 +73,13 @@ public class MyTextDocumentService implements TextDocumentService {
   @Override
   public CompletableFuture<List<? extends Location>> definition(
       TextDocumentPositionParams position) {
-    return CompletableFuture.supplyAsync(() -> null);
+    return CompletableFuture.supplyAsync(
+        () -> References.findDefinition(docs.get(position.getTextDocument().getUri()), position));
   }
 
   @Override
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
-    return CompletableFuture.supplyAsync(() -> null);
+    return CompletableFuture.supplyAsync(() -> References.findReferences(docs.get(params.getTextDocument().getUri()), params, params.getContext()));
   }
 
   @Override
@@ -131,9 +128,8 @@ public class MyTextDocumentService implements TextDocumentService {
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
 
-    MyDocumentModel model = new MyDocumentModel(text);
-    docs.put(uri, model);
-    registerEngineAndRunValidation(uri, langId, text);
+    registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
+    registerEngineAndAnalyze(uri, langId, text);
   }
 
   @Override
@@ -141,51 +137,57 @@ public class MyTextDocumentService implements TextDocumentService {
     String uri = params.getTextDocument().getUri();
     String text = params.getContentChanges().get(0).getText();
 
-    MyDocumentModel model = new MyDocumentModel(text);
-    docs.put(uri, model);
-    performValidation(uri, text);
+    analyzeChanges(uri, text);
   }
 
   @Override
   public void didClose(DidCloseTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-    LOG.info("Document closing invoked");
+    log.info("Document closing invoked");
     docs.remove(uri);
-    Validation.unregisterEngine(uri);
+    Analysis.unregisterEngine(uri);
   }
 
   @Override
   public void didSave(DidSaveTextDocumentParams params) {
-    LOG.info("Document saved...");
+    log.info("Document saved...");
   }
 
-  private void registerEngineAndRunValidation(String uri, String languageType, String text) {
+  private void registerEngineAndAnalyze(String uri, String languageType, String text) {
     if (LanguageEngines.getLanguageEngineById(languageType) != null) {
-      Validation.registerEngine(uri, languageType);
-      performValidation(uri, text);
+      communications.notifyThatLoadingInProgress(uri);
+      Analysis.registerEngine(uri, languageType);
+      analyzeDocumentFirstTime(uri, text);
     } else {
-      notifyClientAboutEngineNotFound(languageType);
+      communications.notifyThatEngineNotFound(languageType);
     }
   }
 
-  private void performValidation(String uri, String text) {
+  private void analyzeDocumentFirstTime(String uri, String text) {
     CompletableFuture.runAsync(
-        () ->
-            myServer
-                .getClient()
-                .publishDiagnostics(
-                    new PublishDiagnosticsParams(uri, Validation.validate(uri, text))));
+        () -> {
+          AnalysisResult result = Analysis.run(uri, text);
+          docs.get(uri).setAnalysisResult(result);
+          publishResult(uri, result);
+        });
   }
 
-  private void notifyClientAboutEngineNotFound(String languageType) {
+  private void analyzeChanges(String uri, String text) {
     CompletableFuture.runAsync(
-        () ->
-            myServer
-                .getClient()
-                .showMessage(
-                    new MessageParams(
-                        MessageType.Error,
-                        "Cannot find a language engine for the given language ID: "
-                            + languageType)));
+        () -> {
+          AnalysisResult result = Analysis.run(uri, text);
+          registerDocument(uri, new MyDocumentModel(text, result));
+          communications.publishDiagnostics(uri, result.getDiagnostics());
+        });
+  }
+
+  private void publishResult(String uri, AnalysisResult result) {
+    communications.cancelProgressNotification(uri);
+    communications.publishDiagnostics(uri, result.getDiagnostics());
+    if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
+  }
+
+  private void registerDocument(String uri, MyDocumentModel document) {
+    docs.put(uri, document);
   }
 }

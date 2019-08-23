@@ -13,15 +13,13 @@
  */
 package com.ca.lsp.cobol.service.delegates;
 
+import com.ca.lsp.cobol.service.delegates.validations.Analysis;
+import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.junit.Test;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
-
-import java.util.List;
-import org.eclipse.lsp4j.Diagnostic;
-import org.junit.Test;
-
-import com.ca.lsp.cobol.service.delegates.validations.Validation;
 
 public class ValidationTest {
   private static final String LANGUAGE = "cbl";
@@ -36,11 +34,11 @@ public class ValidationTest {
   public void testValidation() {
 
     // didOpen register the handler for a given cobol file
-    Validation.registerEngine(DOCUMENT_URI, LANGUAGE);
+    Analysis.registerEngine(DOCUMENT_URI, LANGUAGE);
 
     // based on the language engine the validation process select the correct handler (CLE in the
     // example)
-    List<Diagnostic> diagnosticList = Validation.validate(DOCUMENT_URI, INCORRECT_TEXT_EXAMPLE);
-    assertThat(diagnosticList.size(), is(not(0)));
+    AnalysisResult analysisResult = Analysis.run(DOCUMENT_URI, INCORRECT_TEXT_EXAMPLE);
+    assertThat(analysisResult.getDiagnostics().size(), is(not(0)));
   }
 }

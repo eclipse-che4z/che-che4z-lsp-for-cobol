@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * Mock implementation of language client. Only for testing purposes. Collects the received messages
@@ -77,7 +78,9 @@ public class TestLanguageClient implements LanguageClient {
 
   /** Return the extracted diagnostic messages */
   public List<Diagnostic> getDiagnostics() {
-    return receivedDiagnostics.get(0).getDiagnostics();
+    return receivedDiagnostics.get(0).getDiagnostics().stream()
+        .filter(item -> item.getSeverity().getValue() == 1)
+        .collect(Collectors.toList());
   }
 
   /** Return the received messages to be shown */

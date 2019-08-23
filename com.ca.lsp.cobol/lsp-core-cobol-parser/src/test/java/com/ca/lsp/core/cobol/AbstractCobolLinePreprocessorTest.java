@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
-import com.ca.lsp.core.cobol.parser.error.SyntaxError;
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.listener.FormatListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;

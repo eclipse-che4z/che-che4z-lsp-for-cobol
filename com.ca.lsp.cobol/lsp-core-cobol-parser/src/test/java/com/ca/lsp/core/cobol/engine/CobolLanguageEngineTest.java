@@ -13,32 +13,29 @@
  */
 package com.ca.lsp.core.cobol.engine;
 
-import static com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum.FIXED;
-import static com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum.TANDEM;
-import static com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum.VARIABLE;
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
+import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import com.ca.lsp.core.cobol.parser.error.SyntaxError;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import static com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * JUnit Test checks with Cobol engine for both positive and negative tests with 3 formats
+ *
  * @author ra890997
- * 
  */
 @RunWith(Parameterized.class)
-public class CobolLangauageEngineTest {
+public class CobolLanguageEngineTest {
 
-  public static final String NEGATIVE_TEXT =
+  private static final String NEGATIVE_TEXT =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
@@ -53,7 +50,7 @@ public class CobolLangauageEngineTest {
           + "\r\n"
           + "            STOP RUN.";
 
-  public static final String POSITIVE_TEXT =
+  private static final String POSITIVE_TEXT =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
@@ -67,7 +64,7 @@ public class CobolLangauageEngineTest {
           + "            STOP RUN.";
   private CobolPreprocessor.CobolSourceFormatEnum format;
 
-  public CobolLangauageEngineTest(CobolSourceFormatEnum format) {
+  public CobolLanguageEngineTest(CobolSourceFormatEnum format) {
     super();
     this.format = format;
   }
@@ -79,17 +76,25 @@ public class CobolLangauageEngineTest {
 
   @Test
   public void doCheckNegative() {
-    CobolLanguageEngine engine =
-        new CobolLanguageEngine(format);
-    List<SyntaxError> errors = engine.check(NEGATIVE_TEXT);
-    assertEquals(11, errors.size());
+    CobolLanguageEngine engine = new CobolLanguageEngine(format);
+    engine.run(NEGATIVE_TEXT);
+    assertEquals(
+        11,
+        engine.getErrors().stream()
+            .filter(item -> item.getSeverity() == 1)
+            .collect(Collectors.toList())
+            .size());
   }
 
   @Test
   public void doCheckPositive() {
-    CobolLanguageEngine engine =
-        new CobolLanguageEngine(format);
-    List<SyntaxError> errors = engine.check(POSITIVE_TEXT);
-    assertEquals(0, errors.size());
+    CobolLanguageEngine engine = new CobolLanguageEngine(format);
+    engine.run(POSITIVE_TEXT);
+    assertEquals(
+        0,
+        engine.getErrors().stream()
+            .filter(item -> item.getSeverity() == 1)
+            .collect(Collectors.toList())
+            .size());
   }
 }

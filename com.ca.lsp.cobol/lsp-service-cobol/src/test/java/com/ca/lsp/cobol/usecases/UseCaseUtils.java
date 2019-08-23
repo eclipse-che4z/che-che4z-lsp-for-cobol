@@ -17,13 +17,14 @@ import com.ca.lsp.cobol.service.IMyLanguageServer;
 import com.ca.lsp.cobol.service.MyTextDocumentService;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This utility class provides methods to run use cases with Cobol code examples.
@@ -31,8 +32,9 @@ import org.eclipse.lsp4j.services.TextDocumentService;
  * @author teman02
  */
 public class UseCaseUtils {
-  private static final String LANGUAGE = "cbl";
-  private static final String DOCUMENT_URI = "1";
+  public static final String LANGUAGE = "cbl";
+  public static final String DOCUMENT_URI = "1";
+
   private static final long MAX_TIME_TO_WAIT = 60000L;
   private static final long TIME_TO_POLL = 10L;
   private static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
@@ -108,8 +110,6 @@ public class UseCaseUtils {
    */
   public static void waitForDiagnostics(TestLanguageClient client) {
     await(
-        () -> {
-          return !client.getReceivedDiagnostics().isEmpty();
-        });
+        () -> !client.getReceivedDiagnostics().isEmpty());
   }
 }

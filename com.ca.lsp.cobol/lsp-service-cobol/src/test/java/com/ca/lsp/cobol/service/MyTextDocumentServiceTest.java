@@ -27,7 +27,10 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
+import static com.ca.lsp.cobol.usecases.UseCaseUtils.await;
+import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.*;
 
 /** @author teman02 */
@@ -36,13 +39,15 @@ public class MyTextDocumentServiceTest {
   private static final String LANGUAGE = "COBOL";
   private static final String DOCUMENT_URI = "1";
   private static final String CLOSED_DOCUMENT_URI = "2";
-  private static final String TEXT_EXAMPLE = "IDENTIFICATION DIVISION.";
+  private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
   private MyTextDocumentService service;
+  private TestLanguageClient client;
 
   @Before
   public void createService() {
-    IMyLanguageServer server = new TestLanguageServer();
+    client = new TestLanguageClient();
+    IMyLanguageServer server = new TestLanguageServer(client);
     service = new MyTextDocumentService(server);
     service.didOpen(
         new DidOpenTextDocumentParams(
@@ -52,15 +57,16 @@ public class MyTextDocumentServiceTest {
   @Test(expected = IllegalArgumentException.class)
   public void testCompletionEmpty() {
     service.completion(new CompletionParams());
-    fail("No exception were thrown when IllegalArgumentExcetion is expected");
+    fail("No exception were thrown when IllegalArgumentException is expected");
   }
 
   @Test
   public void testCompletion() {
+    waitForDiagnostics(client);
     CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion =
         service.completion(
             new CompletionParams(
-                new TextDocumentIdentifier(DOCUMENT_URI), new Position(0, 1))); // The
+                new TextDocumentIdentifier(DOCUMENT_URI), new Position(0, 8))); // The
     // position of "Identification division"
     assertCompletionCorrect(completion);
   }
@@ -177,14 +183,20 @@ public class MyTextDocumentServiceTest {
 
   @Test
   public void testIncorrectLangId() {
-
     TestLanguageClient client = new TestLanguageClient();
     MyTextDocumentService service = (MyTextDocumentService) UseCaseUtils.createServer(client);
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, "incorrectId", 1, TEXT_EXAMPLE)));
-    UseCaseUtils.await(() -> !client.getMessagesToShow().isEmpty());
-    assertEquals(1, client.getMessagesToShow().size());
+    await(() -> !client.getMessagesToShow().isEmpty());
+    assertTrue(
+        client.getMessagesToShow().stream()
+            .map((Function<MessageParams, Object>) MessageParams::getMessage)
+            .anyMatch(
+                it ->
+                    it.toString()
+                        .equals(
+                            "Cannot find a language engine for the given language ID: incorrectId")));
   }
 
   @Ignore("Not implemented yet")

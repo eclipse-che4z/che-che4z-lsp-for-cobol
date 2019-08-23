@@ -14,20 +14,20 @@
 package com.ca.lsp.cobol.service.delegates;
 
 import com.ca.lsp.cobol.service.MyDocumentModel;
+import lombok.experimental.UtilityClass;
 import org.eclipse.lsp4j.TextEdit;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+@UtilityClass
 public class Formations {
-
-  private Formations() {
-    throw new AssertionError("Suppress default constructor for noninstantiability");
-  }
-
   private static final Formation FORMATION = new TrimFormation();
 
-  public static List<? extends TextEdit> format(MyDocumentModel model) {
-    return FORMATION.format(model.getLines());
+  public List<TextEdit> format(MyDocumentModel model) {
+    return Optional.ofNullable(model)
+        .map(it -> FORMATION.format(it.getLines()))
+        .orElseGet(Collections::emptyList);
   }
-
 }

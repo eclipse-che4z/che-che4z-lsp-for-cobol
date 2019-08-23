@@ -13,15 +13,11 @@
  */
 package com.ca.lsp.cobol.service.delegates.validations;
 
-import org.eclipse.lsp4j.Diagnostic;
-
-import java.util.List;
-
 public interface LanguageEngineFacade {
   /**
    * @author zacan01
    * @param text of document opened in the client editor
    * @return list of LSP diagnostic object used to display errors in the editor
    */
-  List<Diagnostic> performValidation(String text);
+  AnalysisResult analyze(String text);
 }

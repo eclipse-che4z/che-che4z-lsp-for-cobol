@@ -16,16 +16,13 @@ package com.ca.lsp.cobol.service.delegates;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngines;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
-
-import com.ca.lsp.cobol.service.delegates.validations.LanguageEngines;
-import java.util.Arrays;
-import java.util.List;
-import org.junit.Test;
 
 public class LanguageEnginesTest {
   private static final String LANGUAGE_ID = "cbl";
@@ -38,7 +35,8 @@ public class LanguageEnginesTest {
   public void testGetLanguageEngineByLanguageId() {
     assertThat(
         Objects.requireNonNull(LanguageEngines.getLanguageEngineById(LANGUAGE_ID))
-            .performValidation(INCORRECT_TEXT_EXAMPLE)
+            .analyze(INCORRECT_TEXT_EXAMPLE)
+            .getDiagnostics()
             .size(),
         is(not(0)));
   }
@@ -47,7 +45,8 @@ public class LanguageEnginesTest {
   public void testGetLanguageEngineByUppercaseLanguageId() {
     assertThat(
         Objects.requireNonNull(LanguageEngines.getLanguageEngineById(LANGUAGE_ID_UPPERCASE))
-            .performValidation(INCORRECT_TEXT_EXAMPLE)
+            .analyze(INCORRECT_TEXT_EXAMPLE)
+            .getDiagnostics()
             .size(),
         is(not(0)));
   }
@@ -57,7 +56,8 @@ public class LanguageEnginesTest {
     for (String cobolLangEngine : COBOL_EXTENSIONS) {
       assertThat(
           LanguageEngines.getLanguageEngineById(cobolLangEngine)
-              .performValidation(INCORRECT_TEXT_EXAMPLE)
+              .analyze(INCORRECT_TEXT_EXAMPLE)
+              .getDiagnostics()
               .size(),
           is(not(0)));
     }

@@ -13,19 +13,17 @@
  */
 package com.ca.lsp.core.cobol.parser.listener;
 
+import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.model.Position;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
-
-import com.ca.lsp.core.cobol.parser.error.SyntaxError;
-import com.ca.lsp.core.cobol.parser.error.objects.ErrorPosition;
 
 public class VerboseListener extends BaseErrorListener {
   private List<SyntaxError> errorspipe;
@@ -47,8 +45,8 @@ public class VerboseListener extends BaseErrorListener {
       stack = ((Parser) recognizer).getRuleInvocationStack();
       Collections.reverse(stack);
       CommonToken wrongToken = (CommonToken) offendingSymbol;
-      ErrorPosition position =
-          new ErrorPosition(
+      Position position =
+          new Position(
               wrongToken.getTokenIndex(),
               wrongToken.getStartIndex(),
               wrongToken.getStopIndex(),
@@ -65,8 +63,8 @@ public class VerboseListener extends BaseErrorListener {
     }
     if (recognizer instanceof Lexer) {
       stack.add(((Lexer) recognizer).getText());
-      ErrorPosition position =
-          new ErrorPosition(
+      Position position =
+          new Position(
               charPositionInLine, charPositionInLine, charPositionInLine, line, charPositionInLine);
       errorspipe.add(
           SyntaxError.syntaxerror()

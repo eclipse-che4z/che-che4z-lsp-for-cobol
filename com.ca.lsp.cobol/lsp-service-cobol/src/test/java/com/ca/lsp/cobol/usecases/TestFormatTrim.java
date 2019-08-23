@@ -13,37 +13,33 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import com.ca.lsp.cobol.service.IMyLanguageServer;
+import com.ca.lsp.cobol.service.MyTextDocumentService;
+import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
+import org.eclipse.lsp4j.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
-import org.eclipse.lsp4j.DidOpenTextDocumentParams;
-import org.eclipse.lsp4j.DocumentFormattingParams;
-import org.eclipse.lsp4j.FormattingOptions;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
-import org.eclipse.lsp4j.TextDocumentIdentifier;
-import org.eclipse.lsp4j.TextDocumentItem;
-import org.eclipse.lsp4j.TextEdit;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.ca.lsp.cobol.service.IMyLanguageServer;
-import com.ca.lsp.cobol.service.MyTextDocumentService;
-import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
+import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class TestFormatTrim {
   private static final String ID = "id";
 
   private MyTextDocumentService service;
+  private TestLanguageClient client;
 
   private static final Pattern RTRIM = Pattern.compile("\\s+$");
 
@@ -56,20 +52,36 @@ public class TestFormatTrim {
 
   @Before
   public void createService() {
-    IMyLanguageServer server = new TestLanguageServer();
+    client = new TestLanguageClient();
+    IMyLanguageServer server = new TestLanguageServer(client);
     service = new MyTextDocumentService(server);
     service.didOpen(new DidOpenTextDocumentParams(new TextDocumentItem(ID, "COBOL", 1, TEXT)));
   }
 
   @Test
   public void testTrimming() {
+    waitForDiagnostics(client);
     CompletableFuture<List<? extends TextEdit>> formatting =
         service.formatting(
             new DocumentFormattingParams(
                 new TextDocumentIdentifier(ID), new FormattingOptions(1, false)));
 
     try {
-      assertEquals(formatting.get(), trim(TEXT));
+      assertEquals(trim(TEXT), formatting.get());
+    } catch (InterruptedException | ExecutionException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  @Test
+  public void testTrimmingBeforeDidOpenFinished() {
+    CompletableFuture<List<? extends TextEdit>> formatting =
+        service.formatting(
+            new DocumentFormattingParams(
+                new TextDocumentIdentifier("nonExistingId"), new FormattingOptions(1, false)));
+
+    try {
+      assertEquals(Collections.emptyList(), formatting.get());
     } catch (InterruptedException | ExecutionException e) {
       fail(e.getMessage());
     }

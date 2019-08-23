@@ -13,15 +13,16 @@
  */
 package com.ca.lsp.core.cobol;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-
-import com.ca.lsp.core.cobol.engine.CobolLangauageEngineTest;
-import com.ca.lsp.core.cobol.parser.listener.FormatLitenerTest;
+import com.ca.lsp.core.cobol.engine.CobolLanguageEngineTest;
+import com.ca.lsp.core.cobol.parser.listener.FormatListenerTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolCommentEntriesMarkerImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.ContinuationLineTransformationTest;
+import com.ca.lsp.core.cobol.semantics.CobolVariableCheckTest;
+import com.ca.lsp.core.cobol.semantics.CobolVariableContextTest;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * This suite runs all the test of Cobol parser core.
@@ -31,9 +32,11 @@ import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.ContinuationLineT
 @RunWith(Suite.class)
 @SuiteClasses({
   CobolLineReaderImplTest.class,
-  FormatLitenerTest.class,
+  FormatListenerTest.class,
   ContinuationLineTransformationTest.class,
-  CobolLangauageEngineTest.class,
-  CobolCommentEntriesMarkerImplTest.class
+  CobolLanguageEngineTest.class,
+  CobolCommentEntriesMarkerImplTest.class,
+  CobolVariableContextTest.class,
+  CobolVariableCheckTest.class
 })
 public class CobolTestSuite {}

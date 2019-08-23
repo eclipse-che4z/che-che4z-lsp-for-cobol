@@ -17,10 +17,15 @@ import com.ca.lsp.cobol.negative.NegativeTestSuite;
 import com.ca.lsp.cobol.positive.PositiveTest;
 import com.ca.lsp.cobol.service.MyDocumentModelTest;
 import com.ca.lsp.cobol.service.MyTextDocumentServiceTest;
+import com.ca.lsp.cobol.service.DefinitionsAndUsagesTest;
 import com.ca.lsp.cobol.service.delegates.LanguageEnginesTest;
 import com.ca.lsp.cobol.service.delegates.ValidationTest;
+import com.ca.lsp.cobol.service.delegates.completions.CompletionsChainTest;
+import com.ca.lsp.cobol.service.delegates.completions.SnippetCompletionTest;
+import com.ca.lsp.cobol.service.delegates.completions.VariableCompletionTest;
+import com.ca.lsp.cobol.service.delegates.references.ReferencesTest;
+import com.ca.lsp.cobol.usecases.TestResponsesNotContainLineBreaks;
 import com.ca.lsp.cobol.usecases.UseCaseSuite;
-import com.ca.lsp.cobol.utils.FiltersTest;
 import com.ca.lsp.cobol.utils.KeywordsTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -37,10 +42,15 @@ import org.junit.runners.Suite.SuiteClasses;
   NegativeTestSuite.class,
   MyDocumentModelTest.class,
   MyTextDocumentServiceTest.class,
-  FiltersTest.class,
   UseCaseSuite.class,
   KeywordsTest.class,
   ValidationTest.class,
-  LanguageEnginesTest.class
+  LanguageEnginesTest.class,
+  VariableCompletionTest.class,
+  CompletionsChainTest.class,
+  SnippetCompletionTest.class,
+  ReferencesTest.class,
+  DefinitionsAndUsagesTest.class,
+  TestResponsesNotContainLineBreaks.class
 })
 public class AllTests {}

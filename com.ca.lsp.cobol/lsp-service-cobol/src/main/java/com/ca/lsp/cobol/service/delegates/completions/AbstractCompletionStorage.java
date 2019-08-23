@@ -11,7 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-package com.ca.lsp.cobol.service;
+package com.ca.lsp.cobol.service.delegates.completions;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,50 +24,42 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * THis class is a provider for Cobol keywords and their descriptions
- *
- * @author teman02
- */
-public class Keywords {
-  private static final String KEYWORDS_FILE_PATH = "LanguageKeywords.txt";
-  private static final Logger LOG = LogManager.getLogger(Keywords.class);
-  private Map<String, String> keywordsToDescriptions = new HashMap<>();
+public abstract class AbstractCompletionStorage {
+  private static final Logger LOG = LogManager.getLogger(AbstractCompletionStorage.class);
+  private Map<String, String> storage = new HashMap<>();
 
-  /**
-   * Constructor that fills the Properties with content of LanguageKeywords file. Keep it
-   * package-private to allow instantiation only on the server layer
-   */
-  Keywords() {
+  AbstractCompletionStorage() {
     Properties props = new Properties();
-    try (InputStream propertiesStream = Keywords.class.getResourceAsStream(KEYWORDS_FILE_PATH)) {
+    try (InputStream propertiesStream = getInputStream()) {
       props.load(propertiesStream);
     } catch (IOException e) {
       LOG.error(e.getMessage());
     }
-    fillInKeywords(props);
-    LOG.info("The COBOL keywords has been loaded succesfully");
+    fillInStorage(props);
+    LOG.info("The properties file has been loaded successfully");
   }
+
   /**
    * Return a full set of the registered keywords
    *
    * @return A set of keywords
    */
-  public Set<String> getKeywords() {
-    return keywordsToDescriptions.keySet();
+  Set<String> getLabels() {
+    return storage.keySet();
   }
+
   /**
    * Return a description for given keywords or null not found
    *
-   * @param keyword - Keyword to find a description
+   * @param label - Keyword to find a description
    * @return description
    */
-  public String getDescriptionFor(String keyword) {
-    return keywordsToDescriptions.get(keyword);
+  String getInformationFor(String label) {
+    return storage.get(label);
   }
 
-  private void fillInKeywords(Properties props) {
-    this.keywordsToDescriptions =
+  private void fillInStorage(Properties props) {
+    this.storage =
         props.entrySet().stream()
             .collect(
                 Collectors.toMap(
@@ -84,4 +76,6 @@ public class Keywords {
   private String processDescription(String desc) {
     return desc.replace("<br>", "\r\n\r\n");
   }
+
+  protected abstract InputStream getInputStream();
 }

@@ -13,17 +13,16 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.transformer;
 
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CONT_LINE_NO_AREA_A_REGEX;
+
 import com.ca.lsp.core.cobol.parser.listener.FormatListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CONT_LINE_NO_AREA_A_REGEX;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Process continuation lines. Any sentence, entry, clause, or phrase that requires more than one
@@ -78,8 +77,8 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
    * Method that check if the rule for fixed format is respected: when there is a continuation line
    * the content area A (7-11) should be blank.
    *
-   * @param CobolLine line - a line to be processed
-   * @param int lineNumber
+   * @param cobolLine line - a line to be processed
+   * @param lineNumber lineNumber
    */
   private void checkContentAreaAWithContinuationLine(CobolLine cobolLine, int lineNumber) {
     String line = cobolLine.toString();
@@ -146,9 +145,9 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
    */
   private int getCobolLineTrimmedLength(CobolLine lastCobolLine) {
     return (lastCobolLine.getSequenceArea()
-            + lastCobolLine.getIndicatorArea()
-            + lastCobolLine.getContentAreaA()
-            + lastCobolLine.getContentAreaB())
+                + lastCobolLine.getIndicatorArea()
+                + lastCobolLine.getContentAreaA()
+                + lastCobolLine.getContentAreaB())
             .trim()
             .length()
         - 1;
