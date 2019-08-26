@@ -1,25 +1,18 @@
-# LSP-COBOL #
-COBOL service implementing Language Server Protocol
+# LSP for COBOL Extension
 
-## Project Installation ##
+The LSP for COBOL extension standardizes the communication between language tooling and your code editor. LSP for COBOL defines the protocol that is used between an editor or IDE and a language server that provides the following COBOL syntax awareness features:
 
-#Error - Lombok dependency could not be solved
-* Step 1: Pull the project from GitHub and open it in Eclipse IDE.
-* Step 2: In order to fix all the errors regarding Lombok Dependency, go to your folder .m2/repository/org/projectlombok/lombok/1.xx.xx open a cmd and run next command "java -jar lombok-1.xx.xx.jar" (xx is your lombok version)
-* Step 3: In the lombok window, press update/install, wait few seconds and close the window.
-* Step 4: Go to your Eclipse IDE, restart it.
-* Step 5: Update Maven.
+- **Autocomplete**
+	> Provides suggestions for COBOL keywords while you type.
+- **Syntax check for keywords**
+	> Checks for mistakes and errors in COBOL code.
+- **Syntax highlighting** (with third-party plugins)
+	> Enables syntax highlighting for COBOL code as long as you have an appropriate third-party syntax highlighting extension installed.
 
-## Build project ##
+The LSP for COBOL extension for Visual Studio Code (VSC) integrates several COBOL language features into tools used in Visual Studio Code (VSC). LSP for COBOL recognizes files with the extensions .COB, .CBL and .CPY as COBOL files.
 
-```mvn org.jacoco:jacoco-maven-plugin:prepare-agent verify test-compile```
+## Prerequisites
 
-## Enable socket/pipe communication ##
-Our LSP can be spawned using two different byte stream protocols:
-- web socket
-- named pipes
-
-By default LSP is working with web socket but is possible enable the pipe mode just using the JVM property -DenablePipe=true
-Example:
-`java -jar -DenablePipe=true <LSP_FAT_JAR_LOCATION>`
-
+- NodeJS and npm (You can install them from [here](https://www.npmjs.com/get-npm) if required.)
+- Java
+- (Optional) COBOL 3rd party plugin (required for syntax highlighting)
