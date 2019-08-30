@@ -16,8 +16,7 @@ package com.ca.lsp.cobol.service;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import lombok.Data;
 import lombok.Value;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Position;
 
 import java.io.BufferedReader;
@@ -25,7 +24,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * This class stores a Cobol program text to be processed. Provides a list of lines and text tokens
@@ -34,8 +32,8 @@ import java.util.Objects;
  * @author zacan01, teman02
  */
 @Data
+@Slf4j
 public class MyDocumentModel {
-  private static final Logger LOG = LogManager.getLogger(MyDocumentModel.class);
   private static final String DELIMITER = "[ .\\[\\]()<>,*]+";
   private final List<Line> lines = new ArrayList<>();
   private final String text;
@@ -88,7 +86,7 @@ public class MyDocumentModel {
         lineNumber++;
       }
     } catch (IOException e) {
-      LOG.error(e.getMessage());
+      log.error(e.getMessage());
     }
   }
 
