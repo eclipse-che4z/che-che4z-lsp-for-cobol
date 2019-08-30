@@ -15,8 +15,8 @@ package com.ca.lsp.cobol.positive;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Collections;
@@ -36,7 +36,7 @@ public enum CobolTextRegistry {
   private static final String POSITIVE_ENTRY = "positive";
   private static final String NEGATIVE_ENTRY = "negative";
   // non-static to allow logging at the initialization stage
-  private final Logger log = LogManager.getLogger(CobolTextRegistry.class);
+  private final Logger log = LoggerFactory.getLogger(CobolTextRegistry.class);
 
   private ListMultimap<String, CobolText> texts = ArrayListMultimap.create();
 

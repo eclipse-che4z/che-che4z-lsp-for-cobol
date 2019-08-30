@@ -13,8 +13,7 @@
  */
 package com.ca.lsp.cobol.service.delegates.completions;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +23,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 public abstract class AbstractCompletionStorage {
-  private static final Logger LOG = LogManager.getLogger(AbstractCompletionStorage.class);
   private Map<String, String> storage = new HashMap<>();
 
   AbstractCompletionStorage() {
@@ -33,10 +32,10 @@ public abstract class AbstractCompletionStorage {
     try (InputStream propertiesStream = getInputStream()) {
       props.load(propertiesStream);
     } catch (IOException e) {
-      LOG.error(e.getMessage());
+      log.error(e.getMessage());
     }
     fillInStorage(props);
-    LOG.info("The properties file has been loaded successfully");
+    log.info("The properties file has been loaded successfully");
   }
 
   /**
