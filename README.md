@@ -1,6 +1,6 @@
-# LSP for COBOL Extension
+# Cobol Language Support
 
-The LSP for COBOL extension standardizes the communication between language tooling and your code editor. LSP for COBOL defines the protocol that is used between an editor or IDE and a language server that provides the following COBOL syntax awareness features:
+The Cobol Language Support standardizes the communication between language tooling and your code editor. Cobol Language Support defines the protocol that is used between an editor or IDE and a language server that provides the following COBOL syntax awareness features:
 
 - **Autocomplete**
 	> Provides suggestions for COBOL keywords while you type.
@@ -13,6 +13,5 @@ The LSP for COBOL extension for Visual Studio Code (VSC) integrates several COBO
 
 ## Prerequisites
 
-- NodeJS and npm (You can install them from [here](https://www.npmjs.com/get-npm) if required.)
 - Java
 - (Optional) COBOL 3rd party plugin (required for syntax highlighting)
