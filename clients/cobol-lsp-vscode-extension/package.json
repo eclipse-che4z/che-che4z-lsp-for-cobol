@@ -1,7 +1,7 @@
 {
-    "name": "lsp-for-cobol",
-    "displayName": "LSP for COBOL",
-    "description": "The Language Server Protocol (LSP) for COBOL extension standardizes the communication between language tooling and your code editor.",
+    "name": "cobol-language-support",
+    "displayName": "Cobol Language Support",
+    "description": "COBOL Language Support standardizes the communication between language tooling and your code editor using the Language Server Protocol (LSP) .",
     "author": "Broadcom",
     "license": "EPL-2.0",
     "version": "0.8.0",
@@ -10,7 +10,13 @@
     "engines": {
         "vscode": "^1.30.0"
     },
-    "repository": {},
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/eclipse/che-che4z-lsp-for-cobol.git"
+    },
+    "bugs": {
+        "url": "https://github.com/eclipse/che-che4z-lsp-for-cobol/issues"
+    },
     "categories": [
         "Programming Languages"
     ],
