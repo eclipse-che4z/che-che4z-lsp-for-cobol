@@ -13,6 +13,5 @@ The LSP for COBOL extension for Visual Studio Code (VSC) integrates several COBO
 
 ## Prerequisites
 
-- NodeJS and npm (You can install them from [here](https://www.npmjs.com/get-npm) if required.)
 - Java
 - (Optional) COBOL 3rd party plugin (required for syntax highlighting)
