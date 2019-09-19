@@ -23,6 +23,7 @@
     "activationEvents": [
         "onLanguage:COBOL"
     ],
+    "icon": "resources/logo.png",
     "main": "./out/extension.js",
     "contributes": {
         "languages": [

@@ -1,35 +1,16 @@
-# LSP Extension for Cobol Language
-## Run extension client in socket mode
-```
-//connection with remote LS server
-	let connectionInfo = {
-		port: <SERVER_PORT>,
-		host:<HOSTNAME>
-	};
-	let serverOptions = () => {
-		// Connect to language server via socket
-		let socket = net.connect(connectionInfo);
-		let result: StreamInfo = {
-			writer: socket,
-			reader: socket
-		};
-		return Promise.resolve(result);
-	};
+# Cobol Language Support
+The Cobol Language Support standardizes the communication between language tooling and your code editor using the Language Server Protocol (LSP) . Cobol Language Support defines the protocol that is used between an editor or IDE and a language server that provides the following COBOL syntax awareness features:
 
-	let languageClient = new LanguageClient('LSP','LSP extension for Cobol language', serverOptions, clientOptions);
-	let disposable = languageClient.start();
-```
-## Run extension client in pipe mode
+- **Autocomplete**
+	> Provides suggestions for COBOL keywords while you type.
+- **Syntax check for keywords**
+	> Checks for mistakes and errors in COBOL code.
+- **Syntax highlighting** (with third-party plugins)
+	> Enables syntax highlighting for COBOL code as long as you have an appropriate third-party syntax highlighting extension installed.
 
-```
-//spawn LSP process
-var extPath = extensions.getExtension('BROADCOM.vscode-languageserver-extension').extensionPath;
-let serverOptions: Executable = {
-	command: 'java',
-	args: [ "-jar",`${extPath}/lsp-service-cobol-1.0.1-jar-with-dependencies.jar`, "pipeEnabled"],
-	options: {stdio:  'pipe', detached: true}
-};
+The Cobol Language Support  extension for Visual Studio Code (VSC) integrates several COBOL language features into tools used in Visual Studio Code (VSC). Cobol Language Support  recognizes files with the extensions .COB, .CBL and .CPY as COBOL files.
 
-let languageClient = new LanguageClient('LSP','LSP extension for Cobol language', serverOptions, clientOptions);
-let disposable = languageClient.start();
-```
+## Prerequisites
+
+- Java
+- (Optional) COBOL 3rd party plugin (required for syntax highlighting)

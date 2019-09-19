@@ -13,24 +13,37 @@
  */
 
 import * as net from "net";
-import { ExtensionContext, StatusBarAlignment, window } from "vscode";
-import { LanguageClient, LanguageClientOptions, StreamInfo } from "vscode-languageclient/lib/main";
+import {ExtensionContext, extensions, StatusBarAlignment, window} from "vscode";
+import {
+    Executable,
+    LanguageClient,
+    LanguageClientOptions,
+} from "vscode-languageclient/lib/main";
 
 export function activate(context: ExtensionContext) {
-    // connection with remote LS server
-    const connectionInfo = {
-        host: "localhost",
-        port: 1044,
-    };
-    const serverOptions = () => {
-        // Connect to language server via socket
-        const socket = net.connect(connectionInfo);
-        const result: StreamInfo = {
-            reader: socket,
-            writer: socket,
-        };
-        return Promise.resolve(result);
-    };
+    const fs = require("fs");
+
+    // path resolved to identify the location of the LSP server into the extension
+    const extPath = extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
+    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.8.0.jar`;
+
+    let serverOptions: Executable;
+
+    try {
+        if (fs.existsSync(LSPServerPath)) {
+            serverOptions = {
+                args: ["-Dline.separator=\r\n", "-jar", LSPServerPath, "pipeEnabled"],
+                command: "java",
+                options: { stdio: "pipe", detached: false },
+            };
+        } else {
+            window.showErrorMessage("Cobol extension failed to start - LSP server not found");
+            return;
+        }
+    } catch (err) {
+        window.showErrorMessage(err);
+        return;
+    }
 
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
