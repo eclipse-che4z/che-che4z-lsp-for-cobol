@@ -1,4 +1,4 @@
-# LSP for COBOL Extension
+# Cobol Language Support
 The Cobol Language Support standardizes the communication between language tooling and your code editor using the Language Server Protocol (LSP) . Cobol Language Support defines the protocol that is used between an editor or IDE and a language server that provides the following COBOL syntax awareness features:
 
 - **Autocomplete**
