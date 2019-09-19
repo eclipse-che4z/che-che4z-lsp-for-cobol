@@ -58,7 +58,7 @@
 			<dependency>
 				<groupId>com.ca.lsp</groupId>
 				<artifactId>lsp-core-cobol-parser</artifactId>
-				<version>1.0.0-SNAPSHOT</version>
+				<version>0.8.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.antlr</groupId>
