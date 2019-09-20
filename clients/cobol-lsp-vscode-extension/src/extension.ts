@@ -44,7 +44,7 @@ export async function activate(context: ExtensionContext) {
             return;
         }
     } catch (err) {
-        window.showErrorMessage(err);
+        window.showErrorMessage(err.toString());
         return;
     }
 
@@ -69,19 +69,19 @@ async function isJavaInstalled() {
         const ls = cp.spawn("java", ["-version"]);
         ls.stderr.on("data", (data: any) => {
             if (!data.toString().includes('java version "1.8')) {
-                return reject("Java version 8 expected");
+                reject("Java version 8 expected");
             }
-            return resolve();
+            resolve();
         });
         ls.on("error", (code: any) => {
-            if ("Error: spawn java ENOENT" === code) {
+            if ("Error: spawn java ENOENT" === code.toString()) {
                 reject("Java 8 is not found");
             }
-            return reject(code);
+            reject(code);
         });
         ls.on("close", (code: number) => {
             if (code !== 0) {
-                return reject("An error occured when checking if Java was installed");
+                reject("An error occured when checking if Java was installed");
             }
         });
     });
