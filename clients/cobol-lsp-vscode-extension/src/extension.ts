@@ -13,13 +13,11 @@
  */
 
 import * as cp from "child_process";
-import * as net from "net";
 import {ExtensionContext, extensions, StatusBarAlignment, window} from "vscode";
 import {
     Executable,
     LanguageClient,
     LanguageClientOptions,
-    StreamInfo,
 } from "vscode-languageclient/lib/main";
 
 export async function activate(context: ExtensionContext) {
