@@ -79,7 +79,7 @@ async function isJavaInstalled() {
         });
         ls.on("close", (code: number) => {
             if (code !== 0) {
-                reject("An error occured when checking if Java was installed");
+                reject("An error occurred when checking if Java was installed");
             }
         });
     });
