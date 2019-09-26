@@ -22,16 +22,17 @@ import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 public class MyLanguageServerImpl implements IMyLanguageServer {
-
   private LanguageClient client;
   private TextDocumentService textService;
-  private WorkspaceService workspaceService;
+  private CobolWorkspaceServiceImpl workspaceService;
 
   public MyLanguageServerImpl() {
+
     textService = new MyTextDocumentService(this);
-    workspaceService = new MyWorkspaceService();
+    workspaceService = CobolWorkspaceServiceImpl.getInstance();
   }
 
+  @Override
   public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
     ServerCapabilities capabilities = new ServerCapabilities();
 
@@ -46,9 +47,19 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
     capabilities.setCodeLensProvider(null);
     capabilities.setDocumentFormattingProvider(Boolean.TRUE);
 
+    WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
+    workspaceFoldersOptions.setSupported(Boolean.TRUE);
+    WorkspaceServerCapabilities workspaceServiceCapabilities =
+        new WorkspaceServerCapabilities(workspaceFoldersOptions);
+    capabilities.setWorkspace(workspaceServiceCapabilities);
+
+    // from a given URI the scan search for a folder that contains copybooks and return it as list
+    workspaceService.scanWorkspaceForCopybooks(params.getWorkspaceFolders());
+
     return CompletableFuture.supplyAsync(() -> new InitializeResult(capabilities));
   }
 
+  @Override
   public CompletableFuture<Object> shutdown() {
     return CompletableFuture.supplyAsync(() -> Boolean.TRUE);
   }
@@ -60,22 +71,22 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
 
   @Override
   public TextDocumentService getTextDocumentService() {
-    return this.textService;
+    return textService;
   }
 
   @Override
   public WorkspaceService getWorkspaceService() {
-    return this.workspaceService;
+    return workspaceService;
   }
 
   @Override
   public void setPipeRemoteProxy(LanguageClient languageClient) {
-    this.client = languageClient;
+    client = languageClient;
   }
 
   @Override
   public Runnable setSocketRemoteProxy(LanguageClient languageClient) {
-    return () -> this.client = languageClient;
+    return () -> client = languageClient;
   }
 
   @Override
