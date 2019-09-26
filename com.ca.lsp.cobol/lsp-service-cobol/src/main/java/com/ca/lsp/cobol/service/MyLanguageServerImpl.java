@@ -13,23 +13,28 @@
  */
 package com.ca.lsp.cobol.service;
 
-import org.eclipse.lsp4j.*;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+import org.eclipse.lsp4j.CompletionOptions;
+import org.eclipse.lsp4j.InitializeParams;
+import org.eclipse.lsp4j.InitializeResult;
+import org.eclipse.lsp4j.ServerCapabilities;
+import org.eclipse.lsp4j.TextDocumentSyncKind;
+import org.eclipse.lsp4j.WorkspaceFoldersOptions;
+import org.eclipse.lsp4j.WorkspaceServerCapabilities;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
-import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
-
 public class MyLanguageServerImpl implements IMyLanguageServer {
-
   private LanguageClient client;
   private TextDocumentService textService;
-  private WorkspaceService workspaceService;
+  private CobolWorkspaceServiceImpl workspaceService;
 
   public MyLanguageServerImpl() {
+
     textService = new MyTextDocumentService(this);
-    workspaceService = new MyWorkspaceService();
+    workspaceService = CobolWorkspaceServiceImpl.getInstance();
   }
 
   public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
@@ -46,6 +51,15 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
     capabilities.setCodeLensProvider(null);
     capabilities.setDocumentFormattingProvider(Boolean.TRUE);
 
+    WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
+    workspaceFoldersOptions.setSupported(Boolean.TRUE);
+    WorkspaceServerCapabilities workspaceServiceCapabilities =
+        new WorkspaceServerCapabilities(workspaceFoldersOptions);
+    capabilities.setWorkspace(workspaceServiceCapabilities);
+
+    // from a given URI the scan search for a folder that contains copybooks and return it as list
+    workspaceService.scanWorkspaceForCopybooks(params.getWorkspaceFolders());
+
     return CompletableFuture.supplyAsync(() -> new InitializeResult(capabilities));
   }
 
@@ -60,22 +74,22 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
 
   @Override
   public TextDocumentService getTextDocumentService() {
-    return this.textService;
+    return textService;
   }
 
   @Override
   public WorkspaceService getWorkspaceService() {
-    return this.workspaceService;
+    return workspaceService;
   }
 
   @Override
   public void setPipeRemoteProxy(LanguageClient languageClient) {
-    this.client = languageClient;
+    client = languageClient;
   }
 
   @Override
   public Runnable setSocketRemoteProxy(LanguageClient languageClient) {
-    return () -> this.client = languageClient;
+    return () -> client = languageClient;
   }
 
   @Override
