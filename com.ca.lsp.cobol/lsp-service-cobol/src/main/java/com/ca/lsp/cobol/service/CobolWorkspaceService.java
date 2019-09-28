@@ -13,6 +13,4 @@
  */
 package com.ca.lsp.cobol.service;
 
-import org.eclipse.lsp4j.services.WorkspaceService;
-
-interface CobolWorkspaceService extends WorkspaceService {}
+interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService {}

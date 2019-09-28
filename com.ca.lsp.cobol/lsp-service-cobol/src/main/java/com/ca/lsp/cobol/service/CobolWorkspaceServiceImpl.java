@@ -37,7 +37,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   private static final String URI_FILE_SEPARATOR = "/";
   private List<String> copybookList = new ArrayList<>();
 
-  private CobolWorkspaceServiceImpl() {}
+  CobolWorkspaceServiceImpl() {}
 
   static CobolWorkspaceServiceImpl getInstance() {
     if (INSTANCE == null) INSTANCE = new CobolWorkspaceServiceImpl();
