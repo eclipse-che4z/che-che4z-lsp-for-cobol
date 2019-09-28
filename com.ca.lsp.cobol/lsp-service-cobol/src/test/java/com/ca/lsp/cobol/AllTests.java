@@ -15,9 +15,10 @@ package com.ca.lsp.cobol;
 
 import com.ca.lsp.cobol.negative.NegativeTestSuite;
 import com.ca.lsp.cobol.positive.PositiveTest;
+import com.ca.lsp.cobol.service.DefinitionsAndUsagesTest;
 import com.ca.lsp.cobol.service.MyDocumentModelTest;
 import com.ca.lsp.cobol.service.MyTextDocumentServiceTest;
-import com.ca.lsp.cobol.service.DefinitionsAndUsagesTest;
+import com.ca.lsp.cobol.service.WorkspaceServiceTest;
 import com.ca.lsp.cobol.service.delegates.LanguageEnginesTest;
 import com.ca.lsp.cobol.service.delegates.ValidationTest;
 import com.ca.lsp.cobol.service.delegates.completions.CompletionsChainTest;
@@ -51,6 +52,7 @@ import org.junit.runners.Suite.SuiteClasses;
   SnippetCompletionTest.class,
   ReferencesTest.class,
   DefinitionsAndUsagesTest.class,
-  TestResponsesNotContainLineBreaks.class
+  TestResponsesNotContainLineBreaks.class,
+  WorkspaceServiceTest.class
 })
 public class AllTests {}
