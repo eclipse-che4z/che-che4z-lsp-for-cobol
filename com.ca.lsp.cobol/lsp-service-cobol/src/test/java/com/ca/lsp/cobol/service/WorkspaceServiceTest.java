@@ -1,22 +1,27 @@
 package com.ca.lsp.cobol.service;
 
-import static junit.framework.TestCase.assertEquals;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp4j.WorkspaceFolder;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import org.eclipse.lsp4j.WorkspaceFolder;
-import org.junit.Before;
-import org.junit.Test;
 
+import static junit.framework.TestCase.assertEquals;
+
+@Slf4j
 public class WorkspaceServiceTest {
   private static final String FOLDER_NAME = "test";
-  private Path workspaceFolderPath = null;
+  private URI workspaceFolderPath = null;
   private List<WorkspaceFolder> workspaceFolderList = new ArrayList<>();
 
   private CobolWorkspaceServiceImpl cobolWorkspaceService = new CobolWorkspaceServiceImpl();
@@ -27,7 +32,7 @@ public class WorkspaceServiceTest {
 
     WorkspaceFolder workspaceFolder = new WorkspaceFolder();
     workspaceFolder.setName(FOLDER_NAME);
-    workspaceFolder.setUri(getWorkspaceFolderPath().toUri().toString());
+    workspaceFolder.setUri(adjustURI(getWorkspaceFolderPath().toString()));
     workspaceFolderList.add(workspaceFolder);
     cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
   }
@@ -35,54 +40,66 @@ public class WorkspaceServiceTest {
   @Test
   public void getCopyBookList() {
     assertEquals(cobolWorkspaceService.getCopybookList().size(), 1);
-    removeAllCopybooksFilesAtShutdown(getWorkspaceFolderPath().toAbsolutePath().toString());
   }
 
-  private void removeAllCopybooksFilesAtShutdown(String dir) {
+  @After
+  public void cleanupTempFolder() {
+    removeAllCopybooksFilesAtShutdown(getWorkspaceFolderPath());
+  }
+
+  private void removeAllCopybooksFilesAtShutdown(URI outerDirectoryPath) {
     try {
-      System.out.println(dir);
-      Files.walk(Paths.get(dir))
+      Files.walk(Paths.get(outerDirectoryPath))
           .sorted(Comparator.reverseOrder())
           .map(Path::toFile)
           .forEach(File::delete);
+
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
   private void createTempDirAndFile() {
+    Path workspacePath =
+        Paths.get(
+            System.getProperty("java.io.tmpdir")
+                + System.getProperty("file.separator")
+                + "WORKSPACE");
+
+    Path copybooksPath =
+        Paths.get(workspacePath + System.getProperty("file.separator") + "COPYBOOKS");
+
     try {
+      if (!Files.exists(workspacePath)) {
+        Files.createDirectory(workspacePath);
+      }
 
-      Path parentTempDir =
-          Files.createDirectory(Paths.get(System.getProperty("java.io.tmpdir") + "cpyfolderRoot"));
+      if (!Files.exists(copybooksPath)) {
+        Files.createDirectory(copybooksPath);
+      }
 
-      Path copyBookTempDir =
-          Files.createDirectory(
-              Paths.get(
-                  parentTempDir.toAbsolutePath()
-                      + System.getProperty("file.separator")
-                      + "COPYBOOKS"));
-
-      Path tempFile =
-          Files.createFile(
-              Paths.get(
-                  copyBookTempDir.toAbsolutePath()
-                      + System.getProperty("file.separator")
-                      + "test.cpy"));
-
-      // Path tempFile = Files.createFile(copyBookTempDir, "COPYBOOK", ".cpy");
-      setWorkspaceFolderPath(parentTempDir.toAbsolutePath());
-
+      Files.createFile(
+          Paths.get(copybooksPath + System.getProperty("file.separator") + "copy.cpy"));
     } catch (IOException e) {
       e.printStackTrace();
     }
+
+    setWorkspaceFolderPath(workspacePath.toUri());
   }
 
-  private Path getWorkspaceFolderPath() {
+  private URI getWorkspaceFolderPath() {
     return workspaceFolderPath;
   }
 
-  private void setWorkspaceFolderPath(Path workspaceFolderPath) {
+  private void setWorkspaceFolderPath(URI workspaceFolderPath) {
     this.workspaceFolderPath = workspaceFolderPath;
+  }
+
+  /*
+  Remove the last slash from the URI path in order to replicate the behaviour of the client IDE that send to the server
+  the path of the opened workspace without the last slash.
+   */
+  private String adjustURI(String originalUri) {
+    return originalUri.substring(0, originalUri.length() - 1);
   }
 }

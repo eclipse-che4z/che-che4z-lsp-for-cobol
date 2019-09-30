@@ -13,6 +13,9 @@
  */
 package com.ca.lsp.cobol.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp4j.*;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -22,12 +25,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp4j.DidChangeConfigurationParams;
-import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
-import org.eclipse.lsp4j.SymbolInformation;
-import org.eclipse.lsp4j.WorkspaceFolder;
-import org.eclipse.lsp4j.WorkspaceSymbolParams;
 
 @Slf4j
 public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
@@ -85,7 +82,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   }
 
   /** @return List of copybooks */
-  public List<String> getCopybookList() {
+  List<String> getCopybookList() {
     return copybookList;
   }
 }
