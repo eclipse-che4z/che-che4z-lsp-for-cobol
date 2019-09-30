@@ -13,18 +13,13 @@
  */
 package com.ca.lsp.cobol.service;
 
-import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
-import org.eclipse.lsp4j.CompletionOptions;
-import org.eclipse.lsp4j.InitializeParams;
-import org.eclipse.lsp4j.InitializeResult;
-import org.eclipse.lsp4j.ServerCapabilities;
-import org.eclipse.lsp4j.TextDocumentSyncKind;
-import org.eclipse.lsp4j.WorkspaceFoldersOptions;
-import org.eclipse.lsp4j.WorkspaceServerCapabilities;
+import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
+
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 
 public class MyLanguageServerImpl implements IMyLanguageServer {
   private LanguageClient client;
@@ -37,6 +32,7 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
     workspaceService = CobolWorkspaceServiceImpl.getInstance();
   }
 
+  @Override
   public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
     ServerCapabilities capabilities = new ServerCapabilities();
 
@@ -63,6 +59,7 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
     return CompletableFuture.supplyAsync(() -> new InitializeResult(capabilities));
   }
 
+  @Override
   public CompletableFuture<Object> shutdown() {
     return CompletableFuture.supplyAsync(() -> Boolean.TRUE);
   }

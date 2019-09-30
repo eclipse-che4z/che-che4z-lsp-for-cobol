@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 @Slf4j
 public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
@@ -34,7 +35,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   private static final String URI_FILE_SEPARATOR = "/";
   private List<String> copybookList = new ArrayList<>();
 
-  CobolWorkspaceServiceImpl() {}
+  private CobolWorkspaceServiceImpl() {}
 
   static CobolWorkspaceServiceImpl getInstance() {
     if (INSTANCE == null) INSTANCE = new CobolWorkspaceServiceImpl();
@@ -46,11 +47,11 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    *     workspace opened in the client)
    */
   private void createCopybookList(WorkspaceFolder workspaceFolder) {
-    try {
-      Path directoryPath =
-          Paths.get(new URI(workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME));
-
-      Files.list(directoryPath).forEach(file -> copybookList.add(file.toString()));
+    try (Stream<Path> copybookFoldersStream =
+        Files.list(
+            Paths.get(
+                new URI(workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME)))) {
+      copybookFoldersStream.forEach(file -> copybookList.add(file.toString()));
     } catch (URISyntaxException | IOException e) {
       log.error(e.getMessage());
     }
