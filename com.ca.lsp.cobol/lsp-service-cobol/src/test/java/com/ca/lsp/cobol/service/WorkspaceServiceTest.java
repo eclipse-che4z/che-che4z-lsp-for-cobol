@@ -24,7 +24,7 @@ public class WorkspaceServiceTest {
   private URI workspaceFolderPath = null;
   private List<WorkspaceFolder> workspaceFolderList = new ArrayList<>();
 
-  private CobolWorkspaceServiceImpl cobolWorkspaceService = new CobolWorkspaceServiceImpl();
+  private CobolWorkspaceServiceImpl cobolWorkspaceService = CobolWorkspaceServiceImpl.getInstance();
 
   @Before
   public void scanWorkspaceForCopybooks() {
