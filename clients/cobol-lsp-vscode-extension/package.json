@@ -1,6 +1,6 @@
 {
     "name": "cobol-language-support",
-    "displayName": "Cobol Language Support",
+    "displayName": "COBOL Language Support",
     "description": "COBOL Language Support standardizes the communication between language tooling and your code editor using the Language Server Protocol (LSP) .",
     "author": "Broadcom",
     "license": "EPL-2.0",

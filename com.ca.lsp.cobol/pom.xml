@@ -20,7 +20,7 @@
 	<artifactId>com.ca.lsp.cobol</artifactId>
 	<version>0.8.1</version>
 	<packaging>pom</packaging>
-	<name>CA COBOL LSP :: Parent pom</name>
+	<name>COBOL LSP :: Parent pom</name>
 
 	<properties>
 		<lsp4j.version>0.5.0</lsp4j.version>
