@@ -25,7 +25,7 @@
 	</parent>
 	<artifactId>lsp-core-cobol-parser</artifactId>
 	<version>0.8.0</version>
-	<name>CA COBOL LSP :: LSP Core</name>
+	<name>COBOL LSP :: LSP Core</name>
 	<packaging>jar</packaging>
 
 	<properties>

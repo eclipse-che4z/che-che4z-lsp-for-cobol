@@ -13,8 +13,8 @@
  *   Broadcom, Inc. - initial API and implementation
 -->
 
-# Cobol LSP server running information
-Put in this folder the Cobol LSP server jar with this name
+# COBOL LSP server running information
+Put in this folder the COBOL LSP server jar with this name
 
 ```
 lsp-service-cobol-0.8.0.jar
