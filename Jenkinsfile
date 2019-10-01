@@ -45,7 +45,8 @@ pipeline {
                     sh "ls"
                     sh "cd ./clients/cobol-lsp-vscode-extension"
                     sh "ls"
-                    sh "npm ci"
+                    sh "npm ci -prefix $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
+                    // sh "npm ci"
                     sh "npm test"
                 }
             }
