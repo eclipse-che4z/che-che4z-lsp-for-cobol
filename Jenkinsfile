@@ -33,7 +33,7 @@ pipeline {
     }
     environment {
        branchName = "${env.BRANCH_NAME}"
-       HOME="."
+    //    HOME="."
     }
     stages {
         stage('Install & Test') {
