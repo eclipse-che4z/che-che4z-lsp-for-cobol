@@ -42,6 +42,9 @@ pipeline {
             }
             steps {
                 container('node') {
+                    for(e in env){
+                        echo e + " is " + ${e}
+                    }
                     sh "echo ${env.WORKSPACE}"
                     sh "echo ${env}"
                     sh "pwd"
