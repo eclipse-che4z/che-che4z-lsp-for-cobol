@@ -51,12 +51,13 @@ pipeline {
                     //     }
                     // }
                     sh "echo ${env.WORKSPACE}"
+                    sh "echo home: $HOME"
                     // sh "echo ${env}"
                     sh "pwd"
                     sh "ls"
                     // sh "cd $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
+                    sh "cd clients/cobol-lsp-vscode-extension"
                     sh "pwd"
-                    sh "cd ./clients/cobol-lsp-vscode-extension"
                     sh "ls"
                     sh "npm ci"
                     sh "ls"
