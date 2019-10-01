@@ -37,16 +37,19 @@ pipeline {
     stages {
         stage('Install & Test') {
             environment {
-                npm_config_cache = "${env.WORKSPACE}"
+                npm_config_cache = "${env.WORKSPACE}/clients/cobol-lsp-vscode-extension"
             }
             steps {
                 container('node') {
+                    sh "${env.WORKSPACE}"
                     sh "pwd"
                     sh "ls"
                     sh "cd $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
+                    sh "pwd"
                     // sh "cd ./clients/cobol-lsp-vscode-extension"
                     sh "ls"
                     sh "npm ci"
+                    sh "ls"
                     // sh "npm ci -prefix $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
                     sh "npm test"
                 }
