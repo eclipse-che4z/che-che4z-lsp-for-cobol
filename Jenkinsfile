@@ -51,6 +51,7 @@ pipeline {
                             pwd
                             ls
                             echo "npm ci"
+                            echo 'npm ci dingle quotes'
                             npm ci
                             ls
                             echo "npm run vscode:prepublish"
