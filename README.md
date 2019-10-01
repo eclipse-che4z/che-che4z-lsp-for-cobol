@@ -1,6 +1,6 @@
-# Cobol Language Support
+# COBOL Language Support
 
-The Cobol Language Support standardizes the communication between language tooling and your code editor. Cobol Language Support defines the protocol that is used between an editor or IDE and a language server that provides the following COBOL syntax awareness features:
+The COBOL Language Support standardizes the communication between language tooling and your code editor. COBOL Language Support defines the protocol that is used between an editor or IDE and a language server that provides the following COBOL syntax awareness features:
 
 - **Autocomplete**
 	> Provides suggestions for COBOL keywords while you type.
