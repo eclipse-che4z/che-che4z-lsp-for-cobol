@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ca.lsp</groupId>
     <artifactId>com.ca.lsp.cobol</artifactId>
-    <version>0.8.0</version>
+	<version>0.8.1</version>
     <packaging>pom</packaging>
 	<name>COBOL LSP :: Parent pom</name>
 
@@ -66,12 +66,12 @@
             <dependency>
                 <groupId>com.ca.lsp</groupId>
                 <artifactId>lsp-core-cobol-parser</artifactId>
-                <version>0.8.0</version>
+                <version>0.8.1</version>
             </dependency>
             <dependency>
                 <groupId>com.ca.lsp</groupId>
                 <artifactId>lsp-core-domain</artifactId>
-                <version>0.8.0</version>
+                <version>0.8.1</version>
             </dependency>
             <dependency>
                 <groupId>org.antlr</groupId>
