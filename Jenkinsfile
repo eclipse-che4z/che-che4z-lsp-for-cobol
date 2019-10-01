@@ -46,7 +46,8 @@ pipeline {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
                         // sh '''#!/usr/bin/env bash
-                        sh '''#!/usr/bin/env
+                        // sh '''#!/usr/bin/env
+                        sh '''
                             # Test compilation to catch any errors
                             pwd
                             ls
