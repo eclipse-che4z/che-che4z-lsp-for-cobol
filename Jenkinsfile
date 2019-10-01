@@ -44,7 +44,7 @@ pipeline {
                 container('node') {
                     script {
                         for(e in env){
-                            echo e + " is: "
+                            echo e
                             echo ${e}
                         }
                     }
