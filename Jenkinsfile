@@ -44,7 +44,8 @@ pipeline {
                 container('node') {
                     script {
                         for(e in env){
-                            echo e + " is " + ${e}
+                            echo e + " is: "
+                            echo ${e}
                         }
                     }
                     sh "echo ${env.WORKSPACE}"
