@@ -43,7 +43,7 @@ pipeline {
             steps {
                 container('node') {
                     script {
-                        for(e in ${env}){
+                        for(e in "${env}"){
                             echo e
                             echo ${e}
                         }
