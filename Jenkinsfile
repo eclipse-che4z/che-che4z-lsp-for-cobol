@@ -43,12 +43,11 @@ pipeline {
                 container('node') {
                     sh "pwd"
                     sh "ls"
-                    sh "cd $PWD/clients/cobol-lsp-vscode-extension"
+                    sh "cd $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
                     // sh "cd ./clients/cobol-lsp-vscode-extension"
                     sh "ls"
-                    sh "npm ci -prefix $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
+                    sh "npm ci"
                     // sh "npm ci -prefix $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
-                    // sh "npm ci"
                     sh "npm test"
                 }
             }
