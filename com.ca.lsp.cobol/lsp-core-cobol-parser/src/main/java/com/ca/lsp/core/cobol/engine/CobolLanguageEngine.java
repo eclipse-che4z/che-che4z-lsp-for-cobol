@@ -31,7 +31,12 @@ import com.ca.lsp.core.cobol.visitor.CobolVisitor;
 import com.google.common.collect.Lists;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +51,7 @@ public class CobolLanguageEngine {
   @Getter private List<SyntaxError> errors = new ArrayList<>();
   @Getter private LanguageContext variables = new CobolVariableContext();
   @Getter private LanguageContext paragraphs = new CobolParagraphContext();
+  @Getter private List<File> copybookList;
 
   @SuppressWarnings("unused")
   private CobolParserParams createDefaultParams(final File cobolFile) {
@@ -55,10 +61,16 @@ public class CobolLanguageEngine {
     return result;
   }
 
+  private CobolParserParams createParams() {
+    final CobolParserParams result = new CobolParserParamsImpl();
+    result.setCopyBookFiles(copybookList);
+    return result;
+  }
+
   public void run(String in) {
     CobolPreprocessorImpl preprocessor = new CobolPreprocessorImpl();
     preprocessor.setFormatErrors(new FormatListener(errors));
-    final String preProcessedInput = preprocessor.process(in, sourceFormat);
+    final String preProcessedInput = preprocessor.process(in, sourceFormat, createParams());
     doParse(preProcessedInput);
   }
 
@@ -84,5 +96,9 @@ public class CobolLanguageEngine {
     tourist.setParagraphContext((CobolParagraphContext) paragraphs);
     tourist.visit(tree);
     errors.forEach(errs -> LOG.debug(errs.printSyntaxError()));
+  }
+
+  public void setCopybookList(List<File> copybookList) {
+    this.copybookList = copybookList;
   }
 }
