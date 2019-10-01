@@ -45,7 +45,8 @@ pipeline {
             steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
-                        sh '''#!/usr/bin/env bash
+                        // sh '''#!/usr/bin/env bash
+                        sh '''#!/usr/bin/env
                             # Test compilation to catch any errors
                             npm run vscode:prepublish
                             # Package for prod
