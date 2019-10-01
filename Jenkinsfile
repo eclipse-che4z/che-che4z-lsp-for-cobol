@@ -48,6 +48,12 @@ pipeline {
                         // sh '''#!/usr/bin/env bash
                         sh '''#!/usr/bin/env
                             # Test compilation to catch any errors
+                            pwd
+                            ls
+                            echo "npm ci"
+                            npm ci
+                            ls
+                            echo "npm run vscode:prepublish"
                             npm run vscode:prepublish
                             # Package for prod
                             npm i vsce
