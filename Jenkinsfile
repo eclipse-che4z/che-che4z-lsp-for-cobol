@@ -41,6 +41,10 @@ pipeline {
             }
             steps {
                 container('node') {
+                    sh "pwd"
+                    sh "ls"
+                    sh "cd clients/cobol-lsp-vscode-extension"
+                    sh "ls"
                     sh "npm ci"
                     sh "npm test"
                 }
