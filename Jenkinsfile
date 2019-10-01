@@ -44,6 +44,21 @@ pipeline {
             }
             steps {
                 container('node') {
+                    dir('clients/cobol-lsp-vscode-extension') {
+                        sh '''#!/usr/bin/env bash
+                            # Test compilation to catch any errors
+                            npm run vscode:prepublish
+                            # Package for prod
+                            npm i vsce
+                            npx vsce package
+                            # rename to have datetime for clarity + prevent collisions
+                            export artifact_name=$(basename *.vsix)
+                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%F-%H%M').vsix}
+                        '''
+
+                        // Note there must be exactly one .vsix
+                        stash includes: '*.vsix', name: 'deployables'
+                    }
                     // script {
                     //     for(e in env){
                     //         echo e
