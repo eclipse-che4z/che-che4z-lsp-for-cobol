@@ -16,6 +16,7 @@ package com.ca.lsp.cobol.service;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,11 +34,11 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
 
   private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
   private static final String URI_FILE_SEPARATOR = "/";
-  private List<String> copybookList = new ArrayList<>();
+  private List<File> copybookList = new ArrayList<>();
 
   private CobolWorkspaceServiceImpl() {}
 
-  static CobolWorkspaceServiceImpl getInstance() {
+  public static CobolWorkspaceServiceImpl getInstance() {
     if (INSTANCE == null) INSTANCE = new CobolWorkspaceServiceImpl();
     return INSTANCE;
   }
@@ -51,7 +52,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
         Files.list(
             Paths.get(
                 new URI(workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME)))) {
-      copybookFoldersStream.forEach(file -> copybookList.add(file.toString()));
+      copybookFoldersStream.map(Path::toFile).forEach(copybookList::add);
     } catch (URISyntaxException | IOException e) {
       log.error(e.getMessage());
     }
@@ -79,11 +80,10 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    */
   void scanWorkspaceForCopybooks(List<WorkspaceFolder> workspaceFolders) {
     workspaceFolders.forEach(this::createCopybookList);
-    copybookList.forEach(log::info);
   }
 
   /** @return List of copybooks */
-  List<String> getCopybookList() {
+  public List<File> getCopybookList() {
     return copybookList;
   }
 }
