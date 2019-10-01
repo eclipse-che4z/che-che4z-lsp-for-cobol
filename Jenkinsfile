@@ -33,6 +33,7 @@ pipeline {
     }
     environment {
        branchName = "${env.BRANCH_NAME}"
+       HOME="."
     }
     stages {
         stage('Install & Test') {
@@ -43,14 +44,14 @@ pipeline {
             }
             steps {
                 container('node') {
-                    script {
-                        for(e in env){
-                            echo e
-                            // echo ${e}
-                        }
-                    }
+                    // script {
+                    //     for(e in env){
+                    //         echo e
+                    //         // echo ${e}
+                    //     }
+                    // }
                     sh "echo ${env.WORKSPACE}"
-                    sh "echo ${env}"
+                    // sh "echo ${env}"
                     sh "pwd"
                     sh "ls"
                     sh "cd $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
