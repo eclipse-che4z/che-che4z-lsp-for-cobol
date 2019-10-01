@@ -45,7 +45,7 @@ pipeline {
                     script {
                         for(e in "${env}"){
                             echo e
-                            echo ${e}
+                            echo "${e}"
                         }
                     }
                     sh "echo ${env.WORKSPACE}"
