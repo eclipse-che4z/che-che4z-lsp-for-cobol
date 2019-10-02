@@ -43,8 +43,8 @@ pipeline {
         // disableConcurrentBuilds()
         timestamps()
         timeout(time: 3, unit: 'HOURS')
-        skipDefaultCheckout(false)
-        // skipDefaultCheckout(true)
+        // skipDefaultCheckout(false)
+        skipDefaultCheckout(true)
     }
     environment {
        branchName = "${env.BRANCH_NAME}"
@@ -64,21 +64,24 @@ pipeline {
         //         }
         //      }
         // }
-        stage('Install & Test') {
+        stage('Install & Test Client') {
             environment {
                 npm_config_cache = "${env.WORKSPACE}"
             }
             steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
+                        // sh '''
+                        //     pwd
+                        //     npm ci
+                        //     npm i vsce
+                        //     npx vsce package
+                        //     # rename
+                        //     export artifact_name=$(basename *.vsix)
+                        //     mv -v $artifact_name ${artifact_name/.vsix/_$(TZ='Europe/Prague' date +'%FT%H%M%S').vsix}
+                        // '''
                         sh '''
-                            pwd
-                            npm ci
-                            npm i vsce
-                            npx vsce package
-                            # rename
-                            export artifact_name=$(basename *.vsix)
-                            mv -v $artifact_name ${artifact_name/.vsix/_$(TZ='Europe/Prague' date +'%FT%H%M%S').vsix}
+                            TZ='Europe/Prague' date
                         '''
                     }
                 }
