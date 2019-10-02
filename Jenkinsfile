@@ -69,10 +69,10 @@ pipeline {
                 npm_config_cache = "${env.WORKSPACE}"
             }
             steps {
-                script {
-                    // def date = new Date()
-                    // println date
-                }
+                // script {
+                //     // def date = new Date()
+                //     // println date
+                // }
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
                         // sh '''
@@ -86,6 +86,7 @@ pipeline {
                         // '''
                         sh '''
                             date -d "today + 2 hour" +'%FT%H:%M:%S'
+                            date +'%FT%H:%M:%S'
                         '''
                     }
                 }
