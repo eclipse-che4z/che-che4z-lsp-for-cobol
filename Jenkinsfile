@@ -59,7 +59,7 @@ pipeline {
                             npx vsce package
                             # rename
                             export artifact_name=$(basename *.vsix)
-                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%F-%H%M%S').vsix}
+                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%FT%H%M%S').vsix}
                         '''
                     }
                 }
