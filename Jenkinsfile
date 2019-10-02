@@ -57,9 +57,9 @@ pipeline {
                 container('maven') {
                     dir('com.ca.lsp.cobol') {
                         sh 'mvn -version'
-                        sh 'mvn clean verify'
+                        // sh 'mvn clean verify'
                         sh 'mvn clean install'
-                        // sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar server/'
+                        sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar clients/cobol-lsp-vscode-extension/server/'
                     }
                 }
              }
