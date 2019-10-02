@@ -86,6 +86,7 @@ pipeline {
                         // '''
                         sh '''
                         date
+                        date -d '$(date)'
                         date -d "$(date)"
                         date -d "$(date) +2hour" +'%FT%H:%M:%S'
                         '''
