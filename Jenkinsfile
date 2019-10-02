@@ -59,7 +59,7 @@ pipeline {
                         sh 'mvn -version'
                         // sh 'mvn clean verify'
                         sh 'mvn clean install'
-                        sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar clients/cobol-lsp-vscode-extension/server/'
+                        sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
                     }
                 }
              }
