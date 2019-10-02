@@ -70,8 +70,8 @@ pipeline {
             }
             steps {
                 script {
-                    def date = new Date()
-                    println date
+                    // def date = new Date()
+                    // println date
                 }
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
@@ -85,47 +85,44 @@ pipeline {
                         //     mv -v $artifact_name ${artifact_name/.vsix/_$(TZ='Europe/Prague' date +'%FT%H%M%S').vsix}
                         // '''
                         sh '''
-                            3env TZ=Europe/Prague date
-                            date +'%FT%H%M%S'
-                            date + 2 +'%FT%H%M%S'
-                            date + 2 hour +'%FT%H%M%S'
+                            date -d "today + 2 hour" +'%FT%H:%M:%S'
                         '''
                     }
                 }
             }
         }
-        stage('Package') {
-            environment {
-                npm_config_cache = "${env.WORKSPACE}"
-            }
-            steps {
-                container('node') {
-                }
-            }
-        }
-        stage('Deploy') {
-            steps {
-                script {
-                    if (branchName == 'master' || branchName == 'development') {
-                        container('jnlp') {
-                            sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
+        // stage('Package') {
+        //     environment {
+        //         npm_config_cache = "${env.WORKSPACE}"
+        //     }
+        //     steps {
+        //         container('node') {
+        //         }
+        //     }
+        // }
+        // stage('Deploy') {
+        //     steps {
+        //         script {
+        //             if (branchName == 'master' || branchName == 'development') {
+        //                 container('jnlp') {
+        //                     sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
                                 
-                            }
-                        }
-                    } else {
-                        container('jnlp') {
-                            sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
-                                echo "Deployment skipped for branch: ${branchName}"
-                                sh '''
-                                ssh genie.che4z@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-                                ssh genie.che4z@projects-storage.eclipse.org mkdir -p /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-                                scp -r $workspace/clients/cobol-lsp-vscode-extension/*.vsix genie.che4z@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-                                '''
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //                     }
+        //                 }
+        //             } else {
+        //                 container('jnlp') {
+        //                     sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
+        //                         echo "Deployment skipped for branch: ${branchName}"
+        //                         sh '''
+        //                         ssh genie.che4z@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+        //                         ssh genie.che4z@projects-storage.eclipse.org mkdir -p /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+        //                         scp -r $workspace/clients/cobol-lsp-vscode-extension/*.vsix genie.che4z@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+        //                         '''
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
