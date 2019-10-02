@@ -79,7 +79,7 @@ pipeline {
                         echo env.BUILD_ID
                         echo "ted po bez uvozovek"
                         echo BUILD_ID
-                        BRANCH_NAME
+                        echo BRANCH_NAME
                         echo WORKSPACE
                         // sh '''
                         //     pwd
