@@ -18,14 +18,17 @@ spec:
       name: known-hosts
 """
 
+def kubeLabel = 'explorer-for-zos-pod_' + env.BRANCH_NAME + '_' + env.BUILD_NUMBER
+
 pipeline {
     agent {
         kubernetes {
-            label 'lsp-for-cobol_pod_' + env.BRANCH_NAME + '_' + env.BUILD_NUMBER
+            label kubeLabel
             yaml kubernetes_config
         }
     }    
     options {
+        // disableConcurrentBuilds()
         timestamps()
         timeout(time: 3, unit: 'HOURS')
         skipDefaultCheckout(false)
@@ -33,8 +36,9 @@ pipeline {
     }
     environment {
        branchName = "${env.BRANCH_NAME}"
-       HOME="."
        buildNumber = "${env.BUILD_NUMBER}"
+       workspace = "${env.WORKSPACE}"
+       HOME="."
     }
     stages {
         stage('Install & Test') {
@@ -49,37 +53,18 @@ pipeline {
                             pwd
                             # ls
                             npm ci
-                            npm run vscode:prepublish
+                            # npm run vscode:prepublish
                             # Package for prod
                             npm i vsce
                             npx vsce package
                             # rename
                             export artifact_name=$(basename *.vsix)
-                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%F-%H%M%S_'+$buildNumber).vsix}
+                            mv -v $artifact_name ${artifact_name/.vsix/_$(+$buildNumber + '.' + date +'%F-%H%M%S').vsix}
                         '''
 
                         // Note there must be exactly one .vsix
                         stash includes: '*.vsix', name: 'deployables'
                     }
-                    // script {
-                    //     for(e in env){
-                    //         echo e
-                    //         // echo ${e}
-                    //     }
-                    // }
-                    // sh "echo ${env.WORKSPACE}"
-                    // sh "echo home: $HOME"
-                    // // sh "echo ${env}"
-                    // sh "pwd"
-                    // sh "ls"
-                    // // sh "cd $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
-                    // sh "cd clients/cobol-lsp-vscode-extension"
-                    // sh "pwd"
-                    // sh "ls"
-                    // sh "npm ci"
-                    // sh "ls"
-                    // // sh "npm ci -prefix $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
-                    // sh "npm test"
                 }
             }
         }
@@ -89,9 +74,6 @@ pipeline {
             }
             steps {
                 container('node') {
-                    // sh "npm run webpack-production"
-                    // sh "npm i vsce -prefix $HOME/agent/workspace/*/tools -g"
-                    // sh "$HOME/agent/workspace/*/tools/lib/node_modules/vsce/out/vsce package"
                 }
             }
         }
