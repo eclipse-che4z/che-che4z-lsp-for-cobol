@@ -47,11 +47,10 @@ pipeline {
                         sh '''
                             # Test compilation to catch any errors
                             pwd
-                            echo "ls with //"
-                            echo "npm ci"
-                            npm ci
                             echo "ls with #"
                             # ls
+                            echo "npm ci"
+                            npm ci
                             echo "npm run vscode:prepublish"
                             npm run vscode:prepublish
                             # Package for prod
