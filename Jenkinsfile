@@ -34,35 +34,33 @@ pipeline {
     environment {
        branchName = "${env.BRANCH_NAME}"
        HOME="."
+       buildNumber = "${env.BUILD_NUMBER}"
     }
     stages {
         stage('Install & Test') {
             environment {
                 npm_config_cache = "${env.WORKSPACE}"
-                // env = "${env}"
-                // npm_config_cache = "${env.WORKSPACE}/clients/cobol-lsp-vscode-extension"
             }
             steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
-                        // sh '''#!/usr/bin/env bash
-                        // sh '''#!/usr/bin/env
                         sh '''
                             # Test compilation to catch any errors
                             pwd
-                            ls
+                            echo "ls with //"
+                            // ls
                             echo "npm ci"
-                            echo 'npm ci dingle quotes'
                             npm ci
-                            ls
+                            echo "ls with #"
+                            # ls
                             echo "npm run vscode:prepublish"
                             npm run vscode:prepublish
                             # Package for prod
                             npm i vsce
                             npx vsce package
-                            # rename to have datetime for clarity + prevent collisions
+                            # rename
                             export artifact_name=$(basename *.vsix)
-                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%F-%H%M').vsix}
+                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%F-%H%M'+'_'+$buildNumber).vsix}
                         '''
 
                         // Note there must be exactly one .vsix
@@ -74,19 +72,19 @@ pipeline {
                     //         // echo ${e}
                     //     }
                     // }
-                    sh "echo ${env.WORKSPACE}"
-                    sh "echo home: $HOME"
-                    // sh "echo ${env}"
-                    sh "pwd"
-                    sh "ls"
-                    // sh "cd $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
-                    sh "cd clients/cobol-lsp-vscode-extension"
-                    sh "pwd"
-                    sh "ls"
-                    sh "npm ci"
-                    sh "ls"
-                    // sh "npm ci -prefix $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
-                    sh "npm test"
+                    // sh "echo ${env.WORKSPACE}"
+                    // sh "echo home: $HOME"
+                    // // sh "echo ${env}"
+                    // sh "pwd"
+                    // sh "ls"
+                    // // sh "cd $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
+                    // sh "cd clients/cobol-lsp-vscode-extension"
+                    // sh "pwd"
+                    // sh "ls"
+                    // sh "npm ci"
+                    // sh "ls"
+                    // // sh "npm ci -prefix $HOME/agent/workspace/*/clients/cobol-lsp-vscode-extension"
+                    // sh "npm test"
                 }
             }
         }
@@ -96,9 +94,9 @@ pipeline {
             }
             steps {
                 container('node') {
-                    sh "npm run webpack-production"
-                    sh "npm i vsce -prefix $HOME/agent/workspace/*/tools -g"
-                    sh "$HOME/agent/workspace/*/tools/lib/node_modules/vsce/out/vsce package"
+                    // sh "npm run webpack-production"
+                    // sh "npm i vsce -prefix $HOME/agent/workspace/*/tools -g"
+                    // sh "$HOME/agent/workspace/*/tools/lib/node_modules/vsce/out/vsce package"
                 }
             }
         }
@@ -108,11 +106,11 @@ pipeline {
                     if (branchName == 'master' || branchName == 'development') {
                         container('jnlp') {
                             sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
-                                sh '''
-                                ssh genie.che4z@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-                                ssh genie.che4z@projects-storage.eclipse.org mkdir -p /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-                                scp -r /home/jenkins/agent/workspace/*/*.vsix genie.che4z@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-                                '''
+                                // sh '''
+                                // ssh genie.che4z@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                                // ssh genie.che4z@projects-storage.eclipse.org mkdir -p /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                                // scp -r /home/jenkins/agent/workspace/*/*.vsix genie.che4z@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                                // '''
                             }
                         }
                     } else {
