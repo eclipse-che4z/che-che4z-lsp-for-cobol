@@ -47,18 +47,15 @@ pipeline {
                         sh '''
                             # Test compilation to catch any errors
                             pwd
-                            echo "ls with #"
                             # ls
-                            echo "npm ci"
                             npm ci
-                            echo "npm run vscode:prepublish"
                             npm run vscode:prepublish
                             # Package for prod
                             npm i vsce
                             npx vsce package
                             # rename
                             export artifact_name=$(basename *.vsix)
-                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%F-%H%M'+'_'+$buildNumber).vsix}
+                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%F-%H%M%S_'+$buildNumber).vsix}
                         '''
 
                         // Note there must be exactly one .vsix
