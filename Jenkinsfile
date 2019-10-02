@@ -48,7 +48,6 @@ pipeline {
                             # Test compilation to catch any errors
                             pwd
                             echo "ls with //"
-                            // ls
                             echo "npm ci"
                             npm ci
                             echo "ls with #"
