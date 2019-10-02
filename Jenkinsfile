@@ -71,6 +71,7 @@ pipeline {
             steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
+                        sh 'env'
                         echo sh(script: 'env|sort', returnStdout: true)
 
                         echo env.BUILD_ID
