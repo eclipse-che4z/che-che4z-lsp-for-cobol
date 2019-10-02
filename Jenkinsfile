@@ -69,11 +69,12 @@ pipeline {
                 npm_config_cache = "${env.WORKSPACE}"
             }
             steps {
+                script {
+                    def date = new Date()
+                    println date
+                }
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
-                        def date = new Date()
-
-                        println date
                         // sh '''
                         //     pwd
                         //     npm ci
