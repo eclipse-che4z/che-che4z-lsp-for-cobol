@@ -71,6 +71,7 @@ pipeline {
             steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
+                        echo "${env.BUILD_ID}"
                         // sh '''
                         //     pwd
                         //     npm ci
