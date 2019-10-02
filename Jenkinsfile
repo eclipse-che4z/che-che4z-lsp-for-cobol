@@ -18,7 +18,7 @@ spec:
       name: known-hosts
 """
 
-def kubeLabel = 'explorer-for-zos-pod_' + env.BRANCH_NAME + '_' + env.BUILD_NUMBER
+def kubeLabel = 'lsp-for-cobol_pod_' + env.BRANCH_NAME + '_' + env.BUILD_NUMBER
 
 pipeline {
     agent {
@@ -91,12 +91,16 @@ pipeline {
                             }
                         }
                     } else {
-                        echo "Deployment skipped for branch: ${branchName}"
-                        sh '''
-                        ssh genie.che4z@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-                        ssh genie.che4z@projects-storage.eclipse.org mkdir -p /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-                        scp -r $workspace/*.vsix genie.che4z@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-                        '''
+                        container('jnlp') {
+                            sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
+                                echo "Deployment skipped for branch: ${branchName}"
+                                sh '''
+                                ssh genie.che4z@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                                ssh genie.che4z@projects-storage.eclipse.org mkdir -p /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                                scp -r $workspace/*.vsix genie.che4z@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                                '''
+                            }
+                        }
                     }
                 }
             }
