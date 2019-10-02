@@ -45,12 +45,11 @@ pipeline {
        workspace = "${env.WORKSPACE}"
     }
     stages {
-        stage('Install & Test') {
+        stage('Build a Maven project') {
              steps {
                 container('maven') {
-                    stage('Build a Maven project') {
-                        dir('com.ca.lsp.cobol')
-                            sh 'mvn clean install'
+                    dir('com.ca.lsp.cobol') {
+                        sh 'mvn clean install'
                     }
                 }
              }
