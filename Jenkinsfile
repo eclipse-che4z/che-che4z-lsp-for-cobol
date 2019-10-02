@@ -47,9 +47,9 @@ pipeline {
         skipDefaultCheckout(true)
     }
     environment {
-       branchName = env.BRANCH_NAME
-       buildNumber = env.BUILD_NUMBER
-       workspace = env.WORKSPACE
+       branchName = "${env.BRANCH_NAME}"
+       buildNumber = "${env.BUILD_NUMBER}"
+       workspace = "${env.WORKSPACE}"
     }
     stages {
         // stage('Build LSP server part') {
@@ -66,7 +66,7 @@ pipeline {
         // }
         stage('Install & Test Client') {
             environment {
-                npm_config_cache = env.WORKSPACE
+                npm_config_cache = "${env.WORKSPACE}"
             }
             steps {
                 container('node') {
@@ -78,6 +78,8 @@ pipeline {
                         echo "ted bude bez uvozovek"
                         echo env.BUILD_ID
                         echo "ted po bez uvozovek"
+                        echo BUILD_ID
+                        BRANCH_NAME
                         echo WORKSPACE
                         // sh '''
                         //     pwd
