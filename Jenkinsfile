@@ -59,7 +59,7 @@ pipeline {
                             npx vsce package
                             # rename
                             export artifact_name=$(basename *.vsix)
-                            mv -v $artifact_name ${artifact_name/.vsix/_$($buildNumber + '.' + date +'%F-%H%M%S').vsix}
+                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%F-%H%M%S').vsix}
                         '''
 
                         // Note there must be exactly one .vsix
@@ -95,7 +95,7 @@ pipeline {
                         sh '''
                         ssh genie.che4z@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
                         ssh genie.che4z@projects-storage.eclipse.org mkdir -p /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-                        scp -r /home/jenkins/agent/workspace/*/*.vsix genie.che4z@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                        scp -r $workspace/*.vsix genie.che4z@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
                         '''
                     }
                 }
