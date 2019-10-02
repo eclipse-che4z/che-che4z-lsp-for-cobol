@@ -85,8 +85,8 @@ pipeline {
                         //     mv -v $artifact_name ${artifact_name/.vsix/_$(TZ='Europe/Prague' date +'%FT%H%M%S').vsix}
                         // '''
                         sh '''
-                            date -d "today+2hour" +'%FT%H:%M:%S'
                             date +'%FT%H:%M:%S'
+                            date -d "today+2hour" +'%FT%H:%M:%S'
                         '''
                     }
                 }
