@@ -52,18 +52,18 @@ pipeline {
        workspace = "${env.WORKSPACE}"
     }
     stages {
-        stage('Build LSP server part') {
-             steps {
-                container('maven') {
-                    dir('com.ca.lsp.cobol') {
-                        sh 'mvn -version'
-                        // sh 'mvn clean verify'
-                        sh 'mvn clean install'
-                        sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
-                    }
-                }
-             }
-        }
+        // stage('Build LSP server part') {
+        //      steps {
+        //         container('maven') {
+        //             dir('com.ca.lsp.cobol') {
+        //                 sh 'mvn -version'
+        //                 // sh 'mvn clean verify'
+        //                 sh 'mvn clean install'
+        //                 sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
+        //             }
+        //         }
+        //      }
+        // }
         stage('Install & Test') {
             environment {
                 npm_config_cache = "${env.WORKSPACE}"
@@ -78,7 +78,7 @@ pipeline {
                             npx vsce package
                             # rename
                             export artifact_name=$(basename *.vsix)
-                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%FT%H%M%S').vsix}
+                            mv -v $artifact_name ${artifact_name/.vsix/_$(TZ='Europe/Prague' date +'%FT%H%M%S').vsix}
                         '''
                     }
                 }
