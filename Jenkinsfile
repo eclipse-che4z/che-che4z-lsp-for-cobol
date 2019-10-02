@@ -5,6 +5,11 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
+  - name: maven
+    image: maven:alpine
+    command:
+    - cat
+    tty: true
   - name: node
     image: node:12.10.0-alpine
     tty: true
@@ -38,9 +43,16 @@ pipeline {
        branchName = "${env.BRANCH_NAME}"
        buildNumber = "${env.BUILD_NUMBER}"
        workspace = "${env.WORKSPACE}"
-    //    HOME="."
     }
     stages {
+        stage('Install & Test') {
+            container('maven') {
+                stage('Build a Maven project') {
+                    dir('com.ca.lsp.cobol')
+                        sh 'mvn clean install'
+                }
+            }
+        }
         stage('Install & Test') {
             environment {
                 npm_config_cache = "${env.WORKSPACE}"
