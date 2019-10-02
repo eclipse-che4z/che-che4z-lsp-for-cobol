@@ -85,7 +85,10 @@ pipeline {
                         //     mv -v $artifact_name ${artifact_name/.vsix/_$(TZ='Europe/Prague' date +'%FT%H%M%S').vsix}
                         // '''
                         sh '''
-                            env TZ=Europe/Prague date
+                            3env TZ=Europe/Prague date
+                            date +'%FT%H%M%S'
+                            date + 2 +'%FT%H%M%S'
+                            date + 2 hour +'%FT%H%M%S'
                         '''
                     }
                 }
