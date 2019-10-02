@@ -10,6 +10,13 @@ spec:
     command:
     - cat
     tty: true
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+      requests:
+        memory: "2Gi"
+        cpu: "1"
   - name: node
     image: node:12.10.0-alpine
     tty: true
@@ -49,6 +56,7 @@ pipeline {
              steps {
                 container('maven') {
                     dir('com.ca.lsp.cobol') {
+                        sh 'mvn -version'
                         sh 'mvn clean verify'
                         sh 'mvn clean install'
                         // sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar server/'
