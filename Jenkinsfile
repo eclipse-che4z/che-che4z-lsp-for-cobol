@@ -46,12 +46,14 @@ pipeline {
     }
     stages {
         stage('Install & Test') {
-            container('maven') {
-                stage('Build a Maven project') {
-                    dir('com.ca.lsp.cobol')
-                        sh 'mvn clean install'
+             steps {
+                container('maven') {
+                    stage('Build a Maven project') {
+                        dir('com.ca.lsp.cobol')
+                            sh 'mvn clean install'
+                    }
                 }
-            }
+             }
         }
         stage('Install & Test') {
             environment {
