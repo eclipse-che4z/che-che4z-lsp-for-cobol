@@ -45,11 +45,13 @@ pipeline {
        workspace = "${env.WORKSPACE}"
     }
     stages {
-        stage('Build a Maven project') {
+        stage('Build LSP server part') {
              steps {
                 container('maven') {
                     dir('com.ca.lsp.cobol') {
+                        sh 'mvn clean verify'
                         sh 'mvn clean install'
+                        // sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar server/'
                     }
                 }
              }
@@ -62,12 +64,8 @@ pipeline {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh '''
-                            # Test compilation to catch any errors
                             pwd
-                            # ls
                             npm ci
-                            # npm run vscode:prepublish
-                            # Package for prod
                             npm i vsce
                             npx vsce package
                             # rename
