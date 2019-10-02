@@ -29,3 +29,4 @@ tools
 _cacache
 _locks
 anonymous-cli-metrics.json
+node_modules/
