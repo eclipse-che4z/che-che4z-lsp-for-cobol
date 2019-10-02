@@ -47,9 +47,9 @@ pipeline {
         skipDefaultCheckout(true)
     }
     environment {
-       branchName = "${env.BRANCH_NAME}"
-       buildNumber = "${env.BUILD_NUMBER}"
-       workspace = "${env.WORKSPACE}"
+       branchName = env.BRANCH_NAME
+       buildNumber = env.BUILD_NUMBER
+       workspace = env.WORKSPACE
     }
     stages {
         // stage('Build LSP server part') {
@@ -66,18 +66,19 @@ pipeline {
         // }
         stage('Install & Test Client') {
             environment {
-                npm_config_cache = "${env.WORKSPACE}"
+                npm_config_cache = env.WORKSPACE
             }
             steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
-                        echo "${env.BUILD_ID}"
+                        echo env.BUILD_ID
                         echo "${env.BUILD_TIMESTAMP}"
                         echo "${env.BUILD_DATE}"
                         echo "${env.BUILD_TIME}"
                         echo "ted bude bez uvozovek"
                         echo env.BUILD_ID
                         echo "ted po bez uvozovek"
+                        echo WORKSPACE
                         // sh '''
                         //     pwd
                         //     npm ci
