@@ -73,14 +73,18 @@ pipeline {
                     dir('clients/cobol-lsp-vscode-extension') {
                         echo env.BUILD_ID
                         echo "${env.BUILD_TIMESTAMP}"
+                        echo env.BUILD_TIMESTAMP
                         echo "${env.BUILD_DATE}"
+                        echo env.BUILD_DATE
                         echo "${env.BUILD_TIME}"
+                        echo env.BUILD_TIME
                         echo "ted bude bez uvozovek"
                         echo env.BUILD_ID
                         echo "ted po bez uvozovek"
                         echo BUILD_ID
                         echo BRANCH_NAME
                         echo WORKSPACE
+                        sh 'printenv'
                         // sh '''
                         //     pwd
                         //     npm ci
