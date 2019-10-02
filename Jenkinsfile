@@ -86,7 +86,7 @@ pipeline {
                         // '''
                         sh '''
                             date +'%FT%H:%M:%S'
-                            date -d "'today+2hour'" +'%FT%H:%M:%S'
+                            date -d "`today+2hour`" +'%FT%H:%M:%S'
                         '''
                     }
                 }
