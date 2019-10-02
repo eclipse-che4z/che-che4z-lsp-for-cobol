@@ -38,7 +38,7 @@ pipeline {
        branchName = "${env.BRANCH_NAME}"
        buildNumber = "${env.BUILD_NUMBER}"
        workspace = "${env.WORKSPACE}"
-       HOME="."
+    //    HOME="."
     }
     stages {
         stage('Install & Test') {
@@ -61,9 +61,6 @@ pipeline {
                             export artifact_name=$(basename *.vsix)
                             mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%F-%H%M%S').vsix}
                         '''
-
-                        // Note there must be exactly one .vsix
-                        stash includes: '*.vsix', name: 'deployables'
                     }
                 }
             }
