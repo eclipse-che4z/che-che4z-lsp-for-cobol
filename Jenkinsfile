@@ -20,6 +20,13 @@ spec:
   - name: node
     image: node:12.10.0-alpine
     tty: true
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+      requests:
+        memory: "2Gi"
+        cpu: "1"
   - name: jnlp
     volumeMounts:
     - name: volume-known-hosts
@@ -43,8 +50,8 @@ pipeline {
         // disableConcurrentBuilds()
         timestamps()
         timeout(time: 3, unit: 'HOURS')
-        // skipDefaultCheckout(false)
-        skipDefaultCheckout(true)
+        skipDefaultCheckout(false)
+        // skipDefaultCheckout(true)
     }
     environment {
        branchName = "${env.BRANCH_NAME}"
@@ -68,70 +75,66 @@ pipeline {
             environment {
                 npm_config_cache = "${env.WORKSPACE}"
             }
-            steps {
-                // script {
-                //     // def date = new Date()
-                //     // println date
-                // }
+            steps {                
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
+                        sh '''
+                            pwd
+                            npm ci
+                            npm i vsce
+                            npx vsce package
+                            # rename
+                            export artifact_name=$(basename *.vsix)
+                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%FT%H:%M:%S').vsix}
+                        '''
                         // sh '''
-                        //     pwd
-                        //     npm ci
-                        //     npm i vsce
-                        //     npx vsce package
-                        //     # rename
-                        //     export artifact_name=$(basename *.vsix)
-                        //     mv -v $artifact_name ${artifact_name/.vsix/_$(TZ='Europe/Prague' date +'%FT%H%M%S').vsix}
+                        // date
+                        // date -d '$(date)'
+                        // date -d "$(date)"
+                        // date -d "$(date) +2hour" +'%FT%H:%M:%S'
                         // '''
-                        sh '''
-                        date
-                        date -d '$(date)'
-                        date -d "$(date)"
-                        date -d "$(date) +2hour" +'%FT%H:%M:%S'
-                        '''
 
-                        // sh 'date -d `today+2hour` +'%FT%H:%M:%S''
-                        sh '''
-                            date +'%FT%H:%M:%S'
-                            date -d `"today+2hour"` +'%FT%H:%M:%S'
-                        '''
+                        // // sh 'date -d `today+2hour` +'%FT%H:%M:%S''
+                        // sh '''
+                        //     date +'%FT%H:%M:%S'
+                        //     date -d `"today+2hour"` +'%FT%H:%M:%S'
+                        // '''
                     }
                 }
             }
         }
-        // stage('Package') {
-        //     environment {
-        //         npm_config_cache = "${env.WORKSPACE}"
-        //     }
-        //     steps {
-        //         container('node') {
-        //         }
-        //     }
-        // }
-        // stage('Deploy') {
-        //     steps {
-        //         script {
-        //             if (branchName == 'master' || branchName == 'development') {
-        //                 container('jnlp') {
-        //                     sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
+        stage('Package') {
+            environment {
+                npm_config_cache = "${env.WORKSPACE}"
+            }
+            steps {
+                container('node') {
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    if (branchName == 'master' || branchName == 'development') {
+                        container('jnlp') {
+                            sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
                                 
-        //                     }
-        //                 }
-        //             } else {
-        //                 container('jnlp') {
-        //                     sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
-        //                         echo "Deployment skipped for branch: ${branchName}"
-        //                         sh '''
-        //                         ssh genie.che4z@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-        //                         ssh genie.che4z@projects-storage.eclipse.org mkdir -p /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-        //                         scp -r $workspace/clients/cobol-lsp-vscode-extension/*.vsix genie.che4z@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-        //                         '''
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+                            }
+                        }
+                    } else {
+                        container('jnlp') {
+                            sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
+                                echo "Deployment skipped for branch: ${branchName}"
+                                sh '''
+                                ssh genie.che4z@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                                ssh genie.che4z@projects-storage.eclipse.org mkdir -p /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                                scp -r $workspace/clients/cobol-lsp-vscode-extension/*.vsix genie.che4z@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
