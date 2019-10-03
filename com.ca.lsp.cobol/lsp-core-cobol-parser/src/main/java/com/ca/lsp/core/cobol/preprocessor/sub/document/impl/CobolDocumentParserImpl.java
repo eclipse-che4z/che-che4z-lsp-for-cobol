@@ -16,7 +16,6 @@ package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ca.lsp.core.cobol.model.MappingToken;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -114,14 +113,7 @@ public class CobolDocumentParserImpl implements CobolDocumentParser {
 
     // specify our entry point
     final StartRuleContext startRule = parser.startRule();
-
-    List<MappingToken> copybookMapping = new ArrayList<>();
-    // analyze contained copy books
-    final CobolDocumentParserBriefListenerImpl briefListener =
-        new CobolDocumentParserBriefListenerImpl(copybookMapping);
     final ParseTreeWalker walker = new ParseTreeWalker();
-
-    walker.walk(briefListener, startRule);
 
     // analyze contained copy books
     final CobolDocumentParserListener listener =
