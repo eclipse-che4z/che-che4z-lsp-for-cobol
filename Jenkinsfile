@@ -12,10 +12,10 @@ spec:
     tty: true
     resources:
       limits:
-        memory: "4Gi"
+        memory: "2Gi"
         cpu: "1"
       requests:
-        memory: "4Gi"
+        memory: "2Gi"
         cpu: "1"
   - name: node
     image: node:12.10.0-alpine
@@ -80,11 +80,6 @@ pipeline {
                         sh '''
                             pwd
                             npm ci
-                            npm i vsce
-                            npx vsce package
-                            # rename
-                            export artifact_name=$(basename *.vsix)
-                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%FT%H%M%S').vsix}
                         '''
                     }
                 }
@@ -96,6 +91,15 @@ pipeline {
             }
             steps {
                 container('node') {
+                    dir('clients/cobol-lsp-vscode-extension') {
+                        sh '''
+                            npm i vsce
+                            npx vsce package
+                            # rename
+                            export artifact_name=$(basename *.vsix)
+                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%FT%H%M%S').vsix}
+                        '''
+                    }
                 }
             }
         }
