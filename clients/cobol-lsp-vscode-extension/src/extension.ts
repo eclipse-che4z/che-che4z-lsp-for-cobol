@@ -25,7 +25,7 @@ export async function activate(context: ExtensionContext) {
 
     // path resolved to identify the location of the LSP server into the extension
     const extPath = extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
-    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.8.0.jar`;
+    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.8.1.jar`;
 
     let serverOptions: Executable;
 
@@ -38,7 +38,7 @@ export async function activate(context: ExtensionContext) {
                 options: { stdio: "pipe", detached: false },
             };
         } else {
-            window.showErrorMessage("Cobol extension failed to start - LSP server not found");
+            window.showErrorMessage("COBOL extension failed to start - LSP server not found");
             return;
         }
     } catch (err) {
@@ -48,13 +48,13 @@ export async function activate(context: ExtensionContext) {
 
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
-        // Register the server for cobol
+        // Register the server for COBOL
         documentSelector: ["COBOL"],
     };
     const item = window.createStatusBarItem(StatusBarAlignment.Right, Number.MIN_VALUE);
 
     // Create the language client and start the client.
-    const languageClient = new LanguageClient("LSP", "LSP extension for Cobol language", serverOptions, clientOptions);
+    const languageClient = new LanguageClient("LSP", "LSP extension for COBOL language", serverOptions, clientOptions);
 
     const disposable = languageClient.start();
 
