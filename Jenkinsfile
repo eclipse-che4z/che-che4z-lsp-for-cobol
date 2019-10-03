@@ -97,7 +97,8 @@ pipeline {
                             npm i vsce
                             pwd
                             ls
-                            find / -type d -name "vsce"
+                            #find / -type d -name "vsce"
+                            node_modules/vsce/out/vsce package
                             #npx vsce package
                             #vsce package
                             # rename
