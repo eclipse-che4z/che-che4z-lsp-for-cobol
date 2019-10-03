@@ -13,10 +13,10 @@ spec:
     resources:
       limits:
         memory: "4Gi"
-        cpu: "2"
+        cpu: "1"
       requests:
         memory: "4Gi"
-        cpu: "2"
+        cpu: "1"
   - name: node
     image: node:12.10.0-alpine
     tty: true
@@ -64,7 +64,6 @@ pipeline {
                 container('maven') {
                     dir('com.ca.lsp.cobol') {
                         sh 'mvn -version'
-                        // sh 'mvn clean verify'
                         sh 'mvn clean install'
                         sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
                     }
@@ -85,20 +84,8 @@ pipeline {
                             npx vsce package
                             # rename
                             export artifact_name=$(basename *.vsix)
-                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%FT%H:%M:%S').vsix}
+                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%FT%H%M%S').vsix}
                         '''
-                        // sh '''
-                        // date
-                        // date -d '$(date)'
-                        // date -d "$(date)"
-                        // date -d "$(date) +2hour" +'%FT%H:%M:%S'
-                        // '''
-
-                        // // sh 'date -d `today+2hour` +'%FT%H:%M:%S''
-                        // sh '''
-                        //     date +'%FT%H:%M:%S'
-                        //     date -d `"today+2hour"` +'%FT%H:%M:%S'
-                        // '''
                     }
                 }
             }
