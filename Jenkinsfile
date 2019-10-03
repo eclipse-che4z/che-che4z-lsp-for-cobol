@@ -12,21 +12,21 @@ spec:
     tty: true
     resources:
       limits:
-        memory: "2Gi"
-        cpu: "1"
+        memory: "4Gi"
+        cpu: "2"
       requests:
-        memory: "2Gi"
-        cpu: "1"
+        memory: "4Gi"
+        cpu: "2"
   - name: node
     image: node:12.10.0-alpine
     tty: true
     resources:
       limits:
-        memory: "4Gi"
-        cpu: "2"
+        memory: "2Gi"
+        cpu: "1"
       requests:
-        memory: "4Gi"
-        cpu: "2"
+        memory: "2Gi"
+        cpu: "1"
   - name: jnlp
     volumeMounts:
     - name: volume-known-hosts
