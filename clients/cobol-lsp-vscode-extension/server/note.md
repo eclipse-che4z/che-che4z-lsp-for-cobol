@@ -17,7 +17,7 @@
 Put in this folder the COBOL LSP server jar with this name
 
 ```
-lsp-service-cobol-0.8.0.jar
+lsp-service-cobol-0.8.1.jar
 ```
 In Linux environment be sure that the server folder have read/write permisison, in case simply run the command
 
