@@ -70,7 +70,7 @@ pipeline {
                 }
              }
         }
-        stage('Install & Test Client') {
+        stage('Client - Install dependencies') {
             environment {
                 npm_config_cache = "${env.WORKSPACE}"
             }
@@ -78,14 +78,13 @@ pipeline {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh '''
-                            pwd
                             npm ci
                         '''
                     }
                 }
             }
         }
-        stage('Package') {
+        stage('Client - Package') {
             environment {
                 npm_config_cache = "${env.WORKSPACE}"
             }
