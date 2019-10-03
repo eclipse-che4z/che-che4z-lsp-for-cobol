@@ -92,9 +92,11 @@ pipeline {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh '''
-                            npm i vsce
+                            npm i vsce -prefix $HOME/agent/workspace/$kubeLabel/tools -g
+                            $HOME/agent/workspace/$kubeLabel/tools/lib/node_modules/vsce/out/vsce package
+                            #npm i vsce
                             #npx vsce package
-                            vsce package
+                            #vsce package
                             # rename
                             export artifact_name=$(basename *.vsix)
                             mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%FT%H%M%S').vsix}
