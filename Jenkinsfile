@@ -92,9 +92,11 @@ pipeline {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh '''
-                            npm i vsce -prefix $HOME/agent/workspace/$kubeLabel/tools -g
-                            $HOME/agent/workspace/$kubeLabel/tools/lib/node_modules/vsce/out/vsce package
-                            #npm i vsce
+                            #npm i vsce -prefix $HOME/agent/workspace/$kubeLabel/tools -g
+                            #$HOME/agent/workspace/$kubeLabel/tools/lib/node_modules/vsce/out/vsce package
+                            npm i vsce
+                            pwd
+                            ls
                             #npx vsce package
                             #vsce package
                             # rename
