@@ -97,11 +97,13 @@ pipeline {
                             npm i vsce
                             pwd
                             ls
+                            find / -type d -name "vsce"
                             #npx vsce package
                             #vsce package
                             # rename
-                            export artifact_name=$(basename *.vsix)
-                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%FT%H%M%S').vsix}
+                            
+                            #export artifact_name=$(basename *.vsix)
+                            #mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%FT%H%M%S').vsix}
                         '''
                     }
                 }
