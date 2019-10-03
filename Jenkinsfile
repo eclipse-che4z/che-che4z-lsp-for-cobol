@@ -22,11 +22,11 @@ spec:
     tty: true
     resources:
       limits:
-        memory: "2Gi"
-        cpu: "1"
+        memory: "4Gi"
+        cpu: "2"
       requests:
-        memory: "2Gi"
-        cpu: "1"
+        memory: "4Gi"
+        cpu: "2"
   - name: jnlp
     volumeMounts:
     - name: volume-known-hosts
@@ -59,18 +59,18 @@ pipeline {
        workspace = "${env.WORKSPACE}"
     }
     stages {
-        // stage('Build LSP server part') {
-        //      steps {
-        //         container('maven') {
-        //             dir('com.ca.lsp.cobol') {
-        //                 sh 'mvn -version'
-        //                 // sh 'mvn clean verify'
-        //                 sh 'mvn clean install'
-        //                 sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
-        //             }
-        //         }
-        //      }
-        // }
+        stage('Build LSP server part') {
+             steps {
+                container('maven') {
+                    dir('com.ca.lsp.cobol') {
+                        sh 'mvn -version'
+                        // sh 'mvn clean verify'
+                        sh 'mvn clean install'
+                        sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
+                    }
+                }
+             }
+        }
         stage('Install & Test Client') {
             environment {
                 npm_config_cache = "${env.WORKSPACE}"
