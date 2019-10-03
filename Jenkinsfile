@@ -93,7 +93,8 @@ pipeline {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh '''
                             npm i vsce
-                            npx vsce package
+                            #npx vsce package
+                            npm vsce package
                             # rename
                             export artifact_name=$(basename *.vsix)
                             mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%FT%H%M%S').vsix}
