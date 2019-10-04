@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -34,7 +35,8 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
 
   private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
   private static final String URI_FILE_SEPARATOR = "/";
-  private List<File> copybookList = new ArrayList<>();
+  private List<File> copybookList;
+  private List<WorkspaceFolder> workspaceFolders;
 
   private CobolWorkspaceServiceImpl() {}
 
@@ -48,6 +50,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    *     workspace opened in the client)
    */
   private void createCopybookList(WorkspaceFolder workspaceFolder) {
+    copybookList = new ArrayList<>();
     try (Stream<Path> copybookFoldersStream =
         Files.list(
             Paths.get(
@@ -79,11 +82,51 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    * @param workspaceFolders list of URI paths
    */
   void scanWorkspaceForCopybooks(List<WorkspaceFolder> workspaceFolders) {
-    workspaceFolders.forEach(this::createCopybookList);
+    setWorkspaceFolders(workspaceFolders);
+    getWorkspaceFolders().forEach(this::createCopybookList);
   }
 
   /** @return List of copybooks */
   public List<File> getCopybookList() {
     return copybookList;
+  }
+
+  @Override
+  public Path getURIByFileName(String fileName) {
+    AtomicReference<Path> outputURIPath = new AtomicReference<>();
+    getWorkspaceFolders()
+        .forEach(
+            workspaceFolder -> {
+              try {
+                File workspaceFolderFile =
+                    new File(
+                        new URI(
+                            workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME));
+                Path workspaceFolderPath = workspaceFolderFile.toPath();
+
+                Stream<Path> pathStream =
+                    Files.find(
+                        workspaceFolderPath,
+                        100,
+                        (path, basicFileAttributes) -> {
+                          File resFile = path.toFile();
+                          outputURIPath.set(resFile.toPath());
+                          return !resFile.isDirectory() && resFile.getName().contains(fileName);
+                        });
+                log.info("Number of matches" + pathStream.count());
+              } catch (IOException | URISyntaxException e) {
+                log.error(e.getMessage());
+              }
+            });
+
+    return outputURIPath.get();
+  }
+
+  private List<WorkspaceFolder> getWorkspaceFolders() {
+    return workspaceFolders;
+  }
+
+  private void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
+    this.workspaceFolders = workspaceFolders;
   }
 }
