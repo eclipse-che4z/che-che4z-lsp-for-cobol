@@ -1,6 +1,6 @@
 # Change Log
 
-All notable changes to the "COBOL Language Extension" extension will be documented in this file.
+All notable changes to the COBOL Language Support extension are documented in this file.
 
 ## [0.8.2]
 
