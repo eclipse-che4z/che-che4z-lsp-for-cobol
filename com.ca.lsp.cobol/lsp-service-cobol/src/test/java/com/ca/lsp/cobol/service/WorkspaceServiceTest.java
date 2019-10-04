@@ -1,6 +1,5 @@
 package com.ca.lsp.cobol.service;
 
-import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.junit.After;
@@ -18,21 +17,39 @@ import java.util.Comparator;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 
 @Slf4j
 public class WorkspaceServiceTest {
-  private static final String FOLDER_NAME = "test";
+  private static final String WORKSPACE_FOLDER_NAME = "test";
+  private static final String CPY_FILE_NAME_WITH_EXT = "copy.cpy";
+  private static final String CPY_FILE_ONLY_NAME = "copy";
+
+  private static final String COPYBOOK_CONTENT =
+      "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
+
   private URI workspaceFolderPath = null;
-  private List<WorkspaceFolder> workspaceFolderList = new ArrayList<>();
-  @Inject
-  private CobolWorkspaceServiceImpl cobolWorkspaceService;
+  private final List<WorkspaceFolder> workspaceFolderList = new ArrayList<>();
+
+  private final CobolWorkspaceServiceImpl cobolWorkspaceService =
+      CobolWorkspaceServiceImpl.getInstance();
 
   @Before
   public void scanWorkspaceForCopybooks() {
-    createTempDirAndFile();
+    Path workspacePath =
+        Paths.get(
+            System.getProperty("java.io.tmpdir")
+                + System.getProperty("file.separator")
+                + "WORKSPACE");
+    Path copybooksPath =
+        Paths.get(workspacePath + System.getProperty("file.separator") + "COPYBOOKS");
+    Path cpyFilePath =
+        Paths.get(copybooksPath + System.getProperty("file.separator") + CPY_FILE_NAME_WITH_EXT);
+
+    createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath);
 
     WorkspaceFolder workspaceFolder = new WorkspaceFolder();
-    workspaceFolder.setName(FOLDER_NAME);
+    workspaceFolder.setName(WORKSPACE_FOLDER_NAME);
     workspaceFolder.setUri(adjustURI(getWorkspaceFolderPath().toString()));
     workspaceFolderList.add(workspaceFolder);
     cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
@@ -41,6 +58,13 @@ public class WorkspaceServiceTest {
   @Test
   public void getCopyBookList() {
     assertEquals(cobolWorkspaceService.getCopybookList().size(), 1);
+  }
+
+  @Test
+  public void getUriByName() {
+    cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME);
+    assertTrue(
+        cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME).toUri().toString().length() > 0);
   }
 
   @After
@@ -60,31 +84,22 @@ public class WorkspaceServiceTest {
     }
   }
 
-  private void createTempDirAndFile() {
-    Path workspacePath =
-        Paths.get(
-            System.getProperty("java.io.tmpdir")
-                + System.getProperty("file.separator")
-                + "WORKSPACE");
-
-    Path copybooksPath =
-        Paths.get(workspacePath + System.getProperty("file.separator") + "COPYBOOKS");
+  private void createTempDirAndFile(Path workspacePath, Path copybookFolderPath, Path cpyFilePath) {
 
     try {
+
       if (!Files.exists(workspacePath)) {
         Files.createDirectory(workspacePath);
       }
 
-      if (!Files.exists(copybooksPath)) {
-        Files.createDirectory(copybooksPath);
+      if (!Files.exists(copybookFolderPath)) {
+        Files.createDirectory(copybookFolderPath);
       }
+      Files.createFile(cpyFilePath);
 
-      Files.createFile(
-          Paths.get(copybooksPath + System.getProperty("file.separator") + "copy.cpy"));
     } catch (IOException e) {
       e.printStackTrace();
     }
-
     setWorkspaceFolderPath(workspacePath.toUri());
   }
 
