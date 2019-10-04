@@ -8,6 +8,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ## [0.8.1]
 
+- Automatic check for Java added before launching the LSP server.
 - Extension name updated
 
 ## [0.8.0]
