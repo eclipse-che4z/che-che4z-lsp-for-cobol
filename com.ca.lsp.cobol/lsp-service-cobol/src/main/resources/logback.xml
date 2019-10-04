@@ -16,15 +16,6 @@
   -->
 
 <configuration>
-    <property name="HOME_LOG" value="${user.home}/Broadcom/LSPCobol/logs/app.log"/>
-    <appender name="STDOUT"
-              class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %replace(%msg){'(\\r\\n|\\r|\\n|\r\n|\r|\n)', ''}%n
-            </pattern>
-        </encoder>
-    </appender>
-
     <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${HOME_LOG}</file>
 
