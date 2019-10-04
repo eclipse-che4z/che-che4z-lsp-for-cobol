@@ -92,24 +92,22 @@ pipeline {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh '''
-                            ls server
                             wget https://github.com/tomascechatbroadcomcom/che-devfile/releases/download/lspJar/lsp-service-cobol-0.8.1.jar -P $workspace/clients/cobol-lsp-vscode-extension/server/
-                            ls server
 
                             #npm i vsce -prefix $HOME/agent/workspace/$kubeLabel/tools -g
                             #$HOME/agent/workspace/$kubeLabel/tools/lib/node_modules/vsce/out/vsce package
                             
-                            find -type d -name "vsce"
-                            npm i vsce
-                            find -type d -name "vsce"
+                            #find -type d -name "vsce"
+                            #npm i vsce
+                            #find -type d -name "vsce"
                             
-                            ls node_modules/vsce
-                            ls node_modules/vsce/out
-                            ls node_modules/vsce/out/vsce
+                            #ls node_modules/vsce
+                            #ls node_modules/vsce/out
+                            #ls node_modules/vsce/out/vsce
                             
-                            node_modules/vsce/out/vsce package
+                            vsce package
+                            #node_modules/vsce/out/vsce package
                             #npx vsce package
-                            #vsce package
                             # rename
                             
                             export artifact_name=$(basename *.vsix)
