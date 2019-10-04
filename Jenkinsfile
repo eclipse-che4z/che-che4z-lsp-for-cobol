@@ -94,12 +94,12 @@ pipeline {
                         sh '''
                             #npm i vsce -prefix $HOME/agent/workspace/$kubeLabel/tools -g
                             #$HOME/agent/workspace/$kubeLabel/tools/lib/node_modules/vsce/out/vsce package
-                            npm i vsce -g
+                            npm i vsce
                             #pwd
                             #ls
                             #find / -type d -name "vsce"
                             
-                            #node_modules/vsce/out/vsce package
+                            node_modules/vsce/out/vsce package
                             #npx vsce package
                             vsce package
                             # rename
