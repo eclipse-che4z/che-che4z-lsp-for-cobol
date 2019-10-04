@@ -101,7 +101,7 @@ pipeline {
                             
                             node_modules/vsce/out/vsce package
                             #npx vsce package
-                            vsce package
+                            #vsce package
                             # rename
                             
                             export artifact_name=$(basename *.vsix)
