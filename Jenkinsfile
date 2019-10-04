@@ -59,17 +59,17 @@ pipeline {
        workspace = "${env.WORKSPACE}"
     }
     stages {
-        stage('Build LSP server part') {
-             steps {
-                container('maven') {
-                    dir('com.ca.lsp.cobol') {
-                        sh 'mvn -version'
-                        sh 'mvn clean verify'
-                        sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
-                    }
-                }
-            }
-        }
+        // stage('Build LSP server part') {
+        //      steps {
+        //         container('maven') {
+        //             dir('com.ca.lsp.cobol') {
+        //                 sh 'mvn -version'
+        //                 sh 'mvn clean verify'
+        //                 sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
+        //             }
+        //         }
+        //     }
+        // }
         stage('Client - Install dependencies') {
             environment {
                 npm_config_cache = "${env.WORKSPACE}"
@@ -92,12 +92,18 @@ pipeline {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh '''
+                            wget https://github.com/tomascechatbroadcomcom/che-devfile/releases/download/lspJar/lsp-service-cobol-0.8.1.jar -P $workspace/clients/cobol-lsp-vscode-extension/server/
+                            #mv lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/
+
                             #npm i vsce -prefix $HOME/agent/workspace/$kubeLabel/tools -g
                             #$HOME/agent/workspace/$kubeLabel/tools/lib/node_modules/vsce/out/vsce package
+                            
+                            find / -type d -name "vsce"
                             npm i vsce
-                            #pwd
-                            #ls
-                            #find / -type d -name "vsce"
+                            find / -type d -name "vsce"
+                            
+                            pwd
+                            ls
                             
                             node_modules/vsce/out/vsce package
                             #npx vsce package
