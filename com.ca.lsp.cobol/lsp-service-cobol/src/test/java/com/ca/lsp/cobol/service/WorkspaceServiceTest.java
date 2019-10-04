@@ -17,21 +17,39 @@ import java.util.Comparator;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 
 @Slf4j
 public class WorkspaceServiceTest {
-  private static final String FOLDER_NAME = "test";
-  private URI workspaceFolderPath = null;
-  private List<WorkspaceFolder> workspaceFolderList = new ArrayList<>();
+  private static final String WORKSPACE_FOLDER_NAME = "test";
+  private static final String CPY_FILE_NAME_WITH_EXT = "copy.cpy";
+  private static final String CPY_FILE_ONLY_NAME = "copy";
 
-  private CobolWorkspaceServiceImpl cobolWorkspaceService = CobolWorkspaceServiceImpl.getInstance();
+  private static final String COPYBOOK_CONTENT =
+      "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
+
+  private URI workspaceFolderPath = null;
+  private final List<WorkspaceFolder> workspaceFolderList = new ArrayList<>();
+
+  private final CobolWorkspaceServiceImpl cobolWorkspaceService =
+      CobolWorkspaceServiceImpl.getInstance();
 
   @Before
   public void scanWorkspaceForCopybooks() {
-    createTempDirAndFile();
+    Path workspacePath =
+        Paths.get(
+            System.getProperty("java.io.tmpdir")
+                + System.getProperty("file.separator")
+                + "WORKSPACE");
+    Path copybooksPath =
+        Paths.get(workspacePath + System.getProperty("file.separator") + "COPYBOOKS");
+    Path cpyFilePath =
+        Paths.get(copybooksPath + System.getProperty("file.separator") + CPY_FILE_NAME_WITH_EXT);
+
+    createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath);
 
     WorkspaceFolder workspaceFolder = new WorkspaceFolder();
-    workspaceFolder.setName(FOLDER_NAME);
+    workspaceFolder.setName(WORKSPACE_FOLDER_NAME);
     workspaceFolder.setUri(adjustURI(getWorkspaceFolderPath().toString()));
     workspaceFolderList.add(workspaceFolder);
     cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
@@ -40,6 +58,42 @@ public class WorkspaceServiceTest {
   @Test
   public void getCopyBookList() {
     assertEquals(cobolWorkspaceService.getCopybookList().size(), 1);
+  }
+
+  @Test
+  public void getUriByName() {
+    cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME);
+    assertTrue(
+        cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME).toUri().toString().length() > 0);
+
+    /*
+    // finding files containing 'items' in name
+    Stream<Path> stream = null;
+    AtomicReference<Path> outputURIPath = new AtomicReference<>();
+    System.out.println("copybookpath" + copybooksPath);
+    try {
+      stream =
+          Files.find(
+              copybooksPath,
+              100,
+              (path, basicFileAttributes) -> {
+                File file = path.toFile();
+                outputURIPath.set(file.toPath());
+                return !file.isDirectory() && file.getName().contains(CPY_FILE_ONLY_NAME);
+              });
+
+    } catch (IOException e) {
+
+      e.printStackTrace();
+    }
+    if (stream != null) {
+      assertEquals(stream.count(), 1);
+    }
+    //    assertTrue(
+    //        cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME).toUri().toString().length()
+    // > 0);
+
+     */
   }
 
   @After
@@ -59,31 +113,38 @@ public class WorkspaceServiceTest {
     }
   }
 
-  private void createTempDirAndFile() {
-    Path workspacePath =
-        Paths.get(
-            System.getProperty("java.io.tmpdir")
-                + System.getProperty("file.separator")
-                + "WORKSPACE");
-
-    Path copybooksPath =
-        Paths.get(workspacePath + System.getProperty("file.separator") + "COPYBOOKS");
+  private void createTempDirAndFile(Path workspacePath, Path copybookFolderPath, Path cpyFilePath) {
 
     try {
+
       if (!Files.exists(workspacePath)) {
-        Files.createDirectory(workspacePath);
+        Path wPath = Files.createDirectory(workspacePath);
+        File workspaceFile = wPath.toFile();
+
+        workspaceFile.setReadable(true, false);
+        workspaceFile.setExecutable(true, false);
+        workspaceFile.setWritable(true, false);
       }
 
-      if (!Files.exists(copybooksPath)) {
-        Files.createDirectory(copybooksPath);
+      if (!Files.exists(copybookFolderPath)) {
+        Path cPath = Files.createDirectory(copybookFolderPath);
+        File copybookFolderFile = cPath.toFile();
+
+        // Files.createDirectory(copybookFolderPath);
+        copybookFolderFile.setReadable(true, false);
+        copybookFolderFile.setExecutable(true, false);
+        copybookFolderFile.setWritable(true, false);
       }
 
-      Files.createFile(
-          Paths.get(copybooksPath + System.getProperty("file.separator") + "copy.cpy"));
+      Path theFile = Files.createFile(cpyFilePath);
+      File copyFile = theFile.toFile();
+
+      copyFile.setReadable(true, false);
+      copyFile.setExecutable(true, false);
+      copyFile.setWritable(true, false);
     } catch (IOException e) {
       e.printStackTrace();
     }
-
     setWorkspaceFolderPath(workspacePath.toUri());
   }
 

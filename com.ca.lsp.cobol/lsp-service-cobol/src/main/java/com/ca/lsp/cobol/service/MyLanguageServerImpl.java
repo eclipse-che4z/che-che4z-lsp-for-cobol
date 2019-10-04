@@ -23,8 +23,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class MyLanguageServerImpl implements IMyLanguageServer {
   private LanguageClient client;
-  private TextDocumentService textService;
-  private CobolWorkspaceServiceImpl workspaceService;
+  private final TextDocumentService textService;
+  private final CobolWorkspaceServiceImpl workspaceService;
 
   public MyLanguageServerImpl() {
 

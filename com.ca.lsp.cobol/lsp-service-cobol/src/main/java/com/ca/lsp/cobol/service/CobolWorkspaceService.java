@@ -13,4 +13,8 @@
  */
 package com.ca.lsp.cobol.service;
 
-interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService {}
+import java.nio.file.Path;
+
+interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService {
+  Path getURIByFileName(String fileName);
+}
