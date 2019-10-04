@@ -98,9 +98,10 @@ pipeline {
                             #npm i vsce -prefix $HOME/agent/workspace/$kubeLabel/tools -g
                             #$HOME/agent/workspace/$kubeLabel/tools/lib/node_modules/vsce/out/vsce package
                             
-                            find / -type d -name "vsce"
+                            ls
+                            find -type d -name "vsce"
                             npm i vsce
-                            find / -type d -name "vsce"
+                            find -type d -name "vsce"
                             
                             pwd
                             ls
