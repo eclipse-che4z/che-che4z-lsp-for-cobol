@@ -65,35 +65,6 @@ public class WorkspaceServiceTest {
     cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME);
     assertTrue(
         cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME).toUri().toString().length() > 0);
-
-    /*
-    // finding files containing 'items' in name
-    Stream<Path> stream = null;
-    AtomicReference<Path> outputURIPath = new AtomicReference<>();
-    System.out.println("copybookpath" + copybooksPath);
-    try {
-      stream =
-          Files.find(
-              copybooksPath,
-              100,
-              (path, basicFileAttributes) -> {
-                File file = path.toFile();
-                outputURIPath.set(file.toPath());
-                return !file.isDirectory() && file.getName().contains(CPY_FILE_ONLY_NAME);
-              });
-
-    } catch (IOException e) {
-
-      e.printStackTrace();
-    }
-    if (stream != null) {
-      assertEquals(stream.count(), 1);
-    }
-    //    assertTrue(
-    //        cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME).toUri().toString().length()
-    // > 0);
-
-     */
   }
 
   @After
@@ -118,30 +89,14 @@ public class WorkspaceServiceTest {
     try {
 
       if (!Files.exists(workspacePath)) {
-        Path wPath = Files.createDirectory(workspacePath);
-        File workspaceFile = wPath.toFile();
-
-        workspaceFile.setReadable(true, false);
-        workspaceFile.setExecutable(true, false);
-        workspaceFile.setWritable(true, false);
+        Files.createDirectory(workspacePath);
       }
 
       if (!Files.exists(copybookFolderPath)) {
-        Path cPath = Files.createDirectory(copybookFolderPath);
-        File copybookFolderFile = cPath.toFile();
-
-        // Files.createDirectory(copybookFolderPath);
-        copybookFolderFile.setReadable(true, false);
-        copybookFolderFile.setExecutable(true, false);
-        copybookFolderFile.setWritable(true, false);
+        Files.createDirectory(copybookFolderPath);
       }
+      Files.createFile(cpyFilePath);
 
-      Path theFile = Files.createFile(cpyFilePath);
-      File copyFile = theFile.toFile();
-
-      copyFile.setReadable(true, false);
-      copyFile.setExecutable(true, false);
-      copyFile.setWritable(true, false);
     } catch (IOException e) {
       e.printStackTrace();
     }
