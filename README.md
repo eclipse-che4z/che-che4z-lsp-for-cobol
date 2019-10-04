@@ -9,7 +9,7 @@ COBOL Language Support standardizes the communication between language tooling a
 - **Syntax highlighting** (with third-party plugins)
 	> Enables syntax highlighting for COBOL code as long as you have an appropriate third-party syntax highlighting extension installed.
 
-The COBOL Language Support extension for Visual Studio Code (VSC) integrates several COBOL language features into tools used in Visual Studio Code (VSC). COBOL Language Support recognizes files with the extensions .COB, .CBL and .CPY as COBOL files.
+The COBOL Language Support extension for Visual Studio Code (VSC) integrates several COBOL language features into tools used in VSC. Files with the extensions .COB, .CBL and .CPY are recognized as COBOL files.
 
 ## Prerequisites
 
