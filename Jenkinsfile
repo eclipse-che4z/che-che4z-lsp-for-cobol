@@ -52,6 +52,7 @@ pipeline {
         timeout(time: 3, unit: 'HOURS')
         skipDefaultCheckout(false)
         // skipDefaultCheckout(true)
+        buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '30'))
     }
     environment {
        branchName = "${env.BRANCH_NAME}"
@@ -59,17 +60,17 @@ pipeline {
        workspace = "${env.WORKSPACE}"
     }
     stages {
-        // stage('Build LSP server part') {
-        //      steps {
-        //         container('maven') {
-        //             dir('com.ca.lsp.cobol') {
-        //                 sh 'mvn -version'
-        //                 sh 'mvn clean verify'
-        //                 sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Build LSP server part') {
+             steps {
+                container('maven') {
+                    dir('com.ca.lsp.cobol') {
+                        sh 'mvn -version'
+                        sh 'mvn clean verify'
+                        sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
+                    }
+                }
+            }
+        }
         stage('Client - Install dependencies') {
             environment {
                 npm_config_cache = "${env.WORKSPACE}"
@@ -92,26 +93,13 @@ pipeline {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh '''
-                            wget https://github.com/tomascechatbroadcomcom/che-devfile/releases/download/lspJar/lsp-service-cobol-0.8.1.jar -P $workspace/clients/cobol-lsp-vscode-extension/server/
+                            #wget https://github.com/tomascechatbroadcomcom/che-devfile/releases/download/lspJar/lsp-service-cobol-0.8.1.jar -P $workspace/clients/cobol-lsp-vscode-extension/server/
 
-                            #npm i vsce -prefix $HOME/agent/workspace/$kubeLabel/tools -g
-                            #$HOME/agent/workspace/$kubeLabel/tools/lib/node_modules/vsce/out/vsce package
-                            
-                            #find -type d -name "vsce"
-                            #npm i vsce
-                            #find -type d -name "vsce"
-                            
-                            #ls node_modules/vsce
-                            #ls node_modules/vsce/out
-                            #ls node_modules/vsce/out/vsce
-                            
-                            #vsce package
-                            #node_modules/vsce/out/vsce package
                             npx vsce package
-                            # rename
-                            
+                            # rename                            
                             export artifact_name=$(basename *.vsix)
-                            mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%FT%H%M%S').vsix}
+                            mv -v $artifact_name ${artifact_name/.vsix/_latest.vsix}
+                            #mv -v $artifact_name ${artifact_name/.vsix/_$(date +'%FT%H%M%S').vsix}
                         '''
                     }
                 }
