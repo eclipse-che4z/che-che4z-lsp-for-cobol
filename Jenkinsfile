@@ -98,7 +98,7 @@ pipeline {
                             #$HOME/agent/workspace/$kubeLabel/tools/lib/node_modules/vsce/out/vsce package
                             
                             #find -type d -name "vsce"
-                            npm i vsce
+                            #npm i vsce
                             #find -type d -name "vsce"
                             
                             #ls node_modules/vsce
@@ -106,8 +106,8 @@ pipeline {
                             #ls node_modules/vsce/out/vsce
                             
                             #vsce package
-                            node_modules/vsce/out/vsce package
-                            #npx vsce package
+                            #node_modules/vsce/out/vsce package
+                            npx vsce package
                             # rename
                             
                             export artifact_name=$(basename *.vsix)
