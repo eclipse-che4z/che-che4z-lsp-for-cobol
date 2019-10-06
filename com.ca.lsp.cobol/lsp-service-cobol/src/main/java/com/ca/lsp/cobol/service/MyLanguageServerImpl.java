@@ -25,6 +25,7 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
   private LanguageClient client;
   private final TextDocumentService textService;
   private final CobolWorkspaceServiceImpl workspaceService;
+  private String copybookURIList;
 
   public MyLanguageServerImpl() {
 
@@ -54,7 +55,19 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
     capabilities.setWorkspace(workspaceServiceCapabilities);
 
     // from a given URI the scan search for a folder that contains copybooks and return it as list
+    // todo: this full-scan routine will be removed in favor of an on demand scan
     workspaceService.scanWorkspaceForCopybooks(params.getWorkspaceFolders());
+
+    // snippet of code to show current progress on copybook scan - will be removed from next version
+    StringBuilder copybooksFolderList = new StringBuilder();
+    workspaceService
+        .getCopybookList()
+        .forEach(
+            file ->
+                copybooksFolderList
+                    .append(file.toPath().toString())
+                    .append(System.getProperty("line.separator")));
+    setCopybookURIList(copybooksFolderList.toString());
 
     return CompletableFuture.supplyAsync(() -> new InitializeResult(capabilities));
   }
@@ -92,5 +105,14 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
   @Override
   public LanguageClient getClient() {
     return client;
+  }
+
+  @Override
+  public String getCopybookURIList() {
+    return copybookURIList;
+  }
+
+  private void setCopybookURIList(String copybookURIList) {
+    this.copybookURIList = copybookURIList;
   }
 }

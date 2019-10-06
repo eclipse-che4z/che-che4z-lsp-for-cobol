@@ -14,12 +14,13 @@
 package com.ca.lsp.cobol.service.mocks;
 
 import com.ca.lsp.cobol.service.IMyLanguageServer;
-import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Mock implementation of language server. Only for testing purposes.
@@ -73,5 +74,10 @@ public class TestLanguageServer implements IMyLanguageServer {
   @Override
   public void setPipeRemoteProxy(LanguageClient client) {
     this.client = client;
+  }
+
+  @Override
+  public String getCopybookURIList() {
+    return null;
   }
 }
