@@ -13,8 +13,8 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.ca.lsp.cobol.service.delegates.Formations;
 import com.ca.lsp.cobol.service.delegates.Communications;
+import com.ca.lsp.cobol.service.delegates.Formations;
 import com.ca.lsp.cobol.service.delegates.completions.Completions;
 import com.ca.lsp.cobol.service.delegates.references.References;
 import com.ca.lsp.cobol.service.delegates.validations.Analysis;
@@ -36,9 +36,11 @@ import java.util.concurrent.CompletableFuture;
 public class MyTextDocumentService implements TextDocumentService {
   private final Map<String, MyDocumentModel> docs = Collections.synchronizedMap(new HashMap<>());
   private final Communications communications;
+  private final IMyLanguageServer server;
 
   public MyTextDocumentService(IMyLanguageServer server) {
-    this.communications = new Communications(server);
+    this.server = server;
+    communications = new Communications(server);
   }
 
   Map<String, MyDocumentModel> getDocs() {
@@ -79,7 +81,10 @@ public class MyTextDocumentService implements TextDocumentService {
 
   @Override
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
-    return CompletableFuture.supplyAsync(() -> References.findReferences(docs.get(params.getTextDocument().getUri()), params, params.getContext()));
+    return CompletableFuture.supplyAsync(
+        () ->
+            References.findReferences(
+                docs.get(params.getTextDocument().getUri()), params, params.getContext()));
   }
 
   @Override
@@ -128,6 +133,7 @@ public class MyTextDocumentService implements TextDocumentService {
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
 
+    communications.notifyCopybooksFound(server.getCopybookURIList());
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     registerEngineAndAnalyze(uri, langId, text);
   }

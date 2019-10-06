@@ -26,7 +26,10 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -38,10 +41,10 @@ import java.util.stream.Collectors;
  * @author teman02
  */
 public class Communications {
-  private IMyLanguageServer server;
-  private ScheduledExecutorService executor = Executors.newScheduledThreadPool(5);
+  private final IMyLanguageServer server;
+  private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(5);
 
-  private Set<String> uriInProgress = new HashSet<>();
+  private final Set<String> uriInProgress = new HashSet<>();
 
   public Communications(IMyLanguageServer server) {
     this.server = server;
@@ -82,6 +85,16 @@ public class Communications {
     CompletableFuture.runAsync(
         () ->
             showMessage(MessageType.Info, "No syntax errors detected in " + retrieveFileName(uri)));
+  }
+
+  public void notifyCopybooksFound(String copybooksList) {
+    CompletableFuture.runAsync(
+        () ->
+            getClient()
+                .showMessage(
+                    new MessageParams(
+                        MessageType.Info,
+                        "Copybooks found in the current workspace " + copybooksList)));
   }
 
   public void publishDiagnostics(String uri, List<Diagnostic> diagnostics) {
