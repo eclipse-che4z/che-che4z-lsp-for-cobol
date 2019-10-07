@@ -41,6 +41,8 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   private CobolWorkspaceServiceImpl() {}
 
   /**
+   * Create a list of Files for each copybook found in a specific folder under the workspace
+   *
    * @param workspaceFolder is the folder sent from the client (represent the rootFolder of the
    *     workspace opened in the client)
    */

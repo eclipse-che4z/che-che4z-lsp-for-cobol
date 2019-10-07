@@ -36,10 +36,8 @@ import java.util.concurrent.CompletableFuture;
 public class MyTextDocumentService implements TextDocumentService {
   private final Map<String, MyDocumentModel> docs = Collections.synchronizedMap(new HashMap<>());
   private final Communications communications;
-  private final IMyLanguageServer server;
 
   public MyTextDocumentService(IMyLanguageServer server) {
-    this.server = server;
     communications = new Communications(server);
   }
 
@@ -132,10 +130,6 @@ public class MyTextDocumentService implements TextDocumentService {
     String uri = params.getTextDocument().getUri();
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
-
-    communications.notifyCopybooksFound(server.getCopybookURIList());
-    // will be removed/adjusted in the next version
-    communications.notifyURIOfCopybook("CPBTEST", server.getURIByCopybookName("CPBTEST"));
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     registerEngineAndAnalyze(uri, langId, text);
   }
