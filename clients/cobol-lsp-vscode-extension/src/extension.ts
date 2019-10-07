@@ -30,7 +30,7 @@ export async function activate(context: ExtensionContext) {
     let serverOptions: Executable;
 
     try {
-        // await isJavaInstalled();
+        await isJavaInstalled();
         if (fs.existsSync(LSPServerPath)) {
             serverOptions = {
                 args: ["-Dline.separator=\r\n", "-jar", LSPServerPath, "pipeEnabled"],

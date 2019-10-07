@@ -47,7 +47,7 @@ pipeline {
         }
     }    
     options {
-        disableConcurrentBuilds()
+        // disableConcurrentBuilds()
         timestamps()
         timeout(time: 3, unit: 'HOURS')
         skipDefaultCheckout(false)
@@ -55,7 +55,6 @@ pipeline {
     }
     environment {
        branchName = "${env.BRANCH_NAME}"
-       buildNumber = "${env.BUILD_NUMBER}"
        workspace = "${env.WORKSPACE}"
     }
     stages {
@@ -116,6 +115,11 @@ pipeline {
                         container('jnlp') {
                             sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
                                 echo "Deployment skipped for branch: ${branchName}"
+                                sh '''
+                                ssh genie.che4z@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                                ssh genie.che4z@projects-storage.eclipse.org mkdir -p /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                                scp -r $workspace/clients/cobol-lsp-vscode-extension/*.vsix genie.che4z@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                                '''   
                             }
                         }
                     }
