@@ -58,46 +58,46 @@ pipeline {
        workspace = "${env.WORKSPACE}"
     }
     stages {
-        // stage('Build LSP server part') {
-        //      steps {
-        //         container('maven') {
-        //             dir('com.ca.lsp.cobol') {
-        //                 sh 'mvn -version'
-        //                 sh 'mvn clean verify'
-        //                 sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
-        //             }
-        //         }
-        //     }
-        // }
-        // stage('Client - Install dependencies') {
-        //     environment {
-        //         npm_config_cache = "${env.WORKSPACE}"
-        //     }
-        //     steps {                
-        //         container('node') {
-        //             dir('clients/cobol-lsp-vscode-extension') {
-        //                 sh '''
-        //                     npm ci
-        //                 '''
-        //             }
-        //         }
-        //     }
-        // }
-        // stage('Client - Package') {
-        //     environment {
-        //         npm_config_cache = "${env.WORKSPACE}"
-        //     }
-        //     steps {
-        //         container('node') {
-        //             dir('clients/cobol-lsp-vscode-extension') {
-        //                 sh '''
-        //                     npx vsce package
-        //                     mv cobol-language-support*.vsix cobol-language-support_latest.vsix
-        //                 '''
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Build LSP server part') {
+             steps {
+                container('maven') {
+                    dir('com.ca.lsp.cobol') {
+                        sh 'mvn -version'
+                        sh 'mvn clean verify'
+                        sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
+                    }
+                }
+            }
+        }
+        stage('Client - Install dependencies') {
+            environment {
+                npm_config_cache = "${env.WORKSPACE}"
+            }
+            steps {                
+                container('node') {
+                    dir('clients/cobol-lsp-vscode-extension') {
+                        sh '''
+                            npm ci
+                        '''
+                    }
+                }
+            }
+        }
+        stage('Client - Package') {
+            environment {
+                npm_config_cache = "${env.WORKSPACE}"
+            }
+            steps {
+                container('node') {
+                    dir('clients/cobol-lsp-vscode-extension') {
+                        sh '''
+                            npx vsce package
+                            mv cobol-language-support*.vsix cobol-language-support_latest.vsix
+                        '''
+                    }
+                }
+            }
+        }
         stage('Deploy') {
             steps {
                 script {
@@ -115,9 +115,6 @@ pipeline {
                         container('jnlp') {
                             sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
                                 echo "Deployment skipped for branch: ${branchName}"
-                                sh '''
-                                ssh genie.che4z@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-                                '''    
                             }
                         }
                     }
