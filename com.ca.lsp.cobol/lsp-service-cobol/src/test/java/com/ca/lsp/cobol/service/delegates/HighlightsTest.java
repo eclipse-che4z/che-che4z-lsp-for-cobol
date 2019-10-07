@@ -31,6 +31,10 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Testing Document Highlighting with a variable, position is passed in INNER1_POSITION and the
+ * EXPECTED_RANGES is where the expected highlighting is to be enabled
+ */
 public class HighlightsTest {
   private static final String TEXT =
       "       Identification Division. \n"
@@ -55,11 +59,6 @@ public class HighlightsTest {
           + "           Move inner2 of outer2 to Str.\n"
           + "       End program ProgramId.";
 
-  /*
-   * Testing Document Highlighting with a variable, position is passed in INNER1_POSITION
-   * and the EXPECTED_RANGES is where the expected highlighting is to be enabled
-   */
-
   private static final Position INNER1_POSITION = new Position(16, 18);
 
   private static final List<Range> EXPECTED_RANGES = new ArrayList<>();
@@ -73,10 +72,6 @@ public class HighlightsTest {
 
   private TextDocumentService service;
 
-  /*
-   * Initialising the server
-   */
-
   @Before
   public void initializeService() {
     TestLanguageClient client = new TestLanguageClient();
@@ -84,10 +79,6 @@ public class HighlightsTest {
     runTextValidation(service, TEXT);
     waitForDiagnostics(client);
   }
-
-  /*
-   * Testing if Range from Highlights function is providing proper ranges against EXPECTED_RANGES
-   */
 
   @Test
   public void findHighlightsTest() throws InterruptedException, ExecutionException {
