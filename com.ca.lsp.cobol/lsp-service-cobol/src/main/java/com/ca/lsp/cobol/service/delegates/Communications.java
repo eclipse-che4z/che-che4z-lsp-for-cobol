@@ -97,6 +97,16 @@ public class Communications {
                         "Copybooks found in the current workspace " + copybooksList)));
   }
 
+  public void notifyURIOfCopybook(String copyName, String copybookURI) {
+    CompletableFuture.runAsync(
+        () ->
+            getClient()
+                .showMessage(
+                    new MessageParams(
+                        MessageType.Info,
+                        "Copybooks with name " + copyName + " have path: " + copybookURI)));
+  }
+
   public void publishDiagnostics(String uri, List<Diagnostic> diagnostics) {
     getClient().publishDiagnostics(new PublishDiagnosticsParams(uri, clean(diagnostics)));
   }
