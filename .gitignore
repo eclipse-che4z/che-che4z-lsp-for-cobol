@@ -119,3 +119,6 @@ out
 *.vsix
 .vscode-test
 node_modules
+tools
+logs/app.log
+dist
