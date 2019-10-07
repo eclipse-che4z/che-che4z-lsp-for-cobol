@@ -112,6 +112,11 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
     return copybookURIList;
   }
 
+  @Override
+  public String getURIByCopybookName(String copybookName) {
+    return workspaceService.getURIByFileName(copybookName).toString();
+  }
+
   private void setCopybookURIList(String copybookURIList) {
     this.copybookURIList = copybookURIList;
   }

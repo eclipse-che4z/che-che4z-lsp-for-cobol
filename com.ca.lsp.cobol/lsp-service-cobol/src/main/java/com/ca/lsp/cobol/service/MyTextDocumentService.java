@@ -134,6 +134,8 @@ public class MyTextDocumentService implements TextDocumentService {
     String langId = params.getTextDocument().getLanguageId();
 
     communications.notifyCopybooksFound(server.getCopybookURIList());
+    // will be removed/adjusted in the next version
+    communications.notifyURIOfCopybook("CPBTEST", server.getURIByCopybookName("CPBTEST"));
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     registerEngineAndAnalyze(uri, langId, text);
   }

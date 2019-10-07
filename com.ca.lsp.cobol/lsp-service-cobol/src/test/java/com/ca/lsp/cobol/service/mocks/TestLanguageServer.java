@@ -80,4 +80,9 @@ public class TestLanguageServer implements IMyLanguageServer {
   public String getCopybookURIList() {
     return null;
   }
+
+  @Override
+  public String getURIByCopybookName(String copybookName) {
+    return null;
+  }
 }
