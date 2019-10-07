@@ -113,11 +113,11 @@ public class CobolDocumentParserImpl implements CobolDocumentParser {
 
     // specify our entry point
     final StartRuleContext startRule = parser.startRule();
+    final ParseTreeWalker walker = new ParseTreeWalker();
 
     // analyze contained copy books
     final CobolDocumentParserListener listener =
         createDocumentParserListener(format, params, tokens);
-    final ParseTreeWalker walker = new ParseTreeWalker();
 
     walker.walk(listener, startRule);
 

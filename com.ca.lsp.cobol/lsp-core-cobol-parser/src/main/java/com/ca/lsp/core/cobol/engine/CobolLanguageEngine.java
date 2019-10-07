@@ -31,12 +31,8 @@ import com.ca.lsp.core.cobol.visitor.CobolVisitor;
 import com.google.common.collect.Lists;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
