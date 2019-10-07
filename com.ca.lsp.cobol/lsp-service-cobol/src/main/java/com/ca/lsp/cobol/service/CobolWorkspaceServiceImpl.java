@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
-  private static CobolWorkspaceServiceImpl INSTANCE = null;
+  private static final CobolWorkspaceServiceImpl INSTANCE = new CobolWorkspaceServiceImpl();
 
   private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
   private static final String URI_FILE_SEPARATOR = "/";
@@ -39,11 +39,6 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   private List<WorkspaceFolder> workspaceFolders;
 
   private CobolWorkspaceServiceImpl() {}
-
-  public static CobolWorkspaceServiceImpl getInstance() {
-    if (INSTANCE == null) INSTANCE = new CobolWorkspaceServiceImpl();
-    return INSTANCE;
-  }
 
   /**
    * @param workspaceFolder is the folder sent from the client (represent the rootFolder of the
@@ -128,5 +123,9 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
 
   private void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
     this.workspaceFolders = workspaceFolders;
+  }
+
+  public static CobolWorkspaceServiceImpl getInstance() {
+    return INSTANCE;
   }
 }
