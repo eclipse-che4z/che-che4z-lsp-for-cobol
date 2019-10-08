@@ -122,7 +122,7 @@ pipeline {
                                 sh '''
                                 ssh $sshChe4z rm -rf $deployPath
                                 ssh $sshChe4z mkdir -p $deployPath
-                                scp -r $workspace/*.vsix $sshChe4z:$deployPath
+                                scp -r $workspace/clients/cobol-lsp-vscode-extension/*.vsix $sshChe4z:$deployPath
                                 '''
                                 echo "Deployed to https://$url"
                             }
