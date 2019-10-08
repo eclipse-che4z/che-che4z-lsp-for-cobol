@@ -37,7 +37,8 @@ spec:
       name: known-hosts
 """
 
-def kubeLabel = 'lsp-for-cobol_pod_' + env.BRANCH_NAME + '_' + env.BUILD_NUMBER
+def projectName = 'lsp-for-cobol'
+def kubeLabel = projectName + '_pod_' + env.BRANCH_NAME + '_' + env.BUILD_NUMBER
 
 pipeline {
     agent {
@@ -54,8 +55,8 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '30'))
     }
     environment {
-       branchName = "${env.BRANCH_NAME}"
-       workspace = "${env.WORKSPACE}"
+       branchName = "$env.BRANCH_NAME"
+       workspace = "$env.WORKSPACE"
     }
     stages {
         stage('Build LSP server part') {
@@ -71,53 +72,51 @@ pipeline {
         }
         stage('Client - Install dependencies') {
             environment {
-                npm_config_cache = "${env.WORKSPACE}"
+                npm_config_cache = "$env.WORKSPACE"
             }
             steps {                
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
-                        sh '''
-                            npm ci
-                        '''
+                        sh 'npm ci'
                     }
                 }
             }
         }
         stage('Client - Package') {
             environment {
-                npm_config_cache = "${env.WORKSPACE}"
+                npm_config_cache = "$env.WORKSPACE"
             }
             steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
-                        sh '''
-                            npx vsce package
-                            mv cobol-language-support*.vsix cobol-language-support_latest.vsix
-                        '''
+                        sh 'npx vsce package'
+                        sh 'mv cobol-language-support*.vsix cobol-language-support_latest.vsix'
                     }
                 }
             }
         }
         stage('Deploy') {
+            environment {
+                sshChe4z = "genie.che4z@projects-storage.eclipse.org"
+                project = "download.eclipse.org/che4z/snapshots/$projectName"
+                url = "$project/$branchName"
+                deployPath = "/home/data/httpd/$url"
+            }
             steps {
                 script {
                     if (branchName == 'master' || branchName == 'development') {
                         container('jnlp') {
                             sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
                                 sh '''
-                                ssh genie.che4z@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-                                ssh genie.che4z@projects-storage.eclipse.org mkdir -p /home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
-                                scp -r $workspace/clients/cobol-lsp-vscode-extension/*.vsix genie.che4z@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName
+                                ssh $sshChe4z rm -rf $deployPath
+                                ssh $sshChe4z mkdir -p $deployPath
+                                scp -r $workspace/clients/cobol-lsp-vscode-extension/*.vsix $sshChe4z:$deployPath
                                 '''
-                                echo "Deployed to https://download.eclipse.org/che4z/snapshots/lsp-for-cobol/$branchName"
+                                echo "Deployed to https://$url"
                             }
                         }
                     } else {
-                        container('jnlp') {
-                            sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
-                                echo "Deployment skipped for branch: ${branchName}"
-                            }
-                        }
+                        echo "Deployment skipped for branch: $branchName"
                     }
                 }
             }
