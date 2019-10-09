@@ -19,6 +19,7 @@ import {
     LanguageClient,
     LanguageClientOptions,
 } from "vscode-languageclient/lib/main";
+import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
 
 export async function activate(context: ExtensionContext) {
     const fs = require("fs");
@@ -66,7 +67,8 @@ async function isJavaInstalled() {
     return new Promise<any>((resolve, reject) => {
         const ls = cp.spawn("java", ["-version"]);
         ls.stderr.on("data", (data: any) => {
-            if (!data.toString().includes('java version "1.8')) {
+            var javaCheck = new DefaultJavaVersionCheck();
+            if (!javaCheck.isJavaVersionSupported(data.toString())) {
                 reject("Java version 8 expected");
             }
             resolve();
