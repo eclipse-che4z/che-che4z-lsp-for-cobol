@@ -17,7 +17,7 @@ export interface JavaVersionCheck {
 
 export class DefaultJavaVersionCheck implements JavaVersionCheck {
     public isJavaVersionSupported(versionString: string) {
-        var versionPattern = new RegExp('(java|openjdk) (version)? ?"?((9|\d\d)|(1|9|\d\d)\.(1|8|\d\d).*).*');
+        const versionPattern = new RegExp('(java|openjdk) (version)? ?"?((9|[0-9][0-9])|(1|9|[0-9][0-9])\.(1|8|[0-9][0-9]).*).*');
         return versionPattern.test(versionString);
     }
 }
