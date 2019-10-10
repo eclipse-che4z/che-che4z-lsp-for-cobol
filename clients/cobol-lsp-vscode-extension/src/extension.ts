@@ -67,7 +67,7 @@ async function isJavaInstalled() {
     return new Promise<any>((resolve, reject) => {
         const ls = cp.spawn("java", ["-version"]);
         ls.stderr.on("data", (data: any) => {
-            var javaCheck = new DefaultJavaVersionCheck();
+            let javaCheck = new DefaultJavaVersionCheck();
             if (!javaCheck.isJavaVersionSupported(data.toString())) {
                 reject("Java version 8 expected");
             }
