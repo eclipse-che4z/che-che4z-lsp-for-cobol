@@ -48,6 +48,7 @@ export async function activate(context: ExtensionContext) {
     }
 
     // Options to control the language client
+    
     const clientOptions: LanguageClientOptions = {
         // Register the server for COBOL
         documentSelector: ["COBOL"],
