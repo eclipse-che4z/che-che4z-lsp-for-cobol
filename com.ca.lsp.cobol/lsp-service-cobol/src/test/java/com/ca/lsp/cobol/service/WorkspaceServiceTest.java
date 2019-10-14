@@ -6,7 +6,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -62,9 +64,22 @@ public class WorkspaceServiceTest {
 
   @Test
   public void getUriByName() {
-    cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME);
     assertTrue(
         cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME).toUri().toString().length() > 0);
+  }
+
+  @Test
+  public void getContentByURI() {
+    Path uriForFileName = cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME);
+    File file = null;
+    if (uriForFileName != null) {
+      // get URI in input
+      // check if the path exist and the content is more than zero
+      // return the content lenght to the client or -1 if the file doesnt exist
+      file = uriForFileName.toFile();
+    }
+
+    assertTrue(file != null && file.length() > 0);
   }
 
   @After
@@ -85,9 +100,7 @@ public class WorkspaceServiceTest {
   }
 
   private void createTempDirAndFile(Path workspacePath, Path copybookFolderPath, Path cpyFilePath) {
-
     try {
-
       if (!Files.exists(workspacePath)) {
         Files.createDirectory(workspacePath);
       }
@@ -95,12 +108,29 @@ public class WorkspaceServiceTest {
       if (!Files.exists(copybookFolderPath)) {
         Files.createDirectory(copybookFolderPath);
       }
-      Files.createFile(cpyFilePath);
+
+      Path copybookFilePath = Files.createFile(cpyFilePath);
+      generateDummyContentForFile(copybookFilePath);
 
     } catch (IOException e) {
       e.printStackTrace();
     }
     setWorkspaceFolderPath(workspacePath.toUri());
+  }
+
+  private void generateDummyContentForFile(Path copybookFilePath) {
+    File copybookFile = copybookFilePath.toFile();
+    FileOutputStream fileOutputStream;
+    try {
+      fileOutputStream = new FileOutputStream(copybookFile, true);
+      BufferedOutputStream bufferedOutputStream =
+          new BufferedOutputStream(fileOutputStream, 128 * 100);
+      bufferedOutputStream.write(COPYBOOK_CONTENT.getBytes());
+      bufferedOutputStream.flush();
+      fileOutputStream.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   private URI getWorkspaceFolderPath() {
