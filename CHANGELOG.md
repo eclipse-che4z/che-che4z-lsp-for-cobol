@@ -2,6 +2,12 @@
 
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.8.3]
+
+- Syntax highlighting for COBOL code enabled.
+- Syntax check for keywords highlights potential errors and mistakes in COBOL code.
+- Autocomplete suggestions  for COBOL keywords while you type
+
 ## [0.8.2]
 
 - Updates to README
