@@ -13,7 +13,9 @@
  */
 package com.ca.lsp.core.cobol.preprocessor;
 
+import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,12 +84,12 @@ public interface CobolPreprocessor {
     }
   }
 
-  String process(File cobolFile, CobolSourceFormatEnum format) throws IOException;
+  PreprocessedInput process(File cobolFile, CobolSourceFormatEnum format) throws IOException;
 
-  String process(File cobolFile, CobolSourceFormatEnum format, CobolParserParams params)
+  PreprocessedInput process(File cobolFile, CobolSourceFormatEnum format, CobolParserParams params)
       throws IOException;
 
-  String process(String cobolCode, CobolSourceFormatEnum format);
+  PreprocessedInput process(String cobolCode, CobolSourceFormatEnum format);
 
-  String process(String cobolCode, CobolSourceFormatEnum format, CobolParserParams params);
+  PreprocessedInput process(String cobolCode, CobolSourceFormatEnum format, CobolParserParams params, SemanticContext semanticContext);
 }
