@@ -22,38 +22,44 @@ import com.google.common.collect.Multimap;
 
 import java.util.Collection;
 
-public class CobolParagraphContext implements LanguageContext<String> {
+class CobolNamedContext implements SubContext<String> {
 
-  private Multimap<String, Position> paragraphDefinitions = HashMultimap.create();
-  private Multimap<String, Position> paragraphUsages = HashMultimap.create();
+  private Multimap<String, Position> namedDefinitions = HashMultimap.create();
+  private Multimap<String, Position> namedUsages = HashMultimap.create();
 
   @Override
   public void define(String paragraph, Position position) {
-    paragraphDefinitions.put(paragraph, position);
+    namedDefinitions.put(paragraph, position);
   }
 
   @Override
   public void addUsage(String paragraph, Position position) {
-    paragraphUsages.put(paragraph, position);
+    namedUsages.put(paragraph, position);
   }
 
   @Override
   public Collection<String> getAll() {
-    return paragraphDefinitions.keySet();
+    return namedDefinitions.keySet();
   }
 
   @Override
   public boolean contains(String name) {
-    return paragraphDefinitions.containsKey(name);
+    return namedDefinitions.containsKey(name);
   }
 
   @Override
   public Multimap<String, Position> getUsages() {
-    return paragraphDefinitions;
+    return namedDefinitions;
+  }
+
+  @Override
+  public void merge(SubContext<String> subContext) {
+    namedDefinitions.putAll(subContext.getDefinitions());
+    namedUsages.putAll(subContext.getUsages());
   }
 
   @Override
   public Multimap<String, Position> getDefinitions() {
-    return paragraphUsages;
+    return namedUsages;
   }
 }

@@ -17,8 +17,9 @@ import com.ca.lsp.cobol.service.CobolWorkspaceServiceImpl;
 import com.ca.lsp.core.cobol.LanguageEngineFactory;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.Position;
+import com.ca.lsp.core.cobol.model.ProcessingResult;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.semantics.LanguageContext;
+import com.ca.lsp.core.cobol.semantics.SubContext;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -104,23 +105,23 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
     CobolLanguageEngine engine = LanguageEngineFactory.fixedFormatCobolLanguageEngine();
     engine.setCopybookList(CobolWorkspaceServiceImpl.getInstance().getCopybookList());
-    engine.run(text);
-    LanguageContext variables = engine.getVariables();
-    LanguageContext paragraphs = engine.getParagraphs();
-
-    return new AnalysisResult(
-        convertErrors(engine.getErrors()),
-        retrieveDefinitions(variables),
-        retrieveUsages(variables),
-        retrieveDefinitions(paragraphs),
-        retrieveUsages(paragraphs));
+    return toAnalysisResult(engine.run(text));
   }
 
-  private Map<String, List<Range>> retrieveDefinitions(LanguageContext<?> context) {
+  private AnalysisResult toAnalysisResult(ProcessingResult result) {
+    return new AnalysisResult(
+        convertErrors(result.getErrors()),
+        retrieveDefinitions(result.getSemanticContext().getVariables()),
+        retrieveUsages(result.getSemanticContext().getVariables()),
+        retrieveDefinitions(result.getSemanticContext().getParagraphs()),
+        retrieveUsages(result.getSemanticContext().getParagraphs()));
+  }
+
+  private Map<String, List<Range>> retrieveDefinitions(SubContext<?> context) {
     return retrieveMap(context.getDefinitions().asMap());
   }
 
-  private Map<String, List<Range>> retrieveUsages(LanguageContext<?> context) {
+  private Map<String, List<Range>> retrieveUsages(SubContext<?> context) {
     return retrieveMap(context.getUsages().asMap());
   }
 

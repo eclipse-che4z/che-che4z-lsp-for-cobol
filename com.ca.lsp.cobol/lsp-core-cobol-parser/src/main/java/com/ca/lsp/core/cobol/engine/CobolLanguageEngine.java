@@ -13,65 +13,43 @@
  */
 package com.ca.lsp.core.cobol.engine;
 
-import com.ca.lsp.core.cobol.params.CobolParserParams;
-import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
+import com.ca.lsp.core.cobol.model.PreprocessedInput;
+import com.ca.lsp.core.cobol.model.ProcessingResult;
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolLexer;
 import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.listener.FormatListener;
 import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
-import com.ca.lsp.core.cobol.semantics.LanguageContext;
-import com.ca.lsp.core.cobol.semantics.CobolParagraphContext;
-import com.ca.lsp.core.cobol.semantics.CobolVariableContext;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategy;
 import com.ca.lsp.core.cobol.visitor.CobolVisitor;
-import com.google.common.collect.Lists;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 public class CobolLanguageEngine {
 
   private final CobolPreprocessor.CobolSourceFormatEnum sourceFormat;
-  @Getter private List<SyntaxError> errors = new ArrayList<>();
-  @Getter private LanguageContext variables = new CobolVariableContext();
-  @Getter private LanguageContext paragraphs = new CobolParagraphContext();
-  @Getter private List<File> copybookList;
+  @Setter private List<File> copybookList;
 
-  @SuppressWarnings("unused")
-  private CobolParserParams createDefaultParams(final File cobolFile) {
-    final CobolParserParams result = new CobolParserParamsImpl();
-    final File copyBooksDirectory = cobolFile.getParentFile();
-    result.setCopyBookDirectories(Lists.newArrayList(copyBooksDirectory));
-    return result;
-  }
-
-  private CobolParserParams createParams() {
-    final CobolParserParams result = new CobolParserParamsImpl();
-    result.setCopyBookFiles(copybookList);
-    return result;
-  }
-
-  public void run(String in) {
+  public ProcessingResult run(String in) {
+    List<SyntaxError> errors = new ArrayList<>();
     CobolPreprocessorImpl preprocessor = new CobolPreprocessorImpl();
-    preprocessor.setFormatErrors(new FormatListener(errors));
-    final String preProcessedInput = preprocessor.process(in, sourceFormat, createParams());
-    doParse(preProcessedInput);
-  }
+    preprocessor.setFormatListener(new FormatListener(errors));
+    preprocessor.setCopybookList(copybookList);
 
-  private void doParse(String preProcessedInput) {
-    final CobolLexer lexer = new CobolLexer(CharStreams.fromString(preProcessedInput));
+    final PreprocessedInput preProcessedInput = preprocessor.process(in, sourceFormat);
+    final CobolLexer lexer = new CobolLexer(CharStreams.fromString(preProcessedInput.getInput()));
 
     lexer.removeErrorListeners();
     lexer.addErrorListener(new VerboseListener(errors));
@@ -84,17 +62,14 @@ public class CobolLanguageEngine {
 
     CobolErrorStrategy strategy = new CobolErrorStrategy();
     parser.setErrorHandler(strategy);
+
     CobolParser.StartRuleContext tree = parser.startRule();
+    CobolVisitor visitor = new CobolVisitor();
+    visitor.setSemanticErrors(new SemanticListener(errors));
+    visitor.setSemanticContext(preProcessedInput.getSemanticContext());
+    visitor.visit(tree);
 
-    CobolVisitor tourist = new CobolVisitor();
-    tourist.setSemanticErrors(new SemanticListener(errors));
-    tourist.setVariableContext((CobolVariableContext) variables);
-    tourist.setParagraphContext((CobolParagraphContext) paragraphs);
-    tourist.visit(tree);
     errors.forEach(errs -> LOG.debug(errs.printSyntaxError()));
-  }
-
-  public void setCopybookList(List<File> copybookList) {
-    this.copybookList = copybookList;
+    return new ProcessingResult(errors, preProcessedInput.getSemanticContext());
   }
 }

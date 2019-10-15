@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.impl;
 
+import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
 import com.ca.lsp.core.cobol.parser.listener.FormatListener;
@@ -34,7 +35,8 @@ import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.CobolUnsupportedF
 import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.ContinuationLineTransformation;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.CobolLineWriter;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.impl.CobolLineWriterImpl;
-import com.google.common.collect.Lists;
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -43,74 +45,17 @@ import java.util.List;
 
 @Slf4j
 public class CobolPreprocessorImpl implements CobolPreprocessor {
-
-  private FormatListener formatListener = null;
-
-  public void setFormatErrors(FormatListener formatErrors) {
-    this.formatListener = formatErrors;
-  }
-
-  protected CobolCommentEntriesMarker createCommentEntriesMarker() {
-    return new CobolCommentEntriesMarkerImpl();
-  }
-
-  protected CobolParserParams createDefaultParams() {
-    return new CobolParserParamsImpl();
-  }
-
-  protected CobolParserParams createDefaultParams(final File cobolFile) {
-    final CobolParserParams result = createDefaultParams();
-
-    final File copyBooksDirectory = cobolFile.getParentFile();
-    result.setCopyBookDirectories(Lists.newArrayList(copyBooksDirectory));
-
-    return result;
-  }
-
-  protected CobolDocumentParser createDocumentParser() {
-    return new CobolDocumentParserImpl();
-  }
-
-  protected CobolInlineCommentEntriesNormalizer createInlineCommentEntriesNormalizer() {
-    return new CobolInlineCommentEntriesNormalizerImpl();
-  }
-
-  protected CobolLineIndicatorProcessor createLineIndicatorProcessor() {
-    return new CobolLineIndicatorProcessorImpl();
-  }
-
-  private CobolLinesTransformation createUnsupportedFeaturesProcessor() {
-    return new CobolUnsupportedFeaturesIgnorerImpl(formatListener);
-  }
-
-  private CobolLinesTransformation createContinuationLineProcessor() {
-    return new ContinuationLineTransformation(formatListener);
-  }
-
-  protected CobolLineReader createLineReader() {
-    return new CobolLineReaderImpl(formatListener);
-  }
-
-  protected CobolLineWriter createLineWriter() {
-    return new CobolLineWriterImpl();
-  }
-
-  protected String parseDocument(
-      final List<CobolLine> lines,
-      final CobolPreprocessor.CobolSourceFormatEnum format,
-      final CobolParserParams params) {
-    String code = createLineWriter().serialize(lines);
-    return createDocumentParser().processLines(code, format, params);
-  }
+  @Setter private FormatListener formatListener;
+  @Setter private List<File> copybookList;
 
   @Override
-  public String process(final File cobolFile, final CobolSourceFormatEnum format)
+  public PreprocessedInput process(final File cobolFile, final CobolSourceFormatEnum format)
       throws IOException {
-    return process(cobolFile, format, createDefaultParams(cobolFile));
+    return process(cobolFile, format, createDefaultParams());
   }
 
   @Override
-  public String process(
+  public PreprocessedInput process(
       final File cobolFile, final CobolSourceFormatEnum format, final CobolParserParams params)
       throws IOException {
     final Charset charset = params.getCharset();
@@ -130,25 +75,37 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
         outputBuffer.append(line).append(ProcessingConstants.NEWLINE);
       }
     }
-
-    return process(outputBuffer.toString(), format, params);
+    return process(outputBuffer.toString(), format, params, new SemanticContext());
   }
 
   @Override
-  public String process(final String cobolSourceCode, final CobolSourceFormatEnum format) {
-    return process(cobolSourceCode, format, createDefaultParams());
+  public PreprocessedInput process(
+      final String cobolSourceCode, final CobolSourceFormatEnum format) {
+    return process(cobolSourceCode, format, createDefaultParams(), new SemanticContext());
   }
 
   @Override
-  public String process(
-      final String cobolCode, final CobolSourceFormatEnum format, final CobolParserParams params) {
+  public PreprocessedInput process(
+      final String cobolCode,
+      final CobolSourceFormatEnum format,
+      final CobolParserParams params,
+      final SemanticContext semanticContext) {
     final List<CobolLine> lines = readLines(cobolCode, format, params);
     final List<CobolLine> transformedLines = transformLines(lines);
     final List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
-    return parseDocument(rewrittenLines, format, params);
+    return parseDocument(rewrittenLines, format, params, semanticContext);
   }
 
-  protected List<CobolLine> readLines(
+  private PreprocessedInput parseDocument(
+      final List<CobolLine> lines,
+      final CobolSourceFormatEnum format,
+      final CobolParserParams params,
+      final SemanticContext semanticContext) {
+    String code = createLineWriter().serialize(lines);
+    return createDocumentParser(semanticContext).processLines(code, format, params);
+  }
+
+  private List<CobolLine> readLines(
       final String cobolCode, final CobolSourceFormatEnum format, final CobolParserParams params) {
     return createLineReader().processLines(cobolCode, format, params);
   }
@@ -162,11 +119,49 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
    * Normalizes lines of given COBOL source code, so that comment entries can be parsed and lines
    * have a unified line format.
    */
-  protected List<CobolLine> rewriteLines(final List<CobolLine> lines) {
+  private List<CobolLine> rewriteLines(final List<CobolLine> lines) {
     final List<CobolLine> lineIndicatorProcessedLines =
         createLineIndicatorProcessor().processLines(lines);
     final List<CobolLine> normalizedInlineCommentEntriesLines =
         createInlineCommentEntriesNormalizer().processLines(lineIndicatorProcessedLines);
     return createCommentEntriesMarker().processLines(normalizedInlineCommentEntriesLines);
+  }
+
+  private CobolCommentEntriesMarker createCommentEntriesMarker() {
+    return new CobolCommentEntriesMarkerImpl();
+  }
+
+  private CobolParserParams createDefaultParams() {
+    final CobolParserParams result = new CobolParserParamsImpl();
+    result.setCopyBookFiles(copybookList);
+    return result;
+  }
+
+  private CobolDocumentParser createDocumentParser(SemanticContext semanticContext) {
+    return new CobolDocumentParserImpl(semanticContext);
+  }
+
+  private CobolInlineCommentEntriesNormalizer createInlineCommentEntriesNormalizer() {
+    return new CobolInlineCommentEntriesNormalizerImpl();
+  }
+
+  private CobolLineIndicatorProcessor createLineIndicatorProcessor() {
+    return new CobolLineIndicatorProcessorImpl();
+  }
+
+  private CobolLinesTransformation createUnsupportedFeaturesProcessor() {
+    return new CobolUnsupportedFeaturesIgnorerImpl(formatListener);
+  }
+
+  private CobolLinesTransformation createContinuationLineProcessor() {
+    return new ContinuationLineTransformation(formatListener);
+  }
+
+  private CobolLineReader createLineReader() {
+    return new CobolLineReaderImpl(formatListener);
+  }
+
+  private CobolLineWriter createLineWriter() {
+    return new CobolLineWriterImpl();
   }
 }
