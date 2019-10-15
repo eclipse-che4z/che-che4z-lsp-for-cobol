@@ -4,17 +4,23 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ## [0.8.3]
 
-- Syntax highlighting for COBOL code enabled.
-- Syntax check for keywords highlights potential errors and mistakes in COBOL code.
-- Autocomplete suggestions for COBOL keywords while you type
+#### Added
+- Syntax highlighting for variables and paragraphs in COBOL file enabled
+
+#### Fixes
+- Java automatic check now recognizes all supported JRE/JDK java implementations
 
 ## [0.8.2]
 
+#### Changes
 - Updates to README
 
 ## [0.8.1]
 
-- Automatic check for Java added before launching the LSP server.
+#### Added
+- Automatic check for Java added before launching the LSP server
+
+#### Changed
 - Extension name updated
 
 ## [0.8.0]
