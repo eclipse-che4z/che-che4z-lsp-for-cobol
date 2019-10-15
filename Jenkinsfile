@@ -38,7 +38,7 @@ spec:
 """
 
 def projectName = 'lsp-for-cobol'
-def kubeLabel = projectName + '_pod_' + env.BRANCH_NAME + '_' + env.BUILD_NUMBER
+def kubeLabel = projectName + '_pod_' + env.BUILD_NUMBER + '_' + env.BRANCH_NAME
 kubeLabel = kubeLabel.replaceAll(/[^a-zA-Z0-9._-]+/,"")
 
 pipeline {
@@ -53,7 +53,7 @@ pipeline {
         timestamps()
         timeout(time: 3, unit: 'HOURS')
         skipDefaultCheckout(false)
-        buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '30'))
+        buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '3'))
     }
     environment {
        branchName = "$env.BRANCH_NAME"
@@ -91,6 +91,7 @@ pipeline {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh 'npx vsce package'
+                        archiveArtifacts "*.vsix"
                         sh 'mv cobol-language-support*.vsix cobol-language-support_latest.vsix'
                     }
                 }
