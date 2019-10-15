@@ -7,12 +7,12 @@ All notable changes to the COBOL Language Support extension are documented in th
 #### Added
 - Syntax highlighting for variables and paragraphs in COBOL file enabled
 
-#### Fixed
+#### Fixes
 - Java automatic check now recognizes all supported JRE/JDK java implementations
 
 ## [0.8.2]
 
-#### Changed
+#### Changes
 - Updates to README
 
 ## [0.8.1]
