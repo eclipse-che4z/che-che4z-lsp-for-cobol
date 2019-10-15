@@ -105,7 +105,7 @@ pipeline {
             }
             steps {
                 script {
-                    if (branchName == 'master' || branchName == 'development') {
+                    if (branchName == 'master' || branchName == 'development' || branchName =~ /^[rR]elease-[0-9]+[.][0-9]+[.][0-9]+$/) {
                         container('jnlp') {
                             sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
                                 sh '''
