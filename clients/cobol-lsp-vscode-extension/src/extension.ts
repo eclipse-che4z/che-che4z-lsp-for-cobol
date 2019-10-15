@@ -19,13 +19,14 @@ import {
     LanguageClient,
     LanguageClientOptions,
 } from "vscode-languageclient/lib/main";
+import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
 
 export async function activate(context: ExtensionContext) {
     const fs = require("fs");
 
     // path resolved to identify the location of the LSP server into the extension
     const extPath = extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
-    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.8.2.jar`;
+    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.8.3.jar`;
 
     let serverOptions: Executable;
 
@@ -66,7 +67,8 @@ async function isJavaInstalled() {
     return new Promise<any>((resolve, reject) => {
         const ls = cp.spawn("java", ["-version"]);
         ls.stderr.on("data", (data: any) => {
-            if (!data.toString().includes('java version "1.8')) {
+            let javaCheck = new DefaultJavaVersionCheck();
+            if (!javaCheck.isJavaVersionSupported(data.toString())) {
                 reject("Java version 8 expected");
             }
             resolve();

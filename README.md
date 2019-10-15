@@ -1,3 +1,11 @@
+<div id="header" align="center">
+
+[![Build Status](https://ci.eclipse.org/che4z/buildStatus/icon?job=LSP+for+COBOL%2Fdevelopment)](https://ci.eclipse.org/che4z/job/LSP%20for%20COBOL/job/development/)
+[![slack](https://img.shields.io/badge/chat-on%20Slack-blue)](https://join.slack.com/t/che4z/shared_invite/enQtNzk0MzA4NDMzOTIwLWIzMjEwMjJlOGMxNmMyNzQ1NWZlMzkxNmQ3M2VkYWNjMmE0MGQ0MjIyZmY3MTdhZThkZDg3NGNhY2FmZTEwNzQ)
+
+</div>
+
+
 # COBOL Language Support
 
 COBOL Language Support standardizes the communication between language tooling and your code editor. COBOL Language Support defines the protocol that is used between an editor or IDE and a language server that provides the following COBOL syntax awareness features:

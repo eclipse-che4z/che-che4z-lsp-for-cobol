@@ -25,3 +25,8 @@ vsc-extension-quickstart.md
 undefined/**
 CONTRIBUTING.md 
 .vscode-test/**
+tools
+_cacache
+_locks
+anonymous-cli-metrics.json
+out/__tests__/**
