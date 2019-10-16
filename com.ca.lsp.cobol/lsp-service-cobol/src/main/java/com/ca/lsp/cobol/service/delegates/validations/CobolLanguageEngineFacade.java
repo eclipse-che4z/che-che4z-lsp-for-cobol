@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.cobol.service.delegates.validations;
 
-import com.ca.lsp.cobol.service.CobolWorkspaceServiceImpl;
 import com.ca.lsp.core.cobol.LanguageEngineFactory;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.Position;
@@ -104,18 +103,17 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     }
 
     CobolLanguageEngine engine = LanguageEngineFactory.fixedFormatCobolLanguageEngine();
-    engine.setCopybookList(CobolWorkspaceServiceImpl.getInstance().getCopybookList());
-      return toAnalysisResult(engine.run(text));
+    return toAnalysisResult(engine.run(text));
   }
-    private AnalysisResult toAnalysisResult(ProcessingResult result) {
-        return new AnalysisResult(
-                convertErrors(result.getErrors()),
-                retrieveDefinitions(result.getSemanticContext().getVariables()),
-                retrieveUsages(result.getSemanticContext().getVariables()),
-                retrieveDefinitions(result.getSemanticContext().getParagraphs()),
-                retrieveUsages(result.getSemanticContext().getParagraphs()));
-    }
 
+  private AnalysisResult toAnalysisResult(ProcessingResult result) {
+    return new AnalysisResult(
+        convertErrors(result.getErrors()),
+        retrieveDefinitions(result.getSemanticContext().getVariables()),
+        retrieveUsages(result.getSemanticContext().getVariables()),
+        retrieveDefinitions(result.getSemanticContext().getParagraphs()),
+        retrieveUsages(result.getSemanticContext().getParagraphs()));
+  }
 
   private Map<String, List<Range>> retrieveDefinitions(SubContext<?> context) {
     return retrieveMap(context.getDefinitions().asMap());
