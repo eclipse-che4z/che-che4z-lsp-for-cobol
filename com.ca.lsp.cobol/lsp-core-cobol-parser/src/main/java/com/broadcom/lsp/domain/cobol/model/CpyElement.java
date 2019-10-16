@@ -14,7 +14,7 @@
  *
  */
 
-package com.broadcom.lsp.domain.cobol.databus.model;
+package com.broadcom.lsp.domain.cobol.model;
 
 import lombok.Builder;
 import lombok.Getter;
