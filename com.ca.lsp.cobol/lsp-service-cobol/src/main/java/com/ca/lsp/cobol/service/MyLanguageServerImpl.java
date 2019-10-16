@@ -23,8 +23,9 @@ import java.util.concurrent.CompletableFuture;
 
 public class MyLanguageServerImpl implements IMyLanguageServer {
   private LanguageClient client;
-  private TextDocumentService textService;
-  private CobolWorkspaceServiceImpl workspaceService;
+  private final TextDocumentService textService;
+  private final CobolWorkspaceServiceImpl workspaceService;
+  private String copybookURIList;
 
   public MyLanguageServerImpl() {
 
@@ -52,9 +53,6 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
     WorkspaceServerCapabilities workspaceServiceCapabilities =
         new WorkspaceServerCapabilities(workspaceFoldersOptions);
     capabilities.setWorkspace(workspaceServiceCapabilities);
-
-    // from a given URI the scan search for a folder that contains copybooks and return it as list
-    workspaceService.scanWorkspaceForCopybooks(params.getWorkspaceFolders());
 
     return CompletableFuture.supplyAsync(() -> new InitializeResult(capabilities));
   }
@@ -92,5 +90,15 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
   @Override
   public LanguageClient getClient() {
     return client;
+  }
+
+  @Override
+  public String getCopybookURIList() {
+    return copybookURIList;
+  }
+
+  @Override
+  public String getURIByCopybookName(String copybookName) {
+    return workspaceService.getURIByFileName(copybookName).toString();
   }
 }

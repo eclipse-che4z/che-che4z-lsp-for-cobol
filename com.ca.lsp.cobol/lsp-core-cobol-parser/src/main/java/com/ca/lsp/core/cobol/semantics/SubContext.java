@@ -21,7 +21,7 @@ import com.google.common.collect.Multimap;
 
 import java.util.Collection;
 
-public interface LanguageContext<T> {
+public interface SubContext<T> {
 
   /**
    * Add defined language element to the context
@@ -47,7 +47,7 @@ public interface LanguageContext<T> {
   Collection<T> getAll();
 
   /**
-   * Check if the context contains a languaage element with the provided name already defined
+   * Check if the context contains a language element with the provided name already defined
    *
    * @param name - a language element name to check
    * @return true if the element is already defined
@@ -66,4 +66,6 @@ public interface LanguageContext<T> {
    * @return - multimap of names to a list of positions of usages
    */
   Multimap<String, Position> getUsages();
+
+  void merge(SubContext<T> subContext);
 }

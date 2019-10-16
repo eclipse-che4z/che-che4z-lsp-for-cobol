@@ -23,4 +23,8 @@ public interface IMyLanguageServer extends LanguageServer {
   Runnable setSocketRemoteProxy(LanguageClient client);
 
   void setPipeRemoteProxy(LanguageClient client);
+
+  String getCopybookURIList();
+
+  String getURIByCopybookName(String copybookName);
 }
