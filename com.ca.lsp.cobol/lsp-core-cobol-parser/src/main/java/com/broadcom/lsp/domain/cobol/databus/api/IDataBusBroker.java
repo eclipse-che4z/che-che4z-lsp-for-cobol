@@ -16,7 +16,6 @@
 
 package com.broadcom.lsp.domain.cobol.databus.api;
 
-import com.broadcom.lsp.domain.cobol.databus.impl.IDataBusBrokerImpl;
 import com.google.inject.ImplementedBy;
 import com.google.inject.Singleton;
 
@@ -24,6 +23,5 @@ import com.google.inject.Singleton;
  * Created by lamgi04 on 2019-10-01
  */
 
-@ImplementedBy(IDataBusBrokerImpl.class)
 public interface IDataBusBroker {
 }
