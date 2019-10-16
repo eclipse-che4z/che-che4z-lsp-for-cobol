@@ -16,8 +16,6 @@
 
 package com.broadcom.lsp.cdi;
 
-import com.broadcom.lsp.domain.cobol.databus.api.IDataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.impl.IDataBusBrokerImpl;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
