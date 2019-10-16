@@ -13,41 +13,42 @@
  */
 package com.ca.lsp.core.cobol.engine;
 
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
 import com.ca.lsp.core.cobol.parser.CobolLexer;
 import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.listener.FormatListener;
 import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
-import com.ca.lsp.core.cobol.semantics.LanguageContext;
 import com.ca.lsp.core.cobol.semantics.CobolParagraphContext;
 import com.ca.lsp.core.cobol.semantics.CobolVariableContext;
+import com.ca.lsp.core.cobol.semantics.LanguageContext;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategy;
 import com.ca.lsp.core.cobol.visitor.CobolVisitor;
 import com.google.common.collect.Lists;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 public class CobolLanguageEngine {
 
   private final CobolPreprocessor.CobolSourceFormatEnum sourceFormat;
-  @Getter private List<SyntaxError> errors = new ArrayList<>();
-  @Getter private LanguageContext variables = new CobolVariableContext();
-  @Getter private LanguageContext paragraphs = new CobolParagraphContext();
-  @Getter private List<File> copybookList;
+  @Getter private final List<SyntaxError> errors = new ArrayList<>();
+  @Getter private final LanguageContext variables = new CobolVariableContext();
+  @Getter private final LanguageContext paragraphs = new CobolParagraphContext();
+  @Getter private List<Path> copybookList;
 
   @SuppressWarnings("unused")
   private CobolParserParams createDefaultParams(final File cobolFile) {
@@ -94,7 +95,7 @@ public class CobolLanguageEngine {
     errors.forEach(errs -> LOG.debug(errs.printSyntaxError()));
   }
 
-  public void setCopybookList(List<File> copybookList) {
+  public void setCopybookList(List<Path> copybookList) {
     this.copybookList = copybookList;
   }
 }

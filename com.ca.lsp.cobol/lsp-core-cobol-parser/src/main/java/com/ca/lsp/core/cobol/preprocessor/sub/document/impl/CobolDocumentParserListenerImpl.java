@@ -13,25 +13,6 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.EXEC_CICS_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.EXEC_END_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.EXEC_SQLIMS_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.EXEC_SQL_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.NEWLINE;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
-import java.util.Scanner;
-
-import org.antlr.v4.runtime.BufferedTokenStream;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
@@ -49,6 +30,19 @@ import com.ca.lsp.core.cobol.preprocessor.sub.copybook.impl.FilenameCopyBookFind
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.impl.LiteralCopyBookFinderImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolDocumentParserListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
+import org.antlr.v4.runtime.BufferedTokenStream;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
+import java.util.Scanner;
+
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 
 /**
  * ANTLR visitor, which preprocesses a given COBOL program by executing COPY and REPLACE statements.

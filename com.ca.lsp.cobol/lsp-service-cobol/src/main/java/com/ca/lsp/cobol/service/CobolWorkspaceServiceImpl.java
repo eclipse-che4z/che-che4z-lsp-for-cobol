@@ -35,7 +35,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
 
   private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
   private static final String URI_FILE_SEPARATOR = "/";
-  private List<File> copybookFileList;
+  private List<Path> copybookFileList;
   private List<WorkspaceFolder> workspaceFolders;
 
   private CobolWorkspaceServiceImpl() {}
@@ -67,7 +67,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   }
 
   /** @return List of copybooks */
-  public List<File> getCopybookFileList() {
+  public List<Path> getCopybookFileList() {
     return copybookFileList;
   }
 
@@ -119,7 +119,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
         Files.list(
             Paths.get(
                 new URI(workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME)))) {
-      copybookFoldersStream.map(Path::toFile).forEach(copybookFileList::add);
+      copybookFoldersStream.forEach(copybookFileList::add);
     } catch (URISyntaxException | IOException e) {
       log.error(e.getMessage());
     }
