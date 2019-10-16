@@ -11,13 +11,17 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
-import com.ca.lsp.core.cobol.model.PreprocessedInput;
-import com.ca.lsp.core.cobol.params.CobolParserParams;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
+package com.ca.lsp.core.cobol.model;
 
-public interface CobolDocumentParser {
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
+import lombok.Value;
 
-  PreprocessedInput processLines(String code, CobolSourceFormatEnum format, CobolParserParams params);
+import java.util.List;
+
+@Value
+public class ProcessingResult {
+
+  private List<SyntaxError> errors;
+  private SemanticContext semanticContext;
 }

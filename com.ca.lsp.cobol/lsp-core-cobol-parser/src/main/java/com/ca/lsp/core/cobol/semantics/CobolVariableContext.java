@@ -13,6 +13,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
+
 package com.ca.lsp.core.cobol.semantics;
 
 import com.ca.lsp.core.cobol.model.Position;
@@ -25,10 +26,8 @@ import java.util.stream.Collectors;
 
 /**
  * Implementation of CobolVariableContext that uses ArrayList to store defined variables
- *
- * @author teman02, zacan01, ilise01
  */
-public class CobolVariableContext implements LanguageContext<Variable> {
+public class CobolVariableContext implements SubContext<Variable> {
   private static final int LEVEL_77 = 77;
   private static final int LEVEL_66 = 66;
 
@@ -65,6 +64,13 @@ public class CobolVariableContext implements LanguageContext<Variable> {
   @Override
   public Multimap<String, Position> getUsages() {
     return variableUsages;
+  }
+
+  @Override
+  public void merge(SubContext<Variable> subContext) {
+    variableDefinitions.putAll(subContext.getDefinitions());
+    variableUsages.putAll(subContext.getUsages());
+    variables.addAll(subContext.getAll());
   }
 
   public Variable get(String name) {

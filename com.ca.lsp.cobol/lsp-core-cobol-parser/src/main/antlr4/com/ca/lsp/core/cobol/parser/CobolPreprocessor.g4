@@ -8,14 +8,34 @@
 
 grammar CobolPreprocessor;
 
-startRule
-   : (compilerOptions | copyStatement | execCicsStatement | execSqlStatement | execSqlImsStatement | replaceOffStatement | replaceArea | ejectStatement | skipStatement | titleStatement | charDataLine | NEWLINE)* EOF
-   ;
+startRule : .*? ((compilerOptions | dataDescriptionEntry | copyStatement | execCicsStatement | execSqlStatement | execSqlImsStatement | replaceOffStatement | replaceArea | ejectStatement | skipStatement | titleStatement | NEWLINE)+ .*?)+ ;
 
 // compiler options
-
 compilerOptions
    : (PROCESS | CBL) (COMMACHAR? compilerOption | compilerXOpts)+
+   ;
+
+dataDescriptionEntry
+   : dataDescriptionEntryFormat3 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat1
+   ;
+
+dataDescriptionEntryFormat1
+   : otherLevel (FILLER | dataName)? (GROUP_USAGE|REDEFINES|(IS? EXTERNAL)|(IS? GLOBAL)|(IS? TYPEDEF)|((PICTURE | PIC)))? .*? DOT_FS
+   ;
+
+dataDescriptionEntryFormat2
+   : LEVEL_NUMBER_66 dataName  DOT_FS
+   ;
+
+dataDescriptionEntryFormat3
+   : LEVEL_NUMBER_88 dataName  DOT_FS
+   ;
+
+otherLevel: LEVEL
+   ;
+
+dataName
+   : cobolWord
    ;
 
 compilerXOpts
@@ -32,22 +52,22 @@ compilerOption
    | CICS (LPARENCHAR literal RPARENCHAR)?
    | COBOL2 | COBOL3
    | (CODEPAGE | CP) LPARENCHAR literal RPARENCHAR
-   | (COMPILE | C_CHAR) 
+   | (COMPILE | C_CHAR)
    | CPP | CPSM
    | (CURRENCY | CURR) LPARENCHAR literal RPARENCHAR
    | DATA LPARENCHAR literal RPARENCHAR
    | (DATEPROC | DP) (LPARENCHAR (FLAG | NOFLAG)? COMMACHAR? (TRIG | NOTRIG)? RPARENCHAR)?
-   | DBCS 
-   | (DECK | D_CHAR) 
-   | DEBUG 
+   | DBCS
+   | (DECK | D_CHAR)
+   | DEBUG
    | (DIAGTRUNC | DTR)
    | DLL
-   | (DUMP | DU) 
+   | (DUMP | DU)
    | (DYNAM | DYN)
-   | EDF | EPILOG 
+   | EDF | EPILOG
    | EXIT
    | (EXPORTALL | EXP)
-   | (FASTSRT | FSRT) 
+   | (FASTSRT | FSRT)
    | FEPI
    | (FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (COMMACHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR
    | FLAGSTD LPARENCHAR (M_CHAR | I_CHAR | H_CHAR) (COMMACHAR (D_CHAR | DD | N_CHAR | NN | S_CHAR | SS))? RPARENCHAR
@@ -66,51 +86,51 @@ compilerOption
    | NOBLOCK0
    | NOCBLCARD | NOCICS | NOCMPR2
    | (NOCOMPILE | NOC) (LPARENCHAR (S_CHAR | E_CHAR | W_CHAR) RPARENCHAR)?
-   | NOCPSM 
+   | NOCPSM
    | (NOCURRENCY | NOCURR)
-   | (NODATEPROC | NODP) 
-   | NODBCS | NODEBUG 
-   | (NODECK | NOD) 
-   | NODLL | NODE 
+   | (NODATEPROC | NODP)
+   | NODBCS | NODEBUG
+   | (NODECK | NOD)
+   | NODLL | NODE
    | (NODUMP | NODU)
-   | (NODIAGTRUNC | NODTR) 
+   | (NODIAGTRUNC | NODTR)
    | (NODYNAM | NODYN)
-   | NOEDF | NOEPILOG | NOEXIT 
+   | NOEDF | NOEPILOG | NOEXIT
    | (NOEXPORTALL | NOEXP)
    | (NOFASTSRT | NOFSRT)
-   | NOFEPI 
-   | (NOFLAG | NOF) 
+   | NOFEPI
+   | (NOFLAG | NOF)
    | NOFLAGMIG | NOFLAGSTD
    | NOGRAPHIC
    | NOLENGTH | NOLIB | NOLINKAGE | NOLIST
-   | NOMAP 
+   | NOMAP
    | (NOMDECK | NOMD)
-   | NONAME 
+   | NONAME
    | (NONUMBER | NONUM)
-   | (NOOBJECT | NOOBJ) 
-   | (NOOFFSET | NOOFF) 
+   | (NOOBJECT | NOOBJ)
+   | (NOOFFSET | NOOFF)
    | NOOPSEQUENCE
-   | (NOOPTIMIZE | NOOPT) 
-   | NOOPTIONS 
+   | (NOOPTIMIZE | NOOPT)
+   | NOOPTIONS
    | NOP | NOPROLOG
    | NORENT
-   | (NOSEQUENCE | NOSEQ) 
-   | (NOSOURCE | NOS) 
-   | NOSPIE | NOSQL 
-   | (NOSQLCCSID | NOSQLC) 
-   | (NOSSRANGE | NOSSR) 
+   | (NOSEQUENCE | NOSEQ)
+   | (NOSOURCE | NOS)
+   | NOSPIE | NOSQL
+   | (NOSQLCCSID | NOSQLC)
+   | (NOSSRANGE | NOSSR)
    | NOSTDTRUNC
    | (NOTERMINAL | NOTERM) | NOTEST | NOTHREAD
    | NOVBREF
    | (NOWORD | NOWD)
-   | NSEQ 
+   | NSEQ
    | (NSYMBOL | NS) LPARENCHAR (NATIONAL | NAT | DBCS) RPARENCHAR
    | NOVBREF
    | (NOXREF | NOX)
    | NOZWB
    | (NUMBER | NUM)
    | NUMPROC LPARENCHAR (MIG | NOPFD | PFD) RPARENCHAR
-   | (OBJECT | OBJ) 
+   | (OBJECT | OBJ)
    | (OFFSET | OFF)
    | OPMARGINS LPARENCHAR literal COMMACHAR literal (COMMACHAR literal)? RPARENCHAR
    | OPSEQUENCE LPARENCHAR literal COMMACHAR literal RPARENCHAR
@@ -129,8 +149,8 @@ compilerOption
    | SPACE LPARENCHAR literal RPARENCHAR
    | SPIE
    | SQL (LPARENCHAR literal RPARENCHAR)?
-   | (SQLCCSID | SQLC) 
-   | (SSRANGE | SSR) 
+   | (SQLCCSID | SQLC)
+   | (SSRANGE | SSR)
    | SYSEIB
    | (TERMINAL | TERM)
    | TEST (LPARENCHAR (HOOK | NOHOOK)? COMMACHAR? (SEP | SEPARATE | NOSEP | NOSEPARATE)? COMMACHAR? (EJPD | NOEJPD)? RPARENCHAR)?
@@ -165,7 +185,7 @@ execSqlImsStatement
 // copy statement
 
 copyStatement
-   : COPY copySource (NEWLINE* (directoryPhrase | familyPhrase | replacingPhrase | SUPPRESS))* NEWLINE* DOT
+   : COPY copySource (directoryPhrase | familyPhrase | replacingPhrase | SUPPRESS)* DOT_FS
    ;
 
 copySource
@@ -320,6 +340,10 @@ charDataKeyword
 
 // lexer rules --------------------------------------------------------------------------------
 
+LEVEL_NUMBER_66 : '66';
+LEVEL_NUMBER_88 : '88';
+LEVEL: ([1-9])|([0][1-9])|([1234][0-9])| '77';
+
 // keywords
 ADATA : A D A T A;
 ADV : A D V;
@@ -382,6 +406,7 @@ EXPORTALL : E X P O R T A L L;
 EXTEND : E X T E N D;
 FASTSRT : F A S T S R T;
 FEPI : F E P I;
+FILLER: F I L L E R;
 FLAG : F L A G;
 FLAGSTD : F L A G S T D;
 FSRT : F S R T;
@@ -607,6 +632,7 @@ X_CHAR : X;
 // symbols
 COMMENTTAG : '*>';
 COMMACHAR : ',';
+DOT_FS : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ | '.' EOF;
 DOT : '.';
 DOUBLEEQUALCHAR : '==';
 
