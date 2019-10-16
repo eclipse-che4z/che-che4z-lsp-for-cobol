@@ -14,12 +14,12 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 @Slf4j
 public class WorkspaceServiceTest {
@@ -31,10 +31,9 @@ public class WorkspaceServiceTest {
       "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
 
   private URI workspaceFolderPath = null;
-  private final List<WorkspaceFolder> workspaceFolderList = new ArrayList<>();
-
   private final CobolWorkspaceServiceImpl cobolWorkspaceService =
       CobolWorkspaceServiceImpl.getInstance();
+  private List<WorkspaceFolder> workspaceFolderList = null;
 
   @Before
   public void scanWorkspaceForCopybooks() {
@@ -49,17 +48,22 @@ public class WorkspaceServiceTest {
         Paths.get(copybooksPath + System.getProperty("file.separator") + CPY_FILE_NAME_WITH_EXT);
 
     createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath);
-
     WorkspaceFolder workspaceFolder = new WorkspaceFolder();
     workspaceFolder.setName(WORKSPACE_FOLDER_NAME);
     workspaceFolder.setUri(adjustURI(getWorkspaceFolderPath().toString()));
-    workspaceFolderList.add(workspaceFolder);
-    cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
+    workspaceFolderList = Collections.singletonList(workspaceFolder);
+    cobolWorkspaceService.setWorkspaceFolders(workspaceFolderList);
   }
 
   @Test
+  /*
+  This unit test verify that from a given workspaceFolder URI the WorkspaceManager is able to retrieve all the copybooks
+  present in the COPYBOOK folder.
+  In the real implementation this operation is expensive and not performed.
+   */
   public void getCopyBookList() {
-    assertEquals(cobolWorkspaceService.getCopybookList().size(), 1);
+    cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
+    assertEquals(cobolWorkspaceService.getCopybookFileList().size(), 1);
   }
 
   @Test
