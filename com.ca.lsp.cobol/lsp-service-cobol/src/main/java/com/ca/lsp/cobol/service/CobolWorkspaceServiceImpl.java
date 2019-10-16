@@ -102,6 +102,19 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
     return outputURIPath.get();
   }
 
+  @Override
+  public Stream<String> getContentByURI(String copybookName) {
+    Path uriForFileName = getURIByFileName(copybookName);
+    Stream<String> fileContent = null;
+
+    try {
+      fileContent = Files.lines(uriForFileName);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return fileContent;
+  }
+
   /** @return the singleton instance of CobolWorkspaceServiceImpl */
   public static CobolWorkspaceServiceImpl getInstance() {
     return INSTANCE;

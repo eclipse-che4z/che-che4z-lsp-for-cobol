@@ -14,6 +14,7 @@
 package com.ca.lsp.cobol.service;
 
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService {
   /**
@@ -24,4 +25,6 @@ interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceServ
    * @return URI of file (i.e. file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy)
    */
   Path getURIByFileName(String fileName);
+
+  Stream<String> getContentByURI(String copybookName);
 }
