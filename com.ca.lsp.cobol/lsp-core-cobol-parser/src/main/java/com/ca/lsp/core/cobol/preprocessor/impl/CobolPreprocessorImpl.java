@@ -41,12 +41,13 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
 public class CobolPreprocessorImpl implements CobolPreprocessor {
   @Setter private FormatListener formatListener;
-  @Setter private List<File> copybookList;
+  @Setter private List<Path> copybookList;
 
   @Override
   public PreprocessedInput process(final File cobolFile, final CobolSourceFormatEnum format)

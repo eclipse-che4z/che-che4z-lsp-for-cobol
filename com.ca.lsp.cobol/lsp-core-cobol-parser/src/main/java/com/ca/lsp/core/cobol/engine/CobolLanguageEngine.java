@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +40,7 @@ import java.util.List;
 public class CobolLanguageEngine {
 
   private final CobolPreprocessor.CobolSourceFormatEnum sourceFormat;
-  @Setter private List<File> copybookList;
+  @Setter private List<Path> copybookList;
 
   public ProcessingResult run(String in) {
     List<SyntaxError> errors = new ArrayList<>();
