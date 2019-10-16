@@ -18,7 +18,9 @@ import com.ca.lsp.core.cobol.params.CobolParserParams;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CobolParserParamsImpl implements CobolParserParams {
 
@@ -80,8 +82,8 @@ public class CobolParserParamsImpl implements CobolParserParams {
   }
 
   @Override
-  public void setCopyBookFiles(final List<File> copyBookFiles) {
-    this.copyBookFiles = copyBookFiles;
+  public void setCopyBookFiles(final List<Path> copyBookFiles) {
+    this.copyBookFiles = copyBookFiles.stream().map(Path::toFile).collect(Collectors.toList());
   }
 
   @Override

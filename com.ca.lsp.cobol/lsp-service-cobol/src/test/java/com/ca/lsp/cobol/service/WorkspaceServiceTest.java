@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -63,7 +64,7 @@ public class WorkspaceServiceTest {
    */
   public void getCopyBookList() {
     cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
-    assertEquals(cobolWorkspaceService.getCopybookFileList().size(), 1);
+    assertEquals(1, cobolWorkspaceService.getCopybookFileList().size());
   }
 
   @Test
@@ -75,15 +76,13 @@ public class WorkspaceServiceTest {
   @Test
   public void getContentByURI() {
     Path uriForFileName = cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME);
-    File file = null;
-    if (uriForFileName != null) {
-      // get URI in input
-      // check if the path exist and the content is more than zero
-      // return the content lenght to the client or -1 if the file doesnt exist
-      file = uriForFileName.toFile();
+    Stream<String> fileContent = null;
+    try {
+      fileContent = Files.lines(uriForFileName);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
-
-    assertTrue(file != null && file.length() > 0);
+    assertTrue(fileContent != null && fileContent.count() > 0);
   }
 
   @After
