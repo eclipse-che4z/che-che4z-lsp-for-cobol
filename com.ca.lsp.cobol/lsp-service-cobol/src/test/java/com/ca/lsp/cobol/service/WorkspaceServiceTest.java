@@ -1,5 +1,6 @@
 package com.ca.lsp.cobol.service;
 
+import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.junit.After;
@@ -23,8 +24,8 @@ public class WorkspaceServiceTest {
   private static final String FOLDER_NAME = "test";
   private URI workspaceFolderPath = null;
   private List<WorkspaceFolder> workspaceFolderList = new ArrayList<>();
-
-  private CobolWorkspaceServiceImpl cobolWorkspaceService = CobolWorkspaceServiceImpl.getInstance();
+  @Inject
+  private CobolWorkspaceServiceImpl cobolWorkspaceService;
 
   @Before
   public void scanWorkspaceForCopybooks() {
