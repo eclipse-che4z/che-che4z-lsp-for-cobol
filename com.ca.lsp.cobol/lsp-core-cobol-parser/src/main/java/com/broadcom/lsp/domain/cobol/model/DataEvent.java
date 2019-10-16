@@ -17,15 +17,12 @@
 package com.broadcom.lsp.domain.cobol.model;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * Created by gl669210 on 15/10/2019
+ * Created by gl669210 on 16/10/2019
  */
-@Builder
-public class CblScanElement {
-    @Getter @Setter private String name;
-    @Getter @Setter private String position;
-    @Getter @Setter private String uri;
+@Slf4j
+public class DataEvent {
+    private String registryId = "";
 }

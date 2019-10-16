@@ -34,8 +34,8 @@ import java.util.concurrent.*;
 public class LangServerBootstrap {
     private static final Integer LSP_PORT = 1044;
     private static final String PIPE_ARGM = "pipeEnabled";
-    private MyLanguageServerImpl server = LangServerCtx.getGuiceCtx().getInstance(MyLanguageServerImpl.class);
-
+//    private MyLanguageServerImpl server = LangServerCtx.getGuiceCtx().getInstance(MyLanguageServerImpl.class);
+    private MyLanguageServerImpl server= new MyLanguageServerImpl();
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         LangServerBootstrap starter = new LangServerBootstrap();
         if (args.length > 0) {

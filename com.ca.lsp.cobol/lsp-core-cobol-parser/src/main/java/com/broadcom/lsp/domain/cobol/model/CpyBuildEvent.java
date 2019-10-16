@@ -14,17 +14,18 @@
  *
  */
 
-package com.broadcom.lsp.domain.cobol.databus.impl;
+package com.broadcom.lsp.domain.cobol.model;
 
-import com.broadcom.lsp.domain.cobol.databus.api.IDataBusBroker;
-import com.google.common.eventbus.EventBus;
-import com.google.inject.Singleton;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Created by gl669210 on 15/10/2019
  */
-@Singleton
-public class IDataBusBrokerImpl implements IDataBusBroker {
-    private EventBus eventBus = new EventBus();
-
+@Builder
+public class CpyBuildEvent extends DataEvent{
+    @Getter @Setter private String name;
+    @Getter @Setter private String position;
+    @Getter @Setter private String uri;
 }
