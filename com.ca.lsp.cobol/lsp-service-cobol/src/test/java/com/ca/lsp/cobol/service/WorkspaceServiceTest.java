@@ -17,7 +17,6 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -56,12 +55,12 @@ public class WorkspaceServiceTest {
     cobolWorkspaceService.setWorkspaceFolders(workspaceFolderList);
   }
 
-  @Test
   /*
   This unit test verify that from a given workspaceFolder URI the WorkspaceManager is able to retrieve all the copybooks
   present in the COPYBOOK folder.
   In the real implementation this operation is expensive and not performed.
    */
+  @Test
   public void getCopyBookList() {
     cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
     assertEquals(1, cobolWorkspaceService.getCopybookFileList().size());
@@ -73,16 +72,13 @@ public class WorkspaceServiceTest {
         cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME).toUri().toString().length() > 0);
   }
 
+  /*
+   * This test took in input a copybook name, retrieve the URI of the file (if it exists) and in case affermative return the
+   * content, null otherwise.
+   */
   @Test
-  public void getContentByURI() {
-    Path uriForFileName = cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME);
-    Stream<String> fileContent = null;
-    try {
-      fileContent = Files.lines(uriForFileName);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    assertTrue(fileContent != null && fileContent.count() > 0);
+  public void getContentByCopybookName() {
+    assertTrue(cobolWorkspaceService.getContentByURI(CPY_FILE_ONLY_NAME).toArray().length > 0);
   }
 
   @After
