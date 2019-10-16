@@ -14,7 +14,7 @@
  *
  */
 
-package com.broadcom.lsp.domain.cobol.databus.model;
+package com.broadcom.lsp.domain.cobol.model;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +24,7 @@ import lombok.Setter;
  * Created by gl669210 on 15/10/2019
  */
 @Builder
-public class CblFetchElement {
+public class CblScanElement {
     @Getter @Setter private String name;
     @Getter @Setter private String position;
     @Getter @Setter private String uri;
