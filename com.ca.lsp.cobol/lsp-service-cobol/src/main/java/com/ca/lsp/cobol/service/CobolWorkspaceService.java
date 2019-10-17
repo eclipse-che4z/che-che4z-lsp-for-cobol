@@ -22,7 +22,9 @@ interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceServ
    * - if exists
    *
    * @param fileName (i.e. COPYTEST)
-   * @return URI of file (i.e. file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy)
+   * @return URI of file (i.e. file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy) or
+   *     null if didn't found. This case should be covered by an appropriate diagnostic message
+   *     using the Communication service delegate object
    */
   Path getURIByFileName(String fileName);
 

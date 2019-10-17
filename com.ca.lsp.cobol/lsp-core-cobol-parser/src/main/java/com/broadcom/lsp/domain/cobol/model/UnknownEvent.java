@@ -18,25 +18,20 @@ package com.broadcom.lsp.domain.cobol.model;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Created  on 15/10/2019
  */
 
-
-@NoArgsConstructor
 @Data
-public class CblScanEvent extends DataEvent {
-    private String name;
-    private String position;
-    private String uri;
+@RequiredArgsConstructor
+public class UnknownEvent extends DataEvent {
+    private String eventMessage;
 
     @Builder
-    public CblScanEvent(String name, String position, String uri) {
-        super(DataEventType.CBLSCAN_EVENT, DataEventType.CBLSCAN_EVENT.getId());
-        this.name = name;
-        this.position = position;
-        this.uri = uri;
+    public UnknownEvent(String eventMessage) {
+        super(DataEventType.UNKNOWN_EVENT, DataEventType.UNKNOWN_EVENT.getId());
+        this.eventMessage = eventMessage;
     }
 }

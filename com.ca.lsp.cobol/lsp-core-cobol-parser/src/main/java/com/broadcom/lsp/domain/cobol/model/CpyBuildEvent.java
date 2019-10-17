@@ -17,15 +17,25 @@
 package com.broadcom.lsp.domain.cobol.model;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Created  on 15/10/2019
  */
-@Builder
+
+@Data
+@NoArgsConstructor
 public class CpyBuildEvent extends DataEvent{
-    @Getter @Setter private String name;
-    @Getter @Setter private String position;
-    @Getter @Setter private String uri;
+    private String name;
+    private String position;
+    private String uri;
+
+    @Builder
+    public CpyBuildEvent(String name, String position, String uri) {
+        super(DataEventType.CPYBUILD_EVENT, DataEventType.CPYBUILD_EVENT.getId());
+        this.name = name;
+        this.position = position;
+        this.uri = uri;
+    }
 }

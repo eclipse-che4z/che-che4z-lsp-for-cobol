@@ -14,19 +14,23 @@
  *
  */
 
-package com.broadcom.lsp.domain.cobol.databus.impl;
+package com.broadcom.lsp.domain.cobol.model;
 
-import com.broadcom.lsp.domain.cobol.databus.api.DefaultEventSubScriberImpl;
-import lombok.extern.slf4j.Slf4j;
-
+import lombok.Getter;
 
 /**
- * Created  on 15/10/2019
+ * Created on 17/10/2019
  */
-@Slf4j
-public class IStringSubScriberImpl<String> extends DefaultEventSubScriberImpl<String> {
-    @Override
-    public void onDataHandler(String data) {
-        LOG.info("test subscribe");
+
+public enum DataEventType {
+    UNKNOWN_EVENT("UNKNOWN"),
+    CPYBUILD_EVENT("CPYBUILD"),
+    CBLSCAN_EVENT("CBLSCAN"),
+    CBLFETCH_EVENT("CBLFETCH");
+    @Getter
+    private String id;
+
+    DataEventType(String s) {
+        this.id = s;
     }
 }

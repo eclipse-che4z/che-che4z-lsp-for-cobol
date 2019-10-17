@@ -17,8 +17,12 @@
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
 import com.broadcom.lsp.cdi.DomainModule;
+import com.broadcom.lsp.domain.cobol.databus.api.IDataBusBroker;
+import com.broadcom.lsp.domain.cobol.databus.api.IObserver;
+import com.broadcom.lsp.domain.cobol.model.*;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +30,8 @@ import org.junit.Test;
 /**
  * Created by lamgi04 on 2019-10-02
  */
-public class ISubScriberImplTest {
+@Slf4j
+public class ISubScriberImplTest implements IObserver<DataEvent> {
 
     @Before
     public void setUp() throws Exception {
@@ -39,6 +44,20 @@ public class ISubScriberImplTest {
     @Test
     public void subscribe() {
         Injector injector = Guice.createInjector(new DomainModule());
-        injector.getInstance(IStringSubScriberImpl.class).onDataHandler(new String());
+        DefaultDataBusBroker databus = (DefaultDataBusBroker) injector.getInstance(IDataBusBroker.class);
+
+        databus.subscribe(DataEventType.CPYBUILD_EVENT, this);
+
+        databus.postData(UnknownEvent.builder().eventMessage("UNKNOWN_SUBSCRIPTION TEST").build());
+        databus.postData(CpyBuildEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
+        databus.postData(CblFetchEvent.builder().name("CBLFETCH_SUBSCRIPTION TEST").build());
+        databus.postData(CblScanEvent.builder().name("CBLSCAN_SUBSCRIPTION TEST").build());
+        LOG.debug("DONE!");
+    }
+
+
+    @Override
+    public void observerCallback(DataEvent adaptedDataEvent) {
+        LOG.debug("CALLBACK WORKS!");
     }
 }

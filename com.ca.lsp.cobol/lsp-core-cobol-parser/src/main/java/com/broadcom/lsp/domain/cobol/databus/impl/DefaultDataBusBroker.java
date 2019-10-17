@@ -16,39 +16,49 @@
 
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.domain.cobol.databus.api.AbstractDataBusBrokerImpl;
+import com.broadcom.lsp.domain.cobol.databus.api.AbstractDataBusBroker;
+import com.broadcom.lsp.domain.cobol.databus.api.IObserver;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.model.RegistryId;
-import com.google.common.eventbus.EventBus;
 import com.google.inject.Singleton;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Optional;
 
 /**
  * Created  on 16/10/2019
  */
 @Slf4j
 @Singleton
-public class DefaultDataBusBrokerImpl<T extends DataEvent> extends AbstractDataBusBrokerImpl<T> {
+public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBusBroker<T, S> {
 
     @Override
+    @SneakyThrows
     public void postData(T dataEvent) {
         postData(dataEvent.getRegistryId(),dataEvent);
     }
 
     @Override
+    @SneakyThrows
     public void postData(RegistryId registryId, T dataEvent) {
         seekRegistry(registryId).get().post(dataEvent);
     }
 
     @Override
-    public void subscribe(T dataEvent) {
-        subscribe(dataEvent.getRegistryId(),dataEvent);
+    @SneakyThrows
+    public void subscribe(S dataSubscriber) {
+        subscribe(RegistryId.GENERAL_REGISTRY_ID, dataSubscriber);
     }
 
     @Override
-    public void subscribe(RegistryId registryId, T dataEvent) {
-        seekRegistry(registryId).get().register(dataEvent);
+    @SneakyThrows
+    public void subscribe(RegistryId registryId, S dataSubscriber) {
+        seekRegistry(registryId).get().register(dataSubscriber);
+    }
+
+    @Override
+    @SneakyThrows
+    public void subscribe(DataEventType eventType, IObserver observer) {
+        subscribe(getSubscriber(eventType, observer));
     }
 }

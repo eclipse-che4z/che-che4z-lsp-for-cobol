@@ -16,14 +16,9 @@
 
 package com.broadcom.lsp.domain.cobol.databus.api;
 
-import com.google.common.eventbus.AllowConcurrentEvents;
-import com.google.common.eventbus.Subscribe;
-
 /**
  * Created   on 2019-10-02
  */
 public interface ISubScriber<T> {
-    @Subscribe
-    @AllowConcurrentEvents
-    void onDataHandler(T data);
+    void onDataHandler(T eventType);
 }

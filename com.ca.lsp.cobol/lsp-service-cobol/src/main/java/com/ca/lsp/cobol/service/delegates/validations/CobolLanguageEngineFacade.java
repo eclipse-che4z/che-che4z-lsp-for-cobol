@@ -104,7 +104,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     }
 
     CobolLanguageEngine engine = LanguageEngineFactory.fixedFormatCobolLanguageEngine();
-    engine.setCopybookList(CobolWorkspaceServiceImpl.getInstance().getCopybookList());
+    engine.setCopybookList(CobolWorkspaceServiceImpl.getInstance().getCopybookPathsList());
     return toAnalysisResult(engine.run(text));
   }
 
