@@ -15,11 +15,12 @@ package com.ca.lsp.core.cobol.params;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.List;
 
 public interface CobolParserParams {
 
-  /** @see https://docs.oracle.com/javase/8/docs/technotes/guides/intl/encoding.doc.html */
+  /** @apiNote https://docs.oracle.com/javase/8/docs/technotes/guides/intl/encoding.doc.html */
   Charset getCharset();
 
   List<File> getCopyBookDirectories();
@@ -38,7 +39,7 @@ public interface CobolParserParams {
 
   void setCopyBookExtensions(List<String> copyBookExtensions);
 
-  void setCopyBookFiles(List<File> copyBookFiles);
+  void setCopyBookFiles(List<Path> copyBookFiles);
 
   void setDialect(CobolDialect dialect);
 

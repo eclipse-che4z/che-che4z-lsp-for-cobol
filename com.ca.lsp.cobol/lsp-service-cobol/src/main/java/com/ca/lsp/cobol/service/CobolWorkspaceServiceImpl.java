@@ -35,28 +35,10 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
 
   private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
   private static final String URI_FILE_SEPARATOR = "/";
-  private List<File> copybookList;
+  private List<Path> copybookFileList;
   private List<WorkspaceFolder> workspaceFolders;
 
   private CobolWorkspaceServiceImpl() {}
-
-  /**
-   * Create a list of Files for each copybook found in a specific folder under the workspace
-   *
-   * @param workspaceFolder is the folder sent from the client (represent the rootFolder of the
-   *     workspace opened in the client)
-   */
-  private void createCopybookList(WorkspaceFolder workspaceFolder) {
-    copybookList = new ArrayList<>();
-    try (Stream<Path> copybookFoldersStream =
-        Files.list(
-            Paths.get(
-                new URI(workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME)))) {
-      copybookFoldersStream.map(Path::toFile).forEach(copybookList::add);
-    } catch (URISyntaxException | IOException e) {
-      log.error(e.getMessage());
-    }
-  }
 
   @Override
   public CompletableFuture<List<? extends SymbolInformation>> symbol(WorkspaceSymbolParams params) {
@@ -74,18 +56,19 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   }
 
   /**
-   * Search in a list of given URI paths the presence of copybooks
+   * Search in a list of given URI paths the presence of copybooks in order to create a list of
+   * files for each workspace folder found.
    *
    * @param workspaceFolders list of URI paths
    */
   void scanWorkspaceForCopybooks(List<WorkspaceFolder> workspaceFolders) {
     setWorkspaceFolders(workspaceFolders);
-    getWorkspaceFolders().forEach(this::createCopybookList);
+    getWorkspaceFolders().forEach(this::generateCopybookFileList);
   }
 
   /** @return List of copybooks */
-  public List<File> getCopybookList() {
-    return copybookList;
+  public List<Path> getCopybookFileList() {
+    return copybookFileList;
   }
 
   @Override
@@ -119,15 +102,47 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
     return outputURIPath.get();
   }
 
+  @Override
+  public Stream<String> getContentByURI(String copybookName) {
+    Path uriForFileName = getURIByFileName(copybookName);
+    Stream<String> fileContent = null;
+
+    try {
+      fileContent = Files.lines(uriForFileName);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return fileContent;
+  }
+
+  /** @return the singleton instance of CobolWorkspaceServiceImpl */
+  public static CobolWorkspaceServiceImpl getInstance() {
+    return INSTANCE;
+  }
+
+  /**
+   * Create a list of Files for each copybook found in a specific folder under the workspace
+   *
+   * @param workspaceFolder is the folder sent from the client (represent the rootFolder of the
+   *     workspace opened in the client)
+   */
+  private void generateCopybookFileList(WorkspaceFolder workspaceFolder) {
+    copybookFileList = new ArrayList<>();
+    try (Stream<Path> copybookFoldersStream =
+        Files.list(
+            Paths.get(
+                new URI(workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME)))) {
+      copybookFoldersStream.forEach(copybookFileList::add);
+    } catch (URISyntaxException | IOException e) {
+      log.error(e.getMessage());
+    }
+  }
+
   private List<WorkspaceFolder> getWorkspaceFolders() {
     return workspaceFolders;
   }
 
-  private void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
+  void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
     this.workspaceFolders = workspaceFolders;
-  }
-
-  public static CobolWorkspaceServiceImpl getInstance() {
-    return INSTANCE;
   }
 }
