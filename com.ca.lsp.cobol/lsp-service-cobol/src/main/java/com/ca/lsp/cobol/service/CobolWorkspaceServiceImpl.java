@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 
@@ -26,7 +27,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -35,8 +36,10 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
 
   private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
   private static final String URI_FILE_SEPARATOR = "/";
-  private List<Path> copybookFileList;
+  private List<Path> copybookPathsList;
+  private final List<File> copybookFileList = new ArrayList<>();
   private List<WorkspaceFolder> workspaceFolders;
+  private Path pathFileFound = null;
 
   private CobolWorkspaceServiceImpl() {}
 
@@ -67,39 +70,55 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   }
 
   /** @return List of copybooks */
-  public List<Path> getCopybookFileList() {
-    return copybookFileList;
+  public List<Path> getCopybookPathsList() {
+    return copybookPathsList;
   }
 
   @Override
   public Path getURIByFileName(String fileName) {
-    AtomicReference<Path> outputURIPath = new AtomicReference<>();
+    // define the list of file that will be used for the search
     getWorkspaceFolders()
         .forEach(
-            workspaceFolder -> {
-              try {
-                File workspaceFolderFile =
-                    new File(
-                        new URI(
-                            workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME));
-                Path workspaceFolderPath = workspaceFolderFile.toPath();
+            workspaceFolder ->
+                createFileAndPushInList(
+                    workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME));
 
-                Stream<Path> pathStream =
-                    Files.find(
-                        workspaceFolderPath,
-                        100,
-                        (path, basicFileAttributes) -> {
-                          File resFile = path.toFile();
-                          outputURIPath.set(resFile.toPath());
-                          return !resFile.isDirectory() && resFile.getName().contains(fileName);
-                        });
-                log.info("Number of matches" + pathStream.count());
-              } catch (IOException | URISyntaxException e) {
-                log.error(e.getMessage());
-              }
-            });
+    copybookFileList.forEach(file -> searchInDirectory(fileName, file.toPath()));
+    return pathFileFound;
+  }
 
-    return outputURIPath.get();
+  private void searchInDirectory(String fileName, Path workspaceFolderPath) {
+    try (Stream<Path> stream =
+        Files.find(
+            workspaceFolderPath,
+            100,
+            (path, basicFileAttributes) -> {
+              File resFile = path.toFile();
+              return resFile.isFile()
+                  && !resFile.isDirectory()
+                  && resFile.getName().contains(fileName);
+            })) {
+      stream.findFirst().ifPresent(path -> pathFileFound = path);
+      populateDatabus(fileName, pathFileFound, getContentByURI(pathFileFound.toString()));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void createFileAndPushInList(String uri) {
+    try {
+      copybookFileList.add(new File(new URI(uri)));
+    } catch (URISyntaxException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void populateDatabus(String fileName, Path path, Stream<String> contentStream) {
+    CblFetchEvent fetchEventItem = CblFetchEvent.builder().build();
+    fetchEventItem.setName(fileName);
+    fetchEventItem.setPosition(null);
+    fetchEventItem.setUri(path.toUri().toString());
+    fetchEventItem.setContent(contentStream.collect(Collectors.joining()));
   }
 
   @Override
@@ -127,12 +146,12 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    *     workspace opened in the client)
    */
   private void generateCopybookFileList(WorkspaceFolder workspaceFolder) {
-    copybookFileList = new ArrayList<>();
+    copybookPathsList = new ArrayList<>();
     try (Stream<Path> copybookFoldersStream =
         Files.list(
             Paths.get(
                 new URI(workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME)))) {
-      copybookFoldersStream.forEach(copybookFileList::add);
+      copybookFoldersStream.forEach(copybookPathsList::add);
     } catch (URISyntaxException | IOException e) {
       log.error(e.getMessage());
     }

@@ -17,25 +17,31 @@
 package com.broadcom.lsp.domain.cobol.databus.api;
 
 
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBrokerImpl;
+import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.model.RegistryId;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.ImplementedBy;
-import com.google.inject.Singleton;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created on 2019-10-01
  */
 
-@ImplementedBy(DefaultDataBusBrokerImpl.class)
-@Singleton
-public interface IDataBusBroker<T extends DataEvent> {
-    HashSet<EventBus> registrySet = new HashSet<>();
+@ImplementedBy(DefaultDataBusBroker.class)
+public interface IDataBusBroker<T extends DataEvent, S> {
+    Map<String, EventBus> registrySet = new HashMap<>();
     void postData(T dataEvent);
     void postData(RegistryId registryId,T dataEvent);
-    void subscribe(T dataEvent);
-    void subscribe(RegistryId registryId, T dataEvent);
+
+    void subscribe(S dataSubscriber);
+
+    void subscribe(RegistryId registryId, S dataSubscriber);
+
+    void subscribe(DataEventType eventType, IObserver observer);
+
+    S getSubscriber(DataEventType event, IObserver observer);
 }

@@ -97,6 +97,15 @@ public class Communications {
                         "Copybooks found in the current workspace " + copybooksList)));
   }
 
+  public void notifyCopybookNotFound(String filename) {
+    CompletableFuture.runAsync(
+        () ->
+            getClient()
+                .showMessage(
+                    new MessageParams(
+                        MessageType.Error, "Copybooks" + filename + " is not found")));
+  }
+
   public void notifyURIOfCopybook(String copyName, String copybookURI) {
     CompletableFuture.runAsync(
         () ->

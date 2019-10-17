@@ -24,6 +24,15 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Data
+@NoArgsConstructor
+@RequiredArgsConstructor
 public class DataEvent {
     private RegistryId registryId = RegistryId.GENERAL_REGISTRY_ID;
+    @Getter
+    @NonNull
+    private DataEventType eventType;
+    @Getter
+    @NonNull
+    private String header;
+
 }

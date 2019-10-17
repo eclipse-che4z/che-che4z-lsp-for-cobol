@@ -17,7 +17,8 @@
 package com.broadcom.lsp.domain.cobol.databus.api;
 
 /**
- * Created   on 2019-10-02
+ * Created on 21/10/2019
  */
-public interface IObserver {
+public interface IObserver<O> {
+    void observerCallback(O adaptedDataEvent);
 }

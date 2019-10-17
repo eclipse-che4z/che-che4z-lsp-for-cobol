@@ -130,11 +130,6 @@ public class CobolDocumentParserListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void enterEjectStatement(final CobolPreprocessorParser.EjectStatementContext ctx) {
-    push();
-  }
-
-  @Override
   public void enterExecCicsStatement(final CobolPreprocessorParser.ExecCicsStatementContext ctx) {
     // push a new context for SQL terminals
     push();
@@ -177,6 +172,16 @@ public class CobolDocumentParserListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void enterTitleStatement(final CobolPreprocessorParser.TitleStatementContext ctx) {
     push();
+  }
+
+  @Override
+  public void enterDataName(final CobolPreprocessorParser.DataNameContext ctx) {
+    System.out.println(ctx.getText());
+  }
+
+  @Override
+  public void enterParagraphName(final CobolPreprocessorParser.ParagraphNameContext ctx) {
+    System.out.println(ctx.getText());
   }
 
   @Override
@@ -263,18 +268,15 @@ public class CobolDocumentParserListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void exitEjectStatement(final CobolPreprocessorParser.EjectStatementContext ctx) {
-    // throw away eject statement
-    pop();
-  }
-
-  @Override
   public void exitExecCicsStatement(final CobolPreprocessorParser.ExecCicsStatementContext ctx) {
     // throw away EXEC CICS terminals
     pop();
 
     // a new context for the CICS statement
     push();
+
+    final String textLeft = TokenUtils.getHiddenTokensToLeft(ctx.start.getTokenIndex(),tokens);
+    context().write(textLeft);
 
     /*
      * text
@@ -300,6 +302,9 @@ public class CobolDocumentParserListenerImpl extends CobolPreprocessorBaseListen
     // a new context for the SQLIMS statement
     push();
 
+    final String textLeft = TokenUtils.getHiddenTokensToLeft(ctx.start.getTokenIndex(),tokens);
+    context().write(textLeft);
+
     /*
      * text
      */
@@ -322,6 +327,9 @@ public class CobolDocumentParserListenerImpl extends CobolPreprocessorBaseListen
 
     // a new context for the SQL statement
     push();
+
+    final String textLeft = TokenUtils.getHiddenTokensToLeft(ctx.start.getTokenIndex(),tokens);
+    context().write(textLeft);
 
     /*
      * text

@@ -63,7 +63,7 @@ public class WorkspaceServiceTest {
   @Test
   public void getCopyBookList() {
     cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
-    assertEquals(1, cobolWorkspaceService.getCopybookFileList().size());
+    assertEquals(1, cobolWorkspaceService.getCopybookPathsList().size());
   }
 
   @Test
@@ -110,7 +110,6 @@ public class WorkspaceServiceTest {
 
       Path copybookFilePath = Files.createFile(cpyFilePath);
       generateDummyContentForFile(copybookFilePath);
-
     } catch (IOException e) {
       e.printStackTrace();
     }
