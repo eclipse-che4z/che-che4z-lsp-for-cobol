@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Created by gl669210 on 15/10/2019
+ * Created  on 15/10/2019
  */
 @Builder
 public class CpyBuildEvent extends DataEvent{
