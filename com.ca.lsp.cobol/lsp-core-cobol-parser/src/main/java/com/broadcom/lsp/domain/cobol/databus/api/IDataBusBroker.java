@@ -16,14 +16,26 @@
 
 package com.broadcom.lsp.domain.cobol.databus.api;
 
-import com.broadcom.lsp.domain.cobol.databus.impl.IDataBusBrokerImpl;
+
+import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBrokerImpl;
+import com.broadcom.lsp.domain.cobol.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.model.RegistryId;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.ImplementedBy;
 import com.google.inject.Singleton;
 
+import java.util.HashSet;
+
 /**
- * Created by lamgi04 on 2019-10-01
+ * Created on 2019-10-01
  */
 
-@ImplementedBy(IDataBusBrokerImpl.class)
-public interface IDataBusBroker {
+@ImplementedBy(DefaultDataBusBrokerImpl.class)
+@Singleton
+public interface IDataBusBroker<T extends DataEvent> {
+    HashSet<EventBus> registrySet = new HashSet<>();
+    void postData(T dataEvent);
+    void postData(RegistryId registryId,T dataEvent);
+    void subscribe(T dataEvent);
+    void subscribe(RegistryId registryId, T dataEvent);
 }
