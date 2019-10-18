@@ -21,11 +21,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Created by gl669210 on 15/10/2019
+ * Created  on 15/10/2019
  */
 @Builder
-public class CblFetchEvent extends DataEvent{
-    @Getter @Setter private String name;
-    @Getter @Setter private String position;
-    @Getter @Setter private String uri;
+public class CblFetchEvent extends DataEvent {
+  @Getter @Setter private String name;
+  @Getter @Setter private String position;
+  @Getter @Setter private String uri;
+  @Getter @Setter private String content;
 }

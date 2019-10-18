@@ -14,7 +14,26 @@
 package com.ca.lsp.cobol.service;
 
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService {
+  /**
+   * From a given copybook name (without file extension) this method will return the URI of the file
+   * - if exists
+   *
+   * @param fileName (i.e. COPYTEST)
+   * @return URI of file (i.e. file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy) or
+   *     null if didn't found. This case should be covered by an appropriate diagnostic message
+   *     using the Communication service delegate object
+   */
   Path getURIByFileName(String fileName);
+
+  Stream<String> getContentByURI(String copybookName);
+
+  /**
+   * @param filename name of copybook retrived in the copy instruction
+   * @param URI of the resource found by the method #getUriByFileName()
+   * @param content String content for the resource associated to the URI
+   */
+  void populateDatabus(String filename, Path URI, String content);
 }

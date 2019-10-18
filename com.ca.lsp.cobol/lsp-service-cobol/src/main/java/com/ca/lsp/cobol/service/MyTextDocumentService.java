@@ -25,7 +25,10 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /** @author zacan01 */
@@ -33,9 +36,11 @@ import java.util.concurrent.CompletableFuture;
 public class MyTextDocumentService implements TextDocumentService {
   private final Map<String, MyDocumentModel> docs = Collections.synchronizedMap(new HashMap<>());
   private final Communications communications;
+  // private final IMyLanguageServer server;
 
   public MyTextDocumentService(IMyLanguageServer server) {
     communications = new Communications(server);
+    // this.server = server;
   }
 
   Map<String, MyDocumentModel> getDocs() {
@@ -128,6 +133,16 @@ public class MyTextDocumentService implements TextDocumentService {
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
+    //
+    //    // test to verify object for databus is successfully created...
+    //    String testCopyFile = "CPBTEST";
+    //
+    //    CobolWorkspaceServiceImpl workspaceService =
+    //        (CobolWorkspaceServiceImpl) server.getWorkspaceService();
+    //
+    //    if (workspaceService.getURIByFileName(testCopyFile) == null)
+    //      communications.notifyCopybookNotFound(testCopyFile);
+
     registerEngineAndAnalyze(uri, langId, text);
   }
 
