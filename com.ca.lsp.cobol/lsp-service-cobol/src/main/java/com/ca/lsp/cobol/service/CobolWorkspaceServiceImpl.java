@@ -27,7 +27,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -99,7 +98,6 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
                   && resFile.getName().contains(fileName);
             })) {
       stream.findFirst().ifPresent(path -> pathFileFound = path);
-      populateDatabus(fileName, pathFileFound, getContentByURI(pathFileFound.toString()));
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -113,14 +111,6 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
     }
   }
 
-  private void populateDatabus(String fileName, Path path, Stream<String> contentStream) {
-    CblFetchEvent fetchEventItem = CblFetchEvent.builder().build();
-    fetchEventItem.setName(fileName);
-    fetchEventItem.setPosition(null);
-    fetchEventItem.setUri(path.toUri().toString());
-    fetchEventItem.setContent(contentStream.collect(Collectors.joining()));
-  }
-
   @Override
   public Stream<String> getContentByURI(String copybookName) {
     Path uriForFileName = getURIByFileName(copybookName);
@@ -132,6 +122,14 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
       e.printStackTrace();
     }
     return fileContent;
+  }
+
+  @Override
+  public void populateDatabus(String filename, Path Uri, String content) {
+    CblFetchEvent fetchEventItem = CblFetchEvent.builder().build();
+    fetchEventItem.setUri(Uri.toString());
+    fetchEventItem.setName(filename);
+    fetchEventItem.setContent(content);
   }
 
   /** @return the singleton instance of CobolWorkspaceServiceImpl */
