@@ -98,9 +98,8 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
                   && !resFile.isDirectory()
                   && resFile.getName().contains(fileName);
             })) {
-
       stream.findFirst().ifPresent(path -> pathFileFound = path);
-
+      populateDatabus(fileName, pathFileFound, getContentByURI(pathFileFound.toString()));
     } catch (IOException e) {
       e.printStackTrace();
     }
