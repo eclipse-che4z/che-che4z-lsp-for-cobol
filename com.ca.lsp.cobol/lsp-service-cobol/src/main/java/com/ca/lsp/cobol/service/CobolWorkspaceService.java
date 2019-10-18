@@ -34,4 +34,11 @@ interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceServ
   Path getURIByFileName(String fileName);
 
   Stream<String> getContentByURI(String copybookName);
+
+  /**
+   * @param filename name of copybook retrived in the copy instruction
+   * @param URI of the resource found by the method #getUriByFileName()
+   * @param content String content for the resource associated to the URI
+   */
+  void populateDatabus(String filename, Path URI, String content);
 }

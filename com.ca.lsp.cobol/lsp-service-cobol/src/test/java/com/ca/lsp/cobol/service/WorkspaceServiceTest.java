@@ -1,5 +1,6 @@
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.junit.After;
@@ -17,6 +18,8 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -79,6 +82,18 @@ public class WorkspaceServiceTest {
   @Test
   public void getContentByCopybookName() {
     assertTrue(cobolWorkspaceService.getContentByURI(CPY_FILE_ONLY_NAME).toArray().length > 0);
+  }
+
+  @Test
+  public void fulfillDatabusAndCheckResult() {
+    CblFetchEvent fetchEventItem = CblFetchEvent.builder().build();
+    fetchEventItem.setName(CPY_FILE_ONLY_NAME);
+    fetchEventItem.setUri(
+        cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME).toUri().toString());
+    Stream<String> contentStream = cobolWorkspaceService.getContentByURI(CPY_FILE_ONLY_NAME);
+    fetchEventItem.setContent(contentStream.collect(Collectors.joining()));
+
+    assertTrue(fetchEventItem.getUri().length() > 0 && fetchEventItem.getContent().length() > 0);
   }
 
   @After
