@@ -29,7 +29,6 @@ public class WorkspaceServiceTest {
   private static final String WORKSPACE_FOLDER_NAME = "test";
   private static final String CPY_FILE_NAME_WITH_EXT = "copy.cpy";
   private static final String CPY_FILE_ONLY_NAME = "copy";
-
   private static final String COPYBOOK_CONTENT =
       "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
 
@@ -38,18 +37,27 @@ public class WorkspaceServiceTest {
       CobolWorkspaceServiceImpl.getInstance();
   private List<WorkspaceFolder> workspaceFolderList = null;
 
+  private final Path workspacePath =
+      Paths.get(
+          System.getProperty("java.io.tmpdir")
+              + System.getProperty("file.separator")
+              + "WORKSPACE");
+  private final Path copybooksPath =
+      Paths.get(workspacePath + System.getProperty("file.separator") + "COPYBOOKS");
+
+  private final Path innerCopybooksPath =
+      Paths.get(
+          workspacePath
+              + System.getProperty("file.separator")
+              + "COPYBOOKS"
+              + System.getProperty("file.separator")
+              + "INNER");
+
+  private final Path cpyFilePath =
+      Paths.get(copybooksPath + System.getProperty("file.separator") + CPY_FILE_NAME_WITH_EXT);
+
   @Before
   public void scanWorkspaceForCopybooks() {
-    Path workspacePath =
-        Paths.get(
-            System.getProperty("java.io.tmpdir")
-                + System.getProperty("file.separator")
-                + "WORKSPACE");
-    Path copybooksPath =
-        Paths.get(workspacePath + System.getProperty("file.separator") + "COPYBOOKS");
-    Path cpyFilePath =
-        Paths.get(copybooksPath + System.getProperty("file.separator") + CPY_FILE_NAME_WITH_EXT);
-
     createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath);
     WorkspaceFolder workspaceFolder = new WorkspaceFolder();
     workspaceFolder.setName(WORKSPACE_FOLDER_NAME);
@@ -67,6 +75,18 @@ public class WorkspaceServiceTest {
   public void getCopyBookList() {
     cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
     assertEquals(1, cobolWorkspaceService.getCopybookPathsList().size());
+  }
+
+  @Test
+  public void getMultipleCopybooksInDifferentFolders() {
+    createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath);
+
+    createInnerFolderAndFile(
+        copybooksPath,
+        Paths.get(innerCopybooksPath + System.getProperty("file.separator") + "copy2.cpy"));
+
+    cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
+    assertEquals(2, cobolWorkspaceService.getCopybookPathsList().size());
   }
 
   @Test
@@ -98,15 +118,27 @@ public class WorkspaceServiceTest {
 
   @After
   public void cleanupTempFolder() {
-    removeAllCopybooksFilesAtShutdown(getWorkspaceFolderPath());
-  }
-
-  private void removeAllCopybooksFilesAtShutdown(URI outerDirectoryPath) {
     try {
-      Files.walk(Paths.get(outerDirectoryPath))
+      Files.walk(Paths.get(getWorkspaceFolderPath()))
           .sorted(Comparator.reverseOrder())
           .map(Path::toFile)
           .forEach(File::delete);
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void createInnerFolderAndFile(Path parentFolder, Path copybookFile) {
+    try {
+      // create parent folder
+      if (Files.exists(parentFolder)) {
+        Files.createDirectory(innerCopybooksPath);
+
+        // create file into it
+        Path copybookFilePath = Files.createFile(copybookFile);
+        generateDummyContentForFile(copybookFilePath);
+      }
 
     } catch (IOException e) {
       e.printStackTrace();
@@ -117,14 +149,16 @@ public class WorkspaceServiceTest {
     try {
       if (!Files.exists(workspacePath)) {
         Files.createDirectory(workspacePath);
+        if (!Files.exists(copybookFolderPath)) {
+          Files.createDirectory(copybookFolderPath);
+        }
       }
 
-      if (!Files.exists(copybookFolderPath)) {
-        Files.createDirectory(copybookFolderPath);
+      if (!Files.exists(cpyFilePath)) {
+        Path copybookFilePath = Files.createFile(cpyFilePath);
+        generateDummyContentForFile(copybookFilePath);
       }
 
-      Path copybookFilePath = Files.createFile(cpyFilePath);
-      generateDummyContentForFile(copybookFilePath);
     } catch (IOException e) {
       e.printStackTrace();
     }
