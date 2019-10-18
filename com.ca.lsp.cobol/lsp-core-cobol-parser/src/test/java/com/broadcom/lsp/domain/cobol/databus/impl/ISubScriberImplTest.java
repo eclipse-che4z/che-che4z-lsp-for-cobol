@@ -23,8 +23,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by lamgi04 on 2019-10-02
  */
@@ -41,6 +39,6 @@ public class ISubScriberImplTest {
     @Test
     public void subscribe() {
         Injector injector = Guice.createInjector(new DomainModule());
-        injector.getInstance(IStringSubScriberImpl.class).subscribeDataHandler(new String());
+        injector.getInstance(IStringSubScriberImpl.class).onDataHandler(new String());
     }
 }

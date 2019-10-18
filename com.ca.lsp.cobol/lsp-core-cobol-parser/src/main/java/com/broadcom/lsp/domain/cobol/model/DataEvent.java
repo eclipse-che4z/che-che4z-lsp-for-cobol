@@ -16,13 +16,14 @@
 
 package com.broadcom.lsp.domain.cobol.model;
 
-import lombok.Builder;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Created by gl669210 on 16/10/2019
+ * Created  on 16/10/2019
  */
 @Slf4j
+@Data
 public class DataEvent {
-    private String registryId = "";
+    private RegistryId registryId = RegistryId.GENERAL_REGISTRY_ID;
 }

@@ -19,7 +19,7 @@ package com.broadcom.lsp.domain.cobol.model;
 import lombok.Getter;
 
 /**
- * Created by gl669210 on 16/10/2019
+ * Created  on 16/10/2019
  */
 
 public enum RegistryId {
