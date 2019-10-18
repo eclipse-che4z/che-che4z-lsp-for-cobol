@@ -1011,7 +1011,7 @@ dataOccursSort
    ;
 
 dataPictureClause
-   : (PICTURE | PIC) IS2? pictureString+
+   : (PICTURE | PIC) IS? pictureString+
    ;
 
 pictureString
