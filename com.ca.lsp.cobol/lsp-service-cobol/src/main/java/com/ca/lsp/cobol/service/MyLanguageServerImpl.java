@@ -53,9 +53,6 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
     WorkspaceServerCapabilities workspaceServiceCapabilities =
         new WorkspaceServerCapabilities(workspaceFoldersOptions);
     capabilities.setWorkspace(workspaceServiceCapabilities);
-    //
-    //    // set up workspace folders
-    //    workspaceService.setWorkspaceFolders(params.getWorkspaceFolders());
 
     // workspaceService.setWorkspaceFolders(params.getWorkspaceFolders());
     workspaceService.scanWorkspaceForCopybooks(params.getWorkspaceFolders());
