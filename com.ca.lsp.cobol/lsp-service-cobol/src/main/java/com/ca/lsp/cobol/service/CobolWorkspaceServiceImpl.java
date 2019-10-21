@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019 Broadcom.
+ *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -9,11 +10,16 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ * Broadcom, Inc. - initial API and implementation
+ *
  */
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
+import com.broadcom.lsp.domain.cobol.model.DataEvent;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 
@@ -30,17 +36,18 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 @Slf4j
+@Singleton
 public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   private static final CobolWorkspaceServiceImpl INSTANCE = new CobolWorkspaceServiceImpl();
 
+  @Inject
+  private DefaultDataBusBroker dataBus;
   private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
   private static final String URI_FILE_SEPARATOR = "/";
   private List<Path> copybookPathsList;
   private final List<File> copybookFileList = new ArrayList<>();
   private List<WorkspaceFolder> workspaceFolders;
   private Path pathFileFound = null;
-
-  private CobolWorkspaceServiceImpl() {}
 
   @Override
   public CompletableFuture<List<? extends SymbolInformation>> symbol(WorkspaceSymbolParams params) {
@@ -126,10 +133,11 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
 
   @Override
   public void populateDatabus(String filename, Path Uri, String content) {
-    CblFetchEvent fetchEventItem = CblFetchEvent.builder().build();
-    fetchEventItem.setUri(Uri.toString());
-    fetchEventItem.setName(filename);
-    fetchEventItem.setContent(content);
+    CblFetchEvent fetchEventItem = CblFetchEvent.builder()
+            .uri(Uri.toString())
+            .name(filename)
+            .content(content)
+            .build();
   }
 
   /** @return the singleton instance of CobolWorkspaceServiceImpl */
@@ -161,5 +169,10 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
 
   void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
     this.workspaceFolders = workspaceFolders;
+  }
+
+  @Override
+  public void observerCallback(DataEvent adaptedDataEvent) {
+    log.debug("CALLBACK WORKS!");
   }
 }

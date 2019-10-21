@@ -21,13 +21,13 @@ import com.google.inject.Injector;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Created by lamgi04 on 2019-10-03
+ * Created on 2019-10-03
  * Quick workaround to mantain the backward compatibility
  * meanwhile the old stack doesn't support DI.
  */
 @Slf4j
 public class LangServerCtx {
-    private static final Injector injector = Guice.createInjector(new LangServerModule());
+    private static final Injector injector = Guice.createInjector(new LangServerModule(), new DomainModule());
     public static Injector getGuiceCtx(){
         return injector;
     }

@@ -16,11 +16,8 @@
 
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.cdi.DomainModule;
-import com.broadcom.lsp.domain.cobol.databus.api.IDataBusBroker;
+import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.model.*;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -32,8 +29,11 @@ import org.junit.Test;
 @Slf4j
 public class DataBusImplTest extends AbsDataBusImplTest {
 
+    private DefaultDataBusBroker databus;
+
     @Before
     public void setUp() throws Exception {
+        databus = LangServerCtx.getGuiceCtx().getInstance(DefaultDataBusBroker.class);
     }
 
     @After
@@ -42,8 +42,6 @@ public class DataBusImplTest extends AbsDataBusImplTest {
 
     @Test
     public void subscribe() {
-        Injector injector = Guice.createInjector(new DomainModule());
-        DefaultDataBusBroker databus = (DefaultDataBusBroker) injector.getInstance(IDataBusBroker.class);
 
         databus.subscribe(DataEventType.CPYBUILD_EVENT, this);
 

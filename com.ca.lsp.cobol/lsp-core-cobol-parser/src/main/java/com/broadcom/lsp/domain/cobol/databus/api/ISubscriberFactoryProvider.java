@@ -16,10 +16,10 @@
 
 package com.broadcom.lsp.domain.cobol.databus.api;
 
-import com.broadcom.lsp.cdi.factory.CblFetchSubcriberFactoryImpl;
-import com.broadcom.lsp.cdi.factory.CblScanSubcriberFactoryImpl;
-import com.broadcom.lsp.cdi.factory.CpyBuildSubcriberFactoryImpl;
-import com.broadcom.lsp.cdi.factory.UnknownSubcriberFactoryImpl;
+import com.broadcom.lsp.domain.cobol.factory.CblFetchSubcriberFactoryImpl;
+import com.broadcom.lsp.domain.cobol.factory.CblScanSubcriberFactoryImpl;
+import com.broadcom.lsp.domain.cobol.factory.CpyBuildSubcriberFactoryImpl;
+import com.broadcom.lsp.domain.cobol.factory.UnknownSubcriberFactoryImpl;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
 
 import java.util.NoSuchElementException;

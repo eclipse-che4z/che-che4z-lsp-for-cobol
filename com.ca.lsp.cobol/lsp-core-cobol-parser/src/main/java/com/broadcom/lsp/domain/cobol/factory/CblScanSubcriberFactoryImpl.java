@@ -14,7 +14,7 @@
  *
  */
 
-package com.broadcom.lsp.cdi.factory;
+package com.broadcom.lsp.domain.cobol.factory;
 
 import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.databus.api.ISubcriberAbsFactory;
@@ -27,6 +27,6 @@ import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
 public class CblScanSubcriberFactoryImpl<T> implements ISubcriberAbsFactory<CblScanEventSubScriber> {
     @Override
     public CblScanEventSubScriber create(IDataBusObserver observer) {
-        return new CblScanEventSubScriber(CblScanEvent.builder().build());
+        return new CblScanEventSubScriber(observer, CblScanEvent.builder().build());
     }
 }

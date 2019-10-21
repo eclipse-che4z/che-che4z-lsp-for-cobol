@@ -17,14 +17,26 @@
 package com.broadcom.lsp.domain.cobol.model;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/** Created by gl669210 on 15/10/2019 */
-@Builder
+/**
+ * Created on 15/10/2019
+ */
+@Data
+@NoArgsConstructor
 public class CblFetchEvent extends DataEvent {
-  @Getter @Setter private String name;
-  @Getter @Setter private String position;
-  @Getter @Setter private String uri;
-  @Getter @Setter private String content;
+  private String name;
+  private String position;
+  private String uri;
+  private String content;
+
+  @Builder
+  public CblFetchEvent(String name, String position, String uri, String content) {
+    super(DataEventType.CBLFETCH_EVENT, DataEventType.CBLFETCH_EVENT.getId());
+    this.name = name;
+    this.position = position;
+    this.uri = uri;
+    this.content = content;
+  }
 }
