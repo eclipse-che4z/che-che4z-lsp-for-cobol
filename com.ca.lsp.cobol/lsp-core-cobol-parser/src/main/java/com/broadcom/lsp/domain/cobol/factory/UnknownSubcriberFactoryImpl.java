@@ -14,20 +14,20 @@
  *
  */
 
-package com.broadcom.lsp.cdi.factory;
+package com.broadcom.lsp.domain.cobol.factory;
 
 import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.databus.api.ISubcriberAbsFactory;
-import com.broadcom.lsp.domain.cobol.databus.impl.CpyBuildEventSubScriber;
-import com.broadcom.lsp.domain.cobol.model.CpyBuildEvent;
+import com.broadcom.lsp.domain.cobol.databus.impl.UnknownEventSubScriber;
+import com.broadcom.lsp.domain.cobol.model.UnknownEvent;
 
 /**
  * Created on 17/10/2019
  */
-public class CpyBuildSubcriberFactoryImpl implements ISubcriberAbsFactory<CpyBuildEventSubScriber> {
+public class UnknownSubcriberFactoryImpl<T> implements ISubcriberAbsFactory<UnknownEventSubScriber> {
 
     @Override
-    public CpyBuildEventSubScriber create(IDataBusObserver observer) {
-        return new CpyBuildEventSubScriber(observer, CpyBuildEvent.builder().build());
+    public UnknownEventSubScriber create(IDataBusObserver observer) {
+        return new UnknownEventSubScriber(observer, UnknownEvent.builder().build());
     }
 }

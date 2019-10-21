@@ -16,6 +16,7 @@
 
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
+import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -32,6 +33,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class CblScanEventSubScriber {
+
+    @Getter
+    @NonNull
+    private IDataBusObserver observer;
 
     @NonNull
     @Getter

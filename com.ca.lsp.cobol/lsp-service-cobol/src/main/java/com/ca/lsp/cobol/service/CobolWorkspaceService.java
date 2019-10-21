@@ -21,7 +21,7 @@ import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService, IDataBusObserver<DataEvent> {
+public interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService, IDataBusObserver<DataEvent> {
   /**
    * From a given copybook name (without file extension) this method will return the URI of the file
    * - if exists

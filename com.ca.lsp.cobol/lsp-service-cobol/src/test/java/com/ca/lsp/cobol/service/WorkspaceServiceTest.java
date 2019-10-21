@@ -1,5 +1,22 @@
+/*
+ * Copyright (c) 2019 Broadcom.
+ *
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ * Broadcom, Inc. - initial API and implementation
+ *
+ */
+
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
@@ -34,7 +51,7 @@ public class WorkspaceServiceTest {
 
   private URI workspaceFolderPath = null;
   private final CobolWorkspaceServiceImpl cobolWorkspaceService =
-      CobolWorkspaceServiceImpl.getInstance();
+          LangServerCtx.getGuiceCtx().getInstance(CobolWorkspaceServiceImpl.class);
   private List<WorkspaceFolder> workspaceFolderList = null;
 
   private final Path workspacePath =
