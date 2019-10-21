@@ -16,7 +16,7 @@
 
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.domain.cobol.databus.api.IObserver;
+import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.model.CpyBuildEvent;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -36,7 +36,7 @@ public class CpyBuildEventSubScriber {
 
     @Getter
     @NonNull
-    private IObserver observer;
+    private IDataBusObserver observer;
 
     @NonNull
     @Getter

@@ -18,7 +18,6 @@ package com.broadcom.lsp.domain.cobol.databus.impl;
 
 import com.broadcom.lsp.cdi.DomainModule;
 import com.broadcom.lsp.domain.cobol.databus.api.IDataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.api.IObserver;
 import com.broadcom.lsp.domain.cobol.model.*;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -28,10 +27,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Created by lamgi04 on 2019-10-02
+ * Created on 2019-10-02
  */
 @Slf4j
-public class ISubScriberImplTest implements IObserver<DataEvent> {
+public class DataBusImplTest extends AbsDataBusImplTest {
 
     @Before
     public void setUp() throws Exception {
@@ -53,11 +52,5 @@ public class ISubScriberImplTest implements IObserver<DataEvent> {
         databus.postData(CblFetchEvent.builder().name("CBLFETCH_SUBSCRIPTION TEST").build());
         databus.postData(CblScanEvent.builder().name("CBLSCAN_SUBSCRIPTION TEST").build());
         LOG.debug("DONE!");
-    }
-
-
-    @Override
-    public void observerCallback(DataEvent adaptedDataEvent) {
-        LOG.debug("CALLBACK WORKS!");
     }
 }

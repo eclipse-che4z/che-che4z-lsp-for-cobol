@@ -60,7 +60,7 @@ public abstract class AbstractDataBusBroker<T extends DataEvent, S> implements I
 
     @Override
     @SneakyThrows
-    public S getSubscriber(DataEventType event, IObserver observer) {
+    public S getSubscriber(DataEventType event, IDataBusObserver observer) {
         return (S) ISubscriberFactoryProvider.getFactory(event).create(observer);
     }
 }
