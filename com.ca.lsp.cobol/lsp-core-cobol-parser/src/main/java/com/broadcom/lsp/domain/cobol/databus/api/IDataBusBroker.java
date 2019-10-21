@@ -41,7 +41,7 @@ public interface IDataBusBroker<T extends DataEvent, S> {
 
     void subscribe(RegistryId registryId, S dataSubscriber);
 
-    void subscribe(DataEventType eventType, IObserver observer);
+    void subscribe(DataEventType eventType, IDataBusObserver observer);
 
-    S getSubscriber(DataEventType event, IObserver observer);
+    S getSubscriber(DataEventType event, IDataBusObserver observer);
 }

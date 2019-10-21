@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019 Broadcom.
+ *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -9,11 +10,13 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ * Broadcom, Inc. - initial API and implementation
+ *
  */
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
+import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 
@@ -163,5 +166,10 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
 
   void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
     this.workspaceFolders = workspaceFolders;
+  }
+
+  @Override
+  public void observerCallback(DataEvent adaptedDataEvent) {
+    log.debug("CALLBACK WORKS!");
   }
 }

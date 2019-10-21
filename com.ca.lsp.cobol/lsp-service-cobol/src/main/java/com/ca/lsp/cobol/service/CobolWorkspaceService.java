@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019 Broadcom.
+ *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -9,14 +10,18 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ * Broadcom, Inc. - initial API and implementation
+ *
  */
 package com.ca.lsp.cobol.service;
+
+import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
+import com.broadcom.lsp.domain.cobol.model.DataEvent;
 
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService {
+interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService, IDataBusObserver<DataEvent> {
   /**
    * From a given copybook name (without file extension) this method will return the URI of the file
    * - if exists

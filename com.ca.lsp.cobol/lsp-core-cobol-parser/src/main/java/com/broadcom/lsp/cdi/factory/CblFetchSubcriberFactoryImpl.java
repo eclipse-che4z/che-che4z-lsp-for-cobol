@@ -16,7 +16,7 @@
 
 package com.broadcom.lsp.cdi.factory;
 
-import com.broadcom.lsp.domain.cobol.databus.api.IObserver;
+import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.databus.api.ISubcriberAbsFactory;
 import com.broadcom.lsp.domain.cobol.databus.impl.CblFetchEventSubScriber;
 import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
@@ -26,7 +26,7 @@ import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
  */
 public class CblFetchSubcriberFactoryImpl<T> implements ISubcriberAbsFactory<CblFetchEventSubScriber> {
     @Override
-    public CblFetchEventSubScriber create(IObserver observer) {
+    public CblFetchEventSubScriber create(IDataBusObserver observer) {
         return new CblFetchEventSubScriber(CblFetchEvent.builder().build());
     }
 }

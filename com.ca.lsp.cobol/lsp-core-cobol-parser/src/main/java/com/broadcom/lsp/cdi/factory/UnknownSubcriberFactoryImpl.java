@@ -16,7 +16,7 @@
 
 package com.broadcom.lsp.cdi.factory;
 
-import com.broadcom.lsp.domain.cobol.databus.api.IObserver;
+import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.databus.api.ISubcriberAbsFactory;
 import com.broadcom.lsp.domain.cobol.databus.impl.UnknownEventSubScriber;
 import com.broadcom.lsp.domain.cobol.model.UnknownEvent;
@@ -27,7 +27,7 @@ import com.broadcom.lsp.domain.cobol.model.UnknownEvent;
 public class UnknownSubcriberFactoryImpl<T> implements ISubcriberAbsFactory<UnknownEventSubScriber> {
 
     @Override
-    public UnknownEventSubScriber create(IObserver observer) {
+    public UnknownEventSubScriber create(IDataBusObserver observer) {
         return new UnknownEventSubScriber(UnknownEvent.builder().build());
     }
 }

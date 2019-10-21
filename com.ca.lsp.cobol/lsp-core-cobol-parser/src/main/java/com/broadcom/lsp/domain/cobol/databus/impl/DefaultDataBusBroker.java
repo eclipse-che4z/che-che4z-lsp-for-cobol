@@ -17,7 +17,7 @@
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
 import com.broadcom.lsp.domain.cobol.databus.api.AbstractDataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.api.IObserver;
+import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.model.RegistryId;
@@ -58,7 +58,7 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
 
     @Override
     @SneakyThrows
-    public void subscribe(DataEventType eventType, IObserver observer) {
+    public void subscribe(DataEventType eventType, IDataBusObserver observer) {
         subscribe(getSubscriber(eventType, observer));
     }
 }
