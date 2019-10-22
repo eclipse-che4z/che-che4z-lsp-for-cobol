@@ -64,6 +64,12 @@
             <artifactId>lsp-core-cobol-parser</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/net.jodah/concurrentunit -->
+        <dependency>
+            <groupId>net.jodah</groupId>
+            <artifactId>concurrentunit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

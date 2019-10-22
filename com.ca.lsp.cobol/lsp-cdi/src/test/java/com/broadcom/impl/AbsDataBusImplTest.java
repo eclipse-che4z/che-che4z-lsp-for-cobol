@@ -18,13 +18,17 @@ package com.broadcom.impl;
 
 import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.jodah.concurrentunit.Waiter;
 
 /**
  * Created on 2019-10-02
  */
 @Slf4j
 public abstract class AbsDataBusImplTest implements IDataBusObserver<DataEvent> {
+    @Getter
+    protected final Waiter waiter = new Waiter();
 
     public abstract void setUp() throws Exception;
 

@@ -113,6 +113,13 @@
 				<artifactId>guava</artifactId>
 				<version>28.1-jre</version>
 			</dependency>
+			<!-- https://mvnrepository.com/artifact/net.jodah/concurrentunit -->
+			<dependency>
+				<groupId>net.jodah</groupId>
+				<artifactId>concurrentunit</artifactId>
+				<version>0.4.6</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
