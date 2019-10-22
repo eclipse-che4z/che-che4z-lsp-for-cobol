@@ -47,8 +47,11 @@ public class LangServerBootstrap {
 
     private void initCtx() {
         cdiCtx = LangServerCtx.getGuiceCtx(new ServiceModule(), new DatabusModule());
+        //Example of usage
+        //cdiCtx.getInjector().getInstance(CobolWorkspaceService.class);
         //To Remove...
         server = new MyLanguageServerImpl();
+
     }
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
