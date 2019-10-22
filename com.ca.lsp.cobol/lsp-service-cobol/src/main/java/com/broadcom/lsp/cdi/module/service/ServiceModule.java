@@ -16,11 +16,13 @@
 package com.broadcom.lsp.cdi.module.service;
 
 import com.broadcom.lsp.cdi.module.DefaultModule;
-import com.ca.lsp.cobol.service.*;
+import com.ca.lsp.cobol.service.CobolWorkspaceService;
+import com.ca.lsp.cobol.service.CobolWorkspaceServiceImpl;
+import com.ca.lsp.cobol.service.IMyLanguageServer;
+import com.ca.lsp.cobol.service.MyLanguageServerImpl;
 import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp4j.services.TextDocumentService;
 
 /**
  * Created on 2019-10-02
@@ -31,7 +33,6 @@ public class ServiceModule extends DefaultModule {
     @Override
     protected void configure() {
         super.configure();
-        bind(TextDocumentService.class).to(MyTextDocumentService.class);
         bind(IMyLanguageServer.class).to(MyLanguageServerImpl.class);
         bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
         bind(CobolWorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
