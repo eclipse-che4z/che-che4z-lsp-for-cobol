@@ -27,6 +27,7 @@
     </parent>
     <artifactId>lsp-cdi</artifactId>
     <name>CA COBOL LSP :: LSP CDI Support</name>
+    <version>0.8.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -36,10 +37,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.ca.lsp</groupId>
-            <artifactId>lsp-core-cobol-parser</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
@@ -61,6 +58,11 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.ca.lsp</groupId>
+            <artifactId>lsp-core-cobol-parser</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

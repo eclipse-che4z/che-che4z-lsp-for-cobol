@@ -17,6 +17,7 @@
 package com.broadcom.impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.*;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ public class DataBusImplTest extends AbsDataBusImplTest {
 
     @Before
     public void setUp() throws Exception {
-        databus = LangServerCtx.getGuiceCtx().getInstance(DefaultDataBusBroker.class);
+        databus = LangServerCtx.getGuiceCtx(new DatabusModule()).getInjector().getInstance(DefaultDataBusBroker.class);
     }
 
     @After

@@ -27,6 +27,7 @@
     </parent>
     <artifactId>lsp-service-cobol</artifactId>
     <name>CA COBOL LSP :: LSP Service</name>
+    <version>0.8.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -73,8 +74,6 @@
         <dependency>
             <groupId>com.ca.lsp</groupId>
             <artifactId>lsp-cdi</artifactId>
-            <version>0.8.0</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -123,6 +122,7 @@
                     <systemProperties>
                         <property>
                             <name>filesToTestPath</name>
+                            <!--suppress UnresolvedMavenProperty -->
                             <value>${filesToTestPath}</value>
                         </property>
                     </systemProperties>
