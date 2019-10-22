@@ -14,9 +14,10 @@
  *
  */
 
-package com.broadcom.lsp.domain.cobol.databus.impl;
+package com.broadcom.impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
