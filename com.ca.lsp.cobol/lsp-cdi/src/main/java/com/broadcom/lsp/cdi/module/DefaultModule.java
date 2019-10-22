@@ -14,17 +14,19 @@
  *
  */
 
-package com.broadcom.lsp.cdi.module.databus;
+package com.broadcom.lsp.cdi.module;
 
-import com.broadcom.lsp.cdi.module.DefaultModule;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
 /**
- * Created   on 2019-10-02
+ * Created on 22/10/2019
  */
-//Binding Module
-public class DatabusModule extends DefaultModule {
+public class DefaultModule extends AbstractModule {
     @Override
     protected void configure() {
-        super.configure();
+        bind(String.class)
+                .annotatedWith(Names.named("VERSION"))
+                .toInstance("0.8");
     }
 }
