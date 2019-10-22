@@ -19,7 +19,10 @@ package com.broadcom.impl;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.*;
+import com.broadcom.lsp.domain.cobol.model.CpyBuildEvent;
+import com.broadcom.lsp.domain.cobol.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.model.DataEventType;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -29,7 +32,7 @@ import org.junit.Test;
  * Created on 2019-10-02
  */
 @Slf4j
-public class DataBusImplTest extends AbsDataBusImplTest {
+public class DataBusImplHappyTest extends AbsDataBusImplTest {
 
     private DefaultDataBusBroker databus;
 
@@ -40,17 +43,23 @@ public class DataBusImplTest extends AbsDataBusImplTest {
 
     @After
     public void tearDown() throws Exception {
+        databus = null;
+    }
+
+    @Override
+    public void observerCallback(DataEvent adaptedDataEvent) {
+        waiter.assertTrue(DataEventType.CPYBUILD_EVENT == adaptedDataEvent.getEventType());
+        LOG.debug(String.format("Received : %s", adaptedDataEvent.getEventType().getId()));
+        LOG.debug(String.format("Expected : %s", DataEventType.CPYBUILD_EVENT.getId()));
+        waiter.resume();
     }
 
     @Test
+    @SneakyThrows
     public void subscribe() {
-
         databus.subscribe(DataEventType.CPYBUILD_EVENT, this);
-
-        databus.postData(UnknownEvent.builder().eventMessage("UNKNOWN_SUBSCRIPTION TEST").build());
         databus.postData(CpyBuildEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
-        databus.postData(CblFetchEvent.builder().name("CBLFETCH_SUBSCRIPTION TEST").build());
-        databus.postData(CblScanEvent.builder().name("CBLSCAN_SUBSCRIPTION TEST").build());
-        LOG.debug("DONE!");
+        waiter.await(5000);
     }
+
 }
