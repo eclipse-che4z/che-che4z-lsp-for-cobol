@@ -14,8 +14,8 @@
   ~ Broadcom, Inc. - initial API and implementation
   ~
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,22 +25,14 @@
         <version>0.8.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>lsp-service-cobol</artifactId>
-    <name>CA COBOL LSP :: LSP Service</name>
+    <artifactId>lsp-cdi</artifactId>
+    <name>CA COBOL LSP :: LSP CDI Support</name>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.eclipse.lsp4j</groupId>
-            <artifactId>org.eclipse.lsp4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.lsp4j</groupId>
-            <artifactId>org.eclipse.lsp4j.jsonrpc</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -70,12 +62,6 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.ca.lsp</groupId>
-            <artifactId>lsp-cdi</artifactId>
-            <version>0.8.0</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -92,7 +78,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.ca.lsp.cobol.LangServerBootstrap</mainClass>
+                                    <mainClass>com.ca.com.broadcom.lsp.cdi.lsp.cobol.LangServerBootstrap</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>

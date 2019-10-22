@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright (c) 2019 Broadcom.
- The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
-
- This program and the accompanying materials are made
- available under the terms of the Eclipse Public License 2.0
- which is available at https://www.eclipse.org/legal/epl-2.0/
-
- SPDX-License-Identifier: EPL-2.0
-
- Contributors:
-   Broadcom, Inc. - initial API and implementation
--->
+  ~ Copyright (c) 2019 Broadcom.
+  ~
+  ~ The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+  ~
+  ~ This program and the accompanying materials are made
+  ~ available under the terms of the Eclipse Public License 2.0
+  ~ which is available at https://www.eclipse.org/legal/epl-2.0/
+  ~
+  ~ SPDX-License-Identifier: EPL-2.0
+  ~
+  ~ Contributors:
+  ~ Broadcom, Inc. - initial API and implementation
+  ~
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.ca.lsp</groupId>
-	<artifactId>com.ca.lsp.cobol</artifactId>
+	<groupId>com.ca.com.broadcom.lsp.cdi.lsp</groupId>
+	<artifactId>com.ca.com.broadcom.lsp.cdi.lsp.cobol</artifactId>
 	<version>0.8.0</version>
 	<packaging>pom</packaging>
 	<name>CA COBOL LSP :: Parent pom</name>
@@ -56,8 +58,8 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.ca.lsp</groupId>
-				<artifactId>lsp-core-cobol-parser</artifactId>
+				<groupId>com.ca.com.broadcom.lsp.cdi.lsp</groupId>
+				<artifactId>com.broadcom.lsp.cdi.lsp-core-cobol-parser</artifactId>
 				<version>0.8.0</version>
 			</dependency>
 			<dependency>
@@ -112,5 +114,6 @@
 	<modules>
 		<module>lsp-service-cobol</module>
 		<module>lsp-core-cobol-parser</module>
+		<module>lsp-cdi</module>
 	</modules>
 </project>
