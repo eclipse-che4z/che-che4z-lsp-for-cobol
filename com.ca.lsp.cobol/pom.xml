@@ -18,8 +18,8 @@
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.ca.com.broadcom.lsp.cdi.lsp</groupId>
-	<artifactId>com.ca.com.broadcom.lsp.cdi.lsp.cobol</artifactId>
+	<groupId>com.ca.lsp</groupId>
+	<artifactId>com.ca.lsp.cobol</artifactId>
 	<version>0.8.0</version>
 	<packaging>pom</packaging>
 	<name>CA COBOL LSP :: Parent pom</name>
@@ -58,8 +58,13 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.ca.com.broadcom.lsp.cdi.lsp</groupId>
-				<artifactId>com.broadcom.lsp.cdi.lsp-core-cobol-parser</artifactId>
+				<groupId>com.ca.lsp</groupId>
+				<artifactId>lsp-core-cobol-parser</artifactId>
+				<version>0.8.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.ca.lsp</groupId>
+				<artifactId>lsp-cdi</artifactId>
 				<version>0.8.0</version>
 			</dependency>
 			<dependency>

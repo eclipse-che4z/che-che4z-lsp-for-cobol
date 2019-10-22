@@ -17,6 +17,7 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.cdi.module.service.ServiceModule;
 import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
@@ -51,7 +52,7 @@ public class WorkspaceServiceTest {
 
   private URI workspaceFolderPath = null;
   private final CobolWorkspaceServiceImpl cobolWorkspaceService =
-          LangServerCtx.getGuiceCtx().getInstance(CobolWorkspaceServiceImpl.class);
+          LangServerCtx.getGuiceCtx(new ServiceModule()).getInjector().getInstance(CobolWorkspaceServiceImpl.class);
   private List<WorkspaceFolder> workspaceFolderList = null;
 
   private final Path workspacePath =

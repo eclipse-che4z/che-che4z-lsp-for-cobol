@@ -14,26 +14,20 @@
  *
  */
 
-package com.broadcom.lsp.cdi;
+package com.broadcom.lsp.cdi.module.databus;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
-import lombok.extern.slf4j.Slf4j;
 
 /**
- * Created on 2019-10-02
+ * Created   on 2019-10-02
  */
 //Binding Module
-@Slf4j
-public class LangServerModule extends AbstractModule {
+public class DatabusModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(String.class)
                 .annotatedWith(Names.named("VERSION"))
                 .toInstance("0.8");
-//        bind(TextDocumentService.class).to(MyTextDocumentService.class);
-//        bind(IMyLanguageServer.class).to(MyLanguageServerImpl.class);
-//        bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
-//        bind(CobolWorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     }
 }
