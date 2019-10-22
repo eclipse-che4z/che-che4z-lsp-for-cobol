@@ -16,12 +16,14 @@ package com.ca.lsp.core.cobol.preprocessor.impl;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
+import com.ca.lsp.core.cobol.parser.CobolCleanerListener;
 import com.ca.lsp.core.cobol.parser.listener.FormatListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.ProcessingConstants;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolDocumentParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentParserImpl;
+import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.impl.CobolDocumentCleanerListenerImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolCommentEntriesMarker;
@@ -94,14 +96,24 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     final List<CobolLine> lines = readLines(cobolCode, format, params);
     final List<CobolLine> transformedLines = transformLines(lines);
     final List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
+    //
     return parseDocument(rewrittenLines, format, params, semanticContext);
   }
 
+  private PreprocessedInput cleanDocument(
+          final List<CobolLine> lines,
+          final CobolSourceFormatEnum format,
+          final CobolParserParams params,
+          final SemanticContext semanticContext) {
+    String code = createLineWriter().serialize(lines);
+    return createDocumentParser(semanticContext).processLines(code, format, params);
+  }
+
   private PreprocessedInput parseDocument(
-      final List<CobolLine> lines,
-      final CobolSourceFormatEnum format,
-      final CobolParserParams params,
-      final SemanticContext semanticContext) {
+          final List<CobolLine> lines,
+          final CobolSourceFormatEnum format,
+          final CobolParserParams params,
+          final SemanticContext semanticContext) {
     String code = createLineWriter().serialize(lines);
     return createDocumentParser(semanticContext).processLines(code, format, params);
   }
@@ -140,6 +152,10 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
   private CobolDocumentParser createDocumentParser(SemanticContext semanticContext) {
     return new CobolDocumentParserImpl(semanticContext);
+  }
+
+  private CobolCleanerListener createDocumentCleaner(SemanticContext semanticContext) {
+    return new CobolDocumentCleanerListenerImpl(semanticContext);
   }
 
   private CobolInlineCommentEntriesNormalizer createInlineCommentEntriesNormalizer() {

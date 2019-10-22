@@ -102,7 +102,6 @@ public class CobolDocumentParserImpl implements CobolDocumentParser {
 
     // pass the tokens to the parser
     final CobolPreprocessorParser parser = new CobolPreprocessorParser(tokens);
-
     if (!params.getIgnoreSyntaxErrors()) {
       // register an error listener, so that preprocessing stops on errors
       parser.removeErrorListeners();

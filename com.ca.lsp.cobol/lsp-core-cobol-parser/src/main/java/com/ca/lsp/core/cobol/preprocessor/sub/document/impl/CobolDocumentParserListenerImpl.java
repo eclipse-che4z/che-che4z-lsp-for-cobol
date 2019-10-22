@@ -13,13 +13,6 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.EXEC_CICS_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.EXEC_END_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.EXEC_SQLIMS_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.EXEC_SQL_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.NEWLINE;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -42,7 +35,6 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceClauseContext
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplacingPhraseContext;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CobolWordCopyBookFinder;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.FilenameCopyBookFinder;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.LiteralCopyBookFinder;
@@ -83,29 +75,6 @@ public class CobolDocumentParserListenerImpl extends CobolPreprocessorBaseListen
     contexts.push(new CobolDocumentContext());
   }
 
-  private String buildLines(final String text, final String linePrefix) {
-    final StringBuilder sb = new StringBuilder(text.length());
-    final Scanner scanner = new Scanner(text);
-    boolean firstLine = true;
-
-    while (scanner.hasNextLine()) {
-      if (!firstLine) {
-        sb.append(NEWLINE);
-      }
-
-      final String line = scanner.nextLine();
-      final String trimmedLine = line.trim();
-      final String prefixedLine = linePrefix + WS + trimmedLine;
-      final String suffixedLine = prefixedLine.replaceAll("(?i)(end-exec)", "$1 " + EXEC_END_TAG);
-
-      sb.append(suffixedLine);
-      firstLine = false;
-    }
-
-    scanner.close();
-    return sb.toString();
-  }
-
   @Override
   public CobolDocumentContext context() {
     return contexts.peek();
@@ -126,25 +95,6 @@ public class CobolDocumentParserListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void enterCompilerOptions(final CobolPreprocessorParser.CompilerOptionsContext ctx) {
     // push a new context for COMPILER OPTIONS terminals
-    push();
-  }
-
-  @Override
-  public void enterExecCicsStatement(final CobolPreprocessorParser.ExecCicsStatementContext ctx) {
-    // push a new context for SQL terminals
-    push();
-  }
-
-  @Override
-  public void enterExecSqlImsStatement(
-      final CobolPreprocessorParser.ExecSqlImsStatementContext ctx) {
-    // push a new context for SQL IMS terminals
-    push();
-  }
-
-  @Override
-  public void enterExecSqlStatement(final CobolPreprocessorParser.ExecSqlStatementContext ctx) {
-    // push a new context for SQL terminals
     push();
   }
 
@@ -265,85 +215,7 @@ public class CobolDocumentParserListenerImpl extends CobolPreprocessorBaseListen
     final PreprocessedInput copyBookContent = getCopyBookContent(copySource, format, params);
 
     semanticContext.merge(copyBookContent.getSemanticContext());
-  }
-
-  @Override
-  public void exitExecCicsStatement(final CobolPreprocessorParser.ExecCicsStatementContext ctx) {
-    // throw away EXEC CICS terminals
-    pop();
-
-    // a new context for the CICS statement
-    push();
-
-    final String textLeft = TokenUtils.getHiddenTokensToLeft(ctx.start.getTokenIndex(),tokens);
-    context().write(textLeft);
-
-    /*
-     * text
-     */
-    final String text = TokenUtils.getTextIncludingHiddenTokens(ctx, tokens);
-    final String linePrefix = CobolLine.createBlankSequenceArea(format) + EXEC_CICS_TAG;
-    final String lines = buildLines(text, linePrefix);
-
-    context().write(lines);
-
-    final String content = context().read();
-    pop();
-
-    context().write(content);
-  }
-
-  @Override
-  public void exitExecSqlImsStatement(
-      final CobolPreprocessorParser.ExecSqlImsStatementContext ctx) {
-    // throw away EXEC SQLIMS terminals
-    pop();
-
-    // a new context for the SQLIMS statement
-    push();
-
-    final String textLeft = TokenUtils.getHiddenTokensToLeft(ctx.start.getTokenIndex(),tokens);
-    context().write(textLeft);
-
-    /*
-     * text
-     */
-    final String text = TokenUtils.getTextIncludingHiddenTokens(ctx, tokens);
-    final String linePrefix = CobolLine.createBlankSequenceArea(format) + EXEC_SQLIMS_TAG;
-    final String lines = buildLines(text, linePrefix);
-
-    context().write(lines);
-
-    final String content = context().read();
-    pop();
-
-    context().write(content);
-  }
-
-  @Override
-  public void exitExecSqlStatement(final CobolPreprocessorParser.ExecSqlStatementContext ctx) {
-    // throw away EXEC SQL terminals
-    pop();
-
-    // a new context for the SQL statement
-    push();
-
-    final String textLeft = TokenUtils.getHiddenTokensToLeft(ctx.start.getTokenIndex(),tokens);
-    context().write(textLeft);
-
-    /*
-     * text
-     */
-    final String text = TokenUtils.getTextIncludingHiddenTokens(ctx, tokens);
-    final String linePrefix = CobolLine.createBlankSequenceArea(format) + EXEC_SQL_TAG;
-    final String lines = buildLines(text, linePrefix);
-
-    context().write(lines);
-
-    final String content = context().read();
-    pop();
-
-    context().write(content);
+    //excludeStatementFromText(ctx, COMMENT_TAG);
   }
 
   @Override
