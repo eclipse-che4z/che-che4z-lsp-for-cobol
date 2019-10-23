@@ -1,16 +1,21 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.cleaner.impl;
 
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.parser.CobolCleanerLexer;
 import com.ca.lsp.core.cobol.parser.CobolCleanerParser;
+import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleaner;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleanerListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-public class CobolDocumentCleanerImpl
-    implements com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleaner {
+import java.util.ArrayList;
+import java.util.List;
+
+public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
 
   private static final String[] TRIGGERS =
       new String[] {
@@ -30,14 +35,14 @@ public class CobolDocumentCleanerImpl
 
   @Override
   public String cleanDocument(
-      String code, CobolPreprocessor.CobolSourceFormatEnum format, CobolParserParams params) {
-    final boolean requiresProcessorExecution = containsTrigger(code, TRIGGERS);
+          String text, CobolPreprocessor.CobolSourceFormatEnum format, CobolParserParams params) {
+    final boolean requiresProcessorExecution = containsTrigger(text, TRIGGERS);
     final String result;
 
     if (requiresProcessorExecution) {
-      result = cleanWithParser(code, format);
+      result = cleanWithParser(text, format, params);
     } else {
-      result = code;
+      result = text;
     }
 
     return result;
@@ -60,15 +65,31 @@ public class CobolDocumentCleanerImpl
   }
 
   private String cleanWithParser(
-      final String code, final CobolPreprocessor.CobolSourceFormatEnum format) {
+      final String code,
+      final CobolPreprocessor.CobolSourceFormatEnum format,
+      CobolParserParams params) {
+    // run the lexer
+    List<SyntaxError> errors = new ArrayList<>();
+
     // run the lexer
     final CobolCleanerLexer lexer = new CobolCleanerLexer(CharStreams.fromString(code));
+
+    if (!params.getIgnoreSyntaxErrors()) {
+      // register an error listener, so that preprocessing stops on errors
+      lexer.removeErrorListeners();
+      lexer.addErrorListener(new VerboseListener(errors));
+    }
 
     // get a list of matched tokens
     final CommonTokenStream tokens = new CommonTokenStream(lexer);
 
     // pass the tokens to the parser
     final CobolCleanerParser parser = new CobolCleanerParser(tokens);
+    if (!params.getIgnoreSyntaxErrors()) {
+      // register an error listener, so that preprocessing stops on errors
+      parser.removeErrorListeners();
+      parser.addErrorListener(new VerboseListener(errors));
+    }
 
     // specify our entry point
     CobolCleanerParser.StartCleanContext startRule = parser.startClean();
@@ -83,8 +104,7 @@ public class CobolDocumentCleanerImpl
   }
 
   private CobolDocumentCleanerListener createCleanerListener(
-      final CobolPreprocessor.CobolSourceFormatEnum format,
-      final CommonTokenStream tokens) {
-    return new CobolDocumentCleanerListenerImpl(format, tokens);
+      final CobolPreprocessor.CobolSourceFormatEnum format, final CommonTokenStream tokens) {
+    return new CobolDocumentCommentingCleanerListener(format, tokens);
   }
 }

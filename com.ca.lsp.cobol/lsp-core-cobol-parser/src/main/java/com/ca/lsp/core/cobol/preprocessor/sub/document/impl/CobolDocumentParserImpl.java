@@ -36,7 +36,7 @@ import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolDocumentParserListen
 /** Preprocessor, which parses and processes COPY REPLACE and EXEC SQL statements. */
 @AllArgsConstructor
 public class CobolDocumentParserImpl implements CobolDocumentParser {
-
+  // TODO: remove triggering
   private SemanticContext semanticContext;
   private static final String[] TRIGGERS =
       new String[] {
