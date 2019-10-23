@@ -17,7 +17,11 @@ import java.util.Scanner;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 
-public class CobolDocumentCleanerListenerImpl extends CobolCleanerBaseListener
+/**
+ * This implementation of CobolDocumentCleanerListener performs unwanted tokens elimination by
+ * commenting the out in ANTLR notation
+ */
+public class CobolDocumentCommentingCleanerListener extends CobolCleanerBaseListener
     implements CobolDocumentCleanerListener {
   private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
 
@@ -25,7 +29,7 @@ public class CobolDocumentCleanerListenerImpl extends CobolCleanerBaseListener
 
   private final BufferedTokenStream tokens;
 
-  public CobolDocumentCleanerListenerImpl(
+  CobolDocumentCommentingCleanerListener(
       final CobolPreprocessor.CobolSourceFormatEnum format, final BufferedTokenStream tokens) {
     this.tokens = tokens;
     this.format = format;
@@ -74,7 +78,7 @@ public class CobolDocumentCleanerListenerImpl extends CobolCleanerBaseListener
 
   @Override
   public void exitEjectStatement(CobolCleanerParser.EjectStatementContext ctx) {
-    excludeStatementFromText(ctx, COMMENT_TAG);
+    excludeStatementFromText(ctx, COMMENT_TAG); // TODO: check if a special comment tag is required
   }
 
   private void excludeStatementFromText(ParserRuleContext ctx, String tag) {

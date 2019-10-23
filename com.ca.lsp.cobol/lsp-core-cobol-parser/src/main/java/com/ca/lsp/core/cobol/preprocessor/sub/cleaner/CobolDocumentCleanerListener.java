@@ -16,7 +16,12 @@ package com.ca.lsp.core.cobol.preprocessor.sub.cleaner;
 import com.ca.lsp.core.cobol.parser.CobolCleanerListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
 
+/** This interface appends contextual logic to the base cleaner listener */
 public interface CobolDocumentCleanerListener extends CobolCleanerListener {
-
+  /**
+   * Return the current processing document context
+   *
+   * @return current CobolDocumentContext part
+   */
   CobolDocumentContext context();
 }
