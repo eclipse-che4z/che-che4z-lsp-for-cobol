@@ -20,6 +20,8 @@ import com.ca.lsp.core.cobol.parser.listener.FormatListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.ProcessingConstants;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleaner;
+import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.impl.CobolDocumentCleanerImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolDocumentParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentParserImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
@@ -94,16 +96,24 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     final List<CobolLine> lines = readLines(cobolCode, format, params);
     final List<CobolLine> transformedLines = transformLines(lines);
     final List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
-    return parseDocument(rewrittenLines, format, params, semanticContext);
+    String cleanDocument = cleanDocument(rewrittenLines, format, params);
+    return parseDocument(cleanDocument, format, params, semanticContext);
+  }
+
+  private String cleanDocument(
+      final List<CobolLine> lines,
+      final CobolSourceFormatEnum format,
+      final CobolParserParams params) {
+    String code = createLineWriter().serialize(lines);
+    return createDocumentCleaner().cleanDocument(code, format, params);
   }
 
   private PreprocessedInput parseDocument(
-      final List<CobolLine> lines,
+      final String document,
       final CobolSourceFormatEnum format,
       final CobolParserParams params,
       final SemanticContext semanticContext) {
-    String code = createLineWriter().serialize(lines);
-    return createDocumentParser(semanticContext).processLines(code, format, params);
+    return createDocumentParser(semanticContext).processLines(document, format, params);
   }
 
   private List<CobolLine> readLines(
@@ -140,6 +150,10 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
   private CobolDocumentParser createDocumentParser(SemanticContext semanticContext) {
     return new CobolDocumentParserImpl(semanticContext);
+  }
+
+  private CobolDocumentCleaner createDocumentCleaner() {
+    return new CobolDocumentCleanerImpl();
   }
 
   private CobolInlineCommentEntriesNormalizer createInlineCommentEntriesNormalizer() {
