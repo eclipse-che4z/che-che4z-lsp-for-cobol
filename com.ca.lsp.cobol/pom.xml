@@ -64,7 +64,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.ca.lsp</groupId>
-				<artifactId>lsp-cdi</artifactId>
+				<artifactId>lsp-core-domain</artifactId>
 				<version>0.8.0</version>
 			</dependency>
 			<dependency>
@@ -126,6 +126,6 @@
 	<modules>
 		<module>lsp-service-cobol</module>
 		<module>lsp-core-cobol-parser</module>
-		<module>lsp-cdi</module>
+		<module>lsp-core-domain</module>
 	</modules>
 </project>
