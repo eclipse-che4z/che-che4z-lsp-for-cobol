@@ -59,11 +59,6 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.ca.lsp</groupId>
-            <artifactId>lsp-core-cobol-parser</artifactId>
-            <scope>test</scope>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/net.jodah/concurrentunit -->
         <dependency>
             <groupId>net.jodah</groupId>

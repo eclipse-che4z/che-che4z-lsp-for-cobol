@@ -239,6 +239,14 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>com.ca.lsp</groupId>
+			<artifactId>lsp-core-domain</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.jodah</groupId>
+			<artifactId>concurrentunit</artifactId>
+		</dependency>
+	</dependencies>
 
 </project>

@@ -14,7 +14,7 @@
  *
  */
 
-package com.broadcom.impl;
+package impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
