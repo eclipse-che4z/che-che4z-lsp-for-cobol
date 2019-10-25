@@ -73,7 +73,7 @@
         </dependency>
         <dependency>
             <groupId>com.ca.lsp</groupId>
-            <artifactId>lsp-cdi</artifactId>
+            <artifactId>lsp-core-domain</artifactId>
         </dependency>
     </dependencies>
 

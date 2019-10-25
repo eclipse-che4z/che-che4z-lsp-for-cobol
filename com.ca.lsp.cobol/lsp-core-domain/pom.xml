@@ -25,7 +25,7 @@
         <version>0.8.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>lsp-cdi</artifactId>
+    <artifactId>lsp-core-domain</artifactId>
     <name>CA COBOL LSP :: LSP CDI Support</name>
     <version>0.8.0</version>
     <packaging>jar</packaging>
