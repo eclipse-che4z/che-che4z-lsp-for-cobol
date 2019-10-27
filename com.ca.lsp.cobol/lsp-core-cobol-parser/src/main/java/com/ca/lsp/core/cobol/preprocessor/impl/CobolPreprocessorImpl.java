@@ -22,8 +22,8 @@ import com.ca.lsp.core.cobol.preprocessor.ProcessingConstants;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleaner;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.impl.CobolDocumentCleanerImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolDocumentParser;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentParserImpl;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolCommentEntriesMarker;
@@ -148,8 +148,8 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     return result;
   }
 
-  private CobolDocumentParser createDocumentParser(SemanticContext semanticContext) {
-    return new CobolDocumentParserImpl(semanticContext);
+  private CobolSemanticParser createDocumentParser(SemanticContext semanticContext) {
+    return new CobolSemanticParserImpl(semanticContext);
   }
 
   private CobolDocumentCleaner createDocumentCleaner() {
