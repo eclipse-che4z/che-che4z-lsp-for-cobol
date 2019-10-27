@@ -11,15 +11,13 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
+package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
-
+import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
+import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
 
-import java.io.File;
+public interface CobolSemanticParser {
 
-public interface LiteralCopyBookFinder {
-
-	File findCopyBook(CobolParserParams params, CobolPreprocessorParser.LiteralContext ctx);
+  PreprocessedInput processLines(String code, CobolSourceFormatEnum format, CobolParserParams params);
 }

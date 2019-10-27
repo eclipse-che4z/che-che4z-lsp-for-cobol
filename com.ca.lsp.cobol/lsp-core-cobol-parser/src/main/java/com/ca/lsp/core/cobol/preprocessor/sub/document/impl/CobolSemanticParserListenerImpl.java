@@ -13,20 +13,8 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
 import com.ca.lsp.core.cobol.model.Position;
-import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.Variable;
-import com.ca.lsp.core.cobol.semantics.SemanticContext;
-import org.antlr.v4.runtime.BufferedTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
@@ -34,42 +22,37 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.CopySourceContext;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceClauseContext;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplacingPhraseContext;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
-import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CobolWordCopyBookFinder;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.FilenameCopyBookFinder;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.LiteralCopyBookFinder;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.impl.CobolWordCopyBookFinderImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.impl.FilenameCopyBookFinderImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.impl.LiteralCopyBookFinderImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolDocumentParserListener;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
+import lombok.Getter;
+import org.antlr.v4.runtime.BufferedTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * ANTLR visitor, which preprocesses a given COBOL program by executing COPY and REPLACE statements.
  */
-public class CobolDocumentParserListenerImpl extends CobolPreprocessorBaseListener
-    implements CobolDocumentParserListener {
+public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListener
+    implements CobolSemanticParserListener {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CobolDocumentParserListenerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CobolSemanticParserListenerImpl.class);
 
   private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
-
-  private final CobolSourceFormatEnum format;
-
-  private final CobolParserParams params;
 
   private final BufferedTokenStream tokens;
 
   private final SemanticContext semanticContext;
 
-  CobolDocumentParserListenerImpl(
-      final CobolSourceFormatEnum format,
-      final CobolParserParams params,
+  CobolSemanticParserListenerImpl(
       final BufferedTokenStream tokens,
       final SemanticContext semanticContext) {
-    this.params = params;
     this.tokens = tokens;
-    this.format = format;
     this.semanticContext = semanticContext;
 
     contexts.push(new CobolDocumentContext());
@@ -78,18 +61,6 @@ public class CobolDocumentParserListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public CobolDocumentContext context() {
     return contexts.peek();
-  }
-
-  private CobolWordCopyBookFinder createCobolWordCopyBookFinder() {
-    return new CobolWordCopyBookFinderImpl();
-  }
-
-  private FilenameCopyBookFinder createFilenameCopyBookFinder() {
-    return new FilenameCopyBookFinderImpl();
-  }
-
-  private LiteralCopyBookFinder createLiteralCopyBookFinder() {
-    return new LiteralCopyBookFinderImpl();
   }
 
   @Override
@@ -184,18 +155,20 @@ public class CobolDocumentParserListenerImpl extends CobolPreprocessorBaseListen
       String levelNumber, CobolPreprocessorParser.DataNameContext dataName) {
     Optional.ofNullable(dataName)
         .ifPresent(
-            variable -> {
-              Position position =
-                  new Position(
-                      dataName.getStart().getTokenIndex(),
-                      dataName.getStart().getStartIndex(),
-                      dataName.getStop().getStopIndex(),
-                      dataName.getStart().getLine(),
-                      dataName.getStart().getCharPositionInLine());
-              semanticContext
-                  .getVariables()
-                  .define(new Variable(levelNumber, variable.getText()), position);
-            });
+            variable ->
+                semanticContext
+                    .getVariables()
+                    .define(
+                        new Variable(levelNumber, variable.getText()), retrievePosition(dataName)));
+  }
+
+  private Position retrievePosition(ParserRuleContext token) {
+    return new Position(
+        token.getStart().getTokenIndex(),
+        token.getStart().getStartIndex(),
+        token.getStop().getStopIndex(),
+        token.getStart().getLine(),
+        token.getStart().getCharPositionInLine());
   }
 
   @Override
@@ -207,15 +180,19 @@ public class CobolDocumentParserListenerImpl extends CobolPreprocessorBaseListen
     for (final ReplacingPhraseContext replacingPhrase : ctx.replacingPhrase()) {
       context().storeReplaceablesAndReplacements(replacingPhrase.replaceClause());
     }
-
+    // TODO: implement replacement logic
     /*
      * copy the copy book
      */
     final CopySourceContext copySource = ctx.copySource();
-    final PreprocessedInput copyBookContent = getCopyBookContent(copySource, format, params);
+    String copybookName = retrieveCopybookName(copySource);
+    if (copybookName != null) {
+      semanticContext.getCopybooks().define(copybookName, retrievePosition(copySource));
+    }
+    // TODO: exclude statement from the text
 
-    semanticContext.merge(copyBookContent.getSemanticContext());
-    //excludeStatementFromText(ctx, COMMENT_TAG);
+    // semanticContext.merge(copybookSemanticContext);
+    // excludeStatementFromText(ctx, COMMENT_TAG);
   }
 
   @Override
@@ -258,42 +235,22 @@ public class CobolDocumentParserListenerImpl extends CobolPreprocessorBaseListen
     pop();
   }
 
-  private File findCopyBook(final CopySourceContext copySource, final CobolParserParams params) {
-    final File result;
-
+  private String retrieveCopybookName(final CopySourceContext copySource) {
+    final String copybookName;
+    // TODO: check if this logic may be simplified by grammar
     if (copySource.cobolWord() != null) {
-      result = createCobolWordCopyBookFinder().findCopyBook(params, copySource.cobolWord());
+      copybookName = copySource.cobolWord().getText();
     } else if (copySource.literal() != null) {
-      result = createLiteralCopyBookFinder().findCopyBook(params, copySource.literal());
+      copybookName =
+          PreprocessorStringUtils.trimQuotes(copySource.literal().getText()).replace("\\", "/");
     } else if (copySource.filename() != null) {
-      result = createFilenameCopyBookFinder().findCopyBook(params, copySource.filename());
+      copybookName = copySource.filename().getText();
     } else {
-      LOG.warn("unknown copy book reference type {}", copySource);
-      result = null;
+      LOG.warn("Unknown copy book reference type {}", copySource);
+      copybookName = null;
     }
 
-    return result;
-  }
-
-  private PreprocessedInput getCopyBookContent(
-      final CopySourceContext copySource,
-      final CobolSourceFormatEnum format,
-      final CobolParserParams params) {
-    final File copyBook = findCopyBook(copySource, params);
-    if (copyBook == null) {
-      LOG.warn(
-          "Could not find copy book {} in directory of COBOL input file or copy books param object.",
-          copySource.getText());
-
-      return new PreprocessedInput(null, new SemanticContext());
-    } else {
-      try {
-        return new CobolPreprocessorImpl().process(copyBook, format, params);
-      } catch (final IOException e) {
-        LOG.warn(e.getMessage());
-        return new PreprocessedInput(null, new SemanticContext());
-      }
-    }
+    return copybookName;
   }
 
   /** Pops the current preprocessing context from the stack. */

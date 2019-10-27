@@ -11,14 +11,12 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
+package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
-import com.ca.lsp.core.cobol.params.CobolParserParams;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessorListener;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
 
-import java.io.File;
+public interface CobolSemanticParserListener extends CobolPreprocessorListener {
 
-public interface CobolWordCopyBookFinder {
-
-	File findCopyBook(CobolParserParams params, CobolPreprocessorParser.CobolWordContext ctx);
+  CobolDocumentContext context();
 }

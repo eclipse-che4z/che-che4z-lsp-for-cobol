@@ -14,9 +14,12 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
+import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookAnalysis;
+import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookParallelAnalysis;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import lombok.AllArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
@@ -30,12 +33,12 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolDocumentParser;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolDocumentParserListener;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 
 /** Preprocessor, which parses and processes COPY REPLACE and EXEC SQL statements. */
 @AllArgsConstructor
-public class CobolDocumentParserImpl implements CobolDocumentParser {
+public class CobolSemanticParserImpl implements CobolSemanticParser {
   // TODO: remove triggering
   private SemanticContext semanticContext;
   private static final String[] TRIGGERS =
@@ -112,21 +115,29 @@ public class CobolDocumentParserImpl implements CobolDocumentParser {
     final StartRuleContext startRule = parser.startRule();
     final ParseTreeWalker walker = new ParseTreeWalker();
     // analyze contained copy books
-    final CobolDocumentParserListener listener =
-        createDocumentParserListener(format, params, tokens, semanticContext);
+    final CobolSemanticParserListener listener =
+        createDocumentParserListener(tokens, semanticContext);
 
     walker.walk(listener, startRule);
     // in this section the engine will apply a semantic logic to understand the level of grouping of
     // data
+    Collection<String> copybookNames = semanticContext.getCopybooks().getAll();
+
+    CopybookAnalysis copybookAnalyzer = createCopybookAnalyzer();
+    List<SemanticContext> contexts =
+        copybookAnalyzer.analyzeCopybooks(copybookNames, format, params);
+
+    contexts.forEach(it -> semanticContext.merge(it));
     semanticContext.getVariables().createRelationBetweenVariables();
     return new PreprocessedInput(listener.context().read(), semanticContext);
   }
 
-  private CobolDocumentParserListener createDocumentParserListener(
-      final CobolSourceFormatEnum format,
-      final CobolParserParams params,
-      final CommonTokenStream tokens,
-      final SemanticContext semanticContext) {
-    return new CobolDocumentParserListenerImpl(format, params, tokens, semanticContext);
+  private CobolSemanticParserListener createDocumentParserListener(
+      final CommonTokenStream tokens, final SemanticContext semanticContext) {
+    return new CobolSemanticParserListenerImpl(tokens, semanticContext);
+  }
+
+  private CopybookAnalysis createCopybookAnalyzer() {
+    return new CopybookParallelAnalysis();
   }
 }
