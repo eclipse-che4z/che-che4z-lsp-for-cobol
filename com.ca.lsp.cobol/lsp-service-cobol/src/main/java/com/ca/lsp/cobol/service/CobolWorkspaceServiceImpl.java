@@ -15,9 +15,12 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
+import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -37,10 +40,15 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Singleton
-public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
-  private static final CobolWorkspaceServiceImpl INSTANCE = new CobolWorkspaceServiceImpl();
+public class CobolWorkspaceServiceImpl implements CobolWorkspaceService, IDataBusObserver<DataEvent> {
 
   @Inject
+  public CobolWorkspaceServiceImpl(DefaultDataBusBroker dataBus) {
+    this.dataBus = dataBus;
+    dataBus.subscribe(DataEventType.CBLSCAN_EVENT, this);
+  }
+
+
   private DefaultDataBusBroker dataBus;
   private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
   private static final String URI_FILE_SEPARATOR = "/";
@@ -140,11 +148,6 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
             .build();
   }
 
-  /** @return the singleton instance of CobolWorkspaceServiceImpl */
-  public static CobolWorkspaceServiceImpl getInstance() {
-    return INSTANCE;
-  }
-
   /**
    * Create a list of Files for each copybook found in a specific folder under the workspace
    *
@@ -172,7 +175,14 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   }
 
   @Override
-  public void observerCallback(DataEvent adaptedDataEvent) {
-    log.debug("CALLBACK WORKS!");
+  public void observerCallback(DataEvent event) {
+    if (!event.getEventType().equals(DataEventType.CBLSCAN_EVENT)){
+      return;
+    }
+    CblScanEvent cblEvent = (CblScanEvent) event;
+    String name = cblEvent.getName();
+    Stream<String> content = getContentByURI(name);
+    String stringContent = content.reduce((s1, s2) -> s1+"\r\n" + s2).orElse("");
+    dataBus.postData(CblFetchEvent.builder().name(name).content(stringContent).build());
   }
 }

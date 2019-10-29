@@ -13,18 +13,13 @@
  * Broadcom, Inc. - initial API and implementation
  *
  */
-
 package com.ca.lsp.cobol.service;
-
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.service.ServiceModule;
 import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
+import org.junit.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,10 +33,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
-
 @Slf4j
 public class WorkspaceServiceTest {
   private static final String WORKSPACE_FOLDER_NAME = "test";
@@ -49,12 +42,9 @@ public class WorkspaceServiceTest {
   private static final String CPY_FILE_ONLY_NAME = "copy";
   private static final String COPYBOOK_CONTENT =
       "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
-
   private URI workspaceFolderPath = null;
-  private final CobolWorkspaceServiceImpl cobolWorkspaceService =
-          LangServerCtx.getGuiceCtx(new ServiceModule()).getInjector().getInstance(CobolWorkspaceServiceImpl.class);
+  private static CobolWorkspaceServiceImpl cobolWorkspaceService;
   private List<WorkspaceFolder> workspaceFolderList = null;
-
   private final Path workspacePath =
       Paths.get(
           System.getProperty("java.io.tmpdir")
@@ -62,7 +52,6 @@ public class WorkspaceServiceTest {
               + "WORKSPACE");
   private final Path copybooksPath =
       Paths.get(workspacePath + System.getProperty("file.separator") + "COPYBOOKS");
-
   private final Path innerCopybooksPath =
       Paths.get(
           workspacePath
@@ -70,10 +59,17 @@ public class WorkspaceServiceTest {
               + "COPYBOOKS"
               + System.getProperty("file.separator")
               + "INNER");
-
   private final Path cpyFilePath =
       Paths.get(copybooksPath + System.getProperty("file.separator") + CPY_FILE_NAME_WITH_EXT);
-
+  @BeforeClass
+  public static void setUp() {
+    cobolWorkspaceService =
+        LangServerCtx.getGuiceCtx(new ServiceModule()).getInjector().getInstance(CobolWorkspaceServiceImpl.class);
+  }
+  @AfterClass
+  public static void tearDown() {
+    LangServerCtx.shutdown();
+  }
   @Before
   public void scanWorkspaceForCopybooks() {
     createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath);
@@ -83,7 +79,6 @@ public class WorkspaceServiceTest {
     workspaceFolderList = Collections.singletonList(workspaceFolder);
     cobolWorkspaceService.setWorkspaceFolders(workspaceFolderList);
   }
-
   /*
   This unit test verify that from a given workspaceFolder URI the WorkspaceManager is able to retrieve all the copybooks
   present in the COPYBOOK folder.
@@ -94,25 +89,20 @@ public class WorkspaceServiceTest {
     cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
     assertEquals(1, cobolWorkspaceService.getCopybookPathsList().size());
   }
-
   @Test
   public void getMultipleCopybooksInDifferentFolders() {
     createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath);
-
     createInnerFolderAndFile(
         copybooksPath,
         Paths.get(innerCopybooksPath + System.getProperty("file.separator") + "copy2.cpy"));
-
     cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
     assertEquals(2, cobolWorkspaceService.getCopybookPathsList().size());
   }
-
   @Test
   public void getUriByName() {
     assertTrue(
         cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME).toUri().toString().length() > 0);
   }
-
   /*
    * This test took in input a copybook name, retrieve the URI of the file (if it exists) and in case affermative return the
    * content, null otherwise.
@@ -121,7 +111,6 @@ public class WorkspaceServiceTest {
   public void getContentByCopybookName() {
     assertTrue(cobolWorkspaceService.getContentByURI(CPY_FILE_ONLY_NAME).toArray().length > 0);
   }
-
   @Test
   public void fulfillDatabusAndCheckResult() {
     CblFetchEvent fetchEventItem = CblFetchEvent.builder().build();
@@ -130,39 +119,33 @@ public class WorkspaceServiceTest {
         cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME).toUri().toString());
     Stream<String> contentStream = cobolWorkspaceService.getContentByURI(CPY_FILE_ONLY_NAME);
     fetchEventItem.setContent(contentStream.collect(Collectors.joining()));
-
     assertTrue(fetchEventItem.getUri().length() > 0 && fetchEventItem.getContent().length() > 0);
   }
-
   @After
   public void cleanupTempFolder() {
     try {
       Files.walk(Paths.get(getWorkspaceFolderPath()))
           .sorted(Comparator.reverseOrder())
           .map(Path::toFile)
+          .filter(File::isFile)
           .forEach(File::delete);
-
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
-
   private void createInnerFolderAndFile(Path parentFolder, Path copybookFile) {
     try {
       // create parent folder
       if (Files.exists(parentFolder)) {
         Files.createDirectory(innerCopybooksPath);
-
         // create file into it
         Path copybookFilePath = Files.createFile(copybookFile);
         generateDummyContentForFile(copybookFilePath);
       }
-
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
-
   private void createTempDirAndFile(Path workspacePath, Path copybookFolderPath, Path cpyFilePath) {
     try {
       if (!Files.exists(workspacePath)) {
@@ -171,18 +154,16 @@ public class WorkspaceServiceTest {
           Files.createDirectory(copybookFolderPath);
         }
       }
-
       if (!Files.exists(cpyFilePath)) {
+        //files.
         Path copybookFilePath = Files.createFile(cpyFilePath);
         generateDummyContentForFile(copybookFilePath);
       }
-
     } catch (IOException e) {
       e.printStackTrace();
     }
     setWorkspaceFolderPath(workspacePath.toUri());
   }
-
   private void generateDummyContentForFile(Path copybookFilePath) {
     File copybookFile = copybookFilePath.toFile();
     FileOutputStream fileOutputStream;
@@ -197,15 +178,12 @@ public class WorkspaceServiceTest {
       e.printStackTrace();
     }
   }
-
   private URI getWorkspaceFolderPath() {
     return workspaceFolderPath;
   }
-
   private void setWorkspaceFolderPath(URI workspaceFolderPath) {
     this.workspaceFolderPath = workspaceFolderPath;
   }
-
   /*
   Remove the last slash from the URI path in order to replicate the behaviour of the client IDE that send to the server
   the path of the opened workspace without the last slash.
