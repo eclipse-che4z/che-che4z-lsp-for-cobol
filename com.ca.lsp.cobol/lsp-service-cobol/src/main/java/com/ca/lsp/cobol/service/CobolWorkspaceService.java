@@ -18,8 +18,8 @@ package com.ca.lsp.cobol.service;
 import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
 
+import java.io.IOException;
 import java.nio.file.Path;
-import java.util.stream.Stream;
 
 public interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService, IDataBusObserver<DataEvent> {
   /**
@@ -33,12 +33,5 @@ public interface CobolWorkspaceService extends org.eclipse.lsp4j.services.Worksp
    */
   Path getURIByFileName(String fileName);
 
-  Stream<String> getContentByURI(String copybookName);
-
-  /**
-   * @param filename name of copybook retrived in the copy instruction
-   * @param URI of the resource found by the method #getUriByFileName()
-   * @param content String content for the resource associated to the URI
-   */
-  void populateDatabus(String filename, Path URI, String content);
+  String getContentByURI(String copybookName) throws IOException;
 }

@@ -16,25 +16,29 @@
 package com.broadcom.lsp.cdi.module.service;
 
 import com.broadcom.lsp.cdi.module.DefaultModule;
-import com.ca.lsp.cobol.service.CobolWorkspaceService;
 import com.ca.lsp.cobol.service.CobolWorkspaceServiceImpl;
 import com.ca.lsp.cobol.service.IMyLanguageServer;
 import com.ca.lsp.cobol.service.MyLanguageServerImpl;
+import com.ca.lsp.cobol.service.MyTextDocumentService;
+import com.ca.lsp.cobol.service.delegates.Communications;
+import com.ca.lsp.cobol.service.delegates.ServerCommunications;
 import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp4j.services.TextDocumentService;
+import org.eclipse.lsp4j.services.WorkspaceService;
 
-/**
- * Created on 2019-10-02
- */
-//Binding Module
+/** Created on 2019-10-02 */
+// Binding Module
 @Slf4j
 public class ServiceModule extends DefaultModule {
-    @Override
-    protected void configure() {
-        super.configure();
-//        bind(IMyLanguageServer.class).to(MyLanguageServerImpl.class);
-//        bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
-        bind(CobolWorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
-    }
+  @Override
+  protected void configure() {
+    super.configure();
+    bind(IMyLanguageServer.class).to(MyLanguageServerImpl.class);
+    bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
+    bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
+    bind(Communications.class).to(ServerCommunications.class);
+    bind(TextDocumentService.class).to(MyTextDocumentService.class);
+  }
 }

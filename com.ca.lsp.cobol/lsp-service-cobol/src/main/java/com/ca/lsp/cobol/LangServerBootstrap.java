@@ -19,7 +19,6 @@ import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.cdi.module.service.ServiceModule;
 import com.ca.lsp.cobol.service.IMyLanguageServer;
-import com.ca.lsp.cobol.service.MyLanguageServerImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
@@ -38,20 +37,18 @@ import java.util.concurrent.*;
 public class LangServerBootstrap {
     private static final Integer LSP_PORT = 1044;
     private static final String PIPE_ARGM = "pipeEnabled";
-    private LangServerCtx cdiCtx;
-    private MyLanguageServerImpl server;
+    private IMyLanguageServer server;
 
     public LangServerBootstrap() {
         initCtx();
     }
 
     private void initCtx() {
-        cdiCtx = LangServerCtx.getGuiceCtx(new ServiceModule(), new DatabusModule());
+        LangServerCtx.getGuiceCtx(new ServiceModule(), new DatabusModule());
         //Example of usage
         //cdiCtx.getInjector().getInstance(CobolWorkspaceService.class);
         //To Remove...
-        server = new MyLanguageServerImpl();
-
+        server = LangServerCtx.getInjector().getInstance(IMyLanguageServer.class);
     }
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {

@@ -40,14 +40,14 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Singleton
-public class CobolWorkspaceServiceImpl implements CobolWorkspaceService, IDataBusObserver<DataEvent> {
+public class CobolWorkspaceServiceImpl
+    implements CobolWorkspaceService, IDataBusObserver<DataEvent> {
 
   @Inject
   public CobolWorkspaceServiceImpl(DefaultDataBusBroker dataBus) {
     this.dataBus = dataBus;
     dataBus.subscribe(DataEventType.CBLSCAN_EVENT, this);
   }
-
 
   private DefaultDataBusBroker dataBus;
   private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
@@ -127,25 +127,9 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService, IDataBu
   }
 
   @Override
-  public Stream<String> getContentByURI(String copybookName) {
+  public String getContentByURI(String copybookName) throws IOException {
     Path uriForFileName = getURIByFileName(copybookName);
-    Stream<String> fileContent = null;
-
-    try {
-      fileContent = Files.lines(uriForFileName);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return fileContent;
-  }
-
-  @Override
-  public void populateDatabus(String filename, Path Uri, String content) {
-    CblFetchEvent fetchEventItem = CblFetchEvent.builder()
-            .uri(Uri.toString())
-            .name(filename)
-            .content(content)
-            .build();
+    return Files.lines(uriForFileName).reduce((s1, s2) -> s1 + "\r\n" + s2).orElse("");
   }
 
   /**
@@ -176,13 +160,17 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService, IDataBu
 
   @Override
   public void observerCallback(DataEvent event) {
-    if (!event.getEventType().equals(DataEventType.CBLSCAN_EVENT)){
+    if (!event.getEventType().equals(DataEventType.CBLSCAN_EVENT)) {
       return;
     }
     CblScanEvent cblEvent = (CblScanEvent) event;
     String name = cblEvent.getName();
-    Stream<String> content = getContentByURI(name);
-    String stringContent = content.reduce((s1, s2) -> s1+"\r\n" + s2).orElse("");
-    dataBus.postData(CblFetchEvent.builder().name(name).content(stringContent).build());
+    String content = null;
+    try {
+      content = getContentByURI(name);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    dataBus.postData(CblFetchEvent.builder().name(name).content(content).build());
   }
 }

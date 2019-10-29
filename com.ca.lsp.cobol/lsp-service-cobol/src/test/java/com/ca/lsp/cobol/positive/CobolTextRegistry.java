@@ -35,6 +35,7 @@ public enum CobolTextRegistry {
   private static final String PATH_TO_TEST_RESOURCES = "filesToTestPath";
   private static final String POSITIVE_ENTRY = "positive";
   private static final String NEGATIVE_ENTRY = "negative";
+  private static final String COPYBOOK_ENTRY = "copybooks";
   // non-static to allow logging at the initialization stage
   private final Logger log = LoggerFactory.getLogger(CobolTextRegistry.class);
 
@@ -48,6 +49,11 @@ public enum CobolTextRegistry {
   /** @return all the Cobol files for negative tests */
   public List<CobolText> getNegatives() {
     return Collections.unmodifiableList(texts.get(NEGATIVE_ENTRY));
+  }
+
+  /** @return all the Cobol files for copybooks */
+  public List<CobolText> getCopybooks() {
+    return Collections.unmodifiableList(texts.get(COPYBOOK_ENTRY));
   }
 
   CobolTextRegistry() {
