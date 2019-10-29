@@ -17,8 +17,6 @@ import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.regex.Pattern;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.INDICATOR_FIELD;
@@ -83,11 +81,6 @@ public interface CobolPreprocessor {
       return commentEntryMultiLine;
     }
   }
-
-  PreprocessedInput process(File cobolFile, CobolSourceFormatEnum format) throws IOException;
-
-  PreprocessedInput process(File cobolFile, CobolSourceFormatEnum format, CobolParserParams params)
-      throws IOException;
 
   PreprocessedInput process(String cobolCode, CobolSourceFormatEnum format);
 
