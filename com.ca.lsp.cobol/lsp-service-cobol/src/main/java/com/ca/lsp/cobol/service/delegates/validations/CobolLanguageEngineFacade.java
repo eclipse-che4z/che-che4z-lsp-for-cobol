@@ -13,9 +13,6 @@
  */
 package com.ca.lsp.cobol.service.delegates.validations;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.cdi.module.service.ServiceModule;
-import com.ca.lsp.cobol.service.CobolWorkspaceServiceImpl;
 import com.ca.lsp.core.cobol.LanguageEngineFactory;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.Position;
@@ -106,7 +103,6 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     }
 
     CobolLanguageEngine engine = LanguageEngineFactory.fixedFormatCobolLanguageEngine();
-    engine.setCopybookList(LangServerCtx.getGuiceCtx(new ServiceModule()).getInjector().getInstance(CobolWorkspaceServiceImpl.class).getCopybookPathsList());
     return toAnalysisResult(engine.run(text));
   }
 

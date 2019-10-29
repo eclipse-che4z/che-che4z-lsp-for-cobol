@@ -18,7 +18,6 @@ import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
 import com.ca.lsp.core.cobol.parser.listener.FormatListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
-import com.ca.lsp.core.cobol.preprocessor.ProcessingConstants;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleaner;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.impl.CobolDocumentCleanerImpl;
@@ -41,45 +40,11 @@ import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
 public class CobolPreprocessorImpl implements CobolPreprocessor {
   @Setter private FormatListener formatListener;
-  @Setter private List<Path> copybookList;
-
-  @Override
-  public PreprocessedInput process(final File cobolFile, final CobolSourceFormatEnum format)
-      throws IOException {
-    return process(cobolFile, format, createDefaultParams());
-  }
-
-  @Override
-  public PreprocessedInput process(
-      final File cobolFile, final CobolSourceFormatEnum format, final CobolParserParams params)
-      throws IOException {
-    final Charset charset = params.getCharset();
-
-    LOG.debug(
-        "Preprocessing file {} with line format {} and charset {}.",
-        cobolFile.getName(),
-        format,
-        charset);
-
-    final StringBuilder outputBuffer = new StringBuilder();
-    try (InputStream inputStream = new FileInputStream(cobolFile);
-        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charset);
-        BufferedReader bufferedInputStreamReader = new BufferedReader(inputStreamReader)) {
-      String line;
-      while ((line = bufferedInputStreamReader.readLine()) != null) {
-        outputBuffer.append(line).append(ProcessingConstants.NEWLINE);
-      }
-    }
-    return process(outputBuffer.toString(), format, params, new SemanticContext());
-  }
 
   @Override
   public PreprocessedInput process(
@@ -143,9 +108,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   }
 
   private CobolParserParams createDefaultParams() {
-    final CobolParserParams result = new CobolParserParamsImpl();
-    result.setCopyBookFiles(copybookList);
-    return result;
+    return new CobolParserParamsImpl();
   }
 
   private CobolSemanticParser createDocumentParser(SemanticContext semanticContext) {
