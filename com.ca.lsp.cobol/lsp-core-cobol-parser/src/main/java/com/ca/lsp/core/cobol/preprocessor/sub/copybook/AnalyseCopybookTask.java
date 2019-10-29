@@ -23,7 +23,7 @@ import java.util.concurrent.RecursiveTask;
 
 @Slf4j
 public class AnalyseCopybookTask extends RecursiveTask<SemanticContext>
-    implements IDataBusObserver<DataEvent> {
+    implements IDataBusObserver<CblFetchEvent> {
 
   private static final IDataBusBroker DATABUS =
       LangServerCtx.getGuiceCtx(new DatabusModule())
@@ -61,6 +61,7 @@ public class AnalyseCopybookTask extends RecursiveTask<SemanticContext>
       return preprocessedInput.getSemanticContext();
     } catch (InterruptedException | ExecutionException e) {
       LOG.error("Error copybooks analysis for: " + copyBookName, e);
+      Thread.currentThread().interrupt();
       return new SemanticContext();
     }
   }
@@ -70,14 +71,12 @@ public class AnalyseCopybookTask extends RecursiveTask<SemanticContext>
   }
 
   @Override
-  public void observerCallback(DataEvent event) {
-    if (event.getEventType() != DataEventType.CBLFETCH_EVENT) {
+  public void observerCallback(CblFetchEvent adaptedDataEvent) {
+
+    if (!copyBookName.equals(adaptedDataEvent.getName())) {
       return;
     }
-    CblFetchEvent fetchEvent = (CblFetchEvent) event;
-    if (!copyBookName.equals(fetchEvent.getName())) {
-      return;
-    }
-    waitForResolving.complete((fetchEvent).getContent());
+    waitForResolving.complete((adaptedDataEvent).getContent());
+
   }
 }
