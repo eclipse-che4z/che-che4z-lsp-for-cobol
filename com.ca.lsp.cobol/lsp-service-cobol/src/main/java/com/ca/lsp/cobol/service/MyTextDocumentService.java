@@ -20,6 +20,7 @@ import com.ca.lsp.cobol.service.delegates.references.References;
 import com.ca.lsp.cobol.service.delegates.validations.Analysis;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngines;
+import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -38,8 +39,10 @@ public class MyTextDocumentService implements TextDocumentService {
   private final Communications communications;
   // private final IMyLanguageServer server;
 
-  public MyTextDocumentService(IMyLanguageServer server) {
-    communications = new Communications(server);
+  @Inject
+  public MyTextDocumentService(Communications communications) {
+    this.communications = communications;
+    //    communications = new Communications(server);
     // this.server = server;
   }
 

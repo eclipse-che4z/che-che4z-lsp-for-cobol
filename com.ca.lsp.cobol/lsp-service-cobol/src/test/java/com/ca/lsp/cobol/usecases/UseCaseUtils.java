@@ -13,8 +13,11 @@
  */
 package com.ca.lsp.cobol.usecases;
 
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.ca.lsp.cobol.TestModule;
 import com.ca.lsp.cobol.service.IMyLanguageServer;
 import com.ca.lsp.cobol.service.MyTextDocumentService;
+import com.ca.lsp.cobol.service.delegates.ServerCommunications;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
 import org.awaitility.Awaitility;
@@ -22,6 +25,7 @@ import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
+import org.eclipse.lsp4j.services.WorkspaceService;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -61,8 +65,10 @@ public class UseCaseUtils {
    * @return TextDocumentService instance ready to use
    */
   public static TextDocumentService createServer(LanguageClient client) {
-    IMyLanguageServer server = new TestLanguageServer(client);
-    return new MyTextDocumentService(server);
+    IMyLanguageServer server =
+        new TestLanguageServer(
+            client, LangServerCtx.getInjector().getInstance(WorkspaceService.class));
+    return new MyTextDocumentService(new ServerCommunications(server));
   }
 
   /**
@@ -109,7 +115,6 @@ public class UseCaseUtils {
    * @param client - the TestLanguageClient that should receive the diagnostics
    */
   public static void waitForDiagnostics(TestLanguageClient client) {
-    await(
-        () -> !client.getReceivedDiagnostics().isEmpty());
+    await(() -> !client.getReceivedDiagnostics().isEmpty());
   }
 }

@@ -13,8 +13,7 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.cdi.module.service.ServiceModule;
+import com.google.inject.Inject;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -26,14 +25,12 @@ import java.util.concurrent.CompletableFuture;
 public class MyLanguageServerImpl implements IMyLanguageServer {
   private LanguageClient client;
   private final TextDocumentService textService;
-  private final CobolWorkspaceServiceImpl workspaceService;
-  private String copybookURIList;
+  private final WorkspaceService workspaceService;
 
-  public MyLanguageServerImpl() {
-
-    textService = new MyTextDocumentService(this);
-    //workspaceService = new CobolWorkspaceServiceImpl();
-    workspaceService = LangServerCtx.getGuiceCtx(new ServiceModule()).getInjector().getInstance(CobolWorkspaceServiceImpl.class);
+  @Inject
+  public MyLanguageServerImpl(WorkspaceService workspaceService, TextDocumentService textService) {
+    this.textService = textService;
+    this.workspaceService = workspaceService;
   }
 
   @Override
@@ -58,7 +55,7 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
     capabilities.setWorkspace(workspaceServiceCapabilities);
 
     // workspaceService.setWorkspaceFolders(params.getWorkspaceFolders());
-    workspaceService.scanWorkspaceForCopybooks(params.getWorkspaceFolders());
+    //    workspaceService.scanWorkspaceForCopybooks(params.getWorkspaceFolders());
     return CompletableFuture.supplyAsync(() -> new InitializeResult(capabilities));
   }
 
@@ -95,15 +92,5 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
   @Override
   public LanguageClient getClient() {
     return client;
-  }
-
-  @Override
-  public String getCopybookURIList() {
-    return copybookURIList;
-  }
-
-  @Override
-  public String getURIByCopybookName(String copybookName) {
-    return workspaceService.getURIByFileName(copybookName).toString();
   }
 }

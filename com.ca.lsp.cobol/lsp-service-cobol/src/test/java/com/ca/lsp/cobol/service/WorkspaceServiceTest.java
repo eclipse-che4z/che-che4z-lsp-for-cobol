@@ -14,12 +14,14 @@
  *
  */
 package com.ca.lsp.cobol.service;
+
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.service.ServiceModule;
 import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.junit.*;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,10 +33,10 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
+
 @Slf4j
 public class WorkspaceServiceTest {
   private static final String WORKSPACE_FOLDER_NAME = "test";
@@ -61,15 +63,20 @@ public class WorkspaceServiceTest {
               + "INNER");
   private final Path cpyFilePath =
       Paths.get(copybooksPath + System.getProperty("file.separator") + CPY_FILE_NAME_WITH_EXT);
+
   @BeforeClass
   public static void setUp() {
     cobolWorkspaceService =
-        LangServerCtx.getGuiceCtx(new ServiceModule()).getInjector().getInstance(CobolWorkspaceServiceImpl.class);
+        LangServerCtx.getGuiceCtx(new ServiceModule())
+            .getInjector()
+            .getInstance(CobolWorkspaceServiceImpl.class);
   }
+
   @AfterClass
   public static void tearDown() {
     LangServerCtx.shutdown();
   }
+
   @Before
   public void scanWorkspaceForCopybooks() {
     createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath);
@@ -89,6 +96,7 @@ public class WorkspaceServiceTest {
     cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
     assertEquals(1, cobolWorkspaceService.getCopybookPathsList().size());
   }
+
   @Test
   public void getMultipleCopybooksInDifferentFolders() {
     createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath);
@@ -98,6 +106,7 @@ public class WorkspaceServiceTest {
     cobolWorkspaceService.scanWorkspaceForCopybooks(workspaceFolderList);
     assertEquals(2, cobolWorkspaceService.getCopybookPathsList().size());
   }
+
   @Test
   public void getUriByName() {
     assertTrue(
@@ -108,19 +117,21 @@ public class WorkspaceServiceTest {
    * content, null otherwise.
    */
   @Test
-  public void getContentByCopybookName() {
-    assertTrue(cobolWorkspaceService.getContentByURI(CPY_FILE_ONLY_NAME).toArray().length > 0);
+  public void getContentByCopybookName() throws IOException {
+    assertTrue(cobolWorkspaceService.getContentByURI(CPY_FILE_ONLY_NAME).length() > 0);
   }
+
   @Test
-  public void fulfillDatabusAndCheckResult() {
+  public void fulfillDatabusAndCheckResult() throws IOException {
     CblFetchEvent fetchEventItem = CblFetchEvent.builder().build();
     fetchEventItem.setName(CPY_FILE_ONLY_NAME);
     fetchEventItem.setUri(
         cobolWorkspaceService.getURIByFileName(CPY_FILE_ONLY_NAME).toUri().toString());
-    Stream<String> contentStream = cobolWorkspaceService.getContentByURI(CPY_FILE_ONLY_NAME);
-    fetchEventItem.setContent(contentStream.collect(Collectors.joining()));
+    String content = cobolWorkspaceService.getContentByURI(CPY_FILE_ONLY_NAME);
+    fetchEventItem.setContent(content);
     assertTrue(fetchEventItem.getUri().length() > 0 && fetchEventItem.getContent().length() > 0);
   }
+
   @After
   public void cleanupTempFolder() {
     try {
@@ -133,6 +144,7 @@ public class WorkspaceServiceTest {
       e.printStackTrace();
     }
   }
+
   private void createInnerFolderAndFile(Path parentFolder, Path copybookFile) {
     try {
       // create parent folder
@@ -146,6 +158,7 @@ public class WorkspaceServiceTest {
       e.printStackTrace();
     }
   }
+
   private void createTempDirAndFile(Path workspacePath, Path copybookFolderPath, Path cpyFilePath) {
     try {
       if (!Files.exists(workspacePath)) {
@@ -155,7 +168,7 @@ public class WorkspaceServiceTest {
         }
       }
       if (!Files.exists(cpyFilePath)) {
-        //files.
+        // files.
         Path copybookFilePath = Files.createFile(cpyFilePath);
         generateDummyContentForFile(copybookFilePath);
       }
@@ -164,6 +177,7 @@ public class WorkspaceServiceTest {
     }
     setWorkspaceFolderPath(workspacePath.toUri());
   }
+
   private void generateDummyContentForFile(Path copybookFilePath) {
     File copybookFile = copybookFilePath.toFile();
     FileOutputStream fileOutputStream;
@@ -178,9 +192,11 @@ public class WorkspaceServiceTest {
       e.printStackTrace();
     }
   }
+
   private URI getWorkspaceFolderPath() {
     return workspaceFolderPath;
   }
+
   private void setWorkspaceFolderPath(URI workspaceFolderPath) {
     this.workspaceFolderPath = workspaceFolderPath;
   }

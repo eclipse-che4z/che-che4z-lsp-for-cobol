@@ -13,15 +13,17 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.ca.lsp.cobol.TestModule;
+import com.ca.lsp.cobol.service.delegates.ServerCommunications;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
 import com.ca.lsp.cobol.usecases.UseCaseUtils;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.eclipse.lsp4j.services.WorkspaceService;
+import org.junit.*;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -44,11 +46,23 @@ public class MyTextDocumentServiceTest {
   private MyTextDocumentService service;
   private TestLanguageClient client;
 
+  @BeforeClass
+  public void setUp() {
+    LangServerCtx.getGuiceCtx(new TestModule());
+  }
+
+  @AfterClass
+  public void tearDown() {
+    LangServerCtx.shutdown();
+  }
+
   @Before
   public void createService() {
     client = new TestLanguageClient();
-    IMyLanguageServer server = new TestLanguageServer(client);
-    service = new MyTextDocumentService(server);
+    IMyLanguageServer server =
+        new TestLanguageServer(
+            client, LangServerCtx.getInjector().getInstance(WorkspaceService.class));
+    service = new MyTextDocumentService(new ServerCommunications(server));
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
