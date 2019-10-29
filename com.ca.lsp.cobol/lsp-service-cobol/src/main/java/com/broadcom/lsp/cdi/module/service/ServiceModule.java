@@ -33,8 +33,8 @@ public class ServiceModule extends DefaultModule {
     @Override
     protected void configure() {
         super.configure();
-        bind(IMyLanguageServer.class).to(MyLanguageServerImpl.class);
-        bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
+//        bind(IMyLanguageServer.class).to(MyLanguageServerImpl.class);
+//        bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
         bind(CobolWorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     }
 }

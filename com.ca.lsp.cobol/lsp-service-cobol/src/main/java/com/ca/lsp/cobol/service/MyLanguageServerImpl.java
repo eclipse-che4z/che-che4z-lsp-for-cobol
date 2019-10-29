@@ -13,6 +13,8 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.cdi.module.service.ServiceModule;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -30,7 +32,8 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
   public MyLanguageServerImpl() {
 
     textService = new MyTextDocumentService(this);
-    workspaceService = CobolWorkspaceServiceImpl.getInstance();
+    //workspaceService = new CobolWorkspaceServiceImpl();
+    workspaceService = LangServerCtx.getGuiceCtx(new ServiceModule()).getInjector().getInstance(CobolWorkspaceServiceImpl.class);
   }
 
   @Override
