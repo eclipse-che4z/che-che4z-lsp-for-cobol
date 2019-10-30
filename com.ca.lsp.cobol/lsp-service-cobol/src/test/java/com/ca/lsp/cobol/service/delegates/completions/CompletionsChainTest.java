@@ -13,17 +13,21 @@
  */
 package com.ca.lsp.cobol.service.delegates.completions;
 
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.*;
+import static com.ca.lsp.cobol.usecases.UseCaseUtils.runTextValidation;
+import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -32,7 +36,8 @@ import static org.junit.Assert.assertFalse;
  *
  * @author teman02
  */
-public class CompletionsChainTest {
+public class CompletionsChainTest extends ConfigurableTest {
+  private TextDocumentService service;
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -66,16 +71,23 @@ public class CompletionsChainTest {
           + "       300-Say-Goodbye.\n"
           + "       End program ProgramId.";
 
+  @Before
+  public void createService() {
+    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
+    TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    client.clean();
+    runTextValidation(service, TEXT);
+    waitForDiagnostics(client);
+  }
+
   @Test
   public void testCompletionsOrder() throws ExecutionException, InterruptedException {
-    TextDocumentService service = runServer();
-
     List<CompletionItem> list = getCompletionItems(service, new Position(28, 22));
     assertFalse(list.isEmpty());
 
     assertEquals(CompletionItemKind.Variable, list.get(0).getKind());
     assertEquals(CompletionItemKind.Snippet, list.get(1).getKind());
-    assertEquals(CompletionItemKind.Keyword, list.get(list.size()-1).getKind());
+    assertEquals(CompletionItemKind.Keyword, list.get(list.size() - 1).getKind());
   }
 
   private List<CompletionItem> getCompletionItems(TextDocumentService service, Position position)
@@ -85,14 +97,5 @@ public class CompletionsChainTest {
 
     Either<List<CompletionItem>, CompletionList> either = completions.get();
     return either.getRight().getItems();
-  }
-
-  private TextDocumentService runServer() {
-    TestLanguageClient client = new TestLanguageClient();
-    TextDocumentService service = createServer(client);
-
-    runTextValidation(service, TEXT);
-    waitForDiagnostics(client);
-    return service;
   }
 }

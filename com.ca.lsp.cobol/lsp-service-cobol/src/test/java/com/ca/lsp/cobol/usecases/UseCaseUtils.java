@@ -14,18 +14,12 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.ca.lsp.cobol.TestModule;
-import com.ca.lsp.cobol.service.IMyLanguageServer;
-import com.ca.lsp.cobol.service.MyTextDocumentService;
-import com.ca.lsp.cobol.service.delegates.ServerCommunications;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
-import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
 import org.awaitility.Awaitility;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.eclipse.lsp4j.services.WorkspaceService;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -53,22 +47,13 @@ public class UseCaseUtils {
    * @return TestLanguageClient instance to receive responses from the language server
    */
   public static TestLanguageClient startServerAndRunValidation(String text) {
-    TestLanguageClient client = new TestLanguageClient();
-    runTextValidation(createServer(client), text);
+    TestLanguageClient client =
+            (TestLanguageClient) LangServerCtx.getInjector().getInstance(LanguageClient.class);
+    client.clean();
+    TextDocumentService service =
+            LangServerCtx.getInjector().getInstance(TextDocumentService.class);
+    runTextValidation(service, text);
     return client;
-  }
-
-  /**
-   * Create language server and TextDocumentService instance and return the last one
-   *
-   * @param client - The LanguageClient instance to be observed on the client side
-   * @return TextDocumentService instance ready to use
-   */
-  public static TextDocumentService createServer(LanguageClient client) {
-    IMyLanguageServer server =
-        new TestLanguageServer(
-            client, LangServerCtx.getInjector().getInstance(WorkspaceService.class));
-    return new MyTextDocumentService(new ServerCommunications(server));
   }
 
   /**

@@ -13,6 +13,10 @@
  */
 package com.ca.lsp.cobol.positive;
 
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.cdi.module.databus.DatabusModule;
+import com.ca.lsp.cobol.ConfigurableTest;
+import com.ca.lsp.cobol.TestModule;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +35,7 @@ import static org.junit.Assert.assertEquals;
  * @author teman02
  */
 @RunWith(Parameterized.class)
-public class PositiveTest {
+public class PositiveTest extends ConfigurableTest {
   private CobolText text;
 
   public PositiveTest(CobolText text) {
@@ -40,7 +44,13 @@ public class PositiveTest {
 
   @Parameterized.Parameters
   public static Collection<Object> textsToTest() {
-    return new ArrayList<>(CobolTextRegistry.INSTANCE.getPositives());
+
+    LangServerCtx.getGuiceCtx(new TestModule(), new DatabusModule());
+    Collection<Object> cobolTexts =
+        new ArrayList<>(
+            LangServerCtx.getInjector().getInstance(CobolTextRegistry.class).getPositives());
+    LangServerCtx.shutdown();
+    return cobolTexts;
   }
 
   @Test
