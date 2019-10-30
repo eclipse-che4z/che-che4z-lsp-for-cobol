@@ -1,6 +1,7 @@
 package com.ca.lsp.cobol.service.mocks;
 
-import com.broadcom.lsp.domain.cobol.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
+import com.broadcom.lsp.domain.cobol.model.*;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.positive.CobolTextRegistry;
 import com.ca.lsp.cobol.service.CobolWorkspaceService;
@@ -13,10 +14,13 @@ import java.nio.file.Path;
 public class TestWorkspaceService implements CobolWorkspaceService {
 
   private CobolTextRegistry registry;
+  private DefaultDataBusBroker dataBus;
 
   @Inject
-  public TestWorkspaceService(CobolTextRegistry registry) {
+  public TestWorkspaceService(CobolTextRegistry registry, DefaultDataBusBroker dataBus) {
     this.registry = registry;
+    this.dataBus = dataBus;
+    dataBus.subscribe(DataEventType.CBLSCAN_EVENT, this);
   }
 
   @Override
@@ -26,7 +30,7 @@ public class TestWorkspaceService implements CobolWorkspaceService {
 
   @Override
   public String getContentByURI(String copybookName) {
-    return CobolTextRegistry.INSTANCE.getCopybooks().stream()
+    return registry.getCopybooks().stream()
         .filter(it -> it.getFileName().equals(copybookName))
         .map(CobolText::getText)
         .findAny()
@@ -39,6 +43,14 @@ public class TestWorkspaceService implements CobolWorkspaceService {
   @Override
   public void didChangeWatchedFiles(DidChangeWatchedFilesParams didChangeWatchedFilesParams) {}
 
+
   @Override
-  public void observerCallback(DataEvent adaptedDataEvent) {}
+  public void observerCallback(CpyBuildEvent event) {
+    if (!event.getEventType().equals(DataEventType.CBLSCAN_EVENT)) {
+      return;
+    }
+    String name = event.getName();
+    String content = getContentByURI(name);
+    dataBus.postData(CblFetchEvent.builder().name(name).content(content).build());
+  }
 }

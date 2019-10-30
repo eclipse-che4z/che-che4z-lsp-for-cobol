@@ -16,9 +16,12 @@
 
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +36,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author teman02
  */
-public class DefinitionsAndUsagesTest {
+public class DefinitionsAndUsagesTest extends ConfigurableTest {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -56,6 +59,7 @@ public class DefinitionsAndUsagesTest {
           + "           Move inner1 of outer2 to Str.\n"
           + "           Move inner2 of outer2 to Str.\n"
           + "       End program ProgramId.";
+
   private static final String OUTER1 = "OUTER1";
   private static final String INNER1 = "INNER1";
   private static final String STR = "STR";
@@ -65,12 +69,14 @@ public class DefinitionsAndUsagesTest {
   private AnalysisResult analysisResult;
 
   @Before
-  public void prepareServer() {
-    TestLanguageClient client = new TestLanguageClient();
-    MyTextDocumentService server = (MyTextDocumentService) createServer(client);
-    runTextValidation(server, TEXT);
+  public void createService() {
+    TextDocumentService service =
+        LangServerCtx.getInjector().getInstance(TextDocumentService.class);
+    TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    client.clean();
+    runTextValidation(service, TEXT);
     waitForDiagnostics(client);
-    Map<String, MyDocumentModel> docs = server.getDocs();
+    Map<String, MyDocumentModel> docs = ((MyTextDocumentService) service).getDocs();
     MyDocumentModel document = docs.get(DOCUMENT_URI);
     analysisResult = document.getAnalysisResult();
   }

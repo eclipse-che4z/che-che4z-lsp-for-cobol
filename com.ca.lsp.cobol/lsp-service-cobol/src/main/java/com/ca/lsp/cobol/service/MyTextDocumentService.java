@@ -36,15 +36,7 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 public class MyTextDocumentService implements TextDocumentService {
   private final Map<String, MyDocumentModel> docs = Collections.synchronizedMap(new HashMap<>());
-  private final Communications communications;
-  // private final IMyLanguageServer server;
-
-  @Inject
-  public MyTextDocumentService(Communications communications) {
-    this.communications = communications;
-    //    communications = new Communications(server);
-    // this.server = server;
-  }
+  @Inject private Communications communications;
 
   Map<String, MyDocumentModel> getDocs() {
     return new HashMap<>(docs);

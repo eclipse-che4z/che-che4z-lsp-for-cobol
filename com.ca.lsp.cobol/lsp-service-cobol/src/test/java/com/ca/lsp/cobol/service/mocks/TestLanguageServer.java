@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.cobol.service.mocks;
 
-import com.ca.lsp.cobol.service.CobolWorkspaceService;
 import com.ca.lsp.cobol.service.IMyLanguageServer;
 import com.google.inject.Inject;
 import org.eclipse.lsp4j.InitializeParams;
