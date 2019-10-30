@@ -49,7 +49,7 @@ public class CobolWorkspaceServiceImpl
     dataBus.subscribe(DataEventType.CBLSCAN_EVENT, this);
   }
 
-  private DefaultDataBusBroker dataBus;
+  private final DefaultDataBusBroker dataBus;
   private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
   private static final String URI_FILE_SEPARATOR = "/";
   private List<Path> copybookPathsList;
@@ -84,7 +84,7 @@ public class CobolWorkspaceServiceImpl
   }
 
   /** @return List of copybooks */
-  public List<Path> getCopybookPathsList() {
+  List<Path> getCopybookPathsList() {
     return copybookPathsList;
   }
 

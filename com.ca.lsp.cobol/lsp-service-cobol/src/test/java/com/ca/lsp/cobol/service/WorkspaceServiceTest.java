@@ -138,7 +138,6 @@ public class WorkspaceServiceTest {
       Files.walk(Paths.get(getWorkspaceFolderPath()))
           .sorted(Comparator.reverseOrder())
           .map(Path::toFile)
-          .filter(File::isFile)
           .forEach(File::delete);
     } catch (IOException e) {
       e.printStackTrace();
