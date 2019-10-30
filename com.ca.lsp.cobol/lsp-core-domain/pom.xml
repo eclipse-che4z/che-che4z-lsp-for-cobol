@@ -26,7 +26,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>lsp-core-domain</artifactId>
-    <name>CA COBOL LSP :: LSP CDI Support</name>
+    <name>CA COBOL LSP :: LSP CORE Domain</name>
     <version>0.8.0</version>
     <packaging>jar</packaging>
 
@@ -41,6 +41,10 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

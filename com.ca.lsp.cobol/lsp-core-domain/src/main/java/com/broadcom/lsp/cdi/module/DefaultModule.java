@@ -25,8 +25,8 @@ import com.google.inject.name.Names;
 public class DefaultModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(String.class)
+        bindConstant()
                 .annotatedWith(Names.named("VERSION"))
-                .toInstance("0.8");
+                .to("0.8");
     }
 }
