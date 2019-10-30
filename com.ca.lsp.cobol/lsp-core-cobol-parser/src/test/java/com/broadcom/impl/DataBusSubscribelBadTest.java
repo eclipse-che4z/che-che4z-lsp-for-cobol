@@ -14,7 +14,7 @@
  *
  */
 
-package impl;
+package com.broadcom.impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
@@ -32,7 +32,7 @@ import org.junit.Test;
  * Created on 2019-10-02
  */
 @Slf4j
-public class DataBusImplBadTest extends AbsDataBusImplTest {
+public class DataBusSubscribelBadTest extends AbsDataBusImplTest {
 
     private DefaultDataBusBroker databus;
 
