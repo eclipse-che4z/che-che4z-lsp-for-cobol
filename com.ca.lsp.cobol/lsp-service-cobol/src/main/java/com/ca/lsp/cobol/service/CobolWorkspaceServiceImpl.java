@@ -15,11 +15,9 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
 import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
-import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -45,7 +43,8 @@ import java.util.stream.Stream;
 @Singleton
 public class CobolWorkspaceServiceImpl
     implements CobolWorkspaceService {
-  private final ExecutorService threadPool;
+
+    private final ExecutorService threadPool;
 
   @Inject
   public CobolWorkspaceServiceImpl(DefaultDataBusBroker dataBus) {
@@ -121,7 +120,7 @@ public class CobolWorkspaceServiceImpl
             })) {
       stream.findFirst().ifPresent(path -> pathFileFound = path);
     } catch (IOException e) {
-      log.error(Arrays.toString(e.getStackTrace()));
+      e.printStackTrace();
     }
   }
 
@@ -157,11 +156,13 @@ public class CobolWorkspaceServiceImpl
     }
   }
 
-  private List<WorkspaceFolder> getWorkspaceFolders() {
+  @Override
+  public List<WorkspaceFolder> getWorkspaceFolders() {
     return workspaceFolders;
   }
 
-  void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
+  @Override
+  public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
     this.workspaceFolders = workspaceFolders;
   }
 
@@ -170,19 +171,17 @@ public class CobolWorkspaceServiceImpl
     if (!event.getEventType().equals(DataEventType.CBLSCAN_EVENT)) {
       return;
     }
-
-    // create the task and pass it to the executor service
-    Runnable getContentTask =
-            () -> {
-                String name = event.getName();
-                try {
-                    String content = getContentByURI(name);
-                    dataBus.postData(CblFetchEvent.builder().name(name).content(content).build());
-                } catch (IOException e) {
-                    log.error(Arrays.toString(e.getStackTrace()));
-                }
-            };
-    threadPool.submit(getContentTask);
+      // create the task and pass it to the executor service
+      Runnable getContentTask =
+              () -> {
+                  String name = event.getName();
+                  try {
+                      String content = getContentByURI(name);
+                      dataBus.postData(CblFetchEvent.builder().name(name).content(content).build());
+                  } catch (IOException e) {
+                      log.error(Arrays.toString(e.getStackTrace()));
+                  }
+              };
+      threadPool.submit(getContentTask);
   }
-
 }

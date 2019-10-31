@@ -16,10 +16,7 @@
 package com.broadcom.lsp.cdi.module.service;
 
 import com.broadcom.lsp.cdi.module.DefaultModule;
-import com.ca.lsp.cobol.service.CobolWorkspaceServiceImpl;
-import com.ca.lsp.cobol.service.IMyLanguageServer;
-import com.ca.lsp.cobol.service.MyLanguageServerImpl;
-import com.ca.lsp.cobol.service.MyTextDocumentService;
+import com.ca.lsp.cobol.service.*;
 import com.ca.lsp.cobol.service.delegates.Communications;
 import com.ca.lsp.cobol.service.delegates.ServerCommunications;
 import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
@@ -38,6 +35,7 @@ public class ServiceModule extends DefaultModule {
     bind(IMyLanguageServer.class).to(MyLanguageServerImpl.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
+    bind(CobolWorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
   }
