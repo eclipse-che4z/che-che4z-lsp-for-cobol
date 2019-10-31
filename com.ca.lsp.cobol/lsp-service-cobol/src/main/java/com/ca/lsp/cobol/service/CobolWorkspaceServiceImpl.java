@@ -38,8 +38,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Singleton
-public class CobolWorkspaceServiceImpl
-    implements CobolWorkspaceService {
+public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
 
   @Inject
   public CobolWorkspaceServiceImpl(DefaultDataBusBroker dataBus) {
@@ -148,11 +147,13 @@ public class CobolWorkspaceServiceImpl
     }
   }
 
-  private List<WorkspaceFolder> getWorkspaceFolders() {
+  @Override
+  public List<WorkspaceFolder> getWorkspaceFolders() {
     return workspaceFolders;
   }
 
-  void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
+  @Override
+  public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
     this.workspaceFolders = workspaceFolders;
   }
 

@@ -16,13 +16,12 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
-import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
 import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
-import com.broadcom.lsp.domain.cobol.model.CpyBuildEvent;
-import com.broadcom.lsp.domain.cobol.model.DataEvent;
+import org.eclipse.lsp4j.WorkspaceFolder;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 public interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService, IDataBusObserver<CblScanEvent> {
   /**
@@ -37,4 +36,8 @@ public interface CobolWorkspaceService extends org.eclipse.lsp4j.services.Worksp
   Path getURIByFileName(String fileName);
 
   String getContentByURI(String copybookName) throws IOException;
+
+  List<WorkspaceFolder> getWorkspaceFolders();
+
+  void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders);
 }

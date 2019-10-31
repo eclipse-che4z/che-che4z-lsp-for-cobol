@@ -8,8 +8,10 @@ import com.ca.lsp.cobol.service.CobolWorkspaceService;
 import com.google.inject.Inject;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
+import org.eclipse.lsp4j.WorkspaceFolder;
 
 import java.nio.file.Path;
+import java.util.List;
 
 public class TestWorkspaceService implements CobolWorkspaceService {
 
@@ -35,6 +37,16 @@ public class TestWorkspaceService implements CobolWorkspaceService {
         .map(CobolText::getText)
         .findAny()
         .orElse(null);
+  }
+
+  @Override
+  public List<WorkspaceFolder> getWorkspaceFolders() {
+    return null;
+  }
+
+  @Override
+  public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
+
   }
 
   @Override
