@@ -13,13 +13,13 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * This use cases checks if varying with multiple identifiers works correctly.
@@ -33,7 +33,7 @@ public class TestVaryingCorrect extends PositiveUseCase {
     super(text);
   }
 
-  private static final String BOILERPATE =
+  private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
@@ -59,8 +59,8 @@ public class TestVaryingCorrect extends PositiveUseCase {
   @Parameterized.Parameters
   public static Collection<Object> textsToTest() {
     List<Object> result = new ArrayList<>();
-    result.add(BOILERPATE + VARYING_WITH_TWO_IDENTIFIERS);
-    result.add(BOILERPATE + VARYING_WITH_THREE_IDENTIFIERS);
+    result.add(BOILERPLATE + VARYING_WITH_TWO_IDENTIFIERS);
+    result.add(BOILERPLATE + VARYING_WITH_THREE_IDENTIFIERS);
     return result;
   }
 

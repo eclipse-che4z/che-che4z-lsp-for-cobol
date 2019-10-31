@@ -16,6 +16,7 @@
 
 package com.ca.lsp.cobol.usecases;
 
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.junit.Test;
 
@@ -24,7 +25,7 @@ import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.assertEquals;
 
 /** */
-public class TestVariablesAreCaseInsensitive {
+public class TestVariablesAreCaseInsensitive extends ConfigurableTest {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"

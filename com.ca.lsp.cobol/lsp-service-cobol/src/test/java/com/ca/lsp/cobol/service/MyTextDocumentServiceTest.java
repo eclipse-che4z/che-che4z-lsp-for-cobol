@@ -14,16 +14,15 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.ca.lsp.cobol.TestModule;
-import com.ca.lsp.cobol.service.delegates.ServerCommunications;
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
-import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
 import com.ca.lsp.cobol.usecases.UseCaseUtils;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.eclipse.lsp4j.services.WorkspaceService;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -36,33 +35,22 @@ import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.*;
 
 /** @author teman02 */
-public class MyTextDocumentServiceTest {
+public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private static final String LANGUAGE = "COBOL";
   private static final String DOCUMENT_URI = "1";
   private static final String CLOSED_DOCUMENT_URI = "2";
   private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
-  private MyTextDocumentService service;
+  private TextDocumentService service;
   private TestLanguageClient client;
-
-  @BeforeClass
-  public void setUp() {
-    LangServerCtx.getGuiceCtx(new TestModule());
-  }
-
-  @AfterClass
-  public void tearDown() {
-    LangServerCtx.shutdown();
-  }
 
   @Before
   public void createService() {
-    client = new TestLanguageClient();
-    IMyLanguageServer server =
-        new TestLanguageServer(
-            client, LangServerCtx.getInjector().getInstance(WorkspaceService.class));
-    service = new MyTextDocumentService(new ServerCommunications(server));
+    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
+    client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    client.clean();
+
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
@@ -137,8 +125,6 @@ public class MyTextDocumentServiceTest {
 
   @Test
   public void testDidChange() {
-    TestLanguageClient client = new TestLanguageClient();
-    TextDocumentService service = UseCaseUtils.createServer(client);
     List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
     service.didChange(
@@ -165,8 +151,6 @@ public class MyTextDocumentServiceTest {
 
   @Test
   public void testDidClose() {
-    TestLanguageClient client = new TestLanguageClient();
-    MyTextDocumentService service = (MyTextDocumentService) UseCaseUtils.createServer(client);
     openDocument(service);
     TextDocumentIdentifier testDocument = new TextDocumentIdentifier(CLOSED_DOCUMENT_URI);
     DidCloseTextDocumentParams closedDocument = new DidCloseTextDocumentParams(testDocument);
@@ -174,20 +158,18 @@ public class MyTextDocumentServiceTest {
     assertEquals(Collections.EMPTY_MAP, closeGetter(service));
   }
 
-  private void openDocument(MyTextDocumentService service) {
+  private void openDocument(TextDocumentService service) {
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(CLOSED_DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
   }
 
-  private Map<String, MyDocumentModel> closeGetter(MyTextDocumentService service) {
-    return service.getDocs();
+  private Map<String, MyDocumentModel> closeGetter(TextDocumentService service) {
+    return ((MyTextDocumentService) service).getDocs();
   }
 
   @Test
   public void testDidSave() {
-    TestLanguageClient client = new TestLanguageClient();
-    MyTextDocumentService service = (MyTextDocumentService) UseCaseUtils.createServer(client);
     openDocument(service);
     TextDocumentIdentifier saveDocumentIdentifier = new TextDocumentIdentifier(CLOSED_DOCUMENT_URI);
     DidSaveTextDocumentParams saveDocumentParams =
@@ -197,8 +179,6 @@ public class MyTextDocumentServiceTest {
 
   @Test
   public void testIncorrectLangId() {
-    TestLanguageClient client = new TestLanguageClient();
-    MyTextDocumentService service = (MyTextDocumentService) UseCaseUtils.createServer(client);
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, "incorrectId", 1, TEXT_EXAMPLE)));
@@ -216,8 +196,6 @@ public class MyTextDocumentServiceTest {
   @Ignore("Not implemented yet")
   @Test
   public void testHover() {
-    TestLanguageClient client = new TestLanguageClient();
-    MyTextDocumentService service = (MyTextDocumentService) UseCaseUtils.createServer(client);
     TextDocumentItem testHoverDocument =
         new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE);
     service.didOpen(new DidOpenTextDocumentParams(testHoverDocument));

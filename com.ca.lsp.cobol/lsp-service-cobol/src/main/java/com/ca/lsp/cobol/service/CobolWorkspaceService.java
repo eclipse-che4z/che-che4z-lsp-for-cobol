@@ -16,12 +16,15 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
+import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
+import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
+import com.broadcom.lsp.domain.cobol.model.CpyBuildEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-public interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService, IDataBusObserver<DataEvent> {
+public interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService, IDataBusObserver<CblScanEvent> {
   /**
    * From a given copybook name (without file extension) this method will return the URI of the file
    * - if exists

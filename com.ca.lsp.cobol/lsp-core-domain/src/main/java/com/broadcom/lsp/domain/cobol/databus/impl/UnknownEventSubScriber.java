@@ -49,6 +49,7 @@ public class UnknownEventSubScriber {
     @SneakyThrows
     public void onDataHandler(UnknownEvent eventType) {
         LOG.debug(eventType.getHeader());
+        observer.observerCallback(eventType);
     }
 }
 

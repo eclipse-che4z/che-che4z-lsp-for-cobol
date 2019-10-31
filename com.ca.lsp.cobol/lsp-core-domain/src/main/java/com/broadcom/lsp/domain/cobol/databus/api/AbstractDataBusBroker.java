@@ -16,11 +16,10 @@
 
 package com.broadcom.lsp.domain.cobol.databus.api;
 
-import com.broadcom.lsp.domain.cobol.model.DataEvent;
-import com.broadcom.lsp.domain.cobol.model.DataEventType;
-import com.broadcom.lsp.domain.cobol.model.RegistryId;
+import com.broadcom.lsp.domain.cobol.model.*;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,16 +32,24 @@ import java.util.concurrent.Executors;
  */
 @Slf4j
 public abstract class AbstractDataBusBroker<T extends DataEvent, S> implements IDataBusBroker<T, S> {
-    private ExecutorService executor = Executors.newFixedThreadPool(10);
-    private EventBus generalRegistry = new AsyncEventBus(RegistryId.GENERAL_REGISTRY_ID.getId(), executor);
-    private EventBus scannerRegistry = new AsyncEventBus(RegistryId.SCANNER_REGISTRY_ID.getId(), executor);
-    private EventBus fetcherRegistry = new AsyncEventBus(RegistryId.FETCHER_REGISTRY_ID.getId(), executor);
-    private EventBus cpyRegistry = new AsyncEventBus(RegistryId.CPY_REGISTRY_ID.getId(), executor);
+    private ExecutorService executor;
+    private EventBus generalRegistry;
+    private EventBus scannerRegistry;
+    private EventBus fetcherRegistry;
+    private EventBus cpyRegistry;
 
+    @NonNull
+    private CpyRepository cpyRepo;
 
     private DeadEventSubScriber recycleBin = new DeadEventSubScriber();
 
-    public AbstractDataBusBroker() {
+    public AbstractDataBusBroker(int nthread, CpyRepository cpyRepo) {
+        this.cpyRepo = cpyRepo;
+        executor = Executors.newFixedThreadPool(nthread);
+        generalRegistry = new AsyncEventBus(RegistryId.GENERAL_REGISTRY_ID.getId(), executor);
+        scannerRegistry = new AsyncEventBus(RegistryId.SCANNER_REGISTRY_ID.getId(), executor);
+        fetcherRegistry = new AsyncEventBus(RegistryId.FETCHER_REGISTRY_ID.getId(), executor);
+        cpyRegistry = new AsyncEventBus(RegistryId.CPY_REGISTRY_ID.getId(), executor);
         generalRegistry.register(recycleBin);
         scannerRegistry.register(recycleBin);
         fetcherRegistry.register(recycleBin);
@@ -63,4 +70,44 @@ public abstract class AbstractDataBusBroker<T extends DataEvent, S> implements I
     public S getSubscriber(DataEventType event, IDataBusObserver observer) {
         return (S) ISubscriberFactoryProvider.getFactory(event).create(observer);
     }
+
+    protected abstract void swapAndStore(@NonNull CpyStorable deepcopy);
+
+    @SneakyThrows
+    protected CpyRepository getCpyRepo() {
+        return cpyRepo;
+    }
+
+    @Override
+    @SneakyThrows
+    public int getCacheMaxSize() {
+        return getCpyRepo().getCacheMaxSize();
+    }
+
+    @Override
+    @SneakyThrows
+    public String printCache() {
+        StringBuilder chars = new StringBuilder();
+        cpyRepo.getCache().stream().forEach(l -> chars.append(System.getProperty("line.separator")).append(l).append(System.getProperty("line.separator")));
+        return chars.toString();
+    }
+
+    @Override
+    public int cacheSize() {
+        return getCpyRepo().getCache().size();
+    }
+
+    @Override
+    @SneakyThrows
+    public Optional<CpyStorable> lastRecentlyUsed() {
+
+        return (getCpyRepo().getCache().isEmpty()) ? Optional.empty() : Optional.of(getCpyRepo().getCache().get(0));
+    }
+
+    @Override
+    @SneakyThrows
+    public Optional<CpyStorable> leastRecentlyUsed() {
+        return (getCpyRepo().getCache().isEmpty()) ? Optional.empty() : Optional.of(getCpyRepo().getCache().get(getCpyRepo().getCache().size() - 1));
+    }
+
 }

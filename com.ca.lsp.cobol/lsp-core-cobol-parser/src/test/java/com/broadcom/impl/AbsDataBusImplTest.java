@@ -14,7 +14,7 @@
  *
  */
 
-package impl;
+package com.broadcom.impl;
 
 import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;

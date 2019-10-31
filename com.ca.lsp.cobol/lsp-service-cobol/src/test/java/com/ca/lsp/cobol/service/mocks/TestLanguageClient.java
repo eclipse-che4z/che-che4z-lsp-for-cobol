@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.cobol.service.mocks;
 
+import com.google.inject.Singleton;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
  *
  * @author teman02
  */
+@Singleton
 public class TestLanguageClient implements LanguageClient {
   private List<Object> receivedTelemetry = new ArrayList<>();
   private List<PublishDiagnosticsParams> receivedDiagnostics = new ArrayList<>();
@@ -96,5 +98,13 @@ public class TestLanguageClient implements LanguageClient {
   /** Set the iterator of messages that should be send as a respond in the given order */
   public void setResponseIterator(Iterator<MessageActionItem> responseIterator) {
     this.responseIterator = responseIterator;
+  }
+
+  public void clean() {
+    receivedTelemetry = new ArrayList<>();
+    receivedDiagnostics = new ArrayList<>();
+    messagesToShow = new ArrayList<>();
+    messagesToLog = new ArrayList<>();
+    responseIterator = null;
   }
 }

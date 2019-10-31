@@ -44,7 +44,7 @@ import java.util.stream.Stream;
 @Slf4j
 @Singleton
 public class CobolWorkspaceServiceImpl
-    implements CobolWorkspaceService, IDataBusObserver<DataEvent> {
+    implements CobolWorkspaceService {
   private final ExecutorService threadPool;
 
   @Inject
@@ -153,7 +153,7 @@ public class CobolWorkspaceServiceImpl
                 new URI(workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME)))) {
       copybookFoldersStream.forEach(copybookPathsList::add);
     } catch (URISyntaxException | IOException e) {
-      log.error(Arrays.toString(e.getStackTrace()));
+      log.error(e.getMessage());
     }
   }
 
@@ -166,23 +166,23 @@ public class CobolWorkspaceServiceImpl
   }
 
   @Override
-  public void observerCallback(DataEvent event) {
-    if (!event.getEventType().equals(DataEventType.CPYBUILD_EVENT)) {
+  public void observerCallback(CblScanEvent event) {
+    if (!event.getEventType().equals(DataEventType.CBLSCAN_EVENT)) {
       return;
     }
 
     // create the task and pass it to the executor service
     Runnable getContentTask =
-        () -> {
-          CblScanEvent cblEvent = (CblScanEvent) event;
-          String name = cblEvent.getName();
-          try {
-            String content = getContentByURI(name);
-            dataBus.postData(CblFetchEvent.builder().name(name).content(content).build());
-          } catch (IOException e) {
-            log.error(Arrays.toString(e.getStackTrace()));
-          }
-        };
+            () -> {
+                String name = event.getName();
+                try {
+                    String content = getContentByURI(name);
+                    dataBus.postData(CblFetchEvent.builder().name(name).content(content).build());
+                } catch (IOException e) {
+                    log.error(Arrays.toString(e.getStackTrace()));
+                }
+            };
     threadPool.submit(getContentTask);
   }
+
 }

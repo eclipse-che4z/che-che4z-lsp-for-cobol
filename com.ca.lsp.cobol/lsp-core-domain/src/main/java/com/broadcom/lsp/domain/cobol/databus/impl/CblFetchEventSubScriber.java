@@ -47,6 +47,7 @@ public class CblFetchEventSubScriber {
     @SneakyThrows
     public void onDataHandler(CblFetchEvent eventType) {
         LOG.debug(eventType.getHeader());
+        observer.observerCallback(eventType);
     }
 }
 

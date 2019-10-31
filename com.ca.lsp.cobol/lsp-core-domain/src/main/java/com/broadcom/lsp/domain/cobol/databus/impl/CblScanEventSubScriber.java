@@ -47,6 +47,7 @@ public class CblScanEventSubScriber {
     @SneakyThrows
     public void onDataHandler(CblScanEvent eventType) {
         LOG.debug(eventType.getHeader());
+        observer.observerCallback(eventType);
     }
 }
 
