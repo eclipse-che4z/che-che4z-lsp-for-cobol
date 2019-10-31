@@ -15,11 +15,9 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
 import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
-import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -41,7 +39,7 @@ import java.util.stream.Stream;
 @Slf4j
 @Singleton
 public class CobolWorkspaceServiceImpl
-    implements CobolWorkspaceService, IDataBusObserver<DataEvent> {
+    implements CobolWorkspaceService {
 
   @Inject
   public CobolWorkspaceServiceImpl(DefaultDataBusBroker dataBus) {
@@ -159,12 +157,11 @@ public class CobolWorkspaceServiceImpl
   }
 
   @Override
-  public void observerCallback(DataEvent event) {
+  public void observerCallback(CblScanEvent event) {
     if (!event.getEventType().equals(DataEventType.CBLSCAN_EVENT)) {
       return;
     }
-    CblScanEvent cblEvent = (CblScanEvent) event;
-    String name = cblEvent.getName();
+    String name = event.getName();
     String content = null;
     try {
       content = getContentByURI(name);
