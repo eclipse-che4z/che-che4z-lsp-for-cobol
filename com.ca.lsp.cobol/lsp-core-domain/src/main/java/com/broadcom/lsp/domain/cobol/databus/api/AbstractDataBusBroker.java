@@ -16,6 +16,7 @@
 
 package com.broadcom.lsp.domain.cobol.databus.api;
 
+import com.broadcom.lsp.domain.cobol.databus.impl.CpyRepositoryLRU;
 import com.broadcom.lsp.domain.cobol.model.*;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
@@ -23,6 +24,7 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,13 +40,10 @@ public abstract class AbstractDataBusBroker<T extends DataEvent, S> implements I
     private EventBus fetcherRegistry;
     private EventBus cpyRegistry;
 
-    @NonNull
-    private CpyRepository cpyRepo;
 
     private DeadEventSubScriber recycleBin = new DeadEventSubScriber();
 
-    public AbstractDataBusBroker(int nthread, CpyRepository cpyRepo) {
-        this.cpyRepo = cpyRepo;
+    public AbstractDataBusBroker(int nthread) {
         executor = Executors.newFixedThreadPool(nthread);
         generalRegistry = new AsyncEventBus(RegistryId.GENERAL_REGISTRY_ID.getId(), executor);
         scannerRegistry = new AsyncEventBus(RegistryId.SCANNER_REGISTRY_ID.getId(), executor);
@@ -71,12 +70,6 @@ public abstract class AbstractDataBusBroker<T extends DataEvent, S> implements I
         return (S) ISubscriberFactoryProvider.getFactory(event).create(observer);
     }
 
-    protected abstract void swapAndStore(@NonNull CpyStorable deepcopy);
-
-    @SneakyThrows
-    protected CpyRepository getCpyRepo() {
-        return cpyRepo;
-    }
 
     @Override
     @SneakyThrows
@@ -87,27 +80,14 @@ public abstract class AbstractDataBusBroker<T extends DataEvent, S> implements I
     @Override
     @SneakyThrows
     public String printCache() {
-        StringBuilder chars = new StringBuilder();
-        cpyRepo.getCache().stream().forEach(l -> chars.append(System.getProperty("line.separator")).append(l).append(System.getProperty("line.separator")));
-        return chars.toString();
+        return getCpyRepo().logContent();
     }
 
     @Override
     public int cacheSize() {
-        return getCpyRepo().getCache().size();
+        return getCpyRepo().size();
     }
 
-    @Override
-    @SneakyThrows
-    public Optional<CpyStorable> lastRecentlyUsed() {
-
-        return (getCpyRepo().getCache().isEmpty()) ? Optional.empty() : Optional.of(getCpyRepo().getCache().get(0));
-    }
-
-    @Override
-    @SneakyThrows
-    public Optional<CpyStorable> leastRecentlyUsed() {
-        return (getCpyRepo().getCache().isEmpty()) ? Optional.empty() : Optional.of(getCpyRepo().getCache().get(getCpyRepo().getCache().size() - 1));
-    }
+    protected abstract CpyRepositoryLRU getCpyRepo();
 
 }

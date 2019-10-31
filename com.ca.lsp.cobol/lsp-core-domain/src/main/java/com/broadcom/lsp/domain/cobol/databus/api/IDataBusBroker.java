@@ -27,6 +27,7 @@ import com.google.inject.ImplementedBy;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -60,22 +61,14 @@ public interface IDataBusBroker<T extends DataEvent, S> {
     @SneakyThrows
     CpyStorable storeData(@NonNull CpyStorable dataEvent);
 
-    @SneakyThrows
-    boolean isStored(@NonNull StringBuilder id);
 
     @SneakyThrows
-    boolean isStored(@NonNull String id);
+    CpyStorable getData(@NonNull long uuid);
 
     @SneakyThrows
     boolean isStored(long uuid);
 
     int cacheSize();
-
-    @SneakyThrows
-    Optional<CpyStorable> lastRecentlyUsed();
-
-    @SneakyThrows
-    Optional<CpyStorable> leastRecentlyUsed();
 
     @SneakyThrows
     int getCacheMaxSize();

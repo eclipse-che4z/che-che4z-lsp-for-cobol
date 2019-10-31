@@ -18,6 +18,7 @@ package com.broadcom.impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
+import com.broadcom.lsp.domain.cobol.databus.impl.CpyRepositoryLRU;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.CpyStorable;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
@@ -87,7 +88,7 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
     @Test
     @SneakyThrows
     public void cacheData() {
-        Assert.assertFalse(databus.isStored(new StringBuilder("COPY20")));
+        Assert.assertFalse(databus.isStored(CpyRepositoryLRU.calculateUUID(new StringBuilder("COPY20"))));
         LOG.debug(String.format("Cache content : %s", databus.printCache()));
         Optional<CpyStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
         LOG.debug(String.format("Least Recently Used item : %s  ID : %d", leastRecentlyUsed.get().getName(), leastRecentlyUsed.get().getId()));
@@ -101,7 +102,7 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
                 .position("ROW:3,COL:4")
                 .uri("/var/tmp/worspace1")
                 .build());
-        Assert.assertTrue(databus.isStored(new StringBuilder("COPY20")));
+        Assert.assertTrue(databus.isStored(CpyRepositoryLRU.calculateUUID(new StringBuilder("COPY20"))));
         //Swapped
         Assert.assertEquals(databus.getCacheMaxSize(), databus.cacheSize());
         LOG.debug(String.format("Cache content : %s", databus.printCache()));
