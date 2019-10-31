@@ -114,6 +114,13 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
 
     @Override
     @SneakyThrows
+    public boolean isStored(@NonNull String id) {
+        long uuid = CpyStorable.calculateUUID(id);
+        return isStored(uuid);
+    }
+
+    @Override
+    @SneakyThrows
     public boolean isStored(long uuid) {
         Optional<CpyStorable> cpy = getCpyRepo().getCache().stream()
                 .filter(copy -> uuid == copy.getId())

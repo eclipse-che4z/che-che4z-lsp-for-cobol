@@ -61,6 +61,12 @@ public class CpyStorable implements Serializable {
     }
 
     @SneakyThrows
+    public static long calculateUUID(@NonNull String uuid) {
+        return UUID.nameUUIDFromBytes(uuid.getBytes())
+                .getMostSignificantBits();
+    }
+
+    @SneakyThrows
     public boolean isExpired() {
         return (Instant.now().getEpochSecond() - genDt) > ttu;
     }
