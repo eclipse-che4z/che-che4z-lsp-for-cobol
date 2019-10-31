@@ -1,13 +1,26 @@
+/*
+ * Copyright (c) 2019 Broadcom.
+ *
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ * Broadcom, Inc. - initial API and implementation
+ *
+ */
 package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.api.IDataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
 import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
-import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
@@ -26,8 +39,7 @@ public class AnalyseCopybookTask extends RecursiveTask<SemanticContext>
     implements IDataBusObserver<CblFetchEvent> {
 
   private static final IDataBusBroker DATABUS =
-      LangServerCtx.getGuiceCtx(new DatabusModule())
-          .getInjector()
+      LangServerCtx.getInjector()
           .getInstance(DefaultDataBusBroker.class);
 
   private String copyBookName;
@@ -72,11 +84,9 @@ public class AnalyseCopybookTask extends RecursiveTask<SemanticContext>
 
   @Override
   public void observerCallback(CblFetchEvent adaptedDataEvent) {
-
     if (!copyBookName.equals(adaptedDataEvent.getName())) {
       return;
     }
     waitForResolving.complete((adaptedDataEvent).getContent());
-
   }
 }
