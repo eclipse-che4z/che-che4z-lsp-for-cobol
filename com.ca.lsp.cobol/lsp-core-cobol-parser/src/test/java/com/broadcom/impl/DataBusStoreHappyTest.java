@@ -76,6 +76,7 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
     @After
     public void tearDown() throws Exception {
         databus = null;
+        LangServerCtx.shutdown();
     }
 
     @Override
