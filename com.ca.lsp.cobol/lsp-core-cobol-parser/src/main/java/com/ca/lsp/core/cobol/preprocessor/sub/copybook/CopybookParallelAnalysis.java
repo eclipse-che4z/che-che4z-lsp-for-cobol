@@ -31,7 +31,9 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
       Collection<String> names,
       CobolPreprocessor.CobolSourceFormatEnum format,
       CobolParserParams params) {
-    return ForkJoinTask.invokeAll(createTasks(names, format, params)).stream()
+    return ForkJoinTask.invokeAll(createTasks(names, format, params))
+        .stream() // TODO:add filtration to avoid duplication of requests to workspace service for
+                  // copybooks with the same names / Low priority
         .map(ForkJoinTask::join)
         .collect(Collectors.toList());
   }
