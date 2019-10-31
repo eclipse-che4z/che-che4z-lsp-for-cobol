@@ -31,7 +31,7 @@ public class TestWorkspaceService implements CobolWorkspaceService {
   @Override
   public String getContentByURI(String copybookName) {
     return registry.getCopybooks().stream()
-        .filter(it -> it.getFileName().equals(copybookName))
+        .filter(it -> it.getFileName().equals(copybookName + ".cpy"))
         .map(CobolText::getText)
         .findAny()
         .orElse(null);
@@ -45,7 +45,7 @@ public class TestWorkspaceService implements CobolWorkspaceService {
 
 
   @Override
-  public void observerCallback(CpyBuildEvent event) {
+  public void observerCallback(CblScanEvent event) {
     if (!event.getEventType().equals(DataEventType.CBLSCAN_EVENT)) {
       return;
     }
