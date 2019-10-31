@@ -64,6 +64,9 @@ public interface IDataBusBroker<T extends DataEvent, S> {
     boolean isStored(@NonNull StringBuilder id);
 
     @SneakyThrows
+    boolean isStored(@NonNull String id);
+
+    @SneakyThrows
     boolean isStored(long uuid);
 
     int cacheSize();
