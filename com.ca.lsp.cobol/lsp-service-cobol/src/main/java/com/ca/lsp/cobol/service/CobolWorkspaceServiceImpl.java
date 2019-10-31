@@ -15,11 +15,9 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
 import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
-import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -43,9 +41,16 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Singleton
-public class CobolWorkspaceServiceImpl
-    implements CobolWorkspaceService, IDataBusObserver<DataEvent> {
+public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
+
   private final ExecutorService threadPool;
+  private final DefaultDataBusBroker<CblFetchEvent, CblScanEvent> dataBus;
+  private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
+  private static final String URI_FILE_SEPARATOR = "/";
+  private List<Path> copybookPathsList;
+  private final List<File> copybookFileList = new ArrayList<>();
+  private List<WorkspaceFolder> workspaceFolders;
+  private Path pathFileFound = null;
 
   @Inject
   public CobolWorkspaceServiceImpl(DefaultDataBusBroker dataBus) {
@@ -55,14 +60,6 @@ public class CobolWorkspaceServiceImpl
     // create a thread pool fixed
     threadPool = Executors.newCachedThreadPool();
   }
-
-  private final DefaultDataBusBroker dataBus;
-  private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
-  private static final String URI_FILE_SEPARATOR = "/";
-  private List<Path> copybookPathsList;
-  private final List<File> copybookFileList = new ArrayList<>();
-  private List<WorkspaceFolder> workspaceFolders;
-  private Path pathFileFound = null;
 
   @Override
   public CompletableFuture<List<? extends SymbolInformation>> symbol(WorkspaceSymbolParams params) {
@@ -121,7 +118,7 @@ public class CobolWorkspaceServiceImpl
             })) {
       stream.findFirst().ifPresent(path -> pathFileFound = path);
     } catch (IOException e) {
-      log.error(Arrays.toString(e.getStackTrace()));
+      e.printStackTrace();
     }
   }
 
@@ -153,36 +150,33 @@ public class CobolWorkspaceServiceImpl
                 new URI(workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME)))) {
       copybookFoldersStream.forEach(copybookPathsList::add);
     } catch (URISyntaxException | IOException e) {
-      log.error(Arrays.toString(e.getStackTrace()));
+      log.error(e.getMessage());
     }
-  }
-
-  private List<WorkspaceFolder> getWorkspaceFolders() {
-    return workspaceFolders;
-  }
-
-  void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
-    this.workspaceFolders = workspaceFolders;
   }
 
   @Override
-  public void observerCallback(DataEvent event) {
-    if (!event.getEventType().equals(DataEventType.CPYBUILD_EVENT)) {
-      return;
-    }
+  public List<WorkspaceFolder> getWorkspaceFolders() {
+    return workspaceFolders;
+  }
 
-    // create the task and pass it to the executor service
-    Runnable getContentTask =
+  @Override
+  public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
+    this.workspaceFolders = workspaceFolders;
+  }
+
+  /** create the task and pass it to the executor service */
+  @Override
+  public void observerCallback(CblScanEvent event) {
+    threadPool.submit(
         () -> {
-          CblScanEvent cblEvent = (CblScanEvent) event;
-          String name = cblEvent.getName();
+          String name = event.getName();
+          String content = null;
           try {
-            String content = getContentByURI(name);
-            dataBus.postData(CblFetchEvent.builder().name(name).content(content).build());
+            content = getContentByURI(name);
           } catch (IOException e) {
             log.error(Arrays.toString(e.getStackTrace()));
           }
-        };
-    threadPool.submit(getContentTask);
+          dataBus.postData(CblFetchEvent.builder().name(name).content(content).build());
+        });
   }
 }

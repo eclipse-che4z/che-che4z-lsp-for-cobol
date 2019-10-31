@@ -16,6 +16,7 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.cdi.module.service.ServiceModule;
 import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +68,7 @@ public class WorkspaceServiceTest {
   @BeforeClass
   public static void setUp() {
     cobolWorkspaceService =
-        LangServerCtx.getGuiceCtx(new ServiceModule())
+        LangServerCtx.getGuiceCtx(new ServiceModule(), new DatabusModule())
             .getInjector()
             .getInstance(CobolWorkspaceServiceImpl.class);
   }
