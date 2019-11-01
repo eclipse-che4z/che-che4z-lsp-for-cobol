@@ -35,7 +35,7 @@ public class TestWorkspaceService implements CobolWorkspaceService {
   @Override
   public String getContentByCopybookName(String copybookName) {
     return registry.getCopybooks().stream()
-        .filter(it -> it.getFileName().equals(copybookName + ".cpy"))
+        .filter(it -> it.getFileName().equalsIgnoreCase(copybookName + ".cpy"))
         .map(CobolText::getText)
         .findAny()
         .orElse(null);
