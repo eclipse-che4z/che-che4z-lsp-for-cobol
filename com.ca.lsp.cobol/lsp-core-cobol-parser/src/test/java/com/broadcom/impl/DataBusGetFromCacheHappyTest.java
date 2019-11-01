@@ -29,14 +29,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
  * Created on 2019-10-02
  */
 @Slf4j
-public class DataBusGetFormCacheBadTest extends AbsDataBusImplTest {
+public class DataBusGetFromCacheHappyTest extends AbsDataBusImplTest {
 
     private DefaultDataBusBroker databus;
 
@@ -86,16 +85,18 @@ public class DataBusGetFormCacheBadTest extends AbsDataBusImplTest {
         LOG.debug(String.format("Received : %s", adaptedDataEvent.getEventType().getId()));
     }
 
-    @Test (expected = NoSuchElementException.class)
+    @Test
     @SneakyThrows
-    public void getData() throws NoSuchElementException {
+    public void getData() {
         Assert.assertTrue(databus.isStored(ICpyRepository.calculateUUID("COPY40")));
         LOG.debug(String.format("Cache content : %s", databus.printCache()));
         Optional<CpyStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
         LOG.debug(String.format("Least Recently Used item : %s  ID : %d", leastRecentlyUsed.get().getName(), leastRecentlyUsed.get().getId()));
         //Cache is Full
         LOG.debug(String.format("Cache STATUS --> MaxCacheSize: %d  ActualCacheSize: %d", databus.getCacheMaxSize(), databus.cacheSize()));
-        LOG.debug(String.format("Retrieving not existent item %s will throw NoSuchElementException ", "COPY20"));
-        databus.getData(ICpyRepository.calculateUUID("COPY20")).getName().equalsIgnoreCase("COPY20");
+        LOG.debug(String.format("Retrieving item %s ", "COPY40"));
+        Assert.assertTrue(databus.getData(ICpyRepository.calculateUUID("COPY40")).getName().equalsIgnoreCase("COPY40"));
+        LOG.debug(String.format("Element Retrieved : %s",databus.getData(ICpyRepository.calculateUUID("COPY40"))));
+        LOG.debug(String.format("Cache content : %s", databus.printCache()));
     }
 }
