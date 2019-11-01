@@ -15,35 +15,71 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
-import com.ca.lsp.core.cobol.params.CobolParserParams;
+import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
+import com.ca.lsp.core.cobol.model.Position;
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
+import com.google.common.collect.Multimap;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class CopybookParallelAnalysis implements CopybookAnalysis {
+  private static final int SEVERITY_LEVEL = 1; // error level
+  private static final String ERROR_SUGGESTION = "Copybook not found";
+  private List<SyntaxError> copybookErrors = new ArrayList<>();
+
+  @Override
+  public List<SyntaxError> getCopybookErrors() {
+    return copybookErrors;
+  }
 
   @Override
   public List<SemanticContext> analyzeCopybooks(
-      Collection<String> names,
-      CobolPreprocessor.CobolSourceFormatEnum format,
-      CobolParserParams params) {
-    return ForkJoinTask.invokeAll(createTasks(names, format, params))
-        .stream() // TODO:add filtration to avoid duplication of requests to workspace service for
-                  // copybooks with the same names / Low priority
-        .map(ForkJoinTask::join)
+      Multimap<String, Position> copybooks, CobolPreprocessor.CobolSourceFormatEnum format) {
+    List<CopybookSemanticContext> contexts =
+        ForkJoinTask.invokeAll(createTasks(copybooks.keySet(), format)).stream()
+            .map(ForkJoinTask::join)
+            .collect(Collectors.toList());
+
+    contexts.stream()
+        .filter(it -> it.getContext() == null)
+        .map(CopybookSemanticContext::getName)
+        .forEach(defineErrors(copybooks));
+
+    return contexts.stream()
+        .map(CopybookSemanticContext::getContext)
+        .filter(Objects::nonNull)
         .collect(Collectors.toList());
   }
 
-  private List<ForkJoinTask<SemanticContext>> createTasks(
-      Collection<String> names,
-      CobolPreprocessor.CobolSourceFormatEnum format,
-      CobolParserParams params) {
+  @NotNull
+  private Consumer<String> defineErrors(Multimap<String, Position> copybooks) {
+    return copybookName -> copybooks.get(copybookName).forEach(defineError());
+  }
+
+  @NotNull
+  private Consumer<Position> defineError() {
+    return position ->
+        copybookErrors.add(
+            SyntaxError.syntaxerror()
+                .position(position)
+                .severity(SEVERITY_LEVEL)
+                .suggestion(ERROR_SUGGESTION)
+                .build());
+  }
+
+  private List<ForkJoinTask<CopybookSemanticContext>> createTasks(
+      Set<String> names, CobolPreprocessor.CobolSourceFormatEnum format) {
     return names.stream()
-        .map(it -> new AnalyseCopybookTask(it, params, format))
+        .map(it -> new AnalyseCopybookTask(it, format))
         .collect(Collectors.toList());
   }
 }
