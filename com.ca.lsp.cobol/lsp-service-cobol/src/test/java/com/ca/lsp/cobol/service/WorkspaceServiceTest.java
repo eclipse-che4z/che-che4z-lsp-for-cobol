@@ -18,6 +18,7 @@ package com.ca.lsp.cobol.service;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.cdi.module.service.ServiceModule;
+import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 
 @Slf4j
@@ -53,7 +55,7 @@ public class WorkspaceServiceTest {
   private static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
 
   private URI workspaceFolderPath = null;
-  private Path innerCopybooksPath;
+  private Path innerCopybooksPath = null;
   private static CobolWorkspaceServiceImpl cobolWorkspaceService;
 
   @BeforeClass
@@ -90,8 +92,8 @@ public class WorkspaceServiceTest {
     */
     Path workspacePath = createPathOfName(WS_FOLDER_NAME, Optional.empty());
     Path copybooksPath = createPathOfName(CPYB_FOLDER_NAME, Optional.of(workspacePath));
-    innerCopybooksPath = createPathOfName(CPYB_INNER_NAME, Optional.of(copybooksPath));
     Path cpyFilePath = createPathOfName(CPY_OUTER_FILE_NAME_WITH_EXT, Optional.of(copybooksPath));
+    innerCopybooksPath = createPathOfName(CPYB_INNER_NAME, Optional.of(copybooksPath));
 
     // create two cpy files
     createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath);
@@ -125,6 +127,19 @@ public class WorkspaceServiceTest {
   @Test
   public void getContentByCopybookName() {
     assertTrue(cobolWorkspaceService.getContentByCopybookName(CPY_OUTER_NAME_ONLY).length() > 0);
+  }
+
+  @Test
+  public void testGetUriByCopyBookName() {
+    assertNotNull(cobolWorkspaceService.getURIByCopybookName(CPY_OUTER_NAME_ONLY));
+  }
+
+  @Test
+  public void testDataSentOnDatabus() {
+    String copybookContent = cobolWorkspaceService.getContentByCopybookName(CPY_OUTER_NAME_ONLY);
+    CblFetchEvent cblFetchEvent =
+        CblFetchEvent.builder().name(CPY_OUTER_NAME_ONLY).content(copybookContent).build();
+    assertTrue(cblFetchEvent.getName().length() > 0 && cblFetchEvent.getContent().length() > 0);
   }
 
   private URI getWorkspaceFolderPath() {
