@@ -23,21 +23,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-public interface CobolWorkspaceService extends org.eclipse.lsp4j.services.WorkspaceService, IDataBusObserver<CblScanEvent> {
-  /**
-   * From a given copybook name (without file extension) this method will return the URI of the file
-   * - if exists
-   *
-   * @param fileName (i.e. COPYTEST)
-   * @return URI of file (i.e. file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy) or
-   *     null if didn't found. This case should be covered by an appropriate diagnostic message
-   *     using the Communication service delegate object
-   */
-  Path getURIByFileName(String fileName);
+public interface CobolWorkspaceService
+    extends org.eclipse.lsp4j.services.WorkspaceService, IDataBusObserver<CblScanEvent> {
 
-  String getContentByURI(String copybookName) throws IOException;
+  Path getURIByCopybookName(String fileName);
 
-  List<WorkspaceFolder> getWorkspaceFolders();
+  String getContentByCopybookName(String copybookName) throws IOException;
 
   void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders);
 }

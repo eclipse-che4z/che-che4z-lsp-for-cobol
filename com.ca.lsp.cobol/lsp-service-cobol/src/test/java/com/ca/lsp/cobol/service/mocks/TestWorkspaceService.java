@@ -1,7 +1,9 @@
 package com.ca.lsp.cobol.service.mocks;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.*;
+import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
+import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
+import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.positive.CobolTextRegistry;
 import com.ca.lsp.cobol.service.CobolWorkspaceService;
@@ -15,8 +17,8 @@ import java.util.List;
 
 public class TestWorkspaceService implements CobolWorkspaceService {
 
-  private CobolTextRegistry registry;
-  private DefaultDataBusBroker dataBus;
+  private final CobolTextRegistry registry;
+  private final DefaultDataBusBroker dataBus;
 
   @Inject
   public TestWorkspaceService(CobolTextRegistry registry, DefaultDataBusBroker dataBus) {
@@ -26,12 +28,12 @@ public class TestWorkspaceService implements CobolWorkspaceService {
   }
 
   @Override
-  public Path getURIByFileName(String fileName) {
+  public Path getURIByCopybookName(String fileName) {
     return null;
   }
 
   @Override
-  public String getContentByURI(String copybookName) {
+  public String getContentByCopybookName(String copybookName) {
     return registry.getCopybooks().stream()
         .filter(it -> it.getFileName().equals(copybookName + ".cpy"))
         .map(CobolText::getText)
@@ -40,14 +42,7 @@ public class TestWorkspaceService implements CobolWorkspaceService {
   }
 
   @Override
-  public List<WorkspaceFolder> getWorkspaceFolders() {
-    return null;
-  }
-
-  @Override
-  public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
-
-  }
+  public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {}
 
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams didChangeConfigurationParams) {}
@@ -55,14 +50,13 @@ public class TestWorkspaceService implements CobolWorkspaceService {
   @Override
   public void didChangeWatchedFiles(DidChangeWatchedFilesParams didChangeWatchedFilesParams) {}
 
-
   @Override
   public void observerCallback(CblScanEvent event) {
     if (!event.getEventType().equals(DataEventType.CBLSCAN_EVENT)) {
       return;
     }
     String name = event.getName();
-    String content = getContentByURI(name);
+    String content = getContentByCopybookName(name);
     dataBus.postData(CblFetchEvent.builder().name(name).content(content).build());
   }
 }
