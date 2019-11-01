@@ -35,7 +35,7 @@ import java.util.Optional;
  * Created on 2019-10-02
  */
 @Slf4j
-public class DataBusStoreHappyTest extends AbsDataBusImplTest {
+public class DataBusGetFromCacheHappyTest extends AbsDataBusImplTest {
 
     private DefaultDataBusBroker databus;
 
@@ -87,24 +87,16 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
 
     @Test
     @SneakyThrows
-    public void cacheData() {
-        Assert.assertFalse(databus.isStored(ICpyRepository.calculateUUID(new StringBuilder("COPY20"))));
+    public void getData() {
+        Assert.assertTrue(databus.isStored(ICpyRepository.calculateUUID("COPY40")));
         LOG.debug(String.format("Cache content : %s", databus.printCache()));
         Optional<CpyStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
         LOG.debug(String.format("Least Recently Used item : %s  ID : %d", leastRecentlyUsed.get().getName(), leastRecentlyUsed.get().getId()));
         //Cache is Full
         LOG.debug(String.format("Cache STATUS --> MaxCacheSize: %d  ActualCacheSize: %d", databus.getCacheMaxSize(), databus.cacheSize()));
-        Assert.assertEquals(databus.getCacheMaxSize(), databus.cacheSize());
-        LOG.debug(String.format("Storing new item %s ", "COPY20"));
-        databus.storeData(CpyStorable.builder()
-                .name("COPY20")
-                .content("FASDFASDFSF")
-                .position("ROW:3,COL:4")
-                .uri("/var/tmp/worspace1")
-                .build());
-        Assert.assertTrue(databus.isStored(ICpyRepository.calculateUUID(new StringBuilder("COPY20"))));
-        //Swapped
-        Assert.assertEquals(databus.getCacheMaxSize(), databus.cacheSize());
+        LOG.debug(String.format("Retrieving item %s ", "COPY40"));
+        Assert.assertTrue(databus.getData(ICpyRepository.calculateUUID("COPY40")).getName().equalsIgnoreCase("COPY40"));
+        LOG.debug(String.format("Element Retrieved : %s",databus.getData(ICpyRepository.calculateUUID("COPY40"))));
         LOG.debug(String.format("Cache content : %s", databus.printCache()));
     }
 }

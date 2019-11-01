@@ -28,6 +28,7 @@ import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 
+import java.util.Comparator;
 import java.util.Optional;
 
 /**
@@ -36,18 +37,20 @@ import java.util.Optional;
 @Slf4j
 @Singleton
 public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBusBroker<T, S> {
+    @NonNull
+    private CpyRepositoryLRU cpyRepo;
 
     @Inject
-    public DefaultDataBusBroker(@Named("ASYNC-MESS-DISPATCHER") int nthread, CpyRepository cpyRepo) {
-        super(nthread, cpyRepo);
+    public DefaultDataBusBroker(@Named("ASYNC-MESS-DISPATCHER") int nthread, CpyRepositoryLRU cpyRepo) {
+        super(nthread);
+        this.cpyRepo = cpyRepo;
     }
 
-    /**
-     * Compares its two arguments for order.  Returns a negative integer,
-     * zero, or a positive integer as the first argument is less than, equal
-     * to, or greater than the second.<p>
-     **/
-
+    @Override
+    @SneakyThrows
+    protected CpyRepositoryLRU getCpyRepo() {
+        return cpyRepo;
+    }
 
     @Override
     @SneakyThrows
@@ -82,53 +85,33 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
     @Override
     @SneakyThrows
     @Synchronized
-    public CpyStorable storeData(@NonNull CpyStorable dataEvent) {
-        if (!dataEvent.getClass().toString().equals(CpyStorable.class.toString()))
-            throw new ClassCastException(String.format("Required %s Type not satisfied, found %s", CpyStorable.class, dataEvent.getClass()));
-        CpyStorable deepcopy = SerializationUtils.clone(dataEvent);
+    public CpyStorable storeData(@NonNull CpyStorable storable) {
+        CpyStorable deepcopy = SerializationUtils.clone(storable);
         if (!isStored(deepcopy.getId()))
-            swapAndStore(deepcopy);
+            getCpyRepo().persist(deepcopy);
         getCpyRepo().setSort(false);
-        return dataEvent;
+        return storable;
     }
 
     @Override
     @SneakyThrows
-    protected void swapAndStore(@NonNull CpyStorable deepcopy) {
-        if (getCpyRepo().getCache().size() < getCpyRepo().getCacheMaxSize()) {
-            getCpyRepo().getCache().add(deepcopy);
-            return;
-        }
-        getCpyRepo().getCache()
-                .remove(getCpyRepo().getCache().size() - 1);
-        getCpyRepo().getCache()
-                .add(deepcopy);
+    public CpyStorable getData(@NonNull long uuid) {
+        return getCpyRepo().getCpyStorableCache(uuid).get();
     }
 
     @Override
     @SneakyThrows
-    public boolean isStored(@NonNull StringBuilder id) {
-        long uuid = CpyStorable.calculateUUID(id);
-        return isStored(uuid);
+    public boolean isStored(@NonNull long uuid) {
+        return getCpyRepo().isStored(uuid);
     }
 
-    @Override
     @SneakyThrows
-    public boolean isStored(@NonNull String id) {
-        long uuid = CpyStorable.calculateUUID(id);
-        return isStored(uuid);
+    public Optional<CpyStorable> lastRecentlyUsed() {
+        return getCpyRepo().topItem();
     }
 
-    @Override
     @SneakyThrows
-    public boolean isStored(long uuid) {
-        Optional<CpyStorable> cpy = getCpyRepo().getCache().stream()
-                .filter(copy -> uuid == copy.getId())
-                .findAny();
-        if (cpy.isPresent()) {
-            cpy.get().match();
-            getCpyRepo().setSort(false);
-        }
-        return cpy.isPresent();
+    public Optional<CpyStorable> leastRecentlyUsed() {
+        return getCpyRepo().lastItem();
     }
 }

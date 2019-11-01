@@ -16,6 +16,7 @@
 
 package com.broadcom.lsp.domain.cobol.model;
 
+import com.broadcom.lsp.domain.cobol.databus.api.ICpyRepository;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -24,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -50,20 +50,8 @@ public class CpyStorable implements Serializable {
         this.position = position;
         this.uri = uri;
         this.content = content;
-        this.id = calculateUUID(new StringBuilder()
+        this.id = ICpyRepository.calculateUUID(new StringBuilder()
                 .append(name));
-    }
-
-    @SneakyThrows
-    public static long calculateUUID(@NonNull StringBuilder uuid) {
-        return UUID.nameUUIDFromBytes(uuid.toString().getBytes())
-                .getMostSignificantBits();
-    }
-
-    @SneakyThrows
-    public static long calculateUUID(@NonNull String uuid) {
-        return UUID.nameUUIDFromBytes(uuid.getBytes())
-                .getMostSignificantBits();
     }
 
     @SneakyThrows
