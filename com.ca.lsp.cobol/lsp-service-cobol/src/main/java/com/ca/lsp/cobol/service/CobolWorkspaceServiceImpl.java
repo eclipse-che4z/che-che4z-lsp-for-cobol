@@ -23,15 +23,16 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -42,15 +43,9 @@ import java.util.stream.Stream;
 @Slf4j
 @Singleton
 public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
-
   private final ExecutorService threadPool;
   private final DefaultDataBusBroker<CblFetchEvent, CblScanEvent> dataBus;
-  private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
-  private static final String URI_FILE_SEPARATOR = "/";
-  private List<Path> copybookPathsList;
-  private final List<File> copybookFileList = new ArrayList<>();
   private List<WorkspaceFolder> workspaceFolders;
-  private Path pathFileFound = null;
 
   @Inject
   public CobolWorkspaceServiceImpl(DefaultDataBusBroker dataBus) {
@@ -77,88 +72,40 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   }
 
   /**
-   * Search in a list of given URI paths the presence of copybooks in order to create a list of
-   * files for each workspace folder found.
-   *
-   * @param workspaceFolders list of URI paths
+   * @param copybookName (i.e. COPYTEST)
+   * @return String that represent the content of a found copybook under the workspace folder or
+   *     null if copybook is not found
    */
-  void scanWorkspaceForCopybooks(List<WorkspaceFolder> workspaceFolders) {
-    setWorkspaceFolders(workspaceFolders);
-    getWorkspaceFolders().forEach(this::generateCopybookFileList);
-  }
-
-  /** @return List of copybooks */
-  List<Path> getCopybookPathsList() {
-    return copybookPathsList;
-  }
-
   @Override
-  public Path getURIByFileName(String fileName) {
-    // define the list of file that will be used for the search
-    getWorkspaceFolders()
-        .forEach(
-            workspaceFolder ->
-                createFileAndPushInList(
-                    workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME));
-
-    copybookFileList.forEach(file -> searchInDirectory(fileName, file.toPath()));
-    return pathFileFound;
-  }
-
-  private void searchInDirectory(String fileName, Path workspaceFolderPath) {
-    try (Stream<Path> stream =
-        Files.find(
-            workspaceFolderPath,
-            100,
-            (path, basicFileAttributes) -> {
-              File resFile = path.toFile();
-              return resFile.isFile()
-                  && !resFile.isDirectory()
-                  && resFile.getName().contains(fileName);
-            })) {
-      stream.findFirst().ifPresent(path -> pathFileFound = path);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private void createFileAndPushInList(String uri) {
-    try {
-      copybookFileList.add(new File(new URI(uri)));
-    } catch (URISyntaxException e) {
-      log.error(Arrays.toString(e.getStackTrace()));
-    }
-  }
-
-  @Override
-  public String getContentByURI(String copybookName) throws IOException {
-    Path uriForFileName = getURIByFileName(copybookName);
-    return Files.lines(uriForFileName).reduce((s1, s2) -> s1 + "\r\n" + s2).orElse("");
+  public String getContentByCopybookName(String copybookName) {
+    Path uriForFileName;
+    return (uriForFileName = getURIByCopybookName(copybookName)) != null
+        ? getContentFromCopybook(uriForFileName)
+        : null;
   }
 
   /**
-   * Create a list of Files for each copybook found in a specific folder under the workspace
+   * From a given copybook name (without file extension) this method will return the URI of the file
+   * * - if exists
    *
-   * @param workspaceFolder is the folder sent from the client (represent the rootFolder of the
-   *     workspace opened in the client)
+   * @param fileName (i.e. COPYTEST)
+   * @return URI of file (i.e. file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy) or *
+   *     null if didn't found. This case should be covered by an appropriate diagnostic message *
+   *     using the Communication service delegate object
    */
-  private void generateCopybookFileList(WorkspaceFolder workspaceFolder) {
-    copybookPathsList = new ArrayList<>();
-    try (Stream<Path> copybookFoldersStream =
-        Files.list(
-            Paths.get(
-                new URI(workspaceFolder.getUri() + URI_FILE_SEPARATOR + COPYBOOK_FOLDER_NAME)))) {
-      copybookFoldersStream.forEach(copybookPathsList::add);
-    } catch (URISyntaxException | IOException e) {
-      log.error(e.getMessage());
-    }
-  }
-
   @Override
-  public List<WorkspaceFolder> getWorkspaceFolders() {
-    return workspaceFolders;
+  public Path getURIByCopybookName(String fileName) {
+    return getWorkspaceFolders().stream()
+        .map(workspaceFolder -> searchCopybookInWorkspaceFolder(fileName, workspaceFolder))
+        .findAny()
+        .orElse(null);
   }
 
+  /**
+   * Store the informations about the workspace folder defined by the client IDE
+   *
+   * @param workspaceFolders list of workspace folders sent by the client to the server
+   */
   @Override
   public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
     this.workspaceFolders = workspaceFolders;
@@ -170,13 +117,71 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
     threadPool.submit(
         () -> {
           String name = event.getName();
-          String content = null;
-          try {
-            content = getContentByURI(name);
-          } catch (IOException e) {
-            log.error(Arrays.toString(e.getStackTrace()));
-          }
+          String content;
+          content = getContentByCopybookName(name);
           dataBus.postData(CblFetchEvent.builder().name(name).content(content).build());
         });
+  }
+
+  /**
+   * @param uriForFileName of copybook found under workspace folder
+   * @return content of the file as String content
+   */
+  @Nullable
+  private String getContentFromCopybook(Path uriForFileName) {
+    String content = null;
+    try (Stream<String> stream = Files.lines(uriForFileName)) {
+      content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse(null);
+    } catch (IOException e) {
+      log.error(Arrays.toString(e.getStackTrace()));
+    }
+    return content;
+  }
+
+  /**
+   * @param fileName name provided by preprocessor
+   * @param workspaceFolder NIO Path of workspace folder
+   * @return a valid path of the copybook file or null if not found
+   */
+  @Nullable
+  private Path searchCopybookInWorkspaceFolder(String fileName, WorkspaceFolder workspaceFolder) {
+    Path result = null;
+    try {
+      result = searchInDirectory(fileName, Paths.get(new URI(workspaceFolder.getUri())));
+    } catch (URISyntaxException e) {
+      log.error(Arrays.toString(e.getStackTrace()));
+    }
+    return result;
+  }
+
+  /**
+   * Delegated method to search in directory
+   *
+   * @param fileName name provided by preprocessor
+   * @param workspaceFolderPath NIO Path of workspace folder
+   * @return a valid path of the copybook file or null if not found
+   */
+  private Path searchInDirectory(String fileName, Path workspaceFolderPath) {
+    Path pathFileFound = null;
+    try (Stream<Path> stream =
+        Files.find(
+            workspaceFolderPath,
+            100,
+            (path, basicFileAttributes) -> {
+              File resFile = path.toFile();
+              return resFile.isFile()
+                  && !resFile.isDirectory()
+                  && resFile.getName().toLowerCase().contains(fileName.toLowerCase());
+            },
+            FileVisitOption.FOLLOW_LINKS)) {
+      pathFileFound = stream.findFirst().orElse(null);
+    } catch (IOException e) {
+      log.error(Arrays.toString(e.getStackTrace()));
+    }
+    return pathFileFound;
+  }
+
+  private List<WorkspaceFolder> getWorkspaceFolders() {
+    return workspaceFolders;
   }
 }
