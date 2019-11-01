@@ -22,6 +22,8 @@ import com.google.inject.ImplementedBy;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
+import java.util.UUID;
+
 /**
  * Created on 31/10/2019
  */
@@ -30,6 +32,21 @@ import lombok.SneakyThrows;
 public interface ICpyRepository {
     @SneakyThrows
     void sortCache();
+
+    @SneakyThrows
+    static long calculateUUID(@NonNull StringBuilder uuid) {
+        return UUID.nameUUIDFromBytes(uuid.toString().getBytes())
+                .getMostSignificantBits();
+    }
+
+    @SneakyThrows
+    static long calculateUUID(@NonNull String uuid) {
+        return UUID.nameUUIDFromBytes(uuid.getBytes())
+                .getMostSignificantBits();
+    }
+
+    @SneakyThrows
+    void setSort(boolean isSort);
 
     @SneakyThrows
     void persist(@NonNull CpyStorable deepcopy);

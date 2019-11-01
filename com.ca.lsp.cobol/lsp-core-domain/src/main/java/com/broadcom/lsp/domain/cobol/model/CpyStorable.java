@@ -16,7 +16,7 @@
 
 package com.broadcom.lsp.domain.cobol.model;
 
-import com.broadcom.lsp.domain.cobol.databus.impl.CpyRepositoryLRU;
+import com.broadcom.lsp.domain.cobol.databus.api.ICpyRepository;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -50,7 +50,7 @@ public class CpyStorable implements Serializable {
         this.position = position;
         this.uri = uri;
         this.content = content;
-        this.id = CpyRepositoryLRU.calculateUUID(new StringBuilder()
+        this.id = ICpyRepository.calculateUUID(new StringBuilder()
                 .append(name));
     }
 

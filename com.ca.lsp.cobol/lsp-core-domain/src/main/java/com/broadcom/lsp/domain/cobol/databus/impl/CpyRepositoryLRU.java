@@ -81,23 +81,14 @@ public class CpyRepositoryLRU implements ICpyRepository {
         return cpy ;
     }
 
+    @Override
     @SneakyThrows
     public void setSort(boolean isSort) {
         this.isSort.set(isSort);
     }
 
-    @SneakyThrows
-    public static long calculateUUID(@NonNull StringBuilder uuid) {
-        return UUID.nameUUIDFromBytes(uuid.toString().getBytes())
-                .getMostSignificantBits();
-    }
 
-    @SneakyThrows
-    public static long calculateUUID(@NonNull String uuid) {
-        return UUID.nameUUIDFromBytes(uuid.getBytes())
-                .getMostSignificantBits();
-    }
-
+    @Override
     @SneakyThrows
     public void persist(@NonNull CpyStorable deepcopy) {
         if (!isStored(deepcopy.getId())){
@@ -112,6 +103,7 @@ public class CpyRepositoryLRU implements ICpyRepository {
         }
     }
 
+    @Override
     @SneakyThrows
     public String logContent() {
         StringBuilder chars = new StringBuilder();
@@ -119,6 +111,7 @@ public class CpyRepositoryLRU implements ICpyRepository {
         return chars.toString();
     }
 
+    @Override
     @SneakyThrows
     public int size() {
         return cpyRepo.size();
@@ -138,14 +131,14 @@ public class CpyRepositoryLRU implements ICpyRepository {
     @Override
     @SneakyThrows
     public boolean isStored(@NonNull StringBuilder id) {
-        long uuid = CpyRepositoryLRU.calculateUUID(id);
+        long uuid = ICpyRepository.calculateUUID(id);
         return isStored(uuid);
     }
 
     @Override
     @SneakyThrows
     public boolean isStored(@NonNull String id) {
-        long uuid = CpyRepositoryLRU.calculateUUID(id);
+        long uuid = ICpyRepository.calculateUUID(id);
         return isStored(uuid);
     }
 
