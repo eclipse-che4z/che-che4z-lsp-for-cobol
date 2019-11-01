@@ -34,6 +34,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author teman02
  */
+
 @RunWith(Parameterized.class)
 public class PositiveTest extends ConfigurableTest {
   private CobolText text;
@@ -57,7 +58,7 @@ public class PositiveTest extends ConfigurableTest {
   public void test() {
     TestLanguageClient client = startServerAndRunValidation(text.getText());
 
-    waitForDiagnostics(client);
+    waitForDiagnostics(client, text.getFileName());
 
     assertNoSyntaxErrorsFound(client);
   }

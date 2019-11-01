@@ -48,10 +48,10 @@ public class UseCaseUtils {
    */
   public static TestLanguageClient startServerAndRunValidation(String text) {
     TestLanguageClient client =
-            (TestLanguageClient) LangServerCtx.getInjector().getInstance(LanguageClient.class);
+        (TestLanguageClient) LangServerCtx.getInjector().getInstance(LanguageClient.class);
     client.clean();
     TextDocumentService service =
-            LangServerCtx.getInjector().getInstance(TextDocumentService.class);
+        LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     runTextValidation(service, text);
     return client;
   }
@@ -77,7 +77,21 @@ public class UseCaseUtils {
    *     Should return false if result has not appeared.
    */
   public static void await(Callable<Boolean> checker) {
-    await(checker, MAX_TIME_TO_WAIT);
+    await(checker, MAX_TIME_TO_WAIT, "");
+  }
+
+  /**
+   * Await when the client will receive the needed message. Uses Supplier to check if the event
+   * occurred. WARNING: use only in the thread that has been used to run the server. This
+   * implementation uses the default time to await. Checker example: await( () -> { return
+   * !client.getReceivedDiagnostics().isEmpty(); });
+   *
+   * @param checker - Lambda returning boolean, that will be used to check if the event occurred.
+   *     Should return false if result has not appeared.
+   * @param description - the TestLanguageClient that should receive the diagnostics
+   */
+  public static void await(Callable<Boolean> checker, String description) {
+    await(checker, MAX_TIME_TO_WAIT, description);
   }
 
   /**
@@ -88,9 +102,13 @@ public class UseCaseUtils {
    * @param checker - Lambda returning boolean, that will be used to check if the event occurred.
    *     Should return false if result has not appeared.
    * @param time - the maximum time to wait
+   * @param description - the TestLanguageClient that should receive the diagnostics
    */
-  public static void await(Callable<Boolean> checker, Long time) {
-    Awaitility.await().pollDelay(TIME_TO_POLL, TIME_UNIT).atMost(time, TIME_UNIT).until(checker);
+  public static void await(Callable<Boolean> checker, Long time, String description) {
+    Awaitility.await(description)
+        .pollDelay(TIME_TO_POLL, TIME_UNIT)
+        .atMost(time, TIME_UNIT)
+        .until(checker);
   }
 
   /**
@@ -100,6 +118,17 @@ public class UseCaseUtils {
    * @param client - the TestLanguageClient that should receive the diagnostics
    */
   public static void waitForDiagnostics(TestLanguageClient client) {
-    await(() -> !client.getReceivedDiagnostics().isEmpty());
+    await(() -> !client.getReceivedDiagnostics().isEmpty(), "");
+  }
+
+  /**
+   * Await when the client will receive the diagnostics in case if there are some syntax or format
+   * errors.
+   *
+   * @param client - the TestLanguageClient that should receive the diagnostics
+   * @param description - the TestLanguageClient that should receive the diagnostics
+   */
+  public static void waitForDiagnostics(TestLanguageClient client, String description) {
+    await(() -> !client.getReceivedDiagnostics().isEmpty(), description);
   }
 }
