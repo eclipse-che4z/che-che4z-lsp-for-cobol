@@ -13,13 +13,12 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl;
 
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CHAR_ASTERISK;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CHAR_DOLLAR_SIGN;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CHAR_D_LOWER;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CHAR_D_UPPER;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CHAR_MINUS;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CHAR_SLASH;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
+import com.ca.lsp.core.cobol.params.CobolParserParams;
+import com.ca.lsp.core.cobol.parser.listener.FormatListener;
+import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
+import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +26,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.ca.lsp.core.cobol.params.CobolParserParams;
-import com.ca.lsp.core.cobol.parser.listener.FormatListener;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
-import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
-import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 
 public class CobolLineReaderImpl implements CobolLineReader {
   private static final int INDICATOR_AREA_INDEX = 6;
@@ -159,6 +153,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
   private void registerFormatError(
       int lineNumber, final CobolSourceFormatEnum format, int charPosition, int errorLength) {
+    if (listener == null) return;
     listener.syntaxError(
         lineNumber + 1,
         charPosition,

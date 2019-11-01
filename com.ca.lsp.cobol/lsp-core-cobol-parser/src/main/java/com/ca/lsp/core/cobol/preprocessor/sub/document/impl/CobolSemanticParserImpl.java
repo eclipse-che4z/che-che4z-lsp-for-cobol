@@ -13,28 +13,28 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import com.ca.lsp.core.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
+import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.params.CobolParserParams;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
+import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
+import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookAnalysis;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookParallelAnalysis;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
+import com.google.common.collect.Multimap;
 import lombok.AllArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import com.ca.lsp.core.cobol.params.CobolParserParams;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
-import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Preprocessor, which parses and processes COPY REPLACE and EXEC SQL statements. */
 @AllArgsConstructor
@@ -91,13 +91,13 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   private PreprocessedInput processWithParser(
       final String code, final CobolSourceFormatEnum format, final CobolParserParams params) {
     // run the lexer
-    List<SyntaxError> generalErrors = new ArrayList<>();
+    List<SyntaxError> errors = new ArrayList<>();
     final CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
 
     if (!params.getIgnoreSyntaxErrors()) {
       // register an error listener, so that preprocessing stops on errors
       lexer.removeErrorListeners();
-      lexer.addErrorListener(new VerboseListener(generalErrors));
+      lexer.addErrorListener(new VerboseListener(errors));
     }
 
     // get a list of matched tokens
@@ -108,7 +108,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     if (!params.getIgnoreSyntaxErrors()) {
       // register an error listener, so that preprocessing stops on errors
       parser.removeErrorListeners();
-      parser.addErrorListener(new VerboseListener(generalErrors));
+      parser.addErrorListener(new VerboseListener(errors));
     }
 
     // specify our entry point
@@ -119,17 +119,24 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
         createDocumentParserListener(tokens, semanticContext);
 
     walker.walk(listener, startRule);
-    // in this section the engine will apply a semantic logic to understand the level of grouping of
-    // data
-    Collection<String> copybookNames = semanticContext.getCopybooks().getAll();
+    processCopybooks(format, params, errors);
 
-    CopybookAnalysis copybookAnalyzer = createCopybookAnalyzer();
-    List<SemanticContext> contexts =
-        copybookAnalyzer.analyzeCopybooks(copybookNames, format, params);
-
-    contexts.forEach(it -> semanticContext.merge(it));
     semanticContext.getVariables().createRelationBetweenVariables();
     return new PreprocessedInput(listener.context().read(), semanticContext);
+  }
+
+  private void processCopybooks(
+      CobolSourceFormatEnum format, CobolParserParams params, List<SyntaxError> errors) {
+    Multimap<String, Position> copybookNames = semanticContext.getCopybooks().getDefinitions();
+    if (copybookNames.isEmpty()) {
+      return;
+    }
+    CopybookAnalysis copybookAnalyzer = createCopybookAnalyzer();
+    if (!params.getIgnoreSyntaxErrors()) {
+      errors.addAll(copybookAnalyzer.getCopybookErrors());
+    }
+    List<SemanticContext> contexts = copybookAnalyzer.analyzeCopybooks(copybookNames, format);
+    contexts.forEach(it -> semanticContext.merge(it));
   }
 
   private CobolSemanticParserListener createDocumentParserListener(

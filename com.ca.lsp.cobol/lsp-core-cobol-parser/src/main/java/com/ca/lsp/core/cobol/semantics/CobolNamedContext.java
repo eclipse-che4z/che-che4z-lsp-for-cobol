@@ -19,47 +19,38 @@ package com.ca.lsp.core.cobol.semantics;
 import com.ca.lsp.core.cobol.model.Position;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import lombok.Getter;
 
 import java.util.Collection;
 
 class CobolNamedContext implements SubContext<String> {
 
-  private Multimap<String, Position> namedDefinitions = HashMultimap.create();
-  private Multimap<String, Position> namedUsages = HashMultimap.create();
+  @Getter private Multimap<String, Position> definitions = HashMultimap.create();
+  @Getter private Multimap<String, Position> usages = HashMultimap.create();
 
   @Override
   public void define(String paragraph, Position position) {
-    namedDefinitions.put(paragraph, position);
+    definitions.put(paragraph, position);
   }
 
   @Override
   public void addUsage(String paragraph, Position position) {
-    namedUsages.put(paragraph, position);
+    usages.put(paragraph, position);
   }
 
   @Override
   public Collection<String> getAll() {
-    return namedDefinitions.keySet();
+    return definitions.keySet();
   }
 
   @Override
   public boolean contains(String name) {
-    return namedDefinitions.containsKey(name);
-  }
-
-  @Override
-  public Multimap<String, Position> getUsages() {
-    return namedDefinitions;
+    return definitions.containsKey(name);
   }
 
   @Override
   public void merge(SubContext<String> subContext) {
-    namedDefinitions.putAll(subContext.getDefinitions());
-    namedUsages.putAll(subContext.getUsages());
-  }
-
-  @Override
-  public Multimap<String, Position> getDefinitions() {
-    return namedUsages;
+    definitions.putAll(subContext.getDefinitions());
+    usages.putAll(subContext.getUsages());
   }
 }
