@@ -39,56 +39,10 @@ import java.util.List;
 /** Preprocessor, which parses and processes COPY REPLACE and EXEC SQL statements. */
 @AllArgsConstructor
 public class CobolSemanticParserImpl implements CobolSemanticParser {
-  // TODO: remove triggering
   private SemanticContext semanticContext;
-  private static final String[] TRIGGERS =
-      new String[] {
-        "cbl",
-        "copy",
-        "exec sql",
-        "exec sqlims",
-        "exec cics",
-        "process",
-        "replace",
-        "eject",
-        "skip1",
-        "skip2",
-        "skip3",
-        "title"
-      };
 
   @Override
   public PreprocessedInput processLines(
-      final String code, final CobolSourceFormatEnum format, final CobolParserParams params) {
-    final boolean requiresProcessorExecution = containsTrigger(code, TRIGGERS);
-    final PreprocessedInput result;
-
-    if (requiresProcessorExecution) {
-      result = processWithParser(code, format, params);
-    } else {
-      result = new PreprocessedInput(code, semanticContext);
-    }
-
-    return result;
-  }
-
-  private boolean containsTrigger(final String code, final String[] triggers) {
-    final String codeLowerCase = code.toLowerCase();
-    boolean result = false;
-
-    for (final String trigger : triggers) {
-      final boolean containsTrigger = codeLowerCase.contains(trigger);
-
-      if (containsTrigger) {
-        result = true;
-        break;
-      }
-    }
-
-    return result;
-  }
-
-  private PreprocessedInput processWithParser(
       final String code, final CobolSourceFormatEnum format, final CobolParserParams params) {
     // run the lexer
     List<SyntaxError> errors = new ArrayList<>();
