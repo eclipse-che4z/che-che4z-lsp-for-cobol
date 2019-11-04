@@ -39,7 +39,6 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private static final String LANGUAGE = "COBOL";
   private static final String DOCUMENT_URI = "1";
-  private static final String CLOSED_DOCUMENT_URI = "2";
   private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
   private TextDocumentService service;
@@ -151,17 +150,11 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   @Test
   public void testDidClose() {
-    openDocument(service);
-    TextDocumentIdentifier testDocument = new TextDocumentIdentifier(CLOSED_DOCUMENT_URI);
+    assertEquals(1, closeGetter(service).size());
+    TextDocumentIdentifier testDocument = new TextDocumentIdentifier(DOCUMENT_URI);
     DidCloseTextDocumentParams closedDocument = new DidCloseTextDocumentParams(testDocument);
     service.didClose(closedDocument);
     assertEquals(Collections.EMPTY_MAP, closeGetter(service));
-  }
-
-  private void openDocument(TextDocumentService service) {
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(CLOSED_DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
   }
 
   private Map<String, MyDocumentModel> closeGetter(TextDocumentService service) {
@@ -170,8 +163,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   @Test
   public void testDidSave() {
-    openDocument(service);
-    TextDocumentIdentifier saveDocumentIdentifier = new TextDocumentIdentifier(CLOSED_DOCUMENT_URI);
+    TextDocumentIdentifier saveDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
     DidSaveTextDocumentParams saveDocumentParams =
         new DidSaveTextDocumentParams(saveDocumentIdentifier);
     service.didSave(saveDocumentParams);
