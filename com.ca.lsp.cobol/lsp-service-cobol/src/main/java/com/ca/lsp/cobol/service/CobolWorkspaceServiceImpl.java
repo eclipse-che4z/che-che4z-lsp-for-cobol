@@ -33,6 +33,7 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -95,10 +96,38 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    */
   @Override
   public Path getURIByCopybookName(String fileName) {
-    return getWorkspaceFolders().stream()
-        .map(workspaceFolder -> searchCopybookInWorkspaceFolder(fileName, workspaceFolder))
-        .findAny()
-        .orElse(null);
+
+    List<Path> paths = new ArrayList<>();
+    for (WorkspaceFolder workspaceFolder : workspaceFolders) {
+      try {
+        Path path = searchInDirectory(fileName, Paths.get(new URI(workspaceFolder.getUri())));
+        if (path != null) {
+          paths.add(path);
+          break;
+        }
+      } catch (URISyntaxException e) {
+        e.printStackTrace();
+      }
+    }
+
+    return paths.stream().findAny().orElse(null);
+
+    /*
+    AtomicReference<Path> path = new AtomicReference<>();
+
+    getWorkspaceFolders()
+        .forEach(
+            workspaceFolder -> {
+              try {
+                searchInDirectory(fileName, Paths.get(new URI(workspaceFolder.getUri())));
+              } catch (URISyntaxException e) {
+                e.printStackTrace();
+              }
+            });
+
+    return path.get();
+
+     */
   }
 
   /**
