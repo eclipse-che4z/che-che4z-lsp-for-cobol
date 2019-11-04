@@ -102,7 +102,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void enterParagraphName(final CobolPreprocessorParser.ParagraphNameContext ctx) {
-    System.out.println(ctx.getText());
+    semanticContext.getParagraphs().define(ctx.getText().toUpperCase(), retrievePosition(ctx));
   }
 
   @Override

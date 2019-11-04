@@ -143,14 +143,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     return visitChildren(ctx);
   }
 
+  //TODO: rename to paragraphNameUsage
   @Override
   public Class visitParagraphNameDefinition(CobolParser.ParagraphNameDefinitionContext ctx) {
-    semanticContext.getParagraphs().define(ctx.getText().toUpperCase(), retrievePosition(ctx));
-    return visitChildren(ctx);
-  }
-
-  @Override
-  public Class visitParagraphName(CobolParser.ParagraphNameContext ctx) {
     addUsage(semanticContext.getParagraphs(), ctx);
     return visitChildren(ctx);
   }
