@@ -130,6 +130,11 @@ public class WorkspaceServiceTest {
   }
 
   @Test
+  public void getNullWithNotCopybookNotFound() {
+    assertTrue(cobolWorkspaceService.getContentByCopybookName("ANTHR_CPY") == null);
+  }
+
+  @Test
   public void testGetUriByCopyBookName() {
     assertNotNull(cobolWorkspaceService.getURIByCopybookName(CPY_OUTER_NAME_ONLY));
   }
@@ -161,19 +166,38 @@ public class WorkspaceServiceTest {
   @NotNull
   private Path createPathOfName(String folderName, Optional<Path> parentFolder) {
 
+    // creck if the workspace folder already exists (parent folder)..
+    // Path adjustedPath = adjustIfFolderAlreadyExists(parentFolder.orElse(null));
+
     return parentFolder
         .map(
             path ->
-                Paths.get(
-                    parentFolder.get().toString()
-                        + System.getProperty("file.separator")
-                        + folderName))
+                Paths.get(parentFolder.get() + System.getProperty("file.separator") + folderName))
         .orElseGet(
             () ->
                 Paths.get(
                     System.getProperty("java.io.tmpdir")
                         + System.getProperty("file.separator")
                         + folderName));
+  }
+
+  private Path adjustIfFolderAlreadyExists(Path folder) {
+    if (folder != null && Files.exists(folder)) {
+      // folder is already used.. I will try to create a new one..
+      System.out.println("folder already exists");
+      System.out.println(
+          folder.getParent()
+              + System.getProperty("file.separator")
+              + "WORKSPACE-"
+              + System.currentTimeMillis());
+
+      return Paths.get(
+          folder.getParent()
+              + System.getProperty("file.separator")
+              + "WORKSPACE-"
+              + System.currentTimeMillis());
+    }
+    return null;
   }
 
   // util methods to create dummy cobol code inside copybook file
