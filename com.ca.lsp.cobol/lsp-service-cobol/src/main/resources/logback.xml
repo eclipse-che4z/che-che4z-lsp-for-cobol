@@ -29,7 +29,8 @@
         <file>${HOME_LOG}</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${user.home}/Broadcom/LSPCobol/logs/archived/app.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <fileNamePattern>${user.home}/Broadcom/LSPCobol/logs/archived/app.%d{yyyy-MM-dd}.%i.log.zip
+            </fileNamePattern>
             <maxFileSize>10MB</maxFileSize>
             <totalSizeCap>1GB</totalSizeCap>
             <maxHistory>30</maxHistory>
@@ -43,5 +44,6 @@
 
     <root level="${log.level:-ERROR}">
         <appender-ref ref="FILE-ROLLING"/>
+        <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
