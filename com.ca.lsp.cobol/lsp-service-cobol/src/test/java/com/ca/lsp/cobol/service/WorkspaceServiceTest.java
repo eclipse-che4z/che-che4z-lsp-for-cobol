@@ -37,8 +37,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.*;
 
 @Slf4j
 public class WorkspaceServiceTest {
@@ -131,7 +130,7 @@ public class WorkspaceServiceTest {
 
   @Test
   public void getNullWithNotCopybookNotFound() {
-    assertTrue(cobolWorkspaceService.getContentByCopybookName("ANTHR_CPY") == null);
+    assertNull(cobolWorkspaceService.getContentByCopybookName("ANTHR_CPY"));
   }
 
   @Test
@@ -179,25 +178,6 @@ public class WorkspaceServiceTest {
                     System.getProperty("java.io.tmpdir")
                         + System.getProperty("file.separator")
                         + folderName));
-  }
-
-  private Path adjustIfFolderAlreadyExists(Path folder) {
-    if (folder != null && Files.exists(folder)) {
-      // folder is already used.. I will try to create a new one..
-      System.out.println("folder already exists");
-      System.out.println(
-          folder.getParent()
-              + System.getProperty("file.separator")
-              + "WORKSPACE-"
-              + System.currentTimeMillis());
-
-      return Paths.get(
-          folder.getParent()
-              + System.getProperty("file.separator")
-              + "WORKSPACE-"
-              + System.currentTimeMillis());
-    }
-    return null;
   }
 
   // util methods to create dummy cobol code inside copybook file
