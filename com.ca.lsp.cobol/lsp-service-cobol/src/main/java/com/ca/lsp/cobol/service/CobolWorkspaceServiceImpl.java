@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -33,9 +34,9 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -79,10 +80,9 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    */
   @Override
   public String getContentByCopybookName(String copybookName) {
-    Path uriForFileName;
-    return (uriForFileName = getURIByCopybookName(copybookName)) != null
-        ? getContentFromCopybook(uriForFileName)
-        : null;
+    return Optional.ofNullable(getURIByCopybookName(copybookName))
+        .map(this::retrieveContentByURI)
+        .orElse(null);
   }
 
   /**
@@ -91,43 +91,29 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    *
    * @param fileName (i.e. COPYTEST)
    * @return URI of file (i.e. file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy) or *
-   *     null if didn't found. This case should be covered by an appropriate diagnostic message *
-   *     using the Communication service delegate object
+   *     null if not found. This case should be covered by an appropriate diagnostic message * using
+   *     the Communication service delegate object
    */
   @Override
   public Path getURIByCopybookName(String fileName) {
+    return getWorkspaceFolders().stream()
+        .flatMap(it -> searchInDirectory(fileName, getWorkspaceFolderPath(it)))
+        .findAny()
+        .orElse(null);
+  }
 
-    List<Path> paths = new ArrayList<>();
-    for (WorkspaceFolder workspaceFolder : workspaceFolders) {
-      try {
-        Path path = searchInDirectory(fileName, Paths.get(new URI(workspaceFolder.getUri())));
-        if (path != null) {
-          paths.add(path);
-          break;
-        }
-      } catch (URISyntaxException e) {
-        e.printStackTrace();
-      }
+  /**
+   * @param it workspace folder
+   * @return the Path of the workspace folder
+   * @throws IllegalArgumentException if the URI of WorkspaceFolder is not valid
+   */
+  @NotNull
+  private Path getWorkspaceFolderPath(WorkspaceFolder it) {
+    try {
+      return Paths.get(new URI(it.getUri()));
+    } catch (URISyntaxException e) {
+      throw new IllegalArgumentException("Workspace URI not valid");
     }
-
-    return paths.stream().findAny().orElse(null);
-
-    /*
-    AtomicReference<Path> path = new AtomicReference<>();
-
-    getWorkspaceFolders()
-        .forEach(
-            workspaceFolder -> {
-              try {
-                searchInDirectory(fileName, Paths.get(new URI(workspaceFolder.getUri())));
-              } catch (URISyntaxException e) {
-                e.printStackTrace();
-              }
-            });
-
-    return path.get();
-
-     */
   }
 
   /**
@@ -157,7 +143,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    * @return content of the file as String content
    */
   @Nullable
-  private String getContentFromCopybook(Path uriForFileName) {
+  private String retrieveContentByURI(Path uriForFileName) {
     String content = null;
     try (Stream<String> stream = Files.lines(uriForFileName)) {
       content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse(null);
@@ -168,31 +154,23 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   }
 
   /**
-   * @param fileName name provided by preprocessor
-   * @param workspaceFolder NIO Path of workspace folder
-   * @return a valid path of the copybook file or null if not found
-   */
-  @Nullable
-  private Path searchCopybookInWorkspaceFolder(String fileName, WorkspaceFolder workspaceFolder) {
-    Path result = null;
-    try {
-      result = searchInDirectory(fileName, Paths.get(new URI(workspaceFolder.getUri())));
-    } catch (URISyntaxException e) {
-      log.error(Arrays.toString(e.getStackTrace()));
-    }
-    return result;
-  }
-
-  /**
    * Delegated method to search in directory
    *
    * @param fileName name provided by preprocessor
    * @param workspaceFolderPath NIO Path of workspace folder
    * @return a valid path of the copybook file or null if not found
    */
-  private Path searchInDirectory(String fileName, Path workspaceFolderPath) {
-    Path pathFileFound = null;
-    try (Stream<Path> stream =
+  private Stream<Path> searchInDirectory(String fileName, Path workspaceFolderPath) {
+    return Stream.ofNullable(applySearch(fileName, workspaceFolderPath));
+  }
+
+  /**
+   * @param fileName copybook name
+   * @param workspaceFolderPath pysical path of workspace where to search for the copybook
+   * @return Path of the found copybook in the workspace folder
+   */
+  private Path applySearch(String fileName, Path workspaceFolderPath) {
+    try (Stream<Path> pathStream =
         Files.find(
             workspaceFolderPath,
             100,
@@ -203,11 +181,11 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
                   && resFile.getName().toLowerCase().contains(fileName.toLowerCase());
             },
             FileVisitOption.FOLLOW_LINKS)) {
-      pathFileFound = stream.findFirst().orElse(null);
+      return pathStream.findAny().orElse(null);
     } catch (IOException e) {
       log.error(Arrays.toString(e.getStackTrace()));
+      return null;
     }
-    return pathFileFound;
   }
 
   private List<WorkspaceFolder> getWorkspaceFolders() {
