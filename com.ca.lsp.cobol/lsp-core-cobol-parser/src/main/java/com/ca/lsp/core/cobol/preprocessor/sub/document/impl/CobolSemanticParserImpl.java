@@ -21,6 +21,7 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
+import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookAnalysis;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookParallelAnalysis;
@@ -70,7 +71,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     final ParseTreeWalker walker = new ParseTreeWalker();
     // analyze contained copy books
     final CobolSemanticParserListener listener =
-        createDocumentParserListener(tokens, semanticContext);
+        createDocumentParserListener(tokens, semanticContext, format);
 
     walker.walk(listener, startRule);
     processCopybooks(format, params, errors);
@@ -94,8 +95,8 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   }
 
   private CobolSemanticParserListener createDocumentParserListener(
-      final CommonTokenStream tokens, final SemanticContext semanticContext) {
-    return new CobolSemanticParserListenerImpl(tokens, semanticContext);
+      final CommonTokenStream tokens, final SemanticContext semanticContext, final CobolPreprocessor.CobolSourceFormatEnum format) {
+    return new CobolSemanticParserListenerImpl(tokens, semanticContext, format);
   }
 
   private CopybookAnalysis createCopybookAnalyzer() {

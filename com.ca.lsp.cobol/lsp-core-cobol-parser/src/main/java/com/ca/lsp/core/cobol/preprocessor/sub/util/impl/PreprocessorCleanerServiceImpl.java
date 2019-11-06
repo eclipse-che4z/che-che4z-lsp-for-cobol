@@ -44,7 +44,6 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
       String tag,
       BufferedTokenStream tokens,
       CobolPreprocessor.CobolSourceFormatEnum format) {
-    System.out.println("it is injected at this level");
     // throw away EXEC SQL terminals
     pop();
 
