@@ -8,14 +8,13 @@
 
 grammar CobolPreprocessor;
 
-startRule : .*? ((compilerOptions | dataDivision | procedureDivision | copyStatement | execCicsStatement | execSqlStatement
-                | execSqlImsStatement | replaceOffStatement | replaceArea  | skipStatement | titleStatement | NEWLINE)+ .*?)+ ;
+startRule : .*? ((compilerOptions | dataDescriptionEntry | paragraph | dataDivision | procedureDivision | copyStatement
+            | replaceOffStatement | replaceArea  | skipStatement | titleStatement | NEWLINE)+ .*?)+ EOF;
 
 //statements
 useStatement
    : USE .*?
    ;
-
 
 //procedureDivision
 procedureDivision
@@ -29,7 +28,6 @@ procedureDeclaratives
 procedureDeclarative
    : procedureSectionHeader DOT_FS useStatement DOT_FS paragraphs
    ;
-
 
 //procedureDivisionExtensions
 procedureDivisionBody
@@ -86,11 +84,11 @@ dataDivision
    ;
 
 dataDivisionSection
-   : workingStorageSection | linkageSection
+   : workingStorageSection | linkageSection | copyStatement
    ;
 
 workingStorageSection
-   : WORKING_STORAGE SECTION DOT_FS dataDescriptionEntry*
+   : WORKING_STORAGE SECTION DOT_FS (dataDescriptionEntry | copyStatement)*
    ;
 
 linkageSection
@@ -98,7 +96,7 @@ linkageSection
    ;
 
 dataDescriptionEntry
-   : dataDescriptionEntryFormat3 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat1
+   : (dataDescriptionEntryFormat3 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat1)+
    ;
 
 dataDescriptionEntryFormat1
@@ -301,7 +299,7 @@ copyStatement
    ;
 
 copySource
-   : (literal | cobolWord | filename) ((OF | IN) copyLibrary)?
+   : (literal | cobolWord) ((OF | IN) copyLibrary)?
    ;
 
 copyLibrary
