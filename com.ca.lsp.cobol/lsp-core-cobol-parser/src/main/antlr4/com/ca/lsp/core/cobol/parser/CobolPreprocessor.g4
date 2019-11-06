@@ -8,7 +8,7 @@
 
 grammar CobolPreprocessor;
 
-startRule : .*? ((compilerOptions | dataDescriptionEntry | paragraph | dataDivision | procedureDivision | copyStatement
+startRule : .*? ((compilerOptions | dataDescriptionEntry | dataDivision | procedureDivision | copyStatement
             | replaceOffStatement | replaceArea  | skipStatement | titleStatement | NEWLINE)+ .*?)+ EOF;
 
 //statements
@@ -56,7 +56,7 @@ statement
    : (MOVE | ACCEPT | ADD | ALTER | CALL | CANCEL | CLOSE | COMPUTE | CONTINUE | DELETE | DISABLE | DISPLAY | DIVIDE |  ENABLE | ENTRY | EVALUATE |
    EXIT | GENERATE | GOBACK | GO | IF | INITIALIZE | INITIATE | INSPECT | MERGE | MULTIPLY | OPEN | PERFORM | PURGE | READ | RECEIVE | RELEASE |
    RETURN | REWRITE | SEARCH | SEND | SET | SKIP1 | SKIP2 | SKIP3 | SORT | START | STOP | STRING | SUBTRACT | TERMINATE | TITLE | UNSTRING | USE | WRITE |
-    XML) .*? (execSqlStatement | execSqlImsStatement | execCicsStatement)? .*?
+    XML) .*? (execSqlStatement | execSqlImsStatement | execCicsStatement | copyStatement)? .*?
    ;
 
 
