@@ -24,22 +24,25 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.ca.lsp.cobol.usecases.UseCaseUtils.await;
 import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.*;
 
-/** @author teman02 */
+/**
+ * This test checks the entry points of the {@link TextDocumentService} implementation.
+ */
 public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private static final String LANGUAGE = "COBOL";
   private static final String DOCUMENT_URI = "1";
-  private static final String CLOSED_DOCUMENT_URI = "2";
   private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
   private TextDocumentService service;
@@ -50,10 +53,6 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
-
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -64,63 +63,13 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   @Test
   public void testCompletion() {
-    waitForDiagnostics(client);
+    openAndAwait();
     CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion =
         service.completion(
             new CompletionParams(
                 new TextDocumentIdentifier(DOCUMENT_URI), new Position(0, 8))); // The
     // position of "Identification division"
     assertCompletionCorrect(completion);
-  }
-
-  @Test
-  public void testResolveCompletionItemExisting() {
-    CompletionItem unresolved = new CompletionItem("ADD");
-
-    checkResolving(
-        unresolved,
-        c -> {
-          assertNotNull(c.getValue());
-          assertFalse(c.getValue().isEmpty());
-        });
-  }
-
-  @Test
-  public void testResolveCompletionItemNonExisting() {
-    CompletionItem unresolved = new CompletionItem("abcd");
-    checkResolving(unresolved, c -> assertNull(c.getValue()));
-  }
-
-  @Test
-  public void testResolveCompletionItemEmpty() {
-    CompletionItem unresolved = new CompletionItem();
-    checkResolving(unresolved, c -> assertNull(c.getValue()));
-  }
-
-  private void assertCompletionCorrect(
-      CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion) {
-    try {
-      Either<List<CompletionItem>, CompletionList> either = completion.get();
-      CompletionList right = either.getRight();
-      assertFalse(right.getItems().isEmpty());
-
-      right.getItems().forEach(it -> assertTrue(it.getLabel().toLowerCase().startsWith("i")));
-    } catch (InterruptedException | ExecutionException e) {
-      fail(e.getMessage());
-    }
-  }
-
-  private void checkResolving(CompletionItem unresolved, Consumer<? super MarkupContent> consumer) {
-    CompletableFuture<CompletionItem> resolveCompletionItem =
-        service.resolveCompletionItem(unresolved);
-    try {
-      CompletionItem completionItem = resolveCompletionItem.get();
-      Either<String, MarkupContent> documentation = completionItem.getDocumentation();
-      MarkupContent content = documentation.getRight();
-      Optional.of(content).ifPresent(consumer);
-    } catch (InterruptedException | ExecutionException e) {
-      fail(e.getMessage());
-    }
   }
 
   @Test
@@ -135,43 +84,19 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     assertRange(range);
   }
 
-  private Range retrieveRange(TestLanguageClient client) {
-    List<Diagnostic> diagnostics = client.getDiagnostics();
-    if (diagnostics.isEmpty()) {
-      fail("No diagnostics received");
-    }
-    Diagnostic diagnostic = diagnostics.get(0);
-    return diagnostic.getRange();
-  }
-
-  private void assertRange(Range range) {
-    assertEquals(22, range.getStart().getCharacter());
-    assertEquals(31, range.getEnd().getCharacter());
-  }
-
   @Test
   public void testDidClose() {
-    openDocument(service);
-    TextDocumentIdentifier testDocument = new TextDocumentIdentifier(CLOSED_DOCUMENT_URI);
+    openAndAwait();
+    assertEquals(1, closeGetter(service).size());
+    TextDocumentIdentifier testDocument = new TextDocumentIdentifier(DOCUMENT_URI);
     DidCloseTextDocumentParams closedDocument = new DidCloseTextDocumentParams(testDocument);
     service.didClose(closedDocument);
     assertEquals(Collections.EMPTY_MAP, closeGetter(service));
   }
 
-  private void openDocument(TextDocumentService service) {
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(CLOSED_DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
-  }
-
-  private Map<String, MyDocumentModel> closeGetter(TextDocumentService service) {
-    return ((MyTextDocumentService) service).getDocs();
-  }
-
   @Test
   public void testDidSave() {
-    openDocument(service);
-    TextDocumentIdentifier saveDocumentIdentifier = new TextDocumentIdentifier(CLOSED_DOCUMENT_URI);
+    TextDocumentIdentifier saveDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
     DidSaveTextDocumentParams saveDocumentParams =
         new DidSaveTextDocumentParams(saveDocumentIdentifier);
     service.didSave(saveDocumentParams);
@@ -208,5 +133,44 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     } catch (InterruptedException | ExecutionException e) {
       fail(e.getMessage());
     }
+  }
+
+  private void openAndAwait()
+  {
+    service.didOpen(
+            new DidOpenTextDocumentParams(
+                    new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+    waitForDiagnostics(client);
+  }
+
+  private void assertCompletionCorrect(
+      CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion) {
+    try {
+      Either<List<CompletionItem>, CompletionList> either = completion.get();
+      CompletionList right = either.getRight();
+      assertFalse(right.getItems().isEmpty());
+
+      right.getItems().forEach(it -> assertTrue(it.getLabel().toLowerCase().startsWith("i")));
+    } catch (InterruptedException | ExecutionException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  private Range retrieveRange(TestLanguageClient client) {
+    List<Diagnostic> diagnostics = client.getDiagnostics();
+    if (diagnostics.isEmpty()) {
+      fail("No diagnostics received");
+    }
+    Diagnostic diagnostic = diagnostics.get(0);
+    return diagnostic.getRange();
+  }
+
+  private void assertRange(Range range) {
+    assertEquals(22, range.getStart().getCharacter());
+    assertEquals(31, range.getEnd().getCharacter());
+  }
+
+  private Map<String, MyDocumentModel> closeGetter(TextDocumentService service) {
+    return ((MyTextDocumentService) service).getDocs();
   }
 }

@@ -37,8 +37,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.*;
 
 @Slf4j
 public class WorkspaceServiceTest {
@@ -130,6 +129,11 @@ public class WorkspaceServiceTest {
   }
 
   @Test
+  public void getNullWithNotCopybookNotFound() {
+    assertNull(cobolWorkspaceService.getContentByCopybookName("ANTHR_CPY"));
+  }
+
+  @Test
   public void testGetUriByCopyBookName() {
     assertNotNull(cobolWorkspaceService.getURIByCopybookName(CPY_OUTER_NAME_ONLY));
   }
@@ -161,13 +165,13 @@ public class WorkspaceServiceTest {
   @NotNull
   private Path createPathOfName(String folderName, Optional<Path> parentFolder) {
 
+    // creck if the workspace folder already exists (parent folder)..
+    // Path adjustedPath = adjustIfFolderAlreadyExists(parentFolder.orElse(null));
+
     return parentFolder
         .map(
             path ->
-                Paths.get(
-                    parentFolder.get().toString()
-                        + System.getProperty("file.separator")
-                        + folderName))
+                Paths.get(parentFolder.get() + System.getProperty("file.separator") + folderName))
         .orElseGet(
             () ->
                 Paths.get(
