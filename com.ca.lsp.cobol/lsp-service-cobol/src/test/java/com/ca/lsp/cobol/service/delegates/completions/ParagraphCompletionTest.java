@@ -47,6 +47,10 @@ public class ParagraphCompletionTest {
           + "           Move INNER1 of OUTER1 to Str.\n"
           + "       End program ProgramId.";
 
+  /**
+   * this test creates a test document, scans it for paragraph names, adds them to completionItems,
+   * then attempts to find the expected output
+   */
   @Test
   public void testParagraphCompletion() {
     ParagraphCompletion completion = new ParagraphCompletion();
