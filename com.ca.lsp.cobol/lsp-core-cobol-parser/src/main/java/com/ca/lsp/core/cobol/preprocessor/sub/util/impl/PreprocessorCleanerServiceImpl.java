@@ -21,7 +21,6 @@ import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Scanner;
 
@@ -44,23 +43,29 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
       String tag,
       BufferedTokenStream tokens,
       CobolPreprocessor.CobolSourceFormatEnum format) {
-    // throw away EXEC SQL terminals
     pop();
-
-    // a new context for the SQL statement
     push();
 
     final String textLeft = TokenUtils.getHiddenTokensToLeft(ctx.start.getTokenIndex(), tokens);
     context().write(textLeft);
 
-    /*
-     * text
-     */
-    final String text = TokenUtils.getTextIncludingHiddenTokens(ctx, tokens);
+    final String text = TokenUtils.getTextIncludingHiddenTokens(ctx, tokens).toUpperCase();
     final String linePrefix = CobolLine.createBlankSequenceArea(format) + tag;
-    final String lines = buildLines(text, linePrefix);
+    String[] textSplit = null;
+    String lines;
 
-    context().write(lines);
+    if (!tag.equals(COMMENT_TAG)) {
+      textSplit = text.split("END-EXEC", 2);
+      lines = buildLines(textSplit[0] + "END-EXEC", linePrefix);
+    } else {
+      lines = buildLines(text, linePrefix);
+    }
+
+    if (textSplit != null && textSplit.length > 1 && !textSplit[textSplit.length - 1].isEmpty()) {
+      context().write(lines + textSplit[1]);
+    } else {
+      context().write(lines);
+    }
 
     final String content = context().read();
     pop();
@@ -80,10 +85,11 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
 
       final String line = scanner.nextLine();
       final String trimmedLine = line.trim();
-      final String prefixedLine = linePrefix + WS + trimmedLine;
-      final String suffixedLine = prefixedLine.replaceAll("(?i)(end-exec)", "$1 " + EXEC_END_TAG);
-
-      sb.append(suffixedLine);
+      if (!trimmedLine.isEmpty()) {
+        final String prefixedLine = linePrefix + WS + trimmedLine;
+        final String suffixedLine = prefixedLine.replaceAll("(?i)(end-exec)", "$1 " + EXEC_END_TAG);
+        sb.append(suffixedLine);
+      }
       firstLine = false;
     }
 

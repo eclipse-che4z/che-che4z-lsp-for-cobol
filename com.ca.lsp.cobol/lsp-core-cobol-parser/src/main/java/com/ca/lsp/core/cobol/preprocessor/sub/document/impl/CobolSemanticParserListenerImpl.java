@@ -18,7 +18,6 @@ import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.CopySourceContext;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceClauseContext;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtils;
@@ -192,9 +191,6 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     if (copybookName != null) {
       semanticContext.getCopybooks().define(copybookName, retrievePosition(copySource));
     }
-    // TODO: exclude statement from the text
-
-    //    semanticContext.merge(copybookSemanticContext);
     this.preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens, format);
   }
 
