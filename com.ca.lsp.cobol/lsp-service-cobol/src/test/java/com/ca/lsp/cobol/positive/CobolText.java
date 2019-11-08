@@ -23,7 +23,7 @@ public class CobolText {
   private String fileName;
   private int linesNumber;
 
-  CobolText(String fileName, String fullText, int linesNumber) {
+  public CobolText(String fileName, String fullText, int linesNumber) {
     this.fileName = fileName;
     this.fullText = fullText;
     this.linesNumber = linesNumber;

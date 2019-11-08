@@ -26,7 +26,7 @@ import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
-import com.ca.lsp.cobol.service.mocks.TestWorkspaceService;
+import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import com.google.inject.name.Names;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -43,7 +43,7 @@ public class TestModule extends DefaultModule {
     bind(LanguageClient.class).to(TestLanguageClient.class);
     bind(IMyLanguageServer.class).to(TestLanguageServer.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
-    bind(WorkspaceService.class).to(TestWorkspaceService.class);
+    bind(WorkspaceService.class).to(MockWorkspaceService.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(CobolTextRegistry.class).to(ZipTextRegistry.class);
