@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
-import com.ca.lsp.core.cobol.model.Position;
+import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
@@ -40,7 +40,7 @@ import java.util.List;
 /** Preprocessor, which parses and processes COPY REPLACE and EXEC SQL statements. */
 @AllArgsConstructor
 public class CobolSemanticParserImpl implements CobolSemanticParser {
-  private SemanticContext semanticContext;
+  private final SemanticContext semanticContext;
 
   @Override
   public PreprocessedInput processLines(
@@ -95,7 +95,9 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   }
 
   private CobolSemanticParserListener createDocumentParserListener(
-      final CommonTokenStream tokens, final SemanticContext semanticContext, final CobolPreprocessor.CobolSourceFormatEnum format) {
+      final CommonTokenStream tokens,
+      final SemanticContext semanticContext,
+      final CobolPreprocessor.CobolSourceFormatEnum format) {
     return new CobolSemanticParserListenerImpl(tokens, semanticContext, format);
   }
 
