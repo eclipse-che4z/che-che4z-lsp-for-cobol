@@ -8,6 +8,8 @@ import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.positive.CobolTextRegistry;
 import com.ca.lsp.cobol.service.CobolWorkspaceService;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.Setter;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.WorkspaceFolder;
@@ -15,14 +17,24 @@ import org.eclipse.lsp4j.WorkspaceFolder;
 import java.nio.file.Path;
 import java.util.List;
 
-public class TestWorkspaceService implements CobolWorkspaceService {
+/**
+ * This class is used to mock the actual behavior of {@link
+ * org.eclipse.lsp4j.services.WorkspaceService} by returning the predefined values. It requires the
+ * {@link CobolTextRegistry} as a provider of copybooks. This class is a singleton to allow external
+ * configuration after injecting using DI.
+ *
+ * <p>Notice: singleton implementation with the shared state may cause some dirty-environment
+ * problems, so remember to re-configure the instance if you are working on some test case with
+ * copybooks
+ */
+@Singleton
+public class MockWorkspaceService implements CobolWorkspaceService {
 
-  private final CobolTextRegistry registry;
+  @Setter private CobolTextRegistry registry;
   private final DefaultDataBusBroker dataBus;
 
   @Inject
-  public TestWorkspaceService(CobolTextRegistry registry, DefaultDataBusBroker dataBus) {
-    this.registry = registry;
+  public MockWorkspaceService(DefaultDataBusBroker dataBus) {
     this.dataBus = dataBus;
     dataBus.subscribe(DataEventType.CBLSCAN_EVENT, this);
   }
