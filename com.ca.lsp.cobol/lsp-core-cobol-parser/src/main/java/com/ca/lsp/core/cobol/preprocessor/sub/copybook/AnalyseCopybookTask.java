@@ -42,9 +42,9 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
   private static final IDataBusBroker DATABUS =
       LangServerCtx.getInjector().getInstance(DefaultDataBusBroker.class);
 
-  private String copyBookName;
-  private CobolPreprocessor.CobolSourceFormatEnum format;
-  private CompletableFuture<String> waitForResolving;
+  private final String copyBookName;
+  private final CobolPreprocessor.CobolSourceFormatEnum format;
+  private final CompletableFuture<String> waitForResolving;
 
   AnalyseCopybookTask(String copyBookName, CobolPreprocessor.CobolSourceFormatEnum format) {
 
@@ -55,6 +55,9 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
 
   @Override
   public CopybookSemanticContext compute() {
+
+    // TODO: Check if the semantic context is in cache or not.. if present don't engage the wsm
+
     DATABUS.subscribe(DataEventType.CBLFETCH_EVENT, this);
     DATABUS.postData(CblScanEvent.builder().name(copyBookName).build());
     return runParsing();
@@ -66,7 +69,15 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
       String content = waitForResolving.get();
       if (content != null) {
         result = parseCopybook(content);
+
+        // TODO: serialize paragraph definition (variable serialization is skipped for now..
+
+        // MultiMapSerializableHelper.serialize(result.getParagraphs().getDefinitions());
+
+        // TODO: add the result in cache
+
       }
+
     } catch (InterruptedException | ExecutionException e) {
       LOG.error("Error copybooks analysis for: " + copyBookName, e);
       Thread.currentThread().interrupt();

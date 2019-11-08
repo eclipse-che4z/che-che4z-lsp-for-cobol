@@ -23,49 +23,55 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created  on 15/10/2019
- */
-
+/** Created on 15/10/2019 */
 @Slf4j
 @Data
 public class CpyStorable implements Serializable {
-    //    private int hit = ThreadLocalRandom.current().nextInt(1, 99 + 1);
-    private AtomicInteger hit = new AtomicInteger(0);
-    private long genDt = Instant.now().getEpochSecond();
-    private long ttu = 3600 * 3;
-    private long id;
-    private String name;
-    private String position;
-    private String uri;
-    private String content;
+  //    private int hit = ThreadLocalRandom.current().nextInt(1, 99 + 1);
+  private AtomicInteger hit = new AtomicInteger(0);
+  private long genDt = Instant.now().getEpochSecond();
+  private long ttu = 3600 * 3;
+  private long id;
+  private String name;
+  private String position;
+  private String uri;
+  private String content;
+  private Map<String, Set<Position>> paragraphPosition;
 
-    @Builder
-    public CpyStorable(@NonNull String name, @NonNull String position, @NonNull String uri, @NonNull String content) {
-        this.name = name;
-        this.position = position;
-        this.uri = uri;
-        this.content = content;
-        this.id = ICpyRepository.calculateUUID(new StringBuilder()
-                .append(name));
-    }
+  @Builder
+  public CpyStorable(
+      @NonNull String name,
+      @Nullable String position,
+      @NonNull String uri,
+      @NonNull String content,
+      @Nullable Map<String, Set<Position>> paragraphPosition) {
+    this.name = name;
+    this.position = position;
+    this.uri = uri;
+    this.content = content;
+    this.paragraphPosition = paragraphPosition;
+    id = ICpyRepository.calculateUUID(new StringBuilder().append(name));
+  }
 
-    @SneakyThrows
-    public boolean isExpired() {
-        return (Instant.now().getEpochSecond() - genDt) > ttu;
-    }
+  @SneakyThrows
+  public boolean isExpired() {
+    return (Instant.now().getEpochSecond() - genDt) > ttu;
+  }
 
-    @SneakyThrows
-    public void match() {
-        hit.incrementAndGet();
-    }
+  @SneakyThrows
+  public void match() {
+    hit.incrementAndGet();
+  }
 
-    @SneakyThrows
-    public int getHit() {
-        return hit.get();
-    }
+  @SneakyThrows
+  public int getHit() {
+    return hit.get();
+  }
 }
