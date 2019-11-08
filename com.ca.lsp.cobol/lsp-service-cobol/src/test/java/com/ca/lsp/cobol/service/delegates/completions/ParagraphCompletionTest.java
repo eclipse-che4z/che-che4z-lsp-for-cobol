@@ -56,7 +56,6 @@ public class ParagraphCompletionTest {
         completion.collectCompletions(document, createCompletionParams());
 
     assertEquals(2, completionItems.size());
-    // assertTrue("000-Main-Logic", completionItems.get(1).getLabel());
     assertTrue(
         "100-Test",
         completionItems.get(0).getLabel().contains("100-Test")
