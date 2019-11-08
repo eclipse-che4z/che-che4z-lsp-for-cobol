@@ -32,8 +32,8 @@ public class ParagraphCompletion extends AbstractCompletion {
 
   @Override
   String tryResolve(String label) {
-    // Not yet supported
-    throw new UnsupportedOperationException();
+    // Cannot resolve description for this type of completion 
+    return null;
   }
 
   @Override
