@@ -35,7 +35,7 @@ class VariableCompletion extends AbstractCompletion {
   @Override
   String tryResolve(String label) {
     // Not yet supported
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
