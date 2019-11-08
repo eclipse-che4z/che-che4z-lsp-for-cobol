@@ -14,30 +14,35 @@
 package com.ca.lsp.cobol.service.delegates.completions;
 
 import com.ca.lsp.cobol.service.MyDocumentModel;
+import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 import org.eclipse.lsp4j.CompletionItemKind;
 
-import java.util.Collection;
-
-class KeywordCompletion extends AbstractCompletion {
-  private static final Keywords KEYWORDS = new Keywords();
+public class ParagraphCompletion extends AbstractCompletion {
 
   @Override
   Collection<String> getCompletionSource(MyDocumentModel document) {
-    return KEYWORDS.getLabels();
+    return Optional.ofNullable(document)
+        .map(MyDocumentModel::getAnalysisResult)
+        .map(AnalysisResult::getParagraphs)
+        .orElse(Collections.emptySet());
   }
 
   @Override
   String tryResolve(String label) {
-    return KEYWORDS.getInformationFor(label);
+    // Not yet supported
+    return null;
   }
 
   @Override
   protected String getSortOrderPrefix() {
-    return "3"; // Keywords should go after the variables in the completions list
+    return "1"; // paragraphs are supposed to be the second in the completions list
   }
 
   @Override
   protected CompletionItemKind getKind() {
-    return CompletionItemKind.Keyword;
+    return CompletionItemKind.Method;
   }
 }
