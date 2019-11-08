@@ -15,8 +15,8 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
+import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
-import com.ca.lsp.core.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class CopybookParallelAnalysis implements CopybookAnalysis {
   private static final int SEVERITY_LEVEL = 1; // error level
   private static final String ERROR_SUGGESTION = "Copybook not found";
-  private List<SyntaxError> copybookErrors = new ArrayList<>();
+  private final List<SyntaxError> copybookErrors = new ArrayList<>();
 
   @Override
   public List<SyntaxError> getCopybookErrors() {

@@ -13,8 +13,9 @@
  */
 package com.ca.lsp.core.cobol.parser.listener;
 
+import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.model.Position;
+
 import java.util.List;
 import java.util.Optional;
 

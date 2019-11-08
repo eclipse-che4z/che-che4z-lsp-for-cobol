@@ -16,13 +16,13 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
-import com.ca.lsp.core.cobol.model.Position;
+import com.broadcom.lsp.domain.cobol.model.Position;
 import com.google.common.collect.Multimap;
 
 import java.util.Collection;
 
 public interface SubContext<T> {
-//TODO: Make the implementations serializable
+  // TODO: Make the implementations serializable
   /**
    * Add defined language element to the context
    *
