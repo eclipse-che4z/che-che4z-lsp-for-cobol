@@ -41,10 +41,12 @@ public class Completions {
    */
   private AbstractCompletion initializeCompletionsChain() {
     AbstractCompletion variableProvider = new VariableCompletion();
+    AbstractCompletion paragraphProvider = new ParagraphCompletion();
     AbstractCompletion snippetProvider = new SnippetCompletion();
     AbstractCompletion keywordProvider = new KeywordCompletion();
 
-    variableProvider.setNextCompletionProvider(snippetProvider);
+    variableProvider.setNextCompletionProvider(paragraphProvider);
+    paragraphProvider.setNextCompletionProvider(snippetProvider);
     snippetProvider.setNextCompletionProvider(keywordProvider);
 
     return variableProvider;

@@ -33,7 +33,7 @@ class KeywordCompletion extends AbstractCompletion {
 
   @Override
   protected String getSortOrderPrefix() {
-    return "2"; // Keywords should go after the variables in the completions list
+    return "3"; // Keywords should go after Paragraphs in the completions list
   }
 
   @Override

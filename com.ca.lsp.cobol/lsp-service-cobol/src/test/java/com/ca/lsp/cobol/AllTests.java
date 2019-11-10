@@ -23,6 +23,7 @@ import com.ca.lsp.cobol.service.delegates.HighlightsTest;
 import com.ca.lsp.cobol.service.delegates.LanguageEnginesTest;
 import com.ca.lsp.cobol.service.delegates.ValidationTest;
 import com.ca.lsp.cobol.service.delegates.completions.CompletionsChainTest;
+import com.ca.lsp.cobol.service.delegates.completions.ParagraphCompletionTest;
 import com.ca.lsp.cobol.service.delegates.completions.SnippetCompletionTest;
 import com.ca.lsp.cobol.service.delegates.completions.VariableCompletionTest;
 import com.ca.lsp.cobol.service.delegates.references.ReferencesTest;
@@ -49,6 +50,7 @@ import org.junit.runners.Suite.SuiteClasses;
   VariableCompletionTest.class,
   CompletionsChainTest.class,
   SnippetCompletionTest.class,
+  ParagraphCompletionTest.class,
   ReferencesTest.class,
   DefinitionsAndUsagesTest.class,
   TestResponsesNotContainLineBreaks.class,

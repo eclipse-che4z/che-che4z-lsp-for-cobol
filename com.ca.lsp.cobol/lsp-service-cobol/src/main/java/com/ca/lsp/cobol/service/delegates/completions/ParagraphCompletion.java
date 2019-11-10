@@ -14,42 +14,35 @@
 package com.ca.lsp.cobol.service.delegates.completions;
 
 import com.ca.lsp.cobol.service.MyDocumentModel;
-import org.eclipse.lsp4j.CompletionItem;
-import org.eclipse.lsp4j.CompletionItemKind;
-import org.eclipse.lsp4j.InsertTextFormat;
-
+import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
+import org.eclipse.lsp4j.CompletionItemKind;
 
-public class SnippetCompletion extends AbstractCompletion {
-  private static final Snippets SNIPPETS = new Snippets();
+public class ParagraphCompletion extends AbstractCompletion {
 
   @Override
   Collection<String> getCompletionSource(MyDocumentModel document) {
-    return SNIPPETS.getLabels();
+    return Optional.ofNullable(document)
+        .map(MyDocumentModel::getAnalysisResult)
+        .map(AnalysisResult::getParagraphs)
+        .orElse(Collections.emptySet());
   }
 
   @Override
   String tryResolve(String label) {
-    return Optional.ofNullable(SNIPPETS.getInformationFor(label))
-        .map(string -> string.replaceAll("[${\\d:}]", ""))
-        .orElse(null);
+    // Cannot resolve description for this type of completion 
+    return null;
   }
 
   @Override
   protected String getSortOrderPrefix() {
-    return "2";
-  }
-
-  @Override
-  protected CompletionItem customize(CompletionItem item) {
-    item.setInsertText(SNIPPETS.getInformationFor(item.getLabel()));
-    item.setInsertTextFormat(InsertTextFormat.Snippet);
-    return item;
+    return "1"; // paragraphs are supposed to be the second in the completions list
   }
 
   @Override
   protected CompletionItemKind getKind() {
-    return CompletionItemKind.Snippet;
+    return CompletionItemKind.Method;
   }
 }
