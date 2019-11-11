@@ -17,8 +17,8 @@ import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.TestModule;
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
+import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.Before;
@@ -68,20 +68,19 @@ public class PositiveTest extends ConfigurableTest {
   }
 
   @Before
-  public void setUpServer()
-  {
-      client = (TestLanguageClient) LangServerCtx.getInjector().getInstance(LanguageClient.class);
-      client.clean();
-      service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
+  public void setUpServer() {
+    client = (TestLanguageClient) LangServerCtx.getInjector().getInstance(LanguageClient.class);
+    client.clean();
+    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
 
-      MockWorkspaceService workspaceService =
-              LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
-      workspaceService.setRegistry(LangServerCtx.getInjector().getInstance(CobolTextRegistry.class));
+    MockWorkspaceService workspaceService =
+        LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
+    workspaceService.setCopybooks(LangServerCtx.getInjector().getInstance(CobolTextRegistry.class));
   }
 
   @Test
   public void test() {
-    runTextValidation(service, text.getText());
+    runTextValidation(service, text.getFullText());
 
     waitForDiagnostics(client, text.getFileName());
 

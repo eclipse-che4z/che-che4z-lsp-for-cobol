@@ -30,7 +30,7 @@ import java.util.List;
 @Singleton
 public class MockWorkspaceService implements CobolWorkspaceService {
 
-  @Setter private CobolTextRegistry registry;
+  @Setter private CopybooksMock copybooks;
   private final DefaultDataBusBroker dataBus;
 
   @Inject
@@ -46,9 +46,9 @@ public class MockWorkspaceService implements CobolWorkspaceService {
 
   @Override
   public String getContentByCopybookName(String copybookName) {
-    return registry.getCopybooks().stream()
+    return copybooks.getCopybooks().stream()
         .filter(it -> it.getFileName().equalsIgnoreCase(copybookName + ".cpy"))
-        .map(CobolText::getText)
+        .map(CobolText::getFullText)
         .findAny()
         .orElse(null);
   }

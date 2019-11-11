@@ -77,7 +77,7 @@ public abstract class NegativeTest extends ConfigurableTest {
   private String lookupFile(String fileName) {
     return TEXTS.stream()
         .filter(it -> it.getFileName().equals(fileName))
-        .map(text -> text.getText())
+        .map(CobolText::getFullText)
         .findFirst()
         .orElseThrow(
             () ->
