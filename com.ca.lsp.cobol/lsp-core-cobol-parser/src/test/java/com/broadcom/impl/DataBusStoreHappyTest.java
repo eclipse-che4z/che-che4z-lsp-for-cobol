@@ -141,6 +141,9 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
    */
   @Test
   public void storeContentInCacheWithSerializableOperation() {
+    databus.getCpyRepo().invalidateCache();
+    LOG.info("cache swapped - new size: " + databus.getCpyRepo().size());
+
     // create a dummy Multimap
     paragraphDefinitions.put(PARAGRAPH_NAME, POSITION_FIRST_OCCURRENCE);
     paragraphDefinitions.put(PARAGRAPH_NAME, POSITION_SECOND_OCCURRENCE);
