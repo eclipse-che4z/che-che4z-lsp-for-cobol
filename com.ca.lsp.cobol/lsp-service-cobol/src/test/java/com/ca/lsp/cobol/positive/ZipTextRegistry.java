@@ -81,8 +81,7 @@ public class ZipTextRegistry implements CobolTextRegistry {
 
   private void registerCobolText(ZipInputStream zis, ZipEntry entry) {
     String[] entryName = entry.getName().split("/");
-    if (entryName.length < 2)
-    {
+    if (entryName.length < 2) {
       return;
     }
     CobolText loadCobolText = createCobolText(entryName[1], zis);
@@ -90,7 +89,6 @@ public class ZipTextRegistry implements CobolTextRegistry {
   }
 
   private CobolText createCobolText(String name, ZipInputStream stream) {
-    int linesNumber = 0;
     String fullText = null;
     try {
       BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
@@ -99,13 +97,12 @@ public class ZipTextRegistry implements CobolTextRegistry {
       for (String line = bufferedReader.readLine();
           line != null;
           line = bufferedReader.readLine()) {
-        linesNumber++;
         builder.append(line).append("\r\n");
       }
       fullText = builder.toString();
     } catch (IOException e) {
       log.error(e.getMessage());
     }
-    return new CobolText(name, fullText, linesNumber);
+    return new CobolText(name, fullText);
   }
 }

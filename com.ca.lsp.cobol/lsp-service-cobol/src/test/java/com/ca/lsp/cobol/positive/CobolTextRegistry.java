@@ -15,15 +15,14 @@
  */
 package com.ca.lsp.cobol.positive;
 
+import com.ca.lsp.cobol.service.mocks.CopybooksMock;
+
 import java.util.List;
 
-public interface CobolTextRegistry {
-    /** @return all the Cobol files for positive tests */
-    List<CobolText> getPositives();
+public interface CobolTextRegistry extends CopybooksMock {
+  /** @return all the Cobol files for positive tests */
+  List<CobolText> getPositives();
 
-    /** @return all the Cobol files for negative tests */
-    List<CobolText> getNegatives();
-
-    /** @return all the Cobol files for copybooks */
-    List<CobolText> getCopybooks();
+  /** @return all the Cobol files for negative tests */
+  List<CobolText> getNegatives();
 }
