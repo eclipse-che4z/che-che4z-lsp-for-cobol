@@ -51,6 +51,14 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
 
     final String text = TokenUtils.getTextIncludingHiddenTokens(ctx, tokens).toUpperCase();
     final String linePrefix = CobolLine.createBlankSequenceArea(format) + tag;
+    specificTypeExclusion(tag, text, linePrefix);
+    final String content = context().read();
+    pop();
+
+    context().write(content);
+  }
+
+  public void specificTypeExclusion(String tag, String text, String linePrefix) {
     String[] textSplit = null;
     String lines;
 
@@ -66,11 +74,6 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
     } else {
       context().write(lines);
     }
-
-    final String content = context().read();
-    pop();
-
-    context().write(content);
   }
 
   private String buildLines(final String text, final String linePrefix) {
