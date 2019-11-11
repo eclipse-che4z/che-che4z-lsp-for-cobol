@@ -18,6 +18,7 @@ import com.ca.lsp.core.cobol.parser.listener.FormatListenerTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolCommentEntriesMarkerImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.ContinuationLineTransformationTest;
+import com.ca.lsp.core.cobol.semantics.CobolCleanExtraLanguageTest;
 import com.ca.lsp.core.cobol.semantics.CobolVariableCheckTest;
 import com.ca.lsp.core.cobol.semantics.CobolVariableContextTest;
 import org.junit.runner.RunWith;
@@ -27,7 +28,7 @@ import org.junit.runners.Suite.SuiteClasses;
 /**
  * This suite runs all the test of Cobol parser core.
  *
- * @author teman02
+ * @author teman02, sergiuilie
  */
 @RunWith(Suite.class)
 @SuiteClasses({
@@ -37,6 +38,7 @@ import org.junit.runners.Suite.SuiteClasses;
   CobolLanguageEngineTest.class,
   CobolCommentEntriesMarkerImplTest.class,
   CobolVariableContextTest.class,
-  CobolVariableCheckTest.class
+  CobolVariableCheckTest.class,
+  CobolCleanExtraLanguageTest.class,
 })
 public class CobolTestSuite {}
