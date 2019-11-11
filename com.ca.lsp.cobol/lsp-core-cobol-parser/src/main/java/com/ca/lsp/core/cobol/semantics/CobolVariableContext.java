@@ -16,7 +16,7 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
-import com.ca.lsp.core.cobol.model.Position;
+import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -24,16 +24,14 @@ import com.google.common.collect.Multimap;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Implementation of CobolVariableContext that uses ArrayList to store defined variables
- */
+/** Implementation of CobolVariableContext that uses ArrayList to store defined variables */
 public class CobolVariableContext implements SubContext<Variable> {
   private static final int LEVEL_77 = 77;
   private static final int LEVEL_66 = 66;
 
-  private List<Variable> variables = new ArrayList<>();
-  private Multimap<String, Position> variableDefinitions = HashMultimap.create();
-  private Multimap<String, Position> variableUsages = HashMultimap.create();
+  private final List<Variable> variables = new ArrayList<>();
+  private final Multimap<String, Position> variableDefinitions = HashMultimap.create();
+  private final Multimap<String, Position> variableUsages = HashMultimap.create();
 
   @Override
   public void define(Variable variable, Position position) {
@@ -99,7 +97,7 @@ public class CobolVariableContext implements SubContext<Variable> {
     // variable with level number [ 77 ] are not part of list used to generate the structure because
     // it cannot be a group item but just an element item
     List<Variable> variableList =
-        this.getAll().stream()
+            getAll().stream()
             .filter(
                 variable ->
                     variable.getLevelNumber() != LEVEL_77 && variable.getLevelNumber() != LEVEL_66)
@@ -137,7 +135,7 @@ public class CobolVariableContext implements SubContext<Variable> {
      * of the parent variable.
      */
     if (levelNumberFirstVariable == levelNumberSecondVariable) {
-      this.setVariableAtSameLevel(v1, v2);
+      setVariableAtSameLevel(v1, v2);
 
       /*
        * If the second variable have a level of indentation bigger than the first variable it means that the second variable
@@ -157,7 +155,7 @@ public class CobolVariableContext implements SubContext<Variable> {
        */
 
       if (v1.getParent().getLevelNumber() == 1) {
-        this.setVariableAtSameLevel(v1, v2);
+        setVariableAtSameLevel(v1, v2);
       } else {
         generateRelations(v1.getParent(), v2);
       }

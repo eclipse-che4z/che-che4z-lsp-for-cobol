@@ -24,44 +24,43 @@ import lombok.SneakyThrows;
 
 import java.util.UUID;
 
-/**
- * Created on 31/10/2019
- */
-
+/** Created on 31/10/2019 */
 @ImplementedBy(CpyRepositoryLRU.class)
 public interface ICpyRepository {
-    @SneakyThrows
-    void sortCache();
+  @SneakyThrows
+  void sortCache();
 
-    @SneakyThrows
-    static long calculateUUID(@NonNull StringBuilder uuid) {
-        return UUID.nameUUIDFromBytes(uuid.toString().getBytes())
-                .getMostSignificantBits();
-    }
+  @SneakyThrows
+  static long calculateUUID(@NonNull StringBuilder uuid) {
+    return UUID.nameUUIDFromBytes(uuid.toString().getBytes()).getMostSignificantBits();
+  }
 
-    @SneakyThrows
-    static long calculateUUID(@NonNull String uuid) {
-        return UUID.nameUUIDFromBytes(uuid.getBytes())
-                .getMostSignificantBits();
-    }
+  @SneakyThrows
+  static long calculateUUID(@NonNull String uuid) {
+    return UUID.nameUUIDFromBytes(uuid.getBytes()).getMostSignificantBits();
+  }
 
-    @SneakyThrows
-    void setSort(boolean isSort);
+  @SneakyThrows
+  void setSort(boolean isSort);
 
-    @SneakyThrows
-    void persist(@NonNull CpyStorable deepcopy);
-    @SneakyThrows
-     String logContent();
-    @SneakyThrows
-     int size();
+  @SneakyThrows
+  void persist(@NonNull CpyStorable deepcopy);
 
-    @SneakyThrows
-    boolean isStored(@NonNull StringBuilder id);
+  @SneakyThrows
+  String logContent();
 
-    @SneakyThrows
-    boolean isStored(@NonNull String id);
+  @SneakyThrows
+  int size();
 
-    @SneakyThrows
-    boolean isStored(@NonNull long uuid);
+  @SneakyThrows
+  boolean isStored(@NonNull StringBuilder id);
 
+  @SneakyThrows
+  boolean isStored(@NonNull String id);
+
+  @SneakyThrows
+  boolean isStored(@NonNull long uuid);
+
+  @SneakyThrows
+  void invalidateCache();
 }

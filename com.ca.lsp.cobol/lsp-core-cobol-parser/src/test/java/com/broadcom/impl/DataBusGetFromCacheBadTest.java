@@ -32,70 +32,83 @@ import org.junit.Test;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-/**
- * Created on 2019-10-02
- */
+/** Created on 2019-10-02 */
 @Slf4j
 public class DataBusGetFromCacheBadTest extends AbsDataBusImplTest {
+  private DefaultDataBusBroker databus;
 
-    private DefaultDataBusBroker databus;
+  @Before
+  public void setUp() throws Exception {
+    databus =
+        LangServerCtx.getGuiceCtx(new DatabusModule())
+            .getInjector()
+            .getInstance(DefaultDataBusBroker.class);
+    databus.storeData(
+        CpyStorable.builder()
+            .name("COPY1")
+            .content("FASDFASDFSF")
+            .position("ROW:3,COL:4")
+            .uri("/var/tmp/worspace1")
+            .build());
+    databus.storeData(
+        CpyStorable.builder()
+            .name("COPY2")
+            .content("FASDFASDFSF")
+            .position("ROW:3,COL:4")
+            .uri("/var/tmp/worspace1")
+            .build());
+    databus.storeData(
+        CpyStorable.builder()
+            .name("COPY3")
+            .content("FASDFASDFSF")
+            .position("ROW:3,COL:4")
+            .uri("/var/tmp/worspace1")
+            .build());
+    databus.storeData(
+        CpyStorable.builder()
+            .name("COPY4")
+            .content("FASDFASDFSF")
+            .position("ROW:3,COL:4")
+            .uri("/var/tmp/worspace1")
+            .build());
+    databus.storeData(
+        CpyStorable.builder()
+            .name("COPY40")
+            .content("FASDFASDFSF")
+            .position("ROW:3,COL:4")
+            .uri("/var/tmp/worspace1")
+            .build());
+  }
 
-    @Before
-    public void setUp() throws Exception {
-        databus = LangServerCtx.getGuiceCtx(new DatabusModule()).getInjector().getInstance(DefaultDataBusBroker.class);
-        databus.storeData(CpyStorable.builder()
-                .name("COPY1")
-                .content("FASDFASDFSF")
-                .position("ROW:3,COL:4")
-                .uri("/var/tmp/worspace1")
-                .build());
-        databus.storeData(CpyStorable.builder()
-                .name("COPY2")
-                .content("FASDFASDFSF")
-                .position("ROW:3,COL:4")
-                .uri("/var/tmp/worspace1")
-                .build());
-        databus.storeData(CpyStorable.builder()
-                .name("COPY3")
-                .content("FASDFASDFSF")
-                .position("ROW:3,COL:4")
-                .uri("/var/tmp/worspace1")
-                .build());
-        databus.storeData(CpyStorable.builder()
-                .name("COPY4")
-                .content("FASDFASDFSF")
-                .position("ROW:3,COL:4")
-                .uri("/var/tmp/worspace1")
-                .build());
-        databus.storeData(CpyStorable.builder()
-                .name("COPY40")
-                .content("FASDFASDFSF")
-                .position("ROW:3,COL:4")
-                .uri("/var/tmp/worspace1")
-                .build());
-    }
+  @After
+  public void tearDown() throws Exception {
+    databus = null;
+    LangServerCtx.shutdown();
+  }
 
-    @After
-    public void tearDown() throws Exception {
-        databus = null;
-        LangServerCtx.shutdown();
-    }
+  @Override
+  public void observerCallback(DataEvent adaptedDataEvent) {
+    LOG.debug(String.format("Received : %s", adaptedDataEvent.getEventType().getId()));
+  }
 
-    @Override
-    public void observerCallback(DataEvent adaptedDataEvent) {
-        LOG.debug(String.format("Received : %s", adaptedDataEvent.getEventType().getId()));
-    }
-
-    @Test (expected = NoSuchElementException.class)
-    @SneakyThrows
-    public void getData() throws NoSuchElementException {
-        Assert.assertTrue(databus.isStored(ICpyRepository.calculateUUID("COPY40")));
-        LOG.debug(String.format("Cache content : %s", databus.printCache()));
-        Optional<CpyStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
-        LOG.debug(String.format("Least Recently Used item : %s  ID : %d", leastRecentlyUsed.get().getName(), leastRecentlyUsed.get().getId()));
-        //Cache is Full
-        LOG.debug(String.format("Cache STATUS --> MaxCacheSize: %d  ActualCacheSize: %d", databus.getCacheMaxSize(), databus.cacheSize()));
-        LOG.debug(String.format("Retrieving not existent item %s will throw NoSuchElementException ", "COPY20"));
-        databus.getData(ICpyRepository.calculateUUID("COPY20")).getName().equalsIgnoreCase("COPY20");
-    }
+  @Test(expected = NoSuchElementException.class)
+  @SneakyThrows
+  public void getData() throws NoSuchElementException {
+    Assert.assertTrue(databus.isStored(ICpyRepository.calculateUUID("COPY40")));
+    LOG.debug(String.format("Cache content : %s", databus.printCache()));
+    Optional<CpyStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
+    LOG.debug(
+        String.format(
+            "Least Recently Used item : %s  ID : %d",
+            leastRecentlyUsed.get().getName(), leastRecentlyUsed.get().getId()));
+    // Cache is Full
+    LOG.debug(
+        String.format(
+            "Cache STATUS --> MaxCacheSize: %d  ActualCacheSize: %d",
+            databus.getCacheMaxSize(), databus.cacheSize()));
+    LOG.debug(
+        String.format(
+            "Retrieving not existent item %s will throw NoSuchElementException ", "COPY20"));
+    databus.getData(ICpyRepository.calculateUUID("COPY20")).getName().equalsIgnoreCase("COPY20");
+  }
 }

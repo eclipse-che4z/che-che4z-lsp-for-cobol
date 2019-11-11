@@ -14,16 +14,17 @@
 
 package com.ca.lsp.core.cobol.visitor;
 
+import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.ca.lsp.core.cobol.parser.CobolParserBaseVisitor;
-import com.ca.lsp.core.cobol.model.Position;
 import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
-import java.util.Comparator;
-import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Comparator;
+import java.util.Optional;
 
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private static final Keywords KEYWORDS = new Keywords();
@@ -46,11 +47,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   public void setSemanticErrors(SemanticListener semanticErrors) {
-    this.semanticListener = semanticErrors;
+    semanticListener = semanticErrors;
   }
 
   public void setSemanticContext(SemanticContext context) {
-    this.semanticContext = context;
+    semanticContext = context;
   }
 
   @Override
@@ -143,7 +144,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     return visitChildren(ctx);
   }
 
-  //TODO: rename to paragraphNameUsage
+  // TODO: rename to paragraphNameUsage
   @Override
   public Class visitParagraphNameDefinition(CobolParser.ParagraphNameDefinitionContext ctx) {
     addUsage(semanticContext.getParagraphs(), ctx);
@@ -158,7 +159,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   private void throwWarning(String wrongToken, int startLine, int charPositionInLine) {
-    if (!this.semanticListener.getErrorsPipe().isEmpty()) {
+    if (!semanticListener.getErrorsPipe().isEmpty()) {
       addDistance(wrongToken)
           .ifPresent(
               correctWord ->

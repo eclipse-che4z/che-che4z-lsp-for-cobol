@@ -15,20 +15,16 @@
  */
 package com.ca.lsp.core.cobol.semantics;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import com.ca.lsp.core.cobol.model.Position;
-import com.ca.lsp.core.cobol.semantics.CobolVariableContext;
+import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * Test for CobolVariableContextImpl
@@ -116,7 +112,8 @@ public class CobolVariableContextTest {
     List<String> expected = new ArrayList<>();
     expected.add(VAR1);
     expected.add(VAR2);
-    assertEquals(expected, context.getAll().stream().map(Variable::getName).collect(Collectors.toList()));
+    assertEquals(
+        expected, context.getAll().stream().map(Variable::getName).collect(Collectors.toList()));
   }
 
   /**

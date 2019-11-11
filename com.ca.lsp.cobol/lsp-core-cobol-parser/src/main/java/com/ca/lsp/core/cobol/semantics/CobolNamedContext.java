@@ -16,7 +16,7 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
-import com.ca.lsp.core.cobol.model.Position;
+import com.broadcom.lsp.domain.cobol.model.Position;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
@@ -25,8 +25,8 @@ import java.util.Collection;
 
 class CobolNamedContext implements SubContext<String> {
 
-  @Getter private Multimap<String, Position> definitions = HashMultimap.create();
-  @Getter private Multimap<String, Position> usages = HashMultimap.create();
+  @Getter private final Multimap<String, Position> definitions = HashMultimap.create();
+  @Getter private final Multimap<String, Position> usages = HashMultimap.create();
 
   @Override
   public void define(String paragraph, Position position) {

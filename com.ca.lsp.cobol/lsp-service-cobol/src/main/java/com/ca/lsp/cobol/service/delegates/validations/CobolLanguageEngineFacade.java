@@ -13,9 +13,9 @@
  */
 package com.ca.lsp.cobol.service.delegates.validations;
 
+import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.LanguageEngineFactory;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
-import com.ca.lsp.core.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.ProcessingResult;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.semantics.SubContext;

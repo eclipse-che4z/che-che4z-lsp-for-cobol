@@ -13,12 +13,14 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package com.ca.lsp.core.cobol.model;
+package com.broadcom.lsp.domain.cobol.model;
 
 import lombok.Value;
 
+import java.io.Serializable;
+
 @Value
-public final class Position {
+public final class Position implements Serializable {
   private final int tokenIndex;
   private final int startPosition;
   private final int stopPosition;
