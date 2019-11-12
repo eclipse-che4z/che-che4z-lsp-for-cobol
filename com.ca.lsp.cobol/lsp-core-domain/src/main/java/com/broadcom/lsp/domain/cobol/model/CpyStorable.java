@@ -49,7 +49,7 @@ public class CpyStorable implements Serializable {
   public CpyStorable(
       @NonNull String name,
       @Nullable String position,
-      @NonNull String uri,
+      @Nullable String uri,
       @NonNull String content,
       @Nullable Map<String, Set<Position>> paragraphPosition) {
     this.name = name;

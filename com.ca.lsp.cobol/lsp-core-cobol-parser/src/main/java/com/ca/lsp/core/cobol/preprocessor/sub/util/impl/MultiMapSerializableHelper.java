@@ -14,6 +14,7 @@ import java.util.Set;
 public class MultiMapSerializableHelper {
   private static final Map<String, Set<Position>> map = Maps.newHashMap();
 
+  private MultiMapSerializableHelper() {}
   /**
    * For a given multimap, create a serialization in String
    *
