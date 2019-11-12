@@ -29,6 +29,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestVaryingCorrect.class,
   TestPerformUntilCorrect.class,
   TestEndPerformCausesError.class,
+  TestVariableStructureIsBuiltWithCopybooks.class,
   TestExtraneousInputEOFExpecting.class,
   TestNoErrorOnCompilerDirectives.class,
   TestVariablesAreCaseInsensitive.class,

@@ -14,6 +14,7 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
 import com.broadcom.lsp.domain.cobol.model.Position;
+import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
@@ -90,8 +91,9 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     if (!params.getIgnoreSyntaxErrors()) {
       errors.addAll(copybookAnalyzer.getCopybookErrors());
     }
-    List<SemanticContext> contexts = copybookAnalyzer.analyzeCopybooks(copybookNames, format);
-    contexts.forEach(it -> semanticContext.merge(it));
+    List<CopybookSemanticContext> contexts = copybookAnalyzer.analyzeCopybooks(copybookNames, format);
+
+    contexts.forEach(semanticContext::merge);
   }
 
   private CobolSemanticParserListener createDocumentParserListener(

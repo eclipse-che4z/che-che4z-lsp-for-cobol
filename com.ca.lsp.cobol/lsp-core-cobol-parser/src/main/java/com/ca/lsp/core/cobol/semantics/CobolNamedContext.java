@@ -49,7 +49,7 @@ class CobolNamedContext implements SubContext<String> {
   }
 
   @Override
-  public void merge(SubContext<String> subContext) {
+  public void merge(String name, SubContext<String> subContext) {
     definitions.putAll(subContext.getDefinitions());
     usages.putAll(subContext.getUsages());
   }

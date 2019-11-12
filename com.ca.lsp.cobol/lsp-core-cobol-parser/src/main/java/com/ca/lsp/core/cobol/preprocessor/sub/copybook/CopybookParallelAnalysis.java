@@ -19,13 +19,11 @@ import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
-import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.google.common.collect.Multimap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
 import java.util.function.Consumer;
@@ -42,7 +40,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   }
 
   @Override
-  public List<SemanticContext> analyzeCopybooks(
+  public List<CopybookSemanticContext> analyzeCopybooks(
       Multimap<String, Position> copybooks, CobolPreprocessor.CobolSourceFormatEnum format) {
     List<CopybookSemanticContext> contexts =
         ForkJoinTask.invokeAll(createTasks(copybooks.keySet(), format)).stream()
@@ -55,8 +53,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
         .forEach(defineErrors(copybooks));
 
     return contexts.stream()
-        .map(CopybookSemanticContext::getContext)
-        .filter(Objects::nonNull)
+        .filter(it -> it.getContext() != null)
         .collect(Collectors.toList());
   }
 

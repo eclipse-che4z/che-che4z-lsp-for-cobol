@@ -16,6 +16,7 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
+import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import lombok.Value;
 
 @Value
@@ -24,9 +25,9 @@ public class SemanticContext {
   private SubContext<String> paragraphs = new CobolNamedContext();
   private SubContext<String> copybooks = new CobolNamedContext();
 
-  public void merge(SemanticContext semanticContext) {
-    variables.merge(semanticContext.getVariables());
-    paragraphs.merge(semanticContext.getParagraphs());
-    copybooks.merge(semanticContext.getCopybooks());
+  public void merge(CopybookSemanticContext semanticContext) {
+    variables.merge(semanticContext.getName(), semanticContext.getContext().getVariables());
+    paragraphs.merge(semanticContext.getName(), semanticContext.getContext().getParagraphs());
+    copybooks.merge(semanticContext.getName(), semanticContext.getContext().getCopybooks());
   }
 }
