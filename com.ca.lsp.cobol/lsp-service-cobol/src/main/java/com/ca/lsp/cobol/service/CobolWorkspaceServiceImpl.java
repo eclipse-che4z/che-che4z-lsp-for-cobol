@@ -178,7 +178,8 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
               File resFile = path.toFile();
               return resFile.isFile()
                   && !resFile.isDirectory()
-                  && resFile.getName().toLowerCase().contains(fileName.toLowerCase());
+                  && resFile.getName().toLowerCase().contains(fileName.toLowerCase())
+                  && isValidExtension(resFile.getAbsoluteFile().toString().toLowerCase());
             },
             FileVisitOption.FOLLOW_LINKS)) {
       return pathStream.findAny().orElse(null);
@@ -186,6 +187,12 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
       log.error(Arrays.toString(e.getStackTrace()));
       return null;
     }
+  }
+
+  private boolean isValidExtension(String filePath) {
+    List<String> validExtensions = Arrays.asList("cpy", "cbl", "cobol", "cob");
+    return validExtensions.stream()
+        .anyMatch(ext -> ext.equals(filePath.substring(filePath.lastIndexOf('.') + 1)));
   }
 
   private List<WorkspaceFolder> getWorkspaceFolders() {
