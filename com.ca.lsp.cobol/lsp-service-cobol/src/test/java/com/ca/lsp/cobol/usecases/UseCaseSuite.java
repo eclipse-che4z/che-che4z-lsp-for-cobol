@@ -35,6 +35,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestVariablesAreCaseInsensitive.class,
   TestCorrectErrorUnderscorePosition.class,
   TestExtraSymbolsNotCauseErrorOnNextLine.class,
-  TestCobolStringWithContinuationLineConcatenatedCorrectly.class
+  TestCobolStringWithContinuationLineConcatenatedCorrectly.class,
+  AnalyzeCopybookCaching.class
 })
 public class UseCaseSuite {}
