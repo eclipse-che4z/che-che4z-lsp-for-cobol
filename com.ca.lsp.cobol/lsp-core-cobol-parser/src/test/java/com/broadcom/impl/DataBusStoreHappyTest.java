@@ -35,6 +35,9 @@ import org.junit.Test;
 
 import java.util.Optional;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+
 /** Created on 2019-10-02 */
 @Slf4j
 public class DataBusStoreHappyTest extends AbsDataBusImplTest {
@@ -94,10 +97,9 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     databus = null;
     LangServerCtx.shutdown();
-    // TODO: invoke method to invalidate the cache
   }
 
   @Override
@@ -141,9 +143,6 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
    */
   @Test
   public void storeContentInCacheWithSerializableOperation() {
-    databus.getCpyRepo().invalidateCache();
-    LOG.info("cache swapped - new size: " + databus.getCpyRepo().size());
-
     // create a dummy Multimap
     paragraphDefinitions.put(PARAGRAPH_NAME, POSITION_FIRST_OCCURRENCE);
     paragraphDefinitions.put(PARAGRAPH_NAME, POSITION_SECOND_OCCURRENCE);
@@ -157,12 +156,27 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
             .paragraphPosition(MultiMapSerializableHelper.serializeInHashMap(paragraphDefinitions))
             .build();
     databus.storeData(cpyStorable);
-    assert (cpyStorable.getParagraphPosition().size() > 0);
+    assertTrue(cpyStorable.getParagraphPosition().size() > 0);
   }
 
   @Test
   public void getContentFromCacheWithDeserializeOperation() {
     Optional<CpyStorable> cpyStorable = databus.leastRecentlyUsed();
-    assert !cpyStorable.isPresent() || (cpyStorable.get().getParagraphPosition().size() > 0);
+    assertTrue(!cpyStorable.isPresent() || (cpyStorable.get().getParagraphPosition().size() > 0));
+  }
+
+  @Test
+  public void invalidateCacheTest() {
+    LOG.info("Current cache sizing is: " + databus.getCpyRepo().size());
+    LOG.info("Apply cache invalidation...");
+    databus.getCpyRepo().invalidateCache();
+    LOG.info("New cache sizing is: " + databus.getCpyRepo().size());
+    assertEquals(0, databus.getCpyRepo().size());
+  }
+
+  @Test
+  public void geteElementFromCache() {
+    String element = "COPY1";
+    assertTrue(databus.isStored(ICpyRepository.calculateUUID(new StringBuilder(element))));
   }
 }

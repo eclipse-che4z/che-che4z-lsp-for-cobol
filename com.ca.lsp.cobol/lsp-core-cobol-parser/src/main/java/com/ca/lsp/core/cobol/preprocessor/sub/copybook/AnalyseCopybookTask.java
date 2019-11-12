@@ -16,21 +16,23 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.domain.cobol.databus.api.ICpyRepository;
 import com.broadcom.lsp.domain.cobol.databus.api.IDataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
-import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
-import com.broadcom.lsp.domain.cobol.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.model.*;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.MultiMapSerializableHelper;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RecursiveTask;
@@ -46,43 +48,80 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
   private final CobolPreprocessor.CobolSourceFormatEnum format;
   private final CompletableFuture<String> waitForResolving;
 
-  AnalyseCopybookTask(String copyBookName, CobolPreprocessor.CobolSourceFormatEnum format) {
+  public AnalyseCopybookTask(String copyBookName, CobolPreprocessor.CobolSourceFormatEnum format) {
 
     this.copyBookName = copyBookName;
     this.format = format;
     waitForResolving = new CompletableFuture<>();
   }
 
+  /**
+   * - check if copybook name is already present in cache. If present grab the content from the
+   * cache and create a new fetcher event with the content populated without involve the workspace
+   * manager. involved - if not present - post scan event on the databus -- workspace manager
+   * retrieve the content + create fetcher event on databus - populate the cache with retrived
+   * content
+   *
+   * @return SemanticContext populated for copybooks
+   */
   @Override
   public CopybookSemanticContext compute() {
-
-    // TODO: Check if the semantic context is in cache or not.. if present don't engage the wsm
-
+    SemanticContext semanticContext;
     DATABUS.subscribe(DataEventType.CBLFETCH_EVENT, this);
-    DATABUS.postData(CblScanEvent.builder().name(copyBookName).build());
-    return runParsing();
+    boolean isCopybookInCache = isCopybookInCache(copyBookName);
+
+    if (isCopybookInCache) {
+      semanticContext = parseCopybookFromCache();
+    } else {
+      DATABUS.postData(CblScanEvent.builder().name(copyBookName).build());
+      semanticContext = parseCopybook();
+    }
+    return new CopybookSemanticContext(copyBookName, semanticContext);
   }
 
-  private CopybookSemanticContext runParsing() {
-    SemanticContext result = null;
+  private SemanticContext parseCopybook() {
+    SemanticContext semanticContext = null;
+    String content = null;
     try {
-      String content = waitForResolving.get();
+      content = waitForResolving.get();
       if (content != null) {
-        result = parseCopybook(content);
-
-        // TODO: serialize paragraph definition (variable serialization is skipped for now..
-
-        // MultiMapSerializableHelper.serialize(result.getParagraphs().getDefinitions());
-
-        // TODO: add the result in cache
-
+        semanticContext = parseCopybook(content);
       }
 
     } catch (InterruptedException | ExecutionException e) {
       LOG.error("Error copybooks analysis for: " + copyBookName, e);
       Thread.currentThread().interrupt();
     }
-    return new CopybookSemanticContext(copyBookName, result);
+
+    // populate cache with content retrived from scan analysis
+    if (semanticContext != null) {
+      populateCacheWithCopybookContents(
+          copyBookName,
+          content,
+          MultiMapSerializableHelper.serializeInHashMap(
+              semanticContext.getParagraphs().getDefinitions()));
+    }
+    return semanticContext;
+  }
+
+  private void populateCacheWithCopybookContents(
+      String copyBookName, String content, Map<String, Set<Position>> mapPraragraphDefinitions) {
+    DATABUS.storeData(
+        CpyStorable.builder()
+            .name(copyBookName)
+            .content(content)
+            .paragraphPosition(mapPraragraphDefinitions)
+            .build());
+  }
+
+  private SemanticContext parseCopybookFromCache() {
+    return parseCopybook(getContentFromCache());
+  }
+
+  private String getContentFromCache() {
+    return DATABUS
+        .getData(ICpyRepository.calculateUUID(new StringBuilder(copyBookName)))
+        .getContent();
   }
 
   private SemanticContext parseCopybook(String content) {
@@ -107,5 +146,9 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
       return;
     }
     waitForResolving.complete((adaptedDataEvent).getContent());
+  }
+
+  private boolean isCopybookInCache(String copyBookName) {
+    return DATABUS.isStored(ICpyRepository.calculateUUID(new StringBuilder(copyBookName)));
   }
 }
