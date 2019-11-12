@@ -190,6 +190,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     String copybookName = retrieveCopybookName(copySource);
     if (copybookName != null) {
       semanticContext.getCopybooks().define(copybookName, retrievePosition(copySource));
+      semanticContext.getVariables().define(new Variable("-1", copybookName), retrievePosition(copySource));
     }
     this.preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens, format);
   }

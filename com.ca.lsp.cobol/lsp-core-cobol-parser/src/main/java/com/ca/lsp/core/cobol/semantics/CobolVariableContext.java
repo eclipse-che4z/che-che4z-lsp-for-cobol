@@ -65,10 +65,22 @@ public class CobolVariableContext implements SubContext<Variable> {
   }
 
   @Override
-  public void merge(SubContext<Variable> subContext) {
+  public void merge(String name, SubContext<Variable> subContext) {
     variableDefinitions.putAll(subContext.getDefinitions());
     variableUsages.putAll(subContext.getUsages());
-    variables.addAll(subContext.getAll());
+    buildVariableStructure(name, subContext);
+  }
+
+  private void buildVariableStructure(String name, SubContext<Variable> subContext) {
+    int indexOfCopybook = variables.indexOf(new Variable("-1", name));
+    if (indexOfCopybook == -1) {
+      variables.addAll(subContext.getAll());
+    }
+    variables.addAll(indexOfCopybook + 1, subContext.getAll());
+    variables.remove(indexOfCopybook);
+    if (variables.contains(new Variable("-1", name))) {
+      buildVariableStructure(name, subContext);
+    }
   }
 
   public Variable get(String name) {
@@ -97,10 +109,11 @@ public class CobolVariableContext implements SubContext<Variable> {
     // variable with level number [ 77 ] are not part of list used to generate the structure because
     // it cannot be a group item but just an element item
     List<Variable> variableList =
-            getAll().stream()
+        getAll().stream()
             .filter(
                 variable ->
                     variable.getLevelNumber() != LEVEL_77 && variable.getLevelNumber() != LEVEL_66)
+            .filter(variable -> variable.getLevelNumber() != -1)
             .collect(Collectors.toList());
 
     for (int i = 0; i < variableList.size() - 1; i++) {
