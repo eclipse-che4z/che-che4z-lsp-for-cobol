@@ -50,7 +50,9 @@ public class WorkspaceServiceTest {
   private static final String CPYB_INNER_NAME = "INNER";
 
   private static final String CPY_OUTER_NAME_ONLY = "copy";
+  private static final String CPY_OUTER_ANOTHER_NAME_ONLY = "copy3";
   private static final String CPY_OUTER_FILE_NAME_WITH_EXT = "copy.cpy";
+  private static final String CPY_OUTER_ANOTHER_FILE_NAME_WITH_EXT = "copy3.out";
   private static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
 
   private URI workspaceFolderPath = null;
@@ -83,19 +85,23 @@ public class WorkspaceServiceTest {
     CREATE THREE FOLDER WITH THIS STRUCTURE
     ***************************************
     TEMP/
-    ├── WORKSPACE/
+    └── WORKSPACE/
         ├── INNER/
         │   └── copy2.cpy
+        ├── copy3.out
         └── copy.cpy
     ***************************************
     */
     Path workspacePath = createPathOfName(WS_FOLDER_NAME, Optional.empty());
     Path copybooksPath = createPathOfName(CPYB_FOLDER_NAME, Optional.of(workspacePath));
     Path cpyFilePath = createPathOfName(CPY_OUTER_FILE_NAME_WITH_EXT, Optional.of(copybooksPath));
+    Path anotherCpyFilePath =
+        createPathOfName(CPY_OUTER_ANOTHER_FILE_NAME_WITH_EXT, Optional.of(copybooksPath));
+
     innerCopybooksPath = createPathOfName(CPYB_INNER_NAME, Optional.of(copybooksPath));
 
     // create two cpy files
-    createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath);
+    createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath, anotherCpyFilePath);
     createInnerFolderAndFile(
         copybooksPath,
         createPathOfName(CPY_INNER_FILE_NAME_WITH_EXT, Optional.of(innerCopybooksPath)));
@@ -136,6 +142,15 @@ public class WorkspaceServiceTest {
   @Test
   public void testGetUriByCopyBookName() {
     assertNotNull(cobolWorkspaceService.getURIByCopybookName(CPY_OUTER_NAME_ONLY));
+  }
+
+  /**
+   * This test verify that a file with extension different from the set [cpy,cbl,cobol,cob] is not
+   * recognized as copybook.
+   */
+  @Test
+  public void testNotValidCopybookExtension() {
+    assertNull(cobolWorkspaceService.getURIByCopybookName(CPY_OUTER_ANOTHER_NAME_ONLY));
   }
 
   @Test
@@ -195,7 +210,8 @@ public class WorkspaceServiceTest {
     }
   }
 
-  private void createTempDirAndFile(Path workspacePath, Path copybookFolderPath, Path cpyFilePath) {
+  private void createTempDirAndFile(
+      Path workspacePath, Path copybookFolderPath, Path cpyFilePath, Path anotherCpyFilePath) {
     try {
       if (!Files.exists(workspacePath)) {
         Files.createDirectory(workspacePath);
@@ -206,6 +222,11 @@ public class WorkspaceServiceTest {
       if (!Files.exists(cpyFilePath)) {
         Path copybookFilePath = Files.createFile(cpyFilePath);
         generateDummyContentForFile(copybookFilePath);
+      }
+
+      if (!Files.exists(anotherCpyFilePath)) {
+        Path anotherCopybookFilePath = Files.createFile(anotherCpyFilePath);
+        generateDummyContentForFile(anotherCopybookFilePath);
       }
     } catch (IOException e) {
       e.printStackTrace();
