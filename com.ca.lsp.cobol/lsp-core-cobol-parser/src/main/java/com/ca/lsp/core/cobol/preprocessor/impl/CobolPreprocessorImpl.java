@@ -112,7 +112,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   }
 
   private CobolSemanticParser createDocumentParser(SemanticContext semanticContext) {
-    return new CobolSemanticParserImpl(semanticContext);
+    return new CobolSemanticParserImpl(semanticContext, formatListener);
   }
 
   private CobolDocumentCleaner createDocumentCleaner() {
