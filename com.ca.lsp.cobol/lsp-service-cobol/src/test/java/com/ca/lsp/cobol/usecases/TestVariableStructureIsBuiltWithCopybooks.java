@@ -35,7 +35,7 @@ public class TestVariableStructureIsBuiltWithCopybooks extends PositiveUseCase {
     MockWorkspaceService workspaceService =
         LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
     workspaceService.setCopybooks(
-        () -> List.of(new CobolText("COPYBOOK-CONTENT.cpy", COPYBOOK_CONTENT)));
+        () -> List.of(new CobolText("COPYBOOK-CONTENT", COPYBOOK_CONTENT)));
   }
 
   @Test
