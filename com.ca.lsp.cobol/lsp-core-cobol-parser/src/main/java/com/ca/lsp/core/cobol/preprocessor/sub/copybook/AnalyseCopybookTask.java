@@ -41,7 +41,7 @@ import java.util.concurrent.RecursiveTask;
 public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
     implements IDataBusObserver<CblFetchEvent> {
 
-  private static final IDataBusBroker DATABUS =
+  private final IDataBusBroker DATABUS =
       LangServerCtx.getInjector().getInstance(DefaultDataBusBroker.class);
 
   private final String copyBookName;

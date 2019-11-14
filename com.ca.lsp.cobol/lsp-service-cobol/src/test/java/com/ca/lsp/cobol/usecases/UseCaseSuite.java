@@ -24,11 +24,14 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
+  TestVariableStructureIsBuiltWithCopybooks.class,
+  AnalyzeCopybookCaching.class,
   TestFormatTrim.class,
   TestSyntaxError.class,
   TestVaryingCorrect.class,
   TestPerformUntilCorrect.class,
   TestEndPerformCausesError.class,
+  AnalyzeCopybookCaching.class,
   TestVariableStructureIsBuiltWithCopybooks.class,
   TestExtraneousInputEOFExpecting.class,
   TestNoErrorOnCompilerDirectives.class,
@@ -36,6 +39,5 @@ import org.junit.runners.Suite.SuiteClasses;
   TestCorrectErrorUnderscorePosition.class,
   TestExtraSymbolsNotCauseErrorOnNextLine.class,
   TestCobolStringWithContinuationLineConcatenatedCorrectly.class,
-  AnalyzeCopybookCaching.class
 })
 public class UseCaseSuite {}

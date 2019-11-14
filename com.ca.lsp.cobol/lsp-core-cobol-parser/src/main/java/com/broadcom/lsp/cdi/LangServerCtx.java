@@ -20,6 +20,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class LangServerCtx {
-  // static variable single_instance of type Singleton
   private static LangServerCtx single_instance = null;
   @Getter private static Injector injector;
 
@@ -36,6 +36,7 @@ public class LangServerCtx {
     injector = Guice.createInjector(modules);
   }
 
+  @Synchronized
   public static LangServerCtx getGuiceCtx(@NonNull Module... modules) {
     if (single_instance == null) {
       single_instance = new LangServerCtx(modules);
