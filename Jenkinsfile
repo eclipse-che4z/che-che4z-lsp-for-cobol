@@ -39,7 +39,7 @@ spec:
 
 def projectName = 'lsp-for-cobol'
 def kubeLabel = projectName + '_pod_' + env.BUILD_NUMBER + '_' + env.BRANCH_NAME
-kubeLabel = kubeLabel.replaceAll(/[^a-zA-Z0-9._-]+/,"")
+kubeLabel = kubeLabel.replaceAll(/[^a-zA-Z0-9._-]+/, "")
 
 pipeline {
     agent {
@@ -47,7 +47,7 @@ pipeline {
             label kubeLabel
             yaml kubernetes_config
         }
-    }    
+    }
     options {
         disableConcurrentBuilds()
         timestamps()
@@ -56,12 +56,12 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '3'))
     }
     environment {
-       branchName = "$env.BRANCH_NAME"
-       workspace = "$env.WORKSPACE"
+        branchName = "$env.BRANCH_NAME"
+        workspace = "$env.WORKSPACE"
     }
     stages {
         stage('Build LSP server part') {
-             steps {
+            steps {
                 container('maven') {
                     dir('com.ca.lsp.cobol') {
                         sh 'mvn -version'
@@ -71,11 +71,20 @@ pipeline {
                 }
             }
         }
+        stage('SonarCloud') {
+            steps {
+                container('maven') {
+                    dir('com.ca.lsp.cobol') {
+                        sh 'mvn verify sonar:sonar -Dsonar.projectKey=${projectName} -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN}'
+                    }
+                }
+            }
+        }
         stage('Client - Install dependencies') {
             environment {
                 npm_config_cache = "$env.WORKSPACE"
             }
-            steps {                
+            steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh 'npm ci'
@@ -108,7 +117,7 @@ pipeline {
                 script {
                     if (branchName == 'master' || branchName == 'development') {
                         container('jnlp') {
-                            sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
+                            sshagent(['projects-storage.eclipse.org-bot-ssh']) {
                                 sh '''
                                 ssh $sshChe4z rm -rf $deployPath
                                 ssh $sshChe4z mkdir -p $deployPath
