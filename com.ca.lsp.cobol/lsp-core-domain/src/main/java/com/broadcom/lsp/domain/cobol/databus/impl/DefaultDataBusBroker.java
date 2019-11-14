@@ -113,4 +113,10 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
   public Optional<CpyStorable> leastRecentlyUsed() {
     return getCpyRepo().lastItem();
   }
+
+  @SneakyThrows
+  @Synchronized
+  public void invalidateCache() {
+    getCpyRepo().invalidateCache();
+  }
 }

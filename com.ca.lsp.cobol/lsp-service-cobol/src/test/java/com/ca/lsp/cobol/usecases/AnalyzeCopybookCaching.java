@@ -19,6 +19,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 
 @Slf4j
@@ -52,6 +53,11 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
         () -> List.of(new CobolText(COPYBOOK_NAME, COPYBOOK_CONTENT)));
   }
 
+  //  @After
+  //  public void cleanup() {
+  //    databus.invalidateCache();
+  //  }
+
   @Test
   public void serializeMultiMapInString() {
     log.info("Test serialization in String");
@@ -77,15 +83,10 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
   @Test
   public void analyzeCopybookFromWorkspaceManager() {
     // invalidate cache in order to ask workspace manager to grab the content
-    databus.getCpyRepo().invalidateCache();
-    log.info("element in cache after invalidation: " + databus.getCpyRepo().size());
+    databus.invalidateCache();
     runAnalysis();
-    log.info("element in cache after compute execution: " + databus.getCpyRepo().size());
-    // check that cache is fullfilled after compute method
-    assertTrue(
-        databus
-            .getCpyRepo()
-            .isStored(ICpyRepository.calculateUUID(new StringBuilder(COPYBOOK_NAME))));
+    assertNotNull(databus.getData(ICpyRepository.calculateUUID(new StringBuilder(COPYBOOK_NAME))));
+    // assertTrue(databus.isStored(ICpyRepository.calculateUUID(COPYBOOK_NAME)));
   }
 
   private void runAnalysis() {
