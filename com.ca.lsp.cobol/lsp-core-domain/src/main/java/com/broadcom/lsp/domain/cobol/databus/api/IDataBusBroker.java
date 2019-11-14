@@ -16,7 +16,6 @@
 
 package com.broadcom.lsp.domain.cobol.databus.api;
 
-
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.CpyStorable;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
@@ -27,52 +26,49 @@ import com.google.inject.ImplementedBy;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
-/**
- * Created on 2019-10-01
- */
-
+/** Created on 2019-10-01 */
 @ImplementedBy(DefaultDataBusBroker.class)
 public interface IDataBusBroker<T extends DataEvent, S> {
-    Map<String, EventBus> registrySet = new HashMap<>();
+  Map<String, EventBus> registrySet = new HashMap<>();
 
-    @SneakyThrows
-    void postData(@NonNull T dataEvent);
+  @SneakyThrows
+  void postData(@NonNull T dataEvent);
 
-    @SneakyThrows
-    void postData(@NonNull RegistryId registryId, @NonNull T dataEvent);
+  @SneakyThrows
+  void postData(@NonNull RegistryId registryId, @NonNull T dataEvent);
 
-    @SneakyThrows
-    void subscribe(@NonNull S dataSubscriber);
+  @SneakyThrows
+  void subscribe(@NonNull S dataSubscriber);
 
-    @SneakyThrows
-    void subscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber);
+  @SneakyThrows
+  void subscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber);
 
-    @SneakyThrows
-    void subscribe(@NonNull DataEventType eventType, @NonNull IDataBusObserver observer);
+  @SneakyThrows
+  void subscribe(@NonNull DataEventType eventType, @NonNull IDataBusObserver observer);
 
-    @SneakyThrows
-    S getSubscriber(@NonNull DataEventType event, @NonNull IDataBusObserver observer);
+  @SneakyThrows
+  S getSubscriber(@NonNull DataEventType event, @NonNull IDataBusObserver observer);
 
-    @SneakyThrows
-    CpyStorable storeData(@NonNull CpyStorable dataEvent);
+  @SneakyThrows
+  CpyStorable storeData(@NonNull CpyStorable dataEvent);
 
+  @SneakyThrows
+  CpyStorable getData(@NonNull long uuid);
 
-    @SneakyThrows
-    CpyStorable getData(@NonNull long uuid);
+  @SneakyThrows
+  boolean isStored(long uuid);
 
-    @SneakyThrows
-    boolean isStored(long uuid);
+  int cacheSize();
 
-    int cacheSize();
+  @SneakyThrows
+  int getCacheMaxSize();
 
-    @SneakyThrows
-    int getCacheMaxSize();
+  @SneakyThrows
+  String printCache();
 
-    @SneakyThrows
-    String printCache();
+  @SneakyThrows
+  void invalidateCache();
 }
