@@ -24,16 +24,10 @@ public class ConfigurableTest {
   @BeforeClass
   public static void setUp() {
     LangServerCtx.getGuiceCtx(new TestModule(), new DatabusModule());
-    System.out.println(
-        String.format(
-            "Start %d thread %d:", Thread.currentThread().getId(), System.currentTimeMillis()));
   }
 
   @AfterClass
   public static void tearDown() {
     LangServerCtx.shutdown();
-    System.out.println(
-        String.format(
-            "End %d thread %d:", Thread.currentThread().getId(), System.currentTimeMillis()));
   }
 }
