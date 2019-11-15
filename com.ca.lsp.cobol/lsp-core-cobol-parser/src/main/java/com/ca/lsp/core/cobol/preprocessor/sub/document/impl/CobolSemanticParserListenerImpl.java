@@ -18,6 +18,7 @@ import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.CopySourceContext;
+import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtils;
@@ -30,8 +31,12 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Map;
+import java.util.Optional;
+
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_TAG;
 
 /**
  * ANTLR visitor, which preprocesses a given COBOL program by executing COPY and REPLACE statements.
@@ -40,19 +45,23 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     implements CobolSemanticParserListener {
 
   private static final Logger LOG = LoggerFactory.getLogger(CobolSemanticParserListenerImpl.class);
+  private static final String RECURSION_DETECTED = "Recursive copybook declaration for: %s";
 
   private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
   private final BufferedTokenStream tokens;
   private final CobolPreprocessor.CobolSourceFormatEnum format;
   private final SemanticContext semanticContext;
+  private final PreprocessorListener listener;
 
   CobolSemanticParserListenerImpl(
       final BufferedTokenStream tokens,
       final SemanticContext semanticContext,
-      final CobolPreprocessor.CobolSourceFormatEnum format) {
+      final CobolPreprocessor.CobolSourceFormatEnum format,
+      PreprocessorListener listener) {
     this.tokens = tokens;
     this.format = format;
     this.semanticContext = semanticContext;
+    this.listener = listener;
 
     contexts.push(new CobolDocumentContext());
   }
@@ -189,8 +198,29 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     final CopySourceContext copySource = ctx.copySource();
     String copybookName = retrieveCopybookName(copySource);
     if (copybookName != null) {
-      semanticContext.getCopybooks().define(copybookName, retrievePosition(copySource));
-      semanticContext.getVariables().define(new Variable("-1", copybookName), retrievePosition(copySource));
+      if (semanticContext.getCopybookUsageTracker().stream()
+          .map(Map.Entry::getKey)
+          .noneMatch(copybookName::equals)) {
+        semanticContext.getCopybooks().define(copybookName, retrievePosition(copySource));
+        semanticContext
+            .getVariables()
+            .define(new Variable("-1", copybookName), retrievePosition(copySource));
+
+      } else {
+        if (!semanticContext.getCopybookUsageTracker().isEmpty()) {
+          semanticContext
+              .getCopybookUsageTracker()
+              .get(0)
+              .getValue()
+              .forEach(
+                  it ->
+                      listener.syntaxError(
+                          it.getLine(),
+                          it.getCharPositionInLine(),
+                          String.format(RECURSION_DETECTED, copybookName),
+                          copybookName.length()));
+        }
+      }
     }
     this.preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens, format);
   }

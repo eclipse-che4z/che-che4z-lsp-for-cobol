@@ -14,7 +14,7 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl;
 
 import com.ca.lsp.core.cobol.params.CobolParserParams;
-import com.ca.lsp.core.cobol.parser.listener.FormatListener;
+import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
@@ -30,9 +30,9 @@ import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 
 public class CobolLineReaderImpl implements CobolLineReader {
   private static final int INDICATOR_AREA_INDEX = 6;
-  private FormatListener listener;
+  private PreprocessorListener listener;
 
-  public CobolLineReaderImpl(FormatListener listener) {
+  public CobolLineReaderImpl(PreprocessorListener listener) {
     this.listener = listener;
   }
 

@@ -33,6 +33,8 @@ import org.junit.runners.Suite.SuiteClasses;
   TestCorrectErrorUnderscorePosition.class,
   TestExtraSymbolsNotCauseErrorOnNextLine.class,
   TestVariableStructureIsBuiltWithCopybooks.class,
+  TestCopybookWithRecursiveDependencyIsDetected.class,
+  TestCopybookWithIndirectRecursiveDependencyIsDetected.class,
   TestCobolStringWithContinuationLineConcatenatedCorrectly.class,
 })
 public class UseCaseSuite {}

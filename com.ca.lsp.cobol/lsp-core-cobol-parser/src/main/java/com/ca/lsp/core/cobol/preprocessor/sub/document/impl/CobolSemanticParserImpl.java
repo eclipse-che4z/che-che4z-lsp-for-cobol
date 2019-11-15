@@ -20,7 +20,7 @@ import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
-import com.ca.lsp.core.cobol.parser.listener.FormatListener;
+import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookAnalysis;
@@ -40,7 +40,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CobolSemanticParserImpl implements CobolSemanticParser {
   private final SemanticContext semanticContext;
-  private final FormatListener formatListener;
+  private final PreprocessorListener formatListener;
 
   @Override
   public PreprocessedInput processLines(
@@ -75,7 +75,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     }
     CopybookAnalysis copybookAnalyzer = createCopybookAnalyzer();
     List<CopybookSemanticContext> contexts =
-        copybookAnalyzer.analyzeCopybooks(copybookNames, format);
+        copybookAnalyzer.analyzeCopybooks(copybookNames, semanticContext.getCopybookUsageTracker(), format);
     contexts.forEach(semanticContext::merge);
   }
 
@@ -83,7 +83,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
       final CommonTokenStream tokens,
       final SemanticContext semanticContext,
       final CobolPreprocessor.CobolSourceFormatEnum format) {
-    return new CobolSemanticParserListenerImpl(tokens, semanticContext, format);
+    return new CobolSemanticParserListenerImpl(tokens, semanticContext, format, formatListener);
   }
 
   private CopybookAnalysis createCopybookAnalyzer() {

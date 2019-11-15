@@ -20,17 +20,17 @@ import java.util.List;
 
 import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.parser.listener.FormatListener;
+import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImpl;
 
 public abstract class AbstractCobolLinePreprocessorTest {
 
-  protected FormatListener listener;
+  protected PreprocessorListener listener;
 
   public void eraseListener() {
-    listener = new FormatListener(new ArrayList<SyntaxError>());
+    listener = new PreprocessorListener(new ArrayList<SyntaxError>());
   }
 
   protected List<CobolLine> processText(String text) {

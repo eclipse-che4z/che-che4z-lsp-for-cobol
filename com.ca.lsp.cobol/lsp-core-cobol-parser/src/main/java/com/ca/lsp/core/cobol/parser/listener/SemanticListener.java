@@ -27,11 +27,6 @@ public class SemanticListener extends Listener {
     super(errorsPipe);
   }
 
-  @Override
-  public List<SyntaxError> getErrorsPipe() {
-    return errorsPipe;
-  }
-
   public void syntaxError(int line, int charPositionInLine, String msg, int errorLength) {
     super.syntaxError(line, charPositionInLine, msg, errorLength, WARNING_SEVERITY);
   }

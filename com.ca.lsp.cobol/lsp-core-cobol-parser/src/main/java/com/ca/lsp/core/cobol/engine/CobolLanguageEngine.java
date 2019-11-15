@@ -18,7 +18,7 @@ import com.ca.lsp.core.cobol.model.ProcessingResult;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolLexer;
 import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.parser.listener.FormatListener;
+import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
@@ -30,8 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -40,9 +40,9 @@ public class CobolLanguageEngine {
   private final CobolPreprocessor.CobolSourceFormatEnum sourceFormat;
 
   public ProcessingResult run(String in) {
-    List<SyntaxError> errors = new ArrayList<>();
+    List<SyntaxError> errors = new CopyOnWriteArrayList<>();
     CobolPreprocessorImpl preprocessor = new CobolPreprocessorImpl();
-    preprocessor.setFormatListener(new FormatListener(errors));
+    preprocessor.setListener(new PreprocessorListener(errors));
 
     final PreprocessedInput preProcessedInput = preprocessor.process(in, sourceFormat);
     final CobolLexer lexer = new CobolLexer(CharStreams.fromString(preProcessedInput.getInput()));

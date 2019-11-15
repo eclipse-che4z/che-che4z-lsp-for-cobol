@@ -13,22 +13,16 @@
  */
 package com.ca.lsp.core.cobol.parser.listener;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 
 import java.util.List;
 
-public class FormatListener extends Listener {
+public class PreprocessorListener extends Listener {
 
   private static final int ERROR_SEVERITY = 1;
 
-  public FormatListener(List<SyntaxError> errorsPipe) {
+  public PreprocessorListener(List<SyntaxError> errorsPipe) {
     super(errorsPipe);
-  }
-
-  @Override
-  public List<SyntaxError> getErrorsPipe() {
-    return errorsPipe;
   }
 
   public void syntaxError(int line, int charPositionInLine, String msg, int errorLength) {
@@ -37,9 +31,5 @@ public class FormatListener extends Listener {
 
   public void syntaxError(int line, int charPositionInLine, int charEndingIndex, String msg) {
     super.syntaxError(line, charPositionInLine, charEndingIndex, msg, ERROR_SEVERITY);
-  }
-
-  protected void registerError(String msg, Position position) {
-    super.registerError(msg, position, ERROR_SEVERITY);
   }
 }
