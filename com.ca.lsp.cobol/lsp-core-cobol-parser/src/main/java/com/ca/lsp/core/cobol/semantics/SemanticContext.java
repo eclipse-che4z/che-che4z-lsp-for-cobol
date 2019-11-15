@@ -16,14 +16,20 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
+import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import lombok.Value;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @Value
 public class SemanticContext {
   private CobolVariableContext variables = new CobolVariableContext();
   private SubContext<String> paragraphs = new CobolNamedContext();
   private SubContext<String> copybooks = new CobolNamedContext();
+  private List<Map.Entry<String, Collection<Position>>> copybookUsageTracker;
 
   public void merge(CopybookSemanticContext semanticContext) {
     variables.merge(semanticContext.getName(), semanticContext.getContext().getVariables());

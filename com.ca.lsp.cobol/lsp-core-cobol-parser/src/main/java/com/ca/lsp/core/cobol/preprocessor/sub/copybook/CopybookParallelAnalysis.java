@@ -17,28 +17,31 @@ package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
 import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
-import com.ca.lsp.core.cobol.parser.listener.FormatListener;
+import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.google.common.collect.Multimap;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ForkJoinTask;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class CopybookParallelAnalysis implements CopybookAnalysis {
-  private static final String ERROR_SUGGESTION = "Copybook not found";
-  private final FormatListener listener;
+  private static final String ERROR_SUGGESTION = "%s: Copybook not found";
+  private final PreprocessorListener listener;
 
   @Override
   public List<CopybookSemanticContext> analyzeCopybooks(
-      Multimap<String, Position> copybooks, CobolPreprocessor.CobolSourceFormatEnum format) {
+      Multimap<String, Position> copybooks,
+      List<Map.Entry<String, Collection<Position>>> copybookUsageTracker,
+      CobolPreprocessor.CobolSourceFormatEnum format) {
     List<CopybookSemanticContext> contexts =
-        ForkJoinTask.invokeAll(createTasks(copybooks.keySet(), format)).stream()
+        ForkJoinTask.invokeAll(createTasks(copybooks, copybookUsageTracker, format)).stream()
             .map(ForkJoinTask::join)
             .collect(Collectors.toList());
 
@@ -61,14 +64,16 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
         listener.syntaxError(
             position.getLine(),
             position.getCharPositionInLine(),
-            ERROR_SUGGESTION,
+            String.format(ERROR_SUGGESTION, copybookName),
             copybookName.length());
   }
 
   private List<ForkJoinTask<CopybookSemanticContext>> createTasks(
-      Set<String> names, CobolPreprocessor.CobolSourceFormatEnum format) {
-    return names.stream()
-        .map(it -> new AnalyseCopybookTask(it, format))
+      Multimap<String, Position> names,
+      List<Map.Entry<String, Collection<Position>>> copybookUsageTracker,
+      CobolPreprocessor.CobolSourceFormatEnum format) {
+    return names.asMap().entrySet().stream()
+        .map(it -> new AnalyseCopybookTask(it, copybookUsageTracker, format, listener))
         .collect(Collectors.toList());
   }
 }

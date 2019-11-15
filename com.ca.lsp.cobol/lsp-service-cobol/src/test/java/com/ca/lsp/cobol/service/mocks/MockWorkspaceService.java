@@ -47,7 +47,7 @@ public class MockWorkspaceService implements CobolWorkspaceService {
   @Override
   public String getContentByCopybookName(String copybookName) {
     return copybooks.getCopybooks().stream()
-        .filter(it -> it.getFileName().equalsIgnoreCase(copybookName))
+        .filter(it -> it.getFileName().equalsIgnoreCase(copybookName) || it.getFileName().equalsIgnoreCase(copybookName + ".cpy"))
         .map(CobolText::getFullText)
         .findAny()
         .orElse(null);

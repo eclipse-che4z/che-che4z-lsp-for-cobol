@@ -15,7 +15,7 @@ package com.ca.lsp.core.cobol.preprocessor.sub.line.transformer;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CONT_LINE_NO_AREA_A_REGEX;
 
-import com.ca.lsp.core.cobol.parser.listener.FormatListener;
+import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
 import java.util.ArrayList;
@@ -42,9 +42,9 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private static final Pattern CONTINUATION_LINE_PATTERN =
       Pattern.compile(CONT_LINE_NO_AREA_A_REGEX);
 
-  private FormatListener listener;
+  private PreprocessorListener listener;
 
-  public ContinuationLineTransformation(FormatListener listener) {
+  public ContinuationLineTransformation(PreprocessorListener listener) {
     this.listener = listener;
   }
 

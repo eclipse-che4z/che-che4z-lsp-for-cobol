@@ -20,9 +20,13 @@ import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.google.common.collect.Multimap;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface CopybookAnalysis {
   List<CopybookSemanticContext> analyzeCopybooks(
-      Multimap<String, Position> copybookNames, CobolPreprocessor.CobolSourceFormatEnum format);
+      Multimap<String, Position> copybookNames,
+      List<Map.Entry<String, Collection<Position>>> copybookUsageTracker,
+      CobolPreprocessor.CobolSourceFormatEnum format);
 }

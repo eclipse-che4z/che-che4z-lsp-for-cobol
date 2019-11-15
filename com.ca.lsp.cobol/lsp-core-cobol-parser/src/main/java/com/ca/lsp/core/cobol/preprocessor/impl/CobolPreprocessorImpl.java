@@ -16,7 +16,7 @@ package com.ca.lsp.core.cobol.preprocessor.impl;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
-import com.ca.lsp.core.cobol.parser.listener.FormatListener;
+import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleaner;
@@ -40,16 +40,21 @@ import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
 public class CobolPreprocessorImpl implements CobolPreprocessor {
-  @Setter private FormatListener formatListener;
+  @Setter private PreprocessorListener listener;
 
   @Override
   public PreprocessedInput process(
       final String cobolSourceCode, final CobolSourceFormatEnum format) {
-    return process(cobolSourceCode, format, createDefaultParams(), new SemanticContext());
+    return process(
+        cobolSourceCode,
+        format,
+        createDefaultParams(),
+        new SemanticContext(Collections.emptyList()));
   }
 
   @Override
@@ -112,7 +117,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   }
 
   private CobolSemanticParser createDocumentParser(SemanticContext semanticContext) {
-    return new CobolSemanticParserImpl(semanticContext, formatListener);
+    return new CobolSemanticParserImpl(semanticContext, listener);
   }
 
   private CobolDocumentCleaner createDocumentCleaner() {
@@ -128,15 +133,15 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   }
 
   private CobolLinesTransformation createUnsupportedFeaturesProcessor() {
-    return new CobolUnsupportedFeaturesIgnorerImpl(formatListener);
+    return new CobolUnsupportedFeaturesIgnorerImpl(listener);
   }
 
   private CobolLinesTransformation createContinuationLineProcessor() {
-    return new ContinuationLineTransformation(formatListener);
+    return new ContinuationLineTransformation(listener);
   }
 
   private CobolLineReader createLineReader() {
-    return new CobolLineReaderImpl(formatListener);
+    return new CobolLineReaderImpl(listener);
   }
 
   private CobolLineWriter createLineWriter() {
