@@ -94,6 +94,7 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
 
   @Override
   @SneakyThrows
+  @Synchronized
   public CpyStorable getData(@NonNull long uuid) {
     return getCpyRepo().getCpyStorableCache(uuid).get();
   }
