@@ -75,7 +75,7 @@ pipeline {
             steps {
                 container('maven') {
                     dir('com.ca.lsp.cobol') {
-                        sh 'mvn verify sonar:sonar -Dsonar.projectKey=lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN}'
+                        sh 'mvn verify sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN}'
                     }
                 }
             }
