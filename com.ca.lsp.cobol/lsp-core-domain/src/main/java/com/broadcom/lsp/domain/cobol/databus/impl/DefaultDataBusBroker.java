@@ -100,6 +100,7 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
 
   @Override
   @SneakyThrows
+  @Synchronized
   public boolean isStored(@NonNull long uuid) {
     return getCpyRepo().isStored(uuid);
   }
