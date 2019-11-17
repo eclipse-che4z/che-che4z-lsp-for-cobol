@@ -22,7 +22,6 @@ import com.google.common.collect.Multimap;
 import java.util.Collection;
 
 public interface SubContext<T> {
-  // TODO: Make the implementations serializable
   /**
    * Add defined language element to the context
    *
