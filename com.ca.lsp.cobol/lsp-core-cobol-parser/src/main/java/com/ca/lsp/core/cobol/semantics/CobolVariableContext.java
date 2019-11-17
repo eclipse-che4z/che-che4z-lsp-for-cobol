@@ -21,7 +21,10 @@ import com.ca.lsp.core.cobol.model.Variable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /** Implementation of CobolVariableContext that uses ArrayList to store defined variables */
@@ -91,21 +94,28 @@ public class CobolVariableContext implements SubContext<Variable> {
         .orElse(null);
   }
 
-  public String getChildrenOfSpecificParent(String parentName, String child) {
-    List<String> childrenList = get(parentName).getChildren();
-    return childrenList.stream()
-        .filter(Objects::nonNull)
-        .filter(variable -> (variable).equalsIgnoreCase(child))
-        .findFirst()
-        .orElse(null);
-  }
+  /**
+   * @param rootVariableName the root variable from where start the deep search
+   * @param targetVariableName the name of the variable to found in the variable tree
+   * @return a boolean true if the variable targetVaraible is present false otherwise
+   */
+  public boolean parentContainsSpecificChild(String rootVariableName, String targetVariableName) {
+    Variable rootVariable = get(rootVariableName);
 
-  public boolean parentContainsSpecificChild(String parent, String child) {
-    return getChildrenOfSpecificParent(parent, child) != null;
+    if (rootVariable.getChildren().contains(targetVariableName)) {
+      return true;
+    } else {
+      for (String childVariableName : rootVariable.getChildren()) {
+        Variable childVariable = get(childVariableName);
+        if (childVariable != null) {
+          return parentContainsSpecificChild(childVariable.getName(), targetVariableName);
+        }
+      }
+    }
+    return false;
   }
 
   public void createRelationBetweenVariables() {
-
     // variable with level number [ 77 ] are not part of list used to generate the structure because
     // it cannot be a group item but just an element item
     List<Variable> variableList =
