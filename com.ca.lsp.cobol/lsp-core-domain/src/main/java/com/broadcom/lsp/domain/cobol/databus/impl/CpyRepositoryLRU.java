@@ -28,10 +28,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Created on 25/10/2019 */
@@ -48,7 +45,7 @@ public class CpyRepositoryLRU implements ICpyRepository {
   @Inject
   public CpyRepositoryLRU(@Named("CACHE-MAX-SIZE") int cachesize) {
     cacheMaxSize = cachesize;
-    cpyRepo = new ArrayList<>(cacheMaxSize);
+    cpyRepo = Collections.synchronizedList(new ArrayList<>(cacheMaxSize));
   }
 
   @Override

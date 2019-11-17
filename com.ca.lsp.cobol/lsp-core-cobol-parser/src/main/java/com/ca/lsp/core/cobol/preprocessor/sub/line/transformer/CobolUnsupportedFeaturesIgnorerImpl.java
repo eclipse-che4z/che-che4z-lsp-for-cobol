@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.ca.lsp.core.cobol.parser.listener.FormatListener;
+import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 
 /**
@@ -30,9 +30,9 @@ public class CobolUnsupportedFeaturesIgnorerImpl implements CobolLinesTransforma
   private static final Pattern COMPILER_DIRECTIVE_LINE =
       Pattern.compile("(\\d.{0,6} +|\\s*)(CBL|PROCESS) .+");
 
-  private FormatListener listener;
+  private PreprocessorListener listener;
 
-  public CobolUnsupportedFeaturesIgnorerImpl(FormatListener listener) {
+  public CobolUnsupportedFeaturesIgnorerImpl(PreprocessorListener listener) {
     this.listener = listener;
   }
 

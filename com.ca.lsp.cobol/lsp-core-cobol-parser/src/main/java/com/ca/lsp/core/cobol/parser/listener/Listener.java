@@ -15,21 +15,16 @@ package com.ca.lsp.core.cobol.parser.listener;
 
 import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 public abstract class Listener {
-  protected static final int PREPROCESSING_ERROR_INDEX = -1;
-  protected List<SyntaxError> errorsPipe;
-
-  public Listener(List<SyntaxError> errorsPipe) {
-    this.errorsPipe = errorsPipe;
-  }
-
-  public List<SyntaxError> getErrorsPipe() {
-    return errorsPipe;
-  }
+  private static final int PREPROCESSING_ERROR_INDEX = -1;
+  @Getter private List<SyntaxError> errorsPipe;
 
   public void syntaxError(
       int line, int charPositionInLine, String msg, int errorLength, int severity) {
@@ -63,7 +58,7 @@ public abstract class Listener {
     error.ifPresent(err -> getErrorsPipe().remove(err));
   }
 
-  protected void registerError(String msg, Position position, int severity) {
+  void registerError(String msg, Position position, int severity) {
     if (getErrorsPipe() != null) {
       getErrorsPipe()
           .add(
