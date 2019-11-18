@@ -19,19 +19,13 @@ package com.broadcom.lsp.cdi.module.databus;
 import com.broadcom.lsp.cdi.module.DefaultModule;
 import com.google.inject.name.Names;
 
-/**
- * Created   on 2019-10-02
- */
-//Binding Module
+/** Created on 2019-10-02 */
+// Binding Module
 public class DatabusModule extends DefaultModule {
-    @Override
-    protected void configure() {
-        super.configure();
-        bindConstant()
-                .annotatedWith(Names.named("ASYNC-MESS-DISPATCHER"))
-                .to(10);
-        bindConstant()
-                .annotatedWith(Names.named("CACHE-MAX-SIZE"))
-                .to(5);
-    }
+  @Override
+  protected void configure() {
+    super.configure();
+    bindConstant().annotatedWith(Names.named("ASYNC-MESS-DISPATCHER")).to(10);
+    bindConstant().annotatedWith(Names.named("CACHE-MAX-SIZE")).to(50);
+  }
 }

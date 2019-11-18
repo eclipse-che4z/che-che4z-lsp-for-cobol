@@ -17,7 +17,6 @@
 package com.broadcom.impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.CpyBuildEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
@@ -28,38 +27,39 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Created on 2019-10-02
- */
+/** Created on 2019-10-02 */
 @Slf4j
 public class DataBusSubscribelBadTest extends AbsDataBusImplTest {
 
-    private DefaultDataBusBroker databus;
+  private DefaultDataBusBroker databus;
 
-    @Before
-    public void setUp() throws Exception {
-        databus = LangServerCtx.getGuiceCtx(new DatabusModule()).getInjector().getInstance(DefaultDataBusBroker.class);
-    }
+  @Before
+  public void setUp() throws Exception {
+    databus =
+        LangServerCtx.getGuiceCtx(new DatabusTestModule())
+            .getInjector()
+            .getInstance(DefaultDataBusBroker.class);
+  }
 
-    @After
-    public void tearDown() throws Exception {
-        databus = null;
-    }
+  @After
+  public void tearDown() throws Exception {
+    databus = null;
+    LangServerCtx.shutdown();
+  }
 
-    @Override
-    public void observerCallback(DataEvent adaptedDataEvent) {
-        waiter.assertFalse(DataEventType.CBLFETCH_EVENT == adaptedDataEvent.getEventType());
-        LOG.debug(String.format("Received : %s", adaptedDataEvent.getEventType().getId()));
-        LOG.debug(String.format("Expected : %s", DataEventType.CBLFETCH_EVENT.getId()));
-        waiter.resume();
-    }
+  @Override
+  public void observerCallback(DataEvent adaptedDataEvent) {
+    waiter.assertFalse(DataEventType.CBLFETCH_EVENT == adaptedDataEvent.getEventType());
+    LOG.debug(String.format("Received : %s", adaptedDataEvent.getEventType().getId()));
+    LOG.debug(String.format("Expected : %s", DataEventType.CBLFETCH_EVENT.getId()));
+    waiter.resume();
+  }
 
-    @Test
-    @SneakyThrows
-    public void subscribe() {
-        databus.subscribe(DataEventType.CPYBUILD_EVENT, this);
-        databus.postData(CpyBuildEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
-        waiter.await(5000);
-    }
-
+  @Test
+  @SneakyThrows
+  public void subscribe() {
+    databus.subscribe(DataEventType.CPYBUILD_EVENT, this);
+    databus.postData(CpyBuildEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
+    waiter.await(5000);
+  }
 }

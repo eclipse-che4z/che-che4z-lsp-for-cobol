@@ -17,7 +17,6 @@
 package com.broadcom.impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.api.ICpyRepository;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.CpyStorable;
@@ -40,7 +39,7 @@ public class DataBusGetFromCacheBadTest extends AbsDataBusImplTest {
   @Before
   public void setUp() throws Exception {
     databus =
-        LangServerCtx.getGuiceCtx(new DatabusModule())
+        LangServerCtx.getGuiceCtx(new DatabusTestModule())
             .getInjector()
             .getInstance(DefaultDataBusBroker.class);
     databus.storeData(
