@@ -58,7 +58,7 @@ public class SnippetCompletionTest {
 
   @Test
   public void testGetSortOrderPrefix() {
-    assertEquals("1", provider.getSortOrderPrefix());
+    assertEquals("2", provider.getSortOrderPrefix());
   }
 
   @Test

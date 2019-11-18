@@ -46,6 +46,7 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
     capabilities.setDocumentSymbolProvider(Boolean.FALSE);
     capabilities.setCodeLensProvider(null);
     capabilities.setDocumentFormattingProvider(Boolean.TRUE);
+    capabilities.setDocumentHighlightProvider(Boolean.TRUE);
 
     WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
     workspaceFoldersOptions.setSupported(Boolean.TRUE);

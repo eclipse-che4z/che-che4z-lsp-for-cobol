@@ -20,12 +20,12 @@
 	<parent>
 		<groupId>com.ca.lsp</groupId>
 		<artifactId>com.ca.lsp.cobol</artifactId>
-		<version>0.8.0</version>
+		<version>0.8.3</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>lsp-core-cobol-parser</artifactId>
-	<version>0.8.0</version>
-	<name>CA COBOL LSP :: LSP Core</name>
+	<version>0.8.3</version>
+	<name>COBOL LSP :: LSP Core</name>
 	<packaging>jar</packaging>
 
 	<properties>

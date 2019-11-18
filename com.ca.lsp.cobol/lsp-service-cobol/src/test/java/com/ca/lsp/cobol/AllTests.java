@@ -19,9 +19,11 @@ import com.ca.lsp.cobol.service.DefinitionsAndUsagesTest;
 import com.ca.lsp.cobol.service.MyDocumentModelTest;
 import com.ca.lsp.cobol.service.MyTextDocumentServiceTest;
 import com.ca.lsp.cobol.service.WorkspaceServiceTest;
+import com.ca.lsp.cobol.service.delegates.HighlightsTest;
 import com.ca.lsp.cobol.service.delegates.LanguageEnginesTest;
 import com.ca.lsp.cobol.service.delegates.ValidationTest;
 import com.ca.lsp.cobol.service.delegates.completions.CompletionsChainTest;
+import com.ca.lsp.cobol.service.delegates.completions.ParagraphCompletionTest;
 import com.ca.lsp.cobol.service.delegates.completions.SnippetCompletionTest;
 import com.ca.lsp.cobol.service.delegates.completions.VariableCompletionTest;
 import com.ca.lsp.cobol.service.delegates.references.ReferencesTest;
@@ -34,8 +36,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * The suite for all the tests in project that should be run.
- *
- * @author teman02
  */
 @RunWith(Suite.class)
 @SuiteClasses({
@@ -50,9 +50,11 @@ import org.junit.runners.Suite.SuiteClasses;
   VariableCompletionTest.class,
   CompletionsChainTest.class,
   SnippetCompletionTest.class,
+  ParagraphCompletionTest.class,
   ReferencesTest.class,
   DefinitionsAndUsagesTest.class,
   TestResponsesNotContainLineBreaks.class,
-  WorkspaceServiceTest.class
+  WorkspaceServiceTest.class,
+  HighlightsTest.class
 })
 public class AllTests {}

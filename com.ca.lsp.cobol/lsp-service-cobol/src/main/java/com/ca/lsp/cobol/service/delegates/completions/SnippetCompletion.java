@@ -38,7 +38,7 @@ public class SnippetCompletion extends AbstractCompletion {
 
   @Override
   protected String getSortOrderPrefix() {
-    return "1";
+    return "2";
   }
 
   @Override

@@ -19,13 +19,14 @@ import {
     LanguageClient,
     LanguageClientOptions,
 } from "vscode-languageclient/lib/main";
+import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
 
 export async function activate(context: ExtensionContext) {
     const fs = require("fs");
 
     // path resolved to identify the location of the LSP server into the extension
     const extPath = extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
-    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.8.0.jar`;
+    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.8.3.jar`;
 
     let serverOptions: Executable;
 
@@ -38,7 +39,7 @@ export async function activate(context: ExtensionContext) {
                 options: { stdio: "pipe", detached: false },
             };
         } else {
-            window.showErrorMessage("Cobol extension failed to start - LSP server not found");
+            window.showErrorMessage("COBOL extension failed to start - LSP server not found");
             return;
         }
     } catch (err) {
@@ -48,13 +49,13 @@ export async function activate(context: ExtensionContext) {
 
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
-        // Register the server for cobol
+        // Register the server for COBOL
         documentSelector: ["COBOL"],
     };
     const item = window.createStatusBarItem(StatusBarAlignment.Right, Number.MIN_VALUE);
 
     // Create the language client and start the client.
-    const languageClient = new LanguageClient("LSP", "LSP extension for Cobol language", serverOptions, clientOptions);
+    const languageClient = new LanguageClient("LSP", "LSP extension for COBOL language", serverOptions, clientOptions);
 
     const disposable = languageClient.start();
 
@@ -66,7 +67,8 @@ async function isJavaInstalled() {
     return new Promise<any>((resolve, reject) => {
         const ls = cp.spawn("java", ["-version"]);
         ls.stderr.on("data", (data: any) => {
-            if (!data.toString().includes('java version "1.8')) {
+            let javaCheck = new DefaultJavaVersionCheck();
+            if (!javaCheck.isJavaVersionSupported(data.toString())) {
                 reject("Java version 8 expected");
             }
             resolve();
