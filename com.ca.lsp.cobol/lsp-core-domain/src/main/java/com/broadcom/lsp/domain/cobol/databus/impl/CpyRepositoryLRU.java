@@ -21,10 +21,7 @@ import com.broadcom.lsp.domain.cobol.model.CpyStorable;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.SneakyThrows;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 
@@ -55,6 +52,7 @@ public class CpyRepositoryLRU implements ICpyRepository {
     isSort.set(true);
   }
 
+  @Override
   @SneakyThrows
   public Optional<CpyStorable> getCpyStorableCache(@NonNull long uuid) {
     Optional<CpyStorable> cpy = cpyRepo.stream().filter(copy -> uuid == copy.getId()).findAny();
@@ -76,7 +74,7 @@ public class CpyRepositoryLRU implements ICpyRepository {
 
   @Override
   @SneakyThrows
-  public void persist(@NonNull CpyStorable deepcopy) {
+  public synchronized void persist(@NonNull CpyStorable deepcopy) {
     if (!isStored(deepcopy.getId())) {
       if (cpyRepo.size() < getCacheMaxSize()) {
         cpyRepo.add(deepcopy);
@@ -133,7 +131,7 @@ public class CpyRepositoryLRU implements ICpyRepository {
 
   @Override
   @SneakyThrows
-  public boolean isStored(@NonNull long uuid) {
+  public synchronized boolean isStored(@NonNull long uuid) {
     Optional<CpyStorable> cpy = getCpyStorableInstance(uuid);
     if (cpy.isPresent()) {
       cpy.get().match();

@@ -21,12 +21,15 @@ import com.broadcom.lsp.domain.cobol.model.CpyStorable;
 import com.google.inject.ImplementedBy;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import lombok.Synchronized;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /** Created on 31/10/2019 */
 @ImplementedBy(CpyRepositoryLRU.class)
 public interface ICpyRepository {
+
   @SneakyThrows
   void sortCache();
 
@@ -41,8 +44,15 @@ public interface ICpyRepository {
   }
 
   @SneakyThrows
+  Optional<CpyStorable> getCpyStorableCache(@NonNull long uuid);
+
+  @SneakyThrows
   void setSort(boolean isSort);
 
+  /**
+   * The implementation should be synchronized
+   * @param deepcopy
+   */
   @SneakyThrows
   void persist(@NonNull CpyStorable deepcopy);
 
@@ -58,6 +68,11 @@ public interface ICpyRepository {
   @SneakyThrows
   boolean isStored(@NonNull String id);
 
+  /**
+   * The implementation should be synchronized
+   * @param uuid
+   * @return
+   */
   @SneakyThrows
   boolean isStored(@NonNull long uuid);
 
