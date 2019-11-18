@@ -68,9 +68,8 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     return err -> {
       Diagnostic diagnostic = new Diagnostic();
       diagnostic.setSeverity(checkSeverity(err.getSeverity()));
-      diagnostic.setSource(setupSourceInfo(err.getSeverity()));
       diagnostic.setMessage(err.getSuggestion());
-
+      diagnostic.setSource(setupSourceInfo(err.getSeverity()));
       diagnostic.setRange(convertRange(err.getPosition()));
       return diagnostic;
     };
