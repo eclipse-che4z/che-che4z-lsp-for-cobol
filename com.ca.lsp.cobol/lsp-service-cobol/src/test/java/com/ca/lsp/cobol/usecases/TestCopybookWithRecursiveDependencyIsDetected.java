@@ -6,7 +6,7 @@ import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 /**
@@ -30,7 +30,7 @@ public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCa
 
     MockWorkspaceService workspaceService =
         LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
-    workspaceService.setCopybooks(() -> List.of(new CobolText("RECURSIVE-COPY", RECURSIVE_COPY)));
+    workspaceService.setCopybooks(() -> Collections.singletonList(new CobolText("RECURSIVE-COPY", RECURSIVE_COPY)));
   }
 
   @Test

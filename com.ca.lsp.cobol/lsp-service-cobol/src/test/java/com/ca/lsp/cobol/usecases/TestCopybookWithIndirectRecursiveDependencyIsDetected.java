@@ -6,7 +6,7 @@ import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 /**
@@ -33,7 +33,7 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends Negat
         LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
     workspaceService.setCopybooks(
         () ->
-            List.of(
+            Arrays.asList(
                 new CobolText("INNER-COPY", INNER_COPY),
                 new CobolText("INDIRECT-COPY", INDIRECT_COPY)));
   }
