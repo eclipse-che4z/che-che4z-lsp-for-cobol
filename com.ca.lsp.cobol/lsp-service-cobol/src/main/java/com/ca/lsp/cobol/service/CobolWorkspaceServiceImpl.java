@@ -178,7 +178,11 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
               File resFile = path.toFile();
               return resFile.isFile()
                   && !resFile.isDirectory()
-                  && resFile.getName().toLowerCase().contains(fileName.toLowerCase())
+                  && resFile.getName().contains(".")
+                  && resFile
+                      .getName()
+                      .substring(0, resFile.getName().lastIndexOf('.'))
+                      .equalsIgnoreCase(fileName)
                   && isValidExtension(resFile.getAbsoluteFile().toString().toLowerCase());
             },
             FileVisitOption.FOLLOW_LINKS)) {
