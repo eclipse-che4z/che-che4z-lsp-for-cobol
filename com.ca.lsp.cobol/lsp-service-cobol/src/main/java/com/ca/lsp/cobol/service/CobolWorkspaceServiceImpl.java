@@ -36,6 +36,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -97,7 +98,10 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   @Override
   public Path getURIByCopybookName(String fileName) {
     return getWorkspaceFolders().stream()
-        .flatMap(it -> searchInDirectory(fileName, getWorkspaceFolderPath(it)))
+        .map(this::getWorkspaceFolderPath)
+        .map(it -> searchInDirectory(fileName, it))
+        .map(it -> it.orElse(null))
+        .filter(Objects::nonNull)
         .findAny()
         .orElse(null);
   }
@@ -160,8 +164,8 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    * @param workspaceFolderPath NIO Path of workspace folder
    * @return a valid path of the copybook file or null if not found
    */
-  private Stream<Path> searchInDirectory(String fileName, Path workspaceFolderPath) {
-    return Stream.ofNullable(applySearch(fileName, workspaceFolderPath));
+  private Optional<Path> searchInDirectory(String fileName, Path workspaceFolderPath) {
+    return Optional.ofNullable(applySearch(fileName, workspaceFolderPath));
   }
 
   /**
@@ -178,7 +182,11 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
               File resFile = path.toFile();
               return resFile.isFile()
                   && !resFile.isDirectory()
-                  && resFile.getName().toLowerCase().contains(fileName.toLowerCase())
+                  && resFile.getName().contains(".")
+                  && resFile
+                      .getName()
+                      .substring(0, resFile.getName().lastIndexOf('.'))
+                      .equalsIgnoreCase(fileName)
                   && isValidExtension(resFile.getAbsoluteFile().toString().toLowerCase());
             },
             FileVisitOption.FOLLOW_LINKS)) {

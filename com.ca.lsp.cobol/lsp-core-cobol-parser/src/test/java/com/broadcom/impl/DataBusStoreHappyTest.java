@@ -17,7 +17,6 @@
 package com.broadcom.impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.api.ICpyRepository;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.CpyStorable;
@@ -41,6 +40,12 @@ import static junit.framework.TestCase.assertTrue;
 /** Created on 2019-10-02 */
 @Slf4j
 public class DataBusStoreHappyTest extends AbsDataBusImplTest {
+  // cache dummy static content
+  private static final String CPY_FIXED_NAME = "COPY-";
+  private static final String CPY_FIXED_CONTENT = "FASDFASDFSF";
+  private static final String CPY_FIXED_POSITION = "ROW:3,COL:4";
+  private static final String CPY_FIXED_URI = "/var/tmp/worspace1";
+
   private final String PARAGRAPH_NAME = "PARNAME";
   private final Position POSITION_FIRST_OCCURRENCE = new Position(0, 0, 0, 0, 0);
   private final Position POSITION_SECOND_OCCURRENCE = new Position(10, 10, 10, 10, 10);
@@ -56,42 +61,19 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
     MultiMapSerializableHelper.serializeInHashMap(paragraphDefinitions);
 
     databus =
-        LangServerCtx.getGuiceCtx(new DatabusModule())
+        LangServerCtx.getGuiceCtx(new DatabusTestModule())
             .getInjector()
             .getInstance(DefaultDataBusBroker.class);
-    databus.storeData(
-        CpyStorable.builder()
-            .name("COPY1")
-            .content("FASDFASDFSF")
-            .position("ROW:3,COL:4")
-            .uri("/var/tmp/worspace1")
-            .build());
-    databus.storeData(
-        CpyStorable.builder()
-            .name("COPY2")
-            .content("FASDFASDFSF")
-            .position("ROW:3,COL:4")
-            .uri("/var/tmp/worspace1")
-            .build());
-    databus.storeData(
-        CpyStorable.builder()
-            .name("COPY3")
-            .content("FASDFASDFSF")
-            .position("ROW:3,COL:4")
-            .uri("/var/tmp/worspace1")
-            .build());
-    databus.storeData(
-        CpyStorable.builder()
-            .name("COPY40")
-            .content("FASDFASDFSF")
-            .position("ROW:3,COL:4")
-            .uri("/var/tmp/worspace1")
-            .build());
+
+    // TODO: parametrize store data (size-1 to add also copybook..)
+    fulfillDatabusCacheContent(databus.getCacheMaxSize());
+
+    // add one more elemnent
     databus.storeData(
         CpyStorable.builder()
             .name("COPY-COPYBOOK")
-            .content("FASDFASDFSF")
-            .uri("/var/tmp/worspace1")
+            .content(CPY_FIXED_CONTENT)
+            .uri(CPY_FIXED_URI)
             .paragraphPosition(MultiMapSerializableHelper.serializeInHashMap(paragraphDefinitions))
             .build());
   }
@@ -110,7 +92,9 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
   @Test
   @SneakyThrows
   public void cacheData() {
-    Assert.assertFalse(databus.isStored(ICpyRepository.calculateUUID(new StringBuilder("COPY20"))));
+    String newCopybookName = "COPY-" + (databus.getCacheMaxSize() + 1);
+    Assert.assertFalse(
+        databus.isStored(ICpyRepository.calculateUUID(new StringBuilder(newCopybookName))));
     LOG.debug(String.format("Cache content : %s", databus.printCache()));
     Optional<CpyStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
     LOG.debug(
@@ -123,15 +107,17 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
             "Cache STATUS --> MaxCacheSize: %d  ActualCacheSize: %d",
             databus.getCacheMaxSize(), databus.cacheSize()));
     Assert.assertEquals(databus.getCacheMaxSize(), databus.cacheSize());
-    LOG.debug(String.format("Storing new item %s ", "COPY20"));
+
+    LOG.debug(String.format("Storing new item %s ", newCopybookName));
     databus.storeData(
         CpyStorable.builder()
-            .name("COPY20")
-            .content("FASDFASDFSF")
-            .position("ROW:3,COL:4")
-            .uri("/var/tmp/worspace1")
+            .name(newCopybookName)
+            .content(CPY_FIXED_CONTENT)
+            .position(CPY_FIXED_POSITION)
+            .uri(CPY_FIXED_URI)
             .build());
-    Assert.assertTrue(databus.isStored(ICpyRepository.calculateUUID(new StringBuilder("COPY20"))));
+    Assert.assertTrue(
+        databus.isStored(ICpyRepository.calculateUUID(new StringBuilder(newCopybookName))));
     // Swapped
     Assert.assertEquals(databus.getCacheMaxSize(), databus.cacheSize());
     LOG.debug(String.format("Cache content : %s", databus.printCache()));
@@ -176,7 +162,19 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
 
   @Test
   public void geteElementFromCache() {
-    String element = "COPY1";
+    String element = "COPY-1";
     assertTrue(databus.isStored(ICpyRepository.calculateUUID(new StringBuilder(element))));
+  }
+
+  private void fulfillDatabusCacheContent(int cacheMaxSize) {
+    for (int i = 0; i < cacheMaxSize; i++) {
+      databus.storeData(
+          CpyStorable.builder()
+              .name(CPY_FIXED_NAME + i)
+              .content("FASDFASDFSF")
+              .position("ROW:3,COL:4")
+              .uri("/var/tmp/worspace1")
+              .build());
+    }
   }
 }

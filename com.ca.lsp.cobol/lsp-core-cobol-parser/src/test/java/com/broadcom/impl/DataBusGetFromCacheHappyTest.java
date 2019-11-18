@@ -17,7 +17,6 @@
 package com.broadcom.impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.api.ICpyRepository;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.CpyStorable;
@@ -31,72 +30,76 @@ import org.junit.Test;
 
 import java.util.Optional;
 
-/**
- * Created on 2019-10-02
- */
+/** Created on 2019-10-02 */
 @Slf4j
 public class DataBusGetFromCacheHappyTest extends AbsDataBusImplTest {
+  // cache dummy static content
+  private static final String CPY_FIXED_NAME = "COPY-";
+  private static final String CPY_FIXED_CONTENT = "FASDFASDFSF";
+  private static final String CPY_FIXED_POSITION = "ROW:3,COL:4";
+  private static final String CPY_FIXED_URI = "/var/tmp/worspace1";
 
-    private DefaultDataBusBroker databus;
+  private DefaultDataBusBroker databus;
 
-    @Before
-    public void setUp() throws Exception {
-        databus = LangServerCtx.getGuiceCtx(new DatabusModule()).getInjector().getInstance(DefaultDataBusBroker.class);
-        databus.storeData(CpyStorable.builder()
-                .name("COPY1")
-                .content("FASDFASDFSF")
-                .position("ROW:3,COL:4")
-                .uri("/var/tmp/worspace1")
-                .build());
-        databus.storeData(CpyStorable.builder()
-                .name("COPY2")
-                .content("FASDFASDFSF")
-                .position("ROW:3,COL:4")
-                .uri("/var/tmp/worspace1")
-                .build());
-        databus.storeData(CpyStorable.builder()
-                .name("COPY3")
-                .content("FASDFASDFSF")
-                .position("ROW:3,COL:4")
-                .uri("/var/tmp/worspace1")
-                .build());
-        databus.storeData(CpyStorable.builder()
-                .name("COPY4")
-                .content("FASDFASDFSF")
-                .position("ROW:3,COL:4")
-                .uri("/var/tmp/worspace1")
-                .build());
-        databus.storeData(CpyStorable.builder()
-                .name("COPY40")
-                .content("FASDFASDFSF")
-                .position("ROW:3,COL:4")
-                .uri("/var/tmp/worspace1")
-                .build());
+  @Before
+  public void setUp() throws Exception {
+    databus =
+        LangServerCtx.getGuiceCtx(new DatabusTestModule())
+            .getInjector()
+            .getInstance(DefaultDataBusBroker.class);
+    fulfillDatabusCacheContent(databus.getCacheMaxSize());
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    databus = null;
+    LangServerCtx.shutdown();
+  }
+
+  @Override
+  public void observerCallback(DataEvent adaptedDataEvent) {
+    LOG.debug(String.format("Received : %s", adaptedDataEvent.getEventType().getId()));
+  }
+
+  @Test
+  @SneakyThrows
+  public void getData() {
+    String newCopybookName = "COPY-" + (databus.getCacheMaxSize() - 1);
+
+    Assert.assertTrue(databus.isStored(ICpyRepository.calculateUUID(newCopybookName)));
+    LOG.debug(String.format("Cache content : %s", databus.printCache()));
+    Optional<CpyStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
+    LOG.debug(
+        String.format(
+            "Least Recently Used item : %s  ID : %d",
+            leastRecentlyUsed.get().getName(), leastRecentlyUsed.get().getId()));
+    // Cache is Full
+    LOG.debug(
+        String.format(
+            "Cache STATUS --> MaxCacheSize: %d  ActualCacheSize: %d",
+            databus.getCacheMaxSize(), databus.cacheSize()));
+    LOG.debug(String.format("Retrieving item %s ", newCopybookName));
+    Assert.assertTrue(
+        databus
+            .getData(ICpyRepository.calculateUUID(newCopybookName))
+            .getName()
+            .equalsIgnoreCase(newCopybookName));
+    LOG.debug(
+        String.format(
+            "Element Retrieved : %s",
+            databus.getData(ICpyRepository.calculateUUID(newCopybookName))));
+    LOG.debug(String.format("Cache content : %s", databus.printCache()));
+  }
+
+  private void fulfillDatabusCacheContent(int cacheMaxSize) {
+    for (int i = 0; i < cacheMaxSize; i++) {
+      databus.storeData(
+          CpyStorable.builder()
+              .name(CPY_FIXED_NAME + i)
+              .content(CPY_FIXED_CONTENT)
+              .position(CPY_FIXED_POSITION)
+              .uri(CPY_FIXED_URI)
+              .build());
     }
-
-    @After
-    public void tearDown() throws Exception {
-        databus = null;
-        LangServerCtx.shutdown();
-    }
-
-    @Override
-    public void observerCallback(DataEvent adaptedDataEvent) {
-        LOG.debug(String.format("Received : %s", adaptedDataEvent.getEventType().getId()));
-    }
-
-    @Test
-    @SneakyThrows
-    public void getData() {
-        Assert.assertTrue(databus.isStored(ICpyRepository.calculateUUID("COPY40")));
-        LOG.debug(String.format("Cache content : %s", databus.printCache()));
-        Optional<CpyStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
-        LOG.debug(String.format("Least Recently Used item : %s  ID : %d", leastRecentlyUsed.get().getName(), leastRecentlyUsed.get().getId()));
-        //Cache is Full
-        LOG.debug(String.format("Cache STATUS --> MaxCacheSize: %d  ActualCacheSize: %d", databus.getCacheMaxSize(), databus.cacheSize()));
-        LOG.debug(String.format("Retrieving item %s ", "COPY40"));
-        Assert.assertTrue(databus.getData(ICpyRepository.calculateUUID("COPY40")).getName().equalsIgnoreCase("COPY40"));
-        LOG.debug(String.format("Element Retrieved : %s",databus.getData(ICpyRepository.calculateUUID("COPY40"))));
-        LOG.debug(String.format("Cache content : %s", databus.printCache()));
-    }
+  }
 }
