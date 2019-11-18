@@ -13,8 +13,9 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.ca.lsp.cobol.service.delegates.Communications;
 import com.ca.lsp.cobol.service.delegates.Formations;
+import com.ca.lsp.cobol.service.delegates.Communications;
+import com.ca.lsp.cobol.service.delegates.Highlights;
 import com.ca.lsp.cobol.service.delegates.completions.Completions;
 import com.ca.lsp.cobol.service.delegates.references.References;
 import com.ca.lsp.cobol.service.delegates.validations.Analysis;
@@ -85,7 +86,7 @@ public class MyTextDocumentService implements TextDocumentService {
   @Override
   public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
       TextDocumentPositionParams position) {
-    return CompletableFuture.supplyAsync(() -> null);
+    return CompletableFuture.supplyAsync(() -> Highlights.findHighlights(docs.get(position.getTextDocument().getUri()), position));
   }
 
   @Override
@@ -127,17 +128,8 @@ public class MyTextDocumentService implements TextDocumentService {
     String uri = params.getTextDocument().getUri();
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
-    registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
-    //
-    //    // test to verify object for databus is successfully created...
-    //    String testCopyFile = "CPBTEST";
-    //
-    //    CobolWorkspaceServiceImpl workspaceService =
-    //        (CobolWorkspaceServiceImpl) server.getWorkspaceService();
-    //
-    //    if (workspaceService.getURIByFileName(testCopyFile) == null)
-    //      communications.notifyCopybookNotFound(testCopyFile);
 
+    registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     registerEngineAndAnalyze(uri, langId, text);
   }
 

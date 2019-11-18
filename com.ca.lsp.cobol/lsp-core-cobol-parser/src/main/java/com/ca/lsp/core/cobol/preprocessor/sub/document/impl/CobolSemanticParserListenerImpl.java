@@ -28,6 +28,7 @@ import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_TAG;
 
@@ -184,45 +186,52 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitCopyStatement(final CobolPreprocessorParser.CopyStatementContext ctx) {
-
     /*
-     * replacement phrase
+     * define the copy book
      */
-    //    for (final ReplacingPhraseContext replacingPhrase : ctx.replacingPhrase()) {
-    //      context().storeReplaceablesAndReplacements(replacingPhrase.replaceClause());
-    //    }
-    // TODO: implement replacement logic
-    /*
-     * copy the copy book
-     */
-    final CopySourceContext copySource = ctx.copySource();
+    CopySourceContext copySource = ctx.copySource();
     String copybookName = retrieveCopybookName(copySource);
-    if (copybookName != null) {
-      if (semanticContext.getCopybookUsageTracker().stream()
-          .map(Map.Entry::getKey)
-          .noneMatch(copybookName::equals)) {
-        semanticContext.getCopybooks().define(copybookName, retrievePosition(copySource));
-        semanticContext
-            .getVariables()
-            .define(new Variable("-1", copybookName), retrievePosition(copySource));
-
-      } else {
-        if (!semanticContext.getCopybookUsageTracker().isEmpty()) {
-          semanticContext
-              .getCopybookUsageTracker()
-              .get(0)
-              .getValue()
-              .forEach(
-                  it ->
-                      listener.syntaxError(
-                          it.getLine(),
-                          it.getCharPositionInLine(),
-                          String.format(RECURSION_DETECTED, copybookName),
-                          copybookName.length()));
-        }
-      }
-    }
+    Position position = retrievePosition(copySource);
+    defineCopybook(copybookName, position);
     this.preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens, format);
+  }
+
+  private void defineCopybook(String copybookName, Position position) {
+    if (copybookName == null) {
+      return;
+    }
+    if (checkThisCopybookNotPresentInHierarchy(copybookName)) {
+      semanticContext.getCopybooks().define(copybookName, position);
+      semanticContext.getVariables().define(new Variable("-1", copybookName), position);
+    } else {
+      reportRecursiveCopybooks(copybookName);
+    }
+  }
+
+  private boolean checkThisCopybookNotPresentInHierarchy(String copybookName) {
+    return semanticContext.getCopybookUsageTracker().stream()
+        .map(Map.Entry::getKey)
+        .noneMatch(copybookName::equals);
+  }
+
+  private void reportRecursiveCopybooks(String copybookName) {
+    if (!semanticContext.getCopybookUsageTracker().isEmpty()) {
+      semanticContext
+          .getCopybookUsageTracker()
+          .get(0)
+          .getValue()
+          .forEach(toSyntaxError(copybookName));
+    }
+  }
+
+  @NotNull
+  private Consumer<Position> toSyntaxError(String copybookName) {
+    return it ->
+        listener.syntaxError(
+            it.getLine(),
+            it.getCharPositionInLine(),
+            String.format(RECURSION_DETECTED, copybookName),
+            copybookName.length());
   }
 
   @Override
@@ -230,15 +239,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     /*
      * replacement phrase
      */
-    //    final List<ReplaceClauseContext> replaceClauses =
-    // ctx.replaceByStatement().replaceClause();
-    //    context().storeReplaceablesAndReplacements(replaceClauses);
-    //
-    //    context().replaceReplaceablesByReplacements(tokens);
-    //    final String content = context().read();
-
     this.preprocessorCleanerService.pop();
-    //    context().write(content);
   }
 
   @Override

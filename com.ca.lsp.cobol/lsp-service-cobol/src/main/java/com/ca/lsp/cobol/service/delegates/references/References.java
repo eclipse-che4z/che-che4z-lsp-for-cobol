@@ -38,7 +38,7 @@ public class References {
     return PROVIDER.resolveDefinition(document, position);
   }
 
-  public static List<Location> findReferences(MyDocumentModel document, ReferenceParams position, ReferenceContext context) {
+  public static List<Location> findReferences(MyDocumentModel document, TextDocumentPositionParams position, ReferenceContext context) {
     return PROVIDER.collectReferences(document, position, context);
   }
 }
