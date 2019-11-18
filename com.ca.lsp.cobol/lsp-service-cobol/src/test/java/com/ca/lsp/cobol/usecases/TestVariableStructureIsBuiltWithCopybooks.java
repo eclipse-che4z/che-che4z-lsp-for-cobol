@@ -5,7 +5,7 @@ import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.Collections;
 
 /**
  * This test case checks that there is no semantic error when a variable structure is defined using
@@ -35,7 +35,7 @@ public class TestVariableStructureIsBuiltWithCopybooks extends PositiveUseCase {
     MockWorkspaceService workspaceService =
         LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
     workspaceService.setCopybooks(
-        () -> List.of(new CobolText("COPYBOOK-CONTENT", COPYBOOK_CONTENT)));
+        () -> Collections.singletonList(new CobolText("COPYBOOK-CONTENT", COPYBOOK_CONTENT)));
   }
 
   @Test

@@ -19,6 +19,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -68,7 +69,7 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
   private void initWorkspaceService() {
     MockWorkspaceService mockWorkspaceService = new MockWorkspaceService(databus);
     mockWorkspaceService.setCopybooks(
-        () -> List.of(new CobolText(COPYBOOK_NAME, COPYBOOK_CONTENT)));
+        () -> Collections.singletonList(new CobolText(COPYBOOK_NAME, COPYBOOK_CONTENT)));
   }
 
   @After
