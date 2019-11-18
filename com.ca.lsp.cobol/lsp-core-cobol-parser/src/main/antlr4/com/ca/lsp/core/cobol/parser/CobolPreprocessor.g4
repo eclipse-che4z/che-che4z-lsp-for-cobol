@@ -9,16 +9,39 @@
 grammar CobolPreprocessor;
 
 startRule : .*? ((compilerOptions | dataDescriptionEntry | dataDivision | procedureDivision | copyStatement
-            | replaceOffStatement | replaceArea  | skipStatement | titleStatement | NEWLINE)+ .*?)+ EOF;
-
-//statements
-useStatement
-   : USE .*?
-   ;
+            | replaceOffStatement | replaceArea  | skipStatement | titleStatement | paragraphs2 |  NEWLINE)+ .*?)+ EOF;
 
 //procedureDivision
 procedureDivision
-   : PROCEDURE DIVISION .*? DOT_FS procedureDeclaratives? procedureDivisionBody
+   : PROCEDURE DIVISION procedureDivisionUsingClause? procedureDivisionGivingClause?  DOT_FS procedureDeclaratives? procedureDivisionBody
+   ;
+
+procedureDivisionUsingClause
+   : (USING | CHAINING) procedureDivisionUsingParameter+
+   ;
+
+procedureDivisionGivingClause
+   : (GIVING | RETURNING) dataName
+   ;
+
+procedureDivisionUsingParameter
+   : procedureDivisionByReferencePhrase | procedureDivisionByValuePhrase
+   ;
+
+procedureDivisionByReferencePhrase
+   : (BY? REFERENCE)? procedureDivisionByReference+
+   ;
+
+procedureDivisionByReference
+   : (OPTIONAL? cobolWord) | ANY
+   ;
+
+procedureDivisionByValuePhrase
+   : BY? VALUE procedureDivisionByValue+
+   ;
+
+procedureDivisionByValue
+   : cobolWord | literal | ANY
    ;
 
 procedureDeclaratives
@@ -43,20 +66,233 @@ procedureSectionHeader
    ;
 
 paragraphs
-   : paragraph* sentence*
+   : sentence* paragraph*
+   ;
+
+paragraphs2
+   : sentence+ paragraph+
    ;
 
 sentence
-   : statement* DOT_FS
+   : statement+ DOT_FS
    ;
 
-
-//all the possible combinations to form a statement
+//all the possible combinations to form a statement, super-nongreddy
 statement
-   : (MOVE | ACCEPT | ADD | ALTER | CALL | CANCEL | CLOSE | COMPUTE | CONTINUE | DELETE | DISABLE | DISPLAY | DIVIDE |  ENABLE | ENTRY | EVALUATE |
-   EXIT | GENERATE | GOBACK | GO | IF | INITIALIZE | INITIATE | INSPECT | MERGE | MULTIPLY | OPEN | PERFORM | PURGE | READ | RECEIVE | RELEASE |
-   RETURN | REWRITE | SEARCH | SEND | SET | SKIP1 | SKIP2 | SKIP3 | SORT | START | STOP | STRING | SUBTRACT | TERMINATE | TITLE | UNSTRING | USE | WRITE |
-    XML) .*? (execSqlStatement | execSqlImsStatement | execCicsStatement | copyStatement)? .*?
+   : moveStatement | acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement |
+     continueStatement | deleteStatement | disableStatement | displayStatement | divideStatement |  enableStatement | entryStatement | evaluateStatement |
+     exitStatement | generateStatement | gobackStatement | goStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement |
+     multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement |
+     searchStatement | sendStatement | setStatement | skipNoStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement |
+     titleStatement | unstringStatement | useStatement | writeStatement | xmlStatement |execSqlStatement | execSqlImsStatement | execCicsStatement | copyStatement
+   ;
+
+moveStatement
+   : MOVE ~DOT_FS*?
+   ;
+
+addStatement
+   : ADD ~DOT_FS*?
+   ;
+
+acceptStatement
+   : ACCEPT ~DOT_FS*?
+   ;
+
+alterStatement
+   : ALTER ~DOT_FS*?
+   ;
+
+callStatement
+   : CALL ~DOT_FS*?
+   ;
+
+cancelStatement
+   : CANCEL ~DOT_FS*?
+   ;
+
+closeStatement
+   : CLOSE ~DOT_FS*?
+   ;
+
+computeStatement
+   : COMPUTE ~DOT_FS*?
+   ;
+
+continueStatement
+   : CONTINUE ~DOT_FS*?
+   ;
+
+deleteStatement
+   : DELETE ~DOT_FS*?
+   ;
+
+disableStatement
+   : DISABLE ~DOT_FS*?
+   ;
+
+displayStatement
+   : DISPLAY ~DOT_FS*?
+   ;
+
+divideStatement
+   : DIVIDE ~DOT_FS*?
+   ;
+
+enableStatement
+   : ENABLE ~DOT_FS*?
+   ;
+
+entryStatement
+   : ENTRY ~DOT_FS*?
+   ;
+
+evaluateStatement
+   : EVALUATE ~DOT_FS*?
+   ;
+
+exitStatement
+   : EXIT ~DOT_FS*?
+   ;
+
+generateStatement
+   : GENERATE ~DOT_FS*?
+   ;
+
+gobackStatement
+   : GOBACK ~DOT_FS*?
+   ;
+
+goStatement
+   : GO ~DOT_FS*?
+   ;
+
+ifStatement
+   : IF ~DOT_FS*?
+   ;
+
+initializeStatement
+   : INITIALIZE ~DOT_FS*?
+   ;
+
+initiateStatement
+   : INITIATE ~DOT_FS*?
+   ;
+
+inspectStatement
+   : INSPECT ~DOT_FS*?
+   ;
+
+mergeStatement
+   : MERGE ~DOT_FS*?
+   ;
+
+multiplyStatement
+   : MULTIPLY ~DOT_FS*?
+   ;
+
+openStatement
+   : OPEN ~DOT_FS*?
+   ;
+
+performStatement
+   : PERFORM ~DOT_FS*?
+   ;
+
+purgeStatement
+   : PURGE ~DOT_FS*?
+   ;
+
+readStatement
+   : READ ~DOT_FS*?
+   ;
+
+receiveStatement
+   : RECEIVE ~DOT_FS*?
+   ;
+
+releaseStatement
+   : RELEASE ~DOT_FS*?
+   ;
+
+returnStatement
+   : RETURN ~DOT_FS*?
+   ;
+
+rewriteStatement
+   : REWRITE ~DOT_FS*?
+   ;
+
+searchStatement
+   : SEARCH ~DOT_FS*?
+   ;
+
+sendStatement
+   : SEND ~DOT_FS*?
+   ;
+
+setStatement
+   : SET ~DOT_FS*?
+   ;
+
+skipNoStatement
+   : (SKIP1 | SKIP2 | SKIP3) ~DOT_FS*?
+   ;
+
+skip1Statement
+   : SKIP1 ~DOT_FS*?
+   ;
+
+skip2Statement
+   : SKIP2 ~DOT_FS*?
+   ;
+
+skip3Statement
+   : SKIP3 ~DOT_FS*?
+   ;
+
+sortStatement
+   : SORT ~DOT_FS*?
+   ;
+
+startStatement
+   : START ~DOT_FS*?
+   ;
+
+stopStatement
+   : STOP ~DOT_FS*?
+   ;
+
+stringStatement
+   : STRING ~DOT_FS*?
+   ;
+
+subtractStatement
+   : SUBTRACT ~DOT_FS*?
+   ;
+
+terminateStatement
+   : TERMINATE ~DOT_FS*?
+   ;
+
+titleStatement
+   : TITLE ~DOT_FS*?
+   ;
+
+unstringStatement
+   : UNSTRING ~DOT_FS*?
+   ;
+
+useStatement
+   : USE ~DOT_FS*?
+   ;
+
+writeStatement
+   : WRITE ~DOT_FS*?
+   ;
+
+xmlStatement
+   : XML ~DOT_FS*?
    ;
 
 
@@ -277,19 +513,19 @@ compilerOption
 
 // exec cics statement
 execCicsStatement
-   : EXEC CICS .*? END_EXEC DOT?
+   : EXECCICSLINE+
    ;
-
 
 // exec sql statement
+
 execSqlStatement
-   : EXEC SQL .*? END_EXEC DOT?
+   : EXECSQLLINE+
    ;
 
-
 // exec sql ims statement
+
 execSqlImsStatement
-   : EXEC SQLIMS .*? END_EXEC DOT?
+   : EXECSQLIMSLINE+
    ;
 
 
@@ -349,13 +585,6 @@ replacement
 skipStatement
    : (SKIP1 | SKIP2 | SKIP3) DOT?
    ;
-
-
-// title statement
-titleStatement
-   : TITLE literal DOT?
-   ;
-
 
 // literals
 pseudoText
@@ -468,6 +697,7 @@ CALL: C A L L;
 CANCEL: C A N C E L;
 CBL : C B L;
 CBLCARD : C B L C A R D;
+CHAINING: C H A I N I N G;
 CLOSE: C L O S E;
 CICS : C I C S;
 CO : C O;
@@ -530,6 +760,7 @@ FLAGSTD : F L A G S T D;
 FSRT : F S R T;
 FULL : F U L L;
 GENERATE : G E N E R A T E;
+GIVING: G I V I N G;
 GOBACK : G O B A C K;
 GDS : G D S;
 GO: G O;
@@ -682,6 +913,7 @@ OPEN : O P E N;
 OPMARGINS : O P M A R G I N S;
 OPSEQUENCE : O P S E Q U E N C E;
 OPT : O P T;
+OPTIONAL: O P T I O N A L;
 OPTFILE : O P T F I L E;
 OPTIMIZE : O P T I M I Z E;
 OPTIONS : O P T I O N S;
@@ -699,13 +931,15 @@ PROCEDURE: P R O C E D U R E;
 PROCESS : P R O C E S S;
 PROLOG : P R O L O G;
 QUOTE : Q U O T E;
+READ : R E A D;
+REFERENCE: R E F E R E N C E;
 RENAMES : R E N A M E S;
 RENT : R E N T;
 REPLACE : R E P L A C E;
 REPLACING : R E P L A C I N G;
+RETURNING: R E T U R N I N G;
 RMODE : R M O D E;
 RPARENCHAR : ')';
-READ : R E A D;
 RECEIVE : R E C E I V E;
 RELEASE : R E L E A S E;
 RETURN : R E T U R N;
@@ -757,6 +991,7 @@ TRUNC : T R U N C;
 UE : U E;
 UNSTRING : U N S T R I N G;
 USE : U S E;
+USING: U S I N G;
 UPPER : U P P E R;
 VALUE : V A L U E;
 VALUES : V A L U E S;
@@ -791,6 +1026,9 @@ X_CHAR : X;
 
 
 // symbols
+EXECCICSTAG : '*>EXECCICS';
+EXECSQLTAG : '*>EXECSQL';
+EXECSQLIMSTAG : '*>EXECSQLIMS';
 COMMENTTAG : '*>';
 COMMACHAR : ',';
 DOT_FS : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ | '.' EOF;
@@ -818,7 +1056,10 @@ FILENAME : [a-zA-Z0-9]+ '.' [a-zA-Z0-9]+;
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
-COMMENTLINE : COMMENTTAG ~('\n' | '\r')* -> channel(HIDDEN);
+EXECCICSLINE : EXECCICSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
+EXECSQLIMSLINE : EXECSQLIMSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
+EXECSQLLINE : EXECSQLTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
+COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
 WS : [ \t\f;]+ -> channel(HIDDEN);
 TEXT : ~('\n' | '\r');
 SEPARATOR : ', ' -> channel(HIDDEN);
