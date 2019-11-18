@@ -22,20 +22,17 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
 
-/**
- * Created on 2019-10-02
- */
+/** Created on 2019-10-02 */
 @Slf4j
 public abstract class AbsDataBusImplTest implements IDataBusObserver<DataEvent> {
-    @Getter
-    protected final Waiter waiter = new Waiter();
+  @Getter protected final Waiter waiter = new Waiter();
 
-    public abstract void setUp() throws Exception;
+  public abstract void setUp() throws Exception;
 
-    public abstract void tearDown() throws Exception;
+  public abstract void tearDown() throws Exception;
 
-    @Override
-    public void observerCallback(DataEvent adaptedDataEvent) {
-        LOG.debug("CALLBACK WORKS!");
-    }
+  @Override
+  public void observerCallback(DataEvent adaptedDataEvent) {
+    LOG.debug("CALLBACK WORKS!");
+  }
 }
