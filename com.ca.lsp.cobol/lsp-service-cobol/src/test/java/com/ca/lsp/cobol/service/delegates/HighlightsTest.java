@@ -14,10 +14,11 @@
 
 package com.ca.lsp.cobol.service.delegates;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.createServer;
 import static com.ca.lsp.cobol.usecases.UseCaseUtils.runTextValidation;
 import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
 
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.usecases.UseCaseUtils;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  * Testing Document Highlighting with a variable, position is passed in INNER1_POSITION and the
  * EXPECTED_RANGES is where the expected highlighting is to be enabled
  */
-public class HighlightsTest {
+public class HighlightsTest extends ConfigurableTest {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -71,11 +72,14 @@ public class HighlightsTest {
   }
 
   private TextDocumentService service;
+  private TestLanguageClient client;
+  private static final String ID = "id";
 
   @Before
   public void initializeService() {
-    TestLanguageClient client = new TestLanguageClient();
-    service = createServer(client);
+    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
+    client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    client.clean();
     runTextValidation(service, TEXT);
     waitForDiagnostics(client);
   }

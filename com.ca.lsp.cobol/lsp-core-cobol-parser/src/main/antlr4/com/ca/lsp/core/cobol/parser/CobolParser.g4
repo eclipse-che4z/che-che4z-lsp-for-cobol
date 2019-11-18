@@ -645,7 +645,7 @@ screenDescriptionValueClause
    ;
 
 screenDescriptionPictureClause
-   : (PICTURE | PIC) IS? pictureString
+   : (PICTURE | PIC) IS2? pictureString
    ;
 
 screenDescriptionFromClause
@@ -799,7 +799,7 @@ reportGroupNextGroupNextPage
    ;
 
 reportGroupPictureClause
-   : (PICTURE | PIC) IS? pictureString
+   : (PICTURE | PIC) IS2? pictureString
    ;
 
 reportGroupResetClause
@@ -1011,7 +1011,7 @@ dataOccursSort
    ;
 
 dataPictureClause
-   : (PICTURE | PIC) IS? pictureString+
+   : (PICTURE | PIC) IS2? pictureString+
    ;
 
 pictureString
@@ -2563,12 +2563,12 @@ paragraphName
    : cobolWord | integerLiteral
    ;
 
-paragraphNameDefinition
+paragraphNameUsage
    : cobolWord | integerLiteral
    ;
 
 procedureName
-   : paragraphNameDefinition inSection? | sectionName
+   : paragraphNameUsage inSection? | sectionName
    ;
 
 programName
