@@ -99,11 +99,6 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void enterSkipStatement(final CobolPreprocessorParser.SkipStatementContext ctx) {
-    this.preprocessorCleanerService.push();
-  }
-
-  @Override
   public void enterTitleStatement(final CobolPreprocessorParser.TitleStatementContext ctx) {
     this.preprocessorCleanerService.push();
   }
@@ -252,12 +247,6 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   public void exitReplaceOffStatement(
       final CobolPreprocessorParser.ReplaceOffStatementContext ctx) {
     // throw away REPLACE OFF terminals
-    this.preprocessorCleanerService.pop();
-  }
-
-  @Override
-  public void exitSkipStatement(final CobolPreprocessorParser.SkipStatementContext ctx) {
-    // throw away skip statement
     this.preprocessorCleanerService.pop();
   }
 

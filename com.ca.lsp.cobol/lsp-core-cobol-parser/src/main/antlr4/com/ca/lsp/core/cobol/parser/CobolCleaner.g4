@@ -15,7 +15,15 @@
 grammar CobolCleaner;
 
 startClean
-   : .*? ((execSqlStatement | execSqlImsStatement | execCicsStatement | ejectStatement | NEWLINE)+ .*?)+
+   : cleaning EOF
+   ;
+
+cleaning
+   : .*? (shittyShit+ .*?)+
+   ;
+
+shittyShit
+   : execSqlStatement | execSqlImsStatement | execCicsStatement | ejectStatement | NEWLINE | .
    ;
 
 // exec cics statement
