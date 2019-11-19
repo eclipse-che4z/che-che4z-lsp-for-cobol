@@ -31,9 +31,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-/**
- * The suite for all the tests in project that should be run.
- */
+/** The suite for all the tests in project that should be run. */
 @RunWith(Suite.class)
 @SuiteClasses({
   PositiveTest.class,
@@ -54,6 +52,7 @@ import org.junit.runners.Suite.SuiteClasses;
   WorkspaceServiceTest.class,
   CompletionResolutionTest.class,
   WorkspaceServiceTest.class,
-  HighlightsTest.class
+  HighlightsTest.class,
+  MultiDocumentDefinitionTest.class
 })
 public class AllTests {}

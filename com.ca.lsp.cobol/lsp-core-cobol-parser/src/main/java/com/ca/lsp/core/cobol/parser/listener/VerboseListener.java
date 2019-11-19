@@ -43,6 +43,7 @@ public class VerboseListener extends BaseErrorListener {
       CommonToken wrongToken = (CommonToken) offendingSymbol;
       Position position =
           new Position(
+              null,
               wrongToken.getTokenIndex(),
               wrongToken.getStartIndex(),
               wrongToken.getStopIndex(),
@@ -61,7 +62,12 @@ public class VerboseListener extends BaseErrorListener {
       stack.add(((Lexer) recognizer).getText());
       Position position =
           new Position(
-              charPositionInLine, charPositionInLine, charPositionInLine, line, charPositionInLine);
+              null,
+              charPositionInLine,
+              charPositionInLine,
+              charPositionInLine,
+              line,
+              charPositionInLine);
       errorspipe.add(
           SyntaxError.syntaxerror()
               .position(position)

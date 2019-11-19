@@ -154,7 +154,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
   private void registerFormatError(
       int lineNumber, final CobolSourceFormatEnum format, int charPosition, int errorLength) {
     if (listener == null) return;
-    listener.syntaxError(
+    listener.syntaxError(null,
         lineNumber + 1,
         charPosition,
         "This format is not a " + format.toString() + " format",

@@ -47,8 +47,8 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
   private static final String CPY_FIXED_URI = "/var/tmp/worspace1";
 
   private final String PARAGRAPH_NAME = "PARNAME";
-  private final Position POSITION_FIRST_OCCURRENCE = new Position(0, 0, 0, 0, 0);
-  private final Position POSITION_SECOND_OCCURRENCE = new Position(10, 10, 10, 10, 10);
+  private final Position POSITION_FIRST_OCCURRENCE = new Position(null, 0, 0, 0, 0, 0);
+  private final Position POSITION_SECOND_OCCURRENCE = new Position(null, 10, 10, 10, 10, 10);
   private final Multimap<String, Position> paragraphDefinitions = HashMultimap.create();
 
   private DefaultDataBusBroker databus;

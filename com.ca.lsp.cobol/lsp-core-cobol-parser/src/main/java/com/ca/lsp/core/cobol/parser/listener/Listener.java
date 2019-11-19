@@ -27,10 +27,16 @@ public abstract class Listener {
   @Getter private List<SyntaxError> errorsPipe;
 
   public void syntaxError(
-      int line, int charPositionInLine, String msg, int errorLength, int severity) {
+      String documentName,
+      int line,
+      int charPositionInLine,
+      String msg,
+      int errorLength,
+      int severity) {
     registerError(
         msg,
         new Position(
+            documentName,
             PREPROCESSING_ERROR_INDEX,
             charPositionInLine,
             (charPositionInLine + errorLength),
@@ -40,10 +46,16 @@ public abstract class Listener {
   }
 
   public void syntaxError(
-      int line, int charPositionInLine, int charEndingIndex, String msg, int severity) {
+      String documentName,
+      int line,
+      int charPositionInLine,
+      int charEndingIndex,
+      String msg,
+      int severity) {
     registerError(
         msg,
         new Position(
+            documentName,
             PREPROCESSING_ERROR_INDEX,
             charPositionInLine,
             charEndingIndex,

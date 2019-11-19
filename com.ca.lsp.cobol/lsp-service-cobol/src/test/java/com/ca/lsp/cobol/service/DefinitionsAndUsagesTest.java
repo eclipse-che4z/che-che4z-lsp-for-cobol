@@ -20,6 +20,7 @@ import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.Before;
@@ -85,12 +86,12 @@ public class DefinitionsAndUsagesTest extends ConfigurableTest {
   public void testRecognitionForVariables() {
     assertEquals(analysisResult.getVariables().toString(), 5, analysisResult.getVariables().size());
 
-    Map<String, List<Range>> definitions = analysisResult.getVariableDefinitions();
+    Map<String, List<Location>> definitions = analysisResult.getVariableDefinitions();
     assertEquals(definitions.keySet().toString(), 5, definitions.size());
     assertEquals(definitions.keySet().toString(), 1, definitions.get(OUTER1).size());
     assertEquals(definitions.keySet().toString(), 2, definitions.get(INNER1).size());
 
-    Map<String, List<Range>> usages = analysisResult.getVariableUsages();
+    Map<String, List<Location>> usages = analysisResult.getVariableUsages();
     assertEquals(usages.keySet().toString(), 5, usages.size());
     assertEquals(usages.keySet().toString(), 2, usages.get(OUTER1).size());
     assertEquals(usages.keySet().toString(), 2, usages.get(INNER1).size());
@@ -102,12 +103,12 @@ public class DefinitionsAndUsagesTest extends ConfigurableTest {
     assertEquals(
         analysisResult.getParagraphs().toString(), 2, analysisResult.getParagraphs().size());
 
-    Map<String, List<Range>> definitions = analysisResult.getParagraphDefinitions();
+    Map<String, List<Location>> definitions = analysisResult.getParagraphDefinitions();
     assertEquals(definitions.keySet().toString(), 2, definitions.size());
     assertEquals(definitions.keySet().toString(), 1, definitions.get(MAIN_LOGIC).size());
     assertEquals(definitions.keySet().toString(), 1, definitions.get(TEST).size());
 
-    Map<String, List<Range>> usages = analysisResult.getParagraphUsages();
+    Map<String, List<Location>> usages = analysisResult.getParagraphUsages();
     assertEquals(usages.keySet().toString(), 1, usages.size());
     assertEquals(usages.keySet().toString(), 1, usages.get(TEST).size());
   }
