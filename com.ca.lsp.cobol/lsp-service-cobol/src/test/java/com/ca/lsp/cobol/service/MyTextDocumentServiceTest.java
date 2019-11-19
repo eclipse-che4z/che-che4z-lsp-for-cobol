@@ -36,13 +36,13 @@ import static com.ca.lsp.cobol.usecases.UseCaseUtils.await;
 import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.*;
 
-/**
- * This test checks the entry points of the {@link TextDocumentService} implementation.
- */
+/** This test checks the entry points of the {@link TextDocumentService} implementation. */
 public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private static final String LANGUAGE = "COBOL";
   private static final String DOCUMENT_URI = "1";
+  private static final String CPY_DOCUMENT_URI = "file:///COPYBOOKS/CPYTEST.cpy";
+  private static final String CPY_EXTENSION = "cpy";
   private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
   private TextDocumentService service;
@@ -103,7 +103,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
-  public void testIncorrectLangId() {
+  public void testIncorrectLanguageId() {
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, "incorrectId", 1, TEXT_EXAMPLE)));
@@ -116,6 +116,23 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
                     it.toString()
                         .equals(
                             "Cannot find a language engine for the given language ID: incorrectId")));
+  }
+
+  @Test
+  public void testNotAllowedFileExtensionAnalysis() {
+    service.didOpen(
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(CPY_DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+    await(() -> !client.getMessagesToShow().isEmpty());
+    assertTrue(
+        client.getMessagesToShow().stream()
+            .map((Function<MessageParams, Object>) MessageParams::getMessage)
+            .anyMatch(
+                it ->
+                    it.toString()
+                        .equals(
+                            "Cannot find a language engine for the given language ID: "
+                                + CPY_EXTENSION)));
   }
 
   @Ignore("Not implemented yet")
@@ -135,11 +152,10 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     }
   }
 
-  private void openAndAwait()
-  {
+  private void openAndAwait() {
     service.didOpen(
-            new DidOpenTextDocumentParams(
-                    new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
     waitForDiagnostics(client);
   }
 
