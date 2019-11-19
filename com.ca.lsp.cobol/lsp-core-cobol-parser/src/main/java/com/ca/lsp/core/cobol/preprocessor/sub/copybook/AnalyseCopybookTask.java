@@ -106,20 +106,17 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
     if (semanticContext != null) {
       populateCacheWithCopybookContents(
           copyBookName,
-          content,
-          MultiMapSerializableHelper.serializeInHashMap(
-              semanticContext.getParagraphs().getDefinitions()));
+          content);
     }
     return semanticContext;
   }
 
   private void populateCacheWithCopybookContents(
-      String copyBookName, String content, Map<String, Set<Position>> mapPraragraphDefinitions) {
+      String copyBookName, String content) {
     databus.storeData(
         CpyStorable.builder()
             .name(copyBookName)
             .content(content)
-            .paragraphPosition(mapPraragraphDefinitions)
             .build());
   }
 
