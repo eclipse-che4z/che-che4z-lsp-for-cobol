@@ -22,13 +22,15 @@ import com.ca.lsp.core.cobol.semantics.SubContext;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,16 +43,17 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final String HINT_SRC_LABEL = "H";
 
   // Access should be package-private
-  CobolLanguageEngineFacade() {}
+  CobolLanguageEngineFacade() {
+  }
 
-  private static Range convertRange(Position position) {
-    return new Range(
-        new org.eclipse.lsp4j.Position((position.getLine() - 1), position.getCharPositionInLine()),
-        new org.eclipse.lsp4j.Position(
-            (position.getLine() - 1),
-            ((position.getStopPosition() - position.getStartPosition())
-                + position.getCharPositionInLine()
-                + 1)));
+  @Override
+  public AnalysisResult analyze(String text) {
+    if (isEmpty(text)) {
+      return AnalysisResult.empty();
+    }
+
+    CobolLanguageEngine engine = LanguageEngineFactory.fixedFormatCobolLanguageEngine();
+    return toAnalysisResult(engine.run(text));
   }
 
   private static boolean isEmpty(String text) {
@@ -60,8 +63,14 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static List<Diagnostic> convertErrors(List<SyntaxError> errors) {
     return errors.stream()
         .peek(e -> log.info(e.toString()))
+        .filter(errorOnlyFromCurrentDocument())
         .map(toDiagnostic())
         .collect(Collectors.toList());
+  }
+
+  @NotNull
+  private static Predicate<SyntaxError> errorOnlyFromCurrentDocument() {
+    return syntaxError -> syntaxError.getPosition().getDocumentURI() == null;
   }
 
   private static Function<? super SyntaxError, ? extends Diagnostic> toDiagnostic() {
@@ -97,14 +106,14 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     return DiagnosticSeverity.forValue(severity);
   }
 
-  @Override
-  public AnalysisResult analyze(String text) {
-    if (isEmpty(text)) {
-      return AnalysisResult.empty();
-    }
-
-    CobolLanguageEngine engine = LanguageEngineFactory.fixedFormatCobolLanguageEngine();
-    return toAnalysisResult(engine.run(text));
+  private static Range convertRange(Position position) {
+    return new Range(
+        new org.eclipse.lsp4j.Position((position.getLine() - 1), position.getCharPositionInLine()),
+        new org.eclipse.lsp4j.Position(
+            (position.getLine() - 1),
+            ((position.getStopPosition() - position.getStartPosition())
+                + position.getCharPositionInLine()
+                + 1)));
   }
 
   private AnalysisResult toAnalysisResult(ProcessingResult result) {
@@ -116,22 +125,24 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
         retrieveUsages(result.getSemanticContext().getParagraphs()));
   }
 
-  private Map<String, List<Range>> retrieveDefinitions(SubContext<?> context) {
+  private Map<String, List<Location>> retrieveDefinitions(SubContext<?> context) {
     return retrieveMap(context.getDefinitions().asMap());
   }
 
-  private Map<String, List<Range>> retrieveUsages(SubContext<?> context) {
+  private Map<String, List<Location>> retrieveUsages(SubContext<?> context) {
     return retrieveMap(context.getUsages().asMap());
   }
 
-  private Map<String, List<Range>> retrieveMap(Map<String, Collection<Position>> map) {
+  private Map<String, List<Location>> retrieveMap(Map<String, Collection<Position>> map) {
     return map.entrySet().stream()
         .collect(
             Collectors.toMap(
-                Entry::getKey,
+                Map.Entry::getKey,
                 entry ->
                     entry.getValue().stream()
-                        .map(CobolLanguageEngineFacade::convertRange)
+                        .map(
+                            position ->
+                                new Location(position.getDocumentURI(), convertRange(position)))
                         .collect(Collectors.toList())));
   }
 }

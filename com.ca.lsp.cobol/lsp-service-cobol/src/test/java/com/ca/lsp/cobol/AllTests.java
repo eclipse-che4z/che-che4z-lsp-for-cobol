@@ -16,9 +16,6 @@ package com.ca.lsp.cobol;
 import com.ca.lsp.cobol.negative.NegativeTestSuite;
 import com.ca.lsp.cobol.positive.PositiveTest;
 import com.ca.lsp.cobol.service.*;
-import com.ca.lsp.cobol.service.MyDocumentModelTest;
-import com.ca.lsp.cobol.service.MyTextDocumentServiceTest;
-import com.ca.lsp.cobol.service.DefinitionsAndUsagesTest;
 import com.ca.lsp.cobol.service.delegates.HighlightsTest;
 import com.ca.lsp.cobol.service.delegates.LanguageEnginesTest;
 import com.ca.lsp.cobol.service.delegates.ValidationTest;
@@ -34,9 +31,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-/**
- * The suite for all the tests in project that should be run.
- */
+/** The suite for all the tests in project that should be run. */
 @RunWith(Suite.class)
 @SuiteClasses({
   PositiveTest.class,
@@ -56,6 +51,8 @@ import org.junit.runners.Suite.SuiteClasses;
   TestResponsesNotContainLineBreaks.class,
   WorkspaceServiceTest.class,
   CompletionResolutionTest.class,
-  HighlightsTest.class
+  WorkspaceServiceTest.class,
+  HighlightsTest.class,
+  MultiDocumentDefinitionTest.class
 })
 public class AllTests {}

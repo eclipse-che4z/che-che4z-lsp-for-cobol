@@ -136,9 +136,14 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
     threadPool.submit(
         () -> {
           String name = event.getName();
-          String content;
-          content = getContentByCopybookName(name);
-          dataBus.postData(CblFetchEvent.builder().name(name).content(content).build());
+          Path path = getURIByCopybookName(name);
+          String content = Optional.ofNullable(path).map(this::retrieveContentByURI).orElse(null);
+          dataBus.postData(
+              CblFetchEvent.builder()
+                  .name(name)
+                  .uri(Optional.ofNullable(path).map(Path::toUri).map(URI::toString).orElse(null))
+                  .content(content)
+                  .build());
         });
   }
 

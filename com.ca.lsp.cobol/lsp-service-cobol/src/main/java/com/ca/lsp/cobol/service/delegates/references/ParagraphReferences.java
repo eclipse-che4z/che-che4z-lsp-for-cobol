@@ -17,19 +17,19 @@
 package com.ca.lsp.cobol.service.delegates.references;
 
 import com.ca.lsp.cobol.service.MyDocumentModel;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.Location;
 
 import java.util.List;
 
 class ParagraphReferences extends AbstractReferences {
   @Override
-  List<Range> retrieveReferenceRanges(MyDocumentModel document, String token) {
-    return retrieveRanges(document.getAnalysisResult().getParagraphUsages(), token);
+  List<Location> retrieveReferenceLocations(MyDocumentModel document, String token, String uri) {
+    return retrieveLocations(document.getAnalysisResult().getParagraphUsages(), token, uri);
   }
 
   @Override
-  List<Range> retrieveDefinitionRanges(MyDocumentModel document, String token) {
-    return retrieveRanges(document.getAnalysisResult().getParagraphDefinitions(), token);
+  List<Location> retrieveDefinitionLocations(MyDocumentModel document, String token, String uri) {
+    return retrieveLocations(document.getAnalysisResult().getParagraphDefinitions(), token, uri);
   }
 
 

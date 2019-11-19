@@ -27,12 +27,15 @@ public class SemanticListener extends Listener {
     super(errorsPipe);
   }
 
-  public void syntaxError(int line, int charPositionInLine, String msg, int errorLength) {
-    super.syntaxError(line, charPositionInLine, msg, errorLength, WARNING_SEVERITY);
+  public void syntaxError(
+      String documentName, int line, int charPositionInLine, String msg, int errorLength) {
+    super.syntaxError(documentName, line, charPositionInLine, msg, errorLength, WARNING_SEVERITY);
   }
 
-  public void syntaxError(int line, int charPositionInLine, int charEndingIndex, String msg) {
-    super.syntaxError(line, charPositionInLine, charEndingIndex, msg, WARNING_SEVERITY);
+  public void syntaxError(
+      String documentName, int line, int charPositionInLine, int charEndingIndex, String msg) {
+    super.syntaxError(
+        documentName, line, charPositionInLine, charEndingIndex, msg, WARNING_SEVERITY);
   }
 
   protected void registerError(String msg, Position position) {

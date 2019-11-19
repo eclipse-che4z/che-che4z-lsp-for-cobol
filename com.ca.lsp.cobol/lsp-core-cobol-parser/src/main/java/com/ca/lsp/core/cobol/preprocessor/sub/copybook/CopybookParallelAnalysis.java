@@ -16,6 +16,7 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
 import com.broadcom.lsp.domain.cobol.model.Position;
+import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
@@ -23,9 +24,7 @@ import com.google.common.collect.Multimap;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ForkJoinTask;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -38,7 +37,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   @Override
   public List<CopybookSemanticContext> analyzeCopybooks(
       Multimap<String, Position> copybooks,
-      List<Map.Entry<String, Collection<Position>>> copybookUsageTracker,
+      List<CopybookDefinition> copybookUsageTracker,
       CobolPreprocessor.CobolSourceFormatEnum format) {
     List<CopybookSemanticContext> contexts =
         ForkJoinTask.invokeAll(createTasks(copybooks, copybookUsageTracker, format)).stream()
@@ -62,6 +61,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   private Consumer<Position> defineError(String copybookName) {
     return position ->
         listener.syntaxError(
+            null,
             position.getLine(),
             position.getCharPositionInLine(),
             String.format(ERROR_SUGGESTION, copybookName),
@@ -70,10 +70,16 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
 
   private List<ForkJoinTask<CopybookSemanticContext>> createTasks(
       Multimap<String, Position> names,
-      List<Map.Entry<String, Collection<Position>>> copybookUsageTracker,
+      List<CopybookDefinition> copybookUsageTracker,
       CobolPreprocessor.CobolSourceFormatEnum format) {
     return names.asMap().entrySet().stream()
-        .map(it -> new AnalyseCopybookTask(it, copybookUsageTracker, format, listener))
+        .map(
+            it ->
+                new AnalyseCopybookTask(
+                    new CopybookDefinition(it.getKey(), null, it.getValue()),
+                    copybookUsageTracker,
+                    format,
+                    listener))
         .collect(Collectors.toList());
   }
 }
