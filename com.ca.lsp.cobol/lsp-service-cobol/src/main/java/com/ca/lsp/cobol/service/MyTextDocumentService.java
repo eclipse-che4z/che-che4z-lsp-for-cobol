@@ -153,7 +153,6 @@ public class MyTextDocumentService implements TextDocumentService {
   }
 
   private void registerEngineAndAnalyze(String uri, String languageType, String text) {
-    // if it is a copybook assign the proper language id based on the extension
     String fileExtension = extractExtension(uri);
     if (fileExtension != null
         && !"".equals(fileExtension)
