@@ -12,12 +12,12 @@ COBOL Language Support standardizes the communication between language tooling a
 
 - **Autocomplete**
 	> Provides suggestions for COBOL keywords while you type.
-![](COBOL Language Support - Autocomplete.gif)
+![](AutocompleteGif.gif)
 - **Syntax check for keywords**
 	> Checks for mistakes and errors in COBOL code.
+![](SyntaxCheck.gif)
 - **Syntax highlighting** (with third-party plugins)
 	> Enables syntax highlighting for COBOL code as long as you have an appropriate third-party syntax highlighting extension installed.
-![](SyntaxCheckForKeywordsGif.gif)
 
 The COBOL Language Support extension for Visual Studio Code (VSC) integrates several COBOL language features into tools used in VSC. Files with the extensions .COB, .CBL and .CPY are recognized as COBOL files.
 
