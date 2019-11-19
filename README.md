@@ -12,7 +12,7 @@ COBOL Language Support standardizes the communication between language tooling a
 
 - **Autocomplete**
 	> Provides suggestions for COBOL keywords while you type.
-![](AutocompleteGif.gif)
+![](Autocomplete.gif)
 - **Syntax check for keywords**
 	> Checks for mistakes and errors in COBOL code.
 ![](SyntaxCheck.gif)
