@@ -13,8 +13,8 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.ca.lsp.cobol.service.delegates.Formations;
 import com.ca.lsp.cobol.service.delegates.Communications;
+import com.ca.lsp.cobol.service.delegates.Formations;
 import com.ca.lsp.cobol.service.delegates.Highlights;
 import com.ca.lsp.cobol.service.delegates.completions.Completions;
 import com.ca.lsp.cobol.service.delegates.references.References;
@@ -27,10 +27,7 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /** @author zacan01 */
@@ -86,7 +83,8 @@ public class MyTextDocumentService implements TextDocumentService {
   @Override
   public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
       TextDocumentPositionParams position) {
-    return CompletableFuture.supplyAsync(() -> Highlights.findHighlights(docs.get(position.getTextDocument().getUri()), position));
+    return CompletableFuture.supplyAsync(
+        () -> Highlights.findHighlights(docs.get(position.getTextDocument().getUri()), position));
   }
 
   @Override
@@ -155,13 +153,32 @@ public class MyTextDocumentService implements TextDocumentService {
   }
 
   private void registerEngineAndAnalyze(String uri, String languageType, String text) {
-    if (LanguageEngines.getLanguageEngineById(languageType) != null) {
+    String fileExtension = extractExtension(uri);
+    if (fileExtension != null
+        && !"".equals(fileExtension)
+        && !isValidFileExtension(fileExtension)) {
+      communications.notifyThatEngineNotFound(fileExtension);
+    } else if (LanguageEngines.getLanguageEngineById(languageType) != null) {
       communications.notifyThatLoadingInProgress(uri);
       Analysis.registerEngine(uri, languageType);
       analyzeDocumentFirstTime(uri, text);
+
     } else {
       communications.notifyThatEngineNotFound(languageType);
     }
+  }
+
+  private boolean isValidFileExtension(String fileExtension) {
+    return Arrays.asList("cobol", "cbl", "cob", "COBOL").contains(fileExtension);
+  }
+
+  private String extractExtension(String uri) {
+    String extension = null;
+    if (uri != null) {
+      extension = uri.substring(uri.lastIndexOf('.') + 1, uri.length());
+    }
+
+    return extension;
   }
 
   private void analyzeDocumentFirstTime(String uri, String text) {

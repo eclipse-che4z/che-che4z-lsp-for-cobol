@@ -84,7 +84,6 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
 
   @Override
   @SneakyThrows
-  @Synchronized
   public CpyStorable storeData(@NonNull CpyStorable storable) {
     CpyStorable deepcopy = SerializationUtils.clone(storable);
     if (!isStored(deepcopy.getId())) getCpyRepo().persist(deepcopy);
@@ -94,14 +93,12 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
 
   @Override
   @SneakyThrows
-  @Synchronized
   public CpyStorable getData(@NonNull long uuid) {
     return getCpyRepo().getCpyStorableCache(uuid).get();
   }
 
   @Override
   @SneakyThrows
-  @Synchronized
   public boolean isStored(@NonNull long uuid) {
     return getCpyRepo().isStored(uuid);
   }
@@ -117,7 +114,6 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
   }
 
   @SneakyThrows
-  @Synchronized
   public void invalidateCache() {
     getCpyRepo().invalidateCache();
   }
