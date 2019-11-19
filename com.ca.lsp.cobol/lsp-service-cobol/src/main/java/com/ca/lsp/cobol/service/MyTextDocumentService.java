@@ -154,9 +154,7 @@ public class MyTextDocumentService implements TextDocumentService {
 
   private void registerEngineAndAnalyze(String uri, String languageType, String text) {
     String fileExtension = extractExtension(uri);
-    if (fileExtension != null
-        && !"".equals(fileExtension)
-        && !isValidFileExtension(fileExtension)) {
+    if (fileExtension != null && !isValidFileExtension(fileExtension)) {
       communications.notifyThatEngineNotFound(fileExtension);
     } else if (LanguageEngines.getLanguageEngineById(languageType) != null) {
       communications.notifyThatLoadingInProgress(uri);
@@ -174,10 +172,13 @@ public class MyTextDocumentService implements TextDocumentService {
 
   private String extractExtension(String uri) {
     String extension = null;
+    int startIndex = -1;
     if (uri != null) {
-      extension = uri.substring(uri.lastIndexOf('.') + 1, uri.length());
+      startIndex = uri.lastIndexOf('.') + 1;
+      if (startIndex > 0) {
+        extension = uri.substring(uri.lastIndexOf('.') + 1, uri.length());
+      }
     }
-
     return extension;
   }
 
