@@ -20,10 +20,10 @@ import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusObserver;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.FetchedCopybookEvent;
-import com.broadcom.lsp.domain.cobol.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.model.FetchedCopybookEvent;
+import com.broadcom.lsp.domain.cobol.model.RequiredCopybookEvent;
 import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
@@ -62,7 +62,7 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
       CobolPreprocessor.CobolSourceFormatEnum format,
       PreprocessorListener listener) {
     this.copybookDefinition = copybookDefinition;
-    this.copyBookName = copybookDefinition.getName();
+    copyBookName = copybookDefinition.getName();
     this.copybookUsageTracker = copybookUsageTracker;
     this.format = format;
     this.listener = listener;
@@ -81,9 +81,8 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
   @Override
   public CopybookSemanticContext compute() {
     SemanticContext semanticContext;
-    boolean isCopybookInCache = isCopybookInCache(copyBookName);
 
-    if (isCopybookInCache) {
+    if (isCopybookInCache(copyBookName)) {
       semanticContext = parseCopybookFromCache();
     } else {
       databus.subscribe(DataEventType.FETCHED_COPYBOOK_EVENT, this);
@@ -115,7 +114,12 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
   }
 
   private void populateCacheWithCopybookContents(String content) {
-    databus.storeData(CopybookStorable.builder().name(copybookDefinition.getName()).content(content).uri(copybookDefinition.getUri()).build());
+    databus.storeData(
+        CopybookStorable.builder()
+            .name(copybookDefinition.getName())
+            .content(content)
+            .uri(copybookDefinition.getUri())
+            .build());
   }
 
   private SemanticContext parseCopybookFromCache() {
