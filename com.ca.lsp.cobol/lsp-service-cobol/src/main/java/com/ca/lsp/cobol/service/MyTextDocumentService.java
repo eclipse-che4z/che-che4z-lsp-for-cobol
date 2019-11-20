@@ -176,7 +176,7 @@ public class MyTextDocumentService implements TextDocumentService {
     if (uri != null) {
       startIndex = uri.lastIndexOf('.') + 1;
       if (startIndex > 0) {
-        extension = uri.substring(uri.lastIndexOf('.') + 1, uri.length());
+        extension = uri.substring(uri.lastIndexOf('.') + 1);
       }
     }
     return extension;
