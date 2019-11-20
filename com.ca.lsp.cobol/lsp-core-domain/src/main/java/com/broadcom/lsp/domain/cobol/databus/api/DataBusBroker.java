@@ -41,13 +41,13 @@ public interface DataBusBroker<T extends DataEvent, S> {
   void postData(@NonNull RegistryId registryId, @NonNull T dataEvent);
 
   @SneakyThrows
-  void subscribe(@NonNull S dataSubscriber);
+  @NonNull S subscribe(@NonNull S dataSubscriber);
 
   @SneakyThrows
-  void subscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber);
+  @NonNull S subscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber);
 
   @SneakyThrows
-  void subscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer);
+  @NonNull S subscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer);
 
   @SneakyThrows
   void unSubscribe(S dataSubscriber);
@@ -55,8 +55,6 @@ public interface DataBusBroker<T extends DataEvent, S> {
   @SneakyThrows
   void unSubscribe(@NonNull RegistryId registryId, S dataSubscriber);
 
-  @SneakyThrows
-  void unSubscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer);
 
   @SneakyThrows
   S getSubscriber(@NonNull DataEventType event, @NonNull DataBusObserver observer);
