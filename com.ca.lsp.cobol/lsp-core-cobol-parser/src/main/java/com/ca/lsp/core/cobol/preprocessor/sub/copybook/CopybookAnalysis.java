@@ -16,17 +16,16 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
 import com.broadcom.lsp.domain.cobol.model.Position;
+import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.google.common.collect.Multimap;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public interface CopybookAnalysis {
   List<CopybookSemanticContext> analyzeCopybooks(
       Multimap<String, Position> copybookNames,
-      List<Map.Entry<String, Collection<Position>>> copybookUsageTracker,
+      List<CopybookDefinition> copybookUsageTracker,
       CobolPreprocessor.CobolSourceFormatEnum format);
 }

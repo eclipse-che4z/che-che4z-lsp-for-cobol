@@ -15,24 +15,18 @@
  */
 package com.broadcom.lsp.domain.cobol.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Value;
 
 import java.io.Serializable;
 
 @Value
+@AllArgsConstructor
 public final class Position implements Serializable {
+  private final String documentURI;
   private final int tokenIndex;
   private final int startPosition;
   private final int stopPosition;
   private final int line;
   private final int charPositionInLine;
-
-  public Position(
-      int tokenIndex, int startPosition, int stopPosition, int line, int charPositionInLine) {
-    this.tokenIndex = tokenIndex;
-    this.startPosition = startPosition;
-    this.stopPosition = stopPosition;
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
-  }
 }

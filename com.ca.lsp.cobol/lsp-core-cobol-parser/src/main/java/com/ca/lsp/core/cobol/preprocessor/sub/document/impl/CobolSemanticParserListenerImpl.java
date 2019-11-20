@@ -14,6 +14,7 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
 import com.broadcom.lsp.domain.cobol.model.Position;
+import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -172,11 +173,17 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   private Position retrievePosition(ParserRuleContext token) {
     return new Position(
+        retrieveDocumentURI(),
         token.getStart().getTokenIndex(),
         token.getStart().getStartIndex(),
         token.getStop().getStopIndex(),
         token.getStart().getLine(),
         token.getStart().getCharPositionInLine());
+  }
+
+  private String retrieveDocumentURI() {
+    List<CopybookDefinition> tracker = semanticContext.getCopybookUsageTracker();
+    return tracker.isEmpty() ? null : tracker.get(tracker.size() - 1).getUri();
   }
 
   @Override
@@ -205,7 +212,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   private boolean checkThisCopybookNotPresentInHierarchy(String copybookName) {
     return semanticContext.getCopybookUsageTracker().stream()
-        .map(Map.Entry::getKey)
+        .map(CopybookDefinition::getName)
         .noneMatch(copybookName::equals);
   }
 
@@ -214,7 +221,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
       semanticContext
           .getCopybookUsageTracker()
           .get(0)
-          .getValue()
+          .getUsages()
           .forEach(toSyntaxError(copybookName));
     }
   }
@@ -223,6 +230,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private Consumer<Position> toSyntaxError(String copybookName) {
     return it ->
         listener.syntaxError(
+            retrieveDocumentURI(),
             it.getLine(),
             it.getCharPositionInLine(),
             String.format(RECURSION_DETECTED, copybookName),

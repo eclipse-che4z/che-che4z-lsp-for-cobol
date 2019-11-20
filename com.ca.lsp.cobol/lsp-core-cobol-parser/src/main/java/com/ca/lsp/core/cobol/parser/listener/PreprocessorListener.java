@@ -25,11 +25,11 @@ public class PreprocessorListener extends Listener {
     super(errorsPipe);
   }
 
-  public void syntaxError(int line, int charPositionInLine, String msg, int errorLength) {
-    super.syntaxError(line, charPositionInLine, msg, errorLength, ERROR_SEVERITY);
+  public void syntaxError(String documentName, int line, int charPositionInLine, String msg, int errorLength) {
+    super.syntaxError(documentName, line, charPositionInLine, msg, errorLength, ERROR_SEVERITY);
   }
 
-  public void syntaxError(int line, int charPositionInLine, int charEndingIndex, String msg) {
-    super.syntaxError(line, charPositionInLine, charEndingIndex, msg, ERROR_SEVERITY);
+  public void syntaxError(String documentName, int line, int charPositionInLine, int charEndingIndex, String msg) {
+    super.syntaxError(documentName, line, charPositionInLine, charEndingIndex, msg, ERROR_SEVERITY);
   }
 }

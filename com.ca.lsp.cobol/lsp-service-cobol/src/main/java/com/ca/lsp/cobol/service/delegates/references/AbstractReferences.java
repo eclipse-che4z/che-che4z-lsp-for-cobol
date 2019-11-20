@@ -14,11 +14,15 @@
 package com.ca.lsp.cobol.service.delegates.references;
 
 import com.ca.lsp.cobol.service.MyDocumentModel;
-import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.ReferenceContext;
+import org.eclipse.lsp4j.TextDocumentPositionParams;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,56 +36,56 @@ abstract class AbstractReferences {
 
   List<Location> resolveDefinition(MyDocumentModel document, TextDocumentPositionParams position) {
     String token = retrieveToken(document, position);
+    String uri = position.getTextDocument().getUri();
 
     if (!providerContainsToken(document, token) && nextProvider != null) {
       return nextProvider.resolveDefinition(document, position);
     }
-    return retrieveDefinitionRanges(document, token).stream()
-        .map(convertToLocation(position))
-        .collect(Collectors.toList());
+    return retrieveDefinitionLocations(document, token, uri);
   }
 
   List<Location> collectReferences(
       MyDocumentModel document, TextDocumentPositionParams params, ReferenceContext context) {
 
     String token = retrieveToken(document, params);
+    String uri = params.getTextDocument().getUri();
 
     if (!providerContainsToken(document, token) && nextProvider != null) {
       return nextProvider.collectReferences(document, params, context);
     }
     List<Location> result = new ArrayList<>();
     if (context.isIncludeDeclaration()) {
-      result.addAll(
-          retrieveDefinitionRanges(document, token).stream()
-              .map(convertToLocation(params))
-              .collect(Collectors.toList()));
+      result.addAll(retrieveDefinitionLocations(document, token, uri));
     }
-    result.addAll(
-        retrieveReferenceRanges(document, token).stream()
-            .map(convertToLocation(params))
-            .collect(Collectors.toList()));
+    result.addAll(retrieveReferenceLocations(document, token, uri));
     return result;
   }
 
-  List<Range> retrieveRanges(Map<String, List<Range>> ranges, String token) {
-    return ranges.entrySet().stream()
+  List<Location> retrieveLocations(
+      Map<String, List<Location>> tokenOccurrence, String token, String uri) {
+    return tokenOccurrence.entrySet().stream()
         .filter(it -> it.getKey().equalsIgnoreCase(token))
         .map(Map.Entry::getValue)
         .flatMap(List::stream)
+        .map(fillUriIfNeeded(uri))
         .collect(Collectors.toList());
   }
 
-  abstract List<Range> retrieveReferenceRanges(MyDocumentModel document, String token);
+  @NotNull
+  private Function<Location, Location> fillUriIfNeeded(String uri) {
+    return location ->
+        new Location(Optional.ofNullable(location.getUri()).orElse(uri), location.getRange());
+  }
 
-  abstract List<Range> retrieveDefinitionRanges(MyDocumentModel document, String token);
+  abstract List<Location> retrieveReferenceLocations(
+      MyDocumentModel document, String token, String uri);
+
+  abstract List<Location> retrieveDefinitionLocations(
+      MyDocumentModel document, String token, String uri);
 
   abstract boolean providerContainsToken(MyDocumentModel document, String token);
 
   private String retrieveToken(MyDocumentModel document, TextDocumentPositionParams position) {
     return document.getFullTokenAtPosition(position.getPosition());
-  }
-
-  private Function<Range, Location> convertToLocation(TextDocumentPositionParams position) {
-    return it -> new Location(position.getTextDocument().getUri(), it);
   }
 }

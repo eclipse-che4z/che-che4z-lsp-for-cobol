@@ -168,6 +168,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private void throwSuggestion(String wrongToken, int startLine, int charPositionInLine) {
     semanticListener.syntaxError(
+        null,
         startLine,
         charPositionInLine,
         getWrongTokenStopPosition(wrongToken, charPositionInLine),
@@ -178,6 +179,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void getSemanticError(
       String wrongToken, int startLine, int charPositionInLine, String correctWord) {
     semanticListener.syntaxError(
+        null,
         startLine,
         charPositionInLine,
         getWrongTokenStopPosition(wrongToken, charPositionInLine),
@@ -238,6 +240,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private Position retrievePosition(ParserRuleContext ctx) {
     return new Position(
+        null,
         ctx.getStart().getTokenIndex(),
         ctx.getStart().getStartIndex(),
         ctx.getStart().getStopIndex(),
