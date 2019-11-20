@@ -1530,11 +1530,11 @@ ifStatement
    ;
 
 ifThen
-   : THEN? (NEXT SENTENCE | statement*)
+   : THEN? (NEXT SENTENCE | statement+?)
    ;
 
 ifElse
-   : ELSE (NEXT SENTENCE | statement*)
+   : ELSE (NEXT SENTENCE | statement+?)
    ;
 
 // initialize statement

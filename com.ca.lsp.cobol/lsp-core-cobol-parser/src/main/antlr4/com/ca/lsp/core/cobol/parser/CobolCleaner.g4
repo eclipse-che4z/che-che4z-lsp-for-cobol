@@ -19,10 +19,10 @@ startClean
    ;
 
 cleaning
-   : .*? (shittyShit+ .*?)+
+   : ~(EXEC | EJECT)*? (statements ~EOF*?)+
    ;
 
-shittyShit
+statements
    : execSqlStatement | execSqlImsStatement | execCicsStatement | ejectStatement | NEWLINE | .
    ;
 
@@ -82,7 +82,6 @@ COMMENTLINE : COMMENTTAG ~('\n' | '\r')* -> channel(HIDDEN);
 WS : [ \t\f;]+ -> channel(HIDDEN);
 TEXT : ~('\n' | '\r');
 SEPARATOR : ', ' -> channel(HIDDEN);
-
 
 // case insensitive chars
 fragment A:('a'|'A');
