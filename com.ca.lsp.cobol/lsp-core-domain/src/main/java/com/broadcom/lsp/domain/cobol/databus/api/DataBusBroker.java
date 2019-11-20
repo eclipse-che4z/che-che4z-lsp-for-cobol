@@ -50,6 +50,15 @@ public interface DataBusBroker<T extends DataEvent, S> {
   void subscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer);
 
   @SneakyThrows
+  void unSubscribe(S dataSubscriber);
+
+  @SneakyThrows
+  void unSubscribe(@NonNull RegistryId registryId, S dataSubscriber);
+
+  @SneakyThrows
+  void unSubscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer);
+
+  @SneakyThrows
   S getSubscriber(@NonNull DataEventType event, @NonNull DataBusObserver observer);
 
   @SneakyThrows
