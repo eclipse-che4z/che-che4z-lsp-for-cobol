@@ -44,9 +44,11 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
       Pattern.compile(CONT_LINE_NO_AREA_A_REGEX);
 
   private PreprocessorListener listener;
+  private String documentURI;
 
-  public ContinuationLineTransformation(PreprocessorListener listener) {
+  public ContinuationLineTransformation(PreprocessorListener listener, String documentURI) {
     this.listener = listener;
+    this.documentURI = documentURI;
   }
 
   @Override
@@ -156,7 +158,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
 
   private void registerStringClosingError(int lineNumber, int cobolLineTrimmedLength) {
     listener.syntaxError(
-        null,
+            documentURI,
         lineNumber,
         cobolLineTrimmedLength,
         cobolLineTrimmedLength,
@@ -166,7 +168,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private void registerContinuationLineError(
       int lineNumber, int startIndexAreaA, int countingSpace) {
     listener.syntaxError(
-        null,
+            documentURI,
         lineNumber + 1,
         (END_INDEX_CONTENT_AREA_A - (startIndexAreaA - countingSpace) + 1),
         END_INDEX_CONTENT_AREA_A,
