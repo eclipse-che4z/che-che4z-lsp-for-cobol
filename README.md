@@ -12,8 +12,10 @@ COBOL Language Support standardizes the communication between language tooling a
 
 - **Autocomplete**
 	> Provides suggestions for COBOL keywords while you type.
+![](Autocomplete.gif)
 - **Syntax check for keywords**
 	> Checks for mistakes and errors in COBOL code.
+![](SyntaxCheck.gif)
 - **Syntax highlighting** (with third-party plugins)
 	> Enables syntax highlighting for COBOL code as long as you have an appropriate third-party syntax highlighting extension installed.
 
