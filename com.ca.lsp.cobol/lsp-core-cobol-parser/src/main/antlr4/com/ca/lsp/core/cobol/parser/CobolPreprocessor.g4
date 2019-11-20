@@ -8,7 +8,7 @@
 
 grammar CobolPreprocessor;
 
-startRule : .*? ((compilerOptions | dataDescriptionEntry | dataDivision | procedureDivision | copyStatement
+startRule : ~(DATA)*? ((compilerOptions | dataDescriptionEntry | dataDivision | procedureDivision | copyStatement
             | replaceOffStatement | replaceArea  | skipStatement | titleStatement | paragraphs2 |  NEWLINE)+ .*?)+ EOF;
 
 //procedureDivision
@@ -88,7 +88,7 @@ statement
    ;
 
 moveStatement
-   : MOVE ~DOT_FS*?
+   : MOVE ~(IF | DOT_FS | GO)*?
    ;
 
 addStatement
@@ -168,7 +168,7 @@ goStatement
    ;
 
 ifStatement
-   : IF ~DOT_FS*?
+   : IF ~(MOVE | PERFORM | DOT_FS)*?
    ;
 
 initializeStatement
@@ -298,7 +298,7 @@ xmlStatement
 
 //paragraphs definition
 paragraph
-   : paragraphName DOT_FS (alteredGoTo | sentence*)
+   : paragraphName DOT_FS (alteredGoTo | sentence?)
    ;
 
 paragraphName
