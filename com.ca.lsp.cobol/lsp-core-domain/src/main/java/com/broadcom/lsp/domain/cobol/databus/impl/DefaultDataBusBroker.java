@@ -53,7 +53,7 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
 
   @Override
   @SneakyThrows
-  public CopybookRepositoryLRU getCopybookRepo() {
+  protected CopybookRepositoryLRU getCopybookRepo() {
     return cpyRepo;
   }
 
@@ -85,6 +85,24 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
   @SneakyThrows
   public void subscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer) {
     subscribe(getSubscriber(eventType, observer));
+  }
+
+  @Override
+  @SneakyThrows
+  public void unSubscribe(@NonNull S dataSubscriber) {
+    subscribe(RegistryId.GENERAL_REGISTRY_ID, dataSubscriber);
+  }
+
+  @Override
+  @SneakyThrows
+  public void unSubscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber) {
+    seekRegistry(registryId).ifPresent(it -> it.register(dataSubscriber));
+  }
+
+  @Override
+  @SneakyThrows
+  public void unSubscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer) {
+
   }
 
   @Override
