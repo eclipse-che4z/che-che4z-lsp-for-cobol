@@ -107,11 +107,11 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
 
   @Test
   public void invalidateCacheTest() {
-    LOG.info("Current cache sizing is: " + databus.getCopybookRepo().size());
+    LOG.info("Current cache sizing is: " + databus.cacheSize());
     LOG.info("Apply cache invalidation...");
-    databus.getCopybookRepo().invalidateCache();
-    LOG.info("New cache sizing is: " + databus.getCopybookRepo().size());
-    assertEquals(0, databus.getCopybookRepo().size());
+    databus.invalidateCache();
+    LOG.info("New cache sizing is: " + databus.cacheSize());
+    assertEquals(0, databus.cacheSize());
   }
 
   @Test
