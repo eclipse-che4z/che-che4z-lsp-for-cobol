@@ -16,53 +16,42 @@
 
 package com.broadcom.lsp.domain.cobol.model;
 
-import com.broadcom.lsp.domain.cobol.databus.api.ICpyRepository;
+import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/** Created on 15/10/2019 */
-@Slf4j
+/**
+ * This data class is used to store the analyzed copybook in cache. This object is expected to be
+ * used with LRU algorithm.
+ */
 @Data
-public class CpyStorable implements Serializable {
-  //    private int hit = ThreadLocalRandom.current().nextInt(1, 99 + 1);
+public class CopybookStorable implements Serializable {
+  private static final long TTU = 3600L * 3L;
+
   private AtomicInteger hit = new AtomicInteger(0);
   private long genDt = Instant.now().getEpochSecond();
-  private long ttu = 3600 * 3;
   private long id;
   private String name;
-  private String position;
   private String uri;
   private String content;
-  private Map<String, Set<Position>> paragraphPosition;
 
   @Builder
-  public CpyStorable(
-      @NonNull String name,
-      @Nullable String position,
-      @Nullable String uri,
-      @NonNull String content,
-      @Nullable Map<String, Set<Position>> paragraphPosition) {
+  public CopybookStorable(@NonNull String name, @NonNull String uri, @NonNull String content) {
     this.name = name;
-    this.position = position;
     this.uri = uri;
     this.content = content;
-    this.paragraphPosition = paragraphPosition;
-    id = ICpyRepository.calculateUUID(new StringBuilder().append(name));
+    id = CopybookRepository.calculateUUID(new StringBuilder().append(name));
   }
 
   @SneakyThrows
   public boolean isExpired() {
-    return (Instant.now().getEpochSecond() - genDt) > ttu;
+    return (Instant.now().getEpochSecond() - genDt) > TTU;
   }
 
   @SneakyThrows

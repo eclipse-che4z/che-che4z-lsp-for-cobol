@@ -16,8 +16,8 @@
 
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
-import com.broadcom.lsp.domain.cobol.model.UnknownEvent;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusObserver;
+import com.broadcom.lsp.domain.cobol.model.RequiredCopybookEvent;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import lombok.Getter;
@@ -26,30 +26,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Created on 17/10/2019
- */
-
+/** A subscriber for {@link RequiredCopybookEvent} */
 @Slf4j
 @RequiredArgsConstructor
-public class UnknownEventSubScriber {
+public class RequiredCopybookEventSubscriber {
 
-    @Getter
-    @NonNull
-    private IDataBusObserver observer;
+  @Getter @NonNull private DataBusObserver observer;
 
+  @NonNull @Getter private RequiredCopybookEvent eventType;
 
-    @NonNull
-    @Getter
-    private UnknownEvent eventType;
-
-
-    @Subscribe
-    @AllowConcurrentEvents
-    @SneakyThrows
-    public void onDataHandler(UnknownEvent eventType) {
-        LOG.debug(eventType.getHeader());
-        observer.observerCallback(eventType);
-    }
+  @Subscribe
+  @AllowConcurrentEvents
+  @SneakyThrows
+  public void onDataHandler(RequiredCopybookEvent eventType) {
+    LOG.debug(eventType.getHeader());
+    observer.observerCallback(eventType);
+  }
 }
-

@@ -21,22 +21,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Created  on 15/10/2019
+ * This class is a data transfer object that contains the required information to retrieve a
+ * copybook.
  */
-
-
 @NoArgsConstructor
 @Data
-public class CblScanEvent extends DataEvent {
-    private String name;
-    private String position;
-    private String uri;
+public class RequiredCopybookEvent extends DataEvent {
+  private String name;
 
-    @Builder
-    public CblScanEvent(String name, String position, String uri) {
-        super(DataEventType.CBLSCAN_EVENT, DataEventType.CBLSCAN_EVENT.getId());
-        this.name = name;
-        this.position = position;
-        this.uri = uri;
-    }
+  @Builder
+  public RequiredCopybookEvent(String name) {
+    super(DataEventType.REQUIRED_COPYBOOK_EVENT, DataEventType.REQUIRED_COPYBOOK_EVENT.getId());
+    this.name = name;
+  }
 }

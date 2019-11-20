@@ -16,22 +16,10 @@
 
 package com.broadcom.lsp.domain.cobol.databus.api;
 
-import com.google.common.eventbus.AllowConcurrentEvents;
-import com.google.common.eventbus.DeadEvent;
-import com.google.common.eventbus.Subscribe;
-import lombok.extern.slf4j.Slf4j;
-
 /**
- * Created on 17/10/2019
+ * This interface implements the Observer pattern for the databus. It provides a callback method to
+ * perform some action if the required event is populated.
  */
-
-@Slf4j
-public class DeadEventSubScriber {
-
-    @Subscribe
-    @AllowConcurrentEvents
-    public void onDataHandler(DeadEvent eventType) {
-        LOG.warn(String.format("DROPPED Event : %s", eventType.getEvent().toString()));
-    }
+public interface DataBusObserver<O> {
+  void observerCallback(O adaptedDataEvent);
 }
-

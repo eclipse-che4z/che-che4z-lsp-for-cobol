@@ -16,8 +16,8 @@
 
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
-import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusObserver;
+import com.broadcom.lsp.domain.cobol.model.FetchedCopybookEvent;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import lombok.Getter;
@@ -27,27 +27,21 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Created on 17/10/2019
+ * A subscriber for {@link FetchedCopybookEvent}
  */
-
 @Slf4j
 @RequiredArgsConstructor
-public class CblScanEventSubScriber {
+public class FetchedCopybookEventSubscriber {
 
-    @Getter
-    @NonNull
-    private IDataBusObserver observer;
+  @Getter @NonNull private DataBusObserver observer;
 
-    @NonNull
-    @Getter
-    private CblScanEvent eventType;
+  @NonNull @Getter private FetchedCopybookEvent eventType;
 
-    @Subscribe
-    @AllowConcurrentEvents
-    @SneakyThrows
-    public void onDataHandler(CblScanEvent eventType) {
-        LOG.debug(eventType.getHeader());
-        observer.observerCallback(eventType);
-    }
+  @Subscribe
+  @AllowConcurrentEvents
+  @SneakyThrows
+  public void onDataHandler(FetchedCopybookEvent eventType) {
+    LOG.debug(eventType.getHeader());
+    observer.observerCallback(eventType);
+  }
 }
-

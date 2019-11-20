@@ -16,8 +16,8 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
-import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
+import com.broadcom.lsp.domain.cobol.model.FetchedCopybookEvent;
+import com.broadcom.lsp.domain.cobol.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -47,13 +47,13 @@ import java.util.stream.Stream;
 @Singleton
 public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   private final ExecutorService threadPool;
-  private final DefaultDataBusBroker<CblFetchEvent, CblScanEvent> dataBus;
+  private final DefaultDataBusBroker<FetchedCopybookEvent, RequiredCopybookEvent> dataBus;
   private List<WorkspaceFolder> workspaceFolders;
 
   @Inject
   public CobolWorkspaceServiceImpl(DefaultDataBusBroker dataBus) {
     this.dataBus = dataBus;
-    dataBus.subscribe(DataEventType.CBLSCAN_EVENT, this);
+    dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
 
     // create a thread pool fixed
     threadPool = Executors.newCachedThreadPool();
@@ -132,14 +132,14 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
 
   /** create the task and pass it to the executor service */
   @Override
-  public void observerCallback(CblScanEvent event) {
+  public void observerCallback(RequiredCopybookEvent event) {
     threadPool.submit(
         () -> {
           String name = event.getName();
           Path path = getURIByCopybookName(name);
           String content = Optional.ofNullable(path).map(this::retrieveContentByURI).orElse(null);
           dataBus.postData(
-              CblFetchEvent.builder()
+              FetchedCopybookEvent.builder()
                   .name(name)
                   .uri(Optional.ofNullable(path).map(Path::toUri).map(URI::toString).orElse(null))
                   .content(content)

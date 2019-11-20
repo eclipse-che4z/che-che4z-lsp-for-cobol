@@ -16,78 +16,75 @@
 
 package com.broadcom.lsp.domain.cobol.databus.api;
 
-import com.broadcom.lsp.domain.cobol.databus.impl.CpyRepositoryLRU;
-import com.broadcom.lsp.domain.cobol.model.*;
+import com.broadcom.lsp.domain.cobol.databus.impl.CopybookRepositoryLRU;
+import com.broadcom.lsp.domain.cobol.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.model.RegistryId;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
-import lombok.NonNull;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 
-import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Created  on 16/10/2019
- */
-@Slf4j
-public abstract class AbstractDataBusBroker<T extends DataEvent, S> implements IDataBusBroker<T, S> {
-    private ExecutorService executor;
-    private EventBus generalRegistry;
-    private EventBus scannerRegistry;
-    private EventBus fetcherRegistry;
-    private EventBus cpyRegistry;
+/** This class spawns the cache registries and manage the databus interactions. */
+public abstract class AbstractDataBusBroker<T extends DataEvent, S>
+    implements DataBusBroker<T, S> {
+  private ExecutorService executor;
+  private EventBus generalRegistry;
+  private EventBus scannerRegistry;
+  private EventBus fetcherRegistry;
+  private EventBus cpyRegistry;
 
+  private DeadEventSubscriber recycleBin = new DeadEventSubscriber();
+  private Map<String, EventBus> registrySet = new HashMap<>();
 
-    private DeadEventSubScriber recycleBin = new DeadEventSubScriber();
+  public AbstractDataBusBroker(int numberOfThreads) {
+    executor = Executors.newFixedThreadPool(numberOfThreads);
+    generalRegistry = new AsyncEventBus(RegistryId.GENERAL_REGISTRY_ID.getId(), executor);
+    scannerRegistry = new AsyncEventBus(RegistryId.SCANNER_REGISTRY_ID.getId(), executor);
+    fetcherRegistry = new AsyncEventBus(RegistryId.FETCHER_REGISTRY_ID.getId(), executor);
+    cpyRegistry = new AsyncEventBus(RegistryId.CPY_REGISTRY_ID.getId(), executor);
+    generalRegistry.register(recycleBin);
+    scannerRegistry.register(recycleBin);
+    fetcherRegistry.register(recycleBin);
+    cpyRegistry.register(recycleBin);
+    registrySet.put(RegistryId.GENERAL_REGISTRY_ID.getId(), generalRegistry);
+    registrySet.put(RegistryId.SCANNER_REGISTRY_ID.getId(), scannerRegistry);
+    registrySet.put(RegistryId.FETCHER_REGISTRY_ID.getId(), fetcherRegistry);
+    registrySet.put(RegistryId.CPY_REGISTRY_ID.getId(), cpyRegistry);
+  }
 
-    public AbstractDataBusBroker(int nthread) {
-        executor = Executors.newFixedThreadPool(nthread);
-        generalRegistry = new AsyncEventBus(RegistryId.GENERAL_REGISTRY_ID.getId(), executor);
-        scannerRegistry = new AsyncEventBus(RegistryId.SCANNER_REGISTRY_ID.getId(), executor);
-        fetcherRegistry = new AsyncEventBus(RegistryId.FETCHER_REGISTRY_ID.getId(), executor);
-        cpyRegistry = new AsyncEventBus(RegistryId.CPY_REGISTRY_ID.getId(), executor);
-        generalRegistry.register(recycleBin);
-        scannerRegistry.register(recycleBin);
-        fetcherRegistry.register(recycleBin);
-        cpyRegistry.register(recycleBin);
-        registrySet.put(RegistryId.GENERAL_REGISTRY_ID.getId(), generalRegistry);
-        registrySet.put(RegistryId.SCANNER_REGISTRY_ID.getId(), scannerRegistry);
-        registrySet.put(RegistryId.FETCHER_REGISTRY_ID.getId(), fetcherRegistry);
-        registrySet.put(RegistryId.CPY_REGISTRY_ID.getId(), cpyRegistry);
-    }
+  @SneakyThrows
+  protected Optional<EventBus> seekRegistry(RegistryId registryId) {
+    return Optional.ofNullable(registrySet.get(registryId.getId()));
+  }
 
-    @SneakyThrows
-    protected Optional<EventBus> seekRegistry (RegistryId registryId){
-        return Optional.ofNullable(registrySet.get(registryId.getId()));
-    }
+  @Override
+  @SneakyThrows
+  public S getSubscriber(DataEventType event, DataBusObserver observer) {
+    return (S) SubscriberFactoryProvider.getFactory(event).create(observer);
+  }
 
-    @Override
-    @SneakyThrows
-    public S getSubscriber(DataEventType event, IDataBusObserver observer) {
-        return (S) ISubscriberFactoryProvider.getFactory(event).create(observer);
-    }
+  @Override
+  @SneakyThrows
+  public int getCacheMaxSize() {
+    return getCopybookRepo().getCacheMaxSize();
+  }
 
+  @Override
+  @SneakyThrows
+  public String printCache() {
+    return getCopybookRepo().logContent();
+  }
 
-    @Override
-    @SneakyThrows
-    public int getCacheMaxSize() {
-        return getCpyRepo().getCacheMaxSize();
-    }
+  @Override
+  public int cacheSize() {
+    return getCopybookRepo().size();
+  }
 
-    @Override
-    @SneakyThrows
-    public String printCache() {
-        return getCpyRepo().logContent();
-    }
-
-    @Override
-    public int cacheSize() {
-        return getCpyRepo().size();
-    }
-
-    protected abstract CpyRepositoryLRU getCpyRepo();
-
+  protected abstract CopybookRepositoryLRU getCopybookRepo();
 }

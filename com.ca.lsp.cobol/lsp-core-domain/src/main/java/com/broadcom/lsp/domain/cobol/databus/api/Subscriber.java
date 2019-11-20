@@ -17,8 +17,10 @@
 package com.broadcom.lsp.domain.cobol.databus.api;
 
 /**
- * Created on 21/10/2019
+ * The Subscriber manages the subscription to the databus by the required event type.
+ *
+ * @param <T> - an event type to drive the activity
  */
-public interface IDataBusObserver<O> {
-    void observerCallback(O adaptedDataEvent);
+public interface Subscriber<T> {
+  void onDataHandler(T eventType);
 }

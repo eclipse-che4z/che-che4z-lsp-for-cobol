@@ -16,9 +16,18 @@
 
 package com.broadcom.lsp.domain.cobol.databus.api;
 
-/**
- * Created   on 2019-10-02
- */
-public interface ISubScriber<T> {
-    void onDataHandler(T eventType);
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.DeadEvent;
+import com.google.common.eventbus.Subscribe;
+import lombok.extern.slf4j.Slf4j;
+
+/** This subscriber manages the events that cannot be handled. */
+@Slf4j
+public class DeadEventSubscriber {
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void onDataHandler(DeadEvent eventType) {
+    LOG.warn(String.format("DROPPED Event : %s", eventType.getEvent().toString()));
+  }
 }

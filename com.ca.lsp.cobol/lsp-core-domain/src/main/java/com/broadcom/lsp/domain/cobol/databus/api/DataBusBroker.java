@@ -17,22 +17,22 @@
 package com.broadcom.lsp.domain.cobol.databus.api;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.CpyStorable;
+import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.model.RegistryId;
-import com.google.common.eventbus.EventBus;
 import com.google.inject.ImplementedBy;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/** Created on 2019-10-01 */
+/**
+ * This interface represents API to work with databus.
+ *
+ * @param <T> - a data event class managed by the implementation
+ * @param <S> - a subscriber class for this event
+ */
 @ImplementedBy(DefaultDataBusBroker.class)
-public interface IDataBusBroker<T extends DataEvent, S> {
-  Map<String, EventBus> registrySet = new HashMap<>();
+public interface DataBusBroker<T extends DataEvent, S> {
 
   @SneakyThrows
   void postData(@NonNull T dataEvent);
@@ -47,16 +47,16 @@ public interface IDataBusBroker<T extends DataEvent, S> {
   void subscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber);
 
   @SneakyThrows
-  void subscribe(@NonNull DataEventType eventType, @NonNull IDataBusObserver observer);
+  void subscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer);
 
   @SneakyThrows
-  S getSubscriber(@NonNull DataEventType event, @NonNull IDataBusObserver observer);
+  S getSubscriber(@NonNull DataEventType event, @NonNull DataBusObserver observer);
 
   @SneakyThrows
-  CpyStorable storeData(@NonNull CpyStorable dataEvent);
+  CopybookStorable storeData(@NonNull CopybookStorable dataEvent);
 
   @SneakyThrows
-  CpyStorable getData(@NonNull long uuid);
+  CopybookStorable getData(@NonNull long uuid);
 
   @SneakyThrows
   boolean isStored(long uuid);

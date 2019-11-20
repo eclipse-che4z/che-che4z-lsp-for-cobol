@@ -16,21 +16,14 @@
 
 package com.broadcom.lsp.domain.cobol.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * Created on 17/10/2019
- */
-
+/** Enumeration of IDs for activities performed on the databus */
+@AllArgsConstructor
 public enum DataEventType {
-    UNKNOWN_EVENT("UNKNOWN"),
-    CPYBUILD_EVENT("CPYBUILD"),
-    CBLSCAN_EVENT("CBLSCAN"),
-    CBLFETCH_EVENT("CBLFETCH");
-    @Getter
-    private String id;
-
-    DataEventType(String s) {
-        this.id = s;
-    }
+  UNKNOWN_EVENT("UNKNOWN"),
+  REQUIRED_COPYBOOK_EVENT("REQCPY"),
+  FETCHED_COPYBOOK_EVENT("FETCHEDCPY");
+  @Getter private String id;
 }

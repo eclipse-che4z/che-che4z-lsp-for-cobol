@@ -16,21 +16,18 @@
 
 package com.broadcom.lsp.domain.cobol.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * Created  on 16/10/2019
+ * This enumerations describes different layers of cache repositories. Each repository is assigned
+ * to store the specific kind of information.
  */
-
+@AllArgsConstructor
 public enum RegistryId {
-    GENERAL_REGISTRY_ID("general-registry"),
-    SCANNER_REGISTRY_ID("scanner-registry"),
-    FETCHER_REGISTRY_ID("fetcher-registry"),
-    CPY_REGISTRY_ID("cpy-registry");
-    @Getter
-    private String id;
-
-    RegistryId(String s) {
-        this.id = s;
-    }
+  GENERAL_REGISTRY_ID("general-registry"),
+  SCANNER_REGISTRY_ID("scanner-registry"),
+  FETCHER_REGISTRY_ID("fetcher-registry"),
+  CPY_REGISTRY_ID("cpy-registry");
+  @Getter private String id;
 }

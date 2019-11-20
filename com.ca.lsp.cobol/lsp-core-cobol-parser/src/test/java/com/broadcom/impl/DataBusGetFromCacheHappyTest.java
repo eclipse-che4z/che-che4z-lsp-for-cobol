@@ -17,9 +17,9 @@
 package com.broadcom.impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.domain.cobol.databus.api.ICpyRepository;
+import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.CpyStorable;
+import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -30,19 +30,18 @@ import org.junit.Test;
 
 import java.util.Optional;
 
-/** Created on 2019-10-02 */
+/** This cache verifies the main logic of cache data management. */
 @Slf4j
 public class DataBusGetFromCacheHappyTest extends AbsDataBusImplTest {
   // cache dummy static content
   private static final String CPY_FIXED_NAME = "COPY-";
   private static final String CPY_FIXED_CONTENT = "FASDFASDFSF";
-  private static final String CPY_FIXED_POSITION = "ROW:3,COL:4";
   private static final String CPY_FIXED_URI = "/var/tmp/worspace1";
 
   private DefaultDataBusBroker databus;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     databus =
         LangServerCtx.getGuiceCtx(new DatabusTestModule())
             .getInjector()
@@ -51,7 +50,7 @@ public class DataBusGetFromCacheHappyTest extends AbsDataBusImplTest {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     databus = null;
     LangServerCtx.shutdown();
   }
@@ -66,9 +65,9 @@ public class DataBusGetFromCacheHappyTest extends AbsDataBusImplTest {
   public void getData() {
     String newCopybookName = "COPY-" + (databus.getCacheMaxSize() - 1);
 
-    Assert.assertTrue(databus.isStored(ICpyRepository.calculateUUID(newCopybookName)));
+    Assert.assertTrue(databus.isStored(CopybookRepository.calculateUUID(newCopybookName)));
     LOG.debug(String.format("Cache content : %s", databus.printCache()));
-    Optional<CpyStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
+    Optional<CopybookStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
     LOG.debug(
         String.format(
             "Least Recently Used item : %s  ID : %d",
@@ -81,23 +80,22 @@ public class DataBusGetFromCacheHappyTest extends AbsDataBusImplTest {
     LOG.debug(String.format("Retrieving item %s ", newCopybookName));
     Assert.assertTrue(
         databus
-            .getData(ICpyRepository.calculateUUID(newCopybookName))
+            .getData(CopybookRepository.calculateUUID(newCopybookName))
             .getName()
             .equalsIgnoreCase(newCopybookName));
     LOG.debug(
         String.format(
             "Element Retrieved : %s",
-            databus.getData(ICpyRepository.calculateUUID(newCopybookName))));
+            databus.getData(CopybookRepository.calculateUUID(newCopybookName))));
     LOG.debug(String.format("Cache content : %s", databus.printCache()));
   }
 
   private void fulfillDatabusCacheContent(int cacheMaxSize) {
     for (int i = 0; i < cacheMaxSize; i++) {
       databus.storeData(
-          CpyStorable.builder()
+          CopybookStorable.builder()
               .name(CPY_FIXED_NAME + i)
               .content(CPY_FIXED_CONTENT)
-              .position(CPY_FIXED_POSITION)
               .uri(CPY_FIXED_URI)
               .build());
     }

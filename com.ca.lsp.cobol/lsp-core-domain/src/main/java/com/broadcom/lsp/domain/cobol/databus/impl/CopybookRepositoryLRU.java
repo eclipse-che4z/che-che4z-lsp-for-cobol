@@ -16,32 +16,38 @@
 
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.domain.cobol.databus.api.ICpyRepository;
-import com.broadcom.lsp.domain.cobol.model.CpyStorable;
+import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
+import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/** Created on 25/10/2019 */
+/**
+ * This class manages the caching for copybooks in the databus applying the LRU (Last recently used)
+ * algorithm.
+ */
 @Slf4j
 @Singleton
-public class CpyRepositoryLRU implements ICpyRepository {
+public class CopybookRepositoryLRU implements CopybookRepository {
   @Getter private final int cacheMaxSize;
-  @Setter @NonNull private List<CpyStorable> cpyRepo;
-  private final Comparator<CpyStorable> storableComparator =
-      (e1, e2) -> e1.getHit() - e2.getHit(); // TLRU
+  @Setter @NonNull private List<CopybookStorable> cpyRepo;
+  private final Comparator<CopybookStorable> storableComparator =
+      Comparator.comparingInt(CopybookStorable::getHit); // Time last recently used
 
   @NonNull private final AtomicBoolean isSort = new AtomicBoolean(false);
 
   @Inject
-  public CpyRepositoryLRU(@Named("CACHE-MAX-SIZE") int cachesize) {
-    cacheMaxSize = cachesize;
+  public CopybookRepositoryLRU(@Named("CACHE-MAX-SIZE") int cacheSize) {
+    cacheMaxSize = cacheSize;
     cpyRepo = Collections.synchronizedList(new ArrayList<>(cacheMaxSize));
   }
 
@@ -54,16 +60,15 @@ public class CpyRepositoryLRU implements ICpyRepository {
 
   @Override
   @SneakyThrows
-  public Optional<CpyStorable> getCpyStorableCache(@NonNull long uuid) {
-    Optional<CpyStorable> cpy = cpyRepo.stream().filter(copy -> uuid == copy.getId()).findAny();
-    if (cpy.isPresent()) return Optional.of(SerializationUtils.clone(cpy.get()));
-    return cpy;
+  public Optional<CopybookStorable> getCopybookStorableFromCache(@NonNull long uuid) {
+    Optional<CopybookStorable> cpy =
+        cpyRepo.stream().filter(copy -> uuid == copy.getId()).findAny();
+    return cpy.map(SerializationUtils::clone);
   }
 
   @SneakyThrows
-  private Optional<CpyStorable> getCpyStorableInstance(@NonNull long uuid) {
-    Optional<CpyStorable> cpy = cpyRepo.stream().filter(copy -> uuid == copy.getId()).findAny();
-    return cpy;
+  private Optional<CopybookStorable> getCopybookStorableInstance(@NonNull long uuid) {
+    return cpyRepo.stream().filter(copy -> uuid == copy.getId()).findAny();
   }
 
   @Override
@@ -74,14 +79,14 @@ public class CpyRepositoryLRU implements ICpyRepository {
 
   @Override
   @SneakyThrows
-  public synchronized void persist(@NonNull CpyStorable deepcopy) {
-    if (!isStored(deepcopy.getId())) {
+  public synchronized void persist(@NonNull CopybookStorable deepCopy) {
+    if (!isStored(deepCopy.getId())) {
       if (cpyRepo.size() < getCacheMaxSize()) {
-        cpyRepo.add(deepcopy);
+        cpyRepo.add(deepCopy);
         return;
       }
       cpyRepo.remove(cpyRepo.size() - 1);
-      cpyRepo.add(deepcopy);
+      cpyRepo.add(deepCopy);
     }
   }
 
@@ -89,13 +94,12 @@ public class CpyRepositoryLRU implements ICpyRepository {
   @SneakyThrows
   public String logContent() {
     StringBuilder chars = new StringBuilder();
-    cpyRepo.stream()
-        .forEach(
-            l ->
-                chars
-                    .append(System.getProperty("line.separator"))
-                    .append(l)
-                    .append(System.getProperty("line.separator")));
+    cpyRepo.forEach(
+        l ->
+            chars
+                .append(System.getProperty("line.separator"))
+                .append(l)
+                .append(System.getProperty("line.separator")));
     return chars.toString();
   }
 
@@ -106,33 +110,33 @@ public class CpyRepositoryLRU implements ICpyRepository {
   }
 
   @SneakyThrows
-  public Optional<CpyStorable> topItem() {
+  public Optional<CopybookStorable> topItem() {
     return (cpyRepo.isEmpty()) ? Optional.empty() : Optional.of(cpyRepo.get(0));
   }
 
   @SneakyThrows
-  public Optional<CpyStorable> lastItem() {
+  public Optional<CopybookStorable> lastItem() {
     return (cpyRepo.isEmpty()) ? Optional.empty() : Optional.of(cpyRepo.get(size() - 1));
   }
 
   @Override
   @SneakyThrows
   public boolean isStored(@NonNull StringBuilder id) {
-    long uuid = ICpyRepository.calculateUUID(id);
+    long uuid = CopybookRepository.calculateUUID(id);
     return isStored(uuid);
   }
 
   @Override
   @SneakyThrows
   public boolean isStored(@NonNull String id) {
-    long uuid = ICpyRepository.calculateUUID(id);
+    long uuid = CopybookRepository.calculateUUID(id);
     return isStored(uuid);
   }
 
   @Override
   @SneakyThrows
   public synchronized boolean isStored(@NonNull long uuid) {
-    Optional<CpyStorable> cpy = getCpyStorableInstance(uuid);
+    Optional<CopybookStorable> cpy = getCopybookStorableInstance(uuid);
     if (cpy.isPresent()) {
       cpy.get().match();
       setSort(false);
@@ -141,7 +145,7 @@ public class CpyRepositoryLRU implements ICpyRepository {
     return cpy.isPresent();
   }
 
-  /** method that remove all the elments from the cache */
+  /** Method that remove all the elements from the cache */
   @Override
   public void invalidateCache() {
     cpyRepo.clear();

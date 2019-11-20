@@ -17,8 +17,8 @@
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
 import com.broadcom.lsp.domain.cobol.databus.api.AbstractDataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
-import com.broadcom.lsp.domain.cobol.model.CpyStorable;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusObserver;
+import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.model.RegistryId;
@@ -27,28 +27,33 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.Optional;
 
-/** Created on 16/10/2019 */
+/**
+ * This class is the default implementation for databus broker. It uses a {@link
+ * CopybookRepositoryLRU} to perform caching operations.
+ *
+ * @param <T> - a data event class managed by the implementation
+ * @param <S> - a subscriber class for this event
+ */
 @Slf4j
 @Singleton
 public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBusBroker<T, S> {
-  @NonNull private final CpyRepositoryLRU cpyRepo;
+  @NonNull private final CopybookRepositoryLRU cpyRepo;
 
   @Inject
   public DefaultDataBusBroker(
-      @Named("ASYNC-MESS-DISPATCHER") int nthread, CpyRepositoryLRU cpyRepo) {
-    super(nthread);
+      @Named("ASYNC-MESS-DISPATCHER") int numberOfThreads, CopybookRepositoryLRU cpyRepo) {
+    super(numberOfThreads);
     this.cpyRepo = cpyRepo;
   }
 
   @Override
   @SneakyThrows
-  public CpyRepositoryLRU getCpyRepo() {
+  public CopybookRepositoryLRU getCopybookRepo() {
     return cpyRepo;
   }
 
@@ -61,7 +66,7 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
   @Override
   @SneakyThrows
   public void postData(@NonNull RegistryId registryId, @NonNull T dataEvent) {
-    seekRegistry(registryId).get().post(dataEvent);
+    seekRegistry(registryId).ifPresent(it -> it.post(dataEvent));
   }
 
   @Override
@@ -73,48 +78,48 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
   @Override
   @SneakyThrows
   public void subscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber) {
-    seekRegistry(registryId).get().register(dataSubscriber);
+    seekRegistry(registryId).ifPresent(it -> it.register(dataSubscriber));
   }
 
   @Override
   @SneakyThrows
-  public void subscribe(@NonNull DataEventType eventType, @NonNull IDataBusObserver observer) {
+  public void subscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer) {
     subscribe(getSubscriber(eventType, observer));
   }
 
   @Override
   @SneakyThrows
-  public CpyStorable storeData(@NonNull CpyStorable storable) {
-    CpyStorable deepcopy = SerializationUtils.clone(storable);
-    if (!isStored(deepcopy.getId())) getCpyRepo().persist(deepcopy);
-    getCpyRepo().setSort(false);
+  public CopybookStorable storeData(@NonNull CopybookStorable storable) {
+    CopybookStorable deepCopy = SerializationUtils.clone(storable);
+    if (!isStored(deepCopy.getId())) getCopybookRepo().persist(deepCopy);
+    getCopybookRepo().setSort(false);
     return storable;
   }
 
   @Override
   @SneakyThrows
-  public CpyStorable getData(@NonNull long uuid) {
-    return getCpyRepo().getCpyStorableCache(uuid).get();
+  public CopybookStorable getData(@NonNull long uuid) {
+    return getCopybookRepo().getCopybookStorableFromCache(uuid).get();
   }
 
   @Override
   @SneakyThrows
   public boolean isStored(@NonNull long uuid) {
-    return getCpyRepo().isStored(uuid);
+    return getCopybookRepo().isStored(uuid);
   }
 
   @SneakyThrows
-  public Optional<CpyStorable> lastRecentlyUsed() {
-    return getCpyRepo().topItem();
+  public Optional<CopybookStorable> lastRecentlyUsed() {
+    return getCopybookRepo().topItem();
   }
 
   @SneakyThrows
-  public Optional<CpyStorable> leastRecentlyUsed() {
-    return getCpyRepo().lastItem();
+  public Optional<CopybookStorable> leastRecentlyUsed() {
+    return getCopybookRepo().lastItem();
   }
 
   @SneakyThrows
   public void invalidateCache() {
-    getCpyRepo().invalidateCache();
+    getCopybookRepo().invalidateCache();
   }
 }

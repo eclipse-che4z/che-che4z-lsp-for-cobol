@@ -3,6 +3,7 @@ package com.broadcom.impl;
 import com.broadcom.lsp.cdi.module.DefaultModule;
 import com.google.inject.name.Names;
 
+/** This module provides binding for databus test scope. */
 public class DatabusTestModule extends DefaultModule {
   @Override
   protected void configure() {
