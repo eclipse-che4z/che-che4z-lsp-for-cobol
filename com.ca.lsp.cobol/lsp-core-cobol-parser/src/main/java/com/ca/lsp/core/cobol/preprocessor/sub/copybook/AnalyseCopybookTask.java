@@ -109,13 +109,13 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
 
     // populate cache with content retrieved from scan analysis
     if (semanticContext != null) {
-      populateCacheWithCopybookContents(copyBookName, content);
+      populateCacheWithCopybookContents(content);
     }
     return semanticContext;
   }
 
-  private void populateCacheWithCopybookContents(String copyBookName, String content) {
-    databus.storeData(CpyStorable.builder().name(copyBookName).content(content).build());
+  private void populateCacheWithCopybookContents(String content) {
+    databus.storeData(CpyStorable.builder().name(copybookDefinition.getName()).content(content).uri(copybookDefinition.getUri()).build());
   }
 
   private SemanticContext parseCopybookFromCache() {
