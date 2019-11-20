@@ -39,7 +39,7 @@ spec:
 
 def projectName = 'lsp-for-cobol'
 def kubeLabel = projectName + '_pod_' + env.BUILD_NUMBER + '_' + env.BRANCH_NAME
-kubeLabel = kubeLabel.replaceAll(/[^a-zA-Z0-9._-]+/, "")
+kubeLabel = kubeLabel.replaceAll(/[^a-zA-Z0-9._-]+/,"")
 
 pipeline {
     agent {
