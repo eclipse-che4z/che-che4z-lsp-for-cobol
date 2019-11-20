@@ -230,7 +230,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private Consumer<Position> toSyntaxError(String copybookName) {
     return it ->
         listener.syntaxError(
-            retrieveDocumentURI(),
+            null,
             it.getLine(),
             it.getCharPositionInLine(),
             String.format(RECURSION_DETECTED, copybookName),
