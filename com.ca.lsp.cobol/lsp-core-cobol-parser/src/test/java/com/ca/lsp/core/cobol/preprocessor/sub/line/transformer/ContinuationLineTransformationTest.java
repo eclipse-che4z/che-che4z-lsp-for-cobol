@@ -112,7 +112,7 @@ public class ContinuationLineTransformationTest extends AbstractCobolLinePreproc
   private void runTransformation(String text) {
     List<CobolLine> lines = convertToCobolLines(text);
 
-    ContinuationLineTransformation transformation = new ContinuationLineTransformation(listener);
+    ContinuationLineTransformation transformation = new ContinuationLineTransformation(listener, null);
     transformation.transformLines(lines);
   }
 

@@ -30,14 +30,12 @@ public abstract class AbstractCobolLinePreprocessorTest {
   protected PreprocessorListener listener;
 
   public void eraseListener() {
-    listener = new PreprocessorListener(new ArrayList<SyntaxError>());
+    listener = new PreprocessorListener(new ArrayList<>());
   }
 
   protected List<CobolLine> processText(String text) {
-    CobolLineReaderImpl reader = new CobolLineReaderImpl(listener);
-    List<CobolLine> processed =
-        reader.processLines(text, CobolSourceFormatEnum.FIXED, new CobolParserParamsImpl());
-    return processed;
+    CobolLineReaderImpl reader = new CobolLineReaderImpl(listener, null);
+    return reader.processLines(text, CobolSourceFormatEnum.FIXED, new CobolParserParamsImpl());
   }
 
   protected String reduceLines(List<String> lines) {

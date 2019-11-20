@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.impl;
 
+import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
@@ -63,8 +64,10 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
       final CobolSourceFormatEnum format,
       final CobolParserParams params,
       final SemanticContext semanticContext) {
-    final List<CobolLine> lines = readLines(cobolCode, format, params);
-    final List<CobolLine> transformedLines = transformLines(lines);
+    String documentURI = getDocumentURI(semanticContext);
+    final List<CobolLine> lines =
+        readLines(cobolCode, format, params, documentURI);
+    final List<CobolLine> transformedLines = transformLines(lines, documentURI);
     final List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
     String cleanDocument = cleanDocument(rewrittenLines, format, params);
     return parseDocument(cleanDocument, format, params, semanticContext);
@@ -87,13 +90,17 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   }
 
   private List<CobolLine> readLines(
-      final String cobolCode, final CobolSourceFormatEnum format, final CobolParserParams params) {
-    return createLineReader().processLines(cobolCode, format, params);
+      final String cobolCode,
+      final CobolSourceFormatEnum format,
+      final CobolParserParams params,
+      String documentURI) {
+    return createLineReader(documentURI).processLines(cobolCode, format, params);
   }
 
-  private List<CobolLine> transformLines(List<CobolLine> lines) {
+  private List<CobolLine> transformLines(List<CobolLine> lines, String documentURI) {
     List<CobolLine> transformedLines = createUnsupportedFeaturesProcessor().transformLines(lines);
-    return createContinuationLineProcessor().transformLines(transformedLines);
+    return createContinuationLineProcessor(documentURI)
+        .transformLines(transformedLines);
   }
 
   /**
@@ -136,15 +143,20 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     return new CobolUnsupportedFeaturesIgnorerImpl(listener);
   }
 
-  private CobolLinesTransformation createContinuationLineProcessor() {
-    return new ContinuationLineTransformation(listener);
+  private CobolLinesTransformation createContinuationLineProcessor(String documentURI) {
+    return new ContinuationLineTransformation(listener, documentURI);
   }
 
-  private CobolLineReader createLineReader() {
-    return new CobolLineReaderImpl(listener);
+  private CobolLineReader createLineReader(String documentURI) {
+    return new CobolLineReaderImpl(listener, documentURI);
   }
 
   private CobolLineWriter createLineWriter() {
     return new CobolLineWriterImpl();
+  }
+
+  private String getDocumentURI(SemanticContext semanticContext) {
+    List<CopybookDefinition> tracker = semanticContext.getCopybookUsageTracker();
+    return tracker.isEmpty() ? null : tracker.get(tracker.size() - 1).getUri();
   }
 }
