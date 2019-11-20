@@ -71,38 +71,33 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
 
   @Override
   @SneakyThrows
-  public void subscribe(@NonNull S dataSubscriber) {
-    subscribe(RegistryId.GENERAL_REGISTRY_ID, dataSubscriber);
+  public @NonNull S subscribe(@NonNull S dataSubscriber) {
+    return subscribe(RegistryId.GENERAL_REGISTRY_ID, dataSubscriber);
   }
 
   @Override
   @SneakyThrows
-  public void subscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber) {
+  public @NonNull S subscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber) {
     seekRegistry(registryId).ifPresent(it -> it.register(dataSubscriber));
+    return dataSubscriber;
   }
 
   @Override
   @SneakyThrows
-  public void subscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer) {
-    subscribe(getSubscriber(eventType, observer));
+  public @NonNull S subscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer) {
+    return subscribe(getSubscriber(eventType, observer));
   }
 
   @Override
   @SneakyThrows
   public void unSubscribe(@NonNull S dataSubscriber) {
-    subscribe(RegistryId.GENERAL_REGISTRY_ID, dataSubscriber);
+    unSubscribe(RegistryId.GENERAL_REGISTRY_ID, dataSubscriber);
   }
 
   @Override
   @SneakyThrows
   public void unSubscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber) {
-    seekRegistry(registryId).ifPresent(it -> it.register(dataSubscriber));
-  }
-
-  @Override
-  @SneakyThrows
-  public void unSubscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer) {
-
+    seekRegistry(registryId).ifPresent(it -> it.unregister(dataSubscriber));
   }
 
   @Override
