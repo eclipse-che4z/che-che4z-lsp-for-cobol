@@ -20,18 +20,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Created  on 15/10/2019
- */
-
+/** This data class is used as a generic data transfer event. */
 @Data
 @RequiredArgsConstructor
 public class UnknownEvent extends DataEvent {
-    private String eventMessage;
+  private String eventMessage;
 
-    @Builder
-    public UnknownEvent(String eventMessage) {
-        super(DataEventType.UNKNOWN_EVENT, DataEventType.UNKNOWN_EVENT.getId());
-        this.eventMessage = eventMessage;
-    }
+  @Builder
+  public UnknownEvent(String eventMessage) {
+    super(DataEventType.UNKNOWN_EVENT, DataEventType.UNKNOWN_EVENT.getId());
+    this.eventMessage = eventMessage;
+  }
 }

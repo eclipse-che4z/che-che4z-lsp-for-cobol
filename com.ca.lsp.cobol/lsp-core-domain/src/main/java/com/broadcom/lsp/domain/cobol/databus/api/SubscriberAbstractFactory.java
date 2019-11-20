@@ -16,9 +16,7 @@
 
 package com.broadcom.lsp.domain.cobol.databus.api;
 
-/**
- * Created   on 2019-10-02
- */
-public interface ISubcriberAbsFactory<T> {
-    T create(IDataBusObserver observer);
+/** An abstract factory for the subscribers. */
+public interface SubscriberAbstractFactory<T> {
+  T create(DataBusObserver observer);
 }

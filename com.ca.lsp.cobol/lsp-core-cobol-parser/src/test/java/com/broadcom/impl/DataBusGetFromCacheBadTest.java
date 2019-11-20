@@ -17,70 +17,66 @@
 package com.broadcom.impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.domain.cobol.databus.api.ICpyRepository;
+import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.CpyStorable;
+import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-/** Created on 2019-10-02 */
+import static org.junit.Assert.assertTrue;
+
+/** This test verifies that cache can handle edge cases, e.g. missing elements. */
 @Slf4j
 public class DataBusGetFromCacheBadTest extends AbsDataBusImplTest {
   private DefaultDataBusBroker databus;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     databus =
         LangServerCtx.getGuiceCtx(new DatabusTestModule())
             .getInjector()
             .getInstance(DefaultDataBusBroker.class);
     databus.storeData(
-        CpyStorable.builder()
+        CopybookStorable.builder()
             .name("COPY1")
             .content("FASDFASDFSF")
-            .position("ROW:3,COL:4")
             .uri("/var/tmp/worspace1")
             .build());
     databus.storeData(
-        CpyStorable.builder()
+        CopybookStorable.builder()
             .name("COPY2")
             .content("FASDFASDFSF")
-            .position("ROW:3,COL:4")
             .uri("/var/tmp/worspace1")
             .build());
     databus.storeData(
-        CpyStorable.builder()
+        CopybookStorable.builder()
             .name("COPY3")
             .content("FASDFASDFSF")
-            .position("ROW:3,COL:4")
             .uri("/var/tmp/worspace1")
             .build());
     databus.storeData(
-        CpyStorable.builder()
+        CopybookStorable.builder()
             .name("COPY4")
             .content("FASDFASDFSF")
-            .position("ROW:3,COL:4")
             .uri("/var/tmp/worspace1")
             .build());
     databus.storeData(
-        CpyStorable.builder()
+        CopybookStorable.builder()
             .name("COPY40")
             .content("FASDFASDFSF")
-            .position("ROW:3,COL:4")
             .uri("/var/tmp/worspace1")
             .build());
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     databus = null;
     LangServerCtx.shutdown();
   }
@@ -93,9 +89,9 @@ public class DataBusGetFromCacheBadTest extends AbsDataBusImplTest {
   @Test(expected = NoSuchElementException.class)
   @SneakyThrows
   public void getData() throws NoSuchElementException {
-    Assert.assertTrue(databus.isStored(ICpyRepository.calculateUUID("COPY40")));
+    assertTrue(databus.isStored(CopybookRepository.calculateUUID("COPY40")));
     LOG.debug(String.format("Cache content : %s", databus.printCache()));
-    Optional<CpyStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
+    Optional<CopybookStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
     LOG.debug(
         String.format(
             "Least Recently Used item : %s  ID : %d",
@@ -108,6 +104,10 @@ public class DataBusGetFromCacheBadTest extends AbsDataBusImplTest {
     LOG.debug(
         String.format(
             "Retrieving not existent item %s will throw NoSuchElementException ", "COPY20"));
-    databus.getData(ICpyRepository.calculateUUID("COPY20")).getName().equalsIgnoreCase("COPY20");
+    assertTrue(
+        databus
+            .getData(CopybookRepository.calculateUUID("COPY20"))
+            .getName()
+            .equalsIgnoreCase("COPY20"));
   }
 }

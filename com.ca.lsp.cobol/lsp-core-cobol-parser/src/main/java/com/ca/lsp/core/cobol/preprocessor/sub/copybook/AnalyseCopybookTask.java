@@ -16,13 +16,13 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.domain.cobol.databus.api.ICpyRepository;
-import com.broadcom.lsp.domain.cobol.databus.api.IDataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.api.IDataBusObserver;
+import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusObserver;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
-import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
-import com.broadcom.lsp.domain.cobol.model.CpyStorable;
+import com.broadcom.lsp.domain.cobol.model.FetchedCopybookEvent;
+import com.broadcom.lsp.domain.cobol.model.RequiredCopybookEvent;
+import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
@@ -44,9 +44,9 @@ import java.util.concurrent.RecursiveTask;
 
 @Slf4j
 public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
-    implements IDataBusObserver<CblFetchEvent> {
+    implements DataBusObserver<FetchedCopybookEvent> {
 
-  private final IDataBusBroker databus =
+  private final DataBusBroker databus =
       LangServerCtx.getInjector().getInstance(DefaultDataBusBroker.class);
 
   private final String copyBookName;
@@ -86,8 +86,8 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
     if (isCopybookInCache) {
       semanticContext = parseCopybookFromCache();
     } else {
-      databus.subscribe(DataEventType.CBLFETCH_EVENT, this);
-      databus.postData(CblScanEvent.builder().name(copyBookName).build());
+      databus.subscribe(DataEventType.FETCHED_COPYBOOK_EVENT, this);
+      databus.postData(RequiredCopybookEvent.builder().name(copyBookName).build());
       semanticContext = parseCopybook();
     }
     return new CopybookSemanticContext(copyBookName, semanticContext);
@@ -115,7 +115,7 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
   }
 
   private void populateCacheWithCopybookContents(String content) {
-    databus.storeData(CpyStorable.builder().name(copybookDefinition.getName()).content(content).uri(copybookDefinition.getUri()).build());
+    databus.storeData(CopybookStorable.builder().name(copybookDefinition.getName()).content(content).uri(copybookDefinition.getUri()).build());
   }
 
   private SemanticContext parseCopybookFromCache() {
@@ -123,8 +123,8 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
   }
 
   private String getContentFromCache() {
-    CpyStorable cachedData =
-        databus.getData(ICpyRepository.calculateUUID(new StringBuilder(copyBookName)));
+    CopybookStorable cachedData =
+        databus.getData(CopybookRepository.calculateUUID(new StringBuilder(copyBookName)));
     copybookDefinition.setUri(cachedData.getUri());
     return cachedData.getContent();
   }
@@ -155,7 +155,7 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
   }
 
   @Override
-  public void observerCallback(CblFetchEvent adaptedDataEvent) {
+  public void observerCallback(FetchedCopybookEvent adaptedDataEvent) {
     if (!copyBookName.equals(adaptedDataEvent.getName())) {
       return;
     }
@@ -164,6 +164,6 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
   }
 
   private boolean isCopybookInCache(String copyBookName) {
-    return databus.isStored(ICpyRepository.calculateUUID(new StringBuilder(copyBookName)));
+    return databus.isStored(CopybookRepository.calculateUUID(new StringBuilder(copyBookName)));
   }
 }

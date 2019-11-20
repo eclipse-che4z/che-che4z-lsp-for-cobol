@@ -16,19 +16,18 @@
 
 package com.broadcom.lsp.domain.cobol.databus.api;
 
-import com.broadcom.lsp.domain.cobol.databus.impl.CpyRepositoryLRU;
-import com.broadcom.lsp.domain.cobol.model.CpyStorable;
+import com.broadcom.lsp.domain.cobol.databus.impl.CopybookRepositoryLRU;
+import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
 import com.google.inject.ImplementedBy;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import lombok.Synchronized;
 
 import java.util.Optional;
 import java.util.UUID;
 
-/** Created on 31/10/2019 */
-@ImplementedBy(CpyRepositoryLRU.class)
-public interface ICpyRepository {
+/** This repository manages the caching of copybooks. */
+@ImplementedBy(CopybookRepositoryLRU.class)
+public interface CopybookRepository {
 
   @SneakyThrows
   void sortCache();
@@ -44,17 +43,18 @@ public interface ICpyRepository {
   }
 
   @SneakyThrows
-  Optional<CpyStorable> getCpyStorableCache(@NonNull long uuid);
+  Optional<CopybookStorable> getCopybookStorableFromCache(@NonNull long uuid);
 
   @SneakyThrows
   void setSort(boolean isSort);
 
   /**
-   * The implementation should be synchronized
-   * @param deepcopy
+   * The object to store should be a deep copy of the actual object.
+   *
+   * @param storable - object to store
    */
   @SneakyThrows
-  void persist(@NonNull CpyStorable deepcopy);
+  void persist(@NonNull CopybookStorable storable);
 
   @SneakyThrows
   String logContent();
@@ -68,11 +68,6 @@ public interface ICpyRepository {
   @SneakyThrows
   boolean isStored(@NonNull String id);
 
-  /**
-   * The implementation should be synchronized
-   * @param uuid
-   * @return
-   */
   @SneakyThrows
   boolean isStored(@NonNull long uuid);
 

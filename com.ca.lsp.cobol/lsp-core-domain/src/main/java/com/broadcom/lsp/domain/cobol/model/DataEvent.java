@@ -20,22 +20,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-/**
- * Created  on 16/10/2019
- */
-@Slf4j
+/** The super class for all the events handled by the databus */
 @NoArgsConstructor
 @RequiredArgsConstructor
 public class DataEvent {
-    @Getter
-    private RegistryId registryId = RegistryId.GENERAL_REGISTRY_ID;
-    @Getter
-    @NonNull
-    private DataEventType eventType;
-    @Getter
-    @NonNull
-    private String header;
-
+  @Getter private RegistryId registryId = RegistryId.GENERAL_REGISTRY_ID;
+  @Getter @NonNull private DataEventType eventType;
+  @Getter @NonNull private String header;
 }

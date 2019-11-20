@@ -1,9 +1,9 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.domain.cobol.databus.api.ICpyRepository;
+import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.CpyStorable;
+import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.positive.CobolText;
@@ -15,7 +15,6 @@ import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.MultiMapSerializableHelp
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,10 +57,10 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
 
   private void predefineCache() {
     databus.storeData(
-        CpyStorable.builder()
+        CopybookStorable.builder()
             .name(COPYBOOK_NAME)
+            .uri(COPYBOOK_NAME)
             .content(COPYBOOK_CONTENT)
-            .paragraphPosition(MultiMapSerializableHelper.serializeInHashMap(paragraphDefinitions))
             .build());
   }
 
@@ -94,7 +93,7 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
     runAnalysis();
     log.info(databus.printCache());
     assertTrue(
-        databus.getData(ICpyRepository.calculateUUID(new StringBuilder(COPYBOOK_NAME))).getHit()
+        databus.getData(CopybookRepository.calculateUUID(new StringBuilder(COPYBOOK_NAME))).getHit()
             > 0);
   }
 
@@ -103,7 +102,7 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
     // invalidate cache in order to ask workspace manager to grab the content
     databus.invalidateCache();
     runAnalysis();
-    assertTrue(databus.isStored(ICpyRepository.calculateUUID(COPYBOOK_NAME)));
+    assertTrue(databus.isStored(CopybookRepository.calculateUUID(COPYBOOK_NAME)));
   }
 
   private void runAnalysis() {

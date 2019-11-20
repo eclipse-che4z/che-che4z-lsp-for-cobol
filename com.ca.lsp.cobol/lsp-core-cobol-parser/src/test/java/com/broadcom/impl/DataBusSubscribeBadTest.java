@@ -18,23 +18,23 @@ package com.broadcom.impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.CpyBuildEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.model.RequiredCopybookEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/** Created on 2019-10-02 */
+/** This test verifies that the observer is not triggered by the event it is not subscribed to. */
 @Slf4j
-public class DataBusSubscribelBadTest extends AbsDataBusImplTest {
+public class DataBusSubscribeBadTest extends AbsDataBusImplTest {
 
   private DefaultDataBusBroker databus;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     databus =
         LangServerCtx.getGuiceCtx(new DatabusTestModule())
             .getInjector()
@@ -42,24 +42,25 @@ public class DataBusSubscribelBadTest extends AbsDataBusImplTest {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     databus = null;
     LangServerCtx.shutdown();
   }
 
   @Override
   public void observerCallback(DataEvent adaptedDataEvent) {
-    waiter.assertFalse(DataEventType.CBLFETCH_EVENT == adaptedDataEvent.getEventType());
+    waiter.assertFalse(DataEventType.FETCHED_COPYBOOK_EVENT == adaptedDataEvent.getEventType());
     LOG.debug(String.format("Received : %s", adaptedDataEvent.getEventType().getId()));
-    LOG.debug(String.format("Expected : %s", DataEventType.CBLFETCH_EVENT.getId()));
+    LOG.debug(String.format("Expected : %s", DataEventType.FETCHED_COPYBOOK_EVENT.getId()));
     waiter.resume();
   }
 
   @Test
   @SneakyThrows
   public void subscribe() {
-    databus.subscribe(DataEventType.CPYBUILD_EVENT, this);
-    databus.postData(CpyBuildEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
+    databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
+    databus.postData(
+        RequiredCopybookEvent.builder().name("REQUIRED_COPYBOOK_EVENT_SUBSCRIPTION TEST").build());
     waiter.await(5000);
   }
 }

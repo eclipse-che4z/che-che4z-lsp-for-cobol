@@ -20,24 +20,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Created  on 15/10/2019
- */
-
+/** This class is a data transfer object for retrieved copybook. */
 @Data
 @NoArgsConstructor
-public class CpyBuildEvent extends DataEvent{
-    private String name;
-    private String position;
-    private String uri;
+public class FetchedCopybookEvent extends DataEvent {
+  private String name;
+  private String uri;
+  private String content;
 
-    @Builder
-    public CpyBuildEvent(String name, String position, String uri) {
-        super(DataEventType.CPYBUILD_EVENT, DataEventType.CPYBUILD_EVENT.getId());
-        this.name = name;
-        this.position = position;
-        this.uri = uri;
-    }
-
-
+  @Builder
+  public FetchedCopybookEvent(String name, String uri, String content) {
+    super(DataEventType.FETCHED_COPYBOOK_EVENT, DataEventType.FETCHED_COPYBOOK_EVENT.getId());
+    this.name = name;
+    this.uri = uri;
+    this.content = content;
+  }
 }

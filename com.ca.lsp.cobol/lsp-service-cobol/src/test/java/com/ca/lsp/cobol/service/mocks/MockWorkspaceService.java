@@ -1,9 +1,9 @@
 package com.ca.lsp.cobol.service.mocks;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.CblFetchEvent;
-import com.broadcom.lsp.domain.cobol.model.CblScanEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.model.FetchedCopybookEvent;
+import com.broadcom.lsp.domain.cobol.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.positive.CobolTextRegistry;
 import com.ca.lsp.cobol.service.CobolWorkspaceService;
@@ -36,7 +36,7 @@ public class MockWorkspaceService implements CobolWorkspaceService {
   @Inject
   public MockWorkspaceService(DefaultDataBusBroker dataBus) {
     this.dataBus = dataBus;
-    dataBus.subscribe(DataEventType.CBLSCAN_EVENT, this);
+    dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
   }
 
   @Override
@@ -66,12 +66,9 @@ public class MockWorkspaceService implements CobolWorkspaceService {
   public void didChangeWatchedFiles(DidChangeWatchedFilesParams didChangeWatchedFilesParams) {}
 
   @Override
-  public void observerCallback(CblScanEvent event) {
-    if (!event.getEventType().equals(DataEventType.CBLSCAN_EVENT)) {
-      return;
-    }
+  public void observerCallback(RequiredCopybookEvent event) {
     String name = event.getName();
     String content = getContentByCopybookName(name);
-    dataBus.postData(CblFetchEvent.builder().name(name).uri(name).content(content).build());
+    dataBus.postData(FetchedCopybookEvent.builder().name(name).uri(name).content(content).build());
   }
 }

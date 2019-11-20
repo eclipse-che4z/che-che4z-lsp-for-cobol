@@ -20,6 +20,9 @@ import lombok.Value;
 
 import java.io.Serializable;
 
+/**
+ * This data class is used to describe the position of syntax or semantic element in the workspace.
+ */
 @Value
 @AllArgsConstructor
 public final class Position implements Serializable {
