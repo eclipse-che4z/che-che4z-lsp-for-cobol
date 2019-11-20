@@ -47,7 +47,7 @@ import java.util.stream.Stream;
 @Singleton
 public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   private final ExecutorService threadPool;
-  private final DefaultDataBusBroker<FetchedCopybookEvent, RequiredCopybookEvent> dataBus;
+  private final DefaultDataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
 
   @Inject
