@@ -28,9 +28,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.TimeoutException;
+
 /** This test verifies that the observer is triggered by the event it is subscribed to. */
 @Slf4j
-public class DataBusUnSubscribeHappyTest extends AbsDataBusImplTest {
+public class DataBusUnSubscribeUnitTest extends AbsDataBusImplTest {
 
   private DefaultDataBusBroker databus;
 
@@ -56,12 +58,17 @@ public class DataBusUnSubscribeHappyTest extends AbsDataBusImplTest {
     waiter.resume();
   }
 
-  @Test
+  @Test(expected = TimeoutException.class)
   @SneakyThrows
   public void subscribe() {
-    Subscriber s = (Subscriber) databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
+    //Subscribe
+    Object subscriber = databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
     databus.postData(RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
     waiter.await(5000);
-
+    //Unsubscribe
+    databus.unSubscribe(subscriber);
+    databus.postData(RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
+    //wait undefined because no subscriber anymore
+    waiter.await(5000);
   }
 }
