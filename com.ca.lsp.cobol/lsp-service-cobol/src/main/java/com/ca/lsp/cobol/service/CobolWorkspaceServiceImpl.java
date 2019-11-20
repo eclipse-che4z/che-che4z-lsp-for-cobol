@@ -16,9 +16,9 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
+import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.model.RequiredCopybookEvent;
-import com.broadcom.lsp.domain.cobol.model.DataEventType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ import java.util.stream.Stream;
 @Singleton
 public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   private final ExecutorService threadPool;
-  private final DefaultDataBusBroker<FetchedCopybookEvent, RequiredCopybookEvent> dataBus;
+  private final DefaultDataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
 
   @Inject
