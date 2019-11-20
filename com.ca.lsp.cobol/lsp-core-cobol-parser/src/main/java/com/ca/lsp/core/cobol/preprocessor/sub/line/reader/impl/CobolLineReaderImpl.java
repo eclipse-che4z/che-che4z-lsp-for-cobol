@@ -31,9 +31,11 @@ import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 public class CobolLineReaderImpl implements CobolLineReader {
   private static final int INDICATOR_AREA_INDEX = 6;
   private PreprocessorListener listener;
+  private String documentURI;
 
-  public CobolLineReaderImpl(PreprocessorListener listener) {
+  public CobolLineReaderImpl(PreprocessorListener listener, String documentURI) {
     this.listener = listener;
+    this.documentURI = documentURI;
   }
 
   @Override
@@ -154,7 +156,8 @@ public class CobolLineReaderImpl implements CobolLineReader {
   private void registerFormatError(
       int lineNumber, final CobolSourceFormatEnum format, int charPosition, int errorLength) {
     if (listener == null) return;
-    listener.syntaxError(null,
+    listener.syntaxError(
+        documentURI,
         lineNumber + 1,
         charPosition,
         "This format is not a " + format.toString() + " format",
