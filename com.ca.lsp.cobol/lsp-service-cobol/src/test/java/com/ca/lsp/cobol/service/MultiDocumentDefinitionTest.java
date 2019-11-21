@@ -79,7 +79,7 @@ public class MultiDocumentDefinitionTest extends ConfigurableTest {
   @Test
   public void testVariableDefinitions() {
     Map<String, List<Location>> variableDefinitions = analysisResult.getVariableDefinitions();
-    assertEquals(7, variableDefinitions.size());
+    assertEquals(5, variableDefinitions.size());
 
     assertEquals("STRUCT", variableDefinitions.get("CHILD1").get(0).getUri());
     assertEquals("STRUCT", retrieveURIForGoToDefinition(new Position(6, 20)));

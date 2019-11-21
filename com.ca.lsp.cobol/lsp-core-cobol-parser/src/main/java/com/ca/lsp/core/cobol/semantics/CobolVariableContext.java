@@ -80,6 +80,7 @@ public class CobolVariableContext implements SubContext<Variable> {
     }
     variables.addAll(indexOfCopybook + 1, subContext.getAll());
     variables.remove(indexOfCopybook);
+    variableDefinitions.removeAll(name);
     if (variables.contains(new Variable("-1", name))) {
       buildVariableStructure(name, subContext);
     }
