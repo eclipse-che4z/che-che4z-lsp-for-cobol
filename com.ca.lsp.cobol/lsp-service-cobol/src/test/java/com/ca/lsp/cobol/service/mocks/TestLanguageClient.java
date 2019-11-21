@@ -99,10 +99,10 @@ public class TestLanguageClient implements LanguageClient {
   }
 
   public void clean() {
-    receivedTelemetry = new ArrayList<>();
-    receivedDiagnostics = new ArrayList<>();
-    messagesToShow = new ArrayList<>();
-    messagesToLog = new ArrayList<>();
+    receivedTelemetry.clear();
+    receivedDiagnostics.clear();
+    messagesToShow.clear();
+    messagesToLog.clear();
     responseIterator = null;
   }
 }
