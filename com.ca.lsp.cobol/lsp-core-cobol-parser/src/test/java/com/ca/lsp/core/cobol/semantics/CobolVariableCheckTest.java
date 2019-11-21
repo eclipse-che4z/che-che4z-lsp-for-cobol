@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import static com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum.*;
 import static org.junit.Assert.assertEquals;
 
-/** @author ilise01 */
 public class CobolVariableCheckTest {
 
   /**

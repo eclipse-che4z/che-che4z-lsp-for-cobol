@@ -39,8 +39,6 @@ import static org.junit.Assert.assertEquals;
  * <p>E - Error
  *
  * <p>S - Severe
- *
- * @author teman02
  */
 public abstract class NegativeTest extends ConfigurableTest {
   private static final List<CobolText> TEXTS =

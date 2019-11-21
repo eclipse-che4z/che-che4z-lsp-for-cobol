@@ -24,7 +24,6 @@ import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation
 import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.assertEquals;
 
-/** */
 public class TestVariablesAreCaseInsensitive extends ConfigurableTest {
   private static final String TEXT =
       "       Identification Division. \n"

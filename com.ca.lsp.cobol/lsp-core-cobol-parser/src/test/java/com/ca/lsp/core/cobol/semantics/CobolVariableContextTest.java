@@ -29,8 +29,6 @@ import static org.junit.Assert.*;
 
 /**
  * Test for CobolVariableContextImpl
- *
- * @author teman02
  */
 public class CobolVariableContextTest {
   private static final String LEVEL1 = "01";

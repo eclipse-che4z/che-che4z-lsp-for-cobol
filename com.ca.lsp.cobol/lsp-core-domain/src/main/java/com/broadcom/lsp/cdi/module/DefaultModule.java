@@ -20,7 +20,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
 /**
- * Created on 22/10/2019
+ * THis is a default module that provides DI bindings.
  */
 public class DefaultModule extends AbstractModule {
     @Override

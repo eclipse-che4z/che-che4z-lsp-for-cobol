@@ -39,8 +39,6 @@ import static org.junit.Assert.assertEquals;
  *
  * <p>The CBL (PROCESS) statement must be placed before any comment lines or other
  * compiler-directing statements.
- *
- * @author teman02
  */
 public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
   public TestNoErrorOnCompilerDirectives() {

@@ -34,8 +34,6 @@ import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CONT_LINE_N
  *
  * <p>If there is no hyphen (-) in the indicator area (column 7) of a line, the last character of
  * the preceding line is assumed to be followed by a space.
- *
- * @author zacan01, teman02
  */
 public class ContinuationLineTransformation implements CobolLinesTransformation {
   private static final int START_INDEX_AREA_A = 4;

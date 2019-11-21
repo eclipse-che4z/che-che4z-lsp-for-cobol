@@ -20,8 +20,6 @@ import org.junit.Test;
 
 /**
  * This use case checks if extra symbols on one line do not cause any errors on the next line.
- *
- * @author teman02
  */
 public class TestExtraSymbolsNotCauseErrorOnNextLine extends NegativeUseCase {
   public TestExtraSymbolsNotCauseErrorOnNextLine() {

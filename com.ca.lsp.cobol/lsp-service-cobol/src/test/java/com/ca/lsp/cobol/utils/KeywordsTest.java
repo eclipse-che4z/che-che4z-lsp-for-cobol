@@ -27,8 +27,6 @@ import static org.junit.Assert.fail;
 
 /**
  * This test check if the language keywords file contains all the words that the Cobol Lexer uses.
- *
- * @author teman02
  */
 public class KeywordsTest {
 

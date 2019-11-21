@@ -25,8 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
-/** Created on 2019-10-02 */
-// Binding Module
+/** This module provides DI bindings for service part. */
 @Slf4j
 public class ServiceModule extends DefaultModule {
   @Override

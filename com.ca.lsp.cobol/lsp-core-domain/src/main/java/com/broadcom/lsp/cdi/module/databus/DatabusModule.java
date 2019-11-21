@@ -19,8 +19,7 @@ package com.broadcom.lsp.cdi.module.databus;
 import com.broadcom.lsp.cdi.module.DefaultModule;
 import com.google.inject.name.Names;
 
-/** Created on 2019-10-02 */
-// Binding Module
+/** This module provides DI bindings with default values for databus parameters. */
 public class DatabusModule extends DefaultModule {
   @Override
   protected void configure() {

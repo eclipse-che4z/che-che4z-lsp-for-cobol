@@ -32,11 +32,7 @@ import static com.ca.lsp.cobol.usecases.UseCaseUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * This class checks the expected behavior of Go to Definition request resolving.
- *
- * @author teman02
- */
+/** This class checks the expected behavior of Go to Definition request resolving. */
 public class ReferencesTest extends ConfigurableTest {
   private static final String TEXT =
       "       Identification Division. \n"

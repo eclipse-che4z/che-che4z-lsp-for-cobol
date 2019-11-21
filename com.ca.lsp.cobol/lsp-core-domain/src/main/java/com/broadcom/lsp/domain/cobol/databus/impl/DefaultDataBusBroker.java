@@ -18,7 +18,6 @@ package com.broadcom.lsp.domain.cobol.databus.impl;
 
 import com.broadcom.lsp.domain.cobol.databus.api.AbstractDataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusObserver;
-import com.broadcom.lsp.domain.cobol.databus.api.Subscriber;
 import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;

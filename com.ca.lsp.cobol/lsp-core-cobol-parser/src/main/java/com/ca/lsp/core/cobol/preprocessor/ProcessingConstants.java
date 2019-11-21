@@ -14,8 +14,6 @@
 package com.ca.lsp.core.cobol.preprocessor;
 /**
  * The constants in this class are used while the processing of Cobol code lines.
- *
- * @author teman02
  */
 public final class ProcessingConstants {
   private ProcessingConstants() {}

@@ -28,6 +28,7 @@ import org.eclipse.lsp4j.*;
  *
  * @see References
  */
+
 public class Highlights {
 
   public static List<DocumentHighlight> findHighlights(

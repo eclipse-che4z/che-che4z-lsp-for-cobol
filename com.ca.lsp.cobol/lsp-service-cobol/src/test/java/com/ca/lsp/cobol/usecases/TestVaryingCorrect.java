@@ -23,8 +23,6 @@ import java.util.List;
 
 /**
  * This use cases checks if varying with multiple identifiers works correctly.
- *
- * @author teman02
  */
 @RunWith(Parameterized.class)
 public class TestVaryingCorrect extends PositiveUseCase {
