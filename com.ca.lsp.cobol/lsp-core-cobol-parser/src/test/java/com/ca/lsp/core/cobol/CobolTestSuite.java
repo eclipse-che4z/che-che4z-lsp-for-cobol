@@ -25,11 +25,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-/**
- * This suite runs all the test of Cobol parser core.
- *
- * @author teman02, sergiuilie
- */
+/** This suite runs all the test of Cobol parser core. */
 @RunWith(Suite.class)
 @SuiteClasses({
   CobolLineReaderImplTest.class,
