@@ -38,8 +38,6 @@ import java.util.stream.Collectors;
  * This class serves the communications between server and client. It also allows to send delayable
  * messages. Notice, that all the messages that are going to be sent from server to client should be
  * cleaned by removing line breaks to prevent incorrect parsing.
- *
- * @author teman02
  */
 public class ServerCommunications implements Communications {
   private final IMyLanguageServer server;

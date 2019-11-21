@@ -34,8 +34,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * This class checks that all the semantic elements definitions and usages are found correctly
- *
- * @author teman02
  */
 public class DefinitionsAndUsagesTest extends ConfigurableTest {
   private static final String TEXT =

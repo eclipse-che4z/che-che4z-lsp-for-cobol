@@ -22,8 +22,6 @@ import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 
 /**
  * Preprocessor which removes lines that contains unsupported features
- *
- * @author teman02
  */
 public class CobolUnsupportedFeaturesIgnorerImpl implements CobolLinesTransformation {
 

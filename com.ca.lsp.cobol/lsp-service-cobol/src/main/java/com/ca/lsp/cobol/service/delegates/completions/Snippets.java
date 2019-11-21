@@ -17,8 +17,6 @@ import java.io.InputStream;
 
 /**
  * This class is a provider for Cobol Snippets
- *
- * @author pucgi01
  */
 public class Snippets extends AbstractCompletionStorage {
   private static final String SNIPPETS_FILE_PATH = "LanguageSnippets.txt";

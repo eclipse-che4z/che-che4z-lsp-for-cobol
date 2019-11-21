@@ -30,7 +30,6 @@ import java.util.*;
 import static com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum.*;
 import static org.junit.Assert.assertEquals;
 
-/** @author sergiuilie */
 @Slf4j
 @RunWith(Parameterized.class)
 public class CobolCleanExtraLanguageTest {

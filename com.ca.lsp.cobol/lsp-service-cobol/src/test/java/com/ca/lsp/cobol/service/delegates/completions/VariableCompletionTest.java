@@ -27,8 +27,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Test to check VariableCompletion
- *
- * @author teman02
  */
 public class VariableCompletionTest {
   private static final String TEXT =

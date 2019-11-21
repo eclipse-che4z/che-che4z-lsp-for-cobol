@@ -33,8 +33,6 @@ import static org.junit.Assert.assertFalse;
 
 /**
  * This tests checks the order of completion elements: 1. Variables 2. Keywords
- *
- * @author teman02
  */
 public class CompletionsChainTest extends ConfigurableTest {
   private TextDocumentService service;

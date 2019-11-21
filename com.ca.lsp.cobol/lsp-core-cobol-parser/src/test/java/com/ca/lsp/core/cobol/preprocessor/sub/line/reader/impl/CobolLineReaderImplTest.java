@@ -29,8 +29,6 @@ import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
  * This test checks the line preprocessing logic. Notice, that if there are less than 6 symbols in a
  * line, one space will be added during the preprocessing as a default indicator. All the symbols
  * after 80 should be removed and the new syntax error should be registered.
- *
- * @author teman02
  */
 public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
 

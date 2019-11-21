@@ -30,7 +30,6 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-/** @author zacan01 */
 @Slf4j
 public class MyTextDocumentService implements TextDocumentService {
   private final Map<String, MyDocumentModel> docs = Collections.synchronizedMap(new HashMap<>());

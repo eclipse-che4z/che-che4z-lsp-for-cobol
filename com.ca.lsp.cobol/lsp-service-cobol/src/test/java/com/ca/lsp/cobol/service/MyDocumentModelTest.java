@@ -21,7 +21,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-/** @author teman02 */
 public class MyDocumentModelTest {
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \r\n"

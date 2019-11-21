@@ -29,8 +29,6 @@ import static org.junit.Assert.assertFalse;
 /**
  * This test verifies that all the responses from server are escaped from line breaks to prevent
  * incorrect parsing on the client side.
- *
- * @author teman02
  */
 public class TestResponsesNotContainLineBreaks extends ConfigurableTest {
 

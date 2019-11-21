@@ -30,9 +30,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.*;
 
-/**
- * @author zacan01
- */
 @Slf4j
 public class LangServerBootstrap {
     private static final Integer LSP_PORT = 1044;
@@ -45,9 +42,6 @@ public class LangServerBootstrap {
 
     private void initCtx() {
         LangServerCtx.getGuiceCtx(new ServiceModule(), new DatabusModule());
-        //Example of usage
-        //cdiCtx.getInjector().getInstance(CobolWorkspaceService.class);
-        //To Remove...
         server = LangServerCtx.getInjector().getInstance(IMyLanguageServer.class);
     }
 

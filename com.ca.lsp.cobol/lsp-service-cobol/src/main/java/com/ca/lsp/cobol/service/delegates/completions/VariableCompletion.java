@@ -19,7 +19,6 @@ import org.eclipse.lsp4j.CompletionItemKind;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 
 class VariableCompletion extends AbstractCompletion {

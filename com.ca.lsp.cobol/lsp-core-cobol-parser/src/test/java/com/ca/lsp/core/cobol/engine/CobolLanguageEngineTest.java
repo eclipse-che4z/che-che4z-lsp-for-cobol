@@ -30,8 +30,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * JUnit Test checks with Cobol engine for both positive and negative tests with 3 formats
- *
- * @author ra890997
  */
 @RunWith(Parameterized.class)
 public class CobolLanguageEngineTest {

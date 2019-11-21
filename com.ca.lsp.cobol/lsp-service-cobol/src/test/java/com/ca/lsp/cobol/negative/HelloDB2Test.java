@@ -26,8 +26,6 @@ import org.junit.Test;
  * <p>Same message on line: 33 45
  *
  * <p>35 IGYPS2121-S ""SQLCA"" was not defined as a data-name. The statement was discarded."
- *
- * @author teman02
  */
 public class HelloDB2Test extends NegativeTest {
   private static final String FILE_NAME = "HELLODB2.cbl";

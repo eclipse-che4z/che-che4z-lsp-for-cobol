@@ -23,11 +23,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * This class is used as a delegate for code completion operations.
- *
- * @author teman02
- */
+/** This class is used as a delegate for code completion operations. */
 @UtilityClass
 public class Completions {
 

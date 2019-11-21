@@ -20,8 +20,6 @@ import org.junit.Test;
 
 /**
  * This use case checks if the absence of dot at the end is being recognized as an error.
- *
- * @author teman02
  */
 public class TestExtraneousInputEOFExpecting extends NegativeUseCase {
 

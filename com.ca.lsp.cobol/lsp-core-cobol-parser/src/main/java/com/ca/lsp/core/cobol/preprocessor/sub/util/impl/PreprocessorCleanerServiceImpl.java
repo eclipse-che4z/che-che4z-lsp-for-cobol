@@ -26,7 +26,6 @@ import java.util.Scanner;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 
-/** @author sergiuilie */
 public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerService {
   private final Deque<CobolDocumentContext> contexts;
 

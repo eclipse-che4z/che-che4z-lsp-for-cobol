@@ -18,7 +18,6 @@ import com.ca.lsp.core.cobol.model.SyntaxError;
 
 import java.util.List;
 
-/** @author ilise01 */
 public class SemanticListener extends Listener {
 
   private static final int WARNING_SEVERITY = 2;

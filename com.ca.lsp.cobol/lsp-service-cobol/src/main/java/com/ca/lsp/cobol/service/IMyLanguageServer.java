@@ -16,7 +16,6 @@ package com.ca.lsp.cobol.service;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 
-/** @author zacan01 */
 public interface IMyLanguageServer extends LanguageServer {
   LanguageClient getClient();
 

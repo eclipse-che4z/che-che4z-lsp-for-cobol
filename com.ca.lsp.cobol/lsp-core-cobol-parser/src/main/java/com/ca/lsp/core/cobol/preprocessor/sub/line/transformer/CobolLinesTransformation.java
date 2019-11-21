@@ -20,8 +20,6 @@ import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 /**
  * Performs transformation operations on the given CobolLines. Requires FormatListener to raise or
  * manage format errors that may appear.
- *
- * @author teman02
  */
 public interface CobolLinesTransformation {
 

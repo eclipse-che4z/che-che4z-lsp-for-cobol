@@ -24,11 +24,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-/**
- * This utility class provides methods to run use cases with Cobol code examples.
- *
- * @author teman02
- */
+/** This utility class provides methods to run use cases with Cobol code examples. */
 public class UseCaseUtils {
   public static final String LANGUAGE = "cbl";
   public static final String DOCUMENT_URI = "1";

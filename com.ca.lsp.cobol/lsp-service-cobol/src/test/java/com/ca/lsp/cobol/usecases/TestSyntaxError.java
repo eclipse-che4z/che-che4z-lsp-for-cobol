@@ -21,8 +21,6 @@ import org.junit.Test;
 /**
  * This test checks if the parser recognizes typo on the "DIVISIONs" token. The correct is
  * "DIVISION".
- *
- * @author teman02
  */
 public class TestSyntaxError extends NegativeUseCase {
   public TestSyntaxError() {

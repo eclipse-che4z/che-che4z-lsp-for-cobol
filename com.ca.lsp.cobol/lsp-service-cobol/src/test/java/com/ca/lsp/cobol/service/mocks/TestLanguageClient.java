@@ -26,8 +26,6 @@ import java.util.stream.Collectors;
 /**
  * Mock implementation of language client. Only for testing purposes. Collects the received messages
  * from the server. May respond on the showMessageRequest using the given messages in the Iterator.
- *
- * @author teman02
  */
 @Singleton
 public class TestLanguageClient implements LanguageClient {
