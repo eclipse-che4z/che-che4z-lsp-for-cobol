@@ -89,35 +89,7 @@ public class ServerCommunications implements Communications {
         () ->
             showMessage(MessageType.Info, "No syntax errors detected in " + retrieveFileName(uri)));
   }
-  // @Override
-  //  public void notifyCopybooksFound(String copybooksList) {
-  //    CompletableFuture.runAsync(
-  //        () ->
-  //            getClient()
-  //                .showMessage(
-  //                    new MessageParams(
-  //                        MessageType.Info,
-  //                        "Copybooks found in the current workspace " + copybooksList)));
-  //  }
-  // @Override
-  //  public void notifyCopybookNotFound(String filename) {
-  //    CompletableFuture.runAsync(
-  //        () ->
-  //            getClient()
-  //                .showMessage(
-  //                    new MessageParams(
-  //                        MessageType.Error, "Copybooks" + filename + " is not found")));
-  //  }
-  // @Override
-  //  public void notifyURIOfCopybook(String copyName, String copybookURI) {
-  //    CompletableFuture.runAsync(
-  //        () ->
-  //            getClient()
-  //                .showMessage(
-  //                    new MessageParams(
-  //                        MessageType.Info,
-  //                        "Copybooks with name " + copyName + " have path: " + copybookURI)));
-  //  }
+
   @Override
   public void publishDiagnostics(String uri, List<Diagnostic> diagnostics) {
     getClient().publishDiagnostics(new PublishDiagnosticsParams(uri, clean(diagnostics)));

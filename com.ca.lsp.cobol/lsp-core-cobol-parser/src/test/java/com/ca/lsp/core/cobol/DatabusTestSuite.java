@@ -11,7 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-
 package com.ca.lsp.core.cobol;
 
 import com.broadcom.impl.*;

@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/** Implementation of CobolVariableContext that uses ArrayList to store defined variables */
 public class CobolVariableContext implements SubContext<Variable> {
   private static final int LEVEL_77 = 77;
   private static final int LEVEL_66 = 66;
