@@ -171,7 +171,6 @@ public class CobolCommentEntriesMarkerImpl implements CobolCommentEntriesMarker 
   /** Checks, whether given line starts with a trigger keyword indicating a comment entry. */
   protected boolean startsWithTrigger(final CobolLine line, final String[] triggers) {
     final String contentAreaUpperCase = line.getContentArea().toUpperCase();
-//    final String indicatorArea = line.getIndicatorArea();
 
     boolean result = false;
 

@@ -26,6 +26,7 @@ import org.junit.runners.Suite;
   DataBusGetFromCacheHappyTest.class,
   DataBusStoreHappyTest.class,
   DataBusSubscribeHappyTest.class,
-  DataBusSubscribeBadTest.class
+  DataBusSubscribeBadTest.class,
+  DataBusUnSubscribeTest.class
 })
 public class DatabusTestSuite {}
