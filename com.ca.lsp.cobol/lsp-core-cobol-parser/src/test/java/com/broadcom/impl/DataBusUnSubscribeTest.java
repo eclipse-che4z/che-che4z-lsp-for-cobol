@@ -17,7 +17,6 @@
 package com.broadcom.impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.domain.cobol.databus.api.Subscriber;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.model.DataEventType;
@@ -30,9 +29,12 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeoutException;
 
-/** This test verifies that the observer is triggered by the event it is subscribed to. */
+/**
+ * This test verifies that the object that was unsubscribed from the databus doesn't receive
+ * notifications anymore.
+ */
 @Slf4j
-public class DataBusUnSubscribeUnitTest extends AbsDataBusImplTest {
+public class DataBusUnSubscribeTest extends AbsDataBusImplTest {
 
   private DefaultDataBusBroker databus;
 
@@ -61,14 +63,14 @@ public class DataBusUnSubscribeUnitTest extends AbsDataBusImplTest {
   @Test(expected = TimeoutException.class)
   @SneakyThrows
   public void subscribe() {
-    //Subscribe
+    // Subscribe
     Object subscriber = databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
     databus.postData(RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
     waiter.await(5000);
-    //Unsubscribe
+    // Unsubscribe
     databus.unSubscribe(subscriber);
     databus.postData(RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
-    //wait undefined because no subscriber anymore
+    // wait undefined because no subscriber anymore
     waiter.await(5000);
   }
 }
