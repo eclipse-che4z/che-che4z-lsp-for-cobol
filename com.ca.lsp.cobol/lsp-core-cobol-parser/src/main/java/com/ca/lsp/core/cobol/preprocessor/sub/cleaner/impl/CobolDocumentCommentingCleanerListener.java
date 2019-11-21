@@ -1,20 +1,32 @@
+/*
+ * Copyright (c) 2019 Broadcom.
+ *
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ * Broadcom, Inc. - initial API and implementation
+ *
+ */
 package com.ca.lsp.core.cobol.preprocessor.sub.cleaner.impl;
 
 import com.ca.lsp.core.cobol.parser.CobolCleanerBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolCleanerParser;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
-import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleanerListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
 import org.antlr.v4.runtime.BufferedTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Scanner;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 
@@ -45,42 +57,42 @@ public class CobolDocumentCommentingCleanerListener extends CobolCleanerBaseList
 
   @Override
   public void enterExecCicsStatement(CobolCleanerParser.ExecCicsStatementContext ctx) {
-    this.preprocessorCleanerService.push();
+    preprocessorCleanerService.push();
   }
 
   @Override
   public void exitExecCicsStatement(CobolCleanerParser.ExecCicsStatementContext ctx) {
-    this.preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_CICS_TAG, tokens, format);
+    preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_CICS_TAG, tokens, format);
   }
 
   @Override
   public void enterExecSqlStatement(CobolCleanerParser.ExecSqlStatementContext ctx) {
-    this.preprocessorCleanerService.push();
+    preprocessorCleanerService.push();
   }
 
   @Override
   public void exitExecSqlStatement(CobolCleanerParser.ExecSqlStatementContext ctx) {
-    this.preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_SQL_TAG, tokens, format);
+    preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_SQL_TAG, tokens, format);
   }
 
   @Override
   public void enterExecSqlImsStatement(CobolCleanerParser.ExecSqlImsStatementContext ctx) {
-    this.preprocessorCleanerService.push();
+    preprocessorCleanerService.push();
   }
 
   @Override
   public void exitExecSqlImsStatement(CobolCleanerParser.ExecSqlImsStatementContext ctx) {
-    this.preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_SQLIMS_TAG, tokens, format);
+    preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_SQLIMS_TAG, tokens, format);
   }
 
   @Override
   public void enterEjectStatement(CobolCleanerParser.EjectStatementContext ctx) {
-    this.preprocessorCleanerService.push();
+    preprocessorCleanerService.push();
   }
 
   @Override
   public void exitEjectStatement(CobolCleanerParser.EjectStatementContext ctx) {
-    this.preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens, format);
+    preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens, format);
   }
 
   @Override
