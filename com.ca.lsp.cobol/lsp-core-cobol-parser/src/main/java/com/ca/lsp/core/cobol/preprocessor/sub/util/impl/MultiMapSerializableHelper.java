@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2019 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Broadcom, Inc. - initial API and implementation
+ */
 package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
 import com.broadcom.lsp.domain.cobol.model.Position;
@@ -12,7 +25,7 @@ import java.util.Set;
 
 @Slf4j
 public class MultiMapSerializableHelper {
-  private static final Map<String, Set<Position>> map = Maps.newHashMap();
+  private static final Map<String, Set<Position>> MAP = Maps.newHashMap();
 
   private MultiMapSerializableHelper() {}
   /**
@@ -46,9 +59,9 @@ public class MultiMapSerializableHelper {
       Multimap<String, Position> multimap) {
 
     for (Map.Entry<String, Collection<Position>> entry : multimap.asMap().entrySet()) {
-      map.put(entry.getKey(), ImmutableSet.copyOf(entry.getValue()));
+      MAP.put(entry.getKey(), ImmutableSet.copyOf(entry.getValue()));
     }
-    LOG.info("MAP: " + map.toString());
-    return map;
+    LOG.info("MAP: " + MAP.toString());
+    return MAP;
   }
 }
