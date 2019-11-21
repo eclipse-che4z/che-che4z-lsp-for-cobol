@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019 Broadcom.
+ *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -9,9 +10,9 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ * Broadcom, Inc. - initial API and implementation
+ *
  */
-
 package com.ca.lsp.core.cobol;
 
 import com.broadcom.impl.*;
