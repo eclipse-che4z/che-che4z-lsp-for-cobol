@@ -85,9 +85,10 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
     if (isCopybookInCache(copyBookName)) {
       semanticContext = parseCopybookFromCache();
     } else {
-      databus.subscribe(DataEventType.FETCHED_COPYBOOK_EVENT, this);
+      Object subscriber = databus.subscribe(DataEventType.FETCHED_COPYBOOK_EVENT, this);
       databus.postData(RequiredCopybookEvent.builder().name(copyBookName).build());
       semanticContext = parseCopybook();
+      databus.unSubscribe(subscriber);
     }
     return new CopybookSemanticContext(copyBookName, semanticContext);
   }
