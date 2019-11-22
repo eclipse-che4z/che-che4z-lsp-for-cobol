@@ -30,6 +30,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
@@ -112,7 +113,7 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
   @Override
   @SneakyThrows
   public CopybookStorable getData(@NonNull long uuid) {
-    return getCopybookRepo().getCopybookStorableFromCache(uuid).orElse(null);
+    return getCopybookRepo().getCopybookStorableFromCache(uuid).orElseThrow(NoSuchElementException::new);
   }
 
   @Override
