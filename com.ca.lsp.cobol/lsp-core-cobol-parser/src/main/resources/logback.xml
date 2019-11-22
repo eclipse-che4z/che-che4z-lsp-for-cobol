@@ -24,7 +24,7 @@
             </pattern>
         </encoder>
     </appender>
-
+    
     <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${HOME_LOG}</file>
 

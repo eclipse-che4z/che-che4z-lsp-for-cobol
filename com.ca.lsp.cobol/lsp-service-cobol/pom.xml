@@ -26,8 +26,8 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>lsp-service-cobol</artifactId>
-    <name>CA COBOL LSP :: LSP Service</name>
-    <version>0.8.0</version>
+    <name>COBOL LSP :: LSP Service</name>
+    <version>0.8.3</version>
     <packaging>jar</packaging>
 
     <properties>

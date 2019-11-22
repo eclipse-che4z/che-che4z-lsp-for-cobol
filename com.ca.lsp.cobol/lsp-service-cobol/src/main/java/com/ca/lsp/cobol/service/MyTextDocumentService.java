@@ -126,16 +126,6 @@ public class MyTextDocumentService implements TextDocumentService {
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
-    //
-    //    // test to verify object for databus is successfully created...
-    //    String testCopyFile = "CPBTEST";
-    //
-    //    CobolWorkspaceServiceImpl workspaceService =
-    //        (CobolWorkspaceServiceImpl) server.getWorkspaceService();
-    //
-    //    if (workspaceService.getURIByFileName(testCopyFile) == null)
-    //      communications.notifyCopybookNotFound(testCopyFile);
-
     registerEngineAndAnalyze(uri, langId, text);
   }
 
@@ -196,7 +186,7 @@ public class MyTextDocumentService implements TextDocumentService {
           AnalysisResult result = Analysis.run(uri, text);
           docs.get(uri).setAnalysisResult(result);
           publishResult(uri, result);
-        });
+        }).whenComplete((res,ex) -> ex.printStackTrace());
   }
 
   private void analyzeChanges(String uri, String text) {
