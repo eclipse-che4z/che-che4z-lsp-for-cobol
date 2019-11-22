@@ -20,7 +20,7 @@ import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-public class ConfigurableTest {
+public abstract class ConfigurableTest {
   @BeforeClass
   public static void setUp() {
     LangServerCtx.getGuiceCtx(new TestModule(), new DatabusModule());
