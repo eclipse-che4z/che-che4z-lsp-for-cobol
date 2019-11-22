@@ -46,15 +46,15 @@ import java.util.concurrent.RecursiveTask;
 public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
     implements DataBusObserver<FetchedCopybookEvent> {
 
-  private final DataBusBroker databus =
+  private transient DataBusBroker databus =
       LangServerCtx.getInjector().getInstance(DefaultDataBusBroker.class);
 
   private final String copyBookName;
-  private final CopybookDefinition copybookDefinition;
-  private final List<CopybookDefinition> copybookUsageTracker;
+  private transient CopybookDefinition copybookDefinition;
+  private transient List<CopybookDefinition> copybookUsageTracker;
   private final CobolPreprocessor.CobolSourceFormatEnum format;
-  private final PreprocessorListener listener;
-  private final CompletableFuture<String> waitForResolving;
+  private transient PreprocessorListener listener;
+  private transient CompletableFuture<String> waitForResolving;
 
   public AnalyseCopybookTask(
       CopybookDefinition copybookDefinition,
