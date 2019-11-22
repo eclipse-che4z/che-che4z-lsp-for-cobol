@@ -112,7 +112,7 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
   @Override
   @SneakyThrows
   public CopybookStorable getData(@NonNull long uuid) {
-    return getCopybookRepo().getCopybookStorableFromCache(uuid).get();
+    return getCopybookRepo().getCopybookStorableFromCache(uuid).orElse(null);
   }
 
   @Override
