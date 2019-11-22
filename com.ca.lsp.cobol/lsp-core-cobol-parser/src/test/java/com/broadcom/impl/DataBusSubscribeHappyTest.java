@@ -27,6 +27,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.TimeoutException;
+
+import static org.junit.Assert.fail;
+
 /** This test verifies that the observer is triggered by the event it is subscribed to. */
 @Slf4j
 public class DataBusSubscribeHappyTest extends AbsDataBusImplTest {
@@ -60,6 +64,10 @@ public class DataBusSubscribeHappyTest extends AbsDataBusImplTest {
   public void subscribe() {
     databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
     databus.postData(RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
-    waiter.await(5000);
+    try {
+      waiter.await(5000);
+    } catch (TimeoutException | InterruptedException e) {
+      fail("No events were received");
+    }
   }
 }
