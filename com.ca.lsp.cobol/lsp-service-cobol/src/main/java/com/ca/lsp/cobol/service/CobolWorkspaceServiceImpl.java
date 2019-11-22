@@ -23,9 +23,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -111,7 +111,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    * @return the Path of the workspace folder
    * @throws IllegalArgumentException if the URI of WorkspaceFolder is not valid
    */
-  @NotNull
+  @Nonnull
   private Path getWorkspaceFolderPath(WorkspaceFolder it) {
     try {
       return Paths.get(new URI(it.getUri()));

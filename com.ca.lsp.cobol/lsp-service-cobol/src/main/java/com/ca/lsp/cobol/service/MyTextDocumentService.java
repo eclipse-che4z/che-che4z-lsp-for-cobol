@@ -186,7 +186,7 @@ public class MyTextDocumentService implements TextDocumentService {
           AnalysisResult result = Analysis.run(uri, text);
           docs.get(uri).setAnalysisResult(result);
           publishResult(uri, result);
-        }).whenComplete((res,ex) -> ex.printStackTrace());
+        });
   }
 
   private void analyzeChanges(String uri, String text) {

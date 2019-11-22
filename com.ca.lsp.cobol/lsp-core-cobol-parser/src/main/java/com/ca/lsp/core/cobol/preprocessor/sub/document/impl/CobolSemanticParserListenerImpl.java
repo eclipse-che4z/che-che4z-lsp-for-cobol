@@ -29,10 +29,10 @@ import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -226,7 +226,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     }
   }
 
-  @NotNull
+  @Nonnull
   private Consumer<Position> toSyntaxError(String copybookName) {
     return it ->
         listener.syntaxError(

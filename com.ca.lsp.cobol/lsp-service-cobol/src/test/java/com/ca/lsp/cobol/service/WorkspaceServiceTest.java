@@ -21,9 +21,9 @@ import com.broadcom.lsp.cdi.module.service.ServiceModule;
 import com.broadcom.lsp.domain.cobol.model.FetchedCopybookEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
-import org.jetbrains.annotations.NotNull;
 import org.junit.*;
 
+import javax.annotation.Nonnull;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -177,7 +177,7 @@ public class WorkspaceServiceTest {
     return originalUri.substring(0, originalUri.length() - 1);
   }
 
-  @NotNull
+  @Nonnull
   private Path createPathOfName(String folderName, Optional<Path> parentFolder) {
 
     // creck if the workspace folder already exists (parent folder)..

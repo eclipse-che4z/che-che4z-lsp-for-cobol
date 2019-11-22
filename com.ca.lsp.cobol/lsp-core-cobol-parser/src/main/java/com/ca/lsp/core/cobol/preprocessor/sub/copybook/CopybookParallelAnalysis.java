@@ -22,8 +22,8 @@ import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.google.common.collect.Multimap;
 import lombok.AllArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.ForkJoinTask;
 import java.util.function.Consumer;
@@ -52,12 +52,12 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
     return contexts.stream().filter(it -> it.getContext() != null).collect(Collectors.toList());
   }
 
-  @NotNull
+  @Nonnull
   private Consumer<String> defineErrors(Multimap<String, Position> copybooks) {
     return copybookName -> copybooks.get(copybookName).forEach(defineError(copybookName));
   }
 
-  @NotNull
+  @Nonnull
   private Consumer<Position> defineError(String copybookName) {
     return position ->
         listener.syntaxError(

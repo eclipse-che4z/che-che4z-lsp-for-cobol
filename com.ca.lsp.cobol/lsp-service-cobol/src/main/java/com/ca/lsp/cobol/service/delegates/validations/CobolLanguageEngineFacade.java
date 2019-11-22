@@ -24,8 +24,8 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +68,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
         .collect(Collectors.toList());
   }
 
-  @NotNull
+  @Nonnull
   private static Predicate<SyntaxError> errorOnlyFromCurrentDocument() {
     return syntaxError -> syntaxError.getPosition().getDocumentURI() == null;
   }

@@ -17,8 +17,8 @@ import com.ca.lsp.cobol.service.MyDocumentModel;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.ReferenceContext;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +71,7 @@ abstract class AbstractReferences {
         .collect(Collectors.toList());
   }
 
-  @NotNull
+  @Nonnull
   private Function<Location, Location> fillUriIfNeeded(String uri) {
     return location ->
         new Location(Optional.ofNullable(location.getUri()).orElse(uri), location.getRange());
