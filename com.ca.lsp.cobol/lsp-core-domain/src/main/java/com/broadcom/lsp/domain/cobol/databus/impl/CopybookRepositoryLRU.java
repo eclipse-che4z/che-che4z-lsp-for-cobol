@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Singleton
 public class CopybookRepositoryLRU implements CopybookRepository {
   @Getter private final int cacheMaxSize;
-  @Setter @NonNull private List<CopybookStorable> cpyRepo;
+  @Setter @NonNull private ArrayList<CopybookStorable> cpyRepo;
   private final Comparator<CopybookStorable> storableComparator =
       Comparator.comparingInt(CopybookStorable::getHit); // Time last recently used
 
@@ -48,12 +48,12 @@ public class CopybookRepositoryLRU implements CopybookRepository {
   @Inject
   public CopybookRepositoryLRU(@Named("CACHE-MAX-SIZE") int cacheSize) {
     cacheMaxSize = cacheSize;
-    cpyRepo = Collections.synchronizedList(new ArrayList<>(cacheMaxSize));
+    cpyRepo = new ArrayList<>(cacheMaxSize);
   }
 
   @Override
   @SneakyThrows
-  public void sortCache() {
+  public synchronized void sortCache() {
     if (!isSort.get()) cpyRepo.sort(storableComparator.reversed());
     isSort.set(true);
   }
@@ -61,9 +61,12 @@ public class CopybookRepositoryLRU implements CopybookRepository {
   @Override
   @SneakyThrows
   public Optional<CopybookStorable> getCopybookStorableFromCache(@NonNull long uuid) {
+    ArrayList<CopybookStorable> shallowCpy = (ArrayList<CopybookStorable>) cpyRepo.clone();
     Optional<CopybookStorable> cpy =
-        cpyRepo.stream().filter(copy -> uuid == copy.getId()).findAny();
-    return cpy.map(SerializationUtils::clone);
+            shallowCpy.stream().filter(copy -> uuid == copy.getId()).findAny();
+    if (cpy.isPresent())
+      return cpy.map(SerializationUtils::clone);
+    return cpy;
   }
 
   @SneakyThrows
