@@ -2,6 +2,14 @@
 
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.9.0]
+
+#### Added
+- Support for copybooks added to the COBOL Language Support Language Engine
+
+#### Changed
+- Updates to README
+
 ## [0.8.3]
 
 #### Added
