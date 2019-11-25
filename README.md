@@ -12,11 +12,13 @@
 COBOL Language Support standardizes the communication between language tooling and your code editor. COBOL Language Support defines the protocol that is used between an editor or IDE and a language server that provides the following COBOL syntax awareness features:
 
 - **Autocomplete**
-	> Provides suggestions for COBOL keywords while you type.
+
+	Provides suggestions for COBOL keywords while you type.
 	<img src="Autocomplete.gif" alt="alt text" width="500px" height="300px">
 
 - **Syntax check for keywords**
-	> Checks for mistakes and errors in COBOL code.
+
+	Checks for mistakes and errors in COBOL code.
 	<img src="SyntaxCheck.gif" alt="alt text" width="500px" height="300px">
 - **Syntax highlighting** (with third-party plugins)
 	> Enables syntax highlighting for COBOL code as long as you have an appropriate third-party syntax highlighting extension installed.
