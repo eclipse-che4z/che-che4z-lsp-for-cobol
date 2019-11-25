@@ -9,23 +9,36 @@
 
 # COBOL Language Support
 
-COBOL Language Support standardizes the communication between language tooling and your code editor. COBOL Language Support defines the protocol that is used between an editor or IDE and a language server that provides the following COBOL syntax awareness features:
-
-- **Autocomplete**
-
-	Provides suggestions for COBOL keywords while you type.
-	<img src="Autocomplete.gif" alt="alt text" width="500px" height="300px">
-
-- **Syntax check for keywords**
-
-	Checks for mistakes and errors in COBOL code.
-	<img src="SyntaxCheck.gif" alt="alt text" width="500px" height="300px">
-- **Syntax highlighting** (with third-party plugins)
-	> Enables syntax highlighting for COBOL code as long as you have an appropriate third-party syntax highlighting extension installed.
-
-The COBOL Language Support extension for Visual Studio Code (VSC) integrates several COBOL language features into tools used in VSC. Files with the extensions .COB, .CBL and .CPY are recognized as COBOL files.
+COBOL Language Support standardizes the communication between language tooling and your code editor.
 
 ## Prerequisites
 
 - Java
 - (Optional) COBOL 3rd party plugin (required for syntax highlighting)
+- Copybook path must be defined as **"COPYBOOKS"** folder in current workspace (required for copybook support)
+
+COBOL Language Support defines the protocol that is used between an editor or IDE and a language server that provides the following COBOL syntax awareness features:
+
+- **Autocomplete**
+
+	- Provides suggestions for COBOL keywords while you type.
+		<img src="Autocomplete.gif" alt="alt text" width="500px" height="300px">
+
+- **Syntax check for keywords**
+
+	- Checks for mistakes and errors in COBOL code.
+		<img src="SyntaxCheck.gif" alt="alt text" width="500px" height="300px">
+- **Syntax highlighting** (with third-party plugins)
+	
+	- Enables syntax highlighting for COBOL code as long as you have an appropriate third-party syntax highlighting extension installed.
+	
+- **Copybook Support**
+
+	- Supports semantic analysis for variables and paragraphs across copybooks.
+	- Inbuilt protection against recursive + missing copybooks.
+	- Variables and paragraphs defined across copybooks.
+	- Autocomplete updated to include copybook variables and paragraphs.
+	- Functionality to skip copybook levels when called, reducing call time.
+	- Inbuilt search function to identify all references filled with paragraphs and variables from copybooks
+	
+The COBOL Language Support extension for Visual Studio Code (VSC) integrates several COBOL language features into tools used in VSC. Files with the extensions .COB, .CBL and .CPY are recognized as COBOL files.
