@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Data
 public class CopybookStorable implements Serializable {
-  private static final long TTU = 3600L * 3L;
+  private final long TTU = 3600L * 3L;
 
   private AtomicInteger hit = new AtomicInteger(0);
   private long genDt = Instant.now().getEpochSecond();

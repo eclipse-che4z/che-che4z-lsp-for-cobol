@@ -182,11 +182,11 @@ public class MyTextDocumentService implements TextDocumentService {
 
   private void analyzeDocumentFirstTime(String uri, String text) {
     CompletableFuture.runAsync(
-        () -> {
-          AnalysisResult result = Analysis.run(uri, text);
-          docs.get(uri).setAnalysisResult(result);
-          publishResult(uri, result);
-        });
+            () -> {
+              AnalysisResult result = Analysis.run(uri, text);
+              docs.get(uri).setAnalysisResult(result);
+              publishResult(uri, result);
+            }).whenComplete((res,ex) -> ex.printStackTrace());
   }
 
   private void analyzeChanges(String uri, String text) {
