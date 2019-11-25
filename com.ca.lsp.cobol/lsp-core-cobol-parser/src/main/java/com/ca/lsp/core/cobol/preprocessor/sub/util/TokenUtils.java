@@ -13,30 +13,27 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
-import java.util.List;
-
+import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolHiddenTokenCollectorListenerImpl;
+import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.BufferedTokenStream;
+import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolHiddenTokenCollectorListenerImpl;
-
-import lombok.experimental.UtilityClass;
+import java.util.List;
 
 @UtilityClass
 public class TokenUtils {
 
-  public String getHiddenTokensToLeft(final int tokPos, final BufferedTokenStream tokens) {
-    final List<Token> refChannel =
-        tokens.getHiddenTokensToLeft(tokPos, CobolPreprocessorLexer.HIDDEN);
-    final StringBuilder sb = new StringBuilder();
+  public String getHiddenTokensToLeft(int tokPos, BufferedTokenStream tokens) {
+    List<Token> refChannel = tokens.getHiddenTokensToLeft(tokPos, Lexer.HIDDEN);
+    StringBuilder sb = new StringBuilder();
 
     if (refChannel != null) {
-      for (final Token refToken : refChannel) {
-        final String text = refToken.getText();
+      for (Token refToken : refChannel) {
+        String text = refToken.getText();
         sb.append(text);
       }
     }
@@ -45,16 +42,16 @@ public class TokenUtils {
   }
 
   public String getTextIncludingHiddenTokens(
-      final ParseTree ctx, final BufferedTokenStream tokens) {
-    final CobolHiddenTokenCollectorListenerImpl listener =
+      ParseTree ctx, BufferedTokenStream tokens) {
+    CobolHiddenTokenCollectorListenerImpl listener =
         new CobolHiddenTokenCollectorListenerImpl(tokens);
-    final ParseTreeWalker walker = new ParseTreeWalker();
+    ParseTreeWalker walker = new ParseTreeWalker();
     walker.walk(listener, ctx);
 
     return listener.read();
   }
 
-  public boolean isEOF(final TerminalNode node) {
+  public boolean isEOF(TerminalNode node) {
     return Token.EOF == node.getSymbol().getType();
   }
 }

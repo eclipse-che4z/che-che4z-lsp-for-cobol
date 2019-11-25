@@ -99,7 +99,11 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     TextDocumentIdentifier saveDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
     DidSaveTextDocumentParams saveDocumentParams =
         new DidSaveTextDocumentParams(saveDocumentIdentifier);
+    service.didOpen(
+            new DidOpenTextDocumentParams(
+                    new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
     service.didSave(saveDocumentParams);
+    assertTrue(closeGetter(service).containsKey(DOCUMENT_URI));
   }
 
   @Test
