@@ -573,10 +573,14 @@ familyPhrase
    ;
 
 replaceable
-   : literal | cobolWord | pseudoText | charDataLine
+   : replaceSameElement
    ;
 
 replacement
+   : replaceSameElement
+   ;
+
+replaceSameElement
    : literal | cobolWord | pseudoText | charDataLine
    ;
 
