@@ -16,9 +16,13 @@
 
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,10 +34,8 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * This class checks that all the semantic elements definitions and usages are found correctly
- *
- * @author teman02
  */
-public class DefinitionsAndUsagesTest {
+public class DefinitionsAndUsagesTest extends ConfigurableTest {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -56,6 +58,7 @@ public class DefinitionsAndUsagesTest {
           + "           Move inner1 of outer2 to Str.\n"
           + "           Move inner2 of outer2 to Str.\n"
           + "       End program ProgramId.";
+
   private static final String OUTER1 = "OUTER1";
   private static final String INNER1 = "INNER1";
   private static final String STR = "STR";
@@ -65,12 +68,14 @@ public class DefinitionsAndUsagesTest {
   private AnalysisResult analysisResult;
 
   @Before
-  public void prepareServer() {
-    TestLanguageClient client = new TestLanguageClient();
-    MyTextDocumentService server = (MyTextDocumentService) createServer(client);
-    runTextValidation(server, TEXT);
+  public void createService() {
+    TextDocumentService service =
+        LangServerCtx.getInjector().getInstance(TextDocumentService.class);
+    TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    client.clean();
+    runTextValidation(service, TEXT);
     waitForDiagnostics(client);
-    Map<String, MyDocumentModel> docs = server.getDocs();
+    Map<String, MyDocumentModel> docs = ((MyTextDocumentService) service).getDocs();
     MyDocumentModel document = docs.get(DOCUMENT_URI);
     analysisResult = document.getAnalysisResult();
   }
@@ -79,12 +84,12 @@ public class DefinitionsAndUsagesTest {
   public void testRecognitionForVariables() {
     assertEquals(analysisResult.getVariables().toString(), 5, analysisResult.getVariables().size());
 
-    Map<String, List<Range>> definitions = analysisResult.getVariableDefinitions();
+    Map<String, List<Location>> definitions = analysisResult.getVariableDefinitions();
     assertEquals(definitions.keySet().toString(), 5, definitions.size());
     assertEquals(definitions.keySet().toString(), 1, definitions.get(OUTER1).size());
     assertEquals(definitions.keySet().toString(), 2, definitions.get(INNER1).size());
 
-    Map<String, List<Range>> usages = analysisResult.getVariableUsages();
+    Map<String, List<Location>> usages = analysisResult.getVariableUsages();
     assertEquals(usages.keySet().toString(), 5, usages.size());
     assertEquals(usages.keySet().toString(), 2, usages.get(OUTER1).size());
     assertEquals(usages.keySet().toString(), 2, usages.get(INNER1).size());
@@ -96,12 +101,12 @@ public class DefinitionsAndUsagesTest {
     assertEquals(
         analysisResult.getParagraphs().toString(), 2, analysisResult.getParagraphs().size());
 
-    Map<String, List<Range>> definitions = analysisResult.getParagraphDefinitions();
+    Map<String, List<Location>> definitions = analysisResult.getParagraphDefinitions();
     assertEquals(definitions.keySet().toString(), 2, definitions.size());
     assertEquals(definitions.keySet().toString(), 1, definitions.get(MAIN_LOGIC).size());
     assertEquals(definitions.keySet().toString(), 1, definitions.get(TEST).size());
 
-    Map<String, List<Range>> usages = analysisResult.getParagraphUsages();
+    Map<String, List<Location>> usages = analysisResult.getParagraphUsages();
     assertEquals(usages.keySet().toString(), 1, usages.size());
     assertEquals(usages.keySet().toString(), 1, usages.get(TEST).size());
   }

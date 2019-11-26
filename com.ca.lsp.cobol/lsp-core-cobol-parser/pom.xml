@@ -229,6 +229,18 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.ca.lsp</groupId>
+			<artifactId>lsp-core-domain</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.jodah</groupId>
+			<artifactId>concurrentunit</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>

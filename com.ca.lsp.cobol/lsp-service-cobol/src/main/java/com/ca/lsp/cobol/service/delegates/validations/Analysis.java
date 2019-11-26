@@ -23,8 +23,6 @@ import java.util.Map;
  * This class runs syntax and semantic analysis for a Cobol/Hlasm text.
  *
  * <p>Hard coded values is used in order to parse just the fixed format
- *
- * @author Sergiu Ilie, TEMAN02, ZACAN01
  */
 @Slf4j
 @UtilityClass

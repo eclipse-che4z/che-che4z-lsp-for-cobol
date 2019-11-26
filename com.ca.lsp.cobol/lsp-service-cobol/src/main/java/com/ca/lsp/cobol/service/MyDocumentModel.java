@@ -28,8 +28,6 @@ import java.util.List;
 /**
  * This class stores a Cobol program text to be processed. Provides a list of lines and text tokens
  * by position.
- *
- * @author zacan01, teman02
  */
 @Data
 @Slf4j

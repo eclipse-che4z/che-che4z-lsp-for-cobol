@@ -16,21 +16,21 @@
 
 package com.ca.lsp.cobol.usecases;
 
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.junit.Test;
 
 import java.util.Optional;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.*;
+import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
+import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.assertFalse;
 
 /**
  * This test verifies that all the responses from server are escaped from line breaks to prevent
  * incorrect parsing on the client side.
- *
- * @author teman02
  */
-public class TestResponsesNotContainLineBreaks {
+public class TestResponsesNotContainLineBreaks extends ConfigurableTest {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \n"

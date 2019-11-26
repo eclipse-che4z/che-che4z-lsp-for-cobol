@@ -22,8 +22,6 @@ import org.junit.Test;
  * This use case checks if the position of error is being underscored correctly. There is typo in
  * the TEXT in the line 6, but as designed the following token should be underscored as unexpected,
  * because in this case PERORM may be put as a variable.
- *
- * @author teman02
  */
 public class TestCorrectErrorUnderscorePosition extends NegativeUseCase {
 

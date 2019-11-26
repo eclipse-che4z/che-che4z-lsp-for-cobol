@@ -20,8 +20,6 @@ import org.junit.Test;
 
 /**
  * This use case checks if there is an error being thrown if the END-PERFORM token is missing
- *
- * @author teman02
  */
 public class TestEndPerformCausesError extends NegativeUseCase {
 

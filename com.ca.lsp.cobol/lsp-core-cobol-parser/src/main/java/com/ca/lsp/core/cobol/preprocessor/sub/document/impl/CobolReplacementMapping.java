@@ -17,11 +17,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.antlr.v4.runtime.BufferedTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.codehaus.plexus.util.StringUtils;
 
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.PseudoTextContext;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceableContext;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplacementContext;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceSameElementContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 
 /** A mapping from a replaceable to a replacement. */
@@ -77,40 +79,28 @@ public class CobolReplacementMapping implements Comparable<CobolReplacementMappi
     return result;
   }
 
-  private String getText(final ReplaceableContext ctx, final BufferedTokenStream tokens) {
-    final String result;
-
-    if (ctx.pseudoText() != null) {
-      result = extractPseudoText(ctx.pseudoText(), tokens);
-    } else if (ctx.charDataLine() != null) {
-      result = TokenUtils.getTextIncludingHiddenTokens(ctx, tokens);
-    } else if (ctx.cobolWord() != null) {
-      result = ctx.getText();
-    } else if (ctx.literal() != null) {
-      result = ctx.literal().getText();
-    } else {
-      result = null;
+  private String getText(final ParserRuleContext ctx, final BufferedTokenStream tokens) {
+    if (ctx instanceof ReplaceableContext) {
+      return getContextSameElement(((ReplaceableContext) ctx).replaceSameElement(), tokens);
+    } else if (ctx instanceof ReplacementContext) {
+      return getContextSameElement(((ReplacementContext) ctx).replaceSameElement(), tokens);
     }
-
-    return result;
+    return null;
   }
 
-  private String getText(final ReplacementContext ctx, final BufferedTokenStream tokens) {
-    final String result;
+  private String getContextSameElement(
+      final ReplaceSameElementContext ctx, final BufferedTokenStream tokens) {
 
     if (ctx.pseudoText() != null) {
-      result = extractPseudoText(ctx.pseudoText(), tokens);
+      return extractPseudoText(ctx.pseudoText(), tokens);
     } else if (ctx.charDataLine() != null) {
-      result = TokenUtils.getTextIncludingHiddenTokens(ctx, tokens);
+      return TokenUtils.getTextIncludingHiddenTokens(ctx, tokens);
     } else if (ctx.cobolWord() != null) {
-      result = ctx.getText();
+      return ctx.getText();
     } else if (ctx.literal() != null) {
-      result = ctx.literal().getText();
-    } else {
-      result = null;
+      return ctx.literal().getText();
     }
-
-    return result;
+    return null;
   }
 
   protected String replace(final String string, final BufferedTokenStream tokens) {

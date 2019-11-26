@@ -17,8 +17,6 @@ import java.io.InputStream;
 
 /**
  * This class is a provider for Cobol keywords and their descriptions
- *
- * @author teman02
  */
 public class Keywords extends AbstractCompletionStorage {
   private static final String KEYWORDS_FILE_PATH = "LanguageKeywords.txt";

@@ -21,8 +21,6 @@ import org.junit.runners.Suite.SuiteClasses;
  * This suite contains all the defined negative test cases to ensure that error checking works
  * properly. Notice: Format errors are not a part of the grammar, so they should not be verifying
  * here as negative scenarios. 
- *
- * @author teman02
  */
 @RunWith(Suite.class)
 @SuiteClasses({

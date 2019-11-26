@@ -14,25 +14,24 @@
 package com.ca.lsp.cobol.service.mocks;
 
 import com.ca.lsp.cobol.service.IMyLanguageServer;
-import java.util.concurrent.CompletableFuture;
+import com.google.inject.Inject;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
-/**
- * Mock implementation of language server. Only for testing purposes.
- *
- * @author teman02
- */
+import java.util.concurrent.CompletableFuture;
+
+/** Mock implementation of language server. Only for testing purposes. */
 public class TestLanguageServer implements IMyLanguageServer {
-  private LanguageClient client = null;
+  private LanguageClient client;
+  private WorkspaceService workspaceService;
 
-  public TestLanguageServer() {}
-
-  public TestLanguageServer(LanguageClient client) {
+  @Inject
+  public TestLanguageServer(LanguageClient client, WorkspaceService workspaceService) {
     this.client = client;
+    this.workspaceService = workspaceService;
   }
 
   @Override
@@ -57,7 +56,7 @@ public class TestLanguageServer implements IMyLanguageServer {
 
   @Override
   public WorkspaceService getWorkspaceService() {
-    return null;
+    return workspaceService;
   }
 
   @Override

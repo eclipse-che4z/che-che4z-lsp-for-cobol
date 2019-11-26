@@ -645,7 +645,7 @@ screenDescriptionValueClause
    ;
 
 screenDescriptionPictureClause
-   : (PICTURE | PIC) IS? pictureString
+   : (PICTURE | PIC) IS2? pictureString
    ;
 
 screenDescriptionFromClause
@@ -799,7 +799,7 @@ reportGroupNextGroupNextPage
    ;
 
 reportGroupPictureClause
-   : (PICTURE | PIC) IS? pictureString
+   : (PICTURE | PIC) IS2? pictureString
    ;
 
 reportGroupResetClause
@@ -1530,11 +1530,11 @@ ifStatement
    ;
 
 ifThen
-   : THEN? (NEXT SENTENCE | statement*)
+   : THEN? (NEXT SENTENCE | statement+?)
    ;
 
 ifElse
-   : ELSE (NEXT SENTENCE | statement*)
+   : ELSE (NEXT SENTENCE | statement+?)
    ;
 
 // initialize statement
@@ -2563,12 +2563,12 @@ paragraphName
    : cobolWord | integerLiteral
    ;
 
-paragraphNameDefinition
+paragraphNameUsage
    : cobolWord | integerLiteral
    ;
 
 procedureName
-   : paragraphNameDefinition inSection? | sectionName
+   : paragraphNameUsage inSection? | sectionName
    ;
 
 programName

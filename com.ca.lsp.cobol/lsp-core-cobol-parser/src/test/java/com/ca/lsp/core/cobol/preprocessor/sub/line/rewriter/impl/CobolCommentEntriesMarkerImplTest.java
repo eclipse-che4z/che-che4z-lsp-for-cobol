@@ -29,8 +29,6 @@ import org.junit.Test;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 /**
  * JUnit test for Class CobolCommentEntriesMarker
- *
- * @author ra890997
  */
 public class CobolCommentEntriesMarkerImplTest {
 

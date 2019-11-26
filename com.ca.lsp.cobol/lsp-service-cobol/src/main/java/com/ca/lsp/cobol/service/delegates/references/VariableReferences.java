@@ -14,19 +14,19 @@
 package com.ca.lsp.cobol.service.delegates.references;
 
 import com.ca.lsp.cobol.service.MyDocumentModel;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.Location;
 
 import java.util.List;
 
 class VariableReferences extends AbstractReferences {
   @Override
-  List<Range> retrieveReferenceRanges(MyDocumentModel document, String token) {
-    return retrieveRanges(document.getAnalysisResult().getVariableUsages(), token);
+  List<Location> retrieveReferenceLocations(MyDocumentModel document, String token, String uri) {
+    return retrieveLocations(document.getAnalysisResult().getVariableUsages(), token, uri);
   }
 
   @Override
-  List<Range> retrieveDefinitionRanges(MyDocumentModel document, String token) {
-    return retrieveRanges(document.getAnalysisResult().getVariableDefinitions(), token);
+  List<Location> retrieveDefinitionLocations(MyDocumentModel document, String token, String uri) {
+    return retrieveLocations(document.getAnalysisResult().getVariableDefinitions(), token, uri);
   }
 
 

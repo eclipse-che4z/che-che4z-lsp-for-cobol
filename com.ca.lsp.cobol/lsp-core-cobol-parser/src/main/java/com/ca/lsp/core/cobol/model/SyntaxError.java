@@ -15,9 +15,11 @@
  */
 package com.ca.lsp.core.cobol.model;
 
-import java.util.List;
+import com.broadcom.lsp.domain.cobol.model.Position;
 import lombok.Builder;
 import lombok.Value;
+
+import java.util.List;
 
 @Value
 public class SyntaxError {
@@ -38,6 +40,6 @@ public class SyntaxError {
   }
 
   public String printSyntaxError() {
-    return super.toString().concat(this.toString());
+    return super.toString().concat(toString());
   }
 }

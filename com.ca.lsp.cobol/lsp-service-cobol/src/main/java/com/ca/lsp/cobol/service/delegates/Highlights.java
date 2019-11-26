@@ -30,6 +30,10 @@ import org.eclipse.lsp4j.*;
  */
 public class Highlights {
 
+  private Highlights() {
+    throw new AssertionError("Suppress default constructor for noninstantiability");
+  }
+
   public static List<DocumentHighlight> findHighlights(
       MyDocumentModel myDocumentModel, TextDocumentPositionParams position) {
     return References.findReferences(myDocumentModel, position, new ReferenceContext(true)).stream()

@@ -22,8 +22,6 @@ import org.junit.Test;
  *
  * <p>63 IGYDS0225-S An ""EXEC SQL"" statement was found, but the ""SQL"" compiler option was not in
  * effect. The statement was discarded."
- *
- * @author teman02
  */
 public class Marbles3Test extends NegativeTest {
   private static final String FILE_NAME = "MARBLES3.cbl";

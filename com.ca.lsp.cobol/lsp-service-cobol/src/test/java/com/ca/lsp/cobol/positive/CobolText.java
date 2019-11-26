@@ -13,38 +13,13 @@
  */
 package com.ca.lsp.cobol.positive;
 
+import lombok.Value;
+
 /**
  * This class is used to represent a Cobol program text.
- *
- * @author teman02
  */
+@Value
 public class CobolText {
-  private String fullText;
   private String fileName;
-  private int linesNumber;
-
-  CobolText(String fileName, String fullText, int linesNumber) {
-    this.fileName = fileName;
-    this.fullText = fullText;
-    this.linesNumber = linesNumber;
-  }
-
-  /** @return Full program text */
-  public String getText() {
-    return fullText;
-  }
-
-  /** @return The name of file that contain this Cobol text */
-  public String getFileName() {
-    return fileName;
-  }
-
-  /**
-   * This method should return the exact amount of code lines in stored program.
-   *
-   * @return Number of code lines
-   */
-  public int getLinesNumber() {
-    return linesNumber;
-  }
+  private String fullText;
 }

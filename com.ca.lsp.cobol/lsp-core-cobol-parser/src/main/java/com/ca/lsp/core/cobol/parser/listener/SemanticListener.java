@@ -13,11 +13,11 @@
  */
 package com.ca.lsp.core.cobol.parser.listener;
 
+import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.model.Position;
+
 import java.util.List;
 
-/** @author ilise01 */
 public class SemanticListener extends Listener {
 
   private static final int WARNING_SEVERITY = 2;
@@ -26,17 +26,15 @@ public class SemanticListener extends Listener {
     super(errorsPipe);
   }
 
-  @Override
-  public List<SyntaxError> getErrorsPipe() {
-    return errorsPipe;
+  public void syntaxError(
+      String documentName, int line, int charPositionInLine, String msg, int errorLength) {
+    super.syntaxError(documentName, line, charPositionInLine, msg, errorLength, WARNING_SEVERITY);
   }
 
-  public void syntaxError(int line, int charPositionInLine, String msg, int errorLength) {
-    super.syntaxError(line, charPositionInLine, msg, errorLength, WARNING_SEVERITY);
-  }
-
-  public void syntaxError(int line, int charPositionInLine, int charEndingIndex, String msg) {
-    super.syntaxError(line, charPositionInLine, charEndingIndex, msg, WARNING_SEVERITY);
+  public void syntaxError(
+      String documentName, int line, int charPositionInLine, int charEndingIndex, String msg) {
+    super.syntaxError(
+        documentName, line, charPositionInLine, charEndingIndex, msg, WARNING_SEVERITY);
   }
 
   protected void registerError(String msg, Position position) {

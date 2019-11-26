@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.google.inject.Inject;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -22,16 +23,18 @@ import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 public class MyLanguageServerImpl implements IMyLanguageServer {
-
   private LanguageClient client;
-  private TextDocumentService textService;
-  private WorkspaceService workspaceService;
+  private final TextDocumentService textService;
+  private final CobolWorkspaceService workspaceService;
 
-  public MyLanguageServerImpl() {
-    textService = new MyTextDocumentService(this);
-    workspaceService = new MyWorkspaceService();
+  @Inject
+  public MyLanguageServerImpl(
+      CobolWorkspaceService workspaceService, TextDocumentService textService) {
+    this.textService = textService;
+    this.workspaceService = workspaceService;
   }
 
+  @Override
   public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
     ServerCapabilities capabilities = new ServerCapabilities();
 
@@ -47,9 +50,17 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
     capabilities.setDocumentFormattingProvider(Boolean.TRUE);
     capabilities.setDocumentHighlightProvider(Boolean.TRUE);
 
+    WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
+    workspaceFoldersOptions.setSupported(Boolean.TRUE);
+    WorkspaceServerCapabilities workspaceServiceCapabilities =
+        new WorkspaceServerCapabilities(workspaceFoldersOptions);
+    capabilities.setWorkspace(workspaceServiceCapabilities);
+
+    workspaceService.setWorkspaceFolders(params.getWorkspaceFolders());
     return CompletableFuture.supplyAsync(() -> new InitializeResult(capabilities));
   }
 
+  @Override
   public CompletableFuture<Object> shutdown() {
     return CompletableFuture.supplyAsync(() -> Boolean.TRUE);
   }
@@ -61,22 +72,22 @@ public class MyLanguageServerImpl implements IMyLanguageServer {
 
   @Override
   public TextDocumentService getTextDocumentService() {
-    return this.textService;
+    return textService;
   }
 
   @Override
   public WorkspaceService getWorkspaceService() {
-    return this.workspaceService;
+    return workspaceService;
   }
 
   @Override
   public void setPipeRemoteProxy(LanguageClient languageClient) {
-    this.client = languageClient;
+    client = languageClient;
   }
 
   @Override
   public Runnable setSocketRemoteProxy(LanguageClient languageClient) {
-    return () -> this.client = languageClient;
+    return () -> client = languageClient;
   }
 
   @Override

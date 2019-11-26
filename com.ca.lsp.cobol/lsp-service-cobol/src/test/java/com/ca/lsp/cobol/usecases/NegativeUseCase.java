@@ -13,7 +13,9 @@
  */
 package com.ca.lsp.cobol.usecases;
 
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 
@@ -25,10 +27,9 @@ import static org.junit.Assert.fail;
 
 /**
  * This class is a base for use cases that check the if some text contains syntax errors.
- *
- * @author teman02
  */
-public abstract class NegativeUseCase {
+@Slf4j
+public abstract class NegativeUseCase extends ConfigurableTest {
 
   protected String text;
 
@@ -48,12 +49,13 @@ public abstract class NegativeUseCase {
 
   protected abstract void assertRange(Range range);
 
-  protected Range retrieveRange(TestLanguageClient client) {
+  private Range retrieveRange(TestLanguageClient client) {
     List<Diagnostic> diagnostics = client.getDiagnostics();
     if (diagnostics.isEmpty()) {
       fail("No diagnostics received");
     }
     Diagnostic diagnostic = diagnostics.get(0);
+    log.info(diagnostic.toString());
     return diagnostic.getRange();
   }
 }
