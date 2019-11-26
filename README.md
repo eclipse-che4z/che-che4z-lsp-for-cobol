@@ -25,16 +25,22 @@ COBOL Language Support defines the protocol that is used between an editor or ID
 		- COBOL keywords
 		- COBOL variables
 		- COBOL paragraphs
+		- Code Snippet
 		<img src="Autocomplete.gif" alt="alt text" width="500px" height="300px">
 
 - **Syntax and Semantic Check for Code**
 
-	- Checks for mistakes and errors in COBOL code. Syntax check reviews and provides suggested fixes for the whole content of the code, through syntax and semantic analysis which returns diagnosintis on the entire context of the code, not just keywords
+	- Checks for mistakes and errors in COBOL code. Syntax check reviews and provides suggested fixes for the whole content of the code, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords
+		
 		<img src="SyntaxCheck.gif" alt="alt text" width="500px" height="300px">
 		
-- **Syntax highlighting** (with third-party plugins)
+- **Syntax highlighting**
 	
 	- Enables syntax highlighting for COBOL code as long as you have an appropriate third-party syntax highlighting extension installed.
+	
+- **Syntax Coloring** (with third-party plugins)
+
+	- Contrasting colors used in displayed code for ease of identifying and distinguishing keywords, variables, code snippets and paragraphs.
 	
 - **Copybook Support**
 
@@ -42,11 +48,16 @@ COBOL Language Support defines the protocol that is used between an editor or ID
 		- Ensures and maintains compatibility of copybooks called in code.
 	- Inbuilt protection against recursive + missing copybooks.
 		- Protects against code errors where copybook may contain looping code which could crash processes.
+		- Error message shows where copybook is missing, preventing issue only being discovered when code is executed.  
 	- Variables and paragraphs defined across copybooks.
 		- Ensures consistency of code, assisting with error diagnostics as issues will not be caused by incorrect variables or paragraphs in code. 
 	- Autocomplete updated to include copybook variables and paragraphs.
 		- Speeds up coding process by intuitively suggesting most likely variables or paragraphs to follow existing code.
 	- Functionality to skip copybook levels when called, reducing call time.
-	- Inbuilt search function to identify all references filled with paragraphs and variables from copybooks
+	- Inbuilt search function to identify all references filled with paragraphs and variables from copybooks:
+		- Find all references:
+			- Easily identifies all occurences of relevant copybook in code
+		- Go To Definition:
+			- Right click on any data element to reveal a definition of the element in a small embedded window.	
 	
 The COBOL Language Support extension for Visual Studio Code (VSC) integrates several COBOL language features into tools used in VSC. Files with the extensions .COB, .CBL and .CPY are recognized as COBOL files.
