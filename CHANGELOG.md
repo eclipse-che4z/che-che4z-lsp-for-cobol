@@ -6,6 +6,9 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 #### Added
 - Support for copybooks added to the COBOL Language Support Language Engine
+- Introduced completion suggestions for Paragraphs
+- Cache introduced to improve performance
+- Added source type information in the diagnostic object
 
 #### Changed
 - Updates to README
