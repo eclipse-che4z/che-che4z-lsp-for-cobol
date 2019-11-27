@@ -47,7 +47,7 @@ pipeline {
             label kubeLabel
             yaml kubernetes_config
         }
-    }
+    }    
     options {
         disableConcurrentBuilds()
         timestamps()
@@ -103,7 +103,7 @@ pipeline {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh 'npx vsce package'
                         archiveArtifacts "*.vsix"
-                        sh 'mv cobol-language-support*.vsix cobol-language-support_latest.vsix'
+                        sh 'mv cobol-language-support*.vsix cobol-language-support_0.9.0.vsix'
                     }
                 }
             }
