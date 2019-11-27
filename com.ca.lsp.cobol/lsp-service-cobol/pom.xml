@@ -22,12 +22,12 @@
     <parent>
         <groupId>com.ca.lsp</groupId>
         <artifactId>com.ca.lsp.cobol</artifactId>
-        <version>0.8.3</version>
+        <version>0.9.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>lsp-service-cobol</artifactId>
     <name>COBOL LSP :: LSP Service</name>
-    <version>0.8.3</version>
+    <version>0.9.0</version>
     <packaging>jar</packaging>
 
     <properties>
