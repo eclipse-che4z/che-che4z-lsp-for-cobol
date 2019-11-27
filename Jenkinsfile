@@ -47,7 +47,7 @@ pipeline {
             label kubeLabel
             yaml kubernetes_config
         }
-    }    
+    }
     options {
         disableConcurrentBuilds()
         timestamps()
@@ -66,7 +66,7 @@ pipeline {
                     dir('com.ca.lsp.cobol') {
                         sh 'mvn -version'
                         sh 'set MAVEN_OPTS=-Xss10M'
-                        sh 'mvn clean verify'
+                        sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify'
                         sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
                     }
                 }
