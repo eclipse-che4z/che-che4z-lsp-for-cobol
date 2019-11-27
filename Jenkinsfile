@@ -38,7 +38,7 @@ spec:
 """
 
 def projectName = 'lsp-for-cobol'
-def kubeLabel = projectName + '_pod_' + env.BRANCH_NAME + '_' + env.BUILD_NUMBER
+def kubeLabel = projectName + '_pod_' + env.BUILD_NUMBER + '_' + env.BRANCH_NAME
 kubeLabel = kubeLabel.replaceAll(/[^a-zA-Z0-9._-]+/,"")
 
 pipeline {
@@ -53,20 +53,32 @@ pipeline {
         timestamps()
         timeout(time: 3, unit: 'HOURS')
         skipDefaultCheckout(false)
-        buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '30'))
+        buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '3'))
     }
     environment {
-       branchName = "$env.BRANCH_NAME"
-       workspace = "$env.WORKSPACE"
+        branchName = "$env.BRANCH_NAME"
+        workspace = "$env.WORKSPACE"
     }
     stages {
         stage('Build LSP server part') {
-             steps {
+            steps {
                 container('maven') {
                     dir('com.ca.lsp.cobol') {
                         sh 'mvn -version'
+                        sh 'set MAVEN_OPTS=-Xss10M'
                         sh 'mvn clean verify'
                         sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
+                    }
+                }
+            }
+        }
+        stage('SonarCloud') {
+            steps {
+                container('maven') {
+                    dir('com.ca.lsp.cobol') {
+                        withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
+                            sh "mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN}"
+                        }
                     }
                 }
             }
@@ -75,7 +87,7 @@ pipeline {
             environment {
                 npm_config_cache = "$env.WORKSPACE"
             }
-            steps {                
+            steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh 'npm ci'
@@ -91,7 +103,8 @@ pipeline {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh 'npx vsce package'
-                        sh 'mv cobol-language-support*.vsix cobol-language-support_latest.vsix'
+                        archiveArtifacts "*.vsix"
+                        sh 'mv cobol-language-support*.vsix cobol-language-support_0.9.0.vsix'
                     }
                 }
             }
@@ -107,7 +120,7 @@ pipeline {
                 script {
                     if (branchName == 'master' || branchName == 'development') {
                         container('jnlp') {
-                            sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
+                            sshagent(['projects-storage.eclipse.org-bot-ssh']) {
                                 sh '''
                                 ssh $sshChe4z rm -rf $deployPath
                                 ssh $sshChe4z mkdir -p $deployPath

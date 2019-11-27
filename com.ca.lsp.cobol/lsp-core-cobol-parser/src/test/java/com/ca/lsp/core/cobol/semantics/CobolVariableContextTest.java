@@ -15,25 +15,20 @@
  */
 package com.ca.lsp.core.cobol.semantics;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import com.ca.lsp.core.cobol.model.Position;
-import com.ca.lsp.core.cobol.semantics.CobolVariableContext;
+import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.*;
+
 /**
  * Test for CobolVariableContextImpl
- *
- * @author teman02
  */
 public class CobolVariableContextTest {
   private static final String LEVEL1 = "01";
@@ -42,6 +37,8 @@ public class CobolVariableContextTest {
   private static final String LEVEL18 = "18";
   private static final String LEVEL40 = "40";
   private static final String LEVEL77 = "77";
+  private static final int LEVEL_77 = 77;
+  private static final int LEVEL_66 = 66;
 
   private static final String VAR1 = "VAR1";
   private static final String VAR2 = "VAR2";
@@ -51,9 +48,10 @@ public class CobolVariableContextTest {
   private static final String VAR6 = "VAR6";
   private static final String VAR7 = "VAR7";
   private static final String VAR8 = "VAR8";
+  private static final String PARENT1 = "PARENT1";
 
-  private static final Position ERROR_POSITION1 = new Position(0, 0, 3, 1, 5);
-  private static final Position ERROR_POSITION2 = new Position(0, 4, 8, 2, 5);
+  private static final Position ERROR_POSITION1 = new Position(null, 0, 0, 3, 1, 5);
+  private static final Position ERROR_POSITION2 = new Position(null, 0, 4, 8, 2, 5);
 
   private CobolVariableContext context;
   private Variable var1;
@@ -64,6 +62,8 @@ public class CobolVariableContextTest {
   private Variable var6;
   private Variable var7;
   private Variable var8;
+
+  private List<Variable> variableList;
 
   @Before
   public void createContext() {
@@ -76,6 +76,10 @@ public class CobolVariableContextTest {
     var6 = new Variable(LEVEL18, VAR6); // 18
     var7 = new Variable(LEVEL40, VAR7); // 40
     var8 = new Variable(LEVEL77, VAR8); // 77
+
+    variableList =
+        createVariableHierarchy(
+            "01-parent1", "10-parent2", "20-childOuter", "30-childInner", "40-child");
   }
 
   @Test
@@ -116,30 +120,74 @@ public class CobolVariableContextTest {
     List<String> expected = new ArrayList<>();
     expected.add(VAR1);
     expected.add(VAR2);
-    assertEquals(expected, context.getAll().stream().map(Variable::getName).collect(Collectors.toList()));
+    assertEquals(
+        expected, context.getAll().stream().map(Variable::getName).collect(Collectors.toList()));
   }
 
-  /**
-   * The test verify that exists a relation between first variable (data group) and second variable
-   * (data item) In this case the second variable will have the first variable as parent and it will
-   * be added in the children list of the first variable parent in the structure (if defined)
-   */
   @Test
-  public void createChildElementFromParentGroup() {
-    context.generateRelations(var1, var3);
-    assertTrue(var1.getChildren().contains(var3.getName()));
+  public void searchVariableInStructureHappyTest() {
+    assertTrue(isVariableDefinedInStructure(variableList.get(0), "CHILD"));
   }
 
-  /**
-   * The test verify that two variables are on the same level of indentation, and will have the same
-   * parent in the structure (if defined)
-   */
   @Test
-  public void createChildElementAtSameLevelAsAnotherChild() {
-    // assumptions: v1's  parent is pre-filled to check that v2 will have the same parent
-    var3.setParent(var1);
+  public void searchVariableInStructureBadTest() {
+    assertFalse(isVariableDefinedInStructure(variableList.get(0), "CHILD222"));
+  }
 
-    context.generateRelations(var3, var4);
-    assertEquals(var3.getParent(), var4.getParent());
+  @Test
+  public void getVariableByNameHappyTest() {
+    assertNotNull(get(PARENT1));
+  }
+
+  @Test
+  public void getVariableByNameBadTest() {
+    assertNull(get("NEW-VARIABLE-NOT-CREATED"));
+  }
+
+  private boolean isVariableDefinedInStructure(Variable variable, String targetVariableName) {
+    if (variable.getChildren().contains(targetVariableName)) {
+      return true;
+    } else {
+      for (String childVariableName : variable.getChildren()) {
+        Variable childVariable = get(childVariableName);
+        if (childVariable != null) {
+          return isVariableDefinedInStructure(childVariable, targetVariableName);
+        }
+      }
+    }
+    return false;
+  }
+
+  private Variable get(String name) {
+    return variableList.stream()
+        .filter(
+            variable -> Optional.ofNullable(variable.getName()).orElse("").equalsIgnoreCase(name))
+        .findFirst()
+        .orElse(null);
+  }
+
+  private List<Variable> createVariableHierarchy(String... variableNames) {
+    List<Variable> variables = new ArrayList<>();
+    for (String variable : variableNames) {
+      String[] elements = variable.split("-");
+      variables.add(new Variable(elements[0], elements[1].toUpperCase()));
+    }
+
+    return createRelationshipBetweenVariables(variables);
+  }
+
+  private List<Variable> createRelationshipBetweenVariables(List<Variable> variables) {
+    variables =
+        variables.stream()
+            .filter(
+                variable ->
+                    variable.getLevelNumber() != LEVEL_77 && variable.getLevelNumber() != LEVEL_66)
+            .filter(variable -> variable.getLevelNumber() != -1)
+            .collect(Collectors.toList());
+
+    for (int i = 0; i < variables.size() - 1; i++) {
+      context.generateRelations(variables.get(i), variables.get(i + 1));
+    }
+    return variables;
   }
 }

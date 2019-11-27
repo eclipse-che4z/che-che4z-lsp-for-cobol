@@ -16,6 +16,8 @@
 
 package com.ca.lsp.cobol.service.delegates.references;
 
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -30,12 +32,8 @@ import static com.ca.lsp.cobol.usecases.UseCaseUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * This class checks the expected behavior of Go to Definition request resolving.
- *
- * @author teman02
- */
-public class ReferencesTest {
+/** This class checks the expected behavior of Go to Definition request resolving. */
+public class ReferencesTest extends ConfigurableTest {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -72,9 +70,10 @@ public class ReferencesTest {
   private TextDocumentService service;
 
   @Before
-  public void initializeService() {
-    TestLanguageClient client = new TestLanguageClient();
-    service = createServer(client);
+  public void createService() {
+    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
+    TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    client.clean();
     runTextValidation(service, TEXT);
     waitForDiagnostics(client);
   }

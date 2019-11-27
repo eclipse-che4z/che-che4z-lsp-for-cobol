@@ -13,8 +13,9 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
-import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
 import com.ca.lsp.cobol.usecases.UseCaseUtils;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -23,35 +24,35 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.ca.lsp.cobol.usecases.UseCaseUtils.await;
 import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.*;
 
-/** @author teman02 */
-public class MyTextDocumentServiceTest {
+/** This test checks the entry points of the {@link TextDocumentService} implementation. */
+public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private static final String LANGUAGE = "COBOL";
   private static final String DOCUMENT_URI = "1";
-  private static final String CLOSED_DOCUMENT_URI = "2";
+  private static final String CPY_DOCUMENT_URI = "file:///COPYBOOKS/CPYTEST.cpy";
+  private static final String CPY_EXTENSION = "cpy";
   private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
-  private MyTextDocumentService service;
+  private TextDocumentService service;
   private TestLanguageClient client;
 
   @Before
   public void createService() {
-    client = new TestLanguageClient();
-    IMyLanguageServer server = new TestLanguageServer(client);
-    service = new MyTextDocumentService(server);
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
+    client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    client.clean();
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -62,7 +63,7 @@ public class MyTextDocumentServiceTest {
 
   @Test
   public void testCompletion() {
-    waitForDiagnostics(client);
+    openAndAwait();
     CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion =
         service.completion(
             new CompletionParams(
@@ -72,27 +73,94 @@ public class MyTextDocumentServiceTest {
   }
 
   @Test
-  public void testResolveCompletionItemExisting() {
-    CompletionItem unresolved = new CompletionItem("ADD");
-
-    checkResolving(
-        unresolved,
-        c -> {
-          assertNotNull(c.getValue());
-          assertFalse(c.getValue().isEmpty());
-        });
+  public void testDidChange() {
+    List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
+    textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
+    service.didChange(
+        new DidChangeTextDocumentParams(
+            new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0), textEdits));
+    UseCaseUtils.waitForDiagnostics(client);
+    Range range = retrieveRange(client);
+    assertRange(range);
   }
 
   @Test
-  public void testResolveCompletionItemNonExisting() {
-    CompletionItem unresolved = new CompletionItem("abcd");
-    checkResolving(unresolved, c -> assertNull(c.getValue()));
+  public void testDidClose() {
+    openAndAwait();
+    assertEquals(1, closeGetter(service).size());
+    TextDocumentIdentifier testDocument = new TextDocumentIdentifier(DOCUMENT_URI);
+    DidCloseTextDocumentParams closedDocument = new DidCloseTextDocumentParams(testDocument);
+    service.didClose(closedDocument);
+    assertEquals(Collections.EMPTY_MAP, closeGetter(service));
   }
 
   @Test
-  public void testResolveCompletionItemEmpty() {
-    CompletionItem unresolved = new CompletionItem();
-    checkResolving(unresolved, c -> assertNull(c.getValue()));
+  public void testDidSave() {
+    TextDocumentIdentifier saveDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
+    DidSaveTextDocumentParams saveDocumentParams =
+        new DidSaveTextDocumentParams(saveDocumentIdentifier);
+    service.didOpen(
+            new DidOpenTextDocumentParams(
+                    new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+    service.didSave(saveDocumentParams);
+    assertTrue(closeGetter(service).containsKey(DOCUMENT_URI));
+  }
+
+  @Test
+  public void testIncorrectLanguageId() {
+    service.didOpen(
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(DOCUMENT_URI, "incorrectId", 1, TEXT_EXAMPLE)));
+    await(() -> !client.getMessagesToShow().isEmpty());
+    assertTrue(
+        client.getMessagesToShow().stream()
+            .map((Function<MessageParams, Object>) MessageParams::getMessage)
+            .anyMatch(
+                it ->
+                    it.toString()
+                        .equals(
+                            "Cannot find a language engine for the given language ID: incorrectId")));
+  }
+
+  @Test
+  public void testNotAllowedFileExtensionAnalysis() {
+    service.didOpen(
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(CPY_DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+    await(() -> !client.getMessagesToShow().isEmpty());
+    assertTrue(
+        client.getMessagesToShow().stream()
+            .map((Function<MessageParams, Object>) MessageParams::getMessage)
+            .anyMatch(
+                it ->
+                    it.toString()
+                        .equals(
+                            "Cannot find a language engine for the given language ID: "
+                                + CPY_EXTENSION)));
+  }
+
+  @Ignore("Not implemented yet")
+  @Test
+  public void testHover() {
+    TextDocumentItem testHoverDocument =
+        new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE);
+    service.didOpen(new DidOpenTextDocumentParams(testHoverDocument));
+    Position testHoverPosition = new Position(0, 2);
+    TextDocumentIdentifier testTextDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
+    TextDocumentPositionParams testHoverPositionParams =
+        new TextDocumentPositionParams(testTextDocumentIdentifier, testHoverPosition);
+    try {
+      assertNotNull(service.hover(testHoverPositionParams).get());
+    } catch (InterruptedException | ExecutionException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  private void openAndAwait() {
+    service.didOpen(
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+    waitForDiagnostics(client);
   }
 
   private void assertCompletionCorrect(
@@ -106,33 +174,6 @@ public class MyTextDocumentServiceTest {
     } catch (InterruptedException | ExecutionException e) {
       fail(e.getMessage());
     }
-  }
-
-  private void checkResolving(CompletionItem unresolved, Consumer<? super MarkupContent> consumer) {
-    CompletableFuture<CompletionItem> resolveCompletionItem =
-        service.resolveCompletionItem(unresolved);
-    try {
-      CompletionItem completionItem = resolveCompletionItem.get();
-      Either<String, MarkupContent> documentation = completionItem.getDocumentation();
-      MarkupContent content = documentation.getRight();
-      Optional.of(content).ifPresent(consumer);
-    } catch (InterruptedException | ExecutionException e) {
-      fail(e.getMessage());
-    }
-  }
-
-  @Test
-  public void testDidChange() {
-    TestLanguageClient client = new TestLanguageClient();
-    TextDocumentService service = UseCaseUtils.createServer(client);
-    List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
-    textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
-    service.didChange(
-        new DidChangeTextDocumentParams(
-            new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0), textEdits));
-    UseCaseUtils.waitForDiagnostics(client);
-    Range range = retrieveRange(client);
-    assertRange(range);
   }
 
   private Range retrieveRange(TestLanguageClient client) {
@@ -149,72 +190,7 @@ public class MyTextDocumentServiceTest {
     assertEquals(31, range.getEnd().getCharacter());
   }
 
-  @Test
-  public void testDidClose() {
-    TestLanguageClient client = new TestLanguageClient();
-    MyTextDocumentService service = (MyTextDocumentService) UseCaseUtils.createServer(client);
-    openDocument(service);
-    TextDocumentIdentifier testDocument = new TextDocumentIdentifier(CLOSED_DOCUMENT_URI);
-    DidCloseTextDocumentParams closedDocument = new DidCloseTextDocumentParams(testDocument);
-    service.didClose(closedDocument);
-    assertEquals(Collections.EMPTY_MAP, closeGetter(service));
-  }
-
-  private void openDocument(MyTextDocumentService service) {
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(CLOSED_DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
-  }
-
-  private Map<String, MyDocumentModel> closeGetter(MyTextDocumentService service) {
-    return service.getDocs();
-  }
-
-  @Test
-  public void testDidSave() {
-    TestLanguageClient client = new TestLanguageClient();
-    MyTextDocumentService service = (MyTextDocumentService) UseCaseUtils.createServer(client);
-    openDocument(service);
-    TextDocumentIdentifier saveDocumentIdentifier = new TextDocumentIdentifier(CLOSED_DOCUMENT_URI);
-    DidSaveTextDocumentParams saveDocumentParams =
-        new DidSaveTextDocumentParams(saveDocumentIdentifier);
-    service.didSave(saveDocumentParams);
-  }
-
-  @Test
-  public void testIncorrectLangId() {
-    TestLanguageClient client = new TestLanguageClient();
-    MyTextDocumentService service = (MyTextDocumentService) UseCaseUtils.createServer(client);
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(DOCUMENT_URI, "incorrectId", 1, TEXT_EXAMPLE)));
-    await(() -> !client.getMessagesToShow().isEmpty());
-    assertTrue(
-        client.getMessagesToShow().stream()
-            .map((Function<MessageParams, Object>) MessageParams::getMessage)
-            .anyMatch(
-                it ->
-                    it.toString()
-                        .equals(
-                            "Cannot find a language engine for the given language ID: incorrectId")));
-  }
-
-  @Ignore("Not implemented yet")
-  @Test
-  public void testHover() {
-    TestLanguageClient client = new TestLanguageClient();
-    MyTextDocumentService service = (MyTextDocumentService) UseCaseUtils.createServer(client);
-    TextDocumentItem testHoverDocument =
-        new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE);
-    service.didOpen(new DidOpenTextDocumentParams(testHoverDocument));
-    Position testHoverPosition = new Position(0, 2);
-    TextDocumentIdentifier testTextDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
-    TextDocumentPositionParams testHoverPositionParams =
-        new TextDocumentPositionParams(testTextDocumentIdentifier, testHoverPosition);
-    try {
-      assertNotNull(service.hover(testHoverPositionParams).get());
-    } catch (InterruptedException | ExecutionException e) {
-      fail(e.getMessage());
-    }
+  private Map<String, MyDocumentModel> closeGetter(TextDocumentService service) {
+    return ((MyTextDocumentService) service).getDocs();
   }
 }

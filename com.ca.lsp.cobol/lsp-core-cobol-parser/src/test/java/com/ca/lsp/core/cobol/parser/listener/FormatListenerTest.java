@@ -13,47 +13,43 @@
  */
 package com.ca.lsp.core.cobol.parser.listener;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import org.junit.Test;
 
 import java.util.ArrayList;
 
-import org.junit.Test;
-/**
- * Checks the FormatListener logic.
- *
- * @author teman02
- */
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+/** Checks the FormatListener logic. */
 public class FormatListenerTest {
 
   @Test
   public void testSyntaxErrorWithRange() {
-    FormatListener listener = new FormatListener(new ArrayList<>());
-    listener.syntaxError(0, 0, 0, "");
-    listener.syntaxError(0, 0, 0, "");
+    PreprocessorListener listener = new PreprocessorListener(new ArrayList<>());
+    listener.syntaxError(null, 0, 0, 0, "");
+    listener.syntaxError(null, 0, 0, 0, "");
     assertEquals(2, listener.getErrorsPipe().size());
   }
 
   @Test
   public void testSyntaxErrorWithLength() {
-    FormatListener listener = new FormatListener(new ArrayList<>());
-    listener.syntaxError(0, 0, "", 0);
-    listener.syntaxError(0, 0, "", 0);
+    PreprocessorListener listener = new PreprocessorListener(new ArrayList<>());
+    listener.syntaxError(null, 0, 0, "", 0);
+    listener.syntaxError(null, 0, 0, "", 0);
     assertEquals(2, listener.getErrorsPipe().size());
   }
 
   @Test
   public void testNullPipe() {
-    FormatListener listener = new FormatListener(null);
-    listener.syntaxError(0, 0, "", 0);
+    PreprocessorListener listener = new PreprocessorListener(null);
+    listener.syntaxError(null, 0, 0, "", 0);
     assertNull(listener.getErrorsPipe());
   }
 
   @Test
   public void testUnregister() {
-    FormatListener listener = new FormatListener(new ArrayList<>());
-    listener.syntaxError(0, 0, "", 0);
-    listener.syntaxError(1, 0, "", 0);
+    PreprocessorListener listener = new PreprocessorListener(new ArrayList<>());
+    listener.syntaxError(null, 0, 0, "", 0);
+    listener.syntaxError(null, 1, 0, "", 0);
     listener.unregisterError(1);
     assertEquals(1, listener.getErrorsPipe().size());
   }
@@ -61,11 +57,11 @@ public class FormatListenerTest {
   /* Unusual situation, format error should appear only once at one line */
   @Test
   public void testUnregisterWithMultipleErorsAtOneLine() {
-    FormatListener listener = new FormatListener(new ArrayList<>());
-    listener.syntaxError(0, 0, "", 0);
-    listener.syntaxError(1, 0, "", 0);
-    listener.syntaxError(1, 0, "", 0);
-    listener.syntaxError(1, 0, "", 0);
+    PreprocessorListener listener = new PreprocessorListener(new ArrayList<>());
+    listener.syntaxError(null, 0, 0, "", 0);
+    listener.syntaxError(null, 1, 0, "", 0);
+    listener.syntaxError(null, 1, 0, "", 0);
+    listener.syntaxError(null, 1, 0, "", 0);
     listener.unregisterError(1);
     assertEquals(3, listener.getErrorsPipe().size());
   }

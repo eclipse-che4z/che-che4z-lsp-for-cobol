@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/** @author ilise01 */
 public class Keywords {
   private List<String> myList = new ArrayList<>();
   private static final InputStream KEYWORDS_FILE =

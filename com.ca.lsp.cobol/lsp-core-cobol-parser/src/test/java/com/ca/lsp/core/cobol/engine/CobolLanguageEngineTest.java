@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.core.cobol.engine;
 
+import com.ca.lsp.core.cobol.model.ProcessingResult;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
 import org.junit.Test;
@@ -29,8 +30,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * JUnit Test checks with Cobol engine for both positive and negative tests with 3 formats
- *
- * @author ra890997
  */
 @RunWith(Parameterized.class)
 public class CobolLanguageEngineTest {
@@ -77,24 +76,14 @@ public class CobolLanguageEngineTest {
   @Test
   public void doCheckNegative() {
     CobolLanguageEngine engine = new CobolLanguageEngine(format);
-    engine.run(NEGATIVE_TEXT);
-    assertEquals(
-        11,
-        engine.getErrors().stream()
-            .filter(item -> item.getSeverity() == 1)
-            .collect(Collectors.toList())
-            .size());
+    ProcessingResult result = engine.run(NEGATIVE_TEXT);
+    assertEquals(11, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 
   @Test
   public void doCheckPositive() {
     CobolLanguageEngine engine = new CobolLanguageEngine(format);
-    engine.run(POSITIVE_TEXT);
-    assertEquals(
-        0,
-        engine.getErrors().stream()
-            .filter(item -> item.getSeverity() == 1)
-            .collect(Collectors.toList())
-            .size());
+    ProcessingResult result = engine.run(POSITIVE_TEXT);
+    assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 }

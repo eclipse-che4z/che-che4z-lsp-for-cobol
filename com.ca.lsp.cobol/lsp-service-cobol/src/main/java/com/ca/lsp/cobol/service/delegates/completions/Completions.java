@@ -23,11 +23,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * This class is used as a delegate for code completion operations.
- *
- * @author teman02
- */
+/** This class is used as a delegate for code completion operations. */
 @UtilityClass
 public class Completions {
 
@@ -41,10 +37,12 @@ public class Completions {
    */
   private AbstractCompletion initializeCompletionsChain() {
     AbstractCompletion variableProvider = new VariableCompletion();
+    AbstractCompletion paragraphProvider = new ParagraphCompletion();
     AbstractCompletion snippetProvider = new SnippetCompletion();
     AbstractCompletion keywordProvider = new KeywordCompletion();
 
-    variableProvider.setNextCompletionProvider(snippetProvider);
+    variableProvider.setNextCompletionProvider(paragraphProvider);
+    paragraphProvider.setNextCompletionProvider(snippetProvider);
     snippetProvider.setNextCompletionProvider(keywordProvider);
 
     return variableProvider;

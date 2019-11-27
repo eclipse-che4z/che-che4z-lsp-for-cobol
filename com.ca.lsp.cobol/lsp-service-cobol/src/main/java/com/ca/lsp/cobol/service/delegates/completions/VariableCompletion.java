@@ -19,7 +19,6 @@ import org.eclipse.lsp4j.CompletionItemKind;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 
 class VariableCompletion extends AbstractCompletion {
@@ -34,7 +33,7 @@ class VariableCompletion extends AbstractCompletion {
 
   @Override
   String tryResolve(String label) {
-    // Not yet supported
+    // Cannot resolve description for this type of completion
     return null;
   }
 

@@ -17,23 +17,25 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-/**
- * The suite for the use case tests in the project that should be run.
- *
- * @author teman02
- */
+/** The suite for the use case tests in the project that should be run. */
 @RunWith(Suite.class)
 @SuiteClasses({
   TestFormatTrim.class,
   TestSyntaxError.class,
   TestVaryingCorrect.class,
+  AnalyzeCopybookCaching.class,
   TestPerformUntilCorrect.class,
   TestEndPerformCausesError.class,
   TestExtraneousInputEOFExpecting.class,
   TestNoErrorOnCompilerDirectives.class,
   TestVariablesAreCaseInsensitive.class,
+  TestMissingCopybooksReturnsError.class,
   TestCorrectErrorUnderscorePosition.class,
   TestExtraSymbolsNotCauseErrorOnNextLine.class,
-  TestCobolStringWithContinuationLineConcatenatedCorrectly.class
+  TestVariableStructureIsBuiltWithCopybooks.class,
+  TestCopybookWithRecursiveDependencyIsDetected.class,
+  TestVariableStructureInCopybooksWithMissingLevels.class,
+  TestCopybookWithIndirectRecursiveDependencyIsDetected.class,
+  TestCobolStringWithContinuationLineConcatenatedCorrectly.class,
 })
 public class UseCaseSuite {}

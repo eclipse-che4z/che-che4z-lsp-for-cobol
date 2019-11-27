@@ -13,16 +13,17 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.transformer;
 
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CONT_LINE_NO_AREA_A_REGEX;
-
-import com.ca.lsp.core.cobol.parser.listener.FormatListener;
+import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
+
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CONT_LINE_NO_AREA_A_REGEX;
 
 /**
  * Process continuation lines. Any sentence, entry, clause, or phrase that requires more than one
@@ -33,8 +34,6 @@ import org.apache.commons.lang3.StringUtils;
  *
  * <p>If there is no hyphen (-) in the indicator area (column 7) of a line, the last character of
  * the preceding line is assumed to be followed by a space.
- *
- * @author zacan01, teman02
  */
 public class ContinuationLineTransformation implements CobolLinesTransformation {
   private static final int START_INDEX_AREA_A = 4;
@@ -42,10 +41,12 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private static final Pattern CONTINUATION_LINE_PATTERN =
       Pattern.compile(CONT_LINE_NO_AREA_A_REGEX);
 
-  private FormatListener listener;
+  private PreprocessorListener listener;
+  private String documentURI;
 
-  public ContinuationLineTransformation(FormatListener listener) {
+  public ContinuationLineTransformation(PreprocessorListener listener, String documentURI) {
     this.listener = listener;
+    this.documentURI = documentURI;
   }
 
   @Override
@@ -155,6 +156,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
 
   private void registerStringClosingError(int lineNumber, int cobolLineTrimmedLength) {
     listener.syntaxError(
+            documentURI,
         lineNumber,
         cobolLineTrimmedLength,
         cobolLineTrimmedLength,
@@ -164,6 +166,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private void registerContinuationLineError(
       int lineNumber, int startIndexAreaA, int countingSpace) {
     listener.syntaxError(
+            documentURI,
         lineNumber + 1,
         (END_INDEX_CONTENT_AREA_A - (startIndexAreaA - countingSpace) + 1),
         END_INDEX_CONTENT_AREA_A,

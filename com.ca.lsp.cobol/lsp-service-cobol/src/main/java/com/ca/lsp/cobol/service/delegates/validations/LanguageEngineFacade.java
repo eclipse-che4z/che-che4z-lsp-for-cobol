@@ -15,7 +15,6 @@ package com.ca.lsp.cobol.service.delegates.validations;
 
 public interface LanguageEngineFacade {
   /**
-   * @author zacan01
    * @param text of document opened in the client editor
    * @return list of LSP diagnostic object used to display errors in the editor
    */

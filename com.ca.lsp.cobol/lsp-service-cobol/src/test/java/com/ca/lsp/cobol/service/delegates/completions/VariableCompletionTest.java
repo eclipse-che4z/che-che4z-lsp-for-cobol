@@ -27,8 +27,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Test to check VariableCompletion
- *
- * @author teman02
  */
 public class VariableCompletionTest {
   private static final String TEXT =
@@ -67,14 +65,31 @@ public class VariableCompletionTest {
   }
 
   private MyDocumentModel createModel() {
-    Map<String, List<Range>> variableDefinitions = new HashMap<>();
-    variableDefinitions.put("TBPARM1", Collections.singletonList(new Range(new Position(5, 9), new Position(5, 16))));
-    variableDefinitions.put("TBPARM2", Collections.singletonList(new Range(new Position(6, 9), new Position(6, 16))));
-    variableDefinitions.put("ATCDEM4", Collections.singletonList(new Range(new Position(7, 9), new Position(7, 16))));
-    variableDefinitions.put("P1PARM1", Collections.singletonList(new Range(new Position(8, 9), new Position(8, 16))));
+    Map<String, List<Location>> variableDefinitions = new HashMap<>();
+    variableDefinitions.put(
+        "TBPARM1",
+        Collections.singletonList(
+            new Location(null, new Range(new Position(5, 9), new Position(5, 16)))));
+    variableDefinitions.put(
+        "TBPARM2",
+        Collections.singletonList(
+            new Location(null, new Range(new Position(6, 9), new Position(6, 16)))));
+    variableDefinitions.put(
+        "ATCDEM4",
+        Collections.singletonList(
+            new Location(null, new Range(new Position(7, 9), new Position(7, 16)))));
+    variableDefinitions.put(
+        "P1PARM1",
+        Collections.singletonList(
+            new Location(null, new Range(new Position(8, 9), new Position(8, 16)))));
 
     AnalysisResult result =
-        new AnalysisResult(Collections.emptyList(), variableDefinitions, Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap());
+        new AnalysisResult(
+            Collections.emptyList(),
+            variableDefinitions,
+            Collections.emptyMap(),
+            Collections.emptyMap(),
+            Collections.emptyMap());
 
     return new MyDocumentModel(TEXT, result);
   }

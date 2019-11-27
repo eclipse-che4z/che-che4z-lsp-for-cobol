@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.cobol.usecases;
 
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.Diagnostic;
 
@@ -20,18 +21,14 @@ import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation
 import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.assertEquals;
 
-public abstract class PositiveUseCase {
+public abstract class PositiveUseCase extends ConfigurableTest {
   private String text;
 
   PositiveUseCase(String text) {
     this.text = text;
   }
 
-  protected String getText() {
-    return text;
-  }
-
-  protected void setText(String text) {
+  void setText(String text) {
     this.text = text;
   }
 

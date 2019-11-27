@@ -13,17 +13,18 @@
  */
 package com.ca.lsp.cobol.negative;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-
-import org.eclipse.lsp4j.Diagnostic;
-
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.positive.CobolTextRegistry;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import org.eclipse.lsp4j.Diagnostic;
+
+import java.util.List;
+
+import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
+import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static org.junit.Assert.assertEquals;
 /**
  * This class is an abstract negative test case and should be instantiated with specifying concrete
  * Cobol files to test. Every heir should also override checkErrors() method to assert the
@@ -38,11 +39,10 @@ import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
  * <p>E - Error
  *
  * <p>S - Severe
- *
- * @author teman02
  */
-public abstract class NegativeTest {
-  private static final List<CobolText> TEXTS = CobolTextRegistry.INSTANCE.getNegatives();
+public abstract class NegativeTest extends ConfigurableTest {
+  private static final List<CobolText> TEXTS =
+      LangServerCtx.getInjector().getInstance(CobolTextRegistry.class).getNegatives();
 
   private String text;
   private int expectedErrorsNumber;
@@ -73,10 +73,9 @@ public abstract class NegativeTest {
   }
 
   private String lookupFile(String fileName) {
-    return TEXTS
-        .stream()
+    return TEXTS.stream()
         .filter(it -> it.getFileName().equals(fileName))
-        .map(text -> text.getText())
+        .map(CobolText::getFullText)
         .findFirst()
         .orElseThrow(
             () ->
