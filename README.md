@@ -38,7 +38,7 @@ COBOL Language Support defines the protocol that is used between an editor or ID
 	
 	- Enables syntax highlighting for COBOL code.
 	
-- **Syntax Coloring** (with third-party plugins)
+- **Syntax Colouring** (with third-party plugins)
 
 	- Contrasting colors used in displayed code for ease of identifying and distinguishing keywords, variables, and paragraphs.
 	
