@@ -9,11 +9,11 @@
 
 # COBOL Language Support
 
-COBOL Language Support standardizes the communication between language tooling and your code editor.
+COBOL Language Support standardizes the communication between language tooling for COBOL and your code editor. Files with the extensions .COB, .CBL and .CPY are recognized as COBOL files.
 
 ## Prerequisites
 
-- Java
+- Java 8 or newer
 - (Optional) COBOL 3rd party plugin (required for Syntax colouring)
 - Copybook path must be defined as **"COPYBOOKS"** folder in current workspace (required for copybook support)
 
@@ -30,11 +30,11 @@ COBOL Language Support defines the protocol that is used between an editor or ID
 
 - **Syntax and Semantic Check for Code**
 
-	- Checks for mistakes and errors in COBOL code. Syntax check reviews and provides suggested fixes for the whole content of the code, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords
+	- Checks for mistakes and errors in COBOL code. Syntax check reviews and provides suggested fixes for the whole content of the code, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
 		
 		<img src="SyntaxCheck.gif" alt="alt text" width="500px" height="300px">
 		
-- **Syntax highlighting**
+- **Syntax Highlighting**
 	
 	- Enables syntax highlighting for COBOL code.
 	
@@ -53,11 +53,10 @@ COBOL Language Support defines the protocol that is used between an editor or ID
 		- Ensures consistency of code, assisting with error diagnostics as issues will not be caused by incorrect variables or paragraphs in code. 
 	- Autocomplete updated to include copybook variables and paragraphs.
 		- Speeds up coding process by intuitively suggesting most likely variables or paragraphs to follow existing code.
-	- Functionality to skip copybook levels when called, reducing call time.
+	- Functionality to skip variable levels when called, reducing call time.
 	- Inbuilt search function to identify all references filled with paragraphs and variables from copybooks:
 		- Find all references:
-			- Easily identifies all occurences of relevant copybook in code
+			- Easily identifies all occurences of variables and paragraphs in the code
 		- Go To Definition:
-			- Right click on any data element to reveal a definition of the element in a small embedded window.	
+			- Right click on any variable or paragraph to reveal a definition of the element	
 	
-The COBOL Language Support extension for Visual Studio Code (VSC) integrates several COBOL language features into tools used in VSC. Files with the extensions .COB, .CBL and .CPY are recognized as COBOL files.
