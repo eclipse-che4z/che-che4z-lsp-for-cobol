@@ -26,11 +26,13 @@ COBOL Language Support defines the protocol that is used between an editor or ID
 		- COBOL variables
 		- COBOL paragraphs
 		- Code Snippet
+		
 	![Autocomplete](Autocomplete.gif)
 
 - **Syntax and Semantic Check for Code**
 
 	- Checks for mistakes and errors in COBOL code. Syntax check reviews and provides suggested fixes for the whole content of the code, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
+	
 	![Syntax check](SyntaxCheck.gif)
 		
 - **Syntax Highlighting**
