@@ -78,7 +78,7 @@ pipeline {
                 container('maven') {
                     dir('com.ca.lsp.cobol') {
                         withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
-                          sh "mvn sonar:sonar -Dsonar.coverage.exclusions=$projectName -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
+                          sh "mvn sonar:sonar -Dsonar.coverage.exclusions=$targetFiles -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
                         }
                     }
                 }
