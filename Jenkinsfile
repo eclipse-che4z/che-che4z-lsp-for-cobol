@@ -38,6 +38,7 @@ spec:
 """
 
 def projectName = 'lsp-for-cobol'
+def targetFiles = 'lsp-core-cobol-parser/target/**'
 def kubeLabel = projectName + '_pod_' + env.BUILD_NUMBER + '_' + env.BRANCH_NAME
 kubeLabel = kubeLabel.replaceAll(/[^a-zA-Z0-9._-]+/,"")
 
@@ -77,7 +78,7 @@ pipeline {
                 container('maven') {
                     dir('com.ca.lsp.cobol') {
                         withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
-                            sh "mvn sonar:sonar -Dsonar.coverage.exclusions="lsp-core-cobol-parser/target/**" -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
+                          sh "mvn sonar:sonar -Dsonar.coverage.exclusions=$projectName -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
                         }
                     }
                 }
