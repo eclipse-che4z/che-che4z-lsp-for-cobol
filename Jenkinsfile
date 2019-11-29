@@ -66,7 +66,7 @@ pipeline {
                 container('maven') {
                     dir('com.ca.lsp.cobol') {
                         sh 'mvn -version'
-                        sh 'set MAVEN_OPTS=-Xms512m'
+                        sh 'set MAVEN_OPTS=-Xms1024m'
                         sh 'mvn clean verify'
                         sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
                     }
