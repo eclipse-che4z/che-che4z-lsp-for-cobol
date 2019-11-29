@@ -67,71 +67,8 @@ pipeline {
                     dir('com.ca.lsp.cobol') {
                         sh 'mvn -version'
                         sh 'set MAVEN_OPTS=-Xss10M'
-                        sh 'mvn clean verify'
+                        sh 'mvn clean verify -Dmaven.test.skip=true'
                         sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
-                    }
-                }
-            }
-        }
-        stage('SonarCloud') {
-            steps {
-                container('maven') {
-                    dir('com.ca.lsp.cobol') {
-                        withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
-                          sh "mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
-                        }
-                    }
-                }
-            }
-        }
-        stage('Client - Install dependencies') {
-            environment {
-                npm_config_cache = "$env.WORKSPACE"
-            }
-            steps {
-                container('node') {
-                    dir('clients/cobol-lsp-vscode-extension') {
-                        sh 'npm ci'
-                    }
-                }
-            }
-        }
-        stage('Client - Package') {
-            environment {
-                npm_config_cache = "$env.WORKSPACE"
-            }
-            steps {
-                container('node') {
-                    dir('clients/cobol-lsp-vscode-extension') {
-                        sh 'npx vsce package'
-                        archiveArtifacts "*.vsix"
-                        sh 'mv cobol-language-support*.vsix cobol-language-support_0.9.0.vsix'
-                    }
-                }
-            }
-        }
-        stage('Deploy') {
-            environment {
-                sshChe4z = "genie.che4z@projects-storage.eclipse.org"
-                project = "download.eclipse.org/che4z/snapshots/$projectName"
-                url = "$project/$branchName"
-                deployPath = "/home/data/httpd/$url"
-            }
-            steps {
-                script {
-                    if (branchName == 'master' || branchName == 'development') {
-                        container('jnlp') {
-                            sshagent(['projects-storage.eclipse.org-bot-ssh']) {
-                                sh '''
-                                ssh $sshChe4z rm -rf $deployPath
-                                ssh $sshChe4z mkdir -p $deployPath
-                                scp -r $workspace/clients/cobol-lsp-vscode-extension/*.vsix $sshChe4z:$deployPath
-                                '''
-                                echo "Deployed to https://$url"
-                            }
-                        }
-                    } else {
-                        echo "Deployment skipped for branch: $branchName"
                     }
                 }
             }
