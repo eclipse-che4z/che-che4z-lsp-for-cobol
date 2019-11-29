@@ -144,8 +144,7 @@
           <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
           <propertyName>surefireArgLine</propertyName>
           <excludes>
-            <exclude>com.ca.lsp.cobol/lsp-core-cobol-parser/target/**/*</exclude>
-
+            <exclude>com.ca.lsp.cobol/lsp-core-cobol-parser/target/generated-sources/**/*</exclude>
             <exclude>com.ca.lsp.cobol/lsp-core-cobol-parser/src/main/antlr4/com/ca/lsp/core/cobol/parser/**/*</exclude>
           </excludes>
         </configuration>
