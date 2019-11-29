@@ -1,144 +1,207 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2019 Broadcom.
-  ~
-  ~ The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
-  ~
-  ~ This program and the accompanying materials are made
-  ~ available under the terms of the Eclipse Public License 2.0
-  ~ which is available at https://www.eclipse.org/legal/epl-2.0/
-  ~
-  ~ SPDX-License-Identifier: EPL-2.0
-  ~
-  ~ Contributors:
-  ~ Broadcom, Inc. - initial API and implementation
-  ~
-  -->
+~ Copyright (c) 2019 Broadcom.
+~
+~ The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+~
+~ This program and the accompanying materials are made
+~ available under the terms of the Eclipse Public License 2.0
+~ which is available at https://www.eclipse.org/legal/epl-2.0/
+~
+~ SPDX-License-Identifier: EPL-2.0
+~
+~ Contributors:
+~ Broadcom, Inc. - initial API and implementation
+~
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.ca.lsp</groupId>
-    <artifactId>com.ca.lsp.cobol</artifactId>
-	<version>0.9.0</version>
-    <packaging>pom</packaging>
-    <name>COBOL LSP :: Parent pom</name>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.ca.lsp</groupId>
+  <artifactId>com.ca.lsp.cobol</artifactId>
+  <version>0.9.0</version>
+  <packaging>pom</packaging>
+  <name>COBOL LSP :: Parent pom</name>
 
-    <properties>
-        <lsp4j.version>0.5.0</lsp4j.version>
-        <antlr.version>4.7.1</antlr.version>
-    </properties>
+  <properties>
+    <lsp4j.version>0.5.0</lsp4j.version>
+    <antlr.version>4.7.1</antlr.version>
+  </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.eclipse.lsp4j</groupId>
-                <artifactId>org.eclipse.lsp4j</artifactId>
-                <version>${lsp4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.lsp4j</groupId>
-                <artifactId>org.eclipse.lsp4j.jsonrpc</artifactId>
-                <version>${lsp4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.7.25</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>3.9</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <version>2.11.0</version>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.12</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.ca.lsp</groupId>
-                <artifactId>lsp-core-cobol-parser</artifactId>
-                <version>0.9.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ca.lsp</groupId>
-                <artifactId>lsp-core-domain</artifactId>
-                <version>0.9.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4</artifactId>
-                <version>${antlr.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-runtime</artifactId>
-                <version>${antlr.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-maven-plugin</artifactId>
-                <version>${antlr.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>2.5</version>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.18.10</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>1.2.3</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.inject</groupId>
-                <artifactId>guice</artifactId>
-                <version>4.2.2</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>28.1-jre</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/net.jodah/concurrentunit -->
-            <dependency>
-                <groupId>net.jodah</groupId>
-                <artifactId>concurrentunit</artifactId>
-                <version>0.4.6</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    <modules>
-        <module>lsp-service-cobol</module>
-        <module>lsp-core-cobol-parser</module>
-        <module>lsp-core-domain</module>
-    </modules>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.eclipse.lsp4j</groupId>
+        <artifactId>org.eclipse.lsp4j</artifactId>
+        <version>${lsp4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.lsp4j</groupId>
+        <artifactId>org.eclipse.lsp4j.jsonrpc</artifactId>
+        <version>${lsp4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.25</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.9</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>2.11.0</version>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.12</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.ca.lsp</groupId>
+        <artifactId>lsp-core-cobol-parser</artifactId>
+        <version>0.9.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.ca.lsp</groupId>
+        <artifactId>lsp-core-domain</artifactId>
+        <version>0.9.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4</artifactId>
+        <version>${antlr.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-runtime</artifactId>
+        <version>${antlr.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-maven-plugin</artifactId>
+        <version>${antlr.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.5</version>
+      </dependency>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.18.10</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.2.3</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.inject</groupId>
+        <artifactId>guice</artifactId>
+        <version>4.2.2</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>28.1-jre</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/net.jodah/concurrentunit -->
+      <dependency>
+        <groupId>net.jodah</groupId>
+        <artifactId>concurrentunit</artifactId>
+        <version>0.4.6</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.7.0</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.2</version>
+        <configuration>
+          <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
+          <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+          <propertyName>surefireArgLine</propertyName>
+          <excludes>
+            <exclude>com.ca.lsp.cobol/lsp-core-cobol-parser/target/**/*</exclude>
+
+            <exclude>com.ca.lsp.cobol/lsp-core-cobol-parser/src/main/antlr4/com/ca/lsp/core/cobol/parser/**/*</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <!-- attached to Maven test phase -->
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <forkCount>3</forkCount>
+          <reuseForks>true</reuseForks>
+          <argLine>-Xmx8192m -XX:MaxPermSize=256m</argLine>
+        </configuration>
+      </plugin>
+
+
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <version>2.7</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>cobertura</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
+
+
+
+  <modules>
+    <module>lsp-service-cobol</module>
+    <module>lsp-core-cobol-parser</module>
+    <module>lsp-core-domain</module>
+  </modules>
 </project>
