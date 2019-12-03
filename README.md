@@ -10,7 +10,7 @@
 
 # COBOL Language Support
 
-COBOL Language Support standardizes the communication between language tooling for COBOL and your code editor. Files with the extensions .COB, .CBL and .CPY are recognized as COBOL files.
+COBOL Language Support standardizes the communication between language tooling for COBOL and your code editor. Files with the extensions .COB and .CBL are recognized as COBOL files.
 
 ## Prerequisites
 
