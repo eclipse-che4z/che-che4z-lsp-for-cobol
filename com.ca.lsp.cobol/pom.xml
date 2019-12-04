@@ -28,7 +28,6 @@
     <lsp4j.version>0.5.0</lsp4j.version>
     <antlr.version>4.7.1</antlr.version>
   </properties>
-  
   <dependencyManagement>
     <dependencies>
       <dependency>
