@@ -267,10 +267,12 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private String retrieveCopybookName(final CopySourceContext copySource) {
     final String copybookName;
     if (copySource.cobolWord() != null) {
-      copybookName = copySource.cobolWord().getText();
+      copybookName = copySource.cobolWord().getText().toUpperCase();
     } else if (copySource.literal() != null) {
       copybookName =
-          PreprocessorStringUtils.trimQuotes(copySource.literal().getText()).replace("\\", "/");
+          PreprocessorStringUtils.trimQuotes(copySource.literal().getText())
+              .replace("\\", "/")
+              .toUpperCase();
     } else {
       LOG.warn("Unknown copy book reference type {}", copySource);
       copybookName = null;
