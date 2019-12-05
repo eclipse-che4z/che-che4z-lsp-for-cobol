@@ -31,6 +31,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestVariablesAreCaseInsensitive.class,
   TestMissingCopybooksReturnsError.class,
   TestCorrectErrorUnderscorePosition.class,
+  TestSameCopybooksWIthDifferentCases.class,
   TestExtraSymbolsNotCauseErrorOnNextLine.class,
   TestVariableStructureIsBuiltWithCopybooks.class,
   TestCopybookWithRecursiveDependencyIsDetected.class,
