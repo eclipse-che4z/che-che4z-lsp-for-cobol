@@ -2,7 +2,7 @@
 
 [![Build Status](https://ci.eclipse.org/che4z/buildStatus/icon?job=LSP+for+COBOL%2Fdevelopment)](https://ci.eclipse.org/che4z/job/LSP%20for%20COBOL/job/development/)
 [![slack](https://img.shields.io/badge/chat-on%20Slack-blue)](https://join.slack.com/t/che4z/shared_invite/enQtNzk0MzA4NDMzOTIwLWIzMjEwMjJlOGMxNmMyNzQ1NWZlMzkxNmQ3M2VkYWNjMmE0MGQ0MjIyZmY3MTdhZThkZDg3NGNhY2FmZTEwNzQ)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=eclipse_che-che4z-lsp-for-cobol&metric=alert_status)](https://sonarcloud.io/dashboard?id=eclipse_che-che4z-lsp-for-cobol)
+[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/dashboard?id=eclipse_che-che4z-lsp-for-cobol)
 
 </div>
 
@@ -27,13 +27,13 @@ COBOL Language Support defines the protocol that is used between an editor or ID
 		- COBOL paragraphs
 		- Code Snippet
 		
-	![Autocomplete](Autocomplete.gif)
+	![Autocomplete](Autocompletev2.gif)
 
 - **Syntax and Semantic Check for Code**
 
 	- Checks for mistakes and errors in COBOL code. Syntax check reviews and provides suggested fixes for the whole content of the code, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
 	
-	![Syntax check](SyntaxCheck.gif)
+	![Syntax check](SyntaxCheckv2.gif)
 		
 - **Syntax Highlighting**
 	
