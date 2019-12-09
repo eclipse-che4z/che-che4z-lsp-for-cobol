@@ -2,6 +2,18 @@
 
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.9.1] - 2019-12-09
+
+#### Added
+- JaCoCo in SonarCloud for code measurement
+
+#### Fixed
+- Copybook invocation case insensitive
+- GIFs in README file
+
+#### Changed
+- Updates to README
+
 ## [0.9.0] - 2019-11-27
 
 #### Added
