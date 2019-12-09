@@ -4,7 +4,7 @@
     "description": "COBOL Language Support standardizes the communication between language tooling and your code editor using the Language Server Protocol (LSP).",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
