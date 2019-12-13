@@ -27,9 +27,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
-/**
- * Test for CobolVariableContextImpl
- */
+/** Test for CobolVariableContextImpl */
 public class CobolVariableContextTest {
   private static final String LEVEL1 = "01";
   private static final String LEVEL2 = "02";
@@ -64,6 +62,7 @@ public class CobolVariableContextTest {
   private Variable var8;
 
   private List<Variable> variableList;
+  private List<Variable> variableListToReorder;
 
   @Before
   public void createContext() {
@@ -80,6 +79,9 @@ public class CobolVariableContextTest {
     variableList =
         createVariableHierarchy(
             "01-parent1", "10-parent2", "20-childOuter", "30-childInner", "40-child");
+
+    variableListToReorder =
+        createVariableHierarchy("01-outer1", "02-inner10", "06-inner20", "05-inner21");
   }
 
   @Test
@@ -144,6 +146,39 @@ public class CobolVariableContextTest {
     assertNull(get("NEW-VARIABLE-NOT-CREATED"));
   }
 
+  @Test
+  public void testReorderVariableStructure() {
+    // List<Variable> variablesToReorder = new ArrayList<>();
+    int max = 0;
+
+    for (Variable variable : variableListToReorder) {
+      int levelNumber = variable.getLevelNumber();
+
+      // if level number is higher than max deep that level number will be rewritten by the cobol
+      // compiler
+      if (levelNumber > max) {
+        // if the number distance between current level number and max deep is more than 1 it means
+        // that the level number should have a rewritten level number but max deep value shouldn't
+        // change
+
+        if (levelNumber - max == 1) {
+          max++;
+          variable.setLevelNumber(max);
+        } else {
+          variable.setLevelNumber(max + 1);
+        }
+      }
+
+      // variablesToReorder.add(variable);
+      System.out.println(
+          String.format(
+              "level number = %d and name %s", variable.getLevelNumber(), variable.getName()));
+    }
+    createRelationshipBetweenVariables(variableListToReorder);
+    assertTrue(
+        get("INNER21", variableListToReorder).getParent().getName().equalsIgnoreCase("INNER10"));
+  }
+
   private boolean isVariableDefinedInStructure(Variable variable, String targetVariableName) {
     if (variable.getChildren().contains(targetVariableName)) {
       return true;
@@ -160,6 +195,14 @@ public class CobolVariableContextTest {
 
   private Variable get(String name) {
     return variableList.stream()
+        .filter(
+            variable -> Optional.ofNullable(variable.getName()).orElse("").equalsIgnoreCase(name))
+        .findFirst()
+        .orElse(null);
+  }
+
+  private Variable get(String name, List<Variable> targetList) {
+    return targetList.stream()
         .filter(
             variable -> Optional.ofNullable(variable.getName()).orElse("").equalsIgnoreCase(name))
         .findFirst()

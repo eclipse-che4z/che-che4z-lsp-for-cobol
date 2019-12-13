@@ -126,8 +126,34 @@ public class CobolVariableContext implements SubContext<Variable> {
             .filter(variable -> variable.getLevelNumber() != -1)
             .collect(Collectors.toList());
 
+    // rewrite stage to rewrite level numbers as cobol compiler does
+    rewriteLevels(variableList);
+
     for (int i = 0; i < variableList.size() - 1; i++) {
       generateRelations(variableList.get(i), variableList.get(i + 1));
+    }
+  }
+
+  private void rewriteLevels(List<Variable> variableList) {
+    int max = 0;
+
+    for (Variable variable : variableList) {
+      int levelNumber = variable.getLevelNumber();
+
+      // if level number is higher than max deep that level number will be rewritten by the cobol
+      // compiler
+      if (levelNumber > max) {
+        // if the number distance between current level number and max deep is more than 1 it means
+        // that the level number should have a rewritten level number but max deep value shouldn't
+        // change
+
+        if (levelNumber - max == 1) {
+          max++;
+          variable.setLevelNumber(max);
+        } else {
+          variable.setLevelNumber(max + 1);
+        }
+      }
     }
   }
 
