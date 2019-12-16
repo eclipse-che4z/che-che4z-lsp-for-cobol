@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class LangServerCtx {
-  private static LangServerCtx single_instance = null;
+  private static LangServerCtx singleInstance = null;
   @Getter private static Injector injector;
 
   private LangServerCtx(Module[] modules) {
@@ -38,16 +38,16 @@ public class LangServerCtx {
 
   @Synchronized
   public static LangServerCtx getGuiceCtx(@NonNull Module... modules) {
-    if (single_instance == null) {
-      single_instance = new LangServerCtx(modules);
+    if (singleInstance == null) {
+      singleInstance = new LangServerCtx(modules);
     } else {
       injector.createChildInjector(modules);
     }
-    return single_instance;
+    return singleInstance;
   }
 
   public static void shutdown() {
-    single_instance = null;
+    singleInstance = null;
     injector = null;
   }
 }
