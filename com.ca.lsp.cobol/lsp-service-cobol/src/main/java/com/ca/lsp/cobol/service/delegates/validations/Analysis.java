@@ -16,6 +16,7 @@ package com.ca.lsp.cobol.service.delegates.validations;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +28,8 @@ import java.util.Map;
 @Slf4j
 @UtilityClass
 public class Analysis {
-  private static final Map<String, LanguageEngineFacade> LANGUAGE_ENGINES = new HashMap<>();
+  private static final Map<String, LanguageEngineFacade> LANGUAGE_ENGINES =
+      Collections.synchronizedMap(new HashMap<>());
 
   public void registerEngine(String uri, String languageId) {
     LANGUAGE_ENGINES.put(uri, LanguageEngines.getLanguageEngineById(languageId));
