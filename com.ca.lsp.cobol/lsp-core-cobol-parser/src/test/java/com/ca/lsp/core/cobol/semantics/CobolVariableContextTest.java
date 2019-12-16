@@ -17,6 +17,7 @@ package com.ca.lsp.core.cobol.semantics;
 
 import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
+import lombok.extern.java.Log;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,24 +29,15 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.*;
 
 /** Test for CobolVariableContextImpl */
+@Log
 public class CobolVariableContextTest {
   private static final String LEVEL1 = "01";
   private static final String LEVEL2 = "02";
-  private static final String LEVEL10 = "10";
-  private static final String LEVEL18 = "18";
-  private static final String LEVEL40 = "40";
-  private static final String LEVEL77 = "77";
   private static final int LEVEL_77 = 77;
   private static final int LEVEL_66 = 66;
 
   private static final String VAR1 = "VAR1";
   private static final String VAR2 = "VAR2";
-  private static final String VAR3 = "VAR3";
-  private static final String VAR4 = "VAR4";
-  private static final String VAR5 = "VAR5";
-  private static final String VAR6 = "VAR6";
-  private static final String VAR7 = "VAR7";
-  private static final String VAR8 = "VAR8";
   private static final String PARENT1 = "PARENT1";
 
   private static final Position ERROR_POSITION1 = new Position(null, 0, 0, 3, 1, 5);
@@ -54,48 +46,41 @@ public class CobolVariableContextTest {
   private CobolVariableContext context;
   private Variable var1;
   private Variable var2;
-  private Variable var3;
-  private Variable var4;
-  private Variable var5;
-  private Variable var6;
-  private Variable var7;
-  private Variable var8;
 
-  private List<Variable> variableList;
-  private List<Variable> variableListToReorder;
+  private List<Variable> variableList = new ArrayList<>();
 
   @Before
   public void createContext() {
     context = new CobolVariableContext();
     var1 = new Variable(LEVEL1, VAR1); // 01
     var2 = new Variable(LEVEL2, VAR2); // 02
-    var3 = new Variable(LEVEL10, VAR3); // 10
-    var4 = new Variable(LEVEL10, VAR4); // 10
-    var5 = new Variable(LEVEL10, VAR5); // 10
-    var6 = new Variable(LEVEL18, VAR6); // 18
-    var7 = new Variable(LEVEL40, VAR7); // 40
-    var8 = new Variable(LEVEL77, VAR8); // 77
 
-    variableList =
+    variableList.addAll(
         createVariableHierarchy(
-            "01-parent1", "10-parent2", "20-childOuter", "30-childInner", "40-child");
+            "01-parent1", "10-parent2", "20-childOuter", "30-childInner", "40-child"));
+    variableList.addAll(
+        createVariableHierarchy("01-outer1", "02-inner10", "06-inner20", "05-inner21"));
 
-    variableListToReorder =
-        createVariableHierarchy("01-outer1", "02-inner10", "06-inner20", "05-inner21");
+    variableList.addAll(
+        createVariableHierarchy(
+            "01-outer1",
+            "02-inner10",
+            "06-inner20",
+            "06-inner21",
+            "06-inner22",
+            "03-inner30",
+            "04-inner40",
+            "05-inner41",
+            "02-inner31",
+            "01-outer2"));
   }
 
   @Test
   public void testDefine() {
     context.define(var1, ERROR_POSITION1);
     context.define(var2, ERROR_POSITION1);
-    context.define(var3, ERROR_POSITION1);
-    context.define(var4, ERROR_POSITION1);
-    context.define(var5, ERROR_POSITION1);
-    context.define(var6, ERROR_POSITION1);
-    context.define(var7, ERROR_POSITION1);
-    context.define(var8, ERROR_POSITION1);
 
-    assertEquals(8, context.getAll().size());
+    assertEquals(2, context.getAll().size());
     assertEquals(var1, context.get(VAR1));
   }
 
@@ -148,35 +133,34 @@ public class CobolVariableContextTest {
 
   @Test
   public void testReorderVariableStructure() {
-    // List<Variable> variablesToReorder = new ArrayList<>();
-    int max = 0;
+    int maxVarLevelDeep = 0;
 
-    for (Variable variable : variableListToReorder) {
+    for (Variable variable : variableList) {
       int levelNumber = variable.getLevelNumber();
 
-      // if level number is higher than max deep that level number will be rewritten by the cobol
+      // if level number is higher than maxVarLevelDeep deep that level number will be rewritten by
+      // the cobol
       // compiler
-      if (levelNumber > max) {
-        // if the number distance between current level number and max deep is more than 1 it means
-        // that the level number should have a rewritten level number but max deep value shouldn't
+      if (levelNumber > maxVarLevelDeep) {
+        // if the number distance between current level number and maxVarLevelDeep deep is more than
+        // 1 it means
+        // that the level number should have a rewritten level number but maxVarLevelDeep deep value
+        // shouldn't
         // change
 
-        if (levelNumber - max == 1) {
-          max++;
-          variable.setLevelNumber(max);
+        if (levelNumber - maxVarLevelDeep == 1) {
+          maxVarLevelDeep++;
+          variable.setLevelNumber(maxVarLevelDeep);
         } else {
-          variable.setLevelNumber(max + 1);
+          variable.setLevelNumber(maxVarLevelDeep + 1);
         }
       }
-
-      // variablesToReorder.add(variable);
-      System.out.println(
+      LOG.info(
           String.format(
               "level number = %d and name %s", variable.getLevelNumber(), variable.getName()));
     }
-    createRelationshipBetweenVariables(variableListToReorder);
-    assertTrue(
-        get("INNER21", variableListToReorder).getParent().getName().equalsIgnoreCase("INNER10"));
+    createRelationshipBetweenVariables(variableList);
+    assertTrue(get("INNER21", variableList).getParent().getName().equalsIgnoreCase("INNER10"));
   }
 
   private boolean isVariableDefinedInStructure(Variable variable, String targetVariableName) {
