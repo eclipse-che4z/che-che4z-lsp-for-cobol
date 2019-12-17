@@ -14,13 +14,9 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import java.util.Deque;
-
-/** @author sergiuilie */
 public interface PreprocessorCleanerService {
 
   void excludeStatementFromText(
