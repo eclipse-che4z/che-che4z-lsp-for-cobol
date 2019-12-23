@@ -29,7 +29,7 @@ statements
 // exec cics statement
 
 execCicsStatement
-   : EXEC CICS .*? END_EXEC DOT_FS?
+   : EXEC CICS ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exec sql statement
