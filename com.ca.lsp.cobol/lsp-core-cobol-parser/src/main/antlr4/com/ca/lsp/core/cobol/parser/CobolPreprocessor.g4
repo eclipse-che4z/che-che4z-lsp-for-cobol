@@ -66,7 +66,7 @@ procedureSectionHeader
    ;
 
 paragraphs
-   : sentence* paragraph*
+   : sentence* paragraph+
    ;
 
 paragraphs2
