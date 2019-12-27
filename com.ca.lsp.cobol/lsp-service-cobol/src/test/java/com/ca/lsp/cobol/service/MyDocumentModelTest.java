@@ -86,6 +86,13 @@ public class MyDocumentModelTest {
   }
 
   @Test
+  public void testGetTokenInvalidPositionWithCorrectLine() {
+    Position pos = new Position(3, -19);
+    assertEquals("", model.getFullTokenAtPosition(pos));
+  }
+
+
+  @Test
   public void testPositionAtDelimiter()
   {
     Position pos = new Position(1, 19);
