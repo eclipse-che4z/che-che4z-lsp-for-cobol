@@ -45,6 +45,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   private static final String CPY_EXTENSION = "cpy";
   private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
+
   private TextDocumentService service;
   private TestLanguageClient client;
 
@@ -53,12 +54,6 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testCompletionEmpty() {
-    service.completion(new CompletionParams());
-    fail("No exception were thrown when IllegalArgumentException is expected");
   }
 
   @Test
@@ -100,8 +95,8 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     DidSaveTextDocumentParams saveDocumentParams =
         new DidSaveTextDocumentParams(saveDocumentIdentifier);
     service.didOpen(
-            new DidOpenTextDocumentParams(
-                    new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
     service.didSave(saveDocumentParams);
     assertTrue(closeGetter(service).containsKey(DOCUMENT_URI));
   }
