@@ -29,10 +29,24 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * This class is a set of end-points to apply text operations for COBOL documents. All the requests
+ * that start with "textDocument" go here. The current implementation contains only supported
+ * language features. For more details, please, see the specification:
+ * https://microsoft.github.io//language-server-protocol/specifications/specification-3-14/
+ *
+ * <p>For the maintainers: Please, add logging for exceptions if you run any asynchronous operation.
+ * Also, you you perform any communication with the client, do it a using {@link Communications}
+ * instance.
+ */
 @Slf4j
 public class MyTextDocumentService implements TextDocumentService {
-  private final Map<String, MyDocumentModel> docs = Collections.synchronizedMap(new HashMap<>());
+  private static final List<String> SUPPORTED_EXTENSIONS =
+      Arrays.asList("cobol", "cbl", "cob", "COBOL");
+
+  private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
   @Inject private Communications communications;
 
   Map<String, MyDocumentModel> getDocs() {
@@ -52,16 +66,6 @@ public class MyTextDocumentService implements TextDocumentService {
     log.info("Invoked resolving completion for [{}]", unresolved.getLabel());
 
     return CompletableFuture.supplyAsync(() -> Completions.resolveDocumentationFor(unresolved));
-  }
-
-  @Override
-  public CompletableFuture<Hover> hover(TextDocumentPositionParams position) {
-    return CompletableFuture.supplyAsync(() -> null);
-  }
-
-  @Override
-  public CompletableFuture<SignatureHelp> signatureHelp(TextDocumentPositionParams position) {
-    return CompletableFuture.supplyAsync(() -> null);
   }
 
   @Override
@@ -87,37 +91,9 @@ public class MyTextDocumentService implements TextDocumentService {
   }
 
   @Override
-  public CompletableFuture<List<? extends CodeLens>> codeLens(CodeLensParams params) {
-
-    return CompletableFuture.completedFuture(Collections.emptyList());
-  }
-
-  @Override
-  public CompletableFuture<CodeLens> resolveCodeLens(CodeLens unresolved) {
-    return CompletableFuture.supplyAsync(() -> null);
-  }
-
-  @Override
   public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
     MyDocumentModel model = docs.get(params.getTextDocument().getUri());
     return CompletableFuture.supplyAsync(() -> Formations.format(model));
-  }
-
-  @Override
-  public CompletableFuture<List<? extends TextEdit>> rangeFormatting(
-      DocumentRangeFormattingParams params) {
-    return CompletableFuture.supplyAsync(() -> null);
-  }
-
-  @Override
-  public CompletableFuture<List<? extends TextEdit>> onTypeFormatting(
-      DocumentOnTypeFormattingParams params) {
-    return CompletableFuture.supplyAsync(() -> null);
-  }
-
-  @Override
-  public CompletableFuture<WorkspaceEdit> rename(RenameParams params) {
-    return CompletableFuture.supplyAsync(() -> null);
   }
 
   @Override
@@ -165,19 +141,14 @@ public class MyTextDocumentService implements TextDocumentService {
   }
 
   private boolean isValidFileExtension(String fileExtension) {
-    return Arrays.asList("cobol", "cbl", "cob", "COBOL").contains(fileExtension);
+    return SUPPORTED_EXTENSIONS.contains(fileExtension);
   }
 
   private String extractExtension(String uri) {
-    String extension = null;
-    int startIndex = -1;
-    if (uri != null) {
-      startIndex = uri.lastIndexOf('.') + 1;
-      if (startIndex > 0) {
-        extension = uri.substring(uri.lastIndexOf('.') + 1);
-      }
-    }
-    return extension;
+    return Optional.ofNullable(uri)
+        .filter(it -> it.indexOf('.') > -1)
+        .map(it -> it.substring(it.lastIndexOf('.') + 1))
+        .orElse(null);
   }
 
   private void analyzeDocumentFirstTime(String uri, String text) {
