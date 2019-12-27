@@ -129,7 +129,7 @@ public class MyTextDocumentService implements TextDocumentService {
   private void registerEngineAndAnalyze(String uri, String languageType, String text) {
     String fileExtension = extractExtension(uri);
     if (fileExtension != null && !isValidFileExtension(fileExtension)) {
-      communications.notifyThatEngineNotFound(fileExtension);
+      communications.notifyThatExtensionIsUnsupported(fileExtension);
     } else if (LanguageEngines.getLanguageEngineById(languageType) != null) {
       communications.notifyThatLoadingInProgress(uri);
       Analysis.registerEngine(uri, languageType);
