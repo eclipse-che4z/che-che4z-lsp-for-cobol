@@ -18,10 +18,8 @@ import lombok.experimental.UtilityClass;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /** This class is used as a delegate for code completion operations. */
 @UtilityClass
@@ -49,27 +47,12 @@ public class Completions {
   }
 
   /**
-   * Checks the Completion parameters to prevent NullPointerException by throwing an
-   * IllegalArgumentException
-   *
-   * @param params - CompletionParams to be checked
-   */
-  public void checkCompletionParams(CompletionParams params) {
-    if (params.getTextDocument() == null || params.getPosition() == null) {
-      throw new IllegalArgumentException(
-          "The Language Server cannot process an empty CompletionParams instance");
-    }
-  }
-
-  /**
    * Retrieves a list of keywords starting with a provided token.
    *
    * @return A list of keywords that starts with token
    */
-  public CompletableFuture<Either<List<CompletionItem>, CompletionList>> collectFor(
-      MyDocumentModel document, CompletionParams params) {
-    return CompletableFuture.supplyAsync(
-        () -> Either.forRight(new CompletionList(true, collectCompletions(document, params))));
+  public CompletionList collectFor(MyDocumentModel document, CompletionParams params) {
+    return new CompletionList(true, collectCompletions(document, params));
   }
 
   /**
@@ -86,4 +69,5 @@ public class Completions {
       MyDocumentModel document, CompletionParams params) {
     return COMPLETION_PROVIDER.collectCompletions(document, params);
   }
+
 }
