@@ -29,6 +29,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -56,44 +57,54 @@ public class MyTextDocumentService implements TextDocumentService {
   @Override
   public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
       CompletionParams params) {
-    Completions.checkCompletionParams(params);
-
-    return Completions.collectFor(docs.get(params.getTextDocument().getUri()), params);
+    String uri = params.getTextDocument().getUri();
+    return CompletableFuture.<Either<List<CompletionItem>, CompletionList>>supplyAsync(
+            () -> Either.forRight(Completions.collectFor(docs.get(uri), params)))
+        .whenComplete(
+            reportExceptionIfThrown(createDescriptiveErrorMessage("completion lookup", uri)));
   }
 
   @Override
   public CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem unresolved) {
-    log.info("Invoked resolving completion for [{}]", unresolved.getLabel());
-
-    return CompletableFuture.supplyAsync(() -> Completions.resolveDocumentationFor(unresolved));
+    return CompletableFuture.supplyAsync(() -> Completions.resolveDocumentationFor(unresolved))
+        .whenComplete(
+            reportExceptionIfThrown(
+                createDescriptiveErrorMessage("completion resolving", unresolved.getLabel())));
   }
 
   @Override
   public CompletableFuture<List<? extends Location>> definition(
       TextDocumentPositionParams position) {
-    return CompletableFuture.supplyAsync(
-        () -> References.findDefinition(docs.get(position.getTextDocument().getUri()), position));
+    String uri = position.getTextDocument().getUri();
+    return CompletableFuture.<List<? extends Location>>supplyAsync(
+            () -> References.findDefinition(docs.get(uri), position))
+        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("definitions resolving", uri)));
   }
 
   @Override
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
-    return CompletableFuture.supplyAsync(
-        () ->
-            References.findReferences(
-                docs.get(params.getTextDocument().getUri()), params, params.getContext()));
+    String uri = params.getTextDocument().getUri();
+    return CompletableFuture.<List<? extends Location>>supplyAsync(
+            () -> References.findReferences(docs.get(uri), params, params.getContext()))
+        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("references resolving", uri)));
   }
 
   @Override
   public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
       TextDocumentPositionParams position) {
-    return CompletableFuture.supplyAsync(
-        () -> Highlights.findHighlights(docs.get(position.getTextDocument().getUri()), position));
+    String uri = position.getTextDocument().getUri();
+    return CompletableFuture.<List<? extends DocumentHighlight>>supplyAsync(
+            () -> Highlights.findHighlights(docs.get(uri), position))
+        .whenComplete(
+            reportExceptionIfThrown(createDescriptiveErrorMessage("document highlighting", uri)));
   }
 
   @Override
   public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
-    MyDocumentModel model = docs.get(params.getTextDocument().getUri());
-    return CompletableFuture.supplyAsync(() -> Formations.format(model));
+    String uri = params.getTextDocument().getUri();
+    MyDocumentModel model = docs.get(uri);
+    return CompletableFuture.<List<? extends TextEdit>>supplyAsync(() -> Formations.format(model))
+        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("formatting", uri)));
   }
 
   @Override
@@ -157,16 +168,18 @@ public class MyTextDocumentService implements TextDocumentService {
               AnalysisResult result = Analysis.run(uri, text);
               docs.get(uri).setAnalysisResult(result);
               publishResult(uri, result);
-            }).whenComplete((res,ex) -> ex.printStackTrace());
+            })
+        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
   }
 
   private void analyzeChanges(String uri, String text) {
     CompletableFuture.runAsync(
-        () -> {
-          AnalysisResult result = Analysis.run(uri, text);
-          registerDocument(uri, new MyDocumentModel(text, result));
-          communications.publishDiagnostics(uri, result.getDiagnostics());
-        });
+            () -> {
+              AnalysisResult result = Analysis.run(uri, text);
+              registerDocument(uri, new MyDocumentModel(text, result));
+              communications.publishDiagnostics(uri, result.getDiagnostics());
+            })
+        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
   }
 
   private void publishResult(String uri, AnalysisResult result) {
@@ -177,5 +190,13 @@ public class MyTextDocumentService implements TextDocumentService {
 
   private void registerDocument(String uri, MyDocumentModel document) {
     docs.put(uri, document);
+  }
+
+  private String createDescriptiveErrorMessage(String action, String uri) {
+    return String.format("An exception was thrown while applying %s for %s:", action, uri);
+  }
+
+  private BiConsumer<Object, Throwable> reportExceptionIfThrown(String message) {
+    return (res, ex) -> Optional.ofNullable(ex).ifPresent(it -> log.error(message, it));
   }
 }
