@@ -90,6 +90,19 @@ public class ServerCommunications implements Communications {
             showMessage(MessageType.Info, "No syntax errors detected in " + retrieveFileName(uri)));
   }
 
+  /**
+   * Show a message that the document with the given extension cannot be parsed.
+   *
+   * @param extension - the given document extension
+   */
+  @Override
+  public void notifyThatExtensionIsUnsupported(String extension) {
+    CompletableFuture.runAsync(
+        () ->
+            showMessage(
+                MessageType.Error, "The given document extension is unsupported: " + extension));
+  }
+
   @Override
   public void publishDiagnostics(String uri, List<Diagnostic> diagnostics) {
     getClient().publishDiagnostics(new PublishDiagnosticsParams(uri, clean(diagnostics)));

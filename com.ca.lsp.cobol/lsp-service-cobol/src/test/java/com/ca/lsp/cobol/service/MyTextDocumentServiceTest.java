@@ -32,15 +32,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.await;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.usecases.UseCaseUtils.*;
 import static org.junit.Assert.*;
 
 /** This test checks the entry points of the {@link TextDocumentService} implementation. */
 public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private static final String LANGUAGE = "COBOL";
-  private static final String DOCUMENT_URI = "1";
   private static final String CPY_DOCUMENT_URI = "file:///COPYBOOKS/CPYTEST.cpy";
   private static final String CPY_EXTENSION = "cpy";
   private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
@@ -129,9 +127,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
             .anyMatch(
                 it ->
                     it.toString()
-                        .equals(
-                            "Cannot find a language engine for the given language ID: "
-                                + CPY_EXTENSION)));
+                        .equals("The given document extension is unsupported: " + CPY_EXTENSION)));
   }
 
   @Ignore("Not implemented yet")
