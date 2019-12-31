@@ -16,8 +16,8 @@
 
 package com.ca.lsp.cobol.service.delegates;
 
-import com.ca.lsp.cobol.service.IMyLanguageServer;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
@@ -40,14 +40,14 @@ import java.util.stream.Collectors;
  * cleaned by removing line breaks to prevent incorrect parsing.
  */
 public class ServerCommunications implements Communications {
-  private final IMyLanguageServer server;
   private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(5);
-
   private final Set<String> uriInProgress = new HashSet<>();
 
+  private Provider<LanguageClient> provider;
+
   @Inject
-  public ServerCommunications(IMyLanguageServer server) {
-    this.server = server;
+  public ServerCommunications(Provider<LanguageClient> provider) {
+    this.provider = provider;
   }
 
   @Override
@@ -117,13 +117,13 @@ public class ServerCommunications implements Communications {
     getClient().showMessage(new MessageParams(type, clean(message)));
   }
 
+  private LanguageClient getClient() {
+    return provider.get();
+  }
+
   private String retrieveFileName(String uri) {
     if (uri.indexOf('/') == -1) return uri;
     return uri.substring(uri.lastIndexOf('/') + 1);
-  }
-
-  private LanguageClient getClient() {
-    return server.getClient();
   }
 
   private List<Diagnostic> clean(List<Diagnostic> diagnostics) {
