@@ -53,6 +53,7 @@ import org.junit.runners.Suite.SuiteClasses;
   CompletionResolutionTest.class,
   WorkspaceServiceTest.class,
   HighlightsTest.class,
-  MultiDocumentDefinitionTest.class
+  MultiDocumentDefinitionTest.class,
+  LangServerBootstrapTest.class
 })
 public class AllTests {}

@@ -17,9 +17,5 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 
 public interface IMyLanguageServer extends LanguageServer {
-  LanguageClient getClient();
-
-  Runnable setSocketRemoteProxy(LanguageClient client);
-
-  void setPipeRemoteProxy(LanguageClient client);
+  void setClientRemoteProxy(LanguageClient client);
 }

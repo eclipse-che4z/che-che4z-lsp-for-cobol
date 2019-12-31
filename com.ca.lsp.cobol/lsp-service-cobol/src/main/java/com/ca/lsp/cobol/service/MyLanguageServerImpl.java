@@ -31,7 +31,7 @@ public class MyLanguageServerImpl implements Provider<LanguageClient>, IMyLangua
   private final CobolWorkspaceService workspaceService;
 
   @Inject
-  public MyLanguageServerImpl(
+  MyLanguageServerImpl(
       CobolWorkspaceService workspaceService, TextDocumentService textService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
@@ -84,18 +84,8 @@ public class MyLanguageServerImpl implements Provider<LanguageClient>, IMyLangua
   }
 
   @Override
-  public void setPipeRemoteProxy(LanguageClient languageClient) {
+  public void setClientRemoteProxy(LanguageClient languageClient) {
     client = languageClient;
-  }
-
-  @Override
-  public Runnable setSocketRemoteProxy(LanguageClient languageClient) {
-    return () -> client = languageClient;
-  }
-
-  @Override
-  public LanguageClient getClient() {
-    return client;
   }
 
   @Override

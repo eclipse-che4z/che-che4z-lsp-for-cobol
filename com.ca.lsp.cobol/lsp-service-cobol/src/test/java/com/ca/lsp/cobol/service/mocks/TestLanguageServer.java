@@ -15,6 +15,7 @@ package com.ca.lsp.cobol.service.mocks;
 
 import com.ca.lsp.cobol.service.IMyLanguageServer;
 import com.google.inject.Inject;
+import lombok.Getter;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -25,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 
 /** Mock implementation of language server. Only for testing purposes. */
 public class TestLanguageServer implements IMyLanguageServer {
-  private LanguageClient client;
+  @Getter private LanguageClient client;
   private WorkspaceService workspaceService;
 
   @Inject
@@ -60,17 +61,7 @@ public class TestLanguageServer implements IMyLanguageServer {
   }
 
   @Override
-  public LanguageClient getClient() {
-    return client;
-  }
-
-  @Override
-  public Runnable setSocketRemoteProxy(LanguageClient client) {
-    return () -> this.client = client;
-  }
-
-  @Override
-  public void setPipeRemoteProxy(LanguageClient client) {
+  public void setClientRemoteProxy(LanguageClient client) {
     this.client = client;
   }
 }
