@@ -23,6 +23,7 @@ import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.services.LanguageClient;
+import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
@@ -32,12 +33,12 @@ public class ServiceModule extends DefaultModule {
   @Override
   protected void configure() {
     super.configure();
-    bind(IMyLanguageServer.class).to(MyLanguageServerImpl.class);
+    bind(LanguageServer.class).to(MyLanguageServerImpl.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(CobolWorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
-    bind(LanguageClient.class).toProvider(MyLanguageServerImpl.class);
+    bind(LanguageClient.class).toProvider(ClientProvider.class);
   }
 }

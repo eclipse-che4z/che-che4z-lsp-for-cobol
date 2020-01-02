@@ -19,7 +19,6 @@
 package com.ca.lsp.cobol;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.ca.lsp.cobol.service.IMyLanguageServer;
 import com.ca.lsp.cobol.service.MyLanguageServerImpl;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
@@ -27,6 +26,7 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageClient;
+import org.eclipse.lsp4j.services.LanguageServer;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -76,7 +76,7 @@ public class LangServerBootstrapTest {
 
   @Test
   public void createServerLauncherWithSocket() throws IOException {
-    IMyLanguageServer server = new TestLanguageServer(new TestLanguageClient(), null);
+    LanguageServer server = new TestLanguageServer(new TestLanguageClient(), null);
 
     Executors.newSingleThreadExecutor()
         .submit(
@@ -95,7 +95,7 @@ public class LangServerBootstrapTest {
 
   @Test
   public void createServerLauncher() {
-    IMyLanguageServer server = new TestLanguageServer(new TestLanguageClient(), null);
+    LanguageServer server = new TestLanguageServer(new TestLanguageClient(), null);
 
     Launcher<LanguageClient> launcher =
         LangServerBootstrap.createServerLauncher(server, System.in, System.out);

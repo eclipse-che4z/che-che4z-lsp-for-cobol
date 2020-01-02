@@ -14,10 +14,9 @@
 package com.ca.lsp.cobol.service;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.services.LanguageClient;
+import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
@@ -25,14 +24,12 @@ import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
-public class MyLanguageServerImpl implements Provider<LanguageClient>, IMyLanguageServer {
-  private LanguageClient client;
+public class MyLanguageServerImpl implements LanguageServer {
   private final TextDocumentService textService;
   private final CobolWorkspaceService workspaceService;
 
   @Inject
-  MyLanguageServerImpl(
-      CobolWorkspaceService workspaceService, TextDocumentService textService) {
+  MyLanguageServerImpl(CobolWorkspaceService workspaceService, TextDocumentService textService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
   }
@@ -81,15 +78,5 @@ public class MyLanguageServerImpl implements Provider<LanguageClient>, IMyLangua
   @Override
   public WorkspaceService getWorkspaceService() {
     return workspaceService;
-  }
-
-  @Override
-  public void setClientRemoteProxy(LanguageClient languageClient) {
-    client = languageClient;
-  }
-
-  @Override
-  public LanguageClient get() {
-    return client;
   }
 }

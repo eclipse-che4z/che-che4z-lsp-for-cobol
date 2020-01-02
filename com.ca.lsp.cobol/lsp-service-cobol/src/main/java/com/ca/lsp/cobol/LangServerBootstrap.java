@@ -18,13 +18,15 @@ package com.ca.lsp.cobol;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.cdi.module.service.ServiceModule;
-import com.ca.lsp.cobol.service.IMyLanguageServer;
+import com.ca.lsp.cobol.service.ClientProvider;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
+import org.eclipse.lsp4j.services.LanguageServer;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -49,12 +51,12 @@ public class LangServerBootstrap {
   public static void main(String[] args)
       throws ExecutionException, InterruptedException, IOException {
     initCtx();
-    IMyLanguageServer server = LangServerCtx.getInjector().getInstance(IMyLanguageServer.class);
+    LanguageServer server = LangServerCtx.getInjector().getInstance(LanguageServer.class);
+    ClientProvider provider = LangServerCtx.getInjector().getInstance(ClientProvider.class);
 
     try {
       Launcher<LanguageClient> launcher = startServer(args, server);
-      server.setClientRemoteProxy(launcher.getRemoteProxy());
-
+      provider.set(launcher.getRemoteProxy());
       // suspend the main thread on listening
       launcher.startListening().get();
     } catch (InterruptedException | ExecutionException e) {
@@ -67,17 +69,18 @@ public class LangServerBootstrap {
     LangServerCtx.getGuiceCtx(new ServiceModule(), new DatabusModule());
   }
 
-  Launcher<LanguageClient> startServer(String[] args, IMyLanguageServer server) throws IOException {
+  Launcher<LanguageClient> startServer(@Nonnull String[] args, @Nonnull LanguageServer server)
+      throws IOException {
     return isPipeEnabled(args)
         ? createServerLauncher(server, System.in, System.out)
         : createServerLauncherWithSocket(server);
   }
 
-  boolean isPipeEnabled(String[] args) {
+  boolean isPipeEnabled(@Nonnull String[] args) {
     return args.length > 0 && PIPE_ARG.equals(args[0]);
   }
 
-  Launcher<LanguageClient> createServerLauncherWithSocket(IMyLanguageServer server)
+  Launcher<LanguageClient> createServerLauncherWithSocket(@Nonnull LanguageServer server)
       throws IOException {
     try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
       log.info("Language server started using socket communication on port [{}]", LSP_PORT);
@@ -91,7 +94,7 @@ public class LangServerBootstrap {
   }
 
   Launcher<LanguageClient> createServerLauncher(
-      IMyLanguageServer server, InputStream in, OutputStream out) {
+      @Nonnull LanguageServer server, @Nonnull InputStream in, @Nonnull OutputStream out) {
     return LSPLauncher.createServerLauncher(server, in, out);
   }
 }
