@@ -21,6 +21,8 @@ import com.ca.lsp.cobol.service.delegates.Communications;
 import com.ca.lsp.cobol.service.delegates.ServerCommunications;
 import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
+import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -40,5 +42,7 @@ public class ServiceModule extends DefaultModule {
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(LanguageClient.class).toProvider(ClientProvider.class);
+    bind(CobolLanguageEngine.class);
+    bind(CobolSourceFormat.class).toInstance(CobolSourceFormat.FIXED);
   }
 }

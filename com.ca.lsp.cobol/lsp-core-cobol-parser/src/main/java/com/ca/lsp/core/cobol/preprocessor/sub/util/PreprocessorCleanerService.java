@@ -13,15 +13,12 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 public interface PreprocessorCleanerService {
 
   void excludeStatementFromText(
-      ParserRuleContext ctx,
-      String tag,
-      BufferedTokenStream tokens,
-      CobolPreprocessor.CobolSourceFormatEnum format);
+      ParserRuleContext ctx, String tag, BufferedTokenStream tokens, CobolSourceFormat format);
 }

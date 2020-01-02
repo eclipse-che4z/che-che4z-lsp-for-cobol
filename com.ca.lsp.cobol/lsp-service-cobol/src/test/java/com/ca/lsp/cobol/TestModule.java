@@ -23,9 +23,10 @@ import com.ca.lsp.cobol.service.delegates.Communications;
 import com.ca.lsp.cobol.service.delegates.ServerCommunications;
 import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
+import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.google.inject.name.Names;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -47,6 +48,7 @@ public class TestModule extends DefaultModule {
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(CobolTextRegistry.class).to(ZipTextRegistry.class);
+    bind(CobolSourceFormat.class).toInstance(CobolSourceFormat.FIXED);
     bind(String.class)
         .annotatedWith(Names.named(PATH_TO_TEST_RESOURCES))
         .toProvider(

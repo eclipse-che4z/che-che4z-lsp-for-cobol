@@ -13,8 +13,8 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl;
 
-import static com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum.FIXED;
-import static com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum.TANDEM;
+import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
+import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.TANDEM;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_ENTRY_TAG;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
 import static com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum.COMMENT;

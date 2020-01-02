@@ -20,7 +20,7 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.CopySourceContext;
 import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
@@ -52,14 +52,14 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
   private final BufferedTokenStream tokens;
-  private final CobolPreprocessor.CobolSourceFormatEnum format;
+  private final CobolSourceFormat format;
   private final SemanticContext semanticContext;
   private final PreprocessorListener listener;
 
   CobolSemanticParserListenerImpl(
       final BufferedTokenStream tokens,
       final SemanticContext semanticContext,
-      final CobolPreprocessor.CobolSourceFormatEnum format,
+      final CobolSourceFormat format,
       PreprocessorListener listener) {
     this.tokens = tokens;
     this.format = format;

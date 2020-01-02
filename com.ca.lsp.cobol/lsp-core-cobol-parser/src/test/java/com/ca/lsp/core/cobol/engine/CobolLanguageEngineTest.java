@@ -14,23 +14,18 @@
 package com.ca.lsp.core.cobol.engine;
 
 import com.ca.lsp.core.cobol.model.ProcessingResult;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
-import static com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum.*;
+import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.*;
 import static org.junit.Assert.assertEquals;
 
-/**
- * JUnit Test checks with Cobol engine for both positive and negative tests with 3 formats
- */
+/** JUnit Test checks with Cobol engine for both positive and negative tests with 3 formats */
 @RunWith(Parameterized.class)
 public class CobolLanguageEngineTest {
 
@@ -61,9 +56,9 @@ public class CobolLanguageEngineTest {
           + "            END-PERFORM.\r\n"
           + "\r\n"
           + "            STOP RUN.";
-  private CobolPreprocessor.CobolSourceFormatEnum format;
+  private CobolSourceFormat format;
 
-  public CobolLanguageEngineTest(CobolSourceFormatEnum format) {
+  public CobolLanguageEngineTest(CobolSourceFormat format) {
     super();
     this.format = format;
   }

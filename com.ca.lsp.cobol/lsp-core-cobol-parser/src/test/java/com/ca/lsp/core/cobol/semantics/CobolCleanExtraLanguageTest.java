@@ -17,7 +17,7 @@ package com.ca.lsp.core.cobol.semantics;
 
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ProcessingResult;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +25,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Deque;
 
-import static com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum.*;
+import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
 import static org.junit.Assert.assertEquals;
 
 @Slf4j
@@ -150,7 +153,7 @@ public class CobolCleanExtraLanguageTest {
   private String linePrefix;
   private String tag;
   private String expectedText;
-  private CobolPreprocessor.CobolSourceFormatEnum format = FIXED;
+  private CobolSourceFormat format = FIXED;
   private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
 
   public CobolCleanExtraLanguageTest(

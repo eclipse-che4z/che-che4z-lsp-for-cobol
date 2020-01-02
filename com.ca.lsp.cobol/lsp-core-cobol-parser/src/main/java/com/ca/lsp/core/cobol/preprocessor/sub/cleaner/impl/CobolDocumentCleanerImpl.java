@@ -20,7 +20,7 @@ import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.parser.CobolCleanerLexer;
 import com.ca.lsp.core.cobol.parser.CobolCleanerParser;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleaner;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleanerListener;
 import org.antlr.v4.runtime.CharStreams;
@@ -49,8 +49,7 @@ public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
       };
 
   @Override
-  public String cleanDocument(
-      String text, CobolPreprocessor.CobolSourceFormatEnum format, CobolParserParams params) {
+  public String cleanDocument(String text, CobolSourceFormat format, CobolParserParams params) {
     final boolean requiresProcessorExecution = containsTrigger(text, TRIGGERS);
     final String result;
 
@@ -80,9 +79,7 @@ public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
   }
 
   private String cleanWithParser(
-      final String code,
-      final CobolPreprocessor.CobolSourceFormatEnum format,
-      CobolParserParams params) {
+      final String code, final CobolSourceFormat format, CobolParserParams params) {
     // run the lexer
     List<SyntaxError> errors = new ArrayList<>();
 
@@ -119,7 +116,7 @@ public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
   }
 
   private CobolDocumentCleanerListener createCleanerListener(
-      final CobolPreprocessor.CobolSourceFormatEnum format, final CommonTokenStream tokens) {
+      final CobolSourceFormat format, final CommonTokenStream tokens) {
     return new CobolDocumentCommentingCleanerListener(format, tokens);
   }
 }
