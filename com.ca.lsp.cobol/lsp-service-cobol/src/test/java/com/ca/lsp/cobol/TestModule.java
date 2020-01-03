@@ -21,12 +21,16 @@ import com.ca.lsp.cobol.positive.ZipTextRegistry;
 import com.ca.lsp.cobol.service.MyTextDocumentService;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.communications.ServerCommunications;
+import com.ca.lsp.cobol.service.delegates.formations.Formation;
+import com.ca.lsp.cobol.service.delegates.formations.Formations;
+import com.ca.lsp.cobol.service.delegates.formations.TrimFormation;
 import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -53,5 +57,13 @@ public class TestModule extends DefaultModule {
         .annotatedWith(Names.named(PATH_TO_TEST_RESOURCES))
         .toProvider(
             () -> Optional.ofNullable(System.getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
+
+    bindFormations();
+  }
+
+  private void bindFormations() {
+    bind(Formations.class);
+    Multibinder<Formation> formationBinding = Multibinder.newSetBinder(binder(), Formation.class);
+    formationBinding.addBinding().to(TrimFormation.class);
   }
 }

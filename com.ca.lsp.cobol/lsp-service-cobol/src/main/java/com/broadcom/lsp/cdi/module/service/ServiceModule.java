@@ -19,10 +19,14 @@ import com.broadcom.lsp.cdi.module.DefaultModule;
 import com.ca.lsp.cobol.service.*;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.communications.ServerCommunications;
+import com.ca.lsp.cobol.service.delegates.formations.Formation;
+import com.ca.lsp.cobol.service.delegates.formations.Formations;
+import com.ca.lsp.cobol.service.delegates.formations.TrimFormation;
 import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
+import com.google.inject.multibindings.Multibinder;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -44,5 +48,13 @@ public class ServiceModule extends DefaultModule {
     bind(LanguageClient.class).toProvider(ClientProvider.class);
     bind(CobolLanguageEngine.class);
     bind(CobolSourceFormat.class).toInstance(CobolSourceFormat.FIXED);
+
+    bindFormations();
+  }
+
+  private void bindFormations() {
+    bind(Formations.class);
+    Multibinder<Formation> formationBinding = Multibinder.newSetBinder(binder(), Formation.class);
+    formationBinding.addBinding().to(TrimFormation.class);
   }
 }

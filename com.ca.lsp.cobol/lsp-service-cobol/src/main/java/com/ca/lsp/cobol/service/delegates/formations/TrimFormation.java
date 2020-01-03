@@ -21,6 +21,7 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextEdit;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -34,7 +35,7 @@ public class TrimFormation implements Formation {
   }
 
   @Override
-  public List<TextEdit> format(List<Line> lines) {
+  public List<TextEdit> format(@Nonnull List<Line> lines) {
     List<TextEdit> formattedText = new ArrayList<>();
     for (Line line : lines) {
       String newText = rtrim(line.getText());

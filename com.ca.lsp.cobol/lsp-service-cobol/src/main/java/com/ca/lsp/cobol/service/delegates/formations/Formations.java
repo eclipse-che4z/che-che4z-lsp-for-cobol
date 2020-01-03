@@ -17,20 +17,36 @@
 package com.ca.lsp.cobol.service.delegates.formations;
 
 import com.ca.lsp.cobol.service.MyDocumentModel;
-import lombok.experimental.UtilityClass;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.eclipse.lsp4j.TextEdit;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-@UtilityClass
+@Singleton
 public class Formations {
-  private static final Formation FORMATION = new TrimFormation();
+
+  private Set<Formation> formatters;
+
+  @Inject
+  public Formations(Set<Formation> formations) {
+    this.formatters = formations;
+  }
 
   public List<TextEdit> format(MyDocumentModel model) {
-    return Optional.ofNullable(model)
-        .map(it -> FORMATION.format(it.getLines()))
-        .orElseGet(Collections::emptyList);
+    return Optional.ofNullable(model).map(applyFormatting()).orElse(Collections.emptyList());
+  }
+
+  private Function<MyDocumentModel, List<TextEdit>> applyFormatting() {
+    return document ->
+        formatters.stream()
+            .map(it -> it.format(document.getLines()))
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
   }
 }

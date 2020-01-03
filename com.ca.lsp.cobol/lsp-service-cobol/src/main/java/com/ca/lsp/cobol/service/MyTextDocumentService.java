@@ -15,9 +15,9 @@
 package com.ca.lsp.cobol.service;
 
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
+import com.ca.lsp.cobol.service.delegates.completions.Completions;
 import com.ca.lsp.cobol.service.delegates.formations.Formations;
 import com.ca.lsp.cobol.service.delegates.references.Highlights;
-import com.ca.lsp.cobol.service.delegates.completions.Completions;
 import com.ca.lsp.cobol.service.delegates.references.References;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
@@ -49,13 +49,17 @@ public class MyTextDocumentService implements TextDocumentService {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob", "COBOL");
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
+
   private Communications communications;
   private LanguageEngineFacade engine;
+  private Formations formations;
 
   @Inject
-  public MyTextDocumentService(Communications communications, LanguageEngineFacade engine) {
+  public MyTextDocumentService(
+      Communications communications, LanguageEngineFacade engine, Formations formations) {
     this.communications = communications;
     this.engine = engine;
+    this.formations = formations;
   }
 
   Map<String, MyDocumentModel> getDocs() {
@@ -113,7 +117,7 @@ public class MyTextDocumentService implements TextDocumentService {
   public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
     String uri = params.getTextDocument().getUri();
     MyDocumentModel model = docs.get(uri);
-    return CompletableFuture.<List<? extends TextEdit>>supplyAsync(() -> Formations.format(model))
+    return CompletableFuture.<List<? extends TextEdit>>supplyAsync(() -> formations.format(model))
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("formatting", uri)));
   }
 
