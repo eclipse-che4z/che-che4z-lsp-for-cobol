@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.Ignore;
@@ -21,8 +20,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -102,12 +100,7 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
   @Ignore("Feature is not yet supported")
   @Test
   public void testProcessWithoutNumbersWithTypo() {
-    TestLanguageClient client =
-        startServerAndRunValidation(PROCESS_WITHOUT_NUMBER_TYPO + FOLLOWING_TEXT);
-
-    waitForDiagnostics(client);
-
-    Range range = retrieveRange(client);
+    Range range = retrieveRange(analyzeForErrors(PROCESS_WITHOUT_NUMBER_TYPO + FOLLOWING_TEXT));
 
     assertEquals(1, range.getStart().getLine());
     assertEquals(7, range.getStart().getCharacter());
@@ -116,13 +109,7 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
   @Ignore("Feature is not yet supported")
   @Test
   public void testProcessWithNumbersWithTypo() {
-    TestLanguageClient client =
-        startServerAndRunValidation(PROCESS_WITH_NUMBER_TYPO + FOLLOWING_TEXT);
-
-    waitForDiagnostics(client);
-
-    Range range = retrieveRange(client);
-
+    Range range = retrieveRange(analyzeForErrors(PROCESS_WITH_NUMBER_TYPO + FOLLOWING_TEXT));
     assertEquals(1, range.getStart().getLine());
     assertEquals(7, range.getStart().getCharacter());
   }
@@ -130,18 +117,13 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
   @Ignore("Feature is not yet supported")
   @Test
   public void testLinesBeforeCblNotAllowed() {
-    TestLanguageClient client = startServerAndRunValidation(FOLLOWING_TEXT + CBL_WITH_NUMBER);
-
-    waitForDiagnostics(client);
-
-    Range range = retrieveRange(client);
+    Range range = retrieveRange(analyzeForErrors(FOLLOWING_TEXT + CBL_WITH_NUMBER));
 
     assertEquals(4, range.getStart().getLine());
     assertEquals(7, range.getStart().getCharacter());
   }
 
-  private Range retrieveRange(TestLanguageClient client) {
-    List<Diagnostic> diagnostics = client.getDiagnostics();
+  private Range retrieveRange(List<Diagnostic> diagnostics) {
     assertEquals(1, diagnostics.size());
     Diagnostic diagnostic = diagnostics.get(0);
     return diagnostic.getRange();

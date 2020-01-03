@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.*;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

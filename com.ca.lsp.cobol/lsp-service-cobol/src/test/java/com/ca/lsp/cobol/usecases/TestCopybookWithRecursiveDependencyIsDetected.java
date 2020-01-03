@@ -21,6 +21,7 @@ import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 /**
@@ -54,7 +55,8 @@ public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCa
   }
 
   @Override
-  protected void assertRange(Range range) {
+  protected void assertRanges(List<Range> ranges) {
+    Range range = ranges.get(0);
     assertEquals(4, range.getStart().getLine());
     assertEquals(13, range.getStart().getCharacter());
     assertEquals(4, range.getEnd().getLine());

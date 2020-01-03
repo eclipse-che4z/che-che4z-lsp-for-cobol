@@ -16,25 +16,19 @@
 
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Range;
-import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.*;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
 import static org.junit.Assert.assertEquals;
 
-/**
- * This class checks that all the semantic elements definitions and usages are found correctly
- */
+/** This class checks that all the semantic elements definitions and usages are found correctly */
 public class DefinitionsAndUsagesTest extends ConfigurableTest {
   private static final String TEXT =
       "       Identification Division. \n"
@@ -69,15 +63,7 @@ public class DefinitionsAndUsagesTest extends ConfigurableTest {
 
   @Before
   public void createService() {
-    TextDocumentService service =
-        LangServerCtx.getInjector().getInstance(TextDocumentService.class);
-    TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
-    client.clean();
-    runTextValidation(service, TEXT);
-    waitForDiagnostics(client);
-    Map<String, MyDocumentModel> docs = ((MyTextDocumentService) service).getDocs();
-    MyDocumentModel document = docs.get(DOCUMENT_URI);
-    analysisResult = document.getAnalysisResult();
+    analysisResult = analyze(TEXT);
   }
 
   @Test

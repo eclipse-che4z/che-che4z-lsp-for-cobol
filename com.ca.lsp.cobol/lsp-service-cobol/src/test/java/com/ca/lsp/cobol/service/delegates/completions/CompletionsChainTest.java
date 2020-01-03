@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.runTextValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.runTextValidation;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 

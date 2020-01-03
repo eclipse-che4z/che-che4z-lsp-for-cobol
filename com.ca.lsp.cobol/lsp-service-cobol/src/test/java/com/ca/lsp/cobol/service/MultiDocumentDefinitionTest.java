@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.*;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.Assert.assertEquals;
 
 /**
