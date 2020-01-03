@@ -17,8 +17,8 @@ package com.broadcom.lsp.cdi.module.service;
 
 import com.broadcom.lsp.cdi.module.DefaultModule;
 import com.ca.lsp.cobol.service.*;
-import com.ca.lsp.cobol.service.delegates.Communications;
-import com.ca.lsp.cobol.service.delegates.ServerCommunications;
+import com.ca.lsp.cobol.service.delegates.communications.Communications;
+import com.ca.lsp.cobol.service.delegates.communications.ServerCommunications;
 import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;

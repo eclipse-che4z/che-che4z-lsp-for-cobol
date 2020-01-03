@@ -14,9 +14,9 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.ca.lsp.cobol.service.delegates.Communications;
-import com.ca.lsp.cobol.service.delegates.Formations;
-import com.ca.lsp.cobol.service.delegates.Highlights;
+import com.ca.lsp.cobol.service.delegates.communications.Communications;
+import com.ca.lsp.cobol.service.delegates.formations.Formations;
+import com.ca.lsp.cobol.service.delegates.references.Highlights;
 import com.ca.lsp.cobol.service.delegates.completions.Completions;
 import com.ca.lsp.cobol.service.delegates.references.References;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
