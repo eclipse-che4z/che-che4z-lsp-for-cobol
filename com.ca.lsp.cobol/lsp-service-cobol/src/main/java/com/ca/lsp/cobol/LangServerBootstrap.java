@@ -54,22 +54,31 @@ public class LangServerBootstrap {
     LanguageServer server = LangServerCtx.getInjector().getInstance(LanguageServer.class);
     ClientProvider provider = LangServerCtx.getInjector().getInstance(ClientProvider.class);
 
-    try {
-      Launcher<LanguageClient> launcher = startServer(args, server);
-      provider.set(launcher.getRemoteProxy());
-      // suspend the main thread on listening
-      launcher.startListening().get();
-    } catch (InterruptedException | ExecutionException e) {
-      log.error("An error occurred while starting a language server", e);
-      throw e;
-    }
+    start(args, server, provider);
   }
 
   void initCtx() {
     LangServerCtx.getGuiceCtx(new ServiceModule(), new DatabusModule());
   }
 
-  Launcher<LanguageClient> startServer(@Nonnull String[] args, @Nonnull LanguageServer server)
+  private void start(
+      @Nonnull String[] args, @Nonnull LanguageServer server, @Nonnull ClientProvider provider)
+      throws IOException, InterruptedException, ExecutionException {
+    try {
+      Launcher<LanguageClient> launcher = launchServer(args, server);
+      provider.set(launcher.getRemoteProxy());
+      // suspend the main thread on listening
+      launcher.startListening().get();
+    } catch (ExecutionException e) {
+      log.error("An error occurred while starting a language server", e);
+      throw e;
+    } catch (IOException e) {
+      log.error("Unable to start server using socket communication on port [{}]", LSP_PORT);
+      throw e;
+    }
+  }
+
+  Launcher<LanguageClient> launchServer(@Nonnull String[] args, @Nonnull LanguageServer server)
       throws IOException {
     return isPipeEnabled(args)
         ? createServerLauncher(server, System.in, System.out)
@@ -87,9 +96,6 @@ public class LangServerBootstrap {
       // wait for clients to connect
       Socket socket = serverSocket.accept();
       return createServerLauncher(server, socket.getInputStream(), socket.getOutputStream());
-    } catch (IOException e) {
-      log.error("Unable to start server using socket communication on port [{}]", LSP_PORT);
-      throw e;
     }
   }
 

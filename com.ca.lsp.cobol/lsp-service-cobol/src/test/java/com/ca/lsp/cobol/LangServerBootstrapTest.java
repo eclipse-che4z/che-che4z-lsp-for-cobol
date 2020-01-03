@@ -106,7 +106,7 @@ public class LangServerBootstrapTest {
   @Test
   public void startServer() throws IOException {
     Launcher<LanguageClient> launcher =
-        LangServerBootstrap.startServer(
+        LangServerBootstrap.launchServer(
             new String[] {PIPES}, new TestLanguageServer(new TestLanguageClient(), null));
     assertNotNull(launcher.getRemoteProxy());
   }
