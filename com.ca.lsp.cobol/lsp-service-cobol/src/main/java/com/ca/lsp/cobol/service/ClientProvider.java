@@ -33,7 +33,6 @@ public class ClientProvider implements Provider<LanguageClient> {
   }
 
   @Override
-  @Nonnull
   public LanguageClient get() {
     return client;
   }
