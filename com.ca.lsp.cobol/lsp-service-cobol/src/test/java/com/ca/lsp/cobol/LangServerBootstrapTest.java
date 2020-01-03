@@ -20,7 +20,6 @@ package com.ca.lsp.cobol;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.service.MyLanguageServerImpl;
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -76,7 +75,7 @@ public class LangServerBootstrapTest {
 
   @Test
   public void createServerLauncherWithSocket() throws IOException {
-    LanguageServer server = new TestLanguageServer(new TestLanguageClient(), null);
+    LanguageServer server = new TestLanguageServer();
 
     Executors.newSingleThreadExecutor()
         .submit(
@@ -95,7 +94,7 @@ public class LangServerBootstrapTest {
 
   @Test
   public void createServerLauncher() {
-    LanguageServer server = new TestLanguageServer(new TestLanguageClient(), null);
+    LanguageServer server = new TestLanguageServer();
 
     Launcher<LanguageClient> launcher =
         LangServerBootstrap.createServerLauncher(server, System.in, System.out);
@@ -106,8 +105,7 @@ public class LangServerBootstrapTest {
   @Test
   public void startServer() throws IOException {
     Launcher<LanguageClient> launcher =
-        LangServerBootstrap.launchServer(
-            new String[] {PIPES}, new TestLanguageServer(new TestLanguageClient(), null));
+        LangServerBootstrap.launchServer(new String[] {PIPES}, new TestLanguageServer());
     assertNotNull(launcher.getRemoteProxy());
   }
 }
