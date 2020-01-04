@@ -21,6 +21,7 @@ import com.ca.lsp.cobol.positive.ZipTextRegistry;
 import com.ca.lsp.cobol.service.MyTextDocumentService;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.communications.ServerCommunications;
+import com.ca.lsp.cobol.service.delegates.completions.*;
 import com.ca.lsp.cobol.service.delegates.formations.Formation;
 import com.ca.lsp.cobol.service.delegates.formations.Formations;
 import com.ca.lsp.cobol.service.delegates.formations.TrimFormation;
@@ -59,11 +60,25 @@ public class TestModule extends DefaultModule {
             () -> Optional.ofNullable(System.getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
 
     bindFormations();
+    bindCompletions();
   }
 
   private void bindFormations() {
     bind(Formations.class);
     Multibinder<Formation> formationBinding = Multibinder.newSetBinder(binder(), Formation.class);
     formationBinding.addBinding().to(TrimFormation.class);
+  }
+
+  private void bindCompletions() {
+    bind(Completions.class);
+    Multibinder<Completion> completionBinding =
+        Multibinder.newSetBinder(binder(), Completion.class);
+    completionBinding.addBinding().to(VariableCompletion.class);
+    completionBinding.addBinding().to(ParagraphCompletion.class);
+    completionBinding.addBinding().to(SnippetCompletion.class);
+    completionBinding.addBinding().to(KeywordCompletion.class);
+
+    bind(CompletionStorage.class).annotatedWith(Names.named("Keywords")).to(Keywords.class);
+    bind(CompletionStorage.class).annotatedWith(Names.named("Snippets")).to(Snippets.class);
   }
 }

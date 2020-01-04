@@ -24,10 +24,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
-public abstract class AbstractCompletionStorage {
+public abstract class CompletionStorage {
   private Map<String, String> storage = new HashMap<>();
 
-  AbstractCompletionStorage() {
+  CompletionStorage() {
     Properties props = new Properties();
     try (InputStream propertiesStream = getInputStream()) {
       props.load(propertiesStream);

@@ -53,13 +53,18 @@ public class MyTextDocumentService implements TextDocumentService {
   private Communications communications;
   private LanguageEngineFacade engine;
   private Formations formations;
+  private Completions completions;
 
   @Inject
   public MyTextDocumentService(
-      Communications communications, LanguageEngineFacade engine, Formations formations) {
+      Communications communications,
+      LanguageEngineFacade engine,
+      Formations formations,
+      Completions completions) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
+    this.completions = completions;
   }
 
   Map<String, MyDocumentModel> getDocs() {
@@ -71,14 +76,14 @@ public class MyTextDocumentService implements TextDocumentService {
       CompletionParams params) {
     String uri = params.getTextDocument().getUri();
     return CompletableFuture.<Either<List<CompletionItem>, CompletionList>>supplyAsync(
-            () -> Either.forRight(Completions.collectFor(docs.get(uri), params)))
+            () -> Either.forRight(completions.collectFor(docs.get(uri), params)))
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("completion lookup", uri)));
   }
 
   @Override
   public CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem unresolved) {
-    return CompletableFuture.supplyAsync(() -> Completions.resolveDocumentationFor(unresolved))
+    return CompletableFuture.supplyAsync(() -> completions.resolveDocumentationFor(unresolved))
         .whenComplete(
             reportExceptionIfThrown(
                 createDescriptiveErrorMessage("completion resolving", unresolved.getLabel())));
