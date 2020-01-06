@@ -14,11 +14,12 @@
 package com.ca.lsp.cobol.service.delegates.validations;
 
 import com.broadcom.lsp.domain.cobol.model.Position;
-import com.ca.lsp.core.cobol.LanguageEngineFactory;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ProcessingResult;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.semantics.SubContext;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -34,6 +35,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Singleton
 public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final int FIRST_LINE_SEQ_AND_EXTRA_OP = 8;
   private static final String COBOL_LANG_SUPPORT_LABEL = "COBOL Language Support";
@@ -42,8 +44,11 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final String INFO_SRC_LABEL = "I";
   private static final String HINT_SRC_LABEL = "H";
 
-  // Access should be package-private
-  CobolLanguageEngineFacade() {
+  private CobolLanguageEngine engine;
+
+  @Inject
+  CobolLanguageEngineFacade(CobolLanguageEngine engine) {
+    this.engine = engine;
   }
 
   @Override
@@ -51,8 +56,6 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     if (isEmpty(text)) {
       return AnalysisResult.empty();
     }
-
-    CobolLanguageEngine engine = LanguageEngineFactory.fixedFormatCobolLanguageEngine();
     return toAnalysisResult(engine.run(text));
   }
 

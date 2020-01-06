@@ -19,7 +19,7 @@ import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.google.common.collect.Multimap;
 import lombok.AllArgsConstructor;
 
@@ -38,7 +38,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   public List<CopybookSemanticContext> analyzeCopybooks(
       Multimap<String, Position> copybooks,
       List<CopybookDefinition> copybookUsageTracker,
-      CobolPreprocessor.CobolSourceFormatEnum format) {
+      CobolSourceFormat format) {
     List<CopybookSemanticContext> contexts =
         ForkJoinTask.invokeAll(createTasks(copybooks, copybookUsageTracker, format)).stream()
             .map(ForkJoinTask::join)
@@ -71,7 +71,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   private List<ForkJoinTask<CopybookSemanticContext>> createTasks(
       Multimap<String, Position> names,
       List<CopybookDefinition> copybookUsageTracker,
-      CobolPreprocessor.CobolSourceFormatEnum format) {
+      CobolSourceFormat format) {
     return names.asMap().entrySet().stream()
         .map(
             it ->

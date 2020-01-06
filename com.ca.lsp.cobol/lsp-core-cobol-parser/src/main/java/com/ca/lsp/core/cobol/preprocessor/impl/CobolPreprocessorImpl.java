@@ -19,6 +19,7 @@ import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
 import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleaner;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.impl.CobolDocumentCleanerImpl;
@@ -49,8 +50,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   @Setter private PreprocessorListener listener;
 
   @Override
-  public PreprocessedInput process(
-      final String cobolSourceCode, final CobolSourceFormatEnum format) {
+  public PreprocessedInput process(final String cobolSourceCode, final CobolSourceFormat format) {
     return process(
         cobolSourceCode,
         format,
@@ -61,12 +61,11 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   @Override
   public PreprocessedInput process(
       final String cobolCode,
-      final CobolSourceFormatEnum format,
+      final CobolSourceFormat format,
       final CobolParserParams params,
       final SemanticContext semanticContext) {
     String documentURI = getDocumentURI(semanticContext);
-    final List<CobolLine> lines =
-        readLines(cobolCode, format, params, documentURI);
+    final List<CobolLine> lines = readLines(cobolCode, format, params, documentURI);
     final List<CobolLine> transformedLines = transformLines(lines, documentURI);
     final List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
     String cleanDocument = cleanDocument(rewrittenLines, format, params);
@@ -74,16 +73,14 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   }
 
   private String cleanDocument(
-      final List<CobolLine> lines,
-      final CobolSourceFormatEnum format,
-      final CobolParserParams params) {
+      final List<CobolLine> lines, final CobolSourceFormat format, final CobolParserParams params) {
     String code = createLineWriter().serialize(lines);
     return createDocumentCleaner().cleanDocument(code, format, params);
   }
 
   private PreprocessedInput parseDocument(
       final String document,
-      final CobolSourceFormatEnum format,
+      final CobolSourceFormat format,
       final CobolParserParams params,
       final SemanticContext semanticContext) {
     return createDocumentParser(semanticContext).processLines(document, format, params);
@@ -91,7 +88,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
   private List<CobolLine> readLines(
       final String cobolCode,
-      final CobolSourceFormatEnum format,
+      final CobolSourceFormat format,
       final CobolParserParams params,
       String documentURI) {
     return createLineReader(documentURI).processLines(cobolCode, format, params);
@@ -99,8 +96,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
   private List<CobolLine> transformLines(List<CobolLine> lines, String documentURI) {
     List<CobolLine> transformedLines = createUnsupportedFeaturesProcessor().transformLines(lines);
-    return createContinuationLineProcessor(documentURI)
-        .transformLines(transformedLines);
+    return createContinuationLineProcessor(documentURI).transformLines(transformedLines);
   }
 
   /**

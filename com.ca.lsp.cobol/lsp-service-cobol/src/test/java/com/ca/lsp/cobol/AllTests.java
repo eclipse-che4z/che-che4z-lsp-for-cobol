@@ -17,8 +17,6 @@ import com.ca.lsp.cobol.negative.NegativeTestSuite;
 import com.ca.lsp.cobol.positive.PositiveTest;
 import com.ca.lsp.cobol.service.*;
 import com.ca.lsp.cobol.service.delegates.HighlightsTest;
-import com.ca.lsp.cobol.service.delegates.LanguageEnginesTest;
-import com.ca.lsp.cobol.service.delegates.ValidationTest;
 import com.ca.lsp.cobol.service.delegates.completions.CompletionsChainTest;
 import com.ca.lsp.cobol.service.delegates.completions.ParagraphCompletionTest;
 import com.ca.lsp.cobol.service.delegates.completions.SnippetCompletionTest;
@@ -40,8 +38,6 @@ import org.junit.runners.Suite.SuiteClasses;
   MyTextDocumentServiceTest.class,
   UseCaseSuite.class,
   KeywordsTest.class,
-  ValidationTest.class,
-  LanguageEnginesTest.class,
   VariableCompletionTest.class,
   CompletionsChainTest.class,
   SnippetCompletionTest.class,
@@ -53,6 +49,7 @@ import org.junit.runners.Suite.SuiteClasses;
   CompletionResolutionTest.class,
   WorkspaceServiceTest.class,
   HighlightsTest.class,
-  MultiDocumentDefinitionTest.class
+  MultiDocumentDefinitionTest.class,
+  LangServerBootstrapTest.class
 })
 public class AllTests {}

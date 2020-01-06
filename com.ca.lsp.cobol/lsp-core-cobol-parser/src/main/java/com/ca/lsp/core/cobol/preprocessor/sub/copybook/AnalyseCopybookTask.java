@@ -30,7 +30,7 @@ import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
 import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import lombok.extern.slf4j.Slf4j;
@@ -52,14 +52,14 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
   private final String copyBookName;
   private transient CopybookDefinition copybookDefinition;
   private transient List<CopybookDefinition> copybookUsageTracker;
-  private final CobolPreprocessor.CobolSourceFormatEnum format;
+  private final CobolSourceFormat format;
   private transient PreprocessorListener listener;
   private transient CompletableFuture<String> waitForResolving;
 
   public AnalyseCopybookTask(
       CopybookDefinition copybookDefinition,
       List<CopybookDefinition> copybookUsageTracker,
-      CobolPreprocessor.CobolSourceFormatEnum format,
+      CobolSourceFormat format,
       PreprocessorListener listener) {
     this.copybookDefinition = copybookDefinition;
     copyBookName = copybookDefinition.getName();

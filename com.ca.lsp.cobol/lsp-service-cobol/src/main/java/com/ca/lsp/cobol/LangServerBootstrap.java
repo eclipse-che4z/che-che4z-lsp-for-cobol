@@ -18,80 +18,89 @@ package com.ca.lsp.cobol;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.cdi.module.service.ServiceModule;
-import com.ca.lsp.cobol.service.IMyLanguageServer;
+import com.ca.lsp.cobol.service.ClientProvider;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
+import org.eclipse.lsp4j.services.LanguageServer;
 
+import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
 
+/**
+ * This class is an entry point for the application. It initializes the DI context and runs the
+ * server to accept the connections using either socket on LSP_PORT or pipes using STDIO. After the
+ * establishing of the connection the main thread suspends until it is stopped forcibly.
+ *
+ * <p>To run the extension using path, you may specify "pipeEnabled" as a program argument. In other
+ * case the server will start using socket.
+ */
 @Slf4j
+@UtilityClass
 public class LangServerBootstrap {
-    private static final Integer LSP_PORT = 1044;
-    private static final String PIPE_ARGM = "pipeEnabled";
-    private IMyLanguageServer server;
+  private static final Integer LSP_PORT = 1044;
+  private static final String PIPE_ARG = "pipeEnabled";
 
-    public LangServerBootstrap() {
-        initCtx();
+  public static void main(String[] args)
+      throws ExecutionException, InterruptedException, IOException {
+    initCtx();
+    LanguageServer server = LangServerCtx.getInjector().getInstance(LanguageServer.class);
+    ClientProvider provider = LangServerCtx.getInjector().getInstance(ClientProvider.class);
+
+    start(args, server, provider);
+  }
+
+  void initCtx() {
+    LangServerCtx.getGuiceCtx(new ServiceModule(), new DatabusModule());
+  }
+
+  private void start(
+      @Nonnull String[] args, @Nonnull LanguageServer server, @Nonnull ClientProvider provider)
+      throws IOException, InterruptedException, ExecutionException {
+    try {
+      Launcher<LanguageClient> launcher = launchServer(args, server);
+      provider.set(launcher.getRemoteProxy());
+      // suspend the main thread on listening
+      launcher.startListening().get();
+    } catch (ExecutionException e) {
+      log.error("An error occurred while starting a language server", e);
+      throw e;
+    } catch (IOException e) {
+      log.error("Unable to start server using socket communication on port [{}]", LSP_PORT);
+      throw e;
     }
+  }
 
-    private void initCtx() {
-        LangServerCtx.getGuiceCtx(new ServiceModule(), new DatabusModule());
-        server = LangServerCtx.getInjector().getInstance(IMyLanguageServer.class);
+  Launcher<LanguageClient> launchServer(@Nonnull String[] args, @Nonnull LanguageServer server)
+      throws IOException {
+    return isPipeEnabled(args)
+        ? createServerLauncher(server, System.in, System.out)
+        : createServerLauncherWithSocket(server);
+  }
+
+  boolean isPipeEnabled(@Nonnull String[] args) {
+    return args.length > 0 && PIPE_ARG.equals(args[0]);
+  }
+
+  Launcher<LanguageClient> createServerLauncherWithSocket(@Nonnull LanguageServer server)
+      throws IOException {
+    try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
+      log.info("Language server started using socket communication on port [{}]", LSP_PORT);
+      // wait for clients to connect
+      Socket socket = serverSocket.accept();
+      return createServerLauncher(server, socket.getInputStream(), socket.getOutputStream());
     }
+  }
 
-    public static void main(String[] args) throws InterruptedException, ExecutionException {
-        LangServerBootstrap starter = new LangServerBootstrap();
-        if (args.length > 0) {
-            starter.startLSPServer(args[0]);
-        } else {
-            starter.startLSPServer("socketEnabled");
-        }
-    }
-
-    private void startLSPServer(String pipeEnabled) throws InterruptedException, ExecutionException {
-        if (PIPE_ARGM.equals(pipeEnabled)) {
-            createLSPPipe(server, System.in, System.out);
-        } else {
-            createLSPSocket(server);
-        }
-    }
-
-    private void createLSPSocket(IMyLanguageServer server) {
-        ExecutorService threadPool = Executors.newCachedThreadPool();
-        threadPool.submit(
-                () -> {
-                    while (true) {
-                        try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
-                            log.info("LS started using socket communication on port [{}]", LSP_PORT);
-
-                            // wait for clients to connect
-                            Socket socket = serverSocket.accept();
-
-                            Launcher<LanguageClient> l =
-                                    LSPLauncher.createServerLauncher(
-                                            server, socket.getInputStream(), socket.getOutputStream());
-
-                            // add clients to the server
-                            Runnable addClient = server.setSocketRemoteProxy(l.getRemoteProxy());
-                            l.startListening();
-                            CompletableFuture.runAsync(addClient);
-                        }
-                    }
-                });
-    }
-
-
-    private void createLSPPipe(IMyLanguageServer server, InputStream in, OutputStream out)
-            throws InterruptedException, ExecutionException {
-        Launcher<LanguageClient> l = LSPLauncher.createServerLauncher(server, in, out);
-        Future<?> startListening = l.startListening();
-        server.setPipeRemoteProxy(l.getRemoteProxy());
-        startListening.get();
-    }
+  Launcher<LanguageClient> createServerLauncher(
+      @Nonnull LanguageServer server, @Nonnull InputStream in, @Nonnull OutputStream out) {
+    return LSPLauncher.createServerLauncher(server, in, out);
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -12,8 +12,9 @@
  * Contributors:
  * Broadcom, Inc. - initial API and implementation
  *
+ *
  */
-package com.ca.lsp.cobol.service.delegates;
+package com.ca.lsp.cobol.service.delegates.communications;
 
 import org.eclipse.lsp4j.Diagnostic;
 

@@ -14,13 +14,17 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.ConfigurableTest;
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
+/**
+ * This class is a base for use cases that check the if some text does not contain any syntax
+ * errors.
+ */
 public abstract class PositiveUseCase extends ConfigurableTest {
   private String text;
 
@@ -33,17 +37,13 @@ public abstract class PositiveUseCase extends ConfigurableTest {
   }
 
   protected void test() {
-    TestLanguageClient client = startServerAndRunValidation(text);
+    List<Diagnostic> diagnostics = UseCaseUtils.analyzeForErrors(text);
 
-    waitForDiagnostics(client);
-
-    assertEquals(createMessage(client), 0, client.getDiagnostics().size());
+    assertEquals(createMessage(diagnostics), 0, diagnostics.size());
   }
 
-  private String createMessage(TestLanguageClient client) {
-    return client
-        .getDiagnostics()
-        .stream()
+  private String createMessage(List<Diagnostic> diagnostics) {
+    return diagnostics.stream()
         .map(Diagnostic::getMessage)
         .reduce((x, y) -> x + "\r\n" + y)
         .orElse("");

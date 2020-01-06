@@ -21,8 +21,7 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
 import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookAnalysis;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookParallelAnalysis;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
@@ -44,7 +43,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
   @Override
   public PreprocessedInput processLines(
-      final String code, final CobolSourceFormatEnum format, final CobolParserParams params) {
+      final String code, final CobolSourceFormat format, final CobolParserParams params) {
     // run the lexer
     final CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     // get a list of matched tokens
@@ -68,21 +67,22 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     return new PreprocessedInput(listener.context().read(), semanticContext);
   }
 
-  private void processCopybooks(CobolSourceFormatEnum format) {
+  private void processCopybooks(CobolSourceFormat format) {
     Multimap<String, Position> copybookNames = semanticContext.getCopybooks().getDefinitions();
     if (copybookNames.isEmpty()) {
       return;
     }
     CopybookAnalysis copybookAnalyzer = createCopybookAnalyzer();
     List<CopybookSemanticContext> contexts =
-        copybookAnalyzer.analyzeCopybooks(copybookNames, semanticContext.getCopybookUsageTracker(), format);
+        copybookAnalyzer.analyzeCopybooks(
+            copybookNames, semanticContext.getCopybookUsageTracker(), format);
     contexts.forEach(semanticContext::merge);
   }
 
   private CobolSemanticParserListener createDocumentParserListener(
       final CommonTokenStream tokens,
       final SemanticContext semanticContext,
-      final CobolPreprocessor.CobolSourceFormatEnum format) {
+      final CobolSourceFormat format) {
     return new CobolSemanticParserListenerImpl(tokens, semanticContext, format, formatListener);
   }
 

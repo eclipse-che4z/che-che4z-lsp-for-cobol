@@ -31,7 +31,7 @@ public class SnippetCompletionTest {
 
   @Before
   public void prepareProvider() {
-    provider = new SnippetCompletion();
+    provider = new SnippetCompletion(new Snippets());
   }
 
   @Test

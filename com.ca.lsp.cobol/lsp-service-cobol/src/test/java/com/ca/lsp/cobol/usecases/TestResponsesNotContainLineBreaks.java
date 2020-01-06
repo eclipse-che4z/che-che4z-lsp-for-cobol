@@ -22,8 +22,8 @@ import org.junit.Test;
 
 import java.util.Optional;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.startServerAndRunValidation;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.assertFalse;
 
 /**
@@ -49,12 +49,12 @@ public class TestResponsesNotContainLineBreaks extends ConfigurableTest {
   public void test() {
     TestLanguageClient client = startServerAndRunValidation(TEXT);
     waitForDiagnostics(client);
+
     client.getDiagnostics().forEach(it -> assertStringWithoutLineBreaks(it.getMessage()));
     client.getDiagnostics().forEach(it -> assertStringWithoutLineBreaks(it.getCode()));
     client.getDiagnostics().forEach(it -> assertStringWithoutLineBreaks(it.getSource()));
 
     client.getMessagesToLog().forEach(it -> assertStringWithoutLineBreaks(it.getMessage()));
-
     client.getMessagesToShow().forEach(it -> assertStringWithoutLineBreaks(it.getMessage()));
   }
 

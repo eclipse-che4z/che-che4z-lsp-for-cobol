@@ -14,10 +14,11 @@
 package com.ca.lsp.core.cobol.preprocessor.sub;
 
 import com.ca.lsp.core.cobol.params.CobolDialect;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.ProcessingConstants;
 import com.google.common.base.Strings;
+
+import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.TANDEM;
 
 public class CobolLine {
   protected String commentArea = "";
@@ -27,7 +28,7 @@ public class CobolLine {
   protected String contentAreaB = "";
   protected String contentAreaBOriginal = "";
   protected CobolDialect dialect;
-  protected CobolSourceFormatEnum format;
+  protected CobolSourceFormat format;
   protected String indicatorArea = " ";
   protected String indicatorAreaOriginal = "";
   protected int number;
@@ -78,7 +79,7 @@ public class CobolLine {
     return dialect;
   }
 
-  public CobolSourceFormatEnum getFormat() {
+  public CobolSourceFormat getFormat() {
     return format;
   }
 
@@ -142,7 +143,7 @@ public class CobolLine {
     this.dialect = dialect;
   }
 
-  public void setFormat(CobolSourceFormatEnum format) {
+  public void setFormat(CobolSourceFormat format) {
     this.format = format;
   }
 
@@ -249,11 +250,8 @@ public class CobolLine {
     return cobolLine;
   }
 
-  public static String createBlankSequenceArea(
-      final CobolPreprocessor.CobolSourceFormatEnum format) {
-    return CobolSourceFormatEnum.TANDEM.equals(format)
-        ? ""
-        : Strings.repeat(ProcessingConstants.WS, 6);
+  public static String createBlankSequenceArea(final CobolSourceFormat format) {
+    return TANDEM.equals(format) ? "" : Strings.repeat(ProcessingConstants.WS, 6);
   }
 
   protected static String extractContentAreaA(final String contentArea) {

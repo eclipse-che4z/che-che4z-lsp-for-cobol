@@ -18,7 +18,7 @@ package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.google.common.collect.Multimap;
 
 import java.util.List;
@@ -27,5 +27,5 @@ public interface CopybookAnalysis {
   List<CopybookSemanticContext> analyzeCopybooks(
       Multimap<String, Position> copybookNames,
       List<CopybookDefinition> copybookUsageTracker,
-      CobolPreprocessor.CobolSourceFormatEnum format);
+      CobolSourceFormat format);
 }

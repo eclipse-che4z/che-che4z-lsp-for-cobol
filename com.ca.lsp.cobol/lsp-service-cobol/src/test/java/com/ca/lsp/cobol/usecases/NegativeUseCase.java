@@ -14,20 +14,17 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.ConfigurableTest;
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.Assert.fail;
 
-/**
- * This class is a base for use cases that check the if some text contains syntax errors.
- */
+/** This class is a base for use cases that check the if some text contains syntax errors. */
 @Slf4j
 public abstract class NegativeUseCase extends ConfigurableTest {
 
@@ -38,24 +35,22 @@ public abstract class NegativeUseCase extends ConfigurableTest {
   }
 
   protected void test() {
-    TestLanguageClient client = startServerAndRunValidation(text);
-
-    waitForDiagnostics(client);
-
-    Range range = retrieveRange(client);
-
-    assertRange(range);
+    List<Range> ranges = retrieveRanges(analyzeForErrors(text));
+    if (ranges.isEmpty()) {
+      fail("No diagnostics received");
+    }
+    assertRanges(ranges);
   }
 
-  protected abstract void assertRange(Range range);
+  protected abstract void assertRanges(List<Range> range);
 
-  private Range retrieveRange(TestLanguageClient client) {
-    List<Diagnostic> diagnostics = client.getDiagnostics();
+  private List<Range> retrieveRanges(List<Diagnostic> diagnostics) {
     if (diagnostics.isEmpty()) {
       fail("No diagnostics received");
     }
-    Diagnostic diagnostic = diagnostics.get(0);
-    log.info(diagnostic.toString());
-    return diagnostic.getRange();
+    return diagnostics.stream()
+        .peek(it -> log.info(it.toString()))
+        .map(Diagnostic::getRange)
+        .collect(Collectors.toList());
   }
 }

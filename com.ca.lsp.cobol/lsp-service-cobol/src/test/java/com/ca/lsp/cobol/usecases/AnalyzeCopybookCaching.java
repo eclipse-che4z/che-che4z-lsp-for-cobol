@@ -9,7 +9,6 @@ import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import com.ca.lsp.core.cobol.model.CopybookDefinition;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.AnalyseCopybookTask;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.MultiMapSerializableHelper;
 import com.google.common.collect.HashMultimap;
@@ -21,6 +20,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 
+import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
 import static junit.framework.TestCase.assertTrue;
 
 /**
@@ -110,7 +110,7 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
         new AnalyseCopybookTask(
             new CopybookDefinition(COPYBOOK_NAME, null, null),
             Collections.emptyList(),
-            CobolPreprocessor.CobolSourceFormatEnum.FIXED,
+            FIXED,
             null);
     analyseCopybookTask.compute();
   }

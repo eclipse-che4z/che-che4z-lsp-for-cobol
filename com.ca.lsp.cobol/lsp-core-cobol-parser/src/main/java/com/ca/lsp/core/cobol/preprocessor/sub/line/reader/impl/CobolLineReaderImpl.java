@@ -15,7 +15,7 @@ package com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl;
 
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
@@ -40,7 +40,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
   @Override
   public List<CobolLine> processLines(
-      final String lines, final CobolSourceFormatEnum format, final CobolParserParams params) {
+      final String lines, final CobolSourceFormat format, final CobolParserParams params) {
 
     final List<CobolLine> result = new ArrayList<>();
     try (Scanner scanner = new Scanner(lines)) {
@@ -66,7 +66,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
   public CobolLine parseLine(
       String line,
       final int lineNumber,
-      final CobolSourceFormatEnum format,
+      final CobolSourceFormat format,
       final CobolParserParams params) {
     final Pattern pattern = format.getPattern();
     final Matcher matcher = pattern.matcher(line);
@@ -133,10 +133,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
   }
 
   private String checkFormatCorrect(
-      String line,
-      final int lineNumber,
-      final CobolSourceFormatEnum format,
-      final Matcher matcher) {
+      String line, final int lineNumber, final CobolSourceFormat format, final Matcher matcher) {
     int errorLength = 0;
     int charPosition;
     if (!matcher.matches() && line.length() > INDICATOR_AREA_INDEX) {
@@ -154,7 +151,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
   }
 
   private void registerFormatError(
-      int lineNumber, final CobolSourceFormatEnum format, int charPosition, int errorLength) {
+      int lineNumber, final CobolSourceFormat format, int charPosition, int errorLength) {
     if (listener == null) return;
     listener.syntaxError(
         documentURI,

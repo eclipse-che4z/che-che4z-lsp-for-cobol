@@ -17,13 +17,11 @@ import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.positive.CobolTextRegistry;
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.Diagnostic;
 
 import java.util.List;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static org.junit.Assert.assertEquals;
 /**
  * This class is an abstract negative test case and should be instantiated with specifying concrete
@@ -47,28 +45,26 @@ public abstract class NegativeTest extends ConfigurableTest {
   private String text;
   private int expectedErrorsNumber;
 
-  protected NegativeTest(String fileName, int expectedErrorsNumber) {
+  NegativeTest(String fileName, int expectedErrorsNumber) {
     this.expectedErrorsNumber = expectedErrorsNumber;
     this.text = lookupFile(fileName);
   }
 
   protected void test() {
-    TestLanguageClient client = startServerAndRunValidation(text);
 
-    waitForDiagnostics(client);
+    List<Diagnostic> diagnostics = analyzeForErrors(text);
 
-    asserErrorNumber(client);
+    assertErrorNumber(diagnostics);
 
-    checkErrors(client);
+    checkErrors(diagnostics);
   }
 
   /**
    * Should be overridden to verify the presence of all the required errors.
    *
-   * @param client - The TestLanguageClient instance to retrieve found errors
+   * @param diagnostics - the errors to be checked
    */
-  protected void checkErrors(TestLanguageClient client) {
-    List<Diagnostic> diagnostics = client.getDiagnostics();
+  protected void checkErrors(List<Diagnostic> diagnostics) {
     diagnostics.forEach(System.out::println);
   }
 
@@ -83,7 +79,7 @@ public abstract class NegativeTest extends ConfigurableTest {
                     "The specfied file " + fileName + " does not exist in the given archive"));
   }
 
-  private void asserErrorNumber(TestLanguageClient client) {
-    assertEquals(expectedErrorsNumber, client.getDiagnostics().size());
+  private void assertErrorNumber(List<Diagnostic> diagnostics) {
+    assertEquals(expectedErrorsNumber, diagnostics.size());
   }
 }

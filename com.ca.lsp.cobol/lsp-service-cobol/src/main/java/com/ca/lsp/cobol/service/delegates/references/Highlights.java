@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
+ *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -9,18 +10,20 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ * Broadcom, Inc. - initial API and implementation
+ *
+ *
  */
 
-package com.ca.lsp.cobol.service.delegates;
+package com.ca.lsp.cobol.service.delegates.references;
 
 import com.ca.lsp.cobol.service.MyDocumentModel;
-import com.ca.lsp.cobol.service.delegates.references.References;
+import org.eclipse.lsp4j.*;
+
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.eclipse.lsp4j.*;
 
 /**
  * This Class processes text Highlight requests for semantic elements, it's logic is dependant on
@@ -33,7 +36,7 @@ public class Highlights {
   private Highlights() {
     throw new AssertionError("Suppress default constructor for noninstantiability");
   }
-  
+
   public static List<DocumentHighlight> findHighlights(
       MyDocumentModel myDocumentModel, TextDocumentPositionParams position) {
     return References.findReferences(myDocumentModel, position, new ReferenceContext(true)).stream()

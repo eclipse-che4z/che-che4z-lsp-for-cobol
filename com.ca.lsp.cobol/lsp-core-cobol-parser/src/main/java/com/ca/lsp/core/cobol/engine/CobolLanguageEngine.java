@@ -21,10 +21,11 @@ import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategy;
 import com.ca.lsp.core.cobol.visitor.CobolVisitor;
+import com.google.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
@@ -37,7 +38,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @RequiredArgsConstructor
 public class CobolLanguageEngine {
 
-  private final CobolPreprocessor.CobolSourceFormatEnum sourceFormat;
+  private CobolSourceFormat sourceFormat;
+
+  @Inject
+  public CobolLanguageEngine(CobolSourceFormat sourceFormat) {
+    this.sourceFormat = sourceFormat;
+  }
 
   public ProcessingResult run(String in) {
     List<SyntaxError> errors = new CopyOnWriteArrayList<>();

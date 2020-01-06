@@ -17,11 +17,9 @@ package com.ca.lsp.core.cobol.semantics;
 
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ProcessingResult;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import org.junit.Test;
-import java.util.stream.Collectors;
 
-import static com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum.*;
+import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
 import static org.junit.Assert.assertEquals;
 
 public class CobolVariableCheckTest {

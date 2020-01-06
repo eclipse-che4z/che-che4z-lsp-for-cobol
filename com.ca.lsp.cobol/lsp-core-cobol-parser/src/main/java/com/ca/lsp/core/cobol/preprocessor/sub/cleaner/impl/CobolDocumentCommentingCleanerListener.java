@@ -17,7 +17,7 @@ package com.ca.lsp.core.cobol.preprocessor.sub.cleaner.impl;
 
 import com.ca.lsp.core.cobol.parser.CobolCleanerBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolCleanerParser;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleanerListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
@@ -37,11 +37,11 @@ import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 public class CobolDocumentCommentingCleanerListener extends CobolCleanerBaseListener
     implements CobolDocumentCleanerListener {
   private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
-  private final CobolPreprocessor.CobolSourceFormatEnum format;
+  private final CobolSourceFormat format;
   private final BufferedTokenStream tokens;
 
   CobolDocumentCommentingCleanerListener(
-      final CobolPreprocessor.CobolSourceFormatEnum format, final BufferedTokenStream tokens) {
+      final CobolSourceFormat format, final BufferedTokenStream tokens) {
     this.tokens = tokens;
     this.format = format;
 

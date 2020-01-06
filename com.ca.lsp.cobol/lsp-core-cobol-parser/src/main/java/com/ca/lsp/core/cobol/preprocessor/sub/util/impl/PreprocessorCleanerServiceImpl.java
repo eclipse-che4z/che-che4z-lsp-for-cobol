@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
@@ -38,10 +38,7 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
   }
 
   public void excludeStatementFromText(
-      ParserRuleContext ctx,
-      String tag,
-      BufferedTokenStream tokens,
-      CobolPreprocessor.CobolSourceFormatEnum format) {
+      ParserRuleContext ctx, String tag, BufferedTokenStream tokens, CobolSourceFormat format) {
     pop();
     push();
 

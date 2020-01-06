@@ -18,10 +18,7 @@ import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.*;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -50,11 +47,12 @@ public class ParagraphCompletionTest {
    */
   @Test
   public void testParagraphCompletion() {
-    ParagraphCompletion completion = new ParagraphCompletion();
     MyDocumentModel document = createModel();
 
-    List<CompletionItem> completionItems =
-        completion.collectCompletions(document, createCompletionParams());
+    Set<Completion> completionSet = new HashSet<>();
+    completionSet.add(new ParagraphCompletion());
+    Completions completions = new Completions(completionSet);
+    List<CompletionItem> completionItems = completions.collectFor(document, createCompletionParams()).getItems();
 
     assertEquals(2, completionItems.size());
     assertTrue(
@@ -65,6 +63,8 @@ public class ParagraphCompletionTest {
         "000-Main-Logic",
         completionItems.get(1).getLabel().contains("100-Test")
             || completionItems.get(1).getLabel().contains("000-Main-Logic"));
+
+    assertEquals(CompletionItemKind.Method, completionItems.get(0).getKind());
   }
 
   private CompletionParams createCompletionParams() {

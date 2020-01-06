@@ -13,12 +13,13 @@
  */
 package com.ca.lsp.cobol.service.delegates.completions;
 
+import com.google.inject.Singleton;
+
 import java.io.InputStream;
 
-/**
- * This class is a provider for Cobol Snippets
- */
-public class Snippets extends AbstractCompletionStorage {
+/** This class is a provider for Cobol Snippets */
+@Singleton
+public class Snippets extends CompletionStorage {
   private static final String SNIPPETS_FILE_PATH = "LanguageSnippets.txt";
 
   @Override
