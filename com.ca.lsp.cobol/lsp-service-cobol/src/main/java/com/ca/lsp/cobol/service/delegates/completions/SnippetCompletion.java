@@ -43,7 +43,7 @@ public class SnippetCompletion implements Completion {
 
   @Nullable
   @Override
-  public String tryResolve(String label) {
+  public String tryResolve(@Nonnull String label) {
     return Optional.ofNullable(snippets.getInformationFor(label))
         .map(string -> string.replaceAll("[${\\d:}]", ""))
         .orElse(null);

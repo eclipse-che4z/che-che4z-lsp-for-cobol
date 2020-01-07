@@ -62,9 +62,9 @@ public class MultiDocumentDefinitionTest extends ConfigurableTest {
           + "           03  CHILD3         PIC 9   VALUE IS '2'.";
   private static final String PARS =
       "       PAR1.\n"
-          + "           DISPLAY \"PAR1\"\n"
+          + "           DISPLAY \"PAR1\".\n"
           + "       PAR2.\n"
-          + "           DISPLAY \"PAR2\"\n";
+          + "           DISPLAY \"PAR2\".\n";
   private AnalysisResult analysisResult;
   private TextDocumentService service;
 
