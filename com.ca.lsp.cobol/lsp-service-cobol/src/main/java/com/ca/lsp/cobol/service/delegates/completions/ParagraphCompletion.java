@@ -19,7 +19,6 @@ import com.google.inject.Singleton;
 import org.eclipse.lsp4j.CompletionItemKind;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -34,13 +33,6 @@ public class ParagraphCompletion implements Completion {
         .map(MyDocumentModel::getAnalysisResult)
         .map(AnalysisResult::getParagraphs)
         .orElse(Collections.emptySet());
-  }
-
-  @Nullable
-  @Override
-  public String tryResolve(String label) {
-    // Cannot resolve description for this type of completion
-    return null;
   }
 
   @Nonnull
