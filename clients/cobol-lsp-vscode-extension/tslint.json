@@ -31,7 +31,8 @@
         "arrow-parens": [
             true,
             "ban-single-arg-parens"
-        ]
+        ],
+        "prettier": true
     },
     "defaultSeverity": "warning",
     "extends": [
