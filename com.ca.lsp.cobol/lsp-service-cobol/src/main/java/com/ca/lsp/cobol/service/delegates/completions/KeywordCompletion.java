@@ -40,7 +40,7 @@ public class KeywordCompletion implements Completion {
 
   @Nullable
   @Override
-  public String tryResolve(String label) {
+  public String tryResolve(@Nonnull String label) {
     return keywords.getInformationFor(label);
   }
 
