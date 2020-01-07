@@ -13,16 +13,18 @@
  */
 
 import * as cp from "child_process";
-import {ExtensionContext, extensions, StatusBarAlignment, window} from "vscode";
+import * as fs from "fs";
+import { Disposable, ExtensionContext, extensions, StatusBarAlignment, Uri, window, workspace} from "vscode";
 import {
     Executable,
     LanguageClient,
     LanguageClientOptions,
 } from "vscode-languageclient/lib/main";
+import { CopybooksDownloader } from "./CopybooksDownloader";
 import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
 
 export async function activate(context: ExtensionContext) {
-    const fs = require("fs");
+    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader();
 
     // path resolved to identify the location of the LSP server into the extension
     const extPath = extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
@@ -56,18 +58,31 @@ export async function activate(context: ExtensionContext) {
 
     // Create the language client and start the client.
     const languageClient = new LanguageClient("LSP", "LSP extension for COBOL language", serverOptions, clientOptions);
-
-    const disposable = languageClient.start();
-
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(languageClient.start());
     item.text = "Language Server is active";
+
+    context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
+}
+
+function depChange(uri: Uri, downloader: CopybooksDownloader) {
+    const copybooks: string[] = fs.readFileSync(uri.fsPath).toString().split("\n")
+        .filter(e => e.trim().length > 0)
+        .map(e => e.trim());
+    downloader.downloadCopyBooks(copybooks);
+}
+
+function initWorkspaceTracker(downloader: CopybooksDownloader): Disposable {
+    const watcher = workspace.createFileSystemWatcher("**/.cobdeps/**.deps", false, false, true);
+    watcher.onDidChange(uri => depChange(uri, downloader));
+    watcher.onDidCreate(uri => depChange(uri, downloader));
+    return watcher;
 }
 
 async function isJavaInstalled() {
     return new Promise<any>((resolve, reject) => {
         const ls = cp.spawn("java", ["-version"]);
         ls.stderr.on("data", (data: any) => {
-            let javaCheck = new DefaultJavaVersionCheck();
+            const javaCheck = new DefaultJavaVersionCheck();
             if (!javaCheck.isJavaVersionSupported(data.toString())) {
                 reject("Java version 8 expected");
             }
