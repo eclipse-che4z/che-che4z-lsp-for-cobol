@@ -18,8 +18,14 @@
         "url": "https://github.com/eclipse/che-che4z-lsp-for-cobol/issues"
     },
     "keywords": [
-		"mainframe", "lsp", "cobol", "z/os", "zos", "language-server", "jcl"
-	],
+        "mainframe",
+        "lsp",
+        "cobol",
+        "z/os",
+        "zos",
+        "language-server",
+        "jcl"
+    ],
     "categories": [
         "Programming Languages"
     ],
@@ -38,7 +44,20 @@
                     ".cob"
                 ]
             }
-        ]
+        ],
+        "configuration": {
+            "title": "COBOL language support",
+            "properties": {
+                "cobol-language-support.paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of datasets to search for copybooks",
+                    "uniqueItems": true
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
