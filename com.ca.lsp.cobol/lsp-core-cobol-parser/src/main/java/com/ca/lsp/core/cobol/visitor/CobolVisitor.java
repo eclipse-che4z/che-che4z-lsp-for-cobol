@@ -242,7 +242,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private Position retrievePosition(ParserRuleContext ctx) {
     return new Position(
         null,
-        ctx.getStart().getTokenIndex(),
         ctx.getStart().getStartIndex(),
         ctx.getStart().getStopIndex(),
         ctx.getStart().getLine(),

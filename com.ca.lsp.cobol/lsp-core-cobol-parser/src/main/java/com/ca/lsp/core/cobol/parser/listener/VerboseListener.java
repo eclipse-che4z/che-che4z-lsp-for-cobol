@@ -44,7 +44,6 @@ public class VerboseListener extends BaseErrorListener {
       Position position =
           new Position(
               null,
-              wrongToken.getTokenIndex(),
               wrongToken.getStartIndex(),
               wrongToken.getStopIndex(),
               wrongToken.getLine(),
@@ -61,13 +60,7 @@ public class VerboseListener extends BaseErrorListener {
     if (recognizer instanceof Lexer) {
       stack.add(((Lexer) recognizer).getText());
       Position position =
-          new Position(
-              null,
-              charPositionInLine,
-              charPositionInLine,
-              charPositionInLine,
-              line,
-              charPositionInLine);
+          new Position(null, charPositionInLine, charPositionInLine, line, charPositionInLine);
       errorspipe.add(
           SyntaxError.syntaxerror()
               .position(position)

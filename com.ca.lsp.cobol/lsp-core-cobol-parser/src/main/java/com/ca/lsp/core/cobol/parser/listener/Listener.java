@@ -37,7 +37,6 @@ public abstract class Listener {
         msg,
         new Position(
             documentName,
-            PREPROCESSING_ERROR_INDEX,
             charPositionInLine,
             (charPositionInLine + errorLength),
             line,
@@ -54,13 +53,7 @@ public abstract class Listener {
       int severity) {
     registerError(
         msg,
-        new Position(
-            documentName,
-            PREPROCESSING_ERROR_INDEX,
-            charPositionInLine,
-            charEndingIndex,
-            line,
-            charPositionInLine),
+        new Position(documentName, charPositionInLine, charEndingIndex, line, charPositionInLine),
         severity);
   }
 

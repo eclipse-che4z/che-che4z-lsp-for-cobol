@@ -27,9 +27,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
-/**
- * Test for CobolVariableContextImpl
- */
+/** Test for CobolVariableContextImpl */
 public class CobolVariableContextTest {
   private static final String LEVEL1 = "01";
   private static final String LEVEL2 = "02";
@@ -50,8 +48,8 @@ public class CobolVariableContextTest {
   private static final String VAR8 = "VAR8";
   private static final String PARENT1 = "PARENT1";
 
-  private static final Position ERROR_POSITION1 = new Position(null, 0, 0, 3, 1, 5);
-  private static final Position ERROR_POSITION2 = new Position(null, 0, 4, 8, 2, 5);
+  private static final Position ERROR_POSITION1 = new Position(null, 0, 3, 1, 5);
+  private static final Position ERROR_POSITION2 = new Position(null, 4, 8, 2, 5);
 
   private CobolVariableContext context;
   private Variable var1;

@@ -174,7 +174,6 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private Position retrievePosition(ParserRuleContext token) {
     return new Position(
         retrieveDocumentURI(),
-        token.getStart().getTokenIndex(),
         token.getStart().getStartIndex(),
         token.getStop().getStopIndex(),
         token.getStart().getLine(),
