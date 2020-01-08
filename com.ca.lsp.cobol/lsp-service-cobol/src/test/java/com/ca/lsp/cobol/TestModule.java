@@ -25,6 +25,7 @@ import com.ca.lsp.cobol.service.delegates.completions.*;
 import com.ca.lsp.cobol.service.delegates.formations.Formation;
 import com.ca.lsp.cobol.service.delegates.formations.Formations;
 import com.ca.lsp.cobol.service.delegates.formations.TrimFormation;
+import com.ca.lsp.cobol.service.delegates.references.*;
 import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
@@ -61,6 +62,7 @@ public class TestModule extends DefaultModule {
 
     bindFormations();
     bindCompletions();
+    bindReferences();
   }
 
   private void bindFormations() {
@@ -80,5 +82,13 @@ public class TestModule extends DefaultModule {
 
     bind(CompletionStorage.class).annotatedWith(Names.named("Keywords")).to(Keywords.class);
     bind(CompletionStorage.class).annotatedWith(Names.named("Snippets")).to(Snippets.class);
+  }
+
+  private void bindReferences() {
+    bind(Occurrences.class).to(SemanticElementOccurrences.class);
+    Multibinder<SemanticLocations> referenceBinding =
+            Multibinder.newSetBinder(binder(), SemanticLocations.class);
+    referenceBinding.addBinding().to(VariableLocations.class);
+    referenceBinding.addBinding().to(ParagraphLocations.class);
   }
 }
