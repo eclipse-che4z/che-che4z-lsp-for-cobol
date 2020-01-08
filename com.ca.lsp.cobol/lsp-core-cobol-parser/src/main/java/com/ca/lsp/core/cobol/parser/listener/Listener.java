@@ -70,7 +70,6 @@ public abstract class Listener {
               SyntaxError.syntaxerror()
                   .position(position)
                   .suggestion(msg)
-                  .type(0)
                   .severity(severity)
                   .build());
     }

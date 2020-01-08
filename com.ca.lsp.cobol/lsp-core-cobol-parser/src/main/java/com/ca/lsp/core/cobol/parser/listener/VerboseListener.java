@@ -51,9 +51,7 @@ public class VerboseListener extends BaseErrorListener {
       errorspipe.add(
           SyntaxError.syntaxerror()
               .position(position)
-              .ruleStack(stack)
               .suggestion(msg)
-              .type(wrongToken.getType())
               .severity(1)
               .build());
     }
@@ -64,9 +62,7 @@ public class VerboseListener extends BaseErrorListener {
       errorspipe.add(
           SyntaxError.syntaxerror()
               .position(position)
-              .ruleStack(stack)
               .suggestion(msg.concat(" on ").concat(stack.get(stack.size() - 1)))
-              .type(0)
               .severity(1)
               .build());
     }
