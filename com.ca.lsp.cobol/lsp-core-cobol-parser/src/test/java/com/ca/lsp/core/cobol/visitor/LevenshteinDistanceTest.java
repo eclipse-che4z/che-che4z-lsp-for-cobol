@@ -20,9 +20,8 @@ import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
-import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenSource;
 import org.junit.Test;
 
 import java.util.List;
@@ -40,62 +39,14 @@ public class LevenshteinDistanceTest {
     errors.add(new SyntaxError(new Position("", 1, 1, 1, 1, 1), null, 2, "addedSuggestion", 2));
     visitor.setSemanticErrors(new SemanticListener(errors));
     CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
-    when(node.getStart())
-        .thenReturn(
-            new Token() {
-              @Override
-              public String getText() {
-                return "MOVES";
-              }
-
-              @Override
-              public int getType() {
-                return 0;
-              }
-
-              @Override
-              public int getLine() {
-                return 0;
-              }
-
-              @Override
-              public int getCharPositionInLine() {
-                return 0;
-              }
-
-              @Override
-              public int getChannel() {
-                return 0;
-              }
-
-              @Override
-              public int getTokenIndex() {
-                return 0;
-              }
-
-              @Override
-              public int getStartIndex() {
-                return 0;
-              }
-
-              @Override
-              public int getStopIndex() {
-                return 0;
-              }
-
-              @Override
-              public TokenSource getTokenSource() {
-                return null;
-              }
-
-              @Override
-              public CharStream getInputStream() {
-                return null;
-              }
-            });
+    when(node.getStart()).thenReturn(createNewToken("MOVES"));
     visitor.visitStatement(node);
     errors.forEach(errs -> System.out.println(errs.getSuggestion()));
     assertEquals(2, errors.size());
     assertEquals("Misspelled word, maybe you want to put MOVE", errors.get(1).getSuggestion());
+  }
+
+  private Token createNewToken(String text) {
+    return new CommonToken(0, text);
   }
 }
