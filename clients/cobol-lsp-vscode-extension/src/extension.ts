@@ -14,13 +14,13 @@
 
 import * as cp from "child_process";
 import * as fs from "fs";
-import { Disposable, ExtensionContext, extensions, StatusBarAlignment, Uri, window, workspace} from "vscode";
+import { Disposable, ExtensionContext, extensions, StatusBarAlignment, Uri, window, workspace } from "vscode";
 import {
     Executable,
     LanguageClient,
     LanguageClientOptions,
 } from "vscode-languageclient/lib/main";
-import { CopybooksDownloader } from "./CopybooksDownloader";
+import { CopybooksDownloader, DEPENDENCIES_FOLDER } from "./CopybooksDownloader";
 import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
 
 export async function activate(context: ExtensionContext) {
@@ -72,9 +72,9 @@ function depChange(uri: Uri, downloader: CopybooksDownloader) {
 }
 
 function initWorkspaceTracker(downloader: CopybooksDownloader): Disposable {
-    const watcher = workspace.createFileSystemWatcher("**/.cobdeps/**.deps", false, false, true);
-    watcher.onDidChange(uri => depChange(uri, downloader));
+    const watcher = workspace.createFileSystemWatcher("**/" + DEPENDENCIES_FOLDER + "/**.deps", false, false, true);
     watcher.onDidCreate(uri => depChange(uri, downloader));
+    watcher.onDidChange(uri => depChange(uri, downloader));
     return watcher;
 }
 
