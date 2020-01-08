@@ -34,7 +34,6 @@ import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolCommentEnt
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolInlineCommentEntriesNormalizerImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolLineIndicatorProcessorImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.CobolLinesTransformation;
-import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.CobolUnsupportedFeaturesIgnorerImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.ContinuationLineTransformation;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.CobolLineWriter;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.impl.CobolLineWriterImpl;
@@ -95,8 +94,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   }
 
   private List<CobolLine> transformLines(List<CobolLine> lines, String documentURI) {
-    List<CobolLine> transformedLines = createUnsupportedFeaturesProcessor().transformLines(lines);
-    return createContinuationLineProcessor(documentURI).transformLines(transformedLines);
+    return createContinuationLineProcessor(documentURI).transformLines(lines);
   }
 
   /**
@@ -133,10 +131,6 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
   private CobolLineIndicatorProcessor createLineIndicatorProcessor() {
     return new CobolLineIndicatorProcessorImpl();
-  }
-
-  private CobolLinesTransformation createUnsupportedFeaturesProcessor() {
-    return new CobolUnsupportedFeaturesIgnorerImpl(listener);
   }
 
   private CobolLinesTransformation createContinuationLineProcessor(String documentURI) {
