@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -21,6 +21,8 @@ import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.ContinuationLineT
 import com.ca.lsp.core.cobol.semantics.CobolCleanExtraLanguageTest;
 import com.ca.lsp.core.cobol.semantics.CobolVariableCheckTest;
 import com.ca.lsp.core.cobol.semantics.CobolVariableContextTest;
+import com.ca.lsp.core.cobol.visitor.LevenshteinDistanceTest;
+import com.ca.lsp.core.cobol.visitor.VariableDefinitionTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -36,5 +38,7 @@ import org.junit.runners.Suite.SuiteClasses;
   CobolVariableContextTest.class,
   CobolVariableCheckTest.class,
   CobolCleanExtraLanguageTest.class,
+  LevenshteinDistanceTest.class,
+  VariableDefinitionTest.class,
 })
 public class CobolTestSuite {}
