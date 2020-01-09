@@ -19,7 +19,7 @@ import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
-import org.antlr.v4.runtime.CommonToken;
+import com.ca.lsp.core.cobol.utils.CustomToken;
 import org.antlr.v4.runtime.Token;
 import org.junit.Test;
 
@@ -32,20 +32,23 @@ import static org.mockito.Mockito.*;
 public class LevenshteinDistanceTest {
   private CobolVisitor visitor = new CobolVisitor();
   List<SyntaxError> errors = new CopyOnWriteArrayList<>();
+  final String WRONG_TOKEN = "MOVES";
 
   @Test
   public void testDistance() {
-    errors.add(new SyntaxError(new Position("", 1, 1, 1, 1, 1), null, 2, "addedSuggestion", 2));
+    errors.add(new SyntaxError(new Position("", 1, 1, 1, 1, 1), null, 2, "", 2));
     visitor.setSemanticErrors(new SemanticListener(errors));
+
     CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
-    when(node.getStart()).thenReturn(createNewToken("MOVES"));
+    when(node.getStart()).thenReturn(createNewToken(WRONG_TOKEN));
+
     visitor.visitStatement(node);
-    errors.forEach(errs -> System.out.println(errs.getSuggestion()));
+
     assertEquals(2, errors.size());
     assertEquals("Misspelled word, maybe you want to put MOVE", errors.get(1).getSuggestion());
   }
 
   private Token createNewToken(String text) {
-    return new CommonToken(0, text);
+    return new CustomToken(10, 10, text, 10, 10);
   }
 }
