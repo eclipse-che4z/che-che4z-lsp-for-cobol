@@ -22,6 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
   TestFormatTrim.class,
   TestSyntaxError.class,
+  TestSkipStatement.class,
   TestVaryingCorrect.class,
   AnalyzeCopybookCaching.class,
   TestPerformUntilCorrect.class,

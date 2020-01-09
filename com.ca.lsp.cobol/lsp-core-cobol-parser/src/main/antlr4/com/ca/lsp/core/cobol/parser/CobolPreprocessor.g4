@@ -74,7 +74,7 @@ paragraphs2
    ;
 
 sentence
-   : statement+ DOT_FS
+   : (statement+ DOT_FS) | skipNoStatement+
    ;
 
 //all the possible combinations to form a statement, super-nongreddy
@@ -83,7 +83,7 @@ statement
      continueStatement | deleteStatement | disableStatement | displayStatement | divideStatement |  enableStatement | entryStatement | evaluateStatement |
      exitStatement | generateStatement | gobackStatement | goStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement |
      multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement |
-     searchStatement | sendStatement | setStatement | skipNoStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement |
+     searchStatement | sendStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement |
      titleStatement | unstringStatement | useStatement | writeStatement | xmlStatement |execSqlStatement | execSqlImsStatement | execCicsStatement | copyStatement
    ;
 
