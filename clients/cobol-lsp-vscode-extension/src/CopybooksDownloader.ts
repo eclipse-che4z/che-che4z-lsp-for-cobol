@@ -25,6 +25,7 @@ const SETTINGS_ROOT = "cobol-language-support";
 export class CopybooksDownloader {
     public constructor(private zoweApi: ZoweApi) { }
 
+    // tslint:disable-next-line: cognitive-complexity
     public async downloadCopyBooks(copybooks: string[]) {
         if (vscode.workspace.workspaceFolders.length === 0) {
             vscode.window.showErrorMessage("No workspace folder opened.");
@@ -35,22 +36,30 @@ export class CopybooksDownloader {
         if (!profile) {
             return;
         }
-        for (const ds of await this.listPathDatasets()) {
-            try {
-                const members: string[] = await this.zoweApi.listMembers(ds, profile);
-                for (const member of members) {
-                    if (cb.has(member)) {
-                        await this.downloadCopybook(ds, member, profile);
-                        cb.delete(member);
-                        if (cb.size === 0) {
-                            return;
+        vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Notification,
+                title: "Fetching copybooks",
+            },
+            async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
+                for (const ds of await this.listPathDatasets()) {
+                    progress.report({ message: "Looking in " + ds + ". " + cb.size + " copybook(s) left." });
+                    try {
+                        const members: string[] = await this.zoweApi.listMembers(ds, profile);
+                        for (const member of members) {
+                            if (cb.has(member)) {
+                                await this.downloadCopybook(ds, member, profile);
+                                cb.delete(member);
+                                if (cb.size === 0) {
+                                    return;
+                                }
+                            }
                         }
+                    } catch (e) {
+                        await vscode.window.showErrorMessage(e.toString());
                     }
                 }
-            } catch (e) {
-                await vscode.window.showErrorMessage(e.toString());
-            }
-        }
+            });
     }
 
     private async downloadCopybook(dataset: string, copybook: string, profile: ZOSMFProfile) {
@@ -90,7 +99,7 @@ export class CopybooksDownloader {
                 label: e.name,
                 picked: e.default,
                 value: e,
-            }
+            };
         });
 
         // FIXME rewrite without value 'hack'
