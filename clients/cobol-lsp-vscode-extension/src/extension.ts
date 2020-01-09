@@ -22,9 +22,11 @@ import {
 } from "vscode-languageclient/lib/main";
 import { CopybooksDownloader, DEPENDENCIES_FOLDER } from "./CopybooksDownloader";
 import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
+import { ZoweApi } from "./ZoweApi";
 
 export async function activate(context: ExtensionContext) {
-    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader();
+    const zoweApi: ZoweApi = new ZoweApi();
+    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(zoweApi);
 
     // path resolved to identify the location of the LSP server into the extension
     const extPath = extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
