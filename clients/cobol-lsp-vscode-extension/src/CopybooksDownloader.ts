@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { ZoweApi, ZOSMFProfile } from "./ZoweApi";
 
 export const DEPENDENCIES_FOLDER: string = ".cobdeps";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
@@ -8,6 +9,8 @@ export const COPYBOOKS_FOLDER: string = ".copybooks";
 const SETTINGS_ROOT = "cobol-language-support";
 
 export class CopybooksDownloader {
+    public constructor(private zoweApi: ZoweApi) { }
+
     public async downloadCopyBooks(copybooks: string[]) {
         const cb: Set<string> = new Set(copybooks);
         const profile = await this.askProfile();
@@ -54,11 +57,23 @@ export class CopybooksDownloader {
 
     private async askProfile(): Promise<string> {
         // TODO list all
-        const profiles: string[] = ["Default profile (1st)", "Profile 2"];
-        // TODO If 0 - error
-        if (profiles.length === 1) {
-            return profiles[0];
+        const profiles: ZOSMFProfile[] = this.zoweApi.listZOSMFProfiles();
+        if (profiles.length === 0) {
+            // TODO mey be replace with throw
+            await vscode.window.showErrorMessage("Zowe profile is missing.");
+            return undefined;
         }
-        return await vscode.window.showQuickPick(profiles, { placeHolder: profiles[0], canPickMany: false });
+        if (profiles.length === 1) {
+            return profiles[0].name;
+        }
+        const items: vscode.QuickPickItem[] = profiles.map(e => {
+            return {
+                description: e.username + "@" + e.host + ":" + e.port,
+                label: e.name,
+                picked: e.default,
+            }
+        });
+
+        return (await vscode.window.showQuickPick(items, { placeHolder: items[0].label, canPickMany: false })).label;
     }
 }
