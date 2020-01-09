@@ -15,20 +15,26 @@ export class CopybooksDownloader {
         const cb: Set<string> = new Set(copybooks);
         const profile = await this.askProfile();
         for (const ds of await this.listPathDatasets()) {
-            const members: string[] = this.listMembers(ds, profile);
-            for (const member of members) {
-                if (cb.has(member)) {
-                    await this.downloadCopybook(ds, member, profile);
-                    cb.delete(member);
-                    if (cb.size === 0) {
-                        return;
+            try {
+                const members: string[] = await this.zoweApi.listMembers(ds, profile);
+                // TODO remove
+                console.log(members);
+                for (const member of members) {
+                    if (cb.has(member)) {
+                        await this.downloadCopybook(ds, member, profile);
+                        cb.delete(member);
+                        if (cb.size === 0) {
+                            return;
+                        }
                     }
                 }
+            } catch (e) {
+                await vscode.window.showErrorMessage(e.toString());
             }
         }
     }
 
-    private async downloadCopybook(dataset: string, copybook: string, profile: string) {
+    private async downloadCopybook(dataset: string, copybook: string, profile: ZOSMFProfile) {
         // TOOO error if no workspace
         const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
         const copybookDirPath = path.join(rootPath, COPYBOOKS_FOLDER, dataset);
@@ -41,11 +47,6 @@ export class CopybooksDownloader {
         }
     }
 
-    private listMembers(dataset: string, profile: string): string[] {
-        // TODO
-        return ["CPY1", "CPY2"];
-    }
-
     private async listPathDatasets(): Promise<string[]> {
         if (!vscode.workspace.getConfiguration(SETTINGS_ROOT).has("paths")) {
             // TODO mey be replace with throw
@@ -55,7 +56,7 @@ export class CopybooksDownloader {
         return vscode.workspace.getConfiguration(SETTINGS_ROOT).get("paths");
     }
 
-    private async askProfile(): Promise<string> {
+    private async askProfile(): Promise<ZOSMFProfile> {
         // TODO list all
         const profiles: ZOSMFProfile[] = this.zoweApi.listZOSMFProfiles();
         if (profiles.length === 0) {
@@ -64,16 +65,19 @@ export class CopybooksDownloader {
             return undefined;
         }
         if (profiles.length === 1) {
-            return profiles[0].name;
+            return profiles[0];
         }
         const items: vscode.QuickPickItem[] = profiles.map(e => {
             return {
                 description: e.username + "@" + e.host + ":" + e.port,
                 label: e.name,
                 picked: e.default,
+                value: e,
             }
         });
 
-        return (await vscode.window.showQuickPick(items, { placeHolder: items[0].label, canPickMany: false })).label;
+        // FIXME rewrite without value 'hack'
+        // tslint:disable-next-line: no-string-literal
+        return (await vscode.window.showQuickPick(items, { placeHolder: items[0].label, canPickMany: false }))["value"];
     }
 }
