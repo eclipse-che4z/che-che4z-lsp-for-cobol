@@ -19,6 +19,7 @@ import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReaderDelegate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 
 public class CobolLineReaderImpl implements CobolLineReader {
   private static final int INDICATOR_AREA_INDEX = 6;
+
   private PreprocessorListener listener;
   private String documentURI;
 
@@ -69,10 +71,12 @@ public class CobolLineReaderImpl implements CobolLineReader {
       final CobolSourceFormat format,
       final CobolParserParams params) {
     final Pattern pattern = format.getPattern();
-    final Matcher matcher = pattern.matcher(line);
 
     CobolLine cobolLine = new CobolLine();
 
+    line = getDelegate().apply(line);
+
+    final Matcher matcher = pattern.matcher(line);
     line = checkFormatCorrect(line, lineNumber, format, matcher);
 
     if (line.length() > 0) {
@@ -148,6 +152,10 @@ public class CobolLineReaderImpl implements CobolLineReader {
       line = line.substring(0, line.length() - errorLength);
     }
     return line;
+  }
+
+  private CobolLineReaderDelegate getDelegate() {
+    return new CompilerDirectivesTransformation();
   }
 
   private void registerFormatError(

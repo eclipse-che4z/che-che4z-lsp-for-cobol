@@ -48,7 +48,9 @@ public interface Completion {
    * @return the description for the label or null if not resolved
    */
   @Nullable
-  String tryResolve(String label);
+  default String tryResolve(@Nonnull String label) {
+    return null;
+  }
 
   /**
    * Get a prefix for the completion item to apply sort with the expected order

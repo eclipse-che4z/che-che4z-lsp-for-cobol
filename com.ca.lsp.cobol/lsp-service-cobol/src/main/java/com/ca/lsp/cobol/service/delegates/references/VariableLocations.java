@@ -16,22 +16,26 @@ package com.ca.lsp.cobol.service.delegates.references;
 import com.ca.lsp.cobol.service.MyDocumentModel;
 import org.eclipse.lsp4j.Location;
 
+import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Map;
 
-class VariableReferences extends AbstractReferences {
+/** This class is a provider for locations of variables defined and/or used in the document */
+public class VariableLocations implements SemanticLocations {
+  @Nonnull
   @Override
-  List<Location> retrieveReferenceLocations(MyDocumentModel document, String token, String uri) {
-    return retrieveLocations(document.getAnalysisResult().getVariableUsages(), token, uri);
+  public Map<String, List<Location>> references(@Nonnull MyDocumentModel document) {
+    return document.getAnalysisResult().getVariableUsages();
+  }
+
+  @Nonnull
+  @Override
+  public Map<String, List<Location>> definitions(@Nonnull MyDocumentModel document) {
+    return document.getAnalysisResult().getVariableDefinitions();
   }
 
   @Override
-  List<Location> retrieveDefinitionLocations(MyDocumentModel document, String token, String uri) {
-    return retrieveLocations(document.getAnalysisResult().getVariableDefinitions(), token, uri);
-  }
-
-
-  @Override
-  boolean providerContainsToken(MyDocumentModel document, String token) {
+  public boolean containsToken(@Nonnull MyDocumentModel document, @Nonnull String token) {
     return document.getAnalysisResult().getVariableDefinitions().keySet().stream()
         .anyMatch(token::equalsIgnoreCase);
   }

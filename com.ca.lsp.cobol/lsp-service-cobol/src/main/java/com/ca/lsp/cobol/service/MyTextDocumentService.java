@@ -17,8 +17,7 @@ package com.ca.lsp.cobol.service;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.completions.Completions;
 import com.ca.lsp.cobol.service.delegates.formations.Formations;
-import com.ca.lsp.cobol.service.delegates.references.Highlights;
-import com.ca.lsp.cobol.service.delegates.references.References;
+import com.ca.lsp.cobol.service.delegates.references.Occurrences;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.google.inject.Inject;
@@ -54,17 +53,20 @@ public class MyTextDocumentService implements TextDocumentService {
   private LanguageEngineFacade engine;
   private Formations formations;
   private Completions completions;
+  private Occurrences occurrences;
 
   @Inject
   public MyTextDocumentService(
       Communications communications,
       LanguageEngineFacade engine,
       Formations formations,
-      Completions completions) {
+      Completions completions,
+      Occurrences occurrences) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
     this.completions = completions;
+    this.occurrences = occurrences;
   }
 
   Map<String, MyDocumentModel> getDocs() {
@@ -94,7 +96,7 @@ public class MyTextDocumentService implements TextDocumentService {
       TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
     return CompletableFuture.<List<? extends Location>>supplyAsync(
-            () -> References.findDefinition(docs.get(uri), position))
+            () -> occurrences.findDefinitions(docs.get(uri), position))
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("definitions resolving", uri)));
   }
@@ -103,7 +105,7 @@ public class MyTextDocumentService implements TextDocumentService {
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
     String uri = params.getTextDocument().getUri();
     return CompletableFuture.<List<? extends Location>>supplyAsync(
-            () -> References.findReferences(docs.get(uri), params, params.getContext()))
+            () -> occurrences.findReferences(docs.get(uri), params, params.getContext()))
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("references resolving", uri)));
   }
@@ -113,7 +115,7 @@ public class MyTextDocumentService implements TextDocumentService {
       TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
     return CompletableFuture.<List<? extends DocumentHighlight>>supplyAsync(
-            () -> Highlights.findHighlights(docs.get(uri), position))
+            () -> occurrences.findHighlights(docs.get(uri), position))
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("document highlighting", uri)));
   }
