@@ -31,6 +31,25 @@ export class ZoweApi {
         return profiles;
     }
 
+    public async fetchMember(dataset: string, member: string, profile: ZOSMFProfile): Promise<string> {
+        const headers = {
+            "Authorization": "Basic " + Buffer.from(profile.username + ":" + profile.password).toString("base64"),
+            "Content-Type": "text/plain; charset=UTF-8",
+            "X-CSRF-ZOSMF-HEADER": "",
+        };
+        // default should be https
+        const rpath = `/zosmf/restfiles/ds/${dataset}(${member})`;
+        const url = `https://${profile.host}:${profile.port}${rpath}`;
+        return (await this.doRequest(url, {
+            headers,
+            hostname: profile.host,
+            method: "GET",
+            path: rpath,
+            port: profile.port,
+            rejectUnauthorized: profile.rejectUnauthorized,
+        })).body;
+    }
+
     public async listMembers(dataset: string, profile: ZOSMFProfile): Promise<string[]> {
         const headers = {
             "Authorization": "Basic " + Buffer.from(profile.username + ":" + profile.password).toString("base64"),

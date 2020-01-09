@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { ZoweApi, ZOSMFProfile } from "./ZoweApi";
+import { ZOSMFProfile, ZoweApi } from "./ZoweApi";
 
 export const DEPENDENCIES_FOLDER: string = ".cobdeps";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
@@ -12,13 +12,18 @@ export class CopybooksDownloader {
     public constructor(private zoweApi: ZoweApi) { }
 
     public async downloadCopyBooks(copybooks: string[]) {
+        if (vscode.workspace.workspaceFolders.length === 0) {
+            vscode.window.showErrorMessage("No workspace folder opened.");
+            return;
+        }
         const cb: Set<string> = new Set(copybooks);
         const profile = await this.askProfile();
+        if (!profile) {
+            return;
+        }
         for (const ds of await this.listPathDatasets()) {
             try {
                 const members: string[] = await this.zoweApi.listMembers(ds, profile);
-                // TODO remove
-                console.log(members);
                 for (const member of members) {
                     if (cb.has(member)) {
                         await this.downloadCopybook(ds, member, profile);
@@ -35,21 +40,20 @@ export class CopybooksDownloader {
     }
 
     private async downloadCopybook(dataset: string, copybook: string, profile: ZOSMFProfile) {
-        // TOOO error if no workspace
         const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
         const copybookDirPath = path.join(rootPath, COPYBOOKS_FOLDER, dataset);
         const copybookPath = path.join(copybookDirPath, copybook + ".cpy");
 
         fs.mkdirSync(copybookDirPath, { recursive: true });
         if (!fs.existsSync(copybookPath)) {
-            // TODO download content of copybook and save it
-            fs.writeFileSync(copybookPath, "Hello, CopyBook");
+            const content = await this.zoweApi.fetchMember(dataset, copybook, profile);
+            fs.writeFileSync(copybookPath, content);
         }
     }
 
     private async listPathDatasets(): Promise<string[]> {
         if (!vscode.workspace.getConfiguration(SETTINGS_ROOT).has("paths")) {
-            // TODO mey be replace with throw
+            // TODO may be replace with throw
             await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
             return [];
         }
@@ -57,7 +61,6 @@ export class CopybooksDownloader {
     }
 
     private async askProfile(): Promise<ZOSMFProfile> {
-        // TODO list all
         const profiles: ZOSMFProfile[] = this.zoweApi.listZOSMFProfiles();
         if (profiles.length === 0) {
             // TODO mey be replace with throw
