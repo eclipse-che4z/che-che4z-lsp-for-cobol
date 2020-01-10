@@ -64,7 +64,6 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private static List<Diagnostic> convertErrors(List<SyntaxError> errors) {
     return errors.stream()
-        .peek(e -> log.info(e.toString()))
         .filter(errorOnlyFromCurrentDocument())
         .map(toDiagnostic())
         .collect(Collectors.toList());
