@@ -48,46 +48,46 @@ public class CopybookEventSubscribersTest extends DomainConfigurableTest {
   /** This test verify that the RequiredCopybook factory creates a new RequiredCopybook event */
   @Test
   public void testRequireSubscriberFactory() {
-    assertEquals(getREQCPY(), getRequiredSubscriber().getEventType().getHeader());
+    assertEquals(getREQCPY(), getRequiredSubscriberFromFactory().getEventType().getHeader());
   }
 
   /** This test verify that the FetchedCopybook factory creates a new FetchedCopybook event */
   @Test
   public void testFetchSubscriberFactory() {
-    assertEquals(getFETCHEDCPY(), getFetchedSubscriber().getEventType().getHeader());
+    assertEquals(getFETCHEDCPY(), getFetchedSubscriberFromFactory().getEventType().getHeader());
   }
 
   /** This test verify that the Unknown factory creates a new Unknown event */
   @Test
   public void testUnknownSubscriberFactory() {
-    assertEquals(getUNKNOWN(), getUnknownSubscriber().getEventType().getHeader());
+    assertEquals(getUNKNOWN(), getUnknownSubscriberFromFactory().getEventType().getHeader());
   }
 
   /** This test verify that a wrong factory isn't returned back. */
   @Test
   public void negativeTestSubscriberFactory() {
-    assertNotEquals(getREQCPY(), getFetchedSubscriber());
-    assertNotEquals(getUNKNOWN(), getFetchedSubscriber());
+    assertNotEquals(getREQCPY(), getFetchedSubscriberFromFactory());
+    assertNotEquals(getUNKNOWN(), getFetchedSubscriberFromFactory());
 
-    assertNotEquals(getFETCHEDCPY(), getRequiredSubscriber());
-    assertNotEquals(getUNKNOWN(), getRequiredSubscriber());
+    assertNotEquals(getFETCHEDCPY(), getRequiredSubscriberFromFactory());
+    assertNotEquals(getUNKNOWN(), getRequiredSubscriberFromFactory());
 
-    assertNotEquals(getREQCPY(), getUnknownSubscriber());
-    assertNotEquals(getFETCHEDCPY(), getFetchedSubscriber());
+    assertNotEquals(getREQCPY(), getUnknownSubscriberFromFactory());
+    assertNotEquals(getFETCHEDCPY(), getFetchedSubscriberFromFactory());
   }
 
-  private UnknownEventSubscriber getUnknownSubscriber() {
+  private UnknownEventSubscriber getUnknownSubscriberFromFactory() {
     return (UnknownEventSubscriber)
         SubscriberFactoryProvider.getFactory(DataEventType.UNKNOWN_EVENT).create(databusObserver);
   }
 
-  private RequiredCopybookEventSubscriber getRequiredSubscriber() {
+  private RequiredCopybookEventSubscriber getRequiredSubscriberFromFactory() {
     return (RequiredCopybookEventSubscriber)
         SubscriberFactoryProvider.getFactory(DataEventType.REQUIRED_COPYBOOK_EVENT)
             .create(databusObserver);
   }
 
-  private FetchedCopybookEventSubscriber getFetchedSubscriber() {
+  private FetchedCopybookEventSubscriber getFetchedSubscriberFromFactory() {
     return (FetchedCopybookEventSubscriber)
         SubscriberFactoryProvider.getFactory(DataEventType.FETCHED_COPYBOOK_EVENT)
             .create(databusObserver);
