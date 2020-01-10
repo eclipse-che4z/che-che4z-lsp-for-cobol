@@ -22,10 +22,7 @@ import com.ca.lsp.core.cobol.semantics.SubContext;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.*;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -44,6 +41,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final String WARNING_SRC_LABEL = "W";
   private static final String INFO_SRC_LABEL = "I";
   private static final String HINT_SRC_LABEL = "H";
+  private static final int ERR_POS_INDEX = 1;
 
   private CobolLanguageEngine engine;
 
@@ -84,7 +82,6 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
       diagnostic.setMessage(err.getSuggestion());
       diagnostic.setSource(setupSourceInfo(err.getSeverity()));
       diagnostic.setMessage(err.getSuggestion());
-
       diagnostic.setRange(convertRange(err.getPosition()));
       return diagnostic;
     };
@@ -111,13 +108,16 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   }
 
   private static Range convertRange(Position position) {
+    int positionLine = position.getLine() - ERR_POS_INDEX;
+    int cPosInLn = position.getCharPositionInLine();
+
     return new Range(
-        new org.eclipse.lsp4j.Position((position.getLine() - 1), position.getCharPositionInLine()),
+        new org.eclipse.lsp4j.Position(positionLine, cPosInLn),
         new org.eclipse.lsp4j.Position(
-            (position.getLine() - 1),
+            positionLine,
             ((position.getStopPosition() - position.getStartPosition())
-                + position.getCharPositionInLine()
-                + 1)));
+                + cPosInLn
+                + ERR_POS_INDEX)));
   }
 
   private AnalysisResult toAnalysisResult(ResultWithErrors<SemanticContext> result) {
