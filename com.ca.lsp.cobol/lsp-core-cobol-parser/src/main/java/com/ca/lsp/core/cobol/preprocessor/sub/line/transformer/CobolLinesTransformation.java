@@ -13,9 +13,10 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.transformer;
 
-import java.util.List;
-
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+
+import java.util.List;
 
 /**
  * Performs transformation operations on the given CobolLines. Requires FormatListener to raise or
@@ -23,5 +24,5 @@ import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
  */
 public interface CobolLinesTransformation {
 
-  List<CobolLine> transformLines(List<CobolLine> lines);
+  ResultWithErrors<List<CobolLine>> transformLines(List<CobolLine> lines);
 }

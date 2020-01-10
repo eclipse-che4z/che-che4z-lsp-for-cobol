@@ -13,8 +13,9 @@
  */
 package com.ca.lsp.core.cobol.engine;
 
-import com.ca.lsp.core.cobol.model.ProcessingResult;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -71,14 +72,14 @@ public class CobolLanguageEngineTest {
   @Test
   public void doCheckNegative() {
     CobolLanguageEngine engine = new CobolLanguageEngine(format);
-    ProcessingResult result = engine.run(NEGATIVE_TEXT);
+    ResultWithErrors<SemanticContext> result = engine.run(NEGATIVE_TEXT);
     assertEquals(11, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 
   @Test
   public void doCheckPositive() {
     CobolLanguageEngine engine = new CobolLanguageEngine(format);
-    ProcessingResult result = engine.run(POSITIVE_TEXT);
+    ResultWithErrors<SemanticContext> result = engine.run(POSITIVE_TEXT);
     assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 }

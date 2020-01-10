@@ -15,17 +15,18 @@ package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
 import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookDefinition;
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.CopySourceContext;
-import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
+import lombok.Getter;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -33,10 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_TAG;
@@ -51,20 +49,19 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private static final String RECURSION_DETECTED = "Recursive copybook declaration for: %s";
 
   private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
+  @Getter private final List<SyntaxError> errors = new ArrayList<>();
+
   private final BufferedTokenStream tokens;
   private final CobolSourceFormat format;
   private final SemanticContext semanticContext;
-  private final PreprocessorListener listener;
 
   CobolSemanticParserListenerImpl(
       final BufferedTokenStream tokens,
       final SemanticContext semanticContext,
-      final CobolSourceFormat format,
-      PreprocessorListener listener) {
+      final CobolSourceFormat format) {
     this.tokens = tokens;
     this.format = format;
     this.semanticContext = semanticContext;
-    this.listener = listener;
 
     contexts.push(new CobolDocumentContext());
   }
@@ -228,12 +225,12 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   @Nonnull
   private Consumer<Position> toSyntaxError(String copybookName) {
     return it ->
-        listener.syntaxError(
-            null,
-            it.getLine(),
-            it.getCharPositionInLine(),
-            String.format(RECURSION_DETECTED, copybookName),
-            copybookName.length());
+        errors.add(
+            SyntaxError.syntaxError()
+                .severity(1)
+                .suggestion(String.format(RECURSION_DETECTED, copybookName))
+                .position(it)
+                .build());
   }
 
   @Override

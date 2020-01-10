@@ -14,7 +14,6 @@
 package com.ca.lsp.core.cobol;
 
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngineTest;
-import com.ca.lsp.core.cobol.parser.listener.FormatListenerTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolCommentEntriesMarkerImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.ContinuationLineTransformationTest;
@@ -29,7 +28,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
   CobolLineReaderImplTest.class,
-  FormatListenerTest.class,
   ContinuationLineTransformationTest.class,
   CobolLanguageEngineTest.class,
   CobolCommentEntriesMarkerImplTest.class,
