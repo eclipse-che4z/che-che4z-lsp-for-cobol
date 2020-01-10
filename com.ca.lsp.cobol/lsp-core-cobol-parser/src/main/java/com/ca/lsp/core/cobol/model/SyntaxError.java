@@ -28,7 +28,7 @@ public class SyntaxError {
   private final String suggestion;
   private final int severity;
 
-  @Builder(builderMethodName = "syntaxerror")
+  @Builder(builderMethodName = "syntaxError")
   public SyntaxError(Position position, List<String> ruleStack, String suggestion, int severity) {
     this.position = position;
     this.ruleStack = ruleStack;

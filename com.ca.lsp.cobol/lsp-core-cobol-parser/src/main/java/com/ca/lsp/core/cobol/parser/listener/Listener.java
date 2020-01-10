@@ -67,7 +67,7 @@ public abstract class Listener {
     if (getErrorsPipe() != null) {
       getErrorsPipe()
           .add(
-              SyntaxError.syntaxerror()
+              SyntaxError.syntaxError()
                   .position(position)
                   .suggestion(msg)
                   .severity(severity)

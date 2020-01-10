@@ -49,7 +49,7 @@ public class VerboseListener extends BaseErrorListener {
               wrongToken.getLine(),
               wrongToken.getCharPositionInLine());
       errorspipe.add(
-          SyntaxError.syntaxerror()
+          SyntaxError.syntaxError()
               .position(position)
               .ruleStack(stack)
               .suggestion(msg)
@@ -61,7 +61,7 @@ public class VerboseListener extends BaseErrorListener {
       Position position =
           new Position(null, charPositionInLine, charPositionInLine, line, charPositionInLine);
       errorspipe.add(
-          SyntaxError.syntaxerror()
+          SyntaxError.syntaxError()
               .position(position)
               .ruleStack(stack)
               .suggestion(msg.concat(" on ").concat(stack.get(stack.size() - 1)))
