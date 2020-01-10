@@ -40,7 +40,7 @@ public class VariableDefinitionTest {
   final String VARNAME2 = "notCustom";
   final String LEVEL_NUMBER = "05";
   final Variable VARIABLE = new Variable(LEVEL_NUMBER, VARNAME2);
-  final Position VARIABLE_POSITION = new Position("", 1, 1, 1, 1, 1);
+  final Position VARIABLE_POSITION = new Position("", 1, 1, 1, 1);
 
   @Test
   public void testCheckIfVariableNotDefined() {

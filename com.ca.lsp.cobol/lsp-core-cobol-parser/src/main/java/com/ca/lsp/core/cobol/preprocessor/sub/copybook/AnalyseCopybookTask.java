@@ -27,9 +27,9 @@ import com.broadcom.lsp.domain.cobol.model.RequiredCopybookEvent;
 import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
-import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
@@ -38,12 +38,13 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RecursiveTask;
 
 @Slf4j
-public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
+public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<CopybookSemanticContext>>
     implements DataBusObserver<FetchedCopybookEvent> {
 
   private transient DataBusBroker databus =
@@ -53,19 +54,16 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
   private transient CopybookDefinition copybookDefinition;
   private transient List<CopybookDefinition> copybookUsageTracker;
   private final CobolSourceFormat format;
-  private transient PreprocessorListener listener;
   private transient CompletableFuture<String> waitForResolving;
 
   public AnalyseCopybookTask(
       CopybookDefinition copybookDefinition,
       List<CopybookDefinition> copybookUsageTracker,
-      CobolSourceFormat format,
-      PreprocessorListener listener) {
+      CobolSourceFormat format) {
     this.copybookDefinition = copybookDefinition;
     copyBookName = copybookDefinition.getName();
     this.copybookUsageTracker = copybookUsageTracker;
     this.format = format;
-    this.listener = listener;
     waitForResolving = new CompletableFuture<>();
   }
 
@@ -79,8 +77,8 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
    * @return SemanticContext populated for copybooks
    */
   @Override
-  public CopybookSemanticContext compute() {
-    SemanticContext semanticContext;
+  public ResultWithErrors<CopybookSemanticContext> compute() {
+    ResultWithErrors<SemanticContext> semanticContext;
 
     if (isCopybookInCache(copyBookName)) {
       semanticContext = parseCopybookFromCache();
@@ -90,11 +88,17 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
       semanticContext = parseCopybook();
       databus.unSubscribe(subscriber);
     }
-    return new CopybookSemanticContext(copyBookName, semanticContext);
+    return new ResultWithErrors<>(
+        new CopybookSemanticContext(
+            copyBookName,
+            Optional.ofNullable(semanticContext).map(ResultWithErrors::getResult).orElse(null)),
+        Optional.ofNullable(semanticContext)
+            .map(ResultWithErrors::getErrors)
+            .orElse(Collections.emptyList()));
   }
 
-  private SemanticContext parseCopybook() {
-    SemanticContext semanticContext = null;
+  private ResultWithErrors<SemanticContext> parseCopybook() {
+    ResultWithErrors<SemanticContext> semanticContext = null;
     String content = null;
     try {
       content = waitForResolving.get();
@@ -123,7 +127,7 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
             .build());
   }
 
-  private SemanticContext parseCopybookFromCache() {
+  private ResultWithErrors<SemanticContext> parseCopybookFromCache() {
     return parseCopybook(getContentFromCache());
   }
 
@@ -134,17 +138,18 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
     return cachedData.getContent();
   }
 
-  private SemanticContext parseCopybook(String content) {
+  private ResultWithErrors<SemanticContext> parseCopybook(String content) {
     List<CopybookDefinition> nextTrackerIteration = new ArrayList<>(copybookUsageTracker);
     nextTrackerIteration.add(copybookDefinition);
-    PreprocessedInput preprocessedInput =
+    ResultWithErrors<PreprocessedInput> preprocessedInput =
         getParser()
             .process(
                 content,
                 format,
                 createParams(),
                 new SemanticContext(Collections.unmodifiableList(nextTrackerIteration)));
-    return preprocessedInput.getSemanticContext();
+    return new ResultWithErrors<>(
+        preprocessedInput.getResult().getSemanticContext(), preprocessedInput.getErrors());
   }
 
   private CobolParserParams createParams() {
@@ -154,9 +159,7 @@ public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
   }
 
   private CobolPreprocessorImpl getParser() {
-    CobolPreprocessorImpl cobolPreprocessor = new CobolPreprocessorImpl();
-    cobolPreprocessor.setListener(listener);
-    return cobolPreprocessor;
+    return new CobolPreprocessorImpl();
   }
 
   @Override

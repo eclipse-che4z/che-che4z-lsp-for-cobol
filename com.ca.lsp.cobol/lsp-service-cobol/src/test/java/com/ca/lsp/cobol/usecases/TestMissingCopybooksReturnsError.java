@@ -54,6 +54,6 @@ public class TestMissingCopybooksReturnsError extends NegativeUseCase {
     assertEquals(4, range.getStart().getLine());
     assertEquals(13, range.getStart().getCharacter());
     assertEquals(4, range.getEnd().getLine());
-    assertEquals(30, range.getEnd().getCharacter());
+    assertEquals(29, range.getEnd().getCharacter());
   }
 }

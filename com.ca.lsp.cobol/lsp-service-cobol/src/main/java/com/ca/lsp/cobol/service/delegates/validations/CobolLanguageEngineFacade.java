@@ -15,8 +15,9 @@ package com.ca.lsp.cobol.service.delegates.validations;
 
 import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
-import com.ca.lsp.core.cobol.model.ProcessingResult;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -119,13 +120,13 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
                 + ERR_POS_INDEX)));
   }
 
-  private AnalysisResult toAnalysisResult(ProcessingResult result) {
+  private AnalysisResult toAnalysisResult(ResultWithErrors<SemanticContext> result) {
     return new AnalysisResult(
         convertErrors(result.getErrors()),
-        retrieveDefinitions(result.getSemanticContext().getVariables()),
-        retrieveUsages(result.getSemanticContext().getVariables()),
-        retrieveDefinitions(result.getSemanticContext().getParagraphs()),
-        retrieveUsages(result.getSemanticContext().getParagraphs()));
+        retrieveDefinitions(result.getResult().getVariables()),
+        retrieveUsages(result.getResult().getVariables()),
+        retrieveDefinitions(result.getResult().getParagraphs()),
+        retrieveUsages(result.getResult().getParagraphs()));
   }
 
   private Map<String, List<Location>> retrieveDefinitions(SubContext<?> context) {
