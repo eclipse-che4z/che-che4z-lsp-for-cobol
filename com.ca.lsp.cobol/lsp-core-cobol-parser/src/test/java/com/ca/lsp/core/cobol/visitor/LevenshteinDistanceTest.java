@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class LevenshteinDistanceTest {
   private CobolVisitor visitor = new CobolVisitor();
@@ -36,7 +37,7 @@ public class LevenshteinDistanceTest {
 
   @Test
   public void testDistance() {
-    errors.add(new SyntaxError(new Position("", 1, 1, 1, 1, 1), null, 2, "", 2));
+    errors.add(new SyntaxError(new Position("", 1, 1, 1, 1), null, "", 2));
     visitor.setSemanticErrors(new SemanticListener(errors));
 
     CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
