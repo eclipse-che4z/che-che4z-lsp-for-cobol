@@ -15,7 +15,6 @@ package com.ca.lsp.core.cobol.preprocessor;
 
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 
 public interface CobolPreprocessor {
@@ -23,8 +22,5 @@ public interface CobolPreprocessor {
   ResultWithErrors<PreprocessedInput> process(String cobolCode, CobolSourceFormat format);
 
   ResultWithErrors<PreprocessedInput> process(
-      String cobolCode,
-      CobolSourceFormat format,
-      CobolParserParams params,
-      SemanticContext semanticContext);
+      String cobolCode, CobolSourceFormat format, SemanticContext semanticContext);
 }

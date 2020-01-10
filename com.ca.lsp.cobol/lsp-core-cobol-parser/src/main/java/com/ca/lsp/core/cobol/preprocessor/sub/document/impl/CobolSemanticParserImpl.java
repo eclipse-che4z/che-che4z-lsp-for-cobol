@@ -18,7 +18,6 @@ import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
@@ -45,7 +44,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
   @Override
   public ResultWithErrors<PreprocessedInput> processLines(
-      final String code, final CobolSourceFormat format, final CobolParserParams params) {
+      final String code, final CobolSourceFormat format) {
     // run the lexer
     final CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     // get a list of matched tokens

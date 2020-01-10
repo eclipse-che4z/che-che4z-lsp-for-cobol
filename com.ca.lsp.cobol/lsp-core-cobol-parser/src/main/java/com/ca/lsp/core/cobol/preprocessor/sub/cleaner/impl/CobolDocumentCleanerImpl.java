@@ -16,7 +16,6 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.cleaner.impl;
 
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.parser.CobolCleanerLexer;
 import com.ca.lsp.core.cobol.parser.CobolCleanerParser;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
@@ -49,12 +48,12 @@ public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
       };
 
   @Override
-  public String cleanDocument(String text, CobolSourceFormat format, CobolParserParams params) {
+  public String cleanDocument(String text, CobolSourceFormat format) {
     final boolean requiresProcessorExecution = containsTrigger(text, TRIGGERS);
     final String result;
 
     if (requiresProcessorExecution) {
-      result = cleanWithParser(text, format, params);
+      result = cleanWithParser(text, format);
     } else {
       result = text;
     }
@@ -78,30 +77,25 @@ public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
     return result;
   }
 
-  private String cleanWithParser(
-      final String code, final CobolSourceFormat format, CobolParserParams params) {
+  private String cleanWithParser(final String code, final CobolSourceFormat format) {
     // run the lexer
     List<SyntaxError> errors = new ArrayList<>();
 
     // run the lexer
     final CobolCleanerLexer lexer = new CobolCleanerLexer(CharStreams.fromString(code));
 
-    if (!params.getIgnoreSyntaxErrors()) {
-      // register an error listener, so that preprocessing stops on errors
-      lexer.removeErrorListeners();
-      lexer.addErrorListener(new VerboseListener(errors));
-    }
+    // register an error listener, so that preprocessing stops on errors
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(new VerboseListener(errors));
 
     // get a list of matched tokens
     final CommonTokenStream tokens = new CommonTokenStream(lexer);
 
     // pass the tokens to the parser
     final CobolCleanerParser parser = new CobolCleanerParser(tokens);
-    if (!params.getIgnoreSyntaxErrors()) {
-      // register an error listener, so that preprocessing stops on errors
-      parser.removeErrorListeners();
-      parser.addErrorListener(new VerboseListener(errors));
-    }
+    // register an error listener, so that preprocessing stops on errors
+    parser.removeErrorListeners();
+    parser.addErrorListener(new VerboseListener(errors));
 
     // specify our entry point
     CobolCleanerParser.StartCleanContext startRule = parser.startClean();
