@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.parser.listener;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.cobol.event.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import org.antlr.v4.runtime.*;
 

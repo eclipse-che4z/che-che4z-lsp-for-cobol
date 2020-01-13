@@ -16,12 +16,11 @@
 
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.domain.cobol.databus.api.AbstractDataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.api.DataBusObserver;
-import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
-import com.broadcom.lsp.domain.cobol.model.DataEvent;
-import com.broadcom.lsp.domain.cobol.model.DataEventType;
-import com.broadcom.lsp.domain.cobol.model.RegistryId;
+import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
+import com.broadcom.lsp.domain.cobol.databus.model.RegistryId;
+import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
+import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -46,7 +45,7 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
   @NonNull private final CopybookRepositoryLRU cpyRepo;
 
   @Inject
-  public DefaultDataBusBroker(
+  DefaultDataBusBroker(
       @Named("ASYNC-MESS-DISPATCHER") int numberOfThreads, CopybookRepositoryLRU cpyRepo) {
     super(numberOfThreads);
     this.cpyRepo = cpyRepo;
@@ -85,7 +84,8 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
 
   @Override
   @SneakyThrows
-  public @NonNull S subscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer) {
+  public @NonNull S subscribe(
+      @NonNull DataEventType eventType, @NonNull CopybookObserver observer) {
     return subscribe(getSubscriber(eventType, observer));
   }
 
@@ -113,7 +113,9 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
   @Override
   @SneakyThrows
   public CopybookStorable getData(@NonNull long uuid) {
-    return getCopybookRepo().getCopybookStorableFromCache(uuid).orElseThrow(NoSuchElementException::new);
+    return getCopybookRepo()
+        .getCopybookStorableFromCache(uuid)
+        .orElseThrow(NoSuchElementException::new);
   }
 
   @Override
@@ -132,6 +134,7 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
     return getCopybookRepo().lastItem();
   }
 
+  @Override
   @SneakyThrows
   public void invalidateCache() {
     getCopybookRepo().invalidateCache();

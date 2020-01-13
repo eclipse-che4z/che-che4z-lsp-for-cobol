@@ -15,7 +15,7 @@
  */
 package com.ca.lsp.core.cobol.semantics;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.cobol.event.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
 import org.junit.Before;
 import org.junit.Test;

@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.cobol.service.delegates.validations;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.cobol.event.model.Position;
 import com.ca.lsp.core.cobol.LanguageEngineFactory;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ProcessingResult;

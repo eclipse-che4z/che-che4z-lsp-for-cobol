@@ -16,7 +16,7 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.cobol.event.model.Position;
 import com.google.common.collect.Multimap;
 
 import java.util.Collection;

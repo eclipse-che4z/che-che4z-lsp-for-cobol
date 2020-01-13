@@ -17,7 +17,7 @@
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
 import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
-import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
+import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -28,7 +28,9 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -63,9 +65,8 @@ public class CopybookRepositoryLRU implements CopybookRepository {
   public Optional<CopybookStorable> getCopybookStorableFromCache(@NonNull long uuid) {
     ArrayList<CopybookStorable> shallowCpy = (ArrayList<CopybookStorable>) cpyRepo.clone();
     Optional<CopybookStorable> cpy =
-            shallowCpy.stream().filter(copy -> uuid == copy.getId()).findAny();
-    if (cpy.isPresent())
-      return cpy.map(SerializationUtils::clone);
+        shallowCpy.stream().filter(copy -> uuid == copy.getId()).findAny();
+    if (cpy.isPresent()) return cpy.map(SerializationUtils::clone);
     return cpy;
   }
 

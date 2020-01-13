@@ -18,13 +18,11 @@ package com.broadcom.impl;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.DataEvent;
-import com.broadcom.lsp.domain.cobol.model.DataEventType;
-import com.broadcom.lsp.domain.cobol.model.RequiredCopybookEvent;
-import lombok.SneakyThrows;
+import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

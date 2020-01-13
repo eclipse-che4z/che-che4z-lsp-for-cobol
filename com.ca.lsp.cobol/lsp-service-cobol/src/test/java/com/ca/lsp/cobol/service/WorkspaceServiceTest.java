@@ -18,7 +18,7 @@ package com.ca.lsp.cobol.service;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.cdi.module.service.ServiceModule;
-import com.broadcom.lsp.domain.cobol.model.FetchedCopybookEvent;
+import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.junit.*;
@@ -158,7 +158,9 @@ public class WorkspaceServiceTest {
     String copybookContent = cobolWorkspaceService.getContentByCopybookName(CPY_OUTER_NAME_ONLY);
     FetchedCopybookEvent fetchedCopybookEvent =
         FetchedCopybookEvent.builder().name(CPY_OUTER_NAME_ONLY).content(copybookContent).build();
-    assertTrue(fetchedCopybookEvent.getName().length() > 0 && fetchedCopybookEvent.getContent().length() > 0);
+    assertTrue(
+        fetchedCopybookEvent.getName().length() > 0
+            && fetchedCopybookEvent.getContent().length() > 0);
   }
 
   private URI getWorkspaceFolderPath() {
