@@ -35,8 +35,4 @@ public class SyntaxError {
     this.suggestion = suggestion;
     this.severity = severity;
   }
-
-  public String printSyntaxError() {
-    return super.toString().concat(toString());
-  }
 }

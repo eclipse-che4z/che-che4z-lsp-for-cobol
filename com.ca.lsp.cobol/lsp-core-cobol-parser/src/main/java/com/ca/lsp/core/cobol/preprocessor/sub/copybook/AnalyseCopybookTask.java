@@ -28,8 +28,6 @@ import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.params.CobolParserParams;
-import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
@@ -146,16 +144,9 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
             .process(
                 content,
                 format,
-                createParams(),
                 new SemanticContext(Collections.unmodifiableList(nextTrackerIteration)));
     return new ResultWithErrors<>(
         preprocessedInput.getResult().getSemanticContext(), preprocessedInput.getErrors());
-  }
-
-  private CobolParserParams createParams() {
-    CobolParserParamsImpl cobolParserParams = new CobolParserParamsImpl();
-    cobolParserParams.setIgnoreSyntaxErrors(true);
-    return cobolParserParams;
   }
 
   private CobolPreprocessorImpl getParser() {
