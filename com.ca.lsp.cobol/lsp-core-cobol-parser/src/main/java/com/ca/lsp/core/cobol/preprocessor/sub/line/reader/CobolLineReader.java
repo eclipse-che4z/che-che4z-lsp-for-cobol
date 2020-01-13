@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.reader;
 
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
@@ -21,9 +22,6 @@ import java.util.List;
 
 /** Preprocessor, which analyzes and processes line indicators. */
 public interface CobolLineReader {
-
-  CobolLine parseLine(
-      String line, int lineNumber, CobolSourceFormat format, CobolParserParams params);
-
-  List<CobolLine> processLines(String lines, CobolSourceFormat format, CobolParserParams params);
+  ResultWithErrors<List<CobolLine>> processLines(
+      String lines, CobolSourceFormat format, CobolParserParams params);
 }

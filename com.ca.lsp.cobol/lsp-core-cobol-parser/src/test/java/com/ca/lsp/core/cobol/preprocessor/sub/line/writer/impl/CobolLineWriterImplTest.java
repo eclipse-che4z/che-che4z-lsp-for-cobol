@@ -13,16 +13,15 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.writer.impl;
 
-import static org.junit.Assert.assertEquals;
+import com.ca.lsp.core.cobol.AbstractCobolLinePreprocessorTest;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
+import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.CobolLineWriter;
+import org.junit.Test;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import com.ca.lsp.core.cobol.AbstractCobolLinePreprocessorTest;
-import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.CobolLineWriter;
+import static org.junit.Assert.assertEquals;
 
 public class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
   private static final String TEXT_TO_TEST =
@@ -46,15 +45,11 @@ public class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
           + "\r\n"
           + "                       MOVE 'asd' NEXT LINE\r\n";
 
-  @Before
-  public void eraseListener() {
-    super.eraseListener();
-  }
-
   @Test
   public void test() {
-    List<CobolLine> cobolLines = super.processText(TEXT_TO_TEST);
+    ResultWithErrors<List<CobolLine>> result = super.processText(TEXT_TO_TEST);
     CobolLineWriter writer = new CobolLineWriterImpl();
-    assertEquals(EXPECTED, writer.serialize(cobolLines));
+    assertEquals(EXPECTED, writer.serialize(result.getResult()));
+    assertEquals(0, result.getErrors().size());
   }
 }

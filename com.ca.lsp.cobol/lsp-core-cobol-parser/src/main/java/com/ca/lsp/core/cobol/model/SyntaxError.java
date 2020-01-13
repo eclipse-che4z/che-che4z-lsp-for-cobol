@@ -25,16 +25,13 @@ import java.util.List;
 public class SyntaxError {
   private final Position position;
   private final List<String> ruleStack;
-  private final int type;
   private final String suggestion;
   private final int severity;
 
-  @Builder(builderMethodName = "syntaxerror")
-  public SyntaxError(
-      Position position, List<String> ruleStack, int type, String suggestion, int severity) {
+  @Builder(builderMethodName = "syntaxError")
+  public SyntaxError(Position position, List<String> ruleStack, String suggestion, int severity) {
     this.position = position;
     this.ruleStack = ruleStack;
-    this.type = type;
     this.suggestion = suggestion;
     this.severity = severity;
   }

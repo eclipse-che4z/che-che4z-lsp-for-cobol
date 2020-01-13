@@ -13,10 +13,15 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
+
+import java.util.List;
 
 public interface CobolSemanticParserListener extends CobolPreprocessorListener {
 
   CobolDocumentContext context();
+
+  List<SyntaxError> getErrors();
 }

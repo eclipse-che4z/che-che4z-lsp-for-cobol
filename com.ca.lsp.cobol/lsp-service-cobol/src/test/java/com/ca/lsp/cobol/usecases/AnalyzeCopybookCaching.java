@@ -35,8 +35,8 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
   private final String COPYBOOK_NAME = "copy";
   private final String COPYBOOK_CONTENT = "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
 
-  private final Position POSITION_FIRST_OCCURRENCE = new Position(null, 0, 0, 0, 0, 0);
-  private final Position POSITION_SECOND_OCCURRENCE = new Position(null, 10, 10, 10, 10, 10);
+  private final Position POSITION_FIRST_OCCURRENCE = new Position(null, 0, 0, 0, 0);
+  private final Position POSITION_SECOND_OCCURRENCE = new Position(null, 10, 10, 10, 10);
   private final Multimap<String, Position> paragraphDefinitions = HashMultimap.create();
 
   private final DefaultDataBusBroker databus =
@@ -110,8 +110,7 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
         new AnalyseCopybookTask(
             new CopybookDefinition(COPYBOOK_NAME, null, null),
             Collections.emptyList(),
-            FIXED,
-            null);
+            FIXED);
     analyseCopybookTask.compute();
   }
 }
