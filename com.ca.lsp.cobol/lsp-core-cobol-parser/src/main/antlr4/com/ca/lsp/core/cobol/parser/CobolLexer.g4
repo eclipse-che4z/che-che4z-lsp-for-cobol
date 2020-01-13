@@ -472,6 +472,7 @@ SIGN : S I G N;
 SIZE : S I Z E;
 SKIP1: S K I P '1';
 SKIP2: S K I P '2';
+SKIP3: S K I P '3';
 SORT : S O R T;
 SORT_CONTROL : S O R T MINUSCHAR C O N T R O L;
 SORT_CORE_SIZE : S O R T MINUSCHAR C O R E MINUSCHAR S I Z E;
@@ -610,8 +611,6 @@ COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
 COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
 WS : [ \t\f;]+ -> channel(HIDDEN);
 SEPARATOR : ', ' -> channel(HIDDEN);
-
-SKIP3: S K I P '3';
 
 fragment DIGIT: [0-9];
 
