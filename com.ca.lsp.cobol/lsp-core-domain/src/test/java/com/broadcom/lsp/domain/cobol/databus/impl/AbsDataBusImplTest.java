@@ -14,7 +14,7 @@
  *
  */
 
-package com.broadcom.impl;
+package com.broadcom.lsp.domain.cobol.databus.impl;
 
 import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;

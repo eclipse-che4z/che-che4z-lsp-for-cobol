@@ -13,8 +13,9 @@
  * Broadcom, Inc. - initial API and implementation
  *
  */
-package com.broadcom.lsp.domain;
+package com.broadcom.lsp.domain.cobol.event;
 
+import com.broadcom.lsp.domain.CopybookStorableProvider;
 import com.broadcom.lsp.domain.cobol.event.api.CopybookEventFactory;
 import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
 import com.broadcom.lsp.domain.cobol.event.impl.FetchedCopybookEventSubscriber;
@@ -30,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 @Slf4j
-public class CopybookEventSubscribersTest extends DomainConfigurableTest {
+public class CopybookEventSubscribersTest extends CopybookStorableProvider {
   static class DatabusObserverTest implements CopybookObserver<DataEvent> {
     @Override
     public void observerCallback(DataEvent adaptedDataEvent) {

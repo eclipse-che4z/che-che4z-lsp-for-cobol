@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
-import com.broadcom.lsp.domain.cobol.event.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
@@ -57,9 +57,9 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private final PreprocessorListener listener;
 
   CobolSemanticParserListenerImpl(
-      final BufferedTokenStream tokens,
-      final SemanticContext semanticContext,
-      final CobolPreprocessor.CobolSourceFormatEnum format,
+      BufferedTokenStream tokens,
+      SemanticContext semanticContext,
+      CobolPreprocessor.CobolSourceFormatEnum format,
       PreprocessorListener listener) {
     this.tokens = tokens;
     this.format = format;
@@ -78,46 +78,46 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void enterCompilerOptions(final CobolPreprocessorParser.CompilerOptionsContext ctx) {
+  public void enterCompilerOptions(CobolPreprocessorParser.CompilerOptionsContext ctx) {
     // push a new context for COMPILER OPTIONS terminals
-    this.preprocessorCleanerService.push();
+    preprocessorCleanerService.push();
   }
 
   @Override
-  public void enterReplaceArea(final CobolPreprocessorParser.ReplaceAreaContext ctx) {
-    this.preprocessorCleanerService.push();
+  public void enterReplaceArea(CobolPreprocessorParser.ReplaceAreaContext ctx) {
+    preprocessorCleanerService.push();
   }
 
   @Override
-  public void enterReplaceByStatement(final CobolPreprocessorParser.ReplaceByStatementContext ctx) {
-    this.preprocessorCleanerService.push();
+  public void enterReplaceByStatement(CobolPreprocessorParser.ReplaceByStatementContext ctx) {
+    preprocessorCleanerService.push();
   }
 
   @Override
   public void enterReplaceOffStatement(
-      final CobolPreprocessorParser.ReplaceOffStatementContext ctx) {
-    this.preprocessorCleanerService.push();
+      CobolPreprocessorParser.ReplaceOffStatementContext ctx) {
+    preprocessorCleanerService.push();
   }
 
   @Override
-  public void enterTitleStatement(final CobolPreprocessorParser.TitleStatementContext ctx) {
-    this.preprocessorCleanerService.push();
+  public void enterTitleStatement(CobolPreprocessorParser.TitleStatementContext ctx) {
+    preprocessorCleanerService.push();
   }
 
   @Override
-  public void enterParagraphName(final CobolPreprocessorParser.ParagraphNameContext ctx) {
+  public void enterParagraphName(CobolPreprocessorParser.ParagraphNameContext ctx) {
     semanticContext.getParagraphs().define(ctx.getText().toUpperCase(), retrievePosition(ctx));
   }
 
   @Override
-  public void enterCopyStatement(final CobolPreprocessorParser.CopyStatementContext ctx) {
-    this.preprocessorCleanerService.push();
+  public void enterCopyStatement(CobolPreprocessorParser.CopyStatementContext ctx) {
+    preprocessorCleanerService.push();
   }
 
   @Override
-  public void exitCompilerOptions(final CobolPreprocessorParser.CompilerOptionsContext ctx) {
+  public void exitCompilerOptions(CobolPreprocessorParser.CompilerOptionsContext ctx) {
     // throw away COMPILER OPTIONS terminals
-    this.preprocessorCleanerService.pop();
+    preprocessorCleanerService.pop();
   }
 
   @Override
@@ -187,7 +187,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void exitCopyStatement(final CobolPreprocessorParser.CopyStatementContext ctx) {
+  public void exitCopyStatement(CobolPreprocessorParser.CopyStatementContext ctx) {
     /*
      * define the copy book
      */
@@ -195,7 +195,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     String copybookName = retrieveCopybookName(copySource);
     Position position = retrievePosition(copySource);
     defineCopybook(copybookName, position);
-    this.preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens, format);
+    preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens, format);
   }
 
   private void defineCopybook(String copybookName, Position position) {
@@ -238,34 +238,34 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void exitReplaceArea(final CobolPreprocessorParser.ReplaceAreaContext ctx) {
+  public void exitReplaceArea(CobolPreprocessorParser.ReplaceAreaContext ctx) {
     /*
      * replacement phrase
      */
-    this.preprocessorCleanerService.pop();
+    preprocessorCleanerService.pop();
   }
 
   @Override
-  public void exitReplaceByStatement(final CobolPreprocessorParser.ReplaceByStatementContext ctx) {
+  public void exitReplaceByStatement(CobolPreprocessorParser.ReplaceByStatementContext ctx) {
     // throw away terminals
-    this.preprocessorCleanerService.pop();
+    preprocessorCleanerService.pop();
   }
 
   @Override
   public void exitReplaceOffStatement(
-      final CobolPreprocessorParser.ReplaceOffStatementContext ctx) {
+      CobolPreprocessorParser.ReplaceOffStatementContext ctx) {
     // throw away REPLACE OFF terminals
-    this.preprocessorCleanerService.pop();
+    preprocessorCleanerService.pop();
   }
 
   @Override
-  public void exitTitleStatement(final CobolPreprocessorParser.TitleStatementContext ctx) {
+  public void exitTitleStatement(CobolPreprocessorParser.TitleStatementContext ctx) {
     // throw away title statement
-    this.preprocessorCleanerService.pop();
+    preprocessorCleanerService.pop();
   }
 
-  private String retrieveCopybookName(final CopySourceContext copySource) {
-    final String copybookName;
+  private String retrieveCopybookName(CopySourceContext copySource) {
+    String copybookName;
     if (copySource.cobolWord() != null) {
       copybookName = copySource.cobolWord().getText().toUpperCase();
     } else if (copySource.literal() != null) {
@@ -282,12 +282,12 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void visitTerminal(final TerminalNode node) {
-    final int tokPos = node.getSourceInterval().a;
+  public void visitTerminal(TerminalNode node) {
+    int tokPos = node.getSourceInterval().a;
     context().write(TokenUtils.getHiddenTokensToLeft(tokPos, tokens));
 
     if (!TokenUtils.isEOF(node)) {
-      final String text = node.getText();
+      String text = node.getText();
       context().write(text);
     }
   }

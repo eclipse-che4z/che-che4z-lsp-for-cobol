@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
-import com.broadcom.lsp.domain.cobol.event.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.params.CobolParserParams;
@@ -44,20 +44,20 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
   @Override
   public PreprocessedInput processLines(
-      final String code, final CobolSourceFormatEnum format, final CobolParserParams params) {
+      String code, CobolSourceFormatEnum format, CobolParserParams params) {
     // run the lexer
-    final CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
+    CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     // get a list of matched tokens
-    final CommonTokenStream tokens = new CommonTokenStream(lexer);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
 
     // pass the tokens to the parser
-    final CobolPreprocessorParser parser = new CobolPreprocessorParser(tokens);
+    CobolPreprocessorParser parser = new CobolPreprocessorParser(tokens);
 
     // specify our entry point
-    final StartRuleContext startRule = parser.startRule();
+    StartRuleContext startRule = parser.startRule();
 
-    final ParseTreeWalker walker = new ParseTreeWalker();
-    final CobolSemanticParserListener listener =
+    ParseTreeWalker walker = new ParseTreeWalker();
+    CobolSemanticParserListener listener =
         createDocumentParserListener(tokens, semanticContext, format);
     walker.walk(listener, startRule);
 
@@ -75,14 +75,15 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     }
     CopybookAnalysis copybookAnalyzer = createCopybookAnalyzer();
     List<CopybookSemanticContext> contexts =
-        copybookAnalyzer.analyzeCopybooks(copybookNames, semanticContext.getCopybookUsageTracker(), format);
+        copybookAnalyzer.analyzeCopybooks(
+            copybookNames, semanticContext.getCopybookUsageTracker(), format);
     contexts.forEach(semanticContext::merge);
   }
 
   private CobolSemanticParserListener createDocumentParserListener(
-      final CommonTokenStream tokens,
-      final SemanticContext semanticContext,
-      final CobolPreprocessor.CobolSourceFormatEnum format) {
+      CommonTokenStream tokens,
+      SemanticContext semanticContext,
+      CobolPreprocessor.CobolSourceFormatEnum format) {
     return new CobolSemanticParserListenerImpl(tokens, semanticContext, format, formatListener);
   }
 

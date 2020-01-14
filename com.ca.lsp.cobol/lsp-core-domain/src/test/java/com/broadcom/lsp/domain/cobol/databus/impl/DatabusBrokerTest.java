@@ -15,7 +15,7 @@
  */
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.domain.DomainConfigurableTest;
+import com.broadcom.lsp.domain.CopybookStorableProvider;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @Slf4j
-public class DatabusBrokerTest extends DomainConfigurableTest
+public class DatabusBrokerTest extends CopybookStorableProvider
     implements CopybookObserver<DataEvent> {
   @Getter @Setter private int hitCount;
   private static final DataEventType UNKNOWN_EVENT_TYPE = DataEventType.UNKNOWN_EVENT;

@@ -14,13 +14,13 @@
  *
  */
 
-package com.broadcom.impl;
+package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
+import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
@@ -38,21 +38,17 @@ public class DataBusGetFromCacheHappyTest extends AbsDataBusImplTest {
   private static final String CPY_FIXED_CONTENT = "FASDFASDFSF";
   private static final String CPY_FIXED_URI = "/var/tmp/worspace1";
 
-  private DefaultDataBusBroker databus;
+  private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> databus;
 
   @Before
   public void setUp() {
-    databus =
-        LangServerCtx.getGuiceCtx(new DatabusTestModule())
-            .getInjector()
-            .getInstance(DefaultDataBusBroker.class);
+    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
     fulfillDatabusCacheContent(databus.getCacheMaxSize());
   }
 
   @After
   public void tearDown() {
     databus = null;
-    LangServerCtx.shutdown();
   }
 
   @Override

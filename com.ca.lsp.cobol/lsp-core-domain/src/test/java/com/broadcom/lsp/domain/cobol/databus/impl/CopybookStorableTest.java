@@ -13,15 +13,16 @@
  * Broadcom, Inc. - initial API and implementation
  *
  */
-package com.broadcom.lsp.domain;
+package com.broadcom.lsp.domain.cobol.databus.impl;
 
+import com.broadcom.lsp.domain.CopybookStorableProvider;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class CopybookStorableTest extends DomainConfigurableTest {
+public class CopybookStorableTest extends CopybookStorableProvider {
   private CopybookStorable storable = getDummyStorable();
 
   /** A storable object created is not already expired */

@@ -14,10 +14,9 @@
  *
  */
 
-package com.broadcom.impl;
+package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.impl.RequiredCopybookEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
@@ -34,20 +33,16 @@ import static org.junit.Assert.fail;
 @Slf4j
 public class DataBusSubscribeBadTest extends AbsDataBusImplTest {
 
-  private DefaultDataBusBroker databus;
+  private DefaultDataBusBroker<RequiredCopybookEvent, RequiredCopybookEventSubscriber> databus;
 
   @Before
   public void setUp() {
-    databus =
-        LangServerCtx.getGuiceCtx(new DatabusTestModule())
-            .getInjector()
-            .getInstance(DefaultDataBusBroker.class);
+    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
   }
 
   @After
   public void tearDown() {
     databus = null;
-    LangServerCtx.shutdown();
   }
 
   @Override

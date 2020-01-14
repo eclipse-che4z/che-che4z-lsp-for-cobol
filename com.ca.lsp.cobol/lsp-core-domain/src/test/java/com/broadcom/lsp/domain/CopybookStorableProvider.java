@@ -16,16 +16,15 @@
 package com.broadcom.lsp.domain;
 
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
-import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
-import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
+import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
+import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
 
 @Slf4j
-public class DomainConfigurableTest {
+public class CopybookStorableProvider implements CopybookObserver<DataEvent> {
   @Getter private static final String unknownEventMessage = "Dummy event";
   @Getter private static final String copybookName = "Test";
   @Getter private static final String copybookURI = "file:///C:/Users/test/Test.cbl";
@@ -34,21 +33,16 @@ public class DomainConfigurableTest {
   @Getter private static final String FETCHEDCPY = "FETCHEDCPY";
   @Getter private static final String UNKNOWN = "UNKNOWN";
 
-  @Getter
-  private String requireCopybookHeader = new RequiredCopybookEvent(getCopybookName()).getHeader();
-
-  @Getter
-  private String fetchCopybookHeader =
-      new FetchedCopybookEvent(getCopybookName(), getCopybookURI(), getCopybookContent())
-          .getHeader();
-
-  @Getter private String unknownCopybookHeader = new UnknownEvent(unknownEventMessage).getHeader();
-
   @Singleton
   private static CopybookStorable STORABLE_INSTANCE =
       new CopybookStorable(copybookName, copybookURI, copybookContent);
 
   public CopybookStorable getDummyStorable() {
     return STORABLE_INSTANCE;
+  }
+
+  @Override
+  public void observerCallback(DataEvent adaptedDataEvent) {
+    LOG.debug("CALLBACK WORKS!");
   }
 }

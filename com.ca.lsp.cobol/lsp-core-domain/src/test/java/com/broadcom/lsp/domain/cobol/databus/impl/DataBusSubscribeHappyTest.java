@@ -14,10 +14,9 @@
  *
  */
 
-package com.broadcom.impl;
+package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.impl.RequiredCopybookEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
@@ -29,27 +28,22 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeoutException;
 
-/**
- * This test verifies that the object that was unsubscribed from the databus doesn't receive
- * notifications anymore.
- */
-@Slf4j
-public class DataBusUnSubscribeTest extends AbsDataBusImplTest {
+import static org.junit.Assert.fail;
 
-  private DefaultDataBusBroker databus;
+/** This test verifies that the observer is triggered by the event it is subscribed to. */
+@Slf4j
+public class DataBusSubscribeHappyTest extends AbsDataBusImplTest {
+
+  private DefaultDataBusBroker<RequiredCopybookEvent, RequiredCopybookEventSubscriber> databus;
 
   @Before
   public void setUp() {
-    databus =
-        LangServerCtx.getGuiceCtx(new DatabusTestModule())
-            .getInjector()
-            .getInstance(DefaultDataBusBroker.class);
+    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
   }
 
   @After
   public void tearDown() {
     databus = null;
-    LangServerCtx.shutdown();
   }
 
   @Override
@@ -60,17 +54,15 @@ public class DataBusUnSubscribeTest extends AbsDataBusImplTest {
     waiter.resume();
   }
 
-  @Test(expected = TimeoutException.class)
+  @Test
   @SneakyThrows
   public void subscribe() {
-    // Subscribe
-    Object subscriber = databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
+    databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
     databus.postData(RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
-    waiter.await(5000);
-    // Unsubscribe
-    databus.unSubscribe(subscriber);
-    databus.postData(RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
-    // wait undefined because no subscriber anymore
-    waiter.await(5000);
+    try {
+      waiter.await(5000);
+    } catch (TimeoutException | InterruptedException e) {
+      fail("No events were received");
+    }
   }
 }

@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.model;
 
-import com.broadcom.lsp.domain.cobol.event.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

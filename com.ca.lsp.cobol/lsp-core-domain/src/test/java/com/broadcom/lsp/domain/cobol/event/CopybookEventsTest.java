@@ -1,6 +1,10 @@
 /** */
-package com.broadcom.lsp.domain;
+package com.broadcom.lsp.domain.cobol.event;
 
+import com.broadcom.lsp.domain.CopybookStorableProvider;
+import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
+import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
+import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -8,8 +12,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 @Slf4j
-public class CopybookEventsTest extends DomainConfigurableTest {
-
+public class CopybookEventsTest extends CopybookStorableProvider {
+  private static final String unknownEventMessage = "Dummy event";
   /** Test that the RequiredCopybookEvent DTO is correclty populated */
   @Test
   public void requestCopybookEventTest() {
@@ -39,5 +43,18 @@ public class CopybookEventsTest extends DomainConfigurableTest {
 
     assertNotEquals(getREQCPY(), getFetchCopybookHeader());
     assertNotEquals(getUNKNOWN(), getFetchCopybookHeader());
+  }
+
+  private String getRequireCopybookHeader() {
+    return new RequiredCopybookEvent(getCopybookName()).getHeader();
+  }
+
+  private String getFetchCopybookHeader() {
+    return new FetchedCopybookEvent(getCopybookName(), getCopybookURI(), getCopybookContent())
+        .getHeader();
+  }
+
+  private String getUnknownCopybookHeader() {
+    return new UnknownEvent(unknownEventMessage).getHeader();
   }
 }

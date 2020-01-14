@@ -16,7 +16,7 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
-import com.broadcom.lsp.domain.cobol.event.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;

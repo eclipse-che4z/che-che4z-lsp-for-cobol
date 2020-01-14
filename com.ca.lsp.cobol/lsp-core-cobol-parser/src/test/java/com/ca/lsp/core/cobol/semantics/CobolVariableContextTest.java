@@ -15,7 +15,7 @@
  */
 package com.ca.lsp.core.cobol.semantics;
 
-import com.broadcom.lsp.domain.cobol.event.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,9 +27,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
-/**
- * Test for CobolVariableContextImpl
- */
+/** Test for CobolVariableContextImpl */
 public class CobolVariableContextTest {
   private static final String LEVEL1 = "01";
   private static final String LEVEL2 = "02";

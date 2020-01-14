@@ -13,7 +13,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package com.broadcom.lsp.domain.cobol.event.model;
+package com.broadcom.lsp.domain.common.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Value;

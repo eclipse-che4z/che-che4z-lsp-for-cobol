@@ -14,13 +14,13 @@
  *
  */
 
-package com.broadcom.impl;
+package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
+import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
@@ -29,7 +29,7 @@ import org.junit.Test;
 
 import java.util.Optional;
 
-import static junit.framework.TestCase.*;
+import static org.junit.Assert.*;
 
 /** This tests verifies that serialization to a cache storable object works correctly. */
 @Slf4j
@@ -39,17 +39,12 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
   private static final String CPY_FIXED_CONTENT = "FASDFASDFSF";
   private static final String CPY_FIXED_URI = "/var/tmp/worspace1";
 
-  private DefaultDataBusBroker databus;
+  private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> databus;
 
   @Before
   public void setUp() {
     // create a dummy Multimap
-
-    databus =
-        LangServerCtx.getGuiceCtx(new DatabusTestModule())
-            .getInjector()
-            .getInstance(DefaultDataBusBroker.class);
-
+    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
     fulfillDatabusCacheContent(databus.getCacheMaxSize());
 
     // add one more element
@@ -64,7 +59,6 @@ public class DataBusStoreHappyTest extends AbsDataBusImplTest {
   @After
   public void tearDown() {
     databus = null;
-    LangServerCtx.shutdown();
   }
 
   @Override

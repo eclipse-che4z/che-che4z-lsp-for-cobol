@@ -13,10 +13,10 @@
  * Broadcom, Inc. - initial API and implementation
  *
  */
-package com.broadcom.lsp.domain;
+package com.broadcom.lsp.domain.cobol.databus.impl;
 
+import com.broadcom.lsp.domain.CopybookStorableProvider;
 import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
-import com.broadcom.lsp.domain.cobol.databus.impl.CopybookRepositoryLRU;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ import java.util.NoSuchElementException;
 import static org.junit.Assert.*;
 
 @Slf4j
-public class CopybookRepositoryLRUTest extends DomainConfigurableTest {
+public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
   CopybookRepositoryLRU repository;
   public static final int CACHE_SIZE = 2;
   private CopybookStorable storable = getDummyStorable();

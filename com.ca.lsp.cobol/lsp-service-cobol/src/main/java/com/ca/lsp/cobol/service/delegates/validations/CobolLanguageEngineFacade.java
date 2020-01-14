@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.cobol.service.delegates.validations;
 
-import com.broadcom.lsp.domain.cobol.event.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.LanguageEngineFactory;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ProcessingResult;
@@ -43,8 +43,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final String HINT_SRC_LABEL = "H";
 
   // Access should be package-private
-  CobolLanguageEngineFacade() {
-  }
+  CobolLanguageEngineFacade() {}
 
   @Override
   public AnalysisResult analyze(String text) {
