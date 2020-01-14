@@ -15,11 +15,10 @@ package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 
 public interface CobolSemanticParser {
 
   ResultWithErrors<PreprocessedInput> processLines(
-      String code, CobolSourceFormat format, CobolParserParams params);
+      String code, CobolSourceFormat format);
 }

@@ -16,7 +16,6 @@ package com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl;
 import com.broadcom.lsp.domain.cobol.model.Position;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
@@ -42,7 +41,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
   @Override
   public ResultWithErrors<List<CobolLine>> processLines(
-      final String lines, final CobolSourceFormat format, final CobolParserParams params) {
+      final String lines, final CobolSourceFormat format) {
     final List<SyntaxError> errors = new ArrayList<>();
     final List<CobolLine> result = new ArrayList<>();
     try (Scanner scanner = new Scanner(lines)) {
@@ -53,7 +52,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
       while (scanner.hasNextLine()) {
         currentLine = scanner.nextLine();
 
-        ResultWithErrors<CobolLine> output = parseLine(currentLine, lineNumber, format, params);
+        ResultWithErrors<CobolLine> output = parseLine(currentLine, lineNumber, format);
 
         final CobolLine currentCobolLine = output.getResult();
         errors.addAll(output.getErrors());
@@ -69,10 +68,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
   }
 
   private ResultWithErrors<CobolLine> parseLine(
-      String line,
-      final int lineNumber,
-      final CobolSourceFormat format,
-      final CobolParserParams params) {
+      String line, final int lineNumber, final CobolSourceFormat format) {
     final Pattern pattern = format.getPattern();
 
     CobolLine cobolLine = new CobolLine();
@@ -107,7 +103,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
     }
 
     cobolLine.setFormat(format);
-    cobolLine.setDialect(params.getDialect());
+    cobolLine.setDialect(null);
     cobolLine.setNumber(lineNumber);
 
     return new ResultWithErrors<>(cobolLine, result.getErrors());

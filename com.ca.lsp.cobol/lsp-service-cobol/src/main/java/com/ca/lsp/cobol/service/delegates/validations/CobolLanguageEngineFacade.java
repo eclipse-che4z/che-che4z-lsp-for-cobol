@@ -64,7 +64,6 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private static List<Diagnostic> convertErrors(List<SyntaxError> errors) {
     return errors.stream()
-        .peek(e -> log.info(e.toString()))
         .filter(errorOnlyFromCurrentDocument())
         .map(toDiagnostic())
         .collect(Collectors.toList());
@@ -79,7 +78,6 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     return err -> {
       Diagnostic diagnostic = new Diagnostic();
       diagnostic.setSeverity(checkSeverity(err.getSeverity()));
-      diagnostic.setMessage(err.getSuggestion());
       diagnostic.setSource(setupSourceInfo(err.getSeverity()));
       diagnostic.setMessage(err.getSuggestion());
       diagnostic.setRange(convertRange(err.getPosition()));

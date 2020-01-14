@@ -74,7 +74,7 @@ public class CobolLanguageEngine {
     visitor.setSemanticContext(preProcessedInput.getResult().getSemanticContext());
     visitor.visit(tree);
 
-    errors.forEach(errs -> LOG.debug(errs.printSyntaxError()));
+    errors.forEach(err -> LOG.debug(err.toString()));
     return new ResultWithErrors<>(preProcessedInput.getResult().getSemanticContext(), errors);
   }
 }
