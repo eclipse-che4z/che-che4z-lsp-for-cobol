@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.transformer;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
@@ -92,7 +92,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
    */
   private SyntaxError checkContentAreaAWithContinuationLine(CobolLine cobolLine, int lineNumber) {
     String line = cobolLine.toString();
-    final Matcher continuationLineMatcher = CONTINUATION_LINE_PATTERN.matcher(line);
+    Matcher continuationLineMatcher = CONTINUATION_LINE_PATTERN.matcher(line);
     if (!continuationLineMatcher.matches()) {
       return registerContinuationLineError(lineNumber, countAreaASpaces(line));
     }
@@ -111,7 +111,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
    * doesn't end correctly.
    */
   private SyntaxError checkIfStringClosedCorrectly(
-      CobolLine lastCobolLine, int lineNumber, final CobolLine currentCobolLine) {
+      CobolLine lastCobolLine, int lineNumber, CobolLine currentCobolLine) {
     if (checkIfLineHasUnclosedString(lastCobolLine)
         && !CobolLineTypeEnum.CONTINUATION.equals(currentCobolLine.getType())) {
       // there is a string not closed correctly - I'll raise an error

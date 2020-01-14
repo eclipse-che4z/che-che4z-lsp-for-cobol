@@ -14,7 +14,6 @@
 package com.ca.lsp.cobol.service.delegates.validations;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.LanguageEngineFactory;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
@@ -23,7 +22,10 @@ import com.ca.lsp.core.cobol.semantics.SubContext;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Range;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;

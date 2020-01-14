@@ -39,6 +39,9 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
     }
   }
 
+  private static final String REQCPY = "REQCPY";
+  private static final String FETCHEDCPY = "FETCHEDCPY";
+  private static final String UNKNOWN = "UNKNOWN";
   DatabusObserverTest databusObserver;
 
   @Before
@@ -49,32 +52,32 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
   /** This test verify that the RequiredCopybook factory creates a new RequiredCopybook event */
   @Test
   public void testRequireSubscriberFactory() {
-    assertEquals(getREQCPY(), getRequiredSubscriberFromFactory().getEventType().getHeader());
+    assertEquals(REQCPY, getRequiredSubscriberFromFactory().getEventType().getHeader());
   }
 
   /** This test verify that the FetchedCopybook factory creates a new FetchedCopybook event */
   @Test
   public void testFetchSubscriberFactory() {
-    assertEquals(getFETCHEDCPY(), getFetchedSubscriberFromFactory().getEventType().getHeader());
+    assertEquals(FETCHEDCPY, getFetchedSubscriberFromFactory().getEventType().getHeader());
   }
 
   /** This test verify that the Unknown factory creates a new Unknown event */
   @Test
   public void testUnknownSubscriberFactory() {
-    assertEquals(getUNKNOWN(), getUnknownSubscriberFromFactory().getEventType().getHeader());
+    assertEquals(UNKNOWN, getUnknownSubscriberFromFactory().getEventType().getHeader());
   }
 
   /** This test verify that a wrong factory isn't returned back. */
   @Test
   public void negativeTestSubscriberFactory() {
-    assertNotEquals(getREQCPY(), getFetchedSubscriberFromFactory());
-    assertNotEquals(getUNKNOWN(), getFetchedSubscriberFromFactory());
+    assertNotEquals(REQCPY, getFetchedSubscriberFromFactory());
+    assertNotEquals(UNKNOWN, getFetchedSubscriberFromFactory());
 
-    assertNotEquals(getFETCHEDCPY(), getRequiredSubscriberFromFactory());
-    assertNotEquals(getUNKNOWN(), getRequiredSubscriberFromFactory());
+    assertNotEquals(FETCHEDCPY, getRequiredSubscriberFromFactory());
+    assertNotEquals(UNKNOWN, getRequiredSubscriberFromFactory());
 
-    assertNotEquals(getREQCPY(), getUnknownSubscriberFromFactory());
-    assertNotEquals(getFETCHEDCPY(), getFetchedSubscriberFromFactory());
+    assertNotEquals(REQCPY, getUnknownSubscriberFromFactory());
+    assertNotEquals(FETCHEDCPY, getFetchedSubscriberFromFactory());
   }
 
   private UnknownEventSubscriber getUnknownSubscriberFromFactory() {

@@ -18,23 +18,19 @@ package com.broadcom.lsp.domain;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
 
 @Slf4j
 public class CopybookStorableProvider implements EventObserver<DataEvent> {
-  @Getter private static final String copybookName = "Test";
-  @Getter private static final String copybookURI = "file:///C:/Users/test/Test.cbl";
-  @Getter private static final String copybookContent = "000000 IDENTIFICATION DIVISION.";
-  @Getter private static final String REQCPY = "REQCPY";
-  @Getter private static final String FETCHEDCPY = "FETCHEDCPY";
-  @Getter private static final String UNKNOWN = "UNKNOWN";
+  private static final String COPYBOOK_NAME = "Test";
+  private static final String COPYBOOK_URI = "file:///C:/Users/test/Test.cbl";
+  private static final String COPYBOOK_CONTENT = "000000 IDENTIFICATION DIVISION.";
 
   @Singleton
   private static CopybookStorable STORABLE_INSTANCE =
-      new CopybookStorable(copybookName, copybookURI, copybookContent);
+      new CopybookStorable(COPYBOOK_NAME, COPYBOOK_URI, COPYBOOK_CONTENT);
 
   public CopybookStorable getDummyStorable() {
     return STORABLE_INSTANCE;

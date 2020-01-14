@@ -8,50 +8,64 @@ import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 @Slf4j
 public class CopybookEventsTest extends CopybookStorableProvider {
   private static final String UNKNOWN_EVENT_MESSAGE = "Dummy event";
+  private static final String REQCPY = "REQCPY";
+  private static final String FETCHEDCPY = "FETCHEDCPY";
+  private static final String UNKNOWN = "UNKNOWN";
+  private static final String COPYBOOK_NAME = "Test";
+  private static final String COPYBOOK_URI = "file:///C:/Users/test/Test.cbl";
+  private static final String COPYBOOK_CONTENT = "000000 IDENTIFICATION DIVISION.";
+
   /** Test that the RequiredCopybookEvent DTO is correclty populated */
   @Test
   public void requestCopybookEventTest() {
-    assertEquals(getREQCPY(), getRequireCopybookHeader());
+    assertEquals(REQCPY, getRequireCopybookHeader());
   }
 
   /** Test that the FetchedCopybookEvent DTO is correclty populated */
   @Test
   public void fetchCopybookEventTest() {
-    assertEquals(getFETCHEDCPY(), getFetchCopybookHeader());
+    assertEquals(FETCHEDCPY, getFetchCopybookHeader());
   }
 
   /** Test that the UnknownEvent DTO is correclty populated */
   @Test
   public void unknowEventTest() {
-    assertEquals(getUNKNOWN(), getUnknownCopybookHeader());
+    assertEquals(UNKNOWN, getUnknownCopybookHeader());
   }
 
   /** This test verify that the header of an event object doesn't return a wrong type */
   @Test
   public void negativeTestEvent() {
-    assertNotEquals(getFETCHEDCPY(), getUnknownCopybookHeader());
-    assertNotEquals(getREQCPY(), getUnknownCopybookHeader());
+    assertNotEquals(FETCHEDCPY, getUnknownCopybookHeader());
+    assertNotEquals(REQCPY, getUnknownCopybookHeader());
 
-    assertNotEquals(getFETCHEDCPY(), getRequireCopybookHeader());
-    assertNotEquals(getUNKNOWN(), getRequireCopybookHeader());
+    assertNotEquals(FETCHEDCPY, getRequireCopybookHeader());
+    assertNotEquals(UNKNOWN, getRequireCopybookHeader());
 
-    assertNotEquals(getREQCPY(), getFetchCopybookHeader());
-    assertNotEquals(getUNKNOWN(), getFetchCopybookHeader());
+    assertNotEquals(REQCPY, getFetchCopybookHeader());
+    assertNotEquals(UNKNOWN, getFetchCopybookHeader());
+  }
+
+  /** This test verify that a null header is not returned back from the callee. */
+  @Test
+  public void notNullValuesFromHeaderReturned() {
+    // assert that header is not null value
+    assertNotNull(getUnknownCopybookHeader());
+    assertNotNull(getRequireCopybookHeader());
+    assertNotNull(getFetchCopybookHeader());
   }
 
   private String getRequireCopybookHeader() {
-    return new RequiredCopybookEvent(getCopybookName()).getHeader();
+    return new RequiredCopybookEvent(COPYBOOK_NAME).getHeader();
   }
 
   private String getFetchCopybookHeader() {
-    return new FetchedCopybookEvent(getCopybookName(), getCopybookURI(), getCopybookContent())
-        .getHeader();
+    return new FetchedCopybookEvent(COPYBOOK_NAME, COPYBOOK_URI, COPYBOOK_CONTENT).getHeader();
   }
 
   private String getUnknownCopybookHeader() {
