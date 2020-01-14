@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
+ *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -9,15 +10,18 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ * Broadcom, Inc. - initial API and implementation
+ *
+ *
  */
-package com.ca.lsp.cobol.service.delegates;
+package com.ca.lsp.cobol.service.delegates.formations;
 
 import com.ca.lsp.cobol.service.MyDocumentModel.Line;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextEdit;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -31,7 +35,7 @@ public class TrimFormation implements Formation {
   }
 
   @Override
-  public List<TextEdit> format(List<Line> lines) {
+  public List<TextEdit> format(@Nonnull List<Line> lines) {
     List<TextEdit> formattedText = new ArrayList<>();
     for (Line line : lines) {
       String newText = rtrim(line.getText());

@@ -16,14 +16,14 @@ package com.ca.lsp.cobol.service.delegates.validations;
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.LanguageEngineFactory;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
-import com.ca.lsp.core.cobol.model.ProcessingResult;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.*;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -34,6 +34,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Singleton
 public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final int FIRST_LINE_SEQ_AND_EXTRA_OP = 8;
   private static final String COBOL_LANG_SUPPORT_LABEL = "COBOL Language Support";
@@ -41,17 +42,20 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final String WARNING_SRC_LABEL = "W";
   private static final String INFO_SRC_LABEL = "I";
   private static final String HINT_SRC_LABEL = "H";
+  private static final int ERR_POS_INDEX = 1;
 
-  // Access should be package-private
-  CobolLanguageEngineFacade() {}
+  private CobolLanguageEngine engine;
+
+  @Inject
+  CobolLanguageEngineFacade(CobolLanguageEngine engine) {
+    this.engine = engine;
+  }
 
   @Override
   public AnalysisResult analyze(String text) {
     if (isEmpty(text)) {
       return AnalysisResult.empty();
     }
-
-    CobolLanguageEngine engine = LanguageEngineFactory.fixedFormatCobolLanguageEngine();
     return toAnalysisResult(engine.run(text));
   }
 
@@ -61,7 +65,6 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private static List<Diagnostic> convertErrors(List<SyntaxError> errors) {
     return errors.stream()
-        .peek(e -> log.info(e.toString()))
         .filter(errorOnlyFromCurrentDocument())
         .map(toDiagnostic())
         .collect(Collectors.toList());
@@ -76,10 +79,8 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     return err -> {
       Diagnostic diagnostic = new Diagnostic();
       diagnostic.setSeverity(checkSeverity(err.getSeverity()));
-      diagnostic.setMessage(err.getSuggestion());
       diagnostic.setSource(setupSourceInfo(err.getSeverity()));
       diagnostic.setMessage(err.getSuggestion());
-
       diagnostic.setRange(convertRange(err.getPosition()));
       return diagnostic;
     };
@@ -106,22 +107,25 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   }
 
   private static Range convertRange(Position position) {
+    int positionLine = position.getLine() - ERR_POS_INDEX;
+    int cPosInLn = position.getCharPositionInLine();
+
     return new Range(
-        new org.eclipse.lsp4j.Position((position.getLine() - 1), position.getCharPositionInLine()),
+        new org.eclipse.lsp4j.Position(positionLine, cPosInLn),
         new org.eclipse.lsp4j.Position(
-            (position.getLine() - 1),
+            positionLine,
             ((position.getStopPosition() - position.getStartPosition())
-                + position.getCharPositionInLine()
-                + 1)));
+                + cPosInLn
+                + ERR_POS_INDEX)));
   }
 
-  private AnalysisResult toAnalysisResult(ProcessingResult result) {
+  private AnalysisResult toAnalysisResult(ResultWithErrors<SemanticContext> result) {
     return new AnalysisResult(
         convertErrors(result.getErrors()),
-        retrieveDefinitions(result.getSemanticContext().getVariables()),
-        retrieveUsages(result.getSemanticContext().getVariables()),
-        retrieveDefinitions(result.getSemanticContext().getParagraphs()),
-        retrieveUsages(result.getSemanticContext().getParagraphs()));
+        retrieveDefinitions(result.getResult().getVariables()),
+        retrieveUsages(result.getResult().getVariables()),
+        retrieveDefinitions(result.getResult().getParagraphs()),
+        retrieveUsages(result.getResult().getParagraphs()));
   }
 
   private Map<String, List<Location>> retrieveDefinitions(SubContext<?> context) {

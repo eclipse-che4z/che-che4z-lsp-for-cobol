@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
+ *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -9,19 +10,17 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ * Broadcom, Inc. - initial API and implementation
+ *
+ *
  */
+package com.ca.lsp.cobol.service.delegates.formations;
 
-package com.ca.lsp.core.cobol.model;
-
-import com.ca.lsp.core.cobol.semantics.SemanticContext;
-import lombok.Value;
+import com.ca.lsp.cobol.service.MyDocumentModel.Line;
+import org.eclipse.lsp4j.TextEdit;
 
 import java.util.List;
 
-@Value
-public class ProcessingResult {
-
-  private List<SyntaxError> errors;
-  private SemanticContext semanticContext;
+public interface Formation {
+  List<TextEdit> format(List<Line> lines);
 }

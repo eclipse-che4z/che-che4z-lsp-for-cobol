@@ -11,7 +11,6 @@
  *
  *  Contributors:
  *    Broadcom, Inc. - initial API and implementation
- *
  */
 
 package com.ca.lsp.cobol.service.delegates.references;
@@ -19,23 +18,27 @@ package com.ca.lsp.cobol.service.delegates.references;
 import com.ca.lsp.cobol.service.MyDocumentModel;
 import org.eclipse.lsp4j.Location;
 
+import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Map;
 
-class ParagraphReferences extends AbstractReferences {
+/** This class is a provider for locations of paragraphs defined and/or used in the document */
+public class ParagraphLocations implements SemanticLocations {
+  @Nonnull
   @Override
-  List<Location> retrieveReferenceLocations(MyDocumentModel document, String token, String uri) {
-    return retrieveLocations(document.getAnalysisResult().getParagraphUsages(), token, uri);
+  public Map<String, List<Location>> references(@Nonnull MyDocumentModel document) {
+    return document.getAnalysisResult().getParagraphUsages();
+  }
+
+  @Nonnull
+  @Override
+  public Map<String, List<Location>> definitions(@Nonnull MyDocumentModel document) {
+    return document.getAnalysisResult().getParagraphDefinitions();
   }
 
   @Override
-  List<Location> retrieveDefinitionLocations(MyDocumentModel document, String token, String uri) {
-    return retrieveLocations(document.getAnalysisResult().getParagraphDefinitions(), token, uri);
-  }
-
-
-  @Override
-  boolean providerContainsToken(MyDocumentModel document, String token) {
+  public boolean containsToken(@Nonnull MyDocumentModel document, @Nonnull String token) {
     return document.getAnalysisResult().getParagraphDefinitions().keySet().stream()
-            .anyMatch(token::equalsIgnoreCase);
+        .anyMatch(token::equalsIgnoreCase);
   }
 }

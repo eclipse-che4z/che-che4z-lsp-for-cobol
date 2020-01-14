@@ -9,19 +9,19 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
+ *
  *   Broadcom, Inc. - initial API and implementation
  */
 package com.ca.lsp.cobol.service;
 
-import com.ca.lsp.cobol.service.delegates.Communications;
-import com.ca.lsp.cobol.service.delegates.Formations;
-import com.ca.lsp.cobol.service.delegates.Highlights;
+import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.completions.Completions;
-import com.ca.lsp.cobol.service.delegates.references.References;
-import com.ca.lsp.cobol.service.delegates.validations.Analysis;
+import com.ca.lsp.cobol.service.delegates.formations.Formations;
+import com.ca.lsp.cobol.service.delegates.references.Occurrences;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import com.ca.lsp.cobol.service.delegates.validations.LanguageEngines;
+import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -29,8 +29,8 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -43,12 +43,31 @@ import java.util.concurrent.ConcurrentHashMap;
  * instance.
  */
 @Slf4j
+@Singleton
 public class MyTextDocumentService implements TextDocumentService {
-  private static final List<String> SUPPORTED_EXTENSIONS =
-      Arrays.asList("cobol", "cbl", "cob", "COBOL");
+  private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob", "COBOL");
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
-  @Inject private Communications communications;
+
+  private Communications communications;
+  private LanguageEngineFacade engine;
+  private Formations formations;
+  private Completions completions;
+  private Occurrences occurrences;
+
+  @Inject
+  public MyTextDocumentService(
+      Communications communications,
+      LanguageEngineFacade engine,
+      Formations formations,
+      Completions completions,
+      Occurrences occurrences) {
+    this.communications = communications;
+    this.engine = engine;
+    this.formations = formations;
+    this.completions = completions;
+    this.occurrences = occurrences;
+  }
 
   Map<String, MyDocumentModel> getDocs() {
     return new HashMap<>(docs);
@@ -59,14 +78,14 @@ public class MyTextDocumentService implements TextDocumentService {
       CompletionParams params) {
     String uri = params.getTextDocument().getUri();
     return CompletableFuture.<Either<List<CompletionItem>, CompletionList>>supplyAsync(
-            () -> Either.forRight(Completions.collectFor(docs.get(uri), params)))
+            () -> Either.forRight(completions.collectFor(docs.get(uri), params)))
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("completion lookup", uri)));
   }
 
   @Override
   public CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem unresolved) {
-    return CompletableFuture.supplyAsync(() -> Completions.resolveDocumentationFor(unresolved))
+    return CompletableFuture.supplyAsync(() -> completions.resolveDocumentationFor(unresolved))
         .whenComplete(
             reportExceptionIfThrown(
                 createDescriptiveErrorMessage("completion resolving", unresolved.getLabel())));
@@ -77,16 +96,18 @@ public class MyTextDocumentService implements TextDocumentService {
       TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
     return CompletableFuture.<List<? extends Location>>supplyAsync(
-            () -> References.findDefinition(docs.get(uri), position))
-        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("definitions resolving", uri)));
+            () -> occurrences.findDefinitions(docs.get(uri), position))
+        .whenComplete(
+            reportExceptionIfThrown(createDescriptiveErrorMessage("definitions resolving", uri)));
   }
 
   @Override
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
     String uri = params.getTextDocument().getUri();
     return CompletableFuture.<List<? extends Location>>supplyAsync(
-            () -> References.findReferences(docs.get(uri), params, params.getContext()))
-        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("references resolving", uri)));
+            () -> occurrences.findReferences(docs.get(uri), params, params.getContext()))
+        .whenComplete(
+            reportExceptionIfThrown(createDescriptiveErrorMessage("references resolving", uri)));
   }
 
   @Override
@@ -94,7 +115,7 @@ public class MyTextDocumentService implements TextDocumentService {
       TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
     return CompletableFuture.<List<? extends DocumentHighlight>>supplyAsync(
-            () -> Highlights.findHighlights(docs.get(uri), position))
+            () -> occurrences.findHighlights(docs.get(uri), position))
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("document highlighting", uri)));
   }
@@ -103,7 +124,7 @@ public class MyTextDocumentService implements TextDocumentService {
   public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
     String uri = params.getTextDocument().getUri();
     MyDocumentModel model = docs.get(uri);
-    return CompletableFuture.<List<? extends TextEdit>>supplyAsync(() -> Formations.format(model))
+    return CompletableFuture.<List<? extends TextEdit>>supplyAsync(() -> formations.format(model))
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("formatting", uri)));
   }
 
@@ -129,7 +150,6 @@ public class MyTextDocumentService implements TextDocumentService {
     String uri = params.getTextDocument().getUri();
     log.info("Document closing invoked");
     docs.remove(uri);
-    Analysis.unregisterEngine(uri);
   }
 
   @Override
@@ -139,20 +159,18 @@ public class MyTextDocumentService implements TextDocumentService {
 
   private void registerEngineAndAnalyze(String uri, String languageType, String text) {
     String fileExtension = extractExtension(uri);
-    if (fileExtension != null && !isValidFileExtension(fileExtension)) {
+    if (fileExtension != null && !isCobolFile(fileExtension)) {
       communications.notifyThatExtensionIsUnsupported(fileExtension);
-    } else if (LanguageEngines.getLanguageEngineById(languageType) != null) {
+    } else if (isCobolFile(languageType)) {
       communications.notifyThatLoadingInProgress(uri);
-      Analysis.registerEngine(uri, languageType);
       analyzeDocumentFirstTime(uri, text);
-
     } else {
       communications.notifyThatEngineNotFound(languageType);
     }
   }
 
-  private boolean isValidFileExtension(String fileExtension) {
-    return SUPPORTED_EXTENSIONS.contains(fileExtension);
+  private boolean isCobolFile(String identifier) {
+    return COBOL_IDS.contains(identifier);
   }
 
   private String extractExtension(String uri) {
@@ -165,7 +183,7 @@ public class MyTextDocumentService implements TextDocumentService {
   private void analyzeDocumentFirstTime(String uri, String text) {
     CompletableFuture.runAsync(
             () -> {
-              AnalysisResult result = Analysis.run(uri, text);
+              AnalysisResult result = engine.analyze(text);
               docs.get(uri).setAnalysisResult(result);
               publishResult(uri, result);
             })
@@ -175,7 +193,7 @@ public class MyTextDocumentService implements TextDocumentService {
   private void analyzeChanges(String uri, String text) {
     CompletableFuture.runAsync(
             () -> {
-              AnalysisResult result = Analysis.run(uri, text);
+              AnalysisResult result = engine.analyze(text);
               registerDocument(uri, new MyDocumentModel(text, result));
               communications.publishDiagnostics(uri, result.getDiagnostics());
             })

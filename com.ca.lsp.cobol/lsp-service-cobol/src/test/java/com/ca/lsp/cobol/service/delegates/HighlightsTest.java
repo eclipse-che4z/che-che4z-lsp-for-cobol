@@ -14,13 +14,13 @@
 
 package com.ca.lsp.cobol.service.delegates;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.runTextValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.runTextValidation;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.waitForDiagnostics;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
-import com.ca.lsp.cobol.usecases.UseCaseUtils;
+import com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;

@@ -19,29 +19,29 @@ startClean
    ;
 
 cleaning
-   : ~(EXEC | EJECT)*? (statements ~EOF*?)+
+   : statements+
    ;
 
 statements
-   : execSqlStatement | execSqlImsStatement | execCicsStatement | ejectStatement | NEWLINE | .
+   : execSqlStatement | execSqlImsStatement | execCicsStatement | ejectStatement | .
    ;
 
 // exec cics statement
 
 execCicsStatement
-   : EXEC CICS .*? END_EXEC DOT_FS?
+   : EXEC CICS ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exec sql statement
 
 execSqlStatement
-   : EXEC SQL .*? END_EXEC DOT_FS?
+   : EXEC SQL ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exec sql ims statement
 
 execSqlImsStatement
-   : EXEC SQLIMS .*? END_EXEC DOT_FS?
+   : EXEC SQLIMS ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 ejectStatement
@@ -57,11 +57,28 @@ SQL: S Q L;
 SQLIMS : S Q L I M S;
 
 // symbols
+AMPCHAR : '&';
+ASTERISKCHAR : '*';
+DOUBLEASTERISKCHAR : '**';
+COLONCHAR : ':';
 COMMENTTAG : '*>';
 COMMACHAR : ',';
+DOLLARCHAR : '$';
+DOUBLEQUOTE : '"';
 DOT_FS : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ | '.' EOF;
 DOT : '.';
 MINUSCHAR : '-';
+EQUALCHAR : '=';
+LESSTHANCHAR : '<';
+LESSTHANOREQUAL : '<=';
+LPARENCHAR : '(';
+MORETHANCHAR : '>';
+MORETHANOREQUAL : '>=';
+NOTEQUALCHAR : '<>';
+PLUSCHAR : '+';
+SINGLEQUOTE : '\'';
+RPARENCHAR : ')';
+SLASHCHAR : '/';
 
 fragment HEXNUMBER :
 	X '"' [0-9A-F]+ '"'

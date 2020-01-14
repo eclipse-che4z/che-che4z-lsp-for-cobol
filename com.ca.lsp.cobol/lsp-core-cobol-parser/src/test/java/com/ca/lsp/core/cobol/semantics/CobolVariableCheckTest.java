@@ -16,12 +16,10 @@
 package com.ca.lsp.core.cobol.semantics;
 
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
-import com.ca.lsp.core.cobol.model.ProcessingResult;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import org.junit.Test;
-import java.util.stream.Collectors;
 
-import static com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum.*;
+import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
 import static org.junit.Assert.assertEquals;
 
 public class CobolVariableCheckTest {
@@ -103,7 +101,7 @@ public class CobolVariableCheckTest {
   @Test
   public void test() {
     CobolLanguageEngine engine = new CobolLanguageEngine(FIXED);
-    ProcessingResult result = engine.run(TEXT_TO_TEST);
+    ResultWithErrors<SemanticContext> result = engine.run(TEXT_TO_TEST);
     assertEquals(2, result.getErrors().stream().filter(item -> item.getSeverity() == 3).count());
   }
 }

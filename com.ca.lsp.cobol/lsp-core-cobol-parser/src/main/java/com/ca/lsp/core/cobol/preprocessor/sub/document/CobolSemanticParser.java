@@ -14,10 +14,11 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
-import com.ca.lsp.core.cobol.params.CobolParserParams;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 
 public interface CobolSemanticParser {
 
-  PreprocessedInput processLines(String code, CobolSourceFormatEnum format, CobolParserParams params);
+  ResultWithErrors<PreprocessedInput> processLines(
+      String code, CobolSourceFormat format);
 }

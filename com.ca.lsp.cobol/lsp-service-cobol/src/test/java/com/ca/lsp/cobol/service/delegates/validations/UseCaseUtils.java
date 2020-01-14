@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
+ *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -9,22 +10,31 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ * Broadcom, Inc. - initial API and implementation
+ *
+ *
  */
-package com.ca.lsp.cobol.usecases;
+package com.ca.lsp.cobol.service.delegates.validations;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
+import lombok.experimental.UtilityClass;
 import org.awaitility.Awaitility;
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /** This utility class provides methods to run use cases with Cobol code examples. */
+@UtilityClass
 public class UseCaseUtils {
   public static final String LANGUAGE = "cbl";
   public static final String DOCUMENT_URI = "1";
@@ -32,8 +42,6 @@ public class UseCaseUtils {
   private static final long MAX_TIME_TO_WAIT = 60000L;
   private static final long TIME_TO_POLL = 10L;
   private static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
-
-  private UseCaseUtils() {}
 
   /**
    * Create client, server and run services to validate given text. Plug-and-play method for the
@@ -126,5 +134,32 @@ public class UseCaseUtils {
    */
   public static void waitForDiagnostics(TestLanguageClient client, String description) {
     await(() -> !client.getReceivedDiagnostics().isEmpty(), description);
+  }
+
+  /**
+   * Analyze the given text using a real language engine.
+   *
+   * @param text - text to analyze
+   * @return the entire analysis result
+   */
+  public static AnalysisResult analyze(String text) {
+    return new CobolLanguageEngineFacade(new CobolLanguageEngine(CobolSourceFormat.FIXED))
+        .analyze(text);
+  }
+
+  /**
+   * Analyze the given text using a real language engine leaving only the diagnostics with the
+   * severe (level 1) errors.
+   *
+   * @param text - text to analyze
+   * @return list of diagnostics with only severe errors
+   */
+  public static List<Diagnostic> analyzeForErrors(String text) {
+    LanguageEngineFacade engine =
+        new CobolLanguageEngineFacade(new CobolLanguageEngine(CobolSourceFormat.FIXED));
+    AnalysisResult result = engine.analyze(text);
+    return result.getDiagnostics().stream()
+        .filter(it -> it.getSeverity().getValue() == 1)
+        .collect(Collectors.toList());
   }
 }

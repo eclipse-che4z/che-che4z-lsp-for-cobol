@@ -13,12 +13,14 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl;
 
-import com.ca.lsp.core.cobol.params.CobolParserParams;
-import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
+import com.broadcom.lsp.domain.cobol.model.Position;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
+import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReaderDelegate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,18 +32,17 @@ import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 
 public class CobolLineReaderImpl implements CobolLineReader {
   private static final int INDICATOR_AREA_INDEX = 6;
-  private PreprocessorListener listener;
+
   private String documentURI;
 
-  public CobolLineReaderImpl(PreprocessorListener listener, String documentURI) {
-    this.listener = listener;
+  public CobolLineReaderImpl(String documentURI) {
     this.documentURI = documentURI;
   }
 
   @Override
-  public List<CobolLine> processLines(
-      final String lines, final CobolSourceFormatEnum format, final CobolParserParams params) {
-
+  public ResultWithErrors<List<CobolLine>> processLines(
+      final String lines, final CobolSourceFormat format) {
+    final List<SyntaxError> errors = new ArrayList<>();
     final List<CobolLine> result = new ArrayList<>();
     try (Scanner scanner = new Scanner(lines)) {
       String currentLine;
@@ -51,7 +52,11 @@ public class CobolLineReaderImpl implements CobolLineReader {
       while (scanner.hasNextLine()) {
         currentLine = scanner.nextLine();
 
-        final CobolLine currentCobolLine = parseLine(currentLine, lineNumber, format, params);
+        ResultWithErrors<CobolLine> output = parseLine(currentLine, lineNumber, format);
+
+        final CobolLine currentCobolLine = output.getResult();
+        errors.addAll(output.getErrors());
+
         currentCobolLine.setPredecessor(lastCobolLine);
         result.add(currentCobolLine);
 
@@ -59,21 +64,20 @@ public class CobolLineReaderImpl implements CobolLineReader {
         lastCobolLine = currentCobolLine;
       }
     }
-    return result;
+    return new ResultWithErrors<>(result, errors);
   }
 
-  @Override
-  public CobolLine parseLine(
-      String line,
-      final int lineNumber,
-      final CobolSourceFormatEnum format,
-      final CobolParserParams params) {
+  private ResultWithErrors<CobolLine> parseLine(
+      String line, final int lineNumber, final CobolSourceFormat format) {
     final Pattern pattern = format.getPattern();
-    final Matcher matcher = pattern.matcher(line);
 
     CobolLine cobolLine = new CobolLine();
 
-    line = checkFormatCorrect(line, lineNumber, format, matcher);
+    line = getDelegate().apply(line);
+
+    final Matcher matcher = pattern.matcher(line);
+    ResultWithErrors<String> result = checkFormatCorrect(line, lineNumber, format, matcher);
+    line = result.getResult();
 
     if (line.length() > 0) {
       for (int i = line.length(); i > 0; i--) {
@@ -99,10 +103,10 @@ public class CobolLineReaderImpl implements CobolLineReader {
     }
 
     cobolLine.setFormat(format);
-    cobolLine.setDialect(params.getDialect());
+    cobolLine.setDialect(null);
     cobolLine.setNumber(lineNumber);
 
-    return cobolLine;
+    return new ResultWithErrors<>(cobolLine, result.getErrors());
   }
 
   private CobolLineTypeEnum determineType(final String indicatorArea) {
@@ -132,13 +136,11 @@ public class CobolLineReaderImpl implements CobolLineReader {
     return result;
   }
 
-  private String checkFormatCorrect(
-      String line,
-      final int lineNumber,
-      final CobolSourceFormatEnum format,
-      final Matcher matcher) {
+  private ResultWithErrors<String> checkFormatCorrect(
+      String line, final int lineNumber, final CobolSourceFormat format, final Matcher matcher) {
     int errorLength = 0;
     int charPosition;
+    List<SyntaxError> errors = new ArrayList<>();
     if (!matcher.matches() && line.length() > INDICATOR_AREA_INDEX) {
       if (matcher.lookingAt()) {
         charPosition = matcher.end();
@@ -147,20 +149,28 @@ public class CobolLineReaderImpl implements CobolLineReader {
         charPosition =
             INDICATOR_AREA_INDEX; // format error could appear at the indicator area index, for now
       }
-      registerFormatError(lineNumber, format, charPosition, errorLength);
+      errors.add(registerFormatError(lineNumber, format, charPosition, errorLength));
       line = line.substring(0, line.length() - errorLength);
     }
-    return line;
+    return new ResultWithErrors<>(line, errors);
   }
 
-  private void registerFormatError(
-      int lineNumber, final CobolSourceFormatEnum format, int charPosition, int errorLength) {
-    if (listener == null) return;
-    listener.syntaxError(
-        documentURI,
-        lineNumber + 1,
-        charPosition,
-        "This format is not a " + format.toString() + " format",
-        errorLength);
+  private CobolLineReaderDelegate getDelegate() {
+    return new CompilerDirectivesTransformation();
+  }
+
+  private SyntaxError registerFormatError(
+      int lineNumber, final CobolSourceFormat format, int charPosition, int errorLength) {
+    return SyntaxError.syntaxError()
+        .suggestion("This format is not a " + format.toString() + " format")
+        .severity(1)
+        .position(
+            new Position(
+                documentURI,
+                charPosition,
+                (charPosition + errorLength),
+                lineNumber + 1,
+                charPosition))
+        .build();
   }
 }

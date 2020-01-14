@@ -18,16 +18,11 @@ import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.*;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Test to check VariableCompletion
- */
+/** Test to check VariableCompletion */
 public class VariableCompletionTest {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -50,14 +45,16 @@ public class VariableCompletionTest {
 
   @Test
   public void testVariableCompletion() {
-    VariableCompletion completion = new VariableCompletion();
     MyDocumentModel document = createModel();
-
+    Set<Completion> completionSet = new HashSet<>();
+    completionSet.add(new VariableCompletion());
+    Completions completions = new Completions(completionSet);
     List<CompletionItem> completionItems =
-        completion.collectCompletions(document, createCompletionParams());
+        completions.collectFor(document, createCompletionParams()).getItems();
 
     assertEquals(2, completionItems.size());
     assertEquals("TBPARM1", completionItems.get(0).getLabel());
+    assertEquals(CompletionItemKind.Variable, completionItems.get(0).getKind());
   }
 
   private CompletionParams createCompletionParams() {

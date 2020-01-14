@@ -16,7 +16,7 @@ package com.ca.lsp.cobol.service;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
-import com.ca.lsp.cobol.usecases.UseCaseUtils;
+import com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.*;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.Assert.*;
 
 /** This test checks the entry points of the {@link TextDocumentService} implementation. */

@@ -27,7 +27,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public final class Position implements Serializable {
   private final String documentURI;
-  private final int tokenIndex;
   private final int startPosition;
   private final int stopPosition;
   private final int line;

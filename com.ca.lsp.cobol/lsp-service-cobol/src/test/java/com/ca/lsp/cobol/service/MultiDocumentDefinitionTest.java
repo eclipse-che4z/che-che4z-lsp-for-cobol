@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.*;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -62,9 +62,9 @@ public class MultiDocumentDefinitionTest extends ConfigurableTest {
           + "           03  CHILD3         PIC 9   VALUE IS '2'.";
   private static final String PARS =
       "       PAR1.\n"
-          + "           DISPLAY \"PAR1\"\n"
+          + "           DISPLAY \"PAR1\".\n"
           + "       PAR2.\n"
-          + "           DISPLAY \"PAR2\"\n";
+          + "           DISPLAY \"PAR2\".\n";
   private AnalysisResult analysisResult;
   private TextDocumentService service;
 

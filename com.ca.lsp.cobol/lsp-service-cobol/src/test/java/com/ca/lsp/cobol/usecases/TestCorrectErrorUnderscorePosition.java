@@ -18,6 +18,8 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
+import java.util.List;
+
 /**
  * This use case checks if the position of error is being underscored correctly. There is typo in
  * the TEXT in the line 6, but as designed the following token should be underscored as unexpected,
@@ -50,7 +52,8 @@ public class TestCorrectErrorUnderscorePosition extends NegativeUseCase {
   }
 
   @Override
-  protected void assertRange(Range range) {
+  protected void assertRanges(List<Range> ranges) {
+    Range range = ranges.get(0);
     assertEquals(18, range.getStart().getCharacter());
     assertEquals(25, range.getEnd().getCharacter());
   }
