@@ -20,6 +20,6 @@ package com.broadcom.lsp.domain.cobol.event.api;
  * This interface implements the Observer pattern for the databus. It provides a callback method to
  * perform some action if the required event is populated.
  */
-public interface CopybookObserver<O> {
+public interface EventObserver<O> {
   void observerCallback(O adaptedDataEvent);
 }

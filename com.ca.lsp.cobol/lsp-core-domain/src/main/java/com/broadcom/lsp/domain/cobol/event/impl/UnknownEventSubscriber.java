@@ -16,7 +16,7 @@
 
 package com.broadcom.lsp.domain.cobol.event.impl;
 
-import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UnknownEventSubscriber {
 
-  @Getter @NonNull private CopybookObserver observer;
+  @Getter @NonNull private EventObserver observer;
 
   @NonNull @Getter private UnknownEvent eventType;
 

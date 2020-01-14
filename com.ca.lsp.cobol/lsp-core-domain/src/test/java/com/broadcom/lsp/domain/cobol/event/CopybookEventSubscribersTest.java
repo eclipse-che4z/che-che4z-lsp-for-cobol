@@ -17,7 +17,7 @@ package com.broadcom.lsp.domain.cobol.event;
 
 import com.broadcom.lsp.domain.CopybookStorableProvider;
 import com.broadcom.lsp.domain.cobol.event.api.CopybookEventFactory;
-import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.impl.FetchedCopybookEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.impl.RequiredCopybookEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNotEquals;
 
 @Slf4j
 public class CopybookEventSubscribersTest extends CopybookStorableProvider {
-  static class DatabusObserverTest implements CopybookObserver<DataEvent> {
+  static class DatabusObserverTest implements EventObserver<DataEvent> {
     @Override
     public void observerCallback(DataEvent adaptedDataEvent) {
       LOG.debug("CALLBACK WORKS!");

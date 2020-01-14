@@ -22,7 +22,6 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,11 +38,6 @@ public class DataBusSubscribeHappyTest extends AbsDataBusImplTest {
   @Before
   public void setUp() {
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
-  }
-
-  @After
-  public void tearDown() {
-    databus = null;
   }
 
   @Override

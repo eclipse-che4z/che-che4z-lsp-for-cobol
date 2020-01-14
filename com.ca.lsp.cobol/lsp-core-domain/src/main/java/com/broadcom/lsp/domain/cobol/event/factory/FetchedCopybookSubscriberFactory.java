@@ -16,8 +16,8 @@
 
 package com.broadcom.lsp.domain.cobol.event.factory;
 
-import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
 import com.broadcom.lsp.domain.cobol.event.api.CopybookSubscriber;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.impl.FetchedCopybookEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 
@@ -25,7 +25,7 @@ import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 public class FetchedCopybookSubscriberFactory
     implements CopybookSubscriber<FetchedCopybookEventSubscriber> {
   @Override
-  public FetchedCopybookEventSubscriber create(CopybookObserver observer) {
+  public FetchedCopybookEventSubscriber create(EventObserver observer) {
     return new FetchedCopybookEventSubscriber(observer, FetchedCopybookEvent.builder().build());
   }
 }

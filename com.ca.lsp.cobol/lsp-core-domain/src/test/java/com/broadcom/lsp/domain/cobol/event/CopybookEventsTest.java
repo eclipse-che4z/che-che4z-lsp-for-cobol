@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotEquals;
 
 @Slf4j
 public class CopybookEventsTest extends CopybookStorableProvider {
-  private static final String unknownEventMessage = "Dummy event";
+  private static final String UNKNOWN_EVENT_MESSAGE = "Dummy event";
   /** Test that the RequiredCopybookEvent DTO is correclty populated */
   @Test
   public void requestCopybookEventTest() {
@@ -55,6 +55,6 @@ public class CopybookEventsTest extends CopybookStorableProvider {
   }
 
   private String getUnknownCopybookHeader() {
-    return new UnknownEvent(unknownEventMessage).getHeader();
+    return new UnknownEvent(UNKNOWN_EVENT_MESSAGE).getHeader();
   }
 }

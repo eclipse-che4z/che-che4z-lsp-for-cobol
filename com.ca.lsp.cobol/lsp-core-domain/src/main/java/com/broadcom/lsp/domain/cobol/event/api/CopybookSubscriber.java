@@ -1,5 +1,5 @@
 package com.broadcom.lsp.domain.cobol.event.api;
 
 public interface CopybookSubscriber<T> {
-  T create(CopybookObserver observer);
+  T create(EventObserver observer);
 }

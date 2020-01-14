@@ -23,18 +23,17 @@ import org.junit.runners.Suite;
 
 /** A suite to run the databus tests. */
 @RunWith(Suite.class)
-@Suite.SuiteClasses(
-    value = {
-      CopybookEventsTest.class,
-      CopybookEventSubscribersTest.class,
-      CopybookRepositoryLRUTest.class,
-      CopybookStorableTest.class,
-      DatabusBrokerTest.class,
-      DataBusGetFromCacheBadTest.class,
-      DataBusGetFromCacheHappyTest.class,
-      DataBusStoreHappyTest.class,
-      DataBusSubscribeHappyTest.class,
-      DataBusSubscribeBadTest.class,
-      DataBusUnSubscribeTest.class
-    })
+@Suite.SuiteClasses({
+  CopybookEventsTest.class,
+  CopybookEventSubscribersTest.class,
+  CopybookRepositoryLRUTest.class,
+  CopybookStorableTest.class,
+  DatabusBrokerTest.class,
+  DataBusGetFromCacheBadTest.class,
+  DataBusGetFromCacheHappyTest.class,
+  DataBusStoreHappyTest.class,
+  DataBusSubscribeHappyTest.class,
+  DataBusSubscribeBadTest.class,
+  DataBusUnSubscribeTest.class
+})
 public class DomainTestSuite {}

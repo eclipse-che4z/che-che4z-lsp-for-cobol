@@ -19,7 +19,7 @@ package com.broadcom.lsp.domain.cobol.databus.impl;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.model.RegistryId;
 import com.broadcom.lsp.domain.cobol.event.api.CopybookEventFactory;
-import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.impl.DeadEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
@@ -67,7 +67,7 @@ public abstract class AbstractDataBusBroker<T extends DataEvent, S> implements D
 
   @Override
   @SneakyThrows
-  public S getSubscriber(DataEventType event, CopybookObserver observer) {
+  public S getSubscriber(DataEventType event, EventObserver observer) {
     return (S) CopybookEventFactory.getFactory(event).create(observer);
   }
 

@@ -17,7 +17,7 @@ package com.broadcom.lsp.domain.cobol.databus.impl;
 
 import com.broadcom.lsp.domain.CopybookStorableProvider;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
-import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
@@ -36,7 +36,7 @@ import static org.junit.Assert.assertNotNull;
 
 @Slf4j
 public class DatabusBrokerTest extends CopybookStorableProvider
-    implements CopybookObserver<DataEvent> {
+    implements EventObserver<DataEvent> {
   @Getter @Setter private int hitCount;
   private static final DataEventType UNKNOWN_EVENT_TYPE = DataEventType.UNKNOWN_EVENT;
 

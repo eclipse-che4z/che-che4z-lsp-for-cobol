@@ -16,7 +16,7 @@
 
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ import net.jodah.concurrentunit.Waiter;
  * asynchronous tasks.
  */
 @Slf4j
-public abstract class AbsDataBusImplTest implements CopybookObserver<DataEvent> {
+public abstract class AbsDataBusImplTest implements EventObserver<DataEvent> {
   @Getter protected final Waiter waiter = new Waiter();
 
   @Override

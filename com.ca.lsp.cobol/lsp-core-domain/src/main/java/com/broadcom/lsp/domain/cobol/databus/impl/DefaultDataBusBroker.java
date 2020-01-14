@@ -18,7 +18,7 @@ package com.broadcom.lsp.domain.cobol.databus.impl;
 
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.databus.model.RegistryId;
-import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.google.inject.Inject;
@@ -84,8 +84,7 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
 
   @Override
   @SneakyThrows
-  public @NonNull S subscribe(
-      @NonNull DataEventType eventType, @NonNull CopybookObserver observer) {
+  public @NonNull S subscribe(@NonNull DataEventType eventType, @NonNull EventObserver observer) {
     return subscribe(getSubscriber(eventType, observer));
   }
 

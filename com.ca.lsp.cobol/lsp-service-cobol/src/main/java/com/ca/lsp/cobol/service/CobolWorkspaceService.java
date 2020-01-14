@@ -15,7 +15,7 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import org.eclipse.lsp4j.WorkspaceFolder;
 
@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 public interface CobolWorkspaceService
-    extends org.eclipse.lsp4j.services.WorkspaceService, CopybookObserver<RequiredCopybookEvent> {
+    extends org.eclipse.lsp4j.services.WorkspaceService, EventObserver<RequiredCopybookEvent> {
 
   Path getURIByCopybookName(String fileName);
 

@@ -21,7 +21,6 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,11 +37,6 @@ public class DataBusSubscribeBadTest extends AbsDataBusImplTest {
   @Before
   public void setUp() {
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
-  }
-
-  @After
-  public void tearDown() {
-    databus = null;
   }
 
   @Override

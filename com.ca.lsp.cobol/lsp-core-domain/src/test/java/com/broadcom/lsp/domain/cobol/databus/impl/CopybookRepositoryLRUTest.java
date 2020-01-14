@@ -29,8 +29,8 @@ import static org.junit.Assert.*;
 
 @Slf4j
 public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
-  CopybookRepositoryLRU repository;
-  public static final int CACHE_SIZE = 2;
+  private CopybookRepositoryLRU repository;
+  private static final int CACHE_SIZE = 2;
   private CopybookStorable storable = getDummyStorable();
 
   @Before

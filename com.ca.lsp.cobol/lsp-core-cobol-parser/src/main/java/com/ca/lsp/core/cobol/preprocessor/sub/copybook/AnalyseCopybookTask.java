@@ -20,7 +20,7 @@ import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
-import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
@@ -44,7 +44,7 @@ import java.util.concurrent.RecursiveTask;
 
 @Slf4j
 public class AnalyseCopybookTask extends RecursiveTask<CopybookSemanticContext>
-    implements CopybookObserver<FetchedCopybookEvent> {
+    implements EventObserver<FetchedCopybookEvent> {
 
   private transient DataBusBroker databus =
       LangServerCtx.getInjector().getInstance(DefaultDataBusBroker.class);

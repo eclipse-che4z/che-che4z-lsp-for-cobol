@@ -16,8 +16,8 @@
 
 package com.broadcom.lsp.domain.cobol.event.factory;
 
-import com.broadcom.lsp.domain.cobol.event.api.CopybookObserver;
 import com.broadcom.lsp.domain.cobol.event.api.CopybookSubscriber;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 
@@ -26,7 +26,7 @@ public class UnknownCopybookSubscriberFactory
     implements CopybookSubscriber<UnknownEventSubscriber> {
 
   @Override
-  public UnknownEventSubscriber create(CopybookObserver observer) {
+  public UnknownEventSubscriber create(EventObserver observer) {
     return new UnknownEventSubscriber(observer, UnknownEvent.builder().build());
   }
 }

@@ -23,7 +23,6 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,11 +43,6 @@ public class DataBusGetFromCacheHappyTest extends AbsDataBusImplTest {
   public void setUp() {
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
     fulfillDatabusCacheContent(databus.getCacheMaxSize());
-  }
-
-  @After
-  public void tearDown() {
-    databus = null;
   }
 
   @Override

@@ -23,7 +23,6 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -71,11 +70,6 @@ public class DataBusGetFromCacheBadTest extends AbsDataBusImplTest {
             .content("FASDFASDFSF")
             .uri("/var/tmp/worspace1")
             .build());
-  }
-
-  @After
-  public void tearDown() {
-    databus = null;
   }
 
   @Override
