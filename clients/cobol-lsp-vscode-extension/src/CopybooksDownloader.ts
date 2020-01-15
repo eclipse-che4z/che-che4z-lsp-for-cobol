@@ -31,7 +31,7 @@ export class CopybooksDownloader {
      */
     // tslint:disable-next-line: cognitive-complexity
     public async downloadDependencies(uri: vscode.Uri): Promise<void> {
-        const missingCopybooksFilePath = uri.fsPath.substr(0, uri.fsPath.length - ".dep".length) + "err";
+        const missingCopybooksFilePath = uri.fsPath.substr(0, uri.fsPath.length - ".dep".length) + ".err";
         const copybooks: string[] = fs.readFileSync(uri.fsPath).toString().split("\n")
             .filter(e => e.trim().length > 0)
             .map(e => e.trim());

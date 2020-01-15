@@ -68,7 +68,7 @@ export async function activate(context: ExtensionContext) {
 }
 
 function initWorkspaceTracker(downloader: CopybooksDownloader): Disposable {
-    const watcher = workspace.createFileSystemWatcher("**/" + DEPENDENCIES_FOLDER + "/**/**.deps", false, false, true);
+    const watcher = workspace.createFileSystemWatcher("**/" + DEPENDENCIES_FOLDER + "/**/**.dep", false, false, true);
     watcher.onDidCreate(uri => downloader.downloadDependencies(uri));
     watcher.onDidChange(uri => downloader.downloadDependencies(uri));
     return watcher;
