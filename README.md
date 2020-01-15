@@ -8,52 +8,58 @@
 
 </div>
 
+
 # COBOL Language Support
 
 COBOL Language Support standardizes the communication between language tooling for COBOL and your code editor. Files with the extensions .COB and .CBL are recognized as COBOL files.
 
 ## Prerequisites
 
-- Java version 8 or higher
-- To enable syntax coloring, a third-party COBOL extension is required. The Che4z stacks and Code4z pack all contain Bitlang, which fulfils this requirement.
-- To use the COBOL Language Support extension while working with copybooks, place the copybook files inside a **"COPYBOOKS"** folder within the current workspace.
+- Java 8 or newer
+- (Optional) COBOL 3rd party plugin (required for Syntax colouring)
+- Copybook path must be defined as **"COPYBOOKS"** folder in current workspace (required for copybook support)
 
-## Features
 COBOL Language Support defines the protocol that is used between an editor or IDE, and a language server that provides the following COBOL syntax awareness features:
 
-### Autocomplete
-Autocomplete speeds up the coding process by intuitively suggesting the most likely variables or paragraphs to follow existing code. The extension provides live suggestions while you type for:
+- **Autocomplete**
 
-* COBOL keywords
-* COBOL variables
-* COBOL paragraphs
-* Code Snippet
-* Copybook variables
-* Copybook paragraphs
-
-![Autocomplete](Autocompletev2.gif)
+	- Provides live suggestions while you type for:
+		- COBOL keywords
+		- COBOL variables
+		- COBOL paragraphs
+		- Code Snippet
 		
-### Syntax and Semantic Check for Code
-This feature checks for mistakes and errors in COBOL code. The syntax check feature reviews the whole content of the code and suggests fixes, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
+	![Autocomplete](Autocompletev2.gif)
 
-![Syntax check](SyntaxCheckv2.gif)
-			
-### Syntax Highlighting
-The extension enables syntax highlighting for COBOL code.
+- **Syntax and Semantic Check for Code**
+
+	- Checks for mistakes and errors in COBOL code. Syntax check reviews and provides suggested fixes for the whole content of the code, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
 	
-### Syntax Coloring
-Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, and paragraphs.
-
-A third-party plugin is required to enable syntax coloring. The Che4z stacks and Code4z pack all contain Bitlang, which fulfils this requirement.
+	![Syntax check](SyntaxCheckv2.gif)
+		
+- **Syntax Highlighting**
 	
-### Copybook Support
-To use the COBOL Language Support extension while working with copybooks, place the copybook files inside a **"COPYBOOKS"** folder within the current workspace. The extension includes the following copybook support features:
+	- Enables syntax highlighting for COBOL code.
+	
+- **Syntax Colouring** (with third-party plugins)
 
-* Semantic analysis for keywords, variables, and paragraphs across copybooks, to ensure and maintain compatibility of copybooks called in code.
-* Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.  
-* Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code. 
-* Functionality to skip variable levels when called, reducing call time.
-* Find All References and Go To Definition functionalities.
-** **Find All References** identifies all occurrences of variables and paragraphs from copybooks in the code.
-** **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element.	
+	- Contrasting colors used in displayed code for ease of identifying and distinguishing keywords, variables, and paragraphs.
+	
+- **Copybook Support**
+
+	- Semantic analysis for keywords, variables, and paragraphs, across copybooks supported.
+		- Ensures and maintains compatibility of copybooks called in code.
+	- Inbuilt protection against recursive + missing copybooks.
+		- Protects against code errors where copybook may contain looping code which could crash processes.
+		- Error message shows where copybook is missing, preventing issue only being discovered when code is executed.  
+	- Variables and paragraphs defined across copybooks.
+		- Ensures consistency of code, assisting with error diagnostics as issues will not be caused by incorrect variables or paragraphs in code. 
+	- Autocomplete updated to include copybook variables and paragraphs.
+		- Speeds up coding process by intuitively suggesting most likely variables or paragraphs to follow existing code.
+	- Functionality to skip variable levels when called, reducing call time.
+	- Inbuilt search function to identify all references filled with paragraphs and variables from copybooks:
+		- Find all references:
+			- Easily identifies all occurences of variables and paragraphs in the code
+		- Go To Definition:
+			- Right click on any variable or paragraph to reveal a definition of the element	
 	
