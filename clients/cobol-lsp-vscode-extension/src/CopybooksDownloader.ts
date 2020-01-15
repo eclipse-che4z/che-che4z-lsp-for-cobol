@@ -102,7 +102,6 @@ export class CopybooksDownloader {
 
     private async listPathDatasets(): Promise<string[]> {
         if (!vscode.workspace.getConfiguration(SETTINGS_ROOT).has("paths")) {
-            // TODO may be replace with throw
             await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
             return [];
         }
@@ -112,7 +111,6 @@ export class CopybooksDownloader {
     private async askProfile(): Promise<IProfile> {
         const profiles: ProfilesMap = await this.zoweApi.listZOSMFProfiles();
         if (Object.keys(profiles).length === 0) {
-            // TODO mey be replace with throw
             await vscode.window.showErrorMessage("Zowe profile is missing.");
             return undefined;
         }
