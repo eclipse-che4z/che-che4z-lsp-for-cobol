@@ -23,7 +23,7 @@ As a USER, I would like to... so I can...
 - Code review done by at least one other team member.
 - Manual testing is done.
 - Documentation is added and reviewed (if needed).
-- Pull request is approved.
+- The pull request is approved.
 - The story is merged into the development branch.
 - Tests are performed on the development branch.
 
