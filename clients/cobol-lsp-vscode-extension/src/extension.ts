@@ -74,7 +74,7 @@ function depChange(uri: Uri, downloader: CopybooksDownloader) {
 }
 
 function initWorkspaceTracker(downloader: CopybooksDownloader): Disposable {
-    const watcher = workspace.createFileSystemWatcher("**/" + DEPENDENCIES_FOLDER + "/**.deps", false, false, true);
+    const watcher = workspace.createFileSystemWatcher("**/" + DEPENDENCIES_FOLDER + "/**/**.deps", false, false, true);
     watcher.onDidCreate(uri => depChange(uri, downloader));
     watcher.onDidChange(uri => depChange(uri, downloader));
     return watcher;

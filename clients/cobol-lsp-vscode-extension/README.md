@@ -63,3 +63,10 @@ COBOL Language Support defines the protocol that is used between an editor or ID
 		- Go To Definition:
 			- Right click on any variable or paragraph to reveal a definition of the element
 
+** Install Imperative as a Dependency **
+
+Zowe inperative is pre-required library for building project. Issue the following commands to install Imperative CLI Framework as a dependency.
+```
+npm install --@zowe:registry=https://registry.npmjs.org --no-package-lock --force
+npm ci
+```

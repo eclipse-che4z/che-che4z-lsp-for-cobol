@@ -12,10 +12,11 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import { IProfile } from "@zowe/imperative";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { ZOSMFProfile, ZoweApi } from "./ZoweApi";
+import { ProfilesMap, ZoweApi } from "./ZoweApi";
 
 export const DEPENDENCIES_FOLDER: string = ".cobdeps";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
@@ -56,13 +57,13 @@ export class CopybooksDownloader {
                             }
                         }
                     } catch (e) {
-                        await vscode.window.showErrorMessage(e.toString());
+                        vscode.window.showErrorMessage(e.toString());
                     }
                 }
             });
     }
 
-    private async downloadCopybook(dataset: string, copybook: string, profile: ZOSMFProfile) {
+    private async downloadCopybook(dataset: string, copybook: string, profile: IProfile) {
         const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
         const copybookDirPath = path.join(rootPath, COPYBOOKS_FOLDER, dataset);
         const copybookPath = path.join(copybookDirPath, copybook + ".cpy");
@@ -83,27 +84,31 @@ export class CopybooksDownloader {
         return vscode.workspace.getConfiguration(SETTINGS_ROOT).get("paths");
     }
 
-    private async askProfile(): Promise<ZOSMFProfile> {
-        const profiles: ZOSMFProfile[] = this.zoweApi.listZOSMFProfiles();
-        if (profiles.length === 0) {
+    private async askProfile(): Promise<IProfile> {
+        const profiles: ProfilesMap = await this.zoweApi.listZOSMFProfiles();
+        if (Object.keys(profiles).length === 0) {
             // TODO mey be replace with throw
             await vscode.window.showErrorMessage("Zowe profile is missing.");
             return undefined;
         }
-        if (profiles.length === 1) {
-            return profiles[0];
+        if (Object.keys(profiles).length === 1) {
+            return profiles[Object.keys(profiles)[0]];
         }
-        const items: vscode.QuickPickItem[] = profiles.map(e => {
+        const defaultName = this.zoweApi.getDefaultProfileName();
+        const items: vscode.QuickPickItem[] = Object.keys(profiles).map(name => {
+            const profile: IProfile = profiles[name];
             return {
-                description: e.username + "@" + e.host + ":" + e.port,
-                label: e.name,
-                picked: e.default,
-                value: e,
+                description: profile.username + "@" + profile.host + ":" + profile.port,
+                label: name,
+                picked: name === defaultName,
             };
         });
 
-        // FIXME rewrite without value 'hack'
-        // tslint:disable-next-line: no-string-literal
-        return (await vscode.window.showQuickPick(items, { placeHolder: items[0].label, canPickMany: false }))["value"];
+        const selectedProfile = await vscode.window.showQuickPick(items,
+            { placeHolder: items[0].label, canPickMany: false });
+        if (selectedProfile) {
+            return profiles[selectedProfile.label];
+        }
+        return undefined;
     }
 }
