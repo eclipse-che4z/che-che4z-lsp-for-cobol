@@ -11,11 +11,10 @@ assignees: ''
 As a USER, I would like to... so I can...
 
 ## Acceptance Criteria ##
-- The feature works as designed.
-- The code is tested.
-- There are no bugs or code smells.
-- The solution is tested on all platforms.
-- The changelog is updated.
+- AC #1
+- AC #2
+- AC #3
+- AC #4
 
 ## Definition of Done ##
 - The story is implemented according to the description.
