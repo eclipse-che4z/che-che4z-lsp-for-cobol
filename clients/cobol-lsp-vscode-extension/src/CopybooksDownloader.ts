@@ -26,18 +26,28 @@ const SETTINGS_ROOT = "cobol-language-support";
 export class CopybooksDownloader {
     public constructor(private zoweApi: ZoweApi) { }
 
+    /**
+     * @param copybooks array of copybooks names to download
+     */
     // tslint:disable-next-line: cognitive-complexity
-    public async downloadCopyBooks(copybooks: string[]) {
+    public async downloadDependencies(uri: vscode.Uri): Promise<void> {
+        const missingCopybooksFilePath = uri.fsPath.substr(0, uri.fsPath.length - ".dep".length) + "err";
+        const copybooks: string[] = fs.readFileSync(uri.fsPath).toString().split("\n")
+            .filter(e => e.trim().length > 0)
+            .map(e => e.trim());
+        const missingCopybooks: string[] = this.readMissingCopybooks(missingCopybooksFilePath);
         if (vscode.workspace.workspaceFolders.length === 0) {
             vscode.window.showErrorMessage("No workspace folder opened.");
             return;
         }
+
         const cb: Set<string> = new Set(copybooks);
+        missingCopybooks.forEach(m => cb.delete(m));
         const profile = await this.askProfile();
         if (!profile) {
             return;
         }
-        vscode.window.withProgress(
+        await vscode.window.withProgress(
             {
                 location: vscode.ProgressLocation.Notification,
                 title: "Fetching copybooks",
@@ -61,8 +71,23 @@ export class CopybooksDownloader {
                     }
                 }
             });
+        let errors: string = "";
+        cb.forEach(c => errors += c + "\n");
+        if (errors) {
+            vscode.window.showErrorMessage("Can't download copybooks: " + errors);
+            fs.mkdirSync(path.dirname(missingCopybooksFilePath), { recursive: true });
+            fs.writeFileSync(missingCopybooksFilePath, errors);
+        }
     }
 
+    private readMissingCopybooks(missingCopybooksFilePath: string): string[] {
+        if (fs.existsSync(missingCopybooksFilePath)) {
+            return fs.readFileSync(missingCopybooksFilePath).toString().split("\n")
+                .filter(e => e.trim().length > 0)
+                .map(e => e.trim());
+        }
+        return [];
+    }
     private async downloadCopybook(dataset: string, copybook: string, profile: IProfile) {
         const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
         const copybookDirPath = path.join(rootPath, COPYBOOKS_FOLDER, dataset);

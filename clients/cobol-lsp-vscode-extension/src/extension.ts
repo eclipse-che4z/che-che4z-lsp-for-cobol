@@ -14,6 +14,7 @@
 
 import * as cp from "child_process";
 import * as fs from "fs";
+import * as path from "path";
 import { Disposable, ExtensionContext, extensions, StatusBarAlignment, Uri, window, workspace } from "vscode";
 import {
     Executable,
@@ -66,17 +67,10 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
 }
 
-function depChange(uri: Uri, downloader: CopybooksDownloader) {
-    const copybooks: string[] = fs.readFileSync(uri.fsPath).toString().split("\n")
-        .filter(e => e.trim().length > 0)
-        .map(e => e.trim());
-    downloader.downloadCopyBooks(copybooks);
-}
-
 function initWorkspaceTracker(downloader: CopybooksDownloader): Disposable {
     const watcher = workspace.createFileSystemWatcher("**/" + DEPENDENCIES_FOLDER + "/**/**.deps", false, false, true);
-    watcher.onDidCreate(uri => depChange(uri, downloader));
-    watcher.onDidChange(uri => depChange(uri, downloader));
+    watcher.onDidCreate(uri => downloader.downloadDependencies(uri));
+    watcher.onDidChange(uri => downloader.downloadDependencies(uri));
     return watcher;
 }
 
