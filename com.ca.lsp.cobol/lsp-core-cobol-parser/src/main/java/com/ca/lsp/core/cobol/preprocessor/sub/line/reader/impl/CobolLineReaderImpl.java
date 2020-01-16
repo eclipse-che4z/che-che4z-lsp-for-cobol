@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
@@ -41,9 +41,9 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
   @Override
   public ResultWithErrors<List<CobolLine>> processLines(
-      final String lines, final CobolSourceFormat format) {
-    final List<SyntaxError> errors = new ArrayList<>();
-    final List<CobolLine> result = new ArrayList<>();
+      String lines, CobolSourceFormat format) {
+    List<SyntaxError> errors = new ArrayList<>();
+    List<CobolLine> result = new ArrayList<>();
     try (Scanner scanner = new Scanner(lines)) {
       String currentLine;
       CobolLine lastCobolLine = null;
@@ -54,7 +54,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
         ResultWithErrors<CobolLine> output = parseLine(currentLine, lineNumber, format);
 
-        final CobolLine currentCobolLine = output.getResult();
+        CobolLine currentCobolLine = output.getResult();
         errors.addAll(output.getErrors());
 
         currentCobolLine.setPredecessor(lastCobolLine);
@@ -68,14 +68,14 @@ public class CobolLineReaderImpl implements CobolLineReader {
   }
 
   private ResultWithErrors<CobolLine> parseLine(
-      String line, final int lineNumber, final CobolSourceFormat format) {
-    final Pattern pattern = format.getPattern();
+      String line, int lineNumber, CobolSourceFormat format) {
+    Pattern pattern = format.getPattern();
 
     CobolLine cobolLine = new CobolLine();
 
     line = getDelegate().apply(line);
 
-    final Matcher matcher = pattern.matcher(line);
+    Matcher matcher = pattern.matcher(line);
     ResultWithErrors<String> result = checkFormatCorrect(line, lineNumber, format, matcher);
     line = result.getResult();
 
@@ -109,8 +109,8 @@ public class CobolLineReaderImpl implements CobolLineReader {
     return new ResultWithErrors<>(cobolLine, result.getErrors());
   }
 
-  private CobolLineTypeEnum determineType(final String indicatorArea) {
-    final CobolLineTypeEnum result;
+  private CobolLineTypeEnum determineType(String indicatorArea) {
+    CobolLineTypeEnum result;
 
     switch (indicatorArea) {
       case CHAR_D_UPPER:
@@ -137,7 +137,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
   }
 
   private ResultWithErrors<String> checkFormatCorrect(
-      String line, final int lineNumber, final CobolSourceFormat format, final Matcher matcher) {
+      String line, int lineNumber, CobolSourceFormat format, Matcher matcher) {
     int errorLength = 0;
     int charPosition;
     List<SyntaxError> errors = new ArrayList<>();
@@ -160,7 +160,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
   }
 
   private SyntaxError registerFormatError(
-      int lineNumber, final CobolSourceFormat format, int charPosition, int errorLength) {
+      int lineNumber, CobolSourceFormat format, int charPosition, int errorLength) {
     return SyntaxError.syntaxError()
         .suggestion("This format is not a " + format.toString() + " format")
         .severity(1)

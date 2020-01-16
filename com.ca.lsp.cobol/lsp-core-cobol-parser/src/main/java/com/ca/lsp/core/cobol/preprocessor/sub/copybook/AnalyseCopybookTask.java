@@ -18,12 +18,12 @@ package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.api.DataBusObserver;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
-import com.broadcom.lsp.domain.cobol.model.DataEventType;
-import com.broadcom.lsp.domain.cobol.model.FetchedCopybookEvent;
-import com.broadcom.lsp.domain.cobol.model.RequiredCopybookEvent;
+import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
+import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
+import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
@@ -43,7 +43,7 @@ import java.util.concurrent.RecursiveTask;
 
 @Slf4j
 public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<CopybookSemanticContext>>
-    implements DataBusObserver<FetchedCopybookEvent> {
+    implements EventObserver<FetchedCopybookEvent> {
 
   private transient DataBusBroker databus =
       LangServerCtx.getInjector().getInstance(DefaultDataBusBroker.class);

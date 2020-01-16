@@ -118,6 +118,13 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.5</version>
+
+                <configuration>
+                    <excludes>
+                        <exclude>**/com/broadcom/lsp/cdi/module/**/*</exclude>
+                    </excludes>
+                </configuration>
+
                 <executions>
                     <execution>
                         <id>coverage-prepare-agent</id>

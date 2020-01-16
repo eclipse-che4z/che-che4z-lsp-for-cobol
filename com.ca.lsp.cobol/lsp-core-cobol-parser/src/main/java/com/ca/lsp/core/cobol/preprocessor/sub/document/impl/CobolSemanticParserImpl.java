@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
