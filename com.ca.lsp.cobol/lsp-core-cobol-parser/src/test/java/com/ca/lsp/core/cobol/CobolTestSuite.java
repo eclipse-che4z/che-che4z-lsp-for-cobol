@@ -16,6 +16,7 @@ package com.ca.lsp.core.cobol;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngineTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolCommentEntriesMarkerImplTest;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolLineIndicatorProcessorImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.ContinuationLineTransformationTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.impl.CobolLineWriterImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtilsTest;
@@ -42,5 +43,6 @@ import org.junit.runners.Suite.SuiteClasses;
   PreprocessorStringUtilsTest.class,
   LevenshteinDistanceTest.class,
   VariableDefinitionTest.class,
+  CobolLineIndicatorProcessorImplTest.class
 })
 public class CobolTestSuite {}
