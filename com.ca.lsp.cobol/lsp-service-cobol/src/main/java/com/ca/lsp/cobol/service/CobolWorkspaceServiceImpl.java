@@ -19,6 +19,7 @@ import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
+import com.google.common.annotations.Beta;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,9 @@ import org.eclipse.lsp4j.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,6 +49,7 @@ import java.util.stream.Stream;
 @Slf4j
 @Singleton
 public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
+  public static final String SOMEPROG_DEP = "SOMEPROG.dep";
   private final ExecutorService threadPool;
   private final DefaultDataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
@@ -136,6 +140,13 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
     threadPool.submit(
         () -> {
           String name = event.getName();
+          // generate a dummy .dep file
+          try {
+            generateDependencyFile();
+          } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+          }
+
           Path path = getURIByCopybookName(name);
           String content = Optional.ofNullable(path).map(this::retrieveContentByURI).orElse(null);
           dataBus.postData(
@@ -210,5 +221,46 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
 
   private List<WorkspaceFolder> getWorkspaceFolders() {
     return workspaceFolders;
+  }
+
+  /** This method creates a dep file with a dummy content for e2e scenarios. */
+  @Beta
+  private void generateDependencyFile() throws IOException, URISyntaxException {
+
+    Path cobdepsPath =
+        Paths.get(
+            Paths.get(new URI(getWorkspaceFolders().get(0).getUri()))
+                + System.getProperty("file.separator")
+                + ".cobdeps"
+                + System.getProperty("file.separator"));
+
+    log.info("Path for folder: " + cobdepsPath);
+
+    if (!Files.exists(cobdepsPath)) {
+      Files.createDirectory(cobdepsPath);
+    }
+
+    Path depFilePath = Paths.get(cobdepsPath + System.getProperty("file.separator") + SOMEPROG_DEP);
+    log.info(depFilePath.toString());
+
+    if (!depFilePath.toFile().exists()) {
+      Files.createFile(depFilePath);
+      generateDummyContentForFile(depFilePath);
+    }
+  }
+
+  private void generateDummyContentForFile(Path copybookFilePath) {
+    File copybookFile = copybookFilePath.toFile();
+    FileOutputStream fileOutputStream;
+    try {
+      fileOutputStream = new FileOutputStream(copybookFile, true);
+      BufferedOutputStream bufferedOutputStream =
+          new BufferedOutputStream(fileOutputStream, 128 * 100);
+      bufferedOutputStream.write("DSF".getBytes());
+      bufferedOutputStream.flush();
+      fileOutputStream.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }
