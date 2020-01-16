@@ -20,6 +20,7 @@ import com.broadcom.lsp.domain.cobol.event.api.CopybookEventFactory;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.impl.FetchedCopybookEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.impl.RequiredCopybookEventSubscriber;
+import com.broadcom.lsp.domain.cobol.event.impl.RunAnalysisEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
@@ -39,6 +40,7 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
     }
   }
 
+  private static final String RUN_ANALYSIS = "RUN_ANALYSIS";
   private static final String REQCPY = "REQCPY";
   private static final String FETCHEDCPY = "FETCHEDCPY";
   private static final String UNKNOWN = "UNKNOWN";
@@ -65,6 +67,12 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
   @Test
   public void testUnknownSubscriberFactory() {
     assertEquals(UNKNOWN, getUnknownSubscriberFromFactory().getEventType().getHeader());
+  }
+
+  /** This test verify that the RunAnalysis factory creates a new RunAnalysis event */
+  @Test
+  public void testRunAnalysisSubscriberFactory() {
+    assertEquals(RUN_ANALYSIS, getRunAnalysisSubscriberFromFactory().getEventType().getHeader());
   }
 
   /** This test verify that a wrong factory isn't returned back. */
@@ -95,5 +103,10 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
     return (FetchedCopybookEventSubscriber)
         CopybookEventFactory.getFactory(DataEventType.FETCHED_COPYBOOK_EVENT)
             .create(databusObserver);
+  }
+
+  private RunAnalysisEventSubscriber getRunAnalysisSubscriberFromFactory() {
+    return (RunAnalysisEventSubscriber)
+        CopybookEventFactory.getFactory(DataEventType.RUN_ANALYSIS_EVENT).create(databusObserver);
   }
 }
