@@ -55,5 +55,5 @@ To use the COBOL Language Support extension while working with copybooks, place 
 * Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code. 
 * Functionality to skip variable levels when called, reducing call time.
 * Find All References and Go To Definition functionalities.
-** **Find All References** identifies all occurrences of variables and paragraphs from copybooks in the code.
-** **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element.
+    - **Find All References** identifies all occurrences of variables and paragraphs from copybooks in the code.
+    - **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element.
