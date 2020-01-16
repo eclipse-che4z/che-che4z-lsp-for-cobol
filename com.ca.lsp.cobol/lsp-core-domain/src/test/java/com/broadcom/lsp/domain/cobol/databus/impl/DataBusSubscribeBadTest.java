@@ -30,7 +30,7 @@ import static org.junit.Assert.fail;
 
 /** This test verifies that the observer is not triggered by the event it is not subscribed to. */
 @Slf4j
-public class DataBusSubscribeBadTest extends AbsDataBusImplTest {
+public class DataBusSubscribeBadTest extends DatabusConfigProvider {
 
   private DefaultDataBusBroker<RequiredCopybookEvent, RequiredCopybookEventSubscriber> databus;
 
