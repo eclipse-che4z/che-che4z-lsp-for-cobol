@@ -31,6 +31,13 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
+      <dependency>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.2.0</version>
+      </dependency>
+
       <dependency>
         <groupId>org.eclipse.lsp4j</groupId>
         <artifactId>org.eclipse.lsp4j</artifactId>
