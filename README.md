@@ -13,9 +13,9 @@
 
 COBOL Language Support standardizes the communication between language tooling for COBOL and your code editor. Files with the extensions .COB and .CBL are recognized as COBOL files.
 
-This extension is a part of the Che4z open-source project. Feel free to contribute right here.
+This extension is a part of the [Che4z](https://github.com/eclipse/che-che4z) open-source project. Feel free to contribute right here.
 
-> It's also part of a [Code4z](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.code4z-extension-pack), an all-round package that offers a modern experience for mainframe application developers, including [HLASM Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.hlasm-language-support), Explorer for Endevor, Zowe Explorer and Debugger for Mainframe extensions.
+COBOL Language Support is also part of a [Code4z](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.code4z-extension-pack), an all-round package that offers a modern experience for mainframe application developers, including [HLASM Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.hlasm-language-support), Explorer for Endevor, Zowe Explorer and Debugger for Mainframe extensions.
 
 ## Prerequisites
 
