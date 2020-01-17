@@ -53,6 +53,7 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends Negat
                 new CobolText("INDIRECT-COPY", INDIRECT_COPY)));
   }
 
+  @Override
   @Test
   public void test() {
     super.test();

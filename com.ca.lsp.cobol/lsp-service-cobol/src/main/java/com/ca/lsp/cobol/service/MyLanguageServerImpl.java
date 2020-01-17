@@ -26,11 +26,16 @@ import java.util.concurrent.CompletableFuture;
 @Singleton
 public class MyLanguageServerImpl implements LanguageServer {
   private final TextDocumentService textService;
+  private final FileSystemService fileSystemService;
   private final CobolWorkspaceService workspaceService;
 
   @Inject
-  MyLanguageServerImpl(CobolWorkspaceService workspaceService, TextDocumentService textService) {
+  MyLanguageServerImpl(
+      FileSystemService fileSystemService,
+      TextDocumentService textService,
+      CobolWorkspaceService workspaceService) {
     this.textService = textService;
+    this.fileSystemService = fileSystemService;
     this.workspaceService = workspaceService;
   }
 
@@ -56,7 +61,7 @@ public class MyLanguageServerImpl implements LanguageServer {
         new WorkspaceServerCapabilities(workspaceFoldersOptions);
     capabilities.setWorkspace(workspaceServiceCapabilities);
 
-    workspaceService.setWorkspaceFolders(params.getWorkspaceFolders());
+    fileSystemService.setWorkspaceFolders(params.getWorkspaceFolders());
     return CompletableFuture.supplyAsync(() -> new InitializeResult(capabilities));
   }
 

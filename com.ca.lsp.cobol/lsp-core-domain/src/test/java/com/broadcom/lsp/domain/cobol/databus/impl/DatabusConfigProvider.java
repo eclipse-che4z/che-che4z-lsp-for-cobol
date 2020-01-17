@@ -33,7 +33,7 @@ import java.util.concurrent.TimeoutException;
  */
 @Slf4j
 public abstract class DatabusConfigProvider implements EventObserver<DataEvent> {
-  public static final int WAITER_DELAY = 500;
+  public static final int WAITER_DELAY = 1000;
   @Getter protected final Waiter waiter = new Waiter();
   @Setter @Getter private DataEventType targetEventType;
   private DefaultDataBusBroker databus =

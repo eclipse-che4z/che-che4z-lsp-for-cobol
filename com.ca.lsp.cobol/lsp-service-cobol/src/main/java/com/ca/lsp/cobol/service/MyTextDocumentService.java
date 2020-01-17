@@ -22,6 +22,7 @@ import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -128,10 +129,17 @@ public class MyTextDocumentService implements TextDocumentService {
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("formatting", uri)));
   }
 
+  @SneakyThrows
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
     String text = params.getTextDocument().getText();
+    // TODO: Add unit test for file name
+    //    String fileNameOpened = Paths.get(new URI(uri)).getFileName().toString();
+    //    System.out.println(fileNameOpened);    String fileNameOpened = Paths.get(new
+    // URI(uri)).getFileName().toString();
+    //    System.out.println(fileNameOpened);
+
     String langId = params.getTextDocument().getLanguageId();
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     registerEngineAndAnalyze(uri, langId, text);

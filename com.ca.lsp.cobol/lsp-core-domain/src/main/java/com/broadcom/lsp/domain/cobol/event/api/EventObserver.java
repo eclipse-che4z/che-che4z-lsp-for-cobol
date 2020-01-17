@@ -16,10 +16,13 @@
 
 package com.broadcom.lsp.domain.cobol.event.api;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 /**
  * This interface implements the Observer pattern for the databus. It provides a callback method to
  * perform some action if the required event is populated.
  */
 public interface EventObserver<O> {
-  void observerCallback(O adaptedDataEvent);
+  void observerCallback(O adaptedDataEvent) throws URISyntaxException, IOException;
 }

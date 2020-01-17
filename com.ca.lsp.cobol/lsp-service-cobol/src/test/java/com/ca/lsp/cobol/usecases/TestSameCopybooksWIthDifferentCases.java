@@ -55,6 +55,7 @@ public class TestSameCopybooksWIthDifferentCases extends PositiveUseCase {
         () -> Collections.singletonList(new CobolText("STRUCT1", STRUCT1)));
   }
 
+  @Override
   @Test
   public void test() {
     super.test();

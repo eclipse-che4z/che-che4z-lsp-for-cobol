@@ -51,6 +51,7 @@ public class TestVariableStructureInCopybooksWithMissingLevels extends PositiveU
     workspaceService.setCopybooks(() -> Collections.singletonList(new CobolText("STRUCT", STRUCT)));
   }
 
+  @Override
   @Test
   public void test() {
     super.test();
