@@ -110,7 +110,7 @@ public class CobolLineIndicatorProcessorImplTest {
     CONTINUATION_LINE_WITH_END_QUOTES.setContentAreaBOriginal("        ");
     CONTINUATION_LINE_WITH_END_QUOTES.setContentAreaB("        ");
 
-    List<CobolLine> listOfLines =
+    final List<CobolLine> listOfLines =
         Arrays.asList(
             GOOD_CONTINUATION_LINE_TO_TEST,
             SINGLE_CONTINUATION_LINE_TO_TEST,
