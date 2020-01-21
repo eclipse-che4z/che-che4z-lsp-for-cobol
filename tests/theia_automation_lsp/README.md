@@ -14,21 +14,21 @@ Automate functional tests running on theia with Selenium Explorer in ZOS, Explor
 
   	<code>C:\Python3_x64\Scripts\pip3.exe install virtualenv</code>
 
-3) Clone repository
+3) Clone the repository
 
   	<code>C:\WORK>git clone git@github.gwd.broadcom.net:MFD/theia_automation.git</code>
   
-4) Create virtual environment
+4) Create the virtual environment
 
   	<code>cd C:\WORK\theia_automation</code>
 
   	<code>C:\Python3_x64\python.exe -m virtualenv venv3_x64</code>
   
-5) Activate virtual environment
+5) Activate the virtual environment
 
   	<code>venv3_x64\Scripts\activate.bat</code>
   
-6) Install required Python modules
+6) Install the required Python modules
 
   	<code>venv3_x64\Scripts\pip3.exe install -r requirements.txt</code>
   
@@ -36,13 +36,12 @@ Automate functional tests running on theia with Selenium Explorer in ZOS, Explor
   
   	<code>set PYTHONPATH=C:\WORK\theia_automation</code>
 
-8) Optional:
-- Set Mainframe credentials:
-
-If you need to run a test suite, which doesn't require Mainframe connection like LSP test suite for local COBOL files (see example below), you don't have to provide Mainframe credentials at all.
+8) (Optional) Set Mainframe credentials:
 
 * Modify project file inc\cfg\mf_credentials.py by filling it with your mainframe credentials.
 * If you leave it as it is (with None as credential values), during test start you will be prompted for credentials with a dialog.
+
+**Note**: If you need to run a test suite, which doesn't require Mainframe connection like LSP test suite for local COBOL files (see example below), you don't have to provide Mainframe credentials at all.
 
 9) Establish and Run Theia environment
 
@@ -77,7 +76,7 @@ After Theia is established and running with zos explorer plugin, run the followi
 	
 - <code>venv3_x64\Scripts\python.exe -m robot --removekeywords NAME:login.* --outputdir ..\robot_output --debugfile debug.txt robot_suites</code>
 	
-That will generate log and report without credential information, however xml output will still contain it.
+The command will generate log and report without credential information, however xml output will still contain it.
 	
 2) To remove it from xml, after test suite is completed, run:
 	
