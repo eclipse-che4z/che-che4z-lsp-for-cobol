@@ -14,7 +14,6 @@
 
 import * as cp from "child_process";
 import * as fs from "fs";
-import * as path from "path";
 import { Disposable, ExtensionContext, extensions, StatusBarAlignment, Uri, window, workspace } from "vscode";
 import {
     Executable,

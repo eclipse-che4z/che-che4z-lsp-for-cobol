@@ -31,6 +31,7 @@ export class CopybooksDownloader {
      */
     // tslint:disable-next-line: cognitive-complexity
     public async downloadDependencies(uri: vscode.Uri): Promise<void> {
+        // TODO Maybe introduce download queue?
         const missingCopybooksFilePath = uri.fsPath.substr(0, uri.fsPath.length - ".dep".length) + ".err";
         const copybooks: string[] = fs.readFileSync(uri.fsPath).toString().split("\n")
             .filter(e => e.trim().length > 0)
@@ -118,17 +119,22 @@ export class CopybooksDownloader {
             return profiles[Object.keys(profiles)[0]];
         }
         const defaultName = this.zoweApi.getDefaultProfileName();
-        const items: vscode.QuickPickItem[] = Object.keys(profiles).map(name => {
+        let items: vscode.QuickPickItem[] = [];
+        Object.keys(profiles).forEach(name => {
             const profile: IProfile = profiles[name];
-            return {
+            const item: vscode.QuickPickItem = {
                 description: profile.username + "@" + profile.host + ":" + profile.port,
                 label: name,
-                picked: name === defaultName,
             };
+            if (defaultName === name) {
+                items = [item].concat(items);
+            } else {
+                items.push(item);
+            }
         });
 
         const selectedProfile = await vscode.window.showQuickPick(items,
-            { placeHolder: items[0].label, canPickMany: false });
+            { placeHolder: defaultName, canPickMany: false });
         if (selectedProfile) {
             return profiles[selectedProfile.label];
         }
