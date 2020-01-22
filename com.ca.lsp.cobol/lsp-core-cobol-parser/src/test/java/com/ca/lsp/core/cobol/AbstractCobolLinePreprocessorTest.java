@@ -24,8 +24,8 @@ import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
 public abstract class AbstractCobolLinePreprocessorTest {
 
   protected ResultWithErrors<List<CobolLine>> processText(String text) {
-    CobolLineReaderImpl reader = new CobolLineReaderImpl(null);
-    return reader.processLines(text, FIXED);
+    CobolLineReaderImpl reader = new CobolLineReaderImpl();
+    return reader.processLines(null, text, FIXED);
   }
 
   protected String reduceLines(List<String> lines) {

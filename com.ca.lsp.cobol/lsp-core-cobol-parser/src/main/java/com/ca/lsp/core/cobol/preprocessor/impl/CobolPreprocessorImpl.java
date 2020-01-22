@@ -93,7 +93,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
   private ResultWithErrors<List<CobolLine>> readLines(
       final String cobolCode, final CobolSourceFormat format, String documentURI) {
-    return createLineReader(documentURI).processLines(cobolCode, format);
+    return createLineReader().processLines(documentURI, cobolCode, format);
   }
 
   private ResultWithErrors<List<CobolLine>> transformLines(
@@ -137,8 +137,8 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     return new ContinuationLineTransformation();
   }
 
-  private CobolLineReader createLineReader(String documentURI) {
-    return new CobolLineReaderImpl(documentURI);
+  private CobolLineReader createLineReader() {
+    return new CobolLineReaderImpl();
   }
 
   private CobolLineWriter createLineWriter() {
