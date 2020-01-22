@@ -88,7 +88,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
       final String document,
       final CobolSourceFormat format,
       final SemanticContext semanticContext) {
-    return createDocumentParser(semanticContext).processLines(document, format);
+    return createDocumentParser().processLines(document, semanticContext, format);
   }
 
   private ResultWithErrors<List<CobolLine>> readLines(
@@ -117,8 +117,8 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     return new CobolCommentEntriesMarkerImpl();
   }
 
-  private CobolSemanticParser createDocumentParser(SemanticContext semanticContext) {
-    return new CobolSemanticParserImpl(semanticContext);
+  private CobolSemanticParser createDocumentParser() {
+    return new CobolSemanticParserImpl();
   }
 
   private CobolDocumentCleaner createDocumentCleaner() {
