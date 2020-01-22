@@ -20,6 +20,7 @@ import com.broadcom.lsp.domain.cobol.event.api.CopybookEventFactory;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.impl.FetchedCopybookEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.impl.RequiredCopybookEventSubscriber;
+import com.broadcom.lsp.domain.cobol.event.impl.RerunAnalysisEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
@@ -41,8 +42,9 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
 
   private static final String REQCPY = "REQCPY";
   private static final String FETCHEDCPY = "FETCHEDCPY";
+  private static final String RERUN = "RERUN";
   private static final String UNKNOWN = "UNKNOWN";
-  DatabusObserverTest databusObserver;
+  private DatabusObserverTest databusObserver;
 
   @Before
   public void initObserver() {
@@ -59,6 +61,12 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
   @Test
   public void testFetchSubscriberFactory() {
     assertEquals(FETCHEDCPY, getFetchedSubscriberFromFactory().getEventType().getHeader());
+  }
+
+  /** This test verify that the FetchedCopybook factory creates a new FetchedCopybook event */
+  @Test
+  public void testRerunAnalysisSubscriberFactory() {
+    assertEquals(RERUN, getRerunSubscriberFromFactory().getEventType().getHeader());
   }
 
   /** This test verify that the Unknown factory creates a new Unknown event */
@@ -78,6 +86,8 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
 
     assertNotEquals(REQCPY, getUnknownSubscriberFromFactory());
     assertNotEquals(FETCHEDCPY, getFetchedSubscriberFromFactory());
+
+    assertNotEquals(RERUN, getFetchedSubscriberFromFactory());
   }
 
   private UnknownEventSubscriber getUnknownSubscriberFromFactory() {
@@ -95,5 +105,10 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
     return (FetchedCopybookEventSubscriber)
         CopybookEventFactory.getFactory(DataEventType.FETCHED_COPYBOOK_EVENT)
             .create(databusObserver);
+  }
+
+  private RerunAnalysisEventSubscriber getRerunSubscriberFromFactory() {
+    return (RerunAnalysisEventSubscriber)
+        CopybookEventFactory.getFactory(DataEventType.RERUN_ANALYSIS_EVENT).create(databusObserver);
   }
 }
