@@ -2,7 +2,7 @@
 
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [0.10.0] - 2020-01-20
+## [0.10.0] - 2020-01-24
 
 - Remove unused parser params in order to simplify the dependencies, remove logic duplication. [#136](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/136) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - Remove unused imports and add constants where math operations are in place [#135](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/135) Thanks @[sergiuilie](https://github.com/sergiuilie)
