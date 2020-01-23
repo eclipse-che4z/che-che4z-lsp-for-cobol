@@ -98,7 +98,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
   private ResultWithErrors<List<CobolLine>> transformLines(
       List<CobolLine> lines, String documentURI) {
-    return createContinuationLineProcessor(documentURI).transformLines(lines);
+    return createContinuationLineProcessor().transformLines(documentURI, lines);
   }
 
   /**
@@ -133,8 +133,8 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     return new CobolLineIndicatorProcessorImpl();
   }
 
-  private CobolLinesTransformation createContinuationLineProcessor(String documentURI) {
-    return new ContinuationLineTransformation(documentURI);
+  private CobolLinesTransformation createContinuationLineProcessor() {
+    return new ContinuationLineTransformation();
   }
 
   private CobolLineReader createLineReader(String documentURI) {
