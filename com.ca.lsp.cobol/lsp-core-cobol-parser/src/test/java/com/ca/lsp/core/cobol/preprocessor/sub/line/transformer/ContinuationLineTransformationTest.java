@@ -102,8 +102,8 @@ public class ContinuationLineTransformationTest extends AbstractCobolLinePreproc
   private List<SyntaxError> runTransformation(String text) {
     List<CobolLine> lines = convertToCobolLines(text);
 
-    ContinuationLineTransformation transformation = new ContinuationLineTransformation(null);
-    return transformation.transformLines(lines).getErrors();
+    ContinuationLineTransformation transformation = new ContinuationLineTransformation();
+    return transformation.transformLines(null, lines).getErrors();
   }
 
   private List<CobolLine> convertToCobolLines(String text) {

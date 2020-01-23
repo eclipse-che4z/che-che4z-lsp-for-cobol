@@ -1,9 +1,24 @@
-/** */
+/*
+ * Copyright (c) 2019 Broadcom.
+ *
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ * Broadcom, Inc. - initial API and implementation
+ *
+ */
 package com.broadcom.lsp.domain.cobol.event;
 
 import com.broadcom.lsp.domain.CopybookStorableProvider;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
+import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -15,6 +30,7 @@ public class CopybookEventsTest extends CopybookStorableProvider {
   private static final String UNKNOWN_EVENT_MESSAGE = "Dummy event";
   private static final String REQCPY = "REQCPY";
   private static final String FETCHEDCPY = "FETCHEDCPY";
+  private static final String RUNANALYSIS = "RUNANALYSIS";
   private static final String UNKNOWN = "UNKNOWN";
   private static final String COPYBOOK_NAME = "Test";
   private static final String COPYBOOK_URI = "file:///C:/Users/test/Test.cbl";
@@ -32,9 +48,15 @@ public class CopybookEventsTest extends CopybookStorableProvider {
     assertEquals(FETCHEDCPY, getFetchCopybookHeader());
   }
 
+  /** Test that the FetchedCopybookEvent DTO is correclty populated */
+  @Test
+  public void rerunAnalysisEventTest() {
+    assertEquals(RUNANALYSIS, getRerunAnalysisHeader());
+  }
+
   /** Test that the UnknownEvent DTO is correclty populated */
   @Test
-  public void unknowEventTest() {
+  public void unknownEventTest() {
     assertEquals(UNKNOWN, getUnknownCopybookHeader());
   }
 
@@ -49,6 +71,8 @@ public class CopybookEventsTest extends CopybookStorableProvider {
 
     assertNotEquals(REQCPY, getFetchCopybookHeader());
     assertNotEquals(UNKNOWN, getFetchCopybookHeader());
+
+    assertNotEquals(RUNANALYSIS, getFetchCopybookHeader());
   }
 
   /** This test verify that a null header is not returned back from the callee. */
@@ -66,6 +90,10 @@ public class CopybookEventsTest extends CopybookStorableProvider {
 
   private String getFetchCopybookHeader() {
     return new FetchedCopybookEvent(COPYBOOK_NAME, COPYBOOK_URI, COPYBOOK_CONTENT).getHeader();
+  }
+
+  private String getRerunAnalysisHeader() {
+    return new RunAnalysisEvent().getHeader();
   }
 
   private String getUnknownCopybookHeader() {
