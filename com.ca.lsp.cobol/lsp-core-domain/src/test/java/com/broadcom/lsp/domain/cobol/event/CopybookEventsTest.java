@@ -18,7 +18,7 @@ package com.broadcom.lsp.domain.cobol.event;
 import com.broadcom.lsp.domain.CopybookStorableProvider;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import com.broadcom.lsp.domain.cobol.event.model.RerunAnalysisEvent;
+import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class CopybookEventsTest extends CopybookStorableProvider {
   private static final String UNKNOWN_EVENT_MESSAGE = "Dummy event";
   private static final String REQCPY = "REQCPY";
   private static final String FETCHEDCPY = "FETCHEDCPY";
-  private static final String RERUN = "RERUN";
+  private static final String RUNANALYSIS = "RUNANALYSIS";
   private static final String UNKNOWN = "UNKNOWN";
   private static final String COPYBOOK_NAME = "Test";
   private static final String COPYBOOK_URI = "file:///C:/Users/test/Test.cbl";
@@ -51,7 +51,7 @@ public class CopybookEventsTest extends CopybookStorableProvider {
   /** Test that the FetchedCopybookEvent DTO is correclty populated */
   @Test
   public void rerunAnalysisEventTest() {
-    assertEquals(RERUN, getRerunAnalysisHeader());
+    assertEquals(RUNANALYSIS, getRerunAnalysisHeader());
   }
 
   /** Test that the UnknownEvent DTO is correclty populated */
@@ -72,7 +72,7 @@ public class CopybookEventsTest extends CopybookStorableProvider {
     assertNotEquals(REQCPY, getFetchCopybookHeader());
     assertNotEquals(UNKNOWN, getFetchCopybookHeader());
 
-    assertNotEquals(RERUN, getFetchCopybookHeader());
+    assertNotEquals(RUNANALYSIS, getFetchCopybookHeader());
   }
 
   /** This test verify that a null header is not returned back from the callee. */
@@ -93,7 +93,7 @@ public class CopybookEventsTest extends CopybookStorableProvider {
   }
 
   private String getRerunAnalysisHeader() {
-    return new RerunAnalysisEvent().getHeader();
+    return new RunAnalysisEvent().getHeader();
   }
 
   private String getUnknownCopybookHeader() {

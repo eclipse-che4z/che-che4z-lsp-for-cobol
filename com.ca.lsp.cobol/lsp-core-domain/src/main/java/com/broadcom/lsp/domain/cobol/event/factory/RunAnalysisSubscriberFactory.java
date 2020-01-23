@@ -17,13 +17,13 @@ package com.broadcom.lsp.domain.cobol.event.factory;
 
 import com.broadcom.lsp.domain.cobol.event.api.CopybookSubscriber;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
-import com.broadcom.lsp.domain.cobol.event.impl.RerunAnalysisEventSubscriber;
-import com.broadcom.lsp.domain.cobol.event.model.RerunAnalysisEvent;
-/** This class is a factory for {@link RerunAnalysisEventSubscriber} */
-public class RerunAnalysisSubscriberFactory
-    implements CopybookSubscriber<RerunAnalysisEventSubscriber> {
+import com.broadcom.lsp.domain.cobol.event.impl.RunAnalysisEventSubscriber;
+import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
+/** This class is a factory for {@link RunAnalysisEventSubscriber} */
+public class RunAnalysisSubscriberFactory
+    implements CopybookSubscriber<RunAnalysisEventSubscriber> {
   @Override
-  public RerunAnalysisEventSubscriber create(EventObserver observer) {
-    return new RerunAnalysisEventSubscriber(observer, new RerunAnalysisEvent());
+  public RunAnalysisEventSubscriber create(EventObserver observer) {
+    return new RunAnalysisEventSubscriber(observer, new RunAnalysisEvent());
   }
 }

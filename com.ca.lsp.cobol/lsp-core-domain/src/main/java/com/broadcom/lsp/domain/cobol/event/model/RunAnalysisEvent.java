@@ -21,8 +21,8 @@ import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.RERUN_ANAL
  * This class is a signal object to show that it is needed to run the syntax and semantic again for
  * all the registered documents.
  */
-public class RerunAnalysisEvent extends DataEvent {
-  public RerunAnalysisEvent() {
+public class RunAnalysisEvent extends DataEvent {
+  public RunAnalysisEvent() {
     super(RERUN_ANALYSIS_EVENT, RERUN_ANALYSIS_EVENT.getId());
   }
 }

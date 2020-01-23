@@ -15,7 +15,7 @@ package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.event.model.RerunAnalysisEvent;
+import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
@@ -163,7 +163,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     verifyDidOpen(
         communications, engine, diagnosticsWithErrors, service, INCORRECT_TEXT_EXAMPLE, "2");
 
-    service.observerCallback(new RerunAnalysisEvent());
+    service.observerCallback(new RunAnalysisEvent());
     verifyCallback(communications, engine, diagnosticsNoErrors, TEXT_EXAMPLE, "1");
     verifyCallback(communications, engine, diagnosticsWithErrors, INCORRECT_TEXT_EXAMPLE, "2");
   }

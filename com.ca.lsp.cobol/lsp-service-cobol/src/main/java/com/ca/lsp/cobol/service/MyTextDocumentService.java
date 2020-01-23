@@ -17,7 +17,7 @@ package com.ca.lsp.cobol.service;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
-import com.broadcom.lsp.domain.cobol.event.model.RerunAnalysisEvent;
+import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.completions.Completions;
 import com.ca.lsp.cobol.service.delegates.formations.Formations;
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Singleton
 public class MyTextDocumentService
-    implements TextDocumentService, EventObserver<RerunAnalysisEvent> {
+    implements TextDocumentService, EventObserver<RunAnalysisEvent> {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob", "COBOL");
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
@@ -168,7 +168,7 @@ public class MyTextDocumentService
   }
 
   @Override
-  public void observerCallback(@Nonnull RerunAnalysisEvent event) {
+  public void observerCallback(@Nonnull RunAnalysisEvent event) {
     docs.entrySet().stream()
         .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getText()))
         .forEach(this::analyzeChanges);

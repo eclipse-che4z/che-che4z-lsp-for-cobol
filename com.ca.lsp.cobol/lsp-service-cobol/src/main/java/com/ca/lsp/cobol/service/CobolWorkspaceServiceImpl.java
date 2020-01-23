@@ -16,7 +16,7 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.event.model.RerunAnalysisEvent;
+import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
@@ -74,7 +74,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   public void didChangeWatchedFiles(@Nonnull DidChangeWatchedFilesParams params) {
     dataBus.invalidateCache();
     log.info("Cache invalidated due to a copybooks file watcher was triggered");
-    dataBus.postData(new RerunAnalysisEvent());
+    dataBus.postData(new RunAnalysisEvent());
   }
 
   /**

@@ -19,7 +19,7 @@ import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.cdi.module.service.ServiceModule;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.event.model.RerunAnalysisEvent;
+import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
@@ -28,7 +28,6 @@ import org.eclipse.lsp4j.FileEvent;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.junit.*;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 import javax.annotation.Nonnull;
 import java.io.BufferedOutputStream;
@@ -192,8 +191,8 @@ public class WorkspaceServiceTest {
 
   private void checkWatchers(FileEvent event) {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
-    ArgumentCaptor<RerunAnalysisEvent> captor =
-        ArgumentCaptor.forClass(RerunAnalysisEvent.class);
+    ArgumentCaptor<RunAnalysisEvent> captor =
+        ArgumentCaptor.forClass(RunAnalysisEvent.class);
 
     CobolWorkspaceServiceImpl service = new CobolWorkspaceServiceImpl(broker);
 
