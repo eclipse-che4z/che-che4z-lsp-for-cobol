@@ -34,24 +34,6 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineIndicatorProces
   private static final String LEADING_WHITESPACE = "^\\s+";
   private static final String TRAILING_WHITESPACE = "\\s+$";
 
-  private String conditionalRightTrimContentArea(final CobolLine line) {
-    return !isNextLineContinuation(line) || !isEndingWithOpenLiteral(line)
-        ? rightTrimContentArea(line.getContentArea())
-        : line.getContentArea();
-  }
-
-  private boolean isEndingWithOpenLiteral(final CobolLine line) {
-    final String contentAreaWithoutStringLiterals =
-        removeStringLiterals(line.getContentAreaOriginal());
-    return contentAreaWithoutStringLiterals.contains("\"")
-        || contentAreaWithoutStringLiterals.contains("'");
-  }
-
-  private boolean isNextLineContinuation(final CobolLine line) {
-    return line.getSuccessor() != null
-        && CobolLineTypeEnum.CONTINUATION.equals(line.getSuccessor().getType());
-  }
-
   @Override
   public List<CobolLine> processLines(final List<CobolLine> lines) {
     return lines.stream().map(this::processLine).collect(Collectors.toList());
@@ -102,7 +84,7 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineIndicatorProces
      If a line, which is continued on the next line, ends in column 72 with a quotation mark as
      the last character ...
     */
-    else if (checkContentAreaOriginalEndsWithQuoteMark(line)) {
+    else if (checkContentAreaEndsWithQuoteMark(line)) {
 
       /*
        ... the continuation line by specification has to startPosition with two consecutive
@@ -146,14 +128,6 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineIndicatorProces
             CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
                 WS, conditionalRightTrimmedContentArea, line);
       }
-    }
-    /*
-     If we are ending with a closed literal and the continued line ends with a quotation mark prepend a whitespace to the continuation line
-    */
-    else if (checkContentAreaEndsWithQuoteMark(line)) {
-      result =
-          CobolLine.copyCobolLineWithIndicatorAndContentArea(
-              WS, WS + trimLeadingWhitespace(conditionalRightTrimmedContentArea), line);
     } else {
       /* As fallback trim leading whitespace. We also need to remove the starting quotes if exist */
       result =
@@ -165,9 +139,21 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineIndicatorProces
     return result;
   }
 
-  private boolean checkContentAreaOriginalEndsWithQuoteMark(CobolLine line) {
-    return line.getPredecessor() != null
-        && (checkStringEndsWithQuoteMark(line.getPredecessor().getContentAreaOriginal()));
+  private String conditionalRightTrimContentArea(final CobolLine line) {
+    return !isNextLineContinuation(line) || !isEndingWithOpenLiteral(line)
+        ? rightTrimContentArea(line.getContentArea())
+        : line.getContentArea();
+  }
+
+  private boolean isEndingWithOpenLiteral(final CobolLine line) {
+    final String contentAreaWithoutStringLiterals = removeStringLiterals(line.getContentArea());
+    return contentAreaWithoutStringLiterals.contains("\"")
+        || contentAreaWithoutStringLiterals.contains("'");
+  }
+
+  private boolean isNextLineContinuation(final CobolLine line) {
+    return line.getSuccessor() != null
+        && CobolLineTypeEnum.CONTINUATION.equals(line.getSuccessor().getType());
   }
 
   private boolean checkContentAreaEndsWithQuoteMark(CobolLine line) {
