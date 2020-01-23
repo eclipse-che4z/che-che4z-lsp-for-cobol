@@ -38,12 +38,12 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 * Copybook variables
 * Copybook paragraphs
 
-![Autocomplete](CLSAutocorrect.gif)
+![Autocomplete](/docs/images/CLSAutocorrect.gif)
 		
 ### Syntax and Semantic Check for Code
 This feature checks for mistakes and errors in COBOL code. The syntax check feature reviews the whole content of the code and suggests fixes, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
 
-![Syntax check](CLSErrorHighlighting.gif)
+![Syntax check](/docs/images/CLSErrorHighlighting.gif)
 			
 ### Syntax Highlighting
 The extension enables syntax highlighting for COBOL code.
