@@ -33,18 +33,24 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** Preprocessor, which parses and processes COPY REPLACE and EXEC SQL statements. */
+/**
+ * Preprocessor which retrieves semantic elements definitions, such as variables, paragraphs and
+ * copybooks, and also applies semantic analysis for the copybooks' content
+ */
 @AllArgsConstructor
 public class CobolSemanticParserImpl implements CobolSemanticParser {
-  private final SemanticContext semanticContext;
 
+  @Nonnull
   @Override
   public ResultWithErrors<PreprocessedInput> processLines(
-      final String code, final CobolSourceFormat format) {
+      @Nonnull String code,
+      @Nonnull SemanticContext semanticContext,
+      @Nonnull CobolSourceFormat format) {
     // run the lexer
     final CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     // get a list of matched tokens
@@ -62,7 +68,8 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     walker.walk(listener, startRule);
 
     // analyze contained copy books
-    ResultWithErrors<List<CopybookSemanticContext>> contexts = processCopybooks(format);
+    ResultWithErrors<List<CopybookSemanticContext>> contexts =
+        processCopybooks(semanticContext, format);
     contexts.getResult().forEach(semanticContext::merge);
 
     List<SyntaxError> errors = new ArrayList<>(contexts.getErrors());
@@ -75,7 +82,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   }
 
   private ResultWithErrors<List<CopybookSemanticContext>> processCopybooks(
-      CobolSourceFormat format) {
+      @Nonnull SemanticContext semanticContext, CobolSourceFormat format) {
     Multimap<String, Position> copybookNames = semanticContext.getCopybooks().getDefinitions();
 
     if (copybookNames.isEmpty()) {
@@ -87,13 +94,15 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
         copybookNames, semanticContext.getCopybookUsageTracker(), format);
   }
 
+  @Nonnull
   private CobolSemanticParserListener createDocumentParserListener(
-      final CommonTokenStream tokens,
-      final SemanticContext semanticContext,
-      final CobolSourceFormat format) {
+      @Nonnull CommonTokenStream tokens,
+      @Nonnull SemanticContext semanticContext,
+      @Nonnull CobolSourceFormat format) {
     return new CobolSemanticParserListenerImpl(tokens, semanticContext, format);
   }
 
+  @Nonnull
   private CopybookAnalysis createCopybookAnalyzer() {
     return new CopybookParallelAnalysis();
   }
