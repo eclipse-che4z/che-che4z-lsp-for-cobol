@@ -16,16 +16,15 @@ package com.ca.lsp.core.cobol.preprocessor.sub.util;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-
 public class PreprocessorStringUtilsTest {
 
-  final String TEST_SINGLE_QUOTE_STRING = "\'TESTING IF ALL QUOTES WILL BE REMOVED\'";
-  final String TEST_DOUBLE_QUOTE_STRING = "\"TESTING IF ALL QUOTES WILL BE REMOVED\"";
-  final String EXPECTED_STRING = "TESTING IF ALL QUOTES WILL BE REMOVED";
+  static final String TEST_SINGLE_QUOTE_STRING = "\'TESTING IF ALL QUOTES WILL BE REMOVED\'";
+  static final String TEST_DOUBLE_QUOTE_STRING = "\"TESTING IF ALL QUOTES WILL BE REMOVED\"";
+  static final String EXPECTED_STRING = "TESTING IF ALL QUOTES WILL BE REMOVED";
 
   @Test
   public void trimQuotesTest() {
-    assertEquals(EXPECTED_STRING,PreprocessorStringUtils.trimQuotes(TEST_SINGLE_QUOTE_STRING));
-    assertEquals(EXPECTED_STRING,PreprocessorStringUtils.trimQuotes(TEST_DOUBLE_QUOTE_STRING));
+    assertEquals(EXPECTED_STRING, PreprocessorStringUtils.trimQuotes(TEST_SINGLE_QUOTE_STRING));
+    assertEquals(EXPECTED_STRING, PreprocessorStringUtils.trimQuotes(TEST_DOUBLE_QUOTE_STRING));
   }
 }
