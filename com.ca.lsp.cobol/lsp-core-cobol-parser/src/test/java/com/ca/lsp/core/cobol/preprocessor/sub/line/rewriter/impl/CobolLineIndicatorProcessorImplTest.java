@@ -30,94 +30,97 @@ import java.util.List;
 import org.junit.Test;
 
 public class CobolLineIndicatorProcessorImplTest {
-  private static final String EMPTY_STRING = "";
-  private CobolLine CONTINUATION_LINE = new CobolLine();
-  private CobolLine TRAILING_QUOTE_CONTINUATION_LINE = new CobolLine();
-  private CobolLine EMPTY_CONTINUATION_LINE_TO_TEST = new CobolLine();
-  private CobolLine SINGLE_CONTINUATION_LINE_TO_TEST = new CobolLine();
-  private CobolLine GOOD_CONTINUATION_LINE_TO_TEST = new CobolLine();
-  private CobolLine BAD_CONTINUATION_LINE_TO_TEST = new CobolLine();
-  private CobolLine COMMENT_LINE_TO_TEST = new CobolLine();
-  private CobolLine CONTINUATION_LINE_WITH_END_QUOTES = new CobolLine();
-  private CobolLine COMPILER_DIRECTIVE_LINE_TO_TEST = new CobolLine();
-  private CobolLine NORMAL_LINE_TO_TEST = new CobolLine();
-  private CobolLine DEBUG_LINE_TO_TEST = new CobolLine();
 
+  /**
+   * Testing preprocessing formatting for COBOL files, making sure that only needed information is
+   * being passed to the parser to avoid issues and making token recognition easier
+   */
   @Test
   public void processLinesTest() {
-    CONTINUATION_LINE.setType(CONTINUATION);
-    CONTINUATION_LINE.setIndicatorArea("-");
-    CONTINUATION_LINE.setContentAreaA("        \"CONTINUED LINE ENDS HERE\"     ");
+    final String EMPTY_STRING = "";
+    CobolLine continuationLine = new CobolLine();
+    CobolLine trailingQuoteContinuationLine = new CobolLine();
+    CobolLine emptyContinuationLineToTest = new CobolLine();
+    CobolLine singleContinuationLineToTest = new CobolLine();
+    CobolLine goodContinuationLineToTest = new CobolLine();
+    CobolLine badContinuationLineToTest = new CobolLine();
+    CobolLine commentLineToTest = new CobolLine();
+    CobolLine continuationLineWithEndQuotes = new CobolLine();
+    CobolLine compilerDirectiveLineToTest = new CobolLine();
+    CobolLine normalLineToTest = new CobolLine();
+    CobolLine debugLineToTest = new CobolLine();
+    continuationLine.setType(CONTINUATION);
+    continuationLine.setIndicatorArea("-");
+    continuationLine.setContentAreaA("        \"CONTINUED LINE ENDS HERE\"     ");
 
-    GOOD_CONTINUATION_LINE_TO_TEST.setType(CONTINUATION);
-    GOOD_CONTINUATION_LINE_TO_TEST.setSuccessor(CONTINUATION_LINE);
-    GOOD_CONTINUATION_LINE_TO_TEST.setIndicatorArea(WS);
-    GOOD_CONTINUATION_LINE_TO_TEST.setContentAreaA("       \"RANDOM TEXT   ");
-    GOOD_CONTINUATION_LINE_TO_TEST.setContentAreaB("        ");
+    goodContinuationLineToTest.setType(CONTINUATION);
+    goodContinuationLineToTest.setSuccessor(continuationLine);
+    goodContinuationLineToTest.setIndicatorArea(WS);
+    goodContinuationLineToTest.setContentAreaA("       \"RANDOM TEXT   ");
+    goodContinuationLineToTest.setContentAreaB("        ");
 
-    SINGLE_CONTINUATION_LINE_TO_TEST.setType(CONTINUATION);
-    SINGLE_CONTINUATION_LINE_TO_TEST.setSuccessor(CONTINUATION_LINE);
-    SINGLE_CONTINUATION_LINE_TO_TEST.setIndicatorArea(WS);
-    SINGLE_CONTINUATION_LINE_TO_TEST.setContentAreaA("       'RANDOM TEXT   ");
-    SINGLE_CONTINUATION_LINE_TO_TEST.setContentAreaB("        ");
+    singleContinuationLineToTest.setType(CONTINUATION);
+    singleContinuationLineToTest.setSuccessor(continuationLine);
+    singleContinuationLineToTest.setIndicatorArea(WS);
+    singleContinuationLineToTest.setContentAreaA("       'RANDOM TEXT   ");
+    singleContinuationLineToTest.setContentAreaB("        ");
 
-    TRAILING_QUOTE_CONTINUATION_LINE.setType(CONTINUATION);
-    TRAILING_QUOTE_CONTINUATION_LINE.setSuccessor(CONTINUATION_LINE);
-    TRAILING_QUOTE_CONTINUATION_LINE.setIndicatorArea(WS);
-    TRAILING_QUOTE_CONTINUATION_LINE.setContentAreaA("         \"");
-    TRAILING_QUOTE_CONTINUATION_LINE.setContentAreaB("");
+    trailingQuoteContinuationLine.setType(CONTINUATION);
+    trailingQuoteContinuationLine.setSuccessor(continuationLine);
+    trailingQuoteContinuationLine.setIndicatorArea(WS);
+    trailingQuoteContinuationLine.setContentAreaA("         \"");
+    trailingQuoteContinuationLine.setContentAreaB("");
 
-    BAD_CONTINUATION_LINE_TO_TEST.setType(CONTINUATION);
-    BAD_CONTINUATION_LINE_TO_TEST.setPredecessor(GOOD_CONTINUATION_LINE_TO_TEST);
-    BAD_CONTINUATION_LINE_TO_TEST.setContentAreaA("        \"RANDOM TEXT   ");
-    BAD_CONTINUATION_LINE_TO_TEST.setContentAreaB("        ");
+    badContinuationLineToTest.setType(CONTINUATION);
+    badContinuationLineToTest.setPredecessor(goodContinuationLineToTest);
+    badContinuationLineToTest.setContentAreaA("        \"RANDOM TEXT   ");
+    badContinuationLineToTest.setContentAreaB("        ");
 
-    EMPTY_CONTINUATION_LINE_TO_TEST.setType(CONTINUATION);
-    EMPTY_CONTINUATION_LINE_TO_TEST.setSuccessor(null);
-    EMPTY_CONTINUATION_LINE_TO_TEST.setContentAreaA("           ");
-    EMPTY_CONTINUATION_LINE_TO_TEST.setContentAreaB("           ");
+    emptyContinuationLineToTest.setType(CONTINUATION);
+    emptyContinuationLineToTest.setSuccessor(null);
+    emptyContinuationLineToTest.setContentAreaA("           ");
+    emptyContinuationLineToTest.setContentAreaB("           ");
 
-    COMMENT_LINE_TO_TEST.setType(COMMENT);
-    COMMENT_LINE_TO_TEST.setIndicatorArea("*");
-    COMMENT_LINE_TO_TEST.setContentAreaA("THIS IS A COMMENT        ");
+    commentLineToTest.setType(COMMENT);
+    commentLineToTest.setIndicatorArea("*");
+    commentLineToTest.setContentAreaA("THIS IS A COMMENT        ");
 
-    COMPILER_DIRECTIVE_LINE_TO_TEST.setType(COMPILER_DIRECTIVE);
-    COMPILER_DIRECTIVE_LINE_TO_TEST.setIndicatorArea(WS);
-    COMPILER_DIRECTIVE_LINE_TO_TEST.setContentAreaA("DEFINE");
+    compilerDirectiveLineToTest.setType(COMPILER_DIRECTIVE);
+    compilerDirectiveLineToTest.setIndicatorArea(WS);
+    compilerDirectiveLineToTest.setContentAreaA("DEFINE");
 
-    NORMAL_LINE_TO_TEST.setType(NORMAL);
-    NORMAL_LINE_TO_TEST.setFormat(FIXED);
-    NORMAL_LINE_TO_TEST.setIndicatorArea(WS);
-    NORMAL_LINE_TO_TEST.setContentAreaA("         RANDOM TEXT ,  ");
+    normalLineToTest.setType(NORMAL);
+    normalLineToTest.setFormat(FIXED);
+    normalLineToTest.setIndicatorArea(WS);
+    normalLineToTest.setContentAreaA("         RANDOM TEXT ,  ");
 
-    DEBUG_LINE_TO_TEST.setType(DEBUG);
-    DEBUG_LINE_TO_TEST.setIndicatorArea(WS);
-    DEBUG_LINE_TO_TEST.setContentAreaA("     DEBUG LINE HERE      ");
+    debugLineToTest.setType(DEBUG);
+    debugLineToTest.setIndicatorArea(WS);
+    debugLineToTest.setContentAreaA("     DEBUG LINE HERE      ");
 
-    CONTINUATION_LINE_WITH_END_QUOTES.setType(CONTINUATION);
-    CONTINUATION_LINE_WITH_END_QUOTES.setPredecessor(CONTINUATION_LINE);
-    CONTINUATION_LINE_WITH_END_QUOTES.setSuccessor(CONTINUATION_LINE);
-    CONTINUATION_LINE_WITH_END_QUOTES.setIndicatorArea(WS);
-    CONTINUATION_LINE_WITH_END_QUOTES.setContentAreaA("       \"RANDOM TEXT \"  ");
-    CONTINUATION_LINE_WITH_END_QUOTES.setContentAreaB("        ");
+    continuationLineWithEndQuotes.setType(CONTINUATION);
+    continuationLineWithEndQuotes.setPredecessor(continuationLine);
+    continuationLineWithEndQuotes.setSuccessor(continuationLine);
+    continuationLineWithEndQuotes.setIndicatorArea(WS);
+    continuationLineWithEndQuotes.setContentAreaA("       \"RANDOM TEXT \"  ");
+    continuationLineWithEndQuotes.setContentAreaB("        ");
 
     final List<CobolLine> listOfLines =
         Arrays.asList(
-            GOOD_CONTINUATION_LINE_TO_TEST,
-            SINGLE_CONTINUATION_LINE_TO_TEST,
-            TRAILING_QUOTE_CONTINUATION_LINE,
-            CONTINUATION_LINE,
-            BAD_CONTINUATION_LINE_TO_TEST,
-            EMPTY_CONTINUATION_LINE_TO_TEST,
-            COMMENT_LINE_TO_TEST,
-            COMPILER_DIRECTIVE_LINE_TO_TEST,
-            NORMAL_LINE_TO_TEST,
-            DEBUG_LINE_TO_TEST,
-            CONTINUATION_LINE_WITH_END_QUOTES);
+            goodContinuationLineToTest,
+            singleContinuationLineToTest,
+            trailingQuoteContinuationLine,
+            continuationLine,
+            badContinuationLineToTest,
+            emptyContinuationLineToTest,
+            commentLineToTest,
+            compilerDirectiveLineToTest,
+            normalLineToTest,
+            debugLineToTest,
+            continuationLineWithEndQuotes);
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
     processor.processLines(listOfLines);
 
-    // assertEquals("RANDOM TEXT",processor.processLine(CONTINUATION_LINE));
     assertEquals(
         WS + "\"RANDOM TEXT           ",
         processor.processLines(listOfLines).get(0).getIndicatorArea()
