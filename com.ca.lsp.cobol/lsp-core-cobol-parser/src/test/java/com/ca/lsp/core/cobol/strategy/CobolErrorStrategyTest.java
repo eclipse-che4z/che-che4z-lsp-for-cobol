@@ -32,7 +32,7 @@ import org.junit.Test;
 
 public class CobolErrorStrategyTest {
   @Test
-  public void NoViableAltExceptionTest() {
+  public void noViableAltExceptionTest() {
     Parser recognizer = mock(Parser.class);
     TokenStream stream = mock(TokenStream.class);
     Token token = mock(Token.class);
@@ -51,7 +51,7 @@ public class CobolErrorStrategyTest {
   }
 
   @Test
-  public void InputMismatchExceptionTest() {
+  public void inputMismatchExceptionTest() {
     Parser recognizer = mock(Parser.class);
     Token token = mock(Token.class);
     InputMismatchException errorMock = mock(InputMismatchException.class);
@@ -73,7 +73,7 @@ public class CobolErrorStrategyTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void FailedPredicateExceptionTest() {
+  public void failedPredicateExceptionTest() {
     Parser recognizer = mock(Parser.class);
     FailedPredicateException errorMock = mock(FailedPredicateException.class);
 
