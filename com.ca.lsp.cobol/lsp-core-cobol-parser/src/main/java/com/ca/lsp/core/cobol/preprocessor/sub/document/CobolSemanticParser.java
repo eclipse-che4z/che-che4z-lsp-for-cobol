@@ -16,9 +16,28 @@ package com.ca.lsp.core.cobol.preprocessor.sub.document;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
 
+import javax.annotation.Nonnull;
+
+/**
+ * Preprocessor which retrieves semantic elements definitions, such as variables, paragraphs and
+ * copybooks
+ */
 public interface CobolSemanticParser {
 
+  /**
+   * Fills-in the semantic context of the current document, including elements from the copybooks
+   *
+   * @param code - COBOL program text to analyse
+   * @param semanticContext - semantic context of the currently processed document to be filled in.
+   * @param format - the format of the processing document
+   * @return a PreprocessedInput - text and its semantic context with syntax errors if found or an
+   *     empty list
+   */
+  @Nonnull
   ResultWithErrors<PreprocessedInput> processLines(
-      String code, CobolSourceFormat format);
+      @Nonnull String code,
+      @Nonnull SemanticContext semanticContext,
+      @Nonnull CobolSourceFormat format);
 }
