@@ -23,6 +23,7 @@ import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtilsTest;
 import com.ca.lsp.core.cobol.semantics.CobolCleanExtraLanguageTest;
 import com.ca.lsp.core.cobol.semantics.CobolVariableCheckTest;
 import com.ca.lsp.core.cobol.semantics.CobolVariableContextTest;
+import com.ca.lsp.core.cobol.strategy.CobolErrorStrategyTest;
 import com.ca.lsp.core.cobol.visitor.LevenshteinDistanceTest;
 import com.ca.lsp.core.cobol.visitor.VariableDefinitionTest;
 import org.junit.runner.RunWith;
@@ -43,6 +44,7 @@ import org.junit.runners.Suite.SuiteClasses;
   PreprocessorStringUtilsTest.class,
   LevenshteinDistanceTest.class,
   VariableDefinitionTest.class,
-  CobolLineIndicatorProcessorImplTest.class
+  CobolLineIndicatorProcessorImplTest.class,
+  CobolErrorStrategyTest.class
 })
 public class CobolTestSuite {}
