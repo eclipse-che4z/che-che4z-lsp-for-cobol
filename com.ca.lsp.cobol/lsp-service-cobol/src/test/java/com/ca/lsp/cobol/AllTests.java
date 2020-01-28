@@ -17,13 +17,11 @@ import com.ca.lsp.cobol.negative.NegativeTestSuite;
 import com.ca.lsp.cobol.positive.PositiveTest;
 import com.ca.lsp.cobol.service.*;
 import com.ca.lsp.cobol.service.delegates.HighlightsTest;
-import com.ca.lsp.cobol.service.delegates.LanguageEnginesTest;
-import com.ca.lsp.cobol.service.delegates.ValidationTest;
 import com.ca.lsp.cobol.service.delegates.completions.CompletionsChainTest;
 import com.ca.lsp.cobol.service.delegates.completions.ParagraphCompletionTest;
 import com.ca.lsp.cobol.service.delegates.completions.SnippetCompletionTest;
 import com.ca.lsp.cobol.service.delegates.completions.VariableCompletionTest;
-import com.ca.lsp.cobol.service.delegates.references.ReferencesTest;
+import com.ca.lsp.cobol.service.delegates.references.DocumentOccurrencesTest;
 import com.ca.lsp.cobol.usecases.TestResponsesNotContainLineBreaks;
 import com.ca.lsp.cobol.usecases.UseCaseSuite;
 import com.ca.lsp.cobol.utils.KeywordsTest;
@@ -40,19 +38,19 @@ import org.junit.runners.Suite.SuiteClasses;
   MyTextDocumentServiceTest.class,
   UseCaseSuite.class,
   KeywordsTest.class,
-  ValidationTest.class,
-  LanguageEnginesTest.class,
   VariableCompletionTest.class,
   CompletionsChainTest.class,
   SnippetCompletionTest.class,
   ParagraphCompletionTest.class,
-  ReferencesTest.class,
+  DocumentOccurrencesTest.class,
   DefinitionsAndUsagesTest.class,
   TestResponsesNotContainLineBreaks.class,
   WorkspaceServiceTest.class,
   CompletionResolutionTest.class,
   WorkspaceServiceTest.class,
   HighlightsTest.class,
-  MultiDocumentDefinitionTest.class
+  MultiDocumentDefinitionTest.class,
+  LangServerBootstrapTest.class,
+  MyLanguageServerImplTest.class
 })
 public class AllTests {}

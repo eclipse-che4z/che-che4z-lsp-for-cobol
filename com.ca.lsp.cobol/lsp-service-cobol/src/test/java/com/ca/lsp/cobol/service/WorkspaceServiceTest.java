@@ -18,10 +18,16 @@ package com.ca.lsp.cobol.service;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.cdi.module.service.ServiceModule;
-import com.broadcom.lsp.domain.cobol.model.FetchedCopybookEvent;
+import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
+import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
+import org.eclipse.lsp4j.FileChangeType;
+import org.eclipse.lsp4j.FileEvent;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.junit.*;
+import org.mockito.ArgumentCaptor;
 
 import javax.annotation.Nonnull;
 import java.io.BufferedOutputStream;
@@ -38,6 +44,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static junit.framework.TestCase.*;
+import static org.mockito.Mockito.*;
 
 @Slf4j
 public class WorkspaceServiceTest {
@@ -158,7 +165,44 @@ public class WorkspaceServiceTest {
     String copybookContent = cobolWorkspaceService.getContentByCopybookName(CPY_OUTER_NAME_ONLY);
     FetchedCopybookEvent fetchedCopybookEvent =
         FetchedCopybookEvent.builder().name(CPY_OUTER_NAME_ONLY).content(copybookContent).build();
-    assertTrue(fetchedCopybookEvent.getName().length() > 0 && fetchedCopybookEvent.getContent().length() > 0);
+    assertTrue(
+        fetchedCopybookEvent.getName().length() > 0
+            && fetchedCopybookEvent.getContent().length() > 0);
+  }
+
+  /**
+   * This test verifies that the Workspace Service reacts on the file change watcher's notifications
+   */
+  @Test
+  public void testDidChangeWatchedFilesExistingFileChanged() {
+    checkWatchers(
+        new FileEvent(
+            "file:///c%3A/workspace/COBOL/COPYBOOKS/CpyName.cpy", FileChangeType.Changed));
+  }
+
+  /**
+   * This test verifies that the Workspace Service reacts on the directory change watcher's
+   * notifications
+   */
+  @Test
+  public void testDidChangeWatchedFilesAddedNewFile() {
+    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/COPYBOOKS", FileChangeType.Changed));
+  }
+
+  private void checkWatchers(FileEvent event) {
+    DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
+    ArgumentCaptor<RunAnalysisEvent> captor =
+        ArgumentCaptor.forClass(RunAnalysisEvent.class);
+
+    CobolWorkspaceServiceImpl service = new CobolWorkspaceServiceImpl(broker);
+
+    DidChangeWatchedFilesParams params =
+        new DidChangeWatchedFilesParams(Collections.singletonList(event));
+    service.didChangeWatchedFiles(params);
+
+    verify(broker).invalidateCache();
+    verify(broker).postData(captor.capture());
+    assertNotNull(captor.getValue());
   }
 
   private URI getWorkspaceFolderPath() {

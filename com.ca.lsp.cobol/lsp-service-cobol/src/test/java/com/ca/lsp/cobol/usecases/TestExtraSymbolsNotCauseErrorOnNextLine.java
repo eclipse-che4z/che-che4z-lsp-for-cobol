@@ -13,14 +13,14 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import static org.junit.Assert.assertEquals;
-
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
-/**
- * This use case checks if extra symbols on one line do not cause any errors on the next line.
- */
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+
+/** This use case checks if extra symbols on one line do not cause any errors on the next line. */
 public class TestExtraSymbolsNotCauseErrorOnNextLine extends NegativeUseCase {
   public TestExtraSymbolsNotCauseErrorOnNextLine() {
     super(TEXT);
@@ -38,7 +38,8 @@ public class TestExtraSymbolsNotCauseErrorOnNextLine extends NegativeUseCase {
   }
 
   @Override
-  protected void assertRange(Range range) {
+  protected void assertRanges(List<Range> ranges) {
+    Range range = ranges.get(0);
     assertEquals(80, range.getStart().getCharacter());
     assertEquals(86, range.getEnd().getCharacter());
   }

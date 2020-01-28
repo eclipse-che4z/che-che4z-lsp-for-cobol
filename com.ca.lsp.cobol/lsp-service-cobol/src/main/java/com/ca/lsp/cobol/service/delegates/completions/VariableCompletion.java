@@ -15,35 +15,35 @@ package com.ca.lsp.cobol.service.delegates.completions;
 
 import com.ca.lsp.cobol.service.MyDocumentModel;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
+import com.google.inject.Singleton;
 import org.eclipse.lsp4j.CompletionItemKind;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-class VariableCompletion extends AbstractCompletion {
+@Singleton
+public class VariableCompletion implements Completion {
 
+  @Nonnull
   @Override
-  Collection<String> getCompletionSource(MyDocumentModel document) {
+  public Collection<String> getCompletionSource(MyDocumentModel document) {
     return Optional.ofNullable(document)
         .map(MyDocumentModel::getAnalysisResult)
         .map(AnalysisResult::getVariables)
         .orElse(Collections.emptySet());
   }
 
+  @Nonnull
   @Override
-  String tryResolve(String label) {
-    // Cannot resolve description for this type of completion
-    return null;
-  }
-
-  @Override
-  protected String getSortOrderPrefix() {
+  public String getSortOrderPrefix() {
     return "0"; // Variables are supposed to be the first in the completions list
   }
 
+  @Nonnull
   @Override
-  protected CompletionItemKind getKind() {
+  public CompletionItemKind getKind() {
     return CompletionItemKind.Variable;
   }
 }

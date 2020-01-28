@@ -18,9 +18,7 @@ import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.TestModule;
 import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
-import org.eclipse.lsp4j.services.LanguageClient;
-import org.eclipse.lsp4j.services.TextDocumentService;
+import org.eclipse.lsp4j.Diagnostic;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,9 +26,9 @@ import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.runTextValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -41,9 +39,6 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class PositiveTest extends ConfigurableTest {
   private CobolText text;
-
-  private static TestLanguageClient client;
-  private static TextDocumentService service;
 
   public PositiveTest(CobolText text) {
     this.text = text;
@@ -69,10 +64,6 @@ public class PositiveTest extends ConfigurableTest {
 
   @Before
   public void setUpServer() {
-    client = (TestLanguageClient) LangServerCtx.getInjector().getInstance(LanguageClient.class);
-    client.clean();
-    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
-
     MockWorkspaceService workspaceService =
         LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
     workspaceService.setCopybooks(LangServerCtx.getInjector().getInstance(CobolTextRegistry.class));
@@ -80,35 +71,31 @@ public class PositiveTest extends ConfigurableTest {
 
   @Test
   public void test() {
-    runTextValidation(service, text.getFullText());
+    List<Diagnostic> diagnostics = analyzeForErrors(text.getFullText());
 
-    waitForDiagnostics(client, text.getFileName());
-
-    assertNoSyntaxErrorsFound(client);
+    assertNoSyntaxErrorsFound(diagnostics);
   }
 
-  private void assertNoSyntaxErrorsFound(TestLanguageClient client) {
-    assertEquals(createErrorMessage(client), 0, client.getDiagnostics().size());
+  private void assertNoSyntaxErrorsFound(List<Diagnostic> diagnostics) {
+    assertEquals(createErrorMessage(diagnostics), 0, diagnostics.size());
   }
 
-  private String createErrorMessage(TestLanguageClient client) {
+  private String createErrorMessage(List<Diagnostic> diagnostics) {
     StringBuilder result = new StringBuilder(text.getFileName());
     result.append(" contains syntax errors:\r\n");
-    client
-        .getDiagnostics()
-        .forEach(
-            it -> {
-              result.append(it.getRange().getStart().getLine() + 1);
-              result.append(":");
-              result.append(it.getRange().getStart().getCharacter());
-              result.append(" - ");
-              result.append(it.getRange().getEnd().getLine() + 1);
-              result.append(":");
-              result.append(it.getRange().getEnd().getCharacter());
-              result.append(" : ");
-              result.append(it.getMessage());
-              result.append("\r\n");
-            });
+    diagnostics.forEach(
+        it -> {
+          result.append(it.getRange().getStart().getLine() + 1);
+          result.append(":");
+          result.append(it.getRange().getStart().getCharacter());
+          result.append(" - ");
+          result.append(it.getRange().getEnd().getLine() + 1);
+          result.append(":");
+          result.append(it.getRange().getEnd().getCharacter());
+          result.append(" : ");
+          result.append(it.getMessage());
+          result.append("\r\n");
+        });
     return result.toString();
   }
 }

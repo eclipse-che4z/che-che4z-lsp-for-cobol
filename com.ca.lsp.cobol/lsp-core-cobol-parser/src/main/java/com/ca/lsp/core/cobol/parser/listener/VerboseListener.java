@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.parser.listener;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import org.antlr.v4.runtime.*;
 
@@ -44,36 +44,27 @@ public class VerboseListener extends BaseErrorListener {
       Position position =
           new Position(
               null,
-              wrongToken.getTokenIndex(),
               wrongToken.getStartIndex(),
               wrongToken.getStopIndex(),
               wrongToken.getLine(),
               wrongToken.getCharPositionInLine());
       errorspipe.add(
-          SyntaxError.syntaxerror()
+          SyntaxError.syntaxError()
               .position(position)
               .ruleStack(stack)
               .suggestion(msg)
-              .type(wrongToken.getType())
               .severity(1)
               .build());
     }
     if (recognizer instanceof Lexer) {
       stack.add(((Lexer) recognizer).getText());
       Position position =
-          new Position(
-              null,
-              charPositionInLine,
-              charPositionInLine,
-              charPositionInLine,
-              line,
-              charPositionInLine);
+          new Position(null, charPositionInLine, charPositionInLine, line, charPositionInLine);
       errorspipe.add(
-          SyntaxError.syntaxerror()
+          SyntaxError.syntaxError()
               .position(position)
               .ruleStack(stack)
               .suggestion(msg.concat(" on ").concat(stack.get(stack.size() - 1)))
-              .type(0)
               .severity(1)
               .build());
     }

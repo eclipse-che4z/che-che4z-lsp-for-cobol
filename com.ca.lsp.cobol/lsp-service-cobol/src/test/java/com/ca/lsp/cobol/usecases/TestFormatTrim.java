@@ -15,12 +15,9 @@ package com.ca.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.ConfigurableTest;
-import com.ca.lsp.cobol.service.MyTextDocumentService;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
-import com.google.inject.Inject;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 

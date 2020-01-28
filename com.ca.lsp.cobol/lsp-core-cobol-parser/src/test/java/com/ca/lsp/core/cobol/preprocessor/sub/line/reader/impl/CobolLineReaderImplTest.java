@@ -13,17 +13,16 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl;
 
-import static org.junit.Assert.assertEquals;
+import com.ca.lsp.core.cobol.AbstractCobolLinePreprocessorTest;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
+import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import com.ca.lsp.core.cobol.AbstractCobolLinePreprocessorTest;
-import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import static org.junit.Assert.assertEquals;
 
 /**
  * This test checks the line preprocessing logic. Notice, that if there are less than 6 symbols in a
@@ -32,26 +31,21 @@ import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
  */
 public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
 
-  @Before
-  public void eraseListener() {
-    super.eraseListener();
-  }
-
   @Test
   public void testAllIndicators() {
     List<String> lines = createTextToTest();
     String text = reduceLines(lines);
 
-    List<CobolLine> processed = processText(text);
+    ResultWithErrors<List<CobolLine>> processed = processText(text);
 
-    assertEquals(lines.size(), processed.size());
+    assertEquals(lines.size(), processed.getResult().size());
     for (int i = 0; i < lines.size(); i++) {
-      assertEquals(lines.get(i), processed.get(i).toString());
+      assertEquals(lines.get(i), processed.getResult().get(i).toString());
     }
 
-    assertEquals(1, listener.getErrorsPipe().size());
+    assertEquals(1, processed.getErrors().size());
 
-    SyntaxError syntaxError = listener.getErrorsPipe().get(0);
+    SyntaxError syntaxError = processed.getErrors().get(0);
     assertEquals(6, syntaxError.getPosition().getStartPosition());
     assertEquals(11, syntaxError.getPosition().getLine());
   }
@@ -59,66 +53,61 @@ public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
   /** Empty string should not be processed. */
   @Test
   public void testEmptyLine() {
-    List<CobolLine> processed = processText("");
-    assertEquals(0, processed.size());
-
-    checkNoErrorsFound();
+    ResultWithErrors<List<CobolLine>> processed = processText("");
+    assertEquals(0, processed.getResult().size());
+    assertEquals(0, processed.getErrors().size());
   }
 
   @Test
   public void testTooShortString() {
-    List<CobolLine> processed = processText("abc");
-    assertEquals("abc ", processed.get(0).toString());
-
-    checkNoErrorsFound();
+    ResultWithErrors<List<CobolLine>> processed = processText("abc");
+    assertEquals("abc ", processed.getResult().get(0).toString());
+    assertEquals(0, processed.getErrors().size());
   }
 
   @Test
   public void testOneSpace() {
-    List<CobolLine> processed = processText(" ");
-    assertEquals("  ", processed.get(0).toString());
-
-    checkNoErrorsFound();
+    ResultWithErrors<List<CobolLine>> processed = processText(" ");
+    assertEquals("  ", processed.getResult().get(0).toString());
+    assertEquals(0, processed.getErrors().size());
   }
 
   @Test
   public void testNoSpacesAddedIfIndicatorFieldFilled() {
     String eightSpaces = "        ";
-    List<CobolLine> processed = processText(eightSpaces);
-    assertEquals(eightSpaces, processed.get(0).toString());
+    ResultWithErrors<List<CobolLine>> processed = processText(eightSpaces);
+    assertEquals(eightSpaces, processed.getResult().get(0).toString());
 
-    checkNoErrorsFound();
+    assertEquals(0, processed.getErrors().size());
   }
 
   @Test
   public void testSkipEmtyLineAtEnd() {
     String firstLine =
         "000000 IDENTIFICATION DIVISION.                                         23323232";
-    List<String> lines = new ArrayList<String>();
+    List<String> lines = new ArrayList<>();
     lines.add(firstLine);
     lines.add("");
 
-    List<CobolLine> processed = processText(reduceLines(lines));
+    ResultWithErrors<List<CobolLine>> processed = processText(reduceLines(lines));
 
-    assertEquals(1, processed.size());
-    assertEquals(firstLine, processed.get(0).toString());
-
-    checkNoErrorsFound();
+    assertEquals(1, processed.getResult().size());
+    assertEquals(firstLine, processed.getResult().get(0).toString());
   }
 
   @Test
   public void testEmtyLineAtMiddle() {
-    List<String> lines = new ArrayList<String>();
+    List<String> lines = new ArrayList<>();
     lines.add("000000 IDENTIFICATION DIVISION.                                         23323232");
     lines.add("");
     lines.add("000010 PROGRAM-ID. test1.                                               23323232");
 
-    List<CobolLine> processed = processText(reduceLines(lines));
+    ResultWithErrors<List<CobolLine>> processed = processText(reduceLines(lines));
 
-    assertEquals(3, processed.size());
-    assertEquals(" ", processed.get(1).toString());
+    assertEquals(3, processed.getResult().size());
+    assertEquals(" ", processed.getResult().get(1).toString());
 
-    checkNoErrorsFound();
+    assertEquals(0, processed.getErrors().size());
   }
 
   @Test
@@ -127,18 +116,18 @@ public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
         "000000 IDENTIFICATION DIVISION.                                         23323232extra";
     String cutString =
         "000000 IDENTIFICATION DIVISION.                                         23323232";
-    List<CobolLine> processed = processText(tooLongString);
-    assertEquals(cutString, processed.get(0).toString());
+    ResultWithErrors<List<CobolLine>> processed = processText(tooLongString);
+    assertEquals(cutString, processed.getResult().get(0).toString());
 
-    assertEquals(1, listener.getErrorsPipe().size());
-    SyntaxError syntaxError = listener.getErrorsPipe().get(0);
+    assertEquals(1, processed.getErrors().size());
+    SyntaxError syntaxError = processed.getErrors().get(0);
     assertEquals(80, syntaxError.getPosition().getStartPosition());
   }
 
   // END @Test methods
 
   private List<String> createTextToTest() {
-    List<String> lines = new ArrayList<String>();
+    List<String> lines = new ArrayList<>();
     lines.add("000000 IDENTIFICATION DIVISION.                                         23323232");
     lines.add("000010 PROGRAM-ID. test1.                                               23323232");
     lines.add("000020* AUTHOR. .                                                       23323232");

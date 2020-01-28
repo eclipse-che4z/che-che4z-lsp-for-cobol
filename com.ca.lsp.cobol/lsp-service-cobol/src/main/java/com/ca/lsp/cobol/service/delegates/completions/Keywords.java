@@ -13,12 +13,13 @@
  */
 package com.ca.lsp.cobol.service.delegates.completions;
 
+import com.google.inject.Singleton;
+
 import java.io.InputStream;
 
-/**
- * This class is a provider for Cobol keywords and their descriptions
- */
-public class Keywords extends AbstractCompletionStorage {
+/** This class is a provider for Cobol keywords and their descriptions */
+@Singleton
+public class Keywords extends CompletionStorage {
   private static final String KEYWORDS_FILE_PATH = "LanguageKeywords.txt";
 
   @Override

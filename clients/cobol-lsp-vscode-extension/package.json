@@ -1,10 +1,10 @@
 {
     "name": "cobol-language-support",
     "displayName": "COBOL Language Support",
-    "description": "COBOL Language Support standardizes the communication between language tooling and your code editor using the Language Server Protocol (LSP).",
+    "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "0.9.1",
+    "version": "0.10.0",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
@@ -58,6 +58,6 @@
         "tslint": "^5.18.0",
         "tslint-sonarts": "^1.9.0",
         "typescript": "^3.5.3",
-        "vscode": "^1.1.35"
+        "vscode": "^1.1.33"
     }
 }

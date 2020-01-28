@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.Ignore;
@@ -21,8 +20,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -45,23 +43,21 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
     super(null);
   }
 
-  private static final String CBL_WITHOUT_NUMBERS =
-      "  CBL DIR1,DIR2,DIR3,DIR4,DIR5,DIR6,DIR7,DIR8\r\n";
+  private static final String CBL_WITHOUT_NUMBERS = "  cbl LIB,QUOTE,NODYNAM,TEST(SEP)\r\n";
 
-  private static final String CBL_WITH_NUMBER =
-      "012345  CBL DIR1,DIR2,DIR3,DIR4,DIR5,DIR6,DIR7,DIR8\r\n";
+  private static final String CBL_WITH_NUMBER = "012345 CBL DATA(24),RMODE(24),NODYNAM\r\n";
 
-  private static final String PROCESS_WITHOUT_NUMBER =
-      "PROCESS DIR1,DIR2,DIR3,DIR4,DIR5,DIR6,DIR7,DIR8\r\n";
+  private static final String PROCESS_WITHOUT_NUMBER = "PROCESS DATA(24),RMODE(24),NODYNAM\r\n";
 
-  private static final String PROCESS_WITH_NUMBER =
-      "012345  PROCESS DIR1,DIR2,DIR3,DIR4,DIR5,DIR6,DIR7,DIR8\r\n";
+  private static final String PROCESS_WITH_NUMBER = "012345 PROCESS DATA(24),RMODE(24),NODYNAM\r\n";
 
-  private static final String PROCESS_WITHOUT_NUMBER_TYPO =
-      "PROESS DIR1,DIR2,DIR3,DIR4,DIR5,DIR6,DIR7,DIR8\r\n";
+  private static final String PROCESS_WITHOUT_NUMBER_TYPO = "PROESS DATA(24),RMODE(24),NODYNAM\r\n";
+
+  private static final String CBL_WITH_LONG_LINE =
+      "  CBL LIB,QUOTE,NODYNAM,TEST(SEP)                                       00010003\r\n";
 
   private static final String PROCESS_WITH_NUMBER_TYPO =
-      "012345  PROESS DIR1,DIR2,DIR3,DIR4,DIR5,DIR6,DIR7,DIR8\r\n";
+      "012345 PROESS DATA(24),RMODE(24),NODYNAM\r\n";
 
   private static final String FOLLOWING_TEXT =
       "000000 Identification DIVISION.                                         23323232\r\n"
@@ -99,49 +95,37 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
     super.test();
   }
 
-  @Ignore("Feature is not yet supported")
+  @Test
+  public void testCblWithLongLine() {
+    setText(CBL_WITH_LONG_LINE + FOLLOWING_TEXT);
+    super.test();
+  }
+
   @Test
   public void testProcessWithoutNumbersWithTypo() {
-    TestLanguageClient client =
-        startServerAndRunValidation(PROCESS_WITHOUT_NUMBER_TYPO + FOLLOWING_TEXT);
+    Range range = retrieveRange(analyzeForErrors(PROCESS_WITHOUT_NUMBER_TYPO + FOLLOWING_TEXT));
 
-    waitForDiagnostics(client);
-
-    Range range = retrieveRange(client);
-
-    assertEquals(1, range.getStart().getLine());
+    assertEquals(0, range.getStart().getLine());
     assertEquals(7, range.getStart().getCharacter());
   }
 
-  @Ignore("Feature is not yet supported")
   @Test
   public void testProcessWithNumbersWithTypo() {
-    TestLanguageClient client =
-        startServerAndRunValidation(PROCESS_WITH_NUMBER_TYPO + FOLLOWING_TEXT);
-
-    waitForDiagnostics(client);
-
-    Range range = retrieveRange(client);
-
-    assertEquals(1, range.getStart().getLine());
+    Range range = retrieveRange(analyzeForErrors(PROCESS_WITH_NUMBER_TYPO + FOLLOWING_TEXT));
+    assertEquals(0, range.getStart().getLine());
     assertEquals(7, range.getStart().getCharacter());
   }
 
   @Ignore("Feature is not yet supported")
   @Test
   public void testLinesBeforeCblNotAllowed() {
-    TestLanguageClient client = startServerAndRunValidation(FOLLOWING_TEXT + CBL_WITH_NUMBER);
+    Range range = retrieveRange(analyzeForErrors(FOLLOWING_TEXT + CBL_WITH_NUMBER));
 
-    waitForDiagnostics(client);
-
-    Range range = retrieveRange(client);
-
-    assertEquals(4, range.getStart().getLine());
+    assertEquals(1, range.getStart().getLine());
     assertEquals(7, range.getStart().getCharacter());
   }
 
-  private Range retrieveRange(TestLanguageClient client) {
-    List<Diagnostic> diagnostics = client.getDiagnostics();
+  private Range retrieveRange(List<Diagnostic> diagnostics) {
     assertEquals(1, diagnostics.size());
     Diagnostic diagnostic = diagnostics.get(0);
     return diagnostic.getRange();
