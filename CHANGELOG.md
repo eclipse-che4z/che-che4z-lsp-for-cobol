@@ -2,7 +2,7 @@
 
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [0.10.0] - 2020-01-24
+## [0.10.0] - 2020-01-28
 
 - Make preprocessor parts stateless to simplify dependency injection [#153](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/153) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - Add file system watcher for copybooks to invalidate the cache and run the syntax and semantic analysis for all the registered documents if there are any changes in the copybook files or the directory. [#152](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/152) Thanks @[temanbrcom](https://github.com/temanbrcom)
