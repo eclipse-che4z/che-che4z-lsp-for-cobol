@@ -88,17 +88,17 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
       final String document,
       final CobolSourceFormat format,
       final SemanticContext semanticContext) {
-    return createDocumentParser(semanticContext).processLines(document, format);
+    return createDocumentParser().processLines(document, semanticContext, format);
   }
 
   private ResultWithErrors<List<CobolLine>> readLines(
       final String cobolCode, final CobolSourceFormat format, String documentURI) {
-    return createLineReader(documentURI).processLines(cobolCode, format);
+    return createLineReader().processLines(documentURI, cobolCode, format);
   }
 
   private ResultWithErrors<List<CobolLine>> transformLines(
       List<CobolLine> lines, String documentURI) {
-    return createContinuationLineProcessor(documentURI).transformLines(lines);
+    return createContinuationLineProcessor().transformLines(documentURI, lines);
   }
 
   /**
@@ -117,8 +117,8 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     return new CobolCommentEntriesMarkerImpl();
   }
 
-  private CobolSemanticParser createDocumentParser(SemanticContext semanticContext) {
-    return new CobolSemanticParserImpl(semanticContext);
+  private CobolSemanticParser createDocumentParser() {
+    return new CobolSemanticParserImpl();
   }
 
   private CobolDocumentCleaner createDocumentCleaner() {
@@ -133,12 +133,12 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     return new CobolLineIndicatorProcessorImpl();
   }
 
-  private CobolLinesTransformation createContinuationLineProcessor(String documentURI) {
-    return new ContinuationLineTransformation(documentURI);
+  private CobolLinesTransformation createContinuationLineProcessor() {
+    return new ContinuationLineTransformation();
   }
 
-  private CobolLineReader createLineReader(String documentURI) {
-    return new CobolLineReaderImpl(documentURI);
+  private CobolLineReader createLineReader() {
+    return new CobolLineReaderImpl();
   }
 
   private CobolLineWriter createLineWriter() {

@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
- *
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -10,7 +9,7 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- * Broadcom, Inc. - initial API and implementation
+ *    Broadcom, Inc. - initial API and implementation
  *
  */
 

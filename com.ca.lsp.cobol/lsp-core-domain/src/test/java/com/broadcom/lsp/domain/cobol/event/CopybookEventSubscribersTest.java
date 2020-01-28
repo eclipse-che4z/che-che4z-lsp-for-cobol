@@ -44,7 +44,7 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
   private static final String REQCPY = "REQCPY";
   private static final String FETCHEDCPY = "FETCHEDCPY";
   private static final String UNKNOWN = "UNKNOWN";
-  DatabusObserverTest databusObserver;
+  private DatabusObserverTest databusObserver;
 
   @Before
   public void initObserver() {
@@ -86,6 +86,8 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
 
     assertNotEquals(REQCPY, getUnknownSubscriberFromFactory());
     assertNotEquals(FETCHEDCPY, getFetchedSubscriberFromFactory());
+
+    assertNotEquals(RUNANALYSIS, getFetchedSubscriberFromFactory());
   }
 
   private UnknownEventSubscriber getUnknownSubscriberFromFactory() {

@@ -14,9 +14,15 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
+import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.ca.lsp.cobol.ConfigurableTest;
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import com.ca.lsp.cobol.service.delegates.communications.Communications;
+import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
+import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -34,6 +40,7 @@ import java.util.function.Function;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /** This test checks the entry points of the {@link TextDocumentService} implementation. */
 public class MyTextDocumentServiceTest extends ConfigurableTest {
@@ -128,6 +135,78 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
                 it ->
                     it.toString()
                         .equals("The given document extension is unsupported: " + CPY_EXTENSION)));
+  }
+
+  /**
+   * This test checks that {@link MyTextDocumentService} is subscribed to the databus events and may
+   * re-run analysis of the open documents if it receives a notification.
+   */
+  @Test
+  public void observerCallback() {
+    Communications communications = mock(Communications.class);
+    LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
+    DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
+
+    List<Diagnostic> diagnosticsNoErrors = Collections.emptyList();
+    List<Diagnostic> diagnosticsWithErrors = createDefaultDiagnostics();
+
+    AnalysisResult resultNoErrors = new AnalysisResult(diagnosticsNoErrors, null, null, null, null);
+    AnalysisResult resultWithErrors =
+        new AnalysisResult(diagnosticsWithErrors, null, null, null, null);
+
+    when(engine.analyze(TEXT_EXAMPLE)).thenReturn(resultNoErrors);
+    when(engine.analyze(INCORRECT_TEXT_EXAMPLE)).thenReturn(resultWithErrors);
+
+    MyTextDocumentService service = verifyServiceStart(communications, engine, broker);
+
+    verifyDidOpen(communications, engine, diagnosticsNoErrors, service, TEXT_EXAMPLE, "1");
+    verifyDidOpen(
+        communications, engine, diagnosticsWithErrors, service, INCORRECT_TEXT_EXAMPLE, "2");
+
+    service.observerCallback(new RunAnalysisEvent());
+    verifyCallback(communications, engine, diagnosticsNoErrors, TEXT_EXAMPLE, "1");
+    verifyCallback(communications, engine, diagnosticsWithErrors, INCORRECT_TEXT_EXAMPLE, "2");
+  }
+
+  private List<Diagnostic> createDefaultDiagnostics() {
+    return Collections.singletonList(
+        new Diagnostic(
+            new Range(new Position(0, 0), new Position(0, INCORRECT_TEXT_EXAMPLE.length())),
+            INCORRECT_TEXT_EXAMPLE));
+  }
+
+  private MyTextDocumentService verifyServiceStart(
+      Communications communications, LanguageEngineFacade engine, DefaultDataBusBroker broker) {
+    MyTextDocumentService service =
+        new MyTextDocumentService(communications, engine, null, null, null, broker);
+
+    verify(broker).subscribe(DataEventType.RERUN_ANALYSIS_EVENT, service);
+    return service;
+  }
+
+  private void verifyDidOpen(
+      Communications communications,
+      LanguageEngineFacade engine,
+      List<Diagnostic> diagnostics,
+      MyTextDocumentService service,
+      String textToAnalyse,
+      String uri) {
+    service.didOpen(
+        new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
+
+    verify(engine, timeout(10000)).analyze(textToAnalyse);
+    verify(communications).notifyThatLoadingInProgress(uri);
+    verify(communications).publishDiagnostics(uri, diagnostics);
+  }
+
+  private void verifyCallback(
+      Communications communications,
+      LanguageEngineFacade engine,
+      List<Diagnostic> diagnostics,
+      String text,
+      String uri) {
+    verify(engine, timeout(10000).times(2)).analyze(text);
+    verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
   }
 
   @Ignore("Not implemented yet")

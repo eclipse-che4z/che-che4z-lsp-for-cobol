@@ -22,12 +22,12 @@
     <parent>
         <groupId>com.ca.lsp</groupId>
         <artifactId>com.ca.lsp.cobol</artifactId>
-        <version>0.9.1</version>
+        <version>0.10.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>lsp-core-domain</artifactId>
     <name>COBOL LSP :: LSP CORE Domain</name>
-    <version>0.9.1</version>
+    <version>0.10.0</version>
     <packaging>jar</packaging>
 
     <properties>

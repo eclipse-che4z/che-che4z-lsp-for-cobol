@@ -17,6 +17,7 @@ import com.ca.lsp.core.cobol.params.CobolDialect;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolCommentEntriesMarker;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +61,7 @@ public class CobolCommentEntriesMarkerImpl implements CobolCommentEntriesMarker 
   }
 
   protected CobolLine buildMultiLineCommentEntryLine(final CobolLine line) {
-    return CobolLine.copyCobolLineWithIndicatorArea(COMMENT_ENTRY_TAG + WS, line);
+    return CobolLineUtils.copyCobolLineWithIndicatorArea(COMMENT_ENTRY_TAG + WS, line);
   }
 
   /** Escapes in a given line a potential comment entry. */
@@ -75,7 +76,7 @@ public class CobolCommentEntriesMarkerImpl implements CobolCommentEntriesMarker 
       final String commentEntry = matcher.group(3);
       final String newContentArea = whitespace + trigger + WS + COMMENT_ENTRY_TAG + commentEntry;
 
-      result = CobolLine.copyCobolLineWithContentArea(newContentArea, line);
+      result = CobolLineUtils.copyCobolLineWithContentArea(newContentArea, line);
     } else {
       result = line;
     }

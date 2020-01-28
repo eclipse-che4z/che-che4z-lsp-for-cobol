@@ -14,6 +14,10 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
+import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.completions.Completions;
 import com.ca.lsp.cobol.service.delegates.formations.Formations;
@@ -28,10 +32,12 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -45,7 +51,8 @@ import java.util.function.BiConsumer;
  */
 @Slf4j
 @Singleton
-public class MyTextDocumentService implements TextDocumentService {
+public class MyTextDocumentService
+    implements TextDocumentService, EventObserver<RunAnalysisEvent> {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob", "COBOL");
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
@@ -62,12 +69,15 @@ public class MyTextDocumentService implements TextDocumentService {
       LanguageEngineFacade engine,
       Formations formations,
       Completions completions,
-      Occurrences occurrences) {
+      Occurrences occurrences,
+      DefaultDataBusBroker dataBus) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
     this.completions = completions;
     this.occurrences = occurrences;
+
+    dataBus.subscribe(DataEventType.RERUN_ANALYSIS_EVENT, this);
   }
 
   Map<String, MyDocumentModel> getDocs() {
@@ -163,6 +173,13 @@ public class MyTextDocumentService implements TextDocumentService {
   @Override
   public void didSave(DidSaveTextDocumentParams params) {
     log.info("Document saved...");
+  }
+
+  @Override
+  public void observerCallback(@Nonnull RunAnalysisEvent event) {
+    docs.entrySet().stream()
+        .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getText()))
+        .forEach(this::analyzeChanges);
   }
 
   private void registerEngineAndAnalyze(String uri, String languageType, String text) {

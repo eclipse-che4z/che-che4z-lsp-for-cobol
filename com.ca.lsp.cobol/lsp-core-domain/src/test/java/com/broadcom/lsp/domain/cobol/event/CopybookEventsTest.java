@@ -1,4 +1,18 @@
-/** */
+/*
+ * Copyright (c) 2020 Broadcom.
+ *
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ * Broadcom, Inc. - initial API and implementation
+ *
+ */
 package com.broadcom.lsp.domain.cobol.event;
 
 import com.broadcom.lsp.domain.CopybookStorableProvider;
@@ -14,7 +28,6 @@ import static org.junit.Assert.*;
 @Slf4j
 public class CopybookEventsTest extends CopybookStorableProvider {
   private static final String UNKNOWN_EVENT_MESSAGE = "Dummy event";
-  private static final String RUN_ANALYSIS_EVENT_MESSAGE = "Re-run analysis again";
   private static final String REQCPY = "REQCPY";
   private static final String FETCHEDCPY = "FETCHEDCPY";
   private static final String UNKNOWN = "UNKNOWN";
@@ -37,7 +50,7 @@ public class CopybookEventsTest extends CopybookStorableProvider {
 
   /** Test that the UnknownEvent DTO is correclty populated */
   @Test
-  public void unknowEventTest() {
+  public void unknownEventTest() {
     assertEquals(UNKNOWN, getUnknownCopybookHeader());
   }
 
@@ -86,6 +99,6 @@ public class CopybookEventsTest extends CopybookStorableProvider {
   }
 
   private String getRunAnalysisHeader() {
-    return new RunAnalysisEvent(RUN_ANALYSIS_EVENT_MESSAGE).getHeader();
+    return new RunAnalysisEvent().getHeader();
   }
 }

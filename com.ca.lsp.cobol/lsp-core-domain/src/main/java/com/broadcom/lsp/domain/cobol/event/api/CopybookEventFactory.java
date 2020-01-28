@@ -16,9 +16,9 @@
 
 package com.broadcom.lsp.domain.cobol.event.api;
 
+import com.broadcom.lsp.domain.cobol.event.factory.RunAnalysisSubscriberFactory;
 import com.broadcom.lsp.domain.cobol.event.factory.FetchedCopybookSubscriberFactory;
 import com.broadcom.lsp.domain.cobol.event.factory.RequiredCopybookSubscriberFactory;
-import com.broadcom.lsp.domain.cobol.event.factory.RunAnalysisSubscriberFactory;
 import com.broadcom.lsp.domain.cobol.event.factory.UnknownCopybookSubscriberFactory;
 import com.broadcom.lsp.domain.cobol.event.model.*;
 
