@@ -205,7 +205,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       List<Diagnostic> diagnostics,
       String text,
       String uri) {
-    verify(engine, timeout(1000).times(2)).analyze(text);
+    verify(engine, timeout(10000).times(2)).analyze(text);
     verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
   }
 
