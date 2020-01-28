@@ -45,11 +45,13 @@ import java.util.stream.Stream;
 @Slf4j
 public class FileSystemServiceImpl implements FileSystemService {
   private static final String COBDEPS = ".cobdeps";
-  private static final String SOMEPROG_DEP = "SOMEPROG.dep";
+  private static final String SOMEPROG_DEP_WITHOUT_EXT = "SOMEPROG";
   private final ExecutorService threadPool;
   private final DefaultDataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
-  private Path depFilePath = null;
+
+  private Path dependencyFilePath = null;
+  private Path dependencyFolderPath = null;
 
   @Inject
   public FileSystemServiceImpl(DefaultDataBusBroker dataBus) {
@@ -68,6 +70,8 @@ public class FileSystemServiceImpl implements FileSystemService {
   @Override
   public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
     this.workspaceFolders = workspaceFolders;
+
+    dependencyFolderPath = initializeDependencyFolder();
   }
 
   /**
@@ -137,7 +141,7 @@ public class FileSystemServiceImpl implements FileSystemService {
 
   /**
    * @param fileName copybook name
-   * @param workspaceFolderPath pysical path of workspace where to search for the copybook
+   * @param workspaceFolderPath physical path of workspace where to search for the copybook
    * @return Path of the found copybook in the workspace folder
    */
   private Path applySearch(String fileName, Path workspaceFolderPath) {
@@ -196,8 +200,8 @@ public class FileSystemServiceImpl implements FileSystemService {
           String content = Optional.ofNullable(path).map(this::retrieveContentByPath).orElse(null);
 
           try {
-            addCopybookInDepFile(requiredCopybookName);
-          } catch (IOException | URISyntaxException e) {
+            addCopybookInDepFile(requiredCopybookName, SOMEPROG_DEP_WITHOUT_EXT);
+          } catch (IOException e) {
             log.error(e.getLocalizedMessage());
           }
 
@@ -211,64 +215,91 @@ public class FileSystemServiceImpl implements FileSystemService {
   }
 
   @Beta
-  private void addCopybookInDepFile(String requiredCopybookName)
-      throws IOException, URISyntaxException {
-
+  void addCopybookInDepFile(String requiredCopybookName, String cobolFileName) throws IOException {
     // TODO: Remove hardcoded name for depfile
-    if (isDepFileAlreadyCreated()) {
-      updateDependencyList(depFilePath, requiredCopybookName);
-    } else {
-      updateDependencyList(generateDependencyFile(), requiredCopybookName);
+    if (depFileNotCreatedYet(cobolFileName)) {
+      dependencyFilePath = generateDependencyFile(cobolFileName);
     }
+    updateDependencyList(dependencyFilePath, requiredCopybookName);
   }
 
   protected void updateDependencyList(Path dependencyFilePath, String requiredCopybookName) {
     if (dependencyFilePath != null) {
-      List<String> result = null;
-      try {
-        result = Files.readAllLines(dependencyFilePath);
-        log.info(result.toString());
-      } catch (IOException e) {
-        log.error(e.getLocalizedMessage());
-        e.printStackTrace();
-      }
 
-      if (result != null && !result.contains(requiredCopybookName)) {
-        result.add(requiredCopybookName);
-        try {
-          dependencyFilePath = Files.write(dependencyFilePath, result);
-          depFilePath = dependencyFilePath;
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
+      List<String> lines = getContentFromDependencyFile(dependencyFilePath);
+
+      if (lines != null && !lines.contains(requiredCopybookName)) {
+        lines.add(requiredCopybookName);
+
+        writeLines(dependencyFilePath, lines);
       }
     }
   }
 
-  Path generateDependencyFile() throws URISyntaxException, IOException {
-    Path cobdepsPath =
-        Paths.get(
-            Paths.get(new URI(getWorkspaceFolders().get(0).getUri()))
-                + filesystemSeparator()
-                + COBDEPS
-                + filesystemSeparator());
+  private void writeLines(Path dependencyFilePath, List<String> lines) {
+    try {
+      Files.write(dependencyFilePath, lines);
+    } catch (IOException e) {
+      log.error(e.getLocalizedMessage());
+    }
+  }
 
-    if (!cobdepsPath.toFile().exists()) {
-      Files.createDirectory(cobdepsPath);
+  private List<String> getContentFromDependencyFile(Path dependencyFilePath) {
+    List<String> result = null;
+    try {
+      result = Files.readAllLines(dependencyFilePath);
+      log.info(result.toString());
+    } catch (IOException e) {
+      log.error(e.getLocalizedMessage());
+    }
+    return result;
+  }
+
+  Path generateDependencyFile(String cobolFileName) throws IOException {
+    // check if the folder is defined..
+    if (dependencyFolderPath == null) {
+      dependencyFolderPath = initializeDependencyFolder();
+    }
+    return createDepFileIfNotExistsOrNull(dependencyFolderPath, cobolFileName);
+  }
+
+  private Path createDepFileIfNotExistsOrNull(Path dependencyFolder, String cobolFileName)
+      throws IOException {
+    if (depFileNotCreatedYet(cobolFileName)) {
+      return Files.createFile(Paths.get(dependencyFolder + filesystemSeparator() + cobolFileName));
     }
 
-    Path dependencyPath = Paths.get(cobdepsPath + filesystemSeparator() + SOMEPROG_DEP);
-    if (!dependencyPath.toFile().exists()) {
-      return Files.createFile(dependencyPath);
-    }
+    // the file already exists..
     return null;
   }
 
-  private boolean isDepFileAlreadyCreated() {
-    return depFilePath != null;
+  private boolean depFileNotCreatedYet(String cobolFileName) {
+    return !(Paths.get(dependencyFolderPath + filesystemSeparator() + cobolFileName)
+        .toFile()
+        .exists());
   }
 
   private String filesystemSeparator() {
     return FileSystems.getDefault().getSeparator();
+  }
+
+  /**
+   * This method create the .cobdeps folder that will contains all the dep files required.
+   *
+   * @return the .cobdeps path that will be used to create the dep file or null if some issue
+   *     happens.
+   */
+  private Path initializeDependencyFolder() {
+    try {
+      return Files.createDirectory(
+          Paths.get(
+              Paths.get(new URI(getWorkspaceFolders().get(0).getUri()))
+                  + filesystemSeparator()
+                  + COBDEPS
+                  + filesystemSeparator()));
+    } catch (URISyntaxException | IOException e) {
+      log.error(e.getLocalizedMessage());
+      return null;
+    }
   }
 }

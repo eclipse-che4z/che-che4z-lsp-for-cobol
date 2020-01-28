@@ -1,10 +1,5 @@
 package com.ca.lsp.cobol;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
-import com.ca.lsp.cobol.service.FileSystemService;
-import com.ca.lsp.cobol.service.FileSystemServiceImpl;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
 
@@ -35,16 +30,11 @@ public class FileSystemTestImpl extends ConfigurableTest {
   protected static final String CPY_OUTER_FILE_NAME_WITH_EXT = "copy.cpy";
   protected static final String CPY_OUTER_ANOTHER_FILE_NAME_WITH_EXT = "copy3.out";
   protected static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
-  protected static final String COBDEPS = ".cobdeps";
-  protected static final String SOMEPROG_DEP = "SOMEPROG.dep";
-
+  protected static final String DEP_FILE_COST_NAME = "SOMEPROG";
   private URI workspaceFolderPath = null;
   private Path innerCopybooksPath = null;
   protected Path workspacePath = createPathOfName(WS_FOLDER_NAME, Optional.empty());
-  private FileSystemServiceImpl fileSystemService =
-      (FileSystemServiceImpl) LangServerCtx.getInjector().getInstance(FileSystemService.class);
-  // TODO: check if is necessary..
-  @Getter @Setter protected List<WorkspaceFolder> workspaceFolderList;
+
   /*
   STRUCTURE FOLDER USED FOR TEST PURPOSES
   ***************************************

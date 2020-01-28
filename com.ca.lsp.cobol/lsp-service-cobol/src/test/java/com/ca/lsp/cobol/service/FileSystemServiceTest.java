@@ -16,8 +16,6 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.domain.cobol.databus.impl.AbstractDataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
@@ -35,9 +33,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.*;
@@ -45,8 +40,6 @@ import static org.junit.Assert.*;
 @Slf4j
 public class FileSystemServiceTest extends FileSystemTestImpl
     implements EventObserver<RequiredCopybookEvent> {
-  private DefaultDataBusBroker databus =
-      (DefaultDataBusBroker) LangServerCtx.getInjector().getInstance(AbstractDataBusBroker.class);
 
   private FileSystemServiceImpl fileSystemService =
       (FileSystemServiceImpl) LangServerCtx.getInjector().getInstance(FileSystemService.class);
@@ -103,41 +96,13 @@ public class FileSystemServiceTest extends FileSystemTestImpl
   }
 
   /**
-   * This test verify that a new dependency file is created when a new copybook not present into the
-   * COPYBOOK folder.
+   * This test verify that the dependency file is created when a new copybook is found by the
+   * preprocessor.
    */
   @Test
   public void depFileGenerationPositiveTest() {
-    Path depFileReference;
-    try {
-      depFileReference = fileSystemService.generateDependencyFile();
-      assertTrue(Files.exists(depFileReference));
-    } catch (URISyntaxException | IOException e) {
-      e.printStackTrace();
-      fail("Error for generate dep file");
-    }
-  }
-
-  /**
-   * This test verify that when a copybook is found in the COPYBOOK folder, the dependency file is
-   * not created.
-   */
-  @Test
-  public void depFileGenerationNegativeTest() throws TimeoutException, InterruptedException {
-    /*
-       The following scenario is applied:
-         0. The .cobdep folder is not present
-         1. A required copybook event is generated
-         2. The FileSystem service subscribed for that event try to search the required copybook in
-    the copybook folder
-         3. The copybook is present in the COPYBOOK folder
-         4. The .cobdeps folder is not generated.
-        */
-
-    databus.invalidateCache();
-    databus.postData(RequiredCopybookEvent.builder().name(CPY_OUTER_NAME_ONLY2).build());
-
-    assertFalse(Files.exists(Paths.get(workspacePath + filesystemSeparator() + COBDEPS)));
+    Path depFileReference = getDepFilePathReference();
+    assertTrue(Files.exists(depFileReference));
   }
 
   /**
@@ -147,37 +112,44 @@ public class FileSystemServiceTest extends FileSystemTestImpl
   @Test
   public void depFileUpdatePositiveTest() {
     // create the dep folder with the SOMPROG.dep
-    Path depFileReference = null;
-    try {
-      depFileReference = fileSystemService.generateDependencyFile();
-    } catch (URISyntaxException | IOException e) {
-      e.printStackTrace();
-    }
+    Path depFileReference = getDepFilePathReference();
 
-    if (depFileReference != null) {
-      // check the number of elements before the update
-      List<String> depFileReferenceElementList;
-      int numberOfElements = 0;
-      log.info("Read the dependency file 1st time");
-      depFileReferenceElementList = getElementListFromDepFile(depFileReference);
-      if (depFileReferenceElementList != null) {
-        numberOfElements = depFileReferenceElementList.size();
-      }
+    // check the number of elements before the update
+    int numberOfElements = getNumberOfElementsFromDepFile(depFileReference);
 
-      fileSystemService.updateDependencyList(depFileReference, "ANEWCPY2");
-      // read the list again..
+    // update dep file with a new copybook
+    fileSystemService.updateDependencyList(depFileReference, "ANEWCPY2");
+    // read the list again..
+    // assert that number of element change by 1
+    assertEquals(numberOfElements + 1, getNumberOfElementsFromDepFile(depFileReference));
+  }
 
-      log.info("Read the dep file second time");
-      depFileReferenceElementList = getElementListFromDepFile(depFileReference);
+  /**
+   * This test verify that an already defined dependency file is not updated when a copybook already
+   * defined in COPYBOOK folder is recognized during the analysis.
+   */
+  @Test
+  public void depFileUpdateNegativeTest() throws IOException, URISyntaxException {
+    // create the dep folder with the SOMPROG.dep
+    Path depFileReference = getDepFilePathReference();
 
-      if (depFileReferenceElementList != null) {
-        assertEquals(numberOfElements + 1, depFileReferenceElementList.size());
-      } else {
-        fail("Error during reading dependency file in update");
-      }
-    } else {
-      fail("Error during reading dependency file in read");
-    }
+    // check the number of elements before the update
+    int numberOfElements = getNumberOfElementsFromDepFile(depFileReference);
+
+    // update dep file with a new copybook
+    fileSystemService.addCopybookInDepFile(CPY_OUTER_NAME_ONLY2, DEP_FILE_COST_NAME);
+
+    // assert that number of element didn't change
+    assertEquals(numberOfElements, getNumberOfElementsFromDepFile(depFileReference));
+  }
+
+  private int getNumberOfElementsFromDepFile(Path depFileReference) {
+    List<String> depFileReferenceElementList;
+
+    depFileReferenceElementList = getElementListFromDepFile(depFileReference);
+
+    assert depFileReferenceElementList != null;
+    return depFileReferenceElementList.size();
   }
 
   private List<String> getElementListFromDepFile(Path depFileReference) {
@@ -189,44 +161,14 @@ public class FileSystemServiceTest extends FileSystemTestImpl
     }
   }
 
-  // TODO: MUST be refactored..
-  /**
-   * This test verify that an already defined dependency file is not updated when a copybook already
-   * defined in COPYBOOK folder is recognized during the analysis.
-   */
-  @Test
-  public void depFileUpdateNegativeTest() throws TimeoutException, InterruptedException {
-    // create the dep folder with the SOMPROG.dep
+  private Path getDepFilePathReference() {
+    Path depFileReference = null;
     try {
-      fileSystemService.generateDependencyFile();
-    } catch (URISyntaxException | IOException e) {
-      e.printStackTrace();
-    }
-
-    Path dependencyFile =
-        Paths.get(
-            workspacePath + filesystemSeparator() + COBDEPS + filesystemSeparator() + SOMEPROG_DEP);
-
-    if (!Files.exists(dependencyFile)) {
-      fail("Error creating dependency file");
-    }
-
-    // read copybook number in dep file
-    List<String> result = null;
-    try (Stream<String> lines = Files.lines(dependencyFile)) {
-      result = lines.collect(Collectors.toList());
-      System.out.println(result.size());
+      depFileReference = fileSystemService.generateDependencyFile(DEP_FILE_COST_NAME);
     } catch (IOException e) {
       e.printStackTrace();
     }
-
-    int copybookInDepFile = result.size();
-
-    // create a new required event - the copybook already exist
-    databus.invalidateCache();
-    databus.postData(RequiredCopybookEvent.builder().name("copy2").build());
-
-    assertEquals(copybookInDepFile, result.size());
+    return depFileReference;
   }
 
   @Override
