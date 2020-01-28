@@ -76,13 +76,11 @@ public class SemanticElementOccurrences implements Occurrences {
       @Nonnull TextDocumentPositionParams position,
       @Nonnull Function<SemanticLocations, Map<String, List<Location>>> getOccurrences) {
     String token = retrieveToken(document, position.getPosition());
-    String uri = position.getTextDocument().getUri();
     return semanticLocations.stream()
         .filter(it -> it.containsToken(document, token))
         .map(getOccurrences)
         .map(retrieveLocationsFor(token))
         .flatMap(List::stream)
-        .map(fillUriIfNeeded(uri))
         .collect(Collectors.toList());
   }
 
@@ -105,20 +103,6 @@ public class SemanticElementOccurrences implements Occurrences {
   @Nonnull
   private static Function<Location, DocumentHighlight> toDocumentHighlight() {
     return location -> new DocumentHighlight(location.getRange(), DocumentHighlightKind.Text);
-  }
-
-  /**
-   * If the element is defined in the current document, the location's URI is null by default and
-   * should be replaced with the actual URI
-   *
-   * @param currentDocumentUri - URI of the current document
-   * @return location for the current document or for the copybook
-   */
-  @Nonnull
-  private Function<Location, Location> fillUriIfNeeded(@Nullable String currentDocumentUri) {
-    return location ->
-        new Location(
-            Optional.ofNullable(location.getUri()).orElse(currentDocumentUri), location.getRange());
   }
 
   @Nonnull

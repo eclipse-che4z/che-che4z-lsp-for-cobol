@@ -37,6 +37,7 @@ public interface CobolSemanticParser {
    */
   @Nonnull
   ResultWithErrors<PreprocessedInput> processLines(
+      @Nonnull String uri,
       @Nonnull String code,
       @Nonnull SemanticContext semanticContext,
       @Nonnull CobolSourceFormat format);

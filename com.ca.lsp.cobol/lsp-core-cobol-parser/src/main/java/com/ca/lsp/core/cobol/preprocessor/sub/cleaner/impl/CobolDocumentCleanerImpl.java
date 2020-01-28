@@ -48,12 +48,12 @@ public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
       };
 
   @Override
-  public String cleanDocument(String text, CobolSourceFormat format) {
+  public String cleanDocument(String documentUri, String text, CobolSourceFormat format) {
     final boolean requiresProcessorExecution = containsTrigger(text, TRIGGERS);
     final String result;
 
     if (requiresProcessorExecution) {
-      result = cleanWithParser(text, format);
+      result = cleanWithParser(documentUri, text, format);
     } else {
       result = text;
     }
@@ -77,7 +77,8 @@ public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
     return result;
   }
 
-  private String cleanWithParser(final String code, final CobolSourceFormat format) {
+  private String cleanWithParser(
+      final String documentUri, final String code, final CobolSourceFormat format) {
     // run the lexer
     List<SyntaxError> errors = new ArrayList<>();
 
@@ -86,7 +87,7 @@ public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
 
     // register an error listener, so that preprocessing stops on errors
     lexer.removeErrorListeners();
-    lexer.addErrorListener(new VerboseListener(errors));
+    lexer.addErrorListener(new VerboseListener(errors, documentUri));
 
     // get a list of matched tokens
     final CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -95,7 +96,7 @@ public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
     final CobolCleanerParser parser = new CobolCleanerParser(tokens);
     // register an error listener, so that preprocessing stops on errors
     parser.removeErrorListeners();
-    parser.addErrorListener(new VerboseListener(errors));
+    parser.addErrorListener(new VerboseListener(errors, documentUri));
 
     // specify our entry point
     CobolCleanerParser.StartCleanContext startRule = parser.startClean();

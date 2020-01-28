@@ -142,6 +142,7 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
     ResultWithErrors<PreprocessedInput> preprocessedInput =
         getParser()
             .process(
+                copybookDefinition.getUri(),
                 content,
                 format,
                 new SemanticContext(Collections.unmodifiableList(nextTrackerIteration)));

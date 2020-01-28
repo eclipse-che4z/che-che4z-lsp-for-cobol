@@ -15,8 +15,8 @@ package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -154,18 +154,32 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     AnalysisResult resultWithErrors =
         new AnalysisResult(diagnosticsWithErrors, null, null, null, null);
 
-    when(engine.analyze(TEXT_EXAMPLE)).thenReturn(resultNoErrors);
-    when(engine.analyze(INCORRECT_TEXT_EXAMPLE)).thenReturn(resultWithErrors);
+    String correctDocumentUri = "1";
+    String incorrectDocumentUri = "2";
+
+    when(engine.analyze(correctDocumentUri, TEXT_EXAMPLE)).thenReturn(resultNoErrors);
+    when(engine.analyze(incorrectDocumentUri, INCORRECT_TEXT_EXAMPLE)).thenReturn(resultWithErrors);
 
     MyTextDocumentService service = verifyServiceStart(communications, engine, broker);
 
-    verifyDidOpen(communications, engine, diagnosticsNoErrors, service, TEXT_EXAMPLE, "1");
     verifyDidOpen(
-        communications, engine, diagnosticsWithErrors, service, INCORRECT_TEXT_EXAMPLE, "2");
+        communications, engine, diagnosticsNoErrors, service, TEXT_EXAMPLE, correctDocumentUri);
+    verifyDidOpen(
+        communications,
+        engine,
+        diagnosticsWithErrors,
+        service,
+        INCORRECT_TEXT_EXAMPLE,
+        incorrectDocumentUri);
 
     service.observerCallback(new RunAnalysisEvent());
-    verifyCallback(communications, engine, diagnosticsNoErrors, TEXT_EXAMPLE, "1");
-    verifyCallback(communications, engine, diagnosticsWithErrors, INCORRECT_TEXT_EXAMPLE, "2");
+    verifyCallback(communications, engine, diagnosticsNoErrors, TEXT_EXAMPLE, correctDocumentUri);
+    verifyCallback(
+        communications,
+        engine,
+        diagnosticsWithErrors,
+        INCORRECT_TEXT_EXAMPLE,
+        incorrectDocumentUri);
   }
 
   private List<Diagnostic> createDefaultDiagnostics() {
@@ -194,7 +208,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
 
-    verify(engine, timeout(10000)).analyze(textToAnalyse);
+    verify(engine, timeout(10000)).analyze(uri, textToAnalyse);
     verify(communications).notifyThatLoadingInProgress(uri);
     verify(communications).publishDiagnostics(uri, diagnostics);
   }
@@ -205,7 +219,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       List<Diagnostic> diagnostics,
       String text,
       String uri) {
-    verify(engine, timeout(10000).times(2)).analyze(text);
+    verify(engine, timeout(10000).times(2)).analyze(uri, text);
     verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
   }
 

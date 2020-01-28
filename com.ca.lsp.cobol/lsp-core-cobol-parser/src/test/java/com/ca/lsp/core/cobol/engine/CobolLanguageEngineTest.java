@@ -72,14 +72,14 @@ public class CobolLanguageEngineTest {
   @Test
   public void doCheckNegative() {
     CobolLanguageEngine engine = new CobolLanguageEngine(format);
-    ResultWithErrors<SemanticContext> result = engine.run(NEGATIVE_TEXT);
+    ResultWithErrors<SemanticContext> result = engine.run("1", NEGATIVE_TEXT);
     assertEquals(11, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 
   @Test
   public void doCheckPositive() {
     CobolLanguageEngine engine = new CobolLanguageEngine(format);
-    ResultWithErrors<SemanticContext> result = engine.run(POSITIVE_TEXT);
+    ResultWithErrors<SemanticContext> result = engine.run("1", POSITIVE_TEXT);
     assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 }

@@ -48,6 +48,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   @Nonnull
   @Override
   public ResultWithErrors<PreprocessedInput> processLines(
+      @Nonnull String uri,
       @Nonnull String code,
       @Nonnull SemanticContext semanticContext,
       @Nonnull CobolSourceFormat format) {
@@ -64,7 +65,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
     final ParseTreeWalker walker = new ParseTreeWalker();
     final CobolSemanticParserListener listener =
-        createDocumentParserListener(tokens, semanticContext, format);
+        createDocumentParserListener(uri, tokens, semanticContext, format);
     walker.walk(listener, startRule);
 
     // analyze contained copy books
@@ -96,10 +97,11 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
   @Nonnull
   private CobolSemanticParserListener createDocumentParserListener(
+      @Nonnull String uri,
       @Nonnull CommonTokenStream tokens,
       @Nonnull SemanticContext semanticContext,
       @Nonnull CobolSourceFormat format) {
-    return new CobolSemanticParserListenerImpl(tokens, semanticContext, format);
+    return new CobolSemanticParserListenerImpl(uri, tokens, semanticContext, format);
   }
 
   @Nonnull

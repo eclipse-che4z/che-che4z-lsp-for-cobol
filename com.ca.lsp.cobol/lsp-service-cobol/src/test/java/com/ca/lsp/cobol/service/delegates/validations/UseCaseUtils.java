@@ -144,7 +144,7 @@ public class UseCaseUtils {
    */
   public static AnalysisResult analyze(String text) {
     return new CobolLanguageEngineFacade(new CobolLanguageEngine(CobolSourceFormat.FIXED))
-        .analyze(text);
+        .analyze(DOCUMENT_URI, text);
   }
 
   /**
@@ -157,7 +157,7 @@ public class UseCaseUtils {
   public static List<Diagnostic> analyzeForErrors(String text) {
     LanguageEngineFacade engine =
         new CobolLanguageEngineFacade(new CobolLanguageEngine(CobolSourceFormat.FIXED));
-    AnalysisResult result = engine.analyze(text);
+    AnalysisResult result = engine.analyze(DOCUMENT_URI, text);
     return result.getDiagnostics().stream()
         .filter(it -> it.getSeverity().getValue() == 1)
         .collect(Collectors.toList());
