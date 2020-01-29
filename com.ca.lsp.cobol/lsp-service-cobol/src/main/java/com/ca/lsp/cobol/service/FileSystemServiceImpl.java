@@ -23,6 +23,7 @@ import com.google.common.annotations.Beta;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.eclipse.lsp4j.WorkspaceFolder;
 
 import javax.annotation.Nonnull;
@@ -199,9 +200,14 @@ public class FileSystemServiceImpl implements FileSystemService {
 
     try {
 
-      addCopybookInDepFile(requiredCopybookName, SOMEPROG_DEP_WITHOUT_EXT);
+      addCopybookInDepFile(
+          requiredCopybookName,
+          FilenameUtils.getBaseName(
+              Paths.get(new URI(event.getDocumentUri())).getFileName().toString()));
     } catch (IOException e) {
       log.error("IO Exception add in dep file" + Arrays.toString(e.getStackTrace()));
+    } catch (URISyntaxException e) {
+      e.printStackTrace();
     }
 
     dataBus.postData(
