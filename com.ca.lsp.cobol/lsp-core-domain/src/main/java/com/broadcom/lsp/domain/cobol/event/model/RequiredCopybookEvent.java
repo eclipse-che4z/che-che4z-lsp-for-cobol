@@ -28,10 +28,12 @@ import lombok.NoArgsConstructor;
 @Data
 public class RequiredCopybookEvent extends DataEvent {
   private String name;
+  private String documentUri;
 
   @Builder
-  public RequiredCopybookEvent(String name) {
+  public RequiredCopybookEvent(String name, String documentUri) {
     super(DataEventType.REQUIRED_COPYBOOK_EVENT, DataEventType.REQUIRED_COPYBOOK_EVENT.getId());
     this.name = name;
+    this.documentUri = documentUri;
   }
 }

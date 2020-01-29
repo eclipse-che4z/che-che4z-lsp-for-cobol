@@ -207,7 +207,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private void analyzeDocumentFirstTime(String uri, String text) {
     CompletableFuture.runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(text);
+              AnalysisResult result = engine.analyze(uri, text);
               docs.get(uri).setAnalysisResult(result);
               publishResult(uri, result);
             })
@@ -217,7 +217,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private void analyzeChanges(String uri, String text) {
     CompletableFuture.runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(text);
+              AnalysisResult result = engine.analyze(uri, text);
               registerDocument(uri, new MyDocumentModel(text, result));
               communications.publishDiagnostics(uri, result.getDiagnostics());
             })

@@ -54,27 +54,27 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   }
 
   @Override
-  public AnalysisResult analyze(String text) {
+  public AnalysisResult analyze(String uri, String text) {
     if (isEmpty(text)) {
       return AnalysisResult.empty();
     }
-    return toAnalysisResult(engine.run(text));
+    return toAnalysisResult(engine.run(uri, text), uri);
   }
 
   private static boolean isEmpty(String text) {
     return text.length() <= FIRST_LINE_SEQ_AND_EXTRA_OP;
   }
 
-  private static List<Diagnostic> convertErrors(List<SyntaxError> errors) {
+  private static List<Diagnostic> convertErrors(List<SyntaxError> errors, String uri) {
     return errors.stream()
-        .filter(errorOnlyFromCurrentDocument())
+        .filter(errorOnlyFromCurrentDocument(uri))
         .map(toDiagnostic())
         .collect(Collectors.toList());
   }
 
   @Nonnull
-  private static Predicate<SyntaxError> errorOnlyFromCurrentDocument() {
-    return syntaxError -> syntaxError.getPosition().getDocumentURI() == null;
+  private static Predicate<SyntaxError> errorOnlyFromCurrentDocument(String uri) {
+    return syntaxError -> uri.equals(syntaxError.getPosition().getDocumentURI());
   }
 
   private static Function<? super SyntaxError, ? extends Diagnostic> toDiagnostic() {
@@ -121,9 +121,9 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
                 + ERR_POS_INDEX)));
   }
 
-  private AnalysisResult toAnalysisResult(ResultWithErrors<SemanticContext> result) {
+  private AnalysisResult toAnalysisResult(ResultWithErrors<SemanticContext> result, String uri) {
     return new AnalysisResult(
-        convertErrors(result.getErrors()),
+        convertErrors(result.getErrors(), uri),
         retrieveDefinitions(result.getResult().getVariables()),
         retrieveUsages(result.getResult().getVariables()),
         retrieveDefinitions(result.getResult().getParagraphs()),

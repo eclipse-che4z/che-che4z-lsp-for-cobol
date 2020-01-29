@@ -48,6 +48,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   @Nonnull
   @Override
   public ResultWithErrors<PreprocessedInput> processLines(
+      @Nonnull String uri,
       @Nonnull String code,
       @Nonnull SemanticContext semanticContext,
       @Nonnull CobolSourceFormat format) {
@@ -64,12 +65,12 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
     final ParseTreeWalker walker = new ParseTreeWalker();
     final CobolSemanticParserListener listener =
-        createDocumentParserListener(tokens, semanticContext, format);
+        createDocumentParserListener(uri, tokens, semanticContext, format);
     walker.walk(listener, startRule);
 
     // analyze contained copy books
     ResultWithErrors<List<CopybookSemanticContext>> contexts =
-        processCopybooks(semanticContext, format);
+        processCopybooks(uri, semanticContext, format);
     contexts.getResult().forEach(semanticContext::merge);
 
     List<SyntaxError> errors = new ArrayList<>(contexts.getErrors());
@@ -82,7 +83,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   }
 
   private ResultWithErrors<List<CopybookSemanticContext>> processCopybooks(
-      @Nonnull SemanticContext semanticContext, CobolSourceFormat format) {
+      String documentUri, @Nonnull SemanticContext semanticContext, CobolSourceFormat format) {
     Multimap<String, Position> copybookNames = semanticContext.getCopybooks().getDefinitions();
 
     if (copybookNames.isEmpty()) {
@@ -91,15 +92,16 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
     CopybookAnalysis copybookAnalyzer = createCopybookAnalyzer();
     return copybookAnalyzer.analyzeCopybooks(
-        copybookNames, semanticContext.getCopybookUsageTracker(), format);
+        documentUri, copybookNames, semanticContext.getCopybookUsageTracker(), format);
   }
 
   @Nonnull
   private CobolSemanticParserListener createDocumentParserListener(
+      @Nonnull String uri,
       @Nonnull CommonTokenStream tokens,
       @Nonnull SemanticContext semanticContext,
       @Nonnull CobolSourceFormat format) {
-    return new CobolSemanticParserListenerImpl(tokens, semanticContext, format);
+    return new CobolSemanticParserListenerImpl(uri, tokens, semanticContext, format);
   }
 
   @Nonnull

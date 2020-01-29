@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.impl;
 
-import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
@@ -39,37 +38,42 @@ import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.impl.CobolLineWriterIm
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @Slf4j
 public class CobolPreprocessorImpl implements CobolPreprocessor {
-
+  @Nonnull
   @Override
   public ResultWithErrors<PreprocessedInput> process(
-      final String cobolSourceCode, final CobolSourceFormat format) {
-    return process(cobolSourceCode, format, new SemanticContext(Collections.emptyList()));
+      @Nonnull String documentUri,
+      @Nonnull String cobolSourceCode,
+      @Nonnull CobolSourceFormat format) {
+    return process(
+        documentUri, cobolSourceCode, format, new SemanticContext(Collections.emptyList()));
   }
 
+  @Nonnull
   @Override
   public ResultWithErrors<PreprocessedInput> process(
-      final String cobolCode,
-      final CobolSourceFormat format,
-      final SemanticContext semanticContext) {
-    String documentURI = getDocumentURI(semanticContext);
+      @Nonnull String documentUri,
+      @Nonnull String cobolCode,
+      @Nonnull CobolSourceFormat format,
+      @Nonnull SemanticContext semanticContext) {
 
-    ResultWithErrors<List<CobolLine>> lines = readLines(cobolCode, format, documentURI);
+    ResultWithErrors<List<CobolLine>> lines = readLines(cobolCode, format, documentUri);
 
     ResultWithErrors<List<CobolLine>> transformedLines =
-        transformLines(lines.getResult(), documentURI);
+        transformLines(documentUri, lines.getResult());
 
     List<CobolLine> rewrittenLines = rewriteLines(transformedLines.getResult());
 
-    String cleanDocument = cleanDocument(rewrittenLines, format);
+    String cleanDocument = cleanDocument(documentUri, rewrittenLines, format);
 
     ResultWithErrors<PreprocessedInput> parsedDocument =
-        parseDocument(cleanDocument, format, semanticContext);
+        parseDocument(documentUri, cleanDocument, format, semanticContext);
 
     List<SyntaxError> errors = new ArrayList<>();
     errors.addAll(lines.getErrors());
@@ -79,16 +83,18 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     return new ResultWithErrors<>(parsedDocument.getResult(), errors);
   }
 
-  private String cleanDocument(final List<CobolLine> lines, final CobolSourceFormat format) {
+  private String cleanDocument(
+      String documentUri, final List<CobolLine> lines, final CobolSourceFormat format) {
     String code = createLineWriter().serialize(lines);
-    return createDocumentCleaner().cleanDocument(code, format);
+    return createDocumentCleaner().cleanDocument(documentUri, code, format);
   }
 
   private ResultWithErrors<PreprocessedInput> parseDocument(
+      String documentUri,
       final String document,
       final CobolSourceFormat format,
       final SemanticContext semanticContext) {
-    return createDocumentParser().processLines(document, semanticContext, format);
+    return createDocumentParser().processLines(documentUri, document, semanticContext, format);
   }
 
   private ResultWithErrors<List<CobolLine>> readLines(
@@ -97,7 +103,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   }
 
   private ResultWithErrors<List<CobolLine>> transformLines(
-      List<CobolLine> lines, String documentURI) {
+      String documentURI, List<CobolLine> lines) {
     return createContinuationLineProcessor().transformLines(documentURI, lines);
   }
 
@@ -143,10 +149,5 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
   private CobolLineWriter createLineWriter() {
     return new CobolLineWriterImpl();
-  }
-
-  private String getDocumentURI(SemanticContext semanticContext) {
-    List<CopybookDefinition> tracker = semanticContext.getCopybookUsageTracker();
-    return tracker.isEmpty() ? null : tracker.get(tracker.size() - 1).getUri();
   }
 }

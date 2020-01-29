@@ -101,7 +101,7 @@ public class CobolVariableCheckTest {
   @Test
   public void test() {
     CobolLanguageEngine engine = new CobolLanguageEngine(FIXED);
-    ResultWithErrors<SemanticContext> result = engine.run(TEXT_TO_TEST);
+    ResultWithErrors<SemanticContext> result = engine.run("1", TEXT_TO_TEST);
     assertEquals(2, result.getErrors().stream().filter(item -> item.getSeverity() == 3).count());
   }
 }
