@@ -50,6 +50,8 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   private static final String CPY_EXTENSION = "cpy";
   private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
+  private static final String DOCUMENT_WITH_ERRORS_URI =
+      "file:///c%3A/workspace/incorrect_document.cbl";
 
   private TextDocumentService service;
   private TestLanguageClient client;
@@ -154,32 +156,29 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     AnalysisResult resultWithErrors =
         new AnalysisResult(diagnosticsWithErrors, null, null, null, null);
 
-    String correctDocumentUri = "1";
-    String incorrectDocumentUri = "2";
-
-    when(engine.analyze(correctDocumentUri, TEXT_EXAMPLE)).thenReturn(resultNoErrors);
-    when(engine.analyze(incorrectDocumentUri, INCORRECT_TEXT_EXAMPLE)).thenReturn(resultWithErrors);
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE)).thenReturn(resultNoErrors);
+    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE))
+        .thenReturn(resultWithErrors);
 
     MyTextDocumentService service = verifyServiceStart(communications, engine, broker);
 
-    verifyDidOpen(
-        communications, engine, diagnosticsNoErrors, service, TEXT_EXAMPLE, correctDocumentUri);
+    verifyDidOpen(communications, engine, diagnosticsNoErrors, service, TEXT_EXAMPLE, DOCUMENT_URI);
     verifyDidOpen(
         communications,
         engine,
         diagnosticsWithErrors,
         service,
         INCORRECT_TEXT_EXAMPLE,
-        incorrectDocumentUri);
+        DOCUMENT_WITH_ERRORS_URI);
 
     service.observerCallback(new RunAnalysisEvent());
-    verifyCallback(communications, engine, diagnosticsNoErrors, TEXT_EXAMPLE, correctDocumentUri);
+    verifyCallback(communications, engine, diagnosticsNoErrors, TEXT_EXAMPLE, DOCUMENT_URI);
     verifyCallback(
         communications,
         engine,
         diagnosticsWithErrors,
         INCORRECT_TEXT_EXAMPLE,
-        incorrectDocumentUri);
+        DOCUMENT_WITH_ERRORS_URI);
   }
 
   private List<Diagnostic> createDefaultDiagnostics() {

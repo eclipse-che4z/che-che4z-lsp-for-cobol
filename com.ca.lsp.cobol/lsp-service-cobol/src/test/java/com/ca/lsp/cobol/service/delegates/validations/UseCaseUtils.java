@@ -36,9 +36,9 @@ import java.util.stream.Collectors;
 /** This utility class provides methods to run use cases with Cobol code examples. */
 @UtilityClass
 public class UseCaseUtils {
-  public static final String LANGUAGE = "cbl";
-  public static final String DOCUMENT_URI = "1";
+  public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
 
+  private static final String LANGUAGE = "cbl";
   private static final long MAX_TIME_TO_WAIT = 60000L;
   private static final long TIME_TO_POLL = 10L;
   private static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
