@@ -108,6 +108,7 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
   private void runAnalysis() {
     AnalyseCopybookTask analyseCopybookTask =
         new AnalyseCopybookTask(
+            null,
             new CopybookDefinition(COPYBOOK_NAME, null, null),
             Collections.emptyList(),
             FIXED);

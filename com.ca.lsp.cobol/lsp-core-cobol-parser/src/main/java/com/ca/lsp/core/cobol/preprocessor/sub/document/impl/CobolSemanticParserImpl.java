@@ -70,7 +70,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
     // analyze contained copy books
     ResultWithErrors<List<CopybookSemanticContext>> contexts =
-        processCopybooks(semanticContext, format);
+        processCopybooks(uri, semanticContext, format);
     contexts.getResult().forEach(semanticContext::merge);
 
     List<SyntaxError> errors = new ArrayList<>(contexts.getErrors());
@@ -83,7 +83,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   }
 
   private ResultWithErrors<List<CopybookSemanticContext>> processCopybooks(
-      @Nonnull SemanticContext semanticContext, CobolSourceFormat format) {
+      String documentUri, @Nonnull SemanticContext semanticContext, CobolSourceFormat format) {
     Multimap<String, Position> copybookNames = semanticContext.getCopybooks().getDefinitions();
 
     if (copybookNames.isEmpty()) {
@@ -92,7 +92,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
     CopybookAnalysis copybookAnalyzer = createCopybookAnalyzer();
     return copybookAnalyzer.analyzeCopybooks(
-        copybookNames, semanticContext.getCopybookUsageTracker(), format);
+        documentUri, copybookNames, semanticContext.getCopybookUsageTracker(), format);
   }
 
   @Nonnull
