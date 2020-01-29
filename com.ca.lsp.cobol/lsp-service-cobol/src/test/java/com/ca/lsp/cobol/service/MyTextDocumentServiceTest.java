@@ -194,7 +194,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
 
-    verify(engine, timeout(1000)).analyze(textToAnalyse);
+    verify(engine, timeout(10000)).analyze(textToAnalyse);
     verify(communications).notifyThatLoadingInProgress(uri);
     verify(communications).publishDiagnostics(uri, diagnostics);
   }
@@ -205,7 +205,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       List<Diagnostic> diagnostics,
       String text,
       String uri) {
-    verify(engine, timeout(1000).times(2)).analyze(text);
+    verify(engine, timeout(10000).times(2)).analyze(text);
     verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
   }
 
