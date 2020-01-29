@@ -45,6 +45,7 @@ import java.util.stream.Stream;
 @Slf4j
 public class FileSystemServiceImpl implements FileSystemService {
   private static final String COBDEPS = ".cobdeps";
+  private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
   private static final String SOMEPROG_DEP_WITHOUT_EXT = "SOMEPROG";
   private final ExecutorService threadPool;
   private final DefaultDataBusBroker dataBus;
@@ -136,7 +137,11 @@ public class FileSystemServiceImpl implements FileSystemService {
    * @return a valid path of the copybook file or null if not found
    */
   private Optional<Path> searchInDirectory(String fileName, Path workspaceFolderPath) {
-    return Optional.ofNullable(applySearch(fileName, workspaceFolderPath));
+    return Optional.ofNullable(applySearch(fileName, getCopybookFolderPath(workspaceFolderPath)));
+  }
+
+  private Path getCopybookFolderPath(Path workspaceFolderPath) {
+    return Paths.get(workspaceFolderPath + filesystemSeparator() + COPYBOOK_FOLDER_NAME);
   }
 
   /**
