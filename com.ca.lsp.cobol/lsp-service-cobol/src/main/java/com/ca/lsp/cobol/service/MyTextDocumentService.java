@@ -51,8 +51,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Singleton
-public class MyTextDocumentService
-    implements TextDocumentService, EventObserver<RunAnalysisEvent> {
+public class MyTextDocumentService implements TextDocumentService, EventObserver<RunAnalysisEvent> {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob", "COBOL");
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
@@ -77,7 +76,7 @@ public class MyTextDocumentService
     this.completions = completions;
     this.occurrences = occurrences;
 
-    dataBus.subscribe(DataEventType.RERUN_ANALYSIS_EVENT, this);
+    dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
 
   Map<String, MyDocumentModel> getDocs() {

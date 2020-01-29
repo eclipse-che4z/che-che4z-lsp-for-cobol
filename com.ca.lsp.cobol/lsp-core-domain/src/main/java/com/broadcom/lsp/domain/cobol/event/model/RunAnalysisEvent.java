@@ -15,7 +15,7 @@
 
 package com.broadcom.lsp.domain.cobol.event.model;
 
-import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.RERUN_ANALYSIS_EVENT;
+import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.RUN_ANALYSIS_EVENT;
 
 /**
  * This class is a signal object to show that it is needed to run the syntax and semantic again for

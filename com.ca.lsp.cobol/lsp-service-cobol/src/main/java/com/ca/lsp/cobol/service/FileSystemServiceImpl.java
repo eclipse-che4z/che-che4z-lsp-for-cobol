@@ -256,7 +256,6 @@ public class FileSystemServiceImpl implements FileSystemService {
   }
 
   Path generateDependencyFile(String cobolFileName) throws IOException {
-    // check if the folder is defined..
     if (dependencyFolderPath == null) {
       dependencyFolderPath = initializeDependencyFolder();
     }

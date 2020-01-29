@@ -87,7 +87,7 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
     assertNotEquals(REQCPY, getUnknownSubscriberFromFactory());
     assertNotEquals(FETCHEDCPY, getFetchedSubscriberFromFactory());
 
-    assertNotEquals(RUNANALYSIS, getFetchedSubscriberFromFactory());
+    assertNotEquals(RUN_ANALYSIS, getFetchedSubscriberFromFactory());
   }
 
   private UnknownEventSubscriber getUnknownSubscriberFromFactory() {

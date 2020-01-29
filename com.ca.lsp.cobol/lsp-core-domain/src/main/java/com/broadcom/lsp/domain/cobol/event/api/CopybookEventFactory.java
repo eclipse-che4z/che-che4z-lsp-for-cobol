@@ -16,9 +16,9 @@
 
 package com.broadcom.lsp.domain.cobol.event.api;
 
-import com.broadcom.lsp.domain.cobol.event.factory.RunAnalysisSubscriberFactory;
 import com.broadcom.lsp.domain.cobol.event.factory.FetchedCopybookSubscriberFactory;
 import com.broadcom.lsp.domain.cobol.event.factory.RequiredCopybookSubscriberFactory;
+import com.broadcom.lsp.domain.cobol.event.factory.RunAnalysisSubscriberFactory;
 import com.broadcom.lsp.domain.cobol.event.factory.UnknownCopybookSubscriberFactory;
 import com.broadcom.lsp.domain.cobol.event.model.*;
 
@@ -52,7 +52,7 @@ public interface CopybookEventFactory {
       case REQUIRED_COPYBOOK_EVENT:
         return RequiredCopybookEvent.builder().build();
       case RUN_ANALYSIS_EVENT:
-        return RunAnalysisEvent.builder().build();
+        return new RunAnalysisEvent();
       default:
         throw new NoSuchElementException(
             String.format("No DataEventType found for %s,%s", choice.getId(), choice.name()));
