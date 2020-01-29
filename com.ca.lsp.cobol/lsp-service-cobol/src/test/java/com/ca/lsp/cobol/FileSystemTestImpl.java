@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2020 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Broadcom, Inc. - initial API and implementation
+ */
 package com.ca.lsp.cobol;
 
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +22,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -134,10 +146,6 @@ public class FileSystemTestImpl extends ConfigurableTest {
       e.printStackTrace();
     }
     setWorkspaceFolderPath(workspacePath.toUri());
-  }
-
-  protected String filesystemSeparator() {
-    return FileSystems.getDefault().getSeparator();
   }
 
   private void generateDummyContentForFile(Path copybookFilePath) {

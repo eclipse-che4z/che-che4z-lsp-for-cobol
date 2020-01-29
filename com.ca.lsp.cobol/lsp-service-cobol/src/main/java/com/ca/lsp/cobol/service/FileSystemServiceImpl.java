@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -36,8 +36,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,7 +45,7 @@ public class FileSystemServiceImpl implements FileSystemService {
   private static final String COBDEPS = ".cobdeps";
   private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
   private static final String SOMEPROG_DEP_WITHOUT_EXT = "SOMEPROG";
-  private final ExecutorService threadPool;
+  public static final String DEP_EXTENSION = ".dep";
   private final DefaultDataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
 
@@ -58,9 +56,6 @@ public class FileSystemServiceImpl implements FileSystemService {
   public FileSystemServiceImpl(DefaultDataBusBroker dataBus) {
     this.dataBus = dataBus;
     dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
-
-    // create a thread pool fixed
-    threadPool = Executors.newCachedThreadPool();
   }
 
   /**
@@ -168,7 +163,7 @@ public class FileSystemServiceImpl implements FileSystemService {
             FileVisitOption.FOLLOW_LINKS)) {
       return pathStream.findAny().orElse(null);
     } catch (IOException e) {
-      log.error(Arrays.toString(e.getStackTrace()));
+      log.error("[search in copybook folder]" + Arrays.toString(e.getStackTrace()));
       return null;
     }
   }
@@ -190,7 +185,7 @@ public class FileSystemServiceImpl implements FileSystemService {
     try (Stream<String> stream = Files.lines(uriForFileName)) {
       content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse(null);
     } catch (IOException e) {
-      log.error(Arrays.toString(e.getStackTrace()));
+      log.error("[retrieve content by path]" + Arrays.toString(e.getStackTrace()));
     }
     return content;
   }
@@ -198,31 +193,29 @@ public class FileSystemServiceImpl implements FileSystemService {
   /** create the task and pass it to the executor service */
   @Override
   public void observerCallback(RequiredCopybookEvent event) {
-    threadPool.submit(
-        () -> {
-          String requiredCopybookName = event.getName();
-          Path path = getPathByCopybookName(requiredCopybookName);
-          String content = Optional.ofNullable(path).map(this::retrieveContentByPath).orElse(null);
+    String requiredCopybookName = event.getName();
+    Path path = getPathByCopybookName(requiredCopybookName);
+    String content = Optional.ofNullable(path).map(this::retrieveContentByPath).orElse(null);
 
-          try {
-            addCopybookInDepFile(requiredCopybookName, SOMEPROG_DEP_WITHOUT_EXT);
-          } catch (IOException e) {
-            log.error(e.getLocalizedMessage());
-          }
+    try {
 
-          dataBus.postData(
-              FetchedCopybookEvent.builder()
-                  .name(requiredCopybookName)
-                  .uri(Optional.ofNullable(path).map(Path::toUri).map(URI::toString).orElse(null))
-                  .content(content)
-                  .build());
-        });
+      addCopybookInDepFile(requiredCopybookName, SOMEPROG_DEP_WITHOUT_EXT);
+    } catch (IOException e) {
+      log.error("IO Exception add in dep file" + Arrays.toString(e.getStackTrace()));
+    }
+
+    dataBus.postData(
+        FetchedCopybookEvent.builder()
+            .name(requiredCopybookName)
+            .uri(Optional.ofNullable(path).map(Path::toUri).map(URI::toString).orElse(null))
+            .content(content)
+            .build());
   }
 
   @Beta
   void addCopybookInDepFile(String requiredCopybookName, String cobolFileName) throws IOException {
     // TODO: Remove hardcoded name for depfile
-    if (depFileNotCreatedYet(cobolFileName)) {
+    if (!depFileExists(cobolFileName)) {
       dependencyFilePath = generateDependencyFile(cobolFileName);
     }
     updateDependencyList(dependencyFilePath, requiredCopybookName);
@@ -245,7 +238,7 @@ public class FileSystemServiceImpl implements FileSystemService {
     try {
       Files.write(dependencyFilePath, lines);
     } catch (IOException e) {
-      log.error(e.getLocalizedMessage());
+      log.error("IO Exception write file" + Arrays.toString(e.getStackTrace()));
     }
   }
 
@@ -261,26 +254,23 @@ public class FileSystemServiceImpl implements FileSystemService {
   }
 
   Path generateDependencyFile(String cobolFileName) throws IOException {
-    if (dependencyFolderPath == null) {
-      dependencyFolderPath = initializeDependencyFolder();
+    if (!depFileExists(cobolFileName)) {
+      return Files.createFile(
+          Paths.get(dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION));
+    } else {
+      return Paths.get(
+          dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION);
     }
-    return createDepFileIfNotExistsOrNull(dependencyFolderPath, cobolFileName);
   }
 
-  private Path createDepFileIfNotExistsOrNull(Path dependencyFolder, String cobolFileName)
-      throws IOException {
-    if (depFileNotCreatedYet(cobolFileName)) {
-      return Files.createFile(Paths.get(dependencyFolder + filesystemSeparator() + cobolFileName));
-    }
-
-    // the file already exists..
-    return null;
-  }
-
-  private boolean depFileNotCreatedYet(String cobolFileName) {
-    return !(Paths.get(dependencyFolderPath + filesystemSeparator() + cobolFileName)
-        .toFile()
-        .exists());
+  private boolean depFileExists(String cobolFileName) {
+    System.out.println(
+        "File already exists: "
+            + Files.exists(
+                Paths.get(
+                    dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION)));
+    return Files.exists(
+        Paths.get(dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION));
   }
 
   private String filesystemSeparator() {
