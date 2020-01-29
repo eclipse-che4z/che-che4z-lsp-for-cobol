@@ -49,15 +49,18 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
       LangServerCtx.getInjector().getInstance(DefaultDataBusBroker.class);
 
   private final String copyBookName;
+  private String documentUri;
   private transient CopybookDefinition copybookDefinition;
   private transient List<CopybookDefinition> copybookUsageTracker;
   private final CobolSourceFormat format;
   private transient CompletableFuture<String> waitForResolving;
 
   public AnalyseCopybookTask(
+      String documentUri,
       CopybookDefinition copybookDefinition,
       List<CopybookDefinition> copybookUsageTracker,
       CobolSourceFormat format) {
+    this.documentUri = documentUri;
     this.copybookDefinition = copybookDefinition;
     copyBookName = copybookDefinition.getName();
     this.copybookUsageTracker = copybookUsageTracker;
@@ -82,7 +85,8 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
       semanticContext = parseCopybookFromCache();
     } else {
       Object subscriber = databus.subscribe(DataEventType.FETCHED_COPYBOOK_EVENT, this);
-      databus.postData(RequiredCopybookEvent.builder().name(copyBookName).build());
+      databus.postData(
+          RequiredCopybookEvent.builder().name(copyBookName).documentUri(documentUri).build());
       semanticContext = parseCopybook();
       databus.unSubscribe(subscriber);
     }
@@ -142,6 +146,7 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
     ResultWithErrors<PreprocessedInput> preprocessedInput =
         getParser()
             .process(
+                copybookDefinition.getUri(),
                 content,
                 format,
                 new SemanticContext(Collections.unmodifiableList(nextTrackerIteration)));

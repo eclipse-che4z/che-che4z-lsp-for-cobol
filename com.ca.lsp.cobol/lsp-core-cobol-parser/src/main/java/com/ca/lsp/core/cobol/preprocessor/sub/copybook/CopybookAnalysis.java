@@ -26,6 +26,7 @@ import java.util.List;
 
 public interface CopybookAnalysis {
   ResultWithErrors<List<CopybookSemanticContext>> analyzeCopybooks(
+      String documentUri,
       Multimap<String, Position> copybookNames,
       List<CopybookDefinition> copybookUsageTracker,
       CobolSourceFormat format);
