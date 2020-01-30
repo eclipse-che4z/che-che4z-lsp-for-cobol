@@ -29,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 /** JUnit Test checks with Cobol engine for both positive and negative tests with 3 formats */
 @RunWith(Parameterized.class)
 public class CobolLanguageEngineTest {
+  public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
 
   private static final String NEGATIVE_TEXT =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -72,14 +73,14 @@ public class CobolLanguageEngineTest {
   @Test
   public void doCheckNegative() {
     CobolLanguageEngine engine = new CobolLanguageEngine(format);
-    ResultWithErrors<SemanticContext> result = engine.run(NEGATIVE_TEXT);
+    ResultWithErrors<SemanticContext> result = engine.run(DOCUMENT_URI, NEGATIVE_TEXT);
     assertEquals(11, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 
   @Test
   public void doCheckPositive() {
     CobolLanguageEngine engine = new CobolLanguageEngine(format);
-    ResultWithErrors<SemanticContext> result = engine.run(POSITIVE_TEXT);
+    ResultWithErrors<SemanticContext> result = engine.run(DOCUMENT_URI, POSITIVE_TEXT);
     assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 }
