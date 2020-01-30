@@ -32,114 +32,24 @@ import org.junit.Test;
 public class CobolLineIndicatorProcessorImplTest {
 
   private static final String EMPTY_STRING = "";
-  CobolLine continuationLine = new CobolLine();
-  CobolLine trailingQuoteContinuationLine = new CobolLine();
-  CobolLine emptyContinuationLine = new CobolLine();
-  CobolLine singleContinuationLine = new CobolLine();
-  CobolLine goodContinuationLine = new CobolLine();
-  CobolLine badContinuationLine = new CobolLine();
-  CobolLine commentLine = new CobolLine();
-  CobolLine continuationLineWithEndQuotes = new CobolLine();
 
   /**
    * Testing preprocessing formatting for COBOL files, making sure that only needed information is
    * being passed to the parser to avoid issues and making token recognition easier
    */
   @Test
-  public void processLinesTest() {
-    continuationLine.setType(CONTINUATION);
-    continuationLine.setIndicatorArea("-");
-    continuationLine.setContentAreaA("        \"CONTINUED LINE ENDS HERE\"     ");
-
-    goodContinuationLine.setType(CONTINUATION);
-    goodContinuationLine.setSuccessor(continuationLine);
-    goodContinuationLine.setIndicatorArea(WS);
-    goodContinuationLine.setContentAreaA("       \"RANDOM TEXT   ");
-    goodContinuationLine.setContentAreaB("        ");
-
-    singleContinuationLine.setType(CONTINUATION);
-    singleContinuationLine.setSuccessor(continuationLine);
-    singleContinuationLine.setIndicatorArea(WS);
-    singleContinuationLine.setContentAreaA("       'RANDOM TEXT   ");
-    singleContinuationLine.setContentAreaB("        ");
-
-    trailingQuoteContinuationLine.setType(CONTINUATION);
-    trailingQuoteContinuationLine.setSuccessor(continuationLine);
-    trailingQuoteContinuationLine.setIndicatorArea(WS);
-    trailingQuoteContinuationLine.setContentAreaA("         \"");
-    trailingQuoteContinuationLine.setContentAreaB("");
-
-    badContinuationLine.setType(CONTINUATION);
-    badContinuationLine.setPredecessor(goodContinuationLine);
-    badContinuationLine.setContentAreaA("        \"RANDOM TEXT   ");
-    badContinuationLine.setContentAreaB("        ");
-
-    emptyContinuationLine.setType(CONTINUATION);
-    emptyContinuationLine.setSuccessor(null);
-    emptyContinuationLine.setContentAreaA("           ");
-    emptyContinuationLine.setContentAreaB("           ");
-
-    commentLine.setType(COMMENT);
-    commentLine.setIndicatorArea("*");
-    commentLine.setContentAreaA("THIS IS A COMMENT        ");
-
-    continuationLineWithEndQuotes.setType(CONTINUATION);
-    continuationLineWithEndQuotes.setPredecessor(continuationLine);
-    continuationLineWithEndQuotes.setSuccessor(continuationLine);
-    continuationLineWithEndQuotes.setIndicatorArea(WS);
-    continuationLineWithEndQuotes.setContentAreaA("       \"RANDOM TEXT \"  ");
-    continuationLineWithEndQuotes.setContentAreaB("        ");
-
-    final List<CobolLine> listOfLines =
-        Arrays.asList(
-            goodContinuationLine,
-            singleContinuationLine,
-            trailingQuoteContinuationLine,
-            continuationLine,
-            badContinuationLine,
-            emptyContinuationLine,
-            commentLine,
-            continuationLineWithEndQuotes);
-    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
-    List<CobolLine> outcomeList = processor.processLines(listOfLines);
-
-    assertEquals(
-        WS + "\"RANDOM TEXT           ",
-        outcomeList.get(0).getIndicatorArea() + outcomeList.get(0).getContentArea());
-    assertEquals(
-        WS + "'RANDOM TEXT           ",
-        outcomeList.get(1).getIndicatorArea() + outcomeList.get(1).getContentArea());
-    assertEquals(
-        WS + "\"", outcomeList.get(2).getIndicatorArea() + outcomeList.get(2).getContentArea());
-    assertEquals(
-        WS + "CONTINUED LINE ENDS HERE\"",
-        outcomeList.get(3).getIndicatorArea() + outcomeList.get(3).getContentArea());
-    assertEquals(
-        WS + "RANDOM TEXT",
-        outcomeList.get(4).getIndicatorArea() + outcomeList.get(4).getContentArea());
-    assertEquals(
-        WS + EMPTY_STRING,
-        outcomeList.get(5).getIndicatorArea() + outcomeList.get(5).getContentArea());
-    assertEquals(
-        COMMENT_TAG + WS + "THIS IS A COMMENT",
-        outcomeList.get(6).getIndicatorArea() + outcomeList.get(6).getContentArea());
-    assertEquals(
-        WS + "RANDOM TEXT \"",
-        outcomeList.get(7).getIndicatorArea() + outcomeList.get(7).getContentArea());
-  }
-
-  @Test
   public void debugLineTest() {
     CobolLine debugLine = new CobolLine();
     debugLine.setType(DEBUG);
     debugLine.setIndicatorArea(WS);
-    debugLine.setContentAreaA("     DEBUG LINE HERE      ");
+    debugLine.setContentAreaA("    ");
+    debugLine.setContentAreaB("     DEBUG LINE HERE      ");
 
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
     CobolLine outcome = processor.processLine(debugLine);
 
     assertEquals(
-        WS + "     DEBUG LINE HERE", outcome.getIndicatorArea() + outcome.getContentArea());
+        WS + "         DEBUG LINE HERE", outcome.getIndicatorArea() + outcome.getContentArea());
   }
 
   @Test
@@ -148,13 +58,14 @@ public class CobolLineIndicatorProcessorImplTest {
     normalLine.setType(NORMAL);
     normalLine.setFormat(FIXED);
     normalLine.setIndicatorArea(WS);
-    normalLine.setContentAreaA("         RANDOM TEXT ,  ");
+    normalLine.setContentAreaA("    ");
+    normalLine.setContentAreaB("         RANDOM TEXT ,  ");
 
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
     CobolLine outcome = processor.processLine(normalLine);
 
     assertEquals(
-        WS + "         RANDOM TEXT , ", outcome.getIndicatorArea() + outcome.getContentArea());
+        WS + "             RANDOM TEXT , ", outcome.getIndicatorArea() + outcome.getContentArea());
   }
 
   @Test
@@ -162,11 +73,188 @@ public class CobolLineIndicatorProcessorImplTest {
     CobolLine compilerDirectiveLine = new CobolLine();
     compilerDirectiveLine.setType(COMPILER_DIRECTIVE);
     compilerDirectiveLine.setIndicatorArea(WS);
-    compilerDirectiveLine.setContentAreaA("DEFINE");
+    compilerDirectiveLine.setContentAreaA("    ");
+    compilerDirectiveLine.setContentAreaB("DEFINE");
 
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
     CobolLine outcome = processor.processLine(compilerDirectiveLine);
 
     assertEquals(WS + EMPTY_STRING, outcome.getIndicatorArea() + outcome.getContentArea());
+  }
+
+  @Test
+  public void commentLineTest() {
+    CobolLine commentLine = new CobolLine();
+    commentLine.setType(COMMENT);
+    commentLine.setIndicatorArea("*");
+    commentLine.setContentAreaA("    ");
+    commentLine.setContentAreaB("THIS IS A COMMENT        ");
+
+    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+
+    CobolLine outcome = processor.processLine(commentLine);
+
+    assertEquals(
+        COMMENT_TAG + WS + "    THIS IS A COMMENT",
+        outcome.getIndicatorArea() + outcome.getContentArea());
+  }
+
+  @Test
+  public void continuationLineTest() {
+    CobolLine startContinuationLine = new CobolLine();
+    startContinuationLine.setType(NORMAL);
+    startContinuationLine.setIndicatorArea(WS);
+    startContinuationLine.setContentAreaA("    ");
+    startContinuationLine.setContentAreaB("       \"RANDOM TEXT   ");
+
+    CobolLine middleContinuationLine = new CobolLine();
+    middleContinuationLine.setType(CONTINUATION);
+    middleContinuationLine.setIndicatorArea("-");
+    middleContinuationLine.setContentAreaA("    ");
+    middleContinuationLine.setContentAreaB("        \"RANDOM TEXT   ");
+
+    CobolLine lastContinuationLine = new CobolLine();
+    lastContinuationLine.setType(CONTINUATION);
+    lastContinuationLine.setIndicatorArea("-");
+    lastContinuationLine.setContentAreaA("    ");
+    lastContinuationLine.setContentAreaB("        \"CONTINUED LINE ENDS HERE\"     ");
+
+    startContinuationLine.setSuccessor(middleContinuationLine);
+    middleContinuationLine.setSuccessor(lastContinuationLine);
+
+    List<CobolLine> listOfLines =
+        Arrays.asList(startContinuationLine, middleContinuationLine, lastContinuationLine);
+    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    List<CobolLine> outcomeList = processor.processLines(listOfLines);
+
+    assertEquals(
+        WS + "           \"RANDOM TEXT   ",
+        outcomeList.get(0).getIndicatorArea() + outcomeList.get(0).getContentArea());
+    assertEquals(
+        WS + "RANDOM TEXT   ",
+        outcomeList.get(1).getIndicatorArea() + outcomeList.get(1).getContentArea());
+    assertEquals(
+        WS + "\"CONTINUED LINE ENDS HERE\"",
+        outcomeList.get(2).getIndicatorArea() + outcomeList.get(2).getContentArea());
+  }
+
+  @Test
+  public void emptyContinuationLine() {
+    CobolLine continuationLine = new CobolLine();
+    continuationLine.setType(NORMAL);
+    continuationLine.setIndicatorArea(WS);
+    continuationLine.setContentAreaA("    ");
+    continuationLine.setContentAreaB("       \"RANDOM TEXT   ");
+
+    CobolLine emptyContinuationLine = new CobolLine();
+    emptyContinuationLine.setType(CONTINUATION);
+    emptyContinuationLine.setIndicatorArea("-");
+    emptyContinuationLine.setContentAreaA("    ");
+    emptyContinuationLine.setContentAreaB("           ");
+
+    continuationLine.setSuccessor(emptyContinuationLine);
+
+    final List<CobolLine> listOfLines = Arrays.asList(continuationLine, emptyContinuationLine);
+    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    List<CobolLine> outcomeList = processor.processLines(listOfLines);
+
+    assertEquals(
+        WS + "           \"RANDOM TEXT   ",
+        outcomeList.get(0).getIndicatorArea() + outcomeList.get(0).getContentArea());
+    assertEquals(
+        WS + EMPTY_STRING,
+        outcomeList.get(1).getIndicatorArea() + outcomeList.get(1).getContentArea());
+  }
+
+  @Test
+  public void trailingCommaContinuationLineTest() {
+    CobolLine startContinuationLine = new CobolLine();
+    startContinuationLine.setType(NORMAL);
+    startContinuationLine.setIndicatorArea(WS);
+    startContinuationLine.setContentAreaA("       \"RANDOM TEXT   ");
+    startContinuationLine.setContentAreaB("        ");
+
+    CobolLine trailingCommaContinuationLine = new CobolLine();
+    trailingCommaContinuationLine.setType(CONTINUATION);
+    trailingCommaContinuationLine.setIndicatorArea("-");
+    trailingCommaContinuationLine.setContentAreaA("    ");
+    trailingCommaContinuationLine.setContentAreaB("         ,");
+
+    startContinuationLine.setSuccessor(trailingCommaContinuationLine);
+    trailingCommaContinuationLine.setPredecessor(startContinuationLine);
+
+    List<CobolLine> listOfLines =
+        Arrays.asList(startContinuationLine, trailingCommaContinuationLine);
+    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    List<CobolLine> outcomeList = processor.processLines(listOfLines);
+
+    assertEquals(
+        WS + "       \"RANDOM TEXT           ",
+        outcomeList.get(0).getIndicatorArea() + outcomeList.get(0).getContentArea());
+    assertEquals(
+        WS + "             ," + WS,
+        outcomeList.get(1).getIndicatorArea() + outcomeList.get(1).getContentArea());
+  }
+
+  @Test
+  public void continuationLineWithoutBeginningQuotes() {
+    CobolLine startContinuationLine = new CobolLine();
+    startContinuationLine.setType(NORMAL);
+    startContinuationLine.setIndicatorArea(WS);
+    startContinuationLine.setContentAreaB("       \"RANDOM TEXT   ");
+
+    CobolLine quoteContinuationLine = new CobolLine();
+    quoteContinuationLine.setType(CONTINUATION);
+    quoteContinuationLine.setIndicatorArea("-");
+    quoteContinuationLine.setContentAreaA("    ");
+    quoteContinuationLine.setContentAreaB("          \"RANDOM TEXT SINGLE CONTINUATION LINE\"");
+
+    CobolLine lastContinuationLine = new CobolLine();
+    lastContinuationLine.setType(CONTINUATION);
+    lastContinuationLine.setIndicatorArea("-");
+    lastContinuationLine.setContentAreaA("    ");
+    lastContinuationLine.setContentAreaB("          RANDOM TEXT SINGLE CONTINUATION LINE\"");
+
+    startContinuationLine.setSuccessor(quoteContinuationLine);
+    quoteContinuationLine.setSuccessor(lastContinuationLine);
+
+    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+
+    CobolLine outcome = processor.processLine(lastContinuationLine);
+
+    assertEquals(
+        WS + "RANDOM TEXT SINGLE CONTINUATION LINE\"",
+        outcome.getIndicatorArea() + outcome.getContentArea());
+  }
+
+  @Test
+  public void continuationLineWithOuterQuotes() {
+    CobolLine startContinuationLine = new CobolLine();
+    startContinuationLine.setType(NORMAL);
+    startContinuationLine.setIndicatorArea(WS);
+    startContinuationLine.setContentAreaB("       \"RANDOM TEXT   ");
+
+    CobolLine quoteContinuationLine = new CobolLine();
+    quoteContinuationLine.setType(CONTINUATION);
+    quoteContinuationLine.setIndicatorArea("-");
+    quoteContinuationLine.setContentAreaA("    ");
+    quoteContinuationLine.setContentAreaB("          \"RANDOM TEXT SINGLE CONTINUATION LINE\"");
+
+    CobolLine lastContinuationLine = new CobolLine();
+    lastContinuationLine.setType(CONTINUATION);
+    lastContinuationLine.setIndicatorArea("-");
+    lastContinuationLine.setContentAreaA("    ");
+    lastContinuationLine.setContentAreaB("          \"RANDOM TEXT SINGLE CONTINUATION LINE\"");
+
+    startContinuationLine.setSuccessor(quoteContinuationLine);
+    quoteContinuationLine.setSuccessor(lastContinuationLine);
+
+    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+
+    CobolLine outcome = processor.processLine(lastContinuationLine);
+
+    assertEquals(
+        WS + "RANDOM TEXT SINGLE CONTINUATION LINE\"",
+        outcome.getIndicatorArea() + outcome.getContentArea());
   }
 }
