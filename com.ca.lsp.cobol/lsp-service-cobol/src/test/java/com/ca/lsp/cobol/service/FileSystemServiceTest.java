@@ -27,7 +27,9 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -162,13 +164,23 @@ public class FileSystemServiceTest extends FileSystemTestImpl
   }
 
   private Path getDepFilePathReference() {
-    Path depFileReference = null;
-    try {
-      depFileReference = fileSystemService.generateDependencyFile(DEP_FILE_COST_NAME);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    Path depFileReference;
+    depFileReference =
+        fileSystemService.generateDependencyFile(DEP_FILE_COST_NAME, getDependencyFolder());
     return depFileReference;
+  }
+
+  private Path getDependencyFolder() {
+    try {
+      return Paths.get(new URI(getWorkspaceFolderPath() + ".cobdeps"));
+    } catch (URISyntaxException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  private String filesystemSeparator() {
+    return FileSystems.getDefault().getSeparator();
   }
 
   @Override

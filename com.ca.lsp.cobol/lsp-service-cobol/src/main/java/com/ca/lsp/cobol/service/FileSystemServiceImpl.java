@@ -45,13 +45,9 @@ import java.util.stream.Stream;
 public class FileSystemServiceImpl implements FileSystemService {
   private static final String COBDEPS = ".cobdeps";
   private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
-  private static final String SOMEPROG_DEP_WITHOUT_EXT = "SOMEPROG";
   public static final String DEP_EXTENSION = ".dep";
   private final DefaultDataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
-
-  private Path dependencyFilePath = null;
-  private Path dependencyFolderPath = null;
 
   @Inject
   public FileSystemServiceImpl(DefaultDataBusBroker dataBus) {
@@ -67,8 +63,6 @@ public class FileSystemServiceImpl implements FileSystemService {
   @Override
   public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
     this.workspaceFolders = workspaceFolders;
-
-    dependencyFolderPath = initializeDependencyFolder();
   }
 
   /**
@@ -170,6 +164,7 @@ public class FileSystemServiceImpl implements FileSystemService {
   }
 
   // TODO: UT with syntax coming from zowe..
+  // TODO: REFACTOR WITH STRING UTILS.
   private boolean isValidExtension(String filePath) {
     List<String> validExtensions = Arrays.asList("cpy", "cbl", "cobol", "cob");
     return validExtensions.stream()
@@ -199,13 +194,10 @@ public class FileSystemServiceImpl implements FileSystemService {
     String content = Optional.ofNullable(path).map(this::retrieveContentByPath).orElse(null);
 
     try {
-
       addCopybookInDepFile(
           requiredCopybookName,
           FilenameUtils.getBaseName(
               Paths.get(new URI(event.getDocumentUri())).getFileName().toString()));
-    } catch (IOException e) {
-      log.error("IO Exception add in dep file" + Arrays.toString(e.getStackTrace()));
     } catch (URISyntaxException e) {
       e.printStackTrace();
     }
@@ -219,30 +211,37 @@ public class FileSystemServiceImpl implements FileSystemService {
   }
 
   @Beta
-  void addCopybookInDepFile(String requiredCopybookName, String cobolFileName) throws IOException {
-    // TODO: Remove hardcoded name for depfile
-    if (!depFileExists(cobolFileName)) {
-      dependencyFilePath = generateDependencyFile(cobolFileName);
+  void addCopybookInDepFile(String requiredCopybookName, String cobolFileName) {
+    Path dependencyFolder = initializeDependencyFolder();
+    Path dependencyFile = retrieveDependencyFile(dependencyFolder, cobolFileName);
+
+    if (!depFileExists(dependencyFile)) {
+      dependencyFile = generateDependencyFile(cobolFileName, dependencyFolder);
     }
-    updateDependencyList(dependencyFilePath, requiredCopybookName);
+    // check why dependency file path is sometimes null
+    updateDependencyList(dependencyFile, requiredCopybookName);
+  }
+
+  private Path retrieveDependencyFile(Path dependencyFolderPath, String cobolFileName) {
+    return Paths.get(dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION);
   }
 
   protected void updateDependencyList(Path dependencyFilePath, String requiredCopybookName) {
+    System.out.println("UPDATE DEPENDENCY");
     if (dependencyFilePath != null) {
-
       List<String> lines = getContentFromDependencyFile(dependencyFilePath);
-
+      System.out.println(lines.toString());
+      System.out.println("UPDATE WITH cbl name" + requiredCopybookName);
       if (lines != null && !lines.contains(requiredCopybookName)) {
-        lines.add(requiredCopybookName);
-
-        writeLines(dependencyFilePath, lines);
+        writeOnFile(dependencyFilePath, requiredCopybookName);
       }
     }
   }
 
-  private void writeLines(Path dependencyFilePath, List<String> lines) {
+  private void writeOnFile(Path dependencyFilePath, String contents) {
     try {
-      Files.write(dependencyFilePath, lines);
+      Files.write(dependencyFilePath, (contents + "\n").getBytes(), StandardOpenOption.APPEND);
+
     } catch (IOException e) {
       log.error("IO Exception write file" + Arrays.toString(e.getStackTrace()));
     }
@@ -259,24 +258,24 @@ public class FileSystemServiceImpl implements FileSystemService {
     return result;
   }
 
-  Path generateDependencyFile(String cobolFileName) throws IOException {
-    if (!depFileExists(cobolFileName)) {
+  Path generateDependencyFile(String cobolFileName, Path dependencyFolder) {
+    // verify that the dependency folder exists.
+    System.out.println("GENERATE DEPENDENCY");
+    try {
+      if (dependencyFolder != null) {
+        dependencyFolder = initializeDependencyFolder();
+      }
+
       return Files.createFile(
-          Paths.get(dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION));
-    } else {
-      return Paths.get(
-          dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION);
+          Paths.get(dependencyFolder + filesystemSeparator() + cobolFileName + DEP_EXTENSION));
+    } catch (IOException e) {
+      log.error("[CREATE DEPFILE EXCEPTION]" + e.getLocalizedMessage());
+      return null;
     }
   }
 
-  private boolean depFileExists(String cobolFileName) {
-    System.out.println(
-        "File already exists: "
-            + Files.exists(
-                Paths.get(
-                    dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION)));
-    return Files.exists(
-        Paths.get(dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION));
+  private boolean depFileExists(Path dependencyFile) {
+    return dependencyFile.toFile().exists();
   }
 
   private String filesystemSeparator() {
@@ -290,15 +289,23 @@ public class FileSystemServiceImpl implements FileSystemService {
    *     happens.
    */
   private Path initializeDependencyFolder() {
+    Path folderPath;
     try {
-      return Files.createDirectory(
+      // if file already exists return its path
+      folderPath =
           Paths.get(
               Paths.get(new URI(getWorkspaceFolders().get(0).getUri()))
                   + filesystemSeparator()
                   + COBDEPS
-                  + filesystemSeparator()));
+                  + filesystemSeparator());
+      if (Files.exists(folderPath)) {
+        return folderPath;
+      } else {
+        return Files.createDirectory(folderPath);
+      }
+
     } catch (URISyntaxException | IOException e) {
-      log.error(e.getLocalizedMessage());
+      // exceptional case
       return null;
     }
   }
