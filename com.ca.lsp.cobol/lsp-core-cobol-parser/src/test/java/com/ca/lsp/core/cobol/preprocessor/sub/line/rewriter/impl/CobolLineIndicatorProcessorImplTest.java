@@ -33,10 +33,7 @@ public class CobolLineIndicatorProcessorImplTest {
 
   private static final String EMPTY_STRING = "";
 
-  /**
-   * Testing preprocessing formatting for COBOL files, making sure that only needed information is
-   * being passed to the parser to avoid issues and making token recognition easier
-   */
+  /** Testing Debug lines preformatting for Token analysis */
   @Test
   public void debugLineTest() {
     CobolLine debugLine = new CobolLine();
@@ -52,6 +49,7 @@ public class CobolLineIndicatorProcessorImplTest {
         WS + "         DEBUG LINE HERE", outcome.getIndicatorArea() + outcome.getContentArea());
   }
 
+  /** Testing normal lines preformatting for Token analysis */
   @Test
   public void normalLineTest() {
     CobolLine normalLine = new CobolLine();
@@ -68,6 +66,7 @@ public class CobolLineIndicatorProcessorImplTest {
         WS + "             RANDOM TEXT , ", outcome.getIndicatorArea() + outcome.getContentArea());
   }
 
+  /** Testing Compiler Directive lines preformatting for Token analysis */
   @Test
   public void compilerDirectiveTest() {
     CobolLine compilerDirectiveLine = new CobolLine();
@@ -82,6 +81,7 @@ public class CobolLineIndicatorProcessorImplTest {
     assertEquals(WS + EMPTY_STRING, outcome.getIndicatorArea() + outcome.getContentArea());
   }
 
+  /** Testing comment lines preformatting for Token analysis */
   @Test
   public void commentLineTest() {
     CobolLine commentLine = new CobolLine();
@@ -99,6 +99,7 @@ public class CobolLineIndicatorProcessorImplTest {
         outcome.getIndicatorArea() + outcome.getContentArea());
   }
 
+  /** Testing normal continuation line preformatting for Token analysis */
   @Test
   public void continuationLineTest() {
     CobolLine startContinuationLine = new CobolLine();
@@ -138,6 +139,7 @@ public class CobolLineIndicatorProcessorImplTest {
         outcomeList.get(2).getIndicatorArea() + outcomeList.get(2).getContentArea());
   }
 
+  /** Testing empty continuation line preformatting for Token analysis */
   @Test
   public void emptyContinuationLine() {
     CobolLine continuationLine = new CobolLine();
@@ -166,13 +168,14 @@ public class CobolLineIndicatorProcessorImplTest {
         outcomeList.get(1).getIndicatorArea() + outcomeList.get(1).getContentArea());
   }
 
+  /** Testing continuation lines with trailing comma preformatting for Token analysis */
   @Test
   public void trailingCommaContinuationLineTest() {
     CobolLine startContinuationLine = new CobolLine();
     startContinuationLine.setType(NORMAL);
     startContinuationLine.setIndicatorArea(WS);
-    startContinuationLine.setContentAreaA("       \"RANDOM TEXT   ");
-    startContinuationLine.setContentAreaB("        ");
+    startContinuationLine.setContentAreaA("    ");
+    startContinuationLine.setContentAreaB("       \"RANDOM TEXT   ");
 
     CobolLine trailingCommaContinuationLine = new CobolLine();
     trailingCommaContinuationLine.setType(CONTINUATION);
@@ -189,13 +192,17 @@ public class CobolLineIndicatorProcessorImplTest {
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
     assertEquals(
-        WS + "       \"RANDOM TEXT           ",
+        WS + "           \"RANDOM TEXT   ",
         outcomeList.get(0).getIndicatorArea() + outcomeList.get(0).getContentArea());
     assertEquals(
         WS + "             ," + WS,
         outcomeList.get(1).getIndicatorArea() + outcomeList.get(1).getContentArea());
   }
 
+  /**
+   * Testing a continuation line with no quotes at the start of the line preformatting for Token
+   * analysis
+   */
   @Test
   public void continuationLineWithoutBeginningQuotes() {
     CobolLine startContinuationLine = new CobolLine();
@@ -227,6 +234,10 @@ public class CobolLineIndicatorProcessorImplTest {
         outcome.getIndicatorArea() + outcome.getContentArea());
   }
 
+  /**
+   * Testing a continuation line with quotes at the start and end of the line preformatting for
+   * Token analysis
+   */
   @Test
   public void continuationLineWithOuterQuotes() {
     CobolLine startContinuationLine = new CobolLine();
