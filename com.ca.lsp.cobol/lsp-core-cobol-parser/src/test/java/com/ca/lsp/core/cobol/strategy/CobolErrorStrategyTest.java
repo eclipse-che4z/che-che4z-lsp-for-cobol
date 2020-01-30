@@ -29,6 +29,10 @@ import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.junit.Test;
 
+/**
+ * Testing that the errors that are recognized at the end of file analysis are showing messages as
+ * intended
+ */
 public class CobolErrorStrategyTest {
   @Test
   public void noViableAltExceptionTest() {

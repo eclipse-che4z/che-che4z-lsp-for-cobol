@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 
+/** Testing that the cobol lines are formatted correctly before being used for token analysis */
 public class CobolLineIndicatorProcessorImplTest {
 
   private static final String EMPTY_STRING = "";
