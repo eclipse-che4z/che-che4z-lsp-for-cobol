@@ -15,7 +15,6 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
-import com.ca.lsp.core.cobol.params.CobolDialect;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
@@ -32,7 +31,6 @@ public class CobolLineUtilsTest {
     line.setCommentArea("000000");
     line.setContentAreaA("cont");
     line.setContentAreaB("contentB");
-    line.setDialect(CobolDialect.MF);
     line.setFormat(CobolSourceFormat.FIXED);
     line.setIndicatorArea("*");
     line.setNumber(1);
@@ -45,7 +43,6 @@ public class CobolLineUtilsTest {
     expected.setCommentArea("000000");
     expected.setContentAreaA("");
     expected.setContentAreaB("");
-    expected.setDialect(CobolDialect.MF);
     expected.setFormat(CobolSourceFormat.FIXED);
     expected.setIndicatorArea("*");
     expected.setNumber(1);
