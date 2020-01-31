@@ -19,6 +19,7 @@ import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import com.ca.lsp.cobol.FileSystemTestImpl;
+import net.jodah.concurrentunit.Waiter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,10 +40,13 @@ import static org.junit.Assert.assertTrue;
  * the dependency file.
  */
 public class FileSystemE2ETest extends FileSystemTestImpl {
+  public static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
+  public static final String CPY_NAME_WITHOUT_EXT = "copy2";
   DefaultDataBusBroker broker =
       (DefaultDataBusBroker) LangServerCtx.getInjector().getInstance(AbstractDataBusBroker.class);
 
   private FileSystemServiceImpl fileSystemService = new FileSystemServiceImpl(broker);
+  private Waiter waiter = new Waiter();
 
   @Before
   public void initActivities() {
@@ -70,15 +74,14 @@ public class FileSystemE2ETest extends FileSystemTestImpl {
    * service subscribed to it react generating the dependency file.
    */
   @Test
-  public void generateDependencyFileOnCallback() {
+  public void generateDependencyFileOnCallback() throws InterruptedException {
     // generate a required copybook event
-    broker.postData(RequiredCopybookEvent.builder().name("copy2").build());
-    // add waiter
-    try {
-      Thread.sleep(2000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
+    broker.postData(
+        RequiredCopybookEvent.builder()
+            .name(CPY_NAME_WITHOUT_EXT)
+            .documentUri(DOCUMENT_URI)
+            .build());
+    Thread.sleep(1000);
     assertTrue(depFileExists());
   }
 
@@ -90,12 +93,6 @@ public class FileSystemE2ETest extends FileSystemTestImpl {
   public void noDependencyFileWithOtherEvent() {
     // generate a required copybook event
     broker.postData(UnknownEvent.builder().build());
-    // add waiter
-    try {
-      Thread.sleep(2000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
     assertFalse(depFileExists());
   }
 
@@ -106,7 +103,7 @@ public class FileSystemE2ETest extends FileSystemTestImpl {
                 + filesystemSeparator()
                 + ".cobdeps"
                 + filesystemSeparator()
-                + "SOMEPROG.dep"));
+                + "Test.dep"));
   }
 
   private String filesystemSeparator() {

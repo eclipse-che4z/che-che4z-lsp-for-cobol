@@ -45,7 +45,6 @@ import org.junit.runners.Suite.SuiteClasses;
   DocumentOccurrencesTest.class,
   DefinitionsAndUsagesTest.class,
   TestResponsesNotContainLineBreaks.class,
-  FileSystemServiceTest.class,
   CompletionResolutionTest.class,
   FileSystemServiceTest.class,
   FileSystemE2ETest.class,

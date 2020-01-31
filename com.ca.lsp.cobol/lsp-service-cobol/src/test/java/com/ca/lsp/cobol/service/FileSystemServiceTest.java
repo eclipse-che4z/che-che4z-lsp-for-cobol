@@ -126,12 +126,9 @@ public class FileSystemServiceTest extends FileSystemTestImpl
     assertEquals(numberOfElements + 1, getNumberOfElementsFromDepFile(depFileReference));
   }
 
-  /**
-   * This test verify that an already defined dependency file is not updated when a copybook already
-   * defined in COPYBOOK folder is recognized during the analysis.
-   */
+  /** This test verify that an empty value for the copybook is not added in the deplist. */
   @Test
-  public void depFileUpdateNegativeTest() throws IOException, URISyntaxException {
+  public void depFileWithoutEmptyCopybookName() throws IOException, URISyntaxException {
     // create the dep folder with the SOMPROG.dep
     Path depFileReference = getDepFilePathReference();
 
@@ -139,7 +136,7 @@ public class FileSystemServiceTest extends FileSystemTestImpl
     int numberOfElements = getNumberOfElementsFromDepFile(depFileReference);
 
     // update dep file with a new copybook
-    fileSystemService.addCopybookInDepFile(CPY_OUTER_NAME_ONLY2, DEP_FILE_COST_NAME);
+    fileSystemService.addCopybookInDepFile(EMPTY_COPYBOOK_NAME, DEP_FILE_COST_NAME);
 
     // assert that number of element didn't change
     assertEquals(numberOfElements, getNumberOfElementsFromDepFile(depFileReference));

@@ -38,6 +38,7 @@ public class FileSystemTestImpl extends ConfigurableTest {
   protected static final String CPYB_FOLDER_NAME = "COPYBOOKS";
   protected static final String CPYB_INNER_NAME = "INNER";
   protected static final String CPY_OUTER_NAME_ONLY2 = "copy2";
+  protected static final String EMPTY_COPYBOOK_NAME = " ";
 
   protected static final String CPY_OUTER_FILE_NAME_WITH_EXT = "copy.cpy";
   protected static final String CPY_OUTER_ANOTHER_FILE_NAME_WITH_EXT = "copy3.out";

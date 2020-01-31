@@ -227,12 +227,14 @@ public class FileSystemServiceImpl implements FileSystemService {
   }
 
   protected void updateDependencyList(Path dependencyFilePath, String requiredCopybookName) {
-    System.out.println("UPDATE DEPENDENCY");
+
     if (dependencyFilePath != null) {
       List<String> lines = getContentFromDependencyFile(dependencyFilePath);
-      System.out.println(lines.toString());
-      System.out.println("UPDATE WITH cbl name" + requiredCopybookName);
-      if (lines != null && !lines.contains(requiredCopybookName)) {
+      log.info(lines.toString());
+      log.info("UPDATE WITH cbl name" + requiredCopybookName);
+      if (lines != null
+          && !lines.contains(requiredCopybookName)
+          && !" ".equals(requiredCopybookName)) {
         writeOnFile(dependencyFilePath, requiredCopybookName);
       }
     }
