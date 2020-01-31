@@ -13,101 +13,73 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl;
 
-import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
-import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.TANDEM;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_ENTRY_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
-import static com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum.COMMENT;
-import static com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum.NORMAL;
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.List;
-
+import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineRewriter;
 import org.junit.Test;
 
-import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import java.util.List;
+
+import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_ENTRY_TAG;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
+import static com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils.copyCobolLineWithIndicatorAndContentArea;
+import static com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils.createBlankSequenceArea;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertEquals;
 /**
- * JUnit test for Class CobolCommentEntriesMarker
+ * Unit test for class CobolCommentEntriesMarker. Checks that the lines with comment entries are
+ * escaped and vice versa.
  */
 public class CobolCommentEntriesMarkerImplTest {
 
-  private CobolLine commentLine = new CobolLine();
-  private CobolLine normalLine = new CobolLine();
-  private CobolLine authorLine = new CobolLine();
-  private CobolLine nullLine = new CobolLine();
-  private CobolLine randomContent = new CobolLine();
-  private CobolLine tandemLine = new CobolLine();
-  private List<CobolLine> listOfLines =
-      Arrays.asList(
-          authorLine, commentLine, randomContent, commentLine, normalLine, nullLine, tandemLine);
-  private String emptySequenceArea = "      ";
-  private String commentIndicatorArea = "*";
-  private String authorContentArea = "AUTHOR.RANDOMTEXT";
+  @Test
+  public void testLineWithTriggerEscaped() {
+    CobolLine line = new CobolLine();
+    line.setSequenceArea(createBlankSequenceArea(FIXED));
+    line.setIndicatorArea(WS);
+    line.setContentAreaB("AUTHOR. SE.");
 
-  public CobolCommentEntriesMarkerImplTest() {
-    commentLine.setSequenceArea(emptySequenceArea);
-    commentLine.setIndicatorArea(commentIndicatorArea);
-    commentLine.setContentAreaA("");
-    commentLine.setContentAreaB(null);
-    commentLine.setCommentArea(null);
-    commentLine.setFormat(FIXED);
-    commentLine.setType(COMMENT);
+    CobolLine expected =
+        copyCobolLineWithIndicatorAndContentArea(WS, "AUTHOR. " + COMMENT_ENTRY_TAG + " SE.", line);
 
-    normalLine.setSequenceArea(emptySequenceArea);
-    normalLine.setIndicatorArea(" ");
-    normalLine.setFormat(FIXED);
-    normalLine.setType(NORMAL);
-
-    authorLine.setContentAreaA(authorContentArea);
-    authorLine.setFormat(FIXED);
-    authorLine.setType(NORMAL);
-
-    nullLine.setFormat(FIXED);
-    nullLine.setType(NORMAL);
-
-    randomContent.setType(NORMAL);
-    randomContent.setFormat(FIXED);
-    randomContent.setContentAreaA("ASDASDA");
-
-    tandemLine.setFormat(TANDEM);
+    CobolLineRewriter marker = new CobolCommentEntriesMarkerImpl();
+    assertEquals(expected, marker.processLines(singletonList(line)).get(0));
   }
 
   @Test
-  public void checkStartsWithTriggerPositive() {
-    CobolCommentEntriesMarkerImpl entriesMarker = new CobolCommentEntriesMarkerImpl();
-    assertEquals(
-        "AUTHOR. " + COMMENT_ENTRY_TAG + "RANDOMTEXT",
-        entriesMarker.processSingleLineCommentEntry(authorLine).getContentArea());
+  public void testLineWithoutTriggersNotChanged() {
+    CobolLine line = new CobolLine();
+    line.setSequenceArea(createBlankSequenceArea(FIXED));
+    line.setIndicatorArea(WS);
+    line.setContentAreaA("MOVE");
+    line.setContentAreaB(" A TO B.");
+
+    CobolLineRewriter marker = new CobolCommentEntriesMarkerImpl();
+    assertEquals(line, marker.processLines(singletonList(line)).get(0));
   }
 
   @Test
-  public void checkStartsWithTriggerNegative() {
-    CobolCommentEntriesMarkerImpl entriesMarker = new CobolCommentEntriesMarkerImpl();
-    assertEquals(
-        normalLine.getContentArea(),
-        entriesMarker.processSingleLineCommentEntry(normalLine).getContentArea());
-  }
+  public void testLineWithTriggerInPreviousLineNotEscaped() {
+    CobolLine line1 = new CobolLine();
+    line1.setSequenceArea(createBlankSequenceArea(FIXED));
+    line1.setIndicatorArea(WS);
+    line1.setContentAreaB("AUTHOR. SE.");
 
-  @Test
-  public void checkMismatchingEscapeCommentEntry() {
-    CobolCommentEntriesMarkerImpl entriesMarker = new CobolCommentEntriesMarkerImpl();
-    assertEquals(nullLine, entriesMarker.escapeCommentEntry(nullLine));
-  }
+    CobolLine line2 = new CobolLine();
+    line2.setSequenceArea(createBlankSequenceArea(FIXED));
+    line2.setIndicatorArea(WS);
+    line2.setContentAreaA("MOVE");
+    line2.setContentAreaB(" A TO B.");
+    line2.setPredecessor(line1);
 
-  @Test
-  public void processMultiLineCommentEntryTest() {
-    CobolCommentEntriesMarkerImpl entriesMarker = new CobolCommentEntriesMarkerImpl();
-    List<CobolLine> outputMarker = entriesMarker.processLines(listOfLines);
-    assertEquals(
-        "AUTHOR. " + COMMENT_ENTRY_TAG + "RANDOMTEXT", outputMarker.get(0).getContentArea());
-    assertEquals(COMMENT_ENTRY_TAG + WS, outputMarker.get(1).getIndicatorArea());
-    assertEquals(
-        WS + randomContent.getContentArea(),
-        outputMarker.get(2).getIndicatorArea() + outputMarker.get(2).getContentArea());
-    assertEquals(commentIndicatorArea, outputMarker.get(3).getIndicatorArea());
-    assertEquals(normalLine.getContentArea(), outputMarker.get(4).getContentArea());
-    assertEquals(nullLine, outputMarker.get(5));
-    assertEquals(tandemLine, outputMarker.get(6));
+    CobolLine expected =
+        copyCobolLineWithIndicatorAndContentArea(
+            WS, "AUTHOR. " + COMMENT_ENTRY_TAG + " SE.", line1);
+
+    CobolLineRewriter marker = new CobolCommentEntriesMarkerImpl();
+    List<CobolLine> processedLines = marker.processLines(asList(line1, line2));
+    assertEquals(expected, processedLines.get(0));
+    assertEquals(line2, processedLines.get(1));
   }
 }
