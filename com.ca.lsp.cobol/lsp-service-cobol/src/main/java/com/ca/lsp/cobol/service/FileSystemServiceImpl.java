@@ -158,7 +158,7 @@ public class FileSystemServiceImpl implements FileSystemService {
             FileVisitOption.FOLLOW_LINKS)) {
       return pathStream.findAny().orElse(null);
     } catch (IOException e) {
-      log.error("[search in copybook folder]" + Arrays.toString(e.getStackTrace()));
+      log.error("[copybook not found in copybook folder]" + e.getLocalizedMessage());
       return null;
     }
   }
@@ -193,14 +193,7 @@ public class FileSystemServiceImpl implements FileSystemService {
     Path path = getPathByCopybookName(requiredCopybookName);
     String content = Optional.ofNullable(path).map(this::retrieveContentByPath).orElse(null);
 
-    try {
-      addCopybookInDepFile(
-          requiredCopybookName,
-          FilenameUtils.getBaseName(
-              Paths.get(new URI(event.getDocumentUri())).getFileName().toString()));
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
-    }
+    addCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
 
     dataBus.postData(
         FetchedCopybookEvent.builder()
@@ -211,15 +204,26 @@ public class FileSystemServiceImpl implements FileSystemService {
   }
 
   @Beta
-  void addCopybookInDepFile(String requiredCopybookName, String cobolFileName) {
+  void addCopybookInDepFile(String requiredCopybookName, String documentUri) {
+    String cobolFileName = getCobolFileNameFromUri(documentUri);
     Path dependencyFolder = initializeDependencyFolder();
     Path dependencyFile = retrieveDependencyFile(dependencyFolder, cobolFileName);
 
     if (!depFileExists(dependencyFile)) {
-      dependencyFile = generateDependencyFile(cobolFileName, dependencyFolder);
+      generateDependencyFile(cobolFileName, dependencyFolder);
     }
     // check why dependency file path is sometimes null
     updateDependencyList(dependencyFile, requiredCopybookName);
+  }
+
+  private String getCobolFileNameFromUri(String documentUri) {
+    String result = null;
+    try {
+      result = FilenameUtils.getBaseName(Paths.get(new URI(documentUri)).getFileName().toString());
+    } catch (URISyntaxException e) {
+      log.error("URI not found for the given document " + documentUri);
+    }
+    return result;
   }
 
   private Path retrieveDependencyFile(Path dependencyFolderPath, String cobolFileName) {
@@ -227,11 +231,8 @@ public class FileSystemServiceImpl implements FileSystemService {
   }
 
   protected void updateDependencyList(Path dependencyFilePath, String requiredCopybookName) {
-
     if (dependencyFilePath != null) {
       List<String> lines = getContentFromDependencyFile(dependencyFilePath);
-      log.info(lines.toString());
-      log.info("UPDATE WITH cbl name" + requiredCopybookName);
       if (lines != null
           && !lines.contains(requiredCopybookName)
           && !" ".equals(requiredCopybookName)) {
@@ -243,9 +244,8 @@ public class FileSystemServiceImpl implements FileSystemService {
   private void writeOnFile(Path dependencyFilePath, String contents) {
     try {
       Files.write(dependencyFilePath, (contents + "\n").getBytes(), StandardOpenOption.APPEND);
-
     } catch (IOException e) {
-      log.error("IO Exception write file" + Arrays.toString(e.getStackTrace()));
+      log.error("IO Exception on write" + e.getLocalizedMessage());
     }
   }
 
@@ -260,19 +260,22 @@ public class FileSystemServiceImpl implements FileSystemService {
     return result;
   }
 
-  Path generateDependencyFile(String cobolFileName, Path dependencyFolder) {
-    // verify that the dependency folder exists.
-    System.out.println("GENERATE DEPENDENCY");
+  void generateDependencyFile(String cobolFileName, Path dependencyFolder) {
     try {
       if (dependencyFolder != null) {
         dependencyFolder = initializeDependencyFolder();
       }
 
-      return Files.createFile(
-          Paths.get(dependencyFolder + filesystemSeparator() + cobolFileName + DEP_EXTENSION));
+      // check that the dependency file doesn't exists..
+      Path dependencyFile =
+          Paths.get(dependencyFolder + filesystemSeparator() + cobolFileName + DEP_EXTENSION);
+
+      if (!depFileExists(dependencyFile)) {
+        Files.createFile(
+            Paths.get(dependencyFolder + filesystemSeparator() + cobolFileName + DEP_EXTENSION));
+      }
     } catch (IOException e) {
-      log.error("[CREATE DEPFILE EXCEPTION]" + e.getLocalizedMessage());
-      return null;
+      log.error(e.getCause().getLocalizedMessage());
     }
   }
 
@@ -291,24 +294,27 @@ public class FileSystemServiceImpl implements FileSystemService {
    *     happens.
    */
   private Path initializeDependencyFolder() {
-    Path folderPath;
+    Path folderPath = null;
     try {
-      // if file already exists return its path
       folderPath =
           Paths.get(
               Paths.get(new URI(getWorkspaceFolders().get(0).getUri()))
                   + filesystemSeparator()
                   + COBDEPS
                   + filesystemSeparator());
-      if (Files.exists(folderPath)) {
-        return folderPath;
-      } else {
-        return Files.createDirectory(folderPath);
-      }
+    } catch (URISyntaxException e) {
+      e.printStackTrace();
+    }
 
-    } catch (URISyntaxException | IOException e) {
-      // exceptional case
-      return null;
+    if (folderPath != null) {
+      try {
+        return Files.createDirectory(folderPath);
+      } catch (IOException e) {
+        // folder already exists, return the path
+        return folderPath;
+      }
+    } else {
+      throw new NullPointerException("Error occurred");
     }
   }
 }

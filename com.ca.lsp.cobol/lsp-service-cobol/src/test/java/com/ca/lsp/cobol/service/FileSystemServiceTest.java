@@ -19,7 +19,7 @@ import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import com.ca.lsp.cobol.FileSystemTestImpl;
+import com.ca.lsp.cobol.FileSystemConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,9 +39,10 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.*;
 
 @Slf4j
-public class FileSystemServiceTest extends FileSystemTestImpl
+public class FileSystemServiceTest extends FileSystemConfiguration
     implements EventObserver<RequiredCopybookEvent> {
 
+  private static final String DEP_EXTENSION = ".dep";
   private FileSystemServiceImpl fileSystemService =
       (FileSystemServiceImpl) LangServerCtx.getInjector().getInstance(FileSystemService.class);
 
@@ -136,7 +136,7 @@ public class FileSystemServiceTest extends FileSystemTestImpl
     int numberOfElements = getNumberOfElementsFromDepFile(depFileReference);
 
     // update dep file with a new copybook
-    fileSystemService.addCopybookInDepFile(EMPTY_COPYBOOK_NAME, DEP_FILE_COST_NAME);
+    fileSystemService.addCopybookInDepFile(EMPTY_COPYBOOK_NAME, DOCUMENT_URI);
 
     // assert that number of element didn't change
     assertEquals(numberOfElements, getNumberOfElementsFromDepFile(depFileReference));
@@ -161,10 +161,9 @@ public class FileSystemServiceTest extends FileSystemTestImpl
   }
 
   private Path getDepFilePathReference() {
-    Path depFileReference;
-    depFileReference =
-        fileSystemService.generateDependencyFile(DEP_FILE_COST_NAME, getDependencyFolder());
-    return depFileReference;
+    fileSystemService.generateDependencyFile(DEP_FILE_COST_NAME, getDependencyFolder());
+    return Paths.get(
+        getDependencyFolder() + filesystemSeparator() + DEP_FILE_COST_NAME + DEP_EXTENSION);
   }
 
   private Path getDependencyFolder() {
@@ -174,10 +173,6 @@ public class FileSystemServiceTest extends FileSystemTestImpl
       e.printStackTrace();
       return null;
     }
-  }
-
-  private String filesystemSeparator() {
-    return FileSystems.getDefault().getSeparator();
   }
 
   @Override

@@ -18,7 +18,7 @@ import com.broadcom.lsp.domain.cobol.databus.impl.AbstractDataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
-import com.ca.lsp.cobol.FileSystemTestImpl;
+import com.ca.lsp.cobol.FileSystemConfiguration;
 import net.jodah.concurrentunit.Waiter;
 import org.junit.After;
 import org.junit.Before;
@@ -26,7 +26,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,8 +38,7 @@ import static org.junit.Assert.assertTrue;
  * This class contains all the unit test that perform the publish/subscribe acrivities for generate
  * the dependency file.
  */
-public class FileSystemE2ETest extends FileSystemTestImpl {
-  public static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
+public class FileSystemE2ETest extends FileSystemConfiguration {
   public static final String CPY_NAME_WITHOUT_EXT = "copy2";
   DefaultDataBusBroker broker =
       (DefaultDataBusBroker) LangServerCtx.getInjector().getInstance(AbstractDataBusBroker.class);
@@ -104,9 +102,5 @@ public class FileSystemE2ETest extends FileSystemTestImpl {
                 + ".cobdeps"
                 + filesystemSeparator()
                 + "Test.dep"));
-  }
-
-  private String filesystemSeparator() {
-    return FileSystems.getDefault().getSeparator();
   }
 }

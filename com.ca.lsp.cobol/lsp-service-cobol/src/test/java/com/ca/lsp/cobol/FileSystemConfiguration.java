@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-public class FileSystemTestImpl extends ConfigurableTest {
+public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String COPYBOOK_CONTENT =
       "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
   protected static final String WORKSPACE_FOLDER_NAME = "test";
@@ -39,7 +40,7 @@ public class FileSystemTestImpl extends ConfigurableTest {
   protected static final String CPYB_INNER_NAME = "INNER";
   protected static final String CPY_OUTER_NAME_ONLY2 = "copy2";
   protected static final String EMPTY_COPYBOOK_NAME = " ";
-
+  public static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
   protected static final String CPY_OUTER_FILE_NAME_WITH_EXT = "copy.cpy";
   protected static final String CPY_OUTER_ANOTHER_FILE_NAME_WITH_EXT = "copy3.out";
   protected static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
@@ -90,6 +91,10 @@ public class FileSystemTestImpl extends ConfigurableTest {
 
   private void setWorkspaceFolderPath(URI workspaceFolderPath) {
     this.workspaceFolderPath = workspaceFolderPath;
+  }
+
+  protected String filesystemSeparator() {
+    return FileSystems.getDefault().getSeparator();
   }
 
   /*
