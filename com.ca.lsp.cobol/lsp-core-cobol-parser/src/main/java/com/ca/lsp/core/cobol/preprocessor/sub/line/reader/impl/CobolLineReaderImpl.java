@@ -112,7 +112,6 @@ public class CobolLineReaderImpl implements CobolLineReader {
     }
 
     cobolLine.setFormat(format);
-    cobolLine.setDialect(null);
     cobolLine.setNumber(lineNumber);
 
     return new ResultWithErrors<>(cobolLine, result.getErrors());
