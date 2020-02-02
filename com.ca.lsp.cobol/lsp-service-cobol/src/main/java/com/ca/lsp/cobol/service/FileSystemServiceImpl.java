@@ -275,7 +275,7 @@ public class FileSystemServiceImpl implements FileSystemService {
             Paths.get(dependencyFolder + filesystemSeparator() + cobolFileName + DEP_EXTENSION));
       }
     } catch (IOException e) {
-      log.error(e.getCause().getLocalizedMessage());
+      log.error(e.getMessage());
     }
   }
 

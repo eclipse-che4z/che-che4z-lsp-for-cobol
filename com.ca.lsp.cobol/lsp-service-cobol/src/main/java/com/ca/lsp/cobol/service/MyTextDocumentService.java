@@ -142,13 +142,11 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-    String text = params.getTextDocument().getText();
-    // TODO: Add unit test for file name
-    //    String fileNameOpened = Paths.get(new URI(uri)).getFileName().toString();
-    //    System.out.println(fileNameOpened);    String fileNameOpened = Paths.get(new
-    // URI(uri)).getFileName().toString();
-    //    System.out.println(fileNameOpened);
+    if (uri.startsWith("gitfs:/")) {
+      communications.notifyThatExtensionIsUnsupported("git filesysem");
+    }
 
+    String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     registerEngineAndAnalyze(uri, langId, text);
