@@ -14,7 +14,7 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Singleton
 public class MyTextDocumentService implements TextDocumentService, EventObserver<RunAnalysisEvent> {
-  private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob", "COBOL");
+  private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
 
@@ -63,13 +63,13 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private Occurrences occurrences;
 
   @Inject
-  public MyTextDocumentService(
+  MyTextDocumentService(
       Communications communications,
       LanguageEngineFacade engine,
       Formations formations,
       Completions completions,
       Occurrences occurrences,
-      DefaultDataBusBroker dataBus) {
+      DataBusBroker dataBus) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -192,7 +192,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   }
 
   private boolean isCobolFile(String identifier) {
-    return COBOL_IDS.contains(identifier);
+    return COBOL_IDS.contains(identifier.toLowerCase());
   }
 
   private String extractExtension(String uri) {

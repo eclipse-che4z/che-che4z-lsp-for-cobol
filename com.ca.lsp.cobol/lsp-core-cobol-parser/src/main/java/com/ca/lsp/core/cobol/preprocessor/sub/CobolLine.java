@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub;
 
-import com.ca.lsp.core.cobol.params.CobolDialect;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils;
 import lombok.Data;
@@ -29,7 +28,6 @@ public class CobolLine {
   private String commentArea = "";
   private String contentAreaA = "";
   private String contentAreaB = "";
-  private CobolDialect dialect;
   private CobolSourceFormat format;
   private String indicatorArea = " ";
   private int number;

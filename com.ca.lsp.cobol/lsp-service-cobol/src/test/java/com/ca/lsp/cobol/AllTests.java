@@ -51,6 +51,7 @@ import org.junit.runners.Suite.SuiteClasses;
   HighlightsTest.class,
   MultiDocumentDefinitionTest.class,
   LangServerBootstrapTest.class,
-  MyLanguageServerImplTest.class
+  MyLanguageServerImplTest.class,
+  DocumentExtensionTests.class
 })
 public class AllTests {}

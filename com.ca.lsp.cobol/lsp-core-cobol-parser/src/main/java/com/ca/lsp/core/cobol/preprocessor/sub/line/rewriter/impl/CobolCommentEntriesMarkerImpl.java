@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl;
 
-import com.ca.lsp.core.cobol.params.CobolDialect;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolCommentEntriesMarker;
@@ -34,19 +33,6 @@ public class CobolCommentEntriesMarkerImpl implements CobolCommentEntriesMarker 
   protected boolean foundCommentEntryTriggerInPreviousLine = false;
 
   protected boolean isInCommentEntry = false;
-
-  protected static final String[] TRIGGERSEND =
-      new String[] {
-        "PROGRAM-ID.",
-        "AUTHOR.",
-        "INSTALLATION.",
-        "DATE-WRITTEN.",
-        "DATE-COMPILED.",
-        "SECURITY.",
-        "ENVIRONMENT",
-        "DATA.",
-        "PROCEDURE."
-      };
 
   protected static final String[] TRIGGERSSTART =
       new String[] {
@@ -84,20 +70,8 @@ public class CobolCommentEntriesMarkerImpl implements CobolCommentEntriesMarker 
     return result;
   }
 
-  protected boolean checkIsInCommentEntry(
-      final CobolLine line, final boolean isContentAreaAEmpty, final boolean isInOsvsCommentEntry) {
-    return CobolLineTypeEnum.COMMENT.equals(line.getType())
-        || isContentAreaAEmpty
-        || isInOsvsCommentEntry;
-  }
-
-  /**
-   * OSVS: The comment-entry can be contained in either area A or area B of the comment-entry lines.
-   * However, the next occurrence in area A of any one of the following COBOL words or phrases
-   * terminates the comment-entry and begin the next paragraph or division.
-   */
-  protected boolean isInOsvsCommentEntry(final CobolLine line) {
-    return CobolDialect.OSVS.equals(line.getDialect()) && !startsWithTrigger(line, TRIGGERSEND);
+  protected boolean checkIsInCommentEntry(final CobolLine line, final boolean isContentAreaAEmpty) {
+    return CobolLineTypeEnum.COMMENT.equals(line.getType()) || isContentAreaAEmpty;
   }
 
   @Override
@@ -138,9 +112,8 @@ public class CobolCommentEntriesMarkerImpl implements CobolCommentEntriesMarker 
       result = escapeCommentEntry(line);
     } else if (foundCommentEntryTriggerInPreviousLine || isInCommentEntry) {
       final boolean isContentAreaAEmpty = line.getContentAreaA().trim().isEmpty();
-      final boolean isInOsvsCommentEntry = isInOsvsCommentEntry(line);
 
-      isInCommentEntry = checkIsInCommentEntry(line, isContentAreaAEmpty, isInOsvsCommentEntry);
+      isInCommentEntry = checkIsInCommentEntry(line, isContentAreaAEmpty);
 
       if (isInCommentEntry) {
         result = buildMultiLineCommentEntryLine(line);
