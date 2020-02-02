@@ -163,8 +163,6 @@ public class FileSystemServiceImpl implements FileSystemService {
     }
   }
 
-  // TODO: UT with syntax coming from zowe..
-  // TODO: REFACTOR WITH STRING UTILS.
   private boolean isValidExtension(String filePath) {
     List<String> validExtensions = Arrays.asList("cpy", "cbl", "cobol", "cob");
     return validExtensions.stream()
@@ -314,7 +312,7 @@ public class FileSystemServiceImpl implements FileSystemService {
         return folderPath;
       }
     } else {
-      throw new NullPointerException("Error occurred");
+      return null;
     }
   }
 }

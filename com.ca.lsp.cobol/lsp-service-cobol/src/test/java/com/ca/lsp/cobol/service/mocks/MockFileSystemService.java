@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2020 Broadcom.
+ *
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ * Broadcom, Inc. - initial API and implementation
+ *
+ */
 package com.ca.lsp.cobol.service.mocks;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
@@ -75,12 +90,7 @@ public class MockFileSystemService implements FileSystemService {
         }
 
         if (depFolderPath.toFile().exists()) {
-          // Files.deleteIfExists((Paths.get(depFolderPath + filesystemSeparator() +
-          // SOMEPROG_DEP)));
-
           depFilePath = Paths.get(depFolderPath + filesystemSeparator() + SOMEPROG_DEP);
-
-          // TODO: Replace if exists.
           Files.createFile(Paths.get(depFolderPath + filesystemSeparator() + SOMEPROG_DEP));
           generateDummyContentForFile();
         }
@@ -99,13 +109,17 @@ public class MockFileSystemService implements FileSystemService {
   }
 
   @Override
-  public void observerCallback(RequiredCopybookEvent event) throws URISyntaxException {
+  public void observerCallback(RequiredCopybookEvent event) {
     String name = event.getName();
     Path path = getPathByCopybookName(name);
 
     // if content is null I will update or  generate a dependency file
     if (path == null) {
-      generateDependencyFile();
+      try {
+        generateDependencyFile();
+      } catch (URISyntaxException e) {
+        e.printStackTrace();
+      }
     }
     waiter.resume();
   }

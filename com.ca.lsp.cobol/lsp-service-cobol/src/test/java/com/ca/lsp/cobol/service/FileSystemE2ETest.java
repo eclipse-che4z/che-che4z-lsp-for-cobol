@@ -19,7 +19,6 @@ import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
-import net.jodah.concurrentunit.Waiter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +43,6 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
       (DefaultDataBusBroker) LangServerCtx.getInjector().getInstance(AbstractDataBusBroker.class);
 
   private FileSystemServiceImpl fileSystemService = new FileSystemServiceImpl(broker);
-  private Waiter waiter = new Waiter();
 
   @Before
   public void initActivities() {

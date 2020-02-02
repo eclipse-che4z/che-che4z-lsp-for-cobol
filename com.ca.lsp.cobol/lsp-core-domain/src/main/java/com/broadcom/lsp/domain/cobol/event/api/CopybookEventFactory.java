@@ -42,7 +42,6 @@ public interface CopybookEventFactory {
     }
   }
 
-  // TODO: fetched, required, run needs to be populated with some data..
   static DataEvent createEventByEventType(DataEventType choice) {
     switch (choice) {
       case UNKNOWN_EVENT:
