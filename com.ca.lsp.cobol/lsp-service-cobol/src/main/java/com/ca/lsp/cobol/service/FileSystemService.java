@@ -17,11 +17,13 @@ package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import org.eclipse.lsp4j.services.WorkspaceService;
+import org.eclipse.lsp4j.WorkspaceFolder;
 
 import java.io.IOException;
+import java.util.List;
 
-public interface CobolWorkspaceService
-    extends WorkspaceService, EventObserver<RequiredCopybookEvent> {
+public interface FileSystemService extends EventObserver<RequiredCopybookEvent> {
   String getContentByCopybookName(String copybookName) throws IOException;
+
+  void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders);
 }

@@ -45,14 +45,17 @@ public class MyLanguageServerImpl implements LanguageServer {
 
   private TextDocumentService textService;
   private CobolWorkspaceService workspaceService;
+  private final FileSystemService fileSystemService;
   private Provider<LanguageClient> clientProvider;
 
   @Inject
   MyLanguageServerImpl(
-      CobolWorkspaceService workspaceService,
+      FileSystemService fileSystemService,
       TextDocumentService textService,
+      CobolWorkspaceService workspaceService,
       Provider<LanguageClient> clientProvider) {
     this.textService = textService;
+    this.fileSystemService = fileSystemService;
     this.workspaceService = workspaceService;
     this.clientProvider = clientProvider;
   }
@@ -95,7 +98,7 @@ public class MyLanguageServerImpl implements LanguageServer {
         new WorkspaceServerCapabilities(workspaceFoldersOptions);
     capabilities.setWorkspace(workspaceServiceCapabilities);
 
-    workspaceService.setWorkspaceFolders(params.getWorkspaceFolders());
+    fileSystemService.setWorkspaceFolders(params.getWorkspaceFolders());
     return CompletableFuture.supplyAsync(() -> new InitializeResult(capabilities));
   }
 

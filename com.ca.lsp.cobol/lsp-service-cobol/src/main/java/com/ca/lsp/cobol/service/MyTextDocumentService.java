@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -26,6 +26,7 @@ import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -52,6 +53,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class MyTextDocumentService implements TextDocumentService, EventObserver<RunAnalysisEvent> {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
+  public static final String GIT_FS_URI = "gitfs:/";
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
 
@@ -75,7 +77,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     this.completions = completions;
     this.occurrences = occurrences;
 
-    dataBus.subscribe(DataEventType.RERUN_ANALYSIS_EVENT, this);
+    dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
 
   Map<String, MyDocumentModel> getDocs() {
@@ -137,9 +139,14 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("formatting", uri)));
   }
 
+  @SneakyThrows
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
+    if (uri.startsWith(GIT_FS_URI)) {
+      // communications.notifyThatExtensionIsUnsupported("git filesystem");
+    }
+
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));

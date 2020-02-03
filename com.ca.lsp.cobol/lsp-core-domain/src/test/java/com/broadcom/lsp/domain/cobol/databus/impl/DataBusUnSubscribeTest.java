@@ -31,7 +31,7 @@ import java.util.concurrent.TimeoutException;
  * notifications anymore.
  */
 @Slf4j
-public class DataBusUnSubscribeTest extends AbsDataBusImplTest {
+public class DataBusUnSubscribeTest extends DatabusConfigProvider {
   private DefaultDataBusBroker databus;
 
   @Before
