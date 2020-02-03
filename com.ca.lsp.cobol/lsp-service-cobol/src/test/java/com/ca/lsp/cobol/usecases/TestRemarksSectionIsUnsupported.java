@@ -64,9 +64,9 @@ public class TestRemarksSectionIsUnsupported extends NegativeUseCase {
     Position start = range.getStart();
     Position end = range.getEnd();
 
-    assertEquals(4, start.getLine());
-    assertEquals(4, end.getLine());
-    assertEquals(14, start.getCharacter());
-    assertEquals(21, end.getCharacter());
+    assertEquals(3, start.getLine());
+    assertEquals(3, end.getLine());
+    assertEquals(11, start.getCharacter());
+    assertEquals(18, end.getCharacter());
   }
 }

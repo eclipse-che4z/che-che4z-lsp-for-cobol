@@ -37,7 +37,7 @@ public class CobolCommentEntriesMarkerImpl implements CobolLineRewriter {
 
   private static final String[] TRIGGERS_START =
       new String[] {
-        "AUTHOR.", "INSTALLATION.", "DATE-WRITTEN.", "DATE-COMPILED.", "SECURITY.", "REMARKS."
+        "AUTHOR.", "INSTALLATION.", "DATE-WRITTEN.", "DATE-COMPILED.", "SECURITY."
       };
 
   private static final Pattern COMMENT_ENTRY_TRIGGER_LINE =
