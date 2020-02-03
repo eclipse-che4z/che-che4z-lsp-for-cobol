@@ -12,10 +12,6 @@ import com.google.inject.Singleton;
 import lombok.Setter;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
-import org.eclipse.lsp4j.WorkspaceFolder;
-
-import java.nio.file.Path;
-import java.util.List;
 
 /**
  * This class is used to mock the actual behavior of {@link
@@ -40,11 +36,6 @@ public class MockWorkspaceService implements CobolWorkspaceService {
   }
 
   @Override
-  public Path getURIByCopybookName(String fileName) {
-    return null;
-  }
-
-  @Override
   public String getContentByCopybookName(String copybookName) {
     return copybooks.getCopybooks().stream()
         .filter(
@@ -55,9 +46,6 @@ public class MockWorkspaceService implements CobolWorkspaceService {
         .findAny()
         .orElse(null);
   }
-
-  @Override
-  public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {}
 
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams didChangeConfigurationParams) {}

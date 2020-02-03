@@ -26,6 +26,7 @@ import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -75,7 +76,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     this.completions = completions;
     this.occurrences = occurrences;
 
-    dataBus.subscribe(DataEventType.RERUN_ANALYSIS_EVENT, this);
+    dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
 
   Map<String, MyDocumentModel> getDocs() {
@@ -137,9 +138,14 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("formatting", uri)));
   }
 
+  @SneakyThrows
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
+    if (uri.startsWith("gitfs:/")) {
+      communications.notifyThatExtensionIsUnsupported("git filesysem");
+    }
+
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));

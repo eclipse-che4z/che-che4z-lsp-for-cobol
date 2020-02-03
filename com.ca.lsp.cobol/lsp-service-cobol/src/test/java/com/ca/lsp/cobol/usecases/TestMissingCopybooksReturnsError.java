@@ -43,6 +43,7 @@ public class TestMissingCopybooksReturnsError extends NegativeUseCase {
     workspaceService.setCopybooks(Collections::emptyList);
   }
 
+  @Override
   @Test
   public void test() {
     super.test();

@@ -49,6 +49,7 @@ public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCa
         () -> Collections.singletonList(new CobolText("RECURSIVE-COPY", RECURSIVE_COPY)));
   }
 
+  @Override
   @Test
   public void test() {
     super.test();

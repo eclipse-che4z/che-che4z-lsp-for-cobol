@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 
 /** This tests verifies that serialization to a cache storable object works correctly. */
 @Slf4j
-public class DataBusStoreHappyTest extends AbsDataBusImplTest {
+public class DataBusStoreHappyTest extends DatabusConfigProvider {
   // cache dummy static content
   private static final String CPY_FIXED_NAME = "COPY-";
   private static final String CPY_FIXED_CONTENT = "FASDFASDFSF";

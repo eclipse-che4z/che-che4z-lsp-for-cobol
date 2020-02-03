@@ -16,11 +16,11 @@
 
 package com.broadcom.lsp.domain.cobol.event.api;
 
-import com.broadcom.lsp.domain.cobol.event.factory.RunAnalysisSubscriberFactory;
 import com.broadcom.lsp.domain.cobol.event.factory.FetchedCopybookSubscriberFactory;
 import com.broadcom.lsp.domain.cobol.event.factory.RequiredCopybookSubscriberFactory;
+import com.broadcom.lsp.domain.cobol.event.factory.RunAnalysisSubscriberFactory;
 import com.broadcom.lsp.domain.cobol.event.factory.UnknownCopybookSubscriberFactory;
-import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.event.model.*;
 
 import java.util.NoSuchElementException;
 
@@ -34,11 +34,27 @@ public interface CopybookEventFactory {
         return new FetchedCopybookSubscriberFactory();
       case REQUIRED_COPYBOOK_EVENT:
         return new RequiredCopybookSubscriberFactory();
-      case RERUN_ANALYSIS_EVENT:
+      case RUN_ANALYSIS_EVENT:
         return new RunAnalysisSubscriberFactory();
       default:
         throw new NoSuchElementException(
             String.format("No subscriber found for %s,%s", choice.getId(), choice.name()));
+    }
+  }
+
+  static DataEvent createEventByEventType(DataEventType choice) {
+    switch (choice) {
+      case UNKNOWN_EVENT:
+        return UnknownEvent.builder().eventMessage("DUMMY_EVENT_NAME").build();
+      case FETCHED_COPYBOOK_EVENT:
+        return FetchedCopybookEvent.builder().build();
+      case REQUIRED_COPYBOOK_EVENT:
+        return RequiredCopybookEvent.builder().build();
+      case RUN_ANALYSIS_EVENT:
+        return new RunAnalysisEvent();
+      default:
+        throw new NoSuchElementException(
+            String.format("No DataEventType found for %s,%s", choice.getId(), choice.name()));
     }
   }
 }

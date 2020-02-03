@@ -32,8 +32,6 @@ import org.junit.runners.Suite;
   DataBusGetFromCacheBadTest.class,
   DataBusGetFromCacheHappyTest.class,
   DataBusStoreHappyTest.class,
-  DataBusSubscribeHappyTest.class,
-  DataBusSubscribeBadTest.class,
-  DataBusUnSubscribeTest.class
+  DatabusEventSubscriptionE2ETest.class
 })
 public class DomainTestSuite {}
