@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -55,7 +55,7 @@ export async function activate(context: ExtensionContext) {
     const item = window.createStatusBarItem(StatusBarAlignment.Right, Number.MIN_VALUE);
 
     // Create the language client and start the client.
-    const languageClient = new LanguageClient("LSP", "LSP extension for COBOL language", serverOptions, clientOptions);
+    const languageClient = new LanguageClient("COBOL", "LSP extension for COBOL language", serverOptions, clientOptions);
 
     const disposable = languageClient.start();
 
