@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.model.Variable;
@@ -51,14 +51,17 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
+  private final String documentUri;
   private final BufferedTokenStream tokens;
   private final CobolSourceFormat format;
   private final SemanticContext semanticContext;
 
   CobolSemanticParserListenerImpl(
+      final String documentUri,
       final BufferedTokenStream tokens,
       final SemanticContext semanticContext,
       final CobolSourceFormat format) {
+    this.documentUri = documentUri;
     this.tokens = tokens;
     this.format = format;
     this.semanticContext = semanticContext;
@@ -170,16 +173,11 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   private Position retrievePosition(ParserRuleContext token) {
     return new Position(
-        retrieveDocumentURI(),
+        documentUri,
         token.getStart().getStartIndex(),
         token.getStop().getStopIndex(),
         token.getStart().getLine(),
         token.getStart().getCharPositionInLine());
-  }
-
-  private String retrieveDocumentURI() {
-    List<CopybookDefinition> tracker = semanticContext.getCopybookUsageTracker();
-    return tracker.isEmpty() ? null : tracker.get(tracker.size() - 1).getUri();
   }
 
   @Override

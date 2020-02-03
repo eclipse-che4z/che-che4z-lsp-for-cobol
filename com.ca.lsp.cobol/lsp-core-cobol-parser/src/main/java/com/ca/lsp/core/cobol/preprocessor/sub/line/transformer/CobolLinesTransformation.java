@@ -24,5 +24,5 @@ import java.util.List;
  */
 public interface CobolLinesTransformation {
 
-  ResultWithErrors<List<CobolLine>> transformLines(List<CobolLine> lines);
+  ResultWithErrors<List<CobolLine>> transformLines(String documentURI, List<CobolLine> lines);
 }

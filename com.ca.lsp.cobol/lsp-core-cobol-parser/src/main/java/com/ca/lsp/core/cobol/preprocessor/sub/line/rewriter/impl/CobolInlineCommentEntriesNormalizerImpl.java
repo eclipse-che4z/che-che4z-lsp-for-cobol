@@ -13,16 +13,17 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl;
 
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
+import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolInlineCommentEntriesNormalizer;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolInlineCommentEntriesNormalizer;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_TAG;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
 
 public class CobolInlineCommentEntriesNormalizerImpl
     implements CobolInlineCommentEntriesNormalizer {
@@ -41,7 +42,7 @@ public class CobolInlineCommentEntriesNormalizerImpl
       result = line;
     } else {
       final String newContentArea = line.getContentArea().replace(COMMENT_TAG, COMMENT_TAG + WS);
-      result = CobolLine.copyCobolLineWithContentArea(newContentArea, line);
+      result = CobolLineUtils.copyCobolLineWithContentArea(newContentArea, line);
     }
 
     return result;

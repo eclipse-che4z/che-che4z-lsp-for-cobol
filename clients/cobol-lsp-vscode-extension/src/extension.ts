@@ -30,7 +30,7 @@ export async function activate(context: ExtensionContext) {
 
     // path resolved to identify the location of the LSP server into the extension
     const extPath = extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
-    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.9.1.jar`;
+    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.10.0.jar`;
 
     let serverOptions: Executable;
 

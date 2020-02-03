@@ -15,7 +15,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
@@ -36,11 +36,12 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
 
   @Override
   public ResultWithErrors<List<CopybookSemanticContext>> analyzeCopybooks(
+      String documentUri,
       Multimap<String, Position> copybooks,
       List<CopybookDefinition> copybookUsageTracker,
       CobolSourceFormat format) {
     List<ResultWithErrors<CopybookSemanticContext>> contexts =
-        runAnalysisAsynchronously(copybooks, copybookUsageTracker, format);
+        runAnalysisAsynchronously(documentUri, copybooks, copybookUsageTracker, format);
 
     List<SyntaxError> errors = createMissingCopybookErrors(copybooks, contexts);
 
@@ -50,10 +51,12 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   }
 
   private List<ResultWithErrors<CopybookSemanticContext>> runAnalysisAsynchronously(
+      String documentUri,
       Multimap<String, Position> copybooks,
       List<CopybookDefinition> copybookUsageTracker,
       CobolSourceFormat format) {
-    return ForkJoinTask.invokeAll(createTasks(copybooks, copybookUsageTracker, format)).stream()
+    return ForkJoinTask.invokeAll(createTasks(documentUri, copybooks, copybookUsageTracker, format))
+        .stream()
         .map(ForkJoinTask::join)
         .collect(Collectors.toList());
   }
@@ -101,6 +104,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   }
 
   private List<ForkJoinTask<ResultWithErrors<CopybookSemanticContext>>> createTasks(
+      String documentUri,
       Multimap<String, Position> names,
       List<CopybookDefinition> copybookUsageTracker,
       CobolSourceFormat format) {
@@ -108,7 +112,8 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
         .map(
             it ->
                 new AnalyseCopybookTask(
-                    new CopybookDefinition(it.getKey(), null, it.getValue()),
+                    documentUri,
+                    new CopybookDefinition(it.getKey(), documentUri, it.getValue()),
                     copybookUsageTracker,
                     format))
         .collect(Collectors.toList());

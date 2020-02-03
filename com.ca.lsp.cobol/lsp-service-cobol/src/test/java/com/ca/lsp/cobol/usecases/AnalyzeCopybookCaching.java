@@ -3,8 +3,8 @@ package com.ca.lsp.cobol.usecases;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
@@ -108,6 +108,7 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
   private void runAnalysis() {
     AnalyseCopybookTask analyseCopybookTask =
         new AnalyseCopybookTask(
+            null,
             new CopybookDefinition(COPYBOOK_NAME, null, null),
             Collections.emptyList(),
             FIXED);
