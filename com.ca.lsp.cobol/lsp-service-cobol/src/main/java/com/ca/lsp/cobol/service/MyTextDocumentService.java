@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -53,6 +53,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class MyTextDocumentService implements TextDocumentService, EventObserver<RunAnalysisEvent> {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
+  public static final String GIT_FS_URI = "gitfs:/";
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
 
@@ -142,8 +143,8 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-    if (uri.startsWith("gitfs:/")) {
-      communications.notifyThatExtensionIsUnsupported("git filesysem");
+    if (uri.startsWith(GIT_FS_URI)) {
+      // communications.notifyThatExtensionIsUnsupported("git filesystem");
     }
 
     String text = params.getTextDocument().getText();

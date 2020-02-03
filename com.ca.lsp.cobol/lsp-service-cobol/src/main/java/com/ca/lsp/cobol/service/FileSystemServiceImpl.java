@@ -15,18 +15,18 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.google.common.annotations.Beta;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.lsp4j.WorkspaceFolder;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
@@ -46,11 +46,12 @@ public class FileSystemServiceImpl implements FileSystemService {
   private static final String COBDEPS = ".cobdeps";
   private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
   public static final String DEP_EXTENSION = ".dep";
-  private final DefaultDataBusBroker dataBus;
+  private final DataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
+  private final List<String> validExtensions = Arrays.asList("cpy", "cbl", "cobol", "cob");
 
   @Inject
-  public FileSystemServiceImpl(DefaultDataBusBroker dataBus) {
+  public FileSystemServiceImpl(DataBusBroker dataBus) {
     this.dataBus = dataBus;
     dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
   }
@@ -79,7 +80,7 @@ public class FileSystemServiceImpl implements FileSystemService {
 
   /**
    * From a given copybook name (without file extension) this method will return the URI of the file
-   * * - if exists
+   * - if exists
    *
    * @param fileName (i.e. COPYTEST)
    * @return URI of file (i.e. file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy) or *
@@ -110,7 +111,7 @@ public class FileSystemServiceImpl implements FileSystemService {
    * @return the Path of the workspace folder
    * @throws IllegalArgumentException if the URI of WorkspaceFolder is not valid
    */
-  @Nonnull
+  @NonNull
   private Path getPathFromWorkspaceFolder(WorkspaceFolder it) {
     try {
       return Paths.get(new URI(it.getUri()));
@@ -164,9 +165,8 @@ public class FileSystemServiceImpl implements FileSystemService {
   }
 
   private boolean isValidExtension(String filePath) {
-    List<String> validExtensions = Arrays.asList("cpy", "cbl", "cobol", "cob");
     return validExtensions.stream()
-        .anyMatch(ext -> ext.equals(filePath.substring(filePath.lastIndexOf('.') + 1)));
+        .anyMatch(ext -> ext.equalsIgnoreCase(FilenameUtils.getExtension(filePath)));
   }
 
   /**
@@ -278,7 +278,7 @@ public class FileSystemServiceImpl implements FileSystemService {
   }
 
   private boolean depFileExists(Path dependencyFile) {
-    return dependencyFile.toFile().exists();
+    return dependencyFile != null && dependencyFile.toFile().exists();
   }
 
   private String filesystemSeparator() {

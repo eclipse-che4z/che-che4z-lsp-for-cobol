@@ -31,9 +31,19 @@ public class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
   @Test
   @SneakyThrows
   public void databusSubscriptionPositiveTest() {
+    /*
+     This positive test verify that a class subscribed to a specific DataEventType got a notification about that event.
+     The main flow is explained below:
+       1. The client (our unit class for this example) subscribes itself for an event using the method subscribeTo(theEvent)
+       2. The unit class publish a message on the database of theEvent type and wait for a while using the Waiter
+       3. The observerCallback() of the unit class is triggered (because subscribed on the event published on the databus)
+       4. The callback verify that the event received is exactly the one that is looking for
+       5. It's the same kind of event so will resume the waiter and the test will be ended successfully.
+    */
+
     try {
       databusSubscriptionForPositiveScenario(
-          DataEventType.REQUIRED_COPYBOOK_EVENT, DataEventType.REQUIRED_COPYBOOK_EVENT);
+          DataEventType.REQUIRED_COPYBOOK_EVENT, DataEventType.FETCHED_COPYBOOK_EVENT);
       databusSubscriptionForPositiveScenario(
           DataEventType.FETCHED_COPYBOOK_EVENT, DataEventType.FETCHED_COPYBOOK_EVENT);
       databusSubscriptionForPositiveScenario(
@@ -52,6 +62,15 @@ public class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
   @Test(expected = TimeoutException.class)
   @SneakyThrows
   public void databusSubscriptionNegativeTest() {
+    /*
+     This negative test verify that a class subscribed to a specific DataEventType got a notification about a different event.
+     In this scenario will check that a Timeout exception from the Waiter is thrown.
+     The main flow is explained below:
+       1. The client (our unit class for this example) subscribes itself for an event using the method subscribeTo(theEvent)
+       2. The unit class publish a message on the databud of a different kind of event - let's say anotherDifferentEvent and wait for a while using the Waiter
+       3. The observerCallback() is never triggered because it was registered for theEvent but on the bus there is anotherDifferentEvent
+       4. The waiter will throws a Timeout exception because it wasn't resumed by the observer.
+    */
     databusSubscriptionForNegativeScenario(
         DataEventType.REQUIRED_COPYBOOK_EVENT, DataEventType.UNKNOWN_EVENT);
     databusSubscriptionForNegativeScenario(

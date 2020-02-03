@@ -18,7 +18,6 @@ package com.ca.lsp.cobol.service.mocks;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import com.ca.lsp.cobol.positive.CobolTextRegistry;
 import com.ca.lsp.cobol.service.FileSystemService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -39,14 +38,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * This class is used to mock the actual behavior of {@link
- * org.eclipse.lsp4j.services.WorkspaceService} by returning the predefined values. It requires the
- * {@link CobolTextRegistry} as a provider of copybooks. This class is a singleton to allow external
- * configuration after injecting using DI.
- *
- * <p>Notice: singleton implementation with the shared state may cause some dirty-environment
- * problems, so remember to re-configure the instance if you are working on some test case with
- * copybooks
+ * This class is used to mock the actual behavior of {@link FileSystemService} by returning the
+ * predefined values.
  */
 @Singleton
 @Slf4j

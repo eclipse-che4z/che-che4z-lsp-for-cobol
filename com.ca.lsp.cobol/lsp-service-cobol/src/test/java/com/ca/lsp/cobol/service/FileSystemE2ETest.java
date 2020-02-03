@@ -14,11 +14,14 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.domain.cobol.databus.impl.AbstractDataBusBroker;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
+import lombok.extern.slf4j.Slf4j;
+import org.awaitility.Duration;
+import org.awaitility.core.ConditionTimeoutException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,17 +33,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.awaitility.Awaitility.await;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * This class contains all the unit test that perform the publish/subscribe acrivities for generate
  * the dependency file.
  */
+@Slf4j
 public class FileSystemE2ETest extends FileSystemConfiguration {
   public static final String CPY_NAME_WITHOUT_EXT = "copy2";
-  DefaultDataBusBroker broker =
-      (DefaultDataBusBroker) LangServerCtx.getInjector().getInstance(AbstractDataBusBroker.class);
+  DataBusBroker broker =
+      (DefaultDataBusBroker) LangServerCtx.getInjector().getInstance(DataBusBroker.class);
 
   private FileSystemServiceImpl fileSystemService = new FileSystemServiceImpl(broker);
 
@@ -59,7 +64,7 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
           .map(Path::toFile)
           .forEach(File::delete);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e.getMessage());
     }
 
     broker.invalidateCache();
@@ -70,15 +75,15 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
    * service subscribed to it react generating the dependency file.
    */
   @Test
-  public void generateDependencyFileOnCallback() throws InterruptedException {
+  public void generateDependencyFileOnCallback() {
     // generate a required copybook event
     broker.postData(
         RequiredCopybookEvent.builder()
             .name(CPY_NAME_WITHOUT_EXT)
             .documentUri(DOCUMENT_URI)
             .build());
-    Thread.sleep(1000);
-    assertTrue(depFileExists());
+    // after one second is expected to found the dep file on filesystem
+    waitAndAssert(Boolean.TRUE);
   }
 
   /**
@@ -89,7 +94,8 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
   public void noDependencyFileWithOtherEvent() {
     // generate a required copybook event
     broker.postData(UnknownEvent.builder().build());
-    assertFalse(depFileExists());
+    // after one second is not expected to found the dep file on filesystem
+    waitAndAssert(Boolean.FALSE);
   }
 
   private boolean depFileExists() {
@@ -100,5 +106,18 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
                 + ".cobdeps"
                 + filesystemSeparator()
                 + "Test.dep"));
+  }
+
+  private void waitAndAssert(Boolean expected) {
+    try {
+      await()
+          .atMost(Duration.ONE_SECOND)
+          .untilAsserted(
+              () -> {
+                assertEquals(depFileExists(), expected);
+              });
+    } catch (ConditionTimeoutException e) {
+      fail(e.getMessage());
+    }
   }
 }
