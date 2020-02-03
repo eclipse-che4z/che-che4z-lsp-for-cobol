@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2020 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ */
+
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
@@ -43,7 +57,7 @@ public class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
 
     try {
       databusSubscriptionForPositiveScenario(
-          DataEventType.REQUIRED_COPYBOOK_EVENT, DataEventType.FETCHED_COPYBOOK_EVENT);
+          DataEventType.REQUIRED_COPYBOOK_EVENT, DataEventType.REQUIRED_COPYBOOK_EVENT);
       databusSubscriptionForPositiveScenario(
           DataEventType.FETCHED_COPYBOOK_EVENT, DataEventType.FETCHED_COPYBOOK_EVENT);
       databusSubscriptionForPositiveScenario(
