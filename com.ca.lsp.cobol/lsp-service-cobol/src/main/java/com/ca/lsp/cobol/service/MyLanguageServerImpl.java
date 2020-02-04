@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class MyLanguageServerImpl implements LanguageServer {
   /** Glob patterns to watch COPYBOOKS folder and copybook files */
   private static final List<String> WATCHER_PATTERNS =
-      Arrays.asList("**/COPYBOOKS/*.cpy", "**/COPYBOOKS/*.CPY", "**/COPYBOOKS");
+      Arrays.asList("**/.copybooks/**/*.cpy", "**/.copybooks/**/*.CPY", "**/.copybooks");
 
   /**
    * The kind of events of interest for watchers calculated as WatchKind.Create | WatchKind.Change |

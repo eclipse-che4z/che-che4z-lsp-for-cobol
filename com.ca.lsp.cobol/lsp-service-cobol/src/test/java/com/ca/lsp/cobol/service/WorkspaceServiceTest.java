@@ -39,7 +39,7 @@ public class WorkspaceServiceTest {
   public void testDidChangeWatchedFilesExistingFileChanged() {
     checkWatchers(
         new FileEvent(
-            "file:///c%3A/workspace/COBOL/COPYBOOKS/CpyName.cpy", FileChangeType.Changed));
+            "file:///c%3A/workspace/COBOL/.copybooks/CpyName.cpy", FileChangeType.Changed));
   }
 
   /**
@@ -48,7 +48,7 @@ public class WorkspaceServiceTest {
    */
   @Test
   public void testDidChangeWatchedFilesAddedNewFile() {
-    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/COPYBOOKS", FileChangeType.Changed));
+    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks", FileChangeType.Changed));
   }
 
   private void checkWatchers(FileEvent event) {

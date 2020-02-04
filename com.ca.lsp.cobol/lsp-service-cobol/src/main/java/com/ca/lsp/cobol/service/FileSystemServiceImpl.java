@@ -44,7 +44,7 @@ import java.util.stream.Stream;
 @Slf4j
 public class FileSystemServiceImpl implements FileSystemService {
   private static final String COBDEPS = ".cobdeps";
-  private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
+  private static final String COPYBOOK_FOLDER_NAME = ".copybooks";
   public static final String DEP_EXTENSION = ".dep";
   private final DataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
