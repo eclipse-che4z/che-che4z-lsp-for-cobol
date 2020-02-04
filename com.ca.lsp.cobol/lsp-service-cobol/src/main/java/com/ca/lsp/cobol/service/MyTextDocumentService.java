@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class MyTextDocumentService implements TextDocumentService, EventObserver<RunAnalysisEvent> {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
-  public static final String GIT_FS_URI = "gitfs:/";
+  private static final String GIT_FS_URI = "gitfs:/";
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
 
