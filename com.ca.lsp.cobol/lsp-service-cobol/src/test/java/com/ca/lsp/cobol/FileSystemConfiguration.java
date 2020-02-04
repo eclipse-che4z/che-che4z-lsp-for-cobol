@@ -30,6 +30,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This class provide support methods for FileSystemService and doesn't test anything. More in
+ * detail create the workspace folder in the user tmp folder with some copybooks there
+ */
 @Slf4j
 public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String COPYBOOK_CONTENT =
@@ -108,7 +112,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
   @Nonnull
   private Path createPathOfName(String folderName, Optional<Path> parentFolder) {
 
-    // creck if the workspace folder already exists (parent folder)..
+    // check if the workspace folder already exists (parent folder)..
     return parentFolder
         .map(
             path ->
@@ -134,7 +138,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
         }
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e.getMessage());
     }
   }
 
@@ -149,7 +153,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
       }
 
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e.getMessage());
     }
     setWorkspaceFolderPath(workspacePath.toUri());
   }
@@ -165,7 +169,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
       bufferedOutputStream.flush();
       fileOutputStream.close();
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e.getMessage());
     }
   }
 }
