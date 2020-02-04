@@ -14,24 +14,66 @@
 package com.ca.lsp.cobol.service;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Singleton
 public class MyLanguageServerImpl implements LanguageServer {
-  private final TextDocumentService textService;
-  private final CobolWorkspaceService workspaceService;
+  /** Glob patterns to watch COPYBOOKS folder and copybook files */
+  private static final List<String> WATCHER_PATTERNS =
+      Arrays.asList("**/COPYBOOKS/*.cpy", "**/COPYBOOKS/*.CPY", "**/COPYBOOKS");
+
+  /**
+   * The kind of events of interest for watchers calculated as WatchKind.Create | WatchKind.Change |
+   * WatchKind.Delete which is 7
+   */
+  private static final int WATCH_ALL_KIND = 7;
+
+  private TextDocumentService textService;
+  private CobolWorkspaceService workspaceService;
+  private final FileSystemService fileSystemService;
+  private Provider<LanguageClient> clientProvider;
 
   @Inject
-  MyLanguageServerImpl(CobolWorkspaceService workspaceService, TextDocumentService textService) {
+  MyLanguageServerImpl(
+      FileSystemService fileSystemService,
+      TextDocumentService textService,
+      CobolWorkspaceService workspaceService,
+      Provider<LanguageClient> clientProvider) {
     this.textService = textService;
+    this.fileSystemService = fileSystemService;
     this.workspaceService = workspaceService;
+    this.clientProvider = clientProvider;
+  }
+
+  /**
+   * Initialized request is sent from the client after the 'initialize' request is resolved. It is
+   * used as hook to dynamically register capabilities, e.g. file system watchers.
+   *
+   * @param params - InitializedParams sent by a client
+   */
+  @Override
+  public void initialized(@Nullable InitializedParams params) {
+    LanguageClient client = clientProvider.get();
+    Registration registration =
+        new Registration("copybooksWatcher", "workspace/didChangeWatchedFiles", createWatcher());
+    RegistrationParams registrationParams =
+        new RegistrationParams(Collections.singletonList(registration));
+    client.registerCapability(registrationParams);
   }
 
   @Override
@@ -56,7 +98,7 @@ public class MyLanguageServerImpl implements LanguageServer {
         new WorkspaceServerCapabilities(workspaceFoldersOptions);
     capabilities.setWorkspace(workspaceServiceCapabilities);
 
-    workspaceService.setWorkspaceFolders(params.getWorkspaceFolders());
+    fileSystemService.setWorkspaceFolders(params.getWorkspaceFolders());
     return CompletableFuture.supplyAsync(() -> new InitializeResult(capabilities));
   }
 
@@ -78,5 +120,13 @@ public class MyLanguageServerImpl implements LanguageServer {
   @Override
   public WorkspaceService getWorkspaceService() {
     return workspaceService;
+  }
+
+  @Nonnull
+  private DidChangeWatchedFilesRegistrationOptions createWatcher() {
+    return new DidChangeWatchedFilesRegistrationOptions(
+        WATCHER_PATTERNS.stream()
+            .map(it -> new FileSystemWatcher(it, WATCH_ALL_KIND))
+            .collect(Collectors.toList()));
   }
 }

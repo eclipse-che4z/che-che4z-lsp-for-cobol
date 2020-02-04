@@ -19,6 +19,5 @@ import java.util.List;
 
 public interface CobolLineRewriter {
 
-	List<CobolLine> processLines(List<CobolLine> lines);
-
+  List<CobolLine> processLines(List<CobolLine> lines);
 }

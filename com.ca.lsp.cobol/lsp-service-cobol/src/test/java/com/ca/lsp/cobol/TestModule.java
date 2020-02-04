@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -18,6 +18,8 @@ package com.ca.lsp.cobol;
 import com.broadcom.lsp.cdi.module.DefaultModule;
 import com.ca.lsp.cobol.positive.CobolTextRegistry;
 import com.ca.lsp.cobol.positive.ZipTextRegistry;
+import com.ca.lsp.cobol.service.FileSystemService;
+import com.ca.lsp.cobol.service.FileSystemServiceImpl;
 import com.ca.lsp.cobol.service.MyTextDocumentService;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.communications.ServerCommunications;
@@ -25,6 +27,7 @@ import com.ca.lsp.cobol.service.delegates.completions.*;
 import com.ca.lsp.cobol.service.delegates.formations.Formation;
 import com.ca.lsp.cobol.service.delegates.formations.Formations;
 import com.ca.lsp.cobol.service.delegates.formations.TrimFormation;
+import com.ca.lsp.cobol.service.delegates.references.*;
 import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
@@ -50,6 +53,7 @@ public class TestModule extends DefaultModule {
     bind(LanguageServer.class).to(TestLanguageServer.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(WorkspaceService.class).to(MockWorkspaceService.class);
+    bind(FileSystemService.class).to(FileSystemServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(CobolTextRegistry.class).to(ZipTextRegistry.class);
@@ -61,6 +65,7 @@ public class TestModule extends DefaultModule {
 
     bindFormations();
     bindCompletions();
+    bindReferences();
   }
 
   private void bindFormations() {
@@ -80,5 +85,13 @@ public class TestModule extends DefaultModule {
 
     bind(CompletionStorage.class).annotatedWith(Names.named("Keywords")).to(Keywords.class);
     bind(CompletionStorage.class).annotatedWith(Names.named("Snippets")).to(Snippets.class);
+  }
+
+  private void bindReferences() {
+    bind(Occurrences.class).to(SemanticElementOccurrences.class);
+    Multibinder<SemanticLocations> referenceBinding =
+        Multibinder.newSetBinder(binder(), SemanticLocations.class);
+    referenceBinding.addBinding().to(VariableLocations.class);
+    referenceBinding.addBinding().to(ParagraphLocations.class);
   }
 }

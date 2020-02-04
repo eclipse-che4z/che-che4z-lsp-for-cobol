@@ -16,7 +16,7 @@
 package com.ca.lsp.core.cobol.semantics;
 
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
-import com.ca.lsp.core.cobol.model.ProcessingResult;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
@@ -178,7 +178,7 @@ public class CobolCleanExtraLanguageTest {
   @Test
   public void positiveErrorTest() {
     CobolLanguageEngine engine = new CobolLanguageEngine(format);
-    ProcessingResult result = engine.run(TEXT_TO_TEST);
+    ResultWithErrors<SemanticContext> result = engine.run("1", TEXT_TO_TEST);
     assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 

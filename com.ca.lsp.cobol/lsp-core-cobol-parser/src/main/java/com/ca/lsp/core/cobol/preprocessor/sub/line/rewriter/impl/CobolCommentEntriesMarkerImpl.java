@@ -13,176 +13,52 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl;
 
-import com.ca.lsp.core.cobol.params.CobolDialect;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
-import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolCommentEntriesMarker;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineRewriter;
 
-import java.util.ArrayList;
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_ENTRY_TAG;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
+import static com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils.copyCobolLineWithContentArea;
+import static java.lang.String.join;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
+import static java.util.regex.Pattern.compile;
 
-public class CobolCommentEntriesMarkerImpl implements CobolCommentEntriesMarker {
+/**
+ * Preprocessor, which escapes the comment entries, i.e. strings that should not be processed by the
+ * parser, e.g. author name.
+ */
+public class CobolCommentEntriesMarkerImpl implements CobolLineRewriter {
 
-  protected final Pattern commentEntryTriggerLinePattern;
-
-  protected boolean foundCommentEntryTriggerInPreviousLine = false;
-
-  protected boolean isInCommentEntry = false;
-
-  protected static final String[] TRIGGERSEND =
+  private static final String[] TRIGGERS_START =
       new String[] {
-        "PROGRAM-ID.",
-        "AUTHOR.",
-        "INSTALLATION.",
-        "DATE-WRITTEN.",
-        "DATE-COMPILED.",
-        "SECURITY.",
-        "ENVIRONMENT",
-        "DATA.",
-        "PROCEDURE."
+        "AUTHOR.", "INSTALLATION.", "DATE-WRITTEN.", "DATE-COMPILED.", "SECURITY."
       };
 
-  protected static final String[] TRIGGERSSTART =
-      new String[] {
-        "AUTHOR.", "INSTALLATION.", "DATE-WRITTEN.", "DATE-COMPILED.", "SECURITY.", "REMARKS."
-      };
+  private static final Pattern COMMENT_ENTRY_TRIGGER_LINE =
+      compile("([ \\t]*)(" + join("|", TRIGGERS_START) + ")(.+)", CASE_INSENSITIVE);
 
-  public CobolCommentEntriesMarkerImpl() {
-    final String commentEntryTriggerLineFormat =
-        "([ \\t]*)(" + String.join("|", TRIGGERSSTART) + ")(.+)";
-    commentEntryTriggerLinePattern =
-        Pattern.compile(commentEntryTriggerLineFormat, Pattern.CASE_INSENSITIVE);
-  }
-
-  protected CobolLine buildMultiLineCommentEntryLine(final CobolLine line) {
-    return CobolLine.copyCobolLineWithIndicatorArea(COMMENT_ENTRY_TAG + WS, line);
+  @Override
+  public List<CobolLine> processLines(@Nonnull List<CobolLine> lines) {
+    return lines.stream().map(this::escapeCommentEntry).collect(Collectors.toList());
   }
 
   /** Escapes in a given line a potential comment entry. */
-  protected CobolLine escapeCommentEntry(final CobolLine line) {
-    final CobolLine result;
+  @Nonnull
+  private CobolLine escapeCommentEntry(@Nonnull CobolLine line) {
+    Matcher matcher = COMMENT_ENTRY_TRIGGER_LINE.matcher(line.getContentArea());
 
-    final Matcher matcher = commentEntryTriggerLinePattern.matcher(line.getContentArea());
+    if (!matcher.matches()) return line;
+    String whitespace = matcher.group(1);
+    String trigger = matcher.group(2);
+    String commentEntry = matcher.group(3);
+    String newContentArea = whitespace + trigger + WS + COMMENT_ENTRY_TAG + commentEntry;
 
-    if (matcher.matches()) {
-      final String whitespace = matcher.group(1);
-      final String trigger = matcher.group(2);
-      final String commentEntry = matcher.group(3);
-      final String newContentArea = whitespace + trigger + WS + COMMENT_ENTRY_TAG + commentEntry;
-
-      result = CobolLine.copyCobolLineWithContentArea(newContentArea, line);
-    } else {
-      result = line;
-    }
-
-    return result;
-  }
-
-  protected boolean checkIsInCommentEntry(
-      final CobolLine line, final boolean isContentAreaAEmpty, final boolean isInOsvsCommentEntry) {
-    return CobolLineTypeEnum.COMMENT.equals(line.getType())
-        || isContentAreaAEmpty
-        || isInOsvsCommentEntry;
-  }
-
-  /**
-   * OSVS: The comment-entry can be contained in either area A or area B of the comment-entry lines.
-   * However, the next occurrence in area A of any one of the following COBOL words or phrases
-   * terminates the comment-entry and begin the next paragraph or division.
-   */
-  protected boolean isInOsvsCommentEntry(final CobolLine line) {
-    return CobolDialect.OSVS.equals(line.getDialect()) && !startsWithTrigger(line, TRIGGERSEND);
-  }
-
-  @Override
-  public CobolLine processLine(final CobolLine line) {
-    final CobolLine result;
-
-    if (line.getFormat().isCommentEntryMultiLine()) {
-      result = processMultiLineCommentEntry(line);
-    } else {
-      result = processSingleLineCommentEntry(line);
-    }
-
-    return result;
-  }
-
-  @Override
-  public List<CobolLine> processLines(final List<CobolLine> lines) {
-    final List<CobolLine> result = new ArrayList<>();
-
-    for (final CobolLine line : lines) {
-      final CobolLine processedLine = processLine(line);
-      result.add(processedLine);
-    }
-
-    return result;
-  }
-
-  /**
-   * If the Compiler directive SOURCEFORMAT is specified as or defaulted to FIXED, the comment-entry
-   * can be contained on one or more lines but is restricted to area B of those lines; the next line
-   * commencing in area A begins the next non-comment entry.
-   */
-  protected CobolLine processMultiLineCommentEntry(final CobolLine line) {
-    final boolean foundCommentEntryTriggerInCurrentLine = startsWithTrigger(line, TRIGGERSSTART);
-    final CobolLine result;
-
-    if (foundCommentEntryTriggerInCurrentLine) {
-      result = escapeCommentEntry(line);
-    } else if (foundCommentEntryTriggerInPreviousLine || isInCommentEntry) {
-      final boolean isContentAreaAEmpty = line.getContentAreaA().trim().isEmpty();
-      final boolean isInOsvsCommentEntry = isInOsvsCommentEntry(line);
-
-      isInCommentEntry = checkIsInCommentEntry(line, isContentAreaAEmpty, isInOsvsCommentEntry);
-
-      if (isInCommentEntry) {
-        result = buildMultiLineCommentEntryLine(line);
-      } else {
-        result = line;
-      }
-    } else {
-      result = line;
-    }
-
-    foundCommentEntryTriggerInPreviousLine = foundCommentEntryTriggerInCurrentLine;
-
-    return result;
-  }
-
-  protected CobolLine processSingleLineCommentEntry(final CobolLine line) {
-    final boolean foundCommentEntryTriggerInCurrentLine = startsWithTrigger(line, TRIGGERSSTART);
-    final CobolLine result;
-
-    if (foundCommentEntryTriggerInCurrentLine) {
-      result = escapeCommentEntry(line);
-    } else {
-      result = line;
-    }
-
-    return result;
-  }
-
-  /** Checks, whether given line starts with a trigger keyword indicating a comment entry. */
-  protected boolean startsWithTrigger(final CobolLine line, final String[] triggers) {
-    final String contentAreaUpperCase = line.getContentArea().toUpperCase();
-
-    boolean result = false;
-
-    for (final String trigger : triggers) {
-      final boolean containsTrigger = contentAreaUpperCase.trim().startsWith(trigger);
-
-      if (containsTrigger) {
-        result = true;
-        break;
-      }
-    }
-
-    return result;
+    return copyCobolLineWithContentArea(newContentArea, line);
   }
 }

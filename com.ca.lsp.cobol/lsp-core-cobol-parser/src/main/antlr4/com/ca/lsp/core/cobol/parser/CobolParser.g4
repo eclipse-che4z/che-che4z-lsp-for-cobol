@@ -30,7 +30,7 @@ identificationDivision
    ;
 
 identificationDivisionBody
-   : authorParagraph | installationParagraph | dateWrittenParagraph | dateCompiledParagraph | securityParagraph | remarksParagraph
+   : authorParagraph | installationParagraph | dateWrittenParagraph | dateCompiledParagraph | securityParagraph
    ;
 
 // - program id paragraph ----------------------------------
@@ -67,12 +67,6 @@ dateCompiledParagraph
 
 securityParagraph
    : SECURITY DOT_FS commentEntry?
-   ;
-
-// - remarks paragraph ----------------------------------
-
-remarksParagraph
-   : REMARKS DOT_FS commentEntry? END_REMARKS? DOT_FS?
    ;
 
 // --- environment division --------------------------------------------------------------------
@@ -1151,7 +1145,7 @@ paragraph
    ;
 
 sentence
-   : statement* DOT_FS
+   : (statement* DOT_FS) | skipStatement+
    ;
 
 statement
@@ -1159,7 +1153,7 @@ statement
     displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement | execSqlStatement | execSqlImsStatement | 
     exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement | 
     multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | 
-    sendStatement | serviceReloadStatement | serviceLabelStatement | setStatement | skipStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | 
+    sendStatement | serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
     terminateStatement | titleStatement | unstringStatement | writeStatement | xmlStatement
    ;
 

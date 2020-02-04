@@ -14,14 +14,14 @@
 
 package com.ca.lsp.core.cobol.visitor;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.ca.lsp.core.cobol.parser.CobolParserBaseVisitor;
 import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 
 import java.util.Comparator;
 import java.util.Optional;
@@ -31,6 +31,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private static final int SEVERITY_LEVEL = 3;
   private SemanticListener semanticListener = null;
   private SemanticContext semanticContext = null;
+  private String documentUri = null;
+
+  private static LevenshteinDistance instance = LevenshteinDistance.getDefaultInstance();
 
   private static int getWrongTokenStopPosition(String wrongToken, int charPositionInLine) {
     return charPositionInLine + wrongToken.length() - 1;
@@ -38,7 +41,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private static Optional<String> addDistance(String wrongToken) {
     return KEYWORDS.getList().stream()
-        .map(item -> new Object[] {item, StringUtils.getLevenshteinDistance(wrongToken, item)})
+        .map(item -> new Object[] {item, instance.apply(wrongToken, item)})
         .sorted(Comparator.comparingInt(o -> (int) o[1]))
         .filter(item -> !wrongToken.equals(item[0]))
         .filter(item -> (int) item[1] < 2)
@@ -52,6 +55,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   public void setSemanticContext(SemanticContext context) {
     semanticContext = context;
+  }
+
+  public void setDocumentUri(String documentUri) {
+    this.documentUri = documentUri;
   }
 
   @Override
@@ -159,7 +166,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private void throwWarning(String wrongToken, int startLine, int charPositionInLine) {
     if (!semanticListener.getErrorsPipe().isEmpty()) {
-      addDistance(wrongToken)
+      addDistance(wrongToken.toUpperCase())
           .ifPresent(
               correctWord ->
                   getSemanticError(wrongToken, startLine, charPositionInLine, correctWord));
@@ -168,7 +175,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private void throwSuggestion(String wrongToken, int startLine, int charPositionInLine) {
     semanticListener.syntaxError(
-        null,
+        documentUri,
         startLine,
         charPositionInLine,
         getWrongTokenStopPosition(wrongToken, charPositionInLine),
@@ -179,7 +186,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void getSemanticError(
       String wrongToken, int startLine, int charPositionInLine, String correctWord) {
     semanticListener.syntaxError(
-        null,
+        documentUri,
         startLine,
         charPositionInLine,
         getWrongTokenStopPosition(wrongToken, charPositionInLine),
@@ -240,8 +247,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private Position retrievePosition(ParserRuleContext ctx) {
     return new Position(
-        null,
-        ctx.getStart().getTokenIndex(),
+        documentUri,
         ctx.getStart().getStartIndex(),
         ctx.getStart().getStopIndex(),
         ctx.getStart().getLine(),

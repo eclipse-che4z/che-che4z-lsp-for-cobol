@@ -13,35 +13,22 @@
  */
 package com.ca.lsp.core.cobol;
 
-import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
-import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImpl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
-import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractCobolLinePreprocessorTest {
 
-  protected PreprocessorListener listener;
-
-  public void eraseListener() {
-    listener = new PreprocessorListener(new ArrayList<>());
-  }
-
-  protected List<CobolLine> processText(String text) {
-    CobolLineReaderImpl reader = new CobolLineReaderImpl(listener, null);
-    return reader.processLines(text, FIXED, new CobolParserParamsImpl());
+  protected ResultWithErrors<List<CobolLine>> processText(String text) {
+    CobolLineReaderImpl reader = new CobolLineReaderImpl();
+    return reader.processLines(null, text, FIXED);
   }
 
   protected String reduceLines(List<String> lines) {
-    return lines.stream().reduce((x, y) -> x + "\r\n" + y).get();
-  }
-
-  protected void checkNoErrorsFound() {
-    assertEquals(0, listener.getErrorsPipe().size());
+    return lines.stream().reduce((x, y) -> x + "\r\n" + y).orElse("");
   }
 }

@@ -17,7 +17,7 @@ import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.TestModule;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
+import com.ca.lsp.cobol.service.mocks.MockFileSystemService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,8 +64,8 @@ public class PositiveTest extends ConfigurableTest {
 
   @Before
   public void setUpServer() {
-    MockWorkspaceService workspaceService =
-        LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
+    MockFileSystemService workspaceService =
+        LangServerCtx.getInjector().getInstance(MockFileSystemService.class);
     workspaceService.setCopybooks(LangServerCtx.getInjector().getInstance(CobolTextRegistry.class));
   }
 

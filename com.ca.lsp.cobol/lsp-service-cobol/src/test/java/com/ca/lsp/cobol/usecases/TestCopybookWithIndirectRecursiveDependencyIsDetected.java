@@ -53,6 +53,7 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends Negat
                 new CobolText("INDIRECT-COPY", INDIRECT_COPY)));
   }
 
+  @Override
   @Test
   public void test() {
     super.test();
@@ -64,6 +65,6 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends Negat
     assertEquals(4, range.getStart().getLine());
     assertEquals(13, range.getStart().getCharacter());
     assertEquals(4, range.getEnd().getLine());
-    assertEquals(27, range.getEnd().getCharacter());
+    assertEquals(26, range.getEnd().getCharacter());
   }
 }

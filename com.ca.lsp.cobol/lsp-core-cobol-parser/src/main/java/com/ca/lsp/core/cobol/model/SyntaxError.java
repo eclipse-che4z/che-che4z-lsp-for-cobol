@@ -15,7 +15,7 @@
  */
 package com.ca.lsp.core.cobol.model;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import lombok.Builder;
 import lombok.Value;
 
@@ -25,21 +25,14 @@ import java.util.List;
 public class SyntaxError {
   private final Position position;
   private final List<String> ruleStack;
-  private final int type;
   private final String suggestion;
   private final int severity;
 
-  @Builder(builderMethodName = "syntaxerror")
-  public SyntaxError(
-      Position position, List<String> ruleStack, int type, String suggestion, int severity) {
+  @Builder(builderMethodName = "syntaxError")
+  public SyntaxError(Position position, List<String> ruleStack, String suggestion, int severity) {
     this.position = position;
     this.ruleStack = ruleStack;
-    this.type = type;
     this.suggestion = suggestion;
     this.severity = severity;
-  }
-
-  public String printSyntaxError() {
-    return super.toString().concat(toString());
   }
 }

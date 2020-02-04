@@ -13,35 +13,25 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.transformer;
 
-import static org.junit.Assert.assertEquals;
+import com.ca.lsp.core.cobol.AbstractCobolLinePreprocessorTest;
+import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-import com.ca.lsp.core.cobol.AbstractCobolLinePreprocessorTest;
-import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-
-/**
- * This test checks the continuation line transformation logic.
- *
- * @author zacan01, teman02
- */
+/** This test checks the continuation line transformation logic. */
 public class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTest {
-
-  @Before
-  public void eraseListener() {
-    super.eraseListener();
-  }
 
   /** POSITIVE TEXT: No text allowed in the content area A */
   @Test
   public void testNoContentAreaAInContinuationLine() {
     String line = "000010-    NO CONTENT AREA ON THIS LINE";
-    runTransformation(line);
-    checkNoErrorsFound();
+    List<SyntaxError> errors = runTransformation(line);
+    assertEquals(0, errors.size());
   }
 
   /**
@@ -51,8 +41,8 @@ public class ContinuationLineTransformationTest extends AbstractCobolLinePreproc
   @Test
   public void testContentAreaAInContinuationLine() {
     String line = "000010-THERE IS CONTENT AREA DEFINED HERE";
-    runTransformation(line);
-    assertEquals(1, listener.getErrorsPipe().size());
+    List<SyntaxError> errors = runTransformation(line);
+    assertEquals(1, errors.size());
   }
 
   /**
@@ -61,7 +51,7 @@ public class ContinuationLineTransformationTest extends AbstractCobolLinePreproc
    */
   @Test
   public void testContinuationLineCasePositive() {
-    List<String> lines = new ArrayList<String>();
+    List<String> lines = new ArrayList<>();
     lines.add("000000 IDENTIFICATION DIVISION.                                         23323232");
     lines.add("000010 PROGRAM-ID. test1.                                               23323232");
     lines.add("000020 AUTHOR. TESTER                                                   23323232");
@@ -70,8 +60,8 @@ public class ContinuationLineTransformationTest extends AbstractCobolLinePreproc
     lines.add("000500    01 WS-CONST-CREATE PIC X(134) VALUE 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
     lines.add("000251-    'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'.");
 
-    runTransformation(reduceLines(lines));
-    checkNoErrorsFound();
+    List<SyntaxError> errors = runTransformation(reduceLines(lines));
+    assertEquals(0, errors.size());
   }
 
   /**
@@ -81,7 +71,7 @@ public class ContinuationLineTransformationTest extends AbstractCobolLinePreproc
   @Test
   public void testContinuationLineCaseNegative() {
 
-    List<String> lines = new ArrayList<String>();
+    List<String> lines = new ArrayList<>();
     lines.add("000000 IDENTIFICATION DIVISION.                                         23323232");
     lines.add("000010 PROGRAM-ID. test1.                                               23323232");
     lines.add("000020 AUTHOR. TESTER                                                   23323232");
@@ -90,33 +80,33 @@ public class ContinuationLineTransformationTest extends AbstractCobolLinePreproc
     lines.add("000500    01 WS-CONST-CREATE PIC X(134) VALUE 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
     lines.add("000251     'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'.");
 
-    runTransformation(reduceLines(lines));
+    List<SyntaxError> errors = runTransformation(reduceLines(lines));
 
-    assertEquals(1, listener.getErrorsPipe().size());
+    assertEquals(1, errors.size());
   }
 
   @Test
   public void testQuotesInsideStringNotCauseError() {
-    List<String> lines = new ArrayList<String>();
+    List<String> lines = new ArrayList<>();
 
     lines.add("       VALUE 'DFHCOMMAREA xmlns=\"http://www.BKP92S1O.com/schem'.");
     lines.add("       VALUE 'as/BKP92S1OInterface\"'.");
     lines.add("       \"'\"");
     lines.add("       '\"'");
 
-    runTransformation(reduceLines(lines));
+    List<SyntaxError> errors = runTransformation(reduceLines(lines));
 
-    assertEquals(0, listener.getErrorsPipe().size());
+    assertEquals(0, errors.size());
   }
 
-  private void runTransformation(String text) {
+  private List<SyntaxError> runTransformation(String text) {
     List<CobolLine> lines = convertToCobolLines(text);
 
-    ContinuationLineTransformation transformation = new ContinuationLineTransformation(listener, null);
-    transformation.transformLines(lines);
+    ContinuationLineTransformation transformation = new ContinuationLineTransformation();
+    return transformation.transformLines(null, lines).getErrors();
   }
 
   private List<CobolLine> convertToCobolLines(String text) {
-    return super.processText(text);
+    return super.processText(text).getResult();
   }
 }

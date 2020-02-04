@@ -52,6 +52,7 @@ public class TestVariableStructureIsBuiltWithCopybooks extends PositiveUseCase {
         () -> Collections.singletonList(new CobolText("COPYBOOK-CONTENT", COPYBOOK_CONTENT)));
   }
 
+  @Override
   @Test
   public void test() {
     super.test();

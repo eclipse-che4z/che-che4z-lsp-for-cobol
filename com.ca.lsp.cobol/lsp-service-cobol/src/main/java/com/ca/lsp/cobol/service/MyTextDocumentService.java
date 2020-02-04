@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -14,24 +14,30 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
+import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.completions.Completions;
 import com.ca.lsp.cobol.service.delegates.formations.Formations;
-import com.ca.lsp.cobol.service.delegates.references.Highlights;
-import com.ca.lsp.cobol.service.delegates.references.References;
+import com.ca.lsp.cobol.service.delegates.references.Occurrences;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -45,8 +51,9 @@ import java.util.function.BiConsumer;
  */
 @Slf4j
 @Singleton
-public class MyTextDocumentService implements TextDocumentService {
-  private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob", "COBOL");
+public class MyTextDocumentService implements TextDocumentService, EventObserver<RunAnalysisEvent> {
+  private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
+  private static final String GIT_FS_URI = "gitfs:/";
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
 
@@ -54,17 +61,23 @@ public class MyTextDocumentService implements TextDocumentService {
   private LanguageEngineFacade engine;
   private Formations formations;
   private Completions completions;
+  private Occurrences occurrences;
 
   @Inject
-  public MyTextDocumentService(
+  MyTextDocumentService(
       Communications communications,
       LanguageEngineFacade engine,
       Formations formations,
-      Completions completions) {
+      Completions completions,
+      Occurrences occurrences,
+      DataBusBroker dataBus) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
     this.completions = completions;
+    this.occurrences = occurrences;
+
+    dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
 
   Map<String, MyDocumentModel> getDocs() {
@@ -94,7 +107,7 @@ public class MyTextDocumentService implements TextDocumentService {
       TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
     return CompletableFuture.<List<? extends Location>>supplyAsync(
-            () -> References.findDefinition(docs.get(uri), position))
+            () -> occurrences.findDefinitions(docs.get(uri), position))
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("definitions resolving", uri)));
   }
@@ -103,7 +116,7 @@ public class MyTextDocumentService implements TextDocumentService {
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
     String uri = params.getTextDocument().getUri();
     return CompletableFuture.<List<? extends Location>>supplyAsync(
-            () -> References.findReferences(docs.get(uri), params, params.getContext()))
+            () -> occurrences.findReferences(docs.get(uri), params, params.getContext()))
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("references resolving", uri)));
   }
@@ -113,7 +126,7 @@ public class MyTextDocumentService implements TextDocumentService {
       TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
     return CompletableFuture.<List<? extends DocumentHighlight>>supplyAsync(
-            () -> Highlights.findHighlights(docs.get(uri), position))
+            () -> occurrences.findHighlights(docs.get(uri), position))
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("document highlighting", uri)));
   }
@@ -126,9 +139,14 @@ public class MyTextDocumentService implements TextDocumentService {
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("formatting", uri)));
   }
 
+  @SneakyThrows
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
+    if (uri.startsWith(GIT_FS_URI)) {
+      // communications.notifyThatExtensionIsUnsupported("git filesystem");
+    }
+
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
@@ -155,6 +173,13 @@ public class MyTextDocumentService implements TextDocumentService {
     log.info("Document saved...");
   }
 
+  @Override
+  public void observerCallback(@Nonnull RunAnalysisEvent event) {
+    docs.entrySet().stream()
+        .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getText()))
+        .forEach(this::analyzeChanges);
+  }
+
   private void registerEngineAndAnalyze(String uri, String languageType, String text) {
     String fileExtension = extractExtension(uri);
     if (fileExtension != null && !isCobolFile(fileExtension)) {
@@ -168,7 +193,7 @@ public class MyTextDocumentService implements TextDocumentService {
   }
 
   private boolean isCobolFile(String identifier) {
-    return COBOL_IDS.contains(identifier);
+    return COBOL_IDS.contains(identifier.toLowerCase());
   }
 
   private String extractExtension(String uri) {
@@ -181,7 +206,7 @@ public class MyTextDocumentService implements TextDocumentService {
   private void analyzeDocumentFirstTime(String uri, String text) {
     CompletableFuture.runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(text);
+              AnalysisResult result = engine.analyze(uri, text);
               docs.get(uri).setAnalysisResult(result);
               publishResult(uri, result);
             })
@@ -191,7 +216,7 @@ public class MyTextDocumentService implements TextDocumentService {
   private void analyzeChanges(String uri, String text) {
     CompletableFuture.runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(text);
+              AnalysisResult result = engine.analyze(uri, text);
               registerDocument(uri, new MyDocumentModel(text, result));
               communications.publishDiagnostics(uri, result.getDiagnostics());
             })

@@ -14,12 +14,14 @@
 package com.ca.lsp.core.cobol.preprocessor;
 
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
-import com.ca.lsp.core.cobol.params.CobolParserParams;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 
 public interface CobolPreprocessor {
 
-  PreprocessedInput process(String cobolCode, CobolSourceFormat format);
+  ResultWithErrors<PreprocessedInput> process(
+      String documentUri, String cobolCode, CobolSourceFormat format);
 
-  PreprocessedInput process(String cobolCode, CobolSourceFormat format, CobolParserParams params, SemanticContext semanticContext);
+  ResultWithErrors<PreprocessedInput> process(
+      String documentUri, String cobolCode, CobolSourceFormat format, SemanticContext semanticContext);
 }

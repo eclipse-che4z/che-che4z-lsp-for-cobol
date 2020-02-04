@@ -13,10 +13,11 @@
  */
 package com.ca.lsp.cobol.service.delegates.validations;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
-import com.ca.lsp.core.cobol.model.ProcessingResult;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -43,6 +44,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final String WARNING_SRC_LABEL = "W";
   private static final String INFO_SRC_LABEL = "I";
   private static final String HINT_SRC_LABEL = "H";
+  private static final int ERR_POS_INDEX = 1;
 
   private CobolLanguageEngine engine;
 
@@ -52,38 +54,35 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   }
 
   @Override
-  public AnalysisResult analyze(String text) {
+  public AnalysisResult analyze(String uri, String text) {
     if (isEmpty(text)) {
       return AnalysisResult.empty();
     }
-    return toAnalysisResult(engine.run(text));
+    return toAnalysisResult(engine.run(uri, text), uri);
   }
 
   private static boolean isEmpty(String text) {
     return text.length() <= FIRST_LINE_SEQ_AND_EXTRA_OP;
   }
 
-  private static List<Diagnostic> convertErrors(List<SyntaxError> errors) {
+  private static List<Diagnostic> convertErrors(List<SyntaxError> errors, String uri) {
     return errors.stream()
-        .peek(e -> log.info(e.toString()))
-        .filter(errorOnlyFromCurrentDocument())
+        .filter(errorOnlyFromCurrentDocument(uri))
         .map(toDiagnostic())
         .collect(Collectors.toList());
   }
 
   @Nonnull
-  private static Predicate<SyntaxError> errorOnlyFromCurrentDocument() {
-    return syntaxError -> syntaxError.getPosition().getDocumentURI() == null;
+  private static Predicate<SyntaxError> errorOnlyFromCurrentDocument(String uri) {
+    return syntaxError -> uri.equals(syntaxError.getPosition().getDocumentURI());
   }
 
   private static Function<? super SyntaxError, ? extends Diagnostic> toDiagnostic() {
     return err -> {
       Diagnostic diagnostic = new Diagnostic();
       diagnostic.setSeverity(checkSeverity(err.getSeverity()));
-      diagnostic.setMessage(err.getSuggestion());
       diagnostic.setSource(setupSourceInfo(err.getSeverity()));
       diagnostic.setMessage(err.getSuggestion());
-
       diagnostic.setRange(convertRange(err.getPosition()));
       return diagnostic;
     };
@@ -110,22 +109,25 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   }
 
   private static Range convertRange(Position position) {
+    int positionLine = position.getLine() - ERR_POS_INDEX;
+    int cPosInLn = position.getCharPositionInLine();
+
     return new Range(
-        new org.eclipse.lsp4j.Position((position.getLine() - 1), position.getCharPositionInLine()),
+        new org.eclipse.lsp4j.Position(positionLine, cPosInLn),
         new org.eclipse.lsp4j.Position(
-            (position.getLine() - 1),
+            positionLine,
             ((position.getStopPosition() - position.getStartPosition())
-                + position.getCharPositionInLine()
-                + 1)));
+                + cPosInLn
+                + ERR_POS_INDEX)));
   }
 
-  private AnalysisResult toAnalysisResult(ProcessingResult result) {
+  private AnalysisResult toAnalysisResult(ResultWithErrors<SemanticContext> result, String uri) {
     return new AnalysisResult(
-        convertErrors(result.getErrors()),
-        retrieveDefinitions(result.getSemanticContext().getVariables()),
-        retrieveUsages(result.getSemanticContext().getVariables()),
-        retrieveDefinitions(result.getSemanticContext().getParagraphs()),
-        retrieveUsages(result.getSemanticContext().getParagraphs()));
+        convertErrors(result.getErrors(), uri),
+        retrieveDefinitions(result.getResult().getVariables()),
+        retrieveUsages(result.getResult().getVariables()),
+        retrieveDefinitions(result.getResult().getParagraphs()),
+        retrieveUsages(result.getResult().getParagraphs()));
   }
 
   private Map<String, List<Location>> retrieveDefinitions(SubContext<?> context) {

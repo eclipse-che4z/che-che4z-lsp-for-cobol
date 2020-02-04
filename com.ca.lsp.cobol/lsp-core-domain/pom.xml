@@ -22,12 +22,12 @@
     <parent>
         <groupId>com.ca.lsp</groupId>
         <artifactId>com.ca.lsp.cobol</artifactId>
-        <version>0.9.1</version>
+        <version>0.10.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>lsp-core-domain</artifactId>
     <name>COBOL LSP :: LSP CORE Domain</name>
-    <version>0.9.1</version>
+    <version>0.10.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -118,6 +118,13 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.5</version>
+
+                <configuration>
+                    <excludes>
+                        <exclude>**/com/broadcom/lsp/cdi/module/**/*</exclude>
+                    </excludes>
+                </configuration>
+
                 <executions>
                     <execution>
                         <id>coverage-prepare-agent</id>

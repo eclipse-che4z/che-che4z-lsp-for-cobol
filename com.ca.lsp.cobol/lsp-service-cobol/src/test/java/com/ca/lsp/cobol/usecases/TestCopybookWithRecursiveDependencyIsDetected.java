@@ -49,6 +49,7 @@ public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCa
         () -> Collections.singletonList(new CobolText("RECURSIVE-COPY", RECURSIVE_COPY)));
   }
 
+  @Override
   @Test
   public void test() {
     super.test();
@@ -60,6 +61,6 @@ public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCa
     assertEquals(4, range.getStart().getLine());
     assertEquals(13, range.getStart().getCharacter());
     assertEquals(4, range.getEnd().getLine());
-    assertEquals(28, range.getEnd().getCharacter());
+    assertEquals(27, range.getEnd().getCharacter());
   }
 }

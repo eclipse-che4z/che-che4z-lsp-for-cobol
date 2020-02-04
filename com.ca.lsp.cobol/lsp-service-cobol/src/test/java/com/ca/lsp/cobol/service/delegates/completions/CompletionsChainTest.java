@@ -26,8 +26,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.runTextValidation;
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -91,7 +90,7 @@ public class CompletionsChainTest extends ConfigurableTest {
   private List<CompletionItem> getCompletionItems(TextDocumentService service, Position position)
       throws InterruptedException, ExecutionException {
     CompletableFuture<Either<List<CompletionItem>, CompletionList>> completions =
-        service.completion(new CompletionParams(new TextDocumentIdentifier("1"), position));
+        service.completion(new CompletionParams(new TextDocumentIdentifier(DOCUMENT_URI), position));
 
     Either<List<CompletionItem>, CompletionList> either = completions.get();
     return either.getRight().getItems();

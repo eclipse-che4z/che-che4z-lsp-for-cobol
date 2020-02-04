@@ -36,9 +36,9 @@ import java.util.stream.Collectors;
 /** This utility class provides methods to run use cases with Cobol code examples. */
 @UtilityClass
 public class UseCaseUtils {
-  public static final String LANGUAGE = "cbl";
-  public static final String DOCUMENT_URI = "1";
+  public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
 
+  private static final String LANGUAGE = "cbl";
   private static final long MAX_TIME_TO_WAIT = 60000L;
   private static final long TIME_TO_POLL = 10L;
   private static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
@@ -144,7 +144,7 @@ public class UseCaseUtils {
    */
   public static AnalysisResult analyze(String text) {
     return new CobolLanguageEngineFacade(new CobolLanguageEngine(CobolSourceFormat.FIXED))
-        .analyze(text);
+        .analyze(DOCUMENT_URI, text);
   }
 
   /**
@@ -157,7 +157,7 @@ public class UseCaseUtils {
   public static List<Diagnostic> analyzeForErrors(String text) {
     LanguageEngineFacade engine =
         new CobolLanguageEngineFacade(new CobolLanguageEngine(CobolSourceFormat.FIXED));
-    AnalysisResult result = engine.analyze(text);
+    AnalysisResult result = engine.analyze(DOCUMENT_URI, text);
     return result.getDiagnostics().stream()
         .filter(it -> it.getSeverity().getValue() == 1)
         .collect(Collectors.toList());

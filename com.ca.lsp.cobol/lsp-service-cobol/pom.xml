@@ -22,12 +22,12 @@
     <parent>
         <groupId>com.ca.lsp</groupId>
         <artifactId>com.ca.lsp.cobol</artifactId>
-        <version>0.9.1</version>
+        <version>0.10.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>lsp-service-cobol</artifactId>
     <name>COBOL LSP :: LSP Service</name>
-    <version>0.9.1</version>
+    <version>0.10.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -74,6 +74,16 @@
         <dependency>
             <groupId>com.ca.lsp</groupId>
             <artifactId>lsp-core-domain</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.jodah</groupId>
+            <artifactId>concurrentunit</artifactId>
         </dependency>
     </dependencies>
 

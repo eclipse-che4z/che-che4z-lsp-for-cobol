@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.cleaner;
 
-import com.ca.lsp.core.cobol.params.CobolParserParams;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 
 /**
@@ -24,10 +23,10 @@ public interface CobolDocumentCleaner {
   /**
    * Remove the tokens that are not going to be processed from the text
    *
+   * @param documentUri - the URI of the currently processing document
    * @param text - text to be cleaned
    * @param format - format of the document
-   * @param params - parsing params
    * @return cleaned up text
    */
-  String cleanDocument(String text, CobolSourceFormat format, CobolParserParams params);
+  String cleanDocument(String documentUri, String text, CobolSourceFormat format);
 }

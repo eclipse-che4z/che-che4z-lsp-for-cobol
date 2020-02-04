@@ -17,7 +17,7 @@
 package com.broadcom.lsp.domain.cobol.databus.api;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.CopybookRepositoryLRU;
-import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
+import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.google.inject.ImplementedBy;
 import lombok.NonNull;
 import lombok.SneakyThrows;

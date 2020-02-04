@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.parser.listener;
 
-import com.broadcom.lsp.domain.cobol.model.Position;
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import org.antlr.v4.runtime.*;
 
@@ -23,9 +23,11 @@ import java.util.List;
 
 public class VerboseListener extends BaseErrorListener {
   private final List<SyntaxError> errorspipe;
+  private final String documentUri;
 
-  public VerboseListener(List<SyntaxError> errors) {
+  public VerboseListener(List<SyntaxError> errors, String documentUri) {
     errorspipe = errors;
+    this.documentUri = documentUri;
   }
 
   @Override
@@ -43,18 +45,16 @@ public class VerboseListener extends BaseErrorListener {
       CommonToken wrongToken = (CommonToken) offendingSymbol;
       Position position =
           new Position(
-              null,
-              wrongToken.getTokenIndex(),
+              documentUri,
               wrongToken.getStartIndex(),
               wrongToken.getStopIndex(),
               wrongToken.getLine(),
               wrongToken.getCharPositionInLine());
       errorspipe.add(
-          SyntaxError.syntaxerror()
+          SyntaxError.syntaxError()
               .position(position)
               .ruleStack(stack)
               .suggestion(msg)
-              .type(wrongToken.getType())
               .severity(1)
               .build());
     }
@@ -62,18 +62,12 @@ public class VerboseListener extends BaseErrorListener {
       stack.add(((Lexer) recognizer).getText());
       Position position =
           new Position(
-              null,
-              charPositionInLine,
-              charPositionInLine,
-              charPositionInLine,
-              line,
-              charPositionInLine);
+              documentUri, charPositionInLine, charPositionInLine, line, charPositionInLine);
       errorspipe.add(
-          SyntaxError.syntaxerror()
+          SyntaxError.syntaxError()
               .position(position)
               .ruleStack(stack)
               .suggestion(msg.concat(" on ").concat(stack.get(stack.size() - 1)))
-              .type(0)
               .severity(1)
               .build());
     }

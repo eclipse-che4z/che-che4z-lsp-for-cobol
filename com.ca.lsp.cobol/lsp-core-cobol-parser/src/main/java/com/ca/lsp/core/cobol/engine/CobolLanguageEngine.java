@@ -14,15 +14,15 @@
 package com.ca.lsp.core.cobol.engine;
 
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
-import com.ca.lsp.core.cobol.model.ProcessingResult;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolLexer;
 import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.parser.listener.PreprocessorListener;
 import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategy;
 import com.ca.lsp.core.cobol.visitor.CobolVisitor;
 import com.google.inject.Inject;
@@ -31,8 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,22 +45,26 @@ public class CobolLanguageEngine {
     this.sourceFormat = sourceFormat;
   }
 
-  public ProcessingResult run(String in) {
-    List<SyntaxError> errors = new CopyOnWriteArrayList<>();
-    CobolPreprocessorImpl preprocessor = new CobolPreprocessorImpl();
-    preprocessor.setListener(new PreprocessorListener(errors));
+  public ResultWithErrors<SemanticContext> run(String documentUri, String text) {
 
-    final PreprocessedInput preProcessedInput = preprocessor.process(in, sourceFormat);
-    final CobolLexer lexer = new CobolLexer(CharStreams.fromString(preProcessedInput.getInput()));
+    CobolPreprocessorImpl preprocessor = new CobolPreprocessorImpl();
+
+    ResultWithErrors<PreprocessedInput> preProcessedInput =
+        preprocessor.process(documentUri, text, sourceFormat);
+
+    CobolLexer lexer =
+        new CobolLexer(CharStreams.fromString(preProcessedInput.getResult().getInput()));
+
+    List<SyntaxError> errors = new ArrayList<>(preProcessedInput.getErrors());
 
     lexer.removeErrorListeners();
-    lexer.addErrorListener(new VerboseListener(errors));
+    lexer.addErrorListener(new VerboseListener(errors, documentUri));
 
-    final CommonTokenStream tokens = new CommonTokenStream(lexer);
-    final CobolParser parser = new CobolParser(tokens);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    CobolParser parser = new CobolParser(tokens);
 
     parser.removeErrorListeners();
-    parser.addErrorListener(new VerboseListener(errors));
+    parser.addErrorListener(new VerboseListener(errors, documentUri));
 
     CobolErrorStrategy strategy = new CobolErrorStrategy();
     parser.setErrorHandler(strategy);
@@ -68,10 +72,11 @@ public class CobolLanguageEngine {
     CobolParser.StartRuleContext tree = parser.startRule();
     CobolVisitor visitor = new CobolVisitor();
     visitor.setSemanticErrors(new SemanticListener(errors));
-    visitor.setSemanticContext(preProcessedInput.getSemanticContext());
+    visitor.setSemanticContext(preProcessedInput.getResult().getSemanticContext());
+    visitor.setDocumentUri(documentUri);
     visitor.visit(tree);
 
-    errors.forEach(errs -> LOG.debug(errs.printSyntaxError()));
-    return new ProcessingResult(errors, preProcessedInput.getSemanticContext());
+    errors.forEach(err -> LOG.debug(err.toString()));
+    return new ResultWithErrors<>(preProcessedInput.getResult().getSemanticContext(), errors);
   }
 }

@@ -17,10 +17,11 @@
 package com.broadcom.lsp.domain.cobol.databus.api;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.model.CopybookStorable;
-import com.broadcom.lsp.domain.cobol.model.DataEvent;
-import com.broadcom.lsp.domain.cobol.model.DataEventType;
-import com.broadcom.lsp.domain.cobol.model.RegistryId;
+import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
+import com.broadcom.lsp.domain.cobol.databus.model.RegistryId;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
+import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.google.inject.ImplementedBy;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -41,13 +42,16 @@ public interface DataBusBroker<T extends DataEvent, S> {
   void postData(@NonNull RegistryId registryId, @NonNull T dataEvent);
 
   @SneakyThrows
-  @NonNull S subscribe(@NonNull S dataSubscriber);
+  @NonNull
+  S subscribe(@NonNull S dataSubscriber);
 
   @SneakyThrows
-  @NonNull S subscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber);
+  @NonNull
+  S subscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber);
 
   @SneakyThrows
-  @NonNull S subscribe(@NonNull DataEventType eventType, @NonNull DataBusObserver observer);
+  @NonNull
+  S subscribe(@NonNull DataEventType eventType, @NonNull EventObserver observer);
 
   @SneakyThrows
   void unSubscribe(S dataSubscriber);
@@ -55,9 +59,8 @@ public interface DataBusBroker<T extends DataEvent, S> {
   @SneakyThrows
   void unSubscribe(@NonNull RegistryId registryId, S dataSubscriber);
 
-
   @SneakyThrows
-  S getSubscriber(@NonNull DataEventType event, @NonNull DataBusObserver observer);
+  S getSubscriber(@NonNull DataEventType event, @NonNull EventObserver observer);
 
   @SneakyThrows
   CopybookStorable storeData(@NonNull CopybookStorable dataEvent);
