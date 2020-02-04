@@ -20,7 +20,8 @@ package com.ca.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
+import com.ca.lsp.cobol.service.mocks.MockFileSystemService;
+import com.ca.lsp.cobol.service.mocks.MockFileSystemServiceImpl;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -49,9 +50,9 @@ public class TestSameCopybooksWIthDifferentCases extends PositiveUseCase {
   public TestSameCopybooksWIthDifferentCases() {
     super(TEXT);
 
-    MockWorkspaceService workspaceService =
-        LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
-    workspaceService.setCopybooks(
+    MockFileSystemService mockFileSystemService =
+        LangServerCtx.getInjector().getInstance(MockFileSystemServiceImpl.class);
+    mockFileSystemService.setCopybooks(
         () -> Collections.singletonList(new CobolText("STRUCT1", STRUCT1)));
   }
 

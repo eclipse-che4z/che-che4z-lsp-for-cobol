@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -16,7 +16,8 @@ package com.ca.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
+import com.ca.lsp.cobol.service.mocks.MockFileSystemService;
+import com.ca.lsp.cobol.service.mocks.MockFileSystemServiceImpl;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
@@ -44,9 +45,9 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends Negat
   public TestCopybookWithIndirectRecursiveDependencyIsDetected() {
     super(TEXT);
 
-    MockWorkspaceService workspaceService =
-        LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
-    workspaceService.setCopybooks(
+    MockFileSystemService mockFileSystemService =
+        LangServerCtx.getInjector().getInstance(MockFileSystemServiceImpl.class);
+    mockFileSystemService.setCopybooks(
         () ->
             Arrays.asList(
                 new CobolText("INNER-COPY", INNER_COPY),

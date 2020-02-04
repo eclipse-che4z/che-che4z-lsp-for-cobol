@@ -44,7 +44,7 @@ public class MyLanguageServerImpl implements LanguageServer {
   private static final int WATCH_ALL_KIND = 7;
 
   private TextDocumentService textService;
-  private CobolWorkspaceService workspaceService;
+  private WorkspaceService workspaceService;
   private final FileSystemService fileSystemService;
   private Provider<LanguageClient> clientProvider;
 
@@ -52,7 +52,7 @@ public class MyLanguageServerImpl implements LanguageServer {
   MyLanguageServerImpl(
       FileSystemService fileSystemService,
       TextDocumentService textService,
-      CobolWorkspaceService workspaceService,
+      WorkspaceService workspaceService,
       Provider<LanguageClient> clientProvider) {
     this.textService = textService;
     this.fileSystemService = fileSystemService;

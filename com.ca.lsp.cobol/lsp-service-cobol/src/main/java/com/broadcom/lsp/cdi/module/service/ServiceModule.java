@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
+import org.eclipse.lsp4j.services.WorkspaceService;
 
 /** This module provides DI bindings for service part. */
 @Slf4j
@@ -44,9 +45,9 @@ public class ServiceModule extends DefaultModule {
     bind(LanguageServer.class).to(MyLanguageServerImpl.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(FileSystemService.class).to(FileSystemServiceImpl.class);
-    bind(CobolWorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
+    bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(LanguageClient.class).toProvider(ClientProvider.class);
     bind(CobolLanguageEngine.class);
     bind(CobolSourceFormat.class).toInstance(CobolSourceFormat.FIXED);

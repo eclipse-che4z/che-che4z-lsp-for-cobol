@@ -1,17 +1,13 @@
 package com.ca.lsp.cobol.service.mocks;
 
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
-import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
-import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import com.ca.lsp.cobol.positive.CobolText;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.ca.lsp.cobol.positive.CobolTextRegistry;
-import com.ca.lsp.cobol.service.CobolWorkspaceService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Setter;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
+import org.eclipse.lsp4j.services.WorkspaceService;
 
 /**
  * This class is used to mock the actual behavior of {@link
@@ -24,27 +20,13 @@ import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
  * copybooks
  */
 @Singleton
-public class MockWorkspaceService implements CobolWorkspaceService {
-
+public class MockWorkspaceService implements WorkspaceService {
   @Setter private CopybooksMock copybooks;
-  private final DefaultDataBusBroker dataBus;
+  private final DataBusBroker dataBus;
 
   @Inject
-  public MockWorkspaceService(DefaultDataBusBroker dataBus) {
+  public MockWorkspaceService(DataBusBroker dataBus) {
     this.dataBus = dataBus;
-    dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
-  }
-
-  @Override
-  public String getContentByCopybookName(String copybookName) {
-    return copybooks.getCopybooks().stream()
-        .filter(
-            it ->
-                it.getFileName().equalsIgnoreCase(copybookName)
-                    || it.getFileName().equalsIgnoreCase(copybookName + ".cpy"))
-        .map(CobolText::getFullText)
-        .findAny()
-        .orElse(null);
   }
 
   @Override
@@ -52,11 +34,4 @@ public class MockWorkspaceService implements CobolWorkspaceService {
 
   @Override
   public void didChangeWatchedFiles(DidChangeWatchedFilesParams didChangeWatchedFilesParams) {}
-
-  @Override
-  public void observerCallback(RequiredCopybookEvent event) {
-    String name = event.getName();
-    String content = getContentByCopybookName(name);
-    dataBus.postData(FetchedCopybookEvent.builder().name(name).uri(name).content(content).build());
-  }
 }

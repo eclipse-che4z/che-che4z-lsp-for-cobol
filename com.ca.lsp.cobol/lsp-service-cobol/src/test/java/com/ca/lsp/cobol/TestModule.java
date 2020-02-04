@@ -18,6 +18,7 @@ package com.ca.lsp.cobol;
 import com.broadcom.lsp.cdi.module.DefaultModule;
 import com.ca.lsp.cobol.positive.CobolTextRegistry;
 import com.ca.lsp.cobol.positive.ZipTextRegistry;
+import com.ca.lsp.cobol.service.CobolWorkspaceServiceImpl;
 import com.ca.lsp.cobol.service.FileSystemService;
 import com.ca.lsp.cobol.service.FileSystemServiceImpl;
 import com.ca.lsp.cobol.service.MyTextDocumentService;
@@ -30,7 +31,8 @@ import com.ca.lsp.cobol.service.delegates.formations.TrimFormation;
 import com.ca.lsp.cobol.service.delegates.references.*;
 import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
+import com.ca.lsp.cobol.service.mocks.MockFileSystemService;
+import com.ca.lsp.cobol.service.mocks.MockFileSystemServiceImpl;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
 import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
@@ -52,8 +54,11 @@ public class TestModule extends DefaultModule {
     bind(LanguageClient.class).to(TestLanguageClient.class);
     bind(LanguageServer.class).to(TestLanguageServer.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
-    bind(WorkspaceService.class).to(MockWorkspaceService.class);
+    // TODO: Do we need a mock for worspaceservice impl?
+    bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(FileSystemService.class).to(FileSystemServiceImpl.class);
+    bind(MockFileSystemService.class).to(MockFileSystemServiceImpl.class);
+
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(CobolTextRegistry.class).to(ZipTextRegistry.class);
