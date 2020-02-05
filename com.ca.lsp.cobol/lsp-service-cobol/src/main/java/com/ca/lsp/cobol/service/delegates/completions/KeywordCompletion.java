@@ -47,7 +47,7 @@ public class KeywordCompletion implements Completion {
   @Nonnull
   @Override
   public String getSortOrderPrefix() {
-    return "3"; // Keywords should go after Paragraphs in the completions list
+    return "4"; // Keywords should go after Copybooks in the completions list
   }
 
   @Nonnull
