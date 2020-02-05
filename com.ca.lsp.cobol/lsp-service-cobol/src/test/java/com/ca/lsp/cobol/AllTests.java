@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -47,9 +47,12 @@ import org.junit.runners.Suite.SuiteClasses;
   TestResponsesNotContainLineBreaks.class,
   WorkspaceServiceTest.class,
   CompletionResolutionTest.class,
+  FileSystemServiceTest.class,
+  FileSystemE2ETest.class,
   HighlightsTest.class,
   MultiDocumentDefinitionTest.class,
   LangServerBootstrapTest.class,
+  DocumentExtensionTests.class
   MyLanguageServerImplTest.class,
   DidChangeConfigurationTest.class,
 })

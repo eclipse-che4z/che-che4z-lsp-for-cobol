@@ -193,7 +193,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     MyTextDocumentService service =
         new MyTextDocumentService(communications, engine, null, null, null, broker);
 
-    verify(broker).subscribe(DataEventType.RERUN_ANALYSIS_EVENT, service);
+    verify(broker).subscribe(DataEventType.RUN_ANALYSIS_EVENT, service);
     return service;
   }
 

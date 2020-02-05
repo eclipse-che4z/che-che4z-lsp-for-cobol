@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -14,7 +14,7 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
@@ -26,6 +26,7 @@ import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -50,9 +51,9 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Singleton
-public class MyTextDocumentService
-    implements TextDocumentService, EventObserver<RunAnalysisEvent> {
-  private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob", "COBOL");
+public class MyTextDocumentService implements TextDocumentService, EventObserver<RunAnalysisEvent> {
+  private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
+  private static final String GIT_FS_URI = "gitfs:/";
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
 
@@ -63,20 +64,20 @@ public class MyTextDocumentService
   private Occurrences occurrences;
 
   @Inject
-  public MyTextDocumentService(
+  MyTextDocumentService(
       Communications communications,
       LanguageEngineFacade engine,
       Formations formations,
       Completions completions,
       Occurrences occurrences,
-      DefaultDataBusBroker dataBus) {
+      DataBusBroker dataBus) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
     this.completions = completions;
     this.occurrences = occurrences;
 
-    dataBus.subscribe(DataEventType.RERUN_ANALYSIS_EVENT, this);
+    dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
 
   Map<String, MyDocumentModel> getDocs() {
@@ -138,9 +139,14 @@ public class MyTextDocumentService
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("formatting", uri)));
   }
 
+  @SneakyThrows
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
+    if (uri.startsWith(GIT_FS_URI)) {
+      // communications.notifyThatExtensionIsUnsupported("git filesystem");
+    }
+
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
@@ -187,7 +193,7 @@ public class MyTextDocumentService
   }
 
   private boolean isCobolFile(String identifier) {
-    return COBOL_IDS.contains(identifier);
+    return COBOL_IDS.contains(identifier.toLowerCase());
   }
 
   private String extractExtension(String uri) {

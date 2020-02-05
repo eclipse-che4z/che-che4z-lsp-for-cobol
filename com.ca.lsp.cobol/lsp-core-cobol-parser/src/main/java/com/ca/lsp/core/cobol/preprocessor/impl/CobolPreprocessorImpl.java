@@ -25,9 +25,9 @@ import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolCommentEntriesMarker;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolInlineCommentEntriesNormalizer;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineIndicatorProcessor;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineRewriter;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolCommentEntriesMarkerImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolInlineCommentEntriesNormalizerImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolLineIndicatorProcessorImpl;
@@ -119,7 +119,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     return createCommentEntriesMarker().processLines(normalizedInlineCommentEntriesLines);
   }
 
-  private CobolCommentEntriesMarker createCommentEntriesMarker() {
+  private CobolLineRewriter createCommentEntriesMarker() {
     return new CobolCommentEntriesMarkerImpl();
   }
 

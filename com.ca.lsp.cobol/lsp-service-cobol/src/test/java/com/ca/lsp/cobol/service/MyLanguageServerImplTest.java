@@ -35,7 +35,7 @@ public class MyLanguageServerImplTest {
     ClientProvider provider = new ClientProvider();
     provider.set(client);
 
-    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, provider);
+    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, provider);
     ArgumentCaptor<RegistrationParams> captor = ArgumentCaptor.forClass(RegistrationParams.class);
     server.initialized(new InitializedParams());
 

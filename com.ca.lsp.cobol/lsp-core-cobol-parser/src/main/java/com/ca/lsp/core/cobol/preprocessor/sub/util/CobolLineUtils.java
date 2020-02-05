@@ -97,7 +97,6 @@ public class CobolLineUtils {
     cobolLine.setContentAreaB(line.getContentAreaB());
     cobolLine.setCommentArea(line.getCommentArea());
     cobolLine.setFormat(line.getFormat());
-    cobolLine.setDialect(line.getDialect());
     cobolLine.setNumber(line.getNumber());
     cobolLine.setType(line.getType());
     cobolLine.setPredecessor(line.getPredecessor());

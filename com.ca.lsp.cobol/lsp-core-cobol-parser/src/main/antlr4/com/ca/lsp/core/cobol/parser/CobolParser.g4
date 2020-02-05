@@ -30,7 +30,7 @@ identificationDivision
    ;
 
 identificationDivisionBody
-   : authorParagraph | installationParagraph | dateWrittenParagraph | dateCompiledParagraph | securityParagraph | remarksParagraph
+   : authorParagraph | installationParagraph | dateWrittenParagraph | dateCompiledParagraph | securityParagraph
    ;
 
 // - program id paragraph ----------------------------------
@@ -67,12 +67,6 @@ dateCompiledParagraph
 
 securityParagraph
    : SECURITY DOT_FS commentEntry?
-   ;
-
-// - remarks paragraph ----------------------------------
-
-remarksParagraph
-   : REMARKS DOT_FS commentEntry? END_REMARKS? DOT_FS?
    ;
 
 // --- environment division --------------------------------------------------------------------
