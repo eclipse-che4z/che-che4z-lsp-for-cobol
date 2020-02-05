@@ -41,11 +41,6 @@ public class DidChangeConfigurationTest {
   private DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
   private ClientProvider provider = new ClientProvider();
 
-  @AllArgsConstructor
-  public class TestObject {
-    private String settings;
-  }
-
   /** testObject - the object which should be returned by workspace/configuration */
   @Test
   public void testDidChangeConfiguration() {
@@ -54,12 +49,11 @@ public class DidChangeConfigurationTest {
     ArgumentCaptor<FetchedSettingsEvent> captor =
         ArgumentCaptor.forClass(FetchedSettingsEvent.class);
 
-    TestObject testObject = new TestObject("settings");
     ConfigurationParams params = createParams();
 
     List<Object> list = new ArrayList<>();
     CompletableFuture<List<Object>> completableFuture = new CompletableFuture<>();
-    list.add(testObject);
+    list.add("settings");
     completableFuture.complete(list);
     FetchedSettingsEvent fetchedSettingsEvent = new FetchedSettingsEvent();
     fetchedSettingsEvent.setContent(list);

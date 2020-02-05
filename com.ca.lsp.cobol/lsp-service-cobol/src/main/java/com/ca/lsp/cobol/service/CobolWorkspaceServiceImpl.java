@@ -56,7 +56,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
-    /** section and scope has to be set to whatever we agree on for the dependencies graph */
+    /* section and scope has to be set to whatever we agree on for the dependencies graph */
     try {
       fetchSettings(null, null)
           .thenAccept(e -> dataBus.postData(FetchedSettingsEvent.builder().content(e).build()));
