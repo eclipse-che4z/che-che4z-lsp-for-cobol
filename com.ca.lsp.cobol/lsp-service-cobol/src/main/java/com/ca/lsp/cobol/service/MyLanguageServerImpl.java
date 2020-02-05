@@ -70,18 +70,13 @@ public class MyLanguageServerImpl implements LanguageServer {
     LanguageClient client = clientProvider.get();
     List<Registration> registrationList = new ArrayList<>();
 
-    addItemToRegistration(
-        registrationList, "copybooksWatcher", "workspace/didChangeWatchedFiles", createWatcher());
-    addItemToRegistration(
-        registrationList, "configurationChange", "workspace/didChangeConfiguration", null);
+    registrationList.add(
+        new Registration("copybooksWatcher", "workspace/didChangeWatchedFiles", createWatcher()));
+    registrationList.add(
+        new Registration("configurationChange", "workspace/didChangeConfiguration", null));
 
     RegistrationParams registrationParams = new RegistrationParams(registrationList);
     client.registerCapability(registrationParams);
-  }
-
-  private void addItemToRegistration(
-      List<Registration> registrationList, String id, String method, Object registerOptions) {
-    registrationList.add(new Registration(id, method, registerOptions));
   }
 
   @Override

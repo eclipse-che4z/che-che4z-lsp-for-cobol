@@ -60,7 +60,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
     try {
       fetchSettings(null, null)
           .thenAccept(e -> dataBus.postData(FetchedSettingsEvent.builder().content(e).build()));
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
       log.error(e.getMessage());
     }
   }
@@ -76,16 +76,13 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {
     LanguageClient client = clientProvider.get();
     ConfigurationParams params = new ConfigurationParams();
-    List<ConfigurationItem> itemList = new ArrayList<>();
-    elemToList(itemList, section, scope);
-    params.setItems(itemList);
-
+    params.setItems(elemToList(section, scope));
     return client.configuration(params);
   }
 
   @Nonnull
-  private List<ConfigurationItem> elemToList(
-      List<ConfigurationItem> list, String section, String scope) {
+  private List<ConfigurationItem> elemToList(String section, String scope) {
+    List<ConfigurationItem> list = new ArrayList<>();
     ConfigurationItem item = new ConfigurationItem();
     item.setSection(section);
     item.setScopeUri(scope);
