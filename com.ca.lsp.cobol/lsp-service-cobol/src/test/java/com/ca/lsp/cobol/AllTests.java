@@ -47,10 +47,10 @@ import org.junit.runners.Suite.SuiteClasses;
   TestResponsesNotContainLineBreaks.class,
   WorkspaceServiceTest.class,
   CompletionResolutionTest.class,
-  WorkspaceServiceTest.class,
   HighlightsTest.class,
   MultiDocumentDefinitionTest.class,
   LangServerBootstrapTest.class,
-  MyLanguageServerImplTest.class
+  MyLanguageServerImplTest.class,
+  DidChangeConfigurationTest.class,
 })
 public class AllTests {}

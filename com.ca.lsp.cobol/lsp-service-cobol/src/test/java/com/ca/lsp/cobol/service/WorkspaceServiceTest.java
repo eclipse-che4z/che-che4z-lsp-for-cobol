@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -191,10 +191,9 @@ public class WorkspaceServiceTest {
 
   private void checkWatchers(FileEvent event) {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
-    ArgumentCaptor<RunAnalysisEvent> captor =
-        ArgumentCaptor.forClass(RunAnalysisEvent.class);
+    ArgumentCaptor<RunAnalysisEvent> captor = ArgumentCaptor.forClass(RunAnalysisEvent.class);
 
-    CobolWorkspaceServiceImpl service = new CobolWorkspaceServiceImpl(broker);
+    CobolWorkspaceServiceImpl service = new CobolWorkspaceServiceImpl(broker, null);
 
     DidChangeWatchedFilesParams params =
         new DidChangeWatchedFilesParams(Collections.singletonList(event));

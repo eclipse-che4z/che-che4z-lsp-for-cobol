@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -26,7 +26,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -66,11 +65,20 @@ public class MyLanguageServerImpl implements LanguageServer {
   @Override
   public void initialized(@Nullable InitializedParams params) {
     LanguageClient client = clientProvider.get();
-    Registration registration =
-        new Registration("copybooksWatcher", "workspace/didChangeWatchedFiles", createWatcher());
-    RegistrationParams registrationParams =
-        new RegistrationParams(Collections.singletonList(registration));
+    List<Registration> registrationList = new ArrayList<>();
+
+    addItemToRegistration(
+        registrationList, "copybooksWatcher", "workspace/didChangeWatchedFiles", createWatcher());
+    addItemToRegistration(
+        registrationList, "configurationChange", "workspace/didChangeConfiguration", null);
+
+    RegistrationParams registrationParams = new RegistrationParams(registrationList);
     client.registerCapability(registrationParams);
+  }
+
+  private void addItemToRegistration(
+      List<Registration> registrationList, String id, String method, Object registerOptions) {
+    registrationList.add(new Registration(id, method, registerOptions));
   }
 
   @Override

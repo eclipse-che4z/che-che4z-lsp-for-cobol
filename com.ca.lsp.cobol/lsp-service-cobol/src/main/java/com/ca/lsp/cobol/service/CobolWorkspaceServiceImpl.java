@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -16,14 +16,14 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
-import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
-import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
-import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
+import com.broadcom.lsp.domain.cobol.databus.model.RegistryId;
+import com.broadcom.lsp.domain.cobol.event.model.*;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.services.LanguageClient;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,13 +35,8 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -50,10 +45,13 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   private final ExecutorService threadPool;
   private final DefaultDataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
+  private Provider<LanguageClient> clientProvider;
 
   @Inject
-  public CobolWorkspaceServiceImpl(DefaultDataBusBroker dataBus) {
+  public CobolWorkspaceServiceImpl(
+      DefaultDataBusBroker dataBus, Provider<LanguageClient> clientProvider) {
     this.dataBus = dataBus;
+    this.clientProvider = clientProvider;
     dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
 
     // create a thread pool fixed
@@ -65,9 +63,52 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * This is a notification triggered automatically when the user modify configuration settings in
+   * the client
+   *
+   * @param params - LSPSpecification -> The actual changed settings; Actually -> null all the time.
+   */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
-    throw new UnsupportedOperationException();
+    /** section and scope has to be set to whatever we agree on for the dependencies graph */
+    try {
+      fetchSettings(null, null)
+          .thenAccept(
+              e -> {
+                dataBus.postData(FetchedSettingsEvent.builder().content(e).build());
+              });
+    } catch (Exception e) {
+      log.info(e.getMessage());
+    }
+  }
+
+  /**
+   * After client notifies the server that there is a setting change we need to request the client
+   * those changing by sending a workspace/configuration JSON request
+   *
+   * @param section - The configuration section asked for.
+   * @param scope - The scope to get the configuration section for.
+   * @return - CompletedFuture which contains an object with the settings asked for.
+   */
+  private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {
+    LanguageClient client = clientProvider.get();
+    ConfigurationParams params = new ConfigurationParams();
+    List<ConfigurationItem> itemList = new ArrayList<>();
+    elemToList(itemList, section, scope);
+    params.setItems(itemList);
+
+    return client.configuration(params);
+  }
+
+  @Nonnull
+  private List<ConfigurationItem> elemToList(
+      List<ConfigurationItem> list, String section, String scope) {
+    ConfigurationItem item = new ConfigurationItem();
+    item.setSection(section);
+    item.setScopeUri(scope);
+    list.add(item);
+    return list;
   }
 
   @Override
@@ -178,7 +219,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
 
   /**
    * @param fileName copybook name
-   * @param workspaceFolderPath pysical path of workspace where to search for the copybook
+   * @param workspaceFolderPath physical path of workspace where to search for the copybook
    * @return Path of the found copybook in the workspace folder
    */
   private Path applySearch(String fileName, Path workspaceFolderPath) {
