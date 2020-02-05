@@ -52,7 +52,7 @@ import org.junit.runners.Suite.SuiteClasses;
   HighlightsTest.class,
   MultiDocumentDefinitionTest.class,
   LangServerBootstrapTest.class,
-  DocumentExtensionTests.class
+  DocumentExtensionTests.class,
   MyLanguageServerImplTest.class,
   DidChangeConfigurationTest.class,
 })
