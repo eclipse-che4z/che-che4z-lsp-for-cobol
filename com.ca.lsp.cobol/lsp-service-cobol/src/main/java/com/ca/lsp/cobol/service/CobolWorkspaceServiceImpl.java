@@ -16,7 +16,6 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.model.RegistryId;
 import com.broadcom.lsp.domain.cobol.event.model.*;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
@@ -32,15 +31,8 @@ import org.eclipse.lsp4j.services.LanguageClient;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.FileVisitOption;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Stream;
 
 @Slf4j
 @Singleton
@@ -67,10 +59,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
     /** section and scope has to be set to whatever we agree on for the dependencies graph */
     try {
       fetchSettings(null, null)
-          .thenAccept(
-              e -> {
-                dataBus.postData(FetchedSettingsEvent.builder().content(e).build());
-              });
+          .thenAccept(e -> dataBus.postData(FetchedSettingsEvent.builder().content(e).build()));
     } catch (Exception e) {
       log.error(e.getMessage());
     }
