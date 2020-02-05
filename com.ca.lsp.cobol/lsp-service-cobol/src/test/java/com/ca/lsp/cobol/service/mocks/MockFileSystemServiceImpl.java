@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
 import org.eclipse.lsp4j.WorkspaceFolder;
 
-import java.nio.file.FileSystems;
 import java.util.List;
 
 /**
@@ -41,10 +40,8 @@ import java.util.List;
 @Slf4j
 public class MockFileSystemServiceImpl
     implements MockFileSystemService, EventObserver<RequiredCopybookEvent> {
-  public static final String SOMEPROG_DEP = "SOMEPROG.dep";
   @Setter private CopybooksMock copybooks;
   @Getter private final DefaultDataBusBroker dataBus;
-  private List<WorkspaceFolder> workspaceFolders;
 
   @Getter protected Waiter waiter = new Waiter();
 
@@ -62,13 +59,7 @@ public class MockFileSystemServiceImpl
   }
 
   @Override
-  public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
-    this.workspaceFolders = workspaceFolders;
-  }
-
-  private List<WorkspaceFolder> getWorkspaceFolders() {
-    return workspaceFolders;
-  }
+  public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {}
 
   @Override
   public String getContentByCopybookName(String copybookName) {
@@ -81,63 +72,4 @@ public class MockFileSystemServiceImpl
         .findAny()
         .orElse(null);
   }
-  //
-  //  private Path getPathByCopybookName(String fileName) {
-  //    try (Stream<Path> pathStream =
-  //        Files.find(
-  //            workspaceFoldersAsPathList().get(0),
-  //            100,
-  //            (path, basicFileAttributes) -> {
-  //              File resFile = path.toFile();
-  //              return resFile.isFile()
-  //                  && !resFile.isDirectory()
-  //                  && resFile.getName().contains(".")
-  //                  && resFile
-  //                      .getName()
-  //                      .substring(0, resFile.getName().lastIndexOf('.'))
-  //                      .equalsIgnoreCase(fileName);
-  //            },
-  //            FileVisitOption.FOLLOW_LINKS)) {
-  //      return pathStream.findAny().orElse(null);
-  //    } catch (IOException e) {
-  //      log.error(Arrays.toString(e.getStackTrace()));
-  //    }
-  //    return null;
-  //  }
-  //
-  private String filesystemSeparator() {
-    return FileSystems.getDefault().getSeparator();
-  }
-  //
-  //  private void generateDummyContentForFile() {
-  //    try {
-  //      Files.write(depFilePath, "DSF".getBytes());
-  //    } catch (IOException e) {
-  //      log.error(e.getLocalizedMessage());
-  //    }
-  //  }
-  //
-  //  private List<Path> workspaceFoldersAsPathList() {
-  //    return getWorkspaceFolders().stream()
-  //        .map(this::getPathFromWorkspaceFolder)
-  //        .collect(Collectors.toList());
-  //  }
-  //
-  //  private Path getPathFromWorkspaceFolder(WorkspaceFolder it) {
-  //    try {
-  //      return Paths.get(new URI(it.getUri()));
-  //    } catch (URISyntaxException e) {
-  //      throw new IllegalArgumentException("Workspace URI not valid");
-  //    }
-  //  }
-  //
-  //  private String retrieveContentByPath(Path uriForFileName) {
-  //    String content = null;
-  //    try (Stream<String> stream = Files.lines(uriForFileName)) {
-  //      content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse(null);
-  //    } catch (IOException e) {
-  //      log.error(Arrays.toString(e.getStackTrace()));
-  //    }
-  //    return content;
-  //  }
 }
