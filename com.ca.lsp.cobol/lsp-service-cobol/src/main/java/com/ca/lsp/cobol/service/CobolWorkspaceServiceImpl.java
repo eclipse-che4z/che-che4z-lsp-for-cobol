@@ -16,45 +16,39 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.event.model.*;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
-import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.model.FetchedSettingsEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp4j.ConfigurationItem;
+import org.eclipse.lsp4j.ConfigurationParams;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
-import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Singleton
 public class CobolWorkspaceServiceImpl implements WorkspaceService {
-  private final DataBusBroker dataBus;
+  private final DefaultDataBusBroker dataBus;
   private Provider<LanguageClient> clientProvider;
 
   @Inject
-  public CobolWorkspaceServiceImpl(DataBusBroker dataBus, Provider<LanguageClient> clientProvider) {
+  public CobolWorkspaceServiceImpl(
+      DefaultDataBusBroker dataBus, Provider<LanguageClient> clientProvider) {
     this.dataBus = dataBus;
     this.clientProvider = clientProvider;
-    dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
+    dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT);
   }
 
-  /**
-   * This is a notification triggered automatically when the user modify configuration settings in
-   * the client
-   *
-   * @param params - LSPSpecification -> The actual changed settings; Actually -> null all the time.
-   */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
     /* section and scope has to be set to whatever we agree on for the dependencies graph */
@@ -97,14 +91,4 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     log.info("Cache invalidated due to a copybooks file watcher was triggered");
     dataBus.postData(new RunAnalysisEvent());
   }
-
-  // TODO: Should be removed due to a change of responsability for this class..
-  @Override
-  public String getContentByCopybookName(String copybookName) throws IOException {
-    return null;
-  }
-
-  // TODO: Should be removed due to a change of responsability for this class..
-  @Override
-  public void observerCallback(RequiredCopybookEvent adaptedDataEvent) {}
 }
