@@ -17,7 +17,6 @@ package com.ca.lsp.core.cobol.preprocessor.sub.cleaner.impl;
 
 import com.ca.lsp.core.cobol.parser.CobolCleanerBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolCleanerParser;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleanerListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
@@ -37,13 +36,10 @@ import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 public class CobolDocumentCommentingCleanerListener extends CobolCleanerBaseListener
     implements CobolDocumentCleanerListener {
   private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
-  private final CobolSourceFormat format;
   private final BufferedTokenStream tokens;
 
-  CobolDocumentCommentingCleanerListener(
-      final CobolSourceFormat format, final BufferedTokenStream tokens) {
+  CobolDocumentCommentingCleanerListener(final BufferedTokenStream tokens) {
     this.tokens = tokens;
-    this.format = format;
 
     contexts.push(new CobolDocumentContext());
   }
@@ -62,7 +58,7 @@ public class CobolDocumentCommentingCleanerListener extends CobolCleanerBaseList
 
   @Override
   public void exitExecCicsStatement(CobolCleanerParser.ExecCicsStatementContext ctx) {
-    preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_CICS_TAG, tokens, format);
+    preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_CICS_TAG, tokens);
   }
 
   @Override
@@ -72,7 +68,7 @@ public class CobolDocumentCommentingCleanerListener extends CobolCleanerBaseList
 
   @Override
   public void exitExecSqlStatement(CobolCleanerParser.ExecSqlStatementContext ctx) {
-    preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_SQL_TAG, tokens, format);
+    preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_SQL_TAG, tokens);
   }
 
   @Override
@@ -82,7 +78,7 @@ public class CobolDocumentCommentingCleanerListener extends CobolCleanerBaseList
 
   @Override
   public void exitExecSqlImsStatement(CobolCleanerParser.ExecSqlImsStatementContext ctx) {
-    preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_SQLIMS_TAG, tokens, format);
+    preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_SQLIMS_TAG, tokens);
   }
 
   @Override
@@ -92,7 +88,7 @@ public class CobolDocumentCommentingCleanerListener extends CobolCleanerBaseList
 
   @Override
   public void exitEjectStatement(CobolCleanerParser.EjectStatementContext ctx) {
-    preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens, format);
+    preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens);
   }
 
   @Override

@@ -15,19 +15,15 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
-import com.ca.lsp.core.cobol.preprocessor.ProcessingConstants;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import com.google.common.base.Strings;
 import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
 
-import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.TANDEM;
-
 /** The utility class for CobolLine operations, e.g. copy in different ways */
 @UtilityClass
 public class CobolLineUtils {
+
   /**
    * Copy a given CobolLine and put there the given content
    *
@@ -76,18 +72,6 @@ public class CobolLineUtils {
     return cobolLine;
   }
 
-  /**
-   * Create a blank sequence area depending on the given format, e.g. six white spaces for the fixed
-   * format {@link CobolSourceFormat#FIXED}
-   *
-   * @param format - format of the cobol line
-   * @return a String containing a blank sequence area of a given format
-   */
-  @Nonnull
-  public String createBlankSequenceArea(@Nonnull CobolSourceFormat format) {
-    return TANDEM.equals(format) ? "" : Strings.repeat(ProcessingConstants.WS, 6);
-  }
-
   @Nonnull
   private CobolLine copyCobolLine(@Nonnull CobolLine line) {
     CobolLine cobolLine = new CobolLine();
@@ -96,7 +80,6 @@ public class CobolLineUtils {
     cobolLine.setContentAreaA(line.getContentAreaA());
     cobolLine.setContentAreaB(line.getContentAreaB());
     cobolLine.setCommentArea(line.getCommentArea());
-    cobolLine.setFormat(line.getFormat());
     cobolLine.setNumber(line.getNumber());
     cobolLine.setType(line.getType());
     cobolLine.setPredecessor(line.getPredecessor());
