@@ -13,8 +13,6 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.cleaner;
 
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
-
 /**
  * This component is a part of preprocessor that eliminates the non-processable tokens from the
  * text.
@@ -25,8 +23,7 @@ public interface CobolDocumentCleaner {
    *
    * @param documentUri - the URI of the currently processing document
    * @param text - text to be cleaned
-   * @param format - format of the document
    * @return cleaned up text
    */
-  String cleanDocument(String documentUri, String text, CobolSourceFormat format);
+  String cleanDocument(String documentUri, String text);
 }

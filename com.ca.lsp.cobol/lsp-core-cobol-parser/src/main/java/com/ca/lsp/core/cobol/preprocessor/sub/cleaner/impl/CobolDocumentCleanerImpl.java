@@ -19,7 +19,6 @@ import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolCleanerLexer;
 import com.ca.lsp.core.cobol.parser.CobolCleanerParser;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleaner;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleanerListener;
 import org.antlr.v4.runtime.CharStreams;
@@ -48,12 +47,12 @@ public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
       };
 
   @Override
-  public String cleanDocument(String documentUri, String text, CobolSourceFormat format) {
+  public String cleanDocument(String documentUri, String text) {
     final boolean requiresProcessorExecution = containsTrigger(text, TRIGGERS);
     final String result;
 
     if (requiresProcessorExecution) {
-      result = cleanWithParser(documentUri, text, format);
+      result = cleanWithParser(documentUri, text);
     } else {
       result = text;
     }
@@ -77,8 +76,7 @@ public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
     return result;
   }
 
-  private String cleanWithParser(
-      final String documentUri, final String code, final CobolSourceFormat format) {
+  private String cleanWithParser(final String documentUri, final String code) {
     // run the lexer
     List<SyntaxError> errors = new ArrayList<>();
 
@@ -102,7 +100,7 @@ public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
     CobolCleanerParser.StartCleanContext startRule = parser.startClean();
     final ParseTreeWalker walker = new ParseTreeWalker();
 
-    final CobolDocumentCleanerListener listener = createCleanerListener(format, tokens);
+    final CobolDocumentCleanerListener listener = createCleanerListener(tokens);
 
     walker.walk(listener, startRule);
     // in this section the engine will apply a semantic logic to understand the level of grouping of
@@ -110,8 +108,7 @@ public class CobolDocumentCleanerImpl implements CobolDocumentCleaner {
     return listener.context().read();
   }
 
-  private CobolDocumentCleanerListener createCleanerListener(
-      final CobolSourceFormat format, final CommonTokenStream tokens) {
-    return new CobolDocumentCommentingCleanerListener(format, tokens);
+  private CobolDocumentCleanerListener createCleanerListener(final CommonTokenStream tokens) {
+    return new CobolDocumentCommentingCleanerListener(tokens);
   }
 }

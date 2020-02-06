@@ -19,7 +19,6 @@ package com.ca.lsp.cobol.service.delegates.validations;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import lombok.experimental.UtilityClass;
 import org.awaitility.Awaitility;
 import org.eclipse.lsp4j.Diagnostic;
@@ -143,8 +142,7 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(String text) {
-    return new CobolLanguageEngineFacade(new CobolLanguageEngine(CobolSourceFormat.FIXED))
-        .analyze(DOCUMENT_URI, text);
+    return new CobolLanguageEngineFacade(new CobolLanguageEngine()).analyze(DOCUMENT_URI, text);
   }
 
   /**
@@ -155,8 +153,7 @@ public class UseCaseUtils {
    * @return list of diagnostics with only severe errors
    */
   public static List<Diagnostic> analyzeForErrors(String text) {
-    LanguageEngineFacade engine =
-        new CobolLanguageEngineFacade(new CobolLanguageEngine(CobolSourceFormat.FIXED));
+    LanguageEngineFacade engine = new CobolLanguageEngineFacade(new CobolLanguageEngine());
     AnalysisResult result = engine.analyze(DOCUMENT_URI, text);
     return result.getDiagnostics().stream()
         .filter(it -> it.getSeverity().getValue() == 1)
