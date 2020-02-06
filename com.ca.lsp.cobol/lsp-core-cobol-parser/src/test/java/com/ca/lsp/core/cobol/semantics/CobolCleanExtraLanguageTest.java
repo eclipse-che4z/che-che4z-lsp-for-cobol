@@ -17,7 +17,6 @@ package com.ca.lsp.core.cobol.semantics;
 
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 
-import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
 import static org.junit.Assert.assertEquals;
 
 @Slf4j
@@ -153,7 +151,6 @@ public class CobolCleanExtraLanguageTest {
   private String linePrefix;
   private String tag;
   private String expectedText;
-  private CobolSourceFormat format = FIXED;
   private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
 
   public CobolCleanExtraLanguageTest(
@@ -177,7 +174,7 @@ public class CobolCleanExtraLanguageTest {
 
   @Test
   public void positiveErrorTest() {
-    CobolLanguageEngine engine = new CobolLanguageEngine(format);
+    CobolLanguageEngine engine = new CobolLanguageEngine();
     ResultWithErrors<SemanticContext> result = engine.run("1", TEXT_TO_TEST);
     assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }

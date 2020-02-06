@@ -13,16 +13,16 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.writer.impl;
 
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.NEWLINE;
+import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.CobolLineWriter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
-import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.CobolLineWriter;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.BLANK_SEQUENCE_AREA;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.NEWLINE;
 
 public class CobolLineWriterImpl implements CobolLineWriter {
 
@@ -39,7 +39,7 @@ public class CobolLineWriterImpl implements CobolLineWriter {
           sb.append(NEWLINE);
         }
         counter = 0;
-        sb.append(line.getBlankSequenceArea());
+        sb.append(BLANK_SEQUENCE_AREA);
         sb.append(line.getIndicatorArea());
         sb.append(line.getContentArea());
       }

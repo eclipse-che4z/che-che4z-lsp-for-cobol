@@ -28,7 +28,6 @@ import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import lombok.extern.slf4j.Slf4j;
@@ -52,19 +51,16 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
   private String documentUri;
   private transient CopybookDefinition copybookDefinition;
   private transient List<CopybookDefinition> copybookUsageTracker;
-  private final CobolSourceFormat format;
   private transient CompletableFuture<String> waitForResolving;
 
   public AnalyseCopybookTask(
       String documentUri,
       CopybookDefinition copybookDefinition,
-      List<CopybookDefinition> copybookUsageTracker,
-      CobolSourceFormat format) {
+      List<CopybookDefinition> copybookUsageTracker) {
     this.documentUri = documentUri;
     this.copybookDefinition = copybookDefinition;
     copyBookName = copybookDefinition.getName();
     this.copybookUsageTracker = copybookUsageTracker;
-    this.format = format;
     waitForResolving = new CompletableFuture<>();
   }
 
@@ -148,7 +144,6 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
             .process(
                 copybookDefinition.getUri(),
                 content,
-                format,
                 new SemanticContext(Collections.unmodifiableList(nextTrackerIteration)));
     return new ResultWithErrors<>(
         preprocessedInput.getResult().getSemanticContext(), preprocessedInput.getErrors());

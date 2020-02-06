@@ -19,11 +19,8 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_ENTRY_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils.copyCobolLineWithIndicatorAndContentArea;
-import static com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils.createBlankSequenceArea;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
@@ -36,7 +33,7 @@ public class CobolCommentEntriesMarkerImplTest {
   @Test
   public void testLineWithTriggerEscaped() {
     CobolLine line = new CobolLine();
-    line.setSequenceArea(createBlankSequenceArea(FIXED));
+    line.setSequenceArea(BLANK_SEQUENCE_AREA);
     line.setIndicatorArea(WS);
     line.setContentAreaB("AUTHOR. SE.");
 
@@ -50,7 +47,7 @@ public class CobolCommentEntriesMarkerImplTest {
   @Test
   public void testLineWithoutTriggersNotChanged() {
     CobolLine line = new CobolLine();
-    line.setSequenceArea(createBlankSequenceArea(FIXED));
+    line.setSequenceArea(BLANK_SEQUENCE_AREA);
     line.setIndicatorArea(WS);
     line.setContentAreaA("MOVE");
     line.setContentAreaB(" A TO B.");
@@ -62,12 +59,12 @@ public class CobolCommentEntriesMarkerImplTest {
   @Test
   public void testLineWithTriggerInPreviousLineNotEscaped() {
     CobolLine line1 = new CobolLine();
-    line1.setSequenceArea(createBlankSequenceArea(FIXED));
+    line1.setSequenceArea(BLANK_SEQUENCE_AREA);
     line1.setIndicatorArea(WS);
     line1.setContentAreaB("AUTHOR. SE.");
 
     CobolLine line2 = new CobolLine();
-    line2.setSequenceArea(createBlankSequenceArea(FIXED));
+    line2.setSequenceArea(BLANK_SEQUENCE_AREA);
     line2.setIndicatorArea(WS);
     line2.setContentAreaA("MOVE");
     line2.setContentAreaB(" A TO B.");

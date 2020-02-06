@@ -13,21 +13,16 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl;
 
-import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum.COMMENT;
-import static com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum.COMPILER_DIRECTIVE;
-import static com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum.CONTINUATION;
-import static com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum.NORMAL;
-import static com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum.DEBUG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
-import static org.junit.Assert.assertEquals;
-
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Test;
+
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_TAG;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
+import static com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum.*;
+import static org.junit.Assert.assertEquals;
 
 /** Testing that the cobol lines are formatted correctly before being used for token analysis */
 public class CobolLineIndicatorProcessorImplTest {
@@ -55,7 +50,6 @@ public class CobolLineIndicatorProcessorImplTest {
   public void normalLineTest() {
     CobolLine normalLine = new CobolLine();
     normalLine.setType(NORMAL);
-    normalLine.setFormat(FIXED);
     normalLine.setIndicatorArea(WS);
     normalLine.setContentAreaA("    ");
     normalLine.setContentAreaB("         RANDOM TEXT ,  ");
