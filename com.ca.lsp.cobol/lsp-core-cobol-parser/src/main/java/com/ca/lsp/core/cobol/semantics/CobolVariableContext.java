@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2019 Broadcom.
+ *  Copyright (c) 2020 Broadcom.
  *  The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  *  This program and the accompanying materials are made
@@ -25,8 +25,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
+/**
+ * This class represents a structure to store variables of a COBOL program and build a variable
+ * hierarchy.
+ */
 public class CobolVariableContext implements SubContext<Variable> {
   private static final int LEVEL_77 = 77;
   private static final int LEVEL_66 = 66;
@@ -73,19 +78,6 @@ public class CobolVariableContext implements SubContext<Variable> {
     buildVariableStructure(name, subContext);
   }
 
-  private void buildVariableStructure(String name, SubContext<Variable> subContext) {
-    int indexOfCopybook = variables.indexOf(new Variable("-1", name));
-    if (indexOfCopybook == -1) {
-      variables.addAll(subContext.getAll());
-    }
-    variables.addAll(indexOfCopybook + 1, subContext.getAll());
-    variables.remove(indexOfCopybook);
-    variableDefinitions.removeAll(name);
-    if (variables.contains(new Variable("-1", name))) {
-      buildVariableStructure(name, subContext);
-    }
-  }
-
   public Variable get(String name) {
     return variables.stream()
         .filter(
@@ -124,7 +116,7 @@ public class CobolVariableContext implements SubContext<Variable> {
                 variable ->
                     variable.getLevelNumber() != LEVEL_77 && variable.getLevelNumber() != LEVEL_66)
             .filter(variable -> variable.getLevelNumber() != -1)
-            .collect(Collectors.toList());
+            .collect(toList());
 
     for (int i = 0; i < variableList.size() - 1; i++) {
       generateRelations(variableList.get(i), variableList.get(i + 1));
@@ -132,17 +124,29 @@ public class CobolVariableContext implements SubContext<Variable> {
   }
 
   /**
+   * Remove all the copybook marks that were not resolved. Copybook mark is a variable with copybook
+   * name and level number '-1'. If copybook is missing, then this mark will stay here and should be
+   * deleted not to appear in the variable list.
+   */
+  public void removeUnresolvedCopybookMarks() {
+    List<Variable> unresolvedCopybooks =
+        variables.stream().filter(it -> it.getLevelNumber() == -1).collect(toList());
+    variables.removeAll(unresolvedCopybooks);
+    unresolvedCopybooks.forEach(it -> variableDefinitions.removeAll(it.getName()));
+  }
+
+  /**
    * This routine will identify the correct relation between two variable defined in the data
    * division section. There are 3 different cases verified by that routine: 1) The two variables
    * are on the same level 2) the second variable have a greater level than the first variable in
    * input (it means that. the second variable is children of the first) 3) the second variable have
-   * a lower level than the first variable in input (it means that first and second variable are not
-   * correlated and we need to navigate the structure back to identify the right parent variable)
+   * a lower level than the first variable in input (it means that first and second variable do not
+   * correlate, and we need to navigate the structure back to identify the right parent variable)
    *
    * @param v1 First variable
    * @param v2 Second variable
    */
-  public void generateRelations(Variable v1, Variable v2) {
+  void generateRelations(Variable v1, Variable v2) {
 
     // the second variable is a 01-level that cannot be child of other variables
     if (v2.getLevelNumber() == 1) {
@@ -171,7 +175,7 @@ public class CobolVariableContext implements SubContext<Variable> {
       v2.setParent(v1);
     } else {
       /*
-       * if the second variable have a lower value than the first variable it means that the two variables are not part of the same structure
+       * if the second variable have a lower value than the first variable it means that the two variables are not part of the same structure,
        * and we should navigate back in the structure in order to found the right parent of the second variable.
        * By the way, because the level [01] is on the most outer level, we should check that the parent of the first variable is not a 01-level variable.
        * In that case the two variables will have the same parent and will
@@ -188,11 +192,34 @@ public class CobolVariableContext implements SubContext<Variable> {
   private void setVariableAtSameLevel(Variable v1, Variable v2) {
     /*
      * If the second variable is a 01-level, it is part of a new structure, so the two variables
-     * will not share a common parent but they are on the same 01-level
+     * will not share a common parent, but they are on the same 01-level
      */
     v2.setParent(v1.getParent());
     if (v1.getParent() != null) {
       v1.getParent().getChildren().add(v2.getName());
+    }
+  }
+
+  /**
+   * Replace the copybook mark with a variable structure of this copybook. Copybook analyzer puts
+   * these marks into the context to show where the copybook variable structure should be built in
+   * respecting the main document structure.
+   *
+   * <p>Copybook mark is a variable with copybook name and level number '-1'.
+   *
+   * @param name - copybook name
+   * @param subContext - copybook context
+   */
+  private void buildVariableStructure(String name, SubContext<Variable> subContext) {
+    int indexOfCopybook = variables.indexOf(new Variable("-1", name));
+    if (indexOfCopybook == -1) {
+      variables.addAll(subContext.getAll());
+    }
+    variables.addAll(indexOfCopybook + 1, subContext.getAll());
+    variables.remove(indexOfCopybook);
+    variableDefinitions.removeAll(name);
+    if (variables.contains(new Variable("-1", name))) {
+      buildVariableStructure(name, subContext);
     }
   }
 }

@@ -44,7 +44,6 @@ import org.junit.runners.Suite.SuiteClasses;
   ParagraphCompletionTest.class,
   DocumentOccurrencesTest.class,
   DefinitionsAndUsagesTest.class,
-  TestResponsesNotContainLineBreaks.class,
   WorkspaceServiceTest.class,
   CompletionResolutionTest.class,
   FileSystemServiceTest.class,
