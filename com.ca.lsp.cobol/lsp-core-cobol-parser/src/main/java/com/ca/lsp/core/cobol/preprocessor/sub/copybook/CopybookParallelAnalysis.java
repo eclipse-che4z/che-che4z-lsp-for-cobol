@@ -20,7 +20,6 @@ import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.google.common.collect.Multimap;
 import lombok.AllArgsConstructor;
 
@@ -38,10 +37,9 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   public ResultWithErrors<List<CopybookSemanticContext>> analyzeCopybooks(
       String documentUri,
       Multimap<String, Position> copybooks,
-      List<CopybookDefinition> copybookUsageTracker,
-      CobolSourceFormat format) {
+      List<CopybookDefinition> copybookUsageTracker) {
     List<ResultWithErrors<CopybookSemanticContext>> contexts =
-        runAnalysisAsynchronously(documentUri, copybooks, copybookUsageTracker, format);
+        runAnalysisAsynchronously(documentUri, copybooks, copybookUsageTracker);
 
     List<SyntaxError> errors = createMissingCopybookErrors(copybooks, contexts);
 
@@ -53,9 +51,8 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   private List<ResultWithErrors<CopybookSemanticContext>> runAnalysisAsynchronously(
       String documentUri,
       Multimap<String, Position> copybooks,
-      List<CopybookDefinition> copybookUsageTracker,
-      CobolSourceFormat format) {
-    return ForkJoinTask.invokeAll(createTasks(documentUri, copybooks, copybookUsageTracker, format))
+      List<CopybookDefinition> copybookUsageTracker) {
+    return ForkJoinTask.invokeAll(createTasks(documentUri, copybooks, copybookUsageTracker))
         .stream()
         .map(ForkJoinTask::join)
         .collect(Collectors.toList());
@@ -106,16 +103,14 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   private List<ForkJoinTask<ResultWithErrors<CopybookSemanticContext>>> createTasks(
       String documentUri,
       Multimap<String, Position> names,
-      List<CopybookDefinition> copybookUsageTracker,
-      CobolSourceFormat format) {
+      List<CopybookDefinition> copybookUsageTracker) {
     return names.asMap().entrySet().stream()
         .map(
             it ->
                 new AnalyseCopybookTask(
                     documentUri,
                     new CopybookDefinition(it.getKey(), documentUri, it.getValue()),
-                    copybookUsageTracker,
-                    format))
+                    copybookUsageTracker))
         .collect(Collectors.toList());
   }
 }

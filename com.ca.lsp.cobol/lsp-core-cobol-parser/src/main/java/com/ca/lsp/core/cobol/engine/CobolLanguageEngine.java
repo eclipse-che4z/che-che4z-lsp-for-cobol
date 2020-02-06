@@ -20,12 +20,10 @@ import com.ca.lsp.core.cobol.parser.CobolLexer;
 import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategy;
 import com.ca.lsp.core.cobol.visitor.CobolVisitor;
-import com.google.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
@@ -38,19 +36,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CobolLanguageEngine {
 
-  private CobolSourceFormat sourceFormat;
-
-  @Inject
-  public CobolLanguageEngine(CobolSourceFormat sourceFormat) {
-    this.sourceFormat = sourceFormat;
-  }
-
   public ResultWithErrors<SemanticContext> run(String documentUri, String text) {
 
     CobolPreprocessorImpl preprocessor = new CobolPreprocessorImpl();
 
     ResultWithErrors<PreprocessedInput> preProcessedInput =
-        preprocessor.process(documentUri, text, sourceFormat);
+        preprocessor.process(documentUri, text);
 
     CobolLexer lexer =
         new CobolLexer(CharStreams.fromString(preProcessedInput.getResult().getInput()));
