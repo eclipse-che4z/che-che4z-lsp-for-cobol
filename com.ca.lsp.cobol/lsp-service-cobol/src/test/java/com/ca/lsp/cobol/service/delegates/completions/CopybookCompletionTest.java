@@ -33,6 +33,10 @@ import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.junit.Test;
 
+/**
+ * Testing Copybook autocomplete class, to determine if copybook names will be correctly detected
+ * and shown in the autocomplete list
+ */
 public class CopybookCompletionTest {
 
   private static final String TEXT =
@@ -79,7 +83,6 @@ public class CopybookCompletionTest {
         "BRDCMCP",
         Collections.singletonList(
             new Location(null, new Range(new Position(9, 11), new Position(9, 18)))));
-
 
     AnalysisResult result =
         new AnalysisResult(

@@ -23,6 +23,7 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import org.eclipse.lsp4j.CompletionItemKind;
 
+/** implementation for adding copybook names in the autocomplete list as identified by the parser */
 @Singleton
 public class CopybookCompletion implements Completion {
 
