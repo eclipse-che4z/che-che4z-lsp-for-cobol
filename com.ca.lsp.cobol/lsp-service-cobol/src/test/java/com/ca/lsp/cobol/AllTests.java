@@ -18,6 +18,7 @@ import com.ca.lsp.cobol.positive.PositiveTest;
 import com.ca.lsp.cobol.service.*;
 import com.ca.lsp.cobol.service.delegates.HighlightsTest;
 import com.ca.lsp.cobol.service.delegates.completions.CompletionsChainTest;
+import com.ca.lsp.cobol.service.delegates.completions.CopybookCompletionTest;
 import com.ca.lsp.cobol.service.delegates.completions.ParagraphCompletionTest;
 import com.ca.lsp.cobol.service.delegates.completions.SnippetCompletionTest;
 import com.ca.lsp.cobol.service.delegates.completions.VariableCompletionTest;
@@ -42,6 +43,7 @@ import org.junit.runners.Suite.SuiteClasses;
   CompletionsChainTest.class,
   SnippetCompletionTest.class,
   ParagraphCompletionTest.class,
+  CopybookCompletionTest.class,
   DocumentOccurrencesTest.class,
   DefinitionsAndUsagesTest.class,
   TestResponsesNotContainLineBreaks.class,
