@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -28,6 +28,7 @@ public enum RegistryId {
   GENERAL_REGISTRY_ID("general-registry"),
   SCANNER_REGISTRY_ID("scanner-registry"),
   FETCHER_REGISTRY_ID("fetcher-registry"),
-  CPY_REGISTRY_ID("cpy-registry");
+  CPY_REGISTRY_ID("cpy-registry"),
+  SETTINGS_REGISTRY_ID("settings-registry");
   @Getter private String id;
 }

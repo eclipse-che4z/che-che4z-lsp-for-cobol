@@ -47,13 +47,15 @@ import org.junit.runners.Suite.SuiteClasses;
   DocumentOccurrencesTest.class,
   DefinitionsAndUsagesTest.class,
   TestResponsesNotContainLineBreaks.class,
+  WorkspaceServiceTest.class,
   CompletionResolutionTest.class,
   FileSystemServiceTest.class,
   FileSystemE2ETest.class,
   HighlightsTest.class,
   MultiDocumentDefinitionTest.class,
   LangServerBootstrapTest.class,
+  DocumentExtensionTests.class,
   MyLanguageServerImplTest.class,
-  DocumentExtensionTests.class
+  DidChangeConfigurationTest.class,
 })
 public class AllTests {}
