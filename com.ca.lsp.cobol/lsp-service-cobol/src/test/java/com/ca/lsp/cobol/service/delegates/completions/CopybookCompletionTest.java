@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -9,21 +9,36 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ *    Broadcom, Inc. - initial API and implementation
  */
+
 package com.ca.lsp.cobol.service.delegates.completions;
+
+import static org.junit.Assert.*;
 
 import com.ca.lsp.cobol.service.MyDocumentModel;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp4j.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.CompletionItemKind;
+import org.eclipse.lsp4j.CompletionParams;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.junit.Test;
 
-import java.util.*;
+/**
+ * Testing Copybook autocomplete class, to determine if copybook names will be correctly detected
+ * and shown in the autocomplete list
+ */
+public class CopybookCompletionTest {
 
-import static org.junit.Assert.assertEquals;
-
-/** Test to check VariableCompletion */
-public class VariableCompletionTest {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. ID1.\n"
@@ -35,6 +50,7 @@ public class VariableCompletionTest {
           + "       01 TBPARM2      PIC 99 VALUE 0.\n"
           + "       01 ATCDEM4      PIC X(7) VALUE 'ATCDEM4'.\n"
           + "       01 P1PARM1      PIC 99 VALUE 0.\n"
+          + "       COPY BRDCMCP.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       PROGB.\n"
           + "           PERFORM WITH TEST BEFORE UNTIL TBPARM1 = 0\n"
@@ -44,17 +60,17 @@ public class VariableCompletionTest {
           + "       END PROGRAM ID1.";
 
   @Test
-  public void testVariableCompletion() {
+  public void testCopybookCompletion() {
     MyDocumentModel document = createModel();
     Set<Completion> completionSet = new HashSet<>();
-    completionSet.add(new VariableCompletion());
+    completionSet.add(new CopybookCompletion());
     Completions completions = new Completions(completionSet);
     List<CompletionItem> completionItems =
         completions.collectFor(document, createCompletionParams()).getItems();
 
-    assertEquals(2, completionItems.size());
-    assertEquals("TBPARM1", completionItems.get(0).getLabel());
-    assertEquals(CompletionItemKind.Variable, completionItems.get(0).getKind());
+    assertEquals(1, completionItems.size());
+    assertEquals("BRDCMCP", completionItems.get(0).getLabel());
+    assertEquals(CompletionItemKind.Class, completionItems.get(0).getKind());
   }
 
   private CompletionParams createCompletionParams() {
@@ -62,32 +78,20 @@ public class VariableCompletionTest {
   }
 
   private MyDocumentModel createModel() {
-    Map<String, List<Location>> variableDefinitions = new HashMap<>();
-    variableDefinitions.put(
-        "TBPARM1",
+    Map<String, List<Location>> copybookDefinitions = new HashMap<>();
+    copybookDefinitions.put(
+        "BRDCMCP",
         Collections.singletonList(
-            new Location(null, new Range(new Position(5, 9), new Position(5, 16)))));
-    variableDefinitions.put(
-        "TBPARM2",
-        Collections.singletonList(
-            new Location(null, new Range(new Position(6, 9), new Position(6, 16)))));
-    variableDefinitions.put(
-        "ATCDEM4",
-        Collections.singletonList(
-            new Location(null, new Range(new Position(7, 9), new Position(7, 16)))));
-    variableDefinitions.put(
-        "P1PARM1",
-        Collections.singletonList(
-            new Location(null, new Range(new Position(8, 9), new Position(8, 16)))));
+            new Location(null, new Range(new Position(9, 11), new Position(9, 18)))));
 
     AnalysisResult result =
         new AnalysisResult(
             Collections.emptyList(),
-            variableDefinitions,
             Collections.emptyMap(),
             Collections.emptyMap(),
             Collections.emptyMap(),
-            Collections.emptyMap());
+            Collections.emptyMap(),
+            copybookDefinitions);
 
     return new MyDocumentModel(TEXT, result);
   }
