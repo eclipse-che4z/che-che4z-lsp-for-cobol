@@ -143,8 +143,9 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
+    //A better implementation that will cover the gitfs scenario will be implementated later based on issue #173
     if (uri.startsWith(GIT_FS_URI)) {
-      // communications.notifyThatExtensionIsUnsupported("git filesystem");
+      communications.notifyThatExtensionIsUnsupported("gitfs");
     }
 
     String text = params.getTextDocument().getText();
