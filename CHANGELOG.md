@@ -7,7 +7,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 - Remove unused COBOL dialect support [#169](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/169) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - Make document extension check case-insensitive [#167](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/167) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - Remove copybook name from the variable list if copybook is missing [#190](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/190) Thanks @[temanbrcom](https://github.com/temanbrcom)
-- Introduction of autocomplete for copybooks [#189](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/189) Thanks @[abdrabrcom](https://github.com/abdrabrcom)
+- Introduce autocomplete for copybooks [#189](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/189) Thanks @[abdrabrcom](https://github.com/abdrabrcom)
 - Remove unused COBOL format support [#188](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/188) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - Enable config file synchronization between the client and server [#185](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/185) Thanks @[sergiuilie](https://github.com/sergiuilie)
 - Update `extension.ts` with correct language ID [#176](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/176) Thanks @[sergiuilie](https://github.com/sergiuilie)
