@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -33,8 +33,10 @@ import org.junit.runners.Suite.SuiteClasses;
   TestVariablesAreCaseInsensitive.class,
   TestRemarksSectionIsUnsupported.class,
   TestMissingCopybooksReturnsError.class,
+  TestResponsesNotContainLineBreaks.class,
   TestCorrectErrorUnderscorePosition.class,
   TestSameCopybooksWIthDifferentCases.class,
+  TestMissingCopybookNotInVariableList.class,
   TestExtraSymbolsNotCauseErrorOnNextLine.class,
   TestVariableStructureIsBuiltWithCopybooks.class,
   TestCopybookWithRecursiveDependencyIsDetected.class,

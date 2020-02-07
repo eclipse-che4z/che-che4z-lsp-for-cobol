@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -34,12 +34,13 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Preprocessor which retrieves semantic elements definitions, such as variables, paragraphs and
- * copybooks, and also applies semantic analysis for the copybooks' content
+ * copybooks, and applies semantic analysis for the copybooks' content
  */
 @AllArgsConstructor
 public class CobolSemanticParserImpl implements CobolSemanticParser {
@@ -67,28 +68,36 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     // analyze contained copy books
     ResultWithErrors<List<CopybookSemanticContext>> contexts =
         processCopybooks(uri, semanticContext);
-    contexts.getResult().forEach(semanticContext::merge);
+
+    buildCompleteVariableStructure(semanticContext, contexts);
 
     List<SyntaxError> errors = new ArrayList<>(contexts.getErrors());
-
     errors.addAll(listener.getErrors());
 
-    semanticContext.getVariables().createRelationBetweenVariables();
     return new ResultWithErrors<>(
         new PreprocessedInput(listener.context().read(), semanticContext), errors);
   }
 
+  @Nonnull
   private ResultWithErrors<List<CopybookSemanticContext>> processCopybooks(
-      String documentUri, @Nonnull SemanticContext semanticContext) {
+      @Nonnull String documentUri, @Nonnull SemanticContext semanticContext) {
     Multimap<String, Position> copybookNames = semanticContext.getCopybooks().getDefinitions();
 
     if (copybookNames.isEmpty()) {
-      return new ResultWithErrors<>(Collections.emptyList(), Collections.emptyList());
+      return new ResultWithErrors<>(emptyList(), emptyList());
     }
 
     CopybookAnalysis copybookAnalyzer = createCopybookAnalyzer();
     return copybookAnalyzer.analyzeCopybooks(
         documentUri, copybookNames, semanticContext.getCopybookUsageTracker());
+  }
+
+  private void buildCompleteVariableStructure(
+      @Nonnull SemanticContext semanticContext,
+      @Nonnull ResultWithErrors<List<CopybookSemanticContext>> contexts) {
+    contexts.getResult().forEach(semanticContext::merge);
+    semanticContext.getVariables().removeUnresolvedCopybookMarks();
+    semanticContext.getVariables().createRelationBetweenVariables();
   }
 
   @Nonnull
