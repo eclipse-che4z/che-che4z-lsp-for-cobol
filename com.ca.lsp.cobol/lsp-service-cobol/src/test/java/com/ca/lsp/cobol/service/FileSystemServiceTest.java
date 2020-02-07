@@ -20,6 +20,8 @@ import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -27,16 +29,18 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @Slf4j
 public class FileSystemServiceTest extends FileSystemConfiguration
@@ -47,12 +51,18 @@ public class FileSystemServiceTest extends FileSystemConfiguration
       (FileSystemServiceImpl) LangServerCtx.getInjector().getInstance(FileSystemService.class);
 
   // Activities performed
-  // 1 - Create folder structure in temp folder - Create two copybooks in the provided structure
+  // 1 - Create folder structure in temp folder - Create two copybooks in the provided
+  // structprivaure
   // 2 - Create two copybooks in the provided structure
   // 3 - Initialize the workspaceFolder to reproduce what client does when a new workspace is opened
   //     on the IDE
   // 4 - Initialize the list of workspaces (workspace roots) that WorkspaceManager should have to
   //     apply search operations
+
+  @AllArgsConstructor
+  private class SettingsObject {
+    @Getter private List<String> datasetList;
+  }
 
   @Before
   public void initActivities() {
@@ -64,7 +74,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   @After
   public void cleanupTempFolder() {
     try {
-      Files.walk(Paths.get(getWorkspaceFolderPath()))
+      Files.walk(getWorkspaceFolderPath())
           .sorted(Comparator.reverseOrder())
           .map(Path::toFile)
           .forEach(File::delete);
@@ -142,6 +152,19 @@ public class FileSystemServiceTest extends FileSystemConfiguration
     assertEquals(numberOfElements, getNumberOfElementsFromDepFile(depFileReference));
   }
 
+  @Test
+  public void getSettingsModel() {
+    SettingsObject settingsObject = new SettingsObject(Arrays.asList("ZACAN01.DS1", "ZACAN.DS2"));
+    assertEquals(2, settingsObject.getDatasetList().size());
+  }
+
+  /**
+   * This test verify that the search in the copybook folder is applied searching only in the
+   * dataset name folder provided by the setting
+   */
+  @Test
+  public void searchInCopybookStructureWithDatasetNameFolders() {}
+
   private int getNumberOfElementsFromDepFile(Path depFileReference) {
     List<String> depFileReferenceElementList;
 
@@ -167,12 +190,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   }
 
   private Path getDependencyFolder() {
-    try {
-      return Paths.get(new URI(getWorkspaceFolderPath() + ".cobdeps"));
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
-      return null;
-    }
+    return Paths.get(getWorkspaceFolderPath() + filesystemSeparator() + ".cobdeps");
   }
 
   @Override

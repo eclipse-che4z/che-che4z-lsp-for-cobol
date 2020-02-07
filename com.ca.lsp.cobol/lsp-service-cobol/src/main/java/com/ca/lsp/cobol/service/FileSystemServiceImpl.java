@@ -44,7 +44,7 @@ import java.util.stream.Stream;
 @Slf4j
 public class FileSystemServiceImpl implements FileSystemService {
   private static final String COBDEPS = ".cobdeps";
-  private static final String COPYBOOK_FOLDER_NAME = "COPYBOOKS";
+  private static final String COPYBOOK_FOLDER_NAME = ".copybooks";
   public static final String DEP_EXTENSION = ".dep";
   private final DataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
@@ -113,11 +113,7 @@ public class FileSystemServiceImpl implements FileSystemService {
    */
   @NonNull
   private Path getPathFromWorkspaceFolder(WorkspaceFolder it) {
-    try {
-      return Paths.get(new URI(it.getUri()));
-    } catch (URISyntaxException e) {
-      throw new IllegalArgumentException("Workspace URI not valid");
-    }
+    return Paths.get(it.getUri());
   }
 
   /**
@@ -293,26 +289,18 @@ public class FileSystemServiceImpl implements FileSystemService {
    */
   private Path initializeDependencyFolder() {
     Path folderPath = null;
-    try {
-      folderPath =
-          Paths.get(
-              Paths.get(new URI(getWorkspaceFolders().get(0).getUri()))
-                  + filesystemSeparator()
-                  + COBDEPS
-                  + filesystemSeparator());
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
-    }
+    folderPath =
+        Paths.get(
+            Paths.get(getWorkspaceFolders().get(0).getUri())
+                + filesystemSeparator()
+                + COBDEPS
+                + filesystemSeparator());
 
-    if (folderPath != null) {
-      try {
-        return Files.createDirectory(folderPath);
-      } catch (IOException e) {
-        // folder already exists, return the path
-        return folderPath;
-      }
-    } else {
-      return null;
+    try {
+      return Files.createDirectory(folderPath);
+    } catch (IOException e) {
+      // folder already exists, return the path
+      return folderPath;
     }
   }
 }

@@ -59,7 +59,7 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
   @After
   public void cleanupTempFolder() {
     try {
-      Files.walk(Paths.get(getWorkspaceFolderPath()))
+      Files.walk(getWorkspaceFolderPath())
           .sorted(Comparator.reverseOrder())
           .map(Path::toFile)
           .forEach(File::delete);
@@ -101,7 +101,7 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
   private boolean depFileExists() {
     return Files.exists(
         Paths.get(
-            workspacePath
+            getWorkspaceFolderPath()
                 + filesystemSeparator()
                 + ".cobdeps"
                 + filesystemSeparator()
