@@ -14,20 +14,12 @@
 package com.ca.lsp.core.cobol.engine;
 
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.*;
 import static org.junit.Assert.assertEquals;
 
 /** JUnit Test checks with Cobol engine for both positive and negative tests with 3 formats */
-@RunWith(Parameterized.class)
 public class CobolLanguageEngineTest {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
 
@@ -58,28 +50,17 @@ public class CobolLanguageEngineTest {
           + "            END-PERFORM.\r\n"
           + "\r\n"
           + "            STOP RUN.";
-  private CobolSourceFormat format;
-
-  public CobolLanguageEngineTest(CobolSourceFormat format) {
-    super();
-    this.format = format;
-  }
-
-  @Parameterized.Parameters
-  public static Collection<Object> textsToTest() {
-    return Arrays.asList(FIXED, TANDEM, VARIABLE);
-  }
 
   @Test
   public void doCheckNegative() {
-    CobolLanguageEngine engine = new CobolLanguageEngine(format);
+    CobolLanguageEngine engine = new CobolLanguageEngine();
     ResultWithErrors<SemanticContext> result = engine.run(DOCUMENT_URI, NEGATIVE_TEXT);
     assertEquals(11, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 
   @Test
   public void doCheckPositive() {
-    CobolLanguageEngine engine = new CobolLanguageEngine(format);
+    CobolLanguageEngine engine = new CobolLanguageEngine();
     ResultWithErrors<SemanticContext> result = engine.run(DOCUMENT_URI, POSITIVE_TEXT);
     assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }

@@ -55,7 +55,7 @@ public class WorkspaceServiceTest {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     ArgumentCaptor<RunAnalysisEvent> captor = ArgumentCaptor.forClass(RunAnalysisEvent.class);
 
-    CobolWorkspaceServiceImpl service = new CobolWorkspaceServiceImpl(broker);
+    CobolWorkspaceServiceImpl service = new CobolWorkspaceServiceImpl(broker, null);
 
     DidChangeWatchedFilesParams params =
         new DidChangeWatchedFilesParams(Collections.singletonList(event));

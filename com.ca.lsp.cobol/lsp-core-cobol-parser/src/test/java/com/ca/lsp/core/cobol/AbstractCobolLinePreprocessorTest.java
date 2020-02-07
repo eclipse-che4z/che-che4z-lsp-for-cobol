@@ -19,13 +19,11 @@ import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderIm
 
 import java.util.List;
 
-import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
-
 public abstract class AbstractCobolLinePreprocessorTest {
 
   protected ResultWithErrors<List<CobolLine>> processText(String text) {
     CobolLineReaderImpl reader = new CobolLineReaderImpl();
-    return reader.processLines(null, text, FIXED);
+    return reader.processLines(null, text);
   }
 
   protected String reduceLines(List<String> lines) {

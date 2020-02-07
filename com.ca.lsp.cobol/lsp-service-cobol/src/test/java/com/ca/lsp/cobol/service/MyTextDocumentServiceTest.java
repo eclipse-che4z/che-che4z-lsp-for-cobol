@@ -14,6 +14,7 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
@@ -147,7 +148,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   public void observerCallback() {
     Communications communications = mock(Communications.class);
     LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
-    DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
+    DataBusBroker broker = mock(DataBusBroker.class);
 
     List<Diagnostic> diagnosticsNoErrors = Collections.emptyList();
     List<Diagnostic> diagnosticsWithErrors = createDefaultDiagnostics();
@@ -189,7 +190,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   private MyTextDocumentService verifyServiceStart(
-      Communications communications, LanguageEngineFacade engine, DefaultDataBusBroker broker) {
+      Communications communications, LanguageEngineFacade engine, DataBusBroker broker) {
     MyTextDocumentService service =
         new MyTextDocumentService(communications, engine, null, null, null, broker);
 
