@@ -60,7 +60,7 @@ public class CopybookCompletionTest {
           + "       END PROGRAM ID1.";
 
   @Test
-  public void testVariableCompletion() {
+  public void testCopybookCompletion() {
     MyDocumentModel document = createModel();
     Set<Completion> completionSet = new HashSet<>();
     completionSet.add(new CopybookCompletion());
