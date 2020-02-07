@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -15,10 +15,13 @@ package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter;
 
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 
-/**
- * Preprocessor, which normalizes inline comment entries.
- */
-public interface CobolInlineCommentEntriesNormalizer extends CobolLineRewriter {
+import java.util.List;
 
-	CobolLine processLine(CobolLine line);
+/**
+ * The implementations of this interface should receive a list of lines and apply some changes on
+ * each line. It should not change order of the lines, add or remove them.
+ */
+public interface CobolLineReWriter {
+
+  List<CobolLine> processLines(List<CobolLine> lines);
 }
