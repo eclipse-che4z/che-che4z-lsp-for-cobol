@@ -21,7 +21,6 @@ import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookAnalysis;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookParallelAnalysis;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
@@ -48,10 +47,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   @Nonnull
   @Override
   public ResultWithErrors<PreprocessedInput> processLines(
-      @Nonnull String uri,
-      @Nonnull String code,
-      @Nonnull SemanticContext semanticContext,
-      @Nonnull CobolSourceFormat format) {
+      @Nonnull String uri, @Nonnull String code, @Nonnull SemanticContext semanticContext) {
     // run the lexer
     final CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     // get a list of matched tokens
@@ -65,12 +61,12 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
     final ParseTreeWalker walker = new ParseTreeWalker();
     final CobolSemanticParserListener listener =
-        createDocumentParserListener(uri, tokens, semanticContext, format);
+        createDocumentParserListener(uri, tokens, semanticContext);
     walker.walk(listener, startRule);
 
     // analyze contained copy books
     ResultWithErrors<List<CopybookSemanticContext>> contexts =
-        processCopybooks(uri, semanticContext, format);
+        processCopybooks(uri, semanticContext);
     contexts.getResult().forEach(semanticContext::merge);
 
     List<SyntaxError> errors = new ArrayList<>(contexts.getErrors());
@@ -83,7 +79,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   }
 
   private ResultWithErrors<List<CopybookSemanticContext>> processCopybooks(
-      String documentUri, @Nonnull SemanticContext semanticContext, CobolSourceFormat format) {
+      String documentUri, @Nonnull SemanticContext semanticContext) {
     Multimap<String, Position> copybookNames = semanticContext.getCopybooks().getDefinitions();
 
     if (copybookNames.isEmpty()) {
@@ -92,16 +88,15 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
     CopybookAnalysis copybookAnalyzer = createCopybookAnalyzer();
     return copybookAnalyzer.analyzeCopybooks(
-        documentUri, copybookNames, semanticContext.getCopybookUsageTracker(), format);
+        documentUri, copybookNames, semanticContext.getCopybookUsageTracker());
   }
 
   @Nonnull
   private CobolSemanticParserListener createDocumentParserListener(
       @Nonnull String uri,
       @Nonnull CommonTokenStream tokens,
-      @Nonnull SemanticContext semanticContext,
-      @Nonnull CobolSourceFormat format) {
-    return new CobolSemanticParserListenerImpl(uri, tokens, semanticContext, format);
+      @Nonnull SemanticContext semanticContext) {
+    return new CobolSemanticParserListenerImpl(uri, tokens, semanticContext);
   }
 
   @Nonnull

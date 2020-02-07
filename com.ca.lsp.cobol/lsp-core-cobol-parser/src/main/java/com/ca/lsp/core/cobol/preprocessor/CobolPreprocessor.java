@@ -19,9 +19,8 @@ import com.ca.lsp.core.cobol.semantics.SemanticContext;
 
 public interface CobolPreprocessor {
 
-  ResultWithErrors<PreprocessedInput> process(
-      String documentUri, String cobolCode, CobolSourceFormat format);
+  ResultWithErrors<PreprocessedInput> process(String documentUri, String cobolCode);
 
   ResultWithErrors<PreprocessedInput> process(
-      String documentUri, String cobolCode, CobolSourceFormat format, SemanticContext semanticContext);
+      String documentUri, String cobolCode, SemanticContext semanticContext);
 }

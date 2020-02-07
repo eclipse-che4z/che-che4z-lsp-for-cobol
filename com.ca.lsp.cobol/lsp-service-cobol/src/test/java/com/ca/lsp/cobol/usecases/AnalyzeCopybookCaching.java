@@ -36,7 +36,6 @@ import org.junit.Test;
 
 import java.util.Collections;
 
-import static com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat.FIXED;
 import static junit.framework.TestCase.assertTrue;
 
 /**
@@ -128,8 +127,7 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
         new AnalyseCopybookTask(
             null,
             new CopybookDefinition(COPYBOOK_NAME, null, null),
-            Collections.emptyList(),
-            FIXED);
+            Collections.emptyList());
     analyseCopybookTask.compute();
   }
 }

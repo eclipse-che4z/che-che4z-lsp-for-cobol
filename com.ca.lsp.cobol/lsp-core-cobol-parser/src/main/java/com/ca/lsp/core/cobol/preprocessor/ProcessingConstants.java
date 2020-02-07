@@ -12,12 +12,12 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 package com.ca.lsp.core.cobol.preprocessor;
-/**
- * The constants in this class are used while the processing of Cobol code lines.
- */
-public final class ProcessingConstants {
-  private ProcessingConstants() {}
 
+import lombok.experimental.UtilityClass;
+
+/** The constants in this class are used while the processing of COBOL code lines. */
+@UtilityClass
+public final class ProcessingConstants {
   public static final String CHAR_ASTERISK = "*";
   public static final String CHAR_D_UPPER = "D";
   public static final String CHAR_D_LOWER = "d";
@@ -35,4 +35,5 @@ public final class ProcessingConstants {
   public static final String NEWLINE = "\r\n";
   public static final String WS = " ";
   public static final String CONT_LINE_NO_AREA_A_REGEX = "^(.{6})([-]{1})( ){4}(.*)";
+  public static final String BLANK_SEQUENCE_AREA = "      ";
 }

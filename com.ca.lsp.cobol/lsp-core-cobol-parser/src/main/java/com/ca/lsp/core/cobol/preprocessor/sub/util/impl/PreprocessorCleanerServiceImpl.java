@@ -13,9 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import org.antlr.v4.runtime.BufferedTokenStream;
@@ -38,7 +36,7 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
   }
 
   public void excludeStatementFromText(
-      ParserRuleContext ctx, String tag, BufferedTokenStream tokens, CobolSourceFormat format) {
+      ParserRuleContext ctx, String tag, BufferedTokenStream tokens) {
     pop();
     push();
 
@@ -46,7 +44,7 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
     context().write(textLeft);
 
     final String text = TokenUtils.getTextIncludingHiddenTokens(ctx, tokens).toUpperCase();
-    final String linePrefix = CobolLineUtils.createBlankSequenceArea(format) + tag;
+    final String linePrefix = BLANK_SEQUENCE_AREA + tag;
     specificTypeExclusion(tag, text, linePrefix);
     final String content = context().read();
     pop();

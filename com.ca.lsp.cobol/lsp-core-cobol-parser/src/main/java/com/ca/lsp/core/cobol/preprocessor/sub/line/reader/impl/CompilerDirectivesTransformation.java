@@ -20,6 +20,9 @@ import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReaderDelegat
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.BLANK_SEQUENCE_AREA;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
+
 public class CompilerDirectivesTransformation implements CobolLineReaderDelegate {
   private static final Pattern COMPILER_DIRECTIVE_LINE =
       Pattern.compile("(?i)(.{0,6} +|\\s*)(CBL|PROCESS) .+");
@@ -43,7 +46,7 @@ public class CompilerDirectivesTransformation implements CobolLineReaderDelegate
 
   private String moveContentFromCommentArea(String line) {
     int index = getLineContentStart(line);
-    return "       " + line.substring(index);
+    return BLANK_SEQUENCE_AREA + WS + line.substring(index);
   }
 
   private int getLineContentStart(String line) {

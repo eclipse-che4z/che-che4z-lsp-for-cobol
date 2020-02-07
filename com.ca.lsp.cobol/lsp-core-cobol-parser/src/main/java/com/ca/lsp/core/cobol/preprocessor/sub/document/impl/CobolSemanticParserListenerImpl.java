@@ -20,7 +20,6 @@ import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.CopySourceContext;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
@@ -53,17 +52,14 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   private final String documentUri;
   private final BufferedTokenStream tokens;
-  private final CobolSourceFormat format;
   private final SemanticContext semanticContext;
 
   CobolSemanticParserListenerImpl(
       final String documentUri,
       final BufferedTokenStream tokens,
-      final SemanticContext semanticContext,
-      final CobolSourceFormat format) {
+      final SemanticContext semanticContext) {
     this.documentUri = documentUri;
     this.tokens = tokens;
-    this.format = format;
     this.semanticContext = semanticContext;
 
     contexts.push(new CobolDocumentContext());
@@ -189,7 +185,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     String copybookName = retrieveCopybookName(copySource);
     Position position = retrievePosition(copySource);
     defineCopybook(copybookName, position);
-    this.preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens, format);
+    this.preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens);
   }
 
   private void defineCopybook(String copybookName, Position position) {
