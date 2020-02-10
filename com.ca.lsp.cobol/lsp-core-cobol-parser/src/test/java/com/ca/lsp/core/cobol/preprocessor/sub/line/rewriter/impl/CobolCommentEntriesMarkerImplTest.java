@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -14,7 +14,7 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl;
 
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineRewriter;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineReWriter;
 import org.junit.Test;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class CobolCommentEntriesMarkerImplTest {
     CobolLine expected =
         copyCobolLineWithIndicatorAndContentArea(WS, "AUTHOR. " + COMMENT_ENTRY_TAG + " SE.", line);
 
-    CobolLineRewriter marker = new CobolCommentEntriesMarkerImpl();
+    CobolLineReWriter marker = new CobolCommentEntriesMarkerImpl();
     assertEquals(expected, marker.processLines(singletonList(line)).get(0));
   }
 
@@ -52,7 +52,7 @@ public class CobolCommentEntriesMarkerImplTest {
     line.setContentAreaA("MOVE");
     line.setContentAreaB(" A TO B.");
 
-    CobolLineRewriter marker = new CobolCommentEntriesMarkerImpl();
+    CobolLineReWriter marker = new CobolCommentEntriesMarkerImpl();
     assertEquals(line, marker.processLines(singletonList(line)).get(0));
   }
 
@@ -74,7 +74,7 @@ public class CobolCommentEntriesMarkerImplTest {
         copyCobolLineWithIndicatorAndContentArea(
             WS, "AUTHOR. " + COMMENT_ENTRY_TAG + " SE.", line1);
 
-    CobolLineRewriter marker = new CobolCommentEntriesMarkerImpl();
+    CobolLineReWriter marker = new CobolCommentEntriesMarkerImpl();
     List<CobolLine> processedLines = marker.processLines(asList(line1, line2));
     assertEquals(expected, processedLines.get(0));
     assertEquals(line2, processedLines.get(1));
