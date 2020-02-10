@@ -18,7 +18,7 @@ package com.ca.lsp.cobol.usecases;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
+import com.ca.lsp.cobol.service.mocks.MockFileSystemService;
 import org.eclipse.lsp4j.Location;
 import org.junit.Test;
 
@@ -43,9 +43,9 @@ public class TestMissingCopybookNotInVariableList extends ConfigurableTest {
 
   public TestMissingCopybookNotInVariableList() {
 
-    MockWorkspaceService workspaceService =
-        LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
-    workspaceService.setCopybooks(Collections::emptyList);
+    MockFileSystemService mockFileSystemService =
+        LangServerCtx.getInjector().getInstance(MockFileSystemService.class);
+    mockFileSystemService.setCopybooks(Collections::emptyList);
   }
 
   /**
