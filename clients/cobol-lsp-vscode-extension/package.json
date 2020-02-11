@@ -18,13 +18,7 @@
         "url": "https://github.com/eclipse/che-che4z-lsp-for-cobol/issues"
     },
     "keywords": [
-        "mainframe",
-        "lsp",
-        "cobol",
-        "z/os",
-        "zos",
-        "language-server",
-        "jcl"
+        "mainframe", "lsp", "cobol", "z/os", "zos", "language-server", "jcl"
     ],
     "categories": [
         "Programming Languages"

@@ -153,9 +153,9 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     List<Diagnostic> diagnosticsNoErrors = Collections.emptyList();
     List<Diagnostic> diagnosticsWithErrors = createDefaultDiagnostics();
 
-    AnalysisResult resultNoErrors = new AnalysisResult(diagnosticsNoErrors, null, null, null, null);
+    AnalysisResult resultNoErrors = new AnalysisResult(diagnosticsNoErrors, null, null, null, null,null);
     AnalysisResult resultWithErrors =
-        new AnalysisResult(diagnosticsWithErrors, null, null, null, null);
+        new AnalysisResult(diagnosticsWithErrors, null, null, null, null,null);
 
     when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE)).thenReturn(resultNoErrors);
     when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE))
