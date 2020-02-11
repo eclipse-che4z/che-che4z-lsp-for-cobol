@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -24,9 +24,8 @@ import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolInlineCommentEntriesNormalizer;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineIndicatorProcessor;
-import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineRewriter;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineReWriter;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolCommentEntriesMarkerImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolInlineCommentEntriesNormalizerImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolLineIndicatorProcessorImpl;
@@ -98,7 +97,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   }
 
   /**
-   * Normalizes lines of given COBOL source code, so that comment entries can be parsed and lines
+   * Normalize lines of given COBOL source code, so that comment entries can be parsed and lines
    * have a unified line format.
    */
   private List<CobolLine> rewriteLines(final List<CobolLine> lines) {
@@ -109,7 +108,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     return createCommentEntriesMarker().processLines(normalizedInlineCommentEntriesLines);
   }
 
-  private CobolLineRewriter createCommentEntriesMarker() {
+  private CobolLineReWriter createCommentEntriesMarker() {
     return new CobolCommentEntriesMarkerImpl();
   }
 
@@ -121,7 +120,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     return new CobolDocumentCleanerImpl();
   }
 
-  private CobolInlineCommentEntriesNormalizer createInlineCommentEntriesNormalizer() {
+  private CobolLineReWriter createInlineCommentEntriesNormalizer() {
     return new CobolInlineCommentEntriesNormalizerImpl();
   }
 

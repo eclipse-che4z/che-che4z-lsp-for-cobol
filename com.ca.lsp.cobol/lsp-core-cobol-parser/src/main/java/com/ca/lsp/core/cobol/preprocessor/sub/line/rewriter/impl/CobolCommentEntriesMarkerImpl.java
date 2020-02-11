@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -14,7 +14,7 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl;
 
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineRewriter;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineReWriter;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -33,7 +33,7 @@ import static java.util.regex.Pattern.compile;
  * Preprocessor, which escapes the comment entries, i.e. strings that should not be processed by the
  * parser, e.g. author name.
  */
-public class CobolCommentEntriesMarkerImpl implements CobolLineRewriter {
+public class CobolCommentEntriesMarkerImpl implements CobolLineReWriter {
 
   private static final String[] TRIGGERS_START =
       new String[] {
