@@ -89,6 +89,7 @@ public class ParagraphCompletionTest {
             Collections.emptyMap(),
             paragraphDefinitions,
             Collections.emptyMap(),
+            Collections.emptyMap(),
             Collections.emptyMap());
 
     return new MyDocumentModel(TEXT, result);

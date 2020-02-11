@@ -92,5 +92,6 @@ public class TestModule extends DefaultModule {
         Multibinder.newSetBinder(binder(), SemanticLocations.class);
     referenceBinding.addBinding().to(VariableLocations.class);
     referenceBinding.addBinding().to(ParagraphLocations.class);
+    referenceBinding.addBinding().to(CopybookLocations.class);
   }
 }

@@ -91,7 +91,8 @@ public class CopybookCompletionTest {
             Collections.emptyMap(),
             Collections.emptyMap(),
             Collections.emptyMap(),
-            copybookDefinitions);
+            copybookDefinitions,
+            Collections.emptyMap());
 
     return new MyDocumentModel(TEXT, result);
   }
