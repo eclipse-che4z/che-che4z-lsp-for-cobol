@@ -22,7 +22,6 @@ import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.google.common.annotations.Beta;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.lsp4j.WorkspaceFolder;
@@ -83,12 +82,12 @@ public class FileSystemServiceImpl implements FileSystemService {
    * - if exists
    *
    * @param fileName (i.e. COPYTEST)
-   * @return URI of file (i.e. file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy) or *
-   *     null if not found. This case should be covered by an appropriate diagnostic message * using
-   *     the Communication service delegate object
+   * @return URI of file (i.e. file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy) or
+   *     null if not found. This case should be covered by an appropriate diagnostic messag using
+   *     the Communication service delegate object.
    */
   protected Path getPathByCopybookName(String fileName) {
-    return workspaceFoldersAsPathList().stream()
+    return getWorkspaceFoldersAsPathList().stream()
         .map(it -> searchInDirectory(fileName, it))
         .map(it -> it.orElse(null))
         .filter(Objects::nonNull)
@@ -96,9 +95,10 @@ public class FileSystemServiceImpl implements FileSystemService {
         .orElse(null);
   }
 
-  private List<Path> workspaceFoldersAsPathList() {
+  private List<Path> getWorkspaceFoldersAsPathList() {
     return getWorkspaceFolders().stream()
-        .map(this::getPathFromWorkspaceFolder)
+        .map(this::resolveUriInPath)
+        .filter(Objects::nonNull)
         .collect(Collectors.toList());
   }
 
@@ -107,13 +107,23 @@ public class FileSystemServiceImpl implements FileSystemService {
   }
 
   /**
+   * Normalize the URI defined in the workspace to get a NIO Path object that will be used within
+   * the FileSystemService, example: [input:
+   * file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy] --> [output:
+   * C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy]
+   *
    * @param it workspace folder
    * @return the Path of the workspace folder
    * @throws IllegalArgumentException if the URI of WorkspaceFolder is not valid
    */
-  @NonNull
-  private Path getPathFromWorkspaceFolder(WorkspaceFolder it) {
-    return Paths.get(it.getUri());
+  private Path resolveUriInPath(WorkspaceFolder it) {
+    try {
+      return Paths.get(new URI(it.getUri()).normalize());
+    } catch (URISyntaxException e) {
+      log.error(e.getMessage());
+      log.error("Normalize URI " + it.getUri() + " failed");
+    }
+    return null;
   }
 
   /**
@@ -288,10 +298,9 @@ public class FileSystemServiceImpl implements FileSystemService {
    *     happens.
    */
   private Path initializeDependencyFolder() {
-    Path folderPath = null;
-    folderPath =
+    Path folderPath =
         Paths.get(
-            Paths.get(getWorkspaceFolders().get(0).getUri())
+            getWorkspaceFoldersAsPathList().get(0)
                 + filesystemSeparator()
                 + COBDEPS
                 + filesystemSeparator());

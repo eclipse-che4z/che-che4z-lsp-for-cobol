@@ -20,7 +20,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -85,8 +84,8 @@ public class FileSystemConfiguration extends ConfigurableTest {
 
     WorkspaceFolder workspaceFolder = new WorkspaceFolder();
     workspaceFolder.setName(WORKSPACE_FOLDER_NAME);
-    workspaceFolder.setUri(getWorkspaceFolderPath().toString());
-    setWorkspaceFolderPath(this.workspaceFolder.toUri());
+    workspaceFolder.setUri(String.valueOf(getWorkspaceFolderPath().toUri()));
+    // setWorkspaceFolderPath(this.workspaceFolder.toUri());
 
     return Collections.singletonList(workspaceFolder);
   }
@@ -105,21 +104,8 @@ public class FileSystemConfiguration extends ConfigurableTest {
     return workspaceFolder;
   }
 
-  // TODO: convert uri to path..
-  private void setWorkspaceFolderPath(URI workspaceFolderPath) {
-    workspaceFolder = Paths.get(workspaceFolderPath);
-  }
-
   protected String filesystemSeparator() {
     return FileSystems.getDefault().getSeparator();
-  }
-
-  /*
-  Remove the last slash from the URI path in order to replicate the behaviour of the client IDE that send to the server
-  the path of the opened workspace without the last slash.
-   */
-  private String adjustURI(String originalUri) {
-    return originalUri.substring(0, originalUri.length() - 1);
   }
 
   private void generateDummyContentForFile(Path copybookFolderPath) {
