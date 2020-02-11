@@ -12,10 +12,9 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { BasicProfileManager, IProfile, Session, ISession, RestClient, AbstractSession } from "@zowe/imperative";
+import { BasicProfileManager, IProfile, Session, RestClient, AbstractSession } from "@zowe/imperative";
 import * as os from "os";
 import * as path from "path";
-import * as request from "request";
 
 export interface ProfilesMap {
     [key: string]: IProfile;
@@ -41,8 +40,8 @@ export class ZoweApi {
         return this.profileManager.getDefaultProfileName();
     }
 
-    public async fetchMember(dataset: string, member: string, profile: IProfile): Promise<string> {
-        const session = this.createSession(profile);
+    public async fetchMember(dataset: string, member: string, profileName: string): Promise<string> {
+        const session: Session = await this.createSession(profileName);
 
         // default should be https
         const rpath = `/zosmf/restfiles/ds/${dataset}(${member})`;
@@ -50,9 +49,9 @@ export class ZoweApi {
             "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "" }]);
     }
 
-    public async listMembers(dataset: string, profile: IProfile): Promise<string[]> {
+    public async listMembers(dataset: string, profileName: string): Promise<string[]> {
         // default should be https
-        const session = this.createSession(profile);
+        const session: Session = await this.createSession(profileName);
         const rpath = `/zosmf/restfiles/ds/${dataset}/member`;
         const result = await RestClient.getExpectJSON(session, rpath, [{
             "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "" }]);
@@ -60,7 +59,8 @@ export class ZoweApi {
         return result["items"].map((i: any) => i.member);
     }
 
-    public createSession(profile: IProfile) {
+    public async createSession(profileName: string) {
+        const profile = (await this.profileManager.load({ name: profileName })).profile;
         return new Session({
             ...{
                 hostname: profile.host,
