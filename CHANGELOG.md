@@ -2,6 +2,10 @@
 
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.10.1] - 2020-02-12
+
+- Set the maximum Java heap size as argument in the client [#](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/194) Thanks @[sergiuilie](https://github.com/sergiuilie)
+
 ## [0.10.0] - 2020-01-28
 
 - Increase code coverage for `lsp-core-domain` module to 76.8% [#111](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/111) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
