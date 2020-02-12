@@ -22,6 +22,8 @@ import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.google.common.annotations.Beta;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.lsp4j.WorkspaceFolder;
@@ -49,10 +51,20 @@ public class FileSystemServiceImpl implements FileSystemService {
   private List<WorkspaceFolder> workspaceFolders;
   private final List<String> validExtensions = Arrays.asList("cpy", "cbl", "cobol", "cob");
 
+  @AllArgsConstructor
+  protected static class SettingsObject {
+    @Getter private String profile;
+    @Getter private List<String> datasetList;
+  }
+
   @Inject
   public FileSystemServiceImpl(DataBusBroker dataBus) {
     this.dataBus = dataBus;
     dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
+
+    // TODO: init the settings with some dummy data for now..
+    SettingsObject settingsObject =
+        new SettingsObject("CA11", Arrays.asList("HLQLF01.DSNAME1", "HLQLF01.DSNAME2"));
   }
 
   /**
@@ -72,21 +84,56 @@ public class FileSystemServiceImpl implements FileSystemService {
    */
   @Override
   public String getContentByCopybookName(String copybookName) {
-    return Optional.ofNullable(getPathByCopybookName(copybookName))
+    return Optional.ofNullable(findCopybookInCopybookPath(copybookName))
         .map(this::retrieveContentByPath)
         .orElse(null);
   }
 
+  // TODO: We need to get rid of the SettingsObject parameter and change it
+  /**
+   * This method is used to search for a copybook against a given configuration of datasets that
+   * represent the subpath of the copyooks folder
+   *
+   * @param filename copybook name
+   * @return The path of the existent copybook or null if not found
+   */
+  protected Path findCopybookInCopybookPath(
+      String filename, String profile, List<String> datasetList) {
+
+    List<Path> datasetPathList =
+        datasetList.stream()
+            .map(
+                it ->
+                    // TODO: should be refactor with a better way to get the copybook folder..
+                    Paths.get(
+                        getCopybookFolderPath(getWorkspaceFoldersAsPathList().get(0))
+                            + filesystemSeparator()
+                            + profile
+                            + filesystemSeparator()
+                            + it))
+            .collect(Collectors.toList());
+
+    for (Path targetPath : datasetPathList) {
+      Path copybookFound = applySearch(filename, targetPath);
+      if (copybookFound != null) {
+        log.info("Found on path " + copybookFound);
+        return copybookFound;
+      }
+    }
+    log.info("Copybook not found on dataset list provided by user");
+    return null;
+  }
+
   /**
    * From a given copybook name (without file extension) this method will return the URI of the file
-   * - if exists
+   * - if exists applying a deep search in the copybook folder
    *
    * @param fileName (i.e. COPYTEST)
-   * @return URI of file (i.e. file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy) or
-   *     null if not found. This case should be covered by an appropriate diagnostic messag using
-   *     the Communication service delegate object.
+   * @return NIO Path of file (i.e. C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy) or null
+   *     if not found. This case should be covered by an appropriate diagnostic message using the
+   *     Communication service delegate object.
    */
-  protected Path getPathByCopybookName(String fileName) {
+  protected Path findCopybookInCopybookPath(String fileName) {
     return getWorkspaceFoldersAsPathList().stream()
         .map(it -> searchInDirectory(fileName, it))
         .map(it -> it.orElse(null))
@@ -146,7 +193,7 @@ public class FileSystemServiceImpl implements FileSystemService {
    * @param workspaceFolderPath physical path of workspace where to search for the copybook
    * @return Path of the found copybook in the workspace folder
    */
-  private Path applySearch(String fileName, Path workspaceFolderPath) {
+  protected Path applySearch(String fileName, Path workspaceFolderPath) {
     try (Stream<Path> pathStream =
         Files.find(
             workspaceFolderPath,
@@ -194,7 +241,7 @@ public class FileSystemServiceImpl implements FileSystemService {
   @Override
   public void observerCallback(RequiredCopybookEvent event) {
     String requiredCopybookName = event.getName();
-    Path path = getPathByCopybookName(requiredCopybookName);
+    Path path = findCopybookInCopybookPath(requiredCopybookName);
     String content = Optional.ofNullable(path).map(this::retrieveContentByPath).orElse(null);
 
     addCopybookInDepFile(requiredCopybookName, event.getDocumentUri());

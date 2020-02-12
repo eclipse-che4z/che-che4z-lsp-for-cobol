@@ -13,19 +13,17 @@
  */
 package com.ca.lsp.cobol;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class provide support methods for FileSystemService and doesn't test anything. More in
@@ -41,9 +39,14 @@ public class FileSystemConfiguration extends ConfigurableTest {
   public static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
   protected static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
   protected static final String DEP_FILE_COST_NAME = "SOMEPROG";
-  public static final String PROFILE_NAME = "CA11";
-  public static final String DS_NAME = "ZACAN01.DSNAME1";
+  public static final String PROFILE_NAME = "PRF11";
+  public static final String DSNAME_1 = "HLQLF01.DSNAME1";
+  public static final String DSNAME_2 = "HLQLF01.DSNAME2";
 
+  private Path workspaceFolder = null;
+  protected Path copybooksPath = null;
+  protected SettingsObject settingsObject =
+      new SettingsObject(PROFILE_NAME, Arrays.asList(DSNAME_1, DSNAME_2));
   /*
   STRUCTURE FOLDER USED FOR TEST PURPOSES
   ***************************************
@@ -60,34 +63,64 @@ public class FileSystemConfiguration extends ConfigurableTest {
   ***************************************
   */
 
-  //  private Path copybooksPath =
-  //          Paths.get(System.getProperty("java.io.tmpdir"), "WORKSPACE", ".copybooks");
-  private Path dependencyFolderPath = null;
-  private Path workspaceFolder = null;
+  @AllArgsConstructor
+  protected static class SettingsObject {
+    @Getter private String profile;
+    @Getter private List<String> datasetList;
+  }
 
+  // routine the initialize structures
   protected List<WorkspaceFolder> initWorkspaceFolderList() {
-    // initialize workspace folder
-    workspaceFolder =
-        createFolderStructure(Paths.get(System.getProperty("java.io.tmpdir"), "WORKSPACE"));
+    initWorkspaceFolderStructure();
 
-    // initialize depfile structure
-    if (workspaceFolder != null) {
-      dependencyFolderPath =
-          createFolderStructure(Paths.get(workspaceFolder.toString(), PROFILE_NAME, DS_NAME));
+    initCopybooksWithProfileAndDataset(
+        copybooksPath, settingsObject.getProfile(), settingsObject.getDatasetList());
 
-      generateDummyContentForFile(
-          Paths.get(workspaceFolder + filesystemSeparator() + ".copybooks"));
-
-      generateDummyContentForFile(
-          Paths.get(dependencyFolderPath + filesystemSeparator() + DEP_FILE_COST_NAME + ".dep"));
-    }
+    initDepFileStructure();
 
     WorkspaceFolder workspaceFolder = new WorkspaceFolder();
     workspaceFolder.setName(WORKSPACE_FOLDER_NAME);
     workspaceFolder.setUri(String.valueOf(getWorkspaceFolderPath().toUri()));
-    // setWorkspaceFolderPath(this.workspaceFolder.toUri());
-
     return Collections.singletonList(workspaceFolder);
+  }
+
+  private void initWorkspaceFolderStructure() {
+    workspaceFolder =
+        createFolderStructure(Paths.get(System.getProperty("java.io.tmpdir"), "WORKSPACE"));
+    // generate the path where to store copybooks
+    copybooksPath = Paths.get(workspaceFolder + filesystemSeparator() + ".copybooks");
+  }
+
+  private void initDepFileStructure() {
+    Path cobdepFolder = Paths.get(workspaceFolder + filesystemSeparator() + ".cobdeps");
+
+    if (workspaceFolder != null) {
+      Path dependencyFolderPath = createFolderStructure(cobdepFolder);
+      generateDummyContentForFile(copybooksPath, CPY_INNER_FILE_NAME_WITH_EXT, COPYBOOK_CONTENT);
+
+      generateDummyContentForFile(
+          Paths.get(String.valueOf(dependencyFolderPath)),
+          DEP_FILE_COST_NAME + ".dep",
+          CPY_OUTER_NAME_ONLY2);
+    }
+  }
+
+  // TODO: Rename this weird method..
+  private void initCopybooksWithProfileAndDataset(
+      Path path, String profile, List<String> datasetList) {
+
+    List<Path> retriviedPaths =
+        datasetList.stream()
+            .map(
+                it ->
+                    Paths.get(path + filesystemSeparator() + profile + filesystemSeparator() + it))
+            .collect(Collectors.toList());
+
+    retriviedPaths.forEach(this::createFolderStructure);
+    retriviedPaths.forEach(
+        targetPath ->
+            generateDummyContentForFile(
+                targetPath, CPY_INNER_FILE_NAME_WITH_EXT, COPYBOOK_CONTENT));
   }
 
   private Path createFolderStructure(Path copybooksPath) {
@@ -99,7 +132,6 @@ public class FileSystemConfiguration extends ConfigurableTest {
     }
   }
 
-  // TODO: convert uri to path..
   protected Path getWorkspaceFolderPath() {
     return workspaceFolder;
   }
@@ -108,34 +140,41 @@ public class FileSystemConfiguration extends ConfigurableTest {
     return FileSystems.getDefault().getSeparator();
   }
 
-  private void generateDummyContentForFile(Path copybookFolderPath) {
-    Path copybookFile = null;
-    // create the file if doesn't exists
-    if (!Files.exists(copybookFolderPath)) {
+  private void generateDummyContentForFile(
+      Path targetDirectory, String filenameAndExtension, String content) {
+    Path filePath;
+    // check the folder exist if no create it
+    if (!Files.exists(targetDirectory)) {
       try {
-        Files.createDirectory(copybookFolderPath);
-
-        copybookFile =
-            Files.createFile(
-                Paths.get(
-                    copybookFolderPath + filesystemSeparator() + CPY_INNER_FILE_NAME_WITH_EXT));
+        Files.createDirectory(targetDirectory);
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error(e.getMessage() + "Cannot create forlder " + targetDirectory);
+        return;
       }
     }
-    if (copybookFile != null) {
-      File file = copybookFile.toFile();
-      FileOutputStream fileOutputStream;
-      try {
-        fileOutputStream = new FileOutputStream(file, true);
-        BufferedOutputStream bufferedOutputStream =
-            new BufferedOutputStream(fileOutputStream, 128 * 100);
-        bufferedOutputStream.write(COPYBOOK_CONTENT.getBytes());
-        bufferedOutputStream.flush();
-        fileOutputStream.close();
-      } catch (IOException e) {
-        log.error(e.getMessage());
-      }
+
+    // create the file
+    try {
+      filePath =
+          Files.createFile(
+              Paths.get(targetDirectory + filesystemSeparator() + filenameAndExtension));
+    } catch (IOException e) {
+      log.error(
+          e.getMessage()
+              + String.format(
+                  "Failed create file  %s under folder %s" + filenameAndExtension,
+                  targetDirectory));
+      return;
+    }
+
+    writeContentOnFile(filePath, content);
+  }
+
+  private void writeContentOnFile(Path filePath, String content) {
+    try {
+      Files.write(filePath, (content + "\n").getBytes(), StandardOpenOption.APPEND);
+    } catch (IOException e) {
+      log.error("IO Exception on write" + e.getLocalizedMessage());
     }
   }
 }

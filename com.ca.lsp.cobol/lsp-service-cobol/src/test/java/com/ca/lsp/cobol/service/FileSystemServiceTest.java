@@ -20,8 +20,6 @@ import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -29,11 +27,10 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -58,11 +55,6 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   //     on the IDE
   // 4 - Initialize the list of workspaces (workspace roots) that WorkspaceManager should have to
   //     apply search operations
-
-  @AllArgsConstructor
-  private class SettingsObject {
-    @Getter private List<String> datasetList;
-  }
 
   @Before
   public void initActivities() {
@@ -94,7 +86,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
 
   @Test
   public void getNullWithNotCopybookNotFound() {
-    assertNull(fileSystemService.getContentByCopybookName("ANTHR_CPY"));
+    assertNull(fileSystemService.getContentByCopybookName("ANTHRCPY"));
   }
 
   @Test
@@ -138,7 +130,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
 
   /** This test verify that an empty value for the copybook is not added in the deplist. */
   @Test
-  public void depFileWithoutEmptyCopybookName() throws IOException, URISyntaxException {
+  public void depFileWithoutEmptyCopybookName() {
     // create the dep folder with the SOMPROG.dep
     Path depFileReference = getDepFilePathReference();
 
@@ -154,16 +146,47 @@ public class FileSystemServiceTest extends FileSystemConfiguration
 
   @Test
   public void getSettingsModel() {
-    SettingsObject settingsObject = new SettingsObject(Arrays.asList("ZACAN01.DS1", "ZACAN.DS2"));
     assertEquals(2, settingsObject.getDatasetList().size());
   }
 
   /**
    * This test verify that the search in the copybook folder is applied searching only in the
-   * dataset name folder provided by the setting
+   * dataset name folder provided by the setting and the copybook is found
    */
   @Test
-  public void searchInCopybookStructureWithDatasetNameFolders() {}
+  // TODO: Use a better name...
+  public void searchInCopybookStructureWithDatasetNameFoldersPositive() {
+    // use the list of paths for the search in copybooks delimited only to this list
+    assertNotNull(
+        fileSystemService.findCopybookInCopybookPath(
+            CPY_OUTER_NAME_ONLY2, settingsObject.getProfile(), settingsObject.getDatasetList()));
+  }
+
+  /**
+   * This test verify that the setting provide a list of dataset path in the copybook folder to
+   * search the dataset but the dataset is not found and the method return null.
+   */
+  @Test
+  // TODO: Use a better name...
+  public void searchInCopybookStructureWithDatasetNameFoldersNegative() {
+    assertNull(
+        fileSystemService.findCopybookInCopybookPath(
+            "ANTHCPY1", settingsObject.getProfile(), settingsObject.getDatasetList()));
+  }
+
+  /**
+   * This test verify that when the setting provide a dataset path that is not present in the
+   * copybook folder the search method return null;
+   */
+  // TODO: Use a better name
+  @Test
+  public void searchInCopybookStructureWithWrongStructure() {
+    assertNull(
+        fileSystemService.findCopybookInCopybookPath(
+            CPY_OUTER_NAME_ONLY2,
+            settingsObject.getProfile(),
+            Collections.singletonList("HLQLF02.DSNAME1")));
+  }
 
   private int getNumberOfElementsFromDepFile(Path depFileReference) {
     List<String> depFileReferenceElementList;
