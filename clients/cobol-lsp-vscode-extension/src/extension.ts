@@ -14,22 +14,23 @@
 
 import * as cp from "child_process";
 import * as fs from "fs";
-import { Disposable, ExtensionContext, extensions, StatusBarAlignment, Uri, window, workspace } from "vscode";
+import { Disposable, ExtensionContext, extensions, window, workspace } from "vscode";
 import {
     LanguageClient,
     LanguageClientOptions,
 } from "vscode-languageclient/lib/main";
 import { CopybooksDownloader, DEPENDENCIES_FOLDER } from "./CopybooksDownloader";
 import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
+import { ProfileService } from "./ProfileService";
 import { ZoweApi } from "./ZoweApi";
 
 export async function activate(context: ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
-    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(zoweApi);
+    const profileService: ProfileService = new ProfileService(zoweApi);
+    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(zoweApi, profileService);
     // path resolved to identify the location of the LSP server into the extension
     const extPath = extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
     const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.10.0.jar`;
-
 
     try {
         await isJavaInstalled();

@@ -16,6 +16,7 @@ import { IProfile } from "@zowe/imperative";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { ProfileService } from "./ProfileService";
 import { ProfilesMap, ZoweApi } from "./ZoweApi";
 
 export const DEPENDENCIES_FOLDER: string = ".cobdeps";
@@ -24,7 +25,9 @@ export const COPYBOOKS_FOLDER: string = ".copybooks";
 const SETTINGS_ROOT = "cobol-language-support";
 
 export class CopybooksDownloader {
-    public constructor(private zoweApi: ZoweApi) { }
+    public constructor(
+        private zoweApi: ZoweApi,
+        private profileService: ProfileService) { }
 
     /**
      * @param copybooks array of copybooks names to download
@@ -43,11 +46,28 @@ export class CopybooksDownloader {
         }
 
         const cb: Set<string> = new Set(copybooks);
-        missingCopybooks.forEach(m => cb.delete(m));
-        const profile: string = await this.askProfile();
+        const profile: string = await this.profileService.getProfile(uri);
         if (!profile) {
             return;
         }
+
+        missingCopybooks.forEach(m => cb.delete(m));
+        (await this.listPathDatasets()).forEach(ds => {
+            Array.from(cb.values()).forEach(c => {
+                if (fs.existsSync(this.createCopybookPath(profile, ds, c))) {
+                    cb.delete(c);
+                }
+            });
+        });
+        if (cb.size > 0) {
+            const action: string = await vscode.window.showInformationMessage(
+                "Program contains dependencies to missing copybooks.",
+                "Download Copybooks", "Ignore");
+            if (action !== "Download Copybooks") {
+                return;
+            }
+        }
+
         await vscode.window.withProgress(
             {
                 location: vscode.ProgressLocation.Notification,
@@ -57,16 +77,7 @@ export class CopybooksDownloader {
                 for (const ds of await this.listPathDatasets()) {
                     progress.report({ message: "Looking in " + ds + ". " + cb.size + " copybook(s) left." });
                     try {
-                        const members: string[] = await this.zoweApi.listMembers(ds, profile);
-                        for (const member of members) {
-                            if (cb.has(member)) {
-                                await this.downloadCopybook(ds, member, profile);
-                                cb.delete(member);
-                                if (cb.size === 0) {
-                                    return;
-                                }
-                            }
-                        }
+                        await this.fetchCopybooks(ds, cb, profile);
                     } catch (e) {
                         vscode.window.showErrorMessage(e.toString());
                     }
@@ -78,6 +89,19 @@ export class CopybooksDownloader {
             vscode.window.showErrorMessage("Can't download copybooks: " + errors);
             fs.mkdirSync(path.dirname(missingCopybooksFilePath), { recursive: true });
             fs.writeFileSync(missingCopybooksFilePath, errors);
+        }
+    }
+
+    private async fetchCopybooks(ds, cb, profile) {
+        const members: string[] = await this.zoweApi.listMembers(ds, profile);
+        for (const member of members) {
+            if (cb.has(member)) {
+                await this.downloadCopybook(ds, member, profile);
+                cb.delete(member);
+                if (cb.size === 0) {
+                    return;
+                }
+            }
         }
     }
 
@@ -110,37 +134,5 @@ export class CopybooksDownloader {
             return [];
         }
         return vscode.workspace.getConfiguration(SETTINGS_ROOT).get("paths");
-    }
-
-    private async askProfile(): Promise<string> {
-        const profiles: ProfilesMap = await this.zoweApi.listZOSMFProfiles();
-        if (Object.keys(profiles).length === 0) {
-            await vscode.window.showErrorMessage("Zowe profile is missing.");
-            return undefined;
-        }
-        if (Object.keys(profiles).length === 1) {
-            return Object.keys(profiles)[0];
-        }
-        const defaultName = this.zoweApi.getDefaultProfileName();
-        let items: vscode.QuickPickItem[] = [];
-        Object.keys(profiles).forEach(name => {
-            const profile: IProfile = profiles[name];
-            const item: vscode.QuickPickItem = {
-                description: profile.username + "@" + profile.host + ":" + profile.port,
-                label: name,
-            };
-            if (defaultName === name) {
-                items = [item].concat(items);
-            } else {
-                items.push(item);
-            }
-        });
-
-        const selectedProfile = await vscode.window.showQuickPick(items,
-            { placeHolder: defaultName, canPickMany: false });
-        if (selectedProfile) {
-            return selectedProfile.label;
-        }
-        return undefined;
     }
 }
