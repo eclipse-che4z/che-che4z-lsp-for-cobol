@@ -158,7 +158,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   public void searchInCopybookStructureWithDatasetNameFoldersPositive() {
     // use the list of paths for the search in copybooks delimited only to this list
     assertNotNull(
-        fileSystemService.findCopybookInCopybookPath(
+        fileSystemService.findCopybook(
             CPY_OUTER_NAME_ONLY2, settingsObject.getProfile(), settingsObject.getDatasetList()));
   }
 
@@ -170,7 +170,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   // TODO: Use a better name...
   public void searchInCopybookStructureWithDatasetNameFoldersNegative() {
     assertNull(
-        fileSystemService.findCopybookInCopybookPath(
+        fileSystemService.findCopybook(
             "ANTHCPY1", settingsObject.getProfile(), settingsObject.getDatasetList()));
   }
 
@@ -182,7 +182,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   @Test
   public void searchInCopybookStructureWithWrongStructure() {
     assertNull(
-        fileSystemService.findCopybookInCopybookPath(
+        fileSystemService.findCopybook(
             CPY_OUTER_NAME_ONLY2,
             settingsObject.getProfile(),
             Collections.singletonList("HLQLF02.DSNAME1")));

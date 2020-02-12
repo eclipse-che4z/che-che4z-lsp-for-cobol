@@ -84,12 +84,44 @@ public class FileSystemServiceImpl implements FileSystemService {
    */
   @Override
   public String getContentByCopybookName(String copybookName) {
-    return Optional.ofNullable(findCopybookInCopybookPath(copybookName))
+    return Optional.ofNullable(findCopybook(copybookName))
         .map(this::retrieveContentByPath)
         .orElse(null);
   }
 
-  // TODO: We need to get rid of the SettingsObject parameter and change it
+  /**
+   * @param uriForFileName of copybook found under workspace folder
+   * @return content of the file as String content
+   */
+  @Nullable
+  private String retrieveContentByPath(Path uriForFileName) {
+    String content = null;
+    try (Stream<String> stream = Files.lines(uriForFileName)) {
+      content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse(null);
+    } catch (IOException e) {
+      log.error("[retrieve content by path]" + Arrays.toString(e.getStackTrace()));
+    }
+    return content;
+  }
+
+  /**
+   * From a given copybook name (without file extension) this method will return the URI of the file
+   * - if exists applying a deep search in the copybook folder. No filtered folders where to specify
+   * the search are defined.
+   *
+   * @param fileName (i.e. COPYTEST)
+   * @return NIO Path of file (i.e. C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy) or null
+   *     if not found. This case should be covered by an appropriate diagnostic message using the
+   *     Communication service delegate object.
+   */
+  protected Path findCopybook(String fileName) {
+    return getWorkspaceFoldersAsPathList().stream()
+        .map(it -> applySearch(fileName, getCopybookFolderFromWorkspace(it)))
+        .filter(Objects::nonNull)
+        .findAny()
+        .orElse(null);
+  }
+
   /**
    * This method is used to search for a copybook against a given configuration of datasets that
    * represent the subpath of the copyooks folder
@@ -97,22 +129,11 @@ public class FileSystemServiceImpl implements FileSystemService {
    * @param filename copybook name
    * @return The path of the existent copybook or null if not found
    */
-  protected Path findCopybookInCopybookPath(
-      String filename, String profile, List<String> datasetList) {
+  protected Path findCopybook(String filename, String profile, List<String> datasetList) {
+    return retrievePathOrNull(filename, generatePathListFromSettings(profile, datasetList));
+  }
 
-    List<Path> datasetPathList =
-        datasetList.stream()
-            .map(
-                it ->
-                    // TODO: should be refactor with a better way to get the copybook folder..
-                    Paths.get(
-                        getCopybookFolderPath(getWorkspaceFoldersAsPathList().get(0))
-                            + filesystemSeparator()
-                            + profile
-                            + filesystemSeparator()
-                            + it))
-            .collect(Collectors.toList());
-
+  private Path retrievePathOrNull(String filename, List<Path> datasetPathList) {
     for (Path targetPath : datasetPathList) {
       Path copybookFound = applySearch(filename, targetPath);
       if (copybookFound != null) {
@@ -124,68 +145,17 @@ public class FileSystemServiceImpl implements FileSystemService {
     return null;
   }
 
-  /**
-   * From a given copybook name (without file extension) this method will return the URI of the file
-   * - if exists applying a deep search in the copybook folder
-   *
-   * @param fileName (i.e. COPYTEST)
-   * @return NIO Path of file (i.e. C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy) or null
-   *     if not found. This case should be covered by an appropriate diagnostic message using the
-   *     Communication service delegate object.
-   */
-  protected Path findCopybookInCopybookPath(String fileName) {
-    return getWorkspaceFoldersAsPathList().stream()
-        .map(it -> searchInDirectory(fileName, it))
-        .map(it -> it.orElse(null))
-        .filter(Objects::nonNull)
-        .findAny()
-        .orElse(null);
-  }
-
-  private List<Path> getWorkspaceFoldersAsPathList() {
-    return getWorkspaceFolders().stream()
-        .map(this::resolveUriInPath)
-        .filter(Objects::nonNull)
+  private List<Path> generatePathListFromSettings(String profile, List<String> datasetList) {
+    return datasetList.stream()
+        .map(
+            it ->
+                Paths.get(
+                    getCopybookFolderFromWorkspace(getWorkspaceFoldersAsPathList().get(0))
+                        + filesystemSeparator()
+                        + profile
+                        + filesystemSeparator()
+                        + it))
         .collect(Collectors.toList());
-  }
-
-  private List<WorkspaceFolder> getWorkspaceFolders() {
-    return workspaceFolders;
-  }
-
-  /**
-   * Normalize the URI defined in the workspace to get a NIO Path object that will be used within
-   * the FileSystemService, example: [input:
-   * file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy] --> [output:
-   * C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy]
-   *
-   * @param it workspace folder
-   * @return the Path of the workspace folder
-   * @throws IllegalArgumentException if the URI of WorkspaceFolder is not valid
-   */
-  private Path resolveUriInPath(WorkspaceFolder it) {
-    try {
-      return Paths.get(new URI(it.getUri()).normalize());
-    } catch (URISyntaxException e) {
-      log.error(e.getMessage());
-      log.error("Normalize URI " + it.getUri() + " failed");
-    }
-    return null;
-  }
-
-  /**
-   * Delegated method to search in directory
-   *
-   * @param fileName name provided by preprocessor
-   * @param workspaceFolderPath NIO Path of workspace folder
-   * @return a valid path of the copybook file or null if not found
-   */
-  private Optional<Path> searchInDirectory(String fileName, Path workspaceFolderPath) {
-    return Optional.ofNullable(applySearch(fileName, getCopybookFolderPath(workspaceFolderPath)));
-  }
-
-  private Path getCopybookFolderPath(Path workspaceFolderPath) {
-    return Paths.get(workspaceFolderPath + filesystemSeparator() + COPYBOOK_FOLDER_NAME);
   }
 
   /**
@@ -222,26 +192,46 @@ public class FileSystemServiceImpl implements FileSystemService {
         .anyMatch(ext -> ext.equalsIgnoreCase(FilenameUtils.getExtension(filePath)));
   }
 
+  private List<Path> getWorkspaceFoldersAsPathList() {
+    return getWorkspaceFolders().stream()
+        .map(this::resolveUriPath)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+  }
+
+  private List<WorkspaceFolder> getWorkspaceFolders() {
+    return workspaceFolders;
+  }
+
   /**
-   * @param uriForFileName of copybook found under workspace folder
-   * @return content of the file as String content
+   * Normalize the URI defined in the workspace to get a NIO Path object that will be used within
+   * the FileSystemService, example: [input:
+   * file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy] --> [output:
+   * C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy]
+   *
+   * @param it workspace folder
+   * @return the Path of the workspace folder
+   * @throws IllegalArgumentException if the URI of WorkspaceFolder is not valid
    */
-  @Nullable
-  private String retrieveContentByPath(Path uriForFileName) {
-    String content = null;
-    try (Stream<String> stream = Files.lines(uriForFileName)) {
-      content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse(null);
-    } catch (IOException e) {
-      log.error("[retrieve content by path]" + Arrays.toString(e.getStackTrace()));
+  private Path resolveUriPath(WorkspaceFolder it) {
+    try {
+      return Paths.get(new URI(it.getUri()).normalize());
+    } catch (URISyntaxException e) {
+      log.error(e.getMessage());
+      log.error("Normalize URI " + it.getUri() + " failed");
     }
-    return content;
+    return null;
+  }
+
+  private Path getCopybookFolderFromWorkspace(Path workspaceFolderPath) {
+    return Paths.get(workspaceFolderPath + filesystemSeparator() + COPYBOOK_FOLDER_NAME);
   }
 
   /** create the task and pass it to the executor service */
   @Override
   public void observerCallback(RequiredCopybookEvent event) {
     String requiredCopybookName = event.getName();
-    Path path = findCopybookInCopybookPath(requiredCopybookName);
+    Path path = findCopybook(requiredCopybookName);
     String content = Optional.ofNullable(path).map(this::retrieveContentByPath).orElse(null);
 
     addCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
