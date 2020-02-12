@@ -19,16 +19,23 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-/** This test assert functions of the {@link MyLanguageServerImpl}, such as initialization. */
+/** This test asserts functions of the {@link MyLanguageServerImpl}, such as initialization. */
 public class MyLanguageServerImplTest {
 
+  /**
+   * Test the {@link MyLanguageServerImpl#initialized(InitializedParams)} method. Check that the
+   * file system watchers registered correctly.
+   */
   @Test
   public void initialized() {
     LanguageClient client = mock(LanguageClient.class);
@@ -36,12 +43,36 @@ public class MyLanguageServerImplTest {
     provider.set(client);
 
     MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, provider);
-    ArgumentCaptor<RegistrationParams> captor = ArgumentCaptor.forClass(RegistrationParams.class);
+    ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     server.initialized(new InitializedParams());
 
-    Mockito.verify(client).registerCapability(captor.capture());
+    verify(client).registerCapability(captor.capture());
     RegistrationParams params = captor.getValue();
     assertRegistrationParams(params);
+  }
+
+  /**
+   * Test the {@link MyLanguageServerImpl#initialize(InitializeParams)} method. It should initialize
+   * the services and create a list of supported server capabilities. This test also asserts that
+   * there are only supported capabilities add to the {@link InitializeResult} instance.
+   */
+  @Test
+  public void initialize() {
+    FileSystemService fileSystemService = mock(FileSystemService.class);
+    MyLanguageServerImpl server = new MyLanguageServerImpl(fileSystemService, null, null, null);
+    InitializeParams initializeParams = new InitializeParams();
+
+    List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
+    initializeParams.setWorkspaceFolders(workspaceFolders);
+
+    try {
+      InitializeResult result = server.initialize(initializeParams).get();
+      checkOnlySupportedCapabilitiesAreSet(result.getCapabilities());
+    } catch (InterruptedException | ExecutionException e) {
+      fail(e.getMessage());
+    }
+
+    verify(fileSystemService).setWorkspaceFolders(workspaceFolders);
   }
 
   private void assertRegistrationParams(RegistrationParams params) {
@@ -55,5 +86,32 @@ public class MyLanguageServerImplTest {
 
     watchers.forEach(it -> assertTrue(it.getGlobPattern().startsWith("**/COPYBOOKS")));
     watchers.forEach(it -> assertEquals(7, it.getKind().intValue()));
+  }
+
+  private void checkOnlySupportedCapabilitiesAreSet(ServerCapabilities capabilities) {
+    assertEquals(TextDocumentSyncKind.Full, capabilities.getTextDocumentSync().getLeft());
+    assertTrue(capabilities.getWorkspace().getWorkspaceFolders().getSupported());
+    assertTrue(capabilities.getCompletionProvider().getResolveProvider());
+    assertTrue(capabilities.getDefinitionProvider());
+    assertTrue(capabilities.getReferencesProvider());
+    assertTrue(capabilities.getDocumentFormattingProvider());
+    assertTrue(capabilities.getDocumentHighlightProvider());
+
+    assertNull(capabilities.getWorkspace().getWorkspaceFolders().getChangeNotifications());
+    assertNull(capabilities.getDocumentRangeFormattingProvider());
+    assertNull(capabilities.getHoverProvider());
+    assertNull(capabilities.getRenameProvider());
+    assertNull(capabilities.getWorkspaceSymbolProvider());
+    assertNull(capabilities.getDocumentSymbolProvider());
+    assertNull(capabilities.getCodeActionProvider());
+    assertNull(capabilities.getCodeLensProvider());
+    assertNull(capabilities.getColorProvider());
+    assertNull(capabilities.getTypeDefinitionProvider());
+    assertNull(capabilities.getDocumentLinkProvider());
+    assertNull(capabilities.getExecuteCommandProvider());
+    assertNull(capabilities.getExperimental());
+    assertNull(capabilities.getSignatureHelpProvider());
+    assertNull(capabilities.getFoldingRangeProvider());
+    assertNull(capabilities.getImplementationProvider());
   }
 }
