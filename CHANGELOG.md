@@ -4,7 +4,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ## [0.10.1] - 2020-02-12
 
-- Set the maximum Java heap size as argument in the client [#194](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/194) Thanks @[sergiuilie](https://github.com/sergiuilie)
+- Add maximum Java heap size argument to `extension.ts` [#194](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/194) Thanks @[sergiuilie](https://github.com/sergiuilie)
 
 ## [0.10.0] - 2020-01-28
 
