@@ -191,6 +191,8 @@ public class FileSystemServiceImpl implements FileSystemService {
     Path path = getPathByCopybookName(requiredCopybookName);
     String content = Optional.ofNullable(path).map(this::retrieveContentByPath).orElse(null);
 
+    // TODO: BASED ON THE VALUE OF SYNC TYPE SENT ON THE DATABUS WE WILL ENGAGE OR NOT THIS
+    // METHOD...
     addCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
 
     dataBus.postData(

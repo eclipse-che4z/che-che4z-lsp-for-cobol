@@ -62,6 +62,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private Formations formations;
   private Completions completions;
   private Occurrences occurrences;
+  private TextDocumentSyncType textDocumentSyncType;
 
   @Inject
   MyTextDocumentService(
@@ -143,7 +144,9 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-    //A better implementation that will cover the gitfs scenario will be implementated later based on issue #173
+    textDocumentSyncType = TextDocumentSyncType.DID_OPEN;
+    // A better implementation that will cover the gitfs scenario will be implementated later based
+    // on issue #173
     if (uri.startsWith(GIT_FS_URI)) {
       communications.notifyThatExtensionIsUnsupported("gitfs");
     }
@@ -156,6 +159,8 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
 
   @Override
   public void didChange(DidChangeTextDocumentParams params) {
+    textDocumentSyncType = TextDocumentSyncType.DID_CHANGE;
+    System.out.println(textDocumentSyncType);
     String uri = params.getTextDocument().getUri();
     String text = params.getContentChanges().get(0).getText();
 
@@ -165,6 +170,8 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didClose(DidCloseTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
+    textDocumentSyncType = TextDocumentSyncType.DID_CLOSE;
+
     log.info("Document closing invoked");
     docs.remove(uri);
   }
