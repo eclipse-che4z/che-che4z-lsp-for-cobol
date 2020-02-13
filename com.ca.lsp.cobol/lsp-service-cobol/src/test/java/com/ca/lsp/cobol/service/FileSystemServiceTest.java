@@ -154,8 +154,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
    * dataset name folder provided by the setting and the copybook is found
    */
   @Test
-  // TODO: Use a better name...
-  public void searchInCopybookStructureWithDatasetNameFoldersPositive() {
+  public void findCopybookWithDatasetFilteringPositiveTest() {
     // use the list of paths for the search in copybooks delimited only to this list
     assertNotNull(
         fileSystemService.findCopybook(
@@ -167,8 +166,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
    * search the dataset but the dataset is not found and the method return null.
    */
   @Test
-  // TODO: Use a better name...
-  public void searchInCopybookStructureWithDatasetNameFoldersNegative() {
+  public void findCopybookWithDatasetFilteringNegativeTest() {
     assertNull(
         fileSystemService.findCopybook(
             "ANTHCPY1", settingsObject.getProfile(), settingsObject.getDatasetList()));

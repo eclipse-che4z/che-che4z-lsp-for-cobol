@@ -50,7 +50,9 @@ public class FileSystemServiceImpl implements FileSystemService {
   private final DataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
   private final List<String> validExtensions = Arrays.asList("cpy", "cbl", "cobol", "cob");
+  private SettingsObject settingsObject;
 
+  // TODO: Should be removed when the settings provider is ready to use..
   @AllArgsConstructor
   protected static class SettingsObject {
     @Getter private String profile;
@@ -62,9 +64,8 @@ public class FileSystemServiceImpl implements FileSystemService {
     this.dataBus = dataBus;
     dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
 
-    // TODO: init the settings with some dummy data for now..
-    SettingsObject settingsObject =
-        new SettingsObject("CA11", Arrays.asList("HLQLF01.DSNAME1", "HLQLF01.DSNAME2"));
+    settingsObject =
+        new SettingsObject("PRF11", Arrays.asList("HLQLF01.DSNAME1", "HLQLF01.DSNAME2"));
   }
 
   /**
