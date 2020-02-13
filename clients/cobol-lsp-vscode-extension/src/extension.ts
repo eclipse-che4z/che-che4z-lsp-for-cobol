@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -26,7 +26,7 @@ export async function activate(context: ExtensionContext) {
 
     // path resolved to identify the location of the LSP server into the extension
     const extPath = extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
-    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.10.0.jar`;
+    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.10.1.jar`;
 
     let serverOptions: Executable;
 
@@ -34,7 +34,7 @@ export async function activate(context: ExtensionContext) {
         await isJavaInstalled();
         if (fs.existsSync(LSPServerPath)) {
             serverOptions = {
-                args: ["-Dline.separator=\r\n", "-jar", LSPServerPath, "pipeEnabled"],
+                args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", LSPServerPath, "pipeEnabled"],
                 command: "java",
                 options: { stdio: "pipe", detached: false },
             };
