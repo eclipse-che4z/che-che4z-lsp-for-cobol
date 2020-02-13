@@ -17,12 +17,16 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { ProfilesMap, ZoweApi } from "./ZoweApi";
 
+const SETTINGS_SECTION: string = "cobol-language-support";
+
 export class ProfileService {
     constructor(private zoweApi: ZoweApi) {
     }
 
     public async getProfile(depFile: vscode.Uri): Promise<string> {
-        const detectedProfile = await this.findProfileByDependenciesFile(depFile);
+        const programName = this.getProgramNameFromDepFile(depFile);
+        const detectedProfile = (await this.findProfileByDependenciesFile(depFile))
+            || this.tryGetProfileFromSettings(programName);
         if (detectedProfile) {
             return detectedProfile;
         }
@@ -52,6 +56,10 @@ export class ProfileService {
         const selectedProfile = await vscode.window.showQuickPick(items,
             { placeHolder: defaultName, canPickMany: false });
         if (selectedProfile) {
+            let settingsProfiles = vscode.workspace.getConfiguration().get(SETTINGS_SECTION + ".profiles");
+            settingsProfiles = settingsProfiles ? settingsProfiles : {};
+            settingsProfiles[programName] = selectedProfile.label;
+            await vscode.workspace.getConfiguration().update(SETTINGS_SECTION + ".profiles", settingsProfiles, false);
             return selectedProfile.label;
         }
         return undefined;
@@ -74,6 +82,14 @@ export class ProfileService {
         return undefined;
     }
 
+    private getProgramNameFromDepFile(depFile: vscode.Uri): string {
+        return path.basename(depFile.fsPath, ".dep");
+    }
+
+    private tryGetProfileFromSettings(programName: string): string | undefined {
+        const profiles: {} = vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles");
+        return profiles ? profiles[programName] : undefined;
+    }
     private async tryGetProfileFromDocumentPath(docPath: string): Promise<string | undefined> {
         const profiles = Object.keys(await this.zoweApi.listZOSMFProfiles());
         const segments: string[] = docPath.split(path.sep);
