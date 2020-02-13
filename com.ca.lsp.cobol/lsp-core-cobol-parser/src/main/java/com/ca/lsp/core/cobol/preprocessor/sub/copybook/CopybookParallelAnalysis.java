@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -27,7 +27,11 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.ForkJoinTask;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+
+import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
+import static java.lang.String.format;
+import static java.util.concurrent.ForkJoinTask.invokeAll;
+import static java.util.stream.Collectors.toList;
 
 @AllArgsConstructor
 public class CopybookParallelAnalysis implements CopybookAnalysis {
@@ -52,10 +56,9 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
       String documentUri,
       Multimap<String, Position> copybooks,
       List<CopybookDefinition> copybookUsageTracker) {
-    return ForkJoinTask.invokeAll(createTasks(documentUri, copybooks, copybookUsageTracker))
-        .stream()
+    return invokeAll(createTasks(documentUri, copybooks, copybookUsageTracker)).stream()
         .map(ForkJoinTask::join)
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
   private List<CopybookSemanticContext> collectCorrectContexts(
@@ -63,7 +66,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
     return contexts.stream()
         .map(ResultWithErrors::getResult)
         .filter(it -> it.getContext() != null)
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
   private List<SyntaxError> extractAnalysingErrors(
@@ -71,7 +74,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
     return contexts.stream()
         .map(ResultWithErrors::getErrors)
         .flatMap(List::stream)
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
   private List<SyntaxError> createMissingCopybookErrors(
@@ -83,7 +86,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
         .map(CopybookSemanticContext::getName)
         .map(defineErrors(copybooks))
         .flatMap(List::stream)
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
   @Nonnull
@@ -94,10 +97,11 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
                 position ->
                     SyntaxError.syntaxError()
                         .position(position)
-                        .suggestion(String.format(ERROR_SUGGESTION, copybookName))
+                        .suggestion(format(ERROR_SUGGESTION, copybookName))
                         .severity(1)
+                        .errorCode(MISSING_COPYBOOK)
                         .build())
-            .collect(Collectors.toList());
+            .collect(toList());
   }
 
   private List<ForkJoinTask<ResultWithErrors<CopybookSemanticContext>>> createTasks(
@@ -111,6 +115,6 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
                     documentUri,
                     new CopybookDefinition(it.getKey(), documentUri, it.getValue()),
                     copybookUsageTracker))
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 }

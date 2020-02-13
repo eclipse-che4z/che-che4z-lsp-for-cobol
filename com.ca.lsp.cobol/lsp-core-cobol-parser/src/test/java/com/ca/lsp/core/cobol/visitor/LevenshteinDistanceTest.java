@@ -37,7 +37,7 @@ public class LevenshteinDistanceTest {
 
   @Test
   public void testDistance() {
-    errors.add(new SyntaxError(new Position("", 1, 1, 1, 1), null, "", 2));
+    errors.add(new SyntaxError(new Position("", 1, 1, 1, 1), null, "", 2, null));
     visitor.setSemanticErrors(new SemanticListener(errors));
 
     CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);

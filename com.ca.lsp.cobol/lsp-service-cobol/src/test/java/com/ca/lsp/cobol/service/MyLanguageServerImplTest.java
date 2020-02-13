@@ -15,6 +15,7 @@
 
 package com.ca.lsp.cobol.service;
 
+import com.ca.lsp.core.cobol.model.ErrorCode;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.Test;
@@ -23,7 +24,10 @@ import org.mockito.ArgumentCaptor;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static com.ca.lsp.core.cobol.model.ErrorCode.values;
+import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
@@ -96,6 +100,10 @@ public class MyLanguageServerImplTest {
     assertTrue(capabilities.getReferencesProvider());
     assertTrue(capabilities.getDocumentFormattingProvider());
     assertTrue(capabilities.getDocumentHighlightProvider());
+    assertTrue(capabilities.getCodeActionProvider());
+    assertEquals(
+        stream(values()).map(ErrorCode::name).collect(toList()),
+        capabilities.getExecuteCommandProvider().getCommands());
 
     assertNull(capabilities.getWorkspace().getWorkspaceFolders().getChangeNotifications());
     assertNull(capabilities.getDocumentRangeFormattingProvider());
@@ -103,12 +111,10 @@ public class MyLanguageServerImplTest {
     assertNull(capabilities.getRenameProvider());
     assertNull(capabilities.getWorkspaceSymbolProvider());
     assertNull(capabilities.getDocumentSymbolProvider());
-    assertNull(capabilities.getCodeActionProvider());
     assertNull(capabilities.getCodeLensProvider());
     assertNull(capabilities.getColorProvider());
     assertNull(capabilities.getTypeDefinitionProvider());
     assertNull(capabilities.getDocumentLinkProvider());
-    assertNull(capabilities.getExecuteCommandProvider());
     assertNull(capabilities.getExperimental());
     assertNull(capabilities.getSignatureHelpProvider());
     assertNull(capabilities.getFoldingRangeProvider());

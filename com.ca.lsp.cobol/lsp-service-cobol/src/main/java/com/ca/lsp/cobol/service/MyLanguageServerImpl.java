@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -29,6 +30,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.stream.Collectors.toList;
@@ -107,6 +109,8 @@ public class MyLanguageServerImpl implements LanguageServer {
     capabilities.setReferencesProvider(TRUE);
     capabilities.setDocumentFormattingProvider(TRUE);
     capabilities.setDocumentHighlightProvider(TRUE);
+    capabilities.setCodeActionProvider(TRUE);
+    capabilities.setExecuteCommandProvider(collectExecuteCommandList());
 
     WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
     workspaceFoldersOptions.setSupported(TRUE);
@@ -134,5 +138,11 @@ public class MyLanguageServerImpl implements LanguageServer {
         WATCHER_PATTERNS.stream()
             .map(it -> new FileSystemWatcher(it, WATCH_ALL_KIND))
             .collect(toList()));
+  }
+
+  @Nonnull
+  private ExecuteCommandOptions collectExecuteCommandList() {
+    return new ExecuteCommandOptions(
+        stream(ErrorCode.values()).map(ErrorCode::name).collect(toList()));
   }
 }
