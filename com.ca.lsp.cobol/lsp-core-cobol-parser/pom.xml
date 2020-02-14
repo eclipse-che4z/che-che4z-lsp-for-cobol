@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright (c) 2019 Broadcom.
+ Copyright (c) 2020 Broadcom.
  The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
 
  This program and the accompanying materials are made
@@ -20,11 +20,11 @@
 	<parent>
 		<groupId>com.ca.lsp</groupId>
 		<artifactId>com.ca.lsp.cobol</artifactId>
-		<version>0.10.0</version>
+		<version>0.10.1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>lsp-core-cobol-parser</artifactId>
-	<version>0.10.0</version>
+	<version>0.10.1</version>
 	<name>COBOL LSP :: LSP Core</name>
 	<packaging>jar</packaging>
 
