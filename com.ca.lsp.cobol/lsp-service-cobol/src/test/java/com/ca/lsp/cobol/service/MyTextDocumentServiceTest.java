@@ -160,6 +160,10 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
         new AnalysisResult(diagnosticsWithErrors, null, null, null, null, null);
 
     when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN)).thenReturn(resultNoErrors);
+    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DID_CHANGE))
+        .thenReturn(resultWithErrors);
+
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_CHANGE)).thenReturn(resultNoErrors);
     when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DID_OPEN))
         .thenReturn(resultWithErrors);
 
@@ -221,7 +225,8 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       List<Diagnostic> diagnostics,
       String text,
       String uri) {
-    verify(engine, timeout(10000).times(2)).analyze(uri, text, DID_CHANGE);
+    verify(engine, timeout(10000).times(1)).analyze(uri, text, DID_CHANGE);
+    verify(engine, timeout(10000).times(1)).analyze(uri, text, DID_OPEN);
     verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
   }
 
