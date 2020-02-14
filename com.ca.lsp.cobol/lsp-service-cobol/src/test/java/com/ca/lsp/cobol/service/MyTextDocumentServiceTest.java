@@ -15,7 +15,6 @@ package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.ca.lsp.cobol.ConfigurableTest;
@@ -39,6 +38,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -153,12 +154,13 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     List<Diagnostic> diagnosticsNoErrors = Collections.emptyList();
     List<Diagnostic> diagnosticsWithErrors = createDefaultDiagnostics();
 
-    AnalysisResult resultNoErrors = new AnalysisResult(diagnosticsNoErrors, null, null, null, null,null);
+    AnalysisResult resultNoErrors =
+        new AnalysisResult(diagnosticsNoErrors, null, null, null, null, null);
     AnalysisResult resultWithErrors =
-        new AnalysisResult(diagnosticsWithErrors, null, null, null, null,null);
+        new AnalysisResult(diagnosticsWithErrors, null, null, null, null, null);
 
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE)).thenReturn(resultNoErrors);
-    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN)).thenReturn(resultNoErrors);
+    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DID_OPEN))
         .thenReturn(resultWithErrors);
 
     MyTextDocumentService service = verifyServiceStart(communications, engine, broker);
@@ -208,7 +210,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
 
-    verify(engine, timeout(10000)).analyze(uri, textToAnalyse);
+    verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
     verify(communications).notifyThatLoadingInProgress(uri);
     verify(communications).publishDiagnostics(uri, diagnostics);
   }
@@ -219,7 +221,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       List<Diagnostic> diagnostics,
       String text,
       String uri) {
-    verify(engine, timeout(10000).times(2)).analyze(uri, text);
+    verify(engine, timeout(10000).times(2)).analyze(uri, text, DID_CHANGE);
     verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
   }
 

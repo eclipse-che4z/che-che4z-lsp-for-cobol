@@ -14,6 +14,7 @@
 package com.ca.lsp.cobol.service.delegates.validations;
 
 import com.broadcom.lsp.domain.common.model.Position;
+import com.ca.lsp.cobol.service.TextDocumentSyncType;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
@@ -54,11 +55,12 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   }
 
   @Override
-  public AnalysisResult analyze(String uri, String text) {
+  public AnalysisResult analyze(
+      String uri, String text, TextDocumentSyncType textDocumentSyncType) {
     if (isEmpty(text)) {
       return AnalysisResult.empty();
     }
-    return toAnalysisResult(engine.run(uri, text), uri);
+    return toAnalysisResult(engine.run(uri, text, textDocumentSyncType.toString()), uri);
   }
 
   private static boolean isEmpty(String text) {

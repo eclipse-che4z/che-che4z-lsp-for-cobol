@@ -19,6 +19,7 @@ import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import org.junit.Test;
 
+import static com.ca.lsp.core.cobol.engine.CobolLanguageEngineTest.DID_OPEN;
 import static org.junit.Assert.assertEquals;
 
 public class CobolVariableCheckTest {
@@ -100,7 +101,7 @@ public class CobolVariableCheckTest {
   @Test
   public void test() {
     CobolLanguageEngine engine = new CobolLanguageEngine();
-    ResultWithErrors<SemanticContext> result = engine.run("1", TEXT_TO_TEST);
+    ResultWithErrors<SemanticContext> result = engine.run("1", TEXT_TO_TEST, DID_OPEN);
     assertEquals(2, result.getErrors().stream().filter(item -> item.getSeverity() == 3).count());
   }
 }

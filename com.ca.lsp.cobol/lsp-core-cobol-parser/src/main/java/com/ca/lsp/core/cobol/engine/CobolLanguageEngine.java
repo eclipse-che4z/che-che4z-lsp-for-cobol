@@ -36,12 +36,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CobolLanguageEngine {
 
-  public ResultWithErrors<SemanticContext> run(String documentUri, String text) {
+  public ResultWithErrors<SemanticContext> run(
+      String documentUri, String text, String textDocumentSyncType) {
 
     CobolPreprocessorImpl preprocessor = new CobolPreprocessorImpl();
 
     ResultWithErrors<PreprocessedInput> preProcessedInput =
-        preprocessor.process(documentUri, text);
+        preprocessor.process(documentUri, text, textDocumentSyncType);
 
     CobolLexer lexer =
         new CobolLexer(CharStreams.fromString(preProcessedInput.getResult().getInput()));

@@ -70,10 +70,11 @@ public class DocumentExtensionTests {
   private void checkExtensionMatches(String extension) {
     String uri = DOCUMENT_URI_BEGINNING + extension;
 
-    when(engine.analyze(uri, TEXT)).thenReturn(AnalysisResult.empty());
+    when(engine.analyze(uri, TEXT, TextDocumentSyncType.DID_OPEN))
+        .thenReturn(AnalysisResult.empty());
     fireDidOpen(extension, uri);
 
-    verify(engine, timeout(10000)).analyze(uri, TEXT);
+    verify(engine, timeout(10000)).analyze(uri, TEXT, TextDocumentSyncType.DID_OPEN);
   }
 
   private void checkExtensionNotMatches(String extension) {

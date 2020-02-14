@@ -49,6 +49,7 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
 
   private final String copyBookName;
   private String documentUri;
+  private String textDocumentSyncType;
   private transient CopybookDefinition copybookDefinition;
   private transient List<CopybookDefinition> copybookUsageTracker;
   private transient CompletableFuture<String> waitForResolving;
@@ -56,11 +57,13 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
   public AnalyseCopybookTask(
       String documentUri,
       CopybookDefinition copybookDefinition,
-      List<CopybookDefinition> copybookUsageTracker) {
+      List<CopybookDefinition> copybookUsageTracker,
+      String textDocumentSyncType) {
     this.documentUri = documentUri;
     this.copybookDefinition = copybookDefinition;
     copyBookName = copybookDefinition.getName();
     this.copybookUsageTracker = copybookUsageTracker;
+    this.textDocumentSyncType = textDocumentSyncType;
     waitForResolving = new CompletableFuture<>();
   }
 
@@ -82,7 +85,11 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
     } else {
       Object subscriber = databus.subscribe(DataEventType.FETCHED_COPYBOOK_EVENT, this);
       databus.postData(
-          RequiredCopybookEvent.builder().name(copyBookName).documentUri(documentUri).build());
+          RequiredCopybookEvent.builder()
+              .name(copyBookName)
+              .documentUri(documentUri)
+              .textDocumentSyncType(textDocumentSyncType)
+              .build());
       semanticContext = parseCopybook();
       databus.unSubscribe(subscriber);
     }
@@ -144,7 +151,8 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
             .process(
                 copybookDefinition.getUri(),
                 content,
-                new SemanticContext(Collections.unmodifiableList(nextTrackerIteration)));
+                new SemanticContext(Collections.unmodifiableList(nextTrackerIteration)),
+                textDocumentSyncType);
     return new ResultWithErrors<>(
         preprocessedInput.getResult().getSemanticContext(), preprocessedInput.getErrors());
   }

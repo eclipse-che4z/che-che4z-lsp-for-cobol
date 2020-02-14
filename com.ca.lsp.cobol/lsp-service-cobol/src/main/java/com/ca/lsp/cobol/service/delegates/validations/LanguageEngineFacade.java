@@ -13,11 +13,15 @@
  */
 package com.ca.lsp.cobol.service.delegates.validations;
 
+import com.ca.lsp.cobol.service.TextDocumentSyncType;
+
 public interface LanguageEngineFacade {
   /**
    * @param uri - URI of the processing document to define positions and errors properly
    * @param text of document opened in the client editor
+   * @param textDocumentSyncType reflect the sync status of the document
+   *     (DID_OPEN|DID_CHANGE|DID_CLOSE)
    * @return list of LSP diagnostic object used to display errors in the editor
    */
-  AnalysisResult analyze(String uri, String text);
+  AnalysisResult analyze(String uri, String text, TextDocumentSyncType textDocumentSyncType);
 }

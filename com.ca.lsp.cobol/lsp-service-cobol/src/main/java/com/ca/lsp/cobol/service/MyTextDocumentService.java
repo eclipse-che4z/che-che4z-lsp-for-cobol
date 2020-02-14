@@ -62,7 +62,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private Formations formations;
   private Completions completions;
   private Occurrences occurrences;
-  private TextDocumentSyncType textDocumentSyncType;
 
   @Inject
   MyTextDocumentService(
@@ -144,7 +143,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-    textDocumentSyncType = TextDocumentSyncType.DID_OPEN;
     // A better implementation that will cover the gitfs scenario will be implementated later based
     // on issue #173
     if (uri.startsWith(GIT_FS_URI)) {
@@ -154,23 +152,20 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
-    registerEngineAndAnalyze(uri, langId, text);
+    registerEngineAndAnalyze(uri, langId, text, TextDocumentSyncType.DID_OPEN);
   }
 
   @Override
   public void didChange(DidChangeTextDocumentParams params) {
-    textDocumentSyncType = TextDocumentSyncType.DID_CHANGE;
-    System.out.println(textDocumentSyncType);
     String uri = params.getTextDocument().getUri();
     String text = params.getContentChanges().get(0).getText();
 
-    analyzeChanges(uri, text);
+    analyzeChanges(uri, text, TextDocumentSyncType.DID_CHANGE);
   }
 
   @Override
   public void didClose(DidCloseTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-    textDocumentSyncType = TextDocumentSyncType.DID_CLOSE;
 
     log.info("Document closing invoked");
     docs.remove(uri);
@@ -185,16 +180,17 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   public void observerCallback(@Nonnull RunAnalysisEvent event) {
     docs.entrySet().stream()
         .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getText()))
-        .forEach(this::analyzeChanges);
+        .forEach((uri, text) -> analyzeChanges(uri, text, TextDocumentSyncType.DID_CHANGE));
   }
 
-  private void registerEngineAndAnalyze(String uri, String languageType, String text) {
+  private void registerEngineAndAnalyze(
+      String uri, String languageType, String text, TextDocumentSyncType textDocumentSyncType) {
     String fileExtension = extractExtension(uri);
     if (fileExtension != null && !isCobolFile(fileExtension)) {
       communications.notifyThatExtensionIsUnsupported(fileExtension);
     } else if (isCobolFile(languageType)) {
       communications.notifyThatLoadingInProgress(uri);
-      analyzeDocumentFirstTime(uri, text);
+      analyzeDocumentFirstTime(uri, text, textDocumentSyncType);
     } else {
       communications.notifyThatEngineNotFound(languageType);
     }
@@ -211,20 +207,21 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
         .orElse(null);
   }
 
-  private void analyzeDocumentFirstTime(String uri, String text) {
+  private void analyzeDocumentFirstTime(
+      String uri, String text, TextDocumentSyncType textDocumentSyncType) {
     CompletableFuture.runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text);
+              AnalysisResult result = engine.analyze(uri, text, textDocumentSyncType);
               docs.get(uri).setAnalysisResult(result);
               publishResult(uri, result);
             })
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
   }
 
-  private void analyzeChanges(String uri, String text) {
+  private void analyzeChanges(String uri, String text, TextDocumentSyncType textDocumentSyncType) {
     CompletableFuture.runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text);
+              AnalysisResult result = engine.analyze(uri, text, textDocumentSyncType);
               registerDocument(uri, new MyDocumentModel(text, result));
               communications.publishDiagnostics(uri, result.getDiagnostics());
             })

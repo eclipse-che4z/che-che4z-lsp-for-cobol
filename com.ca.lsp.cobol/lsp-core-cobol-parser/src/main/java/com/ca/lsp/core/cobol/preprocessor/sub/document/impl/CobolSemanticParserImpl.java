@@ -28,6 +28,7 @@ import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListen
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.google.common.collect.Multimap;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -48,26 +49,29 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   @Nonnull
   @Override
   public ResultWithErrors<PreprocessedInput> processLines(
-      @Nonnull String uri, @Nonnull String code, @Nonnull SemanticContext semanticContext) {
+      @Nonnull String uri,
+      @Nonnull String code,
+      @Nonnull SemanticContext semanticContext,
+      @NonNull String textDocumentSyncType) {
     // run the lexer
-    final CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
+    CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     // get a list of matched tokens
-    final CommonTokenStream tokens = new CommonTokenStream(lexer);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
 
     // pass the tokens to the parser
-    final CobolPreprocessorParser parser = new CobolPreprocessorParser(tokens);
+    CobolPreprocessorParser parser = new CobolPreprocessorParser(tokens);
 
     // specify our entry point
-    final StartRuleContext startRule = parser.startRule();
+    StartRuleContext startRule = parser.startRule();
 
-    final ParseTreeWalker walker = new ParseTreeWalker();
-    final CobolSemanticParserListener listener =
+    ParseTreeWalker walker = new ParseTreeWalker();
+    CobolSemanticParserListener listener =
         createDocumentParserListener(uri, tokens, semanticContext);
     walker.walk(listener, startRule);
 
     // analyze contained copy books
     ResultWithErrors<List<CopybookSemanticContext>> contexts =
-        processCopybooks(uri, semanticContext);
+        processCopybooks(uri, semanticContext, textDocumentSyncType);
 
     buildCompleteVariableStructure(semanticContext, contexts);
 
@@ -80,7 +84,9 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
   @Nonnull
   private ResultWithErrors<List<CopybookSemanticContext>> processCopybooks(
-      @Nonnull String documentUri, @Nonnull SemanticContext semanticContext) {
+      @Nonnull String documentUri,
+      @Nonnull SemanticContext semanticContext,
+      String textDocumentSyncType) {
     Multimap<String, Position> copybookNames = semanticContext.getCopybooks().getDefinitions();
 
     if (copybookNames.isEmpty()) {
@@ -89,7 +95,10 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
     CopybookAnalysis copybookAnalyzer = createCopybookAnalyzer();
     return copybookAnalyzer.analyzeCopybooks(
-        documentUri, copybookNames, semanticContext.getCopybookUsageTracker());
+        documentUri,
+        copybookNames,
+        semanticContext.getCopybookUsageTracker(),
+        textDocumentSyncType);
   }
 
   private void buildCompleteVariableStructure(

@@ -50,18 +50,19 @@ public class CobolLanguageEngineTest {
           + "            END-PERFORM.\r\n"
           + "\r\n"
           + "            STOP RUN.";
+  public static final String DID_OPEN = "DID_OPEN";
 
   @Test
   public void doCheckNegative() {
     CobolLanguageEngine engine = new CobolLanguageEngine();
-    ResultWithErrors<SemanticContext> result = engine.run(DOCUMENT_URI, NEGATIVE_TEXT);
+    ResultWithErrors<SemanticContext> result = engine.run(DOCUMENT_URI, NEGATIVE_TEXT, DID_OPEN);
     assertEquals(11, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 
   @Test
   public void doCheckPositive() {
     CobolLanguageEngine engine = new CobolLanguageEngine();
-    ResultWithErrors<SemanticContext> result = engine.run(DOCUMENT_URI, POSITIVE_TEXT);
+    ResultWithErrors<SemanticContext> result = engine.run(DOCUMENT_URI, POSITIVE_TEXT, DID_OPEN);
     assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 }

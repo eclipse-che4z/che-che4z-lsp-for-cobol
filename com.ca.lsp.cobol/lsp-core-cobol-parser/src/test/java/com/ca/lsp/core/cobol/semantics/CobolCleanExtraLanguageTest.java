@@ -175,13 +175,13 @@ public class CobolCleanExtraLanguageTest {
   @Test
   public void positiveErrorTest() {
     CobolLanguageEngine engine = new CobolLanguageEngine();
-    ResultWithErrors<SemanticContext> result = engine.run("1", TEXT_TO_TEST);
+    ResultWithErrors<SemanticContext> result = engine.run("1", TEXT_TO_TEST, "DID_OPEN");
     assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 
   @Test
   public void specificStatementExclusionTest() {
-    final PreprocessorCleanerServiceImpl preprocessorCleanerService =
+    PreprocessorCleanerServiceImpl preprocessorCleanerService =
         new PreprocessorCleanerServiceImpl(contexts);
     preprocessorCleanerService.push();
     preprocessorCleanerService.specificTypeExclusion(tag, text, linePrefix);
