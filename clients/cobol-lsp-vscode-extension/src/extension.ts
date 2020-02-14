@@ -14,7 +14,7 @@
 
 import * as cp from "child_process";
 import * as fs from "fs";
-import { Disposable, ExtensionContext, extensions, window, workspace } from "vscode";
+import { Disposable, ExtensionContext, extensions, window, workspace, commands } from "vscode";
 import {
     LanguageClient,
     LanguageClientOptions,
@@ -55,11 +55,15 @@ export async function activate(context: ExtensionContext) {
     const languageClient = new LanguageClient("COBOL", "LSP extension for COBOL language",
         createServerOptions(LSPServerPath),
         clientOptions);
-    workspace.onDidChangeConfiguration(event => {
+
+    context.subscriptions.push(workspace.onDidChangeConfiguration(event => {
         if (event.affectsConfiguration(SETTINGS_SECTION + ".paths")) {
             copyBooksDownloader.redownloadDependencies();
         }
-    });
+    }));
+    context.subscriptions.push(commands.registerCommand("cobol-language-support.copybooks.redownload", () => {
+        copyBooksDownloader.redownloadDependencies();
+    }));
     context.subscriptions.push(languageClient.start());
     context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
 }

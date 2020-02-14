@@ -35,6 +35,12 @@
     "icon": "resources/logo.png",
     "main": "./out/extension.js",
     "contributes": {
+        "commands": [
+            {
+                "command": "cobol-language-support.copybooks.redownload",
+                "title": "Redownload all copybooks"
+            }
+        ],
         "languages": [
             {
                 "id": "COBOL",
