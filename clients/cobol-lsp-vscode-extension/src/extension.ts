@@ -24,6 +24,8 @@ import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
 import { ProfileService } from "./ProfileService";
 import { ZoweApi } from "./ZoweApi";
 
+export const SETTINGS_SECTION: string = "cobol-language-support";
+
 export async function activate(context: ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
@@ -53,6 +55,11 @@ export async function activate(context: ExtensionContext) {
     const languageClient = new LanguageClient("COBOL", "LSP extension for COBOL language",
         createServerOptions(LSPServerPath),
         clientOptions);
+    workspace.onDidChangeConfiguration(event => {
+        if (event.affectsConfiguration(SETTINGS_SECTION + ".paths")) {
+            copyBooksDownloader.redownloadDependencies();
+        }
+    });
     context.subscriptions.push(languageClient.start());
     context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
 }

@@ -15,9 +15,8 @@
 import { IProfile } from "@zowe/imperative";
 import * as path from "path";
 import * as vscode from "vscode";
+import { SETTINGS_SECTION } from "./extension";
 import { ProfilesMap, ZoweApi } from "./ZoweApi";
-
-const SETTINGS_SECTION: string = "cobol-language-support";
 
 export class ProfileService {
     constructor(private zoweApi: ZoweApi) {

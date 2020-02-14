@@ -12,12 +12,11 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { IProfile } from "@zowe/imperative";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { ProfileService } from "./ProfileService";
-import { ProfilesMap, ZoweApi } from "./ZoweApi";
+import { ZoweApi } from "./ZoweApi";
 
 export const DEPENDENCIES_FOLDER: string = ".cobdeps";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
@@ -29,6 +28,19 @@ export class CopybooksDownloader {
         private zoweApi: ZoweApi,
         private profileService: ProfileService) { }
 
+    public async redownloadDependencies() {
+        (await vscode.workspace.findFiles(".cobdeps/**/*.dep")).forEach(dep => {
+            const errFile = dep.fsPath.substr(0, dep.fsPath.length - 4) + ".err";
+            if (fs.existsSync(errFile)) {
+                try {
+                    fs.unlinkSync(errFile);
+                } catch (error) {
+                    vscode.window.showErrorMessage(error.toString());
+                }
+            }
+            this.downloadDependencies(dep);
+        });
+    }
     /**
      * @param copybooks array of copybooks names to download
      */
