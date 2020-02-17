@@ -83,7 +83,7 @@ public class DocumentExtensionTests {
 
   private void fireDidOpen(String extension, String uri) {
     TextDocumentService service =
-        new MyTextDocumentService(communications, engine, null, null, null, broker);
+        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
     service.didOpen(new DidOpenTextDocumentParams(new TextDocumentItem(uri, extension, 0, TEXT)));
   }
 }
