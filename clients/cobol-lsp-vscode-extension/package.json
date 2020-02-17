@@ -52,13 +52,13 @@
             }
         ],
         "configuration": {
-            "title": "COBOL language support",
+            "title": "Broadcom COBOL LSP",
             "properties": {
-                "cobol-language-support.profiles": {
+                "broadcom-cobol-lsp.cpy-manager.profiles": {
                     "type": "Object",
                     "description": "Program name to profile map"
                 },
-                "cobol-language-support.paths": {
+                "broadcom-cobol-lsp.cpy-manager.paths": {
                     "type": "array",
                     "items": {
                         "type": "string"
