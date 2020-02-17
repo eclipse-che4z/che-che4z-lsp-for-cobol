@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -24,27 +25,36 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
+import static java.lang.Boolean.TRUE;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.emptyList;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
+
+/**
+ * This class sets up the initial state of the services and applies other initialization activities,
+ * such as set server capabilities and register file system watchers.
+ */
 @Singleton
 public class MyLanguageServerImpl implements LanguageServer {
-  /** Glob patterns to watch COPYBOOKS folder and copybook files */
+  /** Glob patterns to watch the copybooks folder and copybook files */
   private static final List<String> WATCHER_PATTERNS =
-      Arrays.asList("**/.copybooks/**/*.cpy", "**/.copybooks/**/*.CPY", "**/.copybooks");
+      asList("**/.copybooks/**/*.cpy", "**/.copybooks/**/*.CPY", "**/.copybooks");
 
   /**
-   * The kind of events of interest for watchers calculated as WatchKind.Create | WatchKind.Change |
-   * WatchKind.Delete which is 7
+   * The kind of events of interest, for watchers calculated as WatchKind.Create | WatchKind.Change
+   * | WatchKind.Delete which is 7
    */
   private static final int WATCH_ALL_KIND = 7;
 
   private TextDocumentService textService;
   private CobolWorkspaceService workspaceService;
-  private final FileSystemService fileSystemService;
+  private FileSystemService fileSystemService;
   private Provider<LanguageClient> clientProvider;
 
   @Inject
@@ -59,62 +69,6 @@ public class MyLanguageServerImpl implements LanguageServer {
     this.clientProvider = clientProvider;
   }
 
-  /**
-   * Initialized request is sent from the client after the 'initialize' request is resolved. It is
-   * used as hook to dynamically register capabilities, e.g. file system watchers.
-   *
-   * @param params - InitializedParams sent by a client
-   */
-  @Override
-  public void initialized(@Nullable InitializedParams params) {
-    LanguageClient client = clientProvider.get();
-    List<Registration> registrationList = new ArrayList<>();
-
-    registrationList.add(
-        new Registration("copybooksWatcher", "workspace/didChangeWatchedFiles", createWatcher()));
-    registrationList.add(
-        new Registration("configurationChange", "workspace/didChangeConfiguration", null));
-
-    RegistrationParams registrationParams = new RegistrationParams(registrationList);
-    client.registerCapability(registrationParams);
-  }
-
-  @Override
-  public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
-    ServerCapabilities capabilities = new ServerCapabilities();
-
-    capabilities.setTextDocumentSync(TextDocumentSyncKind.Full);
-    capabilities.setCompletionProvider(new CompletionOptions(true, new ArrayList<>()));
-    capabilities.setSignatureHelpProvider(null);
-    capabilities.setDefinitionProvider(Boolean.TRUE);
-    capabilities.setHoverProvider(Boolean.FALSE);
-    capabilities.setCodeActionProvider(Boolean.FALSE);
-    capabilities.setReferencesProvider(Boolean.TRUE);
-    capabilities.setDocumentSymbolProvider(Boolean.FALSE);
-    capabilities.setCodeLensProvider(null);
-    capabilities.setDocumentFormattingProvider(Boolean.TRUE);
-    capabilities.setDocumentHighlightProvider(Boolean.TRUE);
-
-    WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
-    workspaceFoldersOptions.setSupported(Boolean.TRUE);
-    WorkspaceServerCapabilities workspaceServiceCapabilities =
-        new WorkspaceServerCapabilities(workspaceFoldersOptions);
-    capabilities.setWorkspace(workspaceServiceCapabilities);
-
-    fileSystemService.setWorkspaceFolders(params.getWorkspaceFolders());
-    return CompletableFuture.supplyAsync(() -> new InitializeResult(capabilities));
-  }
-
-  @Override
-  public CompletableFuture<Object> shutdown() {
-    return CompletableFuture.supplyAsync(() -> Boolean.TRUE);
-  }
-
-  @Override
-  public void exit() {
-    // not supported
-  }
-
   @Override
   public TextDocumentService getTextDocumentService() {
     return textService;
@@ -125,11 +79,70 @@ public class MyLanguageServerImpl implements LanguageServer {
     return workspaceService;
   }
 
+  /**
+   * Initialized request sent from the client after the 'initialize' request resolved. It is used as
+   * hook to dynamically register capabilities, e.g. file system watchers.
+   *
+   * @param params - InitializedParams sent by a client
+   */
+  @Override
+  public void initialized(@Nullable InitializedParams params) {
+    LanguageClient client = clientProvider.get();
+
+    RegistrationParams registrationParams =
+        new RegistrationParams(
+            asList(
+                new Registration(
+                    "copybooksWatcher", "workspace/didChangeWatchedFiles", createWatcher()),
+                new Registration("configurationChange", "workspace/didChangeConfiguration", null)));
+    client.registerCapability(registrationParams);
+  }
+
+  @Override
+  @Nonnull
+  public CompletableFuture<InitializeResult> initialize(@Nonnull InitializeParams params) {
+    ServerCapabilities capabilities = new ServerCapabilities();
+
+    capabilities.setTextDocumentSync(Full);
+    capabilities.setCompletionProvider(new CompletionOptions(true, emptyList()));
+    capabilities.setDefinitionProvider(TRUE);
+    capabilities.setReferencesProvider(TRUE);
+    capabilities.setDocumentFormattingProvider(TRUE);
+    capabilities.setDocumentHighlightProvider(TRUE);
+    capabilities.setCodeActionProvider(TRUE);
+    capabilities.setExecuteCommandProvider(collectExecuteCommandList());
+
+    WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
+    workspaceFoldersOptions.setSupported(TRUE);
+    WorkspaceServerCapabilities workspaceServiceCapabilities =
+        new WorkspaceServerCapabilities(workspaceFoldersOptions);
+    capabilities.setWorkspace(workspaceServiceCapabilities);
+
+    fileSystemService.setWorkspaceFolders(params.getWorkspaceFolders());
+    return supplyAsync(() -> new InitializeResult(capabilities));
+  }
+
+  @Override
+  public CompletableFuture<Object> shutdown() {
+    return supplyAsync(() -> TRUE);
+  }
+
+  @Override
+  public void exit() {
+    // not supported
+  }
+
   @Nonnull
   private DidChangeWatchedFilesRegistrationOptions createWatcher() {
     return new DidChangeWatchedFilesRegistrationOptions(
         WATCHER_PATTERNS.stream()
             .map(it -> new FileSystemWatcher(it, WATCH_ALL_KIND))
-            .collect(Collectors.toList()));
+            .collect(toList()));
+  }
+
+  @Nonnull
+  private ExecuteCommandOptions collectExecuteCommandList() {
+    return new ExecuteCommandOptions(
+        stream(ErrorCode.values()).map(ErrorCode::name).collect(toList()));
   }
 }
