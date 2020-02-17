@@ -21,7 +21,7 @@ import { ZoweApi } from "./ZoweApi";
 export const DEPENDENCIES_FOLDER: string = ".cobdeps";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
 
-const SETTINGS_ROOT = "cobol-language-support";
+const SETTINGS_ROOT = "broadcom-cobol-lsp.cpy-manager";
 
 export class CopybooksDownloader {
     public constructor(
