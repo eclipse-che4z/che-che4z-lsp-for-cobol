@@ -147,28 +147,41 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
    */
   @Test
   public void observerCallback() {
+
+    // configured mock object and diagnostic stubs
     Communications communications = mock(Communications.class);
     LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
     DataBusBroker broker = mock(DataBusBroker.class);
-
     List<Diagnostic> diagnosticsNoErrors = Collections.emptyList();
     List<Diagnostic> diagnosticsWithErrors = createDefaultDiagnostics();
 
+    // created two dummy analysis result, one with error and another without
+    // those object will be used as result of dynamic stubbing stage
     AnalysisResult resultNoErrors =
         new AnalysisResult(diagnosticsNoErrors, null, null, null, null, null);
     AnalysisResult resultWithErrors =
         new AnalysisResult(diagnosticsWithErrors, null, null, null, null, null);
 
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN)).thenReturn(resultNoErrors);
-    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DID_CHANGE))
-        .thenReturn(resultWithErrors);
+    /*
+     * Defined dynamic response based on the possible combinations available when the document is analyzed:
+     *  - text document sync state: [DID_OPEN|DID_CHANGE]
+     *  - document URI [correct|incorrect]
+     */
 
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_CHANGE)).thenReturn(resultNoErrors);
+    // dynamic stubbing for did open event
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN)).thenReturn(resultNoErrors);
     when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DID_OPEN))
         .thenReturn(resultWithErrors);
 
+    // dynamic stubbing for did change event
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_CHANGE)).thenReturn(resultNoErrors);
+    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DID_CHANGE))
+        .thenReturn(resultWithErrors);
+
+    // create a service and verify is subscribed to the required event
     MyTextDocumentService service = verifyServiceStart(communications, engine, broker);
 
+    // simulate the call to the didOpen for two different document one with and one without errors
     verifyDidOpen(communications, engine, diagnosticsNoErrors, service, TEXT_EXAMPLE, DOCUMENT_URI);
     verifyDidOpen(
         communications,
@@ -178,7 +191,15 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
         INCORRECT_TEXT_EXAMPLE,
         DOCUMENT_WITH_ERRORS_URI);
 
+    // after the simulation for triggering the observer callback verify that the analyze method
+    // (more in general the document analysis stage) is triggered
     service.observerCallback(new RunAnalysisEvent());
+
+    /* After sent a message on the databus we'll verify that the document is analyzed by the preprocessor.
+       More in detail we'll check that:
+       - analysis is invoked two times (because two are the document used to make this test
+       - the publish diagnostic after the syntax/semantic analysis is invoked exactly 2 times.
+    */
     verifyCallback(communications, engine, diagnosticsNoErrors, TEXT_EXAMPLE, DOCUMENT_URI);
     verifyCallback(
         communications,
@@ -225,6 +246,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       List<Diagnostic> diagnostics,
       String text,
       String uri) {
+
     verify(engine, timeout(10000).times(1)).analyze(uri, text, DID_CHANGE);
     verify(engine, timeout(10000).times(1)).analyze(uri, text, DID_OPEN);
     verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
