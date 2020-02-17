@@ -106,7 +106,7 @@ pipeline {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh 'npx vsce package'
                         archiveArtifacts "*.vsix"
-                        sh 'mv cobol-language-support*.vsix cobol-language-support_0.10.0.vsix'
+                        sh 'mv cobol-language-support*.vsix cobol-language-support_0.10.1.vsix'
                     }
                 }
             }

@@ -32,7 +32,7 @@ export async function activate(context: ExtensionContext) {
     const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(zoweApi, profileService);
     // path resolved to identify the location of the LSP server into the extension
     const extPath = extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
-    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.10.0.jar`;
+    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.10.1.jar`;
 
     try {
         await isJavaInstalled();
@@ -101,7 +101,7 @@ async function isJavaInstalled() {
 
 function createServerOptions(jarPath: string) {
     return {
-        args: ["-Dline.separator=\r\n", "-jar", jarPath, "pipeEnabled"],
+        args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", LSPServerPath, "pipeEnabled"],
         command: "java",
         options: { stdio: "pipe", detached: false },
     };
