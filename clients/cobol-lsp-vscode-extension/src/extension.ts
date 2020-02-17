@@ -101,7 +101,7 @@ async function isJavaInstalled() {
 
 function createServerOptions(jarPath: string) {
     return {
-        args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", LSPServerPath, "pipeEnabled"],
+        args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
         command: "java",
         options: { stdio: "pipe", detached: false },
     };
