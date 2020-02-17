@@ -45,7 +45,7 @@ export class CopybooksDownloader {
      */
     public async downloadDependencies(uri: vscode.Uri,
                                       message: string = "Program contains dependencies to missing copybooks.",
-                                     ): Promise<void> {
+    ): Promise<void> {
         // TODO Maybe introduce download queue?
         const missingCopybooksFilePath = uri.fsPath.substr(0, uri.fsPath.length - ".dep".length) + ".err";
         const copybooks: string[] = fs.readFileSync(uri.fsPath).toString().split("\n")
@@ -57,22 +57,22 @@ export class CopybooksDownloader {
             return;
         }
 
-        const cb: Set<string> = new Set(copybooks);
+        const copybooksToDownload: Set<string> = new Set(copybooks);
         const profile: string = await this.profileService.getProfile(uri);
         if (!profile) {
             return;
         }
 
-        missingCopybooks.forEach(m => cb.delete(m));
+        missingCopybooks.forEach(m => copybooksToDownload.delete(m));
         (await this.listPathDatasets()).forEach(ds => {
-            Array.from(cb.values()).forEach(c => {
+            Array.from(copybooksToDownload.values()).forEach(c => {
                 if (fs.existsSync(this.createCopybookPath(profile, ds, c))) {
-                    cb.delete(c);
+                    copybooksToDownload.delete(c);
                 }
             });
         });
         const downloadCopybookAction = "Download Copybooks";
-        if (cb.size > 0) {
+        if (copybooksToDownload.size > 0) {
             const action: string = await vscode.window.showInformationMessage(
                 message,
                 downloadCopybookAction);
@@ -87,17 +87,18 @@ export class CopybooksDownloader {
                 title: "Fetching copybooks",
             },
             async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
-                for (const ds of await this.listPathDatasets()) {
-                    progress.report({ message: "Looking in " + ds + ". " + cb.size + " copybook(s) left." });
+                for (const dataset of await this.listPathDatasets()) {
+                    progress.report({ message: "Looking in " + dataset + ". " + copybooksToDownload.size +
+                        " copybook(s) left." });
                     try {
-                        await this.fetchCopybooks(ds, cb, profile);
+                        await this.fetchCopybooks(dataset, copybooksToDownload, profile);
                     } catch (e) {
                         vscode.window.showErrorMessage(e.toString());
                     }
                 }
             });
         let errors: string = "";
-        cb.forEach(c => errors += c + "\n");
+        copybooksToDownload.forEach(c => errors += c + "\n");
         if (errors) {
             vscode.window.showErrorMessage("Can't download copybooks: " + errors);
             fs.mkdirSync(path.dirname(missingCopybooksFilePath), { recursive: true });
