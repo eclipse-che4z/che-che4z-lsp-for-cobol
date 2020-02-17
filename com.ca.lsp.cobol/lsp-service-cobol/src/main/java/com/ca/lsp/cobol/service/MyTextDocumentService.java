@@ -37,7 +37,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -176,9 +175,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
 
   @Override
   public void observerCallback(@Nonnull RunAnalysisEvent event) {
-    docs.entrySet().stream()
-        .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getText()))
-        .forEach(this::analyzeChanges);
+    docs.forEach((key, value) -> analyzeChanges(key, value.getText()));
   }
 
   private void registerEngineAndAnalyze(String uri, String languageType, String text) {
