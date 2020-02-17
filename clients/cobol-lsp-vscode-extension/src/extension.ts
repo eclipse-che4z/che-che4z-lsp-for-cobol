@@ -14,7 +14,7 @@
 
 import * as cp from "child_process";
 import * as fs from "fs";
-import { Disposable, ExtensionContext, extensions, window, workspace, commands } from "vscode";
+import { commands, Disposable, ExtensionContext, extensions, window,  workspace } from "vscode";
 import {
     LanguageClient,
     LanguageClientOptions,
@@ -24,7 +24,7 @@ import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
 import { ProfileService } from "./ProfileService";
 import { ZoweApi } from "./ZoweApi";
 
-export const SETTINGS_SECTION: string = "cobol-language-support";
+export const SETTINGS_SECTION: string = "broadcom-cobol-lsp.cpy-manager";
 
 export async function activate(context: ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
@@ -58,7 +58,7 @@ export async function activate(context: ExtensionContext) {
 
     context.subscriptions.push(workspace.onDidChangeConfiguration(event => {
         if (event.affectsConfiguration(SETTINGS_SECTION + ".paths")) {
-            copyBooksDownloader.redownloadDependencies();
+            copyBooksDownloader.redownloadDependencies("Configuration was updated");
         }
     }));
     context.subscriptions.push(commands.registerCommand("cobol-language-support.copybooks.redownload", () => {

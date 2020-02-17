@@ -15,20 +15,19 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { SETTINGS_SECTION } from "./extension";
 import { ProfileService } from "./ProfileService";
 import { ZoweApi } from "./ZoweApi";
 
 export const DEPENDENCIES_FOLDER: string = ".cobdeps";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
 
-const SETTINGS_ROOT = "broadcom-cobol-lsp.cpy-manager";
-
 export class CopybooksDownloader {
     public constructor(
         private zoweApi: ZoweApi,
         private profileService: ProfileService) { }
 
-    public async redownloadDependencies() {
+    public async redownloadDependencies(message: string = "Redownload dependencies requested.") {
         (await vscode.workspace.findFiles(".cobdeps/**/*.dep")).forEach(dep => {
             const errFile = dep.fsPath.substr(0, dep.fsPath.length - 4) + ".err";
             if (fs.existsSync(errFile)) {
@@ -38,14 +37,15 @@ export class CopybooksDownloader {
                     vscode.window.showErrorMessage(error.toString());
                 }
             }
-            this.downloadDependencies(dep);
+            this.downloadDependencies(dep, message);
         });
     }
     /**
      * @param copybooks array of copybooks names to download
      */
-    // tslint:disable-next-line: cognitive-complexity
-    public async downloadDependencies(uri: vscode.Uri): Promise<void> {
+    public async downloadDependencies(uri: vscode.Uri,
+                                      message: string = "Program contains dependencies to missing copybooks.",
+                                     ): Promise<void> {
         // TODO Maybe introduce download queue?
         const missingCopybooksFilePath = uri.fsPath.substr(0, uri.fsPath.length - ".dep".length) + ".err";
         const copybooks: string[] = fs.readFileSync(uri.fsPath).toString().split("\n")
@@ -71,11 +71,12 @@ export class CopybooksDownloader {
                 }
             });
         });
+        const downloadCopybookAction = "Download Copybooks";
         if (cb.size > 0) {
             const action: string = await vscode.window.showInformationMessage(
-                "Program contains dependencies to missing copybooks.",
-                "Download Copybooks", "Ignore");
-            if (action !== "Download Copybooks") {
+                message,
+                downloadCopybookAction);
+            if (action !== downloadCopybookAction) {
                 return;
             }
         }
@@ -141,10 +142,10 @@ export class CopybooksDownloader {
     }
 
     private async listPathDatasets(): Promise<string[]> {
-        if (!vscode.workspace.getConfiguration(SETTINGS_ROOT).has("paths")) {
+        if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has("paths")) {
             await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
             return [];
         }
-        return vscode.workspace.getConfiguration(SETTINGS_ROOT).get("paths");
+        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get("paths");
     }
 }
