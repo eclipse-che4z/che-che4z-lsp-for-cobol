@@ -193,8 +193,9 @@ public class FileSystemServiceImpl implements FileSystemService {
     String content = Optional.ofNullable(path).map(this::retrieveContentByPath).orElse(null);
 
     // if the document is in DID_OPEN mode is possible write on dependency file..
-    if (TextDocumentSyncType.valueOf(event.getTextDocumentSyncType())
-        .equals(TextDocumentSyncType.DID_OPEN)) {
+    if (event.getTextDocumentSyncType() != null
+        && TextDocumentSyncType.valueOf(event.getTextDocumentSyncType())
+            .equals(TextDocumentSyncType.DID_OPEN)) {
       addCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
     }
 

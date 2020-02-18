@@ -152,15 +152,16 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
-    registerEngineAndAnalyze(uri, langId, text, TextDocumentSyncType.DID_OPEN);
+    registerEngineAndAnalyze(uri, langId, text);
   }
 
   @Override
   public void didChange(DidChangeTextDocumentParams params) {
+    params.getTextDocument();
     String uri = params.getTextDocument().getUri();
     String text = params.getContentChanges().get(0).getText();
 
-    analyzeChanges(uri, text, TextDocumentSyncType.DID_CHANGE);
+    analyzeChanges(uri, text);
   }
 
   @Override
@@ -180,17 +181,16 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   public void observerCallback(@Nonnull RunAnalysisEvent event) {
     docs.entrySet().stream()
         .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getText()))
-        .forEach((uri, text) -> analyzeChanges(uri, text, TextDocumentSyncType.DID_CHANGE));
+        .forEach(this::analyzeChanges);
   }
 
-  private void registerEngineAndAnalyze(
-      String uri, String languageType, String text, TextDocumentSyncType textDocumentSyncType) {
+  private void registerEngineAndAnalyze(String uri, String languageType, String text) {
     String fileExtension = extractExtension(uri);
     if (fileExtension != null && !isCobolFile(fileExtension)) {
       communications.notifyThatExtensionIsUnsupported(fileExtension);
     } else if (isCobolFile(languageType)) {
       communications.notifyThatLoadingInProgress(uri);
-      analyzeDocumentFirstTime(uri, text, textDocumentSyncType);
+      analyzeDocumentFirstTime(uri, text);
     } else {
       communications.notifyThatEngineNotFound(languageType);
     }
@@ -207,21 +207,20 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
         .orElse(null);
   }
 
-  private void analyzeDocumentFirstTime(
-      String uri, String text, TextDocumentSyncType textDocumentSyncType) {
+  private void analyzeDocumentFirstTime(String uri, String text) {
     CompletableFuture.runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text, textDocumentSyncType);
+              AnalysisResult result = engine.analyze(uri, text, TextDocumentSyncType.DID_OPEN);
               docs.get(uri).setAnalysisResult(result);
               publishResult(uri, result);
             })
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
   }
 
-  private void analyzeChanges(String uri, String text, TextDocumentSyncType textDocumentSyncType) {
+  private void analyzeChanges(String uri, String text) {
     CompletableFuture.runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text, textDocumentSyncType);
+              AnalysisResult result = engine.analyze(uri, text, TextDocumentSyncType.DID_CHANGE);
               registerDocument(uri, new MyDocumentModel(text, result));
               communications.publishDiagnostics(uri, result.getDiagnostics());
             })

@@ -175,7 +175,14 @@ public class CobolCleanExtraLanguageTest {
   @Test
   public void positiveErrorTest() {
     CobolLanguageEngine engine = new CobolLanguageEngine();
-    ResultWithErrors<SemanticContext> result = engine.run("1", TEXT_TO_TEST, "DID_OPEN");
+    ResultWithErrors<SemanticContext> result;
+
+    // VERIFY THE SCENARIO FOR DID_OPEN
+    result = engine.run("1", TEXT_TO_TEST, "DID_OPEN");
+    assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
+
+    // VERIFY THE SCENARIO FOR DID_CHANGE
+    result = engine.run("1", TEXT_TO_TEST, "DID_CHANGE");
     assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 
