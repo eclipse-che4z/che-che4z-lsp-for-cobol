@@ -14,10 +14,13 @@
 
 import * as cp from "child_process";
 import * as fs from "fs";
-import { commands, Disposable, ExtensionContext, extensions, window,  workspace } from "vscode";
+import * as net from "net";
+import { commands, ExtensionContext, extensions, window, workspace } from "vscode";
 import {
+    Disposable,
     LanguageClient,
     LanguageClientOptions,
+    StreamInfo,
 } from "vscode-languageclient/lib/main";
 import { CopybooksDownloader, DEPENDENCIES_FOLDER } from "./CopybooksDownloader";
 import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
@@ -36,7 +39,7 @@ export async function activate(context: ExtensionContext) {
 
     try {
         await isJavaInstalled();
-        if (!fs.existsSync(LSPServerPath)) {
+        if (!getLspPort() && !fs.existsSync(LSPServerPath)) {
             window.showErrorMessage("COBOL extension failed to start - LSP server not found");
             return;
         }
@@ -53,8 +56,7 @@ export async function activate(context: ExtensionContext) {
 
     // Create the language client and start the client.
     const languageClient = new LanguageClient("COBOL", "LSP extension for COBOL language",
-        createServerOptions(LSPServerPath),
-        clientOptions);
+        createServerOptions(LSPServerPath), clientOptions);
 
     context.subscriptions.push(workspace.onDidChangeConfiguration(event => {
         if (event.affectsConfiguration(SETTINGS_SECTION + ".paths")) {
@@ -99,7 +101,27 @@ async function isJavaInstalled() {
     });
 }
 
+function getLspPort(): number | undefined {
+    return +workspace.getConfiguration().get("broadcom-cobol-lsp.server.port");
+}
+
 function createServerOptions(jarPath: string) {
+    const port = getLspPort();
+    if (port) {
+        // Connect to language server via socket
+        const connectionInfo = {
+            host: "localhost",
+            port,
+        };
+        return () => {
+            const socket = net.connect(connectionInfo);
+            const result: StreamInfo = {
+                reader: socket,
+                writer: socket,
+            };
+            return Promise.resolve(result);
+        };
+    }
     return {
         args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
         command: "java",

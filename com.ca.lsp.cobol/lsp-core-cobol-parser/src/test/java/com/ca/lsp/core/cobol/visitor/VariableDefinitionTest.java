@@ -18,71 +18,90 @@ package com.ca.lsp.core.cobol.visitor;
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.model.Variable;
-import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.utils.CustomToken;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.ca.lsp.core.cobol.parser.CobolParser.DataNameContext;
+import static com.ca.lsp.core.cobol.parser.CobolParser.QualifiedDataNameFormat1Context;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * This tests checks the variables usages found by the {@link CobolVisitor} for defined and not
+ * defined variables. The there is a usage of a variable that is not found, then an error should be
+ * shown.
+ */
 public class VariableDefinitionTest {
-  private CobolVisitor visitor = new CobolVisitor();
-  List<SyntaxError> errors = new CopyOnWriteArrayList<>();
-  final SemanticContext semanticContext = new SemanticContext(new ArrayList<>());
-  final String VARNAME = "custom";
-  final String VARNAME2 = "notCustom";
-  final String LEVEL_NUMBER = "05";
-  final Variable VARIABLE = new Variable(LEVEL_NUMBER, VARNAME2);
-  final Position VARIABLE_POSITION = new Position("", 1, 1, 1, 1);
+  private static final String INVALID_VARIABLE = "defined";
+  private static final String DEFINED_VARIABLE = "invalid";
+  private static final String LEVEL_NUMBER = "05";
 
+  private static final Position VARIABLE_POSITION = new Position("", 1, 1, 1, 1);
+
+  /**
+   * Check if there is an error shown the processing token if a variable do not present in the
+   * semantic context.
+   */
   @Test
-  public void testCheckIfVariableNotDefined() {
-    semanticContext.getVariables().define(VARIABLE, VARIABLE_POSITION);
-    CustomToken token = createNewToken(VARNAME);
+  public void testVariableDefinitionNotFound() {
+    CobolVisitor visitor = createVisitor(createSemanticContext(), INVALID_VARIABLE);
 
-    mockMethod(VARNAME, token);
-
+    List<SyntaxError> errors = visitor.getErrors();
     assertEquals(1, errors.size());
-    assertEquals("Invalid definition for: " + VARNAME.toUpperCase(), errors.get(0).getSuggestion());
+    assertEquals(
+        "Invalid definition for: " + INVALID_VARIABLE.toUpperCase(), errors.get(0).getSuggestion());
   }
 
+  /** Check if the usage of the variable that present in the semantic context found correctly. */
   @Test
-  public void checkIfVariableDefined() {
-    semanticContext.getVariables().define(VARIABLE, VARIABLE_POSITION);
-    CustomToken token = createNewToken(VARNAME2);
+  public void testDefinedVariableUsageIsFound() {
+    SemanticContext semanticContext = createSemanticContext();
+    CobolVisitor visitor = createVisitor(semanticContext, DEFINED_VARIABLE);
 
-    mockMethod(VARNAME2, token);
     assertEquals(
+        VARIABLE_POSITION,
         semanticContext
             .getVariables()
             .getDefinitions()
-            .get(VARNAME2.toUpperCase())
+            .get(DEFINED_VARIABLE.toUpperCase())
             .iterator()
-            .next(),
-        VARIABLE_POSITION);
-    assertEquals(0, errors.size());
+            .next());
+    assertEquals(0, visitor.getErrors().size());
   }
 
-  private void mockMethod(String variableName, CustomToken token) {
-    CobolParser.QualifiedDataNameFormat1Context node =
-        mock(CobolParser.QualifiedDataNameFormat1Context.class);
-    CobolParser.DataNameContext nodeData = mock(CobolParser.DataNameContext.class);
+  private CobolVisitor createVisitor(SemanticContext semanticContext, String variableName) {
+    CobolVisitor visitor = new CobolVisitor();
+    CustomToken token = createNewToken(variableName);
+
+    visitor.setSemanticContext(semanticContext);
+    visitor.visitQualifiedDataNameFormat1(mockMethod(token));
+
+    return visitor;
+  }
+
+  private SemanticContext createSemanticContext() {
+    SemanticContext semanticContext = new SemanticContext(new ArrayList<>());
+    semanticContext
+        .getVariables()
+        .define(new Variable(LEVEL_NUMBER, DEFINED_VARIABLE), VARIABLE_POSITION);
+    return semanticContext;
+  }
+
+  private QualifiedDataNameFormat1Context mockMethod(CustomToken token) {
+    QualifiedDataNameFormat1Context node = mock(QualifiedDataNameFormat1Context.class);
+    DataNameContext nodeData = mock(DataNameContext.class);
 
     when(node.dataName()).thenReturn(nodeData);
     when(nodeData.getStart()).thenReturn(token);
-    when(nodeData.getText()).thenReturn(variableName);
+    when(nodeData.getText()).thenReturn(token.getText());
     when(node.getStart()).thenReturn(token);
 
-    visitor.setSemanticContext(semanticContext);
-    visitor.setSemanticErrors(new SemanticListener(errors));
-    visitor.visitQualifiedDataNameFormat1(node);
+    return node;
   }
 
   private CustomToken createNewToken(String text) {
