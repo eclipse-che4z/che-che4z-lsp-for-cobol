@@ -18,6 +18,7 @@ package com.ca.lsp.core.cobol.visitor;
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.model.Variable;
+import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.utils.CustomToken;
 import org.junit.Test;
@@ -32,11 +33,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * This tests checks the variables usages found by the {@link CobolVisitor} for defined and not
- * defined variables. The there is a usage of a variable that is not found, then an error should be
- * shown.
+ * This tests checks the semantic analysis applied by the {@link CobolVisitor}, such as variables
+ * usages for defined and not defined variables. The there is a usage of a variable that is not
+ * found, then an error should be shown. Also, it should throw a suggestion if there is a typo in
+ * keywords.
  */
-public class VariableDefinitionTest {
+public class VisitorSemanticAnalysisTest {
+  private static final String WRONG_TOKEN = "MOVES";
   private static final String INVALID_VARIABLE = "defined";
   private static final String DEFINED_VARIABLE = "invalid";
   private static final String LEVEL_NUMBER = "05";
@@ -74,11 +77,27 @@ public class VariableDefinitionTest {
     assertEquals(0, visitor.getErrors().size());
   }
 
+  /**
+   * Check if visitor calculates distance between a wrong token and a keyword and returns a
+   * suggestion with the closest keyword.
+   */
+  @Test
+  public void testMisspelledKeywordDistance() {
+    CobolVisitor visitor = new CobolVisitor(null, null);
+    CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
+    when(node.getStart()).thenReturn(createNewToken(WRONG_TOKEN));
+
+    visitor.visitStatement(node);
+
+    List<SyntaxError> errors = visitor.getErrors();
+    assertEquals(1, errors.size());
+    assertEquals("A misspelled word, maybe you want to put MOVE", errors.get(0).getSuggestion());
+  }
+
   private CobolVisitor createVisitor(SemanticContext semanticContext, String variableName) {
-    CobolVisitor visitor = new CobolVisitor();
+    CobolVisitor visitor = new CobolVisitor(null, semanticContext);
     CustomToken token = createNewToken(variableName);
 
-    visitor.setSemanticContext(semanticContext);
     visitor.visitQualifiedDataNameFormat1(mockMethod(token));
 
     return visitor;
