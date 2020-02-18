@@ -15,41 +15,37 @@
 
 package com.ca.lsp.core.cobol.visitor;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
+import com.ca.lsp.core.cobol.parser.CobolParser.StatementContext;
 import com.ca.lsp.core.cobol.utils.CustomToken;
 import org.antlr.v4.runtime.Token;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/** Test a Levenshtein distance calculation for the misspelled words. */
 public class LevenshteinDistanceTest {
-  private CobolVisitor visitor = new CobolVisitor();
-  List<SyntaxError> errors = new CopyOnWriteArrayList<>();
-  final String WRONG_TOKEN = "MOVES";
+  private static final String WRONG_TOKEN = "MOVES";
 
+  /** Test the distance between wrong token and the keyword. */
   @Test
   public void testDistance() {
-    errors.add(new SyntaxError(new Position("", 1, 1, 1, 1), null, "", 2, null));
-    visitor.setSemanticErrors(new SemanticListener(errors));
-
-    CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
-    when(node.getStart()).thenReturn(createNewToken(WRONG_TOKEN));
+    CobolVisitor visitor = new CobolVisitor();
+    StatementContext node = mock(StatementContext.class);
+    when(node.getStart()).thenReturn(createNewToken());
 
     visitor.visitStatement(node);
 
-    assertEquals(2, errors.size());
-    assertEquals("Misspelled word, maybe you want to put MOVE", errors.get(1).getSuggestion());
+    List<SyntaxError> errors = visitor.getErrors();
+    assertEquals(1, errors.size());
+    assertEquals("A misspelled word, maybe you want to put MOVE", errors.get(0).getSuggestion());
   }
 
-  private Token createNewToken(String text) {
-    return new CustomToken(10, 10, text, 10, 10);
+  private Token createNewToken() {
+    return new CustomToken(10, 10, WRONG_TOKEN, 10, 10);
   }
 }

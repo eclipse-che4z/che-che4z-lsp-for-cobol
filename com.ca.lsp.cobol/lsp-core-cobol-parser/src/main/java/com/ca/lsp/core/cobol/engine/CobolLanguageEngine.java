@@ -18,7 +18,6 @@ import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolLexer;
 import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
@@ -61,10 +60,11 @@ public class CobolLanguageEngine {
 
     CobolParser.StartRuleContext tree = parser.startRule();
     CobolVisitor visitor = new CobolVisitor();
-    visitor.setSemanticErrors(new SemanticListener(errors));
     visitor.setSemanticContext(preProcessedInput.getResult().getSemanticContext());
     visitor.setDocumentUri(documentUri);
     visitor.visit(tree);
+
+    errors.addAll(visitor.getErrors());
 
     errors.forEach(err -> LOG.debug(err.toString()));
     return new ResultWithErrors<>(preProcessedInput.getResult().getSemanticContext(), errors);
