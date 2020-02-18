@@ -13,11 +13,12 @@
  */
 
 import * as cp from "child_process";
-import {ExtensionContext, extensions, StatusBarAlignment, window} from "vscode";
+import * as net from "net";
+import { ExtensionContext, extensions, StatusBarAlignment, window, workspace } from "vscode";
 import {
-    Executable,
     LanguageClient,
     LanguageClientOptions,
+    StreamInfo,
 } from "vscode-languageclient/lib/main";
 import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
 
@@ -28,17 +29,9 @@ export async function activate(context: ExtensionContext) {
     const extPath = extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
     const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.10.1.jar`;
 
-    let serverOptions: Executable;
-
     try {
         await isJavaInstalled();
-        if (fs.existsSync(LSPServerPath)) {
-            serverOptions = {
-                args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", LSPServerPath, "pipeEnabled"],
-                command: "java",
-                options: { stdio: "pipe", detached: false },
-            };
-        } else {
+        if (!getLspPort() && !fs.existsSync(LSPServerPath)) {
             window.showErrorMessage("COBOL extension failed to start - LSP server not found");
             return;
         }
@@ -55,7 +48,8 @@ export async function activate(context: ExtensionContext) {
     const item = window.createStatusBarItem(StatusBarAlignment.Right, Number.MIN_VALUE);
 
     // Create the language client and start the client.
-    const languageClient = new LanguageClient("COBOL", "LSP extension for COBOL language", serverOptions, clientOptions);
+    const languageClient = new LanguageClient("COBOL", "LSP extension for COBOL language",
+        createServerOptions(LSPServerPath), clientOptions);
 
     const disposable = languageClient.start();
 
@@ -67,7 +61,7 @@ async function isJavaInstalled() {
     return new Promise<any>((resolve, reject) => {
         const ls = cp.spawn("java", ["-version"]);
         ls.stderr.on("data", (data: any) => {
-            let javaCheck = new DefaultJavaVersionCheck();
+            const javaCheck = new DefaultJavaVersionCheck();
             if (!javaCheck.isJavaVersionSupported(data.toString())) {
                 reject("Java version 8 expected");
             }
@@ -85,4 +79,32 @@ async function isJavaInstalled() {
             }
         });
     });
+}
+
+function getLspPort(): number | undefined {
+    return +workspace.getConfiguration().get("broadcom-cobol-lsp.server.port");
+}
+
+function createServerOptions(jarPath: string) {
+    const port = getLspPort();
+    if (port) {
+        // Connect to language server via socket
+        const connectionInfo = {
+            host: "localhost",
+            port,
+        };
+        return () => {
+            const socket = net.connect(connectionInfo);
+            const result: StreamInfo = {
+                reader: socket,
+                writer: socket,
+            };
+            return Promise.resolve(result);
+        };
+    }
+    return {
+        args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
+        command: "java",
+        options: { stdio: "pipe", detached: false },
+    };
 }
