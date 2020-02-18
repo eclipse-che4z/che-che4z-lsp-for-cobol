@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -16,6 +16,7 @@ package com.ca.lsp.cobol.service.delegates.validations;
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.cobol.service.TextDocumentSyncType;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
+import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
@@ -34,7 +35,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
+
+import static com.ca.lsp.cobol.service.delegates.validations.AnalysisResult.empty;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @Slf4j
 @Singleton
@@ -58,7 +63,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   public AnalysisResult analyze(
       String uri, String text, TextDocumentSyncType textDocumentSyncType) {
     if (isEmpty(text)) {
-      return AnalysisResult.empty();
+      return empty();
     }
     return toAnalysisResult(engine.run(uri, text, textDocumentSyncType.toString()), uri);
   }
@@ -71,7 +76,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     return errors.stream()
         .filter(errorOnlyFromCurrentDocument(uri))
         .map(toDiagnostic())
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
   @Nonnull
@@ -86,6 +91,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
       diagnostic.setSource(setupSourceInfo(err.getSeverity()));
       diagnostic.setMessage(err.getSuggestion());
       diagnostic.setRange(convertRange(err.getPosition()));
+      diagnostic.setCode(ofNullable(err.getErrorCode()).map(ErrorCode::name).orElse(null));
       return diagnostic;
     };
   }
@@ -144,13 +150,13 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private Map<String, List<Location>> retrieveMap(Map<String, Collection<Position>> map) {
     return map.entrySet().stream()
         .collect(
-            Collectors.toMap(
+            toMap(
                 Map.Entry::getKey,
                 entry ->
                     entry.getValue().stream()
                         .map(
                             position ->
                                 new Location(position.getDocumentURI(), convertRange(position)))
-                        .collect(Collectors.toList())));
+                        .collect(toList())));
   }
 }

@@ -18,6 +18,7 @@ import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
+import com.ca.lsp.cobol.service.delegates.actions.CodeActions;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.completions.Completions;
 import com.ca.lsp.cobol.service.delegates.formations.Formations;
@@ -33,11 +34,17 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
+
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -62,6 +69,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private Formations formations;
   private Completions completions;
   private Occurrences occurrences;
+  private CodeActions actions;
 
   @Inject
   MyTextDocumentService(
@@ -70,12 +78,14 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
       Formations formations,
       Completions completions,
       Occurrences occurrences,
-      DataBusBroker dataBus) {
+      DataBusBroker dataBus,
+      CodeActions actions) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
     this.completions = completions;
     this.occurrences = occurrences;
+    this.actions = actions;
 
     dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
@@ -96,7 +106,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
 
   @Override
   public CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem unresolved) {
-    return CompletableFuture.supplyAsync(() -> completions.resolveDocumentationFor(unresolved))
+    return supplyAsync(() -> completions.resolveDocumentationFor(unresolved))
         .whenComplete(
             reportExceptionIfThrown(
                 createDescriptiveErrorMessage("completion resolving", unresolved.getLabel())));
@@ -139,6 +149,15 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("formatting", uri)));
   }
 
+  @Override
+  public CompletableFuture<List<Either<Command, CodeAction>>> codeAction(CodeActionParams params) {
+    return supplyAsync(() -> actions.collect(params))
+        .whenComplete(
+            reportExceptionIfThrown(
+                createDescriptiveErrorMessage(
+                    "code actions lookup", params.getTextDocument().getUri())));
+  }
+
   @SneakyThrows
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
@@ -179,9 +198,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
 
   @Override
   public void observerCallback(@Nonnull RunAnalysisEvent event) {
-    docs.entrySet().stream()
-        .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getText()))
-        .forEach(this::analyzeChanges);
+    docs.forEach((key, value) -> analyzeChanges(key, value.getText()));
   }
 
   private void registerEngineAndAnalyze(String uri, String languageType, String text) {
@@ -201,7 +218,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   }
 
   private String extractExtension(String uri) {
-    return Optional.ofNullable(uri)
+    return ofNullable(uri)
         .filter(it -> it.indexOf('.') > -1)
         .map(it -> it.substring(it.lastIndexOf('.') + 1))
         .orElse(null);
@@ -238,10 +255,10 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   }
 
   private String createDescriptiveErrorMessage(String action, String uri) {
-    return String.format("An exception was thrown while applying %s for %s:", action, uri);
+    return format("An exception thrown while applying %s for %s:", action, uri);
   }
 
   private BiConsumer<Object, Throwable> reportExceptionIfThrown(String message) {
-    return (res, ex) -> Optional.ofNullable(ex).ifPresent(it -> log.error(message, it));
+    return (res, ex) -> ofNullable(ex).ifPresent(it -> log.error(message, it));
   }
 }
