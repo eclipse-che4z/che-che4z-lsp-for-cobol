@@ -15,6 +15,7 @@
 import { BasicProfileManager, IProfile, Session, RestClient, AbstractSession } from "@zowe/imperative";
 import * as os from "os";
 import * as path from "path";
+import { window } from "vscode";
 
 export interface ProfilesMap {
     [key: string]: IProfile;
@@ -46,17 +47,24 @@ export class ZoweApi {
         // default should be https
         const rpath = `/zosmf/restfiles/ds/${dataset}(${member})`;
         return await RestClient.getExpectString(session, rpath, [{
-            "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "" }]);
+            "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "",
+        }]);
     }
 
     public async listMembers(dataset: string, profileName: string): Promise<string[]> {
         // default should be https
         const session: Session = await this.createSession(profileName);
         const rpath = `/zosmf/restfiles/ds/${dataset}/member`;
-        const result = await RestClient.getExpectJSON(session, rpath, [{
-            "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "" }]);
-        // tslint:disable-next-line: no-string-literal
-        return result["items"].map((i: any) => i.member);
+        try {
+            const result = await RestClient.getExpectJSON(session, rpath, [{
+                "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "",
+            }]);
+            // tslint:disable-next-line: no-string-literal
+            return result["items"].map((i: any) => i.member);
+        } catch (error) {
+            window.showWarningMessage("Can't read members of " + dataset);
+            return [];
+        }
     }
 
     public async createSession(profileName: string) {

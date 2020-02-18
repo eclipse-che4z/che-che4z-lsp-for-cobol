@@ -56,7 +56,7 @@ export class CopybooksDownloader {
      * @param copybooks array of copybooks names to download
      */
     public async downloadDependencies(uri: vscode.Uri,
-                                      message: string = "Program contains dependencies to missing copybooks.",
+        message: string = "Program contains dependencies to missing copybooks.",
     ): Promise<void> {
         // TODO Maybe introduce download queue?
         const missingCopybooksFilePath = uri.fsPath.substr(0, uri.fsPath.length - ".dep".length) + ".err";
@@ -100,8 +100,10 @@ export class CopybooksDownloader {
             },
             async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
                 for (const dataset of await this.listPathDatasets()) {
-                    progress.report({ message: "Looking in " + dataset + ". " + copybooksToDownload.size +
-                        " copybook(s) left." });
+                    progress.report({
+                        message: "Looking in " + dataset + ". " + copybooksToDownload.size +
+                            " copybook(s) left.",
+                    });
                     try {
                         await this.fetchCopybooks(dataset, copybooksToDownload, profile);
                     } catch (e) {
