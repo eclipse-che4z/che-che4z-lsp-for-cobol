@@ -106,7 +106,7 @@ public class DocumentExtensionTests {
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
 
     TextDocumentService service =
-        new MyTextDocumentService(communications, engine, null, null, null, broker);
+        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
     service.didChange(
         new DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier(uri, 0), textEdits));
   }
