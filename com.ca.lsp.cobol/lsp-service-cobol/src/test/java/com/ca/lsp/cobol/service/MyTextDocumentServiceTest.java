@@ -89,6 +89,17 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
+  public void testDidChangeOnCpyFiles() {
+    List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
+    textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
+    MyTextDocumentService spyService = spy((MyTextDocumentService)service);
+    spyService.didChange(
+        new DidChangeTextDocumentParams(
+            new VersionedTextDocumentIdentifier(CPY_DOCUMENT_URI, 0), textEdits));
+    verify(spyService, never()).analyzeChanges(any(), any());
+  }
+
+  @Test
   public void testDidClose() {
     openAndAwait();
     assertEquals(1, closeGetter(service).size());
