@@ -53,6 +53,7 @@ import org.junit.runners.Suite.SuiteClasses;
   DocumentExtensionTests.class,
   MyLanguageServerImplTest.class,
   DidChangeConfigurationTest.class,
+  InitializeConfigurationTest.class,
   CodeActionsTest.class,
   FindCopybookCommandTest.class
 })

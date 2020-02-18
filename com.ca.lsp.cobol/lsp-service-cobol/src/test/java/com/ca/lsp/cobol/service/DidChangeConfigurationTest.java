@@ -16,8 +16,8 @@ package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedSettingsEvent;
-import lombok.AllArgsConstructor;
-import org.eclipse.lsp4j.ConfigurationItem;
+import com.ca.lsp.cobol.service.providers.ClientProvider;
+import com.ca.lsp.cobol.utils.Utility;
 import org.eclipse.lsp4j.ConfigurationParams;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.Test;
@@ -49,7 +49,7 @@ public class DidChangeConfigurationTest {
     ArgumentCaptor<FetchedSettingsEvent> captor =
         ArgumentCaptor.forClass(FetchedSettingsEvent.class);
 
-    ConfigurationParams params = createParams();
+    ConfigurationParams params = Utility.createParams();
 
     List<Object> list = new ArrayList<>();
     CompletableFuture<List<Object>> completableFuture = new CompletableFuture<>();
@@ -68,16 +68,5 @@ public class DidChangeConfigurationTest {
     assertNotNull(captor.getValue());
 
     assertEquals(fetchedSettingsEvent, captor.getValue());
-  }
-
-  private ConfigurationParams createParams() {
-    ConfigurationParams params = new ConfigurationParams();
-    List<ConfigurationItem> itemList = new ArrayList<>();
-    ConfigurationItem item = new ConfigurationItem();
-    item.setSection(null);
-    item.setScopeUri(null);
-    itemList.add(item);
-    params.setItems(itemList);
-    return params;
   }
 }

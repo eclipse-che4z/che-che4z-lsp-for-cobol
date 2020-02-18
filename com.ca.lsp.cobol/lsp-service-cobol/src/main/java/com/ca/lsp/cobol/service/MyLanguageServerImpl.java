@@ -14,9 +14,15 @@
 package com.ca.lsp.cobol.service;
 
 import com.ca.lsp.core.cobol.model.ErrorCode;
+import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
+import com.ca.lsp.cobol.service.providers.SettingsProvider;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -25,6 +31,7 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -40,6 +47,7 @@ import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
  * This class sets up the initial state of the services and applies other initialization activities,
  * such as set server capabilities and register file system watchers.
  */
+@Slf4j
 @Singleton
 public class MyLanguageServerImpl implements LanguageServer {
   /** Glob patterns to watch COPYBOOKS folder and copybook files */
@@ -56,17 +64,20 @@ public class MyLanguageServerImpl implements LanguageServer {
   private CobolWorkspaceService workspaceService;
   private FileSystemService fileSystemService;
   private Provider<LanguageClient> clientProvider;
+  private Provider<ConfigurationSettingsStorable> settingsProvider;
 
   @Inject
   MyLanguageServerImpl(
       FileSystemService fileSystemService,
       TextDocumentService textService,
       CobolWorkspaceService workspaceService,
-      Provider<LanguageClient> clientProvider) {
+      Provider<LanguageClient> clientProvider,
+      Provider<ConfigurationSettingsStorable> settingsProvider) {
     this.textService = textService;
     this.fileSystemService = fileSystemService;
     this.workspaceService = workspaceService;
     this.clientProvider = clientProvider;
+    this.settingsProvider = settingsProvider;
   }
 
   @Override
@@ -96,6 +107,50 @@ public class MyLanguageServerImpl implements LanguageServer {
                     "copybooksWatcher", "workspace/didChangeWatchedFiles", createWatcher()),
                 new Registration("configurationChange", "workspace/didChangeConfiguration", null)));
     client.registerCapability(registrationParams);
+    try {
+      fetchSettings("broadcom-cobol-lsp.cpy-manager", null)
+          .thenAccept(
+              e -> {
+                JsonObject jsonObject = (JsonObject) e.get(0);
+                ConfigurationSettingsStorable configurationSettingsStorable =
+                    isValidJson(jsonObject);
+                ((SettingsProvider) settingsProvider).set(configurationSettingsStorable);
+              });
+    } catch (RuntimeException e) {
+      log.error(e.getMessage());
+    }
+  }
+
+  /**
+   * @param jsonObject - the object which comes from the client and contains configuration settings
+   * @return a custom object of type ConfigurableSettingsStorage if the JSON is valid or null if it
+   *     is failing the check
+   */
+  private ConfigurationSettingsStorable isValidJson(JsonObject jsonObject) {
+    Gson gson = new Gson();
+    try {
+      return gson.fromJson(jsonObject, ConfigurationSettingsStorable.class);
+    } catch (JsonSyntaxException e) {
+      log.error(e.getMessage());
+      return null;
+    }
+  }
+
+  private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {
+    LanguageClient client = clientProvider.get();
+    ConfigurationParams params = new ConfigurationParams();
+    params.setItems(elemToList(section, scope));
+    return client.configuration(params);
+  }
+
+  @Nonnull
+  private List<ConfigurationItem> elemToList(String section, String scope) {
+    List<ConfigurationItem> list = new ArrayList<>();
+    ConfigurationItem item = new ConfigurationItem();
+    item.setSection(section);
+    item.setScopeUri(scope);
+    list.add(item);
+    return list;
   }
 
   @Override

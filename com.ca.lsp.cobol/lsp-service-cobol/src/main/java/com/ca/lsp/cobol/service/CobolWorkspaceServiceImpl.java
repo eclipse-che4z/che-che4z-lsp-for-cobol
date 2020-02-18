@@ -93,7 +93,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
     /* section and scope has to be set to whatever we agree on for the dependencies graph */
     try {
-      fetchSettings(null, null)
+      fetchSettings("broadcom-cobol-lsp.cpy-manager", null)
           .thenAccept(e -> dataBus.postData(FetchedSettingsEvent.builder().content(e).build()));
     } catch (RuntimeException e) {
       log.error(e.getMessage());
