@@ -23,6 +23,18 @@ export const DEPENDENCIES_FOLDER: string = ".cobdeps";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
 
 export class CopybooksDownloader {
+
+    private static createCopybookPath(profileName: string, dataset: string, copybook: string): string {
+        const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        const copybookDirPath = path.join(rootPath, COPYBOOKS_FOLDER, profileName, dataset);
+        return path.join(copybookDirPath, copybook + ".cpy");
+    }
+
+    private static createDatasetPath(profileName: string, dataset: string): string {
+        const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        return path.join(rootPath, COPYBOOKS_FOLDER, profileName, dataset);
+    }
+
     public constructor(
         private zoweApi: ZoweApi,
         private profileService: ProfileService) { }
@@ -66,7 +78,7 @@ export class CopybooksDownloader {
         missingCopybooks.forEach(m => copybooksToDownload.delete(m));
         (await this.listPathDatasets()).forEach(ds => {
             Array.from(copybooksToDownload.values()).forEach(c => {
-                if (fs.existsSync(this.createCopybookPath(profile, ds, c))) {
+                if (fs.existsSync(CopybooksDownloader.createCopybookPath(profile, ds, c))) {
                     copybooksToDownload.delete(c);
                 }
             });
@@ -127,17 +139,13 @@ export class CopybooksDownloader {
         }
         return [];
     }
-    private createCopybookPath(profileName: string, dataset: string, copybook: string): string {
-        const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-        const copybookDirPath = path.join(rootPath, COPYBOOKS_FOLDER, profileName, dataset);
-        fs.mkdirSync(copybookDirPath, { recursive: true });
-        return path.join(copybookDirPath, copybook + ".cpy");
-    }
+
     private async downloadCopybook(dataset: string, copybook: string, profileName: string) {
-        const copybookPath = this.createCopybookPath(profileName, dataset, copybook);
+        const copybookPath = CopybooksDownloader.createCopybookPath(profileName, dataset, copybook);
 
         if (!fs.existsSync(copybookPath)) {
             const content = await this.zoweApi.fetchMember(dataset, copybook, profileName);
+            fs.mkdirSync(CopybooksDownloader.createDatasetPath(profileName, dataset), { recursive: true });
             fs.writeFileSync(copybookPath, content);
         }
     }
