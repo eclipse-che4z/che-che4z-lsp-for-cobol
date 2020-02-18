@@ -21,6 +21,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
 
+/** This class is a provider for locations of copybooks defined/used in the document */
 public class CopybookLocations implements SemanticLocations {
   @Nonnull
   @Override
@@ -39,5 +40,4 @@ public class CopybookLocations implements SemanticLocations {
     return document.getAnalysisResult().getCopybookDefinitions().keySet().stream()
         .anyMatch(token::equalsIgnoreCase);
   }
-
 }
