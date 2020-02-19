@@ -193,7 +193,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
       return;
     }
     if (checkThisCopybookNotPresentInHierarchy(copybookName)) {
-      semanticContext.getCopybooks().define(copybookName, position);
+      semanticContext.getCopybooks().addUsage(copybookName, position);
       semanticContext.getVariables().define(new Variable("-1", copybookName), position);
     } else {
       reportRecursiveCopybooks(copybookName);

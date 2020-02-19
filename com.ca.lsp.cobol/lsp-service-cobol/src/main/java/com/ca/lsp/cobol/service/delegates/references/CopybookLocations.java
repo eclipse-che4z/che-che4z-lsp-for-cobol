@@ -37,7 +37,7 @@ public class CopybookLocations implements SemanticLocations {
 
   @Override
   public boolean containsToken(@Nonnull MyDocumentModel document, @Nonnull String token) {
-    return document.getAnalysisResult().getCopybookDefinitions().keySet().stream()
+    return document.getAnalysisResult().getCopybookUsages().keySet().stream()
         .anyMatch(token::equalsIgnoreCase);
   }
 }

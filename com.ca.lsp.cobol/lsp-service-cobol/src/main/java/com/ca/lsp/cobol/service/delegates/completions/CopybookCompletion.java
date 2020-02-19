@@ -32,7 +32,7 @@ public class CopybookCompletion implements Completion {
   public Collection<String> getCompletionSource(MyDocumentModel document) {
     return Optional.ofNullable(document)
         .map(MyDocumentModel::getAnalysisResult)
-        .map(AnalysisResult::getCopybookDefinitions)
+        .map(AnalysisResult::getCopybookUsages)
         .map(Map::keySet)
         .orElse(Collections.emptySet());
   }
