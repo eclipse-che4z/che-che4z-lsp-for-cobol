@@ -4,6 +4,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ## [0.x.x] - TBD
 
+- Retrieve settings.json at initialize [#207](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/207) Thanks @[sergiuilie](https://github.com/sergiuilie)
 - Remove unused COBOL dialect support [#169](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/169) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - Make document extension check case-insensitive [#167](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/167) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - Remove copybook name from the variable list if copybook is missing [#190](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/190) Thanks @[temanbrcom](https://github.com/temanbrcom)

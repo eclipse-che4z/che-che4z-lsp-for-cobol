@@ -17,17 +17,19 @@ package com.ca.lsp.cobol.service.providers;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import lombok.NonNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 @Singleton
 public class SettingsProvider implements Provider<ConfigurationSettingsStorable> {
   private ConfigurationSettingsStorable configurationSettingsStorable;
 
-  public void set(@NonNull ConfigurationSettingsStorable configurationSettingsStorable) {
+  public void set(@Nonnull ConfigurationSettingsStorable configurationSettingsStorable) {
     this.configurationSettingsStorable = configurationSettingsStorable;
   }
 
   @Override
+  @Nullable
   public ConfigurationSettingsStorable get() {
     return this.configurationSettingsStorable;
   }

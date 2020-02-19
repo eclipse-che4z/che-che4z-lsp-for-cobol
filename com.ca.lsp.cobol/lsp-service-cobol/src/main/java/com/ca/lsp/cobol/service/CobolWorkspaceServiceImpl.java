@@ -31,7 +31,7 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
@@ -111,18 +111,16 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {
     LanguageClient client = clientProvider.get();
     ConfigurationParams params = new ConfigurationParams();
-    params.setItems(elemToList(section, scope));
+    params.setItems(provideConfigurationItemList(section, scope));
     return client.configuration(params);
   }
 
   @Nonnull
-  private List<ConfigurationItem> elemToList(String section, String scope) {
-    List<ConfigurationItem> list = new ArrayList<>();
+  private List<ConfigurationItem> provideConfigurationItemList(String section, String scope) {
     ConfigurationItem item = new ConfigurationItem();
     item.setSection(section);
     item.setScopeUri(scope);
-    list.add(item);
-    return list;
+    return Collections.singletonList(item);
   }
 
   @Override

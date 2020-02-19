@@ -17,21 +17,17 @@ package com.ca.lsp.cobol.utils;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp4j.ConfigurationItem;
 import org.eclipse.lsp4j.ConfigurationParams;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 @UtilityClass
-public final class Utility {
+public final class ServiceTestUtils {
 
   public ConfigurationParams createParams() {
     ConfigurationParams params = new ConfigurationParams();
-    List<ConfigurationItem> itemList = new ArrayList<>();
     ConfigurationItem item = new ConfigurationItem();
     item.setSection("broadcom-cobol-lsp.cpy-manager");
     item.setScopeUri(null);
-    itemList.add(item);
-    params.setItems(itemList);
+    params.setItems(Collections.singletonList(item));
     return params;
   }
 }

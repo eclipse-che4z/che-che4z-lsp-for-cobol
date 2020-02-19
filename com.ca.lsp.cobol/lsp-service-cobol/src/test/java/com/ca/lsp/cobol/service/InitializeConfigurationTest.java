@@ -17,7 +17,7 @@ package com.ca.lsp.cobol.service;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.providers.ClientProvider;
 import com.ca.lsp.cobol.service.providers.SettingsProvider;
-import com.ca.lsp.cobol.utils.Utility;
+import com.ca.lsp.cobol.utils.ServiceTestUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.eclipse.lsp4j.ConfigurationParams;
@@ -41,7 +41,7 @@ public class InitializeConfigurationTest {
   private LanguageClient client = Mockito.mock(LanguageClient.class);
   private ClientProvider provider = new ClientProvider();
   private SettingsProvider settingsProvider = Mockito.mock(SettingsProvider.class);
-  private final String PROFILE_NAME = "myProfile";
+  private final static String PROFILE_NAME = "myProfile";
 
   @Test
   public void testInitializeConfiguration() throws ExecutionException, InterruptedException {
@@ -50,13 +50,11 @@ public class InitializeConfigurationTest {
     MyLanguageServerImpl langServer =
         new MyLanguageServerImpl(null, null, null, provider, settingsProvider);
 
-    ConfigurationParams params = Utility.createParams();
+    ConfigurationParams params = ServiceTestUtils.createParams();
 
     List<String> paths = new ArrayList<>();
     ConfigurationSettingsStorable configurationSettingsStorable =
-        new ConfigurationSettingsStorable();
-    configurationSettingsStorable.setPaths(paths);
-    configurationSettingsStorable.setProfiles(PROFILE_NAME);
+        new ConfigurationSettingsStorable(PROFILE_NAME, paths);
 
     List<Object> list = new ArrayList<>();
     list.add(createJsonObject());

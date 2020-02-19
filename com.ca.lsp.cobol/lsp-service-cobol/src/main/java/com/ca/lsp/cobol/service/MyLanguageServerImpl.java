@@ -32,6 +32,7 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -113,7 +114,7 @@ public class MyLanguageServerImpl implements LanguageServer {
               e -> {
                 JsonObject jsonObject = (JsonObject) e.get(0);
                 ConfigurationSettingsStorable configurationSettingsStorable =
-                    isValidJson(jsonObject);
+                    parseJsonIfValid(jsonObject);
                 ((SettingsProvider) settingsProvider).set(configurationSettingsStorable);
               });
     } catch (RuntimeException e) {
@@ -126,7 +127,7 @@ public class MyLanguageServerImpl implements LanguageServer {
    * @return a custom object of type ConfigurableSettingsStorage if the JSON is valid or null if it
    *     is failing the check
    */
-  private ConfigurationSettingsStorable isValidJson(JsonObject jsonObject) {
+  private ConfigurationSettingsStorable parseJsonIfValid(JsonObject jsonObject) {
     Gson gson = new Gson();
     try {
       return gson.fromJson(jsonObject, ConfigurationSettingsStorable.class);
@@ -139,18 +140,16 @@ public class MyLanguageServerImpl implements LanguageServer {
   private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {
     LanguageClient client = clientProvider.get();
     ConfigurationParams params = new ConfigurationParams();
-    params.setItems(elemToList(section, scope));
+    params.setItems(provideConfigurationItemList(section, scope));
     return client.configuration(params);
   }
 
   @Nonnull
-  private List<ConfigurationItem> elemToList(String section, String scope) {
-    List<ConfigurationItem> list = new ArrayList<>();
+  private List<ConfigurationItem> provideConfigurationItemList(String section, String scope) {
     ConfigurationItem item = new ConfigurationItem();
     item.setSection(section);
     item.setScopeUri(scope);
-    list.add(item);
-    return list;
+    return Collections.singletonList(item);
   }
 
   @Override
