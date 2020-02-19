@@ -25,8 +25,8 @@ import com.ca.lsp.core.cobol.semantics.CobolCleanExtraLanguageTest;
 import com.ca.lsp.core.cobol.semantics.CobolVariableCheckTest;
 import com.ca.lsp.core.cobol.semantics.CobolVariableContextTest;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategyTest;
-import com.ca.lsp.core.cobol.visitor.LevenshteinDistanceTest;
-import com.ca.lsp.core.cobol.visitor.VariableDefinitionTest;
+import com.ca.lsp.core.cobol.visitor.MisspelledKeywordDistanceTest;
+import com.ca.lsp.core.cobol.visitor.VisitorSemanticAnalysisTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -43,8 +43,8 @@ import org.junit.runners.Suite.SuiteClasses;
   CobolCleanExtraLanguageTest.class,
   CobolLineWriterImplTest.class,
   PreprocessorStringUtilsTest.class,
-  LevenshteinDistanceTest.class,
-  VariableDefinitionTest.class,
+  MisspelledKeywordDistanceTest.class,
+  VisitorSemanticAnalysisTest.class,
   CobolLineIndicatorProcessorImplTest.class,
   CobolErrorStrategyTest.class,
   CobolInlineCommentEntriesNormalizerImplTest.class

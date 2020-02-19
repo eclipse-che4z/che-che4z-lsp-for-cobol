@@ -54,14 +54,11 @@ public class CobolLanguageEngine {
 
     parser.removeErrorListeners();
     parser.addErrorListener(new VerboseListener(errors, documentUri));
-
-    CobolErrorStrategy strategy = new CobolErrorStrategy();
-    parser.setErrorHandler(strategy);
+    parser.setErrorHandler(new CobolErrorStrategy());
 
     CobolParser.StartRuleContext tree = parser.startRule();
-    CobolVisitor visitor = new CobolVisitor();
-    visitor.setSemanticContext(preProcessedInput.getResult().getSemanticContext());
-    visitor.setDocumentUri(documentUri);
+    CobolVisitor visitor =
+        new CobolVisitor(documentUri, preProcessedInput.getResult().getSemanticContext());
     visitor.visit(tree);
 
     errors.addAll(visitor.getErrors());
