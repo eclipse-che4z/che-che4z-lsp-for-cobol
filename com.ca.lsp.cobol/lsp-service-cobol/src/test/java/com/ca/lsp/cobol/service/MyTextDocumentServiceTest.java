@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -15,10 +15,10 @@ package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.ca.lsp.cobol.ConfigurableTest;
+import com.ca.lsp.cobol.service.delegates.actions.CodeActions;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
@@ -40,6 +40,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -85,6 +86,17 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     UseCaseUtils.waitForDiagnostics(client);
     Range range = retrieveRange(client);
     assertRange(range);
+  }
+
+  @Test
+  public void testDidChangeOnCpyFiles() {
+    List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
+    textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
+    MyTextDocumentService spyService = spy((MyTextDocumentService)service);
+    spyService.didChange(
+        new DidChangeTextDocumentParams(
+            new VersionedTextDocumentIdentifier(CPY_DOCUMENT_URI, 0), textEdits));
+    verify(spyService, never()).analyzeChanges(any(), any());
   }
 
   @Test
@@ -150,12 +162,13 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
     DataBusBroker broker = mock(DataBusBroker.class);
 
-    List<Diagnostic> diagnosticsNoErrors = Collections.emptyList();
+    List<Diagnostic> diagnosticsNoErrors = emptyList();
     List<Diagnostic> diagnosticsWithErrors = createDefaultDiagnostics();
 
-    AnalysisResult resultNoErrors = new AnalysisResult(diagnosticsNoErrors, null, null, null, null,null);
+    AnalysisResult resultNoErrors =
+        new AnalysisResult(diagnosticsNoErrors, null, null, null, null, null);
     AnalysisResult resultWithErrors =
-        new AnalysisResult(diagnosticsWithErrors, null, null, null, null,null);
+        new AnalysisResult(diagnosticsWithErrors, null, null, null, null, null);
 
     when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE)).thenReturn(resultNoErrors);
     when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE))
@@ -182,6 +195,33 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
         DOCUMENT_WITH_ERRORS_URI);
   }
 
+  /**
+   * Test on the textDocument/codeAction request the {@link CodeActions} delegate called. The
+   * specific logic tested in {@link com.ca.lsp.cobol.service.delegates.actions.CodeActionsTest},
+   * here it is only to verify that the {@link MyTextDocumentService#codeAction(CodeActionParams)}
+   * calls the {@link CodeActions#collect(CodeActionParams)}
+   */
+  @Test
+  public void testCodeActionsEndpoint() {
+    DataBusBroker broker = mock(DataBusBroker.class);
+    CodeActions actions = mock(CodeActions.class);
+
+    CodeActionParams params =
+        new CodeActionParams(new TextDocumentIdentifier(DOCUMENT_URI), null, null);
+    List<Either<Command, CodeAction>> expected = emptyList();
+
+    when(actions.collect(params)).thenReturn(expected);
+
+    MyTextDocumentService service =
+        new MyTextDocumentService(null, null, null, null, null, broker, actions);
+    try {
+      assertEquals(expected, service.codeAction(params).get());
+    } catch (InterruptedException | ExecutionException e) {
+      fail(e.getMessage());
+    }
+    verify(actions).collect(params);
+  }
+
   private List<Diagnostic> createDefaultDiagnostics() {
     return Collections.singletonList(
         new Diagnostic(
@@ -192,7 +232,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   private MyTextDocumentService verifyServiceStart(
       Communications communications, LanguageEngineFacade engine, DataBusBroker broker) {
     MyTextDocumentService service =
-        new MyTextDocumentService(communications, engine, null, null, null, broker);
+        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
 
     verify(broker).subscribe(DataEventType.RUN_ANALYSIS_EVENT, service);
     return service;

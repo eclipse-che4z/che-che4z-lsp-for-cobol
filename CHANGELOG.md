@@ -4,6 +4,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ## [0.x.x] - TBD
 
+- Retrieve settings.json at initialize [#207](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/207) Thanks @[sergiuilie](https://github.com/sergiuilie)
 - Remove unused COBOL dialect support [#169](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/169) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - Make document extension check case-insensitive [#167](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/167) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - Remove copybook name from the variable list if copybook is missing [#190](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/190) Thanks @[temanbrcom](https://github.com/temanbrcom)
@@ -13,6 +14,10 @@ All notable changes to the COBOL Language Support extension are documented in th
 - Update `extension.ts` with correct language ID [#176](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/176) Thanks @[sergiuilie](https://github.com/sergiuilie)
 - Remove remarks support [#174](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/174) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - Introduce a mechanism on the server to generate a `cobdep` folder that contains dependency files for each COBOL file opened in the IDE that contains copybooks [#172](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/172) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
+
+## [0.10.1] - 2020-02-12
+
+- Add maximum Java heap size argument to `extension.ts` [#194](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/194) Thanks @[sergiuilie](https://github.com/sergiuilie)
 
 ## [0.10.0] - 2020-01-28
 

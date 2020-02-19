@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -18,7 +18,6 @@ import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolLexer;
 import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
@@ -40,8 +39,7 @@ public class CobolLanguageEngine {
 
     CobolPreprocessorImpl preprocessor = new CobolPreprocessorImpl();
 
-    ResultWithErrors<PreprocessedInput> preProcessedInput =
-        preprocessor.process(documentUri, text);
+    ResultWithErrors<PreprocessedInput> preProcessedInput = preprocessor.process(documentUri, text);
 
     CobolLexer lexer =
         new CobolLexer(CharStreams.fromString(preProcessedInput.getResult().getInput()));
@@ -56,16 +54,14 @@ public class CobolLanguageEngine {
 
     parser.removeErrorListeners();
     parser.addErrorListener(new VerboseListener(errors, documentUri));
-
-    CobolErrorStrategy strategy = new CobolErrorStrategy();
-    parser.setErrorHandler(strategy);
+    parser.setErrorHandler(new CobolErrorStrategy());
 
     CobolParser.StartRuleContext tree = parser.startRule();
-    CobolVisitor visitor = new CobolVisitor();
-    visitor.setSemanticErrors(new SemanticListener(errors));
-    visitor.setSemanticContext(preProcessedInput.getResult().getSemanticContext());
-    visitor.setDocumentUri(documentUri);
+    CobolVisitor visitor =
+        new CobolVisitor(documentUri, preProcessedInput.getResult().getSemanticContext());
     visitor.visit(tree);
+
+    errors.addAll(visitor.getErrors());
 
     errors.forEach(err -> LOG.debug(err.toString()));
     return new ResultWithErrors<>(preProcessedInput.getResult().getSemanticContext(), errors);

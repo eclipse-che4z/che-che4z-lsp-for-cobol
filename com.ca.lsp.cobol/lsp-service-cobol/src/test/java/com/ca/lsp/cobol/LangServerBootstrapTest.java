@@ -18,20 +18,22 @@
 
 package com.ca.lsp.cobol;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.service.MyLanguageServerImpl;
 import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
+import org.junit.After;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.concurrent.Executors;
 
+import static com.broadcom.lsp.cdi.LangServerCtx.getInjector;
+import static com.broadcom.lsp.cdi.LangServerCtx.shutdown;
+import static com.google.inject.Key.get;
+import static com.google.inject.name.Names.named;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.junit.Assert.*;
 
 /** This test check the logic of the application bootstrap */
@@ -39,17 +41,19 @@ public class LangServerBootstrapTest {
 
   private static final String PIPES = "pipeEnabled";
 
+  @After
+  public void shutdownContext() {
+    shutdown();
+  }
+
   @Test
   public void initCtx() {
     LangServerBootstrap.initCtx();
 
     // Bound class in Service module
-    MyLanguageServerImpl server =
-        LangServerCtx.getInjector().getInstance(MyLanguageServerImpl.class);
+    MyLanguageServerImpl server = getInjector().getInstance(MyLanguageServerImpl.class);
     // Bound constant in Databus module
-    Integer cacheSize =
-        LangServerCtx.getInjector()
-            .getInstance(Key.get(Integer.class, Names.named("CACHE-MAX-SIZE")));
+    Integer cacheSize = getInjector().getInstance(get(Integer.class, named("CACHE-MAX-SIZE")));
 
     assertNotNull(server);
     assertNotNull(cacheSize);
@@ -77,7 +81,7 @@ public class LangServerBootstrapTest {
   public void createServerLauncherWithSocket() throws IOException {
     LanguageServer server = new TestLanguageServer();
 
-    Executors.newSingleThreadExecutor()
+    newSingleThreadExecutor()
         .submit(
             () -> {
               try {
