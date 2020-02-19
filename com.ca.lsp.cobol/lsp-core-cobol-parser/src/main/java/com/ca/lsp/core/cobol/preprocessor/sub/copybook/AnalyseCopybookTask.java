@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -40,6 +40,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RecursiveTask;
 
+/**
+ * Represent the ForkJoinTask that is executed in parallel for address copybooks duties It use a
+ * {@Link DataBusBroker} to communicate with other modules
+ */
 @Slf4j
 public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<CopybookSemanticContext>>
     implements EventObserver<FetchedCopybookEvent> {

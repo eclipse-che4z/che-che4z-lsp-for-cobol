@@ -34,7 +34,6 @@ import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.ContinuationLineT
 import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.CobolLineWriter;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.impl.CobolLineWriterImpl;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nonnull;
@@ -61,7 +60,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
       @Nonnull String documentUri,
       @Nonnull String cobolCode,
       @Nonnull SemanticContext semanticContext,
-      @NonNull String textDocumentSyncType) {
+      @Nonnull String textDocumentSyncType) {
 
     ResultWithErrors<List<CobolLine>> lines = readLines(cobolCode, documentUri);
 

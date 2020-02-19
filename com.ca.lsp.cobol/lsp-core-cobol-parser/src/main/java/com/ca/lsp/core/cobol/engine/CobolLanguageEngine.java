@@ -31,10 +31,23 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class is responsible for run the syntax and semantic analysis of an input cobol document.
+ * Its run method is used by the service facade layer CobolLanguageEngineFacade
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class CobolLanguageEngine {
 
+  /**
+   * Perform syntax and semantic analysisi for the given text document
+   *
+   * @param documentUri unique resource identifier of the processed document
+   * @param text the content of the document that should be processed
+   * @param textDocumentSyncType the document sync type that can be (DID_OPEN|DID_CHANGE)
+   * @return Semantic information wrapper object and list of syntax error that might be send back to
+   *     the client
+   */
   public ResultWithErrors<SemanticContext> run(
       String documentUri, String text, String textDocumentSyncType) {
 

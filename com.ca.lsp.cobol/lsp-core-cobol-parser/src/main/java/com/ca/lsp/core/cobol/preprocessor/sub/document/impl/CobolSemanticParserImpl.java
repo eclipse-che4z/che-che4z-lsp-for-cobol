@@ -28,7 +28,6 @@ import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListen
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.google.common.collect.Multimap;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -52,7 +51,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
       @Nonnull String uri,
       @Nonnull String code,
       @Nonnull SemanticContext semanticContext,
-      @NonNull String textDocumentSyncType) {
+      @Nonnull String textDocumentSyncType) {
     // run the lexer
     CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     // get a list of matched tokens

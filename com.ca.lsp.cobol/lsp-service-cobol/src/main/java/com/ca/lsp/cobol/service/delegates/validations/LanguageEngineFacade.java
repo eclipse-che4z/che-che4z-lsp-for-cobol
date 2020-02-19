@@ -19,8 +19,7 @@ public interface LanguageEngineFacade {
   /**
    * @param uri - URI of the processing document to define positions and errors properly
    * @param text of document opened in the client editor
-   * @param textDocumentSyncType reflect the sync status of the document
-   *     (DID_OPEN|DID_CHANGE|DID_CLOSE)
+   * @param textDocumentSyncType reflect the sync status of the document (DID_OPEN|DID_CHANGE)
    * @return list of LSP diagnostic object used to display errors in the editor
    */
   AnalysisResult analyze(String uri, String text, TextDocumentSyncType textDocumentSyncType);

@@ -186,7 +186,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didClose(DidCloseTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-
     log.info("Document closing invoked");
     docs.remove(uri);
   }
