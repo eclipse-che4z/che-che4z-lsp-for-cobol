@@ -15,6 +15,7 @@
 
 package com.ca.lsp.cobol.service;
 
+import com.ca.lsp.cobol.service.providers.ClientProvider;
 import com.ca.lsp.core.cobol.model.ErrorCode;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -46,7 +47,7 @@ public class MyLanguageServerImplTest {
     ClientProvider provider = new ClientProvider();
     provider.set(client);
 
-    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, provider);
+    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, provider, null);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     server.initialized(new InitializedParams());
 
@@ -63,7 +64,8 @@ public class MyLanguageServerImplTest {
   @Test
   public void initialize() {
     FileSystemService fileSystemService = mock(FileSystemService.class);
-    MyLanguageServerImpl server = new MyLanguageServerImpl(fileSystemService, null, null, null);
+    MyLanguageServerImpl server =
+        new MyLanguageServerImpl(fileSystemService, null, null, null, null);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));

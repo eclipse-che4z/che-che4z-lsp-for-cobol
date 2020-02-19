@@ -170,7 +170,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
 
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
-    registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     registerEngineAndAnalyze(uri, langId, text);
   }
 
@@ -178,8 +177,10 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   public void didChange(DidChangeTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
     String text = params.getContentChanges().get(0).getText();
-
-    analyzeChanges(uri, text);
+    String fileExtension = extractExtension(uri);
+    if (fileExtension != null && isCobolFile(fileExtension)) {
+      analyzeChanges(uri, text);
+    }
   }
 
   @Override
@@ -223,6 +224,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   }
 
   private void analyzeDocumentFirstTime(String uri, String text) {
+    registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     CompletableFuture.runAsync(
             () -> {
               AnalysisResult result = engine.analyze(uri, text);
@@ -232,7 +234,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
   }
 
-  private void analyzeChanges(String uri, String text) {
+  void analyzeChanges(String uri, String text) {
     CompletableFuture.runAsync(
             () -> {
               AnalysisResult result = engine.analyze(uri, text);
