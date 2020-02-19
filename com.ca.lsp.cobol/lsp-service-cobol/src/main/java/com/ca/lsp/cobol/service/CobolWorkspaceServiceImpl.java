@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.CPY_MANAGER;
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -91,9 +93,8 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
-    /* section and scope has to be set to whatever we agree on for the dependencies graph */
     try {
-      fetchSettings("broadcom-cobol-lsp.cpy-manager", null)
+      fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
           .thenAccept(e -> dataBus.postData(FetchedSettingsEvent.builder().content(e).build()));
     } catch (RuntimeException e) {
       log.error(e.getMessage());
@@ -109,10 +110,9 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    * @return - CompletedFuture which contains an object with the settings asked for.
    */
   private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {
-    LanguageClient client = clientProvider.get();
-    ConfigurationParams params = new ConfigurationParams();
-    params.setItems(provideConfigurationItemList(section, scope));
-    return client.configuration(params);
+    ConfigurationParams params =
+        new ConfigurationParams(provideConfigurationItemList(section, scope));
+    return clientProvider.get().configuration(params);
   }
 
   @Nonnull

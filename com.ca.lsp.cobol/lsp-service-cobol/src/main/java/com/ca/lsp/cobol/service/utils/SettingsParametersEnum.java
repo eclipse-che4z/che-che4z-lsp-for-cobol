@@ -12,15 +12,15 @@
  *    Broadcom, Inc. - initial API and implementation
  */
 
-package com.ca.lsp.cobol.model;
+package com.ca.lsp.cobol.service.utils;
 
-import lombok.Value;
+public enum SettingsParametersEnum {
+  CPY_MANAGER("cpy-manager"),
+  LSP_PREFIX("broadcom-cobol-lsp");
 
-import java.util.List;
+  public final String label;
 
-@Value
-public class ConfigurationSettingsStorable {
-
-  private Object profiles;
-  private List<String> paths;
+  private SettingsParametersEnum(String label) {
+    this.label = label;
+  }
 }

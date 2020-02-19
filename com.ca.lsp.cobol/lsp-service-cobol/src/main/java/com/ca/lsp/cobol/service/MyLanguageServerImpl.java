@@ -31,11 +31,12 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.CPY_MANAGER;
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -109,17 +110,25 @@ public class MyLanguageServerImpl implements LanguageServer {
                 new Registration("configurationChange", "workspace/didChangeConfiguration", null)));
     client.registerCapability(registrationParams);
     try {
-      fetchSettings("broadcom-cobol-lsp.cpy-manager", null)
-          .thenAccept(
-              e -> {
-                JsonObject jsonObject = (JsonObject) e.get(0);
-                ConfigurationSettingsStorable configurationSettingsStorable =
-                    parseJsonIfValid(jsonObject);
-                ((SettingsProvider) settingsProvider).set(configurationSettingsStorable);
-              });
+      retrieveAndStoreConfiguration();
     } catch (RuntimeException e) {
       log.error(e.getMessage());
     }
+  }
+
+  /**
+   * Retrieve configuration settings by using fetchSettings() method, validate the JSON and later
+   * store it in the SettingProvider for further use
+   */
+  void retrieveAndStoreConfiguration() {
+    fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
+        .thenAccept(
+            e -> {
+              JsonObject jsonObject = (JsonObject) e.get(0);
+              ConfigurationSettingsStorable configurationSettingsStorable =
+                  parseJsonIfValid(jsonObject);
+              ((SettingsProvider) settingsProvider).set(configurationSettingsStorable);
+            });
   }
 
   /**
@@ -138,10 +147,9 @@ public class MyLanguageServerImpl implements LanguageServer {
   }
 
   private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {
-    LanguageClient client = clientProvider.get();
-    ConfigurationParams params = new ConfigurationParams();
-    params.setItems(provideConfigurationItemList(section, scope));
-    return client.configuration(params);
+    ConfigurationParams params =
+        new ConfigurationParams(provideConfigurationItemList(section, scope));
+    return clientProvider.get().configuration(params);
   }
 
   @Nonnull

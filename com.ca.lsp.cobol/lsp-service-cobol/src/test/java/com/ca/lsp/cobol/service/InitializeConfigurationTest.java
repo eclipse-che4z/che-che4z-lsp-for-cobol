@@ -41,10 +41,10 @@ public class InitializeConfigurationTest {
   private LanguageClient client = Mockito.mock(LanguageClient.class);
   private ClientProvider provider = new ClientProvider();
   private SettingsProvider settingsProvider = Mockito.mock(SettingsProvider.class);
-  private final static String PROFILE_NAME = "myProfile";
+  private static final String PROFILE_NAME = "myProfile";
 
   @Test
-  public void testInitializeConfiguration() throws ExecutionException, InterruptedException {
+  public void testInitializeConfiguration() {
     provider.set(client);
 
     MyLanguageServerImpl langServer =

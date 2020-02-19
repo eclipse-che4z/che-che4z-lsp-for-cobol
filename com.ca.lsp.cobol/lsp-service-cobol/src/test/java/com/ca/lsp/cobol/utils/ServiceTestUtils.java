@@ -19,13 +19,16 @@ import org.eclipse.lsp4j.ConfigurationItem;
 import org.eclipse.lsp4j.ConfigurationParams;
 import java.util.Collections;
 
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.CPY_MANAGER;
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
+
 @UtilityClass
 public final class ServiceTestUtils {
 
   public ConfigurationParams createParams() {
     ConfigurationParams params = new ConfigurationParams();
     ConfigurationItem item = new ConfigurationItem();
-    item.setSection("broadcom-cobol-lsp.cpy-manager");
+    item.setSection(LSP_PREFIX.label + "." + CPY_MANAGER.label);
     item.setScopeUri(null);
     params.setItems(Collections.singletonList(item));
     return params;
