@@ -14,23 +14,42 @@
 
 package com.ca.lsp.cobol.service.providers;
 
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
+import com.broadcom.lsp.domain.cobol.event.model.FetchedSettingsEvent;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import javax.annotation.Nonnull;
+import lombok.extern.slf4j.Slf4j;
+
 import javax.annotation.Nullable;
 
 @Singleton
-public class SettingsProvider implements Provider<ConfigurationSettingsStorable> {
+@Slf4j
+public class SettingsProvider
+    implements Provider<ConfigurationSettingsStorable>, EventObserver<FetchedSettingsEvent> {
   private ConfigurationSettingsStorable configurationSettingsStorable;
 
-  public void set(@Nonnull ConfigurationSettingsStorable configurationSettingsStorable) {
+  public void set(@Nullable ConfigurationSettingsStorable configurationSettingsStorable) {
     this.configurationSettingsStorable = configurationSettingsStorable;
   }
 
   @Override
   @Nullable
   public ConfigurationSettingsStorable get() {
-    return this.configurationSettingsStorable;
+    try {
+      return deepCopy(configurationSettingsStorable);
+    } catch (CloneNotSupportedException e) {
+      log.error(e.getMessage());
+      return null;
+    }
   }
+
+  private static ConfigurationSettingsStorable deepCopy(
+      ConfigurationSettingsStorable configurationSettingsStorable)
+      throws CloneNotSupportedException {
+    return (ConfigurationSettingsStorable) configurationSettingsStorable.clone();
+  }
+
+  @Override
+  public void observerCallback(FetchedSettingsEvent adaptedDataEvent) {}
 }

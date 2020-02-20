@@ -20,7 +20,7 @@ public enum SettingsParametersEnum {
 
   public final String label;
 
-  private SettingsParametersEnum(String label) {
+  SettingsParametersEnum(String label) {
     this.label = label;
   }
 }

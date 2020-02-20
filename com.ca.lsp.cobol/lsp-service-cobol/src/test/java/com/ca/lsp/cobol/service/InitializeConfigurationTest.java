@@ -29,9 +29,9 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * This test class checks if the workspace calls client configuration at the initialize method and
@@ -47,8 +47,7 @@ public class InitializeConfigurationTest {
   public void testInitializeConfiguration() {
     provider.set(client);
 
-    MyLanguageServerImpl langServer =
-        new MyLanguageServerImpl(null, null, null, provider, settingsProvider);
+    MyLanguageServerImpl langServer = new MyLanguageServerImpl(null, null, null, provider, null);
 
     ConfigurationParams params = ServiceTestUtils.createParams();
 

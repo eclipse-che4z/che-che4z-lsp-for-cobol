@@ -19,11 +19,11 @@ import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
+import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.google.common.annotations.Beta;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.lsp4j.WorkspaceFolder;
@@ -50,22 +50,16 @@ public class FileSystemServiceImpl implements FileSystemService {
   private final DataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
   private final List<String> validExtensions = Arrays.asList("cpy", "cbl", "cobol", "cob");
-  private SettingsObject settingsObject;
-
-  // TODO: Should be removed when the settings provider is ready to use..
-  @AllArgsConstructor
-  protected static class SettingsObject {
-    @Getter private String profile;
-    @Getter private List<String> datasetList;
-  }
+  private final Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider;
 
   @Inject
-  public FileSystemServiceImpl(DataBusBroker dataBus) {
+  public FileSystemServiceImpl(
+      DataBusBroker dataBus,
+      Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider) {
     this.dataBus = dataBus;
-    dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
+    this.configurationSettingsStorableProvider = configurationSettingsStorableProvider;
 
-    settingsObject =
-        new SettingsObject("PRF11", Arrays.asList("HLQLF01.DSNAME1", "HLQLF01.DSNAME2"));
+    dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
   }
 
   /**
@@ -232,11 +226,17 @@ public class FileSystemServiceImpl implements FileSystemService {
   @Override
   public void observerCallback(RequiredCopybookEvent event) {
     String requiredCopybookName = event.getName();
-    Path path = findCopybook(requiredCopybookName);
-    String content = Optional.ofNullable(path).map(this::retrieveContentByPath).orElse(null);
 
+    ConfigurationSettingsStorable configurationSettingsStorable =
+        configurationSettingsStorableProvider.get();
+
+    Path path =
+        findCopybook(
+            requiredCopybookName,
+            (String) configurationSettingsStorable.getProfiles(),
+            configurationSettingsStorable.getPaths());
+    String content = getContentByCopybookName(requiredCopybookName);
     addCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
-
     dataBus.postData(
         FetchedCopybookEvent.builder()
             .name(requiredCopybookName)

@@ -19,6 +19,9 @@ import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
+import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
+import com.ca.lsp.cobol.service.providers.SettingsProvider;
+import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Duration;
 import org.awaitility.core.ConditionTimeoutException;
@@ -47,7 +50,11 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
   DataBusBroker broker =
       (DefaultDataBusBroker) LangServerCtx.getInjector().getInstance(DataBusBroker.class);
 
-  private FileSystemServiceImpl fileSystemService = new FileSystemServiceImpl(broker);
+  Provider<ConfigurationSettingsStorable> configurationSettingsStorable =
+      LangServerCtx.getInjector().getInstance(SettingsProvider.class);
+
+  private FileSystemServiceImpl fileSystemService =
+      new FileSystemServiceImpl(broker, configurationSettingsStorable);
 
   @Before
   public void initActivities() {

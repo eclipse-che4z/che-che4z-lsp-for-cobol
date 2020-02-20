@@ -19,8 +19,12 @@ import lombok.Value;
 import java.util.List;
 
 @Value
-public class ConfigurationSettingsStorable {
-
+public class ConfigurationSettingsStorable implements Cloneable {
   private Object profiles;
   private List<String> paths;
+
+  @Override
+  public Object clone() throws CloneNotSupportedException {
+    return super.clone();
+  }
 }

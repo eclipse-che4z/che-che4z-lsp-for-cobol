@@ -13,9 +13,9 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.providers.SettingsProvider;
+import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -66,7 +66,7 @@ public class MyLanguageServerImpl implements LanguageServer {
   private CobolWorkspaceService workspaceService;
   private FileSystemService fileSystemService;
   private Provider<LanguageClient> clientProvider;
-  private Provider<ConfigurationSettingsStorable> settingsProvider;
+  private Provider<SettingsProvider> settingsProvider;
 
   @Inject
   MyLanguageServerImpl(
@@ -74,7 +74,7 @@ public class MyLanguageServerImpl implements LanguageServer {
       TextDocumentService textService,
       CobolWorkspaceService workspaceService,
       Provider<LanguageClient> clientProvider,
-      Provider<ConfigurationSettingsStorable> settingsProvider) {
+      Provider<SettingsProvider> settingsProvider) {
     this.textService = textService;
     this.fileSystemService = fileSystemService;
     this.workspaceService = workspaceService;
@@ -122,14 +122,19 @@ public class MyLanguageServerImpl implements LanguageServer {
    */
   void retrieveAndStoreConfiguration() {
     fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
-        .thenAccept(
-            e -> {
-              JsonObject jsonObject = (JsonObject) e.get(0);
-              ConfigurationSettingsStorable configurationSettingsStorable =
-                  parseJsonIfValid(jsonObject);
-              ((SettingsProvider) settingsProvider).set(configurationSettingsStorable);
-            });
+        .thenAccept(e -> getSettingsFromProvider().set(parseJsonIfValid((JsonObject) e.get(0))));
   }
+
+  private SettingsProvider getSettingsFromProvider() {
+    return settingsProvider.get();
+  }
+
+  /*
+    void retrieveAndStoreConfiguration() {
+    fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
+        .thenAccept(e -> getSettingsFromProvider().set(parseJsonIfValid((JsonObject) e.get(0))));
+  }
+   */
 
   /**
    * @param jsonObject - the object which comes from the client and contains configuration settings
