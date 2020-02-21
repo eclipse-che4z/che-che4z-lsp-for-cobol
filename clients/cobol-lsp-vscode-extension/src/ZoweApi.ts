@@ -12,10 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { BasicProfileManager, IProfile, Session, RestClient, AbstractSession } from "@zowe/imperative";
+import { AbstractSession, BasicProfileManager, IProfile, RestClient, Session } from "@zowe/imperative";
 import * as os from "os";
 import * as path from "path";
-import { window } from "vscode";
+import { commands, window } from "vscode";
 
 export interface ProfilesMap {
     [key: string]: IProfile;
@@ -62,7 +62,11 @@ export class ZoweApi {
             // tslint:disable-next-line: no-string-literal
             return result["items"].map((i: any) => i.member);
         } catch (error) {
-            window.showWarningMessage("Can't read members of " + dataset);
+            const action = "Edit Dataset List";
+            if (action === await window.showWarningMessage("Can't read members of " + dataset, action)) {
+                commands.executeCommand("workbench.action.openSettings",
+                    "broadcom-cobol-lsp.cpy-manager.paths");
+            }
             return [];
         }
     }
