@@ -14,7 +14,7 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.model.CopybookDefinition;
+import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
@@ -202,7 +202,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   private boolean checkThisCopybookNotPresentInHierarchy(String copybookName) {
     return semanticContext.getCopybookUsageTracker().stream()
-        .map(CopybookDefinition::getName)
+        .map(CopybookUsage::getName)
         .noneMatch(copybookName::equals);
   }
 

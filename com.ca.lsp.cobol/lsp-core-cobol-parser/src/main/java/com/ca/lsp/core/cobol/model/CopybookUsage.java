@@ -21,7 +21,7 @@ import java.util.Collection;
 
 @Data
 @AllArgsConstructor
-public class CopybookDefinition {
+public class CopybookUsage {
   private String name;
   private String uri;
   private Collection<Position> usages;
