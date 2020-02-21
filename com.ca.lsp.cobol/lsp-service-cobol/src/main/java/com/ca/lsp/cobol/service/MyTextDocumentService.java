@@ -44,6 +44,7 @@ import java.util.function.BiConsumer;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 /**
@@ -225,17 +226,17 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
 
   private void analyzeDocumentFirstTime(String uri, String text) {
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
-    CompletableFuture.runAsync(
+    runAsync(
             () -> {
               AnalysisResult result = engine.analyze(uri, text);
-              docs.get(uri).setAnalysisResult(result);
+              ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
               publishResult(uri, result);
             })
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
   }
 
   void analyzeChanges(String uri, String text) {
-    CompletableFuture.runAsync(
+    runAsync(
             () -> {
               AnalysisResult result = engine.analyze(uri, text);
               registerDocument(uri, new MyDocumentModel(text, result));
