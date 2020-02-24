@@ -44,6 +44,7 @@ import java.util.function.BiConsumer;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 /**
@@ -170,17 +171,17 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
 
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
-    registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     registerEngineAndAnalyze(uri, langId, text);
   }
 
   @Override
   public void didChange(DidChangeTextDocumentParams params) {
-    params.getTextDocument();
     String uri = params.getTextDocument().getUri();
     String text = params.getContentChanges().get(0).getText();
-
-    analyzeChanges(uri, text);
+    String fileExtension = extractExtension(uri);
+    if (fileExtension != null && isCobolFile(fileExtension)) {
+      analyzeChanges(uri, text);
+    }
   }
 
   @Override
@@ -224,19 +225,20 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   }
 
   private void analyzeDocumentFirstTime(String uri, String text) {
-    CompletableFuture.runAsync(
+    registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
+    runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text, TextDocumentSyncType.DID_OPEN);
-              docs.get(uri).setAnalysisResult(result);
+              AnalysisResult result = engine.analyze(uri, text,TextDocumentSyncType.DID_OPEN);
+              ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
               publishResult(uri, result);
             })
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
   }
 
-  private void analyzeChanges(String uri, String text) {
-    CompletableFuture.runAsync(
+  void analyzeChanges(String uri, String text) {
+    runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text, TextDocumentSyncType.DID_CHANGE);
+              AnalysisResult result = engine.analyze(uri, text,TextDocumentSyncType.DID_CHANGE);
               registerDocument(uri, new MyDocumentModel(text, result));
               communications.publishDiagnostics(uri, result.getDiagnostics());
             })

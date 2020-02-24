@@ -14,9 +14,15 @@
 package com.ca.lsp.cobol.service;
 
 import com.ca.lsp.core.cobol.model.ErrorCode;
+import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
+import com.ca.lsp.cobol.service.providers.SettingsProvider;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -25,9 +31,12 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.CPY_MANAGER;
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -40,6 +49,7 @@ import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
  * This class sets up the initial state of the services and applies other initialization activities,
  * such as set server capabilities and register file system watchers.
  */
+@Slf4j
 @Singleton
 public class MyLanguageServerImpl implements LanguageServer {
   /** Glob patterns to watch COPYBOOKS folder and copybook files */
@@ -56,17 +66,20 @@ public class MyLanguageServerImpl implements LanguageServer {
   private CobolWorkspaceService workspaceService;
   private FileSystemService fileSystemService;
   private Provider<LanguageClient> clientProvider;
+  private Provider<ConfigurationSettingsStorable> settingsProvider;
 
   @Inject
   MyLanguageServerImpl(
       FileSystemService fileSystemService,
       TextDocumentService textService,
       CobolWorkspaceService workspaceService,
-      Provider<LanguageClient> clientProvider) {
+      Provider<LanguageClient> clientProvider,
+      Provider<ConfigurationSettingsStorable> settingsProvider) {
     this.textService = textService;
     this.fileSystemService = fileSystemService;
     this.workspaceService = workspaceService;
     this.clientProvider = clientProvider;
+    this.settingsProvider = settingsProvider;
   }
 
   @Override
@@ -96,6 +109,55 @@ public class MyLanguageServerImpl implements LanguageServer {
                     "copybooksWatcher", "workspace/didChangeWatchedFiles", createWatcher()),
                 new Registration("configurationChange", "workspace/didChangeConfiguration", null)));
     client.registerCapability(registrationParams);
+    try {
+      retrieveAndStoreConfiguration();
+    } catch (RuntimeException e) {
+      log.error(e.getMessage());
+    }
+  }
+
+  /**
+   * Retrieve configuration settings by using fetchSettings() method, validate the JSON and later
+   * store it in the SettingProvider for further use
+   */
+  void retrieveAndStoreConfiguration() {
+    fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
+        .thenAccept(
+            e -> {
+              JsonObject jsonObject = (JsonObject) e.get(0);
+              ConfigurationSettingsStorable configurationSettingsStorable =
+                  parseJsonIfValid(jsonObject);
+              ((SettingsProvider) settingsProvider).set(configurationSettingsStorable);
+            });
+  }
+
+  /**
+   * @param jsonObject - the object which comes from the client and contains configuration settings
+   * @return a custom object of type ConfigurableSettingsStorage if the JSON is valid or null if it
+   *     is failing the check
+   */
+  private ConfigurationSettingsStorable parseJsonIfValid(JsonObject jsonObject) {
+    Gson gson = new Gson();
+    try {
+      return gson.fromJson(jsonObject, ConfigurationSettingsStorable.class);
+    } catch (JsonSyntaxException e) {
+      log.error(e.getMessage());
+      return null;
+    }
+  }
+
+  private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {
+    ConfigurationParams params =
+        new ConfigurationParams(provideConfigurationItemList(section, scope));
+    return clientProvider.get().configuration(params);
+  }
+
+  @Nonnull
+  private List<ConfigurationItem> provideConfigurationItemList(String section, String scope) {
+    ConfigurationItem item = new ConfigurationItem();
+    item.setSection(section);
+    item.setScopeUri(scope);
+    return Collections.singletonList(item);
   }
 
   @Override
