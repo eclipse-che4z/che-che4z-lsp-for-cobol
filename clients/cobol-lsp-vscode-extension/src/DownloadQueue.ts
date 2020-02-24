@@ -4,7 +4,9 @@ export class DownloadQueue {
 
     public push(element: string): void {
         if (this.resolve) {
-            this.resolve(element);
+            const r = this.resolve;
+            this.resolve = undefined;
+            r(element);
         } else {
             this.queue.push(element);
         }

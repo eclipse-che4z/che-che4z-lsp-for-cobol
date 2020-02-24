@@ -2,7 +2,7 @@ import { DownloadQueue } from "../DownloadQueue";
 
 describe("Check download queue", () => {
     const element = "Test";
-    const element_extra = "Test";
+    const elementExtra = "Test";
     it("Can add elements to queue", async () => {
         const queue: DownloadQueue = new DownloadQueue();
         queue.push(element);
@@ -22,10 +22,10 @@ describe("Check download queue", () => {
     it("Can have more then one element", async () => {
         const queue: DownloadQueue = new DownloadQueue();
         queue.push(element);
-        queue.push(element_extra);
+        queue.push(elementExtra);
         expect(await queue.pop()).toEqual(element);
         expect(1).toEqual(queue.length);
-        expect(await queue.pop()).toEqual(element_extra);
+        expect(await queue.pop()).toEqual(elementExtra);
         expect(0).toEqual(queue.length);
     });
 });
