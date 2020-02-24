@@ -173,9 +173,9 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     // created two dummy analysis result, one with error and another without
     // those object will be used as result of dynamic stubbing stage
     AnalysisResult resultNoErrors =
-        new AnalysisResult(diagnosticsNoErrors, null, null, null, null, null);
+        new AnalysisResult(diagnosticsNoErrors, null, null, null, null, null, null);
     AnalysisResult resultWithErrors =
-        new AnalysisResult(diagnosticsWithErrors, null, null, null, null, null);
+        new AnalysisResult(diagnosticsWithErrors, null, null, null, null, null, null);
 
     /*
      * Defined dynamic response based on the possible combinations available when the document is analyzed:

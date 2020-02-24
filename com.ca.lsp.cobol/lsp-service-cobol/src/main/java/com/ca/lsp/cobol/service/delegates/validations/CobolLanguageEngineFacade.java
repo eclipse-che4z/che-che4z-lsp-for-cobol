@@ -136,7 +136,8 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
         retrieveUsages(result.getResult().getVariables()),
         retrieveDefinitions(result.getResult().getParagraphs()),
         retrieveUsages(result.getResult().getParagraphs()),
-        retrieveDefinitions(result.getResult().getCopybooks()));
+        retrieveDefinitions(result.getResult().getCopybooks()),
+        retrieveUsages(result.getResult().getCopybooks()));
   }
 
   private Map<String, List<Location>> retrieveDefinitions(SubContext<?> context) {
