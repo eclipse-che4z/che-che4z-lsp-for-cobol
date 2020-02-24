@@ -30,6 +30,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.internal.stubbing.answers.AnswersWithDelay;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +42,7 @@ import java.util.function.Function;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -92,7 +94,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   public void testDidChangeOnCpyFiles() {
     List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
-    MyTextDocumentService spyService = spy((MyTextDocumentService)service);
+    MyTextDocumentService spyService = spy((MyTextDocumentService) service);
     spyService.didChange(
         new DidChangeTextDocumentParams(
             new VersionedTextDocumentIdentifier(CPY_DOCUMENT_URI, 0), textEdits));
@@ -223,7 +225,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   private List<Diagnostic> createDefaultDiagnostics() {
-    return Collections.singletonList(
+    return singletonList(
         new Diagnostic(
             new Range(new Position(0, 0), new Position(0, INCORRECT_TEXT_EXAMPLE.length())),
             INCORRECT_TEXT_EXAMPLE));
@@ -261,6 +263,38 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       String uri) {
     verify(engine, timeout(10000).times(2)).analyze(uri, text);
     verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
+  }
+
+  /**
+   * Check there were no NullPointerException thrown if a {@link
+   * TextDocumentService#didClose(DidCloseTextDocumentParams)} is invoked when {@link
+   * TextDocumentService#didOpen(DidOpenTextDocumentParams)} processing is not finished yet. If it
+   * was thrown then async task inside the service falls and {@link
+   * Communications#cancelProgressNotification(String)} is not called.
+   */
+  @Test
+  public void testImmediateClosingOfDocumentDoNotCauseNPE() {
+    DataBusBroker broker = mock(DataBusBroker.class);
+    Communications communications = mock(Communications.class);
+    LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
+
+    doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.empty()))
+        .when(engine)
+        .analyze(DOCUMENT_URI, TEXT_EXAMPLE);
+
+    MyTextDocumentService service =
+        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
+
+    service.didOpen(
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
+
+    assertEquals(1, service.getDocs().size());
+
+    service.didClose(new DidCloseTextDocumentParams(new TextDocumentIdentifier(DOCUMENT_URI)));
+    assertEquals(0, service.getDocs().size());
+
+    verify(communications, timeout(2000)).cancelProgressNotification(DOCUMENT_URI);
   }
 
   @Ignore("Not implemented yet")
