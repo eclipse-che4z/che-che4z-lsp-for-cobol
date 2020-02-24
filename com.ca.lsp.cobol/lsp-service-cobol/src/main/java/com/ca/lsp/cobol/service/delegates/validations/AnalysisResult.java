@@ -32,10 +32,12 @@ public class AnalysisResult {
   private Map<String, List<Location>> paragraphDefinitions;
   private Map<String, List<Location>> paragraphUsages;
   private Map<String, List<Location>> copybookDefinitions;
+  private Map<String, List<Location>> copybookUsages;
 
   public static AnalysisResult empty() {
     return new AnalysisResult(
         Collections.emptyList(),
+        Collections.emptyMap(),
         Collections.emptyMap(),
         Collections.emptyMap(),
         Collections.emptyMap(),

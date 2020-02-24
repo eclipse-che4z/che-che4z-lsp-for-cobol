@@ -87,6 +87,7 @@ public class VariableCompletionTest {
             Collections.emptyMap(),
             Collections.emptyMap(),
             Collections.emptyMap(),
+            Collections.emptyMap(),
             Collections.emptyMap());
 
     return new MyDocumentModel(TEXT, result);

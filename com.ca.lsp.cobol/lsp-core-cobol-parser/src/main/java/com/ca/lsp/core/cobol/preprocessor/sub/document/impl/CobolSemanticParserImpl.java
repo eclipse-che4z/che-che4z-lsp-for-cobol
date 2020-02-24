@@ -86,7 +86,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
       @Nonnull String documentUri,
       @Nonnull SemanticContext semanticContext,
       String textDocumentSyncType) {
-    Multimap<String, Position> copybookNames = semanticContext.getCopybooks().getDefinitions();
+    Multimap<String, Position> copybookNames = semanticContext.getCopybooks().getUsages();
 
     if (copybookNames.isEmpty()) {
       return new ResultWithErrors<>(emptyList(), emptyList());

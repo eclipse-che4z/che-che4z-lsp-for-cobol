@@ -24,7 +24,7 @@ import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
-import com.ca.lsp.core.cobol.model.CopybookDefinition;
+import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.AnalyseCopybookTask;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.MultiMapSerializableHelper;
 import com.google.common.collect.HashMultimap;
@@ -165,7 +165,7 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
     AnalyseCopybookTask analyseCopybookTask =
         new AnalyseCopybookTask(
             null,
-            new CopybookDefinition(COPYBOOK_NAME, null, null),
+            new CopybookUsage(COPYBOOK_NAME, null, null),
             Collections.emptyList(),
             "DID_OPEN");
     analyseCopybookTask.compute();
@@ -175,7 +175,7 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
     AnalyseCopybookTask analyseCopybookTask =
         new AnalyseCopybookTask(
             null,
-            new CopybookDefinition(COPYBOOK_NAME, null, null),
+            new CopybookUsage(COPYBOOK_NAME, null, null),
             Collections.emptyList(),
             "DID_OPEN");
     analyseCopybookTask.compute();

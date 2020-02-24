@@ -24,8 +24,8 @@ import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
+import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
@@ -53,19 +53,20 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
 
   private final String copyBookName;
   private String documentUri;
-  private String textDocumentSyncType;
-  private transient CopybookDefinition copybookDefinition;
-  private transient List<CopybookDefinition> copybookUsageTracker;
+  // <<<<<<< HEAD
+  private transient CopybookUsage copybookUsage;
+  private transient List<CopybookUsage> copybookUsageTracker;
   private transient CompletableFuture<String> waitForResolving;
+  private String textDocumentSyncType;
 
   public AnalyseCopybookTask(
       String documentUri,
-      CopybookDefinition copybookDefinition,
-      List<CopybookDefinition> copybookUsageTracker,
+      CopybookUsage copybookUsage,
+      List<CopybookUsage> copybookUsageTracker,
       String textDocumentSyncType) {
     this.documentUri = documentUri;
-    this.copybookDefinition = copybookDefinition;
-    copyBookName = copybookDefinition.getName();
+    this.copybookUsage = copybookUsage;
+    copyBookName = copybookUsage.getName();
     this.copybookUsageTracker = copybookUsageTracker;
     this.textDocumentSyncType = textDocumentSyncType;
     waitForResolving = new CompletableFuture<>();
@@ -130,9 +131,9 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
   private void populateCacheWithCopybookContents(String content) {
     databus.storeData(
         CopybookStorable.builder()
-            .name(copybookDefinition.getName())
+            .name(copybookUsage.getName())
             .content(content)
-            .uri(copybookDefinition.getUri())
+            .uri(copybookUsage.getUri())
             .build());
   }
 
@@ -143,17 +144,17 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
   private String getContentFromCache() {
     CopybookStorable cachedData =
         databus.getData(CopybookRepository.calculateUUID(new StringBuilder(copyBookName)));
-    copybookDefinition.setUri(cachedData.getUri());
+    copybookUsage.setUri(cachedData.getUri());
     return cachedData.getContent();
   }
 
   private ResultWithErrors<SemanticContext> parseCopybook(String content) {
-    List<CopybookDefinition> nextTrackerIteration = new ArrayList<>(copybookUsageTracker);
-    nextTrackerIteration.add(copybookDefinition);
+    List<CopybookUsage> nextTrackerIteration = new ArrayList<>(copybookUsageTracker);
+    nextTrackerIteration.add(copybookUsage);
     ResultWithErrors<PreprocessedInput> preprocessedInput =
         getParser()
             .process(
-                copybookDefinition.getUri(),
+                copybookUsage.getUri(),
                 content,
                 new SemanticContext(Collections.unmodifiableList(nextTrackerIteration)),
                 textDocumentSyncType);
@@ -170,7 +171,7 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
     if (!copyBookName.equals(adaptedDataEvent.getName())) {
       return;
     }
-    copybookDefinition.setUri(adaptedDataEvent.getUri());
+    copybookUsage.setUri(adaptedDataEvent.getUri());
     waitForResolving.complete((adaptedDataEvent).getContent());
   }
 
