@@ -31,11 +31,13 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.CPY_MANAGER;
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -91,9 +93,8 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
-    /* section and scope has to be set to whatever we agree on for the dependencies graph */
     try {
-      fetchSettings(null, null)
+      fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
           .thenAccept(e -> dataBus.postData(FetchedSettingsEvent.builder().content(e).build()));
     } catch (RuntimeException e) {
       log.error(e.getMessage());
@@ -109,20 +110,17 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
    * @return - CompletedFuture which contains an object with the settings asked for.
    */
   private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {
-    LanguageClient client = clientProvider.get();
-    ConfigurationParams params = new ConfigurationParams();
-    params.setItems(elemToList(section, scope));
-    return client.configuration(params);
+    ConfigurationParams params =
+        new ConfigurationParams(provideConfigurationItemList(section, scope));
+    return clientProvider.get().configuration(params);
   }
 
   @Nonnull
-  private List<ConfigurationItem> elemToList(String section, String scope) {
-    List<ConfigurationItem> list = new ArrayList<>();
+  private List<ConfigurationItem> provideConfigurationItemList(String section, String scope) {
     ConfigurationItem item = new ConfigurationItem();
     item.setSection(section);
     item.setScopeUri(scope);
-    list.add(item);
-    return list;
+    return Collections.singletonList(item);
   }
 
   @Override

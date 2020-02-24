@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Broadcom.
+# Copyright (c) 2020 Broadcom.
 # The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
 #
 # This program and the accompanying materials are made
@@ -23,7 +23,7 @@ tslint.json
 Jenkinsfile
 vsc-extension-quickstart.md
 undefined/**
-CONTRIBUTING.md 
+CONTRIBUTING.md
 .vscode-test/**
 tools
 _cacache
