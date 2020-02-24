@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -21,48 +21,30 @@ import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
 import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.text.similarity.LevenshteinDistance;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.ca.lsp.core.cobol.parser.CobolParser.*;
-import static java.util.Comparator.*;
 
-
+/**
+ * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
+ * abstract syntax tree built by {@link com.ca.lsp.core.cobol.parser.CobolParser}. It requires a
+ * semantic context with defined elements to add the usages or throw a warning on an invalid
+ * definition. If there is a misspelled keyword, the visitor finds it and throws a warning.
+ */
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {
-  private static final Keywords KEYWORDS = new Keywords();
   private static final int WARNING_LEVEL = 2;
   private static final int INFO_LEVEL = 3;
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
 
-  private SemanticContext semanticContext = null;
-  private String documentUri = null;
+  private String documentUri;
+  private SemanticContext semanticContext;
 
-  private static LevenshteinDistance instance = LevenshteinDistance.getDefaultInstance();
-
-  private static int getWrongTokenStopPosition(String wrongToken, int charPositionInLine) {
-    return charPositionInLine + wrongToken.length() - 1;
-  }
-
-  private static Optional<String> addDistance(String wrongToken) {
-    return KEYWORDS.getList().stream()
-        .map(item -> new Object[] {item, instance.apply(wrongToken, item)})
-        .sorted(comparingInt(o -> (int) o[1]))
-        .filter(item -> !wrongToken.equals(item[0]))
-        .filter(item -> (int) item[1] < 2)
-        .map(item -> item[0].toString())
-        .findFirst();
-  }
-
-  public void setSemanticContext(SemanticContext context) {
-    semanticContext = context;
-  }
-
-  public void setDocumentUri(String documentUri) {
+  public CobolVisitor(String documentUri, SemanticContext semanticContext) {
     this.documentUri = documentUri;
+    this.semanticContext = semanticContext;
   }
 
   @Override
@@ -169,7 +151,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   private void throwWarning(String wrongToken, int startLine, int charPositionInLine) {
-    addDistance(wrongToken.toUpperCase())
+    MisspelledKeywordDistance.calculateDistance(wrongToken.toUpperCase())
         .ifPresent(
             correctWord ->
                 getSemanticError(wrongToken, startLine, charPositionInLine, correctWord));
@@ -214,20 +196,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     } else if (ctx instanceof QualifiedDataNameFormat1Context
         && ((QualifiedDataNameFormat1Context) ctx).qualifiedInData() != null) {
       iterateOverQualifiedDataNames(
-          (QualifiedDataNameFormat1Context) ctx,
-          variable,
-          startLine,
-          charPositionInLine);
+          (QualifiedDataNameFormat1Context) ctx, variable, startLine, charPositionInLine);
       addUsage(semanticContext.getVariables(), variable, ctx);
     }
     return true;
   }
 
   private void iterateOverQualifiedDataNames(
-      QualifiedDataNameFormat1Context ctx,
-      String variable,
-      int startLine,
-      int charPositionInLine) {
+      QualifiedDataNameFormat1Context ctx, String variable, int startLine, int charPositionInLine) {
     for (QualifiedInDataContext node : ctx.qualifiedInData()) {
       if (node.inData() != null) {
         visitInData(variable, startLine, charPositionInLine, node.inData());
@@ -256,6 +232,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private void addUsage(SubContext<?> langContext, ParserRuleContext ctx) {
     langContext.addUsage(ctx.getText().toUpperCase(), retrievePosition(ctx));
+  }
+
+  private static int getWrongTokenStopPosition(String wrongToken, int charPositionInLine) {
+    return charPositionInLine + wrongToken.length() - 1;
   }
 
   private Position retrievePosition(ParserRuleContext ctx) {
