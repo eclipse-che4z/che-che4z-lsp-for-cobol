@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -19,7 +19,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-/** JUnit Test checks with Cobol engine for both positive and negative tests with 3 formats */
+/**
+ * JUnit Test checks with Cobol engine for both positive and negative tests with 3 formats and the
+ * two different TextDocumentSync types [DID_OPEN|DID_CHANGE]
+ */
 public class CobolLanguageEngineTest {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
 
@@ -50,18 +53,33 @@ public class CobolLanguageEngineTest {
           + "            END-PERFORM.\r\n"
           + "\r\n"
           + "            STOP RUN.";
+  public static final String DID_OPEN = "DID_OPEN";
+  public static final String DID_CHANGE = "DID_CHANGE";
 
   @Test
   public void doCheckNegative() {
     CobolLanguageEngine engine = new CobolLanguageEngine();
-    ResultWithErrors<SemanticContext> result = engine.run(DOCUMENT_URI, NEGATIVE_TEXT);
+    ResultWithErrors<SemanticContext> result;
+    // Run the analysis in DID_OPEN mode
+    result = engine.run(DOCUMENT_URI, NEGATIVE_TEXT, DID_OPEN);
+    assertEquals(11, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
+
+    // Run the analysis in DID_CHANGE mode
+    result = engine.run(DOCUMENT_URI, NEGATIVE_TEXT, DID_CHANGE);
     assertEquals(11, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 
   @Test
   public void doCheckPositive() {
     CobolLanguageEngine engine = new CobolLanguageEngine();
-    ResultWithErrors<SemanticContext> result = engine.run(DOCUMENT_URI, POSITIVE_TEXT);
+    ResultWithErrors<SemanticContext> result;
+
+    // Run the analysis in DID_OPEN mode
+    result = engine.run(DOCUMENT_URI, POSITIVE_TEXT, DID_OPEN);
+    assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
+
+    // Run the analysis in DID_CHANGE mode
+    result = engine.run(DOCUMENT_URI, POSITIVE_TEXT, DID_CHANGE);
     assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 }

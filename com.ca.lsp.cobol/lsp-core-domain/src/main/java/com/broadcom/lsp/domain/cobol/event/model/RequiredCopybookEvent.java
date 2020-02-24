@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -29,11 +29,13 @@ import lombok.NoArgsConstructor;
 public class RequiredCopybookEvent extends DataEvent {
   private String name;
   private String documentUri;
+  private String textDocumentSyncType;
 
   @Builder
-  public RequiredCopybookEvent(String name, String documentUri) {
+  public RequiredCopybookEvent(String name, String documentUri, String textDocumentSyncType) {
     super(DataEventType.REQUIRED_COPYBOOK_EVENT, DataEventType.REQUIRED_COPYBOOK_EVENT.getId());
     this.name = name;
     this.documentUri = documentUri;
+    this.textDocumentSyncType = textDocumentSyncType;
   }
 }

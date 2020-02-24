@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -27,5 +27,6 @@ public interface CopybookAnalysis {
   ResultWithErrors<List<CopybookSemanticContext>> analyzeCopybooks(
       String documentUri,
       Multimap<String, Position> copybookNames,
-      List<CopybookDefinition> copybookUsageTracker);
+      List<CopybookDefinition> copybookUsageTracker,
+      String textDocumentSyncType);
 }

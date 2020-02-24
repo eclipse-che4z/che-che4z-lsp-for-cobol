@@ -30,6 +30,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.internal.stubbing.answers.AnswersWithDelay;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,8 +40,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -92,7 +96,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   public void testDidChangeOnCpyFiles() {
     List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
-    MyTextDocumentService spyService = spy((MyTextDocumentService)service);
+    MyTextDocumentService spyService = spy((MyTextDocumentService) service);
     spyService.didChange(
         new DidChangeTextDocumentParams(
             new VersionedTextDocumentIdentifier(CPY_DOCUMENT_URI, 0), textEdits));
@@ -158,24 +162,41 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
    */
   @Test
   public void observerCallback() {
+
+    // configured mock object and diagnostic stubs
     Communications communications = mock(Communications.class);
     LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
     DataBusBroker broker = mock(DataBusBroker.class);
-
-    List<Diagnostic> diagnosticsNoErrors = emptyList();
+    List<Diagnostic> diagnosticsNoErrors = Collections.emptyList();
     List<Diagnostic> diagnosticsWithErrors = createDefaultDiagnostics();
 
+    // created two dummy analysis result, one with error and another without
+    // those object will be used as result of dynamic stubbing stage
     AnalysisResult resultNoErrors =
         new AnalysisResult(diagnosticsNoErrors, null, null, null, null, null);
     AnalysisResult resultWithErrors =
         new AnalysisResult(diagnosticsWithErrors, null, null, null, null, null);
 
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE)).thenReturn(resultNoErrors);
-    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE))
+    /*
+     * Defined dynamic response based on the possible combinations available when the document is analyzed:
+     *  - text document sync state: [DID_OPEN|DID_CHANGE]
+     *  - document URI [correct|incorrect]
+     */
+
+    // dynamic stubbing for did open event
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN)).thenReturn(resultNoErrors);
+    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DID_OPEN))
         .thenReturn(resultWithErrors);
 
+    // dynamic stubbing for did change event
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_CHANGE)).thenReturn(resultNoErrors);
+    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DID_CHANGE))
+        .thenReturn(resultWithErrors);
+
+    // create a service and verify is subscribed to the required event
     MyTextDocumentService service = verifyServiceStart(communications, engine, broker);
 
+    // simulate the call to the didOpen for two different document one with and one without errors
     verifyDidOpen(communications, engine, diagnosticsNoErrors, service, TEXT_EXAMPLE, DOCUMENT_URI);
     verifyDidOpen(
         communications,
@@ -185,7 +206,15 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
         INCORRECT_TEXT_EXAMPLE,
         DOCUMENT_WITH_ERRORS_URI);
 
+    // after the simulation for triggering the observer callback verify that the analyze method
+    // (more in general the document analysis stage) is triggered
     service.observerCallback(new RunAnalysisEvent());
+
+    /* After sent a message on the databus we'll verify that the document is analyzed by the preprocessor.
+       More in detail we'll check that:
+       - analysis is invoked two times (because two are the document used to make this test
+       - the publish diagnostic after the syntax/semantic analysis is invoked exactly 2 times.
+    */
     verifyCallback(communications, engine, diagnosticsNoErrors, TEXT_EXAMPLE, DOCUMENT_URI);
     verifyCallback(
         communications,
@@ -223,7 +252,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   private List<Diagnostic> createDefaultDiagnostics() {
-    return Collections.singletonList(
+    return singletonList(
         new Diagnostic(
             new Range(new Position(0, 0), new Position(0, INCORRECT_TEXT_EXAMPLE.length())),
             INCORRECT_TEXT_EXAMPLE));
@@ -248,7 +277,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
 
-    verify(engine, timeout(10000)).analyze(uri, textToAnalyse);
+    verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
     verify(communications).notifyThatLoadingInProgress(uri);
     verify(communications).publishDiagnostics(uri, diagnostics);
   }
@@ -259,8 +288,42 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       List<Diagnostic> diagnostics,
       String text,
       String uri) {
-    verify(engine, timeout(10000).times(2)).analyze(uri, text);
+
+    verify(engine, timeout(10000).times(1)).analyze(uri, text, DID_CHANGE);
+    verify(engine, timeout(10000).times(1)).analyze(uri, text, DID_OPEN);
     verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
+  }
+
+  /**
+   * Check there were no NullPointerException thrown if a {@link
+   * TextDocumentService#didClose(DidCloseTextDocumentParams)} is invoked when {@link
+   * TextDocumentService#didOpen(DidOpenTextDocumentParams)} processing is not finished yet. If it
+   * was thrown then async task inside the service falls and {@link
+   * Communications#cancelProgressNotification(String)} is not called.
+   */
+  @Test
+  public void testImmediateClosingOfDocumentDoNotCauseNPE() {
+    DataBusBroker broker = mock(DataBusBroker.class);
+    Communications communications = mock(Communications.class);
+    LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
+
+    doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.empty()))
+        .when(engine)
+        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN);
+
+    MyTextDocumentService service =
+        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
+
+    service.didOpen(
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
+
+    assertEquals(1, service.getDocs().size());
+
+    service.didClose(new DidCloseTextDocumentParams(new TextDocumentIdentifier(DOCUMENT_URI)));
+    assertEquals(0, service.getDocs().size());
+
+    verify(communications, timeout(2000)).cancelProgressNotification(DOCUMENT_URI);
   }
 
   @Ignore("Not implemented yet")

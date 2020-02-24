@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2019 Broadcom.
+ *  Copyright (c) 2020 Broadcom.
  *  The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  *  This program and the accompanying materials are made
@@ -175,13 +175,20 @@ public class CobolCleanExtraLanguageTest {
   @Test
   public void positiveErrorTest() {
     CobolLanguageEngine engine = new CobolLanguageEngine();
-    ResultWithErrors<SemanticContext> result = engine.run("1", TEXT_TO_TEST);
+    ResultWithErrors<SemanticContext> result;
+
+    // VERIFY THE SCENARIO FOR DID_OPEN
+    result = engine.run("1", TEXT_TO_TEST, "DID_OPEN");
+    assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
+
+    // VERIFY THE SCENARIO FOR DID_CHANGE
+    result = engine.run("1", TEXT_TO_TEST, "DID_CHANGE");
     assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 
   @Test
   public void specificStatementExclusionTest() {
-    final PreprocessorCleanerServiceImpl preprocessorCleanerService =
+    PreprocessorCleanerServiceImpl preprocessorCleanerService =
         new PreprocessorCleanerServiceImpl(contexts);
     preprocessorCleanerService.push();
     preprocessorCleanerService.specificTypeExclusion(tag, text, linePrefix);

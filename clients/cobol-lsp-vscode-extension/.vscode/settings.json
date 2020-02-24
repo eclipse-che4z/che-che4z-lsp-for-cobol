@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -19,5 +19,6 @@
 	"search.exclude": {
 		"out": true // set this to false to include "out" folder in search results
 	},
-	"typescript.tsdk": "./node_modules/typescript/lib"
+    "typescript.tsdk": "./node_modules/typescript/lib",
+    "vsicons.presets.angular": false, // we want to use the TS server from our node_modules folder to control its version
 }
