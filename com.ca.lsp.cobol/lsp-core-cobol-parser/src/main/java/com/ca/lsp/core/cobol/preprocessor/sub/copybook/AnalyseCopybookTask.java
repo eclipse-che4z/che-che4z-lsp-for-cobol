@@ -40,6 +40,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RecursiveTask;
 
+/**
+ * Represent the ForkJoinTask that is executed in parallel for address copybooks duties It use a
+ * {@Link DataBusBroker} to communicate with other modules
+ */
 @Slf4j
 public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<CopybookSemanticContext>>
     implements EventObserver<FetchedCopybookEvent> {
@@ -49,16 +53,22 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
 
   private final String copyBookName;
   private String documentUri;
+  // <<<<<<< HEAD
   private transient CopybookUsage copybookUsage;
   private transient List<CopybookUsage> copybookUsageTracker;
   private transient CompletableFuture<String> waitForResolving;
+  private String textDocumentSyncType;
 
   public AnalyseCopybookTask(
-      String documentUri, CopybookUsage copybookUsage, List<CopybookUsage> copybookUsageTracker) {
+      String documentUri,
+      CopybookUsage copybookUsage,
+      List<CopybookUsage> copybookUsageTracker,
+      String textDocumentSyncType) {
     this.documentUri = documentUri;
     this.copybookUsage = copybookUsage;
     copyBookName = copybookUsage.getName();
     this.copybookUsageTracker = copybookUsageTracker;
+    this.textDocumentSyncType = textDocumentSyncType;
     waitForResolving = new CompletableFuture<>();
   }
 
@@ -80,7 +90,11 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
     } else {
       Object subscriber = databus.subscribe(DataEventType.FETCHED_COPYBOOK_EVENT, this);
       databus.postData(
-          RequiredCopybookEvent.builder().name(copyBookName).documentUri(documentUri).build());
+          RequiredCopybookEvent.builder()
+              .name(copyBookName)
+              .documentUri(documentUri)
+              .textDocumentSyncType(textDocumentSyncType)
+              .build());
       semanticContext = parseCopybook();
       databus.unSubscribe(subscriber);
     }
@@ -142,7 +156,8 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
             .process(
                 copybookUsage.getUri(),
                 content,
-                new SemanticContext(Collections.unmodifiableList(nextTrackerIteration)));
+                new SemanticContext(Collections.unmodifiableList(nextTrackerIteration)),
+                textDocumentSyncType);
     return new ResultWithErrors<>(
         preprocessedInput.getResult().getSemanticContext(), preprocessedInput.getErrors());
   }

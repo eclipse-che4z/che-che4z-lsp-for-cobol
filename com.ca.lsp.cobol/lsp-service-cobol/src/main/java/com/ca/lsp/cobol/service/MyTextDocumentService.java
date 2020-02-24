@@ -228,7 +228,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text);
+              AnalysisResult result = engine.analyze(uri, text,TextDocumentSyncType.DID_OPEN);
               ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
               publishResult(uri, result);
             })
@@ -238,7 +238,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   void analyzeChanges(String uri, String text) {
     runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text);
+              AnalysisResult result = engine.analyze(uri, text,TextDocumentSyncType.DID_CHANGE);
               registerDocument(uri, new MyDocumentModel(text, result));
               communications.publishDiagnostics(uri, result.getDiagnostics());
             })

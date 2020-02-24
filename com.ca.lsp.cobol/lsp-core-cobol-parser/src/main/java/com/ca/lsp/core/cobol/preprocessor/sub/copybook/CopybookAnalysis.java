@@ -27,5 +27,6 @@ public interface CopybookAnalysis {
   ResultWithErrors<List<CopybookSemanticContext>> analyzeCopybooks(
       String documentUri,
       Multimap<String, Position> copybookNames,
-      List<CopybookUsage> copybookUsageTracker);
+      List<CopybookUsage> copybookUsageTracker,
+      String textDocumentSyncType);
 }

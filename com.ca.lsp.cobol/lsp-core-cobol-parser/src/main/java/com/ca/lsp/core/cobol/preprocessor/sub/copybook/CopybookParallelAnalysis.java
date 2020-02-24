@@ -41,9 +41,12 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   public ResultWithErrors<List<CopybookSemanticContext>> analyzeCopybooks(
       String documentUri,
       Multimap<String, Position> copybooks,
-      List<CopybookUsage> copybookUsageTracker) {
+      List<CopybookUsage> copybookUsageTracker,
+      String textDocumentSyncType) {
+
     List<ResultWithErrors<CopybookSemanticContext>> contexts =
-        runAnalysisAsynchronously(documentUri, copybooks, copybookUsageTracker);
+        runAnalysisAsynchronously(
+            documentUri, copybooks, copybookUsageTracker, textDocumentSyncType);
 
     List<SyntaxError> errors = createMissingCopybookErrors(copybooks, contexts);
 
@@ -55,8 +58,12 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   private List<ResultWithErrors<CopybookSemanticContext>> runAnalysisAsynchronously(
       String documentUri,
       Multimap<String, Position> copybooks,
-      List<CopybookUsage> copybookUsageTracker) {
-    return invokeAll(createTasks(documentUri, copybooks, copybookUsageTracker)).stream()
+      List<CopybookUsage> copybookUsageTracker,
+      String textDocumentSyncType) {
+
+    return invokeAll(
+            createTasks(documentUri, copybooks, copybookUsageTracker, textDocumentSyncType))
+        .stream()
         .map(ForkJoinTask::join)
         .collect(toList());
   }
@@ -107,14 +114,17 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   private List<ForkJoinTask<ResultWithErrors<CopybookSemanticContext>>> createTasks(
       String documentUri,
       Multimap<String, Position> names,
-      List<CopybookUsage> copybookUsageTracker) {
+      List<CopybookUsage> copybookUsageTracker,
+      String textDocumentSyncType) {
+
     return names.asMap().entrySet().stream()
         .map(
             it ->
                 new AnalyseCopybookTask(
                     documentUri,
                     new CopybookUsage(it.getKey(), documentUri, it.getValue()),
-                    copybookUsageTracker))
+                    copybookUsageTracker,
+                    textDocumentSyncType))
         .collect(toList());
   }
 }

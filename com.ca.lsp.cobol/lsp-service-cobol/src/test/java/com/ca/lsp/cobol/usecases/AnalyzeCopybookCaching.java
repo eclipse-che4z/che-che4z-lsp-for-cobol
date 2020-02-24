@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2020 Broadcom.
+ *
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ * Broadcom, Inc. - initial API and implementation
+ *
+ */
+
 package com.ca.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
@@ -86,30 +102,82 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
     assertTrue(MultiMapSerializableHelper.serializeInHashMap(paragraphDefinitions).size() > 0);
   }
 
+  /** This test verify that after the analysis a specific copybook is retrivied from the cache */
   @Test
   public void analyzeCopybookFromCache() {
+    // test the behavior on DID_OPEN
+    assertDidOpenAnalysisFromCache();
+    // test the behavior on DID_CHANGE
+    assertDidChangeAnalysisFromCache();
+  }
+
+  /**
+   * This test verify that when the cache is empty as first attempt the copybook is loaded from the
+   * filesystem and then is available in the cache.
+   */
+  @Test
+  public void analyzeCopybookFromFileSystemService() {
+    // test the behavior on DID_OPEN
+    assertDidOpenFromFileSystemService();
+    // test the behavior on DID_CHANGE
+    assertDidChangeFromFileSystemService();
+  }
+
+  private void assertDidOpenAnalysisFromCache() {
     log.info(databus.printCache());
-    runAnalysis();
+    runAnalysisInDidOpen();
     log.info(databus.printCache());
+    assertPositiveHitFromCache();
+  }
+
+  private void assertDidChangeAnalysisFromCache() {
+    log.info(databus.printCache());
+    runAnalysisInDidChange();
+    log.info(databus.printCache());
+    assertPositiveHitFromCache();
+  }
+
+  private void assertDidOpenFromFileSystemService() {
+    // invalidate cache in order to ask workspace manager to grab the content
+    databus.invalidateCache();
+    runAnalysisInDidOpen();
+    assertStoredInCache();
+  }
+
+  private void assertDidChangeFromFileSystemService() {
+    // invalidate cache in order to ask workspace manager to grab the content
+    databus.invalidateCache();
+    runAnalysisInDidChange();
+    assertStoredInCache();
+  }
+
+  private void assertStoredInCache() {
+    assertTrue(databus.isStored(CopybookRepository.calculateUUID(COPYBOOK_NAME)));
+  }
+
+  private void assertPositiveHitFromCache() {
     assertTrue(
         databus.getData(CopybookRepository.calculateUUID(new StringBuilder(COPYBOOK_NAME))).getHit()
             > 0);
   }
 
-  @Test
-  public void analyzeCopybookFromWorkspaceManager() {
-    // invalidate cache in order to ask workspace manager to grab the content
-    databus.invalidateCache();
-    runAnalysis();
-    assertTrue(databus.isStored(CopybookRepository.calculateUUID(COPYBOOK_NAME)));
-  }
-
-  private void runAnalysis() {
+  private void runAnalysisInDidChange() {
     AnalyseCopybookTask analyseCopybookTask =
         new AnalyseCopybookTask(
             null,
             new CopybookUsage(COPYBOOK_NAME, null, null),
-            Collections.emptyList());
+            Collections.emptyList(),
+            "DID_OPEN");
+    analyseCopybookTask.compute();
+  }
+
+  private void runAnalysisInDidOpen() {
+    AnalyseCopybookTask analyseCopybookTask =
+        new AnalyseCopybookTask(
+            null,
+            new CopybookUsage(COPYBOOK_NAME, null, null),
+            Collections.emptyList(),
+            "DID_OPEN");
     analyseCopybookTask.compute();
   }
 }

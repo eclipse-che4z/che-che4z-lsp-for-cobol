@@ -17,6 +17,7 @@
 package com.ca.lsp.cobol.service.delegates.validations;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
+import com.ca.lsp.cobol.service.TextDocumentSyncType;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import lombok.experimental.UtilityClass;
@@ -142,7 +143,8 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(String text) {
-    return new CobolLanguageEngineFacade(new CobolLanguageEngine()).analyze(DOCUMENT_URI, text);
+    return new CobolLanguageEngineFacade(new CobolLanguageEngine())
+        .analyze(DOCUMENT_URI, text, TextDocumentSyncType.DID_OPEN);
   }
 
   /**
@@ -154,7 +156,7 @@ public class UseCaseUtils {
    */
   public static List<Diagnostic> analyzeForErrors(String text) {
     LanguageEngineFacade engine = new CobolLanguageEngineFacade(new CobolLanguageEngine());
-    AnalysisResult result = engine.analyze(DOCUMENT_URI, text);
+    AnalysisResult result = engine.analyze(DOCUMENT_URI, text, TextDocumentSyncType.DID_OPEN);
     return result.getDiagnostics().stream()
         .filter(it -> it.getSeverity().getValue() == 1)
         .collect(Collectors.toList());
