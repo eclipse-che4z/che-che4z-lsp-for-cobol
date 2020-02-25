@@ -54,14 +54,6 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
   private Provider<ConfigurationSettingsStorable> configurationSettingsProvider =
       Mockito.mock(Provider.class);
 
-  /*
-     List<String> paths = new ArrayList<>();
-   ConfigurationSettingsStorable configurationSettingsStorable =
-       new ConfigurationSettingsStorable(PROFILE_NAME, paths);
-
-   settingsProvider.set(configurationSettingsStorable);
-  */
-
   @Before
   public void initActivities() {
     // the delegate will prepare the structure and this method will just setup the list of workspace

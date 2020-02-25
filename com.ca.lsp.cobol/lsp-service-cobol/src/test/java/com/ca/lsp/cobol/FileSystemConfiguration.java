@@ -88,13 +88,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
   // routine the initialize structures
   protected List<WorkspaceFolder> initWorkspaceFolderList() {
     initWorkspaceFolderStructure();
-
-    // TODO: Should be removed and changed with a method to spawn the settings
-    //    initCopybooksWithProfileAndDataset(
-    //        copybooksPath, settingsObject.getProfile(), settingsObject.getDatasetList());
-
     initCopybooksWithProfileAndDataset(copybooksPath, configurationSettingsProvider.get());
-
     initDepFileStructure();
 
     WorkspaceFolder workspaceFolder = new WorkspaceFolder();
@@ -133,24 +127,6 @@ public class FileSystemConfiguration extends ConfigurableTest {
 
     List<Path> retriviedPaths =
         targetDatasets.stream()
-            .map(
-                it ->
-                    Paths.get(path + filesystemSeparator() + profile + filesystemSeparator() + it))
-            .collect(Collectors.toList());
-
-    retriviedPaths.forEach(this::createFolderStructure);
-    retriviedPaths.forEach(
-        targetPath ->
-            generateDummyContentForFile(
-                targetPath, CPY_INNER_FILE_NAME_WITH_EXT, COPYBOOK_CONTENT));
-  }
-
-  // TODO: Rename this weird method..
-  private void initCopybooksWithProfileAndDataset(
-      Path path, String profile, List<String> datasetList) {
-
-    List<Path> retriviedPaths =
-        datasetList.stream()
             .map(
                 it ->
                     Paths.get(path + filesystemSeparator() + profile + filesystemSeparator() + it))
@@ -203,7 +179,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
           e.getMessage()
               + String.format(
                   "Failed create file  %s under folder %s" + filenameAndExtension,
-                  targetDirectory));
+                  targetDirectory.toString()));
       return;
     }
 
