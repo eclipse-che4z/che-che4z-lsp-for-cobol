@@ -14,20 +14,30 @@
 
 package com.ca.lsp.cobol.service.providers;
 
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
+import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedSettingsEvent;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
+import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * This class is resposible to keep the settings configuration provided by the user in the setting
+ * storage system and that will be consumed by the {@Link FileSystemServiceImpl}
+ */
 @Singleton
 @Slf4j
 public class SettingsProvider
     implements Provider<ConfigurationSettingsStorable>, EventObserver<FetchedSettingsEvent> {
+  // TODO: Should define and be subscribed on the databus..
   private ConfigurationSettingsStorable configurationSettingsStorable;
+  private DataBusBroker databus = null;
 
   public void set(@Nullable ConfigurationSettingsStorable configurationSettingsStorable) {
     this.configurationSettingsStorable = configurationSettingsStorable;
@@ -44,6 +54,12 @@ public class SettingsProvider
     }
   }
 
+  @Inject
+  public void setDatabus(@Nonnull DataBusBroker databus) {
+    this.databus = databus;
+    this.databus.subscribe(DataEventType.FETCHED_SETTINGS_EVENT, this);
+  }
+
   private static ConfigurationSettingsStorable deepCopy(
       ConfigurationSettingsStorable configurationSettingsStorable)
       throws CloneNotSupportedException {
@@ -51,5 +67,7 @@ public class SettingsProvider
   }
 
   @Override
-  public void observerCallback(FetchedSettingsEvent adaptedDataEvent) {}
+  public void observerCallback(FetchedSettingsEvent fetchedSettingsEvent) {
+    System.out.println("Here we go");
+  }
 }

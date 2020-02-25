@@ -16,16 +16,14 @@
 
 package com.broadcom.lsp.domain.cobol.event.api;
 
-import com.broadcom.lsp.domain.cobol.event.factory.FetchedCopybookSubscriberFactory;
-import com.broadcom.lsp.domain.cobol.event.factory.RequiredCopybookSubscriberFactory;
-import com.broadcom.lsp.domain.cobol.event.factory.RunAnalysisSubscriberFactory;
-import com.broadcom.lsp.domain.cobol.event.factory.UnknownCopybookSubscriberFactory;
+import com.broadcom.lsp.domain.cobol.event.factory.*;
 import com.broadcom.lsp.domain.cobol.event.model.*;
 
 import java.util.NoSuchElementException;
 
 /** An abstract factory for the subscribers. */
 public interface CopybookEventFactory {
+  // TODO: Update unit tests..
   static CopybookSubscriber getFactory(DataEventType choice) {
     switch (choice) {
       case UNKNOWN_EVENT:
@@ -36,6 +34,9 @@ public interface CopybookEventFactory {
         return new RequiredCopybookSubscriberFactory();
       case RUN_ANALYSIS_EVENT:
         return new RunAnalysisSubscriberFactory();
+      case FETCHED_SETTINGS_EVENT:
+        return new FetchedSettingsSubscriberFactory();
+
       default:
         throw new NoSuchElementException(
             String.format("No subscriber found for %s,%s", choice.getId(), choice.name()));
