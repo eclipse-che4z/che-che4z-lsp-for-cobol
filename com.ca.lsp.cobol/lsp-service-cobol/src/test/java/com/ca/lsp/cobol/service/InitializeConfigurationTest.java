@@ -20,6 +20,7 @@ import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import com.ca.lsp.cobol.utils.ServiceTestUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.inject.Provider;
 import org.eclipse.lsp4j.ConfigurationParams;
 import org.eclipse.lsp4j.InitializedParams;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -27,9 +28,12 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static com.ca.lsp.cobol.FileSystemConfiguration.DSNAME_1;
+import static com.ca.lsp.cobol.FileSystemConfiguration.DSNAME_2;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,31 +44,35 @@ import static org.mockito.Mockito.when;
 public class InitializeConfigurationTest {
   private LanguageClient client = Mockito.mock(LanguageClient.class);
   private ClientProvider provider = new ClientProvider();
-  private SettingsProvider settingsProvider = Mockito.mock(SettingsProvider.class);
+  private Provider<SettingsProvider> configurationSettingsProvider = Mockito.mock(Provider.class);
   private static final String PROFILE_NAME = "myProfile";
 
   @Test
   public void testInitializeConfiguration() {
     provider.set(client);
 
-    MyLanguageServerImpl langServer = new MyLanguageServerImpl(null, null, null, provider, null);
+    // create dummy settings
+    SettingsProvider settingsProvider = new SettingsProvider();
+    settingsProvider.set(
+        new ConfigurationSettingsStorable(PROFILE_NAME, Arrays.asList(DSNAME_1, DSNAME_2)));
+
+    when(configurationSettingsProvider.get()).thenReturn(settingsProvider);
+
+    MyLanguageServerImpl langServer =
+        new MyLanguageServerImpl(null, null, null, provider, configurationSettingsProvider);
 
     ConfigurationParams params = ServiceTestUtils.createParams();
-
-    List<String> paths = new ArrayList<>();
-    ConfigurationSettingsStorable configurationSettingsStorable =
-        new ConfigurationSettingsStorable(PROFILE_NAME, paths);
-
     List<Object> list = new ArrayList<>();
     list.add(createJsonObject());
     CompletableFuture<List<Object>> completableFuture = new CompletableFuture<>();
     completableFuture.complete(list);
-    when(client.configuration(params)).thenReturn(completableFuture);
 
+    when(client.configuration(params)).thenReturn(completableFuture);
     langServer.initialized(new InitializedParams());
 
+    // check that server send the request for the initial configuration settings and retrieve a
+    // setting configuration
     verify(client).configuration(params);
-    verify(settingsProvider).set(configurationSettingsStorable);
   }
 
   private JsonObject createJsonObject() {

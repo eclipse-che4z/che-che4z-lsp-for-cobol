@@ -34,10 +34,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 @Slf4j
 public class FileSystemServiceTest extends FileSystemConfiguration
@@ -144,11 +142,6 @@ public class FileSystemServiceTest extends FileSystemConfiguration
     assertEquals(numberOfElements, getNumberOfElementsFromDepFile(depFileReference));
   }
 
-  @Test
-  public void getSettingsModel() {
-    assertEquals(2, settingsObject.getDatasetList().size());
-  }
-
   /**
    * This test verify that the search in the copybook folder is applied searching only in the
    * dataset name folder provided by the setting and the copybook is found
@@ -158,7 +151,9 @@ public class FileSystemServiceTest extends FileSystemConfiguration
     // use the list of paths for the search in copybooks delimited only to this list
     assertNotNull(
         fileSystemService.findCopybook(
-            CPY_OUTER_NAME_ONLY2, settingsObject.getProfile(), settingsObject.getDatasetList()));
+            CPY_OUTER_NAME_ONLY2,
+            (String) configurationSettingsStorable.getProfiles(),
+            configurationSettingsStorable.getPaths()));
   }
 
   /**
@@ -169,20 +164,21 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   public void findCopybookWithDatasetFilteringNegativeTest() {
     assertNull(
         fileSystemService.findCopybook(
-            "ANTHCPY1", settingsObject.getProfile(), settingsObject.getDatasetList()));
+            "ANTHCPY1",
+            (String) configurationSettingsStorable.getProfiles(),
+            configurationSettingsStorable.getPaths()));
   }
-
+  //
   /**
    * This test verify that when the setting provide a dataset path that is not present in the
    * copybook folder the search method return null;
    */
-  // TODO: Use a better name
   @Test
-  public void searchInCopybookStructureWithWrongStructure() {
+  public void findCopybookWithWrongFolderStructure() {
     assertNull(
         fileSystemService.findCopybook(
             CPY_OUTER_NAME_ONLY2,
-            settingsObject.getProfile(),
+            (String) configurationSettingsStorable.getProfiles(),
             Collections.singletonList("HLQLF02.DSNAME1")));
   }
 

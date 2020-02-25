@@ -20,7 +20,6 @@ import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
-import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Duration;
@@ -28,17 +27,20 @@ import org.awaitility.core.ConditionTimeoutException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Comparator;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 
 /**
  * This class contains all the unit test that perform the publish/subscribe acrivities for generate
@@ -47,19 +49,29 @@ import static org.junit.Assert.fail;
 @Slf4j
 public class FileSystemE2ETest extends FileSystemConfiguration {
   public static final String CPY_NAME_WITHOUT_EXT = "copy2";
-  DataBusBroker broker =
+  private DataBusBroker broker =
       (DefaultDataBusBroker) LangServerCtx.getInjector().getInstance(DataBusBroker.class);
+  private Provider<ConfigurationSettingsStorable> configurationSettingsProvider =
+      Mockito.mock(Provider.class);
 
-  Provider<ConfigurationSettingsStorable> configurationSettingsStorable =
-      LangServerCtx.getInjector().getInstance(SettingsProvider.class);
+  /*
+     List<String> paths = new ArrayList<>();
+   ConfigurationSettingsStorable configurationSettingsStorable =
+       new ConfigurationSettingsStorable(PROFILE_NAME, paths);
 
-  private FileSystemServiceImpl fileSystemService =
-      new FileSystemServiceImpl(broker, configurationSettingsStorable);
+   settingsProvider.set(configurationSettingsStorable);
+  */
 
   @Before
   public void initActivities() {
     // the delegate will prepare the structure and this method will just setup the list of workspace
     // folders
+    when(configurationSettingsProvider.get())
+        .thenReturn(
+            new ConfigurationSettingsStorable("myProfile", Arrays.asList(DSNAME_1, DSNAME_2)));
+
+    FileSystemServiceImpl fileSystemService =
+        new FileSystemServiceImpl(broker, configurationSettingsProvider);
     fileSystemService.setWorkspaceFolders(initWorkspaceFolderList());
   }
 

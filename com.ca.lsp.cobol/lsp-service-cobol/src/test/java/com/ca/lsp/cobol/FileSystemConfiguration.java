@@ -13,10 +13,13 @@
  */
 package com.ca.lsp.cobol;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
+import com.ca.lsp.cobol.service.providers.SettingsProvider;
+import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
+import org.junit.Before;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -24,6 +27,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.mockito.Mockito.when;
 
 /**
  * This class provide support methods for FileSystemService and doesn't test anything. More in
@@ -45,8 +50,10 @@ public class FileSystemConfiguration extends ConfigurableTest {
 
   private Path workspaceFolder = null;
   protected Path copybooksPath = null;
-  protected SettingsObject settingsObject =
-      new SettingsObject(PROFILE_NAME, Arrays.asList(DSNAME_1, DSNAME_2));
+  protected Provider<SettingsProvider> configurationSettingsProvider = Mockito.mock(Provider.class);
+
+  // this field represent the predefined setting used for test purposes
+  protected ConfigurationSettingsStorable configurationSettingsStorable = null;
   /*
   STRUCTURE FOLDER USED FOR TEST PURPOSES
   ***************************************
@@ -57,24 +64,36 @@ public class FileSystemConfiguration extends ConfigurableTest {
       │   └── SOMEPROG.dep
       └─── .copybooks
           ├── PROFILE_NAME/
-          │   └── HLQ.DSN.NAME/
+          │   ├── HLQ.DSN.NAME1/
+          │   │   └── copybook.cpy
+          │   └── HLQ.DSN.NAME2/
           │       └── copybook.cpy
           └── copy2.cpy
   ***************************************
-  */
 
-  @AllArgsConstructor
-  protected static class SettingsObject {
-    @Getter private String profile;
-    @Getter private List<String> datasetList;
+  /** Before each unit test configure the settings with a proprer mock */
+  // TODO: Remove similar implementation in others unit tests
+  @Before
+  public void initSettings() {
+    SettingsProvider settingsProvider = new SettingsProvider();
+
+    configurationSettingsStorable =
+        new ConfigurationSettingsStorable(PROFILE_NAME, Arrays.asList(DSNAME_1, DSNAME_2));
+
+    settingsProvider.set(configurationSettingsStorable);
+    when(configurationSettingsProvider.get()).thenReturn(settingsProvider);
   }
 
+  // TODO: Should be renamed as a builder and moved to the @Before
   // routine the initialize structures
   protected List<WorkspaceFolder> initWorkspaceFolderList() {
     initWorkspaceFolderStructure();
 
-    initCopybooksWithProfileAndDataset(
-        copybooksPath, settingsObject.getProfile(), settingsObject.getDatasetList());
+    // TODO: Should be removed and changed with a method to spawn the settings
+    //    initCopybooksWithProfileAndDataset(
+    //        copybooksPath, settingsObject.getProfile(), settingsObject.getDatasetList());
+
+    initCopybooksWithProfileAndDataset(copybooksPath, configurationSettingsProvider.get());
 
     initDepFileStructure();
 
@@ -103,6 +122,27 @@ public class FileSystemConfiguration extends ConfigurableTest {
           DEP_FILE_COST_NAME + ".dep",
           CPY_OUTER_NAME_ONLY2);
     }
+  }
+
+  private void initCopybooksWithProfileAndDataset(
+      Path path, SettingsProvider configurationSettingsProvider) {
+    ConfigurationSettingsStorable configSettings = configurationSettingsProvider.get();
+
+    String profile = (String) configSettings.getProfiles();
+    List<String> targetDatasets = configSettings.getPaths();
+
+    List<Path> retriviedPaths =
+        targetDatasets.stream()
+            .map(
+                it ->
+                    Paths.get(path + filesystemSeparator() + profile + filesystemSeparator() + it))
+            .collect(Collectors.toList());
+
+    retriviedPaths.forEach(this::createFolderStructure);
+    retriviedPaths.forEach(
+        targetPath ->
+            generateDummyContentForFile(
+                targetPath, CPY_INNER_FILE_NAME_WITH_EXT, COPYBOOK_CONTENT));
   }
 
   // TODO: Rename this weird method..
