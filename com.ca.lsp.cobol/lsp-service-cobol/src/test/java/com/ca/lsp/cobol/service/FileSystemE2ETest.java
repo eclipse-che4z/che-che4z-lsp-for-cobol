@@ -90,11 +90,29 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
   }
 
   /**
-   * This test verify that when the preprocessor publish a require copybook event the FileSystem
-   * service subscribed to it react generating the dependency file.
+   * This test verify that when the preprocessor publish a require copybook event specifying the
+   * TextDocumentSync type, the FileSystem service subscribed to it react generating the dependency
+   * file.
    */
   @Test
-  public void generateDependencyFileOnCallback() {
+  public void generateDependencyFileOnCallbackPositiveTest() {
+    // generate a required copybook event
+    broker.postData(
+        RequiredCopybookEvent.builder()
+            .name(CPY_NAME_WITHOUT_EXT)
+            .documentUri(DOCUMENT_URI)
+            .textDocumentSyncType("DID_OPEN")
+            .build());
+    // after one second is expected to found the dep file on filesystem
+    waitAndAssert(Boolean.TRUE);
+  }
+
+  /**
+   * This test verify that when the preprocessor publish a require copybook event without specifying
+   * the TextDocumentSync type, the FileSystem service will not write/update any dependency file.
+   */
+  @Test
+  public void NotGenerateDependencyFileOnCallbackNegativeTest() {
     // generate a required copybook event
     broker.postData(
         RequiredCopybookEvent.builder()
@@ -102,7 +120,24 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
             .documentUri(DOCUMENT_URI)
             .build());
     // after one second is expected to found the dep file on filesystem
-    waitAndAssert(Boolean.TRUE);
+    waitAndAssert(Boolean.FALSE);
+  }
+
+  /**
+   * This test verify that when the preprocessor publish a require copybook event when the document
+   * is in DID_CHANGE mode and the FileSystem service will not write/update any dependency file.
+   */
+  @Test
+  public void NotGenerateDependencyFileOnDidChangeTest() {
+    // generate a required copybook event
+    broker.postData(
+        RequiredCopybookEvent.builder()
+            .name(CPY_NAME_WITHOUT_EXT)
+            .documentUri(DOCUMENT_URI)
+            .textDocumentSyncType("DID_CHANGE")
+            .build());
+    // after one second is expected to found the dep file on filesystem
+    waitAndAssert(Boolean.FALSE);
   }
 
   /**

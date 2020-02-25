@@ -16,7 +16,7 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.model.CopybookDefinition;
+import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
@@ -41,9 +41,12 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   public ResultWithErrors<List<CopybookSemanticContext>> analyzeCopybooks(
       String documentUri,
       Multimap<String, Position> copybooks,
-      List<CopybookDefinition> copybookUsageTracker) {
+      List<CopybookUsage> copybookUsageTracker,
+      String textDocumentSyncType) {
+
     List<ResultWithErrors<CopybookSemanticContext>> contexts =
-        runAnalysisAsynchronously(documentUri, copybooks, copybookUsageTracker);
+        runAnalysisAsynchronously(
+            documentUri, copybooks, copybookUsageTracker, textDocumentSyncType);
 
     List<SyntaxError> errors = createMissingCopybookErrors(copybooks, contexts);
 
@@ -55,8 +58,12 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   private List<ResultWithErrors<CopybookSemanticContext>> runAnalysisAsynchronously(
       String documentUri,
       Multimap<String, Position> copybooks,
-      List<CopybookDefinition> copybookUsageTracker) {
-    return invokeAll(createTasks(documentUri, copybooks, copybookUsageTracker)).stream()
+      List<CopybookUsage> copybookUsageTracker,
+      String textDocumentSyncType) {
+
+    return invokeAll(
+            createTasks(documentUri, copybooks, copybookUsageTracker, textDocumentSyncType))
+        .stream()
         .map(ForkJoinTask::join)
         .collect(toList());
   }
@@ -107,14 +114,17 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   private List<ForkJoinTask<ResultWithErrors<CopybookSemanticContext>>> createTasks(
       String documentUri,
       Multimap<String, Position> names,
-      List<CopybookDefinition> copybookUsageTracker) {
+      List<CopybookUsage> copybookUsageTracker,
+      String textDocumentSyncType) {
+
     return names.asMap().entrySet().stream()
         .map(
             it ->
                 new AnalyseCopybookTask(
                     documentUri,
-                    new CopybookDefinition(it.getKey(), documentUri, it.getValue()),
-                    copybookUsageTracker))
+                    new CopybookUsage(it.getKey(), documentUri, it.getValue()),
+                    copybookUsageTracker,
+                    textDocumentSyncType))
         .collect(toList());
   }
 }

@@ -227,6 +227,16 @@ public class FileSystemServiceImpl implements FileSystemService {
   public void observerCallback(RequiredCopybookEvent event) {
     String requiredCopybookName = event.getName();
 
+    Path path = getPathByCopybookName(requiredCopybookName);
+    String content = Optional.ofNullable(path).map(this::retrieveContentByPath).orElse(null);
+
+    // if the document is in DID_OPEN mode is possible write on dependency file..
+    if (event.getTextDocumentSyncType() != null
+        && TextDocumentSyncType.valueOf(event.getTextDocumentSyncType())
+            .equals(TextDocumentSyncType.DID_OPEN)) {
+      addCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
+    }
+
     ConfigurationSettingsStorable configurationSettingsStorable =
         configurationSettingsStorableProvider.get();
 

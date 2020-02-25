@@ -19,6 +19,8 @@ import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import org.junit.Test;
 
+import static com.ca.lsp.core.cobol.engine.CobolLanguageEngineTest.DID_CHANGE;
+import static com.ca.lsp.core.cobol.engine.CobolLanguageEngineTest.DID_OPEN;
 import static org.junit.Assert.assertEquals;
 
 public class CobolVariableCheckTest {
@@ -97,10 +99,21 @@ public class CobolVariableCheckTest {
           + "000000  END PROGRAM ATCDEM3.\r\n"
           + "000000  END PROGRAM ATCDEM2.                                 \r\n";
 
+  /**
+   * This test verify that the engine returns diagnostics in both scenario where the document sync
+   * type is DID_OPEN or DID_CHANGE.
+   */
   @Test
   public void test() {
     CobolLanguageEngine engine = new CobolLanguageEngine();
-    ResultWithErrors<SemanticContext> result = engine.run("1", TEXT_TO_TEST);
+    ResultWithErrors<SemanticContext> result;
+
+    // SCENARIO FOR DID_OPEN
+    result = engine.run("1", TEXT_TO_TEST, DID_OPEN);
+    assertEquals(2, result.getErrors().stream().filter(item -> item.getSeverity() == 3).count());
+
+    // SCENARIO FOR DID_CHANGE
+    result = engine.run("1", TEXT_TO_TEST, DID_CHANGE);
     assertEquals(2, result.getErrors().stream().filter(item -> item.getSeverity() == 3).count());
   }
 }

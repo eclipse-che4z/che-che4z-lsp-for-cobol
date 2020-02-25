@@ -3,8 +3,13 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 
 ## [0.x.x] - TBD
-
+- Modify dep file creation/update process [#209](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/209) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Retrieve settings.json at initialize [#207](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/207) Thanks @[sergiuilie](https://github.com/sergiuilie)
+- Introduce Code Action to Resolve Copybooks [#198](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/198) Thanks @[temanbrcom](https://github.com/temanbrcom)
+- Make CobolVisitor constructor-configurable to simplify DI [#205](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/205) Thanks @[temanbrcom](https://github.com/temanbrcom)
+- Fix copybook extension check [#203](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/203) Thanks @[grianbrcom](https://github.com/grianbrcom)
+- Remove error listener from CobolVisitor to simpily DI [#201](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/201) Thanks @[temanbrcom](https://github.com/temanbrcom)
+- Refactor MyTextDocumentService::observerCallback [#200](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/200) Thanks @[grianbrcom](https://github.com/grianbrcom)
 - Remove unused COBOL dialect support [#169](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/169) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - Make document extension check case-insensitive [#167](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/167) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - Remove copybook name from the variable list if copybook is missing [#190](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/190) Thanks @[temanbrcom](https://github.com/temanbrcom)
