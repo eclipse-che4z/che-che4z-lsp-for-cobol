@@ -177,9 +177,9 @@ public class FileSystemServiceImpl implements FileSystemService {
   private String retrieveContentByPath(Path uriForFileName) {
     String content = null;
     try (Stream<String> stream = Files.lines(uriForFileName)) {
-      content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse(null);
+      content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse("");
     } catch (IOException e) {
-      log.error("[retrieve content by path]" + Arrays.toString(e.getStackTrace()));
+      log.error("Cannot retrieve copybook content: ", e);
     }
     return content;
   }
