@@ -189,9 +189,9 @@ public class CobolCleanExtraLanguageTest {
   @Test
   public void specificStatementExclusionTest() {
     PreprocessorCleanerServiceImpl preprocessorCleanerService =
-        new PreprocessorCleanerServiceImpl(contexts);
+        new PreprocessorCleanerServiceImpl();
     preprocessorCleanerService.push();
     preprocessorCleanerService.specificTypeExclusion(tag, text, linePrefix);
-    assertEquals(expectedText, contexts.getFirst().read());
+    assertEquals(expectedText, preprocessorCleanerService.context().read());
   }
 }
