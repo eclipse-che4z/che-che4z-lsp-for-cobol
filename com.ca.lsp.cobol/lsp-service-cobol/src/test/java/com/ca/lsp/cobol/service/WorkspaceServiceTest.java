@@ -30,6 +30,7 @@ import org.mockito.ArgumentCaptor;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static java.util.Arrays.asList;
@@ -71,8 +72,11 @@ public class WorkspaceServiceTest {
       fail(e.getMessage());
     }
     verify(broker, timeout(10000)).postData(captor.capture());
-    assertEquals(DOCUMENT_URI, captor.getValue().getDocumentUri());
-    assertEquals(copybookName, captor.getValue().getName());
+    RequiredCopybookEvent event = captor.getValue();
+
+    assertEquals(DOCUMENT_URI, event.getDocumentUri());
+    assertEquals(copybookName, event.getName());
+    assertEquals(DID_OPEN.name(), event.getTextDocumentSyncType());
   }
 
   /**

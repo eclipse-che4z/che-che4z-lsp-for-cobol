@@ -219,6 +219,23 @@ public class FileSystemServiceImpl implements FileSystemService {
     return null;
   }
 
+  //TODO: Should be integrated
+  /**
+   * @param uriForFileName of copybook found under workspace folder
+   * @return content of the file as String content
+   */
+  @Nullable
+  private String retrieveContentByPath(Path uriForFileName) {
+    String content = null;
+    try (Stream<String> stream = Files.lines(uriForFileName)) {
+      content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse("");
+    } catch (IOException e) {
+      log.error("Cannot retrieve copybook content: ", e);
+    }
+    return content;
+  }
+
+
   private Path getCopybookFolderFromWorkspace(Path workspaceFolderPath) {
     return Paths.get(workspaceFolderPath + filesystemSeparator() + COPYBOOK_FOLDER_NAME);
   }

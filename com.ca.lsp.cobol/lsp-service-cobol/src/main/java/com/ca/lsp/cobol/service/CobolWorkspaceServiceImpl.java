@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.CPY_MANAGER;
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
@@ -80,6 +81,7 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
                   RequiredCopybookEvent.builder()
                       .name(copybookName)
                       .documentUri(documentUri)
+                      .textDocumentSyncType(DID_OPEN.name())
                       .build());
             })
         .whenComplete(reportExceptionIfFound(params));
