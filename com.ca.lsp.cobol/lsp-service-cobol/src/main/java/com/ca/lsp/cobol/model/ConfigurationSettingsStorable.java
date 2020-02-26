@@ -14,14 +14,21 @@
 
 package com.ca.lsp.cobol.model;
 
-import lombok.Value;
+import lombok.Builder;
+import lombok.Data;
 
 import java.util.List;
 
-@Value
+@Data
 public class ConfigurationSettingsStorable implements Cloneable {
   private Object profiles;
   private List<String> paths;
+
+  @Builder
+  public ConfigurationSettingsStorable(Object profiles, List<String> paths) {
+    this.profiles = profiles;
+    this.paths = paths;
+  }
 
   @Override
   public Object clone() throws CloneNotSupportedException {

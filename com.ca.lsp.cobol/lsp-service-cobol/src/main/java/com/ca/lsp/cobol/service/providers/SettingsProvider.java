@@ -19,13 +19,17 @@ import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedSettingsEvent;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.Type;
 
 /**
  * This class is resposible to keep the settings configuration provided by the user in the setting
@@ -35,9 +39,16 @@ import javax.annotation.Nullable;
 @Slf4j
 public class SettingsProvider
     implements Provider<ConfigurationSettingsStorable>, EventObserver<FetchedSettingsEvent> {
-  // TODO: Should define and be subscribed on the databus..
   private ConfigurationSettingsStorable configurationSettingsStorable;
-  private DataBusBroker databus = null;
+  @Getter private DataBusBroker databus;
+
+  public SettingsProvider() {}
+
+  @Builder
+  public SettingsProvider(DataBusBroker databus) {
+    this.databus = databus;
+    this.databus.subscribe(DataEventType.FETCHED_SETTINGS_EVENT, this);
+  }
 
   public void set(@Nullable ConfigurationSettingsStorable configurationSettingsStorable) {
     this.configurationSettingsStorable = configurationSettingsStorable;
@@ -68,6 +79,10 @@ public class SettingsProvider
 
   @Override
   public void observerCallback(FetchedSettingsEvent fetchedSettingsEvent) {
-    System.out.println("Here we go");
+    Gson gson = new Gson();
+    set(
+        gson.fromJson(
+            fetchedSettingsEvent.getContent().get(0).toString(),
+            (Type) ConfigurationSettingsStorable.class));
   }
 }

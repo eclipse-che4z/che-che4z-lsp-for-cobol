@@ -94,6 +94,7 @@ public class FileSystemServiceImpl implements FileSystemService {
     try (Stream<String> stream = Files.lines(uriForFileName)) {
       content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse(null);
     } catch (IOException e) {
+      // TODO: Apply same convention for the logs
       log.error("[retrieve content by path]" + Arrays.toString(e.getStackTrace()));
     }
     return content;

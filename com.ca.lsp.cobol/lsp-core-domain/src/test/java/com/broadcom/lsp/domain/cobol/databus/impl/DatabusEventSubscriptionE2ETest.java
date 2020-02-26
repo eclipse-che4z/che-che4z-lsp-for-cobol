@@ -25,7 +25,7 @@ import java.util.concurrent.TimeoutException;
 import static org.junit.Assert.fail;
 
 /**
- * This class contains all the unit tests related to the pubblish/subscribe pattern handled by the
+ * This class contlains all the unit tests related to the pubblish/subscribe pattern handled by the
  * databus.
  */
 @Slf4j
@@ -64,6 +64,8 @@ public class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
           DataEventType.UNKNOWN_EVENT, DataEventType.UNKNOWN_EVENT);
       databusSubscriptionForPositiveScenario(
           DataEventType.RUN_ANALYSIS_EVENT, DataEventType.RUN_ANALYSIS_EVENT);
+      databusSubscriptionForPositiveScenario(
+          DataEventType.FETCHED_SETTINGS_EVENT, DataEventType.FETCHED_SETTINGS_EVENT);
     } catch (TimeoutException | InterruptedException e) {
       fail();
     }
@@ -93,6 +95,8 @@ public class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
         DataEventType.FETCHED_COPYBOOK_EVENT, DataEventType.UNKNOWN_EVENT);
     databusSubscriptionForNegativeScenario(
         DataEventType.UNKNOWN_EVENT, DataEventType.FETCHED_COPYBOOK_EVENT);
+    databusSubscriptionForNegativeScenario(
+        DataEventType.FETCHED_SETTINGS_EVENT, DataEventType.UNKNOWN_EVENT);
   }
 
   @Test(expected = TimeoutException.class)
@@ -102,5 +106,6 @@ public class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
     databusUnsubscribeForPositiveScenario(DataEventType.FETCHED_COPYBOOK_EVENT);
     databusUnsubscribeForPositiveScenario(DataEventType.RUN_ANALYSIS_EVENT);
     databusUnsubscribeForPositiveScenario(DataEventType.UNKNOWN_EVENT);
+    databusUnsubscribeForPositiveScenario(DataEventType.FETCHED_SETTINGS_EVENT);
   }
 }

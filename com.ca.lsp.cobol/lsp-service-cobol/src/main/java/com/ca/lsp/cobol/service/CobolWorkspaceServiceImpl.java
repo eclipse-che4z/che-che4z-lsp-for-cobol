@@ -20,6 +20,7 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedSettingsEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
+import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import com.google.gson.JsonPrimitive;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -94,6 +95,9 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
     try {
+
+      // provide the databus to the settings provider
+      SettingsProvider.builder().databus(dataBus);
       fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
           .thenAccept(e -> dataBus.postData(FetchedSettingsEvent.builder().content(e).build()));
     } catch (RuntimeException e) {
