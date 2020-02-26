@@ -13,18 +13,24 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
+/** This test checks {@link PreprocessorStringUtils} utility functions. */
 public class PreprocessorStringUtilsTest {
 
-  static final String TEST_SINGLE_QUOTE_STRING = "\'TESTING IF ALL QUOTES WILL BE REMOVED\'";
-  static final String TEST_DOUBLE_QUOTE_STRING = "\"TESTING IF ALL QUOTES WILL BE REMOVED\"";
-  static final String EXPECTED_STRING = "TESTING IF ALL QUOTES WILL BE REMOVED";
+  private static final String TEST_SINGLE_QUOTE_STRING =
+      "\'TESTING IF ALL QUOTES WILL BE REMOVED\'";
+  private static final String TEST_DOUBLE_QUOTE_STRING =
+      "\"TESTING IF ALL QUOTES WILL BE REMOVED\"";
+  private static final String EXPECTED_STRING = "TESTING IF ALL QUOTES WILL BE REMOVED";
 
+  /** Test trimming leading quotes by {@link PreprocessorStringUtils#trimQuotes(String)} */
   @Test
   public void trimQuotesTest() {
     assertEquals(EXPECTED_STRING, PreprocessorStringUtils.trimQuotes(TEST_SINGLE_QUOTE_STRING));
     assertEquals(EXPECTED_STRING, PreprocessorStringUtils.trimQuotes(TEST_DOUBLE_QUOTE_STRING));
+    assertEquals(EXPECTED_STRING, PreprocessorStringUtils.trimQuotes(EXPECTED_STRING));
   }
 }
