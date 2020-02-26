@@ -23,7 +23,8 @@ import java.io.IOException;
 import java.util.List;
 
 public interface FileSystemService extends EventObserver<RequiredCopybookEvent> {
-  String getContentByCopybookName(String copybookName) throws IOException;
+  String getContentByCopybookName(String copybookName, String profile, List<String> datasetList)
+      throws IOException;
 
   void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders);
 }

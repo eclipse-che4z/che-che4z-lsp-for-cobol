@@ -75,7 +75,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
   // TODO: Remove similar implementation in others unit tests
   @Before
   public void initSettings() {
-    SettingsProvider settingsProvider = new SettingsProvider(null);
+    SettingsProvider settingsProvider = new SettingsProvider();
 
     configurationSettingsStorable =
         new ConfigurationSettingsStorable(PROFILE_NAME, Arrays.asList(DSNAME_1, DSNAME_2));

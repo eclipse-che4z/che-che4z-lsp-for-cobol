@@ -79,12 +79,20 @@ public class FileSystemServiceTest extends FileSystemConfiguration
    */
   @Test
   public void getContentByCopybookName() {
-    assertNotNull(fileSystemService.getContentByCopybookName(CPY_OUTER_NAME_ONLY2));
+    assertNotNull(
+        fileSystemService.getContentByCopybookName(
+            CPY_OUTER_NAME_ONLY2,
+            (String) configurationSettingsStorable.getProfiles(),
+            configurationSettingsStorable.getPaths()));
   }
 
   @Test
   public void getNullWithNotCopybookNotFound() {
-    assertNull(fileSystemService.getContentByCopybookName("ANTHRCPY"));
+    assertNull(
+        fileSystemService.getContentByCopybookName(
+            "ANTHRCPY",
+            (String) configurationSettingsStorable.getProfiles(),
+            configurationSettingsStorable.getPaths()));
   }
 
   @Test

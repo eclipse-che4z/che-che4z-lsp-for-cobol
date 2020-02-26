@@ -78,8 +78,9 @@ public class FileSystemServiceImpl implements FileSystemService {
    *     null if copybook is not found
    */
   @Override
-  public String getContentByCopybookName(String copybookName) {
-    return Optional.ofNullable(findCopybook(copybookName))
+  public String getContentByCopybookName(
+      String copybookName, String profile, List<String> datasetList) {
+    return Optional.ofNullable(findCopybook(copybookName, profile, datasetList))
         .map(this::retrieveContentByPath)
         .orElse(null);
   }
@@ -92,10 +93,9 @@ public class FileSystemServiceImpl implements FileSystemService {
   private String retrieveContentByPath(Path uriForFileName) {
     String content = null;
     try (Stream<String> stream = Files.lines(uriForFileName)) {
-      content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse(null);
+      content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse("");
     } catch (IOException e) {
-      // TODO: Apply same convention for the logs
-      log.error("[retrieve content by path]" + Arrays.toString(e.getStackTrace()));
+      log.error("Cannot retrieve copybook content: ", e);
     }
     return content;
   }
@@ -219,23 +219,6 @@ public class FileSystemServiceImpl implements FileSystemService {
     return null;
   }
 
-  //TODO: Should be integrated
-  /**
-   * @param uriForFileName of copybook found under workspace folder
-   * @return content of the file as String content
-   */
-  @Nullable
-  private String retrieveContentByPath(Path uriForFileName) {
-    String content = null;
-    try (Stream<String> stream = Files.lines(uriForFileName)) {
-      content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse("");
-    } catch (IOException e) {
-      log.error("Cannot retrieve copybook content: ", e);
-    }
-    return content;
-  }
-
-
   private Path getCopybookFolderFromWorkspace(Path workspaceFolderPath) {
     return Paths.get(workspaceFolderPath + filesystemSeparator() + COPYBOOK_FOLDER_NAME);
   }
@@ -260,7 +243,11 @@ public class FileSystemServiceImpl implements FileSystemService {
             requiredCopybookName,
             (String) configurationSettingsStorable.getProfiles(),
             configurationSettingsStorable.getPaths());
-    String content = getContentByCopybookName(requiredCopybookName);
+    String content =
+        getContentByCopybookName(
+            requiredCopybookName,
+            (String) configurationSettingsStorable.getProfiles(),
+            configurationSettingsStorable.getPaths());
 
     dataBus.postData(
         FetchedCopybookEvent.builder()

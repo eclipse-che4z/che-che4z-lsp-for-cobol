@@ -54,13 +54,15 @@ public class MockFileSystemService implements FileSystemService {
   @Getter protected Waiter waiter = new Waiter();
 
   @Inject
+  // TODO: Get rid of this class
   public MockFileSystemService(DefaultDataBusBroker dataBus) {
     this.dataBus = dataBus;
     dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
   }
 
   @Override
-  public String getContentByCopybookName(String copybookName) {
+  public String getContentByCopybookName(
+      String copybookName, String profileName, List<String> datasetList) {
     Path path = getPathByCopybookName(copybookName);
     if (path != null) {
       return retrieveContentByPath(path);
