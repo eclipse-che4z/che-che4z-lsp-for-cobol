@@ -15,7 +15,7 @@
 import { IProfile } from "@zowe/imperative";
 import * as path from "path";
 import * as vscode from "vscode";
-import { SETTINGS_SECTION } from "./extension";
+import { SETTINGS_SECTION } from "./constants";
 import { ProfilesMap, ZoweApi } from "./ZoweApi";
 
 export class ProfileService {

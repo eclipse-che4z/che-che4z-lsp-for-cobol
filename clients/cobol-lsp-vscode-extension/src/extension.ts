@@ -22,12 +22,12 @@ import {
     LanguageClientOptions,
     StreamInfo,
 } from "vscode-languageclient/lib/main";
-import { CopybooksDownloader, DEPENDENCIES_FOLDER } from "./CopybooksDownloader";
+import { SETTINGS_SECTION } from "./constants";
+import { CopybooksDownloader } from "./CopybooksDownloader";
 import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
+import { DEPENDENCIES_FOLDER } from "./PathUtils";
 import { ProfileService } from "./ProfileService";
 import { ZoweApi } from "./ZoweApi";
-
-export const SETTINGS_SECTION: string = "broadcom-cobol-lsp.cpy-manager";
 
 export async function activate(context: ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
@@ -48,6 +48,7 @@ export async function activate(context: ExtensionContext) {
         return;
     }
 
+    copyBooksDownloader.start();
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
         // Register the server for COBOL
@@ -68,6 +69,7 @@ export async function activate(context: ExtensionContext) {
     }));
     context.subscriptions.push(languageClient.start());
     context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
+    context.subscriptions.push(copyBooksDownloader);
 }
 
 function initWorkspaceTracker(downloader: CopybooksDownloader): Disposable {
