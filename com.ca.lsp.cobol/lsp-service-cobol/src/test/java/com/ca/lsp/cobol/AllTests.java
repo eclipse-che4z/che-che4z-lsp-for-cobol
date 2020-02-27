@@ -47,6 +47,7 @@ import org.junit.runners.Suite.SuiteClasses;
   CompletionResolutionTest.class,
   FileSystemServiceTest.class,
   FileSystemE2ETest.class,
+  DependencyServiceTest.class,
   HighlightsTest.class,
   MultiDocumentDefinitionTest.class,
   LangServerBootstrapTest.class,

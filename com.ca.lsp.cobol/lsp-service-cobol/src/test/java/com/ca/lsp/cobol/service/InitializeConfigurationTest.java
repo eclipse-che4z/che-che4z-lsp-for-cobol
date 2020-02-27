@@ -32,8 +32,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static com.ca.lsp.cobol.FileSystemConfiguration.DSNAME_1;
-import static com.ca.lsp.cobol.FileSystemConfiguration.DSNAME_2;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,6 +44,8 @@ public class InitializeConfigurationTest {
   private ClientProvider provider = new ClientProvider();
   private Provider<SettingsProvider> configurationSettingsProvider = Mockito.mock(Provider.class);
   private static final String PROFILE_NAME = "myProfile";
+  protected static final String DSNAME_1 = "HLQLF01.DSNAME1";
+  protected static final String DSNAME_2 = "HLQLF01.DSNAME2";
 
   @Test
   public void testInitializeConfiguration() {

@@ -19,8 +19,8 @@ import com.broadcom.lsp.cdi.module.DefaultModule;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.positive.CobolTextRegistry;
 import com.ca.lsp.cobol.positive.ZipTextRegistry;
-import com.ca.lsp.cobol.service.FileSystemService;
-import com.ca.lsp.cobol.service.FileSystemServiceImpl;
+import com.ca.lsp.cobol.service.CopybookService;
+import com.ca.lsp.cobol.service.CopybookServiceImpl;
 import com.ca.lsp.cobol.service.MyTextDocumentService;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActions;
@@ -28,6 +28,8 @@ import com.ca.lsp.cobol.service.delegates.actions.FindCopybookCommand;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.communications.ServerCommunications;
 import com.ca.lsp.cobol.service.delegates.completions.*;
+import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
+import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import com.ca.lsp.cobol.service.delegates.formations.Formation;
 import com.ca.lsp.cobol.service.delegates.formations.Formations;
 import com.ca.lsp.cobol.service.delegates.formations.TrimFormation;
@@ -59,10 +61,11 @@ public class TestModule extends DefaultModule {
     bind(LanguageServer.class).to(TestLanguageServer.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(WorkspaceService.class).to(MockWorkspaceService.class);
-    bind(FileSystemService.class).to(FileSystemServiceImpl.class);
+    bind(CopybookService.class).to(CopybookServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(CobolTextRegistry.class).to(ZipTextRegistry.class);
+    bind(CopybookDependencyService.class).to(CopybookDependencyServiceImpl.class);
     bind(String.class)
         .annotatedWith(named(PATH_TO_TEST_RESOURCES))
         .toProvider(() -> ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));

@@ -45,14 +45,16 @@ public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String WORKSPACE_FOLDER_NAME = "test";
   protected static final String CPY_OUTER_NAME_ONLY2 = "copy2";
   protected static final String EMPTY_COPYBOOK_NAME = " ";
-  public static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
+  protected static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
   protected static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
   protected static final String DEP_FILE_COST_NAME = "SOMEPROG";
-  public static final String PROFILE_NAME = "PRF11";
-  public static final String DSNAME_1 = "HLQLF01.DSNAME1";
-  public static final String DSNAME_2 = "HLQLF01.DSNAME2";
+  protected static final String PROFILE_NAME = "PRF11";
+  protected static final String DSNAME_1 = "HLQLF01.DSNAME1";
+  protected static final String DSNAME_2 = "HLQLF01.DSNAME2";
+  protected static final String DEP_EXTENSION = ".dep";
+  protected static final String COPYBOOK_NOT_PRESENT = "ANTHRCPY";
 
-  private Path workspaceFolder = null;
+  protected Path workspaceFolder = null;
   protected Path copybooksFolderPath = null;
   protected Path depenencyFileFolderPath = null;
 
@@ -127,7 +129,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
     return Collections.singletonList(workspaceFolder);
   }
 
-  private void createWorkspaceFolderStructure() {
+  protected void createWorkspaceFolderStructure() {
     workspaceFolder =
         createFolderStructure(Paths.get(System.getProperty("java.io.tmpdir"), "WORKSPACE"));
   }
@@ -137,7 +139,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
         createFolderStructure(Paths.get(workspaceFolder + filesystemSeparator() + ".copybooks"));
   }
 
-  private void createDependencyFileStructure() {
+  protected void createDependencyFileStructure() {
     depenencyFileFolderPath =
         createFolderStructure(Paths.get(workspaceFolder + filesystemSeparator() + ".cobdeps"));
   }

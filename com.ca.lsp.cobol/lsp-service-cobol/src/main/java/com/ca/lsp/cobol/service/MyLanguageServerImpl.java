@@ -64,13 +64,13 @@ public class MyLanguageServerImpl implements LanguageServer {
 
   private TextDocumentService textService;
   private CobolWorkspaceService workspaceService;
-  private FileSystemService fileSystemService;
+  private CopybookService fileSystemService;
   private Provider<LanguageClient> clientProvider;
   private Provider<SettingsProvider> settingsProvider;
 
   @Inject
   MyLanguageServerImpl(
-      FileSystemService fileSystemService,
+      CopybookService fileSystemService,
       TextDocumentService textService,
       CobolWorkspaceService workspaceService,
       Provider<LanguageClient> clientProvider,

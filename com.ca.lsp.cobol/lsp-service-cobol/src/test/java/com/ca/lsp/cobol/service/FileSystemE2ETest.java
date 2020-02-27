@@ -20,6 +20,8 @@ import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
+import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
+import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Duration;
@@ -48,6 +50,9 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
       (DefaultDataBusBroker) LangServerCtx.getInjector().getInstance(DataBusBroker.class);
   private Provider<ConfigurationSettingsStorable> configurationSettingsProvider =
       Mockito.mock(Provider.class);
+  private CopybookDependencyServiceImpl dependencyService =
+      (CopybookDependencyServiceImpl)
+          LangServerCtx.getInjector().getInstance(CopybookDependencyService.class);
 
   @Before
   public void initActivities() {
@@ -57,8 +62,8 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
         .thenReturn(
             new ConfigurationSettingsStorable("myProfile", Arrays.asList(DSNAME_1, DSNAME_2)));
 
-    FileSystemServiceImpl fileSystemService =
-        new FileSystemServiceImpl(broker, configurationSettingsProvider);
+    CopybookServiceImpl fileSystemService =
+        new CopybookServiceImpl(broker, configurationSettingsProvider, dependencyService);
     fileSystemService.setWorkspaceFolders(generateWorkspaceFolder());
   }
 
