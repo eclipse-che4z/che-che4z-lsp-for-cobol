@@ -231,7 +231,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private void checkCopybookNameLength(String copybookName, Position position) {
-    if (copybookName.length() > 8) {
+    if (copybookName != null && copybookName.length() > 8) {
       errors.add(
           SyntaxError.syntaxError()
               .severity(2)
