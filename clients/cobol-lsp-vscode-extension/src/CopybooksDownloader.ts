@@ -43,10 +43,7 @@ export class CopybooksDownloader implements vscode.Disposable {
     /**
      * @param copybooks array of copybooks names to download
      */
-    public async downloadDependencies(
-        uri: vscode.Uri,
-        message: string = "Program contains dependencies to missing copybooks.",
-    ): Promise<void> {
+    public async downloadDependencies(uri: vscode.Uri, message: string = ""): Promise<void> {
         if (!checkWorkspace()) {
             return;
         }
@@ -58,7 +55,7 @@ export class CopybooksDownloader implements vscode.Disposable {
         const missingCopybooks: string[] = await this.listMissingCopybooks(uri, profile);
 
         const downloadCopybookAction = "Download Copybooks";
-        if (missingCopybooks.length > 0) {
+        if (missingCopybooks.length > 0 && message.length > 0) {
             const action: string = await vscode.window.showInformationMessage(
                 message,
                 downloadCopybookAction);

@@ -53,7 +53,7 @@ export class ProfileService {
         });
 
         const selectedProfile = await vscode.window.showQuickPick(items,
-            { placeHolder: defaultName, canPickMany: false });
+            { placeHolder: "Select a zowe profile to search for copybooks", canPickMany: false });
         if (selectedProfile) {
             let settingsProfiles = vscode.workspace.getConfiguration().get(SETTINGS_SECTION + ".profiles");
             settingsProfiles = settingsProfiles ? settingsProfiles : {};
