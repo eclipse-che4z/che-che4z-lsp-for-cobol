@@ -210,6 +210,11 @@ public class FileSystemServiceImpl implements FileSystemService {
   @Beta
   void addCopybookInDepFile(String requiredCopybookName, String documentUri) {
     String cobolFileName = getCobolFileNameFromUri(documentUri);
+    if (requiredCopybookName.length() > 8) {
+      requiredCopybookName = requiredCopybookName.substring(0, 8);
+      log.warn(
+          "Copybook name is more than 8 characters, please rename if the copybook is a PDS/PDSE member");
+    }
     Path dependencyFolder = initializeDependencyFolder();
     Path dependencyFile = retrieveDependencyFile(dependencyFolder, cobolFileName);
 
