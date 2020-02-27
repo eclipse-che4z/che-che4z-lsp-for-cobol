@@ -46,6 +46,8 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   private static final Logger LOG = LoggerFactory.getLogger(CobolSemanticParserListenerImpl.class);
   private static final String RECURSION_DETECTED = "Recursive copybook declaration for: %s";
+  private static final String COPYBOOK_OVER_8_CHARACTERS =
+      "Copybook declaration has more than 8 characters for: %s";
 
   private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
@@ -185,6 +187,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     String copybookName = retrieveCopybookName(copySource);
     Position position = retrievePosition(copySource);
     defineCopybook(copybookName, position);
+    checkCopybookNameLength(copybookName, position);
     this.preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens);
   }
 
@@ -225,6 +228,17 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
                 .suggestion(String.format(RECURSION_DETECTED, copybookName))
                 .position(it)
                 .build());
+  }
+
+  private void checkCopybookNameLength(String copybookName, Position position) {
+    if (copybookName.length() > 8) {
+      errors.add(
+          SyntaxError.syntaxError()
+              .severity(2)
+              .suggestion(String.format(COPYBOOK_OVER_8_CHARACTERS, copybookName))
+              .position(position)
+              .build());
+    }
   }
 
   @Override
