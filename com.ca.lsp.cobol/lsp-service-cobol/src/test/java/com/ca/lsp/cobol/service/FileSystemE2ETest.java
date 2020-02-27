@@ -24,18 +24,13 @@ import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Duration;
 import org.awaitility.core.ConditionTimeoutException;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Comparator;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
@@ -64,21 +59,7 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
 
     FileSystemServiceImpl fileSystemService =
         new FileSystemServiceImpl(broker, configurationSettingsProvider);
-    fileSystemService.setWorkspaceFolders(initWorkspaceFolderList());
-  }
-
-  @After
-  public void cleanupTempFolder() {
-    try {
-      Files.walk(getWorkspaceFolderPath())
-          .sorted(Comparator.reverseOrder())
-          .map(Path::toFile)
-          .forEach(File::delete);
-    } catch (IOException e) {
-      log.error(e.getMessage());
-    }
-
-    broker.invalidateCache();
+    fileSystemService.setWorkspaceFolders(generateWorkspaceFolder());
   }
 
   /**

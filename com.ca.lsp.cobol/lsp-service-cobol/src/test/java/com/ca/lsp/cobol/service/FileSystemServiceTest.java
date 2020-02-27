@@ -21,17 +21,14 @@ import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
@@ -58,24 +55,12 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   public void initActivities() {
     // the delegate will prepare the structure and this method will just setup the list of workspace
     // folders
-    fileSystemService.setWorkspaceFolders(initWorkspaceFolderList());
-  }
-
-  @After
-  public void cleanupTempFolder() {
-    try {
-      Files.walk(getWorkspaceFolderPath())
-          .sorted(Comparator.reverseOrder())
-          .map(Path::toFile)
-          .forEach(File::delete);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    fileSystemService.setWorkspaceFolders(generateWorkspaceFolder());
   }
 
   /*
-   * This test take in input a copybook name, retrieve the URI of the file (if it exists) and in case affermative return the
-   * content, null otherwise.
+   * This test take in input a copybook name and MF configuration (profile, target dataset list), and retrieve the
+   * content of the copybook, null otherwise.
    */
   @Test
   public void getContentByCopybookName() {
@@ -86,6 +71,10 @@ public class FileSystemServiceTest extends FileSystemConfiguration
             configurationSettingsStorable.getPaths()));
   }
 
+  /**
+   * In this test we assert that looking for a copybook that doesn't exists on the target folders
+   * returns null.
+   */
   @Test
   public void getNullWithNotCopybookNotFound() {
     assertNull(
@@ -95,8 +84,14 @@ public class FileSystemServiceTest extends FileSystemConfiguration
             configurationSettingsStorable.getPaths()));
   }
 
+  /**
+   * This test verify that the fetched copybook event is correctly generated and contains the
+   * required informations that the filesystem service should return back to the client.
+   */
+
+  // TODO: Refactor using mockito and the verify that the fetch cpyb is correctly defined
   @Test
-  public void testDataSentOnDatabus() {
+  public void testCorrectFetchedDataAreGenerated() {
     FetchedCopybookEvent fetchedCopybookEvent =
         FetchedCopybookEvent.builder().name(CPY_OUTER_NAME_ONLY2).content("SOME_CONTENT").build();
 
@@ -111,7 +106,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
    */
   @Test
   public void depFileGenerationPositiveTest() {
-    Path depFileReference = getDepFilePathReference();
+    Path depFileReference = createDependencyFile();
     assertTrue(Files.exists(depFileReference));
   }
 
@@ -122,7 +117,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   @Test
   public void depFileUpdatePositiveTest() {
     // create the dep folder with the SOMPROG.dep
-    Path depFileReference = getDepFilePathReference();
+    Path depFileReference = createDependencyFile();
 
     // check the number of elements before the update
     int numberOfElements = getNumberOfElementsFromDepFile(depFileReference);
@@ -138,7 +133,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   @Test
   public void depFileWithoutEmptyCopybookName() {
     // create the dep folder with the SOMPROG.dep
-    Path depFileReference = getDepFilePathReference();
+    Path depFileReference = createDependencyFile();
 
     // check the number of elements before the update
     int numberOfElements = getNumberOfElementsFromDepFile(depFileReference);
@@ -208,14 +203,14 @@ public class FileSystemServiceTest extends FileSystemConfiguration
     }
   }
 
-  private Path getDepFilePathReference() {
+  private Path createDependencyFile() {
     fileSystemService.generateDependencyFile(DEP_FILE_COST_NAME, getDependencyFolder());
     return Paths.get(
         getDependencyFolder() + filesystemSeparator() + DEP_FILE_COST_NAME + DEP_EXTENSION);
   }
 
   private Path getDependencyFolder() {
-    return Paths.get(getWorkspaceFolderPath() + filesystemSeparator() + ".cobdeps");
+    return depenencyFileFolderPath;
   }
 
   @Override

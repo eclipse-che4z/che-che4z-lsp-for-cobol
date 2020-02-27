@@ -18,13 +18,16 @@ import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
+import org.junit.After;
 import org.junit.Before;
 import org.mockito.Mockito;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +35,8 @@ import static org.mockito.Mockito.when;
 
 /**
  * This class provide support methods for FileSystemService and doesn't test anything. More in
- * detail create the workspace folder in the user tmp folder with some copybooks there
+ * detail create the workspace folder in the user tmp folder with some copybooks and dependency file
+ * there.
  */
 @Slf4j
 public class FileSystemConfiguration extends ConfigurableTest {
@@ -49,32 +53,64 @@ public class FileSystemConfiguration extends ConfigurableTest {
   public static final String DSNAME_2 = "HLQLF01.DSNAME2";
 
   private Path workspaceFolder = null;
-  protected Path copybooksPath = null;
+  protected Path copybooksFolderPath = null;
+  protected Path depenencyFileFolderPath = null;
+
   protected Provider<SettingsProvider> configurationSettingsProvider = Mockito.mock(Provider.class);
 
   // this field represent the predefined setting used for test purposes
   protected ConfigurationSettingsStorable configurationSettingsStorable = null;
   /*
-  STRUCTURE FOLDER USED FOR TEST PURPOSES
-  ***************************************
-  TEMP/
-  └── WORKSPACE/
-      ├── .cobdeps
-      │   ├── TEST.dep
-      │   └── SOMEPROG.dep
-      └─── .copybooks
-          ├── PROFILE_NAME/
-          │   ├── HLQ.DSN.NAME1/
-          │   │   └── copybook.cpy
-          │   └── HLQ.DSN.NAME2/
-          │       └── copybook.cpy
-          └── copy2.cpy
-  ***************************************
+    STRUCTURE FOLDER USED FOR TEST PURPOSES
+    ***************************************
+    TEMP/
+    └── WORKSPACE/
+        ├── .cobdeps
+        │   ├── TEST.dep
+        │   └── SOMEPROG.dep
+        └─── .copybooks
+            ├── PROFILE_NAME/
+            │   ├── HLQ.DSN.NAME1/
+            │   │   └── copybook.cpy
+            │   └── HLQ.DSN.NAME2/
+            │       └── copybook.cpy
+            └── copy2.cpy
+    ***************************************
+  */
 
-  /** Before each unit test configure the settings with a proprer mock */
-  // TODO: Remove similar implementation in others unit tests
+  /**
+   * This method initialize the filesystem and the settings configuration that will be used to test
+   * the filesystem service capabilities using the physical filesystem
+   */
   @Before
-  public void initSettings() {
+  public void buildFS() {
+    intializeSettings();
+    createWorkspaceFolderStructure();
+    createCopybookStructure();
+    createDependencyFileStructure();
+
+    // populate copybook folder and dependency file with some content
+    createCopybookFiles();
+    createDependencyFile();
+  }
+
+  @After
+  public void cleanupTempFolder() {
+    try {
+      Files.walk(getWorkspaceFolderPath())
+          .sorted(Comparator.reverseOrder())
+          .map(Path::toFile)
+          .forEach(File::delete);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * This method define the steps necessary to emulate the json settings provided by the user in the
+   * settings.json
+   */
+  private void intializeSettings() {
     SettingsProvider settingsProvider = new SettingsProvider();
 
     configurationSettingsStorable =
@@ -84,43 +120,35 @@ public class FileSystemConfiguration extends ConfigurableTest {
     when(configurationSettingsProvider.get()).thenReturn(settingsProvider);
   }
 
-  // TODO: Should be renamed as a builder and moved to the @Before
-  // routine the initialize structures
-  protected List<WorkspaceFolder> initWorkspaceFolderList() {
-    initWorkspaceFolderStructure();
-    initCopybooksWithProfileAndDataset(copybooksPath, configurationSettingsProvider.get());
-    initDepFileStructure();
-
+  protected List<WorkspaceFolder> generateWorkspaceFolder() {
     WorkspaceFolder workspaceFolder = new WorkspaceFolder();
     workspaceFolder.setName(WORKSPACE_FOLDER_NAME);
     workspaceFolder.setUri(String.valueOf(getWorkspaceFolderPath().toUri()));
     return Collections.singletonList(workspaceFolder);
   }
 
-  private void initWorkspaceFolderStructure() {
+  private void createWorkspaceFolderStructure() {
     workspaceFolder =
         createFolderStructure(Paths.get(System.getProperty("java.io.tmpdir"), "WORKSPACE"));
-    // generate the path where to store copybooks
-    copybooksPath = Paths.get(workspaceFolder + filesystemSeparator() + ".copybooks");
   }
 
-  private void initDepFileStructure() {
-    Path cobdepFolder = Paths.get(workspaceFolder + filesystemSeparator() + ".cobdeps");
-
-    if (workspaceFolder != null) {
-      Path dependencyFolderPath = createFolderStructure(cobdepFolder);
-      generateDummyContentForFile(copybooksPath, CPY_INNER_FILE_NAME_WITH_EXT, COPYBOOK_CONTENT);
-
-      generateDummyContentForFile(
-          Paths.get(String.valueOf(dependencyFolderPath)),
-          DEP_FILE_COST_NAME + ".dep",
-          CPY_OUTER_NAME_ONLY2);
-    }
+  private void createCopybookStructure() {
+    copybooksFolderPath =
+        createFolderStructure(Paths.get(workspaceFolder + filesystemSeparator() + ".copybooks"));
   }
 
-  private void initCopybooksWithProfileAndDataset(
-      Path path, SettingsProvider configurationSettingsProvider) {
-    ConfigurationSettingsStorable configSettings = configurationSettingsProvider.get();
+  private void createDependencyFileStructure() {
+    depenencyFileFolderPath =
+        createFolderStructure(Paths.get(workspaceFolder + filesystemSeparator() + ".cobdeps"));
+  }
+
+  private void createDependencyFile() {
+    generateDummyContentForFile(
+        depenencyFileFolderPath, DEP_FILE_COST_NAME + ".dep", CPY_OUTER_NAME_ONLY2);
+  }
+
+  private void createCopybookFiles() {
+    ConfigurationSettingsStorable configSettings = configurationSettingsProvider.get().get();
 
     String profile = (String) configSettings.getProfiles();
     List<String> targetDatasets = configSettings.getPaths();
@@ -129,7 +157,12 @@ public class FileSystemConfiguration extends ConfigurableTest {
         targetDatasets.stream()
             .map(
                 it ->
-                    Paths.get(path + filesystemSeparator() + profile + filesystemSeparator() + it))
+                    Paths.get(
+                        copybooksFolderPath
+                            + filesystemSeparator()
+                            + profile
+                            + filesystemSeparator()
+                            + it))
             .collect(Collectors.toList());
 
     retriviedPaths.forEach(this::createFolderStructure);
@@ -164,7 +197,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
       try {
         Files.createDirectory(targetDirectory);
       } catch (IOException e) {
-        log.error(e.getMessage() + "Cannot create forlder " + targetDirectory);
+        log.error(e.getMessage());
         return;
       }
     }
@@ -175,11 +208,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
           Files.createFile(
               Paths.get(targetDirectory + filesystemSeparator() + filenameAndExtension));
     } catch (IOException e) {
-      log.error(
-          e.getMessage()
-              + String.format(
-                  "Failed create file  %s under folder %s" + filenameAndExtension,
-                  targetDirectory.toString()));
+      log.error(e.getMessage());
       return;
     }
 
