@@ -74,7 +74,7 @@ export class CopybooksDownloader implements vscode.Disposable {
         let done = false;
         let errors: string[] = [];
         while (!done) {
-            const element = this.queue.pop();
+            const element: CopybookProfile | undefined = await this.queue.pop();
             if (!element) {
                 done = true;
                 continue;
@@ -85,7 +85,7 @@ export class CopybooksDownloader implements vscode.Disposable {
                     title: "Fetching copybooks",
                 },
                 async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
-                    const toDownload: CopybookProfile[] = [];
+                    const toDownload: CopybookProfile[] = [element];
                     while (this.queue.length > 0) {
                         toDownload.push(await this.queue.pop());
                     }
