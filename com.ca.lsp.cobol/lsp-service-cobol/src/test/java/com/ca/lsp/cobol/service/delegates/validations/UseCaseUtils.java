@@ -20,6 +20,7 @@ import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.service.TextDocumentSyncType;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
+import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import lombok.experimental.UtilityClass;
 import org.awaitility.Awaitility;
 import org.eclipse.lsp4j.Diagnostic;
@@ -32,6 +33,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /** This utility class provides methods to run use cases with Cobol code examples. */
 @UtilityClass
@@ -143,7 +146,7 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(String text) {
-    return new CobolLanguageEngineFacade(new CobolLanguageEngine())
+    return new CobolLanguageEngineFacade(new CobolLanguageEngine(new CobolPreprocessorImpl()))
         .analyze(DOCUMENT_URI, text, TextDocumentSyncType.DID_OPEN);
   }
 
@@ -155,10 +158,8 @@ public class UseCaseUtils {
    * @return list of diagnostics with only severe errors
    */
   public static List<Diagnostic> analyzeForErrors(String text) {
-    LanguageEngineFacade engine = new CobolLanguageEngineFacade(new CobolLanguageEngine());
-    AnalysisResult result = engine.analyze(DOCUMENT_URI, text, TextDocumentSyncType.DID_OPEN);
-    return result.getDiagnostics().stream()
+    return analyze(text).getDiagnostics().stream()
         .filter(it -> it.getSeverity().getValue() == 1)
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 }

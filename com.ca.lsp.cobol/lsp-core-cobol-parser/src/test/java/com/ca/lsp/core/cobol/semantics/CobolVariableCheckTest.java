@@ -17,6 +17,7 @@ package com.ca.lsp.core.cobol.semantics;
 
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
+import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import org.junit.Test;
 
 import static com.ca.lsp.core.cobol.engine.CobolLanguageEngineTest.DID_CHANGE;
@@ -105,7 +106,7 @@ public class CobolVariableCheckTest {
    */
   @Test
   public void test() {
-    CobolLanguageEngine engine = new CobolLanguageEngine();
+    CobolLanguageEngine engine = new CobolLanguageEngine(new CobolPreprocessorImpl());
     ResultWithErrors<SemanticContext> result;
 
     // SCENARIO FOR DID_OPEN

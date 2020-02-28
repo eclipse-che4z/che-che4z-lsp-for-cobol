@@ -14,6 +14,7 @@
 package com.ca.lsp.core.cobol.engine;
 
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
+import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import org.junit.Test;
 
@@ -58,7 +59,7 @@ public class CobolLanguageEngineTest {
 
   @Test
   public void doCheckNegative() {
-    CobolLanguageEngine engine = new CobolLanguageEngine();
+    CobolLanguageEngine engine = new CobolLanguageEngine(new CobolPreprocessorImpl());
     ResultWithErrors<SemanticContext> result;
     // Run the analysis in DID_OPEN mode
     result = engine.run(DOCUMENT_URI, NEGATIVE_TEXT, DID_OPEN);
@@ -71,7 +72,7 @@ public class CobolLanguageEngineTest {
 
   @Test
   public void doCheckPositive() {
-    CobolLanguageEngine engine = new CobolLanguageEngine();
+    CobolLanguageEngine engine = new CobolLanguageEngine(new CobolPreprocessorImpl());
     ResultWithErrors<SemanticContext> result;
 
     // Run the analysis in DID_OPEN mode

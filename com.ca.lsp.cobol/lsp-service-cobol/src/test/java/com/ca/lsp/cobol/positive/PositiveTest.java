@@ -13,11 +13,11 @@
  */
 package com.ca.lsp.cobol.positive;
 
+import com.broadcom.lsp.cdi.EngineModule;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.TestModule;
-import com.ca.lsp.cobol.service.mocks.MockFileSystemService;
 import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.Before;
@@ -53,7 +53,7 @@ public class PositiveTest extends ConfigurableTest {
    */
   @Parameterized.Parameters
   public static Collection<Object> retrieveTextsToTest() {
-    LangServerCtx.getGuiceCtx(new TestModule(), new DatabusModule());
+    LangServerCtx.getGuiceCtx(new TestModule(), new EngineModule(), new DatabusModule());
 
     CobolTextRegistry registry = LangServerCtx.getInjector().getInstance(CobolTextRegistry.class);
 

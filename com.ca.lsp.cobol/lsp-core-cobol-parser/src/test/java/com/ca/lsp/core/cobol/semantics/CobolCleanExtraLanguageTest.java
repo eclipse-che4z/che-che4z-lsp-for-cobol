@@ -17,17 +17,15 @@ package com.ca.lsp.core.cobol.semantics;
 
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
+import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Deque;
 
 import static org.junit.Assert.assertEquals;
 
@@ -151,7 +149,6 @@ public class CobolCleanExtraLanguageTest {
   private String linePrefix;
   private String tag;
   private String expectedText;
-  private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
 
   public CobolCleanExtraLanguageTest(
       String tag, String text, String linePrefix, String expectedText) {
@@ -174,7 +171,7 @@ public class CobolCleanExtraLanguageTest {
 
   @Test
   public void positiveErrorTest() {
-    CobolLanguageEngine engine = new CobolLanguageEngine();
+    CobolLanguageEngine engine = new CobolLanguageEngine(new CobolPreprocessorImpl());
     ResultWithErrors<SemanticContext> result;
 
     // VERIFY THE SCENARIO FOR DID_OPEN
