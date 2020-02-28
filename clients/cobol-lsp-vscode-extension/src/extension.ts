@@ -34,9 +34,8 @@ export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
     const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(zoweApi, profileService);
-    // path resolved to identify the location of the LSP server into the extension
-    const extPath = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
-    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.10.1.jar`;
+    const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
+    const LSPServerPath = `${ext.extensionPath}/server/lsp-service-cobol-${ext.packageJSON.version}.jar`;
 
     try {
         await isJavaInstalled();
