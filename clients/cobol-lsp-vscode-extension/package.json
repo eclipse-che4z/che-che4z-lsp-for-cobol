@@ -55,8 +55,8 @@
             "title": "Broadcom COBOL LSP",
             "properties": {
                 "broadcom-cobol-lsp.cpy-manager.profiles": {
-                    "type": "Object",
-                    "description": "Program name to profile map"
+                    "type": "string",
+                    "description": "Current default profile for copybook downloader"
                 },
                 "broadcom-cobol-lsp.cpy-manager.paths": {
                     "type": "array",

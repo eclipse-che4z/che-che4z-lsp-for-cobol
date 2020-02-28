@@ -55,10 +55,9 @@ export class ProfileService {
         const selectedProfile = await vscode.window.showQuickPick(items,
             { placeHolder: "Select a zowe profile to search for copybooks", canPickMany: false });
         if (selectedProfile) {
-            let settingsProfiles = vscode.workspace.getConfiguration().get(SETTINGS_SECTION + ".profiles");
-            settingsProfiles = settingsProfiles ? settingsProfiles : {};
-            settingsProfiles[programName] = selectedProfile.label;
-            await vscode.workspace.getConfiguration().update(SETTINGS_SECTION + ".profiles", settingsProfiles, false);
+            // TODO Switch to program specific profiles
+            await vscode.workspace.getConfiguration().update(SETTINGS_SECTION + ".profiles",
+                selectedProfile.label, false);
             return selectedProfile.label;
         }
         return undefined;
@@ -86,8 +85,8 @@ export class ProfileService {
     }
 
     private tryGetProfileFromSettings(programName: string): string | undefined {
-        const profiles: {} = vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles");
-        return profiles ? profiles[programName] : undefined;
+        // TODO switch from single profile to program specific profile
+        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles");
     }
     private async tryGetProfileFromDocumentPath(docPath: string): Promise<string | undefined> {
         const profiles = Object.keys(await this.zoweApi.listZOSMFProfiles());
