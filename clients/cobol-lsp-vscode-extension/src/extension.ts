@@ -15,7 +15,7 @@
 import * as cp from "child_process";
 import * as fs from "fs";
 import * as net from "net";
-import { commands, ExtensionContext, extensions, window, workspace } from "vscode";
+import * as vscode from "vscode";
 import {
     Disposable,
     LanguageClient,
@@ -24,27 +24,28 @@ import {
 } from "vscode-languageclient/lib/main";
 import { SETTINGS_SECTION } from "./constants";
 import { CopybooksDownloader } from "./CopybooksDownloader";
+import { CopybooksDownloaderCodeActionProvider } from "./CopybooksDownloaderCodeActionProvider";
 import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
 import { DEPENDENCIES_FOLDER } from "./PathUtils";
 import { ProfileService } from "./ProfileService";
 import { ZoweApi } from "./ZoweApi";
 
-export async function activate(context: ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
     const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(zoweApi, profileService);
     // path resolved to identify the location of the LSP server into the extension
-    const extPath = extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
+    const extPath = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
     const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.10.1.jar`;
 
     try {
         await isJavaInstalled();
         if (!getLspPort() && !fs.existsSync(LSPServerPath)) {
-            window.showErrorMessage("COBOL extension failed to start - LSP server not found");
+            vscode.window.showErrorMessage("COBOL extension failed to start - LSP server not found");
             return;
         }
     } catch (err) {
-        window.showErrorMessage(err.toString());
+        vscode.window.showErrorMessage(err.toString());
         return;
     }
 
@@ -59,24 +60,30 @@ export async function activate(context: ExtensionContext) {
     const languageClient = new LanguageClient("COBOL", "LSP extension for COBOL language",
         createServerOptions(LSPServerPath), clientOptions);
 
-    context.subscriptions.push(workspace.onDidChangeConfiguration(event => {
+    context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
         if (event.affectsConfiguration(SETTINGS_SECTION + ".paths")) {
             copyBooksDownloader.redownloadDependencies("Configuration was updated");
         }
     }));
-    context.subscriptions.push(commands.registerCommand("cobol-language-support.copybooks.redownload", () => {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-language-support.copybooks.redownload", () => {
         copyBooksDownloader.redownloadDependencies();
     }));
     context.subscriptions.push(languageClient.start());
     context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
     context.subscriptions.push(copyBooksDownloader);
+
+    context.subscriptions.push(
+        vscode.languages.registerCodeActionsProvider(
+            { scheme: "file", language: "COBOL" },
+            new CopybooksDownloaderCodeActionProvider()));
 }
 
 function initWorkspaceTracker(downloader: CopybooksDownloader): Disposable {
-    const watcher = workspace.createFileSystemWatcher("**/" + DEPENDENCIES_FOLDER + "/**/**.dep", false, false, true);
-    watcher.onDidCreate(uri => downloader.downloadDependencies(uri));
-    watcher.onDidChange(uri => downloader.downloadDependencies(uri,
+    const watcher = vscode.workspace.createFileSystemWatcher("**/"
+        + DEPENDENCIES_FOLDER + "/**/**.dep", false, false, true);
+    watcher.onDidCreate(uri => downloader.downloadDependencies(uri,
         "Program contains dependencies to missing copybooks."));
+    watcher.onDidChange(uri => downloader.downloadDependencies(uri));
     return watcher;
 }
 
@@ -105,7 +112,7 @@ async function isJavaInstalled() {
 }
 
 function getLspPort(): number | undefined {
-    return +workspace.getConfiguration().get("broadcom-cobol-lsp.server.port");
+    return +vscode.workspace.getConfiguration().get("broadcom-cobol-lsp.server.port");
 }
 
 function createServerOptions(jarPath: string) {
