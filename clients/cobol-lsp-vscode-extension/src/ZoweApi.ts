@@ -15,7 +15,6 @@
 import { AbstractSession, BasicProfileManager, IProfile, RestClient, Session } from "@zowe/imperative";
 import * as os from "os";
 import * as path from "path";
-import { commands, window } from "vscode";
 
 export interface ProfilesMap {
     [key: string]: IProfile;
@@ -56,20 +55,11 @@ export class ZoweApi {
         // default should be https
         const session: Session = await this.createSession(profileName);
         const rpath = `/zosmf/restfiles/ds/${dataset}/member`;
-        try {
-            const result = await RestClient.getExpectJSON(session, rpath, [{
-                "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "",
-            }]);
-            // tslint:disable-next-line: no-string-literal
-            return result["items"].map((i: any) => i.member);
-        } catch (error) {
-            const action = "Edit Dataset List";
-            if (action === await window.showWarningMessage("Can't read members of " + dataset, action)) {
-                commands.executeCommand("workbench.action.openSettings",
-                    "broadcom-cobol-lsp.cpy-manager.paths");
-            }
-            return [];
-        }
+        const result = await RestClient.getExpectJSON(session, rpath, [{
+            "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "",
+        }]);
+        // tslint:disable-next-line: no-string-literal
+        return result["items"].map((i: any) => i.member);
     }
 
     public async createSession(profileName: string) {

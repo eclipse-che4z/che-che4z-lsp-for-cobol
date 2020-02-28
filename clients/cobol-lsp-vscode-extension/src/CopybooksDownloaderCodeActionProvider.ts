@@ -25,6 +25,11 @@ export class CopybooksDownloaderCodeActionProvider implements vscode.CodeActionP
             arguments: ["broadcom-cobol-lsp.cpy-manager.paths"],
             command: "workbench.action.openSettings",
             title: "Setup copybook datasets list",
+        },
+        {
+            arguments: ["broadcom-cobol-lsp.cpy-manager.profiles"],
+            command: "workbench.action.openSettings",
+            title: "Change default zowe profile",
         }];
     }
 

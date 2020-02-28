@@ -93,8 +93,13 @@ export class CopybooksDownloader implements vscode.Disposable {
                         });
                         toDownload.forEach(async cp => {
                             try {
-                                if (!await this.fetchCopybook(dataset, cp)) {
+                                const fetchResult = await this.fetchCopybook(dataset, cp);
+                                if (!fetchResult && !errors.includes(cp.copybook)) {
                                     errors.push(cp.copybook);
+                                }
+                                if (fetchResult && errors.includes(cp.copybook)) {
+                                    const index = errors.indexOf(cp.copybook);
+                                    errors = errors.slice(index, 1);
                                 }
                             } catch (e) {
                                 vscode.window.showErrorMessage(e.toString());
@@ -103,7 +108,7 @@ export class CopybooksDownloader implements vscode.Disposable {
                     }
                 });
             if (this.queue.length === 0 && errors.length > 0) {
-                vscode.window.showErrorMessage("Can't download copybooks: " + errors);
+                this.processDownloadError("Can't download copybooks: " + errors);
                 errors = [];
             }
         }
@@ -111,16 +116,35 @@ export class CopybooksDownloader implements vscode.Disposable {
     public dispose() {
         this.queue.stop();
     }
-
-    private async fetchCopybook(dataset: string, copybookProfile: CopybookProfile): Promise<boolean> {
-        const members: string[] = await this.zoweApi.listMembers(dataset, copybookProfile.profile);
-        if (members.includes(copybookProfile.copybook)) {
-            await this.downloadCopybook(dataset, copybookProfile.copybook, copybookProfile.profile);
-            return true;
+    public async processDownloadError(title: string) {
+        const actionDatasets = "Edit Datasets";
+        const actionProfile = "Change zowe profile";
+        const action = await vscode.window.showErrorMessage(title,
+            actionDatasets, actionProfile);
+        if (action === actionDatasets) {
+            vscode.commands.executeCommand("workbench.action.openSettings",
+                "broadcom-cobol-lsp.cpy-manager.paths");
         }
-        return false;
+        if (action === actionProfile) {
+            vscode.commands.executeCommand("workbench.action.openSettings",
+                "broadcom-cobol-lsp.cpy-manager.profiles");
+        }
     }
 
+    private async fetchCopybook(dataset: string, copybookProfile: CopybookProfile): Promise<boolean> {
+        let members: string[] = [];
+        try {
+            members = await this.zoweApi.listMembers(dataset, copybookProfile.profile);
+        } catch (error) {
+            await this.processDownloadError("Can't read members of " + dataset);
+            return false;
+        }
+        if (!members.includes(copybookProfile.copybook)) {
+            return false;
+        }
+        await this.downloadCopybook(dataset, copybookProfile.copybook, copybookProfile.profile);
+        return true;
+    }
     private async downloadCopybook(dataset: string, copybook: string, profileName: string) {
         const copybookPath = createCopybookPath(profileName, dataset, copybook);
 
