@@ -21,11 +21,8 @@ export interface ProfilesMap {
 }
 
 export class ZoweApi {
-    private profileParams = {
-        profileRootDirectory: path.join(os.homedir(), ".zowe", "profiles"),
-        type: "zosmf",
-    };
-    private profileManager = new BasicProfileManager(this.profileParams);
+
+    private profileManager = new BasicProfileManager(this.createProfileParams());
 
     public async listZOSMFProfiles(): Promise<ProfilesMap> {
         const profiles: ProfilesMap = {};
@@ -63,7 +60,7 @@ export class ZoweApi {
     }
 
     public async createSession(profileName: string) {
-        const profile = (await new BasicProfileManager(this.profileParams).load({ name: profileName })).profile;
+        const profile = (await new BasicProfileManager(this.createProfileParams()).load({ name: profileName })).profile;
         return new Session({
             ...{
                 hostname: profile.host,
@@ -71,5 +68,13 @@ export class ZoweApi {
             },
             ...profile,
         });
+    }
+
+    private createProfileParams() {
+        const zoweHome = process.env.ZOWE_CLI_HOME || os.homedir();
+        return {
+            profileRootDirectory: path.join(zoweHome, ".zowe", "profiles"),
+            type: "zosmf",
+        };
     }
 }
