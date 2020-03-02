@@ -20,7 +20,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ConfigurationSettingsStorable implements Cloneable {
+public class ConfigurationSettingsStorable {
   private Object profiles;
   private List<String> paths;
 
@@ -28,10 +28,5 @@ public class ConfigurationSettingsStorable implements Cloneable {
   public ConfigurationSettingsStorable(Object profiles, List<String> paths) {
     this.profiles = profiles;
     this.paths = paths;
-  }
-
-  @Override
-  public Object clone() throws CloneNotSupportedException {
-    return super.clone();
   }
 }

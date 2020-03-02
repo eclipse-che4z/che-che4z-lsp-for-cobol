@@ -20,6 +20,7 @@ import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
+import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import com.google.inject.Provider;
@@ -28,7 +29,6 @@ import org.awaitility.Duration;
 import org.awaitility.core.ConditionTimeoutException;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -37,6 +37,7 @@ import java.util.Arrays;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -44,15 +45,15 @@ import static org.mockito.Mockito.when;
  * the dependency file.
  */
 @Slf4j
-public class FileSystemE2ETest extends FileSystemConfiguration {
+public class CopybookServiceE2ETest extends FileSystemConfiguration {
   public static final String CPY_NAME_WITHOUT_EXT = "copy2";
   private DataBusBroker broker =
       (DefaultDataBusBroker) LangServerCtx.getInjector().getInstance(DataBusBroker.class);
   private Provider<ConfigurationSettingsStorable> configurationSettingsProvider =
-      Mockito.mock(Provider.class);
-  private CopybookDependencyServiceImpl dependencyService =
-      (CopybookDependencyServiceImpl)
-          LangServerCtx.getInjector().getInstance(CopybookDependencyService.class);
+      mock(Provider.class);
+
+  private Communications communications = mock(Communications.class);
+  private CopybookDependencyService dependencyService = new CopybookDependencyServiceImpl();
 
   @Before
   public void initActivities() {
@@ -62,9 +63,10 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
         .thenReturn(
             new ConfigurationSettingsStorable("myProfile", Arrays.asList(DSNAME_1, DSNAME_2)));
 
-    CopybookServiceImpl fileSystemService =
-        new CopybookServiceImpl(broker, configurationSettingsProvider, dependencyService);
-    fileSystemService.setWorkspaceFolders(generateWorkspaceFolder());
+    CopybookServiceImpl copybookService =
+        new CopybookServiceImpl(
+            broker, configurationSettingsProvider, dependencyService, communications);
+    copybookService.setWorkspaceFolders(generateWorkspaceFolder());
   }
 
   /**
@@ -74,6 +76,7 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
    */
   @Test
   public void generateDependencyFileOnCallbackPositiveTest() {
+
     // generate a required copybook event
     broker.postData(
         RequiredCopybookEvent.builder()

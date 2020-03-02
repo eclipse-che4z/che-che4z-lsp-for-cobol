@@ -33,7 +33,8 @@ import java.lang.reflect.Type;
 
 /**
  * This class is resposible to keep the settings configuration provided by the user in the setting
- * storage system and that will be consumed by the {@Link FileSystemServiceImpl}
+ * storage system and that will be consumed by the {@link
+ * com.ca.lsp.cobol.service.CopybookServiceImpl}
  */
 @Singleton
 @Slf4j
@@ -54,17 +55,24 @@ public class SettingsProvider
     this.configurationSettingsStorable = configurationSettingsStorable;
   }
 
+  /**
+   * The method invoked by a provider return the object that represent the user settings config.
+   *
+   * @return a {@link ConfigurationSettingsStorable} fullfilled with the user settings or an empty
+   *     one if not present
+   */
   @Override
   @Nullable
   public ConfigurationSettingsStorable get() {
-    try {
+
+    if (configurationSettingsStorable != null) {
       return deepCopy(configurationSettingsStorable);
-    } catch (CloneNotSupportedException e) {
-      log.error(e.getMessage());
-      return null;
+    } else {
+      return ConfigurationSettingsStorable.builder().build();
     }
   }
 
+  /** @param databus the channel used for receive message about {@link FetchedSettingsEvent} */
   @Inject
   public void setDatabus(@Nonnull DataBusBroker databus) {
     this.databus = databus;
@@ -72,11 +80,19 @@ public class SettingsProvider
   }
 
   private static ConfigurationSettingsStorable deepCopy(
-      ConfigurationSettingsStorable configurationSettingsStorable)
-      throws CloneNotSupportedException {
-    return (ConfigurationSettingsStorable) configurationSettingsStorable.clone();
+      ConfigurationSettingsStorable configurationSettingsStorable) {
+    return ConfigurationSettingsStorable.builder()
+        .profiles(configurationSettingsStorable.getProfiles())
+        .paths(configurationSettingsStorable.getPaths())
+        .build();
   }
 
+  /**
+   * When a message {@link FetchedSettingsEvent} is published on the databus the {@link
+   * SettingsProvider} update the object that contains the user settings with new content
+   *
+   * @param fetchedSettingsEvent published object that contains update for the user settings
+   */
   @Override
   public void observerCallback(FetchedSettingsEvent fetchedSettingsEvent) {
     Gson gson = new Gson();

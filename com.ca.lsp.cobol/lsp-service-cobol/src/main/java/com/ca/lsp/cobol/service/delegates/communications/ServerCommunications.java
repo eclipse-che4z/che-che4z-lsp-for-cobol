@@ -105,6 +105,15 @@ public class ServerCommunications implements Communications {
   }
 
   @Override
+  public void notifyCopybookMessageInfo(CopybookMessageInfo copybookMessageInfo) {
+    CompletableFuture.runAsync(
+        () ->
+            showMessage(
+                MessageType.Error,
+                "Error during the copybook analysis, reason: " + copybookMessageInfo.getMessage()));
+  }
+
+  @Override
   public void publishDiagnostics(String uri, List<Diagnostic> diagnostics) {
     getClient().publishDiagnostics(new PublishDiagnosticsParams(uri, clean(diagnostics)));
   }

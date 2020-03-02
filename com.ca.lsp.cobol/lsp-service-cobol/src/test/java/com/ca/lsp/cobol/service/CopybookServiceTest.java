@@ -32,10 +32,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @Slf4j
-public class FileSystemServiceTest extends FileSystemConfiguration
+public class CopybookServiceTest extends FileSystemConfiguration
     implements EventObserver<RequiredCopybookEvent> {
 
-  private CopybookServiceImpl fileSystemService =
+  private CopybookServiceImpl copybookService =
       (CopybookServiceImpl) LangServerCtx.getInjector().getInstance(CopybookService.class);
 
   // Activities performed
@@ -51,7 +51,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   public void initActivities() {
     // the delegate will prepare the structure and this method will just setup the list of workspace
     // folders
-    fileSystemService.setWorkspaceFolders(generateWorkspaceFolder());
+    copybookService.setWorkspaceFolders(generateWorkspaceFolder());
   }
 
   /**
@@ -60,7 +60,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
    */
   @Test
   public void findCopybookByNamePositiveTest() {
-    assertNotNull(fileSystemService.findCopybook(CPY_OUTER_NAME_ONLY2));
+    assertNotNull(copybookService.findCopybook(CPY_OUTER_NAME_ONLY2));
   }
 
   /**
@@ -69,7 +69,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
    */
   @Test
   public void findCopybookByNameNegativeTest() {
-    assertNull(fileSystemService.findCopybook(COPYBOOK_NOT_PRESENT));
+    assertNull(copybookService.findCopybook(COPYBOOK_NOT_PRESENT));
   }
 
   /*
@@ -79,12 +79,12 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   @Test
   public void getContentByCopybookName() {
     Path path =
-        fileSystemService.findCopybook(
+        copybookService.findCopybook(
             CPY_OUTER_NAME_ONLY2,
             (String) configurationSettingsStorable.getProfiles(),
             configurationSettingsStorable.getPaths());
 
-    assertNotNull(fileSystemService.retrieveContentByPath(path));
+    assertNotNull(copybookService.retrieveContentByPath(path));
   }
 
   /**
@@ -94,7 +94,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   @Test
   public void getNullWithNotCopybookNotFound() {
     assertNull(
-        fileSystemService.findCopybook(
+        copybookService.findCopybook(
             COPYBOOK_NOT_PRESENT,
             (String) configurationSettingsStorable.getProfiles(),
             configurationSettingsStorable.getPaths()));
@@ -102,10 +102,8 @@ public class FileSystemServiceTest extends FileSystemConfiguration
 
   /**
    * This test verify that the fetched copybook event is correctly generated and contains the
-   * required informations that the filesystem service should return back to the client.
+   * required informations that the {@link CopybookService} should return back to the client.
    */
-
-  // TODO: Refactor using mockito and the verify that the fetch cpyb is correctly defined
   @Test
   public void testCorrectFetchedDataAreGenerated() {
     FetchedCopybookEvent fetchedCopybookEvent =
@@ -124,7 +122,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   public void findCopybookWithDatasetFilteringPositiveTest() {
     // use the list of paths for the search in copybooks delimited only to this list
     assertNotNull(
-        fileSystemService.findCopybook(
+        copybookService.findCopybook(
             CPY_OUTER_NAME_ONLY2,
             (String) configurationSettingsStorable.getProfiles(),
             configurationSettingsStorable.getPaths()));
@@ -137,7 +135,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   @Test
   public void findCopybookWithDatasetFilteringNegativeTest() {
     assertNull(
-        fileSystemService.findCopybook(
+        copybookService.findCopybook(
             "ANTHCPY1",
             (String) configurationSettingsStorable.getProfiles(),
             configurationSettingsStorable.getPaths()));
@@ -150,7 +148,7 @@ public class FileSystemServiceTest extends FileSystemConfiguration
   @Test
   public void findCopybookWithWrongFolderStructure() {
     assertNull(
-        fileSystemService.findCopybook(
+        copybookService.findCopybook(
             CPY_OUTER_NAME_ONLY2,
             (String) configurationSettingsStorable.getProfiles(),
             Collections.singletonList("HLQLF02.DSNAME1")));

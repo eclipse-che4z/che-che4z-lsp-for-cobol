@@ -129,17 +129,10 @@ public class MyLanguageServerImpl implements LanguageServer {
     return settingsProvider.get();
   }
 
-  /*
-    void retrieveAndStoreConfiguration() {
-    fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
-        .thenAccept(e -> getSettingsFromProvider().set(parseJsonIfValid((JsonObject) e.get(0))));
-  }
-   */
-
   /**
    * @param jsonObject - the object which comes from the client and contains configuration settings
-   * @return a custom object of type ConfigurableSettingsStorage if the JSON is valid or null if it
-   *     is failing the check
+   * @return a custom object of type ConfigurableSettingsStorable if the JSON is valid or an empty
+   *     ConfigurableSettingsStorable if it is failing the parsing
    */
   private ConfigurationSettingsStorable parseJsonIfValid(JsonObject jsonObject) {
     Gson gson = new Gson();
@@ -147,7 +140,7 @@ public class MyLanguageServerImpl implements LanguageServer {
       return gson.fromJson(jsonObject, ConfigurationSettingsStorable.class);
     } catch (JsonSyntaxException e) {
       log.error(e.getMessage());
-      return null;
+      return ConfigurationSettingsStorable.builder().build();
     }
   }
 
