@@ -54,7 +54,9 @@ public class CopybookSearchWithoutConfigTest {
   CopybookDependencyService dependencyService = mock(CopybookDependencyService.class);
   Communications communications = mock(Communications.class);
   private CopybookServiceImpl copybookService;
+  private static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
   Path workspaceFolderPath = null;
+  RequiredCopybookEvent requiredCopybookEvent;
   /** Initialize the copybook service and dependency service but not the relevant folders */
   @Before
   public void init() {
@@ -64,6 +66,13 @@ public class CopybookSearchWithoutConfigTest {
     copybookService =
         new CopybookServiceImpl(dataBusBroker, settingsProvider, dependencyService, communications);
     copybookService.setWorkspaceFolders(generateWorkspaceFolder());
+
+    requiredCopybookEvent =
+        RequiredCopybookEvent.builder()
+            .name(CPY_NAME)
+            .documentUri(DOCUMENT_URI)
+            .textDocumentSyncType("DID_OPEN")
+            .build();
   }
 
   @After
@@ -91,7 +100,8 @@ public class CopybookSearchWithoutConfigTest {
     when(settingsProvider.get()).thenReturn(ConfigurationSettingsStorable.builder().build());
 
     try {
-      copybookService.observerCallback(RequiredCopybookEvent.builder().name(CPY_NAME).build());
+      copybookService.observerCallback(requiredCopybookEvent);
+      verifyThatDepFileIsEngaged();
       verify(communications, times(1)).notifyCopybookMessageInfo(NO_SETTINGS);
     } catch (Exception e) {
       fail();
@@ -110,7 +120,8 @@ public class CopybookSearchWithoutConfigTest {
     when(settingsProvider.get()).thenReturn(new ConfigurationSettingsStorable("myProfile", null));
 
     try {
-      copybookService.observerCallback(RequiredCopybookEvent.builder().name(CPY_NAME).build());
+      copybookService.observerCallback(requiredCopybookEvent);
+      verifyThatDepFileIsEngaged();
       verify(communications, times(1)).notifyCopybookMessageInfo(NO_DATASET_IN_SETTINGS);
     } catch (Exception e) {
       fail();
@@ -130,7 +141,8 @@ public class CopybookSearchWithoutConfigTest {
                 .paths(Collections.singletonList("HLQ.DS1"))
                 .build());
     try {
-      copybookService.observerCallback(RequiredCopybookEvent.builder().name(CPY_NAME).build());
+      copybookService.observerCallback(requiredCopybookEvent);
+      verifyThatDepFileIsEngaged();
       verify(communications, times(1)).notifyCopybookMessageInfo(COPYBOOK_FOLDER_MISS);
     } catch (Exception e) {
       fail();
@@ -143,6 +155,16 @@ public class CopybookSearchWithoutConfigTest {
     workspaceFolder.setName("TEST");
     workspaceFolder.setUri(String.valueOf(workspaceFolderPath.toUri()));
     return Collections.singletonList(workspaceFolder);
+  }
+
+  /**
+   * Pre-condition of each test for copybook management is that the dependency file creation is
+   * engaged.
+   */
+  private void verifyThatDepFileIsEngaged() {
+    verify(dependencyService, times(1))
+        .addCopybookInDepFile(
+            requiredCopybookEvent.getName(), requiredCopybookEvent.getDocumentUri());
   }
 
   private Path createFolderStructure(Path copybooksPath) {
