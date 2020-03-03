@@ -71,9 +71,9 @@ export class ZoweApi {
     }
 
     private createProfileParams() {
-        const zoweHome = process.env.ZOWE_CLI_HOME || os.homedir();
+        const zoweHome = process.env.ZOWE_CLI_HOME || path.join(os.homedir(), ".zowe");
         return {
-            profileRootDirectory: path.join(zoweHome, ".zowe", "profiles"),
+            profileRootDirectory: path.join(zoweHome, "profiles"),
             type: "zosmf",
         };
     }
