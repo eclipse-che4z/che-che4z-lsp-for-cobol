@@ -116,11 +116,11 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
    * filesystem and then is available in the cache.
    */
   @Test
-  public void analyzeCopybookFromFileSystemService() {
+  public void analyzeCopybookFromCopybookService() {
     // test the behavior on DID_OPEN
-    assertDidOpenFromFileSystemService();
+    assertDidOpenFromCopybookService();
     // test the behavior on DID_CHANGE
-    assertDidChangeFromFileSystemService();
+    assertDidChangeFromCopybookService();
   }
 
   private void assertDidOpenAnalysisFromCache() {
@@ -137,14 +137,14 @@ public class AnalyzeCopybookCaching extends ConfigurableTest {
     assertPositiveHitFromCache();
   }
 
-  private void assertDidOpenFromFileSystemService() {
+  private void assertDidOpenFromCopybookService() {
     // invalidate cache in order to ask workspace manager to grab the content
     databus.invalidateCache();
     runAnalysisInDidOpen();
     assertStoredInCache();
   }
 
-  private void assertDidChangeFromFileSystemService() {
+  private void assertDidChangeFromCopybookService() {
     // invalidate cache in order to ask workspace manager to grab the content
     databus.invalidateCache();
     runAnalysisInDidChange();

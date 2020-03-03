@@ -211,6 +211,12 @@ public class CopybookServiceImpl implements CopybookService {
     String content = null;
     Path path;
 
+    // if the document is in DID_OPEN mode is possible write on dependency file..
+    if (isFileInDidOpen(event)) {
+      dependencyService.setWorkspaceFolderPaths(getWorkspaceFoldersAsPathList());
+      dependencyService.addCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
+    }
+
     if (missingInformationToSearchCopybooks()) {
       selectAppropriateMessageForCommunication();
 
@@ -221,12 +227,6 @@ public class CopybookServiceImpl implements CopybookService {
               .content(null)
               .build());
       return;
-    }
-
-    // if the document is in DID_OPEN mode is possible write on dependency file..
-    if (isFileInDidOpen(event)) {
-      dependencyService.setWorkspaceFolderPaths(getWorkspaceFoldersAsPathList());
-      dependencyService.addCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
     }
 
     ConfigurationSettingsStorable configurationSettingsStorable =
