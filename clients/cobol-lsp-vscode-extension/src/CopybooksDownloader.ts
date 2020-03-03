@@ -54,16 +54,37 @@ export class CopybooksDownloader implements vscode.Disposable {
 
         const missingCopybooks: string[] = await this.listMissingCopybooks(uri, profile);
 
-        const downloadCopybookAction = "Download Copybooks";
-        if (missingCopybooks.length > 0 && message.length > 0) {
+        if (!message.length) {
+            missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
+        } else if (missingCopybooks.length > 0) {
+            // TODO: refactor: move to external class
+            const downloadCopybookAction = "Download Copybooks";
+            const actionDatasets = "Edit Datasets";
+            const actionProfile = "Change zowe profile";
+            const actions = [];
+            if ((await this.listPathDatasets()).length > 0) {
+                actions.push(downloadCopybookAction);
+            }
+            if (message !== "Configuration was updated") {
+                actions.push(actionDatasets);
+                actions.push(actionProfile);
+            }
             const action: string = await vscode.window.showInformationMessage(
                 message,
-                downloadCopybookAction);
-            if (action !== downloadCopybookAction) {
-                return;
+                ...actions);
+            if (action === downloadCopybookAction) {
+                missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
+            }
+            if (action === actionDatasets) {
+                vscode.commands.executeCommand("workbench.action.openSettings",
+                    "broadcom-cobol-lsp.cpy-manager.paths");
+            }
+            if (action === actionProfile) {
+                vscode.commands.executeCommand("workbench.action.openSettings",
+                    "broadcom-cobol-lsp.cpy-manager.profiles");
             }
         }
-        missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
+
     }
 
     // tslint:disable-next-line: cognitive-complexity
@@ -86,6 +107,7 @@ export class CopybooksDownloader implements vscode.Disposable {
                     while (this.queue.length > 0) {
                         toDownload.push(await this.queue.pop());
                     }
+                    toDownload.map(cp => cp.copybook).forEach(cb => errors.push(cb));
                     for (const dataset of await this.listPathDatasets()) {
                         progress.report({
                             message: "Looking in " + dataset + ". " + toDownload.length +
@@ -94,9 +116,6 @@ export class CopybooksDownloader implements vscode.Disposable {
                         toDownload.forEach(async cp => {
                             try {
                                 const fetchResult = await this.fetchCopybook(dataset, cp);
-                                if (!fetchResult && !errors.includes(cp.copybook)) {
-                                    errors.push(cp.copybook);
-                                }
                                 if (fetchResult && errors.includes(cp.copybook)) {
                                     const index = errors.indexOf(cp.copybook);
                                     errors = errors.slice(index, 1);
