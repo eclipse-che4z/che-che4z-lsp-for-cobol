@@ -113,23 +113,23 @@ export class CopybooksDownloader implements vscode.Disposable {
                             message: "Looking in " + dataset + ". " + toDownload.length +
                                 " copybook(s) left.",
                         });
-                        toDownload.forEach(async cp => {
+                        for(const cp of toDownload) {
                             try {
                                 const fetchResult = await this.fetchCopybook(dataset, cp);
                                 if (fetchResult && errors.includes(cp.copybook)) {
                                     const index = errors.indexOf(cp.copybook);
-                                    errors = errors.slice(index, 1);
+                                    errors.splice(index, 1);
                                 }
                             } catch (e) {
                                 vscode.window.showErrorMessage(e.toString());
                             }
-                        });
+                        }
+                    }
+                    if (this.queue.length === 0 && errors.length > 0) {
+                        this.processDownloadError("Can't download copybooks: " + errors);
+                        errors = [];
                     }
                 });
-            if (this.queue.length === 0 && errors.length > 0) {
-                this.processDownloadError("Can't download copybooks: " + errors);
-                errors = [];
-            }
         }
     }
     public dispose() {
