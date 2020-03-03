@@ -3,6 +3,7 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 
 ## [0.x.x] - TBD
+- Consume user settings in Copybook Service [#221](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/221) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Modify dep file creation/update process [#209](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/209) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Retrieve settings.json at initialize [#207](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/207) Thanks @[sergiuilie](https://github.com/sergiuilie)
 - Introduce Code Action to Resolve Copybooks [#198](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/198) Thanks @[temanbrcom](https://github.com/temanbrcom)
