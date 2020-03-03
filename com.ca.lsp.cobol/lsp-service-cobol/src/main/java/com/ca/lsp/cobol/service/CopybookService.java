@@ -22,6 +22,10 @@ import org.eclipse.lsp4j.WorkspaceFolder;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * Provide API definition to search for copybooks files and define the workspace folder opened in
+ * the client when the LSP server is triggered.
+ */
 public interface CopybookService extends EventObserver<RequiredCopybookEvent> {
   Path findCopybook(String fileName);
 

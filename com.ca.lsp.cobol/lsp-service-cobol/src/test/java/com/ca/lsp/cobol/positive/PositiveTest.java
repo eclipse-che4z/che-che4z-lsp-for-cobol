@@ -46,7 +46,7 @@ public class PositiveTest extends ConfigurableTest {
 
   /**
    * Retrieve the files to be analyzed by Language Server from {@link CobolTextRegistry} using
-   * file-based implementation.p
+   * file-based implementation.
    *
    * @return a collection of objects that would be passed to the constructor one by one.
    */

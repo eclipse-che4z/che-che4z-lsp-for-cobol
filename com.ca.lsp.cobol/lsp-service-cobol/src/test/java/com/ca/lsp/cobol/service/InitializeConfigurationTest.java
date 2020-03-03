@@ -47,6 +47,10 @@ public class InitializeConfigurationTest {
   protected static final String DSNAME_1 = "HLQLF01.DSNAME1";
   protected static final String DSNAME_2 = "HLQLF01.DSNAME2";
 
+  /**
+   * This test verify that the server is able to store the initial settings retrivied from the
+   * settings.json
+   */
   @Test
   public void testInitializeConfiguration() {
     provider.set(client);

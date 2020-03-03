@@ -45,6 +45,10 @@ import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.runAsync;
 
+/**
+ * This class is responsible to watch for any changes into the copybook folder and to fetch updated
+ * settings coming from the client
+ */
 @Slf4j
 @Singleton
 public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
@@ -132,6 +136,12 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
     return Collections.singletonList(item);
   }
 
+  /**
+   * This method is triggered when the user modify the settings in the settings.json
+   *
+   * @param params the object that wrap the content changed by the user in the settings.json and
+   *     sent from the client to the server.
+   */
   @Override
   public void didChangeWatchedFiles(@Nonnull DidChangeWatchedFilesParams params) {
     dataBus.invalidateCache();

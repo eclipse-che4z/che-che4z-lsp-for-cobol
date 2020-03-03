@@ -26,11 +26,9 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.eclipse.lsp4j.WorkspaceFolder;
 
 import javax.annotation.Nullable;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,13 +36,15 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.ca.lsp.cobol.service.delegates.communications.CopybookMessageInfo.*;
-import static com.ca.lsp.cobol.service.utils.FileSystemUtil.filesystemSeparator;
-import static com.ca.lsp.cobol.service.utils.FileSystemUtil.isFileExists;
+import static com.ca.lsp.cobol.service.utils.FileSystemUtil.*;
 
 @Singleton
 @Slf4j
@@ -53,7 +53,6 @@ public class CopybookServiceImpl implements CopybookService {
   private final DataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
   private CopybookDependencyService dependencyService;
-  private final List<String> validExtensions = Arrays.asList("cpy", "cbl", "cobol", "cob");
   private final Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider;
   private Communications communications;
 
@@ -160,26 +159,13 @@ public class CopybookServiceImpl implements CopybookService {
         Files.find(
             targetFolderPath,
             100,
-            (path, basicFileAttributes) -> isValidFile(path.toFile(), fileName),
+            (path, basicFileAttributes) -> isValidFileFound(path.toFile(), fileName),
             FileVisitOption.FOLLOW_LINKS)) {
       return pathStream.findAny().orElse(null);
     } catch (IOException e) {
       log.error(e.getMessage());
       return null;
     }
-  }
-
-  private boolean isValidFile(File resFile, String fileName) {
-    return resFile.isFile()
-        && !resFile.isDirectory()
-        && resFile.getName().contains(".")
-        && FilenameUtils.getBaseName(resFile.getName()).equalsIgnoreCase(fileName)
-        && isValidExtension(resFile.getAbsoluteFile().toString().toLowerCase());
-  }
-
-  private boolean isValidExtension(String filePath) {
-    return validExtensions.stream()
-        .anyMatch(ext -> ext.equalsIgnoreCase(FilenameUtils.getExtension(filePath)));
   }
 
   private List<Path> getWorkspaceFoldersAsPathList() {

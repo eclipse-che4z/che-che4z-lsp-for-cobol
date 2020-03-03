@@ -25,7 +25,7 @@ import java.util.concurrent.TimeoutException;
 import static org.junit.Assert.fail;
 
 /**
- * This class contlains all the unit tests related to the pubblish/subscribe pattern handled by the
+ * This class contains all the unit tests related to the pubblish/subscribe pattern handled by the
  * databus.
  */
 @Slf4j

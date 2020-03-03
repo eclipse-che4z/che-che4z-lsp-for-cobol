@@ -21,7 +21,6 @@ import org.eclipse.lsp4j.Diagnostic;
 import java.util.List;
 
 public interface Communications {
-
   void notifyThatLoadingInProgress(String uri);
 
   void notifyThatEngineNotFound(String languageType);

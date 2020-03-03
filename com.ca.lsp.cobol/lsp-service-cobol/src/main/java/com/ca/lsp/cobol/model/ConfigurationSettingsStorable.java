@@ -19,6 +19,10 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * This class act as a DTO to store the settings information provided by the user and required to
+ * search copybooks on MF and in the copybook folder.
+ */
 @Data
 public class ConfigurationSettingsStorable {
   private Object profiles;

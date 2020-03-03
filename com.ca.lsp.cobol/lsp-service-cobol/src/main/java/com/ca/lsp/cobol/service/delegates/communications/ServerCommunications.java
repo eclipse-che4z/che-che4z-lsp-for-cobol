@@ -51,6 +51,12 @@ public class ServerCommunications implements Communications {
     this.provider = provider;
   }
 
+  /**
+   * This method raise a notification message back to the client if is unable to found a language
+   * engine for a given document id
+   *
+   * @param languageType enum that represent the langugage type
+   */
   @Override
   public void notifyThatEngineNotFound(String languageType) {
     CompletableFuture.runAsync(
@@ -104,6 +110,13 @@ public class ServerCommunications implements Communications {
                 MessageType.Error, "The given document extension is unsupported: " + extension));
   }
 
+  /**
+   * This method raise a popup message back to the user with a message customized by the enumeration
+   * class
+   *
+   * @param copybookMessageInfo the enum kind that represent the event that will be shown to the
+   *     user
+   */
   @Override
   public void notifyCopybookMessageInfo(CopybookMessageInfo copybookMessageInfo) {
     CompletableFuture.runAsync(
@@ -113,11 +126,23 @@ public class ServerCommunications implements Communications {
                 "Error during the copybook analysis, reason: " + copybookMessageInfo.getMessage()));
   }
 
+  /**
+   * This method raise a diagnostic message to the client with syntax error retrivied by the Cobol
+   * LSP server
+   *
+   * @param uri document opened in the client
+   * @param diagnostics list populated by the language engine
+   */
   @Override
   public void publishDiagnostics(String uri, List<Diagnostic> diagnostics) {
     getClient().publishDiagnostics(new PublishDiagnosticsParams(uri, clean(diagnostics)));
   }
 
+  /**
+   * Destroy the popup notification that alert the user that the cobol analysis is still ongoing
+   *
+   * @param uri document open in the client
+   */
   @Override
   public void cancelProgressNotification(String uri) {
     uriInProgress.remove(uri);

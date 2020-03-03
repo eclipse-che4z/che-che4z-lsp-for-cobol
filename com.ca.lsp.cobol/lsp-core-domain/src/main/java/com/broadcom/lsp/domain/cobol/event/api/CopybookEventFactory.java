@@ -23,7 +23,6 @@ import java.util.NoSuchElementException;
 
 /** An abstract factory for the subscribers. */
 public interface CopybookEventFactory {
-  // TODO: Update unit tests..
   static CopybookSubscriber getFactory(DataEventType choice) {
     switch (choice) {
       case UNKNOWN_EVENT:

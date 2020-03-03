@@ -93,6 +93,10 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
     return result;
   }
 
+  /**
+   * @param workspaceFolderPaths list of target folders that contains copybooks. Thi information is
+   *     provided by {@link com.ca.lsp.cobol.service.CopybookService}
+   */
   @Override
   public void setWorkspaceFolderPaths(List<Path> workspaceFolderPaths) {
     this.workspaceFolderPaths = workspaceFolderPaths;

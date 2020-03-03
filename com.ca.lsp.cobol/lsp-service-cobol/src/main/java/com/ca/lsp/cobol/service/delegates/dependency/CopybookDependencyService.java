@@ -19,6 +19,10 @@ package com.ca.lsp.cobol.service.delegates.dependency;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * This interface defines the API to generate and update dependency file for copybook download
+ * management
+ */
 public interface CopybookDependencyService {
   void setWorkspaceFolderPaths(List<Path> workspaceFolderPaths);
 
