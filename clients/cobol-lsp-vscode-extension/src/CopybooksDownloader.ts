@@ -15,7 +15,7 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { SETTINGS_SECTION } from "./constants";
-import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
+import { CopybookProfile, DownloadQueue } from "./services/DownloadQueue";
 import { checkWorkspace, createCopybookPath, createDatasetPath } from "./PathUtils";
 import { ProfileService } from "./ProfileService";
 import { ZoweApi } from "./ZoweApi";

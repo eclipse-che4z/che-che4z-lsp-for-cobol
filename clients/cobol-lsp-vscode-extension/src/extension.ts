@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as cp from "child_process";
 import * as fs from "fs";
 import * as net from "net";
 import * as vscode from "vscode";
@@ -25,9 +24,9 @@ import {
 import { SETTINGS_SECTION } from "./constants";
 import { CopybooksDownloader } from "./CopybooksDownloader";
 import { CopybooksDownloaderCodeActionProvider } from "./CopybooksDownloaderCodeActionProvider";
-import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
 import { DEPENDENCIES_FOLDER } from "./PathUtils";
 import { ProfileService } from "./ProfileService";
+import { JavaCheck } from "./services/JavaCheck";
 import { ZoweApi } from "./ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -38,7 +37,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const LSPServerPath = `${ext.extensionPath}/server/lsp-service-cobol-${ext.packageJSON.version}.jar`;
 
     try {
-        await isJavaInstalled();
+        await new JavaCheck().isJavaInstalled();
         if (!getLspPort() && !fs.existsSync(LSPServerPath)) {
             vscode.window.showErrorMessage("COBOL extension failed to start - LSP server not found");
             return;
@@ -84,30 +83,6 @@ function initWorkspaceTracker(downloader: CopybooksDownloader): Disposable {
         "Program contains dependencies to missing copybooks."));
     watcher.onDidChange(uri => downloader.downloadDependencies(uri));
     return watcher;
-}
-
-async function isJavaInstalled() {
-    return new Promise<any>((resolve, reject) => {
-        const ls = cp.spawn("java", ["-version"]);
-        ls.stderr.on("data", (data: any) => {
-            const javaCheck = new DefaultJavaVersionCheck();
-            if (!javaCheck.isJavaVersionSupported(data.toString())) {
-                reject("Java version 8 expected");
-            }
-            resolve();
-        });
-        ls.on("error", (code: any) => {
-            if ("Error: spawn java ENOENT" === code.toString()) {
-                reject("Java 8 is not found");
-            }
-            reject(code);
-        });
-        ls.on("close", (code: number) => {
-            if (code !== 0) {
-                reject("An error occurred when checking if Java was installed");
-            }
-        });
-    });
 }
 
 function getLspPort(): number | undefined {
