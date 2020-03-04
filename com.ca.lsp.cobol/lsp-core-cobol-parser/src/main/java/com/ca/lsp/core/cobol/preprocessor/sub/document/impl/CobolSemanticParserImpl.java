@@ -22,12 +22,11 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookAnalysis;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookParallelAnalysis;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.google.common.collect.Multimap;
-import lombok.AllArgsConstructor;
+import com.google.inject.Inject;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -42,8 +41,13 @@ import static java.util.Collections.emptyList;
  * Preprocessor which retrieves semantic elements definitions, such as variables, paragraphs and
  * copybooks, and applies semantic analysis for the copybooks' content
  */
-@AllArgsConstructor
 public class CobolSemanticParserImpl implements CobolSemanticParser {
+  private CopybookAnalysis analysis;
+
+  @Inject
+  public CobolSemanticParserImpl(CopybookAnalysis analysis) {
+    this.analysis = analysis;
+  }
 
   @Nonnull
   @Override
@@ -91,9 +95,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     if (copybookNames.isEmpty()) {
       return new ResultWithErrors<>(emptyList(), emptyList());
     }
-
-    CopybookAnalysis copybookAnalyzer = createCopybookAnalyzer();
-    return copybookAnalyzer.analyzeCopybooks(
+    return analysis.analyzeCopybooks(
         documentUri,
         copybookNames,
         semanticContext.getCopybookUsageTracker(),
@@ -114,10 +116,5 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
       @Nonnull CommonTokenStream tokens,
       @Nonnull SemanticContext semanticContext) {
     return new CobolSemanticParserListenerImpl(uri, tokens, semanticContext);
-  }
-
-  @Nonnull
-  private CopybookAnalysis createCopybookAnalyzer() {
-    return new CopybookParallelAnalysis();
   }
 }

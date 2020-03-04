@@ -23,6 +23,7 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 /**
  * This test check that the error is shown if the copybook that is used in the Cobol file contains a
@@ -42,17 +43,12 @@ public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCa
 
   public TestCopybookWithRecursiveDependencyIsDetected() {
     super(TEXT);
-
-    MockWorkspaceService workspaceService =
-        LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
-    workspaceService.setCopybooks(
-        () -> Collections.singletonList(new CobolText("RECURSIVE-COPY", RECURSIVE_COPY)));
   }
 
   @Override
   @Test
   public void test() {
-    super.test();
+    super.test(singletonList(new CobolText("RECURSIVE-COPY", RECURSIVE_COPY)));
   }
 
   @Override
