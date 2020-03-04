@@ -15,10 +15,15 @@
  */
 package com.ca.lsp.core.cobol.semantics;
 
+import com.broadcom.lsp.cdi.EngineModule;
+import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
+import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookParallelAnalysis;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
+import com.google.inject.Guice;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -171,7 +176,7 @@ public class CobolCleanExtraLanguageTest {
 
   @Test
   public void positiveErrorTest() {
-    CobolLanguageEngine engine = new CobolLanguageEngine(new CobolPreprocessorImpl());
+    CobolLanguageEngine engine = Guice.createInjector(new EngineModule(), new DatabusModule()).getInstance(CobolLanguageEngine.class);
     ResultWithErrors<SemanticContext> result;
 
     // VERIFY THE SCENARIO FOR DID_OPEN
