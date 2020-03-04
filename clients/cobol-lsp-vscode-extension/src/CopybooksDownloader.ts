@@ -14,10 +14,10 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { SETTINGS_SECTION } from "./constants";
-import { CopybookProfile, DownloadQueue } from "./services/DownloadQueue";
-import { checkWorkspace, createCopybookPath, createDatasetPath } from "./PathUtils";
+import { DEPENDENCIES_FOLDER, SETTINGS_SECTION } from "./constants";
 import { ProfileService } from "./ProfileService";
+import { CopybookProfile, DownloadQueue } from "./services/DownloadQueue";
+import { checkWorkspace, createCopybookPath, createDatasetPath } from "./services/PathUtils";
 import { ZoweApi } from "./ZoweApi";
 
 export class CopybooksDownloader implements vscode.Disposable {
@@ -28,31 +28,23 @@ export class CopybooksDownloader implements vscode.Disposable {
         private profileService: ProfileService) { }
 
     public async redownloadDependencies(message: string = "Redownload dependencies requested.") {
-        (await vscode.workspace.findFiles(".cobdeps/**/*.dep")).forEach(dep => {
-            const errFile = dep.fsPath.substr(0, dep.fsPath.length - 4) + ".err";
-            if (fs.existsSync(errFile)) {
-                try {
-                    fs.unlinkSync(errFile);
-                } catch (error) {
-                    vscode.window.showErrorMessage(error.toString());
-                }
-            }
+        (await vscode.workspace.findFiles(DEPENDENCIES_FOLDER + "/**/*.dep")).forEach(dep => {
             this.downloadDependencies(dep, message);
         });
     }
     /**
      * @param copybooks array of copybooks names to download
      */
-    public async downloadDependencies(uri: vscode.Uri, message: string = ""): Promise<void> {
+    public async downloadDependencies(depFileUri: vscode.Uri, message: string = ""): Promise<void> {
         if (!checkWorkspace()) {
             return;
         }
-        const profile: string = await this.profileService.getProfile(uri);
+        const profile: string = await this.profileService.getProfile(depFileUri);
         if (!profile) {
             return;
         }
 
-        const missingCopybooks: string[] = await this.listMissingCopybooks(uri, profile);
+        const missingCopybooks: string[] = await this.listMissingCopybooks(depFileUri, profile);
 
         if (!message.length) {
             missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
@@ -113,7 +105,7 @@ export class CopybooksDownloader implements vscode.Disposable {
                             message: "Looking in " + dataset + ". " + toDownload.length +
                                 " copybook(s) left.",
                         });
-                        for(const cp of toDownload) {
+                        for (const cp of toDownload) {
                             try {
                                 const fetchResult = await this.fetchCopybook(dataset, cp);
                                 if (fetchResult && errors.includes(cp.copybook)) {

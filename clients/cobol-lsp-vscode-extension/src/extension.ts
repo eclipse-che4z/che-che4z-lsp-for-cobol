@@ -22,9 +22,9 @@ import {
     StreamInfo,
 } from "vscode-languageclient/lib/main";
 import { SETTINGS_SECTION } from "./constants";
+import { DEPENDENCIES_FOLDER } from "./constants";
 import { CopybooksDownloader } from "./CopybooksDownloader";
 import { CopybooksDownloaderCodeActionProvider } from "./CopybooksDownloaderCodeActionProvider";
-import { DEPENDENCIES_FOLDER } from "./PathUtils";
 import { ProfileService } from "./ProfileService";
 import { JavaCheck } from "./services/JavaCheck";
 import { ZoweApi } from "./ZoweApi";
