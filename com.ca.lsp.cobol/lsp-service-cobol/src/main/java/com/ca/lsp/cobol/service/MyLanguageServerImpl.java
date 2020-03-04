@@ -52,9 +52,9 @@ import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
 @Slf4j
 @Singleton
 public class MyLanguageServerImpl implements LanguageServer {
-  /** Glob patterns to watch COPYBOOKS folder and copybook files */
+  /** Glob patterns to watch the copybooks folder and copybook files */
   private static final List<String> WATCHER_PATTERNS =
-      asList("**/COPYBOOKS/*.cpy", "**/COPYBOOKS/*.CPY", "**/COPYBOOKS");
+      asList("**/.copybooks/**/*.cpy", "**/.copybooks/**/*.CPY", "**/.copybooks");
 
   /**
    * The kind of events of interest, for watchers calculated as WatchKind.Create | WatchKind.Change

@@ -90,7 +90,7 @@ public class MyLanguageServerImplTest {
         ((DidChangeWatchedFilesRegistrationOptions) registration.getRegisterOptions())
             .getWatchers();
 
-    watchers.forEach(it -> assertTrue(it.getGlobPattern().startsWith("**/COPYBOOKS")));
+    watchers.forEach(it -> assertTrue(it.getGlobPattern().startsWith("**/.copybooks")));
     watchers.forEach(it -> assertEquals(7, it.getKind().intValue()));
   }
 

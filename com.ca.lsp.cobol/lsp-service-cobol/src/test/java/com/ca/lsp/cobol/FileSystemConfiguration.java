@@ -43,6 +43,9 @@ public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String COPYBOOK_CONTENT =
       "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
   protected static final String WORKSPACE_FOLDER_NAME = "test";
+  protected static final String WS_FOLDER_NAME = "WORKSPACE";
+  protected static final String CPYB_FOLDER_NAME = ".copybooks";
+  protected static final String CPYB_INNER_NAME = "INNER";
   protected static final String CPY_OUTER_NAME_ONLY2 = "copy2";
   protected static final String EMPTY_COPYBOOK_NAME = " ";
   protected static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
