@@ -15,10 +15,8 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
@@ -28,58 +26,64 @@ import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
+import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RecursiveTask;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Optional.ofNullable;
+
 /**
- * Represent the ForkJoinTask that is executed in parallel for address copybooks duties It use a
- * {@Link DataBusBroker} to communicate with other modules
+ * Represent the ForkJoinTask that is executed in parallel for address copybooks duties It uses a
+ * {@link DataBusBroker} to communicate with other modules
  */
 @Slf4j
 public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<CopybookSemanticContext>>
     implements EventObserver<FetchedCopybookEvent> {
 
-  private transient DataBusBroker databus =
-      LangServerCtx.getInjector().getInstance(DefaultDataBusBroker.class);
-
+  private transient DataBusBroker databus;
   private final String copyBookName;
   private String documentUri;
-  // <<<<<<< HEAD
   private transient CopybookUsage copybookUsage;
   private transient List<CopybookUsage> copybookUsageTracker;
   private transient CompletableFuture<String> waitForResolving;
   private String textDocumentSyncType;
+  private transient CobolPreprocessor preprocessor;
 
+  @Inject
   public AnalyseCopybookTask(
-      String documentUri,
-      CopybookUsage copybookUsage,
-      List<CopybookUsage> copybookUsageTracker,
-      String textDocumentSyncType) {
+      DataBusBroker databus,
+      CobolPreprocessor preprocessor,
+      @Assisted("documentUri") String documentUri,
+      @Assisted("copybookUsage") CopybookUsage copybookUsage,
+      @Assisted("copybookUsageTracker") List<CopybookUsage> copybookUsageTracker,
+      @Assisted("textDocumentSyncType") String textDocumentSyncType) {
     this.documentUri = documentUri;
     this.copybookUsage = copybookUsage;
     copyBookName = copybookUsage.getName();
     this.copybookUsageTracker = copybookUsageTracker;
     this.textDocumentSyncType = textDocumentSyncType;
+    this.preprocessor = preprocessor;
     waitForResolving = new CompletableFuture<>();
+    this.databus = databus;
   }
 
   /**
-   * - check if copybook name is already present in cache. If present grab the content from the
-   * cache and create a new fetcher event with the content populated without involve the workspace
-   * manager. involved - if not present - post scan event on the databus -- workspace manager
-   * retrieve the content + create fetcher event on databus - populate the cache with retrived
-   * content
+   * Check if copybook name already presents in the cache. If presents, grab the content from the
+   * cache and parse without involving the workspace manager. If not present - post a scan event on
+   * the data bus for workspace manager to retrieve the content and post fetch event on data bus to
+   * populate the cache with the retrieved content.
    *
-   * @return SemanticContext populated for copybooks
+   * @return SemanticContext with errors (if found) populated for copybooks.
    */
   @Override
   public ResultWithErrors<CopybookSemanticContext> compute() {
@@ -101,10 +105,8 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
     return new ResultWithErrors<>(
         new CopybookSemanticContext(
             copyBookName,
-            Optional.ofNullable(semanticContext).map(ResultWithErrors::getResult).orElse(null)),
-        Optional.ofNullable(semanticContext)
-            .map(ResultWithErrors::getErrors)
-            .orElse(Collections.emptyList()));
+            ofNullable(semanticContext).map(ResultWithErrors::getResult).orElse(null)),
+        ofNullable(semanticContext).map(ResultWithErrors::getErrors).orElse(emptyList()));
   }
 
   private ResultWithErrors<SemanticContext> parseCopybook() {
@@ -121,7 +123,7 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
       Thread.currentThread().interrupt();
     }
 
-    // populate cache with content retrieved from scan analysis
+    // populate the cache with content retrieved while analysis
     if (semanticContext != null) {
       populateCacheWithCopybookContents(content);
     }
@@ -152,18 +154,13 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
     List<CopybookUsage> nextTrackerIteration = new ArrayList<>(copybookUsageTracker);
     nextTrackerIteration.add(copybookUsage);
     ResultWithErrors<PreprocessedInput> preprocessedInput =
-        getParser()
-            .process(
-                copybookUsage.getUri(),
-                content,
-                new SemanticContext(Collections.unmodifiableList(nextTrackerIteration)),
-                textDocumentSyncType);
+        preprocessor.process(
+            copybookUsage.getUri(),
+            content,
+            new SemanticContext(unmodifiableList(nextTrackerIteration)),
+            textDocumentSyncType);
     return new ResultWithErrors<>(
         preprocessedInput.getResult().getSemanticContext(), preprocessedInput.getErrors());
-  }
-
-  private CobolPreprocessorImpl getParser() {
-    return new CobolPreprocessorImpl();
   }
 
   @Override
