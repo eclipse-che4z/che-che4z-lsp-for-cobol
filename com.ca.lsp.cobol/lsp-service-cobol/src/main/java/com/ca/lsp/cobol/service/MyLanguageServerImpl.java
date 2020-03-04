@@ -137,7 +137,7 @@ public class MyLanguageServerImpl implements LanguageServer {
       return gson.fromJson(jsonObject, ConfigurationSettingsStorable.class);
     } catch (JsonSyntaxException e) {
       log.error(e.getMessage());
-      return ConfigurationSettingsStorable.generateDefaultConfigurationSettingsStorable();
+      return ConfigurationSettingsStorable.emptyConfigurationSettingsStorable();
     }
   }
 

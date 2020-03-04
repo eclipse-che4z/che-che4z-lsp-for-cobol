@@ -100,7 +100,7 @@ public class CopybookSearchWithoutConfigTest {
 
     // when asking for a setting config we'll give an empty object as defined in the API
     when(settingsProvider.get())
-        .thenReturn(ConfigurationSettingsStorable.generateDefaultConfigurationSettingsStorable());
+        .thenReturn(ConfigurationSettingsStorable.emptyConfigurationSettingsStorable());
 
     try {
       copybookService.observerCallback(requiredCopybookEvent);
