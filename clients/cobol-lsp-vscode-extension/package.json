@@ -35,6 +35,12 @@
     "icon": "resources/logo.png",
     "main": "./out/extension.js",
     "contributes": {
+        "commands": [
+            {
+                "command": "cobol-language-support.copybooks.redownload",
+                "title": "Redownload all copybooks"
+            }
+        ],
         "languages": [
             {
                 "id": "COBOL",
@@ -44,7 +50,24 @@
                     ".cob"
                 ]
             }
-        ]
+        ],
+        "configuration": {
+            "title": "Broadcom COBOL LSP",
+            "properties": {
+                "broadcom-cobol-lsp.cpy-manager.profiles": {
+                    "type": "string",
+                    "description": "Current default profile for copybook downloader"
+                },
+                "broadcom-cobol-lsp.cpy-manager.paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of datasets to search for copybooks",
+                    "uniqueItems": true
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
@@ -54,6 +77,7 @@
         "test": "jest -w 1"
     },
     "dependencies": {
+        "@zowe/imperative": "^4.4.5",
         "vscode-languageclient": "^5.2.1"
     },
     "devDependencies": {
