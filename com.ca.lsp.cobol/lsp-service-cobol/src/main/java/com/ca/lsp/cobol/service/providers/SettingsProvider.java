@@ -23,7 +23,6 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,12 +44,6 @@ public class SettingsProvider
 
   public SettingsProvider() {}
 
-  @Builder
-  public SettingsProvider(DataBusBroker databus) {
-    this.databus = databus;
-    this.databus.subscribe(DataEventType.FETCHED_SETTINGS_EVENT, this);
-  }
-
   public void set(@Nullable ConfigurationSettingsStorable configurationSettingsStorable) {
     this.configurationSettingsStorable = configurationSettingsStorable;
   }
@@ -64,7 +57,6 @@ public class SettingsProvider
   @Override
   @Nullable
   public ConfigurationSettingsStorable get() {
-
     if (configurationSettingsStorable != null) {
       return deepCopy(configurationSettingsStorable);
     } else {
@@ -72,6 +64,8 @@ public class SettingsProvider
     }
   }
 
+  // TODO: We don't need to set the databus but we should modify the constructor to inject it. At
+  // startup lang server also should inject it.
   /** @param databus the channel used for receive message about {@link FetchedSettingsEvent} */
   @Inject
   public void setDatabus(@Nonnull DataBusBroker databus) {
@@ -79,6 +73,7 @@ public class SettingsProvider
     this.databus.subscribe(DataEventType.FETCHED_SETTINGS_EVENT, this);
   }
 
+  // TODO: changing the annotation (test it before please) we can get rid of this deep copy
   private static ConfigurationSettingsStorable deepCopy(
       ConfigurationSettingsStorable configurationSettingsStorable) {
     return ConfigurationSettingsStorable.builder()

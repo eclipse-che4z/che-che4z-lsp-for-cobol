@@ -101,12 +101,10 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
     try {
-
+      SettingsProvider settingsProvider = new SettingsProvider();
+      settingsProvider.setDatabus(dataBus);
       // invalidate cache to avoid false positive
       dataBus.invalidateCache();
-
-      // provide the databus to the settings provider
-      SettingsProvider.builder().databus(dataBus);
       fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
           .thenAccept(e -> dataBus.postData(FetchedSettingsEvent.builder().content(e).build()));
     } catch (RuntimeException e) {

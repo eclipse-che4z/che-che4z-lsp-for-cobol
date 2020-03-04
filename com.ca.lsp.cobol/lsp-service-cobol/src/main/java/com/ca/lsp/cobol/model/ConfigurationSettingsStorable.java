@@ -24,6 +24,7 @@ import java.util.List;
  * search copybooks on MF and in the copybook folder.
  */
 @Data
+// TODO: Change to value annotation
 public class ConfigurationSettingsStorable {
   private Object profiles;
   private List<String> paths;

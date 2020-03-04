@@ -48,15 +48,15 @@ import static org.mockito.Mockito.*;
  * dependency file without a dependency folder.
  */
 public class CopybookSearchWithoutConfigTest {
-  public static final String CPY_NAME = "ACPYTEST";
-  DataBusBroker dataBusBroker = mock(DataBusBroker.class);
-  Provider settingsProvider = mock(Provider.class);
-  CopybookDependencyService dependencyService = mock(CopybookDependencyService.class);
-  Communications communications = mock(Communications.class);
+  private static final String CPY_NAME = "ACPYTEST";
+  private DataBusBroker dataBusBroker = mock(DataBusBroker.class);
+  private Provider settingsProvider = mock(Provider.class);
+  private CopybookDependencyService dependencyService = mock(CopybookDependencyService.class);
+  private Communications communications = mock(Communications.class);
   private CopybookServiceImpl copybookService;
   private static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
-  Path workspaceFolderPath = null;
-  RequiredCopybookEvent requiredCopybookEvent;
+  private Path workspaceFolderPath = null;
+  private RequiredCopybookEvent requiredCopybookEvent;
   /** Initialize the copybook service and dependency service but not the relevant folders */
   @Before
   public void init() {

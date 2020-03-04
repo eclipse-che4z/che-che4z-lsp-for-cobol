@@ -66,6 +66,7 @@ public class MyLanguageServerImpl implements LanguageServer {
   private CobolWorkspaceService workspaceService;
   private CopybookService copybookService;
   private Provider<LanguageClient> clientProvider;
+
   private Provider<SettingsProvider> settingsProvider;
 
   @Inject
@@ -74,6 +75,7 @@ public class MyLanguageServerImpl implements LanguageServer {
       TextDocumentService textService,
       CobolWorkspaceService workspaceService,
       Provider<LanguageClient> clientProvider,
+      // TODO: Remove the provider and inject the settings directly
       Provider<SettingsProvider> settingsProvider) {
     this.textService = textService;
     this.copybookService = copybookService;

@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
@@ -47,8 +46,15 @@ import static org.mockito.Mockito.when;
 @Slf4j
 public class CopybookServiceE2ETest extends FileSystemConfiguration {
   public static final String CPY_NAME_WITHOUT_EXT = "copy2";
-  private DataBusBroker broker =
-      (DefaultDataBusBroker) LangServerCtx.getInjector().getInstance(DataBusBroker.class);
+  private DataBusBroker broker = new DefaultDataBusBroker();
+
+  // TODO
+  /*
+    - remove popup
+  - when delete copybook we should see syntax error
+
+     */
+
   private Provider<ConfigurationSettingsStorable> configurationSettingsProvider =
       mock(Provider.class);
 
