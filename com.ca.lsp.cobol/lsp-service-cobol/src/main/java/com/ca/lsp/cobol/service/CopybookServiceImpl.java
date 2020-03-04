@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.ca.lsp.cobol.service.delegates.communications.CopybookMessageInfo.*;
-import static com.ca.lsp.cobol.service.utils.FileSystemUtil.*;
+import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
 
 @Singleton
 @Slf4j
@@ -154,7 +154,7 @@ public class CopybookServiceImpl implements CopybookService {
    * @param targetFolderPath physical path of workspace where to search for the copybook
    * @return Path of the found copybook in the target folder.
    */
-  protected Path applySearch(String fileName, Path targetFolderPath) {
+  private Path applySearch(String fileName, Path targetFolderPath) {
     try (Stream<Path> pathStream =
         Files.find(
             targetFolderPath,
@@ -252,10 +252,11 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private void selectAppropriateMessageForCommunication() {
-    if (copybookFolderNotDefined()) {
-      communications.notifyCopybookMessageInfo(COPYBOOK_FOLDER_MISS);
-    }
+    checkCopybookFolderNotDefined();
+    checkSettingsNotDefined();
+  }
 
+  private void checkSettingsNotDefined() {
     if (settingsNotDefined()) {
       communications.notifyCopybookMessageInfo(NO_SETTINGS);
     } else if (datasetSettingsNotDefined()) {
@@ -263,8 +264,14 @@ public class CopybookServiceImpl implements CopybookService {
     }
   }
 
+  private void checkCopybookFolderNotDefined() {
+    if (copybookFolderNotDefined()) {
+      communications.notifyLogMessageInfo(COPYBOOK_FOLDER_MISS);
+    }
+  }
+
   private boolean datasetSettingsNotDefined() {
-    return configurationSettingsStorableProvider.get().getPaths() == null;
+    return configurationSettingsStorableProvider.get().getPaths().isEmpty();
   }
 
   private boolean missingInformationToSearchCopybooks() {
@@ -272,8 +279,7 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private boolean settingsNotDefined() {
-    return (configurationSettingsStorableProvider.get().getProfiles() == null)
-        && (configurationSettingsStorableProvider.get().getPaths() == null);
+    return configurationSettingsStorableProvider.get() == null;
   }
 
   private boolean copybookFolderNotDefined() {

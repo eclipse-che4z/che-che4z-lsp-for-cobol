@@ -15,7 +15,6 @@ package com.ca.lsp.cobol;
 
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.providers.SettingsProvider;
-import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.junit.After;
@@ -43,9 +42,6 @@ public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String COPYBOOK_CONTENT =
       "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
   protected static final String WORKSPACE_FOLDER_NAME = "test";
-  protected static final String WS_FOLDER_NAME = "WORKSPACE";
-  protected static final String CPYB_FOLDER_NAME = ".copybooks";
-  protected static final String CPYB_INNER_NAME = "INNER";
   protected static final String CPY_OUTER_NAME_ONLY2 = "copy2";
   protected static final String EMPTY_COPYBOOK_NAME = " ";
   protected static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
@@ -61,7 +57,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
   protected Path copybooksFolderPath = null;
   protected Path depenencyFileFolderPath = null;
 
-  protected Provider<SettingsProvider> configurationSettingsProvider = Mockito.mock(Provider.class);
+  protected SettingsProvider settingsProvider = Mockito.mock(SettingsProvider.class);
 
   // this field represent the predefined setting used for test purposes
   protected ConfigurationSettingsStorable configurationSettingsStorable = null;
@@ -107,7 +103,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
           .map(Path::toFile)
           .forEach(File::delete);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e.getMessage());
     }
   }
 
@@ -116,13 +112,14 @@ public class FileSystemConfiguration extends ConfigurableTest {
    * settings.json
    */
   private void intializeSettings() {
-    SettingsProvider settingsProvider = new SettingsProvider();
+    // SettingsProvider settingsProvider = new SettingsProvider();
 
     configurationSettingsStorable =
-        new ConfigurationSettingsStorable(PROFILE_NAME, Arrays.asList(DSNAME_1, DSNAME_2));
+        new ConfigurationSettingsStorable(
+            PROFILE_NAME, Collections.unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2)));
 
     settingsProvider.set(configurationSettingsStorable);
-    when(configurationSettingsProvider.get()).thenReturn(settingsProvider);
+    when(settingsProvider.get()).thenReturn(configurationSettingsStorable);
   }
 
   protected List<WorkspaceFolder> generateWorkspaceFolder() {
@@ -153,12 +150,12 @@ public class FileSystemConfiguration extends ConfigurableTest {
   }
 
   private void createCopybookFiles() {
-    ConfigurationSettingsStorable configSettings = configurationSettingsProvider.get().get();
+    ConfigurationSettingsStorable configSettings = settingsProvider.get();
 
     String profile = (String) configSettings.getProfiles();
     List<String> targetDatasets = configSettings.getPaths();
 
-    List<Path> retriviedPaths =
+    List<Path> retrievedPaths =
         targetDatasets.stream()
             .map(
                 it ->
@@ -170,8 +167,8 @@ public class FileSystemConfiguration extends ConfigurableTest {
                             + it))
             .collect(Collectors.toList());
 
-    retriviedPaths.forEach(this::createFolderStructure);
-    retriviedPaths.forEach(
+    retrievedPaths.forEach(this::createFolderStructure);
+    retrievedPaths.forEach(
         targetPath ->
             generateDummyContentForFile(
                 targetPath, CPY_INNER_FILE_NAME_WITH_EXT, COPYBOOK_CONTENT));

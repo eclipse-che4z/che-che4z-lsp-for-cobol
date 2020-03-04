@@ -30,7 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static com.ca.lsp.cobol.service.utils.FileSystemUtil.*;
+import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
 
 /** This class is responsible for everything is related with the copybook dependency manangement */
 @Slf4j
@@ -71,7 +71,7 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
   public void updateDependencyList(Path dependencyFilePath, String copybookName) {
     if (dependencyFilePath != null) {
       List<String> lines = getContentFromDependencyFile(dependencyFilePath);
-      if (lines != null && !lines.contains(copybookName) && !" ".equals(copybookName)) {
+      if (lines != null && !lines.contains(copybookName)) {
         writeOnFile(dependencyFilePath, copybookName);
       }
     }

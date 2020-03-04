@@ -35,7 +35,7 @@ import java.util.List;
  */
 @Slf4j
 @UtilityClass
-public class FileSystemUtil {
+public class FileSystemUtils {
   private final List<String> ALLOWED_EXTENSIONS = Arrays.asList("cpy", "cbl", "cobol", "cob");
 
   /** @return the representation os based of the FS separator */
@@ -76,7 +76,7 @@ public class FileSystemUtil {
         && !currentFile.isDirectory()
         && currentFile.getName().contains(".")
         && FilenameUtils.getBaseName(currentFile.getName()).equalsIgnoreCase(requiredName)
-        && haveFileValidExtension(currentFile.getAbsoluteFile().toString().toLowerCase());
+        && hasFileValidExtension(currentFile.getAbsoluteFile().toString().toLowerCase());
   }
 
   /**
@@ -85,7 +85,7 @@ public class FileSystemUtil {
    * @param fullPath file full path with extension
    * @return true if the file have a valid extension false otherwise
    */
-  public boolean haveFileValidExtension(String fullPath) {
+  public boolean hasFileValidExtension(String fullPath) {
     return ALLOWED_EXTENSIONS.stream()
         .anyMatch(ext -> ext.equalsIgnoreCase(FilenameUtils.getExtension(fullPath)));
   }

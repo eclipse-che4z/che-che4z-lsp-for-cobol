@@ -13,8 +13,8 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
@@ -22,6 +22,7 @@ import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
+import com.google.inject.Guice;
 import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Duration;
@@ -33,6 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
+import static java.util.Collections.unmodifiableList;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -46,14 +48,8 @@ import static org.mockito.Mockito.when;
 @Slf4j
 public class CopybookServiceE2ETest extends FileSystemConfiguration {
   public static final String CPY_NAME_WITHOUT_EXT = "copy2";
-  private DataBusBroker broker = new DefaultDataBusBroker();
-
-  // TODO
-  /*
-    - remove popup
-  - when delete copybook we should see syntax error
-
-     */
+  private final DataBusBroker broker =
+      Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
 
   private Provider<ConfigurationSettingsStorable> configurationSettingsProvider =
       mock(Provider.class);
@@ -67,7 +63,8 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
     // folders
     when(configurationSettingsProvider.get())
         .thenReturn(
-            new ConfigurationSettingsStorable("myProfile", Arrays.asList(DSNAME_1, DSNAME_2)));
+            new ConfigurationSettingsStorable(
+                "myProfile", unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2))));
 
     CopybookServiceImpl copybookService =
         new CopybookServiceImpl(

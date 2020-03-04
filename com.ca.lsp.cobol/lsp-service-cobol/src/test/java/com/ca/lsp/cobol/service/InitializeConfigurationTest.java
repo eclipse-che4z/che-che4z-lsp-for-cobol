@@ -20,7 +20,6 @@ import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import com.ca.lsp.cobol.utils.ServiceTestUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.inject.Provider;
 import org.eclipse.lsp4j.ConfigurationParams;
 import org.eclipse.lsp4j.InitializedParams;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -32,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Collections.unmodifiableList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
 public class InitializeConfigurationTest {
   private LanguageClient client = Mockito.mock(LanguageClient.class);
   private ClientProvider provider = new ClientProvider();
-  private Provider<SettingsProvider> configurationSettingsProvider = Mockito.mock(Provider.class);
+  private SettingsProvider settingsProvider = Mockito.mock(SettingsProvider.class);
   private static final String PROFILE_NAME = "myProfile";
   protected static final String DSNAME_1 = "HLQLF01.DSNAME1";
   protected static final String DSNAME_2 = "HLQLF01.DSNAME2";
@@ -55,15 +55,13 @@ public class InitializeConfigurationTest {
   public void testInitializeConfiguration() {
     provider.set(client);
 
-    // create dummy settings
-    SettingsProvider settingsProvider = new SettingsProvider();
-    settingsProvider.set(
-        new ConfigurationSettingsStorable(PROFILE_NAME, Arrays.asList(DSNAME_1, DSNAME_2)));
-
-    when(configurationSettingsProvider.get()).thenReturn(settingsProvider);
+    when(settingsProvider.get())
+        .thenReturn(
+            new ConfigurationSettingsStorable(
+                PROFILE_NAME, unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2))));
 
     MyLanguageServerImpl langServer =
-        new MyLanguageServerImpl(null, null, null, provider, configurationSettingsProvider);
+        new MyLanguageServerImpl(null, null, null, provider, settingsProvider);
 
     ConfigurationParams params = ServiceTestUtils.createParams();
     List<Object> list = new ArrayList<>();

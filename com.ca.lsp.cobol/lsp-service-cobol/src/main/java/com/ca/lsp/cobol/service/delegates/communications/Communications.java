@@ -33,5 +33,7 @@ public interface Communications {
 
   void notifyThatExtensionIsUnsupported(String extension);
 
-  void notifyCopybookMessageInfo(CopybookMessageInfo missInformation);
+  void notifyCopybookMessageInfo(CopybookMessageInfo copybookMessageInfo);
+
+  void notifyLogMessageInfo(CopybookMessageInfo copybookMessageInfo);
 }

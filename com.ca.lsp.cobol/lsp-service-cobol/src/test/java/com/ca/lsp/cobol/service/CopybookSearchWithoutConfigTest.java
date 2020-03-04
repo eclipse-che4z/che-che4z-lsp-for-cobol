@@ -23,6 +23,7 @@ import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
 import com.google.inject.Provider;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.junit.After;
 import org.junit.Before;
@@ -47,6 +48,7 @@ import static org.mockito.Mockito.*;
  * related to the search copybook without a copybook folder or without settings, and write/update
  * dependency file without a dependency folder.
  */
+@Slf4j
 public class CopybookSearchWithoutConfigTest {
   private static final String CPY_NAME = "ACPYTEST";
   private DataBusBroker dataBusBroker = mock(DataBusBroker.class);
@@ -83,7 +85,7 @@ public class CopybookSearchWithoutConfigTest {
           .map(Path::toFile)
           .forEach(File::delete);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e.getMessage());
     }
   }
 
@@ -97,14 +99,15 @@ public class CopybookSearchWithoutConfigTest {
     // preprocessor found a copybook.
 
     // when asking for a setting config we'll give an empty object as defined in the API
-    when(settingsProvider.get()).thenReturn(ConfigurationSettingsStorable.builder().build());
+    when(settingsProvider.get())
+        .thenReturn(ConfigurationSettingsStorable.generateDefaultConfigurationSettingsStorable());
 
     try {
       copybookService.observerCallback(requiredCopybookEvent);
       verifyThatDepFileIsEngaged();
       verify(communications, times(1)).notifyCopybookMessageInfo(NO_SETTINGS);
     } catch (Exception e) {
-      fail();
+      fail(e.getMessage());
     }
   }
 
@@ -116,15 +119,15 @@ public class CopybookSearchWithoutConfigTest {
   public void findCopybookWithOnlyProfileDefined() {
     // simulate that user have not provided settings for profile and datasetlist but the
     // preprocessor found a copybook.
-
-    when(settingsProvider.get()).thenReturn(new ConfigurationSettingsStorable("myProfile", null));
+    when(settingsProvider.get())
+        .thenReturn(new ConfigurationSettingsStorable("myProfile", Collections.emptyList()));
 
     try {
       copybookService.observerCallback(requiredCopybookEvent);
       verifyThatDepFileIsEngaged();
       verify(communications, times(1)).notifyCopybookMessageInfo(NO_DATASET_IN_SETTINGS);
     } catch (Exception e) {
-      fail();
+      fail(e.getMessage());
     }
   }
 
@@ -135,17 +138,13 @@ public class CopybookSearchWithoutConfigTest {
   @Test
   public void findCopybookWithoutCopybookFolderDefined() {
     when(settingsProvider.get())
-        .thenReturn(
-            ConfigurationSettingsStorable.builder()
-                .profiles("PRF")
-                .paths(Collections.singletonList("HLQ.DS1"))
-                .build());
+        .thenReturn(new ConfigurationSettingsStorable("PRF", Collections.singletonList("HLQ.DS1")));
     try {
       copybookService.observerCallback(requiredCopybookEvent);
       verifyThatDepFileIsEngaged();
-      verify(communications, times(1)).notifyCopybookMessageInfo(COPYBOOK_FOLDER_MISS);
+      verify(communications, times(1)).notifyLogMessageInfo(COPYBOOK_FOLDER_MISS);
     } catch (Exception e) {
-      fail();
+      fail(e.getMessage());
     }
   }
 
@@ -171,6 +170,7 @@ public class CopybookSearchWithoutConfigTest {
     try {
       return Files.createDirectories(copybooksPath);
     } catch (IOException e) {
+      log.error(e.getMessage());
       return null;
     }
   }

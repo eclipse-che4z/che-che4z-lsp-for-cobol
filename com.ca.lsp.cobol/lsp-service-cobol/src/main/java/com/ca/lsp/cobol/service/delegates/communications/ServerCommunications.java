@@ -126,6 +126,14 @@ public class ServerCommunications implements Communications {
                 "Error during the copybook analysis, reason: " + copybookMessageInfo.getMessage()));
   }
 
+  @Override
+  public void notifyLogMessageInfo(CopybookMessageInfo copybookMessageInfo) {
+    CompletableFuture.runAsync(
+        () ->
+            getClient()
+                .logMessage(new MessageParams(MessageType.Info, copybookMessageInfo.getMessage())));
+  }
+
   /**
    * This method raise a diagnostic message to the client with syntax error retrivied by the Cobol
    * LSP server

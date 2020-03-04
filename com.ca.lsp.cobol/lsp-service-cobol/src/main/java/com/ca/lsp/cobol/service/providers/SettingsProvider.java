@@ -23,10 +23,8 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 
@@ -40,9 +38,13 @@ import java.lang.reflect.Type;
 public class SettingsProvider
     implements Provider<ConfigurationSettingsStorable>, EventObserver<FetchedSettingsEvent> {
   private ConfigurationSettingsStorable configurationSettingsStorable;
-  @Getter private DataBusBroker databus;
+  private DataBusBroker databus;
 
-  public SettingsProvider() {}
+  @Inject
+  public SettingsProvider(DataBusBroker databus) {
+    this.databus = databus;
+    this.databus.subscribe(DataEventType.FETCHED_SETTINGS_EVENT, this);
+  }
 
   public void set(@Nullable ConfigurationSettingsStorable configurationSettingsStorable) {
     this.configurationSettingsStorable = configurationSettingsStorable;
@@ -57,29 +59,7 @@ public class SettingsProvider
   @Override
   @Nullable
   public ConfigurationSettingsStorable get() {
-    if (configurationSettingsStorable != null) {
-      return deepCopy(configurationSettingsStorable);
-    } else {
-      return ConfigurationSettingsStorable.builder().build();
-    }
-  }
-
-  // TODO: We don't need to set the databus but we should modify the constructor to inject it. At
-  // startup lang server also should inject it.
-  /** @param databus the channel used for receive message about {@link FetchedSettingsEvent} */
-  @Inject
-  public void setDatabus(@Nonnull DataBusBroker databus) {
-    this.databus = databus;
-    this.databus.subscribe(DataEventType.FETCHED_SETTINGS_EVENT, this);
-  }
-
-  // TODO: changing the annotation (test it before please) we can get rid of this deep copy
-  private static ConfigurationSettingsStorable deepCopy(
-      ConfigurationSettingsStorable configurationSettingsStorable) {
-    return ConfigurationSettingsStorable.builder()
-        .profiles(configurationSettingsStorable.getProfiles())
-        .paths(configurationSettingsStorable.getPaths())
-        .build();
+    return configurationSettingsStorable;
   }
 
   /**

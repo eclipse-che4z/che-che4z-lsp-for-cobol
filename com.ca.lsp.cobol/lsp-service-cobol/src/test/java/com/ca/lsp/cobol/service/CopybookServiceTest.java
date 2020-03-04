@@ -15,28 +15,51 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
+import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
+import com.ca.lsp.cobol.service.delegates.communications.Communications;
+import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
+import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
 
 @Slf4j
 public class CopybookServiceTest extends FileSystemConfiguration
     implements EventObserver<RequiredCopybookEvent> {
 
-  private CopybookServiceImpl copybookService =
-      (CopybookServiceImpl) LangServerCtx.getInjector().getInstance(CopybookService.class);
+  //  private CopybookServiceImpl copybookService =
+  //      (CopybookServiceImpl) LangServerCtx.getInjector().getInstance(CopybookService.class);
+
+  DataBusBroker dataBus = mock(DataBusBroker.class);
+  Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider =
+      mock(Provider.class);
+  Communications communications = mock(Communications.class);
+  CopybookDependencyService dependencyService = mock(CopybookDependencyService.class);
+  /*
+   DataBusBroker dataBus,
+     Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider,
+     CopybookDependencyService dependencyService,
+     Communications communications
+  */
+
+  CopybookService copybookService =
+      new CopybookServiceImpl(
+          dataBus, configurationSettingsStorableProvider, dependencyService, communications);
 
   // Activities performed
   // 1 - Create folder structure in temp folder - Create two copybooks in the provided
@@ -77,14 +100,14 @@ public class CopybookServiceTest extends FileSystemConfiguration
    * content of the copybook, null otherwise.
    */
   @Test
-  public void getContentByCopybookName() {
+  public void getContentByCopybookName() throws IOException {
     Path path =
         copybookService.findCopybook(
             CPY_OUTER_NAME_ONLY2,
             (String) configurationSettingsStorable.getProfiles(),
             configurationSettingsStorable.getPaths());
 
-    assertNotNull(copybookService.retrieveContentByPath(path));
+    assertTrue(Files.readAllBytes(path).length > 0);
   }
 
   /**

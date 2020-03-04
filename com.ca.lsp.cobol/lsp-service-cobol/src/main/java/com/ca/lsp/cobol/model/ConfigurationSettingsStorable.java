@@ -14,24 +14,28 @@
 
 package com.ca.lsp.cobol.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * This class act as a DTO to store the settings information provided by the user and required to
  * search copybooks on MF and in the copybook folder.
  */
-@Data
-// TODO: Change to value annotation
+@Value
 public class ConfigurationSettingsStorable {
   private Object profiles;
   private List<String> paths;
+  //
+  //  @Builder
+  //  public ConfigurationSettingsStorable(Object profiles, List<String> paths) {
+  //    this.profiles = profiles;
+  //    this.paths = paths;
+  //    // this.paths = Collections.unmodifiableList(paths);
+  //  }
 
-  @Builder
-  public ConfigurationSettingsStorable(Object profiles, List<String> paths) {
-    this.profiles = profiles;
-    this.paths = paths;
+  public static ConfigurationSettingsStorable generateDefaultConfigurationSettingsStorable() {
+    return new ConfigurationSettingsStorable(null, Collections.emptyList());
   }
 }

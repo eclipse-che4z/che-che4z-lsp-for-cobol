@@ -15,9 +15,7 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.FileSystemConfiguration;
-import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -36,9 +34,7 @@ import static org.junit.Assert.assertEquals;
 /** This class represent all the unit test for the copybook dependency managament service */
 @Slf4j
 public class DependencyServiceTest extends FileSystemConfiguration {
-  private CopybookDependencyServiceImpl dependencyService =
-      (CopybookDependencyServiceImpl)
-          LangServerCtx.getInjector().getInstance(CopybookDependencyService.class);
+  private CopybookDependencyServiceImpl dependencyService = new CopybookDependencyServiceImpl();
 
   @Before
   public void initActivities() {

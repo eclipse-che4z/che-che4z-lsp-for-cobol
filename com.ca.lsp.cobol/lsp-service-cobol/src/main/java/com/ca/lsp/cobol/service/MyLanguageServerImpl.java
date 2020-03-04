@@ -67,7 +67,7 @@ public class MyLanguageServerImpl implements LanguageServer {
   private CopybookService copybookService;
   private Provider<LanguageClient> clientProvider;
 
-  private Provider<SettingsProvider> settingsProvider;
+  private SettingsProvider settingsProvider;
 
   @Inject
   MyLanguageServerImpl(
@@ -75,8 +75,7 @@ public class MyLanguageServerImpl implements LanguageServer {
       TextDocumentService textService,
       CobolWorkspaceService workspaceService,
       Provider<LanguageClient> clientProvider,
-      // TODO: Remove the provider and inject the settings directly
-      Provider<SettingsProvider> settingsProvider) {
+      SettingsProvider settingsProvider) {
     this.textService = textService;
     this.copybookService = copybookService;
     this.workspaceService = workspaceService;
@@ -124,11 +123,7 @@ public class MyLanguageServerImpl implements LanguageServer {
    */
   void retrieveAndStoreConfiguration() {
     fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
-        .thenAccept(e -> getSettingsFromProvider().set(parseJsonIfValid((JsonObject) e.get(0))));
-  }
-
-  private SettingsProvider getSettingsFromProvider() {
-    return settingsProvider.get();
+        .thenAccept(e -> settingsProvider.set(parseJsonIfValid((JsonObject) e.get(0))));
   }
 
   /**
@@ -142,7 +137,7 @@ public class MyLanguageServerImpl implements LanguageServer {
       return gson.fromJson(jsonObject, ConfigurationSettingsStorable.class);
     } catch (JsonSyntaxException e) {
       log.error(e.getMessage());
-      return ConfigurationSettingsStorable.builder().build();
+      return ConfigurationSettingsStorable.generateDefaultConfigurationSettingsStorable();
     }
   }
 
