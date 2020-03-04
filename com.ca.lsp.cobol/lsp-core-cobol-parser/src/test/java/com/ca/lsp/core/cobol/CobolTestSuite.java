@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.core.cobol;
 
-import com.ca.lsp.core.cobol.engine.CobolLanguageEngineTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolCommentEntriesMarkerImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolInlineCommentEntriesNormalizerImplTest;
@@ -36,7 +35,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
   CobolLineReaderImplTest.class,
   ContinuationLineTransformationTest.class,
-  CobolLanguageEngineTest.class,
   CobolCommentEntriesMarkerImplTest.class,
   CobolVariableContextTest.class,
   CobolVariableCheckTest.class,
