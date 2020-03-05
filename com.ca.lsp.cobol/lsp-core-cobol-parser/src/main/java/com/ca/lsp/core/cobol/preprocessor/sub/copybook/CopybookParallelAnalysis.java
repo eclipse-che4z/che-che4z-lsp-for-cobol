@@ -16,12 +16,13 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
+import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.google.common.collect.Multimap;
-import lombok.AllArgsConstructor;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -33,9 +34,15 @@ import static java.lang.String.format;
 import static java.util.concurrent.ForkJoinTask.invokeAll;
 import static java.util.stream.Collectors.toList;
 
-@AllArgsConstructor
+@Singleton
 public class CopybookParallelAnalysis implements CopybookAnalysis {
   private static final String ERROR_SUGGESTION = "%s: Copybook not found";
+  private AnalyseCopybookTaskFactory factory;
+
+  @Inject
+  public CopybookParallelAnalysis(AnalyseCopybookTaskFactory factory) {
+    this.factory = factory;
+  }
 
   @Override
   public ResultWithErrors<List<CopybookSemanticContext>> analyzeCopybooks(
@@ -120,7 +127,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
     return names.asMap().entrySet().stream()
         .map(
             it ->
-                new AnalyseCopybookTask(
+                factory.create(
                     documentUri,
                     new CopybookUsage(it.getKey(), documentUri, it.getValue()),
                     copybookUsageTracker,

@@ -15,15 +15,18 @@
  */
 package com.ca.lsp.core.cobol.semantics;
 
+import com.broadcom.lsp.cdi.EngineModule;
+import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
+import com.google.inject.Guice;
 import org.junit.Test;
 
-import static com.ca.lsp.core.cobol.engine.CobolLanguageEngineTest.DID_CHANGE;
-import static com.ca.lsp.core.cobol.engine.CobolLanguageEngineTest.DID_OPEN;
 import static org.junit.Assert.assertEquals;
 
 public class CobolVariableCheckTest {
+  private static final String DID_OPEN = "DID_OPEN";
+  private static final String DID_CHANGE = "DID_CHANGE";
 
   /**
    * This test represent the semantic check for variable in PROCEDURE DIVISION section There are
@@ -105,7 +108,9 @@ public class CobolVariableCheckTest {
    */
   @Test
   public void test() {
-    CobolLanguageEngine engine = new CobolLanguageEngine();
+    CobolLanguageEngine engine =
+        Guice.createInjector(new EngineModule(), new DatabusModule())
+            .getInstance(CobolLanguageEngine.class);
     ResultWithErrors<SemanticContext> result;
 
     // SCENARIO FOR DID_OPEN

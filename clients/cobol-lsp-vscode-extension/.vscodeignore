@@ -13,6 +13,7 @@
 .vscode/**
 typings/**
 out/test/**
+coverage/**
 test/**
 src/**
 images/**

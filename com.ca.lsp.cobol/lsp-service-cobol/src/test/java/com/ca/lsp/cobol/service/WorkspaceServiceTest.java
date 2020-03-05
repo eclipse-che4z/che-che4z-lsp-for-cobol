@@ -125,7 +125,9 @@ public class WorkspaceServiceTest {
    */
   @Test
   public void testDidChangeWatchedFilesExistingFileChanged() {
-    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/COPYBOOKS/CpyName.cpy", Changed));
+    checkWatchers(
+        new FileEvent(
+            "file:///c%3A/workspace/COBOL/.copybooks/CpyName.cpy", Changed));
   }
 
   /**
@@ -134,7 +136,7 @@ public class WorkspaceServiceTest {
    */
   @Test
   public void testDidChangeWatchedFilesAddedNewFile() {
-    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/COPYBOOKS", Changed));
+    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks", Changed));
   }
 
   private void checkWatchers(FileEvent event) {

@@ -1,5 +1,6 @@
 package com.ca.lsp.cobol.service.mocks;
 
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
@@ -27,10 +28,10 @@ import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 public class MockWorkspaceService implements CobolWorkspaceService {
 
   @Setter private CopybooksMock copybooks;
-  private final DefaultDataBusBroker dataBus;
+  private final DataBusBroker dataBus;
 
   @Inject
-  public MockWorkspaceService(DefaultDataBusBroker dataBus) {
+  public MockWorkspaceService(DataBusBroker dataBus) {
     this.dataBus = dataBus;
     dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
   }

@@ -28,6 +28,7 @@
     <revision>0.10.1</revision>
     <lsp4j.version>0.5.0</lsp4j.version>
     <antlr.version>4.7.1</antlr.version>
+    <guice.version>4.2.2</guice.version>
   </properties>
 
   <dependencyManagement>
@@ -108,9 +109,14 @@
       <dependency>
         <groupId>com.google.inject</groupId>
         <artifactId>guice</artifactId>
-        <version>4.2.2</version>
+        <version>${guice.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.google.inject.extensions</groupId>
+        <artifactId>guice-assistedinject</artifactId>
+        <version>${guice.version}</version>
+      </dependency>
+        <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>28.1-jre</version>

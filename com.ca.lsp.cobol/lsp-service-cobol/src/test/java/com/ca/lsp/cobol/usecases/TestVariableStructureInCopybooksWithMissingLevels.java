@@ -14,12 +14,12 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import org.junit.Test;
 
 import java.util.Collections;
+
+import static java.util.Collections.singletonList;
 
 /**
  * This test verifies that the variable structure can be built correctly with copybooks and that
@@ -45,15 +45,11 @@ public class TestVariableStructureInCopybooksWithMissingLevels extends PositiveU
 
   public TestVariableStructureInCopybooksWithMissingLevels() {
     super(TEXT);
-
-    MockWorkspaceService workspaceService =
-        LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
-    workspaceService.setCopybooks(() -> Collections.singletonList(new CobolText("STRUCT", STRUCT)));
   }
 
   @Override
   @Test
   public void test() {
-    super.test();
+    super.test(singletonList(new CobolText("STRUCT", STRUCT)));
   }
 }
