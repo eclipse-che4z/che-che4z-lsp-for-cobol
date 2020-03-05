@@ -34,6 +34,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import javax.annotation.Nonnull;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -162,7 +163,8 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @SneakyThrows
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
-    String uri = params.getTextDocument().getUri();
+    // decode the URI in UTF-8 to avoid issue with special chars
+    String uri = URLDecoder.decode(params.getTextDocument().getUri(), "UTF-8");
     // A better implementation that will cover the gitfs scenario will be implementated later based
     // on issue #173
     if (uri.startsWith(GIT_FS_URI)) {
@@ -228,7 +230,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text,TextDocumentSyncType.DID_OPEN);
+              AnalysisResult result = engine.analyze(uri, text, TextDocumentSyncType.DID_OPEN);
               ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
               publishResult(uri, result);
             })
@@ -238,7 +240,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   void analyzeChanges(String uri, String text) {
     runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text,TextDocumentSyncType.DID_CHANGE);
+              AnalysisResult result = engine.analyze(uri, text, TextDocumentSyncType.DID_CHANGE);
               registerDocument(uri, new MyDocumentModel(text, result));
               communications.publishDiagnostics(uri, result.getDiagnostics());
             })
