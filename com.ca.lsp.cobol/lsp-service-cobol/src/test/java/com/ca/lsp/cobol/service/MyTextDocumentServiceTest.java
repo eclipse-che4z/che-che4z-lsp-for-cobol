@@ -276,10 +276,10 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       String uri) {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
-
     verify(communications).notifyThatLoadingInProgress(uri);
     verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
-    verify(communications).publishDiagnostics(uri, diagnostics);
+    verify(communications, timeout(10000)).cancelProgressNotification(uri);
+    verify(communications, timeout(10000)).publishDiagnostics(uri, diagnostics);
   }
 
   private void verifyCallback(
