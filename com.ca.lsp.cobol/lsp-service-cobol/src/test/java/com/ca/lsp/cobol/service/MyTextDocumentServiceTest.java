@@ -277,8 +277,8 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
 
-    verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
     verify(communications).notifyThatLoadingInProgress(uri);
+    verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
     verify(communications).publishDiagnostics(uri, diagnostics);
   }
 
