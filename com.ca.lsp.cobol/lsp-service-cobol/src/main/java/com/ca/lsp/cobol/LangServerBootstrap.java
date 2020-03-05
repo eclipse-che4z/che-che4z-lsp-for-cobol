@@ -15,6 +15,7 @@
  */
 package com.ca.lsp.cobol;
 
+import com.broadcom.lsp.cdi.EngineModule;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.cdi.module.service.ServiceModule;
@@ -58,7 +59,7 @@ public class LangServerBootstrap {
   }
 
   void initCtx() {
-    LangServerCtx.getGuiceCtx(new ServiceModule(), new DatabusModule());
+    LangServerCtx.getGuiceCtx(new ServiceModule(), new EngineModule(), new DatabusModule());
   }
 
   private void start(

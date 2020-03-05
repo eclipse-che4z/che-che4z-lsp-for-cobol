@@ -19,11 +19,12 @@ import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolLexer;
 import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
-import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
+import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategy;
 import com.ca.lsp.core.cobol.visitor.CobolVisitor;
-import lombok.RequiredArgsConstructor;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -33,11 +34,18 @@ import java.util.List;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
- * Its run method is used by the service facade layer CobolLanguageEngineFacade
+ * Its run method used by the service facade layer CobolLanguageEngineFacade.
  */
 @Slf4j
-@RequiredArgsConstructor
+@Singleton
 public class CobolLanguageEngine {
+
+  private CobolPreprocessor preprocessor;
+
+  @Inject
+  public CobolLanguageEngine(CobolPreprocessor preprocessor) {
+    this.preprocessor = preprocessor;
+  }
 
   /**
    * Perform syntax and semantic analysisi for the given text document
@@ -45,13 +53,11 @@ public class CobolLanguageEngine {
    * @param documentUri unique resource identifier of the processed document
    * @param text the content of the document that should be processed
    * @param textDocumentSyncType the document sync type that can be (DID_OPEN|DID_CHANGE)
-   * @return Semantic information wrapper object and list of syntax error that might be send back to
+   * @return Semantic information wrapper object and list of syntax error that might send back to
    *     the client
    */
   public ResultWithErrors<SemanticContext> run(
       String documentUri, String text, String textDocumentSyncType) {
-
-    CobolPreprocessorImpl preprocessor = new CobolPreprocessorImpl();
 
     ResultWithErrors<PreprocessedInput> preProcessedInput =
         preprocessor.process(documentUri, text, textDocumentSyncType);

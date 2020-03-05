@@ -14,17 +14,14 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-/** This test checks that if a copybook is not found than error is shown. */
+/** This test checks that if a copybook not found then error shown. */
 public class TestMissingCopybooksReturnsError extends NegativeUseCase {
 
   private static final String TEXT =
@@ -37,10 +34,6 @@ public class TestMissingCopybooksReturnsError extends NegativeUseCase {
 
   public TestMissingCopybooksReturnsError() {
     super(TEXT);
-
-    MockWorkspaceService workspaceService =
-        LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
-    workspaceService.setCopybooks(Collections::emptyList);
   }
 
   @Override
