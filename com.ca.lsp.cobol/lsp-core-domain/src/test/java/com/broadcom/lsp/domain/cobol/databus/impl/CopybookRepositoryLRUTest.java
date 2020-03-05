@@ -22,7 +22,11 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.internal.util.reflection.FieldSetter;
 
+import java.lang.reflect.Field;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.NoSuchElementException;
 
 import static org.junit.Assert.*;
@@ -30,7 +34,7 @@ import static org.junit.Assert.*;
 @Slf4j
 public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
   private CopybookRepositoryLRU repository;
-  private static final int CACHE_SIZE = 2;
+  private static final int CACHE_SIZE = 4;
   private CopybookStorable storable = getDummyStorable();
 
   @Before
@@ -63,6 +67,60 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
   }
 
   /**
+   * This test validates that the cache is throwing the expired elements away, the elements which
+   * are older than 3h
+   *
+   * @throws NoSuchFieldException
+   */
+  @Test
+  public void testCacheExpiration() throws NoSuchFieldException {
+    long genDt = Instant.now().minus(4, ChronoUnit.HOURS).getEpochSecond();
+
+    CopybookStorable storableCpy = new CopybookStorable("REMOVE", "URI", "DUMMY CONTENT");
+    Field f = storableCpy.getClass().getDeclaredField("genDt");
+    f.setAccessible(true);
+    FieldSetter.setField(storableCpy, f, genDt);
+
+    repository.persist(storableCpy);
+    repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO232", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
+
+    assertEquals(3, repository.size());
+  }
+
+  /**
+   * This test validates the cache sort mechanism, first is sorted by the hits and after by the
+   * time, it is worth to mention that we need to put the thread asleep for 1ms in order to have a
+   * time difference at the creation moment, if not it will not differentiate and the order will be
+   * not the expected one
+   *
+   * @throws InterruptedException
+   */
+  @Test
+  public void testCacheSort() throws InterruptedException {
+    CopybookStorable topElem = new CopybookStorable("NEW_STO3", "URI", "DUMMY CONTENT");
+    Thread.sleep(1);
+    CopybookStorable lastElem = new CopybookStorable("NEW_STO1", "URI", "DUMMY CONTENT");
+
+    repository.persist(topElem);
+    repository.persist(lastElem);
+    repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO2", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO3", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO3", "URI", "DUMMY CONTENT"));
+
+    assertEquals(topElem.getName(), repository.topItem().get().getName());
+    assertEquals(topElem.getContent(), repository.topItem().get().getContent());
+    assertEquals(lastElem.getName(), repository.lastItem().get().getName());
+    assertEquals(lastElem.getContent(), repository.lastItem().get().getContent());
+    assertEquals(CACHE_SIZE, repository.size());
+  }
+
+  /**
    * This test verify that when a new element should be stored in a full cache, the oldest element
    * is removed from the cache
    */
@@ -73,9 +131,18 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
     repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
     LOG.info("Cache sizing after NEW_STO = " + repository.size());
 
+    repository.persist(new CopybookStorable("NEW_STO2 ", "URI2", "DUMMY CONTENT2"));
+    LOG.info("Cache sizing after NEW_STO = " + repository.size());
+
+    repository.persist(new CopybookStorable("NEW_STO3 ", "URI2", "DUMMY CONTENT2"));
+    LOG.info("Cache sizing after NEW_STO = " + repository.size());
+
+    repository.persist(new CopybookStorable("NEW_STO4 ", "URI2", "DUMMY CONTENT2"));
+    LOG.info("Cache sizing after NEW_STO = " + repository.size());
+
     int prevCacheSize = repository.size();
 
-    repository.persist(new CopybookStorable("NEW_STO2 ", "URI2", "DUMMY CONTENT2"));
+    repository.persist(new CopybookStorable("NEW_STO5 ", "URI2", "DUMMY CONTENT2"));
     LOG.info("Cache sizing after NEW_STO = " + repository.size());
 
     assertEquals(repository.size(), prevCacheSize);
