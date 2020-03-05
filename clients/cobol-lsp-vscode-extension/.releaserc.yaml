@@ -1,8 +1,14 @@
-branches: ["development"]
+branches:
+    - master
+    - name: development
+      prerelease: alpha
+    - name: release-+([0-9]).+([0-9]).+([0-9])
+      prerelease: fix
 ci: false
 plugins:
-    - "@semantic-release/commit-analyzer"
-    - "@semantic-release/release-notes-generator"
-    - "@semantic-release/changelog"
-    - ["@semantic-release/exec", {"prepareCmd": "releaseScripts/prepare.sh ${nextRelease.version} \"${nextRelease.notes}\""}]
-    - "@semantic-release/github"
+    - @semantic-release/commit-analyzer
+    - @semantic-release/release-notes-generator
+    - @semantic-release/changelog
+    - - @semantic-release/exec
+      - prepareCmd: releaseScripts/prepare.sh ${nextRelease.version} ${branch.name} "${nextRelease.notes}"
+    - @semantic-release/github
