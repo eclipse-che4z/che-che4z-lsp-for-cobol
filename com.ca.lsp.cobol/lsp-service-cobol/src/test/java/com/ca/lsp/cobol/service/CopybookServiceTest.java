@@ -41,21 +41,11 @@ import static org.mockito.Mockito.mock;
 @Slf4j
 public class CopybookServiceTest extends FileSystemConfiguration
     implements EventObserver<RequiredCopybookEvent> {
-
-  //  private CopybookServiceImpl copybookService =
-  //      (CopybookServiceImpl) LangServerCtx.getInjector().getInstance(CopybookService.class);
-
   DataBusBroker dataBus = mock(DataBusBroker.class);
   Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider =
       mock(Provider.class);
   Communications communications = mock(Communications.class);
   CopybookDependencyService dependencyService = mock(CopybookDependencyService.class);
-  /*
-   DataBusBroker dataBus,
-     Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider,
-     CopybookDependencyService dependencyService,
-     Communications communications
-  */
 
   CopybookService copybookService =
       new CopybookServiceImpl(
@@ -163,7 +153,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
             (String) configurationSettingsStorable.getProfiles(),
             configurationSettingsStorable.getPaths()));
   }
-  //
+
   /**
    * This test verify that when the setting provide a dataset path that is not present in the
    * copybook folder the search method return null;

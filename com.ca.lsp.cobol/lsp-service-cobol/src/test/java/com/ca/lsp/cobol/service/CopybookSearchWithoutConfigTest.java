@@ -99,8 +99,7 @@ public class CopybookSearchWithoutConfigTest {
     // preprocessor found a copybook.
 
     // when asking for a setting config we'll give an empty object as defined in the API
-    when(settingsProvider.get())
-        .thenReturn(ConfigurationSettingsStorable.emptyConfigurationSettingsStorable());
+    when(settingsProvider.get()).thenReturn(null);
 
     try {
       copybookService.observerCallback(requiredCopybookEvent);
