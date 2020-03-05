@@ -16,6 +16,7 @@ import * as fs from "fs";
 import * as vscode from "vscode";
 import { DEPENDENCIES_FOLDER, SETTINGS_SECTION } from "./constants";
 import { ProfileService } from "./ProfileService";
+import { DependenciesDesc, loadDepFile } from "./services/DependencyService";
 import { CopybookProfile, DownloadQueue } from "./services/DownloadQueue";
 import { checkWorkspace, createCopybookPath, createDatasetPath } from "./services/PathUtils";
 import { ZoweApi } from "./ZoweApi";
@@ -39,12 +40,13 @@ export class CopybooksDownloader implements vscode.Disposable {
         if (!checkWorkspace()) {
             return;
         }
-        const profile: string = await this.profileService.getProfile(depFileUri);
+        const depDesc: DependenciesDesc = loadDepFile(depFileUri);
+        const profile: string = await this.profileService.getProfile(depDesc.programName);
         if (!profile) {
             return;
         }
 
-        const missingCopybooks: string[] = await this.listMissingCopybooks(depFileUri, profile);
+        const missingCopybooks: string[] = await this.listMissingCopybooks(depDesc.copybooks, profile);
 
         if (!message.length) {
             missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
@@ -166,10 +168,7 @@ export class CopybooksDownloader implements vscode.Disposable {
         }
     }
 
-    private async listMissingCopybooks(uri: vscode.Uri, profileName: string): Promise<string[]> {
-        const copybooks: string[] = fs.readFileSync(uri.fsPath).toString().split("\n")
-            .filter(e => e.trim().length > 0)
-            .map(e => e.trim());
+    private async listMissingCopybooks(copybooks: string[], profileName: string): Promise<string[]> {
 
         const copybooksToDownload: Set<string> = new Set(copybooks);
         (await this.listPathDatasets()).forEach(ds => {

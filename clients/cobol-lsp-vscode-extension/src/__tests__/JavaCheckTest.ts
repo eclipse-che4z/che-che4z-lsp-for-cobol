@@ -15,7 +15,7 @@
 import { JavaCheck } from "../services/JavaCheck";
 
 describe("Check Java version", () => {
-    it("Checks if Java version is supported", async () => {
+    it("checks if Java version is supported", async () => {
         expect(JavaCheck.isJavaVersionSupported('openjdk version "1.8.0-internal"')).toBeTruthy();
         expect(JavaCheck.isJavaVersionSupported('java version "1.8.0_181"')).toBeTruthy();
         expect(JavaCheck.isJavaVersionSupported('openjdk version "1.11.0-internal"')).toBeTruthy();
@@ -27,7 +27,8 @@ describe("Check Java version", () => {
         expect(JavaCheck.isJavaVersionSupported('openjdk version "12.0.1" 2018-10-16')).toBeTruthy();
         expect(JavaCheck.isJavaVersionSupported("java 11 2018-09-25")).toBeTruthy();
         expect(JavaCheck.isJavaVersionSupported("java 12 2019-03-19")).toBeTruthy();
-
+    });
+    it("checks if Java version is not supported", async () => {
         expect(JavaCheck.isJavaVersionSupported('java version "1.7.0_131"')).toBeFalsy();
     });
 });

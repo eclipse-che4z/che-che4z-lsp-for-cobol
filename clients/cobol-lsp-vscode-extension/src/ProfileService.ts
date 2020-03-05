@@ -22,9 +22,12 @@ export class ProfileService {
     constructor(private zoweApi: ZoweApi) {
     }
 
-    public async getProfile(depFile: vscode.Uri): Promise<string> {
-        const programName = this.getProgramNameFromDepFile(depFile);
-        const detectedProfile = (await this.findProfileByDependenciesFile(depFile))
+    public async listProfiles(): Promise<ProfilesMap> {
+        return this.zoweApi.listZOSMFProfiles();
+
+    }
+    public async getProfile(programName: string): Promise<string | undefined> {
+        const detectedProfile: string | undefined = (await this.findProfileByDependenciesFile(programName))
             || this.tryGetProfileFromSettings(programName);
         if (detectedProfile) {
             return detectedProfile;
@@ -63,25 +66,20 @@ export class ProfileService {
         return undefined;
     }
 
-    private async findProfileByDependenciesFile(depFile: vscode.Uri): Promise<string | undefined> {
-        const depName = path.basename(depFile.fsPath, ".dep");
+    private async findProfileByDependenciesFile(programName: string): Promise<string | undefined> {
         for (const doc of vscode.workspace.textDocuments) {
             const docPath = doc.fileName;
             if (!docPath.toLowerCase().endsWith(".cbl")) {
                 continue;
             }
-            const programName = path.basename(docPath, path.extname(docPath));
-            if (programName === depName) {
+            const openName = path.basename(docPath, path.extname(docPath));
+            if (programName === openName) {
                 return this.tryGetProfileFromDocumentPath(docPath);
             } else {
                 return undefined;
             }
         }
         return undefined;
-    }
-
-    private getProgramNameFromDepFile(depFile: vscode.Uri): string {
-        return path.basename(depFile.fsPath, ".dep");
     }
 
     private tryGetProfileFromSettings(programName: string): string | undefined {
