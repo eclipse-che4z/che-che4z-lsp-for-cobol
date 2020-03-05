@@ -74,9 +74,10 @@ export class ProfileService {
             }
             const openName = path.basename(docPath, path.extname(docPath));
             if (programName === openName) {
-                return this.tryGetProfileFromDocumentPath(docPath);
-            } else {
-                return undefined;
+                const profile = await this.tryGetProfileFromDocumentPath(docPath);
+                if (profile) {
+                    return profile;
+                }
             }
         }
         return undefined;
