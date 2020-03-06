@@ -88,7 +88,7 @@ public class CopybookRepositoryLRU implements CopybookRepository {
   @Override
   @SneakyThrows
   public synchronized void persist(@NonNull CopybookStorable deepCopy) {
-    cpyRepo.removeIf(elem -> elem.isExpired());
+    cpyRepo.removeIf(CopybookStorable::isExpired);
 
     if (!isStored(deepCopy.getId())) {
       if (cpyRepo.size() < getCacheMaxSize()) {
