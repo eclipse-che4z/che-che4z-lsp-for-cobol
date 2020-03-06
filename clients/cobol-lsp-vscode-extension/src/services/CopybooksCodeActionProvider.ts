@@ -13,7 +13,7 @@
  */
 import * as vscode from "vscode";
 
-export class CopybooksDownloaderCodeActionProvider implements vscode.CodeActionProvider {
+export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
     public provideCodeActions(doc: vscode.TextDocument, range: vscode.Range | vscode.Selection,
         // tslint:disable-next-line: align
         context: vscode.CodeActionContext, token: vscode.CancellationToken,
