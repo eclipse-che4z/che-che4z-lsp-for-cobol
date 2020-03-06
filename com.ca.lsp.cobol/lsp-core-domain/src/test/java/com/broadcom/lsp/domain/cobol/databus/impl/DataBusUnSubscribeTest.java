@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -31,7 +31,7 @@ import java.util.concurrent.TimeoutException;
  * notifications anymore.
  */
 @Slf4j
-public class DataBusUnSubscribeTest extends AbsDataBusImplTest {
+public class DataBusUnSubscribeTest extends DatabusConfigProvider {
   private DefaultDataBusBroker databus;
 
   @Before

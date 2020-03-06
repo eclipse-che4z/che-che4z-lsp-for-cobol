@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,49 +13,47 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl;
 
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
+import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineReWriter;
 
-import java.util.ArrayList;
+import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolInlineCommentEntriesNormalizer;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_TAG;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
+import static com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils.copyCobolLineWithContentArea;
+import static java.util.regex.Pattern.compile;
+import static java.util.stream.Collectors.toList;
 
-public class CobolInlineCommentEntriesNormalizerImpl
-    implements CobolInlineCommentEntriesNormalizer {
+/**
+ * The pre-processor which looks for denormalized lines and rewrites them. A line is a denormalized
+ * one if it has no space after an ANTLR comment tag.
+ */
+public class CobolInlineCommentEntriesNormalizerImpl implements CobolLineReWriter {
 
-  protected static final String DENORMALIZED_COMMENT_ENTRY_REGEX = "\\*>[^ ]";
+  private static final Pattern DENORMALIZED_COMMENT_ENTRY = compile("\\*>[^ ]");
 
-  protected final Pattern denormalizedCommentEntryPattern =
-      Pattern.compile(DENORMALIZED_COMMENT_ENTRY_REGEX);
-
+  /**
+   * Check all the lines if they have denormalized comment entries and normalize them.
+   *
+   * @param lines - a list of lines to process
+   * @return list of normalized lines
+   */
   @Override
-  public CobolLine processLine(final CobolLine line) {
-    final Matcher matcher = denormalizedCommentEntryPattern.matcher(line.getContentArea());
-    final CobolLine result;
-
-    if (!matcher.find()) {
-      result = line;
-    } else {
-      final String newContentArea = line.getContentArea().replace(COMMENT_TAG, COMMENT_TAG + WS);
-      result = CobolLine.copyCobolLineWithContentArea(newContentArea, line);
-    }
-
-    return result;
+  @Nonnull
+  public List<CobolLine> processLines(@Nonnull List<CobolLine> lines) {
+    return lines.stream().map(this::normalizeLine).collect(toList());
   }
 
-  @Override
-  public List<CobolLine> processLines(final List<CobolLine> lines) {
-    final List<CobolLine> result = new ArrayList<>();
+  @Nonnull
+  private CobolLine normalizeLine(@Nonnull CobolLine line) {
+    if (isNormal(line)) return line;
+    String newContentArea = line.getContentArea().replace(COMMENT_TAG, COMMENT_TAG + WS);
+    return copyCobolLineWithContentArea(newContentArea, line);
+  }
 
-    for (final CobolLine line : lines) {
-      final CobolLine processedLine = processLine(line);
-      result.add(processedLine);
-    }
-
-    return result;
+  private boolean isNormal(@Nonnull CobolLine line) {
+    return !DENORMALIZED_COMMENT_ENTRY.matcher(line.getContentArea()).find();
   }
 }

@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -18,7 +18,10 @@ package com.ca.lsp.cobol.service.delegates.references;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.ConfigurableTest;
+import com.ca.lsp.cobol.positive.CobolText;
+import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import java.util.Arrays;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.Before;
@@ -55,17 +58,25 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
           + "           Move inner2 of outer1 to Str.\n"
           + "           Move inner1 of outer2 to Str.\n"
           + "           Move inner2 of outer2 to Str.\n"
+          + "       COPY CPYBK1.\n"
+          + "       COPY CPYBK2.\n"
+          + "       COPY CPYBK1.\n"
           + "       End program ProgramId.";
 
   private static final Position INNER1_POSITION = new Position(16, 18);
   private static final Position OUTER1_POSITION = new Position(16, 28);
   private static final Position MAIN_POSITION = new Position(12, 10);
   private static final Position TEST_POSITION = new Position(15, 10);
+  private static final Position TEST_COPYBOOK1 = new Position(20, 14);
+  private static final Position TEST_COPYBOOK2 = new Position(21, 14);
   private static final Position DIVISION_POSITION = new Position(11, 18);
   private static final int INNER1_LENGTH = "inner1".length();
   private static final int OUTER1_LENGTH = "outer1".length();
   private static final int MAIN_LENGTH = "000-Main-Logic".length();
   private static final int TEST_LENGTH = "100-Test".length();
+  private static final int COPY_LENGTH = "CPYBK1".length();
+  private static final String COPYBOOK1 = "       COPY CPYBK1.";
+  private static final String COPYBOOK2 = "       COPY CPYBK2.";
 
   private TextDocumentService service;
 
@@ -74,6 +85,11 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
+    MockWorkspaceService workspaceService =
+        LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
+    workspaceService.setCopybooks(
+        () ->
+            Arrays.asList(new CobolText("CPYBK1", COPYBOOK1), new CobolText("CPYBK2", COPYBOOK2)));
     runTextValidation(service, TEXT);
     waitForDiagnostics(client);
   }
@@ -157,6 +173,23 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
     List<? extends Location> locations = invokeDefinitionsRequest(TEST_POSITION);
     assertEquals(1, locations.size());
     assertContainsRange(locations, range(15, 7, TEST_LENGTH));
+  }
+
+  @Test
+  public void testFindMultipleCopybookReferences() throws ExecutionException, InterruptedException {
+    List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK1, true);
+    assertEquals(2, locations.size());
+
+    assertContainsRange(locations, range(20, 12, COPY_LENGTH));
+    assertContainsRange(locations, range(22, 12, COPY_LENGTH));
+  }
+
+  @Test
+  public void testFindSingleCopybookReference() throws ExecutionException, InterruptedException {
+    List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK2, true);
+    assertEquals(1, locations.size());
+
+    assertContainsRange(locations, range(21, 12, COPY_LENGTH));
   }
 
   private List<? extends Location> invokeDefinitionsRequest(Position position)

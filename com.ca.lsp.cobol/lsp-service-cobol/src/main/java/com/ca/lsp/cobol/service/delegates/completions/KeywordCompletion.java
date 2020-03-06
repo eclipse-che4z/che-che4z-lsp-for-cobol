@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -47,7 +47,7 @@ public class KeywordCompletion implements Completion {
   @Nonnull
   @Override
   public String getSortOrderPrefix() {
-    return "3"; // Keywords should go after Paragraphs in the completions list
+    return "4"; // Keywords should go after Copybooks in the completions list
   }
 
   @Nonnull

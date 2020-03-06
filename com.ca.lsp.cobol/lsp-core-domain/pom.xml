@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2019 Broadcom.
+  ~ Copyright (c) 2020 Broadcom.
   ~
   ~ The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
   ~
@@ -22,12 +22,12 @@
     <parent>
         <groupId>com.ca.lsp</groupId>
         <artifactId>com.ca.lsp.cobol</artifactId>
-        <version>0.9.1</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>lsp-core-domain</artifactId>
     <name>COBOL LSP :: LSP CORE Domain</name>
-    <version>0.9.1</version>
+    <version>${revision}</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -67,6 +67,11 @@
         <dependency>
             <groupId>net.jodah</groupId>
             <artifactId>concurrentunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

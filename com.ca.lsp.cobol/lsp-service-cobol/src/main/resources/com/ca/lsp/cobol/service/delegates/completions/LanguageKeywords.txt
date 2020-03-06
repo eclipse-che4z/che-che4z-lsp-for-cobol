@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Broadcom.
+# Copyright (c) 2020 Broadcom.
 # The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
 #
 # This program and the accompanying materials are made
@@ -198,7 +198,6 @@ END-OF-PAGE=When END-OF-PAGE is specified, and the logical end of the printed pa
 END-PERFORM=This explicit scope terminator serves to delimit the scope of the PERFORM statement.<br>[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsperf.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 END-READ=This explicit scope terminator serves to delimit the scope of the READ statement.<br>[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsread.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 END-RECEIVE=
-END-REMARKS=
 END-RETURN=This explicit scope terminator serves to delimit the scope of the RETURN statement.<br>[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsretu.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 END-REWRITE=This explicit scope terminator serves to delimit the scope of the REWRITE statement.<br>[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsrewr.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 END-SEARCH=This explicit scope terminator serves to delimit the scope of the SEARCH statement.<br>[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlpssear.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
@@ -438,7 +437,6 @@ REFERENCES=
 RELATIVE=The RELATIVE keyword is part of the RELATIVE KEY clause and a parameter for the ORGANIZATION clause.<br>[Search IBM documentation](https://www.ibm.com/support/knowledgecenter/SS6SG3_6.2.0/welcome.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 RELEASE=The RELEASE statement transfers records from an input/output area to the initial phase of a sorting operation.<br>[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsrele.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 REMAINDER=The result of subtracting the product of the quotient and the divisor from the dividend is stored.<br>[Read more](https://www.ibm.com/support/knowledgecenter/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsdivi.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
-REMARKS=
 REMOTE=
 REMOVAL=CLOSE statement parameter.<br>[Read more](https://www.ibm.com/support/knowledgecenter/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsclos.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 REMOVE=

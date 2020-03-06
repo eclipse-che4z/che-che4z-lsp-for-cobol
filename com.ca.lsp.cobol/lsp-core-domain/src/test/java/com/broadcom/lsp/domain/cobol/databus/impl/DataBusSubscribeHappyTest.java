@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 
 /** This test verifies that the observer is triggered by the event it is subscribed to. */
 @Slf4j
-public class DataBusSubscribeHappyTest extends AbsDataBusImplTest {
+public class DataBusSubscribeHappyTest extends DatabusConfigProvider {
 
   private DefaultDataBusBroker<RequiredCopybookEvent, RequiredCopybookEventSubscriber> databus;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -15,104 +15,96 @@
 package com.ca.lsp.core.cobol.visitor;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.parser.CobolParser;
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolParserBaseVisitor;
-import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
+import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.text.similarity.LevenshteinDistance;
 
-import java.util.Comparator;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
+import static com.ca.lsp.core.cobol.parser.CobolParser.*;
+
+/**
+ * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
+ * abstract syntax tree built by {@link com.ca.lsp.core.cobol.parser.CobolParser}. It requires a
+ * semantic context with defined elements to add the usages or throw a warning on an invalid
+ * definition. If there is a misspelled keyword, the visitor finds it and throws a warning.
+ */
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {
-  private static final Keywords KEYWORDS = new Keywords();
-  private static final int SEVERITY_LEVEL = 3;
-  private SemanticListener semanticListener = null;
-  private SemanticContext semanticContext = null;
-  private static LevenshteinDistance instance = LevenshteinDistance.getDefaultInstance();
+  private static final int WARNING_LEVEL = 2;
+  private static final int INFO_LEVEL = 3;
 
-  private static int getWrongTokenStopPosition(String wrongToken, int charPositionInLine) {
-    return charPositionInLine + wrongToken.length() - 1;
-  }
+  @Getter private List<SyntaxError> errors = new ArrayList<>();
 
-  private static Optional<String> addDistance(String wrongToken) {
-    return KEYWORDS.getList().stream()
-        .map(item -> new Object[] {item, instance.apply(wrongToken, item)})
-        .sorted(Comparator.comparingInt(o -> (int) o[1]))
-        .filter(item -> !wrongToken.equals(item[0]))
-        .filter(item -> (int) item[1] < 2)
-        .map(item -> item[0].toString())
-        .findFirst();
-  }
+  private String documentUri;
+  private SemanticContext semanticContext;
 
-  public void setSemanticErrors(SemanticListener semanticErrors) {
-    semanticListener = semanticErrors;
-  }
-
-  public void setSemanticContext(SemanticContext context) {
-    semanticContext = context;
+  public CobolVisitor(String documentUri, SemanticContext semanticContext) {
+    this.documentUri = documentUri;
+    this.semanticContext = semanticContext;
   }
 
   @Override
-  public Class visitProcedureSection(CobolParser.ProcedureSectionContext ctx) {
+  public Class visitProcedureSection(ProcedureSectionContext ctx) {
     String wrongToken = ctx.getStart().getText();
     throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitStatement(CobolParser.StatementContext ctx) {
+  public Class visitStatement(StatementContext ctx) {
     String wrongToken = ctx.getStart().getText();
     throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitIfThen(CobolParser.IfThenContext ctx) {
+  public Class visitIfThen(IfThenContext ctx) {
     String wrongToken = ctx.getStart().getText();
     throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitIfElse(CobolParser.IfElseContext ctx) {
+  public Class visitIfElse(IfElseContext ctx) {
     String wrongToken = ctx.getStart().getText();
     throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitPerformInlineStatement(CobolParser.PerformInlineStatementContext ctx) {
+  public Class visitPerformInlineStatement(PerformInlineStatementContext ctx) {
     String wrongToken = ctx.getStart().getText();
     throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitSentence(CobolParser.SentenceContext ctx) {
+  public Class visitSentence(SentenceContext ctx) {
     String wrongToken = ctx.getStart().getText();
     throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitIdentifier(CobolParser.IdentifierContext ctx) {
+  public Class visitIdentifier(IdentifierContext ctx) {
     String wrongToken = ctx.getStart().getText();
     throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitEvaluateWhenOther(CobolParser.EvaluateWhenOtherContext ctx) {
+  public Class visitEvaluateWhenOther(EvaluateWhenOtherContext ctx) {
     String wrongToken = ctx.getStart().getText();
     throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitQualifiedDataNameFormat1(CobolParser.QualifiedDataNameFormat1Context ctx) {
+  public Class visitQualifiedDataNameFormat1(QualifiedDataNameFormat1Context ctx) {
     if (ctx.dataName() != null) {
       String variable = ctx.dataName().getText().toUpperCase();
       checkForVariable(
@@ -125,7 +117,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   public Class visitDataName2(
-      CobolParser.DataName2Context ctx, String child, int childStartLine, int childPositionInLine) {
+      DataName2Context ctx, String child, int childStartLine, int childPositionInLine) {
     if (checkForVariable(
         ctx.getText(), ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), null)) {
       checkParentContainsChildren(ctx.getText(), child, childStartLine, childPositionInLine);
@@ -134,57 +126,66 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   public Class visitInData(
-      String child, int childStartLine, int childPositionInLine, CobolParser.InDataContext ctx) {
+      String child, int childStartLine, int childPositionInLine, InDataContext ctx) {
     checkForDataName2(ctx.dataName2(), child, childStartLine, childPositionInLine);
     return visitChildren(ctx);
   }
 
   public Class visitInTable(
-      String child, int childStartLine, int childPositionInLine, CobolParser.InTableContext ctx) {
+      String child, int childStartLine, int childPositionInLine, InTableContext ctx) {
     checkForDataName2(ctx.tableCall().dataName2(), child, childStartLine, childPositionInLine);
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitParagraphNameUsage(CobolParser.ParagraphNameUsageContext ctx) {
+  public Class visitParagraphNameUsage(ParagraphNameUsageContext ctx) {
     addUsage(semanticContext.getParagraphs(), ctx);
     return visitChildren(ctx);
   }
 
   private void checkForDataName2(
-      CobolParser.DataName2Context ctx, String child, int childStartLine, int childPositionInLine) {
+      DataName2Context ctx, String child, int childStartLine, int childPositionInLine) {
     if (ctx != null) {
       visitDataName2(ctx, child, childStartLine, childPositionInLine);
     }
   }
 
   private void throwWarning(String wrongToken, int startLine, int charPositionInLine) {
-    if (!semanticListener.getErrorsPipe().isEmpty()) {
-      addDistance(wrongToken.toUpperCase())
-          .ifPresent(
-              correctWord ->
-                  getSemanticError(wrongToken, startLine, charPositionInLine, correctWord));
-    }
+    MisspelledKeywordDistance.calculateDistance(wrongToken.toUpperCase())
+        .ifPresent(
+            correctWord ->
+                getSemanticError(wrongToken, startLine, charPositionInLine, correctWord));
   }
 
   private void throwSuggestion(String wrongToken, int startLine, int charPositionInLine) {
-    semanticListener.syntaxError(
-        null,
-        startLine,
-        charPositionInLine,
-        getWrongTokenStopPosition(wrongToken, charPositionInLine),
-        "Invalid definition for: " + wrongToken,
-        SEVERITY_LEVEL);
+    errors.add(
+        SyntaxError.syntaxError()
+            .position(
+                new Position(
+                    documentUri,
+                    charPositionInLine,
+                    getWrongTokenStopPosition(wrongToken, charPositionInLine),
+                    startLine,
+                    charPositionInLine))
+            .suggestion("Invalid definition for: " + wrongToken)
+            .severity(INFO_LEVEL)
+            .build());
   }
 
   private void getSemanticError(
       String wrongToken, int startLine, int charPositionInLine, String correctWord) {
-    semanticListener.syntaxError(
-        null,
-        startLine,
-        charPositionInLine,
-        getWrongTokenStopPosition(wrongToken, charPositionInLine),
-        "Misspelled word, maybe you want to put " + correctWord);
+    errors.add(
+        SyntaxError.syntaxError()
+            .position(
+                new Position(
+                    documentUri,
+                    charPositionInLine,
+                    getWrongTokenStopPosition(wrongToken, charPositionInLine),
+                    startLine,
+                    charPositionInLine))
+            .suggestion("A misspelled word, maybe you want to put " + correctWord)
+            .severity(WARNING_LEVEL)
+            .build());
   }
 
   private boolean checkForVariable(
@@ -192,32 +193,26 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     if (!semanticContext.getVariables().contains(variable)) {
       throwSuggestion(variable, startLine, charPositionInLine);
       return false;
-    } else if (ctx instanceof CobolParser.QualifiedDataNameFormat1Context
-        && ((CobolParser.QualifiedDataNameFormat1Context) ctx).qualifiedInData() != null) {
+    } else if (ctx instanceof QualifiedDataNameFormat1Context
+        && ((QualifiedDataNameFormat1Context) ctx).qualifiedInData() != null) {
       iterateOverQualifiedDataNames(
-          (CobolParser.QualifiedDataNameFormat1Context) ctx,
-          variable,
-          startLine,
-          charPositionInLine);
+          (QualifiedDataNameFormat1Context) ctx, variable, startLine, charPositionInLine);
       addUsage(semanticContext.getVariables(), variable, ctx);
     }
     return true;
   }
 
   private void iterateOverQualifiedDataNames(
-      CobolParser.QualifiedDataNameFormat1Context ctx,
-      String variable,
-      int startLine,
-      int charPositionInLine) {
-    for (CobolParser.QualifiedInDataContext node : ctx.qualifiedInData()) {
+      QualifiedDataNameFormat1Context ctx, String variable, int startLine, int charPositionInLine) {
+    for (QualifiedInDataContext node : ctx.qualifiedInData()) {
       if (node.inData() != null) {
         visitInData(variable, startLine, charPositionInLine, node.inData());
-        CobolParser.DataName2Context context = node.inData().dataName2();
+        DataName2Context context = node.inData().dataName2();
         variable = context.getText();
         addUsage(semanticContext.getVariables(), context);
       } else {
         visitInTable(variable, startLine, charPositionInLine, node.inTable());
-        CobolParser.DataName2Context context = node.inTable().tableCall().dataName2();
+        DataName2Context context = node.inTable().tableCall().dataName2();
         variable = context.getText();
         addUsage(semanticContext.getVariables(), context);
       }
@@ -239,9 +234,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     langContext.addUsage(ctx.getText().toUpperCase(), retrievePosition(ctx));
   }
 
+  private static int getWrongTokenStopPosition(String wrongToken, int charPositionInLine) {
+    return charPositionInLine + wrongToken.length() - 1;
+  }
+
   private Position retrievePosition(ParserRuleContext ctx) {
     return new Position(
-        null,
+        documentUri,
         ctx.getStart().getStartIndex(),
         ctx.getStart().getStopIndex(),
         ctx.getStart().getLine(),

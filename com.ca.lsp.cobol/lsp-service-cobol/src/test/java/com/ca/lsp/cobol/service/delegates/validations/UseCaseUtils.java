@@ -16,10 +16,18 @@
  */
 package com.ca.lsp.cobol.service.delegates.validations;
 
+import com.broadcom.lsp.cdi.EngineModule;
 import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.cdi.module.databus.DatabusModule;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
+import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
+import com.ca.lsp.cobol.positive.CobolText;
+import com.ca.lsp.cobol.service.TextDocumentSyncType;
+import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
-import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import lombok.experimental.UtilityClass;
 import org.awaitility.Awaitility;
 import org.eclipse.lsp4j.Diagnostic;
@@ -31,13 +39,15 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 /** This utility class provides methods to run use cases with Cobol code examples. */
 @UtilityClass
 public class UseCaseUtils {
-  public static final String LANGUAGE = "cbl";
-  public static final String DOCUMENT_URI = "1";
+  public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
+  private static final String LANGUAGE = "cbl";
 
   private static final long MAX_TIME_TO_WAIT = 60000L;
   private static final long TIME_TO_POLL = 10L;
@@ -94,7 +104,7 @@ public class UseCaseUtils {
    *     Should return false if result has not appeared.
    * @param description - the TestLanguageClient that should receive the diagnostics
    */
-  public static void await(Callable<Boolean> checker, String description) {
+  private static void await(Callable<Boolean> checker, String description) {
     await(checker, MAX_TIME_TO_WAIT, description);
   }
 
@@ -108,7 +118,7 @@ public class UseCaseUtils {
    * @param time - the maximum time to wait
    * @param description - the TestLanguageClient that should receive the diagnostics
    */
-  public static void await(Callable<Boolean> checker, Long time, String description) {
+  private static void await(Callable<Boolean> checker, Long time, String description) {
     Awaitility.await(description)
         .pollDelay(TIME_TO_POLL, TIME_UNIT)
         .atMost(time, TIME_UNIT)
@@ -143,8 +153,7 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(String text) {
-    return new CobolLanguageEngineFacade(new CobolLanguageEngine(CobolSourceFormat.FIXED))
-        .analyze(text);
+    return analyze(text, emptyList());
   }
 
   /**
@@ -155,11 +164,42 @@ public class UseCaseUtils {
    * @return list of diagnostics with only severe errors
    */
   public static List<Diagnostic> analyzeForErrors(String text) {
-    LanguageEngineFacade engine =
-        new CobolLanguageEngineFacade(new CobolLanguageEngine(CobolSourceFormat.FIXED));
-    AnalysisResult result = engine.analyze(text);
-    return result.getDiagnostics().stream()
+    return analyzeForErrors(text, emptyList());
+  }
+  /**
+   * Analyze the given text using a real language engine leaving only the diagnostics with the
+   * severe (level 1) errors providing copybooks required for the analysis
+   *
+   * @param text - text to analyze
+   * @param copybooks - list of copybooks required for the analysis
+   * @return list of diagnostics with only severe errors
+   */
+  public static List<Diagnostic> analyzeForErrors(String text, List<CobolText> copybooks) {
+    return analyze(text, copybooks).getDiagnostics().stream()
         .filter(it -> it.getSeverity().getValue() == 1)
-        .collect(Collectors.toList());
+        .collect(toList());
+  }
+  /**
+   * Analyze the given text using a real language engine providing copybooks required for the
+   * analysis
+   *
+   * @param text - text to analyze
+   * @param copybooks - list of copybooks required for the analysis
+   * @return the entire analysis result
+   */
+  @SuppressWarnings("unchecked")
+  public static AnalysisResult analyze(String text, List<CobolText> copybooks) {
+
+    Injector injector = Guice.createInjector(new EngineModule(), new DatabusModule());
+
+    DataBusBroker<FetchedCopybookEvent, RequiredCopybookEvent> broker =
+        injector.getInstance(DataBusBroker.class);
+
+    MockWorkspaceService workspaceService = new MockWorkspaceService(broker);
+    workspaceService.setCopybooks(() -> copybooks);
+
+    return injector
+        .getInstance(CobolLanguageEngineFacade.class)
+        .analyze(DOCUMENT_URI, text, TextDocumentSyncType.DID_OPEN);
   }
 }

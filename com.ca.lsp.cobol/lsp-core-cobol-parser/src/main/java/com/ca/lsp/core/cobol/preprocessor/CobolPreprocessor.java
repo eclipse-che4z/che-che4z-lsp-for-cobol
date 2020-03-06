@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -17,10 +17,14 @@ import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 
+/** The CobolPreprocessor is engaged in order to process, trasform and parse the document */
 public interface CobolPreprocessor {
-
-  ResultWithErrors<PreprocessedInput> process(String cobolCode, CobolSourceFormat format);
+  ResultWithErrors<PreprocessedInput> process(
+      String documentUri, String cobolCode, String textDocumentSyncType);
 
   ResultWithErrors<PreprocessedInput> process(
-      String cobolCode, CobolSourceFormat format, SemanticContext semanticContext);
+      String documentUri,
+      String cobolCode,
+      SemanticContext semanticContext,
+      String textDocumentSyncType);
 }

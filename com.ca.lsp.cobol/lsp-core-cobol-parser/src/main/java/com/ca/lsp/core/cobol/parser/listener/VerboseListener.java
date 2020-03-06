@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -23,9 +23,11 @@ import java.util.List;
 
 public class VerboseListener extends BaseErrorListener {
   private final List<SyntaxError> errorspipe;
+  private final String documentUri;
 
-  public VerboseListener(List<SyntaxError> errors) {
+  public VerboseListener(List<SyntaxError> errors, String documentUri) {
     errorspipe = errors;
+    this.documentUri = documentUri;
   }
 
   @Override
@@ -43,7 +45,7 @@ public class VerboseListener extends BaseErrorListener {
       CommonToken wrongToken = (CommonToken) offendingSymbol;
       Position position =
           new Position(
-              null,
+              documentUri,
               wrongToken.getStartIndex(),
               wrongToken.getStopIndex(),
               wrongToken.getLine(),
@@ -59,7 +61,8 @@ public class VerboseListener extends BaseErrorListener {
     if (recognizer instanceof Lexer) {
       stack.add(((Lexer) recognizer).getText());
       Position position =
-          new Position(null, charPositionInLine, charPositionInLine, line, charPositionInLine);
+          new Position(
+              documentUri, charPositionInLine, charPositionInLine, line, charPositionInLine);
       errorspipe.add(
           SyntaxError.syntaxError()
               .position(position)

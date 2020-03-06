@@ -1,5 +1,5 @@
 <!---
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its  * subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -17,9 +17,9 @@
 Put in this folder the COBOL LSP server jar with this name
 
 ```
-lsp-service-cobol-0.9.1.jar
+lsp-service-cobol-0.10.1.jar
 ```
-In Linux environment be sure that the server folder have read/write permisison, in case simply run the command
+In Linux environment be sure that the server folder have read/write permission, in case simply run the command
 
 ```
 chmod -R 777 server

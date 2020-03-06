@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -31,10 +31,14 @@ public class AnalysisResult {
   private Map<String, List<Location>> variableUsages;
   private Map<String, List<Location>> paragraphDefinitions;
   private Map<String, List<Location>> paragraphUsages;
+  private Map<String, List<Location>> copybookDefinitions;
+  private Map<String, List<Location>> copybookUsages;
 
   public static AnalysisResult empty() {
     return new AnalysisResult(
         Collections.emptyList(),
+        Collections.emptyMap(),
+        Collections.emptyMap(),
         Collections.emptyMap(),
         Collections.emptyMap(),
         Collections.emptyMap(),

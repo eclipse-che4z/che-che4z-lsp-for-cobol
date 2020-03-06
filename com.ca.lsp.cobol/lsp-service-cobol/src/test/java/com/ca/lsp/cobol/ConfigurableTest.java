@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -15,6 +15,7 @@
  */
 package com.ca.lsp.cobol;
 
+import com.broadcom.lsp.cdi.EngineModule;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import org.junit.AfterClass;
@@ -23,7 +24,7 @@ import org.junit.BeforeClass;
 public abstract class ConfigurableTest {
   @BeforeClass
   public static void setUp() {
-    LangServerCtx.getGuiceCtx(new TestModule(), new DatabusModule());
+    LangServerCtx.getGuiceCtx(new TestModule(), new EngineModule(), new DatabusModule());
   }
 
   @AfterClass

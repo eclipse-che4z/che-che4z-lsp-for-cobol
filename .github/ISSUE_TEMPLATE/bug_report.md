@@ -7,18 +7,16 @@ assignees: ''
 
 ---
 
-<!-- Please include as much useful information as possible. -->
+<!--
+  Before opening a new issue, please search existing issues https://github.com/eclipse/che-che4z-lsp-for-cobol/issues
+-->
 
-<!-- 
+<!--
 Useful Links:
   - Documentation: https://github.com/eclipse/che-che4z-lsp-for-cobol/blob/development/README.md
   - Contributing: https://github.com/eclipse/che-che4z-lsp-for-cobol/blob/development/CONTRIBUTING.md
   Eclipse Che has public chat on:
   - Slack: https://che4z.slack.com/
--->
-
-<!--
-  Before opening a new issue, please search existing issues https://github.com/eclipse/che-che4z-lsp-for-cobol/issues
 -->
 
 ## Description ##

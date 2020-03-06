@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -102,8 +102,8 @@ public class ContinuationLineTransformationTest extends AbstractCobolLinePreproc
   private List<SyntaxError> runTransformation(String text) {
     List<CobolLine> lines = convertToCobolLines(text);
 
-    ContinuationLineTransformation transformation = new ContinuationLineTransformation(null);
-    return transformation.transformLines(lines).getErrors();
+    ContinuationLineTransformation transformation = new ContinuationLineTransformation();
+    return transformation.transformLines(null, lines).getErrors();
   }
 
   private List<CobolLine> convertToCobolLines(String text) {

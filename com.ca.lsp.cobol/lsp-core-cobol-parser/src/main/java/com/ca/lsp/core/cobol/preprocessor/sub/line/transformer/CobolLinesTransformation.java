@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -24,5 +24,5 @@ import java.util.List;
  */
 public interface CobolLinesTransformation {
 
-  ResultWithErrors<List<CobolLine>> transformLines(List<CobolLine> lines);
+  ResultWithErrors<List<CobolLine>> transformLines(String documentURI, List<CobolLine> lines);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -72,13 +72,11 @@ public class HighlightsTest extends ConfigurableTest {
   }
 
   private TextDocumentService service;
-  private TestLanguageClient client;
-  private static final String ID = "id";
 
   @Before
   public void initializeService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
-    client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
     runTextValidation(service, TEXT);
     waitForDiagnostics(client);
