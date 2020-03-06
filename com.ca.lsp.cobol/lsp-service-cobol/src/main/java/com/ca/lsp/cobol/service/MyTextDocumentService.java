@@ -34,7 +34,6 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import javax.annotation.Nonnull;
-import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -163,8 +162,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @SneakyThrows
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
-    // decode the URI in UTF-8 to avoid issue with special chars
-    String uri = URLDecoder.decode(params.getTextDocument().getUri(), "UTF-8");
+    String uri = params.getTextDocument().getUri();
     // A better implementation that will cover the gitfs scenario will be implementated later based
     // on issue #173
     if (uri.startsWith(GIT_FS_URI)) {
@@ -176,6 +174,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     registerEngineAndAnalyze(uri, langId, text);
   }
 
+  @SneakyThrows
   @Override
   public void didChange(DidChangeTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();

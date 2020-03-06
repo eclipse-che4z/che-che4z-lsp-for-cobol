@@ -26,8 +26,6 @@ import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.services.LanguageClient;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +35,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.ca.lsp.cobol.service.utils.FileSystemUtils.decodeURI;
 
 /**
  * This class serves the communications between server and client. It also allows to send delayable
@@ -191,14 +191,5 @@ public class ServerCommunications implements Communications {
 
   private String clean(String source) {
     return source.replaceAll("(\\r\\n|\\r|\\n)", "");
-  }
-
-  private String decodeURI(String uri) {
-    try {
-      return URLDecoder.decode(uri, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      log.error(e.getMessage());
-      return uri;
-    }
   }
 }

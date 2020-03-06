@@ -21,6 +21,8 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -88,5 +90,22 @@ public class FileSystemUtils {
   public boolean hasFileValidExtension(String fullPath) {
     return ALLOWED_EXTENSIONS.stream()
         .anyMatch(ext -> ext.equalsIgnoreCase(FilenameUtils.getExtension(fullPath)));
+  }
+
+  /**
+   * This method could be used when an URI contains special chars (as parenthesis, spaces and so on)
+   * that are encoded by the LSP protocol on the client side but needs to be encoded in order to
+   * display to the user the uri correctly.
+   *
+   * @param uri provided by the {@link org.eclipse.lsp4j.services.TextDocumentService}
+   * @return a new String decoded with UTF8
+   */
+  public static String decodeURI(String uri) {
+    try {
+      return URLDecoder.decode(uri, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      log.error(e.getMessage());
+      return uri;
+    }
   }
 }
