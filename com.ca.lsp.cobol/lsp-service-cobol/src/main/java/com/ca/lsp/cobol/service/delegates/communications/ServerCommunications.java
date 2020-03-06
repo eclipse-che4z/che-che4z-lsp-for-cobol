@@ -19,12 +19,15 @@ package com.ca.lsp.cobol.service.delegates.communications;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.services.LanguageClient;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +43,7 @@ import java.util.stream.Collectors;
  * messages. Notice, that all the messages that are going to be sent from server to client should be
  * cleaned by removing line breaks to prevent incorrect parsing.
  */
+@Slf4j
 public class ServerCommunications implements Communications {
   private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(5);
   private final Set<String> uriInProgress = new HashSet<>();
@@ -74,11 +78,13 @@ public class ServerCommunications implements Communications {
    */
   @Override
   public void notifyThatLoadingInProgress(String uri) {
-    uriInProgress.add(uri);
+    String decodedUri = decodeURI(uri);
+    uriInProgress.add(decodedUri);
     executor.schedule(
         () -> {
-          if (uriInProgress.remove(uri)) {
-            showMessage(MessageType.Info, retrieveFileName(uri) + ": Syntax analysis in progress");
+          if (uriInProgress.remove(decodedUri)) {
+            showMessage(
+                MessageType.Info, retrieveFileName(decodedUri) + ": Syntax analysis in progress");
           }
         },
         3,
@@ -94,7 +100,9 @@ public class ServerCommunications implements Communications {
   public void notifyThatDocumentAnalysed(String uri) {
     CompletableFuture.runAsync(
         () ->
-            showMessage(MessageType.Info, "No syntax errors detected in " + retrieveFileName(uri)));
+            showMessage(
+                MessageType.Info,
+                "No syntax errors detected in " + retrieveFileName(decodeURI(uri))));
   }
 
   /**
@@ -143,7 +151,8 @@ public class ServerCommunications implements Communications {
    */
   @Override
   public void publishDiagnostics(String uri, List<Diagnostic> diagnostics) {
-    getClient().publishDiagnostics(new PublishDiagnosticsParams(uri, clean(diagnostics)));
+    getClient()
+        .publishDiagnostics(new PublishDiagnosticsParams(decodeURI(uri), clean(diagnostics)));
   }
 
   /**
@@ -153,7 +162,7 @@ public class ServerCommunications implements Communications {
    */
   @Override
   public void cancelProgressNotification(String uri) {
-    uriInProgress.remove(uri);
+    uriInProgress.remove(decodeURI(uri));
   }
 
   private void showMessage(MessageType type, String message) {
@@ -182,5 +191,14 @@ public class ServerCommunications implements Communications {
 
   private String clean(String source) {
     return source.replaceAll("(\\r\\n|\\r|\\n)", "");
+  }
+
+  private String decodeURI(String uri) {
+    try {
+      return URLDecoder.decode(uri, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      log.error(e.getMessage());
+      return uri;
+    }
   }
 }
