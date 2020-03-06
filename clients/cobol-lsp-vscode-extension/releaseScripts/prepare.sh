@@ -27,7 +27,6 @@ update_version () {
     sed -i "s/<revision>.*</<revision>$1</g" ../../com.ca.lsp.cobol/pom.xml
     sed -i "s/lsp-service-cobol-.*\.jar/lsp-service-cobol-$1.jar/g" server/note.md
     sed -i "s/cobol-language-support_.*\.vsix'/cobol-language-support_$1.vsix'/g" ../../Jenkinsfile
-    sed -i "s/lsp-service-cobol-.*\.jar/lsp-service-cobol-$1.jar/g" src/extension.ts
     echo "Versions updated to $1"
 }
 
