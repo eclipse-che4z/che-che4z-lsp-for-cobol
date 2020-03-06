@@ -174,7 +174,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     registerEngineAndAnalyze(uri, langId, text);
   }
 
-  @SneakyThrows
   @Override
   public void didChange(DidChangeTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
