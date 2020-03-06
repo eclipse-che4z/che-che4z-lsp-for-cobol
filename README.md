@@ -37,6 +37,7 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 * Code Snippet
 * Copybook variables
 * Copybook paragraphs
+* Names of copybooks that are used in the program
 
 ![Autocomplete](/docs/images/CLSAutocorrect.gif)
 		
