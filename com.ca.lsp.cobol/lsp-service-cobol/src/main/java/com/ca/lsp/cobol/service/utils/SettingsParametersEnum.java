@@ -14,13 +14,17 @@
 
 package com.ca.lsp.cobol.service.utils;
 
+/**
+ * This enum contains the structure of the settings.json that contains the MF related settings to
+ * search a copybook.
+ */
 public enum SettingsParametersEnum {
   CPY_MANAGER("cpy-manager"),
   LSP_PREFIX("broadcom-cobol-lsp");
 
   public final String label;
 
-  private SettingsParametersEnum(String label) {
+  SettingsParametersEnum(String label) {
     this.label = label;
   }
 }

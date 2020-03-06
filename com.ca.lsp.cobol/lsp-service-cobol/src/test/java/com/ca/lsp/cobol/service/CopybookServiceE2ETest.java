@@ -13,61 +13,63 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
+import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
+import com.ca.lsp.cobol.service.delegates.communications.Communications;
+import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
+import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
+import com.google.inject.Guice;
+import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Duration;
 import org.awaitility.core.ConditionTimeoutException;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Comparator;
+import java.util.Arrays;
 
+import static java.util.Collections.unmodifiableList;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * This class contains all the unit test that perform the publish/subscribe acrivities for generate
  * the dependency file.
  */
 @Slf4j
-public class FileSystemE2ETest extends FileSystemConfiguration {
+public class CopybookServiceE2ETest extends FileSystemConfiguration {
   public static final String CPY_NAME_WITHOUT_EXT = "copy2";
-  DataBusBroker broker =
-      (DefaultDataBusBroker) LangServerCtx.getInjector().getInstance(DataBusBroker.class);
+  private final DataBusBroker broker =
+      Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
 
-  private FileSystemServiceImpl fileSystemService = new FileSystemServiceImpl(broker);
+  private Provider<ConfigurationSettingsStorable> configurationSettingsProvider =
+      mock(Provider.class);
+
+  private Communications communications = mock(Communications.class);
+  private CopybookDependencyService dependencyService = new CopybookDependencyServiceImpl();
 
   @Before
   public void initActivities() {
     // the delegate will prepare the structure and this method will just setup the list of workspace
     // folders
-    fileSystemService.setWorkspaceFolders(initWorkspaceFolderList());
-  }
+    when(configurationSettingsProvider.get())
+        .thenReturn(
+            new ConfigurationSettingsStorable(
+                "myProfile", unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2))));
 
-  @After
-  public void cleanupTempFolder() {
-    try {
-      Files.walk(Paths.get(getWorkspaceFolderPath()))
-          .sorted(Comparator.reverseOrder())
-          .map(Path::toFile)
-          .forEach(File::delete);
-    } catch (IOException e) {
-      log.error(e.getMessage());
-    }
-
-    broker.invalidateCache();
+    CopybookServiceImpl copybookService =
+        new CopybookServiceImpl(
+            broker, configurationSettingsProvider, dependencyService, communications);
+    copybookService.setWorkspaceFolders(generateWorkspaceFolder());
   }
 
   /**
@@ -77,6 +79,7 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
    */
   @Test
   public void generateDependencyFileOnCallbackPositiveTest() {
+
     // generate a required copybook event
     broker.postData(
         RequiredCopybookEvent.builder()
@@ -136,7 +139,7 @@ public class FileSystemE2ETest extends FileSystemConfiguration {
   private boolean depFileExists() {
     return Files.exists(
         Paths.get(
-            workspacePath
+            getWorkspaceFolderPath()
                 + filesystemSeparator()
                 + ".cobdeps"
                 + filesystemSeparator()
