@@ -20,11 +20,13 @@ import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvi
 import { ProfileService } from "./ProfileService";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { ZoweApi } from "./ZoweApi";
+import { CopybookResolver } from "./services/CopybookResolver";
 
 export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
-    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(zoweApi, profileService);
+    const resolver: CopybookResolver = new CopybookResolver();
+    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(resolver, zoweApi, profileService);
     const languageClientService: LanguageClientService = new LanguageClientService();
 
     try {

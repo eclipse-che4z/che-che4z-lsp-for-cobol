@@ -20,11 +20,13 @@ import { DependenciesDesc, loadDepFile } from "./services/DependencyService";
 import { CopybookProfile, DownloadQueue } from "./services/DownloadQueue";
 import { checkWorkspace, createCopybookPath, createDatasetPath } from "./services/PathUtils";
 import { ZoweApi } from "./ZoweApi";
+import { CopybookResolver } from "./services/CopybookResolver";
 
 export class CopybooksDownloader implements vscode.Disposable {
     private queue: DownloadQueue = new DownloadQueue();
 
     public constructor(
+        private resolver: CopybookResolver,
         private zoweApi: ZoweApi,
         private profileService: ProfileService) { }
 
@@ -51,38 +53,16 @@ export class CopybooksDownloader implements vscode.Disposable {
         if (!message.length) {
             missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
         } else if (missingCopybooks.length > 0) {
-            // TODO: refactor: move to external class
-            const downloadCopybookAction = "Download Copybooks";
-            const actionDatasets = "Edit Datasets";
-            const actionProfile = "Change zowe profile";
-            const actions = [];
-            if ((await this.listPathDatasets()).length > 0) {
-                actions.push(downloadCopybookAction);
-            }
-            if (message !== "Configuration was updated") {
-                actions.push(actionDatasets);
-                actions.push(actionProfile);
-            }
-            const action: string = await vscode.window.showInformationMessage(
-                message,
-                ...actions);
-            if (action === downloadCopybookAction) {
-                missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
-            }
-            if (action === actionDatasets) {
-                vscode.commands.executeCommand("workbench.action.openSettings",
-                    "broadcom-cobol-lsp.cpy-manager.paths");
-            }
-            if (action === actionProfile) {
-                vscode.commands.executeCommand("workbench.action.openSettings",
-                    "broadcom-cobol-lsp.cpy-manager.profiles");
-            }
+            this.resolver.fixMissingDownloads(message, missingCopybooks, profile, {
+                hasPaths: (await this.listPathDatasets()).length > 0,
+            });
         }
 
     }
 
     // tslint:disable-next-line: cognitive-complexity
     public async start() {
+        this.resolver.setQueue(this.queue);
         let done = false;
         let errors: string[] = [];
         while (!done) {
@@ -120,7 +100,7 @@ export class CopybooksDownloader implements vscode.Disposable {
                         }
                     }
                     if (this.queue.length === 0 && errors.length > 0) {
-                        this.processDownloadError("Can't download copybooks: " + errors);
+                        this.resolver.processDownloadError("Can't download copybooks: " + errors);
                         errors = [];
                     }
                 });
@@ -129,27 +109,14 @@ export class CopybooksDownloader implements vscode.Disposable {
     public dispose() {
         this.queue.stop();
     }
-    public async processDownloadError(title: string) {
-        const actionDatasets = "Edit Datasets";
-        const actionProfile = "Change zowe profile";
-        const action = await vscode.window.showErrorMessage(title,
-            actionDatasets, actionProfile);
-        if (action === actionDatasets) {
-            vscode.commands.executeCommand("workbench.action.openSettings",
-                "broadcom-cobol-lsp.cpy-manager.paths");
-        }
-        if (action === actionProfile) {
-            vscode.commands.executeCommand("workbench.action.openSettings",
-                "broadcom-cobol-lsp.cpy-manager.profiles");
-        }
-    }
+
 
     private async fetchCopybook(dataset: string, copybookProfile: CopybookProfile): Promise<boolean> {
         let members: string[] = [];
         try {
             members = await this.zoweApi.listMembers(dataset, copybookProfile.profile);
         } catch (error) {
-            await this.processDownloadError("Can't read members of " + dataset);
+            await this.resolver.processDownloadError("Can't read members of " + dataset);
             return false;
         }
         if (!members.includes(copybookProfile.copybook)) {
