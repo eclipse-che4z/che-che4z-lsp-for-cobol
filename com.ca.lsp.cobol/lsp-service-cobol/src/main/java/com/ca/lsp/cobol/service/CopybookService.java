@@ -19,11 +19,17 @@ import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import org.eclipse.lsp4j.WorkspaceFolder;
 
-import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
-public interface FileSystemService extends EventObserver<RequiredCopybookEvent> {
-  String getContentByCopybookName(String copybookName) throws IOException;
+/**
+ * Provide API definition to search for copybooks files and define the workspace folder opened in
+ * the client when the LSP server is triggered.
+ */
+public interface CopybookService extends EventObserver<RequiredCopybookEvent> {
+  Path findCopybook(String fileName);
+
+  Path findCopybook(String filename, String profile, List<String> datasetList);
 
   void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders);
 }

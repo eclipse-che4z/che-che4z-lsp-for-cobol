@@ -63,7 +63,7 @@ public class MyLanguageServerImplTest {
    */
   @Test
   public void initialize() {
-    FileSystemService fileSystemService = mock(FileSystemService.class);
+    CopybookService fileSystemService = mock(CopybookService.class);
     MyLanguageServerImpl server =
         new MyLanguageServerImpl(fileSystemService, null, null, null, null);
     InitializeParams initializeParams = new InitializeParams();
@@ -90,7 +90,7 @@ public class MyLanguageServerImplTest {
         ((DidChangeWatchedFilesRegistrationOptions) registration.getRegisterOptions())
             .getWatchers();
 
-    watchers.forEach(it -> assertTrue(it.getGlobPattern().startsWith("**/COPYBOOKS")));
+    watchers.forEach(it -> assertTrue(it.getGlobPattern().startsWith("**/.copybooks")));
     watchers.forEach(it -> assertEquals(7, it.getKind().intValue()));
   }
 

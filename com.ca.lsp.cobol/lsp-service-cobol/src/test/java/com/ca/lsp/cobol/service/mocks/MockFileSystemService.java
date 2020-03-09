@@ -18,7 +18,7 @@ package com.ca.lsp.cobol.service.mocks;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import com.ca.lsp.cobol.service.FileSystemService;
+import com.ca.lsp.cobol.service.CopybookService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
@@ -38,12 +38,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * This class is used to mock the actual behavior of {@link FileSystemService} by returning the
+ * This class is used to mock the actual behavior of {@link CopybookService} by returning the
  * predefined values.
  */
 @Singleton
 @Slf4j
-public class MockFileSystemService implements FileSystemService {
+public class MockFileSystemService implements CopybookService {
   public static final String SOMEPROG_DEP = "SOMEPROG.dep";
   @Setter private CopybooksMock copybooks;
   @Getter private final DefaultDataBusBroker dataBus;
@@ -54,19 +54,10 @@ public class MockFileSystemService implements FileSystemService {
   @Getter protected Waiter waiter = new Waiter();
 
   @Inject
+  // TODO: Get rid of this class
   public MockFileSystemService(DefaultDataBusBroker dataBus) {
     this.dataBus = dataBus;
     dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
-  }
-
-  @Override
-  public String getContentByCopybookName(String copybookName) {
-    Path path = getPathByCopybookName(copybookName);
-    if (path != null) {
-      return retrieveContentByPath(path);
-    } else {
-      return null;
-    }
   }
 
   public void generateDependencyFile() throws URISyntaxException {
@@ -115,6 +106,16 @@ public class MockFileSystemService implements FileSystemService {
       }
     }
     waiter.resume();
+  }
+
+  @Override
+  public Path findCopybook(String fileName) {
+    return null;
+  }
+
+  @Override
+  public Path findCopybook(String filename, String profile, List<String> datasetList) {
+    return null;
   }
 
   @Override

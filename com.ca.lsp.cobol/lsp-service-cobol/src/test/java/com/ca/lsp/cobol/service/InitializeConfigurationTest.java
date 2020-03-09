@@ -27,11 +27,13 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
-import static org.mockito.Mockito.*;
+import static java.util.Collections.unmodifiableList;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * This test class checks if the workspace calls client configuration at the initialize method and
@@ -42,30 +44,37 @@ public class InitializeConfigurationTest {
   private ClientProvider provider = new ClientProvider();
   private SettingsProvider settingsProvider = Mockito.mock(SettingsProvider.class);
   private static final String PROFILE_NAME = "myProfile";
+  protected static final String DSNAME_1 = "HLQLF01.DSNAME1";
+  protected static final String DSNAME_2 = "HLQLF01.DSNAME2";
 
+  /**
+   * This test verify that the server is able to store the initial settings retrivied from the
+   * settings.json
+   */
   @Test
   public void testInitializeConfiguration() {
     provider.set(client);
+
+    when(settingsProvider.get())
+        .thenReturn(
+            new ConfigurationSettingsStorable(
+                PROFILE_NAME, unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2))));
 
     MyLanguageServerImpl langServer =
         new MyLanguageServerImpl(null, null, null, provider, settingsProvider);
 
     ConfigurationParams params = ServiceTestUtils.createParams();
-
-    List<String> paths = new ArrayList<>();
-    ConfigurationSettingsStorable configurationSettingsStorable =
-        new ConfigurationSettingsStorable(PROFILE_NAME, paths);
-
     List<Object> list = new ArrayList<>();
     list.add(createJsonObject());
     CompletableFuture<List<Object>> completableFuture = new CompletableFuture<>();
     completableFuture.complete(list);
-    when(client.configuration(params)).thenReturn(completableFuture);
 
+    when(client.configuration(params)).thenReturn(completableFuture);
     langServer.initialized(new InitializedParams());
 
+    // check that server send the request for the initial configuration settings and retrieve a
+    // setting configuration
     verify(client).configuration(params);
-    verify(settingsProvider).set(configurationSettingsStorable);
   }
 
   private JsonObject createJsonObject() {

@@ -14,11 +14,13 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.ConfigurableTest;
+import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
 
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -37,7 +39,11 @@ public abstract class PositiveUseCase extends ConfigurableTest {
   }
 
   protected void test() {
-    List<Diagnostic> diagnostics = UseCaseUtils.analyzeForErrors(text);
+    test(emptyList());
+  }
+
+  protected void test(List<CobolText> copybooks) {
+    List<Diagnostic> diagnostics = UseCaseUtils.analyzeForErrors(text, copybooks);
 
     assertEquals(createMessage(diagnostics), 0, diagnostics.size());
   }

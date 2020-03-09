@@ -52,7 +52,7 @@ import static org.mockito.Mockito.*;
 public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private static final String LANGUAGE = "COBOL";
-  private static final String CPY_DOCUMENT_URI = "file:///COPYBOOKS/CPYTEST.cpy";
+  private static final String CPY_DOCUMENT_URI = "file:///.copybooks/CPYTEST.cpy";
   private static final String CPY_EXTENSION = "cpy";
   private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
@@ -276,10 +276,10 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       String uri) {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
-
-    verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
     verify(communications).notifyThatLoadingInProgress(uri);
-    verify(communications).publishDiagnostics(uri, diagnostics);
+    verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
+    verify(communications, timeout(10000)).cancelProgressNotification(uri);
+    verify(communications, timeout(10000)).publishDiagnostics(uri, diagnostics);
   }
 
   private void verifyCallback(

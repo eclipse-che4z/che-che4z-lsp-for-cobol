@@ -44,6 +44,8 @@ public class CopybookRepositoryLRU implements CopybookRepository {
   @Setter @NonNull private ArrayList<CopybookStorable> cpyRepo;
   private final Comparator<CopybookStorable> storableComparator =
       Comparator.comparingInt(CopybookStorable::getHit); // Time last recently used
+  private final Comparator<CopybookStorable> timeComparator =
+      Comparator.comparingLong(CopybookStorable::getGenDt);
 
   @NonNull private final AtomicBoolean isSort = new AtomicBoolean(false);
 
@@ -56,7 +58,9 @@ public class CopybookRepositoryLRU implements CopybookRepository {
   @Override
   @SneakyThrows
   public synchronized void sortCache() {
-    if (!isSort.get()) cpyRepo.sort(storableComparator.reversed());
+    if (!isSort.get()) {
+      cpyRepo.sort(storableComparator.reversed().thenComparing(timeComparator));
+    }
     isSort.set(true);
   }
 
@@ -84,6 +88,8 @@ public class CopybookRepositoryLRU implements CopybookRepository {
   @Override
   @SneakyThrows
   public synchronized void persist(@NonNull CopybookStorable deepCopy) {
+    cpyRepo.removeIf(CopybookStorable::isExpired);
+
     if (!isStored(deepCopy.getId())) {
       if (cpyRepo.size() < getCacheMaxSize()) {
         cpyRepo.add(deepCopy);

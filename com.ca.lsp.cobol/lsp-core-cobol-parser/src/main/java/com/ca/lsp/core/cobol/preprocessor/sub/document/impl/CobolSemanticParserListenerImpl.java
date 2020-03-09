@@ -18,168 +18,117 @@ import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.CopySourceContext;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.*;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtils;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_TAG;
+import static java.util.Optional.ofNullable;
 
 /**
  * ANTLR visitor, which preprocesses a given COBOL program by executing COPY and REPLACE statements.
  */
+@Slf4j
 public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListener
     implements CobolSemanticParserListener {
-
-  private static final Logger LOG = LoggerFactory.getLogger(CobolSemanticParserListenerImpl.class);
   private static final String RECURSION_DETECTED = "Recursive copybook declaration for: %s";
   private static final String COPYBOOK_OVER_8_CHARACTERS =
       "Copybook declaration has more than 8 characters for: %s";
 
-  private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
+  private final PreprocessorCleanerServiceImpl preprocessorCleanerService;
   private final String documentUri;
   private final BufferedTokenStream tokens;
   private final SemanticContext semanticContext;
 
   CobolSemanticParserListenerImpl(
-      final String documentUri,
-      final BufferedTokenStream tokens,
-      final SemanticContext semanticContext) {
+      String documentUri, BufferedTokenStream tokens, SemanticContext semanticContext) {
     this.documentUri = documentUri;
     this.tokens = tokens;
     this.semanticContext = semanticContext;
 
-    contexts.push(new CobolDocumentContext());
+    preprocessorCleanerService = new PreprocessorCleanerServiceImpl();
   }
 
-  private final PreprocessorCleanerServiceImpl preprocessorCleanerService =
-      new PreprocessorCleanerServiceImpl(contexts);
-
+  @Nonnull
   @Override
   public CobolDocumentContext context() {
-    return contexts.peek();
+    return preprocessorCleanerService.context();
   }
 
   @Override
-  public void enterCompilerOptions(final CobolPreprocessorParser.CompilerOptionsContext ctx) {
-    // push a new context for COMPILER OPTIONS terminals
-    this.preprocessorCleanerService.push();
+  public void enterCompilerOptions(@Nonnull CompilerOptionsContext ctx) {
+    // push a new context for the COMPILER OPTIONS terminals
+    preprocessorCleanerService.push();
   }
 
   @Override
-  public void enterReplaceArea(final CobolPreprocessorParser.ReplaceAreaContext ctx) {
-    this.preprocessorCleanerService.push();
+  public void enterReplaceArea(@Nonnull ReplaceAreaContext ctx) {
+    preprocessorCleanerService.push();
   }
 
   @Override
-  public void enterReplaceByStatement(final CobolPreprocessorParser.ReplaceByStatementContext ctx) {
-    this.preprocessorCleanerService.push();
+  public void enterReplaceByStatement(@Nonnull ReplaceByStatementContext ctx) {
+    preprocessorCleanerService.push();
   }
 
   @Override
-  public void enterReplaceOffStatement(
-      final CobolPreprocessorParser.ReplaceOffStatementContext ctx) {
-    this.preprocessorCleanerService.push();
+  public void enterReplaceOffStatement(@Nonnull ReplaceOffStatementContext ctx) {
+    preprocessorCleanerService.push();
   }
 
   @Override
-  public void enterTitleStatement(final CobolPreprocessorParser.TitleStatementContext ctx) {
-    this.preprocessorCleanerService.push();
+  public void enterTitleStatement(@Nonnull TitleStatementContext ctx) {
+    preprocessorCleanerService.push();
   }
 
   @Override
-  public void enterParagraphName(final CobolPreprocessorParser.ParagraphNameContext ctx) {
+  public void enterParagraphName(@Nonnull ParagraphNameContext ctx) {
     semanticContext.getParagraphs().define(ctx.getText().toUpperCase(), retrievePosition(ctx));
   }
 
   @Override
-  public void enterCopyStatement(final CobolPreprocessorParser.CopyStatementContext ctx) {
-    this.preprocessorCleanerService.push();
+  public void enterCopyStatement(@Nonnull CopyStatementContext ctx) {
+    preprocessorCleanerService.push();
   }
 
   @Override
-  public void exitCompilerOptions(final CobolPreprocessorParser.CompilerOptionsContext ctx) {
+  public void exitCompilerOptions(@Nonnull CompilerOptionsContext ctx) {
     // throw away COMPILER OPTIONS terminals
-    this.preprocessorCleanerService.pop();
+    preprocessorCleanerService.pop();
   }
 
   @Override
-  public void exitDataDescriptionEntryFormat1(
-      CobolPreprocessorParser.DataDescriptionEntryFormat1Context ctx) {
+  public void exitDataDescriptionEntryFormat1(@Nonnull DataDescriptionEntryFormat1Context ctx) {
     createVariableAndDefine(ctx);
   }
 
   @Override
-  public void exitDataDescriptionEntryFormat2(
-      CobolPreprocessorParser.DataDescriptionEntryFormat2Context ctx) {
+  public void exitDataDescriptionEntryFormat2(@Nonnull DataDescriptionEntryFormat2Context ctx) {
     createVariableAndDefine(ctx);
   }
 
   @Override
-  public void exitDataDescriptionEntryFormat3(
-      CobolPreprocessorParser.DataDescriptionEntryFormat3Context ctx) {
+  public void exitDataDescriptionEntryFormat3(@Nonnull DataDescriptionEntryFormat3Context ctx) {
     createVariableAndDefine(ctx);
   }
 
-  private void createVariableAndDefine(ParserRuleContext ctx) {
-    String levelNumber;
-
-    if (ctx instanceof CobolPreprocessorParser.DataDescriptionEntryFormat1Context) {
-      CobolPreprocessorParser.DataDescriptionEntryFormat1Context ctxDataDescF1 =
-          (CobolPreprocessorParser.DataDescriptionEntryFormat1Context) ctx;
-      levelNumber = ctxDataDescF1.otherLevel().getText();
-      defineVariableIfPresent(levelNumber, ctxDataDescF1.dataName());
-
-    } else if (ctx instanceof CobolPreprocessorParser.DataDescriptionEntryFormat2Context) {
-      CobolPreprocessorParser.DataDescriptionEntryFormat2Context ctxDataDescF2 =
-          (CobolPreprocessorParser.DataDescriptionEntryFormat2Context) ctx;
-      levelNumber = ctxDataDescF2.LEVEL_NUMBER_66().getText();
-      defineVariableIfPresent(levelNumber, ctxDataDescF2.dataName());
-    } else {
-      CobolPreprocessorParser.DataDescriptionEntryFormat3Context ctxDataDescF3 =
-          (CobolPreprocessorParser.DataDescriptionEntryFormat3Context) ctx;
-      levelNumber = ctxDataDescF3.LEVEL_NUMBER_88().getText();
-      defineVariableIfPresent(levelNumber, ctxDataDescF3.dataName());
-    }
-  }
-
-  private void defineVariableIfPresent(
-      String levelNumber, CobolPreprocessorParser.DataNameContext dataName) {
-    Optional.ofNullable(dataName)
-        .ifPresent(
-            variable ->
-                semanticContext
-                    .getVariables()
-                    .define(
-                        new Variable(levelNumber, variable.getText()), retrievePosition(dataName)));
-  }
-
-  private Position retrievePosition(ParserRuleContext token) {
-    return new Position(
-        documentUri,
-        token.getStart().getStartIndex(),
-        token.getStop().getStopIndex(),
-        token.getStart().getLine(),
-        token.getStart().getCharPositionInLine());
-  }
-
   @Override
-  public void exitCopyStatement(final CobolPreprocessorParser.CopyStatementContext ctx) {
+  public void exitCopyStatement(@Nonnull CopyStatementContext ctx) {
     /*
      * define the copy book
      */
@@ -189,45 +138,6 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     defineCopybook(copybookName, position);
     checkCopybookNameLength(copybookName, position);
     this.preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens);
-  }
-
-  private void defineCopybook(String copybookName, Position position) {
-    if (copybookName == null) {
-      return;
-    }
-    if (checkThisCopybookNotPresentInHierarchy(copybookName)) {
-      semanticContext.getCopybooks().addUsage(copybookName, position);
-      semanticContext.getVariables().define(new Variable("-1", copybookName), position);
-    } else {
-      reportRecursiveCopybooks(copybookName);
-    }
-  }
-
-  private boolean checkThisCopybookNotPresentInHierarchy(String copybookName) {
-    return semanticContext.getCopybookUsageTracker().stream()
-        .map(CopybookUsage::getName)
-        .noneMatch(copybookName::equals);
-  }
-
-  private void reportRecursiveCopybooks(String copybookName) {
-    if (!semanticContext.getCopybookUsageTracker().isEmpty()) {
-      semanticContext
-          .getCopybookUsageTracker()
-          .get(0)
-          .getUsages()
-          .forEach(toSyntaxError(copybookName));
-    }
-  }
-
-  @Nonnull
-  private Consumer<Position> toSyntaxError(String copybookName) {
-    return it ->
-        errors.add(
-            SyntaxError.syntaxError()
-                .severity(1)
-                .suggestion(String.format(RECURSION_DETECTED, copybookName))
-                .position(it)
-                .build());
   }
 
   private void checkCopybookNameLength(String copybookName, Position position) {
@@ -242,33 +152,38 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void exitReplaceArea(final CobolPreprocessorParser.ReplaceAreaContext ctx) {
+  public void exitReplaceArea(@Nonnull ReplaceAreaContext ctx) {
     /*
      * replacement phrase
      */
-    this.preprocessorCleanerService.pop();
+    preprocessorCleanerService.pop();
   }
 
   @Override
-  public void exitReplaceByStatement(final CobolPreprocessorParser.ReplaceByStatementContext ctx) {
+  public void exitReplaceByStatement(@Nonnull ReplaceByStatementContext ctx) {
     // throw away terminals
-    this.preprocessorCleanerService.pop();
+    preprocessorCleanerService.pop();
   }
 
   @Override
-  public void exitReplaceOffStatement(
-      final CobolPreprocessorParser.ReplaceOffStatementContext ctx) {
+  public void exitReplaceOffStatement(@Nonnull ReplaceOffStatementContext ctx) {
     // throw away REPLACE OFF terminals
-    this.preprocessorCleanerService.pop();
+    preprocessorCleanerService.pop();
   }
 
   @Override
-  public void exitTitleStatement(final CobolPreprocessorParser.TitleStatementContext ctx) {
+  public void exitTitleStatement(@Nonnull TitleStatementContext ctx) {
     // throw away title statement
-    this.preprocessorCleanerService.pop();
+    preprocessorCleanerService.pop();
   }
 
-  private String retrieveCopybookName(final CopySourceContext copySource) {
+  @Override
+  public void visitTerminal(@Nonnull TerminalNode node) {
+    preprocessorCleanerService.visitTerminal(node, tokens);
+  }
+
+  @Nullable
+  private String retrieveCopybookName(@Nonnull CopySourceContext copySource) {
     final String copybookName;
     if (copySource.cobolWord() != null) {
       copybookName = copySource.cobolWord().getText().toUpperCase();
@@ -285,14 +200,82 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     return copybookName;
   }
 
-  @Override
-  public void visitTerminal(final TerminalNode node) {
-    final int tokPos = node.getSourceInterval().a;
-    context().write(TokenUtils.getHiddenTokensToLeft(tokPos, tokens));
-
-    if (!TokenUtils.isEOF(node)) {
-      final String text = node.getText();
-      context().write(text);
+  private void defineCopybook(@Nullable String copybookName, @Nonnull Position position) {
+    if (copybookName == null) {
+      return;
     }
+    if (checkThisCopybookNotPresentInHierarchy(copybookName)) {
+      semanticContext.getCopybooks().addUsage(copybookName, position);
+      semanticContext.getVariables().define(new Variable("-1", copybookName), position);
+    } else {
+      reportRecursiveCopybooks(copybookName);
+    }
+  }
+
+  private boolean checkThisCopybookNotPresentInHierarchy(@Nonnull String copybookName) {
+    return semanticContext.getCopybookUsageTracker().stream()
+        .map(CopybookUsage::getName)
+        .noneMatch(copybookName::equals);
+  }
+
+  private void reportRecursiveCopybooks(@Nonnull String copybookName) {
+    if (!semanticContext.getCopybookUsageTracker().isEmpty()) {
+      semanticContext
+          .getCopybookUsageTracker()
+          .get(0)
+          .getUsages()
+          .forEach(toSyntaxError(copybookName));
+    }
+  }
+
+  private void createVariableAndDefine(@Nonnull ParserRuleContext ctx) {
+    String levelNumber;
+
+    if (ctx instanceof DataDescriptionEntryFormat1Context) {
+      DataDescriptionEntryFormat1Context ctxDataDescF1 = (DataDescriptionEntryFormat1Context) ctx;
+      levelNumber = ctxDataDescF1.otherLevel().getText();
+      defineVariableIfPresent(levelNumber, ctxDataDescF1.dataName());
+
+    } else if (ctx instanceof DataDescriptionEntryFormat2Context) {
+      DataDescriptionEntryFormat2Context ctxDataDescF2 = (DataDescriptionEntryFormat2Context) ctx;
+      levelNumber = ctxDataDescF2.LEVEL_NUMBER_66().getText();
+      defineVariableIfPresent(levelNumber, ctxDataDescF2.dataName());
+    } else {
+      DataDescriptionEntryFormat3Context ctxDataDescF3 = (DataDescriptionEntryFormat3Context) ctx;
+      levelNumber = ctxDataDescF3.LEVEL_NUMBER_88().getText();
+      defineVariableIfPresent(levelNumber, ctxDataDescF3.dataName());
+    }
+  }
+
+  private void defineVariableIfPresent(
+      @Nullable String levelNumber, @Nullable DataNameContext dataName) {
+    ofNullable(dataName)
+        .ifPresent(
+            variable ->
+                semanticContext
+                    .getVariables()
+                    .define(
+                        new Variable(levelNumber, variable.getText()), retrievePosition(dataName)));
+  }
+
+  @Nonnull
+  private Position retrievePosition(@Nonnull ParserRuleContext token) {
+    return new Position(
+        documentUri,
+        token.getStart().getStartIndex(),
+        token.getStop().getStopIndex(),
+        token.getStart().getLine(),
+        token.getStart().getCharPositionInLine());
+  }
+
+  @Nonnull
+  private Consumer<Position> toSyntaxError(@Nonnull String copybookName) {
+    return it ->
+        errors.add(
+            SyntaxError.syntaxError()
+                .severity(1)
+                .suggestion(String.format(RECURSION_DETECTED, copybookName))
+                .position(it)
+                .build());
   }
 }
