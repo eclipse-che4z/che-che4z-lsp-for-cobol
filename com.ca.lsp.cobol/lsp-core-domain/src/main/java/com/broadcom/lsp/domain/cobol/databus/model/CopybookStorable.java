@@ -32,10 +32,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Data
 public class CopybookStorable implements Serializable {
-  private static final long TTU = 3600L * 3L;
+  private static final long TTU = 3600000L * 3L;
 
   private AtomicInteger hit = new AtomicInteger(0);
-  private long genDt = Instant.now().getEpochSecond();
+  private long genDt = Instant.now().toEpochMilli();
   private long id;
   private String name;
   private String uri;
@@ -51,7 +51,7 @@ public class CopybookStorable implements Serializable {
 
   @SneakyThrows
   public boolean isExpired() {
-    return (Instant.now().getEpochSecond() - genDt) > TTU;
+    return (Instant.now().toEpochMilli() - genDt) > TTU;
   }
 
   @SneakyThrows

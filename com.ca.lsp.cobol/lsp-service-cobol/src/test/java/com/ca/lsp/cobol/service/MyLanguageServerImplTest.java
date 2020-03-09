@@ -63,7 +63,7 @@ public class MyLanguageServerImplTest {
    */
   @Test
   public void initialize() {
-    FileSystemService fileSystemService = mock(FileSystemService.class);
+    CopybookService fileSystemService = mock(CopybookService.class);
     MyLanguageServerImpl server =
         new MyLanguageServerImpl(fileSystemService, null, null, null, null);
     InitializeParams initializeParams = new InitializeParams();

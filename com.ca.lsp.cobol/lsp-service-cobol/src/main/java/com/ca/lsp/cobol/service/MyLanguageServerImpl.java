@@ -13,9 +13,9 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.providers.SettingsProvider;
+import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -64,19 +64,20 @@ public class MyLanguageServerImpl implements LanguageServer {
 
   private TextDocumentService textService;
   private CobolWorkspaceService workspaceService;
-  private FileSystemService fileSystemService;
+  private CopybookService copybookService;
   private Provider<LanguageClient> clientProvider;
-  private Provider<ConfigurationSettingsStorable> settingsProvider;
+
+  private SettingsProvider settingsProvider;
 
   @Inject
   MyLanguageServerImpl(
-      FileSystemService fileSystemService,
+      CopybookService copybookService,
       TextDocumentService textService,
       CobolWorkspaceService workspaceService,
       Provider<LanguageClient> clientProvider,
-      Provider<ConfigurationSettingsStorable> settingsProvider) {
+      SettingsProvider settingsProvider) {
     this.textService = textService;
-    this.fileSystemService = fileSystemService;
+    this.copybookService = copybookService;
     this.workspaceService = workspaceService;
     this.clientProvider = clientProvider;
     this.settingsProvider = settingsProvider;
@@ -122,19 +123,13 @@ public class MyLanguageServerImpl implements LanguageServer {
    */
   void retrieveAndStoreConfiguration() {
     fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
-        .thenAccept(
-            e -> {
-              JsonObject jsonObject = (JsonObject) e.get(0);
-              ConfigurationSettingsStorable configurationSettingsStorable =
-                  parseJsonIfValid(jsonObject);
-              ((SettingsProvider) settingsProvider).set(configurationSettingsStorable);
-            });
+        .thenAccept(e -> settingsProvider.set(parseJsonIfValid((JsonObject) e.get(0))));
   }
 
   /**
    * @param jsonObject - the object which comes from the client and contains configuration settings
-   * @return a custom object of type ConfigurableSettingsStorage if the JSON is valid or null if it
-   *     is failing the check
+   * @return a custom object of type ConfigurableSettingsStorable if the JSON is valid or an empty
+   *     ConfigurableSettingsStorable if it is failing the parsing
    */
   private ConfigurationSettingsStorable parseJsonIfValid(JsonObject jsonObject) {
     Gson gson = new Gson();
@@ -142,7 +137,7 @@ public class MyLanguageServerImpl implements LanguageServer {
       return gson.fromJson(jsonObject, ConfigurationSettingsStorable.class);
     } catch (JsonSyntaxException e) {
       log.error(e.getMessage());
-      return null;
+      return ConfigurationSettingsStorable.emptyConfigurationSettingsStorable();
     }
   }
 
@@ -180,7 +175,7 @@ public class MyLanguageServerImpl implements LanguageServer {
         new WorkspaceServerCapabilities(workspaceFoldersOptions);
     capabilities.setWorkspace(workspaceServiceCapabilities);
 
-    fileSystemService.setWorkspaceFolders(params.getWorkspaceFolders());
+    copybookService.setWorkspaceFolders(params.getWorkspaceFolders());
     return supplyAsync(() -> new InitializeResult(capabilities));
   }
 
