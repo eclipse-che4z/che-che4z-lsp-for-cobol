@@ -31,14 +31,10 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.CPY_MANAGER;
@@ -146,5 +142,22 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     dataBus.invalidateCache();
     log.info("Cache invalidated due to a copybooks file watcher was triggered");
     dataBus.postData(new RunAnalysisEvent());
+  }
+
+  @Nullable
+  private String getStringArgument(@Nonnull ExecuteCommandParams params, int index) {
+    return ((JsonPrimitive) params.getArguments().get(index)).getAsString();
+  }
+
+  @Nonnull
+  private BiConsumer<Object, Throwable> reportExceptionIfFound(
+      @Nonnull ExecuteCommandParams params) {
+    return (res, ex) ->
+        ofNullable(ex)
+            .ifPresent(
+                it ->
+                    log.error(
+                        "Cannot execute command " + params.getCommand() + ": " + params.toString(),
+                        ex));
   }
 }

@@ -19,8 +19,8 @@ import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import com.ca.lsp.cobol.service.mocks.MockFileSystemService;
-import com.ca.lsp.cobol.service.mocks.MockFileSystemServiceImpl;
+import com.ca.lsp.cobol.service.mocks.MockCopybookService;
+import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -71,8 +71,8 @@ public class MultiDocumentDefinitionTest extends ConfigurableTest {
 
   public MultiDocumentDefinitionTest() {
 
-    MockFileSystemService mockFileSystemService =
-        LangServerCtx.getInjector().getInstance(MockFileSystemServiceImpl.class);
+    MockCopybookService mockFileSystemService =
+        LangServerCtx.getInjector().getInstance(MockCopybookServiceImpl.class);
 
     mockFileSystemService.setCopybooks(
         () -> Arrays.asList(new CobolText("STRUCT", STRUCT), new CobolText("PARS", PARS)));

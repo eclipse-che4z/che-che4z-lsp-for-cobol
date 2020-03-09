@@ -14,9 +14,6 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
-import com.ca.lsp.cobol.service.mocks.MockFileSystemService;
-import com.ca.lsp.cobol.service.mocks.MockFileSystemServiceImpl;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
@@ -37,10 +34,6 @@ public class TestMissingCopybooksReturnsError extends NegativeUseCase {
 
   public TestMissingCopybooksReturnsError() {
     super(TEXT);
-    //TODO: Get rid of this inject..
-    MockFileSystemService mockFileSystemService =
-        LangServerCtx.getInjector().getInstance(MockFileSystemServiceImpl.class);
-    mockFileSystemService.setCopybooks(Collections::emptyList);
   }
 
   @Override

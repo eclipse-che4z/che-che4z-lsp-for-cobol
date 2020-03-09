@@ -14,10 +14,11 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.cdi.module.databus.DatabusModule;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.mocks.MockFileSystemService;
-import com.ca.lsp.cobol.service.mocks.MockFileSystemServiceImpl;
+import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
+import com.google.inject.Guice;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
@@ -45,10 +46,11 @@ public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCa
   public TestCopybookWithRecursiveDependencyIsDetected() {
     super(TEXT);
 
-    //TODO: Get rid of this inject..
-    MockFileSystemService mockFileSystemService =
-        LangServerCtx.getInjector().getInstance(MockFileSystemServiceImpl.class);
-    mockFileSystemService.setCopybooks(
+    DataBusBroker databus =
+        Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
+
+    MockCopybookServiceImpl copybookService = new MockCopybookServiceImpl(databus);
+    copybookService.setCopybooks(
         () -> Collections.singletonList(new CobolText("RECURSIVE-COPY", RECURSIVE_COPY)));
   }
 

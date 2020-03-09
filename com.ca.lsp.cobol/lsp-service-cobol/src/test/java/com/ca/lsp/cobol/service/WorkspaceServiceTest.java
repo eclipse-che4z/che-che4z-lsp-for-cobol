@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.FileEvent;
+import org.eclipse.lsp4j.services.WorkspaceService;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -58,7 +59,7 @@ public class WorkspaceServiceTest {
     ArgumentCaptor<RequiredCopybookEvent> captor = forClass(RequiredCopybookEvent.class);
     String copybookName = "COPYBOOK";
 
-    CobolWorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
 
     CompletableFuture<Object> result =
         service.executeCommand(
@@ -86,7 +87,7 @@ public class WorkspaceServiceTest {
   @Test
   public void testExecuteNonExistingCommand() {
     DataBusBroker broker = mock(DataBusBroker.class);
-    CobolWorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
 
     CompletableFuture<Object> result =
         service.executeCommand(new ExecuteCommandParams("Missing command name", emptyList()));
@@ -106,7 +107,7 @@ public class WorkspaceServiceTest {
   @Test
   public void testExecuteCommandIncorrectArguments() {
     DataBusBroker broker = mock(DataBusBroker.class);
-    CobolWorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
 
     CompletableFuture<Object> result =
         service.executeCommand(
@@ -125,9 +126,7 @@ public class WorkspaceServiceTest {
    */
   @Test
   public void testDidChangeWatchedFilesExistingFileChanged() {
-    checkWatchers(
-        new FileEvent(
-            "file:///c%3A/workspace/COBOL/.copybooks/CpyName.cpy", Changed));
+    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks/CpyName.cpy", Changed));
   }
 
   /**
@@ -143,7 +142,7 @@ public class WorkspaceServiceTest {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     ArgumentCaptor<RunAnalysisEvent> captor = forClass(RunAnalysisEvent.class);
 
-    CobolWorkspaceServiceImpl service = new CobolWorkspaceServiceImpl(broker, null);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
 
     DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));
     service.didChangeWatchedFiles(params);

@@ -13,10 +13,14 @@
  */
 package com.ca.lsp.cobol.positive;
 
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.broadcom.lsp.cdi.module.databus.DatabusModule;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.ca.lsp.cobol.ConfigurableTest;
-import com.ca.lsp.cobol.TestModule;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
+import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
+import com.google.inject.Guice;
 import org.eclipse.lsp4j.Diagnostic;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -57,7 +61,6 @@ public class PositiveTest extends ConfigurableTest {
         new ZipTextRegistry(ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
     copybooks = registry.getCopybooks();
 
-    return new ArrayList<>(registry.getPositives());
     Collection<Object> cobolTexts = new ArrayList<>(registry.getPositives());
 
     LangServerCtx.shutdown();
@@ -66,9 +69,11 @@ public class PositiveTest extends ConfigurableTest {
 
   @Before
   public void setUpServer() {
-    MockFileSystemServiceImpl workspaceService =
-        LangServerCtx.getInjector().getInstance(MockFileSystemServiceImpl.class);
-    workspaceService.setCopybooks(LangServerCtx.getInjector().getInstance(CobolTextRegistry.class));
+    DataBusBroker databus =
+        Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
+
+    MockCopybookServiceImpl copybookService = new MockCopybookServiceImpl(databus);
+    copybookService.setCopybooks(LangServerCtx.getInjector().getInstance(CobolTextRegistry.class));
   }
 
   @Test

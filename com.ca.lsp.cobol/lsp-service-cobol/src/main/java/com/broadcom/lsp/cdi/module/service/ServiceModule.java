@@ -54,7 +54,7 @@ public class ServiceModule extends DefaultModule {
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(CopybookService.class).to(CopybookServiceImpl.class);
     bind(CopybookDependencyService.class).to(CopybookDependencyServiceImpl.class);
-    bind(CobolWorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
+    bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
