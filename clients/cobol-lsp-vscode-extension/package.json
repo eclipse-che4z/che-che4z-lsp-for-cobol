@@ -51,7 +51,8 @@
                 "extensions": [
                     ".cbl",
                     ".cpy",
-                    ".cob"
+                    ".cob",
+                    ".cobol"
                 ]
             }
         ],

@@ -45,7 +45,7 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
         return msg.substring(0, msg.indexOf(":"));
     }
     private extractProgramName(doc: vscode.TextDocument) {
-        return path.basename(doc.fileName, ".cbl")
+        return path.basename(doc.fileName, path.extname(doc.fileName));
     }
     private shouldHaveCodeAction(context: vscode.CodeActionContext): boolean {
         if (!context.diagnostics || context.diagnostics.length < 1) {

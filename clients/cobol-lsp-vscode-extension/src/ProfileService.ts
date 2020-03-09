@@ -66,10 +66,15 @@ export class ProfileService {
         return undefined;
     }
 
+    private isCobolProgram(fsPath: string) {
+        const ext = path.extname(fsPath).toLocaleLowerCase();
+        return ext === ".cbl"  || ext === ".cob" || ext === ".cobol";
+    }
+
     private async findProfileByDependenciesFile(programName: string): Promise<string | undefined> {
         for (const doc of vscode.workspace.textDocuments) {
             const docPath = doc.fileName;
-            if (!docPath.toLowerCase().endsWith(".cbl")) {
+            if (!this.isCobolProgram(docPath)) {
                 continue;
             }
             const openName = path.basename(docPath, path.extname(docPath));

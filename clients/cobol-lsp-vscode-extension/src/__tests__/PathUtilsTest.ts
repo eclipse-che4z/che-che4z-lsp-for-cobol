@@ -12,24 +12,25 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
+import * as path from "path";
 import { checkWorkspace, createCopybookPath, createDatasetPath } from "../services/PathUtils";
 
 describe("PathUtils tests", () => {
     const fsPath = "/projects";
     const profile = "profile";
     const dataset = "dataset";
+    beforeEach(() => {
+        vscode.workspace.workspaceFolders = [{ uri: { fsPath } } as any];
+    });
 
     it("creates copybook path", () => {
-        vscode.workspace.workspaceFolders = [{uri: {fsPath}} as any];
         expect(createCopybookPath(profile, dataset, "copybook"))
-            .toEqual("/projects/.copybooks/profile/dataset/copybook.cpy");
+            .toEqual(path.join("/", "projects", ".copybooks", "profile", "dataset", "copybook.cpy"));
     });
     it("creates dataset path", () => {
-        vscode.workspace.workspaceFolders = [{uri: {fsPath}} as any];
-        expect(createDatasetPath(profile, dataset)).toEqual("/projects/.copybooks/profile/dataset");
+        expect(createDatasetPath(profile, dataset)).toEqual(path.join("/projects", ".copybooks", "profile", "dataset"));
     });
     it("check workspace", () => {
-        vscode.workspace.workspaceFolders = [{uri: {fsPath}} as any];
         expect(checkWorkspace()).toEqual(true);
         vscode.workspace.workspaceFolders = [];
         expect(checkWorkspace()).toEqual(false);

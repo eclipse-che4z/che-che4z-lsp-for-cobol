@@ -16,6 +16,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 
+const DEP_EXT = ".dep";
+
 export interface DependenciesDesc {
     programName: string;
     copybooks: string[];
@@ -25,6 +27,6 @@ export function loadDepFile(depFileUri: vscode.Uri): DependenciesDesc {
     const copybooks: string[] = fs.readFileSync(depFileUri.fsPath).toString().split("\n")
         .filter(e => e.trim().length > 0)
         .map(e => e.trim());
-    const programName: string = path.basename(depFileUri.fsPath, ".dep");
+    const programName: string = path.basename(depFileUri.fsPath, DEP_EXT);
     return { copybooks, programName };
 }

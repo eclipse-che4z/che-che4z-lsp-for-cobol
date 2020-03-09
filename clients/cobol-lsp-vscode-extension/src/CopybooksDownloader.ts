@@ -35,6 +35,7 @@ export class CopybooksDownloader implements vscode.Disposable {
             this.downloadDependencies(dep, message);
         });
     }
+
     /**
      * @param copybooks array of copybooks names to download
      */
@@ -69,7 +70,6 @@ export class CopybooksDownloader implements vscode.Disposable {
 
     }
 
-    // tslint:disable-next-line: cognitive-complexity
     public async start() {
         this.resolver.setQueue(this.queue);
         let done = false;
@@ -115,10 +115,10 @@ export class CopybooksDownloader implements vscode.Disposable {
                 });
         }
     }
+
     public dispose() {
         this.queue.stop();
     }
-
 
     private async fetchCopybook(dataset: string, copybookProfile: CopybookProfile): Promise<boolean> {
         let members: string[] = [];
@@ -134,9 +134,9 @@ export class CopybooksDownloader implements vscode.Disposable {
         await this.downloadCopybook(dataset, copybookProfile.copybook, copybookProfile.profile);
         return true;
     }
+
     private async downloadCopybook(dataset: string, copybook: string, profileName: string) {
         const copybookPath = createCopybookPath(profileName, dataset, copybook);
-
         if (!fs.existsSync(copybookPath)) {
             const content = await this.zoweApi.fetchMember(dataset, copybook, profileName);
             fs.mkdirSync(createDatasetPath(profileName, dataset), { recursive: true });
@@ -145,7 +145,6 @@ export class CopybooksDownloader implements vscode.Disposable {
     }
 
     private async listMissingCopybooks(copybooks: string[], profileName: string): Promise<string[]> {
-
         const copybooksToDownload: Set<string> = new Set(copybooks);
         (await this.listPathDatasets()).forEach(ds => {
             Array.from(copybooksToDownload.values()).forEach(c => {

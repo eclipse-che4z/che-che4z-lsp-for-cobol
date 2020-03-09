@@ -13,10 +13,10 @@
  */
 import * as cp from "child_process";
 
+const versionPattern = new RegExp('(java|openjdk) (version)? ?"?((9|[0-9][0-9])|(1|9|[0-9][0-9])\.(1|8|[0-9][0-9]).*).*');
+
 export class JavaCheck {
     public static isJavaVersionSupported(versionString: string) {
-        // tslint:disable-next-line: max-line-length
-        const versionPattern = new RegExp('(java|openjdk) (version)? ?"?((9|[0-9][0-9])|(1|9|[0-9][0-9])\.(1|8|[0-9][0-9]).*).*');
         return versionPattern.test(versionString);
     }
     public async isJavaInstalled() {
