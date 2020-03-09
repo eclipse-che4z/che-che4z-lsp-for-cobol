@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
+import * as path from "path";
 
 export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
     public provideCodeActions(doc: vscode.TextDocument, range: vscode.Range | vscode.Selection,
@@ -21,18 +22,31 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
         if (!this.shouldHaveCodeAction(context)) {
             return [];
         }
-        return [{
-            arguments: ["broadcom-cobol-lsp.cpy-manager.paths"],
-            command: "workbench.action.openSettings",
-            title: "Setup copybook datasets list",
-        },
-        {
-            arguments: ["broadcom-cobol-lsp.cpy-manager.profiles"],
-            command: "workbench.action.openSettings",
-            title: "Change default zowe profile",
-        }];
+        return [
+            {
+                arguments: [this.extractCopybookName(context), this.extractProgramName(doc)],
+                command: "broadcom-cobol-lsp.cpy-manager.fetch-copybook",
+                title: "Fetch copybook",
+            },
+            {
+                arguments: ["broadcom-cobol-lsp.cpy-manager.paths"],
+                command: "workbench.action.openSettings",
+                title: "Setup copybook datasets list",
+            },
+            {
+                arguments: ["broadcom-cobol-lsp.cpy-manager.profiles"],
+                command: "workbench.action.openSettings",
+                title: "Change default zowe profile",
+            }];
     }
 
+    private extractCopybookName(context: vscode.CodeActionContext) {
+        const msg = context.diagnostics[0].message;
+        return msg.substring(0, msg.indexOf(":"));
+    }
+    private extractProgramName(doc: vscode.TextDocument) {
+        return path.basename(doc.fileName, ".cbl")
+    }
     private shouldHaveCodeAction(context: vscode.CodeActionContext): boolean {
         if (!context.diagnostics || context.diagnostics.length < 1) {
             return false;

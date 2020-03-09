@@ -21,6 +21,7 @@ import { ProfileService } from "./ProfileService";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { ZoweApi } from "./ZoweApi";
 import { CopybookResolver } from "./services/CopybookResolver";
+import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 
 export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
@@ -46,8 +47,11 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
 
     // Commands
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-language-support.copybooks.redownload", () => {
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.redownload", () => {
         copyBooksDownloader.redownloadDependencies();
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
+        fetchCopybookCommand(copybook, copyBooksDownloader, programName);
     }));
 
 

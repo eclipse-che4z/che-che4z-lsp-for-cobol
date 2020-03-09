@@ -38,6 +38,15 @@ export class CopybooksDownloader implements vscode.Disposable {
     /**
      * @param copybooks array of copybooks names to download
      */
+    async downloadCopybooks(copybooks: string[], programName: string): Promise<void> {
+        // TODO do it right
+        const profile: string = await this.profileService.getProfile(programName);
+        if (!profile) {
+            return;
+        }
+        copybooks.forEach(copybook => this.queue.push(copybook, profile));
+    }
+
     public async downloadDependencies(depFileUri: vscode.Uri, message: string = ""): Promise<void> {
         if (!checkWorkspace()) {
             return;
