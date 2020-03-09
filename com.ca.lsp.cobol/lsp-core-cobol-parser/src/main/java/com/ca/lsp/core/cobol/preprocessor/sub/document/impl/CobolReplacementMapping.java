@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,40 +13,25 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.PseudoTextContext;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceSameElementContext;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceableContext;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplacementContext;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
+import lombok.Data;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.codehaus.plexus.util.StringUtils;
 
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.PseudoTextContext;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceableContext;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplacementContext;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceSameElementContext;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** A mapping from a replaceable to a replacement. */
+@Data
 public class CobolReplacementMapping implements Comparable<CobolReplacementMapping> {
 
   private ReplaceableContext replaceable;
   private ReplacementContext replacement;
-
-  public ReplaceableContext getReplaceable() {
-    return replaceable;
-  }
-
-  public void setReplaceable(ReplaceableContext replaceable) {
-    this.replaceable = replaceable;
-  }
-
-  public ReplacementContext getReplacement() {
-    return replacement;
-  }
-
-  public void setReplacement(ReplacementContext replacement) {
-    this.replacement = replacement;
-  }
 
   private String extractPseudoText(
       final PseudoTextContext pseudoTextCtx, final BufferedTokenStream tokens) {
@@ -127,30 +112,6 @@ public class CobolReplacementMapping implements Comparable<CobolReplacementMappi
   @Override
   public String toString() {
     return replaceable.getText() + " -> " + replacement.getText();
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((replaceable == null) ? 0 : replaceable.hashCode());
-    result = prime * result + ((replacement == null) ? 0 : replacement.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    CobolReplacementMapping other = (CobolReplacementMapping) obj;
-    if (replaceable == null) {
-      if (other.replaceable != null) return false;
-    } else if (!replaceable.equals(other.replaceable)) return false;
-    if (replacement == null) {
-      if (other.replacement != null) return false;
-    } else if (!replacement.equals(other.replacement)) return false;
-    return true;
   }
 
   @Override

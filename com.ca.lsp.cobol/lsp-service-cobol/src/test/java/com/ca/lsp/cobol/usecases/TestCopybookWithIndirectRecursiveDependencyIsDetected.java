@@ -26,8 +26,8 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 /**
- * This test check that the error is shown if the copybook that is used in the Cobol file contains a
- * link to an other one, that has a dependency to the first copybook.
+ * This test checks the error shown if the copybook that is used in the Cobol file contains a link
+ * to another one, that has a dependency to the first copybook.
  */
 public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends NegativeUseCase {
 
@@ -45,6 +45,7 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends Negat
   public TestCopybookWithIndirectRecursiveDependencyIsDetected() {
     super(TEXT);
 
+    //TODO: Get rid of this inject..
     MockFileSystemService mockFileSystemService =
         LangServerCtx.getInjector().getInstance(MockFileSystemServiceImpl.class);
     mockFileSystemService.setCopybooks(
@@ -57,7 +58,9 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends Negat
   @Override
   @Test
   public void test() {
-    super.test();
+    super.test(Arrays.asList(
+                new CobolText("INNER-COPY", INNER_COPY),
+                new CobolText("INDIRECT-COPY", INDIRECT_COPY)));
   }
 
   @Override

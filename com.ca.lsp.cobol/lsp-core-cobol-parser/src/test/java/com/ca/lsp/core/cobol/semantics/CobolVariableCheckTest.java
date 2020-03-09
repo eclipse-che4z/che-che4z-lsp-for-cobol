@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2019 Broadcom.
+ *  Copyright (c) 2020 Broadcom.
  *  The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  *  This program and the accompanying materials are made
@@ -15,13 +15,18 @@
  */
 package com.ca.lsp.core.cobol.semantics;
 
+import com.broadcom.lsp.cdi.EngineModule;
+import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
+import com.google.inject.Guice;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class CobolVariableCheckTest {
+  private static final String DID_OPEN = "DID_OPEN";
+  private static final String DID_CHANGE = "DID_CHANGE";
 
   /**
    * This test represent the semantic check for variable in PROCEDURE DIVISION section There are
@@ -97,10 +102,23 @@ public class CobolVariableCheckTest {
           + "000000  END PROGRAM ATCDEM3.\r\n"
           + "000000  END PROGRAM ATCDEM2.                                 \r\n";
 
+  /**
+   * This test verify that the engine returns diagnostics in both scenario where the document sync
+   * type is DID_OPEN or DID_CHANGE.
+   */
   @Test
   public void test() {
-    CobolLanguageEngine engine = new CobolLanguageEngine();
-    ResultWithErrors<SemanticContext> result = engine.run("1", TEXT_TO_TEST);
+    CobolLanguageEngine engine =
+        Guice.createInjector(new EngineModule(), new DatabusModule())
+            .getInstance(CobolLanguageEngine.class);
+    ResultWithErrors<SemanticContext> result;
+
+    // SCENARIO FOR DID_OPEN
+    result = engine.run("1", TEXT_TO_TEST, DID_OPEN);
+    assertEquals(2, result.getErrors().stream().filter(item -> item.getSeverity() == 3).count());
+
+    // SCENARIO FOR DID_CHANGE
+    result = engine.run("1", TEXT_TO_TEST, DID_CHANGE);
     assertEquals(2, result.getErrors().stream().filter(item -> item.getSeverity() == 3).count());
   }
 }

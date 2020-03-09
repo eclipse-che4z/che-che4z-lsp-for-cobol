@@ -14,13 +14,14 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.mocks.MockFileSystemService;
 import com.ca.lsp.cobol.service.mocks.MockFileSystemServiceImpl;
 import org.junit.Test;
 
 import java.util.Collections;
+
+import static java.util.Collections.singletonList;
 
 /**
  * This test verifies that the variable structure can be built correctly with copybooks and that
@@ -47,6 +48,7 @@ public class TestVariableStructureInCopybooksWithMissingLevels extends PositiveU
   public TestVariableStructureInCopybooksWithMissingLevels() {
     super(TEXT);
 
+    //TODO: Get rid of inject..
     MockFileSystemService mockFileSystemService =
         LangServerCtx.getInjector().getInstance(MockFileSystemServiceImpl.class);
     mockFileSystemService.setCopybooks(
@@ -56,6 +58,6 @@ public class TestVariableStructureInCopybooksWithMissingLevels extends PositiveU
   @Override
   @Test
   public void test() {
-    super.test();
+    super.test(singletonList(new CobolText("STRUCT", STRUCT)));
   }
 }

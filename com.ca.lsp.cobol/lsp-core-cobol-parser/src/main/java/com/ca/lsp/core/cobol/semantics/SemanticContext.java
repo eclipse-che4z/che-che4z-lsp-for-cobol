@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2019 Broadcom.
+ *  Copyright (c) 2020 Broadcom.
  *  The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  *  This program and the accompanying materials are made
@@ -16,7 +16,7 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
-import com.ca.lsp.core.cobol.model.CopybookDefinition;
+import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
 import lombok.Value;
 
@@ -27,7 +27,7 @@ public class SemanticContext {
   private CobolVariableContext variables = new CobolVariableContext();
   private SubContext<String> paragraphs = new CobolNamedContext();
   private SubContext<String> copybooks = new CobolNamedContext();
-  private List<CopybookDefinition> copybookUsageTracker;
+  private List<CopybookUsage> copybookUsageTracker;
 
   public void merge(CopybookSemanticContext semanticContext) {
     variables.merge(semanticContext.getName(), semanticContext.getContext().getVariables());

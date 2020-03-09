@@ -78,8 +78,8 @@ public class CopybookCompletionTest {
   }
 
   private MyDocumentModel createModel() {
-    Map<String, List<Location>> copybookDefinitions = new HashMap<>();
-    copybookDefinitions.put(
+    Map<String, List<Location>> copybookUsages = new HashMap<>();
+    copybookUsages.put(
         "BRDCMCP",
         Collections.singletonList(
             new Location(null, new Range(new Position(9, 11), new Position(9, 18)))));
@@ -91,7 +91,8 @@ public class CopybookCompletionTest {
             Collections.emptyMap(),
             Collections.emptyMap(),
             Collections.emptyMap(),
-            copybookDefinitions);
+            Collections.emptyMap(),
+            copybookUsages);
 
     return new MyDocumentModel(TEXT, result);
   }

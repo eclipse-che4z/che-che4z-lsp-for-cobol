@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -16,89 +16,78 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.cleaner.impl;
 
 import com.ca.lsp.core.cobol.parser.CobolCleanerBaseListener;
-import com.ca.lsp.core.cobol.parser.CobolCleanerParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleanerListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import javax.annotation.Nonnull;
 
+import static com.ca.lsp.core.cobol.parser.CobolCleanerParser.*;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 
 /**
- * This implementation of CobolDocumentCleanerListener performs unwanted tokens elimination by
- * commenting the out in ANTLR notation
+ * This implementation of {@link CobolDocumentCleanerListener} performs unwanted token elimination
+ * by commenting the out in ANTLR notation
  */
 public class CobolDocumentCommentingCleanerListener extends CobolCleanerBaseListener
     implements CobolDocumentCleanerListener {
-  private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
-  private final BufferedTokenStream tokens;
+  private BufferedTokenStream tokens;
+  private PreprocessorCleanerServiceImpl preprocessorCleanerService;
 
-  CobolDocumentCommentingCleanerListener(final BufferedTokenStream tokens) {
+  CobolDocumentCommentingCleanerListener(@Nonnull BufferedTokenStream tokens) {
     this.tokens = tokens;
-
-    contexts.push(new CobolDocumentContext());
-  }
-
-  private final PreprocessorCleanerServiceImpl preprocessorCleanerService =
-      new PreprocessorCleanerServiceImpl(contexts);
-
-  public CobolDocumentContext context() {
-    return contexts.peek();
+    preprocessorCleanerService = new PreprocessorCleanerServiceImpl();
   }
 
   @Override
-  public void enterExecCicsStatement(CobolCleanerParser.ExecCicsStatementContext ctx) {
+  public CobolDocumentContext context() {
+    return preprocessorCleanerService.context();
+  }
+
+  @Override
+  public void enterExecCicsStatement(@Nonnull ExecCicsStatementContext ctx) {
     preprocessorCleanerService.push();
   }
 
   @Override
-  public void exitExecCicsStatement(CobolCleanerParser.ExecCicsStatementContext ctx) {
+  public void exitExecCicsStatement(@Nonnull ExecCicsStatementContext ctx) {
     preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_CICS_TAG, tokens);
   }
 
   @Override
-  public void enterExecSqlStatement(CobolCleanerParser.ExecSqlStatementContext ctx) {
+  public void enterExecSqlStatement(@Nonnull ExecSqlStatementContext ctx) {
     preprocessorCleanerService.push();
   }
 
   @Override
-  public void exitExecSqlStatement(CobolCleanerParser.ExecSqlStatementContext ctx) {
+  public void exitExecSqlStatement(@Nonnull ExecSqlStatementContext ctx) {
     preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_SQL_TAG, tokens);
   }
 
   @Override
-  public void enterExecSqlImsStatement(CobolCleanerParser.ExecSqlImsStatementContext ctx) {
+  public void enterExecSqlImsStatement(@Nonnull ExecSqlImsStatementContext ctx) {
     preprocessorCleanerService.push();
   }
 
   @Override
-  public void exitExecSqlImsStatement(CobolCleanerParser.ExecSqlImsStatementContext ctx) {
+  public void exitExecSqlImsStatement(@Nonnull ExecSqlImsStatementContext ctx) {
     preprocessorCleanerService.excludeStatementFromText(ctx, EXEC_SQLIMS_TAG, tokens);
   }
 
   @Override
-  public void enterEjectStatement(CobolCleanerParser.EjectStatementContext ctx) {
+  public void enterEjectStatement(@Nonnull EjectStatementContext ctx) {
     preprocessorCleanerService.push();
   }
 
   @Override
-  public void exitEjectStatement(CobolCleanerParser.EjectStatementContext ctx) {
+  public void exitEjectStatement(@Nonnull EjectStatementContext ctx) {
     preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens);
   }
 
   @Override
-  public void visitTerminal(final TerminalNode node) {
-    final int tokPos = node.getSourceInterval().a;
-    context().write(TokenUtils.getHiddenTokensToLeft(tokPos, tokens));
-
-    if (!TokenUtils.isEOF(node)) {
-      final String text = node.getText();
-      context().write(text);
-    }
+  public void visitTerminal(@Nonnull TerminalNode node) {
+    preprocessorCleanerService.visitTerminal(node, tokens);
   }
 }

@@ -18,13 +18,12 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.mocks.MockFileSystemService;
 import com.ca.lsp.cobol.service.mocks.MockFileSystemServiceImpl;
 import org.junit.Test;
 
-import java.util.Collections;
+import static java.util.Collections.singletonList;
 
 /**
  * This test checks that there is no error thrown when there are several COPY statements onw by one
@@ -50,6 +49,7 @@ public class TestSameCopybooksWIthDifferentCases extends PositiveUseCase {
   public TestSameCopybooksWIthDifferentCases() {
     super(TEXT);
 
+    //TODO: Get rid of this inject..
     MockFileSystemService mockFileSystemService =
         LangServerCtx.getInjector().getInstance(MockFileSystemServiceImpl.class);
     mockFileSystemService.setCopybooks(
@@ -59,6 +59,6 @@ public class TestSameCopybooksWIthDifferentCases extends PositiveUseCase {
   @Override
   @Test
   public void test() {
-    super.test();
+    super.test(singletonList(new CobolText("STRUCT1", STRUCT1)));
   }
 }

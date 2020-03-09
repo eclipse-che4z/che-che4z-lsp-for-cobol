@@ -19,11 +19,13 @@ import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
-import org.eclipse.lsp4j.DidOpenTextDocumentParams;
-import org.eclipse.lsp4j.TextDocumentItem;
+import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -33,9 +35,9 @@ import static org.mockito.Mockito.*;
  * ignoring case) then the according to notification should be sent.
  */
 public class DocumentExtensionTests {
-
   private static final String DOCUMENT_URI_BEGINNING = "file:///c%3A/workspace/document.";
   private static final String TEXT = "";
+  private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
 
   private DataBusBroker broker;
   private Communications communications;
@@ -48,6 +50,10 @@ public class DocumentExtensionTests {
     engine = mock(LanguageEngineFacade.class);
   }
 
+  /**
+   * This test verify that supported cobol extensions are correctly analyzed by the underneath
+   * engine in both TextDocumentSync types [DID_OPEN|DID_CHANGE].
+   */
   @Test
   public void testMatchingExtensions() {
     checkExtensionMatches("cbl");
@@ -70,10 +76,18 @@ public class DocumentExtensionTests {
   private void checkExtensionMatches(String extension) {
     String uri = DOCUMENT_URI_BEGINNING + extension;
 
-    when(engine.analyze(uri, TEXT)).thenReturn(AnalysisResult.empty());
+    // dynamic stubbing in DID_OPEN mode
+    when(engine.analyze(uri, TEXT, TextDocumentSyncType.DID_OPEN))
+        .thenReturn(AnalysisResult.empty());
     fireDidOpen(extension, uri);
+    verify(engine, timeout(10000).times(1)).analyze(uri, TEXT, TextDocumentSyncType.DID_OPEN);
 
-    verify(engine, timeout(10000)).analyze(uri, TEXT);
+    // dynamic stubbing in DID_CHANGE mode
+    when(engine.analyze(uri, TEXT, TextDocumentSyncType.DID_CHANGE))
+        .thenReturn(AnalysisResult.empty());
+    fireDidChange(uri);
+    verify(engine, timeout(10000))
+        .analyze(uri, INCORRECT_TEXT_EXAMPLE, TextDocumentSyncType.DID_CHANGE);
   }
 
   private void checkExtensionNotMatches(String extension) {
@@ -83,7 +97,17 @@ public class DocumentExtensionTests {
 
   private void fireDidOpen(String extension, String uri) {
     TextDocumentService service =
-        new MyTextDocumentService(communications, engine, null, null, null, broker);
+        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
     service.didOpen(new DidOpenTextDocumentParams(new TextDocumentItem(uri, extension, 0, TEXT)));
+  }
+
+  private void fireDidChange(String uri) {
+    List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
+    textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
+
+    TextDocumentService service =
+        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
+    service.didChange(
+        new DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier(uri, 0), textEdits));
   }
 }

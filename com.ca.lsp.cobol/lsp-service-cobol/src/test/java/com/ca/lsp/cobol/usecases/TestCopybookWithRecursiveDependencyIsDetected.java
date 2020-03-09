@@ -24,6 +24,7 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 /**
  * This test check that the error is shown if the copybook that is used in the Cobol file contains a
@@ -44,6 +45,7 @@ public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCa
   public TestCopybookWithRecursiveDependencyIsDetected() {
     super(TEXT);
 
+    //TODO: Get rid of this inject..
     MockFileSystemService mockFileSystemService =
         LangServerCtx.getInjector().getInstance(MockFileSystemServiceImpl.class);
     mockFileSystemService.setCopybooks(
@@ -53,7 +55,7 @@ public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCa
   @Override
   @Test
   public void test() {
-    super.test();
+    super.test(singletonList(new CobolText("RECURSIVE-COPY", RECURSIVE_COPY)));
   }
 
   @Override

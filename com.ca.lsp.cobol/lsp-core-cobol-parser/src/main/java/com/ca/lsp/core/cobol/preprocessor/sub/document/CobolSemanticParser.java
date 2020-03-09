@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -30,10 +30,14 @@ public interface CobolSemanticParser {
    *
    * @param code - COBOL program text to analyse
    * @param semanticContext - semantic context of the currently processed document to be filled in.
+   * @param textDocumentSyncType - reflect the sync status of the document (DID_OPEN|DID_CHANGE)
    * @return a PreprocessedInput - text and its semantic context with syntax errors if found or an
    *     empty list
    */
   @Nonnull
   ResultWithErrors<PreprocessedInput> processLines(
-      @Nonnull String uri, @Nonnull String code, @Nonnull SemanticContext semanticContext);
+      @Nonnull String uri,
+      @Nonnull String code,
+      @Nonnull SemanticContext semanticContext,
+      String textDocumentSyncType);
 }

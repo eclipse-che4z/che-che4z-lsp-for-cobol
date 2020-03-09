@@ -21,7 +21,6 @@ import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleaner;
 import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.impl.CobolDocumentCleanerImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineIndicatorProcessor;
@@ -34,6 +33,8 @@ import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.ContinuationLineT
 import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.CobolLineWriter;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.impl.CobolLineWriterImpl;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nonnull;
@@ -42,12 +43,24 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
+@Singleton
 public class CobolPreprocessorImpl implements CobolPreprocessor {
+  private CobolSemanticParser semanticParser;
+
+  @Inject
+  public CobolPreprocessorImpl(CobolSemanticParser semanticParser) {
+    this.semanticParser = semanticParser;
+  }
+
   @Nonnull
   @Override
   public ResultWithErrors<PreprocessedInput> process(
-      @Nonnull String documentUri, @Nonnull String cobolSourceCode) {
-    return process(documentUri, cobolSourceCode, new SemanticContext(Collections.emptyList()));
+      @Nonnull String documentUri, @Nonnull String cobolSourceCode, String textDocumentSyncType) {
+    return process(
+        documentUri,
+        cobolSourceCode,
+        new SemanticContext(Collections.emptyList()),
+        textDocumentSyncType);
   }
 
   @Nonnull
@@ -55,7 +68,8 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   public ResultWithErrors<PreprocessedInput> process(
       @Nonnull String documentUri,
       @Nonnull String cobolCode,
-      @Nonnull SemanticContext semanticContext) {
+      @Nonnull SemanticContext semanticContext,
+      @Nonnull String textDocumentSyncType) {
 
     ResultWithErrors<List<CobolLine>> lines = readLines(cobolCode, documentUri);
 
@@ -67,7 +81,8 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     String cleanDocument = cleanDocument(documentUri, rewrittenLines);
 
     ResultWithErrors<PreprocessedInput> parsedDocument =
-        parseDocument(documentUri, cleanDocument, semanticContext);
+        semanticParser.processLines(
+            documentUri, cleanDocument, semanticContext, textDocumentSyncType);
 
     List<SyntaxError> errors = new ArrayList<>();
     errors.addAll(lines.getErrors());
@@ -77,17 +92,12 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     return new ResultWithErrors<>(parsedDocument.getResult(), errors);
   }
 
-  private String cleanDocument(String documentUri, final List<CobolLine> lines) {
+  private String cleanDocument(String documentUri, List<CobolLine> lines) {
     String code = createLineWriter().serialize(lines);
     return createDocumentCleaner().cleanDocument(documentUri, code);
   }
 
-  private ResultWithErrors<PreprocessedInput> parseDocument(
-      String documentUri, final String document, final SemanticContext semanticContext) {
-    return createDocumentParser().processLines(documentUri, document, semanticContext);
-  }
-
-  private ResultWithErrors<List<CobolLine>> readLines(final String cobolCode, String documentURI) {
+  private ResultWithErrors<List<CobolLine>> readLines(String cobolCode, String documentURI) {
     return createLineReader().processLines(documentURI, cobolCode);
   }
 
@@ -100,20 +110,16 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
    * Normalize lines of given COBOL source code, so that comment entries can be parsed and lines
    * have a unified line format.
    */
-  private List<CobolLine> rewriteLines(final List<CobolLine> lines) {
-    final List<CobolLine> lineIndicatorProcessedLines =
+  private List<CobolLine> rewriteLines(List<CobolLine> lines) {
+    List<CobolLine> lineIndicatorProcessedLines =
         createLineIndicatorProcessor().processLines(lines);
-    final List<CobolLine> normalizedInlineCommentEntriesLines =
+    List<CobolLine> normalizedInlineCommentEntriesLines =
         createInlineCommentEntriesNormalizer().processLines(lineIndicatorProcessedLines);
     return createCommentEntriesMarker().processLines(normalizedInlineCommentEntriesLines);
   }
 
   private CobolLineReWriter createCommentEntriesMarker() {
     return new CobolCommentEntriesMarkerImpl();
-  }
-
-  private CobolSemanticParser createDocumentParser() {
-    return new CobolSemanticParserImpl();
   }
 
   private CobolDocumentCleaner createDocumentCleaner() {

@@ -13,13 +13,10 @@
  */
 package com.ca.lsp.cobol.positive;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.TestModule;
-import com.ca.lsp.cobol.service.mocks.MockFileSystemServiceImpl;
+import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import org.eclipse.lsp4j.Diagnostic;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -29,15 +26,19 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
+import static java.lang.System.getProperty;
+import static java.util.Optional.ofNullable;
 import static org.junit.Assert.assertEquals;
 
 /**
  * This class provides capability to run the server for actual cobol files that are provided using
  * {@link CobolTextRegistry}. The positive test should always pass. If not, then there are some
- * regressions. The complete error description with the file name is logged.
+ * regressions. The complete error description with the file name logged.
  */
 @RunWith(Parameterized.class)
 public class PositiveTest extends ConfigurableTest {
+  private static final String PATH_TO_TEST_RESOURCES = "filesToTestPath";
+  private static List<CobolText> copybooks;
   private CobolText text;
 
   public PositiveTest(CobolText text) {
@@ -52,10 +53,11 @@ public class PositiveTest extends ConfigurableTest {
    */
   @Parameterized.Parameters
   public static Collection<Object> retrieveTextsToTest() {
-    LangServerCtx.getGuiceCtx(new TestModule(), new DatabusModule());
+    CobolTextRegistry registry =
+        new ZipTextRegistry(ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
+    copybooks = registry.getCopybooks();
 
-    CobolTextRegistry registry = LangServerCtx.getInjector().getInstance(CobolTextRegistry.class);
-
+    return new ArrayList<>(registry.getPositives());
     Collection<Object> cobolTexts = new ArrayList<>(registry.getPositives());
 
     LangServerCtx.shutdown();
@@ -71,9 +73,7 @@ public class PositiveTest extends ConfigurableTest {
 
   @Test
   public void test() {
-    List<Diagnostic> diagnostics = analyzeForErrors(text.getFullText());
-
-    assertNoSyntaxErrorsFound(diagnostics);
+    assertNoSyntaxErrorsFound(analyzeForErrors(text.getFullText(), copybooks));
   }
 
   private void assertNoSyntaxErrorsFound(List<Diagnostic> diagnostics) {

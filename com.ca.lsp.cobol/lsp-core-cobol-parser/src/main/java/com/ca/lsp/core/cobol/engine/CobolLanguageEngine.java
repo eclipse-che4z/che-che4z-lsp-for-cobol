@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -18,13 +18,13 @@ import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolLexer;
 import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
-import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
+import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategy;
 import com.ca.lsp.core.cobol.visitor.CobolVisitor;
-import lombok.RequiredArgsConstructor;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -32,16 +32,35 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class is responsible for run the syntax and semantic analysis of an input cobol document.
+ * Its run method used by the service facade layer CobolLanguageEngineFacade.
+ */
 @Slf4j
-@RequiredArgsConstructor
+@Singleton
 public class CobolLanguageEngine {
 
-  public ResultWithErrors<SemanticContext> run(String documentUri, String text) {
+  private CobolPreprocessor preprocessor;
 
-    CobolPreprocessorImpl preprocessor = new CobolPreprocessorImpl();
+  @Inject
+  public CobolLanguageEngine(CobolPreprocessor preprocessor) {
+    this.preprocessor = preprocessor;
+  }
+
+  /**
+   * Perform syntax and semantic analysisi for the given text document
+   *
+   * @param documentUri unique resource identifier of the processed document
+   * @param text the content of the document that should be processed
+   * @param textDocumentSyncType the document sync type that can be (DID_OPEN|DID_CHANGE)
+   * @return Semantic information wrapper object and list of syntax error that might send back to
+   *     the client
+   */
+  public ResultWithErrors<SemanticContext> run(
+      String documentUri, String text, String textDocumentSyncType) {
 
     ResultWithErrors<PreprocessedInput> preProcessedInput =
-        preprocessor.process(documentUri, text);
+        preprocessor.process(documentUri, text, textDocumentSyncType);
 
     CobolLexer lexer =
         new CobolLexer(CharStreams.fromString(preProcessedInput.getResult().getInput()));
@@ -56,16 +75,14 @@ public class CobolLanguageEngine {
 
     parser.removeErrorListeners();
     parser.addErrorListener(new VerboseListener(errors, documentUri));
-
-    CobolErrorStrategy strategy = new CobolErrorStrategy();
-    parser.setErrorHandler(strategy);
+    parser.setErrorHandler(new CobolErrorStrategy());
 
     CobolParser.StartRuleContext tree = parser.startRule();
-    CobolVisitor visitor = new CobolVisitor();
-    visitor.setSemanticErrors(new SemanticListener(errors));
-    visitor.setSemanticContext(preProcessedInput.getResult().getSemanticContext());
-    visitor.setDocumentUri(documentUri);
+    CobolVisitor visitor =
+        new CobolVisitor(documentUri, preProcessedInput.getResult().getSemanticContext());
     visitor.visit(tree);
+
+    errors.addAll(visitor.getErrors());
 
     errors.forEach(err -> LOG.debug(err.toString()));
     return new ResultWithErrors<>(preProcessedInput.getResult().getSemanticContext(), errors);

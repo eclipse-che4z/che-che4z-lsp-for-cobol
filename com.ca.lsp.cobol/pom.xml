@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-~ Copyright (c) 2019 Broadcom.
+~ Copyright (c) 2020 Broadcom.
 ~
 ~ The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
 ~
@@ -20,13 +20,15 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ca.lsp</groupId>
   <artifactId>com.ca.lsp.cobol</artifactId>
-  <version>0.10.0</version>
+  <version>${revision}</version>
   <packaging>pom</packaging>
   <name>COBOL LSP :: Parent pom</name>
 
   <properties>
+    <revision>0.10.1</revision>
     <lsp4j.version>0.5.0</lsp4j.version>
     <antlr.version>4.7.1</antlr.version>
+    <guice.version>4.2.2</guice.version>
   </properties>
 
   <dependencyManagement>
@@ -66,12 +68,12 @@
       <dependency>
         <groupId>com.ca.lsp</groupId>
         <artifactId>lsp-core-cobol-parser</artifactId>
-        <version>0.10.0</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>com.ca.lsp</groupId>
         <artifactId>lsp-core-domain</artifactId>
-        <version>0.10.0</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.antlr</groupId>
@@ -107,9 +109,14 @@
       <dependency>
         <groupId>com.google.inject</groupId>
         <artifactId>guice</artifactId>
-        <version>4.2.2</version>
+        <version>${guice.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.google.inject.extensions</groupId>
+        <artifactId>guice-assistedinject</artifactId>
+        <version>${guice.version}</version>
+      </dependency>
+        <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>28.1-jre</version>

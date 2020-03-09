@@ -15,18 +15,17 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.mocks.MockFileSystemService;
 import org.eclipse.lsp4j.Location;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -43,6 +42,7 @@ public class TestMissingCopybookNotInVariableList extends ConfigurableTest {
 
   public TestMissingCopybookNotInVariableList() {
 
+    //TODO: Get rid of this inject
     MockFileSystemService mockFileSystemService =
         LangServerCtx.getInjector().getInstance(MockFileSystemService.class);
     mockFileSystemService.setCopybooks(Collections::emptyList);
@@ -54,7 +54,7 @@ public class TestMissingCopybookNotInVariableList extends ConfigurableTest {
    */
   @Test
   public void test() {
-    AnalysisResult result = analyze(TEXT);
+    AnalysisResult result = analyze(TEXT, emptyList());
     Map<String, List<Location>> variableDefinitions = result.getVariableDefinitions();
 
     assertEquals(variableDefinitions.keySet().toString(), 1, variableDefinitions.size());

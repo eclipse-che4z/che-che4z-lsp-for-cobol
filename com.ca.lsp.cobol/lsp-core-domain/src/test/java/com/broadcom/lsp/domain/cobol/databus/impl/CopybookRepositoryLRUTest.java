@@ -18,11 +18,17 @@ package com.broadcom.lsp.domain.cobol.databus.impl;
 import com.broadcom.lsp.domain.CopybookStorableProvider;
 import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import net.jodah.concurrentunit.Waiter;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.internal.util.reflection.FieldSetter;
 
+import java.lang.reflect.Field;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.NoSuchElementException;
 
 import static org.junit.Assert.*;
@@ -30,8 +36,9 @@ import static org.junit.Assert.*;
 @Slf4j
 public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
   private CopybookRepositoryLRU repository;
-  private static final int CACHE_SIZE = 2;
+  private static final int CACHE_SIZE = 4;
   private CopybookStorable storable = getDummyStorable();
+  @Getter protected final Waiter waiter = new Waiter();
 
   @Before
   public void initRepository() {
@@ -63,6 +70,85 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
   }
 
   /**
+   * This test validates that the cache is throwing the expired elements away, the elements which
+   * are older than 3h
+   *
+   * @throws NoSuchFieldException
+   */
+  @Test
+  public void testCacheExpiration() throws NoSuchFieldException {
+    long genDt = Instant.now().minus(4, ChronoUnit.HOURS).getEpochSecond();
+
+    CopybookStorable storableCpy = new CopybookStorable("REMOVE", "URI", "DUMMY CONTENT");
+    Field f = storableCpy.getClass().getDeclaredField("genDt");
+    f.setAccessible(true);
+    FieldSetter.setField(storableCpy, f, genDt);
+
+    repository.persist(storableCpy);
+    repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO232", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
+
+    assertEquals(3, repository.size());
+  }
+
+  /**
+   * This test validates the cache sort mechanism, first is sorted by the hits and after by the time
+   * in ms, it is worth to mention that we need to delay with 1ms the element in order to have a
+   * time difference at the creation moment, if not it will not differentiate and the order will be
+   * not the expected one
+   *
+   * @throws NoSuchFieldException
+   */
+  @Test
+  public void testCacheSort() throws NoSuchFieldException {
+    long genDt = Instant.now().minus(1, ChronoUnit.MILLIS).toEpochMilli();
+
+    CopybookStorable elem1 = new CopybookStorable("NEW_STO3", "URI", "DUMMY CONTENT");
+
+    /*
+     The mechanism is using ms to evaluate the time of creation, because the process is too fast there is a need
+      for one ms delay
+    */
+    Field f = elem1.getClass().getDeclaredField("genDt");
+    f.setAccessible(true);
+    FieldSetter.setField(elem1, f, genDt);
+
+    CopybookStorable elem2 = new CopybookStorable("NEW_STO1", "URI", "DUMMY CONTENT");
+
+    /*
+     Element1 and element2 are used as notation in order to make more visible the expected result
+    */
+    repository.persist(elem1);
+    repository.persist(elem2);
+    repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO2", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO3", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
+    repository.persist(new CopybookStorable("NEW_STO3", "URI", "DUMMY CONTENT"));
+
+    assertEquals(elem1.getName(), repository.topItem().get().getName());
+    assertEquals(elem1.getContent(), repository.topItem().get().getContent());
+    assertEquals(elem2.getName(), repository.lastItem().get().getName());
+    assertEquals(elem2.getContent(), repository.lastItem().get().getContent());
+    assertEquals(CACHE_SIZE, repository.size());
+  }
+
+  /** This test validates that an exception is thrown if provided arguments are null. */
+  @Test(expected = IllegalArgumentException.class)
+  public void testNullArguments() {
+    repository.persist(new CopybookStorable(null, null, null));
+    repository.persist(null);
+  }
+
+  @Test
+  public void testWrongSearchedElement() {
+    assertFalse(repository.isStored(storable.getName() + "wrong"));
+  }
+
+  /**
    * This test verify that when a new element should be stored in a full cache, the oldest element
    * is removed from the cache
    */
@@ -73,9 +159,18 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
     repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
     LOG.info("Cache sizing after NEW_STO = " + repository.size());
 
+    repository.persist(new CopybookStorable("NEW_STO2 ", "URI2", "DUMMY CONTENT2"));
+    LOG.info("Cache sizing after NEW_STO = " + repository.size());
+
+    repository.persist(new CopybookStorable("NEW_STO3 ", "URI2", "DUMMY CONTENT2"));
+    LOG.info("Cache sizing after NEW_STO = " + repository.size());
+
+    repository.persist(new CopybookStorable("NEW_STO4 ", "URI2", "DUMMY CONTENT2"));
+    LOG.info("Cache sizing after NEW_STO = " + repository.size());
+
     int prevCacheSize = repository.size();
 
-    repository.persist(new CopybookStorable("NEW_STO2 ", "URI2", "DUMMY CONTENT2"));
+    repository.persist(new CopybookStorable("NEW_STO5 ", "URI2", "DUMMY CONTENT2"));
     LOG.info("Cache sizing after NEW_STO = " + repository.size());
 
     assertEquals(repository.size(), prevCacheSize);
@@ -91,7 +186,7 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
   }
 
   /**
-   * This test verify that a NoSuchElementException is throwed if the cache is empty or the element
+   * This test verify that a NoSuchElementException is thrown if the cache is empty or the element
    * looking for doesn't exist.
    */
   @Test(expected = NoSuchElementException.class)
@@ -118,14 +213,14 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
     assertNotNull(repository.lastItem().get());
   }
 
-  /** This test verify that an element defined in the cache is retrivied correctly */
+  /** This test verify that an element defined in the cache is retrieved correctly */
   @Test
   public void testStoredElement() {
     assertTrue(repository.isStored(new StringBuilder(storable.getName())));
     assertTrue(repository.isStored(storable.getName()));
   }
 
-  /** This test verify that the cache invalidation works correclty. */
+  /** This test verify that the cache invalidation works correctly. */
   @Test
   public void testCacheInvalidation() {
     repository.invalidateCache();

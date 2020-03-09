@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -21,7 +21,7 @@ import java.util.Collection;
 
 @Data
 @AllArgsConstructor
-public class CopybookDefinition {
+public class CopybookUsage {
   private String name;
   private String uri;
   private Collection<Position> usages;

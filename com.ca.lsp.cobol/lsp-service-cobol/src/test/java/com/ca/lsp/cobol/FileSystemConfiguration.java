@@ -13,163 +13,215 @@
  */
 package com.ca.lsp.cobol;
 
+import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
+import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
+import org.junit.After;
+import org.junit.Before;
+import org.mockito.Mockito;
 
-import javax.annotation.Nonnull;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.mockito.Mockito.when;
 
 /**
  * This class provide support methods for FileSystemService and doesn't test anything. More in
- * detail create the workspace folder in the user tmp folder with some copybooks there
+ * detail create the workspace folder in the user tmp folder with some copybooks and dependency file
+ * there.
  */
 @Slf4j
 public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String COPYBOOK_CONTENT =
       "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
   protected static final String WORKSPACE_FOLDER_NAME = "test";
-  protected static final String WS_FOLDER_NAME = "WORKSPACE";
-  protected static final String CPYB_FOLDER_NAME = "COPYBOOKS";
-  protected static final String CPYB_INNER_NAME = "INNER";
   protected static final String CPY_OUTER_NAME_ONLY2 = "copy2";
   protected static final String EMPTY_COPYBOOK_NAME = " ";
-  public static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
-  protected static final String CPY_OUTER_FILE_NAME_WITH_EXT = "copy.cpy";
-  protected static final String CPY_OUTER_ANOTHER_FILE_NAME_WITH_EXT = "copy3.out";
+  protected static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
   protected static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
   protected static final String DEP_FILE_COST_NAME = "SOMEPROG";
-  private URI workspaceFolderPath = null;
-  private Path innerCopybooksPath = null;
-  protected Path workspacePath = createPathOfName(WS_FOLDER_NAME, Optional.empty());
+  protected static final String PROFILE_NAME = "PRF11";
+  protected static final String DSNAME_1 = "HLQLF01.DSNAME1";
+  protected static final String DSNAME_2 = "HLQLF01.DSNAME2";
+  protected static final String DEP_EXTENSION = ".dep";
+  protected static final String COPYBOOK_NOT_PRESENT = "ANTHRCPY";
 
+  protected Path workspaceFolder = null;
+  protected Path copybooksFolderPath = null;
+  protected Path depenencyFileFolderPath = null;
+
+  protected SettingsProvider settingsProvider = Mockito.mock(SettingsProvider.class);
+
+  // this field represent the predefined setting used for test purposes
+  protected ConfigurationSettingsStorable configurationSettingsStorable = null;
   /*
-  STRUCTURE FOLDER USED FOR TEST PURPOSES
-  ***************************************
-  TEMP/
-  └── WORKSPACE/
-      ├── .cobdeps
-      │   └── SOMEPROG.dep
-      └─── COPYBOOKS
-          ├── INNER/
-          │   └── copy2.cpy
-          ├── copy3.out
-          └── copy.cpy
-  ***************************************
+    STRUCTURE FOLDER USED FOR TEST PURPOSES
+    ***************************************
+    TEMP/
+    └── WORKSPACE/
+        ├── .cobdeps
+        │   ├── TEST.dep
+        │   └── SOMEPROG.dep
+        └─── .copybooks
+            ├── PROFILE_NAME/
+            │   ├── HLQ.DSN.NAME1/
+            │   │   └── copybook.cpy
+            │   └── HLQ.DSN.NAME2/
+            │       └── copybook.cpy
+            └── copy2.cpy
+    ***************************************
   */
 
-  protected List<WorkspaceFolder> initWorkspaceFolderList() {
-    Path copybooksPath = createPathOfName(CPYB_FOLDER_NAME, Optional.of(workspacePath));
-    Path cpyFilePath = createPathOfName(CPY_OUTER_FILE_NAME_WITH_EXT, Optional.of(copybooksPath));
-    Path anotherCpyFilePath =
-        createPathOfName(CPY_OUTER_ANOTHER_FILE_NAME_WITH_EXT, Optional.of(copybooksPath));
-    innerCopybooksPath = createPathOfName(CPYB_INNER_NAME, Optional.of(copybooksPath));
+  /**
+   * This method initialize the filesystem and the settings configuration that will be used to test
+   * the filesystem service capabilities using the physical filesystem
+   */
+  @Before
+  public void buildFS() {
+    intializeSettings();
+    createWorkspaceFolderStructure();
+    createCopybookStructure();
+    createDependencyFileStructure();
 
-    // create two cpy files
-    createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath, anotherCpyFilePath);
-    createInnerFolderAndFile(
-        copybooksPath,
-        createPathOfName(CPY_INNER_FILE_NAME_WITH_EXT, Optional.of(innerCopybooksPath)));
+    // populate copybook folder and dependency file with some content
+    createCopybookFiles();
+    createDependencyFile();
+  }
 
+  @After
+  public void cleanupTempFolder() {
+    try {
+      Files.walk(getWorkspaceFolderPath())
+          .sorted(Comparator.reverseOrder())
+          .map(Path::toFile)
+          .forEach(File::delete);
+    } catch (IOException e) {
+      log.error(e.getMessage());
+    }
+  }
+
+  /**
+   * This method define the steps necessary to emulate the json settings provided by the user in the
+   * settings.json
+   */
+  private void intializeSettings() {
+    // SettingsProvider settingsProvider = new SettingsProvider();
+
+    configurationSettingsStorable =
+        new ConfigurationSettingsStorable(
+            PROFILE_NAME, Collections.unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2)));
+
+    settingsProvider.set(configurationSettingsStorable);
+    when(settingsProvider.get()).thenReturn(configurationSettingsStorable);
+  }
+
+  protected List<WorkspaceFolder> generateWorkspaceFolder() {
     WorkspaceFolder workspaceFolder = new WorkspaceFolder();
     workspaceFolder.setName(WORKSPACE_FOLDER_NAME);
-    workspaceFolder.setUri(adjustURI(getWorkspaceFolderPath().toString()));
-    setWorkspaceFolderPath(workspacePath.toUri());
-
+    workspaceFolder.setUri(String.valueOf(getWorkspaceFolderPath().toUri()));
     return Collections.singletonList(workspaceFolder);
   }
 
-  protected URI getWorkspaceFolderPath() {
-    return workspaceFolderPath;
+  protected void createWorkspaceFolderStructure() {
+    workspaceFolder =
+        createFolderStructure(Paths.get(System.getProperty("java.io.tmpdir"), "WORKSPACE"));
   }
 
-  private void setWorkspaceFolderPath(URI workspaceFolderPath) {
-    this.workspaceFolderPath = workspaceFolderPath;
+  private void createCopybookStructure() {
+    copybooksFolderPath =
+        createFolderStructure(Paths.get(workspaceFolder + filesystemSeparator() + ".copybooks"));
+  }
+
+  protected void createDependencyFileStructure() {
+    depenencyFileFolderPath =
+        createFolderStructure(Paths.get(workspaceFolder + filesystemSeparator() + ".cobdeps"));
+  }
+
+  private void createDependencyFile() {
+    generateDummyContentForFile(
+        depenencyFileFolderPath, DEP_FILE_COST_NAME + ".dep", CPY_OUTER_NAME_ONLY2);
+  }
+
+  private void createCopybookFiles() {
+    ConfigurationSettingsStorable configSettings = settingsProvider.get();
+
+    String profile = (String) configSettings.getProfiles();
+    List<String> targetDatasets = configSettings.getPaths();
+
+    List<Path> retrievedPaths =
+        targetDatasets.stream()
+            .map(
+                it ->
+                    Paths.get(
+                        copybooksFolderPath
+                            + filesystemSeparator()
+                            + profile
+                            + filesystemSeparator()
+                            + it))
+            .collect(Collectors.toList());
+
+    retrievedPaths.forEach(this::createFolderStructure);
+    retrievedPaths.forEach(
+        targetPath ->
+            generateDummyContentForFile(
+                targetPath, CPY_INNER_FILE_NAME_WITH_EXT, COPYBOOK_CONTENT));
+  }
+
+  private Path createFolderStructure(Path copybooksPath) {
+    try {
+      return Files.createDirectories(copybooksPath);
+    } catch (IOException e) {
+      log.error(e.getMessage());
+      return null;
+    }
+  }
+
+  protected Path getWorkspaceFolderPath() {
+    return workspaceFolder;
   }
 
   protected String filesystemSeparator() {
     return FileSystems.getDefault().getSeparator();
   }
 
-  /*
-  Remove the last slash from the URI path in order to replicate the behaviour of the client IDE that send to the server
-  the path of the opened workspace without the last slash.
-   */
-  private String adjustURI(String originalUri) {
-    return originalUri.substring(0, originalUri.length() - 1);
-  }
-
-  @Nonnull
-  private Path createPathOfName(String folderName, Optional<Path> parentFolder) {
-
-    // check if the workspace folder already exists (parent folder)..
-    return parentFolder
-        .map(
-            path ->
-                Paths.get(parentFolder.get() + System.getProperty("file.separator") + folderName))
-        .orElseGet(
-            () ->
-                Paths.get(
-                    System.getProperty("java.io.tmpdir")
-                        + System.getProperty("file.separator")
-                        + folderName));
-  }
-
-  // util methods to create dummy cobol code inside copybook file
-  private void createInnerFolderAndFile(Path parentFolder, Path copybookFile) {
-    try {
-      // create parent folder
-      if (Files.exists(parentFolder)) {
-        if (!Files.exists(copybookFile)) {
-          Files.createDirectory(innerCopybooksPath);
-          // create file into it
-          Path copybookFilePath = Files.createFile(copybookFile);
-          generateDummyContentForFile(copybookFilePath);
-        }
+  private void generateDummyContentForFile(
+      Path targetDirectory, String filenameAndExtension, String content) {
+    Path filePath;
+    // check the folder exist if no create it
+    if (!Files.exists(targetDirectory)) {
+      try {
+        Files.createDirectory(targetDirectory);
+      } catch (IOException e) {
+        log.error(e.getMessage());
+        return;
       }
+    }
+
+    // create the file
+    try {
+      filePath =
+          Files.createFile(
+              Paths.get(targetDirectory + filesystemSeparator() + filenameAndExtension));
     } catch (IOException e) {
       log.error(e.getMessage());
+      return;
     }
+
+    writeContentOnFile(filePath, content);
   }
 
-  private void createTempDirAndFile(
-      Path workspacePath, Path copybookFolderPath, Path cpyFilePath, Path anotherCpyFilePath) {
+  private void writeContentOnFile(Path filePath, String content) {
     try {
-      if (!Files.exists(workspacePath)) {
-        Files.createDirectory(workspacePath);
-        if (!Files.exists(copybookFolderPath)) {
-          Files.createDirectory(copybookFolderPath);
-        }
-      }
-
+      Files.write(filePath, (content + "\n").getBytes(), StandardOpenOption.APPEND);
     } catch (IOException e) {
-      log.error(e.getMessage());
-    }
-    setWorkspaceFolderPath(workspacePath.toUri());
-  }
-
-  private void generateDummyContentForFile(Path copybookFilePath) {
-    File copybookFile = copybookFilePath.toFile();
-    FileOutputStream fileOutputStream;
-    try {
-      fileOutputStream = new FileOutputStream(copybookFile, true);
-      BufferedOutputStream bufferedOutputStream =
-          new BufferedOutputStream(fileOutputStream, 128 * 100);
-      bufferedOutputStream.write(COPYBOOK_CONTENT.getBytes());
-      bufferedOutputStream.flush();
-      fileOutputStream.close();
-    } catch (IOException e) {
-      log.error(e.getMessage());
+      log.error("IO Exception on write" + e.getLocalizedMessage());
     }
   }
 }

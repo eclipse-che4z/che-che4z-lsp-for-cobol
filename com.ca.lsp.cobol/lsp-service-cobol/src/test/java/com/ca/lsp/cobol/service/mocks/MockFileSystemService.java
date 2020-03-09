@@ -13,8 +13,8 @@
  */
 package com.ca.lsp.cobol.service.mocks;
 
-import com.ca.lsp.cobol.service.FileSystemService;
+import com.ca.lsp.cobol.service.CopybookService;
 
-public interface MockFileSystemService extends FileSystemService {
+public interface MockFileSystemService extends CopybookService {
   void setCopybooks(CopybooksMock copybooksMock);
 }

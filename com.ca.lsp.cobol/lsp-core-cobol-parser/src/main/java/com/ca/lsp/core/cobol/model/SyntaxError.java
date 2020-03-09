@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2019 Broadcom.
+ *  Copyright (c) 2020 Broadcom.
  *  The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  *  This program and the accompanying materials are made
@@ -27,12 +27,21 @@ public class SyntaxError {
   private final List<String> ruleStack;
   private final String suggestion;
   private final int severity;
+  private final ErrorCode errorCode;
 
+  // Please, don't use static imports for this method:
+  // https://github.com/rzwitserloot/lombok/issues/2044
   @Builder(builderMethodName = "syntaxError")
-  public SyntaxError(Position position, List<String> ruleStack, String suggestion, int severity) {
+  public SyntaxError(
+      Position position,
+      List<String> ruleStack,
+      String suggestion,
+      int severity,
+      ErrorCode errorCode) {
     this.position = position;
     this.ruleStack = ruleStack;
     this.suggestion = suggestion;
     this.severity = severity;
+    this.errorCode = errorCode;
   }
 }

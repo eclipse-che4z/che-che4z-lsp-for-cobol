@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2019 Broadcom.
+ *  Copyright (c) 2020 Broadcom.
  *  The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  *  This program and the accompanying materials are made
@@ -15,19 +15,22 @@
  */
 package com.ca.lsp.core.cobol.semantics;
 
+import com.broadcom.lsp.cdi.EngineModule;
+import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
+import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
+import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookParallelAnalysis;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
+import com.google.inject.Guice;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Deque;
 
 import static org.junit.Assert.assertEquals;
 
@@ -151,7 +154,6 @@ public class CobolCleanExtraLanguageTest {
   private String linePrefix;
   private String tag;
   private String expectedText;
-  private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
 
   public CobolCleanExtraLanguageTest(
       String tag, String text, String linePrefix, String expectedText) {
@@ -174,17 +176,24 @@ public class CobolCleanExtraLanguageTest {
 
   @Test
   public void positiveErrorTest() {
-    CobolLanguageEngine engine = new CobolLanguageEngine();
-    ResultWithErrors<SemanticContext> result = engine.run("1", TEXT_TO_TEST);
+    CobolLanguageEngine engine = Guice.createInjector(new EngineModule(), new DatabusModule()).getInstance(CobolLanguageEngine.class);
+    ResultWithErrors<SemanticContext> result;
+
+    // VERIFY THE SCENARIO FOR DID_OPEN
+    result = engine.run("1", TEXT_TO_TEST, "DID_OPEN");
+    assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
+
+    // VERIFY THE SCENARIO FOR DID_CHANGE
+    result = engine.run("1", TEXT_TO_TEST, "DID_CHANGE");
     assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
   }
 
   @Test
   public void specificStatementExclusionTest() {
-    final PreprocessorCleanerServiceImpl preprocessorCleanerService =
-        new PreprocessorCleanerServiceImpl(contexts);
+    PreprocessorCleanerServiceImpl preprocessorCleanerService =
+        new PreprocessorCleanerServiceImpl();
     preprocessorCleanerService.push();
     preprocessorCleanerService.specificTypeExclusion(tag, text, linePrefix);
-    assertEquals(expectedText, contexts.getFirst().read());
+    assertEquals(expectedText, preprocessorCleanerService.context().read());
   }
 }

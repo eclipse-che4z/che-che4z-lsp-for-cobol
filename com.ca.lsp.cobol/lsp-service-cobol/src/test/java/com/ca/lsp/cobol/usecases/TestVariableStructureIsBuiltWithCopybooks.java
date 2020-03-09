@@ -14,13 +14,12 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.mocks.MockFileSystemService;
 import com.ca.lsp.cobol.service.mocks.MockFileSystemServiceImpl;
 import org.junit.Test;
 
-import java.util.Collections;
+import static java.util.Collections.singletonList;
 
 /**
  * This test case checks that there is no semantic error when a variable structure is defined using
@@ -47,6 +46,7 @@ public class TestVariableStructureIsBuiltWithCopybooks extends PositiveUseCase {
 
   public TestVariableStructureIsBuiltWithCopybooks() {
     super(TEXT);
+    //TODO: Get rid of inject..
     MockFileSystemService mockFileSystemService =
         LangServerCtx.getInjector().getInstance(MockFileSystemServiceImpl.class);
     mockFileSystemService.setCopybooks(
@@ -56,6 +56,6 @@ public class TestVariableStructureIsBuiltWithCopybooks extends PositiveUseCase {
   @Override
   @Test
   public void test() {
-    super.test();
+    super.test(singletonList(new CobolText("COPYBOOK-CONTENT", COPYBOOK_CONTENT)));
   }
 }
