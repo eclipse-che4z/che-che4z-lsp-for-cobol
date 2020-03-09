@@ -16,11 +16,11 @@ Automate functional tests running on theia with Selenium Explorer in ZOS, Explor
 
 3) Clone the repository
 
-  	<code>C:\WORK>git clone git@github.gwd.broadcom.net:MFD/theia_automation.git</code>
+  	<code>C:\WORK>git clone https://github.com/eclipse/che-che4z-lsp-for-cobol.git</code>
   
 4) Create the virtual environment
 
-  	<code>cd C:\WORK\theia_automation</code>
+  	<code>cd C:\WORK\che-che4z-lsp-for-cobol\theia_automation</code>
 
   	<code>C:\Python3_x64\python.exe -m virtualenv venv3_x64</code>
   
@@ -34,7 +34,7 @@ Automate functional tests running on theia with Selenium Explorer in ZOS, Explor
   
 7) Set PYTHONPATH
   
-  	<code>set PYTHONPATH=C:\WORK\theia_automation</code>
+  	<code>set PYTHONPATH=C:\WORK\che-che4z-lsp-for-cobol\theia_automation</code>
 
 8) (Optional) Set Mainframe credentials:
 
