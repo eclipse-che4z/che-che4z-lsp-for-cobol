@@ -71,10 +71,10 @@ public class MultiDocumentDefinitionTest extends ConfigurableTest {
 
   public MultiDocumentDefinitionTest() {
 
-    MockCopybookService mockFileSystemService =
+    MockCopybookService mockCopybookService =
         LangServerCtx.getInjector().getInstance(MockCopybookServiceImpl.class);
 
-    mockFileSystemService.setCopybooks(
+    mockCopybookService.setCopybooks(
         () -> Arrays.asList(new CobolText("STRUCT", STRUCT), new CobolText("PARS", PARS)));
   }
 

@@ -94,8 +94,8 @@ public class AnalyzeCopybookCaching {
   }
 
   private void initWorkspaceService() {
-    MockCopybookService mockWorkspaceService = new MockCopybookServiceImpl(databus);
-    mockWorkspaceService.setCopybooks(
+    MockCopybookService mockCopybookService = new MockCopybookServiceImpl(databus);
+    mockCopybookService.setCopybooks(
         () -> singletonList(new CobolText(COPYBOOK_NAME, COPYBOOK_CONTENT)));
   }
 
