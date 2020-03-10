@@ -23,22 +23,27 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
         if (!this.shouldHaveCodeAction(context)) {
             return [];
         }
-        return [
-            {
-                arguments: [this.extractCopybookName(context), this.extractProgramName(doc)],
-                command: "broadcom-cobol-lsp.cpy-manager.fetch-copybook",
-                title: "Fetch copybook",
-            },
-            {
-                arguments: ["broadcom-cobol-lsp.cpy-manager.paths"],
-                command: "workbench.action.openSettings",
-                title: "Setup copybook datasets list",
-            },
-            {
-                arguments: ["broadcom-cobol-lsp.cpy-manager.profiles"],
-                command: "workbench.action.openSettings",
-                title: "Change default zowe profile",
-            }];
+        const fetchCopybook = new vscode.CodeAction("Fetch copybook", vscode.CodeActionKind.QuickFix);
+        fetchCopybook.command = {
+            command: "broadcom-cobol-lsp.cpy-manager.fetch-copybook",
+            title: "Fetch copybook",
+            arguments: [this.extractCopybookName(context), this.extractProgramName(doc)],
+        };
+
+        const datasetPaths = new vscode.CodeAction("Setup copybook datasets list", vscode.CodeActionKind.QuickFix);
+        datasetPaths.command = {
+            arguments: ["broadcom-cobol-lsp.cpy-manager.paths"],
+            command: "workbench.action.openSettings",
+            title: "Setup copybook datasets list",
+        };
+
+        const changeProfile = new vscode.CodeAction("Change default zowe profile", vscode.CodeActionKind.QuickFix);
+        changeProfile.command = {
+            arguments: ["broadcom-cobol-lsp.cpy-manager.profiles"],
+            command: "workbench.action.openSettings",
+            title: "Change default zowe profile",
+        };
+        return [fetchCopybook, datasetPaths, changeProfile];
     }
 
     private extractCopybookName(context: vscode.CodeActionContext) {
