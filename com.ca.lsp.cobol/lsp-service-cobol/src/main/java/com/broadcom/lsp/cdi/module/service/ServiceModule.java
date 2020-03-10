@@ -57,7 +57,6 @@ public class ServiceModule extends DefaultModule {
     bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
-    bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(LanguageClient.class).toProvider(ClientProvider.class);
     bind(ConfigurationSettingsStorable.class).toProvider(SettingsProvider.class);
 

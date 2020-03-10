@@ -15,16 +15,11 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.module.databus.DatabusModule;
-import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
-import com.google.inject.Guice;
 import org.eclipse.lsp4j.Location;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -43,14 +38,6 @@ public class TestMissingCopybookNotInVariableList extends ConfigurableTest {
           + "       01 PARENT. COPY CPYNAME.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       MOVE 00 TO CHILD1 OF PARENT.";
-
-  public TestMissingCopybookNotInVariableList() {
-    DataBusBroker databus =
-        Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
-
-    MockCopybookServiceImpl copybookService = new MockCopybookServiceImpl(databus);
-    copybookService.setCopybooks(Collections::emptyList);
-  }
 
   /**
    * Assert that there is no variable with name 'CPYNAME' in the defined variable list due to the

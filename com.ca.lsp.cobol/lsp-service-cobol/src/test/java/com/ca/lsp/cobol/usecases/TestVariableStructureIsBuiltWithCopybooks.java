@@ -14,14 +14,8 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.module.databus.DatabusModule;
-import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
-import com.google.inject.Guice;
 import org.junit.Test;
-
-import java.util.Collections;
 
 import static java.util.Collections.singletonList;
 
@@ -50,12 +44,6 @@ public class TestVariableStructureIsBuiltWithCopybooks extends PositiveUseCase {
 
   public TestVariableStructureIsBuiltWithCopybooks() {
     super(TEXT);
-    DataBusBroker databus =
-        Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
-
-    MockCopybookServiceImpl copybookService = new MockCopybookServiceImpl(databus);
-    copybookService.setCopybooks(
-        () -> Collections.singletonList(new CobolText("COPYBOOK-CONTENT", COPYBOOK_CONTENT)));
   }
 
   @Override
