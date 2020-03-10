@@ -144,7 +144,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     if (copybookName != null && copybookName.length() > 8) {
       errors.add(
           SyntaxError.syntaxError()
-              .severity(2)
+              .severity(3)
               .suggestion(String.format(COPYBOOK_OVER_8_CHARACTERS, copybookName))
               .position(position)
               .build());
