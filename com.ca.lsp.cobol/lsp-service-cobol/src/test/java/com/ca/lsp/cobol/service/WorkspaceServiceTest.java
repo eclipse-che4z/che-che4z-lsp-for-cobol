@@ -47,38 +47,6 @@ import static org.mockito.Mockito.*;
  */
 @Slf4j
 public class WorkspaceServiceTest {
-
-  /**
-   * Test of the workspace/executeCommand entry point. Assert that on a MISSING_COPYBOOK the {@link
-   * RequiredCopybookEvent} is fired.
-   */
-  @Test
-  public void testExecuteCommand() {
-    DataBusBroker broker = mock(DataBusBroker.class);
-    ArgumentCaptor<RequiredCopybookEvent> captor = forClass(RequiredCopybookEvent.class);
-    String copybookName = "COPYBOOK";
-
-    CobolWorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
-
-    CompletableFuture<Object> result =
-        service.executeCommand(
-            new ExecuteCommandParams(
-                MISSING_COPYBOOK.name(),
-                asList(new JsonPrimitive(copybookName), new JsonPrimitive(DOCUMENT_URI))));
-
-    try {
-      assertNull(result.get());
-    } catch (InterruptedException | ExecutionException e) {
-      fail(e.getMessage());
-    }
-    verify(broker, timeout(10000)).postData(captor.capture());
-    RequiredCopybookEvent event = captor.getValue();
-
-    assertEquals(DOCUMENT_URI, event.getDocumentUri());
-    assertEquals(copybookName, event.getName());
-    assertEquals(DID_OPEN.name(), event.getTextDocumentSyncType());
-  }
-
   /**
    * Test of the workspace/executeCommand entry point. Assert no changes applied if the command name
    * not recognized.
