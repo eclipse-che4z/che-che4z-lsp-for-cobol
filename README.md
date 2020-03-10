@@ -23,7 +23,6 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 - Java version 8 or higher
 - To enable syntax coloring, a third-party COBOL extension is required. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
-- To use the COBOL Language Support extension while working with copybooks, place the copybook files inside a **"COPYBOOKS"** folder within the current workspace.
 
 ## Features
 COBOL Language Support defines the protocol that is used between an editor or IDE, and a language server that provides the following COBOL syntax awareness features:
@@ -55,7 +54,10 @@ Contrasting colors are used in displayed code for ease of identifying and distin
 A third-party plugin is required to enable syntax coloring. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
 	
 ### Copybook Support
-To use the COBOL Language Support extension while working with copybooks, place the copybook files inside a **"COPYBOOKS"** folder within the current workspace. The extension includes the following copybook support features:
+
+Whenever you open a program or project which uses copybooks, all the copybooks that are not stored in the local workspace are downloaded from the mainframe. Copybooks are stored in a **.copybooks** directory within the workspace, which is created automatically when copybooks are downloaded.
+
+The extension includes the following copybook support features:
 
 * Semantic analysis for keywords, variables, and paragraphs across copybooks, to ensure and maintain compatibility of copybooks called in code.
 * Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.  
