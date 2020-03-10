@@ -26,7 +26,7 @@ export interface DependenciesDesc {
 export function loadDepFile(depFileUri: vscode.Uri): DependenciesDesc {
     const copybooks: string[] = fs.readFileSync(depFileUri.fsPath).toString().split("\n")
         .filter(e => e.trim().length > 0)
-        .map(e => e.trim());
+        .map(e => e.trim().substring(0, 8));
     const programName: string = path.basename(depFileUri.fsPath, DEP_EXT);
     return { copybooks, programName };
 }
