@@ -22,6 +22,7 @@ import { LanguageClientService } from "./services/LanguageClientService";
 import { ZoweApi } from "./ZoweApi";
 import { CopybookResolver } from "./services/CopybookResolver";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
+import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 
 export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
@@ -52,6 +53,9 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
     context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
         fetchCopybookCommand(copybook, copyBooksDownloader, programName);
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile", () => {
+        changeDefaultZoweProfile(profileService);
     }));
 
 

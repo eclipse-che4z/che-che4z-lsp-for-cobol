@@ -26,12 +26,15 @@ export class ProfileService {
         return this.zoweApi.listZOSMFProfiles();
 
     }
-    public async getProfile(programName: string): Promise<string | undefined> {
-        const detectedProfile: string | undefined = (await this.findProfileByDependenciesFile(programName))
-            || this.tryGetProfileFromSettings(programName);
-        if (detectedProfile) {
-            return detectedProfile;
+    public async getProfile(programName?: string): Promise<string | undefined> {
+        if(programName) {
+            const detectedProfile: string | undefined = (await this.findProfileByDependenciesFile(programName))
+                || this.tryGetProfileFromSettings(programName);
+            if (detectedProfile) {
+                return detectedProfile;
+            }
         }
+
         const profiles: ProfilesMap = await this.zoweApi.listZOSMFProfiles();
         if (Object.keys(profiles).length === 0) {
             await vscode.window.showErrorMessage("Zowe profile is missing.");

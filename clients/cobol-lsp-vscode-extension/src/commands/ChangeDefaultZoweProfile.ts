@@ -11,8 +11,8 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { CopybooksDownloader } from "../CopybooksDownloader";
+import { ProfileService } from "../ProfileService";
 
-export function fetchCopybookCommand(copybook: string, downloader: CopybooksDownloader, programName: string) {
-    downloader.downloadCopybooks([copybook], programName);
+export function changeDefaultZoweProfile(profileService: ProfileService) {
+    profileService.getProfile();
 }

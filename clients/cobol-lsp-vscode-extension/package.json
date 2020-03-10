@@ -43,6 +43,10 @@
             {
                 "command": "broadcom-cobol-lsp.cpy-manager.fetch-copybook",
                 "title": "Fetch copybook"
+            },
+            {
+                "command": "broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile",
+                "title": "Change default Zowe profile"
             }
         ],
         "languages": [
