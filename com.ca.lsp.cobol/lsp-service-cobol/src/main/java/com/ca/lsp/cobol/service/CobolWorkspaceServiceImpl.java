@@ -16,7 +16,6 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
-import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedSettingsEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
@@ -58,7 +57,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   public CobolWorkspaceServiceImpl(DataBusBroker dataBus, Provider<LanguageClient> clientProvider) {
     this.dataBus = dataBus;
     this.clientProvider = clientProvider;
-    dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT);
   }
 
   /**

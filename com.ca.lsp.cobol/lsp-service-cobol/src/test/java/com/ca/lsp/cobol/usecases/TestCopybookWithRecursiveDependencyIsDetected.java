@@ -14,15 +14,10 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.module.databus.DatabusModule;
-import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
-import com.google.inject.Guice;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
@@ -45,13 +40,6 @@ public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCa
 
   public TestCopybookWithRecursiveDependencyIsDetected() {
     super(TEXT);
-
-    DataBusBroker databus =
-        Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
-
-    MockCopybookServiceImpl copybookService = new MockCopybookServiceImpl(databus);
-    copybookService.setCopybooks(
-        () -> Collections.singletonList(new CobolText("RECURSIVE-COPY", RECURSIVE_COPY)));
   }
 
   @Override
