@@ -15,6 +15,6 @@ from inc.exceptions.general_exception import GeneralException
 
 class ElementNotFoundException(GeneralException):
 
-    def __init__(self, driver, call_from=None, msg=""):
-        super(ElementNotFoundException, self).__init__(driver, call_from=call_from, msg=msg)
+    def __init__(self, driver, call_from=None, msg="", do_dump=True):
+        super(ElementNotFoundException, self).__init__(driver, call_from=call_from, msg=msg, do_dump=do_dump)
 

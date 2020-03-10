@@ -10,16 +10,7 @@
 # Contributors:
 #   Broadcom, Inc. - initial API and implementation
 
-.git
-.idea
-.theia
-.extsrcs
-*.pyc
-venv*
-*.log
-*geckodriver*
-*chromedriver*
-.vscode
-.cobdeps
-.copybooks
-*.zip
+CHE_LOGIN_TITLE = "Log in to Eclipse Che"
+CHE_LOADING_TITLE = "Loading Dashboard..."
+
+CHE_BUG_TITLE = "The file 'file:///home/theia/.theia/settings.json' has been changed on the file system."

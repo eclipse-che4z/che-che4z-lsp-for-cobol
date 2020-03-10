@@ -16,6 +16,7 @@ import urllib.request as urllib2
 import urllib.parse as urlparse
 import zipfile
 import tarfile
+from inc.helpers import ensure_dir
 
 ENGINES_EXE = {
     "chrome": "chromedriver",
@@ -25,15 +26,15 @@ ENGINES_EXE = {
 DRIVERS = {
     "darwin": {
         "firefox": "https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-macos.tar.gz",
-        "chrome": "https://chromedriver.storage.googleapis.com/77.0.3865.40/chromedriver_mac64.zip"
+        "chrome": "https://chromedriver.storage.googleapis.com/80.0.3987.106/chromedriver_mac64.zip"
     },
     "linux": {
         "firefox": "https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz",
-        "chrome": "https://chromedriver.storage.googleapis.com/77.0.3865.40/chromedriver_linux64.zip"
+        "chrome": "https://chromedriver.storage.googleapis.com/80.0.3987.106/chromedriver_linux64.zip"
     },
     "win32": {
         "firefox": "https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-win64.zip",
-        "chrome": "https://chromedriver.storage.googleapis.com/77.0.3865.40/chromedriver_win32.zip"
+        "chrome": "https://chromedriver.storage.googleapis.com/80.0.3987.106/chromedriver_win32.zip"
     }
 }
 
@@ -72,6 +73,7 @@ def download_file(url, save_dir=None):
         filename = 'downloaded.file'
 
     if save_dir:
+        ensure_dir(save_dir)
         filename = os.path.join(save_dir, filename)
 
     filename = os.path.abspath(filename)

@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Broadcom.
+# Copyright (c) 2020 Broadcom.
 # The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
 #
 # This program and the accompanying materials are made
@@ -13,12 +13,39 @@
 from inc.theia import zos_constants
 
 SELF = None
-THEIA = "theia-app-shell"
+THEIA = "Theia"
+THEIA_APP_SHELL = "theia-app-shell"
+
+CHE_LOGIN_ID = "kc-form-login"
+CHE_SUBMIT = "kc-login"
+
+IDE_IFRAME = "ide_iframe"
 
 FILES_EXPLORER_TAB_ID = "shell-tab-explorer-view-container"
 FILES_EXPLORER_ID = "explorer-view-container"
 
-FILES_PANEL_TITLE = "^Explorer:.*$"
+THEIA_LEFT_RIGHT_PANEL = "theia-left-right-split-panel"
+
+SHELL_TAB_DEBUG = "shell-tab-debug"
+THEIA_DEBUG = "debug"
+THEIA_DEBUG_CONFIGURE = "theia-debug-configure"
+THEIA_DEBUG_START = "theia-debug-start"
+THEIA_DEBUG_STOP = "theia-debug-stop"
+THEIA_DEBUG_STEP_OVER = "theia-debug-step-over"
+THEIA_DEBUG_CONTINUE = "theia-debug-continue"
+THEIA_DEBUG_TOP_STACK_FRAME = "theia-debug-top-stack-frame"
+THEIA_DEBUG_TOP_STACK_FRAME_LINE = "theia-debug-top-stack-frame-line"
+THEIA_DEBUG_THREAD = "theia-debug-thread"
+THEIA_REMOVE_BREAKPOINTS_BUTTON = "debug.breakpoint.removeAll"
+THEIA_SOURCE_BREAKPOINT = "theia-source-breakpoint"
+
+THEIA_DEBUG_BREAKPOINT = "theia-debug-breakpoint"
+THEIA_DEBUG_BREAKPOINT_HINT = "theia-debug-breakpoint-hint"
+THEIA_DEBUG_CONSOLE_VARIABLE = "theia-debug-console-variable"
+
+THEIA_HEADER = "theia-header"
+
+FILES_PANEL_TITLE = "^Explorer.*$"
 FILES_EXPLORER_CONTENT = "files"
 
 THEIA_NOTIFICATION_CONTAINER = "theia-notifications-container"
@@ -38,6 +65,7 @@ THEIA_BOTTOM_SPLIT_PANEL = "theia-bottom-split-panel"
 THEIA_MAIN_CONTENT_PANEL = "theia-main-content-panel"
 THEIA_LEFT_CONTENT_PANEL = "theia-left-content-panel"
 THEIA_DOCK_PANEL_WIDGET = "p-DockPanel-widget"
+THEIA_DOCK_PANEL = "p-DockPanel"
 THEIA_SIDE_PANEL_TOOLBAR = "theia-sidepanel-toolbar"
 THEIA_SIDE_PANEL_TITLE = "theia-sidepanel-title"
 
@@ -60,11 +88,17 @@ THEIA_IFRAME = "pending-frame"
 
 THEIA_TREE_EXPANDABLE_NODES = "theia-ExpandableTreeNode"
 THEIA_TREE_NODES = "theia-TreeNode"
-THEIA_TREE_NODE_CONTENT = "theia-TreeNodeSegmentGrow"
+THEIA_DIR_NODE = "theia-DirNode"
+THEIA_TREE_NODE_CONTENT = "theia-TreeNodeContent"
+THEIA_TREE_CONTAINER = "theia-TreeContainer"
+THEIA_TREE_NODE_SEGMENT_GROW = "theia-TreeNodeSegmentGrow"
+
 THEIA_INLINE_ACTIONS = "theia-tree-view-inline-action"
 
 THEIA_VIEWS_CONTAINER_SECTION_LABEL = "theia-views-container-section-label"
 THEIA_EXPAND_ARROW = "theia-ExpansionToggle"
+
+THEIA_USER_PREFERENCES = "code-editor-opener:user_storage:settings.json"
 
 THEIA_STATUS_BAR = "theia-statusBar"
 THEIA_STATUS_BAR_RIGHT_AREA = "right"
@@ -73,6 +107,7 @@ THEIA_STATUS_ELEMENTS_WITH_COMMANDS = "hasCommand"
 THEIA_DIALOG_SHELL = "theia-dialog-shell"
 THEIA_DIALOG_CONTROL = "dialogControl"
 THEIA_DIALOG_TITLE = "dialogTitle"
+THEIA_DIALOG_CONTENT = "dialogContent"
 THEIA_DIALOG_SAVE_BUTTON = "Save"
 THEIA_DIALOG_DONT_SAVE_BUTTON = "Don't save"
 THEIA_DIALOG_CANCEL_BUTTON = "Cancel"
@@ -117,6 +152,10 @@ MONAKO_HOVER_CONTENTS = "hover-contents"
 ARIA_LABEL = "aria-label"
 ARIA_HAS_POPUP = "aria-haspopup"
 ARIA_HIDDEN = "aria-hidden"
+ARIA_EXPANDED = "aria-expanded"
+
+SCROLL_Y = "ps__rail-y"
+SCROLL_Y_THUMB = "ps__thumb-y"
 
 Ok = "Ok"
 Close = "Close"
@@ -133,10 +172,21 @@ HOST_CFG_FORM_NAME = "name"
 HOST_CFG_FORM_URL = "url"
 OK = "OK"
 
+# Main menu constants
 HelpAbout = "Theia"
 Preferences = "Preferences"
+Debug = "Debug"
+Breakpoints = "Breakpoints"
+NoBreakpoints = "No breakpoints"
+Variables = "Variables"
+DebugRemoveAllBreakpoints = "Remove All breakpoints"
+SelectAll = "Select All"
+Copy = "Copy"
+Paste = "Paste"
+Save = "Save"
 TheiaDialog = "dialog"
 TheiaTab = "tab"
+LeftTab = "left_tab"
 
 ELEMENT_TEXT = "element_text"
 ELEMENT_TYPE = "element_type"
@@ -150,20 +200,100 @@ TEXT_CLASS = "text"
 SPAN = "span"
 
 THEIA_UI = {
+    CHE_LOGIN_ID: {
+        ELEMENT_TEXT: CHE_LOGIN_ID,
+        ELEMENT_TYPE: TYPE_ID
+    },
+    CHE_SUBMIT: {
+        ELEMENT_TEXT: CHE_SUBMIT,
+        ELEMENT_TYPE: TYPE_ID
+    },
+    IDE_IFRAME: {
+        ELEMENT_TEXT: "ide-application-iframe",
+        ELEMENT_TYPE: TYPE_ID
+    },
     FILES_EXPLORER_ID: {
         ELEMENT_TEXT: FILES_EXPLORER_ID,
+        ELEMENT_TYPE: TYPE_ID
+    },
+    THEIA_LEFT_RIGHT_PANEL: {
+        ELEMENT_TEXT: THEIA_LEFT_RIGHT_PANEL,
         ELEMENT_TYPE: TYPE_ID
     },
     FILES_EXPLORER_TAB_ID: {
         ELEMENT_TEXT: FILES_EXPLORER_TAB_ID,
         ELEMENT_TYPE: TYPE_ID
     },
+    SHELL_TAB_DEBUG: {
+        ELEMENT_TEXT: SHELL_TAB_DEBUG,
+        ELEMENT_TYPE: TYPE_ID
+    },
+    THEIA_DEBUG: {
+        ELEMENT_TEXT: THEIA_DEBUG,
+        ELEMENT_TYPE: TYPE_ID
+    },
+    THEIA_DEBUG_CONFIGURE: {
+        ELEMENT_TEXT: THEIA_DEBUG_CONFIGURE,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_DEBUG_START: {
+        ELEMENT_TEXT: THEIA_DEBUG_START,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_DEBUG_STOP: {
+        ELEMENT_TEXT: THEIA_DEBUG_STOP,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_DEBUG_STEP_OVER: {
+        ELEMENT_TEXT: THEIA_DEBUG_STEP_OVER,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_DEBUG_CONTINUE: {
+        ELEMENT_TEXT: THEIA_DEBUG_CONTINUE,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_DEBUG_TOP_STACK_FRAME: {
+        ELEMENT_TEXT: THEIA_DEBUG_TOP_STACK_FRAME,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_DEBUG_TOP_STACK_FRAME_LINE: {
+        ELEMENT_TEXT: THEIA_DEBUG_TOP_STACK_FRAME_LINE,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_DEBUG_THREAD: {
+        ELEMENT_TEXT: THEIA_DEBUG_THREAD,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_REMOVE_BREAKPOINTS_BUTTON: {
+        ELEMENT_TEXT: THEIA_REMOVE_BREAKPOINTS_BUTTON,
+        ELEMENT_TYPE: TYPE_ID
+    },
+    THEIA_SOURCE_BREAKPOINT: {
+        ELEMENT_TEXT: THEIA_SOURCE_BREAKPOINT,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_DEBUG_BREAKPOINT: {
+        ELEMENT_TEXT: THEIA_DEBUG_BREAKPOINT,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_DEBUG_BREAKPOINT_HINT: {
+        ELEMENT_TEXT: THEIA_DEBUG_BREAKPOINT_HINT,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_DEBUG_CONSOLE_VARIABLE: {
+        ELEMENT_TEXT: THEIA_DEBUG_CONSOLE_VARIABLE,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_HEADER: {
+        ELEMENT_TEXT: THEIA_HEADER,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
     FILES_EXPLORER_CONTENT: {
         ELEMENT_TEXT:FILES_EXPLORER_CONTENT,
         ELEMENT_TYPE: TYPE_ID
     },
-    THEIA: {
-        ELEMENT_TEXT: THEIA,
+    THEIA_APP_SHELL: {
+        ELEMENT_TEXT: THEIA_APP_SHELL,
         ELEMENT_TYPE: TYPE_ID
     },
     THEIA_TAB_CONTENT: {
@@ -278,6 +408,10 @@ THEIA_UI = {
         ELEMENT_TEXT: THEIA_DOCK_PANEL_WIDGET,
         ELEMENT_TYPE: TYPE_CLASS
     },
+    THEIA_DOCK_PANEL: {
+        ELEMENT_TEXT: THEIA_DOCK_PANEL,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
     zos_constants.ZOS_EXPLORER_CONTAINER: {
         ELEMENT_TEXT: zos_constants.ZOS_EXPLORER_CONTAINER,
         ELEMENT_TYPE: TYPE_ID
@@ -292,6 +426,10 @@ THEIA_UI = {
     },
     THEIA_STATUS_BAR: {
         ELEMENT_TEXT: THEIA_STATUS_BAR,
+        ELEMENT_TYPE: TYPE_ID
+    },
+    THEIA_USER_PREFERENCES: {
+        ELEMENT_TEXT: THEIA_USER_PREFERENCES,
         ELEMENT_TYPE: TYPE_ID
     },
     THEIA_STATUS_BAR_RIGHT_AREA: {
@@ -312,6 +450,10 @@ THEIA_UI = {
     },
     THEIA_DIALOG_TITLE: {
         ELEMENT_TEXT: THEIA_DIALOG_TITLE,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_DIALOG_CONTENT: {
+        ELEMENT_TEXT: THEIA_DIALOG_CONTENT,
         ELEMENT_TYPE: TYPE_CLASS
     },
     THEIA_IFRAME: {
@@ -364,6 +506,14 @@ THEIA_UI = {
     },
     THEIA_TREE_NODE_CONTENT: {
         ELEMENT_TEXT: THEIA_TREE_NODE_CONTENT,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_TREE_CONTAINER: {
+        ELEMENT_TEXT: THEIA_TREE_CONTAINER,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    THEIA_TREE_NODE_SEGMENT_GROW: {
+        ELEMENT_TEXT: THEIA_TREE_NODE_SEGMENT_GROW,
         ELEMENT_TYPE: TYPE_CLASS
     },
     THEIA_INLINE_ACTIONS: {
@@ -477,14 +627,24 @@ THEIA_UI = {
     MONAKO_CURRENT_LINE: {
         ELEMENT_TEXT: MONAKO_CURRENT_LINE,
         ELEMENT_TYPE: TYPE_CLASS
+    },
+    SCROLL_Y: {
+        ELEMENT_TEXT: SCROLL_Y,
+        ELEMENT_TYPE: TYPE_CLASS
+    },
+    SCROLL_Y_THUMB: {
+        ELEMENT_TEXT: SCROLL_Y_THUMB,
+        ELEMENT_TYPE: TYPE_CLASS
     }
 }
 
+DEFAULT_TINY_TIMEOUT = 5
 DEFAULT_SHORT_TIMEOUT = 10
 DEFAULT_TIMEOUT = 30
 DEFAULT_LONG_TIMEOUT = 60
 DEFAULT_HUGE_TIMEOUT = 180
 
+THEIA_ENABLED = "enabled"
 STATE_VISIBLE = "visible"
 STATE_HIDDEN = "hidden"
 THEIA_ELEMENT_COLLAPSED = "theia-mod-collapsed"
@@ -493,3 +653,5 @@ THEIA_HIDDEN = "p-mod-hidden"
 THEIA_CLOSED = "closed"
 THEIA_UNSAVED_FILE = "theia-mod-dirty"
 THEIA_FOCUSED = "focused"
+THEIA_LOCALS = "Locals"
+THEIA_MOD_DISABLED = "theia-mod-disabled"

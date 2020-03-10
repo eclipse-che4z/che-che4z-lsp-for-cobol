@@ -10,16 +10,7 @@
 # Contributors:
 #   Broadcom, Inc. - initial API and implementation
 
-.git
-.idea
-.theia
-.extsrcs
-*.pyc
-venv*
-*.log
-*geckodriver*
-*chromedriver*
-.vscode
-.cobdeps
-.copybooks
-*.zip
+CHE_CREDENTIALS = {
+    "username": "user",
+    "password": "pass"
+}
