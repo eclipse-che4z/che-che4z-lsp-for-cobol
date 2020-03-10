@@ -15,9 +15,10 @@ import * as vscode from "vscode";
 import * as path from "path";
 
 export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
-    public provideCodeActions(doc: vscode.TextDocument, range: vscode.Range | vscode.Selection,
-        // tslint:disable-next-line: align
-        context: vscode.CodeActionContext, token: vscode.CancellationToken,
+    public provideCodeActions(doc: vscode.TextDocument,
+        range: vscode.Range | vscode.Selection,
+        context: vscode.CodeActionContext,
+        token: vscode.CancellationToken,
     ): vscode.ProviderResult<Array<vscode.Command | vscode.CodeAction>> {
         if (!this.shouldHaveCodeAction(context)) {
             return [];
