@@ -3,6 +3,8 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 
 ## [0.x.x] - TBD
+- Redefine responsibilities of WorkspaceServiceTest [232](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/232) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
+- Remove copybooks Quick Fix on the server side due to it is a client responsibility [234](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/234) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - No escape chars in filename [#228](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/228) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Finalize LRU Algorithm [#227](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/227) Thanks @[sergiuilie](https://github.com/sergiuilie)
 - Consume user settings in Copybook Service [#221](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/221) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
