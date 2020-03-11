@@ -14,9 +14,7 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
@@ -48,9 +46,10 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends Negat
   @Override
   @Test
   public void test() {
-    super.test(Arrays.asList(
-                new CobolText("INNER-COPY", INNER_COPY),
-                new CobolText("INDIRECT-COPY", INDIRECT_COPY)));
+    super.test(
+        Arrays.asList(
+            new CobolText("INNER-COPY", INNER_COPY),
+            new CobolText("INDIRECT-COPY", INDIRECT_COPY)));
   }
 
   @Override
