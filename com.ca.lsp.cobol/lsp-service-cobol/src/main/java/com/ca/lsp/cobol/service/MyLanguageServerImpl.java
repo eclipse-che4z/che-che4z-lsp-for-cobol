@@ -66,7 +66,7 @@ public class MyLanguageServerImpl implements LanguageServer {
   private WorkspaceService workspaceService;
   private CopybookService copybookService;
   private Provider<LanguageClient> clientProvider;
-
+  private MyTextDocumentService customTextService;
   private SettingsProvider settingsProvider;
 
   @Inject
@@ -75,12 +75,14 @@ public class MyLanguageServerImpl implements LanguageServer {
       TextDocumentService textService,
       WorkspaceService workspaceService,
       Provider<LanguageClient> clientProvider,
-      SettingsProvider settingsProvider) {
+      SettingsProvider settingsProvider,
+      MyTextDocumentService customTextService) {
     this.textService = textService;
     this.copybookService = copybookService;
     this.workspaceService = workspaceService;
     this.clientProvider = clientProvider;
     this.settingsProvider = settingsProvider;
+    this.customTextService = customTextService;
   }
 
   @Override
@@ -176,6 +178,7 @@ public class MyLanguageServerImpl implements LanguageServer {
     capabilities.setWorkspace(workspaceServiceCapabilities);
 
     copybookService.setWorkspaceFolders(params.getWorkspaceFolders());
+    customTextService.setWorkspaceFolders(params.getWorkspaceFolders());
     return supplyAsync(() -> new InitializeResult(capabilities));
   }
 

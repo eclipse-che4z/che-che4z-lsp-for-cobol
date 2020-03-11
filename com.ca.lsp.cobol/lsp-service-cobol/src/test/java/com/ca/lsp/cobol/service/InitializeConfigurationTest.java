@@ -61,7 +61,7 @@ public class InitializeConfigurationTest {
                 PROFILE_NAME, unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2))));
 
     MyLanguageServerImpl langServer =
-        new MyLanguageServerImpl(null, null, null, provider, settingsProvider);
+        new MyLanguageServerImpl(null, null, null, provider, settingsProvider, null);
 
     ConfigurationParams params = ServiceTestUtils.createParams();
     List<Object> list = new ArrayList<>();

@@ -50,7 +50,7 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
   @Beta
   @Override
   public void addCopybookInDepFile(String requiredCopybookName, String documentUri) {
-    String cobolFileName = getCobolFileNameFromUri(documentUri);
+    String cobolFileName = getFileNameFromURI(documentUri);
     Path dependencyFolder = createDependencyFileFolder();
     Path dependencyFile = retrieveDependencyFile(dependencyFolder, cobolFileName);
 
@@ -123,20 +123,6 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
     } catch (IOException e) {
       log.error(e.getMessage());
     }
-  }
-
-  private Path retrieveDependencyFile(Path dependencyFolderPath, String cobolFileName) {
-    return Paths.get(dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION);
-  }
-
-  private String getCobolFileNameFromUri(String documentUri) {
-    String result = null;
-    try {
-      result = FilenameUtils.getBaseName(Paths.get(new URI(documentUri)).getFileName().toString());
-    } catch (URISyntaxException e) {
-      log.error(e.getMessage());
-    }
-    return result;
   }
 
   /**

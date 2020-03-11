@@ -47,7 +47,7 @@ public class MyLanguageServerImplTest {
     ClientProvider provider = new ClientProvider();
     provider.set(client);
 
-    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, provider, null);
+    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, provider, null, null);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     server.initialized(new InitializedParams());
 
@@ -64,8 +64,9 @@ public class MyLanguageServerImplTest {
   @Test
   public void initialize() {
     CopybookService fileSystemService = mock(CopybookService.class);
+    MyTextDocumentService textDocumentService = mock(MyTextDocumentService.class);
     MyLanguageServerImpl server =
-        new MyLanguageServerImpl(fileSystemService, null, null, null, null);
+        new MyLanguageServerImpl(fileSystemService, null, null, null, null, textDocumentService);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));

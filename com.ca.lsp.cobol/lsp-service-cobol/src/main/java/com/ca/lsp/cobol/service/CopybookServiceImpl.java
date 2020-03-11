@@ -236,7 +236,7 @@ public class CopybookServiceImpl implements CopybookService {
     path =
         findCopybook(
             requiredCopybookName,
-            (String) configurationSettingsStorable.getProfiles(),
+            configurationSettingsStorable.getProfiles().toString(),
             configurationSettingsStorable.getPaths());
 
     if (isFileExists(path)) {
