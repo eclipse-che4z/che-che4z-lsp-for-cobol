@@ -6,7 +6,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 - Redefine responsibilities of WorkspaceServiceTest [232](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/232) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Dependency file should contain 8 char max copybook name [#175](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/175) Thanks @[ishche](https://github.com/ishche)
 - StatusBar copybook downloader profile switcher [#240](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/240) Thanks @[ishche](https://github.com/ishche)
-- Move fetch copybook quickfix from LSP server to extension. [#235](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/235) Thanks @[ishche](https://github.com/ishche)
+- Move fetch copybook Quick Fix from LSP server to extension. [#235](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/235) Thanks @[ishche](https://github.com/ishche)
 - Address StackOverflow during build [#230](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/230) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - No escape chars in filename [#228](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/228) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Finalize LRU Algorithm [#227](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/227) Thanks @[sergiuilie](https://github.com/sergiuilie)
