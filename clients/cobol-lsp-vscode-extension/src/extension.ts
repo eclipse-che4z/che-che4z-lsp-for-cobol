@@ -42,8 +42,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // Listeners
     context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
-        if (event.affectsConfiguration(SETTINGS_SECTION + ".paths")) {
+        if (event.affectsConfiguration(SETTINGS_SECTION)) {
             copyBooksDownloader.redownloadDependencies("Configuration was updated");
+            profileService.updateStatusBar();
         }
     }));
 
