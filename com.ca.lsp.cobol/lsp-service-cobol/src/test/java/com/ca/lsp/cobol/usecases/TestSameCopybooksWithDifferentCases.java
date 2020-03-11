@@ -27,7 +27,7 @@ import static java.util.Collections.singletonList;
  * This test checks that there is no error thrown when there are several COPY statements onw by one
  * with one name in different cases.
  */
-public class TestSameCopybooksWIthDifferentCases extends PositiveUseCase {
+public class TestSameCopybooksWithDifferentCases extends PositiveUseCase {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
@@ -44,7 +44,7 @@ public class TestSameCopybooksWIthDifferentCases extends PositiveUseCase {
           + "           03  CHILD2         PIC 9   VALUE IS '1'.\n"
           + "           03  CHILD3         PIC 9   VALUE IS '2'.";
 
-  public TestSameCopybooksWIthDifferentCases() {
+  public TestSameCopybooksWithDifferentCases() {
     super(TEXT);
   }
 
