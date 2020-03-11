@@ -4,7 +4,6 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ## [0.x.x] - TBD
 - Redefine responsibilities of WorkspaceServiceTest [232](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/232) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
-- Remove copybooks Quick Fix on the server side due to it is a client responsibility [234](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/234) Thanks @[temanbrcom](https://github.com/temanbrcom)
 - Dependency file should contain 8 char max copybook name [#175](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/175) Thanks @[ishche](https://github.com/ishche)
 - StatusBar copybook downloader profile switcher [#240](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/240) Thanks @[ishche](https://github.com/ishche)
 - Move fetch copybook quickfix from LSP server to extension. [#235](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/235) Thanks @[ishche](https://github.com/ishche)
