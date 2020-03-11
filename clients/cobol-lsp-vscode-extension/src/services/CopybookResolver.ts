@@ -41,8 +41,7 @@ export class CopybookResolver {
                 "broadcom-cobol-lsp.cpy-manager.paths");
         }
         if (action === actionProfile) {
-            vscode.commands.executeCommand("workbench.action.openSettings",
-                "broadcom-cobol-lsp.cpy-manager.profiles");
+            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile");
         }
     }
 
@@ -56,8 +55,7 @@ export class CopybookResolver {
                 "broadcom-cobol-lsp.cpy-manager.paths");
         }
         if (action === actionProfile) {
-            vscode.commands.executeCommand("workbench.action.openSettings",
-                "broadcom-cobol-lsp.cpy-manager.profiles");
+            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile");
         }
     }
 
