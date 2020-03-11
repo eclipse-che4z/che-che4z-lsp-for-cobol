@@ -3,6 +3,7 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 
 ## [0.x.x] - TBD
+- A comma-separated list of datasets editor [#241](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/241) Thanks @[ishche](https://github.com/ishche)
 - Dependency file should contain 8 char max copybook name [#175](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/175)
 - StatusBar copybook downloader profile switcher [#239](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/239)
 - Move fetch copybook quickfix from LSP server to extension. [#235](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/235)
