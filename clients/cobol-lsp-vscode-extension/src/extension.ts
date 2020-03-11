@@ -23,12 +23,15 @@ import { ZoweApi } from "./ZoweApi";
 import { CopybookResolver } from "./services/CopybookResolver";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
+import { editDatasetPaths } from "./commands/EditDatasetPaths";
+import { PathsService } from "./services/PathsService";
 
 export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
     const resolver: CopybookResolver = new CopybookResolver();
-    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(resolver, zoweApi, profileService);
+    const pathsService: PathsService = new PathsService();
+    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(resolver, zoweApi, profileService, pathsService);
     const languageClientService: LanguageClientService = new LanguageClientService();
 
     try {
@@ -57,6 +60,9 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
     context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile", () => {
         changeDefaultZoweProfile(profileService);
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths", () => {
+        editDatasetPaths(pathsService);
     }));
 
 

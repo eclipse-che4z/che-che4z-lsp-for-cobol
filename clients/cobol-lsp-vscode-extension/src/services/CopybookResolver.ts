@@ -37,8 +37,7 @@ export class CopybookResolver {
             missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
         }
         if (action === actionDatasets) {
-            vscode.commands.executeCommand("workbench.action.openSettings",
-                "broadcom-cobol-lsp.cpy-manager.paths");
+            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths");
         }
         if (action === actionProfile) {
             vscode.commands.executeCommand("workbench.action.openSettings",
@@ -52,8 +51,7 @@ export class CopybookResolver {
         const action = await vscode.window.showErrorMessage(title,
             actionDatasets, actionProfile);
         if (action === actionDatasets) {
-            vscode.commands.executeCommand("workbench.action.openSettings",
-                "broadcom-cobol-lsp.cpy-manager.paths");
+            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths");
         }
         if (action === actionProfile) {
             vscode.commands.executeCommand("workbench.action.openSettings",
