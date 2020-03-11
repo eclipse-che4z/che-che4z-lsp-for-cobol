@@ -65,6 +65,7 @@ export class CopybooksDownloader implements vscode.Disposable {
         } else if (missingCopybooks.length > 0) {
             this.resolver.fixMissingDownloads(message, missingCopybooks, profile, {
                 hasPaths: (await this.listPathDatasets()).length > 0,
+                hasProfiles: Object.keys(await this.profileService.listProfiles()).length > 1,
             });
         }
 
