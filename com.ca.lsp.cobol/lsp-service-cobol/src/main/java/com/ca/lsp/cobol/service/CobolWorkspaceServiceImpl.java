@@ -36,13 +36,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.CPY_MANAGER;
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
-import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static java.util.concurrent.CompletableFuture.runAsync;
 
 /**
  * This class is responsible to watch for any changes into the copybook folder and to fetch updated
@@ -73,21 +70,6 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   @Nonnull
   @Override
   public CompletableFuture<Object> executeCommand(@Nonnull ExecuteCommandParams params) {
-    runAsync(
-            () -> {
-              if (!MISSING_COPYBOOK.name().equals(params.getCommand())) {
-                return;
-              }
-              String copybookName = getStringArgument(params, 0);
-              String documentUri = getStringArgument(params, 1);
-              dataBus.postData(
-                  RequiredCopybookEvent.builder()
-                      .name(copybookName)
-                      .documentUri(documentUri)
-                      .textDocumentSyncType(DID_OPEN.name())
-                      .build());
-            })
-        .whenComplete(reportExceptionIfFound(params));
     return completedFuture(null);
   }
 
