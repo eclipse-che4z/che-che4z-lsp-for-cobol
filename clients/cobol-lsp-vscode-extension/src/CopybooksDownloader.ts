@@ -14,13 +14,14 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { DEPENDENCIES_FOLDER, SETTINGS_SECTION } from "./constants";
+import { DEPENDENCIES_FOLDER } from "./constants";
 import { ProfileService } from "./ProfileService";
 import { DependenciesDesc, loadDepFile } from "./services/DependencyService";
 import { CopybookProfile, DownloadQueue } from "./services/DownloadQueue";
 import { checkWorkspace, createCopybookPath, createDatasetPath } from "./services/PathUtils";
 import { ZoweApi } from "./ZoweApi";
 import { CopybookResolver } from "./services/CopybookResolver";
+import { PathsService } from "./services/PathsService";
 
 export class CopybooksDownloader implements vscode.Disposable {
     private queue: DownloadQueue = new DownloadQueue();
@@ -28,7 +29,8 @@ export class CopybooksDownloader implements vscode.Disposable {
     public constructor(
         private resolver: CopybookResolver,
         private zoweApi: ZoweApi,
-        private profileService: ProfileService) { }
+        private profileService: ProfileService,
+        private pathsService: PathsService) { }
 
     public async redownloadDependencies(message: string = "Redownload dependencies requested.") {
         (await vscode.workspace.findFiles(DEPENDENCIES_FOLDER + "/**/*.dep")).forEach(dep => {
@@ -92,7 +94,7 @@ export class CopybooksDownloader implements vscode.Disposable {
                         toDownload.push(await this.queue.pop());
                     }
                     toDownload.map(cp => cp.copybook).forEach(cb => errors.push(cb));
-                    for (const dataset of await this.listPathDatasets()) {
+                    for (const dataset of await this.pathsService.listPathDatasets()) {
                         progress.report({
                             message: "Looking in " + dataset + ". " + toDownload.length +
                                 " copybook(s) left.",
@@ -147,7 +149,7 @@ export class CopybooksDownloader implements vscode.Disposable {
 
     private async listMissingCopybooks(copybooks: string[], profileName: string): Promise<string[]> {
         const copybooksToDownload: Set<string> = new Set(copybooks);
-        (await this.listPathDatasets()).forEach(ds => {
+        (await this.pathsService.listPathDatasets()).forEach(ds => {
             Array.from(copybooksToDownload.values()).forEach(c => {
                 if (fs.existsSync(createCopybookPath(profileName, ds, c))) {
                     copybooksToDownload.delete(c);
@@ -156,13 +158,5 @@ export class CopybooksDownloader implements vscode.Disposable {
         });
 
         return Array.from(copybooksToDownload.values());
-    }
-
-    private async listPathDatasets(): Promise<string[]> {
-        if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has("paths")) {
-            await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
-            return [];
-        }
-        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get("paths");
     }
 }
