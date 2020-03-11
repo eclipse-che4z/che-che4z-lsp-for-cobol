@@ -18,7 +18,7 @@ import { DownloadQueue } from "./DownloadQueue";
 export class CopybookResolver {
     private queue: DownloadQueue;
 
-    async fixMissingDownloads(reasonMsg: string, missingCopybooks: string[], profile: string, options: { hasPaths: boolean }) {
+    async fixMissingDownloads(reasonMsg: string, missingCopybooks: string[], profile: string, options: { hasPaths: boolean, hasProfiles: boolean }) {
         const downloadCopybookAction = "Download Copybooks";
         const actionDatasets = "Edit Datasets";
         const actionProfile = "Change zowe profile";
@@ -28,7 +28,9 @@ export class CopybookResolver {
         }
         if (reasonMsg !== "Configuration was updated") {
             actions.push(actionDatasets);
-            actions.push(actionProfile);
+            if(options.hasProfiles) {
+                actions.push(actionProfile);
+            }
         }
         const action: string = await vscode.window.showInformationMessage(
             reasonMsg,
