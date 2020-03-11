@@ -16,6 +16,8 @@ import { AbstractSession, BasicProfileManager, IProfile, RestClient, Session } f
 import * as os from "os";
 import * as path from "path";
 
+const ZOSMF_PREFIX = "/zosmf/restfiles/ds/";
+
 export interface ProfilesMap {
     [key: string]: IProfile;
 }
@@ -42,7 +44,7 @@ export class ZoweApi {
         const session: Session = await this.createSession(profileName);
 
         // default should be https
-        const rpath = `/zosmf/restfiles/ds/${dataset}(${member})`;
+        const rpath = `${ZOSMF_PREFIX}${dataset}(${member})`;
         return await RestClient.getExpectString(session, rpath, [{
             "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "",
         }]);
@@ -51,7 +53,7 @@ export class ZoweApi {
     public async listMembers(dataset: string, profileName: string): Promise<string[]> {
         // default should be https
         const session: Session = await this.createSession(profileName);
-        const rpath = `/zosmf/restfiles/ds/${dataset}/member`;
+        const rpath = `${ZOSMF_PREFIX}${dataset}/member`;
         const result = await RestClient.getExpectJSON(session, rpath, [{
             "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "",
         }]);
