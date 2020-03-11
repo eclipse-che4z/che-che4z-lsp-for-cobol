@@ -12,128 +12,69 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as cp from "child_process";
-import * as fs from "fs";
-import * as net from "net";
 import * as vscode from "vscode";
-import {
-    Disposable,
-    LanguageClient,
-    LanguageClientOptions,
-    StreamInfo,
-} from "vscode-languageclient/lib/main";
 import { SETTINGS_SECTION } from "./constants";
+import { DEPENDENCIES_FOLDER } from "./constants";
 import { CopybooksDownloader } from "./CopybooksDownloader";
-import { CopybooksDownloaderCodeActionProvider } from "./CopybooksDownloaderCodeActionProvider";
-import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
-import { DEPENDENCIES_FOLDER } from "./PathUtils";
+import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
 import { ProfileService } from "./ProfileService";
+import { LanguageClientService } from "./services/LanguageClientService";
 import { ZoweApi } from "./ZoweApi";
+import { CopybookResolver } from "./services/CopybookResolver";
+import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
+import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 
 export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
-    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(zoweApi, profileService);
-    const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
-    const LSPServerPath = `${ext.extensionPath}/server/lsp-service-cobol-${ext.packageJSON.version}.jar`;
+    const resolver: CopybookResolver = new CopybookResolver();
+    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(resolver, zoweApi, profileService);
+    const languageClientService: LanguageClientService = new LanguageClientService();
 
     try {
-        await isJavaInstalled();
-        if (!getLspPort() && !fs.existsSync(LSPServerPath)) {
-            vscode.window.showErrorMessage("COBOL extension failed to start - LSP server not found");
-            return;
-        }
+        await languageClientService.checkPrerequisites();
     } catch (err) {
         vscode.window.showErrorMessage(err.toString());
         return;
     }
 
     copyBooksDownloader.start();
-    // Options to control the language client
-    const clientOptions: LanguageClientOptions = {
-        // Register the server for COBOL
-        documentSelector: ["COBOL"],
-    };
 
-    // Create the language client and start the client.
-    const languageClient = new LanguageClient("COBOL", "LSP extension for COBOL language",
-        createServerOptions(LSPServerPath), clientOptions);
-
+    // Listeners
     context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
-        if (event.affectsConfiguration(SETTINGS_SECTION + ".paths")) {
+        if (event.affectsConfiguration(SETTINGS_SECTION)) {
             copyBooksDownloader.redownloadDependencies("Configuration was updated");
+            profileService.updateStatusBar();
         }
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("cobol-language-support.copybooks.redownload", () => {
+
+    // Commands
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.redownload", () => {
         copyBooksDownloader.redownloadDependencies();
     }));
-    context.subscriptions.push(languageClient.start());
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
+        fetchCopybookCommand(copybook, copyBooksDownloader, programName);
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile", () => {
+        changeDefaultZoweProfile(profileService);
+    }));
+
+
+    context.subscriptions.push(languageClientService.start());
     context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
     context.subscriptions.push(copyBooksDownloader);
 
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
             { scheme: "file", language: "COBOL" },
-            new CopybooksDownloaderCodeActionProvider()));
+            new CopybooksCodeActionProvider()));
 }
 
-function initWorkspaceTracker(downloader: CopybooksDownloader): Disposable {
+function initWorkspaceTracker(downloader: CopybooksDownloader): vscode.Disposable {
     const watcher = vscode.workspace.createFileSystemWatcher("**/"
         + DEPENDENCIES_FOLDER + "/**/**.dep", false, false, true);
     watcher.onDidCreate(uri => downloader.downloadDependencies(uri,
         "Program contains dependencies to missing copybooks."));
     watcher.onDidChange(uri => downloader.downloadDependencies(uri));
     return watcher;
-}
-
-async function isJavaInstalled() {
-    return new Promise<any>((resolve, reject) => {
-        const ls = cp.spawn("java", ["-version"]);
-        ls.stderr.on("data", (data: any) => {
-            const javaCheck = new DefaultJavaVersionCheck();
-            if (!javaCheck.isJavaVersionSupported(data.toString())) {
-                reject("Java version 8 expected");
-            }
-            resolve();
-        });
-        ls.on("error", (code: any) => {
-            if ("Error: spawn java ENOENT" === code.toString()) {
-                reject("Java 8 is not found");
-            }
-            reject(code);
-        });
-        ls.on("close", (code: number) => {
-            if (code !== 0) {
-                reject("An error occurred when checking if Java was installed");
-            }
-        });
-    });
-}
-
-function getLspPort(): number | undefined {
-    return +vscode.workspace.getConfiguration().get("broadcom-cobol-lsp.server.port");
-}
-
-function createServerOptions(jarPath: string) {
-    const port = getLspPort();
-    if (port) {
-        // Connect to language server via socket
-        const connectionInfo = {
-            host: "localhost",
-            port,
-        };
-        return () => {
-            const socket = net.connect(connectionInfo);
-            const result: StreamInfo = {
-                reader: socket,
-                writer: socket,
-            };
-            return Promise.resolve(result);
-        };
-    }
-    return {
-        args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
-        command: "java",
-        options: { stdio: "pipe", detached: false },
-    };
 }

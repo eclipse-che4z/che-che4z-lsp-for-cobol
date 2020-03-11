@@ -37,8 +37,16 @@
     "contributes": {
         "commands": [
             {
-                "command": "cobol-language-support.copybooks.redownload",
+                "command": "broadcom-cobol-lsp.cpy-manager.redownload",
                 "title": "Redownload all copybooks"
+            },
+            {
+                "command": "broadcom-cobol-lsp.cpy-manager.fetch-copybook",
+                "title": "Fetch copybook"
+            },
+            {
+                "command": "broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile",
+                "title": "Change default Zowe profile"
             }
         ],
         "languages": [
@@ -47,7 +55,8 @@
                 "extensions": [
                     ".cbl",
                     ".cpy",
-                    ".cob"
+                    ".cob",
+                    ".cobol"
                 ]
             }
         ],

@@ -13,9 +13,7 @@
  */
 import * as path from "path";
 import * as vscode from "vscode";
-
-export const DEPENDENCIES_FOLDER: string = ".cobdeps";
-export const COPYBOOKS_FOLDER: string = ".copybooks";
+import { COPYBOOKS_FOLDER } from "../constants";
 
 export function createCopybookPath(profileName: string, dataset: string, copybook: string): string {
     const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
