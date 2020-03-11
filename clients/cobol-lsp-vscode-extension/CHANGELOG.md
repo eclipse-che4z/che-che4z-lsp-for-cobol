@@ -3,6 +3,7 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 
 ## [0.x.x] - TBD
+- StatusBar copybook downloader profile switcher [#239] (https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/239)
 - Move fetch copybook quickfix from LSP server to extension. [#235](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/235)
 - Address StackOverflow during build [#230](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/230) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - No escape chars in filename [#228](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/228) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
