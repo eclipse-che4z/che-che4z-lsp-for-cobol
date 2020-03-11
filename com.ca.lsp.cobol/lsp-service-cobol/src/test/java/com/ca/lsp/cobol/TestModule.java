@@ -24,7 +24,6 @@ import com.ca.lsp.cobol.service.CopybookServiceImpl;
 import com.ca.lsp.cobol.service.MyTextDocumentService;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActions;
-import com.ca.lsp.cobol.service.delegates.actions.FindCopybookCommand;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.communications.ServerCommunications;
 import com.ca.lsp.cobol.service.delegates.completions.*;
@@ -108,8 +107,6 @@ public class TestModule extends DefaultModule {
 
   private void bindCodeActions() {
     bind(CodeActions.class);
-    Multibinder<CodeActionProvider> codeActionBinding =
-        newSetBinder(binder(), CodeActionProvider.class);
-    codeActionBinding.addBinding().to(FindCopybookCommand.class);
+    newSetBinder(binder(), CodeActionProvider.class);
   }
 }
