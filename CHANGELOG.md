@@ -4,11 +4,13 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ## [0.x.x] - TBD
 - Dependency file should contain 8 char max copybook name [#175](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/175)
+- StatusBar copybook downloader profile switcher [#239](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/239)
 - Move fetch copybook quickfix from LSP server to extension. [#235](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/235)
 - Address StackOverflow during build [#230](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/230) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - No escape chars in filename [#228](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/228) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Finalize LRU Algorithm [#227](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/227) Thanks @[sergiuilie](https://github.com/sergiuilie)
 - Consume user settings in Copybook Service [#221](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/221) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
+- Support copybooks downloading [#208](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/208) Thanks @[ishche](https://github.com/ishche)
 - Modify dep file creation/update process [#209](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/209) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Retrieve settings.json at initialize [#207](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/207) Thanks @[sergiuilie](https://github.com/sergiuilie)
 - Introduce Code Action to Resolve Copybooks [#198](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/198) Thanks @[temanbrcom](https://github.com/temanbrcom)
