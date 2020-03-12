@@ -45,6 +45,8 @@ import static java.util.Optional.ofNullable;
 public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListener
     implements CobolSemanticParserListener {
   private static final String RECURSION_DETECTED = "Recursive copybook declaration for: %s";
+  private static final String COPYBOOK_OVER_8_CHARACTERS =
+      "Copybook declaration has more than 8 characters for: %s";
 
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
@@ -134,7 +136,19 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     String copybookName = retrieveCopybookName(copySource);
     Position position = retrievePosition(copySource);
     defineCopybook(copybookName, position);
+    checkCopybookNameLength(copybookName, position);
     this.preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens);
+  }
+
+  private void checkCopybookNameLength(String copybookName, Position position) {
+    if (copybookName != null && copybookName.length() > 8) {
+      errors.add(
+          SyntaxError.syntaxError()
+              .severity(3)
+              .suggestion(String.format(COPYBOOK_OVER_8_CHARACTERS, copybookName))
+              .position(position)
+              .build());
+    }
   }
 
   @Override
