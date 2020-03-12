@@ -171,8 +171,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-    deleteDependencyFile(uri);
-
     // A better implementation that will cover the gitfs scenario will be implementated later based
     // on issue #173
     if (uri.startsWith(GIT_FS_URI)) {
@@ -197,6 +195,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didClose(DidCloseTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
+    deleteDependencyFile(uri);
     log.info("Document closing invoked");
     docs.remove(uri);
   }
@@ -224,7 +223,8 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   }
 
   /**
-   * This method
+   * This method deletes the dependency file based on the COBOL name and workspace path
+   *
    * @param uri
    */
   private void deleteDependencyFile(String uri) {
