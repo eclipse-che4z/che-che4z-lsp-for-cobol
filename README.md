@@ -30,13 +30,13 @@ COBOL Language Support defines the protocol that is used between an editor or ID
 ### Autocomplete
 Autocomplete speeds up the coding process by intuitively suggesting the most likely variables or paragraphs to follow existing code. The extension provides live suggestions while you type for:
 
-* COBOL keywords
-* COBOL variables
-* COBOL paragraphs
-* Code Snippet
-* Copybook variables
-* Copybook paragraphs
-* Names of copybooks that are used in the program
+- COBOL keywords
+- COBOL variables
+- COBOL paragraphs
+- Code Snippet
+- Copybook variables
+- Copybook paragraphs
+- Names of copybooks that are used in the program
 
 ![Autocomplete](/docs/images/CLSAutocorrect.gif)
 		
@@ -55,7 +55,20 @@ A third-party plugin is required to enable syntax coloring. The Che4z basic stac
 	
 ### Copybook Support
 
-Whenever you open a program or project which uses copybooks, all the copybooks that are not stored in the local workspace are downloaded from the mainframe. Copybooks are stored in a **.copybooks** directory within the workspace, which is created automatically when copybooks are downloaded.
+The LSP for COBOL extension can retrieve copybooks used in your projects from the mainframe and download them locally. You can open copybooks in your IDE and make use of the copybook support features of the extension.
+
+#### Retrieving Copybooks
+
+To retrieve copybooks from the mainframe, **follow these steps:**
+
+1. Ensure that you have a Zowe CLI zosmf profile configured.
+2. Open the extension settings. 
+3. Under **Profiles**, specify your Zowe CLI zosmf profile.
+4. Under **Paths**, specify any number of data sets to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
+5. Open a program or project.  
+   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe. Copybooks are stored in a **.copybooks** directory within the workspace, which is created automatically when copybooks are downloaded.
+
+#### Copybook Support Features
 
 The extension includes the following copybook support features:
 
