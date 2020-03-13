@@ -64,7 +64,7 @@ To retrieve copybooks from the mainframe, **follow these steps:**
 1. Ensure that you have a Zowe CLI zosmf profile configured.
 2. Open the extension settings. 
 3. Under **Profiles**, specify your Zowe CLI zosmf profile.
-4. Under **Paths**, specify any number of data sets to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
+4. Under **Paths**, add any number of data sets to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
 5. Open a program or project.  
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe. Copybooks are stored in a **.copybooks** directory within the workspace, which is created automatically when copybooks are downloaded.
 
