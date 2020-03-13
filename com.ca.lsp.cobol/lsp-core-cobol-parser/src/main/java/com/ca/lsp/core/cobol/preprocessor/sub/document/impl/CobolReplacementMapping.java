@@ -21,7 +21,7 @@ import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import lombok.Data;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

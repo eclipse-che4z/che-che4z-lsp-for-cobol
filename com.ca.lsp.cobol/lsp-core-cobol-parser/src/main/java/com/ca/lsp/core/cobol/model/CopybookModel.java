@@ -9,18 +9,17 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ *    Broadcom, Inc. - initial API and implementation
+ *
  */
+
 package com.ca.lsp.core.cobol.model;
 
-import com.broadcom.lsp.domain.common.model.Position;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
-public class CopybookUsage {
+@Value
+public class CopybookModel {
   private String name;
   private String uri;
-  private Position position;
+  private String content;
 }

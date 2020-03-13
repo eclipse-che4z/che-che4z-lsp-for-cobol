@@ -157,7 +157,7 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
         preprocessor.process(
             copybookUsage.getUri(),
             content,
-            new SemanticContext(unmodifiableList(nextTrackerIteration)),
+            null,
             textDocumentSyncType);
     return new ResultWithErrors<>(
         preprocessedInput.getResult().getSemanticContext(), preprocessedInput.getErrors());

@@ -73,7 +73,7 @@ public class AnalyzeCopybookCaching {
     predefineCache();
     initWorkspaceService();
     when(preprocessor.process(
-            any(), any(String.class), any(SemanticContext.class), any(String.class)))
+            any(), any(String.class), any(), any(String.class)))
         .thenReturn(
             new ResultWithErrors<>(new PreprocessedInput(COPYBOOK_CONTENT, null), emptyList()));
   }

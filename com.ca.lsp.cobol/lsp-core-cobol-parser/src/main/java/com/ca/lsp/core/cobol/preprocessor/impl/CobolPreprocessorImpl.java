@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.impl;
 
+import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
@@ -32,14 +33,14 @@ import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.CobolLinesTransfo
 import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.ContinuationLineTransformation;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.CobolLineWriter;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.impl.CobolLineWriterImpl;
-import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 
 @Slf4j
@@ -56,11 +57,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   @Override
   public ResultWithErrors<PreprocessedInput> process(
       @Nonnull String documentUri, @Nonnull String cobolSourceCode, String textDocumentSyncType) {
-    return process(
-        documentUri,
-        cobolSourceCode,
-        new SemanticContext(Collections.emptyList()),
-        textDocumentSyncType);
+    return process(documentUri, cobolSourceCode, new ArrayDeque<>(), textDocumentSyncType);
   }
 
   @Nonnull
@@ -68,7 +65,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   public ResultWithErrors<PreprocessedInput> process(
       @Nonnull String documentUri,
       @Nonnull String cobolCode,
-      @Nonnull SemanticContext semanticContext,
+      Deque<CopybookUsage> copybookStack,
       @Nonnull String textDocumentSyncType) {
 
     ResultWithErrors<List<CobolLine>> lines = readLines(cobolCode, documentUri);
@@ -82,7 +79,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
     ResultWithErrors<PreprocessedInput> parsedDocument =
         semanticParser.processLines(
-            documentUri, cleanDocument, semanticContext, textDocumentSyncType);
+            documentUri, cleanDocument, copybookStack, textDocumentSyncType);
 
     List<SyntaxError> errors = new ArrayList<>();
     errors.addAll(lines.getErrors());

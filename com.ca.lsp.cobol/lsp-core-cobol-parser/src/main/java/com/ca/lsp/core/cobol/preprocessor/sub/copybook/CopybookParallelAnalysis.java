@@ -129,7 +129,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
             it ->
                 factory.create(
                     documentUri,
-                    new CopybookUsage(it.getKey(), documentUri, it.getValue()),
+                    new CopybookUsage(it.getKey(), documentUri, it.getValue().iterator().next()),
                     copybookUsageTracker,
                     textDocumentSyncType))
         .collect(toList());

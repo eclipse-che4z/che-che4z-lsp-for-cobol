@@ -13,11 +13,12 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
+import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.semantics.SemanticContext;
 
 import javax.annotation.Nonnull;
+import java.util.Deque;
 
 /**
  * Preprocessor which retrieves semantic elements definitions, such as variables, paragraphs and
@@ -29,7 +30,6 @@ public interface CobolSemanticParser {
    * Fills-in the semantic context of the current document, including elements from the copybooks
    *
    * @param code - COBOL program text to analyse
-   * @param semanticContext - semantic context of the currently processed document to be filled in.
    * @param textDocumentSyncType - reflect the sync status of the document (DID_OPEN|DID_CHANGE)
    * @return a PreprocessedInput - text and its semantic context with syntax errors if found or an
    *     empty list
@@ -38,6 +38,6 @@ public interface CobolSemanticParser {
   ResultWithErrors<PreprocessedInput> processLines(
       @Nonnull String uri,
       @Nonnull String code,
-      @Nonnull SemanticContext semanticContext,
+      Deque<CopybookUsage> copybookStack,
       String textDocumentSyncType);
 }
