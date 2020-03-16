@@ -16,7 +16,9 @@ import { JavaCheck } from "./JavaCheck";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import * as net from "net";
-import { StreamInfo, LanguageClient, LanguageClientOptions } from "vscode-languageclient";
+import { StreamInfo, LanguageClient, LanguageClientOptions, ConfigurationRequest, ConfigurationParams, CancellationToken } from "vscode-languageclient";
+import { LANGUAGE_ID } from "../constants";
+import { ConfigurationWorkspaceMiddleware } from "vscode-languageclient/lib/configuration";
 
 export class LanguageClientService {
     private jarPath: string;
@@ -28,15 +30,14 @@ export class LanguageClientService {
     async checkPrerequisites(): Promise<void> {
         await new JavaCheck().isJavaInstalled();
         if (!this.getLspPort() && !fs.existsSync(this.jarPath)) {
-            throw new Error("LSP server not found");
+            throw new Error("LSP server for " + LANGUAGE_ID + " not found");
         }
     }
     start(): vscode.Disposable {
-        const clientOptions: LanguageClientOptions = {
-            documentSelector: ["COBOL"],
-        };
-        const languageClient = new LanguageClient("COBOL", "LSP extension for COBOL language",
-            this.createServerOptions(this.jarPath), clientOptions);
+        const languageClient = new LanguageClient(LANGUAGE_ID,
+            "LSP extension for " + LANGUAGE_ID + " language",
+            this.createServerOptions(this.jarPath),
+            this.createClientOptions());
         return languageClient.start();
     }
 
@@ -44,6 +45,25 @@ export class LanguageClientService {
         return +vscode.workspace.getConfiguration().get("broadcom-cobol-lsp.server.port");
     }
 
+    private createClientOptions(): LanguageClientOptions {
+        const signatureFunc: ConfigurationRequest.MiddlewareSignature = async (
+            params: ConfigurationParams,
+            token: CancellationToken,
+            next: ConfigurationRequest.HandlerSignature) => {
+
+            console.log(params.items);
+            return ["Hello, World", "Path/To/Something"];
+            // return next(params, token);
+        }
+        const configurationMiddleware: ConfigurationWorkspaceMiddleware = {
+            configuration: signatureFunc,
+        };
+
+        return {
+            documentSelector: [LANGUAGE_ID],
+            middleware: { workspace: configurationMiddleware }
+        };
+    }
     private createServerOptions(jarPath: string) {
         const port = this.getLspPort();
         if (port) {

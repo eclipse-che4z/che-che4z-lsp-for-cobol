@@ -13,7 +13,7 @@
  */
 
 import * as vscode from "vscode";
-import { SETTINGS_SECTION } from "./constants";
+import { SETTINGS_SECTION, LANGUAGE_ID } from "./constants";
 import { DEPENDENCIES_FOLDER } from "./constants";
 import { CopybooksDownloader } from "./CopybooksDownloader";
 import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
@@ -66,7 +66,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
-            { scheme: "file", language: "COBOL" },
+            { scheme: "file", language: LANGUAGE_ID },
             new CopybooksCodeActionProvider()));
 }
 
