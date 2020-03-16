@@ -21,7 +21,7 @@ import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
-import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
+import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
@@ -53,7 +53,8 @@ public class CopybookSearchWithoutConfigTest {
   private static final String CPY_NAME = "ACPYTEST";
   private DataBusBroker dataBusBroker = mock(DataBusBroker.class);
   private Provider settingsProvider = mock(Provider.class);
-  private CopybookDependencyService dependencyService = mock(CopybookDependencyService.class);
+  private CopybookDependencyServiceImpl dependencyService =
+      mock(CopybookDependencyServiceImpl.class);
   private Communications communications = mock(Communications.class);
   private CopybookServiceImpl copybookService;
   private static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
@@ -75,6 +76,15 @@ public class CopybookSearchWithoutConfigTest {
             .documentUri(DOCUMENT_URI)
             .textDocumentSyncType("DID_OPEN")
             .build();
+
+    initInteractionWithDependency();
+  }
+
+  private void initInteractionWithDependency() {
+    when(dependencyService.isFileInDidOpen(requiredCopybookEvent)).thenReturn(true);
+    doCallRealMethod()
+        .when(dependencyService)
+        .invoke(requiredCopybookEvent, CPY_NAME, Collections.singletonList(workspaceFolderPath));
   }
 
   @After
@@ -103,7 +113,7 @@ public class CopybookSearchWithoutConfigTest {
 
     try {
       copybookService.observerCallback(requiredCopybookEvent);
-      verifyThatDepFileIsEngaged();
+      verifyThatDepFileIsCreated();
       verify(communications, times(1)).notifyCopybookMessageInfo(NO_SETTINGS);
     } catch (Exception e) {
       fail(e.getMessage());
@@ -123,7 +133,7 @@ public class CopybookSearchWithoutConfigTest {
 
     try {
       copybookService.observerCallback(requiredCopybookEvent);
-      verifyThatDepFileIsEngaged();
+      verifyThatDepFileIsCreated();
       verify(communications, times(1)).notifyCopybookMessageInfo(NO_DATASET_IN_SETTINGS);
     } catch (Exception e) {
       fail(e.getMessage());
@@ -140,7 +150,7 @@ public class CopybookSearchWithoutConfigTest {
         .thenReturn(new ConfigurationSettingsStorable("PRF", Collections.singletonList("HLQ.DS1")));
     try {
       copybookService.observerCallback(requiredCopybookEvent);
-      verifyThatDepFileIsEngaged();
+      verifyThatDepFileIsCreated();
       verify(communications, times(1)).notifyLogMessageInfo(COPYBOOK_FOLDER_MISS);
     } catch (Exception e) {
       fail(e.getMessage());
@@ -159,10 +169,22 @@ public class CopybookSearchWithoutConfigTest {
    * Pre-condition of each test for copybook management is that the dependency file creation is
    * engaged.
    */
-  private void verifyThatDepFileIsEngaged() {
-    verify(dependencyService, times(1))
+  private void verifyThatDepFileIsCreated() {
+    //
+    //    verify(dependencyService, times(1))
+    //        .setWorkspaceFolderPaths(Collections.singletonList(workspaceFolderPath));
+    //    when(dependencyService.isFileInDidOpen(requiredCopybookEvent)).thenReturn(true);
+
+    //    dependencyService.invoke(
+    //        requiredCopybookEvent, CPY_NAME, Collections.singletonList(workspaceFolderPath));
+
+    verify(dependencyService, atLeast(1))
         .addCopybookInDepFile(
             requiredCopybookEvent.getName(), requiredCopybookEvent.getDocumentUri());
+    //
+    //    verify(dependencyService, times(1))
+    //        .addCopybookInDepFile(
+    //            requiredCopybookEvent.getName(), requiredCopybookEvent.getDocumentUri());
   }
 
   private Path createFolderStructure(Path copybooksPath) {

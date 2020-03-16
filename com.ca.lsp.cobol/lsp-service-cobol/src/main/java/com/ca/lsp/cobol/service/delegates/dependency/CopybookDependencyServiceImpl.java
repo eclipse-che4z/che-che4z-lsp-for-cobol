@@ -15,7 +15,9 @@
  */
 package com.ca.lsp.cobol.service.delegates.dependency;
 
+import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.service.CopybookServiceImpl;
+import com.ca.lsp.cobol.service.TextDocumentSyncType;
 import com.google.common.annotations.Beta;
 import com.google.inject.Singleton;
 import lombok.Getter;
@@ -39,6 +41,33 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
   private static final String COBDEPS = ".cobdeps";
   private static final String DEP_EXTENSION = ".dep";
   @Getter private List<Path> workspaceFolderPaths;
+
+  /**
+   * TODO: Add description
+   *
+   * @param event contains information the copybook (document URI and event sync type)
+   * @param requiredCopybookName name that represent the new copybook that is supposed to go into
+   * @param targetPaths
+   */
+  @Override
+  public void invoke(
+      RequiredCopybookEvent event, String requiredCopybookName, List<Path> targetPaths) {
+    setWorkspaceFolderPaths(targetPaths);
+    if (isFileInDidOpen(event)) {
+      addCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
+    }
+  }
+
+  /**
+   * @param event
+   * @return
+   */
+  @Override
+  public boolean isFileInDidOpen(RequiredCopybookEvent event) {
+    return event.getTextDocumentSyncType() != null
+        && TextDocumentSyncType.valueOf(event.getTextDocumentSyncType())
+            .equals(TextDocumentSyncType.DID_OPEN);
+  }
 
   /**
    * This method write the copybook name sent by the {@link CopybookServiceImpl} into the dependency

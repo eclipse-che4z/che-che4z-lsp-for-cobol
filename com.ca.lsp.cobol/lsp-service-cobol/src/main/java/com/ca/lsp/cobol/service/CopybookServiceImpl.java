@@ -22,6 +22,7 @@ import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
+import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -211,11 +212,10 @@ public class CopybookServiceImpl implements CopybookService {
     String content = null;
     Path path;
 
-    // if the document is in DID_OPEN mode is possible write on dependency file..
-    if (isFileInDidOpen(event)) {
-      dependencyService.setWorkspaceFolderPaths(getWorkspaceFoldersAsPathList());
-      dependencyService.addCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
-    }
+    // TODO: Check if is possible move it into the constructor
+
+    CopybookDependencyServiceImpl impl = (CopybookDependencyServiceImpl) dependencyService;
+    impl.invoke(event, requiredCopybookName, getWorkspaceFoldersAsPathList());
 
     if (missingInformationToSearchCopybooks()) {
       selectAppropriateMessageForCommunication();
@@ -284,11 +284,5 @@ public class CopybookServiceImpl implements CopybookService {
 
   private boolean copybookFolderNotDefined() {
     return !getCopybookFolder(getWorkspaceFoldersAsPathList().get(0)).toFile().exists();
-  }
-
-  private boolean isFileInDidOpen(RequiredCopybookEvent event) {
-    return event.getTextDocumentSyncType() != null
-        && TextDocumentSyncType.valueOf(event.getTextDocumentSyncType())
-            .equals(TextDocumentSyncType.DID_OPEN);
   }
 }
