@@ -9,7 +9,8 @@
 grammar CobolPreprocessor;
 
 startRule : ~(DATA | IDENTIFICATION)*? ((compilerOptions | dataDescriptionEntry | dataDivision | procedureDivision | copyStatement
-            | replaceOffStatement | replaceArea  | skipStatement | titleStatement | paragraphs2 |  NEWLINE | IDENTIFICATION)+ .*?)+ EOF;
+            | replaceOffStatement | replaceArea  | skipStatement | titleStatement | paragraphs2 | execCicsStatement | execSqlImsStatement
+            | execSqlStatement | NEWLINE | IDENTIFICATION)+ .*?)+ EOF;
 
 //procedureDivision
 procedureDivision
@@ -91,7 +92,7 @@ everything
     : ~(ACCEPT | ADD | ALTER | CALL | CANCEL | CLOSE | COMPUTE | CONTINUE | DELETE | DISABLE | DISPLAY | DIVIDE | ENABLE |
       ENTRY | EVALUATE | EXIT | GENERATE | GOBACK | GO | IF | INITIALIZE | INITIATE | INSPECT | MERGE | MULTIPLY | OPEN | PERFORM | PURGE | READ |
       RECEIVE | RELEASE | RETURN | REWRITE | SEARCH | SEND | SET | SKIP1 | SKIP2 | SKIP3 | SORT | START | STOP | STRING | SUBTRACT | TERMINATE |
-      TITLE | UNSTRING | USE | WRITE | XML | EXECCICSLINE | EXECSQLIMSLINE | EXECSQLLINE| DOT_FS | COPY | MOVE)*?
+      TITLE | UNSTRING | USE | WRITE | XML | EXEC | EJECT | DOT_FS | COPY | MOVE)*?
     ;
 
 moveStatement
@@ -997,9 +998,9 @@ X_CHAR : X;
 
 
 // symbols
-EXECCICSTAG : '*>EXECCICS';
-EXECSQLTAG : '*>EXECSQL';
-EXECSQLIMSTAG : '*>EXECSQLIMS';
+//EXECCICSTAG : '*>EXECCICS';
+//EXECSQLTAG : '*>EXECSQL';
+//EXECSQLIMSTAG : '*>EXECSQLIMS';
 COMMENTTAG : '*>';
 COMMENTENTRYTAG : '*>CE';
 COMMACHAR : ',';
@@ -1028,9 +1029,9 @@ FILENAME : [a-zA-Z0-9]+ '.' [a-zA-Z0-9]+;
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
-EXECCICSLINE : EXECCICSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
-EXECSQLIMSLINE : EXECSQLIMSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
-EXECSQLLINE : EXECSQLTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
+//EXECCICSLINE : EXECCICSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
+//EXECSQLIMSLINE : EXECSQLIMSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
+//EXECSQLLINE : EXECSQLTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
 COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
 COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
 WS : [ \t\f;]+ -> channel(HIDDEN);
