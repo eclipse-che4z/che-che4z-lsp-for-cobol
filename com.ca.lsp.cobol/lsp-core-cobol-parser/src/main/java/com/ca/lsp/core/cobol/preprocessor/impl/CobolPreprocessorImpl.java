@@ -19,8 +19,6 @@ import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.CobolDocumentCleaner;
-import com.ca.lsp.core.cobol.preprocessor.sub.cleaner.impl.CobolDocumentCleanerImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImpl;
@@ -75,11 +73,12 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
     List<CobolLine> rewrittenLines = rewriteLines(transformedLines.getResult());
 
-    String cleanDocument = cleanDocument(documentUri, rewrittenLines);
+    String code = createLineWriter().serialize(rewrittenLines);
+
 
     ResultWithErrors<PreprocessedInput> parsedDocument =
         semanticParser.processLines(
-            documentUri, cleanDocument, copybookStack, textDocumentSyncType);
+            documentUri, code, copybookStack, textDocumentSyncType);
 
     List<SyntaxError> errors = new ArrayList<>();
     errors.addAll(lines.getErrors());
@@ -87,11 +86,6 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     errors.addAll(parsedDocument.getErrors());
 
     return new ResultWithErrors<>(parsedDocument.getResult(), errors);
-  }
-
-  private String cleanDocument(String documentUri, List<CobolLine> lines) {
-    String code = createLineWriter().serialize(lines);
-    return createDocumentCleaner().cleanDocument(documentUri, code);
   }
 
   private ResultWithErrors<List<CobolLine>> readLines(String cobolCode, String documentURI) {
@@ -117,10 +111,6 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
   private CobolLineReWriter createCommentEntriesMarker() {
     return new CobolCommentEntriesMarkerImpl();
-  }
-
-  private CobolDocumentCleaner createDocumentCleaner() {
-    return new CobolDocumentCleanerImpl();
   }
 
   private CobolLineReWriter createInlineCommentEntriesNormalizer() {

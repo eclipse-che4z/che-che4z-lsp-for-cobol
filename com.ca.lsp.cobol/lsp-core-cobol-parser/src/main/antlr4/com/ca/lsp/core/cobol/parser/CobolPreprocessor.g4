@@ -84,7 +84,7 @@ statement
      exitStatement | generateStatement | gobackStatement | goStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement |
      multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement |
      searchStatement | sendStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement |
-     titleStatement | unstringStatement | useStatement | writeStatement | xmlStatement |execSqlStatement | execSqlImsStatement | execCicsStatement | copyStatement
+     titleStatement | unstringStatement | useStatement | writeStatement | xmlStatement |execSqlStatement | execSqlImsStatement | execCicsStatement | copyStatement | ejectStatement
    ;
 
 everything
@@ -473,23 +473,26 @@ compilerOption
    ;
 
 
-// exec cics statement
+
 execCicsStatement
-   : EXECCICSLINE+
+   : EXEC CICS ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exec sql statement
 
 execSqlStatement
-   : EXECSQLLINE+
+   : EXEC SQL ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exec sql ims statement
 
 execSqlImsStatement
-   : EXECSQLIMSLINE+
+   : EXEC SQLIMS ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
+ejectStatement
+   : EJECT DOT_FS?
+   ;
 
 // copy statement
 copyStatement
@@ -708,9 +711,10 @@ END: E N D;
 ENTRY: E N T R Y;
 EVALUATE : E V A L U A T E;
 EJPD : E J P D;
+EJECT: E J E C T;
 EN : E N;
 ENGLISH : E N G L I S H;
-END_EXEC : E N D '-' E X E C;
+END_EXEC : E N D MINUSCHAR E X E C;
 EPILOG : E P I L O G;
 EXCI : E X C I;
 EXEC : E X E C;

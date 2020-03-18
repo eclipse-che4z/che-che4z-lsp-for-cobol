@@ -16,16 +16,20 @@ package com.ca.lsp.core.cobol.visitor;
 
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolParserBaseVisitor;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
 import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.ca.lsp.core.cobol.parser.CobolParser.*;
+import static java.util.Optional.ofNullable;
 
 /**
  * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
@@ -114,6 +118,60 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
           ctx);
     }
     return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitParagraphName(ParagraphNameContext ctx) {
+    semanticContext.getParagraphs().define(ctx.getText().toUpperCase(), retrievePosition(ctx));
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
+    createVariableAndDefine(ctx);
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitDataDescriptionEntryFormat2(DataDescriptionEntryFormat2Context ctx) {
+    createVariableAndDefine(ctx);
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitDataDescriptionEntryFormat3(DataDescriptionEntryFormat3Context ctx) {
+    createVariableAndDefine(ctx);
+    return visitChildren(ctx);
+  }
+
+  private void createVariableAndDefine(@Nonnull ParserRuleContext ctx) {
+    String levelNumber;
+
+    if (ctx instanceof DataDescriptionEntryFormat1Context) {
+      DataDescriptionEntryFormat1Context ctxDataDescF1 = (DataDescriptionEntryFormat1Context) ctx;
+      levelNumber = ctxDataDescF1.otherLevel().getText();
+      defineVariableIfPresent(levelNumber, ctxDataDescF1.dataName1());
+
+    } else if (ctx instanceof DataDescriptionEntryFormat2Context) {
+      DataDescriptionEntryFormat2Context ctxDataDescF2 = (DataDescriptionEntryFormat2Context) ctx;
+      levelNumber = ctxDataDescF2.LEVEL_NUMBER_66().getText();
+      defineVariableIfPresent(levelNumber, ctxDataDescF2.dataName1());
+    } else {
+      DataDescriptionEntryFormat3Context ctxDataDescF3 = (DataDescriptionEntryFormat3Context) ctx;
+      levelNumber = ctxDataDescF3.LEVEL_NUMBER_88().getText();
+      defineVariableIfPresent(levelNumber, ctxDataDescF3.dataName1());
+    }
+  }
+
+  private void defineVariableIfPresent(
+      @Nullable String levelNumber, @Nullable DataName1Context dataName) {
+    ofNullable(dataName)
+        .ifPresent(
+            variable ->
+                semanticContext
+                    .getVariables()
+                    .define(
+                        new Variable(levelNumber, variable.getText()), retrievePosition(dataName)));
   }
 
   public Class visitDataName2(

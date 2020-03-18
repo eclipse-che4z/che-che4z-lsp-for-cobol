@@ -40,8 +40,8 @@ import java.util.List;
 
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.NEWLINE;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 
 /**
  * ANTLR visitor, which preprocesses a given COBOL program by executing COPY and REPLACE statements.
@@ -91,6 +91,46 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
+  public void enterExecCicsStatement(@Nonnull ExecCicsStatementContext ctx) {
+    cleaner.push();
+  }
+
+  @Override
+  public void exitExecCicsStatement(@Nonnull ExecCicsStatementContext ctx) {
+    cleaner.excludeStatementFromText(ctx, EXEC_CICS_TAG, tokens);
+  }
+
+  @Override
+  public void enterExecSqlStatement(@Nonnull ExecSqlStatementContext ctx) {
+    cleaner.push();
+  }
+
+  @Override
+  public void exitExecSqlStatement(@Nonnull ExecSqlStatementContext ctx) {
+    cleaner.excludeStatementFromText(ctx, EXEC_SQL_TAG, tokens);
+  }
+
+  @Override
+  public void enterExecSqlImsStatement(@Nonnull ExecSqlImsStatementContext ctx) {
+    cleaner.push();
+  }
+
+  @Override
+  public void exitExecSqlImsStatement(@Nonnull ExecSqlImsStatementContext ctx) {
+    cleaner.excludeStatementFromText(ctx, EXEC_SQLIMS_TAG, tokens);
+  }
+
+  @Override
+  public void enterEjectStatement(@Nonnull EjectStatementContext ctx) {
+    cleaner.push();
+  }
+
+  @Override
+  public void exitEjectStatement(@Nonnull EjectStatementContext ctx) {
+    cleaner.excludeStatementFromText(ctx, COMMENT_TAG, tokens);
+  }
+
+  @Override
   public void enterCompilerOptions(@Nonnull CompilerOptionsContext ctx) {
     // push a new context for the COMPILER OPTIONS terminals
     cleaner.push();
@@ -117,11 +157,6 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void enterParagraphName(@Nonnull ParagraphNameContext ctx) {
-    semanticContext.getParagraphs().define(ctx.getText().toUpperCase(), retrievePosition(ctx));
-  }
-
-  @Override
   public void enterCopyStatement(@Nonnull CopyStatementContext ctx) {
     cleaner.push();
   }
@@ -130,21 +165,6 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   public void exitCompilerOptions(@Nonnull CompilerOptionsContext ctx) {
     // throw away COMPILER OPTIONS terminals
     cleaner.pop();
-  }
-
-  @Override
-  public void exitDataDescriptionEntryFormat1(@Nonnull DataDescriptionEntryFormat1Context ctx) {
-    createVariableAndDefine(ctx);
-  }
-
-  @Override
-  public void exitDataDescriptionEntryFormat2(@Nonnull DataDescriptionEntryFormat2Context ctx) {
-    createVariableAndDefine(ctx);
-  }
-
-  @Override
-  public void exitDataDescriptionEntryFormat3(@Nonnull DataDescriptionEntryFormat3Context ctx) {
-    createVariableAndDefine(ctx);
   }
 
   @Override
@@ -299,36 +319,6 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
       return;
     }
     semanticContext.getCopybooks().addUsage(copybookName, position);
-  }
-
-  private void createVariableAndDefine(@Nonnull ParserRuleContext ctx) {
-    String levelNumber;
-
-    if (ctx instanceof DataDescriptionEntryFormat1Context) {
-      DataDescriptionEntryFormat1Context ctxDataDescF1 = (DataDescriptionEntryFormat1Context) ctx;
-      levelNumber = ctxDataDescF1.otherLevel().getText();
-      defineVariableIfPresent(levelNumber, ctxDataDescF1.dataName());
-
-    } else if (ctx instanceof DataDescriptionEntryFormat2Context) {
-      DataDescriptionEntryFormat2Context ctxDataDescF2 = (DataDescriptionEntryFormat2Context) ctx;
-      levelNumber = ctxDataDescF2.LEVEL_NUMBER_66().getText();
-      defineVariableIfPresent(levelNumber, ctxDataDescF2.dataName());
-    } else {
-      DataDescriptionEntryFormat3Context ctxDataDescF3 = (DataDescriptionEntryFormat3Context) ctx;
-      levelNumber = ctxDataDescF3.LEVEL_NUMBER_88().getText();
-      defineVariableIfPresent(levelNumber, ctxDataDescF3.dataName());
-    }
-  }
-
-  private void defineVariableIfPresent(
-      @Nullable String levelNumber, @Nullable DataNameContext dataName) {
-    ofNullable(dataName)
-        .ifPresent(
-            variable ->
-                semanticContext
-                    .getVariables()
-                    .define(
-                        new Variable(levelNumber, variable.getText()), retrievePosition(dataName)));
   }
 
   @Nonnull
