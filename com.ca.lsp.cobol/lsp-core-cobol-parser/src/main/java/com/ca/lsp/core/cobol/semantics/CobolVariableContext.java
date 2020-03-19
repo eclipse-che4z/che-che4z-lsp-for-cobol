@@ -75,7 +75,6 @@ public class CobolVariableContext implements SubContext<Variable> {
   public void merge(String name, SubContext<Variable> subContext) {
     variableDefinitions.putAll(subContext.getDefinitions());
     variableUsages.putAll(subContext.getUsages());
-    buildVariableStructure(name, subContext);
   }
 
   public Variable get(String name) {
@@ -123,17 +122,6 @@ public class CobolVariableContext implements SubContext<Variable> {
     }
   }
 
-  /**
-   * Remove all the copybook marks that were not resolved. Copybook mark is a variable with copybook
-   * name and level number '-1'. If copybook is missing, then this mark will stay here and should be
-   * deleted not to appear in the variable list.
-   */
-  public void removeUnresolvedCopybookMarks() {
-    List<Variable> unresolvedCopybooks =
-        variables.stream().filter(it -> it.getLevelNumber() == -1).collect(toList());
-    variables.removeAll(unresolvedCopybooks);
-    unresolvedCopybooks.forEach(it -> variableDefinitions.removeAll(it.getName()));
-  }
 
   /**
    * This routine will identify the correct relation between two variable defined in the data
@@ -197,29 +185,6 @@ public class CobolVariableContext implements SubContext<Variable> {
     v2.setParent(v1.getParent());
     if (v1.getParent() != null) {
       v1.getParent().getChildren().add(v2.getName());
-    }
-  }
-
-  /**
-   * Replace the copybook mark with a variable structure of this copybook. Copybook analyzer puts
-   * these marks into the context to show where the copybook variable structure should be built in
-   * respecting the main document structure.
-   *
-   * <p>Copybook mark is a variable with copybook name and level number '-1'.
-   *
-   * @param name - copybook name
-   * @param subContext - copybook context
-   */
-  private void buildVariableStructure(String name, SubContext<Variable> subContext) {
-    int indexOfCopybook = variables.indexOf(new Variable("-1", name));
-    if (indexOfCopybook == -1) {
-      variables.addAll(subContext.getAll());
-    }
-    variables.addAll(indexOfCopybook + 1, subContext.getAll());
-    variables.remove(indexOfCopybook);
-    variableDefinitions.removeAll(name);
-    if (variables.contains(new Variable("-1", name))) {
-      buildVariableStructure(name, subContext);
     }
   }
 }

@@ -41,10 +41,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private static final int WARNING_LEVEL = 2;
   private static final int INFO_LEVEL = 3;
 
-  @Getter private List<SyntaxError> errors = new ArrayList<>();
-
   private String documentUri;
-  private SemanticContext semanticContext;
+  @Getter private SemanticContext semanticContext;
+  @Getter private List<SyntaxError> errors = new ArrayList<>();
 
   public CobolVisitor(String documentUri, SemanticContext semanticContext) {
     this.documentUri = documentUri;

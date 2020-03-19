@@ -142,25 +142,6 @@ public class CobolVariableContextTest {
     assertNull(get("NEW-VARIABLE-NOT-CREATED"));
   }
 
-  /**
-   * Test that {@link CobolVariableContext#removeUnresolvedCopybookMarks} removes all the variables
-   * that have level number '-1'.
-   */
-  @Test
-  public void removeUnresolvedCopybookMarksTest() {
-    CobolVariableContext context = new CobolVariableContext();
-    Position pos = new Position("doc", 0, 1, 0, 0);
-    String cpyMark = "cpyMark";
-
-    context.define(new Variable("-1", cpyMark), pos);
-    context.define(new Variable("0", "var1"), pos);
-    context.define(new Variable("1", "var2"), pos);
-    context.removeUnresolvedCopybookMarks();
-
-    assertEquals(2, context.getAll().size());
-    assertFalse(context.contains(cpyMark));
-  }
-
   private boolean isVariableDefinedInStructure(Variable variable, String targetVariableName) {
     if (variable.getChildren().contains(targetVariableName)) {
       return true;
