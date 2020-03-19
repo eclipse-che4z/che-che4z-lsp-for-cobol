@@ -28,9 +28,7 @@ import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.AnalyseCopybookTask;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.MultiMapSerializableHelper;
-import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Guice;
@@ -176,26 +174,26 @@ public class AnalyzeCopybookCaching {
   }
 
   private void runAnalysisInDidChange() {
-    AnalyseCopybookTask analyseCopybookTask =
-        new AnalyseCopybookTask(
-            databus,
-            preprocessor,
-            null,
-            new CopybookUsage(COPYBOOK_NAME, null, null),
-            emptyList(),
-            "DID_CHANGE");
-    analyseCopybookTask.compute();
+//    AnalyseCopybookTask analyseCopybookTask =
+//        new AnalyseCopybookTask(
+//            databus,
+//            preprocessor,
+//            null,
+//            new CopybookUsage(COPYBOOK_NAME, null, null),
+//            emptyList(),
+//            "DID_CHANGE");
+//    analyseCopybookTask.compute();
   }
 
   private void runAnalysisInDidOpen() {
-    AnalyseCopybookTask analyseCopybookTask =
-        new AnalyseCopybookTask(
-            databus,
-            preprocessor,
-            null,
-            new CopybookUsage(COPYBOOK_NAME, null, null),
-            emptyList(),
-            "DID_OPEN");
-    analyseCopybookTask.compute();
+//    AnalyseCopybookTask analyseCopybookTask =
+//        new AnalyseCopybookTask(
+//            databus,
+//            preprocessor,
+//            null,
+//            new CopybookUsage(COPYBOOK_NAME, null, null),
+//            emptyList(),
+//            "DID_OPEN");
+//    analyseCopybookTask.compute();
   }
 }

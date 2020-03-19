@@ -19,15 +19,10 @@ import com.broadcom.lsp.cdi.module.DefaultModule;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.AnalyseCopybookTaskFactory;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookAnalysis;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookParallelAnalysis;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserListenerFactory;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserListenerImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CopybookResolutionProvider;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
@@ -37,14 +32,9 @@ public class EngineModule extends DefaultModule {
   protected void configure() {
     bind(CobolLanguageEngine.class);
     bind(CobolPreprocessor.class).to(CobolPreprocessorImpl.class);
-    bind(CopybookAnalysis.class).to(CopybookParallelAnalysis.class);
     bind(CobolPreprocessor.class).to(CobolPreprocessorImpl.class);
     bind(CobolSemanticParser.class).to(CobolSemanticParserImpl.class);
     bind(CopybookResolution.class).toProvider(CopybookResolutionProvider.class);
-    install(
-        new FactoryModuleBuilder()
-            .implement(CobolSemanticParserListener.class, CobolSemanticParserListenerImpl.class)
-            .build(AnalyseCopybookTaskFactory.class));
     install(new FactoryModuleBuilder().build(CobolSemanticParserListenerFactory.class));
   }
 }
