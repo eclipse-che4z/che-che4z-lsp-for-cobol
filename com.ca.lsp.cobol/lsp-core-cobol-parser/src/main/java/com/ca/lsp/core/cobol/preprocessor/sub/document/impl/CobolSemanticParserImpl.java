@@ -21,6 +21,7 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.google.inject.Inject;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -28,6 +29,10 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import javax.annotation.Nonnull;
 import java.util.Deque;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 /**
  * Preprocessor which retrieves semantic elements definitions, such as variables, paragraphs and
@@ -35,6 +40,21 @@ import java.util.Deque;
  */
 public class CobolSemanticParserImpl implements CobolSemanticParser {
   private CobolSemanticParserListenerFactory listenerFactory;
+
+  private static final List<String> TRIGGERS =
+      asList(
+          "cbl",
+          "copy",
+          "exec sql",
+          "exec sqlims",
+          "exec cics",
+          "process",
+          "replace",
+          "eject",
+          "skip1",
+          "skip2",
+          "skip3",
+          "title");
 
   @Inject
   public CobolSemanticParserImpl(CobolSemanticParserListenerFactory listenerFactory) {
@@ -46,7 +66,24 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   public ResultWithErrors<PreprocessedInput> processLines(
       @Nonnull String uri,
       @Nonnull String code,
-      Deque<CopybookUsage> copybookStack,
+      @Nonnull Deque<CopybookUsage> copybookStack,
+      @Nonnull String textDocumentSyncType) {
+
+    return needsProcessing(code)
+        ? cleanWithParser(uri, code, copybookStack, textDocumentSyncType)
+        : defaultProcessingResult(code);
+  }
+
+  private boolean needsProcessing(@Nonnull String code) {
+    String codeLowerCase = code.toLowerCase();
+    return TRIGGERS.stream().anyMatch(codeLowerCase::contains);
+  }
+
+  @Nonnull
+  private ResultWithErrors<PreprocessedInput> cleanWithParser(
+      @Nonnull String uri,
+      @Nonnull String code,
+      @Nonnull Deque<CopybookUsage> copybookStack,
       @Nonnull String textDocumentSyncType) {
     // run the lexer
     CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
@@ -69,5 +106,10 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     return new ResultWithErrors<>(
         new PreprocessedInput(listener.context().read(), listener.getSemanticContext()),
         listener.getErrors());
+  }
+
+  @Nonnull
+  private ResultWithErrors<PreprocessedInput> defaultProcessingResult(@Nonnull String code) {
+    return new ResultWithErrors<>(new PreprocessedInput(code, new SemanticContext()), emptyList());
   }
 }

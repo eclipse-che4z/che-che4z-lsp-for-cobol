@@ -23,7 +23,6 @@ import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.utils.CustomToken;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.ca.lsp.core.cobol.parser.CobolParser.DataNameContext;
@@ -104,7 +103,7 @@ public class VisitorSemanticAnalysisTest {
   }
 
   private SemanticContext createSemanticContext() {
-    SemanticContext semanticContext = new SemanticContext(new ArrayList<>());
+    SemanticContext semanticContext = new SemanticContext();
     semanticContext
         .getVariables()
         .define(new Variable(LEVEL_NUMBER, DEFINED_VARIABLE), VARIABLE_POSITION);

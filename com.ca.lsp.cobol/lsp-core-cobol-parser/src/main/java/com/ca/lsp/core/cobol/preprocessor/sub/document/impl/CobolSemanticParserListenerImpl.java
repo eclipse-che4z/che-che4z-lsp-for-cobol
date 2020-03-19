@@ -81,7 +81,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     this.cleaner = cleaner;
     this.preprocessor = preprocessor;
     this.resolutions = resolutions;
-    semanticContext = new SemanticContext(new ArrayList<>());
+    semanticContext = new SemanticContext();
   }
 
   @Nonnull

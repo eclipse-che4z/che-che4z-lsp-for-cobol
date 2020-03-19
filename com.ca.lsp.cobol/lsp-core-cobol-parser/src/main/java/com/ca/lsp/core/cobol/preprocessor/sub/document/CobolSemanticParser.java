@@ -38,6 +38,6 @@ public interface CobolSemanticParser {
   ResultWithErrors<PreprocessedInput> processLines(
       @Nonnull String uri,
       @Nonnull String code,
-      Deque<CopybookUsage> copybookStack,
-      String textDocumentSyncType);
+      @Nonnull Deque<CopybookUsage> copybookStack,
+      @Nonnull String textDocumentSyncType);
 }
