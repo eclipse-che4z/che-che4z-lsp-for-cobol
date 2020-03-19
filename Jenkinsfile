@@ -91,7 +91,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }}
       post {
         always {
           container('node') {
@@ -99,5 +99,4 @@ pipeline {
           }
         }
       }
-    }
 }
