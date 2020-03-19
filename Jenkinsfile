@@ -85,7 +85,7 @@ pipeline {
             steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
-                        sh 'npx vsce package'
+                        sh 'npx package'
                         archiveArtifacts "*.vsix"
                         sh 'mv cobol-language-support*.vsix cobol-language-support_0.10.1.vsix'
                     }
