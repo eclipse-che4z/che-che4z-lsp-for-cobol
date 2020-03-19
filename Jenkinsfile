@@ -59,7 +59,7 @@ pipeline {
                     dir('com.ca.lsp.cobol') {
                         sh 'mvn -version'
                         sh 'set MAVEN_OPTS=-Xms1024m'
-                        sh 'mvn clean verify'
+                        sh 'mvn verify -DskipTests'
                         sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
                     }
                 }
@@ -85,12 +85,19 @@ pipeline {
             steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
-                        sh 'npx package'
+                        sh 'npx vsce package'
                         archiveArtifacts "*.vsix"
                         sh 'mv cobol-language-support*.vsix cobol-language-support_0.10.1.vsix'
                     }
                 }
             }
         }
+      post {
+        always {
+          container('node') {
+            archiveArtifacts artifacts: '_logs/*', fingerprint: true
+          }
+        }
+      }
     }
 }
