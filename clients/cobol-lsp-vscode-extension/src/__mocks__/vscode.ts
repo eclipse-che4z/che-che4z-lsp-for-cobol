@@ -15,10 +15,14 @@
 // tslint:disable: no-namespace no-empty
 export namespace workspace {
     export const workspaceFolders: [] = [];
-    export function getConfiguration() {}
+    export function getConfiguration() { }
 }
 
 export namespace window {
-    export let showErrorMessage = () => {};
-    export let showInformationMessage = () => {};
+    export let showErrorMessage = () => { };
+    export let showInformationMessage = () => { };
+    export let createStatusBarItem = () => { return { show: () => { } } };
+}
+export enum StatusBarAlignment {
+    Right,
 }
