@@ -111,12 +111,7 @@ pipeline {
         steps {
           container('theia') {
             dir('tests') {
-              sh 'sudo cp -a theia_automation_lsp/test_files/cobol/. /home/project/'
-              sh 'mkdir /home/theia/extplugin'
-              sh 'cp ../clients/cobol-lsp-vscode-extension/*.vsix /home/theia/extplugin/'
-              sh 'wget https://marketplace.visualstudio.com/_apis/public/gallery/publishers/bitlang/vsextensions/cobol/6.0.23/vspackage'
-              sh 'mv vspackage theia/extplugin/bitlang.cobol-6.0.23.vsix'
-              sh 'THEIA_DEFAULT_PLUGINS=local-dir:/home/theia/extplugins yarn theia start /home/project --hostname=0.0.0.0 &'
+              sh 'theiaPrepare.sh'
             }
           }
           container('python') {
