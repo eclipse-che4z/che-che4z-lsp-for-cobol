@@ -69,7 +69,7 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
     CopybookServiceImpl copybookService =
         new CopybookServiceImpl(
             broker, configurationSettingsProvider, dependencyService, communications);
-    copybookService.setWorkspaceFolders(generateWorkspaceFolder());
+    copybookService.setWorkspaceFolders(createWorkspaceFolders());
   }
 
   /**

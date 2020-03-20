@@ -51,20 +51,9 @@ public class CopybookServiceTest extends FileSystemConfiguration
       new CopybookServiceImpl(
           dataBus, configurationSettingsStorableProvider, dependencyService, communications);
 
-  // Activities performed
-  // 1 - Create folder structure in temp folder - Create two copybooks in the provided
-  // structprivaure
-  // 2 - Create two copybooks in the provided structure
-  // 3 - Initialize the workspaceFolder to reproduce what client does when a new workspace is opened
-  //     on the IDE
-  // 4 - Initialize the list of workspaces (workspace roots) that WorkspaceManager should have to
-  //     apply search operations
-
   @Before
   public void initActivities() {
-    // the delegate will prepare the structure and this method will just setup the list of workspace
-    // folders
-    copybookService.setWorkspaceFolders(generateWorkspaceFolder());
+    copybookService.setWorkspaceFolders(createWorkspaceFolders());
   }
 
   /**
@@ -171,5 +160,18 @@ public class CopybookServiceTest extends FileSystemConfiguration
   public void observerCallback(RequiredCopybookEvent event) {
     log.info(event.toString());
     log.info("OBSERVER CALLBACK FROM TEST METHOD");
+  }
+
+  @Test
+  public void identifyNestedCopybooks() {
+    // pre condition: filesystem with nested copybook defined..
+
+    // then when a new copybook is found we'll check if the name is different by the docuri
+
+    // the test will assert true and the logic will be used to send copybook to the dep service
+
+    // TODO: Add an integration test on the e2e test
+
+    assert 1 == 1;
   }
 }

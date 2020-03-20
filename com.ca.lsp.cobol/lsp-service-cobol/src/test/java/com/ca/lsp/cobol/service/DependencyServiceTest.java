@@ -39,7 +39,7 @@ public class DependencyServiceTest extends FileSystemConfiguration {
   @Before
   public void initActivities() {
     createWorkspaceFolderStructure();
-    createDependencyFileStructure();
+    createDependencyFolder();
 
     dependencyService.setWorkspaceFolderPaths(Collections.singletonList(workspaceFolder));
   }
@@ -52,6 +52,12 @@ public class DependencyServiceTest extends FileSystemConfiguration {
   public void depFileGenerationPositiveTest() {
     Path depFileReference = createDependencyFile();
     assertTrue(Files.exists(depFileReference));
+  }
+
+  private Path createDependencyFile() {
+    dependencyService.generateDependencyFile(DEP_FILE_COST_NAME);
+    return Paths.get(
+        depenencyFileFolderPath + filesystemSeparator() + DEP_FILE_COST_NAME + DEP_EXTENSION);
   }
 
   /**
@@ -73,22 +79,6 @@ public class DependencyServiceTest extends FileSystemConfiguration {
     assertEquals(numberOfElements + 1, getNumberOfElementsFromDepFile(depFileReference));
   }
 
-  /** This test verify that an empty value for the copybook is not added in the deplist. */
-  @Test
-  public void depFileWithoutEmptyCopybookName() {
-    // create the dep folder with the SOMPROG.dep
-    Path depFileReference = createDependencyFile();
-
-    // check the number of elements before the update
-    int numberOfElements = getNumberOfElementsFromDepFile(depFileReference);
-
-    // update dep file with a new copybook
-    dependencyService.addCopybookInDepFile(EMPTY_COPYBOOK_NAME, DOCUMENT_URI);
-
-    // assert that number of element didn't change
-    assertEquals(numberOfElements, getNumberOfElementsFromDepFile(depFileReference));
-  }
-
   private int getNumberOfElementsFromDepFile(Path depFileReference) {
     List<String> depFileReferenceElementList;
 
@@ -107,9 +97,19 @@ public class DependencyServiceTest extends FileSystemConfiguration {
     }
   }
 
-  private Path createDependencyFile() {
-    dependencyService.generateDependencyFile(DEP_FILE_COST_NAME);
-    return Paths.get(
-        depenencyFileFolderPath + filesystemSeparator() + DEP_FILE_COST_NAME + DEP_EXTENSION);
+  /** This test verify that an empty value for the copybook is not added in the deplist. */
+  @Test
+  public void depFileWithoutEmptyCopybookName() {
+    // create the dep folder with the SOMPROG.dep
+    Path depFileReference = createDependencyFile();
+
+    // check the number of elements before the update
+    int numberOfElements = getNumberOfElementsFromDepFile(depFileReference);
+
+    // update dep file with a new copybook
+    dependencyService.addCopybookInDepFile(EMPTY_COPYBOOK_NAME, DOCUMENT_URI);
+
+    // assert that number of element didn't change
+    assertEquals(numberOfElements, getNumberOfElementsFromDepFile(depFileReference));
   }
 }
