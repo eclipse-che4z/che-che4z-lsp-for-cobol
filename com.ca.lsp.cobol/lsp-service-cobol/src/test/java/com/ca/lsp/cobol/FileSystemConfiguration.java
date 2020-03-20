@@ -50,13 +50,13 @@ public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String COPYBOOK_NOT_PRESENT = "ANTHRCPY";
   protected static final String EMPTY_COPYBOOK_NAME = " ";
   protected static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
+  public static final String CPYNEST_CPY = "CPYNEST.cpy";
 
   protected static final String DEP_FILE_COST_NAME = "SOMEPROG";
   protected static final String DEP_EXTENSION = ".dep";
 
   protected static final String COPYBOOK_CONTENT =
       "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
-
   protected static final String NESTED_COPYBOOK_CONTENT = "000230 COPY CPYNEST2.";
 
   protected Path workspaceFolder = null;
@@ -169,7 +169,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
   }
 
   private void createNestedCopybooks() {
-    writeContentOnFile(createFile(copybooksFolderPath, "CBLNEST.cpy"), NESTED_COPYBOOK_CONTENT);
+    writeContentOnFile(createFile(copybooksFolderPath, CPYNEST_CPY), NESTED_COPYBOOK_CONTENT);
   }
 
   private List<Path> getPathListFromSettings() {

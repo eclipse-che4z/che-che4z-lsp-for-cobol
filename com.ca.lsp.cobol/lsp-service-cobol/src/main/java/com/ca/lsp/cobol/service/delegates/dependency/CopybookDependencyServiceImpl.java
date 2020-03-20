@@ -53,9 +53,16 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
   public void invoke(
       RequiredCopybookEvent event, String requiredCopybookName, List<Path> targetPaths) {
     setWorkspaceFolderPaths(targetPaths);
-    if (isFileInDidOpen(event)) {
+    if (isFileInDidOpen(event) || isNestedCopybookBeProcessed(event)) {
       addCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
     }
+  }
+
+  private boolean isNestedCopybookBeProcessed(RequiredCopybookEvent event) {
+    return event
+            .getTextDocumentSyncType()
+            .equalsIgnoreCase(TextDocumentSyncType.DID_CHANGE.toString())
+        && FilenameUtils.getExtension(event.getDocumentUri()).equalsIgnoreCase("cpy");
   }
 
   /**
@@ -63,6 +70,7 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
    * @return
    */
   @Override
+  // TODO: Make it private
   public boolean isFileInDidOpen(RequiredCopybookEvent event) {
     return event.getTextDocumentSyncType() != null
         && TextDocumentSyncType.valueOf(event.getTextDocumentSyncType())

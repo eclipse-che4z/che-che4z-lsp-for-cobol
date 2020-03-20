@@ -161,17 +161,4 @@ public class CopybookServiceTest extends FileSystemConfiguration
     log.info(event.toString());
     log.info("OBSERVER CALLBACK FROM TEST METHOD");
   }
-
-  @Test
-  public void identifyNestedCopybooks() {
-    // pre condition: filesystem with nested copybook defined..
-
-    // then when a new copybook is found we'll check if the name is different by the docuri
-
-    // the test will assert true and the logic will be used to send copybook to the dep service
-
-    // TODO: Add an integration test on the e2e test
-
-    assert 1 == 1;
-  }
 }

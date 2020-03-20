@@ -213,7 +213,6 @@ public class CopybookServiceImpl implements CopybookService {
     Path path;
 
     // TODO: Check if is possible move it into the constructor
-
     CopybookDependencyServiceImpl impl = (CopybookDependencyServiceImpl) dependencyService;
     impl.invoke(event, requiredCopybookName, getWorkspaceFoldersAsPathList());
 

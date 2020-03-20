@@ -15,6 +15,7 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ import static org.junit.Assert.assertEquals;
 /** This class represent all the unit test for the copybook dependency managament service */
 @Slf4j
 public class DependencyServiceTest extends FileSystemConfiguration {
+  public static final String NESTED_CPY_NAME = "CPYNEST2";
   private CopybookDependencyServiceImpl dependencyService = new CopybookDependencyServiceImpl();
 
   @Before
@@ -111,5 +113,26 @@ public class DependencyServiceTest extends FileSystemConfiguration {
 
     // assert that number of element didn't change
     assertEquals(numberOfElements, getNumberOfElementsFromDepFile(depFileReference));
+  }
+
+  @Test
+  public void depFileForNestedCopybooksIsCreated() {
+    String documentURI =
+        Paths.get(copybooksFolderPath + filesystemSeparator() + CPYNEST_CPY).toUri().toString();
+
+    RequiredCopybookEvent requiredCopybookEvent =
+        new RequiredCopybookEvent(
+            NESTED_CPY_NAME, documentURI, TextDocumentSyncType.DID_CHANGE.toString());
+
+    dependencyService.invoke(
+        requiredCopybookEvent, NESTED_CPY_NAME, Collections.singletonList(workspaceFolder));
+    assertDepFileIsCreated();
+  }
+
+  private void assertDepFileIsCreated() {
+    assertTrue(
+        Files.exists(
+            Paths.get(
+                depenencyFileFolderPath + filesystemSeparator() + "CPYNEST" + DEP_EXTENSION)));
   }
 }
