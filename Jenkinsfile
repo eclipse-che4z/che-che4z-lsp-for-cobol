@@ -27,6 +27,26 @@ spec:
       requests:
         memory: "2Gi"
         cpu: "1"
+  - name: theia
+    image: theiaide/theia-java
+    tty: true
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+      requests:
+        memory: "2Gi"
+        cpu: "1"
+  - name: python
+    image: python
+    tty: true
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+      requests:
+        memory: "2Gi"
+        cpu: "1"
 """
 
 def projectName = 'lsp-for-cobol'
@@ -86,11 +106,37 @@ pipeline {
                     }
                 }
             }
-        }}
+        }
+      stage('Integration test') {
+        steps {
+          container('theia') {
+            dir('/home') {
+              sh 'cp -a $workspace/tests/theia_automation_lsp/test_files/cobol/. project
+              sh 'mkdir theia/extplugin'
+              sh 'cp $workspace/clients/cobol-lsp-vscode-extension/*.vsix theia/extplugin'
+              sh 'wget https://marketplace.visualstudio.com/_apis/public/gallery/publishers/bitlang/vsextensions/cobol/6.0.23/vspackage'
+              sh 'mv vspackage theia/extplugin/bitlang.cobol-6.0.23.vsix'
+              sh 'THEIA_DEFAULT_PLUGINS=local-dir:/home/theia/extplugins yarn theia start /home/project --hostname=0.0.0.0 &'
+            }
+          }
+          container('python') {
+            dir('tests/theia_automation_lsp') {
+              sh 'pip install -r requirements.txt'
+              sh 'apt update'
+              sh 'apt install firefox-esr -y'
+              sh 'PYTHONPATH=`pwd` robot --variable HEADLESS:True --outputdir robot_output robot_suites/lsp/local/firefox_lsp_local.robot'
+            }
+          }
+        }
+      }
+    }
       post {
         always {
           container('node') {
             archiveArtifacts artifacts: '_logs/*', fingerprint: true
+          }
+          container('python') {
+            archiveArtifacts "tests/theia_automation_lsp/robot_output/*"
           }
         }
       }
