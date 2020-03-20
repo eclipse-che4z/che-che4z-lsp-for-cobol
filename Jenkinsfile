@@ -18,7 +18,7 @@ spec:
         memory: "2Gi"
         cpu: "1"
   - name: node
-    image: node:12.10.0-alpine
+    image: node
     tty: true
     resources:
       limits:
@@ -73,7 +73,7 @@ pipeline {
             steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
-                        sh 'npm install'
+                        sh 'npm ci'
                     }
                 }
             }
