@@ -30,6 +30,8 @@ spec:
   - name: theia
     image: theiaide/theia-java
     tty: true
+    command: [ "/bin/bash", "-c", "--" ]
+    args: [ "while true; do sleep 1000; done;" ]
     resources:
       limits:
         memory: "2Gi"
