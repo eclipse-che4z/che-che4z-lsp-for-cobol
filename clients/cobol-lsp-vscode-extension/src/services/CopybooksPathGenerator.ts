@@ -11,9 +11,35 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as path from "path";
+
 import * as vscode from "vscode";
-import { COPYBOOKS_FOLDER } from "../constants";
+import * as path from "path";
+import { ProfileService } from "./ProfileService";
+import { SETTINGS_SECTION, COPYBOOKS_FOLDER } from "../constants";
+
+export class CopybooksPathGenerator {
+    constructor(private profileService: ProfileService) { }
+
+    async listUris(): Promise<vscode.Uri[]> {
+        const result: vscode.Uri[] = [];
+        const profile: string = await this.profileService.getProfile();
+        if (profile) {
+            for (const dataset of await this.listDatasets()) {
+                const uri: vscode.Uri = vscode.Uri.file(createDatasetPath(profile, dataset));
+                result.push(uri);
+            }
+        }
+        return result;
+    }
+
+    async listDatasets(): Promise<string[]> {
+        if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has("paths")) {
+            await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
+            return [];
+        }
+        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get("paths");
+    }
+}
 
 export function createCopybookPath(profileName: string, dataset: string, copybook: string): string {
     const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
@@ -21,7 +47,7 @@ export function createCopybookPath(profileName: string, dataset: string, copyboo
     return path.join(copybookDirPath, copybook + ".cpy");
 }
 
-export function  createDatasetPath(profileName: string, dataset: string): string {
+export function createDatasetPath(profileName: string, dataset: string): string {
     const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
     return path.join(rootPath, COPYBOOKS_FOLDER, profileName, dataset);
 }

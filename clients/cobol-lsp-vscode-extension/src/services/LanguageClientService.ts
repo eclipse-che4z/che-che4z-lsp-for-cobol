@@ -19,11 +19,12 @@ import * as net from "net";
 import { StreamInfo, LanguageClient, LanguageClientOptions, ConfigurationRequest, ConfigurationParams, CancellationToken } from "vscode-languageclient";
 import { LANGUAGE_ID } from "../constants";
 import { ConfigurationWorkspaceMiddleware } from "vscode-languageclient/lib/configuration";
+import { CopybooksPathGenerator } from "./CopybooksPathGenerator";
 
 export class LanguageClientService {
     private jarPath: string;
 
-    constructor() {
+    constructor(private copybooksPathGenerator: CopybooksPathGenerator) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
         this.jarPath = `${ext.extensionPath}/server/lsp-service-cobol-${ext.packageJSON.version}.jar`;
     }
@@ -51,9 +52,9 @@ export class LanguageClientService {
             token: CancellationToken,
             next: ConfigurationRequest.HandlerSignature) => {
 
-            console.log(params.items);
-            return ["Hello, World", "Path/To/Something"];
-            // return next(params, token);
+            // TODO if request params are right
+            return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
+            // TODO else return next(params, token);
         }
         const configurationMiddleware: ConfigurationWorkspaceMiddleware = {
             configuration: signatureFunc,

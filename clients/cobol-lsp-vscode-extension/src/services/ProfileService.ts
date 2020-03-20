@@ -15,7 +15,7 @@
 import { IProfile } from "@zowe/imperative";
 import * as path from "path";
 import * as vscode from "vscode";
-import { SETTINGS_SECTION } from "./constants";
+import { SETTINGS_SECTION } from "../constants";
 import { ProfilesMap, ZoweApi } from "./ZoweApi";
 import { Disposable } from "vscode-languageclient";
 

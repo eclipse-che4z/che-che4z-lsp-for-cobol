@@ -13,9 +13,10 @@
  */
 import * as vscode from "vscode";
 import * as path from "path";
-import { checkWorkspace, createCopybookPath, createDatasetPath } from "../services/PathUtils";
+import { checkWorkspace, createCopybookPath, createDatasetPath, CopybooksPathGenerator } from "../services/CopybooksPathGenerator";
+import { ProfileService } from "../services/ProfileService";
 
-describe("PathUtils tests", () => {
+describe("CopybooksPathGenerator tests", () => {
     const fsPath = "/projects";
     const profile = "profile";
     const dataset = "dataset";
@@ -34,5 +35,15 @@ describe("PathUtils tests", () => {
         expect(checkWorkspace()).toEqual(true);
         vscode.workspace.workspaceFolders = [];
         expect(checkWorkspace()).toEqual(false);
+    });
+
+    it("generates array of uris", async () => {
+        const profileService: any = {
+            getProfile: () => Promise.resolve(profile),
+        };
+        const gen: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
+        gen.listDatasets = () => Promise.resolve(["DATASET1", "DATASET2"]);
+        const result = await gen.listUris();
+        expect(result.toString()).toBe("file:///projects/.copybooks/profile/DATASET1,file:///projects/.copybooks/profile/DATASET2");
     });
 });

@@ -15,21 +15,23 @@
 import * as vscode from "vscode";
 import { SETTINGS_SECTION, LANGUAGE_ID } from "./constants";
 import { DEPENDENCIES_FOLDER } from "./constants";
-import { CopybooksDownloader } from "./CopybooksDownloader";
+import { CopybooksDownloader } from "./services/CopybooksDownloader";
 import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
-import { ProfileService } from "./ProfileService";
+import { ProfileService } from "./services/ProfileService";
 import { LanguageClientService } from "./services/LanguageClientService";
-import { ZoweApi } from "./ZoweApi";
-import { CopybookResolver } from "./services/CopybookResolver";
+import { ZoweApi } from "./services/ZoweApi";
+import { CopybookFix } from "./services/CopybookFix";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
+import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
 
 export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
-    const resolver: CopybookResolver = new CopybookResolver();
-    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(resolver, zoweApi, profileService);
-    const languageClientService: LanguageClientService = new LanguageClientService();
+    const copybookFix: CopybookFix = new CopybookFix();
+    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService);
+    const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
+    const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator);
 
     try {
         await languageClientService.checkPrerequisites();
