@@ -21,7 +21,7 @@ import static java.util.Collections.singletonList;
 
 /**
  * This test verifies that the variable structure can be built correctly with copybooks and that
- * error is not thrown if there are no ambiguous definitions, even with skipped hierarchical levels
+ * error not thrown if there are no ambiguous definitions, even with skipped hierarchical levels
  * on usage.
  */
 public class TestVariableStructureInCopybooksWithMissingLevels extends PositiveUseCase {

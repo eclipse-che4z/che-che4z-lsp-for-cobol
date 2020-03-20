@@ -15,13 +15,15 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+
 /**
  * This test checks the error shown if the copybook that is used in the Cobol file contains a link
  * to another one, that has a dependency to the first copybook.
@@ -29,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends NegativeUseCase {
 
   private static final String TEXT =
-      "        IDENTIFICATION DIVISION. \r\n"
+      "        IDENTIFICATION DIVISION.\r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
@@ -47,17 +49,21 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends Negat
   @Test
   public void test() {
     super.test(
-        Arrays.asList(
+        asList(
             new CobolText("INNER-COPY", INNER_COPY),
             new CobolText("INDIRECT-COPY", INDIRECT_COPY)));
   }
 
   @Override
-  protected void assertRanges(List<Range> ranges) {
-    Range range = ranges.get(0);
-    assertEquals(4, range.getStart().getLine());
-    assertEquals(13, range.getStart().getCharacter());
-    assertEquals(4, range.getEnd().getLine());
-    assertEquals(26, range.getEnd().getCharacter());
+  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
+    assertEquals("Number of diagnostics", 1, diagnostics.size());
+    Diagnostic diagnostic = diagnostics.get(0);
+    assertEquals("Recursive copybook declaration for: INDIRECT-COPY", diagnostic.getMessage());
+
+    Range range = diagnostic.getRange();
+    assertEquals("Diagnostic start line", 4, range.getStart().getLine());
+    assertEquals("Diagnostic start character", 13, range.getStart().getCharacter());
+    assertEquals("Diagnostic end line", 4, range.getEnd().getLine());
+    assertEquals("Diagnostic end character", 26, range.getEnd().getCharacter());
   }
 }

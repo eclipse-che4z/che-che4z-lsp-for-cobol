@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.cobol.usecases;
 
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
@@ -30,7 +31,7 @@ public class TestSyntaxError extends NegativeUseCase {
   }
 
   private static final String TEXT =
-      "        IDENTIFICATION DIVISIONs. \r\n" // Typo on DIVISIONs
+      "        IDENTIFICATION DIVISIONs.\r\n" // Typo on DIVISIONs
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
@@ -42,9 +43,15 @@ public class TestSyntaxError extends NegativeUseCase {
   }
 
   @Override
-  protected void assertRanges(List<Range> ranges) {
-    Range range = ranges.get(0);
-    assertEquals(23, range.getStart().getCharacter());
-    assertEquals(32, range.getEnd().getCharacter());
+  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
+    assertEquals("Number of diagnostics", 1, diagnostics.size());
+    Diagnostic diagnostic = diagnostics.get(0);
+    assertEquals("Syntax error on 'DIVISIONs' expected DIVISION", diagnostic.getMessage());
+
+    Range range = diagnostic.getRange();
+    assertEquals("Diagnostic start line", 23, range.getStart().getCharacter());
+    assertEquals("Diagnostic start character", 32, range.getEnd().getCharacter());
+    assertEquals("Diagnostic end line", 0, range.getStart().getLine());
+    assertEquals("Diagnostic end character", 0, range.getEnd().getLine());
   }
 }

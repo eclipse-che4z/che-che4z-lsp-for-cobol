@@ -13,13 +13,12 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
 
 import java.util.List;
 
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 
@@ -27,7 +26,7 @@ import static org.junit.Assert.assertEquals;
  * This class is a base for use cases that check the if some text does not contain any syntax
  * errors.
  */
-public abstract class PositiveUseCase extends ConfigurableTest {
+public abstract class PositiveUseCase {
   private String text;
 
   PositiveUseCase(String text) {
@@ -43,7 +42,7 @@ public abstract class PositiveUseCase extends ConfigurableTest {
   }
 
   protected void test(List<CobolText> copybooks) {
-    List<Diagnostic> diagnostics = UseCaseUtils.analyzeForErrors(text, copybooks);
+    List<Diagnostic> diagnostics = analyzeForErrors(text, copybooks);
 
     assertEquals(createMessage(diagnostics), 0, diagnostics.size());
   }

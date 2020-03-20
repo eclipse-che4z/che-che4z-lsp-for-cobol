@@ -16,24 +16,26 @@ package com.ca.lsp.cobol.usecases;
 
 import org.junit.Test;
 
+/** This test checks that there are no errors on the "SKIP2" statement. */
 public class TestSkipStatement extends PositiveUseCase {
 
   private static final String TEXT =
-      "        IDENTIFICATION DIVISION. \r\n"
-          + "        PROGRAM-ID. SKIP_TEST.\r\n"
-          + "        DATA DIVISION.\r\n"
-          + "        WORKING-STORAGE SECTION.   \r\n"
-          + "        PROCEDURE DIVISION.\r\n"
-          + "       PROGA.\r\n"
-          + "       SKIP1\r\n"
-          + "           PERFORM WITH TEST BEFORE UNTIL ID0 = 0\r\n"
-          + "             SUBTRACT 1 FROM TAPARM1\r\n"
-          + "             CALL 'ID1'\r\n"
-          + "           END-PERFORM\r\n"
-          + "           .\r\n"
-          + "        SKIP2.\r\n"
-          + "        PROGB.\r\n"
-          + "        EXIT.\r\n"
+      "        IDENTIFICATION DIVISION.\n"
+          + "        PROGRAM-ID. SKIP_TEST.\n"
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        01 ID0.\n"
+          + "        01 TAPARM1.\n"
+          + "        PROCEDURE DIVISION.\n"
+          + "       PROGA.\n"
+          + "       SKIP1\n"
+          + "           PERFORM WITH TEST BEFORE UNTIL ID0 = 0\n"
+          + "             SUBTRACT 1 FROM TAPARM1\n"
+          + "             CALL 'ID1'\n"
+          + "           END-PERFORM.\n"
+          + "        SKIP2.\n"
+          + "        PROGB.\n"
+          + "        EXIT.\n"
           + "        EJECT";
 
   public TestSkipStatement() {

@@ -15,6 +15,7 @@
 
 package com.ca.lsp.cobol.usecases;
 
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
@@ -22,10 +23,9 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 /**
- * This test checks that the remarks are not marked as comments and the syntax analysis is applied.
+ * This test checks that the remarks not marked as comments, and the syntax analysis applied.
  *
  * <p>The REMARKS is an old syntax that is not supported anymore, so it should be marked as error.
  */
@@ -64,19 +64,27 @@ public class TestRemarksAreUnsupported extends NegativeUseCase {
   /**
    * Assert that the error range points to the 'INPUT' at line 6
    *
-   * @param ranges - error ranges found by syntax analysis
+   * @param diagnostics - errors found by syntax analysis
    */
   @Override
-  protected void assertRanges(List<Range> ranges) {
-    assertFalse(ranges.isEmpty());
+  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
 
-    Range range = ranges.get(0);
+    assertEquals("Number of diagnostics", 1, diagnostics.size());
+    Diagnostic diagnostic = diagnostics.get(0);
+    assertEquals(
+        "Syntax error on 'INPUT' expected "
+            + "{<EOF>, AUTHOR, DATA, DATE_COMPILED, DATE_WRITTEN, "
+            + "END, ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, "
+            + "PROCEDURE, SECURITY, COMMENTENTRYLINE}",
+        diagnostic.getMessage());
+
+    Range range = diagnostic.getRange();
     Position start = range.getStart();
     Position end = range.getEnd();
 
-    assertEquals(6, start.getLine());
-    assertEquals(6, end.getLine());
-    assertEquals(13, start.getCharacter());
-    assertEquals(18, end.getCharacter());
+    assertEquals("Diagnostic start line", 6, start.getLine());
+    assertEquals("Diagnostic start character", 13, start.getCharacter());
+    assertEquals("Diagnostic end line", 6, end.getLine());
+    assertEquals("Diagnostic end character", 18, end.getCharacter());
   }
 }

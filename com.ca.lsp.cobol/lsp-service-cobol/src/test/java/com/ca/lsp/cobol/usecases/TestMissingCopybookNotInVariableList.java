@@ -15,7 +15,6 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Location;
 import org.junit.Test;
@@ -29,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /** This test covers case when copybook that was not found appears as a variable. */
-public class TestMissingCopybookNotInVariableList extends ConfigurableTest {
+public class TestMissingCopybookNotInVariableList {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"

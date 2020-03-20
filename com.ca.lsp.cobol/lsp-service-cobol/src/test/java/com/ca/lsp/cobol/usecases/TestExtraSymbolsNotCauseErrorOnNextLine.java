@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.cobol.usecases;
 
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
@@ -22,9 +23,6 @@ import static org.junit.Assert.assertEquals;
 
 /** This use case checks if extra symbols on one line do not cause any errors on the next line. */
 public class TestExtraSymbolsNotCauseErrorOnNextLine extends NegativeUseCase {
-  public TestExtraSymbolsNotCauseErrorOnNextLine() {
-    super(TEXT);
-  }
 
   private static final String TEXT =
       "000000 Identification DIVISION.                                         23323232extra\r\n" // Extra symbols at the end of this line
@@ -32,15 +30,26 @@ public class TestExtraSymbolsNotCauseErrorOnNextLine extends NegativeUseCase {
           + "002800  HELLOWORLD.                                                     23323232\r\n"
           + "024200 PROCEDURE DIVISION .                                             CM1014.2";
 
+  public TestExtraSymbolsNotCauseErrorOnNextLine() {
+    super(TEXT);
+  }
+
   @Test
   public void test() {
     super.test();
   }
 
   @Override
-  protected void assertRanges(List<Range> ranges) {
-    Range range = ranges.get(0);
-    assertEquals(80, range.getStart().getCharacter());
-    assertEquals(86, range.getEnd().getCharacter());
+  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
+    assertEquals("Number of diagnostics", 1, diagnostics.size());
+    Diagnostic diagnostic = diagnostics.get(0);
+    assertEquals("The line doesn't match the fixed format", diagnostic.getMessage());
+
+    // The position of dot at the end of line "INITIALIZE ID4(ROW-SUB)."
+    Range range = diagnostic.getRange();
+    assertEquals("Diagnostic start line", 0, range.getStart().getLine());
+    assertEquals("Diagnostic start character", 80, range.getStart().getCharacter());
+    assertEquals("Diagnostic end line", 0, range.getEnd().getLine());
+    assertEquals("Diagnostic end character", 86, range.getEnd().getCharacter());
   }
 }

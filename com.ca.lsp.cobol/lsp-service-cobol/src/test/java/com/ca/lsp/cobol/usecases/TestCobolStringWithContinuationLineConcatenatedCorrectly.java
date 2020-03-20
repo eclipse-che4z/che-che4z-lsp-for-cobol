@@ -15,6 +15,10 @@ package com.ca.lsp.cobol.usecases;
 
 import org.junit.Test;
 
+/**
+ * This test checks that there are no errors thrown if a keyword split and concatenated by a
+ * concatenation line.
+ */
 public class TestCobolStringWithContinuationLineConcatenatedCorrectly extends PositiveUseCase {
 
   private static final String TEXT =

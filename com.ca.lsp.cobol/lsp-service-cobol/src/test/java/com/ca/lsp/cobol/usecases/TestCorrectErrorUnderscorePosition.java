@@ -13,33 +13,33 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import static org.junit.Assert.assertEquals;
-
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- * This use case checks if the position of error is being underscored correctly. There is typo in
- * the TEXT in the line 6, but as designed the following token should be underscored as unexpected,
- * because in this case PERORM may be put as a variable.
+ * This use case checks if the position of error underscored correctly. There is a typo in the TEXT
+ * in the line 6, but as designed the following token should be underscored as unexpected, because
+ * in this case "PERORM" recognized as a variable.
  */
 public class TestCorrectErrorUnderscorePosition extends NegativeUseCase {
 
   private static final String TEXT =
-      "        IDENTIFICATION DIVISION. \r\n"
+      "        IDENTIFICATION DIVISION.\r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
-          + "        WORKING-STORAGE SECTION.   \r\n"
+          + "        WORKING-STORAGE SECTION.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
           + "           PERORM VARYING A FROM 10 BY 10 UNTIL A > 40\r\n" // Typo in "PERORM",
-                                                                         // offending token is
-                                                                         // "VARYING"
+          // offending token is
+          // "VARYING"
           + "               PERFORM VARYING b FROM 1 BY 1 UNTIL B > 4\r\n"
           + "               END-PERFORM\r\n"
           + "            END-PERFORM.\r\n"
-          + "\r\n"
           + "            STOP RUN.";
 
   public TestCorrectErrorUnderscorePosition() {
@@ -52,9 +52,18 @@ public class TestCorrectErrorUnderscorePosition extends NegativeUseCase {
   }
 
   @Override
-  protected void assertRanges(List<Range> ranges) {
-    Range range = ranges.get(0);
-    assertEquals(18, range.getStart().getCharacter());
-    assertEquals(25, range.getEnd().getCharacter());
+  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
+    // The keywords between "PERORM" and "END-PERFORM" cannot be recognized, so they are marked as
+    // errors
+    assertEquals("Number of diagnostics", 11, diagnostics.size());
+
+    Diagnostic diagnostic = diagnostics.get(0);
+    assertEquals("Syntax error on 'VARYING' expected SECTION", diagnostic.getMessage());
+
+    Range range = diagnostic.getRange();
+    assertEquals("Diagnostic start line", 5, range.getStart().getLine());
+    assertEquals("Diagnostic start character", 18, range.getStart().getCharacter());
+    assertEquals("Diagnostic end line", 5, range.getEnd().getLine());
+    assertEquals("Diagnostic end character", 25, range.getEnd().getCharacter());
   }
 }

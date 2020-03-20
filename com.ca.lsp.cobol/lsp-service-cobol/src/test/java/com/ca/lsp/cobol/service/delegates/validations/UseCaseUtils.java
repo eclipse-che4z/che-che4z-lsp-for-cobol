@@ -55,23 +55,6 @@ public class UseCaseUtils {
   private static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
 
   /**
-   * Create client, server and run services to validate given text. Plug-and-play method for the
-   * following methods.
-   *
-   * @param text - Cobol text to be validated
-   * @return TestLanguageClient instance to receive responses from the language server
-   */
-  public static TestLanguageClient startServerAndRunValidation(String text) {
-    TestLanguageClient client =
-        (TestLanguageClient) LangServerCtx.getInjector().getInstance(LanguageClient.class);
-    client.clean();
-    TextDocumentService service =
-        LangServerCtx.getInjector().getInstance(TextDocumentService.class);
-    runTextValidation(service, text);
-    return client;
-  }
-
-  /**
    * Perform validation of the given text on the service
    *
    * @param service - TextDocumentService instance to validate the text

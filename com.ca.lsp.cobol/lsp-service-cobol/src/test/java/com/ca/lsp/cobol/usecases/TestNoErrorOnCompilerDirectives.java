@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
  *
  * <p>The CBL (PROCESS) statement can be preceded by a sequence number in columns 1 through 6. The
  * first character of the sequence number must be numeric, and CBL or PROCESS can begin in column 8
- * or after; if a sequence number is not specified, CBL or PROCESS can begin in column 1 or after.
+ * or after; if a sequence number not specified, CBL or PROCESS can begin in column 1 or after.
  *
  * <p>The CBL (PROCESS) statement must end before or at column 72, and options cannot be continued
  * across multiple CBL (PROCESS) statements. However, you can use more than one CBL (PROCESS)
@@ -104,16 +104,22 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
   @Test
   public void testProcessWithoutNumbersWithTypo() {
     Range range = retrieveRange(analyzeForErrors(PROCESS_WITHOUT_NUMBER_TYPO + FOLLOWING_TEXT));
-
-    assertEquals(0, range.getStart().getLine());
-    assertEquals(7, range.getStart().getCharacter());
+    // TODO: Update this test when the compiler directives fully supported
+    //  to check the correct position
+    assertEquals("Diagnostic start line", 0, range.getStart().getLine());
+    assertEquals("Diagnostic start character", 7, range.getStart().getCharacter());
+    assertEquals("Diagnostic end line", 0, range.getEnd().getLine());
+    assertEquals("Diagnostic end character", 11, range.getEnd().getCharacter());
   }
 
   @Test
   public void testProcessWithNumbersWithTypo() {
     Range range = retrieveRange(analyzeForErrors(PROCESS_WITH_NUMBER_TYPO + FOLLOWING_TEXT));
-    assertEquals(0, range.getStart().getLine());
-    assertEquals(7, range.getStart().getCharacter());
+
+    assertEquals("Diagnostic start line", 0, range.getStart().getLine());
+    assertEquals("Diagnostic start character", 7, range.getStart().getCharacter());
+    assertEquals("Diagnostic end line", 0, range.getEnd().getLine());
+    assertEquals("Diagnostic end character", 11, range.getEnd().getCharacter());
   }
 
   @Ignore("Feature is not yet supported")

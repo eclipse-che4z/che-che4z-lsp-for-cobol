@@ -15,27 +15,24 @@ package com.ca.lsp.cobol.usecases;
 
 import org.junit.Test;
 
-/**
- * This use cases checks if PERFORM with UNTIL sentence is being processed correctly.
- */
+/** This use cases checks if "PERFORM" with the "UNTIL" sentence processed correctly. */
 public class TestPerformUntilCorrect extends PositiveUseCase {
 
-  public TestPerformUntilCorrect() {
-    super(TEXT);
-  }
-
   private static final String TEXT =
-      "        IDENTIFICATION DIVISION. \r\n"
+      "        IDENTIFICATION DIVISION.\r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
-          + "        WORKING-STORAGE SECTION.   \r\n"
+          + "        WORKING-STORAGE SECTION.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
           + "       PROGA.\r\n"
           + "           PERFORM WITH TEST BEFORE UNTIL ID0 = 0\r\n"
           + "             SUBTRACT 1 FROM TAPARM1\r\n"
           + "             CALL 'ID1'\r\n"
-          + "           END-PERFORM\r\n"
-          + "           .";
+          + "           END-PERFORM.";
+
+  public TestPerformUntilCorrect() {
+    super(TEXT);
+  }
 
   @Test
   public void test() {

@@ -20,10 +20,10 @@ import org.junit.Test;
 import static java.util.Collections.singletonList;
 
 /**
- * This test case checks that there is no semantic error when a variable structure is defined using
- * a copybook. Here COPYBOOK-CONTENT represents a copybook that has a variable definition with a
- * level 02. By idea this variable will be recognized as a child of PARENT variable. if not, there
- * will be an error thrown at CHILD OF PARENT statement.
+ * This test case checks that there is no semantic error when a variable structure defined using a
+ * copybook. Here COPYBOOK-CONTENT represents a copybook that has a variable definition with a level
+ * 02. By idea this variable will be recognized as a child of PARENT variable. if not, there will be
+ * an error thrown at CHILD OF PARENT statement.
  */
 public class TestVariableStructureIsBuiltWithCopybooks extends PositiveUseCase {
   private static final String TEXT =

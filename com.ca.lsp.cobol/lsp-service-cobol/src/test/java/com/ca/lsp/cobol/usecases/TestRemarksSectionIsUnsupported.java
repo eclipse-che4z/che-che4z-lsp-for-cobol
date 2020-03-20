@@ -15,6 +15,7 @@
 
 package com.ca.lsp.cobol.usecases;
 
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
@@ -22,10 +23,9 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 /**
- * This test checks that the remarks section is not marked as a comment and the syntax analysis is
+ * This test checks that the remarks section is not marked as a comment, and the syntax analysis
  * applied.
  *
  * <p>The REMARKS is an old syntax that is not supported anymore, so it should be marked as error.
@@ -34,8 +34,8 @@ public class TestRemarksSectionIsUnsupported extends NegativeUseCase {
 
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID.             TEST1.\n"
-          + "       AUTHOR.                 SE.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       AUTHOR.     SE.\n"
           + "           REMARKS.\n"
           + "              PURPOSE.\n"
           + "              THIS PROGRAM IS DEFINED TO TEST A NUMBER OF THE\n"
@@ -54,19 +54,26 @@ public class TestRemarksSectionIsUnsupported extends NegativeUseCase {
   /**
    * Assert that the error range points to the 'REMARKS' at line 4
    *
-   * @param ranges - error ranges found by syntax analysis
+   * @param diagnostics - errors found by syntax analysis
    */
   @Override
-  protected void assertRanges(List<Range> ranges) {
-    assertFalse(ranges.isEmpty());
+  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
+    assertEquals("Number of diagnostics", 1, diagnostics.size());
+    Diagnostic diagnostic = diagnostics.get(0);
+    assertEquals(
+        "Syntax error on 'REMARKS' expected "
+            + "{<EOF>, AUTHOR, DATA, DATE_COMPILED, DATE_WRITTEN, END, "
+            + "ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, "
+            + "SECURITY, COMMENTENTRYLINE}",
+        diagnostic.getMessage());
 
-    Range range = ranges.get(0);
+    Range range = diagnostic.getRange();
     Position start = range.getStart();
     Position end = range.getEnd();
 
-    assertEquals(3, start.getLine());
-    assertEquals(3, end.getLine());
-    assertEquals(11, start.getCharacter());
-    assertEquals(18, end.getCharacter());
+    assertEquals("Diagnostic start line", 3, start.getLine());
+    assertEquals("Diagnostic start character", 3, end.getLine());
+    assertEquals("Diagnostic end line", 11, start.getCharacter());
+    assertEquals("Diagnostic end character", 18, end.getCharacter());
   }
 }

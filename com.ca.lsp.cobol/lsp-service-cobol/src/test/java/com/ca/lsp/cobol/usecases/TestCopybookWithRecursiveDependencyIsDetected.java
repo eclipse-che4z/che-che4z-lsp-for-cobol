@@ -15,6 +15,7 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
@@ -23,13 +24,13 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 /**
- * This test check that the error is shown if the copybook that is used in the Cobol file contains a
+ * This test checks that the error shown if the copybook that is used in the Cobol file contains a
  * link to itself.
  */
 public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCase {
 
   private static final String TEXT =
-      "        IDENTIFICATION DIVISION. \r\n"
+      "        IDENTIFICATION DIVISION.\r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
@@ -49,11 +50,15 @@ public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCa
   }
 
   @Override
-  protected void assertRanges(List<Range> ranges) {
-    Range range = ranges.get(0);
-    assertEquals(4, range.getStart().getLine());
-    assertEquals(13, range.getStart().getCharacter());
-    assertEquals(4, range.getEnd().getLine());
-    assertEquals(27, range.getEnd().getCharacter());
+  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
+    assertEquals("Number of diagnostics", 1, diagnostics.size());
+    Diagnostic diagnostic = diagnostics.get(0);
+    assertEquals("Recursive copybook declaration for: RECURSIVE-COPY", diagnostic.getMessage());
+
+    Range range = diagnostic.getRange();
+    assertEquals("Diagnostic start line", 4, range.getStart().getLine());
+    assertEquals("Diagnostic start character", 13, range.getStart().getCharacter());
+    assertEquals("Diagnostic end line", 4, range.getEnd().getLine());
+    assertEquals("Diagnostic end character", 27, range.getEnd().getCharacter());
   }
 }

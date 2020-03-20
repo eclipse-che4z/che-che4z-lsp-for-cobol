@@ -35,7 +35,7 @@ public class TestVaryingCorrect extends PositiveUseCase {
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
-          + "        WORKING-STORAGE SECTION.   \r\n"
+          + "        WORKING-STORAGE SECTION.\r\n"
           + "        PROCEDURE DIVISION.\r\n";
 
   private static final String VARYING_WITH_TWO_IDENTIFIERS =
