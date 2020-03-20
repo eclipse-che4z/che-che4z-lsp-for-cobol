@@ -18,7 +18,7 @@ spec:
         memory: "2Gi"
         cpu: "1"
   - name: node
-    image: node
+    image: node:12.10.0-alpine
     tty: true
     resources:
       limits:
@@ -58,9 +58,6 @@ pipeline {
                 container('maven') {
                     dir('com.ca.lsp.cobol') {
                         sh 'mvn -version'
-                        sh 'set MAVEN_OPTS=-Xms1024m'
-                        sh 'mvn verify -DskipTests'
-                        sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
                     }
                 }
             }
@@ -73,7 +70,7 @@ pipeline {
             steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
-                        sh 'npm ci'
+                        sh 'echo depend'
                     }
                 }
             }
@@ -85,9 +82,7 @@ pipeline {
             steps {
                 container('node') {
                     dir('clients/cobol-lsp-vscode-extension') {
-                        sh 'npx vsce package'
-                        archiveArtifacts "*.vsix"
-                        sh 'mv cobol-language-support*.vsix cobol-language-support_0.10.1.vsix'
+                         sh 'echo node compile'
                     }
                 }
             }
