@@ -111,7 +111,7 @@ pipeline {
         steps {
           container('theia') {
             dir('/home') {
-              sh 'cp -a $workspace/tests/theia_automation_lsp/test_files/cobol/. project
+              sh 'cp -a $workspace/tests/theia_automation_lsp/test_files/cobol/. project'
               sh 'mkdir theia/extplugin'
               sh 'cp $workspace/clients/cobol-lsp-vscode-extension/*.vsix theia/extplugin'
               sh 'wget https://marketplace.visualstudio.com/_apis/public/gallery/publishers/bitlang/vsextensions/cobol/6.0.23/vspackage'
