@@ -10,45 +10,17 @@ spec:
     command:
     - cat
     tty: true
-    resources:
-      limits:
-        memory: "2Gi"
-        cpu: "1"
-      requests:
-        memory: "2Gi"
-        cpu: "1"
   - name: node
     image: node:12.10.0-alpine
     tty: true
-    resources:
-      limits:
-        memory: "2Gi"
-        cpu: "1"
-      requests:
-        memory: "2Gi"
-        cpu: "1"
   - name: theia
     image: theiaide/theia-java
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
-    resources:
-      limits:
-        memory: "2Gi"
-        cpu: "1"
-      requests:
-        memory: "2Gi"
-        cpu: "1"
   - name: python
     image: python
     tty: true
-    resources:
-      limits:
-        memory: "2Gi"
-        cpu: "1"
-      requests:
-        memory: "2Gi"
-        cpu: "1"
 """
 
 def projectName = 'lsp-for-cobol'
