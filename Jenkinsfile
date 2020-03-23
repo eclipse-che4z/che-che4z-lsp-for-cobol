@@ -85,7 +85,7 @@ pipeline {
         steps {
           container('theia') {
             dir('tests') {
-              sh 'theiaPrepare.sh'
+              sh 'echo foobar'
             }
           }
           container('python') {
