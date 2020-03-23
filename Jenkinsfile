@@ -14,7 +14,7 @@ spec:
     image: node:12.10.0-alpine
     tty: true
   - name: theia
-    image: theiaide/theia-java
+    image: theiaide/theia
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
