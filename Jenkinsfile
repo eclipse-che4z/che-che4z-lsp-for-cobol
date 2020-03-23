@@ -91,9 +91,10 @@ pipeline {
             }
           }
           container('theia') {
+            withRun('-u theia') {
             dir('tests') {
               sh 'echo foobar'
-            }
+            }}
           }
           container('python') {
             dir('tests/theia_automation_lsp') {
