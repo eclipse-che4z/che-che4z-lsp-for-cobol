@@ -29,8 +29,8 @@ export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
     const copybookFix: CopybookFix = new CopybookFix();
-    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService);
     const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
+    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator);
     const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator);
 
     try {
