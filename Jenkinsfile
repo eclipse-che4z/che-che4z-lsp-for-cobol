@@ -21,6 +21,8 @@ spec:
   - name: python
     image: python
     tty: true
+    command: [ "/bin/bash", "-c", "--" ]
+    args: [ "while true; do sleep 1000; done;" ]
 """
 
 def projectName = 'lsp-for-cobol'
