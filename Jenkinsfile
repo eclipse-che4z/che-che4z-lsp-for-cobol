@@ -86,14 +86,9 @@ pipeline {
         }
       stage('Integration test') {
         steps {
-          container('python') {
-            dir('tests') {
-              sh 'echo foobar from python'
-            }
-          }
           container('theia') {
             dir('tests') {
-              sh 'echo foobar'
+              sh './theiaPrepare.sh'
             }
           }
           container('python') {
