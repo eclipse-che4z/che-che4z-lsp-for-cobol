@@ -19,7 +19,7 @@ spec:
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
     securityContext:
-      runAsUser: 1001
+      runAsUser: 1000
   - name: python
     image: python
     tty: true
