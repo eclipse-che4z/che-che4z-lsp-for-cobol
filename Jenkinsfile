@@ -18,6 +18,8 @@ spec:
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
+    securityContext:
+      runAsUser: 1001
   - name: python
     image: python
     tty: true
@@ -91,10 +93,9 @@ pipeline {
             }
           }
           container('theia') {
-            withRun('-u theia') {
             dir('tests') {
               sh 'echo foobar'
-            }}
+            }
           }
           container('python') {
             dir('tests/theia_automation_lsp') {
