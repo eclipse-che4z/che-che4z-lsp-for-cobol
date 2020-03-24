@@ -22,7 +22,6 @@ import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
-import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -87,13 +86,13 @@ public class CopybookServiceImpl implements CopybookService {
    */
   @Nullable
   String retrieveContentByPath(Path uriForFileName) {
-    String content = null;
+    // TODO:move it on the file syst utis (read and reduce)
     try (Stream<String> stream = Files.lines(uriForFileName)) {
-      content = stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse("");
+      return stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse("");
     } catch (IOException e) {
       log.error(e.getMessage());
     }
-    return content;
+    return null;
   }
 
   /**
@@ -109,7 +108,7 @@ public class CopybookServiceImpl implements CopybookService {
   @Override
   public Path findCopybook(String fileName) {
     return getWorkspaceFoldersAsPathList().stream()
-        .map(it -> applySearch(fileName, getCopybookFolder(it)))
+        .map(it -> applySearch(fileName, getCopybookBaseFolder(it)))
         .filter(Objects::nonNull)
         .findAny()
         .orElse(null);
@@ -136,17 +135,15 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private List<Path> generatePathListFromSettings(String profile, List<String> datasetList) {
-    // can happen here that copybooks or internal structure is null
     return datasetList.stream()
         .map(
             it ->
                 Paths.get(
-                    getCopybookFolder(getWorkspaceFoldersAsPathList().get(0))
+                    getCopybookBaseFolder(getWorkspaceFoldersAsPathList().get(0))
                         + filesystemSeparator()
                         + profile
                         + filesystemSeparator()
                         + it))
-        .filter(Objects::nonNull)
         .collect(Collectors.toList());
   }
 
@@ -201,7 +198,7 @@ public class CopybookServiceImpl implements CopybookService {
     return null;
   }
 
-  private Path getCopybookFolder(Path workspaceFolderPath) {
+  private Path getCopybookBaseFolder(Path workspaceFolderPath) {
     return Paths.get(workspaceFolderPath + filesystemSeparator() + COPYBOOK_FOLDER_NAME);
   }
 
@@ -209,45 +206,10 @@ public class CopybookServiceImpl implements CopybookService {
   @Override
   public void observerCallback(RequiredCopybookEvent event) {
     String requiredCopybookName = event.getName();
-    String content = null;
-    Path path;
 
-    // TODO: Check if is possible move it into the constructor
-    CopybookDependencyServiceImpl impl = (CopybookDependencyServiceImpl) dependencyService;
-    impl.invoke(event, requiredCopybookName, getWorkspaceFoldersAsPathList());
-
-    if (missingInformationToSearchCopybooks()) {
-      selectAppropriateMessageForCommunication();
-
-      dataBus.postData(
-          FetchedCopybookEvent.builder()
-              .name(requiredCopybookName)
-              .uri(null)
-              .content(null)
-              .build());
-      return;
-    }
-
-    ConfigurationSettingsStorable configurationSettingsStorable =
-        configurationSettingsStorableProvider.get();
-
-    // search the copybook against the target folders provided from the settings
-    path =
-        findCopybook(
-            requiredCopybookName,
-            (String) configurationSettingsStorable.getProfiles(),
-            configurationSettingsStorable.getPaths());
-
-    if (isFileExists(path)) {
-      content = retrieveContentByPath(path);
-    }
-
-    dataBus.postData(
-        FetchedCopybookEvent.builder()
-            .name(requiredCopybookName)
-            .uri(Optional.ofNullable(path).map(Path::toUri).map(URI::toString).orElse(null))
-            .content(content)
-            .build());
+    dependencyService.addCopybookInDepFile(
+        event, requiredCopybookName, getWorkspaceFoldersAsPathList());
+    resolveCopybookContent(requiredCopybookName);
   }
 
   private void selectAppropriateMessageForCommunication() {
@@ -273,8 +235,57 @@ public class CopybookServiceImpl implements CopybookService {
     return configurationSettingsStorableProvider.get().getPaths().isEmpty();
   }
 
-  private boolean missingInformationToSearchCopybooks() {
-    return copybookFolderNotDefined() || settingsNotDefined() || datasetSettingsNotDefined();
+  /**
+   * This method is delegated to check that the user have right settings to search for copybooks and
+   * retrieve its content in the affermative case
+   *
+   * @param requiredCopybookName name of the copybook for what is necessary retrieve the content if
+   *     exists.
+   */
+  private void resolveCopybookContent(String requiredCopybookName) {
+    if (settingsAreIncomplete(requiredCopybookName)) {
+      return;
+    }
+
+    ConfigurationSettingsStorable configurationSettingsStorable =
+        configurationSettingsStorableProvider.get();
+
+    Path path =
+        findCopybook(
+            requiredCopybookName,
+            (String) configurationSettingsStorable.getProfiles(),
+            configurationSettingsStorable.getPaths());
+    if (isFileExists(path)) {
+      pubblishOnDatabus(requiredCopybookName, retrieveContentByPath(path), path);
+    } else {
+      pubblishOnDatabus(requiredCopybookName);
+    }
+  }
+
+  private boolean settingsAreIncomplete(String requiredCopybookName) {
+    if (copybookFolderNotDefined() || settingsNotDefined() || datasetSettingsNotDefined()) {
+      pubblishMissingInfoForCopybooks(requiredCopybookName);
+      return true;
+    }
+    return false;
+  }
+
+  private void pubblishMissingInfoForCopybooks(String requiredCopybookName) {
+    selectAppropriateMessageForCommunication();
+    pubblishOnDatabus(requiredCopybookName);
+  }
+
+  private void pubblishOnDatabus(String requiredCopybookName, String content, Path path) {
+    dataBus.postData(
+        FetchedCopybookEvent.builder()
+            .name(requiredCopybookName)
+            .uri(Optional.ofNullable(path).map(Path::toUri).map(URI::toString).orElse(null))
+            .content(content)
+            .build());
+  }
+
+  private void pubblishOnDatabus(String requiredCopybookName) {
+    dataBus.postData(FetchedCopybookEvent.builder().name(requiredCopybookName).build());
   }
 
   private boolean settingsNotDefined() {
@@ -282,6 +293,6 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private boolean copybookFolderNotDefined() {
-    return !getCopybookFolder(getWorkspaceFoldersAsPathList().get(0)).toFile().exists();
+    return !getCopybookBaseFolder(getWorkspaceFoldersAsPathList().get(0)).toFile().exists();
   }
 }

@@ -27,7 +27,8 @@ import java.util.List;
  */
 public interface CopybookDependencyService {
 
-  void invoke(RequiredCopybookEvent event, String requiredCopybookName, List<Path> targetPaths);
+  void addCopybookInDepFile(
+      RequiredCopybookEvent event, String requiredCopybookName, List<Path> targetPaths);
 
   boolean isFileInDidOpen(RequiredCopybookEvent event);
 
@@ -37,5 +38,5 @@ public interface CopybookDependencyService {
 
   void updateDependencyList(Path dependencyFilePath, String requiredCopybookName);
 
-  void addCopybookInDepFile(String requiredCopybookName, String documentUri);
+  void writeCopybookInDepFile(String requiredCopybookName, String documentUri);
 }

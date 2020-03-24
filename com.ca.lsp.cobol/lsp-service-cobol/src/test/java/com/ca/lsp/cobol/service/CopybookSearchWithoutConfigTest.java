@@ -84,7 +84,8 @@ public class CopybookSearchWithoutConfigTest {
     when(dependencyService.isFileInDidOpen(requiredCopybookEvent)).thenReturn(true);
     doCallRealMethod()
         .when(dependencyService)
-        .invoke(requiredCopybookEvent, CPY_NAME, Collections.singletonList(workspaceFolderPath));
+        .addCopybookInDepFile(
+            requiredCopybookEvent, CPY_NAME, Collections.singletonList(workspaceFolderPath));
   }
 
   @After
@@ -179,7 +180,7 @@ public class CopybookSearchWithoutConfigTest {
     //        requiredCopybookEvent, CPY_NAME, Collections.singletonList(workspaceFolderPath));
 
     verify(dependencyService, atLeast(1))
-        .addCopybookInDepFile(
+        .writeCopybookInDepFile(
             requiredCopybookEvent.getName(), requiredCopybookEvent.getDocumentUri());
     //
     //    verify(dependencyService, times(1))

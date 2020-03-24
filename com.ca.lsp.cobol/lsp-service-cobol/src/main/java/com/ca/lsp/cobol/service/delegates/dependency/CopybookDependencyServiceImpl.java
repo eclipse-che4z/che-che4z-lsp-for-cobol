@@ -22,14 +22,8 @@ import com.google.common.annotations.Beta;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
@@ -43,34 +37,39 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
   @Getter private List<Path> workspaceFolderPaths;
 
   /**
-   * TODO: Add description
+   * This method is invoked to handle the insertion of a copybook name into the dependency file
    *
    * @param event contains information the copybook (document URI and event sync type)
-   * @param requiredCopybookName name that represent the new copybook that is supposed to go into
-   * @param targetPaths
+   * @param requiredCopybookName name that represent the new copybook that is supposed to be written
+   * @param targetPaths the reference path where create or search a dependency file.
    */
   @Override
-  public void invoke(
+  public void addCopybookInDepFile(
       RequiredCopybookEvent event, String requiredCopybookName, List<Path> targetPaths) {
     setWorkspaceFolderPaths(targetPaths);
     if (isFileInDidOpen(event) || isNestedCopybookBeProcessed(event)) {
-      addCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
+      writeCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
     }
   }
 
   private boolean isNestedCopybookBeProcessed(RequiredCopybookEvent event) {
+    return isDocumentInDidOpen(event)
+        && getExtensionFromURI(event.getDocumentUri()).equalsIgnoreCase("cpy");
+  }
+
+  private boolean isDocumentInDidOpen(RequiredCopybookEvent event) {
     return event
-            .getTextDocumentSyncType()
-            .equalsIgnoreCase(TextDocumentSyncType.DID_CHANGE.toString())
-        && FilenameUtils.getExtension(event.getDocumentUri()).equalsIgnoreCase("cpy");
+        .getTextDocumentSyncType()
+        .equalsIgnoreCase(TextDocumentSyncType.DID_CHANGE.toString());
   }
 
   /**
-   * @param event
-   * @return
+   * This method return true if the file is opened in DID_OPEN, false otherwise
+   *
+   * @param event sent on the databus
+   * @return true if the file is opened in DID_OPEN mode, false otherwise
    */
   @Override
-  // TODO: Make it private
   public boolean isFileInDidOpen(RequiredCopybookEvent event) {
     return event.getTextDocumentSyncType() != null
         && TextDocumentSyncType.valueOf(event.getTextDocumentSyncType())
@@ -86,16 +85,27 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
    */
   @Beta
   @Override
-  public void addCopybookInDepFile(String requiredCopybookName, String documentUri) {
-    String cobolFileName = getCobolFileNameFromUri(documentUri);
-    Path dependencyFolder = createDependencyFileFolder();
-    Path dependencyFile = retrieveDependencyFile(dependencyFolder, cobolFileName);
+  public void writeCopybookInDepFile(String requiredCopybookName, String documentUri) {
 
-    if (!isFileExists(dependencyFile)) {
+    String cobolFileName = getNameFromURI(documentUri);
+
+    writeDependency(
+        getPath(getDependencyFolderPath().toString(), cobolFileName + DEP_EXTENSION),
+        cobolFileName,
+        requiredCopybookName);
+  }
+
+  private Path getDependencyFolderPath() {
+    return getPath(getWorkspaceFolderPaths().get(0).toString(), COBDEPS);
+  }
+
+  private void writeDependency(
+      Path dependencyFolder, String cobolFileName, String requiredCopybookName) {
+
+    if (!isFileExists(dependencyFolder)) {
       generateDependencyFile(cobolFileName);
     }
-    // check why dependency file path is sometimes null
-    updateDependencyList(dependencyFile, requiredCopybookName);
+    updateDependencyList(dependencyFolder, requiredCopybookName);
   }
 
   /**
@@ -106,28 +116,13 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
    */
   @Override
   public void updateDependencyList(Path dependencyFilePath, String copybookName) {
-    if (dependencyFilePath != null) {
-      List<String> lines = getContentFromDependencyFile(dependencyFilePath);
-      if (lines != null && !lines.contains(copybookName)) {
-        writeOnFile(dependencyFilePath, copybookName);
-      }
+    if (isCopybokNotPresentInDepFile(copybookName, getContentFromFile(dependencyFilePath))) {
+      writeInFile(dependencyFilePath, copybookName);
     }
   }
 
-  /**
-   * This method retrieve the content of a dependency file and return it back to the callee.
-   *
-   * @param dependencyFilePath target path of the dependency file
-   * @return the content of the dependency file or null if doesn't exists
-   */
-  private List<String> getContentFromDependencyFile(Path dependencyFilePath) {
-    List<String> result = null;
-    try {
-      result = Files.readAllLines(dependencyFilePath);
-    } catch (IOException e) {
-      log.error(e.getMessage());
-    }
-    return result;
+  private boolean isCopybokNotPresentInDepFile(String copybookName, List<String> lines) {
+    return lines != null && !lines.contains(copybookName);
   }
 
   /**
@@ -146,55 +141,11 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
    */
   @Override
   public void generateDependencyFile(String cobolFileName) {
-    try {
-      Path dependencyFolder = createDependencyFileFolder();
-
-      // check that the dependency file doesn't exists..
-      Path dependencyFile =
-          Paths.get(dependencyFolder + filesystemSeparator() + cobolFileName + DEP_EXTENSION);
-
-      if (!isFileExists(dependencyFile)) {
-        Files.createFile(
-            Paths.get(dependencyFolder + filesystemSeparator() + cobolFileName + DEP_EXTENSION));
-      }
-    } catch (IOException e) {
-      log.error(e.getMessage());
-    }
+    createDependencyFileFolder();
+    createFile(getPath(getDependencyFolderPath().toString(), cobolFileName + DEP_EXTENSION));
   }
 
-  private Path retrieveDependencyFile(Path dependencyFolderPath, String cobolFileName) {
-    return Paths.get(dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION);
-  }
-
-  private String getCobolFileNameFromUri(String documentUri) {
-    String result = null;
-    try {
-      result = FilenameUtils.getBaseName(Paths.get(new URI(documentUri)).getFileName().toString());
-    } catch (URISyntaxException e) {
-      log.error(e.getMessage());
-    }
-    return result;
-  }
-
-  /**
-   * This method create the .cobdeps folder that will contains all the dep files required.
-   *
-   * @return the .cobdeps path that will be used to create the dep file or null if some issue
-   *     happens.
-   */
-  private Path createDependencyFileFolder() {
-    Path folderPath =
-        Paths.get(
-            getWorkspaceFolderPaths().get(0)
-                + filesystemSeparator()
-                + COBDEPS
-                + filesystemSeparator());
-
-    try {
-      return Files.createDirectory(folderPath);
-    } catch (IOException e) {
-      // folder already exists, return the path
-      return folderPath;
-    }
+  private void createDependencyFileFolder() {
+    createFolder(getPath(getWorkspaceFolderPaths().get(0).toString(), COBDEPS));
   }
 }

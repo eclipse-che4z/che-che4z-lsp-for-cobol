@@ -19,16 +19,20 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.nio.file.Files.readAllLines;
 
 /**
  * This is an utility class that provide filesystem related methods consumed by the classes that
@@ -57,7 +61,7 @@ public class FileSystemUtils {
    * @param targetPath NIO path of the target file where to write
    * @param contents the content to write
    */
-  public static void writeOnFile(Path targetPath, String contents) {
+  public static void writeInFile(Path targetPath, String contents) {
     try {
       Files.write(targetPath, (contents + "\n").getBytes(), StandardOpenOption.APPEND);
     } catch (IOException e) {
@@ -106,6 +110,93 @@ public class FileSystemUtils {
     } catch (UnsupportedEncodingException e) {
       log.error(e.getMessage());
       return uri;
+    }
+  }
+
+  /**
+   * This method return a {@link Path} representation of a bunch of {@link String} given as input or
+   * null if is not possible get the path. After each pah a FS separator is added automatically
+   *
+   * @param basePath the string that represent the base path
+   * @param more additional String used to compose the path
+   * @return the {@link Path} that contains all the given segment, null if the path doesn't exists.
+   */
+  public Path getPath(@Nonnull String basePath, @Nonnull String... more) {
+    return Paths.get(
+        basePath,
+        filesystemSeparator(),
+        Arrays.stream(more)
+            .map(path -> path + filesystemSeparator())
+            .collect(Collectors.joining()));
+  }
+
+  /**
+   * This method create a folder from a given path
+   *
+   * @param path in input that will be used to create the folder
+   */
+  public void createFolder(Path path) {
+    try {
+      Files.createDirectory(path);
+    } catch (IOException e) {
+      log.error(e.getMessage());
+    }
+  }
+
+  /**
+   * Create a file on filesystem from a given {@link Path}
+   *
+   * @param path target path that will be used to create the file
+   */
+  public void createFile(Path path) {
+    if (!path.toFile().exists()) {
+      try {
+        Files.createFile(path);
+      } catch (IOException e) {
+        log.error(e.getMessage());
+      }
+    }
+  }
+
+  /**
+   * This method extract the name of a file from a valid {@link URI} and return the name back to the
+   * client as String or null in case of error.
+   *
+   * @param uri the reference of the file from where extract the name
+   * @return the String representation of the file name or null if any {@link URISyntaxException} is
+   *     caught.
+   */
+  public String getNameFromURI(String uri) {
+    try {
+      return FilenameUtils.getBaseName(Paths.get(new URI(uri)).getFileName().toString());
+    } catch (URISyntaxException e) {
+      log.error(e.getMessage());
+      return null;
+    }
+  }
+
+  /**
+   * This method extract the file extension from the {@link URI} given as input
+   *
+   * @param uri reference to the file from where extract the file extension
+   * @return the String representation of the file extension or null if the URI is not valid
+   */
+  public String getExtensionFromURI(String uri) {
+    return FilenameUtils.getExtension(uri);
+  }
+
+  /**
+   * This method retrieve the content of a dependency file and return it back to the callee.
+   *
+   * @param filePath target path of the file
+   * @return the content of the dependency file or null if doesn't exists
+   */
+  public List<String> getContentFromFile(Path filePath) {
+    try {
+      return readAllLines(filePath);
+    } catch (IOException e) {
+      log.error(e.getMessage());
+      return Collections.emptyList();
     }
   }
 }
