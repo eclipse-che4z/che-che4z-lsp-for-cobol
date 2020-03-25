@@ -179,7 +179,7 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
               StandardOpenOption.WRITE,
               StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error(e.getMessage());
         }
       }
     }
@@ -258,7 +258,7 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
     try {
       result = FilenameUtils.getBaseName(Paths.get(new URI(documentUri)).getFileName().toString());
     } catch (URISyntaxException e) {
-      e.printStackTrace();
+      log.error(e.getMessage());
     }
     return result;
   }

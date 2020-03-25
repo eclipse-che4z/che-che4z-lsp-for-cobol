@@ -27,8 +27,6 @@ import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
@@ -36,17 +34,11 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
-import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.runAsync;
@@ -67,8 +59,6 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class MyTextDocumentService implements TextDocumentService, EventObserver<RunAnalysisEvent> {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
   private static final String GIT_FS_URI = "gitfs:/";
-  private static final String COBDEPS = ".cobdeps";
-  private static final String DEP_EXTENSION = ".dep";
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
 
@@ -78,7 +68,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private Completions completions;
   private Occurrences occurrences;
   private CodeActions actions;
-  @Getter @Setter private List<WorkspaceFolder> workspaceFolders;
 
   @Inject
   MyTextDocumentService(
@@ -195,7 +184,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didClose(DidCloseTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-    //    deleteDependencyFile(uri);
     log.info("Document closing invoked");
     docs.remove(uri);
   }
@@ -220,29 +208,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     } else {
       communications.notifyThatEngineNotFound(languageType);
     }
-  }
-
-  /**
-   * This method deletes the dependency file based on the COBOL name and workspace path
-   *
-   * @param uri
-   */
-  private void deleteDependencyFile(String uri) {
-    Path folderPath = null;
-    if (checkIfInitWasCalled()) {
-      folderPath =
-          Paths.get(
-              getDependencyFileFolderPath()
-                  + FileSystems.getDefault().getSeparator()
-                  + getFileNameFromURI(uri)
-                  + DEP_EXTENSION);
-    }
-    if (isFileExists(folderPath))
-      try {
-        Files.delete(folderPath);
-      } catch (IOException e) {
-        log.error(e.getMessage());
-      }
   }
 
   private boolean isCobolFile(String identifier) {
@@ -293,17 +258,5 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
 
   private BiConsumer<Object, Throwable> reportExceptionIfThrown(String message) {
     return (res, ex) -> ofNullable(ex).ifPresent(it -> log.error(message, it));
-  }
-
-  private Path getDependencyFileFolderPath() {
-    return Paths.get(
-        getWorkspaceFoldersAsPathList(getWorkspaceFolders()).get(0)
-            + filesystemSeparator()
-            + COBDEPS
-            + filesystemSeparator());
-  }
-
-  private boolean checkIfInitWasCalled() {
-    return getWorkspaceFolders() != null;
   }
 }
