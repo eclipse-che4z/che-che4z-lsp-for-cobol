@@ -19,6 +19,7 @@ import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
+import com.broadcom.lsp.domain.cobol.event.model.CopybookDepEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
@@ -87,6 +88,12 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
    */
   @Override
   public ResultWithErrors<CopybookSemanticContext> compute() {
+    databus.postData(
+        CopybookDepEvent.builder()
+            .copybookName(copyBookName)
+            .textDocumentSync(textDocumentSyncType)
+            .documentUri(documentUri)
+            .build());
     ResultWithErrors<SemanticContext> semanticContext;
 
     if (isCopybookInCache(copyBookName)) {

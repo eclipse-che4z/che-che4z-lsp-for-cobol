@@ -35,6 +35,8 @@ public interface CopybookEventFactory {
         return new RunAnalysisSubscriberFactory();
       case FETCHED_SETTINGS_EVENT:
         return new FetchedSettingsSubscriberFactory();
+      case COPYBOOK_DEP_EVENT:
+        return new CopybookDepSubscriberFactory();
 
       default:
         throw new NoSuchElementException(

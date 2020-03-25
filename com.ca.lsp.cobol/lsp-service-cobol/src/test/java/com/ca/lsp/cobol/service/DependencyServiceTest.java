@@ -15,8 +15,11 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.broadcom.lsp.cdi.module.databus.DatabusModule;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.ca.lsp.cobol.FileSystemConfiguration;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
+import com.google.inject.Guice;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +37,11 @@ import static org.junit.Assert.assertEquals;
 /** This class represent all the unit test for the copybook dependency managament service */
 @Slf4j
 public class DependencyServiceTest extends FileSystemConfiguration {
-  private CopybookDependencyServiceImpl dependencyService = new CopybookDependencyServiceImpl();
+  private final DataBusBroker broker =
+      Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
+
+  private CopybookDependencyServiceImpl dependencyService =
+      new CopybookDependencyServiceImpl(broker, null);
 
   @Before
   public void initActivities() {
