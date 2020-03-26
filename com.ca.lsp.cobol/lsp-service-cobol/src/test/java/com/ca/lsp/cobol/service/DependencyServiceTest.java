@@ -87,16 +87,6 @@ public class DependencyServiceTest extends FileSystemConfiguration {
 
     // check if the copybook name was deleted and the .dep file contains no elements
     waitAndAssert(numberOfElements - 1, depFileReference);
-
-    // Try to delete the .dep file at the end of the test
-    try {
-      Files.walk(depFileReference)
-          .sorted(Comparator.reverseOrder())
-          .map(Path::toFile)
-          .forEach(File::delete);
-    } catch (IOException e) {
-      log.error(e.getMessage());
-    }
   }
 
   /**

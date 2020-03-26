@@ -14,7 +14,6 @@
 package com.ca.lsp.cobol.service;
 
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
-import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
 import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.google.gson.Gson;
@@ -68,7 +67,6 @@ public class MyLanguageServerImpl implements LanguageServer {
   private CopybookService copybookService;
   private Provider<LanguageClient> clientProvider;
   private SettingsProvider settingsProvider;
-  private CopybookDependencyService copybookDependencyService;
 
   @Inject
   MyLanguageServerImpl(
@@ -76,14 +74,12 @@ public class MyLanguageServerImpl implements LanguageServer {
       TextDocumentService textService,
       WorkspaceService workspaceService,
       Provider<LanguageClient> clientProvider,
-      SettingsProvider settingsProvider,
-      CopybookDependencyService copybookDependencyService) {
+      SettingsProvider settingsProvider) {
     this.textService = textService;
     this.copybookService = copybookService;
     this.workspaceService = workspaceService;
     this.clientProvider = clientProvider;
     this.settingsProvider = settingsProvider;
-    this.copybookDependencyService = copybookDependencyService;
   }
 
   @Override

@@ -18,7 +18,6 @@ package com.ca.lsp.cobol.service.delegates.dependency;
 
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.CopybookDepEvent;
-import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 
 import java.nio.file.Path;
 import java.util.List;
