@@ -41,6 +41,7 @@ import static org.mockito.Mockito.when;
 public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String WORKSPACE_FOLDER_NAME = "test";
   protected static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
+  protected static final String CPY_DOCUMENT_URI = "file:///C:/Users/test/CPYNEST.cpy";
 
   protected static final String PROFILE_NAME = "PRF11";
   protected static final String DSNAME_1 = "HLQLF01.DSNAME1";

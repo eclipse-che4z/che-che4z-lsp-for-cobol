@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -31,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.nio.file.Files.readAllLines;
 
@@ -197,6 +199,58 @@ public class FileSystemUtils {
     } catch (IOException e) {
       log.error(e.getMessage());
       return Collections.emptyList();
+    }
+  }
+
+  /**
+   * @param path URI from where extract the content
+   * @return content of the file as String representation
+   */
+  @Nullable
+  public String getContentByPath(Path path) {
+    try (Stream<String> stream = Files.lines(path)) {
+      return stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse("");
+    } catch (IOException e) {
+      log.error(e.getMessage());
+      return null;
+    }
+  }
+
+  /**
+   * @param fileName file to search
+   * @param targetFolderPath physical path where to search for the file
+   * @return Path of the found copybook in the target folder.
+   */
+  public Path applySearch(String fileName, Path targetFolderPath) {
+    try (Stream<Path> pathStream =
+        Files.find(
+            targetFolderPath,
+            100,
+            (path, basicFileAttributes) -> isValidFileFound(path.toFile(), fileName),
+            FileVisitOption.FOLLOW_LINKS)) {
+      return pathStream.findAny().orElse(null);
+    } catch (IOException e) {
+      log.error(e.getMessage());
+      return null;
+    }
+  }
+
+  /**
+   * Normalize the URI defined in the workspace to get a NIO Path object that will be used within
+   * the FileSystemService, example: [input:
+   * file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy] --> [output:
+   * C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy]
+   *
+   * @param uri {@link URI} representation of a file
+   * @return the {@link Path} representation of the given URI in input
+   * @throws IllegalArgumentException if the URI of WorkspaceFolder is not valid
+   */
+  public Path getPathFromURI(String uri) {
+    try {
+      return Paths.get(new URI(uri).normalize());
+    } catch (URISyntaxException e) {
+      log.error(e.getMessage());
+      return null;
     }
   }
 }
