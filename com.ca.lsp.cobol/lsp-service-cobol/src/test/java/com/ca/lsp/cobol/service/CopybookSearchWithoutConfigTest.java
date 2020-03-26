@@ -171,21 +171,9 @@ public class CopybookSearchWithoutConfigTest {
    * engaged.
    */
   private void verifyThatDepFileIsCreated() {
-    //
-    //    verify(dependencyService, times(1))
-    //        .setWorkspaceFolderPaths(Collections.singletonList(workspaceFolderPath));
-    //    when(dependencyService.isFileInDidOpen(requiredCopybookEvent)).thenReturn(true);
-
-    //    dependencyService.invoke(
-    //        requiredCopybookEvent, CPY_NAME, Collections.singletonList(workspaceFolderPath));
-
     verify(dependencyService, atLeast(1))
         .writeCopybookInDepFile(
             requiredCopybookEvent.getName(), requiredCopybookEvent.getDocumentUri());
-    //
-    //    verify(dependencyService, times(1))
-    //        .addCopybookInDepFile(
-    //            requiredCopybookEvent.getName(), requiredCopybookEvent.getDocumentUri());
   }
 
   private Path createFolderStructure(Path copybooksPath) {
