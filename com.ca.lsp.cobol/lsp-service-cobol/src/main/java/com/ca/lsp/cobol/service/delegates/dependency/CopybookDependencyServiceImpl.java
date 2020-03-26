@@ -144,8 +144,18 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
     }
   }
 
+  /**
+   * This method is triggered when on databus the postData method is called and contains
+   * CopybookDepEvent; This method implements the update logic for .dep file, by update we
+   * understand that if the copybook is present in the .copybook folder than its name should be
+   * remove from .dep file
+   *
+   * @param event of type CopybookDepEvent
+   */
   @Override
   public void observerCallback(CopybookDepEvent event) {
+    // we are not checking .dep on DID_OPEN because on DID_OPEN the file is updated with the
+    // required copybooks
     if (!event.getTextDocumentSync().equals("DID_OPEN")) {
 
       Path path =
@@ -161,27 +171,34 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
                   + COBDEPS
                   + filesystemSeparator());
 
-      // change with document name, stupid blin
       Path dependencyFilePath =
           retrieveDependencyFile(folderPath, getFileNameFromURI(event.getDocumentUri()));
 
       if (path != null && isFileExists(dependencyFilePath)) {
-        List<String> result = null;
-        try {
-          result = Files.readAllLines(dependencyFilePath);
-          List<String> updatedLines =
-              result.stream()
-                  .filter(s -> !s.equals(event.getCopybookName()))
-                  .collect(Collectors.toList());
-          Files.write(
-              dependencyFilePath,
-              updatedLines,
-              StandardOpenOption.WRITE,
-              StandardOpenOption.TRUNCATE_EXISTING);
-        } catch (IOException e) {
-          log.error(e.getMessage());
-        }
+        removeCpyFromDep(dependencyFilePath, event.getCopybookName());
       }
+    }
+  }
+
+  /**
+   * This method removes a given string from a given file
+   *
+   * @param dependencyFilePath - the path to .dep file
+   * @param copybookName
+   */
+  private void removeCpyFromDep(Path dependencyFilePath, String copybookName) {
+    List<String> result = null;
+    try {
+      result = Files.readAllLines(dependencyFilePath);
+      List<String> updatedLines =
+          result.stream().filter(s -> !s.equals(copybookName)).collect(Collectors.toList());
+      Files.write(
+          dependencyFilePath,
+          updatedLines,
+          StandardOpenOption.WRITE,
+          StandardOpenOption.TRUNCATE_EXISTING);
+    } catch (IOException e) {
+      log.error(e.getMessage());
     }
   }
 
@@ -207,7 +224,13 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
     }
   }
 
-  /** come on */
+  /**
+   * This method is used to search for a copybook against a given configuration of datasets that
+   * represent the sub-path of the copyooks folder
+   *
+   * @param filename copybook name
+   * @return The path of the existent copybook or null if not found
+   */
   private Path findCopybook(String filename, String profile, List<String> datasetList) {
     return retrievePathOrNull(filename, generatePathListFromSettings(profile, datasetList));
   }
@@ -220,6 +243,11 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
         .orElse(null);
   }
 
+  /**
+   * @param fileName copybook name
+   * @param targetFolderPath physical path of workspace where to search for the copybook
+   * @return Path of the found copybook in the target folder.
+   */
   private Path applySearch(String fileName, Path targetFolderPath) {
     try (Stream<Path> pathStream =
         Files.find(
