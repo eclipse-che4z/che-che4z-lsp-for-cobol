@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,17 +13,16 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.transformer;
 
-import java.util.List;
-
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+
+import java.util.List;
 
 /**
  * Performs transformation operations on the given CobolLines. Requires FormatListener to raise or
  * manage format errors that may appear.
- *
- * @author teman02
  */
 public interface CobolLinesTransformation {
 
-  List<CobolLine> transformLines(List<CobolLine> lines);
+  ResultWithErrors<List<CobolLine>> transformLines(String documentURI, List<CobolLine> lines);
 }

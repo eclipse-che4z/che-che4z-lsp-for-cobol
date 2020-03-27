@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright (c) 2019 Broadcom.
- The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
-
- This program and the accompanying materials are made
- available under the terms of the Eclipse Public License 2.0
- which is available at https://www.eclipse.org/legal/epl-2.0/
-
- SPDX-License-Identifier: EPL-2.0
-
- Contributors:
-   Broadcom, Inc. - initial API and implementation
--->
+  ~ Copyright (c) 2020 Broadcom.
+  ~
+  ~ The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+  ~
+  ~ This program and the accompanying materials are made
+  ~ available under the terms of the Eclipse Public License 2.0
+  ~ which is available at https://www.eclipse.org/legal/epl-2.0/
+  ~
+  ~ SPDX-License-Identifier: EPL-2.0
+  ~
+  ~ Contributors:
+  ~ Broadcom, Inc. - initial API and implementation
+  ~
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -20,11 +22,12 @@
     <parent>
         <groupId>com.ca.lsp</groupId>
         <artifactId>com.ca.lsp.cobol</artifactId>
-        <version>0.8.3</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>lsp-service-cobol</artifactId>
-    <name>CA COBOL LSP :: LSP Service</name>
+    <name>COBOL LSP :: LSP Service</name>
+    <version>${revision}</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -48,6 +51,14 @@
             <artifactId>lsp-core-cobol-parser</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assistedinject</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -64,8 +75,21 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-    </dependencies>
+        <dependency>
+            <groupId>com.ca.lsp</groupId>
+            <artifactId>lsp-core-domain</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
 
+        <dependency>
+            <groupId>net.jodah</groupId>
+            <artifactId>concurrentunit</artifactId>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>
@@ -80,7 +104,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.ca.lsp.cobol.Main</mainClass>
+                                    <mainClass>com.ca.lsp.cobol.LangServerBootstrap</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
@@ -94,16 +118,6 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M3</version>
                 <configuration>
@@ -111,9 +125,11 @@
                     <systemProperties>
                         <property>
                             <name>filesToTestPath</name>
+                            <!--suppress UnresolvedMavenProperty -->
                             <value>${filesToTestPath}</value>
                         </property>
                     </systemProperties>
+                    <argLine>${argLine}</argLine>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -123,6 +139,27 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.5</version>
+                <executions>
+                    <execution>
+                        <id>coverage-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>coverage-report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 </project>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,16 +13,16 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import static org.junit.Assert.assertEquals;
-
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * This test checks if the parser recognizes typo on the "DIVISIONs" token. The correct is
  * "DIVISION".
- *
- * @author teman02
  */
 public class TestSyntaxError extends NegativeUseCase {
   public TestSyntaxError() {
@@ -42,7 +42,8 @@ public class TestSyntaxError extends NegativeUseCase {
   }
 
   @Override
-  protected void assertRange(Range range) {
+  protected void assertRanges(List<Range> ranges) {
+    Range range = ranges.get(0);
     assertEquals(23, range.getStart().getCharacter());
     assertEquals(32, range.getEnd().getCharacter());
   }

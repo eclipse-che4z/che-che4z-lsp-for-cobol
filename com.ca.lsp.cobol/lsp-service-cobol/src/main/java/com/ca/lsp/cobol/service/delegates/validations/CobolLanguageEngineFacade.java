@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,24 +13,36 @@
  */
 package com.ca.lsp.cobol.service.delegates.validations;
 
-import com.ca.lsp.core.cobol.LanguageEngineFactory;
+import com.broadcom.lsp.domain.common.model.Position;
+import com.ca.lsp.cobol.service.TextDocumentSyncType;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
-import com.ca.lsp.core.cobol.model.Position;
+import com.ca.lsp.core.cobol.model.ErrorCode;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.semantics.LanguageContext;
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
+import com.ca.lsp.core.cobol.semantics.SubContext;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
+
+import static com.ca.lsp.cobol.service.delegates.validations.AnalysisResult.empty;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @Slf4j
+@Singleton
 public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final int FIRST_LINE_SEQ_AND_EXTRA_OP = 8;
   private static final String COBOL_LANG_SUPPORT_LABEL = "COBOL Language Support";
@@ -38,38 +50,48 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final String WARNING_SRC_LABEL = "W";
   private static final String INFO_SRC_LABEL = "I";
   private static final String HINT_SRC_LABEL = "H";
+  private static final int ERR_POS_INDEX = 1;
 
-  // Access should be package-private
-  CobolLanguageEngineFacade() {}
+  private CobolLanguageEngine engine;
 
-  private static Range convertRange(Position position) {
-    return new Range(
-        new org.eclipse.lsp4j.Position((position.getLine() - 1), position.getCharPositionInLine()),
-        new org.eclipse.lsp4j.Position(
-            (position.getLine() - 1),
-            ((position.getStopPosition() - position.getStartPosition())
-                + position.getCharPositionInLine()
-                + 1)));
+  @Inject
+  CobolLanguageEngineFacade(CobolLanguageEngine engine) {
+    this.engine = engine;
+  }
+
+  @Override
+  public AnalysisResult analyze(
+      String uri, String text, TextDocumentSyncType textDocumentSyncType) {
+    if (isEmpty(text)) {
+      return empty();
+    }
+    return toAnalysisResult(engine.run(uri, text, textDocumentSyncType.toString()), uri);
   }
 
   private static boolean isEmpty(String text) {
     return text.length() <= FIRST_LINE_SEQ_AND_EXTRA_OP;
   }
 
-  private static List<Diagnostic> convertErrors(List<SyntaxError> errors) {
+  private static List<Diagnostic> convertErrors(List<SyntaxError> errors, String uri) {
     return errors.stream()
-        .peek(e -> log.info(e.toString()))
+        .filter(errorOnlyFromCurrentDocument(uri))
         .map(toDiagnostic())
-        .collect(Collectors.toList());
+        .collect(toList());
+  }
+
+  @Nonnull
+  private static Predicate<SyntaxError> errorOnlyFromCurrentDocument(String uri) {
+    return syntaxError -> uri.equals(syntaxError.getPosition().getDocumentURI());
   }
 
   private static Function<? super SyntaxError, ? extends Diagnostic> toDiagnostic() {
     return err -> {
       Diagnostic diagnostic = new Diagnostic();
       diagnostic.setSeverity(checkSeverity(err.getSeverity()));
-      diagnostic.setMessage(err.getSuggestion());
       diagnostic.setSource(setupSourceInfo(err.getSeverity()));
+      diagnostic.setMessage(err.getSuggestion());
       diagnostic.setRange(convertRange(err.getPosition()));
+      diagnostic.setCode(ofNullable(err.getErrorCode()).map(ErrorCode::name).orElse(null));
       return diagnostic;
     };
   }
@@ -94,41 +116,48 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     return DiagnosticSeverity.forValue(severity);
   }
 
-  @Override
-  public AnalysisResult analyze(String text) {
-    if (isEmpty(text)) {
-      return AnalysisResult.empty();
-    }
+  private static Range convertRange(Position position) {
+    int positionLine = position.getLine() - ERR_POS_INDEX;
+    int cPosInLn = position.getCharPositionInLine();
 
-    CobolLanguageEngine engine = LanguageEngineFactory.fixedFormatCobolLanguageEngine();
-    engine.run(text);
-    LanguageContext variables = engine.getVariables();
-    LanguageContext paragraphs = engine.getParagraphs();
-
-    return new AnalysisResult(
-        convertErrors(engine.getErrors()),
-        retrieveDefinitions(variables),
-        retrieveUsages(variables),
-        retrieveDefinitions(paragraphs),
-        retrieveUsages(paragraphs));
+    return new Range(
+        new org.eclipse.lsp4j.Position(positionLine, cPosInLn),
+        new org.eclipse.lsp4j.Position(
+            positionLine,
+            ((position.getStopPosition() - position.getStartPosition())
+                + cPosInLn
+                + ERR_POS_INDEX)));
   }
 
-  private Map<String, List<Range>> retrieveDefinitions(LanguageContext<?> context) {
+  private AnalysisResult toAnalysisResult(ResultWithErrors<SemanticContext> result, String uri) {
+    return new AnalysisResult(
+        convertErrors(result.getErrors(), uri),
+        retrieveDefinitions(result.getResult().getVariables()),
+        retrieveUsages(result.getResult().getVariables()),
+        retrieveDefinitions(result.getResult().getParagraphs()),
+        retrieveUsages(result.getResult().getParagraphs()),
+        retrieveDefinitions(result.getResult().getCopybooks()),
+        retrieveUsages(result.getResult().getCopybooks()));
+  }
+
+  private Map<String, List<Location>> retrieveDefinitions(SubContext<?> context) {
     return retrieveMap(context.getDefinitions().asMap());
   }
 
-  private Map<String, List<Range>> retrieveUsages(LanguageContext<?> context) {
+  private Map<String, List<Location>> retrieveUsages(SubContext<?> context) {
     return retrieveMap(context.getUsages().asMap());
   }
 
-  private Map<String, List<Range>> retrieveMap(Map<String, Collection<Position>> map) {
+  private Map<String, List<Location>> retrieveMap(Map<String, Collection<Position>> map) {
     return map.entrySet().stream()
         .collect(
-            Collectors.toMap(
-                Entry::getKey,
+            toMap(
+                Map.Entry::getKey,
                 entry ->
                     entry.getValue().stream()
-                        .map(CobolLanguageEngineFacade::convertRange)
-                        .collect(Collectors.toList())));
+                        .map(
+                            position ->
+                                new Location(position.getDocumentURI(), convertRange(position)))
+                        .collect(toList())));
   }
 }

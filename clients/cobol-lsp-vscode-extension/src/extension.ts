@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,77 +12,75 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as cp from "child_process";
-import {ExtensionContext, extensions, StatusBarAlignment, window} from "vscode";
-import {
-    Executable,
-    LanguageClient,
-    LanguageClientOptions,
-} from "vscode-languageclient/lib/main";
-import { DefaultJavaVersionCheck } from "./JavaVersionCheck";
+import * as vscode from "vscode";
+import { SETTINGS_SECTION } from "./constants";
+import { DEPENDENCIES_FOLDER } from "./constants";
+import { CopybooksDownloader } from "./CopybooksDownloader";
+import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
+import { ProfileService } from "./ProfileService";
+import { LanguageClientService } from "./services/LanguageClientService";
+import { ZoweApi } from "./ZoweApi";
+import { CopybookResolver } from "./services/CopybookResolver";
+import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
+import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
+import { editDatasetPaths } from "./commands/EditDatasetPaths";
+import { PathsService } from "./services/PathsService";
 
-export async function activate(context: ExtensionContext) {
-    const fs = require("fs");
-
-    // path resolved to identify the location of the LSP server into the extension
-    const extPath = extensions.getExtension("BroadcomMFD.cobol-language-support").extensionPath;
-    const LSPServerPath = `${extPath}/server/lsp-service-cobol-0.8.3.jar`;
-
-    let serverOptions: Executable;
+export async function activate(context: vscode.ExtensionContext) {
+    const zoweApi: ZoweApi = new ZoweApi();
+    const profileService: ProfileService = new ProfileService(zoweApi);
+    const resolver: CopybookResolver = new CopybookResolver();
+    const pathsService: PathsService = new PathsService();
+    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(resolver, zoweApi, profileService, pathsService);
+    const languageClientService: LanguageClientService = new LanguageClientService();
 
     try {
-        await isJavaInstalled();
-        if (fs.existsSync(LSPServerPath)) {
-            serverOptions = {
-                args: ["-Dline.separator=\r\n", "-jar", LSPServerPath, "pipeEnabled"],
-                command: "java",
-                options: { stdio: "pipe", detached: false },
-            };
-        } else {
-            window.showErrorMessage("COBOL extension failed to start - LSP server not found");
-            return;
-        }
+        await languageClientService.checkPrerequisites();
     } catch (err) {
-        window.showErrorMessage(err.toString());
+        vscode.window.showErrorMessage(err.toString());
         return;
     }
 
-    // Options to control the language client
-    const clientOptions: LanguageClientOptions = {
-        // Register the server for COBOL
-        documentSelector: ["COBOL"],
-    };
-    const item = window.createStatusBarItem(StatusBarAlignment.Right, Number.MIN_VALUE);
+    copyBooksDownloader.start();
 
-    // Create the language client and start the client.
-    const languageClient = new LanguageClient("LSP", "LSP extension for COBOL language", serverOptions, clientOptions);
+    // Listeners
+    context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
+        if (event.affectsConfiguration(SETTINGS_SECTION)) {
+            copyBooksDownloader.redownloadDependencies("Configuration was updated");
+            profileService.updateStatusBar();
+        }
+    }));
 
-    const disposable = languageClient.start();
+    // Commands
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.redownload", () => {
+        copyBooksDownloader.redownloadDependencies();
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
+        fetchCopybookCommand(copybook, copyBooksDownloader, programName);
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile", () => {
+        changeDefaultZoweProfile(profileService);
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths", () => {
+        editDatasetPaths(pathsService);
+    }));
 
-    context.subscriptions.push(disposable);
-    item.text = "Language Server is active";
+
+    context.subscriptions.push(languageClientService.start());
+    context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
+    context.subscriptions.push(copyBooksDownloader);
+
+    context.subscriptions.push(
+        vscode.languages.registerCodeActionsProvider(
+            { scheme: "file", language: "COBOL" },
+            new CopybooksCodeActionProvider()));
 }
 
-async function isJavaInstalled() {
-    return new Promise<any>((resolve, reject) => {
-        const ls = cp.spawn("java", ["-version"]);
-        ls.stderr.on("data", (data: any) => {
-            let javaCheck = new DefaultJavaVersionCheck();
-            if (!javaCheck.isJavaVersionSupported(data.toString())) {
-                reject("Java version 8 expected");
-            }
-            resolve();
-        });
-        ls.on("error", (code: any) => {
-            if ("Error: spawn java ENOENT" === code.toString()) {
-                reject("Java 8 is not found");
-            }
-            reject(code);
-        });
-        ls.on("close", (code: number) => {
-            if (code !== 0) {
-                reject("An error occurred when checking if Java was installed");
-            }
-        });
-    });
+function initWorkspaceTracker(downloader: CopybooksDownloader): vscode.Disposable {
+    const watcher = vscode.workspace.createFileSystemWatcher("**/"
+        + DEPENDENCIES_FOLDER + "/**/**.dep", false, false, true);
+    watcher.onDidCreate(uri => downloader.downloadDependencies(uri,
+        "Program contains dependencies to missing copybooks."));
+    watcher.onDidChange(uri => downloader.downloadDependencies(uri));
+    return watcher;
 }

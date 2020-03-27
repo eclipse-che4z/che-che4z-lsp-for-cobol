@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright (c) 2019 Broadcom.
+ Copyright (c) 2020 Broadcom.
  The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
 
  This program and the accompanying materials are made
@@ -20,11 +20,11 @@
 	<parent>
 		<groupId>com.ca.lsp</groupId>
 		<artifactId>com.ca.lsp.cobol</artifactId>
-		<version>0.8.3</version>
+		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>lsp-core-cobol-parser</artifactId>
-	<version>0.8.3</version>
+	<version>${revision}</version>
 	<name>COBOL LSP :: LSP Core</name>
 	<packaging>jar</packaging>
 
@@ -92,7 +92,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.19.1</version>
 				<configuration>
-					<argLine>-Xmx2048m -Djava.awt.headless=true</argLine>
+					<argLine>${argLine} -Xmx2048m -Djava.awt.headless=true</argLine>
 					<excludes>
 						<exclude>${exclude.tests}</exclude>
 					</excludes>
@@ -145,6 +145,33 @@
 				<artifactId>coveralls-maven-plugin</artifactId>
 				<version>4.3.0</version>
 			</plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.5</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/generated-sources/**/*</exclude>
+                        <exclude>**/com/ca/lsp/core/cobol/parser/**/*</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>coverage-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>coverage-report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
 		</plugins>
 
 		<pluginManagement>
@@ -216,6 +243,11 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.6</version>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
@@ -229,6 +261,31 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 		</dependency>
-	</dependencies>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.ca.lsp</groupId>
+			<artifactId>lsp-core-domain</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.jodah</groupId>
+			<artifactId>concurrentunit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assistedinject</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assistedinject</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

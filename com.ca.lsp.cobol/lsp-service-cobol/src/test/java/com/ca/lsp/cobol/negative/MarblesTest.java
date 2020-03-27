@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -22,8 +22,6 @@ import org.junit.Test;
  *
  * <p>57 IGYDS0225-S An ""EXEC SQL"" statement was found, but the ""SQL"" compiler option was not in
  * effect. The statement was discarded."
- *
- * @author teman02
  */
 public class MarblesTest extends NegativeTest {
   private static final String FILE_NAME = "MARBLES.cbl";

@@ -8,12 +8,341 @@
 
 grammar CobolPreprocessor;
 
-startRule
-   : (compilerOptions | copyStatement | execCicsStatement | execSqlStatement | execSqlImsStatement | replaceOffStatement | replaceArea | ejectStatement | skipStatement | titleStatement | charDataLine | NEWLINE)* EOF
+startRule : ~(DATA | IDENTIFICATION)*? ((compilerOptions | dataDescriptionEntry | dataDivision | procedureDivision | copyStatement
+            | replaceOffStatement | replaceArea  | skipStatement | titleStatement | paragraphs2 |  NEWLINE | IDENTIFICATION)+ .*?)+ EOF;
+
+//procedureDivision
+procedureDivision
+   : PROCEDURE DIVISION procedureDivisionUsingClause? procedureDivisionGivingClause?  DOT_FS procedureDeclaratives? procedureDivisionBody
    ;
 
-// compiler options
+procedureDivisionUsingClause
+   : (USING | CHAINING) procedureDivisionUsingParameter+
+   ;
 
+procedureDivisionGivingClause
+   : (GIVING | RETURNING) dataName
+   ;
+
+procedureDivisionUsingParameter
+   : procedureDivisionByReferencePhrase | procedureDivisionByValuePhrase
+   ;
+
+procedureDivisionByReferencePhrase
+   : (BY? REFERENCE)? procedureDivisionByReference+
+   ;
+
+procedureDivisionByReference
+   : (OPTIONAL? cobolWord) | ANY
+   ;
+
+procedureDivisionByValuePhrase
+   : BY? VALUE procedureDivisionByValue+
+   ;
+
+procedureDivisionByValue
+   : cobolWord | literal | ANY
+   ;
+
+procedureDeclaratives
+   : DECLARATIVES DOT_FS procedureDeclarative+ END DECLARATIVES DOT_FS
+   ;
+
+procedureDeclarative
+   : procedureSectionHeader DOT_FS useStatement DOT_FS paragraphs
+   ;
+
+//procedureDivisionExtensions
+procedureDivisionBody
+   : paragraphs procedureSection*
+   ;
+
+procedureSection
+   : procedureSectionHeader DOT_FS paragraphs
+   ;
+
+procedureSectionHeader
+   : sectionName SECTION literal?
+   ;
+
+paragraphs
+   : sentence* paragraph+
+   ;
+
+paragraphs2
+   : sentence+ paragraph+
+   ;
+
+sentence
+   : (statement+ DOT_FS) | skipNoStatement+
+   ;
+
+//all the possible combinations to form a statement, super-nongreddy
+statement
+   : moveStatement | acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement |
+     continueStatement | deleteStatement | disableStatement | displayStatement | divideStatement |  enableStatement | entryStatement | evaluateStatement |
+     exitStatement | generateStatement | gobackStatement | goStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement |
+     multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement |
+     searchStatement | sendStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement |
+     titleStatement | unstringStatement | useStatement | writeStatement | xmlStatement |execSqlStatement | execSqlImsStatement | execCicsStatement | copyStatement
+   ;
+
+everything
+    : ~(ACCEPT | ADD | ALTER | CALL | CANCEL | CLOSE | COMPUTE | CONTINUE | DELETE | DISABLE | DISPLAY | DIVIDE | ENABLE |
+      ENTRY | EVALUATE | EXIT | GENERATE | GOBACK | GO | IF | INITIALIZE | INITIATE | INSPECT | MERGE | MULTIPLY | OPEN | PERFORM | PURGE | READ |
+      RECEIVE | RELEASE | RETURN | REWRITE | SEARCH | SEND | SET | SKIP1 | SKIP2 | SKIP3 | SORT | START | STOP | STRING | SUBTRACT | TERMINATE |
+      TITLE | UNSTRING | USE | WRITE | XML | EXECCICSLINE | EXECSQLIMSLINE | EXECSQLLINE| DOT_FS | COPY | MOVE)*?
+    ;
+
+moveStatement
+   : MOVE everything;
+
+addStatement
+   : ADD everything;
+
+acceptStatement
+   : ACCEPT everything;
+
+alterStatement
+   : ALTER everything;
+
+callStatement
+   : CALL everything;
+
+cancelStatement
+   : CANCEL everything;
+
+closeStatement
+   : CLOSE everything;
+
+computeStatement
+   : COMPUTE everything;
+
+continueStatement
+   : CONTINUE everything;
+
+deleteStatement
+   : DELETE everything;
+
+disableStatement
+   : DISABLE everything;
+
+displayStatement
+   : DISPLAY everything;
+
+divideStatement
+   : DIVIDE everything;
+
+enableStatement
+   : ENABLE everything;
+
+entryStatement
+   : ENTRY everything;
+
+evaluateStatement
+   : EVALUATE everything;
+
+exitStatement
+   : EXIT everything;
+
+generateStatement
+   : GENERATE everything;
+
+gobackStatement
+   : GOBACK everything;
+
+goStatement
+   : GO everything;
+
+ifStatement
+   : IF everything;
+
+initializeStatement
+   : INITIALIZE everything;
+
+initiateStatement
+   : INITIATE everything;
+
+inspectStatement
+   : INSPECT everything;
+
+mergeStatement
+   : MERGE everything;
+
+multiplyStatement
+   : MULTIPLY everything;
+
+openStatement
+   : OPEN everything;
+
+performStatement
+   : PERFORM everything;
+
+purgeStatement
+   : PURGE everything;
+
+readStatement
+   : READ  everything;
+
+receiveStatement
+   : RECEIVE everything;
+
+releaseStatement
+   : RELEASE everything;
+
+returnStatement
+   : RETURN everything;
+
+rewriteStatement
+   : REWRITE everything;
+
+searchStatement
+   : SEARCH everything;
+
+sendStatement
+   : SEND everything;
+
+setStatement
+   : SET everything;
+
+skipNoStatement
+   : (SKIP1 | SKIP2 | SKIP3) everything;
+
+skip1Statement
+   : SKIP1 ~DOT_FS*?
+   ;
+
+skip2Statement
+   : SKIP2 ~DOT_FS*?
+   ;
+
+skip3Statement
+   : SKIP3 ~DOT_FS*?
+   ;
+
+sortStatement
+   : SORT everything;
+
+startStatement
+   : START everything;
+
+stopStatement
+   : STOP everything;
+
+stringStatement
+   : STRING everything;
+
+subtractStatement
+   : SUBTRACT everything;
+
+terminateStatement
+   : TERMINATE everything;
+
+titleStatement
+   : TITLE everything;
+
+unstringStatement
+   : UNSTRING everything;
+
+useStatement
+   : USE everything;
+
+writeStatement
+   : WRITE everything;
+
+xmlStatement
+   : XML ~(ACCEPT | ADD | ALTER | CALL | CANCEL | CLOSE | COMPUTE | CONTINUE | DELETE | DISABLE | DISPLAY | DIVIDE | ENABLE |
+             ENTRY | EVALUATE | EXIT | GENERATE | GOBACK | GO | IF | INITIALIZE | INITIATE | INSPECT | MERGE | MULTIPLY | OPEN | PERFORM | PURGE | READ |
+             RECEIVE | RELEASE | RETURN | REWRITE | SEARCH | SEND | SET | SKIP1 | SKIP2 | SKIP3 | SORT | START | STOP | STRING | SUBTRACT | TERMINATE |
+             TITLE | UNSTRING | USE | WRITE | XML | EXECCICSLINE | EXECSQLIMSLINE | EXECSQLLINE| DOT_FS | COPY | MOVE)*?
+            ;
+
+
+//paragraphs definition
+paragraph
+   : paragraphName DOT_FS (alteredGoTo | sentence)
+   ;
+
+paragraphName
+   : cobolWord
+   ;
+
+alteredGoTo
+   : GO TO? DOT_FS
+   ;
+
+sectionName
+   : cobolWord
+   ;
+
+
+//data division and variable definition
+dataDivision
+   : DATA DIVISION DOT_FS dataDivisionSection*
+   ;
+
+dataDivisionSection
+   : workingStorageSection | linkageSection | copyStatement
+   ;
+
+workingStorageSection
+   : WORKING_STORAGE SECTION DOT_FS (dataDescriptionEntry | copyStatement)*
+   ;
+
+linkageSection
+   : LINKAGE SECTION DOT_FS dataDescriptionEntry*
+   ;
+
+dataDescriptionEntry
+   : (dataDescriptionEntryFormat1 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat3)+
+   ;
+
+dataDescriptionEntryFormat1
+   : otherLevel (FILLER | dataName)? ~DOT_FS*? DOT_FS
+   ;
+
+dataDescriptionEntryFormat2
+   : LEVEL_NUMBER_66 dataName dataRenamesClause DOT_FS
+   ;
+
+dataDescriptionEntryFormat3
+   : LEVEL_NUMBER_88 dataName dataValueClause DOT_FS
+   ;
+
+dataRenamesClause
+   : RENAMES qualifiedDataName ((THROUGH | THRU) qualifiedDataName)?
+   ;
+
+qualifiedDataName
+   : cobolWord
+   ;
+
+dataValueClause
+   : ((VALUE | VALUES) (IS | ARE)?) dataValueInterval (COMMACHAR? dataValueInterval)*
+   ;
+
+dataValueInterval
+   : dataValueIntervalFrom dataValueIntervalTo?
+   ;
+
+dataValueIntervalFrom
+   : literal | cobolWord
+   ;
+
+dataValueIntervalTo
+   : (THROUGH | THRU) literal
+   ;
+
+otherLevel: LEVEL
+   ;
+
+dataName
+   : cobolWord
+   ;
+//end of data division and variable definition
+
+
+// compiler options
 compilerOptions
    : (PROCESS | CBL) (COMMACHAR? compilerOption | compilerXOpts)+
    ;
@@ -25,29 +354,28 @@ compilerXOpts
 compilerOption
    : ADATA | ADV | APOST
    | (ARITH | AR) LPARENCHAR (EXTEND | E_CHAR | COMPAT | C_CHAR) RPARENCHAR
-   | AWO
    | BLOCK0
    | (BUFSIZE | BUF) LPARENCHAR literal RPARENCHAR
    | CBLCARD
    | CICS (LPARENCHAR literal RPARENCHAR)?
    | COBOL2 | COBOL3
    | (CODEPAGE | CP) LPARENCHAR literal RPARENCHAR
-   | (COMPILE | C_CHAR) 
+   | (COMPILE | C_CHAR)
    | CPP | CPSM
    | (CURRENCY | CURR) LPARENCHAR literal RPARENCHAR
    | DATA LPARENCHAR literal RPARENCHAR
    | (DATEPROC | DP) (LPARENCHAR (FLAG | NOFLAG)? COMMACHAR? (TRIG | NOTRIG)? RPARENCHAR)?
-   | DBCS 
-   | (DECK | D_CHAR) 
-   | DEBUG 
+   | DBCS
+   | (DECK | D_CHAR)
+   | DEBUG
    | (DIAGTRUNC | DTR)
    | DLL
-   | (DUMP | DU) 
+   | (DUMP | DU)
    | (DYNAM | DYN)
-   | EDF | EPILOG 
+   | EDF | EPILOG
    | EXIT
    | (EXPORTALL | EXP)
-   | (FASTSRT | FSRT) 
+   | (FASTSRT | FSRT)
    | FEPI
    | (FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (COMMACHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR
    | FLAGSTD LPARENCHAR (M_CHAR | I_CHAR | H_CHAR) (COMMACHAR (D_CHAR | DD | N_CHAR | NN | S_CHAR | SS))? RPARENCHAR
@@ -66,51 +394,51 @@ compilerOption
    | NOBLOCK0
    | NOCBLCARD | NOCICS | NOCMPR2
    | (NOCOMPILE | NOC) (LPARENCHAR (S_CHAR | E_CHAR | W_CHAR) RPARENCHAR)?
-   | NOCPSM 
+   | NOCPSM
    | (NOCURRENCY | NOCURR)
-   | (NODATEPROC | NODP) 
-   | NODBCS | NODEBUG 
-   | (NODECK | NOD) 
-   | NODLL | NODE 
+   | (NODATEPROC | NODP)
+   | NODBCS | NODEBUG
+   | (NODECK | NOD)
+   | NODLL | NODE
    | (NODUMP | NODU)
-   | (NODIAGTRUNC | NODTR) 
+   | (NODIAGTRUNC | NODTR)
    | (NODYNAM | NODYN)
-   | NOEDF | NOEPILOG | NOEXIT 
+   | NOEDF | NOEPILOG | NOEXIT
    | (NOEXPORTALL | NOEXP)
    | (NOFASTSRT | NOFSRT)
-   | NOFEPI 
-   | (NOFLAG | NOF) 
+   | NOFEPI
+   | (NOFLAG | NOF)
    | NOFLAGMIG | NOFLAGSTD
    | NOGRAPHIC
    | NOLENGTH | NOLIB | NOLINKAGE | NOLIST
-   | NOMAP 
+   | NOMAP
    | (NOMDECK | NOMD)
-   | NONAME 
+   | NONAME
    | (NONUMBER | NONUM)
-   | (NOOBJECT | NOOBJ) 
-   | (NOOFFSET | NOOFF) 
+   | (NOOBJECT | NOOBJ)
+   | (NOOFFSET | NOOFF)
    | NOOPSEQUENCE
-   | (NOOPTIMIZE | NOOPT) 
-   | NOOPTIONS 
+   | (NOOPTIMIZE | NOOPT)
+   | NOOPTIONS
    | NOP | NOPROLOG
    | NORENT
-   | (NOSEQUENCE | NOSEQ) 
-   | (NOSOURCE | NOS) 
-   | NOSPIE | NOSQL 
-   | (NOSQLCCSID | NOSQLC) 
-   | (NOSSRANGE | NOSSR) 
+   | (NOSEQUENCE | NOSEQ)
+   | (NOSOURCE | NOS)
+   | NOSPIE | NOSQL
+   | (NOSQLCCSID | NOSQLC)
+   | (NOSSRANGE | NOSSR)
    | NOSTDTRUNC
    | (NOTERMINAL | NOTERM) | NOTEST | NOTHREAD
    | NOVBREF
    | (NOWORD | NOWD)
-   | NSEQ 
+   | NSEQ
    | (NSYMBOL | NS) LPARENCHAR (NATIONAL | NAT | DBCS) RPARENCHAR
    | NOVBREF
    | (NOXREF | NOX)
    | NOZWB
    | (NUMBER | NUM)
    | NUMPROC LPARENCHAR (MIG | NOPFD | PFD) RPARENCHAR
-   | (OBJECT | OBJ) 
+   | (OBJECT | OBJ)
    | (OFFSET | OFF)
    | OPMARGINS LPARENCHAR literal COMMACHAR literal (COMMACHAR literal)? RPARENCHAR
    | OPSEQUENCE LPARENCHAR literal COMMACHAR literal RPARENCHAR
@@ -129,8 +457,8 @@ compilerOption
    | SPACE LPARENCHAR literal RPARENCHAR
    | SPIE
    | SQL (LPARENCHAR literal RPARENCHAR)?
-   | (SQLCCSID | SQLC) 
-   | (SSRANGE | SSR) 
+   | (SQLCCSID | SQLC)
+   | (SSRANGE | SSR)
    | SYSEIB
    | (TERMINAL | TERM)
    | TEST (LPARENCHAR (HOOK | NOHOOK)? COMMACHAR? (SEP | SEPARATE | NOSEP | NOSEPARATE)? COMMACHAR? (EJPD | NOEJPD)? RPARENCHAR)?
@@ -144,43 +472,43 @@ compilerOption
    | ZWB
    ;
 
-// exec cics statement
 
+// exec cics statement
 execCicsStatement
-   : EXEC CICS charData END_EXEC DOT?
+   : EXECCICSLINE+
    ;
 
 // exec sql statement
 
 execSqlStatement
-   : EXEC SQL charDataSql END_EXEC DOT?
+   : EXECSQLLINE+
    ;
 
 // exec sql ims statement
 
 execSqlImsStatement
-   : EXEC SQLIMS charData END_EXEC DOT?
+   : EXECSQLIMSLINE+
    ;
 
-// copy statement
 
+// copy statement
 copyStatement
-   : COPY copySource (NEWLINE* (directoryPhrase | familyPhrase | replacingPhrase | SUPPRESS))* NEWLINE* DOT
+   : COPY copySource (directoryPhrase | familyPhrase | replacingPhrase | SUPPRESS)* DOT_FS
    ;
 
 copySource
-   : (literal | cobolWord | filename) ((OF | IN) copyLibrary)?
+   : (literal | cobolWord) ((OF | IN) copyLibrary)?
    ;
 
 copyLibrary
    : literal | cobolWord
    ;
 
+
+// replace statement
 replacingPhrase
    : REPLACING NEWLINE* replaceClause (NEWLINE+ replaceClause)*
    ;
-
-// replace statement
 
 replaceArea
    : replaceByStatement (copyStatement | charData)* replaceOffStatement?
@@ -207,43 +535,30 @@ familyPhrase
    ;
 
 replaceable
-   : literal | cobolWord | pseudoText | charDataLine
+   : replaceSameElement
    ;
 
 replacement
+   : replaceSameElement
+   ;
+
+replaceSameElement
    : literal | cobolWord | pseudoText | charDataLine
    ;
 
-// eject statement
-
-ejectStatement
-   : EJECT DOT?
-   ;
 
 // skip statement
-
 skipStatement
    : (SKIP1 | SKIP2 | SKIP3) DOT?
    ;
 
-// title statement
-
-titleStatement
-   : TITLE literal DOT?
-   ;
-
-// literal ----------------------------------
-
+// literals
 pseudoText
    : DOUBLEEQUALCHAR charData? DOUBLEEQUALCHAR
    ;
 
 charData
    : (charDataLine | NEWLINE)+
-   ;
-
-charDataSql
-   : (charDataLine | COPY | REPLACE | NEWLINE)+
    ;
 
 charDataLine
@@ -255,21 +570,19 @@ cobolWord
    ;
 
 literal
-   : NONNUMERICLITERAL | NUMERICLITERAL
+   : NONNUMERICLITERAL | NUMERICLITERAL | otherLevel | LEVEL_NUMBER_66 | LEVEL_NUMBER_88
    ;
 
 filename
    : FILENAME
    ;
 
-// keywords ----------------------------------
-
 charDataKeyword
    : ADATA | ADV | ALIAS | ANSI | ANY | APOST | AR | ARITH | AUTO | AWO
    | BIN | BLOCK0 | BUF | BUFSIZE | BY
    | CBL | CBLCARD | CO | COBOL2 | COBOL3 | CODEPAGE | COMMACHAR | COMPAT | COMPILE | CP | CPP | CPSM | CS | CURR | CURRENCY
    | DATA | DATEPROC | DBCS | DD | DEBUG | DECK | DIAGTRUNC | DLI | DLL | DP | DTR | DU | DUMP | DYN | DYNAM
-   | EDF | EJECT | EJPD | EN | ENGLISH | EPILOG | EXCI | EXIT | EXP | EXPORTALL | EXTEND
+   | EDF | EJPD | EN | ENGLISH | EPILOG | EXCI | EXIT | EXP | EXPORTALL | EXTEND
    | FASTSRT | FLAG | FLAGSTD | FULL | FSRT
    | GDS | GRAPHIC
    | HOOK
@@ -318,16 +631,26 @@ charDataKeyword
    | C_CHAR | D_CHAR | E_CHAR | F_CHAR | H_CHAR | I_CHAR | M_CHAR | N_CHAR | Q_CHAR | S_CHAR | U_CHAR | W_CHAR | X_CHAR
    ;
 
+
+
 // lexer rules --------------------------------------------------------------------------------
 
+LEVEL_NUMBER_66 : '66';
+LEVEL_NUMBER_88 : '88';
+LEVEL: ([1-9])|([0][1-9])|([1234][0-9])| '77';
+
 // keywords
+ACCEPT: A C C E P T;
 ADATA : A D A T A;
 ADV : A D V;
+ADD: A D D;
 ALIAS : A L I A S;
+ALTER: A L T E R;
 ANSI : A N S I;
 ANY : A N Y;
 APOST : A P O S T;
 AR : A R;
+ARE : A R E;
 ARITH : A R I T H;
 AUTO : A U T O;
 AWO : A W O;
@@ -336,10 +659,16 @@ BLOCK0 : B L O C K '0';
 BUF : B U F;
 BUFSIZE : B U F S I Z E;
 BY : B Y;
+CALL: C A L L;
+CANCEL: C A N C E L;
 CBL : C B L;
 CBLCARD : C B L C A R D;
+CHAINING: C H A I N I N G;
+CLOSE: C L O S E;
 CICS : C I C S;
 CO : C O;
+COMPUTE: C O M P U T E;
+CONTINUE: C O N T I N U E;
 COBOL2 : C O B O L '2';
 COBOL3 : C O B O L '3';
 CODEPAGE : C O D E P A G E;
@@ -357,8 +686,14 @@ DATEPROC : D A T E P R O C;
 DBCS : D B C S;
 DD : D D;
 DEBUG : D E B U G;
+DECLARATIVES: D E C L A R A T I V E S;
 DECK : D E C K;
+DELETE: D E L E T E;
 DIAGTRUNC : D I A G T R U N C;
+DIVISION: D I V I S I O N;
+DISABLE: D I S A B L E;
+DISPLAY: D I S P L A Y;
+DIVIDE: D I V I D E;
 DLI : D L I;
 DLL : D L L;
 DP : D P;
@@ -368,7 +703,10 @@ DUMP : D U M P;
 DYN : D Y N;
 DYNAM : D Y N A M;
 EDF : E D F;
-EJECT : E J E C T;
+ENABLE: E N A B L E;
+END: E N D;
+ENTRY: E N T R Y;
+EVALUATE : E V A L U A T E;
 EJPD : E J P D;
 EN : E N;
 ENGLISH : E N G L I S H;
@@ -382,15 +720,26 @@ EXPORTALL : E X P O R T A L L;
 EXTEND : E X T E N D;
 FASTSRT : F A S T S R T;
 FEPI : F E P I;
+FILLER: F I L L E R;
 FLAG : F L A G;
 FLAGSTD : F L A G S T D;
 FSRT : F S R T;
 FULL : F U L L;
+GENERATE : G E N E R A T E;
+GIVING: G I V I N G;
+GOBACK : G O B A C K;
 GDS : G D S;
+GO: G O;
 GRAPHIC : G R A P H I C;
 HOOK : H O O K;
 IN : I N;
+IF: I F;
+IDENTIFICATION: I D E N T I F I C A T I O N;
+INITIALIZE : I N I T I A L I Z E;
+INITIATE : I N I T I A T E;
+INSPECT : I N S P E C T;
 INTDATE : I N T D A T E;
+IS: I S;
 JA : J A;
 JP : J P;
 KA : K A;
@@ -416,7 +765,10 @@ MAX : M A X;
 MD : M D;
 MDECK : M D E C K;
 MIG : M I G;
+MERGE : M E R G E;
+MULTIPLY : M U L T I P L Y;
 MIXED : M I X E D;
+MOVE: M O V E;
 NAME : N A M E;
 NAT : N A T;
 NATIONAL : N A T I O N A L;
@@ -524,27 +876,51 @@ OFF : O F F;
 OFFSET : O F F S E T;
 ON : O N;
 OP : O P;
+OPEN : O P E N;
 OPMARGINS : O P M A R G I N S;
 OPSEQUENCE : O P S E Q U E N C E;
 OPT : O P T;
+OPTIONAL: O P T I O N A L;
 OPTFILE : O P T F I L E;
 OPTIMIZE : O P T I M I Z E;
 OPTIONS : O P T I O N S;
 OUT : O U T;
 OUTDD : O U T D D;
+PERFORM : P E R F O R M;
+PURGE : P U R G E;
+PIC : P I C;
+PICTURE : P I C T U R E;
 PFD : P F D;
 PPTDBG : P P T D B G;
 PGMN : P G M N;
 PGMNAME : P G M N A M E;
+PROCEDURE: P R O C E D U R E;
 PROCESS : P R O C E S S;
 PROLOG : P R O L O G;
 QUOTE : Q U O T E;
+READ : R E A D;
+REFERENCE: R E F E R E N C E;
+RENAMES : R E N A M E S;
 RENT : R E N T;
 REPLACE : R E P L A C E;
 REPLACING : R E P L A C I N G;
+RETURNING: R E T U R N I N G;
 RMODE : R M O D E;
 RPARENCHAR : ')';
+RECEIVE : R E C E I V E;
+RELEASE : R E L E A S E;
+RETURN : R E T U R N;
+REWRITE : R E W R I T E;
+SECTION: S E C T I O N;
 SEP : S E P;
+SEARCH : S E A R C H;
+SEND : S E N D;
+SET: S E T;
+SORT : S O R T;
+START : S T A R T;
+STOP : S T O P;
+STRING : S T R I N G;
+SUBTRACT : S U B T R A C T;
 SEPARATE : S E P A R A T E;
 SEQ : S E Q;
 SEQUENCE : S E Q U E N C E;
@@ -571,15 +947,27 @@ SZ : S Z;
 TERM : T E R M;
 TERMINAL : T E R M I N A L;
 TEST : T E S T;
+TERMINATE : T E R M I N A T E;
 THREAD : T H R E A D;
+THROUGH : T H R O U G H;
+THRU : T H R U;
 TITLE : T I T L E;
+TO: T O;
 TRIG : T R I G;
 TRUNC : T R U N C;
 UE : U E;
+UNSTRING : U N S T R I N G;
+USE : U S E;
+USING: U S I N G;
 UPPER : U P P E R;
+VALUE : V A L U E;
+VALUES : V A L U E S;
 VBREF : V B R E F;
 WD : W D;
 WORD : W O R D;
+WORKING_STORAGE: W O R K I N G MINUSCHAR S T O R A G E;
+WRITE : W R I T E;
+XML : X M L;
 XMLPARSE : X M L P A R S E;
 XMLSS : X M L S S;
 XOPTS: X O P T S;
@@ -605,10 +993,16 @@ X_CHAR : X;
 
 
 // symbols
+EXECCICSTAG : '*>EXECCICS';
+EXECSQLTAG : '*>EXECSQL';
+EXECSQLIMSTAG : '*>EXECSQLIMS';
 COMMENTTAG : '*>';
+COMMENTENTRYTAG : '*>CE';
 COMMACHAR : ',';
+DOT_FS : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ | '.' EOF;
 DOT : '.';
 DOUBLEEQUALCHAR : '==';
+MINUSCHAR : '-';
 
 // literals
 NONNUMERICLITERAL : STRINGLITERAL | HEXNUMBER;
@@ -629,10 +1023,15 @@ FILENAME : [a-zA-Z0-9]+ '.' [a-zA-Z0-9]+;
 
 
 // whitespace, line breaks, comments, ...
-NEWLINE : '\r'? '\n';
-COMMENTLINE : COMMENTTAG ~('\n' | '\r')* -> channel(HIDDEN);
+NEWLINE : '\r'? '\n' -> channel(HIDDEN);
+EXECCICSLINE : EXECCICSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
+EXECSQLIMSLINE : EXECSQLIMSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
+EXECSQLLINE : EXECSQLTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
+COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
+COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
 WS : [ \t\f;]+ -> channel(HIDDEN);
 TEXT : ~('\n' | '\r');
+SEPARATOR : ', ' -> channel(HIDDEN);
 
 
 // case insensitive chars

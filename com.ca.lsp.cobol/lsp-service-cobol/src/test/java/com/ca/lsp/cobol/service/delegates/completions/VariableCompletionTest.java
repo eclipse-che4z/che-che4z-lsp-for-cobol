@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -18,18 +18,11 @@ import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.*;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Test to check VariableCompletion
- *
- * @author teman02
- */
+/** Test to check VariableCompletion */
 public class VariableCompletionTest {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -52,14 +45,16 @@ public class VariableCompletionTest {
 
   @Test
   public void testVariableCompletion() {
-    VariableCompletion completion = new VariableCompletion();
     MyDocumentModel document = createModel();
-
+    Set<Completion> completionSet = new HashSet<>();
+    completionSet.add(new VariableCompletion());
+    Completions completions = new Completions(completionSet);
     List<CompletionItem> completionItems =
-        completion.collectCompletions(document, createCompletionParams());
+        completions.collectFor(document, createCompletionParams()).getItems();
 
     assertEquals(2, completionItems.size());
     assertEquals("TBPARM1", completionItems.get(0).getLabel());
+    assertEquals(CompletionItemKind.Variable, completionItems.get(0).getKind());
   }
 
   private CompletionParams createCompletionParams() {
@@ -67,14 +62,33 @@ public class VariableCompletionTest {
   }
 
   private MyDocumentModel createModel() {
-    Map<String, List<Range>> variableDefinitions = new HashMap<>();
-    variableDefinitions.put("TBPARM1", Collections.singletonList(new Range(new Position(5, 9), new Position(5, 16))));
-    variableDefinitions.put("TBPARM2", Collections.singletonList(new Range(new Position(6, 9), new Position(6, 16))));
-    variableDefinitions.put("ATCDEM4", Collections.singletonList(new Range(new Position(7, 9), new Position(7, 16))));
-    variableDefinitions.put("P1PARM1", Collections.singletonList(new Range(new Position(8, 9), new Position(8, 16))));
+    Map<String, List<Location>> variableDefinitions = new HashMap<>();
+    variableDefinitions.put(
+        "TBPARM1",
+        Collections.singletonList(
+            new Location(null, new Range(new Position(5, 9), new Position(5, 16)))));
+    variableDefinitions.put(
+        "TBPARM2",
+        Collections.singletonList(
+            new Location(null, new Range(new Position(6, 9), new Position(6, 16)))));
+    variableDefinitions.put(
+        "ATCDEM4",
+        Collections.singletonList(
+            new Location(null, new Range(new Position(7, 9), new Position(7, 16)))));
+    variableDefinitions.put(
+        "P1PARM1",
+        Collections.singletonList(
+            new Location(null, new Range(new Position(8, 9), new Position(8, 16)))));
 
     AnalysisResult result =
-        new AnalysisResult(Collections.emptyList(), variableDefinitions, Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap());
+        new AnalysisResult(
+            Collections.emptyList(),
+            variableDefinitions,
+            Collections.emptyMap(),
+            Collections.emptyMap(),
+            Collections.emptyMap(),
+            Collections.emptyMap(),
+            Collections.emptyMap());
 
     return new MyDocumentModel(TEXT, result);
   }

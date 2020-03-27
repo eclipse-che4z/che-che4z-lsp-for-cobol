@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2019 Broadcom.
+ *  Copyright (c) 2020 Broadcom.
  *  The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  *  This program and the accompanying materials are made
@@ -15,29 +15,33 @@
  */
 package com.ca.lsp.core.cobol.model;
 
-import java.util.List;
+import com.broadcom.lsp.domain.common.model.Position;
 import lombok.Builder;
 import lombok.Value;
+
+import java.util.List;
 
 @Value
 public class SyntaxError {
   private final Position position;
   private final List<String> ruleStack;
-  private final int type;
   private final String suggestion;
   private final int severity;
+  private final ErrorCode errorCode;
 
-  @Builder(builderMethodName = "syntaxerror")
+  // Please, don't use static imports for this method:
+  // https://github.com/rzwitserloot/lombok/issues/2044
+  @Builder(builderMethodName = "syntaxError")
   public SyntaxError(
-      Position position, List<String> ruleStack, int type, String suggestion, int severity) {
+      Position position,
+      List<String> ruleStack,
+      String suggestion,
+      int severity,
+      ErrorCode errorCode) {
     this.position = position;
     this.ruleStack = ruleStack;
-    this.type = type;
     this.suggestion = suggestion;
     this.severity = severity;
-  }
-
-  public String printSyntaxError() {
-    return super.toString().concat(this.toString());
+    this.errorCode = errorCode;
   }
 }

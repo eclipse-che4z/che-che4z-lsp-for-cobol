@@ -38,6 +38,7 @@ spec:
 """
 
 def projectName = 'lsp-for-cobol'
+def targetFiles = 'lsp-core-cobol-parser/target/**'
 def kubeLabel = projectName + '_pod_' + env.BUILD_NUMBER + '_' + env.BRANCH_NAME
 kubeLabel = kubeLabel.replaceAll(/[^a-zA-Z0-9._-]+/,"")
 
@@ -65,18 +66,20 @@ pipeline {
                 container('maven') {
                     dir('com.ca.lsp.cobol') {
                         sh 'mvn -version'
+                        sh 'set MAVEN_OPTS=-Xms1024m'
                         sh 'mvn clean verify'
                         sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
                     }
                 }
             }
         }
+
         stage('SonarCloud') {
             steps {
                 container('maven') {
                     dir('com.ca.lsp.cobol') {
                         withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
-                            sh "mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN}"
+                            sh "mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
                         }
                     }
                 }
@@ -103,7 +106,7 @@ pipeline {
                     dir('clients/cobol-lsp-vscode-extension') {
                         sh 'npx vsce package'
                         archiveArtifacts "*.vsix"
-                        sh 'mv cobol-language-support*.vsix cobol-language-support_latest.vsix'
+                        sh 'mv cobol-language-support*.vsix cobol-language-support_0.10.1.vsix'
                     }
                 }
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,29 +13,28 @@
  */
 package com.ca.lsp.core.cobol.parser.listener;
 
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.model.Position;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.util.List;
-import java.util.Optional;
 
+@AllArgsConstructor
 public abstract class Listener {
-  protected static final int PREPROCESSING_ERROR_INDEX = -1;
-  protected List<SyntaxError> errorsPipe;
-
-  public Listener(List<SyntaxError> errorsPipe) {
-    this.errorsPipe = errorsPipe;
-  }
-
-  public List<SyntaxError> getErrorsPipe() {
-    return errorsPipe;
-  }
+  @Getter private List<SyntaxError> errorsPipe;
 
   public void syntaxError(
-      int line, int charPositionInLine, String msg, int errorLength, int severity) {
+      String documentName,
+      int line,
+      int charPositionInLine,
+      String msg,
+      int errorLength,
+      int severity) {
     registerError(
         msg,
         new Position(
-            PREPROCESSING_ERROR_INDEX,
+            documentName,
             charPositionInLine,
             (charPositionInLine + errorLength),
             line,
@@ -44,32 +43,25 @@ public abstract class Listener {
   }
 
   public void syntaxError(
-      int line, int charPositionInLine, int charEndingIndex, String msg, int severity) {
+      String documentName,
+      int line,
+      int charPositionInLine,
+      int charEndingIndex,
+      String msg,
+      int severity) {
     registerError(
         msg,
-        new Position(
-            PREPROCESSING_ERROR_INDEX,
-            charPositionInLine,
-            charEndingIndex,
-            line,
-            charPositionInLine),
+        new Position(documentName, charPositionInLine, charEndingIndex, line, charPositionInLine),
         severity);
   }
 
-  public void unregisterError(int line) {
-    Optional<SyntaxError> error =
-        getErrorsPipe().stream().filter(err -> err.getPosition().getLine() == line).findFirst();
-    error.ifPresent(err -> getErrorsPipe().remove(err));
-  }
-
-  protected void registerError(String msg, Position position, int severity) {
+  void registerError(String msg, Position position, int severity) {
     if (getErrorsPipe() != null) {
       getErrorsPipe()
           .add(
-              SyntaxError.syntaxerror()
+              SyntaxError.syntaxError()
                   .position(position)
                   .suggestion(msg)
-                  .type(0)
                   .severity(severity)
                   .build());
     }

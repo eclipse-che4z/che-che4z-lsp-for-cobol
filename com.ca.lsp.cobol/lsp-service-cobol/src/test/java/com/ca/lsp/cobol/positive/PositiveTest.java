@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,67 +13,76 @@
  */
 package com.ca.lsp.cobol.positive;
 
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import com.ca.lsp.cobol.ConfigurableTest;
+import org.eclipse.lsp4j.Diagnostic;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
+import static java.lang.System.getProperty;
+import static java.util.Optional.ofNullable;
 import static org.junit.Assert.assertEquals;
 
 /**
- * This positive test should always pass. If not, then there are some regressions.
- *
- * @author teman02
+ * This class provides capability to run the server for actual cobol files that are provided using
+ * {@link CobolTextRegistry}. The positive test should always pass. If not, then there are some
+ * regressions. The complete error description with the file name logged.
  */
 @RunWith(Parameterized.class)
-public class PositiveTest {
+public class PositiveTest extends ConfigurableTest {
+  private static final String PATH_TO_TEST_RESOURCES = "filesToTestPath";
+  private static List<CobolText> copybooks;
   private CobolText text;
 
   public PositiveTest(CobolText text) {
     this.text = text;
   }
 
+  /**
+   * Retrieve the files to be analyzed by Language Server from {@link CobolTextRegistry} using
+   * file-based implementation.
+   *
+   * @return a collection of objects that would be passed to the constructor one by one.
+   */
   @Parameterized.Parameters
-  public static Collection<Object> textsToTest() {
-    return new ArrayList<>(CobolTextRegistry.INSTANCE.getPositives());
+  public static Collection<Object> retrieveTextsToTest() {
+    CobolTextRegistry registry =
+        new ZipTextRegistry(ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
+    copybooks = registry.getCopybooks();
+
+    return new ArrayList<>(registry.getPositives());
   }
 
   @Test
   public void test() {
-    TestLanguageClient client = startServerAndRunValidation(text.getText());
-
-    waitForDiagnostics(client);
-
-    assertNoSyntaxErrorsFound(client);
+    assertNoSyntaxErrorsFound(analyzeForErrors(text.getFullText(), copybooks));
   }
 
-  private void assertNoSyntaxErrorsFound(TestLanguageClient client) {
-    assertEquals(createErrorMessage(client), 0, client.getDiagnostics().size());
+  private void assertNoSyntaxErrorsFound(List<Diagnostic> diagnostics) {
+    assertEquals(createErrorMessage(diagnostics), 0, diagnostics.size());
   }
 
-  private String createErrorMessage(TestLanguageClient client) {
+  private String createErrorMessage(List<Diagnostic> diagnostics) {
     StringBuilder result = new StringBuilder(text.getFileName());
     result.append(" contains syntax errors:\r\n");
-    client
-        .getDiagnostics()
-        .forEach(
-            it -> {
-              result.append(it.getRange().getStart().getLine() + 1);
-              result.append(":");
-              result.append(it.getRange().getStart().getCharacter());
-              result.append(" - ");
-              result.append(it.getRange().getEnd().getLine() + 1);
-              result.append(":");
-              result.append(it.getRange().getEnd().getCharacter());
-              result.append(" : ");
-              result.append(it.getMessage());
-              result.append("\r\n");
-            });
+    diagnostics.forEach(
+        it -> {
+          result.append(it.getRange().getStart().getLine() + 1);
+          result.append(":");
+          result.append(it.getRange().getStart().getCharacter());
+          result.append(" - ");
+          result.append(it.getRange().getEnd().getLine() + 1);
+          result.append(":");
+          result.append(it.getRange().getEnd().getCharacter());
+          result.append(" : ");
+          result.append(it.getMessage());
+          result.append("\r\n");
+        });
     return result.toString();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,16 +13,20 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.transformer;
 
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CONT_LINE_NO_AREA_A_REGEX;
-
-import com.ca.lsp.core.cobol.parser.listener.FormatListener;
+import com.broadcom.lsp.domain.common.model.Position;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
+
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CONT_LINE_NO_AREA_A_REGEX;
 
 /**
  * Process continuation lines. Any sentence, entry, clause, or phrase that requires more than one
@@ -33,8 +37,6 @@ import org.apache.commons.lang3.StringUtils;
  *
  * <p>If there is no hyphen (-) in the indicator area (column 7) of a line, the last character of
  * the preceding line is assumed to be followed by a space.
- *
- * @author zacan01, teman02
  */
 public class ContinuationLineTransformation implements CobolLinesTransformation {
   private static final int START_INDEX_AREA_A = 4;
@@ -42,35 +44,37 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private static final Pattern CONTINUATION_LINE_PATTERN =
       Pattern.compile(CONT_LINE_NO_AREA_A_REGEX);
 
-  private FormatListener listener;
-
-  public ContinuationLineTransformation(FormatListener listener) {
-    this.listener = listener;
-  }
-
   @Override
-  public List<CobolLine> transformLines(List<CobolLine> lines) {
+  public ResultWithErrors<List<CobolLine>> transformLines(
+      String documentURI, List<CobolLine> lines) {
     List<CobolLine> result = new ArrayList<>();
+    List<SyntaxError> errors = new ArrayList<>();
     CobolLine previousLine = null;
     for (int i = 0; i < lines.size(); i++) {
       CobolLine cobolLine = lines.get(i);
 
-      checkContinuationLine(i, cobolLine);
-      checkIfStringClosedCorrectly(previousLine, i, cobolLine);
+      Optional.ofNullable(checkContinuationLine(documentURI, i, cobolLine)).ifPresent(errors::add);
+      Optional.ofNullable(checkIfStringClosedCorrectly(previousLine, documentURI, i, cobolLine))
+          .ifPresent(errors::add);
 
       previousLine = cobolLine;
       result.add(cobolLine);
     }
-    return result;
+    return new ResultWithErrors<>(result, errors);
   }
 
-  /** Check if line is a continuation one and performs pattern check */
-  private void checkContinuationLine(int lineNumber, CobolLine cobolLine) {
+  /**
+   * Check if line is a continuation one and performs pattern check
+   *
+   * @return a SyntaxError if there is a continuation line error or null if not
+   */
+  private SyntaxError checkContinuationLine(String uri, int lineNumber, CobolLine cobolLine) {
     if (CobolLineTypeEnum.CONTINUATION.equals(cobolLine.getType())) {
 
       // invoke method for noContentInAreaA
-      checkContentAreaAWithContinuationLine(cobolLine, lineNumber);
+      return checkContentAreaAWithContinuationLine(cobolLine, uri, lineNumber);
     }
+    return null;
   }
 
   /**
@@ -78,14 +82,18 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
    * the content area A (7-11) should be blank.
    *
    * @param cobolLine line - a line to be processed
-   * @param lineNumber lineNumber
+   * @param uri - URI of the processing document
+   * @param lineNumber - number of the currently processing line
+   * @return error if found or null
    */
-  private void checkContentAreaAWithContinuationLine(CobolLine cobolLine, int lineNumber) {
+  private SyntaxError checkContentAreaAWithContinuationLine(
+      CobolLine cobolLine, String uri, int lineNumber) {
     String line = cobolLine.toString();
-    final Matcher continuationLineMatcher = CONTINUATION_LINE_PATTERN.matcher(line);
+    Matcher continuationLineMatcher = CONTINUATION_LINE_PATTERN.matcher(line);
     if (!continuationLineMatcher.matches()) {
-      registerContinuationLineError(lineNumber, START_INDEX_AREA_A, countAreaASpaces(line));
+      return registerContinuationLineError(uri, lineNumber, countAreaASpaces(line));
     }
+    return null;
   }
 
   /** Count number of spaces between INDICATOR_AREA and CONTENT_AREA_A */
@@ -99,13 +107,15 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
    * Check and raise an error if indicator area A of current line is not empty and the previous line
    * doesn't end correctly.
    */
-  private void checkIfStringClosedCorrectly(
-      CobolLine lastCobolLine, int lineNumber, final CobolLine currentCobolLine) {
-    if (checkIfLineHasUnclosedString(lastCobolLine)
+  private SyntaxError checkIfStringClosedCorrectly(
+      CobolLine previousCobolLine, String uri, int lineNumber, CobolLine currentCobolLine) {
+    if (checkIfLineHasUnclosedString(previousCobolLine)
         && !CobolLineTypeEnum.CONTINUATION.equals(currentCobolLine.getType())) {
       // there is a string not closed correctly - I'll raise an error
-      registerStringClosingError(lineNumber, getCobolLineTrimmedLength(lastCobolLine));
+      return registerStringClosingError(
+          uri, lineNumber, getCobolLineTrimmedLength(previousCobolLine));
     }
+    return null;
   }
 
   /** Check with a good pattern if there is an unclosed string */
@@ -140,7 +150,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
    * The syntax error should be thrown in the content area B, so it is necessary to remove the
    * comment area from the Cobol line
    *
-   * @param lastCobolLine
+   * @param lastCobolLine - CobolLine that was processed before the current one
    * @return content length without spaces
    */
   private int getCobolLineTrimmedLength(CobolLine lastCobolLine) {
@@ -153,20 +163,28 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
         - 1;
   }
 
-  private void registerStringClosingError(int lineNumber, int cobolLineTrimmedLength) {
-    listener.syntaxError(
-        lineNumber,
-        cobolLineTrimmedLength,
-        cobolLineTrimmedLength,
-        "IGYDS1082-E A period was required.");
+  private SyntaxError registerStringClosingError(
+      String uri, int lineNumber, int cobolLineTrimmedLength) {
+    return SyntaxError.syntaxError()
+        .position(
+            new Position(
+                uri,
+                cobolLineTrimmedLength,
+                cobolLineTrimmedLength,
+                lineNumber,
+                cobolLineTrimmedLength))
+        .suggestion("IGYDS1082-E A period was required.")
+        .severity(1)
+        .build();
   }
 
-  private void registerContinuationLineError(
-      int lineNumber, int startIndexAreaA, int countingSpace) {
-    listener.syntaxError(
-        lineNumber + 1,
-        (END_INDEX_CONTENT_AREA_A - (startIndexAreaA - countingSpace) + 1),
-        END_INDEX_CONTENT_AREA_A,
-        "A continuation line cannot contain values in the Content Area A");
+  private SyntaxError registerContinuationLineError(String uri, int lineNumber, int countingSpace) {
+    int startPosition = END_INDEX_CONTENT_AREA_A - (START_INDEX_AREA_A - countingSpace) + 1;
+    return SyntaxError.syntaxError()
+        .position(
+            new Position(uri, startPosition, END_INDEX_CONTENT_AREA_A, lineNumber, startPosition))
+        .suggestion("A continuation line cannot contain values in the Content Area A")
+        .severity(1)
+        .build();
   }
 }

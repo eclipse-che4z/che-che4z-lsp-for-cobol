@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -28,8 +28,6 @@ import java.util.List;
 /**
  * This class stores a Cobol program text to be processed. Provides a list of lines and text tokens
  * by position.
- *
- * @author zacan01, teman02
  */
 @Data
 @Slf4j
@@ -90,25 +88,33 @@ public class MyDocumentModel {
     }
   }
 
+  private String retrieveToken(Position position, Line route) {
+
+    String beginning = retrieveTokenBeginning(position, route);
+    String ending = retrieveTokenEnding(position, route);
+
+    return beginning + ending;
+  }
+
   private String retrieveTokenBeginning(Position position, Line route) {
-    if (!isCharacterInBounds(position, route)) {
-      return "";
-    }
-    if (isPositionAtDelimiter(position, route)) {
+    if (isPositionIncorrect(position, route)) {
       return "";
     }
     String[] beginning = route.getText().substring(0, position.getCharacter()).split(DELIMITER);
     return beginning.length > 0 ? beginning[beginning.length - 1] : "";
   }
 
-  private String retrieveToken(Position position, Line route) {
-
-    String beginning = retrieveTokenBeginning(position, route);
-
+  private String retrieveTokenEnding(Position position, Line route) {
+    if (isPositionIncorrect(position, route)) {
+      return "";
+    }
     String[] rightPart = route.getText().substring(position.getCharacter()).split(DELIMITER);
 
-    String ending = rightPart.length > 0 ? rightPart[0] : "";
-    return beginning + ending;
+    return rightPart.length > 0 ? rightPart[0] : "";
+  }
+
+  private boolean isPositionIncorrect(Position position, Line route) {
+    return !isCharacterInBounds(position, route) || isPositionAtDelimiter(position, route);
   }
 
   private boolean isCharacterInBounds(Position position, Line route) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,17 +13,16 @@
  */
 package com.ca.lsp.cobol.negative;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
-import static org.junit.Assert.assertEquals;
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.ca.lsp.cobol.ConfigurableTest;
+import com.ca.lsp.cobol.positive.CobolText;
+import com.ca.lsp.cobol.positive.CobolTextRegistry;
+import org.eclipse.lsp4j.Diagnostic;
 
 import java.util.List;
 
-import org.eclipse.lsp4j.Diagnostic;
-
-import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.positive.CobolTextRegistry;
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
+import static org.junit.Assert.assertEquals;
 /**
  * This class is an abstract negative test case and should be instantiated with specifying concrete
  * Cobol files to test. Every heir should also override checkErrors() method to assert the
@@ -38,45 +37,41 @@ import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
  * <p>E - Error
  *
  * <p>S - Severe
- *
- * @author teman02
  */
-public abstract class NegativeTest {
-  private static final List<CobolText> TEXTS = CobolTextRegistry.INSTANCE.getNegatives();
+public abstract class NegativeTest extends ConfigurableTest {
+  private static final List<CobolText> TEXTS =
+      LangServerCtx.getInjector().getInstance(CobolTextRegistry.class).getNegatives();
 
   private String text;
   private int expectedErrorsNumber;
 
-  protected NegativeTest(String fileName, int expectedErrorsNumber) {
+  NegativeTest(String fileName, int expectedErrorsNumber) {
     this.expectedErrorsNumber = expectedErrorsNumber;
     this.text = lookupFile(fileName);
   }
 
   protected void test() {
-    TestLanguageClient client = startServerAndRunValidation(text);
 
-    waitForDiagnostics(client);
+    List<Diagnostic> diagnostics = analyzeForErrors(text);
 
-    asserErrorNumber(client);
+    assertErrorNumber(diagnostics);
 
-    checkErrors(client);
+    checkErrors(diagnostics);
   }
 
   /**
    * Should be overridden to verify the presence of all the required errors.
    *
-   * @param client - The TestLanguageClient instance to retrieve found errors
+   * @param diagnostics - the errors to be checked
    */
-  protected void checkErrors(TestLanguageClient client) {
-    List<Diagnostic> diagnostics = client.getDiagnostics();
+  protected void checkErrors(List<Diagnostic> diagnostics) {
     diagnostics.forEach(System.out::println);
   }
 
   private String lookupFile(String fileName) {
-    return TEXTS
-        .stream()
+    return TEXTS.stream()
         .filter(it -> it.getFileName().equals(fileName))
-        .map(text -> text.getText())
+        .map(CobolText::getFullText)
         .findFirst()
         .orElseThrow(
             () ->
@@ -84,7 +79,7 @@ public abstract class NegativeTest {
                     "The specfied file " + fileName + " does not exist in the given archive"));
   }
 
-  private void asserErrorNumber(TestLanguageClient client) {
-    assertEquals(expectedErrorsNumber, client.getDiagnostics().size());
+  private void assertErrorNumber(List<Diagnostic> diagnostics) {
+    assertEquals(expectedErrorsNumber, diagnostics.size());
   }
 }

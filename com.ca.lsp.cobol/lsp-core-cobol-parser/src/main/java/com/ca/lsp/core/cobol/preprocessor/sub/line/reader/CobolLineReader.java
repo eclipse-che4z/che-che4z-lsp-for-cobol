@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,19 +13,25 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.reader;
 
-import com.ca.lsp.core.cobol.params.CobolParserParams;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
- * Preprocessor, which analyzes and processes line indicators.
+ * Preprocessor, which converts strings with COBOL code into a specific entities; analyzes and
+ * processes line indicators.
  */
 public interface CobolLineReader {
-
-	CobolLine parseLine(String line, int lineNumber, CobolSourceFormatEnum format, CobolParserParams params);
-
-	List<CobolLine> processLines(String lines, CobolSourceFormatEnum format, CobolParserParams params);
-
+  /**
+   * Convert String with COBOL code into CobolLines that are used further in the parsing.
+   *
+   * @param uri - URI of the currently open document
+   * @param lines - a String to be converted into CobolLine list
+   * @return List of COBOL lines with a list of errors if found or an empty list
+   */
+  @Nonnull
+  ResultWithErrors<List<CobolLine>> processLines(@Nullable String uri, @Nonnull String lines);
 }

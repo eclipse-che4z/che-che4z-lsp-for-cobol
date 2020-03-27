@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -31,7 +31,7 @@ public class SnippetCompletionTest {
 
   @Before
   public void prepareProvider() {
-    provider = new SnippetCompletion();
+    provider = new SnippetCompletion(new Snippets());
   }
 
   @Test
@@ -58,7 +58,7 @@ public class SnippetCompletionTest {
 
   @Test
   public void testGetSortOrderPrefix() {
-    assertEquals("2", provider.getSortOrderPrefix());
+    assertEquals("3", provider.getSortOrderPrefix());
   }
 
   @Test

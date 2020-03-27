@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,23 +13,21 @@
  */
 package com.ca.lsp.core.cobol.parser.listener;
 
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.model.Position;
+import org.antlr.v4.runtime.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.antlr.v4.runtime.BaseErrorListener;
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
 
 public class VerboseListener extends BaseErrorListener {
-  private List<SyntaxError> errorspipe;
+  private final List<SyntaxError> errorspipe;
+  private final String documentUri;
 
-  public VerboseListener(List<SyntaxError> errors) {
+  public VerboseListener(List<SyntaxError> errors, String documentUri) {
     errorspipe = errors;
+    this.documentUri = documentUri;
   }
 
   @Override
@@ -47,17 +45,16 @@ public class VerboseListener extends BaseErrorListener {
       CommonToken wrongToken = (CommonToken) offendingSymbol;
       Position position =
           new Position(
-              wrongToken.getTokenIndex(),
+              documentUri,
               wrongToken.getStartIndex(),
               wrongToken.getStopIndex(),
               wrongToken.getLine(),
               wrongToken.getCharPositionInLine());
       errorspipe.add(
-          SyntaxError.syntaxerror()
+          SyntaxError.syntaxError()
               .position(position)
               .ruleStack(stack)
               .suggestion(msg)
-              .type(wrongToken.getType())
               .severity(1)
               .build());
     }
@@ -65,13 +62,12 @@ public class VerboseListener extends BaseErrorListener {
       stack.add(((Lexer) recognizer).getText());
       Position position =
           new Position(
-              charPositionInLine, charPositionInLine, charPositionInLine, line, charPositionInLine);
+              documentUri, charPositionInLine, charPositionInLine, line, charPositionInLine);
       errorspipe.add(
-          SyntaxError.syntaxerror()
+          SyntaxError.syntaxError()
               .position(position)
               .ruleStack(stack)
               .suggestion(msg.concat(" on ").concat(stack.get(stack.size() - 1)))
-              .type(0)
               .severity(1)
               .build());
     }

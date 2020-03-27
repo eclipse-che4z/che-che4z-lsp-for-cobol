@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -15,29 +15,18 @@ package com.ca.lsp.cobol;
 
 import com.ca.lsp.cobol.negative.NegativeTestSuite;
 import com.ca.lsp.cobol.positive.PositiveTest;
-import com.ca.lsp.cobol.service.MyDocumentModelTest;
-import com.ca.lsp.cobol.service.MyTextDocumentServiceTest;
-import com.ca.lsp.cobol.service.DefinitionsAndUsagesTest;
+import com.ca.lsp.cobol.service.*;
 import com.ca.lsp.cobol.service.delegates.HighlightsTest;
-import com.ca.lsp.cobol.service.delegates.LanguageEnginesTest;
-import com.ca.lsp.cobol.service.delegates.ValidationTest;
-import com.ca.lsp.cobol.service.delegates.completions.CompletionsChainTest;
-import com.ca.lsp.cobol.service.delegates.completions.ParagraphCompletionTest;
-import com.ca.lsp.cobol.service.delegates.completions.SnippetCompletionTest;
-import com.ca.lsp.cobol.service.delegates.completions.VariableCompletionTest;
-import com.ca.lsp.cobol.service.delegates.references.ReferencesTest;
-import com.ca.lsp.cobol.usecases.TestResponsesNotContainLineBreaks;
+import com.ca.lsp.cobol.service.delegates.actions.CodeActionsTest;
+import com.ca.lsp.cobol.service.delegates.completions.*;
+import com.ca.lsp.cobol.service.delegates.references.DocumentOccurrencesTest;
 import com.ca.lsp.cobol.usecases.UseCaseSuite;
 import com.ca.lsp.cobol.utils.KeywordsTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-/**
- * The suite for all the tests in project that should be run.
- *
- * @author teman02
- */
+/** The suite for all the tests in project that should be run. */
 @RunWith(Suite.class)
 @SuiteClasses({
   PositiveTest.class,
@@ -46,15 +35,26 @@ import org.junit.runners.Suite.SuiteClasses;
   MyTextDocumentServiceTest.class,
   UseCaseSuite.class,
   KeywordsTest.class,
-  ValidationTest.class,
-  LanguageEnginesTest.class,
   VariableCompletionTest.class,
   CompletionsChainTest.class,
   SnippetCompletionTest.class,
   ParagraphCompletionTest.class,
-  ReferencesTest.class,
+  CopybookCompletionTest.class,
+  DocumentOccurrencesTest.class,
   DefinitionsAndUsagesTest.class,
-  TestResponsesNotContainLineBreaks.class,
-  HighlightsTest.class
+  WorkspaceServiceTest.class,
+  CompletionResolutionTest.class,
+  CopybookServiceTest.class,
+  CopybookServiceE2ETest.class,
+  DependencyServiceTest.class,
+  CopybookSearchWithoutConfigTest.class,
+  HighlightsTest.class,
+  MultiDocumentDefinitionTest.class,
+  LangServerBootstrapTest.class,
+  DocumentExtensionTests.class,
+  MyLanguageServerImplTest.class,
+  DidChangeConfigurationTest.class,
+  InitializeConfigurationTest.class,
+  CodeActionsTest.class
 })
 public class AllTests {}

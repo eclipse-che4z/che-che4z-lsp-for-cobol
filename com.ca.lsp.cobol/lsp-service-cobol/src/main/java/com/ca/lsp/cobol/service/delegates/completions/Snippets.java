@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,14 +13,13 @@
  */
 package com.ca.lsp.cobol.service.delegates.completions;
 
+import com.google.inject.Singleton;
+
 import java.io.InputStream;
 
-/**
- * This class is a provider for Cobol Snippets
- *
- * @author pucgi01
- */
-public class Snippets extends AbstractCompletionStorage {
+/** This class is a provider for Cobol Snippets */
+@Singleton
+public class Snippets extends CompletionStorage {
   private static final String SNIPPETS_FILE_PATH = "LanguageSnippets.txt";
 
   @Override

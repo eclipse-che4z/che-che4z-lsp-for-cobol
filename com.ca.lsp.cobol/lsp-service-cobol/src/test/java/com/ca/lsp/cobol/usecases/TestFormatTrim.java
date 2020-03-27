@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,11 +13,11 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import com.ca.lsp.cobol.service.IMyLanguageServer;
-import com.ca.lsp.cobol.service.MyTextDocumentService;
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
-import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
 import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,14 +31,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.waitForDiagnostics;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class TestFormatTrim {
+public class TestFormatTrim extends ConfigurableTest {
   private static final String ID = "id";
 
-  private MyTextDocumentService service;
+  private TextDocumentService service;
   private TestLanguageClient client;
 
   private static final Pattern RTRIM = Pattern.compile("\\s+$");
@@ -52,9 +52,9 @@ public class TestFormatTrim {
 
   @Before
   public void createService() {
-    client = new TestLanguageClient();
-    IMyLanguageServer server = new TestLanguageServer(client);
-    service = new MyTextDocumentService(server);
+    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
+    client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    client.clean();
     service.didOpen(new DidOpenTextDocumentParams(new TextDocumentItem(ID, "COBOL", 1, TEXT)));
   }
 

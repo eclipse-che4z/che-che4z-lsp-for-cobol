@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,76 +13,78 @@
  */
 package com.ca.lsp.core.cobol.engine;
 
-import com.ca.lsp.core.cobol.params.CobolParserParams;
-import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
+import com.ca.lsp.core.cobol.model.PreprocessedInput;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolLexer;
 import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.parser.listener.FormatListener;
-import com.ca.lsp.core.cobol.parser.listener.SemanticListener;
 import com.ca.lsp.core.cobol.parser.listener.VerboseListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
-import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
-import com.ca.lsp.core.cobol.semantics.LanguageContext;
-import com.ca.lsp.core.cobol.semantics.CobolParagraphContext;
-import com.ca.lsp.core.cobol.semantics.CobolVariableContext;
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategy;
 import com.ca.lsp.core.cobol.visitor.CobolVisitor;
-import com.google.common.collect.Lists;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * This class is responsible for run the syntax and semantic analysis of an input cobol document.
+ * Its run method used by the service facade layer CobolLanguageEngineFacade.
+ */
 @Slf4j
-@RequiredArgsConstructor
+@Singleton
 public class CobolLanguageEngine {
 
-  private final CobolPreprocessor.CobolSourceFormatEnum sourceFormat;
-  @Getter private List<SyntaxError> errors = new ArrayList<>();
-  @Getter private LanguageContext variables = new CobolVariableContext();
-  @Getter private LanguageContext paragraphs = new CobolParagraphContext();
+  private CobolPreprocessor preprocessor;
 
-  @SuppressWarnings("unused")
-  private CobolParserParams createDefaultParams(final File cobolFile) {
-    final CobolParserParams result = new CobolParserParamsImpl();
-    final File copyBooksDirectory = cobolFile.getParentFile();
-    result.setCopyBookDirectories(Lists.newArrayList(copyBooksDirectory));
-    return result;
+  @Inject
+  public CobolLanguageEngine(CobolPreprocessor preprocessor) {
+    this.preprocessor = preprocessor;
   }
 
-  public void run(String in) {
-    CobolPreprocessorImpl preprocessor = new CobolPreprocessorImpl();
-    preprocessor.setFormatErrors(new FormatListener(errors));
-    final String preProcessedInput = preprocessor.process(in, sourceFormat);
-    doParse(preProcessedInput);
-  }
+  /**
+   * Perform syntax and semantic analysisi for the given text document
+   *
+   * @param documentUri unique resource identifier of the processed document
+   * @param text the content of the document that should be processed
+   * @param textDocumentSyncType the document sync type that can be (DID_OPEN|DID_CHANGE)
+   * @return Semantic information wrapper object and list of syntax error that might send back to
+   *     the client
+   */
+  public ResultWithErrors<SemanticContext> run(
+      String documentUri, String text, String textDocumentSyncType) {
 
-  private void doParse(String preProcessedInput) {
-    final CobolLexer lexer = new CobolLexer(CharStreams.fromString(preProcessedInput));
+    ResultWithErrors<PreprocessedInput> preProcessedInput =
+        preprocessor.process(documentUri, text, textDocumentSyncType);
+
+    CobolLexer lexer =
+        new CobolLexer(CharStreams.fromString(preProcessedInput.getResult().getInput()));
+
+    List<SyntaxError> errors = new ArrayList<>(preProcessedInput.getErrors());
 
     lexer.removeErrorListeners();
-    lexer.addErrorListener(new VerboseListener(errors));
+    lexer.addErrorListener(new VerboseListener(errors, documentUri));
 
-    final CommonTokenStream tokens = new CommonTokenStream(lexer);
-    final CobolParser parser = new CobolParser(tokens);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    CobolParser parser = new CobolParser(tokens);
 
     parser.removeErrorListeners();
-    parser.addErrorListener(new VerboseListener(errors));
+    parser.addErrorListener(new VerboseListener(errors, documentUri));
+    parser.setErrorHandler(new CobolErrorStrategy());
 
-    CobolErrorStrategy strategy = new CobolErrorStrategy();
-    parser.setErrorHandler(strategy);
     CobolParser.StartRuleContext tree = parser.startRule();
+    CobolVisitor visitor =
+        new CobolVisitor(documentUri, preProcessedInput.getResult().getSemanticContext());
+    visitor.visit(tree);
 
-    CobolVisitor tourist = new CobolVisitor();
-    tourist.setSemanticErrors(new SemanticListener(errors));
-    tourist.setVariableContext((CobolVariableContext) variables);
-    tourist.setParagraphContext((CobolParagraphContext) paragraphs);
-    tourist.visit(tree);
-    errors.forEach(errs -> LOG.debug(errs.printSyntaxError()));
+    errors.addAll(visitor.getErrors());
+
+    errors.forEach(err -> LOG.debug(err.toString()));
+    return new ResultWithErrors<>(preProcessedInput.getResult().getSemanticContext(), errors);
   }
 }

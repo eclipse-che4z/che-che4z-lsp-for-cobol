@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,21 +13,15 @@
  */
 package com.ca.lsp.cobol.service.delegates.completions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import com.ca.lsp.cobol.service.MyDocumentModel;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.eclipse.lsp4j.CompletionItem;
-import org.eclipse.lsp4j.CompletionParams;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
-import org.eclipse.lsp4j.TextDocumentIdentifier;
+import org.eclipse.lsp4j.*;
 import org.junit.Test;
+
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /** Test to check ParagraphCompletion */
 public class ParagraphCompletionTest {
@@ -53,11 +47,12 @@ public class ParagraphCompletionTest {
    */
   @Test
   public void testParagraphCompletion() {
-    ParagraphCompletion completion = new ParagraphCompletion();
     MyDocumentModel document = createModel();
 
-    List<CompletionItem> completionItems =
-        completion.collectCompletions(document, createCompletionParams());
+    Set<Completion> completionSet = new HashSet<>();
+    completionSet.add(new ParagraphCompletion());
+    Completions completions = new Completions(completionSet);
+    List<CompletionItem> completionItems = completions.collectFor(document, createCompletionParams()).getItems();
 
     assertEquals(2, completionItems.size());
     assertTrue(
@@ -68,6 +63,8 @@ public class ParagraphCompletionTest {
         "000-Main-Logic",
         completionItems.get(1).getLabel().contains("100-Test")
             || completionItems.get(1).getLabel().contains("000-Main-Logic"));
+
+    assertEquals(CompletionItemKind.Method, completionItems.get(0).getKind());
   }
 
   private CompletionParams createCompletionParams() {
@@ -75,13 +72,15 @@ public class ParagraphCompletionTest {
   }
 
   private MyDocumentModel createModel() {
-    Map<String, List<Range>> paragraphDefinitions = new HashMap<>();
+    Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
     paragraphDefinitions.put(
         "000-Main-Logic",
-        Collections.singletonList(new Range(new Position(7, 6), new Position(7, 20))));
+        Collections.singletonList(
+            new Location(null, new Range(new Position(7, 6), new Position(7, 20)))));
     paragraphDefinitions.put(
         "100-Test",
-        Collections.singletonList(new Range(new Position(10, 6), new Position(10, 14))));
+        Collections.singletonList(
+            new Location(null, new Range(new Position(10, 6), new Position(10, 14)))));
 
     AnalysisResult result =
         new AnalysisResult(
@@ -89,6 +88,8 @@ public class ParagraphCompletionTest {
             Collections.emptyMap(),
             Collections.emptyMap(),
             paragraphDefinitions,
+            Collections.emptyMap(),
+            Collections.emptyMap(),
             Collections.emptyMap());
 
     return new MyDocumentModel(TEXT, result);

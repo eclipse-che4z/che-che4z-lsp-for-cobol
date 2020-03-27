@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,22 +13,22 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import com.ca.lsp.cobol.ConfigurableTest;
+import com.ca.lsp.cobol.positive.CobolText;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.fail;
 
-/**
- * This class is a base for use cases that check the if some text contains syntax errors.
- *
- * @author teman02
- */
-public abstract class NegativeUseCase {
+/** This class is a base for use cases that check the if some text contains syntax errors. */
+@Slf4j
+public abstract class NegativeUseCase extends ConfigurableTest {
 
   protected String text;
 
@@ -37,23 +37,26 @@ public abstract class NegativeUseCase {
   }
 
   protected void test() {
-    TestLanguageClient client = startServerAndRunValidation(text);
-
-    waitForDiagnostics(client);
-
-    Range range = retrieveRange(client);
-
-    assertRange(range);
+    test(emptyList());
   }
 
-  protected abstract void assertRange(Range range);
+  protected void test(List<CobolText> copybooks) {
+    List<Range> ranges = retrieveRanges(analyzeForErrors(text, copybooks));
+    if (ranges.isEmpty()) {
+      fail("No diagnostics received");
+    }
+    assertRanges(ranges);
+  }
 
-  protected Range retrieveRange(TestLanguageClient client) {
-    List<Diagnostic> diagnostics = client.getDiagnostics();
+  protected abstract void assertRanges(List<Range> range);
+
+  private List<Range> retrieveRanges(List<Diagnostic> diagnostics) {
     if (diagnostics.isEmpty()) {
       fail("No diagnostics received");
     }
-    Diagnostic diagnostic = diagnostics.get(0);
-    return diagnostic.getRange();
+    return diagnostics.stream()
+        .peek(it -> log.info(it.toString()))
+        .map(Diagnostic::getRange)
+        .collect(Collectors.toList());
   }
 }

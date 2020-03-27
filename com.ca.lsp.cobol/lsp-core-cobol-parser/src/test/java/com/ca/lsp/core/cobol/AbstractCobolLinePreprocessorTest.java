@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,38 +13,20 @@
  */
 package com.ca.lsp.core.cobol;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.ca.lsp.core.cobol.params.impl.CobolParserParamsImpl;
-import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.parser.listener.FormatListener;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
+import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImpl;
 
+import java.util.List;
+
 public abstract class AbstractCobolLinePreprocessorTest {
 
-  protected FormatListener listener;
-
-  public void eraseListener() {
-    listener = new FormatListener(new ArrayList<SyntaxError>());
-  }
-
-  protected List<CobolLine> processText(String text) {
-    CobolLineReaderImpl reader = new CobolLineReaderImpl(listener);
-    List<CobolLine> processed =
-        reader.processLines(text, CobolSourceFormatEnum.FIXED, new CobolParserParamsImpl());
-    return processed;
+  protected ResultWithErrors<List<CobolLine>> processText(String text) {
+    CobolLineReaderImpl reader = new CobolLineReaderImpl();
+    return reader.processLines(null, text);
   }
 
   protected String reduceLines(List<String> lines) {
-    return lines.stream().reduce((x, y) -> x + "\r\n" + y).get();
-  }
-
-  protected void checkNoErrorsFound() {
-    assertEquals(0, listener.getErrorsPipe().size());
+    return lines.stream().reduce((x, y) -> x + "\r\n" + y).orElse("");
   }
 }

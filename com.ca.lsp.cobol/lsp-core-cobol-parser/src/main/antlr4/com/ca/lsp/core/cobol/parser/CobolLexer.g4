@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -195,7 +195,6 @@ END_OF_PAGE : E N D MINUSCHAR O F MINUSCHAR P A G E;
 END_PERFORM : E N D MINUSCHAR P E R F O R M;
 END_READ : E N D MINUSCHAR R E A D;
 END_RECEIVE : E N D MINUSCHAR R E C E I V E;
-END_REMARKS : E N D MINUSCHAR R E M A R K S;
 END_RETURN : E N D MINUSCHAR R E T U R N;
 END_REWRITE : E N D MINUSCHAR R E W R I T E;
 END_SEARCH : E N D MINUSCHAR S E A R C H;
@@ -418,7 +417,6 @@ RELATIVE : R E L A T I V E;
 RELEASE : R E L E A S E;
 RELOAD: R E L O A D;
 REMAINDER : R E M A I N D E R;
-REMARKS : R E M A R K S;
 REMOVAL : R E M O V A L;
 REMOVE : R E M O V E;
 RENAMES : R E N A M E S;
@@ -571,8 +569,8 @@ ASTERISKCHAR : '*';
 DOUBLEASTERISKCHAR : '**';
 COLONCHAR : ':';
 COMMACHAR : ',';
-COMMENTENTRYTAG : '*>CE';
 COMMENTTAG : '*>';
+COMMENTENTRYTAG : '*>CE';
 DOLLARCHAR : '$';
 DOUBLEQUOTE : '"';
 // period full stopPosition
@@ -607,8 +605,8 @@ NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 EXECCICSLINE : EXECCICSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
 EXECSQLIMSLINE : EXECSQLIMSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
 EXECSQLLINE : EXECSQLTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
-COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
 COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
+COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
 WS : [ \t\f;]+ -> channel(HIDDEN);
 SEPARATOR : ', ' -> channel(HIDDEN);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -16,7 +16,7 @@ package com.ca.lsp.cobol.service.delegates.validations;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.Location;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,14 +27,18 @@ import java.util.Set;
 @AllArgsConstructor
 public class AnalysisResult {
   private List<Diagnostic> diagnostics;
-  private Map<String, List<Range>> variableDefinitions;
-  private Map<String, List<Range>> variableUsages;
-  private Map<String, List<Range>> paragraphDefinitions;
-  private Map<String, List<Range>> paragraphUsages;
+  private Map<String, List<Location>> variableDefinitions;
+  private Map<String, List<Location>> variableUsages;
+  private Map<String, List<Location>> paragraphDefinitions;
+  private Map<String, List<Location>> paragraphUsages;
+  private Map<String, List<Location>> copybookDefinitions;
+  private Map<String, List<Location>> copybookUsages;
 
   public static AnalysisResult empty() {
     return new AnalysisResult(
         Collections.emptyList(),
+        Collections.emptyMap(),
+        Collections.emptyMap(),
         Collections.emptyMap(),
         Collections.emptyMap(),
         Collections.emptyMap(),

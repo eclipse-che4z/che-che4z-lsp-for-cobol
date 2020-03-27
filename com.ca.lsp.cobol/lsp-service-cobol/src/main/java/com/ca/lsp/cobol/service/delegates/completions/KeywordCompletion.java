@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -14,30 +14,45 @@
 package com.ca.lsp.cobol.service.delegates.completions;
 
 import com.ca.lsp.cobol.service.MyDocumentModel;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import org.eclipse.lsp4j.CompletionItemKind;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 
-class KeywordCompletion extends AbstractCompletion {
-  private static final Keywords KEYWORDS = new Keywords();
+@Singleton
+public class KeywordCompletion implements Completion {
+  private CompletionStorage keywords;
 
-  @Override
-  Collection<String> getCompletionSource(MyDocumentModel document) {
-    return KEYWORDS.getLabels();
+  @Inject
+  KeywordCompletion(@Named("Keywords") CompletionStorage keywords) {
+    this.keywords = keywords;
   }
 
+  @Nonnull
   @Override
-  String tryResolve(String label) {
-    return KEYWORDS.getInformationFor(label);
+  public Collection<String> getCompletionSource(MyDocumentModel document) {
+    return keywords.getLabels();
   }
 
+  @Nullable
   @Override
-  protected String getSortOrderPrefix() {
-    return "3"; // Keywords should go after Paragraphs in the completions list
+  public String tryResolve(@Nonnull String label) {
+    return keywords.getInformationFor(label);
   }
 
+  @Nonnull
   @Override
-  protected CompletionItemKind getKind() {
+  public String getSortOrderPrefix() {
+    return "4"; // Keywords should go after Copybooks in the completions list
+  }
+
+  @Nonnull
+  @Override
+  public CompletionItemKind getKind() {
     return CompletionItemKind.Keyword;
   }
 }

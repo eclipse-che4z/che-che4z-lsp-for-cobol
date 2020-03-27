@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -14,12 +14,13 @@
 
 package com.ca.lsp.cobol.service.delegates;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.createServer;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.runTextValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.runTextValidation;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.waitForDiagnostics;
 
+import com.broadcom.lsp.cdi.LangServerCtx;
+import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
-import com.ca.lsp.cobol.usecases.UseCaseUtils;
+import com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -35,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  * Testing Document Highlighting with a variable, position is passed in INNER1_POSITION and the
  * EXPECTED_RANGES is where the expected highlighting is to be enabled
  */
-public class HighlightsTest {
+public class HighlightsTest extends ConfigurableTest {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -74,8 +75,9 @@ public class HighlightsTest {
 
   @Before
   public void initializeService() {
-    TestLanguageClient client = new TestLanguageClient();
-    service = createServer(client);
+    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
+    TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    client.clean();
     runTextValidation(service, TEXT);
     waitForDiagnostics(client);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -27,8 +27,6 @@ import static org.junit.Assert.fail;
 
 /**
  * This test check if the language keywords file contains all the words that the Cobol Lexer uses.
- *
- * @author teman02
  */
 public class KeywordsTest {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -15,34 +15,35 @@ package com.ca.lsp.cobol.service.delegates.completions;
 
 import com.ca.lsp.cobol.service.MyDocumentModel;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
+import com.google.inject.Singleton;
+import org.eclipse.lsp4j.CompletionItemKind;
+
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
-import org.eclipse.lsp4j.CompletionItemKind;
 
-public class ParagraphCompletion extends AbstractCompletion {
+@Singleton
+public class ParagraphCompletion implements Completion {
 
+  @Nonnull
   @Override
-  Collection<String> getCompletionSource(MyDocumentModel document) {
+  public Collection<String> getCompletionSource(MyDocumentModel document) {
     return Optional.ofNullable(document)
         .map(MyDocumentModel::getAnalysisResult)
         .map(AnalysisResult::getParagraphs)
         .orElse(Collections.emptySet());
   }
 
+  @Nonnull
   @Override
-  String tryResolve(String label) {
-    // Cannot resolve description for this type of completion 
-    return null;
-  }
-
-  @Override
-  protected String getSortOrderPrefix() {
+  public String getSortOrderPrefix() {
     return "1"; // paragraphs are supposed to be the second in the completions list
   }
 
+  @Nonnull
   @Override
-  protected CompletionItemKind getKind() {
+  public CompletionItemKind getKind() {
     return CompletionItemKind.Method;
   }
 }

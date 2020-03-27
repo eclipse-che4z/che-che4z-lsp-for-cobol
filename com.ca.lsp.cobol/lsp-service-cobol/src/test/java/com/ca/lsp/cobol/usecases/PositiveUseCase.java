@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,40 +13,43 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import com.ca.lsp.cobol.ConfigurableTest;
+import com.ca.lsp.cobol.positive.CobolText;
+import com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
+import java.util.List;
+
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 
-public abstract class PositiveUseCase {
+/**
+ * This class is a base for use cases that check the if some text does not contain any syntax
+ * errors.
+ */
+public abstract class PositiveUseCase extends ConfigurableTest {
   private String text;
 
   PositiveUseCase(String text) {
     this.text = text;
   }
 
-  protected String getText() {
-    return text;
-  }
-
-  protected void setText(String text) {
+  void setText(String text) {
     this.text = text;
   }
 
   protected void test() {
-    TestLanguageClient client = startServerAndRunValidation(text);
-
-    waitForDiagnostics(client);
-
-    assertEquals(createMessage(client), 0, client.getDiagnostics().size());
+    test(emptyList());
   }
 
-  private String createMessage(TestLanguageClient client) {
-    return client
-        .getDiagnostics()
-        .stream()
+  protected void test(List<CobolText> copybooks) {
+    List<Diagnostic> diagnostics = UseCaseUtils.analyzeForErrors(text, copybooks);
+
+    assertEquals(createMessage(diagnostics), 0, diagnostics.size());
+  }
+
+  private String createMessage(List<Diagnostic> diagnostics) {
+    return diagnostics.stream()
         .map(Diagnostic::getMessage)
         .reduce((x, y) -> x + "\r\n" + y)
         .orElse("");

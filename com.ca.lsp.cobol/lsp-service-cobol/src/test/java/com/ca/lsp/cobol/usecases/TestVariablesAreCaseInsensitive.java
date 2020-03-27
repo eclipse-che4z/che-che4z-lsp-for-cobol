@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2019 Broadcom.
+ *  Copyright (c) 2020 Broadcom.
  *  The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  *  This program and the accompanying materials are made
@@ -16,15 +16,9 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.junit.Test;
 
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.startServerAndRunValidation;
-import static com.ca.lsp.cobol.usecases.UseCaseUtils.waitForDiagnostics;
-import static org.junit.Assert.assertEquals;
-
-/** */
-public class TestVariablesAreCaseInsensitive {
+public class TestVariablesAreCaseInsensitive extends PositiveUseCase {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -48,12 +42,12 @@ public class TestVariablesAreCaseInsensitive {
           + "           Move INNER2 of outer2 to Str.\n"
           + "       End program ProgramId.";
 
+  public TestVariablesAreCaseInsensitive() {
+    super(TEXT);
+  }
+
   @Test
   public void test() {
-    TestLanguageClient client = startServerAndRunValidation(TEXT);
-
-    waitForDiagnostics(client);
-
-    assertEquals(0, client.getReceivedDiagnostics().get(0).getDiagnostics().size());
+    super.test();
   }
 }

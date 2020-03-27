@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,13 +13,21 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
+import lombok.experimental.UtilityClass;
+
+import javax.annotation.Nonnull;
+
+/** This utility class provides functions that are useful for pre-processing a COBOL document */
+@UtilityClass
 public class PreprocessorStringUtils {
-
-  private PreprocessorStringUtils() {
-    throw new IllegalStateException("Utility class");
-  }
-
-  public static String trimQuotes(final String input) {
-    return input.replaceAll("^[\"']|[\"']$", "");
+  /**
+   * Remove leading quote char from the string
+   *
+   * @param line - string to process
+   * @return a string without leading quote char
+   */
+  @Nonnull
+  public String trimQuotes(@Nonnull String line) {
+    return line.replaceAll("^[\"']|[\"']$", "");
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -26,8 +26,6 @@ import org.junit.Test;
  *
  * <p>45 IGYDS1089-S ""DEENDING"" was invalid. Scanning was resumed at the next area ""A"" item,
  * level-number, or the start of the next clause."
- *
- * @author teman02
  */
 public class Chetest1Test extends NegativeTest {
   private static final String FILE_NAME = "CHETEST1.cbl";

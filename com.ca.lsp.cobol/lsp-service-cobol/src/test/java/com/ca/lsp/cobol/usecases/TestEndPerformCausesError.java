@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,16 +13,14 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import static org.junit.Assert.assertEquals;
-
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
-/**
- * This use case checks if there is an error being thrown if the END-PERFORM token is missing
- *
- * @author teman02
- */
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+
+/** This use case checks if there is an error being thrown if the END-PERFORM token is missing */
 public class TestEndPerformCausesError extends NegativeUseCase {
 
   private static final String TEXT =
@@ -51,7 +49,8 @@ public class TestEndPerformCausesError extends NegativeUseCase {
   }
 
   @Override
-  protected void assertRange(Range range) {
+  protected void assertRanges(List<Range> ranges) {
+    Range range = ranges.get(0);
     // The position of dot at the end of line "INITIALIZE ID4(ROW-SUB)."
     assertEquals(8, range.getStart().getLine());
     assertEquals(46, range.getStart().getCharacter());
