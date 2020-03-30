@@ -56,6 +56,8 @@ public interface CopybookEventFactory {
         return new RunAnalysisEvent();
       case FETCHED_SETTINGS_EVENT:
         return FetchedSettingsEvent.builder().build();
+      case COPYBOOK_DEP_EVENT:
+        return CopybookDepEvent.builder().build();
       default:
         throw new NoSuchElementException(
             String.format("No DataEventType found for %s,%s", choice.getId(), choice.name()));

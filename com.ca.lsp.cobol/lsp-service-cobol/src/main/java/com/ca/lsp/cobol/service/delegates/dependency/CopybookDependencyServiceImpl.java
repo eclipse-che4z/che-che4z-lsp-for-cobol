@@ -16,10 +16,12 @@
 package com.ca.lsp.cobol.service.delegates.dependency;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.CopybookDepEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.CopybookServiceImpl;
+import com.ca.lsp.cobol.service.TextDocumentSyncType;
 import com.google.common.annotations.Beta;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -43,7 +45,8 @@ import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
 /** This class is responsible for everything is related with the copybook dependency manangement */
 @Slf4j
 @Singleton
-public class CopybookDependencyServiceImpl implements CopybookDependencyService {
+public class CopybookDependencyServiceImpl
+    implements CopybookDependencyService, EventObserver<CopybookDepEvent> {
   private static final String COBDEPS = ".cobdeps";
   private static final String COPYBOOK_FOLDER_NAME = ".copybooks";
   private static final String DEP_EXTENSION = ".dep";
@@ -158,7 +161,7 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
   public void observerCallback(CopybookDepEvent event) {
     // we are not checking .dep on DID_OPEN because on DID_OPEN the file is updated with the
     // required copybooks
-    if (!event.getTextDocumentSync().equals("DID_OPEN")) {
+    if (event.getTextDocumentSync().equals(TextDocumentSyncType.DID_CHANGE.name())) {
 
       Path path =
           findCopybook(
@@ -189,13 +192,12 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
    * @param copybookName
    */
   private void removeCpyFromDep(Path dependencyFilePath, String copybookName) {
-    List<String> result = null;
     try {
-      result = Files.readAllLines(dependencyFilePath);
+      List<String> result = Files.readAllLines(dependencyFilePath);
       List<String> updatedLines =
           result.stream().filter(s -> !s.equals(copybookName)).collect(Collectors.toList());
       // don't write if the lines were not modify
-      if (updatedLines != result) {
+      if (!updatedLines.equals(result)) {
         Files.write(
             dependencyFilePath,
             updatedLines,
@@ -278,7 +280,7 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
                         + profile
                         + filesystemSeparator()
                         + it))
-        .filter(Objects::nonNull)
+        .filter(Files::exists)
         .collect(Collectors.toList());
   }
 

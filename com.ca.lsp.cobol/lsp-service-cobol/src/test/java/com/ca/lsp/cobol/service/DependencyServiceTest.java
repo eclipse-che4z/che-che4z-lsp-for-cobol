@@ -18,32 +18,29 @@ package com.ca.lsp.cobol.service;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.CopybookDepEvent;
+import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.ca.lsp.cobol.FileSystemConfiguration;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import com.google.inject.Guice;
 import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
-import org.awaitility.Duration;
-import org.awaitility.core.ConditionTimeoutException;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import static java.util.Collections.unmodifiableList;
 import static junit.framework.TestCase.assertTrue;
-import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /** This class represent all the unit test for the copybook dependency managament service */
 @Slf4j
@@ -66,6 +63,15 @@ public class DependencyServiceTest extends FileSystemConfiguration {
     dependencyService.setWorkspaceFolderPaths(Collections.singletonList(workspaceFolder));
   }
 
+  @Test
+  public void databusSubscriptionTest() {
+    DataBusBroker brokerMock = mock(DataBusBroker.class);
+
+    CopybookDependencyServiceImpl dependencyServiceT =
+        new CopybookDependencyServiceImpl(brokerMock, null);
+    verify(brokerMock).subscribe(DataEventType.COPYBOOK_DEP_EVENT, dependencyServiceT);
+  }
+
   /**
    * This test proves that the .dep file should update and remove the copybooks which were already
    * downloaded and present in the .copybook directory
@@ -78,15 +84,14 @@ public class DependencyServiceTest extends FileSystemConfiguration {
     int numberOfElements = getNumberOfElementsFromDepFile(depFileReference);
 
     // trigger the event which will update the .dep file @link{CopybookDependencyServiceImpl.class}
-    broker.postData(
+    dependencyService.observerCallback(
         CopybookDepEvent.builder()
             .copybookName(CPY_OUTER_NAME_ONLY2)
             .textDocumentSync("DID_CHANGE")
             .documentUri(DOCUMENT_URI)
             .build());
 
-    // check if the copybook name was deleted and the .dep file contains no elements
-    waitAndAssert(numberOfElements - 1, depFileReference);
+    assertEquals(numberOfElements - 1, getNumberOfElementsFromDepFile(depFileReference));
   }
 
   /**
@@ -155,18 +160,5 @@ public class DependencyServiceTest extends FileSystemConfiguration {
   private Path createDependencyFile(String depFileName) {
     dependencyService.generateDependencyFile(depFileName);
     return Paths.get(depenencyFileFolderPath + filesystemSeparator() + depFileName + DEP_EXTENSION);
-  }
-
-  private void waitAndAssert(int expected, Path depFile) {
-    try {
-      await()
-          .atMost(Duration.ONE_SECOND)
-          .untilAsserted(
-              () -> {
-                assertEquals(getNumberOfElementsFromDepFile(depFile), expected);
-              });
-    } catch (ConditionTimeoutException e) {
-      fail(e.getMessage());
-    }
   }
 }

@@ -16,9 +16,6 @@
 
 package com.ca.lsp.cobol.service.delegates.dependency;
 
-import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
-import com.broadcom.lsp.domain.cobol.event.model.CopybookDepEvent;
-
 import java.nio.file.Path;
 import java.util.List;
 
@@ -26,7 +23,7 @@ import java.util.List;
  * This interface defines the API to generate and update dependency file for copybook download
  * management
  */
-public interface CopybookDependencyService extends EventObserver<CopybookDepEvent> {
+public interface CopybookDependencyService {
   void setWorkspaceFolderPaths(List<Path> workspaceFolderPaths);
 
   void generateDependencyFile(String cobolFileName);
