@@ -8,340 +8,24 @@
 
 grammar CobolPreprocessor;
 
-startRule : ~(DATA | IDENTIFICATION)*? ((compilerOptions | dataDescriptionEntry | dataDivision | procedureDivision | copyStatement
-            | replaceOffStatement | replaceArea  | skipStatement | titleStatement | paragraphs2 | execCicsStatement | execSqlImsStatement
-            | execSqlStatement | NEWLINE | IDENTIFICATION)+ .*?)+ EOF;
-
-//procedureDivision
-procedureDivision
-   : PROCEDURE DIVISION procedureDivisionUsingClause? procedureDivisionGivingClause?  DOT_FS procedureDeclaratives? procedureDivisionBody
-   ;
-
-procedureDivisionUsingClause
-   : (USING | CHAINING) procedureDivisionUsingParameter+
-   ;
-
-procedureDivisionGivingClause
-   : (GIVING | RETURNING) dataName
-   ;
-
-procedureDivisionUsingParameter
-   : procedureDivisionByReferencePhrase | procedureDivisionByValuePhrase
-   ;
-
-procedureDivisionByReferencePhrase
-   : (BY? REFERENCE)? procedureDivisionByReference+
-   ;
-
-procedureDivisionByReference
-   : (OPTIONAL? cobolWord) | ANY
-   ;
-
-procedureDivisionByValuePhrase
-   : BY? VALUE procedureDivisionByValue+
-   ;
-
-procedureDivisionByValue
-   : cobolWord | literal | ANY
-   ;
-
-procedureDeclaratives
-   : DECLARATIVES DOT_FS procedureDeclarative+ END DECLARATIVES DOT_FS
-   ;
-
-procedureDeclarative
-   : procedureSectionHeader DOT_FS useStatement DOT_FS paragraphs
-   ;
-
-//procedureDivisionExtensions
-procedureDivisionBody
-   : paragraphs procedureSection*
-   ;
-
-procedureSection
-   : procedureSectionHeader DOT_FS paragraphs
-   ;
-
-procedureSectionHeader
-   : sectionName SECTION literal?
-   ;
-
-paragraphs
-   : sentence* paragraph+
-   ;
-
-paragraphs2
-   : sentence+ paragraph+
-   ;
-
-sentence
-   : (statement+ DOT_FS) | skipNoStatement+
-   ;
-
-//all the possible combinations to form a statement, super-nongreddy
-statement
-   : moveStatement | acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement |
-     continueStatement | deleteStatement | disableStatement | displayStatement | divideStatement |  enableStatement | entryStatement | evaluateStatement |
-     exitStatement | generateStatement | gobackStatement | goStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement |
-     multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement |
-     searchStatement | sendStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement |
-     titleStatement | unstringStatement | useStatement | writeStatement | xmlStatement |execSqlStatement | execSqlImsStatement | execCicsStatement | copyStatement | ejectStatement
+startRule
+   : .*? ((compilerOptions | copyStatement | execSqlStatement | execCicsStatement | execSqlImsStatement | skipNoStatement | ejectStatement | replaceArea | titleStatement | NEWLINE)+ .*?)+ EOF
    ;
 
 everything
-    : ~(ACCEPT | ADD | ALTER | CALL | CANCEL | CLOSE | COMPUTE | CONTINUE | DELETE | DISABLE | DISPLAY | DIVIDE | ENABLE |
+    : ~(ACCEPT | ADD | ALTER | CALL | CANCEL | CLOSE | COMPUTE | CONTINUE | DELETE | DISABLE | DISPLAY | DIVIDE | ENABLE | EXEC | EJECT |
       ENTRY | EVALUATE | EXIT | GENERATE | GOBACK | GO | IF | INITIALIZE | INITIATE | INSPECT | MERGE | MULTIPLY | OPEN | PERFORM | PURGE | READ |
       RECEIVE | RELEASE | RETURN | REWRITE | SEARCH | SEND | SET | SKIP1 | SKIP2 | SKIP3 | SORT | START | STOP | STRING | SUBTRACT | TERMINATE |
-      TITLE | UNSTRING | USE | WRITE | XML | EXEC | EJECT | DOT_FS | COPY | MOVE)*?
+      TITLE | UNSTRING | USE | WRITE | XML | DOT_FS | COPY | MOVE)*?
     ;
 
-moveStatement
-   : MOVE everything;
-
-addStatement
-   : ADD everything;
-
-acceptStatement
-   : ACCEPT everything;
-
-alterStatement
-   : ALTER everything;
-
-callStatement
-   : CALL everything;
-
-cancelStatement
-   : CANCEL everything;
-
-closeStatement
-   : CLOSE everything;
-
-computeStatement
-   : COMPUTE everything;
-
-continueStatement
-   : CONTINUE everything;
-
-deleteStatement
-   : DELETE everything;
-
-disableStatement
-   : DISABLE everything;
-
-displayStatement
-   : DISPLAY everything;
-
-divideStatement
-   : DIVIDE everything;
-
-enableStatement
-   : ENABLE everything;
-
-entryStatement
-   : ENTRY everything;
-
-evaluateStatement
-   : EVALUATE everything;
-
-exitStatement
-   : EXIT everything;
-
-generateStatement
-   : GENERATE everything;
-
-gobackStatement
-   : GOBACK everything;
-
-goStatement
-   : GO everything;
-
-ifStatement
-   : IF everything;
-
-initializeStatement
-   : INITIALIZE everything;
-
-initiateStatement
-   : INITIATE everything;
-
-inspectStatement
-   : INSPECT everything;
-
-mergeStatement
-   : MERGE everything;
-
-multiplyStatement
-   : MULTIPLY everything;
-
-openStatement
-   : OPEN everything;
-
-performStatement
-   : PERFORM everything;
-
-purgeStatement
-   : PURGE everything;
-
-readStatement
-   : READ  everything;
-
-receiveStatement
-   : RECEIVE everything;
-
-releaseStatement
-   : RELEASE everything;
-
-returnStatement
-   : RETURN everything;
-
-rewriteStatement
-   : REWRITE everything;
-
-searchStatement
-   : SEARCH everything;
-
-sendStatement
-   : SEND everything;
-
-setStatement
-   : SET everything;
-
 skipNoStatement
-   : (SKIP1 | SKIP2 | SKIP3) everything;
-
-skip1Statement
-   : SKIP1 ~DOT_FS*?
+   : (SKIP1 | SKIP2 | SKIP3) everything
    ;
-
-skip2Statement
-   : SKIP2 ~DOT_FS*?
-   ;
-
-skip3Statement
-   : SKIP3 ~DOT_FS*?
-   ;
-
-sortStatement
-   : SORT everything;
-
-startStatement
-   : START everything;
-
-stopStatement
-   : STOP everything;
-
-stringStatement
-   : STRING everything;
-
-subtractStatement
-   : SUBTRACT everything;
-
-terminateStatement
-   : TERMINATE everything;
 
 titleStatement
-   : TITLE everything;
-
-unstringStatement
-   : UNSTRING everything;
-
-useStatement
-   : USE everything;
-
-writeStatement
-   : WRITE everything;
-
-xmlStatement
-   : XML ~(ACCEPT | ADD | ALTER | CALL | CANCEL | CLOSE | COMPUTE | CONTINUE | DELETE | DISABLE | DISPLAY | DIVIDE | ENABLE |
-             ENTRY | EVALUATE | EXIT | GENERATE | GOBACK | GO | IF | INITIALIZE | INITIATE | INSPECT | MERGE | MULTIPLY | OPEN | PERFORM | PURGE | READ |
-             RECEIVE | RELEASE | RETURN | REWRITE | SEARCH | SEND | SET | SKIP1 | SKIP2 | SKIP3 | SORT | START | STOP | STRING | SUBTRACT | TERMINATE |
-             TITLE | UNSTRING | USE | WRITE | XML | EXECCICSLINE | EXECSQLIMSLINE | EXECSQLLINE| DOT_FS | COPY | MOVE)*?
-            ;
-
-
-//paragraphs definition
-paragraph
-   : paragraphName DOT_FS (alteredGoTo | sentence)
+   : TITLE everything
    ;
-
-paragraphName
-   : cobolWord
-   ;
-
-alteredGoTo
-   : GO TO? DOT_FS
-   ;
-
-sectionName
-   : cobolWord
-   ;
-
-
-//data division and variable definition
-dataDivision
-   : DATA DIVISION DOT_FS dataDivisionSection*
-   ;
-
-dataDivisionSection
-   : workingStorageSection | linkageSection | copyStatement
-   ;
-
-workingStorageSection
-   : WORKING_STORAGE SECTION DOT_FS (dataDescriptionEntry | copyStatement)*
-   ;
-
-linkageSection
-   : LINKAGE SECTION DOT_FS dataDescriptionEntry*
-   ;
-
-dataDescriptionEntry
-   : (dataDescriptionEntryFormat1 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat3)+
-   ;
-
-dataDescriptionEntryFormat1
-   : otherLevel (FILLER | dataName)? ~DOT_FS*? DOT_FS
-   ;
-
-dataDescriptionEntryFormat2
-   : LEVEL_NUMBER_66 dataName dataRenamesClause DOT_FS
-   ;
-
-dataDescriptionEntryFormat3
-   : LEVEL_NUMBER_88 dataName dataValueClause DOT_FS
-   ;
-
-dataRenamesClause
-   : RENAMES qualifiedDataName ((THROUGH | THRU) qualifiedDataName)?
-   ;
-
-qualifiedDataName
-   : cobolWord
-   ;
-
-dataValueClause
-   : ((VALUE | VALUES) (IS | ARE)?) dataValueInterval (COMMACHAR? dataValueInterval)*
-   ;
-
-dataValueInterval
-   : dataValueIntervalFrom dataValueIntervalTo?
-   ;
-
-dataValueIntervalFrom
-   : literal | cobolWord
-   ;
-
-dataValueIntervalTo
-   : (THROUGH | THRU) literal
-   ;
-
-otherLevel: LEVEL
-   ;
-
-dataName
-   : cobolWord
-   ;
-//end of data division and variable definition
-
 
 // compiler options
 compilerOptions
@@ -473,24 +157,22 @@ compilerOption
    | ZWB
    ;
 
-
-
+// exec cics statement
 execCicsStatement
    : EXEC CICS ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exec sql statement
-
 execSqlStatement
    : EXEC SQL ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exec sql ims statement
-
 execSqlImsStatement
    : EXEC SQLIMS ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
+// eject statement
 ejectStatement
    : EJECT DOT_FS?
    ;
@@ -574,7 +256,7 @@ cobolWord
    ;
 
 literal
-   : NONNUMERICLITERAL | NUMERICLITERAL | otherLevel | LEVEL_NUMBER_66 | LEVEL_NUMBER_88
+   : NONNUMERICLITERAL | NUMERICLITERAL
    ;
 
 filename
@@ -634,14 +316,6 @@ charDataKeyword
    | ZWB
    | C_CHAR | D_CHAR | E_CHAR | F_CHAR | H_CHAR | I_CHAR | M_CHAR | N_CHAR | Q_CHAR | S_CHAR | U_CHAR | W_CHAR | X_CHAR
    ;
-
-
-
-// lexer rules --------------------------------------------------------------------------------
-
-LEVEL_NUMBER_66 : '66';
-LEVEL_NUMBER_88 : '88';
-LEVEL: ([1-9])|([0][1-9])|([1234][0-9])| '77';
 
 // keywords
 ACCEPT: A C C E P T;
@@ -707,15 +381,15 @@ DUMP : D U M P;
 DYN : D Y N;
 DYNAM : D Y N A M;
 EDF : E D F;
+EJECT: E J E C T;
 ENABLE: E N A B L E;
 END: E N D;
 ENTRY: E N T R Y;
 EVALUATE : E V A L U A T E;
 EJPD : E J P D;
-EJECT: E J E C T;
 EN : E N;
 ENGLISH : E N G L I S H;
-END_EXEC : E N D MINUSCHAR E X E C;
+END_EXEC : E N D '-' E X E C;
 EPILOG : E P I L O G;
 EXCI : E X C I;
 EXEC : E X E C;
@@ -998,9 +672,9 @@ X_CHAR : X;
 
 
 // symbols
-//EXECCICSTAG : '*>EXECCICS';
-//EXECSQLTAG : '*>EXECSQL';
-//EXECSQLIMSTAG : '*>EXECSQLIMS';
+EXECCICSTAG : '*>EXECCICS';
+EXECSQLTAG : '*>EXECSQL';
+EXECSQLIMSTAG : '*>EXECSQLIMS';
 COMMENTTAG : '*>';
 COMMENTENTRYTAG : '*>CE';
 COMMACHAR : ',';
@@ -1029,9 +703,6 @@ FILENAME : [a-zA-Z0-9]+ '.' [a-zA-Z0-9]+;
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
-//EXECCICSLINE : EXECCICSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
-//EXECSQLIMSLINE : EXECSQLIMSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
-//EXECSQLLINE : EXECSQLTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
 COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
 COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
 WS : [ \t\f;]+ -> channel(HIDDEN);
