@@ -45,6 +45,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String CPY_OUTER_NAME_ONLY2 = "copy2";
   protected static final String EMPTY_COPYBOOK_NAME = " ";
   protected static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
+  protected static final String COPYBOOK_NAME = "Test";
   protected static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
   protected static final String DEP_FILE_COST_NAME = "SOMEPROG";
   protected static final String PROFILE_NAME = "PRF11";

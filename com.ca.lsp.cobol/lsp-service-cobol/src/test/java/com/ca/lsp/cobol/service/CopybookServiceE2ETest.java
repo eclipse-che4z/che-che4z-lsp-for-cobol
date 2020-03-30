@@ -55,7 +55,8 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
       mock(Provider.class);
 
   private Communications communications = mock(Communications.class);
-  private CopybookDependencyService dependencyService = new CopybookDependencyServiceImpl();
+  private CopybookDependencyService dependencyService =
+      new CopybookDependencyServiceImpl(broker, null);
 
   @Before
   public void initActivities() {

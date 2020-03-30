@@ -18,17 +18,18 @@ import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceIm
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.eclipse.lsp4j.WorkspaceFolder;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
-import java.util.List;
+import java.nio.file.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This is an utility class that provide filesystem related methods consumed by the classes that
@@ -39,6 +40,7 @@ import java.util.List;
 @UtilityClass
 public class FileSystemUtils {
   private final List<String> ALLOWED_EXTENSIONS = Arrays.asList("cpy", "cbl", "cobol", "cob");
+  private static final String DEP_EXTENSION = ".dep";
 
   /** @return the representation os based of the FS separator */
   public static String filesystemSeparator() {
@@ -107,5 +109,58 @@ public class FileSystemUtils {
       log.error(e.getMessage());
       return uri;
     }
+  }
+
+  /**
+   * @param workspaceFolders folders which are provided at the init moment
+   * @return a list of path of those folders
+   */
+  public List<Path> getWorkspaceFoldersAsPathList(List<WorkspaceFolder> workspaceFolders) {
+    return Optional.ofNullable(workspaceFolders)
+        .map(Collection::stream)
+        .orElseGet(Stream::empty)
+        .filter(Objects::nonNull)
+        .map(FileSystemUtils::resolveUriPath)
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * This method can be used to extract the name of a given COBOL file from the URI
+   *
+   * @param documentUri
+   * @return the cobol program name from the given URI
+   */
+  public String getFileNameFromURI(String documentUri) {
+    String result = null;
+    try {
+      result = FilenameUtils.getBaseName(Paths.get(new URI(documentUri)).getFileName().toString());
+    } catch (URISyntaxException e) {
+      log.error(e.getMessage());
+    }
+    return result;
+  }
+
+  /**
+   * This method provides the path to a specific file based on the COBOL file
+   *
+   * @param dependencyFolderPath the folder where we are creating the dependency file
+   * @param cobolFileName
+   * @return the path of the dependency file
+   */
+  public Path retrieveDependencyFile(Path dependencyFolderPath, String cobolFileName) {
+    return Paths.get(dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION);
+  }
+
+  /**
+   * @param it workspace folder
+   * @return the normalized path version of the given folder
+   */
+  private Path resolveUriPath(WorkspaceFolder it) {
+    try {
+      return Paths.get(new URI(it.getUri()).normalize());
+    } catch (URISyntaxException e) {
+      log.error(e.getMessage());
+    }
+    return null;
   }
 }
