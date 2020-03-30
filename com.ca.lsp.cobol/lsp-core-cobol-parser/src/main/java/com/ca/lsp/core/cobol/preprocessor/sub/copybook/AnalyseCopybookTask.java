@@ -88,12 +88,6 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
    */
   @Override
   public ResultWithErrors<CopybookSemanticContext> compute() {
-    databus.postData(
-        CopybookDepEvent.builder()
-            .copybookName(copyBookName)
-            .textDocumentSync(textDocumentSyncType)
-            .documentUri(documentUri)
-            .build());
     ResultWithErrors<SemanticContext> semanticContext;
 
     if (isCopybookInCache(copyBookName)) {
@@ -109,6 +103,14 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
       semanticContext = parseCopybook();
       databus.unSubscribe(subscriber);
     }
+
+    databus.postData(
+        CopybookDepEvent.builder()
+            .copybookName(copyBookName)
+            .textDocumentSync(textDocumentSyncType)
+            .documentUri(documentUri)
+            .build());
+
     return new ResultWithErrors<>(
         new CopybookSemanticContext(
             copyBookName,

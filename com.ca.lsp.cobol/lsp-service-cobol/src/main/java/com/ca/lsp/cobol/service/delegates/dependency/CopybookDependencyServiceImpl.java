@@ -25,6 +25,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 
@@ -152,6 +153,7 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
    *
    * @param event of type CopybookDepEvent
    */
+  @Synchronized
   @Override
   public void observerCallback(CopybookDepEvent event) {
     // we are not checking .dep on DID_OPEN because on DID_OPEN the file is updated with the
@@ -192,11 +194,14 @@ public class CopybookDependencyServiceImpl implements CopybookDependencyService 
       result = Files.readAllLines(dependencyFilePath);
       List<String> updatedLines =
           result.stream().filter(s -> !s.equals(copybookName)).collect(Collectors.toList());
-      Files.write(
-          dependencyFilePath,
-          updatedLines,
-          StandardOpenOption.WRITE,
-          StandardOpenOption.TRUNCATE_EXISTING);
+      // don't write if the lines were not modify
+      if (updatedLines != result) {
+        Files.write(
+            dependencyFilePath,
+            updatedLines,
+            StandardOpenOption.WRITE,
+            StandardOpenOption.TRUNCATE_EXISTING);
+      }
     } catch (IOException e) {
       log.error(e.getMessage());
     }
