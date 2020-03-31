@@ -4,6 +4,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ## [0.x.x] - TBD
 - Fix nested copybooks that are not downloaded [#251](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/251) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
+- Update dependency file on didChange [#248](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/248) Thanks @[sergiuilie](https://github.com/sergiuilie)
 - Don't ask to select profile if there are less then two of them available [#245](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/245) Thanks @[ishche](https://github.com/ishche)
 - Redefine responsibilities of WorkspaceServiceTest [232](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/232) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Dependency file should contain 8 char max copybook name [#175](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/175) Thanks @[ishche](https://github.com/ishche)

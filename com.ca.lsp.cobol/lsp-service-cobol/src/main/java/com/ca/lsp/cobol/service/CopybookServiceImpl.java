@@ -199,7 +199,7 @@ public class CopybookServiceImpl implements CopybookService {
     Path path =
         findCopybook(
             requiredCopybookName,
-            (String) configurationSettingsStorable.getProfiles(),
+            configurationSettingsStorable.getProfiles().toString(),
             configurationSettingsStorable.getPaths());
     if (isFileExists(path)) {
       publishOnDatabus(requiredCopybookName, getContentByPath(path), path);

@@ -66,7 +66,6 @@ public class MyLanguageServerImpl implements LanguageServer {
   private WorkspaceService workspaceService;
   private CopybookService copybookService;
   private Provider<LanguageClient> clientProvider;
-
   private SettingsProvider settingsProvider;
 
   @Inject
