@@ -27,6 +27,30 @@ spec:
       requests:
         memory: "2Gi"
         cpu: "1"
+  - name: theia
+    image: theiaide/theia-java:0.16.1
+    tty: true
+    command: [ "/bin/bash", "-c", "--" ]
+    args: [ "while true; do sleep 1000; done;" ]
+    securityContext:
+      runAsUser: 0
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+      requests:
+        memory: "2Gi"
+        cpu: "1"
+  - name: python
+    image: python
+    tty: true
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+      requests:
+        memory: "2Gi"
+        cpu: "1"
   - name: jnlp
     volumeMounts:
     - name: volume-known-hosts
@@ -42,12 +66,22 @@ def targetFiles = 'lsp-core-cobol-parser/target/**'
 def kubeLabel = projectName + '_pod_' + env.BUILD_NUMBER + '_' + env.BRANCH_NAME
 kubeLabel = kubeLabel.replaceAll(/[^a-zA-Z0-9._-]+/,"")
 
+boolean isTimeTriggeredBuild() {
+    for (currentBuildCause in currentBuild.buildCauses) {
+        return currentBuildCause._class == 'hudson.triggers.TimerTrigger$TimerTriggerCause'
+    }
+    return false
+}
+
 pipeline {
     agent {
         kubernetes {
             label kubeLabel
             yaml kubernetes_config
         }
+    }
+    triggers {
+        cron('0 0 * * 1-5')
     }
     options {
         disableConcurrentBuilds()
@@ -111,6 +145,29 @@ pipeline {
                 }
             }
         }
+        stage('Integration test') {
+            steps {
+                script {
+                    if (isTimeTriggeredBuild() && (branchName == 'development' || env.CHANGE_ID)) {
+                        container('theia') {
+                            dir('tests') {
+                                sh './theiaPrepare.sh'
+                            }
+                        }
+                        container('python') {
+                            dir('tests/theia_automation_lsp') {
+                                sh 'pip install -r requirements.txt'
+                                sh 'apt update'
+                                sh 'apt install firefox-esr -y'
+                                sh 'PYTHONPATH=`pwd` robot -i Rally -e Unstable --variable HEADLESS:True --outputdir robot_output robot_suites/lsp/local/firefox_lsp_local.robot'
+                            }
+                        }
+                    } else {
+                        echo "Integration test was skipped"
+                    }
+                }
+            }
+        }
         stage('Deploy') {
             environment {
                 sshChe4z = "genie.che4z@projects-storage.eclipse.org"
@@ -134,6 +191,19 @@ pipeline {
                     } else {
                         echo "Deployment skipped for branch: $branchName"
                     }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            container('theia') {
+                dir('tests') {
+                    sh 'mkdir artifacts'
+                    sh 'cp /home/theia/theia.log artifacts'
+                    sh 'cp -a theia_automation_lsp/robot_output/. artifacts'
+                    sh 'cp -a theia_robot_output/. artifacts'
+                    archiveArtifacts "artifacts/**"
                 }
             }
         }
