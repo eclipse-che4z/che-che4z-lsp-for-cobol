@@ -117,9 +117,7 @@ public class CopybookServiceImpl implements CopybookService {
     return retrievePathOrNull(
         filename,
         getPathList(
-            getCopybookBaseFolder(workspaceFolderPaths.get(0)) + filesystemSeparator(),
-            profile,
-            datasetList));
+            getCopybookBaseFolder(workspaceFolderPaths.get(0)).toString(), profile, datasetList));
   }
 
   private Path retrievePathOrNull(String filename, List<Path> datasetPathList) {

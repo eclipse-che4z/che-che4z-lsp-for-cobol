@@ -30,7 +30,6 @@ import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Objects;
@@ -164,25 +163,22 @@ public class CopybookDependencyServiceImpl
    */
   @Synchronized
   @Override
-  // TODO: Refactor
   public void observerCallback(CopybookDepEvent event) {
     // we are not checking .dep on DID_OPEN because on DID_OPEN the file is updated with the
     // required copybooks
     if (event.getTextDocumentSync().equals(TextDocumentSyncType.DID_CHANGE.name())) {
-      Path path = getCopybookPath(event);
-
-      Path dependencyFilePath =
-          getPath(
-              getWorkspaceFolderPaths().get(0).toString()
-                  + filesystemSeparator()
-                  + COBDEPS
-                  + filesystemSeparator(),
-              getNameFromURI(event.getDocumentUri()) + DEP_EXTENSION);
-
-      if (path != null && isFileExists(dependencyFilePath)) {
+      Path dependencyFilePath = getDependencyFilePath(event);
+      if (getCopybookPath(event) != null && isFileExists(dependencyFilePath)) {
         removeIfPresent(event.getCopybookName(), dependencyFilePath);
       }
     }
+  }
+
+  private Path getDependencyFilePath(CopybookDepEvent event) {
+    return getPath(
+        getWorkspaceFolderPaths().get(0).toString(),
+        COBDEPS,
+        getNameFromURI(event.getDocumentUri()) + DEP_EXTENSION);
   }
 
   private Path getCopybookPath(CopybookDepEvent event) {
@@ -195,13 +191,12 @@ public class CopybookDependencyServiceImpl
 
   private List<Path> getTargetFolders() {
     return getPathList(
-        getCopybookFolder() + filesystemSeparator(),
+        getCopybookFolder(),
         configurationSettingsStorableProvider.get().getProfiles().toString(),
         configurationSettingsStorableProvider.get().getPaths());
   }
 
   private String getCopybookFolder() {
-    return Paths.get(workspaceFolderPaths.get(0) + filesystemSeparator() + COPYBOOK_FOLDER_NAME)
-        .toString();
+    return getPath(workspaceFolderPaths.get(0).toString(), COPYBOOK_FOLDER_NAME).toString();
   }
 }

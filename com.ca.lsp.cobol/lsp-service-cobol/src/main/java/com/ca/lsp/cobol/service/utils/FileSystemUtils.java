@@ -44,13 +44,6 @@ import static java.nio.file.Files.readAllLines;
 @UtilityClass
 public class FileSystemUtils {
   private final List<String> ALLOWED_EXTENSIONS = Arrays.asList("cpy", "cbl", "cobol", "cob");
-  private static final String DEP_EXTENSION = ".dep";
-
-  /** @return the representation os based of the FS separator */
-  public static String filesystemSeparator() {
-    return FileSystems.getDefault().getSeparator();
-  }
-
   /**
    * @param pathFile NIO path of the file to check
    * @return true if the path represent a valid file, false otherwise
@@ -143,7 +136,7 @@ public class FileSystemUtils {
    */
   public List<Path> getPathList(@Nonnull String outer, String inner, List<String> variablePart) {
     return variablePart.stream()
-        .map(it -> Paths.get(outer + inner + filesystemSeparator() + it))
+        .map(it -> Paths.get(outer, inner, it))
         .filter(Files::exists)
         .collect(Collectors.toList());
   }
@@ -297,18 +290,6 @@ public class FileSystemUtils {
       log.error(e.getMessage());
     }
     return result;
-  }
-
-  /**
-   * This method provides the path to a specific file based on the COBOL file
-   *
-   * @param dependencyFolderPath the folder where we are creating the dependency file
-   * @param cobolFileName
-   * @return the path of the dependency file
-   */
-  // TODO: refactor this.. should be agnostic from folder and name return the path
-  public Path retrieveDependencyFile(Path dependencyFolderPath, String cobolFileName) {
-    return Paths.get(dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION);
   }
 
   /**
