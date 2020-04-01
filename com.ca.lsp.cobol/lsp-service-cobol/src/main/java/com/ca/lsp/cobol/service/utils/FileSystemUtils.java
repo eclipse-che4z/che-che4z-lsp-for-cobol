@@ -53,8 +53,6 @@ public class FileSystemUtils {
   }
 
   /**
-   * * *
-   *
    * @param targetPath NIO path of the target file where to write
    * @param content the content to write
    * @param standardOpenOption the open option desidered (APPEND|TRUNCATE)
