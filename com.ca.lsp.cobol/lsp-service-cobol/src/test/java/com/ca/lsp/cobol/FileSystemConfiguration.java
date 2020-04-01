@@ -39,20 +39,27 @@ import static org.mockito.Mockito.when;
  */
 @Slf4j
 public class FileSystemConfiguration extends ConfigurableTest {
-  protected static final String COPYBOOK_CONTENT =
-      "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
   protected static final String WORKSPACE_FOLDER_NAME = "test";
-  protected static final String CPY_OUTER_NAME_ONLY2 = "copy2";
-  protected static final String EMPTY_COPYBOOK_NAME = " ";
-  protected static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
-  protected static final String COPYBOOK_NAME = "Test";
-  protected static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
-  protected static final String DEP_FILE_COST_NAME = "SOMEPROG";
+  protected static final String COBOL_FILE_DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
+  protected static final String CPY_DOCUMENT_URI = "file:///C:/Users/test/CPYNEST.cpy";
+
   protected static final String PROFILE_NAME = "PRF11";
   protected static final String DSNAME_1 = "HLQLF01.DSNAME1";
   protected static final String DSNAME_2 = "HLQLF01.DSNAME2";
-  protected static final String DEP_EXTENSION = ".dep";
+
+  protected static final String CPY_NAME_WITHOUT_EXT = "copy2";
   protected static final String COPYBOOK_NOT_PRESENT = "ANTHRCPY";
+  protected static final String EMPTY_COPYBOOK_NAME = " ";
+  protected static final String COBOL_FILE_NAME = "Test";
+  protected static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
+  public static final String CPYNEST_CPY = "CPYNEST.cpy";
+
+  protected static final String DEP_FILE_COST_NAME = "SOMEPROG";
+  protected static final String DEP_EXTENSION = ".dep";
+
+  protected static final String COPYBOOK_CONTENT =
+      "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
+  protected static final String NESTED_COPYBOOK_CONTENT = "000230 COPY CPYNEST2.";
 
   protected Path workspaceFolder = null;
   protected Path copybooksFolderPath = null;
@@ -85,36 +92,35 @@ public class FileSystemConfiguration extends ConfigurableTest {
    * the filesystem service capabilities using the physical filesystem
    */
   @Before
-  public void buildFS() {
-    intializeSettings();
-    createWorkspaceFolderStructure();
-    createCopybookStructure();
-    createDependencyFileStructure();
+  public void buildTempFilesystem() {
+    intializeSettingsWithSomeContent();
 
-    // populate copybook folder and dependency file with some content
+    createWorkspaceFolderStructure();
+    createCopybookFolders();
+    createDependencyFolder();
+
     createCopybookFiles();
+    createNestedCopybooks();
     createDependencyFile();
   }
 
   @After
-  public void cleanupTempFolder() {
+  public void cleanupTempFilesystem() {
     try {
-      Files.walk(getWorkspaceFolderPath())
-          .sorted(Comparator.reverseOrder())
-          .map(Path::toFile)
-          .forEach(File::delete);
+      deleteFolders();
     } catch (IOException e) {
       log.error(e.getMessage());
     }
   }
 
-  /**
-   * This method define the steps necessary to emulate the json settings provided by the user in the
-   * settings.json
-   */
-  private void intializeSettings() {
-    // SettingsProvider settingsProvider = new SettingsProvider();
+  private void deleteFolders() throws IOException {
+    Files.walk(getWorkspaceFolderPath())
+        .sorted(Comparator.reverseOrder())
+        .map(Path::toFile)
+        .forEach(File::delete);
+  }
 
+  private void intializeSettingsWithSomeContent() {
     configurationSettingsStorable =
         new ConfigurationSettingsStorable(
             PROFILE_NAME, Collections.unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2)));
@@ -123,7 +129,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
     when(settingsProvider.get()).thenReturn(configurationSettingsStorable);
   }
 
-  protected List<WorkspaceFolder> generateWorkspaceFolder() {
+  protected List<WorkspaceFolder> createWorkspaceFolders() {
     WorkspaceFolder workspaceFolder = new WorkspaceFolder();
     workspaceFolder.setName(WORKSPACE_FOLDER_NAME);
     workspaceFolder.setUri(String.valueOf(getWorkspaceFolderPath().toUri()));
@@ -131,51 +137,61 @@ public class FileSystemConfiguration extends ConfigurableTest {
   }
 
   protected void createWorkspaceFolderStructure() {
-    workspaceFolder =
-        createFolderStructure(Paths.get(System.getProperty("java.io.tmpdir"), "WORKSPACE"));
+    workspaceFolder = createFolders(Paths.get(System.getProperty("java.io.tmpdir"), "WORKSPACE"));
   }
 
-  private void createCopybookStructure() {
+  private void createCopybookFolders() {
     copybooksFolderPath =
-        createFolderStructure(Paths.get(workspaceFolder + filesystemSeparator() + ".copybooks"));
+        createFolders(Paths.get(workspaceFolder + filesystemSeparator() + ".copybooks"));
+
+    createFoldersFromDatasetSettings();
   }
 
-  protected void createDependencyFileStructure() {
+  private void createFoldersFromDatasetSettings() {
+    List<Path> datasetPathList = getPathListFromSettings();
+    datasetPathList.forEach(this::createFolders);
+  }
+
+  protected void createDependencyFolder() {
     depenencyFileFolderPath =
-        createFolderStructure(Paths.get(workspaceFolder + filesystemSeparator() + ".cobdeps"));
+        createFolders(Paths.get(workspaceFolder + filesystemSeparator() + ".cobdeps"));
   }
 
   private void createDependencyFile() {
-    generateDummyContentForFile(
-        depenencyFileFolderPath, DEP_FILE_COST_NAME + ".dep", CPY_OUTER_NAME_ONLY2);
+    writeContentOnFile(
+        createFile(depenencyFileFolderPath, DEP_FILE_COST_NAME + ".dep"), CPY_NAME_WITHOUT_EXT);
   }
 
   private void createCopybookFiles() {
-    ConfigurationSettingsStorable configSettings = settingsProvider.get();
+    getPathListFromSettings()
+        .forEach(
+            targetPath ->
+                writeContentOnFile(
+                    createFile(targetPath, CPY_INNER_FILE_NAME_WITH_EXT), COPYBOOK_CONTENT));
+  }
 
+  private void createNestedCopybooks() {
+    writeContentOnFile(createFile(copybooksFolderPath, CPYNEST_CPY), NESTED_COPYBOOK_CONTENT);
+  }
+
+  private List<Path> getPathListFromSettings() {
+    ConfigurationSettingsStorable configSettings = settingsProvider.get();
     String profile = (String) configSettings.getProfiles();
     List<String> targetDatasets = configSettings.getPaths();
 
-    List<Path> retrievedPaths =
-        targetDatasets.stream()
-            .map(
-                it ->
-                    Paths.get(
-                        copybooksFolderPath
-                            + filesystemSeparator()
-                            + profile
-                            + filesystemSeparator()
-                            + it))
-            .collect(Collectors.toList());
-
-    retrievedPaths.forEach(this::createFolderStructure);
-    retrievedPaths.forEach(
-        targetPath ->
-            generateDummyContentForFile(
-                targetPath, CPY_INNER_FILE_NAME_WITH_EXT, COPYBOOK_CONTENT));
+    return targetDatasets.stream()
+        .map(
+            it ->
+                Paths.get(
+                    copybooksFolderPath
+                        + filesystemSeparator()
+                        + profile
+                        + filesystemSeparator()
+                        + it))
+        .collect(Collectors.toList());
   }
 
-  private Path createFolderStructure(Path copybooksPath) {
+  private Path createFolders(Path copybooksPath) {
     try {
       return Files.createDirectories(copybooksPath);
     } catch (IOException e) {
@@ -192,37 +208,21 @@ public class FileSystemConfiguration extends ConfigurableTest {
     return FileSystems.getDefault().getSeparator();
   }
 
-  private void generateDummyContentForFile(
-      Path targetDirectory, String filenameAndExtension, String content) {
-    Path filePath;
-    // check the folder exist if no create it
-    if (!Files.exists(targetDirectory)) {
-      try {
-        Files.createDirectory(targetDirectory);
-      } catch (IOException e) {
-        log.error(e.getMessage());
-        return;
-      }
-    }
-
-    // create the file
+  private Path createFile(Path targetDirectory, String filenameAndExtension) {
     try {
-      filePath =
-          Files.createFile(
-              Paths.get(targetDirectory + filesystemSeparator() + filenameAndExtension));
+      return Files.createFile(
+          Paths.get(targetDirectory + filesystemSeparator() + filenameAndExtension));
     } catch (IOException e) {
       log.error(e.getMessage());
-      return;
+      return null;
     }
-
-    writeContentOnFile(filePath, content);
   }
 
   private void writeContentOnFile(Path filePath, String content) {
     try {
       Files.write(filePath, (content + "\n").getBytes(), StandardOpenOption.APPEND);
     } catch (IOException e) {
-      log.error("IO Exception on write" + e.getLocalizedMessage());
+      log.error(e.getMessage());
     }
   }
 }

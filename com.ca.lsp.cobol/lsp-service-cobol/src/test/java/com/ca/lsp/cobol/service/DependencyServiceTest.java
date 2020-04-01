@@ -19,8 +19,10 @@ import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.CopybookDepEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
+import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import com.google.inject.Guice;
 import com.google.inject.Provider;
@@ -45,6 +47,7 @@ import static org.mockito.Mockito.verify;
 /** This class represent all the unit test for the copybook dependency managament service */
 @Slf4j
 public class DependencyServiceTest extends FileSystemConfiguration {
+  public static final String NESTED_CPY_NAME = "CPYNEST2";
   private final DataBusBroker broker =
       Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
   Provider<ConfigurationSettingsStorable> provider =
@@ -52,14 +55,13 @@ public class DependencyServiceTest extends FileSystemConfiguration {
           new ConfigurationSettingsStorable(
               PROFILE_NAME, unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2)));
 
-  private CopybookDependencyServiceImpl dependencyService =
+  private CopybookDependencyService dependencyService =
       new CopybookDependencyServiceImpl(broker, provider);
 
   @Before
   public void initActivities() {
     createWorkspaceFolderStructure();
-    createDependencyFileStructure();
-
+    createDependencyFolder();
     dependencyService.setWorkspaceFolderPaths(Collections.singletonList(workspaceFolder));
   }
 
@@ -67,9 +69,9 @@ public class DependencyServiceTest extends FileSystemConfiguration {
   public void databusSubscriptionTest() {
     DataBusBroker brokerMock = mock(DataBusBroker.class);
 
-    CopybookDependencyServiceImpl dependencyServiceT =
+    CopybookDependencyServiceImpl dependencyService =
         new CopybookDependencyServiceImpl(brokerMock, null);
-    verify(brokerMock).subscribe(DataEventType.COPYBOOK_DEP_EVENT, dependencyServiceT);
+    verify(brokerMock).subscribe(DataEventType.COPYBOOK_DEP_EVENT, dependencyService);
   }
 
   /**
@@ -77,21 +79,45 @@ public class DependencyServiceTest extends FileSystemConfiguration {
    * downloaded and present in the .copybook directory
    */
   @Test
-  public void depFileUpdateTest() {
-    // create the .dep file
-    Path depFileReference = createDependencyFile(COPYBOOK_NAME);
-    dependencyService.addCopybookInDepFile(CPY_OUTER_NAME_ONLY2, DOCUMENT_URI);
+  public void whenACopybookIsFound_ShouldBeRemovedFromDepFile() {
+    CopybookDependencyServiceImpl copybookDependencyServiceImpl =
+        new CopybookDependencyServiceImpl(broker, provider);
+    copybookDependencyServiceImpl.setWorkspaceFolderPaths(
+        Collections.singletonList(workspaceFolder));
+    Path depFileReference = createDependencyFileForCobolFile(COBOL_FILE_NAME);
+
+    copybookDependencyServiceImpl.addCopybookInDepFile(
+        createRequiredEvent(
+            CPY_NAME_WITHOUT_EXT,
+            COBOL_FILE_DOCUMENT_URI,
+            TextDocumentSyncType.DID_OPEN.toString()),
+        CPY_NAME_WITHOUT_EXT);
+
     int numberOfElements = getNumberOfElementsFromDepFile(depFileReference);
 
     // trigger the event which will update the .dep file @link{CopybookDependencyServiceImpl.class}
-    dependencyService.observerCallback(
-        CopybookDepEvent.builder()
-            .copybookName(CPY_OUTER_NAME_ONLY2)
-            .textDocumentSync("DID_CHANGE")
-            .documentUri(DOCUMENT_URI)
-            .build());
+    invokeObserverCallback(copybookDependencyServiceImpl);
 
     assertEquals(numberOfElements - 1, getNumberOfElementsFromDepFile(depFileReference));
+  }
+
+  private Path createDependencyFileForCobolFile(String depFileName) {
+    dependencyService.generateDependencyFile(depFileName);
+    return Paths.get(depenencyFileFolderPath + filesystemSeparator() + depFileName + DEP_EXTENSION);
+  }
+
+  public RequiredCopybookEvent createRequiredEvent(
+      String copybookName, String documentURI, String documentSyncType) {
+    return new RequiredCopybookEvent(copybookName, documentURI, documentSyncType);
+  }
+
+  private void invokeObserverCallback(CopybookDependencyServiceImpl copybookDependencyServiceImpl) {
+    copybookDependencyServiceImpl.observerCallback(
+        CopybookDepEvent.builder()
+            .copybookName(CPY_NAME_WITHOUT_EXT)
+            .textDocumentSync("DID_CHANGE")
+            .documentUri(COBOL_FILE_DOCUMENT_URI)
+            .build());
   }
 
   /**
@@ -100,7 +126,7 @@ public class DependencyServiceTest extends FileSystemConfiguration {
    */
   @Test
   public void depFileGenerationPositiveTest() {
-    Path depFileReference = createDependencyFile(DEP_FILE_COST_NAME);
+    Path depFileReference = createDependencyFileForCobolFile(DEP_FILE_COST_NAME);
     assertTrue(Files.exists(depFileReference));
   }
 
@@ -110,32 +136,31 @@ public class DependencyServiceTest extends FileSystemConfiguration {
    */
   @Test
   public void depFileUpdatePositiveTest() {
-    // create the dep folder with the SOMPROG.dep
-    Path depFileReference = createDependencyFile(DEP_FILE_COST_NAME);
+    Path depFileReference = createDependencyFileForCobolFile(DEP_FILE_COST_NAME);
 
-    // check the number of elements before the update
+    // check the number of elements inside the dependency file before update it
     int numberOfElements = getNumberOfElementsFromDepFile(depFileReference);
 
-    // update dep file with a new copybook
     dependencyService.updateDependencyList(depFileReference, "ANEWCPY2");
-    // read the list again..
-    // assert that number of element change by 1
+
     assertEquals(numberOfElements + 1, getNumberOfElementsFromDepFile(depFileReference));
   }
 
   /** This test verify that an empty value for the copybook is not added in the deplist. */
   @Test
   public void depFileWithoutEmptyCopybookName() {
-    // create the dep folder with the SOMPROG.dep
-    Path depFileReference = createDependencyFile(DEP_FILE_COST_NAME);
+    Path depFileReference = createDependencyFileForCobolFile(DEP_FILE_COST_NAME);
 
-    // check the number of elements before the update
+    // check the number of elements inside the dependency file before update it
     int numberOfElements = getNumberOfElementsFromDepFile(depFileReference);
 
-    // update dep file with a new copybook
-    dependencyService.addCopybookInDepFile(EMPTY_COPYBOOK_NAME, DOCUMENT_URI);
+    dependencyService.addCopybookInDepFile(
+        createRequiredEvent(
+            CPY_NAME_WITHOUT_EXT,
+            COBOL_FILE_DOCUMENT_URI,
+            TextDocumentSyncType.DID_OPEN.toString()),
+        EMPTY_COPYBOOK_NAME);
 
-    // assert that number of element didn't change
     assertEquals(numberOfElements, getNumberOfElementsFromDepFile(depFileReference));
   }
 
@@ -157,8 +182,25 @@ public class DependencyServiceTest extends FileSystemConfiguration {
     }
   }
 
-  private Path createDependencyFile(String depFileName) {
-    dependencyService.generateDependencyFile(depFileName);
-    return Paths.get(depenencyFileFolderPath + filesystemSeparator() + depFileName + DEP_EXTENSION);
+  @Test
+  public void depFileForNestedCopybooksIsCreated() {
+    dependencyService.addCopybookInDepFile(
+        createRequiredEvent(
+            NESTED_CPY_NAME,
+            getDocumentURIFromCopybookName(),
+            TextDocumentSyncType.DID_CHANGE.toString()),
+        NESTED_CPY_NAME);
+    assertDepFileIsCreated();
+  }
+
+  private String getDocumentURIFromCopybookName() {
+    return Paths.get(copybooksFolderPath + filesystemSeparator() + CPYNEST_CPY).toUri().toString();
+  }
+
+  private void assertDepFileIsCreated() {
+    assertTrue(
+        Files.exists(
+            Paths.get(
+                depenencyFileFolderPath + filesystemSeparator() + "CPYNEST" + DEP_EXTENSION)));
   }
 }
