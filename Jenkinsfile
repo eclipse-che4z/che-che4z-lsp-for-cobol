@@ -34,23 +34,9 @@ spec:
     args: [ "while true; do sleep 1000; done;" ]
     securityContext:
       runAsUser: 0
-    resources:
-      limits:
-        memory: "2Gi"
-        cpu: "1"
-      requests:
-        memory: "2Gi"
-        cpu: "1"
   - name: python
     image: python
     tty: true
-    resources:
-      limits:
-        memory: "2Gi"
-        cpu: "1"
-      requests:
-        memory: "2Gi"
-        cpu: "1"
   - name: jnlp
     volumeMounts:
     - name: volume-known-hosts
