@@ -60,12 +60,17 @@ public class FileSystemUtils {
   }
 
   /**
+   * * *
+   *
    * @param targetPath NIO path of the target file where to write
-   * @param contents the content to write
+   * @param content the content to write
+   * @param standardOpenOption the open option desidered (APPEND|TRUNCATE)
    */
-  public static void writeInFile(Path targetPath, String contents) {
+  public static void writeInFile(
+      Path targetPath, String content, StandardOpenOption standardOpenOption) {
     try {
-      Files.write(targetPath, (contents + "\n").getBytes(), StandardOpenOption.APPEND);
+      Files.write(
+          targetPath, (content + "\n").getBytes(), StandardOpenOption.WRITE, standardOpenOption);
     } catch (IOException e) {
       log.error(e.getMessage());
     }
@@ -125,6 +130,22 @@ public class FileSystemUtils {
    */
   public Path getPath(@Nonnull String basePath, @Nonnull String... more) {
     return Paths.get(basePath, more);
+  }
+
+  /**
+   * This method return the list of paths represented by a fixed part (outer + inner) and a variable
+   * part iterated to obtains path in this form: {[base,middle,v1],[base,middle,v2], ...}
+   *
+   * @param outer first level of folder
+   * @param inner second level of folder (represent the name of an inner folder)
+   * @param variablePart list of names of folders that are contained inside the inner
+   * @return a lis of paths represented in the way: {[outer,inner,v1],[outer,inner,v2], ...}
+   */
+  public List<Path> getPathList(@Nonnull String outer, String inner, List<String> variablePart) {
+    return variablePart.stream()
+        .map(it -> Paths.get(outer + inner + filesystemSeparator() + it))
+        .filter(Files::exists)
+        .collect(Collectors.toList());
   }
 
   /**
@@ -285,6 +306,7 @@ public class FileSystemUtils {
    * @param cobolFileName
    * @return the path of the dependency file
    */
+  // TODO: refactor this.. should be agnostic from folder and name return the path
   public Path retrieveDependencyFile(Path dependencyFolderPath, String cobolFileName) {
     return Paths.get(dependencyFolderPath + filesystemSeparator() + cobolFileName + DEP_EXTENSION);
   }
@@ -300,5 +322,21 @@ public class FileSystemUtils {
       log.error(e.getMessage());
     }
     return null;
+  }
+
+  public void removeIfPresent(String element, Path targetFile) {
+    try {
+      List<String> result = getContentFromFile(targetFile);
+
+      List<String> updatedLines =
+          result.stream().filter(s -> !s.equals(element)).collect(Collectors.toList());
+
+      // don't write if the lines were not modify
+      if (!updatedLines.equals(result)) {
+        Files.write(targetFile, updatedLines, StandardOpenOption.TRUNCATE_EXISTING);
+      }
+    } catch (IOException e) {
+      log.error(e.getMessage());
+    }
   }
 }

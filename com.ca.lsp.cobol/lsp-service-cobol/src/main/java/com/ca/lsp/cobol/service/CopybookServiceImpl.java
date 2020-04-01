@@ -30,7 +30,6 @@ import org.eclipse.lsp4j.WorkspaceFolder;
 
 import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -115,7 +114,12 @@ public class CopybookServiceImpl implements CopybookService {
    */
   @Override
   public Path findCopybook(String filename, String profile, List<String> datasetList) {
-    return retrievePathOrNull(filename, generatePathListFromSettings(profile, datasetList));
+    return retrievePathOrNull(
+        filename,
+        getPathList(
+            getCopybookBaseFolder(workspaceFolderPaths.get(0)) + filesystemSeparator(),
+            profile,
+            datasetList));
   }
 
   private Path retrievePathOrNull(String filename, List<Path> datasetPathList) {
@@ -124,19 +128,6 @@ public class CopybookServiceImpl implements CopybookService {
         .filter(Objects::nonNull)
         .findAny()
         .orElse(null);
-  }
-
-  private List<Path> generatePathListFromSettings(String profile, List<String> datasetList) {
-    return datasetList.stream()
-        .map(
-            it ->
-                Paths.get(
-                    getCopybookBaseFolder(workspaceFolderPaths.get(0))
-                        + filesystemSeparator()
-                        + profile
-                        + filesystemSeparator()
-                        + it))
-        .collect(Collectors.toList());
   }
 
   private List<Path> getWorkspaceFoldersAsPathList() {
@@ -157,7 +148,7 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private Path getCopybookBaseFolder(Path workspaceFolderPath) {
-    return Paths.get(workspaceFolderPath + filesystemSeparator() + COPYBOOK_FOLDER_NAME);
+    return getPath(workspaceFolderPath.toString(), COPYBOOK_FOLDER_NAME);
   }
 
   /** create the task and pass it to the executor service */

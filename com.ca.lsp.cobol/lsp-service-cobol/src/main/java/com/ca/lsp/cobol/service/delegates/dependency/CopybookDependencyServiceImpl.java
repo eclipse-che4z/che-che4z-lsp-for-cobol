@@ -28,18 +28,12 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
 
@@ -132,7 +126,7 @@ public class CopybookDependencyServiceImpl
   @Override
   public void updateDependencyList(Path dependencyFilePath, String copybookName) {
     if (isCopybokNotPresentInDepFile(copybookName, getContentFromFile(dependencyFilePath))) {
-      writeInFile(dependencyFilePath, copybookName);
+      writeInFile(dependencyFilePath, copybookName, StandardOpenOption.APPEND);
     }
   }
 
@@ -175,99 +169,39 @@ public class CopybookDependencyServiceImpl
     // we are not checking .dep on DID_OPEN because on DID_OPEN the file is updated with the
     // required copybooks
     if (event.getTextDocumentSync().equals(TextDocumentSyncType.DID_CHANGE.name())) {
-
-      Path path =
-          findCopybook(
-              event.getCopybookName(),
-              configurationSettingsStorableProvider.get().getProfiles().toString(),
-              configurationSettingsStorableProvider.get().getPaths());
-
-      Path folderPath =
-          Paths.get(
-              getWorkspaceFolderPaths().get(0)
-                  + filesystemSeparator()
-                  + COBDEPS
-                  + filesystemSeparator());
+      Path path = getCopybookPath(event);
 
       Path dependencyFilePath =
-          retrieveDependencyFile(folderPath, getFileNameFromURI(event.getDocumentUri()));
+          getPath(
+              getWorkspaceFolderPaths().get(0).toString()
+                  + filesystemSeparator()
+                  + COBDEPS
+                  + filesystemSeparator(),
+              getNameFromURI(event.getDocumentUri()) + DEP_EXTENSION);
 
       if (path != null && isFileExists(dependencyFilePath)) {
-        removeCpyFromDep(dependencyFilePath, event.getCopybookName());
+        removeIfPresent(event.getCopybookName(), dependencyFilePath);
       }
     }
   }
 
-  /**
-   * This method removes a given string from a given file
-   *
-   * @param dependencyFilePath - the path to .dep file
-   * @param copybookName
-   */
-  // TODO: Refactor this..
-  private void removeCpyFromDep(Path dependencyFilePath, String copybookName) {
-    try {
-      List<String> result = Files.readAllLines(dependencyFilePath);
-      List<String> updatedLines =
-          result.stream().filter(s -> !s.equals(copybookName)).collect(Collectors.toList());
-      // don't write if the lines were not modify
-      if (!updatedLines.equals(result)) {
-        Files.write(
-            dependencyFilePath,
-            updatedLines,
-            StandardOpenOption.WRITE,
-            StandardOpenOption.TRUNCATE_EXISTING);
-      }
-    } catch (IOException e) {
-      log.error(e.getMessage());
-    }
-  }
-
-  /**
-   * This method is used to search for a copybook against a given configuration of datasets that
-   * represent the sub-path of the copyooks folder
-   *
-   * @param filename copybook name
-   * @return The path of the existent copybook or null if not found
-   */
-  private Path findCopybook(String filename, String profile, List<String> datasetList) {
-    return retrievePathOrNull(filename, generatePathListFromSettings(profile, datasetList));
-  }
-
-  private Path retrievePathOrNull(String filename, List<Path> datasetPathList) {
-    return datasetPathList.stream()
-        .map(it -> applySearch(filename, it))
+  private Path getCopybookPath(CopybookDepEvent event) {
+    return getTargetFolders().stream()
+        .map(it -> applySearch(event.getCopybookName(), it))
         .filter(Objects::nonNull)
         .findAny()
         .orElse(null);
   }
 
-  private List<Path> generatePathListFromSettings(String profile, List<String> datasetList) {
-    // TODO: Check if is possible replace the filer..
-    return datasetList.stream()
-        .map(
-            it ->
-                Paths.get(
-                    getCopybookFolder(workspaceFolderPaths.get(0))
-                        + filesystemSeparator()
-                        + profile
-                        + filesystemSeparator()
-                        + it))
-        .filter(Files::exists)
-        .collect(Collectors.toList());
+  private List<Path> getTargetFolders() {
+    return getPathList(
+        getCopybookFolder() + filesystemSeparator(),
+        configurationSettingsStorableProvider.get().getProfiles().toString(),
+        configurationSettingsStorableProvider.get().getPaths());
   }
 
-  private Path getCopybookFolder(Path workspaceFolderPath) {
-    return Paths.get(workspaceFolderPath + filesystemSeparator() + COPYBOOK_FOLDER_NAME);
-  }
-
-  private String getFileNameFromURI(String documentUri) {
-    String result = null;
-    try {
-      result = FilenameUtils.getBaseName(Paths.get(new URI(documentUri)).getFileName().toString());
-    } catch (URISyntaxException e) {
-      log.error(e.getMessage());
-    }
-    return result;
+  private String getCopybookFolder() {
+    return Paths.get(workspaceFolderPaths.get(0) + filesystemSeparator() + COPYBOOK_FOLDER_NAME)
+        .toString();
   }
 }
