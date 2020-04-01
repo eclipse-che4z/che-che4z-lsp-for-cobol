@@ -32,12 +32,6 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.nio.file.*;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.nio.file.Files.readAllLines;
 
@@ -130,12 +124,7 @@ public class FileSystemUtils {
    * @return the {@link Path} that contains all the given segment, null if the path doesn't exists.
    */
   public Path getPath(@Nonnull String basePath, @Nonnull String... more) {
-    return Paths.get(
-        basePath,
-        filesystemSeparator(),
-        Arrays.stream(more)
-            .map(path -> path + filesystemSeparator())
-            .collect(Collectors.joining()));
+    return Paths.get(basePath, more);
   }
 
   /**

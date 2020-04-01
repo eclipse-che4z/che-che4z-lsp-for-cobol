@@ -40,18 +40,17 @@ import static org.mockito.Mockito.when;
 @Slf4j
 public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String WORKSPACE_FOLDER_NAME = "test";
-  protected static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
+  protected static final String COBOL_FILE_DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
   protected static final String CPY_DOCUMENT_URI = "file:///C:/Users/test/CPYNEST.cpy";
 
   protected static final String PROFILE_NAME = "PRF11";
   protected static final String DSNAME_1 = "HLQLF01.DSNAME1";
   protected static final String DSNAME_2 = "HLQLF01.DSNAME2";
 
-  protected static final String CPY_OUTER_NAME_ONLY2 = "copy2";
+  protected static final String CPY_NAME_WITHOUT_EXT = "copy2";
   protected static final String COPYBOOK_NOT_PRESENT = "ANTHRCPY";
   protected static final String EMPTY_COPYBOOK_NAME = " ";
-  protected static final String DOCUMENT_URI = "file:///C:/Users/test/Test.cbl";
-  protected static final String COPYBOOK_NAME = "Test";
+  protected static final String COBOL_FILE_NAME = "Test";
   protected static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
   public static final String CPYNEST_CPY = "CPYNEST.cpy";
 
@@ -160,7 +159,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
 
   private void createDependencyFile() {
     writeContentOnFile(
-        createFile(depenencyFileFolderPath, DEP_FILE_COST_NAME + ".dep"), CPY_OUTER_NAME_ONLY2);
+        createFile(depenencyFileFolderPath, DEP_FILE_COST_NAME + ".dep"), CPY_NAME_WITHOUT_EXT);
   }
 
   private void createCopybookFiles() {

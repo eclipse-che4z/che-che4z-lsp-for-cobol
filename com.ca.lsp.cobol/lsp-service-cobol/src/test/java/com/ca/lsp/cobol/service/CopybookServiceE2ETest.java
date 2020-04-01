@@ -51,7 +51,6 @@ import static org.mockito.Mockito.when;
  */
 @Slf4j
 public class CopybookServiceE2ETest extends FileSystemConfiguration {
-  public static final String CPY_NAME_WITHOUT_EXT = "copy2";
   private final DataBusBroker broker =
       Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
 
@@ -89,7 +88,7 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
     broker.postData(
         RequiredCopybookEvent.builder()
             .name(CPY_NAME_WITHOUT_EXT)
-            .documentUri(DOCUMENT_URI)
+            .documentUri(COBOL_FILE_DOCUMENT_URI)
             .textDocumentSyncType("DID_OPEN")
             .build());
 
@@ -106,7 +105,7 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
     broker.postData(
         RequiredCopybookEvent.builder()
             .name(CPY_NAME_WITHOUT_EXT)
-            .documentUri(DOCUMENT_URI)
+            .documentUri(COBOL_FILE_DOCUMENT_URI)
             .build());
 
     // after one second is expected to found the dep file on filesystem
@@ -122,7 +121,7 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
     broker.postData(
         RequiredCopybookEvent.builder()
             .name(CPY_NAME_WITHOUT_EXT)
-            .documentUri(DOCUMENT_URI)
+            .documentUri(COBOL_FILE_DOCUMENT_URI)
             .textDocumentSyncType("DID_CHANGE")
             .build());
     // after one second is expected to found the dep file on filesystem
@@ -174,7 +173,7 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
     broker.postData(
         RequiredCopybookEvent.builder()
             .name(CPYNEST_CPY)
-            .documentUri(DOCUMENT_URI)
+            .documentUri(COBOL_FILE_DOCUMENT_URI)
             .textDocumentSyncType("DID_OPEN")
             .build());
 

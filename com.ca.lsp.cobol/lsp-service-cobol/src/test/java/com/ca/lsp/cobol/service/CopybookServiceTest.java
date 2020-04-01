@@ -62,7 +62,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
    */
   @Test
   public void findCopybookByNamePositiveTest() {
-    assertNotNull(copybookService.findCopybook(CPY_OUTER_NAME_ONLY2));
+    assertNotNull(copybookService.findCopybook(CPY_NAME_WITHOUT_EXT));
   }
 
   /**
@@ -82,7 +82,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
   public void getContentByCopybookName() throws IOException {
     Path path =
         copybookService.findCopybook(
-            CPY_OUTER_NAME_ONLY2,
+            CPY_NAME_WITHOUT_EXT,
             (String) configurationSettingsStorable.getProfiles(),
             configurationSettingsStorable.getPaths());
 
@@ -109,7 +109,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
   @Test
   public void testCorrectFetchedDataAreGenerated() {
     FetchedCopybookEvent fetchedCopybookEvent =
-        FetchedCopybookEvent.builder().name(CPY_OUTER_NAME_ONLY2).content("SOME_CONTENT").build();
+        FetchedCopybookEvent.builder().name(CPY_NAME_WITHOUT_EXT).content("SOME_CONTENT").build();
 
     assertTrue(
         fetchedCopybookEvent.getName().length() > 0
@@ -125,7 +125,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
     // use the list of paths for the search in copybooks delimited only to this list
     assertNotNull(
         copybookService.findCopybook(
-            CPY_OUTER_NAME_ONLY2,
+            CPY_NAME_WITHOUT_EXT,
             (String) configurationSettingsStorable.getProfiles(),
             configurationSettingsStorable.getPaths()));
   }
@@ -151,7 +151,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
   public void findCopybookWithWrongFolderStructure() {
     assertNull(
         copybookService.findCopybook(
-            CPY_OUTER_NAME_ONLY2,
+            CPY_NAME_WITHOUT_EXT,
             (String) configurationSettingsStorable.getProfiles(),
             Collections.singletonList("HLQLF02.DSNAME1")));
   }

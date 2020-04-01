@@ -47,6 +47,8 @@ public class CopybookServiceImpl implements CopybookService {
   private static final String COPYBOOK_FOLDER_NAME = ".copybooks";
   private final DataBusBroker dataBus;
   private List<WorkspaceFolder> workspaceFolders;
+  private List<Path> workspaceFolderPaths;
+
   private CopybookDependencyService dependencyService;
   private final Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider;
   private Communications communications;
@@ -66,13 +68,23 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   /**
-   * Store the informations about the workspace folder defined by the client IDE
+   * Store the information about the workspace folders defined by the client IDE
    *
    * @param workspaceFolders list of workspace folders sent by the client to the server
    */
   @Override
   public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
     this.workspaceFolders = workspaceFolders;
+    createPathListFromWorkspaceFolders();
+    setPathListInDependencyFile();
+  }
+
+  private void createPathListFromWorkspaceFolders() {
+    workspaceFolderPaths = getWorkspaceFoldersAsPathList();
+  }
+
+  private void setPathListInDependencyFile() {
+    dependencyService.setWorkspaceFolderPaths(workspaceFolderPaths);
   }
 
   /**
@@ -87,7 +99,7 @@ public class CopybookServiceImpl implements CopybookService {
    */
   @Override
   public Path findCopybook(String fileName) {
-    return getWorkspaceFoldersAsPathList().stream()
+    return workspaceFolderPaths.stream()
         .map(it -> applySearch(fileName, getCopybookBaseFolder(it)))
         .filter(Objects::nonNull)
         .findAny()
@@ -119,7 +131,7 @@ public class CopybookServiceImpl implements CopybookService {
         .map(
             it ->
                 Paths.get(
-                    getCopybookBaseFolder(getWorkspaceFoldersAsPathList().get(0))
+                    getCopybookBaseFolder(workspaceFolderPaths.get(0))
                         + filesystemSeparator()
                         + profile
                         + filesystemSeparator()
@@ -153,8 +165,7 @@ public class CopybookServiceImpl implements CopybookService {
   public void observerCallback(RequiredCopybookEvent event) {
     String requiredCopybookName = event.getName();
 
-    dependencyService.addCopybookInDepFile(
-        event, requiredCopybookName, getWorkspaceFoldersAsPathList());
+    dependencyService.addCopybookInDepFile(event, requiredCopybookName);
     resolveCopybookContent(requiredCopybookName);
   }
 
@@ -239,6 +250,6 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private boolean copybookFolderNotDefined() {
-    return !getCopybookBaseFolder(getWorkspaceFoldersAsPathList().get(0)).toFile().exists();
+    return !getCopybookBaseFolder(workspaceFolderPaths.get(0)).toFile().exists();
   }
 }

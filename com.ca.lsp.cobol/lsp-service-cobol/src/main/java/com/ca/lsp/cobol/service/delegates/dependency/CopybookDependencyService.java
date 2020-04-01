@@ -27,8 +27,7 @@ import java.util.List;
  */
 public interface CopybookDependencyService {
 
-  void addCopybookInDepFile(
-      RequiredCopybookEvent event, String requiredCopybookName, List<Path> targetPaths);
+  void addCopybookInDepFile(RequiredCopybookEvent event, String requiredCopybookName);
 
   boolean isFileInDidOpen(RequiredCopybookEvent event);
 
@@ -37,6 +36,4 @@ public interface CopybookDependencyService {
   void generateDependencyFile(String cobolFileName);
 
   void updateDependencyList(Path dependencyFilePath, String requiredCopybookName);
-
-  void writeCopybookInDepFile(String requiredCopybookName, String documentUri);
 }
