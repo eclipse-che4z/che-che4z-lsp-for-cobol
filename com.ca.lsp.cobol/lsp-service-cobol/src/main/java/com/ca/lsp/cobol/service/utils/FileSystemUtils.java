@@ -29,7 +29,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.file.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -262,35 +264,6 @@ public class FileSystemUtils {
   }
 
   /**
-   * @param workspaceFolders folders which are provided at the init moment
-   * @return a list of path of those folders
-   */
-  public List<Path> getWorkspaceFoldersAsPathList(List<WorkspaceFolder> workspaceFolders) {
-    return Optional.ofNullable(workspaceFolders)
-        .map(Collection::stream)
-        .orElseGet(Stream::empty)
-        .filter(Objects::nonNull)
-        .map(FileSystemUtils::resolveUriPath)
-        .collect(Collectors.toList());
-  }
-
-  /**
-   * This method can be used to extract the name of a given COBOL file from the URI
-   *
-   * @param documentUri
-   * @return the cobol program name from the given URI
-   */
-  public String getFileNameFromURI(String documentUri) {
-    String result = null;
-    try {
-      result = FilenameUtils.getBaseName(Paths.get(new URI(documentUri)).getFileName().toString());
-    } catch (URISyntaxException e) {
-      log.error(e.getMessage());
-    }
-    return result;
-  }
-
-  /**
    * @param it workspace folder
    * @return the normalized path version of the given folder
    */
@@ -303,16 +276,22 @@ public class FileSystemUtils {
     return null;
   }
 
-  public void removeIfPresent(String element, Path targetFile) {
+  /**
+   * Remove an element present inside the file defined on targetPath
+   *
+   * @param element to remove from the file
+   * @param targetPath Path reference to the file
+   */
+  public void removeIfPresent(String element, Path targetPath) {
     try {
-      List<String> result = getContentFromFile(targetFile);
+      List<String> result = getContentFromFile(targetPath);
 
       List<String> updatedLines =
           result.stream().filter(s -> !s.equals(element)).collect(Collectors.toList());
 
       // don't write if the lines were not modify
       if (!updatedLines.equals(result)) {
-        Files.write(targetFile, updatedLines, StandardOpenOption.TRUNCATE_EXISTING);
+        Files.write(targetPath, updatedLines, StandardOpenOption.TRUNCATE_EXISTING);
       }
     } catch (IOException e) {
       log.error(e.getMessage());
