@@ -32,8 +32,6 @@ spec:
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
-    securityContext:
-      runAsUser: 0
   - name: python
     image: python
     tty: true
@@ -134,7 +132,7 @@ pipeline {
         stage('Integration test') {
             steps {
                 script {
-                    if (isTimeTriggeredBuild() && (branchName == 'development' || env.CHANGE_ID)) {
+                    if (branchName == 'integration-tests') {
                         container('theia') {
                             dir('tests') {
                                 sh './theiaPrepare.sh'
