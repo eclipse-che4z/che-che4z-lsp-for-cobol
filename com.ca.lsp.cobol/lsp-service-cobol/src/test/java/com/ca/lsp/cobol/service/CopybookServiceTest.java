@@ -93,9 +93,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
   public void getContentByCopybookName() throws IOException {
     Path path =
         copybookService.findCopybook(
-            CPY_OUTER_NAME_ONLY2,
-            (String) configurationSettingsStorable.getProfiles(),
-            configurationSettingsStorable.getPaths());
+            CPY_OUTER_NAME_ONLY2, configurationSettingsStorable.getPaths());
 
     assertTrue(Files.readAllBytes(path).length > 0);
   }
@@ -108,9 +106,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
   public void getNullWithNotCopybookNotFound() {
     assertNull(
         copybookService.findCopybook(
-            COPYBOOK_NOT_PRESENT,
-            (String) configurationSettingsStorable.getProfiles(),
-            configurationSettingsStorable.getPaths()));
+            COPYBOOK_NOT_PRESENT, configurationSettingsStorable.getPaths()));
   }
 
   /**
@@ -136,9 +132,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
     // use the list of paths for the search in copybooks delimited only to this list
     assertNotNull(
         copybookService.findCopybook(
-            CPY_OUTER_NAME_ONLY2,
-            (String) configurationSettingsStorable.getProfiles(),
-            configurationSettingsStorable.getPaths()));
+            CPY_OUTER_NAME_ONLY2, configurationSettingsStorable.getPaths()));
   }
 
   /**
@@ -147,11 +141,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
    */
   @Test
   public void findCopybookWithDatasetFilteringNegativeTest() {
-    assertNull(
-        copybookService.findCopybook(
-            "ANTHCPY1",
-            (String) configurationSettingsStorable.getProfiles(),
-            configurationSettingsStorable.getPaths()));
+    assertNull(copybookService.findCopybook("ANTHCPY1", configurationSettingsStorable.getPaths()));
   }
 
   /**
@@ -163,8 +153,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
     assertNull(
         copybookService.findCopybook(
             CPY_OUTER_NAME_ONLY2,
-            (String) configurationSettingsStorable.getProfiles(),
-            Collections.singletonList("HLQLF02.DSNAME1")));
+            Collections.singletonList(PROFILE_NAME + filesystemSeparator() + "HLQLF02.DSNAME1")));
   }
 
   @Override

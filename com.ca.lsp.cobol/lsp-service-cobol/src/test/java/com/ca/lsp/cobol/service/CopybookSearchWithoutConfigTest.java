@@ -119,7 +119,7 @@ public class CopybookSearchWithoutConfigTest {
     // simulate that user have not provided settings for profile and datasetlist but the
     // preprocessor found a copybook.
     when(settingsProvider.get())
-        .thenReturn(new ConfigurationSettingsStorable("myProfile", Collections.emptyList()));
+        .thenReturn(new ConfigurationSettingsStorable( Collections.emptyList()));
 
     try {
       copybookService.observerCallback(requiredCopybookEvent);
@@ -137,7 +137,7 @@ public class CopybookSearchWithoutConfigTest {
   @Test
   public void findCopybookWithoutCopybookFolderDefined() {
     when(settingsProvider.get())
-        .thenReturn(new ConfigurationSettingsStorable("PRF", Collections.singletonList("HLQ.DS1")));
+        .thenReturn(new ConfigurationSettingsStorable(Collections.singletonList("HLQ.DS1")));
     try {
       copybookService.observerCallback(requiredCopybookEvent);
       verifyThatDepFileIsEngaged();

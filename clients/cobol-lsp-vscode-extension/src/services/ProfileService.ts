@@ -15,9 +15,9 @@
 import { IProfile } from "@zowe/imperative";
 import * as path from "path";
 import * as vscode from "vscode";
+import { Disposable } from "vscode-languageclient";
 import { SETTINGS_SECTION } from "../constants";
 import { ProfilesMap, ZoweApi } from "./ZoweApi";
-import { Disposable } from "vscode-languageclient";
 
 const DEFAULT_STATUS_TEXT = "CPY profile: undefined";
 
@@ -34,14 +34,17 @@ export class ProfileService implements Disposable {
 
     async getProfile(programName?: string): Promise<string | undefined> {
         if (programName) {
-            const detectedProfile: string | undefined = (await this.findProfileByDependenciesFile(programName))
-                || this.tryGetProfileFromSettings();
+            const detectedProfile: string | undefined = (await this.findProfileByDependenciesFile(programName));
             if (detectedProfile) {
                 return detectedProfile;
             }
         }
 
         const profiles: ProfilesMap = await this.zoweApi.listZOSMFProfiles();
+        const profile = this.tryGetProfileFromSettings(profiles);
+        if (profile) {
+            return profile;
+        }
         if (Object.keys(profiles).length === 0) {
             await vscode.window.showErrorMessage("Zowe profile is missing.");
             return undefined;
@@ -75,8 +78,9 @@ export class ProfileService implements Disposable {
         return undefined;
     }
 
-    updateStatusBar() {
-        const profile: string | undefined = this.tryGetProfileFromSettings();
+    async updateStatusBar() {
+        const profiles: ProfilesMap = await this.zoweApi.listZOSMFProfiles();
+        const profile: string | undefined = this.tryGetProfileFromSettings(profiles);
         if (profile) {
             this.defaultProfileStatusBarItem.text = `CPY profile: ${profile}`;
         } else {
@@ -117,9 +121,15 @@ export class ProfileService implements Disposable {
         return undefined;
     }
 
-    private tryGetProfileFromSettings(): string | undefined {
+    private tryGetProfileFromSettings(profiles: ProfilesMap): string | undefined {
         // TODO switch from single profile to program specific profile
-        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles");
+        const profile: string = vscode.workspace.getConfiguration().get(SETTINGS_SECTION + ".profiles");
+
+        if (profiles[profile]) {
+            return profile;
+        }
+
+        return undefined;
     }
     private async tryGetProfileFromDocumentPath(docPath: string): Promise<string | undefined> {
         const profiles = Object.keys(await this.zoweApi.listZOSMFProfiles());

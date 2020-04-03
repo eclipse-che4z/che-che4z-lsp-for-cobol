@@ -44,6 +44,7 @@ import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
+import static com.ca.lsp.cobol.service.utils.FileSystemUtils.interpretPaths;
 
 /**
  * This class sets up the initial state of the services and applies other initialization activities,
@@ -123,7 +124,12 @@ public class MyLanguageServerImpl implements LanguageServer {
    */
   void retrieveAndStoreConfiguration() {
     fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
-        .thenAccept(e -> settingsProvider.set(parseJsonIfValid((JsonObject) e.get(0))));
+        .thenAccept(
+            e -> {
+              ConfigurationSettingsStorable config =
+                  new ConfigurationSettingsStorable(interpretPaths(e));
+              settingsProvider.set(config);
+            });
   }
 
   /**

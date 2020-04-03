@@ -122,8 +122,8 @@ public class CopybookServiceImpl implements CopybookService {
    * @return The path of the existent copybook or null if not found
    */
   @Override
-  public Path findCopybook(String filename, String profile, List<String> datasetList) {
-    return retrievePathOrNull(filename, generatePathListFromSettings(profile, datasetList));
+  public Path findCopybook(String filename, List<String> paths) {
+    return retrievePathOrNull(filename, generatePathListFromSettings(paths));
   }
 
   private Path retrievePathOrNull(String filename, List<Path> datasetPathList) {
@@ -134,17 +134,10 @@ public class CopybookServiceImpl implements CopybookService {
         .orElse(null);
   }
 
-  private List<Path> generatePathListFromSettings(String profile, List<String> datasetList) {
+  private List<Path> generatePathListFromSettings(List<String> paths) {
     // can happen here that copybooks or internal structure is null
-    return datasetList.stream()
-        .map(
-            it ->
-                Paths.get(
-                    getCopybookFolder(getWorkspaceFoldersAsPathList().get(0))
-                        + filesystemSeparator()
-                        + profile
-                        + filesystemSeparator()
-                        + it))
+    return paths.stream()
+        .map(it -> Paths.get(getCopybookFolder(getWorkspaceFoldersAsPathList().get(0)) + it))
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
   }
@@ -233,11 +226,7 @@ public class CopybookServiceImpl implements CopybookService {
         configurationSettingsStorableProvider.get();
 
     // search the copybook against the target folders provided from the settings
-    path =
-        findCopybook(
-            requiredCopybookName,
-            (String) configurationSettingsStorable.getProfiles(),
-            configurationSettingsStorable.getPaths());
+    path = findCopybook(requiredCopybookName, configurationSettingsStorable.getPaths());
 
     if (isFileExists(path)) {
       content = retrieveContentByPath(path);

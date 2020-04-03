@@ -12,10 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as vscode from "vscode";
 import * as path from "path";
+import * as vscode from "vscode";
+import { COPYBOOKS_FOLDER, SETTINGS_SECTION } from "../constants";
 import { ProfileService } from "./ProfileService";
-import { SETTINGS_SECTION, COPYBOOKS_FOLDER } from "../constants";
 
 export class CopybooksPathGenerator {
     constructor(private profileService: ProfileService) { }

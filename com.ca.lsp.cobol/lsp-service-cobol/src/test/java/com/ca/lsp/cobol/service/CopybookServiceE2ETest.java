@@ -64,7 +64,7 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
     when(configurationSettingsProvider.get())
         .thenReturn(
             new ConfigurationSettingsStorable(
-                "myProfile", unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2))));
+                unmodifiableList(Arrays.asList(FULL_PATH, FULL_PATH2))));
 
     CopybookServiceImpl copybookService =
         new CopybookServiceImpl(

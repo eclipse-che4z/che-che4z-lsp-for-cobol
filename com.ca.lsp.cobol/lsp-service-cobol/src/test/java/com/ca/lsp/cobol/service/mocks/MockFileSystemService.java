@@ -114,7 +114,7 @@ public class MockFileSystemService implements CopybookService {
   }
 
   @Override
-  public Path findCopybook(String filename, String profile, List<String> datasetList) {
+  public Path findCopybook(String filename, List<String> paths) {
     return null;
   }
 

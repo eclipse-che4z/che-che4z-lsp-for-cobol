@@ -12,14 +12,14 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { JavaCheck } from "./JavaCheck";
 import * as fs from "fs";
-import * as vscode from "vscode";
 import * as net from "net";
-import { StreamInfo, LanguageClient, LanguageClientOptions, ConfigurationRequest, ConfigurationParams, CancellationToken } from "vscode-languageclient";
+import * as vscode from "vscode";
 import { LANGUAGE_ID } from "../constants";
+import {CancellationToken, ConfigurationParams, ConfigurationRequest, LanguageClient, LanguageClientOptions, StreamInfo} from "vscode-languageclient";
 import { ConfigurationWorkspaceMiddleware } from "vscode-languageclient/lib/configuration";
 import { CopybooksPathGenerator } from "./CopybooksPathGenerator";
+import { JavaCheck } from "./JavaCheck";
 
 export class LanguageClientService {
     private jarPath: string;
@@ -55,7 +55,7 @@ export class LanguageClientService {
             // TODO if request params are right
             return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
             // TODO else return next(params, token);
-        }
+        };
         const configurationMiddleware: ConfigurationWorkspaceMiddleware = {
             configuration: signatureFunc,
         };

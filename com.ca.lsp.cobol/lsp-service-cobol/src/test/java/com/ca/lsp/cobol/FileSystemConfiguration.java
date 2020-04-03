@@ -50,6 +50,10 @@ public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String PROFILE_NAME = "PRF11";
   protected static final String DSNAME_1 = "HLQLF01.DSNAME1";
   protected static final String DSNAME_2 = "HLQLF01.DSNAME2";
+  protected static final String FULL_PATH =
+      filesystemSeparator() + PROFILE_NAME + filesystemSeparator() + DSNAME_1;
+  protected static final String FULL_PATH2 =
+      filesystemSeparator() + PROFILE_NAME + filesystemSeparator() + DSNAME_2;
   protected static final String DEP_EXTENSION = ".dep";
   protected static final String COPYBOOK_NOT_PRESENT = "ANTHRCPY";
 
@@ -112,11 +116,9 @@ public class FileSystemConfiguration extends ConfigurableTest {
    * settings.json
    */
   private void intializeSettings() {
-    // SettingsProvider settingsProvider = new SettingsProvider();
-
     configurationSettingsStorable =
         new ConfigurationSettingsStorable(
-            PROFILE_NAME, Collections.unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2)));
+            Collections.unmodifiableList(Arrays.asList(FULL_PATH, FULL_PATH2)));
 
     settingsProvider.set(configurationSettingsStorable);
     when(settingsProvider.get()).thenReturn(configurationSettingsStorable);
@@ -152,19 +154,11 @@ public class FileSystemConfiguration extends ConfigurableTest {
   private void createCopybookFiles() {
     ConfigurationSettingsStorable configSettings = settingsProvider.get();
 
-    String profile = (String) configSettings.getProfiles();
     List<String> targetDatasets = configSettings.getPaths();
 
     List<Path> retrievedPaths =
         targetDatasets.stream()
-            .map(
-                it ->
-                    Paths.get(
-                        copybooksFolderPath
-                            + filesystemSeparator()
-                            + profile
-                            + filesystemSeparator()
-                            + it))
+            .map(it -> Paths.get(copybooksFolderPath + it))
             .collect(Collectors.toList());
 
     retrievedPaths.forEach(this::createFolderStructure);
@@ -187,7 +181,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
     return workspaceFolder;
   }
 
-  protected String filesystemSeparator() {
+  protected static String filesystemSeparator() {
     return FileSystems.getDefault().getSeparator();
   }
 

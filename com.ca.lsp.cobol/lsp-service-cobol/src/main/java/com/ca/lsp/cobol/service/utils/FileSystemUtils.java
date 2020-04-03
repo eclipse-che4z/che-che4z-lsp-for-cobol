@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This is an utility class that provide filesystem related methods consumed by the classes that
@@ -39,6 +40,7 @@ import java.util.List;
 @UtilityClass
 public class FileSystemUtils {
   private final List<String> ALLOWED_EXTENSIONS = Arrays.asList("cpy", "cbl", "cobol", "cob");
+  private final String COPYBOOKS_FOLDER = ".copybooks";
 
   /** @return the representation os based of the FS separator */
   public static String filesystemSeparator() {
@@ -107,5 +109,24 @@ public class FileSystemUtils {
       log.error(e.getMessage());
       return uri;
     }
+  }
+
+  /**
+   * This method is used to transform from a List<Object> to a list of strings which contains the
+   * exact path needed to be attached to a required URI.
+   *
+   * @param settings result of the requested configuration settings
+   * @return list of refactored strings
+   */
+  public static List<String> interpretPaths(List<Object> settings) {
+    return settings.stream()
+        .map(
+            f -> {
+              String path = f.toString();
+              return path.substring(path.indexOf(COPYBOOKS_FOLDER) + COPYBOOKS_FOLDER.length())
+                  .replace("/", filesystemSeparator())
+                  .replace("\"", "");
+            })
+        .collect(Collectors.toList());
   }
 }
