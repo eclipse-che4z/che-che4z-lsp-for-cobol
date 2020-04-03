@@ -24,7 +24,6 @@ import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.mocks.MockCopybookService;
 import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
-import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
@@ -37,8 +36,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
+import static java.util.Collections.*;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -70,10 +68,11 @@ public class AnalyzeCopybookCaching {
     initParagraphDefinitions();
     predefineCache();
     initWorkspaceService();
-    when(preprocessor.process(
-            any(), any(String.class), any(), any(String.class)))
+    when(preprocessor.process(any(), any(String.class), any(), any(String.class)))
         .thenReturn(
-            new ResultWithErrors<>(new PreprocessedInput(COPYBOOK_CONTENT, null), emptyList()));
+            new ResultWithErrors<>(
+                new PreprocessedInput(COPYBOOK_CONTENT, null, emptyMap(), emptyMap()),
+                emptyList()));
   }
 
   private void initParagraphDefinitions() {
@@ -174,26 +173,26 @@ public class AnalyzeCopybookCaching {
   }
 
   private void runAnalysisInDidChange() {
-//    AnalyseCopybookTask analyseCopybookTask =
-//        new AnalyseCopybookTask(
-//            databus,
-//            preprocessor,
-//            null,
-//            new CopybookUsage(COPYBOOK_NAME, null, null),
-//            emptyList(),
-//            "DID_CHANGE");
-//    analyseCopybookTask.compute();
+    //    AnalyseCopybookTask analyseCopybookTask =
+    //        new AnalyseCopybookTask(
+    //            databus,
+    //            preprocessor,
+    //            null,
+    //            new CopybookUsage(COPYBOOK_NAME, null, null),
+    //            emptyList(),
+    //            "DID_CHANGE");
+    //    analyseCopybookTask.compute();
   }
 
   private void runAnalysisInDidOpen() {
-//    AnalyseCopybookTask analyseCopybookTask =
-//        new AnalyseCopybookTask(
-//            databus,
-//            preprocessor,
-//            null,
-//            new CopybookUsage(COPYBOOK_NAME, null, null),
-//            emptyList(),
-//            "DID_OPEN");
-//    analyseCopybookTask.compute();
+    //    AnalyseCopybookTask analyseCopybookTask =
+    //        new AnalyseCopybookTask(
+    //            databus,
+    //            preprocessor,
+    //            null,
+    //            new CopybookUsage(COPYBOOK_NAME, null, null),
+    //            emptyList(),
+    //            "DID_OPEN");
+    //    analyseCopybookTask.compute();
   }
 }

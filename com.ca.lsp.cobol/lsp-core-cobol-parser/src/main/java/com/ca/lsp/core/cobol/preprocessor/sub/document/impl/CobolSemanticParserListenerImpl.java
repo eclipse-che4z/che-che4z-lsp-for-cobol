@@ -34,9 +34,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.NEWLINE;
@@ -55,7 +53,9 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private static final String ERROR_SUGGESTION = "%s: Copybook not found";
 
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
-  @Getter private SemanticContext semanticContext;
+  @Getter private final SemanticContext semanticContext = new SemanticContext();
+  @Getter private final Map<String, List<Position>> innerMappings = new HashMap<>();
+  @Getter private final Map<String, Integer> copybookDeltas = new HashMap<>();
 
   private PreprocessorCleanerServiceImpl cleaner;
   private String documentUri;
@@ -81,7 +81,6 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     this.cleaner = cleaner;
     this.preprocessor = preprocessor;
     this.resolutions = resolutions;
-    semanticContext = new SemanticContext();
   }
 
   @Nonnull
@@ -186,11 +185,21 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     /*
      * copy the copy book
      */
-    String copyBookContent = getCopyBookContent(ctx.copySource());
+    String copybookName = retrieveCopybookName(ctx.copySource());
+    Position position = retrievePosition(ctx.copySource());
+    String copyBookContent = getCopyBookContent(copybookName, position);
 
     if (copyBookContent != null) {
       context().write(copyBookContent + NEWLINE);
       context().replaceReplaceablesByReplacements(tokens);
+    }
+
+    if (innerMappings.get(copybookName) != null) {
+      int copybookLength = innerMappings.get(copybookName).size();
+      int copybookDefinitionLength = ctx.getStop().getTokenIndex() - ctx.getStart().getTokenIndex();
+      int delta = copybookLength - copybookDefinitionLength;
+
+      copybookDeltas.put(copybookName, delta);
     }
 
     String content = context().read();
@@ -199,14 +208,11 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     context().write(content);
   }
 
-  private String getCopyBookContent(CopySourceContext copySource) {
-
+  private String getCopyBookContent(String copybookName, Position position) {
     /*
      * define the copy book
      */
-    String copybookName = retrieveCopybookName(copySource);
     if (copybookName == null) return "";
-    Position position = retrievePosition(copySource);
     defineCopybook(copybookName, position);
     checkCopybookNameLength(copybookName, position);
 
@@ -219,7 +225,6 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
                       .suggestion(String.format(RECURSION_DETECTED, it.getName()))
                       .position(it.getPosition())
                       .build()));
-
       return "";
     }
 
@@ -242,8 +247,13 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
         preprocessor.process(
             copybook.getUri(), copybook.getContent(), copybookStack, textDocumentSyncType);
     errors.addAll(result.getErrors());
+
+    PreprocessedInput input = result.getResult();
+    innerMappings.putAll(input.getTokenMapping());
+    copybookDeltas.putAll(input.getCopybookDeltas());
+
     copybookStack.pop();
-    return result.getResult().getInput();
+    return input.getInput();
   }
 
   private void checkCopybookNameLength(String copybookName, Position position) {

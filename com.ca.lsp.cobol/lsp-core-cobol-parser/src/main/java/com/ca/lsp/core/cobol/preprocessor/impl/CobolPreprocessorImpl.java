@@ -75,10 +75,8 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
     String code = createLineWriter().serialize(rewrittenLines);
 
-
     ResultWithErrors<PreprocessedInput> parsedDocument =
-        semanticParser.processLines(
-            documentUri, code, copybookStack, textDocumentSyncType);
+        semanticParser.processLines(documentUri, code, copybookStack, textDocumentSyncType);
 
     List<SyntaxError> errors = new ArrayList<>();
     errors.addAll(lines.getErrors());

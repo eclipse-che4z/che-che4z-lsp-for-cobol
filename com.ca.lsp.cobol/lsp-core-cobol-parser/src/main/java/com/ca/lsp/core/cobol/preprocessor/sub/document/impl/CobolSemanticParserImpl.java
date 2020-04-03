@@ -13,15 +13,14 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
+import com.ca.lsp.core.cobol.parser.*;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
-import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.google.inject.Inject;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -30,9 +29,9 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import javax.annotation.Nonnull;
 import java.util.Deque;
 import java.util.List;
+import java.util.Map;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Preprocessor which retrieves semantic elements definitions, such as variables, paragraphs and
@@ -40,21 +39,6 @@ import static java.util.Collections.emptyList;
  */
 public class CobolSemanticParserImpl implements CobolSemanticParser {
   private CobolSemanticParserListenerFactory listenerFactory;
-
-  private static final List<String> TRIGGERS =
-      asList(
-          "cbl",
-          "copy",
-          "exec sql",
-          "exec sqlims",
-          "exec cics",
-          "process",
-          "replace",
-          "eject",
-          "skip1",
-          "skip2",
-          "skip3",
-          "title");
 
   @Inject
   public CobolSemanticParserImpl(CobolSemanticParserListenerFactory listenerFactory) {
@@ -64,23 +48,6 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   @Nonnull
   @Override
   public ResultWithErrors<PreprocessedInput> processLines(
-      @Nonnull String uri,
-      @Nonnull String code,
-      @Nonnull Deque<CopybookUsage> copybookStack,
-      @Nonnull String textDocumentSyncType) {
-
-    return needsProcessing(code)
-        ? cleanWithParser(uri, code, copybookStack, textDocumentSyncType)
-        : defaultProcessingResult(code);
-  }
-
-  private boolean needsProcessing(@Nonnull String code) {
-    String codeLowerCase = code.toLowerCase();
-    return TRIGGERS.stream().anyMatch(codeLowerCase::contains);
-  }
-
-  @Nonnull
-  private ResultWithErrors<PreprocessedInput> cleanWithParser(
       @Nonnull String uri,
       @Nonnull String code,
       @Nonnull Deque<CopybookUsage> copybookStack,
@@ -102,14 +69,40 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     walker.walk(listener, startRule);
 
     // analyze contained copy books
-
     return new ResultWithErrors<>(
-        new PreprocessedInput(listener.context().read(), listener.getSemanticContext()),
+        new PreprocessedInput(
+            listener.context().read(),
+            listener.getSemanticContext(),
+            createTokenMapping(uri, code, listener.getInnerMappings()),
+            listener.getCopybookDeltas()),
         listener.getErrors());
   }
 
-  @Nonnull
-  private ResultWithErrors<PreprocessedInput> defaultProcessingResult(@Nonnull String code) {
-    return new ResultWithErrors<>(new PreprocessedInput(code, new SemanticContext()), emptyList());
+  private Map<String, List<Position>> createTokenMapping(
+      @Nonnull String uri,
+      @Nonnull String code,
+      @Nonnull Map<String, List<Position>> innerMappings) {
+    CobolLexer lexer = new CobolLexer(CharStreams.fromString(code));
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    CobolParser parser = new CobolParser(tokens);
+    CobolParser.StartRuleContext tree = parser.startRule();
+
+    ParseTreeWalker walker = new ParseTreeWalker();
+    walker.walk(new CobolParserBaseListener(), tree);
+    innerMappings.put(uri, convertTokensToPositions(uri, tokens));
+    return innerMappings;
+  }
+
+  private List<Position> convertTokensToPositions(@Nonnull String uri, CommonTokenStream tokens) {
+    return tokens.getTokens().stream()
+        .map(
+            it ->
+                new Position(
+                    uri,
+                    it.getStartIndex(),
+                    it.getStopIndex(),
+                    it.getLine(),
+                    it.getCharPositionInLine()))
+        .collect(toList());
   }
 }
