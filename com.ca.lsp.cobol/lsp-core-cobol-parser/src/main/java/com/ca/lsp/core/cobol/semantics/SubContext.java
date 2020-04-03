@@ -66,5 +66,5 @@ public interface SubContext<T> {
    */
   Multimap<String, Position> getUsages();
 
-  void merge(String name, SubContext<T> subContext);
+  void merge(SubContext<T> subContext);
 }

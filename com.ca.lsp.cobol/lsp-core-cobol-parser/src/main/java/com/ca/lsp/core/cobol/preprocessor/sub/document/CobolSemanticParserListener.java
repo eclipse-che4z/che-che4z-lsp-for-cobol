@@ -16,21 +16,18 @@ package com.ca.lsp.core.cobol.preprocessor.sub.document;
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorListener;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
-import com.ca.lsp.core.cobol.semantics.SemanticContext;
+import com.ca.lsp.core.cobol.semantics.SubContext;
 
 import java.util.List;
 import java.util.Map;
 
 public interface CobolSemanticParserListener extends CobolPreprocessorListener {
 
-  CobolDocumentContext context();
+  String getResult();
 
   List<SyntaxError> getErrors();
 
-  SemanticContext getSemanticContext();
+  SubContext<String> getUsedCopybooks();
 
   Map<String, List<Position>> getInnerMappings();
-
-  Map<String, Integer> getCopybookDeltas();
 }

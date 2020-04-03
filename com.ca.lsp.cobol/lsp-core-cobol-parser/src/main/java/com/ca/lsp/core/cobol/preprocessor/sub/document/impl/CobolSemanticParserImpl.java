@@ -15,7 +15,7 @@ package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookUsage;
-import com.ca.lsp.core.cobol.model.PreprocessedInput;
+import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.parser.*;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
@@ -47,7 +47,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
   @Nonnull
   @Override
-  public ResultWithErrors<PreprocessedInput> processLines(
+  public ResultWithErrors<ExtendedDocument> processLines(
       @Nonnull String uri,
       @Nonnull String code,
       @Nonnull Deque<CopybookUsage> copybookStack,
@@ -68,20 +68,18 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
         listenerFactory.create(uri, tokens, copybookStack, textDocumentSyncType);
     walker.walk(listener, startRule);
 
+    Map<String, List<Position>> innerMappings = listener.getInnerMappings();
+    List<Position> tokenMapping = createTokenMapping(uri, code);
+
+    innerMappings.put(uri, tokenMapping);
+
     // analyze contained copy books
     return new ResultWithErrors<>(
-        new PreprocessedInput(
-            listener.context().read(),
-            listener.getSemanticContext(),
-            createTokenMapping(uri, code, listener.getInnerMappings()),
-            listener.getCopybookDeltas()),
+        new ExtendedDocument(listener.getResult(), listener.getUsedCopybooks(), innerMappings),
         listener.getErrors());
   }
 
-  private Map<String, List<Position>> createTokenMapping(
-      @Nonnull String uri,
-      @Nonnull String code,
-      @Nonnull Map<String, List<Position>> innerMappings) {
+  private List<Position> createTokenMapping(@Nonnull String uri, @Nonnull String code) {
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(code));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     CobolParser parser = new CobolParser(tokens);
@@ -89,8 +87,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
     ParseTreeWalker walker = new ParseTreeWalker();
     walker.walk(new CobolParserBaseListener(), tree);
-    innerMappings.put(uri, convertTokensToPositions(uri, tokens));
-    return innerMappings;
+    return convertTokensToPositions(uri, tokens);
   }
 
   private List<Position> convertTokensToPositions(@Nonnull String uri, CommonTokenStream tokens) {
@@ -102,7 +99,8 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
                     it.getStartIndex(),
                     it.getStopIndex(),
                     it.getLine(),
-                    it.getCharPositionInLine()))
+                    it.getCharPositionInLine(),
+                    it.getText()))
         .collect(toList());
   }
 }

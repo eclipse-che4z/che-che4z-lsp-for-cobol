@@ -15,20 +15,44 @@
  */
 package com.broadcom.lsp.domain.common.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.Data;
 
 import java.io.Serializable;
 
 /**
  * This data class is used to describe the position of syntax or semantic element in the workspace.
  */
-@Value
-@AllArgsConstructor
+@Data
 public final class Position implements Serializable {
   private final String documentURI;
   private final int startPosition;
   private final int stopPosition;
   private final int line;
   private final int charPositionInLine;
+
+  private String token;
+
+  public Position(
+      String documentURI,
+      int startPosition,
+      int stopPosition,
+      int line,
+      int charPositionInLine,
+      String token) {
+    this.documentURI = documentURI;
+    this.startPosition = startPosition;
+    this.stopPosition = stopPosition;
+    this.line = line;
+    this.charPositionInLine = charPositionInLine;
+    this.token = token;
+  }
+
+  public Position(
+      String documentURI, int startPosition, int stopPosition, int line, int charPositionInLine) {
+    this.documentURI = documentURI;
+    this.startPosition = startPosition;
+    this.stopPosition = stopPosition;
+    this.line = line;
+    this.charPositionInLine = charPositionInLine;
+  }
 }

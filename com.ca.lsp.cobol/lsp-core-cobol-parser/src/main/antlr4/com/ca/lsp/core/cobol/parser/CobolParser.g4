@@ -962,11 +962,11 @@ dataDescriptionEntryExecSql
 
 //TODO: make it beautiful
 dataDescriptionEntryCpy
-   : COPYENTRY IDENTIFIER
+   : COPYENTRY IDENTIFIER DOT_FS
    ;
 
 dataDescriptionExitCpy
-   : COPYEXIT
+   : COPYEXIT DOT_FS
    ;
    
 dataGroupUsageClause

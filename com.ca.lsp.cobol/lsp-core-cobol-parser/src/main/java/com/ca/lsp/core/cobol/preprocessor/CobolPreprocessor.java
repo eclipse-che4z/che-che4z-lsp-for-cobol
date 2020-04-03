@@ -14,19 +14,19 @@
 package com.ca.lsp.core.cobol.preprocessor;
 
 import com.ca.lsp.core.cobol.model.CopybookUsage;
-import com.ca.lsp.core.cobol.model.PreprocessedInput;
+import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 
 import java.util.Deque;
 
 /** The CobolPreprocessor is engaged in order to process, trasform and parse the document */
 public interface CobolPreprocessor {
-  ResultWithErrors<PreprocessedInput> process(
+  ResultWithErrors<ExtendedDocument> process(
       String documentUri,
       String cobolCode,
       Deque<CopybookUsage> copybookStack,
       String textDocumentSyncType);
 
-  ResultWithErrors<PreprocessedInput> process(
+  ResultWithErrors<ExtendedDocument> process(
       String documentUri, String cobolCode, String textDocumentSyncType);
 }

@@ -23,19 +23,19 @@ import lombok.Getter;
 
 import java.util.Collection;
 
-class CobolNamedContext implements SubContext<String> {
+public class CobolNamedContext implements SubContext<String> {
 
   @Getter private final Multimap<String, Position> definitions = HashMultimap.create();
   @Getter private final Multimap<String, Position> usages = HashMultimap.create();
 
   @Override
-  public void define(String paragraph, Position position) {
-    definitions.put(paragraph, position);
+  public void define(String name, Position position) {
+    definitions.put(name, position);
   }
 
   @Override
-  public void addUsage(String paragraph, Position position) {
-    usages.put(paragraph, position);
+  public void addUsage(String name, Position position) {
+    usages.put(name, position);
   }
 
   @Override
@@ -49,7 +49,7 @@ class CobolNamedContext implements SubContext<String> {
   }
 
   @Override
-  public void merge(String name, SubContext<String> subContext) {
+  public void merge(SubContext<String> subContext) {
     definitions.putAll(subContext.getDefinitions());
     usages.putAll(subContext.getUsages());
   }

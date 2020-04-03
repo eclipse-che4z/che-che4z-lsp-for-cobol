@@ -94,7 +94,7 @@ public class VisitorSemanticAnalysisTest {
   }
 
   private CobolVisitor createVisitor(SemanticContext semanticContext, String variableName) {
-    CobolVisitor visitor = new CobolVisitor(null, semanticContext);
+    CobolVisitor visitor = new CobolVisitor(null, null);
     CustomToken token = createNewToken(variableName);
 
     visitor.visitQualifiedDataNameFormat1(mockMethod(token));

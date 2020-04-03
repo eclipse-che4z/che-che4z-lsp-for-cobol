@@ -14,7 +14,7 @@
 package com.ca.lsp.core.cobol.preprocessor.impl;
 
 import com.ca.lsp.core.cobol.model.CopybookUsage;
-import com.ca.lsp.core.cobol.model.PreprocessedInput;
+import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
@@ -53,14 +53,14 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
   @Nonnull
   @Override
-  public ResultWithErrors<PreprocessedInput> process(
+  public ResultWithErrors<ExtendedDocument> process(
       @Nonnull String documentUri, @Nonnull String cobolSourceCode, String textDocumentSyncType) {
     return process(documentUri, cobolSourceCode, new ArrayDeque<>(), textDocumentSyncType);
   }
 
   @Nonnull
   @Override
-  public ResultWithErrors<PreprocessedInput> process(
+  public ResultWithErrors<ExtendedDocument> process(
       @Nonnull String documentUri,
       @Nonnull String cobolCode,
       Deque<CopybookUsage> copybookStack,
@@ -75,7 +75,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
     String code = createLineWriter().serialize(rewrittenLines);
 
-    ResultWithErrors<PreprocessedInput> parsedDocument =
+    ResultWithErrors<ExtendedDocument> parsedDocument =
         semanticParser.processLines(documentUri, code, copybookStack, textDocumentSyncType);
 
     List<SyntaxError> errors = new ArrayList<>();

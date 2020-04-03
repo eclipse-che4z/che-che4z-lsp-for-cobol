@@ -24,7 +24,7 @@ import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.mocks.MockCopybookService;
 import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
-import com.ca.lsp.core.cobol.model.PreprocessedInput;
+import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.MultiMapSerializableHelper;
@@ -71,7 +71,7 @@ public class AnalyzeCopybookCaching {
     when(preprocessor.process(any(), any(String.class), any(), any(String.class)))
         .thenReturn(
             new ResultWithErrors<>(
-                new PreprocessedInput(COPYBOOK_CONTENT, null, emptyMap(), emptyMap()),
+                new ExtendedDocument(COPYBOOK_CONTENT, null, emptyMap()),
                 emptyList()));
   }
 

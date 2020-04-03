@@ -14,16 +14,15 @@
 package com.ca.lsp.core.cobol.model;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.semantics.SemanticContext;
+import com.ca.lsp.core.cobol.semantics.SubContext;
 import lombok.Value;
 
 import java.util.List;
 import java.util.Map;
 
 @Value
-public class PreprocessedInput {
-  private String input;
-  private SemanticContext semanticContext;
+public class ExtendedDocument {
+  private String text;
+  private SubContext<String> usedCopybooks;
   private Map<String, List<Position>> tokenMapping;
-  private Map<String, Integer> copybookDeltas;
 }

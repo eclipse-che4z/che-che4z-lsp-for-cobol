@@ -72,7 +72,7 @@ public class CobolVariableContext implements SubContext<Variable> {
   }
 
   @Override
-  public void merge(String name, SubContext<Variable> subContext) {
+  public void merge(SubContext<Variable> subContext) {
     variableDefinitions.putAll(subContext.getDefinitions());
     variableUsages.putAll(subContext.getUsages());
   }
@@ -121,7 +121,6 @@ public class CobolVariableContext implements SubContext<Variable> {
       generateRelations(variableList.get(i), variableList.get(i + 1));
     }
   }
-
 
   /**
    * This routine will identify the correct relation between two variable defined in the data

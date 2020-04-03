@@ -14,7 +14,7 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
 import com.ca.lsp.core.cobol.model.CopybookUsage;
-import com.ca.lsp.core.cobol.model.PreprocessedInput;
+import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 
 import javax.annotation.Nonnull;
@@ -35,7 +35,7 @@ public interface CobolSemanticParser {
    *     empty list
    */
   @Nonnull
-  ResultWithErrors<PreprocessedInput> processLines(
+  ResultWithErrors<ExtendedDocument> processLines(
       @Nonnull String uri,
       @Nonnull String code,
       @Nonnull Deque<CopybookUsage> copybookStack,

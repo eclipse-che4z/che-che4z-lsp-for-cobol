@@ -15,6 +15,9 @@ package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.*;
+import com.ca.lsp.core.cobol.parser.CobolLexer;
+import com.ca.lsp.core.cobol.parser.CobolParser;
+import com.ca.lsp.core.cobol.parser.CobolParserBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.*;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
@@ -22,14 +25,15 @@ import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListen
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
-import com.ca.lsp.core.cobol.semantics.SemanticContext;
+import com.ca.lsp.core.cobol.semantics.CobolNamedContext;
+import com.ca.lsp.core.cobol.semantics.SubContext;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.BufferedTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import javax.annotation.Nonnull;
@@ -40,6 +44,7 @@ import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.NEWLINE;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 /**
  * ANTLR visitor, which preprocesses a given COBOL program by executing COPY and REPLACE statements.
@@ -53,9 +58,8 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private static final String ERROR_SUGGESTION = "%s: Copybook not found";
 
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
-  @Getter private final SemanticContext semanticContext = new SemanticContext();
+  @Getter private final SubContext<String> usedCopybooks = new CobolNamedContext();
   @Getter private final Map<String, List<Position>> innerMappings = new HashMap<>();
-  @Getter private final Map<String, Integer> copybookDeltas = new HashMap<>();
 
   private PreprocessorCleanerServiceImpl cleaner;
   private String documentUri;
@@ -85,8 +89,8 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   @Nonnull
   @Override
-  public CobolDocumentContext context() {
-    return cleaner.context();
+  public String getResult() {
+    return cleaner.context().read();
   }
 
   @Override
@@ -173,15 +177,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     cleaner.pop();
 
     // a new context for the copy book content
-    cleaner.push();
-
-    /*
-     * replacement phrase
-     */
-    for (ReplacingPhraseContext replacingPhrase : ctx.replacingPhrase()) {
-      context().storeReplaceablesAndReplacements(replacingPhrase.replaceClause());
-    }
-
+    cleaner.context().write(" *>CPYENTER ");
     /*
      * copy the copy book
      */
@@ -189,23 +185,68 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     Position position = retrievePosition(ctx.copySource());
     String copyBookContent = getCopyBookContent(copybookName, position);
 
-    if (copyBookContent != null) {
-      context().write("*>CPYENTER " + copybookName + copyBookContent + " *>CPYEXIT" + NEWLINE);
-      context().replaceReplaceablesByReplacements(tokens);
+    List<ReplacingPhraseContext> replacingPhraseContexts = ctx.replacingPhrase();
+    if (!replacingPhraseContexts.isEmpty()) {
+
+      String copybookWithReplacingName =
+          copybookName
+              + replacingPhraseContexts.stream()
+                  .map(RuleContext::getText)
+                  .reduce((r1, r2) -> r1 + r2)
+                  .orElse("")
+                  .replaceAll("[^a-zA-Z0-9]+", "")
+                  .trim();
+
+      cleaner.context().write(copybookWithReplacingName + ". ");
+      cleaner.push();
+      for (ReplacingPhraseContext replacingPhrase : replacingPhraseContexts) {
+        cleaner.context().storeReplaceablesAndReplacements(replacingPhrase.replaceClause());
+      }
+
+      cleaner.context().write(copyBookContent);
+      cleaner.context().replaceReplaceablesByReplacements(tokens);
+      List<Position> tokenMapping = createTokenMapping(copybookName, cleaner.context().read());
+      innerMappings.put(copybookWithReplacingName, tokenMapping);
+      cleaner.context().write(NEWLINE + " *>CPYEXIT. ");
+
+    } else {
+      cleaner.push();
+      writeCopybookContent(copybookName, copyBookContent);
     }
 
-    if (innerMappings.get(copybookName) != null) {
-      int copybookLength = innerMappings.get(copybookName).size();
-      int copybookDefinitionLength = ctx.getStop().getTokenIndex() - ctx.getStart().getTokenIndex();
-      int delta = copybookLength - copybookDefinitionLength;
-
-      copybookDeltas.put(copybookName, delta);
-    }
-
-    String content = context().read();
+    String content = cleaner.context().read();
     cleaner.pop();
 
-    context().write(content);
+    cleaner.context().write(content);
+  }
+
+  private List<Position> createTokenMapping(@Nonnull String uri, @Nonnull String code) {
+    CobolLexer lexer = new CobolLexer(CharStreams.fromString(code));
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    CobolParser parser = new CobolParser(tokens);
+    CobolParser.StartRuleContext tree = parser.startRule();
+
+    ParseTreeWalker walker = new ParseTreeWalker();
+    walker.walk(new CobolParserBaseListener(), tree);
+    return convertTokensToPositions(uri, tokens);
+  }
+
+  private List<Position> convertTokensToPositions(@Nonnull String uri, CommonTokenStream tokens) {
+    return tokens.getTokens().stream()
+        .map(
+            it ->
+                new Position(
+                    uri,
+                    it.getStartIndex(),
+                    it.getStopIndex(),
+                    it.getLine(),
+                    it.getCharPositionInLine(),
+                    it.getText()))
+        .collect(toList());
+  }
+
+  private void writeCopybookContent(String copybookName, String copyBookContent) {
+    cleaner.context().write(copybookName + ". " + copyBookContent + NEWLINE + " *>CPYEXIT. ");
   }
 
   private String getCopyBookContent(String copybookName, Position position) {
@@ -243,17 +284,17 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     }
 
     copybookStack.push(new CopybookUsage(copybookName, null, position));
-    ResultWithErrors<PreprocessedInput> result =
+    ResultWithErrors<ExtendedDocument> result =
         preprocessor.process(
             copybook.getUri(), copybook.getContent(), copybookStack, textDocumentSyncType);
     errors.addAll(result.getErrors());
 
-    PreprocessedInput input = result.getResult();
+    ExtendedDocument input = result.getResult();
     innerMappings.putAll(input.getTokenMapping());
-    copybookDeltas.putAll(input.getCopybookDeltas());
+    usedCopybooks.merge(input.getUsedCopybooks());
 
     copybookStack.pop();
-    return input.getInput();
+    return input.getText();
   }
 
   private void checkCopybookNameLength(String copybookName, Position position) {
@@ -274,13 +315,13 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
      */
     List<ReplaceClauseContext> replaceClauses = ctx.replaceByStatement().replaceClause();
 
-    context().storeReplaceablesAndReplacements(replaceClauses);
-    context().replaceReplaceablesByReplacements(tokens);
+    cleaner.context().storeReplaceablesAndReplacements(replaceClauses);
+    cleaner.context().replaceReplaceablesByReplacements(tokens);
 
-    String content = context().read();
+    String content = cleaner.context().read();
 
     cleaner.pop();
-    context().write(content);
+    cleaner.context().write(content);
   }
 
   @Override
@@ -328,7 +369,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     if (copybookName == null) {
       return;
     }
-    semanticContext.getCopybooks().addUsage(copybookName, position);
+    usedCopybooks.addUsage(copybookName, position);
   }
 
   @Nonnull

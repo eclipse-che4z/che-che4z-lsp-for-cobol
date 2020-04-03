@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.engine;
 
-import com.ca.lsp.core.cobol.model.PreprocessedInput;
+import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolLexer;
@@ -48,7 +48,7 @@ public class CobolLanguageEngine {
   }
 
   /**
-   * Perform syntax and semantic analysisi for the given text document
+   * Perform syntax and semantic analysis for the given text document
    *
    * @param documentUri unique resource identifier of the processed document
    * @param text the content of the document that should be processed
@@ -59,13 +59,13 @@ public class CobolLanguageEngine {
   public ResultWithErrors<SemanticContext> run(
       String documentUri, String text, String textDocumentSyncType) {
 
-    ResultWithErrors<PreprocessedInput> preProcessedInput =
+    ResultWithErrors<ExtendedDocument> extendedDocument =
         preprocessor.process(documentUri, text, textDocumentSyncType);
 
     CobolLexer lexer =
-        new CobolLexer(CharStreams.fromString(preProcessedInput.getResult().getInput()));
+        new CobolLexer(CharStreams.fromString(extendedDocument.getResult().getText()));
 
-    List<SyntaxError> errors = new ArrayList<>(preProcessedInput.getErrors());
+    List<SyntaxError> errors = new ArrayList<>(extendedDocument.getErrors());
 
     lexer.removeErrorListeners();
     lexer.addErrorListener(new VerboseListener(errors, documentUri));
@@ -78,8 +78,7 @@ public class CobolLanguageEngine {
     parser.setErrorHandler(new CobolErrorStrategy());
 
     CobolParser.StartRuleContext tree = parser.startRule();
-    CobolVisitor visitor =
-        new CobolVisitor(documentUri, preProcessedInput.getResult().getSemanticContext());
+    CobolVisitor visitor = new CobolVisitor(documentUri, extendedDocument.getResult());
     visitor.visit(tree);
 
     errors.addAll(visitor.getErrors());
