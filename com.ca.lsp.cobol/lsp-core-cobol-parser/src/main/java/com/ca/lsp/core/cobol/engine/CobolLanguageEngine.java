@@ -86,8 +86,6 @@ public class CobolLanguageEngine {
 
     errors.forEach(err -> LOG.debug(err.toString()));
 
-    SemanticContext semanticContext = visitor.getSemanticContext();
-    semanticContext.getVariables().createRelationBetweenVariables();
-    return new ResultWithErrors<>(semanticContext, errors);
+    return new ResultWithErrors<>(visitor.getSemanticContext(), errors);
   }
 }

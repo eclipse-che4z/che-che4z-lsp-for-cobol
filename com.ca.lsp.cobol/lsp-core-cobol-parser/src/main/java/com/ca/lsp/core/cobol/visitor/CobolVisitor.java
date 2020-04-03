@@ -171,6 +171,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
                     .getVariables()
                     .define(
                         new Variable(levelNumber, variable.getText()), retrievePosition(dataName)));
+    semanticContext.getVariables().createRelationBetweenVariables();
   }
 
   public Class visitDataName2(
