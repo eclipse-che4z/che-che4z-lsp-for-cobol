@@ -941,7 +941,7 @@ otherLevel: LEVEL
 // end of data description utils ---------------------------
 
 dataDescriptionEntry
-   : dataDescriptionEntryFormat1 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat3 | dataDescriptionEntryExecSql
+   : dataDescriptionEntryFormat1 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat3 | dataDescriptionEntryExecSql | dataDescriptionEntryCpy | dataDescriptionExitCpy
    ;
 
 dataDescriptionEntryFormat1
@@ -958,6 +958,15 @@ dataDescriptionEntryFormat3
 
 dataDescriptionEntryExecSql
    : EXECSQLLINE+ DOT_FS?
+   ;
+
+//TODO: make it beautiful
+dataDescriptionEntryCpy
+   : COPYENTRY IDENTIFIER
+   ;
+
+dataDescriptionExitCpy
+   : COPYEXIT
    ;
    
 dataGroupUsageClause
@@ -1154,7 +1163,17 @@ statement
     exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement | 
     multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | 
     sendStatement | serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | titleStatement | unstringStatement | writeStatement | xmlStatement
+    terminateStatement | titleStatement | unstringStatement | writeStatement | xmlStatement | enterCpy | exitCpy
+   ;
+
+
+//TODO: modify the copybook name rule to accept everything including keywords
+enterCpy
+   : COPYENTRY IDENTIFIER
+   ;
+
+exitCpy
+   : COPYEXIT
    ;
 
 // accept statement

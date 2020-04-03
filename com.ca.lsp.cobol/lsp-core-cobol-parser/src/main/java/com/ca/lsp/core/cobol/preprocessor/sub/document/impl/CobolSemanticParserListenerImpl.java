@@ -190,7 +190,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     String copyBookContent = getCopyBookContent(copybookName, position);
 
     if (copyBookContent != null) {
-      context().write(copyBookContent + NEWLINE);
+      context().write("*>CPYENTER " + copybookName + copyBookContent + " *>CPYEXIT" + NEWLINE);
       context().replaceReplaceablesByReplacements(tokens);
     }
 
