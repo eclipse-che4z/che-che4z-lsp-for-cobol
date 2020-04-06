@@ -16,9 +16,6 @@ package com.ca.lsp.cobol.service;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import com.ca.lsp.core.cobol.model.ErrorCode;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -130,21 +127,6 @@ public class MyLanguageServerImpl implements LanguageServer {
                   new ConfigurationSettingsStorable(interpretPaths(e));
               settingsProvider.set(config);
             });
-  }
-
-  /**
-   * @param jsonObject - the object which comes from the client and contains configuration settings
-   * @return a custom object of type ConfigurableSettingsStorable if the JSON is valid or an empty
-   *     ConfigurableSettingsStorable if it is failing the parsing
-   */
-  private ConfigurationSettingsStorable parseJsonIfValid(JsonObject jsonObject) {
-    Gson gson = new Gson();
-    try {
-      return gson.fromJson(jsonObject, ConfigurationSettingsStorable.class);
-    } catch (JsonSyntaxException e) {
-      log.error(e.getMessage());
-      return ConfigurationSettingsStorable.emptyConfigurationSettingsStorable();
-    }
   }
 
   private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {

@@ -11,10 +11,10 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as vscode from "vscode";
 import * as path from "path";
-import { checkWorkspace, createCopybookPath, createDatasetPath, CopybooksPathGenerator } from "../services/CopybooksPathGenerator";
-import { ProfileService } from "../services/ProfileService";
+import * as vscode from "vscode";
+// tslint:disable-next-line: max-line-length
+import { checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath} from "../services/CopybooksPathGenerator";
 
 describe("CopybooksPathGenerator tests", () => {
     const fsPath = "/projects";
@@ -44,6 +44,7 @@ describe("CopybooksPathGenerator tests", () => {
         const gen: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
         gen.listDatasets = () => Promise.resolve(["DATASET1", "DATASET2"]);
         const result = await gen.listUris();
-        expect(result.toString()).toBe("file:///projects/.copybooks/profile/DATASET1,file:///projects/.copybooks/profile/DATASET2");
+        expect(result[0].toString()).toContain("/projects/.copybooks/profile/DATASET1");
+        expect(result[1].toString()).toContain("/projects/.copybooks/profile/DATASET2");
     });
 });
