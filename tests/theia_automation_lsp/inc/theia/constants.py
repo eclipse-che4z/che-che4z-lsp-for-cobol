@@ -18,7 +18,7 @@ THEIA = "theia-app-shell"
 FILES_EXPLORER_TAB_ID = "shell-tab-explorer-view-container"
 FILES_EXPLORER_ID = "explorer-view-container"
 
-FILES_PANEL_TITLE = "^Explorer:.*$"
+FILES_PANEL_TITLE = "^Explorer.*$"
 FILES_EXPLORER_CONTENT = "files"
 
 THEIA_NOTIFICATION_CONTAINER = "theia-notifications-container"

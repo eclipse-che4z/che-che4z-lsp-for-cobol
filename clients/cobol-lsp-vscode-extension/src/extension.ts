@@ -24,6 +24,8 @@ import { CopybookFix } from "./services/CopybookFix";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
+import { editDatasetPaths } from "./commands/EditDatasetPaths";
+import { PathsService } from "./services/PathsService";
 
 export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
@@ -32,6 +34,10 @@ export async function activate(context: vscode.ExtensionContext) {
     const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
     const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator);
     const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator);
+    const resolver: CopybookResolver = new CopybookResolver();
+    const pathsService: PathsService = new PathsService();
+    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(resolver, zoweApi, profileService, pathsService);
+    const languageClientService: LanguageClientService = new LanguageClientService();
 
     try {
         await languageClientService.checkPrerequisites();
@@ -59,6 +65,9 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
     context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile", () => {
         changeDefaultZoweProfile(profileService);
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths", () => {
+        editDatasetPaths(pathsService);
     }));
 
 

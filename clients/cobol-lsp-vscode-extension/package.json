@@ -47,6 +47,10 @@
             {
                 "command": "broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile",
                 "title": "Change default Zowe profile"
+            },
+            {
+                "command": "broadcom-cobol-lsp.cpy-manager.edit-dataset-paths",
+                "title": "Edit dataset paths"
             }
         ],
         "languages": [

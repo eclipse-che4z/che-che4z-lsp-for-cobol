@@ -14,8 +14,6 @@
 package com.ca.lsp.cobol.positive;
 
 import com.ca.lsp.cobol.ConfigurableTest;
-import com.ca.lsp.cobol.TestModule;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.Test;
 import org.junit.runner.RunWith;

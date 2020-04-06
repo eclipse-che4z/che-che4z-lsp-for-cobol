@@ -30,11 +30,10 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
             arguments: [this.extractCopybookName(context), this.extractProgramName(doc)],
         };
 
-        const datasetPaths = new vscode.CodeAction("Setup copybook datasets list", vscode.CodeActionKind.QuickFix);
+        const datasetPaths = new vscode.CodeAction("Edit copybook datasets list", vscode.CodeActionKind.QuickFix);
         datasetPaths.command = {
-            arguments: ["broadcom-cobol-lsp.cpy-manager.paths"],
-            command: "workbench.action.openSettings",
-            title: "Setup copybook datasets list",
+            command: "broadcom-cobol-lsp.cpy-manager.edit-dataset-paths",
+            title: "Edit copybook datasets list",
         };
 
         const changeProfile = new vscode.CodeAction("Change default zowe profile", vscode.CodeActionKind.QuickFix);
