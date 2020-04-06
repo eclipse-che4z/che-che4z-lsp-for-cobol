@@ -13,19 +13,20 @@
  */
 
 import * as vscode from "vscode";
-import { SETTINGS_SECTION, LANGUAGE_ID } from "./constants";
-import { DEPENDENCIES_FOLDER } from "./constants";
-import { CopybooksDownloader } from "./services/CopybooksDownloader";
-import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
-import { ProfileService } from "./services/ProfileService";
-import { LanguageClientService } from "./services/LanguageClientService";
-import { ZoweApi } from "./services/ZoweApi";
-import { CopybookFix } from "./services/CopybookFix";
-import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
-import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
 import { editDatasetPaths } from "./commands/EditDatasetPaths";
+import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
+import { DEPENDENCIES_FOLDER } from "./constants";
+import { LANGUAGE_ID, SETTINGS_SECTION } from "./constants";
+import { CopybookFix } from "./services/CopybookFix";
+import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
+import { CopybooksDownloader } from "./services/CopybooksDownloader";
+import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
+
+import { LanguageClientService } from "./services/LanguageClientService";
 import { PathsService } from "./services/PathsService";
+import { ProfileService } from "./services/ProfileService";
+import { ZoweApi } from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
@@ -34,10 +35,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
     const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator);
     const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator);
-    const resolver: CopybookResolver = new CopybookResolver();
     const pathsService: PathsService = new PathsService();
-    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(resolver, zoweApi, profileService, pathsService);
-    const languageClientService: LanguageClientService = new LanguageClientService();
 
     try {
         await languageClientService.checkPrerequisites();

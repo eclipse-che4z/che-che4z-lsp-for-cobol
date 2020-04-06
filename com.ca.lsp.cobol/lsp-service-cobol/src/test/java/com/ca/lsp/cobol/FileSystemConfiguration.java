@@ -58,10 +58,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String COBOL_FILE_NAME = "Test";
   protected static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
   public static final String CPYNEST_CPY = "CPYNEST.cpy";
-
   protected static final String DEP_FILE_COST_NAME = "SOMEPROG";
-  protected static final String DEP_EXTENSION = ".dep";
-
   protected static final String COPYBOOK_CONTENT =
       "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
   protected static final String NESTED_COPYBOOK_CONTENT = "000230 COPY CPYNEST2.";
@@ -98,7 +95,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
    */
   @Before
   public void buildTempFilesystem() {
-    intializeSettingsWithSomeContent();
+    intializeSettings();
 
     createWorkspaceFolderStructure();
     createCopybookFolders();
@@ -189,8 +186,8 @@ public class FileSystemConfiguration extends ConfigurableTest {
     List<String> targetDatasets = configSettings.getPaths();
 
     return targetDatasets.stream()
-            .map(it -> Paths.get(copybooksFolderPath + it))
-            .collect(Collectors.toList());
+        .map(it -> Paths.get(copybooksFolderPath + it))
+        .collect(Collectors.toList());
   }
 
   private Path createFolders(Path copybooksPath) {

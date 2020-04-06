@@ -14,13 +14,13 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
+import { loadDepFile, DependenciesDesc } from "./DependencyService";
 import { DEPENDENCIES_FOLDER } from "../constants";
-import { ProfileService } from "./ProfileService";
-import { DependenciesDesc, loadDepFile } from "./DependencyService";
-import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
-import { ZoweApi } from "./ZoweApi";
 import { CopybookFix } from "./CopybookFix";
 import { CopybooksPathGenerator, createDatasetPath, createCopybookPath, checkWorkspace } from "./CopybooksPathGenerator";
+import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
+import { ProfileService } from "./ProfileService";
+import { ZoweApi } from "./ZoweApi";
 
 export class CopybooksDownloader implements vscode.Disposable {
     private queue: DownloadQueue = new DownloadQueue();
@@ -158,6 +158,5 @@ export class CopybooksDownloader implements vscode.Disposable {
 
         return Array.from(copybooksToDownload.values());
     }
-
 
 }

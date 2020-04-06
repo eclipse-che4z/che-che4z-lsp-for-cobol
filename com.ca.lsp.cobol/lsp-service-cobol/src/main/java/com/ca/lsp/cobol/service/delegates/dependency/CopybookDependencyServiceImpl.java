@@ -65,12 +65,12 @@ public class CopybookDependencyServiceImpl
    */
   @Override
   public void addCopybookInDepFile(RequiredCopybookEvent event, String requiredCopybookName) {
-    if (isFileInDidOpen(event) || isProcessingACopybbok(event)) {
+    if (isFileInDidOpen(event) || isCopybookProcessed(event)) {
       writeCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
     }
   }
 
-  private boolean isProcessingACopybbok(RequiredCopybookEvent event) {
+  private boolean isCopybookProcessed(RequiredCopybookEvent event) {
     return event
             .getTextDocumentSyncType()
             .equalsIgnoreCase(TextDocumentSyncType.DID_CHANGE.toString())
@@ -124,12 +124,12 @@ public class CopybookDependencyServiceImpl
    */
   @Override
   public void updateDependencyList(Path dependencyFilePath, String copybookName) {
-    if (isCopybokNotPresentInDepFile(copybookName, getContentFromFile(dependencyFilePath))) {
+    if (isCopybookNotPresentInDepFile(copybookName, getContentFromFile(dependencyFilePath))) {
       writeInFile(dependencyFilePath, copybookName, StandardOpenOption.APPEND);
     }
   }
 
-  private boolean isCopybokNotPresentInDepFile(String copybookName, List<String> lines) {
+  private boolean isCopybookNotPresentInDepFile(String copybookName, List<String> lines) {
     return lines != null && !lines.contains(copybookName);
   }
 
@@ -190,10 +190,7 @@ public class CopybookDependencyServiceImpl
   }
 
   private List<Path> getTargetFolders() {
-    return getPathList(
-        getCopybookFolder(),
-        configurationSettingsStorableProvider.get().getProfiles().toString(),
-        configurationSettingsStorableProvider.get().getPaths());
+    return getPathList(getCopybookFolder(), configurationSettingsStorableProvider.get().getPaths());
   }
 
   private String getCopybookFolder() {

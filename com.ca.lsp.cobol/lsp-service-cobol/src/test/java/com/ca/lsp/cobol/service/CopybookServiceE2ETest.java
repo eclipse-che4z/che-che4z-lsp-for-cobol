@@ -76,11 +76,6 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
         .thenReturn(
             new ConfigurationSettingsStorable(
                 unmodifiableList(Arrays.asList(FULL_PATH, FULL_PATH2))));
-
-    CopybookServiceImpl copybookService =
-        new CopybookServiceImpl(
-            broker, configurationSettingsProvider, dependencyService, communications);
-    copybookService.setWorkspaceFolders(generateWorkspaceFolder());
   }
 
   /**

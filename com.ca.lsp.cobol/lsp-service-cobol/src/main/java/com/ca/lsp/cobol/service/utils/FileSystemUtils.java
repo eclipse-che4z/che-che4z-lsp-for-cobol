@@ -156,13 +156,12 @@ public class FileSystemUtils {
    * part iterated to obtains path in this form: {[base,middle,v1],[base,middle,v2], ...}
    *
    * @param outer first level of folder
-   * @param inner second level of folder (represent the name of an inner folder)
    * @param variablePart list of names of folders that are contained inside the inner
    * @return a lis of paths represented in the way: {[outer,inner,v1],[outer,inner,v2], ...}
    */
-  public List<Path> getPathList(@Nonnull String outer, String inner, List<String> variablePart) {
+  public List<Path> getPathList(@Nonnull String outer, List<String> variablePart) {
     return variablePart.stream()
-        .map(it -> Paths.get(outer, inner, it))
+        .map(it -> Paths.get(outer, it))
         .filter(Files::exists)
         .collect(Collectors.toList());
   }

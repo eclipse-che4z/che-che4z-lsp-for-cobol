@@ -113,13 +113,10 @@ public class CopybookServiceImpl implements CopybookService {
    * @return The path of the existent copybook or null if not found
    */
   @Override
-  public Path findCopybook(String filename, List<String> paths) {
-    return retrievePathOrNull(filename, generatePathListFromSettings(paths));
-  public Path findCopybook(String filename, String profile, List<String> datasetList) {
+  public Path findCopybook(String filename, List<String> datasetList) {
     return retrievePathOrNull(
         filename,
-        getPathList(
-            getCopybookBaseFolder(workspaceFolderPaths.get(0)).toString(), profile, datasetList));
+        getPathList(getCopybookBaseFolder(workspaceFolderPaths.get(0)).toString(), datasetList));
   }
 
   private Path retrievePathOrNull(String filename, List<Path> datasetPathList) {
@@ -128,33 +125,6 @@ public class CopybookServiceImpl implements CopybookService {
         .filter(Objects::nonNull)
         .findAny()
         .orElse(null);
-  }
-
-  private List<Path> generatePathListFromSettings(List<String> paths) {
-    // can happen here that copybooks or internal structure is null
-    return paths.stream()
-        .map(it -> Paths.get(getCopybookFolder(getWorkspaceFoldersAsPathList().get(0)) + it))
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
-  }
-
-  /**
-   * @param fileName copybook name
-   * @param targetFolderPath physical path of workspace where to search for the copybook
-   * @return Path of the found copybook in the target folder.
-   */
-  private Path applySearch(String fileName, Path targetFolderPath) {
-    try (Stream<Path> pathStream =
-        Files.find(
-            targetFolderPath,
-            100,
-            (path, basicFileAttributes) -> isValidFileFound(path.toFile(), fileName),
-            FileVisitOption.FOLLOW_LINKS)) {
-      return pathStream.findAny().orElse(null);
-    } catch (IOException e) {
-      log.error(e.getMessage());
-      return null;
-    }
   }
 
   private List<Path> getWorkspaceFoldersAsPathList() {
@@ -182,25 +152,8 @@ public class CopybookServiceImpl implements CopybookService {
   @Override
   public void observerCallback(RequiredCopybookEvent event) {
     String requiredCopybookName = event.getName();
-
-    //changes coming from dev
-      // dependencyService.addCopybookInDepFile(event, requiredCopybookName);
-      //    resolveCopybookContent(requiredCopybookName);
-
-
-    // search the copybook against the target folders provided from the settings
-    path = findCopybook(requiredCopybookName, configurationSettingsStorable.getPaths());
-
-    if (isFileExists(path)) {
-      content = retrieveContentByPath(path);
-    }
-
-    dataBus.postData(
-        FetchedCopybookEvent.builder()
-            .name(requiredCopybookName)
-            .uri(Optional.ofNullable(path).map(Path::toUri).map(URI::toString).orElse(null))
-            .content(content)
-            .build());
+    dependencyService.addCopybookInDepFile(event, requiredCopybookName);
+    resolveCopybookContent(requiredCopybookName);
   }
 
   private void selectAppropriateMessageForCommunication() {
@@ -241,11 +194,7 @@ public class CopybookServiceImpl implements CopybookService {
     ConfigurationSettingsStorable configurationSettingsStorable =
         configurationSettingsStorableProvider.get();
 
-    Path path =
-        findCopybook(
-            requiredCopybookName,
-            configurationSettingsStorable.getProfiles().toString(),
-            configurationSettingsStorable.getPaths());
+    Path path = findCopybook(requiredCopybookName, configurationSettingsStorable.getPaths());
     if (isFileExists(path)) {
       publishOnDatabus(requiredCopybookName, getContentByPath(path), path);
     } else {
