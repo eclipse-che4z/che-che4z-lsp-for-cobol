@@ -30,8 +30,4 @@ public class ConfigurationSettingsStorable {
   public ConfigurationSettingsStorable(List<String> paths) {
     this.paths = Collections.unmodifiableList(paths);
   }
-
-  public static ConfigurationSettingsStorable emptyConfigurationSettingsStorable() {
-    return new ConfigurationSettingsStorable(Collections.emptyList());
-  }
 }
