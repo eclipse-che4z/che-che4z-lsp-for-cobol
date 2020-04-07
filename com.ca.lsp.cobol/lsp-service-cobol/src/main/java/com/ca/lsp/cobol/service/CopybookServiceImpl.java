@@ -45,6 +45,7 @@ import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
 public class CopybookServiceImpl implements CopybookService {
   private static final String COPYBOOK_FOLDER_NAME = ".copybooks";
   private final DataBusBroker dataBus;
+  private List<WorkspaceFolder> workspaceFolders;
   private List<Path> workspaceFolderPaths;
 
   private CopybookDependencyService dependencyService;
@@ -72,18 +73,13 @@ public class CopybookServiceImpl implements CopybookService {
    */
   @Override
   public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
-    createPathListFromWorkspaceFolders(workspaceFolders);
+    this.workspaceFolders = workspaceFolders;
+    createPathListFromWorkspaceFolders();
     setPathListInDependencyFile();
   }
 
-  private void createPathListFromWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {
-    workspaceFolderPaths =
-        Optional.ofNullable(workspaceFolders)
-            .map(Collection::stream)
-            .orElseGet(Stream::empty)
-            .filter(Objects::nonNull)
-            .map(this::resolveURI)
-            .collect(Collectors.toList());
+  private void createPathListFromWorkspaceFolders() {
+    workspaceFolderPaths = getWorkspaceFoldersAsPathList();
   }
 
   private void setPathListInDependencyFile() {
@@ -130,6 +126,19 @@ public class CopybookServiceImpl implements CopybookService {
         .filter(Objects::nonNull)
         .findAny()
         .orElse(null);
+  }
+
+  private List<Path> getWorkspaceFoldersAsPathList() {
+    return Optional.ofNullable(getWorkspaceFolders())
+        .map(Collection::stream)
+        .orElseGet(Stream::empty)
+        .filter(Objects::nonNull)
+        .map(this::resolveURI)
+        .collect(Collectors.toList());
+  }
+
+  private List<WorkspaceFolder> getWorkspaceFolders() {
+    return workspaceFolders;
   }
 
   private Path resolveURI(WorkspaceFolder workspaceFolder) {

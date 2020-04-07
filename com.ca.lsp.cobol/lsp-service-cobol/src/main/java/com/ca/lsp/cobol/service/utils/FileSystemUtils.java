@@ -18,6 +18,7 @@ import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceIm
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.eclipse.lsp4j.WorkspaceFolder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -260,6 +261,19 @@ public class FileSystemUtils {
       log.error(e.getMessage());
       return null;
     }
+  }
+
+  /**
+   * @param it workspace folder
+   * @return the normalized path version of the given folder
+   */
+  private Path resolveUriPath(WorkspaceFolder it) {
+    try {
+      return Paths.get(new URI(it.getUri()).normalize());
+    } catch (URISyntaxException e) {
+      log.error(e.getMessage());
+    }
+    return null;
   }
 
   /**

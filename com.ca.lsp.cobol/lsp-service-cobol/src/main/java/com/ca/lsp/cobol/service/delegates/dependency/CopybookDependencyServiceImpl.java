@@ -65,12 +65,12 @@ public class CopybookDependencyServiceImpl
    */
   @Override
   public void addCopybookInDepFile(RequiredCopybookEvent event, String requiredCopybookName) {
-    if (isFileInDidOpen(event) || isProcessingACopybook(event)) {
+    if (isFileInDidOpen(event) || isProcessingACopybbok(event)) {
       writeCopybookInDepFile(requiredCopybookName, event.getDocumentUri());
     }
   }
 
-  private boolean isProcessingACopybook(RequiredCopybookEvent event) {
+  private boolean isProcessingACopybbok(RequiredCopybookEvent event) {
     return event
             .getTextDocumentSyncType()
             .equalsIgnoreCase(TextDocumentSyncType.DID_CHANGE.toString())
