@@ -129,7 +129,7 @@ public class CopybookSearchWithoutConfigTest {
     // simulate that user have not provided settings for profile and datasetlist but the
     // preprocessor found a copybook.
     when(settingsProvider.get())
-        .thenReturn(new ConfigurationSettingsStorable( Collections.emptyList()));
+        .thenReturn(new ConfigurationSettingsStorable(Collections.emptyList()));
 
     try {
       copybookService.observerCallback(requiredCopybookEvent);

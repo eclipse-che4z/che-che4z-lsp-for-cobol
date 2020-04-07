@@ -57,7 +57,7 @@ public class InitializeConfigurationTest {
 
     when(settingsProvider.get())
         .thenReturn(
-            new ConfigurationSettingsStorable( unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2))));
+            new ConfigurationSettingsStorable(unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2))));
 
     MyLanguageServerImpl langServer =
         new MyLanguageServerImpl(null, null, null, provider, settingsProvider);

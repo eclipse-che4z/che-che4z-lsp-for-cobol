@@ -75,7 +75,7 @@ export class CopybooksDownloader implements vscode.Disposable {
     public async start() {
         this.resolver.setQueue(this.queue);
         let done = false;
-        let errors: string[] = [];
+        const errors = new Set();
         while (!done) {
             const element: CopybookProfile | undefined = await this.queue.pop();
             if (!element) {
@@ -92,7 +92,7 @@ export class CopybooksDownloader implements vscode.Disposable {
                     while (this.queue.length > 0) {
                         toDownload.push(await this.queue.pop());
                     }
-                    toDownload.map(cp => cp.copybook).forEach(cb => errors.push(cb));
+                    toDownload.map(cp => cp.copybook).forEach(cb => errors.add(cb));
                     for (const dataset of await this.pathGenerator.listDatasets()) {
                         progress.report({
                             message: "Looking in " + dataset + ". " + toDownload.length +
@@ -101,18 +101,17 @@ export class CopybooksDownloader implements vscode.Disposable {
                         for (const cp of toDownload) {
                             try {
                                 const fetchResult = await this.fetchCopybook(dataset, cp);
-                                if (fetchResult && errors.includes(cp.copybook)) {
-                                    const index = errors.indexOf(cp.copybook);
-                                    errors.splice(index, 1);
+                                if (fetchResult) {
+                                    errors.delete(cp.copybook);
                                 }
                             } catch (e) {
                                 vscode.window.showErrorMessage(e.toString());
                             }
                         }
                     }
-                    if (this.queue.length === 0 && errors.length > 0) {
-                        this.resolver.processDownloadError("Can't download copybooks: " + errors);
-                        errors = [];
+                    if (this.queue.length === 0 && errors.size > 0) {
+                        this.resolver.processDownloadError("Can't download copybooks: " + Array.from(errors));
+                        errors.clear();
                     }
                 });
         }
@@ -158,5 +157,4 @@ export class CopybooksDownloader implements vscode.Disposable {
 
         return Array.from(copybooksToDownload.values());
     }
-
 }

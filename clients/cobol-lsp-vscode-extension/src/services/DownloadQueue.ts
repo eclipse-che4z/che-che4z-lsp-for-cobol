@@ -12,9 +12,18 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-export interface CopybookProfile {
-    copybook: string;
-    profile: string;
+export class CopybookProfile {
+    readonly copybook: string;
+    readonly profile: string;
+
+    constructor(copybook: string, profile: string) {
+        this.copybook = copybook;
+        this.profile = profile;
+    }
+
+    public equals(other: CopybookProfile): boolean {
+        return this.copybook == other.copybook && this.profile == other.profile
+    }
 }
 
 export class DownloadQueue {
@@ -27,7 +36,13 @@ export class DownloadQueue {
             this.resolve = undefined;
             r({ copybook, profile });
         } else {
-            this.queue.push({ copybook, profile });
+            const copybookProfile = new CopybookProfile(copybook, profile);
+            for (const item of this.queue) {
+                if (copybookProfile.equals(item)) {
+                    return
+                }
+            }
+            this.queue.push(copybookProfile);
         }
     }
 

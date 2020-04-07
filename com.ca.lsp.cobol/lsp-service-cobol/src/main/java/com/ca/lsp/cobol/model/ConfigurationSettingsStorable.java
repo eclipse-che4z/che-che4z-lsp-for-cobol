@@ -28,7 +28,7 @@ public class ConfigurationSettingsStorable {
   private List<String> paths;
 
   public ConfigurationSettingsStorable(List<String> paths) {
-    this.paths = paths;
+    this.paths = Collections.unmodifiableList(paths);
   }
 
   public static ConfigurationSettingsStorable emptyConfigurationSettingsStorable() {

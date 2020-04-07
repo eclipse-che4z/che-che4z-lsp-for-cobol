@@ -46,12 +46,12 @@ public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String PROFILE_NAME = "PRF11";
   protected static final String DSNAME_1 = "HLQLF01.DSNAME1";
   protected static final String DSNAME_2 = "HLQLF01.DSNAME2";
+  protected static final String DSNAME_3 = "HLQLF02.DSNAME1";
 
   protected static final String CPY_NAME_WITHOUT_EXT = "copy2";
-  protected static final String FULL_PATH =
-      filesystemSeparator() + PROFILE_NAME + filesystemSeparator() + DSNAME_1;
-  protected static final String FULL_PATH2 =
-      filesystemSeparator() + PROFILE_NAME + filesystemSeparator() + DSNAME_2;
+  protected static final String FULL_PATH = createFullPath(PROFILE_NAME, DSNAME_1);
+  protected static final String FULL_PATH2 = createFullPath(PROFILE_NAME, DSNAME_2);
+  protected static final String WRONG_PATH = createFullPath(PROFILE_NAME, DSNAME_3);
   protected static final String DEP_EXTENSION = ".dep";
   protected static final String COPYBOOK_NOT_PRESENT = "ANTHRCPY";
   protected static final String EMPTY_COPYBOOK_NAME = " ";
@@ -135,6 +135,10 @@ public class FileSystemConfiguration extends ConfigurableTest {
     when(settingsProvider.get()).thenReturn(configurationSettingsStorable);
   }
 
+  protected static String createFullPath(String profile, String dataset) {
+    return filesystemSeparator() + profile + filesystemSeparator() + dataset;
+  }
+
   protected List<WorkspaceFolder> createWorkspaceFolders() {
     WorkspaceFolder workspaceFolder = new WorkspaceFolder();
     workspaceFolder.setName(WORKSPACE_FOLDER_NAME);
@@ -174,10 +178,6 @@ public class FileSystemConfiguration extends ConfigurableTest {
             targetPath ->
                 writeContentOnFile(
                     createFile(targetPath, CPY_INNER_FILE_NAME_WITH_EXT), COPYBOOK_CONTENT));
-  }
-
-  private void createNestedCopybooks() {
-    writeContentOnFile(createFile(copybooksFolderPath, CPYNEST_CPY), NESTED_COPYBOOK_CONTENT);
   }
 
   private List<Path> getPathListFromSettings() {
