@@ -47,12 +47,12 @@ This feature checks for mistakes and errors in COBOL code. The syntax check feat
 
 ### Syntax Highlighting
 The extension enables syntax highlighting for COBOL code.
-	
+
 ### Syntax Coloring
 Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, and paragraphs.
 
 A third-party plugin is required to enable syntax coloring. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
-	
+
 ### Copybook Support
 
 The LSP for COBOL extension can retrieve copybooks used in your projects from the mainframe and download them locally. You can open copybooks in your IDE and make use of the copybook support features of the extension.
@@ -62,10 +62,9 @@ The LSP for COBOL extension can retrieve copybooks used in your projects from th
 To retrieve copybooks from the mainframe, **follow these steps:**
 
 1. Ensure that you have a [Zowe CLI zosmf profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) configured.
-2. Open the extension settings. 
-3. Under **Profiles**, specify your Zowe CLI zosmf profile.
-4. Under **Paths**, add any number of data sets to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
-5. Open a program or project.  
+2. Open the extension settings.
+3. Under **Paths**, add any number of data sets to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
+4. Open a program or project.
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe. Copybooks are stored in a **.copybooks** directory within the workspace, which is created automatically when copybooks are downloaded.
 
 #### Copybook Support Features
@@ -73,8 +72,8 @@ To retrieve copybooks from the mainframe, **follow these steps:**
 The extension includes the following copybook support features:
 
 * Semantic analysis for keywords, variables, and paragraphs across copybooks, to ensure and maintain compatibility of copybooks called in code.
-* Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.  
-* Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code. 
+* Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.
+* Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code.
 * Functionality to skip variable levels when called, reducing call time.
 * Find All References and Go To Definition functionalities.
     - **Find All References** identifies all occurrences of variables and paragraphs from copybooks in the code.
