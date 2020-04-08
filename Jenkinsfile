@@ -1,6 +1,6 @@
 #!groovy
 
-def kubernetes_config = """
+def kubernetes_build_config = """
 apiVersion: v1
 kind: Pod
 spec:
@@ -27,14 +27,9 @@ spec:
       requests:
         memory: "2Gi"
         cpu: "1"
-  - name: theia
-    image: theiaide/theia-java:0.16.1
-    tty: true
-    command: [ "/bin/bash", "-c", "--" ]
-    args: [ "while true; do sleep 1000; done;" ]
-  - name: python
-    image: python
-    tty: true
+    volumeMounts:
+    - name: tools
+      mountPath: /opt/tools
   - name: jnlp
     volumeMounts:
     - name: volume-known-hosts
@@ -43,12 +38,58 @@ spec:
   - name: volume-known-hosts
     configMap:
       name: known-hosts
+  - name: tools
+    persistentVolumeClaim:
+      claimName: tools-claim-jiro-lspforcobol
+"""
+
+def kubernetes_test_config = """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: theia
+    image: theiaide/theia-java:0.16.1
+    tty: true
+    command: [ "/bin/bash", "-c", "--" ]
+    args: [ "while true; do sleep 1000; done;" ]
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+      requests:
+        memory: "2Gi"
+        cpu: "1"
+    volumeMounts:
+    - name: tools
+      mountPath: /opt/tools
+  - name: python
+    image: python
+    tty: true
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+      requests:
+        memory: "2Gi"
+        cpu: "1"
+  - name: jnlp
+    volumeMounts:
+    - name: volume-known-hosts
+      mountPath: /home/jenkins/.ssh
+  volumes:
+  - name: volume-known-hosts
+    configMap:
+      name: known-hosts
+  - name: tools
+    persistentVolumeClaim:
+      claimName: tools-claim-jiro-lspforcobol
 """
 
 def projectName = 'lsp-for-cobol'
-def targetFiles = 'lsp-core-cobol-parser/target/**'
-def kubeLabel = projectName + '_pod_' + env.BUILD_NUMBER + '_' + env.BRANCH_NAME
-kubeLabel = kubeLabel.replaceAll(/[^a-zA-Z0-9._-]+/,"")
+def kubeLabelPrefix = "${projectName}_pod_${env.BUILD_NUMBER}_${env.BRANCH_NAME}".replaceAll(/[^a-zA-Z0-9._-]+/,"")
+def kubeBuildLabel = "${kubeLabelPrefix}_build"
+def kubeTestLabel = "${kubeBuildLabel}_test"
 
 boolean isTimeTriggeredBuild() {
     for (currentBuildCause in currentBuild.buildCauses) {
@@ -58,12 +99,7 @@ boolean isTimeTriggeredBuild() {
 }
 
 pipeline {
-    agent {
-        kubernetes {
-            label kubeLabel
-            yaml kubernetes_config
-        }
-    }
+    agent none
     triggers {
         cron('0 0 * * 1-5')
     }
@@ -76,118 +112,109 @@ pipeline {
     }
     environment {
         branchName = "$env.BRANCH_NAME"
-        workspace = "$env.WORKSPACE"
     }
     stages {
-        stage('Build LSP server part') {
-            steps {
-                container('maven') {
-                    dir('com.ca.lsp.cobol') {
-                        sh 'mvn -version'
-                        sh 'set MAVEN_OPTS=-Xms1024m'
-                        sh 'mvn clean verify'
-                        sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $workspace/clients/cobol-lsp-vscode-extension/server/'
-                    }
+        stage('Build a package') {
+            agent {
+                kubernetes {
+                    label kubeBuildLabel
+                    yaml kubernetes_build_config
                 }
             }
-        }
+            stages {
+                stage('Build LSP server part') {
+                    steps {
+                        container('maven') {
+                            dir('com.ca.lsp.cobol') {
+                                sh 'mvn -version'
+                                sh 'set MAVEN_OPTS=-Xms1024m'
+                                sh 'mvn clean verify'
+                                sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
+                            }
+                        }
+                    }
+                }
 
-        stage('SonarCloud') {
-            steps {
-                container('maven') {
-                    dir('com.ca.lsp.cobol') {
-                        withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
-                            sh "mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
-                        }
-                    }
-                }
-            }
-        }
-        stage('Client - Install dependencies') {
-            environment {
-                npm_config_cache = "$env.WORKSPACE"
-            }
-            steps {
-                container('node') {
-                    dir('clients/cobol-lsp-vscode-extension') {
-                        sh 'npm ci'
-                    }
-                }
-            }
-        }
-        stage('Client - Package') {
-            environment {
-                npm_config_cache = "$env.WORKSPACE"
-            }
-            steps {
-                container('node') {
-                    dir('clients/cobol-lsp-vscode-extension') {
-                        sh 'npx vsce package'
-                        archiveArtifacts "*.vsix"
-                        sh 'mv cobol-language-support*.vsix cobol-language-support_0.10.1.vsix'
-                    }
-                }
-            }
-        }
-        stage('Integration test') {
-            steps {
-                script {
-                    if (branchName == 'integration-tests') {
-                        container('theia') {
-                            dir('tests') {
-                                sh './theiaPrepare.sh'
+                stage('SonarCloud') {
+                    steps {
+                        container('maven') {
+                            dir('com.ca.lsp.cobol') {
+                                withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
+                                    sh "mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
+                                }
                             }
                         }
-                        container('python') {
-                            dir('tests/theia_automation_lsp') {
-                                sh 'pip install -r requirements.txt'
-                                sh 'apt update'
-                                sh 'apt install firefox-esr -y'
-                                sh 'PYTHONPATH=`pwd` robot -i Rally -e Unstable --variable HEADLESS:True --outputdir robot_output robot_suites/lsp/local/firefox_lsp_local.robot'
+                    }
+                }
+
+                stage('Client - Install dependencies') {
+                    environment {
+                        npm_config_cache = "$env.WORKSPACE"
+                    }
+                    steps {
+                        container('node') {
+                            dir('clients/cobol-lsp-vscode-extension') {
+                                sh 'npm ci'
                             }
                         }
-                    } else {
-                        echo "Integration test was skipped"
+                    }
+                }
+                stage('Client - Package') {
+                    environment {
+                        npm_config_cache = "$env.WORKSPACE"
+                    }
+                    steps {
+                        container('node') {
+                            dir('clients/cobol-lsp-vscode-extension') {
+                                sh 'npx vsce package'
+                                archiveArtifacts "*.vsix"
+                                sh 'rm -rf /opt/tools/latestPackage'
+                                sh 'mkdir /opt/tools/latestPackage'
+                                sh 'cp cobol-language-support*.vsix /opt/tools/latestPackage'
+                                sh 'mv cobol-language-support*.vsix cobol-language-support_0.10.1.vsix'
+                            }
+                        }
                     }
                 }
             }
         }
-        stage('Deploy') {
-            environment {
-                sshChe4z = "genie.che4z@projects-storage.eclipse.org"
-                project = "download.eclipse.org/che4z/snapshots/$projectName"
-                url = "$project/$branchName"
-                deployPath = "/home/data/httpd/$url"
+        stage('Integration testing') {
+            when {
+                expression { isTimeTriggeredBuild() && (branchName == 'development' || env.CHANGE_ID) }
+                beforeAgent true
+            }
+            agent {
+                kubernetes {
+                    label kubeTestLabel
+                    yaml kubernetes_test_config
+                }
             }
             steps {
-                script {
-                    if (branchName == 'master' || branchName == 'development') {
-                        container('jnlp') {
-                            sshagent(['projects-storage.eclipse.org-bot-ssh']) {
-                                sh '''
-                                ssh $sshChe4z rm -rf $deployPath
-                                ssh $sshChe4z mkdir -p $deployPath
-                                scp -r $workspace/clients/cobol-lsp-vscode-extension/*.vsix $sshChe4z:$deployPath
-                                '''
-                                echo "Deployed to https://$url"
-                            }
-                        }
-                    } else {
-                        echo "Deployment skipped for branch: $branchName"
+                container('theia') {
+                    dir('tests') {
+                        sh './theiaPrepare.sh'
+                    }
+                }
+                container('python') {
+                    dir('tests/theia_automation_lsp') {
+                        sh 'pip install -r requirements.txt'
+                        sh 'apt update'
+                        sh 'apt install firefox-esr -y'
+                        sh 'PYTHONPATH=`pwd` robot -i Rally -e Unstable --variable HEADLESS:True --outputdir robot_output robot_suites/lsp/local/firefox_lsp_local.robot'
                     }
                 }
             }
-        }
-    }
-    post {
-        always {
-            container('theia') {
-                dir('tests') {
-                    sh 'mkdir artifacts'
-                    sh 'cp /home/theia/theia.log artifacts'
-                    sh 'cp -a theia_automation_lsp/robot_output/. artifacts'
-                    sh 'cp -a theia_robot_output/. artifacts'
-                    archiveArtifacts "artifacts/**"
+            post {
+                always {
+                    container('theia') {
+                        dir('tests') {
+                            sh 'mkdir artifacts'
+                            sh 'cp /home/theia/theia.log artifacts'
+                            sh 'cp -a theia_automation_lsp/robot_output/. artifacts'
+                            sh 'cp -a theia_robot_output/. artifacts'
+                            archiveArtifacts "artifacts/**"
+                        }
+                    }
                 }
             }
         }
