@@ -61,7 +61,7 @@ The LSP for COBOL extension can retrieve copybooks used in your projects from th
 
 To retrieve copybooks from the mainframe, **follow these steps:**
 
-1. Ensure that you have a Zowe CLI zosmf profile configured.
+1. Ensure that you have a [Zowe CLI zosmf profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) configured.
 2. Open the extension settings. 
 3. Under **Profiles**, specify your Zowe CLI zosmf profile.
 4. Under **Paths**, add any number of data sets to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
