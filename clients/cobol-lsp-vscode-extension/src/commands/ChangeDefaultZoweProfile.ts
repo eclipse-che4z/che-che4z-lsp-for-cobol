@@ -11,7 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { ProfileService } from "../ProfileService";
+import { ProfileService } from "../services/ProfileService";
 
 export function changeDefaultZoweProfile(profileService: ProfileService) {
     profileService.getProfile();

@@ -13,26 +13,29 @@
  */
 
 import * as vscode from "vscode";
-import { SETTINGS_SECTION } from "./constants";
-import { DEPENDENCIES_FOLDER } from "./constants";
-import { CopybooksDownloader } from "./CopybooksDownloader";
-import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
-import { ProfileService } from "./ProfileService";
-import { LanguageClientService } from "./services/LanguageClientService";
-import { ZoweApi } from "./ZoweApi";
-import { CopybookResolver } from "./services/CopybookResolver";
-import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 import { editDatasetPaths } from "./commands/EditDatasetPaths";
+import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
+import { DEPENDENCIES_FOLDER } from "./constants";
+import { LANGUAGE_ID, SETTINGS_SECTION } from "./constants";
+import { CopybookFix } from "./services/CopybookFix";
+import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
+import { CopybooksDownloader } from "./services/CopybooksDownloader";
+import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
+
+import { LanguageClientService } from "./services/LanguageClientService";
 import { PathsService } from "./services/PathsService";
+import { ProfileService } from "./services/ProfileService";
+import { ZoweApi } from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
-    const resolver: CopybookResolver = new CopybookResolver();
+    const copybookFix: CopybookFix = new CopybookFix();
+    const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
+    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator);
+    const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator);
     const pathsService: PathsService = new PathsService();
-    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(resolver, zoweApi, profileService, pathsService);
-    const languageClientService: LanguageClientService = new LanguageClientService();
 
     try {
         await languageClientService.checkPrerequisites();
@@ -72,7 +75,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
-            { scheme: "file", language: "COBOL" },
+            { scheme: "file", language: LANGUAGE_ID },
             new CopybooksCodeActionProvider()));
 }
 

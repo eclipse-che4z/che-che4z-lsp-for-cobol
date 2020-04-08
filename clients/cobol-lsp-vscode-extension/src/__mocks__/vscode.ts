@@ -11,6 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import * as url from "url";
 
 // tslint:disable: no-namespace no-empty
 export namespace workspace {
@@ -21,4 +22,16 @@ export namespace workspace {
 export namespace window {
     export let showErrorMessage = () => {};
     export let showInformationMessage = () => {};
+    export let createStatusBarItem = () => { return { show: () => { } } };
+}
+export enum StatusBarAlignment {
+    Right,
+}
+
+export class Uri {
+    static file(path: string): Uri {
+        const result: Uri = new Uri();
+        result.toString = () => url.pathToFileURL(path).toString();
+        return result;
+    }
 }

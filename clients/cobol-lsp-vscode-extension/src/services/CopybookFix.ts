@@ -15,7 +15,7 @@
 import * as vscode from "vscode";
 import { DownloadQueue } from "./DownloadQueue";
 
-export class CopybookResolver {
+export class CopybookFix {
     private queue: DownloadQueue;
 
     async fixMissingDownloads(reasonMsg: string, missingCopybooks: string[], profile: string, options: { hasPaths: boolean, hasProfiles: boolean }) {

@@ -44,7 +44,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-/** This class represent all the unit test for the copybook dependency managament service */
+/** This class represent all the unit test for the copybook dependency management service */
 @Slf4j
 public class DependencyServiceTest extends FileSystemConfiguration {
   public static final String NESTED_CPY_NAME = "CPYNEST2";
@@ -52,8 +52,7 @@ public class DependencyServiceTest extends FileSystemConfiguration {
       Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
   Provider<ConfigurationSettingsStorable> provider =
       () ->
-          new ConfigurationSettingsStorable(
-              PROFILE_NAME, unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2)));
+          new ConfigurationSettingsStorable(unmodifiableList(Arrays.asList(FULL_PATH, FULL_PATH2)));
 
   private CopybookDependencyService dependencyService =
       new CopybookDependencyServiceImpl(broker, provider);

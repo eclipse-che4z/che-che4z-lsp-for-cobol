@@ -13,7 +13,7 @@
  */
 
 import * as vscode from "vscode";
-import { CopybooksDownloader } from "../CopybooksDownloader";
+import { CopybooksDownloader } from "../services/CopybooksDownloader";
 
 // tslint:disable: no-unused-expression no-string-literal
 describe("Copybook downloader", () => {

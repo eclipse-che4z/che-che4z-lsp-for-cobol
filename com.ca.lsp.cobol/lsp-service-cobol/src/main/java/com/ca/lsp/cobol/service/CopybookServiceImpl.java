@@ -117,11 +117,10 @@ public class CopybookServiceImpl implements CopybookService {
    * @return The path of the existent copybook or null if not found
    */
   @Override
-  public Path findCopybook(String filename, String profile, List<String> datasetList) {
+  public Path findCopybook(String filename, List<String> datasetList) {
     return retrievePathOrNull(
         filename,
-        getPathList(
-            getCopybookBaseFolder(workspaceFolderPaths.get(0)).toString(), profile, datasetList));
+        getPathList(getCopybookBaseFolder(workspaceFolderPaths.get(0)).toString(), datasetList));
   }
 
   private Path retrievePathOrNull(String filename, List<Path> datasetPathList) {
@@ -144,7 +143,6 @@ public class CopybookServiceImpl implements CopybookService {
   @Override
   public void observerCallback(RequiredCopybookEvent event) {
     String requiredCopybookName = event.getName();
-
     dependencyService.addCopybookInDepFile(event, requiredCopybookName);
     resolveCopybookContent(requiredCopybookName);
   }
@@ -187,11 +185,7 @@ public class CopybookServiceImpl implements CopybookService {
     ConfigurationSettingsStorable configurationSettingsStorable =
         configurationSettingsStorableProvider.get();
 
-    Path path =
-        findCopybook(
-            requiredCopybookName,
-            configurationSettingsStorable.getProfiles().toString(),
-            configurationSettingsStorable.getPaths());
+    Path path = findCopybook(requiredCopybookName, configurationSettingsStorable.getPaths());
     if (isFileExists(path)) {
       publishOnDatabus(requiredCopybookName, getContentByPath(path), path);
     } else {

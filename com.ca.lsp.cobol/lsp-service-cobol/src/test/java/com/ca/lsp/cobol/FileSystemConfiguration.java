@@ -46,17 +46,19 @@ public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String PROFILE_NAME = "PRF11";
   protected static final String DSNAME_1 = "HLQLF01.DSNAME1";
   protected static final String DSNAME_2 = "HLQLF01.DSNAME2";
+  protected static final String DSNAME_3 = "HLQLF02.DSNAME1";
 
   protected static final String CPY_NAME_WITHOUT_EXT = "copy2";
+  protected static final String FULL_PATH = createFullPath(PROFILE_NAME, DSNAME_1);
+  protected static final String FULL_PATH2 = createFullPath(PROFILE_NAME, DSNAME_2);
+  protected static final String WRONG_PATH = createFullPath(PROFILE_NAME, DSNAME_3);
+  protected static final String DEP_EXTENSION = ".dep";
   protected static final String COPYBOOK_NOT_PRESENT = "ANTHRCPY";
   protected static final String EMPTY_COPYBOOK_NAME = " ";
   protected static final String COBOL_FILE_NAME = "Test";
   protected static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
   public static final String CPYNEST_CPY = "CPYNEST.cpy";
-
   protected static final String DEP_FILE_COST_NAME = "SOMEPROG";
-  protected static final String DEP_EXTENSION = ".dep";
-
   protected static final String COPYBOOK_CONTENT =
       "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
   protected static final String NESTED_COPYBOOK_CONTENT = "000230 COPY CPYNEST2.";
@@ -93,14 +95,14 @@ public class FileSystemConfiguration extends ConfigurableTest {
    */
   @Before
   public void buildTempFilesystem() {
-    intializeSettingsWithSomeContent();
+    intializeSettings();
 
     createWorkspaceFolderStructure();
     createCopybookFolders();
     createDependencyFolder();
 
+    // populate copybook folder and dependency file with some content
     createCopybookFiles();
-    createNestedCopybooks();
     createDependencyFile();
   }
 
@@ -120,13 +122,21 @@ public class FileSystemConfiguration extends ConfigurableTest {
         .forEach(File::delete);
   }
 
-  private void intializeSettingsWithSomeContent() {
+  /**
+   * This method define the steps necessary to emulate the json settings provided by the user in the
+   * settings.json
+   */
+  private void intializeSettings() {
     configurationSettingsStorable =
         new ConfigurationSettingsStorable(
-            PROFILE_NAME, Collections.unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2)));
+            Collections.unmodifiableList(Arrays.asList(FULL_PATH, FULL_PATH2)));
 
     settingsProvider.set(configurationSettingsStorable);
     when(settingsProvider.get()).thenReturn(configurationSettingsStorable);
+  }
+
+  protected static String createFullPath(String profile, String dataset) {
+    return filesystemSeparator() + profile + filesystemSeparator() + dataset;
   }
 
   protected List<WorkspaceFolder> createWorkspaceFolders() {
@@ -170,24 +180,13 @@ public class FileSystemConfiguration extends ConfigurableTest {
                     createFile(targetPath, CPY_INNER_FILE_NAME_WITH_EXT), COPYBOOK_CONTENT));
   }
 
-  private void createNestedCopybooks() {
-    writeContentOnFile(createFile(copybooksFolderPath, CPYNEST_CPY), NESTED_COPYBOOK_CONTENT);
-  }
-
   private List<Path> getPathListFromSettings() {
     ConfigurationSettingsStorable configSettings = settingsProvider.get();
-    String profile = (String) configSettings.getProfiles();
+
     List<String> targetDatasets = configSettings.getPaths();
 
     return targetDatasets.stream()
-        .map(
-            it ->
-                Paths.get(
-                    copybooksFolderPath
-                        + filesystemSeparator()
-                        + profile
-                        + filesystemSeparator()
-                        + it))
+        .map(it -> Paths.get(copybooksFolderPath + it))
         .collect(Collectors.toList());
   }
 
@@ -204,7 +203,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
     return workspaceFolder;
   }
 
-  protected String filesystemSeparator() {
+  protected static String filesystemSeparator() {
     return FileSystems.getDefault().getSeparator();
   }
 
