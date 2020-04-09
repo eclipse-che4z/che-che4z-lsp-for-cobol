@@ -2,16 +2,20 @@
 
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [0.x.x] - TBD
+## [0.11.0] - 2020-04-09
 
 #### Added
-- Automatic copybook retrieval
+- Automatic copybook retrieval based on Zowe connection
 - Downloading of nested copybooks
+- Code actions items to enhance user experience
 
 #### Changed
-- Readme updated
+- Updates to README
 
 #### Fixed
+- Copybook extension check
+- Address StackOverflow exception during build
+- Make document extension check case-insensitive
 
 ## [0.10.1] - 2020-02-12
 
