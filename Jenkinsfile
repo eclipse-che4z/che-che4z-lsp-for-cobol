@@ -47,6 +47,8 @@ spec:
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
+    securityContext:
+      runAsUser: 1001140001
     resources:
       limits:
         memory: "2Gi"
