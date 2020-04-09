@@ -165,7 +165,7 @@ pipeline {
         }
         stage('Integration testing') {
             when {
-                expression { isTimeTriggeredBuild() && (branchName == 'development' || env.CHANGE_ID) }
+                expression { true }
                 beforeAgent true
             }
             agent {
