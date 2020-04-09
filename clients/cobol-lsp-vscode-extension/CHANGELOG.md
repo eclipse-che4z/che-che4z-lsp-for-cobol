@@ -7,7 +7,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 #### Added
 - Automatic copybook retrieval based on Zowe connection
 - Downloading of nested copybooks
-- Code actions items to enhance user experience
+- New code actions to enhance user experience
 
 #### Changed
 - Updates to README
