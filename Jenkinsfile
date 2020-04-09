@@ -27,9 +27,6 @@ spec:
       requests:
         memory: "2Gi"
         cpu: "1"
-    volumeMounts:
-    - name: tools
-      mountPath: /opt/tools
   - name: jnlp
     volumeMounts:
     - name: volume-known-hosts
@@ -38,9 +35,6 @@ spec:
   - name: volume-known-hosts
     configMap:
       name: known-hosts
-  - name: tools
-    persistentVolumeClaim:
-      claimName: tools-claim-jiro-lspforcobol
 """
 
 def kubernetes_test_config = """
@@ -60,9 +54,6 @@ spec:
       requests:
         memory: "2Gi"
         cpu: "1"
-    volumeMounts:
-    - name: tools
-      mountPath: /opt/tools
   - name: python
     image: python
     tty: true
@@ -81,9 +72,6 @@ spec:
   - name: volume-known-hosts
     configMap:
       name: known-hosts
-  - name: tools
-    persistentVolumeClaim:
-      claimName: tools-claim-jiro-lspforcobol
 """
 
 def projectName = 'lsp-for-cobol'
@@ -168,9 +156,6 @@ pipeline {
                             dir('clients/cobol-lsp-vscode-extension') {
                                 sh 'npx vsce package'
                                 archiveArtifacts "*.vsix"
-                                sh 'rm -rf /opt/tools/latestPackage'
-                                sh 'mkdir /opt/tools/latestPackage'
-                                sh 'cp cobol-language-support*.vsix /opt/tools/latestPackage'
                                 sh 'mv cobol-language-support*.vsix cobol-language-support_0.10.1.vsix'
                             }
                         }
@@ -192,6 +177,7 @@ pipeline {
             steps {
                 container('theia') {
                     dir('tests') {
+                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
                         sh './theiaPrepare.sh'
                     }
                 }
