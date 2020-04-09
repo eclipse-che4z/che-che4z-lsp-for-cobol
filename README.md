@@ -23,6 +23,9 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 - Java version 8 or higher
 - To enable syntax coloring, a third-party COBOL extension is required. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
+- To enable automatic copybook retrieval, the following are required:
+    - Configured TSO/E address space services, z/OS data set and file REST interface, and z/OS jobs REST interface. For more information, see [https://docs.zowe.org/stable/user-guide/systemrequirements-zosmf.html#z-os-requirements](z/OS Requirements).
+    - [Zowe CLI zosmf profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html).
 
 ## Features
 COBOL Language Support defines the protocol that is used between an editor or IDE, and a language server that provides the following COBOL syntax awareness features:
