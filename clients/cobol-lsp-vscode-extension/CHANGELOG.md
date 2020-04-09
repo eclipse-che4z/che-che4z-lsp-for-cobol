@@ -5,7 +5,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 ## [0.11.0] - 2020-04-09
 
 #### Added
-- Automatic copybook retrieval based on Zowe connection
+- Automatic copybook retrieval via Zowe connection
 - Downloading of nested copybooks
 - New code actions to enhance user experience
 
