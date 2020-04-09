@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -16,7 +16,6 @@ package com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl;
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
@@ -31,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
+import static java.util.regex.Pattern.compile;
 
 /**
  * Preprocessor, which converts strings with COBOL code into a specific entities; analyzes and
@@ -41,11 +41,13 @@ import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
  */
 public class CobolLineReaderImpl implements CobolLineReader {
   private static final int INDICATOR_AREA_INDEX = 6;
+  private static final Pattern FIXED_FORMAT_PATTERN =
+      compile("^(.{6})" + INDICATOR_FIELD + "(.{0,4})(.{0,61})(.{0,8})");
 
   @Nonnull
   @Override
   public ResultWithErrors<List<CobolLine>> processLines(
-      @Nullable String documentURI, @Nonnull String lines, @Nonnull CobolSourceFormat format) {
+      @Nullable String documentURI, @Nonnull String lines) {
     List<SyntaxError> errors = new ArrayList<>();
     List<CobolLine> result = new ArrayList<>();
     try (Scanner scanner = new Scanner(lines)) {
@@ -56,8 +58,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
       while (scanner.hasNextLine()) {
         currentLine = scanner.nextLine();
 
-        ResultWithErrors<CobolLine> output =
-            parseLine(currentLine, documentURI, lineNumber, format);
+        ResultWithErrors<CobolLine> output = parseLine(currentLine, documentURI, lineNumber);
 
         CobolLine currentCobolLine = output.getResult();
         errors.addAll(output.getErrors());
@@ -74,18 +75,13 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
   @Nonnull
   private ResultWithErrors<CobolLine> parseLine(
-      @Nonnull String line,
-      @Nullable String uri,
-      int lineNumber,
-      @Nonnull CobolSourceFormat format) {
-    Pattern pattern = format.getPattern();
-
+      @Nonnull String line, @Nullable String uri, int lineNumber) {
     CobolLine cobolLine = new CobolLine();
 
     line = getDelegate().apply(line);
 
-    Matcher matcher = pattern.matcher(line);
-    ResultWithErrors<String> result = checkFormatCorrect(line, uri, lineNumber, format, matcher);
+    Matcher matcher = FIXED_FORMAT_PATTERN.matcher(line);
+    ResultWithErrors<String> result = checkFormatCorrect(line, uri, lineNumber, matcher);
     line = result.getResult();
 
     if (line.length() > 0) {
@@ -111,8 +107,6 @@ public class CobolLineReaderImpl implements CobolLineReader {
       }
     }
 
-    cobolLine.setFormat(format);
-    cobolLine.setDialect(null);
     cobolLine.setNumber(lineNumber);
 
     return new ResultWithErrors<>(cobolLine, result.getErrors());
@@ -148,11 +142,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
   @Nonnull
   private ResultWithErrors<String> checkFormatCorrect(
-      @Nonnull String line,
-      @Nullable String uri,
-      int lineNumber,
-      @Nonnull CobolSourceFormat format,
-      @Nonnull Matcher matcher) {
+      @Nonnull String line, @Nullable String uri, int lineNumber, @Nonnull Matcher matcher) {
     int errorLength = 0;
     int charPosition;
     List<SyntaxError> errors = new ArrayList<>();
@@ -164,7 +154,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
         charPosition =
             INDICATOR_AREA_INDEX; // format error could appear at the indicator area index, for now
       }
-      errors.add(registerFormatError(uri, lineNumber, format, charPosition, errorLength));
+      errors.add(registerFormatError(uri, lineNumber, charPosition, errorLength));
       line = line.substring(0, line.length() - errorLength);
     }
     return new ResultWithErrors<>(line, errors);
@@ -177,13 +167,9 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
   @Nonnull
   private SyntaxError registerFormatError(
-      @Nullable String uri,
-      int lineNumber,
-      @Nonnull CobolSourceFormat format,
-      int charPosition,
-      int errorLength) {
+      @Nullable String uri, int lineNumber, int charPosition, int errorLength) {
     return SyntaxError.syntaxError()
-        .suggestion("This format is not a " + format.toString() + " format")
+        .suggestion("The line doesn't match the fixed format")
         .severity(1)
         .position(
             new Position(

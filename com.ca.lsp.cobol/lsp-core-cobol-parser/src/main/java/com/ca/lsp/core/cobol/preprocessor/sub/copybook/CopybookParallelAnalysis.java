@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -16,31 +16,44 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.model.CopybookDefinition;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
+import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.google.common.collect.Multimap;
-import lombok.AllArgsConstructor;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.ForkJoinTask;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-@AllArgsConstructor
+import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
+import static java.lang.String.format;
+import static java.util.concurrent.ForkJoinTask.invokeAll;
+import static java.util.stream.Collectors.toList;
+
+@Singleton
 public class CopybookParallelAnalysis implements CopybookAnalysis {
   private static final String ERROR_SUGGESTION = "%s: Copybook not found";
+  private AnalyseCopybookTaskFactory factory;
+
+  @Inject
+  public CopybookParallelAnalysis(AnalyseCopybookTaskFactory factory) {
+    this.factory = factory;
+  }
 
   @Override
   public ResultWithErrors<List<CopybookSemanticContext>> analyzeCopybooks(
+      String documentUri,
       Multimap<String, Position> copybooks,
-      List<CopybookDefinition> copybookUsageTracker,
-      CobolSourceFormat format) {
+      List<CopybookUsage> copybookUsageTracker,
+      String textDocumentSyncType) {
+
     List<ResultWithErrors<CopybookSemanticContext>> contexts =
-        runAnalysisAsynchronously(copybooks, copybookUsageTracker, format);
+        runAnalysisAsynchronously(
+            documentUri, copybooks, copybookUsageTracker, textDocumentSyncType);
 
     List<SyntaxError> errors = createMissingCopybookErrors(copybooks, contexts);
 
@@ -50,12 +63,16 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
   }
 
   private List<ResultWithErrors<CopybookSemanticContext>> runAnalysisAsynchronously(
+      String documentUri,
       Multimap<String, Position> copybooks,
-      List<CopybookDefinition> copybookUsageTracker,
-      CobolSourceFormat format) {
-    return ForkJoinTask.invokeAll(createTasks(copybooks, copybookUsageTracker, format)).stream()
+      List<CopybookUsage> copybookUsageTracker,
+      String textDocumentSyncType) {
+
+    return invokeAll(
+            createTasks(documentUri, copybooks, copybookUsageTracker, textDocumentSyncType))
+        .stream()
         .map(ForkJoinTask::join)
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
   private List<CopybookSemanticContext> collectCorrectContexts(
@@ -63,7 +80,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
     return contexts.stream()
         .map(ResultWithErrors::getResult)
         .filter(it -> it.getContext() != null)
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
   private List<SyntaxError> extractAnalysingErrors(
@@ -71,7 +88,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
     return contexts.stream()
         .map(ResultWithErrors::getErrors)
         .flatMap(List::stream)
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
   private List<SyntaxError> createMissingCopybookErrors(
@@ -83,7 +100,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
         .map(CopybookSemanticContext::getName)
         .map(defineErrors(copybooks))
         .flatMap(List::stream)
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
   @Nonnull
@@ -94,23 +111,27 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
                 position ->
                     SyntaxError.syntaxError()
                         .position(position)
-                        .suggestion(String.format(ERROR_SUGGESTION, copybookName))
+                        .suggestion(format(ERROR_SUGGESTION, copybookName))
                         .severity(1)
+                        .errorCode(MISSING_COPYBOOK)
                         .build())
-            .collect(Collectors.toList());
+            .collect(toList());
   }
 
   private List<ForkJoinTask<ResultWithErrors<CopybookSemanticContext>>> createTasks(
+      String documentUri,
       Multimap<String, Position> names,
-      List<CopybookDefinition> copybookUsageTracker,
-      CobolSourceFormat format) {
+      List<CopybookUsage> copybookUsageTracker,
+      String textDocumentSyncType) {
+
     return names.asMap().entrySet().stream()
         .map(
             it ->
-                new AnalyseCopybookTask(
-                    new CopybookDefinition(it.getKey(), null, it.getValue()),
+                factory.create(
+                    documentUri,
+                    new CopybookUsage(it.getKey(), documentUri, it.getValue()),
                     copybookUsageTracker,
-                    format))
-        .collect(Collectors.toList());
+                    textDocumentSyncType))
+        .collect(toList());
   }
 }

@@ -15,12 +15,11 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
-import com.ca.lsp.core.cobol.params.CobolDialect;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
 import org.junit.Test;
 
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.BLANK_SEQUENCE_AREA;
 import static org.junit.Assert.assertEquals;
 
 /** This class is a unit test for {@link CobolLineUtils} and checks its utility methods. */
@@ -32,8 +31,6 @@ public class CobolLineUtilsTest {
     line.setCommentArea("000000");
     line.setContentAreaA("cont");
     line.setContentAreaB("contentB");
-    line.setDialect(CobolDialect.MF);
-    line.setFormat(CobolSourceFormat.FIXED);
     line.setIndicatorArea("*");
     line.setNumber(1);
     line.setSequenceArea("seqArea");
@@ -45,8 +42,6 @@ public class CobolLineUtilsTest {
     expected.setCommentArea("000000");
     expected.setContentAreaA("");
     expected.setContentAreaB("");
-    expected.setDialect(CobolDialect.MF);
-    expected.setFormat(CobolSourceFormat.FIXED);
     expected.setIndicatorArea("*");
     expected.setNumber(1);
     expected.setSequenceArea("seqArea");
@@ -112,23 +107,5 @@ public class CobolLineUtilsTest {
     CobolLine actual = CobolLineUtils.copyCobolLineWithIndicatorArea("-", line);
 
     assertEquals(expected, actual);
-  }
-
-  @Test
-  public void createBlankSequenceAreaFixed() {
-    String actual = CobolLineUtils.createBlankSequenceArea(CobolSourceFormat.FIXED);
-    assertEquals("      ", actual);
-  }
-
-  @Test
-  public void createBlankSequenceAreaTandem() {
-    String actual = CobolLineUtils.createBlankSequenceArea(CobolSourceFormat.TANDEM);
-    assertEquals("", actual);
-  }
-
-  @Test
-  public void createBlankSequenceAreaVariable() {
-    String actual = CobolLineUtils.createBlankSequenceArea(CobolSourceFormat.VARIABLE);
-    assertEquals("      ", actual);
   }
 }

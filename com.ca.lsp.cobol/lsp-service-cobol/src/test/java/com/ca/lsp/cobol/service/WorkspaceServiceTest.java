@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -15,169 +15,86 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
-import com.broadcom.lsp.cdi.module.databus.DatabusModule;
-import com.broadcom.lsp.cdi.module.service.ServiceModule;
+import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
-import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
+import com.google.gson.JsonPrimitive;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
-import org.eclipse.lsp4j.FileChangeType;
+import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.FileEvent;
-import org.eclipse.lsp4j.WorkspaceFolder;
-import org.junit.*;
+import org.eclipse.lsp4j.services.WorkspaceService;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import javax.annotation.Nonnull;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
-import static junit.framework.TestCase.*;
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
+import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.eclipse.lsp4j.FileChangeType.Changed;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.*;
 
+/**
+ * This test checks the entry points of the {@link org.eclipse.lsp4j.services.WorkspaceService}
+ * implementation.
+ */
 @Slf4j
 public class WorkspaceServiceTest {
-  private static final String COPYBOOK_CONTENT =
-      "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
-
-  private static final String WORKSPACE_FOLDER_NAME = "test";
-  private static final String WS_FOLDER_NAME = "WORKSPACE";
-  private static final String CPYB_FOLDER_NAME = "COPYBOOKS";
-  private static final String CPYB_INNER_NAME = "INNER";
-
-  private static final String CPY_OUTER_NAME_ONLY = "copy";
-  private static final String CPY_OUTER_ANOTHER_NAME_ONLY = "copy3";
-  private static final String CPY_OUTER_FILE_NAME_WITH_EXT = "copy.cpy";
-  private static final String CPY_OUTER_ANOTHER_FILE_NAME_WITH_EXT = "copy3.out";
-  private static final String CPY_INNER_FILE_NAME_WITH_EXT = "copy2.cpy";
-
-  private URI workspaceFolderPath = null;
-  private Path innerCopybooksPath = null;
-  private static CobolWorkspaceServiceImpl cobolWorkspaceService;
-
-  @BeforeClass
-  public static void setUp() {
-    cobolWorkspaceService =
-        LangServerCtx.getGuiceCtx(new ServiceModule(), new DatabusModule())
-            .getInjector()
-            .getInstance(CobolWorkspaceServiceImpl.class);
-  }
-
-  @AfterClass
-  public static void tearDown() {
-    LangServerCtx.shutdown();
-  }
-
-  // Activities performed
-  // 1 - Create folder structure in temp folder - Create two copybooks in the provided structure
-  // 2 - Create two copybooks in the provided structure
-  // 3 - Initialize the workspaceFolder to reproduce what client does when a new workspace is opened
-  //     on the IDE
-  // 4 - Initialize the list of workspaces (workspace roots) that WorkspaceManager should have to
-  //     apply search operations
-  @Before
-  public void initActivities() {
-    /*
-    CREATE THREE FOLDER WITH THIS STRUCTURE
-    ***************************************
-    TEMP/
-    └── WORKSPACE/
-        ├── INNER/
-        │   └── copy2.cpy
-        ├── copy3.out
-        └── copy.cpy
-    ***************************************
-    */
-    Path workspacePath = createPathOfName(WS_FOLDER_NAME, Optional.empty());
-    Path copybooksPath = createPathOfName(CPYB_FOLDER_NAME, Optional.of(workspacePath));
-    Path cpyFilePath = createPathOfName(CPY_OUTER_FILE_NAME_WITH_EXT, Optional.of(copybooksPath));
-    Path anotherCpyFilePath =
-        createPathOfName(CPY_OUTER_ANOTHER_FILE_NAME_WITH_EXT, Optional.of(copybooksPath));
-
-    innerCopybooksPath = createPathOfName(CPYB_INNER_NAME, Optional.of(copybooksPath));
-
-    // create two cpy files
-    createTempDirAndFile(workspacePath, copybooksPath, cpyFilePath, anotherCpyFilePath);
-    createInnerFolderAndFile(
-        copybooksPath,
-        createPathOfName(CPY_INNER_FILE_NAME_WITH_EXT, Optional.of(innerCopybooksPath)));
-
-    WorkspaceFolder workspaceFolder = new WorkspaceFolder();
-    workspaceFolder.setName(WORKSPACE_FOLDER_NAME);
-    workspaceFolder.setUri(adjustURI(getWorkspaceFolderPath().toString()));
-    List<WorkspaceFolder> workspaceFolderList = Collections.singletonList(workspaceFolder);
-    cobolWorkspaceService.setWorkspaceFolders(workspaceFolderList);
-  }
-
-  @After
-  public void cleanupTempFolder() {
-    try {
-      Files.walk(Paths.get(getWorkspaceFolderPath()))
-          .sorted(Comparator.reverseOrder())
-          .map(Path::toFile)
-          .forEach(File::delete);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  /*
-   * This test take in input a copybook name, retrieve the URI of the file (if it exists) and in case affermative return the
-   * content, null otherwise.
+  /**
+   * Test of the workspace/executeCommand entry point. Assert no changes applied if the command name
+   * not recognized.
    */
   @Test
-  public void getContentByCopybookName() {
-    assertTrue(cobolWorkspaceService.getContentByCopybookName(CPY_OUTER_NAME_ONLY).length() > 0);
-  }
+  public void testExecuteNonExistingCommand() {
+    DataBusBroker broker = mock(DataBusBroker.class);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
 
-  @Test
-  public void getNullWithNotCopybookNotFound() {
-    assertNull(cobolWorkspaceService.getContentByCopybookName("ANTHR_CPY"));
-  }
+    CompletableFuture<Object> result =
+        service.executeCommand(new ExecuteCommandParams("Missing command name", emptyList()));
 
-  @Test
-  public void testGetUriByCopyBookName() {
-    assertNotNull(cobolWorkspaceService.getURIByCopybookName(CPY_OUTER_NAME_ONLY));
+    try {
+      assertNull(result.get());
+    } catch (InterruptedException | ExecutionException e) {
+      fail(e.getMessage());
+    }
+    verify(broker, timeout(1000).times(0)).postData(any());
   }
 
   /**
-   * This test verify that a file with extension different from the set [cpy,cbl,cobol,cob] is not
-   * recognized as copybook.
+   * Test of the workspace/executeCommand entry point. Assert no changes applied if the argument
+   * list is incomplete.
    */
   @Test
-  public void testNotValidCopybookExtension() {
-    assertNull(cobolWorkspaceService.getURIByCopybookName(CPY_OUTER_ANOTHER_NAME_ONLY));
-  }
+  public void testExecuteCommandIncorrectArguments() {
+    DataBusBroker broker = mock(DataBusBroker.class);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
 
-  @Test
-  public void testDataSentOnDatabus() {
-    String copybookContent = cobolWorkspaceService.getContentByCopybookName(CPY_OUTER_NAME_ONLY);
-    FetchedCopybookEvent fetchedCopybookEvent =
-        FetchedCopybookEvent.builder().name(CPY_OUTER_NAME_ONLY).content(copybookContent).build();
-    assertTrue(
-        fetchedCopybookEvent.getName().length() > 0
-            && fetchedCopybookEvent.getContent().length() > 0);
-  }
+    CompletableFuture<Object> result =
+        service.executeCommand(
+            new ExecuteCommandParams(
+                MISSING_COPYBOOK.name(), singletonList(new JsonPrimitive(DOCUMENT_URI))));
 
+    try {
+      assertNull(result.get());
+    } catch (InterruptedException | ExecutionException e) {
+      fail(e.getMessage());
+    }
+    verify(broker, never()).postData(any());
+  }
   /**
    * This test verifies that the Workspace Service reacts on the file change watcher's notifications
    */
   @Test
   public void testDidChangeWatchedFilesExistingFileChanged() {
-    checkWatchers(
-        new FileEvent(
-            "file:///c%3A/workspace/COBOL/COPYBOOKS/CpyName.cpy", FileChangeType.Changed));
+    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks/CpyName.cpy", Changed));
   }
 
   /**
@@ -186,110 +103,20 @@ public class WorkspaceServiceTest {
    */
   @Test
   public void testDidChangeWatchedFilesAddedNewFile() {
-    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/COPYBOOKS", FileChangeType.Changed));
+    checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks", Changed));
   }
 
   private void checkWatchers(FileEvent event) {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
-    ArgumentCaptor<RunAnalysisEvent> captor =
-        ArgumentCaptor.forClass(RunAnalysisEvent.class);
+    ArgumentCaptor<RunAnalysisEvent> captor = forClass(RunAnalysisEvent.class);
 
-    CobolWorkspaceServiceImpl service = new CobolWorkspaceServiceImpl(broker);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
 
-    DidChangeWatchedFilesParams params =
-        new DidChangeWatchedFilesParams(Collections.singletonList(event));
+    DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));
     service.didChangeWatchedFiles(params);
 
     verify(broker).invalidateCache();
     verify(broker).postData(captor.capture());
     assertNotNull(captor.getValue());
-  }
-
-  private URI getWorkspaceFolderPath() {
-    return workspaceFolderPath;
-  }
-
-  private void setWorkspaceFolderPath(URI workspaceFolderPath) {
-    this.workspaceFolderPath = workspaceFolderPath;
-  }
-
-  /*
-  Remove the last slash from the URI path in order to replicate the behaviour of the client IDE that send to the server
-  the path of the opened workspace without the last slash.
-   */
-  private String adjustURI(String originalUri) {
-    return originalUri.substring(0, originalUri.length() - 1);
-  }
-
-  @Nonnull
-  private Path createPathOfName(String folderName, Optional<Path> parentFolder) {
-
-    // creck if the workspace folder already exists (parent folder)..
-    // Path adjustedPath = adjustIfFolderAlreadyExists(parentFolder.orElse(null));
-
-    return parentFolder
-        .map(
-            path ->
-                Paths.get(parentFolder.get() + System.getProperty("file.separator") + folderName))
-        .orElseGet(
-            () ->
-                Paths.get(
-                    System.getProperty("java.io.tmpdir")
-                        + System.getProperty("file.separator")
-                        + folderName));
-  }
-
-  // util methods to create dummy cobol code inside copybook file
-  private void createInnerFolderAndFile(Path parentFolder, Path copybookFile) {
-    try {
-      // create parent folder
-      if (Files.exists(parentFolder)) {
-        Files.createDirectory(innerCopybooksPath);
-        // create file into it
-        Path copybookFilePath = Files.createFile(copybookFile);
-        generateDummyContentForFile(copybookFilePath);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private void createTempDirAndFile(
-      Path workspacePath, Path copybookFolderPath, Path cpyFilePath, Path anotherCpyFilePath) {
-    try {
-      if (!Files.exists(workspacePath)) {
-        Files.createDirectory(workspacePath);
-        if (!Files.exists(copybookFolderPath)) {
-          Files.createDirectory(copybookFolderPath);
-        }
-      }
-      if (!Files.exists(cpyFilePath)) {
-        Path copybookFilePath = Files.createFile(cpyFilePath);
-        generateDummyContentForFile(copybookFilePath);
-      }
-
-      if (!Files.exists(anotherCpyFilePath)) {
-        Path anotherCopybookFilePath = Files.createFile(anotherCpyFilePath);
-        generateDummyContentForFile(anotherCopybookFilePath);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    setWorkspaceFolderPath(workspacePath.toUri());
-  }
-
-  private void generateDummyContentForFile(Path copybookFilePath) {
-    File copybookFile = copybookFilePath.toFile();
-    FileOutputStream fileOutputStream;
-    try {
-      fileOutputStream = new FileOutputStream(copybookFile, true);
-      BufferedOutputStream bufferedOutputStream =
-          new BufferedOutputStream(fileOutputStream, 128 * 100);
-      bufferedOutputStream.write(COPYBOOK_CONTENT.getBytes());
-      bufferedOutputStream.flush();
-      fileOutputStream.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 }

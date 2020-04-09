@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -31,7 +31,7 @@ import java.util.Optional;
 
 /** This cache verifies the main logic of cache data management. */
 @Slf4j
-public class DataBusGetFromCacheHappyTest extends AbsDataBusImplTest {
+public class DataBusGetFromCacheHappyTest extends DatabusConfigProvider {
   // cache dummy static content
   private static final String CPY_FIXED_NAME = "COPY-";
   private static final String CPY_FIXED_CONTENT = "FASDFASDFSF";

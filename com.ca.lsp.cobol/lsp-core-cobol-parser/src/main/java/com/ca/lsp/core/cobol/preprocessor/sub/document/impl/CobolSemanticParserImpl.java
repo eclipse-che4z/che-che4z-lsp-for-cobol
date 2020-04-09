@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -21,89 +21,100 @@ import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookAnalysis;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookParallelAnalysis;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.google.common.collect.Multimap;
-import lombok.AllArgsConstructor;
+import com.google.inject.Inject;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Preprocessor which retrieves semantic elements definitions, such as variables, paragraphs and
- * copybooks, and also applies semantic analysis for the copybooks' content
+ * copybooks, and applies semantic analysis for the copybooks' content
  */
-@AllArgsConstructor
 public class CobolSemanticParserImpl implements CobolSemanticParser {
+  private CopybookAnalysis analysis;
+
+  @Inject
+  public CobolSemanticParserImpl(CopybookAnalysis analysis) {
+    this.analysis = analysis;
+  }
 
   @Nonnull
   @Override
   public ResultWithErrors<PreprocessedInput> processLines(
+      @Nonnull String uri,
       @Nonnull String code,
       @Nonnull SemanticContext semanticContext,
-      @Nonnull CobolSourceFormat format) {
+      @Nonnull String textDocumentSyncType) {
     // run the lexer
-    final CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
+    CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     // get a list of matched tokens
-    final CommonTokenStream tokens = new CommonTokenStream(lexer);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
 
     // pass the tokens to the parser
-    final CobolPreprocessorParser parser = new CobolPreprocessorParser(tokens);
+    CobolPreprocessorParser parser = new CobolPreprocessorParser(tokens);
 
     // specify our entry point
-    final StartRuleContext startRule = parser.startRule();
+    StartRuleContext startRule = parser.startRule();
 
-    final ParseTreeWalker walker = new ParseTreeWalker();
-    final CobolSemanticParserListener listener =
-        createDocumentParserListener(tokens, semanticContext, format);
+    ParseTreeWalker walker = new ParseTreeWalker();
+    CobolSemanticParserListener listener =
+        createDocumentParserListener(uri, tokens, semanticContext);
     walker.walk(listener, startRule);
 
     // analyze contained copy books
     ResultWithErrors<List<CopybookSemanticContext>> contexts =
-        processCopybooks(semanticContext, format);
-    contexts.getResult().forEach(semanticContext::merge);
+        processCopybooks(uri, semanticContext, textDocumentSyncType);
+
+    buildCompleteVariableStructure(semanticContext, contexts);
 
     List<SyntaxError> errors = new ArrayList<>(contexts.getErrors());
-
     errors.addAll(listener.getErrors());
 
-    semanticContext.getVariables().createRelationBetweenVariables();
     return new ResultWithErrors<>(
         new PreprocessedInput(listener.context().read(), semanticContext), errors);
   }
 
+  @Nonnull
   private ResultWithErrors<List<CopybookSemanticContext>> processCopybooks(
-      @Nonnull SemanticContext semanticContext, CobolSourceFormat format) {
-    Multimap<String, Position> copybookNames = semanticContext.getCopybooks().getDefinitions();
+      @Nonnull String documentUri,
+      @Nonnull SemanticContext semanticContext,
+      String textDocumentSyncType) {
+    Multimap<String, Position> copybookNames = semanticContext.getCopybooks().getUsages();
 
     if (copybookNames.isEmpty()) {
-      return new ResultWithErrors<>(Collections.emptyList(), Collections.emptyList());
+      return new ResultWithErrors<>(emptyList(), emptyList());
     }
+    return analysis.analyzeCopybooks(
+        documentUri,
+        copybookNames,
+        semanticContext.getCopybookUsageTracker(),
+        textDocumentSyncType);
+  }
 
-    CopybookAnalysis copybookAnalyzer = createCopybookAnalyzer();
-    return copybookAnalyzer.analyzeCopybooks(
-        copybookNames, semanticContext.getCopybookUsageTracker(), format);
+  private void buildCompleteVariableStructure(
+      @Nonnull SemanticContext semanticContext,
+      @Nonnull ResultWithErrors<List<CopybookSemanticContext>> contexts) {
+    contexts.getResult().forEach(semanticContext::merge);
+    semanticContext.getVariables().removeUnresolvedCopybookMarks();
+    semanticContext.getVariables().createRelationBetweenVariables();
   }
 
   @Nonnull
   private CobolSemanticParserListener createDocumentParserListener(
+      @Nonnull String uri,
       @Nonnull CommonTokenStream tokens,
-      @Nonnull SemanticContext semanticContext,
-      @Nonnull CobolSourceFormat format) {
-    return new CobolSemanticParserListenerImpl(tokens, semanticContext, format);
-  }
-
-  @Nonnull
-  private CopybookAnalysis createCopybookAnalyzer() {
-    return new CopybookParallelAnalysis();
+      @Nonnull SemanticContext semanticContext) {
+    return new CobolSemanticParserListenerImpl(uri, tokens, semanticContext);
   }
 }

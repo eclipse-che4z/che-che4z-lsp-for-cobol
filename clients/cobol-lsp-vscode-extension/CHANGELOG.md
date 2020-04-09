@@ -2,6 +2,20 @@
 
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.11.0] - 2020-04-09
+
+#### Added
+- Automatic copybook retrieval via Zowe connection
+- Downloading of nested copybooks
+- Copybooks can be downloaded using a quick fix
+#### Changed
+- Updates to README
+
+#### Fixed
+- Copybook extension check
+- Address StackOverflow exception during build
+- Make document extension check case-insensitive
+
 ## [0.10.1] - 2020-02-12
 
 - Add maximum Java heap size argument to `extension.ts` [#194](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/194) Thanks @[sergiuilie](https://github.com/sergiuilie)

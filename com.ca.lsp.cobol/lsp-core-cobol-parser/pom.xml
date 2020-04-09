@@ -20,11 +20,11 @@
 	<parent>
 		<groupId>com.ca.lsp</groupId>
 		<artifactId>com.ca.lsp.cobol</artifactId>
-		<version>0.10.1</version>
+		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>lsp-core-cobol-parser</artifactId>
-	<version>0.10.1</version>
+	<version>${revision}</version>
 	<name>COBOL LSP :: LSP Core</name>
 	<packaging>jar</packaging>
 
@@ -278,6 +278,14 @@
 			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assistedinject</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assistedinject</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

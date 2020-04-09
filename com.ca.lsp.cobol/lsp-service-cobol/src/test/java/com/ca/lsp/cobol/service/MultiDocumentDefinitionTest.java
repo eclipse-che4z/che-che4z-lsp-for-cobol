@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2019 Broadcom.
+ *  Copyright (c) 2020 Broadcom.
  *  The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  *  This program and the accompanying materials are made
@@ -19,7 +19,8 @@ import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
+import com.ca.lsp.cobol.service.mocks.MockCopybookService;
+import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -70,9 +71,10 @@ public class MultiDocumentDefinitionTest extends ConfigurableTest {
 
   public MultiDocumentDefinitionTest() {
 
-    MockWorkspaceService workspaceService =
-        LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
-    workspaceService.setCopybooks(
+    MockCopybookService mockCopybookService =
+        LangServerCtx.getInjector().getInstance(MockCopybookServiceImpl.class);
+
+    mockCopybookService.setCopybooks(
         () -> Arrays.asList(new CobolText("STRUCT", STRUCT), new CobolText("PARS", PARS)));
   }
 

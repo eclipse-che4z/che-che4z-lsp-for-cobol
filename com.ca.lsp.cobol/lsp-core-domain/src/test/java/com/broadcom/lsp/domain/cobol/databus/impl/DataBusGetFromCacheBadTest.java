@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 
 /** This test verifies that cache can handle edge cases, e.g. missing elements. */
 @Slf4j
-public class DataBusGetFromCacheBadTest extends AbsDataBusImplTest {
+public class DataBusGetFromCacheBadTest extends DatabusConfigProvider {
   private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> databus;
 
   @Before

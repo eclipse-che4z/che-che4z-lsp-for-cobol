@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -14,15 +14,13 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 /**
  * This test check that the error is shown if the copybook that is used in the Cobol file contains a
@@ -42,16 +40,12 @@ public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCa
 
   public TestCopybookWithRecursiveDependencyIsDetected() {
     super(TEXT);
-
-    MockWorkspaceService workspaceService =
-        LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
-    workspaceService.setCopybooks(
-        () -> Collections.singletonList(new CobolText("RECURSIVE-COPY", RECURSIVE_COPY)));
   }
 
+  @Override
   @Test
   public void test() {
-    super.test();
+    super.test(singletonList(new CobolText("RECURSIVE-COPY", RECURSIVE_COPY)));
   }
 
   @Override

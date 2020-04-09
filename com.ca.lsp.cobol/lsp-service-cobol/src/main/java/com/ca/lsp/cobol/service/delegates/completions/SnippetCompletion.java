@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -52,7 +52,7 @@ public class SnippetCompletion implements Completion {
   @Nonnull
   @Override
   public String getSortOrderPrefix() {
-    return "2";
+    return "3";
   }
 
   @Nonnull

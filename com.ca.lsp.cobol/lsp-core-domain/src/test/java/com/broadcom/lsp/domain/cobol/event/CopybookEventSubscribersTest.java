@@ -40,9 +40,9 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
     }
   }
 
+  private static final String RUN_ANALYSIS = "RUN_ANALYSIS";
   private static final String REQCPY = "REQCPY";
   private static final String FETCHEDCPY = "FETCHEDCPY";
-  private static final String RUNANALYSIS = "RUNANALYSIS";
   private static final String UNKNOWN = "UNKNOWN";
   private DatabusObserverTest databusObserver;
 
@@ -63,16 +63,16 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
     assertEquals(FETCHEDCPY, getFetchedSubscriberFromFactory().getEventType().getHeader());
   }
 
-  /** This test verify that the FetchedCopybook factory creates a new FetchedCopybook event */
-  @Test
-  public void testRerunAnalysisSubscriberFactory() {
-    assertEquals(RUNANALYSIS, getRerunSubscriberFromFactory().getEventType().getHeader());
-  }
-
   /** This test verify that the Unknown factory creates a new Unknown event */
   @Test
   public void testUnknownSubscriberFactory() {
     assertEquals(UNKNOWN, getUnknownSubscriberFromFactory().getEventType().getHeader());
+  }
+
+  /** This test verify that the RunAnalysis factory creates a new RunAnalysis event */
+  @Test
+  public void testRunAnalysisSubscriberFactory() {
+    assertEquals(RUN_ANALYSIS, getRunAnalysisSubscriberFromFactory().getEventType().getHeader());
   }
 
   /** This test verify that a wrong factory isn't returned back. */
@@ -87,7 +87,7 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
     assertNotEquals(REQCPY, getUnknownSubscriberFromFactory());
     assertNotEquals(FETCHEDCPY, getFetchedSubscriberFromFactory());
 
-    assertNotEquals(RUNANALYSIS, getFetchedSubscriberFromFactory());
+    assertNotEquals(RUN_ANALYSIS, getFetchedSubscriberFromFactory());
   }
 
   private UnknownEventSubscriber getUnknownSubscriberFromFactory() {
@@ -107,8 +107,8 @@ public class CopybookEventSubscribersTest extends CopybookStorableProvider {
             .create(databusObserver);
   }
 
-  private RunAnalysisEventSubscriber getRerunSubscriberFromFactory() {
+  private RunAnalysisEventSubscriber getRunAnalysisSubscriberFromFactory() {
     return (RunAnalysisEventSubscriber)
-        CopybookEventFactory.getFactory(DataEventType.RERUN_ANALYSIS_EVENT).create(databusObserver);
+        CopybookEventFactory.getFactory(DataEventType.RUN_ANALYSIS_EVENT).create(databusObserver);
   }
 }

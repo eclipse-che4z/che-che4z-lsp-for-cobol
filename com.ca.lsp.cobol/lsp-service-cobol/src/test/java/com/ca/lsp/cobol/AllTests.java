@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -17,12 +17,9 @@ import com.ca.lsp.cobol.negative.NegativeTestSuite;
 import com.ca.lsp.cobol.positive.PositiveTest;
 import com.ca.lsp.cobol.service.*;
 import com.ca.lsp.cobol.service.delegates.HighlightsTest;
-import com.ca.lsp.cobol.service.delegates.completions.CompletionsChainTest;
-import com.ca.lsp.cobol.service.delegates.completions.ParagraphCompletionTest;
-import com.ca.lsp.cobol.service.delegates.completions.SnippetCompletionTest;
-import com.ca.lsp.cobol.service.delegates.completions.VariableCompletionTest;
+import com.ca.lsp.cobol.service.delegates.actions.CodeActionsTest;
+import com.ca.lsp.cobol.service.delegates.completions.*;
 import com.ca.lsp.cobol.service.delegates.references.DocumentOccurrencesTest;
-import com.ca.lsp.cobol.usecases.TestResponsesNotContainLineBreaks;
 import com.ca.lsp.cobol.usecases.UseCaseSuite;
 import com.ca.lsp.cobol.utils.KeywordsTest;
 import org.junit.runner.RunWith;
@@ -42,15 +39,22 @@ import org.junit.runners.Suite.SuiteClasses;
   CompletionsChainTest.class,
   SnippetCompletionTest.class,
   ParagraphCompletionTest.class,
+  CopybookCompletionTest.class,
   DocumentOccurrencesTest.class,
   DefinitionsAndUsagesTest.class,
-  TestResponsesNotContainLineBreaks.class,
   WorkspaceServiceTest.class,
   CompletionResolutionTest.class,
-  WorkspaceServiceTest.class,
+  CopybookServiceTest.class,
+  CopybookServiceE2ETest.class,
+  DependencyServiceTest.class,
+  CopybookSearchWithoutConfigTest.class,
   HighlightsTest.class,
   MultiDocumentDefinitionTest.class,
   LangServerBootstrapTest.class,
-  MyLanguageServerImplTest.class
+  DocumentExtensionTests.class,
+  MyLanguageServerImplTest.class,
+  DidChangeConfigurationTest.class,
+  InitializeConfigurationTest.class,
+  CodeActionsTest.class
 })
 public class AllTests {}

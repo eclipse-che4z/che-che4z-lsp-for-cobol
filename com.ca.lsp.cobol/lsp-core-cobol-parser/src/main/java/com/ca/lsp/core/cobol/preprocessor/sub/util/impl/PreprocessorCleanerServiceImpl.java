@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,24 +13,26 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolDocumentContext;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Scanner;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 
 public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerService {
-  private final Deque<CobolDocumentContext> contexts;
+  private Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
 
-  public PreprocessorCleanerServiceImpl(Deque<CobolDocumentContext> contexts) {
-    this.contexts = contexts;
+  public PreprocessorCleanerServiceImpl() {
+    contexts.push(new CobolDocumentContext());
   }
 
   public CobolDocumentContext context() {
@@ -38,23 +40,24 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
   }
 
   public void excludeStatementFromText(
-      ParserRuleContext ctx, String tag, BufferedTokenStream tokens, CobolSourceFormat format) {
+      @Nonnull ParserRuleContext ctx, @Nonnull String tag, @Nonnull BufferedTokenStream tokens) {
     pop();
     push();
 
-    final String textLeft = TokenUtils.getHiddenTokensToLeft(ctx.start.getTokenIndex(), tokens);
+    String textLeft = TokenUtils.getHiddenTokensToLeft(ctx.start.getTokenIndex(), tokens);
     context().write(textLeft);
 
-    final String text = TokenUtils.getTextIncludingHiddenTokens(ctx, tokens).toUpperCase();
-    final String linePrefix = CobolLineUtils.createBlankSequenceArea(format) + tag;
+    String text = TokenUtils.getTextIncludingHiddenTokens(ctx, tokens).toUpperCase();
+    String linePrefix = BLANK_SEQUENCE_AREA + tag;
     specificTypeExclusion(tag, text, linePrefix);
-    final String content = context().read();
+    String content = context().read();
     pop();
 
     context().write(content);
   }
 
-  public void specificTypeExclusion(String tag, String text, String linePrefix) {
+  public void specificTypeExclusion(
+      @Nonnull String tag, @Nonnull String text, @Nonnull String linePrefix) {
     String[] textSplit = null;
     String lines;
 
@@ -72,9 +75,20 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
     }
   }
 
-  private String buildLines(final String text, final String linePrefix) {
-    final StringBuilder sb = new StringBuilder(text.length());
-    final Scanner scanner = new Scanner(text);
+  public void visitTerminal(TerminalNode node, BufferedTokenStream tokens) {
+    int tokPos = node.getSourceInterval().a;
+    context().write(TokenUtils.getHiddenTokensToLeft(tokPos, tokens));
+
+    if (!TokenUtils.isEOF(node)) {
+      String text = node.getText();
+      context().write(text);
+    }
+  }
+
+  @Nonnull
+  private String buildLines(@Nonnull String text, @Nonnull String linePrefix) {
+    StringBuilder sb = new StringBuilder(text.length());
+    Scanner scanner = new Scanner(text);
     boolean firstLine = true;
 
     while (scanner.hasNextLine()) {
@@ -82,11 +96,11 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
         sb.append(NEWLINE);
       }
 
-      final String line = scanner.nextLine();
-      final String trimmedLine = line.trim();
+      String line = scanner.nextLine();
+      String trimmedLine = line.trim();
       if (!trimmedLine.isEmpty()) {
-        final String prefixedLine = linePrefix + WS + trimmedLine;
-        final String suffixedLine = prefixedLine.replaceAll("(?i)(end-exec)", "$1 " + EXEC_END_TAG);
+        String prefixedLine = linePrefix + WS + trimmedLine;
+        String suffixedLine = prefixedLine.replaceAll("(?i)(end-exec)", "$1 " + EXEC_END_TAG);
         sb.append(suffixedLine);
       }
       firstLine = false;
@@ -97,11 +111,13 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
   }
 
   /** Pops the current preprocessing context from the stack. */
+  @Nullable
   public CobolDocumentContext pop() {
     return contexts.pop();
   }
 
   /** Pushes a new preprocessing context onto the stack. */
+  @Nullable
   public CobolDocumentContext push() {
     CobolDocumentContext cobolDocumentContext = new CobolDocumentContext();
     contexts.push(new CobolDocumentContext());

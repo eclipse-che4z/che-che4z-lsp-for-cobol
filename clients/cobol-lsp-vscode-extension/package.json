@@ -18,8 +18,14 @@
         "url": "https://github.com/eclipse/che-che4z-lsp-for-cobol/issues"
     },
     "keywords": [
-		"mainframe", "lsp", "cobol", "z/os", "zos", "language-server", "jcl"
-	],
+        "mainframe",
+        "lsp",
+        "cobol",
+        "z/os",
+        "zos",
+        "language-server",
+        "jcl"
+    ],
     "categories": [
         "Programming Languages"
     ],
@@ -29,16 +35,52 @@
     "icon": "resources/logo.png",
     "main": "./out/extension.js",
     "contributes": {
+        "commands": [
+            {
+                "command": "broadcom-cobol-lsp.cpy-manager.redownload",
+                "title": "Redownload all copybooks"
+            },
+            {
+                "command": "broadcom-cobol-lsp.cpy-manager.fetch-copybook",
+                "title": "Fetch copybook"
+            },
+            {
+                "command": "broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile",
+                "title": "Change default Zowe profile"
+            },
+            {
+                "command": "broadcom-cobol-lsp.cpy-manager.edit-dataset-paths",
+                "title": "Edit dataset paths"
+            }
+        ],
         "languages": [
             {
                 "id": "COBOL",
                 "extensions": [
                     ".cbl",
                     ".cpy",
-                    ".cob"
+                    ".cob",
+                    ".cobol"
                 ]
             }
-        ]
+        ],
+        "configuration": {
+            "title": "Broadcom COBOL LSP",
+            "properties": {
+                "broadcom-cobol-lsp.cpy-manager.profiles": {
+                    "type": "string",
+                    "description": "Current default profile for copybook downloader"
+                },
+                "broadcom-cobol-lsp.cpy-manager.paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of datasets to search for copybooks",
+                    "uniqueItems": true
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
@@ -48,6 +90,7 @@
         "test": "jest -w 1"
     },
     "dependencies": {
+        "@zowe/imperative": "^4.4.5",
         "vscode-languageclient": "^5.2.1"
     },
     "devDependencies": {

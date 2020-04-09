@@ -22,12 +22,12 @@
     <parent>
         <groupId>com.ca.lsp</groupId>
         <artifactId>com.ca.lsp.cobol</artifactId>
-        <version>0.10.1</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>lsp-core-domain</artifactId>
     <name>COBOL LSP :: LSP CORE Domain</name>
-    <version>0.10.1</version>
+    <version>${revision}</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -69,34 +69,14 @@
             <artifactId>concurrentunit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <archive>
-                                <manifest>
-                                    <mainClass>com.ca.com.broadcom.lsp.cdi.lsp.cobol.LangServerBootstrap</mainClass>
-                                </manifest>
-                            </archive>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <appendAssemblyId>false</appendAssemblyId>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

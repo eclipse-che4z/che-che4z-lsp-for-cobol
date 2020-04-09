@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -14,9 +14,7 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
@@ -25,8 +23,8 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 /**
- * This test check that the error is shown if the copybook that is used in the Cobol file contains a
- * link to an other one, that has a dependency to the first copybook.
+ * This test checks the error shown if the copybook that is used in the Cobol file contains a link
+ * to another one, that has a dependency to the first copybook.
  */
 public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends NegativeUseCase {
 
@@ -43,19 +41,15 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends Negat
 
   public TestCopybookWithIndirectRecursiveDependencyIsDetected() {
     super(TEXT);
-
-    MockWorkspaceService workspaceService =
-        LangServerCtx.getInjector().getInstance(MockWorkspaceService.class);
-    workspaceService.setCopybooks(
-        () ->
-            Arrays.asList(
-                new CobolText("INNER-COPY", INNER_COPY),
-                new CobolText("INDIRECT-COPY", INDIRECT_COPY)));
   }
 
+  @Override
   @Test
   public void test() {
-    super.test();
+    super.test(
+        Arrays.asList(
+            new CobolText("INNER-COPY", INNER_COPY),
+            new CobolText("INDIRECT-COPY", INDIRECT_COPY)));
   }
 
   @Override

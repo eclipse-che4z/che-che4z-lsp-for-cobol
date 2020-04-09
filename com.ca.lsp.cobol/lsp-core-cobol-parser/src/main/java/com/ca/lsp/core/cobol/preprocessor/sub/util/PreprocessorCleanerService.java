@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,12 +13,10 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
-import com.ca.lsp.core.cobol.preprocessor.CobolSourceFormat;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 public interface PreprocessorCleanerService {
 
-  void excludeStatementFromText(
-      ParserRuleContext ctx, String tag, BufferedTokenStream tokens, CobolSourceFormat format);
+  void excludeStatementFromText(ParserRuleContext ctx, String tag, BufferedTokenStream tokens);
 }

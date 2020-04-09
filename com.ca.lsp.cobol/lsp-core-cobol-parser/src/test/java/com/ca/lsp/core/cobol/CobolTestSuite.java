@@ -13,15 +13,19 @@
  */
 package com.ca.lsp.core.cobol;
 
-import com.ca.lsp.core.cobol.engine.CobolLanguageEngineTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolCommentEntriesMarkerImplTest;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolInlineCommentEntriesNormalizerImplTest;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolLineIndicatorProcessorImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.ContinuationLineTransformationTest;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.impl.CobolLineWriterImplTest;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtilsTest;
 import com.ca.lsp.core.cobol.semantics.CobolCleanExtraLanguageTest;
 import com.ca.lsp.core.cobol.semantics.CobolVariableCheckTest;
 import com.ca.lsp.core.cobol.semantics.CobolVariableContextTest;
-import com.ca.lsp.core.cobol.visitor.LevenshteinDistanceTest;
-import com.ca.lsp.core.cobol.visitor.VariableDefinitionTest;
+import com.ca.lsp.core.cobol.strategy.CobolErrorStrategyTest;
+import com.ca.lsp.core.cobol.visitor.MisspelledKeywordDistanceTest;
+import com.ca.lsp.core.cobol.visitor.VisitorSemanticAnalysisTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -31,12 +35,16 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
   CobolLineReaderImplTest.class,
   ContinuationLineTransformationTest.class,
-  CobolLanguageEngineTest.class,
   CobolCommentEntriesMarkerImplTest.class,
   CobolVariableContextTest.class,
   CobolVariableCheckTest.class,
   CobolCleanExtraLanguageTest.class,
-  LevenshteinDistanceTest.class,
-  VariableDefinitionTest.class,
+  CobolLineWriterImplTest.class,
+  PreprocessorStringUtilsTest.class,
+  MisspelledKeywordDistanceTest.class,
+  VisitorSemanticAnalysisTest.class,
+  CobolLineIndicatorProcessorImplTest.class,
+  CobolErrorStrategyTest.class,
+  CobolInlineCommentEntriesNormalizerImplTest.class
 })
 public class CobolTestSuite {}
