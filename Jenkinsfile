@@ -48,7 +48,7 @@ spec:
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
     securityContext:
-      runAsUser: 1001140001
+      runAsUser: 1000
     resources:
       limits:
         memory: "2Gi"
