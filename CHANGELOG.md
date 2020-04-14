@@ -16,6 +16,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 - Address StackOverflow during build [#230](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/230) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - No escape chars in filename [#228](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/228) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Finalize LRU Algorithm [#227](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/227) Thanks @[sergiuilie](https://github.com/sergiuilie)
+- Add semantic release tool integration [#219](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/219) Thanks @[grianbrcom](https://github.com/grianbrcom)
 - Consume user settings in Copybook Service [#221](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/221) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Support copybooks downloading [#208](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/208) Thanks @[ishche](https://github.com/ishche)
 - Modify dep file creation/update process [#209](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/209) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
