@@ -12,3 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 export const SETTINGS_SECTION: string = "broadcom-cobol-lsp.cpy-manager";
+export const DEPENDENCIES_FOLDER: string = ".cobdeps";
+export const COPYBOOKS_FOLDER: string = ".copybooks";
+export const LANGUAGE_ID = "COBOL";

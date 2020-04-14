@@ -11,23 +11,8 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-// See https://go.microsoft.com/fwlink/?LinkId=733558
-// for the documentation about the tasks.json format
-{
-    "version": "2.0.0",
-	"tasks": [
-		{
-			"type": "npm",
-			"script": "watch",
-			"problemMatcher": "$tsc-watch",
-			"isBackground": true,
-			"presentation": {
-				"reveal": "never"
-			},
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
-		}
-	]
+import { CopybooksDownloader } from "../services/CopybooksDownloader";
+
+export function fetchCopybookCommand(copybook: string, downloader: CopybooksDownloader, programName: string) {
+    downloader.downloadCopybooks([copybook], programName);
 }

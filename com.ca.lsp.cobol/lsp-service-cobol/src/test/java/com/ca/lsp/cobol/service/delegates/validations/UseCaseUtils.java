@@ -24,7 +24,8 @@ import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.TextDocumentSyncType;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
+import com.ca.lsp.cobol.service.mocks.MockCopybookService;
+import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -189,14 +190,13 @@ public class UseCaseUtils {
    */
   @SuppressWarnings("unchecked")
   public static AnalysisResult analyze(String text, List<CobolText> copybooks) {
-
     Injector injector = Guice.createInjector(new EngineModule(), new DatabusModule());
 
     DataBusBroker<FetchedCopybookEvent, RequiredCopybookEvent> broker =
         injector.getInstance(DataBusBroker.class);
 
-    MockWorkspaceService workspaceService = new MockWorkspaceService(broker);
-    workspaceService.setCopybooks(() -> copybooks);
+    MockCopybookService mockCopybookService = new MockCopybookServiceImpl(broker);
+    mockCopybookService.setCopybooks(() -> copybooks);
 
     return injector
         .getInstance(CobolLanguageEngineFacade.class)

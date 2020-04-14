@@ -25,7 +25,7 @@
   <name>COBOL LSP :: Parent pom</name>
 
   <properties>
-    <revision>0.10.1</revision>
+    <revision>0.11.0</revision>
     <lsp4j.version>0.5.0</lsp4j.version>
     <antlr.version>4.7.1</antlr.version>
     <guice.version>4.2.2</guice.version>
@@ -33,6 +33,13 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
+      <dependency>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.2.0</version>
+      </dependency>
+
       <dependency>
         <groupId>org.eclipse.lsp4j</groupId>
         <artifactId>org.eclipse.lsp4j</artifactId>

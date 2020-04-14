@@ -17,8 +17,6 @@ package com.ca.lsp.cobol.usecases;
 import com.ca.lsp.cobol.positive.CobolText;
 import org.junit.Test;
 
-import java.util.Collections;
-
 import static java.util.Collections.singletonList;
 
 /**

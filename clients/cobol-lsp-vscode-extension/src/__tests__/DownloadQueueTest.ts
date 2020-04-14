@@ -11,20 +11,20 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { DownloadQueue } from "../DownloadQueue";
+import { DownloadQueue } from "../services/DownloadQueue";
 
 describe("Check download queue", () => {
     const element = "Test";
     const profile = "profile";
-    const elementExtra = "Test";
-    it("Can add elements to queue", async () => {
+    const elementExtra = "Test_Extra";
+    it("can add elements to queue", async () => {
         const queue: DownloadQueue = new DownloadQueue();
         queue.push(element, profile);
         const e = await queue.pop();
         expect(e).toEqual({ copybook: element, profile });
         expect(0).toEqual(queue.length);
     });
-    it("Can wait", async () => {
+    it("can wait", async () => {
         const queue: DownloadQueue = new DownloadQueue();
         const result = queue.pop().then(e => {
             expect(e).toEqual({ copybook: element, profile });
@@ -33,13 +33,33 @@ describe("Check download queue", () => {
         await result;
         expect(0).toEqual(queue.length);
     });
-    it("Can have more then one element", async () => {
+    it("can have more then one element", async () => {
         const queue: DownloadQueue = new DownloadQueue();
         queue.push(element, profile);
         queue.push(elementExtra, profile);
-        expect(await queue.pop()).toEqual({ copybook: element, profile });
-        expect(1).toEqual(queue.length);
         expect(await queue.pop()).toEqual({ copybook: elementExtra, profile });
+        expect(1).toEqual(queue.length);
+        expect(await queue.pop()).toEqual({ copybook: element, profile });
+        expect(0).toEqual(queue.length);
+    });
+    it("can ignore duplicates", async () => {
+        const queue: DownloadQueue = new DownloadQueue();
+        queue.push(element, profile);
+        queue.push(element, profile);
+        expect(1).toEqual(queue.length);
+    });
+    it("can stop", async () => {
+        const queue: DownloadQueue = new DownloadQueue();
+        queue.stop();
+        expect(0).toEqual(queue.length);
+    });
+    it("can stop async", async () => {
+        const queue: DownloadQueue = new DownloadQueue();
+        const result = queue.pop().then(e => {
+            expect(e).toEqual(undefined);
+        });
+        queue.stop();
+        await result;
         expect(0).toEqual(queue.length);
     });
 });

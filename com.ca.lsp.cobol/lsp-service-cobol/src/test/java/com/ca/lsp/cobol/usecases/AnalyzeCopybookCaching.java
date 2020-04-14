@@ -22,7 +22,8 @@ import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
+import com.ca.lsp.cobol.service.mocks.MockCopybookService;
+import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
@@ -93,8 +94,8 @@ public class AnalyzeCopybookCaching {
   }
 
   private void initWorkspaceService() {
-    MockWorkspaceService mockWorkspaceService = new MockWorkspaceService(databus);
-    mockWorkspaceService.setCopybooks(
+    MockCopybookService mockCopybookService = new MockCopybookServiceImpl(databus);
+    mockCopybookService.setCopybooks(
         () -> singletonList(new CobolText(COPYBOOK_NAME, COPYBOOK_CONTENT)));
   }
 

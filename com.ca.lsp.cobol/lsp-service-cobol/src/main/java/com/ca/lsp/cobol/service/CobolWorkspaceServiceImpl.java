@@ -16,7 +16,6 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
-import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedSettingsEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
@@ -27,10 +26,10 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
+import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -47,8 +46,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
  */
 @Slf4j
 @Singleton
-public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
-
+public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private DataBusBroker dataBus;
   private Provider<LanguageClient> clientProvider;
 
@@ -56,7 +54,6 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
   public CobolWorkspaceServiceImpl(DataBusBroker dataBus, Provider<LanguageClient> clientProvider) {
     this.dataBus = dataBus;
     this.clientProvider = clientProvider;
-    dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
   }
 
   /**
@@ -126,16 +123,6 @@ public class CobolWorkspaceServiceImpl implements CobolWorkspaceService {
     log.info("Cache invalidated due to a copybooks file watcher was triggered");
     dataBus.postData(new RunAnalysisEvent());
   }
-
-  // TODO: Should be removed due to a change of responsability for this class..
-  @Override
-  public String getContentByCopybookName(String copybookName) throws IOException {
-    return null;
-  }
-
-  // TODO: Should be removed due to a change of responsability for this class..
-  @Override
-  public void observerCallback(RequiredCopybookEvent adaptedDataEvent) {}
 
   @Nullable
   private String getStringArgument(@Nonnull ExecuteCommandParams params, int index) {

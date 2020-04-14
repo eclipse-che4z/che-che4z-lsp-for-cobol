@@ -4,7 +4,7 @@
     "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "0.10.1",
+    "version": "0.11.0",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
@@ -37,8 +37,20 @@
     "contributes": {
         "commands": [
             {
-                "command": "cobol-language-support.copybooks.redownload",
+                "command": "broadcom-cobol-lsp.cpy-manager.redownload",
                 "title": "Redownload all copybooks"
+            },
+            {
+                "command": "broadcom-cobol-lsp.cpy-manager.fetch-copybook",
+                "title": "Fetch copybook"
+            },
+            {
+                "command": "broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile",
+                "title": "Change default Zowe profile"
+            },
+            {
+                "command": "broadcom-cobol-lsp.cpy-manager.edit-dataset-paths",
+                "title": "Edit dataset paths"
             }
         ],
         "languages": [
@@ -47,7 +59,8 @@
                 "extensions": [
                     ".cbl",
                     ".cpy",
-                    ".cob"
+                    ".cob",
+                    ".cobol"
                 ]
             }
         ],
