@@ -14,13 +14,10 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.mocks.MockWorkspaceService;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.singletonList;

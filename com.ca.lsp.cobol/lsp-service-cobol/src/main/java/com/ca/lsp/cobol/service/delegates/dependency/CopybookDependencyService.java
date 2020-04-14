@@ -16,6 +16,8 @@
 
 package com.ca.lsp.cobol.service.delegates.dependency;
 
+import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
+
 import java.nio.file.Path;
 import java.util.List;
 
@@ -24,11 +26,14 @@ import java.util.List;
  * management
  */
 public interface CopybookDependencyService {
+
+  void addCopybookInDepFile(RequiredCopybookEvent event, String requiredCopybookName);
+
+  boolean isFileInDidOpen(RequiredCopybookEvent event);
+
   void setWorkspaceFolderPaths(List<Path> workspaceFolderPaths);
 
   void generateDependencyFile(String cobolFileName);
 
   void updateDependencyList(Path dependencyFilePath, String requiredCopybookName);
-
-  void addCopybookInDepFile(String requiredCopybookName, String documentUri);
 }

@@ -17,7 +17,7 @@ import com.ca.lsp.core.cobol.model.PreprocessedInput;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 
-/** The CobolPreprocessor is engaged in order to process, trasform and parse the document */
+/** The CobolPreprocessor is engaged in order to process, transform and parse the document */
 public interface CobolPreprocessor {
   ResultWithErrors<PreprocessedInput> process(
       String documentUri, String cobolCode, String textDocumentSyncType);

@@ -23,7 +23,6 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 - Java version 8 or higher
 - To enable syntax coloring, a third-party COBOL extension is required. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
-- To use the COBOL Language Support extension while working with copybooks, place the copybook files inside a **"COPYBOOKS"** folder within the current workspace.
 
 ## Features
 COBOL Language Support defines the protocol that is used between an editor or IDE, and a language server that provides the following COBOL syntax awareness features:
@@ -31,12 +30,13 @@ COBOL Language Support defines the protocol that is used between an editor or ID
 ### Autocomplete
 Autocomplete speeds up the coding process by intuitively suggesting the most likely variables or paragraphs to follow existing code. The extension provides live suggestions while you type for:
 
-* COBOL keywords
-* COBOL variables
-* COBOL paragraphs
-* Code Snippet
-* Copybook variables
-* Copybook paragraphs
+- COBOL keywords
+- COBOL variables
+- COBOL paragraphs
+- Code Snippet
+- Copybook variables
+- Copybook paragraphs
+- Names of copybooks that are used in the program
 
 ![Autocomplete](https://github.com/eclipse/che-che4z-lsp-for-cobol/raw/master/docs/images/CLSAutocorrect.gif)
 
@@ -54,7 +54,22 @@ Contrasting colors are used in displayed code for ease of identifying and distin
 A third-party plugin is required to enable syntax coloring. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
 
 ### Copybook Support
-To use the COBOL Language Support extension while working with copybooks, place the copybook files inside a **"COPYBOOKS"** folder within the current workspace. The extension includes the following copybook support features:
+
+The LSP for COBOL extension can retrieve copybooks used in your projects from the mainframe and download them locally. You can open copybooks in your IDE and make use of the copybook support features of the extension.
+
+#### Retrieving Copybooks
+
+To retrieve copybooks from the mainframe, **follow these steps:**
+
+1. Ensure that you have a [Zowe CLI zosmf profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) configured.
+2. Open the extension settings.
+3. Under **Paths**, add any number of data sets to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
+4. Open a program or project.
+   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe. Copybooks are stored in a **.copybooks** directory within the workspace, which is created automatically when copybooks are downloaded.
+
+#### Copybook Support Features
+
+The extension includes the following copybook support features:
 
 * Semantic analysis for keywords, variables, and paragraphs across copybooks, to ensure and maintain compatibility of copybooks called in code.
 * Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.

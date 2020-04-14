@@ -22,6 +22,9 @@ import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
+import com.ca.lsp.core.cobol.model.CopybookUsage;
+import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.sub.copybook.AnalyseCopybookTask;
 import com.google.inject.Guice;
 import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
@@ -47,7 +51,6 @@ import static org.mockito.Mockito.when;
  */
 @Slf4j
 public class CopybookServiceE2ETest extends FileSystemConfiguration {
-  public static final String CPY_NAME_WITHOUT_EXT = "copy2";
   private final DataBusBroker broker =
       Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
 
@@ -55,21 +58,24 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
       mock(Provider.class);
 
   private Communications communications = mock(Communications.class);
-  private CopybookDependencyService dependencyService = new CopybookDependencyServiceImpl();
+  private CopybookDependencyService dependencyService =
+      new CopybookDependencyServiceImpl(broker, null);
 
   @Before
   public void initActivities() {
-    // the delegate will prepare the structure and this method will just setup the list of workspace
-    // folders
-    when(configurationSettingsProvider.get())
-        .thenReturn(
-            new ConfigurationSettingsStorable(
-                "myProfile", unmodifiableList(Arrays.asList(DSNAME_1, DSNAME_2))));
+    createProfileConfiguration();
 
     CopybookServiceImpl copybookService =
         new CopybookServiceImpl(
             broker, configurationSettingsProvider, dependencyService, communications);
-    copybookService.setWorkspaceFolders(generateWorkspaceFolder());
+    copybookService.setWorkspaceFolders(createWorkspaceFolders());
+  }
+
+  private void createProfileConfiguration() {
+    when(configurationSettingsProvider.get())
+        .thenReturn(
+            new ConfigurationSettingsStorable(
+                unmodifiableList(Arrays.asList(FULL_PATH, FULL_PATH2))));
   }
 
   /**
@@ -78,17 +84,16 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
    * file.
    */
   @Test
-  public void generateDependencyFileOnCallbackPositiveTest() {
-
-    // generate a required copybook event
+  public void publishRequestOfCopybook_createDependencyFile() {
     broker.postData(
         RequiredCopybookEvent.builder()
             .name(CPY_NAME_WITHOUT_EXT)
-            .documentUri(DOCUMENT_URI)
+            .documentUri(COBOL_FILE_DOCUMENT_URI)
             .textDocumentSyncType("DID_OPEN")
             .build());
+
     // after one second is expected to found the dep file on filesystem
-    waitAndAssert(Boolean.TRUE);
+    waitAndAssert_DepFileIsCreated(Boolean.TRUE);
   }
 
   /**
@@ -96,15 +101,15 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
    * the TextDocumentSync type, the FileSystem service will not write/update any dependency file.
    */
   @Test
-  public void NotGenerateDependencyFileOnCallbackNegativeTest() {
-    // generate a required copybook event
+  public void noTextDocSyncTypeDefined_NoDependencyFileIsCreated() {
     broker.postData(
         RequiredCopybookEvent.builder()
             .name(CPY_NAME_WITHOUT_EXT)
-            .documentUri(DOCUMENT_URI)
+            .documentUri(COBOL_FILE_DOCUMENT_URI)
             .build());
+
     // after one second is expected to found the dep file on filesystem
-    waitAndAssert(Boolean.FALSE);
+    waitAndAssert_DepFileIsCreated(Boolean.FALSE);
   }
 
   /**
@@ -112,16 +117,15 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
    * is in DID_CHANGE mode and the FileSystem service will not write/update any dependency file.
    */
   @Test
-  public void NotGenerateDependencyFileOnDidChangeTest() {
-    // generate a required copybook event
+  public void DocumentInDidChangeMode_NoDepFileIsCreated() {
     broker.postData(
         RequiredCopybookEvent.builder()
             .name(CPY_NAME_WITHOUT_EXT)
-            .documentUri(DOCUMENT_URI)
+            .documentUri(COBOL_FILE_DOCUMENT_URI)
             .textDocumentSyncType("DID_CHANGE")
             .build());
     // after one second is expected to found the dep file on filesystem
-    waitAndAssert(Boolean.FALSE);
+    waitAndAssert_DepFileIsCreated(Boolean.FALSE);
   }
 
   /**
@@ -129,11 +133,11 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
    * file is not created. This test assume that .cobdep folder exists but no depfile is created.
    */
   @Test
-  public void noDependencyFileWithOtherEvent() {
+  public void unknownEventPublished_NoDepFileIsCreated() {
     // generate a required copybook event
     broker.postData(UnknownEvent.builder().build());
     // after one second is not expected to found the dep file on filesystem
-    waitAndAssert(Boolean.FALSE);
+    waitAndAssert_DepFileIsCreated(Boolean.FALSE);
   }
 
   private boolean depFileExists() {
@@ -146,7 +150,7 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
                 + "Test.dep"));
   }
 
-  private void waitAndAssert(Boolean expected) {
+  private void waitAndAssert_DepFileIsCreated(Boolean expected) {
     try {
       await()
           .atMost(Duration.ONE_SECOND)
@@ -157,5 +161,61 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
     } catch (ConditionTimeoutException e) {
       fail(e.getMessage());
     }
+  }
+
+  /**
+   * This test verify that when a nested copybook is processed a new dependency file is created. So
+   * in total there are two dep file, one that contains the outer copybook found in the cobol file
+   * processed and one that contains the inner copybook found inside the outer copybook.
+   */
+  @Test
+  public void nestedCopybooks_GenerateTwoDependencyFile() {
+    broker.postData(
+        RequiredCopybookEvent.builder()
+            .name(CPYNEST_CPY)
+            .documentUri(COBOL_FILE_DOCUMENT_URI)
+            .textDocumentSyncType("DID_OPEN")
+            .build());
+
+    runAnalysisOnCopybook();
+
+    waitAndAssert_DepsFileAreCreated();
+  }
+
+  private void runAnalysisOnCopybook() {
+    CobolPreprocessor preprocessor = mock(CobolPreprocessor.class);
+    AnalyseCopybookTask analyseCopybookTask =
+        new AnalyseCopybookTask(
+            broker,
+            preprocessor,
+            CPY_DOCUMENT_URI,
+            new CopybookUsage("CPYNEST2", null, null),
+            emptyList(),
+            "DID_CHANGE");
+    analyseCopybookTask.compute();
+  }
+
+  private void waitAndAssert_DepsFileAreCreated() {
+    try {
+      await()
+          .atMost(Duration.TWO_SECONDS)
+          .untilAsserted(
+              () -> {
+                assertEquals(Boolean.TRUE, depFileExists());
+                assertEquals(Boolean.TRUE, innerDepFileExists());
+              });
+    } catch (ConditionTimeoutException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  private Boolean innerDepFileExists() {
+    return Files.exists(
+        Paths.get(
+            getWorkspaceFolderPath()
+                + filesystemSeparator()
+                + ".cobdeps"
+                + filesystemSeparator()
+                + "CPYNEST.dep"));
   }
 }

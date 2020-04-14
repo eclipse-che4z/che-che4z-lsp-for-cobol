@@ -29,7 +29,7 @@ import java.util.List;
 public interface CopybookService extends EventObserver<RequiredCopybookEvent> {
   Path findCopybook(String fileName);
 
-  Path findCopybook(String filename, String profile, List<String> datasetList);
+  Path findCopybook(String filename, List<String> paths);
 
   void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders);
 }

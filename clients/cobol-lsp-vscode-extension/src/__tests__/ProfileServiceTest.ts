@@ -1,4 +1,4 @@
-import { ProfileService } from "../ProfileService";
+import { ProfileService } from "../services/ProfileService";
 
 /*
  * Copyright (c) 2020 Broadcom.

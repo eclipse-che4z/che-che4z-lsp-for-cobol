@@ -51,20 +51,9 @@ public class CopybookServiceTest extends FileSystemConfiguration
       new CopybookServiceImpl(
           dataBus, configurationSettingsStorableProvider, dependencyService, communications);
 
-  // Activities performed
-  // 1 - Create folder structure in temp folder - Create two copybooks in the provided
-  // structprivaure
-  // 2 - Create two copybooks in the provided structure
-  // 3 - Initialize the workspaceFolder to reproduce what client does when a new workspace is opened
-  //     on the IDE
-  // 4 - Initialize the list of workspaces (workspace roots) that WorkspaceManager should have to
-  //     apply search operations
-
   @Before
   public void initActivities() {
-    // the delegate will prepare the structure and this method will just setup the list of workspace
-    // folders
-    copybookService.setWorkspaceFolders(generateWorkspaceFolder());
+    copybookService.setWorkspaceFolders(createWorkspaceFolders());
   }
 
   /**
@@ -73,7 +62,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
    */
   @Test
   public void findCopybookByNamePositiveTest() {
-    assertNotNull(copybookService.findCopybook(CPY_OUTER_NAME_ONLY2));
+    assertNotNull(copybookService.findCopybook(CPY_NAME_WITHOUT_EXT));
   }
 
   /**
@@ -93,9 +82,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
   public void getContentByCopybookName() throws IOException {
     Path path =
         copybookService.findCopybook(
-            CPY_OUTER_NAME_ONLY2,
-            (String) configurationSettingsStorable.getProfiles(),
-            configurationSettingsStorable.getPaths());
+            CPY_NAME_WITHOUT_EXT, configurationSettingsStorable.getPaths());
 
     assertTrue(Files.readAllBytes(path).length > 0);
   }
@@ -108,9 +95,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
   public void getNullWithNotCopybookNotFound() {
     assertNull(
         copybookService.findCopybook(
-            COPYBOOK_NOT_PRESENT,
-            (String) configurationSettingsStorable.getProfiles(),
-            configurationSettingsStorable.getPaths()));
+            COPYBOOK_NOT_PRESENT, configurationSettingsStorable.getPaths()));
   }
 
   /**
@@ -120,7 +105,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
   @Test
   public void testCorrectFetchedDataAreGenerated() {
     FetchedCopybookEvent fetchedCopybookEvent =
-        FetchedCopybookEvent.builder().name(CPY_OUTER_NAME_ONLY2).content("SOME_CONTENT").build();
+        FetchedCopybookEvent.builder().name(CPY_NAME_WITHOUT_EXT).content("SOME_CONTENT").build();
 
     assertTrue(
         fetchedCopybookEvent.getName().length() > 0
@@ -136,9 +121,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
     // use the list of paths for the search in copybooks delimited only to this list
     assertNotNull(
         copybookService.findCopybook(
-            CPY_OUTER_NAME_ONLY2,
-            (String) configurationSettingsStorable.getProfiles(),
-            configurationSettingsStorable.getPaths()));
+            CPY_NAME_WITHOUT_EXT, configurationSettingsStorable.getPaths()));
   }
 
   /**
@@ -147,11 +130,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
    */
   @Test
   public void findCopybookWithDatasetFilteringNegativeTest() {
-    assertNull(
-        copybookService.findCopybook(
-            "ANTHCPY1",
-            (String) configurationSettingsStorable.getProfiles(),
-            configurationSettingsStorable.getPaths()));
+    assertNull(copybookService.findCopybook("ANTHCPY1", configurationSettingsStorable.getPaths()));
   }
 
   /**
@@ -161,10 +140,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
   @Test
   public void findCopybookWithWrongFolderStructure() {
     assertNull(
-        copybookService.findCopybook(
-            CPY_OUTER_NAME_ONLY2,
-            (String) configurationSettingsStorable.getProfiles(),
-            Collections.singletonList("HLQLF02.DSNAME1")));
+        copybookService.findCopybook(CPY_NAME_WITHOUT_EXT, Collections.singletonList(WRONG_PATH)));
   }
 
   @Override

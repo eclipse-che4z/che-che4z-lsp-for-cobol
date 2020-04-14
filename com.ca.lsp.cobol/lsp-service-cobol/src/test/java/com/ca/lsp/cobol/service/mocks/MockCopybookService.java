@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2020 Broadcom.
- *
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -10,18 +9,22 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- * Broadcom, Inc. - initial API and implementation
- *
+ *   Broadcom, Inc. - initial API and implementation
  */
-package com.ca.lsp.cobol.service;
+package com.ca.lsp.cobol.service.mocks;
 
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import org.eclipse.lsp4j.services.WorkspaceService;
+import com.ca.lsp.cobol.service.CopybookService;
 
 import java.io.IOException;
 
-public interface CobolWorkspaceService
-    extends WorkspaceService, EventObserver<RequiredCopybookEvent> {
+/**
+ * This interface define the responsability for a mock class used during the
+ * com.ca.lsp.cobol.positive.PositiveTest suite
+ */
+public interface MockCopybookService extends CopybookService, EventObserver<RequiredCopybookEvent> {
+  void setCopybooks(CopybooksMock copybooksMock);
+
   String getContentByCopybookName(String copybookName) throws IOException;
 }
