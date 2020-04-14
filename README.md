@@ -21,8 +21,11 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 ## Prerequisites
 
-- Java version 8 or higher
+- Java version 8 or higher.
 - To enable syntax coloring, a third-party COBOL extension is required. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
+- To enable automatic copybook retrieval, the following are required:
+    - Configured TSO/E address space services, z/OS data set and file REST interface, and z/OS jobs REST interface. For more information, see [https://docs.zowe.org/stable/user-guide/systemrequirements-zosmf.html#z-os-requirements](z/OS Requirements).
+    - [Zowe CLI zosmf profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html).
 
 ## Features
 COBOL Language Support defines the protocol that is used between an editor or IDE, and a language server that provides the following COBOL syntax awareness features:
@@ -66,6 +69,8 @@ To retrieve copybooks from the mainframe, **follow these steps:**
 3. Under **Paths**, add any number of data sets to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
 4. Open a program or project.  
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe. Copybooks are stored in a **.copybooks** directory within the workspace, which is created automatically when copybooks are downloaded.
+   
+   **Tip:** We recommend that you refresh your copybooks from time to time. To refresh your copybooks, manually delete the hidden .copybooks folder in your workspace. The copybooks are then re-downloaded from the mainframe the next time you open a file.
 
 #### Copybook Support Features
 
