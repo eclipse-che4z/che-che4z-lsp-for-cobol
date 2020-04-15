@@ -24,11 +24,10 @@ export interface ProfilesMap {
 
 export class ZoweApi {
 
-    private profileManager = new BasicProfileManager(this.createProfileParams());
-
     public async listZOSMFProfiles(): Promise<ProfilesMap> {
+        const profileManager = new BasicProfileManager(this.createProfileParams());
         const profiles: ProfilesMap = {};
-        for (const loadedProfile of await this.profileManager.loadAll()) {
+        for (const loadedProfile of await profileManager.loadAll()) {
             if (loadedProfile.failNotFound) {
                 profiles[loadedProfile.name] = loadedProfile.profile;
             }
@@ -37,7 +36,8 @@ export class ZoweApi {
     }
 
     public getDefaultProfileName() {
-        return this.profileManager.getDefaultProfileName();
+        const profileManager = new BasicProfileManager(this.createProfileParams());
+        return profileManager.getDefaultProfileName();
     }
 
     public async fetchMember(dataset: string, member: string, profileName: string): Promise<string> {
