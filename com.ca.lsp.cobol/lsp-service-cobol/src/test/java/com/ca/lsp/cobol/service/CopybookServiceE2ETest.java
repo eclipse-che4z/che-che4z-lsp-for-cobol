@@ -19,7 +19,6 @@ import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
-import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import com.ca.lsp.core.cobol.model.CopybookUsage;
@@ -57,7 +56,6 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
   private Provider<ConfigurationSettingsStorable> configurationSettingsProvider =
       mock(Provider.class);
 
-  private Communications communications = mock(Communications.class);
   private CopybookDependencyService dependencyService =
       new CopybookDependencyServiceImpl(broker, null);
 
@@ -66,8 +64,7 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
     createProfileConfiguration();
 
     CopybookServiceImpl copybookService =
-        new CopybookServiceImpl(
-            broker, configurationSettingsProvider, dependencyService, communications);
+        new CopybookServiceImpl(broker, configurationSettingsProvider, dependencyService);
     copybookService.setWorkspaceFolders(createWorkspaceFolders());
   }
 

@@ -21,7 +21,6 @@ import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
-import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
 import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
@@ -44,12 +43,10 @@ public class CopybookServiceTest extends FileSystemConfiguration
   DataBusBroker dataBus = mock(DataBusBroker.class);
   Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider =
       mock(Provider.class);
-  Communications communications = mock(Communications.class);
   CopybookDependencyService dependencyService = mock(CopybookDependencyService.class);
 
   CopybookService copybookService =
-      new CopybookServiceImpl(
-          dataBus, configurationSettingsStorableProvider, dependencyService, communications);
+      new CopybookServiceImpl(dataBus, configurationSettingsStorableProvider, dependencyService);
 
   @Before
   public void initActivities() {
