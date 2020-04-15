@@ -2,10 +2,9 @@
 set -x
 set -e
 
-cp -a theia_automation_lsp/test_files/cobol/. /home/project/
-mkdir /root/.zowe
-cp -a zoweConfig/. /root/.zowe
-wget https://github.com/spgennard/vscode_cobol/releases/download/6.0.23/cobol-6.0.23.vsix
+cp -r theia_automation_lsp/test_files/cobol/. /home/project/
+mkdir /home/node/.zowe
+cp -r zoweConfig/. /home/node/.zowe
 cp *.vsix /home/theia/plugins/
 
 cd /home/theia

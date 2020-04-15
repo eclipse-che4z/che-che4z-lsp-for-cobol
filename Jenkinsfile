@@ -43,12 +43,10 @@ kind: Pod
 spec:
   containers:
   - name: theia
-    image: theiaide/theia-java:0.16.1
+    image: grianbrcom/theia4cobol:1.0.0
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
-    securityContext:
-      runAsUser: 1000
     resources:
       limits:
         memory: "2Gi"
@@ -57,7 +55,7 @@ spec:
         memory: "2Gi"
         cpu: "1"
   - name: python
-    image: python
+    image: grianbrcom/python-firefox:1.0.0
     tty: true
     resources:
       limits:
@@ -185,9 +183,7 @@ pipeline {
                 }
                 container('python') {
                     dir('tests/theia_automation_lsp') {
-                        sh 'pip install -r requirements.txt'
-                        sh 'apt update'
-                        sh 'apt install firefox-esr -y'
+                        sh 'pip install --no-cache-dir -r requirements.txt'
                         sh 'PYTHONPATH=`pwd` robot -i Rally -e Unstable --variable HEADLESS:True --outputdir robot_output robot_suites/lsp/local/firefox_lsp_local.robot'
                     }
                 }
