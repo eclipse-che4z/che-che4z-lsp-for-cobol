@@ -177,7 +177,7 @@ pipeline {
             steps {
                 container('theia') {
                     dir('tests') {
-                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
+                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}'
                         sh './theiaPrepare.sh'
                     }
                 }
