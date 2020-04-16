@@ -32,30 +32,12 @@ export class ProfileService implements Disposable {
         return this.zoweApi.listZOSMFProfiles();
     }
 
-    async getProfile(programName?: string): Promise<string | undefined> {
-        if (programName) {
-            const detectedProfile: string | undefined = (await this.findProfileByDependenciesFile(programName));
-            if (detectedProfile) {
-                return detectedProfile;
-            }
-        }
-
-        const profiles: ProfilesMap = await this.zoweApi.listZOSMFProfiles();
-        const profile = this.tryGetProfileFromSettings(profiles);
-        if (profile) {
-            return profile;
-        }
-        if (Object.keys(profiles).length === 0) {
-            await vscode.window.showErrorMessage("Zowe profile is missing.");
-            return undefined;
-        }
-        if (Object.keys(profiles).length === 1) {
-            return Object.keys(profiles)[0];
-        }
+    public async getProfileFromMultiple(profiles?: ProfilesMap): Promise<string | undefined> {
         const defaultName = this.zoweApi.getDefaultProfileName();
+        const auxProfiles: ProfilesMap = profiles ? profiles : await this.zoweApi.listZOSMFProfiles();
         let items: vscode.QuickPickItem[] = [];
-        Object.keys(profiles).forEach(name => {
-            const profile: IProfile = profiles[name];
+        Object.keys(auxProfiles).forEach(name => {
+            const profile: IProfile = auxProfiles[name];
             const item: vscode.QuickPickItem = {
                 description: profile.username + "@" + profile.host + ":" + profile.port,
                 label: name,
@@ -76,6 +58,30 @@ export class ProfileService implements Disposable {
             return selectedProfile.label;
         }
         return undefined;
+    }
+
+    async getProfile(programName?: string): Promise<string | undefined> {
+        if (programName) {
+            const detectedProfile: string | undefined = (await this.findProfileByDependenciesFile(programName));
+            if (detectedProfile) {
+                return detectedProfile;
+            }
+        }
+
+        const profiles: ProfilesMap = await this.zoweApi.listZOSMFProfiles();
+        const profile = this.tryGetProfileFromSettings(profiles);
+        if (profile) {
+            return profile;
+        }
+        if (Object.keys(profiles).length === 0) {
+            await vscode.window.showErrorMessage("Zowe profile is missing.");
+            return undefined;
+        }
+        if (Object.keys(profiles).length === 1) {
+            return Object.keys(profiles)[0];
+        }
+
+        this.getProfileFromMultiple(profiles);
     }
 
     async updateStatusBar() {

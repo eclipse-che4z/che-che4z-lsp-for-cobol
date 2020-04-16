@@ -14,5 +14,5 @@
 import { ProfileService } from "../services/ProfileService";
 
 export function changeDefaultZoweProfile(profileService: ProfileService) {
-    profileService.getProfile();
+    profileService.getProfileFromMultiple();
 }
