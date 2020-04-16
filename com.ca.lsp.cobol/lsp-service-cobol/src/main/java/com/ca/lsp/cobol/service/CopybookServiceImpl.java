@@ -20,7 +20,6 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
-import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -37,7 +36,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.ca.lsp.cobol.service.delegates.communications.CopybookMessageInfo.*;
 import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
 
 @Singleton
@@ -49,19 +47,15 @@ public class CopybookServiceImpl implements CopybookService {
 
   private CopybookDependencyService dependencyService;
   private final Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider;
-  private Communications communications;
 
   @Inject
   public CopybookServiceImpl(
       DataBusBroker dataBus,
       Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider,
-      CopybookDependencyService dependencyService,
-      Communications communications) {
+      CopybookDependencyService dependencyService) {
     this.dataBus = dataBus;
     this.configurationSettingsStorableProvider = configurationSettingsStorableProvider;
     this.dependencyService = dependencyService;
-    this.communications = communications;
-
     dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
   }
 
@@ -142,45 +136,20 @@ public class CopybookServiceImpl implements CopybookService {
   /** create the task and pass it to the executor service */
   @Override
   public void observerCallback(RequiredCopybookEvent event) {
+
     String requiredCopybookName = event.getName();
     dependencyService.addCopybookInDepFile(event, requiredCopybookName);
     resolveCopybookContent(requiredCopybookName);
   }
 
-  private void selectAppropriateMessageForCommunication() {
-    checkCopybookFolderNotDefined();
-    checkSettingsNotDefined();
-  }
-
-  private void checkSettingsNotDefined() {
-    if (settingsNotDefined()) {
-      communications.notifyCopybookMessageInfo(NO_SETTINGS);
-    } else if (datasetSettingsNotDefined()) {
-      communications.notifyCopybookMessageInfo(NO_DATASET_IN_SETTINGS);
-    }
-  }
-
-  private void checkCopybookFolderNotDefined() {
-    if (copybookFolderNotDefined()) {
-      communications.notifyLogMessageInfo(COPYBOOK_FOLDER_MISS);
-    }
-  }
-
-  private boolean datasetSettingsNotDefined() {
-    return configurationSettingsStorableProvider.get().getPaths().isEmpty();
-  }
-
   /**
-   * This method is delegated to check that the user have right settings to search for copybooks and
-   * retrieve its content in the affermative case
+   * This method is delegated to check that the user have right settings to retrieve the content of
+   * a copybook from a given name
    *
    * @param requiredCopybookName name of the copybook for what is necessary retrieve the content if
    *     exists.
    */
   private void resolveCopybookContent(String requiredCopybookName) {
-    if (settingsAreIncomplete(requiredCopybookName)) {
-      return;
-    }
 
     ConfigurationSettingsStorable configurationSettingsStorable =
         configurationSettingsStorableProvider.get();
@@ -191,19 +160,6 @@ public class CopybookServiceImpl implements CopybookService {
     } else {
       publishOnDatabus(requiredCopybookName);
     }
-  }
-
-  private boolean settingsAreIncomplete(String requiredCopybookName) {
-    if (copybookFolderNotDefined() || settingsNotDefined() || datasetSettingsNotDefined()) {
-      publishMissingInfoForCopybooks(requiredCopybookName);
-      return true;
-    }
-    return false;
-  }
-
-  private void publishMissingInfoForCopybooks(String requiredCopybookName) {
-    selectAppropriateMessageForCommunication();
-    publishOnDatabus(requiredCopybookName);
   }
 
   private void publishOnDatabus(String requiredCopybookName, String content, Path path) {
@@ -217,13 +173,5 @@ public class CopybookServiceImpl implements CopybookService {
 
   private void publishOnDatabus(String requiredCopybookName) {
     dataBus.postData(FetchedCopybookEvent.builder().name(requiredCopybookName).build());
-  }
-
-  private boolean settingsNotDefined() {
-    return configurationSettingsStorableProvider.get() == null;
-  }
-
-  private boolean copybookFolderNotDefined() {
-    return !getCopybookBaseFolder(workspaceFolderPaths.get(0)).toFile().exists();
   }
 }

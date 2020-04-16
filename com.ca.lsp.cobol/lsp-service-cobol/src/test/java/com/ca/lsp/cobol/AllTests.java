@@ -47,7 +47,6 @@ import org.junit.runners.Suite.SuiteClasses;
   CopybookServiceTest.class,
   CopybookServiceE2ETest.class,
   DependencyServiceTest.class,
-  CopybookSearchWithoutConfigTest.class,
   HighlightsTest.class,
   MultiDocumentDefinitionTest.class,
   LangServerBootstrapTest.class,
