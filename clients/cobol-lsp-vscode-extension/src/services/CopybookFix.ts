@@ -28,7 +28,7 @@ export class CopybookFix {
         }
         if (reasonMsg !== "Configuration was updated") {
             actions.push(actionDatasets);
-            if(options.hasProfiles) {
+            if (options.hasProfiles) {
                 actions.push(actionProfile);
             }
         }
