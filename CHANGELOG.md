@@ -2,6 +2,9 @@
 
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.x.x] - TBD
+- Nested copybook failed to be retrieved at didOpen moment [#285](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/285) Thanks @[sergiuilie](https://github.com/sergiuilie)
+
 ## [0.11.0] - 2020-04-09
 - Client multiples the items in the download queue [#257](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/257) Thanks @[grianbrcom](https://github.com/grianbrcom)
 - Calculate and return a full URI containing Zowe profile [#266](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/266) Thanks @[ishche](https://github.com/ishche) @[sergiuilie](https://github.com/sergiuilie)

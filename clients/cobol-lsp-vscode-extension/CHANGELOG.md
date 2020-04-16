@@ -3,6 +3,7 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 
 ## [0.x.x] - TBD
+- Nested copybook failed to be retrieved at didOpen moment [#285](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/285) Thanks @[sergiuilie](https://github.com/sergiuilie)
 - Add semantic release tool integration [#219](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/219) Thanks @[grianbrcom](https://github.com/grianbrcom)
 
 ## [0.11.0] - 2020-04-09
