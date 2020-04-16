@@ -92,6 +92,14 @@ export class ProfileService implements Disposable {
         this.defaultProfileStatusBarItem.dispose();
     }
 
+    public async checkMultipleProfiles(): Promise<boolean> {
+        const profiles: ProfilesMap = await this.listProfiles();
+        if (Object.keys(profiles).length > 1) {
+            return true;
+        }
+        return false;
+    }
+
     private createStatusBarItem() {
         this.defaultProfileStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
         this.defaultProfileStatusBarItem.command = "broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile";

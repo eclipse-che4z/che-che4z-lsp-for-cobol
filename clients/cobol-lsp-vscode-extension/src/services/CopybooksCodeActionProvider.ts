@@ -11,23 +11,28 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as vscode from "vscode";
 import * as path from "path";
+import * as vscode from "vscode";
+import { ProfileService } from "./ProfileService";
+import { ProfilesMap, ZoweApi } from "./ZoweApi";
 
 export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
-    public provideCodeActions(doc: vscode.TextDocument,
-        range: vscode.Range | vscode.Selection,
-        context: vscode.CodeActionContext,
-        token: vscode.CancellationToken,
-    ): vscode.ProviderResult<Array<vscode.Command | vscode.CodeAction>> {
+
+    constructor(private profileService: ProfileService) { }
+
+    public async provideCodeActions(doc: vscode.TextDocument,
+                                    range: vscode.Range | vscode.Selection,
+                                    context: vscode.CodeActionContext,
+                                    token: vscode.CancellationToken,
+    ): Promise<Array<vscode.Command | vscode.CodeAction>> {
         if (!this.shouldHaveCodeAction(context)) {
             return [];
         }
         const fetchCopybook = new vscode.CodeAction("Fetch copybook", vscode.CodeActionKind.QuickFix);
         fetchCopybook.command = {
+            arguments: [this.extractCopybookName(context), this.extractProgramName(doc)],
             command: "broadcom-cobol-lsp.cpy-manager.fetch-copybook",
             title: "Fetch copybook",
-            arguments: [this.extractCopybookName(context), this.extractProgramName(doc)],
         };
 
         const datasetPaths = new vscode.CodeAction("Edit copybook datasets list", vscode.CodeActionKind.QuickFix);
@@ -41,7 +46,11 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
             command: "broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile",
             title: "Change default zowe profile",
         };
-        return [fetchCopybook, datasetPaths, changeProfile];
+
+        if (await this.profileService.checkMultipleProfiles()) {
+            return [fetchCopybook, datasetPaths, changeProfile];
+        }
+        return [fetchCopybook, datasetPaths];
     }
 
     private extractCopybookName(context: vscode.CodeActionContext) {
