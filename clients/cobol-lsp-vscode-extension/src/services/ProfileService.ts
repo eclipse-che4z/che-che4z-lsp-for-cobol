@@ -80,8 +80,7 @@ export class ProfileService implements Disposable {
         if (Object.keys(profiles).length === 1) {
             return Object.keys(profiles)[0];
         }
-
-        this.getProfileFromMultiple(profiles);
+        return this.getProfileFromMultiple(profiles);
     }
 
     async updateStatusBar() {

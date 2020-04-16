@@ -30,6 +30,19 @@
                 "${workspaceFolder}/out/**/*.js"
             ],
             "preLaunchTask": "npm: watch"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Tests",
+            "program": "${workspaceRoot}\\node_modules\\jest\\bin\\jest.js",
+            "args": [
+                "-i"
+            ],
+            "internalConsoleOptions": "openOnSessionStart",
+            "outFiles": [
+                "${workspaceRoot}/src/__tests__/*"
+            ]
         }
     ]
 }
