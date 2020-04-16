@@ -44,7 +44,7 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
         const changeProfile = new vscode.CodeAction("Change default zowe profile", vscode.CodeActionKind.QuickFix);
         changeProfile.command = {
             command: "broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile",
-            title: "Change default zowe profile",
+            title: "Change zowe profile",
         };
 
         if (await this.profileService.checkMultipleProfiles()) {
