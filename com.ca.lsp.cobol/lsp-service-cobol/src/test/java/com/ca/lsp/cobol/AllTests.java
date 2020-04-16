@@ -37,6 +37,7 @@ import org.junit.runners.Suite.SuiteClasses;
   KeywordsTest.class,
   VariableCompletionTest.class,
   CompletionsChainTest.class,
+  CpyRecognizedWithoutConfigTest.class,
   SnippetCompletionTest.class,
   ParagraphCompletionTest.class,
   CopybookCompletionTest.class,

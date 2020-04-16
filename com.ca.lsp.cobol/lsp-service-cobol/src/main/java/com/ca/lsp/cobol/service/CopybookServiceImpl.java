@@ -150,9 +150,12 @@ public class CopybookServiceImpl implements CopybookService {
    *     exists.
    */
   private void resolveCopybookContent(String requiredCopybookName) {
-
     ConfigurationSettingsStorable configurationSettingsStorable =
         configurationSettingsStorableProvider.get();
+    if (configurationSettingsStorable == null) {
+      publishOnDatabus(requiredCopybookName);
+      return;
+    }
 
     Path path = findCopybook(requiredCopybookName, configurationSettingsStorable.getPaths());
     if (isFileExists(path)) {
