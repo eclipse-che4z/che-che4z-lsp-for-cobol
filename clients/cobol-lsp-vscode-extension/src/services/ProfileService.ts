@@ -39,7 +39,7 @@ export class ProfileService implements Disposable {
         Object.keys(auxProfiles).forEach(name => {
             const profile: IProfile = auxProfiles[name];
             const item: vscode.QuickPickItem = {
-                description: profile.username + "@" + profile.host + ":" + profile.port,
+                description: profile.user + "@" + profile.host + ":" + profile.port,
                 label: name,
             };
             if (defaultName === name) {
