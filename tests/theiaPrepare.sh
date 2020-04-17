@@ -3,7 +3,6 @@ set -x
 set -e
 
 cp -r theia_automation_lsp/test_files/cobol/. /home/project/
-mkdir /home/node/.zowe
 cp -r zoweConfig/. /home/node/.zowe
 cp *.vsix /home/theia/plugins/
 
