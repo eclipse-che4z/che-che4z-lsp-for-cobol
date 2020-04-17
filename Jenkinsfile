@@ -43,7 +43,7 @@ kind: Pod
 spec:
   containers:
   - name: theia
-    image: grianbrcom/theia4cobol:1.0.0
+    image: grianbrcom/theia4cobol
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
@@ -55,7 +55,7 @@ spec:
         memory: "2Gi"
         cpu: "1"
   - name: python
-    image: grianbrcom/python-firefox:1.0.0
+    image: grianbrcom/python-firefox
     tty: true
     resources:
       limits:
@@ -177,11 +177,7 @@ pipeline {
             steps {
                 container('theia') {
                     dir('tests') {
-                        script {
-                          step ([$class: 'CopyArtifact',
-                               projectName: '${JOB_NAME}',
-                               filter: "*.vsix"]);
-                           }
+                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
                         sh './theiaPrepare.sh'
                     }
                 }
