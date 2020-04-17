@@ -99,10 +99,7 @@ export class ProfileService implements Disposable {
 
     public async checkMultipleProfiles(): Promise<boolean> {
         const profiles: ProfilesMap = await this.listProfiles();
-        if (Object.keys(profiles).length > 1) {
-            return true;
-        }
-        return false;
+        return Object.keys(profiles).length > 1;
     }
 
     private createStatusBarItem() {
