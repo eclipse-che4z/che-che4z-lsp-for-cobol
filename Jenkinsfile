@@ -183,7 +183,6 @@ pipeline {
                 }
                 container('python') {
                     dir('tests/theia_automation_lsp') {
-                        sh 'pip install --no-cache-dir -r requirements.txt'
                         sh 'PYTHONPATH=`pwd` robot -i Rally -e Unstable --variable HEADLESS:True --outputdir robot_output robot_suites/lsp/local/firefox_lsp_local.robot'
                     }
                 }
