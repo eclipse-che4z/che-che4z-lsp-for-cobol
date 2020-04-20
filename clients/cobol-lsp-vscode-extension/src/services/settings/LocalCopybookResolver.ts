@@ -16,25 +16,30 @@ import {SETTINGS_SECTION_LOCAL} from "../../constants";
 import {CopybookLocation} from "./CopybookLocation";
 import {SettingsUtils} from "./util/SettingsUtils";
 
+function resolveURIList(list: string[]): string[] {
+    const result: string[] = [];
+    list.filter(element => element !== "*").forEach(location => {
+        result.push(resolveURI(location));
+    });
+    return result;
+}
+
+function resolveURI(location: string) {
+    try {
+        return decodeURI(location);
+    } catch (e) {
+        return "";
+    }
+}
+
 export class LocalCopybookResolver implements CopybookLocation {
     // add here logic related to the resolution of physical paths
     private static parse(list: string[]) {
-        if (list !== undefined) {
-            return this.createArrayResolvedLocations(list);
-        }
-        return [];
-    }
-
-    private static createArrayResolvedLocations(list: string[]) {
-        const result: string[] = [];
-        try {
-            list.filter(element => element !== "*").forEach(location => {
-                result.push(decodeURI(location));
-            });
-        } catch (e) {
+        if (list === undefined) {
             return [];
         }
-        return result;
+        return resolveURIList(list).filter(uri => uri !== "");
+
     }
 
     public resolveLocation(json: string): string[] {
