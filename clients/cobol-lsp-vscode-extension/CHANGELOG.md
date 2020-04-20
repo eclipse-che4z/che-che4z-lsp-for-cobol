@@ -3,6 +3,7 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 
 ## [0.x.x] - TBD
+- "Change profile" in Quick fix menu when multiple profiles [#294](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/294) Thanks @[sergiuilie](https://github.com/sergiuilie)
 - Nested copybook failed to be retrieved at didOpen moment [#285](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/285) Thanks @[sergiuilie](https://github.com/sergiuilie)
 - Remove error message when settings for copybooks are not defined [#289](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/289) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Add semantic release tool integration [#219](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/219) Thanks @[grianbrcom](https://github.com/grianbrcom)

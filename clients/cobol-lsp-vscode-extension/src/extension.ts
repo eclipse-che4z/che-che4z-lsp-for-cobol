@@ -26,7 +26,7 @@ import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { PathsService } from "./services/PathsService";
 import { ProfileService } from "./services/ProfileService";
-import { ZoweApi } from "./services/ZoweApi";
+import { ProfilesMap, ZoweApi } from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
@@ -68,7 +68,6 @@ export async function activate(context: vscode.ExtensionContext) {
         editDatasetPaths(pathsService);
     }));
 
-
     context.subscriptions.push(languageClientService.start());
     context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
     context.subscriptions.push(copyBooksDownloader);
@@ -76,7 +75,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
             { scheme: "file", language: LANGUAGE_ID },
-            new CopybooksCodeActionProvider()));
+            new CopybooksCodeActionProvider(profileService)));
 }
 
 function initWorkspaceTracker(downloader: CopybooksDownloader): vscode.Disposable {
