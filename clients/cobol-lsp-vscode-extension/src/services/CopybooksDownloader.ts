@@ -15,7 +15,7 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { loadDepFile, DependenciesDesc } from "./DependencyService";
-import { DEPENDENCIES_FOLDER } from "../constants";
+import { DEPENDENCIES_FOLDER, PROCESS_DOWNLOAD_ERROR_MSG } from "../constants";
 import { CopybookFix } from "./CopybookFix";
 import { CopybooksPathGenerator, createDatasetPath, createCopybookPath, checkWorkspace } from "./CopybooksPathGenerator";
 import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
@@ -110,7 +110,7 @@ export class CopybooksDownloader implements vscode.Disposable {
                         }
                     }
                     if (this.queue.length === 0 && errors.size > 0) {
-                        this.resolver.processDownloadError("Some copybooks could not be downloaded. Please provide correct settings for nested copybooks and fetch again. Missing copybooks: " + Array.from(errors));
+                        this.resolver.processDownloadError(PROCESS_DOWNLOAD_ERROR_MSG + Array.from(errors));
                         errors.clear();
                     }
                 });
