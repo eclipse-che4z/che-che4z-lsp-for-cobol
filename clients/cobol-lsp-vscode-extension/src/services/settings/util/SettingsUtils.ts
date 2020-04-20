@@ -11,20 +11,8 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-
-import {SETTINGS_SECTION_LOCATION} from "../../constants";
-
-export class SettingsParser {
-    private static isValidJSON(json: string): boolean {
+export class SettingsUtils {
+    public static isValidJSON(json: string): boolean {
         return (json !== undefined && json.trim().length > 0);
     }
-
-    public resolveLocations(json: string): string[] {
-        if (SettingsParser.isValidJSON(json)) {
-            const locations: string[] = JSON.parse(json)[SETTINGS_SECTION_LOCATION];
-            return (locations !== undefined) ? locations : [];
-        }
-        return [];
-    }
-
 }
