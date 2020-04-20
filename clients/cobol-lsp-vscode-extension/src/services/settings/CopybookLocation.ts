@@ -11,8 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-export const SETTINGS_SECTION: string = "broadcom-cobol-lsp.cpy-manager";
-export const SETTINGS_SECTION_LOCAL: string = "broadcom-cobol-lsp.cpy-manager.local";
-export const DEPENDENCIES_FOLDER: string = ".cobdeps";
-export const COPYBOOKS_FOLDER: string = ".copybooks";
-export const LANGUAGE_ID = "COBOL";
+export interface CopybookLocation {
+    resolveLocation(jsonSegment: string): string[];
+}
