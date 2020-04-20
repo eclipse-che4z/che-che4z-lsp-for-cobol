@@ -101,6 +101,7 @@ describe("validate path resource with bad configuration", () => {
         }, 0);
     });
 
+    //TODO: Question - what happen if a list contains one valid resource and one malformed?
     test("a not valid path is not resolved and and empty array of resolved paths is returned", () => {
         assertParseOf({
             "key": "value",
