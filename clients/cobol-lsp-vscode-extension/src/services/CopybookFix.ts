@@ -26,7 +26,7 @@ export class CopybookFix {
         if (options.hasPaths) {
             actions.push(downloadCopybookAction);
         }
-        if (reasonMsg !== "Configuration was updated") {
+        if (reasonMsg !== "Configuration updated. Please provide correct settings for nested copybooks and fetch again.") {
             actions.push(actionDatasets);
             if (options.hasProfiles) {
                 actions.push(actionProfile);

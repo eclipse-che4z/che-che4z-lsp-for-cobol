@@ -110,7 +110,7 @@ export class CopybooksDownloader implements vscode.Disposable {
                         }
                     }
                     if (this.queue.length === 0 && errors.size > 0) {
-                        this.resolver.processDownloadError("Can't download copybooks: " + Array.from(errors));
+                        this.resolver.processDownloadError("Some copybooks could not be downloaded. Please provide correct settings for nested copybooks and fetch again. Missing copybooks: " + Array.from(errors));
                         errors.clear();
                     }
                 });
@@ -126,7 +126,7 @@ export class CopybooksDownloader implements vscode.Disposable {
         try {
             members = await this.zoweApi.listMembers(dataset, copybookProfile.profile);
         } catch (error) {
-            await this.resolver.processDownloadError("Can't read members of " + dataset);
+            await this.resolver.processDownloadError("Can't read members of dataset: " + dataset);
             return false;
         }
         if (!members.includes(copybookProfile.copybook)) {
