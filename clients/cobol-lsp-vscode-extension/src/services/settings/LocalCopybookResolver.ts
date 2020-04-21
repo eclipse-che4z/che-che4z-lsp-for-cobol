@@ -21,15 +21,15 @@ function fileExist(element: string): boolean {
 }
 
 function resolveURIList(list: string[]): string[] {
-    const result: string[] = [];
+    const result: Set<string> = new Set<string>();
+
     list.filter(element => element !== "*" && fileExist(element)).forEach(location => {
-        result.push(decodeURI(location));
+        result.add(decodeURI(location));
     });
-    return result;
+    return [...result];
 }
 
 export class LocalCopybookResolver implements CopybookResolver {
-    // add here logic related to the resolution of physical paths
     private static parse(list: string[]) {
         if (list === undefined) {
             return [];

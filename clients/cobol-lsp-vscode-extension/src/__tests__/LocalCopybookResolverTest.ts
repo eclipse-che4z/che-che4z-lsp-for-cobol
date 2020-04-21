@@ -19,8 +19,9 @@ import {LocalCopybookResolver} from "../services/settings/LocalCopybookResolver"
 const settingsParser: LocalCopybookResolver = new LocalCopybookResolver();
 const STAR_LOCATION = "*";
 const FILENAME: string = "test.cbl";
-const FILENAME_URI: string = createFile();
+let FILENAME_URI: string = "";
 
+//TODO: Should be removed when done
 /* NOTE
 When the settings json contains paths, them should be escaped, but on the server those settings come already escaped
 SETTINGS.JSON
@@ -55,6 +56,14 @@ ALLOWED SETTINGS TO TEST
         "ENDEVOR_PROFILE@CONFIG/ENV/STAGE/SYSTEM/SUBSYSTEM/ELEMENT2",
     ],
  */
+
+beforeAll(() => {
+    FILENAME_URI = createFile();
+});
+
+afterAll(() => {
+    return deleteTempFile();
+});
 
 describe("test parse method against bad setting configurations", () => {
     test("parse a not valid settings file returns an empty list", () => {
@@ -111,33 +120,26 @@ describe("validate path resource with bad configuration", () => {
         }, 0);
     });
 
-    test("only not valid URIs are not calculated and included in the result list returned", () => {
+});
+
+describe("validate path resource with correct configuration", () => {
+    test("only not valid URIs are excluded from the result list returned", () => {
         assertParseOf({
             "key": "value",
             "broadcom-cobol-lsp.cpy-manager.local": ["%", FILENAME_URI],
         }, 1);
     });
-});
-
-describe("validate path resource with correct configuration", () => {
     it("a correct escaped path is found and the list of valid URI is returned", () => {
         assertParseOf(prepareJson(), 1);
     });
 
-    it("a not existent path is included in the json but is not included in the returned URI list", () => {
+    it("a valid path written two times is included in the list only one time", () => {
         assertParseOf({
             "key": "value",
-            "broadcom-cobol-lsp.cpy-manager.local": ["URI_UNDEFINED"],
-        }, 0);
+            "broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI, FILENAME_URI],
+        }, 1);
     });
 
-    it("a correct Windows-Like path is provided in the json and the list of valid URI is returned", () => {
-
-    });
-
-});
-afterAll(() => {
-    return deleteTempFile();
 });
 
 function createFile(): string {
@@ -158,15 +160,13 @@ function deleteTempFile() {
 }
 
 function prepareJson() {
-    const testURI: string = createFile();
-
-    if (testURI === null) {
+    if (FILENAME_URI === null) {
         throw new Error("URI not found");
     }
 
     return {
         "key": "value",
-        "broadcom-cobol-lsp.cpy-manager.local": [testURI],
+        "broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI],
     };
 }
 
