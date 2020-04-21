@@ -49,7 +49,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // Listeners
     context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
         if (event.affectsConfiguration(SETTINGS_SECTION) &&
-        vscode.workspace.getConfiguration().get(SETTINGS_SECTION + ".profiles")) {
+        vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles")) {
             copyBooksDownloader.redownloadDependencies(REASON_MSG);
             profileService.updateStatusBar();
         }
