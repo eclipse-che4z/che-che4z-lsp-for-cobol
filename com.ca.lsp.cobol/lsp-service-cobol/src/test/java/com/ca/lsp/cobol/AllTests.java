@@ -41,7 +41,6 @@ import org.junit.runners.Suite.SuiteClasses;
   ParagraphCompletionTest.class,
   CopybookCompletionTest.class,
   DocumentOccurrencesTest.class,
-  DefinitionsAndUsagesTest.class,
   WorkspaceServiceTest.class,
   CompletionResolutionTest.class,
   CopybookServiceTest.class,

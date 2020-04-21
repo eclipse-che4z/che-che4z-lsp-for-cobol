@@ -344,9 +344,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
       return false;
     } else if (ctx instanceof QualifiedDataNameFormat1Context
         && ((QualifiedDataNameFormat1Context) ctx).qualifiedInData() != null) {
+      addUsage(semanticContext.getVariables(), variable, ctx);
       iterateOverQualifiedDataNames(
           (QualifiedDataNameFormat1Context) ctx, variable, startLine, charPositionInLine);
-      addUsage(semanticContext.getVariables(), variable, ctx);
     }
     return true;
   }

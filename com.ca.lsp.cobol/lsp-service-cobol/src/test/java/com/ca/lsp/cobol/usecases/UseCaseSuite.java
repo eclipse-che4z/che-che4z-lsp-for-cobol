@@ -42,6 +42,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestExtraSymbolsNotCauseErrorOnNextLine.class,
   TestVariableStructureIsBuiltWithCopybooks.class,
   TestCopybookWithRecursiveDependencyIsDetected.class,
+  TestRepetitiveVariableUsagesInAdjacentStatements.class,
   TestVariableStructureInCopybooksWithMissingLevels.class,
   TestCopybookWithIndirectRecursiveDependencyIsDetected.class,
   TestCobolStringWithContinuationLineConcatenatedCorrectly.class,
