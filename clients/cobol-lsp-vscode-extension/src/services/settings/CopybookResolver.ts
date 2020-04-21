@@ -12,5 +12,5 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 export interface CopybookResolver {
-    resolveCopybook(jsonSegment: string): string[];
+    resolveCopybooks(jsonSegment: string): string[];
 }
