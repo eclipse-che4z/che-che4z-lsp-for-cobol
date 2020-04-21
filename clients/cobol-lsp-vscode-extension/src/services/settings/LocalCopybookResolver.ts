@@ -11,25 +11,21 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-
+import * as fs from "fs";
 import {SETTINGS_SECTION_LOCAL} from "../../constants";
 import {CopybookLocation} from "./CopybookLocation";
 import {SettingsUtils} from "./util/SettingsUtils";
 
-function resolveURIList(list: string[]): string[] {
-    const result: string[] = [];
-    list.filter(element => element !== "*").forEach(location => {
-        result.push(resolveURI(location));
-    });
-    return result;
+function fileExist(element: string): boolean {
+    return fs.existsSync(element);
 }
 
-function resolveURI(location: string) {
-    try {
-        return decodeURI(location);
-    } catch (e) {
-        return "";
-    }
+function resolveURIList(list: string[]): string[] {
+    const result: string[] = [];
+    list.filter(element => element !== "*" && fileExist(element)).forEach(location => {
+        result.push(decodeURI(location));
+    });
+    return result;
 }
 
 export class LocalCopybookResolver implements CopybookLocation {
