@@ -60,6 +60,11 @@ export class ProfileService implements Disposable {
         return undefined;
     }
 
+    public async getProfileFromSettings(profiles?: ProfilesMap): Promise<string | undefined> {
+        const auxProfiles: ProfilesMap = profiles ? profiles : await this.zoweApi.listZOSMFProfiles();
+        return this.tryGetProfileFromSettings(auxProfiles);
+    }
+
     async getProfile(programName?: string): Promise<string | undefined> {
         if (programName) {
             const detectedProfile: string | undefined = (await this.findProfileByDependenciesFile(programName));
