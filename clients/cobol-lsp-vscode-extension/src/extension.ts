@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 import { editDatasetPaths } from "./commands/EditDatasetPaths";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
-import { DEPENDENCIES_FOLDER } from "./constants";
+import { DEPENDENCIES_FOLDER, REASON_MSG } from "./constants";
 import { LANGUAGE_ID, SETTINGS_SECTION } from "./constants";
 import { CopybookFix } from "./services/CopybookFix";
 import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
@@ -49,7 +49,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // Listeners
     context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
         if (event.affectsConfiguration(SETTINGS_SECTION)) {
-            copyBooksDownloader.redownloadDependencies("Configuration was updated");
+            copyBooksDownloader.redownloadDependencies(REASON_MSG);
             profileService.updateStatusBar();
         }
     }));

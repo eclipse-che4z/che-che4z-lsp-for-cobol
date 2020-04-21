@@ -14,6 +14,7 @@
 
 import * as vscode from "vscode";
 import { DownloadQueue } from "./DownloadQueue";
+import { REASON_MSG} from "../constants";
 
 export class CopybookFix {
     private queue: DownloadQueue;
@@ -26,7 +27,7 @@ export class CopybookFix {
         if (options.hasPaths) {
             actions.push(downloadCopybookAction);
         }
-        if (reasonMsg !== "Configuration was updated") {
+        if (reasonMsg !== REASON_MSG) {
             actions.push(actionDatasets);
             if (options.hasProfiles) {
                 actions.push(actionProfile);
