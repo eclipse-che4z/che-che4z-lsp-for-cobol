@@ -91,8 +91,6 @@ public class TestMappingWithMultiDefinitions {
 
   @Test
   public void test() {
-    System.out.println("mama");
-
     AnalysisResult result =
         analyze(
             DOCUMENT,
@@ -186,7 +184,7 @@ public class TestMappingWithMultiDefinitions {
 
   private void assertVariableDefinitions(Map<String, List<Location>> variableDefinitions) {
     assertEquals(
-        "Variable usages: " + variableDefinitions.toString(), 15, variableDefinitions.size());
+        "Variable definitions: " + variableDefinitions.toString(), 15, variableDefinitions.size());
     assertSingleLocation(variableDefinitions, "PARENT", DOCUMENT_URI, 4, 10);
     assertSingleLocation(variableDefinitions, "PARENT2", DOCUMENT_URI, 5, 10);
 

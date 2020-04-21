@@ -119,7 +119,7 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
     assertEquals("Diagnostic start line", 0, range.getStart().getLine());
     assertEquals("Diagnostic start character", 7, range.getStart().getCharacter());
     assertEquals("Diagnostic end line", 0, range.getEnd().getLine());
-    assertEquals("Diagnostic end character", 11, range.getEnd().getCharacter());
+    assertEquals("Diagnostic end character", 13, range.getEnd().getCharacter());
   }
 
   @Ignore("Feature is not yet supported")

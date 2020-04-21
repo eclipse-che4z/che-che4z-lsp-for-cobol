@@ -46,15 +46,13 @@ public class TestExtraneousInputEOFExpecting extends NegativeUseCase {
     assertEquals("Number of diagnostics", 1, diagnostics.size());
     Diagnostic diagnostic = diagnostics.get(0);
     assertEquals(
-        "Extraneous input '<EOF>' expected "
-            + "{ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, COMPUTE, "
-            + "CONTINUE, DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, "
-            + "ENTRY, EVALUATE, EXHIBIT, EXIT, GENERATE, GOBACK, GO, "
-            + "IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, "
-            + "OPEN, PERFORM, PURGE, READ, RECEIVE, RELEASE, RETURN, REWRITE, "
-            + "SEARCH, SEND, SERVICE, SET, SORT, START, STOP, STRING, SUBTRACT, "
-            + "TERMINATE, TITLE, UNSTRING, WRITE, XML, DOT_FS, EXECCICSLINE, "
-            + "EXECSQLIMSLINE, EXECSQLLINE}",
+        "Extraneous input '<EOF>' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, "
+            + "COMPUTE, CONTINUE, DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, "
+            + "EXHIBIT, EXIT, GENERATE, GOBACK, GO, IF, INITIALIZE, INITIATE, INSPECT, MERGE, "
+            + "MOVE, MULTIPLY, OPEN, PERFORM, PURGE, READ, RECEIVE, RELEASE, RETURN, REWRITE, "
+            + "SEARCH, SEND, SERVICE, SET, SORT, START, STOP, STRING, SUBTRACT, TERMINATE, TITLE, "
+            + "UNSTRING, WRITE, XML, DOT_FS, '*>CPYENTER', '*>CPYEXIT', EXECCICSLINE, EXECSQLIMSLINE, "
+            + "EXECSQLLINE}",
         diagnostic.getMessage());
 
     Range range = diagnostic.getRange();

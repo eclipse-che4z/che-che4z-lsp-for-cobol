@@ -92,7 +92,7 @@ public class TestSameCopybooksWithDifferentCases {
     assertCopybookVariableDefinitions(variableDefinitions, "PARENT2", 0, 11);
     assertCopybookVariableDefinitions(variableDefinitions, "CHILD1", 1, 15);
     assertCopybookVariableDefinitions(variableDefinitions, "CHILD2", 2, 15);
-    assertCopybookVariableDefinitions(variableDefinitions, "CHILD3", 5, 15);
+    assertCopybookVariableDefinitions(variableDefinitions, "CHILD3", 3, 15);
   }
 
   private void assertVariableUsages(AnalysisResult result) {
@@ -116,9 +116,8 @@ public class TestSameCopybooksWithDifferentCases {
       int line,
       int startCharacter) {
     List<Location> parent2definitions = variableDefinitions.get(varName);
-    assertEquals("Number of " + varName + " definitions", 2, parent2definitions.size());
+    assertEquals("Number of " + varName + " definitions", 1, parent2definitions.size());
     assertLocation(parent2definitions.get(0), CPY_NAME, line, startCharacter, varName.length());
-    assertLocation(parent2definitions.get(1), CPY_NAME, line, startCharacter, varName.length());
   }
 
   private void assertLocation(

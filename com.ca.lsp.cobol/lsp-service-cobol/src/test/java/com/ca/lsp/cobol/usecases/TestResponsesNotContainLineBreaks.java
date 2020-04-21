@@ -16,14 +16,22 @@
 
 package com.ca.lsp.cobol.usecases;
 
+import com.ca.lsp.cobol.service.delegates.communications.ServerCommunications;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import java.util.List;
 
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static java.util.Optional.ofNullable;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.verify;
 
 /**
  * This test verifies that all the responses from server escaped from line breaks to prevent
@@ -46,7 +54,14 @@ public class TestResponsesNotContainLineBreaks {
 
   @Test
   public void test() {
-    List<Diagnostic> diagnostics = analyzeForErrors(TEXT);
+    LanguageClient client = Mockito.mock(LanguageClient.class);
+    ArgumentCaptor<PublishDiagnosticsParams> captor = forClass(PublishDiagnosticsParams.class);
+    ServerCommunications communications = new ServerCommunications(() -> client);
+
+    communications.publishDiagnostics(DOCUMENT_URI, analyzeForErrors(TEXT));
+
+    verify(client).publishDiagnostics(captor.capture());
+    List<Diagnostic> diagnostics = captor.getValue().getDiagnostics();
 
     diagnostics.forEach(it -> assertStringWithoutLineBreaks(it.getMessage()));
     diagnostics.forEach(it -> assertStringWithoutLineBreaks(it.getCode()));
