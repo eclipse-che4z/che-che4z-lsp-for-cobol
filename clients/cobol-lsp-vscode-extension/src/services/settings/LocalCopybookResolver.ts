@@ -13,7 +13,7 @@
  */
 import * as fs from "fs";
 import {SETTINGS_SECTION_LOCAL} from "../../constants";
-import {CopybookLocation} from "./CopybookLocation";
+import {CopybookResolver} from "./CopybookResolver";
 import {SettingsUtils} from "./util/SettingsUtils";
 
 function fileExist(element: string): boolean {
@@ -28,7 +28,7 @@ function resolveURIList(list: string[]): string[] {
     return result;
 }
 
-export class LocalCopybookResolver implements CopybookLocation {
+export class LocalCopybookResolver implements CopybookResolver {
     // add here logic related to the resolution of physical paths
     private static parse(list: string[]) {
         if (list === undefined) {
@@ -38,7 +38,7 @@ export class LocalCopybookResolver implements CopybookLocation {
 
     }
 
-    public resolveLocation(json: string): string[] {
+    public resolveCopybook(json: string): string[] {
         if (SettingsUtils.isValidJSON(json)) {
             return LocalCopybookResolver.parse(JSON.parse(json)[SETTINGS_SECTION_LOCAL]);
         }

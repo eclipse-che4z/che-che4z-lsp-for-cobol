@@ -122,7 +122,6 @@ describe("validate path resource with bad configuration", () => {
 describe("validate path resource with correct configuration", () => {
     it("a correct escaped path is found and the list of valid URI is returned", () => {
         assertParseOf(prepareJson(), 1);
-        // deleteTempFile();
     });
 
     it("a not existent path is included in the json but is not included in the returned URI list", () => {
@@ -172,5 +171,5 @@ function prepareJson() {
 }
 
 function assertParseOf(value: any, expectedSizeList: number) {
-    expect(settingsParser.resolveLocation(JSON.stringify(value)).length).toBe(expectedSizeList);
+    expect(settingsParser.resolveCopybook(JSON.stringify(value)).length).toBe(expectedSizeList);
 }
