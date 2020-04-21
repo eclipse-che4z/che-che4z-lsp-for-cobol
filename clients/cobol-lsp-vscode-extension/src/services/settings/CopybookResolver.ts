@@ -11,6 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-export interface CopybookLocation {
-    resolveLocation(jsonSegment: string): string[];
+export interface CopybookResolver {
+    resolveCopybook(jsonSegment: string): string[];
 }
