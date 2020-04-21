@@ -35,10 +35,9 @@ export class LocalCopybookResolver implements CopybookResolver {
             return [];
         }
         return resolveURIList(list).filter(uri => uri !== "");
-
     }
 
-    public resolveCopybook(json: string): string[] {
+    public resolveCopybooks(json: string): string[] {
         if (SettingsUtils.isValidJSON(json)) {
             return LocalCopybookResolver.parse(JSON.parse(json)[SETTINGS_SECTION_LOCAL]);
         }

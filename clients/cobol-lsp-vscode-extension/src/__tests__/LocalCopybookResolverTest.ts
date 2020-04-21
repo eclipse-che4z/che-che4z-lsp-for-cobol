@@ -21,42 +21,6 @@ const STAR_LOCATION = "*";
 const FILENAME: string = "test.cbl";
 let FILENAME_URI: string = "";
 
-//TODO: Should be removed when done
-/* NOTE
-When the settings json contains paths, them should be escaped, but on the server those settings come already escaped
-SETTINGS.JSON
-    {
-       //... other settings
-       "setting.test":["src\\folder\\file.ts"],
-       //... other settings
-    }
-INVOCATION OF [await vscode.workspace.getConfiguration(setting).get("test")] RETURNS ["src\folder\test"]
-ON UNIX SYSTEM NO NEED TO APPLY ESCAPING ON CLIENT AND TRANSLATION ON THE SERVER ["src/folder/test"]
- */
-
-/*
-ALLOWED SETTINGS TO TEST
-- LOCAL:
-    "broadcom-cobol-lsp.cpy-manager.paths.local": [
-        "FOLDER\\SUBFOLDER\\COPYFOLDER\\COPY",
-        "FOLDER/SUBFOLDER/COPYFOLDER/COPY"
-        "FOLDER\\SUBFOLDER\\COPYFOLDER/*" (STRETCH),
-        "FOLDER/SUBFOLDER/COPYFOLDER/* (STRETCH)"
-    ],
-
-- DSN:
-    "broadcom-cobol-lsp.cpy-manager.paths.DSN": [
-        "ZOSMF_PROFILE@HLQ.DSNAME1.COPY1",
-        "ZOSMF_PROFILE@HLQ.DSNAME1.COPY2",
-    ],
-
-- ENDEVOR: (OUT OF SCOPE)
-   "broadcom-cobol-lsp.cpy-manager.paths.endevor": [
-        "ENDEVOR_PROFILE@CONFIG/ENV/STAGE/SYSTEM/SUBSYSTEM/ELEMENT1",
-        "ENDEVOR_PROFILE@CONFIG/ENV/STAGE/SYSTEM/SUBSYSTEM/ELEMENT2",
-    ],
- */
-
 beforeAll(() => {
     FILENAME_URI = createFile();
 });
@@ -65,7 +29,7 @@ afterAll(() => {
     return deleteTempFile();
 });
 
-describe("test parse method against bad setting configurations", () => {
+describe("test parse method against bad setting configuration", () => {
     test("parse a not valid settings file returns an empty list", () => {
         assertParseOf(100, 0);
     });
@@ -83,53 +47,53 @@ describe("test parse method against bad setting configurations", () => {
     });
 });
 
-describe("test parse method with allowed setting configuration", () => {
+describe("test parse method with correct setting configuration", () => {
     test("parse a setting file with key 'LOCAL' return the values in an array", () => {
         assertParseOf({"broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI]}, 1);
     });
 
-    test("parse a setting file with etherogeneous keys with the key 'LOCAL' return the value in an array", () => {
+    test("parse a setting file with etherogeneous keys that include the key 'LOCAL' return the LOCAL's values in an array", () => {
         assertParseOf({"key": "value", "broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI]}, 1);
     });
 
 });
 
-describe("validate path resource with bad configuration", () => {
+describe("validate bad path resource", () => {
     test("an array of paths defined as '*' is not resolved and an empty array is returned'", () => {
         assertParseOf({"key": "value", "broadcom-cobol-lsp.cpy-manager.local": [STAR_LOCATION]}, 0);
     });
 
-    test("an array of paths eith defined as '*' are not resolved in an etherogeneous array and are excluded from the result'", () => {
+    test("an array of paths defined where an item is '*' is not resolved within an etherogeneous array and is excluded from the result", () => {
         assertParseOf({
             "key": "value",
             "broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI, STAR_LOCATION],
         }, 1);
     });
 
-    test("an empty array of paths is not resolved and an empty array of resolved paths is returned", () => {
+    test("an empty array of paths is resolved in an empty array returned", () => {
         assertParseOf({
             "key": "value",
             "broadcom-cobol-lsp.cpy-manager.local": [],
         }, 0);
     });
 
-    test("a not valid path is not resolved and and empty array of resolved paths is returned", () => {
+    test("a not valid path is not resolved and excluded from the result array", () => {
         assertParseOf({
             "key": "value",
             "broadcom-cobol-lsp.cpy-manager.local": ["%"],
         }, 0);
     });
 
-});
-
-describe("validate path resource with correct configuration", () => {
-    test("only not valid URIs are excluded from the result list returned", () => {
+    test("a not valid path is not resolved and excluded from the result array within an etherogeneous array", () => {
         assertParseOf({
             "key": "value",
             "broadcom-cobol-lsp.cpy-manager.local": ["%", FILENAME_URI],
         }, 1);
     });
-    it("a correct escaped path is found and the list of valid URI is returned", () => {
+});
+
+describe("validate path resource with correct configuration", () => {
+    it("an escaped path is found on FS and its URI is returned in the result list", () => {
         assertParseOf(prepareJson(), 1);
     });
 
@@ -171,5 +135,5 @@ function prepareJson() {
 }
 
 function assertParseOf(value: any, expectedSizeList: number) {
-    expect(settingsParser.resolveCopybook(JSON.stringify(value)).length).toBe(expectedSizeList);
+    expect(settingsParser.resolveCopybooks(JSON.stringify(value)).length).toBe(expectedSizeList);
 }
