@@ -28,6 +28,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestPerformUntilCorrect.class,
   TestEndPerformCausesError.class,
   TestRemarksAreUnsupported.class,
+  TestCpyNameWithSpecialChar.class,
   TestExtraneousInputEOFExpecting.class,
   TestNoErrorOnCompilerDirectives.class,
   TestVariablesAreCaseInsensitive.class,
