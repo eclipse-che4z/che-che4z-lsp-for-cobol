@@ -109,6 +109,10 @@ pipeline {
                     yaml kubernetes_build_config
                 }
             }
+            when {
+                expression { false }
+                beforeAgent true
+            }
             stages {
                 stage('Build LSP server part') {
                     steps {
@@ -177,13 +181,13 @@ pipeline {
             steps {
                 container('theia') {
                     dir('tests') {
-                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
+                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}'
                         sh './theiaPrepare.sh'
                     }
                 }
                 container('python') {
                     dir('tests/theia_automation_lsp') {
-                        sh 'PYTHONPATH=`pwd` robot -i Rally -e Unstable --variable HEADLESS:True --outputdir robot_output robot_suites/lsp/local/firefox_lsp_local.robot'
+                        sh 'HOME=`pwd`/robot_home PYTHONPATH=`pwd` robot -i Rally -e Unstable --variable HEADLESS:True --exitonfailure --outputdir robot_output robot_suites/lsp/local/firefox_lsp_local.robot'
                     }
                 }
             }
