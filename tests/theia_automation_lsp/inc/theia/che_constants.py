@@ -10,10 +10,7 @@
 # Contributors:
 #   Broadcom, Inc. - initial API and implementation
 
-from inc.exceptions.general_exception import GeneralException
+CHE_LOGIN_TITLE = "Log in to Eclipse Che"
+CHE_LOADING_TITLE = "Loading Dashboard..."
 
-
-class NoLineNumberOnScreenException(GeneralException):
-
-    def __init__(self, driver, call_from=None, msg="", do_dump=True):
-        super(NoLineNumberOnScreenException, self).__init__(driver, call_from=call_from, msg=msg, do_dump=do_dump)
+CHE_BUG_TITLE = "The file 'file:///home/theia/.theia/settings.json' has been changed on the file system."

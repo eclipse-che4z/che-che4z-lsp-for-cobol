@@ -10,5 +10,7 @@
 # Contributors:
 #   Broadcom, Inc. - initial API and implementation
 
-ROBOT_OUTPUT_DIR ="theia_robot_output"
+ROBOT_OUTPUT_DIR = "theia_robot_output"
 DUMP_DIR_NAME = "dump"
+TEST_FILES_DIR = "test_files"
+COBOL_DIR = "cobol"

@@ -16,6 +16,8 @@
 
        Data Division.
        Working-Storage Section.
+       COPY BOOK1R.
+           01 BOOK2-REC.
            01 User-Num1 PIC 9(9).
            01 User-Num2 PIC 9(9).
            01 User-Address.
