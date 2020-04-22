@@ -180,7 +180,7 @@ TC152049 Navigate through definitions
     Close Tab  ${Editor}  ${Active Tab}
 
 TC152080 Find all references
-    [Tags]  TC152080  COBOL_LOCAL  LSP  FireFox  Rally
+    [Tags]  TC152080  COBOL_LOCAL  LSP  FireFox  Rally  Unstable
     [Documentation]  Checks that LSP can find all references and navigate by them
     ${Explorer Title Node} =  Find File Explorer Panel
     ${Top File Element} =  Find First Element In Files Explorer
