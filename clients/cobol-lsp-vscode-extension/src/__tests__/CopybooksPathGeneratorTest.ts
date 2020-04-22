@@ -40,6 +40,7 @@ describe("CopybooksPathGenerator tests", () => {
     it("generates array of uris", async () => {
         const profileService: any = {
             getProfile: () => Promise.resolve(profile),
+            getProfileFromSettings: () => Promise.resolve(profile),
         };
         const gen: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
         gen.listDatasets = () => Promise.resolve(["DATASET1", "DATASET2"]);

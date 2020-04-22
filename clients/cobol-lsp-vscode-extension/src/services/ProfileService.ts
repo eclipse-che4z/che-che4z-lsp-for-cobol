@@ -53,11 +53,16 @@ export class ProfileService implements Disposable {
             { placeHolder: "Select a zowe profile to search for copybooks", canPickMany: false });
         if (selectedProfile) {
             // TODO Switch to program specific profiles
-            await vscode.workspace.getConfiguration().update(SETTINGS_SECTION + ".profiles",
+            await vscode.workspace.getConfiguration(SETTINGS_SECTION).update("profiles",
                 selectedProfile.label, false);
             return selectedProfile.label;
         }
         return undefined;
+    }
+
+    public async getProfileFromSettings(profiles?: ProfilesMap): Promise<string | undefined> {
+        const auxProfiles: ProfilesMap = profiles ? profiles : await this.zoweApi.listZOSMFProfiles();
+        return this.tryGetProfileFromSettings(auxProfiles);
     }
 
     async getProfile(programName?: string): Promise<string | undefined> {
@@ -133,7 +138,7 @@ export class ProfileService implements Disposable {
 
     private tryGetProfileFromSettings(profiles: ProfilesMap): string | undefined {
         // TODO switch from single profile to program specific profile
-        const profile: string = vscode.workspace.getConfiguration().get(SETTINGS_SECTION + ".profiles");
+        const profile: string = vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles");
 
         if (profiles[profile]) {
             return profile;
