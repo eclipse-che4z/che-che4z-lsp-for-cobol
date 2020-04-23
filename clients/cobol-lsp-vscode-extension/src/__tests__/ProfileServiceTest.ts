@@ -16,7 +16,6 @@ import { ProfileService } from "../services/ProfileService";
 
 import * as path from "path";
 import * as vscode from "vscode";
-import { updateProfileActionDesc } from "@zowe/imperative";
 
 describe("Profile Service tests", () => {
     const programName = "programName";

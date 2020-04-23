@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 import { editDatasetPaths } from "./commands/EditDatasetPaths";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
-import { DEPENDENCIES_FOLDER } from "./constants";
+import { DEPENDENCIES_FOLDER, REASON_MSG } from "./constants";
 import { LANGUAGE_ID, SETTINGS_SECTION } from "./constants";
 import { CopybookFix } from "./services/CopybookFix";
 import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
@@ -26,7 +26,7 @@ import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { PathsService } from "./services/PathsService";
 import { ProfileService } from "./services/ProfileService";
-import { ZoweApi } from "./services/ZoweApi";
+import { ProfilesMap, ZoweApi } from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
@@ -48,8 +48,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // Listeners
     context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
-        if (event.affectsConfiguration(SETTINGS_SECTION)) {
-            copyBooksDownloader.redownloadDependencies("Configuration was updated");
+        if (event.affectsConfiguration(SETTINGS_SECTION) &&
+        vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles")) {
+            copyBooksDownloader.redownloadDependencies(REASON_MSG);
             profileService.updateStatusBar();
         }
     }));
@@ -68,7 +69,6 @@ export async function activate(context: vscode.ExtensionContext) {
         editDatasetPaths(pathsService);
     }));
 
-
     context.subscriptions.push(languageClientService.start());
     context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
     context.subscriptions.push(copyBooksDownloader);
@@ -76,7 +76,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
             { scheme: "file", language: LANGUAGE_ID },
-            new CopybooksCodeActionProvider()));
+            new CopybooksCodeActionProvider(profileService)));
 }
 
 function initWorkspaceTracker(downloader: CopybooksDownloader): vscode.Disposable {

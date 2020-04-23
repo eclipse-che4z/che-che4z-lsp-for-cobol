@@ -2,6 +2,12 @@
 
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.x.x] - TBD
+- "Change profile" in Quick fix menu when multiple profiles [#294](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/294) Thanks @[sergiuilie](https://github.com/sergiuilie)
+- Nested copybook failed to be retrieved at didOpen moment [#285](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/285) Thanks @[sergiuilie](https://github.com/sergiuilie)
+- Remove error message when settings for copybooks are not defined [#289](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/289) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
+- Add semantic release tool integration [#219](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/219) Thanks @[grianbrcom](https://github.com/grianbrcom)
+
 ## [0.11.0] - 2020-04-09
 - Client multiples the items in the download queue [#257](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/257) Thanks @[grianbrcom](https://github.com/grianbrcom)
 - Calculate and return a full URI containing Zowe profile [#266](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/266) Thanks @[ishche](https://github.com/ishche) @[sergiuilie](https://github.com/sergiuilie)
@@ -16,6 +22,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 - Address StackOverflow during build [#230](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/230) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - No escape chars in filename [#228](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/228) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Finalize LRU Algorithm [#227](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/227) Thanks @[sergiuilie](https://github.com/sergiuilie)
+- Add semantic release tool integration [#219](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/219) Thanks @[grianbrcom](https://github.com/grianbrcom)
 - Consume user settings in Copybook Service [#221](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/221) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
 - Support copybooks downloading [#208](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/208) Thanks @[ishche](https://github.com/ishche)
 - Modify dep file creation/update process [#209](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/209) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
