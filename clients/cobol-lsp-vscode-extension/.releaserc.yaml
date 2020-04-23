@@ -12,4 +12,9 @@ plugins:
     - @semantic-release/changelog
     - - @semantic-release/exec
       - prepareCmd: releaseScripts/prepare.sh ${nextRelease.version} ${branch.name} "${nextRelease.notes}"
-    - @semantic-release/github
+    - - "@semantic-release/github"
+      - successComment: false
+        failComment: false
+        failTitle: false
+        labels: false
+        releasedLabels: false
