@@ -29,18 +29,35 @@ function resolveURIList(list: string[]): string[] {
     return [...result];
 }
 
+/**
+ * This class implement the resolution of paths defined into the configuration file in a list
+ * of URIs that are present on the filesystem
+ */
 export class LocalCopybookResolver implements CopybookResolver {
-    private static parse(list: string[]) {
+    private static parse(list: string[]): string[] {
         if (list === undefined) {
             return [];
         }
         return resolveURIList(list).filter(uri => uri !== "");
     }
 
-    public resolveCopybooks(json: string): string[] {
+    /**
+     * @param json segment of the JSON setting that contains the key to access to the local path definition
+     * @return a list of resolved URIs, empty array if the JSON segment is not valid or the key is not found
+     */
+    public resolveCopybooksFromJSON(json: string): string[] {
         if (SettingsUtils.isValidJSON(json)) {
             return LocalCopybookResolver.parse(JSON.parse(json)[SETTINGS_SECTION_LOCAL]);
         }
         return [];
     }
+
+    /**
+     * @param list the provided list of physical path defined by the user
+     * @return a list of resolved URIs, empty array if the input list doesn't contains any valid/found URIs
+     */
+    public resolve(list: string[]): string[] {
+        return LocalCopybookResolver.parse(list);
+    }
+
 }
