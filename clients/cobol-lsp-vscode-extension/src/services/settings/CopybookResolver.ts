@@ -11,6 +11,11 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+/**
+ * This interface represent the base class that define the API to resolve a JSON segment or a list of paths
+ * defined by the user in the settings configuration in a list of URI Paths available on the filesystem.
+ */
 export interface CopybookResolver {
-    resolveCopybooks(jsonSegment: string): string[];
+    resolveCopybooksFromJSON(jsonSegment: string): string[];
+    resolve(list: string[]): string[];
 }

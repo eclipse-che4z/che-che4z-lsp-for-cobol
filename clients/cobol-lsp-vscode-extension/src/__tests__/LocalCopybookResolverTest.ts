@@ -52,7 +52,7 @@ describe("test parse method with correct setting configuration", () => {
         assertParseOf({"broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI]}, 1);
     });
 
-    test("parse a setting file with etherogeneous keys that include the key 'LOCAL' return the LOCAL's values in an array", () => {
+    test("parse a setting file with heterogeneous keys that include the key 'LOCAL' return the LOCAL's values in an array", () => {
         assertParseOf({"key": "value", "broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI]}, 1);
     });
 
@@ -60,36 +60,25 @@ describe("test parse method with correct setting configuration", () => {
 
 describe("validate bad path resource", () => {
     test("an array of paths defined as '*' is not resolved and an empty array is returned'", () => {
-        assertParseOf({"key": "value", "broadcom-cobol-lsp.cpy-manager.local": [STAR_LOCATION]}, 0);
+        assertResourceContent([STAR_LOCATION], 0);
     });
 
-    test("an array of paths defined where an item is '*' is not resolved within an etherogeneous array and is excluded from the result", () => {
-        assertParseOf({
-            "key": "value",
-            "broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI, STAR_LOCATION],
-        }, 1);
+    test("an array of paths defined where an item is '*' is not resolved within an heterogeneous array and is excluded from the result", () => {
+       assertResourceContent([FILENAME_URI, STAR_LOCATION], 1);
     });
 
     test("an empty array of paths is resolved in an empty array returned", () => {
-        assertParseOf({
-            "key": "value",
-            "broadcom-cobol-lsp.cpy-manager.local": [],
-        }, 0);
+        assertResourceContent([],0);
     });
 
     test("a not valid path is not resolved and excluded from the result array", () => {
-        assertParseOf({
-            "key": "value",
-            "broadcom-cobol-lsp.cpy-manager.local": ["%"],
-        }, 0);
+        assertResourceContent(["%"],0);
     });
 
-    test("a not valid path is not resolved and excluded from the result array within an etherogeneous array", () => {
-        assertParseOf({
-            "key": "value",
-            "broadcom-cobol-lsp.cpy-manager.local": ["%", FILENAME_URI],
-        }, 1);
+    test("a not valid path is not resolved and excluded from the result array within an heterogeneous array", () => {
+        assertResourceContent(["%", FILENAME_URI],1);
     });
+
 });
 
 describe("validate path resource with correct configuration", () => {
@@ -107,7 +96,6 @@ describe("validate path resource with correct configuration", () => {
 });
 
 function createFile(): string {
-    //TODO: check if is possible improve it..
     fs.writeFile(FILENAME, "Some dummy content", err => {
         if (err) {
             return null;
@@ -135,5 +123,11 @@ function prepareJson() {
 }
 
 function assertParseOf(value: any, expectedSizeList: number) {
-    expect(settingsParser.resolveCopybooks(JSON.stringify(value)).length).toBe(expectedSizeList);
+    expect(settingsParser.resolveCopybooksFromJSON(JSON.stringify(value)).length).toBe(expectedSizeList);
 }
+
+function assertResourceContent(list: string[], expectedSizeList: number ){
+    expect(settingsParser.resolve(list).length).toBe(expectedSizeList)
+}
+
+
