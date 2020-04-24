@@ -24,12 +24,13 @@
             </pattern>
         </encoder>
     </appender>
-    
+
     <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${HOME_LOG}</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>./Broadcom/LSPCobol/logs/archived/app.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <fileNamePattern>${user.home}/Broadcom/LSPCobol/logs/archived/app.%d{yyyy-MM-dd}.%i.log.zip
+            </fileNamePattern>
             <maxFileSize>10MB</maxFileSize>
             <totalSizeCap>1GB</totalSizeCap>
             <maxHistory>30</maxHistory>
