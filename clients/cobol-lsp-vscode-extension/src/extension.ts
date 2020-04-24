@@ -22,6 +22,7 @@ import { CopybookFix } from "./services/CopybookFix";
 import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
 import { CopybooksDownloader } from "./services/CopybooksDownloader";
 import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
+import { initializeSettings } from "./services/Settings";
 
 import { LanguageClientService } from "./services/LanguageClientService";
 import { PathsService } from "./services/PathsService";
@@ -29,6 +30,8 @@ import { ProfileService } from "./services/ProfileService";
 import { ProfilesMap, ZoweApi } from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
+    initializeSettings();
+
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
     const copybookFix: CopybookFix = new CopybookFix();
