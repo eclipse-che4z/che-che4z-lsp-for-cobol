@@ -18,15 +18,15 @@ import * as vscode from "vscode";
 export class PathsService {
 
     async listPathDatasets(): Promise<string[]> {
-        if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has("paths")) {
+        if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has("paths.zowe")) {
             await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
             return [];
         }
-        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get("paths");
+        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get("paths.zowe");
     }
 
     setPathDatasets(paths: string[]) {
-        vscode.workspace.getConfiguration(SETTINGS_SECTION).update("paths", paths);
+        vscode.workspace.getConfiguration(SETTINGS_SECTION).update("paths.zowe", paths);
     }
 }
 

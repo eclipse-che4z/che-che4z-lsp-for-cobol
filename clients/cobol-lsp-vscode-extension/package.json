@@ -75,7 +75,7 @@
                     "type": "string",
                     "description": "Current default profile for copybook downloader"
                 },
-                "broadcom-cobol-lsp.cpy-manager.paths": {
+                "broadcom-cobol-lsp.cpy-manager.paths.zowe": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -83,7 +83,7 @@
                     "description": "Default list of datasets to search for copybooks",
                     "uniqueItems": true
                 },
-                "broadcom-cobol-lsp.cpy-manager.local": {
+                "broadcom-cobol-lsp.cpy-manager.paths.local": {
                     "type": "array",
                     "items": {
                         "type": "string"

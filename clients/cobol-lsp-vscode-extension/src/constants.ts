@@ -12,7 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 export const SETTINGS_SECTION: string = "broadcom-cobol-lsp.cpy-manager";
-export const PATHS_LOCAL_KEY = "local";
+export const PATH_SETTINGS_SECTION: string = "broadcom-cobol-lsp.cpy-manager-paths";
+
+export const PATHS_LOCAL_KEY = "paths.local";
+export const ZOWE_KEY = "zowe";
 export const DEPENDENCIES_FOLDER: string = ".cobdeps";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
 export const LANGUAGE_ID = "COBOL";
