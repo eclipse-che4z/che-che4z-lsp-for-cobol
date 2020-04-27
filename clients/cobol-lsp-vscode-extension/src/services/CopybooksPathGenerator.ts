@@ -22,7 +22,7 @@ export class CopybooksPathGenerator {
 
     async listUris(): Promise<vscode.Uri[]> {
         const result: vscode.Uri[] = [];
-        const profile: string = await this.profileService.getProfile();
+        const profile: string = await this.profileService.getProfileFromSettings();
         if (profile) {
             for (const dataset of await this.listDatasets()) {
                 const uri: vscode.Uri = vscode.Uri.file(createDatasetPath(profile, dataset));

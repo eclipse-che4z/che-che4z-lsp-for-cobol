@@ -32,6 +32,39 @@ export class ProfileService implements Disposable {
         return this.zoweApi.listZOSMFProfiles();
     }
 
+    public async getProfileFromMultiple(profiles?: ProfilesMap): Promise<string | undefined> {
+        const defaultName = this.zoweApi.getDefaultProfileName();
+        const auxProfiles: ProfilesMap = profiles ? profiles : await this.zoweApi.listZOSMFProfiles();
+        let items: vscode.QuickPickItem[] = [];
+        Object.keys(auxProfiles).forEach(name => {
+            const profile: IProfile = auxProfiles[name];
+            const item: vscode.QuickPickItem = {
+                description: profile.user + "@" + profile.host + ":" + profile.port,
+                label: name,
+            };
+            if (defaultName === name) {
+                items = [item].concat(items);
+            } else {
+                items.push(item);
+            }
+        });
+
+        const selectedProfile = await vscode.window.showQuickPick(items,
+            { placeHolder: "Select a zowe profile to search for copybooks", canPickMany: false });
+        if (selectedProfile) {
+            // TODO Switch to program specific profiles
+            await vscode.workspace.getConfiguration(SETTINGS_SECTION).update("profiles",
+                selectedProfile.label, false);
+            return selectedProfile.label;
+        }
+        return undefined;
+    }
+
+    public async getProfileFromSettings(profiles?: ProfilesMap): Promise<string | undefined> {
+        const auxProfiles: ProfilesMap = profiles ? profiles : await this.zoweApi.listZOSMFProfiles();
+        return this.tryGetProfileFromSettings(auxProfiles);
+    }
+
     async getProfile(programName?: string): Promise<string | undefined> {
         if (programName) {
             const detectedProfile: string | undefined = (await this.findProfileByDependenciesFile(programName));
@@ -52,30 +85,7 @@ export class ProfileService implements Disposable {
         if (Object.keys(profiles).length === 1) {
             return Object.keys(profiles)[0];
         }
-        const defaultName = this.zoweApi.getDefaultProfileName();
-        let items: vscode.QuickPickItem[] = [];
-        Object.keys(profiles).forEach(name => {
-            const profile: IProfile = profiles[name];
-            const item: vscode.QuickPickItem = {
-                description: profile.username + "@" + profile.host + ":" + profile.port,
-                label: name,
-            };
-            if (defaultName === name) {
-                items = [item].concat(items);
-            } else {
-                items.push(item);
-            }
-        });
-
-        const selectedProfile = await vscode.window.showQuickPick(items,
-            { placeHolder: "Select a zowe profile to search for copybooks", canPickMany: false });
-        if (selectedProfile) {
-            // TODO Switch to program specific profiles
-            await vscode.workspace.getConfiguration().update(SETTINGS_SECTION + ".profiles",
-                selectedProfile.label, false);
-            return selectedProfile.label;
-        }
-        return undefined;
+        return this.getProfileFromMultiple(profiles);
     }
 
     async updateStatusBar() {
@@ -90,6 +100,11 @@ export class ProfileService implements Disposable {
 
     dispose(): void {
         this.defaultProfileStatusBarItem.dispose();
+    }
+
+    public async checkMultipleProfiles(): Promise<boolean> {
+        const profiles: ProfilesMap = await this.listProfiles();
+        return Object.keys(profiles).length > 1;
     }
 
     private createStatusBarItem() {
@@ -123,7 +138,7 @@ export class ProfileService implements Disposable {
 
     private tryGetProfileFromSettings(profiles: ProfilesMap): string | undefined {
         // TODO switch from single profile to program specific profile
-        const profile: string = vscode.workspace.getConfiguration().get(SETTINGS_SECTION + ".profiles");
+        const profile: string = vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles");
 
         if (profiles[profile]) {
             return profile;
