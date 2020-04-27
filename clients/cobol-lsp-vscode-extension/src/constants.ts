@@ -16,3 +16,5 @@ export const PATHS_LOCAL_KEY = ".paths.local";
 export const DEPENDENCIES_FOLDER: string = ".cobdeps";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
 export const LANGUAGE_ID = "COBOL";
+export const REASON_MSG = "Configuration updated. Ensure your configuration contains correct paths to nested copybooks.";
+export const PROCESS_DOWNLOAD_ERROR_MSG = "Some copybooks could not be downloaded. Ensure your configuration contains correct paths to nested copybooks. Missing copybooks: ";
