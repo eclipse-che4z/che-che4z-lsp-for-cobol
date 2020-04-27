@@ -12,9 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as fs from "fs";
-import {SETTINGS_SECTION_LOCAL} from "../../constants";
 import {CopybookResolver} from "./CopybookResolver";
-import {SettingsUtils} from "./util/SettingsUtils";
 
 function fileExist(element: string): boolean {
     return fs.existsSync(element);

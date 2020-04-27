@@ -16,8 +16,7 @@ import * as fs from "fs";
 import * as path from "path";
 import {LocalCopybookResolver} from "../services/settings/LocalCopybookResolver";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
-import {SETTINGS_SECTION_LOCAL} from "../constants";
-import {func} from "vscode-languageclient/lib/utils/is";
+import {SETTINGS_SECTION, PATHS_LOCAL_KEY} from "../constants";
 
 const settingsParser: LocalCopybookResolver = new LocalCopybookResolver();
 const STAR_LOCATION = "*";
@@ -136,7 +135,7 @@ function assertResourceContent(list: string[], expectedSizeList: number ){
 
 function resolveCopybooksFromJSON(json: string): string[] {
     if (SettingsUtils.isValidJSON(json)) {
-        return settingsParser.resolve(JSON.parse(json)[SETTINGS_SECTION_LOCAL]);
+        return settingsParser.resolve(JSON.parse(json)[SETTINGS_SECTION+PATHS_LOCAL_KEY]);
     }
     return [];
 }

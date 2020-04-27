@@ -13,16 +13,18 @@
  */
 
 import * as vscode from "vscode";
-import {SETTINGS_SECTION} from "../constants";
+import {PATHS_LOCAL_KEY, SETTINGS_SECTION} from "../constants";
 import {CopybookResolver} from "../services/settings/CopybookResolver";
 
+
+
 export async function resolveLocalCopybooks(copybookResolver: CopybookResolver) {
-    if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has("local")) {
+    if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has(PATHS_LOCAL_KEY)) {
         await vscode.window.showErrorMessage("Please, specify LOCAL paths for copybooks in settings.");
         return [];
     }
 
-    const result: string[] = copybookResolver.resolve(vscode.workspace.getConfiguration(SETTINGS_SECTION).get("local"));
+    const result: string[] = copybookResolver.resolve(vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
     if (result.length === 0) {
         vscode.window.showInformationMessage("No resource found");
     } else {
