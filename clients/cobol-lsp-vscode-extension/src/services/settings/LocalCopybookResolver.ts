@@ -12,9 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as fs from "fs";
-import {SETTINGS_SECTION_LOCAL} from "../../constants";
 import {CopybookResolver} from "./CopybookResolver";
-import {SettingsUtils} from "./util/SettingsUtils";
 
 function fileExist(element: string): boolean {
     return fs.existsSync(element);
@@ -39,17 +37,6 @@ export class LocalCopybookResolver implements CopybookResolver {
             return [];
         }
         return resolveURIList(list).filter(uri => uri !== "");
-    }
-
-    /**
-     * @param json segment of the JSON setting that contains the key to access to the local path definition
-     * @return a list of resolved URIs, empty array if the JSON segment is not valid or the key is not found
-     */
-    public resolveCopybooksFromJSON(json: string): string[] {
-        if (SettingsUtils.isValidJSON(json)) {
-            return LocalCopybookResolver.parse(JSON.parse(json)[SETTINGS_SECTION_LOCAL]);
-        }
-        return [];
     }
 
     /**
