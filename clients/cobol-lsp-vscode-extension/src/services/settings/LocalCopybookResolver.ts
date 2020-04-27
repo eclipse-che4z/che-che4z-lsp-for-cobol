@@ -13,9 +13,10 @@
  */
 import * as fs from "fs";
 import {CopybookResolver} from "./CopybookResolver";
+import * as path from "path";
 
 function fileExist(element: string): boolean {
-    return fs.existsSync(element);
+    return fs.existsSync(path.normalize(element));
 }
 
 function resolveURIList(list: string[]): string[] {

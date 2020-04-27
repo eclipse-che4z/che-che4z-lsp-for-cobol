@@ -78,7 +78,11 @@ describe("validate bad path resource", () => {
     });
 
     test("a not valid path is not resolved and excluded from the result array within an heterogeneous array", () => {
-        assertResourceContent(["%", FILENAME_URI],1);
+        assertResourceContent(["%", FILENAME_URI], 1);
+    });
+
+    test("A resource with double slashes (or back slashes) are normalized before apply the search", () => {
+        assertResourceContent([FILENAME_URI.split("\\").join("//")], 1);
     });
 
 });
