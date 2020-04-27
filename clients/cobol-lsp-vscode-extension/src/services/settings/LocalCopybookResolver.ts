@@ -42,17 +42,6 @@ export class LocalCopybookResolver implements CopybookResolver {
     }
 
     /**
-     * @param json segment of the JSON setting that contains the key to access to the local path definition
-     * @return a list of resolved URIs, empty array if the JSON segment is not valid or the key is not found
-     */
-    public resolveCopybooksFromJSON(json: string): string[] {
-        if (SettingsUtils.isValidJSON(json)) {
-            return LocalCopybookResolver.parse(JSON.parse(json)[SETTINGS_SECTION_LOCAL]);
-        }
-        return [];
-    }
-
-    /**
      * @param list the provided list of physical path defined by the user
      * @return a list of resolved URIs, empty array if the input list doesn't contains any valid/found URIs
      */

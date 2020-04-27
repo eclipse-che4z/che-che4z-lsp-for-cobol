@@ -15,6 +15,9 @@
 import * as fs from "fs";
 import * as path from "path";
 import {LocalCopybookResolver} from "../services/settings/LocalCopybookResolver";
+import {SettingsUtils} from "../services/settings/util/SettingsUtils";
+import {SETTINGS_SECTION_LOCAL} from "../constants";
+import {func} from "vscode-languageclient/lib/utils/is";
 
 const settingsParser: LocalCopybookResolver = new LocalCopybookResolver();
 const STAR_LOCATION = "*";
@@ -49,11 +52,11 @@ describe("test parse method against bad setting configuration", () => {
 
 describe("test parse method with correct setting configuration", () => {
     test("parse a setting file with key 'LOCAL' return the values in an array", () => {
-        assertParseOf({"broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI]}, 1);
+        assertParseOf({"broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME_URI]}, 1);
     });
 
     test("parse a setting file with heterogeneous keys that include the key 'LOCAL' return the LOCAL's values in an array", () => {
-        assertParseOf({"key": "value", "broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI]}, 1);
+        assertParseOf({"key": "value", "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME_URI]}, 1);
     });
 
 });
@@ -89,7 +92,7 @@ describe("validate path resource with correct configuration", () => {
     it("a valid path written two times is included in the list only one time", () => {
         assertParseOf({
             "key": "value",
-            "broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI, FILENAME_URI],
+            "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME_URI, FILENAME_URI],
         }, 1);
     });
 
@@ -118,16 +121,26 @@ function prepareJson() {
 
     return {
         "key": "value",
-        "broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI],
+        "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME_URI],
     };
 }
 
 function assertParseOf(value: any, expectedSizeList: number) {
-    expect(settingsParser.resolveCopybooksFromJSON(JSON.stringify(value)).length).toBe(expectedSizeList);
+    expect(resolveCopybooksFromJSON(JSON.stringify(value)).length).toBe(expectedSizeList);
 }
 
 function assertResourceContent(list: string[], expectedSizeList: number ){
     expect(settingsParser.resolve(list).length).toBe(expectedSizeList)
 }
+
+
+function resolveCopybooksFromJSON(json: string): string[] {
+    if (SettingsUtils.isValidJSON(json)) {
+        return settingsParser.resolve(JSON.parse(json)[SETTINGS_SECTION_LOCAL]);
+    }
+    return [];
+}
+
+
 
 
