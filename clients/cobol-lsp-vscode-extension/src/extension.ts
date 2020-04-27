@@ -24,13 +24,13 @@ import { CopybooksDownloader } from "./services/CopybooksDownloader";
 import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
 import { initializeSettings } from "./services/Settings";
 
+import {resolveLocalCopybooks} from "./commands/ResolveLocalCopybooks";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { PathsService } from "./services/PathsService";
 import { ProfileService } from "./services/ProfileService";
-import { ProfilesMap, ZoweApi } from "./services/ZoweApi";
-import {resolveLocalCopybooks} from "./commands/ResolveLocalCopybooks";
-import {LocalCopybookResolver} from "./services/settings/LocalCopybookResolver";
 import {CopybookResolver} from "./services/settings/CopybookResolver";
+import {LocalCopybookResolver} from "./services/settings/LocalCopybookResolver";
+import { ZoweApi } from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
     initializeSettings();

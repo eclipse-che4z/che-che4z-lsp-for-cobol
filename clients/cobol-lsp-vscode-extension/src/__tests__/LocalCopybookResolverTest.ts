@@ -14,9 +14,9 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import {PATHS_LOCAL_KEY, SETTINGS_SECTION } from "../constants";
 import {LocalCopybookResolver} from "../services/settings/LocalCopybookResolver";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
-import {SETTINGS_SECTION, PATHS_LOCAL_KEY} from "../constants";
 
 const settingsParser: LocalCopybookResolver = new LocalCopybookResolver();
 const STAR_LOCATION = "*";
@@ -51,11 +51,11 @@ describe("test parse method against bad setting configuration", () => {
 
 describe("test parse method with correct setting configuration", () => {
     test("parse a setting file with key 'LOCAL' return the values in an array", () => {
-        assertParseOf({"broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI]}, 1);
+        assertParseOf({"broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME_URI]}, 1);
     });
 
     test("parse a setting file with heterogeneous keys that include the key 'LOCAL' return the LOCAL's values in an array", () => {
-        assertParseOf({"key": "value", "broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI]}, 1);
+        assertParseOf({"key": "value", "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME_URI]}, 1);
     });
 
 });
@@ -70,15 +70,19 @@ describe("validate bad path resource", () => {
     });
 
     test("an empty array of paths is resolved in an empty array returned", () => {
-        assertResourceContent([],0);
+        assertResourceContent([], 0);
     });
 
     test("a not valid path is not resolved and excluded from the result array", () => {
-        assertResourceContent(["%"],0);
+        assertResourceContent(["%"], 0);
     });
 
     test("a not valid path is not resolved and excluded from the result array within an heterogeneous array", () => {
-        assertResourceContent(["%", FILENAME_URI],1);
+        assertResourceContent(["%", FILENAME_URI], 1);
+    });
+
+    test("A resource with double slashes (or back slashes) are normalized before apply the search", () => {
+        assertResourceContent([FILENAME_URI.split("\\").join("//")], 1);
     });
 
 });
@@ -91,7 +95,7 @@ describe("validate path resource with correct configuration", () => {
     it("a valid path written two times is included in the list only one time", () => {
         assertParseOf({
             "key": "value",
-            "broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI, FILENAME_URI],
+            "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME_URI, FILENAME_URI],
         }, 1);
     });
 
@@ -103,6 +107,7 @@ function createFile(): string {
             return null;
         }
     });
+    //TODO: we have to mock the settings call to have in the list exactly the location of this temporary file..
     return path.resolve(FILENAME);
 }
 
@@ -120,7 +125,7 @@ function prepareJson() {
 
     return {
         "key": "value",
-        "broadcom-cobol-lsp.cpy-manager.local": [FILENAME_URI],
+        "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME_URI],
     };
 }
 
@@ -128,18 +133,13 @@ function assertParseOf(value: any, expectedSizeList: number) {
     expect(resolveCopybooksFromJSON(JSON.stringify(value)).length).toBe(expectedSizeList);
 }
 
-function assertResourceContent(list: string[], expectedSizeList: number ){
-    expect(settingsParser.resolve(list).length).toBe(expectedSizeList)
+function assertResourceContent(list: string[], expectedSizeList: number ) {
+    expect(settingsParser.resolve(list).length).toBe(expectedSizeList);
 }
-
 
 function resolveCopybooksFromJSON(json: string): string[] {
     if (SettingsUtils.isValidJSON(json)) {
-        return settingsParser.resolve(JSON.parse(json)[SETTINGS_SECTION+"."+PATHS_LOCAL_KEY]);
+        return settingsParser.resolve(JSON.parse(json)[SETTINGS_SECTION + "." + PATHS_LOCAL_KEY]);
     }
     return [];
 }
-
-
-
-
