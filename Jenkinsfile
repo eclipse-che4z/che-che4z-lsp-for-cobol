@@ -89,7 +89,8 @@ boolean isTimeTriggeredBuild() {
 pipeline {
     agent none
     triggers {
-        cron('0 0 * * 1-5')
+        // Schedule nightly build for development branch or for pull request
+        cron(branchName == 'development' || env.CHANGE_ID ? '0 0 * * 1-5' : '')
     }
     options {
         disableConcurrentBuilds()
@@ -191,7 +192,7 @@ pipeline {
                 // - release branch (names like release-x.y.z)
                 // - automatic nightly builds for "development" branch
                 // - automatic nightly builds for each open Pull Request
-                expression { branchName.startsWith("release") || (isTimeTriggeredBuild() && (branchName == 'development' || env.CHANGE_ID)) }
+                expression { branchName.startsWith("release") || isTimeTriggeredBuild() }
                 beforeAgent true
             }
             agent {
