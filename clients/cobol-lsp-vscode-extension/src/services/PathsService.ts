@@ -12,21 +12,21 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { SETTINGS_SECTION } from "../constants";
+import {PATHS_ZOWE, SETTINGS_SECTION} from "../constants";
 import * as vscode from "vscode";
 
 export class PathsService {
 
     async listPathDatasets(): Promise<string[]> {
-        if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has("paths.zowe")) {
+        if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has(PATHS_ZOWE)) {
             await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
             return [];
         }
-        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get("paths.zowe");
+        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);
     }
 
     setPathDatasets(paths: string[]) {
-        vscode.workspace.getConfiguration(SETTINGS_SECTION).update("paths.zowe", paths);
+        vscode.workspace.getConfiguration(SETTINGS_SECTION).update(PATHS_ZOWE, paths);
     }
 }
 

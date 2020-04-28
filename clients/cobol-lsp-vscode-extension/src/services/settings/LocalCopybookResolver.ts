@@ -12,16 +12,27 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as fs from "fs";
-import {CopybookResolver} from "./CopybookResolver";
 import * as path from "path";
+import {URL} from "url";
+import {CopybookResolver} from "./CopybookResolver";
+import {SettingsUtils} from "./util/SettingsUtils";
 
+/**
+ * This function search the presence of a file within a list of workspace folders defined on the client.
+ * @param element represent the resource to search within the workspace folder list
+ */
+//TODO: could be defined in a setting file?
 function fileExist(element: string): boolean {
-    return fs.existsSync(path.normalize(element));
+    for (const workspaceFolder of SettingsUtils.getWorkspacesURI()) {
+        if (fs.existsSync(new URL(path.join(workspaceFolder, element)))) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function resolveURIList(list: string[]): string[] {
     const result: Set<string> = new Set<string>();
-
     list.filter(element => element !== "*" && fileExist(element)).forEach(location => {
         result.add(decodeURI(location));
     });

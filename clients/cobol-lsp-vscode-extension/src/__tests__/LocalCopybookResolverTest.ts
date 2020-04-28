@@ -14,9 +14,9 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import {PATHS_LOCAL_KEY, SETTINGS_SECTION } from "../constants";
 import {LocalCopybookResolver} from "../services/settings/LocalCopybookResolver";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
-import {SETTINGS_SECTION, PATHS_LOCAL_KEY} from "../constants";
 
 const settingsParser: LocalCopybookResolver = new LocalCopybookResolver();
 const STAR_LOCATION = "*";
@@ -70,11 +70,11 @@ describe("validate bad path resource", () => {
     });
 
     test("an empty array of paths is resolved in an empty array returned", () => {
-        assertResourceContent([],0);
+        assertResourceContent([], 0);
     });
 
     test("a not valid path is not resolved and excluded from the result array", () => {
-        assertResourceContent(["%"],0);
+        assertResourceContent(["%"], 0);
     });
 
     test("a not valid path is not resolved and excluded from the result array within an heterogeneous array", () => {
@@ -107,6 +107,7 @@ function createFile(): string {
             return null;
         }
     });
+    //TODO: we have to mock the settings call to have in the list exactly the location of this temporary file..
     return path.resolve(FILENAME);
 }
 
@@ -132,13 +133,13 @@ function assertParseOf(value: any, expectedSizeList: number) {
     expect(resolveCopybooksFromJSON(JSON.stringify(value)).length).toBe(expectedSizeList);
 }
 
-function assertResourceContent(list: string[], expectedSizeList: number ){
-    expect(settingsParser.resolve(list).length).toBe(expectedSizeList)
+function assertResourceContent(list: string[], expectedSizeList: number ) {
+    expect(settingsParser.resolve(list).length).toBe(expectedSizeList);
 }
 
 function resolveCopybooksFromJSON(json: string): string[] {
     if (SettingsUtils.isValidJSON(json)) {
-        return settingsParser.resolve(JSON.parse(json)[SETTINGS_SECTION+"."+PATHS_LOCAL_KEY]);
+        return settingsParser.resolve(JSON.parse(json)[SETTINGS_SECTION + "." + PATHS_LOCAL_KEY]);
     }
     return [];
 }
