@@ -90,7 +90,7 @@ pipeline {
     agent none
     triggers {
         // Schedule nightly build for development branch or for pull request
-        cron(branchName == 'development' || env.CHANGE_ID ? '0 0 * * 1-5' : '')
+        cron(env.BRANCH_NAME == 'development' || env.CHANGE_ID ? '0 0 * * 1-5' : '')
     }
     options {
         disableConcurrentBuilds()
