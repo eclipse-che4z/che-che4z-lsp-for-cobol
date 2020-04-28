@@ -100,7 +100,7 @@ public class ServerCommunications implements Communications {
   public void notifyThatDocumentAnalysed(String uri) {
     CompletableFuture.runAsync(
         () ->
-            showMessage(
+            logMessage(
                 MessageType.Info,
                 "No syntax errors detected in " + retrieveFileName(decodeURI(uri))));
   }
@@ -167,6 +167,10 @@ public class ServerCommunications implements Communications {
 
   private void showMessage(MessageType type, String message) {
     getClient().showMessage(new MessageParams(type, clean(message)));
+  }
+
+  private void logMessage(MessageType type, String message) {
+    getClient().logMessage(new MessageParams(type, clean(message)));
   }
 
   private LanguageClient getClient() {
