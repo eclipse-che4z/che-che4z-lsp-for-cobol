@@ -11,7 +11,7 @@
 
 # COBOL Language Support
 
-COBOL Language Support standardizes the communication between language tooling for COBOL and your code editor. Files with the extensions .COB and .CBL are recognized as COBOL files.
+COBOL Language Support leverages the language server protocol to provide autocomplete, highlighting and diagnostic features for COBOL code and copybooks. Files with the extensions .COB and .CBL are recognized as COBOL files.
 
 > How can we improve COBOL Language Support? [Let us know on our Git repository](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues)
 
