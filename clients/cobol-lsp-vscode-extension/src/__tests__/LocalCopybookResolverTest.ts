@@ -21,10 +21,12 @@ import {SettingsUtils} from "../services/settings/util/SettingsUtils";
 const settingsParser: LocalCopybookResolver = new LocalCopybookResolver();
 const STAR_LOCATION = "*";
 const FILENAME: string = "test.cbl";
-let FILENAME_URI: string = "";
 
 beforeAll(() => {
-    FILENAME_URI = createFile();
+    const FILENAME_URI = createFile();
+    const filePathURI: string = path.dirname(FILENAME_URI);
+    //NOTE: mock the method to obtain an URI in the format: [file://URI_FOLDER] - doesn't contain the file name with ext.
+    SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + filePathURI]);
 });
 
 afterAll(() => {
@@ -51,11 +53,11 @@ describe("test parse method against bad setting configuration", () => {
 
 describe("test parse method with correct setting configuration", () => {
     test("parse a setting file with key 'LOCAL' return the values in an array", () => {
-        assertParseOf({"broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME_URI]}, 1);
+        assertParseOf({"broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME]}, 1);
     });
 
     test("parse a setting file with heterogeneous keys that include the key 'LOCAL' return the LOCAL's values in an array", () => {
-        assertParseOf({"key": "value", "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME_URI]}, 1);
+        assertParseOf({"key": "value", "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME]}, 1);
     });
 
 });
@@ -66,7 +68,7 @@ describe("validate bad path resource", () => {
     });
 
     test("an array of paths defined where an item is '*' is not resolved within an heterogeneous array and is excluded from the result", () => {
-       assertResourceContent([FILENAME_URI, STAR_LOCATION], 1);
+       assertResourceContent([FILENAME, STAR_LOCATION], 1);
     });
 
     test("an empty array of paths is resolved in an empty array returned", () => {
@@ -78,11 +80,11 @@ describe("validate bad path resource", () => {
     });
 
     test("a not valid path is not resolved and excluded from the result array within an heterogeneous array", () => {
-        assertResourceContent(["%", FILENAME_URI], 1);
+        assertResourceContent(["%", FILENAME], 1);
     });
 
     test("A resource with double slashes (or back slashes) are normalized before apply the search", () => {
-        assertResourceContent([FILENAME_URI.split("\\").join("//")], 1);
+        assertResourceContent([FILENAME.split("\\").join("//")], 1);
     });
 
 });
@@ -95,7 +97,7 @@ describe("validate path resource with correct configuration", () => {
     it("a valid path written two times is included in the list only one time", () => {
         assertParseOf({
             "key": "value",
-            "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME_URI, FILENAME_URI],
+            "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME, FILENAME],
         }, 1);
     });
 
@@ -107,7 +109,6 @@ function createFile(): string {
             return null;
         }
     });
-    //TODO: we have to mock the settings call to have in the list exactly the location of this temporary file..
     return path.resolve(FILENAME);
 }
 
@@ -119,13 +120,13 @@ function deleteTempFile() {
 }
 
 function prepareJson() {
-    if (FILENAME_URI === null) {
-        throw new Error("URI not found");
+    if (FILENAME === null) {
+        throw new Error("File not found");
     }
 
     return {
         "key": "value",
-        "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME_URI],
+        "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME],
     };
 }
 
