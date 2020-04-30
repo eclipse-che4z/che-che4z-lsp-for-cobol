@@ -18,23 +18,26 @@ import {CopybookResolver} from "./CopybookResolver";
 import {SettingsUtils} from "./util/SettingsUtils";
 
 /**
- * This function search the presence of a file within a list of workspace folders defined on the client.
- * @param element represent the resource to search within the workspace folder list
+ * This function construct an URI from a valid resource provided from the setting configuration
+ * @param resource represent the file to search within the workspace folder list
+ * @return an URI representation of the file or undefined if not found
  */
-//TODO: could be defined in a setting file?
-function fileExist(element: string): boolean {
+function getURIFromResource(resource: string): URL {
     for (const workspaceFolder of SettingsUtils.getWorkspacesURI()) {
-        if (fs.existsSync(new URL(path.join(workspaceFolder, element)))) {
-            return true;
+        const uri: URL = new URL(path.join(workspaceFolder, resource));
+        if (fs.existsSync(uri)) {
+            return uri;
         }
     }
-    return false;
 }
 
 function resolveURIList(list: string[]): string[] {
     const result: Set<string> = new Set<string>();
-    list.filter(element => element !== "*" && fileExist(element)).forEach(location => {
-        result.add(decodeURI(location));
+    list.filter(resource => resource !== "*").forEach(resource => {
+        const URI: URL = getURIFromResource(resource);
+        if (URI !== undefined) {
+            result.add(URI.href);
+        }
     });
     return [...result];
 }

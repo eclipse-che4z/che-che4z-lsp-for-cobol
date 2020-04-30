@@ -12,8 +12,8 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {PATHS_ZOWE, SETTINGS_SECTION} from "../constants";
 import * as vscode from "vscode";
+import {PATHS_ZOWE, SETTINGS_SECTION} from "../constants";
 
 export class PathsService {
 

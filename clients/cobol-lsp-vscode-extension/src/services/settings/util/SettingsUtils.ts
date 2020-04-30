@@ -1,6 +1,4 @@
 import * as vscode from "vscode";
-import {URL} from "url";
-import * as fs from "fs";
 /*
  * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
@@ -19,7 +17,6 @@ export class SettingsUtils {
         return (json !== undefined && json.trim().length > 0);
     }
 
-    // TODO: Is necessary add unit test? vsc call will be mocked..
     /**From a configuration of single/multi workspace folders, their URIs are collected and returned in a util method.
      * @returns list of resolved URI in FS style
      */
