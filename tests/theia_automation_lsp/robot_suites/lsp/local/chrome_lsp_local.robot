@@ -50,7 +50,7 @@ ${Semantic Error Line}   40
 ${Semantic Hint}    Invalid definition for: USER-CITY1COBOL Language Support - I
 
 ${Line With Spaces}    35
-${Space Hint}   This format is not a FIXED formatCOBOL Language Support - E
+${Space Hint}   The line doesn't match the fixed formatCOBOL Language Support - E
 
 ${Snippet Line}   41
 ${Snippet}   ADD id TO id
@@ -104,7 +104,7 @@ Open Member Macro
 
 *** Test Cases ***
 TC152046 Nominal - check syntax Ok message
-    [Tags]  TC152046  COBOL_LOCAL  LSP  Chrome  Rally
+    [Tags]  TC152046  COBOL_LOCAL  LSP  Chrome  Rally  Unstable
     [Documentation]  Checks that when opening Cobol file with correct syntax there is an appropriate message is shown
     ${Explorer Title Node} =  Find File Explorer Panel
     ${Top File Element} =  Find First Element In Files Explorer
@@ -180,7 +180,7 @@ TC152049 Navigate through definitions
     Close Tab  ${Editor}  ${Active Tab}
 
 TC152080 Find all references
-    [Tags]  TC152080  COBOL_LOCAL  LSP  Chrome  Rally
+    [Tags]  TC152080  COBOL_LOCAL  LSP  Chrome  Rally  Unstable
     [Documentation]  Checks that LSP can find all references and navigate by them
     ${Explorer Title Node} =  Find File Explorer Panel
     ${Top File Element} =  Find First Element In Files Explorer
