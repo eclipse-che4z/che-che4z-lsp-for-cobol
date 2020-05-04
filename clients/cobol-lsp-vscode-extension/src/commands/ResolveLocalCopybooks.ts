@@ -23,6 +23,9 @@ export async function resolveLocalCopybooks(copybookResolver: CopybookResolver) 
     }
 
     const result: string[] = copybookResolver.resolve(vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
+    //TODO: Will be removed after test on CHE
+    vscode.window.showInformationMessage(vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
+
     if (result.length === 0) {
         vscode.window.showInformationMessage("No resource found");
     } else {

@@ -75,7 +75,7 @@
                     "type": "string",
                     "description": "Current default profile for copybook downloader"
                 },
-                "broadcom-cobol-lsp.cpy-manager.paths.zowe": {
+                "broadcom-cobol-lsp.cpy-manager.paths.dsn": {
                     "type": "array",
                     "items": {
                         "type": "string"
