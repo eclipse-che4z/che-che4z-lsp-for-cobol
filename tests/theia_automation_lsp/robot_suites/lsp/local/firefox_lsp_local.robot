@@ -104,7 +104,7 @@ Open Member Macro
 
 *** Test Cases ***
 TC152046 Nominal - check syntax Ok message
-    [Tags]  TC152046  COBOL_LOCAL  LSP  FireFox  Rally
+    [Tags]  TC152046  COBOL_LOCAL  LSP  FireFox  Rally  Unstable
     [Documentation]  Checks that when opening Cobol file with correct syntax there is an appropriate message is shown
     ${Explorer Title Node} =  Find File Explorer Panel
     ${Top File Element} =  Find First Element In Files Explorer
@@ -180,7 +180,7 @@ TC152049 Navigate through definitions
     Close Tab  ${Editor}  ${Active Tab}
 
 TC152080 Find all references
-    [Tags]  TC152080  COBOL_LOCAL  LSP  FireFox  Rally
+    [Tags]  TC152080  COBOL_LOCAL  LSP  FireFox  Rally  Unstable
     [Documentation]  Checks that LSP can find all references and navigate by them
     ${Explorer Title Node} =  Find File Explorer Panel
     ${Top File Element} =  Find First Element In Files Explorer
