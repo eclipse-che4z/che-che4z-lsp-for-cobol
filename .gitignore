@@ -123,3 +123,7 @@ node_modules
 tools
 logs/app.log
 dist
+
+# ignore COBOL lang-support files, but not settings.json
+.broadcom/**
+!settings.json
