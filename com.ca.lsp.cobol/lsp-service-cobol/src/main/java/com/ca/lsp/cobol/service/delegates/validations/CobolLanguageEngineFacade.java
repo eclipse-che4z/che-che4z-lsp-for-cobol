@@ -20,10 +20,8 @@ import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
-import com.ca.lsp.core.cobol.semantics.SubContext;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Location;
@@ -41,7 +39,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
-@Slf4j
 @Singleton
 public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final int FIRST_LINE_SEQ_AND_EXTRA_OP = 8;
@@ -130,34 +127,24 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   }
 
   private AnalysisResult toAnalysisResult(ResultWithErrors<SemanticContext> result, String uri) {
+    SemanticContext context = result.getResult();
     return new AnalysisResult(
         convertErrors(result.getErrors(), uri),
-        retrieveDefinitions(result.getResult().getVariables()),
-        retrieveUsages(result.getResult().getVariables()),
-        retrieveDefinitions(result.getResult().getParagraphs()),
-        retrieveUsages(result.getResult().getParagraphs()),
-        retrieveDefinitions(result.getResult().getCopybooks()),
-        retrieveUsages(result.getResult().getCopybooks()));
+        convertPositions(context.getVariableDefinitions()),
+        convertPositions(context.getVariableUsages()),
+        convertPositions(context.getParagraphDefinitions()),
+        convertPositions(context.getParagraphUsages()),
+        convertPositions(context.getCopybookDefinitions()),
+        convertPositions(context.getCopybookUsages()));
   }
 
-  private Map<String, List<Location>> retrieveDefinitions(SubContext<?> context) {
-    return retrieveMap(context.getDefinitions().asMap());
+  private Map<String, List<Location>> convertPositions(Map<String, Collection<Position>> source) {
+    return source.entrySet().stream().collect(toMap(Map.Entry::getKey, this::convertPosition));
   }
 
-  private Map<String, List<Location>> retrieveUsages(SubContext<?> context) {
-    return retrieveMap(context.getUsages().asMap());
-  }
-
-  private Map<String, List<Location>> retrieveMap(Map<String, Collection<Position>> map) {
-    return map.entrySet().stream()
-        .collect(
-            toMap(
-                Map.Entry::getKey,
-                entry ->
-                    entry.getValue().stream()
-                        .map(
-                            position ->
-                                new Location(position.getDocumentURI(), convertRange(position)))
-                        .collect(toList())));
+  private List<Location> convertPosition(Map.Entry<String, Collection<Position>> entry) {
+    return entry.getValue().stream()
+        .map(position -> new Location(position.getDocumentURI(), convertRange(position)))
+        .collect(toList());
   }
 }

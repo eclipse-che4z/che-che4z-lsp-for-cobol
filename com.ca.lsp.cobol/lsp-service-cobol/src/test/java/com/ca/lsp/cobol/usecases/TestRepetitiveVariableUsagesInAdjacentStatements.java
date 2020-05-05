@@ -18,17 +18,13 @@ package com.ca.lsp.cobol.usecases;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * This test checks that document with multi-definitions parsed correctly and all the usages of
@@ -156,23 +152,5 @@ public class TestRepetitiveVariableUsagesInAdjacentStatements {
     assertLocation(usages, STR, DOCUMENT_URI, 17, 36);
     assertLocation(usages, STR, DOCUMENT_URI, 18, 36);
     assertLocation(usages, STR, DOCUMENT_URI, 19, 36);
-  }
-
-  private void assertNumberOfLocations(
-      Map<String, List<Location>> source, String name, int number) {
-    assertEquals("Number of " + name + " usages: ", number, source.get(name).size());
-  }
-
-  private void assertLocation(
-      Map<String, List<Location>> source, String name, String uri, int line, int startChar) {
-    List<Location> locations = source.get(name);
-    Location expected =
-        new Location(
-            uri,
-            new Range(
-                new Position(line, startChar), new Position(line, startChar + name.length())));
-    assertTrue(
-        "Expected location for " + name + " not found: " + expected.toString(),
-        locations.contains(expected));
   }
 }

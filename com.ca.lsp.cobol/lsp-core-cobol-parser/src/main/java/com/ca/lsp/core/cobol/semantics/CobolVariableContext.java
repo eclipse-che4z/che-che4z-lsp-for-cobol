@@ -16,44 +16,44 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 /**
  * This class represents a structure to store variables of a COBOL program and build a variable
  * hierarchy.
  */
-public class CobolVariableContext implements SubContext<Variable> {
+public class CobolVariableContext<T> implements SubContext<Variable, T> {
   private static final int LEVEL_77 = 77;
   private static final int LEVEL_66 = 66;
 
   private final List<Variable> variables = new ArrayList<>();
-  private final Multimap<String, Position> variableDefinitions = HashMultimap.create();
-  private final Multimap<String, Position> variableUsages = HashMultimap.create();
+  private final Multimap<String, T> variableDefinitions = HashMultimap.create();
+  private final Multimap<String, T> variableUsages = HashMultimap.create();
 
   @Override
-  public void define(Variable variable, Position position) {
+  public void define(Variable variable, T position) {
     variables.add(variable);
     variableDefinitions.put(variable.getName(), position);
+    createRelationBetweenVariables();
   }
 
   @Override
-  public void addUsage(String variableName, Position position) {
+  public void addUsage(String variableName, T position) {
     variableUsages.put(variableName, position);
   }
 
   @Override
   public List<Variable> getAll() {
-    return Collections.unmodifiableList(variables);
+    return unmodifiableList(variables);
   }
 
   @Override
@@ -62,25 +62,24 @@ public class CobolVariableContext implements SubContext<Variable> {
   }
 
   @Override
-  public Multimap<String, Position> getDefinitions() {
+  public Multimap<String, T> getDefinitions() {
     return variableDefinitions;
   }
 
   @Override
-  public Multimap<String, Position> getUsages() {
+  public Multimap<String, T> getUsages() {
     return variableUsages;
   }
 
   @Override
-  public void merge(SubContext<Variable> subContext) {
+  public void merge(SubContext<Variable, T> subContext) {
     variableDefinitions.putAll(subContext.getDefinitions());
     variableUsages.putAll(subContext.getUsages());
   }
 
   public Variable get(String name) {
     return variables.stream()
-        .filter(
-            variable -> Optional.ofNullable(variable.getName()).orElse("").equalsIgnoreCase(name))
+        .filter(variable -> ofNullable(variable.getName()).orElse("").equalsIgnoreCase(name))
         .findFirst()
         .orElse(null);
   }
@@ -92,6 +91,10 @@ public class CobolVariableContext implements SubContext<Variable> {
    */
   public boolean parentContainsSpecificChild(String rootVariableName, String targetVariableName) {
     Variable rootVariable = get(rootVariableName);
+
+    if (rootVariable == null) {
+      return false;
+    }
 
     if (rootVariable.getChildren().contains(targetVariableName)) {
       return true;
@@ -106,7 +109,7 @@ public class CobolVariableContext implements SubContext<Variable> {
     return false;
   }
 
-  public void createRelationBetweenVariables() {
+  private void createRelationBetweenVariables() {
     // variable with level number [ 77 ] are not part of list used to generate the structure because
     // it cannot be a group item but just an element item
     List<Variable> variableList =

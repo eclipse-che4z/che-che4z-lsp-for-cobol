@@ -19,19 +19,22 @@ import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 
-public class TestMappingWIthReplacing {
+/**
+ * This test verifies that the replacing statement changes the variable names in the given copybook
+ * by the provided pattern. Here, :TAG: should be replaced with CSTOUT, so the copybook content
+ * processed as CSTOUT-KEY and CSTOUT-ID, and those variables are available for "Go to Definition"
+ * request.
+ */
+public class TestMappingWithReplacing {
 
   private static final String DOCUMENT =
       "       IDENTIFICATION DIVISION.\r\n"
@@ -48,9 +51,12 @@ public class TestMappingWIthReplacing {
   private static final String CUSTCOPY =
       "           05  :TAG:-KEY.\r\n" + "               10  :TAG:-ID             PIC 9.\r\n";
 
+  private static final String CUSTCOPY_NAME = "CUSTCOPY";
+
   @Test
   public void test() {
-    AnalysisResult result = analyze(DOCUMENT, singletonList(new CobolText("CUSTCOPY", CUSTCOPY)));
+    AnalysisResult result =
+        analyze(DOCUMENT, singletonList(new CobolText(CUSTCOPY_NAME, CUSTCOPY)));
 
     assertDiagnostics(result.getDiagnostics());
     assertCopybookUsages(result.getCopybookUsages());
@@ -68,7 +74,8 @@ public class TestMappingWIthReplacing {
 
   private void assertCopybookUsages(Map<String, List<Location>> copybookUsages) {
     assertEquals("Copybook usages: " + copybookUsages.toString(), 1, copybookUsages.size());
-    assertSingleLocation(copybookUsages, "CUSTCOPY", DOCUMENT_URI, 5, 12);
+    assertNumberOfLocations(copybookUsages, CUSTCOPY_NAME, 1);
+    assertLocation(copybookUsages, CUSTCOPY_NAME, DOCUMENT_URI, 5, 12);
   }
 
   private void assertParagraphUsages(Map<String, List<Location>> paragraphUsages) {
@@ -80,35 +87,35 @@ public class TestMappingWIthReplacing {
         "Paragraph definitions: " + paragraphDefinitions.toString(),
         1,
         paragraphDefinitions.size());
-    assertSingleLocation(paragraphDefinitions, "MAINLINE", DOCUMENT_URI, 7, 7);
+
+    assertNumberOfLocations(paragraphDefinitions, "MAINLINE", 1);
+    assertLocation(paragraphDefinitions, "MAINLINE", DOCUMENT_URI, 7, 7);
   }
 
   private void assertVariableUsages(Map<String, List<Location>> variableUsages) {
     assertEquals("Variable usages: " + variableUsages.toString(), 3, variableUsages.size());
 
-    assertSingleLocation(variableUsages, "PARENT", DOCUMENT_URI, 8, 48);
-    assertSingleLocation(variableUsages, "CSTOUT-KEY", DOCUMENT_URI, 8, 34);
-    assertSingleLocation(variableUsages, "CSTOUT-ID", DOCUMENT_URI, 8, 21);
+    assertNumberOfLocations(variableUsages, "PARENT", 1);
+    assertLocation(variableUsages, "PARENT", DOCUMENT_URI, 8, 48);
+
+    assertNumberOfLocations(variableUsages, "CSTOUT-KEY", 1);
+    assertLocation(variableUsages, "CSTOUT-KEY", DOCUMENT_URI, 8, 34);
+
+    assertNumberOfLocations(variableUsages, "CSTOUT-ID", 1);
+    assertLocation(variableUsages, "CSTOUT-ID", DOCUMENT_URI, 8, 21);
   }
 
   private void assertVariableDefinitions(Map<String, List<Location>> variableDefinitions) {
     assertEquals(
         "Variable usages: " + variableDefinitions.toString(), 3, variableDefinitions.size());
-    assertSingleLocation(variableDefinitions, "PARENT", DOCUMENT_URI, 4, 11);
-    assertSingleLocation(variableDefinitions, "CSTOUT-KEY", "CUSTCOPY", 0, 15);
-    assertSingleLocation(variableDefinitions, "CSTOUT-ID", "CUSTCOPY", 1, 19);
-  }
 
-  private void assertSingleLocation(
-      Map<String, List<Location>> source, String name, String parent, int line, int start) {
-    List<Location> locations = source.get(name);
+    assertNumberOfLocations(variableDefinitions, "PARENT", 1);
+    assertLocation(variableDefinitions, "PARENT", DOCUMENT_URI, 4, 11);
 
-    assertEquals("Number of " + name + "locations: ", 1, locations.size());
-    assertEquals(
-        name + " location:",
-        new Location(
-            parent,
-            new Range(new Position(line, start), new Position(line, start + name.length()))),
-        locations.get(0));
+    assertNumberOfLocations(variableDefinitions, "CSTOUT-KEY", 1);
+    assertLocation(variableDefinitions, "CSTOUT-KEY", CUSTCOPY_NAME, 0, 15);
+
+    assertNumberOfLocations(variableDefinitions, "CSTOUT-ID", 1);
+    assertLocation(variableDefinitions, "CSTOUT-ID", CUSTCOPY_NAME, 1, 19);
   }
 }

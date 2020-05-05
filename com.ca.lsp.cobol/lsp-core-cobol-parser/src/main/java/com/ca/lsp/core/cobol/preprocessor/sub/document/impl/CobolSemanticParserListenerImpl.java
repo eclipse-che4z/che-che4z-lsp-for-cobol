@@ -15,9 +15,6 @@ package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.*;
-import com.ca.lsp.core.cobol.parser.CobolLexer;
-import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.parser.CobolParserBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.*;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
@@ -25,15 +22,15 @@ import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListen
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
-import com.ca.lsp.core.cobol.semantics.CobolNamedContext;
-import com.ca.lsp.core.cobol.semantics.SubContext;
+import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.BufferedTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import javax.annotation.Nonnull;
@@ -41,10 +38,11 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.NEWLINE;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
+import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.convertTokensToPositions;
+import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.retrieveTokens;
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
+import static java.util.Optional.ofNullable;
 
 /**
  * ANTLR visitor, which preprocesses a given COBOL program by executing COPY and REPLACE statements.
@@ -58,8 +56,9 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private static final String ERROR_SUGGESTION = "%s: Copybook not found";
 
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
-  @Getter private final SubContext<String> usedCopybooks = new CobolNamedContext();
-  @Getter private final Map<String, List<Position>> innerMappings = new HashMap<>();
+  @Getter private final NamedSubContext<Position> copybooks = new NamedSubContext<>();
+
+  @Getter private final Map<String, List<Position>> documentMappings = new HashMap<>();
 
   private PreprocessorCleanerServiceImpl cleaner;
   private String documentUri;
@@ -90,7 +89,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   @Nonnull
   @Override
   public String getResult() {
-    return cleaner.context().read();
+    return cleaner.peek().read();
   }
 
   @Override
@@ -177,124 +176,132 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     cleaner.pop();
 
     // a new context for the copy book content
-    cleaner.context().write(" *>CPYENTER ");
+    cleaner.peek().write(CPY_ENTER_TAG);
     /*
      * copy the copy book
      */
     String copybookName = retrieveCopybookName(ctx.copySource());
     Position position = retrievePosition(ctx.copySource());
-    String copyBookContent = getCopyBookContent(copybookName, position);
+
+    addCopybookUsage(copybookName, position);
+
+    CopybookModel model = getCopyBookContent(copybookName, position);
+    String copybookContent = model.getContent();
 
     List<ReplacingPhraseContext> replacingPhraseContexts = ctx.replacingPhrase();
     if (!replacingPhraseContexts.isEmpty()) {
-
-      String copybookWithReplacingName =
-          copybookName
-              + replacingPhraseContexts.stream()
-                  .map(RuleContext::getText)
-                  .reduce((r1, r2) -> r1 + r2)
-                  .orElse("")
-                  .replaceAll("[^a-zA-Z0-9]+", "")
-                  .trim();
-
-      cleaner.context().write(copybookWithReplacingName + ". ");
-      cleaner.push();
-      for (ReplacingPhraseContext replacingPhrase : replacingPhraseContexts) {
-        cleaner.context().storeReplaceablesAndReplacements(replacingPhrase.replaceClause());
-      }
-
-      cleaner.context().write(copyBookContent);
-      cleaner.context().replaceReplaceablesByReplacements(tokens);
-      List<Position> tokenMapping = createTokenMapping(copybookName, cleaner.context().read());
-      innerMappings.put(copybookWithReplacingName, tokenMapping);
-      cleaner.context().write(NEWLINE + " *>CPYEXIT. ");
-
+      applyReplacing(copybookName, model.getUri(), copybookContent, replacingPhraseContexts);
     } else {
-      cleaner.push();
-      writeCopybookContent(copybookName, copyBookContent);
+      writeCopybookContent(copybookName, copybookContent);
     }
 
-    String content = cleaner.context().read();
+    String content = cleaner.peek().read();
     cleaner.pop();
 
-    cleaner.context().write(content);
+    cleaner.peek().write(content);
   }
 
-  private List<Position> createTokenMapping(@Nonnull String uri, @Nonnull String code) {
-    CobolLexer lexer = new CobolLexer(CharStreams.fromString(code));
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    CobolParser parser = new CobolParser(tokens);
-    CobolParser.StartRuleContext tree = parser.startRule();
+  private void applyReplacing(
+      String copybookName,
+      String uri,
+      String copybookContent,
+      List<ReplacingPhraseContext> replacingPhraseContexts) {
+    String copybookWithReplacingName =
+        getUniqueNameForReplacing(copybookName, replacingPhraseContexts);
 
-    ParseTreeWalker walker = new ParseTreeWalker();
-    walker.walk(new CobolParserBaseListener(), tree);
-    return convertTokensToPositions(uri, tokens);
+    cleaner.peek().write(copybookWithReplacingName + ". ");
+    CobolDocumentContext documentContext = cleaner.push();
+    replacingPhraseContexts.forEach(
+        it -> documentContext.storeReplaceablesAndReplacements(it.replaceClause()));
+
+    documentContext.write(copybookContent);
+    documentContext.replaceReplaceablesByReplacements(tokens);
+
+    documentMappings.put(
+        copybookWithReplacingName,
+        convertTokensToPositions(uri, retrieveTokens(documentContext.read())));
+    documentContext.write(CPY_EXIT_TAG);
   }
 
-  private List<Position> convertTokensToPositions(@Nonnull String uri, CommonTokenStream tokens) {
-    return tokens.getTokens().stream()
-        .map(
-            it ->
-                new Position(
-                    uri,
-                    it.getStartIndex(),
-                    it.getStopIndex(),
-                    it.getLine(),
-                    it.getCharPositionInLine(),
-                    it.getText()))
-        .collect(toList());
+  private String getUniqueNameForReplacing(
+      String copybookName, List<ReplacingPhraseContext> replacingPhraseContexts) {
+    return copybookName
+        + replacingPhraseContexts.stream()
+            .map(RuleContext::getText)
+            .reduce((r1, r2) -> r1 + r2)
+            .orElse("")
+            .replaceAll("[^a-zA-Z0-9]+", "")
+            .trim();
   }
 
   private void writeCopybookContent(String copybookName, String copyBookContent) {
-    cleaner.context().write(copybookName + ". " + copyBookContent + NEWLINE + " *>CPYEXIT. ");
+    cleaner.push().write(copybookName + ". " + copyBookContent + CPY_EXIT_TAG);
   }
 
-  private String getCopyBookContent(String copybookName, Position position) {
-    /*
-     * define the copy book
-     */
-    if (copybookName == null) return "";
-    defineCopybook(copybookName, position);
+  private CopybookModel getCopyBookContent(String copybookName, Position position) {
+
+    if (copybookName == null) return emptyModel(null);
+
     checkCopybookNameLength(copybookName, position);
 
-    if (copybookStack.stream().map(CopybookUsage::getName).anyMatch(copybookName::equals)) {
-      copybookStack.forEach(
-          it ->
-              errors.add(
-                  SyntaxError.syntaxError()
-                      .severity(1)
-                      .suggestion(String.format(RECURSION_DETECTED, it.getName()))
-                      .position(it.getPosition())
-                      .build()));
-      return "";
+    if (hasRecursion(copybookName)) {
+      copybookStack.forEach(this::reportRecursiveCopybook);
+      return emptyModel(copybookName);
     }
 
     CopybookModel copybook =
         resolutions.get().resolve(copybookName, documentUri, textDocumentSyncType);
 
     if (copybook == null || copybook.getContent() == null) {
-      errors.add(
-          SyntaxError.syntaxError()
-              .position(position)
-              .suggestion(format(ERROR_SUGGESTION, copybookName))
-              .severity(1)
-              .errorCode(MISSING_COPYBOOK)
-              .build());
-      return "";
+      reportMissingCopybooks(copybookName, position);
+      return emptyModel(copybookName);
     }
 
-    copybookStack.push(new CopybookUsage(copybookName, null, position));
+    ExtendedDocument document = processCopybook(copybookName, position, copybook);
+    documentMappings.putAll(document.getDocumentPositions());
+    copybooks.merge(document.getCopybooks());
+
+    return new CopybookModel(copybookName, copybook.getUri(), document.getText());
+  }
+
+  private boolean hasRecursion(String copybookName) {
+    return copybookStack.stream().map(CopybookUsage::getName).anyMatch(copybookName::equals);
+  }
+
+  private ExtendedDocument processCopybook(
+      String copybookName, Position position, CopybookModel copybook) {
+    copybookStack.push(new CopybookUsage(copybookName, position));
     ResultWithErrors<ExtendedDocument> result =
         preprocessor.process(
             copybook.getUri(), copybook.getContent(), copybookStack, textDocumentSyncType);
+    copybookStack.pop();
+
     errors.addAll(result.getErrors());
 
-    ExtendedDocument input = result.getResult();
-    innerMappings.putAll(input.getTokenMapping());
-    usedCopybooks.merge(input.getUsedCopybooks());
+    return result.getResult();
+  }
 
-    copybookStack.pop();
-    return input.getText();
+  private CopybookModel emptyModel(String copybookName) {
+    return new CopybookModel(copybookName, copybookName, "");
+  }
+
+  private void reportRecursiveCopybook(CopybookUsage usage) {
+    errors.add(
+        SyntaxError.syntaxError()
+            .severity(1)
+            .suggestion(String.format(RECURSION_DETECTED, usage.getName()))
+            .position(usage.getPosition())
+            .build());
+  }
+
+  private void reportMissingCopybooks(String copybookName, Position position) {
+    errors.add(
+        SyntaxError.syntaxError()
+            .position(position)
+            .suggestion(format(ERROR_SUGGESTION, copybookName))
+            .severity(1)
+            .errorCode(MISSING_COPYBOOK)
+            .build());
   }
 
   private void checkCopybookNameLength(String copybookName, Position position) {
@@ -315,13 +322,14 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
      */
     List<ReplaceClauseContext> replaceClauses = ctx.replaceByStatement().replaceClause();
 
-    cleaner.context().storeReplaceablesAndReplacements(replaceClauses);
-    cleaner.context().replaceReplaceablesByReplacements(tokens);
+    CobolDocumentContext documentContext = cleaner.peek();
+    documentContext.storeReplaceablesAndReplacements(replaceClauses);
+    documentContext.replaceReplaceablesByReplacements(tokens);
 
-    String content = cleaner.context().read();
+    String content = documentContext.read();
 
     cleaner.pop();
-    cleaner.context().write(content);
+    cleaner.peek().write(content);
   }
 
   @Override
@@ -349,7 +357,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   @Nullable
   private String retrieveCopybookName(@Nonnull CopySourceContext copySource) {
-    final String copybookName;
+    String copybookName;
     if (copySource.cobolWord() != null) {
       copybookName = copySource.cobolWord().getText().toUpperCase();
     } else if (copySource.literal() != null) {
@@ -365,11 +373,8 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     return copybookName;
   }
 
-  private void defineCopybook(@Nullable String copybookName, @Nonnull Position position) {
-    if (copybookName == null) {
-      return;
-    }
-    usedCopybooks.addUsage(copybookName, position);
+  private void addCopybookUsage(@Nullable String copybookName, @Nonnull Position position) {
+    ofNullable(copybookName).ifPresent(it -> copybooks.addUsage(it, position));
   }
 
   @Nonnull
@@ -379,6 +384,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
         token.getStart().getStartIndex(),
         token.getStop().getStopIndex(),
         token.getStart().getLine(),
-        token.getStart().getCharPositionInLine());
+        token.getStart().getCharPositionInLine(),
+        token.getStart().getText());
   }
 }

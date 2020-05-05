@@ -17,7 +17,6 @@
 package com.ca.lsp.cobol.service.delegates.validations;
 
 import com.broadcom.lsp.cdi.EngineModule;
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
@@ -31,18 +30,18 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.experimental.UtilityClass;
 import org.awaitility.Awaitility;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DidOpenTextDocumentParams;
-import org.eclipse.lsp4j.TextDocumentItem;
-import org.eclipse.lsp4j.services.LanguageClient;
+import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /** This utility class provides methods to run use cases with Cobol code examples. */
 @UtilityClass
@@ -150,6 +149,7 @@ public class UseCaseUtils {
   public static List<Diagnostic> analyzeForErrors(String text) {
     return analyzeForErrors(text, emptyList());
   }
+
   /**
    * Analyze the given text using a real language engine leaving only the diagnostics with the
    * severe (level 1) errors providing copybooks required for the analysis
@@ -163,6 +163,7 @@ public class UseCaseUtils {
         .filter(it -> it.getSeverity().getValue() == 1)
         .collect(toList());
   }
+
   /**
    * Analyze the given text using a real language engine providing copybooks required for the
    * analysis
@@ -171,8 +172,22 @@ public class UseCaseUtils {
    * @param copybooks - list of copybooks required for the analysis
    * @return the entire analysis result
    */
-  @SuppressWarnings("unchecked")
   public static AnalysisResult analyze(String text, List<CobolText> copybooks) {
+    return analyze(text, copybooks, TextDocumentSyncType.DID_OPEN);
+  }
+
+  /**
+   * Analyze the given text using a real language engine providing copybooks required for the
+   * analysis with the required sync type
+   *
+   * @param text - text to analyze
+   * @param copybooks - list of copybooks required for the analysis
+   * @param syncType - sync type for the analysis
+   * @return the entire analysis result
+   */
+  @SuppressWarnings("unchecked")
+  public static AnalysisResult analyze(
+      String text, List<CobolText> copybooks, TextDocumentSyncType syncType) {
     Injector injector = Guice.createInjector(new EngineModule(), new DatabusModule());
 
     DataBusBroker<FetchedCopybookEvent, RequiredCopybookEvent> broker =
@@ -183,6 +198,42 @@ public class UseCaseUtils {
 
     return injector
         .getInstance(CobolLanguageEngineFacade.class)
-        .analyze(DOCUMENT_URI, text, TextDocumentSyncType.DID_OPEN);
+        .analyze(DOCUMENT_URI, text, syncType);
+  }
+
+  /**
+   * Assert that the given source contains expected number of locations for the element with the
+   * given name
+   *
+   * @param source - map with locations of semantic elements
+   * @param name - name of the semantic element to check
+   * @param number - expected number of locations
+   */
+  public static void assertNumberOfLocations(
+      Map<String, List<Location>> source, String name, int number) {
+    assertEquals("Number of " + name + " usages: ", number, source.get(name).size());
+  }
+
+  /**
+   * Assert that the given source contains the expected location for a semantic element with the
+   * given name
+   *
+   * @param source - map with locations of semantic elements
+   * @param name - name of the semantic element to check
+   * @param uri - document URI of the location
+   * @param line - line number of the location
+   * @param startChar - start character of the location. End character is startChar + name length.
+   */
+  public static void assertLocation(
+      Map<String, List<Location>> source, String name, String uri, int line, int startChar) {
+    List<Location> locations = source.get(name);
+    Location expected =
+        new Location(
+            uri,
+            new Range(
+                new Position(line, startChar), new Position(line, startChar + name.length())));
+    assertTrue(
+        "Expected location for " + name + " not found: " + expected.toString(),
+        locations.contains(expected));
   }
 }

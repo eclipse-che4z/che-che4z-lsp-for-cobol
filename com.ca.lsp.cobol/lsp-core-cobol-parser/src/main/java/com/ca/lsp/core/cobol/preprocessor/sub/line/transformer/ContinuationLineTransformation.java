@@ -172,7 +172,8 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
                 cobolLineTrimmedLength,
                 cobolLineTrimmedLength,
                 lineNumber,
-                cobolLineTrimmedLength))
+                cobolLineTrimmedLength,
+                null))
         .suggestion("IGYDS1082-E A period was required.")
         .severity(1)
         .build();
@@ -182,7 +183,8 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
     int startPosition = END_INDEX_CONTENT_AREA_A - (START_INDEX_AREA_A - countingSpace) + 1;
     return SyntaxError.syntaxError()
         .position(
-            new Position(uri, startPosition, END_INDEX_CONTENT_AREA_A, lineNumber, startPosition))
+            new Position(
+                uri, startPosition, END_INDEX_CONTENT_AREA_A, lineNumber, startPosition, null))
         .suggestion("A continuation line cannot contain values in the Content Area A")
         .severity(1)
         .build();

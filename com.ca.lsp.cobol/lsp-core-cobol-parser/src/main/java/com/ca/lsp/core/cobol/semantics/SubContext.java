@@ -16,19 +16,18 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import com.google.common.collect.Multimap;
 
 import java.util.Collection;
 
-public interface SubContext<T> {
+public interface SubContext<T, P> {
   /**
    * Add defined language element to the context
    *
    * @param name - a language element name
    * @param position - position of the used element
    */
-  void define(T name, Position position);
+  void define(T name, P position);
 
   /**
    * Add the position of a language element usage
@@ -36,7 +35,7 @@ public interface SubContext<T> {
    * @param name - a language element name
    * @param position - position of the used element
    */
-  void addUsage(String name, Position position);
+  void addUsage(String name, P position);
 
   /**
    * Get list of names of defined elements
@@ -58,13 +57,13 @@ public interface SubContext<T> {
    *
    * @return - multimap of names to a list of positions of definitions
    */
-  Multimap<String, Position> getDefinitions();
+  Multimap<String, P> getDefinitions();
   /**
    * Get all the registered usage of the language elements
    *
    * @return - multimap of names to a list of positions of usages
    */
-  Multimap<String, Position> getUsages();
+  Multimap<String, P> getUsages();
 
-  void merge(SubContext<T> subContext);
+  void merge(SubContext<T, P> subContext);
 }

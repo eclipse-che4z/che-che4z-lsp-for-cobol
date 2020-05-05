@@ -13,36 +13,39 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
+import com.broadcom.lsp.domain.common.model.Position;
+import com.ca.lsp.core.cobol.parser.CobolLexer;
+import com.ca.lsp.core.cobol.parser.CobolParser;
+import com.ca.lsp.core.cobol.parser.CobolParserBaseListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolHiddenTokenCollectorListenerImpl;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.BufferedTokenStream;
-import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.function.Function;
+
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static org.antlr.v4.runtime.Lexer.HIDDEN;
 
 @UtilityClass
 public class TokenUtils {
 
-  public String getHiddenTokensToLeft(int tokPos, BufferedTokenStream tokens) {
-    List<Token> refChannel = tokens.getHiddenTokensToLeft(tokPos, Lexer.HIDDEN);
-    StringBuilder sb = new StringBuilder();
-
-    if (refChannel != null) {
-      for (Token refToken : refChannel) {
-        String text = refToken.getText();
-        sb.append(text);
-      }
-    }
-
-    return sb.toString();
+  public static String getHiddenTokensToLeft(int tokPos, BufferedTokenStream tokens) {
+    return ofNullable(tokens.getHiddenTokensToLeft(tokPos, HIDDEN))
+        .map(it -> it.stream().map(Token::getText).collect(joining()))
+        .orElse("");
   }
 
-  public String getTextIncludingHiddenTokens(
-      ParseTree ctx, BufferedTokenStream tokens) {
+  public static String getTextIncludingHiddenTokens(ParseTree ctx, BufferedTokenStream tokens) {
     CobolHiddenTokenCollectorListenerImpl listener =
         new CobolHiddenTokenCollectorListenerImpl(tokens);
     ParseTreeWalker walker = new ParseTreeWalker();
@@ -51,7 +54,38 @@ public class TokenUtils {
     return listener.read();
   }
 
-  public boolean isEOF(TerminalNode node) {
+  public static boolean isEOF(TerminalNode node) {
     return Token.EOF == node.getSymbol().getType();
+  }
+
+  public static CommonTokenStream retrieveTokens(@Nonnull String code) {
+    CobolLexer lexer = new CobolLexer(CharStreams.fromString(code));
+    lexer.removeErrorListeners();
+
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    CobolParser parser = new CobolParser(tokens);
+    parser.removeErrorListeners();
+
+    CobolParser.StartRuleContext tree = parser.startRule();
+
+    ParseTreeWalker walker = new ParseTreeWalker();
+    walker.walk(new CobolParserBaseListener(), tree);
+    return tokens;
+  }
+
+  public static List<Position> convertTokensToPositions(
+      @Nonnull String uri, CommonTokenStream tokens) {
+    return tokens.getTokens().stream().map(toPosition(uri)).collect(toList());
+  }
+
+  private static Function<Token, Position> toPosition(@Nonnull String uri) {
+    return it ->
+        new Position(
+            uri,
+            it.getStartIndex(),
+            it.getStopIndex(),
+            it.getLine(),
+            it.getCharPositionInLine(),
+            it.getText());
   }
 }

@@ -1,43 +1,39 @@
 /*
+ * Copyright (c) 2020 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
- *  Copyright (c) 2020 Broadcom.
- *  The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- *  This program and the accompanying materials are made
- *  available under the terms of the Eclipse Public License 2.0
- *  which is available at https://www.eclipse.org/legal/epl-2.0/
+ * SPDX-License-Identifier: EPL-2.0
  *
- *  SPDX-License-Identifier: EPL-2.0
- *
- *  Contributors:
+ * Contributors:
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package com.ca.lsp.core.cobol.semantics;
 
-import com.broadcom.lsp.cdi.EngineModule;
-import com.broadcom.lsp.cdi.module.databus.DatabusModule;
-import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
-import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.google.inject.Guice;
+package com.ca.lsp.cobol.usecases;
+
+import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.junit.Test;
 
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 
-public class CobolVariableCheckTest {
-  private static final String DID_OPEN = "DID_OPEN";
-  private static final String DID_CHANGE = "DID_CHANGE";
+/**
+ * This test is looking for a clean implementation of a mechanism which can remove SQL, CICS, COPY
+ * statements from COBOL code. If they are not removed then a syntax error thrown.
+ */
+public class TestExtraLanguagesCleaned {
 
-  /**
-   * This test represent the semantic check for variable in PROCEDURE DIVISION section There are
-   * some typos in text, the BORROWE variable and TBPARM15 variable are not define in the DATA
-   * DIVISON so the engine is able to throw a suggestion. First implementation of a test for
-   * semantic analysis for variables. More to come
-   */
   private static final String TEXT_TO_TEST =
-      "000000  IDENTIFICATION DIVISION.                               \r\n"
-          + "000000  PROGRAM-ID.             ATCDEM2.\r\n"
-          + "000000  AUTHOR.                 TIM MAGEE.\r\n"
+      "000000  IDENTIFICATION DIVISION.\r\n"
+          + "000000  PROGRAM-ID.    FILETOTEST.\r\n"
+          + "000000  AUTHOR. SERGIU ILIE.\r\n"
           + "000000   DATA DIVISION.\r\n"
           + "000000  WORKING-STORAGE SECTION.\r\n"
           + "000000  01 TAPARM1.\r\n"
@@ -53,9 +49,6 @@ public class CobolVariableCheckTest {
           + "000000  MOVE 'ILCHIMVS' TO TASTRUCT.\r\n"
           + "000000  MOVE 'ILSPR' TO LOC-ID.\r\n"
           + "000000  MOVE 'AIX' TO OP-SYS.\r\n"
-          + "000000  MOVE 'KY' TO STATE.\r\n"
-          + "000000  MOVE 'LEX' TO CITY.\r\n"
-          + "000000  MOVE 'VM ' TO OP-SYS.\r\n"
           + "000000  PROGA.\r\n"
           + "000000  PERFORM WITH TEST BEFORE UNTIL TAPARM1 = 0\r\n"
           + "000000  SUBTRACT 1 FROM TAPARM1\r\n"
@@ -87,7 +80,8 @@ public class CobolVariableCheckTest {
           + "000000         88 teenager  VALUE 0  THRU 17.\r\n"
           + "000000  PROCEDURE DIVISION.\r\n"
           + "000000  PROGB.\r\n"
-          + "000000  PERFORM WITH TEST BEFORE UNTIL TBPARM15 = 0\r\n"
+          + "000000  EXEC CICS HANDLE CONDITION ERROR(ERRORS) END-EXEC.\r\n"
+          + "000000  PERFORM WITH TEST BEFORE UNTIL TBPARM1 = 0\r\n"
           + "000000  SUBTRACT 1 FROM TBPARM1\r\n"
           + "000000  CALL 'ATCDEM4'\r\n"
           + "000000  END-PERFORM\r\n"
@@ -97,28 +91,26 @@ public class CobolVariableCheckTest {
           + "000000  PERFORM WITH TEST BEFORE UNTIL TBPARM2 = 0\r\n"
           + "000000  SUBTRACT 1 FROM TBPARM2\r\n"
           + "000000  END-PERFORM.\r\n"
+          + "000000             EXEC CICS LINK PROGRAM(CRUD-PGM-NAME)\r\n"
+          + "000000  RESP(RESPONSE)COMMAREA(LINK-AREA) END-EXEC.\r\n"
           + "000000          PROCB.\r\n"
-          + "000000  MOVE 10 TO MAMA OF AGE OF BORROWE.\r\n"
+          + "000000  MOVE 10 TO MAMA OF AGE OF BORROWER.\r\n"
           + "000000  END PROGRAM ATCDEM3.\r\n"
-          + "000000  END PROGRAM ATCDEM2.                                 \r\n";
+          + "           \r\n";
 
-  /**
-   * This test verify that the engine returns diagnostics in both scenario where the document sync
-   * type is DID_OPEN or DID_CHANGE.
-   */
   @Test
-  public void test() {
-    CobolLanguageEngine engine =
-        Guice.createInjector(new EngineModule(), new DatabusModule())
-            .getInstance(CobolLanguageEngine.class);
-    ResultWithErrors<SemanticContext> result;
+  public void verifyLanguageCleaningForDidOpen() {
+    AnalysisResult result = analyze(TEXT_TO_TEST, emptyList(), DID_OPEN);
+    assertEquals(0, countDiagnostics(result));
+  }
 
-    // SCENARIO FOR DID_OPEN
-    result = engine.run("1", TEXT_TO_TEST, DID_OPEN);
-    assertEquals(2, result.getErrors().stream().filter(item -> item.getSeverity() == 3).count());
+  @Test
+  public void verifyLanguageCleaningForDidChange() {
+    AnalysisResult result = analyze(TEXT_TO_TEST, emptyList(), DID_CHANGE);
+    assertEquals(0, countDiagnostics(result));
+  }
 
-    // SCENARIO FOR DID_CHANGE
-    result = engine.run("1", TEXT_TO_TEST, DID_CHANGE);
-    assertEquals(2, result.getErrors().stream().filter(item -> item.getSeverity() == 3).count());
+  private long countDiagnostics(AnalysisResult result) {
+    return result.getDiagnostics().size();
   }
 }

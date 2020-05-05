@@ -173,7 +173,12 @@ public class CobolLineReaderImpl implements CobolLineReader {
         .severity(1)
         .position(
             new Position(
-                uri, charPosition, (charPosition + errorLength), lineNumber + 1, charPosition))
+                uri,
+                charPosition,
+                (charPosition + errorLength),
+                lineNumber + 1,
+                charPosition,
+                null))
         .build();
   }
 }

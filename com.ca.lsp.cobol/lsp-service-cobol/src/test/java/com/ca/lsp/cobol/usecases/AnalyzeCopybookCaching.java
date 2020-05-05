@@ -54,8 +54,8 @@ public class AnalyzeCopybookCaching {
   private final String COPYBOOK_NAME = "copy";
   private final String COPYBOOK_CONTENT = "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
 
-  private final Position POSITION_FIRST_OCCURRENCE = new Position(null, 0, 0, 0, 0);
-  private final Position POSITION_SECOND_OCCURRENCE = new Position(null, 10, 10, 10, 10);
+  private final Position POSITION_FIRST_OCCURRENCE = new Position(null, 0, 0, 0, 0, null);
+  private final Position POSITION_SECOND_OCCURRENCE = new Position(null, 10, 10, 10, 10, null);
   private final Multimap<String, Position> paragraphDefinitions = HashMultimap.create();
 
   private final DataBusBroker databus =
@@ -71,8 +71,7 @@ public class AnalyzeCopybookCaching {
     when(preprocessor.process(any(), any(String.class), any(), any(String.class)))
         .thenReturn(
             new ResultWithErrors<>(
-                new ExtendedDocument(COPYBOOK_CONTENT, null, emptyMap()),
-                emptyList()));
+                new ExtendedDocument(COPYBOOK_CONTENT, null, emptyMap()), emptyList()));
   }
 
   private void initParagraphDefinitions() {

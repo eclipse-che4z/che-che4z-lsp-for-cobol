@@ -27,6 +27,8 @@ import java.util.Deque;
 import java.util.Scanner;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
+import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.getHiddenTokensToLeft;
+import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.getTextIncludingHiddenTokens;
 
 public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerService {
   private Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
@@ -35,25 +37,22 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
     contexts.push(new CobolDocumentContext());
   }
 
-  public CobolDocumentContext context() {
+  public CobolDocumentContext peek() {
     return contexts.peek();
   }
 
   public void excludeStatementFromText(
       @Nonnull ParserRuleContext ctx, @Nonnull String tag, @Nonnull BufferedTokenStream tokens) {
     pop();
-    push();
+    CobolDocumentContext documentContext = push();
+    documentContext.write(getHiddenTokensToLeft(ctx.start.getTokenIndex(), tokens));
 
-    String textLeft = TokenUtils.getHiddenTokensToLeft(ctx.start.getTokenIndex(), tokens);
-    context().write(textLeft);
-
-    String text = TokenUtils.getTextIncludingHiddenTokens(ctx, tokens).toUpperCase();
     String linePrefix = BLANK_SEQUENCE_AREA + tag;
-    specificTypeExclusion(tag, text, linePrefix);
-    String content = context().read();
+    specificTypeExclusion(tag, getTextIncludingHiddenTokens(ctx, tokens).toUpperCase(), linePrefix);
+    String content = documentContext.read();
     pop();
 
-    context().write(content);
+    peek().write(content);
   }
 
   public void specificTypeExclusion(
@@ -69,19 +68,18 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
     }
 
     if (textSplit != null && textSplit.length > 1 && !textSplit[textSplit.length - 1].isEmpty()) {
-      context().write(lines + textSplit[1]);
+      peek().write(lines + textSplit[1]);
     } else {
-      context().write(lines);
+      peek().write(lines);
     }
   }
 
   public void visitTerminal(TerminalNode node, BufferedTokenStream tokens) {
     int tokPos = node.getSourceInterval().a;
-    context().write(TokenUtils.getHiddenTokensToLeft(tokPos, tokens));
+    peek().write(getHiddenTokensToLeft(tokPos, tokens));
 
     if (!TokenUtils.isEOF(node)) {
-      String text = node.getText();
-      context().write(text);
+      peek().write(node.getText());
     }
   }
 
@@ -117,10 +115,10 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
   }
 
   /** Pushes a new preprocessing context onto the stack. */
-  @Nullable
+  @Nonnull
   public CobolDocumentContext push() {
     CobolDocumentContext cobolDocumentContext = new CobolDocumentContext();
-    contexts.push(new CobolDocumentContext());
+    contexts.push(cobolDocumentContext);
     return cobolDocumentContext;
   }
 }

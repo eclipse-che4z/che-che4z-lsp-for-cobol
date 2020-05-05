@@ -19,15 +19,12 @@ import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
@@ -89,18 +86,25 @@ public class TestMappingWithMultiDefinitions {
           + "               MOVE 11 TO CHILD2\r\n"
           + "           END-IF.\r\n";
 
+  private static final String STRUC_NAME = "STRUC";
+  private static final String WITHNEST_NAME = "WITHNEST";
+  private static final String PARS_NAME = "PARS";
+  private static final String NESTED_NAME = "NESTED";
+  private static final String NESTED1_NAME = "NESTED1";
+  private static final String NESTED2_NAME = "NESTED2";
+
   @Test
   public void test() {
     AnalysisResult result =
         analyze(
             DOCUMENT,
             asList(
-                new CobolText("STRUC", STRUC),
-                new CobolText("WITHNEST", WITHNEST),
-                new CobolText("NESTED", NESTED),
-                new CobolText("NESTED1", NESTED1),
-                new CobolText("NESTED2", NESTED2),
-                new CobolText("PARS", PARS)));
+                new CobolText(STRUC_NAME + ".CPY", STRUC),
+                new CobolText(WITHNEST_NAME + ".CPY", WITHNEST),
+                new CobolText(NESTED_NAME + ".CPY", NESTED),
+                new CobolText(NESTED1_NAME + ".CPY", NESTED1),
+                new CobolText(NESTED2_NAME + ".CPY", NESTED2),
+                new CobolText(PARS_NAME + ".CPY", PARS)));
 
     assertDiagnostics(result.getDiagnostics());
     assertCopybookUsages(result.getCopybookUsages());
@@ -118,31 +122,30 @@ public class TestMappingWithMultiDefinitions {
 
   private void assertCopybookUsages(Map<String, List<Location>> copybookUsages) {
     assertEquals("Copybook usages: " + copybookUsages.toString(), 6, copybookUsages.size());
-    List<Location> struc = copybookUsages.get("STRUC");
 
-    assertEquals("Number of STRUC usage: ", 2, struc.size());
+    assertNumberOfLocations(copybookUsages, STRUC_NAME, 2);
+    assertLocation(copybookUsages, STRUC_NAME, DOCUMENT_URI, 4, 23);
+    assertLocation(copybookUsages, STRUC_NAME, DOCUMENT_URI, 5, 24);
 
-    assertEquals(
-        "STRUC first usage:",
-        new Location(DOCUMENT_URI, new Range(new Position(4, 23), new Position(4, 28))),
-        struc.get(0));
-
-    assertEquals(
-        "STRUC second usage:",
-        new Location(DOCUMENT_URI, new Range(new Position(5, 24), new Position(5, 29))),
-        struc.get(1));
-
-    assertSingleLocation(copybookUsages, "WITHNEST", DOCUMENT_URI, 6, 12);
-    assertSingleLocation(copybookUsages, "PARS", DOCUMENT_URI, 9, 12);
-    assertSingleLocation(copybookUsages, "NESTED", "WITHNEST", 2, 16);
-    assertSingleLocation(copybookUsages, "NESTED1", "WITHNEST", 4, 16);
-    assertSingleLocation(copybookUsages, "NESTED2", "NESTED1", 3, 16);
+    assertNumberOfLocations(copybookUsages, WITHNEST_NAME, 1);
+    assertLocation(copybookUsages, WITHNEST_NAME, DOCUMENT_URI, 6, 12);
+    assertNumberOfLocations(copybookUsages, PARS_NAME, 1);
+    assertLocation(copybookUsages, PARS_NAME, DOCUMENT_URI, 9, 12);
+    assertNumberOfLocations(copybookUsages, NESTED_NAME, 1);
+    assertLocation(copybookUsages, NESTED_NAME, WITHNEST_NAME, 2, 16);
+    assertNumberOfLocations(copybookUsages, NESTED1_NAME, 1);
+    assertLocation(copybookUsages, NESTED1_NAME, WITHNEST_NAME, 4, 16);
+    assertNumberOfLocations(copybookUsages, NESTED2_NAME, 1);
+    assertLocation(copybookUsages, NESTED2_NAME, NESTED1_NAME, 3, 16);
   }
 
   private void assertParagraphUsages(Map<String, List<Location>> paragraphUsages) {
     assertEquals("Paragraph usages: " + paragraphUsages.toString(), 2, paragraphUsages.size());
-    assertSingleLocation(paragraphUsages, "PAR1", DOCUMENT_URI, 13, 19);
-    assertSingleLocation(paragraphUsages, "MAIN-LINE", DOCUMENT_URI, 8, 15);
+
+    assertNumberOfLocations(paragraphUsages, "PAR1", 1);
+    assertLocation(paragraphUsages, "PAR1", DOCUMENT_URI, 13, 19);
+    assertNumberOfLocations(paragraphUsages, "MAIN-LINE", 1);
+    assertLocation(paragraphUsages, "MAIN-LINE", DOCUMENT_URI, 8, 15);
   }
 
   private void assertParagraphDefinitions(Map<String, List<Location>> paragraphDefinitions) {
@@ -150,73 +153,72 @@ public class TestMappingWithMultiDefinitions {
         "Paragraph definitions: " + paragraphDefinitions.toString(),
         2,
         paragraphDefinitions.size());
-    assertSingleLocation(paragraphDefinitions, "PAR1", "PARS", 0, 7);
-    assertSingleLocation(paragraphDefinitions, "MAIN-LINE", DOCUMENT_URI, 10, 7);
+    assertLocation(paragraphDefinitions, "PAR1", "PARS", 0, 7);
+    assertLocation(paragraphDefinitions, "MAIN-LINE", DOCUMENT_URI, 10, 7);
   }
 
   private void assertVariableUsages(Map<String, List<Location>> variableUsages) {
     assertEquals("Variable usages: " + variableUsages.toString(), 6, variableUsages.size());
-    List<Location> child2 = variableUsages.get("CHILD2");
 
-    assertEquals("Number of CHILD2 usages: ", 3, child2.size());
+    assertNumberOfLocations(variableUsages, "CHILD2", 3);
+    assertLocation(variableUsages, "CHILD2", PARS_NAME, 3, 26);
+    assertLocation(variableUsages, "CHILD2", PARS_NAME, 5, 26);
+    assertLocation(variableUsages, "CHILD2", DOCUMENT_URI, 11, 22);
 
-    assertEquals(
-        "CHILD2 usage:",
-        new Location("PARS", new Range(new Position(3, 26), new Position(3, 32))),
-        child2.get(0));
+    assertNumberOfLocations(variableUsages, "PARENT", 1);
+    assertLocation(variableUsages, "PARENT", DOCUMENT_URI, 11, 32);
 
-    assertEquals(
-        "CHILD2 usage:",
-        new Location("PARS", new Range(new Position(5, 26), new Position(5, 32))),
-        child2.get(1));
+    assertNumberOfLocations(variableUsages, "CHILD1", 1);
+    assertLocation(variableUsages, "CHILD1", "PARS", 1, 14);
 
-    assertEquals(
-        "CHILD2 usage:",
-        new Location(DOCUMENT_URI, new Range(new Position(11, 22), new Position(11, 28))),
-        child2.get(2));
+    assertNumberOfLocations(variableUsages, "CHILD3-NESTED", 1);
+    assertLocation(variableUsages, "CHILD3-NESTED", DOCUMENT_URI, 12, 22);
 
-    assertSingleLocation(variableUsages, "PARENT", DOCUMENT_URI, 11, 32);
-    assertSingleLocation(variableUsages, "CHILD1", "PARS", 1, 14);
-    assertSingleLocation(variableUsages, "CHILD3-NESTED", DOCUMENT_URI, 12, 22);
-    assertSingleLocation(variableUsages, "PARENT-NESTED", DOCUMENT_URI, 12, 39);
-    assertSingleLocation(variableUsages, "PARENT3", DOCUMENT_URI, 12, 56);
+    assertNumberOfLocations(variableUsages, "PARENT-NESTED", 1);
+    assertLocation(variableUsages, "PARENT-NESTED", DOCUMENT_URI, 12, 39);
+
+    assertNumberOfLocations(variableUsages, "PARENT3", 1);
+    assertLocation(variableUsages, "PARENT3", DOCUMENT_URI, 12, 56);
   }
 
   private void assertVariableDefinitions(Map<String, List<Location>> variableDefinitions) {
     assertEquals(
         "Variable definitions: " + variableDefinitions.toString(), 15, variableDefinitions.size());
-    assertSingleLocation(variableDefinitions, "PARENT", DOCUMENT_URI, 4, 10);
-    assertSingleLocation(variableDefinitions, "PARENT2", DOCUMENT_URI, 5, 10);
 
-    assertSingleLocation(variableDefinitions, "CHILD1", "STRUC", 0, 15);
-    assertSingleLocation(variableDefinitions, "CHILD2", "STRUC", 1, 15);
+    assertNumberOfLocations(variableDefinitions, "PARENT", 1);
+    assertLocation(variableDefinitions, "PARENT", DOCUMENT_URI, 4, 10);
+    assertNumberOfLocations(variableDefinitions, "PARENT2", 1);
+    assertLocation(variableDefinitions, "PARENT2", DOCUMENT_URI, 5, 10);
 
-    assertSingleLocation(variableDefinitions, "PARENT3", "WITHNEST", 0, 10);
-    assertSingleLocation(variableDefinitions, "CHILD3", "WITHNEST", 1, 15);
-    assertSingleLocation(variableDefinitions, "CHILD4", "WITHNEST", 3, 15);
-    assertSingleLocation(variableDefinitions, "CHILD5", "WITHNEST", 5, 15);
+    assertNumberOfLocations(variableDefinitions, "CHILD1", 1);
+    assertLocation(variableDefinitions, "CHILD1", STRUC_NAME, 0, 15);
+    assertNumberOfLocations(variableDefinitions, "CHILD2", 1);
+    assertLocation(variableDefinitions, "CHILD2", STRUC_NAME, 1, 15);
 
-    assertSingleLocation(variableDefinitions, "CHILD6", "NESTED", 0, 15);
-    assertSingleLocation(variableDefinitions, "CHILD7", "NESTED", 1, 15);
+    assertNumberOfLocations(variableDefinitions, "PARENT3", 1);
+    assertLocation(variableDefinitions, "PARENT3", WITHNEST_NAME, 0, 10);
+    assertNumberOfLocations(variableDefinitions, "CHILD3", 1);
+    assertLocation(variableDefinitions, "CHILD3", WITHNEST_NAME, 1, 15);
+    assertNumberOfLocations(variableDefinitions, "CHILD4", 1);
+    assertLocation(variableDefinitions, "CHILD4", WITHNEST_NAME, 3, 15);
+    assertNumberOfLocations(variableDefinitions, "CHILD5", 1);
+    assertLocation(variableDefinitions, "CHILD5", WITHNEST_NAME, 5, 15);
 
-    assertSingleLocation(variableDefinitions, "PARENT-NESTED", "NESTED1", 0, 10);
-    assertSingleLocation(variableDefinitions, "CHILD1-NESTED", "NESTED1", 1, 15);
-    assertSingleLocation(variableDefinitions, "CHILD2-NESTED", "NESTED1", 2, 15);
+    assertNumberOfLocations(variableDefinitions, "CHILD6", 1);
+    assertLocation(variableDefinitions, "CHILD6", NESTED_NAME, 0, 15);
+    assertNumberOfLocations(variableDefinitions, "CHILD7", 1);
+    assertLocation(variableDefinitions, "CHILD7", NESTED_NAME, 1, 15);
 
-    assertSingleLocation(variableDefinitions, "CHILD3-NESTED", "NESTED2", 0, 15);
-    assertSingleLocation(variableDefinitions, "CHILD4-NESTED", "NESTED2", 1, 15);
-  }
+    assertNumberOfLocations(variableDefinitions, "PARENT-NESTED", 1);
+    assertLocation(variableDefinitions, "PARENT-NESTED", NESTED1_NAME, 0, 10);
+    assertNumberOfLocations(variableDefinitions, "CHILD1-NESTED", 1);
+    assertLocation(variableDefinitions, "CHILD1-NESTED", NESTED1_NAME, 1, 15);
+    assertNumberOfLocations(variableDefinitions, "CHILD2-NESTED", 1);
+    assertLocation(variableDefinitions, "CHILD2-NESTED", NESTED1_NAME, 2, 15);
 
-  private void assertSingleLocation(
-      Map<String, List<Location>> source, String name, String parent, int line, int start) {
-    List<Location> locations = source.get(name);
-
-    assertEquals("Number of " + name + " usages: ", 1, locations.size());
-    assertEquals(
-        name + " usage:",
-        new Location(
-            parent,
-            new Range(new Position(line, start), new Position(line, start + name.length()))),
-        locations.get(0));
+    assertNumberOfLocations(variableDefinitions, "CHILD3-NESTED", 1);
+    assertLocation(variableDefinitions, "CHILD3-NESTED", NESTED2_NAME, 0, 15);
+    assertNumberOfLocations(variableDefinitions, "CHILD4-NESTED", 1);
+    assertLocation(variableDefinitions, "CHILD4-NESTED", NESTED2_NAME, 1, 15);
   }
 }

@@ -16,7 +16,7 @@ package com.ca.lsp.core.cobol.preprocessor.sub.document;
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorListener;
-import com.ca.lsp.core.cobol.semantics.SubContext;
+import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public interface CobolSemanticParserListener extends CobolPreprocessorListener {
 
   List<SyntaxError> getErrors();
 
-  SubContext<String> getUsedCopybooks();
+  NamedSubContext<Position> getCopybooks();
 
-  Map<String, List<Position>> getInnerMappings();
+  Map<String, List<Position>> getDocumentMappings();
 }
