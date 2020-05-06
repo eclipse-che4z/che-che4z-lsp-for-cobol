@@ -30,6 +30,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestExtraLanguagesCleaned.class,
   TestEndPerformCausesError.class,
   TestRemarksAreUnsupported.class,
+  TestCpyNameWithSpecialChar.class,
   TestExtraneousInputEOFExpecting.class,
   TestNoErrorOnCompilerDirectives.class,
   TestVariablesAreCaseInsensitive.class,

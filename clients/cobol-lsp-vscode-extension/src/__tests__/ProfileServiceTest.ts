@@ -1,4 +1,4 @@
-import { ProfileService } from "../ProfileService";
+import { ProfileService } from "../services/ProfileService";
 
 /*
  * Copyright (c) 2020 Broadcom.
@@ -16,7 +16,6 @@ import { ProfileService } from "../ProfileService";
 
 import * as path from "path";
 import * as vscode from "vscode";
-import { updateProfileActionDesc } from "@zowe/imperative";
 
 describe("Profile Service tests", () => {
     const programName = "programName";

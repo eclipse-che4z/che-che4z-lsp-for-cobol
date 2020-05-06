@@ -13,9 +13,10 @@
  */
 
 import * as vscode from "vscode";
+import { REASON_MSG} from "../constants";
 import { DownloadQueue } from "./DownloadQueue";
 
-export class CopybookResolver {
+export class CopybookFix {
     private queue: DownloadQueue;
 
     async fixMissingDownloads(reasonMsg: string, missingCopybooks: string[], profile: string, options: { hasPaths: boolean, hasProfiles: boolean }) {
@@ -26,9 +27,9 @@ export class CopybookResolver {
         if (options.hasPaths) {
             actions.push(downloadCopybookAction);
         }
-        if (reasonMsg !== "Configuration was updated") {
+        if (reasonMsg !== REASON_MSG) {
             actions.push(actionDatasets);
-            if(options.hasProfiles) {
+            if (options.hasProfiles) {
                 actions.push(actionProfile);
             }
         }
@@ -42,8 +43,7 @@ export class CopybookResolver {
             vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths");
         }
         if (action === actionProfile) {
-            vscode.commands.executeCommand("workbench.action.openSettings",
-                "broadcom-cobol-lsp.cpy-manager.profiles");
+            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile");
         }
     }
 
@@ -56,8 +56,7 @@ export class CopybookResolver {
             vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths");
         }
         if (action === actionProfile) {
-            vscode.commands.executeCommand("workbench.action.openSettings",
-                "broadcom-cobol-lsp.cpy-manager.profiles");
+            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile");
         }
     }
 

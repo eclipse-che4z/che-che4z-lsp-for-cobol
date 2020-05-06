@@ -19,7 +19,7 @@ import com.ca.lsp.core.cobol.model.ResultWithErrors;
 
 import java.util.Deque;
 
-/** The CobolPreprocessor is engaged in order to process, trasform and parse the document */
+/** The CobolPreprocessor is engaged in order to process, transform and parse the document */
 public interface CobolPreprocessor {
   ResultWithErrors<ExtendedDocument> process(
       String documentUri,

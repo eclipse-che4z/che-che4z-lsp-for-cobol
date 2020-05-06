@@ -25,10 +25,9 @@ import java.util.List;
  */
 @Value
 public class ConfigurationSettingsStorable {
-  private Object profiles;
   private List<String> paths;
 
-  public static ConfigurationSettingsStorable emptyConfigurationSettingsStorable() {
-    return new ConfigurationSettingsStorable(null, Collections.emptyList());
+  public ConfigurationSettingsStorable(List<String> paths) {
+    this.paths = Collections.unmodifiableList(paths);
   }
 }

@@ -11,11 +11,12 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as vscode from "vscode";
 import * as path from "path";
-import { checkWorkspace, createCopybookPath, createDatasetPath } from "../services/PathUtils";
+import * as vscode from "vscode";
+// tslint:disable-next-line: max-line-length
+import { checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath} from "../services/CopybooksPathGenerator";
 
-describe("PathUtils tests", () => {
+describe("CopybooksPathGenerator tests", () => {
     const fsPath = "/projects";
     const profile = "profile";
     const dataset = "dataset";
@@ -34,5 +35,17 @@ describe("PathUtils tests", () => {
         expect(checkWorkspace()).toEqual(true);
         vscode.workspace.workspaceFolders = [];
         expect(checkWorkspace()).toEqual(false);
+    });
+
+    it("generates array of uris", async () => {
+        const profileService: any = {
+            getProfile: () => Promise.resolve(profile),
+            getProfileFromSettings: () => Promise.resolve(profile),
+        };
+        const gen: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
+        gen.listDatasets = () => Promise.resolve(["DATASET1", "DATASET2"]);
+        const result = await gen.listUris();
+        expect(result[0].toString()).toContain("/projects/.copybooks/profile/DATASET1");
+        expect(result[1].toString()).toContain("/projects/.copybooks/profile/DATASET2");
     });
 });

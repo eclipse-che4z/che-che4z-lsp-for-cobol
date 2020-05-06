@@ -19,14 +19,13 @@ import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedSettingsEvent;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 
+import static com.ca.lsp.cobol.service.utils.FileSystemUtils.interpretPaths;
 import javax.annotation.Nullable;
-import java.lang.reflect.Type;
 
 /**
  * This class is resposible to keep the settings configuration provided by the user in the setting
@@ -70,10 +69,9 @@ public class SettingsProvider
    */
   @Override
   public void observerCallback(FetchedSettingsEvent fetchedSettingsEvent) {
-    Gson gson = new Gson();
-    set(
-        gson.fromJson(
-            fetchedSettingsEvent.getContent().get(0).toString(),
-            (Type) ConfigurationSettingsStorable.class));
+
+    ConfigurationSettingsStorable config =
+        new ConfigurationSettingsStorable(interpretPaths(fetchedSettingsEvent.getContent()));
+    set(config);
   }
 }

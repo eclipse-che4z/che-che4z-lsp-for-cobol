@@ -3,35 +3,25 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 
 ## [0.x.x] - TBD
-- Don't ask to select profile if there are less then two of them available [#245](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/245)
-- Redefine responsibilities of WorkspaceServiceTest [232](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/232) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
-- Dependency file should contain 8 char max copybook name [#175](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/175) Thanks @[ishche](https://github.com/ishche)
-- StatusBar copybook downloader profile switcher [#240](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/240) Thanks @[ishche](https://github.com/ishche)
-- Move fetch copybook Quick Fix from LSP server to extension. [#235](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/235) Thanks @[ishche](https://github.com/ishche)
-- A comma-separated list of datasets editor [#242](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/242) Thanks @[ishche](https://github.com/ishche)
-- Dependency file should contain 8 char max copybook name [#175](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/175)
-- StatusBar copybook downloader profile switcher [#239](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/239)
-- Address StackOverflow during build [#230](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/230) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
-- No escape chars in filename [#228](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/228) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
-- Finalize LRU Algorithm [#227](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/227) Thanks @[sergiuilie](https://github.com/sergiuilie)
-- Consume user settings in Copybook Service [#221](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/221) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
-- Support copybooks downloading [#208](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/208) Thanks @[ishche](https://github.com/ishche)
-- Modify dep file creation/update process [#209](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/209) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
-- Retrieve settings.json at initialize [#207](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/207) Thanks @[sergiuilie](https://github.com/sergiuilie)
-- Introduce Code Action to Resolve Copybooks [#198](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/198) Thanks @[temanbrcom](https://github.com/temanbrcom)
-- Make CobolVisitor constructor-configurable to simplify DI [#205](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/205) Thanks @[temanbrcom](https://github.com/temanbrcom)
-- Fix copybook extension check [#203](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/203) Thanks @[grianbrcom](https://github.com/grianbrcom)
-- Remove error listener from CobolVisitor to simpily DI [#201](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/201) Thanks @[temanbrcom](https://github.com/temanbrcom)
-- Refactor MyTextDocumentService::observerCallback [#200](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/200) Thanks @[grianbrcom](https://github.com/grianbrcom)
-- Remove unused COBOL dialect support [#169](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/169) Thanks @[temanbrcom](https://github.com/temanbrcom)
-- Make document extension check case-insensitive [#167](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/167) Thanks @[temanbrcom](https://github.com/temanbrcom)
-- Remove copybook name from the variable list if copybook is missing [#190](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/190) Thanks @[temanbrcom](https://github.com/temanbrcom)
-- Introduce autocomplete for copybooks [#189](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/189) Thanks @[abdrabrcom](https://github.com/abdrabrcom)
-- Remove unused COBOL format support [#188](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/188) Thanks @[temanbrcom](https://github.com/temanbrcom)
-- Enable config file synchronization between the client and server [#185](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/185) Thanks @[sergiuilie](https://github.com/sergiuilie)
-- Update `extension.ts` with correct language ID [#176](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/176) Thanks @[sergiuilie](https://github.com/sergiuilie)
-- Remove remarks support [#174](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/174) Thanks @[temanbrcom](https://github.com/temanbrcom)
-- Introduce a mechanism on the server to generate a `cobdep` folder that contains dependency files for each COBOL file opened in the IDE that contains copybooks [#172](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/172) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
+- "Change profile" in Quick fix menu when multiple profiles [#294](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/294) Thanks @[sergiuilie](https://github.com/sergiuilie)
+- Nested copybook failed to be retrieved at didOpen moment [#285](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/285) Thanks @[sergiuilie](https://github.com/sergiuilie)
+- Remove error message when settings for copybooks are not defined [#289](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/289) Thanks @[zacanbrcom](https://github.com/zacanbrcom)
+- Add semantic release tool integration [#219](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/219) Thanks @[grianbrcom](https://github.com/grianbrcom)
+
+## [0.11.0] - 2020-04-09
+
+#### Added
+- Automatic copybook retrieval via Zowe connection
+- Downloading of nested copybooks
+- Copybooks can be downloaded using a quick fix
+
+#### Changed
+- Updates to README
+
+#### Fixed
+- Copybook extension check
+- Address StackOverflow exception during build
+- Make document extension check case-insensitive
 
 ## [0.10.1] - 2020-02-12
 

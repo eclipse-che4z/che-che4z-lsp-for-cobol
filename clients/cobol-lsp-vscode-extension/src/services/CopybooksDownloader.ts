@@ -14,23 +14,22 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { DEPENDENCIES_FOLDER } from "./constants";
+import { loadDepFile, DependenciesDesc } from "./DependencyService";
+import { DEPENDENCIES_FOLDER, PROCESS_DOWNLOAD_ERROR_MSG } from "../constants";
+import { CopybookFix } from "./CopybookFix";
+import { CopybooksPathGenerator, createDatasetPath, createCopybookPath, checkWorkspace } from "./CopybooksPathGenerator";
+import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
 import { ProfileService } from "./ProfileService";
-import { DependenciesDesc, loadDepFile } from "./services/DependencyService";
-import { CopybookProfile, DownloadQueue } from "./services/DownloadQueue";
-import { checkWorkspace, createCopybookPath, createDatasetPath } from "./services/PathUtils";
 import { ZoweApi } from "./ZoweApi";
-import { CopybookResolver } from "./services/CopybookResolver";
-import { PathsService } from "./services/PathsService";
 
 export class CopybooksDownloader implements vscode.Disposable {
     private queue: DownloadQueue = new DownloadQueue();
 
     public constructor(
-        private resolver: CopybookResolver,
+        private resolver: CopybookFix,
         private zoweApi: ZoweApi,
         private profileService: ProfileService,
-        private pathsService: PathsService) { }
+        private pathGenerator: CopybooksPathGenerator) { }
 
     public async redownloadDependencies(message: string = "Redownload dependencies requested.") {
         (await vscode.workspace.findFiles(DEPENDENCIES_FOLDER + "/**/*.dep")).forEach(dep => {
@@ -66,7 +65,7 @@ export class CopybooksDownloader implements vscode.Disposable {
             missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
         } else if (missingCopybooks.length > 0) {
             this.resolver.fixMissingDownloads(message, missingCopybooks, profile, {
-                hasPaths: (await this.pathsService.listPathDatasets()).length > 0,
+                hasPaths: (await this.pathGenerator.listDatasets()).length > 0,
                 hasProfiles: Object.keys(await this.profileService.listProfiles()).length > 1,
             });
         }
@@ -76,7 +75,7 @@ export class CopybooksDownloader implements vscode.Disposable {
     public async start() {
         this.resolver.setQueue(this.queue);
         let done = false;
-        let errors: string[] = [];
+        const errors = new Set();
         while (!done) {
             const element: CopybookProfile | undefined = await this.queue.pop();
             if (!element) {
@@ -93,8 +92,8 @@ export class CopybooksDownloader implements vscode.Disposable {
                     while (this.queue.length > 0) {
                         toDownload.push(await this.queue.pop());
                     }
-                    toDownload.map(cp => cp.copybook).forEach(cb => errors.push(cb));
-                    for (const dataset of await this.pathsService.listPathDatasets()) {
+                    toDownload.map(cp => cp.copybook).forEach(cb => errors.add(cb));
+                    for (const dataset of await this.pathGenerator.listDatasets()) {
                         progress.report({
                             message: "Looking in " + dataset + ". " + toDownload.length +
                                 " copybook(s) left.",
@@ -102,18 +101,17 @@ export class CopybooksDownloader implements vscode.Disposable {
                         for (const cp of toDownload) {
                             try {
                                 const fetchResult = await this.fetchCopybook(dataset, cp);
-                                if (fetchResult && errors.includes(cp.copybook)) {
-                                    const index = errors.indexOf(cp.copybook);
-                                    errors.splice(index, 1);
+                                if (fetchResult) {
+                                    errors.delete(cp.copybook);
                                 }
                             } catch (e) {
                                 vscode.window.showErrorMessage(e.toString());
                             }
                         }
                     }
-                    if (this.queue.length === 0 && errors.length > 0) {
-                        this.resolver.processDownloadError("Can't download copybooks: " + errors);
-                        errors = [];
+                    if (this.queue.length === 0 && errors.size > 0) {
+                        this.resolver.processDownloadError(PROCESS_DOWNLOAD_ERROR_MSG + Array.from(errors));
+                        errors.clear();
                     }
                 });
         }
@@ -128,7 +126,7 @@ export class CopybooksDownloader implements vscode.Disposable {
         try {
             members = await this.zoweApi.listMembers(dataset, copybookProfile.profile);
         } catch (error) {
-            await this.resolver.processDownloadError("Can't read members of " + dataset);
+            await this.resolver.processDownloadError("Can't read members of dataset: " + dataset);
             return false;
         }
         if (!members.includes(copybookProfile.copybook)) {
@@ -149,7 +147,7 @@ export class CopybooksDownloader implements vscode.Disposable {
 
     private async listMissingCopybooks(copybooks: string[], profileName: string): Promise<string[]> {
         const copybooksToDownload: Set<string> = new Set(copybooks);
-        (await this.pathsService.listPathDatasets()).forEach(ds => {
+        (await this.pathGenerator.listDatasets()).forEach(ds => {
             Array.from(copybooksToDownload.values()).forEach(c => {
                 if (fs.existsSync(createCopybookPath(profileName, ds, c))) {
                     copybooksToDownload.delete(c);

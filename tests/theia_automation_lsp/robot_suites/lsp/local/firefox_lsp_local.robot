@@ -50,7 +50,7 @@ ${Semantic Error Line}   40
 ${Semantic Hint}    Invalid definition for: USER-CITY1COBOL Language Support - I
 
 ${Line With Spaces}    35
-${Space Hint}   This format is not a FIXED formatCOBOL Language Support - E
+${Space Hint}   The line doesn't match the fixed formatCOBOL Language Support - E
 
 ${Snippet Line}   41
 ${Snippet}   ADD id TO id

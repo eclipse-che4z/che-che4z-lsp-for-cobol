@@ -16,9 +16,6 @@ package com.ca.lsp.cobol.service;
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import com.ca.lsp.core.cobol.model.ErrorCode;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -44,6 +41,7 @@ import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
+import static com.ca.lsp.cobol.service.utils.FileSystemUtils.interpretPaths;
 
 /**
  * This class sets up the initial state of the services and applies other initialization activities,
@@ -66,7 +64,6 @@ public class MyLanguageServerImpl implements LanguageServer {
   private WorkspaceService workspaceService;
   private CopybookService copybookService;
   private Provider<LanguageClient> clientProvider;
-
   private SettingsProvider settingsProvider;
 
   @Inject
@@ -123,22 +120,12 @@ public class MyLanguageServerImpl implements LanguageServer {
    */
   void retrieveAndStoreConfiguration() {
     fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
-        .thenAccept(e -> settingsProvider.set(parseJsonIfValid((JsonObject) e.get(0))));
-  }
-
-  /**
-   * @param jsonObject - the object which comes from the client and contains configuration settings
-   * @return a custom object of type ConfigurableSettingsStorable if the JSON is valid or an empty
-   *     ConfigurableSettingsStorable if it is failing the parsing
-   */
-  private ConfigurationSettingsStorable parseJsonIfValid(JsonObject jsonObject) {
-    Gson gson = new Gson();
-    try {
-      return gson.fromJson(jsonObject, ConfigurationSettingsStorable.class);
-    } catch (JsonSyntaxException e) {
-      log.error(e.getMessage());
-      return ConfigurationSettingsStorable.emptyConfigurationSettingsStorable();
-    }
+        .thenAccept(
+            e -> {
+              ConfigurationSettingsStorable config =
+                  new ConfigurationSettingsStorable(interpretPaths(e));
+              settingsProvider.set(config);
+            });
   }
 
   private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {

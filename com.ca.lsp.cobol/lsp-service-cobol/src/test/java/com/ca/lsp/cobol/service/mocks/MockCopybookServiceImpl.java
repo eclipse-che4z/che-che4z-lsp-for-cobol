@@ -63,7 +63,7 @@ public class MockCopybookServiceImpl implements MockCopybookService {
   }
 
   @Override
-  public Path findCopybook(String filename, String profile, List<String> datasetList) {
+  public Path findCopybook(String filename, List<String> datasetList) {
     return null;
   }
 

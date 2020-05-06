@@ -32,18 +32,17 @@
             "preLaunchTask": "npm: watch"
         },
         {
-            "name": "Extension Tests",
-            "type": "extensionHost",
+            "type": "node",
             "request": "launch",
-            "runtimeExecutable": "${execPath}",
+            "name": "Debug Tests",
+            "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
             "args": [
-                "--extensionDevelopmentPath=${workspaceFolder}",
-                "--extensionTestsPath=${workspaceFolder}/out/test"
+                "-i"
             ],
+            "internalConsoleOptions": "openOnSessionStart",
             "outFiles": [
-                "${workspaceFolder}/out/test/**/*.js"
-            ],
-            "preLaunchTask": "npm: watch"
+                "${workspaceRoot}/src/__tests__/*"
+            ]
         }
     ]
 }

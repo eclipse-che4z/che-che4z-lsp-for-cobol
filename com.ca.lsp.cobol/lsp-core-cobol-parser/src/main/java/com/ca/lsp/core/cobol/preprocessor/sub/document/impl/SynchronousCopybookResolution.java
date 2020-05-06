@@ -17,9 +17,7 @@ package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
-import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
-import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
-import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
+import com.broadcom.lsp.domain.cobol.event.model.*;
 import com.ca.lsp.core.cobol.model.CopybookModel;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +53,12 @@ public class SynchronousCopybookResolution
             .name(copybookName)
             .documentUri(documentUri)
             .textDocumentSyncType(textDocumentSyncType)
+            .build());
+    broker.postData(
+        CopybookDepEvent.builder()
+            .copybookName(copybookName)
+            .documentUri(documentUri)
+            .textDocumentSync(textDocumentSyncType)
             .build());
     try {
       return waitForResolving.get();

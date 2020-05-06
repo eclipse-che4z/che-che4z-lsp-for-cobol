@@ -13,26 +13,32 @@
  */
 
 import * as vscode from "vscode";
-import { SETTINGS_SECTION } from "./constants";
-import { DEPENDENCIES_FOLDER } from "./constants";
-import { CopybooksDownloader } from "./CopybooksDownloader";
-import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
-import { ProfileService } from "./ProfileService";
-import { LanguageClientService } from "./services/LanguageClientService";
-import { ZoweApi } from "./ZoweApi";
-import { CopybookResolver } from "./services/CopybookResolver";
-import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 import { editDatasetPaths } from "./commands/EditDatasetPaths";
+import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
+import { DEPENDENCIES_FOLDER, REASON_MSG } from "./constants";
+import { LANGUAGE_ID, SETTINGS_SECTION } from "./constants";
+import { CopybookFix } from "./services/CopybookFix";
+import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
+import { CopybooksDownloader } from "./services/CopybooksDownloader";
+import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
+import { initializeSettings } from "./services/Settings";
+
+import { LanguageClientService } from "./services/LanguageClientService";
 import { PathsService } from "./services/PathsService";
+import { ProfileService } from "./services/ProfileService";
+import { ProfilesMap, ZoweApi } from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
+    initializeSettings();
+
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
-    const resolver: CopybookResolver = new CopybookResolver();
+    const copybookFix: CopybookFix = new CopybookFix();
+    const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
+    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator);
+    const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator);
     const pathsService: PathsService = new PathsService();
-    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(resolver, zoweApi, profileService, pathsService);
-    const languageClientService: LanguageClientService = new LanguageClientService();
 
     try {
         await languageClientService.checkPrerequisites();
@@ -45,8 +51,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // Listeners
     context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
-        if (event.affectsConfiguration(SETTINGS_SECTION)) {
-            copyBooksDownloader.redownloadDependencies("Configuration was updated");
+        if (event.affectsConfiguration(SETTINGS_SECTION) &&
+        vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles")) {
+            copyBooksDownloader.redownloadDependencies(REASON_MSG);
             profileService.updateStatusBar();
         }
     }));
@@ -65,15 +72,14 @@ export async function activate(context: vscode.ExtensionContext) {
         editDatasetPaths(pathsService);
     }));
 
-
     context.subscriptions.push(languageClientService.start());
     context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
     context.subscriptions.push(copyBooksDownloader);
 
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
-            { scheme: "file", language: "COBOL" },
-            new CopybooksCodeActionProvider()));
+            { scheme: "file", language: LANGUAGE_ID },
+            new CopybooksCodeActionProvider(profileService)));
 }
 
 function initWorkspaceTracker(downloader: CopybooksDownloader): vscode.Disposable {
