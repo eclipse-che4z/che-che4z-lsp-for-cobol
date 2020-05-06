@@ -24,7 +24,7 @@ import { CopybooksDownloader } from "./services/CopybooksDownloader";
 import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
 import { initializeSettings } from "./services/Settings";
 
-import {resolveLocalCopybooks} from "./commands/ResolveLocalCopybooks";
+import {resolveLocalCopybooksCommand} from "./commands/ResolveLocalCopybooksCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { PathsService } from "./services/PathsService";
 import { ProfileService } from "./services/ProfileService";
@@ -78,7 +78,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     //POC Command: Used just to quickly share the resolution - might be removed later on.
     context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.resolve-local-copybooks", () => {
-        resolveLocalCopybooks(copybookResolver);
+        resolveLocalCopybooksCommand(copybookResolver);
     }));
 
 

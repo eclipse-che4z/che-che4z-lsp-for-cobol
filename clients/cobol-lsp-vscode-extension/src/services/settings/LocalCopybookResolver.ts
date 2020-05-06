@@ -18,40 +18,23 @@ import {CopybookResolver} from "./CopybookResolver";
 import {SettingsUtils} from "./util/SettingsUtils";
 
 /**
- * This function construct an URI from a valid resource provided from the setting configuration
- * @param resource represent the file to search within the workspace folder list
- * @return an URI representation of the file or undefined if not found
- */
-function getURIFromResource(resource: string): URL {
-    for (const workspaceFolder of SettingsUtils.getWorkspacesURI()) {
-        const uri: URL = new URL(path.join(workspaceFolder, resource));
-        if (fs.existsSync(uri)) {
-            return uri;
-        }
-    }
-}
-
-function resolveURIList(list: string[]): string[] {
-    const result: Set<string> = new Set<string>();
-    list.filter(resource => resource !== "*").forEach(resource => {
-        const URI: URL = getURIFromResource(resource);
-        if (URI !== undefined) {
-            result.add(URI.href);
-        }
-    });
-    return [...result];
-}
-
-/**
  * This class implement the resolution of paths defined into the configuration file in a list
  * of URIs that are present on the filesystem
  */
 export class LocalCopybookResolver implements CopybookResolver {
-    private static parse(list: string[]): string[] {
-        if (list === undefined) {
-            return [];
+
+    /**
+     * This function construct an URI from a valid resource provided from the setting configuration
+     * @param resource represent the file to search within the workspace folder list
+     * @return an URI representation of the file or undefined if not found
+     */
+    private static getURIFromResource(resource: string): URL {
+        for (const workspaceFolder of SettingsUtils.getWorkspacesURI()) {
+            const uri: URL = new URL(path.join(workspaceFolder, resource));
+            if (fs.existsSync(uri)) {
+                return uri;
+            }
         }
-        return resolveURIList(list).filter(uri => uri !== "");
     }
 
     /**
@@ -59,7 +42,20 @@ export class LocalCopybookResolver implements CopybookResolver {
      * @return a list of resolved URIs, empty array if the input list doesn't contains any valid/found URIs
      */
     public resolve(list: string[]): string[] {
-        return LocalCopybookResolver.parse(list);
+        if (list === undefined) {
+            return [];
+        }
+        return this.resolveURIList(list).filter(uri => uri !== "");
     }
 
+    private  resolveURIList(list: string[]): string[] {
+        const result: Set<string> = new Set<string>();
+        list.filter(resource => resource !== "*").forEach(resource => {
+            const URI: URL = LocalCopybookResolver.getURIFromResource(resource);
+            if (URI !== undefined) {
+                result.add(URI.href);
+            }
+        });
+        return [...result];
+    }
 }
