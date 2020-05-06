@@ -1,3 +1,5 @@
+import { convertError } from "./services/ZoweError";
+
 /*
  * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
@@ -17,3 +19,9 @@ export const COPYBOOKS_FOLDER: string = ".copybooks";
 export const LANGUAGE_ID = "COBOL";
 export const REASON_MSG = "Configuration updated. Ensure your configuration contains correct paths to nested copybooks.";
 export const PROCESS_DOWNLOAD_ERROR_MSG = "Some copybooks could not be downloaded. Ensure your configuration contains correct paths to nested copybooks. Missing copybooks: ";
+export const PROFILE_NAME_PLACEHOLDER = "<profilename>";
+export const NO_PASSWORD_ERROR_MSG = `No password in Zowe profile ${PROFILE_NAME_PLACEHOLDER}.`;
+export const CONN_REFUSED_ERROR_MSG = `Connection to mainframe using Zowe profile ${PROFILE_NAME_PLACEHOLDER} failed.`;
+export const INVALID_CREDENTIALS_ERROR_MSG = `Incorrect credentials in Zowe profile ${PROFILE_NAME_PLACEHOLDER}.`;
+export const DSN_PLACEHOLDER = "<DSN>";
+export const DSN_NOT_FOUND_ERROR_MSG = `Dataset ${DSN_PLACEHOLDER} not found.`;

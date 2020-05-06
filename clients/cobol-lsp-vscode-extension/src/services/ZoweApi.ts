@@ -15,6 +15,7 @@
 import { AbstractSession, BasicProfileManager, IProfile, RestClient, Session } from "@zowe/imperative";
 import * as os from "os";
 import * as path from "path";
+import { convertError, Type, ZoweError } from "./ZoweError";
 
 const ZOSMF_PREFIX = "/zosmf/restfiles/ds/";
 
@@ -41,28 +42,39 @@ export class ZoweApi {
     }
 
     public async fetchMember(dataset: string, member: string, profileName: string): Promise<string> {
-        const session: Session = await this.createSession(profileName);
+        try {
+            const session: Session = await this.createSession(profileName);
 
-        // default should be https
-        const rpath = `${ZOSMF_PREFIX}${dataset}(${member})`;
-        return await RestClient.getExpectString(session, rpath, [{
-            "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "",
-        }]);
+            // default should be https
+            const rpath = `${ZOSMF_PREFIX}${dataset}(${member})`;
+            return await RestClient.getExpectString(session, rpath, [{
+                "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "",
+            }]);
+        } catch (error) {
+            throw convertError(error);
+        }
     }
 
     public async listMembers(dataset: string, profileName: string): Promise<string[]> {
-        // default should be https
-        const session: Session = await this.createSession(profileName);
-        const rpath = `${ZOSMF_PREFIX}${dataset}/member`;
-        const result = await RestClient.getExpectJSON(session, rpath, [{
-            "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "",
-        }]);
-        // tslint:disable-next-line: no-string-literal
-        return result["items"].map((i: any) => i.member);
+        try {
+            // default should be https
+            const session: Session = await this.createSession(profileName);
+            const rpath = `${ZOSMF_PREFIX}${dataset}/member`;
+            const result = await RestClient.getExpectJSON(session, rpath, [{
+                "Content-Type": "application/json", "X-CSRF-ZOSMF-HEADER": "",
+            }]);
+            // tslint:disable-next-line: no-string-literal
+            return result["items"].map((i: any) => i.member);
+        } catch (error) {
+            throw convertError(error);
+        }
     }
 
     public async createSession(profileName: string) {
         const profile = (await new BasicProfileManager(this.createProfileParams()).load({ name: profileName })).profile;
+        if (profile.password === "") {
+            throw new ZoweError("No password", Type.NoPassword);
+        }
         return new Session({
             ...{
                 hostname: profile.host,
