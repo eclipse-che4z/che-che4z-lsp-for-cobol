@@ -20,11 +20,18 @@ import com.ca.lsp.core.cobol.model.CopybookModel;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/** This interface represents the API for retrieving copybooks */
 public interface CopybookResolution {
 
+  /**
+   * Retrieve and return the copybook by its name. C
+   *
+   * @param copybookName - the name of the copybook to be retrieved
+   * @param documentUri - the currently processing document that contains the copy statement
+   * @param syncType - text document synchronization type
+   * @return a CopybookModel that contains copybook name, its URI and the content
+   */
   @Nullable
   CopybookModel resolve(
-      @Nullable String copyBookName,
-      @Nonnull String documentUri,
-      @Nonnull String textDocumentSyncType);
+      @Nonnull String copybookName, @Nonnull String documentUri, @Nonnull String syncType);
 }

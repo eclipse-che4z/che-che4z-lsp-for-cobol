@@ -20,6 +20,10 @@ import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
+/**
+ * This class creates instances of {@link CopybookResolution} on demand. It requires the data bus
+ * broker to the instances to register on it.
+ */
 public class CopybookResolutionProvider implements Provider<CopybookResolution> {
 
   private DataBusBroker broker;
@@ -31,7 +35,6 @@ public class CopybookResolutionProvider implements Provider<CopybookResolution> 
 
   @Override
   public CopybookResolution get() {
-
     return new SynchronousCopybookResolution(broker);
   }
 }

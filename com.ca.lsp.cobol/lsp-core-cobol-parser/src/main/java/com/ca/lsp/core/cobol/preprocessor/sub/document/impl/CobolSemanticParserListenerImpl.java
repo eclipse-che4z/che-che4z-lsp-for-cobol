@@ -45,7 +45,8 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
 /**
- * ANTLR visitor, which preprocesses a given COBOL program by executing COPY and REPLACE statements.
+ * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
+ * and REPLACE statements and removing non-processable sections starting with EXEC statements.
  */
 @Slf4j
 public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListener

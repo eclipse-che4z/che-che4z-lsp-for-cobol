@@ -24,7 +24,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestSyntaxError.class,
   TestSkipStatement.class,
   TestVaryingCorrect.class,
-  AnalyzeCopybookCaching.class,
+  TestCopybookCaching.class,
   TestPerformUntilCorrect.class,
   TestMappingWithReplacing.class,
   TestExtraLanguagesCleaned.class,

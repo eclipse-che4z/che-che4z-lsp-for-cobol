@@ -17,6 +17,10 @@ package com.ca.lsp.core.cobol.model;
 
 import lombok.Value;
 
+/**
+ * This data class represents a resolved copybook. It consists of the copybook name, its URI using
+ * for positions and the content.
+ */
 @Value
 public class CopybookModel {
   private String name;

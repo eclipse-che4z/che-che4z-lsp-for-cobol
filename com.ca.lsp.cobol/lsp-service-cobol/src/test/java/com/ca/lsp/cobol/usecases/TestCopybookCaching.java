@@ -16,6 +16,7 @@
 
 package com.ca.lsp.cobol.usecases;
 
+import com.broadcom.lsp.cdi.EngineModule;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
@@ -24,33 +25,30 @@ import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.mocks.MockCopybookService;
 import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
-import com.ca.lsp.core.cobol.model.ExtendedDocument;
-import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CopybookResolutionProvider;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.MultiMapSerializableHelper;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Guice;
+import com.google.inject.Injector;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static java.util.Collections.*;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
+import static java.util.Collections.singletonList;
 import static junit.framework.TestCase.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
- * This test checks the logic of caching logic performed by copybook analyzer. The cache invalidated
- * before each test run. The runAnalysis() method starts the analyzing task synchronously, and after
- * finish the content of the copybook should appear in cache managing by databus. After accessing
- * the cache element its hit counter should increase to maintain the element persistence. Also, all
- * the objects in cache expected to be serializable.
+ * This test checks the caching logic performed by copybook resolution. The cache invalidated before
+ * each test run. The runAnalysis() method starts the resolving task synchronously, and after finish
+ * the content of the copybook should appear in cache managing by data bus. After accessing the
+ * cache element its hit counter should increase to maintain the element persistence. Also, all the
+ * objects in cache expected to be serializable.
  */
 @Slf4j
-public class AnalyzeCopybookCaching {
+public class TestCopybookCaching {
   private final String COPYBOOK_NAME = "copy";
   private final String COPYBOOK_CONTENT = "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
 
@@ -58,26 +56,23 @@ public class AnalyzeCopybookCaching {
   private final Position POSITION_SECOND_OCCURRENCE = new Position(null, 10, 10, 10, 10, null);
   private final Multimap<String, Position> paragraphDefinitions = HashMultimap.create();
 
-  private final DataBusBroker databus =
-      Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
-
-  private CobolPreprocessor preprocessor = mock(CobolPreprocessor.class);
+  private DataBusBroker databus = null;
+  private CopybookResolutionProvider resolution = null;
 
   @Before
   public void init() {
+    Injector injector = Guice.createInjector(new DatabusModule(), new EngineModule());
+    databus = injector.getInstance(DataBusBroker.class);
+    resolution = injector.getInstance(CopybookResolutionProvider.class);
     initParagraphDefinitions();
     predefineCache();
     initWorkspaceService();
-    when(preprocessor.process(any(), any(String.class), any(), any(String.class)))
-        .thenReturn(
-            new ResultWithErrors<>(
-                new ExtendedDocument(COPYBOOK_CONTENT, null, emptyMap()), emptyList()));
   }
 
   private void initParagraphDefinitions() {
-    String PARAGRAPH_NAME = "PARNAME";
-    paragraphDefinitions.put(PARAGRAPH_NAME, POSITION_FIRST_OCCURRENCE);
-    paragraphDefinitions.put(PARAGRAPH_NAME, POSITION_SECOND_OCCURRENCE);
+    String paragraphName = "PARNAME";
+    paragraphDefinitions.put(paragraphName, POSITION_FIRST_OCCURRENCE);
+    paragraphDefinitions.put(paragraphName, POSITION_SECOND_OCCURRENCE);
   }
 
   private void predefineCache() {
@@ -112,7 +107,7 @@ public class AnalyzeCopybookCaching {
     assertTrue(MultiMapSerializableHelper.serializeInHashMap(paragraphDefinitions).size() > 0);
   }
 
-  /** This test verifies that after the analysis a specific copybook is retrivied from the cache */
+  /** This test verifies that after the analysis a specific copybook retrieved from the cache */
   @Test
   public void analyzeCopybookFromCache() {
     // test the behavior on DID_OPEN
@@ -122,7 +117,7 @@ public class AnalyzeCopybookCaching {
   }
 
   /**
-   * This test verify that when the cache is empty as first attempt the copybook is loaded from the
+   * This test verifies that when the cache is empty as first attempt the copybook loaded from the
    * filesystem and then is available in the cache.
    */
   @Test
@@ -135,29 +130,29 @@ public class AnalyzeCopybookCaching {
 
   private void assertDidOpenAnalysisFromCache() {
     log.info(databus.printCache());
-    runAnalysisInDidOpen();
+    runAnalysis("DID_OPEN");
     log.info(databus.printCache());
     assertPositiveHitFromCache();
   }
 
   private void assertDidChangeAnalysisFromCache() {
     log.info(databus.printCache());
-    runAnalysisInDidChange();
+    runAnalysis("DID_CHANGE");
     log.info(databus.printCache());
     assertPositiveHitFromCache();
   }
 
   private void assertDidOpenFromCopybookService() {
-    // invalidate cache in order to ask workspace manager to grab the content
+    // invalidate the cache in order to ask workspace manager to grab the content
     databus.invalidateCache();
-    runAnalysisInDidOpen();
+    runAnalysis("DID_OPEN");
     assertStoredInCache();
   }
 
   private void assertDidChangeFromCopybookService() {
-    // invalidate cache in order to ask workspace manager to grab the content
+    // invalidate the cache in order to ask workspace manager to grab the content
     databus.invalidateCache();
-    runAnalysisInDidChange();
+    runAnalysis("DID_CHANGE");
     assertStoredInCache();
   }
 
@@ -171,27 +166,7 @@ public class AnalyzeCopybookCaching {
             > 0);
   }
 
-  private void runAnalysisInDidChange() {
-    //    AnalyseCopybookTask analyseCopybookTask =
-    //        new AnalyseCopybookTask(
-    //            databus,
-    //            preprocessor,
-    //            null,
-    //            new CopybookUsage(COPYBOOK_NAME, null, null),
-    //            emptyList(),
-    //            "DID_CHANGE");
-    //    analyseCopybookTask.compute();
-  }
-
-  private void runAnalysisInDidOpen() {
-    //    AnalyseCopybookTask analyseCopybookTask =
-    //        new AnalyseCopybookTask(
-    //            databus,
-    //            preprocessor,
-    //            null,
-    //            new CopybookUsage(COPYBOOK_NAME, null, null),
-    //            emptyList(),
-    //            "DID_OPEN");
-    //    analyseCopybookTask.compute();
+  private void runAnalysis(String syncType) {
+    resolution.get().resolve(COPYBOOK_NAME, DOCUMENT_URI, syncType);
   }
 }
