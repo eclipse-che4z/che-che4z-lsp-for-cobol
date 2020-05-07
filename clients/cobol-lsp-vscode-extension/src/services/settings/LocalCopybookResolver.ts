@@ -38,14 +38,11 @@ export class LocalCopybookResolver implements CopybookResolver {
     }
 
     /**
-     * @param list the provided list of physical path defined by the user
+     * @param list the provided list of physical path defined by the user or undefined
      * @return a list of resolved URIs, empty array if the input list doesn't contains any valid/found URIs
      */
-    public resolve(list: string[]): string[] {
-        if (list === undefined) {
-            return [];
-        }
-        return this.resolveURIList(list).filter(uri => uri !== "");
+    public resolve(list: string[] | undefined): string[] {
+        return (list) ? this.resolveURIList(list).filter(uri => uri !== "") : [];
     }
 
     private  resolveURIList(list: string[]): string[] {
