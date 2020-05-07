@@ -293,7 +293,7 @@ Navigate To Element Path
 
 *** Test Cases ***
 TC152046 Nominal - check syntax Ok message
-    [Tags]  TC152046  COBOL_LOCAL  LSP  Chrome  Rally
+    [Tags]  TC152046  COBOL_LOCAL  LSP  Chrome  Rally  Unstable
     [Documentation]  Checks that when opening Cobol file with correct syntax there is an appropriate message is shown
     ${Explorer Title Node} =  Find File Explorer Panel
     ${Top File Element} =  Find First Element In Files Explorer
