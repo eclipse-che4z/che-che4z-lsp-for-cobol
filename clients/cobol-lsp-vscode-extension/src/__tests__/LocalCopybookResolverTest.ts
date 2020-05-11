@@ -17,7 +17,6 @@ import * as path from "path";
 import {PATHS_LOCAL_KEY, SETTINGS_SECTION } from "../constants";
 import {LocalCopybookResolver} from "../services/settings/LocalCopybookResolver";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
-import { URL } from "url";
 
 const settingsParser: LocalCopybookResolver = new LocalCopybookResolver();
 const STAR_LOCATION = "*";
@@ -25,9 +24,8 @@ const FILENAME: string = "test.cbl";
 
 beforeAll(() => {
     const FILENAME_URI = createFile();
-    const filePathURI: string = path.dirname(FILENAME_URI);
-    //NOTE: mock the method to obtain an URI in the format: [file://URI_FOLDER] - doesn't contain the file name with ext.
-    SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + filePathURI]);
+    const fileDirectoryURI: string = path.dirname(FILENAME_URI);
+    SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + fileDirectoryURI]);
 });
 
 afterAll(() => {

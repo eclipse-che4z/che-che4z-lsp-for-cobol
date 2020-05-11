@@ -79,11 +79,23 @@
         "configuration": {
             "title": "Broadcom COBOL LSP",
             "properties": {
+                "broadcom-cobol.test": {
+                    "profile": {
+                        "type": "string",
+                        "description": "Current default profile for copybook downloader"
+                    },
+                    "dsn": {
+                        "type": "string",
+                        "description": "whenever"
+                    },
+                    "default": "false",
+                    "type": "object"
+                },
                 "broadcom-cobol-lsp.cpy-manager.profiles": {
                     "type": "string",
                     "description": "Current default profile for copybook downloader"
                 },
-                "broadcom-cobol-lsp.cpy-manager.paths.zowe": {
+                "broadcom-cobol-lsp.cpy-manager.paths.dsn": {
                     "type": "array",
                     "items": {
                         "type": "string"

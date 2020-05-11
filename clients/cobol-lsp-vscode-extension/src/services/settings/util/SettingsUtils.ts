@@ -14,7 +14,7 @@ import * as vscode from "vscode";
  */
 export class SettingsUtils {
     public static isValidJSON(json: string): boolean {
-        return (json !== undefined && json.trim().length > 0);
+        return (json !== undefined) ? JSON.parse(json) : false;
     }
 
     /**From a configuration of single/multi workspace folders, their URIs are collected and returned in a util method.

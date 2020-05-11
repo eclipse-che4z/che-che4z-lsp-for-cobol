@@ -53,7 +53,7 @@ if [ "development" == "$CURRENT_BRANCH" ]; then
     echo "Branch 'release-$SHORT_RELEASE' created and pushed"
 
     git checkout development
-    update_version "$SHORT_RELEASE-NEXT"
+    update_version "$SHORT_RELEASE+NEXT"
     git add package.json ../../com.ca.lsp.cobol/pom.xml server/note.md ../../Jenkinsfile src/extension.ts
     git commit -s -m "chore(release): Switch to development version"
     git push
