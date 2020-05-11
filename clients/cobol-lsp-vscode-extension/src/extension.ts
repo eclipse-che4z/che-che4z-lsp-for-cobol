@@ -17,7 +17,7 @@ import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 import { editDatasetPaths } from "./commands/EditDatasetPaths";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { DEPENDENCIES_FOLDER, REASON_MSG } from "./constants";
-import { LANGUAGE_ID, SETTINGS_SECTION } from "./constants";
+import { LANGUAGE_ID, SETTINGS_SECTION, PATHS_LOCAL_KEY } from "./constants";
 import { CopybookFix } from "./services/CopybookFix";
 import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
 import { CopybooksDownloader } from "./services/CopybooksDownloader";
@@ -31,6 +31,7 @@ import { ProfileService } from "./services/ProfileService";
 import {CopybookResolver} from "./services/settings/CopybookResolver";
 import {LocalCopybookResolver} from "./services/settings/LocalCopybookResolver";
 import { ZoweApi } from "./services/ZoweApi";
+import { Prioritizer } from "./services/Prioritizer";
 
 export async function activate(context: vscode.ExtensionContext) {
     initializeSettings();
@@ -38,9 +39,10 @@ export async function activate(context: vscode.ExtensionContext) {
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
     const copybookFix: CopybookFix = new CopybookFix();
+    const prioritizer: Prioritizer = new Prioritizer();
     const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
-    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator);
-    const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator);
+    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator, prioritizer);
+    const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator, prioritizer);
     const pathsService: PathsService = new PathsService();
     const copybookResolver: CopybookResolver = new LocalCopybookResolver();
 
@@ -81,6 +83,17 @@ export async function activate(context: vscode.ExtensionContext) {
         resolveLocalCopybooks(copybookResolver);
     }));
 
+    //to be deleted after implementation
+    context.subscriptions.push
+    (vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.resolve-git-copybooks", () => {
+        prioritizer.checkCopybooksPresentLocal(["DEMO1", "DEMO2"],
+             vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
+    }));
+
+    context.subscriptions.push
+    (vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.resolve-git-copybooks-2", () => {
+        vscode.window.showInformationMessage("My message: " + prioritizer.getLocalCpyURI());
+    }));
 
     context.subscriptions.push(languageClientService.start());
     context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));

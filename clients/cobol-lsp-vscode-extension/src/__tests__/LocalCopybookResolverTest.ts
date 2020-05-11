@@ -17,6 +17,7 @@ import * as path from "path";
 import {PATHS_LOCAL_KEY, SETTINGS_SECTION } from "../constants";
 import {LocalCopybookResolver} from "../services/settings/LocalCopybookResolver";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
+import { URL } from "url";
 
 const settingsParser: LocalCopybookResolver = new LocalCopybookResolver();
 const STAR_LOCATION = "*";
