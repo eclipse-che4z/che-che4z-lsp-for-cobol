@@ -56,7 +56,7 @@ export class Prioritizer {
     private copybookInLocal(copybook: string, resolvedUri: string[]): string {
         let finalUri: URL;
         resolvedUri.forEach(uri => {
-            let url = new URL(uri);
+            const url = new URL(uri);
             if (uri.includes(copybook) && fs.existsSync(url)) {
                 finalUri = url;
             }
