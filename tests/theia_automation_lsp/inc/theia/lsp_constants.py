@@ -19,10 +19,13 @@ SAVE_DIALOG_TEMPLATE = "Do you want to save the changes you made to {0}?"
 COPYBOOK_FOLDER = ".copybooks"
 ZOWE_PROFILE = "zowe-profile-1"
 
+SETTINGS_JSON_PATHS_DSN = "broadcom-cobol-lsp.cpy-manager.paths"
+SETTINGS_JSON_PROFILES = "broadcom-cobol-lsp.cpy-manager.profiles"
+
 CPY_DIR_1 = "DATA.SET.PATH1"
 CPY_DIR_2 = "DATA.SET.PATH2"
 
 USER_COPYBOOK_PREFERENCES = {
-    "broadcom-cobol-lsp.cpy-manager.paths": [CPY_DIR_1, CPY_DIR_2],
-    "broadcom-cobol-lsp.cpy-manager.profiles": ZOWE_PROFILE
+    SETTINGS_JSON_PATHS_DSN: [CPY_DIR_1, CPY_DIR_2],
+    SETTINGS_JSON_PROFILES: ZOWE_PROFILE
 }
