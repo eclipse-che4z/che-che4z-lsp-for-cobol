@@ -34,7 +34,7 @@ export class CopybooksPathGenerator {
 
     async listDatasets(): Promise<string[]> {
         if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has(PATHS_ZOWE)) {
-            await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
+            vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
             return [];
         }
         return vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);

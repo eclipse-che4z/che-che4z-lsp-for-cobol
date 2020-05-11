@@ -15,7 +15,7 @@ import urllib.parse
 import os
 import base64
 from copy import deepcopy
-from selenium.common.exceptions import WebDriverException, TimeoutException
+from selenium.common.exceptions import WebDriverException, NoSuchElementException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions
@@ -25,19 +25,15 @@ from inc.exceptions.custom_timeout_exception import CustomTimeoutException
 from inc.exceptions.element_not_found_exception import ElementNotFoundException
 from inc.exceptions.general_exception import GeneralException
 from inc.exceptions.no_line_number_exception import NoLineNumberOnScreenException
-from inc.helpers import highlight, dump
+from inc.helpers import highlight, dump, bool2str
 from inc.theia import constants, lsp_constants
+from inc.theia.main_menu import MainMenu
 from inc.theia.ui import UI
 from lib.common_driver import CommonDriver
 from inc.decorators.wait_till_exist import WaitTillExist
 
 
 class MonakoEditor(CommonDriver):
-
-    SHORT_TIMEOUT = constants.DEFAULT_SHORT_TIMEOUT
-    DEFAULT_TIMEOUT = constants.DEFAULT_TIMEOUT
-    DEFAULT_LONG_TIMEOUT = constants.DEFAULT_LONG_TIMEOUT
-    DEFAULT_HUGE_TIMEOUT = constants.DEFAULT_HUGE_TIMEOUT
 
     def __init__(self, driver=None):
         super(MonakoEditor, self).__init__(driver)
@@ -114,6 +110,10 @@ class MonakoEditor(CommonDriver):
         tab = self.wait_for_tab_with_dataset_member(dataset, member)
         self.close_tab_element(tab)
 
+    @staticmethod
+    def get_tab_element_title(tab):
+        return tab.text
+
     def wait_for_tab_with_dataset_member(self, dataset, member):
         tab_text = lsp_constants.TAB_TITLE_TEMPLATE.format(dataset.upper(), member.upper())
         return self.wait_for_tab_exist(tab_text)
@@ -127,6 +127,26 @@ class MonakoEditor(CommonDriver):
 
         for tab in tabs:
             if tab.text == tab_text:
+                return tab
+
+        raise WebDriverException
+
+    @WaitTillExist()
+    def wait_for_sub_tab_exist(self, tab_text):
+        main_content = self.find_it(UI.get_theia_main_content_panel_locator())
+        dock_panel = self.find_it(UI.get_theia_dock_panel_locator(), parent=main_content)
+
+        highlight(dock_panel, effect_time=1)
+
+        tabs = self.find_them(UI.get_tabs_locator(), parent=dock_panel)
+
+        for tab in tabs:
+            if tab.text == tab_text:
+                highlight(tab, effect_time=1)
+
+                if constants.THEIA_CURRENT_TAB not in tab.get_attribute(constants.TYPE_CLASS):
+                    self.click_me(tab)
+
                 return tab
 
         raise WebDriverException
@@ -152,6 +172,14 @@ class MonakoEditor(CommonDriver):
             editor = self.get_editor_element()
 
         self.click_me(editor)
+
+    def set_focus_in_user_preferences(self, editor=None):
+        if editor is None:
+            editor = self.get_editor_element()
+
+        user_preferences = self.find_it(UI.get_theia_user_preferences_locator(), parent=editor)
+        self.click_me(user_preferences)
+        return user_preferences
 
     def get_line_numbers_elements(self, editor=None):
         if editor is None:
@@ -201,7 +229,12 @@ class MonakoEditor(CommonDriver):
             line_content = self.get_line_content_with_number(line_number, editor=parent)
 
             if line_content.find(content) == -1:
-                raise AssertException(self.get_driver(), content, line_content, call_from=self.get_current_line_num.__name__)
+                raise AssertException(
+                    self.get_driver(),
+                    content,
+                    line_content,
+                    call_from=self.get_current_line_num.__name__
+                )
 
             print("...Ok")
 
@@ -287,7 +320,7 @@ class MonakoEditor(CommonDriver):
             line_numbers_elements = self.get_line_numbers_elements()
 
             elapsed_time = round(time.time())
-            if elapsed_time - start_time > self.DEFAULT_HUGE_TIMEOUT:
+            if elapsed_time - start_time > constants.DEFAULT_HUGE_TIMEOUT:
                 raise CustomTimeoutException(self.get_driver(), call_from=self.scroll_editor_till_line_number.__name__)
 
             try:
@@ -306,13 +339,6 @@ class MonakoEditor(CommonDriver):
             except Exception:
                 raise GeneralException(self.get_driver(), call_from=self.scroll_editor_till_line_number.__name__)
 
-    def send_key_sequence(self, key_list):
-        actions = ActionChains(self.get_driver())
-        for key in key_list:
-            actions.send_keys(key)
-
-        actions.perform()
-
     def page_down(self, editor=None):
         if editor is None:
             editor = self.get_editor_element()
@@ -327,8 +353,8 @@ class MonakoEditor(CommonDriver):
         self.set_focus(editor)
         self.send_key_sequence([Keys.PAGE_UP])
 
-    @WaitTillExist(timeout=constants.DEFAULT_SHORT_TIMEOUT)
-    def error_should_present(self, editor=None, error_type=None):
+    @WaitTillExist(timeout=constants.DEFAULT_TIMEOUT)
+    def error_should_present(self, editor=None, error_type=None, error_should_exist=True):
         if editor is None:
             editor = self.get_editor_element()
 
@@ -346,21 +372,28 @@ class MonakoEditor(CommonDriver):
         else:
             raise Exception("Unsupported error_type: '{0}'".format(error_type))
 
-        if not len(error_divs):
+        if not len(error_divs) and error_should_exist:
+            raise WebDriverException
+
+        if len(error_divs) and not error_should_exist:
             raise WebDriverException
 
         return error_divs
 
-    def find_errors_on_screen(self, editor=None, error_type="error"):
+    def find_errors_on_screen(self, editor=None, error_type="error", error_should_exist=True):
         if editor is None:
             editor = self.get_editor_element()
 
         error_lines = list()
 
-        error_divs = self.error_should_present(editor=editor, error_type=error_type)
+        error_divs = self.error_should_present(
+            editor=editor,
+            error_type=error_type,
+            error_should_exist=error_should_exist
+        )
         print("error_divs: '{0}'".format(error_divs))
         # debug!
-        if not len(error_divs):
+        if not len(error_divs) and error_should_exist:
             dump(self.get_driver(), reason=self.find_errors_on_screen.__name__)
 
         for error_div in error_divs:
@@ -418,6 +451,8 @@ class MonakoEditor(CommonDriver):
         if editor is None:
             editor = self.get_editor_element()
 
+        highlight(editor, effect_time=1)
+
         overlays = self.find_it(UI.get_monako_overlays_locator(), parent=editor)
         error_divs = self.find_them(divs_locator, parent=overlays)
 
@@ -431,6 +466,8 @@ class MonakoEditor(CommonDriver):
     def show_tooltip(self, tooltip_type, line_number, editor=None):
         if editor is None:
             editor = self.get_editor_element()
+
+        highlight(editor, effect_time=1)
 
         if tooltip_type == "error":
             divs_locator = UI.get_editor_errors_locator()
@@ -481,6 +518,14 @@ class MonakoEditor(CommonDriver):
         actions = ActionChains(self.get_driver())
         actions.key_down(Keys.CONTROL)
         actions.send_keys(Keys.SPACE)
+        actions.key_up(Keys.CONTROL)
+        actions.perform()
+
+    def control_left_click(self, element):
+        actions = ActionChains(self.get_driver())
+        actions.move_to_element(element)
+        actions.key_down(Keys.CONTROL)
+        actions.click()
         actions.key_up(Keys.CONTROL)
         actions.perform()
 
@@ -558,6 +603,7 @@ class MonakoEditor(CommonDriver):
 
         line_element = self.get_line_element_with_number(line_number, editor=editor)
         element = self.get_text_element_in_line(line_element, text)
+        highlight(element)
 
         return element
 
@@ -596,50 +642,78 @@ class MonakoEditor(CommonDriver):
         except Exception:
             raise GeneralException(self.get_driver(), call_from=self.close_zone_widget_if_exists.__name__)
 
+    def get_zone_widget_rows(self, editor=None):
+        if editor is None:
+            editor = self.get_editor_element()
+
+        WebDriverWait(
+            self.get_driver(),
+            constants.DEFAULT_TIMEOUT
+        ).until(
+            expected_conditions.presence_of_element_located(UI.get_monako_zone_widget_locator())
+        )
+
+        widget_zone = self.find_it(UI.get_monako_zone_widget_locator(), parent=editor)
+        highlight(widget_zone)
+        list_rows = self.find_them(UI.get_monako_list_row_locator(), parent=widget_zone)
+
+        return list_rows
+
+    def expand_widget_row_if_needed(self, list_row):
+        expanded = list_row.get_attribute(constants.ARIA_EXPANDED)
+        if expanded in [None, bool2str(True)]:
+            return
+
+        self.click_me(list_row)
+
+    def remove_tree_branches(self, list_lows):
+        rows = []
+        for list_row in list_lows:
+            expanded = list_row.get_attribute(constants.ARIA_EXPANDED)
+            if expanded is None:
+                rows.append(list_row)
+
+        return rows
+
     def get_references_num(self, editor=None):
         if editor is None:
             editor = self.get_editor_element()
 
-        WebDriverWait(
-            self.get_driver(),
-            self.DEFAULT_TIMEOUT
-        ).until(
-            expected_conditions.presence_of_element_located(UI.get_monako_zone_widget_locator())
-        )
-
-        widget_zone = self.find_it(UI.get_monako_zone_widget_locator(), parent=editor)
-        highlight(widget_zone)
-        list_rows = self.find_them(UI.get_monako_list_row_locator(), parent=widget_zone)
+        list_rows = self.get_references_in_widget_zone(editor)
         return len(list_rows)
 
-    def get_line_num_for_reference(self, ref_num, content=None, editor=None):
+    def get_references_in_widget_zone(self, editor=None):
         if editor is None:
             editor = self.get_editor_element()
 
+        list_rows = self.get_zone_widget_rows(editor)
+
+        for list_row in list_rows:
+            self.expand_widget_row_if_needed(list_row)
+
+        list_rows = self.get_zone_widget_rows(editor)
+        list_rows = self.remove_tree_branches(list_rows)
+
+        return list_rows
+
+    def get_line_num_for_reference(self, ref_num, list_rows=None, content=None, editor=None):
+        if list_rows is None:
+            list_rows = self.get_zone_widget_rows(editor)
+
         ref_num = int(ref_num)
-
-        WebDriverWait(
-            self.get_driver(),
-            self.DEFAULT_TIMEOUT
-        ).until(
-            expected_conditions.presence_of_element_located(UI.get_monako_zone_widget_locator())
-        )
-
-        widget_zone = self.find_it(UI.get_monako_zone_widget_locator(), parent=editor)
-        highlight(widget_zone)
-        list_rows = self.find_them(UI.get_monako_list_row_locator(), parent=widget_zone)
         self.click_me(list_rows[ref_num])
 
+        widget_zone = self.find_it(UI.get_monako_zone_widget_locator(), parent=editor)
         current_line_num = self.get_current_line_num(content=content, parent=widget_zone)
         return current_line_num
 
-    def navigate_with_references(self, editor=None):
+    def expand_tree_of_references(self, editor=None):
         if editor is None:
             editor = self.get_editor_element()
 
         WebDriverWait(
             self.get_driver(),
-            self.DEFAULT_TIMEOUT
+            constants.DEFAULT_TIMEOUT
         ).until(
             expected_conditions.presence_of_element_located(UI.get_monako_zone_widget_locator())
         )
@@ -651,7 +725,7 @@ class MonakoEditor(CommonDriver):
         for row in tree_rows:
             highlight(row, effect_time=1)
             self.click_me(row)
-            current_line_num = self.get_current_line_num(parent=widget_zone)
+            # current_line_num = self.get_current_line_num(parent=widget_zone)
 
     def get_current_line_num_inside_widget_zone(self, content, editor=None):
         if editor is None:
@@ -659,7 +733,7 @@ class MonakoEditor(CommonDriver):
 
         WebDriverWait(
             self.get_driver(),
-            self.DEFAULT_TIMEOUT
+            constants.DEFAULT_TIMEOUT
         ).until(
             expected_conditions.presence_of_element_located(UI.get_monako_zone_widget_locator())
         )
@@ -670,3 +744,162 @@ class MonakoEditor(CommonDriver):
         current_line_num = self.get_current_line_num(content=content, parent=widget_zone)
 
         return current_line_num
+
+    def find_lines_with_breakpoints(self, editor=None):
+        if editor is None:
+            editor = self.get_editor_element()
+
+        lines = list()
+        break_points = self.find_them(UI.get_debug_breakpoint_locator(), parent=editor)
+
+        for break_point in break_points:
+            line_number_element = self.get_parent_node(break_point)
+            line_number = self.find_it(UI.get_monako_line_numbers_content_locator(), parent=line_number_element)
+            lines.append(line_number.text)
+
+        print("lines with breakpoints: {0}".format(sorted(lines)))
+
+        return sorted(lines)
+
+    def find_line_with_breakpoint_hint(self, editor=None):
+        if editor is None:
+            editor = self.get_editor_element()
+
+        try:
+            break_point_hint = self.find_it(UI.get_debug_breakpoint_hint_locator(), parent=editor)
+            line_number_element = self.get_parent_node(break_point_hint)
+            line_number = self.find_it(UI.get_monako_line_numbers_content_locator(), parent=line_number_element)
+            return line_number.text
+
+        except (NoSuchElementException, ElementNotFoundException):
+            return None
+
+        except Exception:
+            raise
+
+    def find_variables_header(self, parent=None):
+        headers = self.find_them(UI.get_theia_header_locator(), parent=parent)
+        for header in headers:
+            if header.text.upper() == constants.Variables.upper():
+                return header
+
+        raise ElementNotFoundException("Variables header not found")
+
+    def find_breakpoints_header(self, parent=None):
+        headers = self.find_them(UI.get_theia_header_locator(), parent=parent)
+        for header in headers:
+            if header.text.upper() == constants.Breakpoints.upper():
+                highlight(header)
+                return header
+
+        raise ElementNotFoundException("Breakpoints header not found")
+
+    def clear_breakpoints(self):
+        debug_container = self.find_it(UI.get_debug_locator())
+        header = self.find_breakpoints_header(parent=debug_container)
+
+        breakpoint_container = self.get_parent_node(header)
+        highlight(breakpoint_container)
+
+        trees = self.find_them(UI.get_tree_container_locator(), parent=breakpoint_container)
+        for tree in trees:
+            highlight(tree)
+            if tree.text.upper() == constants.NoBreakpoints.upper():
+                print("There are no breakpoints. Nothing to clear.")
+                return
+
+        menu = MainMenu(self.get_driver())
+        menu.invoke_menu_path(constants.DebugRemoveAllBreakpoints)
+
+    @WaitTillExist()
+    def move_to_line_number_element(self, line_number, editor=None):
+        if editor is None:
+            editor = self.get_editor_element()
+
+        line_number_element = self.get_line_number_element(line_number, editor=editor)
+        highlight(line_number_element)
+
+        try:
+            actions = ActionChains(self.get_driver())
+            actions.move_to_element(line_number_element)
+            actions.perform()
+
+        except Exception:
+            raise WebDriverException
+
+        return line_number_element
+
+    def move_mouse_until_hint_is_shown(self, line_number, editor=None):
+        if editor is None:
+            editor = self.get_editor_element()
+
+        self.move_to_line_number_element(line_number, editor=editor)
+
+        offset = 10
+        max_offset = 50
+        current_offset = 0
+
+        actions = ActionChains(self.get_driver())
+
+        while True:
+            if current_offset >= max_offset:
+                raise Exception("Max offset achieved, no breakpoint hint detected")
+
+            current_offset = current_offset + offset
+            actions.move_by_offset(-offset, 0)
+            actions.perform()
+            number = self.find_line_with_breakpoint_hint()
+            print("Line number with hint: '{0}'".format(number))
+            if number is None:
+                continue
+
+            if number != line_number:
+                raise Exception(
+                    "Breakpoint hint line number doesn't correspond to search one: {0}<->{1}".format(
+                        number, line_number
+                    )
+                )
+
+            break
+
+    @WaitTillExist()
+    def breakpoints_num_increased(self, current_num):
+        debug_container = self.find_it(UI.get_debug_locator())
+        header = self.find_breakpoints_header(parent=debug_container)
+        breakpoint_container = self.get_parent_node(header)
+        breakpoint_elements = self.find_them(UI.get_debug_source_breakpoint_locator(), parent=breakpoint_container)
+
+        breakpoints_num = len(breakpoint_elements)
+        if breakpoints_num > current_num:
+            return
+
+        raise WebDriverException
+
+    def set_breakpoint_at_line(self, line_number, editor=None):
+        if editor is None:
+            editor = self.get_editor_element()
+
+        debug_container = self.find_it(UI.get_debug_locator())
+        header = self.find_breakpoints_header(parent=debug_container)
+        breakpoint_container = self.get_parent_node(header)
+
+        breakpoints_num = None
+
+        trees = self.find_them(UI.get_tree_container_locator(), parent=breakpoint_container)
+        for tree in trees:
+            highlight(tree, effect_time=1)
+            if tree.text.upper() == constants.NoBreakpoints.upper():
+                breakpoints_num = 0
+                break
+
+        if breakpoints_num is None:
+            breakpoint_elements = self.find_them(UI.get_debug_source_breakpoint_locator(), parent=breakpoint_container)
+            breakpoints_num = len(breakpoint_elements)
+
+        breakpoint_lines = self.find_lines_with_breakpoints(editor)
+        if line_number not in breakpoint_lines:
+            self.move_mouse_until_hint_is_shown(line_number, editor)
+            actions = ActionChains(self.get_driver())
+            actions.click()
+            actions.perform()
+            self.breakpoints_num_increased(breakpoints_num)
