@@ -16,6 +16,8 @@
 
        Data Division.
        Working-Storage Section.
+       COPY BOOK3.
+           01 BOOK2-REC.
            01 User-Num1 PIC 9(9).
            01 User-Num2 PIC 9(9).
            01 User-Address.
@@ -37,6 +39,7 @@
            Move 'CZ' To User-Country.
            Move 11000 To User-Index.
            Move 777123456 To User-Phone.
+           Move 777987654 To User-Phone-Mobile.
 
            Display "User-Num1     : " User-Num1.
            Display "User-Num2     : " User-Num2.

@@ -15,18 +15,25 @@ from inc.helpers import dump
 
 class GeneralException(Exception):
 
-    def __init__(self, driver=None, call_from=None, msg=""):
+    def __init__(self, driver=None, call_from=None, msg="", do_dump=True):
         self.driver = driver
         self.msg = msg
         super(GeneralException, self).__init__(msg)
         if msg != "":
             print(msg)
 
+        self.do_dump = do_dump
+
         reason = self.__class__.__name__
         if call_from is not None:
             reason = "{0}: {1}".format(reason, call_from)
 
-        dump(self.driver, reason=reason)
+        try:
+            if self.do_dump:
+                dump(self.driver, reason=reason)
+
+        finally:
+            pass
 
     def __str__(self):
         return self.msg

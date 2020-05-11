@@ -10,10 +10,7 @@
 # Contributors:
 #   Broadcom, Inc. - initial API and implementation
 
-from inc.exceptions.general_exception import GeneralException
-
-
-class NoLineNumberOnScreenException(GeneralException):
-
-    def __init__(self, driver, call_from=None, msg="", do_dump=True):
-        super(NoLineNumberOnScreenException, self).__init__(driver, call_from=call_from, msg=msg, do_dump=do_dump)
+CHE_CREDENTIALS = {
+    "username": "user",
+    "password": "pass"
+}

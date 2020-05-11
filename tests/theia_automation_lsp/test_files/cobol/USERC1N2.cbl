@@ -16,6 +16,9 @@
 
        Data Division.
        Working-Storage Section.
+       COPY BOOK1N.
+       COPY BOOK2N.
+           01 BOOK2-REC.
            01 User-Num1 PIC 9(9).
            01 User-Num2 PIC 9(9).
            01 User-Address.
@@ -37,6 +40,7 @@
            Move 'CZ' To User-Country.
            Move 11000 To User-Index.
            Move 777123456 To User-Phone.
+           Move 777987654 To User-Phone-Mobile.
 
            Display "User-Num1     : " User-Num1.
            Display "User-Num2     : " User-Num2.
@@ -45,5 +49,6 @@
            Display "User-Country  : " User-Country.
            Display "User-Index    : " User-Index.
            Display "User-Phone    : " User-Phone.
+           Display "User-Phone-M  : " User-Phone-Mobile1.
 
        End program HELLO-WORLD.
