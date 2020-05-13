@@ -962,7 +962,7 @@ dataDescriptionEntryExecSql
 
 //TODO: make it beautiful
 dataDescriptionEntryCpy
-   : COPYENTRY IDENTIFIER DOT_FS
+   : COPYENTRY URI_IDENTIFIER DOT_FS
    ;
 
 dataDescriptionExitCpy
@@ -1169,7 +1169,7 @@ statement
 
 //TODO: modify the copybook name rule to accept everything including keywords
 enterCpy
-   : COPYENTRY IDENTIFIER
+   : COPYENTRY URI_IDENTIFIER
    ;
 
 exitCpy

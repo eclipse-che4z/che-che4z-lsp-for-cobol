@@ -117,16 +117,16 @@ public class TestMisspelledKeywordWarningInCorrectPosition {
     assertEquals("Variable definitions: " + definitions.toString(), 4, definitions.size());
 
     assertNumberOfLocations(definitions, PARENT1, 1);
-    assertLocation(definitions, PARENT1, STRUC1_NAME, 0, 11);
+    assertLocation(definitions, PARENT1, toURI(STRUC1_NAME), 0, 11);
 
     assertNumberOfLocations(definitions, CHILD1, 1);
-    assertLocation(definitions, CHILD1, STRUC1_NAME, 1, 15);
+    assertLocation(definitions, CHILD1, toURI(STRUC1_NAME), 1, 15);
 
     assertNumberOfLocations(definitions, CHILD2, 1);
-    assertLocation(definitions, CHILD2, STRUC1_NAME, 2, 15);
+    assertLocation(definitions, CHILD2, toURI(STRUC1_NAME), 2, 15);
 
     assertNumberOfLocations(definitions, CHILD3, 1);
-    assertLocation(definitions, CHILD3, STRUC1_NAME, 3, 15);
+    assertLocation(definitions, CHILD3, toURI(STRUC1_NAME), 3, 15);
   }
 
   private void assertVariableUsages(Map<String, List<Location>> usages) {

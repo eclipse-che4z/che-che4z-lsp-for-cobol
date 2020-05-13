@@ -31,6 +31,8 @@ import org.eclipse.lsp4j.WorkspaceFolder;
 import java.nio.file.Path;
 import java.util.List;
 
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.toURI;
+
 /**
  * This class is used to mock the actual behavior of {@link
  * com.ca.lsp.cobol.service.CopybookService} and return stubs value not used to validate any
@@ -54,7 +56,8 @@ public class MockCopybookServiceImpl implements MockCopybookService {
   public void observerCallback(RequiredCopybookEvent event) {
     String name = event.getName();
     String content = getContentByCopybookName(event.getName());
-    dataBus.postData(FetchedCopybookEvent.builder().name(name).uri(name).content(content).build());
+    dataBus.postData(
+        FetchedCopybookEvent.builder().name(name).uri(toURI(name)).content(content).build());
   }
 
   @Override

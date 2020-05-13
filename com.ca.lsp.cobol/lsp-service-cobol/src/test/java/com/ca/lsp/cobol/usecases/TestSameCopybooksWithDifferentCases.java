@@ -29,8 +29,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Map;
 
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 
@@ -117,7 +116,7 @@ public class TestSameCopybooksWithDifferentCases {
       int startCharacter) {
     List<Location> parent2definitions = variableDefinitions.get(varName);
     assertEquals("Number of " + varName + " definitions", 1, parent2definitions.size());
-    assertLocation(parent2definitions.get(0), CPY_NAME, line, startCharacter, varName.length());
+    assertLocation(parent2definitions.get(0), toURI(CPY_NAME), line, startCharacter, varName.length());
   }
 
   private void assertLocation(

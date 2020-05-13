@@ -193,7 +193,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     if (!replacingPhraseContexts.isEmpty()) {
       applyReplacing(copybookName, model.getUri(), copybookContent, replacingPhraseContexts);
     } else {
-      writeCopybookContent(copybookName, copybookContent);
+      writeCopybookContent("<URI>" + model.getUri() + "</URI>", copybookContent);
     }
 
     String content = cleaner.peek().read();
@@ -210,7 +210,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     String copybookWithReplacingName =
         getUniqueNameForReplacing(copybookName, replacingPhraseContexts);
 
-    cleaner.peek().write(copybookWithReplacingName + ". ");
+    cleaner.peek().write("<URI>" + copybookWithReplacingName + "</URI>. ");
     CobolDocumentContext documentContext = cleaner.push();
     replacingPhraseContexts.forEach(
         it -> documentContext.storeReplaceablesAndReplacements(it.replaceClause()));

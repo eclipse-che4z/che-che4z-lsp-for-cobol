@@ -132,11 +132,11 @@ public class TestMappingWithMultiDefinitions {
     assertNumberOfLocations(copybookUsages, PARS_NAME, 1);
     assertLocation(copybookUsages, PARS_NAME, DOCUMENT_URI, 9, 12);
     assertNumberOfLocations(copybookUsages, NESTED_NAME, 1);
-    assertLocation(copybookUsages, NESTED_NAME, WITHNEST_NAME, 2, 16);
+    assertLocation(copybookUsages, NESTED_NAME, toURI(WITHNEST_NAME), 2, 16);
     assertNumberOfLocations(copybookUsages, NESTED1_NAME, 1);
-    assertLocation(copybookUsages, NESTED1_NAME, WITHNEST_NAME, 4, 16);
+    assertLocation(copybookUsages, NESTED1_NAME, toURI(WITHNEST_NAME), 4, 16);
     assertNumberOfLocations(copybookUsages, NESTED2_NAME, 1);
-    assertLocation(copybookUsages, NESTED2_NAME, NESTED1_NAME, 3, 16);
+    assertLocation(copybookUsages, NESTED2_NAME, toURI(NESTED1_NAME), 3, 16);
   }
 
   private void assertParagraphUsages(Map<String, List<Location>> paragraphUsages) {
@@ -153,7 +153,7 @@ public class TestMappingWithMultiDefinitions {
         "Paragraph definitions: " + paragraphDefinitions.toString(),
         2,
         paragraphDefinitions.size());
-    assertLocation(paragraphDefinitions, "PAR1", "PARS", 0, 7);
+    assertLocation(paragraphDefinitions, "PAR1", toURI(PARS_NAME), 0, 7);
     assertLocation(paragraphDefinitions, "MAIN-LINE", DOCUMENT_URI, 10, 7);
   }
 
@@ -161,15 +161,15 @@ public class TestMappingWithMultiDefinitions {
     assertEquals("Variable usages: " + variableUsages.toString(), 6, variableUsages.size());
 
     assertNumberOfLocations(variableUsages, "CHILD2", 3);
-    assertLocation(variableUsages, "CHILD2", PARS_NAME, 3, 26);
-    assertLocation(variableUsages, "CHILD2", PARS_NAME, 5, 26);
+    assertLocation(variableUsages, "CHILD2", toURI(PARS_NAME), 3, 26);
+    assertLocation(variableUsages, "CHILD2", toURI(PARS_NAME), 5, 26);
     assertLocation(variableUsages, "CHILD2", DOCUMENT_URI, 11, 22);
 
     assertNumberOfLocations(variableUsages, "PARENT", 1);
     assertLocation(variableUsages, "PARENT", DOCUMENT_URI, 11, 32);
 
     assertNumberOfLocations(variableUsages, "CHILD1", 1);
-    assertLocation(variableUsages, "CHILD1", "PARS", 1, 14);
+    assertLocation(variableUsages, "CHILD1", toURI(PARS_NAME), 1, 14);
 
     assertNumberOfLocations(variableUsages, "CHILD3-NESTED", 1);
     assertLocation(variableUsages, "CHILD3-NESTED", DOCUMENT_URI, 12, 22);
@@ -191,34 +191,34 @@ public class TestMappingWithMultiDefinitions {
     assertLocation(variableDefinitions, "PARENT2", DOCUMENT_URI, 5, 10);
 
     assertNumberOfLocations(variableDefinitions, "CHILD1", 1);
-    assertLocation(variableDefinitions, "CHILD1", STRUC_NAME, 0, 15);
+    assertLocation(variableDefinitions, "CHILD1", toURI(STRUC_NAME), 0, 15);
     assertNumberOfLocations(variableDefinitions, "CHILD2", 1);
-    assertLocation(variableDefinitions, "CHILD2", STRUC_NAME, 1, 15);
+    assertLocation(variableDefinitions, "CHILD2", toURI(STRUC_NAME), 1, 15);
 
     assertNumberOfLocations(variableDefinitions, "PARENT3", 1);
-    assertLocation(variableDefinitions, "PARENT3", WITHNEST_NAME, 0, 10);
+    assertLocation(variableDefinitions, "PARENT3", toURI(WITHNEST_NAME), 0, 10);
     assertNumberOfLocations(variableDefinitions, "CHILD3", 1);
-    assertLocation(variableDefinitions, "CHILD3", WITHNEST_NAME, 1, 15);
+    assertLocation(variableDefinitions, "CHILD3", toURI(WITHNEST_NAME), 1, 15);
     assertNumberOfLocations(variableDefinitions, "CHILD4", 1);
-    assertLocation(variableDefinitions, "CHILD4", WITHNEST_NAME, 3, 15);
+    assertLocation(variableDefinitions, "CHILD4", toURI(WITHNEST_NAME), 3, 15);
     assertNumberOfLocations(variableDefinitions, "CHILD5", 1);
-    assertLocation(variableDefinitions, "CHILD5", WITHNEST_NAME, 5, 15);
+    assertLocation(variableDefinitions, "CHILD5", toURI(WITHNEST_NAME), 5, 15);
 
     assertNumberOfLocations(variableDefinitions, "CHILD6", 1);
-    assertLocation(variableDefinitions, "CHILD6", NESTED_NAME, 0, 15);
+    assertLocation(variableDefinitions, "CHILD6", toURI(NESTED_NAME), 0, 15);
     assertNumberOfLocations(variableDefinitions, "CHILD7", 1);
-    assertLocation(variableDefinitions, "CHILD7", NESTED_NAME, 1, 15);
+    assertLocation(variableDefinitions, "CHILD7", toURI(NESTED_NAME), 1, 15);
 
     assertNumberOfLocations(variableDefinitions, "PARENT-NESTED", 1);
-    assertLocation(variableDefinitions, "PARENT-NESTED", NESTED1_NAME, 0, 10);
+    assertLocation(variableDefinitions, "PARENT-NESTED", toURI(NESTED1_NAME), 0, 10);
     assertNumberOfLocations(variableDefinitions, "CHILD1-NESTED", 1);
-    assertLocation(variableDefinitions, "CHILD1-NESTED", NESTED1_NAME, 1, 15);
+    assertLocation(variableDefinitions, "CHILD1-NESTED", toURI(NESTED1_NAME), 1, 15);
     assertNumberOfLocations(variableDefinitions, "CHILD2-NESTED", 1);
-    assertLocation(variableDefinitions, "CHILD2-NESTED", NESTED1_NAME, 2, 15);
+    assertLocation(variableDefinitions, "CHILD2-NESTED", toURI(NESTED1_NAME), 2, 15);
 
     assertNumberOfLocations(variableDefinitions, "CHILD3-NESTED", 1);
-    assertLocation(variableDefinitions, "CHILD3-NESTED", NESTED2_NAME, 0, 15);
+    assertLocation(variableDefinitions, "CHILD3-NESTED", toURI(NESTED2_NAME), 0, 15);
     assertNumberOfLocations(variableDefinitions, "CHILD4-NESTED", 1);
-    assertLocation(variableDefinitions, "CHILD4-NESTED", NESTED2_NAME, 1, 15);
+    assertLocation(variableDefinitions, "CHILD4-NESTED", toURI(NESTED2_NAME), 1, 15);
   }
 }

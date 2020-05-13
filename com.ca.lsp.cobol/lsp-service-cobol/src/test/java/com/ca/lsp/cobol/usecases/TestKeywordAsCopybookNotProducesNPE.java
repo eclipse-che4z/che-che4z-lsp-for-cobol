@@ -104,10 +104,10 @@ public class TestKeywordAsCopybookNotProducesNPE {
     assertLocation(definitions, PARENT1, DOCUMENT_URI, 4, 12);
 
     assertNumberOfLocations(definitions, CHILD1, 1);
-    assertLocation(definitions, CHILD1, DETAIL_NAME, 0, 15);
+    assertLocation(definitions, CHILD1, toURI(DETAIL_NAME), 0, 15);
 
     assertNumberOfLocations(definitions, CHILD2, 1);
-    assertLocation(definitions, CHILD2, DETAIL_NAME, 1, 15);
+    assertLocation(definitions, CHILD2, toURI(DETAIL_NAME), 1, 15);
   }
 
   private void assertVariableUsages(Map<String, List<Location>> usages) {

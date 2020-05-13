@@ -47,12 +47,17 @@ import static org.junit.Assert.assertTrue;
 @UtilityClass
 public class UseCaseUtils {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
+  private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.copybooks/";
+  private static final String CPY_URI_SUFFIX = ".cpy";
   private static final String LANGUAGE = "cbl";
 
   private static final long MAX_TIME_TO_WAIT = 60000L;
   private static final long TIME_TO_POLL = 10L;
   private static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
 
+  public static String toURI(String name) {
+    return CPY_URI_PREFIX + name + CPY_URI_SUFFIX;
+  }
   /**
    * Perform validation of the given text on the service
    *

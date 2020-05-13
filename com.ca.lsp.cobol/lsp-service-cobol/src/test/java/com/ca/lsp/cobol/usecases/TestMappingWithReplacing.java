@@ -51,12 +51,11 @@ public class TestMappingWithReplacing {
   private static final String CUSTCOPY =
       "           05  :TAG:-KEY.\r\n" + "               10  :TAG:-ID             PIC 9.\r\n";
 
-  private static final String CUSTCOPY_NAME = "CUSTCOPY";
+  private static final String CUSTCOPY_URI = toURI("CUSTCOPY");
 
   @Test
   public void test() {
-    AnalysisResult result =
-        analyze(DOCUMENT, singletonList(new CobolText(CUSTCOPY_NAME, CUSTCOPY)));
+    AnalysisResult result = analyze(DOCUMENT, singletonList(new CobolText("CUSTCOPY", CUSTCOPY)));
 
     assertDiagnostics(result.getDiagnostics());
     assertCopybookUsages(result.getCopybookUsages());
@@ -74,8 +73,8 @@ public class TestMappingWithReplacing {
 
   private void assertCopybookUsages(Map<String, List<Location>> copybookUsages) {
     assertEquals("Copybook usages: " + copybookUsages.toString(), 1, copybookUsages.size());
-    assertNumberOfLocations(copybookUsages, CUSTCOPY_NAME, 1);
-    assertLocation(copybookUsages, CUSTCOPY_NAME, DOCUMENT_URI, 5, 12);
+    assertNumberOfLocations(copybookUsages, "CUSTCOPY", 1);
+    assertLocation(copybookUsages, "CUSTCOPY", DOCUMENT_URI, 5, 12);
   }
 
   private void assertParagraphUsages(Map<String, List<Location>> paragraphUsages) {
@@ -113,9 +112,9 @@ public class TestMappingWithReplacing {
     assertLocation(variableDefinitions, "PARENT", DOCUMENT_URI, 4, 11);
 
     assertNumberOfLocations(variableDefinitions, "CSTOUT-KEY", 1);
-    assertLocation(variableDefinitions, "CSTOUT-KEY", CUSTCOPY_NAME, 0, 15);
+    assertLocation(variableDefinitions, "CSTOUT-KEY", CUSTCOPY_URI, 0, 15);
 
     assertNumberOfLocations(variableDefinitions, "CSTOUT-ID", 1);
-    assertLocation(variableDefinitions, "CSTOUT-ID", CUSTCOPY_NAME, 1, 19);
+    assertLocation(variableDefinitions, "CSTOUT-ID", CUSTCOPY_URI, 1, 19);
   }
 }

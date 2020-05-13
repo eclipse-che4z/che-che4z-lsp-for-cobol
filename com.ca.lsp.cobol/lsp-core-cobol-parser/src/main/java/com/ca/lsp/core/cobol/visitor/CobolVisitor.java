@@ -67,14 +67,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   @Override
   public Class visitDataDescriptionEntryCpy(DataDescriptionEntryCpyContext ctx) {
-    String cpyName = retrieveCpyName(ctx.IDENTIFIER(), ctx);
+    String cpyName = retrieveCpyName(ctx.URI_IDENTIFIER(), ctx);
     documentHierarchyStack.push(nextDocLevel(cpyName));
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitEnterCpy(EnterCpyContext ctx) {
-    String cpyName = retrieveCpyName(ctx.IDENTIFIER(), ctx);
+    String cpyName = retrieveCpyName(ctx.URI_IDENTIFIER(), ctx);
     documentHierarchyStack.push(nextDocLevel(cpyName));
     return visitChildren(ctx);
   }
@@ -82,7 +82,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private String retrieveCpyName(TerminalNode identifier, ParserRuleContext ctx) {
     return ofNullable(identifier)
         .map(ParseTree::getText)
-        .orElse(ctx.getChildCount() > 1 ? ctx.getChild(1).getText() : "");
+        .orElse(ctx.getChildCount() > 1 ? ctx.getChild(1).getText() : "")
+        .replace("<URI>", "")
+        .replace("</URI>", "");
   }
 
   private DocumentHierarchyLevel nextDocLevel(String cpyName) {
