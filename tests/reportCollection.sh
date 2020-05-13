@@ -15,14 +15,12 @@
 ##
 
 set -x
-set -e
 
-mkdir robot_home
-mkdir -p theia_home/.zowe
-export HOME=`pwd`/theia_home
-cp -r theia_automation_lsp/test_files/cobol/. /home/project/
-cp -r zoweConfig/. theia_home/.zowe
-cp *.vsix /home/theia/plugins/
+mkdir artifacts
 
-cd /home/theia
-nohup yarn theia start /home/project --hostname=0.0.0.0 > theia.log &
+cp /home/theia/theia.log artifacts
+cp -a theia_automation_lsp/robot_output/. artifacts
+cp theia_automation_lsp/gecodriver.log artifacts
+
+# The script exit successfully in any case
+exit 0

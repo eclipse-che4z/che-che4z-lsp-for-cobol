@@ -204,7 +204,7 @@ pipeline {
             steps {
                 container('theia') {
                     dir('tests') {
-                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}'
+                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
                         sh './theiaPrepare.sh'
                     }
                 }
@@ -218,10 +218,7 @@ pipeline {
                 always {
                     container('theia') {
                         dir('tests') {
-                            sh 'mkdir artifacts'
-                            sh 'cp /home/theia/theia.log artifacts'
-                            sh 'cp -a theia_automation_lsp/robot_output/. artifacts'
-                            sh 'cp -a theia_robot_output/. artifacts'
+                            sh './reportCollection.sh'
                             archiveArtifacts "artifacts/**"
                         }
                     }
