@@ -95,7 +95,8 @@ pipeline {
     options {
         disableConcurrentBuilds()
         timestamps()
-        timeout(time: 3, unit: 'HOURS')
+        // Timeout is 23 hours for job triggered by timer, otherwise is 3 hours
+        timeout(time: isTimeTriggeredBuild() ? 23 : 3, unit: 'HOURS')
         skipDefaultCheckout(false)
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '3'))
     }
@@ -112,6 +113,9 @@ pipeline {
             }
             stages {
                 stage('Build LSP server part') {
+                    options {
+                        timeout(time: 20, unit: 'MINUTES')
+                    }
                     steps {
                         container('maven') {
                             dir('com.ca.lsp.cobol') {
@@ -125,6 +129,9 @@ pipeline {
                 }
 
                 stage('SonarCloud') {
+                    options {
+                        timeout(time: 8, unit: 'MINUTES')
+                    }
                     steps {
                         container('maven') {
                             dir('com.ca.lsp.cobol') {
@@ -139,6 +146,9 @@ pipeline {
                     environment {
                         npm_config_cache = "$env.WORKSPACE"
                     }
+                    options {
+                        timeout(time: 5, unit: 'MINUTES')
+                    }
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
@@ -150,6 +160,9 @@ pipeline {
                 stage('Client - Package') {
                     environment {
                         npm_config_cache = "$env.WORKSPACE"
+                    }
+                    options {
+                        timeout(time: 5, unit: 'MINUTES')
                     }
                     steps {
                         container('node') {
@@ -171,6 +184,9 @@ pipeline {
                     when {
                         expression { branchName == 'master' || branchName == 'development' }
                     }
+                    options {
+                        timeout(time: 1, unit: 'MINUTES')
+                    }
                     steps {
                         container('jnlp') {
                             sshagent(['projects-storage.eclipse.org-bot-ssh']) {
@@ -186,7 +202,7 @@ pipeline {
                 }
             }
         }
-        stage('Integration testing') {
+        stage('Integration testing part') {
             when {
                 // Run integration tests only in cases of:
                 // - release branch (names like release-x.y.z)
@@ -201,16 +217,23 @@ pipeline {
                     yaml kubernetes_test_config
                 }
             }
-            steps {
-                container('theia') {
-                    dir('tests') {
-                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
-                        sh './theiaPrepare.sh'
+            stages {
+                stage('Integration testing') {
+                    options {
+                        timeout(time: 1, unit: 'MINUTES')
                     }
-                }
-                container('python') {
-                    dir('tests/theia_automation_lsp') {
-                        sh 'HOME=`pwd`/robot_home PYTHONPATH=`pwd` robot -i Rally -e Unstable --variable HEADLESS:True --outputdir robot_output robot_suites/lsp/local/firefox_lsp_local.robot'
+                    steps {
+                        container('theia') {
+                            dir('tests') {
+                                copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
+                                sh './theiaPrepare.sh'
+                            }
+                        }
+                        container('python') {
+                            dir('tests/theia_automation_lsp') {
+                                sh 'HOME=`pwd`/robot_home PYTHONPATH=`pwd` robot -i Rally -e Unstable --variable HEADLESS:True --outputdir robot_output robot_suites/lsp/local/firefox_lsp_local.robot'
+                            }
+                        }
                     }
                 }
             }
