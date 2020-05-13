@@ -21,7 +21,7 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 ## Prerequisites
 
-- Java version 8 or higher.
+- Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
 - To enable syntax coloring, a third-party COBOL extension is required. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
 - To enable automatic copybook retrieval, the following are required:
     - Configured TSO/E address space services, z/OS data set and file REST interface, and z/OS jobs REST interface. For more information, see [z/OS Requirements](https://docs.zowe.org/stable/user-guide/systemrequirements-zosmf.html#z-os-requirements)).

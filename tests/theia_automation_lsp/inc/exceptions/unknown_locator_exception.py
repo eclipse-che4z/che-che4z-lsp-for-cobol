@@ -15,5 +15,5 @@ from inc.exceptions.general_exception import GeneralException
 
 class UnknownLocatorException(GeneralException):
 
-    def __init__(self, driver=None, call_from=None, msg=""):
-        super(UnknownLocatorException, self).__init__(driver, call_from=call_from, msg=msg)
+    def __init__(self, driver=None, call_from=None, msg="", do_dump=True):
+        super(UnknownLocatorException, self).__init__(driver, call_from=call_from, msg=msg, do_dump=do_dump)
