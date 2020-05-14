@@ -15,8 +15,8 @@ from inc.exceptions.general_exception import GeneralException
 
 class AssertException(GeneralException):
 
-    def __init__(self, driver, test_content, actual_content, call_from=None, msg=""):
-        super(AssertException, self).__init__(driver, call_from=call_from, msg=msg)
+    def __init__(self, driver, test_content, actual_content, call_from=None, msg="", do_dump=True):
+        super(AssertException, self).__init__(driver, call_from=call_from, msg=msg, do_dump=do_dump)
         self.test_content = test_content
         self.actual_content = actual_content
         self.msg = "Wrong expected content\nExpected: '{0}'\nActual: '{1}'".format(

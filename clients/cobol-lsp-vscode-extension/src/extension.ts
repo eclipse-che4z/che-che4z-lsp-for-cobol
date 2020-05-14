@@ -24,10 +24,13 @@ import { CopybooksDownloader } from "./services/CopybooksDownloader";
 import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
 import { initializeSettings } from "./services/Settings";
 
+import {resolveLocalCopybooksCommand} from "./commands/ResolveLocalCopybooksCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { PathsService } from "./services/PathsService";
 import { ProfileService } from "./services/ProfileService";
-import { ProfilesMap, ZoweApi } from "./services/ZoweApi";
+import {CopybookResolver} from "./services/settings/CopybookResolver";
+import {LocalCopybookResolver} from "./services/settings/LocalCopybookResolver";
+import { ZoweApi } from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
     initializeSettings();
@@ -39,6 +42,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator);
     const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator);
     const pathsService: PathsService = new PathsService();
+    const copybookResolver: CopybookResolver = new LocalCopybookResolver();
 
     try {
         await languageClientService.checkPrerequisites();
@@ -71,6 +75,12 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths", () => {
         editDatasetPaths(pathsService);
     }));
+
+    //POC Command: Used just to quickly share the resolution - might be removed later on.
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.resolve-local-copybooks", () => {
+        resolveLocalCopybooksCommand(copybookResolver);
+    }));
+
 
     context.subscriptions.push(languageClientService.start());
     context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
