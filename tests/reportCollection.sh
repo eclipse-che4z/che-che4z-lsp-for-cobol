@@ -20,7 +20,7 @@ mkdir artifacts
 
 cp /home/theia/theia.log artifacts
 cp -a theia_automation_lsp/robot_output/. artifacts
-cp theia_automation_lsp/gecodriver.log artifacts
+cp theia_automation_lsp/geckodriver.log artifacts
 
 # The script exit successfully in any case
 exit 0
