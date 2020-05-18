@@ -58,6 +58,7 @@ public class ServiceModule extends DefaultModule {
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(LanguageClient.class).toProvider(ClientProvider.class);
     bind(ConfigurationSettingsStorable.class).toProvider(SettingsProvider.class);
+    bind(ClientService.class).to(ClientServiceImpl.class);
 
     bindFormations();
     bindCompletions();
