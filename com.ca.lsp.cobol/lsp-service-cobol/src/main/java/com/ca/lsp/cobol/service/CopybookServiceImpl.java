@@ -69,14 +69,15 @@ public class CopybookServiceImpl implements CopybookService {
     }
 
     String cobolFileName = getNameFromURI(event.getDocumentUri());
-    CompletableFuture<List<Object>> future = clientService.callClient("copybook." + cobolFileName + ":" + requiredCopybookName);
     try {
-      String uri = future.get().get(0).toString();
+      String uri = clientService.callClientSync("copybook", cobolFileName, requiredCopybookName);
       if (!uri.isEmpty()) {
         Path file = FileSystemUtils.getPathFromURI(uri);
         copybookPath.put(requiredCopybookName, file);
         publishOnDatabus(requiredCopybookName, FileSystemUtils.getContentByPath(file), file);
         return;
+      } else {
+        publishOnDatabus(requiredCopybookName);
       }
     } catch (InterruptedException | ExecutionException e) {
       log.error("Error resolving copybook", e);
