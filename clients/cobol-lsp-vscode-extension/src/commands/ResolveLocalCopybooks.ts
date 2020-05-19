@@ -15,7 +15,7 @@
 import * as vscode from "vscode";
 import {PATHS_LOCAL_KEY, SETTINGS_SECTION} from "../constants";
 import {CopybookResolver} from "../services/settings/CopybookResolver";
-
+//TODO: Should be removed
 export async function resolveLocalCopybooks(copybookResolver: CopybookResolver) {
     if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has(PATHS_LOCAL_KEY)) {
         await vscode.window.showErrorMessage("Please, specify LOCAL paths for copybooks in settings.");

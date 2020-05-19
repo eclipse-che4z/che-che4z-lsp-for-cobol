@@ -31,12 +31,14 @@ export class LocalCopybookResolver implements CopybookResolver {
     private static getURIFromResource(resource: string): URL {
         for (const workspaceFolder of SettingsUtils.getWorkspacesURI()) {
             const uri: URL = new URL(path.join(workspaceFolder, resource));
+            console.log("analyzed");
+            console.log(uri);
             if (fs.existsSync(uri)) {
                 return uri;
             }
         }
     }
-
+    //TODO: introduce parameter for the copybook name to verify that is defined
     /**
      * @param list the provided list of physical path defined by the user or undefined
      * @return a list of resolved URIs, empty array if the input list doesn't contains any valid/found URIs
