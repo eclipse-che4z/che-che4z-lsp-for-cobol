@@ -52,9 +52,16 @@ export class LanguageClientService {
             token: CancellationToken,
             next: ConfigurationRequest.HandlerSignature) => {
 
-            // TODO if request params are right
-            return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
-            // TODO else return next(params, token);
+            if (params.items.length === 1) {
+                const section = params.items[0].section;
+                if (section.startsWith("broadcom-cobol-lsp.cpy-manager")) {
+                    return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
+                }
+                if (section.startsWith("broadcom-cobol-lsp.theParam")) {
+                    return ["foobar"];
+                }
+            }
+            return next(params, token);
         };
         const configurationMiddleware: ConfigurationWorkspaceMiddleware = {
             configuration: signatureFunc,
