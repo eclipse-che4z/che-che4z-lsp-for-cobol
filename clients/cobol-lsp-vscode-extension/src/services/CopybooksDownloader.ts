@@ -52,6 +52,8 @@ export class CopybooksDownloader implements vscode.Disposable {
     }
 
     public async downloadDependencies(depFileUri: vscode.Uri, message: string = ""): Promise<void> {
+
+
         if (!checkWorkspace()) {
             return;
         }
@@ -158,16 +160,19 @@ export class CopybooksDownloader implements vscode.Disposable {
      * @param message message to be displayed
      */
     private async continueDownloadFromMF(notLocalCpy: string[], programName: string, message: string) {
-        const action = await vscode.window.showErrorMessage("Do you wanna use Zowe?",
-                "Yes", "Never");
-        if (action === "Yes") {
-            const profile: string = await this.profileService.getProfile(programName);
-            if (!profile) {
-                return;
-            }
-            const missingCopybooks: string[] = await this.listMissingCopybooks(notLocalCpy, profile);
-            this.resolveMissingCopybooksFromMF(message, missingCopybooks, profile);
+
+        //TODO: remove it
+        // const action = await vscode.window.showErrorMessage("Do you wanna use Zowe?",
+        //         "Yes", "Never");
+        // if (action === "Yes") {
+        //
+        // }
+        const profile: string = await this.profileService.getProfile(programName);
+        if (!profile) {
+            return;
         }
+        const missingCopybooks: string[] = await this.listMissingCopybooks(notLocalCpy, profile);
+        this.resolveMissingCopybooksFromMF(message, missingCopybooks, profile);
     }
 
     private async fetchCopybook(dataset: string, copybookProfile: CopybookProfile): Promise<boolean> {

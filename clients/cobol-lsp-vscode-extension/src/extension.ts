@@ -16,8 +16,8 @@ import * as vscode from "vscode";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 import { editDatasetPaths } from "./commands/EditDatasetPaths";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
-import { DEPENDENCIES_FOLDER, REASON_MSG } from "./constants";
-import { LANGUAGE_ID, SETTINGS_SECTION, PATHS_LOCAL_KEY } from "./constants";
+import {DEPENDENCIES_FOLDER, PATHS_LOCAL_KEY, PATHS_ZOWE, REASON_MSG} from "./constants";
+import { LANGUAGE_ID, SETTINGS_SECTION} from "./constants";
 import { CopybookFix } from "./services/CopybookFix";
 import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
 import { CopybooksDownloader } from "./services/CopybooksDownloader";
@@ -32,6 +32,7 @@ import {CopybookResolver} from "./services/settings/CopybookResolver";
 import {LocalCopybookResolver} from "./services/settings/LocalCopybookResolver";
 import { ZoweApi } from "./services/ZoweApi";
 import { Prioritizer } from "./services/Prioritizer";
+import {CopybookResolveURI} from "./services/CopybookResolveURI";
 
 export async function activate(context: vscode.ExtensionContext) {
     initializeSettings();
@@ -78,19 +79,25 @@ export async function activate(context: vscode.ExtensionContext) {
         editDatasetPaths(pathsService);
     }));
 
-    //to be deleted after implementation
-    context.subscriptions.push
-    (vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.resolve-git-copybooks", () => {
-        prioritizer.checkCopybooksPresentLocal(["DEMO1", "DEMO2"],
-             vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
-    }));
+    //TODO: remove it
+    // context.subscriptions.push
+    // (vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.resolve-git-copybooks", () => {
+    //     vscode.workspace.getConfiguration(SETTINGS_SECTION).update(PATHS_LOCAL_KEY,"MAMMT",vscode.ConfigurationTarget.Global);
+    //     console.log("I updated the settings..");
+    //     // prioritizer.checkCopybooksPresentLocal(["DEMO1", "DEMO2"],
+    //     //      vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
+    // }));
 
-    context.subscriptions.push
-    (vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.resolve-git-copybooks-2", () => {
-        vscode.window.showInformationMessage("My message: " + prioritizer.getLocalCpyURI());
-    }));
+    // context.subscriptions.push
+    // (vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.resolve-git-copybooks-2", () => {
+    //     let copybookResolverURI:CopybookResolveURI  = new CopybookResolveURI();
+    //     //should come from depfile...
+    //     console.log("found it locally");
+    //     vscode.window.showInformationMessage(copybookResolverURI.generateConfigurationForCopybook("SLICKM0"));
+    // }));
 
-    //POC Command: Used just to quickly share the resolution - might be removed later on.
+
+    //TODO: remove it
     context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.resolve-local-copybooks", () => {
         resolveLocalCopybooksCommand(copybookResolver);
     }));
@@ -109,8 +116,18 @@ export async function activate(context: vscode.ExtensionContext) {
 function initWorkspaceTracker(downloader: CopybooksDownloader): vscode.Disposable {
     const watcher = vscode.workspace.createFileSystemWatcher("**/"
         + DEPENDENCIES_FOLDER + "/**/**.dep", false, false, true);
-    watcher.onDidCreate(uri => downloader.downloadDependencies(uri,
-        "Program contains dependencies to missing copybooks."));
-    watcher.onDidChange(uri => downloader.downloadDependencies(uri));
+
+    const copybookResolveURI: CopybookResolveURI = new CopybookResolveURI();
+
+
+
+    //instead of invoking zowe we have to invoke the prioritizer
+    watcher.onDidCreate(uri => copybookResolveURI.resolveCopybooksInDepFile(uri),  "Program contains dependencies to resolve.");
+    watcher.onDidChange(uri => copybookResolveURI.resolveCopybooksInDepFile(uri));
+
+
+    // watcher.onDidCreate(uri => downloader.downloadDependencies(uri,
+    //     "Program contains dependencies to missing copybooks."));
+    // watcher.onDidChange(uri => downloader.downloadDependencies(uri));
     return watcher;
 }

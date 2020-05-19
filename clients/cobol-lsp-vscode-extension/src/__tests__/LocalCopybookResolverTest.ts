@@ -17,7 +17,7 @@ import * as path from "path";
 import {PATHS_LOCAL_KEY, SETTINGS_SECTION } from "../constants";
 import {LocalCopybookResolver} from "../services/settings/LocalCopybookResolver";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
-
+//TODO: adjust behavior to have in settings only folders..
 const settingsParser: LocalCopybookResolver = new LocalCopybookResolver();
 const STAR_LOCATION = "*";
 const FILENAME: string = "test.cbl";

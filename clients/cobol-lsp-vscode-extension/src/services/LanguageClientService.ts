@@ -48,6 +48,8 @@ export class LanguageClientService {
     }
 
     private createClientOptions(): LanguageClientOptions {
+
+        //TODO: Define the middleware in a separate structure injected into the language client...
         const signatureFunc: ConfigurationRequest.MiddlewareSignature = async (
             params: ConfigurationParams,
             token: CancellationToken,
@@ -70,8 +72,11 @@ export class LanguageClientService {
              * the open file has to ask for settings in order to resolve the local copybooks
              */
 
-            console.log(this.prioritizer.getLocalCpyURI());
+             console.log(this.prioritizer.getLocalCpyURI());
+            //TODO: get the dependency file content and apply the prioritazion..
 
+
+            //TODO: Should return an object in the form {cpy_name, uri}
             return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
             // TODO else return next(params, token);
         };
