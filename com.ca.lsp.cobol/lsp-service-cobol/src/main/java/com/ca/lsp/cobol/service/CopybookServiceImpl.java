@@ -33,6 +33,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,15 +49,18 @@ public class CopybookServiceImpl implements CopybookService {
 
   private CopybookDependencyService dependencyService;
   private final Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider;
+  private ClientService clientService;
 
   @Inject
   public CopybookServiceImpl(
       DataBusBroker dataBus,
       Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider,
-      CopybookDependencyService dependencyService) {
+      CopybookDependencyService dependencyService,
+      ClientService clientService) {
     this.dataBus = dataBus;
     this.configurationSettingsStorableProvider = configurationSettingsStorableProvider;
     this.dependencyService = dependencyService;
+    this.clientService = clientService;
     dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
   }
 
@@ -138,7 +143,9 @@ public class CopybookServiceImpl implements CopybookService {
   public void observerCallback(RequiredCopybookEvent event) {
 
     String requiredCopybookName = event.getName();
-    dependencyService.addCopybookInDepFile(event, requiredCopybookName);
+    String cobolFileName = getNameFromURI(event.getDocumentUri());
+    clientService.callClient("copybook." + cobolFileName + ":" + requiredCopybookName);
+
     resolveCopybookContent(requiredCopybookName);
   }
 

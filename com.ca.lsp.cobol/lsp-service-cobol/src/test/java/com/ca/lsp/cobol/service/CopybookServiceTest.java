@@ -46,7 +46,7 @@ public class CopybookServiceTest extends FileSystemConfiguration
   CopybookDependencyService dependencyService = mock(CopybookDependencyService.class);
 
   CopybookService copybookService =
-      new CopybookServiceImpl(dataBus, configurationSettingsStorableProvider, dependencyService);
+      new CopybookServiceImpl(dataBus, configurationSettingsStorableProvider, dependencyService, null);
 
   @Before
   public void initActivities() {

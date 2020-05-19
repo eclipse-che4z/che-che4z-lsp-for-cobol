@@ -61,7 +61,7 @@ public class CpyRecognizedWithoutConfigTest {
         createFolderStructure(Paths.get(System.getProperty("java.io.tmpdir"), "WORKSPACE"));
 
     copybookService =
-        new CopybookServiceImpl(dataBusBroker, settingsProvider, dependencyService);
+        new CopybookServiceImpl(dataBusBroker, settingsProvider, dependencyService, null);
     copybookService.setWorkspaceFolders(generateWorkspaceFolder());
 
     requiredCopybookEvent =

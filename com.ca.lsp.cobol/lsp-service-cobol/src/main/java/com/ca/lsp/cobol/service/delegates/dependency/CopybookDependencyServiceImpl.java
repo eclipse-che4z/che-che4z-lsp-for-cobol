@@ -97,10 +97,10 @@ public class CopybookDependencyServiceImpl
   public void writeCopybookInDepFile(String requiredCopybookName, String documentUri) {
     String cobolFileName = getNameFromURI(documentUri);
 
-    writeDependency(
-        getPath(getDependencyFolderPath().toString(), cobolFileName + DEP_EXTENSION),
-        cobolFileName,
-        requiredCopybookName);
+//    writeDependency(
+//        getPath(getDependencyFolderPath().toString(), cobolFileName + DEP_EXTENSION),
+//        cobolFileName,
+//        requiredCopybookName);
   }
 
   private Path getDependencyFolderPath() {
