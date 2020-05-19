@@ -17,7 +17,6 @@ package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedSettingsEvent;
-import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.google.gson.JsonPrimitive;
 import com.google.inject.Inject;
@@ -37,8 +36,10 @@ import java.util.function.BiConsumer;
 
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.CPY_MANAGER;
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
+import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.concurrent.CompletableFuture.runAsync;
 
 /**
  * This class is responsible to watch for any changes into the copybook folder and to fetch updated
@@ -67,7 +68,18 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   @Nonnull
   @Override
   public CompletableFuture<Object> executeCommand(@Nonnull ExecuteCommandParams params) {
+    runAsync(executeCopybookFix(params)).whenComplete(reportExceptionIfFound(params));
+
     return completedFuture(null);
+  }
+
+  private Runnable executeCopybookFix(@Nonnull ExecuteCommandParams params) {
+    return () -> {
+      if (MISSING_COPYBOOK.name().equals(params.getCommand())) {
+        dataBus.invalidateCache();
+        dataBus.postData(new RunAnalysisEvent());
+      }
+    };
   }
 
   /**

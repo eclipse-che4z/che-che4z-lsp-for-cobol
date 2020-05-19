@@ -28,12 +28,6 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
         if (!this.shouldHaveCodeAction(context)) {
             return [];
         }
-        const fetchCopybook = new vscode.CodeAction("Fetch copybook", vscode.CodeActionKind.QuickFix);
-        fetchCopybook.command = {
-            arguments: [this.extractCopybookName(context), this.extractProgramName(doc)],
-            command: "broadcom-cobol-lsp.cpy-manager.fetch-copybook",
-            title: "Fetch copybook",
-        };
 
         const datasetPaths = new vscode.CodeAction("Edit copybook datasets list", vscode.CodeActionKind.QuickFix);
         datasetPaths.command = {
@@ -48,9 +42,9 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
         };
 
         if (await this.profileService.checkMultipleProfiles()) {
-            return [fetchCopybook, datasetPaths, changeProfile];
+            return [datasetPaths, changeProfile];
         }
-        return [fetchCopybook, datasetPaths];
+        return [datasetPaths];
     }
 
     private extractCopybookName(context: vscode.CodeActionContext) {

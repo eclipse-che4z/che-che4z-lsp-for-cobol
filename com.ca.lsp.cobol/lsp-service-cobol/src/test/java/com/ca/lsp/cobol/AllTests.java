@@ -18,6 +18,7 @@ import com.ca.lsp.cobol.positive.PositiveTest;
 import com.ca.lsp.cobol.service.*;
 import com.ca.lsp.cobol.service.delegates.HighlightsTest;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActionsTest;
+import com.ca.lsp.cobol.service.delegates.actions.FindCopybookCommandTest;
 import com.ca.lsp.cobol.service.delegates.communications.ServerCommunicationsTest;
 import com.ca.lsp.cobol.service.delegates.completions.*;
 import com.ca.lsp.cobol.service.delegates.references.DocumentOccurrencesTest;
@@ -56,6 +57,7 @@ import org.junit.runners.Suite.SuiteClasses;
   DidChangeConfigurationTest.class,
   InitializeConfigurationTest.class,
   CodeActionsTest.class,
-  ServerCommunicationsTest.class
+  ServerCommunicationsTest.class,
+  FindCopybookCommandTest.class
 })
 public class AllTests {}
