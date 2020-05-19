@@ -57,18 +57,18 @@ public class MockCopybookServiceImpl implements MockCopybookService {
     dataBus.postData(FetchedCopybookEvent.builder().name(name).uri(name).content(content).build());
   }
 
-  @Override
-  public Path findCopybook(String fileName) {
-    return null;
-  }
-
-  @Override
-  public Path findCopybook(String filename, List<String> datasetList) {
-    return null;
-  }
-
-  @Override
-  public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {}
+//  @Override
+//  public Path findCopybook(String fileName) {
+//    return null;
+//  }
+//
+//  @Override
+//  public Path findCopybook(String filename, List<String> datasetList) {
+//    return null;
+//  }
+//
+//  @Override
+//  public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {}
 
   @Override
   public String getContentByCopybookName(String copybookName) {

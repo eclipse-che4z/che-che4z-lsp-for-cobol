@@ -28,8 +28,6 @@ import com.ca.lsp.cobol.service.delegates.actions.CodeActions;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.communications.ServerCommunications;
 import com.ca.lsp.cobol.service.delegates.completions.*;
-import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
-import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import com.ca.lsp.cobol.service.delegates.formations.Formation;
 import com.ca.lsp.cobol.service.delegates.formations.Formations;
 import com.ca.lsp.cobol.service.delegates.formations.TrimFormation;
@@ -67,7 +65,6 @@ public class TestModule extends DefaultModule {
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(CobolTextRegistry.class).to(ZipTextRegistry.class);
-    bind(CopybookDependencyService.class).to(CopybookDependencyServiceImpl.class);
     bind(String.class)
         .annotatedWith(named(PATH_TO_TEST_RESOURCES))
         .toProvider(() -> ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));

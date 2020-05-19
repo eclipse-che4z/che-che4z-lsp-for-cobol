@@ -40,7 +40,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const copybookFix: CopybookFix = new CopybookFix();
     const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
     const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator);
-    const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator);
+    const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator, copyBooksDownloader);
     const pathsService: PathsService = new PathsService();
     const copybookResolver: CopybookResolver = new LocalCopybookResolver();
 
@@ -83,7 +83,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 
     context.subscriptions.push(languageClientService.start());
-    context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
+    // context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
     context.subscriptions.push(copyBooksDownloader);
 
     context.subscriptions.push(
