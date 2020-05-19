@@ -20,11 +20,12 @@ import {CancellationToken, ConfigurationParams, ConfigurationRequest, LanguageCl
 import { ConfigurationWorkspaceMiddleware } from "vscode-languageclient/lib/configuration";
 import { CopybooksPathGenerator } from "./CopybooksPathGenerator";
 import { JavaCheck } from "./JavaCheck";
+import { CopybooksDownloader } from "./CopybooksDownloader";
 
 export class LanguageClientService {
     private jarPath: string;
 
-    constructor(private copybooksPathGenerator: CopybooksPathGenerator) {
+    constructor(private copybooksPathGenerator: CopybooksPathGenerator, private copybookDownloader: CopybooksDownloader) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
         this.jarPath = `${ext.extensionPath}/server/lsp-service-cobol-${ext.packageJSON.version}.jar`;
     }
@@ -57,8 +58,12 @@ export class LanguageClientService {
                 if (section.startsWith("broadcom-cobol-lsp.cpy-manager")) {
                     return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
                 }
-                if (section.startsWith("broadcom-cobol-lsp.theParam")) {
-                    return ["foobar"];
+                // broadcom-cobol-lsp.copybook.<cobolFileName>:<copybookName>
+                if (section.startsWith("broadcom-cobol-lsp.copybook")) {
+                    const [cobolFileName, copybookName] = section.split(".").pop().split(":");
+
+                    this.copybookDownloader.downloadDependency(cobolFileName, copybookName);
+                    return ["Hi from middleware"];
                 }
             }
             return next(params, token);
