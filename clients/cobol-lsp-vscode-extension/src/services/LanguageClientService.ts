@@ -54,16 +54,19 @@ export class LanguageClientService {
             next: ConfigurationRequest.HandlerSignature) => {
 
             if (params.items.length === 1) {
-                const section = params.items[0].section;
-                if (section.startsWith("broadcom-cobol-lsp.cpy-manager")) {
-                    return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
-                }
-                // broadcom-cobol-lsp.copybook.<cobolFileName>:<copybookName>
-                if (section.startsWith("broadcom-cobol-lsp.copybook")) {
-                    const [cobolFileName, copybookName] = section.split(".").pop().split(":");
-
-                    this.copybookDownloader.downloadDependency(cobolFileName, copybookName);
-                    return ["Hi from middleware"];
+                const section = params.items[0].section.split(".");
+                if (section[0] === "broadcom-cobol-lsp") {
+                    switch (section[1]) {
+                        case "cpy-manager":
+                            return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
+                        case "copybook":
+                            const cobolFileName = section[2];
+                            const copybookName = section[3];
+                            this.copybookDownloader.downloadDependency(cobolFileName, copybookName);
+                            return [""];
+                        default:
+                            break;
+                    }
                 }
             }
             return next(params, token);

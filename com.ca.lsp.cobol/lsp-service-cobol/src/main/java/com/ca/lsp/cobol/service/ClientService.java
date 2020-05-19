@@ -1,8 +1,9 @@
 package com.ca.lsp.cobol.service;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public interface ClientService {
-    CompletableFuture<List<Object>> callClient(String param);
+    CompletableFuture<String> callClient(String... section);
+    String callClientSync(String... section) throws ExecutionException, InterruptedException;
 }

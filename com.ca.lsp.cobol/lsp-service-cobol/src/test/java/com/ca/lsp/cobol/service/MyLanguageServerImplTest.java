@@ -47,7 +47,7 @@ public class MyLanguageServerImplTest {
     ClientProvider provider = new ClientProvider();
     provider.set(client);
 
-    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, provider, null);
+    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, provider, null, null);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     server.initialized(new InitializedParams());
 
@@ -64,7 +64,7 @@ public class MyLanguageServerImplTest {
   @Test
   public void initialize() {
     MyLanguageServerImpl server =
-        new MyLanguageServerImpl(null, null, null, null);
+        new MyLanguageServerImpl(null, null, null, null, null);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));

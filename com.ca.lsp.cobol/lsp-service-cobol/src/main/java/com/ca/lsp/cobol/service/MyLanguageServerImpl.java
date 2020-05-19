@@ -64,17 +64,20 @@ public class MyLanguageServerImpl implements LanguageServer {
   private WorkspaceService workspaceService;
   private Provider<LanguageClient> clientProvider;
   private SettingsProvider settingsProvider;
+  private CopybookService copybookService;
 
   @Inject
   MyLanguageServerImpl(
       TextDocumentService textService,
       WorkspaceService workspaceService,
       Provider<LanguageClient> clientProvider,
-      SettingsProvider settingsProvider) {
+      SettingsProvider settingsProvider,
+      CopybookService copybookService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.clientProvider = clientProvider;
     this.settingsProvider = settingsProvider;
+    this.copybookService = copybookService;
   }
 
   @Override
