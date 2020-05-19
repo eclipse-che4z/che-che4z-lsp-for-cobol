@@ -14,7 +14,6 @@
 package com.ca.lsp.cobol.service.utils;
 
 import com.ca.lsp.cobol.service.CopybookServiceImpl;
-import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -38,8 +37,7 @@ import static java.nio.file.Files.readAllLines;
 
 /**
  * This is an utility class that provide filesystem related methods consumed by the classes that
- * rely on the filesystem implementation as {@link CopybookServiceImpl} and {@link
- * CopybookDependencyServiceImpl}
+ * rely on the filesystem implementation as {@link CopybookServiceImpl}
  */
 @Slf4j
 @UtilityClass
@@ -201,7 +199,7 @@ public class FileSystemUtils {
    * @return the String representation of the file name or null if any {@link URISyntaxException} is
    *     caught.
    */
-  public String getNameFromURI(String uri) {
+  public static String getNameFromURI(String uri) {
     try {
       return FilenameUtils.getBaseName(Paths.get(new URI(uri)).getFileName().toString());
     } catch (URISyntaxException e) {
@@ -240,7 +238,7 @@ public class FileSystemUtils {
    * @return content of the file as String representation
    */
   @Nullable
-  public String getContentByPath(Path path) {
+  public static String getContentByPath(Path path) {
     try (Stream<String> stream = Files.lines(path)) {
       return stream.reduce((s1, s2) -> s1 + "\r\n" + s2).orElse("");
     } catch (IOException e) {
@@ -278,7 +276,7 @@ public class FileSystemUtils {
    * @return the {@link Path} representation of the given URI in input
    * @throws IllegalArgumentException if the URI of WorkspaceFolder is not valid
    */
-  public Path getPathFromURI(String uri) {
+  public static Path getPathFromURI(String uri) {
     try {
       return Paths.get(new URI(uri).normalize());
     } catch (URISyntaxException e) {
