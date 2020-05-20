@@ -35,7 +35,6 @@ export class CopybookResolveURI {
     //TODO: refactor with unit test
     public searchCopybookLocally(copybookName: string, targetFolders: string[]): string {
         const copybookResolver: CopybookResolver = new LocalCopybookResolver();
-        console.log(targetFolders);
         const localFolderList: string[] =  copybookResolver.resolve(targetFolders);
         for (const folder of localFolderList) {
             //what about copybook name extension?

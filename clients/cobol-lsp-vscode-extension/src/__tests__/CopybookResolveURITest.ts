@@ -12,7 +12,8 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "fs";
+//import * as fs from "fs";
+import * as fs from "fs-extra";
 import * as path from "path";
 import {CopybookResolveURI} from "../services/CopybookResolveURI";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
@@ -35,11 +36,8 @@ function createFile(filename: string): string {
 }
 
 function removeFolder(pathFile: string) {
-    //TODO: don't remove not emty folders..
-    fs.rmdirSync(pathFile);
+    fs.remove(pathFile);
 }
-
-
 
 
 
