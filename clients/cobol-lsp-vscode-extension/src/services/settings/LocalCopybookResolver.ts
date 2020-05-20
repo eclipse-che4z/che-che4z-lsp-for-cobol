@@ -31,8 +31,6 @@ export class LocalCopybookResolver implements CopybookResolver {
     private static getURIFromResource(resource: string): URL {
         for (const workspaceFolder of SettingsUtils.getWorkspacesURI()) {
             const uri: URL = new URL(path.join(workspaceFolder, resource));
-            console.log("analyzed");
-            console.log(uri);
             if (fs.existsSync(uri)) {
                 return uri;
             }

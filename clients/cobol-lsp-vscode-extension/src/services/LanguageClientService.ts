@@ -55,6 +55,16 @@ export class LanguageClientService {
             token: CancellationToken,
             next: ConfigurationRequest.HandlerSignature) => {
 
+            if (params.items.length === 1) {
+                const section = params.items[0].section;
+                if (section.startsWith("broadcom-cobol-lsp.cpy-manager")) {
+                    return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
+                }
+                if (section.startsWith("broadcom-cobol-lsp.theParam")) {
+                    return ["foobar"];
+                }
+            }
+            return next(params, token);
             // TODO if request params are right
 
             // TODO after server modification this method return the local copybooks URI

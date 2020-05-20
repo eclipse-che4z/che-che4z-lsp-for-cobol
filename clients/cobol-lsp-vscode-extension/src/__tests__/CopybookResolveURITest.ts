@@ -12,20 +12,35 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-//TODO: create copybook folder with copy file
-//TODO: after all delete the folder
-
-import {CopybookResolveURI} from "../services/CopybookResolveURI";
 import * as fs from "fs";
 import * as path from "path";
+import {CopybookResolveURI} from "../services/CopybookResolveURI";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
 const copybookName: string = "NSTCOPY1";
 const copybookResolverUri: CopybookResolveURI = new CopybookResolveURI();
 const folderPath = path.join(__dirname, ".cobdeps");
+createDirectory(folderPath);
+createFile(copybookName);
+SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + __dirname]);
 
-const FILE_URI: string = createFile(copybookName);
-const fileDirectoryURI = path.dirname(FILE_URI);
-SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + fileDirectoryURI]);
+// file utils
+function createFile(filename: string): string {
+
+    fs.writeFile(path.join(folderPath, filename), "Some dummy content", err => {
+        if (err) {
+            return null;
+        }
+    });
+    return path.resolve(folderPath, filename);
+}
+
+function removeFolder(pathFile: string) {
+    //TODO: don't remove not emty folders..
+    fs.rmdirSync(pathFile);
+}
+
+
+
 
 
 describe("Resolve local copybook against bad configuration of target folders", () => {
@@ -47,29 +62,14 @@ function createDirectory(targetPath: string) {
     fs.promises.mkdir(targetPath, { recursive: true }).catch(console.log);
 }
 
-function createFile(filename: string): string {
-        createDirectory(folderPath);
-        fs.writeFile(path.join(folderPath, filename), "Some dummy content", err => {
-            if (err) {
-                return null;
-            }
-        });
-        return path.resolve(folderPath, filename);
-    }
 
-function deleteTempFile(pathFile: string) {
-    const filePath: string = path.resolve(pathFile);
-    if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-    }
-}
 
 describe("Resolve local copybook present in one or more folders specified by the user", () => {
     test("given a folder that contains the target copybook, it is found and its uri is returned", () =>{
-
-        expect(copybookResolverUri.searchCopybookLocally(copybookName, [path.relative(__dirname, FILE_URI)])).toBeDefined();
+        expect(copybookResolverUri.searchCopybookLocally(copybookName, [".cobdeps"])).toBeDefined();
+        removeFolder(folderPath);
         //todo: REMOVE FOLDER AND FILE
-        // deleteTempFile(FILE_URI);
+        // removeFolder(FILE_URI);
     });
 });
 
