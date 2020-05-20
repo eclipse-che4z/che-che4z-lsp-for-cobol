@@ -26,10 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -45,9 +43,7 @@ public class CopybookServiceImpl implements CopybookService {
   private final Map<String, Path> copybookPath = new ConcurrentHashMap<>(8, 0.9f, 1);
 
   @Inject
-  public CopybookServiceImpl(
-      DataBusBroker dataBus,
-      ClientService clientService) {
+  public CopybookServiceImpl(DataBusBroker dataBus, ClientService clientService) {
     this.dataBus = dataBus;
     this.clientService = clientService;
     dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
@@ -71,6 +67,8 @@ public class CopybookServiceImpl implements CopybookService {
     String cobolFileName = getNameFromURI(event.getDocumentUri());
     try {
       String uri = clientService.callClientSync("copybook", cobolFileName, requiredCopybookName);
+
+      System.out.println("Get uri from middleware" + uri);
       if (!uri.isEmpty()) {
         Path file = FileSystemUtils.getPathFromURI(uri);
         copybookPath.put(requiredCopybookName, file);
@@ -84,7 +82,6 @@ public class CopybookServiceImpl implements CopybookService {
       publishOnDatabus(requiredCopybookName);
     }
   }
-
 
   private void publishOnDatabus(String requiredCopybookName, String content, Path path) {
     dataBus.postData(
