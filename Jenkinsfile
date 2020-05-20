@@ -117,7 +117,7 @@ pipeline {
                             dir('com.ca.lsp.cobol') {
                                 sh 'mvn -version'
                                 sh 'set MAVEN_OPTS=-Xms1024m'
-                                sh 'mvn clean verify'
+                                sh 'mvn clean verify --no-transfer-progress'
                                 sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
                             }
                         }
@@ -129,7 +129,7 @@ pipeline {
                         container('maven') {
                             dir('com.ca.lsp.cobol') {
                                 withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
-                                    sh "mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
+                                    sh "mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME} --no-transfer-progress"
                                 }
                             }
                         }
@@ -204,7 +204,7 @@ pipeline {
             steps {
                 container('theia') {
                     dir('tests') {
-                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}'
+                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
                         sh './theiaPrepare.sh'
                     }
                 }
@@ -218,10 +218,7 @@ pipeline {
                 always {
                     container('theia') {
                         dir('tests') {
-                            sh 'mkdir artifacts'
-                            sh 'cp /home/theia/theia.log artifacts'
-                            sh 'cp -a theia_automation_lsp/robot_output/. artifacts'
-                            sh 'cp -a theia_robot_output/. artifacts'
+                            sh './reportCollection.sh'
                             archiveArtifacts "artifacts/**"
                         }
                     }
