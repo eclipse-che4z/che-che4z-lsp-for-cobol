@@ -20,11 +20,10 @@ import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.*;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActions;
+import com.ca.lsp.cobol.service.delegates.actions.FindCopybookCommand;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.communications.ServerCommunications;
 import com.ca.lsp.cobol.service.delegates.completions.*;
-import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyService;
-import com.ca.lsp.cobol.service.delegates.dependency.CopybookDependencyServiceImpl;
 import com.ca.lsp.cobol.service.delegates.formations.Formation;
 import com.ca.lsp.cobol.service.delegates.formations.Formations;
 import com.ca.lsp.cobol.service.delegates.formations.TrimFormation;
@@ -52,12 +51,12 @@ public class ServiceModule extends DefaultModule {
     bind(LanguageServer.class).to(MyLanguageServerImpl.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(CopybookService.class).to(CopybookServiceImpl.class);
-    bind(CopybookDependencyService.class).to(CopybookDependencyServiceImpl.class);
     bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(LanguageClient.class).toProvider(ClientProvider.class);
     bind(ConfigurationSettingsStorable.class).toProvider(SettingsProvider.class);
+    bind(ClientService.class).to(ClientServiceImpl.class);
 
     bindFormations();
     bindCompletions();
@@ -95,6 +94,8 @@ public class ServiceModule extends DefaultModule {
 
   private void bindCodeActions() {
     bind(CodeActions.class);
-    newSetBinder(binder(), CodeActionProvider.class);
+    Multibinder<CodeActionProvider> codeActionBinding =
+        newSetBinder(binder(), CodeActionProvider.class);
+    codeActionBinding.addBinding().to(FindCopybookCommand.class);
   }
 }
