@@ -27,9 +27,4 @@ import java.util.List;
  * the client when the LSP server is triggered.
  */
 public interface CopybookService extends EventObserver<RequiredCopybookEvent> {
-  Path findCopybook(String fileName);
-
-  Path findCopybook(String filename, List<String> paths);
-
-  void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders);
 }

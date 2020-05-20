@@ -34,7 +34,10 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
@@ -195,7 +198,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
 
   @Override
   public void observerCallback(@Nonnull RunAnalysisEvent event) {
-    docs.forEach((key, value) -> analyzeChanges(key, value.getText()));
+    docs.forEach((key, value) -> analyzeDocumentFirstTime(key, value.getText()));
   }
 
   private void registerEngineAndAnalyze(String uri, String languageType, String text) {
