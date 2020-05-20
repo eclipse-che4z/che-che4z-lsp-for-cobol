@@ -15,17 +15,16 @@
 import * as fs from "fs";
 import * as net from "net";
 import * as vscode from "vscode";
-import { LANGUAGE_ID } from "../constants";
-import {CancellationToken, ConfigurationParams, ConfigurationRequest, LanguageClient, LanguageClientOptions, StreamInfo} from "vscode-languageclient";
+import {ConfigurationRequest, LanguageClient, LanguageClientOptions, StreamInfo} from "vscode-languageclient";
 import { ConfigurationWorkspaceMiddleware } from "vscode-languageclient/lib/configuration";
-import { CopybooksPathGenerator } from "./CopybooksPathGenerator";
+import { LANGUAGE_ID } from "../constants";
 import { JavaCheck } from "./JavaCheck";
-import { CopybooksDownloader } from "./CopybooksDownloader";
+import { Middleware } from "./Middleware";
 
 export class LanguageClientService {
     private jarPath: string;
 
-    constructor(private copybooksPathGenerator: CopybooksPathGenerator, private copybookDownloader: CopybooksDownloader) {
+    constructor(private middleware: Middleware) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
         this.jarPath = `${ext.extensionPath}/server/lsp-service-cobol-${ext.packageJSON.version}.jar`;
     }
@@ -48,29 +47,7 @@ export class LanguageClientService {
     }
 
     private createClientOptions(): LanguageClientOptions {
-        const signatureFunc: ConfigurationRequest.MiddlewareSignature = async (
-            params: ConfigurationParams,
-            token: CancellationToken,
-            next: ConfigurationRequest.HandlerSignature) => {
-
-            if (params.items.length === 1) {
-                const section = params.items[0].section.split(".");
-                if (section[0] === "broadcom-cobol-lsp") {
-                    switch (section[1]) {
-                        case "cpy-manager":
-                            return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
-                        case "copybook":
-                            const cobolFileName = section[2];
-                            const copybookName = section[3];
-                            this.copybookDownloader.downloadDependency(cobolFileName, copybookName);
-                            return [""];
-                        default:
-                            break;
-                    }
-                }
-            }
-            return next(params, token);
-        };
+        const signatureFunc: ConfigurationRequest.MiddlewareSignature = this.middleware.handleConfigurationRequest;
         const configurationMiddleware: ConfigurationWorkspaceMiddleware = {
             configuration: signatureFunc,
         };
