@@ -62,6 +62,22 @@ export class CopybooksDownloader implements vscode.Disposable {
         copybooks.forEach(copybook => this.queue.push(copybook, profile));
     }
 
+    public async downloadDependency(cobolFileName: string, copybookName: string): Promise<void> {
+        if (!checkWorkspace()) {
+            return;
+        }
+        const profile: string = await this.profileService.getProfile(cobolFileName);
+        if (!profile) {
+            return;
+        }
+
+        this.resolver.fixMissingDownloads("", [copybookName], profile, {
+            hasPaths: (await this.pathGenerator.listDatasets()).length > 0,
+            hasProfiles: Object.keys(await this.profileService.listProfiles()).length > 1,
+        });
+
+    }
+
     public async downloadDependencies(depFileUri: vscode.Uri, message: string = ""): Promise<void> {
         if (!checkWorkspace()) {
             return;
