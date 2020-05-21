@@ -16,7 +16,6 @@
 package com.ca.lsp.cobol;
 
 import com.broadcom.lsp.cdi.module.DefaultModule;
-import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.positive.CobolTextRegistry;
 import com.ca.lsp.cobol.positive.ZipTextRegistry;
 import com.ca.lsp.cobol.service.*;
@@ -36,7 +35,6 @@ import com.ca.lsp.cobol.service.mocks.MockCopybookService;
 import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
-import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import com.google.inject.multibindings.Multibinder;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -67,7 +65,6 @@ public class TestModule extends DefaultModule {
         .annotatedWith(named(PATH_TO_TEST_RESOURCES))
         .toProvider(() -> ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
 
-    bind(ConfigurationSettingsStorable.class).toProvider(SettingsProvider.class);
     bind(ClientService.class).to(ClientServiceImpl.class);
 
     bindFormations();

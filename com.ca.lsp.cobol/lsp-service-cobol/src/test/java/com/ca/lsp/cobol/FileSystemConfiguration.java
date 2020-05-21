@@ -13,24 +13,17 @@
  */
 package com.ca.lsp.cobol;
 
-import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
-import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.junit.After;
 import org.junit.Before;
-import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.mockito.Mockito.when;
 
 /**
  * This class provide support methods for FileSystemService and doesn't test anything. More in
@@ -67,10 +60,10 @@ public class FileSystemConfiguration extends ConfigurableTest {
   protected Path copybooksFolderPath = null;
   protected Path depenencyFileFolderPath = null;
 
-  protected SettingsProvider settingsProvider = Mockito.mock(SettingsProvider.class);
-
-  // this field represent the predefined setting used for test purposes
-  protected ConfigurationSettingsStorable configurationSettingsStorable = null;
+  //  protected SettingsProvider settingsProvider = Mockito.mock(SettingsProvider.class);
+  //
+  //  // this field represent the predefined setting used for test purposes
+  //  protected ConfigurationSettingsStorable configurationSettingsStorable = null;
   /*
     STRUCTURE FOLDER USED FOR TEST PURPOSES
     ***************************************
@@ -95,14 +88,14 @@ public class FileSystemConfiguration extends ConfigurableTest {
    */
   @Before
   public void buildTempFilesystem() {
-    intializeSettings();
+//    intializeSettings();
 
     createWorkspaceFolderStructure();
     createCopybookFolders();
     createDependencyFolder();
 
     // populate copybook folder and dependency file with some content
-    createCopybookFiles();
+//    createCopybookFiles();
     createDependencyFile();
   }
 
@@ -122,18 +115,18 @@ public class FileSystemConfiguration extends ConfigurableTest {
         .forEach(File::delete);
   }
 
-  /**
-   * This method define the steps necessary to emulate the json settings provided by the user in the
-   * settings.json
-   */
-  private void intializeSettings() {
-    configurationSettingsStorable =
-        new ConfigurationSettingsStorable(
-            Collections.unmodifiableList(Arrays.asList(FULL_PATH, FULL_PATH2)));
-
-    settingsProvider.set(configurationSettingsStorable);
-    when(settingsProvider.get()).thenReturn(configurationSettingsStorable);
-  }
+//  /**
+//   * This method define the steps necessary to emulate the json settings provided by the user in the
+//   * settings.json
+//   */
+//  private void intializeSettings() {
+//    configurationSettingsStorable =
+//        new ConfigurationSettingsStorable(
+//            Collections.unmodifiableList(Arrays.asList(FULL_PATH, FULL_PATH2)));
+//
+//    settingsProvider.set(configurationSettingsStorable);
+//    when(settingsProvider.get()).thenReturn(configurationSettingsStorable);
+//  }
 
   protected static String createFullPath(String profile, String dataset) {
     return filesystemSeparator() + profile + filesystemSeparator() + dataset;
@@ -154,13 +147,13 @@ public class FileSystemConfiguration extends ConfigurableTest {
     copybooksFolderPath =
         createFolders(Paths.get(workspaceFolder + filesystemSeparator() + ".copybooks"));
 
-    createFoldersFromDatasetSettings();
+//    createFoldersFromDatasetSettings();
   }
 
-  private void createFoldersFromDatasetSettings() {
-    List<Path> datasetPathList = getPathListFromSettings();
-    datasetPathList.forEach(this::createFolders);
-  }
+//  private void createFoldersFromDatasetSettings() {
+//    List<Path> datasetPathList = getPathListFromSettings();
+//    datasetPathList.forEach(this::createFolders);
+//  }
 
   protected void createDependencyFolder() {
     depenencyFileFolderPath =
@@ -172,23 +165,23 @@ public class FileSystemConfiguration extends ConfigurableTest {
         createFile(depenencyFileFolderPath, DEP_FILE_COST_NAME + ".dep"), CPY_NAME_WITHOUT_EXT);
   }
 
-  private void createCopybookFiles() {
-    getPathListFromSettings()
-        .forEach(
-            targetPath ->
-                writeContentOnFile(
-                    createFile(targetPath, CPY_INNER_FILE_NAME_WITH_EXT), COPYBOOK_CONTENT));
-  }
+//  private void createCopybookFiles() {
+//    getPathListFromSettings()
+//        .forEach(
+//            targetPath ->
+//                writeContentOnFile(
+//                    createFile(targetPath, CPY_INNER_FILE_NAME_WITH_EXT), COPYBOOK_CONTENT));
+//  }
 
-  private List<Path> getPathListFromSettings() {
-    ConfigurationSettingsStorable configSettings = settingsProvider.get();
-
-    List<String> targetDatasets = configSettings.getPaths();
-
-    return targetDatasets.stream()
-        .map(it -> Paths.get(copybooksFolderPath + it))
-        .collect(Collectors.toList());
-  }
+//  private List<Path> getPathListFromSettings() {
+//    ConfigurationSettingsStorable configSettings = settingsProvider.get();
+//
+//    List<String> targetDatasets = configSettings.getPaths();
+//
+//    return targetDatasets.stream()
+//        .map(it -> Paths.get(copybooksFolderPath + it))
+//        .collect(Collectors.toList());
+//  }
 
   private Path createFolders(Path copybooksPath) {
     try {

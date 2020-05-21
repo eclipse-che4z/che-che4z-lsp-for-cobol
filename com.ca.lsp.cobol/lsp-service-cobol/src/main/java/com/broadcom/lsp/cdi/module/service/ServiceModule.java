@@ -16,7 +16,6 @@
 package com.broadcom.lsp.cdi.module.service;
 
 import com.broadcom.lsp.cdi.module.DefaultModule;
-import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.*;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActions;
@@ -31,7 +30,6 @@ import com.ca.lsp.cobol.service.delegates.references.*;
 import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.ca.lsp.cobol.service.providers.ClientProvider;
-import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import com.google.inject.multibindings.Multibinder;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -55,7 +53,6 @@ public class ServiceModule extends DefaultModule {
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(LanguageClient.class).toProvider(ClientProvider.class);
-    bind(ConfigurationSettingsStorable.class).toProvider(SettingsProvider.class);
     bind(ClientService.class).to(ClientServiceImpl.class);
 
     bindFormations();

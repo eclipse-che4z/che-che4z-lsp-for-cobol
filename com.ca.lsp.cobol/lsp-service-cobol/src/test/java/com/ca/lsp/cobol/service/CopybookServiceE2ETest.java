@@ -18,12 +18,10 @@ import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import com.ca.lsp.cobol.FileSystemConfiguration;
-import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.copybook.AnalyseCopybookTask;
 import com.google.inject.Guice;
-import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Duration;
 import org.awaitility.core.ConditionTimeoutException;
@@ -32,15 +30,12 @@ import org.junit.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * This class contains all the unit test that perform the publish/subscribe acrivities for generate
@@ -50,24 +45,23 @@ import static org.mockito.Mockito.when;
 public class CopybookServiceE2ETest extends FileSystemConfiguration {
   private final DataBusBroker broker =
       Guice.createInjector(new DatabusModule()).getInstance(DataBusBroker.class);
-
-  private Provider<ConfigurationSettingsStorable> configurationSettingsProvider =
-      mock(Provider.class);
+  //
+  //  private Provider<ConfigurationSettingsStorable> configurationSettingsProvider =
+  //      mock(Provider.class);
 
   @Before
   public void initActivities() {
-    createProfileConfiguration();
+    //    createProfileConfiguration();
 
-    CopybookServiceImpl copybookService =
-        new CopybookServiceImpl(broker, null);
+    CopybookServiceImpl copybookService = new CopybookServiceImpl(broker, null);
   }
 
-  private void createProfileConfiguration() {
-    when(configurationSettingsProvider.get())
-        .thenReturn(
-            new ConfigurationSettingsStorable(
-                unmodifiableList(Arrays.asList(FULL_PATH, FULL_PATH2))));
-  }
+  //  private void createProfileConfiguration() {
+  //    when(configurationSettingsProvider.get())
+  //        .thenReturn(
+  //            new ConfigurationSettingsStorable(
+  //                unmodifiableList(Arrays.asList(FULL_PATH, FULL_PATH2))));
+  //  }
 
   /**
    * This test verify that when the preprocessor publish a require copybook event specifying the
