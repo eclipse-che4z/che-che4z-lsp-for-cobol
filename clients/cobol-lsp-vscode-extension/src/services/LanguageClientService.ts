@@ -24,10 +24,9 @@ import { Prioritizer } from "./Prioritizer";
 import { CopybooksDownloader } from "./CopybooksDownloader";
 
 export class LanguageClientService {
-    private jarPath: string;
+    private readonly jarPath: string;
 
-    constructor(private copybooksPathGenerator: CopybooksPathGenerator, private prioritizer: Prioritizer) {
-    constructor(private copybooksPathGenerator: CopybooksPathGenerator, private copybookDownloader: CopybooksDownloader) {
+    constructor(private copybooksPathGenerator: CopybooksPathGenerator, private copybookDownloader: CopybooksDownloader, private prioritizer: Prioritizer) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
         this.jarPath = `${ext.extensionPath}/server/lsp-service-cobol-${ext.packageJSON.version}.jar`;
     }

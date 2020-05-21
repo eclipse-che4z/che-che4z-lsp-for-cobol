@@ -16,23 +16,22 @@ import * as fs from "fs";
 import * as vscode from "vscode";
 import { loadDepFile, DependenciesDesc } from "./DependencyService";
 import {
-    DEPENDENCIES_FOLDER,
-    PROCESS_DOWNLOAD_ERROR_MSG,
     DSN_NOT_FOUND_ERROR_MSG,
     INVALID_CREDENTIALS_ERROR_MSG,
     DSN_PLACEHOLDER,
     PROFILE_NAME_PLACEHOLDER,
     CONN_REFUSED_ERROR_MSG,
     NO_PASSWORD_ERROR_MSG,
-    SETTINGS_SECTION, PATHS_LOCAL_KEY
+
 } from "../constants";
+import { DEPENDENCIES_FOLDER, PROCESS_DOWNLOAD_ERROR_MSG, SETTINGS_SECTION, PATHS_LOCAL_KEY } from "../constants";
 import { CopybooksPathGenerator, createDatasetPath, createCopybookPath, checkWorkspace } from "./CopybooksPathGenerator";
 import { Prioritizer } from "./Prioritizer";
 import { CopybookFix } from "./CopybookFix";
 import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
 import { ProfileService } from "./ProfileService";
 import { ZoweApi } from "./ZoweApi";
-import { Type, ZoweError } from "./ZoweError";
+import {Type, ZoweError} from "./ZoweError";
 
 export class CopybooksDownloader implements vscode.Disposable {
     private queue: DownloadQueue = new DownloadQueue();
@@ -107,7 +106,7 @@ export class CopybooksDownloader implements vscode.Disposable {
     public async start() {
         this.resolver.setQueue(this.queue);
         let done = false;
-        const errors = new Set<string>();
+        const errors = new Set();
         while (!done) {
             const element: CopybookProfile | undefined = await this.queue.pop();
             if (!element) {
@@ -120,7 +119,27 @@ export class CopybooksDownloader implements vscode.Disposable {
                     title: "Fetching copybooks",
                 },
                 async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
-                    await this.handleQueue(element, errors, progress);
+                    const toDownload: CopybookProfile[] = [element];
+                    while (this.queue.length > 0) {
+                        toDownload.push(await this.queue.pop());
+                    }
+                    toDownload.map(cp => cp.copybook).forEach(cb => errors.add(cb));
+                    for (const dataset of await this.pathGenerator.listDatasets()) {
+                        progress.report({
+                            message: "Looking in " + dataset + ". " + toDownload.length +
+                                " copybook(s) left.",
+                        });
+                        for (const cp of toDownload) {
+                            try {
+                                const fetchResult = await this.fetchCopybook(dataset, cp);
+                                if (fetchResult) {
+                                    errors.delete(cp.copybook);
+                                }
+                            } catch (e) {
+                                vscode.window.showErrorMessage(e.toString());
+                            }
+                        }
+                    }
                     if (this.queue.length === 0 && errors.size > 0) {
                         this.resolver.processDownloadError(PROCESS_DOWNLOAD_ERROR_MSG + Array.from(errors));
                         errors.clear();

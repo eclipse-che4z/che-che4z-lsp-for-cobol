@@ -18,7 +18,6 @@ import { DownloadQueue } from "./DownloadQueue";
 
 export class CopybookFix {
     private queue: DownloadQueue;
-
     async fixMissingDownloads(reasonMsg: string, missingCopybooks: string[], profile: string, options: { hasPaths: boolean, hasProfiles: boolean }) {
         const downloadCopybookAction = "Download Copybooks";
         const actionDatasets = "Edit Datasets";
