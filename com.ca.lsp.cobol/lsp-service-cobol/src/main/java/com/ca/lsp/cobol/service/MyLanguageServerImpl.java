@@ -15,22 +15,19 @@ package com.ca.lsp.cobol.service;
 
 import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
 import static java.lang.Boolean.TRUE;
-import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
@@ -44,31 +41,25 @@ import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
 @Slf4j
 @Singleton
 public class MyLanguageServerImpl implements LanguageServer {
-  /** Glob patterns to watch the copybooks folder and copybook files */
-  private static final List<String> WATCHER_PATTERNS =
-      asList("**/.copybooks/**/*.cpy", "**/.copybooks/**/*.CPY", "**/.copybooks");
-
-  /**
-   * The kind of events of interest, for watchers calculated as WatchKind.Create | WatchKind.Change
-   * | WatchKind.Delete which is 7
-   */
-  private static final int WATCH_ALL_KIND = 7;
 
   private TextDocumentService textService;
   private WorkspaceService workspaceService;
-  private Provider<LanguageClient> clientProvider;
   private CopybookService copybookService;
+  private WatchingService watchingService;
+  private ClientService clientService;
 
   @Inject
   MyLanguageServerImpl(
       TextDocumentService textService,
       WorkspaceService workspaceService,
-      Provider<LanguageClient> clientProvider,
-      CopybookService copybookService) {
+      CopybookService copybookService,
+      WatchingService watchingService,
+      ClientService clientService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
-    this.clientProvider = clientProvider;
     this.copybookService = copybookService;
+    this.watchingService = watchingService;
+    this.clientService = clientService;
   }
 
   @Override
@@ -89,15 +80,9 @@ public class MyLanguageServerImpl implements LanguageServer {
    */
   @Override
   public void initialized(@Nullable InitializedParams params) {
-    LanguageClient client = clientProvider.get();
-
-    RegistrationParams registrationParams =
-        new RegistrationParams(
-            asList(
-                new Registration(
-                    "copybooksWatcher", "workspace/didChangeWatchedFiles", createWatcher()),
-                new Registration("configurationChange", "workspace/didChangeConfiguration", null)));
-    client.registerCapability(registrationParams);
+    watchingService.watchConfigurationChange();
+    watchingService.watchPredefinedFolder();
+    addLocalFilesWatcher();
   }
 
   @Override
@@ -123,6 +108,10 @@ public class MyLanguageServerImpl implements LanguageServer {
     return supplyAsync(() -> new InitializeResult(capabilities));
   }
 
+  private void addLocalFilesWatcher() {
+    clientService.callClient(LOCAL_PATHS.label).thenAccept(it -> watchingService.addWatchers(it));
+  }
+
   @Override
   public CompletableFuture<Object> shutdown() {
     return supplyAsync(() -> TRUE);
@@ -131,14 +120,6 @@ public class MyLanguageServerImpl implements LanguageServer {
   @Override
   public void exit() {
     // not supported
-  }
-
-  @Nonnull
-  private DidChangeWatchedFilesRegistrationOptions createWatcher() {
-    return new DidChangeWatchedFilesRegistrationOptions(
-        WATCHER_PATTERNS.stream()
-            .map(it -> new FileSystemWatcher(it, WATCH_ALL_KIND))
-            .collect(toList()));
   }
 
   @Nonnull

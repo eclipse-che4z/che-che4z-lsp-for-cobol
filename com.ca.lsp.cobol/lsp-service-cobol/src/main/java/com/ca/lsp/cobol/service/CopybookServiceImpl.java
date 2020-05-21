@@ -19,7 +19,6 @@ import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import com.ca.lsp.cobol.service.utils.FileSystemUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -27,12 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 
-import static com.ca.lsp.cobol.service.utils.FileSystemUtils.getNameFromURI;
-import static java.lang.Thread.currentThread;
+import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
+import static java.util.Optional.ofNullable;
 
 @Singleton
 @Slf4j
@@ -57,8 +54,8 @@ public class CopybookServiceImpl implements CopybookService {
 
     if (copybookPath.containsKey(requiredCopybookName)) {
       Path file = copybookPath.get(requiredCopybookName);
-      if (FileSystemUtils.isFileExists(file)) {
-        publishOnDatabus(requiredCopybookName, FileSystemUtils.getContentByPath(file), file);
+      if (isFileExists(file)) {
+        publishOnDatabus(requiredCopybookName, getContentByPath(file), file);
         return;
       } else {
         copybookPath.remove(requiredCopybookName);
@@ -66,19 +63,18 @@ public class CopybookServiceImpl implements CopybookService {
     }
 
     String cobolFileName = getNameFromURI(event.getDocumentUri());
-    try {
-      String uri = clientService.callClientSync("copybook", cobolFileName, requiredCopybookName);
-      if (!uri.isEmpty()) {
-        Path file = FileSystemUtils.getPathFromURI(uri);
-        copybookPath.put(requiredCopybookName, file);
-        publishOnDatabus(requiredCopybookName, FileSystemUtils.getContentByPath(file), file);
-      } else {
-        publishOnDatabus(requiredCopybookName);
-      }
-    } catch (InterruptedException | ExecutionException e) {
-      log.error("Error resolving copybook", e);
+
+    String uri =
+        clientService
+            .callClientSync("copybook", cobolFileName, requiredCopybookName)
+            .map(it -> it.get(0))
+            .orElse("");
+    if (uri.isEmpty()) {
       publishOnDatabus(requiredCopybookName);
-      currentThread().interrupt();
+    } else {
+      Path file = getPathFromURI(uri);
+      copybookPath.put(requiredCopybookName, file);
+      publishOnDatabus(requiredCopybookName, getContentByPath(file), file);
     }
   }
 
@@ -86,7 +82,7 @@ public class CopybookServiceImpl implements CopybookService {
     dataBus.postData(
         FetchedCopybookEvent.builder()
             .name(requiredCopybookName)
-            .uri(Optional.ofNullable(path).map(Path::toUri).map(URI::toString).orElse(null))
+            .uri(ofNullable(path).map(Path::toUri).map(URI::toString).orElse(null))
             .content(content)
             .build());
   }

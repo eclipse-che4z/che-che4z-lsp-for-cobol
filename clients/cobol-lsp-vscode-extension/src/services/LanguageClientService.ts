@@ -57,8 +57,6 @@ export class LanguageClientService {
                 const section = params.items[0].section.split(".");
                 if (section[0] === "broadcom-cobol-lsp") {
                     switch (section[1]) {
-                        case "cpy-manager":
-                            return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
                         case "copybook":
                             const cobolFileName = section[2];
                             const copybookName = section[3];
