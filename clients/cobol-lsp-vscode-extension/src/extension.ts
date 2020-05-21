@@ -104,7 +104,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 
     context.subscriptions.push(languageClientService.start());
-    // context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
+    context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
     context.subscriptions.push(copyBooksDownloader);
 
     context.subscriptions.push(
@@ -116,18 +116,8 @@ export async function activate(context: vscode.ExtensionContext) {
 function initWorkspaceTracker(downloader: CopybooksDownloader): vscode.Disposable {
     const watcher = vscode.workspace.createFileSystemWatcher("**/"
         + DEPENDENCIES_FOLDER + "/**/**.dep", false, false, true);
-
-    const copybookResolveURI: CopybookResolveURI = new CopybookResolveURI();
-
-
-
-    //instead of invoking zowe we have to invoke the prioritizer
-    watcher.onDidCreate(uri => copybookResolveURI.resolveCopybooksInDepFile(uri),  "Program contains dependencies to resolve.");
-    watcher.onDidChange(uri => copybookResolveURI.resolveCopybooksInDepFile(uri));
-
-
-    // watcher.onDidCreate(uri => downloader.downloadDependencies(uri,
-    //     "Program contains dependencies to missing copybooks."));
-    // watcher.onDidChange(uri => downloader.downloadDependencies(uri));
+    watcher.onDidCreate(uri => downloader.downloadDependencies(uri,
+        "Program contains dependencies to missing copybooks."));
+    watcher.onDidChange(uri => downloader.downloadDependencies(uri));
     return watcher;
 }
