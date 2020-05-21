@@ -50,7 +50,7 @@ public class InitializeConfigurationTest {
   public void testInitializeConfiguration() {
     provider.set(client);
 
-    MyLanguageServerImpl langServer = new MyLanguageServerImpl(null, null, provider, null);
+    MyLanguageServerImpl langServer = new MyLanguageServerImpl(null, null, null, null, null);
 
     ConfigurationParams params = ServiceTestUtils.createParams();
     List<Object> list = new ArrayList<>();

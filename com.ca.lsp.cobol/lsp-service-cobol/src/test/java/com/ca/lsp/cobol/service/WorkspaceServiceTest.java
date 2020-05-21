@@ -56,7 +56,7 @@ public class WorkspaceServiceTest {
     DataBusBroker broker = mock(DataBusBroker.class);
     String copybookName = "COPYBOOK";
 
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null);
 
     CompletableFuture<Object> result =
         service.executeCommand(
@@ -79,7 +79,7 @@ public class WorkspaceServiceTest {
   @Test
   public void testExecuteNonExistingCommand() {
     DataBusBroker broker = mock(DataBusBroker.class);
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null);
 
     CompletableFuture<Object> result =
         service.executeCommand(new ExecuteCommandParams("Missing command name", emptyList()));
@@ -99,7 +99,7 @@ public class WorkspaceServiceTest {
   @Test
   public void testExecuteCommandIncorrectArguments() {
     DataBusBroker broker = mock(DataBusBroker.class);
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null);
 
     CompletableFuture<Object> result =
         service.executeCommand(
@@ -134,7 +134,7 @@ public class WorkspaceServiceTest {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     ArgumentCaptor<RunAnalysisEvent> captor = forClass(RunAnalysisEvent.class);
 
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null);
 
     DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));
     service.didChangeWatchedFiles(params);

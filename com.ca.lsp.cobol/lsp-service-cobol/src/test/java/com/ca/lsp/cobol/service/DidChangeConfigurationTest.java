@@ -45,7 +45,7 @@ public class DidChangeConfigurationTest {
   @Test
   public void testDidChangeConfiguration() {
     CobolWorkspaceServiceImpl cobolWorkspaceService =
-        new CobolWorkspaceServiceImpl(broker, provider);
+        new CobolWorkspaceServiceImpl(broker, null, null);
     ArgumentCaptor<FetchedSettingsEvent> captor =
         ArgumentCaptor.forClass(FetchedSettingsEvent.class);
 
