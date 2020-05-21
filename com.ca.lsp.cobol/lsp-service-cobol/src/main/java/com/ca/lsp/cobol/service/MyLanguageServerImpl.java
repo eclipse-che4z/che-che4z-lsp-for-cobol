@@ -13,8 +13,6 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
-import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -28,12 +26,9 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.CPY_MANAGER;
-import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -41,7 +36,6 @@ import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
-import static com.ca.lsp.cobol.service.utils.FileSystemUtils.interpretPaths;
 
 /**
  * This class sets up the initial state of the services and applies other initialization activities,
@@ -63,7 +57,6 @@ public class MyLanguageServerImpl implements LanguageServer {
   private TextDocumentService textService;
   private WorkspaceService workspaceService;
   private Provider<LanguageClient> clientProvider;
-  private SettingsProvider settingsProvider;
   private CopybookService copybookService;
 
   @Inject
@@ -71,12 +64,10 @@ public class MyLanguageServerImpl implements LanguageServer {
       TextDocumentService textService,
       WorkspaceService workspaceService,
       Provider<LanguageClient> clientProvider,
-      SettingsProvider settingsProvider,
       CopybookService copybookService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.clientProvider = clientProvider;
-    this.settingsProvider = settingsProvider;
     this.copybookService = copybookService;
   }
 
@@ -107,39 +98,6 @@ public class MyLanguageServerImpl implements LanguageServer {
                     "copybooksWatcher", "workspace/didChangeWatchedFiles", createWatcher()),
                 new Registration("configurationChange", "workspace/didChangeConfiguration", null)));
     client.registerCapability(registrationParams);
-    try {
-      retrieveAndStoreConfiguration();
-    } catch (RuntimeException e) {
-      log.error(e.getMessage());
-    }
-  }
-
-  /**
-   * Retrieve configuration settings by using fetchSettings() method, validate the JSON and later
-   * store it in the SettingProvider for further use
-   */
-  void retrieveAndStoreConfiguration() {
-    fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
-        .thenAccept(
-            e -> {
-              ConfigurationSettingsStorable config =
-                  new ConfigurationSettingsStorable(interpretPaths(e));
-              settingsProvider.set(config);
-            });
-  }
-
-  private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {
-    ConfigurationParams params =
-        new ConfigurationParams(provideConfigurationItemList(section, scope));
-    return clientProvider.get().configuration(params);
-  }
-
-  @Nonnull
-  private List<ConfigurationItem> provideConfigurationItemList(String section, String scope) {
-    ConfigurationItem item = new ConfigurationItem();
-    item.setSection(section);
-    item.setScopeUri(scope);
-    return Collections.singletonList(item);
   }
 
   @Override

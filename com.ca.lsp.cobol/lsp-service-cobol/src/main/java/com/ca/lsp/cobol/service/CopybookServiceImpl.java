@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 import static com.ca.lsp.cobol.service.utils.FileSystemUtils.getNameFromURI;
+import static java.lang.Thread.currentThread;
 
 @Singleton
 @Slf4j
@@ -73,13 +74,13 @@ public class CopybookServiceImpl implements CopybookService {
         Path file = FileSystemUtils.getPathFromURI(uri);
         copybookPath.put(requiredCopybookName, file);
         publishOnDatabus(requiredCopybookName, FileSystemUtils.getContentByPath(file), file);
-        return;
       } else {
         publishOnDatabus(requiredCopybookName);
       }
     } catch (InterruptedException | ExecutionException e) {
       log.error("Error resolving copybook", e);
       publishOnDatabus(requiredCopybookName);
+      currentThread().interrupt();
     }
   }
 
