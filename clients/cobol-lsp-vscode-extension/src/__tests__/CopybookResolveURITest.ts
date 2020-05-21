@@ -17,7 +17,6 @@ import * as path from "path";
 import {CopybookResolveURI} from "../services/CopybookResolveURI";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
 const copybookName: string = "NSTCOPY1";
-const copybookResolverUri: CopybookResolveURI = new CopybookResolveURI();
 const CPY_FOLDER_NAME = ".cobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
 
@@ -51,28 +50,28 @@ afterAll(() => {
 
 describe("Resolve local copybook against bad configuration of target folders", () => {
     test("given an undefined value as list of folders, the copybook is not retrieved", () => {
-        expect(copybookResolverUri.searchCopybookLocally(copybookName, undefined)).toBe(undefined);
+        expect(CopybookResolveURI.searchCopybookLocally(copybookName, undefined)).toBe(undefined);
     });
 
     test("given an empty list of folders, the copybook is not retrieved", () => {
-        expect(copybookResolverUri.searchCopybookLocally(copybookName, [])).toBe(undefined);
+        expect(CopybookResolveURI.searchCopybookLocally(copybookName, [])).toBe(undefined);
     });
 
     test("given a folder that not contains copybooks, the target copybook is not retrieved", () => {
-        expect(copybookResolverUri.searchCopybookLocally(copybookName, [__dirname])).toBe(undefined);
+        expect(CopybookResolveURI.searchCopybookLocally(copybookName, [__dirname])).toBe(undefined);
     });
 
     test("given a not empty folder, a copybook that is not present in that folder is not retrivied and the uri returned is undefined", () => {
-        expect(copybookResolverUri.searchCopybookLocally("NSTCPY2", [CPY_FOLDER_NAME])).toBeUndefined();
+        expect(CopybookResolveURI.searchCopybookLocally("NSTCPY2", [CPY_FOLDER_NAME])).toBeUndefined();
     });
 });
 
 describe("Resolve local copybook present in one or more folders specified by the user", () => {
     test("given a folder that contains the target copybook, it is found and its uri is returned", () => {
-        expect(copybookResolverUri.searchCopybookLocally(copybookName, [CPY_FOLDER_NAME])).toBeDefined();
+        expect(CopybookResolveURI.searchCopybookLocally(copybookName, [CPY_FOLDER_NAME])).toBeDefined();
     });
 
     test("given two times the same folder that contains the target copybook, one uri is still returned", () => {
-        expect(copybookResolverUri.searchCopybookLocally(copybookName, [CPY_FOLDER_NAME])).toBeDefined();
+        expect(CopybookResolveURI.searchCopybookLocally(copybookName, [CPY_FOLDER_NAME])).toBeDefined();
     });
 });

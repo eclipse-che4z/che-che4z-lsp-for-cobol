@@ -43,9 +43,12 @@ export async function activate(context: vscode.ExtensionContext) {
     const prioritizer: Prioritizer = new Prioritizer();
     const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
     const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator, prioritizer);
-    const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator, copyBooksDownloader,prioritizer);
     const pathsService: PathsService = new PathsService();
     const copybookResolver: CopybookResolver = new LocalCopybookResolver();
+    const copybookResolveURI: CopybookResolveURI = new CopybookResolveURI(profileService, copyBooksDownloader);
+    const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator, copyBooksDownloader,prioritizer, copybookResolveURI);
+
+
 
     try {
         await languageClientService.checkPrerequisites();
@@ -104,7 +107,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 
     context.subscriptions.push(languageClientService.start());
-    context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
+    // context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
     context.subscriptions.push(copyBooksDownloader);
 
     context.subscriptions.push(
@@ -112,12 +115,16 @@ export async function activate(context: vscode.ExtensionContext) {
             { scheme: "file", language: LANGUAGE_ID },
             new CopybooksCodeActionProvider(profileService)));
 }
-
-function initWorkspaceTracker(downloader: CopybooksDownloader): vscode.Disposable {
-    const watcher = vscode.workspace.createFileSystemWatcher("**/"
-        + DEPENDENCIES_FOLDER + "/**/**.dep", false, false, true);
-    watcher.onDidCreate(uri => downloader.downloadDependencies(uri,
-        "Program contains dependencies to missing copybooks."));
-    watcher.onDidChange(uri => downloader.downloadDependencies(uri));
-    return watcher;
-}
+//
+// function initWorkspaceTracker(downloader: CopybooksDownloader): vscode.Disposable {
+//     const watcher = vscode.workspace.createFileSystemWatcher("**/"
+//         + DEPENDENCIES_FOLDER + "/**/**.dep", false, false, true);
+//
+//     //instead of invoking zowe we have to invoke the prioritizer
+//
+//
+//     // watcher.onDidCreate(uri => downloader.downloadDependencies(uri,
+//     //     "Program contains dependencies to missing copybooks."));
+//     // watcher.onDidChange(uri => downloader.downloadDependencies(uri));
+//     return watcher;
+// }

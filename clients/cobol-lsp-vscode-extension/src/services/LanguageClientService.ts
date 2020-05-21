@@ -22,11 +22,14 @@ import { CopybooksPathGenerator } from "./CopybooksPathGenerator";
 import { JavaCheck } from "./JavaCheck";
 import { Prioritizer } from "./Prioritizer";
 import { CopybooksDownloader } from "./CopybooksDownloader";
+import {CopybookResolveURI} from "./CopybookResolveURI";
+
+
 
 export class LanguageClientService {
     private readonly jarPath: string;
 
-    constructor(private copybooksPathGenerator: CopybooksPathGenerator, private copybookDownloader: CopybooksDownloader, private prioritizer: Prioritizer) {
+    constructor(private copybooksPathGenerator: CopybooksPathGenerator, private copybookDownloader: CopybooksDownloader, private prioritizer: Prioritizer, private copybookResolverURI: CopybookResolveURI) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
         this.jarPath = `${ext.extensionPath}/server/lsp-service-cobol-${ext.packageJSON.version}.jar`;
     }
@@ -63,10 +66,12 @@ export class LanguageClientService {
                         case "cpy-manager":
                             return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
                         case "copybook":
+
                             const cobolFileName = section[2];
                             const copybookName = section[3];
-                            this.copybookDownloader.downloadDependency(cobolFileName, copybookName);
-                            return [""];
+                            const uri = await this.copybookResolverURI.resolveCopybooksInDepFile(copybookName, cobolFileName);
+
+                            return [uri];
                         default:
                             break;
                     }

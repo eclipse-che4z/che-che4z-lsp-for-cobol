@@ -11,65 +11,68 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import * as fs from "fs";
+import * as path from "path";
+import {URL} from "url";
 import * as vscode from "vscode";
 import {PATHS_LOCAL_KEY, PATHS_ZOWE, SETTINGS_SECTION} from "../constants";
+import {ProfileService} from "./ProfileService";
 import {CopybookResolver} from "./settings/CopybookResolver";
 import {LocalCopybookResolver} from "./settings/LocalCopybookResolver";
-import {URL} from "url";
-import * as path from "path";
-import * as fs from "fs";
-import {Uri} from "vscode";
-import {DependenciesDesc, loadDepFile} from "./DependencyService";
+import {CopybooksDownloader} from "./CopybooksDownloader";
 
 function localSettingsAreFound(): boolean {
     const localPaths: string[] = vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY);
     return localPaths !== undefined && localPaths.length > 0;
 }
 
-function datasetSettingsAreFound(): boolean {
-    const datasets: string[] = vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);
-    return datasets !== undefined && datasets.length > 0;
-}
-
 export class CopybookResolveURI {
-    //TODO: refactor with unit test
-    public searchCopybookLocally(copybookName: string, targetFolders: string[]): string {
+
+    public static searchCopybookLocally(copybookName: string, targetFolders: string[]): string {
         const copybookResolver: CopybookResolver = new LocalCopybookResolver();
         const localFolderList: string[] =  copybookResolver.resolve(targetFolders);
         for (const folder of localFolderList) {
-            //what about copybook name extension?
-            //priority about folders? two file same name but different folders? - add unit test
             const uri: URL = new URL(path.join(folder, copybookName));
             if (fs.existsSync(uri)) {
                 return uri.href;
             }
         }
     }
+    constructor(private profileService: ProfileService, private copybooksDownloader: CopybooksDownloader) {
+    }
+    public  async resolveCopybooksInDepFile(copybookName: string, cobolProgramName: string): Promise<string> {
+        let result: string;
+        if (localSettingsAreFound()) {
+            result = CopybookResolveURI.searchCopybookLocally(copybookName, vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
+        }
 
-    resolveCopybooksInDepFile(depFileUri: Uri) {
-        const depDesc: DependenciesDesc = loadDepFile(depFileUri);
-        //try to search them first locally
+        if (!result) {
+            const profile = await this.profileService.getProfile(cobolProgramName);
 
-        depDesc.copybooks.forEach(copybook => {
-            console.log(vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
-            if (localSettingsAreFound()) {
-                //TODO: use api to resolve locally and get the uri
-                const localCpy: string = this.searchCopybookLocally(copybook, vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
-                if (localCpy) {
-                    //create delivery object
-                    vscode.window.showInformationMessage(JSON.stringify({
-                        "cpyName" : copybook,
-                        "uri": localCpy,
-                        "type": "local",
-                    }));
-                } else {
-                    vscode.window.showInformationMessage("Not found locally " + copybook + " - search it on mf...");
-                    //TODO: should be globally defined with all the copybooks not found locally..
-                    const items: string[] = new Array();
-                    items.push(copybook);
-                    //copybooksDownloader.downloadCopybooks(items,"");
+            const dsnList: string[] = vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);
+
+            outer: for (const dsnPath of dsnList ) {
+                for (const wsFolder of vscode.workspace.workspaceFolders) {
+                    const uri: URL = new URL(path.join(wsFolder.uri.scheme + "://" + wsFolder.uri.path, ".copybooks", profile, dsnPath, copybookName + ".cpy"));
+                    if (fs.existsSync(uri)) {
+                       result = uri.toString();
+                       break outer;
+                   }
+
                 }
+
             }
-        });
+
+
+            // get profile --> profileServ.get
+            // concatenate copub + profi. +
+        }
+        if (!result) {
+            this.copybooksDownloader.downloadDependency(cobolProgramName, copybookName);
+
+        }
+
+        // TODO: handle situation when copybookName is found on .copybook folder..
+        return result || "";
     }
 }
