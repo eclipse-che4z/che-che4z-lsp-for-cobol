@@ -26,6 +26,7 @@ import { initializeSettings } from "./services/Settings";
 
 import {resolveLocalCopybooksCommand} from "./commands/ResolveLocalCopybooksCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
+import { Middleware } from "./services/Middleware";
 import { PathsService } from "./services/PathsService";
 import { ProfileService } from "./services/ProfileService";
 import {CopybookResolver} from "./services/settings/CopybookResolver";
@@ -46,9 +47,8 @@ export async function activate(context: vscode.ExtensionContext) {
     const pathsService: PathsService = new PathsService();
     const copybookResolver: CopybookResolver = new LocalCopybookResolver();
     const copybookResolveURI: CopybookResolveURI = new CopybookResolveURI(profileService, copyBooksDownloader);
-    const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator, copyBooksDownloader,prioritizer, copybookResolveURI);
-
-
+    const middleware: Middleware = new Middleware(copybooksPathGenerator, copybookResolveURI);
+    const languageClientService: LanguageClientService = new LanguageClientService(middleware);
 
     try {
         await languageClientService.checkPrerequisites();
