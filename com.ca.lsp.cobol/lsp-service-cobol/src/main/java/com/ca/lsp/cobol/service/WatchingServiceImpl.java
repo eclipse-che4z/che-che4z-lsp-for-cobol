@@ -79,7 +79,7 @@ public class WatchingServiceImpl implements WatchingService {
                       it,
                       WATCH_FILES,
                       new DidChangeWatchedFilesRegistrationOptions(
-                          singletonList(new FileSystemWatcher(it + "/**/*", WATCH_ALL_KIND))));
+                          singletonList(new FileSystemWatcher("**/" + it + "/**/*", WATCH_ALL_KIND))));
                 })
             .collect(toList()));
   }
