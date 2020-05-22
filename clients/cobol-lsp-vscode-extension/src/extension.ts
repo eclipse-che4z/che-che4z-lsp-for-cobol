@@ -84,7 +84,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 
     context.subscriptions.push(languageClientService.start());
-    context.subscriptions.push(initWorkspacerWatcher(copyBooksDownloader));
+    context.subscriptions.push(initWorkspaceWatcher(copyBooksDownloader));
     context.subscriptions.push(copyBooksDownloader);
 
     context.subscriptions.push(
@@ -93,7 +93,7 @@ export async function activate(context: vscode.ExtensionContext) {
             new CopybooksCodeActionProvider(profileService)));
 }
 
-function initWorkspacerWatcher(downloader: CopybooksDownloader): vscode.Disposable {
+function initWorkspaceWatcher(downloader: CopybooksDownloader): vscode.Disposable {
     const watcher = vscode.workspace.createFileSystemWatcher("**/"
         + path.join(C4Z_FOLDER, DEPENDENCIES_FOLDER) + "/**/**.dep", false, false, true);
     watcher.onDidCreate(uri => downloader.downloadDependencies(uri,
