@@ -36,7 +36,7 @@ export class LocalCopybookResolver implements CopybookResolver {
             }
         }
     }
-    //TODO: introduce parameter for the copybook name to verify that is defined
+
     /**
      * @param list the provided list of physical path defined by the user or undefined
      * @return a list of resolved URIs, empty array if the input list doesn't contains any valid/found URIs

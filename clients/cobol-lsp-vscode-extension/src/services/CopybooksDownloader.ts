@@ -14,23 +14,22 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { loadDepFile, DependenciesDesc } from "./DependencyService";
 import {
-    DSN_NOT_FOUND_ERROR_MSG,
-    INVALID_CREDENTIALS_ERROR_MSG,
-    DSN_PLACEHOLDER,
-    PROFILE_NAME_PLACEHOLDER,
     CONN_REFUSED_ERROR_MSG,
+    DEPENDENCIES_FOLDER,
+    DSN_NOT_FOUND_ERROR_MSG,
+    DSN_PLACEHOLDER,
+    INVALID_CREDENTIALS_ERROR_MSG,
     NO_PASSWORD_ERROR_MSG,
-
+    PROCESS_DOWNLOAD_ERROR_MSG,
+    PROFILE_NAME_PLACEHOLDER,
 } from "../constants";
-import { DEPENDENCIES_FOLDER, PROCESS_DOWNLOAD_ERROR_MSG, SETTINGS_SECTION, PATHS_LOCAL_KEY } from "../constants";
-import { CopybooksPathGenerator, createDatasetPath, createCopybookPath, checkWorkspace } from "./CopybooksPathGenerator";
-import { Prioritizer } from "./Prioritizer";
-import { CopybookFix } from "./CopybookFix";
-import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
-import { ProfileService } from "./ProfileService";
-import { ZoweApi } from "./ZoweApi";
+import {CopybookFix} from "./CopybookFix";
+import {checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath} from "./CopybooksPathGenerator";
+import {DependenciesDesc, loadDepFile} from "./DependencyService";
+import {CopybookProfile, DownloadQueue} from "./DownloadQueue";
+import {ProfileService} from "./ProfileService";
+import {ZoweApi} from "./ZoweApi";
 import {Type, ZoweError} from "./ZoweError";
 
 export class CopybooksDownloader implements vscode.Disposable {
@@ -40,10 +39,11 @@ export class CopybooksDownloader implements vscode.Disposable {
         private resolver: CopybookFix,
         private zoweApi: ZoweApi,
         private profileService: ProfileService,
-        private pathGenerator: CopybooksPathGenerator,
-        private prioritizer: Prioritizer) { }
+        private pathGenerator: CopybooksPathGenerator) {
+    }
 
     public async redownloadDependencies(message: string = "Redownload dependencies requested.") {
+        //TODO: related to zowe refactor - Should comunicate the server to recalculate the copybooks?
         (await vscode.workspace.findFiles(DEPENDENCIES_FOLDER + "/**/*.dep")).forEach(dep => {
             this.downloadDependencies(dep, message);
         });
@@ -89,17 +89,15 @@ export class CopybooksDownloader implements vscode.Disposable {
             return;
         }
 
-        this.prioritizer.checkCopybooksPresentLocal(depDesc.copybooks,
-        vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
-        const notLocalCpy: string[] = this.prioritizer.getNotLocalCpy();
-        const localCpyExists: boolean = this.prioritizer.getLocalCpyURI().length > 0;
+        const missingCopybooks: string[] = await this.listMissingCopybooks(depDesc.copybooks, profile);
 
-        // message to be displayed should be adjusted according to the requirments
-        if (localCpyExists) {
-        // we can use the logic from continueDownloadFromMF in order to ask user if would like to use Zowe or no - TBD
-                this.notifyUserIfCopyNotLocal("Some copybooks are not present locally", notLocalCpy.length > 0);
-            } else {
-                this.continueDownloadFromMF(notLocalCpy, depDesc.programName, message);
+        if (!message.length) {
+            missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
+        } else if (missingCopybooks.length > 0) {
+            this.resolver.fixMissingDownloads(message, missingCopybooks, profile, {
+                hasPaths: (await this.pathGenerator.listDatasets()).length > 0,
+                hasProfiles: Object.keys(await this.profileService.listProfiles()).length > 1,
+            });
         }
     }
 
@@ -153,9 +151,9 @@ export class CopybooksDownloader implements vscode.Disposable {
     }
 
     private async handleQueue(
-            element: CopybookProfile,
-            errors: Set<string>,
-            progress: vscode.Progress<{ message?: string; increment?: number }>) {
+        element: CopybookProfile,
+        errors: Set<string>,
+        progress: vscode.Progress<{ message?: string; increment?: number }>) {
         const toDownload: CopybookProfile[] = [element];
         while (this.queue.length > 0) {
             toDownload.push(await this.queue.pop());
@@ -187,10 +185,10 @@ export class CopybooksDownloader implements vscode.Disposable {
     }
 
     private async handleDataset(
-            dataset: string,
-            toDownload: CopybookProfile[],
-            errors: Set<string>,
-            progress: vscode.Progress<{ message?: string; increment?: number }>) {
+        dataset: string,
+        toDownload: CopybookProfile[],
+        errors: Set<string>,
+        progress: vscode.Progress<{ message?: string; increment?: number }>) {
         try {
             progress.report({
                 message: "Looking in " + dataset + ". " + toDownload.length +
@@ -226,53 +224,6 @@ export class CopybooksDownloader implements vscode.Disposable {
         }
     }
 
-    /**
-     * This method pushes missingCopybooks into the queue to be downloaded from MF
-     * @param message message to be displayed
-     * @param missingCopybooks copybooks which are not presented locally
-     * @param profile Zowe connection profile
-     */
-    private async resolveMissingCopybooksFromMF(message: string, missingCopybooks: string[], profile: string) {
-        if (!message.length) {
-            missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
-        } else if (missingCopybooks.length > 0) {
-            this.resolver.fixMissingDownloads(message, missingCopybooks, profile, {
-                hasPaths: (await this.pathGenerator.listDatasets()).length > 0,
-                hasProfiles: Object.keys(await this.profileService.listProfiles()).length > 1,
-            });
-        }
-    }
-
-    /**
-     * @param title message to be displayed
-     * @param cpyNotLocal check if there are any copybooks unresolved locally
-     */
-    private notifyUserIfCopyNotLocal(title: string, cpyNotLocal: boolean) {
-        if (cpyNotLocal) { vscode.window.showErrorMessage(title); }
-    }
-
-    /**
-     * This method is implemented in order to create a smooth transition from local analyze to MF download
-     * @param notLocalCpy copybooks not present in local workspace
-     * @param programName analyzed COBOL file
-     * @param message message to be displayed
-     */
-    private async continueDownloadFromMF(notLocalCpy: string[], programName: string, message: string) {
-
-        //TODO: remove it
-        // const action = await vscode.window.showErrorMessage("Do you wanna use Zowe?",
-        //         "Yes", "Never");
-        // if (action === "Yes") {
-        //
-        // }
-        const profile: string = await this.profileService.getProfile(programName);
-        if (!profile) {
-            return;
-        }
-        const missingCopybooks: string[] = await this.listMissingCopybooks(notLocalCpy, profile);
-        this.resolveMissingCopybooksFromMF(message, missingCopybooks, profile);
-    }
-
     private async fetchCopybook(dataset: string, copybookProfile: CopybookProfile): Promise<boolean> {
         let members: string[] = [];
         try {
@@ -295,7 +246,7 @@ export class CopybooksDownloader implements vscode.Disposable {
         const copybookPath = createCopybookPath(profileName, dataset, copybook);
         if (!fs.existsSync(copybookPath)) {
             const content = await this.zoweApi.fetchMember(dataset, copybook, profileName);
-            fs.mkdirSync(createDatasetPath(profileName, dataset), { recursive: true });
+            fs.mkdirSync(createDatasetPath(profileName, dataset), {recursive: true});
             fs.writeFileSync(copybookPath, content);
         }
     }
