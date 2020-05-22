@@ -17,6 +17,9 @@ package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
+import com.google.common.collect.Streams;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +36,6 @@ import java.util.function.BiConsumer;
 
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.runAsync;
@@ -90,8 +92,10 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
-    List<String> localFolders = clientService.callClientSync(LOCAL_PATHS.label).orElse(emptyList());
+    clientService.callClient(LOCAL_PATHS.label).thenAccept(it -> updateWatchers(toStrings(it)));
+  }
 
+  private void updateWatchers(List<String> localFolders) {
     List<String> watchingFolders = watchingService.getWatchingFolders();
 
     watchingService.addWatchers(
@@ -99,8 +103,15 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
 
     watchingService.removeWatchers(
         watchingFolders.stream().filter(it -> !localFolders.contains(it)).collect(toList()));
-
     rerunAnalysis();
+  }
+
+  private List<String> toStrings(List<Object> it) {
+    return it.stream()
+        .map(obj -> (JsonArray) obj)
+        .flatMap(Streams::stream)
+        .map(JsonElement::getAsString)
+        .collect(toList());
   }
 
   /**
