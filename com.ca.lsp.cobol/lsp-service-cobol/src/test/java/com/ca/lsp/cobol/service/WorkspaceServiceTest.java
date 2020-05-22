@@ -49,7 +49,7 @@ import static org.mockito.Mockito.*;
 public class WorkspaceServiceTest {
   /**
    * Test of the workspace/executeCommand entry point. Assert that on a MISSING_COPYBOOK the {@link
-   * RequiredCopybookEvent} is fired.
+   * RequiredCopybookEvent} fired.
    */
   @Test
   public void testExecuteCommand() {
@@ -92,27 +92,6 @@ public class WorkspaceServiceTest {
     verify(broker, timeout(1000).times(0)).postData(any());
   }
 
-  /**
-   * Test of the workspace/executeCommand entry point. Assert no changes applied if the argument
-   * list is incomplete.
-   */
-  @Test
-  public void testExecuteCommandIncorrectArguments() {
-    DataBusBroker broker = mock(DataBusBroker.class);
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null);
-
-    CompletableFuture<Object> result =
-        service.executeCommand(
-            new ExecuteCommandParams(
-                MISSING_COPYBOOK.name(), singletonList(new JsonPrimitive(DOCUMENT_URI))));
-
-    try {
-      assertNull(result.get());
-    } catch (InterruptedException | ExecutionException e) {
-      fail(e.getMessage());
-    }
-    verify(broker, never()).postData(any());
-  }
   /**
    * This test verifies that the Workspace Service reacts on the file change watcher's notifications
    */
