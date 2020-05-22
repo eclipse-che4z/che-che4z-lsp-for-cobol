@@ -15,7 +15,7 @@
 import * as fs from "fs";
 import * as net from "net";
 import * as vscode from "vscode";
-import { LanguageClient, LanguageClientOptions, StreamInfo} from "vscode-languageclient";
+import { LanguageClient, LanguageClientOptions, StreamInfo, ConfigurationRequest, ConfigurationParams} from "vscode-languageclient";
 import { ConfigurationWorkspaceMiddleware } from "vscode-languageclient/lib/configuration";
 import { LANGUAGE_ID } from "../constants";
 import { JavaCheck } from "./JavaCheck";
@@ -47,8 +47,14 @@ export class LanguageClientService {
     }
 
     private createClientOptions(): LanguageClientOptions {
+        const signatureFunc: ConfigurationRequest.MiddlewareSignature = async (
+            params: ConfigurationParams,
+            token: vscode.CancellationToken,
+            next: ConfigurationRequest.HandlerSignature) => {
+                return await this.middleware.handleConfigurationRequest(params, token, next);
+        };
         const configurationMiddleware: ConfigurationWorkspaceMiddleware = {
-            configuration: this.middleware.handleConfigurationRequest,
+            configuration: signatureFunc,
         };
 
         return {
