@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 import { editDatasetPaths } from "./commands/EditDatasetPaths";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
-import {DEPENDENCIES_FOLDER, PATHS_LOCAL_KEY, PATHS_ZOWE, REASON_MSG} from "./constants";
+import {REASON_MSG} from "./constants";
 import { LANGUAGE_ID, SETTINGS_SECTION} from "./constants";
 import { CopybookFix } from "./services/CopybookFix";
 import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
