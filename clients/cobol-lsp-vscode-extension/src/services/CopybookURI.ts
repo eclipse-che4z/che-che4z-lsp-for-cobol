@@ -64,7 +64,6 @@ export class CopybookURI {
             //COPYBOOK NOT PRESENT LOCALLY..
             this.copybooksDownloader.downloadDependency(cobolProgramName, copybookName);
         }
-        vscode.window.showInformationMessage(result);
         return result || "";
     }
 
