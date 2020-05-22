@@ -70,9 +70,9 @@ export class CopybookResolveURI {
     }
 
     private getLocalDownloadedCopybooks(profile: string): string[] {
-        const datasets: string[] = vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);
+        const result: string[] =  Object.assign([], vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE));
         //the URI should be formatted as "file://[WORKSPACE_FOLDER]/.copybooks/PROFILE/DATASET_
-        datasets.forEach((value, index) => datasets[index] =  ".copybooks/" + profile + "/" + value);
-        return datasets;
+        result.forEach((value, index) => result[index] =  ".copybooks/" + profile + "/" + value);
+        return result;
     }
 }
