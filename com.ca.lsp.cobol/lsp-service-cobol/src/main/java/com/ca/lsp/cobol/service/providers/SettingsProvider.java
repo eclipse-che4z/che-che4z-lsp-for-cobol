@@ -28,7 +28,7 @@ import static com.ca.lsp.cobol.service.utils.FileSystemUtils.interpretPaths;
 import javax.annotation.Nullable;
 
 /**
- * This class is resposible to keep the settings configuration provided by the user in the setting
+ * This class is responsible to keep the settings configuration provided by the user in the setting
  * storage system and that will be consumed by the {@link
  * com.ca.lsp.cobol.service.CopybookServiceImpl}
  */
