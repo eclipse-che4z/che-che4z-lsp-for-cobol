@@ -16,21 +16,25 @@ import * as path from "path";
 import {URL} from "url";
 import * as vscode from "vscode";
 import {PATHS_LOCAL_KEY, PATHS_ZOWE, SETTINGS_SECTION} from "../constants";
+import {CopybooksDownloader} from "./CopybooksDownloader";
 import {ProfileService} from "./ProfileService";
 import {CopybookResolver} from "./settings/CopybookResolver";
 import {LocalCopybookResolver} from "./settings/LocalCopybookResolver";
-import {CopybooksDownloader} from "./CopybooksDownloader";
 
-function localSettingsAreFound(): boolean {
-    const localPaths: string[] = vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY);
-    return localPaths !== undefined && localPaths.length > 0;
-}
-
+/**
+ * This class is responsible to identify from which source resolve copybooks required by the server.
+ */
 export class CopybookResolveURI {
-
+    /**
+     * This method scan the list of folders as given input and find the required copybook name within the folder.
+     * If found returns its URI representation
+     * @param copybookName name of the copybook asked by the server
+     * @param targetFolders list of folders from where to search the copybook
+     */
     public static searchCopybookLocally(copybookName: string, targetFolders: string[]): string {
         const copybookResolver: CopybookResolver = new LocalCopybookResolver();
         const localFolderList: string[] =  copybookResolver.resolve(targetFolders);
+
         for (const folder of localFolderList) {
             const uri: URL = new URL(path.join(folder, copybookName));
             if (fs.existsSync(uri)) {
@@ -38,41 +42,37 @@ export class CopybookResolveURI {
             }
         }
     }
+
     constructor(private profileService: ProfileService, private copybooksDownloader: CopybooksDownloader) {
     }
-    public  async resolveCopybooksInDepFile(copybookName: string, cobolProgramName: string): Promise<string> {
+
+    //TODO: Find a better name..
+    /**
+     * This function will try to resolve a given copybook name followind diff
+     * @param copybookName Name of the required copybook
+     * @param cobolProgramName name of the cobol file opened in the IDE
+     */
+    public async resolveCopybooksInDepFile(copybookName: string, cobolProgramName: string): Promise<string> {
+        // check on local paths provided by the user
         let result: string;
-        if (localSettingsAreFound()) {
-            result = CopybookResolveURI.searchCopybookLocally(copybookName, vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
+        result = CopybookResolveURI.searchCopybookLocally(copybookName, vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
+
+        if (!result) {
+            result = CopybookResolveURI.searchCopybookLocally(copybookName + ".cpy", this.getLocalDownloadedCopybooks(await this.profileService.getProfile(cobolProgramName)));
         }
 
         if (!result) {
-            const profile = await this.profileService.getProfile(cobolProgramName);
-
-            const dsnList: string[] = vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);
-
-            outer: for (const dsnPath of dsnList ) {
-                for (const wsFolder of vscode.workspace.workspaceFolders) {
-                    const uri: URL = new URL(path.join(wsFolder.uri.scheme + "://" + wsFolder.uri.path, ".copybooks", profile, dsnPath, copybookName + ".cpy"));
-                    if (fs.existsSync(uri)) {
-                       result = uri.toString();
-                       break outer;
-                   }
-
-                }
-
-            }
-
-
-            // get profile --> profileServ.get
-            // concatenate copub + profi. +
-        }
-        if (!result) {
+            //COPYBOOK NOT PRESENT LOCALLY..
             this.copybooksDownloader.downloadDependency(cobolProgramName, copybookName);
-
         }
-
-        // TODO: handle situation when copybookName is found on .copybook folder..
+        vscode.window.showInformationMessage(result);
         return result || "";
+    }
+
+    private getLocalDownloadedCopybooks(profile: string): string[] {
+        const datasets: string[] = vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);
+        //the URI should be formatted as "file://[WORKSPACE_FOLDER]/.copybooks/PROFILE/DATASET_
+        datasets.forEach((value, index) => datasets[index] =  ".copybooks/" + profile + "/" + value);
+        return datasets;
     }
 }
