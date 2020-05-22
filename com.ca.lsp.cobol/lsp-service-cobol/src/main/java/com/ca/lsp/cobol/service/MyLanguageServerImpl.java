@@ -14,6 +14,9 @@
 package com.ca.lsp.cobol.service;
 
 import com.ca.lsp.core.cobol.model.ErrorCode;
+import com.google.common.collect.Streams;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +27,7 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
@@ -109,7 +113,17 @@ public class MyLanguageServerImpl implements LanguageServer {
   }
 
   private void addLocalFilesWatcher() {
-    clientService.callClient(LOCAL_PATHS.label).thenAccept(it -> watchingService.addWatchers(it));
+    clientService
+        .callClient(LOCAL_PATHS.label)
+        .thenAccept(it -> watchingService.addWatchers(toStrings(it)));
+  }
+
+  private List<String> toStrings(List<Object> it) {
+    return it.stream()
+        .map(obj -> (JsonArray) obj)
+        .flatMap(Streams::stream)
+        .map(JsonElement::getAsString)
+        .collect(toList());
   }
 
   @Override
