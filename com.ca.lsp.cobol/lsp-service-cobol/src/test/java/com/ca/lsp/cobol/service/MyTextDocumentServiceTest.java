@@ -178,7 +178,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
         new AnalysisResult(diagnosticsWithErrors, null, null, null, null, null, null);
 
     /*
-     * Defined dynamic response based on the possible combinations available when the document is analyzed:
+     * Defined dynamic response based on the possible combinations available when the document analyzed:
      *  - text document sync state: [DID_OPEN|DID_CHANGE]
      *  - document URI [correct|incorrect]
      */
@@ -206,15 +206,15 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
         INCORRECT_TEXT_EXAMPLE,
         DOCUMENT_WITH_ERRORS_URI);
 
-    // after the simulation for triggering the observer callback verify that the analyze method
+    // after the simulation for triggering the observer callback verify that the analysis method
     // (more in general the document analysis stage) is triggered
     service.observerCallback(new RunAnalysisEvent());
 
-    /* After sent a message on the databus we'll verify that the document is analyzed by the preprocessor.
-       More in detail we'll check that:
-       - analysis is invoked two times (because two are the document used to make this test
-       - the publish diagnostic after the syntax/semantic analysis is invoked exactly 2 times.
-    */
+    /* After sending a message on the data bus we'll verify that the document analyzed by the preprocessor.
+    More in detail we'll check:
+            - analysis invoked two times (because two documents opened previously)
+            - the diagnostic published exactly 2 times after the syntax/semantic analysis invoked.
+            */
     verifyCallback(communications, engine, diagnosticsNoErrors, TEXT_EXAMPLE, DOCUMENT_URI);
     verifyCallback(
         communications,
@@ -289,8 +289,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       String text,
       String uri) {
 
-    verify(engine, timeout(10000).times(1)).analyze(uri, text, DID_CHANGE);
-    verify(engine, timeout(10000).times(1)).analyze(uri, text, DID_OPEN);
+    verify(engine, timeout(10000).times(2)).analyze(uri, text, DID_OPEN);
     verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
   }
 
