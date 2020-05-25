@@ -54,7 +54,7 @@ public class FileSystemUtils {
    * @param pathFile NIO path of the file to check
    * @return true if the path represent a valid file, false otherwise
    */
-  public static boolean isFileExists(Path pathFile) {
+  public static boolean fileExists(Path pathFile) {
     return pathFile != null && pathFile.toFile().exists();
   }
 
