@@ -19,20 +19,19 @@ import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import com.ca.lsp.cobol.service.utils.FileSystemUtils;
+import com.google.gson.JsonPrimitive;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 
-import static com.ca.lsp.cobol.service.utils.FileSystemUtils.getNameFromURI;
-import static java.lang.Thread.currentThread;
+import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
+import static java.util.Optional.ofNullable;
 
 @Singleton
 @Slf4j
@@ -57,8 +56,8 @@ public class CopybookServiceImpl implements CopybookService {
 
     if (copybookPath.containsKey(requiredCopybookName)) {
       Path file = copybookPath.get(requiredCopybookName);
-      if (FileSystemUtils.isFileExists(file)) {
-        publishOnDatabus(requiredCopybookName, FileSystemUtils.getContentByPath(file), file);
+      if (fileExists(file)) {
+        publishOnDatabus(requiredCopybookName, getContentByPath(file), file);
         return;
       } else {
         copybookPath.remove(requiredCopybookName);
@@ -66,34 +65,40 @@ public class CopybookServiceImpl implements CopybookService {
     }
 
     String cobolFileName = getNameFromURI(event.getDocumentUri());
-    try {
-      String uri = clientService.callClientSync("copybook", cobolFileName, requiredCopybookName);
+    clientService
+        .callClient("copybook", cobolFileName, requiredCopybookName)
+        .thenAccept(
+            result -> dataBus.postData(fetchCopybook(requiredCopybookName, retrieveURI(result))));
+  }
 
-      System.out.println("Get uri from middleware" + uri);
-      if (!uri.isEmpty()) {
-        Path file = FileSystemUtils.getPathFromURI(uri);
-        copybookPath.put(requiredCopybookName, file);
-        publishOnDatabus(requiredCopybookName, FileSystemUtils.getContentByPath(file), file);
-      } else {
-        publishOnDatabus(requiredCopybookName);
-      }
-    } catch (InterruptedException | ExecutionException e) {
-      log.error("Error resolving copybook", e);
-      publishOnDatabus(requiredCopybookName);
-      currentThread().interrupt();
+  private FetchedCopybookEvent fetchCopybook(String requiredCopybookName, String uri) {
+    if (uri.isEmpty()) {
+      return FetchedCopybookEvent.builder().name(requiredCopybookName).build();
     }
+    Path file = getPathFromURI(uri);
+    copybookPath.put(requiredCopybookName, file);
+
+    return FetchedCopybookEvent.builder()
+        .name(requiredCopybookName)
+        .uri(toURI(file))
+        .content(getContentByPath(file))
+        .build();
   }
 
   private void publishOnDatabus(String requiredCopybookName, String content, Path path) {
     dataBus.postData(
         FetchedCopybookEvent.builder()
             .name(requiredCopybookName)
-            .uri(Optional.ofNullable(path).map(Path::toUri).map(URI::toString).orElse(null))
+            .uri(toURI(path))
             .content(content)
             .build());
   }
 
-  private void publishOnDatabus(String requiredCopybookName) {
-    dataBus.postData(FetchedCopybookEvent.builder().name(requiredCopybookName).build());
+  private String toURI(Path file) {
+    return ofNullable(file).map(Path::toUri).map(URI::toString).orElse(null);
+  }
+
+  private String retrieveURI(List<Object> result) {
+    return result.isEmpty() ? "" : ((JsonPrimitive) result.get(0)).getAsString();
   }
 }

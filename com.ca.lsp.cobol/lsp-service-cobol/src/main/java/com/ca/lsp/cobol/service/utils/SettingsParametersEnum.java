@@ -20,7 +20,9 @@ package com.ca.lsp.cobol.service.utils;
  */
 public enum SettingsParametersEnum {
   CPY_MANAGER("cpy-manager"),
-  LSP_PREFIX("broadcom-cobol-lsp");
+  LSP_PREFIX("broadcom-cobol-lsp"),
+  LOCAL_PATHS("cpy-manager.paths.local"),
+  DATASETS("cpy-manager.paths.dsn");
 
   public final String label;
 
