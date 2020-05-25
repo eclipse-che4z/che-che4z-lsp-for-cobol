@@ -193,6 +193,21 @@ public class FileSystemUtils {
   }
 
   /**
+   * Creates a directory by creating all nonexistent parent directories first.
+   *
+   * @param path
+   * @return
+   */
+  public Path createFolders(Path path) {
+    try {
+      return Files.createDirectories(path);
+    } catch (IOException e) {
+      log.error(e.getMessage());
+      return null;
+    }
+  }
+
+  /**
    * This method create a folder from a given path
    *
    * @param path in input that will be used to create the folder

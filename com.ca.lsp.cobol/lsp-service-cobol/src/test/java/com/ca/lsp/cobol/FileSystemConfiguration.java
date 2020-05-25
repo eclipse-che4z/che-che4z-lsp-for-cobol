@@ -15,6 +15,7 @@ package com.ca.lsp.cobol;
 
 import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
 import com.ca.lsp.cobol.service.providers.SettingsProvider;
+import com.ca.lsp.cobol.service.utils.FileSystemUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.junit.After;
@@ -159,7 +160,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
 
   private void createFoldersFromDatasetSettings() {
     List<Path> datasetPathList = getPathListFromSettings();
-    datasetPathList.forEach(this::createFolders);
+    datasetPathList.forEach(FileSystemUtils::createFolders);
   }
 
   protected void createDependencyFolder() {
@@ -188,15 +189,6 @@ public class FileSystemConfiguration extends ConfigurableTest {
     return targetDatasets.stream()
         .map(it -> Paths.get(copybooksFolderPath + it))
         .collect(Collectors.toList());
-  }
-
-  private Path createFolders(Path copybooksPath) {
-    try {
-      return Files.createDirectories(copybooksPath);
-    } catch (IOException e) {
-      log.error(e.getMessage());
-      return null;
-    }
   }
 
   protected Path getWorkspaceFolderPath() {

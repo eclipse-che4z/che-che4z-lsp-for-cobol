@@ -48,7 +48,7 @@ export function createFileWithGivenPath(folderPath: string, fileName: string, pa
         if (fs.existsSync(filePath)) {
             const notFound = fs.readFileSync(filePath).toString().split("\n")
                 .filter(e => e.trim().length > 0)
-                .map(e => e.trim()).every(v => !v.startsWith(pattern));
+                .map(e => e.trim()).every(v => v !== pattern);
             if (notFound) {
                 fs.appendFileSync(filePath, "\n" + pattern);
             }

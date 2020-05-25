@@ -88,10 +88,6 @@ public class CopybookDependencyServiceImpl
             .equals(TextDocumentSyncType.DID_OPEN);
   }
 
-  private void createDependencyFileFolder() {
-    createFolder(getDependencyFolderPath());
-  }
-
   public void writeCopybookInDepFile(String requiredCopybookName, String documentUri) {
     String cobolFileName = getNameFromURI(documentUri);
 
@@ -147,7 +143,7 @@ public class CopybookDependencyServiceImpl
    */
   @Override
   public void generateDependencyFile(String cobolFileName) {
-    createDependencyFileFolder(); //?
+    createFolders(getDependencyFolderPath());
     createFile(getPath(getDependencyFolderPath().toString(), cobolFileName + DEP_EXTENSION));
   }
 
@@ -187,6 +183,8 @@ public class CopybookDependencyServiceImpl
   }
 
   private List<Path> getTargetFolders() {
-    return getPathList(getCopybookFolderPath(workspaceFolderPaths.get(0).toString()).toString(), configurationSettingsStorableProvider.get().getPaths());
+    Path copybookFolderPath = getCopybookFolderPath(workspaceFolderPaths.get(0).toString());
+    createFolders(copybookFolderPath);
+    return getPathList(copybookFolderPath.toString(), configurationSettingsStorableProvider.get().getPaths());
   }
 }

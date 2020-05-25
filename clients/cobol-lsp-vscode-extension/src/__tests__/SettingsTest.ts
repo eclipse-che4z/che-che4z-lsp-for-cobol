@@ -89,7 +89,7 @@ describe(".gitignore file in .c4z folder tests", () => {
     });
 
     it("Modify .gitignore file if exists", () => {        
-        const pattern = "srs/*/n.sds";
+        const pattern = "srs/*\n.sds/*";
         createFileWithGivenPath(c4zFolder, fileName, pattern);
         const found = fs.readFileSync(filePath).toString().split("\n")
             .filter(e => e.trim().length > 0)
