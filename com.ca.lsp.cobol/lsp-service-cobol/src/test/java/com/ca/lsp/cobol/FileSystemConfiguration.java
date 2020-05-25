@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.cobol;
 
+import com.ca.lsp.cobol.service.utils.FileSystemUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.junit.After;
@@ -182,15 +183,6 @@ public class FileSystemConfiguration extends ConfigurableTest {
 //        .map(it -> Paths.get(copybooksFolderPath + it))
 //        .collect(Collectors.toList());
 //  }
-
-  private Path createFolders(Path copybooksPath) {
-    try {
-      return Files.createDirectories(copybooksPath);
-    } catch (IOException e) {
-      log.error(e.getMessage());
-      return null;
-    }
-  }
 
   protected Path getWorkspaceFolderPath() {
     return workspaceFolder;
