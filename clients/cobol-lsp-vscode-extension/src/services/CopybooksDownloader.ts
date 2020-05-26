@@ -16,7 +16,6 @@ import * as fs from "fs";
 import * as vscode from "vscode";
 import {
     CONN_REFUSED_ERROR_MSG,
-    DEPENDENCIES_FOLDER,
     DSN_NOT_FOUND_ERROR_MSG,
     DSN_PLACEHOLDER,
     INVALID_CREDENTIALS_ERROR_MSG,
@@ -26,7 +25,6 @@ import {
 } from "../constants";
 import {CopybookFix} from "./CopybookFix";
 import {checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath} from "./CopybooksPathGenerator";
-import {DependenciesDesc, loadDepFile} from "./DependencyService";
 import {CopybookProfile, DownloadQueue} from "./DownloadQueue";
 import {ProfileService} from "./ProfileService";
 import {ZoweApi} from "./ZoweApi";
@@ -40,13 +38,6 @@ export class CopybooksDownloader implements vscode.Disposable {
         private zoweApi: ZoweApi,
         private profileService: ProfileService,
         private pathGenerator: CopybooksPathGenerator) {
-    }
-
-    public async redownloadDependencies(message: string = "Redownload dependencies requested.") {
-        //TODO: related to zowe refactor - Should comunicate the server to recalculate the copybooks?
-        (await vscode.workspace.findFiles(DEPENDENCIES_FOLDER + "/**/*.dep")).forEach(dep => {
-            this.downloadDependencies(dep, message);
-        });
     }
 
     /**
@@ -72,30 +63,6 @@ export class CopybooksDownloader implements vscode.Disposable {
         //async needed?
         this.resolver.downloadMissingCopybooks([copybookName], profile);
 
-    }
-
-    public async downloadDependencies(depFileUri: vscode.Uri, message: string = ""): Promise<void> {
-        if (!checkWorkspace()) {
-            return;
-        }
-        const depDesc: DependenciesDesc = loadDepFile(depFileUri);
-
-        // TODO: REMOVE PROFILE OR ADD IT AFTER LOCAL CHECK
-        const profile: string = await this.profileService.getProfile(depDesc.programName);
-        if (!profile) {
-            return;
-        }
-
-        const missingCopybooks: string[] = await this.listMissingCopybooks(depDesc.copybooks, profile);
-
-        if (!message.length) {
-            missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
-        } else if (missingCopybooks.length > 0) {
-            this.resolver.fixMissingDownloads(missingCopybooks, profile, {
-                hasPaths: (await this.pathGenerator.listDatasets()).length > 0,
-                hasProfiles: Object.keys(await this.profileService.listProfiles()).length > 1,
-            }, message);
-        }
     }
 
     public async start() {

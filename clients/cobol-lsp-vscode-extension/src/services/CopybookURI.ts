@@ -67,7 +67,8 @@ export class CopybookURI {
     }
 
     /**
-     * This method produce an array with element that following the schema "file://[WORKSPACE_FOLDER]/.copybooks/PROFILE/DATASET
+     * This method produce an array with element that following the schema
+     * "file://[WORKSPACE_FOLDER]/.copybooks/PROFILE/DATASET
      * @param profile
      */
     private getLocalDownloadedCopybooks(profile: string): string[] {
