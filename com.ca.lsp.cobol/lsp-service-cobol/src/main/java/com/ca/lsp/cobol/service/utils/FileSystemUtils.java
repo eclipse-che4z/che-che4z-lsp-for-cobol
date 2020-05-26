@@ -202,7 +202,7 @@ public class FileSystemUtils {
     try {
       return Files.createDirectories(path);
     } catch (IOException e) {
-      log.error("Error creating folders for "+ path + ": " + e);
+      log.error("Error creating folders for "+ path,  e);
       return null;
     }
   }
