@@ -42,21 +42,24 @@ function isUndefinedInWorkspace(property: string, index: number, array: string[]
  */
 export function createFileWithGivenPath(folderPath: string, fileName: string, pattern: string): void {
 
-    const ch4zPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, folderPath);
-    const filePath = path.join(ch4zPath, fileName);
-    try {
-        if (fs.existsSync(filePath)) {
-            const notFound = fs.readFileSync(filePath).toString().split("\n")
-                .filter(e => e.trim().length > 0)
-                .map(e => e.trim()).every(v => v !== pattern);
-            if (notFound) {
-                fs.appendFileSync(filePath, "\n" + pattern);
+    const ws = vscode.workspace.workspaceFolders[0];
+    if (ws !== undefined) {
+        const ch4zPath = path.join(ws.uri.fsPath, folderPath);    
+        const filePath = path.join(ch4zPath, fileName);
+        try {
+            if (fs.existsSync(filePath)) {
+                const notFound = fs.readFileSync(filePath).toString().split("\n")
+                    .filter(e => e.trim().length > 0)
+                    .map(e => e.trim()).every(v => v !== pattern);
+                if (notFound) {
+                    fs.appendFileSync(filePath, "\n" + pattern);
+                }
+            } else {
+                fs.mkdirSync(ch4zPath, { recursive: true });
+                fs.writeFileSync(filePath, pattern);
             }
-        } else {
-            fs.mkdirSync(ch4zPath, { recursive: true });
-            fs.writeFileSync(filePath, pattern);
+        } catch (e) {
+            vscode.window.showErrorMessage("File error: " + e.toString());
         }
-    } catch (e) {
-        vscode.window.showErrorMessage("File error: " + e.toString());
     }
 }

@@ -34,7 +34,7 @@ export class CopybooksDownloader implements vscode.Disposable {
         private pathGenerator: CopybooksPathGenerator) { }
 
     public async redownloadDependencies(message: string = "Redownload dependencies requested.") {
-        (await vscode.workspace.findFiles(path.join(C4Z_FOLDER, DEPENDENCIES_FOLDER) + "/**/*.dep")).forEach(dep => {
+        (await vscode.workspace.findFiles(C4Z_FOLDER+ "/" + DEPENDENCIES_FOLDER + "/**/*.dep")).forEach(dep => {
             this.downloadDependencies(dep, message);
         });
     }
