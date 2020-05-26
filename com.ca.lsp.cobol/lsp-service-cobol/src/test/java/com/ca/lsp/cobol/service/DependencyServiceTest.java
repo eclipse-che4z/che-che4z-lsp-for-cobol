@@ -43,6 +43,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
 
 /** This class represent all the unit test for the copybook dependency management service */
 @Slf4j
@@ -102,7 +103,7 @@ public class DependencyServiceTest extends FileSystemConfiguration {
 
   private Path createDependencyFileForCobolFile(String depFileName) {
     dependencyService.generateDependencyFile(depFileName);
-    return Paths.get(depenencyFileFolderPath + filesystemSeparator() + depFileName + DEP_EXTENSION);
+    return Paths.get(dependencyFileFolderPath + filesystemSeparator() + depFileName + DEP_EXTENSION);
   }
 
   public RequiredCopybookEvent createRequiredEvent(
@@ -200,6 +201,6 @@ public class DependencyServiceTest extends FileSystemConfiguration {
     assertTrue(
         Files.exists(
             Paths.get(
-                depenencyFileFolderPath + filesystemSeparator() + "CPYNEST" + DEP_EXTENSION)));
+                dependencyFileFolderPath + filesystemSeparator() + "CPYNEST" + DEP_EXTENSION)));
   }
 }

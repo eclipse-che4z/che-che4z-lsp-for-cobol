@@ -13,16 +13,17 @@
  */
 
 import * as vscode from "vscode";
+import * as path from "path";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 import { editDatasetPaths } from "./commands/EditDatasetPaths";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
-import { DEPENDENCIES_FOLDER, REASON_MSG } from "./constants";
+import { C4Z_FOLDER, DEPENDENCIES_FOLDER, GITIGNORE_FILE, REASON_MSG } from "./constants";
 import { LANGUAGE_ID, SETTINGS_SECTION } from "./constants";
 import { CopybookFix } from "./services/CopybookFix";
 import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
 import { CopybooksDownloader } from "./services/CopybooksDownloader";
 import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
-import { initializeSettings } from "./services/Settings";
+import { initializeSettings, createFileWithGivenPath } from "./services/Settings";
 
 import {resolveLocalCopybooksCommand} from "./commands/ResolveLocalCopybooksCommand";
 import { LanguageClientService } from "./services/LanguageClientService";
@@ -83,7 +84,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 
     context.subscriptions.push(languageClientService.start());
-    context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
+    context.subscriptions.push(initWorkspaceWatcher(copyBooksDownloader));
     context.subscriptions.push(copyBooksDownloader);
 
     context.subscriptions.push(
@@ -92,11 +93,14 @@ export async function activate(context: vscode.ExtensionContext) {
             new CopybooksCodeActionProvider(profileService)));
 }
 
-function initWorkspaceTracker(downloader: CopybooksDownloader): vscode.Disposable {
+function initWorkspaceWatcher(downloader: CopybooksDownloader): vscode.Disposable {
     const watcher = vscode.workspace.createFileSystemWatcher("**/"
-        + DEPENDENCIES_FOLDER + "/**/**.dep", false, false, true);
+        + path.join(C4Z_FOLDER, DEPENDENCIES_FOLDER) + "/**/**.dep", false, false, true);
     watcher.onDidCreate(uri => downloader.downloadDependencies(uri,
         "Program contains dependencies to missing copybooks."));
     watcher.onDidChange(uri => downloader.downloadDependencies(uri));
+
+    //create .gitignore file within .c4z folder
+    createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
     return watcher;
 }

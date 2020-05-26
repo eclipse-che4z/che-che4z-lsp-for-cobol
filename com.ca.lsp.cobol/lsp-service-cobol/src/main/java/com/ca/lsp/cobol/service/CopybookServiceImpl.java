@@ -41,7 +41,6 @@ import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
 @Singleton
 @Slf4j
 public class CopybookServiceImpl implements CopybookService {
-  private static final String COPYBOOK_FOLDER_NAME = ".copybooks";
   private final DataBusBroker dataBus;
   private List<Path> workspaceFolderPaths;
 
@@ -130,7 +129,7 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private Path getCopybookBaseFolder(Path workspaceFolderPath) {
-    return getPath(workspaceFolderPath.toString(), COPYBOOK_FOLDER_NAME);
+    return getCopybookFolderPath(workspaceFolderPath.toString());
   }
 
   /** create the task and pass it to the executor service */
