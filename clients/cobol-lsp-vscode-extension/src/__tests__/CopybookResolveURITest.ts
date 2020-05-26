@@ -18,6 +18,7 @@ import {CopybookURI} from "../services/CopybookURI";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
 
 const copybookName: string = "NSTCOPY1";
+const copybookNameWithExtension: string = "NSTCOPY2.cpy";
 const CPY_FOLDER_NAME = ".cobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
 
@@ -44,6 +45,7 @@ function removeFolder(pathFile: string) {
 beforeAll(() => {
     createDirectory(folderPath);
     createFile(copybookName);
+    createFile(copybookNameWithExtension);
 });
 
 afterAll(() => {
@@ -76,4 +78,9 @@ describe("Resolve local copybook present in one or more folders specified by the
     test("given two times the same folder that contains the target copybook, one uri is still returned", () => {
         expect(CopybookURI.searchInWorkspace(copybookName, [CPY_FOLDER_NAME])).toBeDefined();
     });
+
+    test("Given a copybook with extension on filesystem, the uri is correctly returned", () => {
+        expect(CopybookURI.searchInWorkspace("NSTCOPY2", [CPY_FOLDER_NAME])).toBeDefined();
+    });
+
 });
