@@ -20,6 +20,20 @@ import {CopybooksDownloader} from "./CopybooksDownloader";
 import {ProfileService} from "./ProfileService";
 import {CopybookResolver} from "./settings/CopybookResolver";
 import {LocalCopybookResolver} from "./settings/LocalCopybookResolver";
+import {CopybookUtil} from "./settings/util/CopybookUtil";
+
+function getURIFrom(folder: string, copybookName: string, extensions?: string[]): URL {
+    if (!extensions) {
+        return new URL(path.join(folder, copybookName));
+    } else {
+        for (const extension of extensions) {
+            const uri = new URL(path.join(folder, copybookName + "." + extension));
+            if (fs.existsSync(uri)) {
+                return uri;
+            }
+        }
+    }
+}
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
@@ -36,9 +50,15 @@ export class CopybookURI {
         const localFolderList: string[] = copybookResolver.resolve(targetFolders);
 
         for (const folder of localFolderList) {
-            const uri: URL = new URL(path.join(folder, copybookName));
+            let uri: URL = getURIFrom(folder, copybookName);
+
             if (fs.existsSync(uri)) {
                 return uri.href;
+            } else {
+                uri = getURIFrom(folder, copybookName, CopybookUtil.getValidCopybookExtensionList());
+                if (fs.existsSync(uri)) {
+                    return uri.href;
+                }
             }
         }
     }
@@ -57,7 +77,7 @@ export class CopybookURI {
         result = CopybookURI.searchInWorkspace(copybookName, vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
 
         if (!result) {
-            result = CopybookURI.searchInWorkspace(copybookName + ".cpy", this.getLocalDownloadedCopybooks(await this.profileService.getProfile(cobolProgramName)));
+            result = CopybookURI.searchInWorkspace(copybookName, this.getLocalDownloadedCopybooks(await this.profileService.getProfile(cobolProgramName)));
         }
         //COPYBOOK NOT PRESENT LOCALLY..
         if (!result) {
@@ -77,4 +97,5 @@ export class CopybookURI {
         result.forEach((value, index) => result[index] = ".copybooks/" + profile + "/" + value);
         return result;
     }
+
 }
