@@ -63,12 +63,15 @@ public class CopybookServiceImpl implements CopybookService {
         copybookPath.remove(requiredCopybookName);
       }
     }
-
-    String cobolFileName = getNameFromURI(event.getDocumentUri());
-    clientService
-        .callClient("copybook", cobolFileName, requiredCopybookName)
-        .thenAccept(
-            result -> dataBus.postData(fetchCopybook(requiredCopybookName, retrieveURI(result))));
+    if (TextDocumentSyncType.DID_OPEN.toString().equals(event.getTextDocumentSyncType())) {
+      String cobolFileName = getNameFromURI(event.getDocumentUri());
+      clientService
+              .callClient("copybook", cobolFileName, requiredCopybookName)
+              .thenAccept(
+                      result -> dataBus.postData(fetchCopybook(requiredCopybookName, retrieveURI(result))));
+    } else {
+      publishOnDatabus(requiredCopybookName, null, null);
+    }
   }
 
   private FetchedCopybookEvent fetchCopybook(String requiredCopybookName, String uri) {
