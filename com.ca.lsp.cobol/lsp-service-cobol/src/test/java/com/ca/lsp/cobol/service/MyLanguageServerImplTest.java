@@ -15,24 +15,23 @@
 
 package com.ca.lsp.cobol.service;
 
-import com.ca.lsp.cobol.service.providers.ClientProvider;
 import com.ca.lsp.core.cobol.model.ErrorCode;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
 import static com.ca.lsp.core.cobol.model.ErrorCode.values;
 import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /** This test asserts functions of the {@link MyLanguageServerImpl}, such as initialization. */
 public class MyLanguageServerImplTest {
@@ -43,17 +42,25 @@ public class MyLanguageServerImplTest {
    */
   @Test
   public void initialized() {
-    LanguageClient client = mock(LanguageClient.class);
-    ClientProvider provider = new ClientProvider();
-    provider.set(client);
+    ClientService clientService = mock(ClientService.class);
+    WatchingService watchingService = mock(WatchingService.class);
 
-    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, null, null);
-    ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
+    JsonArray arr = new JsonArray();
+    String path = "foo/bar";
+    arr.add(new JsonPrimitive(path));
+
+    when(clientService.callClient(LOCAL_PATHS.label))
+        .thenReturn(completedFuture(singletonList(arr)));
+
+    MyLanguageServerImpl server =
+        new MyLanguageServerImpl(null, null, null, watchingService, clientService);
+
     server.initialized(new InitializedParams());
 
-    verify(client).registerCapability(captor.capture());
-    RegistrationParams params = captor.getValue();
-    assertRegistrationParams(params);
+    verify(watchingService).watchConfigurationChange();
+    verify(watchingService).watchPredefinedFolder();
+    verify(clientService).callClient(LOCAL_PATHS.label);
+    verify(watchingService).addWatchers(singletonList(path));
   }
 
   /**
@@ -75,8 +82,6 @@ public class MyLanguageServerImplTest {
     } catch (InterruptedException | ExecutionException e) {
       fail(e.getMessage());
     }
-
-    //    verify(fileSystemService).setWorkspaceFolders(workspaceFolders);
   }
 
   private void assertRegistrationParams(RegistrationParams params) {
