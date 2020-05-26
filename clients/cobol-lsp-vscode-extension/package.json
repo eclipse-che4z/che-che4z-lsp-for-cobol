@@ -30,7 +30,8 @@
         "Programming Languages"
     ],
     "activationEvents": [
-        "onLanguage:COBOL"
+        "onLanguage:COBOL",
+        "workspaceContains:/.c4z"
     ],
     "icon": "resources/logo.png",
     "main": "./out/extension.js",
