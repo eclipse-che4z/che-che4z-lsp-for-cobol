@@ -92,18 +92,24 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
-    clientService.callClient(LOCAL_PATHS.label).thenAccept(it -> updateWatchers(toStrings(it)));
+    clientService
+        .callClient(LOCAL_PATHS.label)
+        .thenAccept(it -> acceptSettingsChange(toStrings(it)));
   }
 
-  private void updateWatchers(List<String> localFolders) {
+  private void acceptSettingsChange(List<String> localFolders) {
     List<String> watchingFolders = watchingService.getWatchingFolders();
 
+    updateWatchers(localFolders, watchingFolders);
+    rerunAnalysis();
+  }
+
+  private void updateWatchers(List<String> newPaths, List<String> existingPaths) {
     watchingService.addWatchers(
-        localFolders.stream().filter(it -> !watchingFolders.contains(it)).collect(toList()));
+        newPaths.stream().filter(it -> !existingPaths.contains(it)).collect(toList()));
 
     watchingService.removeWatchers(
-        watchingFolders.stream().filter(it -> !localFolders.contains(it)).collect(toList()));
-    rerunAnalysis();
+        existingPaths.stream().filter(it -> !newPaths.contains(it)).collect(toList()));
   }
 
   private List<String> toStrings(List<Object> it) {
