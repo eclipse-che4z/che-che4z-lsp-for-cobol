@@ -59,17 +59,20 @@ export class CopybookURI {
         if (!result) {
             result = CopybookURI.searchInWorkspace(copybookName + ".cpy", this.getLocalDownloadedCopybooks(await this.profileService.getProfile(cobolProgramName)));
         }
-
+        //COPYBOOK NOT PRESENT LOCALLY..
         if (!result) {
-            //COPYBOOK NOT PRESENT LOCALLY..
             this.copybooksDownloader.downloadDependency(cobolProgramName, copybookName);
         }
         return result || "";
     }
 
+    /**
+     * This method produce an array with element that following the schema "file://[WORKSPACE_FOLDER]/.copybooks/PROFILE/DATASET
+     * @param profile
+     */
     private getLocalDownloadedCopybooks(profile: string): string[] {
         const result: string[] = Object.assign([], vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE));
-        //the URI should be formatted as "file://[WORKSPACE_FOLDER]/.copybooks/PROFILE/DATASET_
+
         result.forEach((value, index) => result[index] = ".copybooks/" + profile + "/" + value);
         return result;
     }
