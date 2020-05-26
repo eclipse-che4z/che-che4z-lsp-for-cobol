@@ -13,26 +13,39 @@
  */
 
 import * as vscode from "vscode";
-import { REASON_MSG} from "../constants";
-import { DownloadQueue } from "./DownloadQueue";
+import {REASON_MSG} from "../constants";
+import {DownloadQueue} from "./DownloadQueue";
 
 export class CopybookFix {
     private queue: DownloadQueue;
 
-    //TODO: adjust the logic of this component.. could be called without a message...
-    async fixMissingDownloads(reasonMsg: string, missingCopybooks: string[], profile: string, options: { hasPaths: boolean, hasProfiles: boolean }) {
+    /**
+     * This method add in the download queue the copybooks that weren't found locally.
+     * @param missingCopybooks
+     * @param profile
+     */
+    public async downloadMissingCopybooks(missingCopybooks: string[], profile: string) {
+        missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
+    }
+
+    /**
+     * This method is engaged when for some reasons is not possible download a copybook using zowe.
+     * Based on the specific scenario provides some action buttons to help user to take the appropriate
+     * activity to resolve the copybook
+     * @param missingCopybooks
+     * @param profile
+     * @param options
+     * @param reasonMsg
+     */
+    public async fixMissingDownloads(missingCopybooks: string[], profile: string, options: { hasPaths: boolean, hasProfiles: boolean }, reasonMsg?: string) {
         const downloadCopybookAction = "Download Copybooks";
         const actionDatasets = "Edit Datasets";
         const actionProfile = "Change zowe profile";
         const actions = [];
-        //temporary
-        if (options.hasPaths && reasonMsg === "") {
+
+        if (options.hasPaths) {
             actions.push(downloadCopybookAction);
         }
-
-        //temporary
-        reasonMsg = REASON_MSG;
-
         if (reasonMsg !== REASON_MSG) {
             actions.push(actionDatasets);
             if (options.hasProfiles) {

@@ -28,8 +28,6 @@ import {Middleware} from "./services/Middleware";
 import {PathsService} from "./services/PathsService";
 import {ProfileService} from "./services/ProfileService";
 import {initializeSettings} from "./services/Settings";
-import {CopybookResolver} from "./services/settings/CopybookResolver";
-import {LocalCopybookResolver} from "./services/settings/LocalCopybookResolver";
 import {ZoweApi} from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -41,7 +39,6 @@ export async function activate(context: vscode.ExtensionContext) {
     const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
     const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator);
     const pathsService: PathsService = new PathsService();
-    const copybookResolver: CopybookResolver = new LocalCopybookResolver();
     const copybookResolveURI: CopybookURI = new CopybookURI(profileService, copyBooksDownloader);
     const middleware: Middleware = new Middleware(copybooksPathGenerator, copybookResolveURI);
     const languageClientService: LanguageClientService = new LanguageClientService(middleware);

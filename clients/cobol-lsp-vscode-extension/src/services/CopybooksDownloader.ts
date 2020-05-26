@@ -69,11 +69,8 @@ export class CopybooksDownloader implements vscode.Disposable {
         if (!profile) {
             return;
         }
-
-        this.resolver.fixMissingDownloads("", [copybookName], profile, {
-            hasPaths: (await this.pathGenerator.listDatasets()).length > 0,
-            hasProfiles: Object.keys(await this.profileService.listProfiles()).length > 1,
-        });
+        //async needed?
+        this.resolver.downloadMissingCopybooks([copybookName], profile);
 
     }
 
@@ -94,10 +91,10 @@ export class CopybooksDownloader implements vscode.Disposable {
         if (!message.length) {
             missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
         } else if (missingCopybooks.length > 0) {
-            this.resolver.fixMissingDownloads(message, missingCopybooks, profile, {
+            this.resolver.fixMissingDownloads(missingCopybooks, profile, {
                 hasPaths: (await this.pathGenerator.listDatasets()).length > 0,
                 hasProfiles: Object.keys(await this.profileService.listProfiles()).length > 1,
-            });
+            }, message);
         }
     }
 
