@@ -17,7 +17,7 @@ import {changeDefaultZoweProfile} from "./commands/ChangeDefaultZoweProfile";
 import {editDatasetPaths} from "./commands/EditDatasetPaths";
 import {fetchCopybookCommand} from "./commands/FetchCopybookCommand";
 
-import {LANGUAGE_ID, REASON_MSG, SETTINGS_SECTION} from "./constants";
+import {LANGUAGE_ID, SETTINGS_SECTION} from "./constants";
 import {CopybookFix} from "./services/CopybookFix";
 import {CopybooksCodeActionProvider} from "./services/CopybooksCodeActionProvider";
 import {CopybooksDownloader} from "./services/CopybooksDownloader";
@@ -56,15 +56,11 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
         if (event.affectsConfiguration(SETTINGS_SECTION) &&
             vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles")) {
-            copyBooksDownloader.redownloadDependencies(REASON_MSG);
             profileService.updateStatusBar();
         }
     }));
 
     // Commands
-    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.redownload", () => {
-        copyBooksDownloader.redownloadDependencies();
-    }));
     context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
         fetchCopybookCommand(copybook, copyBooksDownloader, programName);
     }));
@@ -77,8 +73,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(languageClientService.start());
 
-    //TODO: related to zowe refactor
-    // context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
     context.subscriptions.push(copyBooksDownloader);
 
     context.subscriptions.push(
@@ -86,17 +80,3 @@ export async function activate(context: vscode.ExtensionContext) {
             {scheme: "file", language: LANGUAGE_ID},
             new CopybooksCodeActionProvider(profileService)));
 }
-
-//TODO: related to zowe refactor
-// function initWorkspaceTracker(downloader: CopybooksDownloader): vscode.Disposable {
-//     const watcher = vscode.workspace.createFileSystemWatcher("**/"
-//         + DEPENDENCIES_FOLDER + "/**/**.dep", false, false, true);
-//
-//     //instead of invoking zowe we have to invoke the prioritizer
-//
-//
-//     // watcher.onDidCreate(uri => downloader.downloadDependencies(uri,
-//     //     "Program contains dependencies to missing copybooks."));
-//     // watcher.onDidChange(uri => downloader.downloadDependencies(uri));
-//     return watcher;
-// }
