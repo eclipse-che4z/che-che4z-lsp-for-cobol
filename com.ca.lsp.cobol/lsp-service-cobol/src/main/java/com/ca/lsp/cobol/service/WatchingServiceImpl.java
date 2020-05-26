@@ -17,6 +17,7 @@ package com.ca.lsp.cobol.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 
@@ -28,6 +29,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
 /** This class creates watchers with type to watch all types of events. */
+@Singleton
 public class WatchingServiceImpl implements WatchingService {
 
   /** Glob patterns to watch the copybooks folder and copybook files */
@@ -79,7 +81,8 @@ public class WatchingServiceImpl implements WatchingService {
                       it,
                       WATCH_FILES,
                       new DidChangeWatchedFilesRegistrationOptions(
-                          singletonList(new FileSystemWatcher("**/" + it + "/**/*", WATCH_ALL_KIND))));
+                          singletonList(
+                              new FileSystemWatcher("**/" + it + "/**/*", WATCH_ALL_KIND))));
                 })
             .collect(toList()));
   }
