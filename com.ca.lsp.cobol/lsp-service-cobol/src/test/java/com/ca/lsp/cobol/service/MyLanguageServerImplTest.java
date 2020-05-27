@@ -84,19 +84,6 @@ public class MyLanguageServerImplTest {
     }
   }
 
-  private void assertRegistrationParams(RegistrationParams params) {
-    Registration registration = params.getRegistrations().get(0);
-    assertNotNull(registration.getId());
-    assertEquals("workspace/didChangeWatchedFiles", registration.getMethod());
-
-    List<FileSystemWatcher> watchers =
-        ((DidChangeWatchedFilesRegistrationOptions) registration.getRegisterOptions())
-            .getWatchers();
-
-    watchers.forEach(it -> assertTrue(it.getGlobPattern().startsWith("**/.copybooks")));
-    watchers.forEach(it -> assertEquals(7, it.getKind().intValue()));
-  }
-
   private void checkOnlySupportedCapabilitiesAreSet(ServerCapabilities capabilities) {
     assertEquals(TextDocumentSyncKind.Full, capabilities.getTextDocumentSync().getLeft());
     assertTrue(capabilities.getWorkspace().getWorkspaceFolders().getSupported());
