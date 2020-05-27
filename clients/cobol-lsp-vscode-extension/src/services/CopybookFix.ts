@@ -13,7 +13,6 @@
  */
 
 import * as vscode from "vscode";
-import {REASON_MSG} from "../constants";
 import {DownloadQueue} from "./DownloadQueue";
 
 export class CopybookFix {
@@ -21,49 +20,13 @@ export class CopybookFix {
 
     /**
      * This method add in the download queue the copybooks that weren't found locally.
-     * @param missingCopybooks
-     * @param profile
+     * @param missingCopybooks list of copybooks not found by the server and not found by
+     * {@link CopybookURI#resolveCopybookURI}
+     * @param profile represent a name of a folder within the .copybooks folder that have the same name as the
+     * connection name needed to download copybooks from mainframe.
      */
     public async downloadMissingCopybooks(missingCopybooks: string[], profile: string) {
         missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
-    }
-
-    /**
-     * This method is engaged when for some reasons is not possible download a copybook using zowe.
-     * Based on the specific scenario provides some action buttons to help user to take the appropriate
-     * activity to resolve the copybook
-     * @param missingCopybooks
-     * @param profile
-     * @param options
-     * @param reasonMsg
-     */
-    public async fixMissingDownloads(missingCopybooks: string[], profile: string, options: { hasPaths: boolean, hasProfiles: boolean }, reasonMsg?: string) {
-        const downloadCopybookAction = "Download Copybooks";
-        const actionDatasets = "Edit Datasets";
-        const actionProfile = "Change zowe profile";
-        const actions = [];
-
-        if (options.hasPaths) {
-            actions.push(downloadCopybookAction);
-        }
-        if (reasonMsg !== REASON_MSG) {
-            actions.push(actionDatasets);
-            if (options.hasProfiles) {
-                actions.push(actionProfile);
-            }
-        }
-        const action: string = await vscode.window.showInformationMessage(
-            reasonMsg,
-            ...actions);
-        if (action === downloadCopybookAction) {
-            missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
-        }
-        if (action === actionDatasets) {
-            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths");
-        }
-        if (action === actionProfile) {
-            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile");
-        }
     }
 
     async processDownloadError(title: string) {
