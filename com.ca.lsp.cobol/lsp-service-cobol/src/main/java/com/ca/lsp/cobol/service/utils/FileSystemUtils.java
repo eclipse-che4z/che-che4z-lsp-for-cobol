@@ -43,7 +43,14 @@ import static java.nio.file.Files.readAllLines;
 @UtilityClass
 public class FileSystemUtils {
   private final List<String> ALLOWED_EXTENSIONS = Arrays.asList("cpy", "cbl", "cobol", "cob");
-  private final String COPYBOOKS_FOLDER = ".copybooks";
+
+  public final String C4Z_FOLDER = ".c4z";
+  public final String COBDEPS_FOLDER = ".cobdeps";
+  public final String COPYBOOKS_FOLDER = ".copybooks";
+  public final String WORKSPACE_FOLDER = "WORKSPACE";
+
+
+  public static final String DEP_EXTENSION = ".dep";
 
   /** @return the representation os based of the FS separator */
   public static String filesystemSeparator() {
@@ -149,6 +156,26 @@ public class FileSystemUtils {
   }
 
   /**
+   * Returns full path for copybook folder which is inside .ch4z folder
+   *
+   * @param workspacePath
+   * @return - full path
+   */
+  public Path getCopybookFolderPath(String workspacePath) {
+    return getPath(workspacePath, C4Z_FOLDER, COPYBOOKS_FOLDER);
+  }
+
+  /**
+   * Returns full path for cobdeps folder which is inside .ch4z folder
+   *
+   * @param workspacePath
+   * @return - full path
+   */
+  public Path getCobolDependencyFolderPath(String workspacePath) {
+    return getPath(workspacePath, C4Z_FOLDER, COBDEPS_FOLDER);
+  }
+
+  /**
    * This method return the list of paths represented by a fixed part (outer + inner) and a variable
    * part iterated to obtains path in this form: {[base,middle,v1],[base,middle,v2], ...}
    *
@@ -161,6 +188,21 @@ public class FileSystemUtils {
         .map(it -> Paths.get(outer, it))
         .filter(Files::exists)
         .collect(Collectors.toList());
+  }
+
+  /**
+   * Creates a directory by creating all nonexistent parent directories first.
+   *
+   * @param path
+   * @return
+   */
+  public Path createFolders(Path path) {
+    try {
+      return Files.createDirectories(path);
+    } catch (IOException e) {
+      log.error("Error creating folders for "+ path,  e);
+      return null;
+    }
   }
 
   /**

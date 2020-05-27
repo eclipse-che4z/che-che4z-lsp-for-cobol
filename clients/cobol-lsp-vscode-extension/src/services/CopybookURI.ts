@@ -88,13 +88,13 @@ export class CopybookURI {
 
     /**
      * This method produce an array with element that following the schema
-     * "file://[WORKSPACE_FOLDER]/.copybooks/PROFILE/DATASET
+     * "file://[WORKSPACE_FOLDER]/.c4z/.copybooks/PROFILE/DATASET
      * @param profile
      */
     private getLocalDownloadedCopybooks(profile: string): string[] {
         const result: string[] = Object.assign([], vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE));
 
-        result.forEach((value, index) => result[index] = ".copybooks/" + profile + "/" + value);
+        result.forEach((value, index) => result[index] = ".c4z/.copybooks/" + profile + "/" + value);
         return result;
     }
 
