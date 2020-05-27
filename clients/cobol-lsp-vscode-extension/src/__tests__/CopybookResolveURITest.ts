@@ -14,6 +14,7 @@
 
 import * as fs from "fs-extra";
 import * as path from "path";
+import * as vscode from "vscode";
 import {CopybookURI} from "../services/CopybookURI";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
 
@@ -40,6 +41,14 @@ function createDirectory(targetPath: string) {
 
 function removeFolder(pathFile: string) {
     fs.remove(pathFile);
+}
+
+function buildResultArrayFrom(settingsMockValue: string[], profileName: string): number {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+        get: jest.fn().mockReturnValue(settingsMockValue),
+    });
+    const copybookResolveURI = new CopybookURI(undefined, undefined);
+    return (copybookResolveURI as any).createPathForCopybookDownloaded(profileName).length;
 }
 
 beforeAll(() => {
@@ -83,4 +92,21 @@ describe("Resolve local copybook present in one or more folders specified by the
         expect(CopybookURI.searchInWorkspace("NSTCOPY2", [CPY_FOLDER_NAME])).toBeDefined();
     });
 
+});
+
+describe("With invalid input parameters, the list of URI that represent copybook downloaded are not generated", () => {
+    test("given a profile but no dataset, the result list returned is empty", () => {
+        expect(buildResultArrayFrom(undefined, "PRF")).toBe(0);
+
+    });
+
+    test("given a list of dataset but no profile, the result list returned is empty", () => {
+        expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], undefined)).toBe(0);
+    });
+});
+
+describe("With allowed input parameters, the list of URI that represent copybook downloaded is correctly generated", () => {
+    test("given profile and dataset list with one element, the result list is correctly generated with size 1 ", () => {
+        expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "PRF")).toBe(1);
+    });
 });
