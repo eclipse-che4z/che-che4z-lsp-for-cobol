@@ -21,6 +21,7 @@ import com.google.inject.Singleton;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,10 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
-/** This class creates watchers with type to watch all types of events. */
+/**
+ * This class creates watchers with type to watch all types of events. The key to remove a watcher
+ * is its path without any changes.
+ */
 @Singleton
 public class WatchingServiceImpl implements WatchingService {
 
@@ -53,6 +57,7 @@ public class WatchingServiceImpl implements WatchingService {
     this.clientProvider = clientProvider;
   }
 
+  @Nonnull
   public List<String> getWatchingFolders() {
     return unmodifiableList(folderWatchers);
   }
@@ -71,7 +76,7 @@ public class WatchingServiceImpl implements WatchingService {
                     singletonList(new FileSystemWatcher(COPYBOOKS_FOLDER_GLOB, WATCH_ALL_KIND))))));
   }
 
-  public void addWatchers(List<String> paths) {
+  public void addWatchers(@Nonnull List<String> paths) {
     register(
         paths.stream()
             .map(
@@ -88,18 +93,17 @@ public class WatchingServiceImpl implements WatchingService {
   }
 
   @Override
-  public void removeWatchers(List<String> paths) {
-    clientProvider
-        .get()
-        .unregisterCapability(
-            new UnregistrationParams(
-                paths.stream()
-                    .map(
-                        it -> {
-                          folderWatchers.remove(it);
-                          return new Unregistration(it, WATCH_FILES);
-                        })
-                    .collect(toList())));
+  public void removeWatchers(@Nonnull List<String> paths) {
+    List<String> collect = paths.stream().filter(folderWatchers::remove).collect(toList());
+    if (!collect.isEmpty()) {
+      clientProvider
+          .get()
+          .unregisterCapability(
+              new UnregistrationParams(
+                  collect.stream()
+                      .map(it -> new Unregistration(it, WATCH_FILES))
+                      .collect(toList())));
+    }
   }
 
   private void register(List<Registration> registrations) {
