@@ -41,9 +41,7 @@ import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
 @Singleton
 public class CopybookDependencyServiceImpl
     implements CopybookDependencyService, EventObserver<CopybookDepEvent> {
-  private static final String COBDEPS = ".cobdeps";
-  private static final String COPYBOOK_FOLDER_NAME = ".copybooks";
-  private static final String DEP_EXTENSION = ".dep";
+
   @Getter private List<Path> workspaceFolderPaths;
   private final DataBusBroker dataBus;
   private final Provider<ConfigurationSettingsStorable> configurationSettingsStorableProvider;
@@ -90,10 +88,6 @@ public class CopybookDependencyServiceImpl
             .equals(TextDocumentSyncType.DID_OPEN);
   }
 
-  private void createDependencyFileFolder() {
-    createFolder(getDependencyFolderPath());
-  }
-
   public void writeCopybookInDepFile(String requiredCopybookName, String documentUri) {
     String cobolFileName = getNameFromURI(documentUri);
 
@@ -104,7 +98,7 @@ public class CopybookDependencyServiceImpl
   }
 
   private Path getDependencyFolderPath() {
-    return getPath(getWorkspaceFolderPaths().get(0).toString(), COBDEPS);
+    return getCobolDependencyFolderPath(getWorkspaceFolderPaths().get(0).toString());
   }
 
   private void writeDependency(
@@ -149,7 +143,7 @@ public class CopybookDependencyServiceImpl
    */
   @Override
   public void generateDependencyFile(String cobolFileName) {
-    createDependencyFileFolder();
+    createFolders(getDependencyFolderPath());
     createFile(getPath(getDependencyFolderPath().toString(), cobolFileName + DEP_EXTENSION));
   }
 
@@ -176,8 +170,7 @@ public class CopybookDependencyServiceImpl
 
   private Path getDependencyFilePath(CopybookDepEvent event) {
     return getPath(
-        getWorkspaceFolderPaths().get(0).toString(),
-        COBDEPS,
+            getCobolDependencyFolderPath(getWorkspaceFolderPaths().get(0).toString()).toString(),
         getNameFromURI(event.getDocumentUri()) + DEP_EXTENSION);
   }
 
@@ -190,10 +183,8 @@ public class CopybookDependencyServiceImpl
   }
 
   private List<Path> getTargetFolders() {
-    return getPathList(getCopybookFolder(), configurationSettingsStorableProvider.get().getPaths());
-  }
-
-  private String getCopybookFolder() {
-    return getPath(workspaceFolderPaths.get(0).toString(), COPYBOOK_FOLDER_NAME).toString();
+    Path copybookFolderPath = getCopybookFolderPath(workspaceFolderPaths.get(0).toString());
+    createFolders(copybookFolderPath);
+    return getPathList(copybookFolderPath.toString(), configurationSettingsStorableProvider.get().getPaths());
   }
 }
