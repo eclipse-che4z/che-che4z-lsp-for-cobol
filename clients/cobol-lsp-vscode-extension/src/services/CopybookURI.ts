@@ -102,7 +102,7 @@ export class CopybookURI {
 
     /**
      * This method produce an array with element that following the schema
-     * "file://[WORKSPACE_FOLDER]/.c4z/.copybooks/PROFILE/DATASET
+     * "file://[WORKSPACE_FOLDER]/.copybooks/PROFILE/DATASET
      * @param profile represent a name of a folder within the .copybooks folder that have the same name as the
      * connection name needed to download copybooks from mainframe.
      */
@@ -111,7 +111,7 @@ export class CopybookURI {
         const datasets: string[] = vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);
         if (profile && datasets) {
             result = Object.assign([], datasets);
-            result.forEach((value, index) => result[index] = ".c4z/.copybooks/" + profile + "/" + value);
+            result.forEach((value, index) => result[index] = ".copybooks/" + profile + "/" + value);
         }
         return result;
     }
