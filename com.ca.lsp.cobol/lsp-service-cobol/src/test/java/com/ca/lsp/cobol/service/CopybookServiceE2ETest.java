@@ -39,6 +39,8 @@ import static org.mockito.Mockito.mock;
 
 import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
 
+import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
+
 /**
  * This class contains all the unit test that perform the publish/subscribe acrivities for generate
  * the dependency file.
