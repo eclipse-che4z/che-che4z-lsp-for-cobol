@@ -35,8 +35,6 @@ import com.ca.lsp.cobol.service.mocks.MockCopybookService;
 import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
-import com.ca.lsp.cobol.service.utils.FileSystemService;
-import com.ca.lsp.cobol.service.utils.FileSystemServiceImpl;
 import com.google.inject.multibindings.Multibinder;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -64,7 +62,6 @@ public class TestModule extends DefaultModule {
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(CobolTextRegistry.class).to(ZipTextRegistry.class);
     bind(WatchingService.class).to(WatchingServiceImpl.class);
-    bind(FileSystemService.class).to(FileSystemServiceImpl.class);
     bind(String.class)
         .annotatedWith(named(PATH_TO_TEST_RESOURCES))
         .toProvider(() -> ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
