@@ -1,4 +1,3 @@
-import * as vscode from "vscode";
 /*
  * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
@@ -12,6 +11,8 @@ import * as vscode from "vscode";
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import * as vscode from "vscode";
+
 export class SettingsUtils {
     public static isValidJSON(json: string): boolean {
         return (json !== undefined) ? JSON.parse(json) : false;

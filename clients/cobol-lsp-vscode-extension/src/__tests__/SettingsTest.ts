@@ -1,10 +1,3 @@
-import * as fs from "fs";
-import * as path from "path";
-import {checkWorkspace} from "../services/CopybooksPathGenerator";
-import { initializeSettings, createFileWithGivenPath } from "../services/Settings";
-import * as vscode from "vscode";
-import {SettingsUtils} from "../services/settings/util/SettingsUtils";
-
 /*
  * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
@@ -18,31 +11,37 @@ import {SettingsUtils} from "../services/settings/util/SettingsUtils";
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import * as fs from "fs";
+import * as path from "path";
+import * as vscode from "vscode";
+import {createFileWithGivenPath, initializeSettings} from "../services/Settings";
+import {SettingsUtils} from "../services/settings/util/SettingsUtils";
 
 const fsPath = "/ws-vscode";
+const scheme = "file";
 const c4zFolder = ".c4z";
 const fileName = ".gitignore";
 let filePath: string;
 
 beforeAll(() => {
-    vscode.workspace.workspaceFolders = [{ uri: { fsPath } } as any];
+    vscode.workspace.workspaceFolders = [{uri: {fsPath}} as any];
     filePath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, c4zFolder, fileName);
 });
 
 afterAll(() => {
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-        }
+    if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+    }
 });
 
 describe("Settings initialization tests", () => {
 
     it("Update all settings if not present in workspace", async () => {
         const updateSettings = jest.fn();
-        const inspectSettings = jest.fn().mockReturnValue({ workspaceValue: undefined });
+        const inspectSettings = jest.fn().mockReturnValue({workspaceValue: undefined});
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             update: updateSettings,
-            get: jest.fn().mockReturnValueOnce({ prop1: "val1", prop2: "val2", prop3: "val3" })
+            get: jest.fn().mockReturnValueOnce({prop1: "val1", prop2: "val2", prop3: "val3"})
                 .mockReturnValueOnce("val1")
                 .mockReturnValueOnce("val2")
                 .mockReturnValueOnce("val3"),
@@ -60,12 +59,12 @@ describe("Settings initialization tests", () => {
 
     it("Update no settings if one present in workspace", async () => {
         const updateSettings = jest.fn();
-        const inspectSettings = jest.fn().mockReturnValueOnce({ workspaceValue: undefined })
-            .mockReturnValueOnce({ workspaceValue: "val2" })
-            .mockReturnValueOnce({ workspaceValue: undefined });
+        const inspectSettings = jest.fn().mockReturnValueOnce({workspaceValue: undefined})
+            .mockReturnValueOnce({workspaceValue: "val2"})
+            .mockReturnValueOnce({workspaceValue: undefined});
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             update: updateSettings,
-            get: jest.fn().mockReturnValueOnce({ prop1: "val1", prop2: "val2", prop3: "val3" })
+            get: jest.fn().mockReturnValueOnce({prop1: "val1", prop2: "val2", prop3: "val3"})
                 .mockReturnValueOnce("val1")
                 .mockReturnValueOnce("val2")
                 .mockReturnValueOnce("val3"),
@@ -80,7 +79,7 @@ describe("Settings initialization tests", () => {
 
 });
 
-describe(".gitignore file in .c4z folder tests", () => { 
+describe(".gitignore file in .c4z folder tests", () => {
 
     it("Create .gitignore file if not exists", () => {
         createFileWithGivenPath(c4zFolder, fileName, "/**");
@@ -88,14 +87,21 @@ describe(".gitignore file in .c4z folder tests", () => {
         expect(fs.existsSync(filePath)).toEqual(true);
     });
 
-    it("Modify .gitignore file if exists", () => {        
+    it("Modify .gitignore file if exists", () => {
         const pattern = "srs/*\n.sds/*";
         createFileWithGivenPath(c4zFolder, fileName, pattern);
         const found = fs.readFileSync(filePath).toString().split("\n")
             .filter(e => e.trim().length > 0)
-            .map(e =>  e.trim()).indexOf(pattern);
-        
-        expect(found).toBeGreaterThanOrEqual(-1);
-    });   
+            .map(e => e.trim()).indexOf(pattern);
 
+        expect(found).toBeGreaterThanOrEqual(-1);
+    });
+});
+
+describe("Validate URI generation for a given workspace folder", () => {
+    test("With a valid workspace folder, the method return a valid URI representation", () => {
+        const path = "/ws-vscode";
+        vscode.workspace.workspaceFolders = [{uri: {path, scheme}} as any];
+        expect(SettingsUtils.getWorkspacesURI()[0]).toBe("file:///ws-vscode");
+    });
 });
