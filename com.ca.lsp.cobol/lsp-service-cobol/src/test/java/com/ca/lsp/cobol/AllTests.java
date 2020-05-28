@@ -47,7 +47,6 @@ import org.junit.runners.Suite.SuiteClasses;
   WorkspaceServiceTest.class,
   CompletionResolutionTest.class,
   CopybookServiceTest.class,
-  CopybookServiceE2ETest.class,
   HighlightsTest.class,
   MultiDocumentDefinitionTest.class,
   LangServerBootstrapTest.class,
