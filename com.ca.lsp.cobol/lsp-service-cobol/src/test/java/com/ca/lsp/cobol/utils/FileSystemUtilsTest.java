@@ -14,10 +14,9 @@
  */
 package com.ca.lsp.cobol.utils;
 
-import com.ca.lsp.cobol.service.utils.FileSystemUtils;
+import com.ca.lsp.cobol.service.utils.FileSystemService;
+import com.ca.lsp.cobol.service.utils.WorkspaceFileService;
 import org.junit.Test;
-
-import java.io.UnsupportedEncodingException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,10 +28,10 @@ public class FileSystemUtilsTest {
    * will return the original URI before the client encode it.
    */
   @Test
-  public void documentUriDecodingTest() throws UnsupportedEncodingException {
+  public void documentUriDecodingTest() {
     String decodedURI = "file:///user/COBOL/HLQ0001.DEMO.COBOL(MEMBFILE).cbl";
+    FileSystemService service = new WorkspaceFileService();
     assertEquals(
-        decodedURI,
-        FileSystemUtils.decodeURI("file:///user/COBOL/HLQ0001.DEMO.COBOL%28MEMBFILE%29.cbl"));
+        decodedURI, service.decodeURI("file:///user/COBOL/HLQ0001.DEMO.COBOL%28MEMBFILE%29.cbl"));
   }
 }

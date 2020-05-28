@@ -15,6 +15,7 @@
 
 package com.ca.lsp.cobol.service.delegates.communications;
 
+import com.ca.lsp.cobol.service.utils.FileSystemService;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -42,7 +43,9 @@ public class ServerCommunicationsTest {
 
   private void assertDocumentAnalysedNotification(String uri, String fileName) {
     LanguageClient client = mock(LanguageClient.class);
-    ServerCommunications communications = new ServerCommunications(() -> client);
+    FileSystemService files = mock(FileSystemService.class);
+    when(files.decodeURI(uri)).thenReturn(uri);
+    ServerCommunications communications = new ServerCommunications(() -> client, files);
     ArgumentCaptor<MessageParams> captor = forClass(MessageParams.class);
 
     communications.notifyThatDocumentAnalysed(uri);
