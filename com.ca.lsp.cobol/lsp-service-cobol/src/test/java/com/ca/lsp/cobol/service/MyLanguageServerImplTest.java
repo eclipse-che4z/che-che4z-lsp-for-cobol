@@ -43,7 +43,7 @@ public class MyLanguageServerImplTest {
   @Test
   public void initialized() {
     ClientService clientService = mock(ClientService.class);
-    WatchingService watchingService = mock(WatchingService.class);
+    WatcherService watcherService = mock(WatcherService.class);
 
     JsonArray arr = new JsonArray();
     String path = "foo/bar";
@@ -53,14 +53,14 @@ public class MyLanguageServerImplTest {
         .thenReturn(completedFuture(singletonList(arr)));
 
     MyLanguageServerImpl server =
-        new MyLanguageServerImpl(null, null, null, watchingService, clientService);
+        new MyLanguageServerImpl(null, null, null, watcherService, clientService);
 
     server.initialized(new InitializedParams());
 
-    verify(watchingService).watchConfigurationChange();
-    verify(watchingService).watchPredefinedFolder();
+    verify(watcherService).watchConfigurationChange();
+    verify(watcherService).watchPredefinedFolder();
     verify(clientService).callClient(LOCAL_PATHS.label);
-    verify(watchingService).addWatchers(singletonList(path));
+    verify(watcherService).addWatchers(singletonList(path));
   }
 
   /**

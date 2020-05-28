@@ -61,7 +61,7 @@ public class TestModule extends DefaultModule {
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(CobolTextRegistry.class).to(ZipTextRegistry.class);
-    bind(WatchingService.class).to(WatchingServiceImpl.class);
+    bind(WatcherService.class).to(WatcherServiceImpl.class);
     bind(String.class)
         .annotatedWith(named(PATH_TO_TEST_RESOURCES))
         .toProvider(() -> ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
