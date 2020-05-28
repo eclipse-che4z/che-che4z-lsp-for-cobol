@@ -13,21 +13,24 @@
  */
 
 import * as vscode from "vscode";
-import {changeDefaultZoweProfile} from "./commands/ChangeDefaultZoweProfile";
-import {editDatasetPaths} from "./commands/EditDatasetPaths";
-import {fetchCopybookCommand} from "./commands/FetchCopybookCommand";
 
-import {LANGUAGE_ID, SETTINGS_SECTION} from "./constants";
-import {CopybookFix} from "./services/CopybookFix";
-import {CopybooksCodeActionProvider} from "./services/CopybooksCodeActionProvider";
-import {CopybooksDownloader} from "./services/CopybooksDownloader";
-import {CopybooksPathGenerator} from "./services/CopybooksPathGenerator";
+import * as path from "path";
+import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
+import { editDatasetPaths } from "./commands/EditDatasetPaths";
+import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
+import { C4Z_FOLDER, DEPENDENCIES_FOLDER, GITIGNORE_FILE, REASON_MSG } from "./constants";
+import { LANGUAGE_ID, SETTINGS_SECTION } from "./constants";
+import { CopybookFix } from "./services/CopybookFix";
+import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
+import { CopybooksDownloader } from "./services/CopybooksDownloader";
+import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
+import { initializeSettings, createFileWithGivenPath } from "./services/Settings";
+
 import {CopybookURI} from "./services/CopybookURI";
 import {LanguageClientService} from "./services/LanguageClientService";
 import {Middleware} from "./services/Middleware";
 import {PathsService} from "./services/PathsService";
 import {ProfileService} from "./services/ProfileService";
-import {initializeSettings} from "./services/Settings";
 import {ZoweApi} from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -73,8 +76,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(languageClientService.start());
 
+    //create .gitignore file within .c4z folder
+    createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
     context.subscriptions.push(copyBooksDownloader);
 
+    createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
             {scheme: "file", language: LANGUAGE_ID},

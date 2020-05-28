@@ -66,9 +66,9 @@ public class CopybookServiceImpl implements CopybookService {
     if (TextDocumentSyncType.DID_OPEN.toString().equals(event.getTextDocumentSyncType())) {
       String cobolFileName = getNameFromURI(event.getDocumentUri());
       clientService
-              .callClient("copybook", cobolFileName, requiredCopybookName)
-              .thenAccept(
-                      result -> dataBus.postData(fetchCopybook(requiredCopybookName, retrieveURI(result))));
+          .callClient("copybook", cobolFileName, requiredCopybookName)
+          .thenAccept(
+              result -> dataBus.postData(fetchCopybook(requiredCopybookName, retrieveURI(result))));
     } else {
       publishOnDatabus(requiredCopybookName, null, null);
     }

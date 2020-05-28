@@ -30,7 +30,8 @@
         "Programming Languages"
     ],
     "activationEvents": [
-        "onLanguage:COBOL"
+        "onLanguage:COBOL",
+        "workspaceContains:/.c4z"
     ],
     "icon": "resources/logo.png",
     "main": "./out/extension.js",
@@ -122,7 +123,7 @@
         "test": "jest -w 1"
     },
     "dependencies": {
-        "@zowe/imperative": "^4.4.5",
+        "@zowe/imperative": "4.4.5",
         "vscode-languageclient": "^5.2.1"
     },
     "devDependencies": {
