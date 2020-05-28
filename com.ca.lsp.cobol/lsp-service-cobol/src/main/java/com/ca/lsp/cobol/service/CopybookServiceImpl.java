@@ -16,9 +16,9 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
-import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
+import com.ca.lsp.cobol.service.utils.FileSystemService;
 import com.google.gson.JsonPrimitive;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -29,72 +29,94 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
-import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
+import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.REQUIRED_COPYBOOK_EVENT;
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static java.util.Optional.ofNullable;
 
-@Singleton
+/** This service processes copybook requests and returns content by its name */
 @Slf4j
+@Singleton
+@SuppressWarnings("unchecked")
 public class CopybookServiceImpl implements CopybookService {
   private final DataBusBroker dataBus;
-
   private final ClientService clientService;
+  private final FileSystemService files;
 
   private final Map<String, Path> copybookPath = new ConcurrentHashMap<>(8, 0.9f, 1);
 
   @Inject
-  public CopybookServiceImpl(DataBusBroker dataBus, ClientService clientService) {
+  public CopybookServiceImpl(
+      DataBusBroker dataBus, ClientService clientService, FileSystemService files) {
     this.dataBus = dataBus;
     this.clientService = clientService;
-    dataBus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
+    this.files = files;
+
+    dataBus.subscribe(REQUIRED_COPYBOOK_EVENT, this);
   }
 
-  /** create the task and pass it to the executor service */
+  /**
+   * Retrieve copybook content by its name, and the document name {@see RequiredCopybookEvent}. It
+   * will apply a file system calls only if the {@link TextDocumentSyncType is DID_OPEN} in order to
+   * avoid obtaining the copybooks with incomplete names.
+   *
+   * <p>The retrieved URIs stored in the cache. If the URI points to non-existing file, then the
+   * cache invalidated and new request applied.
+   *
+   * <p>Replies with copybook content and its URI if exists, or with an empty response if the
+   * copybook not found. The response sends in any case.
+   *
+   * @param event - copybook request params
+   */
   @Override
   public void observerCallback(RequiredCopybookEvent event) {
     String requiredCopybookName = event.getName();
 
     if (copybookPath.containsKey(requiredCopybookName)) {
       Path file = copybookPath.get(requiredCopybookName);
-      if (fileExists(file)) {
-        publishOnDatabus(requiredCopybookName, getContentByPath(file), file);
+      if (files.fileExists(file)) {
+        sendResponse(requiredCopybookName, files.getContentByPath(file), file);
         return;
       } else {
         copybookPath.remove(requiredCopybookName);
       }
     }
-    if (TextDocumentSyncType.DID_OPEN.toString().equals(event.getTextDocumentSyncType())) {
-      String cobolFileName = getNameFromURI(event.getDocumentUri());
+    if (DID_OPEN.name().equals(event.getTextDocumentSyncType())) {
+      String cobolFileName = files.getNameFromURI(event.getDocumentUri());
       clientService
           .callClient("copybook", cobolFileName, requiredCopybookName)
-          .thenAccept(
-              result -> dataBus.postData(fetchCopybook(requiredCopybookName, retrieveURI(result))));
+          .thenAccept(sendResponse(requiredCopybookName));
     } else {
-      publishOnDatabus(requiredCopybookName, null, null);
+      sendResponse(requiredCopybookName, null, null);
     }
   }
 
-  private FetchedCopybookEvent fetchCopybook(String requiredCopybookName, String uri) {
-    if (uri.isEmpty()) {
-      return FetchedCopybookEvent.builder().name(requiredCopybookName).build();
-    }
-    Path file = getPathFromURI(uri);
-    copybookPath.put(requiredCopybookName, file);
-
-    return FetchedCopybookEvent.builder()
-        .name(requiredCopybookName)
-        .uri(toURI(file))
-        .content(getContentByPath(file))
-        .build();
+  private Consumer<List<Object>> sendResponse(String requiredCopybookName) {
+    return result -> dataBus.postData(fetchCopybook(requiredCopybookName, retrieveURI(result)));
   }
 
-  private void publishOnDatabus(String requiredCopybookName, String content, Path path) {
+  private void sendResponse(String requiredCopybookName, String content, Path path) {
     dataBus.postData(
         FetchedCopybookEvent.builder()
             .name(requiredCopybookName)
             .uri(toURI(path))
             .content(content)
             .build());
+  }
+
+  private FetchedCopybookEvent fetchCopybook(String requiredCopybookName, String uri) {
+    if (uri.isEmpty()) {
+      return FetchedCopybookEvent.builder().name(requiredCopybookName).build();
+    }
+    Path file = files.getPathFromURI(uri);
+    copybookPath.put(requiredCopybookName, file);
+
+    return FetchedCopybookEvent.builder()
+        .name(requiredCopybookName)
+        .uri(toURI(file))
+        .content(files.getContentByPath(file))
+        .build();
   }
 
   private String toURI(Path file) {
