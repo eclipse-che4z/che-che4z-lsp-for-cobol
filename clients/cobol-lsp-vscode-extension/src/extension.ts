@@ -78,9 +78,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     //create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
+    
     context.subscriptions.push(copyBooksDownloader);
-
-    createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
             {scheme: "file", language: LANGUAGE_ID},
