@@ -77,6 +77,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
-            { scheme: "file", language: LANGUAGE_ID },
+            {scheme: "file", language: LANGUAGE_ID},
             new CopybooksCodeActionProvider(profileService)));
 }
