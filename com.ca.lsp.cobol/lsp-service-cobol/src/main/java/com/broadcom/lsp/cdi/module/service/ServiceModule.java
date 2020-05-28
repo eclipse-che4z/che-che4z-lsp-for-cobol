@@ -30,8 +30,6 @@ import com.ca.lsp.cobol.service.delegates.references.*;
 import com.ca.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.ca.lsp.cobol.service.providers.ClientProvider;
-import com.ca.lsp.cobol.service.utils.FileSystemService;
-import com.ca.lsp.cobol.service.utils.FileSystemServiceImpl;
 import com.google.inject.multibindings.Multibinder;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -57,7 +55,6 @@ public class ServiceModule extends DefaultModule {
     bind(LanguageClient.class).toProvider(ClientProvider.class);
     bind(ClientService.class).to(ClientServiceImpl.class);
     bind(WatchingService.class).to(WatchingServiceImpl.class);
-    bind(FileSystemService.class).to(FileSystemServiceImpl.class);
 
     bindFormations();
     bindCompletions();
