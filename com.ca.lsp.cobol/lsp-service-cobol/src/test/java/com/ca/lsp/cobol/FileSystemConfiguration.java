@@ -20,15 +20,10 @@ import org.junit.Before;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
 
 /**
  * This class provide support methods for FileSystemService and doesn't test anything. More in
@@ -50,6 +45,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
   protected static final String FULL_PATH = createFullPath(PROFILE_NAME, DSNAME_1);
   protected static final String FULL_PATH2 = createFullPath(PROFILE_NAME, DSNAME_2);
   protected static final String WRONG_PATH = createFullPath(PROFILE_NAME, DSNAME_3);
+  protected static final String DEP_EXTENSION = ".dep";
   protected static final String COPYBOOK_NOT_PRESENT = "ANTHRCPY";
   protected static final String EMPTY_COPYBOOK_NAME = " ";
   protected static final String COBOL_FILE_NAME = "Test";
@@ -62,7 +58,7 @@ public class FileSystemConfiguration extends ConfigurableTest {
 
   protected Path workspaceFolder = null;
   protected Path copybooksFolderPath = null;
-  protected Path dependencyFileFolderPath = null;
+  protected Path depenencyFileFolderPath = null;
 
   //  protected SettingsProvider settingsProvider = Mockito.mock(SettingsProvider.class);
   //
@@ -73,17 +69,16 @@ public class FileSystemConfiguration extends ConfigurableTest {
     ***************************************
     TEMP/
     └── WORKSPACE/
-        └── .c4z
-            └── .cobdeps
-                ├── TEST.dep
-                └── SOMEPROG.dep
-                .copybooks
-                ├── PROFILE_NAME/
-                │   ├── HLQ.DSN.NAME1/
-                │   │   └── copybook.cpy
-                │   └── HLQ.DSN.NAME2/
-                │       └── copybook.cpy
-                └── copy2.cpy
+        ├── .cobdeps
+        │   ├── TEST.dep
+        │   └── SOMEPROG.dep
+        └─── .copybooks
+            ├── PROFILE_NAME/
+            │   ├── HLQ.DSN.NAME1/
+            │   │   └── copybook.cpy
+            │   └── HLQ.DSN.NAME2/
+            │       └── copybook.cpy
+            └── copy2.cpy
     ***************************************
   */
 
@@ -145,11 +140,12 @@ public class FileSystemConfiguration extends ConfigurableTest {
   }
 
   protected void createWorkspaceFolderStructure() {
-    workspaceFolder = createFolders(Paths.get(System.getProperty("java.io.tmpdir"), WORKSPACE_FOLDER));
+    workspaceFolder = createFolders(Paths.get(System.getProperty("java.io.tmpdir"), "WORKSPACE"));
   }
 
   private void createCopybookFolders() {
-    copybooksFolderPath =  createFolders(Paths.get(getCopybookFolderPath(workspaceFolder.toString()).toString()));
+    copybooksFolderPath =
+        createFolders(Paths.get(workspaceFolder + filesystemSeparator() + ".copybooks"));
 
 //    createFoldersFromDatasetSettings();
   }
@@ -160,13 +156,13 @@ public class FileSystemConfiguration extends ConfigurableTest {
 //  }
 
   protected void createDependencyFolder() {
-    dependencyFileFolderPath =
-        createFolders(Paths.get(getCobolDependencyFolderPath(workspaceFolder.toString()).toString()));
+    depenencyFileFolderPath =
+        createFolders(Paths.get(workspaceFolder + filesystemSeparator() + ".cobdeps"));
   }
 
   private void createDependencyFile() {
     writeContentOnFile(
-        createFile(dependencyFileFolderPath, DEP_FILE_COST_NAME + DEP_EXTENSION), CPY_NAME_WITHOUT_EXT);
+        createFile(depenencyFileFolderPath, DEP_FILE_COST_NAME + ".dep"), CPY_NAME_WITHOUT_EXT);
   }
 
 //  private void createCopybookFiles() {
@@ -187,10 +183,22 @@ public class FileSystemConfiguration extends ConfigurableTest {
 //        .collect(Collectors.toList());
 //  }
 
+  private Path createFolders(Path copybooksPath) {
+    try {
+      return Files.createDirectories(copybooksPath);
+    } catch (IOException e) {
+      log.error(e.getMessage());
+      return null;
+    }
+  }
+
   protected Path getWorkspaceFolderPath() {
     return workspaceFolder;
   }
 
+  protected static String filesystemSeparator() {
+    return FileSystems.getDefault().getSeparator();
+  }
 
   private Path createFile(Path targetDirectory, String filenameAndExtension) {
     try {

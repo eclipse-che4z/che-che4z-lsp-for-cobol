@@ -37,8 +37,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
-import static com.ca.lsp.cobol.service.utils.FileSystemUtils.*;
-
 /**
  * This class contains all the unit test that perform the publish/subscribe acrivities for generate
  * the dependency file.
@@ -130,7 +128,11 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
   private boolean depFileExists() {
     return Files.exists(
         Paths.get(
-                getCobolDependencyFolderPath(getWorkspaceFolderPath().toString()).toString(),  "Test.dep"));
+            getWorkspaceFolderPath()
+                + filesystemSeparator()
+                + ".cobdeps"
+                + filesystemSeparator()
+                + "Test.dep"));
   }
 
   private void waitAndAssert_DepFileIsCreated(Boolean expected) {
@@ -195,6 +197,10 @@ public class CopybookServiceE2ETest extends FileSystemConfiguration {
   private Boolean innerDepFileExists() {
     return Files.exists(
         Paths.get(
-                getCobolDependencyFolderPath(getWorkspaceFolderPath().toString()).toString(), "CPYNEST.dep"));
+            getWorkspaceFolderPath()
+                + filesystemSeparator()
+                + ".cobdeps"
+                + filesystemSeparator()
+                + "CPYNEST.dep"));
   }
 }

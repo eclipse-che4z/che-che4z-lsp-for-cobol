@@ -79,10 +79,18 @@ def kubeLabelPrefix = "${projectName}_pod_${env.BUILD_NUMBER}_${env.BRANCH_NAME}
 def kubeBuildLabel = "${kubeLabelPrefix}_build"
 def kubeTestLabel = "${kubeBuildLabel}_test"
 
+boolean isTimeTriggeredBuild() {
+    for (currentBuildCause in currentBuild.buildCauses) {
+        return currentBuildCause._class == 'hudson.triggers.TimerTrigger$TimerTriggerCause'
+    }
+    return false
+}
+
 pipeline {
     agent none
-    parameters {
-        booleanParam(defaultValue: false, description: 'Run integration tests.', name: 'integrationTests')
+    triggers {
+        // Schedule nightly build for development branch or for pull request
+        cron(env.BRANCH_NAME == 'development' || env.CHANGE_ID ? '0 0 * * 1-5' : '')
     }
     options {
         disableConcurrentBuilds()
@@ -180,7 +188,11 @@ pipeline {
         }
         stage('Integration testing') {
             when {
-                expression { params.integrationTests }
+                // Run integration tests only in cases of:
+                // - release branch (names like release-x.y.z)
+                // - automatic nightly builds for "development" branch
+                // - automatic nightly builds for each open Pull Request
+                expression { branchName.startsWith("release") || isTimeTriggeredBuild() }
                 beforeAgent true
             }
             agent {
