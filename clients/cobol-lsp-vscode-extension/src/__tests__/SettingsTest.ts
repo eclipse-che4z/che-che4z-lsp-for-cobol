@@ -1,4 +1,9 @@
-import { initializeSettings } from "../services/Settings";
+import * as fs from "fs";
+import * as path from "path";
+import {checkWorkspace} from "../services/CopybooksPathGenerator";
+import { initializeSettings, createFileWithGivenPath } from "../services/Settings";
+import * as vscode from "vscode";
+import {SettingsUtils} from "../services/settings/util/SettingsUtils";
 
 /*
  * Copyright (c) 2020 Broadcom.
@@ -14,7 +19,21 @@ import { initializeSettings } from "../services/Settings";
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as vscode from "vscode";
+const fsPath = "/ws-vscode";
+const c4zFolder = ".c4z";
+const fileName = ".gitignore";
+let filePath: string;
+
+beforeAll(() => {
+    vscode.workspace.workspaceFolders = [{ uri: { fsPath } } as any];
+    filePath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, c4zFolder, fileName);
+});
+
+afterAll(() => {
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+});
 
 describe("Settings initialization tests", () => {
 
@@ -58,5 +77,25 @@ describe("Settings initialization tests", () => {
         expect(inspectSettings).toHaveBeenCalledTimes(2);
         expect(updateSettings).toHaveBeenCalledTimes(0);
     });
+
+});
+
+describe(".gitignore file in .c4z folder tests", () => { 
+
+    it("Create .gitignore file if not exists", () => {
+        createFileWithGivenPath(c4zFolder, fileName, "/**");
+
+        expect(fs.existsSync(filePath)).toEqual(true);
+    });
+
+    it("Modify .gitignore file if exists", () => {        
+        const pattern = "srs/*\n.sds/*";
+        createFileWithGivenPath(c4zFolder, fileName, pattern);
+        const found = fs.readFileSync(filePath).toString().split("\n")
+            .filter(e => e.trim().length > 0)
+            .map(e =>  e.trim()).indexOf(pattern);
+        
+        expect(found).toBeGreaterThanOrEqual(-1);
+    });   
 
 });
