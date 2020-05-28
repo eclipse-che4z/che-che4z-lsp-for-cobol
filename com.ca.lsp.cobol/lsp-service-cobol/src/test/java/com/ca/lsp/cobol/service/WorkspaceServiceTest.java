@@ -104,10 +104,10 @@ public class WorkspaceServiceTest {
   public void testChangeConfigurationNewPath() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     ClientService clientService = mock(ClientService.class);
-    WatchingService watchingService = mock(WatchingService.class);
+    WatcherService watcherService = mock(WatcherService.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, clientService, watchingService);
+        new CobolWorkspaceServiceImpl(broker, clientService, watcherService);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     JsonArray arr = new JsonArray();
@@ -116,12 +116,12 @@ public class WorkspaceServiceTest {
 
     when(clientService.callClient(LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
-    when(watchingService.getWatchingFolders()).thenReturn(emptyList());
+    when(watcherService.getWatchingFolders()).thenReturn(emptyList());
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
 
-    verify(watchingService).addWatchers(watcherCaptor.capture());
-    verify(watchingService).removeWatchers(emptyList());
+    verify(watcherService).addWatchers(watcherCaptor.capture());
+    verify(watcherService).removeWatchers(emptyList());
     assertEquals(path, watcherCaptor.getValue().get(0));
 
     verify(broker).postData(any(RunAnalysisEvent.class));
@@ -132,10 +132,10 @@ public class WorkspaceServiceTest {
   public void testChangeConfigurationNoChangesInPaths() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     ClientService clientService = mock(ClientService.class);
-    WatchingService watchingService = mock(WatchingService.class);
+    WatcherService watcherService = mock(WatcherService.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, clientService, watchingService);
+        new CobolWorkspaceServiceImpl(broker, clientService, watcherService);
 
     JsonArray arr = new JsonArray();
     String path = "foo/bar";
@@ -143,12 +143,12 @@ public class WorkspaceServiceTest {
 
     when(clientService.callClient(LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
-    when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
+    when(watcherService.getWatchingFolders()).thenReturn(singletonList(path));
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
 
-    verify(watchingService).addWatchers(emptyList());
-    verify(watchingService).removeWatchers(emptyList());
+    verify(watcherService).addWatchers(emptyList());
+    verify(watcherService).removeWatchers(emptyList());
   }
 
   /** Test an existing watcher removed when its path doesn't exist in setting.json */
@@ -156,10 +156,10 @@ public class WorkspaceServiceTest {
   public void testChangeConfigurationPathRemoved() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     ClientService clientService = mock(ClientService.class);
-    WatchingService watchingService = mock(WatchingService.class);
+    WatcherService watcherService = mock(WatcherService.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, clientService, watchingService);
+        new CobolWorkspaceServiceImpl(broker, clientService, watcherService);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     JsonArray arr = new JsonArray();
@@ -167,12 +167,12 @@ public class WorkspaceServiceTest {
     arr.add(new JsonPrimitive(path));
 
     when(clientService.callClient(LOCAL_PATHS.label)).thenReturn(completedFuture(emptyList()));
-    when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
+    when(watcherService.getWatchingFolders()).thenReturn(singletonList(path));
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
 
-    verify(watchingService).addWatchers(emptyList());
-    verify(watchingService).removeWatchers(watcherCaptor.capture());
+    verify(watcherService).addWatchers(emptyList());
+    verify(watcherService).removeWatchers(watcherCaptor.capture());
     assertEquals(path, watcherCaptor.getValue().get(0));
 
     verify(broker).postData(any(RunAnalysisEvent.class));
@@ -183,18 +183,18 @@ public class WorkspaceServiceTest {
   public void testChangeConfigurationNoPathToRegister() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     ClientService clientService = mock(ClientService.class);
-    WatchingService watchingService = mock(WatchingService.class);
+    WatcherService watcherService = mock(WatcherService.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, clientService, watchingService);
+        new CobolWorkspaceServiceImpl(broker, clientService, watcherService);
 
     when(clientService.callClient(LOCAL_PATHS.label)).thenReturn(completedFuture(emptyList()));
-    when(watchingService.getWatchingFolders()).thenReturn(emptyList());
+    when(watcherService.getWatchingFolders()).thenReturn(emptyList());
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
 
-    verify(watchingService).addWatchers(emptyList());
-    verify(watchingService).removeWatchers(emptyList());
+    verify(watcherService).addWatchers(emptyList());
+    verify(watcherService).removeWatchers(emptyList());
   }
 
   /**

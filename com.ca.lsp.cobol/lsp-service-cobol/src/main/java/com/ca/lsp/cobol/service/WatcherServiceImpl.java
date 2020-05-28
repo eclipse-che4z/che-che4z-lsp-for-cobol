@@ -34,7 +34,7 @@ import static java.util.stream.Collectors.toList;
  * is its path without any changes.
  */
 @Singleton
-public class WatchingServiceImpl implements WatchingService {
+public class WatcherServiceImpl implements WatcherService {
 
   /** Glob patterns to watch the copybooks folder and copybook files */
   private static final String COPYBOOKS_FOLDER_GLOB = "**/.copybooks/**/*";
@@ -53,7 +53,7 @@ public class WatchingServiceImpl implements WatchingService {
   private final Provider<LanguageClient> clientProvider;
 
   @Inject
-  WatchingServiceImpl(Provider<LanguageClient> clientProvider) {
+  WatcherServiceImpl(Provider<LanguageClient> clientProvider) {
     this.clientProvider = clientProvider;
   }
 

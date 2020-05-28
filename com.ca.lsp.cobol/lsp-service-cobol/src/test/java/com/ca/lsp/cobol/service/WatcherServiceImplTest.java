@@ -30,10 +30,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
- * This class is a unit test for the {@link WatchingServiceImpl} and asserts that it creates correct
+ * This class is a unit test for the {@link WatcherServiceImpl} and asserts that it creates correct
  * JSON object structures on each watching request.
  */
-public class WatchingServiceImplTest {
+public class WatcherServiceImplTest {
 
   @Test
   public void watchConfigurationChange() {
@@ -41,9 +41,9 @@ public class WatchingServiceImplTest {
     ClientProvider provider = new ClientProvider();
     provider.set(client);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
-    WatchingService watchingService = new WatchingServiceImpl(provider);
+    WatcherService watcherService = new WatcherServiceImpl(provider);
 
-    watchingService.watchConfigurationChange();
+    watcherService.watchConfigurationChange();
 
     verify(client).registerCapability(captor.capture());
 
@@ -62,9 +62,9 @@ public class WatchingServiceImplTest {
     ClientProvider provider = new ClientProvider();
     provider.set(client);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
-    WatchingService watchingService = new WatchingServiceImpl(provider);
+    WatcherService watcherService = new WatcherServiceImpl(provider);
 
-    watchingService.watchPredefinedFolder();
+    watcherService.watchPredefinedFolder();
 
     verify(client).registerCapability(captor.capture());
     assertRegistrationParams(captor.getValue());
@@ -76,10 +76,10 @@ public class WatchingServiceImplTest {
     ClientProvider provider = new ClientProvider();
     provider.set(client);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
-    WatchingService watchingService = new WatchingServiceImpl(provider);
+    WatcherService watcherService = new WatcherServiceImpl(provider);
 
-    watchingService.addWatchers(asList("foo/bar", "baz", "bar\\foo"));
-    assertEquals(asList("foo/bar", "baz", "bar\\foo"), watchingService.getWatchingFolders());
+    watcherService.addWatchers(asList("foo/bar", "baz", "bar\\foo"));
+    assertEquals(asList("foo/bar", "baz", "bar\\foo"), watcherService.getWatchingFolders());
 
     verify(client).registerCapability(captor.capture());
     RegistrationParams params = captor.getValue();
@@ -97,12 +97,12 @@ public class WatchingServiceImplTest {
     ClientProvider provider = new ClientProvider();
     provider.set(client);
     ArgumentCaptor<UnregistrationParams> captor = forClass(UnregistrationParams.class);
-    WatchingService watchingService = new WatchingServiceImpl(provider);
+    WatcherService watcherService = new WatcherServiceImpl(provider);
 
-    watchingService.addWatchers(asList("foo/bar", "baz", "bar\\foo"));
-    watchingService.removeWatchers(asList("non-existing", "foo/bar"));
+    watcherService.addWatchers(asList("foo/bar", "baz", "bar\\foo"));
+    watcherService.removeWatchers(asList("non-existing", "foo/bar"));
 
-    assertEquals(asList("baz", "bar\\foo"), watchingService.getWatchingFolders());
+    assertEquals(asList("baz", "bar\\foo"), watcherService.getWatchingFolders());
 
     verify(client).unregisterCapability(captor.capture());
     UnregistrationParams params = captor.getValue();
