@@ -22,19 +22,9 @@ export class Middleware {
 
         if (params.items.length === 1) {
             const sectionName = params.items[0].section;
-            const section = sectionName.split(".");
-            if (section[0] === "broadcom-cobol-lsp") {
-                switch (section[1]) {
-                    case "cpy-manager":
-                        return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
-                    case "copybook":
-                        const [cobolFileName, copybookName] = Middleware.extractFileAndCopybookNames(sectionName);
-                        const uri = await this.copybookResolverURI.resolveCopybookURI(copybookName, cobolFileName);
-
-                        return [uri];
-                    default:
-                        break;
-                }
+            if (sectionName.startsWith("broadcom-cobol-lsp.copybook")) {
+                const [cobolFileName, copybookName] = Middleware.extractFileAndCopybookNames(sectionName);
+                return [await this.copybookResolverURI.resolveCopybookURI(copybookName, cobolFileName)];
             }
         }
         return next(params, token);
