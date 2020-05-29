@@ -25,14 +25,6 @@ function constructParams(sectionName: string): any {
 
 // tslint:disable: no-unused-expression no-string-literal
 describe("Copybook downloader", () => {
-    it("Handle cpy-manager request", async () => {
-        const copybookPathGenerator: any = {
-            listUris: jest.fn().mockResolvedValue(["uri"]),
-        };
-        const middleware = new Middleware(copybookPathGenerator, null);
-        const params = constructParams("broadcom-cobol-lsp.cpy-manager");
-        expect(await middleware.handleConfigurationRequest(params, null, null)).toEqual(["uri"]);
-    });
     it("Handle copybook request", async () => {
         const copybookResolverURI: any = {
             resolveCopybookURI: jest.fn().mockResolvedValue("copybookUri"),
