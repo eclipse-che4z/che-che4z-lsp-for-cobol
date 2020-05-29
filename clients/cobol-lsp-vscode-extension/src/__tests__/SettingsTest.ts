@@ -81,13 +81,13 @@ describe("Settings initialization tests", () => {
 
 describe(".gitignore file in .c4z folder tests", () => {
 
-    it("Create .gitignore file if not exists", () => {
+    it.skip("Create .gitignore file if not exists", () => {
         createFileWithGivenPath(c4zFolder, fileName, "/**");
 
         expect(fs.existsSync(filePath)).toEqual(true);
     });
 
-    it("Modify .gitignore file if exists", () => {
+    it.skip("Modify .gitignore file if exists", () => {
         const pattern = "srs/*\n.sds/*";
         createFileWithGivenPath(c4zFolder, fileName, pattern);
         const found = fs.readFileSync(filePath).toString().split("\n")
