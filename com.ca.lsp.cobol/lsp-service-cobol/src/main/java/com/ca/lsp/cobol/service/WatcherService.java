@@ -24,7 +24,7 @@ import java.util.List;
  * appears. It stops watching, but still exists if the folder deleted. The list of all the
  * registered paths to watch available using {@link #getWatchingFolders()}.
  */
-public interface WatchingService {
+public interface WatcherService {
   /** Subscribe to notifications that the settings.json changed */
   void watchConfigurationChange();
 

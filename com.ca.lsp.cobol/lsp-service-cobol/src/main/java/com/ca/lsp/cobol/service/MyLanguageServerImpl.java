@@ -49,7 +49,7 @@ public class MyLanguageServerImpl implements LanguageServer {
   private TextDocumentService textService;
   private WorkspaceService workspaceService;
   private CopybookService copybookService;
-  private WatchingService watchingService;
+  private WatcherService watcherService;
   private ClientService clientService;
 
   @Inject
@@ -57,12 +57,12 @@ public class MyLanguageServerImpl implements LanguageServer {
       TextDocumentService textService,
       WorkspaceService workspaceService,
       CopybookService copybookService,
-      WatchingService watchingService,
+      WatcherService watcherService,
       ClientService clientService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.copybookService = copybookService;
-    this.watchingService = watchingService;
+    this.watcherService = watcherService;
     this.clientService = clientService;
   }
 
@@ -84,8 +84,8 @@ public class MyLanguageServerImpl implements LanguageServer {
    */
   @Override
   public void initialized(@Nullable InitializedParams params) {
-    watchingService.watchConfigurationChange();
-    watchingService.watchPredefinedFolder();
+    watcherService.watchConfigurationChange();
+    watcherService.watchPredefinedFolder();
     addLocalFilesWatcher();
   }
 
@@ -115,7 +115,7 @@ public class MyLanguageServerImpl implements LanguageServer {
   private void addLocalFilesWatcher() {
     clientService
         .callClient(LOCAL_PATHS.label)
-        .thenAccept(it -> watchingService.addWatchers(toStrings(it)));
+        .thenAccept(it -> watcherService.addWatchers(toStrings(it)));
   }
 
   private List<String> toStrings(List<Object> it) {

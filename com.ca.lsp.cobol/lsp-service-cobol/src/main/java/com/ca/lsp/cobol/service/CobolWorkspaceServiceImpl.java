@@ -50,14 +50,14 @@ import static java.util.stream.Collectors.toList;
 public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private DataBusBroker dataBus;
   private ClientService clientService;
-  private WatchingService watchingService;
+  private WatcherService watcherService;
 
   @Inject
   public CobolWorkspaceServiceImpl(
-      DataBusBroker dataBus, ClientService clientService, WatchingService watchingService) {
+      DataBusBroker dataBus, ClientService clientService, WatcherService watcherService) {
     this.dataBus = dataBus;
     this.clientService = clientService;
-    this.watchingService = watchingService;
+    this.watcherService = watcherService;
   }
 
   /**
@@ -98,17 +98,17 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   }
 
   private void acceptSettingsChange(List<String> localFolders) {
-    List<String> watchingFolders = watchingService.getWatchingFolders();
+    List<String> watchingFolders = watcherService.getWatchingFolders();
 
     updateWatchers(localFolders, watchingFolders);
     rerunAnalysis();
   }
 
   private void updateWatchers(List<String> newPaths, List<String> existingPaths) {
-    watchingService.addWatchers(
+    watcherService.addWatchers(
         newPaths.stream().filter(it -> !existingPaths.contains(it)).collect(toList()));
 
-    watchingService.removeWatchers(
+    watcherService.removeWatchers(
         existingPaths.stream().filter(it -> !newPaths.contains(it)).collect(toList()));
   }
 
