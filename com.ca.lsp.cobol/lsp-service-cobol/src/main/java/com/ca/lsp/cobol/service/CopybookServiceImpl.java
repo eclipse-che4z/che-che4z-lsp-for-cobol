@@ -110,6 +110,9 @@ public class CopybookServiceImpl implements CopybookService {
       return FetchedCopybookEvent.builder().name(requiredCopybookName).build();
     }
     Path file = files.getPathFromURI(uri);
+    if (file == null) {
+      return FetchedCopybookEvent.builder().name(requiredCopybookName).build();
+    }
     copybookPath.put(requiredCopybookName, file);
 
     return FetchedCopybookEvent.builder()
