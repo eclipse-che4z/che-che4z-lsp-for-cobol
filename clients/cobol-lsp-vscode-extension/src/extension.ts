@@ -18,7 +18,7 @@ import * as path from "path";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 import { editDatasetPaths } from "./commands/EditDatasetPaths";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
-import { C4Z_FOLDER, DEPENDENCIES_FOLDER, GITIGNORE_FILE, REASON_MSG } from "./constants";
+import { C4Z_FOLDER, GITIGNORE_FILE} from "./constants";
 import { LANGUAGE_ID, SETTINGS_SECTION } from "./constants";
 import { CopybookFix } from "./services/CopybookFix";
 import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
