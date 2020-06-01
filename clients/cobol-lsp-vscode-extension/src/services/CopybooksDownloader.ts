@@ -60,7 +60,6 @@ export class CopybooksDownloader implements vscode.Disposable {
         if (!profile) {
             return;
         }
-        //async needed?
         this.resolver.downloadMissingCopybooks([copybookName], profile);
 
     }
@@ -114,6 +113,8 @@ export class CopybooksDownloader implements vscode.Disposable {
         this.queue.stop();
     }
 
+    //TODO: NO INVOKED IN THE CODE BUT USED BY UNIT TEST
+    //TODO: VERIFY ZOWE ERRORS ARE STILL SUPPORTED
     private async handleQueue(
         element: CopybookProfile,
         errors: Set<string>,
