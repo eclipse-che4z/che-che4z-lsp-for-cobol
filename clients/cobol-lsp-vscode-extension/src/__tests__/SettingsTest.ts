@@ -18,7 +18,7 @@ import {createFileWithGivenPath, initializeSettings} from "../services/Settings"
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
 import { C4Z_FOLDER, GITIGNORE_FILE} from "../constants";
 
-const fsPath = "ws-vscode";
+const fsPath = "/ws-vscode";
 const scheme = "file";
 let c4zPath: string;
 let filePath: string;
