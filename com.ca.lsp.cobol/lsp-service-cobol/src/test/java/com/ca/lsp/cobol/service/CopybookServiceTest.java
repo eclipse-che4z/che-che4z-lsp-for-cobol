@@ -97,6 +97,31 @@ public class CopybookServiceTest {
   }
 
   /**
+   * Test a main positive scenario when the copybook exists, and the request invoked while "did
+   * open" analysis.
+   */
+  @Test
+  public void testResponseIfFileNotExists() {
+    CopybookService copybookService = new CopybookServiceImpl(broker, clientService, files);
+    verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
+
+    when(files.getPathFromURI(VALID_CPY_URI)).thenReturn(null);
+
+    copybookService.observerCallback(
+        RequiredCopybookEvent.builder()
+            .name(VALID_CPY_NAME)
+            .documentUri(DOCUMENT_URI)
+            .textDocumentSyncType(DID_OPEN.name())
+            .build());
+
+    verify(files).getNameFromURI(DOCUMENT_URI);
+    verify(files).getPathFromURI(VALID_CPY_URI);
+
+    verify(broker, timeout(10000))
+        .postData(FetchedCopybookEvent.builder().name(VALID_CPY_NAME).build());
+  }
+
+  /**
    * Test the service should return the content of the copybook only while analysis runs in the "did
    * open" mode. When it is in "did change", the copybook name may be incomplete and due to this
    * unable to resolve.
