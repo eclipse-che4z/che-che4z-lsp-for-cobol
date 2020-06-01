@@ -11,27 +11,29 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
+import {C4Z_FOLDER, GITIGNORE_FILE} from "../constants";
 import {createFileWithGivenPath, initializeSettings} from "../services/Settings";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
-import { C4Z_FOLDER, GITIGNORE_FILE} from "../constants";
 
-const fsPath = "ws-vscode";
+const fsPath = "tmp-ws";
 const scheme = "file";
+let wsPath: string;
 let c4zPath: string;
 let filePath: string;
 
 beforeAll(() => {
     vscode.workspace.workspaceFolders = [{uri: {fsPath}} as any];
-    c4zPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, C4Z_FOLDER);
+    wsPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath);
+    c4zPath = path.join(wsPath, C4Z_FOLDER);
     filePath = path.join(c4zPath, GITIGNORE_FILE);
 });
 
 afterAll(() => {
     if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+       fs.rmdirSync(wsPath, { recursive: true });
     }
 });
 
@@ -85,6 +87,7 @@ describe(".gitignore file in .c4z folder tests", () => {
     it ("Create .gitignore file if not exists", () => {
         createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
+        expect(fs.existsSync(wsPath)).toEqual(true);
         expect(fs.existsSync(c4zPath)).toEqual(true);
         expect(fs.existsSync(filePath)).toEqual(true);
     });
