@@ -50,11 +50,11 @@ import static java.util.stream.Collectors.toList;
 public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private DataBusBroker dataBus;
   private ClientService clientService;
-  private WatchingService watchingService;
+  private WatcherService watchingService;
 
   @Inject
   public CobolWorkspaceServiceImpl(
-      DataBusBroker dataBus, ClientService clientService, WatchingService watchingService) {
+      DataBusBroker dataBus, ClientService clientService, WatcherService watchingService) {
     this.dataBus = dataBus;
     this.clientService = clientService;
     this.watchingService = watchingService;

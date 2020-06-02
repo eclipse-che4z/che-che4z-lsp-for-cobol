@@ -49,7 +49,7 @@ public class MyLanguageServerImpl implements LanguageServer {
   private TextDocumentService textService;
   private WorkspaceService workspaceService;
   private CopybookService copybookService;
-  private WatchingService watchingService;
+  private WatcherService watchingService;
   private ClientService clientService;
 
   @Inject
@@ -57,7 +57,7 @@ public class MyLanguageServerImpl implements LanguageServer {
       TextDocumentService textService,
       WorkspaceService workspaceService,
       CopybookService copybookService,
-      WatchingService watchingService,
+      WatcherService watchingService,
       ClientService clientService) {
     this.textService = textService;
     this.workspaceService = workspaceService;

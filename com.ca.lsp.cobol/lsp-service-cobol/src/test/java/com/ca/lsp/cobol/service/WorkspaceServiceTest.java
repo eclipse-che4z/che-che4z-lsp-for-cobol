@@ -104,7 +104,7 @@ public class WorkspaceServiceTest {
   public void testChangeConfigurationNewPath() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     ClientService clientService = mock(ClientService.class);
-    WatchingService watchingService = mock(WatchingService.class);
+    WatcherService watchingService = mock(WatcherService.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(broker, clientService, watchingService);
@@ -132,7 +132,7 @@ public class WorkspaceServiceTest {
   public void testChangeConfigurationNoChangesInPaths() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     ClientService clientService = mock(ClientService.class);
-    WatchingService watchingService = mock(WatchingService.class);
+    WatcherService watchingService = mock(WatcherService.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(broker, clientService, watchingService);
@@ -156,7 +156,7 @@ public class WorkspaceServiceTest {
   public void testChangeConfigurationPathRemoved() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     ClientService clientService = mock(ClientService.class);
-    WatchingService watchingService = mock(WatchingService.class);
+    WatcherService watchingService = mock(WatcherService.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(broker, clientService, watchingService);
@@ -183,7 +183,7 @@ public class WorkspaceServiceTest {
   public void testChangeConfigurationNoPathToRegister() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     ClientService clientService = mock(ClientService.class);
-    WatchingService watchingService = mock(WatchingService.class);
+    WatcherService watchingService = mock(WatcherService.class);
 
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(broker, clientService, watchingService);

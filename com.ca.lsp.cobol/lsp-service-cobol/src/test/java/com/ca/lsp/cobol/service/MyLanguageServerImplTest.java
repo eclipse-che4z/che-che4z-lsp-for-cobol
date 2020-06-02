@@ -43,7 +43,7 @@ public class MyLanguageServerImplTest {
   @Test
   public void initialized() {
     ClientService clientService = mock(ClientService.class);
-    WatchingService watchingService = mock(WatchingService.class);
+    WatcherService watchingService = mock(WatcherService.class);
 
     JsonArray arr = new JsonArray();
     String path = "foo/bar";
