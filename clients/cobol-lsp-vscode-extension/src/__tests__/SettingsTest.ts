@@ -11,26 +11,29 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
+import {C4Z_FOLDER, GITIGNORE_FILE} from "../constants";
 import {createFileWithGivenPath, initializeSettings} from "../services/Settings";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
 
-const fsPath = "/ws-vscode";
+const fsPath = "tmp-ws";
 const scheme = "file";
-const c4zFolder = ".c4z";
-const fileName = ".gitignore";
+let wsPath: string;
+let c4zPath: string;
 let filePath: string;
 
 beforeAll(() => {
     vscode.workspace.workspaceFolders = [{uri: {fsPath}} as any];
-    filePath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, c4zFolder, fileName);
+    wsPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath);
+    c4zPath = path.join(wsPath, C4Z_FOLDER);
+    filePath = path.join(c4zPath, GITIGNORE_FILE);
 });
 
 afterAll(() => {
     if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+       fs.rmdirSync(wsPath, { recursive: true });
     }
 });
 
@@ -81,20 +84,31 @@ describe("Settings initialization tests", () => {
 
 describe(".gitignore file in .c4z folder tests", () => {
 
-    it.skip("Create .gitignore file if not exists", () => {
-        createFileWithGivenPath(c4zFolder, fileName, "/**");
+    it ("Create .gitignore file if not exists", () => {
+        createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
+        expect(fs.existsSync(wsPath)).toEqual(true);
+        expect(fs.existsSync(c4zPath)).toEqual(true);
         expect(fs.existsSync(filePath)).toEqual(true);
     });
 
-    it.skip("Modify .gitignore file if exists", () => {
+    it ("Modify .gitignore file if exists", () => {
         const pattern = "srs/*\n.sds/*";
-        createFileWithGivenPath(c4zFolder, fileName, pattern);
+        createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, pattern);
         const found = fs.readFileSync(filePath).toString().split("\n")
             .filter(e => e.trim().length > 0)
             .map(e => e.trim()).indexOf(pattern);
 
         expect(found).toBeGreaterThanOrEqual(-1);
+    });
+
+    it("workspace not exist", () => {
+        vscode.workspace.workspaceFolders = [];
+        const createFile = jest.fn();
+        createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
+
+        expect(createFile).toHaveBeenCalledTimes(0);
+        expect(vscode.workspace.workspaceFolders[0]).toBe(undefined);
     });
 });
 
