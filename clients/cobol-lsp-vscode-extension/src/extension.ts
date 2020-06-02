@@ -18,7 +18,7 @@ import * as path from "path";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 import { editDatasetPaths } from "./commands/EditDatasetPaths";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
-import { C4Z_FOLDER, DEPENDENCIES_FOLDER, GITIGNORE_FILE, REASON_MSG } from "./constants";
+import { C4Z_FOLDER, GITIGNORE_FILE} from "./constants";
 import { LANGUAGE_ID, SETTINGS_SECTION } from "./constants";
 import { CopybookFix } from "./services/CopybookFix";
 import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
@@ -78,9 +78,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     //create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
-    context.subscriptions.push(copyBooksDownloader);
 
-    createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
+    context.subscriptions.push(copyBooksDownloader);
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
             {scheme: "file", language: LANGUAGE_ID},
