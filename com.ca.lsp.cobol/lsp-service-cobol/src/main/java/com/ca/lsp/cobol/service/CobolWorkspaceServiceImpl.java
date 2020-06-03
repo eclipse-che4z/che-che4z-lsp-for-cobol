@@ -49,18 +49,18 @@ import static java.util.stream.Collectors.toList;
 @Singleton
 public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private DataBusBroker dataBus;
-  private ClientService clientService;
+  private SettingsService settingsService;
   private WatcherService watchingService;
   private CopybookService copybookService;
 
   @Inject
   public CobolWorkspaceServiceImpl(
       DataBusBroker dataBus,
-      ClientService clientService,
+      SettingsService settingsService,
       WatcherService watchingService,
       CopybookService copybookService) {
     this.dataBus = dataBus;
-    this.clientService = clientService;
+    this.settingsService = settingsService;
     this.watchingService = watchingService;
     this.copybookService = copybookService;
   }
@@ -98,8 +98,8 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
-    clientService
-        .callClient(LOCAL_PATHS.label)
+    settingsService
+        .getConfiguration(LOCAL_PATHS.label)
         .thenAccept(it -> acceptSettingsChange(toStrings(it)));
   }
 

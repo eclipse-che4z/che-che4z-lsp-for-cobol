@@ -49,18 +49,18 @@ public class MyLanguageServerImpl implements LanguageServer {
   private TextDocumentService textService;
   private WorkspaceService workspaceService;
   private WatcherService watchingService;
-  private ClientService clientService;
+  private SettingsService settingsService;
 
   @Inject
   MyLanguageServerImpl(
       TextDocumentService textService,
       WorkspaceService workspaceService,
       WatcherService watchingService,
-      ClientService clientService) {
+      SettingsService settingsService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
-    this.clientService = clientService;
+    this.settingsService = settingsService;
   }
 
   @Override
@@ -110,8 +110,8 @@ public class MyLanguageServerImpl implements LanguageServer {
   }
 
   private void addLocalFilesWatcher() {
-    clientService
-        .callClient(LOCAL_PATHS.label)
+    settingsService
+        .getConfiguration(LOCAL_PATHS.label)
         .thenAccept(it -> watchingService.addWatchers(toStrings(it)));
   }
 
