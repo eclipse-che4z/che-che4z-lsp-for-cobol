@@ -212,7 +212,6 @@ public class WorkspaceServiceTest {
    */
   @Test
   public void testDidChangeWatchedFilesExistingFileCreated() {
-    log.error("asdd", new Error());
     checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks/CpyName.cpy", Created));
   }
 
