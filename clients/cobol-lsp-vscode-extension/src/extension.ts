@@ -41,8 +41,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
     const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator);
     const pathsService: PathsService = new PathsService();
-    const copybookResolveURI: CopybookURI = new CopybookURI(profileService, copyBooksDownloader);
-    const middleware: Middleware = new Middleware(copybooksPathGenerator, copybookResolveURI);
+    const middleware: Middleware = new Middleware(copybooksPathGenerator, new CopybookURI(profileService, copyBooksDownloader));
     const languageClientService: LanguageClientService = new LanguageClientService(middleware);
 
     try {
