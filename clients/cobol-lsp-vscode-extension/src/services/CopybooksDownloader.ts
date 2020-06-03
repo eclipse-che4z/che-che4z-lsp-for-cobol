@@ -67,7 +67,7 @@ export class CopybooksDownloader implements vscode.Disposable {
     public async start() {
         this.resolver.setQueue(this.queue);
         let done = false;
-        const errors = new Set();
+        const errors = new Set<string>();
         while (!done) {
             const element: CopybookProfile | undefined = await this.queue.pop();
             if (!element) {
@@ -80,27 +80,7 @@ export class CopybooksDownloader implements vscode.Disposable {
                     title: "Fetching copybooks",
                 },
                 async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
-                    const toDownload: CopybookProfile[] = [element];
-                    while (this.queue.length > 0) {
-                        toDownload.push(await this.queue.pop());
-                    }
-                    toDownload.map(cp => cp.copybook).forEach(cb => errors.add(cb));
-                    for (const dataset of await this.pathGenerator.listDatasets()) {
-                        progress.report({
-                            message: "Looking in " + dataset + ". " + toDownload.length +
-                                " copybook(s) left.",
-                        });
-                        for (const cp of toDownload) {
-                            try {
-                                const fetchResult = await this.fetchCopybook(dataset, cp);
-                                if (fetchResult) {
-                                    errors.delete(cp.copybook);
-                                }
-                            } catch (e) {
-                                vscode.window.showErrorMessage(e.toString());
-                            }
-                        }
-                    }
+                    await this.handleQueue(element, errors, progress);
                     if (this.queue.length === 0 && errors.size > 0) {
                         this.resolver.processDownloadError(PROCESS_DOWNLOAD_ERROR_MSG + Array.from(errors));
                         errors.clear();
@@ -113,8 +93,6 @@ export class CopybooksDownloader implements vscode.Disposable {
         this.queue.stop();
     }
 
-    //TODO: NO INVOKED IN THE CODE BUT USED BY UNIT TEST
-    //TODO: VERIFY ZOWE ERRORS ARE STILL SUPPORTED
     private async handleQueue(
         element: CopybookProfile,
         errors: Set<string>,
