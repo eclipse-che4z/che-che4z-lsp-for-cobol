@@ -15,7 +15,7 @@ import * as fs from "fs";
 import * as path from "path";
 import {URL} from "url";
 import * as vscode from "vscode";
-import {PATHS_LOCAL_KEY, PATHS_ZOWE, SETTINGS_SECTION} from "../constants";
+import {C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_LOCAL_KEY, PATHS_ZOWE, SETTINGS_SECTION} from "../constants";
 import {CopybooksDownloader} from "./CopybooksDownloader";
 import {ProfileService} from "./ProfileService";
 import {CopybookResolver} from "./settings/CopybookResolver";
@@ -111,7 +111,7 @@ export class CopybookURI {
         const datasets: string[] = vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);
         if (profile && datasets) {
             result = Object.assign([], datasets);
-            result.forEach((value, index) => result[index] = ".c4z/.copybooks/" + profile + "/" + value);
+            result.forEach((value, index) => result[index] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" + profile + "/" + value);
         }
         return result;
     }

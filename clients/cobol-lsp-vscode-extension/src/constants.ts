@@ -16,7 +16,6 @@ export const SETTINGS_SECTION: string = "broadcom-cobol-lsp.cpy-manager";
 export const PATHS_LOCAL_KEY = "paths.local";
 export const PATHS_ZOWE = "paths.dsn";
 export const C4Z_FOLDER: string = ".c4z";
-export const DEPENDENCIES_FOLDER: string = ".cobdeps";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
 export const GITIGNORE_FILE: string = ".gitignore";
 export const LANGUAGE_ID = "COBOL";
