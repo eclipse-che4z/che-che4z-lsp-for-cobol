@@ -193,17 +193,4 @@ export class CopybooksDownloader implements vscode.Disposable {
             fs.writeFileSync(copybookPath, content);
         }
     }
-
-    private async listMissingCopybooks(copybooks: string[], profileName: string): Promise<string[]> {
-        const copybooksToDownload: Set<string> = new Set(copybooks);
-        (await this.pathGenerator.listDatasets()).forEach(ds => {
-            Array.from(copybooksToDownload.values()).forEach(c => {
-                if (fs.existsSync(createCopybookPath(profileName, ds, c))) {
-                    copybooksToDownload.delete(c);
-                }
-            });
-        });
-
-        return Array.from(copybooksToDownload.values());
-    }
 }
