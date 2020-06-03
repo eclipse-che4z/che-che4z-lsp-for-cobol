@@ -14,7 +14,6 @@
 
 import * as vscode from "vscode";
 
-import * as path from "path";
 import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
 import { editDatasetPaths } from "./commands/EditDatasetPaths";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
@@ -76,7 +75,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(languageClientService.start());
 
-    //create .gitignore file within .c4z folder
+    // create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
     context.subscriptions.push(copyBooksDownloader);
