@@ -47,15 +47,15 @@ public class CopybookServiceTest {
   private static final String CONTENT = "content";
 
   private DataBusBroker broker = mock(DataBusBroker.class);
-  private ClientService clientService = mock(ClientService.class);
+  private SettingsService settingsService = mock(SettingsService.class);
   private FileSystemService files = mock(FileSystemService.class);
   private Path cpyPath = mock(Path.class);
 
   @Before
   public void setupMocks() {
-    when(clientService.callClient("copybook", "document", VALID_CPY_NAME))
+    when(settingsService.getConfiguration("copybook", "document", VALID_CPY_NAME))
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(VALID_CPY_URI))));
-    when(clientService.callClient("copybook", "document", INVALID_CPY_NAME))
+    when(settingsService.getConfiguration("copybook", "document", INVALID_CPY_NAME))
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
 
     when(cpyPath.toUri()).thenReturn(URI.create(VALID_CPY_URI));
@@ -73,7 +73,7 @@ public class CopybookServiceTest {
    */
   @Test
   public void testRequestWhileDidOpenProcessed() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, clientService, files);
+    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
 
     copybookService.observerCallback(
@@ -102,7 +102,7 @@ public class CopybookServiceTest {
    */
   @Test
   public void testResponseIfFileNotExists() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, clientService, files);
+    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
 
     when(files.getPathFromURI(VALID_CPY_URI)).thenReturn(null);
@@ -128,7 +128,7 @@ public class CopybookServiceTest {
    */
   @Test
   public void testRequestWhileDidChangeNotProcessed() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, clientService, null);
+    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, null);
 
     copybookService.observerCallback(
         RequiredCopybookEvent.builder()
@@ -146,7 +146,7 @@ public class CopybookServiceTest {
    */
   @Test
   public void testRequestWhenUriNotFoundProcessed() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, clientService, files);
+    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
 
     copybookService.observerCallback(
@@ -167,7 +167,7 @@ public class CopybookServiceTest {
    */
   @Test
   public void testNoNewClientCallsOnDidChange() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, clientService, files);
+    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
 
     copybookService.observerCallback(
@@ -200,7 +200,7 @@ public class CopybookServiceTest {
   /** Test the cached URI deleted if the file is not available anymore. */
   @Test
   public void testCacheInvalidatedIfUriUnavailable() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, clientService, files);
+    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
 
     copybookService.observerCallback(
@@ -247,7 +247,7 @@ public class CopybookServiceTest {
    */
   @Test
   public void testCacheInvalidation() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, clientService, files);
+    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
 
     copybookService.observerCallback(
