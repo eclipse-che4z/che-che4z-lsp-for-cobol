@@ -17,14 +17,12 @@ package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import org.eclipse.lsp4j.WorkspaceFolder;
-
-import java.nio.file.Path;
-import java.util.List;
 
 /**
  * Provide API definition to search for copybooks files and define the workspace folder opened in
- * the client when the LSP server is triggered.
+ * the client when the LSP server triggered.
  */
 public interface CopybookService extends EventObserver<RequiredCopybookEvent> {
+  /** Remove all the stored copybook names and URIs. */
+  void invalidateURICache();
 }

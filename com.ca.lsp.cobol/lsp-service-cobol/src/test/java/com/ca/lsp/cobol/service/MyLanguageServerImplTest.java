@@ -53,7 +53,7 @@ public class MyLanguageServerImplTest {
         .thenReturn(completedFuture(singletonList(arr)));
 
     MyLanguageServerImpl server =
-        new MyLanguageServerImpl(null, null, null, watchingService, clientService);
+        new MyLanguageServerImpl(null, null, watchingService, clientService);
 
     server.initialized(new InitializedParams());
 
@@ -70,7 +70,7 @@ public class MyLanguageServerImplTest {
    */
   @Test
   public void initialize() {
-    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, null, null);
+    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, null);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));

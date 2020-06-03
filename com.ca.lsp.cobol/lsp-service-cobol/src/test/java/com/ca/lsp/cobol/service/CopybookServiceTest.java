@@ -240,4 +240,43 @@ public class CopybookServiceTest {
                 .uri(VALID_CPY_URI)
                 .build());
   }
+
+  /**
+   * Test when cache invalidation invoked, the next copybook requests tries to resolve URI in order
+   * to avoid dirty state
+   */
+  @Test
+  public void testCacheInvalidation() {
+    CopybookService copybookService = new CopybookServiceImpl(broker, clientService, files);
+    verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
+
+    copybookService.observerCallback(
+        RequiredCopybookEvent.builder()
+            .name(VALID_CPY_NAME)
+            .documentUri(DOCUMENT_URI)
+            .textDocumentSyncType(DID_OPEN.name())
+            .build());
+
+    copybookService.invalidateURICache();
+
+    copybookService.observerCallback(
+        RequiredCopybookEvent.builder()
+            .name(VALID_CPY_NAME)
+            .documentUri(DOCUMENT_URI)
+            .textDocumentSyncType(DID_OPEN.name())
+            .build());
+
+    // Check the requests applied same logic
+    verify(broker, timeout(10000).times(2))
+        .postData(
+            FetchedCopybookEvent.builder()
+                .name(VALID_CPY_NAME)
+                .content(CONTENT)
+                .uri(VALID_CPY_URI)
+                .build());
+
+    verify(files, times(2)).getContentByPath(cpyPath);
+    verify(files, times(2)).getNameFromURI(DOCUMENT_URI);
+    verify(files, times(2)).getPathFromURI(VALID_CPY_URI);
+  }
 }

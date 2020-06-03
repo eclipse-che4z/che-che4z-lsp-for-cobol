@@ -51,13 +51,18 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private DataBusBroker dataBus;
   private ClientService clientService;
   private WatcherService watchingService;
+  private CopybookService copybookService;
 
   @Inject
   public CobolWorkspaceServiceImpl(
-      DataBusBroker dataBus, ClientService clientService, WatcherService watchingService) {
+      DataBusBroker dataBus,
+      ClientService clientService,
+      WatcherService watchingService,
+      CopybookService copybookService) {
     this.dataBus = dataBus;
     this.clientService = clientService;
     this.watchingService = watchingService;
+    this.copybookService = copybookService;
   }
 
   /**
@@ -85,8 +90,9 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   }
 
   /**
-   * This is a notification triggered automatically when the user modify configuration settings in
-   * the client
+   * Process changed configuration on the client state. This notification triggered automatically
+   * when the user modify configuration settings in the client. Invalidate all the caches to avoid
+   * dirty state.
    *
    * @param params - LSPSpecification -> The actual changed settings; Actually -> null all the time.
    */
@@ -102,6 +108,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
 
     updateWatchers(localFolders, watchingFolders);
     rerunAnalysis();
+    copybookService.invalidateURICache();
   }
 
   private void updateWatchers(List<String> newPaths, List<String> existingPaths) {

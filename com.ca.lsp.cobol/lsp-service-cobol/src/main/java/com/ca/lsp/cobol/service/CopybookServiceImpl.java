@@ -56,6 +56,11 @@ public class CopybookServiceImpl implements CopybookService {
     dataBus.subscribe(REQUIRED_COPYBOOK_EVENT, this);
   }
 
+  @Override
+  public void invalidateURICache() {
+    copybookPath.clear();
+  }
+
   /**
    * Retrieve copybook content by its name, and the document name {@see RequiredCopybookEvent}. It
    * will apply a file system calls only if the {@link TextDocumentSyncType is DID_OPEN} in order to

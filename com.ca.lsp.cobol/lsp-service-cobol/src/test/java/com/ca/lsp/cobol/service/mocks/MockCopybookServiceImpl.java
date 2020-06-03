@@ -26,13 +26,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
-import org.eclipse.lsp4j.WorkspaceFolder;
-
-import java.nio.file.Path;
-import java.util.List;
 
 /**
- * This class is used to mock the actual behavior of {@link
+ * This class used to mock the actual behavior of {@link
  * com.ca.lsp.cobol.service.CopybookService} and return stubs value not used to validate any
  * CopybookService functionality
  */
@@ -57,19 +53,6 @@ public class MockCopybookServiceImpl implements MockCopybookService {
     dataBus.postData(FetchedCopybookEvent.builder().name(name).uri(name).content(content).build());
   }
 
-//  @Override
-//  public Path findCopybook(String fileName) {
-//    return null;
-//  }
-//
-//  @Override
-//  public Path findCopybook(String filename, List<String> datasetList) {
-//    return null;
-//  }
-//
-//  @Override
-//  public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {}
-
   @Override
   public String getContentByCopybookName(String copybookName) {
     return copybooks.getCopybooks().stream()
@@ -81,4 +64,7 @@ public class MockCopybookServiceImpl implements MockCopybookService {
         .findAny()
         .orElse(null);
   }
+
+  @Override
+  public void invalidateURICache() {}
 }
