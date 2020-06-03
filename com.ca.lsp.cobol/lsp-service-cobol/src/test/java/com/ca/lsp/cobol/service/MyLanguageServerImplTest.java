@@ -42,24 +42,24 @@ public class MyLanguageServerImplTest {
    */
   @Test
   public void initialized() {
-    ClientService clientService = mock(ClientService.class);
+    SettingsService settingsService = mock(SettingsService.class);
     WatcherService watchingService = mock(WatcherService.class);
 
     JsonArray arr = new JsonArray();
     String path = "foo/bar";
     arr.add(new JsonPrimitive(path));
 
-    when(clientService.callClient(LOCAL_PATHS.label))
+    when(settingsService.getConfiguration(LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
 
     MyLanguageServerImpl server =
-        new MyLanguageServerImpl(null, null, null, watchingService, clientService);
+        new MyLanguageServerImpl(null, null, watchingService, settingsService);
 
     server.initialized(new InitializedParams());
 
     verify(watchingService).watchConfigurationChange();
     verify(watchingService).watchPredefinedFolder();
-    verify(clientService).callClient(LOCAL_PATHS.label);
+    verify(settingsService).getConfiguration(LOCAL_PATHS.label);
     verify(watchingService).addWatchers(singletonList(path));
   }
 
@@ -70,7 +70,7 @@ public class MyLanguageServerImplTest {
    */
   @Test
   public void initialize() {
-    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, null, null);
+    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, null);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));

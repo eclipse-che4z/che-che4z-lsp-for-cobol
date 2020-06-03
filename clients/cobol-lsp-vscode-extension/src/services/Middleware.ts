@@ -11,6 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+
 import {CancellationToken} from "vscode";
 import {ConfigurationParams, ConfigurationRequest} from "vscode-languageclient";
 import {CopybooksPathGenerator} from "./CopybooksPathGenerator";

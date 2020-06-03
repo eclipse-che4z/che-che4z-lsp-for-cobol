@@ -49,15 +49,20 @@ import static java.util.stream.Collectors.toList;
 @Singleton
 public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private DataBusBroker dataBus;
-  private ClientService clientService;
+  private SettingsService settingsService;
   private WatcherService watchingService;
+  private CopybookService copybookService;
 
   @Inject
   public CobolWorkspaceServiceImpl(
-      DataBusBroker dataBus, ClientService clientService, WatcherService watchingService) {
+      DataBusBroker dataBus,
+      SettingsService settingsService,
+      WatcherService watchingService,
+      CopybookService copybookService) {
     this.dataBus = dataBus;
-    this.clientService = clientService;
+    this.settingsService = settingsService;
     this.watchingService = watchingService;
+    this.copybookService = copybookService;
   }
 
   /**
@@ -85,15 +90,16 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   }
 
   /**
-   * This is a notification triggered automatically when the user modify configuration settings in
-   * the client
+   * Process changed configuration on the client state. This notification triggered automatically
+   * when the user modify configuration settings in the client. Invalidate all the caches to avoid
+   * dirty state.
    *
    * @param params - LSPSpecification -> The actual changed settings; Actually -> null all the time.
    */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
-    clientService
-        .callClient(LOCAL_PATHS.label)
+    settingsService
+        .getConfiguration(LOCAL_PATHS.label)
         .thenAccept(it -> acceptSettingsChange(toStrings(it)));
   }
 
@@ -102,6 +108,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
 
     updateWatchers(localFolders, watchingFolders);
     rerunAnalysis();
+    copybookService.invalidateURICache();
   }
 
   private void updateWatchers(List<String> newPaths, List<String> existingPaths) {

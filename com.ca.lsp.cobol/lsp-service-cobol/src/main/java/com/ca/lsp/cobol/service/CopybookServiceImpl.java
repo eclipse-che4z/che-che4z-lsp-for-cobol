@@ -41,19 +41,24 @@ import static java.util.Optional.ofNullable;
 @SuppressWarnings("unchecked")
 public class CopybookServiceImpl implements CopybookService {
   private final DataBusBroker dataBus;
-  private final ClientService clientService;
+  private final SettingsService settingsService;
   private final FileSystemService files;
 
   private final Map<String, Path> copybookPath = new ConcurrentHashMap<>(8, 0.9f, 1);
 
   @Inject
   public CopybookServiceImpl(
-      DataBusBroker dataBus, ClientService clientService, FileSystemService files) {
+          DataBusBroker dataBus, SettingsService settingsService, FileSystemService files) {
     this.dataBus = dataBus;
-    this.clientService = clientService;
+    this.settingsService = settingsService;
     this.files = files;
 
     dataBus.subscribe(REQUIRED_COPYBOOK_EVENT, this);
+  }
+
+  @Override
+  public void invalidateURICache() {
+    copybookPath.clear();
   }
 
   /**
@@ -84,8 +89,8 @@ public class CopybookServiceImpl implements CopybookService {
     }
     if (DID_OPEN.name().equals(event.getTextDocumentSyncType())) {
       String cobolFileName = files.getNameFromURI(event.getDocumentUri());
-      clientService
-          .callClient("copybook", cobolFileName, requiredCopybookName)
+      settingsService
+          .getConfiguration("copybook", cobolFileName, requiredCopybookName)
           .thenAccept(sendResponse(requiredCopybookName));
     } else {
       sendResponse(requiredCopybookName, null, null);

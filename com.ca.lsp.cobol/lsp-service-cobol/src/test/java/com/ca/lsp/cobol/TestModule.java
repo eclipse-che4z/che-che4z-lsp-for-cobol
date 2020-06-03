@@ -69,7 +69,7 @@ public class TestModule extends DefaultModule {
         .annotatedWith(named(PATH_TO_TEST_RESOURCES))
         .toProvider(() -> ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
 
-    bind(ClientService.class).to(ClientServiceImpl.class);
+    bind(SettingsService.class).to(SettingsServiceImpl.class);
 
     bindFormations();
     bindCompletions();

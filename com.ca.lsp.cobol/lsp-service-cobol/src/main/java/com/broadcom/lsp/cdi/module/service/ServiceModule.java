@@ -55,7 +55,7 @@ public class ServiceModule extends DefaultModule {
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(MyTextDocumentService.class);
     bind(LanguageClient.class).toProvider(ClientProvider.class);
-    bind(ClientService.class).to(ClientServiceImpl.class);
+    bind(SettingsService.class).to(SettingsServiceImpl.class);
     bind(WatcherService.class).to(WatcherServiceImpl.class);
     bind(FileSystemService.class).to(WorkspaceFileService.class);
 
