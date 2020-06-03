@@ -48,7 +48,6 @@ public class MyLanguageServerImpl implements LanguageServer {
 
   private TextDocumentService textService;
   private WorkspaceService workspaceService;
-  private CopybookService copybookService;
   private WatcherService watchingService;
   private ClientService clientService;
 
@@ -56,12 +55,10 @@ public class MyLanguageServerImpl implements LanguageServer {
   MyLanguageServerImpl(
       TextDocumentService textService,
       WorkspaceService workspaceService,
-      CopybookService copybookService,
       WatcherService watchingService,
       ClientService clientService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
-    this.copybookService = copybookService;
     this.watchingService = watchingService;
     this.clientService = clientService;
   }
