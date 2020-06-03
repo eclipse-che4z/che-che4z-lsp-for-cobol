@@ -1,5 +1,5 @@
 # Theia Automation
-Automate functional tests running on theia with Selenium Explorer in ZOS, Explorer for Endevor, and COBOL LSP.
+Automate functional tests running on Theia with Selenium Explorer in ZOS, Explorer for Endevor, and COBOL LSP.
 
 #### Prerequisite:
 - Windows Environment 
@@ -71,7 +71,7 @@ Automate functional tests running on theia with Selenium Explorer in ZOS, Explor
 * Modify project file inc\cfg\mf_credentials.py by filling it with your mainframe credentials.
 * If you leave it as it is (with None as credential values), during test start you will be prompted for credentials with a dialog.
 
-**Note**: If you need to run a test suite, which doesn't require Mainframe connection like LSP test suite for local COBOL files (see example below), you don't have to provide Mainframe credentials at all.
+**Note**: If you need to run a test suite, which doesn't require Mainframe connection, like LSP test suite for local COBOL files (see example below), Mainframe credentials are not required.
 
 9) Establish and Run Theia environment
 
@@ -122,7 +122,7 @@ Linux:
 	
 The command will generate log and report without credential information, however xml output will still contain it.
 	
-2) To remove it from xml, after test suite is completed, run:
+2) To remove credential information from xml, after test suite is completed, run:
 
 Windows:
 	
