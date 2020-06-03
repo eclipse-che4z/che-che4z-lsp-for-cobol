@@ -12,39 +12,38 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { SETTINGS_SECTION } from "../constants";
-import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
+import * as vscode from "vscode";
+import { SETTINGS_SECTION } from "../constants";
 
 export function initializeSettings() {
-    let configuration = vscode.workspace.getConfiguration(SETTINGS_SECTION);
-    let properties = Object.keys(vscode.workspace.getConfiguration().get(SETTINGS_SECTION));
+    const configuration = vscode.workspace.getConfiguration(SETTINGS_SECTION);
+    const properties = Object.keys(vscode.workspace.getConfiguration().get(SETTINGS_SECTION));
 
     if (properties.every(isUndefinedInWorkspace)) {
-        properties.forEach((property) => {
+        properties.forEach(property => {
             configuration.update(property, configuration.get(property), vscode.ConfigurationTarget.Workspace);
         });
     }
 }
 
-function isUndefinedInWorkspace(property: string, index: number, array: string[]): boolean {
-    return vscode.workspace.getConfiguration(SETTINGS_SECTION).inspect(property).workspaceValue == undefined;
+function isUndefinedInWorkspace(property: string): boolean {
+    return vscode.workspace.getConfiguration(SETTINGS_SECTION).inspect(property).workspaceValue === undefined;
 }
 
-
 /**
- * New file (e.g .gitignore) will be created or edited if exits, under project folder (e.g. workspace/.c4z) with given  pattern
- * 
- * @param path 
- * @param fileName 
- * @param pattern 
+ * New file (e.g .gitignore) will be created or edited if exits, under project folder
+ * (e.g. workspace/.c4z) with given  pattern
+ * @param folderPath
+ * @param fileName
+ * @param pattern
  */
 export function createFileWithGivenPath(folderPath: string, fileName: string, pattern: string): void {
 
     const ws = vscode.workspace.workspaceFolders[0];
     if (ws !== undefined) {
-        const ch4zPath = path.join(ws.uri.fsPath, folderPath);    
+        const ch4zPath = path.join(ws.uri.fsPath, folderPath);
         const filePath = path.join(ch4zPath, fileName);
         try {
             if (fs.existsSync(filePath)) {

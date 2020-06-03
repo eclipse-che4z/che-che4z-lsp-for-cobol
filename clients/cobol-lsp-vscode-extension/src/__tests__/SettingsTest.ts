@@ -33,7 +33,7 @@ beforeAll(() => {
 
 afterAll(() => {
     if (fs.existsSync(filePath)) {
-       fs.rmdirSync(wsPath, { recursive: true });
+        fs.remove(wsPath);
     }
 });
 
@@ -84,7 +84,7 @@ describe("Settings initialization tests", () => {
 
 describe(".gitignore file in .c4z folder tests", () => {
 
-    it ("Create .gitignore file if not exists", () => {
+    it("Create .gitignore file if not exists", () => {
         createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
         expect(fs.existsSync(wsPath)).toEqual(true);
@@ -92,7 +92,7 @@ describe(".gitignore file in .c4z folder tests", () => {
         expect(fs.existsSync(filePath)).toEqual(true);
     });
 
-    it ("Modify .gitignore file if exists", () => {
+    it("Modify .gitignore file if exists", () => {
         const pattern = "srs/*\n.sds/*";
         createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, pattern);
         const found = fs.readFileSync(filePath).toString().split("\n")
