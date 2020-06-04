@@ -32,7 +32,7 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-    if (fs.existsSync(filePath)) {
+    if (fs.existsSync(wsPath)) {
         fs.remove(wsPath);
     }
 });
