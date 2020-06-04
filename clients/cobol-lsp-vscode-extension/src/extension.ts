@@ -14,22 +14,21 @@
 
 import * as vscode from "vscode";
 
-import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
-import { editDatasetPaths } from "./commands/EditDatasetPaths";
-import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
-import { C4Z_FOLDER, GITIGNORE_FILE} from "./constants";
-import { LANGUAGE_ID, SETTINGS_SECTION } from "./constants";
-import { CopybookFix } from "./services/CopybookFix";
-import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
-import { CopybooksDownloader } from "./services/CopybooksDownloader";
-import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
-import { initializeSettings, createFileWithGivenPath } from "./services/Settings";
+import {changeDefaultZoweProfile} from "./commands/ChangeDefaultZoweProfile";
+import {editDatasetPaths} from "./commands/EditDatasetPaths";
+import {fetchCopybookCommand} from "./commands/FetchCopybookCommand";
+import {C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID, SETTINGS_SECTION} from "./constants";
+import {CopybookDownloadService} from "./services/CopybookDownloadService";
+import {CopybookFix} from "./services/CopybookFix";
+import {CopybooksCodeActionProvider} from "./services/CopybooksCodeActionProvider";
+import {CopybooksPathGenerator} from "./services/CopybooksPathGenerator";
 
 import {CopybookURI} from "./services/CopybookURI";
 import {LanguageClientService} from "./services/LanguageClientService";
 import {Middleware} from "./services/Middleware";
 import {PathsService} from "./services/PathsService";
 import {ProfileService} from "./services/ProfileService";
+import {createFileWithGivenPath, initializeSettings} from "./services/Settings";
 import {ZoweApi} from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -39,7 +38,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const profileService: ProfileService = new ProfileService(zoweApi);
     const copybookFix: CopybookFix = new CopybookFix();
     const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
-    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator);
+    const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService(copybookFix, zoweApi, profileService, copybooksPathGenerator);
     const pathsService: PathsService = new PathsService();
     const middleware: Middleware = new Middleware(copybooksPathGenerator, new CopybookURI(profileService, copyBooksDownloader));
     const languageClientService: LanguageClientService = new LanguageClientService(middleware);

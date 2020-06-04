@@ -30,7 +30,7 @@ import {ProfileService} from "./ProfileService";
 import {ZoweApi} from "./ZoweApi";
 import {Type, ZoweError} from "./ZoweError";
 
-export class CopybooksDownloader implements vscode.Disposable {
+export class CopybookDownloadService implements vscode.Disposable {
     private queue: DownloadQueue = new DownloadQueue();
 
     public constructor(

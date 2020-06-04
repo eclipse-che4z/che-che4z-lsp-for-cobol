@@ -17,7 +17,7 @@ import * as path from "path";
 import {URL} from "url";
 import * as vscode from "vscode";
 import {C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_LOCAL_KEY, PATHS_ZOWE, SETTINGS_SECTION} from "../constants";
-import {CopybooksDownloader} from "./CopybooksDownloader";
+import {CopybookDownloadService} from "./CopybookDownloadService";
 import {ProfileService} from "./ProfileService";
 import {CopybookResolver} from "./settings/CopybookResolver";
 import {LocalCopybookResolver} from "./settings/LocalCopybookResolver";
@@ -76,7 +76,7 @@ export class CopybookURI {
 
     }
 
-    constructor(private profileService: ProfileService, private copybooksDownloader: CopybooksDownloader) {
+    constructor(private profileService: ProfileService, private copybooksDownloader: CopybookDownloadService) {
     }
 
     /**

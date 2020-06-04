@@ -20,7 +20,7 @@ import {
     ConfigurationRequest,
     LanguageClient,
     LanguageClientOptions,
-    StreamInfo
+    StreamInfo,
 } from "vscode-languageclient";
 import {ConfigurationWorkspaceMiddleware} from "vscode-languageclient/lib/configuration";
 import {LANGUAGE_ID} from "../constants";
