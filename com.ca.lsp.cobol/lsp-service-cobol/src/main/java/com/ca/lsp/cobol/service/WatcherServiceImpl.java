@@ -18,6 +18,7 @@ package com.ca.lsp.cobol.service;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.Synchronized;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 
@@ -36,17 +37,19 @@ import static java.util.stream.Collectors.toList;
 @Singleton
 public class WatcherServiceImpl implements WatcherService {
 
-  /** Glob patterns to watch the copybooks folder and copybook files */
-  private static final String COPYBOOKS_FOLDER_GLOB = "**/.copybooks/**/*";
-
   /**
    * The kind of events of interest, for watchers calculated as WatchKind.Create | WatchKind.Change
    * | WatchKind.Delete which is 7
    */
   private static final int WATCH_ALL_KIND = 7;
 
+  /** Glob patterns to watch the copybooks folder and copybook files */
+  private static final String COPYBOOKS_FOLDER_GLOB = "**/.copybooks/**/*";
+
   private static final String WATCH_FILES = "workspace/didChangeWatchedFiles";
   private static final String WATCH_CONFIGURATION = "workspace/didChangeConfiguration";
+  private static final String CONFIGURATION_CHANGE_ID = "configurationChange";
+  private static final String PREDEFINED_FOLDER_WATCHER = "copybooksWatcher";
 
   private final List<String> folderWatchers = new ArrayList<>();
 
@@ -62,20 +65,24 @@ public class WatcherServiceImpl implements WatcherService {
     return unmodifiableList(folderWatchers);
   }
 
+  @Override
   public void watchConfigurationChange() {
-    register(singletonList(new Registration("configurationChange", WATCH_CONFIGURATION, null)));
+    register(singletonList(new Registration(CONFIGURATION_CHANGE_ID, WATCH_CONFIGURATION, null)));
   }
 
+  @Override
   public void watchPredefinedFolder() {
     register(
         singletonList(
             new Registration(
-                "copybooksWatcher",
+                PREDEFINED_FOLDER_WATCHER,
                 WATCH_FILES,
                 new DidChangeWatchedFilesRegistrationOptions(
                     singletonList(new FileSystemWatcher(COPYBOOKS_FOLDER_GLOB, WATCH_ALL_KIND))))));
   }
 
+  @Override
+  @Synchronized
   public void addWatchers(@Nonnull List<String> paths) {
     register(
         paths.stream()
@@ -86,24 +93,28 @@ public class WatcherServiceImpl implements WatcherService {
                       it,
                       WATCH_FILES,
                       new DidChangeWatchedFilesRegistrationOptions(
-                          singletonList(
-                              new FileSystemWatcher("**/" + it + "/**/*", WATCH_ALL_KIND))));
+                          singletonList(new FileSystemWatcher(toGlobPattern(it), WATCH_ALL_KIND))));
                 })
             .collect(toList()));
   }
 
   @Override
+  @Synchronized
   public void removeWatchers(@Nonnull List<String> paths) {
-    List<String> collect = paths.stream().filter(folderWatchers::remove).collect(toList());
-    if (!collect.isEmpty()) {
+    List<String> removedWatchers = paths.stream().filter(folderWatchers::remove).collect(toList());
+    if (!removedWatchers.isEmpty()) {
       clientProvider
           .get()
           .unregisterCapability(
               new UnregistrationParams(
-                  collect.stream()
+                  removedWatchers.stream()
                       .map(it -> new Unregistration(it, WATCH_FILES))
                       .collect(toList())));
     }
+  }
+
+  private String toGlobPattern(String it) {
+    return "**/" + it + "/**/*";
   }
 
   private void register(List<Registration> registrations) {
