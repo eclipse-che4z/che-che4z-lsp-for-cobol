@@ -67,7 +67,7 @@ export class ProfileService implements Disposable {
 
     async getProfile(programName?: string): Promise<string | undefined> {
         if (programName) {
-            const detectedProfile: string | undefined = (await this.findProfileByDependenciesFile(programName));
+            const detectedProfile: string | undefined = (await this.findProfileFromDocument(programName));
             if (detectedProfile) {
                 return detectedProfile;
             }
@@ -119,7 +119,7 @@ export class ProfileService implements Disposable {
         return ext === ".cbl" || ext === ".cob" || ext === ".cobol";
     }
 
-    private async findProfileByDependenciesFile(programName: string): Promise<string | undefined> {
+    private async findProfileFromDocument(programName: string): Promise<string | undefined> {
         for (const doc of vscode.workspace.textDocuments) {
             const docPath = doc.fileName;
             if (!this.isCobolProgram(docPath)) {

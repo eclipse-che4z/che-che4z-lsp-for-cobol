@@ -52,10 +52,6 @@
             {
                 "command": "broadcom-cobol-lsp.cpy-manager.edit-dataset-paths",
                 "title": "Edit dataset paths"
-            },
-            {
-                "command": "broadcom-cobol-lsp.cpy-manager.resolve-local-copybooks",
-                "title": "Resolve Local Copybooks"
             }
         ],
         "languages": [

@@ -13,10 +13,10 @@
  */
 
 import * as vscode from "vscode";
-import { CopybooksDownloader } from "../services/CopybooksDownloader";
-import { CopybooksPathGenerator } from "../services/CopybooksPathGenerator";
-import { CopybookProfile } from "../services/DownloadQueue";
-import { Type, ZoweError } from "../services/ZoweError";
+import {CopybookDownloadService} from "../services/CopybookDownloadService";
+import {CopybooksPathGenerator} from "../services/CopybooksPathGenerator";
+import {CopybookProfile} from "../services/DownloadQueue";
+import {Type, ZoweError} from "../services/ZoweError";
 
 // tslint:disable: no-unused-expression no-string-literal
 describe("Copybook downloader", () => {
@@ -26,43 +26,43 @@ describe("Copybook downloader", () => {
     const copybookProfile = new CopybookProfile("copybook", profile);
     const zoweGeneralError = new ZoweError("zowe error", Type.General);
     it("Can download copybook", async () => {
-/* WORK IN PROGRESS
-        const zoweApi: any = {
-            listZOSMFProfiles: jest.fn().mockReturnValue(["Something"]),
-        };
-        const profileService: any = {
-            getProfile: jest.fn().mockReturnValue(profile),
-        };
-        const cbd: CopybooksDownloader = new CopybooksDownloader(zoweApi, profileService);
-        const uri: any = {};
-        (cbd as any).listMissingCopybooks = () => ["COPYBVOOK"];
-        try {
-            await cbd.downloadDependencies(uri);
-            cbd.start();
-        } finally {
-            cbd.dispose();
-        }
+        /* WORK IN PROGRESS
+                const zoweApi: any = {
+                    listZOSMFProfiles: jest.fn().mockReturnValue(["Something"]),
+                };
+                const profileService: any = {
+                    getProfile: jest.fn().mockReturnValue(profile),
+                };
+                const cbd: CopybooksDownloader = new CopybooksDownloader(zoweApi, profileService);
+                const uri: any = {};
+                (cbd as any).listMissingCopybooks = () => ["COPYBVOOK"];
+                try {
+                    await cbd.downloadDependencies(uri);
+                    cbd.start();
+                } finally {
+                    cbd.dispose();
+                }
 
-        expect(zoweApi.listZOSMFProfiles).toBeCalled();
-*/
+                expect(zoweApi.listZOSMFProfiles).toBeCalled();
+        */
 
     });
     it("fetchCopybook rethrow ZoweError from zoweApi", async () => {
         const zoweApi: any = {
             listMembers: jest.fn().mockRejectedValue(zoweGeneralError),
         };
-        const cbd = new CopybooksDownloader(null, zoweApi, null, null);
+        const cbd = new CopybookDownloadService(null, zoweApi, null, null);
         expect((cbd as any).fetchCopybook(null, null)).rejects.toEqual(zoweGeneralError);
     });
     it("handleCopybook rethrow ZoweError from zoweApi", async () => {
         const zoweApi: any = {
             listMembers: jest.fn().mockRejectedValue(zoweGeneralError),
         };
-        const cbd = new CopybooksDownloader(null, zoweApi, null, null);
+        const cbd = new CopybookDownloadService(null, zoweApi, null, null);
         expect((cbd as any).handleCopybook(null, null, null)).rejects.toEqual(zoweGeneralError);
     });
     it("handleDataset rethow non NotFound ZoweErrors", async () => {
-        const cbd = new CopybooksDownloader(null, null, null, null);
+        const cbd = new CopybookDownloadService(null, null, null, null);
         (cbd as any).handleCopybook = jest.fn().mockRejectedValue(zoweGeneralError);
         const toDownload = [copybookProfile];
         const progress = {report: jest.fn()};
@@ -70,7 +70,7 @@ describe("Copybook downloader", () => {
     });
     it("handleDataset show an error if copybook is not found", async () => {
         const zoweError = new ZoweError("not found", Type.NotFound);
-        const cbd = new CopybooksDownloader(null, null, null, null);
+        const cbd = new CopybookDownloadService(null, null, null, null);
         (cbd as any).handleCopybook = jest.fn().mockRejectedValue(zoweError);
         const toDownload = [copybookProfile];
         const progress = {report: jest.fn()};
@@ -80,7 +80,7 @@ describe("Copybook downloader", () => {
     });
     it("handleDataset show an error for non ZoweError", async () => {
         const errorMessage = "The error";
-        const cbd = new CopybooksDownloader(null, null, null, null);
+        const cbd = new CopybookDownloadService(null, null, null, null);
         (cbd as any).handleCopybook = jest.fn().mockRejectedValue(new Error(errorMessage));
         const toDownload = [copybookProfile];
         const progress = {report: jest.fn()};
@@ -92,7 +92,7 @@ describe("Copybook downloader", () => {
         const errorMessage = "The error";
         const pathGenerator = new CopybooksPathGenerator(null);
         pathGenerator.listDatasets = jest.fn().mockResolvedValue(["dataset"]);
-        const cbd = new CopybooksDownloader(null, null, null, pathGenerator);
+        const cbd = new CopybookDownloadService(null, null, null, pathGenerator);
         (cbd as any).handleDataset = jest.fn().mockRejectedValue(new Error(errorMessage));
         vscode.window.showErrorMessage = jest.fn();
         await (cbd as any).handleQueue(copybookProfile, new Set(), null);
@@ -101,7 +101,7 @@ describe("Copybook downloader", () => {
     it("handleQueue handle Invalid credentials ZoweError", async () => {
         const pathGenerator = new CopybooksPathGenerator(null);
         pathGenerator.listDatasets = jest.fn().mockResolvedValue(["dataset"]);
-        const cbd = new CopybooksDownloader(null, null, null, pathGenerator);
+        const cbd = new CopybookDownloadService(null, null, null, pathGenerator);
         (cbd as any).handleDataset = jest.fn().mockRejectedValue(new ZoweError("", Type.InvalidCredentials));
         vscode.window.showErrorMessage = jest.fn();
         await (cbd as any).handleQueue(copybookProfile, new Set(), null);
@@ -111,7 +111,7 @@ describe("Copybook downloader", () => {
     it("handleQueue handle Connection refused ZoweError", async () => {
         const pathGenerator = new CopybooksPathGenerator(null);
         pathGenerator.listDatasets = jest.fn().mockResolvedValue(["dataset"]);
-        const cbd = new CopybooksDownloader(null, null, null, pathGenerator);
+        const cbd = new CopybookDownloadService(null, null, null, pathGenerator);
         (cbd as any).handleDataset = jest.fn().mockRejectedValue(new ZoweError("", Type.ConnRefused));
         vscode.window.showErrorMessage = jest.fn();
         await (cbd as any).handleQueue(copybookProfile, new Set(), null);
@@ -121,7 +121,7 @@ describe("Copybook downloader", () => {
     it("handleQueue handle No password ZoweError", async () => {
         const pathGenerator = new CopybooksPathGenerator(null);
         pathGenerator.listDatasets = jest.fn().mockResolvedValue(["dataset"]);
-        const cbd = new CopybooksDownloader(null, null, null, pathGenerator);
+        const cbd = new CopybookDownloadService(null, null, null, pathGenerator);
         (cbd as any).handleDataset = jest.fn().mockRejectedValue(new ZoweError("", Type.NoPassword));
         vscode.window.showErrorMessage = jest.fn();
         await (cbd as any).handleQueue(copybookProfile, new Set(), null);

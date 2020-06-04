@@ -14,7 +14,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import {PATHS_LOCAL_KEY, SETTINGS_SECTION } from "../constants";
+import {PATHS_LOCAL_KEY, SETTINGS_SECTION} from "../constants";
 import {LocalCopybookResolver} from "../services/settings/LocalCopybookResolver";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
 
@@ -67,7 +67,7 @@ describe("validate bad path resource", () => {
     });
 
     test("an array of paths defined where an item is '*' is not resolved within an heterogeneous array and is excluded from the result", () => {
-       assertResourceContent([FILENAME, STAR_LOCATION], 1);
+        assertResourceContent([FILENAME, STAR_LOCATION], 1);
     });
 
     test("an empty array of paths is resolved in an empty array returned", () => {
@@ -133,7 +133,7 @@ function assertParseOf(value: any, expectedSizeList: number) {
     expect(resolveCopybooksFromJSON(JSON.stringify(value)).length).toBe(expectedSizeList);
 }
 
-function assertResourceContent(list: string[], expectedSizeList: number ) {
+function assertResourceContent(list: string[], expectedSizeList: number) {
     expect(settingsParser.resolve(list).length).toBe(expectedSizeList);
 }
 

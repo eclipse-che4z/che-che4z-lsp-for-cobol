@@ -14,36 +14,37 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import * as path from "path";
-import { loadDepFile, DependenciesDesc } from "./DependencyService";
-import { C4Z_FOLDER, DEPENDENCIES_FOLDER, PROCESS_DOWNLOAD_ERROR_MSG, DSN_NOT_FOUND_ERROR_MSG, INVALID_CREDENTIALS_ERROR_MSG, DSN_PLACEHOLDER, PROFILE_NAME_PLACEHOLDER, CONN_REFUSED_ERROR_MSG, NO_PASSWORD_ERROR_MSG } from "../constants";
-import { CopybookFix } from "./CopybookFix";
-import { CopybooksPathGenerator, createDatasetPath, createCopybookPath, checkWorkspace } from "./CopybooksPathGenerator";
-import { CopybookProfile, DownloadQueue } from "./DownloadQueue";
-import { ProfileService } from "./ProfileService";
-import { ZoweApi } from "./ZoweApi";
-import { Type, ZoweError } from "./ZoweError";
+import {
+    CONN_REFUSED_ERROR_MSG,
+    DSN_NOT_FOUND_ERROR_MSG,
+    DSN_PLACEHOLDER,
+    INVALID_CREDENTIALS_ERROR_MSG,
+    NO_PASSWORD_ERROR_MSG,
+    PROCESS_DOWNLOAD_ERROR_MSG,
+    PROFILE_NAME_PLACEHOLDER,
+} from "../constants";
+import {CopybookFix} from "./CopybookFix";
+import {checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath} from "./CopybooksPathGenerator";
+import {CopybookProfile, DownloadQueue} from "./DownloadQueue";
+import {ProfileService} from "./ProfileService";
+import {ZoweApi} from "./ZoweApi";
+import {Type, ZoweError} from "./ZoweError";
 
-export class CopybooksDownloader implements vscode.Disposable {
+export class CopybookDownloadService implements vscode.Disposable {
     private queue: DownloadQueue = new DownloadQueue();
 
     public constructor(
         private resolver: CopybookFix,
         private zoweApi: ZoweApi,
         private profileService: ProfileService,
-        private pathGenerator: CopybooksPathGenerator) { }
-
-    public async redownloadDependencies(message: string = "Redownload dependencies requested.") {
-        (await vscode.workspace.findFiles(C4Z_FOLDER+ "/" + DEPENDENCIES_FOLDER + "/**/*.dep")).forEach(dep => {
-            this.downloadDependencies(dep, message);
-        });
+        private pathGenerator: CopybooksPathGenerator) {
     }
 
     /**
      * @param copybooks array of copybooks names to download
+     * @param programName analyzed COBOL file
      */
     async downloadCopybooks(copybooks: string[], programName: string): Promise<void> {
-        // TODO do it right
         const profile: string = await this.profileService.getProfile(programName);
         if (!profile) {
             return;
@@ -51,26 +52,15 @@ export class CopybooksDownloader implements vscode.Disposable {
         copybooks.forEach(copybook => this.queue.push(copybook, profile));
     }
 
-    public async downloadDependencies(depFileUri: vscode.Uri, message: string = ""): Promise<void> {
+    public async downloadDependency(cobolFileName: string, copybookName: string): Promise<void> {
         if (!checkWorkspace()) {
             return;
         }
-        const depDesc: DependenciesDesc = loadDepFile(depFileUri);
-        const profile: string = await this.profileService.getProfile(depDesc.programName);
+        const profile: string = await this.profileService.getProfile(cobolFileName);
         if (!profile) {
             return;
         }
-
-        const missingCopybooks: string[] = await this.listMissingCopybooks(depDesc.copybooks, profile);
-
-        if (!message.length) {
-            missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
-        } else if (missingCopybooks.length > 0) {
-            this.resolver.fixMissingDownloads(message, missingCopybooks, profile, {
-                hasPaths: (await this.pathGenerator.listDatasets()).length > 0,
-                hasProfiles: Object.keys(await this.profileService.listProfiles()).length > 1,
-            });
-        }
+        this.resolver.downloadMissingCopybooks([copybookName], profile);
 
     }
 
@@ -104,9 +94,9 @@ export class CopybooksDownloader implements vscode.Disposable {
     }
 
     private async handleQueue(
-            element: CopybookProfile,
-            errors: Set<string>,
-            progress: vscode.Progress<{ message?: string; increment?: number }>) {
+        element: CopybookProfile,
+        errors: Set<string>,
+        progress: vscode.Progress<{ message?: string; increment?: number }>) {
         const toDownload: CopybookProfile[] = [element];
         while (this.queue.length > 0) {
             toDownload.push(await this.queue.pop());
@@ -138,10 +128,10 @@ export class CopybooksDownloader implements vscode.Disposable {
     }
 
     private async handleDataset(
-            dataset: string,
-            toDownload: CopybookProfile[],
-            errors: Set<string>,
-            progress: vscode.Progress<{ message?: string; increment?: number }>) {
+        dataset: string,
+        toDownload: CopybookProfile[],
+        errors: Set<string>,
+        progress: vscode.Progress<{ message?: string; increment?: number }>) {
         try {
             progress.report({
                 message: "Looking in " + dataset + ". " + toDownload.length +
@@ -199,21 +189,8 @@ export class CopybooksDownloader implements vscode.Disposable {
         const copybookPath = createCopybookPath(profileName, dataset, copybook);
         if (!fs.existsSync(copybookPath)) {
             const content = await this.zoweApi.fetchMember(dataset, copybook, profileName);
-            fs.mkdirSync(createDatasetPath(profileName, dataset), { recursive: true });
+            fs.mkdirSync(createDatasetPath(profileName, dataset), {recursive: true});
             fs.writeFileSync(copybookPath, content);
         }
-    }
-
-    private async listMissingCopybooks(copybooks: string[], profileName: string): Promise<string[]> {
-        const copybooksToDownload: Set<string> = new Set(copybooks);
-        (await this.pathGenerator.listDatasets()).forEach(ds => {
-            Array.from(copybooksToDownload.values()).forEach(c => {
-                if (fs.existsSync(createCopybookPath(profileName, ds, c))) {
-                    copybooksToDownload.delete(c);
-                }
-            });
-        });
-
-        return Array.from(copybooksToDownload.values());
     }
 }

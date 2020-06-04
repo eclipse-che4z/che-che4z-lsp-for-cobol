@@ -13,12 +13,12 @@
  */
 import * as path from "path";
 import * as vscode from "vscode";
-import { ProfileService } from "./ProfileService";
-import { ProfilesMap, ZoweApi } from "./ZoweApi";
+import {ProfileService} from "./ProfileService";
 
 export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
 
-    constructor(private profileService: ProfileService) { }
+    constructor(private profileService: ProfileService) {
+    }
 
     public async provideCodeActions(doc: vscode.TextDocument,
                                     range: vscode.Range | vscode.Selection,
@@ -28,12 +28,6 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
         if (!this.shouldHaveCodeAction(context)) {
             return [];
         }
-        const fetchCopybook = new vscode.CodeAction("Fetch copybook", vscode.CodeActionKind.QuickFix);
-        fetchCopybook.command = {
-            arguments: [this.extractCopybookName(context), this.extractProgramName(doc)],
-            command: "broadcom-cobol-lsp.cpy-manager.fetch-copybook",
-            title: "Fetch copybook",
-        };
 
         const datasetPaths = new vscode.CodeAction("Edit copybook datasets list", vscode.CodeActionKind.QuickFix);
         datasetPaths.command = {
@@ -48,18 +42,20 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
         };
 
         if (await this.profileService.checkMultipleProfiles()) {
-            return [fetchCopybook, datasetPaths, changeProfile];
+            return [datasetPaths, changeProfile];
         }
-        return [fetchCopybook, datasetPaths];
+        return [datasetPaths];
     }
 
     private extractCopybookName(context: vscode.CodeActionContext) {
         const msg = context.diagnostics[0].message;
         return msg.substring(0, msg.indexOf(":"));
     }
+
     private extractProgramName(doc: vscode.TextDocument) {
         return path.basename(doc.fileName, path.extname(doc.fileName));
     }
+
     private shouldHaveCodeAction(context: vscode.CodeActionContext): boolean {
         if (!context.diagnostics || context.diagnostics.length < 1) {
             return false;
