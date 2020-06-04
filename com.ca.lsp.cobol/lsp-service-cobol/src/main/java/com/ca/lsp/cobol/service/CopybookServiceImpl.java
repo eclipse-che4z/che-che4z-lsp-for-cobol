@@ -33,6 +33,7 @@ import java.util.function.Consumer;
 
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.REQUIRED_COPYBOOK_EVENT;
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK;
 import static java.util.Optional.ofNullable;
 
 /** This service processes copybook requests and returns content by its name */
@@ -44,11 +45,11 @@ public class CopybookServiceImpl implements CopybookService {
   private final SettingsService settingsService;
   private final FileSystemService files;
 
-  private final Map<String, Path> copybookPath = new ConcurrentHashMap<>(8, 0.9f, 1);
+  private final Map<String, Path> copybookPaths = new ConcurrentHashMap<>(8, 0.9f, 1);
 
   @Inject
   public CopybookServiceImpl(
-          DataBusBroker dataBus, SettingsService settingsService, FileSystemService files) {
+      DataBusBroker dataBus, SettingsService settingsService, FileSystemService files) {
     this.dataBus = dataBus;
     this.settingsService = settingsService;
     this.files = files;
@@ -58,7 +59,7 @@ public class CopybookServiceImpl implements CopybookService {
 
   @Override
   public void invalidateURICache() {
-    copybookPath.clear();
+    copybookPaths.clear();
   }
 
   /**
@@ -78,19 +79,19 @@ public class CopybookServiceImpl implements CopybookService {
   public void observerCallback(RequiredCopybookEvent event) {
     String requiredCopybookName = event.getName();
 
-    if (copybookPath.containsKey(requiredCopybookName)) {
-      Path file = copybookPath.get(requiredCopybookName);
+    if (copybookPaths.containsKey(requiredCopybookName)) {
+      Path file = copybookPaths.get(requiredCopybookName);
       if (files.fileExists(file)) {
         sendResponse(requiredCopybookName, files.getContentByPath(file), file);
         return;
       } else {
-        copybookPath.remove(requiredCopybookName);
+        copybookPaths.remove(requiredCopybookName);
       }
     }
     if (DID_OPEN.name().equals(event.getTextDocumentSyncType())) {
       String cobolFileName = files.getNameFromURI(event.getDocumentUri());
       settingsService
-          .getConfiguration("copybook", cobolFileName, requiredCopybookName)
+          .getConfiguration(COPYBOOK.label, cobolFileName, requiredCopybookName)
           .thenAccept(sendResponse(requiredCopybookName));
     } else {
       sendResponse(requiredCopybookName, null, null);
@@ -118,7 +119,7 @@ public class CopybookServiceImpl implements CopybookService {
     if (file == null) {
       return FetchedCopybookEvent.builder().name(requiredCopybookName).build();
     }
-    copybookPath.put(requiredCopybookName, file);
+    copybookPaths.put(requiredCopybookName, file);
 
     return FetchedCopybookEvent.builder()
         .name(requiredCopybookName)
