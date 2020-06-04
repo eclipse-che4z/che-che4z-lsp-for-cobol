@@ -103,7 +103,7 @@ public class WorkspaceServiceTest {
   @Test
   public void testChangeConfigurationNewPath() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
-    SettingsService settingsService = mock(SettingsService.class);
+    SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
     CopybookService copybookService = mock(CopybookService.class);
 
@@ -117,6 +117,7 @@ public class WorkspaceServiceTest {
 
     when(settingsService.getConfiguration(LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.toStrings(any())).thenCallRealMethod();
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
@@ -134,7 +135,7 @@ public class WorkspaceServiceTest {
   @Test
   public void testChangeConfigurationNoChangesInPaths() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
-    SettingsService settingsService = mock(SettingsService.class);
+    SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
     CopybookService copybookService = mock(CopybookService.class);
 
@@ -147,6 +148,7 @@ public class WorkspaceServiceTest {
 
     when(settingsService.getConfiguration(LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.toStrings(any())).thenCallRealMethod();
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
@@ -172,7 +174,8 @@ public class WorkspaceServiceTest {
     String path = "foo/bar";
     arr.add(new JsonPrimitive(path));
 
-    when(settingsService.getConfiguration(LOCAL_PATHS.label)).thenReturn(completedFuture(emptyList()));
+    when(settingsService.getConfiguration(LOCAL_PATHS.label))
+        .thenReturn(completedFuture(emptyList()));
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
@@ -196,7 +199,8 @@ public class WorkspaceServiceTest {
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService);
 
-    when(settingsService.getConfiguration(LOCAL_PATHS.label)).thenReturn(completedFuture(emptyList()));
+    when(settingsService.getConfiguration(LOCAL_PATHS.label))
+        .thenReturn(completedFuture(emptyList()));
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));

@@ -17,9 +17,6 @@ package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
-import com.google.common.collect.Streams;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -100,7 +97,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
     settingsService
         .getConfiguration(LOCAL_PATHS.label)
-        .thenAccept(it -> acceptSettingsChange(toStrings(it)));
+        .thenAccept(it -> acceptSettingsChange(settingsService.toStrings(it)));
   }
 
   private void acceptSettingsChange(List<String> localFolders) {
@@ -117,14 +114,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
 
     watchingService.removeWatchers(
         existingPaths.stream().filter(it -> !newPaths.contains(it)).collect(toList()));
-  }
-
-  private List<String> toStrings(List<Object> it) {
-    return it.stream()
-        .map(obj -> (JsonArray) obj)
-        .flatMap(Streams::stream)
-        .map(JsonElement::getAsString)
-        .collect(toList());
   }
 
   /**

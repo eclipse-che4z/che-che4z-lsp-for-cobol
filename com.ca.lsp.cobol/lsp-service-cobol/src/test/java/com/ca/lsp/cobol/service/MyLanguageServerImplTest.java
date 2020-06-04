@@ -42,7 +42,7 @@ public class MyLanguageServerImplTest {
    */
   @Test
   public void initialized() {
-    SettingsService settingsService = mock(SettingsService.class);
+    SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
 
     JsonArray arr = new JsonArray();
@@ -51,6 +51,7 @@ public class MyLanguageServerImplTest {
 
     when(settingsService.getConfiguration(LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.toStrings(any())).thenCallRealMethod();
 
     MyLanguageServerImpl server =
         new MyLanguageServerImpl(null, null, watchingService, settingsService);

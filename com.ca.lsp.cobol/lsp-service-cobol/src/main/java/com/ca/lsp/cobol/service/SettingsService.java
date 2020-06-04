@@ -19,17 +19,25 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Provide API definition to fetch configuration settings from the client.
- * Works via LSP workspace/configuration request.
+ * Provide API definition to fetch configuration settings from the client. Works via LSP
+ * workspace/configuration request.
  */
 public interface SettingsService {
   /**
-   * Fetch the required configuration section from the client.
-   * Note that Scope URI is null.
-   * The {@link com.ca.lsp.cobol.service.utils.SettingsParametersEnum#LSP_PREFIX LSP prefix} will
-   * be added to specified section.
+   * Fetch the required configuration section from the client. Note that Scope URI is null. The
+   * {@link com.ca.lsp.cobol.service.utils.SettingsParametersEnum#LSP_PREFIX LSP prefix} will be
+   * added to specified section.
+   *
    * @param section the required section.
    * @return a list of one configuration object.
    */
   CompletableFuture<List<Object>> getConfiguration(String... section);
+
+  /**
+   * Convert JSON objects in configuration response to strings.
+   *
+   * @param objects - content of the client settings response
+   * @return objects converted to strings
+   */
+  List<String> toStrings(List<Object> objects);
 }

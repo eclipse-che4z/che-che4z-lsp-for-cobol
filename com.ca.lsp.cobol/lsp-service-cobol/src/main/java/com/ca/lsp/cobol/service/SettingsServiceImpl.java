@@ -15,6 +15,9 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.google.common.collect.Streams;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -23,6 +26,7 @@ import org.eclipse.lsp4j.ConfigurationItem;
 import org.eclipse.lsp4j.ConfigurationParams;
 import org.eclipse.lsp4j.services.LanguageClient;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
@@ -30,10 +34,9 @@ import java.util.concurrent.CompletableFuture;
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 
-/**
- * This service fetch configuration settings from the client.
- */
+/** This service fetch configuration settings from the client. */
 @Slf4j
 @Singleton
 public class SettingsServiceImpl implements SettingsService {
@@ -44,8 +47,9 @@ public class SettingsServiceImpl implements SettingsService {
     this.clientProvider = clientProvider;
   }
 
+  @Nonnull
   @Override
-  public CompletableFuture<List<Object>> getConfiguration(String... param) {
+  public CompletableFuture<List<Object>> getConfiguration(@Nonnull String... param) {
     ConfigurationItem item = new ConfigurationItem();
     item.setSection(buildRequestParam(param));
     item.setScopeUri(null);
@@ -53,7 +57,18 @@ public class SettingsServiceImpl implements SettingsService {
     return clientProvider.get().configuration(new ConfigurationParams(singletonList(item)));
   }
 
-  private String buildRequestParam(String[] param) {
+  @Nonnull
+  @Override
+  public List<String> toStrings(@Nonnull List<Object> objects) {
+    return objects.stream()
+        .map(obj -> (JsonArray) obj)
+        .flatMap(Streams::stream)
+        .map(JsonElement::getAsString)
+        .collect(toList());
+  }
+
+  @Nonnull
+  private String buildRequestParam(@Nonnull String[] param) {
     StringJoiner joiner = new StringJoiner(".");
     joiner.add(LSP_PREFIX.label);
     asList(param).forEach(joiner::add);
