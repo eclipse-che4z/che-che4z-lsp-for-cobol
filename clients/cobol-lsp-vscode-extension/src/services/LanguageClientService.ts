@@ -15,11 +15,17 @@
 import * as fs from "fs";
 import * as net from "net";
 import * as vscode from "vscode";
-import { LanguageClient, LanguageClientOptions, StreamInfo, ConfigurationRequest, ConfigurationParams} from "vscode-languageclient";
-import { ConfigurationWorkspaceMiddleware } from "vscode-languageclient/lib/configuration";
-import { LANGUAGE_ID } from "../constants";
-import { JavaCheck } from "./JavaCheck";
-import { Middleware } from "./Middleware";
+import {
+    ConfigurationParams,
+    ConfigurationRequest,
+    LanguageClient,
+    LanguageClientOptions,
+    StreamInfo
+} from "vscode-languageclient";
+import {ConfigurationWorkspaceMiddleware} from "vscode-languageclient/lib/configuration";
+import {LANGUAGE_ID} from "../constants";
+import {JavaCheck} from "./JavaCheck";
+import {Middleware} from "./Middleware";
 
 export class LanguageClientService {
     private readonly jarPath: string;
@@ -28,12 +34,14 @@ export class LanguageClientService {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
         this.jarPath = `${ext.extensionPath}/server/lsp-service-cobol-${ext.packageJSON.version}.jar`;
     }
+
     public async checkPrerequisites(): Promise<void> {
         await new JavaCheck().isJavaInstalled();
         if (!this.getLspPort() && !fs.existsSync(this.jarPath)) {
             throw new Error("LSP server for " + LANGUAGE_ID + " not found");
         }
     }
+
     public start(): vscode.Disposable {
         const languageClient = new LanguageClient(LANGUAGE_ID,
             "LSP extension for " + LANGUAGE_ID + " language",
@@ -51,7 +59,7 @@ export class LanguageClientService {
             params: ConfigurationParams,
             token: vscode.CancellationToken,
             next: ConfigurationRequest.HandlerSignature) => {
-                return await this.middleware.handleConfigurationRequest(params, token, next);
+            return await this.middleware.handleConfigurationRequest(params, token, next);
         };
         const configurationMiddleware: ConfigurationWorkspaceMiddleware = {
             configuration: signatureFunc,
@@ -59,10 +67,9 @@ export class LanguageClientService {
 
         return {
             documentSelector: [LANGUAGE_ID],
-            middleware: { workspace: configurationMiddleware },
+            middleware: {workspace: configurationMiddleware},
         };
     }
-
 
     private createServerOptions(jarPath: string) {
         const port = this.getLspPort();
@@ -84,7 +91,7 @@ export class LanguageClientService {
         return {
             args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
             command: "java",
-            options: { stdio: "pipe", detached: false },
+            options: {stdio: "pipe", detached: false},
         };
     }
 }
