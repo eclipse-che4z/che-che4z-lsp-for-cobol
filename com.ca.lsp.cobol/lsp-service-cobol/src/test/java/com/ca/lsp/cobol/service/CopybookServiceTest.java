@@ -31,6 +31,7 @@ import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static java.util.Collections.singletonList;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static org.mockito.Mockito.*;
 
@@ -278,5 +279,27 @@ public class CopybookServiceTest {
     verify(files, times(2)).getContentByPath(cpyPath);
     verify(files, times(2)).getNameFromURI(DOCUMENT_URI);
     verify(files, times(2)).getPathFromURI(VALID_CPY_URI);
+  }
+
+  /**
+   * Test {@link CopybookService} responds even if the {@link SettingsService} return invalid result
+   */
+  @Test
+  public void testServiceRespondsIfClientSendsInvalidResult() {
+    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
+    verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
+
+    when(settingsService.getConfiguration(any())).thenReturn(completedFuture(null));
+    copybookService.observerCallback(
+        RequiredCopybookEvent.builder()
+            .name(VALID_CPY_NAME)
+            .documentUri(DOCUMENT_URI)
+            .textDocumentSyncType(DID_OPEN.name())
+            .build());
+
+    verify(broker, timeout(10000).times(1))
+        .postData(FetchedCopybookEvent.builder().name(VALID_CPY_NAME).build());
+
+    verify(files, times(1)).getNameFromURI(DOCUMENT_URI);
   }
 }

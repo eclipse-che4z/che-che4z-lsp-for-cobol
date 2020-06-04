@@ -133,6 +133,10 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private String retrieveURI(List<Object> result) {
-    return result.isEmpty() ? "" : ((JsonPrimitive) result.get(0)).getAsString();
+    if (result == null || result.isEmpty()) return "";
+    Object obj = result.get(0);
+    if (!(obj instanceof JsonPrimitive)) return "";
+
+    return ((JsonPrimitive) obj).getAsString();
   }
 }
