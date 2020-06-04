@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as fs from "fs";
+import {readdirSync} from "fs";
 import * as path from "path";
 import {URL} from "url";
 import * as vscode from "vscode";
@@ -62,14 +63,17 @@ export class CopybookURI {
     private static getURIFrom(folder: string, copybookName: string, extensions?: string[]): URL {
         if (!extensions) {
             return new URL(path.join(folder, copybookName));
-        } else {
-            for (const extension of extensions) {
-                const uri = new URL(path.join(folder, copybookName + "." + extension));
-                if (fs.existsSync(uri)) {
-                    return uri;
-                }
+        }
+
+        const fileList = readdirSync(new URL(folder));
+
+        for (const extension of extensions) {
+            const copybookFileWithExtension = copybookName + "." + extension;
+            if (fileList.find(filename => filename === copybookFileWithExtension)) {
+                return new URL(path.join(folder, copybookFileWithExtension));
             }
         }
+
     }
 
     constructor(private profileService: ProfileService, private copybooksDownloader: CopybooksDownloader) {
@@ -79,7 +83,7 @@ export class CopybookURI {
      * This function will try to resolve a given copybook name applying a two-step search strategy:
      * - search it on folders provided by the user in the setting.json
      * - search in the folder where the extension download copybooks from MF (.copybooks)
-     * If is not found in the previous steps than the user is notified and needs to download it from MF
+     * If it's not found in the previous steps than the user is notified and needs to download it from MF
      * or update the setting.json with an additional folder on the workspace where to search this missed copybook.
      * @param copybookName Name of the required copybook
      * @param cobolProgramName name of the cobol file opened in the IDE

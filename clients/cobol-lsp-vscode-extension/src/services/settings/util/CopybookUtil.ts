@@ -13,7 +13,7 @@
  */
 export class CopybookUtil {
     public static getValidCopybookExtensionList() {
-        return ["cpy"];
+        return ["cpy", "CPY", "Cpy"];
     }
 
 }
