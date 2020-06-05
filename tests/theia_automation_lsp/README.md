@@ -83,7 +83,7 @@ Automate functional tests running on Theia with Selenium Explorer in z/OS, Explo
 	
 10) Prepare the Theia environment for test suites
 
-:warning: **Warning**:
+:information_source: **Note**:
 
 - In order to run the LSP COBOL LOCAL test suite, open a workspace in Theia, and put the test COBOL files in the root folder of that opened workspace.
  
@@ -104,7 +104,7 @@ After Theia is established and running with the z/OS explorer plugin, run the fo
        <code>venv3_x64/bin/python3 -m robot --outputdir ../robot_output --debugfile debug.txt robot_suites</code>
 
 * * *
-:information_source: **Note**:
+:warning: **Warning**:
 
 - The log and output xml file contain MF credential information. You might wish to remove this information before sharing your logs.
 
