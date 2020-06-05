@@ -15,6 +15,7 @@ package com.ca.lsp.core.cobol;
 
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImpl;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
 public abstract class AbstractCobolLinePreprocessorTest {
 
   protected ResultWithErrors<List<CobolLine>> processText(String text) {
-    CobolLineReaderImpl reader = new CobolLineReaderImpl();
+    CobolLineReader reader = new CobolLineReaderImpl();
     return reader.processLines(null, text);
   }
 

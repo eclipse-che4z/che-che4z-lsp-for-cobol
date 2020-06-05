@@ -17,12 +17,13 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.service.delegates.communications.ServerCommunications;
+import com.ca.lsp.cobol.service.utils.FileSystemService;
+import com.ca.lsp.cobol.service.utils.WorkspaceFileService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyz
 import static java.util.Optional.ofNullable;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * This test verifies that all the responses from server escaped from line breaks to prevent
@@ -54,9 +55,12 @@ public class TestResponsesNotContainLineBreaks {
 
   @Test
   public void test() {
-    LanguageClient client = Mockito.mock(LanguageClient.class);
+    LanguageClient client = mock(LanguageClient.class);
     ArgumentCaptor<PublishDiagnosticsParams> captor = forClass(PublishDiagnosticsParams.class);
-    ServerCommunications communications = new ServerCommunications(() -> client);
+    FileSystemService files = mock(WorkspaceFileService.class);
+    when(files.decodeURI(anyString())).thenCallRealMethod();
+
+    ServerCommunications communications = new ServerCommunications(() -> client, files);
 
     communications.publishDiagnostics(DOCUMENT_URI, analyzeForErrors(TEXT));
 

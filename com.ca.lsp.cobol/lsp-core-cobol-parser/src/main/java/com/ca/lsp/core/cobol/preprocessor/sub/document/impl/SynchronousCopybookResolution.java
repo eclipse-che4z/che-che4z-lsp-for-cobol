@@ -19,7 +19,6 @@ import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
-import com.broadcom.lsp.domain.cobol.event.model.CopybookDepEvent;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.core.cobol.model.CopybookModel;
@@ -72,12 +71,6 @@ public class SynchronousCopybookResolution
   public CopybookModel resolve(
       @Nonnull String copybookName, @Nonnull String documentUri, @Nonnull String syncType) {
     checkState();
-    broker.postData(
-        CopybookDepEvent.builder()
-            .copybookName(copybookName)
-            .documentUri(documentUri)
-            .textDocumentSync(syncType)
-            .build());
 
     if (isCopybookInCache(copybookName)) {
       broker.unSubscribe(this);

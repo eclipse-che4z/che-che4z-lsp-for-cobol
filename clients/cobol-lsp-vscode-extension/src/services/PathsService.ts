@@ -13,7 +13,15 @@
  */
 
 import * as vscode from "vscode";
-import {PATHS_ZOWE, SETTINGS_SECTION} from "../constants";
+import {
+    DSN_CONTAINS_PROHIBITED_CHAR,
+    DSN_MUSTBE_NOT_EMPTY,
+    DSN_NOMORE_8CHARS,
+    DSN_START_PROHIBITED_CHAR,
+    PATHS_ZOWE,
+    SEGMENT_PLACEHOLDER,
+    SETTINGS_SECTION
+} from "../constants";
 
 export class PathsService {
 
@@ -49,19 +57,20 @@ function validateDatasetName(inputValue: string): string | undefined {
     const segmentHlqSegmentRegex = new RegExp("^([@#$A-Za-z0-9-]{1,8})$");
     for (const segment of nameSegments) {
         if (segment.length === 0) {
-            return "Dataset name segment must not be empty.";
+            return DSN_MUSTBE_NOT_EMPTY;
         }
 
         if (segment.length > 8) {
-            return "Dataset name segment can't be more than 8 characters.";
+            return DSN_NOMORE_8CHARS;
         }
 
         if (!segmentHlqFirstCharRegex.test(segment.charAt(0))) {
-            return `Dataset name segment: ${segment} starts with a prohibited character.`;
+
+            return DSN_START_PROHIBITED_CHAR.replace(SEGMENT_PLACEHOLDER, segment);
         }
 
         if (!segmentHlqSegmentRegex.test(segment)) {
-            return `Dataset name segment: ${segment} contains a prohibited character.`;
+            return DSN_CONTAINS_PROHIBITED_CHAR.replace(SEGMENT_PLACEHOLDER, segment);
         }
     }
     return undefined;
