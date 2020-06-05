@@ -20,12 +20,11 @@ export class CopybookFix {
 
     /**
      * This method add in the download queue the copybooks that weren't found locally.
-     * @param missingCopybooks list of copybooks not found by the server and not found by
-     * {@link CopybookURI#resolveCopybookURI}
+     * @param missingCopybooks list of copybooks not found
      * @param profile represent a name of a folder within the .copybooks folder that have the same name as the
      * connection name needed to download copybooks from mainframe.
      */
-    public async downloadMissingCopybooks(missingCopybooks: string[], profile: string) {
+    public async addCopybookInQueue(missingCopybooks: string[], profile: string) {
         missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
     }
 
