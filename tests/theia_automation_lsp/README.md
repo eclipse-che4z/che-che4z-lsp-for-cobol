@@ -31,13 +31,13 @@ Automate functional tests running on Theia with Selenium Explorer in z/OS, Explo
          
       Windows:
 
-  	<code>cd C:\WORK\che-che4z-lsp-for-cobol\theia_automation</code>
+    <code>cd C:\WORK\che-che4z-lsp-for-cobol\tests\theia_automation</code>
 
   	<code>C:\Python3_x64\python.exe -m virtualenv venv3_x64</code>
 
       Linux:
 
-      <code>cd $HOME/work/che-che4z-lsp-for-cobol/theia_automation</code>
+      <code>cd $HOME/work/che-che4z-lsp-for-cobol/tests/theia_automation</code>
 
       <code>python -m virtualenv venv3_x64</code>
 
