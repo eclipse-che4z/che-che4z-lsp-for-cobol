@@ -1,5 +1,5 @@
 # Theia Automation
-Automate functional tests running on Theia with Selenium Explorer in ZOS, Explorer for Endevor, and COBOL LSP.
+Automate functional tests running on Theia with Selenium Explorer in z/OS, Explorer for Endevor, and COBOL LSP.
 
 #### Prerequisite:
 - Windows Environment 
@@ -11,7 +11,7 @@ Automate functional tests running on Theia with Selenium Explorer in ZOS, Explor
 
   	<code>http://python.org</code>
 
-2) Install virtualenv module
+2) Install the virtualenv module
 
      Windows:
   	<code>C:\Python3_x64\Scripts\pip3.exe install virtualenv</code>
@@ -66,14 +66,14 @@ Automate functional tests running on Theia with Selenium Explorer in ZOS, Explor
       Linux:
         <code>export PYTHONPATH=$HOME/work/che-che4z-lsp-for-cobol/theia_automation</code>
 
-8) (Optional) Set Mainframe credentials:
+8) (Optional) Set mainframe credentials:
 
 * Modify project file inc\cfg\mf_credentials.py by filling it with your mainframe credentials.
-* If you leave it as it is (with None as credential values), during test start you will be prompted for credentials with a dialog.
+* If you leave it as it is (with None as credential values), when you start the test you will be prompted for credentials with a dialog.
 
-**Note**: If you need to run a test suite, which doesn't require Mainframe connection, like LSP test suite for local COBOL files (see example below), Mainframe credentials are not required.
+**Note**: If you need to run a test suite which doesn't require a mainframe connection, like LSP test suite for local COBOL files (see example below), mainframe credentials are not required.
 
-9) Establish and Run Theia environment
+9) Establish and Run the Theia environment
 
 - Refer to https://github.com/eclipse-theia/theia/blob/master/doc/Developing.md
     
@@ -81,19 +81,19 @@ Automate functional tests running on Theia with Selenium Explorer in ZOS, Explor
 
 	- https://github.com/eclipse-theia/theia/blob/master/doc/Developing.md#building-on-windows
 	
-10) Prepare Theia environment for test suites
+10) Prepare the Theia environment for test suites
 
 :warning: **Warning**:
 
-- In order to run LSP COBOL LOCAL test suite, a workspace should be opened in Theia, and test Cobol files should be put in the root folder of that opened workspace.
+- In order to run the LSP COBOL LOCAL test suite, open a workspace in Theia, and put the test COBOL files in the root folder of that opened workspace.
  
-- Test Cobol files can be found in test_files\cobol subdirectory of a project.
+- The test COBOL files can be found in the test_files\cobol subdirectory of a project.
 
-Basically run Theia  <code>yarn start $HOME/work/theia-automation/test_files/cobol</code>
+Basically run Theia <code>yarn start $HOME/work/theia-automation/test_files/cobol</code>
 
 11) Run Robot tests
 
-After Theia is established and running with zos explorer plugin, run the following robot tests:
+After Theia is established and running with the z/OS explorer plugin, run the following robot tests:
 
 - To run all suites
   
@@ -106,11 +106,11 @@ After Theia is established and running with zos explorer plugin, run the followi
 * * *
 :information_source: **Note**:
 
-- Your log and output xml file will contain MF credentials information! You may wish to remove this information before sharing your logs.
+- The log and output xml file contain MF credential information. You might wish to remove this information before sharing your logs.
 
 ##### Procedure:
 
-1) Run robot framework with a slightly modified command:
+1) Run the robot framework with a slightly modified command:
 
 Windows:
 	
@@ -122,7 +122,7 @@ Linux:
 	
 The command will generate log and report without credential information, however xml output will still contain it.
 	
-2) To remove credential information from xml, after test suite is completed, run:
+2) To remove credential information from the xml file, after the test suite is completed, run:
 
 Windows:
 	
@@ -132,9 +132,9 @@ Linux:
 
 - <code>venv3_x64/bin/python venv3_x64/lib/python3.8/site-packages/robot/rebot.py --removekeywords NAME:login.* --log ../robot_output/log.html --report ../robot_output/report.html --output ../robot_output/output.xml</code>
 
-* Example how to run Robot tests for LSP Cobol local files
+* Example procedure to run Robot tests for LSP Cobol local files
 
-- To run test in a headless mode (not showing a browser) with Firefox engine:
+- To run the test in headless mode (not showing a browser) with Firefox engine:
     
 Windows: 
 
@@ -144,7 +144,7 @@ Linux:
 
 <code>venv3_x64/bin/python3 venv3_x64/bin/robot --variable HEADLESS:True -i Rally --outputdir ../theia_robot_output --debugfile debug.txt robot_suites/lsp/local/firefox_lsp_local.robot</code>
 
-- If you want to see a browser, set variable HEADLESS to False:
+- If you want to see a browser, set the variable HEADLESS to False:
   
 Windows:
   
@@ -156,7 +156,7 @@ Linux:
 
 * * *
 
-12) Deactivate virtual environment
+12) Deactivate the virtual environment
 
 Windows:
 <code>venv3_x64\Scripts\deactivate.bat</code>
