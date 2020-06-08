@@ -24,7 +24,7 @@ export class JavaCheck {
             const ls = cp.spawn("java", ["-version"]);
             ls.stderr.on("data", (data: any) => {
                 if (!JavaCheck.isJavaVersionSupported(data.toString())) {
-                    reject("Java version 8 expected");
+                    reject("Minimum expected Java version is 8");
                 }
                 resolve();
             });
