@@ -73,7 +73,7 @@ To set up automatic copybook retrieval from the mainframe, **follow these steps:
 3. Under **Paths: Dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
 4. Under **Profile**, enter the name of your Zowe CLI z/OSMF profile.
 5. Open a program or project.  
-   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3. Copybooks are stored locally in a **.copybooks** directory within the workspace, which is created automatically.
+   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3. Copybooks are stored locally in a **.copybooks** directory within the workspace, which is created automatically.  
    Copybook support features are now enabled.
    
    **Tip:** Because copybooks that are downloaded to the .copybooks folder might change on the mainframe, we recommend that you refresh your copybooks from time to time. To refresh your copybooks, manually delete the hidden .copybooks folder in your workspace. The copybooks are then re-downloaded from the mainframe the next time you open a file that references each copybook.
@@ -87,7 +87,7 @@ You can also store your copybooks locally in folders in your workspace and speci
 1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
 2. Switch from **User** to **Workspace**.
 3. Under **Paths: Local**, specify the relative paths of the folders containing copybooks.
-4. Open a program or project.
+4. Open a program or project.  
    Copybook support features are now enabled.
 
 **Note**: If a copybook with the same name is located in both a local folder and a mainframe data set, the one in the local folder is used.
