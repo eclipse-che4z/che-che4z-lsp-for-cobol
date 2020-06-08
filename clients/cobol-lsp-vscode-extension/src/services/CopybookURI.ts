@@ -36,7 +36,6 @@ export class CopybookURI {
     public static searchInWorkspace(copybookName: string, targetFolders: string[]): string {
         const copybookResolver: CopybookResolver = new LocalCopybookResolver();
         const localFolderList: string[] = copybookResolver.resolve(targetFolders);
-
         for (const folder of localFolderList) {
             let uri: URL = this.getURIFrom(folder, copybookName);
 

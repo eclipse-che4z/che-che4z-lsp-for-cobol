@@ -15,7 +15,9 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
+import {CopybookDownloadService} from "../services/CopybookDownloadService";
 import {CopybookURI} from "../services/CopybookURI";
+import {ProfileService} from "../services/ProfileService";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
 
 const copybookName: string = "NSTCOPY1";
@@ -50,6 +52,10 @@ function buildResultArrayFrom(settingsMockValue: string[], profileName: string):
     const copybookResolveURI = new CopybookURI(undefined, undefined);
     return (copybookResolveURI as any).createPathForCopybookDownloaded(profileName).length;
 }
+
+beforeEach(() => {
+    jest.clearAllMocks();
+});
 
 beforeAll(() => {
     createDirectory(folderPath);
@@ -108,5 +114,53 @@ describe("With invalid input parameters, the list of URI that represent copybook
 describe("With allowed input parameters, the list of URI that represent copybook downloaded is correctly generated", () => {
     test("given profile and dataset list with one element, the result list is correctly generated with size 1 ", () => {
         expect(buildResultArrayFrom(["HLQ.DATASET1.DATASET2"], "PRF")).toBe(1);
+    });
+});
+
+describe("Prioritize search criteria for copybooks test suite", () => {
+    function provideMockValueForLocalAndDSN(localPath: string, dsnPath: string) {
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValueOnce({
+            get: jest.fn().mockReturnValueOnce([localPath]),
+        }).mockReturnValueOnce({
+            get: jest.fn().mockReturnValueOnce([dsnPath]),
+        });
+    }
+
+    const profileService: ProfileService = new ProfileService(undefined);
+    const copybookDownloadService: CopybookDownloadService = new CopybookDownloadService(undefined, undefined, undefined, undefined);
+    const copybookURI: CopybookURI = new CopybookURI(profileService, copybookDownloadService);
+    profileService.getProfile = jest.fn().mockReturnValue("PRF");
+    copybookDownloadService.downloadCopybook = jest.fn().mockReturnValue("CPY");
+
+    const spySearchInWorkspace = jest.spyOn(CopybookURI, "searchInWorkspace");
+    test("With only a local folder defined in the settings.json, the search is applied locally", async () => {
+        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+            get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
+        });
+
+        const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
+        expect(uri.includes(CPY_FOLDER_NAME)).toBe(true);
+        expect(spySearchInWorkspace).toBeCalledTimes(1);
+
+    });
+
+    test("With no settings provided, two search strategies are applied and function return an empty string", async () => {
+        profileService.getProfile = jest.fn().mockReturnValue("PRF");
+        copybookDownloadService.downloadCopybook = jest.fn().mockReturnValue("CPY");
+        provideMockValueForLocalAndDSN("", "");
+
+        const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
+        expect(uri).toBe("");
+        expect(spySearchInWorkspace).toBeCalledTimes(2);
+    });
+
+    test("With both local and dsn references defined in the settings.json, the search is applied on local resources" +
+        "first", async () => {
+        provideMockValueForLocalAndDSN(CPY_FOLDER_NAME, "");
+
+        const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
+        expect(uri === "").toBe(false);
+        expect(spySearchInWorkspace).toBeCalledTimes(1);
+
     });
 });
