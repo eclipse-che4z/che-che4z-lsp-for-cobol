@@ -58,20 +58,12 @@ describe("Checks Java installation", () => {
         map = {};
     });
 
-    const checkExpect  = (error, expectedErrMsg) => {
-        expect(error.toString()).toEqual(expectedErrMsg);
-    };
-
     it("when required version is supported", async () => {
         (cp as any).spawn = jest.fn().mockReturnValue({stderr: {on: stderrFn}, on: jest.fn()});
         const promise = javaCheck.isJavaInstalled();
         map.data("java 11 2018-09-25");
 
-        try {
-            expect(await promise).toEqual(undefined);
-        } catch (e) {
-            checkExpect(e, expectedErrMsgSupportedJavaVersion);
-        }
+        await expect(promise).resolves.toEqual(undefined);
     });
 
     it("when required version is not supported", async () => {
@@ -79,11 +71,7 @@ describe("Checks Java installation", () => {
         const promise = javaCheck.isJavaInstalled();
         map.data('java version "1.5.0_22"');
 
-        try {
-            await promise;
-        } catch (e) {
-            checkExpect(e, expectedErrMsgSupportedJavaVersion);
-        }
+        await expect(promise).rejects.toEqual(expectedErrMsgSupportedJavaVersion);
     });
 
     it("when 'error' event is emitted  - spawned", async () => {
@@ -91,11 +79,7 @@ describe("Checks Java installation", () => {
         const promise = javaCheck.isJavaInstalled();
         map.error("Error: spawn java ENOENT");
 
-        try {
-            await promise;
-        } catch (e) {
-            checkExpect(e, expectedErrMsgJavaVersionNotFound);
-        }
+        await expect(promise).rejects.toEqual(expectedErrMsgJavaVersionNotFound);
     });
 
     it("when 'error' event is emitted  - not be spawned", async () => {
@@ -103,11 +87,7 @@ describe("Checks Java installation", () => {
         const promise = javaCheck.isJavaInstalled();
         map.error("Other error");
 
-        try {
-            await promise;
-        } catch (e) {
-            checkExpect(e, "Other error");
-        }
+        await expect(promise).rejects.toEqual("Other error");
     });
 
     it("when 'close' event is emitted", async () => {
@@ -115,10 +95,6 @@ describe("Checks Java installation", () => {
         const promise = javaCheck.isJavaInstalled();
         map.close(23);
 
-        try {
-            await promise;
-        } catch (e) {
-            checkExpect(e, "An error occurred when checking if Java was installed");
-        }
+        await expect(promise).rejects.toEqual("An error occurred when checking if Java was installed");
     });
 });
