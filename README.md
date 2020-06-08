@@ -60,22 +60,39 @@ A third-party plugin is required to enable syntax coloring. The Che4z basic stac
 	
 ## Copybook Support
 
-The LSP for COBOL extension can retrieve copybooks used in your projects from the mainframe and download them locally. You can open copybooks in your IDE and make use of the copybook support features of the extension.
+The COBOL Language Support extension can retrieve copybooks used in your projects from the mainframe and download them locally. You can also store copybooks locally in folders in your workspace. Copybook support features of the extension are enabled whenever a copybook called in source code is successfully located in a specified mainframe data set or local folder.
 
-#### Retrieving Copybooks
+Ensure that copybook names are specified in your source code in upper case, for example `COPY BOOK1` and not `COPY book1`.
+
+### Retrieving Copybooks from the Mainframe
 
 To set up automatic copybook retrieval from the mainframe, **follow these steps:**
 
 1. Ensure that you have a [Zowe CLI z/OSMF profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) configured, with credentials defined.
 2. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
-3. Under **Paths**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
+3. Under **Paths: Dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
 4. Under **Profile**, enter the name of your Zowe CLI z/OSMF profile.
 5. Open a program or project.  
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3. Copybooks are stored locally in a **.copybooks** directory within the workspace, which is created automatically.
+   Copybook support features are now enabled.
    
    **Tip:** Because copybooks that are downloaded to the .copybooks folder might change on the mainframe, we recommend that you refresh your copybooks from time to time. To refresh your copybooks, manually delete the hidden .copybooks folder in your workspace. The copybooks are then re-downloaded from the mainframe the next time you open a file that references each copybook.
+   
+### Storing Copybooks Locally
 
-#### Copybook Support Features
+You can also store your copybooks locally in folders in your workspace and specify those folder paths in your workspace extension settings.
+
+**Follow these steps:**
+
+1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
+2. Switch from **User** to **Workspace**.
+3. Under **Paths: Local**, specify the relative paths of the folders containing copybooks.
+4. Open a program or project.
+   Copybook support features are now enabled.
+
+**Note**: If a copybook with the same name is located in both a local folder and a mainframe data set, the one in the local folder is used.
+
+### Copybook Support Features
 
 The extension includes the following copybook support features:
 
@@ -85,4 +102,4 @@ The extension includes the following copybook support features:
 * Functionality to skip variable levels when called, reducing call time.
 * Find All References and Go To Definition functionalities.
     - **Find All References** identifies all occurrences of variables and paragraphs from copybooks in the code.
-    - **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element.
+    - **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element. If the definition is in a copybook, the copybook opens.
