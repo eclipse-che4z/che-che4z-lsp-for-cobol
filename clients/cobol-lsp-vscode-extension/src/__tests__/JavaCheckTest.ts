@@ -16,7 +16,7 @@ import * as cp from "child_process";
 import {JavaCheck} from "../services/JavaCheck";
 
 describe("Checks Java version", () => {
-    it("when version is supported", async () => {
+    it("If Java version is supported", async () => {
         expect(JavaCheck.isJavaVersionSupported('openjdk version "1.8.0-internal"')).toBeTruthy();
         expect(JavaCheck.isJavaVersionSupported('java version "1.8.0_181"')).toBeTruthy();
         expect(JavaCheck.isJavaVersionSupported('openjdk version "1.11.0-internal"')).toBeTruthy();
@@ -32,7 +32,7 @@ describe("Checks Java version", () => {
         expect(JavaCheck.isJavaVersionSupported("java 14 2020-03-17")).toBeTruthy();
     });
 
-    it("when version is not supported", async () => {
+    it("If Java version is not supported", async () => {
         expect(JavaCheck.isJavaVersionSupported('java version "1.7.0_131"')).toBeFalsy();
         expect(JavaCheck.isJavaVersionSupported('java version "1.5.0_22"')).toBeFalsy();
     });
@@ -44,7 +44,7 @@ describe("Checks Java installation", () => {
     let map: any;
     let checkFn: any;
     let stderrFn: any;
-    const expectedErrMsgSupportedJavaVersion = "Java version 8 expected";
+    const expectedErrMsgSupportedJavaVersion = "Minimum expected Java version is 8";
     const expectedErrMsgJavaVersionNotFound = "Java 8 is not found";
 
     beforeEach(() => {
