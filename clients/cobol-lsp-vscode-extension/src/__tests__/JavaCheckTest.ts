@@ -44,7 +44,7 @@ describe("Checks Java installation", () => {
     let map: any;
     let checkFn: any;
     let stderrFn: any;
-    const expectedErrMsgJavaVersionFound = "Java version 8 expected";
+    const expectedErrMsgSupportedJavaVersion = "Java version 8 expected";
     const expectedErrMsgJavaVersionNotFound = "Java 8 is not found";
 
     beforeEach(() => {
@@ -58,6 +58,10 @@ describe("Checks Java installation", () => {
         map = {};
     });
 
+    const checkExpect  = (error, expectedErrMsg) => {
+        expect(error.toString()).toEqual(expectedErrMsg);
+    };
+
     it("when required version is supported", async () => {
         (cp as any).spawn = jest.fn().mockReturnValue({stderr: {on: stderrFn}, on: jest.fn()});
         const promise = javaCheck.isJavaInstalled();
@@ -66,7 +70,7 @@ describe("Checks Java installation", () => {
         try {
             expect(await promise).toEqual(undefined);
         } catch (e) {
-            expect(e.toString()).toEqual(expectedErrMsgJavaVersionFound);
+            checkExpect(e, expectedErrMsgSupportedJavaVersion);
         }
     });
 
@@ -78,7 +82,7 @@ describe("Checks Java installation", () => {
         try {
             await promise;
         } catch (e) {
-            expect(e.toString()).toEqual(expectedErrMsgJavaVersionFound);
+            checkExpect(e, expectedErrMsgSupportedJavaVersion);
         }
     });
 
@@ -90,7 +94,7 @@ describe("Checks Java installation", () => {
         try {
             await promise;
         } catch (e) {
-            expect(e.toString()).toEqual(expectedErrMsgJavaVersionNotFound);
+            checkExpect(e, expectedErrMsgJavaVersionNotFound);
         }
     });
 
@@ -102,7 +106,7 @@ describe("Checks Java installation", () => {
         try {
             await promise;
         } catch (e) {
-            expect(e.toString()).toEqual("Other error");
+            checkExpect(e, "Other error");
         }
     });
 
@@ -114,7 +118,7 @@ describe("Checks Java installation", () => {
         try {
             await promise;
         } catch (e) {
-            expect(e.toString()).toEqual("An error occurred when checking if Java was installed");
+            checkExpect(e, "An error occurred when checking if Java was installed");
         }
     });
 });
