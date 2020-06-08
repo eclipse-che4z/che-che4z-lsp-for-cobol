@@ -76,7 +76,7 @@ To set up automatic copybook retrieval from the mainframe, **follow these steps:
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3. Copybooks are stored locally in a **.copybooks** directory within the workspace, which is created automatically.  
    Copybook support features are now enabled.
    
-   **Tip:** Because copybooks that are downloaded to the .copybooks folder might change on the mainframe, we recommend that you refresh your copybooks from time to time. To refresh your copybooks, manually delete the hidden .copybooks folder in your workspace. The copybooks are then re-downloaded from the mainframe the next time you open a file that references each copybook.
+**Tip:** Because copybooks that are downloaded to the .copybooks folder might change on the mainframe, we recommend that you refresh your copybooks from time to time. To refresh your copybooks, manually delete the hidden .copybooks folder in your workspace. The copybooks are then re-downloaded from the mainframe the next time you open a file that references each copybook.
    
 ### Storing Copybooks Locally
 
