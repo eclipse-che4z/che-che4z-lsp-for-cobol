@@ -62,11 +62,27 @@ A third-party plugin is required to enable syntax coloring. The Che4z basic stac
 
 The COBOL Language Support extension can retrieve copybooks used in your projects from the mainframe and download them locally. You can also store copybooks locally in folders in your workspace. Copybook support features of the extension are enabled whenever a copybook called in source code is successfully located in a specified mainframe data set or local folder.
 
-Ensure that copybook names are specified in your source code in upper case, for example `COPY BOOK1` and not `COPY book1`.
+Ensure that copybook names are specified in your source code in upper case, for example `COPY BOOK1` and not `COPY book1`. Lower case copybook names are not resolved by the extension and are marked as errors.
+
+### Storing Copybooks Locally
+
+You can store your copybooks locally in folders in your workspace and specify those folder paths in your workspace extension settings.
+
+**Follow these steps:**
+
+1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
+2. Switch from **User** to **Workspace**.
+3. Under **Paths: Local**, specify the relative paths of the folders containing copybooks.
+4. Open a program or project.  
+   Copybook support features are now enabled.
 
 ### Retrieving Copybooks from the Mainframe
 
-To set up automatic copybook retrieval from the mainframe, **follow these steps:**
+You can also set up automatic copybook retrieval from the mainframe to download copybooks from mainframe data sets to your workspace. 
+
+If a copybook with the same name is located in both a local folder and a mainframe data set, the one in the local folder is used. 
+
+**Follow these steps:**
 
 1. Ensure that you have a [Zowe CLI z/OSMF profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) configured, with credentials defined.
 2. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
@@ -77,20 +93,6 @@ To set up automatic copybook retrieval from the mainframe, **follow these steps:
    Copybook support features are now enabled.
    
 **Tip:** Because copybooks that are downloaded to the .copybooks folder might change on the mainframe, we recommend that you refresh your copybooks from time to time. To refresh your copybooks, manually delete the hidden .copybooks folder in your workspace. The copybooks are then re-downloaded from the mainframe the next time you open a file that references each copybook.
-   
-### Storing Copybooks Locally
-
-You can also store your copybooks locally in folders in your workspace and specify those folder paths in your workspace extension settings.
-
-**Follow these steps:**
-
-1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
-2. Switch from **User** to **Workspace**.
-3. Under **Paths: Local**, specify the relative paths of the folders containing copybooks.
-4. Open a program or project.  
-   Copybook support features are now enabled.
-
-**Note**: If a copybook with the same name is located in both a local folder and a mainframe data set, the one in the local folder is used.
 
 ### Copybook Support Features
 
