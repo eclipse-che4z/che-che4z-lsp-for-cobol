@@ -27,7 +27,7 @@ SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + __dirnam
 
 // file utils
 function createFile(filename: string): string {
-    fs.writeFile(path.join(folderPath, filename), "Some dummy content", err => {
+    fs.writeFileSync(path.join(folderPath, filename), "Some dummy content", err => {
         if (err) {
             return null;
         }
@@ -36,7 +36,8 @@ function createFile(filename: string): string {
 }
 
 function createDirectory(targetPath: string) {
-    fs.promises.mkdir(targetPath, {recursive: true}).catch(console.error);
+
+    fs.mkdirSync(targetPath, {recursive: true});
 }
 
 function removeFolder(pathFile: string) {
