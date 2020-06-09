@@ -92,11 +92,11 @@ If a copybook with the same name is located in both a local folder and a mainfra
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3.
    Copybook support features are now enabled.
 
-Copybooks are stored locally in the **.c4z/.copybooks** directory within the workspace, which is created automatically.
+Copybooks that you retrieve from mainframe data sets are stored in the **.c4z/.copybooks** directory within the workspace, which is created automatically.
 
 Because copybooks that are downloaded to the .copybooks folder might change on the mainframe, we recommend that you refresh your copybooks from time to time. To refresh your copybooks, manually delete the .copybooks folder in your workspace. The copybooks are then re-downloaded from the mainframe the next time you open a file that references each copybook.
 
-Copybooks downloaded using an older version of COBOL Language Support might also be found in a **.copybooks** directory in the workspace root. We recommend deleting this folder so that the files are re-downloaded to the **.c4z/.copybooks** folder.
+Copybooks downloaded from the mainframe using an older version of COBOL Language Support might also be found in a **.copybooks** directory in the workspace root. We recommend that you delete this folder so that all files are downloaded again to the **.c4z/.copybooks** folder.
 
 ### Copybook Support Features
 
