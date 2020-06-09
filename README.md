@@ -89,7 +89,7 @@ If a copybook with the same name is located in both a local folder and a mainfra
 3. Under **Paths: Dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
 4. Under **Profile**, enter the name of your Zowe CLI z/OSMF profile.
 5. Open a program or project.  
-   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3.
+   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3.  
    Copybook support features are now enabled.
 
 Copybooks that you retrieve from mainframe data sets are stored in the **.c4z/.copybooks** directory within the workspace, which is created automatically.
