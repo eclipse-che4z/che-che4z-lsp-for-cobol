@@ -72,7 +72,7 @@ You can store your copybooks locally in folders in your workspace and specify th
 
 1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
 2. Switch from **User** to **Workspace**.
-3. Under **Paths: Local**, specify the relative paths of the folders containing copybooks.
+3. Under **Paths: Local**, specify the relative paths of the folders containing copybooks. The folders are searched in the order they are listed, so if two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
 4. Open a program or project.  
    Copybook support features are now enabled.
 
@@ -80,7 +80,7 @@ You can store your copybooks locally in folders in your workspace and specify th
 
 You can also set up automatic copybook retrieval from the mainframe to download copybooks from mainframe data sets to your workspace. 
 
-If a copybook with the same name is located in both a local folder and a mainframe data set, the one in the local folder is used. 
+If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used. 
 
 **Follow these steps:**
 
