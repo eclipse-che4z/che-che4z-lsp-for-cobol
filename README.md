@@ -60,7 +60,7 @@ A third-party plugin is required to enable syntax coloring. The Che4z basic stac
 	
 ## Copybook Support
 
-The COBOL Language Support extension supports copybooks called by your source code that are stored in a folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe CLI z/OSMF profile to automatically download them from the mainframe to a folder in your workspace. The local folders and mainframe data sets that contain copybooks used in your project are specified in the workspace settings.
+The COBOL Language Support extension supports copybooks called by your source code that are stored in a folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe CLI z/OSMF profile to automatically download them from the mainframe to your workspace. You specify the local folders and mainframe data sets that contain copybooks used in your project in the workspace settings.
 
 Ensure that copybook names are called in your source code in upper case, for example `COPY BOOK1` and not `COPY book1`. Lower case copybook names are not resolved by the extension and are marked as errors.
 
@@ -89,10 +89,14 @@ If a copybook with the same name is located in both a local folder and a mainfra
 3. Under **Paths: Dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
 4. Under **Profile**, enter the name of your Zowe CLI z/OSMF profile.
 5. Open a program or project.  
-   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3. Copybooks are stored locally in a **.copybooks** directory within the workspace, which is created automatically.  
+   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3.
    Copybook support features are now enabled.
-   
-**Tip:** Because copybooks that are downloaded to the .copybooks folder might change on the mainframe, we recommend that you refresh your copybooks from time to time. To refresh your copybooks, manually delete the hidden .copybooks folder in your workspace. The copybooks are then re-downloaded from the mainframe the next time you open a file that references each copybook.
+
+Copybooks are stored locally in the **.c4z/.copybooks** directory within the workspace, which is created automatically.
+
+Because copybooks that are downloaded to the .copybooks folder might change on the mainframe, we recommend that you refresh your copybooks from time to time. To refresh your copybooks, manually delete the .copybooks folder in your workspace. The copybooks are then re-downloaded from the mainframe the next time you open a file that references each copybook.
+
+Copybooks downloaded using an older version of COBOL Language Support might also be found in a **.copybooks** directory in the workspace root. We recommend deleting this folder so that the files are re-downloaded to the **.c4z/.copybooks** folder.
 
 ### Copybook Support Features
 
