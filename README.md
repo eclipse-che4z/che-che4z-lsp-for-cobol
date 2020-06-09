@@ -86,9 +86,10 @@ If a copybook with the same name is located in both a local folder and a mainfra
 
 1. Ensure that you have a [Zowe CLI z/OSMF profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) configured, with credentials defined.
 2. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
-3. Under **Paths: Dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
-4. Under **Profile**, enter the name of your Zowe CLI z/OSMF profile.
-5. Open a program or project.  
+3. Switch from **User** to **Workspace**.
+4. Under **Paths: Dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
+5. Under **Profile**, enter the name of your Zowe CLI z/OSMF profile.
+6. Open a program or project.  
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3.  
    Copybook support features are now enabled.
 
