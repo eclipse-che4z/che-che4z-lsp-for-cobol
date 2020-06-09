@@ -60,7 +60,7 @@ A third-party plugin is required to enable syntax coloring. The Che4z basic stac
 	
 ## Copybook Support
 
-The COBOL Language Support extension supports copybooks called by your source code that are stored in a folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe CLI z/OSMF profile to automatically download them from the mainframe to your workspace. 
+The COBOL Language Support extension supports copybooks called by your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe CLI z/OSMF profile to automatically download them from the mainframe to your workspace. 
 
 To enable copybook support, you specify the local folders and mainframe data sets that contain copybooks used in your project in the workspace settings. When a copybook is called in the program, the folders and data sets are searched in the order they are listed for files and members that match the copybook's name. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
 
