@@ -107,7 +107,9 @@ public class TestMappingWithMultiDefinitions {
                 new CobolText(PARS_NAME + ".CPY", PARS)));
 
     assertDiagnostics(result.getDiagnostics());
+
     assertCopybookUsages(result.getCopybookUsages());
+    assertCopybookDefinitions(result.getCopybookDefinitions());
 
     assertVariableDefinitions(result.getVariableDefinitions());
     assertVariableUsages(result.getVariableUsages());
@@ -137,6 +139,17 @@ public class TestMappingWithMultiDefinitions {
     assertLocation(copybookUsages, NESTED1_NAME, toURI(WITHNEST_NAME), 4, 16);
     assertNumberOfLocations(copybookUsages, NESTED2_NAME, 1);
     assertLocation(copybookUsages, NESTED2_NAME, toURI(NESTED1_NAME), 3, 16);
+  }
+
+  private void assertCopybookDefinitions(Map<String, List<Location>> copybookDefinitions) {
+    assertEquals(
+        "Copybook definitions: " + copybookDefinitions.toString(), 6, copybookDefinitions.size());
+    assertCopybookDefinition(copybookDefinitions, STRUC_NAME);
+    assertCopybookDefinition(copybookDefinitions, WITHNEST_NAME);
+    assertCopybookDefinition(copybookDefinitions, PARS_NAME);
+    assertCopybookDefinition(copybookDefinitions, NESTED_NAME);
+    assertCopybookDefinition(copybookDefinitions, NESTED1_NAME);
+    assertCopybookDefinition(copybookDefinitions, NESTED2_NAME);
   }
 
   private void assertParagraphUsages(Map<String, List<Location>> paragraphUsages) {

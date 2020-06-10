@@ -88,7 +88,8 @@ public class TestKeywordAsCopybookNotProducesNPE {
 
   private void assertCopybookDefinitions(Map<String, List<Location>> copybookDefinitions) {
     assertEquals(
-        "Copybook definitions: " + copybookDefinitions.toString(), 0, copybookDefinitions.size());
+        "Copybook definitions: " + copybookDefinitions.toString(), 1, copybookDefinitions.size());
+    assertCopybookDefinition(copybookDefinitions, DETAIL_NAME);
   }
 
   private void assertCopybookUsages(Map<String, List<Location>> copybookUsages) {

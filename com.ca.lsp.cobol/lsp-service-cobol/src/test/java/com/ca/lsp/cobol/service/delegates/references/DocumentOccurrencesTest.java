@@ -178,7 +178,7 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
   @Test
   public void testFindMultipleCopybookReferences() throws ExecutionException, InterruptedException {
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK1, true);
-    assertEquals(3, locations.size());
+    assertEquals(4, locations.size());
 
     assertContainsRange(locations, range(20, 12, COPY_LENGTH));
     assertContainsRange(locations, range(22, 12, COPY_LENGTH));
@@ -187,7 +187,7 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
   @Test
   public void testFindSingleCopybookReference() throws ExecutionException, InterruptedException {
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK2, true);
-    assertEquals(2, locations.size());
+    assertEquals(3, locations.size());
 
     assertContainsRange(locations, range(21, 12, COPY_LENGTH));
   }

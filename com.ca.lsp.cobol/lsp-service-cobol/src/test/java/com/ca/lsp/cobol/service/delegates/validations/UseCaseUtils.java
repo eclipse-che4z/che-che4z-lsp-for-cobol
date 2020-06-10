@@ -241,4 +241,20 @@ public class UseCaseUtils {
         "Expected location for " + name + " not found: " + expected.toString(),
         locations.contains(expected));
   }
+
+  /**
+   * Assert that the given source contains the given copybook definition with one position pointing
+   * to the beginning of the copybook file
+   *
+   * @param source - map with locations of semantic elements
+   * @param name - name of the copybook to check
+   */
+  public static void assertCopybookDefinition(Map<String, List<Location>> source, String name) {
+    assertEquals("Number of " + name + " usages: ", 1, source.get(name).size());
+    Location expected =
+        new Location(toURI(name), new Range(new Position(0, 0), new Position(0, 0)));
+    assertTrue(
+        "Expected location for " + name + " not found: " + expected.toString(),
+        source.get(name).contains(expected));
+  }
 }

@@ -58,7 +58,9 @@ public class TestMappingWithReplacing {
     AnalysisResult result = analyze(DOCUMENT, singletonList(new CobolText("CUSTCOPY", CUSTCOPY)));
 
     assertDiagnostics(result.getDiagnostics());
+
     assertCopybookUsages(result.getCopybookUsages());
+    assertCopybookDefinitions(result.getCopybookDefinitions());
 
     assertVariableDefinitions(result.getVariableDefinitions());
     assertVariableUsages(result.getVariableUsages());
@@ -75,6 +77,12 @@ public class TestMappingWithReplacing {
     assertEquals("Copybook usages: " + copybookUsages.toString(), 1, copybookUsages.size());
     assertNumberOfLocations(copybookUsages, "CUSTCOPY", 1);
     assertLocation(copybookUsages, "CUSTCOPY", DOCUMENT_URI, 5, 12);
+  }
+
+  private void assertCopybookDefinitions(Map<String, List<Location>> copybookDefinitions) {
+    assertEquals(
+        "Copybook definitions: " + copybookDefinitions.toString(), 1, copybookDefinitions.size());
+    assertCopybookDefinition(copybookDefinitions, "CUSTCOPY");
   }
 
   private void assertParagraphUsages(Map<String, List<Location>> paragraphUsages) {

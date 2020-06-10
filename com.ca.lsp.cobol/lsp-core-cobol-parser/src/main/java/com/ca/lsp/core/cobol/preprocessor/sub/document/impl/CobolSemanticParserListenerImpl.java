@@ -43,6 +43,7 @@ import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.convertToke
 import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.retrieveTokens;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
@@ -184,10 +185,11 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     String copybookName = retrieveCopybookName(ctx.copySource());
     Position position = retrievePosition(ctx.copySource());
 
-    addCopybookUsage(copybookName, position);
-
     CopybookModel model = getCopyBookContent(copybookName, position);
     String copybookContent = model.getContent();
+
+    addCopybookUsage(copybookName, position);
+    addCopybookDefinition(copybookName, model.getUri());
 
     List<ReplacingPhraseContext> replacingPhraseContexts = ctx.replacingPhrase();
     if (!replacingPhraseContexts.isEmpty()) {
@@ -283,7 +285,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private CopybookModel emptyModel(String copybookName) {
-    return new CopybookModel(copybookName, copybookName, "");
+    return new CopybookModel(copybookName, "", "");
   }
 
   private void reportRecursiveCopybook(CopybookUsage usage) {
@@ -376,6 +378,12 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   private void addCopybookUsage(@Nullable String copybookName, @Nonnull Position position) {
     ofNullable(copybookName).ifPresent(it -> copybooks.addUsage(it, position));
+  }
+
+  private void addCopybookDefinition(String copybookName, String uri) {
+    if (!isEmpty(copybookName) && !isEmpty(uri)) {
+      copybooks.define(copybookName, new Position(uri, 0, -1, 1, 0, null));
+    }
   }
 
   @Nonnull

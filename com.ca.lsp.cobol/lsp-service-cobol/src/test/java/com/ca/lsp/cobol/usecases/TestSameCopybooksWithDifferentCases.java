@@ -61,6 +61,7 @@ public class TestSameCopybooksWithDifferentCases {
 
     assertDiagnostics(result);
     assertCopybookUsages(result);
+    assertCopybookDefinitions(result);
     assertVariableDefinitions(result);
     assertVariableUsages(result);
   }
@@ -78,6 +79,13 @@ public class TestSameCopybooksWithDifferentCases {
 
     assertLocation(struct1Usages.get(0), DOCUMENT_URI, 4, 26, CPY_NAME.length());
     assertLocation(struct1Usages.get(1), DOCUMENT_URI, 5, 12, CPY_NAME.length());
+  }
+
+  private void assertCopybookDefinitions(AnalysisResult result) {
+    Map<String, List<Location>> copybookDefinitions = result.getCopybookDefinitions();
+    assertEquals(
+        "Copybook definitions: " + copybookDefinitions.toString(), 1, copybookDefinitions.size());
+    assertCopybookDefinition(copybookDefinitions, "STRUCT1");
   }
 
   private void assertVariableDefinitions(AnalysisResult result) {
@@ -116,7 +124,8 @@ public class TestSameCopybooksWithDifferentCases {
       int startCharacter) {
     List<Location> parent2definitions = variableDefinitions.get(varName);
     assertEquals("Number of " + varName + " definitions", 1, parent2definitions.size());
-    assertLocation(parent2definitions.get(0), toURI(CPY_NAME), line, startCharacter, varName.length());
+    assertLocation(
+        parent2definitions.get(0), toURI(CPY_NAME), line, startCharacter, varName.length());
   }
 
   private void assertLocation(
