@@ -45,7 +45,7 @@ export class CopybookDownloadService implements vscode.Disposable {
      * @param programName analyzed COBOL file
      */
     async downloadCopybooks(copybooks: string[], programName: string): Promise<void> {
-        const profile: string = await this.profileService.getProfile(programName);
+        const profile: string = await this.profileService.getProfileFromDocument(programName);
         if (!profile) {
             return;
         }
@@ -56,7 +56,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         if (!checkWorkspace()) {
             return;
         }
-        const profile: string = await this.profileService.getProfile(cobolFileName);
+        const profile: string = await this.profileService.getProfileFromDocument(cobolFileName);
         if (!profile) {
             return;
         }

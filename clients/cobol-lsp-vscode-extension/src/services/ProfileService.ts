@@ -12,16 +12,22 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { IProfile } from "@zowe/imperative";
+import {IProfile} from "@zowe/imperative";
 import * as path from "path";
 import * as vscode from "vscode";
-import { Disposable } from "vscode-languageclient";
-import { SETTINGS_SECTION } from "../constants";
-import { ProfilesMap, ZoweApi } from "./ZoweApi";
+import {Disposable} from "vscode-languageclient";
+import {SETTINGS_SECTION} from "../constants";
+import {ProfilesMap, ZoweApi} from "./ZoweApi";
 
 const DEFAULT_STATUS_TEXT = "CPY profile: undefined";
 
 export class ProfileService implements Disposable {
+
+    private static isCobolProgram(fsPath: string) {
+        const ext = path.extname(fsPath).toLocaleLowerCase();
+        return ext === ".cbl" || ext === ".cob" || ext === ".cobol";
+    }
+
     defaultProfileStatusBarItem: vscode.StatusBarItem;
 
     constructor(private zoweApi: ZoweApi) {
@@ -50,7 +56,7 @@ export class ProfileService implements Disposable {
         });
 
         const selectedProfile = await vscode.window.showQuickPick(items,
-            { placeHolder: "Select a zowe profile to search for copybooks", canPickMany: false });
+            {placeHolder: "Select a zowe profile to search for copybooks", canPickMany: false});
         if (selectedProfile) {
             // TODO Switch to program specific profiles
             await vscode.workspace.getConfiguration(SETTINGS_SECTION).update("profiles",
@@ -63,29 +69,6 @@ export class ProfileService implements Disposable {
     public async getProfileFromSettings(profiles?: ProfilesMap): Promise<string | undefined> {
         const auxProfiles: ProfilesMap = profiles ? profiles : await this.zoweApi.listZOSMFProfiles();
         return this.tryGetProfileFromSettings(auxProfiles);
-    }
-
-    async getProfile(programName?: string): Promise<string | undefined> {
-        if (programName) {
-            const detectedProfile: string | undefined = (await this.findProfileFromDocument(programName));
-            if (detectedProfile) {
-                return detectedProfile;
-            }
-        }
-
-        const profiles: ProfilesMap = await this.zoweApi.listZOSMFProfiles();
-        const profile = this.tryGetProfileFromSettings(profiles);
-        if (profile) {
-            return profile;
-        }
-        if (Object.keys(profiles).length === 0) {
-            await vscode.window.showErrorMessage("Zowe profile is missing.");
-            return undefined;
-        }
-        if (Object.keys(profiles).length === 1) {
-            return Object.keys(profiles)[0];
-        }
-        return this.getProfileFromMultiple(profiles);
     }
 
     async updateStatusBar() {
@@ -107,22 +90,16 @@ export class ProfileService implements Disposable {
         return Object.keys(profiles).length > 1;
     }
 
-    private createStatusBarItem() {
-        this.defaultProfileStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
-        this.defaultProfileStatusBarItem.command = "broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile";
-        this.updateStatusBar();
-        this.defaultProfileStatusBarItem.show();
-    }
-
-    private isCobolProgram(fsPath: string) {
-        const ext = path.extname(fsPath).toLocaleLowerCase();
-        return ext === ".cbl" || ext === ".cob" || ext === ".cobol";
-    }
-
-    private async findProfileFromDocument(programName: string): Promise<string | undefined> {
+    /**
+     * This async method verify that a profile is selected by the user and could be used to resolve
+     * resources on MF
+     * @param programName name of the COBOL program opened into the workspace
+     * @return a string representation of the profile selected or undefined
+     */
+    public async getProfileFromDocument(programName: string): Promise<string | undefined> {
         for (const doc of vscode.workspace.textDocuments) {
             const docPath = doc.fileName;
-            if (!this.isCobolProgram(docPath)) {
+            if (!ProfileService.isCobolProgram(docPath)) {
                 continue;
             }
             const openName = path.basename(docPath, path.extname(docPath));
@@ -136,6 +113,13 @@ export class ProfileService implements Disposable {
         return undefined;
     }
 
+    private createStatusBarItem() {
+        this.defaultProfileStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
+        this.defaultProfileStatusBarItem.command = "broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile";
+        this.updateStatusBar();
+        this.defaultProfileStatusBarItem.show();
+    }
+
     private tryGetProfileFromSettings(profiles: ProfilesMap): string | undefined {
         // TODO switch from single profile to program specific profile
         const profile: string = vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles");
@@ -146,6 +130,7 @@ export class ProfileService implements Disposable {
 
         return undefined;
     }
+
     private async tryGetProfileFromDocumentPath(docPath: string): Promise<string | undefined> {
         const profiles = Object.keys(await this.zoweApi.listZOSMFProfiles());
         const segments: string[] = docPath.split(path.sep);
