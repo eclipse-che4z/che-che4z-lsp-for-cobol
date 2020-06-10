@@ -114,7 +114,7 @@ SuiteInit
     Log  Heasless: ${HEADLESS}
 
     CheShare  &{CHE_CREDENTIALS}
-    ${CREDENTIALS} =  CheRequest  &{CHE_CREDENTIALS}[password]
+    ${CREDENTIALS} =  CheRequest  ${CHE_CREDENTIALS}[password]
 
     Log  ${CREDENTIALS}
 
@@ -276,14 +276,15 @@ Navigate To Element Path
     ${Last Element} =  Set Variable  ${Element Path}[-1]
     Log  ${Last Element}
 
-    :For  ${subpath}  IN  @{Element Path}
-    \   Log  ${subpath}
-    \   Exit For Loop If  '${subpath}' == '${Last Element}'
-    \   ${Element} =  Inside File Explorer Navigate Down To ${subpath} From ${From Element}
-    \   ${IS_DIR} =  Is Directory  ${Element}
-    \   Exit For Loop If  ${IS_DIR} == ${FALSE}
-    \   Expand Directory Node  ${Element}
-    \   ${From Element} =  Set Variable  ${Element}
+    FOR  ${subpath}  IN  @{Element Path}
+       Log  ${subpath}
+       Exit For Loop If  '${subpath}' == '${Last Element}'
+       ${Element} =  Inside File Explorer Navigate Down To ${subpath} From ${From Element}
+       ${IS_DIR} =  Is Directory  ${Element}
+       Exit For Loop If  ${IS_DIR} == ${FALSE}
+       Expand Directory Node  ${Element}
+       ${From Element} =  Set Variable  ${Element}
+    END
 
     Return From Keyword If  ${Is File Exist} == ${False}  ${Element}
 
