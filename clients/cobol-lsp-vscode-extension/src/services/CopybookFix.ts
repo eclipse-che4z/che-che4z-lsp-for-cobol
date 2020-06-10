@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 import {DownloadQueue} from "./DownloadQueue";
 
 export class CopybookFix {
-    private queue: DownloadQueue;
+    private queue: DownloadQueue = new DownloadQueue();
 
     /**
      * This method add in the download queue the copybooks that weren't found locally.
