@@ -89,7 +89,7 @@ Automate functional tests running on Theia with Selenium Explorer in z/OS, Explo
  
 - The test COBOL files can be found in the test_files\cobol subdirectory of a project.
 
-Basically run Theia <code>yarn start $HOME/work/theia-automation/test_files/cobol</code>
+Run Theia <code>yarn start $HOME/work/theia-automation/test_files/cobol</code>
 
 11) Run Robot tests
 
