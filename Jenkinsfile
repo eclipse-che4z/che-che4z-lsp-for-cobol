@@ -139,6 +139,22 @@ pipeline {
                         }
                     }
                 }
+
+                stage('Client - Build Test Report'){
+                  environment {
+                      npm_config_cache = "$env.WORKSPACE"
+                  }
+                  steps {
+                      container('node') {
+                          dir('clients/cobol-lsp-vscode-extension') {
+                            sh 'npm t'
+                          }
+                      }
+                  }
+                }
+
+
+
                 stage('Client - Package') {
                     environment {
                         npm_config_cache = "$env.WORKSPACE"
