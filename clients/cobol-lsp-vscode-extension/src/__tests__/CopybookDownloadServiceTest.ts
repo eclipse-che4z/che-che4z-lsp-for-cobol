@@ -24,21 +24,18 @@ import {ProfileService} from "../services/ProfileService";
 import {ZoweApi} from "../services/ZoweApi";
 import {Type, ZoweError} from "../services/ZoweError";
 
-vscode.workspace.workspaceFolders = [{} as any];
-vscode.window.showInformationMessage = () => Promise.resolve("Download Copybooks");
 const profile = "zoweProfile";
+const errorMessage = "The error";
 const copybookProfile = new CopybookProfile("copybook", profile);
 const zoweGeneralError = new ZoweError("zowe error", Type.General);
 const copybookFix: CopybookFix = new CopybookFix();
 
-describe("Test fetchCopybook against bad and correct configurations", () => {
-    let zoweApi: ZoweApi;
-    let copybookDownloadService: CopybookDownloadService;
+vscode.workspace.workspaceFolders = [{} as any];
+vscode.window.showInformationMessage = () => Promise.resolve("Download Copybooks");
 
-    beforeAll(() => {
-        zoweApi = new ZoweApi();
-        copybookDownloadService = new CopybookDownloadService(copybookFix, zoweApi, null, null);
-    });
+describe("Test fetchCopybook against bad and correct configurations", () => {
+    const zoweApi: ZoweApi = new ZoweApi();
+    const copybookDownloadService: CopybookDownloadService = new CopybookDownloadService(copybookFix, zoweApi, null, null);
 
     test("Given a copybook name that is not a valid member on MF, the copybook is not downloaded", async () => {
         zoweApi.listMembers = jest.fn().mockReturnValue("ANTHMEM");
@@ -83,90 +80,64 @@ describe("Receiving an error from zowe api layer, copybooks are not retrivied an
         });
 
         it("handleCopybook delete copybook from its internal queue if the copybook is a valid member on MF", async () => {
-            // simulate that the copybook required is a valid member name on MF
             (cbd as any).fetchCopybook = jest.fn().mockReturnValue(true);
 
-            // simulate that the a copybook not found is already defined in a queue
             const errorQueue: Set<string> = new Set();
             errorQueue.add("copybook");
 
             await (cbd as any).handleCopybook("DSNAME1", copybookProfile, errorQueue);
-
-            // after the analysis - since the item in the queue is a valid member on MF it should be removed from the
-            // error queue
             expect(errorQueue.size).toBe(0);
         });
-
     });
 
     describe("Suite of tests related to handleDataset", () => {
+        const cbd = new CopybookDownloadService(null, null, null, null);
+        const toDownload = [copybookProfile];
+        const progress = {report: jest.fn()};
+        const zoweError = new ZoweError("not found", Type.NotFound);
+        vscode.window.showErrorMessage = jest.fn();
 
         it("handleDataset rethow non NotFound ZoweErrors", async () => {
-            const cbd = new CopybookDownloadService(null, null, null, null);
             (cbd as any).handleCopybook = jest.fn().mockRejectedValue(zoweGeneralError);
-            const toDownload = [copybookProfile];
-            const progress = {report: jest.fn()};
             expect((cbd as any).handleDataset(null, toDownload, null, progress)).rejects.toEqual(zoweGeneralError);
         });
         it("handleDataset show an error if copybook is not found", async () => {
-            const zoweError = new ZoweError("not found", Type.NotFound);
-            const cbd = new CopybookDownloadService(null, null, null, null);
             (cbd as any).handleCopybook = jest.fn().mockRejectedValue(zoweError);
-            const toDownload = [copybookProfile];
-            const progress = {report: jest.fn()};
-            vscode.window.showErrorMessage = jest.fn();
             await (cbd as any).handleDataset("DATA.SET", toDownload, null, progress);
             expect(vscode.window.showErrorMessage).toHaveBeenCalledWith("Dataset DATA.SET not found.");
         });
         it("handleDataset show an error for non ZoweError", async () => {
-            const errorMessage = "The error";
-            const cbd = new CopybookDownloadService(null, null, null, null);
             (cbd as any).handleCopybook = jest.fn().mockRejectedValue(new Error(errorMessage));
-            const toDownload = [copybookProfile];
-            const progress = {report: jest.fn()};
-            vscode.window.showErrorMessage = jest.fn();
             await (cbd as any).handleDataset("DATA.SET", toDownload, null, progress);
             expect(vscode.window.showErrorMessage).toHaveBeenCalledWith("Error: " + errorMessage);
         });
     });
 
     describe("Suite of tests related to handleQueue", () => {
+        const pathGenerator = new CopybooksPathGenerator(null);
+        const cbd = new CopybookDownloadService(null, null, null, pathGenerator);
+        pathGenerator.listDatasets = jest.fn().mockResolvedValue(["dataset"]);
+        vscode.window.showErrorMessage = jest.fn();
+
         it("handleQueue show an error for non ZoweError", async () => {
-            const errorMessage = "The error";
-            const pathGenerator = new CopybooksPathGenerator(null);
-            pathGenerator.listDatasets = jest.fn().mockResolvedValue(["dataset"]);
-            const cbd = new CopybookDownloadService(null, null, null, pathGenerator);
             (cbd as any).handleDataset = jest.fn().mockRejectedValue(new Error(errorMessage));
-            vscode.window.showErrorMessage = jest.fn();
             await (cbd as any).handleQueue(copybookProfile, new Set(), null);
             expect(vscode.window.showErrorMessage).toHaveBeenCalledWith("Error: " + errorMessage);
         });
         it("handleQueue handle Invalid credentials ZoweError", async () => {
-            const pathGenerator = new CopybooksPathGenerator(null);
-            pathGenerator.listDatasets = jest.fn().mockResolvedValue(["dataset"]);
-            const cbd = new CopybookDownloadService(null, null, null, pathGenerator);
             (cbd as any).handleDataset = jest.fn().mockRejectedValue(new ZoweError("", Type.InvalidCredentials));
-            vscode.window.showErrorMessage = jest.fn();
             await (cbd as any).handleQueue(copybookProfile, new Set(), null);
             expect(vscode.window.showErrorMessage)
                 .toHaveBeenCalledWith("Incorrect credentials in Zowe profile zoweProfile.");
         });
         it("handleQueue handle Connection refused ZoweError", async () => {
-            const pathGenerator = new CopybooksPathGenerator(null);
-            pathGenerator.listDatasets = jest.fn().mockResolvedValue(["dataset"]);
-            const cbd = new CopybookDownloadService(null, null, null, pathGenerator);
             (cbd as any).handleDataset = jest.fn().mockRejectedValue(new ZoweError("", Type.ConnRefused));
-            vscode.window.showErrorMessage = jest.fn();
             await (cbd as any).handleQueue(copybookProfile, new Set(), null);
             expect(vscode.window.showErrorMessage)
                 .toHaveBeenCalledWith("Connection to mainframe using Zowe profile zoweProfile failed.");
         });
         it("handleQueue handle No password ZoweError", async () => {
-            const pathGenerator = new CopybooksPathGenerator(null);
-            pathGenerator.listDatasets = jest.fn().mockResolvedValue(["dataset"]);
-            const cbd = new CopybookDownloadService(null, null, null, pathGenerator);
             (cbd as any).handleDataset = jest.fn().mockRejectedValue(new ZoweError("", Type.NoPassword));
-            vscode.window.showErrorMessage = jest.fn();
             await (cbd as any).handleQueue(copybookProfile, new Set(), null);
             expect(vscode.window.showErrorMessage).toHaveBeenCalledWith("No password in Zowe profile zoweProfile.");
         });
@@ -195,7 +166,6 @@ describe("Test the creation of folders that contains copybooks downloaded from M
         await (copybooksDownloadService as any).downloadCopybookFromMFUsingZowe("dataset", "copybook", "profile");
         expect(fs.existsSync(copybookURIPath)).toBe(true);
 
-        // remove folder and file created to run the scenario
         cleanupScenario();
     });
 });

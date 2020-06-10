@@ -139,7 +139,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
         });
 
         const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
-        expect(uri.includes(CPY_FOLDER_NAME)).toBe(true);
+        expect(uri).toMatch(CPY_FOLDER_NAME);
         expect(spySearchInWorkspace).toBeCalledTimes(1);
 
     });
@@ -159,7 +159,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
         provideMockValueForLocalAndDSN(CPY_FOLDER_NAME, "");
 
         const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
-        expect(uri === "").toBe(false);
+        expect(uri).not.toBe("");
         expect(spySearchInWorkspace).toBeCalledTimes(1);
 
     });
