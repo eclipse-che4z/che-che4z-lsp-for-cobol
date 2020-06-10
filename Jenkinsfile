@@ -140,7 +140,7 @@ pipeline {
                     }
                 }
 
-                stage('Client - Build Test Report'){
+                stage('Client - Unit tests'){
                   environment {
                       npm_config_cache = "$env.WORKSPACE"
                   }
