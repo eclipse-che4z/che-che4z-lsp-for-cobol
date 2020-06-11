@@ -17,10 +17,9 @@ import * as vscode from "vscode";
 import {changeDefaultZoweProfile} from "./commands/ChangeDefaultZoweProfile";
 import {editDatasetPaths} from "./commands/EditDatasetPaths";
 import {fetchCopybookCommand} from "./commands/FetchCopybookCommand";
-import {C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID, SETTINGS_SECTION} from "./constants";
+import {C4Z_FOLDER, GITIGNORE_FILE, SETTINGS_SECTION} from "./constants";
 import {CopybookDownloadService} from "./services/CopybookDownloadService";
 import {CopybookFix} from "./services/CopybookFix";
-import {CopybooksCodeActionProvider} from "./services/CopybooksCodeActionProvider";
 import {CopybooksPathGenerator} from "./services/CopybooksPathGenerator";
 
 import {CopybookURI} from "./services/CopybookURI";
@@ -64,7 +63,6 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
         fetchCopybookCommand(copybook, copyBooksDownloader, programName);
     }));
-    // TODO: Should we leave it as standalone command?
     context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile", () => {
         changeDefaultZoweProfile(profileService);
     }));
@@ -78,8 +76,5 @@ export async function activate(context: vscode.ExtensionContext) {
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
     context.subscriptions.push(copyBooksDownloader);
-    context.subscriptions.push(
-        vscode.languages.registerCodeActionsProvider(
-            {scheme: "file", language: LANGUAGE_ID},
-            new CopybooksCodeActionProvider(profileService)));
+
 }

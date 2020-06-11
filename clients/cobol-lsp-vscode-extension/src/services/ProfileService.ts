@@ -34,10 +34,6 @@ export class ProfileService implements Disposable {
         this.createStatusBarItem();
     }
 
-    async listProfiles(): Promise<ProfilesMap> {
-        return this.zoweApi.listZOSMFProfiles();
-    }
-
     public async getProfileFromMultiple(profiles?: ProfilesMap): Promise<string | undefined> {
         const defaultName = this.zoweApi.getDefaultProfileName();
         const auxProfiles: ProfilesMap = profiles ? profiles : await this.zoweApi.listZOSMFProfiles();
@@ -83,11 +79,6 @@ export class ProfileService implements Disposable {
 
     dispose(): void {
         this.defaultProfileStatusBarItem.dispose();
-    }
-
-    public async checkMultipleProfiles(): Promise<boolean> {
-        const profiles: ProfilesMap = await this.listProfiles();
-        return Object.keys(profiles).length > 1;
     }
 
     /**
