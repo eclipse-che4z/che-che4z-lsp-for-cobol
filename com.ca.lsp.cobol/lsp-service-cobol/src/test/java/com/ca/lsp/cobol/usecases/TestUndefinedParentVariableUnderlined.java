@@ -78,17 +78,18 @@ public class TestUndefinedParentVariableUnderlined {
     assertParagraphUsages(result.getParagraphUsages());
   }
 
-  private void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Diagnostics: " + diagnostics.toString(), 2, diagnostics.size());
+  private void assertDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
+    long numberOfDiagnostics = diagnostics.values().stream().mapToLong(List::size).sum();
+    assertEquals("Diagnostics: " + diagnostics.toString(), 2, numberOfDiagnostics);
 
-    Diagnostic age = diagnostics.get(1);
+    Diagnostic age = diagnostics.get(DOCUMENT_URI).get(1);
     assertEquals("Invalid definition for: AGE", age.getMessage());
     assertEquals(new Range(new Position(9, 27), new Position(9, 30)), age.getRange());
     assertEquals(Information, age.getSeverity());
     assertEquals("COBOL Language Support - I", age.getSource());
     assertNull(age.getCode());
 
-    Diagnostic borrowe = diagnostics.get(0);
+    Diagnostic borrowe = diagnostics.get(DOCUMENT_URI).get(0);
     assertEquals("Invalid definition for: BORROWE", borrowe.getMessage());
     assertEquals(new Range(new Position(9, 34), new Position(9, 41)), borrowe.getRange());
     assertEquals(Information, borrowe.getSeverity());

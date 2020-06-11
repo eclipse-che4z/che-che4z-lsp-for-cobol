@@ -14,24 +14,15 @@
 
 package com.ca.lsp.cobol.service.delegates.completions;
 
-import static org.junit.Assert.*;
-
 import com.ca.lsp.cobol.service.MyDocumentModel;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.eclipse.lsp4j.CompletionItem;
-import org.eclipse.lsp4j.CompletionItemKind;
-import org.eclipse.lsp4j.CompletionParams;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
-import org.eclipse.lsp4j.TextDocumentIdentifier;
+import org.eclipse.lsp4j.*;
 import org.junit.Test;
+
+import java.util.*;
+
+import static java.util.Collections.emptyMap;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Testing Copybook autocomplete class, to determine if copybook names will be correctly detected
@@ -86,13 +77,7 @@ public class CopybookCompletionTest {
 
     AnalysisResult result =
         new AnalysisResult(
-            Collections.emptyList(),
-            Collections.emptyMap(),
-            Collections.emptyMap(),
-            Collections.emptyMap(),
-            Collections.emptyMap(),
-            Collections.emptyMap(),
-            copybookUsages);
+            emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), copybookUsages);
 
     return new MyDocumentModel(TEXT, result);
   }

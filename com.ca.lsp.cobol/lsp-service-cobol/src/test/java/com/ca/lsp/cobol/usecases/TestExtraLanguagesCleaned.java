@@ -18,6 +18,8 @@ package com.ca.lsp.cobol.usecases;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.junit.Test;
 
+import java.util.List;
+
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
@@ -111,6 +113,6 @@ public class TestExtraLanguagesCleaned {
   }
 
   private long countDiagnostics(AnalysisResult result) {
-    return result.getDiagnostics().size();
+    return result.getDiagnostics().values().stream().mapToLong(List::size).sum();
   }
 }

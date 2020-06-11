@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -52,7 +53,8 @@ public class ParagraphCompletionTest {
     Set<Completion> completionSet = new HashSet<>();
     completionSet.add(new ParagraphCompletion());
     Completions completions = new Completions(completionSet);
-    List<CompletionItem> completionItems = completions.collectFor(document, createCompletionParams()).getItems();
+    List<CompletionItem> completionItems =
+        completions.collectFor(document, createCompletionParams()).getItems();
 
     assertEquals(2, completionItems.size());
     assertTrue(
@@ -84,13 +86,13 @@ public class ParagraphCompletionTest {
 
     AnalysisResult result =
         new AnalysisResult(
-            Collections.emptyList(),
-            Collections.emptyMap(),
-            Collections.emptyMap(),
+            emptyMap(),
+            emptyMap(),
+            emptyMap(),
             paragraphDefinitions,
-            Collections.emptyMap(),
-            Collections.emptyMap(),
-            Collections.emptyMap());
+            emptyMap(),
+            emptyMap(),
+            emptyMap());
 
     return new MyDocumentModel(TEXT, result);
   }

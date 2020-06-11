@@ -15,34 +15,29 @@
  */
 package com.ca.lsp.cobol.service;
 
-import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import com.ca.lsp.cobol.service.mocks.MockCopybookService;
-import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
-import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 /**
  * This test verifies that the definition positions for semantic elements from copybooks contain
- * URIs to these copybooks. If a semantic element was defined in the currently open document, the
- * URI should represent this document.
+ * URIs to these copybooks. If a semantic element defined in the currently open document, the URI
+ * should represent this document.
  */
 public class MultiDocumentDefinitionTest extends ConfigurableTest {
   private static final String TEXT =
@@ -66,31 +61,13 @@ public class MultiDocumentDefinitionTest extends ConfigurableTest {
           + "           DISPLAY \"PAR1\".\n"
           + "       PAR2.\n"
           + "           DISPLAY \"PAR2\".\n";
+
   private AnalysisResult analysisResult;
-  private TextDocumentService service;
-
-  public MultiDocumentDefinitionTest() {
-
-    MockCopybookService mockCopybookService =
-        LangServerCtx.getInjector().getInstance(MockCopybookServiceImpl.class);
-
-    mockCopybookService.setCopybooks(
-        () -> Arrays.asList(new CobolText("STRUCT", STRUCT), new CobolText("PARS", PARS)));
-  }
 
   @Before
   public void prepareAnalysisResult() {
-    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
-    TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
-    client.clean();
-
-    runTextValidation(service, TEXT);
-    waitForDiagnostics(client);
-    assertEquals(0, client.getDiagnostics().size());
-
-    Map<String, MyDocumentModel> docs = ((MyTextDocumentService) service).getDocs();
-    MyDocumentModel document = docs.get(DOCUMENT_URI);
-    analysisResult = document.getAnalysisResult();
+    analysisResult =
+        analyze(TEXT, asList(new CobolText("STRUCT", STRUCT), new CobolText("PARS", PARS)));
   }
 
   @Test
@@ -99,31 +76,13 @@ public class MultiDocumentDefinitionTest extends ConfigurableTest {
     assertEquals(5, variableDefinitions.size());
 
     assertEquals(toURI("STRUCT"), variableDefinitions.get("CHILD1").get(0).getUri());
-    assertEquals(toURI("STRUCT"), retrieveURIForGoToDefinition(new Position(6, 20)));
-    assertEquals(DOCUMENT_URI, retrieveURIForGoToDefinition(new Position(6, 30)));
   }
 
-  @Ignore("Not yet implemented")
   @Test
   public void testParagraphDefinition() {
     Map<String, List<Location>> paragraphDefinitions = analysisResult.getParagraphDefinitions();
     assertEquals(2, paragraphDefinitions.size());
 
-    assertEquals("PARS", paragraphDefinitions.get("PAR2").get(0).getUri());
-    assertEquals("PARS", retrieveURIForGoToDefinition(new Position(8, 17)));
-  }
-
-  private String retrieveURIForGoToDefinition(Position position) {
-    try {
-      return service
-          .definition(
-              new TextDocumentPositionParams(new TextDocumentIdentifier(DOCUMENT_URI), position))
-          .get()
-          .get(0)
-          .getUri();
-    } catch (InterruptedException | ExecutionException e) {
-      e.printStackTrace();
-      return null;
-    }
+    assertEquals(toURI("PARS"), paragraphDefinitions.get("PAR2").get(0).getUri());
   }
 }

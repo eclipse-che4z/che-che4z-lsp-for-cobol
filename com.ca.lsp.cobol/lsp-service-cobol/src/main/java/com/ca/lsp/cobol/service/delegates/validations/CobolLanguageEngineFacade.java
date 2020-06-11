@@ -27,18 +27,23 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static com.ca.lsp.cobol.service.delegates.validations.AnalysisResult.empty;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * This class is a facade that maps the result of the syntax and semantic analysis to a model
+ * consumed by the LSP, i.e. convert {@link SyntaxError} to {@link Diagnostic}, positions to ones
+ * protocol-related, and adjust semantic context.
+ */
 @Singleton
 public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final int FIRST_LINE_SEQ_AND_EXTRA_OP = 8;
@@ -56,6 +61,15 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     this.engine = engine;
   }
 
+  /**
+   * Analyze the document using the COBOL language engine and find syntax/semantic errors,
+   * variables, paragraphs etc.
+   *
+   * @param uri - URI of the processing document to define positions and errors properly
+   * @param text of document opened in the client editor
+   * @param textDocumentSyncType reflect the sync status of the document (DID_OPEN|DID_CHANGE)
+   * @return a model containing full analysis result, e.g. errors and semantic elements
+   */
   @Override
   public AnalysisResult analyze(
       String uri, String text, TextDocumentSyncType textDocumentSyncType) {
@@ -65,23 +79,69 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     return toAnalysisResult(engine.run(uri, text, textDocumentSyncType.toString()), uri);
   }
 
+  /**
+   * Don't analyze the document if it is empty or contains only sequence area
+   *
+   * @param text - document to analyze
+   * @return true if the document is empty from the engine point of view
+   */
   private static boolean isEmpty(String text) {
     return text.length() <= FIRST_LINE_SEQ_AND_EXTRA_OP;
   }
 
-  private static List<Diagnostic> convertErrors(List<SyntaxError> errors, String uri) {
+  private AnalysisResult toAnalysisResult(ResultWithErrors<SemanticContext> result, String uri) {
+    SemanticContext context = result.getResult();
+    return new AnalysisResult(
+        collectDiagnosticsForAffectedDocuments(
+            convertErrors(result.getErrors()), context.getCopybookDefinitions(), uri),
+        convertPositions(context.getVariableDefinitions()),
+        convertPositions(context.getVariableUsages()),
+        convertPositions(context.getParagraphDefinitions()),
+        convertPositions(context.getParagraphUsages()),
+        convertPositions(context.getCopybookDefinitions()),
+        convertPositions(context.getCopybookUsages()));
+  }
+
+  /**
+   * Collect diagnostics for each document, used in the analysis - the main COBOL file and all the
+   * copybooks. If there were no errors for some URI, then provide an empty list to clean-up the
+   * errors after the previous analysis.
+   *
+   * @param diagnostics - list of found syntax and semantic errors
+   * @param copybookDefinitions - list of copybook definitions used in this analysis
+   * @param uri - current document URI
+   * @return map with file URI as a key, and lists of diagnostics as values
+   */
+  private Map<String, List<Diagnostic>> collectDiagnosticsForAffectedDocuments(
+      Map<String, List<Diagnostic>> diagnostics,
+      Map<String, Collection<Position>> copybookDefinitions,
+      String uri) {
+    Map<String, List<Diagnostic>> result = new HashMap<>(diagnostics);
+    copybookDefinitions.values().stream()
+        .flatMap(Collection::stream)
+        .map(Position::getDocumentURI)
+        .forEach(it -> result.putIfAbsent(it, emptyList()));
+    result.putIfAbsent(uri, emptyList());
+    return result;
+  }
+
+  private static Map<String, List<Diagnostic>> convertErrors(List<SyntaxError> errors) {
     return errors.stream()
-        .filter(errorOnlyFromCurrentDocument(uri))
-        .map(toDiagnostic())
-        .collect(toList());
+        .map(SyntaxError::getPosition)
+        .map(Position::getDocumentURI)
+        .distinct()
+        .collect(toMap(uri -> uri, toDiagnostics(errors)));
   }
 
-  @Nonnull
-  private static Predicate<SyntaxError> errorOnlyFromCurrentDocument(String uri) {
-    return syntaxError -> uri.equals(syntaxError.getPosition().getDocumentURI());
+  private static Function<String, List<Diagnostic>> toDiagnostics(List<SyntaxError> errors) {
+    return uri ->
+        errors.stream()
+            .filter(err -> err.getPosition().getDocumentURI().equals(uri))
+            .map(toDiagnostic())
+            .collect(toList());
   }
 
-  private static Function<? super SyntaxError, ? extends Diagnostic> toDiagnostic() {
+  private static Function<SyntaxError, Diagnostic> toDiagnostic() {
     return err -> {
       Diagnostic diagnostic = new Diagnostic();
       diagnostic.setSeverity(checkSeverity(err.getSeverity()));
@@ -124,18 +184,6 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
             ((position.getStopPosition() - position.getStartPosition())
                 + cPosInLn
                 + ERR_POS_INDEX)));
-  }
-
-  private AnalysisResult toAnalysisResult(ResultWithErrors<SemanticContext> result, String uri) {
-    SemanticContext context = result.getResult();
-    return new AnalysisResult(
-        convertErrors(result.getErrors(), uri),
-        convertPositions(context.getVariableDefinitions()),
-        convertPositions(context.getVariableUsages()),
-        convertPositions(context.getParagraphDefinitions()),
-        convertPositions(context.getParagraphUsages()),
-        convertPositions(context.getCopybookDefinitions()),
-        convertPositions(context.getCopybookUsages()));
   }
 
   private Map<String, List<Location>> convertPositions(Map<String, Collection<Position>> source) {

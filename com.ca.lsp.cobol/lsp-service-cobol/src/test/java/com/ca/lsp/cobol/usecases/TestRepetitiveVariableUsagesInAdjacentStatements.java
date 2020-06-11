@@ -95,8 +95,9 @@ public class TestRepetitiveVariableUsagesInAdjacentStatements {
     assertLocation(definitions, MAIN_LOGIC, DOCUMENT_URI, 12, 7);
   }
 
-  private void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Diagnostics: " + diagnostics.toString(), 0, diagnostics.size());
+  private void assertDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
+    long numberOfDiagnostics = diagnostics.values().stream().mapToLong(List::size).sum();
+    assertEquals("Diagnostics: " + diagnostics.toString(), 0, numberOfDiagnostics);
   }
 
   private void assertCopybookDefinitions(Map<String, List<Location>> copybookDefinitions) {

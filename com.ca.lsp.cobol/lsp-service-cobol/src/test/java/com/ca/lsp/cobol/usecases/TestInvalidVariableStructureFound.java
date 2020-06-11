@@ -67,10 +67,11 @@ public class TestInvalidVariableStructureFound {
     assertParagraphUsages(result.getParagraphUsages());
   }
 
-  private void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Diagnostics: " + diagnostics.toString(), 1, diagnostics.size());
+  private void assertDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
+    long numberOfDiagnostics = diagnostics.values().stream().mapToLong(List::size).sum();
+    assertEquals("Diagnostics: " + diagnostics.toString(), 1, numberOfDiagnostics);
 
-    Diagnostic invalidChild1 = diagnostics.get(0);
+    Diagnostic invalidChild1 = diagnostics.get(DOCUMENT_URI).get(0);
     assertEquals("Invalid definition for: CHILD1", invalidChild1.getMessage());
     assertEquals(new Range(new Position(8, 21), new Position(8, 27)), invalidChild1.getRange());
     assertEquals(Information, invalidChild1.getSeverity());

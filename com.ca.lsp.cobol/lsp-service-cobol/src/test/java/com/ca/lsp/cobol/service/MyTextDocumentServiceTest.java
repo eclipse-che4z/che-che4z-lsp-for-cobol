@@ -43,8 +43,7 @@ import java.util.function.Function;
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
+import static java.util.Collections.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -167,8 +166,8 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     Communications communications = mock(Communications.class);
     LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
     DataBusBroker broker = mock(DataBusBroker.class);
-    List<Diagnostic> diagnosticsNoErrors = Collections.emptyList();
-    List<Diagnostic> diagnosticsWithErrors = createDefaultDiagnostics();
+    Map<String, List<Diagnostic>> diagnosticsNoErrors = emptyMap();
+    Map<String, List<Diagnostic>> diagnosticsWithErrors = createDefaultDiagnostics();
 
     // created two dummy analysis result, one with error and another without
     // those object will be used as result of dynamic stubbing stage
@@ -251,11 +250,13 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     verify(actions).collect(params);
   }
 
-  private List<Diagnostic> createDefaultDiagnostics() {
-    return singletonList(
-        new Diagnostic(
-            new Range(new Position(0, 0), new Position(0, INCORRECT_TEXT_EXAMPLE.length())),
-            INCORRECT_TEXT_EXAMPLE));
+  private Map<String, List<Diagnostic>> createDefaultDiagnostics() {
+    return singletonMap(
+        DOCUMENT_URI,
+        singletonList(
+            new Diagnostic(
+                new Range(new Position(0, 0), new Position(0, INCORRECT_TEXT_EXAMPLE.length())),
+                INCORRECT_TEXT_EXAMPLE)));
   }
 
   private MyTextDocumentService verifyServiceStart(
@@ -270,7 +271,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   private void verifyDidOpen(
       Communications communications,
       LanguageEngineFacade engine,
-      List<Diagnostic> diagnostics,
+      Map<String, List<Diagnostic>> diagnostics,
       MyTextDocumentService service,
       String textToAnalyse,
       String uri) {
@@ -279,18 +280,18 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     verify(communications).notifyThatLoadingInProgress(uri);
     verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
     verify(communications, timeout(10000)).cancelProgressNotification(uri);
-    verify(communications, timeout(10000)).publishDiagnostics(uri, diagnostics);
+    verify(communications, timeout(10000)).publishDiagnostics(diagnostics);
   }
 
   private void verifyCallback(
       Communications communications,
       LanguageEngineFacade engine,
-      List<Diagnostic> diagnostics,
+      Map<String, List<Diagnostic>> diagnostics,
       String text,
       String uri) {
 
     verify(engine, timeout(10000).times(2)).analyze(uri, text, DID_OPEN);
-    verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
+    verify(communications, times(2)).publishDiagnostics(diagnostics);
   }
 
   /**

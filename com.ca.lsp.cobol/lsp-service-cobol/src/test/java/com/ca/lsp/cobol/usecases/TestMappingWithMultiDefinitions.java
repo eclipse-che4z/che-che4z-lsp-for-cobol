@@ -118,8 +118,16 @@ public class TestMappingWithMultiDefinitions {
     assertParagraphUsages(result.getParagraphUsages());
   }
 
-  private void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Diagnostics: " + diagnostics.toString(), 0, diagnostics.size());
+  private void assertDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
+    String message = "Diagnostics: " + diagnostics.toString();
+    assertEquals(message, 7, diagnostics.size());
+    assertEquals(message, 0, diagnostics.get(DOCUMENT_URI).size());
+    assertEquals(message, 0, diagnostics.get(toURI(STRUC_NAME)).size());
+    assertEquals(message, 0, diagnostics.get(toURI(WITHNEST_NAME)).size());
+    assertEquals(message, 0, diagnostics.get(toURI(PARS_NAME)).size());
+    assertEquals(message, 0, diagnostics.get(toURI(NESTED_NAME)).size());
+    assertEquals(message, 0, diagnostics.get(toURI(NESTED1_NAME)).size());
+    assertEquals(message, 0, diagnostics.get(toURI(NESTED2_NAME)).size());
   }
 
   private void assertCopybookUsages(Map<String, List<Location>> copybookUsages) {

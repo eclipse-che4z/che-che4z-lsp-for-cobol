@@ -69,8 +69,10 @@ public class TestMappingWithReplacing {
     assertParagraphUsages(result.getParagraphUsages());
   }
 
-  private void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Diagnostics: " + diagnostics.toString(), 0, diagnostics.size());
+  private void assertDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
+    String message = "Diagnostics: " + diagnostics.toString();
+    assertEquals(message, 0, diagnostics.get(DOCUMENT_URI).size());
+    assertEquals(message, 0, diagnostics.get(CUSTCOPY_URI).size());
   }
 
   private void assertCopybookUsages(Map<String, List<Location>> copybookUsages) {

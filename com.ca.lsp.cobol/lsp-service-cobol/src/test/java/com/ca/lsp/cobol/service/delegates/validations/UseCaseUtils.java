@@ -38,7 +38,9 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -58,6 +60,7 @@ public class UseCaseUtils {
   public static String toURI(String name) {
     return CPY_URI_PREFIX + name + CPY_URI_SUFFIX;
   }
+
   /**
    * Perform validation of the given text on the service
    *
@@ -161,12 +164,16 @@ public class UseCaseUtils {
    *
    * @param text - text to analyze
    * @param copybooks - list of copybooks required for the analysis
-   * @return list of diagnostics with only severe errors
+   * @return map of diagnostics with only severe errors
    */
   public static List<Diagnostic> analyzeForErrors(String text, List<CobolText> copybooks) {
-    return analyze(text, copybooks).getDiagnostics().stream()
-        .filter(it -> it.getSeverity().getValue() == 1)
-        .collect(toList());
+    return ofNullable(analyze(text, copybooks).getDiagnostics().get(DOCUMENT_URI))
+        .map(
+            diagnostics ->
+                diagnostics.stream()
+                    .filter(it -> it.getSeverity().getValue() == 1)
+                    .collect(toList()))
+        .orElse(emptyList());
   }
 
   /**
@@ -178,7 +185,7 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(String text, List<CobolText> copybooks) {
-    return analyze(text, copybooks, TextDocumentSyncType.DID_OPEN);
+    return analyze(text, copybooks, DID_OPEN);
   }
 
   /**

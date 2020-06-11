@@ -75,11 +75,14 @@ public class TestMisspelledKeywordWarningInCorrectPosition {
     assertParagraphUsages(result.getParagraphUsages());
   }
 
-  private void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Diagnostics: " + diagnostics.toString(), 3, diagnostics.size());
+  private void assertDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
+    long numberOfDiagnostics = diagnostics.values().stream().mapToLong(List::size).sum();
+    assertEquals("Diagnostics: " + diagnostics.toString(), 3, numberOfDiagnostics);
+    assertEquals("Number of copybook diagnostics: ", 0, diagnostics.get(toURI(STRUC1_NAME)).size());
 
     Diagnostic diagnostic =
-        diagnostics.stream()
+        diagnostics.values().stream()
+            .flatMap(List::stream)
             .filter(it -> it.getMessage().contains("misspelled"))
             .findFirst()
             .orElse(null);

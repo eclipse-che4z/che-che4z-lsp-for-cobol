@@ -29,6 +29,7 @@ import java.util.List;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -62,7 +63,7 @@ public class TestResponsesNotContainLineBreaks {
 
     ServerCommunications communications = new ServerCommunications(() -> client, files);
 
-    communications.publishDiagnostics(DOCUMENT_URI, analyzeForErrors(TEXT));
+    communications.publishDiagnostics(singletonMap(DOCUMENT_URI, analyzeForErrors(TEXT)));
 
     verify(client).publishDiagnostics(captor.capture());
     List<Diagnostic> diagnostics = captor.getValue().getDiagnostics();

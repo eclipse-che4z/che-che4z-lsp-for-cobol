@@ -53,6 +53,7 @@ public class TestSameCopybooksWithDifferentCases {
           + "           03  CHILD1         PIC 9   VALUE IS '0'.\n"
           + "           03  CHILD2         PIC 9   VALUE IS '1'.\n"
           + "           03  CHILD3         PIC 9   VALUE IS '2'.";
+
   private static final String CPY_NAME = "STRUCT1";
 
   @Test
@@ -67,8 +68,9 @@ public class TestSameCopybooksWithDifferentCases {
   }
 
   private void assertDiagnostics(AnalysisResult result) {
-    List<Diagnostic> diagnostics = result.getDiagnostics();
-    assertEquals(createMessage(diagnostics), 0, diagnostics.size());
+    Map<String, List<Diagnostic>> diagnostics = result.getDiagnostics();
+    assertEquals(createMessage(diagnostics), 0, diagnostics.get(DOCUMENT_URI).size());
+    assertEquals(createMessage(diagnostics), 0, diagnostics.get(toURI(CPY_NAME)).size());
   }
 
   private void assertCopybookUsages(AnalysisResult result) {
@@ -142,8 +144,9 @@ public class TestSameCopybooksWithDifferentCases {
     assertEquals("Location end character", startPosition + nameLength, end.getCharacter());
   }
 
-  private String createMessage(List<Diagnostic> diagnostics) {
-    return diagnostics.stream()
+  private String createMessage(Map<String, List<Diagnostic>> diagnostics) {
+    return diagnostics.values().stream()
+        .flatMap(List::stream)
         .map(Diagnostic::getMessage)
         .reduce((x, y) -> x + "\r\n" + y)
         .orElse("");

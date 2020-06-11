@@ -72,8 +72,11 @@ public class TestKeywordAsCopybookNotProducesNPE {
     assertParagraphUsages(result.getParagraphUsages());
   }
 
-  private void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Diagnostics: " + diagnostics.toString(), 0, diagnostics.size());
+  private void assertDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
+    String message = "Diagnostics: " + diagnostics.toString();
+    assertEquals(message, 2, diagnostics.size());
+    assertEquals(message, 0, diagnostics.get(DOCUMENT_URI).size());
+    assertEquals(message, 0, diagnostics.get(toURI(DETAIL_NAME)).size());
   }
 
   private void assertParagraphUsages(Map<String, List<Location>> usages) {

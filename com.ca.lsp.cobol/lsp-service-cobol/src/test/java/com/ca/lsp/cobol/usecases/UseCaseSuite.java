@@ -31,6 +31,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestEndPerformCausesError.class,
   TestRemarksAreUnsupported.class,
   TestCpyNameWithSpecialChar.class,
+  TestErrorsInDifferentFiles.class,
   TestExtraneousInputEOFExpecting.class,
   TestNoErrorOnCompilerDirectives.class,
   TestVariablesAreCaseInsensitive.class,

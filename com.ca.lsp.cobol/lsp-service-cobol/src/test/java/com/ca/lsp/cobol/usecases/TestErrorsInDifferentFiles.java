@@ -15,6 +15,7 @@
 
 package com.ca.lsp.cobol.usecases;
 
+import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -25,16 +26,19 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Map;
 
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
+import static java.util.Collections.singletonList;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
- * This test asserts syntax error on not defined variable. CHILD1 on line 6 is used, but not
- * defined, so it should be underlined.
+ * Test syntax errors found in a copybook displayed in the according file. Here, variable definition
+ * in the copybook pasted to procedure division that is an error.
  */
-public class TestMessageIfVariableNotDefined {
+public class TestErrorsInDifferentFiles {
+
   private static final String TEXT =
       "0      Identification Division. \n"
           + "1      Program-id.    ProgramId.\n"
@@ -42,15 +46,20 @@ public class TestMessageIfVariableNotDefined {
           + "3      Working-Storage Section.\n"
           + "4      Procedure Division.\n"
           + "5      000-Main-Logic.\n"
-          + "6          MOVE 0 TO CHILD1.\n"
-          + "7      End program ProgramId.";
+          + "6      COPY ASDASD. \n"
+          + "7          DISPLAY CHILD1.\n"
+          + "8      End program ProgramId.";
 
-  private static final String CHILD1 = "CHILD1";
+  private static final String ASDASD = "           03  CHILD1         PIC 9   VALUE IS '0'.";
+
+  private static final String ASDASD_NAME = "ASDASD";
+
   private static final String MAIN_LOGIC = "000-MAIN-LOGIC";
+  private static final String CHILD1 = "CHILD1";
 
   @Test
   public void test() {
-    AnalysisResult result = analyze(TEXT);
+    AnalysisResult result = analyze(TEXT, singletonList(new CobolText(ASDASD_NAME, ASDASD)));
     assertDiagnostics(result.getDiagnostics());
 
     assertCopybookUsages(result.getCopybookUsages());
@@ -65,14 +74,31 @@ public class TestMessageIfVariableNotDefined {
 
   private void assertDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
     long numberOfDiagnostics = diagnostics.values().stream().mapToLong(List::size).sum();
-    assertEquals("Diagnostics: " + diagnostics.toString(), 1, numberOfDiagnostics);
+    assertEquals("Diagnostics: " + diagnostics.toString(), 3, numberOfDiagnostics);
+    List<Diagnostic> documentDiagnostics = diagnostics.get(DOCUMENT_URI);
 
-    Diagnostic invalidChild1 = diagnostics.get(DOCUMENT_URI).get(0);
+    Diagnostic invalidChild1 = documentDiagnostics.get(0);
     assertEquals("Invalid definition for: CHILD1", invalidChild1.getMessage());
-    assertEquals(new Range(new Position(6, 21), new Position(6, 27)), invalidChild1.getRange());
+    assertEquals(new Range(new Position(7, 19), new Position(7, 25)), invalidChild1.getRange());
     assertEquals(Information, invalidChild1.getSeverity());
     assertEquals("COBOL Language Support - I", invalidChild1.getSource());
     assertNull(invalidChild1.getCode());
+
+    List<Diagnostic> copybookDiagnostics = diagnostics.get(toURI(ASDASD_NAME));
+
+    Diagnostic unexpectedChild1 = copybookDiagnostics.get(0);
+    assertEquals("Syntax error on 'CHILD1' expected SECTION", unexpectedChild1.getMessage());
+    assertEquals(new Range(new Position(0, 15), new Position(0, 21)), unexpectedChild1.getRange());
+    assertEquals(Error, unexpectedChild1.getSeverity());
+    assertEquals("COBOL Language Support - E", unexpectedChild1.getSource());
+    assertNull(unexpectedChild1.getCode());
+
+    Diagnostic unexpectedPic = copybookDiagnostics.get(1);
+    assertEquals("Syntax error on 'PIC' expected SECTION", unexpectedPic.getMessage());
+    assertEquals(new Range(new Position(0, 30), new Position(0, 33)), unexpectedPic.getRange());
+    assertEquals(Error, unexpectedPic.getSeverity());
+    assertEquals("COBOL Language Support - E", unexpectedPic.getSource());
+    assertNull(unexpectedPic.getCode());
   }
 
   private void assertParagraphUsages(Map<String, List<Location>> usages) {
@@ -87,11 +113,14 @@ public class TestMessageIfVariableNotDefined {
 
   private void assertCopybookDefinitions(Map<String, List<Location>> copybookDefinitions) {
     assertEquals(
-        "Copybook definitions: " + copybookDefinitions.toString(), 0, copybookDefinitions.size());
+        "Copybook definitions: " + copybookDefinitions.toString(), 1, copybookDefinitions.size());
+    assertCopybookDefinition(copybookDefinitions, ASDASD_NAME);
   }
 
   private void assertCopybookUsages(Map<String, List<Location>> copybookUsages) {
-    assertEquals("Copybook usages: " + copybookUsages.toString(), 0, copybookUsages.size());
+    assertEquals("Copybook usages: " + copybookUsages.toString(), 1, copybookUsages.size());
+    assertNumberOfLocations(copybookUsages, ASDASD_NAME, 1);
+    assertLocation(copybookUsages, ASDASD_NAME, DOCUMENT_URI, 6, 12);
   }
 
   private void assertVariableDefinitions(Map<String, List<Location>> definitions) {
@@ -102,24 +131,6 @@ public class TestMessageIfVariableNotDefined {
     assertEquals("Variable usages: " + usages.toString(), 1, usages.size());
 
     assertNumberOfLocations(usages, CHILD1, 1);
-    assertLocation(usages, CHILD1, DOCUMENT_URI, 6, 21);
-  }
-
-  private void assertNumberOfLocations(
-      Map<String, List<Location>> source, String name, int number) {
-    assertEquals("Number of " + name + " usages: ", number, source.get(name).size());
-  }
-
-  private void assertLocation(
-      Map<String, List<Location>> source, String name, String uri, int line, int startChar) {
-    List<Location> locations = source.get(name);
-    Location expected =
-        new Location(
-            uri,
-            new Range(
-                new Position(line, startChar), new Position(line, startChar + name.length())));
-    assertTrue(
-        "Expected location for " + name + " not found: " + expected.toString(),
-        locations.contains(expected));
+    assertLocation(usages, CHILD1, DOCUMENT_URI, 7, 19);
   }
 }

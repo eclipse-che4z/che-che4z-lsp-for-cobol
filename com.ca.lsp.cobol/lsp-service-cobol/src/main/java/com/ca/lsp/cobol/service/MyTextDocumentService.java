@@ -54,7 +54,7 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
  * https://microsoft.github.io//language-server-protocol/specifications/specification-3-14/
  *
  * <p>For the maintainers: Please, add logging for exceptions if you run any asynchronous operation.
- * Also, you you perform any communication with the client, do it a using {@link Communications}
+ * Also, you perform any communication with the client, do it a using {@link Communications}
  * instance.
  */
 @Slf4j
@@ -163,7 +163,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-    // A better implementation that will cover the gitfs scenario will be implementated later based
+    // A better implementation that will cover the gitfs scenario will be implemented later based
     // on issue #173
     if (uri.startsWith(GIT_FS_URI)) {
       communications.notifyThatExtensionIsUnsupported("gitfs");
@@ -240,14 +240,14 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
             () -> {
               AnalysisResult result = engine.analyze(uri, text, TextDocumentSyncType.DID_CHANGE);
               registerDocument(uri, new MyDocumentModel(text, result));
-              communications.publishDiagnostics(uri, result.getDiagnostics());
+              communications.publishDiagnostics(result.getDiagnostics());
             })
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
   }
 
   private void publishResult(String uri, AnalysisResult result) {
     communications.cancelProgressNotification(uri);
-    communications.publishDiagnostics(uri, result.getDiagnostics());
+    communications.publishDiagnostics(result.getDiagnostics());
     if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
   }
 

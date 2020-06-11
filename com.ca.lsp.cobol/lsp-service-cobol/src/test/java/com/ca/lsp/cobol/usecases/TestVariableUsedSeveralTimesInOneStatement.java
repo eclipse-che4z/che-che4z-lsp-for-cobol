@@ -65,8 +65,9 @@ public class TestVariableUsedSeveralTimesInOneStatement {
     assertParagraphUsages(result.getParagraphUsages());
   }
 
-  private void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Diagnostics: " + diagnostics.toString(), 0, diagnostics.size());
+  private void assertDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
+    long numberOfDiagnostics = diagnostics.values().stream().mapToLong(List::size).sum();
+    assertEquals("Diagnostics: " + diagnostics.toString(), 0, numberOfDiagnostics);
   }
 
   private void assertParagraphUsages(Map<String, List<Location>> usages) {
