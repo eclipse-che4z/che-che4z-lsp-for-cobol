@@ -492,8 +492,8 @@ TC152051 Syntax Errors have more detailed hints
     @{ERROR_LINES} =  Find Lines With Errors  ${Editor}  ${Active Editor}
     ${LINES} =  Create List  @{ERROR_LINES}
     Log  ${LINES}
-    ${Tooltip Text} =  Show Error Tooltip For Line Number  ${Editor}  @{LINES}[0]  ${Active Editor}
-    Should Be Equal  @{LINES}[0]   ${Error Line Number}
+    ${Tooltip Text} =  Show Error Tooltip For Line Number  ${Editor}  ${LINES}[0]  ${Active Editor}
+    Should Be Equal  ${LINES}[0]   ${Error Line Number}
     Should Be Equal  ${Error Hint}  ${Tooltip Text}
 
     ${Active Tab} =  Get Active Tab  ${Editor}
@@ -701,8 +701,8 @@ Check incorrect Local Cobol File - Full Scenario
     Sleep  1
 
     ${Active Editor} =  Get Active Editor  ${Editor}
-    ${Tooltip Text} =  Show Error Tooltip For Line Number  ${Editor}  @{LINES}[0]  ${Active Editor}
-    Should Be Equal  @{LINES}[0]   ${Error Line Number}
+    ${Tooltip Text} =  Show Error Tooltip For Line Number  ${Editor}  ${LINES}[0]  ${Active Editor}
+    Should Be Equal  ${LINES}[0]   ${Error Line Number}
     Should Be Equal  ${Error Hint}  ${Tooltip Text}
 
     ${Int Line} =  Convert To Integer   ${Semantic Error Line}
@@ -809,7 +809,7 @@ TC174956 Copybook - not exist: error underlined
     ${LINES} =  Create List  @{ERROR_LINES}
     Log  ${LINES}
     Mark Lines  ${Editor}  ${LINES}  ${Active Editor}
-    Should Be True  @{Lines}[0] == ${Copy Line 1}
+    Should Be True  ${Lines}[0] == ${Copy Line 1}
 
     ${Editor} =  Get Editor
     ${Active Tab} =  Get Active Tab  ${Editor}
@@ -836,7 +836,7 @@ TC174658 Copybook - not exist: detailed hint
     @{ERROR_LINES} =  Find Lines With Errors  ${Editor}  ${Active Editor}
     ${LINES} =  Create List  @{ERROR_LINES}
     Log  ${LINES}
-    ${Tooltip Text} =  Show Error Tooltip For Line Number  ${Editor}  @{LINES}[0]  ${Active Editor}
+    ${Tooltip Text} =  Show Error Tooltip For Line Number  ${Editor}  ${LINES}[0]  ${Active Editor}
     Should Be Equal  ${Copybook Not Found Hint}  ${Tooltip Text}
 
     ${Editor} =  Get Editor
@@ -866,7 +866,7 @@ TC174916 Copybook - recursive error
     ${LINES} =  Create List  @{ERROR_LINES}
     Log  ${LINES}
     Mark Lines  ${Editor}  ${LINES}  ${Active Editor}
-    Should Be True   @{LINES}[0] == ${Copy Line 1}
+    Should Be True   ${LINES}[0] == ${Copy Line 1}
 
     ${Editor} =  Get Editor
     ${Active Tab} =  Get Active Tab  ${Editor}
@@ -890,7 +890,7 @@ TC174917 Copybook - recursive detailed hint
     @{ERROR_LINES} =  Find Lines With Errors  ${Editor}  ${Active Editor}
     ${LINES} =  Create List  @{ERROR_LINES}
     Log  ${LINES}
-    ${Tooltip Text} =  Show Error Tooltip For Line Number  ${Editor}  @{LINES}[0]  ${Active Editor}
+    ${Tooltip Text} =  Show Error Tooltip For Line Number  ${Editor}  ${LINES}[0]  ${Active Editor}
     Should Be Equal  ${Copybook Recursive Error Hint}  ${Tooltip Text}
 
     ${Editor} =  Get Editor
@@ -1092,7 +1092,7 @@ TC174952 Copybook - not exist, but dynamically appears
     ${LINES} =  Create List  @{ERROR_LINES}
     Log  ${LINES}
     Mark Lines  ${Editor}  ${LINES}  ${Active Editor}
-    Should Be True  @{Lines}[0] == ${Copy Line 1}
+    Should Be True  ${Lines}[0] == ${Copy Line 1}
 
     Copy File Macro    ${Copybook Missing Src Path}   ${Copybook Missing Path}   ${Copybook Missing}.cpy
 
@@ -1113,7 +1113,7 @@ TC174952 Copybook - not exist, but dynamically appears
     ${LINES} =  Create List  @{ERROR_LINES}
     Log  ${LINES}
     Mark Lines  ${Editor}  ${LINES}  ${Active Editor}
-    Should Be True  @{Lines}[0] == ${Copy Line 1}
+    Should Be True  ${Lines}[0] == ${Copy Line 1}
 
 TC174953 Copybook - definition not exist, but dynamically appears
     [Tags]  TC174953  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  DEFECT_OPEN  DE465210
@@ -1143,7 +1143,7 @@ TC174953 Copybook - definition not exist, but dynamically appears
     ${LINES} =  Create List  @{ERROR_LINES}
     Log  ${LINES}
     Mark Lines  ${Editor}  ${LINES}  ${Active Editor}
-    Should Be True  @{Lines}[0] == ${References Line 1}
+    Should Be True  ${Lines}[0] == ${References Line 1}
 
     Copy File Macro  ${Copybook Missing Src Path}   ${Copybook Missing Path}   ${Copybook Missing}.cpy
 
@@ -1171,4 +1171,4 @@ TC174953 Copybook - definition not exist, but dynamically appears
     ${LINES} =  Create List  @{ERROR_LINES}
     Log  ${LINES}
     Mark Lines  ${Editor}  ${LINES}  ${Active Editor}
-    Should Be True  @{Lines}[0] == ${References Line 1}
+    Should Be True  ${Lines}[0] == ${References Line 1}
