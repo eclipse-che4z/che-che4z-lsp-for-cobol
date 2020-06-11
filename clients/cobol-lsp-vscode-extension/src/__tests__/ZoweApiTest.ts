@@ -97,13 +97,11 @@ describe("ZoweApi public methods", () => {
         expect(loadMock).toBeCalledWith({name: "zoweProfile"});
     });
     it("createSession works fine if password is set", async () => {
-        loadMock.mockResolvedValue({profile: {password: "secret", host: "theHost"}});
-        const expectedSession = {
-            hostname: "theHost",
-            password: "secret",
-            type: "basic",
-        };
-        expect(zoweApi.createSession("zoweProfile")).resolves.toEqual({ISession: expectedSession});
+        loadMock.mockResolvedValue({profile: {user: "user", password: "secret", host: "theHost"}});
+        const session = (await zoweApi.createSession("zoweProfile")).ISession;
+        expect(session.hostname).toBe("theHost");
+        expect(session.user).toBe("user");
+        expect(session.password).toBe("secret");
         expect(loadMock).toBeCalledWith({name: "zoweProfile"});
     });
 });
