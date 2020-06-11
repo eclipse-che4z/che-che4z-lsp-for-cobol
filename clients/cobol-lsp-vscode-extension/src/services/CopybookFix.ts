@@ -29,15 +29,10 @@ export class CopybookFix {
     }
 
     async processDownloadError(title: string) {
-        const actionDatasets = "Edit Datasets";
-        const actionProfile = "Change zowe profile";
-        const action = await vscode.window.showErrorMessage(title,
-            actionDatasets, actionProfile);
-        if (action === actionDatasets) {
-            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths");
-        }
-        if (action === actionProfile) {
-            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile");
+        const actionSettings = "Change settings";
+        const action = await vscode.window.showErrorMessage(title, actionSettings);
+        if (action === actionSettings) {
+            vscode.commands.executeCommand("workbench.action.openSettings", "broadcom-cobol-lsp");
         }
     }
 
