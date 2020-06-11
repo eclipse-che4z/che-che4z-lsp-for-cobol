@@ -32,6 +32,9 @@ const copybookFix: CopybookFix = new CopybookFix();
 
 vscode.workspace.workspaceFolders = [{} as any];
 vscode.window.showInformationMessage = () => Promise.resolve("Download Copybooks");
+vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+    get: jest.fn().mockReturnValue(undefined),
+});
 
 describe("Test fetchCopybook against bad and correct configurations", () => {
     const zoweApi: ZoweApi = new ZoweApi();
@@ -65,7 +68,7 @@ describe("Receiving an error from zowe api layer, copybooks are not retrivied an
                 listMembers: jest.fn().mockRejectedValue(zoweGeneralError),
             };
             const cbd = new CopybookDownloadService(null, zoweApi, null, null);
-            expect((cbd as any).fetchCopybook(null, null)).rejects.toEqual(zoweGeneralError);
+            await expect((cbd as any).fetchCopybook(null, {profile: null})).rejects.toEqual(zoweGeneralError);
         });
     });
 
@@ -76,7 +79,7 @@ describe("Receiving an error from zowe api layer, copybooks are not retrivied an
         const cbd = new CopybookDownloadService(null, zoweApi, null, null);
 
         it("handleCopybook rethrow ZoweError from zoweApi", async () => {
-            expect((cbd as any).handleCopybook(null, null, null)).rejects.toEqual(zoweGeneralError);
+            await expect((cbd as any).handleCopybook(null, {profile: null}, null)).rejects.toEqual(zoweGeneralError);
         });
 
         it("handleCopybook delete copybook from its internal queue if the copybook is a valid member on MF", async () => {
@@ -99,7 +102,7 @@ describe("Receiving an error from zowe api layer, copybooks are not retrivied an
 
         it("handleDataset rethow non NotFound ZoweErrors", async () => {
             (cbd as any).handleCopybook = jest.fn().mockRejectedValue(zoweGeneralError);
-            expect((cbd as any).handleDataset(null, toDownload, null, progress)).rejects.toEqual(zoweGeneralError);
+            await expect((cbd as any).handleDataset(null, toDownload, null, progress)).rejects.toEqual(zoweGeneralError);
         });
         it("handleDataset show an error if copybook is not found", async () => {
             (cbd as any).handleCopybook = jest.fn().mockRejectedValue(zoweError);
