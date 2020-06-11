@@ -294,7 +294,7 @@ Navigate To Element Path
 
 *** Test Cases ***
 TC152046 Nominal - check syntax Ok message
-    [Tags]  TC152046  COBOL_LOCAL  LSP  FireFox  Rally  Unstable
+    [Tags]  TC152046  COBOL_LOCAL  LSP  FireFox  Rally  NEED_UPDATE
     [Documentation]  Checks that when opening Cobol file with correct syntax there is an appropriate message is shown
     ${Explorer Title Node} =  Find File Explorer Panel
     ${Top File Element} =  Find First Element In Files Explorer
@@ -404,7 +404,7 @@ TC152080 Find all references from the word begin
     Close Tab  ${Editor}  ${Active Tab}
 
 TC152080 Find all references from the word middle
-    [Tags]  TC152080  COBOL_LOCAL  LSP  FireFox  Rally  Unstable
+    [Tags]  TC152080  COBOL_LOCAL  LSP  FireFox  Rally  DEFECT_OPEN  DE465817
     [Documentation]  Checks that LSP can find all references and navigate by them
     ${Explorer Title Node} =  Find File Explorer Panel
     ${Top File Element} =  Find First Element In Files Explorer
@@ -750,7 +750,7 @@ Check incorrect Local Cobol File - Full Scenario
 # Copybooks
 
 TC174655 Copybook - Nominal
-    [Tags]  TC174655  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  Unstable
+    [Tags]  TC174655  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  NEED_UPDATE
     [Documentation]  Checks that when opening Cobol file with correct reference to copybook,
          ...  there is syntax ok message shown
 
@@ -788,7 +788,7 @@ TC174657 Copybook - not exist: no syntax ok message
     Close Tab  ${Editor}  ${Active Tab}
 
 TC174956 Copybook - not exist: error underlined
-    [Tags]  TC174956  COBOL_LOCAL  LSP  FireFox  Rally  Copybook
+    [Tags]  TC174956  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  DEFECT_OPEN  DE465210
     [Documentation]  Checks that error lines are marked in a file
 
     # Modify User Preferences With Datasets and Zowe Profile Macro
@@ -816,7 +816,7 @@ TC174956 Copybook - not exist: error underlined
     Close Tab  ${Editor}  ${Active Tab}
 
 TC174658 Copybook - not exist: detailed hint
-    [Tags]  TC174658  COBOL_LOCAL  LSP  FireFox  Rally  Copybook
+    [Tags]  TC174658  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  DEFECT_OPEN  DE465210
     [Documentation]  Checks that error lines for missing copybook have detailed hints
 
     # Modify User Preferences With Datasets and Zowe Profile Macro
@@ -844,7 +844,7 @@ TC174658 Copybook - not exist: detailed hint
     Close Tab  ${Editor}  ${Active Tab}
 
 TC174916 Copybook - recursive error
-    [Tags]  TC174916  COBOL_LOCAL  LSP  FireFox  Rally  Copybook
+    [Tags]  TC174916  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  DEFECT_OPEN  DE465210
     [Documentation]  Checks that when opening Cobol file which recursively refers to copybooks,
         ...  copybook is underlined with an error
 
@@ -873,7 +873,7 @@ TC174916 Copybook - recursive error
     Close Tab  ${Editor}  ${Active Tab}
 
 TC174917 Copybook - recursive detailed hint
-    [Tags]  TC174917  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  Unstable
+    [Tags]  TC174917  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  DEFECT_OPEN  DE465210
     [Documentation]  Checks that when opening Cobol file which recursively refers to copybooks,
         ...  have detailed error hint
 
@@ -898,7 +898,7 @@ TC174917 Copybook - recursive detailed hint
     Close Tab  ${Editor}  ${Active Tab}
 
 TC174932 Copybook - invalid definition
-    [Tags]  TC174932  COBOL_LOCAL  LSP  FireFox  Rally  Copybook
+    [Tags]  TC174932  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  DEFECT_OPEN  DE465210
     [Documentation]  Checks that when opening Cobol file which uses invalid definition from copybook,
        ...   this definition is underlined as a semantic error
 
@@ -926,7 +926,7 @@ TC174932 Copybook - invalid definition
     Close Tab  ${Editor}  ${Active Tab}
 
 TC174933 Copybook - invalid definition hint
-    [Tags]  TC174933  COBOL_LOCAL  LSP  FireFox  Rally  Copybook
+    [Tags]  TC174933  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  DEFECT_OPEN  DE465210
     [Documentation]  Checks that when opening Cobol file which uses invalid definition from copybook,
        ...   has detailed hint on mouse hover
 
@@ -954,7 +954,7 @@ TC174933 Copybook - invalid definition hint
     Close Tab  ${Editor}  ${Active Tab}
 
 TC174918 Copybook - peek definition
-    [Tags]  TC174918  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  Unstable
+    [Tags]  TC174918  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  DEFECT_OPEN  DE465210
     [Documentation]  Checks that Peek Definition functionality works in theia in cobol file via context menu
 
     # Modify User Preferences With Datasets and Zowe Profile Macro
@@ -988,7 +988,7 @@ TC174918 Copybook - peek definition
     Close Tab  ${Editor}  ${Active Tab}
 
 TC174930 Copybook - Ctrl+Click on definition
-    [Tags]  TC174930  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  Unstable
+    [Tags]  TC174930  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  DEFECT_OPEN  DE465210
     [Documentation]  Checks that Peek Definition functionality works in theia in cobol file via Ctrl+Click
 
     # Modify User Preferences With Datasets and Zowe Profile Macro
@@ -1020,7 +1020,7 @@ TC174930 Copybook - Ctrl+Click on definition
     Close Tab  ${Editor}  ${Active Tab}
 
 TC174931 Copybook - peek references
-    [Tags]  TC174931  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  Unstable
+    [Tags]  TC174931  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  DEFECT_OPEN  DE465210
     [Documentation]  Checks that LSP can find all references (also in copybooks) and navigate by them
 
     # Modify User Preferences With Datasets and Zowe Profile Macro
@@ -1066,7 +1066,7 @@ TC174931 Copybook - peek references
     Close Tab  ${Editor}  ${Active Tab}
 
 TC174952 Copybook - not exist, but dynamically appears
-    [Tags]  TC174952  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  Unstable
+    [Tags]  TC174952  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  DEFECT_OPEN  DE465210
     [Documentation]  Checks that LSP can dynamically detect appearance of copybook and rescan cobol file on the fly
 
     # Modify User Preferences With Datasets and Zowe Profile Macro
@@ -1116,7 +1116,7 @@ TC174952 Copybook - not exist, but dynamically appears
     Should Be True  @{Lines}[0] == ${Copy Line 1}
 
 TC174953 Copybook - definition not exist, but dynamically appears
-    [Tags]  TC174953  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  Unstable
+    [Tags]  TC174953  COBOL_LOCAL  LSP  FireFox  Rally  Copybook  DEFECT_OPEN  DE465210
     [Documentation]  Checks that LSP can dynamically detect definitions from an appeared
         ...   copybook and rescan cobol file on the fly
 
