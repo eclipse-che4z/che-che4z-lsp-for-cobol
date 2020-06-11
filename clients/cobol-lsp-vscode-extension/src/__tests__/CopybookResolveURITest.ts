@@ -35,7 +35,7 @@ vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
 });
 // file utils
 function createFile(filename: string): string {
-    fs.writeFile(path.join(folderPath, filename), "Some dummy content", err => {
+    fs.writeFileSync(path.join(folderPath, filename), "Some dummy content", err => {
         if (err) {
             return null;
         }
@@ -43,7 +43,8 @@ function createFile(filename: string): string {
     return path.resolve(folderPath, filename);
 }
 function createDirectory(targetPath: string) {
-    fs.promises.mkdir(targetPath, {recursive: true}).catch(console.error);
+
+    fs.mkdirSync(targetPath, {recursive: true});
 }
 function removeFolder(pathFile: string) {
     fs.remove(pathFile);
