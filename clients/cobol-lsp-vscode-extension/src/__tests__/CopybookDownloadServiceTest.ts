@@ -176,7 +176,7 @@ describe("Test the creation of folders that contains copybooks downloaded from M
 describe("Test the capability to add missing copybooks to the download queue", () => {
     function setupScenario() {
         const profileService: ProfileService = new ProfileService(new ZoweApi());
-        profileService.getProfile = jest.fn().mockReturnValue("PROFILE");
+        profileService.getProfileFromDocument = jest.fn().mockReturnValue("PROFILE");
         const copybooksDownloader = new CopybookDownloadService(copybookFix, new ZoweApi(), profileService, null);
         return {copybooksDownloader};
     }
