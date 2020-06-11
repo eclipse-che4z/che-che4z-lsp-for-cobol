@@ -41,18 +41,13 @@ export class CopybookDownloadService implements vscode.Disposable {
     }
 
     /**
-     * @param copybooks array of copybooks names to download
-     * @param programName analyzed COBOL file
+     * This method is invoked by {@link CopybookURI#resolveCopybookURI} when the target copybbok is not found on
+     * local workspaces and should be added in the download queue for copybooks that the LSP client will try
+     * to download from MF
+     * @param cobolFileName name of the document open in workspace
+     * @param copybookName name of the copybook required by the LSP server
      */
-    async downloadCopybooks(copybooks: string[], programName: string): Promise<void> {
-        const profile: string = await this.profileService.getProfileFromDocument(programName);
-        if (!profile) {
-            return;
-        }
-        copybooks.forEach(copybook => this.queue.push(copybook, profile));
-    }
-
-    public async downloadDependency(cobolFileName: string, copybookName: string): Promise<void> {
+    public async downloadCopybook(cobolFileName: string, copybookName: string): Promise<void> {
         if (!checkWorkspace()) {
             return;
         }
@@ -60,7 +55,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         if (!profile) {
             return;
         }
-        this.resolver.downloadMissingCopybooks([copybookName], profile);
+        this.resolver.addCopybookInQueue([copybookName], profile);
 
     }
 
@@ -181,11 +176,11 @@ export class CopybookDownloadService implements vscode.Disposable {
         if (!members.includes(copybookProfile.copybook)) {
             return false;
         }
-        await this.downloadCopybook(dataset, copybookProfile.copybook, copybookProfile.profile);
+        await this.downloadCopybookFromMFUsingZowe(dataset, copybookProfile.copybook, copybookProfile.profile);
         return true;
     }
 
-    private async downloadCopybook(dataset: string, copybook: string, profileName: string) {
+    private async downloadCopybookFromMFUsingZowe(dataset: string, copybook: string, profileName: string) {
         const copybookPath = createCopybookPath(profileName, dataset, copybook);
         if (!fs.existsSync(copybookPath)) {
             const content = await this.zoweApi.fetchMember(dataset, copybook, profileName);
