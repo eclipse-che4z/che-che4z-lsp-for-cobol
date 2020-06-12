@@ -214,7 +214,7 @@ pipeline {
                 }
                 container('python') {
                     dir('tests/theia_automation_lsp') {
-                        sh 'HOME=`pwd`/robot_home PYTHONPATH=`pwd` robot -i Rally -e Unstable --variable HEADLESS:True --outputdir robot_output robot_suites/lsp/local/firefox_lsp_local.robot'
+                        sh 'HOME=`pwd`/robot_home PYTHONPATH=`pwd` robot -i Rally -e NEED_UPDATE -e DEFECT_OPEN --variable HEADLESS:True --outputdir robot_output robot_suites/lsp/local/firefox_lsp_local.robot'
                     }
                 }
             }
