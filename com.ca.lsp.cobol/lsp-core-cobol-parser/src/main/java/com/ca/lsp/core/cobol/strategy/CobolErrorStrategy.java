@@ -13,17 +13,9 @@
  */
 package com.ca.lsp.core.cobol.strategy;
 
-import org.antlr.v4.runtime.DefaultErrorStrategy;
-import org.antlr.v4.runtime.FailedPredicateException;
-import org.antlr.v4.runtime.InputMismatchException;
-import org.antlr.v4.runtime.NoViableAltException;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.misc.IntervalSet;
-
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
 
 @Slf4j
 public class CobolErrorStrategy extends DefaultErrorStrategy {
@@ -72,6 +64,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
       return; // don't report spurious errors
     }
     beginErrorCondition(recognizer);
+
     if (e instanceof NoViableAltException) {
       reportNoViableAlternative(recognizer, (NoViableAltException) e);
     } else if (e instanceof InputMismatchException) {
@@ -85,11 +78,31 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
   }
 
   @Override
+  public void sync(Parser recognizer) {
+    Token currentToken = recognizer.getCurrentToken();
+    String terminal = currentToken.getText();
+    // If the processing stopped at the copybook enter tag and cannot be recovered in place, it
+    // means that there are, in fact, two affected tokens
+    if (terminal.startsWith("*>CPYENTER")) {
+      int nextTokenType = recognizer.getInputStream().LA(3);
+      IntervalSet expecting = getExpectedTokens(recognizer);
+      if (expecting.contains(nextTokenType)) {
+        // Move processing forward two times
+        recognizer.consume();
+        recognizer.consume();
+      }
+    }
+    super.sync(recognizer);
+  }
+
+  @Override
   protected void reportInputMismatch(Parser recognizer, InputMismatchException e) {
     String msg =
         String.format(
             parseCustomMessage(
-                getStandardMessage(REPORT_INPUT_MISMATCH), REPORT_INPUT_MISMATCH, getRule(recognizer)),
+                getStandardMessage(REPORT_INPUT_MISMATCH),
+                REPORT_INPUT_MISMATCH,
+                getRule(recognizer)),
             getOffendingToken(e),
             getExpectedToken(recognizer, e));
     recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
@@ -109,7 +122,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
         String.format(
             parseCustomMessage(
                 getStandardMessage(REPORT_NO_VIABLE_ALTERNATIVE),
-                    REPORT_NO_VIABLE_ALTERNATIVE,
+                REPORT_NO_VIABLE_ALTERNATIVE,
                 getRule(recognizer)),
             input,
             null);
@@ -127,7 +140,9 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     String msg =
         String.format(
             parseCustomMessage(
-                getStandardMessage(REPORT_UNWANTED_TOKEN), REPORT_UNWANTED_TOKEN, getRule(recognizer)),
+                getStandardMessage(REPORT_UNWANTED_TOKEN),
+                REPORT_UNWANTED_TOKEN,
+                getRule(recognizer)),
             tokenName,
             getExpectedToken(recognizer, null));
     recognizer.notifyErrorListeners(t, msg, null);
@@ -143,7 +158,8 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     String rule = getRule(recognizer);
     String msg =
         String.format(
-            parseCustomMessage(getStandardMessage(REPORT_MISSING_TOKEN), REPORT_MISSING_TOKEN, rule),
+            parseCustomMessage(
+                getStandardMessage(REPORT_MISSING_TOKEN), REPORT_MISSING_TOKEN, rule),
             getExpectedToken(recognizer, null),
             rule);
     recognizer.notifyErrorListeners(t, msg, null);

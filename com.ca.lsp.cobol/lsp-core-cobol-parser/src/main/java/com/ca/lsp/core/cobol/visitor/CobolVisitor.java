@@ -25,10 +25,8 @@ import com.ca.lsp.core.cobol.semantics.CobolVariableContext;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
 import lombok.Getter;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import javax.annotation.Nullable;
@@ -36,6 +34,7 @@ import java.util.*;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
@@ -63,49 +62,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     documentHierarchyStack.push(
         new DocumentHierarchyLevel(
             documentUri, new ArrayList<>(documentPositions.get(documentUri))));
-  }
-
-  @Override
-  public Class visitDataDescriptionEntryCpy(DataDescriptionEntryCpyContext ctx) {
-    String cpyName = retrieveCpyName(ctx.URI_IDENTIFIER(), ctx);
-    documentHierarchyStack.push(nextDocLevel(cpyName));
-    return visitChildren(ctx);
-  }
-
-  @Override
-  public Class visitEnterCpy(EnterCpyContext ctx) {
-    String cpyName = retrieveCpyName(ctx.URI_IDENTIFIER(), ctx);
-    documentHierarchyStack.push(nextDocLevel(cpyName));
-    return visitChildren(ctx);
-  }
-
-  private String retrieveCpyName(TerminalNode identifier, ParserRuleContext ctx) {
-    return ofNullable(identifier)
-        .map(ParseTree::getText)
-        .orElse(ctx.getChildCount() > 1 ? ctx.getChild(1).getText() : "")
-        .replace("<URI>", "")
-        .replace("</URI>", "");
-  }
-
-  private DocumentHierarchyLevel nextDocLevel(String cpyName) {
-    return new DocumentHierarchyLevel(
-        cpyName, ofNullable(documentPositions.get(cpyName)).orElse(emptyList()));
-  }
-
-  @Override
-  public Class visitDataDescriptionExitCpy(DataDescriptionExitCpyContext ctx) {
-    moveToPreviousLevel();
-    return visitChildren(ctx);
-  }
-
-  @Override
-  public Class visitExitCpy(ExitCpyContext ctx) {
-    moveToPreviousLevel();
-    return visitChildren(ctx);
-  }
-
-  private void moveToPreviousLevel() {
-    documentHierarchyStack.pop();
   }
 
   @Nullable
@@ -252,7 +208,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     Token token = node.getSymbol();
     Position position = calculatePosition(token);
     mapping.put(token, position);
-
+    checkControlSymbol(token.getText());
     return super.visitTerminal(node);
   }
 
@@ -261,8 +217,31 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     Token token = node.getSymbol();
     Position position = calculatePosition(token);
     mapping.put(token, position);
-
+    checkControlSymbol(token.getText());
     return super.visitTerminal(node);
+  }
+
+  private void checkControlSymbol(String terminal) {
+    if (isEmpty(terminal)) return;
+    if (terminal.startsWith("*>CPYENTER")) {
+      moveToNextLevel(terminal);
+    } else if ("*>CPYEXIT".equals(terminal)) {
+      moveToPreviousLevel();
+    }
+  }
+
+  private void moveToNextLevel(String cpy) {
+    documentHierarchyStack.push(
+        nextDocLevel(cpy.substring(10).replace("<URI>", "").replace("</URI>", "")));
+  }
+
+  private DocumentHierarchyLevel nextDocLevel(String cpyName) {
+    return new DocumentHierarchyLevel(
+        cpyName, ofNullable(documentPositions.get(cpyName)).orElse(emptyList()));
+  }
+
+  private void moveToPreviousLevel() {
+    documentHierarchyStack.pop();
   }
 
   private void checkForVariable(String variable, QualifiedDataNameFormat1Context ctx) {
