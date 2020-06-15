@@ -231,7 +231,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     return copybookName
         + replacingPhraseContexts.stream()
             .map(RuleContext::getText)
-            .reduce((r1, r2) -> r1 + r2)
+            .reduce(String::concat)
             .orElse("")
             .replaceAll("[^a-zA-Z0-9]+", "")
             .trim();
