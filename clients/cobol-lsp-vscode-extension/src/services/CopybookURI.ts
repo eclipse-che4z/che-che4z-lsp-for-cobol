@@ -93,7 +93,7 @@ export class CopybookURI {
         result = CopybookURI.searchInWorkspace(copybookName, vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
         // check in subfolders under .copybooks (copybook downloaded from MF)
         if (!result) {
-            result = CopybookURI.searchInWorkspace(copybookName, this.createPathForCopybookDownloaded(await this.profileService.getProfileFromDocument(cobolProgramName)));
+            result = CopybookURI.searchInWorkspace(copybookName, this.createPathForCopybookDownloaded(await this.profileService.resolveProfile(cobolProgramName)));
         }
         // copybook is not present on any folders defined by the user and not already downloaded, so is marked
         // a copybook that should be downloaded manually by the user.

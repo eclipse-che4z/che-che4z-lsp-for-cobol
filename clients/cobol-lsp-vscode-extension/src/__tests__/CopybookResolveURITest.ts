@@ -29,7 +29,7 @@ const copybookNameWithExtension: string = "NSTCOPY2.cpy";
 const CPY_FOLDER_NAME = ".cobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
 SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + __dirname]);
-profileService.getProfileFromDocument = jest.fn().mockReturnValue("PRF");
+profileService.resolveProfile = jest.fn().mockReturnValue("PRF");
 copybookDownloadService.downloadCopybook = jest.fn().mockReturnValue("CPY");
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
     get: jest.fn().mockReturnValue(undefined),
@@ -129,7 +129,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
         expect(spySearchInWorkspace).toBeCalledTimes(1);
     });
     test("With no settings provided, two search strategies are applied and function return an empty string", async () => {
-        profileService.getProfileFromDocument = jest.fn().mockReturnValue("PRF");
+        profileService.resolveProfile = jest.fn().mockReturnValue("PRF");
         copybookDownloadService.downloadCopybook = jest.fn().mockReturnValue("CPY");
         provideMockValueForLocalAndDSN("", "");
         const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
