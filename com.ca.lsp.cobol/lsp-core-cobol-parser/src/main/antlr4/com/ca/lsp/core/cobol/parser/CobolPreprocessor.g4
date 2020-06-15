@@ -193,7 +193,7 @@ copyLibrary
 
 // replace statement
 replacingPhrase
-   : REPLACING NEWLINE* replaceClause (NEWLINE+ replaceClause)*
+   : REPLACING NEWLINE* replaceClause+
    ;
 
 replaceArea
