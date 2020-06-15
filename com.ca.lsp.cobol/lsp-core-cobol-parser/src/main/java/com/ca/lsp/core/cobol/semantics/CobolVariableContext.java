@@ -22,6 +22,7 @@ import com.google.common.collect.Multimap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;
@@ -47,8 +48,8 @@ public class CobolVariableContext<T> implements SubContext<Variable, T> {
   }
 
   @Override
-  public void addUsage(String variableName, T position) {
-    variableUsages.put(variableName, position);
+  public void addUsage(String variable, T position) {
+    variableUsages.put(variable, position);
   }
 
   @Override
@@ -85,28 +86,29 @@ public class CobolVariableContext<T> implements SubContext<Variable, T> {
   }
 
   /**
+   * Check if the given root variable contains a variable with a given name, even indirectly
+   *
    * @param rootVariableName the root variable from where start the deep search
    * @param targetVariableName the name of the variable to found in the variable tree
-   * @return a boolean true if the variable targetVaraible is present false otherwise
+   * @return true if the target variable presents or false otherwise
    */
   public boolean parentContainsSpecificChild(String rootVariableName, String targetVariableName) {
-    Variable rootVariable = get(rootVariableName);
+    return ofNullable(get(rootVariableName))
+        .map(Variable::getChildren)
+        .map(
+            children ->
+                children.contains(targetVariableName)
+                    || checkAnyVariableContainsChild(children, targetVariableName))
+        .orElse(false);
+  }
 
-    if (rootVariable == null) {
-      return false;
-    }
-
-    if (rootVariable.getChildren().contains(targetVariableName)) {
-      return true;
-    } else {
-      for (String childVariableName : rootVariable.getChildren()) {
-        Variable childVariable = get(childVariableName);
-        if (childVariable != null) {
-          return parentContainsSpecificChild(childVariable.getName(), targetVariableName);
-        }
-      }
-    }
-    return false;
+  private boolean checkAnyVariableContainsChild(List<String> variables, String child) {
+    return variables.stream()
+        .map(this::get)
+        .filter(Objects::nonNull)
+        .map(variable -> parentContainsSpecificChild(variable.getName(), child))
+        .findAny()
+        .orElse(false);
   }
 
   private void createRelationBetweenVariables() {

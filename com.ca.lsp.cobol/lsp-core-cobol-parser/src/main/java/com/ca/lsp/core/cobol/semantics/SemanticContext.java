@@ -23,6 +23,10 @@ import lombok.Value;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * THis class represents the entire semantic context of the current document, including its
+ * variables, paragraphs, copybooks etc., with their definitions and usages.
+ */
 @Value
 @AllArgsConstructor
 public class SemanticContext {
@@ -32,5 +36,4 @@ public class SemanticContext {
   private Map<String, Collection<Position>> paragraphUsages;
   private Map<String, Collection<Position>> copybookDefinitions;
   private Map<String, Collection<Position>> copybookUsages;
-
 }

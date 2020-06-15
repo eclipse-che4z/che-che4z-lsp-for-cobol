@@ -21,6 +21,12 @@ import lombok.Getter;
 
 import java.util.Collection;
 
+/**
+ * This class represents a semantic sub-context for specific types of elements that have names and
+ * stores their definitions and variables.
+ *
+ * @param <T> - type of positions of the semantic elements
+ */
 public class NamedSubContext<T> implements SubContext<String, T> {
 
   @Getter private final Multimap<String, T> definitions = HashMultimap.create();
