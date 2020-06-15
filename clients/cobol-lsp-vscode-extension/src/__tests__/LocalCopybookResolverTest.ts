@@ -44,6 +44,7 @@ describe("test parse method against bad setting configuration", () => {
     test("parse an empty setting file returns an empty list", () => {
         assertParseOf({}, 0);
     });
+    
 
     test("parse a setting file without the key 'LOCAL' return an empty list", () => {
         assertParseOf({"key": []}, 0);
@@ -52,11 +53,11 @@ describe("test parse method against bad setting configuration", () => {
 
 describe("test parse method with correct setting configuration", () => {
     test("parse a setting file with key 'LOCAL' return the values in an array", () => {
-        assertParseOf({"broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME]}, 1);
+        assertParseOf({"broadcom-cobol-lsp.cpy-manager.paths-local": [FILENAME]}, 1);
     });
 
     test("parse a setting file with heterogeneous keys that include the key 'LOCAL' return the LOCAL's values in an array", () => {
-        assertParseOf({"key": "value", "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME]}, 1);
+        assertParseOf({"key": "value", "broadcom-cobol-lsp.cpy-manager.paths-local": [FILENAME]}, 1);
     });
 
 });
@@ -96,7 +97,7 @@ describe("validate path resource with correct configuration", () => {
     it("a valid path written two times is included in the list only one time", () => {
         assertParseOf({
             "key": "value",
-            "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME, FILENAME],
+            "broadcom-cobol-lsp.cpy-manager.paths-local": [FILENAME, FILENAME],
         }, 1);
     });
 
@@ -125,7 +126,7 @@ function prepareJson() {
 
     return {
         "key": "value",
-        "broadcom-cobol-lsp.cpy-manager.paths.local": [FILENAME],
+        "broadcom-cobol-lsp.cpy-manager.paths-local": [FILENAME],
     };
 }
 
