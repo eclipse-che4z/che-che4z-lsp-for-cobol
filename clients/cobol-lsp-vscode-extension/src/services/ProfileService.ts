@@ -81,6 +81,12 @@ export class ProfileService implements Disposable {
         this.defaultProfileStatusBarItem.dispose();
     }
 
+    public async resolveProfile(programName: string) {
+        const profile: string = await this.getProfileFromSettings();
+        return (profile) ? profile : await this.getProfileFromDocument(programName);
+
+    }
+
     /**
      * This async method verify that a profile is selected by the user and could be used to resolve
      * resources on MF
