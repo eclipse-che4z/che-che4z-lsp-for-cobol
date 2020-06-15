@@ -36,6 +36,10 @@ vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
     get: jest.fn().mockReturnValue(undefined),
 });
 
+beforeEach(() => {
+    jest.clearAllMocks();
+});
+
 describe("Test fetchCopybook against bad and correct configurations", () => {
     const zoweApi: ZoweApi = new ZoweApi();
     const copybookDownloadService: CopybookDownloadService = new CopybookDownloadService(copybookFix, zoweApi, null, null);
@@ -173,19 +177,33 @@ describe("Test the creation of folders that contains copybooks downloaded from M
     });
 });
 
-describe("Test the capability to add missing copybooks to the download queue", () => {
+describe("Validate download copybooks from mainframe with correct and incorrect configuration provided", () => {
     function setupScenario() {
         const profileService: ProfileService = new ProfileService(new ZoweApi());
-        profileService.getProfileFromDocument = jest.fn().mockReturnValue("PROFILE");
         const copybooksDownloader = new CopybookDownloadService(copybookFix, new ZoweApi(), profileService, null);
-        return {copybooksDownloader};
+        return {copybooksDownloader, profileService};
     }
 
-    test("When no workspace is open, copybooks are not added to the download queue", async () => {
-        const {copybooksDownloader} = setupScenario();
+    async function runSpyScenarioWithConditions(spyMethod: any, toBeCalledTimes: number, profileName?: string) {
+        const {copybooksDownloader, profileService} = setupScenario();
 
-        const spyAddInQueue = jest.spyOn(copybookFix, "addCopybookInQueue");
+        profileService.resolveProfile = jest.fn().mockReturnValue(profileName);
+        const spy = jest.spyOn(copybookFix, spyMethod);
         await copybooksDownloader.downloadCopybook("copybook", "CBLPRG");
-        expect(spyAddInQueue).toBeCalledTimes(1);
+        expect(spy).toBeCalledTimes(toBeCalledTimes);
+    }
+
+    test("Given a defined workspace and profile, the copybook is added to the download queue", async () => {
+        await runSpyScenarioWithConditions("addCopybookInQueue", 1, "PROFILE");
     });
+
+    test("Given a not defined profile, the copybook is not downloaded and user is notified", async () => {
+        await runSpyScenarioWithConditions("processDownloadError", 1);
+    });
+
+    test("Given a not defined workspace, the copybook is not downloaded and user is notified", async () => {
+        vscode.workspace.workspaceFolders = [];
+        await runSpyScenarioWithConditions("addCopybookInQueue", 0, "PROFILE");
+    });
+
 });

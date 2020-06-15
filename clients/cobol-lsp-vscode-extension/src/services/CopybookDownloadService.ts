@@ -51,11 +51,12 @@ export class CopybookDownloadService implements vscode.Disposable {
         if (!checkWorkspace()) {
             return;
         }
-        const profile: string = await this.profileService.getProfileFromDocument(cobolFileName);
+        const profile: string = await this.profileService.resolveProfile(cobolFileName);
         if (!profile) {
+            this.createErrorMessageForCopybooks(new Set<string>().add(copybookName));
             return;
         }
-        this.resolver.addCopybookInQueue([copybookName], profile);
+        await this.resolver.addCopybookInQueue([copybookName], profile);
 
     }
 
@@ -77,11 +78,15 @@ export class CopybookDownloadService implements vscode.Disposable {
                 async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
                     await this.handleQueue(element, errors, progress);
                     if (this.queue.length === 0 && errors.size > 0) {
-                        this.resolver.processDownloadError(PROCESS_DOWNLOAD_ERROR_MSG + Array.from(errors));
+                        this.createErrorMessageForCopybooks(errors);
                         errors.clear();
                     }
                 });
         }
+    }
+
+    private createErrorMessageForCopybooks(datasets: Set<string>) {
+        this.resolver.processDownloadError(PROCESS_DOWNLOAD_ERROR_MSG + Array.from(datasets));
     }
 
     public dispose() {
