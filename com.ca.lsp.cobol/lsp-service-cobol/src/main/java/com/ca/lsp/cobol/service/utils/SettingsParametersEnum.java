@@ -20,8 +20,8 @@ package com.ca.lsp.cobol.service.utils;
  */
 public enum SettingsParametersEnum {
   COPYBOOK("copybook"),
-  DATASETS("cpy-manager.paths.dsn"),
-  LOCAL_PATHS("cpy-manager.paths.local"),
+  DATASETS("cpy-manager.paths-dsn"),
+  LOCAL_PATHS("cpy-manager.paths-local"),
   LSP_PREFIX("broadcom-cobol-lsp");
 
   public final String label;
