@@ -17,9 +17,10 @@ import * as vscode from "vscode";
 import {changeDefaultZoweProfile} from "./commands/ChangeDefaultZoweProfile";
 import {editDatasetPaths} from "./commands/EditDatasetPaths";
 import {fetchCopybookCommand} from "./commands/FetchCopybookCommand";
-import {C4Z_FOLDER, GITIGNORE_FILE, SETTINGS_SECTION} from "./constants";
+import {C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID, SETTINGS_SECTION} from "./constants";
 import {CopybookDownloadService} from "./services/CopybookDownloadService";
 import {CopybookFix} from "./services/CopybookFix";
+import {CopybooksCodeActionProvider} from "./services/CopybooksCodeActionProvider";
 import {CopybooksPathGenerator} from "./services/CopybooksPathGenerator";
 
 import {CopybookURI} from "./services/CopybookURI";
@@ -77,4 +78,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(copyBooksDownloader);
 
+    context.subscriptions.push(
+        vscode.languages.registerCodeActionsProvider(
+            {scheme: "file", language: LANGUAGE_ID},
+            new CopybooksCodeActionProvider()));
 }

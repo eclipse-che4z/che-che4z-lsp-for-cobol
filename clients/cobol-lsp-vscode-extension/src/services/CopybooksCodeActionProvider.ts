@@ -13,12 +13,8 @@
  */
 import * as vscode from "vscode";
 import {QUICKFIX_GOTOSETTINGS} from "../constants";
-import {ProfileService} from "./ProfileService";
 
 export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
-
-    constructor(private profileService: ProfileService) {
-    }
 
     public async provideCodeActions(doc: vscode.TextDocument,
                                     range: vscode.Range | vscode.Selection,
@@ -29,11 +25,13 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
             return [];
         }
 
-        const datasetPaths = new vscode.CodeAction(QUICKFIX_GOTOSETTINGS, vscode.CodeActionKind.QuickFix);
-        datasetPaths.command = {
+        const goToSettings = new vscode.CodeAction(QUICKFIX_GOTOSETTINGS, vscode.CodeActionKind.QuickFix);
+        goToSettings.command = {
             command: "workbench.action.openSettings",
             title: QUICKFIX_GOTOSETTINGS,
+            arguments: ["broadcom-cobol-lsp"],
         };
+        return [goToSettings];
     }
 
     private shouldHaveCodeAction(context: vscode.CodeActionContext): boolean {

@@ -34,3 +34,6 @@ export const DSN_MUSTBE_NOT_EMPTY = "Dataset name segment must not be empty.";
 export const DSN_NOMORE_8CHARS = "Dataset name segment can't be more than 8 characters.";
 export const DSN_START_PROHIBITED_CHAR = `Dataset name segment: ${SEGMENT_PLACEHOLDER} starts with a prohibited character.`;
 export const DSN_CONTAINS_PROHIBITED_CHAR = `Dataset name segment: ${SEGMENT_PLACEHOLDER} contains a prohibited character.`;
+
+// QUICK FIX CONSTANTS
+export const QUICKFIX_GOTOSETTINGS = "Open settings";
