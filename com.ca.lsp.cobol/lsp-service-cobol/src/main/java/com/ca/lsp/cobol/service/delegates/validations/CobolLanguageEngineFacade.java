@@ -27,10 +27,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 import static com.ca.lsp.cobol.service.delegates.validations.AnalysisResult.empty;
@@ -192,6 +189,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private List<Location> convertPosition(Map.Entry<String, Collection<Position>> entry) {
     return entry.getValue().stream()
+        .filter(Objects::nonNull)
         .map(position -> new Location(position.getDocumentURI(), convertRange(position)))
         .collect(toList());
   }
