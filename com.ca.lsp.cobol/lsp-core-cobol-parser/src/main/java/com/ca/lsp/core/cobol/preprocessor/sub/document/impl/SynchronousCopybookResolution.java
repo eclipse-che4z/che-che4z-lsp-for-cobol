@@ -47,8 +47,8 @@ public class SynchronousCopybookResolution
 
   private DataBusBroker broker;
 
-  private CompletableFuture<CopybookModel> waitForResolving = null;
-  private String copybookName = null;
+  private CompletableFuture<CopybookModel> waitForResolving;
+  private String copybookName;
 
   SynchronousCopybookResolution(DataBusBroker broker) {
     this.broker = broker;

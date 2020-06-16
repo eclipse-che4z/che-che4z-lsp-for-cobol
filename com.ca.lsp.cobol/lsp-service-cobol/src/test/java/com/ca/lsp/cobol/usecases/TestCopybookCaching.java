@@ -56,8 +56,8 @@ public class TestCopybookCaching {
   private final Position POSITION_SECOND_OCCURRENCE = new Position(null, 10, 10, 10, 10, null);
   private final Multimap<String, Position> paragraphDefinitions = HashMultimap.create();
 
-  private DataBusBroker databus = null;
-  private CopybookResolutionProvider resolution = null;
+  private DataBusBroker databus;
+  private CopybookResolutionProvider resolution;
 
   @Before
   public void init() {
