@@ -75,6 +75,15 @@ describe("Checks Java installation", () => {
         await expect(promise).resolves.toEqual(undefined);
     });
 
+    it("should skip not relevant lines and fail", async () => {
+        (cp as any).spawn = jest.fn().mockReturnValue({stderr: {on: stderrFn}, on: checkFn});
+        const promise = javaCheck.isJavaInstalled();
+        map.data("Picked up JAVA_TOOL_OPTIONS: -Xmx2254m");
+        map.data('java version "1.5.0_22"');
+        map.close(0);
+        await expect(promise).rejects.toEqual(expectedErrMsgSupportedJavaVersion);
+    });
+
     it("when required version is not supported", async () => {
         (cp as any).spawn = jest.fn().mockReturnValue({stderr: {on: stderrFn}, on: checkFn});
         const promise = javaCheck.isJavaInstalled();
