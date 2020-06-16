@@ -26,3 +26,5 @@ cp *.vsix /home/theia/plugins/
 
 cd /home/theia
 nohup yarn theia start /home/project --hostname=0.0.0.0 > theia.log &
+echo "Waiting for Theia starting..."
+sed '/Deploy plugins list took/q' <(tail -n 0 -f /home/theia/theia.log) > /dev/null

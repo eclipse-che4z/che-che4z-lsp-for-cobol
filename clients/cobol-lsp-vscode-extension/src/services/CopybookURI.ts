@@ -36,7 +36,6 @@ export class CopybookURI {
     public static searchInWorkspace(copybookName: string, targetFolders: string[]): string {
         const copybookResolver: CopybookResolver = new LocalCopybookResolver();
         const localFolderList: string[] = copybookResolver.resolve(targetFolders);
-
         for (const folder of localFolderList) {
             let uri: URL = this.getURIFrom(folder, copybookName);
 
@@ -99,7 +98,7 @@ export class CopybookURI {
         // copybook is not present on any folders defined by the user and not already downloaded, so is marked
         // a copybook that should be downloaded manually by the user.
         if (!result) {
-            this.copybooksDownloader.downloadDependency(cobolProgramName, copybookName);
+            this.copybooksDownloader.downloadCopybook(cobolProgramName, copybookName);
         }
         return result || "";
     }
