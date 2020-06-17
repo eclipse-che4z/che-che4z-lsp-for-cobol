@@ -17,6 +17,7 @@ package com.ca.lsp.cobol.service;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.event.model.AnalysisFinishedEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActions;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
@@ -71,6 +72,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private Completions completions;
   private Occurrences occurrences;
   private CodeActions actions;
+  private DataBusBroker dataBus;
 
   @Inject
   MyTextDocumentService(
@@ -87,6 +89,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     this.completions = completions;
     this.occurrences = occurrences;
     this.actions = actions;
+    this.dataBus = dataBus;
 
     dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
@@ -246,6 +249,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   }
 
   private void publishResult(String uri, AnalysisResult result) {
+    dataBus.postData(AnalysisFinishedEvent.builder().documentUri(uri).build());
     communications.cancelProgressNotification(uri);
     communications.publishDiagnostics(uri, result.getDiagnostics());
     if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
