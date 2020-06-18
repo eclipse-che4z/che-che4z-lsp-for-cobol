@@ -18,6 +18,7 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceSameElementCo
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceableContext;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplacementContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -28,6 +29,7 @@ import java.util.regex.Pattern;
 
 /** A mapping from a replaceable to a replacement. */
 @Data
+@AllArgsConstructor
 public class CobolReplacementMapping implements Comparable<CobolReplacementMapping> {
 
   private ReplaceableContext replaceable;

@@ -43,6 +43,7 @@ import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.convertToke
 import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.retrieveTokens;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -214,12 +215,13 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
     cleaner.peek().write("<URI>" + copybookWithReplacingName + "</URI>. ");
     CobolDocumentContext documentContext = cleaner.push();
-    replacingPhraseContexts.forEach(
-        it -> documentContext.storeReplaceablesAndReplacements(it.replaceClause()));
-
     documentContext.write(copybookContent);
-    documentContext.replaceReplaceablesByReplacements(tokens);
-
+    documentContext.applyReplacing(
+        replacingPhraseContexts.stream()
+            .map(ReplacingPhraseContext::replaceClause)
+            .flatMap(List::stream)
+            .collect(toList()),
+        tokens);
     documentMappings.put(
         copybookWithReplacingName,
         convertTokensToPositions(uri, retrieveTokens(documentContext.read())));
@@ -326,8 +328,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     List<ReplaceClauseContext> replaceClauses = ctx.replaceByStatement().replaceClause();
 
     CobolDocumentContext documentContext = cleaner.peek();
-    documentContext.storeReplaceablesAndReplacements(replaceClauses);
-    documentContext.replaceReplaceablesByReplacements(tokens);
+    documentContext.applyReplacing(replaceClauses, tokens);
 
     String content = documentContext.read();
 
