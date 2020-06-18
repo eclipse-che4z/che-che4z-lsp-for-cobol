@@ -16,6 +16,7 @@
 package com.ca.lsp.cobol.service.mocks;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
@@ -47,9 +48,9 @@ public class MockCopybookServiceImpl implements MockCopybookService {
   }
 
   @Override
-  public void observerCallback(RequiredCopybookEvent event) {
-    String name = event.getName();
-    String content = getContentByCopybookName(event.getName());
+  public void observerCallback(DataEvent event) {
+    String name = ((RequiredCopybookEvent) event).getName();
+    String content = getContentByCopybookName(((RequiredCopybookEvent) event).getName());
     dataBus.postData(FetchedCopybookEvent.builder().name(name).uri(name).content(content).build());
   }
 

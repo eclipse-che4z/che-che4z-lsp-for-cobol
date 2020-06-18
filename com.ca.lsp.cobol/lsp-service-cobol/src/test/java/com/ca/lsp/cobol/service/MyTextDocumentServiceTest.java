@@ -16,6 +16,7 @@ package com.ca.lsp.cobol.service;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
+import com.broadcom.lsp.domain.cobol.event.model.AnalysisFinishedEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActions;
@@ -197,10 +198,11 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     MyTextDocumentService service = verifyServiceStart(communications, engine, broker);
 
     // simulate the call to the didOpen for two different document one with and one without errors
-    verifyDidOpen(communications, engine, diagnosticsNoErrors, service, TEXT_EXAMPLE, DOCUMENT_URI);
+    verifyDidOpen(communications, engine, broker, diagnosticsNoErrors, service, TEXT_EXAMPLE, DOCUMENT_URI);
     verifyDidOpen(
         communications,
         engine,
+        broker,
         diagnosticsWithErrors,
         service,
         INCORRECT_TEXT_EXAMPLE,
@@ -270,6 +272,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   private void verifyDidOpen(
       Communications communications,
       LanguageEngineFacade engine,
+      DataBusBroker dataBus,
       List<Diagnostic> diagnostics,
       MyTextDocumentService service,
       String textToAnalyse,
@@ -280,6 +283,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
     verify(communications, timeout(10000)).cancelProgressNotification(uri);
     verify(communications, timeout(10000)).publishDiagnostics(uri, diagnostics);
+    verify(dataBus, timeout(10000)).postData(AnalysisFinishedEvent.builder().documentUri(uri).build());
   }
 
   private void verifyCallback(

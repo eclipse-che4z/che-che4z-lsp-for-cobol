@@ -16,13 +16,13 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
-import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
+import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 
 /**
  * Provide API definition to search for copybooks files and define the workspace folder opened in
  * the client when the LSP server triggered.
  */
-public interface CopybookService extends EventObserver<RequiredCopybookEvent> {
+public interface CopybookService extends EventObserver<DataEvent> {
   /** Remove all the stored copybook names and URIs. */
   void invalidateURICache();
 }

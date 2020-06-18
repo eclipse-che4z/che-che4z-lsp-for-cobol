@@ -14,7 +14,6 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
-import {CopybookDownloadService} from "../services/CopybookDownloadService";
 import {CopybookURI} from "../services/CopybookURI";
 import {ProfileService} from "../services/ProfileService";
 import {SettingsUtils} from "../services/settings/util/SettingsUtils";
@@ -22,15 +21,13 @@ import {ZoweApi} from "../services/ZoweApi";
 
 const zoweApi: ZoweApi = new ZoweApi();
 const profileService: ProfileService = new ProfileService(zoweApi);
-const copybookDownloadService: CopybookDownloadService = new CopybookDownloadService(undefined, zoweApi, profileService, undefined);
-const copybookURI: CopybookURI = new CopybookURI(profileService, copybookDownloadService);
+const copybookURI: CopybookURI = new CopybookURI(profileService);
 const copybookName: string = "NSTCOPY1";
 const copybookNameWithExtension: string = "NSTCOPY2.cpy";
 const CPY_FOLDER_NAME = ".cobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
 SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + __dirname]);
 profileService.resolveProfile = jest.fn().mockReturnValue("PRF");
-copybookDownloadService.downloadCopybook = jest.fn().mockReturnValue("CPY");
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
     get: jest.fn().mockReturnValue(undefined),
 });
@@ -130,7 +127,6 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     });
     test("With no settings provided, two search strategies are applied and function return an empty string", async () => {
         profileService.resolveProfile = jest.fn().mockReturnValue("PRF");
-        copybookDownloadService.downloadCopybook = jest.fn().mockReturnValue("CPY");
         provideMockValueForLocalAndDSN("", "");
         const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
         expect(uri).toBe("");

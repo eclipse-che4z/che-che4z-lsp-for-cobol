@@ -16,9 +16,12 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.event.model.AnalysisFinishedEvent;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.service.utils.FileSystemService;
+import com.google.common.base.Joiner;
 import com.google.gson.JsonPrimitive;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -28,12 +31,16 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.REQUIRED_COPYBOOK_EVENT;
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
-import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK;
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK_RESOLVE;
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK_DOWNLOAD;
 import static java.util.Optional.ofNullable;
 
 /** This service processes copybook requests and returns content by its name */
@@ -46,6 +53,7 @@ public class CopybookServiceImpl implements CopybookService {
   private final FileSystemService files;
 
   private final Map<String, Path> copybookPaths = new ConcurrentHashMap<>(8, 0.9f, 1);
+  private final Map<String, Set<String>> copybooksForDownloading = new ConcurrentHashMap<>(8, 0.9f, 1);
 
   @Inject
   public CopybookServiceImpl(
@@ -55,11 +63,30 @@ public class CopybookServiceImpl implements CopybookService {
     this.files = files;
 
     dataBus.subscribe(REQUIRED_COPYBOOK_EVENT, this);
+    dataBus.subscribe(ANALYSIS_FINISHED_EVENT, this);
   }
 
   @Override
   public void invalidateURICache() {
     copybookPaths.clear();
+    copybooksForDownloading.clear();
+  }
+
+  /**
+   * Depends on DataEvent type it will be handled with appropriate handler:
+   * {@link #handleRequiredCopybookEvent} or {@link #handleAnalysisFinishedEvent}.
+   *
+   * @param event the instance of {@link RequiredCopybookEvent} or {@link AnalysisFinishedEvent}
+   */
+  @Override
+  public void observerCallback(DataEvent event) {
+    if (event instanceof RequiredCopybookEvent) {
+      handleRequiredCopybookEvent((RequiredCopybookEvent) event);
+    } else if (event instanceof AnalysisFinishedEvent) {
+      handleAnalysisFinishedEvent((AnalysisFinishedEvent) event);
+    } else {
+      log.error("Unexpected DataEvent: {}", event);
+    }
   }
 
   /**
@@ -75,8 +102,7 @@ public class CopybookServiceImpl implements CopybookService {
    *
    * @param event - copybook request params
    */
-  @Override
-  public void observerCallback(RequiredCopybookEvent event) {
+  private void handleRequiredCopybookEvent(RequiredCopybookEvent event) {
     String requiredCopybookName = event.getName();
 
     if (copybookPaths.containsKey(requiredCopybookName)) {
@@ -91,15 +117,39 @@ public class CopybookServiceImpl implements CopybookService {
     if (DID_OPEN.name().equals(event.getTextDocumentSyncType())) {
       String cobolFileName = files.getNameFromURI(event.getDocumentUri());
       settingsService
-          .getConfiguration(COPYBOOK.label, cobolFileName, requiredCopybookName)
-          .thenAccept(sendResponse(requiredCopybookName));
+              .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, requiredCopybookName)
+              .thenAccept(sendResponse(cobolFileName, requiredCopybookName));
     } else {
       sendResponse(requiredCopybookName, null, null);
     }
   }
 
-  private Consumer<List<Object>> sendResponse(String requiredCopybookName) {
-    return result -> dataBus.postData(fetchCopybook(requiredCopybookName, retrieveURI(result)));
+  /**
+   * Sends downloading requests to the Client for copybooks not presented locally, if any.
+   *
+   * <p>A list of missed copybooks grouped by document URI.
+   *
+   * @param event - document analysis done
+   */
+  private void handleAnalysisFinishedEvent(AnalysisFinishedEvent event) {
+    String cobolFileName = files.getNameFromURI(event.getDocumentUri());
+    if (copybooksForDownloading.containsKey(cobolFileName)) {
+      settingsService
+              .getConfigurations(copybooksForDownloading.remove(cobolFileName).stream()
+                      .map(copybook -> Joiner.on(".").join(COPYBOOK_DOWNLOAD.label, cobolFileName, copybook))
+                      .collect(Collectors.toList()));
+    }
+  }
+
+  private Consumer<List<Object>> sendResponse(String cobolFileName, String requiredCopybookName) {
+    return result -> {
+      String uri = retrieveURI(result);
+      if (uri.isEmpty()) {
+        copybooksForDownloading.computeIfAbsent(cobolFileName, s -> ConcurrentHashMap.newKeySet())
+                .add(requiredCopybookName);
+      }
+      dataBus.postData(fetchCopybook(requiredCopybookName, uri));
+    };
   }
 
   private void sendResponse(String requiredCopybookName, String content, Path path) {
