@@ -15,6 +15,7 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -28,11 +29,9 @@ import org.eclipse.lsp4j.services.LanguageClient;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
@@ -50,11 +49,18 @@ public class SettingsServiceImpl implements SettingsService {
   @Nonnull
   @Override
   public CompletableFuture<List<Object>> getConfiguration(@Nonnull String... param) {
-    ConfigurationItem item = new ConfigurationItem();
-    item.setSection(buildRequestParam(param));
-    item.setScopeUri(null);
+    return getConfigurations(singletonList(Joiner.on(".").join(param)));
+  }
 
-    return clientProvider.get().configuration(new ConfigurationParams(singletonList(item)));
+  @Nonnull
+  @Override
+  public CompletableFuture<List<Object>> getConfigurations(@Nonnull List<String> sections) {
+    return clientProvider.get().configuration(new ConfigurationParams(
+            sections.stream()
+                    .map(section -> LSP_PREFIX.label+"."+section)
+                    .map(SettingsServiceImpl::buildConfigurationItem)
+                    .collect(toList())
+    ));
   }
 
   @Nonnull
@@ -68,10 +74,10 @@ public class SettingsServiceImpl implements SettingsService {
   }
 
   @Nonnull
-  private String buildRequestParam(@Nonnull String[] param) {
-    StringJoiner joiner = new StringJoiner(".");
-    joiner.add(LSP_PREFIX.label);
-    asList(param).forEach(joiner::add);
-    return joiner.toString();
+  private static ConfigurationItem buildConfigurationItem(@Nonnull String section) {
+    ConfigurationItem item = new ConfigurationItem();
+    item.setSection(section);
+    item.setScopeUri(null);
+    return item;
   }
 }

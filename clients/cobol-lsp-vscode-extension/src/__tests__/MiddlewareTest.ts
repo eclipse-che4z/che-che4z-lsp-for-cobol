@@ -24,33 +24,46 @@ function constructParams(sectionName: string): any {
 
 // tslint:disable: no-unused-expression no-string-literal
 describe("Copybook downloader", () => {
+    const resolveCopybookURIMock = jest.fn().mockResolvedValue("copybookUri");
+    const copybookResolverURI: any = {
+        resolveCopybookURI: resolveCopybookURIMock,
+    };
+    const downloadCopybookMock = jest.fn().mockResolvedValue(null);
+    const copybookDownloader: any = {
+        downloadCopybook: downloadCopybookMock,
+    };
+    const middleware = new Middleware(copybookResolverURI, copybookDownloader);
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
     it("Handle copybook request", async () => {
-        const copybookResolverURI: any = {
-            resolveCopybookURI: jest.fn().mockResolvedValue("copybookUri"),
-        };
-        const middleware = new Middleware(null, copybookResolverURI);
-        const params = constructParams("broadcom-cobol-lsp.copybook.cobFile.bookName");
+        const params = constructParams("broadcom-cobol-lsp.copybook-resolve.cobFile.bookName");
         expect(await middleware.handleConfigurationRequest(params, null, null)).toEqual(["copybookUri"]);
-        expect(copybookResolverURI.resolveCopybookURI).toHaveBeenCalledWith("bookName", "cobFile");
+        expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName", "cobFile");
     });
     it("Handle copybook request for name with dots", async () => {
-        const copybookResolverURI: any = {
-            resolveCopybookURI: jest.fn().mockResolvedValue("copybookUri"),
-        };
-        const middleware = new Middleware(null, copybookResolverURI);
-        const params = constructParams("broadcom-cobol-lsp.copybook.USER.CLIST.COB.bookName");
+        const params = constructParams("broadcom-cobol-lsp.copybook-resolve.USER.CLIST.COB.bookName");
         expect(await middleware.handleConfigurationRequest(params, null, null)).toEqual(["copybookUri"]);
-        expect(copybookResolverURI.resolveCopybookURI).toHaveBeenCalledWith("bookName", "USER.CLIST.COB");
+        expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName", "USER.CLIST.COB");
+    });
+    it("Handle copybook download request", async () => {
+        const params = {items: [
+            "broadcom-cobol-lsp.copybook-download.cobFile.bookName",
+            "broadcom-cobol-lsp.copybook-download.USER.CLIST.COB.bookName",
+        ].map(sectionName => ({section: sectionName}))};
+        await expect(middleware.handleConfigurationRequest(params, null, null)).resolves.toEqual([]);
+        expect(downloadCopybookMock).toHaveBeenCalledWith("cobFile", "bookName");
+        expect(downloadCopybookMock).toHaveBeenCalledWith("USER.CLIST.COB", "bookName");
     });
     it("Call next for non cobol params", async () => {
-        const middleware = new Middleware(null, null);
         const params = constructParams("foo.bar");
         const next = jest.fn().mockReturnValue(["next"]);
         expect(await middleware.handleConfigurationRequest(params, null, next)).toEqual(["next"]);
         expect(next).toHaveBeenCalledWith(params, null);
     });
     it("Call next for unexpected second qualifier", async () => {
-        const middleware = new Middleware(null, null);
         const params = constructParams("broadcom-cobol-lsp.bar");
         const next = jest.fn().mockReturnValue(["next"]);
         expect(await middleware.handleConfigurationRequest(params, null, next)).toEqual(["next"]);

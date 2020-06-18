@@ -12,9 +12,9 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {CancellationToken} from "vscode";
+import {CancellationToken, HandlerResult } from "vscode-jsonrpc";
 import {ConfigurationParams, ConfigurationRequest} from "vscode-languageclient";
-import {CopybooksPathGenerator} from "./CopybooksPathGenerator";
+import {CopybookDownloadService} from "./CopybookDownloadService";
 import {CopybookURI} from "./CopybookURI";
 
 export class Middleware {
@@ -25,20 +25,27 @@ export class Middleware {
         return [params.substring(secondDot + 1, lastDot), params.substring(lastDot + 1)];
     }
     constructor(
-        private copybooksPathGenerator: CopybooksPathGenerator,
-        private copybookResolverURI: CopybookURI) {
+        private copybookResolverURI: CopybookURI,
+        private copybookDownloader: CopybookDownloadService) {
     }
 
     public async handleConfigurationRequest(
         params: ConfigurationParams,
         token: CancellationToken,
-        next: ConfigurationRequest.HandlerSignature) {
+        next: ConfigurationRequest.HandlerSignature): Promise<HandlerResult<any[], void>> {
 
-        if (params.items.length === 1) {
+        if (params.items.length > 0) {
             const sectionName = params.items[0].section;
-            if (sectionName.startsWith("broadcom-cobol-lsp.copybook")) {
+            if (sectionName.startsWith("broadcom-cobol-lsp.copybook-resolve")) {
                 const [cobolFileName, copybookName] = Middleware.extractFileAndCopybookNames(sectionName);
                 return [await this.copybookResolverURI.resolveCopybookURI(copybookName, cobolFileName)];
+            }
+            if (sectionName.startsWith("broadcom-cobol-lsp.copybook-download")) {
+                for (const item of params.items) {
+                    const [cobolFileName, copybookName] = Middleware.extractFileAndCopybookNames(item.section);
+                    this.copybookDownloader.downloadCopybook(cobolFileName, copybookName);
+                }
+                return [];
             }
         }
         return next(params, token);

@@ -75,7 +75,7 @@ export class CopybookURI {
 
     }
 
-    constructor(private profileService: ProfileService, private copybooksDownloader: CopybookDownloadService) {
+    constructor(private profileService: ProfileService) {
     }
 
     /**
@@ -94,11 +94,6 @@ export class CopybookURI {
         // check in subfolders under .copybooks (copybook downloaded from MF)
         if (!result) {
             result = CopybookURI.searchInWorkspace(copybookName, this.createPathForCopybookDownloaded(await this.profileService.getProfile(cobolProgramName)));
-        }
-        // copybook is not present on any folders defined by the user and not already downloaded, so is marked
-        // a copybook that should be downloaded manually by the user.
-        if (!result) {
-            this.copybooksDownloader.downloadCopybook(cobolProgramName, copybookName);
         }
         return result || "";
     }
