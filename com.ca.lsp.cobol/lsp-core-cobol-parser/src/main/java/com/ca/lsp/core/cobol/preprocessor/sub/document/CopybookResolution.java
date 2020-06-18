@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 public interface CopybookResolution {
 
   /**
-   * Retrieve and return the copybook by its name. C
+   * Retrieve and return the copybook by its name.
    *
    * @param copybookName - the name of the copybook to be retrieved
    * @param documentUri - the currently processing document that contains the copy statement
