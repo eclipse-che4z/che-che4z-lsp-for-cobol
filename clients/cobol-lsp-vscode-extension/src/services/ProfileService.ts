@@ -16,7 +16,7 @@ import {IProfile} from "@zowe/imperative";
 import * as path from "path";
 import * as vscode from "vscode";
 import {Disposable} from "vscode-languageclient";
-import {SETTINGS_SECTION} from "../constants";
+import {COBOL_CBL_EXT, COBOL_COB_EXT, COBOL_COBOL_EXT, SETTINGS_SECTION} from "../constants";
 import {ProfilesMap, ZoweApi} from "./ZoweApi";
 
 const DEFAULT_STATUS_TEXT = "CPY profile: undefined";
@@ -25,7 +25,7 @@ export class ProfileService implements Disposable {
 
     private static isCobolProgram(fsPath: string) {
         const ext = path.extname(fsPath).toLocaleLowerCase();
-        return ext === ".cbl" || ext === ".cob" || ext === ".cobol";
+        return [COBOL_CBL_EXT, COBOL_COB_EXT, COBOL_COBOL_EXT].includes(ext);
     }
 
     defaultProfileStatusBarItem: vscode.StatusBarItem;
