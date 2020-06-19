@@ -37,8 +37,31 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
     contexts.push(new DocumentBuffer());
   }
 
+  /** Return the current preprocessing context from the stack. */
   public DocumentBuffer peek() {
     return contexts.peek();
+  }
+
+  /** Pop the current preprocessing context from the stack. */
+  @Nullable
+  public DocumentBuffer pop() {
+    return contexts.pop();
+  }
+
+  /** Push a new preprocessing context onto the stack. */
+  @Nonnull
+  public DocumentBuffer push() {
+    DocumentBuffer cobolDocumentContext = new DocumentBuffer();
+    contexts.push(cobolDocumentContext);
+    return cobolDocumentContext;
+  }
+
+  public void write(String text) {
+    peek().write(text);
+  }
+
+  public String read() {
+    return peek().read();
   }
 
   public void excludeStatementFromText(
@@ -52,7 +75,7 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
     String content = documentContext.read();
     pop();
 
-    peek().write(content);
+    write(content);
   }
 
   public void specificTypeExclusion(
@@ -68,18 +91,18 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
     }
 
     if (textSplit != null && textSplit.length > 1 && !textSplit[textSplit.length - 1].isEmpty()) {
-      peek().write(lines + textSplit[1]);
+      write(lines + textSplit[1]);
     } else {
-      peek().write(lines);
+      write(lines);
     }
   }
 
   public void visitTerminal(TerminalNode node, BufferedTokenStream tokens) {
     int tokPos = node.getSourceInterval().a;
-    peek().write(getHiddenTokensToLeft(tokPos, tokens));
+    write(getHiddenTokensToLeft(tokPos, tokens));
 
     if (!TokenUtils.isEOF(node)) {
-      peek().write(node.getText());
+      write(node.getText());
     }
   }
 
@@ -106,19 +129,5 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
 
     scanner.close();
     return sb.toString();
-  }
-
-  /** Pops the current preprocessing context from the stack. */
-  @Nullable
-  public DocumentBuffer pop() {
-    return contexts.pop();
-  }
-
-  /** Pushes a new preprocessing context onto the stack. */
-  @Nonnull
-  public DocumentBuffer push() {
-    DocumentBuffer cobolDocumentContext = new DocumentBuffer();
-    contexts.push(cobolDocumentContext);
-    return cobolDocumentContext;
   }
 }

@@ -61,7 +61,6 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
   @Getter private final NamedSubContext<Position> copybooks = new NamedSubContext<>();
-
   @Getter private final Map<String, List<Position>> documentMappings = new HashMap<>();
 
   private PreprocessorCleanerServiceImpl cleaner;
@@ -96,7 +95,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   @Nonnull
   @Override
   public String getResult() {
-    return cleaner.peek().read();
+    return cleaner.read();
   }
 
   @Override
@@ -178,17 +177,8 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitCopyStatement(@Nonnull CopyStatementContext ctx) {
-
-    // throw away COPY terminals
-    cleaner.pop();
-
-    // a new context for the copy book content
-    cleaner.peek().write(CPY_ENTER_TAG);
-    /*
-     * copy the copy book
-     */
-    List<ReplacingPhraseContext> replacingPhrase = ctx.replacingPhrase();
     CopySourceContext copySource = ctx.copySource();
+    List<ReplacingPhraseContext> replacingPhrase = ctx.replacingPhrase();
 
     String copybookName = retrieveCopybookName(copySource);
     Position position = retrievePosition(copySource);
@@ -200,26 +190,74 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
     ExtendedDocument copybookDocument =
         processCopybook(copybookName, uri, replacedContent, position);
-
     String copybookContent = copybookDocument.getText();
 
     checkCopybookNameLength(copybookName, position);
     addCopybookUsage(copybookName, position);
     addCopybookDefinition(copybookName, uri);
 
+    collectNestedSemanticData(uri, copybookId, replacedContent, copybookDocument);
+    writeCopybook(copybookId, copybookContent);
+  }
+
+  @Override
+  public void exitReplaceArea(@Nonnull ReplaceAreaContext ctx) {
+    List<ReplaceClauseContext> replaceClauses = ctx.replaceByStatement().replaceClause();
+
+    String content = applyReplacing(cleaner.read(), replaceClauses);
+
+    cleaner.pop();
+    cleaner.write(content);
+  }
+
+  @Override
+  public void exitReplaceByStatement(@Nonnull ReplaceByStatementContext ctx) {
+    // throw away terminals
+    cleaner.pop();
+  }
+
+  @Override
+  public void exitReplaceOffStatement(@Nonnull ReplaceOffStatementContext ctx) {
+    // throw away REPLACE OFF terminals
+    cleaner.pop();
+  }
+
+  @Override
+  public void exitTitleStatement(@Nonnull TitleStatementContext ctx) {
+    // throw away title statement
+    cleaner.pop();
+  }
+
+  @Override
+  public void visitTerminal(@Nonnull TerminalNode node) {
+    cleaner.visitTerminal(node, tokens);
+  }
+
+  private void collectNestedSemanticData(
+      String uri, String copybookId, String replacedContent, ExtendedDocument copybookDocument) {
     copybooks.merge(copybookDocument.getCopybooks());
     documentMappings.putAll(copybookDocument.getDocumentPositions());
     documentMappings.computeIfAbsent(
         copybookId, it -> convertTokensToPositions(uri, retrieveTokens(replacedContent)));
+  }
 
-    cleaner.peek().write("<URI>" + copybookId + "</URI>. ");
-    cleaner.push().write(copybookContent);
-    cleaner.peek().write(CPY_EXIT_TAG);
-
-    String content = cleaner.peek().read();
+  private void writeCopybook(String copybookId, String copybookContent) {
+    // throw away COPY terminals
     cleaner.pop();
+    // write copybook beginning trigger
+    cleaner.write(CPY_ENTER_TAG);
+    cleaner.write("<URI>");
+    cleaner.write(copybookId);
+    cleaner.write("</URI>. ");
+    // a new context for the copy book content
+    cleaner.push();
+    cleaner.write(copybookContent);
+    // write copybook closing trigger
+    cleaner.write(CPY_EXIT_TAG);
 
-    cleaner.peek().write(content);
+    String content = cleaner.read();
+    cleaner.pop();
+    cleaner.write(content);
   }
 
   private String applyReplacing(
@@ -286,72 +324,6 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     return new CopybookModel(copybookName, "", "");
   }
 
-  private void reportRecursiveCopybook(CopybookUsage usage) {
-    errors.add(
-        SyntaxError.syntaxError()
-            .severity(1)
-            .suggestion(String.format(RECURSION_DETECTED, usage.getName()))
-            .position(usage.getPosition())
-            .build());
-  }
-
-  private void reportMissingCopybooks(String copybookName, Position position) {
-    errors.add(
-        SyntaxError.syntaxError()
-            .position(position)
-            .suggestion(format(ERROR_SUGGESTION, copybookName))
-            .severity(1)
-            .errorCode(MISSING_COPYBOOK)
-            .build());
-  }
-
-  private void checkCopybookNameLength(String copybookName, Position position) {
-    if (copybookName != null && copybookName.length() > 8) {
-      errors.add(
-          SyntaxError.syntaxError()
-              .severity(3)
-              .suggestion(String.format(COPYBOOK_OVER_8_CHARACTERS, copybookName))
-              .position(position)
-              .build());
-    }
-  }
-
-  @Override
-  public void exitReplaceArea(@Nonnull ReplaceAreaContext ctx) {
-    /*
-     * replacement phrase
-     */
-    List<ReplaceClauseContext> replaceClauses = ctx.replaceByStatement().replaceClause();
-
-    String content = applyReplacing(cleaner.peek().read(), replaceClauses);
-
-    cleaner.pop();
-    cleaner.peek().write(content);
-  }
-
-  @Override
-  public void exitReplaceByStatement(@Nonnull ReplaceByStatementContext ctx) {
-    // throw away terminals
-    cleaner.pop();
-  }
-
-  @Override
-  public void exitReplaceOffStatement(@Nonnull ReplaceOffStatementContext ctx) {
-    // throw away REPLACE OFF terminals
-    cleaner.pop();
-  }
-
-  @Override
-  public void exitTitleStatement(@Nonnull TitleStatementContext ctx) {
-    // throw away title statement
-    cleaner.pop();
-  }
-
-  @Override
-  public void visitTerminal(@Nonnull TerminalNode node) {
-    cleaner.visitTerminal(node, tokens);
-  }
-
   @Nullable
   private String retrieveCopybookName(@Nonnull CopySourceContext copySource) {
     String copybookName;
@@ -389,5 +361,35 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
         token.getStart().getLine(),
         token.getStart().getCharPositionInLine(),
         token.getStart().getText());
+  }
+
+  private void reportRecursiveCopybook(CopybookUsage usage) {
+    errors.add(
+        SyntaxError.syntaxError()
+            .severity(1)
+            .suggestion(String.format(RECURSION_DETECTED, usage.getName()))
+            .position(usage.getPosition())
+            .build());
+  }
+
+  private void reportMissingCopybooks(String copybookName, Position position) {
+    errors.add(
+        SyntaxError.syntaxError()
+            .position(position)
+            .suggestion(format(ERROR_SUGGESTION, copybookName))
+            .severity(1)
+            .errorCode(MISSING_COPYBOOK)
+            .build());
+  }
+
+  private void checkCopybookNameLength(String copybookName, Position position) {
+    if (copybookName != null && copybookName.length() > 8) {
+      errors.add(
+          SyntaxError.syntaxError()
+              .severity(3)
+              .suggestion(String.format(COPYBOOK_OVER_8_CHARACTERS, copybookName))
+              .position(position)
+              .build());
+    }
   }
 }
