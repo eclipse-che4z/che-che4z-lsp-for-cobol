@@ -1,7 +1,3 @@
-import * as path from "path";
-import * as vscode from "vscode";
-import {ProfileService} from "../services/ProfileService";
-
 /*
  * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
@@ -15,6 +11,9 @@ import {ProfileService} from "../services/ProfileService";
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import * as path from "path";
+import * as vscode from "vscode";
+import {ProfileService} from "../services/ProfileService";
 
 describe("Profile Service tests", () => {
     const programName = "programName";
