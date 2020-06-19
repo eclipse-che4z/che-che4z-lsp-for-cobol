@@ -36,7 +36,7 @@ import static org.junit.Assert.assertNull;
  */
 public class FindCopybookCommandTest {
 
-  private static final String TITLE = "Fetch copybook";
+  private static final String TITLE = "Resolve copybook";
   private static final String COPYBOOK_NAME = "CPYNAME";
 
   private static final Range RANGE = new Range(new Position(0, 0), new Position(0, 1));

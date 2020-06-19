@@ -77,8 +77,9 @@ export async function activate(context: vscode.ExtensionContext) {
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
     context.subscriptions.push(copyBooksDownloader);
+
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
             {scheme: "file", language: LANGUAGE_ID},
-            new CopybooksCodeActionProvider(profileService)));
+            new CopybooksCodeActionProvider()));
 }
