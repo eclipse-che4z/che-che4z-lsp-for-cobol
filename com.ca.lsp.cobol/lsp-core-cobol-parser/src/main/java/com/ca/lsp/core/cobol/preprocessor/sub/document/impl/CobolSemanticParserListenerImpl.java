@@ -190,18 +190,35 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     String copybookName = retrieveCopybookName(ctx.copySource());
     Position position = retrievePosition(ctx.copySource());
 
+    checkCopybookNameLength(copybookName, position);
+
     CopybookModel model = getCopyBookContent(copybookName, position);
-    String copybookContent = model.getContent();
+
+    ExtendedDocument copybookDocument = processCopybook(copybookName, position, model);
+    documentMappings.putAll(copybookDocument.getDocumentPositions());
+    copybooks.merge(copybookDocument.getCopybooks());
+
+    String copybookContent = copybookDocument.getText();
 
     addCopybookUsage(copybookName, position);
     addCopybookDefinition(copybookName, model.getUri());
 
     List<ReplacingPhraseContext> replacingPhraseContexts = ctx.replacingPhrase();
+
+    String copybookId = getCopybookId(model.getUri(), replacingPhraseContexts);
+
+    cleaner.peek().write("<URI>" + copybookId + "</URI>. ");
     if (!replacingPhraseContexts.isEmpty()) {
-      applyReplacing(copybookName, model.getUri(), copybookContent, replacingPhraseContexts);
+
+      cleaner
+          .push()
+          .write(
+              applyReplacing(copybookId, model.getUri(), copybookContent, replacingPhraseContexts));
     } else {
-      writeCopybookContent("<URI>" + model.getUri() + "</URI>", copybookContent);
+      cleaner.push().write(copybookContent);
     }
+
+    cleaner.peek().write(CPY_EXIT_TAG);
 
     String content = cleaner.peek().read();
     cleaner.pop();
@@ -209,34 +226,28 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     cleaner.peek().write(content);
   }
 
-  private void applyReplacing(
-      String copybookName,
+  private String applyReplacing(
+      String copybookId,
       String uri,
       String copybookContent,
       List<ReplacingPhraseContext> replacingPhraseContexts) {
-    String copybookWithReplacingName =
-        getUniqueNameForReplacing(copybookName, replacingPhraseContexts);
 
-    cleaner.peek().write("<URI>" + copybookWithReplacingName + "</URI>. ");
-
-    DocumentBuffer documentContext = cleaner.push();
     List<ReplaceClauseContext> replaceClauses =
         replacingPhraseContexts.stream()
             .map(ReplacingPhraseContext::replaceClause)
             .flatMap(List::stream)
             .collect(toList());
-
-    documentContext.write(replacingService.applyReplacing(copybookContent, replaceClauses, tokens));
+    String replacedContent =
+        replacingService.applyReplacing(copybookContent, replaceClauses, tokens);
 
     documentMappings.put(
-        copybookWithReplacingName,
-        convertTokensToPositions(uri, retrieveTokens(documentContext.read())));
-    documentContext.write(CPY_EXIT_TAG);
+        copybookId, convertTokensToPositions(uri, retrieveTokens(replacedContent)));
+    return replacedContent;
   }
 
-  private String getUniqueNameForReplacing(
-      String copybookName, List<ReplacingPhraseContext> replacingPhraseContexts) {
-    return copybookName
+  private String getCopybookId(
+      String copybookURI, List<ReplacingPhraseContext> replacingPhraseContexts) {
+    return copybookURI
         + replacingPhraseContexts.stream()
             .map(RuleContext::getText)
             .reduce(String::concat)
@@ -245,15 +256,9 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
             .trim();
   }
 
-  private void writeCopybookContent(String copybookName, String copyBookContent) {
-    cleaner.push().write(copybookName + ". " + copyBookContent + CPY_EXIT_TAG);
-  }
-
   private CopybookModel getCopyBookContent(String copybookName, Position position) {
 
     if (copybookName == null) return emptyModel(null);
-
-    checkCopybookNameLength(copybookName, position);
 
     if (hasRecursion(copybookName)) {
       copybookStack.forEach(this::reportRecursiveCopybook);
@@ -268,11 +273,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
       return emptyModel(copybookName);
     }
 
-    ExtendedDocument document = processCopybook(copybookName, position, copybook);
-    documentMappings.putAll(document.getDocumentPositions());
-    copybooks.merge(document.getCopybooks());
-
-    return new CopybookModel(copybookName, copybook.getUri(), document.getText());
+    return copybook;
   }
 
   private boolean hasRecursion(String copybookName) {
