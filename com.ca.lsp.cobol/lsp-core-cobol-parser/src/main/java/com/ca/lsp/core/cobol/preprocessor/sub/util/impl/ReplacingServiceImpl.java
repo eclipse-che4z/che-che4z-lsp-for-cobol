@@ -22,7 +22,6 @@ import com.google.inject.Singleton;
 import org.antlr.v4.runtime.BufferedTokenStream;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -35,11 +34,8 @@ public class ReplacingServiceImpl implements ReplacingService {
   @Nonnull
   public String applyReplacing(
       @Nonnull String text,
-      @Nullable List<ReplaceClauseContext> replaceClauses,
+      @Nonnull List<ReplaceClauseContext> replaceClauses,
       @Nonnull BufferedTokenStream tokens) {
-    if (replaceClauses == null) {
-      return text;
-    }
     return replaceClauses.stream()
         .map(it -> new CobolReplacementMapping(it.replaceable(), it.replacement()))
         .reduce(

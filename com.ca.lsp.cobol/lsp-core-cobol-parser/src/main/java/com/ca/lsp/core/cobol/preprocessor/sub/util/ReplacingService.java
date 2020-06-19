@@ -19,7 +19,6 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceClauseContext
 import org.antlr.v4.runtime.BufferedTokenStream;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 
 /** This service applies replacing for given text by replace clauses and tokens. */
@@ -35,6 +34,6 @@ public interface ReplacingService {
   @Nonnull
   String applyReplacing(
       @Nonnull String text,
-      @Nullable List<ReplaceClauseContext> replaceClauses,
+      @Nonnull List<ReplaceClauseContext> replaceClauses,
       @Nonnull BufferedTokenStream tokens);
 }
