@@ -45,6 +45,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestMissingCopybooksReturnsError.class,
   TestResponsesNotContainLineBreaks.class,
   TestInvalidVariableStructureFound.class,
+  TestReplacingNotAppliedRecursively.class,
   TestCorrectErrorUnderscorePosition.class,
   TestSameCopybooksWithDifferentCases.class,
   TestKeywordAsCopybookNotProducesNPE.class,
@@ -60,6 +61,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestMisspelledKeywordWarningInCorrectPosition.class,
   TestRepetitiveVariableUsagesInAdjacentStatements.class,
   TestVariableStructureInCopybooksWithMissingLevels.class,
+  TestSameCopybookReplacingDeclarationsNotProducesNPE.class,
   TestCopybookWithIndirectRecursiveDependencyIsDetected.class,
   TestCobolStringWithContinuationLineConcatenatedCorrectly.class,
 })

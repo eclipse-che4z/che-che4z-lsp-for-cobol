@@ -187,20 +187,19 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     /*
      * copy the copy book
      */
-    String copybookName = retrieveCopybookName(ctx.copySource());
-    Position position = retrievePosition(ctx.copySource());
+    List<ReplacingPhraseContext> replacingPhrase = ctx.replacingPhrase();
+    CopySourceContext copySource = ctx.copySource();
+
+    String copybookName = retrieveCopybookName(copySource);
+    Position position = retrievePosition(copySource);
     CopybookModel model = getCopyBookContent(copybookName, position);
-    List<ReplacingPhraseContext> replacingPhraseContexts = ctx.replacingPhrase();
     String uri = model.getUri();
     String rawContent = model.getContent();
+    String copybookId = getCopybookId(uri, replacingPhrase);
+    String replacedContent = applyReplacing(rawContent, collectReplacePatterns(replacingPhrase));
 
-    checkCopybookNameLength(copybookName, position);
-    addCopybookUsage(copybookName, position);
-    addCopybookDefinition(copybookName, uri);
-
-    ExtendedDocument copybookDocument = processCopybook(copybookName, uri, rawContent, position);
-    documentMappings.putAll(copybookDocument.getDocumentPositions());
-    copybooks.merge(copybookDocument.getCopybooks());
+    ExtendedDocument copybookDocument =
+        processCopybook(copybookName, uri, replacedContent, position);
 
     String copybookContent = copybookDocument.getText();
 
@@ -208,27 +207,32 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     addCopybookUsage(copybookName, position);
     addCopybookDefinition(copybookName, uri);
 
-    String copybookId = getCopybookId(uri, replacingPhraseContexts);
-
-    cleaner.peek().write("<URI>" + copybookId + "</URI>. ");
-    List<ReplaceClauseContext> replaceClauses =
-        replacingPhraseContexts.stream()
-            .map(ReplacingPhraseContext::replaceClause)
-            .flatMap(List::stream)
-            .collect(toList());
-    String replacedContent =
-        replacingService.applyReplacing(copybookContent, replaceClauses, tokens);
-
+    copybooks.merge(copybookDocument.getCopybooks());
+    documentMappings.putAll(copybookDocument.getDocumentPositions());
     documentMappings.computeIfAbsent(
         copybookId, it -> convertTokensToPositions(uri, retrieveTokens(replacedContent)));
-    cleaner.push().write(replacedContent);
 
+    cleaner.peek().write("<URI>" + copybookId + "</URI>. ");
+    cleaner.push().write(copybookContent);
     cleaner.peek().write(CPY_EXIT_TAG);
 
     String content = cleaner.peek().read();
     cleaner.pop();
 
     cleaner.peek().write(content);
+  }
+
+  private String applyReplacing(
+      String rawContent, List<ReplaceClauseContext> replaceClauseContexts) {
+    return replacingService.applyReplacing(rawContent, replaceClauseContexts, tokens);
+  }
+
+  private List<ReplaceClauseContext> collectReplacePatterns(
+      List<ReplacingPhraseContext> replacingPhrase) {
+    return replacingPhrase.stream()
+        .map(ReplacingPhraseContext::replaceClause)
+        .flatMap(List::stream)
+        .collect(toList());
   }
 
   private String getCopybookId(
@@ -319,7 +323,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
      */
     List<ReplaceClauseContext> replaceClauses = ctx.replaceByStatement().replaceClause();
 
-    String content = replacingService.applyReplacing(cleaner.peek().read(), replaceClauses, tokens);
+    String content = applyReplacing(cleaner.peek().read(), replaceClauses);
 
     cleaner.pop();
     cleaner.peek().write(content);
