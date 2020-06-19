@@ -21,9 +21,9 @@ import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserListenerFactory;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CopybookResolutionProvider;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.*;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.ReplacingServiceImpl;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 /** This module provides DI bindings for COBOL language engine part. */
@@ -36,5 +36,6 @@ public class EngineModule extends DefaultModule {
     bind(CobolSemanticParser.class).to(CobolSemanticParserImpl.class);
     bind(CopybookResolution.class).toProvider(CopybookResolutionProvider.class);
     install(new FactoryModuleBuilder().build(CobolSemanticParserListenerFactory.class));
+    bind(ReplacingService.class).to(ReplacingServiceImpl.class);
   }
 }

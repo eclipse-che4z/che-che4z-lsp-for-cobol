@@ -21,6 +21,7 @@ import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtils;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.google.inject.Inject;
@@ -70,6 +71,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private CobolPreprocessor preprocessor;
   private Provider<CopybookResolution> resolutions;
   private Deque<CopybookUsage> copybookStack;
+  private ReplacingService replacingService;
 
   @Inject
   CobolSemanticParserListenerImpl(
@@ -79,7 +81,8 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
       @Assisted("textDocumentSyncType") String textDocumentSyncType,
       PreprocessorCleanerServiceImpl cleaner,
       CobolPreprocessor preprocessor,
-      Provider<CopybookResolution> resolutions) {
+      Provider<CopybookResolution> resolutions,
+      ReplacingService replacingService) {
     this.documentUri = documentUri;
     this.tokens = tokens;
     this.copybookStack = copybookStack;
@@ -87,6 +90,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     this.cleaner = cleaner;
     this.preprocessor = preprocessor;
     this.resolutions = resolutions;
+    this.replacingService = replacingService;
   }
 
   @Nonnull
@@ -214,14 +218,16 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
         getUniqueNameForReplacing(copybookName, replacingPhraseContexts);
 
     cleaner.peek().write("<URI>" + copybookWithReplacingName + "</URI>. ");
-    CobolDocumentContext documentContext = cleaner.push();
-    documentContext.write(copybookContent);
-    documentContext.applyReplacing(
+
+    DocumentBuffer documentContext = cleaner.push();
+    List<ReplaceClauseContext> replaceClauses =
         replacingPhraseContexts.stream()
             .map(ReplacingPhraseContext::replaceClause)
             .flatMap(List::stream)
-            .collect(toList()),
-        tokens);
+            .collect(toList());
+
+    documentContext.write(replacingService.applyReplacing(copybookContent, replaceClauses, tokens));
+
     documentMappings.put(
         copybookWithReplacingName,
         convertTokensToPositions(uri, retrieveTokens(documentContext.read())));
@@ -321,16 +327,13 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void exitReplaceArea(ReplaceAreaContext ctx) {
+  public void exitReplaceArea(@Nonnull ReplaceAreaContext ctx) {
     /*
      * replacement phrase
      */
     List<ReplaceClauseContext> replaceClauses = ctx.replaceByStatement().replaceClause();
 
-    CobolDocumentContext documentContext = cleaner.peek();
-    documentContext.applyReplacing(replaceClauses, tokens);
-
-    String content = documentContext.read();
+    String content = replacingService.applyReplacing(cleaner.peek().read(), replaceClauses, tokens);
 
     cleaner.pop();
     cleaner.peek().write(content);

@@ -90,7 +90,7 @@ public class CobolReplacementMapping implements Comparable<CobolReplacementMappi
     return null;
   }
 
-  protected String replace(final String string, final BufferedTokenStream tokens) {
+  public String replace(final String string, final BufferedTokenStream tokens) {
     final String replaceableString = getText(replaceable, tokens);
     final String replacementString = getText(replacement, tokens);
 
