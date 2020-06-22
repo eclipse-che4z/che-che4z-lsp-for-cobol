@@ -33,8 +33,7 @@ import java.util.function.Function;
 import static com.ca.lsp.cobol.service.delegates.validations.AnalysisResult.empty;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 
 /**
  * This class is a facade that maps the result of the syntax and semantic analysis to a model
@@ -124,18 +123,9 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private static Map<String, List<Diagnostic>> convertErrors(List<SyntaxError> errors) {
     return errors.stream()
-        .map(SyntaxError::getPosition)
-        .map(Position::getDocumentURI)
-        .distinct()
-        .collect(toMap(uri -> uri, toDiagnostics(errors)));
-  }
-
-  private static Function<String, List<Diagnostic>> toDiagnostics(List<SyntaxError> errors) {
-    return uri ->
-        errors.stream()
-            .filter(err -> err.getPosition().getDocumentURI().equals(uri))
-            .map(toDiagnostic())
-            .collect(toList());
+        .collect(
+            groupingBy(
+                err -> err.getPosition().getDocumentURI(), mapping(toDiagnostic(), toList())));
   }
 
   private static Function<SyntaxError, Diagnostic> toDiagnostic() {
