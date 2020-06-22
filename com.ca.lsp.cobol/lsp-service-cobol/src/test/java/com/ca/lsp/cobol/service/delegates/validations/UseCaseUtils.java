@@ -49,6 +49,7 @@ import static org.junit.Assert.assertTrue;
 @UtilityClass
 public class UseCaseUtils {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
+  public static final String DOCUMENT_2_URI = "file:///c%3A/workspace/document2.cbl";
   private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.copybooks/";
   private static final String CPY_URI_SUFFIX = ".cpy";
   private static final String LANGUAGE = "cbl";

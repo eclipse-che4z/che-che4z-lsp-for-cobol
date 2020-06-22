@@ -19,7 +19,8 @@ package com.ca.lsp.cobol.service.utils;
  * search a copybook.
  */
 public enum SettingsParametersEnum {
-  COPYBOOK("copybook"),
+  COPYBOOK_RESOLVE("copybook-resolve"),
+  COPYBOOK_DOWNLOAD("copybook-download"),
   DATASETS("cpy-manager.paths.dsn"),
   LOCAL_PATHS("cpy-manager.paths.local"),
   LSP_PREFIX("broadcom-cobol-lsp");

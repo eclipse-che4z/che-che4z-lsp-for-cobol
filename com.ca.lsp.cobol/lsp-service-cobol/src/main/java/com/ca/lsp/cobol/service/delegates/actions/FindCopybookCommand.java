@@ -37,7 +37,7 @@ import static org.eclipse.lsp4j.CodeActionKind.QuickFix;
  * action arguments with copybook name and the URI of the current document.
  */
 public class FindCopybookCommand implements CodeActionProvider {
-  private static final String TITLE = "Fetch copybook";
+  private static final String TITLE = "Resolve copybook";
 
   @Nonnull
   @Override

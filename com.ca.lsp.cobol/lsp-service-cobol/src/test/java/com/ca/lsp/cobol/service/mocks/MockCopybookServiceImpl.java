@@ -16,6 +16,7 @@
 package com.ca.lsp.cobol.service.mocks;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
@@ -30,9 +31,8 @@ import net.jodah.concurrentunit.Waiter;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.toURI;
 
 /**
- * This class used to mock the actual behavior of {@link
- * com.ca.lsp.cobol.service.CopybookService} and return stubs value not used to validate any
- * CopybookService functionality
+ * This class used to mock the actual behavior of {@link com.ca.lsp.cobol.service.CopybookService}
+ * and return stubs value not used to validate any CopybookService functionality
  */
 @Singleton
 @Slf4j
@@ -49,9 +49,9 @@ public class MockCopybookServiceImpl implements MockCopybookService {
   }
 
   @Override
-  public void observerCallback(RequiredCopybookEvent event) {
-    String name = event.getName();
-    String content = getContentByCopybookName(event.getName());
+  public void observerCallback(DataEvent event) {
+    String name = ((RequiredCopybookEvent) event).getName();
+    String content = getContentByCopybookName(((RequiredCopybookEvent) event).getName());
     dataBus.postData(
         FetchedCopybookEvent.builder().name(name).uri(toURI(name)).content(content).build());
   }

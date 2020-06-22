@@ -68,36 +68,24 @@
         "configuration": {
             "title": "Broadcom COBOL LSP",
             "properties": {
-                "broadcom-cobol.test": {
-                    "profile": {
-                        "type": "string",
-                        "description": "Current default profile for copybook downloader"
-                    },
-                    "dsn": {
-                        "type": "string",
-                        "description": "whenever"
-                    },
-                    "default": "false",
-                    "type": "object"
-                },
                 "broadcom-cobol-lsp.cpy-manager.profiles": {
                     "type": "string",
                     "description": "Current default profile for copybook downloader"
                 },
-                "broadcom-cobol-lsp.cpy-manager.paths.dsn": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of datasets to search for copybooks",
-                    "uniqueItems": true
-                },
-                "broadcom-cobol-lsp.cpy-manager.paths.local": {
+                "broadcom-cobol-lsp.cpy-manager.paths-local": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     },
                     "description": "Default list of local paths to search for copybooks",
+                    "uniqueItems": true
+                },
+                "broadcom-cobol-lsp.cpy-manager.paths-dsn": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Default list of datasets to search for copybooks",
                     "uniqueItems": true
                 }
             }
