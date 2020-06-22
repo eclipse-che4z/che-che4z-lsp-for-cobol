@@ -34,7 +34,7 @@ public class SyntaxError {
 
   // Please, don't use static imports for this method:
   // https://github.com/rzwitserloot/lombok/issues/2044
-  @Builder(builderMethodName = "syntaxError")
+  @Builder(builderMethodName = "syntaxError", toBuilder = true)
   public SyntaxError(
       Position position,
       Token startToken,

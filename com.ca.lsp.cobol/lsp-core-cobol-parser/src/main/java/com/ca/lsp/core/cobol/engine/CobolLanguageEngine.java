@@ -127,14 +127,9 @@ public class CobolLanguageEngine {
   }
 
   private Function<SyntaxError, SyntaxError> convertError(Map<Token, Position> mapping) {
-    return err ->
-        SyntaxError.syntaxError()
-            .severity(err.getSeverity())
-            .ruleStack(err.getRuleStack())
-            .suggestion(err.getSuggestion())
-            .errorCode(err.getErrorCode())
-            .position(convertPositionRange(err.getStartToken(), err.getStopToken(), mapping))
-            .build();
+      return err -> err.toBuilder()
+              .position(convertPositionRange(err.getStartToken(), err.getStopToken(), mapping))
+              .build();
   }
 
   private Position convertPositionRange(Token start, Token stop, Map<Token, Position> mapping) {
