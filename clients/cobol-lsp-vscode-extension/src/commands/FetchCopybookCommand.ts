@@ -14,5 +14,5 @@
 import {CopybookDownloadService} from "../services/CopybookDownloadService";
 
 export function fetchCopybookCommand(copybook: string, downloader: CopybookDownloadService, programName: string) {
-    downloader.downloadCopybook(programName, copybook);
+    downloader.downloadCopybooks(programName, [copybook]);
 }

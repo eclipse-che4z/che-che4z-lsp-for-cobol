@@ -189,7 +189,7 @@ describe("Validate download copybooks from mainframe with correct and incorrect 
 
         profileService.resolveProfile = jest.fn().mockReturnValue(profileName);
         const spy = jest.spyOn(copybookFix, spyMethod);
-        await copybooksDownloader.downloadCopybook("copybook", "CBLPRG");
+        await copybooksDownloader.downloadCopybooks("copybook", ["CBLPRG"]);
         expect(spy).toBeCalledTimes(toBeCalledTimes);
     }
 
