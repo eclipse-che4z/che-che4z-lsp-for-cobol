@@ -1,3 +1,4 @@
+
  /*
 * Copyright (C) 2017, Ulrich Wolffgang <ulrich.wolffgang@proleap.io>
 * All rights reserved.
@@ -179,7 +180,7 @@ ejectStatement
 
 // copy statement
 copyStatement
-   : COPY copySource (directoryPhrase | familyPhrase | replacingPhrase | SUPPRESS)* DOT_FS
+   : COPY copySource (directoryPhrase | familyPhrase | replacingPhrase | SUPPRESS)? DOT_FS
    ;
 
 copySource

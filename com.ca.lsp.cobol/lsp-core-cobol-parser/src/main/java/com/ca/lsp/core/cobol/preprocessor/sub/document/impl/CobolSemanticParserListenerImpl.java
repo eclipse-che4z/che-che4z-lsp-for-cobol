@@ -43,8 +43,8 @@ import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.convertTokensToPositions;
 import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.retrieveTokens;
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -178,15 +178,15 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyStatement(@Nonnull CopyStatementContext ctx) {
     CopySourceContext copySource = ctx.copySource();
-    List<ReplacingPhraseContext> replacingPhrase = ctx.replacingPhrase();
+    List<ReplaceClauseContext> replacing = getReplacing(ctx);
 
     String copybookName = retrieveCopybookName(copySource);
     Position position = retrievePosition(copySource);
     CopybookModel model = getCopyBookContent(copybookName, position);
     String uri = model.getUri();
     String rawContent = model.getContent();
-    String copybookId = getCopybookId(uri, replacingPhrase);
-    String replacedContent = applyReplacing(rawContent, collectReplacePatterns(replacingPhrase));
+    String copybookId = getCopybookId(uri, replacing);
+    String replacedContent = applyReplacing(rawContent, replacing);
 
     ExtendedDocument copybookDocument =
         processCopybook(copybookName, uri, replacedContent, position);
@@ -233,6 +233,12 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     cleaner.visitTerminal(node, tokens);
   }
 
+  private List<ReplaceClauseContext> getReplacing(@Nonnull CopyStatementContext ctx) {
+    return ofNullable(ctx.replacingPhrase())
+        .map(ReplacingPhraseContext::replaceClause)
+        .orElse(emptyList());
+  }
+
   private void collectNestedSemanticData(
       String uri, String copybookId, String replacedContent, ExtendedDocument copybookDocument) {
     copybooks.merge(copybookDocument.getCopybooks());
@@ -265,16 +271,8 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     return replacingService.applyReplacing(rawContent, replaceClauseContexts, tokens);
   }
 
-  private List<ReplaceClauseContext> collectReplacePatterns(
-      List<ReplacingPhraseContext> replacingPhrase) {
-    return replacingPhrase.stream()
-        .map(ReplacingPhraseContext::replaceClause)
-        .flatMap(List::stream)
-        .collect(toList());
-  }
-
   private String getCopybookId(
-      String copybookURI, List<ReplacingPhraseContext> replacingPhraseContexts) {
+      String copybookURI, List<ReplaceClauseContext> replacingPhraseContexts) {
     return copybookURI
         + replacingPhraseContexts.stream()
             .map(RuleContext::getText)
