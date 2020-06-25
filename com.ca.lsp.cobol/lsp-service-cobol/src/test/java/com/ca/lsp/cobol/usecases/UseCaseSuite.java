@@ -56,6 +56,8 @@ import org.junit.runners.Suite.SuiteClasses;
   TestExtraSymbolsNotCauseErrorOnNextLine.class,
   TestVariableStructureIsBuiltWithCopybooks.class,
   TestVariableUsedSeveralTimesInOneStatement.class,
+  TestReplacingPseudoTextReplacesLevelNumber.class,
+  TestReplacingIdentifiersAppliedForFullTokens.class,
   TestIdentificationDivisionInCopybookWithError.class,
   TestCopybookWithRecursiveDependencyIsDetected.class,
   TestMisspelledKeywordWarningInCorrectPosition.class,
