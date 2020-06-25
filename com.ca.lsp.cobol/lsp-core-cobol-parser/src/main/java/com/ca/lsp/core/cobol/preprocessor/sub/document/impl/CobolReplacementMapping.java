@@ -15,69 +15,43 @@ package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.PseudoTextContext;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceSameElementContext;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceableContext;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplacementContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.antlr.v4.runtime.BufferedTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Arrays.stream;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.split;
+
 /** A mapping from a replaceable to a replacement. */
 @Data
 @AllArgsConstructor
-public class CobolReplacementMapping implements Comparable<CobolReplacementMapping> {
+public class CobolReplacementMapping {
 
-  private ReplaceableContext replaceable;
-  private ReplacementContext replacement;
+  private ReplaceSameElementContext replaceable;
+  private ReplaceSameElementContext replacement;
 
-  private String extractPseudoText(
-      final PseudoTextContext pseudoTextCtx, final BufferedTokenStream tokens) {
-    final String pseudoText = TokenUtils.getTextIncludingHiddenTokens(pseudoTextCtx, tokens).trim();
+  private String extractPseudoText(PseudoTextContext pseudoTextCtx, BufferedTokenStream tokens) {
+    String pseudoText = TokenUtils.getTextIncludingHiddenTokens(pseudoTextCtx, tokens).trim();
     return pseudoText.replaceAll("^==", "").replaceAll("==$", "").trim();
   }
 
   /**
-   * Whitespace in Cobol replaceables matches line breaks. Hence, the replaceable search string has
-   * to be enhanced to a regex, which is returned by this function.
+   * Get a regex from string. Whitespace in Cobol replaceables matches line breaks. Hence, the
+   * replaceable search string has to be enhanced to a regex
    */
-  private String getRegexFromReplaceable(final String replaceable) {
-    final String result;
-
-    if (replaceable == null) {
-      result = null;
-    } else {
-      final String[] parts = StringUtils.split(replaceable);
-      final String[] regexParts = new String[parts.length];
-      final String regexSeparator = "[\\r\\n\\s]+";
-
-      for (int i = 0; i < parts.length; i++) {
-        final String part = parts[i];
-        regexParts[i] = Pattern.quote(part);
-      }
-
-      result = StringUtils.join(regexParts, regexSeparator);
-    }
-
-    return result;
+  private String getRegexFromReplaceable(String replaceable) {
+    return stream(split(ofNullable(replaceable).orElse("")))
+        .map(Pattern::quote)
+        .collect(joining("[\\r\\n\\s]+"));
   }
 
-  private String getText(final ParserRuleContext ctx, final BufferedTokenStream tokens) {
-    if (ctx instanceof ReplaceableContext) {
-      return getContextSameElement(((ReplaceableContext) ctx).replaceSameElement(), tokens);
-    } else if (ctx instanceof ReplacementContext) {
-      return getContextSameElement(((ReplacementContext) ctx).replaceSameElement(), tokens);
-    }
-    return null;
-  }
-
-  private String getContextSameElement(
-      final ReplaceSameElementContext ctx, final BufferedTokenStream tokens) {
-
+  private String getText(ReplaceSameElementContext ctx, BufferedTokenStream tokens) {
     if (ctx.pseudoText() != null) {
       return extractPseudoText(ctx.pseudoText(), tokens);
     } else if (ctx.charDataLine() != null) {
@@ -90,34 +64,17 @@ public class CobolReplacementMapping implements Comparable<CobolReplacementMappi
     return null;
   }
 
-  public String replace(final String string, final BufferedTokenStream tokens) {
-    final String replaceableString = getText(replaceable, tokens);
-    final String replacementString = getText(replacement, tokens);
+  public String replace(String text, BufferedTokenStream tokens) {
+    String replaceableString = getText(replaceable, tokens);
+    String replacementString = getText(replacement, tokens);
 
-    final String result;
-
-    if (replaceableString != null && replacementString != null) {
-      // regex for the replaceable
-      final String replaceableRegex = getRegexFromReplaceable(replaceableString);
-
-      // regex for the replacement
-      final String quotedReplacementRegex = Matcher.quoteReplacement(replacementString);
-
-      result = Pattern.compile(replaceableRegex).matcher(string).replaceAll(quotedReplacementRegex);
-    } else {
-      result = string;
+    if (replaceableString == null || replacementString == null) {
+      return text;
     }
-
-    return result;
-  }
-
-  @Override
-  public String toString() {
-    return replaceable.getText() + " -> " + replacement.getText();
-  }
-
-  @Override
-  public int compareTo(final CobolReplacementMapping o) {
-    return o.replaceable.getText().length() - replaceable.getText().length();
+    // regex for the replaceable
+    String replaceableRegex = getRegexFromReplaceable(replaceableString);
+    // regex for the replacement
+    String quotedReplacementRegex = Matcher.quoteReplacement(replacementString);
+    return Pattern.compile(replaceableRegex).matcher(text).replaceAll(quotedReplacementRegex);
   }
 }

@@ -37,7 +37,10 @@ public class ReplacingServiceImpl implements ReplacingService {
       @Nonnull List<ReplaceClauseContext> replaceClauses,
       @Nonnull BufferedTokenStream tokens) {
     return replaceClauses.stream()
-        .map(it -> new CobolReplacementMapping(it.replaceable(), it.replacement()))
+        .map(
+            it ->
+                new CobolReplacementMapping(
+                    it.replaceable().replaceSameElement(), it.replacement().replaceSameElement()))
         .reduce(
             text, (replaced, pattern) -> pattern.replace(replaced, tokens), (str1, str2) -> str2);
   }
