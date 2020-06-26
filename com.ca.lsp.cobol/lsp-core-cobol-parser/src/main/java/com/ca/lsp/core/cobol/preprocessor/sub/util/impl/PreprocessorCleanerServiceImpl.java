@@ -16,6 +16,7 @@ package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.DocumentBuffer;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
+import com.google.inject.Inject;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -27,13 +28,14 @@ import java.util.Deque;
 import java.util.Scanner;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
-import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.getHiddenTokensToLeft;
-import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.getTextIncludingHiddenTokens;
 
 public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerService {
   private Deque<DocumentBuffer> contexts = new ArrayDeque<>();
+  private TokenUtils tokenUtils;
 
-  public PreprocessorCleanerServiceImpl() {
+  @Inject
+  public PreprocessorCleanerServiceImpl(TokenUtils tokenUtils) {
+    this.tokenUtils = tokenUtils;
     contexts.push(new DocumentBuffer());
   }
 
@@ -68,10 +70,11 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
       @Nonnull ParserRuleContext ctx, @Nonnull String tag, @Nonnull BufferedTokenStream tokens) {
     pop();
     DocumentBuffer documentContext = push();
-    documentContext.write(getHiddenTokensToLeft(ctx.start.getTokenIndex(), tokens));
+    documentContext.write(tokenUtils.retrieveHiddenTextToLeft(ctx.start.getTokenIndex(), tokens));
 
     String linePrefix = BLANK_SEQUENCE_AREA + tag;
-    specificTypeExclusion(tag, getTextIncludingHiddenTokens(ctx, tokens).toUpperCase(), linePrefix);
+    specificTypeExclusion(
+        tag, tokenUtils.retrieveTextIncludingHiddenTokens(ctx, tokens).toUpperCase(), linePrefix);
     String content = documentContext.read();
     pop();
 
@@ -99,9 +102,9 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
 
   public void visitTerminal(TerminalNode node, BufferedTokenStream tokens) {
     int tokPos = node.getSourceInterval().a;
-    write(getHiddenTokensToLeft(tokPos, tokens));
+    write(tokenUtils.retrieveHiddenTextToLeft(tokPos, tokens));
 
-    if (!TokenUtils.isEOF(node)) {
+    if (tokenUtils.notEOF(node)) {
       write(node.getText());
     }
   }

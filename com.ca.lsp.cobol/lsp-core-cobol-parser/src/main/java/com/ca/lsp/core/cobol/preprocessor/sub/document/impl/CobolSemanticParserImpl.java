@@ -22,6 +22,7 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.google.inject.Inject;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -32,19 +33,19 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
-import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.convertTokensToPositions;
-import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.retrieveTokens;
-
 /**
  * Preprocessor which retrieves semantic elements definitions, such as variables, paragraphs and
  * copybooks, and applies semantic analysis for the copybooks' content
  */
 public class CobolSemanticParserImpl implements CobolSemanticParser {
   private CobolSemanticParserListenerFactory listenerFactory;
+  private TokenUtils tokenUtils;
 
   @Inject
-  public CobolSemanticParserImpl(CobolSemanticParserListenerFactory listenerFactory) {
+  public CobolSemanticParserImpl(
+      CobolSemanticParserListenerFactory listenerFactory, TokenUtils tokenUtils) {
     this.listenerFactory = listenerFactory;
+    this.tokenUtils = tokenUtils;
   }
 
   @Nonnull
@@ -73,7 +74,8 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     walker.walk(listener, startRule);
 
     Map<String, List<Position>> innerMappings = listener.getDocumentMappings();
-    List<Position> tokenMapping = convertTokensToPositions(uri, retrieveTokens(code));
+    List<Position> tokenMapping =
+        tokenUtils.convertTokensToPositions(uri, tokenUtils.retrieveTokens(code));
 
     innerMappings.put(uri, tokenMapping);
 

@@ -21,6 +21,7 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceSameElementCo
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolReplacementMapping;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.antlr.v4.runtime.BufferedTokenStream;
 
@@ -40,6 +41,12 @@ import static org.apache.commons.lang3.StringUtils.split;
  */
 @Singleton
 public class ReplacingServiceImpl implements ReplacingService {
+  private TokenUtils tokenUtils;
+
+  @Inject
+  ReplacingServiceImpl(TokenUtils tokenUtils) {
+    this.tokenUtils = tokenUtils;
+  }
 
   @Nonnull
   public String applyReplacing(
@@ -90,7 +97,7 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   private String extractPlainText(ReplaceSameElementContext ctx, BufferedTokenStream tokens) {
     if (ctx.charDataLine() != null) {
-      return TokenUtils.getTextIncludingHiddenTokens(ctx, tokens);
+      return tokenUtils.retrieveTextIncludingHiddenTokens(ctx, tokens);
     } else if (ctx.cobolWord() != null) {
       return ctx.getText();
     } else if (ctx.literal() != null) {
@@ -100,7 +107,7 @@ public class ReplacingServiceImpl implements ReplacingService {
   }
 
   private String extractPseudoText(PseudoTextContext pseudoTextCtx, BufferedTokenStream tokens) {
-    String pseudoText = TokenUtils.getTextIncludingHiddenTokens(pseudoTextCtx, tokens).trim();
+    String pseudoText = tokenUtils.retrieveTextIncludingHiddenTokens(pseudoTextCtx, tokens).trim();
     return pseudoText.replaceAll("^==", "").replaceAll("==$", "").trim();
   }
 

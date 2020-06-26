@@ -24,13 +24,13 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  */
 public class CobolHiddenTokenCollectorListenerImpl extends CobolPreprocessorBaseListener {
 
-  private boolean firstTerminal = true;
-
   private final StringBuilder outputBuffer = new StringBuilder();
 
   private final BufferedTokenStream tokens;
+  private final TokenUtils tokenUtils;
 
-  public CobolHiddenTokenCollectorListenerImpl(final BufferedTokenStream tokens) {
+  public CobolHiddenTokenCollectorListenerImpl(TokenUtils tokenUtils, BufferedTokenStream tokens) {
+    this.tokenUtils = tokenUtils;
     this.tokens = tokens;
   }
 
@@ -39,17 +39,14 @@ public class CobolHiddenTokenCollectorListenerImpl extends CobolPreprocessorBase
   }
 
   @Override
-  public void visitTerminal(final TerminalNode node) {
-    if (!firstTerminal) {
-      final int tokPos = node.getSourceInterval().a;
-      outputBuffer.append(TokenUtils.getHiddenTokensToLeft(tokPos, tokens));
+  public void visitTerminal(TerminalNode node) {
+    if (outputBuffer.length() > 0) {
+      int tokPos = node.getSourceInterval().a;
+      outputBuffer.append(tokenUtils.retrieveHiddenTextToLeft(tokPos, tokens));
     }
 
-    if (!TokenUtils.isEOF(node)) {
-      final String text = node.getText();
-      outputBuffer.append(text);
+    if (tokenUtils.notEOF(node)) {
+      outputBuffer.append(node.getText());
     }
-
-    firstTerminal = false;
   }
 }

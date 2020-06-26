@@ -22,6 +22,7 @@ import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListen
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.google.inject.Inject;
@@ -40,8 +41,6 @@ import java.util.*;
 
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
-import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.convertTokensToPositions;
-import static com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils.retrieveTokens;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -71,6 +70,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private Provider<CopybookResolution> resolutions;
   private Deque<CopybookUsage> copybookStack;
   private ReplacingService replacingService;
+  private TokenUtils tokenUtils;
 
   @Inject
   CobolSemanticParserListenerImpl(
@@ -81,7 +81,8 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
       PreprocessorCleanerServiceImpl cleaner,
       CobolPreprocessor preprocessor,
       Provider<CopybookResolution> resolutions,
-      ReplacingService replacingService) {
+      ReplacingService replacingService,
+      TokenUtils tokenUtils) {
     this.documentUri = documentUri;
     this.tokens = tokens;
     this.copybookStack = copybookStack;
@@ -90,6 +91,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     this.preprocessor = preprocessor;
     this.resolutions = resolutions;
     this.replacingService = replacingService;
+    this.tokenUtils = tokenUtils;
   }
 
   @Nonnull
@@ -244,7 +246,10 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     copybooks.merge(copybookDocument.getCopybooks());
     documentMappings.putAll(copybookDocument.getDocumentPositions());
     documentMappings.computeIfAbsent(
-        copybookId, it -> convertTokensToPositions(uri, retrieveTokens(replacedContent)));
+        copybookId,
+        it ->
+            tokenUtils.convertTokensToPositions(
+                uri, tokenUtils.retrieveTokens(replacedContent)));
   }
 
   private void writeCopybook(String copybookId, String copybookContent) {

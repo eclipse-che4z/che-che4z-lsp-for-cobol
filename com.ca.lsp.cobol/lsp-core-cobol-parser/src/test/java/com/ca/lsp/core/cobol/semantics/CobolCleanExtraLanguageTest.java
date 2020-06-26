@@ -16,6 +16,7 @@
 package com.ca.lsp.core.cobol.semantics;
 
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.TokenUtilsImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -98,7 +99,7 @@ public class CobolCleanExtraLanguageTest {
   @Test
   public void specificStatementExclusionTest() {
     PreprocessorCleanerServiceImpl preprocessorCleanerService =
-        new PreprocessorCleanerServiceImpl();
+        new PreprocessorCleanerServiceImpl(new TokenUtilsImpl());
     preprocessorCleanerService.push();
     preprocessorCleanerService.specificTypeExclusion(tag, text, linePrefix);
     assertEquals(expectedText, preprocessorCleanerService.peek().read());
