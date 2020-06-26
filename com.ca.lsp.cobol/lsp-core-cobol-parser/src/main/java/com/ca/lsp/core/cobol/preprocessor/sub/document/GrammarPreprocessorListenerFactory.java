@@ -16,15 +16,15 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
 import com.ca.lsp.core.cobol.model.CopybookUsage;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserListenerImpl;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.GrammarPreprocessorListenerImpl;
 import com.google.inject.assistedinject.Assisted;
 import org.antlr.v4.runtime.BufferedTokenStream;
 
 import javax.annotation.Nonnull;
 import java.util.Deque;
 
-public interface CobolSemanticParserListenerFactory {
-  CobolSemanticParserListenerImpl create(
+public interface GrammarPreprocessorListenerFactory {
+  GrammarPreprocessorListenerImpl create(
       @Nonnull @Assisted("uri") String uri,
       @Nonnull BufferedTokenStream tokens,
       @Nonnull Deque<CopybookUsage> copybookStack,

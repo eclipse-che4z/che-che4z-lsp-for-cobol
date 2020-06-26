@@ -21,7 +21,11 @@ import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import java.util.List;
 import java.util.Map;
 
-public interface CobolSemanticParserListener extends CobolPreprocessorListener {
+/**
+ * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
+ * and REPLACE statements and removing non-processable sections starting with EXEC statements.
+ */
+public interface GrammarPreprocessorListener extends CobolPreprocessorListener {
 
   String getResult();
 

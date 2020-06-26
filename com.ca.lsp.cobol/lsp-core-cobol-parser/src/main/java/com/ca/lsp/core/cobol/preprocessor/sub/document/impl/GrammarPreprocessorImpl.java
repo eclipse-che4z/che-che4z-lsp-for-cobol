@@ -20,9 +20,9 @@ import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListenerFactory;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListener;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListenerFactory;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.google.inject.Inject;
 import org.antlr.v4.runtime.CharStreams;
@@ -35,23 +35,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Preprocessor which retrieves semantic elements definitions, such as variables, paragraphs and
- * copybooks, and applies semantic analysis for the copybooks' content
+ * This class runs pre-processing for COBOL using CobolPreprocessor.g4 grammar file. As a result, it
+ * returns an extended document with all the available copybooks included, with their definitions
+ * and usages specified, as well as related errors.
  */
-public class CobolSemanticParserImpl implements CobolSemanticParser {
-  private CobolSemanticParserListenerFactory listenerFactory;
+public class GrammarPreprocessorImpl implements GrammarPreprocessor {
+  private GrammarPreprocessorListenerFactory listenerFactory;
   private TokenUtils tokenUtils;
 
   @Inject
-  public CobolSemanticParserImpl(
-      CobolSemanticParserListenerFactory listenerFactory, TokenUtils tokenUtils) {
+  public GrammarPreprocessorImpl(
+      GrammarPreprocessorListenerFactory listenerFactory, TokenUtils tokenUtils) {
     this.listenerFactory = listenerFactory;
     this.tokenUtils = tokenUtils;
   }
 
   @Nonnull
   @Override
-  public ResultWithErrors<ExtendedDocument> processLines(
+  public ResultWithErrors<ExtendedDocument> buildExtendedDocument(
       @Nonnull String uri,
       @Nonnull String code,
       @Nonnull Deque<CopybookUsage> copybookStack,
@@ -70,7 +71,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     StartRuleContext startRule = parser.startRule();
 
     ParseTreeWalker walker = new ParseTreeWalker();
-    CobolSemanticParserListener listener =
+    GrammarPreprocessorListener listener =
         listenerFactory.create(uri, tokens, copybookStack, textDocumentSyncType);
     walker.walk(listener, startRule);
 
@@ -79,7 +80,6 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
     innerMappings.put(uri, tokenMapping);
 
-    // analyze contained copy books
     return new ResultWithErrors<>(
         new ExtendedDocument(listener.getResult(), listener.getCopybooks(), innerMappings),
         listener.getErrors());

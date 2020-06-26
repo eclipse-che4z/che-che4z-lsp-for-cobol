@@ -19,7 +19,7 @@ import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineIndicatorProcessor;
@@ -44,11 +44,11 @@ import java.util.List;
 @Slf4j
 @Singleton
 public class CobolPreprocessorImpl implements CobolPreprocessor {
-  private CobolSemanticParser semanticParser;
+  private GrammarPreprocessor grammarPreprocessor;
 
   @Inject
-  public CobolPreprocessorImpl(CobolSemanticParser semanticParser) {
-    this.semanticParser = semanticParser;
+  public CobolPreprocessorImpl(GrammarPreprocessor grammarPreprocessor) {
+    this.grammarPreprocessor = grammarPreprocessor;
   }
 
   @Nonnull
@@ -76,7 +76,8 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
     String code = createLineWriter().serialize(rewrittenLines);
 
     ResultWithErrors<ExtendedDocument> parsedDocument =
-        semanticParser.processLines(documentUri, code, copybookStack, textDocumentSyncType);
+        grammarPreprocessor.buildExtendedDocument(
+            documentUri, code, copybookStack, textDocumentSyncType);
 
     List<SyntaxError> errors = new ArrayList<>();
     errors.addAll(lines.getErrors());

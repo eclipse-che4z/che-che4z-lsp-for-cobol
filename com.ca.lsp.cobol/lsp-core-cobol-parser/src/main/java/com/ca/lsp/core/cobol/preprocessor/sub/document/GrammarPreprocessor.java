@@ -20,22 +20,21 @@ import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import javax.annotation.Nonnull;
 import java.util.Deque;
 
-/**
- * Preprocessor which retrieves semantic elements definitions, such as variables, paragraphs and
- * copybooks
- */
-public interface CobolSemanticParser {
+/** This interface represents service to build the extended document */
+public interface GrammarPreprocessor {
 
   /**
-   * Fills-in the semantic context of the current document, including elements from the copybooks
+   * Build extended document using its COPY statements, excluding non-processable statements,
+   * applying related semantic analysis
    *
+   * @param uri - the URI of the processing document
    * @param code - COBOL program text to analyse
+   * @param copybookStack - stack, representing the hierarchy of nesting copybooks
    * @param textDocumentSyncType - reflect the sync status of the document (DID_OPEN|DID_CHANGE)
-   * @return a PreprocessedInput - text and its semantic context with syntax errors if found or an
-   *     empty list
+   * @return extended document with copybooks and related errors
    */
   @Nonnull
-  ResultWithErrors<ExtendedDocument> processLines(
+  ResultWithErrors<ExtendedDocument> buildExtendedDocument(
       @Nonnull String uri,
       @Nonnull String code,
       @Nonnull Deque<CopybookUsage> copybookStack,

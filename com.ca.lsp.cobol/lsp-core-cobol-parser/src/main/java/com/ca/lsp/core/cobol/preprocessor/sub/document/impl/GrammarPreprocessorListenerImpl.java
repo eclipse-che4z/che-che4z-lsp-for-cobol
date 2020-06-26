@@ -18,7 +18,7 @@ import com.ca.lsp.core.cobol.model.*;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.*;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorStringUtils;
@@ -51,8 +51,8 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  * and REPLACE statements and removing non-processable sections starting with EXEC statements.
  */
 @Slf4j
-public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListener
-    implements CobolSemanticParserListener {
+public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListener
+    implements GrammarPreprocessorListener {
   private static final String RECURSION_DETECTED = "Recursive copybook declaration for: %s";
   private static final String COPYBOOK_OVER_8_CHARACTERS =
       "Copybook declaration has more than 8 characters for: %s";
@@ -73,7 +73,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private TokenUtils tokenUtils;
 
   @Inject
-  CobolSemanticParserListenerImpl(
+  GrammarPreprocessorListenerImpl(
       @Assisted("uri") String documentUri,
       @Assisted BufferedTokenStream tokens,
       @Assisted Deque<CopybookUsage> copybookStack,
