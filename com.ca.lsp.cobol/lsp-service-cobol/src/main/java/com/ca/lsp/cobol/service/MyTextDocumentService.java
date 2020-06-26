@@ -16,8 +16,8 @@ package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
-import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.AnalysisFinishedEvent;
+import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActions;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
@@ -63,6 +63,7 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class MyTextDocumentService implements TextDocumentService, EventObserver<RunAnalysisEvent> {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
   private static final String GIT_FS_URI = "gitfs:/";
+  public static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
 
@@ -166,10 +167,10 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-    // A better implementation that will cover the gitfs scenario will be implementated later based
-    // on issue #173
+
+    // git FS URIs are not currently supported
     if (uri.startsWith(GIT_FS_URI)) {
-      communications.notifyThatExtensionIsUnsupported("gitfs");
+      log.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
     }
 
     String text = params.getTextDocument().getText();
