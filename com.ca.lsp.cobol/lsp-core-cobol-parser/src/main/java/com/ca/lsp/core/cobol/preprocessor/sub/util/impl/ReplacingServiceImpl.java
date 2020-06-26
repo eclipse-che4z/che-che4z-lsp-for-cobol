@@ -18,7 +18,7 @@ package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.PseudoTextContext;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceClauseContext;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceSameElementContext;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolReplacementMapping;
+import com.ca.lsp.core.cobol.model.ReplacingMapping;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.google.inject.Inject;
@@ -56,13 +56,13 @@ public class ReplacingServiceImpl implements ReplacingService {
     return replaceClauses.stream()
         .map(
             it ->
-                new CobolReplacementMapping(
+                new ReplacingMapping(
                     it.replaceable().replaceSameElement(), it.replacement().replaceSameElement()))
         .reduce(
             text, (replaced, pattern) -> replace(replaced, pattern, tokens), (str1, str2) -> str2);
   }
 
-  private String replace(String text, CobolReplacementMapping pattern, BufferedTokenStream tokens) {
+  private String replace(String text, ReplacingMapping pattern, BufferedTokenStream tokens) {
     return Pattern.compile(getReplaceablePattern(pattern.getReplaceable(), tokens))
         .matcher(text)
         .replaceAll(getReplacementPattern(pattern.getReplacement(), tokens));

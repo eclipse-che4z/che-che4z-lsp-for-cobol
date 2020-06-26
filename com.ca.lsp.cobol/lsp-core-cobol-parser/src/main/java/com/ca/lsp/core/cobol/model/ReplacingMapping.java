@@ -9,19 +9,17 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ *    Broadcom, Inc. - initial API and implementation
+ *
  */
-package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
+package com.ca.lsp.core.cobol.model;
 
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceSameElementContext;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
-/** A mapping from a replaceable to a replacement. */
-@Data
-@AllArgsConstructor
-public class CobolReplacementMapping {
-
+/** A mapping from a replaceable to a replacement used in REPLACING statements. */
+@Value
+public class ReplacingMapping {
   private ReplaceSameElementContext replaceable;
   private ReplaceSameElementContext replacement;
 }
