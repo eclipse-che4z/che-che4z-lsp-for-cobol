@@ -47,15 +47,18 @@ import static org.antlr.v4.runtime.Token.EOF;
 @Singleton
 public class TokenUtilsImpl implements TokenUtils {
 
+  @Nonnull
   @Override
-  public String retrieveHiddenTextToLeft(int position, BufferedTokenStream tokens) {
+  public String retrieveHiddenTextToLeft(int position, @Nonnull BufferedTokenStream tokens) {
     return ofNullable(tokens.getHiddenTokensToLeft(position, HIDDEN))
         .map(it -> it.stream().map(Token::getText).collect(joining()))
         .orElse("");
   }
 
+  @Nonnull
   @Override
-  public String retrieveTextIncludingHiddenTokens(ParseTree context, BufferedTokenStream tokens) {
+  public String retrieveTextIncludingHiddenTokens(
+      @Nonnull ParseTree context, @Nonnull BufferedTokenStream tokens) {
     CobolHiddenTokenCollectorListenerImpl listener =
         new CobolHiddenTokenCollectorListenerImpl(this, tokens);
     ParseTreeWalker walker = new ParseTreeWalker();
@@ -64,13 +67,19 @@ public class TokenUtilsImpl implements TokenUtils {
     return listener.read();
   }
 
+  @Nonnull
   @Override
-  public boolean notEOF(TerminalNode node) {
-    return node.getSymbol().getType() != EOF;
+  public List<Position> retrievePositionsFromText(@Nonnull String uri, @Nonnull String code) {
+    return retrieveTokens(code).getTokens().stream().map(toPosition(uri)).collect(toList());
   }
 
   @Override
-  public CommonTokenStream retrieveTokens(@Nonnull String code) {
+  public boolean notEOF(@Nonnull TerminalNode node) {
+    return node.getSymbol().getType() != EOF;
+  }
+
+  @Nonnull
+  private CommonTokenStream retrieveTokens(@Nonnull String code) {
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(code));
     lexer.removeErrorListeners();
 
@@ -85,11 +94,7 @@ public class TokenUtilsImpl implements TokenUtils {
     return tokens;
   }
 
-  @Override
-  public List<Position> convertTokensToPositions(@Nonnull String uri, BufferedTokenStream tokens) {
-    return tokens.getTokens().stream().map(toPosition(uri)).collect(toList());
-  }
-
+  @Nonnull
   private Function<Token, Position> toPosition(@Nonnull String uri) {
     return it ->
         new Position(

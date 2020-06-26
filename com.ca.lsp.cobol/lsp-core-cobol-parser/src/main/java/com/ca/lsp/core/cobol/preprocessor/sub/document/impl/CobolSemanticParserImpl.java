@@ -74,8 +74,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
     walker.walk(listener, startRule);
 
     Map<String, List<Position>> innerMappings = listener.getDocumentMappings();
-    List<Position> tokenMapping =
-        tokenUtils.convertTokensToPositions(uri, tokenUtils.retrieveTokens(code));
+    List<Position> tokenMapping = tokenUtils.retrievePositionsFromText(uri, code);
 
     innerMappings.put(uri, tokenMapping);
 

@@ -17,7 +17,6 @@ package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
 import com.broadcom.lsp.domain.common.model.Position;
 import org.antlr.v4.runtime.BufferedTokenStream;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -37,7 +36,8 @@ public interface TokenUtils {
    * @param tokens - stream of tokens
    * @return string that contains hidden tokens' text
    */
-  String retrieveHiddenTextToLeft(int position, BufferedTokenStream tokens);
+  @Nonnull
+  String retrieveHiddenTextToLeft(int position, @Nonnull BufferedTokenStream tokens);
 
   /**
    * Retrieve the full text of the given context including hidden tokens
@@ -46,7 +46,19 @@ public interface TokenUtils {
    * @param tokens - stream that contains relative tokens
    * @return string that contains full text of context
    */
-  String retrieveTextIncludingHiddenTokens(ParseTree context, BufferedTokenStream tokens);
+  @Nonnull
+  String retrieveTextIncludingHiddenTokens(
+      @Nonnull ParseTree context, @Nonnull BufferedTokenStream tokens);
+
+  /**
+   * Split text into tokens and retrieve their positions
+   *
+   * @param uri - document URI to fill-in positions
+   * @param code - text to parse
+   * @return List of positions of the given text
+   */
+  @Nonnull
+  List<Position> retrievePositionsFromText(@Nonnull String uri, @Nonnull String code);
 
   /**
    * Check the given node in not end of file
@@ -54,9 +66,5 @@ public interface TokenUtils {
    * @param node - terminal node to check
    * @return true if this node is not end of file
    */
-  boolean notEOF(TerminalNode node);
-
-  CommonTokenStream retrieveTokens(@Nonnull String code);
-
-  List<Position> convertTokensToPositions(@Nonnull String uri, BufferedTokenStream tokens);
+  boolean notEOF(@Nonnull TerminalNode node);
 }

@@ -246,10 +246,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     copybooks.merge(copybookDocument.getCopybooks());
     documentMappings.putAll(copybookDocument.getDocumentPositions());
     documentMappings.computeIfAbsent(
-        copybookId,
-        it ->
-            tokenUtils.convertTokensToPositions(
-                uri, tokenUtils.retrieveTokens(replacedContent)));
+        copybookId, it -> tokenUtils.retrievePositionsFromText(uri, replacedContent));
   }
 
   private void writeCopybook(String copybookId, String copybookContent) {
