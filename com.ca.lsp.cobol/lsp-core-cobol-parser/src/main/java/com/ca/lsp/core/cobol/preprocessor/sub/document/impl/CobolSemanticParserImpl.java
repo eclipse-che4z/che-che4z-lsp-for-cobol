@@ -22,6 +22,7 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListenerFactory;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.google.inject.Inject;
 import org.antlr.v4.runtime.CharStreams;

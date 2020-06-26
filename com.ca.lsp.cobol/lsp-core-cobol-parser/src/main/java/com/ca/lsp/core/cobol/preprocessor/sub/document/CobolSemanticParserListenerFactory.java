@@ -13,9 +13,10 @@
  *
  */
 
-package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
+package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
 import com.ca.lsp.core.cobol.model.CopybookUsage;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserListenerImpl;
 import com.google.inject.assistedinject.Assisted;
 import org.antlr.v4.runtime.BufferedTokenStream;
 

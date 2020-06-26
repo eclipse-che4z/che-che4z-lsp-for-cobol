@@ -20,7 +20,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
-import static com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils.copyCobolLineWithIndicatorAndContentArea;
+import static com.ca.lsp.core.cobol.preprocessor.sub.util.impl.CobolLineUtils.copyCobolLineWithIndicatorAndContentArea;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;

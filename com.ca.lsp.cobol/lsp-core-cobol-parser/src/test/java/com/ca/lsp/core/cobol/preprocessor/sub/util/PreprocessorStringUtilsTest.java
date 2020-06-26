@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorStringUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

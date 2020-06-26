@@ -22,7 +22,7 @@ import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserListenerFactory;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListenerFactory;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CopybookResolutionProvider;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;

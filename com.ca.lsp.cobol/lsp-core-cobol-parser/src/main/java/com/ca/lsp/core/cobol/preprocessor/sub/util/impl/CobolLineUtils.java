@@ -13,7 +13,7 @@
  *
  */
 
-package com.ca.lsp.core.cobol.preprocessor.sub.util;
+package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import lombok.experimental.UtilityClass;

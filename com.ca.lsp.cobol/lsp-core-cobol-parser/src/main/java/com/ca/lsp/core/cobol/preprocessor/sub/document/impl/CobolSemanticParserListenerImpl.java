@@ -21,7 +21,7 @@ import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtils;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;

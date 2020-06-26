@@ -9,9 +9,10 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ *    Broadcom, Inc. - initial API and implementation
+ *
  */
-package com.ca.lsp.core.cobol.preprocessor.sub.util;
+package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
 import lombok.experimental.UtilityClass;
 

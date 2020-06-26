@@ -17,9 +17,9 @@ package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.CobolLineUtils;
 import org.junit.Test;
 
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.BLANK_SEQUENCE_AREA;
 import static org.junit.Assert.assertEquals;
 
 /** This class is a unit test for {@link CobolLineUtils} and checks its utility methods. */
