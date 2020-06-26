@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.DocumentBuffer;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.google.inject.Inject;
@@ -28,60 +27,67 @@ import java.util.Deque;
 import java.util.Scanner;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
+import static java.util.Optional.ofNullable;
 
 public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerService {
-  private Deque<DocumentBuffer> contexts = new ArrayDeque<>();
+  private Deque<StringBuilder> contexts = new ArrayDeque<>();
   private TokenUtils tokenUtils;
 
   @Inject
   public PreprocessorCleanerServiceImpl(TokenUtils tokenUtils) {
     this.tokenUtils = tokenUtils;
-    contexts.push(new DocumentBuffer());
+    contexts.push(new StringBuilder());
   }
 
-  /** Return the current preprocessing context from the stack. */
-  public DocumentBuffer peek() {
-    return contexts.peek();
+  @Override
+  @Nonnull
+  public StringBuilder peek() {
+    return ofNullable(contexts.peek())
+        .orElseThrow(() -> new IllegalStateException("Document structure corrupted"));
   }
 
-  /** Pop the current preprocessing context from the stack. */
+  @Override
   @Nullable
-  public DocumentBuffer pop() {
+  public StringBuilder pop() {
     return contexts.pop();
   }
 
-  /** Push a new preprocessing context onto the stack. */
+  @Override
   @Nonnull
-  public DocumentBuffer push() {
-    DocumentBuffer cobolDocumentContext = new DocumentBuffer();
+  public StringBuilder push() {
+    StringBuilder cobolDocumentContext = new StringBuilder();
     contexts.push(cobolDocumentContext);
     return cobolDocumentContext;
   }
 
-  public void write(String text) {
-    peek().write(text);
+  @Override
+  public void write(@Nonnull String text) {
+    peek().append(text);
   }
 
+  @Override
   public String read() {
-    return peek().read();
+    return peek().toString();
   }
 
+  @Override
   public void excludeStatementFromText(
       @Nonnull ParserRuleContext ctx, @Nonnull String tag, @Nonnull BufferedTokenStream tokens) {
     pop();
-    DocumentBuffer documentContext = push();
-    documentContext.write(tokenUtils.retrieveHiddenTextToLeft(ctx.start.getTokenIndex(), tokens));
+    StringBuilder documentContext = push();
+    documentContext.append(tokenUtils.retrieveHiddenTextToLeft(ctx.start.getTokenIndex(), tokens));
 
     String linePrefix = BLANK_SEQUENCE_AREA + tag;
-    specificTypeExclusion(
+    excludeSpecificType(
         tag, tokenUtils.retrieveTextIncludingHiddenTokens(ctx, tokens).toUpperCase(), linePrefix);
-    String content = documentContext.read();
+    String content = documentContext.toString();
     pop();
 
     write(content);
   }
 
-  public void specificTypeExclusion(
+  @Override
+  public void excludeSpecificType(
       @Nonnull String tag, @Nonnull String text, @Nonnull String linePrefix) {
     String[] textSplit = null;
     String lines;
@@ -100,7 +106,8 @@ public class PreprocessorCleanerServiceImpl implements PreprocessorCleanerServic
     }
   }
 
-  public void visitTerminal(TerminalNode node, BufferedTokenStream tokens) {
+  @Override
+  public void writeToken(TerminalNode node, BufferedTokenStream tokens) {
     int tokPos = node.getSourceInterval().a;
     write(tokenUtils.retrieveHiddenTextToLeft(tokPos, tokens));
 

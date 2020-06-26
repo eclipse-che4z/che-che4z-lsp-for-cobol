@@ -101,7 +101,7 @@ public class CobolCleanExtraLanguageTest {
     PreprocessorCleanerServiceImpl preprocessorCleanerService =
         new PreprocessorCleanerServiceImpl(new TokenUtilsImpl());
     preprocessorCleanerService.push();
-    preprocessorCleanerService.specificTypeExclusion(tag, text, linePrefix);
-    assertEquals(expectedText, preprocessorCleanerService.peek().read());
+    preprocessorCleanerService.excludeSpecificType(tag, text, linePrefix);
+    assertEquals(expectedText, preprocessorCleanerService.peek().toString());
   }
 }

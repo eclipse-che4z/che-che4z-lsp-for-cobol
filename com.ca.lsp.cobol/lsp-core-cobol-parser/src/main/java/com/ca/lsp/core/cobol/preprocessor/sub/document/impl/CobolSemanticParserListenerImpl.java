@@ -20,10 +20,10 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.*;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParserListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -62,7 +62,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   @Getter private final NamedSubContext<Position> copybooks = new NamedSubContext<>();
   @Getter private final Map<String, List<Position>> documentMappings = new HashMap<>();
 
-  private PreprocessorCleanerServiceImpl cleaner;
+  private PreprocessorCleanerService cleaner;
   private String documentUri;
   private BufferedTokenStream tokens;
   private String textDocumentSyncType;
@@ -78,7 +78,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
       @Assisted BufferedTokenStream tokens,
       @Assisted Deque<CopybookUsage> copybookStack,
       @Assisted("textDocumentSyncType") String textDocumentSyncType,
-      PreprocessorCleanerServiceImpl cleaner,
+      PreprocessorCleanerService cleaner,
       CobolPreprocessor preprocessor,
       Provider<CopybookResolution> resolutions,
       ReplacingService replacingService,
@@ -232,7 +232,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void visitTerminal(@Nonnull TerminalNode node) {
-    cleaner.visitTerminal(node, tokens);
+    cleaner.writeToken(node, tokens);
   }
 
   private List<ReplaceClauseContext> getReplacing(@Nonnull CopyStatementContext ctx) {
