@@ -47,16 +47,16 @@ export class CopybookDownloadService implements vscode.Disposable {
      * @param cobolFileName name of the document open in workspace
      * @param copybookName name of the copybook required by the LSP server
      */
-    public async downloadCopybook(cobolFileName: string, copybookName: string): Promise<void> {
+    public async downloadCopybooks(cobolFileName: string, copybookNames: string[]): Promise<void> {
         if (!checkWorkspace()) {
             return;
         }
         const profile: string = await this.profileService.resolveProfile(cobolFileName);
         if (!profile) {
-            this.createErrorMessageForCopybooks(new Set<string>().add(copybookName));
+            this.createErrorMessageForCopybooks(new Set<string>(copybookNames));
             return;
         }
-        await this.resolver.addCopybookInQueue([copybookName], profile);
+        await this.resolver.addCopybookInQueue(copybookNames, profile);
 
     }
 

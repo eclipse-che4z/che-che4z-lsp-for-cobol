@@ -41,10 +41,9 @@ export class Middleware {
                 return [await this.copybookResolverURI.resolveCopybookURI(copybookName, cobolFileName)];
             }
             if (sectionName.startsWith("broadcom-cobol-lsp.copybook-download")) {
-                for (const item of params.items) {
-                    const [cobolFileName, copybookName] = Middleware.extractFileAndCopybookNames(item.section);
-                    this.copybookDownloader.downloadCopybook(cobolFileName, copybookName);
-                }
+                const extractedNames = params.items.map(item => Middleware.extractFileAndCopybookNames(item.section));
+                const copybookNames = extractedNames.map(names => names[1]);
+                this.copybookDownloader.downloadCopybooks(extractedNames[0][0], copybookNames);
                 return [];
             }
         }

@@ -33,8 +33,4 @@ public interface Communications {
   void notifyThatDocumentAnalysed(String uri);
 
   void notifyThatExtensionIsUnsupported(String extension);
-
-  void notifyCopybookMessageInfo(CopybookMessageInfo copybookMessageInfo);
-
-  void notifyLogMessageInfo(CopybookMessageInfo copybookMessageInfo);
 }

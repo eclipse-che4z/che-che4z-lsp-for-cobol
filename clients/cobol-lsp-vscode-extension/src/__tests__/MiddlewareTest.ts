@@ -28,9 +28,9 @@ describe("Copybook downloader", () => {
     const copybookResolverURI: any = {
         resolveCopybookURI: resolveCopybookURIMock,
     };
-    const downloadCopybookMock = jest.fn().mockResolvedValue(null);
+    const downloadCopybooksMock = jest.fn().mockResolvedValue(null);
     const copybookDownloader: any = {
-        downloadCopybook: downloadCopybookMock,
+        downloadCopybooks: downloadCopybooksMock,
     };
     const middleware = new Middleware(copybookResolverURI, copybookDownloader);
 
@@ -51,11 +51,10 @@ describe("Copybook downloader", () => {
     it("Handle copybook download request", async () => {
         const params = {items: [
             "broadcom-cobol-lsp.copybook-download.cobFile.bookName",
-            "broadcom-cobol-lsp.copybook-download.USER.CLIST.COB.bookName",
+            "broadcom-cobol-lsp.copybook-download.cobFile.bookName2",
         ].map(sectionName => ({section: sectionName}))};
         await expect(middleware.handleConfigurationRequest(params, null, null)).resolves.toEqual([]);
-        expect(downloadCopybookMock).toHaveBeenCalledWith("cobFile", "bookName");
-        expect(downloadCopybookMock).toHaveBeenCalledWith("USER.CLIST.COB", "bookName");
+        expect(downloadCopybooksMock).toHaveBeenCalledWith("cobFile", ["bookName", "bookName2"]);
     });
     it("Call next for non cobol params", async () => {
         const params = constructParams("foo.bar");
