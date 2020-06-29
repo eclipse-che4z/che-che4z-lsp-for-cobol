@@ -35,10 +35,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
@@ -254,6 +251,31 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     communications.cancelProgressNotification(uri);
     communications.publishDiagnostics(uri, result.getDiagnostics());
     if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
+  }
+
+  @Override
+  public CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> documentSymbol(DocumentSymbolParams params) {
+    String uri = params.getTextDocument().getUri();
+    return supplyAsync(() -> collectSymbols(uri))
+        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("documentSymbol", uri)));
+  }
+
+  private List<Either<SymbolInformation, DocumentSymbol>> collectSymbols(String uri) {
+    if (!docs.containsKey(uri)) {
+      return Collections.emptyList();
+    }
+    MyDocumentModel model = docs.get(uri);
+    List<Either<SymbolInformation, DocumentSymbol>> result = new ArrayList<>();
+    for (Map.Entry<String, List<Location>> entry: model.getAnalysisResult().getParagraphDefinitions().entrySet()) {
+      result.add(Either.forLeft(new SymbolInformation(entry.getKey(), SymbolKind.Method, entry.getValue().get(0))));
+    }
+    for (Map.Entry<String, List<Location>> entry: model.getAnalysisResult().getVariableDefinitions().entrySet()) {
+      result.add(Either.forLeft(new SymbolInformation(entry.getKey(), SymbolKind.Variable, entry.getValue().get(0))));
+    }
+    for (Map.Entry<String, List<Location>> entry: model.getAnalysisResult().getCopybookUsages().entrySet()) {
+      result.add(Either.forLeft(new SymbolInformation(entry.getKey(), SymbolKind.Package, entry.getValue().get(0))));
+    }
+    return result;
   }
 
   private void registerDocument(String uri, MyDocumentModel document) {
