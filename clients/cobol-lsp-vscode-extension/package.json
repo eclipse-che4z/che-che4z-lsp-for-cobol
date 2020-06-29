@@ -65,6 +65,17 @@
                 ]
             }
         ],
+        "grammars": [
+            {
+                "language": "COBOL",
+                "scopeName": "source.cobol",
+                "path": "./syntaxes/COBOL.tmLanguage.json",
+                "embeddedLanguages": {
+                    "meta.embedded.block.sql": "sql",
+                    "meta.embedded.block.html": "html"
+                }
+            }
+        ],
         "configuration": {
             "title": "Broadcom COBOL LSP",
             "properties": {
