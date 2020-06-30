@@ -11,7 +11,9 @@
 
 # COBOL Language Support
 
-COBOL Language Support standardizes the communication between language tooling for COBOL and your code editor. Files with the extensions .COB and .CBL are recognized as COBOL files.
+COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, highlighting and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using a Zowe CLI z/OSMF profile to automatically retrieve copybooks used in your programs and store them in your workspace. 
+
+COBOL Language Support recognizes files with the extensions `.cob` and `.cbl` as COBOL files.
 
 > How can we improve COBOL Language Support? [Let us know on our Git repository](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues)
 
@@ -21,14 +23,18 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 ## Prerequisites
 
-- Java version 8 or higher.
+- Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
 - To enable syntax coloring, a third-party COBOL extension is required. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
 - To enable automatic copybook retrieval, the following are required:
     - Configured TSO/E address space services, z/OS data set and file REST interface, and z/OS jobs REST interface. For more information, see [z/OS Requirements](https://docs.zowe.org/stable/user-guide/systemrequirements-zosmf.html#z-os-requirements).
     - [Zowe CLI z/OSMF profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) with credentials.
+    
+## Compatibility
+
+The COBOL Language Support extension is not compatible with other extensions that provide COBOL support, with the exception of Bitlang's COBOL extension. We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
 
 ## Features
-COBOL Language Support defines the protocol that is used between an editor or IDE, and a language server that provides the following COBOL syntax awareness features:
+COBOL Language Support provides the following COBOL syntax awareness features:
 
 ### Autocomplete
 Autocomplete speeds up the coding process by intuitively suggesting the most likely variables or paragraphs to follow existing code. The extension provides live suggestions while you type for:
@@ -50,36 +56,61 @@ This feature checks for mistakes and errors in COBOL code. The syntax check feat
 
 ### Syntax Highlighting
 The extension enables syntax highlighting for COBOL code.
-
+	
 ### Syntax Coloring
 Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, and paragraphs.
 
 A third-party plugin is required to enable syntax coloring. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
+	
+## Copybook Support
 
-### Copybook Support
+The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe CLI z/OSMF profile to automatically download them from the mainframe to your workspace. 
 
-The LSP for COBOL extension can retrieve copybooks used in your projects from the mainframe and download them locally. You can open copybooks in your IDE and make use of the copybook support features of the extension.
+You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and  data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the copybook's name. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
 
-#### Retrieving Copybooks
+### Storing Copybooks Locally
 
-To retrieve copybooks from the mainframe, **follow these steps:**
+You can store your copybooks locally in folders in your workspace and specify those folder paths in your workspace extension settings. Ensure that the file names of your locally stored copybooks are in upper case, for example `BOOK1.CPY` and not `book1.CPY`.
+
+**Follow these steps:**
+
+1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
+2. Switch from **User** to **Workspace**.
+3. Under **Paths: Local**, specify the relative paths of the folders containing copybooks. The folders are searched in the order they are listed, so if two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
+4. Open a program or project.  
+   Copybook support features are now enabled.
+
+### Retrieving Copybooks from the Mainframe
+
+You can also set up automatic copybook retrieval from the mainframe to download copybooks from mainframe data sets to your workspace. 
+
+**Follow these steps:**
 
 1. Ensure that you have a [Zowe CLI z/OSMF profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) configured, with credentials defined.
-2. Open the extension settings. 
-3. Under **Paths**, add any number of data sets to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
-4. Open a program or project.  
-   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe. Copybooks are stored in a **.copybooks** directory within the workspace, which is created automatically when copybooks are downloaded.
-   
-   **Tip:** Because copybooks that are downloaded to the .copybooks folder might change on the mainframe, we recommend that you refresh your copybooks from time to time. To refresh your copybooks, manually delete the hidden .copybooks folder in your workspace. The copybooks are then re-downloaded from the mainframe the next time you open a file that references each copybook.
-   
-#### Copybook Support Features
+2. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
+3. Switch from **User** to **Workspace**.
+4. Under **Paths: Dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
+5. Under **Profile**, enter the name of your Zowe CLI z/OSMF profile.
+6. Open a program or project.  
+   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3.  
+   Copybook support features are now enabled.
+
+Copybooks that you retrieve from mainframe data sets are stored in the **.c4z/.copybooks** directory within the workspace, which is created automatically.
+
+Because copybooks that are downloaded to the .copybooks folder might change on the mainframe, we recommend that you refresh your copybooks from time to time. To refresh your copybooks, manually delete the .copybooks folder in your workspace. The copybooks are then re-downloaded from the mainframe the next time you open a file that references each copybook.
+
+Copybooks downloaded from the mainframe using an older version of COBOL Language Support might also be found in a **.copybooks** directory in the workspace root. We recommend that you delete this folder so that all files are downloaded again to the **.c4z/.copybooks** folder.
+
+### Copybook Support Features
 
 The extension includes the following copybook support features:
 
 * Semantic analysis for keywords, variables, and paragraphs across copybooks, to ensure and maintain compatibility of copybooks called in code.
-* Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.
-* Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code.
+* Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.  
+* Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code. 
 * Functionality to skip variable levels when called, reducing call time.
 * Find All References and Go To Definition functionalities.
     - **Find All References** identifies all occurrences of variables and paragraphs from copybooks in the code.
-    - **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element.
+    - **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element. If the definition is in a copybook, the copybook opens.
+    
+![Go To Definition in a copybook](https://github.com/eclipse/che-che4z-lsp-for-cobol/raw/master/docs/images/CPYGoToDefinition.gif)
