@@ -23,6 +23,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -115,9 +116,7 @@ public class CobolVariableContextTest {
     context.define(var1, ERROR_POSITION1);
     context.define(var2, ERROR_POSITION1);
 
-    List<String> expected = new ArrayList<>();
-    expected.add(VAR1);
-    expected.add(VAR2);
+    List<String> expected = List.of(VAR1, VAR2);
     assertEquals(
         expected, context.getAll().stream().map(Variable::getName).collect(Collectors.toList()));
   }
@@ -196,9 +195,7 @@ public class CobolVariableContextTest {
   private List<Variable> createRelationshipBetweenVariables(List<Variable> variables) {
     variables =
         variables.stream()
-            .filter(
-                variable ->
-                    variable.getLevelNumber() != LEVEL_77 && variable.getLevelNumber() != LEVEL_66)
+            .filter(levelPredicate(LEVEL_77).and(levelPredicate(LEVEL_66)))
             .filter(variable -> variable.getLevelNumber() != -1)
             .collect(Collectors.toList());
 
@@ -206,5 +203,9 @@ public class CobolVariableContextTest {
       context.generateRelations(variables.get(i), variables.get(i + 1));
     }
     return variables;
+  }
+
+  private Predicate<Variable> levelPredicate(int level) {
+    return v -> v.getLevelNumber() != level;
   }
 }

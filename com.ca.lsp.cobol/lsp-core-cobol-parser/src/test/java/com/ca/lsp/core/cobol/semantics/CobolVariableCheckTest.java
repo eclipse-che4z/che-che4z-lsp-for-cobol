@@ -19,9 +19,14 @@ import com.broadcom.lsp.cdi.EngineModule;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.google.inject.Guice;
 import org.junit.Test;
 
+import java.util.function.Predicate;
+
+import static com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils.getEmptyLinesCount;
+import static com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils.getNonEmptyLinesCount;
 import static org.junit.Assert.assertEquals;
 
 public class CobolVariableCheckTest {
@@ -115,10 +120,21 @@ public class CobolVariableCheckTest {
 
     // SCENARIO FOR DID_OPEN
     result = engine.run("1", TEXT_TO_TEST, DID_OPEN);
-    assertEquals(2, result.getErrors().stream().filter(item -> item.getSeverity() == 3).count());
+    Predicate<SyntaxError> syntaxErrorPredicate = item -> item.getSeverity() == 3;
+    assertEquals(2, result.getErrors().stream().filter(syntaxErrorPredicate).count());
 
     // SCENARIO FOR DID_CHANGE
     result = engine.run("1", TEXT_TO_TEST, DID_CHANGE);
-    assertEquals(2, result.getErrors().stream().filter(item -> item.getSeverity() == 3).count());
+    assertEquals(2, result.getErrors().stream().filter(syntaxErrorPredicate).count());
+  }
+
+  @Test
+  public void testEmptyLinesCount() {
+    assertEquals(0, getEmptyLinesCount(TEXT_TO_TEST));
+  }
+
+  @Test
+  public void testNonEmptyLinesCount() {
+    assertEquals(66, getNonEmptyLinesCount(TEXT_TO_TEST));
   }
 }

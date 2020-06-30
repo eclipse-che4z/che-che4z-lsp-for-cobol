@@ -31,7 +31,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -75,7 +74,7 @@ public class MultiDocumentDefinitionTest extends ConfigurableTest {
         LangServerCtx.getInjector().getInstance(MockCopybookServiceImpl.class);
 
     mockCopybookService.setCopybooks(
-        () -> Arrays.asList(new CobolText("STRUCT", STRUCT), new CobolText("PARS", PARS)));
+        () -> List.of(new CobolText("STRUCT", STRUCT), new CobolText("PARS", PARS)));
   }
 
   @Before

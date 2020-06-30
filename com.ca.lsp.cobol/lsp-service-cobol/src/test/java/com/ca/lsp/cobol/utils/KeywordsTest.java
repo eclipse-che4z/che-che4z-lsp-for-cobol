@@ -19,7 +19,10 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -42,7 +45,7 @@ public class KeywordsTest {
 
   private List<String> retrieveExpectedWords() {
     final CobolLexer lexer = new CobolLexer(null);
-    List<String> ruleNames = Arrays.asList(lexer.getRuleNames());
+    List<String> ruleNames = List.of(lexer.getRuleNames());
 
     return ruleNames.stream().filter(it -> it.length() > 1).collect(Collectors.toList());
   }

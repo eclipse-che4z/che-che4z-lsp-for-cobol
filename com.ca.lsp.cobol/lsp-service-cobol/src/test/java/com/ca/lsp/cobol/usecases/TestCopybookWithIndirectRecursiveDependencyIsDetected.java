@@ -18,7 +18,6 @@ import com.ca.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -47,7 +46,7 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends Negat
   @Test
   public void test() {
     super.test(
-        Arrays.asList(
+        List.of(
             new CobolText("INNER-COPY", INNER_COPY),
             new CobolText("INDIRECT-COPY", INDIRECT_COPY)));
   }
