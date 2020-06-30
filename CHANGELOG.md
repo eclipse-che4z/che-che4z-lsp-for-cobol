@@ -4,11 +4,29 @@ All notable changes to the COBOL Language Support extension are documented in th
 ## [0.12.0] (date)
 
 #### Added
-- Local copybook support
+
+- Support for local copybooks
+- Dynamic registration for watchers
+
+#### Changed
+
+- Adjust the info message about missing copybooks
+- Reduce the number of error/informational messages
+- Inform user about wrong credentials and stop sending other MF requests
+- Updates to README
+
+#### Fixed
+
+- Create a .gitignore file if it doesn't exist
+- Fix glob pattern for dynamic registration
+- Fix issue with indirect overwrite settings conf for DSN paths
+- Fix issues related to unrecognised copybook extensions
+- Fix representation of settings.json in Theia
+- Use sync APIs to create a folder and write to a file to avoid unexpected behavior
 
 ## [0.11.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.11.0...0.11.1) (2020-04-23)
 
-### Bug Fixes
+#### Fixed
 
 * "Change profile" in Quick fix menu when multiple profiles ([#298](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/298)) ([a0e44f9](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a0e44f914e0bd3c9e0a63274e3d830e4c9db0f45))
 * Inform user that the copybook may be nested if downloading faile… ([#303](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/303)) ([666d774](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/666d7744f59dd1e0d0989687c5c087782471091b)), closes [#301](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/301)
