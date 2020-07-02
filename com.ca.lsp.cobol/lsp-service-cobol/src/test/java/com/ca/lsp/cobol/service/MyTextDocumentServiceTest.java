@@ -15,8 +15,8 @@ package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
-import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.AnalysisFinishedEvent;
+import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActions;
@@ -33,10 +33,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.internal.stubbing.answers.AnswersWithDelay;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
@@ -44,16 +41,19 @@ import java.util.function.Function;
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
+import static java.util.Arrays.asList;
+import static java.util.Collections.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /** This test checks the entry points of the {@link TextDocumentService} implementation. */
+@SuppressWarnings("unchecked")
 public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private static final String LANGUAGE = "COBOL";
   private static final String CPY_DOCUMENT_URI = "file:///.copybooks/CPYTEST.cpy";
+  private static final String PARENT_CPY_URI = "file:///.copybooks/PARENT.cpy";
+  private static final String NESTED_CPY_URI = "file:///.copybooks/NESTED.cpy";
   private static final String CPY_EXTENSION = "cpy";
   private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
@@ -198,7 +198,8 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     MyTextDocumentService service = verifyServiceStart(communications, engine, broker);
 
     // simulate the call to the didOpen for two different document one with and one without errors
-    verifyDidOpen(communications, engine, broker, diagnosticsNoErrors, service, TEXT_EXAMPLE, DOCUMENT_URI);
+    verifyDidOpen(
+        communications, engine, broker, diagnosticsNoErrors, service, TEXT_EXAMPLE, DOCUMENT_URI);
     verifyDidOpen(
         communications,
         engine,
@@ -281,9 +282,10 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
     verify(communications).notifyThatLoadingInProgress(uri);
     verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
+    verify(dataBus, timeout(10000))
+        .postData(AnalysisFinishedEvent.builder().documentUri(uri).copybookUris(emptyList()).build());
     verify(communications, timeout(10000)).cancelProgressNotification(uri);
     verify(communications, timeout(10000)).publishDiagnostics(uri, diagnostics);
-    verify(dataBus, timeout(10000)).postData(AnalysisFinishedEvent.builder().documentUri(uri).build());
   }
 
   private void verifyCallback(
@@ -344,6 +346,50 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     } catch (InterruptedException | ExecutionException e) {
       fail(e.getMessage());
     }
+  }
+
+  /**
+   * Test {@link AnalysisFinishedEvent} sent after the analysis finished and contains all the
+   * document URIs that contain nested copybooks, including the main document
+   */
+  @Test
+  public void testAnalysisFinishedNotification() {
+    DataBusBroker broker = mock(DataBusBroker.class);
+    LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
+    Communications communications = mock(Communications.class);
+
+    Map<String, List<Location>> copybookUsages = new HashMap<>();
+    Location parentLocation = new Location(DOCUMENT_URI, null);
+    Location nestedLocation = new Location(PARENT_CPY_URI, null);
+    Location nested2Location = new Location(NESTED_CPY_URI, null);
+    copybookUsages.put("PARENT", asList(parentLocation, parentLocation));
+    copybookUsages.put("NESTED", singletonList(nestedLocation));
+    copybookUsages.put("NESTED2", singletonList(nested2Location));
+
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN))
+        .thenReturn(
+            new AnalysisResult(
+                emptyList(),
+                emptyMap(),
+                emptyMap(),
+                emptyMap(),
+                emptyMap(),
+                emptyMap(),
+                copybookUsages));
+
+    MyTextDocumentService service =
+        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
+
+    service.didOpen(
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
+
+    verify(broker, timeout(10000))
+        .postData(
+            AnalysisFinishedEvent.builder()
+                .documentUri(DOCUMENT_URI)
+                .copybookUris(asList(NESTED_CPY_URI, DOCUMENT_URI, PARENT_CPY_URI))
+                .build());
   }
 
   private void openAndAwait() {
