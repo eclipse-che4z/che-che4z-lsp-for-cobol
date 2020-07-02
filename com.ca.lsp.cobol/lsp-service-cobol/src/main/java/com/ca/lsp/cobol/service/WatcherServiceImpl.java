@@ -26,6 +26,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
@@ -87,13 +88,15 @@ public class WatcherServiceImpl implements WatcherService {
     register(
         paths.stream()
             .map(
-                it -> {
-                  folderWatchers.add(it);
+                folder -> {
+                  folderWatchers.add(folder);
                   return new Registration(
-                      it,
+                      folder,
                       WATCH_FILES,
                       new DidChangeWatchedFilesRegistrationOptions(
-                          singletonList(new FileSystemWatcher(toGlobPattern(it), WATCH_ALL_KIND))));
+                          asList(
+                              new FileSystemWatcher(createFileWatcher(folder), WATCH_ALL_KIND),
+                              new FileSystemWatcher(createFolderWatcher(folder), WATCH_ALL_KIND))));
                 })
             .collect(toList()));
   }
@@ -113,8 +116,12 @@ public class WatcherServiceImpl implements WatcherService {
     }
   }
 
-  private String toGlobPattern(String it) {
-    return "**/" + it + "/**/*";
+  private String createFileWatcher(String folder) {
+    return "**/" + folder + "/**/*";
+  }
+
+  private String createFolderWatcher(String folder) {
+    return "**/" + folder;
   }
 
   private void register(List<Registration> registrations) {

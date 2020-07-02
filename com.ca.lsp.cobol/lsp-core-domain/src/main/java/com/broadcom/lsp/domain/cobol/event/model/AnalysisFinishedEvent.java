@@ -16,19 +16,26 @@ package com.broadcom.lsp.domain.cobol.event.model;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
- * This class is a signal object to show that analysis is finished. Contains the uri of analyzed document.
+ * This class is a signal object to show that analysis finished. Contains the uri of analyzed
+ * document.
  */
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @Data
-public class AnalysisFinishedEvent extends DataEvent{
-    private String documentUri;
+public class AnalysisFinishedEvent extends DataEvent {
+  private String documentUri;
+  private List<String> copybookUris;
 
-    @Builder
-    public AnalysisFinishedEvent(String documentUri) {
-        super(DataEventType.ANALYSIS_FINISHED_EVENT, DataEventType.ANALYSIS_FINISHED_EVENT.getId());
-        this.documentUri = documentUri;
-    }
+  @Builder
+  public AnalysisFinishedEvent(String documentUri, List<String> copybookUris) {
+    super(DataEventType.ANALYSIS_FINISHED_EVENT, DataEventType.ANALYSIS_FINISHED_EVENT.getId());
+    this.documentUri = documentUri;
+    this.copybookUris = copybookUris;
+  }
 }

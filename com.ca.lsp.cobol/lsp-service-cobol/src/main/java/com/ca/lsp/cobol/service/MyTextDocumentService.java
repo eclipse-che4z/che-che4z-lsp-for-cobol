@@ -44,9 +44,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static java.util.stream.Collectors.toList;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -63,7 +65,7 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class MyTextDocumentService implements TextDocumentService, EventObserver<RunAnalysisEvent> {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
   private static final String GIT_FS_URI = "gitfs:/";
-  public static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
+  private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
 
@@ -249,10 +251,23 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   }
 
   private void publishResult(String uri, AnalysisResult result) {
-    dataBus.postData(AnalysisFinishedEvent.builder().documentUri(uri).build());
+    notifyAnalysisFinished(uri, result.getCopybookUsages());
     communications.cancelProgressNotification(uri);
     communications.publishDiagnostics(result.getDiagnostics());
     if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
+  }
+
+  private void notifyAnalysisFinished(String uri, Map<String, List<Location>> copybooks) {
+    dataBus.postData(
+        AnalysisFinishedEvent.builder()
+            .documentUri(uri)
+            .copybookUris(
+                ofNullable(copybooks).map(Map::values).orElse(emptyList()).stream()
+                    .flatMap(List::stream)
+                    .map(Location::getUri)
+                    .distinct()
+                    .collect(toList()))
+            .build());
   }
 
   private void registerDocument(String uri, MyDocumentModel document) {
