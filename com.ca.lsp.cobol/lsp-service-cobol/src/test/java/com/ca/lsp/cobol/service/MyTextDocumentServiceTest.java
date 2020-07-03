@@ -245,7 +245,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     when(actions.collect(params)).thenReturn(expected);
 
     MyTextDocumentService service =
-        new MyTextDocumentService(null, null, null, null, null, broker, actions);
+        new MyTextDocumentService(null, null, null, null, null, broker, actions, null);
     try {
       assertEquals(expected, service.codeAction(params).get());
     } catch (InterruptedException | ExecutionException e) {
@@ -264,7 +264,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   private MyTextDocumentService verifyServiceStart(
       Communications communications, LanguageEngineFacade engine, DataBusBroker broker) {
     MyTextDocumentService service =
-        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
+        new MyTextDocumentService(communications, engine, null, null, null, broker, null, null);
 
     verify(broker).subscribe(DataEventType.RUN_ANALYSIS_EVENT, service);
     return service;
@@ -317,7 +317,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
         .analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN);
 
     MyTextDocumentService service =
-        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
+        new MyTextDocumentService(communications, engine, null, null, null, broker, null, null);
 
     service.didOpen(
         new DidOpenTextDocumentParams(
@@ -378,7 +378,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
                 copybookUsages));
 
     MyTextDocumentService service =
-        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
+        new MyTextDocumentService(communications, engine, null, null, null, broker, null, null);
 
     service.didOpen(
         new DidOpenTextDocumentParams(

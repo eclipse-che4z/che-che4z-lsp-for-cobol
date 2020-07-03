@@ -19,6 +19,8 @@ import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.AnalysisFinishedEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
+import com.ca.lsp.cobol.Message;
+import com.ca.lsp.cobol.OtherLangClient;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActions;
 import com.ca.lsp.cobol.service.delegates.communications.Communications;
 import com.ca.lsp.cobol.service.delegates.completions.Completions;
@@ -26,12 +28,16 @@ import com.ca.lsp.cobol.service.delegates.formations.Formations;
 import com.ca.lsp.cobol.service.delegates.references.Occurrences;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
+import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import javax.annotation.Nonnull;
@@ -77,6 +83,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private CodeActions actions;
   private DataBusBroker dataBus;
 
+  private Provider<LanguageClient> clientProvider;
   @Inject
   MyTextDocumentService(
       Communications communications,
@@ -85,7 +92,8 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
       Completions completions,
       Occurrences occurrences,
       DataBusBroker dataBus,
-      CodeActions actions) {
+      CodeActions actions,
+      Provider<LanguageClient> clientProvider) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -93,6 +101,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     this.occurrences = occurrences;
     this.actions = actions;
     this.dataBus = dataBus;
+    this.clientProvider = clientProvider;
 
     dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
@@ -178,6 +187,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     String text = params.getTextDocument().getText();
     String langId = params.getTextDocument().getLanguageId();
     registerEngineAndAnalyze(uri, langId, text);
+    ((OtherLangClient) clientProvider.get()).sendFoobar(new Message("Hi from server"));
   }
 
   @Override
@@ -188,6 +198,11 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     if (fileExtension != null && isCobolFile(fileExtension)) {
       analyzeChanges(uri, text);
     }
+  }
+
+  @JsonNotification(value="poc/toServer")
+  public void foobar(JsonObject foo) {
+    log.info("Call from client {}", foo.get("message"));
   }
 
   @Override

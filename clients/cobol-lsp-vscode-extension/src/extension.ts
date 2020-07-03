@@ -67,11 +67,11 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile", () => {
         changeDefaultZoweProfile(profileService);
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths", () => {
-        editDatasetPaths(pathsService);
-    }));
-
     context.subscriptions.push(languageClientService.start());
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths", () => {
+        // editDatasetPaths(pathsService);
+        languageClientService.languangeClient.sendNotification("poc/toServer", {message: "Hi from client"});
+    }));
 
     // create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");

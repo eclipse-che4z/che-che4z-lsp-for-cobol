@@ -21,14 +21,22 @@ import {
     LanguageClient,
     LanguageClientOptions,
     StreamInfo,
+    NotificationType,
 } from "vscode-languageclient";
 import {ConfigurationWorkspaceMiddleware} from "vscode-languageclient/lib/configuration";
 import {LANGUAGE_ID} from "../constants";
 import {JavaCheck} from "./JavaCheck";
 import {Middleware} from "./Middleware";
 
+class Message {
+    public readonly message: string;
+}
+
+// tslint:disable-next-line: max-classes-per-file
 export class LanguageClientService {
     private readonly jarPath: string;
+
+    public languangeClient: LanguageClient;
 
     constructor(private middleware: Middleware) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
@@ -47,7 +55,16 @@ export class LanguageClientService {
             "LSP extension for " + LANGUAGE_ID + " language",
             this.createServerOptions(this.jarPath),
             this.createClientOptions());
+        this.languangeClient = languageClient;
+        languageClient.onReady().then(() => {
+            languageClient.onNotification(new NotificationType<Message, void>("poc/toClient"),
+                message => this.receive(message.message));
+        });
         return languageClient.start();
+    }
+
+    private receive(message: string) {
+        vscode.window.showInformationMessage("Hello World! " + message);
     }
 
     private getLspPort(): number | undefined {

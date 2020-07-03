@@ -102,6 +102,13 @@ public class LangServerBootstrap {
 
   Launcher<LanguageClient> createServerLauncher(
       @Nonnull LanguageServer server, @Nonnull InputStream in, @Nonnull OutputStream out) {
-    return LSPLauncher.createServerLauncher(server, in, out);
+    //return LSPLauncher.createServerLauncher(server, in, out);
+    return new LSPLauncher.Builder<LanguageClient>()
+        .setLocalService(server)
+        .setRemoteInterface(OtherLangClient.class)
+        .setInput(in)
+        .setOutput(out)
+        .create();
   }
+
 }
