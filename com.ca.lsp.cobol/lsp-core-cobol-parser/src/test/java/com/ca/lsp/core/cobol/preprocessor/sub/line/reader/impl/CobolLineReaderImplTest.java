@@ -82,7 +82,7 @@ public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
   }
 
   @Test
-  public void testSkipEmtyLineAtEnd() {
+  public void testSkipEmptyLineAtEnd() {
     String firstLine =
         "000000 IDENTIFICATION DIVISION.                                         23323232";
     List<String> lines = new ArrayList<>();
@@ -96,7 +96,7 @@ public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
   }
 
   @Test
-  public void testEmtyLineAtMiddle() {
+  public void testEmptyLineAtMiddle() {
     List<String> lines = new ArrayList<>();
     lines.add("000000 IDENTIFICATION DIVISION.                                         23323232");
     lines.add("");

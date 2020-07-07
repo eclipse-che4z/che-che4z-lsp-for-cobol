@@ -15,5 +15,13 @@ module.exports = {
         "resources/**/*.{js,jsx,ts}",
         "!**/node_modules/**",
         "!**/coverage/**"
-     ]
+     ],
+     "coverageThreshold": {
+      "global": {
+        "branches": 59,
+        "functions": 60,
+        "lines": 60,
+        // "statements": -10
+      }
+    }
   }

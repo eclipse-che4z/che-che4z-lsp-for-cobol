@@ -13,50 +13,26 @@
  */
 
 import * as vscode from "vscode";
-import { REASON_MSG} from "../constants";
-import { DownloadQueue } from "./DownloadQueue";
+import {DownloadQueue} from "./DownloadQueue";
 
 export class CopybookFix {
-    private queue: DownloadQueue;
+    private queue: DownloadQueue = new DownloadQueue();
 
-    async fixMissingDownloads(reasonMsg: string, missingCopybooks: string[], profile: string, options: { hasPaths: boolean, hasProfiles: boolean }) {
-        const downloadCopybookAction = "Download Copybooks";
-        const actionDatasets = "Edit Datasets";
-        const actionProfile = "Change zowe profile";
-        const actions = [];
-        if (options.hasPaths) {
-            actions.push(downloadCopybookAction);
-        }
-        if (reasonMsg !== REASON_MSG) {
-            actions.push(actionDatasets);
-            if (options.hasProfiles) {
-                actions.push(actionProfile);
-            }
-        }
-        const action: string = await vscode.window.showInformationMessage(
-            reasonMsg,
-            ...actions);
-        if (action === downloadCopybookAction) {
-            missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
-        }
-        if (action === actionDatasets) {
-            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths");
-        }
-        if (action === actionProfile) {
-            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile");
-        }
+    /**
+     * This method add in the download queue the copybooks that weren't found locally.
+     * @param missingCopybooks list of copybooks not found
+     * @param profile represent a name of a folder within the .copybooks folder that have the same name as the
+     * connection name needed to download copybooks from mainframe.
+     */
+    public async addCopybookInQueue(missingCopybooks: string[], profile: string) {
+        missingCopybooks.forEach(copybook => this.queue.push(copybook, profile));
     }
 
     async processDownloadError(title: string) {
-        const actionDatasets = "Edit Datasets";
-        const actionProfile = "Change zowe profile";
-        const action = await vscode.window.showErrorMessage(title,
-            actionDatasets, actionProfile);
-        if (action === actionDatasets) {
-            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths");
-        }
-        if (action === actionProfile) {
-            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile");
+        const actionSettings = "Change settings";
+        const action = await vscode.window.showErrorMessage(title, actionSettings);
+        if (action === actionSettings) {
+            vscode.commands.executeCommand("workbench.action.openSettings", "broadcom-cobol-lsp");
         }
     }
 

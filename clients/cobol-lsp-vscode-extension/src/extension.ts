@@ -13,29 +13,35 @@
  */
 
 import * as vscode from "vscode";
-import { changeDefaultZoweProfile } from "./commands/ChangeDefaultZoweProfile";
-import { editDatasetPaths } from "./commands/EditDatasetPaths";
-import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
-import { DEPENDENCIES_FOLDER, REASON_MSG } from "./constants";
-import { LANGUAGE_ID, SETTINGS_SECTION } from "./constants";
-import { CopybookFix } from "./services/CopybookFix";
-import { CopybooksCodeActionProvider } from "./services/CopybooksCodeActionProvider";
-import { CopybooksDownloader } from "./services/CopybooksDownloader";
-import { CopybooksPathGenerator } from "./services/CopybooksPathGenerator";
 
-import { LanguageClientService } from "./services/LanguageClientService";
-import { PathsService } from "./services/PathsService";
-import { ProfileService } from "./services/ProfileService";
-import { ProfilesMap, ZoweApi } from "./services/ZoweApi";
+import {changeDefaultZoweProfile} from "./commands/ChangeDefaultZoweProfile";
+import {editDatasetPaths} from "./commands/EditDatasetPaths";
+import {fetchCopybookCommand} from "./commands/FetchCopybookCommand";
+import {C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID, SETTINGS_SECTION} from "./constants";
+import {CopybookDownloadService} from "./services/CopybookDownloadService";
+import {CopybookFix} from "./services/CopybookFix";
+import {CopybooksCodeActionProvider} from "./services/CopybooksCodeActionProvider";
+import {CopybooksPathGenerator} from "./services/CopybooksPathGenerator";
+
+import {CopybookURI} from "./services/CopybookURI";
+import {LanguageClientService} from "./services/LanguageClientService";
+import {Middleware} from "./services/Middleware";
+import {PathsService} from "./services/PathsService";
+import {ProfileService} from "./services/ProfileService";
+import {createFileWithGivenPath, initializeSettings} from "./services/Settings";
+import {ZoweApi} from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
+    initializeSettings();
+
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
     const copybookFix: CopybookFix = new CopybookFix();
     const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
-    const copyBooksDownloader: CopybooksDownloader = new CopybooksDownloader(copybookFix, zoweApi, profileService, copybooksPathGenerator);
-    const languageClientService: LanguageClientService = new LanguageClientService(copybooksPathGenerator);
+    const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService(copybookFix, zoweApi, profileService, copybooksPathGenerator);
     const pathsService: PathsService = new PathsService();
+    const middleware: Middleware = new Middleware(new CopybookURI(profileService), copyBooksDownloader);
+    const languageClientService: LanguageClientService = new LanguageClientService(middleware);
 
     try {
         await languageClientService.checkPrerequisites();
@@ -49,16 +55,12 @@ export async function activate(context: vscode.ExtensionContext) {
     // Listeners
     context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
         if (event.affectsConfiguration(SETTINGS_SECTION) &&
-        vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles")) {
-            copyBooksDownloader.redownloadDependencies(REASON_MSG);
+            vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles")) {
             profileService.updateStatusBar();
         }
     }));
 
     // Commands
-    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.redownload", () => {
-        copyBooksDownloader.redownloadDependencies();
-    }));
     context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
         fetchCopybookCommand(copybook, copyBooksDownloader, programName);
     }));
@@ -70,20 +72,14 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(languageClientService.start());
-    context.subscriptions.push(initWorkspaceTracker(copyBooksDownloader));
+
+    // create .gitignore file within .c4z folder
+    createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
+
     context.subscriptions.push(copyBooksDownloader);
 
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider(
-            { scheme: "file", language: LANGUAGE_ID },
-            new CopybooksCodeActionProvider(profileService)));
-}
-
-function initWorkspaceTracker(downloader: CopybooksDownloader): vscode.Disposable {
-    const watcher = vscode.workspace.createFileSystemWatcher("**/"
-        + DEPENDENCIES_FOLDER + "/**/**.dep", false, false, true);
-    watcher.onDidCreate(uri => downloader.downloadDependencies(uri,
-        "Program contains dependencies to missing copybooks."));
-    watcher.onDidChange(uri => downloader.downloadDependencies(uri));
-    return watcher;
+            {scheme: "file", language: LANGUAGE_ID},
+            new CopybooksCodeActionProvider()));
 }
