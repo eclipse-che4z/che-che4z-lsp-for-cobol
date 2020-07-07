@@ -32,13 +32,6 @@ update_version () {
 
 update_version $RELEASE
 
-cp CHANGELOG.md ../../
-echo "Changelog copied"
-
-if [ "master" == "$CURRENT_BRANCH" ]; then
-    git add CHANGELOG.md ../../CHANGELOG.md
-fi
-
 git add package.json ../../com.ca.lsp.cobol/pom.xml server/note.md ../../Jenkinsfile src/extension.ts
 git commit -s -m "chore(release): $RELEASE" -m "" -m "$RELEASE_NOTES"
 git push
@@ -59,5 +52,3 @@ if [ "development" == "$CURRENT_BRANCH" ]; then
     git push
     echo "Changes with devel version committed"
 fi
-
-git checkout CHANGELOG.md ../../CHANGELOG.md
