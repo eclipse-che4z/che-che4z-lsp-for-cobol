@@ -16,7 +16,6 @@ from robot.api.deco import keyword
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 from inc.conditions.element_with_locator_nomore_exist import ElementLocatorNoMoreExist
-from inc.helpers import copy_copybook, delete_copybook
 
 
 def get_login_name(upper=True):
@@ -57,29 +56,5 @@ def enter_value_in_element(cls, value, element, overwrite=True):
     # cls.input_value_with_copy_paste(value, element)
 
 
-def fill_form_value(cls, element, value):
-    cls.form_input(element, value)
-
-
-def get_che_username_element(cls):
-    return cls.get_che_form_username()
-
-
-def get_che_password_element(cls):
-    return cls.get_che_form_password()
-
-
-def submit_che_form(cls):
-    return cls.che_submit_credentials_form()
-
-
 def enter_credentials(view, username, password):
     view.enter_mf_credentials(username, password)
-
-
-def copy_copybook_file(src, dst):
-    copy_copybook(src, dst)
-
-
-def delete_copybook_file(target):
-    delete_copybook(target)

@@ -11,8 +11,8 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import {CopybookDownloadService} from "../services/CopybookDownloadService";
+import { CopybooksDownloader } from "../services/CopybooksDownloader";
 
-export function fetchCopybookCommand(copybook: string, downloader: CopybookDownloadService, programName: string) {
-    downloader.downloadCopybooks(programName, [copybook]);
+export function fetchCopybookCommand(copybook: string, downloader: CopybooksDownloader, programName: string) {
+    downloader.downloadCopybooks([copybook], programName);
 }

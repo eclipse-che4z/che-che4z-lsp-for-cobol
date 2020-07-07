@@ -15,5 +15,5 @@ from inc.exceptions.general_exception import GeneralException
 
 class CustomTimeoutException(GeneralException):
 
-    def __init__(self, driver, call_from=None, msg="", do_dump=True):
-        super(CustomTimeoutException, self).__init__(driver, call_from=call_from, msg=msg, do_dump=do_dump)
+    def __init__(self, driver, call_from=None, msg=""):
+        super(CustomTimeoutException, self).__init__(driver, call_from=call_from, msg=msg)

@@ -4,7 +4,7 @@
     "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "0.12.0-alpha.1",
+    "version": "0.11.1",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
@@ -30,8 +30,7 @@
         "Programming Languages"
     ],
     "activationEvents": [
-        "onLanguage:COBOL",
-        "workspaceContains:/.c4z"
+        "onLanguage:COBOL"
     ],
     "icon": "resources/logo.png",
     "main": "./out/extension.js",
@@ -72,15 +71,7 @@
                     "type": "string",
                     "description": "Current default profile for copybook downloader"
                 },
-                "broadcom-cobol-lsp.cpy-manager.paths-local": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Default list of local paths to search for copybooks",
-                    "uniqueItems": true
-                },
-                "broadcom-cobol-lsp.cpy-manager.paths-dsn": {
+                "broadcom-cobol-lsp.cpy-manager.paths": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -96,10 +87,10 @@
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "jest -w 1 --unhandled-rejections=strict"
+        "test": "jest -w 1"
     },
     "dependencies": {
-        "@zowe/imperative": "4.4.5",
+        "@zowe/imperative": "^4.4.5",
         "vscode-languageclient": "^5.2.1"
     },
     "devDependencies": {

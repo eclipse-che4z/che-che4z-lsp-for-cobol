@@ -16,7 +16,6 @@
 package com.ca.lsp.cobol.service.mocks;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
-import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
@@ -27,9 +26,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
+import org.eclipse.lsp4j.WorkspaceFolder;
+
+import java.nio.file.Path;
+import java.util.List;
 
 /**
- * This class used to mock the actual behavior of {@link
+ * This class is used to mock the actual behavior of {@link
  * com.ca.lsp.cobol.service.CopybookService} and return stubs value not used to validate any
  * CopybookService functionality
  */
@@ -48,11 +51,24 @@ public class MockCopybookServiceImpl implements MockCopybookService {
   }
 
   @Override
-  public void observerCallback(DataEvent event) {
-    String name = ((RequiredCopybookEvent) event).getName();
-    String content = getContentByCopybookName(((RequiredCopybookEvent) event).getName());
+  public void observerCallback(RequiredCopybookEvent event) {
+    String name = event.getName();
+    String content = getContentByCopybookName(event.getName());
     dataBus.postData(FetchedCopybookEvent.builder().name(name).uri(name).content(content).build());
   }
+
+  @Override
+  public Path findCopybook(String fileName) {
+    return null;
+  }
+
+  @Override
+  public Path findCopybook(String filename, List<String> datasetList) {
+    return null;
+  }
+
+  @Override
+  public void setWorkspaceFolders(List<WorkspaceFolder> workspaceFolders) {}
 
   @Override
   public String getContentByCopybookName(String copybookName) {
@@ -65,7 +81,4 @@ public class MockCopybookServiceImpl implements MockCopybookService {
         .findAny()
         .orElse(null);
   }
-
-  @Override
-  public void invalidateURICache() {}
 }

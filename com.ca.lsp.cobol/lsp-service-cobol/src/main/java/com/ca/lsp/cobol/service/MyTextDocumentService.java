@@ -16,7 +16,6 @@ package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
-import com.broadcom.lsp.domain.cobol.event.model.AnalysisFinishedEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActions;
@@ -35,20 +34,15 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static java.util.stream.Collectors.toList;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -57,7 +51,7 @@ import static java.util.stream.Collectors.toList;
  * https://microsoft.github.io//language-server-protocol/specifications/specification-3-14/
  *
  * <p>For the maintainers: Please, add logging for exceptions if you run any asynchronous operation.
- * Also, you perform any communication with the client, do it a using {@link Communications}
+ * Also, you you perform any communication with the client, do it a using {@link Communications}
  * instance.
  */
 @Slf4j
@@ -65,7 +59,6 @@ import static java.util.stream.Collectors.toList;
 public class MyTextDocumentService implements TextDocumentService, EventObserver<RunAnalysisEvent> {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
   private static final String GIT_FS_URI = "gitfs:/";
-  private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
 
@@ -75,7 +68,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private Completions completions;
   private Occurrences occurrences;
   private CodeActions actions;
-  private DataBusBroker dataBus;
 
   @Inject
   MyTextDocumentService(
@@ -92,7 +84,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     this.completions = completions;
     this.occurrences = occurrences;
     this.actions = actions;
-    this.dataBus = dataBus;
 
     dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
@@ -169,10 +160,10 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-
-    // git FS URIs are not currently supported
+    // A better implementation that will cover the gitfs scenario will be implementated later based
+    // on issue #173
     if (uri.startsWith(GIT_FS_URI)) {
-      log.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
+      communications.notifyThatExtensionIsUnsupported("gitfs");
     }
 
     String text = params.getTextDocument().getText();
@@ -204,7 +195,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
 
   @Override
   public void observerCallback(@Nonnull RunAnalysisEvent event) {
-    docs.forEach((key, value) -> analyzeDocumentFirstTime(key, value.getText()));
+    docs.forEach((key, value) -> analyzeChanges(key, value.getText()));
   }
 
   private void registerEngineAndAnalyze(String uri, String languageType, String text) {
@@ -252,23 +243,9 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   }
 
   private void publishResult(String uri, AnalysisResult result) {
-    notifyAnalysisFinished(uri, result.getCopybookUsages());
     communications.cancelProgressNotification(uri);
     communications.publishDiagnostics(uri, result.getDiagnostics());
     if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
-  }
-
-  private void notifyAnalysisFinished(String uri, Map<String, List<Location>> copybooks) {
-    dataBus.postData(
-        AnalysisFinishedEvent.builder()
-            .documentUri(uri)
-            .copybookUris(
-                ofNullable(copybooks).map(Map::values).orElse(emptyList()).stream()
-                    .flatMap(List::stream)
-                    .map(Location::getUri)
-                    .distinct()
-                    .collect(toList()))
-            .build());
   }
 
   private void registerDocument(String uri, MyDocumentModel document) {

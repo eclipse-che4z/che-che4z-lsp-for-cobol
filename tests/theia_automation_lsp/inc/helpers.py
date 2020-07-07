@@ -16,8 +16,7 @@ from time import sleep
 import sys
 import os
 from selenium.webdriver.common.keys import Keys
-from inc.cfg.env_constants import ROBOT_OUTPUT_DIR, DUMP_DIR_NAME, TEST_FILES_DIR, COBOL_DIR
-from inc.theia.lsp_constants import COPYBOOK_FOLDER
+from inc.cfg.env_constants import ROBOT_OUTPUT_DIR, DUMP_DIR_NAME
 
 DEFAULT_EFFECT_TIME = 0
 DEFAULT_EFFECT_COLOR = "red"
@@ -74,17 +73,6 @@ def str2bool(input_string):
     raise Exception("Unsupported input for converting to boolean: {0}".format(input_string))
 
 
-def bool2str(value):
-    if value is True:
-        return "true"
-
-    elif value is False:
-        return "false"
-
-    else:
-        raise Exception("Unsupported boolean value '{0}'".format(value))
-
-
 def sum_pixels(a, b):
     suffix = "px"
     a = int(a.strip(suffix))
@@ -118,7 +106,7 @@ def get_mod_key():
     return mod_key
 
 
-def get_next_filename_in_path(path, filename_template, size=1000):
+def get_next_filename_in_path(path, filename_template, size=100):
     size_str = str(size)
     for i in range(size):
         i_str = str(i)
@@ -151,13 +139,9 @@ def ignore_error(target_func):
     return func_wrapper()
 
 
-def get_dump_dir():
-    cur_dir = os.path.dirname(__file__)
-    return os.path.abspath(os.path.join(cur_dir, "..", "..", "..", "..", ROBOT_OUTPUT_DIR, DUMP_DIR_NAME))
-
-
 def prepare_dump_path():
-    save_dir = get_dump_dir()
+    cur_dir = os.path.dirname(__file__)
+    save_dir = os.path.abspath(os.path.join(cur_dir, "..", "..", ROBOT_OUTPUT_DIR, DUMP_DIR_NAME))
 
     try:
         if os.path.exists(save_dir):
@@ -183,13 +167,13 @@ def dump(driver, reason=None):
         print("No driver defined. Cannot dump html.")
         return
 
-    save_dir = get_dump_dir()
+    cur_dir = os.path.dirname(__file__)
+    save_dir = os.path.abspath(os.path.join(cur_dir, "..", "..", ROBOT_OUTPUT_DIR, DUMP_DIR_NAME))
 
     html_file = dump_html(driver, save_dir)
     scr_file = dump_screenshot(driver, save_dir)
 
-    if None not in [html_file, scr_file]:
-        update_map_file(save_dir, html_file, scr_file, reason)
+    update_map_file(save_dir, html_file, scr_file, reason)
 
 
 def dump_html(driver, save_dir):
@@ -250,20 +234,3 @@ def update_map_file(save_dir, fname, scr_name, src):
 
     with open(map_fpath, "a") as fd:
         fd.write(os.path.basename(fname) + "\t" + os.path.basename(scr_name) + "\t" + str(src) + "\n")
-
-
-def copy_copybook(src, dst):
-    cur_dir = os.path.dirname(__file__)
-    copybook_dir = os.path.abspath(os.path.join(cur_dir, "..", TEST_FILES_DIR, COBOL_DIR, COPYBOOK_FOLDER))
-    src_path = os.path.abspath(os.path.join(copybook_dir, src))
-    dst_path = os.path.abspath(os.path.join(copybook_dir, dst))
-    shutil.copyfile(src_path, dst_path)
-
-
-def delete_copybook(copybook):
-    cur_dir = os.path.dirname(__file__)
-    copybook_dir = os.path.abspath(os.path.join(cur_dir, "..", TEST_FILES_DIR, COBOL_DIR, COPYBOOK_FOLDER))
-    copybook_path = os.path.abspath(os.path.join(copybook_dir, copybook))
-
-    if os.path.exists(copybook_path):
-        os.remove(copybook_path)

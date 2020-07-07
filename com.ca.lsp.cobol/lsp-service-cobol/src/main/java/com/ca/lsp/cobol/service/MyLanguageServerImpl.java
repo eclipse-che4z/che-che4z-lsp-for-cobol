@@ -13,26 +13,35 @@
  */
 package com.ca.lsp.cobol.service;
 
+import com.ca.lsp.cobol.model.ConfigurationSettingsStorable;
+import com.ca.lsp.cobol.service.providers.SettingsProvider;
 import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.CPY_MANAGER;
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
 import static java.lang.Boolean.TRUE;
+import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
+import static com.ca.lsp.cobol.service.utils.FileSystemUtils.interpretPaths;
 
 /**
  * This class sets up the initial state of the services and applies other initialization activities,
@@ -41,22 +50,34 @@ import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
 @Slf4j
 @Singleton
 public class MyLanguageServerImpl implements LanguageServer {
+  /** Glob patterns to watch the copybooks folder and copybook files */
+  private static final List<String> WATCHER_PATTERNS =
+      asList("**/.copybooks/**/*.cpy", "**/.copybooks/**/*.CPY", "**/.copybooks");
+
+  /**
+   * The kind of events of interest, for watchers calculated as WatchKind.Create | WatchKind.Change
+   * | WatchKind.Delete which is 7
+   */
+  private static final int WATCH_ALL_KIND = 7;
 
   private TextDocumentService textService;
   private WorkspaceService workspaceService;
-  private WatcherService watchingService;
-  private SettingsService settingsService;
+  private CopybookService copybookService;
+  private Provider<LanguageClient> clientProvider;
+  private SettingsProvider settingsProvider;
 
   @Inject
   MyLanguageServerImpl(
+      CopybookService copybookService,
       TextDocumentService textService,
       WorkspaceService workspaceService,
-      WatcherService watchingService,
-      SettingsService settingsService) {
+      Provider<LanguageClient> clientProvider,
+      SettingsProvider settingsProvider) {
     this.textService = textService;
+    this.copybookService = copybookService;
     this.workspaceService = workspaceService;
-    this.watchingService = watchingService;
-    this.settingsService = settingsService;
+    this.clientProvider = clientProvider;
+    this.settingsProvider = settingsProvider;
   }
 
   @Override
@@ -67,6 +88,58 @@ public class MyLanguageServerImpl implements LanguageServer {
   @Override
   public WorkspaceService getWorkspaceService() {
     return workspaceService;
+  }
+
+  /**
+   * Initialized request sent from the client after the 'initialize' request resolved. It is used as
+   * hook to dynamically register capabilities, e.g. file system watchers.
+   *
+   * @param params - InitializedParams sent by a client
+   */
+  @Override
+  public void initialized(@Nullable InitializedParams params) {
+    LanguageClient client = clientProvider.get();
+
+    RegistrationParams registrationParams =
+        new RegistrationParams(
+            asList(
+                new Registration(
+                    "copybooksWatcher", "workspace/didChangeWatchedFiles", createWatcher()),
+                new Registration("configurationChange", "workspace/didChangeConfiguration", null)));
+    client.registerCapability(registrationParams);
+    try {
+      retrieveAndStoreConfiguration();
+    } catch (RuntimeException e) {
+      log.error(e.getMessage());
+    }
+  }
+
+  /**
+   * Retrieve configuration settings by using fetchSettings() method, validate the JSON and later
+   * store it in the SettingProvider for further use
+   */
+  void retrieveAndStoreConfiguration() {
+    fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
+        .thenAccept(
+            e -> {
+              ConfigurationSettingsStorable config =
+                  new ConfigurationSettingsStorable(interpretPaths(e));
+              settingsProvider.set(config);
+            });
+  }
+
+  private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {
+    ConfigurationParams params =
+        new ConfigurationParams(provideConfigurationItemList(section, scope));
+    return clientProvider.get().configuration(params);
+  }
+
+  @Nonnull
+  private List<ConfigurationItem> provideConfigurationItemList(String section, String scope) {
+    ConfigurationItem item = new ConfigurationItem();
+    item.setSection(section);
+    item.setScopeUri(scope);
+    return Collections.singletonList(item);
   }
 
   @Override
@@ -89,20 +162,8 @@ public class MyLanguageServerImpl implements LanguageServer {
         new WorkspaceServerCapabilities(workspaceFoldersOptions);
     capabilities.setWorkspace(workspaceServiceCapabilities);
 
+    copybookService.setWorkspaceFolders(params.getWorkspaceFolders());
     return supplyAsync(() -> new InitializeResult(capabilities));
-  }
-
-  /**
-   * Initialized request sent from the client after the 'initialize' request resolved. It is used as
-   * hook to dynamically register capabilities, e.g. file system watchers.
-   *
-   * @param params - InitializedParams sent by a client
-   */
-  @Override
-  public void initialized(@Nullable InitializedParams params) {
-    watchingService.watchConfigurationChange();
-    watchingService.watchPredefinedFolder();
-    addLocalFilesWatcher();
   }
 
   @Override
@@ -115,10 +176,12 @@ public class MyLanguageServerImpl implements LanguageServer {
     // not supported
   }
 
-  private void addLocalFilesWatcher() {
-    settingsService
-        .getConfiguration(LOCAL_PATHS.label)
-        .thenAccept(it -> watchingService.addWatchers(settingsService.toStrings(it)));
+  @Nonnull
+  private DidChangeWatchedFilesRegistrationOptions createWatcher() {
+    return new DidChangeWatchedFilesRegistrationOptions(
+        WATCHER_PATTERNS.stream()
+            .map(it -> new FileSystemWatcher(it, WATCH_ALL_KIND))
+            .collect(toList()));
   }
 
   @Nonnull

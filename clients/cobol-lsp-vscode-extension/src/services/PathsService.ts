@@ -12,29 +12,21 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import { SETTINGS_SECTION } from "../constants";
 import * as vscode from "vscode";
-import {
-    DSN_CONTAINS_PROHIBITED_CHAR,
-    DSN_MUSTBE_NOT_EMPTY,
-    DSN_NOMORE_8CHARS,
-    DSN_START_PROHIBITED_CHAR,
-    PATHS_ZOWE,
-    SEGMENT_PLACEHOLDER,
-    SETTINGS_SECTION
-} from "../constants";
 
 export class PathsService {
 
     async listPathDatasets(): Promise<string[]> {
-        if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has(PATHS_ZOWE)) {
+        if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has("paths")) {
             await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
             return [];
         }
-        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);
+        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get("paths");
     }
 
     setPathDatasets(paths: string[]) {
-        vscode.workspace.getConfiguration(SETTINGS_SECTION).update(PATHS_ZOWE, paths);
+        vscode.workspace.getConfiguration(SETTINGS_SECTION).update("paths", paths);
     }
 }
 
@@ -57,20 +49,19 @@ function validateDatasetName(inputValue: string): string | undefined {
     const segmentHlqSegmentRegex = new RegExp("^([@#$A-Za-z0-9-]{1,8})$");
     for (const segment of nameSegments) {
         if (segment.length === 0) {
-            return DSN_MUSTBE_NOT_EMPTY;
+            return "Dataset name segment must not be empty.";
         }
 
         if (segment.length > 8) {
-            return DSN_NOMORE_8CHARS;
+            return "Dataset name segment can't be more than 8 characters.";
         }
 
         if (!segmentHlqFirstCharRegex.test(segment.charAt(0))) {
-
-            return DSN_START_PROHIBITED_CHAR.replace(SEGMENT_PLACEHOLDER, segment);
+            return `Dataset name segment: ${segment} starts with a prohibited character.`;
         }
 
         if (!segmentHlqSegmentRegex.test(segment)) {
-            return DSN_CONTAINS_PROHIBITED_CHAR.replace(SEGMENT_PLACEHOLDER, segment);
+            return `Dataset name segment: ${segment} contains a prohibited character.`;
         }
     }
     return undefined;

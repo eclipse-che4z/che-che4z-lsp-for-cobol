@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Broadcom.
+# Copyright (c) 2019 Broadcom.
 # The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
 #
 # This program and the accompanying materials are made
@@ -15,17 +15,3 @@ LSP_COBOL_MEMBER_SYNTAX_OK_TEMPLATE = "No syntax errors detected in {0}.cbl"
 TAB_TITLE_TEMPLATE = "{0}_{1}.cbl"
 
 SAVE_DIALOG_TEMPLATE = "Do you want to save the changes you made to {0}?"
-
-COPYBOOK_FOLDER = ".copybooks"
-ZOWE_PROFILE = "zowe-profile-1"
-
-SETTINGS_JSON_PATHS_DSN = "broadcom-cobol-lsp.cpy-manager.paths"
-SETTINGS_JSON_PROFILES = "broadcom-cobol-lsp.cpy-manager.profiles"
-
-CPY_DIR_1 = "DATA.SET.PATH1"
-CPY_DIR_2 = "DATA.SET.PATH2"
-
-USER_COPYBOOK_PREFERENCES = {
-    SETTINGS_JSON_PATHS_DSN: [CPY_DIR_1, CPY_DIR_2],
-    SETTINGS_JSON_PROFILES: ZOWE_PROFILE
-}

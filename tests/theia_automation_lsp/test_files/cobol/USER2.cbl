@@ -32,7 +32,7 @@
         100-Print-User.
            Move 123456789 To User-Num1.
            Move User-Num1 To User-Num2.
-           Move 'Wenceslav Square 846/1' To User-Address.
+           Move 'Wenceslas Square 846/1' To User-Address.
            Move 'Prague' To User-City.
            Move 'CZ' To User-Country.
            Move 11000 To User-Index.

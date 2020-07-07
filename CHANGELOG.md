@@ -1,34 +1,9 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [0.12.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.11.1...0.12.0) (2020-07-07)
-
-### Bug Fixes
-
-* Avoid many error messages for copybook downloading #384 (8f3ab6f)
-* Change log archive path pattern to relate on the user directory #307 (9c6c882)
-* Create a .gitignore file if it doesn't exist #329 (40ca9f7)
-* Fix glob pattern for dynamic registration #355 (7117683)
-* Fix issue related to copybook with extensions that were not recognized as valid URIs GH-355 (39169e2), closes #355
-* Fix issue with indirect overwrite settings conf for dsn paths (1afe039)
-* Fix representation of settings.json in Theia #393 (b4cd52b)
-* Hide 'no errors found' message GH-312 (6f19c9b), closes #312
-* Remove popup message, track event in log file #318 (ba33f88)
-* Unexpected Java 8 expected error message #333 (#396) (9c224a6)
-* Update activation event #331 (ac65f46)
-* Use sync APIs to create folder and write to file to avoid unexpected behavior (17b8908)
-
-### Features
-
-* Adjust the info message about missing copybooks #391 (54a3386)
-* Fetch copybooks without .dep files GH-327 (098f4bc), closes #327
-* Inform user about wrong credentials and stop sending other MF requests (0dc0548), closes #237
-* Introduce dynamic registration for watchers GH-355 (0358b95), closes #355
-* Retrieve local copybooks if they exist GH-327 (7d3a068), closes #327
-
 ## [0.11.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.11.0...0.11.1) (2020-04-23)
 
-#### Bug Fixes
+### Bug Fixes
 
 * "Change profile" in Quick fix menu when multiple profiles ([#298](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/298)) ([a0e44f9](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a0e44f914e0bd3c9e0a63274e3d830e4c9db0f45))
 * Inform user that the copybook may be nested if downloading faile… ([#303](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/303)) ([666d774](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/666d7744f59dd1e0d0989687c5c087782471091b)), closes [#301](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/301)

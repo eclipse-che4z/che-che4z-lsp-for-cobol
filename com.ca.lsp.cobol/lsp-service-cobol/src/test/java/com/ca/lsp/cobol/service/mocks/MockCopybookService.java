@@ -14,7 +14,7 @@
 package com.ca.lsp.cobol.service.mocks;
 
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
-import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
+import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.service.CopybookService;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ import java.io.IOException;
  * This interface define the responsability for a mock class used during the
  * com.ca.lsp.cobol.positive.PositiveTest suite
  */
-public interface MockCopybookService extends CopybookService, EventObserver<DataEvent> {
+public interface MockCopybookService extends CopybookService, EventObserver<RequiredCopybookEvent> {
   void setCopybooks(CopybooksMock copybooksMock);
 
   String getContentByCopybookName(String copybookName) throws IOException;

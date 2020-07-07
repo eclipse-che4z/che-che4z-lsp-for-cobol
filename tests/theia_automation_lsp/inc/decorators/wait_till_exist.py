@@ -13,7 +13,6 @@
 from time import sleep
 from selenium.common.exceptions import WebDriverException, NoSuchElementException, TimeoutException
 from inc.exceptions.custom_timeout_exception import CustomTimeoutException
-from inc.exceptions.element_not_found_exception import ElementNotFoundException
 from inc.exceptions.general_exception import GeneralException
 from inc.theia.constants import DEFAULT_TIMEOUT
 from inspect import getmembers, ismethod
@@ -21,62 +20,46 @@ from inspect import getmembers, ismethod
 
 class WaitTillExist(object):
 
-    def __init__(self, timeout=None, interval=1, should_exist=True, do_dump=True):
+    def __init__(self, timeout=None):
         self.driver = None
         self.timeout = timeout
         if self.timeout is None:
             self.timeout = DEFAULT_TIMEOUT
 
-        self.interval = interval
-        self.should_exist = should_exist
-        self.do_dump = do_dump
-
     def __call__(self, target_func):
         def func_wrapper(*args, **kwargs):
+            interval = 1
             elapsed = 0
 
             while True:
                 if elapsed > self.timeout:
-                    exception = TimeoutException
+
                     if args:
                         method = getmembers(args[0], ismethod)
                         if method:
                             class_obj = args[0]
                             self.driver = class_obj.get_driver()
-                            exception = CustomTimeoutException(
-                                self.driver,
-                                call_from=target_func.__name__,
-                                do_dump=self.do_dump
-                            )
+                            raise CustomTimeoutException(self.driver, call_from=target_func.__name__)
 
-                    if self.should_exist:
-                        raise exception
-
-                    else:
-                        return
+                    raise TimeoutException
 
                 try:
                     res = target_func(*args, **kwargs)
                     print("Ok, waited for {0} sec!".format(elapsed))
                     return res
 
-                except (WebDriverException, NoSuchElementException, ElementNotFoundException):
-                    print("Wait for '{0}' sec".format(self.interval))
-                    sleep(self.interval)
-                    elapsed += self.interval
+                except (WebDriverException, NoSuchElementException):
+                    print("Wait for '{0}' sec".format(interval))
+                    sleep(interval)
+                    elapsed += interval
 
-                except Exception as e:
+                except Exception:
                     if args:
                         method = getmembers(args[0], ismethod)
                         if method:
                             class_obj = args[0]
                             self.driver = class_obj.get_driver()
 
-                    raise GeneralException(
-                        self.driver,
-                        call_from=target_func.__name__,
-                        msg=e.args,
-                        do_dump=self.do_dump
-                    )
+                    raise GeneralException(self.driver, call_from=target_func.__name__)
 
         return func_wrapper

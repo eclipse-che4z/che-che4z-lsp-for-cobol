@@ -16,27 +16,29 @@
 package com.ca.lsp.cobol.service;
 
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
+import com.broadcom.lsp.domain.cobol.event.model.FetchedSettingsEvent;
+import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
+import com.google.gson.JsonPrimitive;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp4j.CodeActionParams;
-import org.eclipse.lsp4j.DidChangeConfigurationParams;
-import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
-import org.eclipse.lsp4j.ExecuteCommandParams;
+import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
-import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
-import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.CPY_MANAGER;
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LSP_PREFIX;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static java.util.concurrent.CompletableFuture.runAsync;
-import static java.util.stream.Collectors.toList;
 
 /**
  * This class is responsible to watch for any changes into the copybook folder and to fetch updated
@@ -46,20 +48,12 @@ import static java.util.stream.Collectors.toList;
 @Singleton
 public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private DataBusBroker dataBus;
-  private SettingsService settingsService;
-  private WatcherService watchingService;
-  private CopybookService copybookService;
+  private Provider<LanguageClient> clientProvider;
 
   @Inject
-  public CobolWorkspaceServiceImpl(
-      DataBusBroker dataBus,
-      SettingsService settingsService,
-      WatcherService watchingService,
-      CopybookService copybookService) {
+  public CobolWorkspaceServiceImpl(DataBusBroker dataBus, Provider<LanguageClient> clientProvider) {
     this.dataBus = dataBus;
-    this.settingsService = settingsService;
-    this.watchingService = watchingService;
-    this.copybookService = copybookService;
+    this.clientProvider = clientProvider;
   }
 
   /**
@@ -73,64 +67,66 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   @Nonnull
   @Override
   public CompletableFuture<Object> executeCommand(@Nonnull ExecuteCommandParams params) {
-    runAsync(executeCopybookFix(params)).whenComplete(reportExceptionIfFound(params));
-
     return completedFuture(null);
   }
 
-  private Runnable executeCopybookFix(@Nonnull ExecuteCommandParams params) {
-    return () -> {
-      if (MISSING_COPYBOOK.name().equals(params.getCommand())) {
-        rerunAnalysis();
-      }
-    };
-  }
-
   /**
-   * Process changed configuration on the client state. This notification triggered automatically
-   * when the user modify configuration settings in the client. Invalidate all the caches to avoid
-   * dirty state.
+   * This is a notification triggered automatically when the user modify configuration settings in
+   * the client
    *
    * @param params - LSPSpecification -> The actual changed settings; Actually -> null all the time.
    */
   @Override
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
-    settingsService
-        .getConfiguration(LOCAL_PATHS.label)
-        .thenAccept(it -> acceptSettingsChange(settingsService.toStrings(it)));
-  }
+    try {
 
-  private void acceptSettingsChange(List<String> localFolders) {
-    List<String> watchingFolders = watchingService.getWatchingFolders();
-
-    updateWatchers(localFolders, watchingFolders);
-    rerunAnalysis();
-    copybookService.invalidateURICache();
-  }
-
-  private void updateWatchers(List<String> newPaths, List<String> existingPaths) {
-    watchingService.addWatchers(
-        newPaths.stream().filter(it -> !existingPaths.contains(it)).collect(toList()));
-
-    watchingService.removeWatchers(
-        existingPaths.stream().filter(it -> !newPaths.contains(it)).collect(toList()));
+      // invalidate cache to avoid false positive
+      dataBus.invalidateCache();
+      fetchSettings(LSP_PREFIX.label + "." + CPY_MANAGER.label, null)
+          .thenAccept(e -> dataBus.postData(FetchedSettingsEvent.builder().content(e).build()));
+    } catch (RuntimeException e) {
+      log.error(e.getMessage());
+    }
   }
 
   /**
-   * This method triggered when the user modifies the settings in the settings.json
+   * After client notifies the server that there is a setting change we need to request the client
+   * those changing by sending a workspace/configuration JSON request
+   *
+   * @param section - The configuration section asked for.
+   * @param scope - The scope to get the configuration section for.
+   * @return - CompletedFuture which contains an object with the settings asked for.
+   */
+  private CompletableFuture<List<Object>> fetchSettings(String section, String scope) {
+    ConfigurationParams params =
+        new ConfigurationParams(provideConfigurationItemList(section, scope));
+    return clientProvider.get().configuration(params);
+  }
+
+  @Nonnull
+  private List<ConfigurationItem> provideConfigurationItemList(String section, String scope) {
+    ConfigurationItem item = new ConfigurationItem();
+    item.setSection(section);
+    item.setScopeUri(scope);
+    return Collections.singletonList(item);
+  }
+
+  /**
+   * This method is triggered when the user modify the settings in the settings.json
    *
    * @param params the object that wrap the content changed by the user in the settings.json and
    *     sent from the client to the server.
    */
   @Override
   public void didChangeWatchedFiles(@Nonnull DidChangeWatchedFilesParams params) {
-    rerunAnalysis();
+    dataBus.invalidateCache();
+    log.info("Cache invalidated due to a copybooks file watcher was triggered");
+    dataBus.postData(new RunAnalysisEvent());
   }
 
-  private void rerunAnalysis() {
-    dataBus.invalidateCache();
-    log.info("Cache invalidated");
-    dataBus.postData(new RunAnalysisEvent());
+  @Nullable
+  private String getStringArgument(@Nonnull ExecuteCommandParams params, int index) {
+    return ((JsonPrimitive) params.getArguments().get(index)).getAsString();
   }
 
   @Nonnull

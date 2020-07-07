@@ -104,6 +104,13 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
       databus.unSubscribe(subscriber);
     }
 
+    databus.postData(
+        CopybookDepEvent.builder()
+            .copybookName(copyBookName)
+            .textDocumentSync(textDocumentSyncType)
+            .documentUri(documentUri)
+            .build());
+
     return new ResultWithErrors<>(
         new CopybookSemanticContext(
             copyBookName,

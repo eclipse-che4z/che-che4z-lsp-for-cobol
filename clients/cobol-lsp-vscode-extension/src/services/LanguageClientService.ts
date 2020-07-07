@@ -15,34 +15,26 @@
 import * as fs from "fs";
 import * as net from "net";
 import * as vscode from "vscode";
-import {
-    ConfigurationParams,
-    ConfigurationRequest,
-    LanguageClient,
-    LanguageClientOptions,
-    StreamInfo,
-} from "vscode-languageclient";
-import {ConfigurationWorkspaceMiddleware} from "vscode-languageclient/lib/configuration";
-import {LANGUAGE_ID} from "../constants";
-import {JavaCheck} from "./JavaCheck";
-import {Middleware} from "./Middleware";
+import { LANGUAGE_ID } from "../constants";
+import {CancellationToken, ConfigurationParams, ConfigurationRequest, LanguageClient, LanguageClientOptions, StreamInfo} from "vscode-languageclient";
+import { ConfigurationWorkspaceMiddleware } from "vscode-languageclient/lib/configuration";
+import { CopybooksPathGenerator } from "./CopybooksPathGenerator";
+import { JavaCheck } from "./JavaCheck";
 
 export class LanguageClientService {
-    private readonly jarPath: string;
+    private jarPath: string;
 
-    constructor(private middleware: Middleware) {
+    constructor(private copybooksPathGenerator: CopybooksPathGenerator) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
         this.jarPath = `${ext.extensionPath}/server/lsp-service-cobol-${ext.packageJSON.version}.jar`;
     }
-
-    public async checkPrerequisites(): Promise<void> {
+    async checkPrerequisites(): Promise<void> {
         await new JavaCheck().isJavaInstalled();
         if (!this.getLspPort() && !fs.existsSync(this.jarPath)) {
             throw new Error("LSP server for " + LANGUAGE_ID + " not found");
         }
     }
-
-    public start(): vscode.Disposable {
+    start(): vscode.Disposable {
         const languageClient = new LanguageClient(LANGUAGE_ID,
             "LSP extension for " + LANGUAGE_ID + " language",
             this.createServerOptions(this.jarPath),
@@ -57,9 +49,12 @@ export class LanguageClientService {
     private createClientOptions(): LanguageClientOptions {
         const signatureFunc: ConfigurationRequest.MiddlewareSignature = async (
             params: ConfigurationParams,
-            token: vscode.CancellationToken,
+            token: CancellationToken,
             next: ConfigurationRequest.HandlerSignature) => {
-            return await this.middleware.handleConfigurationRequest(params, token, next);
+
+            // TODO if request params are right
+            return (await this.copybooksPathGenerator.listUris()).map(uri => uri.toString());
+            // TODO else return next(params, token);
         };
         const configurationMiddleware: ConfigurationWorkspaceMiddleware = {
             configuration: signatureFunc,
@@ -67,10 +62,9 @@ export class LanguageClientService {
 
         return {
             documentSelector: [LANGUAGE_ID],
-            middleware: {workspace: configurationMiddleware},
+            middleware: { workspace: configurationMiddleware }
         };
     }
-
     private createServerOptions(jarPath: string) {
         const port = this.getLspPort();
         if (port) {
@@ -91,7 +85,7 @@ export class LanguageClientService {
         return {
             args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", jarPath, "pipeEnabled"],
             command: "java",
-            options: {stdio: "pipe", detached: false},
+            options: { stdio: "pipe", detached: false },
         };
     }
 }

@@ -22,7 +22,7 @@ export class CopybookProfile {
     }
 
     public equals(other: CopybookProfile): boolean {
-        return this.copybook == other.copybook && this.profile == other.profile;
+        return this.copybook == other.copybook && this.profile == other.profile
     }
 }
 
@@ -34,12 +34,12 @@ export class DownloadQueue {
         if (this.resolve) {
             const r = this.resolve;
             this.resolve = undefined;
-            r({copybook, profile});
+            r({ copybook, profile });
         } else {
             const copybookProfile = new CopybookProfile(copybook, profile);
             for (const item of this.queue) {
                 if (copybookProfile.equals(item)) {
-                    return;
+                    return
                 }
             }
             this.queue.push(copybookProfile);

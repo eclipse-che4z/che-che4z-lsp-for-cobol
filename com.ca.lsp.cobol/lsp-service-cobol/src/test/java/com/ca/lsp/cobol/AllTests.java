@@ -18,8 +18,6 @@ import com.ca.lsp.cobol.positive.PositiveTest;
 import com.ca.lsp.cobol.service.*;
 import com.ca.lsp.cobol.service.delegates.HighlightsTest;
 import com.ca.lsp.cobol.service.delegates.actions.CodeActionsTest;
-import com.ca.lsp.cobol.service.delegates.actions.FindCopybookCommandTest;
-import com.ca.lsp.cobol.service.delegates.communications.ServerCommunicationsTest;
 import com.ca.lsp.cobol.service.delegates.completions.*;
 import com.ca.lsp.cobol.service.delegates.references.DocumentOccurrencesTest;
 import com.ca.lsp.cobol.usecases.UseCaseSuite;
@@ -39,6 +37,7 @@ import org.junit.runners.Suite.SuiteClasses;
   KeywordsTest.class,
   VariableCompletionTest.class,
   CompletionsChainTest.class,
+  CpyRecognizedWithoutConfigTest.class,
   SnippetCompletionTest.class,
   ParagraphCompletionTest.class,
   CopybookCompletionTest.class,
@@ -47,14 +46,15 @@ import org.junit.runners.Suite.SuiteClasses;
   WorkspaceServiceTest.class,
   CompletionResolutionTest.class,
   CopybookServiceTest.class,
+  CopybookServiceE2ETest.class,
+  DependencyServiceTest.class,
   HighlightsTest.class,
   MultiDocumentDefinitionTest.class,
   LangServerBootstrapTest.class,
   DocumentExtensionTests.class,
   MyLanguageServerImplTest.class,
-  CodeActionsTest.class,
-  ServerCommunicationsTest.class,
-  FindCopybookCommandTest.class,
-  WatcherServiceImplTest.class
+  DidChangeConfigurationTest.class,
+  InitializeConfigurationTest.class,
+  CodeActionsTest.class
 })
 public class AllTests {}

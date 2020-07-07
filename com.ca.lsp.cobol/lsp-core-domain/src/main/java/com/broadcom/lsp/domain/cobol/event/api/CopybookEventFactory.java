@@ -37,8 +37,6 @@ public interface CopybookEventFactory {
         return new FetchedSettingsSubscriberFactory();
       case COPYBOOK_DEP_EVENT:
         return new CopybookDepSubscriberFactory();
-      case ANALYSIS_FINISHED_EVENT:
-        return new AnalysisFinishedSubscriberFactory();
 
       default:
         throw new NoSuchElementException(
@@ -60,8 +58,6 @@ public interface CopybookEventFactory {
         return FetchedSettingsEvent.builder().build();
       case COPYBOOK_DEP_EVENT:
         return CopybookDepEvent.builder().build();
-      case ANALYSIS_FINISHED_EVENT:
-        return AnalysisFinishedEvent.builder().build();
       default:
         throw new NoSuchElementException(
             String.format("No DataEventType found for %s,%s", choice.getId(), choice.name()));

@@ -48,7 +48,6 @@ import static java.util.stream.Collectors.toList;
 @UtilityClass
 public class UseCaseUtils {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
-  public static final String DOCUMENT_2_URI = "file:///c%3A/workspace/document2.cbl";
   private static final String LANGUAGE = "cbl";
 
   private static final long MAX_TIME_TO_WAIT = 60000L;

@@ -14,7 +14,8 @@ import re
 import time
 from time import sleep
 from robot.api.deco import keyword
-from selenium.common.exceptions import WebDriverException, NoSuchElementException, StaleElementReferenceException
+from selenium.common.exceptions import WebDriverException, NoSuchElementException, TimeoutException, \
+    StaleElementReferenceException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -27,13 +28,17 @@ from inc.exceptions.general_exception import GeneralException
 from inc.exceptions.unexpected_notification_message_exception import UnexpectedNotificationMessage
 from inc.theia import zos_constants
 from inc.theia.ui import UI
-from inc.helpers import highlight, lt_pixels, get_mod_key, str2bool, dump, string_is_regexp, sum_pixels
+from inc.helpers import highlight, lt_pixels, get_mod_key, str2bool, dump, string_is_regexp
 from lib.common_driver import CommonDriver
 from inc.decorators.wait_till_exist import WaitTillExist
 import pyperclip
 
 
 class CommonEngine(CommonDriver):
+
+    DEFAULT_TIMEOUT = constants.DEFAULT_TIMEOUT
+    DEFAULT_LONG_TIMEOUT = constants.DEFAULT_LONG_TIMEOUT
+    DEFAULT_HUGE_TIMEOUT = constants.DEFAULT_HUGE_TIMEOUT
 
     def __init__(self, url=None, headless=None):
         super(CommonEngine, self).__init__()
@@ -56,13 +61,17 @@ class CommonEngine(CommonDriver):
     def get_content(self):
         self._driver.get(self.url)
 
+    @staticmethod
+    def is_element_expanded(element):
+        return constants.THEIA_ELEMENT_COLLAPSED not in element.get_attribute(constants.TYPE_CLASS)
+
     @WaitTillExist()
     def invoke_left_bar_item(self, item):
-        WebDriverWait(self._driver, constants.DEFAULT_TIMEOUT).until(
+        WebDriverWait(self._driver, self.DEFAULT_TIMEOUT).until(
             expected_conditions.presence_of_element_located(UI.get_left_menu_bar_locator())
         )
 
-        WebDriverWait(self._driver, constants.DEFAULT_TIMEOUT).until(
+        WebDriverWait(self._driver, self.DEFAULT_TIMEOUT).until(
             expected_conditions.presence_of_all_elements_located(UI.get_tabs_locator())
         )
 
@@ -89,7 +98,7 @@ class CommonEngine(CommonDriver):
     @WaitTillExist()
     def click_node_to_expand(self, node):
         parent_node = self.get_parent_node(node)
-        child_node_content = self.find_it(UI.get_tree_node_segment_grow_locator(), parent=node)
+        child_node_content = self.find_it(UI.get_tree_node_content_locator(), parent=node)
         node_id = child_node_content.get_attribute(constants.TYPE_ID)
 
         if constants.THEIA_TREE_EXPANDABLE_NODES in node.get_attribute(constants.TYPE_CLASS):
@@ -180,20 +189,6 @@ class CommonEngine(CommonDriver):
         if input_element is not None:
             self.confirm_input(input_element)
 
-    def form_input(self, element, value):
-        print("Input value in form")
-        self.click_me(element)
-        mod_key = get_mod_key()
-
-        actions = ActionChains(self.get_driver())
-        actions.key_down(mod_key)
-        actions.send_keys('a')
-        actions.key_up(mod_key)
-
-        actions.send_keys(Keys.DELETE)
-        actions.send_keys(value)
-        actions.perform()
-
     def input_value_with_copy_paste(self, value, input_element=None):
         print("Input value with copy/paste")
 
@@ -223,28 +218,6 @@ class CommonEngine(CommonDriver):
         actions = ActionChains(self.get_driver())
         actions.move_to_element(content)
         actions.send_keys(Keys.PAGE_UP)
-        actions.perform()
-
-    def scroll_up(self, content, offset=-50):
-        y_thumb_scroll = self.find_it(UI.get_y_thumb_scroll_locator(), parent=content)
-        highlight(y_thumb_scroll)
-
-        actions = ActionChains(self.get_driver())
-        actions.move_to_element(y_thumb_scroll)
-        actions.click_and_hold(y_thumb_scroll)
-        actions.move_by_offset(0, offset)
-        actions.release()
-        actions.perform()
-
-    def scroll_down(self, content, offset=50):
-        y_thumb_scroll = self.find_it(UI.get_y_thumb_scroll_locator(), parent=content)
-        highlight(y_thumb_scroll)
-
-        actions = ActionChains(self.get_driver())
-        actions.move_to_element(y_thumb_scroll)
-        actions.click_and_hold(y_thumb_scroll)
-        actions.move_by_offset(0, offset)
-        actions.release()
         actions.perform()
 
     def get_tree_element_top_by_id(self, node_id):
@@ -286,11 +259,11 @@ class CommonEngine(CommonDriver):
     def wait_for_data_sets_expanded_short(self, node_id, content):
         return self.wait_for_data_sets_is_expanded(node_id, content)
 
-    @WaitTillExist(timeout=constants.DEFAULT_LONG_TIMEOUT)
+    @WaitTillExist(constants.DEFAULT_LONG_TIMEOUT)
     def wait_for_data_sets_expanded_long(self, node_id, content):
         return self.wait_for_data_sets_is_expanded(node_id, content)
 
-    @WaitTillExist(timeout=constants.DEFAULT_HUGE_TIMEOUT, interval=10)
+    @WaitTillExist(constants.DEFAULT_HUGE_TIMEOUT)
     def wait_for_data_sets_expanded_huge(self, node_id, content):
         return self.wait_for_data_sets_is_expanded(node_id, content)
 
@@ -299,11 +272,7 @@ class CommonEngine(CommonDriver):
         node_top = self.get_tree_element_top_by_id(node_id)
         node_padding = self.get_tree_element_padding_by_id(node_id)
 
-        try:
-            child_nodes = self.find_them(UI.get_tree_nodes_locator(), parent=content)
-
-        except (NoSuchElementException, ElementNotFoundException):
-            raise WebDriverException
+        child_nodes = self.find_them(UI.get_tree_nodes_locator(), parent=content)
 
         for child_node in child_nodes:
             highlight(child_node)
@@ -490,39 +459,8 @@ class CommonEngine(CommonDriver):
                     call_from=self.wait_for_timeout_waiting_notification.__name__
                 )
 
-    def expect_notification_message(self, msg_text, like=False, timeout=None):
-        if timeout is None:
-            timeout = constants.DEFAULT_TIMEOUT
-
-        if timeout == constants.DEFAULT_TIMEOUT:
-            return self.expect_notification_message_default(msg_text, like)
-
-        if timeout == constants.DEFAULT_SHORT_TIMEOUT:
-            return self.expect_notification_message_short(msg_text, like)
-
-        if timeout == constants.DEFAULT_LONG_TIMEOUT:
-            return self.expect_notification_message_long(msg_text, like)
-
-        if timeout == constants.DEFAULT_HUGE_TIMEOUT:
-            return self.expect_notification_message_huge(msg_text, like)
-
     @WaitTillExist()
-    def expect_notification_message_default(self, msg_text, like=False):
-        return self.expect_notification(msg_text, like)
-
-    @WaitTillExist(timeout=constants.DEFAULT_SHORT_TIMEOUT)
-    def expect_notification_message_short(self, msg_text, like=False):
-        return self.expect_notification(msg_text, like)
-
-    @WaitTillExist(timeout=constants.DEFAULT_LONG_TIMEOUT)
-    def expect_notification_message_long(self, msg_text, like=False):
-        return self.expect_notification(msg_text, like)
-
-    @WaitTillExist(timeout=constants.DEFAULT_HUGE_TIMEOUT, interval=10)
-    def expect_notification_message_huge(self, msg_text, like=False):
-        return self.expect_notification(msg_text, like)
-
-    def expect_notification(self, msg_text, like=False):
+    def expect_notification_message(self, msg_text, like=False):
         print("Expecting notification message '{0}' ...".format(msg_text))
         notification_container = self.find_it(UI.get_theia_notification_container_locator())
         highlight(notification_container)
@@ -546,20 +484,12 @@ class CommonEngine(CommonDriver):
 
         raise WebDriverException
 
-    def close_notification_with_message_and_wait_it_is_closed(self, notification, msg_text):
-        clear_button = self.find_it(UI.get_theia_notification_close_button_locator(), parent=notification)
-        self.click_me(clear_button, element_human_name=constants.Close)
-        self.expect_notification_message_gone(msg_text)
-
     def close_notification_message(self, msg_text):
         notification = self.expect_notification_message(msg_text)
         highlight(notification)
-        self.close_notification_with_message_and_wait_it_is_closed(notification, msg_text)
-
-    def close_notification(self, notification):
-        text_el = self.find_it(UI.get_theia_notification_message_locator(), parent=notification)
-        msg_text = text_el.text
-        self.close_notification_with_message_and_wait_it_is_closed(notification, msg_text)
+        clear_button = self.find_it(UI.get_theia_notification_close_button_locator(), parent=notification)
+        self.click_me(clear_button, element_human_name=constants.Close)
+        self.expect_notification_message_gone(msg_text)
 
     @WaitTillExist()
     def expect_notification_message_gone(self, msg_text):
@@ -576,21 +506,12 @@ class CommonEngine(CommonDriver):
         print("Expecting notification message '{0}' to disappear ... Ok".format(msg_text))
         return
 
-    def find_child_node(self, content, child_name, top, padding, node_prev_padding):
+    def find_child_node(self, content, child_name, top, padding):
         child_nodes = self.find_them(UI.get_tree_nodes_locator(), parent=content)
-
-        previous_child_padding_left = "0px"
 
         for child_node in child_nodes:
             child_parent = self.get_parent_node(child_node)
             child_parent_top = self.get_element_top(child_parent)
-
-            child_node_padding_left = self.get_element_padding_left(child_node)
-            if lt_pixels(child_node_padding_left, previous_child_padding_left) and lt_pixels("0px", node_prev_padding):
-                print("Another subdir")
-                break
-
-            previous_child_padding_left = child_node_padding_left
 
             if lt_pixels(child_parent_top, top):
                 continue
@@ -599,19 +520,20 @@ class CommonEngine(CommonDriver):
             if lt_pixels(child_padding, padding):
                 continue
 
-            child_node_content = self.find_it(UI.get_tree_node_segment_grow_locator(), parent=child_node)
+            child_node_content = self.find_it(UI.get_tree_node_content_locator(), parent=child_node)
             if child_node_content.text != child_name:
                 continue
 
+            if child_node_content.text == child_name:
+                return child_node
+
+            child_node_padding_left = self.get_element_padding_left(child_node)
             # we reached another Connection name, but looking not for a connection
             if child_node_padding_left == "0px" and padding != "0px":
                 print("Next connection reached!")
                 print("child_node_padding_left: '{0}'".format(child_node_padding_left))
                 print("padding: '{0}'".format(padding))
                 break
-
-            if child_node_content.text == child_name:
-                return child_node
 
         return None
 
@@ -638,7 +560,7 @@ class CommonEngine(CommonDriver):
 
     def find_file_explorer_content(self):
         locator = UI.get_files_explorer_content_locator()
-        WebDriverWait(self._driver, constants.DEFAULT_TIMEOUT).until(
+        WebDriverWait(self._driver, self.DEFAULT_TIMEOUT).until(
             expected_conditions.presence_of_element_located(locator)
         )
         file_explorer = self.find_it(locator)
@@ -648,94 +570,24 @@ class CommonEngine(CommonDriver):
         content = self.find_file_explorer_content()
         highlight(content)
 
-    @keyword("Navigate All the Way ${direction}")
-    def scroll_all_up(self, direction):
-        content = self.find_file_explorer_content()
-        highlight(content)
-        return self.scroll_explorer(direction, content)
-
-    def scroll_explorer(self, direction, content):
-        start_time = round(time.time())
-
-        while True:
-            elapsed_time = round(time.time())
-            if elapsed_time - start_time > constants.DEFAULT_HUGE_TIMEOUT:
-                raise CustomTimeoutException(
-                    self.get_driver(),
-                    call_from=self.scroll_explorer.__name__
-                )
-
-            if direction == "Up":
-                while not self.is_files_content_scrolled_up():
-                    self.scroll_up(content)
-
-                break
-
-            elif direction == "Down":
-                while not self.is_files_content_scrolled_down():
-                    self.scroll_down(content)
-
-                break
-
-            else:
-                raise Exception("Unsupported direction: '{0}'".format(direction))
-
-    @keyword("Scroll ${direction} File Explorer From ${upper_node} And Find ${element_name} Which Is ${present}")
-    def scroll_file_explorer_element_can_be_missing(self, direction, upper_node, element_name, present):
-        content = self.find_file_explorer_content()
-        highlight(content)
-        return self.scroll_till_element_is_found(direction, content, element_name, upper_node, should_present=present)
-
     @keyword("Inside File Explorer Navigate ${direction} to ${element_name} from ${upper_node}")
     def scroll_file_explorer_till_element_is_found(self, direction, element_name, upper_node):
         content = self.find_file_explorer_content()
         highlight(content)
         return self.scroll_till_element_is_found(direction, content, element_name, upper_node)
 
-    def is_files_content_scrolled_up(self):
-        content = self.find_file_explorer_content()
-        highlight(content)
-
-        y_scroll = self.find_it(UI.get_y_scroll_locator(), parent=content)
-        highlight(y_scroll)
-
-        y_scroll_top = y_scroll.value_of_css_property("top")
-
-        return y_scroll_top == "0px"
-
-    def is_files_content_scrolled_down(self):
-        content = self.find_file_explorer_content()
-        highlight(content)
-
-        y_scroll = self.find_it(UI.get_y_scroll_locator(), parent=content)
-        highlight(y_scroll)
-
-        y_thumb_scroll = self.find_it(UI.get_y_thumb_scroll_locator(), parent=content)
-        highlight(y_thumb_scroll)
-
-        y_scroll_height = y_scroll.value_of_css_property("height")
-
-        y_thumb_scroll_height = y_thumb_scroll.value_of_css_property("height")
-        y_thumb_scroll_top = y_thumb_scroll.value_of_css_property("top")
-
-        full_height = sum_pixels(y_thumb_scroll_height, y_thumb_scroll_top)
-
-        return full_height in ["0px", y_scroll_height]
-
-    def scroll_till_element_is_found(self, direction, content, element_name, upper_node, should_present=True):
+    def scroll_till_element_is_found(self, direction, content, element_name, upper_node):
         self.node_should_exist(upper_node)
 
         if constants.THEIA_VIEW_CONTAINER_TITLE_NODE in upper_node.get_attribute(constants.TYPE_CLASS) \
                 or constants.THEIA_SIDE_PANEL_TOOLBAR in upper_node.get_attribute(constants.TYPE_CLASS):
             node_top = "0px"
             node_padding = "0px"
-            node_prev_padding = "-1px"
 
         else:
             parent_upper_node = self.get_parent_node(upper_node)
             node_top = self.get_element_top(parent_upper_node)
             node_padding = self.get_element_padding_left(upper_node)
-            node_prev_padding = node_padding
 
         found_node = None
 
@@ -743,14 +595,14 @@ class CommonEngine(CommonDriver):
 
         while True:
             elapsed_time = round(time.time())
-            if elapsed_time - start_time > constants.DEFAULT_HUGE_TIMEOUT:
+            if elapsed_time - start_time > self.DEFAULT_HUGE_TIMEOUT:
                 raise CustomTimeoutException(
                     self.get_driver(),
                     call_from=self.scroll_file_explorer_till_element_is_found.__name__
                 )
 
             try:
-                found_node = self.find_child_node(content, element_name, node_top, node_padding, node_prev_padding)
+                found_node = self.find_child_node(content, element_name, node_top, node_padding)
 
             except StaleElementReferenceException:
                 print("Got StaleElementReferenceException exception, wait 1 sec")
@@ -765,10 +617,6 @@ class CommonEngine(CommonDriver):
                 break
 
             if direction == "Down":
-                if self.is_files_content_scrolled_down():
-                    print("Scrolled fully down")
-                    break
-
                 self.page_down_tree(content)
 
             elif direction == "Up":
@@ -777,7 +625,7 @@ class CommonEngine(CommonDriver):
             else:
                 raise Exception("Unsupported scroll direction: '{0}'".format(direction))
 
-        if found_node is None and should_present:
+        if found_node is None:
             raise ElementNotFoundException(self.get_driver())
 
         return found_node
@@ -814,7 +662,7 @@ class CommonEngine(CommonDriver):
             if node_padding_left != padding_left:
                 continue
 
-            node_content = self.find_it(UI.get_tree_node_segment_grow_locator(), parent=tree_node)
+            node_content = self.find_it(UI.get_tree_node_content_locator(), parent=tree_node)
             if node_content.text == connection_name:
                 return tree_node
 
@@ -843,7 +691,7 @@ class CommonEngine(CommonDriver):
         try:
             input_widget = self.find_it(UI.get_monako_input_widget_locator())
 
-        except (NoSuchElementException, ElementNotFoundException):
+        except NoSuchElementException:
             return
 
         hidden = str2bool(input_widget.get_attribute(constants.ARIA_HIDDEN))
@@ -877,20 +725,3 @@ class CommonEngine(CommonDriver):
 
         if visible and input_element.get_attribute(constants.ELEMENT_TITLE) == title:
             raise WebDriverException
-
-    def send_ctrl_left(self):
-        actions = [
-            {
-                "action": "key_down",
-                "value": Keys.CONTROL
-            },
-            {
-                "action": "send_keys",
-                "value": Keys.LEFT
-            },
-            {
-                "action": "key_up",
-                "value": Keys.CONTROL
-            }
-        ]
-        self.execute_key_sequence(actions)

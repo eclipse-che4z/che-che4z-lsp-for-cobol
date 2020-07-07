@@ -58,7 +58,7 @@ class ZosChromeEngine(FileExplorer):
             os.remove(downloaded_driver)
 
         if self.platform not in ["windows", "win32"]:
-            if not drv.is_file_executable(self.driver_path):
+            if not drv.is_file_executable:
                 st = os.stat(self.driver_path)
                 os.chmod(self.driver_path, st.st_mode | stat.S_IEXEC)
 

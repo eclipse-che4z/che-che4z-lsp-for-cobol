@@ -15,23 +15,24 @@
 
 package com.ca.lsp.cobol.service;
 
+import com.ca.lsp.cobol.service.providers.ClientProvider;
 import com.ca.lsp.core.cobol.model.ErrorCode;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
 import static com.ca.lsp.core.cobol.model.ErrorCode.values;
 import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
-import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /** This test asserts functions of the {@link MyLanguageServerImpl}, such as initialization. */
 public class MyLanguageServerImplTest {
@@ -42,26 +43,17 @@ public class MyLanguageServerImplTest {
    */
   @Test
   public void initialized() {
-    SettingsService settingsService = mock(SettingsServiceImpl.class);
-    WatcherService watchingService = mock(WatcherService.class);
+    LanguageClient client = mock(LanguageClient.class);
+    ClientProvider provider = new ClientProvider();
+    provider.set(client);
 
-    JsonArray arr = new JsonArray();
-    String path = "foo/bar";
-    arr.add(new JsonPrimitive(path));
-
-    when(settingsService.getConfiguration(LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
-    when(settingsService.toStrings(any())).thenCallRealMethod();
-
-    MyLanguageServerImpl server =
-        new MyLanguageServerImpl(null, null, watchingService, settingsService);
-
+    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, provider, null);
+    ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     server.initialized(new InitializedParams());
 
-    verify(watchingService).watchConfigurationChange();
-    verify(watchingService).watchPredefinedFolder();
-    verify(settingsService).getConfiguration(LOCAL_PATHS.label);
-    verify(watchingService).addWatchers(singletonList(path));
+    verify(client).registerCapability(captor.capture());
+    RegistrationParams params = captor.getValue();
+    assertRegistrationParams(params);
   }
 
   /**
@@ -71,7 +63,9 @@ public class MyLanguageServerImplTest {
    */
   @Test
   public void initialize() {
-    MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, null);
+    CopybookService fileSystemService = mock(CopybookService.class);
+    MyLanguageServerImpl server =
+        new MyLanguageServerImpl(fileSystemService, null, null, null, null);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
@@ -83,6 +77,21 @@ public class MyLanguageServerImplTest {
     } catch (InterruptedException | ExecutionException e) {
       fail(e.getMessage());
     }
+
+    verify(fileSystemService).setWorkspaceFolders(workspaceFolders);
+  }
+
+  private void assertRegistrationParams(RegistrationParams params) {
+    Registration registration = params.getRegistrations().get(0);
+    assertNotNull(registration.getId());
+    assertEquals("workspace/didChangeWatchedFiles", registration.getMethod());
+
+    List<FileSystemWatcher> watchers =
+        ((DidChangeWatchedFilesRegistrationOptions) registration.getRegisterOptions())
+            .getWatchers();
+
+    watchers.forEach(it -> assertTrue(it.getGlobPattern().startsWith("**/.copybooks")));
+    watchers.forEach(it -> assertEquals(7, it.getKind().intValue()));
   }
 
   private void checkOnlySupportedCapabilitiesAreSet(ServerCapabilities capabilities) {

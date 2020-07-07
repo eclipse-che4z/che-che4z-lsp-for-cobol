@@ -14,7 +14,7 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
-import {C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_ZOWE, SETTINGS_SECTION} from "../constants";
+import { COPYBOOKS_FOLDER, SETTINGS_SECTION } from "../constants";
 import { ProfileService } from "./ProfileService";
 
 export class CopybooksPathGenerator {
@@ -33,23 +33,23 @@ export class CopybooksPathGenerator {
     }
 
     async listDatasets(): Promise<string[]> {
-        if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has(PATHS_ZOWE)) {
-            vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
+        if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has("paths")) {
+            await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
             return [];
         }
-        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);
+        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get("paths");
     }
 }
 
 export function createCopybookPath(profileName: string, dataset: string, copybook: string): string {
     const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-    const copybookDirPath = path.join(rootPath, C4Z_FOLDER, COPYBOOKS_FOLDER, profileName, dataset);
+    const copybookDirPath = path.join(rootPath, COPYBOOKS_FOLDER, profileName, dataset);
     return path.join(copybookDirPath, copybook + ".cpy");
 }
 
 export function createDatasetPath(profileName: string, dataset: string): string {
     const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-    return path.join(rootPath, C4Z_FOLDER, COPYBOOKS_FOLDER, profileName, dataset);
+    return path.join(rootPath, COPYBOOKS_FOLDER, profileName, dataset);
 }
 
 export function checkWorkspace(): boolean {
