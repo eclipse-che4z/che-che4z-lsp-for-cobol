@@ -21,12 +21,13 @@ export class JavaCheck {
     }
     public async isJavaInstalled() {
         return new Promise<any>((resolve, reject) => {
+            let resolved = false;
             const ls = cp.spawn("java", ["-version"]);
             ls.stderr.on("data", (data: any) => {
-                if (!JavaCheck.isJavaVersionSupported(data.toString())) {
-                    reject("Java version 8 expected");
+                if (JavaCheck.isJavaVersionSupported(data.toString())) {
+                    resolved = true;
+                    resolve();
                 }
-                resolve();
             });
             ls.on("error", (code: any) => {
                 if ("Error: spawn java ENOENT" === code.toString()) {
@@ -37,6 +38,9 @@ export class JavaCheck {
             ls.on("close", (code: number) => {
                 if (code !== 0) {
                     reject("An error occurred when checking if Java was installed");
+                }
+                if(!resolved) {
+                    reject("Minimum expected Java version is 8");
                 }
             });
         });

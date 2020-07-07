@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Broadcom.
+# Copyright (c) 2020 Broadcom.
 # The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
 #
 # This program and the accompanying materials are made
@@ -16,7 +16,7 @@ from inc.exceptions.unknown_locator_exception import UnknownLocatorException
 from inc.theia import zos_constants
 
 
-def _get_locator(locator_text):
+def _get_locator_type(locator_text):
     if locator_text == constants.TYPE_ID:
         return By.ID
 
@@ -40,8 +40,24 @@ class UI(object):
             raise Exception("Item {0} does not exist in dictionary".format(item))
 
         return \
-            _get_locator(constants.THEIA_UI[item][constants.ELEMENT_TYPE]), \
+            _get_locator_type(constants.THEIA_UI[item][constants.ELEMENT_TYPE]), \
             constants.THEIA_UI[item][constants.ELEMENT_TEXT]
+
+    @staticmethod
+    def get_che_login_form_locator():
+        return UI.get_element_locator(constants.CHE_LOGIN_ID)
+
+    @staticmethod
+    def get_che_password_form_locator():
+        return UI.get_element_locator(constants.CHE_LOGIN_ID)
+
+    @staticmethod
+    def get_che_submit_form_locator():
+        return UI.get_element_locator(constants.CHE_SUBMIT)
+
+    @staticmethod
+    def get_ide_iframe_locator():
+        return UI.get_element_locator(constants.IDE_IFRAME)
 
     @staticmethod
     def get_locator_by_id(id):
@@ -52,8 +68,76 @@ class UI(object):
         return UI.get_element_locator(constants.FILES_EXPLORER_ID)
 
     @staticmethod
+    def get_theia_left_right_panel_locator():
+        return UI.get_element_locator(constants.THEIA_LEFT_RIGHT_PANEL)
+
+    @staticmethod
     def get_files_explorer_tab_locator():
         return UI.get_element_locator(constants.FILES_EXPLORER_TAB_ID)
+
+    @staticmethod
+    def get_debug_tab_locator():
+        return UI.get_element_locator(constants.SHELL_TAB_DEBUG)
+
+    @staticmethod
+    def get_debug_locator():
+        return UI.get_element_locator(constants.THEIA_DEBUG)
+
+    @staticmethod
+    def get_debug_configure_locator():
+        return UI.get_element_locator(constants.THEIA_DEBUG_CONFIGURE)
+
+    @staticmethod
+    def get_debug_start_locator():
+        return UI.get_element_locator(constants.THEIA_DEBUG_START)
+
+    @staticmethod
+    def get_debug_stop_locator():
+        return UI.get_element_locator(constants.THEIA_DEBUG_STOP)
+
+    @staticmethod
+    def get_debug_step_over_locator():
+        return UI.get_element_locator(constants.THEIA_DEBUG_STEP_OVER)
+
+    @staticmethod
+    def get_debug_continue_locator():
+        return UI.get_element_locator(constants.THEIA_DEBUG_CONTINUE)
+
+    @staticmethod
+    def get_debug_top_stack_frame_locator():
+        return UI.get_element_locator(constants.THEIA_DEBUG_TOP_STACK_FRAME)
+
+    @staticmethod
+    def get_debug_top_stack_frame_line_locator():
+        return UI.get_element_locator(constants.THEIA_DEBUG_TOP_STACK_FRAME_LINE)
+
+    @staticmethod
+    def get_debug_thread_locator():
+        return UI.get_element_locator(constants.THEIA_DEBUG_THREAD)
+
+    @staticmethod
+    def get_debug_remove_breakpoint_locator():
+        return UI.get_element_locator(constants.THEIA_REMOVE_BREAKPOINTS_BUTTON)
+
+    @staticmethod
+    def get_debug_source_breakpoint_locator():
+        return UI.get_element_locator(constants.THEIA_SOURCE_BREAKPOINT)
+
+    @staticmethod
+    def get_debug_breakpoint_locator():
+        return UI.get_element_locator(constants.THEIA_DEBUG_BREAKPOINT)
+
+    @staticmethod
+    def get_debug_breakpoint_hint_locator():
+        return UI.get_element_locator(constants.THEIA_DEBUG_BREAKPOINT_HINT)
+
+    @staticmethod
+    def get_debug_console_variable_locator():
+        return UI.get_element_locator(constants.THEIA_DEBUG_CONSOLE_VARIABLE)
+
+    @staticmethod
+    def get_theia_header_locator():
+        return UI.get_element_locator(constants.THEIA_HEADER)
 
     @staticmethod
     def get_files_explorer_content_locator():
@@ -61,7 +145,7 @@ class UI(object):
 
     @staticmethod
     def get_theia_locator():
-        return UI.get_element_locator(constants.THEIA)
+        return UI.get_element_locator(constants.THEIA_APP_SHELL)
 
     @staticmethod
     def get_left_menu_bar_locator():
@@ -128,6 +212,10 @@ class UI(object):
         return UI.get_element_locator(constants.THEIA_DOCK_PANEL_WIDGET)
 
     @staticmethod
+    def get_theia_dock_panel_locator():
+        return UI.get_element_locator(constants.THEIA_DOCK_PANEL)
+
+    @staticmethod
     def get_tab_bar_locator():
         return UI.get_element_locator(constants.THEIA_TAB_BAR)
 
@@ -142,6 +230,11 @@ class UI(object):
     @staticmethod
     def get_theia_expand_arrow_locator():
         return UI.get_element_locator(constants.THEIA_EXPAND_ARROW)
+
+    @staticmethod
+    def get_theia_user_preferences_locator():
+        return UI.get_element_locator(constants.THEIA_USER_PREFERENCES)
+
 
     @staticmethod
     def get_theia_statusbar_locator():
@@ -166,6 +259,10 @@ class UI(object):
     @staticmethod
     def get_theia_dialog_title_locator():
         return UI.get_element_locator(constants.THEIA_DIALOG_TITLE)
+
+    @staticmethod
+    def get_theia_dialog_content_locator():
+        return UI.get_element_locator(constants.THEIA_DIALOG_CONTENT)
 
     @staticmethod
     def get_zos_explorer_locator():
@@ -234,6 +331,14 @@ class UI(object):
     @staticmethod
     def get_tree_node_content_locator():
         return UI.get_element_locator(constants.THEIA_TREE_NODE_CONTENT)
+
+    @staticmethod
+    def get_tree_container_locator():
+        return UI.get_element_locator(constants.THEIA_TREE_CONTAINER)
+
+    @staticmethod
+    def get_tree_node_segment_grow_locator():
+        return UI.get_element_locator(constants.THEIA_TREE_NODE_SEGMENT_GROW)
 
     @staticmethod
     def get_tree_node_actions_locator():
@@ -378,3 +483,11 @@ class UI(object):
     @staticmethod
     def get_spans_locator():
         return UI.get_element_locator(constants.SPAN)
+
+    @staticmethod
+    def get_y_scroll_locator():
+        return UI.get_element_locator(constants.SCROLL_Y)
+
+    @staticmethod
+    def get_y_thumb_scroll_locator():
+        return UI.get_element_locator(constants.SCROLL_Y_THUMB)

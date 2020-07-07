@@ -26,10 +26,10 @@ describe("CopybooksPathGenerator tests", () => {
 
     it("creates copybook path", () => {
         expect(createCopybookPath(profile, dataset, "copybook"))
-            .toEqual(path.join("/", "projects", ".copybooks", "profile", "dataset", "copybook.cpy"));
+            .toEqual(path.join("/", "projects", ".c4z", ".copybooks", "profile", "dataset", "copybook.cpy"));
     });
     it("creates dataset path", () => {
-        expect(createDatasetPath(profile, dataset)).toEqual(path.join("/projects", ".copybooks", "profile", "dataset"));
+        expect(createDatasetPath(profile, dataset)).toEqual(path.join("/projects", ".c4z", ".copybooks", "profile", "dataset"));
     });
     it("check workspace", () => {
         expect(checkWorkspace()).toEqual(true);
@@ -45,7 +45,7 @@ describe("CopybooksPathGenerator tests", () => {
         const gen: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
         gen.listDatasets = () => Promise.resolve(["DATASET1", "DATASET2"]);
         const result = await gen.listUris();
-        expect(result[0].toString()).toContain("/projects/.copybooks/profile/DATASET1");
-        expect(result[1].toString()).toContain("/projects/.copybooks/profile/DATASET2");
+        expect(result[0].toString()).toContain("/projects/.c4z/.copybooks/profile/DATASET1");
+        expect(result[1].toString()).toContain("/projects/.c4z/.copybooks/profile/DATASET2");
     });
 });

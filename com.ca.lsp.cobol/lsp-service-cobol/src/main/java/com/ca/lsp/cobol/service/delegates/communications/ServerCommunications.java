@@ -17,6 +17,7 @@
 
 package com.ca.lsp.cobol.service.delegates.communications;
 
+import com.ca.lsp.cobol.service.utils.FileSystemService;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +37,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.ca.lsp.cobol.service.utils.FileSystemUtils.decodeURI;
-
 /**
  * This class serves the communications between server and client. It also allows to send delayable
  * messages. Notice, that all the messages that are going to be sent from server to client should be
@@ -45,14 +44,16 @@ import static com.ca.lsp.cobol.service.utils.FileSystemUtils.decodeURI;
  */
 @Slf4j
 public class ServerCommunications implements Communications {
+  private Provider<LanguageClient> provider;
+  private FileSystemService files;
+
   private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(5);
   private final Set<String> uriInProgress = new HashSet<>();
 
-  private Provider<LanguageClient> provider;
-
   @Inject
-  public ServerCommunications(Provider<LanguageClient> provider) {
+  public ServerCommunications(Provider<LanguageClient> provider, FileSystemService files) {
     this.provider = provider;
+    this.files = files;
   }
 
   /**
@@ -78,7 +79,7 @@ public class ServerCommunications implements Communications {
    */
   @Override
   public void notifyThatLoadingInProgress(String uri) {
-    String decodedUri = decodeURI(uri);
+    String decodedUri = files.decodeURI(uri);
     uriInProgress.add(decodedUri);
     executor.schedule(
         () -> {
@@ -100,9 +101,9 @@ public class ServerCommunications implements Communications {
   public void notifyThatDocumentAnalysed(String uri) {
     CompletableFuture.runAsync(
         () ->
-            showMessage(
+            logMessage(
                 MessageType.Info,
-                "No syntax errors detected in " + retrieveFileName(decodeURI(uri))));
+                "No syntax errors detected in " + retrieveFileName(files.decodeURI(uri))));
   }
 
   /**
@@ -119,30 +120,6 @@ public class ServerCommunications implements Communications {
   }
 
   /**
-   * This method raise a popup message back to the user with a message customized by the enumeration
-   * class
-   *
-   * @param copybookMessageInfo the enum kind that represent the event that will be shown to the
-   *     user
-   */
-  @Override
-  public void notifyCopybookMessageInfo(CopybookMessageInfo copybookMessageInfo) {
-    CompletableFuture.runAsync(
-        () ->
-            showMessage(
-                MessageType.Error,
-                "Error during the copybook analysis, reason: " + copybookMessageInfo.getMessage()));
-  }
-
-  @Override
-  public void notifyLogMessageInfo(CopybookMessageInfo copybookMessageInfo) {
-    CompletableFuture.runAsync(
-        () ->
-            getClient()
-                .logMessage(new MessageParams(MessageType.Info, copybookMessageInfo.getMessage())));
-  }
-
-  /**
    * This method raise a diagnostic message to the client with syntax error retrivied by the Cobol
    * LSP server
    *
@@ -152,7 +129,7 @@ public class ServerCommunications implements Communications {
   @Override
   public void publishDiagnostics(String uri, List<Diagnostic> diagnostics) {
     getClient()
-        .publishDiagnostics(new PublishDiagnosticsParams(decodeURI(uri), clean(diagnostics)));
+        .publishDiagnostics(new PublishDiagnosticsParams(files.decodeURI(uri), clean(diagnostics)));
   }
 
   /**
@@ -162,11 +139,15 @@ public class ServerCommunications implements Communications {
    */
   @Override
   public void cancelProgressNotification(String uri) {
-    uriInProgress.remove(decodeURI(uri));
+    uriInProgress.remove(files.decodeURI(uri));
   }
 
   private void showMessage(MessageType type, String message) {
     getClient().showMessage(new MessageParams(type, clean(message)));
+  }
+
+  private void logMessage(MessageType type, String message) {
+    getClient().logMessage(new MessageParams(type, clean(message)));
   }
 
   private LanguageClient getClient() {
