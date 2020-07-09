@@ -31,8 +31,10 @@ import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.ANALYSIS_F
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.REQUIRED_COPYBOOK_EVENT;
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_2_URI;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
@@ -49,12 +51,17 @@ public class CopybookServiceTest {
       "file:///c%3A/workspace/.c4z/.copybooks/VALIDNAME.CPY";
   private static final String INVALID_CPY_NAME = "INVALID";
   private static final String INVALID_2_CPY_NAME = "INVALID_2";
+  private static final String PARENT_CPY_NAME = "PARENT";
+  private static final String PARENT_CPY_URI = "file:///c%3A/workspace/.c4z/.copybooks/PARENT.CPY";
+  private static final String PARENT_CONTENT = "         COPY NESTED.";
+  private static final String NESTED_CPY_NAME = "nested";
   private static final String CONTENT = "content";
 
   private DataBusBroker broker = mock(DataBusBroker.class);
   private SettingsService settingsService = mock(SettingsService.class);
   private FileSystemService files = mock(FileSystemService.class);
   private Path cpyPath = mock(Path.class);
+  private Path parentPath = mock(Path.class);
 
   @Before
   public void setupMocks() {
@@ -64,12 +71,14 @@ public class CopybookServiceTest {
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
 
     when(cpyPath.toUri()).thenReturn(URI.create(VALID_CPY_URI));
+    when(parentPath.toUri()).thenReturn(URI.create(PARENT_CPY_URI));
 
     when(files.getNameFromURI(VALID_CPY_URI)).thenReturn(VALID_CPY_NAME);
     when(files.getNameFromURI(DOCUMENT_URI)).thenReturn("document");
     when(files.getPathFromURI(VALID_CPY_URI)).thenReturn(cpyPath);
     when(files.getContentByPath(cpyPath)).thenReturn(CONTENT);
     when(files.fileExists(cpyPath)).thenReturn(true);
+    when(files.fileExists(parentPath)).thenReturn(true);
   }
 
   /**
@@ -308,11 +317,10 @@ public class CopybookServiceTest {
   }
 
   /**
-   * Test that the service must collect not resolved copybooks and sends downloading request for them on
-   * {@link AnalysisFinishedEvent}.
-   * The server must track missed copybooks for each document separately.
-   * The server must send a downloading request only once. Any subsequent Done analysis events should not trigger
-   * downloading requests until new missed copybooks found.
+   * Test the service must collect not resolved copybooks and sends downloading request for them on
+   * {@link AnalysisFinishedEvent}. The server must track missed copybooks for each document
+   * separately. The server must send a downloading request only once. Any subsequent Done analysis
+   * events should not trigger downloading requests until new missed copybooks found.
    */
   @Test
   public void testServiceSendsDownloadingRequestForAnalysisFinishedEvent() {
@@ -360,23 +368,88 @@ public class CopybookServiceTest {
 
     // First document parsing done
     copybookService.observerCallback(
-        AnalysisFinishedEvent.builder()
-            .documentUri(DOCUMENT_URI)
-            .build());
-    verify(settingsService, times(1)).getConfigurations(singletonList("copybook-download.document.INVALID"));
+        AnalysisFinishedEvent.builder().documentUri(DOCUMENT_URI).copybookUris(emptyList()).build());
+    verify(settingsService, times(1))
+        .getConfigurations(singletonList("copybook-download.document.INVALID"));
 
     // Others parsing done events for first document are not trigger settingsService
     copybookService.observerCallback(
-        AnalysisFinishedEvent.builder()
-            .documentUri(DOCUMENT_URI)
-            .build());
-    verify(settingsService, times(1)).getConfigurations(singletonList("copybook-download.document.INVALID"));
+        AnalysisFinishedEvent.builder().documentUri(DOCUMENT_URI).copybookUris(emptyList()).build());
+    verify(settingsService, times(1))
+        .getConfigurations(singletonList("copybook-download.document.INVALID"));
 
     // Second document parsing done
     copybookService.observerCallback(
-        AnalysisFinishedEvent.builder()
-            .documentUri(DOCUMENT_2_URI)
+        AnalysisFinishedEvent.builder().documentUri(DOCUMENT_2_URI).copybookUris(emptyList()).build());
+    verify(settingsService, times(1))
+        .getConfigurations(singletonList("copybook-download.document2.INVALID_2"));
+  }
+
+  /**
+   * Test the service collects all the copybooks that were not resolved and sends a request to
+   * resolve all of them, including nested ones
+   */
+  @Test
+  public void testServiceSendsDownloadingRequestForAllNotResolvedCopybooks() {
+    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
+    verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
+    verify(broker).subscribe(ANALYSIS_FINISHED_EVENT, copybookService);
+
+    when(files.getNameFromURI(PARENT_CPY_URI)).thenReturn(PARENT_CPY_NAME);
+    when(files.getPathFromURI(PARENT_CPY_URI)).thenReturn(parentPath);
+    when(files.getContentByPath(parentPath)).thenReturn(PARENT_CONTENT);
+    when(files.getContentByPath(parentPath)).thenReturn(PARENT_CONTENT);
+
+    when(settingsService.getConfiguration("copybook-resolve", PARENT_CPY_NAME, NESTED_CPY_NAME))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
+
+    when(settingsService.getConfiguration("copybook-resolve", "document", PARENT_CPY_NAME))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(PARENT_CPY_URI))));
+
+    copybookService.observerCallback(
+        RequiredCopybookEvent.builder()
+            .name(INVALID_CPY_NAME)
+            .documentUri(DOCUMENT_URI)
+            .textDocumentSyncType(DID_OPEN.name())
             .build());
-    verify(settingsService, times(1)).getConfigurations(singletonList("copybook-download.document2.INVALID_2"));
+    copybookService.observerCallback(
+        RequiredCopybookEvent.builder()
+            .name(PARENT_CPY_NAME)
+            .documentUri(DOCUMENT_URI)
+            .textDocumentSyncType(DID_OPEN.name())
+            .build());
+    // Nested copybook declaration
+    copybookService.observerCallback(
+        RequiredCopybookEvent.builder()
+            .name(NESTED_CPY_NAME)
+            .documentUri(PARENT_CPY_URI)
+            .textDocumentSyncType(DID_OPEN.name())
+            .build());
+
+    // Wait for all settingsService calls processed
+    verify(broker, timeout(10000))
+        .postData(FetchedCopybookEvent.builder().name(INVALID_CPY_NAME).build());
+    verify(broker, timeout(10000))
+        .postData(
+            FetchedCopybookEvent.builder()
+                .name(PARENT_CPY_NAME)
+                .content(PARENT_CONTENT)
+                .uri(PARENT_CPY_URI)
+                .build());
+
+    verify(broker, timeout(10000))
+        .postData(FetchedCopybookEvent.builder().name(NESTED_CPY_NAME).build());
+
+    // Notify that analysis finished sending the document URI and copybook names that have nested
+    // copybooks
+    copybookService.observerCallback(
+        AnalysisFinishedEvent.builder()
+            .documentUri(DOCUMENT_URI)
+            .copybookUris(asList(PARENT_CPY_URI, DOCUMENT_URI))
+            .build());
+
+    verify(settingsService, times(1))
+        .getConfigurations(
+            asList("copybook-download.document.nested", "copybook-download.document.INVALID"));
   }
 }

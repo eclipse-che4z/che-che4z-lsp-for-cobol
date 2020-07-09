@@ -122,10 +122,14 @@ public class WatcherServiceImplTest {
     List<FileSystemWatcher> watchers =
         ((DidChangeWatchedFilesRegistrationOptions) registration.getRegisterOptions())
             .getWatchers();
-    assertEquals(1, watchers.size());
-    FileSystemWatcher watcher = watchers.get(0);
-    assertEquals("**/" + glob + "/**/*", watcher.getGlobPattern());
-    assertEquals(7, watcher.getKind().intValue());
+    assertEquals(2, watchers.size());
+    FileSystemWatcher fileWatcher = watchers.get(0);
+    assertEquals("**/" + glob + "/**/*", fileWatcher.getGlobPattern());
+    assertEquals(7, fileWatcher.getKind().intValue());
+
+    FileSystemWatcher folderWatcher = watchers.get(1);
+    assertEquals("**/" + glob, folderWatcher.getGlobPattern());
+    assertEquals(7, folderWatcher.getKind().intValue());
   }
 
   private void assertRegistrationParams(RegistrationParams params) {

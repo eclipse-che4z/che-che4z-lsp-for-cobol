@@ -120,30 +120,6 @@ public class ServerCommunications implements Communications {
   }
 
   /**
-   * This method raise a popup message back to the user with a message customized by the enumeration
-   * class
-   *
-   * @param copybookMessageInfo the enum kind that represent the event that will be shown to the
-   *     user
-   */
-  @Override
-  public void notifyCopybookMessageInfo(CopybookMessageInfo copybookMessageInfo) {
-    CompletableFuture.runAsync(
-        () ->
-            showMessage(
-                MessageType.Error,
-                "Error during the copybook analysis, reason: " + copybookMessageInfo.getMessage()));
-  }
-
-  @Override
-  public void notifyLogMessageInfo(CopybookMessageInfo copybookMessageInfo) {
-    CompletableFuture.runAsync(
-        () ->
-            getClient()
-                .logMessage(new MessageParams(MessageType.Info, copybookMessageInfo.getMessage())));
-  }
-
-  /**
    * This method raise a diagnostic message to the client with syntax error retrivied by the Cobol
    * LSP server
    *
