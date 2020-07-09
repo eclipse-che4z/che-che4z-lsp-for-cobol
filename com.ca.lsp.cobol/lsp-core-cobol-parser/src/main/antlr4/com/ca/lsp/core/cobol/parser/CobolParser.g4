@@ -2399,10 +2399,6 @@ generalIdentifier
    : qualifiedDataName | tableCall | functionCall | specialRegister
    ;
 
-localIdentifier
-   : tableCall | functionCall | specialRegister
-   ;
-
 tableCall
    : dataName2 (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
    ;
