@@ -37,7 +37,6 @@ import java.util.concurrent.ExecutionException;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -68,7 +67,7 @@ public class WorkspaceServiceTest {
         service.executeCommand(
             new ExecuteCommandParams(
                 MISSING_COPYBOOK.name(),
-                asList(new JsonPrimitive(copybookName), new JsonPrimitive(DOCUMENT_URI))));
+                List.of(new JsonPrimitive(copybookName), new JsonPrimitive(DOCUMENT_URI))));
 
     try {
       assertNull(result.get());

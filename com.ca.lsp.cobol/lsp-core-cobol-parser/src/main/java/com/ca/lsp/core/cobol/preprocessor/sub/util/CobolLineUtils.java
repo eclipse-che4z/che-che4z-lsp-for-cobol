@@ -19,6 +19,7 @@ import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
+import java.util.function.Predicate;
 
 /** The utility class for CobolLine operations, e.g. copy in different ways */
 @UtilityClass
@@ -95,5 +96,13 @@ public class CobolLineUtils {
   @Nonnull
   private String extractContentAreaB(@Nonnull String contentArea) {
     return contentArea.length() > 4 ? contentArea.substring(4) : "";
+  }
+
+  public long  getEmptyLinesCount(@Nonnull String txt) {
+    return txt.lines().filter(String::isBlank).count();
+  }
+
+  public long  getNonEmptyLinesCount(@Nonnull String txt) {
+    return txt.lines().filter(Predicate.not(String::isEmpty)).count();
   }
 }

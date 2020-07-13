@@ -6,7 +6,7 @@ kind: Pod
 spec:
   containers:
   - name: maven
-    image: maven:alpine
+    image: maven:3-openjdk-11
     command:
     - cat
     tty: true

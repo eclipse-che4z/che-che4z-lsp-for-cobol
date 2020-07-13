@@ -54,7 +54,7 @@ public class CompletionResolutionTest extends ConfigurableTest {
         unresolved,
         c -> {
           assertNotNull(c.getValue());
-          assertFalse(c.getValue().isEmpty());
+          assertFalse(c.getValue().isBlank());
         });
   }
 
