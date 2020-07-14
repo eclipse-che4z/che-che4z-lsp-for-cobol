@@ -34,7 +34,6 @@ public class TestExtraSymbolsNotCauseErrorOnNextLine {
 
   private static final String MESSAGE = "The line doesn't match the fixed format";
 
-  @Ignore
   @Test
   public void test() {
     UseCaseEngine.runTest(
