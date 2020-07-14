@@ -53,6 +53,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestIdentificationDivisionInCopybook.class,
   TestUndefinedParentVariableUnderlined.class,
   TestEntireProcedureDivisionInCopybook.class,
+  TestReplacingForSeveralTokensInOneLine.class,
   TestExtraSymbolsNotCauseErrorOnNextLine.class,
   TestVariableStructureIsBuiltWithCopybooks.class,
   TestVariableUsedSeveralTimesInOneStatement.class,

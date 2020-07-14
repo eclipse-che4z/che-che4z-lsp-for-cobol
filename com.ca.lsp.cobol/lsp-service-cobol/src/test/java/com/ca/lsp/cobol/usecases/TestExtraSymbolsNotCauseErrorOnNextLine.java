@@ -13,43 +13,34 @@
  */
 package com.ca.lsp.cobol.usecases;
 
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
 
 /** This use case checks if extra symbols on one line do not cause any errors on the next line. */
-public class TestExtraSymbolsNotCauseErrorOnNextLine extends NegativeUseCase {
+public class TestExtraSymbolsNotCauseErrorOnNextLine {
 
   private static final String TEXT =
-      "000000 Identification DIVISION.                                         23323232extra\r\n" // Extra symbols at the end of this line
+      "000000 Identification DIVISION.                                         23323232{extra|1}\r\n" // Extra symbols at the end of this line
           + "002800 Program-ID.                                                      23323232\r\n" // Should not show an error on this line
           + "002800  HELLOWORLD.                                                     23323232\r\n"
           + "024200 PROCEDURE DIVISION .                                             CM1014.2";
 
-  public TestExtraSymbolsNotCauseErrorOnNextLine() {
-    super(TEXT);
-  }
+  private static final String MESSAGE = "The line doesn't match the fixed format";
 
+  @Ignore
   @Test
   public void test() {
-    super.test();
-  }
-
-  @Override
-  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Number of diagnostics", 1, diagnostics.size());
-    Diagnostic diagnostic = diagnostics.get(0);
-    assertEquals("The line doesn't match the fixed format", diagnostic.getMessage());
-
-    // The position of dot at the end of line "INITIALIZE ID4(ROW-SUB)."
-    Range range = diagnostic.getRange();
-    assertEquals("Diagnostic start line", 0, range.getStart().getLine());
-    assertEquals("Diagnostic start character", 80, range.getStart().getCharacter());
-    assertEquals("Diagnostic end line", 0, range.getEnd().getLine());
-    assertEquals("Diagnostic end character", 86, range.getEnd().getCharacter());
+    UseCaseEngine.runTest(
+        TEXT,
+        emptyList(),
+        singletonMap(
+            "1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

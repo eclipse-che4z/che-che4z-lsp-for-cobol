@@ -14,45 +14,34 @@
 
 package com.ca.lsp.cobol.usecases;
 
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** This test checks that if a copybook not found then error shown. */
-public class TestMissingCopybooksReturnsError extends NegativeUseCase {
+public class TestMissingCopybooksReturnsError {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
-          + "        COPY MISSING-COPYBOOK.\n\n"
+          + "        COPY {~MISSCPY|missing}.\n\n"
           + "        PROCEDURE DIVISION.\n\n";
 
-  public TestMissingCopybooksReturnsError() {
-    super(TEXT);
-  }
-
-  @Override
   @Test
   public void test() {
-    super.test();
-  }
-
-  @Override
-  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Number of diagnostics", 1, diagnostics.size());
-    Diagnostic diagnostic = diagnostics.get(0);
-    assertEquals("MISSING-COPYBOOK: Copybook not found", diagnostic.getMessage());
-
-    Range range = diagnostic.getRange();
-    assertEquals("Diagnostic start line", 4, range.getStart().getLine());
-    assertEquals("Diagnostic start character", 13, range.getStart().getCharacter());
-    assertEquals("Diagnostic end line", 4, range.getEnd().getLine());
-    assertEquals("Diagnostic end character", 29, range.getEnd().getCharacter());
+    UseCaseEngine.runTest(
+        TEXT,
+        emptyList(),
+        singletonMap(
+            "missing",
+            new Diagnostic(
+                null, "MISSCPY: Copybook not found", Error, ERROR.getText(), "MISSING_COPYBOOK")));
   }
 }

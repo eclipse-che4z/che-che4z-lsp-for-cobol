@@ -15,21 +15,21 @@
 
 package com.ca.lsp.cobol.usecases;
 
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
 
 /**
  * This test checks that the remarks not marked as comments, and the syntax analysis applied.
  *
  * <p>The REMARKS is an old syntax that is not supported anymore, so it should be marked as error.
  */
-public class TestRemarksAreUnsupported extends NegativeUseCase {
+public class TestRemarksAreUnsupported {
 
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -38,7 +38,7 @@ public class TestRemarksAreUnsupported extends NegativeUseCase {
           + "      *REMARKS.\n"
           + "      ******************************************************************\n"
           + "\n"
-          + "             INPUT FILE           - DDS0001.PATSRCH\n"
+          + "             {INPUT|unsupported} FILE           - DDS0001.PATSRCH\n"
           + "\n"
           + "             VSAM MASTER FILES    - DDS0001.PATMASTR & DDS0001.PATPERSN\n"
           + "\n"
@@ -52,39 +52,20 @@ public class TestRemarksAreUnsupported extends NegativeUseCase {
           + "\n"
           + "       ENVIRONMENT DIVISION.";
 
-  public TestRemarksAreUnsupported() {
-    super(TEXT);
-  }
-
   @Test
   public void test() {
-    super.test();
-  }
-
-  /**
-   * Assert that the error range points to the 'INPUT' at line 6
-   *
-   * @param diagnostics - errors found by syntax analysis
-   */
-  @Override
-  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
-
-    assertEquals("Number of diagnostics", 1, diagnostics.size());
-    Diagnostic diagnostic = diagnostics.get(0);
-    assertEquals(
-        "Syntax error on 'INPUT' expected "
-            + "{<EOF>, AUTHOR, DATA, DATE_COMPILED, DATE_WRITTEN, "
-            + "END, ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, "
-            + "PROCEDURE, SECURITY, COMMENTENTRYLINE}",
-        diagnostic.getMessage());
-
-    Range range = diagnostic.getRange();
-    Position start = range.getStart();
-    Position end = range.getEnd();
-
-    assertEquals("Diagnostic start line", 6, start.getLine());
-    assertEquals("Diagnostic start character", 13, start.getCharacter());
-    assertEquals("Diagnostic end line", 6, end.getLine());
-    assertEquals("Diagnostic end character", 18, end.getCharacter());
+    UseCaseEngine.runTest(
+        TEXT,
+        emptyList(),
+        singletonMap(
+            "unsupported",
+            new Diagnostic(
+                null,
+                "Syntax error on 'INPUT' expected "
+                    + "{<EOF>, AUTHOR, DATA, DATE_COMPILED, DATE_WRITTEN, "
+                    + "END, ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, "
+                    + "PROCEDURE, SECURITY, COMMENTENTRYLINE}",
+                DiagnosticSeverity.Error,
+                ERROR.getText())));
   }
 }

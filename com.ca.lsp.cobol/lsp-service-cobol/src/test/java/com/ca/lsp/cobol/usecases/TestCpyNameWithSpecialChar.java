@@ -14,50 +14,40 @@
 
 package com.ca.lsp.cobol.usecases;
 
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
 
 /**
  * This test proves that special chars (@,#,$) in copybook name recognized correctly, and the error
  * appears because of the missing copybook.
  */
-public class TestCpyNameWithSpecialChar extends NegativeUseCase {
+public class TestCpyNameWithSpecialChar {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
-          + "        01 VAR1.\r\n"
-          + "          02 VAR2.\r\n"
-          + "        COPY @SPE#-$.\r\n"
+          + "        01 {$*VAR1}.\r\n"
+          + "          02 {$*VAR2}.\r\n"
+          + "        COPY {~@SPE#-$|1}.\r\n"
           + "        PROCEDURE DIVISION.\r\n";
 
-  public TestCpyNameWithSpecialChar() {
-    super(TEXT);
-  }
+  private static final String MESSAGE = "@SPE#-$: Copybook not found";
+  private static final String CODE = "MISSING_COPYBOOK";
 
   @Test
   public void test() {
-    super.test();
-  }
-
-  @Override
-  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Number of diagnostics", 1, diagnostics.size());
-
-    Diagnostic diagnostic = diagnostics.get(0);
-    assertEquals("@SPE#-$: Copybook not found", diagnostic.getMessage());
-
-    Range range = diagnostic.getRange();
-    assertEquals("Diagnostic start line", 6, range.getStart().getLine());
-    assertEquals("Diagnostic start character", 13, range.getStart().getCharacter());
-    assertEquals("Diagnostic end line", 6, range.getEnd().getLine());
-    assertEquals("Diagnostic end character", 20, range.getEnd().getCharacter());
+    UseCaseEngine.runTest(
+        TEXT,
+        emptyList(),
+        singletonMap(
+            "1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText(), CODE)));
   }
 }

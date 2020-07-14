@@ -15,55 +15,62 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.positive.CobolText;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 
 /**
- * This test checks the error shown if the copybook that is used in the Cobol file contains a link
+ * This test checks the error shown if the copybook that is used in the COBOL file contains a link
  * to another one, that has a dependency to the first copybook.
  */
-public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends NegativeUseCase {
+public class TestCopybookWithIndirectRecursiveDependencyIsDetected {
 
   private static final String TEXT =
-      "        IDENTIFICATION DIVISION.\r\n"
-          + "        PROGRAM-ID. test1.\r\n"
-          + "        DATA DIVISION.\r\n"
-          + "        WORKING-STORAGE SECTION.\r\n"
-          + "        COPY INDIRECT-COPY.\n\n"
-          + "        PROCEDURE DIVISION.\n\n";
+      "        IDENTIFICATION DIVISION.\n"
+          + "        PROGRAM-ID. test1.\n"
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        COPY {~INDIRECT-COPY|1|3}.\n"
+          + "        PROCEDURE DIVISION.\n";
 
-  private static final String INDIRECT_COPY = "        COPY INNER-COPY.";
-  private static final String INNER_COPY = "        COPY INDIRECT-COPY.";
+  private static final String INDIRECT = "        COPY {~INNER-COPY|2|4}.";
+  private static final String INNER_COPY = "        COPY {~INDIRECT-COPY|3}.";
 
-  public TestCopybookWithIndirectRecursiveDependencyIsDetected() {
-    super(TEXT);
-  }
+  private static final String INDIRECT_NAME = "INDIRECT-COPY";
+  private static final String INNER_COPY_NAME = "INNER-COPY";
 
-  @Override
+  private static final String MESSAGE_RECURSION = "Recursive copybook declaration for: ";
+  private static final String MESSAGE_LONG_DECLARATION =
+      "Copybook declaration has more than 8 characters for: ";
+
   @Test
   public void test() {
-    super.test(
-        asList(
-            new CobolText("INNER-COPY", INNER_COPY),
-            new CobolText("INDIRECT-COPY", INDIRECT_COPY)));
-  }
+    Map<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+    expectedDiagnostics.put(
+        "1", new Diagnostic(null, MESSAGE_RECURSION + INDIRECT_NAME, Error, ERROR.getText()));
+    expectedDiagnostics.put(
+        "2", new Diagnostic(null, MESSAGE_RECURSION + INNER_COPY_NAME, Error, ERROR.getText()));
+    expectedDiagnostics.put(
+        "3",
+        new Diagnostic(
+            null, MESSAGE_LONG_DECLARATION + INDIRECT_NAME, Information, INFO.getText()));
+    expectedDiagnostics.put(
+        "4",
+        new Diagnostic(
+            null, MESSAGE_LONG_DECLARATION + INNER_COPY_NAME, Information, INFO.getText()));
 
-  @Override
-  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Number of diagnostics", 1, diagnostics.size());
-    Diagnostic diagnostic = diagnostics.get(0);
-    assertEquals("Recursive copybook declaration for: INDIRECT-COPY", diagnostic.getMessage());
-
-    Range range = diagnostic.getRange();
-    assertEquals("Diagnostic start line", 4, range.getStart().getLine());
-    assertEquals("Diagnostic start character", 13, range.getStart().getCharacter());
-    assertEquals("Diagnostic end line", 4, range.getEnd().getLine());
-    assertEquals("Diagnostic end character", 26, range.getEnd().getCharacter());
+    UseCaseEngine.runTest(
+        TEXT,
+        asList(new CobolText(INNER_COPY_NAME, INNER_COPY), new CobolText(INDIRECT_NAME, INDIRECT)),
+        expectedDiagnostics);
   }
 }

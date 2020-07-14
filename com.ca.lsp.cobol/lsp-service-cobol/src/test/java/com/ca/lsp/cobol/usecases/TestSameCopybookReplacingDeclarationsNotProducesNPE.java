@@ -16,17 +16,11 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Location;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
-import java.util.List;
-import java.util.Map;
-
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
 
 /**
  * This test verifies that several similar COPY statements with REPLACING does not produce
@@ -34,91 +28,24 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestSameCopybookReplacingDeclarationsNotProducesNPE {
 
-  private static final String DOCUMENT =
+  private static final String TEXT =
       "0      IDENTIFICATION DIVISION.\n"
           + "1      PROGRAM-ID. TESTREPL.\n"
           + "2      DATA DIVISION.\n"
           + "3      WORKING-STORAGE SECTION.\n"
-          + "4      01  PARENT.\n"
-          + "5      COPY REPL REPLACING ==:TAG:== BY ==ABC==.\n"
-          + "6      COPY REPL REPLACING ==:TAG:== BY ==ABC==.\n"
+          + "4      01  {$*PARENT}.\n"
+          + "5      COPY {~REPL} REPLACING ==:TAG:== BY ==ABC==.\n"
+          + "6      COPY {~REPL} REPLACING ==:TAG:== BY ==ABC==.\n"
           + "7      PROCEDURE DIVISION.\n"
-          + "8      MAINLINE.\n"
-          + "9      MOVE 0 TO ABC-ID.\n"
+          + "8      {#*MAINLINE}.\n"
+          + "9      MOVE 0 TO {$ABC-ID}.\n"
           + "10     GOBACK. ";
 
-  private static final String REPL = "       05 :TAG:-ID PIC 9.\n";
+  private static final String REPL = "       05 {$*:TAG:-ID^ABC-ID} PIC 9.\n";
   private static final String REPL_NAME = "REPL";
-  private static final String REPL_URI = toURI(REPL_NAME);
-
-  private static final String PARENT = "PARENT";
-  private static final String MAINLINE = "MAINLINE";
-  private static final String ABC_ID = "ABC-ID";
 
   @Test
   public void test() {
-    AnalysisResult result = analyze(DOCUMENT, singletonList(new CobolText(REPL_NAME, REPL)));
-
-    assertDiagnostics(result.getDiagnostics());
-
-    assertCopybookUsages(result.getCopybookUsages());
-    assertCopybookDefinitions(result.getCopybookDefinitions());
-
-    assertVariableDefinitions(result.getVariableDefinitions());
-    assertVariableUsages(result.getVariableUsages());
-
-    assertParagraphDefinitions(result.getParagraphDefinitions());
-    assertParagraphUsages(result.getParagraphUsages());
-  }
-
-  private void assertDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
-    String message = "Diagnostics: " + diagnostics.toString();
-    assertEquals(message, 0, diagnostics.get(DOCUMENT_URI).size());
-    assertEquals(message, 0, diagnostics.get(REPL_URI).size());
-  }
-
-  private void assertCopybookUsages(Map<String, List<Location>> copybookUsages) {
-    assertEquals("Copybook usages: " + copybookUsages.toString(), 1, copybookUsages.size());
-    assertNumberOfLocations(copybookUsages, REPL_NAME, 2);
-    assertLocation(copybookUsages, REPL_NAME, DOCUMENT_URI, 5, 12);
-    assertLocation(copybookUsages, REPL_NAME, DOCUMENT_URI, 6, 12);
-  }
-
-  private void assertCopybookDefinitions(Map<String, List<Location>> copybookDefinitions) {
-    assertEquals(
-        "Copybook definitions: " + copybookDefinitions.toString(), 1, copybookDefinitions.size());
-    assertCopybookDefinition(copybookDefinitions, REPL_NAME);
-  }
-
-  private void assertParagraphUsages(Map<String, List<Location>> paragraphUsages) {
-    assertEquals("Paragraph usages: " + paragraphUsages.toString(), 0, paragraphUsages.size());
-  }
-
-  private void assertParagraphDefinitions(Map<String, List<Location>> paragraphDefinitions) {
-    assertEquals(
-        "Paragraph definitions: " + paragraphDefinitions.toString(),
-        1,
-        paragraphDefinitions.size());
-
-    assertNumberOfLocations(paragraphDefinitions, MAINLINE, 1);
-    assertLocation(paragraphDefinitions, MAINLINE, DOCUMENT_URI, 8, 7);
-  }
-
-  private void assertVariableUsages(Map<String, List<Location>> variableUsages) {
-    assertEquals("Variable usages: " + variableUsages.toString(), 1, variableUsages.size());
-
-    assertNumberOfLocations(variableUsages, ABC_ID, 1);
-    assertLocation(variableUsages, ABC_ID, DOCUMENT_URI, 9, 17);
-  }
-
-  private void assertVariableDefinitions(Map<String, List<Location>> variableDefinitions) {
-    assertEquals(
-        "Variable usages: " + variableDefinitions.toString(), 2, variableDefinitions.size());
-
-    assertNumberOfLocations(variableDefinitions, PARENT, 1);
-    assertLocation(variableDefinitions, PARENT, DOCUMENT_URI, 4, 11);
-
-    assertNumberOfLocations(variableDefinitions, ABC_ID, 1);
-    assertLocation(variableDefinitions, ABC_ID, REPL_URI, 0, 10);
+    UseCaseEngine.runTest(TEXT, singletonList(new CobolText(REPL_NAME, REPL)), emptyMap());
   }
 }

@@ -15,50 +15,38 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.positive.CobolText;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.Test;
 
-import java.util.List;
-
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
+import static java.util.Collections.singletonMap;
 /**
  * This test checks that the error shown if the copybook that is used in the Cobol file contains a
  * link to itself.
  */
-public class TestCopybookWithRecursiveDependencyIsDetected extends NegativeUseCase {
+public class TestCopybookWithRecursiveDependencyIsDetected {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
-          + "        COPY RECURSIVE-COPY.\n\n"
+          + "        COPY {~REC-CPY|1}.\n\n"
           + "        PROCEDURE DIVISION.\n\n";
 
-  private static final String RECURSIVE_COPY = "        COPY RECURSIVE-COPY.";
+  private static final String REC_CPY = "        COPY {~REC-CPY}.";
+  private static final String REC_CPY_NAME = "REC-CPY";
+  private static final String MESSAGE = "Recursive copybook declaration for: " + REC_CPY_NAME;
 
-  public TestCopybookWithRecursiveDependencyIsDetected() {
-    super(TEXT);
-  }
-
-  @Override
   @Test
   public void test() {
-    super.test(singletonList(new CobolText("RECURSIVE-COPY", RECURSIVE_COPY)));
-  }
 
-  @Override
-  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Number of diagnostics", 1, diagnostics.size());
-    Diagnostic diagnostic = diagnostics.get(0);
-    assertEquals("Recursive copybook declaration for: RECURSIVE-COPY", diagnostic.getMessage());
-
-    Range range = diagnostic.getRange();
-    assertEquals("Diagnostic start line", 4, range.getStart().getLine());
-    assertEquals("Diagnostic start character", 13, range.getStart().getCharacter());
-    assertEquals("Diagnostic end line", 4, range.getEnd().getLine());
-    assertEquals("Diagnostic end character", 27, range.getEnd().getCharacter());
+    UseCaseEngine.runTest(
+        TEXT,
+        singletonList(new CobolText(REC_CPY_NAME, REC_CPY)),
+        singletonMap("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

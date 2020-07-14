@@ -16,17 +16,11 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Location;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
-import java.util.List;
-import java.util.Map;
-
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
 
 /**
  * This test verifies that the replacing statement changes the variable names in the given copybook
@@ -36,95 +30,27 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestMappingWithReplacing {
 
-  private static final String DOCUMENT =
+  private static final String TEXT =
       "       IDENTIFICATION DIVISION.\r\n"
           + "       PROGRAM-ID. TEST1.\r\n"
           + "       DATA DIVISION.\r\n"
           + "       WORKING-STORAGE SECTION.\r\n"
-          + "       01  PARENT.\r\n"
-          + "       COPY CUSTCOPY REPLACING ==:TAG:== BY ==CSTOUT==.\r\n"
+          + "       01  {$*PARENT}.\r\n"
+          + "       COPY {~CUSTCOPY} REPLACING ==:TAG:== BY ==CSTOUT==.\r\n"
           + "       PROCEDURE DIVISION.\r\n"
-          + "       MAINLINE.\r\n"
-          + "           MOVE 1 TO CSTOUT-ID OF CSTOUT-KEY OF PARENT.\r\n"
+          + "       {#*MAINLINE}.\r\n"
+          + "           MOVE 1 TO {$CSTOUT-ID} OF {$CSTOUT-KEY} OF {$PARENT}.\r\n"
           + "       GOBACK.";
 
   private static final String CUSTCOPY =
-      "           05  :TAG:-KEY.\r\n" + "               10  :TAG:-ID             PIC 9.\r\n";
+      "           05  {$*:TAG:-KEY^CSTOUT-KEY}.\r\n"
+          + "               10  {$*:TAG:-ID^CSTOUT-ID}             PIC 9.\r\n";
 
-  private static final String CUSTCOPY_URI = toURI("CUSTCOPY");
+  private static final String CUSTCOPY_NAME = "CUSTCOPY";
 
   @Test
   public void test() {
-    AnalysisResult result = analyze(DOCUMENT, singletonList(new CobolText("CUSTCOPY", CUSTCOPY)));
-
-    assertDiagnostics(result.getDiagnostics());
-
-    assertCopybookUsages(result.getCopybookUsages());
-    assertCopybookDefinitions(result.getCopybookDefinitions());
-
-    assertVariableDefinitions(result.getVariableDefinitions());
-    assertVariableUsages(result.getVariableUsages());
-
-    assertParagraphDefinitions(result.getParagraphDefinitions());
-    assertParagraphUsages(result.getParagraphUsages());
-  }
-
-  private void assertDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
-    String message = "Diagnostics: " + diagnostics.toString();
-    assertEquals(message, 0, diagnostics.get(DOCUMENT_URI).size());
-    assertEquals(message, 0, diagnostics.get(CUSTCOPY_URI).size());
-  }
-
-  private void assertCopybookUsages(Map<String, List<Location>> copybookUsages) {
-    assertEquals("Copybook usages: " + copybookUsages.toString(), 1, copybookUsages.size());
-    assertNumberOfLocations(copybookUsages, "CUSTCOPY", 1);
-    assertLocation(copybookUsages, "CUSTCOPY", DOCUMENT_URI, 5, 12);
-  }
-
-  private void assertCopybookDefinitions(Map<String, List<Location>> copybookDefinitions) {
-    assertEquals(
-        "Copybook definitions: " + copybookDefinitions.toString(), 1, copybookDefinitions.size());
-    assertCopybookDefinition(copybookDefinitions, "CUSTCOPY");
-  }
-
-  private void assertParagraphUsages(Map<String, List<Location>> paragraphUsages) {
-    assertEquals("Paragraph usages: " + paragraphUsages.toString(), 0, paragraphUsages.size());
-  }
-
-  private void assertParagraphDefinitions(Map<String, List<Location>> paragraphDefinitions) {
-    assertEquals(
-        "Paragraph definitions: " + paragraphDefinitions.toString(),
-        1,
-        paragraphDefinitions.size());
-
-    assertNumberOfLocations(paragraphDefinitions, "MAINLINE", 1);
-    assertLocation(paragraphDefinitions, "MAINLINE", DOCUMENT_URI, 7, 7);
-  }
-
-  private void assertVariableUsages(Map<String, List<Location>> variableUsages) {
-    assertEquals("Variable usages: " + variableUsages.toString(), 3, variableUsages.size());
-
-    assertNumberOfLocations(variableUsages, "PARENT", 1);
-    assertLocation(variableUsages, "PARENT", DOCUMENT_URI, 8, 48);
-
-    assertNumberOfLocations(variableUsages, "CSTOUT-KEY", 1);
-    assertLocation(variableUsages, "CSTOUT-KEY", DOCUMENT_URI, 8, 34);
-
-    assertNumberOfLocations(variableUsages, "CSTOUT-ID", 1);
-    assertLocation(variableUsages, "CSTOUT-ID", DOCUMENT_URI, 8, 21);
-  }
-
-  private void assertVariableDefinitions(Map<String, List<Location>> variableDefinitions) {
-    assertEquals(
-        "Variable usages: " + variableDefinitions.toString(), 3, variableDefinitions.size());
-
-    assertNumberOfLocations(variableDefinitions, "PARENT", 1);
-    assertLocation(variableDefinitions, "PARENT", DOCUMENT_URI, 4, 11);
-
-    assertNumberOfLocations(variableDefinitions, "CSTOUT-KEY", 1);
-    assertLocation(variableDefinitions, "CSTOUT-KEY", CUSTCOPY_URI, 0, 15);
-
-    assertNumberOfLocations(variableDefinitions, "CSTOUT-ID", 1);
-    assertLocation(variableDefinitions, "CSTOUT-ID", CUSTCOPY_URI, 1, 19);
+    UseCaseEngine.runTest(
+            TEXT, singletonList(new CobolText(CUSTCOPY_NAME, CUSTCOPY)), emptyMap());
   }
 }

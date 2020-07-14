@@ -14,36 +14,36 @@
 
 package com.ca.lsp.cobol.usecases;
 
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+
 /** This test checks that there are no errors on the "SKIP2" statement. */
-public class TestSkipStatement extends PositiveUseCase {
+public class TestSkipStatement {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. SKIP_TEST.\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
-          + "        01 ID0.\n"
-          + "        01 TAPARM1.\n"
+          + "        01 {$*ID0}.\n"
+          + "        01 {$*TAPARM1}.\n"
           + "        PROCEDURE DIVISION.\n"
-          + "       PROGA.\n"
+          + "       {#*PROGA}.\n"
           + "       SKIP1\n"
-          + "           PERFORM WITH TEST BEFORE UNTIL ID0 = 0\n"
-          + "             SUBTRACT 1 FROM TAPARM1\n"
+          + "           PERFORM WITH TEST BEFORE UNTIL {$ID0} = 0\n"
+          + "             SUBTRACT 1 FROM {$TAPARM1}\n"
           + "             CALL 'ID1'\n"
           + "           END-PERFORM.\n"
           + "        SKIP2.\n"
-          + "        PROGB.\n"
+          + "        {#*PROGB}.\n"
           + "        EXIT.\n"
           + "        EJECT";
 
-  public TestSkipStatement() {
-    super(TEXT);
-  }
-
   @Test
   public void test() {
-    super.test();
+    UseCaseEngine.runTest(TEXT, emptyList(), emptyMap());
   }
 }
