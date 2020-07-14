@@ -43,11 +43,6 @@ import static java.util.stream.Collectors.*;
 @Singleton
 public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final int FIRST_LINE_SEQ_AND_EXTRA_OP = 8;
-  private static final String COBOL_LANG_SUPPORT_LABEL = "COBOL Language Support";
-  private static final String ERROR_SRC_LABEL = "E";
-  private static final String WARNING_SRC_LABEL = "W";
-  private static final String INFO_SRC_LABEL = "I";
-  private static final String HINT_SRC_LABEL = "H";
   private static final int ERR_POS_INDEX = 1;
 
   private CobolLanguageEngine engine;
@@ -141,19 +136,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   }
 
   private static String setupSourceInfo(int severity) {
-    // if there is a syntax error source parameter will be SYNTAX_ERROR otherwise SEMANTIC_ERROR
-    switch (severity) {
-      case 1:
-        return COBOL_LANG_SUPPORT_LABEL + " - " + ERROR_SRC_LABEL;
-      case 2:
-        return COBOL_LANG_SUPPORT_LABEL + " - " + WARNING_SRC_LABEL;
-      case 3:
-        return COBOL_LANG_SUPPORT_LABEL + " - " + INFO_SRC_LABEL;
-      case 4:
-        return COBOL_LANG_SUPPORT_LABEL + " - " + HINT_SRC_LABEL;
-      default:
-        return COBOL_LANG_SUPPORT_LABEL;
-    }
+    return SourceInfoLevels.values()[severity - 1].getText();
   }
 
   private static DiagnosticSeverity checkSeverity(int severity) {
