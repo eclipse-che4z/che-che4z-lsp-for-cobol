@@ -49,6 +49,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestCorrectErrorUnderscorePosition.class,
   TestSameCopybooksWithDifferentCases.class,
   TestKeywordAsCopybookNotProducesNPE.class,
+  TestReplacingAppliedForCopybookNames.class,
   TestMissingCopybookNotInVariableList.class,
   TestIdentificationDivisionInCopybook.class,
   TestUndefinedParentVariableUnderlined.class,

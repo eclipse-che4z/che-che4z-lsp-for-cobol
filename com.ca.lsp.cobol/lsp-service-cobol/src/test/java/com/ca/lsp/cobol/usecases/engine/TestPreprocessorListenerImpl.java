@@ -133,7 +133,7 @@ public class TestPreprocessorListenerImpl extends TestPreprocessorBaseListener {
       CopybookStatementContext ctx, Map<String, List<Location>> copybookUsages) {
     return it ->
         processToken(
-            it.getText(), ctx, it.replacement(), copybookUsages, ctx.diagnostic());
+            it.cpyName().getText(), ctx, it.replacement(), copybookUsages, ctx.diagnostic());
   }
 
   @Override
