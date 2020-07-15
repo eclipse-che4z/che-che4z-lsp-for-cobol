@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ca.lsp.core.cobol.model.ErrorSeverity.ERROR;
 import static java.util.Collections.reverse;
 
 public class ParserListener extends BaseErrorListener {
@@ -50,7 +51,7 @@ public class ParserListener extends BaseErrorListener {
             .startToken((CommonToken) offendingSymbol)
             .ruleStack(stack)
             .suggestion(suggestion)
-            .severity(1)
+            .severity(ERROR)
             .build());
   }
 }

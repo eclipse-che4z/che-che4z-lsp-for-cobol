@@ -32,6 +32,8 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import javax.annotation.Nullable;
 import java.util.*;
 
+import static com.ca.lsp.core.cobol.model.ErrorSeverity.INFO;
+import static com.ca.lsp.core.cobol.model.ErrorSeverity.WARNING;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -43,8 +45,6 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  * definition. If there is a misspelled keyword, the visitor finds it and throws a warning.
  */
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {
-  private static final int WARNING_LEVEL = 2;
-  private static final int INFO_LEVEL = 3;
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
   @Getter private Map<Token, Position> mapping = new HashMap<>();
@@ -298,7 +298,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     errors.add(
         SyntaxError.syntaxError()
             .suggestion("Invalid definition for: " + dataName)
-            .severity(INFO_LEVEL)
+            .severity(INFO)
             .startToken(startToken)
             .stopToken(stopToken)
             .build());
@@ -313,7 +313,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     SyntaxError error =
         SyntaxError.syntaxError()
             .suggestion("A misspelled word, maybe you want to put " + suggestion)
-            .severity(WARNING_LEVEL)
+            .severity(WARNING)
             .startToken(token)
             .build();
     errors.add(error);

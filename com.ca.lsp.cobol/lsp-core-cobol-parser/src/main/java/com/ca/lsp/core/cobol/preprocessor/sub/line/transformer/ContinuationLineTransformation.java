@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.ca.lsp.core.cobol.model.ErrorSeverity.ERROR;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CONT_LINE_NO_AREA_A_REGEX;
 
 /**
@@ -175,7 +176,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
                 cobolLineTrimmedLength,
                 null))
         .suggestion("IGYDS1082-E A period was required.")
-        .severity(1)
+        .severity(ERROR)
         .build();
   }
 
@@ -186,7 +187,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
             new Position(
                 uri, startPosition, END_INDEX_CONTENT_AREA_A, lineNumber, startPosition, null))
         .suggestion("A continuation line cannot contain values in the Content Area A")
-        .severity(1)
+        .severity(ERROR)
         .build();
   }
 }
