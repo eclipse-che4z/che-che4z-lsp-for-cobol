@@ -17,13 +17,6 @@ import {JavaCheck} from "../services/JavaCheck";
 
 describe("Checks Java version", () => {
     it("If Java version is supported", async () => {
-        expect(JavaCheck.isJavaVersionSupported('openjdk version "1.8.0-internal"')).toBeTruthy();
-        expect(JavaCheck.isJavaVersionSupported('java version "1.8.0_181"')).toBeTruthy();
-        expect(JavaCheck.isJavaVersionSupported('openjdk version "1.11.0-internal"')).toBeTruthy();
-        expect(JavaCheck.isJavaVersionSupported('java version "1.11.0_181"')).toBeTruthy();
-        expect(JavaCheck.isJavaVersionSupported('java version "10.0.1" 2018-04-17')).toBeTruthy();
-        expect(JavaCheck.isJavaVersionSupported('java version "9"')).toBeTruthy();
-        expect(JavaCheck.isJavaVersionSupported('java version "1.8.0_131"')).toBeTruthy();
         expect(JavaCheck.isJavaVersionSupported('openjdk version "11.0.1" 2018-10-16')).toBeTruthy();
         expect(JavaCheck.isJavaVersionSupported('openjdk version "12.0.1" 2018-10-16')).toBeTruthy();
         expect(JavaCheck.isJavaVersionSupported("java 11 2018-09-25")).toBeTruthy();
@@ -33,6 +26,13 @@ describe("Checks Java version", () => {
     });
 
     it("If Java version is not supported", async () => {
+        expect(JavaCheck.isJavaVersionSupported('openjdk version "1.11.0-internal"')).toBeFalsy();
+        expect(JavaCheck.isJavaVersionSupported('java version "1.11.0_181"')).toBeFalsy();
+        expect(JavaCheck.isJavaVersionSupported('java version "10.0.1" 2018-04-17')).toBeFalsy();
+        expect(JavaCheck.isJavaVersionSupported('java version "9.0.1"')).toBeFalsy();        
+        expect(JavaCheck.isJavaVersionSupported('openjdk version "1.8.0-internal"')).toBeFalsy();        
+        expect(JavaCheck.isJavaVersionSupported('java version "1.8.0_131"')).toBeFalsy();
+        expect(JavaCheck.isJavaVersionSupported('java version "1.8.0_181"')).toBeFalsy();
         expect(JavaCheck.isJavaVersionSupported('java version "1.7.0_131"')).toBeFalsy();
         expect(JavaCheck.isJavaVersionSupported('java version "1.5.0_22"')).toBeFalsy();
     });
@@ -44,8 +44,8 @@ describe("Checks Java installation", () => {
     let map: any;
     let checkFn: any;
     let stderrFn: any;
-    const expectedErrMsgSupportedJavaVersion = "Minimum expected Java version is 8";
-    const expectedErrMsgJavaVersionNotFound = "Java 8 is not found";
+    const expectedErrMsgSupportedJavaVersion = "Minimum expected Java version is 11";
+    const expectedErrMsgJavaVersionNotFound = "Java 11 is not found";
 
     beforeEach(() => {
         javaCheck = new JavaCheck();

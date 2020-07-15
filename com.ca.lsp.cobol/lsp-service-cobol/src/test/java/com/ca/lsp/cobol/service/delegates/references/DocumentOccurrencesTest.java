@@ -26,7 +26,6 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
@@ -89,7 +88,7 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
         LangServerCtx.getInjector().getInstance(MockCopybookService.class);
     copybookService.setCopybooks(
         () ->
-            Arrays.asList(new CobolText("CPYBK1", COPYBOOK1), new CobolText("CPYBK2", COPYBOOK2)));
+            List.of(new CobolText("CPYBK1", COPYBOOK1), new CobolText("CPYBK2", COPYBOOK2)));
     runTextValidation(service, TEXT);
     waitForDiagnostics(client);
   }

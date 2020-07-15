@@ -68,6 +68,7 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected {
         new Diagnostic(
             null, MESSAGE_LONG_DECLARATION + INNER_COPY_NAME, Information, INFO.getText()));
 
+
     UseCaseEngine.runTest(
         TEXT,
         asList(new CobolText(INNER_COPY_NAME, INNER_COPY), new CobolText(INDIRECT_NAME, INDIRECT)),

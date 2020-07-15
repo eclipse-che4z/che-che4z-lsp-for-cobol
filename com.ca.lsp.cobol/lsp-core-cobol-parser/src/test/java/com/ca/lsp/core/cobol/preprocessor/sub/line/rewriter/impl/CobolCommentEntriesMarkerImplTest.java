@@ -21,7 +21,6 @@ import java.util.List;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static com.ca.lsp.core.cobol.preprocessor.sub.util.impl.CobolLineUtils.copyCobolLineWithIndicatorAndContentArea;
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 /**
@@ -75,7 +74,8 @@ public class CobolCommentEntriesMarkerImplTest {
             WS, "AUTHOR. " + COMMENT_ENTRY_TAG + " SE.", line1);
 
     CobolLineReWriter marker = new CobolCommentEntriesMarkerImpl();
-    List<CobolLine> processedLines = marker.processLines(asList(line1, line2));
+
+    List<CobolLine> processedLines = marker.processLines(List.of(line1, line2));
     assertEquals(expected, processedLines.get(0));
     assertEquals(line2, processedLines.get(1));
   }

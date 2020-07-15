@@ -23,8 +23,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Collection;
+import java.util.List;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 @Slf4j
@@ -88,7 +88,7 @@ public class CobolCleanExtraLanguageTest {
 
   @Parameterized.Parameters
   public static Collection<Object> textsToTest() {
-    return asList(
+    return List.of(
         new Object[][] {
           {CICS_TAG, CICS_TEXT, LINE_PREFIX_CICS, CICS_EXPECTED_TEXT},
           {SQL_TAG, SQL_TEXT, LINE_PREFIX_SQL, SQL_EXPECTED_TEXT},
