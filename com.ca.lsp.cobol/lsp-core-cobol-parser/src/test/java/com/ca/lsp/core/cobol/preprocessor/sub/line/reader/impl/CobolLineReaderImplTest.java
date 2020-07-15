@@ -17,6 +17,7 @@ import com.ca.lsp.core.cobol.AbstractCobolLinePreprocessorTest;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
+import com.google.common.collect.Lists;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -85,9 +86,7 @@ public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
   public void testSkipEmptyLineAtEnd() {
     String firstLine =
         "000000 IDENTIFICATION DIVISION.                                         23323232";
-    List<String> lines = new ArrayList<>();
-    lines.add(firstLine);
-    lines.add("");
+    List<String> lines = Lists.newArrayList(firstLine, "");
 
     ResultWithErrors<List<CobolLine>> processed = processText(reduceLines(lines));
 
