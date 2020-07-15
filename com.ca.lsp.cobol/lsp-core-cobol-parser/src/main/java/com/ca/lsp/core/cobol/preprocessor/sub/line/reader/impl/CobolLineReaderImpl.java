@@ -29,6 +29,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.ca.lsp.core.cobol.model.ErrorSeverity.ERROR;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static java.util.regex.Pattern.compile;
 
@@ -170,7 +171,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
       @Nullable String uri, int lineNumber, int charPosition, int errorLength) {
     return SyntaxError.syntaxError()
         .suggestion("The line doesn't match the fixed format")
-        .severity(1)
+        .severity(ERROR)
         .position(
             new Position(
                 uri,

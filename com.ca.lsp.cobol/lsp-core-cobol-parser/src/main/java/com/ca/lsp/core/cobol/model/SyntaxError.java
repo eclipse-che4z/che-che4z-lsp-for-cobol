@@ -29,7 +29,7 @@ public class SyntaxError {
   Token stopToken;
   List<String> ruleStack;
   String suggestion;
-  int severity;
+  ErrorSeverity severity;
   ErrorCode errorCode;
 
   // Please, don't use static imports for this method:
@@ -41,7 +41,7 @@ public class SyntaxError {
       Token stopToken,
       List<String> ruleStack,
       String suggestion,
-      int severity,
+      ErrorSeverity severity,
       ErrorCode errorCode) {
     this.position = position;
     this.startToken = startToken;

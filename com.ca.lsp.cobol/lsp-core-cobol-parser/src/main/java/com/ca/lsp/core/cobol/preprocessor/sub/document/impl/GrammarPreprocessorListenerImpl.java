@@ -18,12 +18,12 @@ import com.ca.lsp.core.cobol.model.*;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.*;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -40,6 +40,8 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
+import static com.ca.lsp.core.cobol.model.ErrorSeverity.ERROR;
+import static com.ca.lsp.core.cobol.model.ErrorSeverity.INFO;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -366,7 +368,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private void reportRecursiveCopybook(CopybookUsage usage) {
     errors.add(
         SyntaxError.syntaxError()
-            .severity(1)
+            .severity(ERROR)
             .suggestion(String.format(RECURSION_DETECTED, usage.getName()))
             .position(usage.getPosition())
             .build());
@@ -377,7 +379,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         SyntaxError.syntaxError()
             .position(position)
             .suggestion(format(ERROR_SUGGESTION, copybookName))
-            .severity(1)
+            .severity(ERROR)
             .errorCode(MISSING_COPYBOOK)
             .build());
   }
@@ -386,7 +388,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (copybookName != null && copybookName.length() > 8) {
       errors.add(
           SyntaxError.syntaxError()
-              .severity(3)
+              .severity(INFO)
               .suggestion(String.format(COPYBOOK_OVER_8_CHARACTERS, copybookName))
               .position(position)
               .build());

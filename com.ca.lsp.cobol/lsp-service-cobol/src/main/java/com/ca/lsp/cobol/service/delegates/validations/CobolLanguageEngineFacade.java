@@ -17,6 +17,7 @@ import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.cobol.service.TextDocumentSyncType;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ErrorCode;
+import com.ca.lsp.core.cobol.model.ErrorSeverity;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
@@ -135,12 +136,12 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     };
   }
 
-  private static String setupSourceInfo(int severity) {
-    return SourceInfoLevels.values()[severity - 1].getText();
+  private static String setupSourceInfo(ErrorSeverity severity) {
+    return SourceInfoLevels.values()[severity.ordinal()].getText();
   }
 
-  private static DiagnosticSeverity checkSeverity(int severity) {
-    return DiagnosticSeverity.forValue(severity);
+  private static DiagnosticSeverity checkSeverity(ErrorSeverity severity) {
+    return DiagnosticSeverity.forValue(severity.ordinal() + 1);
   }
 
   private static Range convertRange(Position position) {
