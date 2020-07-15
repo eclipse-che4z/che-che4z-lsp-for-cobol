@@ -23,7 +23,6 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
@@ -78,8 +77,8 @@ public class WatcherServiceImplTest {
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider);
 
-    watcherService.addWatchers(asList("foo/bar", "baz", "bar\\foo"));
-    assertEquals(asList("foo/bar", "baz", "bar\\foo"), watcherService.getWatchingFolders());
+    watcherService.addWatchers(List.of("foo/bar", "baz", "bar\\foo"));
+    assertEquals(List.of("foo/bar", "baz", "bar\\foo"), watcherService.getWatchingFolders());
 
     verify(client).registerCapability(captor.capture());
     RegistrationParams params = captor.getValue();
@@ -99,10 +98,10 @@ public class WatcherServiceImplTest {
     ArgumentCaptor<UnregistrationParams> captor = forClass(UnregistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider);
 
-    watcherService.addWatchers(asList("foo/bar", "baz", "bar\\foo"));
-    watcherService.removeWatchers(asList("non-existing", "foo/bar"));
+    watcherService.addWatchers(List.of("foo/bar", "baz", "bar\\foo"));
+    watcherService.removeWatchers(List.of("non-existing", "foo/bar"));
 
-    assertEquals(asList("baz", "bar\\foo"), watcherService.getWatchingFolders());
+    assertEquals(List.of("baz", "bar\\foo"), watcherService.getWatchingFolders());
 
     verify(client).unregisterCapability(captor.capture());
     UnregistrationParams params = captor.getValue();

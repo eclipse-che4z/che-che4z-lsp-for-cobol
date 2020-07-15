@@ -23,6 +23,7 @@ import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;
@@ -116,15 +117,17 @@ public class CobolVariableContext<T> implements SubContext<Variable, T> {
     // it cannot be a group item but just an element item
     List<Variable> variableList =
         getAll().stream()
-            .filter(
-                variable ->
-                    variable.getLevelNumber() != LEVEL_77 && variable.getLevelNumber() != LEVEL_66)
+            .filter(levelPredicate(LEVEL_77).and(levelPredicate(LEVEL_66)))
             .filter(variable -> variable.getLevelNumber() != -1)
             .collect(toList());
 
     for (int i = 0; i < variableList.size() - 1; i++) {
       generateRelations(variableList.get(i), variableList.get(i + 1));
     }
+  }
+
+  private Predicate<Variable> levelPredicate(int level) {
+    return v -> v.getLevelNumber() != level;
   }
 
   /**

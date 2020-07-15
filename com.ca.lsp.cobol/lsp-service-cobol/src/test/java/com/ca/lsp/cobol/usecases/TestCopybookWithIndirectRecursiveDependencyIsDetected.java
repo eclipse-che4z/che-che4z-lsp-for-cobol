@@ -21,7 +21,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -49,7 +48,7 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends Negat
   @Test
   public void test() {
     super.test(
-        asList(
+        List.of(
             new CobolText("INNER-COPY", INNER_COPY),
             new CobolText("INDIRECT-COPY", INDIRECT_COPY)));
   }

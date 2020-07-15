@@ -26,7 +26,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.util.reflection.FieldSetter;
 
-import java.lang.reflect.Field;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.NoSuchElementException;
@@ -64,7 +63,7 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
    */
   @Test
   public void testPersist() {
-    int prevCacheSize = repository.size();
+    var prevCacheSize = repository.size();
     repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
     assertEquals(repository.size(), prevCacheSize + 1);
   }
@@ -77,10 +76,10 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
    */
   @Test
   public void testCacheExpiration() throws NoSuchFieldException {
-    long genDt = Instant.now().minus(4, ChronoUnit.HOURS).getEpochSecond();
+    var genDt = Instant.now().minus(4, ChronoUnit.HOURS).getEpochSecond();
+    var storableCpy = new CopybookStorable("REMOVE", "URI", "DUMMY CONTENT");
 
-    CopybookStorable storableCpy = new CopybookStorable("REMOVE", "URI", "DUMMY CONTENT");
-    Field f = storableCpy.getClass().getDeclaredField("genDt");
+    var f = storableCpy.getClass().getDeclaredField("genDt");
     f.setAccessible(true);
     FieldSetter.setField(storableCpy, f, genDt);
 
@@ -104,17 +103,17 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
   public void testCacheSort() throws NoSuchFieldException {
     long genDt = Instant.now().minus(1, ChronoUnit.MILLIS).toEpochMilli();
 
-    CopybookStorable elem1 = new CopybookStorable("NEW_STO3", "URI", "DUMMY CONTENT");
+    var elem1 = new CopybookStorable("NEW_STO3", "URI", "DUMMY CONTENT");
 
     /*
      The mechanism is using ms to evaluate the time of creation, because the process is too fast there is a need
       for one ms delay
     */
-    Field f = elem1.getClass().getDeclaredField("genDt");
+    var f = elem1.getClass().getDeclaredField("genDt");
     f.setAccessible(true);
     FieldSetter.setField(elem1, f, genDt);
 
-    CopybookStorable elem2 = new CopybookStorable("NEW_STO1", "URI", "DUMMY CONTENT");
+    var elem2 = new CopybookStorable("NEW_STO1", "URI", "DUMMY CONTENT");
 
     /*
      Element1 and element2 are used as notation in order to make more visible the expected result
