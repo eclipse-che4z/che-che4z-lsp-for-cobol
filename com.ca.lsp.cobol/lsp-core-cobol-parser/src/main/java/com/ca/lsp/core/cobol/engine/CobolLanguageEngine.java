@@ -32,6 +32,8 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -64,8 +66,9 @@ public class CobolLanguageEngine {
    * @return Semantic information wrapper object and list of syntax error that might send back to
    *     the client
    */
+  @Nonnull
   public ResultWithErrors<SemanticContext> run(
-      String documentUri, String text, String textDocumentSyncType) {
+      @Nonnull String documentUri, @Nonnull String text, @Nonnull String textDocumentSyncType) {
 
     ResultWithErrors<ExtendedDocument> extendedDocument =
         preprocessor.process(documentUri, text, textDocumentSyncType);
@@ -98,7 +101,8 @@ public class CobolLanguageEngine {
     return new ResultWithErrors<>(buildSemanticContext(visitor, mapping), accumulatedErrors);
   }
 
-  private SemanticContext buildSemanticContext(CobolVisitor visitor, Map<Token, Position> mapping) {
+  private SemanticContext buildSemanticContext(
+      @Nonnull CobolVisitor visitor, @Nonnull Map<Token, Position> mapping) {
     return new SemanticContext(
         mapPositions(visitor.getVariables().getDefinitions(), mapping),
         mapPositions(visitor.getVariables().getUsages(), mapping),
@@ -109,30 +113,37 @@ public class CobolLanguageEngine {
   }
 
   private Map<String, Collection<Position>> mapPositions(
-      Multimap<String, Token> source, Map<Token, Position> mapping) {
+      @Nonnull Multimap<String, Token> source, @Nonnull Map<Token, Position> mapping) {
     return source.asMap().entrySet().stream()
         .collect(toMap(Map.Entry::getKey, mapPositions(mapping)));
   }
 
+  @Nonnull
   private Function<Map.Entry<String, Collection<Token>>, Collection<Position>> mapPositions(
-      Map<Token, Position> mapping) {
+      @Nonnull Map<Token, Position> mapping) {
     return it -> it.getValue().stream().map(mapping::get).collect(toSet());
   }
 
-  private List<SyntaxError> finalizeErrors(List<SyntaxError> errors, Map<Token, Position> mapping) {
+  @Nonnull
+  private List<SyntaxError> finalizeErrors(
+      @Nonnull List<SyntaxError> errors, @Nonnull Map<Token, Position> mapping) {
     return errors.stream()
         .map(convertError(mapping))
         .filter(it -> it.getPosition() != null)
         .collect(toList());
   }
 
-  private Function<SyntaxError, SyntaxError> convertError(Map<Token, Position> mapping) {
-      return err -> err.toBuilder()
-              .position(convertPositionRange(err.getStartToken(), err.getStopToken(), mapping))
-              .build();
+  @Nonnull
+  private Function<SyntaxError, SyntaxError> convertError(@Nonnull Map<Token, Position> mapping) {
+    return err ->
+        err.toBuilder()
+            .position(convertPositionRange(err.getStartToken(), err.getStopToken(), mapping))
+            .build();
   }
 
-  private Position convertPositionRange(Token start, Token stop, Map<Token, Position> mapping) {
+  @Nonnull
+  private Position convertPositionRange(
+      @Nonnull Token start, @Nullable Token stop, @Nonnull Map<Token, Position> mapping) {
     Position position = mapping.get(start);
     if (start == stop || stop == null) {
       return position;
