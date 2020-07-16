@@ -26,7 +26,7 @@ public enum SourceInfoLevels {
   ERROR("E"),
   WARNING("W"),
   INFO("I"),
-  HINT("I");
+  HINT("H");
 
   private static final String COBOL_LANG_SUPPORT_LABEL = "COBOL Language Support";
 
