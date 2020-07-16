@@ -26,6 +26,7 @@ import com.ca.lsp.cobol.service.TextDocumentSyncType;
 import com.ca.lsp.cobol.service.mocks.MockCopybookService;
 import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.experimental.UtilityClass;
@@ -67,11 +68,9 @@ public class UseCaseUtils {
   /**
    * Perform validation of the given text on the service.
    *
-   * <p>Deprecated - try using analyze, analyzeForErrors, or {@link *
-   * com.ca.lsp.cobol.usecases.engine.UseCaseEngine}
-   *
    * @param service - TextDocumentService instance to validate the text
    * @param text - COBOL text to be tested
+   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
    */
   @Deprecated
   public static void runTextValidation(TextDocumentService service, String text) {
@@ -85,11 +84,9 @@ public class UseCaseUtils {
    * implementation uses the default time to await. Checker example: await( () -> { return
    * !client.getReceivedDiagnostics().isEmpty(); });
    *
-   * <p>Deprecated - try using analyze, analyzeForErrors, or {@link
-   * com.ca.lsp.cobol.usecases.engine.UseCaseEngine}
-   *
    * @param checker - Lambda returning boolean, that will be used to check if the event occurred.
    *     Should return false if result has not appeared.
+   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
    */
   @Deprecated
   public static void await(Callable<Boolean> checker) {
@@ -102,12 +99,10 @@ public class UseCaseUtils {
    * implementation uses the default time to await. Checker example: await( () -> { return
    * !client.getReceivedDiagnostics().isEmpty(); });
    *
-   * <p>Deprecated - try using analyze, analyzeForErrors, or {@link
-   * com.ca.lsp.cobol.usecases.engine.UseCaseEngine}
-   *
    * @param checker - Lambda returning boolean, that will be used to check if the event occurred.
    *     Should return false if result has not appeared.
    * @param description - the TestLanguageClient that should receive the diagnostics
+   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
    */
   @Deprecated
   private static void await(Callable<Boolean> checker, String description) {
@@ -119,13 +114,11 @@ public class UseCaseUtils {
    * occurred. WARNING: use only in the thread that has been used to run the server. Checker
    * example: await( () -> { return !client.getReceivedDiagnostics().isEmpty(); });
    *
-   * <p>Deprecated - try using analyze, analyzeForErrors, or {@link
-   * com.ca.lsp.cobol.usecases.engine.UseCaseEngine}
-   *
    * @param checker - Lambda returning boolean, that will be used to check if the event occurred.
    *     Should return false if result has not appeared.
    * @param time - the maximum time to wait
    * @param description - the TestLanguageClient that should receive the diagnostics
+   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
    */
   @Deprecated
   private static void await(Callable<Boolean> checker, Long time, String description) {
@@ -139,10 +132,8 @@ public class UseCaseUtils {
    * Await when the client will receive the diagnostics in case if there are some syntax or format
    * errors.
    *
-   * <p>Deprecated - try using analyze, analyzeForErrors, or {@link
-   * com.ca.lsp.cobol.usecases.engine.UseCaseEngine}
-   *
    * @param client - the TestLanguageClient that should receive the diagnostics
+   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
    */
   @Deprecated
   public static void waitForDiagnostics(TestLanguageClient client) {
