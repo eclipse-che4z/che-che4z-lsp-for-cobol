@@ -23,7 +23,6 @@ import com.ca.lsp.cobol.service.delegates.communications.ServerCommunicationsTes
 import com.ca.lsp.cobol.service.delegates.completions.*;
 import com.ca.lsp.cobol.service.delegates.references.DocumentOccurrencesTest;
 import com.ca.lsp.cobol.usecases.UseCaseSuite;
-import com.ca.lsp.cobol.utils.KeywordsTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -36,7 +35,6 @@ import org.junit.runners.Suite.SuiteClasses;
   MyDocumentModelTest.class,
   MyTextDocumentServiceTest.class,
   UseCaseSuite.class,
-  KeywordsTest.class,
   VariableCompletionTest.class,
   CompletionsChainTest.class,
   SnippetCompletionTest.class,
