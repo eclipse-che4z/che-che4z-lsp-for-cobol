@@ -23,7 +23,6 @@ import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListen
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -36,7 +35,6 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
@@ -187,6 +185,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     String copybookName = retrieveCopybookName(copySource);
     Position position = retrievePosition(copySource);
     CopybookModel model = getCopyBookContent(copybookName, position);
+
     String uri = model.getUri();
     String rawContent = model.getContent();
     String copybookId = getCopybookId(uri, replacing);
@@ -288,7 +287,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   private CopybookModel getCopyBookContent(String copybookName, Position position) {
 
-    if (copybookName == null) return emptyModel(null);
+    if (copybookName.isEmpty()) return emptyModel(copybookName);
 
     if (hasRecursion(copybookName)) {
       copybookStack.forEach(this::reportRecursiveCopybook);
@@ -326,30 +325,22 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     return new CopybookModel(copybookName, "", "");
   }
 
-  @Nullable
+  @Nonnull
   private String retrieveCopybookName(@Nonnull CopySourceContext copySource) {
-    String copybookName;
-    if (copySource.cobolWord() != null) {
-      copybookName = copySource.cobolWord().getText().toUpperCase();
-    } else if (copySource.literal() != null) {
-      copybookName =
-          PreprocessorStringUtils.trimQuotes(copySource.literal().getText())
-              .replace("\\", "/")
-              .toUpperCase();
-    } else {
-      LOG.warn("Unknown copy book reference type {}", copySource);
-      copybookName = null;
-    }
-
-    return copybookName;
+    return retrieveCopybookName(
+        Optional.<RuleContext>ofNullable(copySource.cobolWord()).orElse(copySource.literal()));
   }
 
-  private void addCopybookUsage(@Nullable String copybookName, @Nonnull Position position) {
-    ofNullable(copybookName).ifPresent(it -> copybooks.addUsage(it, position));
+  private String retrieveCopybookName(@Nonnull RuleContext context) {
+    return context.getText().toUpperCase();
+  }
+
+  private void addCopybookUsage(@Nonnull String copybookName, @Nonnull Position position) {
+    copybooks.addUsage(copybookName, position);
   }
 
   private void addCopybookDefinition(String copybookName, String uri) {
-    if (!isEmpty(copybookName) && !isEmpty(uri)) {
+    if (!(isEmpty(copybookName) || isEmpty(uri))) {
       copybooks.define(copybookName, new Position(uri, 0, -1, 1, 0, null));
     }
   }
@@ -369,7 +360,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     errors.add(
         SyntaxError.syntaxError()
             .severity(ERROR)
-            .suggestion(String.format(RECURSION_DETECTED, usage.getName()))
+            .suggestion(format(RECURSION_DETECTED, usage.getName()))
             .position(usage.getPosition())
             .build());
   }
@@ -385,11 +376,11 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private void checkCopybookNameLength(String copybookName, Position position) {
-    if (copybookName != null && copybookName.length() > 8) {
+    if (copybookName.length() > 8) {
       errors.add(
           SyntaxError.syntaxError()
               .severity(INFO)
-              .suggestion(String.format(COPYBOOK_OVER_8_CHARACTERS, copybookName))
+              .suggestion(format(COPYBOOK_OVER_8_CHARACTERS, copybookName))
               .position(position)
               .build());
     }
