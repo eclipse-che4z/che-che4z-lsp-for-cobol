@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.ERROR;
-import static java.util.Collections.reverse;
 
+/** This error listener registers syntax errors found by the COBOL parser. */
 public class ParserListener extends BaseErrorListener {
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
@@ -36,21 +36,11 @@ public class ParserListener extends BaseErrorListener {
       int charPositionInLine,
       String msg,
       RecognitionException e) {
-    String suggestion = msg;
-    List<String> stack = new ArrayList<>();
-    if (recognizer instanceof Parser) {
-      stack = ((Parser) recognizer).getRuleInvocationStack();
-      reverse(stack);
-    }
-    if (recognizer instanceof Lexer) {
-      stack.add(((Lexer) recognizer).getText());
-      suggestion = msg.concat(" on ").concat(stack.get(stack.size() - 1));
-    }
     errors.add(
         SyntaxError.syntaxError()
             .startToken((CommonToken) offendingSymbol)
-            .ruleStack(stack)
-            .suggestion(suggestion)
+            .ruleStack(((Parser) recognizer).getRuleInvocationStack())
+            .suggestion(msg)
             .severity(ERROR)
             .build());
   }
