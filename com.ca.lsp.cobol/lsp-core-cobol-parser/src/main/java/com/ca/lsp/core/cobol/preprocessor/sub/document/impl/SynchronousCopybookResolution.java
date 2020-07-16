@@ -41,6 +41,7 @@ import static java.util.Optional.ofNullable;
  * {@link CompletableFuture} to synchronize the interaction with the data bus.
  */
 @Slf4j
+@SuppressWarnings("unchecked")
 public class SynchronousCopybookResolution
     implements CopybookResolution, EventObserver<FetchedCopybookEvent> {
   private static final String EXCEPTION_MESSAGE = "Copybook resolution instance cannot be reused";
@@ -101,12 +102,14 @@ public class SynchronousCopybookResolution
       return;
     }
     String name = event.getName();
-    String uri = event.getUri();
-    String content = event.getContent();
 
     if (!copybookName.equals(name)) {
       return;
     }
+
+    String uri = event.getUri();
+    String content = event.getContent();
+
     broker.unSubscribe(this);
     ofNullable(content).ifPresent(it -> broker.storeData(new CopybookStorable(name, uri, content)));
     waitForResolving.complete(new CopybookModel(name, uri, content));
