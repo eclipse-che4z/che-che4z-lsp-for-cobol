@@ -27,11 +27,32 @@ import java.util.Map;
  */
 public interface GrammarPreprocessorListener extends CobolPreprocessorListener {
 
+  /**
+   * Get text of extended document, i.e. with all copybooks built in and replacing applied.
+   *
+   * @return text of extended document.
+   */
   String getResult();
 
+  /**
+   * Get list of found syntax errors during building the extended document.
+   *
+   * @return list of errors.
+   */
   List<SyntaxError> getErrors();
 
+  /**
+   * Get copybooks subcontext, including all the copybooks usages and definitions of the given
+   * document.
+   *
+   * @return copybooks semantic subcontext.
+   */
   NamedSubContext<Position> getCopybooks();
 
-  Map<String, List<Position>> getDocumentMappings();
+  /**
+   * Get mappings of initial positions of the copybooks, used in this document.
+   *
+   * @return mappings of copybooks.
+   */
+  Map<String, List<Position>> getNestedMappings();
 }

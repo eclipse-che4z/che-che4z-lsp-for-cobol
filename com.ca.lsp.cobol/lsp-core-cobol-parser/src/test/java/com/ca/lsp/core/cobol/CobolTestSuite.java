@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.core.cobol;
 
+import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.GrammarPreprocessorImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl.CobolLineReaderImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolCommentEntriesMarkerImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolInlineCommentEntriesNormalizerImplTest;
@@ -43,6 +44,7 @@ import org.junit.runners.Suite.SuiteClasses;
   VisitorSemanticAnalysisTest.class,
   CobolLineIndicatorProcessorImplTest.class,
   CobolErrorStrategyTest.class,
-  CobolInlineCommentEntriesNormalizerImplTest.class
+  CobolInlineCommentEntriesNormalizerImplTest.class,
+  GrammarPreprocessorImplTest.class
 })
 public class CobolTestSuite {}

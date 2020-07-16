@@ -19,14 +19,12 @@ import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.StartRuleContext;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListenerFactory;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.google.inject.Inject;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import javax.annotation.Nonnull;
@@ -57,31 +55,48 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
       @Nonnull String code,
       @Nonnull Deque<CopybookUsage> copybookStack,
       @Nonnull String textDocumentSyncType) {
-    // run the lexer
-    CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
-    lexer.removeErrorListeners();
-    // get a list of matched tokens
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    GrammarPreprocessorListener fulfilledListener =
+        runGrammarProcessing(uri, code, copybookStack, textDocumentSyncType);
 
-    // pass the tokens to the parser
+    return new ResultWithErrors<>(
+        buildExtendedDocument(uri, code, fulfilledListener), fulfilledListener.getErrors());
+  }
+
+  @Nonnull
+  private GrammarPreprocessorListener runGrammarProcessing(
+      @Nonnull String uri,
+      @Nonnull String code,
+      @Nonnull Deque<CopybookUsage> copybookStack,
+      @Nonnull String textDocumentSyncType) {
+    Lexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
+    lexer.removeErrorListeners();
+
+    BufferedTokenStream tokens = new CommonTokenStream(lexer);
+
     CobolPreprocessorParser parser = new CobolPreprocessorParser(tokens);
     parser.removeErrorListeners();
 
-    // specify our entry point
-    StartRuleContext startRule = parser.startRule();
+    RuleContext startRule = parser.startRule();
 
     ParseTreeWalker walker = new ParseTreeWalker();
     GrammarPreprocessorListener listener =
         listenerFactory.create(uri, tokens, copybookStack, textDocumentSyncType);
     walker.walk(listener, startRule);
+    return listener;
+  }
 
-    Map<String, List<Position>> innerMappings = listener.getDocumentMappings();
-    List<Position> tokenMapping = tokenUtils.retrievePositionsFromText(uri, code);
+  @Nonnull
+  private ExtendedDocument buildExtendedDocument(
+      @Nonnull String uri, @Nonnull String code, GrammarPreprocessorListener listener) {
+    return new ExtendedDocument(
+        listener.getResult(), listener.getCopybooks(), getPositionMapping(uri, code, listener));
+  }
 
-    innerMappings.put(uri, tokenMapping);
-
-    return new ResultWithErrors<>(
-        new ExtendedDocument(listener.getResult(), listener.getCopybooks(), innerMappings),
-        listener.getErrors());
+  @Nonnull
+  private Map<String, List<Position>> getPositionMapping(
+      @Nonnull String uri, @Nonnull String code, GrammarPreprocessorListener listener) {
+    Map<String, List<Position>> accumulatedMappings = listener.getNestedMappings();
+    accumulatedMappings.put(uri, tokenUtils.retrievePositionsFromText(uri, code));
+    return accumulatedMappings;
   }
 }

@@ -60,7 +60,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
   @Getter private final NamedSubContext<Position> copybooks = new NamedSubContext<>();
-  @Getter private final Map<String, List<Position>> documentMappings = new HashMap<>();
+  @Getter private final Map<String, List<Position>> nestedMappings = new HashMap<>();
 
   private PreprocessorCleanerService cleaner;
   private String documentUri;
@@ -245,8 +245,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private void collectNestedSemanticData(
       String uri, String copybookId, String replacedContent, ExtendedDocument copybookDocument) {
     copybooks.merge(copybookDocument.getCopybooks());
-    documentMappings.putAll(copybookDocument.getDocumentPositions());
-    documentMappings.computeIfAbsent(
+    nestedMappings.putAll(copybookDocument.getDocumentPositions());
+    nestedMappings.computeIfAbsent(
         copybookId, it -> tokenUtils.retrievePositionsFromText(uri, replacedContent));
   }
 
