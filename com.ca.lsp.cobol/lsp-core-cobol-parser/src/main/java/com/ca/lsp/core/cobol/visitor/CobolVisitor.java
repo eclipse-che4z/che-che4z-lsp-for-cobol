@@ -90,7 +90,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitIdentifier(IdentifierContext ctx) {
+  public Class visitGeneralIdentifier(GeneralIdentifierContext ctx) {
     String wrongToken = ctx.getStart().getText();
     throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
     return visitChildren(ctx);
