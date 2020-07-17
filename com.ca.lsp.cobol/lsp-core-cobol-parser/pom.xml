@@ -29,7 +29,6 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<exclude.tests>nothing.to.exclude</exclude.tests>
 	</properties>
@@ -42,6 +41,27 @@
 			</properties>
 		</profile>
 	</profiles>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-maven-plugin</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.ca.lsp</groupId>
+			<artifactId>lsp-core-domain</artifactId>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<resources>
@@ -78,7 +98,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.6.1</version>
 				<configuration>
-					<release>11</release>
+					<release>${java.version}</release>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -214,77 +234,5 @@
 		<defaultGoal>package</defaultGoal>
 
 	</build>
-	<dependencies>
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4-runtime</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4-maven-plugin</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-text</artifactId>
-			<version>1.6</version>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.ca.lsp</groupId>
-			<artifactId>lsp-core-domain</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>net.jodah</groupId>
-			<artifactId>concurrentunit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-assistedinject</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-assistedinject</artifactId>
-        </dependency>
-    </dependencies>
 
 </project>
