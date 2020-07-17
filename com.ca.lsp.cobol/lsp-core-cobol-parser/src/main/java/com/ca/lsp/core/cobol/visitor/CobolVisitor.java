@@ -259,6 +259,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     for (QualifiedInDataContext node : ctx.qualifiedInData()) {
 
       DataName2Context context = getDataName2Context(node);
+      if (context == null) continue;
       String parent = context.getText().toUpperCase();
       Token parentToken = context.getStart();
 
@@ -279,9 +280,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   private DataName2Context getDataName2Context(QualifiedInDataContext node) {
-    return node.inData() == null
-        ? node.inTable().tableCall().dataName2()
-        : node.inData().dataName2();
+    return ofNullable(node.inData())
+        .map(InDataContext::dataName2)
+        .orElse(
+            ofNullable(node.inTable())
+                .map(InTableContext::tableCall)
+                .map(TableCallContext::dataName2)
+                .orElse(null));
   }
 
   private void checkVariableStructure(String parent, String child, Token startToken) {

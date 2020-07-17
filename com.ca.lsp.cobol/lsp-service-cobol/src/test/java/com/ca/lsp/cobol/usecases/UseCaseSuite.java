@@ -42,6 +42,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestRemarksSectionIsUnsupported.class,
   TestMappingWithMultiDefinitions.class,
   TestMessageIfVariableNotDefined.class,
+  TestPerformWithoutEndNotCauseNPE.class,
   TestMissingCopybooksReturnsError.class,
   TestResponsesNotContainLineBreaks.class,
   TestInvalidVariableStructureFound.class,
