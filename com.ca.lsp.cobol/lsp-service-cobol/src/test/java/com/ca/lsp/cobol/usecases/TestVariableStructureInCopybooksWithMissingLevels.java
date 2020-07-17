@@ -15,39 +15,37 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.positive.CobolText;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
-import static java.util.Collections.singletonList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This test verifies that the variable structure can be built correctly with copybooks and that
- * error not thrown if there are no ambiguous definitions, even with skipped hierarchical levels
- * on usage.
+ * error not thrown if there are no ambiguous definitions, even with skipped hierarchical levels on
+ * usage.
  */
-public class TestVariableStructureInCopybooksWithMissingLevels extends PositiveUseCase {
+public class TestVariableStructureInCopybooksWithMissingLevels {
 
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01  PARENT.   COPY STRUCT.\n"
+          + "       01  {$*PARENT}.   COPY {~STRUCT}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "       MOVE 00 TO CHILD1 OF PARENT.";
+          + "       MOVE 00 TO {$CHILD1} OF {$PARENT}.";
 
   private static final String STRUCT =
-      "       02  PARENT2.\n"
-          + "           03  CHILD1         PIC 9   VALUE IS '0'.\n"
-          + "           03  CHILD2         PIC 9   VALUE IS '1'.\n"
-          + "           03  CHILD3         PIC 9   VALUE IS '2'.";
+      "       02  {$*PARENT2}.\n"
+          + "           03  {$*CHILD1}         PIC 9   VALUE IS '0'.\n"
+          + "           03  {$*CHILD2}         PIC 9   VALUE IS '1'.\n"
+          + "           03  {$*CHILD3}         PIC 9   VALUE IS '2'.";
+  private static final String STRUCT_NAME = "STRUCT";
 
-  public TestVariableStructureInCopybooksWithMissingLevels() {
-    super(TEXT);
-  }
-
-  @Override
   @Test
   public void test() {
-    super.test(singletonList(new CobolText("STRUCT", STRUCT)));
+    UseCaseEngine.runTest(TEXT, List.of(new CobolText(STRUCT_NAME, STRUCT)), Map.of());
   }
 }

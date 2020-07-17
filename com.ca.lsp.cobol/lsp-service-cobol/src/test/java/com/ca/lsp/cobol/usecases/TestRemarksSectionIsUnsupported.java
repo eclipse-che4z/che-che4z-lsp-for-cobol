@@ -15,14 +15,15 @@
 
 package com.ca.lsp.cobol.usecases;
 
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /**
  * This test checks that the remarks section is not marked as a comment, and the syntax analysis
@@ -30,50 +31,32 @@ import static org.junit.Assert.assertEquals;
  *
  * <p>The REMARKS is an old syntax that is not supported anymore, so it should be marked as error.
  */
-public class TestRemarksSectionIsUnsupported extends NegativeUseCase {
+public class TestRemarksSectionIsUnsupported {
 
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       AUTHOR.     SE.\n"
-          + "           REMARKS.\n"
+          + "           {REMARKS|unsupported}.\n"
           + "              PURPOSE.\n"
           + "              THIS PROGRAM IS DEFINED TO TEST A NUMBER OF THE\n"
           + "              APPLICATION TESTING COLLECTION AND DEBUG TOOL FUNCTIONS\n"
           + "       ENVIRONMENT DIVISION.";
 
-  public TestRemarksSectionIsUnsupported() {
-    super(TEXT);
-  }
-
   @Test
   public void test() {
-    super.test();
-  }
-
-  /**
-   * Assert that the error range points to the 'REMARKS' at line 4
-   *
-   * @param diagnostics - errors found by syntax analysis
-   */
-  @Override
-  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Number of diagnostics", 1, diagnostics.size());
-    Diagnostic diagnostic = diagnostics.get(0);
-    assertEquals(
-        "Syntax error on 'REMARKS' expected "
-            + "{<EOF>, AUTHOR, DATA, DATE_COMPILED, DATE_WRITTEN, END, "
-            + "ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, "
-            + "SECURITY, COMMENTENTRYLINE}",
-        diagnostic.getMessage());
-
-    Range range = diagnostic.getRange();
-    Position start = range.getStart();
-    Position end = range.getEnd();
-
-    assertEquals("Diagnostic start line", 3, start.getLine());
-    assertEquals("Diagnostic start character", 3, end.getLine());
-    assertEquals("Diagnostic end line", 11, start.getCharacter());
-    assertEquals("Diagnostic end character", 18, end.getCharacter());
+    UseCaseEngine.runTest(
+        TEXT,
+        List.of(),
+        Map.of(
+            "unsupported",
+            new Diagnostic(
+                null,
+                "Syntax error on 'REMARKS' expected "
+                    + "{<EOF>, AUTHOR, DATA, DATE_COMPILED, DATE_WRITTEN, END, "
+                    + "ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, "
+                    + "SECURITY, COMMENTENTRYLINE}",
+                DiagnosticSeverity.Error,
+                ERROR.getText())));
   }
 }

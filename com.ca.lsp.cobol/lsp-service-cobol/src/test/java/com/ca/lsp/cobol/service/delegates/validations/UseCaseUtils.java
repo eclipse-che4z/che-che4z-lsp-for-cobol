@@ -26,48 +26,53 @@ import com.ca.lsp.cobol.service.TextDocumentSyncType;
 import com.ca.lsp.cobol.service.mocks.MockCopybookService;
 import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.experimental.UtilityClass;
 import org.awaitility.Awaitility;
-import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.DidOpenTextDocumentParams;
+import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-/** This utility class provides methods to run use cases with Cobol code examples. */
+/** This utility class provides methods to run use cases with COBOL code examples. */
 @UtilityClass
 public class UseCaseUtils {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
   public static final String DOCUMENT_2_URI = "file:///c%3A/workspace/document2.cbl";
-  private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.copybooks/";
+
+  private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.c4z/.copybooks/";
   private static final String CPY_URI_SUFFIX = ".cpy";
   private static final String LANGUAGE = "cbl";
 
   private static final long MAX_TIME_TO_WAIT = 60000L;
   private static final long TIME_TO_POLL = 10L;
-  private static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
+  private static final TimeUnit TIME_UNIT = MILLISECONDS;
 
   public static String toURI(String name) {
     return CPY_URI_PREFIX + name + CPY_URI_SUFFIX;
   }
 
   /**
-   * Perform validation of the given text on the service
+   * Perform validation of the given text on the service.
    *
    * @param service - TextDocumentService instance to validate the text
-   * @param text - Cobol text to be tested
+   * @param text - COBOL text to be tested
+   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
    */
+  @Deprecated
   public static void runTextValidation(TextDocumentService service, String text) {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, text)));
@@ -81,7 +86,9 @@ public class UseCaseUtils {
    *
    * @param checker - Lambda returning boolean, that will be used to check if the event occurred.
    *     Should return false if result has not appeared.
+   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
    */
+  @Deprecated
   public static void await(Callable<Boolean> checker) {
     await(checker, MAX_TIME_TO_WAIT, "");
   }
@@ -95,7 +102,9 @@ public class UseCaseUtils {
    * @param checker - Lambda returning boolean, that will be used to check if the event occurred.
    *     Should return false if result has not appeared.
    * @param description - the TestLanguageClient that should receive the diagnostics
+   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
    */
+  @Deprecated
   private static void await(Callable<Boolean> checker, String description) {
     await(checker, MAX_TIME_TO_WAIT, description);
   }
@@ -109,7 +118,9 @@ public class UseCaseUtils {
    *     Should return false if result has not appeared.
    * @param time - the maximum time to wait
    * @param description - the TestLanguageClient that should receive the diagnostics
+   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
    */
+  @Deprecated
   private static void await(Callable<Boolean> checker, Long time, String description) {
     Awaitility.await(description)
         .pollDelay(TIME_TO_POLL, TIME_UNIT)
@@ -122,30 +133,11 @@ public class UseCaseUtils {
    * errors.
    *
    * @param client - the TestLanguageClient that should receive the diagnostics
+   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
    */
+  @Deprecated
   public static void waitForDiagnostics(TestLanguageClient client) {
     await(() -> !client.getReceivedDiagnostics().isEmpty(), "");
-  }
-
-  /**
-   * Await when the client will receive the diagnostics in case if there are some syntax or format
-   * errors.
-   *
-   * @param client - the TestLanguageClient that should receive the diagnostics
-   * @param description - the TestLanguageClient that should receive the diagnostics
-   */
-  public static void waitForDiagnostics(TestLanguageClient client, String description) {
-    await(() -> !client.getReceivedDiagnostics().isEmpty(), description);
-  }
-
-  /**
-   * Analyze the given text using a real language engine.
-   *
-   * @param text - text to analyze
-   * @return the entire analysis result
-   */
-  public static AnalysisResult analyze(String text) {
-    return analyze(text, emptyList());
   }
 
   /**
@@ -165,14 +157,14 @@ public class UseCaseUtils {
    *
    * @param text - text to analyze
    * @param copybooks - list of copybooks required for the analysis
-   * @return map of diagnostics with only severe errors
+   * @return list of diagnostics with only severe errors
    */
   public static List<Diagnostic> analyzeForErrors(String text, List<CobolText> copybooks) {
     return ofNullable(analyze(text, copybooks).getDiagnostics().get(DOCUMENT_URI))
         .map(
             diagnostics ->
                 diagnostics.stream()
-                    .filter(it -> it.getSeverity().getValue() == 1)
+                    .filter(it -> it.getSeverity() == DiagnosticSeverity.Error)
                     .collect(toList()))
         .orElse(emptyList());
   }
@@ -212,57 +204,5 @@ public class UseCaseUtils {
     return injector
         .getInstance(CobolLanguageEngineFacade.class)
         .analyze(DOCUMENT_URI, text, syncType);
-  }
-
-  /**
-   * Assert that the given source contains expected number of locations for the element with the
-   * given name
-   *
-   * @param source - map with locations of semantic elements
-   * @param name - name of the semantic element to check
-   * @param number - expected number of locations
-   */
-  public static void assertNumberOfLocations(
-      Map<String, List<Location>> source, String name, int number) {
-    assertEquals("Number of " + name + " usages: ", number, source.get(name).size());
-  }
-
-  /**
-   * Assert that the given source contains the expected location for a semantic element with the
-   * given name
-   *
-   * @param source - map with locations of semantic elements
-   * @param name - name of the semantic element to check
-   * @param uri - document URI of the location
-   * @param line - line number of the location
-   * @param startChar - start character of the location. End character is startChar + name length.
-   */
-  public static void assertLocation(
-      Map<String, List<Location>> source, String name, String uri, int line, int startChar) {
-    List<Location> locations = source.get(name);
-    Location expected =
-        new Location(
-            uri,
-            new Range(
-                new Position(line, startChar), new Position(line, startChar + name.length())));
-    assertTrue(
-        "Expected location for " + name + " not found: " + expected.toString(),
-        locations.contains(expected));
-  }
-
-  /**
-   * Assert that the given source contains the given copybook definition with one position pointing
-   * to the beginning of the copybook file
-   *
-   * @param source - map with locations of semantic elements
-   * @param name - name of the copybook to check
-   */
-  public static void assertCopybookDefinition(Map<String, List<Location>> source, String name) {
-    assertEquals("Number of " + name + " usages: ", 1, source.get(name).size());
-    Location expected =
-        new Location(toURI(name), new Range(new Position(0, 0), new Position(0, 0)));
-    assertTrue(
-        "Expected location for " + name + " not found: " + expected.toString(),
-        source.get(name).contains(expected));
   }
 }

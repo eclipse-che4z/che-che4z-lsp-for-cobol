@@ -13,16 +13,18 @@
  */
 package com.ca.lsp.cobol.usecases;
 
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /** This use case checks if the absence of dot at the end recognized as an error. */
-public class TestExtraneousInputEOFExpecting extends NegativeUseCase {
+public class TestExtraneousInputEOFExpecting {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\r\n"
@@ -30,35 +32,22 @@ public class TestExtraneousInputEOFExpecting extends NegativeUseCase {
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
-          + "           if (1 > 0) NEXT SENTENCE"; // No dot at the end of file
+          + "           if (1 > 0) NEXT SENTENCE{|1}"; // No dot at the end of file
 
-  public TestExtraneousInputEOFExpecting() {
-    super(TEXT);
-  }
+  private static final String MESSAGE =
+      "Extraneous input '<EOF>' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, "
+          + "COMPUTE, CONTINUE, DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, "
+          + "EXHIBIT, EXIT, GENERATE, GOBACK, GO, IF, INITIALIZE, INITIATE, INSPECT, MERGE, "
+          + "MOVE, MULTIPLY, OPEN, PERFORM, PURGE, READ, RECEIVE, RELEASE, RETURN, REWRITE, "
+          + "SEARCH, SEND, SERVICE, SET, SORT, START, STOP, STRING, SUBTRACT, TERMINATE, TITLE, "
+          + "UNSTRING, WRITE, XML, DOT_FS, COPYENTRY, '*>CPYEXIT', EXECCICSLINE, EXECSQLIMSLINE, "
+          + "EXECSQLLINE}";
 
   @Test
   public void test() {
-    super.test();
-  }
-
-  @Override
-  protected void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Number of diagnostics", 1, diagnostics.size());
-    Diagnostic diagnostic = diagnostics.get(0);
-    assertEquals(
-        "Extraneous input '<EOF>' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, "
-            + "COMPUTE, CONTINUE, DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, "
-            + "EXHIBIT, EXIT, GENERATE, GOBACK, GO, IF, INITIALIZE, INITIATE, INSPECT, MERGE, "
-            + "MOVE, MULTIPLY, OPEN, PERFORM, PURGE, READ, RECEIVE, RELEASE, RETURN, REWRITE, "
-            + "SEARCH, SEND, SERVICE, SET, SORT, START, STOP, STRING, SUBTRACT, TERMINATE, TITLE, "
-            + "UNSTRING, WRITE, XML, DOT_FS, COPYENTRY, '*>CPYEXIT', EXECCICSLINE, EXECSQLIMSLINE, "
-            + "EXECSQLLINE}",
-        diagnostic.getMessage());
-
-    Range range = diagnostic.getRange();
-    assertEquals("Diagnostic start line", 5, range.getStart().getLine());
-    assertEquals("Diagnostic start character", 35, range.getStart().getCharacter());
-    assertEquals("Diagnostic end line", 5, range.getEnd().getLine());
-    assertEquals("Diagnostic end character", 35, range.getEnd().getCharacter());
+    UseCaseEngine.runTest(
+        TEXT,
+        List.of(),
+        Map.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }
