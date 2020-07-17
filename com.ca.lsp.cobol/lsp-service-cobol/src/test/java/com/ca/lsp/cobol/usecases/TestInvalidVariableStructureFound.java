@@ -19,9 +19,10 @@ import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonMap;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 
 /**
@@ -47,8 +48,6 @@ public class TestInvalidVariableStructureFound {
   @Test
   public void test() {
     UseCaseEngine.runTest(
-        TEXT,
-        emptyList(),
-        singletonMap("1", new Diagnostic(null, MESSAGE, Information, INFO.getText())));
+        TEXT, List.of(), Map.of("1", new Diagnostic(null, MESSAGE, Information, INFO.getText())));
   }
 }

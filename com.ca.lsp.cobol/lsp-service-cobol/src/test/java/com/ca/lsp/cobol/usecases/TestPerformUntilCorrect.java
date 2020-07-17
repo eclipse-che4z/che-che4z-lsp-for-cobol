@@ -16,8 +16,8 @@ package com.ca.lsp.cobol.usecases;
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
+import java.util.List;
+import java.util.Map;
 
 /** This use cases checks if "PERFORM" with the "UNTIL" sentence processed correctly. */
 public class TestPerformUntilCorrect {
@@ -38,6 +38,6 @@ public class TestPerformUntilCorrect {
 
   @Test
   public void test() {
-    UseCaseEngine.runTest(TEXT, emptyList(), emptyMap());
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

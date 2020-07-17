@@ -18,22 +18,13 @@ package com.ca.lsp.cobol.usecases;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
 
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.toURI;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  * This test checks the insertion of IDENTIFICATION DIVISION statement that contains a syntax error
@@ -63,7 +54,7 @@ public class TestIdentificationDivisionInCopybookWithError {
   public void test() {
     UseCaseEngine.runTest(
         TEXT,
-        asList(new CobolText(IDDIV_NAME, IDDIV), new CobolText(STRUCT1_NAME, STRUCT1)),
-        singletonMap("1", new Diagnostic(null, MESSAGE, Error, ERROR.getText())));
+        List.of(new CobolText(IDDIV_NAME, IDDIV), new CobolText(STRUCT1_NAME, STRUCT1)),
+        Map.of("1", new Diagnostic(null, MESSAGE, Error, ERROR.getText())));
   }
 }

@@ -21,9 +21,7 @@ import org.junit.runners.Parameterized;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
+import java.util.Map;
 
 /** This use cases checks if varying with multiple identifiers works correctly. */
 @RunWith(Parameterized.class)
@@ -78,6 +76,6 @@ public class TestVaryingCorrect {
 
   @Test
   public void test() {
-    UseCaseEngine.runTest(text, emptyList(), emptyMap());
+    UseCaseEngine.runTest(text, List.of(), Map.of());
   }
 }

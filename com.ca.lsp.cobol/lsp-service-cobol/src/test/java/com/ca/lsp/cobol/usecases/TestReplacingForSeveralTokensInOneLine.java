@@ -18,12 +18,13 @@ package com.ca.lsp.cobol.usecases;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 
 /**
  * This test verifies that the replacing statement changes the variable names following one by one,
@@ -54,9 +55,7 @@ public class TestReplacingForSeveralTokensInOneLine {
   public void test() {
     UseCaseEngine.runTest(
         DOCUMENT,
-        singletonList(new CobolText(REPL_NAME, REPL)),
-        singletonMap(
-            "invalid",
-            new Diagnostic(null, MESSAGE, DiagnosticSeverity.Information, INFO.getText())));
+        List.of(new CobolText(REPL_NAME, REPL)),
+        Map.of("invalid", new Diagnostic(null, MESSAGE, Information, INFO.getText())));
   }
 }

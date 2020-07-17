@@ -18,9 +18,10 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonMap;
 
 /** This use case checks if the absence of dot at the end recognized as an error. */
 public class TestExtraneousInputEOFExpecting {
@@ -46,8 +47,7 @@ public class TestExtraneousInputEOFExpecting {
   public void test() {
     UseCaseEngine.runTest(
         TEXT,
-        emptyList(),
-        singletonMap(
-            "1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
+        List.of(),
+        Map.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

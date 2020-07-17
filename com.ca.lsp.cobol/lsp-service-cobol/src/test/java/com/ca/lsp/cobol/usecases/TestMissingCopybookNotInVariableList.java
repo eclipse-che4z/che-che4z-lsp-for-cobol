@@ -19,12 +19,11 @@ import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.Test;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
-import static java.util.Collections.emptyList;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 
@@ -45,14 +44,14 @@ public class TestMissingCopybookNotInVariableList {
 
   @Test
   public void test() {
-    Map<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-    expectedDiagnostics.put(
-        "missing",
-        new Diagnostic(
-            null, "CPYNAME: Copybook not found", Error, ERROR.getText(), "MISSING_COPYBOOK"));
-    expectedDiagnostics.put(
-        "invalid",
-        new Diagnostic(null, "Invalid definition for: CHILD1", Information, INFO.getText()));
-    UseCaseEngine.runTest(TEXT, emptyList(), expectedDiagnostics);
+    UseCaseEngine.runTest(
+        TEXT,
+        List.of(),
+        Map.of(
+            "missing",
+            new Diagnostic(
+                null, "CPYNAME: Copybook not found", Error, ERROR.getText(), "MISSING_COPYBOOK"),
+            "invalid",
+            new Diagnostic(null, "Invalid definition for: CHILD1", Information, INFO.getText())));
   }
 }

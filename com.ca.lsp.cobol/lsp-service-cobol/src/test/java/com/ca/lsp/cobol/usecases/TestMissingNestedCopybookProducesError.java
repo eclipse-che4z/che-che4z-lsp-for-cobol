@@ -20,9 +20,10 @@ import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** Test missing nested copybooks produce syntax errors in parent copybooks. */
@@ -47,9 +48,9 @@ public class TestMissingNestedCopybookProducesError {
   @Test
   public void test() {
     UseCaseEngine.runTest(
-            TEXT,
-        singletonList(new CobolText(REPL_NAME, REPL)),
-        singletonMap(
+        TEXT,
+        List.of(new CobolText(REPL_NAME, REPL)),
+        Map.of(
             "missing",
             new Diagnostic(
                 null, "CPYNAME: Copybook not found", Error, ERROR.getText(), "MISSING_COPYBOOK")));

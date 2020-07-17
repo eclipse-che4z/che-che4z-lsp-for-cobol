@@ -20,12 +20,11 @@ import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.Test;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
-import static java.util.Collections.singletonList;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 
@@ -53,17 +52,16 @@ public class TestErrorsInDifferentFiles {
 
   @Test
   public void test() {
-    Map<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-    expectedDiagnostics.put(
-        "invalid",
-        new Diagnostic(null, "Invalid definition for: CHILD1", Information, INFO.getText()));
-    expectedDiagnostics.put(
-        "pic",
-        new Diagnostic(null, "Syntax error on 'PIC' expected SECTION", Error, ERROR.getText()));
-    expectedDiagnostics.put(
-        "child1",
-        new Diagnostic(null, "Syntax error on 'CHILD1' expected SECTION", Error, ERROR.getText()));
     UseCaseEngine.runTest(
-        TEXT, singletonList(new CobolText(ASDASD_NAME, ASDASD)), expectedDiagnostics);
+        TEXT,
+        List.of(new CobolText(ASDASD_NAME, ASDASD)),
+        Map.of(
+            "invalid",
+            new Diagnostic(null, "Invalid definition for: CHILD1", Information, INFO.getText()),
+            "pic",
+            new Diagnostic(null, "Syntax error on 'PIC' expected SECTION", Error, ERROR.getText()),
+            "child1",
+            new Diagnostic(
+                null, "Syntax error on 'CHILD1' expected SECTION", Error, ERROR.getText())));
   }
 }

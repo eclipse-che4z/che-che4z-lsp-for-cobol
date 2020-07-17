@@ -20,9 +20,10 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
 /**
  * This test checks that the error shown if the copybook that is used in the Cobol file contains a
  * link to itself.
@@ -46,7 +47,7 @@ public class TestCopybookWithRecursiveDependencyIsDetected {
 
     UseCaseEngine.runTest(
         TEXT,
-        singletonList(new CobolText(REC_CPY_NAME, REC_CPY)),
-        singletonMap("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
+        List.of(new CobolText(REC_CPY_NAME, REC_CPY)),
+        Map.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

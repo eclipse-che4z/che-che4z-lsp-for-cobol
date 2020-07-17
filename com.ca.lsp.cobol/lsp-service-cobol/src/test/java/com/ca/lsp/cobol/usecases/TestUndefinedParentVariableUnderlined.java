@@ -17,23 +17,17 @@ package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
-import static java.util.Collections.emptyList;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  * This test checks that the undefined parent variable underlined while variable call hierarchy
@@ -53,21 +47,24 @@ public class TestUndefinedParentVariableUnderlined {
           + "9       MOVE 10 TO {$MAMA} OF {$AGE|1} OF {$BORROWE|2}.\r\n"
           + "10      END PROGRAM TEST1.";
 
-
   private static final String MESSAGE = "Invalid definition for: ";
   private static final String BORROWE = "BORROWE";
   private static final String AGE = "AGE";
 
   @Test
   public void assertSyncTypeNotChangesLogic() {
-    assertEquals(analyze(TEXT, emptyList(), DID_OPEN), analyze(TEXT, emptyList(), DID_CHANGE));
+    assertEquals(analyze(TEXT, List.of(), DID_OPEN), analyze(TEXT, List.of(), DID_CHANGE));
   }
 
   @Test
   public void assertAnalysisResult() {
-      Map<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-      expectedDiagnostics.put("1", new Diagnostic(null, MESSAGE + AGE, Information, INFO.getText()));
-      expectedDiagnostics.put("2", new Diagnostic(null, MESSAGE + BORROWE, Information, INFO.getText()));
-      UseCaseEngine.runTest(TEXT, emptyList(), expectedDiagnostics);
+    UseCaseEngine.runTest(
+        TEXT,
+        List.of(),
+        Map.of(
+            "1",
+            new Diagnostic(null, MESSAGE + AGE, Information, INFO.getText()),
+            "2",
+            new Diagnostic(null, MESSAGE + BORROWE, Information, INFO.getText())));
   }
 }

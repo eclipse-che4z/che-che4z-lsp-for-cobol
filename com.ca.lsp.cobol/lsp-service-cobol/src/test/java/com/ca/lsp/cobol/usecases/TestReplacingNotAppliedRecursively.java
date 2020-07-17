@@ -19,8 +19,8 @@ import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Test REPLACING statement not applied recursively. Here, the STRUCT1 copybook contains a variable
@@ -51,7 +51,7 @@ public class TestReplacingNotAppliedRecursively {
   public void test() {
     UseCaseEngine.runTest(
         TEXT,
-        asList(new CobolText(REPL_NAME, REPL), new CobolText(STRUCT1_NAME, STRUCT1)),
-        emptyMap());
+        List.of(new CobolText(REPL_NAME, REPL), new CobolText(STRUCT1_NAME, STRUCT1)),
+        Map.of());
   }
 }

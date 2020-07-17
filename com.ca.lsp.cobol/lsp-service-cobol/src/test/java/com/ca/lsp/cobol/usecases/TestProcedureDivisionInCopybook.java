@@ -19,8 +19,8 @@ import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This test checks the insertion of PROCEDURE DIVISION statement with a copybook doesn't produce
@@ -48,7 +48,7 @@ public class TestProcedureDivisionInCopybook {
   public void assertAnalysisResult() {
     UseCaseEngine.runTest(
         TEXT,
-        asList(new CobolText(PROCDIV_NAME, PROCDIV), new CobolText(STRUCT1_NAME, STRUCT1)),
-        emptyMap());
+        List.of(new CobolText(PROCDIV_NAME, PROCDIV), new CobolText(STRUCT1_NAME, STRUCT1)),
+        Map.of());
   }
 }

@@ -19,8 +19,8 @@ import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This test checks that the REPLACING statement applied one by one will be collapsed to show only
@@ -43,11 +43,12 @@ public class TestReplacingAppliedOneByOne {
           + "10     GOBACK.";
 
   private static final String CUSTCOPY =
-      "           05  {$*ABC-KEY^JKL-KEY}.\r\n" + "               10  {$*ABC-ID^JKL-ID}             PIC 9.\r\n";
+      "           05  {$*ABC-KEY^JKL-KEY}.\r\n"
+          + "               10  {$*ABC-ID^JKL-ID}             PIC 9.\r\n";
   private static final String CUSTCOPY_NAME = "CUSTCOPY";
 
   @Test
   public void test() {
-    UseCaseEngine.runTest(TEXT, singletonList(new CobolText(CUSTCOPY_NAME, CUSTCOPY)), emptyMap());
+    UseCaseEngine.runTest(TEXT, List.of(new CobolText(CUSTCOPY_NAME, CUSTCOPY)), Map.of());
   }
 }

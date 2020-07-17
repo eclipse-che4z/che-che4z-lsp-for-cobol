@@ -20,9 +20,10 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonMap;
 
 /**
  * This test checks that the remarks not marked as comments, and the syntax analysis applied.
@@ -56,8 +57,8 @@ public class TestRemarksAreUnsupported {
   public void test() {
     UseCaseEngine.runTest(
         TEXT,
-        emptyList(),
-        singletonMap(
+        List.of(),
+        Map.of(
             "unsupported",
             new Diagnostic(
                 null,

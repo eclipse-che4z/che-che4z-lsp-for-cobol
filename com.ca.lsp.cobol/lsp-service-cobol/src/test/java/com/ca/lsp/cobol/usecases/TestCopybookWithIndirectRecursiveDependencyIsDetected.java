@@ -19,12 +19,11 @@ import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.Test;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
-import static java.util.Arrays.asList;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 
@@ -54,24 +53,19 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected {
 
   @Test
   public void test() {
-    Map<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-    expectedDiagnostics.put(
-        "1", new Diagnostic(null, MESSAGE_RECURSION + INDIRECT_NAME, Error, ERROR.getText()));
-    expectedDiagnostics.put(
-        "2", new Diagnostic(null, MESSAGE_RECURSION + INNER_COPY_NAME, Error, ERROR.getText()));
-    expectedDiagnostics.put(
-        "3",
-        new Diagnostic(
-            null, MESSAGE_LONG_DECLARATION + INDIRECT_NAME, Information, INFO.getText()));
-    expectedDiagnostics.put(
-        "4",
-        new Diagnostic(
-            null, MESSAGE_LONG_DECLARATION + INNER_COPY_NAME, Information, INFO.getText()));
-
-
     UseCaseEngine.runTest(
         TEXT,
-        asList(new CobolText(INNER_COPY_NAME, INNER_COPY), new CobolText(INDIRECT_NAME, INDIRECT)),
-        expectedDiagnostics);
+        List.of(new CobolText(INNER_COPY_NAME, INNER_COPY), new CobolText(INDIRECT_NAME, INDIRECT)),
+        Map.of(
+            "1",
+            new Diagnostic(null, MESSAGE_RECURSION + INDIRECT_NAME, Error, ERROR.getText()),
+            "2",
+            new Diagnostic(null, MESSAGE_RECURSION + INNER_COPY_NAME, Error, ERROR.getText()),
+            "3",
+            new Diagnostic(
+                null, MESSAGE_LONG_DECLARATION + INDIRECT_NAME, Information, INFO.getText()),
+            "4",
+            new Diagnostic(
+                null, MESSAGE_LONG_DECLARATION + INNER_COPY_NAME, Information, INFO.getText())));
   }
 }

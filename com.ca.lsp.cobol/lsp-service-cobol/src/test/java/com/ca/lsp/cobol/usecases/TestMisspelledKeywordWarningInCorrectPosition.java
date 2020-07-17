@@ -20,12 +20,11 @@ import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.Test;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.WARNING;
-import static java.util.Collections.singletonList;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
 
@@ -54,16 +53,18 @@ public class TestMisspelledKeywordWarningInCorrectPosition {
 
   @Test
   public void test() {
-    Map<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-    expectedDiagnostics.put(
-        "misspelled",
-        new Diagnostic(
-            null, "A misspelled word, maybe you want to put DISPLAY", Warning, WARNING.getText()));
-    expectedDiagnostics.put(
-        "hello",
-        new Diagnostic(
-            null, "Syntax error on '\"hello\"' expected SECTION", Error, ERROR.getText()));
     UseCaseEngine.runTest(
-        TEXT, singletonList(new CobolText(STRUC1_NAME, STRUC1)), expectedDiagnostics);
+        TEXT,
+        List.of(new CobolText(STRUC1_NAME, STRUC1)),
+        Map.of(
+            "misspelled",
+            new Diagnostic(
+                null,
+                "A misspelled word, maybe you want to put DISPLAY",
+                Warning,
+                WARNING.getText()),
+            "hello",
+            new Diagnostic(
+                null, "Syntax error on '\"hello\"' expected SECTION", Error, ERROR.getText())));
   }
 }

@@ -18,9 +18,10 @@ import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonMap;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** This test checks that if a copybook not found then error shown. */
@@ -38,8 +39,8 @@ public class TestMissingCopybooksReturnsError {
   public void test() {
     UseCaseEngine.runTest(
         TEXT,
-        emptyList(),
-        singletonMap(
+        List.of(),
+        Map.of(
             "missing",
             new Diagnostic(
                 null, "MISSCPY: Copybook not found", Error, ERROR.getText(), "MISSING_COPYBOOK")));

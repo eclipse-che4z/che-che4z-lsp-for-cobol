@@ -18,9 +18,10 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonMap;
 
 /**
  * This test checks if the parser recognizes typo on the "DIVISIONs" token. The correct is
@@ -42,8 +43,7 @@ public class TestSyntaxError {
 
     UseCaseEngine.runTest(
         TEXT,
-        emptyList(),
-        singletonMap(
-            "typo", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
+        List.of(),
+        Map.of("typo", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

@@ -19,8 +19,8 @@ import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Test replacing with changing variable number returns a correct structure. Here, "01 AA-PARENT"
@@ -51,6 +51,6 @@ public class TestReplacingPseudoTextReplacesLevelNumber {
 
   @Test
   public void test() {
-    UseCaseEngine.runTest(TEXT, singletonList(new CobolText(REPL_NAME, REPL)), emptyMap());
+    UseCaseEngine.runTest(TEXT, List.of(new CobolText(REPL_NAME, REPL)), Map.of());
   }
 }

@@ -17,8 +17,8 @@ import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This test checks that there are no errors thrown if a string literal split and concatenated by a
@@ -49,6 +49,6 @@ public class TestCobolStringWithContinuationLineConcatenatedCorrectly {
   // TODO: #414
   @Test
   public void test() {
-    UseCaseEngine.runTest(TEXT, emptyList(), emptyMap());
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

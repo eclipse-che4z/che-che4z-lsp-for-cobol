@@ -19,8 +19,8 @@ import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This test checks the positive scenario with building an extended document with correct positions
@@ -91,13 +91,13 @@ public class TestMappingWithMultiDefinitions {
   public void test() {
     UseCaseEngine.runTest(
         DOCUMENT,
-        asList(
+        List.of(
             new CobolText(STRUC_NAME, STRUC),
             new CobolText(WITHNEST_NAME, WITHNEST),
             new CobolText(NESTED_NAME, NESTED),
             new CobolText(NESTED1_NAME, NESTED1),
             new CobolText(NESTED2_NAME, NESTED2),
             new CobolText(PARS_NAME, PARS)),
-        emptyMap());
+        Map.of());
   }
 }

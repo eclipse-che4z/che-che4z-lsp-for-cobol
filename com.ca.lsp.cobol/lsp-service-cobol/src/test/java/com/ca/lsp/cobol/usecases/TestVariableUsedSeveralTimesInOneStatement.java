@@ -16,17 +16,10 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Location;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
-
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static org.junit.Assert.assertEquals;
 
 /**
  * This test checks that document with multi-definitions parsed correctly and all the usages of
@@ -49,6 +42,6 @@ public class TestVariableUsedSeveralTimesInOneStatement {
 
   @Test
   public void test() {
-    UseCaseEngine.runTest(TEXT, emptyList(), emptyMap());
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

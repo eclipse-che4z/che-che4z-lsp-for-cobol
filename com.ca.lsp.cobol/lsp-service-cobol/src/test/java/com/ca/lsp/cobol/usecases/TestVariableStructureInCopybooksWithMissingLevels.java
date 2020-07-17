@@ -18,8 +18,8 @@ import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This test verifies that the variable structure can be built correctly with copybooks and that
@@ -46,6 +46,6 @@ public class TestVariableStructureInCopybooksWithMissingLevels {
 
   @Test
   public void test() {
-    UseCaseEngine.runTest(TEXT, singletonList(new CobolText(STRUCT_NAME, STRUCT)), emptyMap());
+    UseCaseEngine.runTest(TEXT, List.of(new CobolText(STRUCT_NAME, STRUCT)), Map.of());
   }
 }

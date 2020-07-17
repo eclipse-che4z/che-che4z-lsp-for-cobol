@@ -16,12 +16,12 @@ package com.ca.lsp.cobol.usecases;
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonMap;
 
 /** This use case checks if extra symbols on one line do not cause any errors on the next line. */
 public class TestExtraSymbolsNotCauseErrorOnNextLine {
@@ -38,8 +38,7 @@ public class TestExtraSymbolsNotCauseErrorOnNextLine {
   public void test() {
     UseCaseEngine.runTest(
         TEXT,
-        emptyList(),
-        singletonMap(
-            "1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
+        List.of(),
+        Map.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

@@ -18,8 +18,8 @@ package com.ca.lsp.cobol.usecases;
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This test checks that document with multi-definitions parsed correctly and all the usages of
@@ -51,6 +51,6 @@ public class TestRepetitiveVariableUsagesInAdjacentStatements {
 
   @Test
   public void test() {
-    UseCaseEngine.runTest(TEXT, emptyList(), emptyMap());
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

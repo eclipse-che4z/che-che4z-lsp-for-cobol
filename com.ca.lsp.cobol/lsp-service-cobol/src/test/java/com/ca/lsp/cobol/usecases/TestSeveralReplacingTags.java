@@ -19,8 +19,8 @@ import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This test checks that the REPLACING statement with several patterns specified does not cause any
@@ -49,6 +49,6 @@ public class TestSeveralReplacingTags {
 
   @Test
   public void test() {
-    UseCaseEngine.runTest(TEXT, singletonList(new CobolText(CUSTCOPY_NAME, CUSTCOPY)), emptyMap());
+    UseCaseEngine.runTest(TEXT, List.of(new CobolText(CUSTCOPY_NAME, CUSTCOPY)), Map.of());
   }
 }

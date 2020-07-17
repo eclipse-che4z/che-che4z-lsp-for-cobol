@@ -19,8 +19,8 @@ import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.Test;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
+import java.util.List;
+import java.util.Map;
 
 /** This test checks that the grammar may process the entire program put into a copybook */
 public class TestEntireProgramInCopybook {
@@ -46,7 +46,7 @@ public class TestEntireProgramInCopybook {
   public void test() {
     UseCaseEngine.runTest(
         TEXT,
-        asList(new CobolText(PROGA_NAME, PROGA), new CobolText(STRUCT1_NAME, STRUCT1)),
-        emptyMap());
+        List.of(new CobolText(PROGA_NAME, PROGA), new CobolText(STRUCT1_NAME, STRUCT1)),
+        Map.of());
   }
 }
