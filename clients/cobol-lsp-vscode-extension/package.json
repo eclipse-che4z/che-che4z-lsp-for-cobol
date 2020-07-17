@@ -65,6 +65,17 @@
                 ]
             }
         ],
+        "grammars": [
+            {
+                "language": "COBOL",
+                "scopeName": "source.cobol",
+                "path": "./syntaxes/COBOL.tmLanguage.json",
+                "embeddedLanguages": {
+                    "meta.embedded.block.sql": "sql",
+                    "meta.embedded.block.html": "html"
+                }
+            }
+        ],
         "configuration": {
             "title": "Broadcom COBOL LSP",
             "properties": {
@@ -88,6 +99,17 @@
                     "description": "Default list of datasets to search for copybooks",
                     "uniqueItems": true
                 }
+            }
+        },
+        "configurationDefaults": {
+            "[COBOL]": {
+                "editor.renderIndentGuides": false,
+                "editor.rulers": [
+                    7,
+                    11,
+                    72,
+                    80
+                ]
             }
         }
     },
