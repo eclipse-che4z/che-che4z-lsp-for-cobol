@@ -16,7 +16,10 @@ package com.ca.lsp.core.cobol.visitor;
 
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import lombok.Getter;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +42,6 @@ public class ParserListener extends BaseErrorListener {
     errors.add(
         SyntaxError.syntaxError()
             .startToken((CommonToken) offendingSymbol)
-            .ruleStack(((Parser) recognizer).getRuleInvocationStack())
             .suggestion(msg)
             .severity(ERROR)
             .build());
