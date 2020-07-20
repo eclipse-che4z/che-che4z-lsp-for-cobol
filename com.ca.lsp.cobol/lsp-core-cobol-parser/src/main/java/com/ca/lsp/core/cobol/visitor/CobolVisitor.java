@@ -34,9 +34,10 @@ import java.util.*;
 
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.INFO;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.WARNING;
+import static com.ca.lsp.core.cobol.parser.CobolLexer.COPYENTRY;
+import static com.ca.lsp.core.cobol.parser.CobolLexer.COPYEXIT;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
@@ -208,7 +209,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     Token token = node.getSymbol();
     Position position = calculatePosition(token);
     mapping.put(token, position);
-    checkControlSymbol(token.getText());
+    checkControlSymbol(token);
     return super.visitTerminal(node);
   }
 
@@ -217,15 +218,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     Token token = node.getSymbol();
     Position position = calculatePosition(token);
     mapping.put(token, position);
-    checkControlSymbol(token.getText());
+    checkControlSymbol(token);
     return super.visitTerminal(node);
   }
 
-  private void checkControlSymbol(String terminal) {
-    if (isEmpty(terminal)) return;
-    if (terminal.startsWith("*>CPYENTER")) {
-      moveToNextLevel(terminal);
-    } else if ("*>CPYEXIT".equals(terminal)) {
+  private void checkControlSymbol(Token terminal) {
+    if (terminal.getType() == COPYENTRY) {
+      moveToNextLevel(terminal.getText());
+    } else if (terminal.getType() == COPYEXIT) {
       moveToPreviousLevel();
     }
   }
