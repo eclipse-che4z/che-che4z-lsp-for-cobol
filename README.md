@@ -11,7 +11,7 @@
 
 # COBOL Language Support
 
-COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, highlighting and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using a Zowe CLI z/OSMF profile to automatically retrieve copybooks used in your programs and store them in your workspace. 
+COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using a Zowe CLI z/OSMF profile to automatically retrieve copybooks used in your programs and store them in your workspace. 
 
 COBOL Language Support recognizes files with the extensions `.cob` and `.cbl` as COBOL files.
 
@@ -24,7 +24,6 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 ## Prerequisites
 
 - Java version 11 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
-- To enable syntax coloring, a third-party COBOL extension is required. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
 - To enable automatic copybook retrieval, the following are required:
     - Configured TSO/E address space services, z/OS data set and file REST interface, and z/OS jobs REST interface. For more information, see [z/OS Requirements](https://docs.zowe.org/stable/user-guide/systemrequirements-zosmf.html#z-os-requirements).
     - [Zowe CLI z/OSMF profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) with credentials.
@@ -59,8 +58,6 @@ The extension enables syntax highlighting for COBOL code.
 	
 ### Syntax Coloring
 Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, and paragraphs.
-
-A third-party plugin is required to enable syntax coloring. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
 	
 ## Copybook Support
 
@@ -111,6 +108,6 @@ The extension includes the following copybook support features:
 * Functionality to skip variable levels when called, reducing call time.
 * Find All References and Go To Definition functionalities.
     - **Find All References** identifies all occurrences of variables and paragraphs from copybooks in the code.
-    - **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element. If the definition is in a copybook, the copybook opens.	
+    - **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element. If the definition is in a copybook, the copybook opens.
 
 ![Go To Definition in a copybook](/docs/images/CPYGoToDefinition.gif)
