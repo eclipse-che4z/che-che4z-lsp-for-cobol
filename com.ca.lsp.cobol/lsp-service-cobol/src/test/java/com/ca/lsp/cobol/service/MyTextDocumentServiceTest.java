@@ -168,6 +168,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     Communications communications = mock(Communications.class);
     LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
     DataBusBroker broker = mock(DataBusBroker.class);
+
     List<Diagnostic> diagnosticsNoErrors = Collections.emptyList();
     List<Diagnostic> diagnosticsWithErrors = createDefaultDiagnostics();
 
@@ -254,6 +255,23 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     verify(actions).collect(params);
   }
 
+  /**
+   * This test verify that when a {@link MyTextDocumentService#didClose(DidCloseTextDocumentParams)}
+   * is sent from the client to dispose a document, all the related diagnostic message are disposed
+   * from the document.
+   */
+  @Test
+  public void testDidCloseDisposeDiagnostics() {
+    Communications spyCommunications = spy(Communications.class);
+
+    DidCloseTextDocumentParams closedDocument =
+        new DidCloseTextDocumentParams(new TextDocumentIdentifier(DOCUMENT_URI));
+    service.didClose(closedDocument);
+
+    assertEquals(Collections.EMPTY_MAP, closeGetter(service));
+    verify(spyCommunications, atMost(1)).publishDiagnostics(DOCUMENT_URI, List.of());
+  }
+
   private List<Diagnostic> createDefaultDiagnostics() {
     return singletonList(
         new Diagnostic(
@@ -283,7 +301,8 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     verify(communications).notifyThatLoadingInProgress(uri);
     verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
     verify(dataBus, timeout(10000))
-        .postData(AnalysisFinishedEvent.builder().documentUri(uri).copybookUris(emptyList()).build());
+        .postData(
+            AnalysisFinishedEvent.builder().documentUri(uri).copybookUris(emptyList()).build());
     verify(communications, timeout(10000)).cancelProgressNotification(uri);
     verify(communications, timeout(10000)).publishDiagnostics(uri, diagnostics);
   }
