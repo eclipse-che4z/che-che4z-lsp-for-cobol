@@ -27,6 +27,7 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 - To enable automatic copybook retrieval, the following are required:
     - Configured TSO/E address space services, z/OS data set and file REST interface, and z/OS jobs REST interface. For more information, see [z/OS Requirements](https://docs.zowe.org/stable/user-guide/systemrequirements-zosmf.html#z-os-requirements).
     - [Zowe CLI z/OSMF profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) with credentials.
+- To enable outline view, a third-party COBOL extension is required. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
     
 ## Compatibility
 
@@ -58,6 +59,11 @@ The extension enables syntax highlighting for COBOL code.
 	
 ### Syntax Coloring
 Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, and paragraphs.
+
+### Outline View
+Outline view lets you navigate easily between different sections and divisions of your source code. 
+
+A third-party plugin is required to enable outline view. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
 	
 ## Copybook Support
 
