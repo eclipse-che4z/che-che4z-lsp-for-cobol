@@ -108,7 +108,10 @@ public class TestPreprocessorListenerImpl extends TestPreprocessorBaseListener {
         ofNullable(ctx.word())
             .map(WordContext::identifier)
             .map(RuleContext::getText)
-            .orElse(ofNullable(ctx.STRINGLITERAL()).map(ParseTree::getText).orElse(""));
+            .orElse(
+                ofNullable(ctx.STRINGLITERAL())
+                    .map(ParseTree::getText)
+                    .orElse(ofNullable(ctx.TEXT()).map(ParseTree::getText).orElse("")));
 
     processToken(text, ctx, replacementContext, null, ctx.diagnostic());
   }
