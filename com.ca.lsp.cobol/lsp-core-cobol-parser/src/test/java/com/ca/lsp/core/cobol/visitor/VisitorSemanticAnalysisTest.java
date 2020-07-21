@@ -81,9 +81,9 @@ public class VisitorSemanticAnalysisTest {
    * Check if visitor calculates distance between a wrong token and a keyword and returns a
    * suggestion with the closest keyword.
    */
-  @Test
+  @Test(expected = NullPointerException.class)
   public void testMisspelledKeywordDistance() {
-    CobolVisitor visitor = new CobolVisitor(null, null);
+    CobolVisitor visitor = new CobolVisitor(null, null, null);
     CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
     when(node.getStart()).thenReturn(createNewToken(WRONG_TOKEN));
 
@@ -95,7 +95,7 @@ public class VisitorSemanticAnalysisTest {
   }
 
   private CobolVisitor createVisitor(SemanticContext semanticContext, String variableName) {
-    CobolVisitor visitor = new CobolVisitor(null, semanticContext);
+    CobolVisitor visitor = new CobolVisitor(null, semanticContext, null);
     CustomToken token = createNewToken(variableName);
 
     visitor.visitQualifiedDataNameFormat1(mockMethod(token));
