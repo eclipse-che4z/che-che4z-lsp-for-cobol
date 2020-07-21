@@ -12,19 +12,15 @@
  *    Broadcom, Inc. - initial API and implementation
  */
 
-package com.ca.lsp.core.cobol.visitor;
+package com.ca.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cdi.EngineModule;
-import com.broadcom.lsp.cdi.module.databus.DatabusModule;
-import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
-import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.semantics.SemanticContext;
-import com.google.inject.Guice;
+import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
 
 /** This test verifies if the margins are respected and warnings are thrown */
-public class MarginABTest {
+public class TestMarginAB {
 
   /**
    * In TEXT_DIVISION_WRONG_PLACE string there are several DIVISIONS that are not in the right place
@@ -141,51 +137,33 @@ public class MarginABTest {
 
   @Test
   public void checkForAreaA() {
-    CobolLanguageEngine engine =
-        Guice.createInjector(new EngineModule(), new DatabusModule())
-            .getInstance(CobolLanguageEngine.class);
-    ResultWithErrors<SemanticContext> result;
-
-    result = engine.run("1", TEXT_DIVISION_WRONG_PLACE, "DID_OPEN");
-    assertEquals(3, result.getErrors().size());
+    AnalysisResult result = analyze(TEXT_DIVISION_WRONG_PLACE);
+    assertEquals(3, result.getDiagnostics().size());
   }
 
   @Test
   public void checkForAreaB() {
-    CobolLanguageEngine engine =
-        Guice.createInjector(new EngineModule(), new DatabusModule())
-            .getInstance(CobolLanguageEngine.class);
-    ResultWithErrors<SemanticContext> result;
-
-    result = engine.run("1", TEXT_AREA_B, "DID_OPEN");
-    assertEquals(5, result.getErrors().size());
+    AnalysisResult result = analyze(TEXT_AREA_B);
+    assertEquals(5, result.getDiagnostics().size());
   }
 
   @Test
   public void checkCorrectProgramID() {
-    CobolLanguageEngine engine =
-        Guice.createInjector(new EngineModule(), new DatabusModule())
-            .getInstance(CobolLanguageEngine.class);
-    ResultWithErrors<SemanticContext> result;
+    AnalysisResult result = analyze(TEXT_PROGRAM_ID);
 
-    result = engine.run("1", TEXT_PROGRAM_ID, "DID_OPEN");
-    assertEquals(1, result.getErrors().size());
+    assertEquals(1, result.getDiagnostics().size());
     assertEquals(
         "Program-name must be identical to the program-name of the corresponding PROGRAM-ID paragraph: FILETOTEST",
-        result.getErrors().get(0).getSuggestion());
+        result.getDiagnostics().get(0).getMessage());
   }
 
   @Test
   public void checkDeclaratives() {
-    CobolLanguageEngine engine =
-        Guice.createInjector(new EngineModule(), new DatabusModule())
-            .getInstance(CobolLanguageEngine.class);
-    ResultWithErrors<SemanticContext> result;
+    AnalysisResult result = analyze(TEXT_DECLARATIVES);
 
-    result = engine.run("1", TEXT_DECLARATIVES, "DID_OPEN");
-    assertEquals(3, result.getErrors().size());
+    assertEquals(3, result.getDiagnostics().size());
     assertEquals(
         "Following token can not be on the same line with DECLARATIVE token: MAMA",
-        result.getErrors().get(1).getSuggestion());
+        result.getDiagnostics().get(1).getMessage());
   }
 }

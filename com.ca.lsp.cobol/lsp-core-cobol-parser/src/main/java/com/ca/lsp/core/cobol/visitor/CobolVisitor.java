@@ -20,7 +20,6 @@ import com.ca.lsp.core.cobol.parser.CobolParserBaseVisitor;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
 import lombok.Getter;
-import lombok.Setter;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -41,8 +40,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private static final int INFO_LEVEL = 3;
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
-  @Getter @Setter private String programName;
 
+  private String programName = null;
   private String documentUri;
   private SemanticContext semanticContext;
   private CommonTokenStream tokenStream;
@@ -56,83 +55,84 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   @Override
   public Class visitIdentificationDivision(IdentificationDivisionContext ctx) {
-    String token = ctx.getStart().getText();
-    areaAWarning(ctx.start.getCharPositionInLine(), token, ctx.getStart().getLine());
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitProgramIdParagraph(ProgramIdParagraphContext ctx) {
     if (ctx.programName() != null) {
-      setProgramName(ctx.programName().getText());
+      programName = ctx.programName().getText();
     }
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitProcedureDivision(ProcedureDivisionContext ctx) {
-    String token = ctx.getStart().getText();
-    areaAWarning(ctx.start.getCharPositionInLine(), token, ctx.getStart().getLine());
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitEnvironmentDivision(EnvironmentDivisionContext ctx) {
-    String token = ctx.getStart().getText();
-    areaAWarning(ctx.start.getCharPositionInLine(), token, ctx.getStart().getLine());
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitDataDivision(DataDivisionContext ctx) {
-    String token = ctx.getStart().getText();
-    areaAWarning(ctx.start.getCharPositionInLine(), token, ctx.getStart().getLine());
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitDataDivisionSection(DataDivisionSectionContext ctx) {
-    String token = ctx.getStart().getText();
-    areaAWarning(ctx.start.getCharPositionInLine(), token, ctx.getStart().getLine());
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitEnvironmentDivisionBody(EnvironmentDivisionBodyContext ctx) {
-    String token = ctx.getStart().getText();
-    areaAWarning(ctx.start.getCharPositionInLine(), token, ctx.getStart().getLine());
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitProcedureSectionHeader(ProcedureSectionHeaderContext ctx) {
-    String token = ctx.getStart().getText();
-    areaAWarning(ctx.start.getCharPositionInLine(), token, ctx.getStart().getLine());
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitProcedureSection(ProcedureSectionContext ctx) {
-    String token = ctx.getStart().getText();
-    throwWarning(token, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
+    Token token = ctx.getStart();
+    throwWarning(token.getText(), token.getLine(), token.getCharPositionInLine());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitParagraph(ParagraphContext ctx) {
-    String token = ctx.getStart().getText();
-    areaAWarning(ctx.start.getCharPositionInLine(), token, ctx.getStart().getLine());
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
-    String token = ctx.getStart().getText();
-    if (token.equals("01") || token.equals("1") || token.equals("77")) {
-      areaAWarning(ctx.start.getCharPositionInLine(), token, ctx.getStart().getLine());
+    Token token = ctx.getStart();
+    String tokenText = token.getText();
+    if (tokenText.equals("01") || tokenText.equals("1") || tokenText.equals("77")) {
+      areaAWarning(ctx.start.getCharPositionInLine(), tokenText, token.getLine());
     } else {
       List<Token> tokenList =
-          tokenStream.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
+          tokenStream.getTokens(token.getTokenIndex(), ctx.getStop().getTokenIndex());
       areaBWarning(tokenList);
     }
     return visitChildren(ctx);
@@ -164,8 +164,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   public Class visitEndProgramStatement(EndProgramStatementContext ctx) {
     Token programName = ctx.programName().getStart();
     checkProgramName(programName);
-    String token = ctx.getStart().getText();
-    areaAWarning(ctx.start.getCharPositionInLine(), token, ctx.getStart().getLine());
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
     return visitChildren(ctx);
   }
 
@@ -395,7 +395,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   private void checkProgramName(Token token) {
-    if (getProgramName() == null) {
+    if (programName == null) {
       throwException(
           "",
           token.getLine(),
@@ -408,9 +408,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   private void checkProgramNameIdentical(Token token) {
-    if (!getProgramName().equals(token.getText())) {
+    if (!programName.equals(token.getText())) {
       throwException(
-          getProgramName(),
+          programName,
           token.getLine(),
           token.getCharPositionInLine(),
           "Program-name must be identical to the program-name of the corresponding PROGRAM-ID paragraph: ",

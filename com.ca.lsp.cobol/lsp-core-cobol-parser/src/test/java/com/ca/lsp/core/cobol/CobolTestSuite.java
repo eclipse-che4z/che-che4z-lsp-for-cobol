@@ -24,7 +24,6 @@ import com.ca.lsp.core.cobol.semantics.CobolCleanExtraLanguageTest;
 import com.ca.lsp.core.cobol.semantics.CobolVariableCheckTest;
 import com.ca.lsp.core.cobol.semantics.CobolVariableContextTest;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategyTest;
-import com.ca.lsp.core.cobol.visitor.MarginABTest;
 import com.ca.lsp.core.cobol.visitor.MisspelledKeywordDistanceTest;
 import com.ca.lsp.core.cobol.visitor.VisitorSemanticAnalysisTest;
 import org.junit.runner.RunWith;
@@ -47,6 +46,5 @@ import org.junit.runners.Suite.SuiteClasses;
   CobolLineIndicatorProcessorImplTest.class,
   CobolErrorStrategyTest.class,
   CobolInlineCommentEntriesNormalizerImplTest.class,
-  MarginABTest.class,
 })
 public class CobolTestSuite {}
