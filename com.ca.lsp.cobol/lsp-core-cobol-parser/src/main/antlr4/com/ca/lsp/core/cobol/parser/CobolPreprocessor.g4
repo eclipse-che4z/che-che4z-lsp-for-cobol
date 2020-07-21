@@ -701,7 +701,6 @@ fragment STRINGLITERAL :
 IDENTIFIER : [a-zA-Z0-9#@$]+ ([-_]+ [a-zA-Z0-9#@$]+)*;
 FILENAME : [a-zA-Z0-9]+ '.' [a-zA-Z0-9]+;
 
-
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
@@ -710,6 +709,8 @@ WS : [ \t\f;]+ -> channel(HIDDEN);
 TEXT : ~('\n' | '\r');
 SEPARATOR : ', ' -> channel(HIDDEN);
 
+// treat all the non-processed tokens as errors
+ERRORCHAR : . ;
 
 // case insensitive chars
 fragment A:('a'|'A');

@@ -35,6 +35,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestErrorsInDifferentFiles.class,
   TestEntireProgramInCopybook.class,
   TestReplacingAppliedOneByOne.class,
+  TestUnexpectedCharErrorShown.class,
   TestProcedureDivisionInCopybook.class,
   TestExtraneousInputEOFExpecting.class,
   TestNoErrorOnCompilerDirectives.class,

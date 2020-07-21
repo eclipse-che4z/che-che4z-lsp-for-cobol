@@ -612,6 +612,9 @@ COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
 WS : [ \t\f;]+ -> channel(HIDDEN);
 SEPARATOR : ', ' -> channel(HIDDEN);
 
+// treat all the non-processed tokens as errors
+ERRORCHAR : . ;
+
 fragment DIGIT: [0-9];
 
 fragment HEXNUMBER :
