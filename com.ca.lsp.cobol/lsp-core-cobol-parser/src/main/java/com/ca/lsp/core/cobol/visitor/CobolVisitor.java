@@ -130,10 +130,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     String tokenText = token.getText();
     if (tokenText.equals("01") || tokenText.equals("1") || tokenText.equals("77")) {
       areaAWarning(ctx.start.getCharPositionInLine(), tokenText, token.getLine());
-    } else {
-      List<Token> tokenList =
-          tokenStream.getTokens(token.getTokenIndex(), ctx.getStop().getTokenIndex());
-      areaBWarning(tokenList);
     }
     return visitChildren(ctx);
   }

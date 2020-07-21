@@ -69,7 +69,7 @@ public class TestMarginAB {
           + "000000  01 ATCDEM3      PIC X(7) VALUE 'ATCDEM3'.\n"
           + "000000  01 P1PARM1      PIC 99 VALUE 0.\n"
           + "000000  01 TASTRUCT.\n"
-          + "000000  05 LOC-ID.\n" // starting area A instead of B
+          + "000000  05 LOC-ID.\n" // starting in the correct area, must not be a warning
           + "000000         10 STATE    PIC X(2).\n"
           + "000000         10 CITY     PIC X(3).\n"
           + "000000     05 OP-SYS     PIC X(3).\n"
@@ -144,7 +144,7 @@ public class TestMarginAB {
   @Test
   public void checkForAreaB() {
     AnalysisResult result = analyze(TEXT_AREA_B);
-    assertEquals(5, result.getDiagnostics().size());
+    assertEquals(4, result.getDiagnostics().size());
   }
 
   @Test
