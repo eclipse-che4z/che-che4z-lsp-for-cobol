@@ -28,6 +28,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.ForkJoinTask;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static java.lang.String.format;
@@ -79,7 +80,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
       List<ResultWithErrors<CopybookSemanticContext>> contexts) {
     return contexts.stream()
         .map(ResultWithErrors::getResult)
-        .filter(it -> it.getContext() != null)
+        .filter(Predicate.not(ctxNullPredicate()))
         .collect(toList());
   }
 
@@ -96,11 +97,15 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
       List<ResultWithErrors<CopybookSemanticContext>> contexts) {
     return contexts.stream()
         .map(ResultWithErrors::getResult)
-        .filter(it -> it.getContext() == null)
+        .filter(ctxNullPredicate())
         .map(CopybookSemanticContext::getName)
         .map(defineErrors(copybooks))
         .flatMap(List::stream)
         .collect(toList());
+  }
+
+  private Predicate<CopybookSemanticContext> ctxNullPredicate() {
+    return it -> it.getContext() == null;
   }
 
   @Nonnull

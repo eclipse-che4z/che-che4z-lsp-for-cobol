@@ -102,7 +102,7 @@ public class TestFormatTrim extends ConfigurableTest {
     } catch (IOException e) {
       fail(e.getMessage());
     }
-    return null;
+    return List.of();
   }
 
   private static String rtrim(String s) {

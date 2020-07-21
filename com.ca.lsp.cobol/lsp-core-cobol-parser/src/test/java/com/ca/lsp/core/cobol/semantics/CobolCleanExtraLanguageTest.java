@@ -19,9 +19,7 @@ import com.broadcom.lsp.cdi.EngineModule;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookParallelAnalysis;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserImpl;
+import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
 import com.google.inject.Guice;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +27,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.assertEquals;
 
@@ -166,7 +165,7 @@ public class CobolCleanExtraLanguageTest {
 
   @Parameterized.Parameters
   public static Collection<Object> textsToTest() {
-    return Arrays.asList(
+    return List.of(
         new Object[][] {
           {CICS_TAG, CICS_TEXT, LINE_PREFIX_CICS, CICS_EXPECTED_TEXT},
           {SQL_TAG, SQL_TEXT, LINE_PREFIX_SQL, SQL_EXPECTED_TEXT},
@@ -181,11 +180,12 @@ public class CobolCleanExtraLanguageTest {
 
     // VERIFY THE SCENARIO FOR DID_OPEN
     result = engine.run("1", TEXT_TO_TEST, "DID_OPEN");
-    assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
+    Predicate<SyntaxError> syntaxErrorPredicate = item -> item.getSeverity() == 1;
+    assertEquals(0, result.getErrors().stream().filter(syntaxErrorPredicate).count());
 
     // VERIFY THE SCENARIO FOR DID_CHANGE
     result = engine.run("1", TEXT_TO_TEST, "DID_CHANGE");
-    assertEquals(0, result.getErrors().stream().filter(item -> item.getSeverity() == 1).count());
+    assertEquals(0, result.getErrors().stream().filter(syntaxErrorPredicate).count());
   }
 
   @Test

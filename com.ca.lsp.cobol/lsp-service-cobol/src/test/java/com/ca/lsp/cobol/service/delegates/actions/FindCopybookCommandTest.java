@@ -15,11 +15,11 @@
 
 package com.ca.lsp.cobol.service.delegates.actions;
 
+import com.google.common.collect.Lists;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
@@ -85,7 +85,7 @@ public class FindCopybookCommandTest {
   public void testCollectCommandsOrActionsMixed() {
     CodeActionProvider provider = new FindCopybookCommand();
 
-    List<Diagnostic> diagnostics = Arrays.asList(SYNTAX_ERROR, COPYBOOK_ERROR);
+    List<Diagnostic> diagnostics = Lists.newArrayList(SYNTAX_ERROR, COPYBOOK_ERROR);
     CodeActionParams params =
         new CodeActionParams(
             new TextDocumentIdentifier(DOCUMENT_URI), RANGE, new CodeActionContext(diagnostics));

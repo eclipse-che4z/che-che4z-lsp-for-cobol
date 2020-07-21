@@ -208,18 +208,6 @@ setStatement
 skipNoStatement
    : (SKIP1 | SKIP2 | SKIP3) everything;
 
-skip1Statement
-   : SKIP1 ~DOT_FS*?
-   ;
-
-skip2Statement
-   : SKIP2 ~DOT_FS*?
-   ;
-
-skip3Statement
-   : SKIP3 ~DOT_FS*?
-   ;
-
 sortStatement
    : SORT everything;
 

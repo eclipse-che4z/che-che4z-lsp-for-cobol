@@ -16,7 +16,6 @@ package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_TAG;
@@ -119,7 +118,7 @@ public class CobolLineIndicatorProcessorImplTest {
     middleContinuationLine.setSuccessor(lastContinuationLine);
 
     List<CobolLine> listOfLines =
-        Arrays.asList(startContinuationLine, middleContinuationLine, lastContinuationLine);
+        List.of(startContinuationLine, middleContinuationLine, lastContinuationLine);
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
@@ -151,7 +150,7 @@ public class CobolLineIndicatorProcessorImplTest {
 
     continuationLine.setSuccessor(emptyContinuationLine);
 
-    final List<CobolLine> listOfLines = Arrays.asList(continuationLine, emptyContinuationLine);
+    final List<CobolLine> listOfLines = List.of(continuationLine, emptyContinuationLine);
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
@@ -182,7 +181,7 @@ public class CobolLineIndicatorProcessorImplTest {
     trailingCommaContinuationLine.setPredecessor(startContinuationLine);
 
     List<CobolLine> listOfLines =
-        Arrays.asList(startContinuationLine, trailingCommaContinuationLine);
+        List.of(startContinuationLine, trailingCommaContinuationLine);
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
