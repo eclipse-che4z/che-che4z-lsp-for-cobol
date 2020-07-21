@@ -28,7 +28,7 @@ multiToken
    ;
 
 errorStatement
-   : START (STRINGLITERAL | word)? diagnostic* STOP
+   : START (STRINGLITERAL | word | TEXT)? diagnostic* STOP
    ;
 
 copybookStatement
@@ -114,7 +114,6 @@ NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 WS : [ \t\f;]+ -> channel(HIDDEN);
 TEXT : ~('\n' | '\r');
 SEPARATOR : ', ' -> channel(HIDDEN);
-
 
 // case insensitive chars
 fragment A:('a'|'A');
