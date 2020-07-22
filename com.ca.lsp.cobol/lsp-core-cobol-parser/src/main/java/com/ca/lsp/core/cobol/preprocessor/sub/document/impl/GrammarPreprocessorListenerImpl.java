@@ -22,7 +22,6 @@ import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -70,7 +69,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private Provider<CopybookResolution> resolutions;
   private Deque<CopybookUsage> copybookStack;
   private ReplacingService replacingService;
-  private TokenUtils tokenUtils;
 
   @Inject
   GrammarPreprocessorListenerImpl(
@@ -81,8 +79,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       PreprocessorCleanerService cleaner,
       CobolPreprocessor preprocessor,
       Provider<CopybookResolution> resolutions,
-      ReplacingService replacingService,
-      TokenUtils tokenUtils) {
+      ReplacingService replacingService) {
     this.documentUri = documentUri;
     this.tokens = tokens;
     this.copybookStack = copybookStack;
@@ -91,7 +88,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     this.preprocessor = preprocessor;
     this.resolutions = resolutions;
     this.replacingService = replacingService;
-    this.tokenUtils = tokenUtils;
   }
 
   @Nonnull
@@ -199,7 +195,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     addCopybookUsage(copybookName, position);
     addCopybookDefinition(copybookName, uri);
 
-    collectNestedSemanticData(uri, copybookId, replacedContent, copybookDocument);
+    collectNestedSemanticData(uri, copybookId, copybookDocument);
     writeCopybook(copybookId, copybookContent);
   }
 
@@ -243,11 +239,10 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private void collectNestedSemanticData(
-      String uri, String copybookId, String replacedContent, ExtendedDocument copybookDocument) {
+      String uri, String copybookId, ExtendedDocument copybookDocument) {
     copybooks.merge(copybookDocument.getCopybooks());
     nestedMappings.putAll(copybookDocument.getDocumentPositions());
-    nestedMappings.computeIfAbsent(
-        copybookId, it -> tokenUtils.retrievePositionsFromText(uri, replacedContent));
+    nestedMappings.putIfAbsent(copybookId, nestedMappings.get(uri));
   }
 
   private void writeCopybook(String copybookId, String copybookContent) {
