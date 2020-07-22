@@ -79,7 +79,7 @@ public class CobolLanguageEngine {
 
     CobolParser.StartRuleContext tree = parser.startRule();
     CobolVisitor visitor =
-        new CobolVisitor(documentUri, preProcessedInput.getResult().getSemanticContext());
+        new CobolVisitor(documentUri, preProcessedInput.getResult().getSemanticContext(), tokens);
     visitor.visit(tree);
 
     errors.addAll(visitor.getErrors());

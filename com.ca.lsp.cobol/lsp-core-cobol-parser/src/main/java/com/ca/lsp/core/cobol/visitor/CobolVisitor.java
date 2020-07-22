@@ -20,7 +20,9 @@ import com.ca.lsp.core.cobol.parser.CobolParserBaseVisitor;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
 import lombok.Getter;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,26 +38,153 @@ import static com.ca.lsp.core.cobol.parser.CobolParser.*;
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private static final int WARNING_LEVEL = 2;
   private static final int INFO_LEVEL = 3;
+  private static final String AREA_A_WARNING_MSG = "Following token must start in Area A: ";
+  private static final String AREA_B_WARNING_MSG = "Following token must start in Area B: ";
+  private static final String IDENTICAL_PROGRAM_MSG =
+      "Program-name must be identical to the program-name of the corresponding PROGRAM-ID paragraph: ";
+  private static final String DECLARATIVE_SAME_MSG =
+      "Following token can not be on the same line with DECLARATIVE token: ";
+  private static final String INVALID_DEF_MSG = "Invalid definition for: ";
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
 
+  private String programName = null;
   private String documentUri;
   private SemanticContext semanticContext;
+  private CommonTokenStream tokenStream;
 
-  public CobolVisitor(String documentUri, SemanticContext semanticContext) {
+  public CobolVisitor(
+      String documentUri, SemanticContext semanticContext, CommonTokenStream tokenStream) {
     this.documentUri = documentUri;
     this.semanticContext = semanticContext;
+    this.tokenStream = tokenStream;
+  }
+
+  @Override
+  public Class visitIdentificationDivision(IdentificationDivisionContext ctx) {
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitProgramIdParagraph(ProgramIdParagraphContext ctx) {
+    if (ctx.programName() != null) {
+      programName = ctx.programName().getText();
+    }
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitProcedureDivision(ProcedureDivisionContext ctx) {
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitEnvironmentDivision(EnvironmentDivisionContext ctx) {
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitDataDivision(DataDivisionContext ctx) {
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitDataDivisionSection(DataDivisionSectionContext ctx) {
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitEnvironmentDivisionBody(EnvironmentDivisionBodyContext ctx) {
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitProcedureSectionHeader(ProcedureSectionHeaderContext ctx) {
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    return visitChildren(ctx);
   }
 
   @Override
   public Class visitProcedureSection(ProcedureSectionContext ctx) {
-    String wrongToken = ctx.getStart().getText();
-    throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
+    Token token = ctx.getStart();
+    throwWarning(token.getText(), token.getLine(), token.getCharPositionInLine());
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitParagraph(ParagraphContext ctx) {
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
+    Token token = ctx.getStart();
+    String tokenText = token.getText();
+    if (tokenText.equals("01") || tokenText.equals("1") || tokenText.equals("77")) {
+      areaAWarning(ctx.start.getCharPositionInLine(), tokenText, token.getLine());
+    }
+    return visitChildren(ctx);
+  }
+
+  /**
+   * In this method, first condition is checking if there is any other element present on the same
+   * line as DECLARATIVES token and throws an error if the condition is true; In the PROCEDURE
+   * DIVISION, each of the keywords DECLARATIVES and END DECLARATIVES must begin in Area A and be
+   * followed immediately by a separator period; no other text can appear on the same line. After
+   * the keywords END DECLARATIVES, no text can appear before the following section header.
+   */
+  @Override
+  public Class visitProcedureDeclaratives(ProcedureDeclarativesContext ctx) {
+    Token firstDeclarative = ctx.getStart();
+    int firstDeclLine = firstDeclarative.getLine();
+    Token declarativeBody = ctx.procedureDeclarative(0).getStart();
+    Token endToken = ctx.END().getSymbol();
+
+    if (firstDeclLine == declarativeBody.getLine()) {
+      throwException(
+          declarativeBody.getText(),
+          declarativeBody.getLine(),
+          declarativeBody.getCharPositionInLine(),
+          DECLARATIVE_SAME_MSG,
+          WARNING_LEVEL);
+    }
+
+    areaAWarning(
+        firstDeclarative.getCharPositionInLine(), firstDeclarative.getText(), firstDeclLine);
+    areaAWarning(endToken.getCharPositionInLine(), endToken.getText(), endToken.getLine());
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitEndProgramStatement(EndProgramStatementContext ctx) {
+    Token endProgramNameToken = ctx.programName().getStart();
+    checkProgramName(endProgramNameToken);
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitStatement(StatementContext ctx) {
+    List<Token> tokenList =
+        tokenStream.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
+    areaBWarning(tokenList);
+
     String wrongToken = ctx.getStart().getText();
     throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
     return visitChildren(ctx);
@@ -157,8 +286,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
                 getSemanticError(wrongToken, startLine, charPositionInLine, correctWord));
   }
 
-  private void throwSuggestion(String wrongToken, int startLine, int charPositionInLine) {
-    errors.add(
+  private void throwException(
+      String wrongToken, int startLine, int charPositionInLine, String message, int severity) {
+    SyntaxError syntaxError =
         SyntaxError.syntaxError()
             .position(
                 new Position(
@@ -167,9 +297,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
                     getWrongTokenStopPosition(wrongToken, charPositionInLine),
                     startLine,
                     charPositionInLine))
-            .suggestion("Invalid definition for: " + wrongToken)
-            .severity(INFO_LEVEL)
-            .build());
+            .suggestion(message + wrongToken)
+            .severity(severity)
+            .build();
+
+    if (!errors.contains(syntaxError)) {
+      errors.add(syntaxError);
+    }
   }
 
   private void getSemanticError(
@@ -191,7 +325,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private boolean checkForVariable(
       String variable, int startLine, int charPositionInLine, ParserRuleContext ctx) {
     if (!semanticContext.getVariables().contains(variable)) {
-      throwSuggestion(variable, startLine, charPositionInLine);
+      throwException(variable, startLine, charPositionInLine, INVALID_DEF_MSG, INFO_LEVEL);
       return false;
     } else if (ctx instanceof QualifiedDataNameFormat1Context
         && ((QualifiedDataNameFormat1Context) ctx).qualifiedInData() != null) {
@@ -222,7 +356,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void checkParentContainsChildren(
       String parent, String children, int startLine, int charPositionInLine) {
     if (!semanticContext.getVariables().parentContainsSpecificChild(parent, children)) {
-      throwSuggestion(children, startLine, charPositionInLine);
+      throwException(children, startLine, charPositionInLine, INVALID_DEF_MSG, INFO_LEVEL);
     }
   }
 
@@ -245,5 +379,45 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
         ctx.getStart().getStopIndex(),
         ctx.getStart().getLine(),
         ctx.getStart().getCharPositionInLine());
+  }
+
+  private void areaAWarning(int charPosition, String token, int startLine) {
+    if (charPosition > 10) {
+      throwException(token, startLine, charPosition, AREA_A_WARNING_MSG, WARNING_LEVEL);
+    }
+  }
+
+  private void areaBWarning(List<Token> tokenList) {
+    for (Token token : tokenList) {
+      int charPosition = token.getCharPositionInLine();
+      if (charPosition > 6 && charPosition < 11 && token.getChannel() != 1) {
+        throwException(
+            token.getText(), token.getLine(), charPosition, AREA_B_WARNING_MSG, WARNING_LEVEL);
+      }
+    }
+  }
+
+  private void checkProgramName(Token token) {
+    if (programName == null) {
+      throwException(
+          "",
+          token.getLine(),
+          token.getCharPositionInLine(),
+          "There is an issue with PROGRAM-ID paragraph",
+          WARNING_LEVEL);
+    } else {
+      checkProgramNameIdentical(token);
+    }
+  }
+
+  private void checkProgramNameIdentical(Token token) {
+    if (!programName.equals(token.getText())) {
+      throwException(
+          programName,
+          token.getLine(),
+          token.getCharPositionInLine(),
+          IDENTICAL_PROGRAM_MSG,
+          WARNING_LEVEL);
+    }
   }
 }

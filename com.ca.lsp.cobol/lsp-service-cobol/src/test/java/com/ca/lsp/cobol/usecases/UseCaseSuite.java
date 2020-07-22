@@ -20,6 +20,7 @@ import org.junit.runners.Suite.SuiteClasses;
 /** The suite for the use case tests in the project that should be run. */
 @RunWith(Suite.class)
 @SuiteClasses({
+  TestMarginAB.class,
   TestFormatTrim.class,
   TestSyntaxError.class,
   TestSkipStatement.class,
