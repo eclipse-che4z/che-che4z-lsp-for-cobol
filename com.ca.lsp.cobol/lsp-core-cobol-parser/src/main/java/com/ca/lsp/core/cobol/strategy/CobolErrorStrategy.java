@@ -17,6 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
+import static com.ca.lsp.core.cobol.parser.CobolParser.COPYENTRY;
+import static com.ca.lsp.core.cobol.parser.CobolParser.COPYEXIT;
+
 @Slf4j
 public class CobolErrorStrategy extends DefaultErrorStrategy {
 
@@ -75,24 +78,6 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
       LOG.error("unknown recognition error type: " + e.getClass().getName());
       recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e);
     }
-  }
-
-  @Override
-  public void sync(Parser recognizer) {
-    Token currentToken = recognizer.getCurrentToken();
-    String terminal = currentToken.getText();
-    // If the processing stopped at the copybook enter tag and cannot be recovered in place, it
-    // means that there are, in fact, two affected tokens
-    if (terminal.startsWith("*>CPYENTER")) {
-      int nextTokenType = recognizer.getInputStream().LA(3);
-      IntervalSet expecting = getExpectedTokens(recognizer);
-      if (expecting.contains(nextTokenType)) {
-        // Move processing forward two times
-        recognizer.consume();
-        recognizer.consume();
-      }
-    }
-    super.sync(recognizer);
   }
 
   @Override
