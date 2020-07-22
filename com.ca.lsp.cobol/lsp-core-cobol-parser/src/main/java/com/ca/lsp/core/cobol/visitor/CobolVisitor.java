@@ -38,6 +38,13 @@ import static com.ca.lsp.core.cobol.parser.CobolParser.*;
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private static final int WARNING_LEVEL = 2;
   private static final int INFO_LEVEL = 3;
+  private static final String AREA_A_WARNING_MSG = "Following token must start in Area A: ";
+  private static final String AREA_B_WARNING_MSG = "Following token must start in Area B: ";
+  private static final String IDENTICAL_PROGRAM_MSG =
+      "Program-name must be identical to the program-name of the corresponding PROGRAM-ID paragraph: ";
+  private static final String DECLARATIVE_SAME_MSG =
+      "Following token can not be on the same line with DECLARATIVE token: ";
+  private static final String INVALID_DEF_MSG = "Invalid definition for: ";
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
 
@@ -134,6 +141,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     return visitChildren(ctx);
   }
 
+  /**
+   * In this method, first condition is checking if there is any other element present on the same
+   * line as DECLARATIVES token and throws an error if the condition is true; In the PROCEDURE
+   * DIVISION, each of the keywords DECLARATIVES and END DECLARATIVES must begin in Area A and be
+   * followed immediately by a separator period; no other text can appear on the same line. After
+   * the keywords END DECLARATIVES, no text can appear before the following section header.
+   */
   @Override
   public Class visitProcedureDeclaratives(ProcedureDeclarativesContext ctx) {
     Token firstDeclarative = ctx.getStart();
@@ -146,7 +160,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
           declarativeBody.getText(),
           declarativeBody.getLine(),
           declarativeBody.getCharPositionInLine(),
-          "Following token can not be on the same line with DECLARATIVE token: ",
+          DECLARATIVE_SAME_MSG,
           WARNING_LEVEL);
     }
 
@@ -158,8 +172,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   @Override
   public Class visitEndProgramStatement(EndProgramStatementContext ctx) {
-    Token programName = ctx.programName().getStart();
-    checkProgramName(programName);
+    Token endProgramNameToken = ctx.programName().getStart();
+    checkProgramName(endProgramNameToken);
     Token token = ctx.getStart();
     areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
     return visitChildren(ctx);
@@ -311,8 +325,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private boolean checkForVariable(
       String variable, int startLine, int charPositionInLine, ParserRuleContext ctx) {
     if (!semanticContext.getVariables().contains(variable)) {
-      throwException(
-          variable, startLine, charPositionInLine, "Invalid definition for: ", INFO_LEVEL);
+      throwException(variable, startLine, charPositionInLine, INVALID_DEF_MSG, INFO_LEVEL);
       return false;
     } else if (ctx instanceof QualifiedDataNameFormat1Context
         && ((QualifiedDataNameFormat1Context) ctx).qualifiedInData() != null) {
@@ -343,8 +356,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void checkParentContainsChildren(
       String parent, String children, int startLine, int charPositionInLine) {
     if (!semanticContext.getVariables().parentContainsSpecificChild(parent, children)) {
-      throwException(
-          children, startLine, charPositionInLine, "Invalid definition for: ", INFO_LEVEL);
+      throwException(children, startLine, charPositionInLine, INVALID_DEF_MSG, INFO_LEVEL);
     }
   }
 
@@ -371,8 +383,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private void areaAWarning(int charPosition, String token, int startLine) {
     if (charPosition > 10) {
-      throwException(
-          token, startLine, charPosition, "Following token must start in Area A: ", WARNING_LEVEL);
+      throwException(token, startLine, charPosition, AREA_A_WARNING_MSG, WARNING_LEVEL);
     }
   }
 
@@ -381,11 +392,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
       int charPosition = token.getCharPositionInLine();
       if (charPosition > 6 && charPosition < 11 && token.getChannel() != 1) {
         throwException(
-            token.getText(),
-            token.getLine(),
-            charPosition,
-            "Following token must start in Area B: ",
-            WARNING_LEVEL);
+            token.getText(), token.getLine(), charPosition, AREA_B_WARNING_MSG, WARNING_LEVEL);
       }
     }
   }
@@ -409,7 +416,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
           programName,
           token.getLine(),
           token.getCharPositionInLine(),
-          "Program-name must be identical to the program-name of the corresponding PROGRAM-ID paragraph: ",
+          IDENTICAL_PROGRAM_MSG,
           WARNING_LEVEL);
     }
   }
