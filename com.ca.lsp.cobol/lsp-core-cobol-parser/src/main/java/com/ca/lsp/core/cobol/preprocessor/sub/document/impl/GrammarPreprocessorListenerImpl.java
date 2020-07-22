@@ -252,7 +252,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     cleaner.write(CPY_ENTER_TAG);
     cleaner.write("<URI>");
     cleaner.write(copybookId);
-    cleaner.write("</URI>. ");
+    cleaner.write("</URI>");
     cleaner.write(copybookContent);
     // write copybook closing trigger
     cleaner.write(CPY_EXIT_TAG);

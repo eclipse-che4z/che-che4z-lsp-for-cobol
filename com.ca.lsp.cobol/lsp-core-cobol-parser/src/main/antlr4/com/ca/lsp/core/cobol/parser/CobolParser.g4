@@ -962,11 +962,11 @@ dataDescriptionEntryExecSql
 
 //TODO: make it beautiful
 dataDescriptionEntryCpy
-   : COPYENTRY URI_IDENTIFIER DOT_FS
+   : COPYENTRY
    ;
 
 dataDescriptionExitCpy
-   : COPYEXIT DOT_FS
+   : COPYEXIT
    ;
    
 dataGroupUsageClause
@@ -1154,7 +1154,7 @@ paragraph
    ;
 
 sentence
-   : (statement* DOT_FS) | skipStatement+
+   : (statement* DOT_FS) | skipStatement+ | enterCpy | exitCpy
    ;
 
 statement
@@ -1169,7 +1169,7 @@ statement
 
 //TODO: modify the copybook name rule to accept everything including keywords
 enterCpy
-   : COPYENTRY URI_IDENTIFIER
+   : COPYENTRY
    ;
 
 exitCpy
