@@ -21,6 +21,7 @@ import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.utils.CustomToken;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -83,9 +84,13 @@ public class VisitorSemanticAnalysisTest {
    */
   @Test
   public void testMisspelledKeywordDistance() {
-    CobolVisitor visitor = new CobolVisitor(null, null);
     CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
     when(node.getStart()).thenReturn(createNewToken(WRONG_TOKEN));
+    when(node.getStop()).thenReturn(createNewToken(WRONG_TOKEN));
+
+    CommonTokenStream tokenStream = mock(CommonTokenStream.class);
+
+    CobolVisitor visitor = new CobolVisitor(null, null, tokenStream);
 
     visitor.visitStatement(node);
 
@@ -94,8 +99,15 @@ public class VisitorSemanticAnalysisTest {
     assertEquals("A misspelled word, maybe you want to put MOVE", errors.get(0).getSuggestion());
   }
 
+  @Test(expected = NullPointerException.class)
+  public void testMisspelledKeywordDistanceWithException() {
+    CobolVisitor visitor = new CobolVisitor(null, null, null);
+    CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
+    visitor.visitStatement(node);
+  }
+
   private CobolVisitor createVisitor(SemanticContext semanticContext, String variableName) {
-    CobolVisitor visitor = new CobolVisitor(null, semanticContext);
+    CobolVisitor visitor = new CobolVisitor(null, semanticContext, null);
     CustomToken token = createNewToken(variableName);
 
     visitor.visitQualifiedDataNameFormat1(mockMethod(token));

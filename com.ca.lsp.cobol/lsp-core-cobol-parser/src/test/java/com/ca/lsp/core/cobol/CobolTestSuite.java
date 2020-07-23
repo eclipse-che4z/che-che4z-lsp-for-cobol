@@ -45,6 +45,6 @@ import org.junit.runners.Suite.SuiteClasses;
   VisitorSemanticAnalysisTest.class,
   CobolLineIndicatorProcessorImplTest.class,
   CobolErrorStrategyTest.class,
-  CobolInlineCommentEntriesNormalizerImplTest.class
+  CobolInlineCommentEntriesNormalizerImplTest.class,
 })
 public class CobolTestSuite {}
