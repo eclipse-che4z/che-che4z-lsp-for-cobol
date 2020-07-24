@@ -141,6 +141,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     return visitChildren(ctx);
   }
 
+  @Override
+  public Class visitFileDescriptionEntry(FileDescriptionEntryContext ctx) {
+    Token token = ctx.getStart();
+    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    return visitChildren(ctx);
+  }
+
   /**
    * In this method, first condition is checking if there is any other element present on the same
    * line as DECLARATIVES token and throws an error if the condition is true; In the PROCEDURE

@@ -25,11 +25,18 @@ public class TestMarginAB {
   /**
    * In TEXT_DIVISION_WRONG_PLACE string there are several DIVISIONS that are not in the right place
    */
-  private static final String TEXT_DIVISION_WRONG_PLACE =
+  private static final String TEXT_AREA_A =
       "000000       IDENTIFICATION DIVISION.\n" // starting area B instead of A
           + "000000  PROGRAM-ID.    FILETOTEST.\n"
           + "000000  AUTHOR. SERGIU ILIE.\n"
           + "000000     DATA DIVISION.\n" // starting area B instead of A
+          + "000000 FILE SECTION.\n"
+          + "000000     FD  TRANS-FILE-IN\n" // FD starting in area B instead of A
+          + "000000     LABEL RECORDS ARE STANDARD\n"
+          + "000000     RECORDING MODE IS F\n"
+          + "000000     BLOCK CONTAINS 0 RECORDS\n"
+          + "000000     RECORD CONTAINS 113 CHARACTERS\n"
+          + "000000     DATA RECORD IS BILL-LADING-RECORD.\n"
           + "000000  WORKING-STORAGE SECTION.\n"
           + "000000  01 TAPARM1.\n"
           + "000000  01 TAPARM2      PIC 99 VALUE 2.\n"
@@ -137,8 +144,8 @@ public class TestMarginAB {
 
   @Test
   public void checkForAreaA() {
-    AnalysisResult result = analyze(TEXT_DIVISION_WRONG_PLACE);
-    assertEquals(3, result.getDiagnostics().size());
+    AnalysisResult result = analyze(TEXT_AREA_A);
+    assertEquals(4, result.getDiagnostics().size());
   }
 
   @Test
