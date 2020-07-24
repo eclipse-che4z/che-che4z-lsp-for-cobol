@@ -16,6 +16,8 @@ package com.ca.lsp.cobol.negative;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.List;
+
 /**
  * " 57 IGYDS1089-S ""INDXED"" was invalid. Scanning was resumed at the next area ""A"" item,
  * level-number, or the start of the next clause.
@@ -40,7 +42,7 @@ public class Chetest2Test extends NegativeTest {
   private static final int EXPECTED_ERRORS_NUMBER = 19;
 
   public Chetest2Test() {
-    super(FILE_NAME, EXPECTED_ERRORS_NUMBER);
+    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
   }
 
   @Ignore("Unsupported while semantic analysis is not implemented")

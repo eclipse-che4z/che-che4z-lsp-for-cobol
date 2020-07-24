@@ -25,6 +25,7 @@ import java.util.Map;
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
 import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 import static org.junit.Assert.assertEquals;
@@ -53,7 +54,9 @@ public class TestUndefinedParentVariableUnderlined {
 
   @Test
   public void assertSyncTypeNotChangesLogic() {
-    assertEquals(analyze(TEXT, List.of(), DID_OPEN), analyze(TEXT, List.of(), DID_CHANGE));
+    assertEquals(
+        analyze(DOCUMENT_URI, TEXT, List.of(), DID_OPEN),
+        analyze(DOCUMENT_URI, TEXT, List.of(), DID_CHANGE));
   }
 
   @Test

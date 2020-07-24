@@ -63,7 +63,8 @@ public class TestResponsesNotContainLineBreaks {
 
     ServerCommunications communications = new ServerCommunications(() -> client, files);
 
-    communications.publishDiagnostics(singletonMap(DOCUMENT_URI, analyzeForErrors(TEXT)));
+    communications.publishDiagnostics(
+        singletonMap(DOCUMENT_URI, analyzeForErrors(DOCUMENT_URI, TEXT)));
 
     verify(client).publishDiagnostics(captor.capture());
     List<Diagnostic> diagnostics = captor.getValue().getDiagnostics();

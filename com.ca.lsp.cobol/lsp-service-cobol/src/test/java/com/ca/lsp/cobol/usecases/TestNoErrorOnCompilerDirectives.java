@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static org.junit.Assert.assertEquals;
 
@@ -103,7 +104,8 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
 
   @Test
   public void testProcessWithoutNumbersWithTypo() {
-    Range range = retrieveRange(analyzeForErrors(PROCESS_WITHOUT_NUMBER_TYPO + FOLLOWING_TEXT));
+    Range range =
+        retrieveRange(analyzeForErrors(DOCUMENT_URI, PROCESS_WITHOUT_NUMBER_TYPO + FOLLOWING_TEXT));
     // TODO: Update this test when the compiler directives fully supported
     //  to check the correct position
     assertEquals("Diagnostic start line", 0, range.getStart().getLine());
@@ -114,7 +116,8 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
 
   @Test
   public void testProcessWithNumbersWithTypo() {
-    Range range = retrieveRange(analyzeForErrors(PROCESS_WITH_NUMBER_TYPO + FOLLOWING_TEXT));
+    Range range =
+        retrieveRange(analyzeForErrors(DOCUMENT_URI, PROCESS_WITH_NUMBER_TYPO + FOLLOWING_TEXT));
 
     assertEquals("Diagnostic start line", 0, range.getStart().getLine());
     assertEquals("Diagnostic start character", 7, range.getStart().getCharacter());
@@ -125,7 +128,7 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
   @Ignore("Feature is not yet supported")
   @Test
   public void testLinesBeforeCblNotAllowed() {
-    Range range = retrieveRange(analyzeForErrors(FOLLOWING_TEXT + CBL_WITH_NUMBER));
+    Range range = retrieveRange(analyzeForErrors(DOCUMENT_URI, FOLLOWING_TEXT + CBL_WITH_NUMBER));
 
     assertEquals(1, range.getStart().getLine());
     assertEquals(7, range.getStart().getCharacter());
