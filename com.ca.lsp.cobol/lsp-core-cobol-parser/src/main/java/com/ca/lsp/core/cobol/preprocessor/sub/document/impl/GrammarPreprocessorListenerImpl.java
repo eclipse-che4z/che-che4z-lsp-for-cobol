@@ -31,10 +31,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import javax.annotation.Nonnull;
 import java.util.*;
+import java.util.function.Function;
 
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.ERROR;
@@ -43,6 +45,7 @@ import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -58,8 +61,10 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private static final String ERROR_SUGGESTION = "%s: Copybook not found";
 
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
-  @Getter private final NamedSubContext<Position> copybooks = new NamedSubContext<>();
-  @Getter private final Map<String, List<Position>> nestedMappings = new HashMap<>();
+
+  private final NamedSubContext copybooks = new NamedSubContext();
+  private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
+  private final Map<Integer, Integer> shifts = new HashMap<>();
 
   private PreprocessorCleanerService cleaner;
   private String documentUri;
@@ -92,8 +97,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Nonnull
   @Override
-  public String getResult() {
-    return cleaner.read();
+  public ExtendedDocument getResult() {
+    nestedMappings.put(
+        documentUri,
+        new DocumentMapping(
+            tokens.getTokens().stream().map(toPosition()).collect(toList()), shifts));
+    return new ExtendedDocument(cleaner.read(), copybooks, nestedMappings);
   }
 
   @Override
@@ -197,6 +206,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
     collectNestedSemanticData(uri, copybookId, copybookDocument);
     writeCopybook(copybookId, copybookContent);
+
+    accumulateShift(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
+  }
+
+  private void accumulateShift(int start, int stop) {
+    shifts.put(start - 1, stop - start + 1);
   }
 
   @Override
@@ -241,7 +256,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private void collectNestedSemanticData(
       String uri, String copybookId, ExtendedDocument copybookDocument) {
     copybooks.merge(copybookDocument.getCopybooks());
-    nestedMappings.putAll(copybookDocument.getDocumentPositions());
+    nestedMappings.putAll(copybookDocument.getDocumentMapping());
     nestedMappings.putIfAbsent(copybookId, nestedMappings.get(uri));
   }
 
@@ -343,6 +358,18 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         token.getStart().getLine(),
         token.getStart().getCharPositionInLine(),
         token.getStart().getText());
+  }
+
+  @Nonnull
+  private Function<Token, Position> toPosition() {
+    return it ->
+        new Position(
+            documentUri,
+            it.getStartIndex(),
+            it.getStopIndex(),
+            it.getLine(),
+            it.getCharPositionInLine(),
+            it.getText());
   }
 
   private void reportRecursiveCopybook(CopybookUsage usage) {

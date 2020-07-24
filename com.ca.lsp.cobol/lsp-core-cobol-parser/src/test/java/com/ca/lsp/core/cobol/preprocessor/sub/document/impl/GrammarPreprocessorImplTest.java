@@ -16,19 +16,14 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.model.CopybookUsage;
-import com.ca.lsp.core.cobol.model.ExtendedDocument;
-import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.model.*;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListenerFactory;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.junit.Test;
 
 import java.util.ArrayDeque;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,46 +47,40 @@ public class GrammarPreprocessorImplTest {
   private static final Position RESULT_POS = new Position(CPYNAME, 0, 6, 0, 0, null);
   private static final Position CPYNAME_POS = new Position(DOCUMENT, 5, 12, 0, 5, null);
   private static final Position COPY_POS = new Position(DOCUMENT, 0, 4, 0, 0, null);
-  private static final List<Position> POSITIONS = List.of(COPY_POS, CPYNAME_POS);
 
   @Test
   public void testBuildingExtendedDocument() {
     GrammarPreprocessorListenerImpl listener = mock(GrammarPreprocessorListenerImpl.class);
     GrammarPreprocessorListenerFactory factory = mock(GrammarPreprocessorListenerFactory.class);
-    TokenUtils utils = mock(TokenUtils.class);
 
     List<SyntaxError> errors = emptyList();
     ArrayDeque<CopybookUsage> copybookStack = new ArrayDeque<>();
 
-    Map<String, List<Position>> nestedMappings = new HashMap<>();
-    nestedMappings.put(CPYNAME, List.of(RESULT_POS));
-
-    NamedSubContext<Position> copybooks = new NamedSubContext<>();
+    NamedSubContext copybooks = new NamedSubContext();
     copybooks.addUsage(CPYNAME, CPYNAME_POS);
+    DocumentMapping mainMapping = new DocumentMapping(List.of(CPYNAME_POS, COPY_POS), Map.of(0, 2));
+    DocumentMapping cpyMapping = new DocumentMapping(List.of(RESULT_POS), Map.of());
+
+    ExtendedDocument expectedDocument =
+        new ExtendedDocument(RESULT, copybooks, Map.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping));
 
     when(factory.create(
             eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(SYNC_TYPE)))
         .thenReturn(listener);
-    when(utils.retrievePositionsFromText(DOCUMENT, TEXT)).thenReturn(POSITIONS);
-    when(listener.getCopybooks()).thenReturn(copybooks);
     when(listener.getErrors()).thenReturn(errors);
-    when(listener.getResult()).thenReturn(RESULT);
-    when(listener.getNestedMappings()).thenReturn(nestedMappings);
+    when(listener.getResult()).thenReturn(expectedDocument);
 
-    GrammarPreprocessor preprocessor = new GrammarPreprocessorImpl(factory, utils);
+    GrammarPreprocessor preprocessor = new GrammarPreprocessorImpl(factory);
 
     ResultWithErrors<ExtendedDocument> extendedDocument =
         preprocessor.buildExtendedDocument(DOCUMENT, TEXT, copybookStack, SYNC_TYPE);
 
-    Map<String, List<Position>> expectedMappings = new HashMap<>(nestedMappings);
-    expectedMappings.put(CPYNAME, List.of(RESULT_POS));
-
     verify(factory)
         .create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(SYNC_TYPE));
-    verify(utils).retrievePositionsFromText(DOCUMENT, TEXT);
     assertEquals(RESULT, extendedDocument.getResult().getText());
     assertEquals(copybooks, extendedDocument.getResult().getCopybooks());
-    assertEquals(expectedMappings, extendedDocument.getResult().getDocumentPositions());
+    assertEquals(mainMapping, expectedDocument.getDocumentMapping().get(DOCUMENT));
+    assertEquals(cpyMapping, expectedDocument.getDocumentMapping().get(CPYNAME));
     assertEquals(errors, extendedDocument.getErrors());
   }
 }

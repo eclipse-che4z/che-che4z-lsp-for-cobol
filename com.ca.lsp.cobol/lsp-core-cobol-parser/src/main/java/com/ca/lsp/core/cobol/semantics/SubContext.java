@@ -16,6 +16,7 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
+import com.broadcom.lsp.domain.common.model.Position;
 import com.google.common.collect.Multimap;
 
 import java.util.Collection;
@@ -25,16 +26,15 @@ import java.util.Collection;
  * of a specific type regarding the currently processing document
  *
  * @param <T> - type of semantic elements to store
- * @param <P> - type of positions of the semantic elements
  */
-public interface SubContext<T, P> {
+public interface SubContext<T> {
   /**
    * Add defined language element to the context
    *
    * @param element - a language element
    * @param position - position of the used element
    */
-  void define(T element, P position);
+  void define(T element, Position position);
 
   /**
    * Add the position of a language element usage
@@ -42,7 +42,7 @@ public interface SubContext<T, P> {
    * @param element - a language element
    * @param position - position of the used element
    */
-  void addUsage(String element, P position);
+  void addUsage(String element, Position position);
 
   /**
    * Get list of names of defined elements
@@ -64,19 +64,19 @@ public interface SubContext<T, P> {
    *
    * @return - multimap of names to a list of positions of definitions
    */
-  Multimap<String, P> getDefinitions();
+  Multimap<String, Position> getDefinitions();
 
   /**
    * Get all the registered usage of the language elements
    *
    * @return - multimap of names to a list of positions of usages
    */
-  Multimap<String, P> getUsages();
+  Multimap<String, Position> getUsages();
 
   /**
    * Copy the content of the given subContext into this one.
    *
    * @param subContext - a subContext that should be merged into this one.
    */
-  void merge(SubContext<T, P> subContext);
+  void merge(SubContext<T> subContext);
 }

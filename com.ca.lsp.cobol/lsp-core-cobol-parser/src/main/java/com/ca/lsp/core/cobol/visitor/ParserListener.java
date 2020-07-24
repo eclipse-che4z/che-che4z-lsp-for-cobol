@@ -41,7 +41,7 @@ public class ParserListener extends BaseErrorListener {
       RecognitionException e) {
     errors.add(
         SyntaxError.syntaxError()
-            .startToken((CommonToken) offendingSymbol)
+            .offendedToken((CommonToken) offendingSymbol)
             .suggestion(msg)
             .severity(ERROR)
             .build());
