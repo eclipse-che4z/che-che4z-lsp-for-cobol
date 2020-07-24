@@ -16,15 +16,13 @@
 package com.ca.lsp.core.cobol.model;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
 import java.util.List;
+import java.util.Map;
 
-@Data
-@AllArgsConstructor
-public class DocumentHierarchyLevel {
-  private final String name;
-  private List<Position> positions;
-
+@Value
+public class DocumentMapping {
+  List<Position> positions;
+  Map<Integer, Integer> shifts;
 }

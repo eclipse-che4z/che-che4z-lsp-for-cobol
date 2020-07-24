@@ -15,7 +15,6 @@
 package com.ca.lsp.core.cobol.visitor;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.model.DocumentHierarchyLevel;
 import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.model.Variable;
@@ -26,17 +25,13 @@ import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
 import lombok.Getter;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.INFO;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.WARNING;
-import static com.ca.lsp.core.cobol.parser.CobolLexer.COPYENTRY;
-import static com.ca.lsp.core.cobol.parser.CobolLexer.COPYEXIT;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -48,58 +43,16 @@ import static java.util.Optional.ofNullable;
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
-  @Getter private Map<Token, Position> mapping = new HashMap<>();
-  @Getter private SubContext<String, Token> paragraphs = new NamedSubContext<>();
-  @Getter private CobolVariableContext<Token> variables = new CobolVariableContext<>();
+  @Getter private SubContext<String> paragraphs = new NamedSubContext();
+  @Getter private CobolVariableContext variables = new CobolVariableContext();
 
-  @Getter private NamedSubContext<Position> copybooks;
+  @Getter private NamedSubContext copybooks;
 
-  private Deque<DocumentHierarchyLevel> documentHierarchyStack = new ArrayDeque<>();
-  private Map<String, List<Position>> documentPositions;
+  private Map<Token, Position> positionMapping;
 
-  public CobolVisitor(String documentUri, ExtendedDocument extendedDocument) {
+  public CobolVisitor(ExtendedDocument extendedDocument, Map<Token, Position> positionMapping) {
     copybooks = extendedDocument.getCopybooks();
-    documentPositions = extendedDocument.getDocumentPositions();
-    documentHierarchyStack.push(
-        new DocumentHierarchyLevel(
-            documentUri, new ArrayList<>(documentPositions.get(documentUri))));
-  }
-
-  @Nullable
-  private Position calculatePosition(Token token) {
-    DocumentHierarchyLevel currentDocument = documentHierarchyStack.peek();
-    if (currentDocument == null) {
-      return null;
-    }
-    String tokenText = token.getText();
-    List<Position> positions = currentDocument.getPositions();
-    Position position = findPosition(tokenText, positions);
-    if (position != null) {
-      currentDocument.setPositions(
-          positions.subList(positions.indexOf(position) + 1, positions.size()));
-    } else {
-      position = applyReversePositionLookUp(tokenText, currentDocument.getName(), positions.size());
-    }
-    return position;
-  }
-
-  private Position applyReversePositionLookUp(
-      String tokenText, String docName, int numberOfCurrentPositions) {
-
-    List<Position> initialPositions = documentPositions.get(docName);
-    if (initialPositions == null) {
-      return null;
-    }
-
-    List<Position> subList =
-        initialPositions.subList(0, initialPositions.size() - numberOfCurrentPositions);
-    Collections.reverse(subList);
-
-    return findPosition(tokenText, subList);
-  }
-
-  private Position findPosition(String tokenText, List<Position> subList) {
-    return subList.stream().filter(it -> it.getToken().equals(tokenText)).findFirst().orElse(null);
+    this.positionMapping = positionMapping;
   }
 
   @Override
@@ -152,7 +105,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   @Override
   public Class visitParagraphName(ParagraphNameContext ctx) {
-    paragraphs.define(ctx.getText().toUpperCase(), ctx.getStart());
+    paragraphs.define(ctx.getText().toUpperCase(), getPosition(ctx.getStart()));
     return visitChildren(ctx);
   }
 
@@ -162,7 +115,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     String levelNumber = ctx.otherLevel().getText();
     ofNullable(ctx.dataName1())
         .ifPresent(
-            variable -> defineVariable(levelNumber, variable.getText(), variable.getStart()));
+            variable ->
+                defineVariable(levelNumber, variable.getText(), getPosition(variable.getStart())));
     return visitChildren(ctx);
   }
 
@@ -172,7 +126,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     String levelNumber = ctx.LEVEL_NUMBER_66().getText();
     ofNullable(ctx.dataName1())
         .ifPresent(
-            variable -> defineVariable(levelNumber, variable.getText(), variable.getStart()));
+            variable ->
+                defineVariable(levelNumber, variable.getText(), getPosition(variable.getStart())));
     return visitChildren(ctx);
   }
 
@@ -181,18 +136,19 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     String levelNumber = ctx.LEVEL_NUMBER_88().getText();
     ofNullable(ctx.dataName1())
         .ifPresent(
-            variable -> defineVariable(levelNumber, variable.getText(), variable.getStart()));
+            variable ->
+                defineVariable(levelNumber, variable.getText(), getPosition(variable.getStart())));
     return visitChildren(ctx);
   }
 
-  private void defineVariable(String level, String name, Token token) {
-    variables.define(new Variable(level, name), token);
+  private void defineVariable(String level, String name, Position position) {
+    variables.define(new Variable(level, name), position);
   }
 
   @Override
   public Class visitParagraphNameUsage(ParagraphNameUsageContext ctx) {
     String name = ctx.getText().toUpperCase();
-    addUsage(paragraphs, name, ctx.getStart());
+    addUsage(paragraphs, name, getPosition(ctx.getStart()));
     return visitChildren(ctx);
   }
 
@@ -204,49 +160,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     return visitChildren(ctx);
   }
 
-  @Override
-  public Class visitTerminal(TerminalNode node) {
-    Token token = node.getSymbol();
-    Position position = calculatePosition(token);
-    mapping.put(token, position);
-    checkControlSymbol(token);
-    return super.visitTerminal(node);
-  }
-
-  @Override
-  public Class visitErrorNode(ErrorNode node) {
-    Token token = node.getSymbol();
-    Position position = calculatePosition(token);
-    mapping.put(token, position);
-    checkControlSymbol(token);
-    return super.visitTerminal(node);
-  }
-
-  private void checkControlSymbol(Token terminal) {
-    if (terminal.getType() == COPYENTRY) {
-      moveToNextLevel(terminal.getText());
-    } else if (terminal.getType() == COPYEXIT) {
-      moveToPreviousLevel();
-    }
-  }
-
-  private void moveToNextLevel(String cpy) {
-    documentHierarchyStack.push(
-        nextDocLevel(cpy.substring(10).replace("<URI>", "").replace("</URI>", "")));
-  }
-
-  private DocumentHierarchyLevel nextDocLevel(String cpyName) {
-    return new DocumentHierarchyLevel(
-        cpyName, ofNullable(documentPositions.get(cpyName)).orElse(emptyList()));
-  }
-
-  private void moveToPreviousLevel() {
-    documentHierarchyStack.pop();
-  }
-
   private void checkForVariable(String variable, QualifiedDataNameFormat1Context ctx) {
-    checkVariableDefinition(variable, ctx.getStart());
-    addUsage(variables, variable, ctx.getStart());
+    Position position = getPosition(ctx.getStart());
+    checkVariableDefinition(variable, position);
+    addUsage(variables, variable, position);
 
     if (ctx.qualifiedInData() != null) {
       iterateOverQualifiedDataNames(ctx, variable);
@@ -260,20 +177,26 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
       DataName2Context context = getDataName2Context(node);
       if (context == null) continue;
+
       String parent = context.getText().toUpperCase();
       Token parentToken = context.getStart();
+      Position parentPosition = getPosition(parentToken);
 
-      checkVariableDefinition(parent, parentToken);
-      checkVariableStructure(parent, child, childToken);
+      checkVariableDefinition(parent, parentPosition);
+      checkVariableStructure(parent, child, getPosition(childToken));
 
       childToken = parentToken;
       child = parent;
 
-      addUsage(variables, child, parentToken);
+      addUsage(variables, child, parentPosition);
     }
   }
 
-  private void checkVariableDefinition(String name, Token position) {
+  private Position getPosition(Token childToken) {
+    return positionMapping.get(childToken);
+  }
+
+  private void checkVariableDefinition(String name, Position position) {
     if (!variables.contains(name)) {
       reportVariableNotDefined(name, position, position); // starts and finishes in one token
     }
@@ -289,37 +212,46 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
                 .orElse(null));
   }
 
-  private void checkVariableStructure(String parent, String child, Token startToken) {
+  private void checkVariableStructure(String parent, String child, Position position) {
     if (!variables.parentContainsSpecificChild(parent, child)) {
-      reportVariableNotDefined(child, startToken, startToken);
+      reportVariableNotDefined(child, position, position);
     }
   }
 
-  private void addUsage(SubContext<?, Token> langContext, String name, Token token) {
-    langContext.addUsage(name.toUpperCase(), token);
+  private void addUsage(SubContext<?> langContext, String name, Position position) {
+    langContext.addUsage(name.toUpperCase(), position);
   }
 
-  private void reportVariableNotDefined(String dataName, Token startToken, Token stopToken) {
+  private Position getIntervalPosition(Position start, Position stop) {
+    return new Position(
+        start.getDocumentURI(),
+        start.getStartPosition(),
+        stop.getStopPosition(),
+        start.getLine(),
+        start.getCharPositionInLine(),
+        start.getToken());
+  }
+
+  private void reportVariableNotDefined(String dataName, Position start, Position stop) {
     errors.add(
         SyntaxError.syntaxError()
             .suggestion("Invalid definition for: " + dataName)
             .severity(INFO)
-            .startToken(startToken)
-            .stopToken(stopToken)
+            .position(getIntervalPosition(start, stop))
             .build());
   }
 
   private void throwWarning(Token token) {
     MisspelledKeywordDistance.calculateDistance(token.getText().toUpperCase())
-        .ifPresent(correctWord -> reportMisspelledKeyword(correctWord, token));
+        .ifPresent(correctWord -> reportMisspelledKeyword(correctWord, getPosition(token)));
   }
 
-  private void reportMisspelledKeyword(String suggestion, Token token) {
+  private void reportMisspelledKeyword(String suggestion, Position position) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .suggestion("A misspelled word, maybe you want to put " + suggestion)
             .severity(WARNING)
-            .startToken(token)
+            .position(position)
             .build();
     errors.add(error);
   }

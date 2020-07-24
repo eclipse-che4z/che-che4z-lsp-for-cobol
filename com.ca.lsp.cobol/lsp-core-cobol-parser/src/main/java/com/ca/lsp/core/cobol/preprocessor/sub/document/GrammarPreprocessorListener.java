@@ -13,26 +13,17 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
-import com.broadcom.lsp.domain.common.model.Position;
+import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorListener;
-import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
  * and REPLACE statements and removing non-processable sections starting with EXEC statements.
  */
 public interface GrammarPreprocessorListener extends CobolPreprocessorListener {
-
-  /**
-   * Get text of extended document, i.e. with all copybooks built in and replacing applied.
-   *
-   * @return text of extended document.
-   */
-  String getResult();
 
   /**
    * Get list of found syntax errors during building the extended document.
@@ -42,17 +33,9 @@ public interface GrammarPreprocessorListener extends CobolPreprocessorListener {
   List<SyntaxError> getErrors();
 
   /**
-   * Get copybooks subcontext, including all the copybooks usages and definitions of the given
-   * document.
+   * Get the extended document of the COBOL file and the used copybooks.
    *
-   * @return copybooks semantic subcontext.
+   * @return extended document
    */
-  NamedSubContext<Position> getCopybooks();
-
-  /**
-   * Get mappings of initial positions of the copybooks, used in this document.
-   *
-   * @return mappings of copybooks.
-   */
-  Map<String, List<Position>> getNestedMappings();
+  ExtendedDocument getResult();
 }

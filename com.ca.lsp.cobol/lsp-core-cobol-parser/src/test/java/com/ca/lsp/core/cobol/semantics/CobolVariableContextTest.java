@@ -52,7 +52,7 @@ public class CobolVariableContextTest {
   private static final Position ERROR_POSITION1 = new Position(null, 0, 3, 1, 5, null);
   private static final Position ERROR_POSITION2 = new Position(null, 4, 8, 2, 5, null);
 
-  private CobolVariableContext<Position> context;
+  private CobolVariableContext context;
   private Variable var1;
   private Variable var2;
   private Variable var3;
@@ -66,7 +66,7 @@ public class CobolVariableContextTest {
 
   @Before
   public void createContext() {
-    context = new CobolVariableContext<>();
+    context = new CobolVariableContext();
     var1 = new Variable(LEVEL1, VAR1); // 01
     var2 = new Variable(LEVEL2, VAR2); // 02
     var3 = new Variable(LEVEL10, VAR3); // 10

@@ -25,9 +25,8 @@ import java.util.List;
 @Value
 public class SyntaxError {
   Position position;
-  Token startToken;
-  Token stopToken;
   List<String> ruleStack;
+  Token offendedToken;
   String suggestion;
   ErrorSeverity severity;
   ErrorCode errorCode;
@@ -37,16 +36,14 @@ public class SyntaxError {
   @Builder(builderMethodName = "syntaxError", toBuilder = true)
   public SyntaxError(
       Position position,
-      Token startToken,
-      Token stopToken,
       List<String> ruleStack,
+      Token offendedToken,
       String suggestion,
       ErrorSeverity severity,
       ErrorCode errorCode) {
     this.position = position;
-    this.startToken = startToken;
-    this.stopToken = stopToken;
     this.ruleStack = ruleStack;
+    this.offendedToken = offendedToken;
     this.suggestion = suggestion;
     this.severity = severity;
     this.errorCode = errorCode;

@@ -16,6 +16,7 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -33,23 +34,23 @@ import static java.util.stream.Collectors.toList;
  * This class represents a structure to store variables of a COBOL program and build a variable
  * hierarchy.
  */
-public class CobolVariableContext<T> implements SubContext<Variable, T> {
+public class CobolVariableContext implements SubContext<Variable> {
   private static final int LEVEL_77 = 77;
   private static final int LEVEL_66 = 66;
 
   private final List<Variable> variables = new ArrayList<>();
-  private final Multimap<String, T> variableDefinitions = HashMultimap.create();
-  private final Multimap<String, T> variableUsages = HashMultimap.create();
+  private final Multimap<String, Position> variableDefinitions = HashMultimap.create();
+  private final Multimap<String, Position> variableUsages = HashMultimap.create();
 
   @Override
-  public void define(Variable variable, T position) {
+  public void define(Variable variable, Position position) {
     variables.add(variable);
     variableDefinitions.put(variable.getName(), position);
     createRelationBetweenVariables();
   }
 
   @Override
-  public void addUsage(String variable, T position) {
+  public void addUsage(String variable, Position position) {
     variableUsages.put(variable, position);
   }
 
@@ -64,17 +65,17 @@ public class CobolVariableContext<T> implements SubContext<Variable, T> {
   }
 
   @Override
-  public Multimap<String, T> getDefinitions() {
+  public Multimap<String, Position> getDefinitions() {
     return variableDefinitions;
   }
 
   @Override
-  public Multimap<String, T> getUsages() {
+  public Multimap<String, Position> getUsages() {
     return variableUsages;
   }
 
   @Override
-  public void merge(SubContext<Variable, T> subContext) {
+  public void merge(SubContext<Variable> subContext) {
     variableDefinitions.putAll(subContext.getDefinitions());
     variableUsages.putAll(subContext.getUsages());
   }

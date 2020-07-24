@@ -15,6 +15,7 @@
 
 package com.ca.lsp.core.cobol.visitor;
 
+import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolParser;
@@ -22,10 +23,10 @@ import com.ca.lsp.core.cobol.utils.CustomToken;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.ca.lsp.core.cobol.parser.CobolParser.DataNameContext;
 import static com.ca.lsp.core.cobol.parser.CobolParser.QualifiedDataNameFormat1Context;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -47,7 +48,13 @@ public class VisitorSemanticAnalysisTest {
    */
   @Test
   public void testVariableDefinitionNotFound() {
-    CobolVisitor visitor = visitToken();
+    CustomToken token = createNewToken(INVALID_VARIABLE);
+    CobolVisitor visitor =
+        new CobolVisitor(
+            new ExtendedDocument(null, null, singletonMap("", null)),
+            Map.of(token, new Position("", 0, 0, 0, 0, "invalid")));
+
+    visitor.visitQualifiedDataNameFormat1(mockMethod(token));
 
     List<SyntaxError> errors = visitor.getErrors();
     assertEquals(1, errors.size());
@@ -61,7 +68,13 @@ public class VisitorSemanticAnalysisTest {
    */
   @Test
   public void testMisspelledKeywordDistance() {
-    CobolVisitor visitor = createVisitor();
+
+    CustomToken token = createNewToken(WRONG_TOKEN);
+    CobolVisitor visitor =
+        new CobolVisitor(
+            new ExtendedDocument(null, null, singletonMap("", null)),
+            Map.of(token, new Position("", 0, 0, 0, 0, WRONG_TOKEN)));
+
     CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
     when(node.getStart()).thenReturn(createNewToken(WRONG_TOKEN));
 
@@ -70,19 +83,6 @@ public class VisitorSemanticAnalysisTest {
     List<SyntaxError> errors = visitor.getErrors();
     assertEquals(1, errors.size());
     assertEquals("A misspelled word, maybe you want to put MOVE", errors.get(0).getSuggestion());
-  }
-
-  private CobolVisitor createVisitor() {
-    return new CobolVisitor("", new ExtendedDocument(null, null, singletonMap("", emptyList())));
-  }
-
-  private CobolVisitor visitToken() {
-    CobolVisitor visitor = createVisitor();
-    CustomToken token = createNewToken(INVALID_VARIABLE);
-
-    visitor.visitQualifiedDataNameFormat1(mockMethod(token));
-
-    return visitor;
   }
 
   private QualifiedDataNameFormat1Context mockMethod(CustomToken token) {

@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
@@ -22,15 +21,12 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListenerFactory;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.google.inject.Inject;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import javax.annotation.Nonnull;
 import java.util.Deque;
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class runs pre-processing for COBOL using CobolPreprocessor.g4 grammar file. As a result, it
@@ -39,31 +35,15 @@ import java.util.Map;
  */
 public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   private GrammarPreprocessorListenerFactory listenerFactory;
-  private TokenUtils tokenUtils;
 
   @Inject
-  public GrammarPreprocessorImpl(
-      GrammarPreprocessorListenerFactory listenerFactory, TokenUtils tokenUtils) {
+  public GrammarPreprocessorImpl(GrammarPreprocessorListenerFactory listenerFactory) {
     this.listenerFactory = listenerFactory;
-    this.tokenUtils = tokenUtils;
   }
 
   @Nonnull
   @Override
   public ResultWithErrors<ExtendedDocument> buildExtendedDocument(
-      @Nonnull String uri,
-      @Nonnull String code,
-      @Nonnull Deque<CopybookUsage> copybookStack,
-      @Nonnull String textDocumentSyncType) {
-    GrammarPreprocessorListener fulfilledListener =
-        runGrammarProcessing(uri, code, copybookStack, textDocumentSyncType);
-
-    return new ResultWithErrors<>(
-        buildExtendedDocument(uri, code, fulfilledListener), fulfilledListener.getErrors());
-  }
-
-  @Nonnull
-  private GrammarPreprocessorListener runGrammarProcessing(
       @Nonnull String uri,
       @Nonnull String code,
       @Nonnull Deque<CopybookUsage> copybookStack,
@@ -82,21 +62,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
     GrammarPreprocessorListener listener =
         listenerFactory.create(uri, tokens, copybookStack, textDocumentSyncType);
     walker.walk(listener, startRule);
-    return listener;
-  }
 
-  @Nonnull
-  private ExtendedDocument buildExtendedDocument(
-      @Nonnull String uri, @Nonnull String code, GrammarPreprocessorListener listener) {
-    return new ExtendedDocument(
-        listener.getResult(), listener.getCopybooks(), getPositionMapping(uri, code, listener));
-  }
-
-  @Nonnull
-  private Map<String, List<Position>> getPositionMapping(
-      @Nonnull String uri, @Nonnull String code, GrammarPreprocessorListener listener) {
-    Map<String, List<Position>> accumulatedMappings = listener.getNestedMappings();
-    accumulatedMappings.put(uri, tokenUtils.retrievePositionsFromText(uri, code));
-    return accumulatedMappings;
+    return new ResultWithErrors<>(listener.getResult(), listener.getErrors());
   }
 }

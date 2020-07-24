@@ -24,7 +24,6 @@ import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategy;
 import com.ca.lsp.core.cobol.visitor.CobolVisitor;
 import com.ca.lsp.core.cobol.visitor.ParserListener;
-import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -33,14 +32,12 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
@@ -73,16 +70,14 @@ public class CobolLanguageEngine {
     ResultWithErrors<ExtendedDocument> extendedDocument =
         preprocessor.process(documentUri, text, textDocumentSyncType);
 
-    CobolLexer lexer =
-        new CobolLexer(CharStreams.fromString(extendedDocument.getResult().getText()));
-
     List<SyntaxError> accumulatedErrors = new ArrayList<>(extendedDocument.getErrors());
 
-    ParserListener listener = new ParserListener();
+    CobolLexer lexer =
+        new CobolLexer(CharStreams.fromString(extendedDocument.getResult().getText()));
     lexer.removeErrorListeners();
-    lexer.addErrorListener(listener);
 
     CommonTokenStream tokens = new CommonTokenStream(lexer);
+    ParserListener listener = new ParserListener();
 
     CobolParser parser = new CobolParser(tokens);
     parser.removeErrorListeners();
@@ -90,38 +85,27 @@ public class CobolLanguageEngine {
     parser.setErrorHandler(new CobolErrorStrategy());
 
     CobolParser.StartRuleContext tree = parser.startRule();
-    CobolVisitor visitor = new CobolVisitor(documentUri, extendedDocument.getResult());
+    Map<Token, Position> positionMapping =
+        Mapping.createPositionMapping(
+            tokens, extendedDocument.getResult().getDocumentMapping(), documentUri);
+    CobolVisitor visitor = new CobolVisitor(extendedDocument.getResult(), positionMapping);
     visitor.visit(tree);
 
-    Map<Token, Position> mapping = visitor.getMapping();
-    accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), mapping));
-    accumulatedErrors.addAll(finalizeErrors(visitor.getErrors(), mapping));
+    accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
+    accumulatedErrors.addAll(visitor.getErrors());
     accumulatedErrors.forEach(err -> LOG.debug(err.toString()));
 
-    return new ResultWithErrors<>(buildSemanticContext(visitor, mapping), accumulatedErrors);
+    return new ResultWithErrors<>(buildSemanticContext(visitor), accumulatedErrors);
   }
 
-  private SemanticContext buildSemanticContext(
-      @Nonnull CobolVisitor visitor, @Nonnull Map<Token, Position> mapping) {
+  private SemanticContext buildSemanticContext(@Nonnull CobolVisitor visitor) {
     return new SemanticContext(
-        mapPositions(visitor.getVariables().getDefinitions(), mapping),
-        mapPositions(visitor.getVariables().getUsages(), mapping),
-        mapPositions(visitor.getParagraphs().getDefinitions(), mapping),
-        mapPositions(visitor.getParagraphs().getUsages(), mapping),
+        visitor.getVariables().getDefinitions().asMap(),
+        visitor.getVariables().getUsages().asMap(),
+        visitor.getParagraphs().getDefinitions().asMap(),
+        visitor.getParagraphs().getUsages().asMap(),
         visitor.getCopybooks().getDefinitions().asMap(),
         visitor.getCopybooks().getUsages().asMap());
-  }
-
-  private Map<String, Collection<Position>> mapPositions(
-      @Nonnull Multimap<String, Token> source, @Nonnull Map<Token, Position> mapping) {
-    return source.asMap().entrySet().stream()
-        .collect(toMap(Map.Entry::getKey, mapPositions(mapping)));
-  }
-
-  @Nonnull
-  private Function<Map.Entry<String, Collection<Token>>, Collection<Position>> mapPositions(
-      @Nonnull Map<Token, Position> mapping) {
-    return it -> it.getValue().stream().map(mapping::get).collect(toSet());
   }
 
   @Nonnull
@@ -135,25 +119,6 @@ public class CobolLanguageEngine {
 
   @Nonnull
   private Function<SyntaxError, SyntaxError> convertError(@Nonnull Map<Token, Position> mapping) {
-    return err ->
-        err.toBuilder()
-            .position(convertPositionRange(err.getStartToken(), err.getStopToken(), mapping))
-            .build();
-  }
-
-  @Nonnull
-  private Position convertPositionRange(
-      @Nonnull Token start, @Nullable Token stop, @Nonnull Map<Token, Position> mapping) {
-    Position position = mapping.get(start);
-    if (start == stop || stop == null) {
-      return position;
-    }
-    return new Position(
-        position.getDocumentURI(),
-        start.getStartIndex(),
-        stop.getStopIndex(),
-        start.getLine(),
-        start.getCharPositionInLine(),
-        start.getText());
+    return err -> err.toBuilder().position(mapping.get(err.getOffendedToken())).build();
   }
 }
