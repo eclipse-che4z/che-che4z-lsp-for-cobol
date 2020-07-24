@@ -41,18 +41,21 @@ import static org.junit.Assert.assertEquals;
 public abstract class NegativeTest extends ConfigurableTest {
   private static final List<CobolText> TEXTS =
       LangServerCtx.getInjector().getInstance(CobolTextRegistry.class).getNegatives();
-
+  private String fileName;
   private String text;
   private int expectedErrorsNumber;
+  private List<CobolText> copybooks;
 
-  NegativeTest(String fileName, int expectedErrorsNumber) {
+  NegativeTest(String fileName, int expectedErrorsNumber, List<CobolText> copybooks) {
+    this.fileName = fileName;
     this.expectedErrorsNumber = expectedErrorsNumber;
     this.text = lookupFile(fileName);
+    this.copybooks = copybooks;
   }
 
   protected void test() {
 
-    List<Diagnostic> diagnostics = analyzeForErrors(text);
+    List<Diagnostic> diagnostics = analyzeForErrors(fileName, text, copybooks);
 
     assertErrorNumber(diagnostics);
 

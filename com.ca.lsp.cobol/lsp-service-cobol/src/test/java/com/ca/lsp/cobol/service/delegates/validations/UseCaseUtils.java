@@ -144,23 +144,26 @@ public class UseCaseUtils {
    * Analyze the given text using a real language engine leaving only the diagnostics with the
    * severe (level 1) errors.
    *
+   * @param fileName - name of the processing file
    * @param text - text to analyze
    * @return list of diagnostics with only severe errors
    */
-  public static List<Diagnostic> analyzeForErrors(String text) {
-    return analyzeForErrors(text, emptyList());
+  public static List<Diagnostic> analyzeForErrors(String fileName, String text) {
+    return analyzeForErrors(fileName, text, emptyList());
   }
 
   /**
    * Analyze the given text using a real language engine leaving only the diagnostics with the
    * severe (level 1) errors providing copybooks required for the analysis
    *
+   * @param fileName - name of the processing file
    * @param text - text to analyze
    * @param copybooks - list of copybooks required for the analysis
    * @return list of diagnostics with only severe errors
    */
-  public static List<Diagnostic> analyzeForErrors(String text, List<CobolText> copybooks) {
-    return ofNullable(analyze(text, copybooks).getDiagnostics().get(DOCUMENT_URI))
+  public static List<Diagnostic> analyzeForErrors(
+      String fileName, String text, List<CobolText> copybooks) {
+    return ofNullable(analyze(fileName, text, copybooks).getDiagnostics().get(fileName))
         .map(
             diagnostics ->
                 diagnostics.stream()
@@ -173,18 +176,20 @@ public class UseCaseUtils {
    * Analyze the given text using a real language engine providing copybooks required for the
    * analysis
    *
+   * @param fileName - name of the processing file
    * @param text - text to analyze
    * @param copybooks - list of copybooks required for the analysis
    * @return the entire analysis result
    */
-  public static AnalysisResult analyze(String text, List<CobolText> copybooks) {
-    return analyze(text, copybooks, DID_OPEN);
+  public static AnalysisResult analyze(String fileName, String text, List<CobolText> copybooks) {
+    return analyze(fileName, text, copybooks, DID_OPEN);
   }
 
   /**
    * Analyze the given text using a real language engine providing copybooks required for the
    * analysis with the required sync type
    *
+   * @param fileName - name of the processing file
    * @param text - text to analyze
    * @param copybooks - list of copybooks required for the analysis
    * @param syncType - sync type for the analysis
@@ -192,7 +197,7 @@ public class UseCaseUtils {
    */
   @SuppressWarnings("unchecked")
   public static AnalysisResult analyze(
-      String text, List<CobolText> copybooks, TextDocumentSyncType syncType) {
+      String fileName, String text, List<CobolText> copybooks, TextDocumentSyncType syncType) {
     Injector injector = Guice.createInjector(new EngineModule(), new DatabusModule());
 
     DataBusBroker<FetchedCopybookEvent, RequiredCopybookEvent> broker =
@@ -201,8 +206,6 @@ public class UseCaseUtils {
     MockCopybookService mockCopybookService = new MockCopybookServiceImpl(broker);
     mockCopybookService.setCopybooks(() -> copybooks);
 
-    return injector
-        .getInstance(CobolLanguageEngineFacade.class)
-        .analyze(DOCUMENT_URI, text, syncType);
+    return injector.getInstance(CobolLanguageEngineFacade.class).analyze(fileName, text, syncType);
   }
 }

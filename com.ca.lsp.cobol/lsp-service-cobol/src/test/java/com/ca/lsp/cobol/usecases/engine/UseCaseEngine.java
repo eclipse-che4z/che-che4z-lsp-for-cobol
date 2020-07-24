@@ -105,7 +105,7 @@ public class UseCaseEngine {
       String text, List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics) {
 
     PreprocessedDocument document = prepareDocument(text, copybooks, expectedDiagnostics);
-    AnalysisResult actual = analyze(document.getText(), document.getCopybooks());
+    AnalysisResult actual = analyze(DOCUMENT_URI, document.getText(), document.getCopybooks());
     TestData expected = document.getTestData();
 
     assertResultEquals(actual, expected);

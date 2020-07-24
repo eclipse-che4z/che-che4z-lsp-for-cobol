@@ -14,6 +14,7 @@
 package com.ca.lsp.cobol.positive;
 
 import com.ca.lsp.cobol.ConfigurableTest;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +34,7 @@ import static org.junit.Assert.assertEquals;
  * {@link CobolTextRegistry}. The positive test should always pass. If not, then there are some
  * regressions. The complete error description with the file name logged.
  */
+@Slf4j
 @RunWith(Parameterized.class)
 public class PositiveTest extends ConfigurableTest {
   private static final String PATH_TO_TEST_RESOURCES = "filesToTestPath";
@@ -60,7 +62,8 @@ public class PositiveTest extends ConfigurableTest {
 
   @Test
   public void test() {
-    assertNoSyntaxErrorsFound(analyzeForErrors(text.getFullText(), copybooks));
+    log.debug("Processing: " + text.getFileName());
+    assertNoSyntaxErrorsFound(analyzeForErrors(text.getFileName(), text.getFullText(), copybooks));
   }
 
   private void assertNoSyntaxErrorsFound(List<Diagnostic> diagnostics) {

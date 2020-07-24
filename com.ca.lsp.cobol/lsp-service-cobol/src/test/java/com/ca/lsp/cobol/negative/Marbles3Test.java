@@ -16,6 +16,8 @@ package com.ca.lsp.cobol.negative;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.List;
+
 /**
  * " IGYSC1428-W The ""TEST(DWARF)"" option was specified but the compiler return code was 8 or
  * greater. The ""NOTEST"" option will be in effect.
@@ -28,7 +30,7 @@ public class Marbles3Test extends NegativeTest {
   private static final int EXPECTED_ERRORS_NUMBER = 2;
 
   public Marbles3Test() {
-    super(FILE_NAME, EXPECTED_ERRORS_NUMBER);
+    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
   }
 
   @Ignore("Unsupported while semantic analysis is not implemented")

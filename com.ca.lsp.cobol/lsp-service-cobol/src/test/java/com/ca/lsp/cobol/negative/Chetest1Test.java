@@ -17,6 +17,8 @@ package com.ca.lsp.cobol.negative;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.List;
+
 /**
  * 20 IGYLI0088-S The "COPY" statement was invalid. Expected "REPLACING", but found "02". The
  * statement was discarded.
@@ -32,7 +34,7 @@ public class Chetest1Test extends NegativeTest {
   private static final int EXPECTED_ERRORS_NUMBER = 3;
 
   public Chetest1Test() {
-    super(FILE_NAME, EXPECTED_ERRORS_NUMBER);
+    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
   }
 
   @Ignore("Unsupported while semantic analysis is not implemented")

@@ -18,6 +18,7 @@ import org.eclipse.lsp4j.Diagnostic;
 
 import java.util.List;
 
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
@@ -42,7 +43,7 @@ public abstract class PositiveUseCase {
   }
 
   protected void test(List<CobolText> copybooks) {
-    List<Diagnostic> diagnostics = analyzeForErrors(text, copybooks);
+    List<Diagnostic> diagnostics = analyzeForErrors(DOCUMENT_URI, text, copybooks);
 
     assertEquals(createMessage(diagnostics), 0, diagnostics.size());
   }
