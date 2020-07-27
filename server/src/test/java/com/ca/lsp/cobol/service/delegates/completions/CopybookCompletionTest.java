@@ -75,9 +75,7 @@ class CopybookCompletionTest {
         Collections.singletonList(
             new Location(null, new Range(new Position(9, 11), new Position(9, 18)))));
 
-    AnalysisResult result =
-        new AnalysisResult(
-            emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), copybookUsages);
+    AnalysisResult result = AnalysisResult.empty().toBuilder().copybookUsages(copybookUsages).build();
 
     return new MyDocumentModel(TEXT, result);
   }

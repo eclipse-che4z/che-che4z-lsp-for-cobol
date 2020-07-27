@@ -228,10 +228,8 @@ class MyTextDocumentServiceTest extends ConfigurableTest {
 
     // created two dummy analysis result, one with error and another without
     // those object will be used as result of dynamic stubbing stage
-    AnalysisResult resultNoErrors =
-        new AnalysisResult(diagnosticsNoErrors, null, null, null, null, null, null);
-    AnalysisResult resultWithErrors =
-        new AnalysisResult(diagnosticsWithErrors, null, null, null, null, null, null);
+    AnalysisResult resultNoErrors = AnalysisResult.builder().diagnostics(diagnosticsNoErrors).build();
+    AnalysisResult resultWithErrors = AnalysisResult.builder().diagnostics(diagnosticsWithErrors).build();
 
     /*
      * Defined dynamic response based on the possible combinations available when the document analyzed:
@@ -299,8 +297,7 @@ class MyTextDocumentServiceTest extends ConfigurableTest {
 
     when(actions.collect(params)).thenReturn(expected);
 
-    MyTextDocumentService service =
-        new MyTextDocumentService(null, null, null, null, null, broker, actions);
+    MyTextDocumentService service = MyTextDocumentService.builder().dataBus(broker).actions(actions).build();
     try {
       assertEquals(expected, service.codeAction(params).get());
     } catch (InterruptedException | ExecutionException e) {
@@ -336,8 +333,7 @@ class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private MyTextDocumentService verifyServiceStart(
       Communications communications, LanguageEngineFacade engine, DataBusBroker broker) {
-    MyTextDocumentService service =
-        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
+    MyTextDocumentService service = MyTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).build();
 
     verify(broker).subscribe(DataEventType.RUN_ANALYSIS_EVENT, service);
     return service;
@@ -390,8 +386,7 @@ class MyTextDocumentServiceTest extends ConfigurableTest {
         .when(engine)
         .analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
 
-    MyTextDocumentService service =
-        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
+    MyTextDocumentService service = MyTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).build();
 
     service.didOpen(
         new DidOpenTextDocumentParams(
@@ -441,18 +436,9 @@ class MyTextDocumentServiceTest extends ConfigurableTest {
     copybookUsages.put("NESTED2", singletonList(nested2Location));
 
     when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
-        .thenReturn(
-            new AnalysisResult(
-                emptyMap(),
-                emptyMap(),
-                emptyMap(),
-                emptyMap(),
-                emptyMap(),
-                emptyMap(),
-                copybookUsages));
+        .thenReturn(AnalysisResult.empty().toBuilder().copybookUsages(copybookUsages).build());
 
-    MyTextDocumentService service =
-        new MyTextDocumentService(communications, engine, null, null, null, broker, null);
+    MyTextDocumentService service = MyTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).build();
 
     service.didOpen(
         new DidOpenTextDocumentParams(

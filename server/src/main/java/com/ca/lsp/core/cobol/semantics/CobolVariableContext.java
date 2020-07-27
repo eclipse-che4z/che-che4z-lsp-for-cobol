@@ -37,8 +37,9 @@ import static java.util.stream.Collectors.toList;
  */
 @EqualsAndHashCode
 public class CobolVariableContext implements SubContext<Variable> {
-  private static final int LEVEL_77 = 77;
-  private static final int LEVEL_66 = 66;
+  public static final int LEVEL_77 = 77;
+  public static final int LEVEL_66 = 66;
+  public static final int LEVEL_88 = 88;
 
   private final List<Variable> variables = new ArrayList<>();
   private final Multimap<String, Position> variableDefinitions = HashMultimap.create();

@@ -19,22 +19,28 @@ import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolParser.*;
 import com.ca.lsp.core.cobol.parser.CobolParserBaseVisitor;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.semantics.CobolVariableContext;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
+import com.ca.lsp.core.cobol.semantics.outline.NodeType;
+import com.ca.lsp.core.cobol.semantics.outline.OutlineTreeBuilder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
+import org.eclipse.lsp4j.DocumentSymbol;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Map;
 
+import static com.ca.lsp.core.cobol.semantics.outline.OutlineNodeNames.*;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.INFO;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.WARNING;
 import static java.util.Optional.ofNullable;
@@ -66,15 +72,18 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private NamedSubContext copybooks;
   private CommonTokenStream tokenStream;
+  private OutlineTreeBuilder outlineTreeBuilder;
   private Map<Token, Position> positionMapping;
 
   public CobolVisitor(
+      @Nonnull String documentUri,
       @Nonnull NamedSubContext copybooks,
       @Nonnull CommonTokenStream tokenStream,
       @Nonnull Map<Token, Position> positionMapping) {
     this.copybooks = copybooks;
     this.positionMapping = positionMapping;
     this.tokenStream = tokenStream;
+    outlineTreeBuilder = new OutlineTreeBuilder(documentUri, positionMapping);
   }
 
   /**
@@ -91,12 +100,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
         paragraphs.getDefinitions().asMap(),
         paragraphs.getUsages().asMap(),
         copybooks.getDefinitions().asMap(),
-        copybooks.getUsages().asMap());
+        copybooks.getUsages().asMap(),
+        buildOutlineTree());
   }
 
   @Override
   public Class visitIdentificationDivision(IdentificationDivisionContext ctx) {
     areaAWarning(ctx.getStart());
+    outlineTreeBuilder.addNode(IDENTIFICATION_DIVISION, NodeType.DIVISION, ctx);
     return visitChildren(ctx);
   }
 
@@ -104,6 +115,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   public Class visitProgramIdParagraph(ProgramIdParagraphContext ctx) {
     if (ctx.programName() != null) {
       programName = ctx.programName().getText();
+      outlineTreeBuilder.renameProgram(programName, ctx);
+      outlineTreeBuilder.addNode(PROGRAM_ID_PREFIX + programName, NodeType.PROGRAM_ID, ctx);
     }
     return visitChildren(ctx);
   }
@@ -111,18 +124,21 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   @Override
   public Class visitProcedureDivision(ProcedureDivisionContext ctx) {
     areaAWarning(ctx.getStart());
+    outlineTreeBuilder.addNode(PROCEDURE_DIVISION, NodeType.DIVISION, ctx);
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitEnvironmentDivision(EnvironmentDivisionContext ctx) {
     areaAWarning(ctx.getStart());
+    outlineTreeBuilder.addNode(ENVIRONMENT_DIVISION, NodeType.DIVISION, ctx);
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitDataDivision(DataDivisionContext ctx) {
     areaAWarning(ctx.getStart());
+    outlineTreeBuilder.addNode(DATA_DIVISION, NodeType.DIVISION, ctx);
     return visitChildren(ctx);
   }
 
@@ -145,20 +161,36 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
+  public Class visitWorkingStorageSection(WorkingStorageSectionContext ctx) {
+    outlineTreeBuilder.addNode(WORKING_STORAGE_SECTION, NodeType.SECTION, ctx);
+    outlineTreeBuilder.initVariables();
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitProgramUnit(ProgramUnitContext ctx) {
+    outlineTreeBuilder.addProgram(ctx);
+    return visitChildren(ctx);
+  }
+
+  @Override
   public Class visitProcedureSection(ProcedureSectionContext ctx) {
     throwWarning(ctx.getStart());
+    outlineTreeBuilder.addNode(ctx.getStart().getText(), NodeType.PROCEDURE_SECTION, ctx);
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitParagraph(ParagraphContext ctx) {
     areaAWarning(ctx.getStart());
+    outlineTreeBuilder.addNode(ctx.getStart().getText(), NodeType.PROCEDURE, ctx);
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitFileDescriptionEntry(FileDescriptionEntryContext ctx) {
     areaAWarning(ctx.getStart());
+    outlineTreeBuilder.addNode(ctx.fileName().getText(), NodeType.FILE, ctx);
     return visitChildren(ctx);
   }
 
@@ -190,6 +222,52 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     Token endProgramNameToken = ctx.programName().getStart();
     checkProgramName(endProgramNameToken);
     areaAWarning(ctx.getStart());
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitConfigurationSection(ConfigurationSectionContext ctx) {
+    outlineTreeBuilder.addNode(CONFIGURATION_SECTION, NodeType.SECTION, ctx);
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitInputOutputSection(InputOutputSectionContext ctx) {
+    outlineTreeBuilder.addNode(INPUT_OUTPUT_SECTION, NodeType.SECTION, ctx);
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitSelectClause(SelectClauseContext ctx) {
+    outlineTreeBuilder.addNode(ctx.fileName().getText(), NodeType.FILE, ctx);
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitFileSection(FileSectionContext ctx) {
+    outlineTreeBuilder.addNode(FILE_SECTION, NodeType.SECTION, ctx);
+    outlineTreeBuilder.initVariables();
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitLinkageSection(LinkageSectionContext ctx) {
+    outlineTreeBuilder.addNode(LINKAGE_SECTION, NodeType.SECTION, ctx);
+    outlineTreeBuilder.initVariables();
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitLocalStorageSection(LocalStorageSectionContext ctx) {
+    outlineTreeBuilder.addNode(LOCAL_STORAGE_SECTION, NodeType.SECTION, ctx);
+    outlineTreeBuilder.initVariables();
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitCommunicationSection(CommunicationSectionContext ctx) {
+    outlineTreeBuilder.addNode(COMMUNICATION_SECTION, NodeType.SECTION, ctx);
+    outlineTreeBuilder.initVariables();
     return visitChildren(ctx);
   }
 
@@ -258,17 +336,33 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
         .ifPresent(
             variable ->
                 defineVariable(levelNumber, variable.getText(), getPosition(variable.getStart())));
+    String name = Optional.ofNullable(ctx.dataName1()).map(RuleContext::getText).orElse(FILLER_NAME);
+    int level = Integer.parseInt(levelNumber);
+    outlineTreeBuilder.addVariable(level, name, getDataDescriptionNodeType(ctx), ctx);
     return visitChildren(ctx);
+  }
+
+  private NodeType getDataDescriptionNodeType(DataDescriptionEntryFormat1Context ctx) {
+    // Data description with a pic clause is a FIELD
+    if (!ctx.dataPictureClause().isEmpty()) {
+      return NodeType.FIELD;
+    }
+    // Data description with a redefines clause is a REDEFINES
+    if (!ctx.dataRedefinesClause().isEmpty()) {
+      return NodeType.REDEFINES;
+    }
+    // Data description is a STRUCT in other cases
+    return NodeType.STRUCT;
   }
 
   @Override
   public Class visitDataDescriptionEntryFormat2(DataDescriptionEntryFormat2Context ctx) {
-
     String levelNumber = ctx.LEVEL_NUMBER_66().getText();
     ofNullable(ctx.dataName1())
         .ifPresent(
             variable ->
                 defineVariable(levelNumber, variable.getText(), getPosition(variable.getStart())));
+    outlineTreeBuilder.addVariable(CobolVariableContext.LEVEL_66, ctx.dataName1().getText(), NodeType.FIELD_66, ctx);
     return visitChildren(ctx);
   }
 
@@ -279,6 +373,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
         .ifPresent(
             variable ->
                 defineVariable(levelNumber, variable.getText(), getPosition(variable.getStart())));
+    outlineTreeBuilder.addVariable(CobolVariableContext.LEVEL_88, ctx.dataName1().getText(), NodeType.FIELD_88, ctx);
     return visitChildren(ctx);
   }
 
@@ -292,6 +387,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     String name = ctx.getText().toUpperCase();
     addUsage(paragraphs, name, getPosition(ctx.getStart()));
     return visitChildren(ctx);
+  }
+
+  private List<DocumentSymbol> buildOutlineTree() {
+    return outlineTreeBuilder.build(copybooks.getUsages());
   }
 
   @Override

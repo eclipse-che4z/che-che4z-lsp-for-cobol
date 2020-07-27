@@ -92,7 +92,7 @@ public class CobolLanguageEngine {
             tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri);
 
     CobolVisitor visitor =
-        new CobolVisitor(extendedDocument.getCopybooks(), tokens, positionMapping);
+        new CobolVisitor(documentUri, extendedDocument.getCopybooks(), tokens, positionMapping);
     visitor.visit(tree);
 
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
