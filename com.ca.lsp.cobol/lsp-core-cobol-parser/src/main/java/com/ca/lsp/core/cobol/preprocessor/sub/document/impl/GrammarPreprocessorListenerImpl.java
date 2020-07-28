@@ -15,8 +15,8 @@ package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.*;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessor.*;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.*;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListener;

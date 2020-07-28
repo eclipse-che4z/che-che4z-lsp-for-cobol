@@ -38,7 +38,8 @@ class Mapping {
     documentHierarchyStack.push(new DocumentHierarchyLevel(documentPositions.get(documentUri)));
     List<Token> tokens = tokenStream.getTokens();
     outer:
-    for (Token token : tokens) {
+    for (int i = 0; i < tokens.size(); i++) {
+      Token token = tokens.get(i);
       String text = token.getText();
       if (token.getType() == COPYENTRY) {
         documentHierarchyStack.push(
@@ -47,19 +48,21 @@ class Mapping {
       }
       if (token.getType() == COPYEXIT) {
         documentHierarchyStack.pop();
+        i++;
         continue;
       }
-      Position position = documentHierarchyStack.peek().getCurrent();
-
       if (text.startsWith("*>")) {
+        documentHierarchyStack.peek().forward();
         continue;
       }
+
+      Position position = documentHierarchyStack.peek().getCurrent();
 
       String posText = position.getToken();
       if (tokenMatches(text, posText)) {
         result.put(token, position);
         documentHierarchyStack.peek().forward();
-      } else if (text.trim().isEmpty()) {
+      } else if (text.isEmpty()) {
         continue;
       } else {
 

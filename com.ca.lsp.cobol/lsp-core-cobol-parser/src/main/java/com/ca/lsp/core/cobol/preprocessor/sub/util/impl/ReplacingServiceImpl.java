@@ -15,9 +15,9 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.PseudoTextContext;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceClauseContext;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceSameElementContext;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessor.PseudoTextContext;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessor.ReplaceClauseContext;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessor.ReplaceSameElementContext;
 import com.ca.lsp.core.cobol.model.ReplacingMapping;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;

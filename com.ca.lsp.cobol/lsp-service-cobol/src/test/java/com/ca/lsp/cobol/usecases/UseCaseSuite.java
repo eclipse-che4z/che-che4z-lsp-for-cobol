@@ -47,6 +47,7 @@ import org.junit.runners.Suite.SuiteClasses;
   TestMissingCopybooksReturnsError.class,
   TestResponsesNotContainLineBreaks.class,
   TestInvalidVariableStructureFound.class,
+  TestPicClausesNotCauseSyntaxErrors.class,
   TestReplacingNotAppliedRecursively.class,
   TestCorrectErrorUnderscorePosition.class,
   TestSameCopybooksWithDifferentCases.class,

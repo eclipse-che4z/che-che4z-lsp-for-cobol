@@ -14,7 +14,7 @@
  */
 package com.ca.lsp.core.cobol.model;
 
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceSameElementContext;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessor.ReplaceSameElementContext;
 import lombok.Value;
 
 /** A mapping from a replaceable to a replacement used in REPLACING statements. */

@@ -15,7 +15,7 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser.ReplaceClauseContext;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessor.ReplaceClauseContext;
 import org.antlr.v4.runtime.BufferedTokenStream;
 
 import javax.annotation.Nonnull;

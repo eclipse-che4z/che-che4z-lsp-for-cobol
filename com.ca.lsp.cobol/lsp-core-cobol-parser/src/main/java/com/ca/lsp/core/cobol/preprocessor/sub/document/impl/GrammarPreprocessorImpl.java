@@ -17,7 +17,7 @@ import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorParser;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListenerFactory;
@@ -53,7 +53,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
 
     BufferedTokenStream tokens = new CommonTokenStream(lexer);
 
-    CobolPreprocessorParser parser = new CobolPreprocessorParser(tokens);
+    CobolPreprocessor parser = new CobolPreprocessor(tokens);
     parser.removeErrorListeners();
 
     RuleContext startRule = parser.startRule();
