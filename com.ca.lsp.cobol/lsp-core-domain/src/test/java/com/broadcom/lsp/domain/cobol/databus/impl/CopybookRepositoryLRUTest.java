@@ -22,15 +22,16 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.reflection.FieldSetter;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
@@ -39,7 +40,7 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
   private CopybookStorable storable = getDummyStorable();
   @Getter protected final Waiter waiter = new Waiter();
 
-  @Before
+  @BeforeEach
   public void initRepository() {
     repository = new CopybookRepositoryLRU(CACHE_SIZE);
     repository.persist(storable);
@@ -136,10 +137,14 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
   }
 
   /** This test validates that an exception is thrown if provided arguments are null. */
-  @Test(expected = IllegalArgumentException.class)
-  public void testNullArguments() {
-    repository.persist(new CopybookStorable(null, null, null));
-    repository.persist(null);
+  @Test
+  public void testNullArguments() throws IllegalArgumentException {
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          repository.persist(new CopybookStorable(null, null, null));
+          repository.persist(null);
+        });
   }
 
   @Test
@@ -188,16 +193,21 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
    * This test verify that a NoSuchElementException is thrown if the cache is empty or the element
    * looking for doesn't exist.
    */
-  @Test(expected = NoSuchElementException.class)
+  @Test
   @SneakyThrows
   public void testNoSuchElement() throws NoSuchElementException {
-    // search a not present element
-    assertTrue(
-        repository
-            .getCopybookStorableFromCache(CopybookRepository.calculateUUID("NOT-PRESENT-ITEM"))
-            .get()
-            .getName()
-            .equalsIgnoreCase("NOT-PRESENT-ITEM"));
+    Assertions.assertThrows(
+        NoSuchElementException.class,
+        () -> {
+          // search a not present element
+          assertTrue(
+              repository
+                  .getCopybookStorableFromCache(
+                      CopybookRepository.calculateUUID("NOT-PRESENT-ITEM"))
+                  .get()
+                  .getName()
+                  .equalsIgnoreCase("NOT-PRESENT-ITEM"));
+        });
   }
 
   /** This test verify that for a not empty cache the top item is returned to the callee. */

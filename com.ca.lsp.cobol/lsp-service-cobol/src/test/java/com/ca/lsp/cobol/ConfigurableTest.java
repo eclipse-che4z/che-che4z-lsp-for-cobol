@@ -18,16 +18,16 @@ package com.ca.lsp.cobol;
 import com.broadcom.lsp.cdi.EngineModule;
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 public abstract class ConfigurableTest {
-  @BeforeClass
+  @BeforeAll
   public static void setUp() {
     LangServerCtx.getGuiceCtx(new TestModule(), new EngineModule(), new DatabusModule());
   }
 
-  @AfterClass
+  @AfterAll
   public static void tearDown() {
     LangServerCtx.shutdown();
   }

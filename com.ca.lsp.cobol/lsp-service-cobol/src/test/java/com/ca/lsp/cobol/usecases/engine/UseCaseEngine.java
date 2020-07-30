@@ -33,8 +33,8 @@ import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.CharStreams.fromString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This class applies syntax and semantic analysis for COBOL texts using the actual Language Engine.
@@ -184,11 +184,11 @@ public class UseCaseEngine {
   private void assertDiagnostics(
       Map<String, List<Diagnostic>> expected, Map<String, List<Diagnostic>> actual) {
     String message = "Diagnostics: " + actual.toString();
-    assertEquals(message, expected.size(), actual.size());
+    assertEquals(expected.size(), actual.size(), message);
     assertEquals(
-        message,
         expected.values().stream().flatMap(Collection::stream).filter(Objects::nonNull).count(),
-        actual.values().stream().mapToLong(Collection::size).sum());
+        actual.values().stream().mapToLong(Collection::size).sum(),
+        message);
     expected.forEach(
         (key, value) ->
             actual
@@ -196,19 +196,19 @@ public class UseCaseEngine {
                 .forEach(
                     actualDiag ->
                         assertTrue(
-                            "Diagnostic not found: " + actualDiag.toString(),
-                            value.contains(actualDiag))));
+                            value.contains(actualDiag),
+                            "Diagnostic not found: " + actualDiag.toString())));
   }
 
   private void assertResult(
       String message, Map<String, List<Location>> expected, Map<String, List<Location>> actual) {
-    assertEquals(message, expected.keySet(), actual.keySet());
+    assertEquals(expected.keySet(), actual.keySet(), message);
     expected.forEach(
         (key, value) ->
             assertEquals(
-                message,
                 value.stream().sorted(getLocationComparator()).collect(toList()),
-                actual.get(key).stream().sorted(getLocationComparator()).collect(toList())));
+                actual.get(key).stream().sorted(getLocationComparator()).collect(toList()),
+                message));
   }
 
   private Comparator<Location> getLocationComparator() {

@@ -14,14 +14,14 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl;
 
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_TAG;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
 import static com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Testing that the cobol lines are formatted correctly before being used for token analysis */
 public class CobolLineIndicatorProcessorImplTest {
@@ -180,8 +180,7 @@ public class CobolLineIndicatorProcessorImplTest {
     startContinuationLine.setSuccessor(trailingCommaContinuationLine);
     trailingCommaContinuationLine.setPredecessor(startContinuationLine);
 
-    List<CobolLine> listOfLines =
-        List.of(startContinuationLine, trailingCommaContinuationLine);
+    List<CobolLine> listOfLines = List.of(startContinuationLine, trailingCommaContinuationLine);
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 

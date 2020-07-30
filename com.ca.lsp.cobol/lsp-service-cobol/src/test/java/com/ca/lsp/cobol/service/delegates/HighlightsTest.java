@@ -14,23 +14,24 @@
 
 package com.ca.lsp.cobol.service.delegates;
 
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.runTextValidation;
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.waitForDiagnostics;
-
 import com.broadcom.lsp.cdi.LangServerCtx;
 import com.ca.lsp.cobol.ConfigurableTest;
-import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
+import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.services.TextDocumentService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.runTextValidation;
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.waitForDiagnostics;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Testing Document Highlighting with a variable, position is passed in INNER1_POSITION and the
@@ -73,7 +74,7 @@ public class HighlightsTest extends ConfigurableTest {
 
   private TextDocumentService service;
 
-  @Before
+  @BeforeEach
   public void initializeService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);

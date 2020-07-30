@@ -21,8 +21,8 @@ import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.service.utils.FileSystemService;
 import com.google.gson.JsonPrimitive;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.nio.file.Path;
@@ -63,7 +63,7 @@ public class CopybookServiceTest {
   private Path cpyPath = mock(Path.class);
   private Path parentPath = mock(Path.class);
 
-  @Before
+  @BeforeEach
   public void setupMocks() {
     when(settingsService.getConfiguration("copybook-resolve", "document", VALID_CPY_NAME))
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(VALID_CPY_URI))));
@@ -368,19 +368,28 @@ public class CopybookServiceTest {
 
     // First document parsing done
     copybookService.observerCallback(
-        AnalysisFinishedEvent.builder().documentUri(DOCUMENT_URI).copybookUris(emptyList()).build());
+        AnalysisFinishedEvent.builder()
+            .documentUri(DOCUMENT_URI)
+            .copybookUris(emptyList())
+            .build());
     verify(settingsService, times(1))
         .getConfigurations(singletonList("copybook-download.document.INVALID"));
 
     // Others parsing done events for first document are not trigger settingsService
     copybookService.observerCallback(
-        AnalysisFinishedEvent.builder().documentUri(DOCUMENT_URI).copybookUris(emptyList()).build());
+        AnalysisFinishedEvent.builder()
+            .documentUri(DOCUMENT_URI)
+            .copybookUris(emptyList())
+            .build());
     verify(settingsService, times(1))
         .getConfigurations(singletonList("copybook-download.document.INVALID"));
 
     // Second document parsing done
     copybookService.observerCallback(
-        AnalysisFinishedEvent.builder().documentUri(DOCUMENT_2_URI).copybookUris(emptyList()).build());
+        AnalysisFinishedEvent.builder()
+            .documentUri(DOCUMENT_2_URI)
+            .copybookUris(emptyList())
+            .build());
     verify(settingsService, times(1))
         .getConfigurations(singletonList("copybook-download.document2.INVALID_2"));
   }

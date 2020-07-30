@@ -17,11 +17,11 @@ package com.ca.lsp.cobol.usecases;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This use case checks that there is no NullPointerException thrown if END-PERFORM missing. */
 public class TestPerformWithoutEndNotCauseNPE extends NegativeUseCase {
@@ -49,16 +49,16 @@ public class TestPerformWithoutEndNotCauseNPE extends NegativeUseCase {
   @Override
   protected void assertDiagnostics(List<Diagnostic> diagnostics) {
     {
-      assertEquals("Number of diagnostics", 1, diagnostics.size());
+      assertEquals(1, diagnostics.size(), "Number of diagnostics");
 
       Diagnostic diagnostic = diagnostics.get(0);
       assertEquals("No viable alternative at input OF PARENT.\r\n       ", diagnostic.getMessage());
 
       Range range = diagnostic.getRange();
-      assertEquals("Diagnostic start line", 8, range.getStart().getLine());
-      assertEquals("Diagnostic start character", 40, range.getStart().getCharacter());
-      assertEquals("Diagnostic end line", 8, range.getEnd().getLine());
-      assertEquals("Diagnostic end character", 50, range.getEnd().getCharacter());
+      assertEquals(8, range.getStart().getLine(), "Diagnostic start line");
+      assertEquals(40, range.getStart().getCharacter(), "Diagnostic start character");
+      assertEquals(8, range.getEnd().getLine(), "Diagnostic end line");
+      assertEquals(50, range.getEnd().getCharacter(), "Diagnostic end character");
     }
   }
 }

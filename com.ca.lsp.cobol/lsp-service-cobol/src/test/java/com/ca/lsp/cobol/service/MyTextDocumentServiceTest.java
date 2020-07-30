@@ -28,9 +28,9 @@ import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.internal.stubbing.answers.AnswersWithDelay;
 
 import java.util.*;
@@ -43,7 +43,7 @@ import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /** This test checks the entry points of the {@link TextDocumentService} implementation. */
@@ -63,7 +63,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   private TextDocumentService service;
   private TestLanguageClient client;
 
-  @Before
+  @BeforeEach
   public void createService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
@@ -285,7 +285,8 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     verify(communications).notifyThatLoadingInProgress(uri);
     verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
     verify(dataBus, timeout(10000))
-        .postData(AnalysisFinishedEvent.builder().documentUri(uri).copybookUris(emptyList()).build());
+        .postData(
+            AnalysisFinishedEvent.builder().documentUri(uri).copybookUris(emptyList()).build());
     verify(communications, timeout(10000)).cancelProgressNotification(uri);
     verify(communications, timeout(10000)).publishDiagnostics(diagnostics);
   }
@@ -333,7 +334,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     verify(communications, timeout(2000)).cancelProgressNotification(DOCUMENT_URI);
   }
 
-  @Ignore("Not implemented yet")
+  @Disabled("Not implemented yet")
   @Test
   public void testHover() {
     TextDocumentItem testHoverDocument =

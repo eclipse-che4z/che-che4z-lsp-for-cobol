@@ -13,21 +13,14 @@
  */
 package com.ca.lsp.core.cobol.strategy;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import org.antlr.v4.runtime.FailedPredicateException;
-import org.antlr.v4.runtime.InputMismatchException;
-import org.antlr.v4.runtime.NoViableAltException;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.VocabularyImpl;
-import org.antlr.v4.runtime.misc.IntervalSet;
-import org.junit.Test;
+
+import static org.mockito.Mockito.*;
 
 /**
  * Testing that the errors that are recognized at the end of file analysis are showing messages as
@@ -75,14 +68,18 @@ public class CobolErrorStrategyTest {
         .notifyErrorListeners(token, "Syntax error on '<0>' expected text", errorMock);
   }
 
-  @Test(expected = NullPointerException.class)
-  public void failedPredicateExceptionTest() {
-    Parser recognizer = mock(Parser.class);
-    FailedPredicateException errorMock = mock(FailedPredicateException.class);
+  @Test
+  public void failedPredicateExceptionTest() throws NullPointerException {
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> {
+          Parser recognizer = mock(Parser.class);
+          FailedPredicateException errorMock = mock(FailedPredicateException.class);
 
-    CobolErrorStrategy strategy = new CobolErrorStrategy();
+          CobolErrorStrategy strategy = new CobolErrorStrategy();
 
-    strategy.reportError(recognizer, errorMock);
+          strategy.reportError(recognizer, errorMock);
+        });
   }
 
   @Test

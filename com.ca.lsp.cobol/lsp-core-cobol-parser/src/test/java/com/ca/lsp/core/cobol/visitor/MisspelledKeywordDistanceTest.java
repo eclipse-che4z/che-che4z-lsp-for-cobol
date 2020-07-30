@@ -15,12 +15,12 @@
 
 package com.ca.lsp.core.cobol.visitor;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /** Test a Levenshtein distance calculation for the misspelled words. */
 public class MisspelledKeywordDistanceTest {

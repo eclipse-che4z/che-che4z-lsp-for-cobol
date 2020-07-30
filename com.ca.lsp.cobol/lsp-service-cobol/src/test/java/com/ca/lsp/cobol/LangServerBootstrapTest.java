@@ -23,8 +23,8 @@ import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -34,14 +34,14 @@ import static com.broadcom.lsp.cdi.LangServerCtx.shutdown;
 import static com.google.inject.Key.get;
 import static com.google.inject.name.Names.named;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /** This test check the logic of the application bootstrap */
 public class LangServerBootstrapTest {
 
   private static final String PIPES = "pipeEnabled";
 
-  @After
+  @AfterEach
   public void shutdownContext() {
     shutdown();
   }

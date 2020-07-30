@@ -15,11 +15,11 @@ package com.ca.lsp.cobol.service;
 
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.Position;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class MyDocumentModelTest {
   private static final String TEXT =
@@ -38,7 +38,7 @@ public class MyDocumentModelTest {
 
   private MyDocumentModel model;
 
-  @Before
+  @BeforeEach
   public void createModel() {
     model = new MyDocumentModel(TEXT, AnalysisResult.empty());
   }
@@ -91,10 +91,8 @@ public class MyDocumentModelTest {
     assertEquals("", model.getFullTokenAtPosition(pos));
   }
 
-
   @Test
-  public void testPositionAtDelimiter()
-  {
+  public void testPositionAtDelimiter() {
     Position pos = new Position(1, 19);
     assertEquals("", model.getTokenBeforePosition(pos));
   }

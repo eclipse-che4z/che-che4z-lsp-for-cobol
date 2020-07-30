@@ -22,7 +22,7 @@ import com.ca.lsp.cobol.service.utils.WorkspaceFileService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.services.LanguageClient;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.List;
@@ -31,7 +31,7 @@ import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUME
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.*;
 
@@ -78,9 +78,9 @@ public class TestResponsesNotContainLineBreaks {
     ofNullable(str)
         .ifPresent(
             it -> {
-              assertFalse(it, it.contains("\r\n"));
-              assertFalse(it, it.contains("\n"));
-              assertFalse(it, it.contains("\r"));
+              assertFalse(it.contains("\r\n"), it);
+              assertFalse(it.contains("\n"), it);
+              assertFalse(it.contains("\r"), it);
             });
   }
 }

@@ -17,8 +17,8 @@ package com.ca.lsp.core.cobol.semantics;
 
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /** Test for CobolVariableContextImpl */
 public class CobolVariableContextTest {
@@ -64,7 +64,7 @@ public class CobolVariableContextTest {
 
   private List<Variable> variableList;
 
-  @Before
+  @BeforeEach
   public void createContext() {
     context = new CobolVariableContext();
     var1 = new Variable(LEVEL1, VAR1); // 01

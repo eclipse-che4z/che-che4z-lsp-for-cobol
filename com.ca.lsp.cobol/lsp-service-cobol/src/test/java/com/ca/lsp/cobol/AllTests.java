@@ -23,13 +23,14 @@ import com.ca.lsp.cobol.service.delegates.communications.ServerCommunicationsTes
 import com.ca.lsp.cobol.service.delegates.completions.*;
 import com.ca.lsp.cobol.service.delegates.references.DocumentOccurrencesTest;
 import com.ca.lsp.cobol.usecases.UseCaseSuite;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.platform.suite.api.SelectClasses;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
 
 /** The suite for all the tests in project that should be run. */
-@RunWith(Suite.class)
-@SuiteClasses({
+@RunWith(JUnitPlatform.class)
+
+@SelectClasses({
   PositiveTest.class,
   NegativeTestSuite.class,
   MyDocumentModelTest.class,

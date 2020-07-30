@@ -14,9 +14,9 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorStringUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This test checks {@link PreprocessorStringUtils} utility functions. */
 public class PreprocessorStringUtilsTest {

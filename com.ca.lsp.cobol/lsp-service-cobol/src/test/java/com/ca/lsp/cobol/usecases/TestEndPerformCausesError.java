@@ -15,11 +15,11 @@ package com.ca.lsp.cobol.usecases;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This use case checks if there is an error thrown if the END-PERFORM token is missing */
 public class TestEndPerformCausesError extends NegativeUseCase {
@@ -59,7 +59,7 @@ public class TestEndPerformCausesError extends NegativeUseCase {
 
   @Override
   protected void assertDiagnostics(List<Diagnostic> diagnostics) {
-    assertEquals("Number of diagnostics", 1, diagnostics.size());
+    assertEquals(1, diagnostics.size(), "Number of diagnostics");
     Diagnostic diagnostic = diagnostics.get(0);
     assertEquals(
         "Extraneous input '.\\r\\n       \\r\\n                  ' expected END TERMINATOR",
@@ -67,11 +67,11 @@ public class TestEndPerformCausesError extends NegativeUseCase {
 
     // The position of dot at the end of line "INITIALIZE ID4(ROW-SUB)."
     Range range = diagnostic.getRange();
-    assertEquals("Diagnostic start line", 16, range.getStart().getLine());
-    assertEquals("Diagnostic start character", 46, range.getStart().getCharacter());
-    assertEquals("Diagnostic end line", 16, range.getEnd().getLine());
+    assertEquals(16, range.getStart().getLine(), "Diagnostic start line");
+    assertEquals(46, range.getStart().getCharacter(), "Diagnostic start character");
+    assertEquals(16, range.getEnd().getLine(), "Diagnostic end line");
     // Lines 17 and 18 are concatenated with line 16 from the parser point of view because there is
     // no terminating token
-    assertEquals("Diagnostic end character", 76, range.getEnd().getCharacter());
+    assertEquals(76, range.getEnd().getCharacter(), "Diagnostic end character");
   }
 }

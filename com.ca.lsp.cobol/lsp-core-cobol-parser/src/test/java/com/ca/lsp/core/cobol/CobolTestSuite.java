@@ -26,13 +26,13 @@ import com.ca.lsp.core.cobol.semantics.CobolVariableContextTest;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategyTest;
 import com.ca.lsp.core.cobol.visitor.MisspelledKeywordDistanceTest;
 import com.ca.lsp.core.cobol.visitor.VisitorSemanticAnalysisTest;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.platform.suite.api.SelectClasses;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
 
 /** This suite runs all the test of Cobol parser core. */
-@RunWith(Suite.class)
-@SuiteClasses({
+@RunWith(JUnitPlatform.class)
+@SelectClasses({
   CobolLineReaderImplTest.class,
   ContinuationLineTransformationTest.class,
   CobolCommentEntriesMarkerImplTest.class,

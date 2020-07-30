@@ -22,7 +22,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import java.util.List;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * This class is an abstract negative test case and should be instantiated with specifying concrete
  * Cobol files to test. Every heir should also override checkErrors() method to assert the

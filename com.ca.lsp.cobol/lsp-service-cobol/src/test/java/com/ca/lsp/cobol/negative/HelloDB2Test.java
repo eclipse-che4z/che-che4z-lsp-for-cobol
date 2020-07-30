@@ -13,8 +13,8 @@
  */
 package com.ca.lsp.cobol.negative;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -29,6 +29,7 @@ import java.util.List;
  *
  * <p>35 IGYPS2121-S ""SQLCA"" was not defined as a data-name. The statement was discarded."
  */
+@Disabled("Unsupported while semantic analysis is not implemented")
 public class HelloDB2Test extends NegativeTest {
   private static final String FILE_NAME = "HELLODB2.cbl";
   private static final int EXPECTED_ERRORS_NUMBER = 5;
@@ -37,7 +38,6 @@ public class HelloDB2Test extends NegativeTest {
     super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
   }
 
-  @Ignore("Unsupported while semantic analysis is not implemented")
   @Test
   public void test() {
     super.test();

@@ -18,17 +18,16 @@ package com.ca.lsp.core.cobol.semantics;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.TokenUtilsImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
-@RunWith(Parameterized.class)
 public class CobolCleanExtraLanguageTest {
 
   private static final String CICS_TEXT =
@@ -72,32 +71,18 @@ public class CobolCleanExtraLanguageTest {
 
   private static final String COPY_EXPECTED_TEXT = "      *> COPY SQLCA.\r\n" + "\r\n";
 
-  private String text;
-  private String linePrefix;
-  private String tag;
-  private String expectedText;
+  private static Stream<Arguments> textsToTest() {
+    return Stream.of(
+        Arguments.of(CICS_TAG, CICS_TEXT, LINE_PREFIX_CICS, CICS_EXPECTED_TEXT),
+        Arguments.of(SQL_TAG, SQL_TEXT, LINE_PREFIX_SQL, SQL_EXPECTED_TEXT),
+        Arguments.of(COPY_TAG, COPY_TEXT, LINE_PREFIX_COPY, COPY_EXPECTED_TEXT));
+  }
 
-  public CobolCleanExtraLanguageTest(
+  @ParameterizedTest
+  @MethodSource("textsToTest")
+  @DisplayName("Parameterized - specificStatementExclusionTest")
+  public void specificStatementExclusionTest(
       String tag, String text, String linePrefix, String expectedText) {
-    super();
-    this.tag = tag;
-    this.text = text;
-    this.linePrefix = linePrefix;
-    this.expectedText = expectedText;
-  }
-
-  @Parameterized.Parameters
-  public static Collection<Object> textsToTest() {
-    return List.of(
-        new Object[][] {
-          {CICS_TAG, CICS_TEXT, LINE_PREFIX_CICS, CICS_EXPECTED_TEXT},
-          {SQL_TAG, SQL_TEXT, LINE_PREFIX_SQL, SQL_EXPECTED_TEXT},
-          {COPY_TAG, COPY_TEXT, LINE_PREFIX_COPY, COPY_EXPECTED_TEXT}
-        });
-  }
-
-  @Test
-  public void specificStatementExclusionTest() {
     PreprocessorCleanerServiceImpl preprocessorCleanerService =
         new PreprocessorCleanerServiceImpl(new TokenUtilsImpl());
     preprocessorCleanerService.push();

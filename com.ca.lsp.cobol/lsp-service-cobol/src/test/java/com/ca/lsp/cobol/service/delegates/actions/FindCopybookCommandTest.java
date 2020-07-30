@@ -18,7 +18,7 @@ package com.ca.lsp.cobol.service.delegates.actions;
 import com.google.common.collect.Lists;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -27,8 +27,8 @@ import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static java.util.Collections.singletonList;
 import static org.eclipse.lsp4j.CodeActionKind.QuickFix;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Test {@link FindCopybookCommand} code action provider that resolves diagnostics for missing

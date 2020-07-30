@@ -18,12 +18,13 @@ package com.broadcom.lsp.domain;
 import com.broadcom.lsp.domain.cobol.databus.impl.*;
 import com.broadcom.lsp.domain.cobol.event.CopybookEventSubscribersTest;
 import com.broadcom.lsp.domain.cobol.event.CopybookEventsTest;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.platform.suite.api.SelectClasses;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 
 /** A suite to run the databus tests. */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
+@RunWith(JUnitPlatform.class)
+@SelectClasses({
   CopybookEventsTest.class,
   CopybookEventSubscribersTest.class,
   CopybookRepositoryLRUTest.class,
