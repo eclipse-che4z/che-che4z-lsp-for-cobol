@@ -26,10 +26,6 @@ public final class ProcessingConstants {
   public static final String CHAR_SLASH = "/";
   public static final String COMMENT_ENTRY_TAG = "*>CE";
   public static final String COMMENT_TAG = "*>";
-  public static final String EXEC_CICS_TAG = "*>EXECCICS";
-  public static final String EXEC_END_TAG = "}";
-  public static final String EXEC_SQL_TAG = "*>EXECSQL";
-  public static final String EXEC_SQLIMS_TAG = "*>EXECSQLIMS";
   public static final String INDICATOR_FIELD = "([\\s*\\-/Dd$]{1})";
   public static final String CONTLINE_INDICATOR_FIELD = "([-]{1})";
   public static final String NEWLINE = "\r\n";

@@ -14,7 +14,6 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
 import org.antlr.v4.runtime.BufferedTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import javax.annotation.Nonnull;
@@ -25,15 +24,6 @@ import javax.annotation.Nullable;
  * comment tags, that shows ANTLR that the following line should not be processed.
  */
 public interface PreprocessorCleanerService {
-  /**
-   * Exclude the given statement from text using specified comment tag.
-   *
-   * @param ctx - context of statement to exclude
-   * @param tag - comment tag to mark the text as excluded
-   * @param tokens - tokens of the processing documents to retrieve the full text of the statement
-   */
-  void excludeStatementFromText(
-      @Nonnull ParserRuleContext ctx, @Nonnull String tag, @Nonnull BufferedTokenStream tokens);
 
   /**
    * Return the current preprocessing context from the stack.
@@ -72,8 +62,6 @@ public interface PreprocessorCleanerService {
    * @return string value of the current document level
    */
   String read();
-
-  void excludeSpecificType(@Nonnull String tag, @Nonnull String text, @Nonnull String linePrefix);
 
   /**
    * Write given token including hidden tokens to left to the current level

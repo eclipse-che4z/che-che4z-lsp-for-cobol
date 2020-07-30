@@ -21,7 +21,6 @@ import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl.CobolLineIndica
 import com.ca.lsp.core.cobol.preprocessor.sub.line.transformer.ContinuationLineTransformationTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.impl.CobolLineWriterImplTest;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorStringUtilsTest;
-import com.ca.lsp.core.cobol.semantics.CobolCleanExtraLanguageTest;
 import com.ca.lsp.core.cobol.semantics.CobolVariableContextTest;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategyTest;
 import com.ca.lsp.core.cobol.visitor.MisspelledKeywordDistanceTest;
@@ -37,7 +36,6 @@ import org.junit.runner.RunWith;
   ContinuationLineTransformationTest.class,
   CobolCommentEntriesMarkerImplTest.class,
   CobolVariableContextTest.class,
-  CobolCleanExtraLanguageTest.class,
   CobolLineWriterImplTest.class,
   PreprocessorStringUtilsTest.class,
   MisspelledKeywordDistanceTest.class,

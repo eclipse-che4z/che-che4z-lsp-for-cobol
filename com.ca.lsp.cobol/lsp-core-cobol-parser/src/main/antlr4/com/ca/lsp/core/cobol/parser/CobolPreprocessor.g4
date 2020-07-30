@@ -11,7 +11,7 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((compilerOptions | copyStatement | execSqlStatement | execCicsStatement | execSqlImsStatement | skipNoStatement | ejectStatement | replaceArea | titleStatement | NEWLINE)+ .*?)+ EOF
+   : .*? ((compilerOptions | copyStatement | skipNoStatement | ejectStatement | replaceArea | titleStatement | NEWLINE)+ .*?)+ EOF
    ;
 
 everything
@@ -159,20 +159,6 @@ compilerOption
    | ZWB
    ;
 
-// exec cics statement
-execCicsStatement
-   : EXEC CICS ~END_EXEC*? END_EXEC DOT_FS?
-   ;
-
-// exec sql statement
-execSqlStatement
-   : EXEC SQL ~END_EXEC*? END_EXEC DOT_FS?
-   ;
-
-// exec sql ims statement
-execSqlImsStatement
-   : EXEC SQLIMS ~END_EXEC*? END_EXEC DOT_FS?
-   ;
 
 // eject statement
 ejectStatement

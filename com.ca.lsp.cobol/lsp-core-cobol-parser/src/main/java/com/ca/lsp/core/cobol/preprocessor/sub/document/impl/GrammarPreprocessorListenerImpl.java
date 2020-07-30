@@ -41,7 +41,8 @@ import java.util.function.Function;
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.ERROR;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.INFO;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CPY_ENTER_TAG;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CPY_EXIT_TAG;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -103,36 +104,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         new DocumentMapping(
             tokens.getTokens().stream().map(toPosition()).collect(toList()), shifts));
     return new ExtendedDocument(cleaner.read(), copybooks, nestedMappings);
-  }
-
-  @Override
-  public void enterExecCicsStatement(@Nonnull ExecCicsStatementContext ctx) {
-    cleaner.push();
-  }
-
-  @Override
-  public void exitExecCicsStatement(@Nonnull ExecCicsStatementContext ctx) {
-    cleaner.excludeStatementFromText(ctx, EXEC_CICS_TAG, tokens);
-  }
-
-  @Override
-  public void enterExecSqlStatement(@Nonnull ExecSqlStatementContext ctx) {
-    cleaner.push();
-  }
-
-  @Override
-  public void exitExecSqlStatement(@Nonnull ExecSqlStatementContext ctx) {
-    cleaner.excludeStatementFromText(ctx, EXEC_SQL_TAG, tokens);
-  }
-
-  @Override
-  public void enterExecSqlImsStatement(@Nonnull ExecSqlImsStatementContext ctx) {
-    cleaner.push();
-  }
-
-  @Override
-  public void exitExecSqlImsStatement(@Nonnull ExecSqlImsStatementContext ctx) {
-    cleaner.excludeStatementFromText(ctx, EXEC_SQLIMS_TAG, tokens);
   }
 
   @Override

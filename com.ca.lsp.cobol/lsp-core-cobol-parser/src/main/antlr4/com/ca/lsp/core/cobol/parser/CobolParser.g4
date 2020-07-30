@@ -957,7 +957,7 @@ dataDescriptionEntryFormat3
    ;
 
 dataDescriptionEntryExecSql
-   : EXECSQLLINE+ DOT_FS?
+   : execSqlStatement+
    ;
 
 //TODO: make it beautiful
@@ -1477,21 +1477,20 @@ evaluateValue
    ;
 
 // exec cics statement
-
 execCicsStatement
-   : EXECCICSLINE+
+   : EXEC CICS ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exec sql statement
 
 execSqlStatement
-   : EXECSQLLINE+
+   : EXEC SQL ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exec sql ims statement
 
 execSqlImsStatement
-   : EXECSQLIMSLINE+
+   : EXEC SQLIMS ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exhibit statement

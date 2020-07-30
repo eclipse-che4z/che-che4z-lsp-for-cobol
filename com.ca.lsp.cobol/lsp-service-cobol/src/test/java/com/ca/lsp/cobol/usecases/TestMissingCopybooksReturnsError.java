@@ -32,8 +32,8 @@ public class TestMissingCopybooksReturnsError {
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
-          + "        COPY {~MISSCPY|missing}.\n\n"
-          + "        PROCEDURE DIVISION.\n\n";
+          + "        COPY {~MISSCPY|missing}.\r\n"
+          + "        PROCEDURE DIVISION.\r\n";
 
   @Test
   public void test() {
