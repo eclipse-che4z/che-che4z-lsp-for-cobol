@@ -21,7 +21,7 @@ import java.util.List;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static java.util.Collections.emptyList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This class is a base for use cases that check the if some text does not contain any syntax
@@ -45,7 +45,7 @@ public abstract class PositiveUseCase {
   protected void test(List<CobolText> copybooks) {
     List<Diagnostic> diagnostics = analyzeForErrors(DOCUMENT_URI, text, copybooks);
 
-    assertEquals(createMessage(diagnostics), 0, diagnostics.size());
+    assertEquals(0, diagnostics.size(), createMessage(diagnostics));
   }
 
   private String createMessage(List<Diagnostic> diagnostics) {

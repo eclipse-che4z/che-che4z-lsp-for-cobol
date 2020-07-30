@@ -16,12 +16,12 @@ package com.ca.lsp.cobol.service.delegates.completions;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.InsertTextFormat;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SnippetCompletionTest {
   private static final String INSERT_TEXT = "WRITE ${1:item}";
@@ -29,7 +29,7 @@ public class SnippetCompletionTest {
   private static final String LABEL = "WRITE";
   private SnippetCompletion provider;
 
-  @Before
+  @BeforeEach
   public void prepareProvider() {
     provider = new SnippetCompletion(new Snippets());
   }

@@ -13,13 +13,13 @@
  */
 package com.ca.lsp.cobol.usecases;
 
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.platform.suite.api.SelectClasses;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
 
 /** The suite for the use case tests in the project that should be run. */
-@RunWith(Suite.class)
-@SuiteClasses({
+@RunWith(JUnitPlatform.class)
+@SelectClasses({
   TestFormatTrim.class,
   TestSyntaxError.class,
   TestSkipStatement.class,

@@ -23,16 +23,16 @@ import com.ca.lsp.cobol.service.mocks.MockCopybookService;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** This class checks the expected behavior of Go to Definition request resolving. */
 public class DocumentOccurrencesTest extends ConfigurableTest {
@@ -79,7 +79,7 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
 
   private TextDocumentService service;
 
-  @Before
+  @BeforeEach
   public void createService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);

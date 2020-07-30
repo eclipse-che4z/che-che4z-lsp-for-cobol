@@ -32,9 +32,9 @@ import com.google.common.collect.Multimap;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static java.util.Collections.singletonList;
@@ -59,7 +59,7 @@ public class TestCopybookCaching {
   private DataBusBroker databus;
   private CopybookResolutionProvider resolution;
 
-  @Before
+  @BeforeEach
   public void init() {
     Injector injector = Guice.createInjector(new DatabusModule(), new EngineModule());
     databus = injector.getInstance(DataBusBroker.class);
@@ -90,7 +90,7 @@ public class TestCopybookCaching {
         () -> singletonList(new CobolText(COPYBOOK_NAME, COPYBOOK_CONTENT)));
   }
 
-  @After
+  @AfterEach
   public void cleanup() {
     databus.invalidateCache();
   }

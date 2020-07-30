@@ -14,8 +14,8 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class TestCobolStringWithContinuationLineConcatenatedCorrectly {
           + "000000 {#*PROGRAM2}.\n"
           + "000000  DISPLAY 'HELLO'.";
 
-  @Ignore("Continuation line cause a semantic error #414")
+  @Disabled("Continuation line cause a semantic error #414")
   // TODO: #414
   @Test
   public void test() {

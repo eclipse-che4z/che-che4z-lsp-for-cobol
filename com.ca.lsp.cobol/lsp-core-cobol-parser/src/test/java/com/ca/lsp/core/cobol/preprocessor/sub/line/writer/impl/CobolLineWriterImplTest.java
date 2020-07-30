@@ -17,11 +17,11 @@ import com.ca.lsp.core.cobol.AbstractCobolLinePreprocessorTest;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.writer.CobolLineWriter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
   private static final String TEXT_TO_TEST =

@@ -17,7 +17,7 @@ package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +28,7 @@ import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.IN
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This test checks that the undefined parent variable underlined while variable call hierarchy

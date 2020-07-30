@@ -21,8 +21,8 @@ import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class DocumentExtensionTests {
   private Communications communications;
   private LanguageEngineFacade engine;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     broker = mock(DataBusBroker.class);
     communications = mock(Communications.class);

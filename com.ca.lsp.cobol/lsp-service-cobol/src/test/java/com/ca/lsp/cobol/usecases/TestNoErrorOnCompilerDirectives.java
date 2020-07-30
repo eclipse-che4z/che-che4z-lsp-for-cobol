@@ -15,14 +15,14 @@ package com.ca.lsp.cobol.usecases;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Compiler directives should not raise a format error.
@@ -108,10 +108,10 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
         retrieveRange(analyzeForErrors(DOCUMENT_URI, PROCESS_WITHOUT_NUMBER_TYPO + FOLLOWING_TEXT));
     // TODO: Update this test when the compiler directives fully supported
     //  to check the correct position
-    assertEquals("Diagnostic start line", 0, range.getStart().getLine());
-    assertEquals("Diagnostic start character", 7, range.getStart().getCharacter());
-    assertEquals("Diagnostic end line", 0, range.getEnd().getLine());
-    assertEquals("Diagnostic end character", 11, range.getEnd().getCharacter());
+    assertEquals(0, range.getStart().getLine(), "Diagnostic start line");
+    assertEquals(7, range.getStart().getCharacter(), "Diagnostic start character");
+    assertEquals(0, range.getEnd().getLine(), "Diagnostic end line");
+    assertEquals(11, range.getEnd().getCharacter(), "Diagnostic end character");
   }
 
   @Test
@@ -119,13 +119,13 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
     Range range =
         retrieveRange(analyzeForErrors(DOCUMENT_URI, PROCESS_WITH_NUMBER_TYPO + FOLLOWING_TEXT));
 
-    assertEquals("Diagnostic start line", 0, range.getStart().getLine());
-    assertEquals("Diagnostic start character", 7, range.getStart().getCharacter());
-    assertEquals("Diagnostic end line", 0, range.getEnd().getLine());
-    assertEquals("Diagnostic end character", 13, range.getEnd().getCharacter());
+    assertEquals(0, range.getStart().getLine(), "Diagnostic start line");
+    assertEquals(7, range.getStart().getCharacter(), "Diagnostic start character");
+    assertEquals(0, range.getEnd().getLine(), "Diagnostic end line");
+    assertEquals(13, range.getEnd().getCharacter(), "Diagnostic end character");
   }
 
-  @Ignore("Feature is not yet supported")
+  @Disabled("Feature is not yet supported")
   @Test
   public void testLinesBeforeCblNotAllowed() {
     Range range = retrieveRange(analyzeForErrors(DOCUMENT_URI, FOLLOWING_TEXT + CBL_WITH_NUMBER));

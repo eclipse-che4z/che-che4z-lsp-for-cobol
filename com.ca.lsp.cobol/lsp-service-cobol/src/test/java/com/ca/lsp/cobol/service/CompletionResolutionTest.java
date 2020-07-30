@@ -20,15 +20,15 @@ import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This test checks the logic of completion items resolution implemented by {@link
@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 public class CompletionResolutionTest extends ConfigurableTest {
   private TextDocumentService service;
 
-  @Before
+  @BeforeEach
   public void createService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
   }

@@ -23,12 +23,12 @@ import com.broadcom.lsp.domain.cobol.event.impl.RunAnalysisEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * This test checks functionality of event subscriber factory. It creates subscribers with required
@@ -50,7 +50,7 @@ public class CopybookEventSubscribersTest {
 
   private DatabusObserverTest databusObserver;
 
-  @Before
+  @BeforeEach
   public void initObserver() {
     databusObserver = new DatabusObserverTest();
   }

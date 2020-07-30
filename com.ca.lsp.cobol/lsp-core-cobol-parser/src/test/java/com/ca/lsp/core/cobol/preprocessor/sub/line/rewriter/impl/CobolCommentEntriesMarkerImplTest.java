@@ -15,14 +15,14 @@ package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl;
 
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineReWriter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static com.ca.lsp.core.cobol.preprocessor.sub.util.impl.CobolLineUtils.copyCobolLineWithIndicatorAndContentArea;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Unit test for class CobolCommentEntriesMarker. Checks that the lines with comment entries are
  * escaped and vice versa.

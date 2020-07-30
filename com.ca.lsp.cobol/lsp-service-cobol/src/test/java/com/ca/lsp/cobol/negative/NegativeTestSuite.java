@@ -13,17 +13,17 @@
  */
 package com.ca.lsp.cobol.negative;
 
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.platform.suite.api.SelectClasses;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * This suite contains all the defined negative test cases to ensure that error checking works
  * properly. Notice: Format errors are not a part of the grammar, so they should not be verifying
- * here as negative scenarios. 
+ * here as negative scenarios.
  */
-@RunWith(Suite.class)
-@SuiteClasses({
+@RunWith(JUnitPlatform.class)
+@SelectClasses({
   Chetest1Test.class,
   Chetest2Test.class,
   HelloDB2Test.class,

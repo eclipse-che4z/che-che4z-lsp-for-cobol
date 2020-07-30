@@ -16,12 +16,12 @@ package com.ca.lsp.core.cobol.preprocessor.sub.line.transformer;
 import com.ca.lsp.core.cobol.AbstractCobolLinePreprocessorTest;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This test checks the continuation line transformation logic. */
 public class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTest {

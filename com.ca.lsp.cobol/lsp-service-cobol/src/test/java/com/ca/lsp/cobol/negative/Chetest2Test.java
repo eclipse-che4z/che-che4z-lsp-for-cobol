@@ -13,8 +13,8 @@
  */
 package com.ca.lsp.cobol.negative;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -37,6 +37,7 @@ import java.util.List;
  * <p>100 IGYPS2072-S ""ST"" was invalid. Skipped to the next verb, period or procedure-name
  * definition."
  */
+@Disabled("Unsupported while semantic analysis is not implemented")
 public class Chetest2Test extends NegativeTest {
   private static final String FILE_NAME = "CHETEST2.cbl";
   private static final int EXPECTED_ERRORS_NUMBER = 19;
@@ -45,7 +46,6 @@ public class Chetest2Test extends NegativeTest {
     super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
   }
 
-  @Ignore("Unsupported while semantic analysis is not implemented")
   @Test
   public void test() {
     super.test();

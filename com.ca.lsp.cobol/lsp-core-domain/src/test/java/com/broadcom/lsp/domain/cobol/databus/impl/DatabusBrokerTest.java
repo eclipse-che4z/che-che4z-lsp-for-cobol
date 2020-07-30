@@ -27,12 +27,12 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static com.broadcom.lsp.domain.cobol.databus.model.RegistryId.GENERAL_REGISTRY_ID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Slf4j
 public class DatabusBrokerTest extends CopybookStorableProvider
@@ -46,7 +46,7 @@ public class DatabusBrokerTest extends CopybookStorableProvider
 
   @Getter private final Waiter waiter = new Waiter();
 
-  @Before
+  @BeforeEach
   public void initCache() {
     // populate the cache with some data
     broker.storeData(dummyCopybook);

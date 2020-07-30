@@ -14,22 +14,16 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /** This use cases checks if varying with multiple identifiers works correctly. */
-@RunWith(Parameterized.class)
 public class TestVaryingCorrect {
-
-  public TestVaryingCorrect(String text) {
-    this.text = text;
-  }
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -64,18 +58,15 @@ public class TestVaryingCorrect {
           + "            AFTER {$IDENTIFIER-8} FROM {$IDENTIFIER-9}\r\n"
           + "            BY {$IDENTIFIER-10} UNTIL CONDITION-3.";
 
-  private String text;
-
-  @Parameterized.Parameters
-  public static Collection<Object> textsToTest() {
-    List<Object> result = new ArrayList<>();
-    result.add(BOILERPLATE + VARYING_WITH_TWO_IDENTIFIERS);
-    result.add(BOILERPLATE + VARYING_WITH_THREE_IDENTIFIERS);
-    return result;
+  private static Stream<String> textsToTest() {
+    return Stream.of(
+        BOILERPLATE + VARYING_WITH_TWO_IDENTIFIERS, BOILERPLATE + VARYING_WITH_THREE_IDENTIFIERS);
   }
 
-  @Test
-  public void test() {
+  @ParameterizedTest
+  @MethodSource("textsToTest")
+  @DisplayName("Parameterized - varying tests")
+  public void test(String text) {
     UseCaseEngine.runTest(text, List.of(), Map.of());
   }
 }

@@ -15,11 +15,11 @@ package com.ca.lsp.cobol.usecases;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This use case checks if the position of error underscored correctly. There is a typo in the TEXT
@@ -55,15 +55,15 @@ public class TestCorrectErrorUnderscorePosition extends NegativeUseCase {
   protected void assertDiagnostics(List<Diagnostic> diagnostics) {
     // The keywords between "PERORM" and "END-PERFORM" cannot be recognized, so they are marked as
     // errors
-    assertEquals("Number of diagnostics", 11, diagnostics.size());
+    assertEquals(11, diagnostics.size(), "Number of diagnostics");
 
     Diagnostic diagnostic = diagnostics.get(0);
     assertEquals("Syntax error on 'VARYING' expected SECTION", diagnostic.getMessage());
 
     Range range = diagnostic.getRange();
-    assertEquals("Diagnostic start line", 5, range.getStart().getLine());
-    assertEquals("Diagnostic start character", 18, range.getStart().getCharacter());
-    assertEquals("Diagnostic end line", 5, range.getEnd().getLine());
-    assertEquals("Diagnostic end character", 25, range.getEnd().getCharacter());
+    assertEquals(5, range.getStart().getLine(), "Diagnostic start line");
+    assertEquals(18, range.getStart().getCharacter(), "Diagnostic start character");
+    assertEquals(5, range.getEnd().getLine(), "Diagnostic end line");
+    assertEquals(25, range.getEnd().getCharacter(), "Diagnostic end character");
   }
 }

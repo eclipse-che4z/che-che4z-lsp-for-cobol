@@ -23,12 +23,12 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /** This tests verifies that serialization to a cache storable object works correctly. */
 @Slf4j
@@ -40,7 +40,7 @@ public class DataBusStoreHappyTest extends DatabusConfigProvider {
 
   private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> databus;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     // create a dummy Multimap
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));

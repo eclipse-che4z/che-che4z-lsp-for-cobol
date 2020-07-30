@@ -16,13 +16,13 @@ package com.ca.lsp.cobol.service.delegates.completions;
 import com.ca.lsp.cobol.service.MyDocumentModel;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
 import static java.util.Collections.emptyMap;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Test to check ParagraphCompletion */
 public class ParagraphCompletionTest {
@@ -58,13 +58,13 @@ public class ParagraphCompletionTest {
 
     assertEquals(2, completionItems.size());
     assertTrue(
-        "100-Test",
         completionItems.get(0).getLabel().contains("100-Test")
-            || completionItems.get(0).getLabel().contains("000-Main-Logic"));
+            || completionItems.get(0).getLabel().contains("000-Main-Logic"),
+        "100-Test");
     assertTrue(
-        "000-Main-Logic",
         completionItems.get(1).getLabel().contains("100-Test")
-            || completionItems.get(1).getLabel().contains("000-Main-Logic"));
+            || completionItems.get(1).getLabel().contains("000-Main-Logic"),
+        "000-Main-Logic");
 
     assertEquals(CompletionItemKind.Method, completionItems.get(0).getKind());
   }
