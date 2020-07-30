@@ -107,16 +107,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void enterEjectStatement(@Nonnull EjectStatementContext ctx) {
-    cleaner.push();
-  }
-
-  @Override
-  public void exitEjectStatement(@Nonnull EjectStatementContext ctx) {
-    cleaner.excludeStatementFromText(ctx, COMMENT_TAG, tokens);
-  }
-
-  @Override
   public void enterCompilerOptions(@Nonnull CompilerOptionsContext ctx) {
     // push a new context for the COMPILER OPTIONS terminals
     cleaner.push();

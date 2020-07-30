@@ -78,7 +78,6 @@ DUMP : D U M P;
 DYN : D Y N;
 DYNAM : D Y N A M;
 EDF : E D F;
-EJECT: E J E C T;
 ENABLE: E N A B L E;
 END: E N D;
 ENTRY: E N T R Y;

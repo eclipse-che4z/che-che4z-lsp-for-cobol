@@ -11,7 +11,7 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((compilerOptions | copyStatement | skipNoStatement | ejectStatement | replaceArea | titleStatement | NEWLINE)+ .*?)+ EOF
+   : .*? ((compilerOptions | copyStatement | skipNoStatement | replaceArea | titleStatement | NEWLINE)+ .*?)+ EOF
    ;
 
 everything
@@ -157,12 +157,6 @@ compilerOption
    | (XREF | X_CHAR) (LPARENCHAR (FULL | SHORT)? RPARENCHAR)?
    | (YEARWINDOW | YW) LPARENCHAR literal RPARENCHAR
    | ZWB
-   ;
-
-
-// eject statement
-ejectStatement
-   : EJECT DOT_FS?
    ;
 
 // copy statement
