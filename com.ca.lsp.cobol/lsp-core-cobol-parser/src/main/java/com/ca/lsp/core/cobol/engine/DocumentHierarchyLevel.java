@@ -51,4 +51,6 @@ public class DocumentHierarchyLevel {
   public void forceForward(int length) {
     index += length;
   }
+
+  public void initialForward() { index += ofNullable(shifts.get(index)).orElse(0);}
 }

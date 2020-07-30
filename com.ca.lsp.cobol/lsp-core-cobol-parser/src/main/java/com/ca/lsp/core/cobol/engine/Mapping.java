@@ -23,8 +23,7 @@ import org.antlr.v4.runtime.Token;
 
 import java.util.*;
 
-import static com.ca.lsp.core.cobol.parser.CobolLexer.COPYENTRY;
-import static com.ca.lsp.core.cobol.parser.CobolLexer.COPYEXIT;
+import static com.ca.lsp.core.cobol.parser.CobolLexer.*;
 
 @UtilityClass
 class Mapping {
@@ -36,6 +35,7 @@ class Mapping {
     Map<Token, Position> result = new HashMap<>();
     Deque<DocumentHierarchyLevel> documentHierarchyStack = new ArrayDeque<>();
     documentHierarchyStack.push(new DocumentHierarchyLevel(documentPositions.get(documentUri)));
+    documentHierarchyStack.peek().initialForward();
     List<Token> tokens = tokenStream.getTokens();
     outer:
     for (int i = 0; i < tokens.size(); i++) {
@@ -48,11 +48,8 @@ class Mapping {
       }
       if (token.getType() == COPYEXIT) {
         documentHierarchyStack.pop();
-        i++;
-        continue;
-      }
-      if (text.startsWith("*>")) {
         documentHierarchyStack.peek().forward();
+        i++;
         continue;
       }
 
@@ -62,8 +59,6 @@ class Mapping {
       if (tokenMatches(text, posText)) {
         result.put(token, position);
         documentHierarchyStack.peek().forward();
-      } else if (text.isEmpty()) {
-        continue;
       } else {
 
         List<Position> positionsInFront = documentHierarchyStack.peek().lookahead();
@@ -88,6 +83,6 @@ class Mapping {
     String positionText = position.trim();
     String trimmedToken = text.trim();
     return trimmedToken.equals(positionText)
-        || trimmedToken.replace("\r\n", "").equals(positionText.replace("<EOF>", ""));
+        || trimmedToken.equals(positionText.replace("<EOF>", ""));
   }
 }

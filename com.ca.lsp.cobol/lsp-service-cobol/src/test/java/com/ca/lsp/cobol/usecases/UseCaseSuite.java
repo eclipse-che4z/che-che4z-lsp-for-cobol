@@ -33,6 +33,7 @@ import org.junit.runner.RunWith;
   TestRemarksAreUnsupported.class,
   TestCpyNameWithSpecialChar.class,
   TestErrorsInDifferentFiles.class,
+  TestSeveralCopybooksInARow.class,
   TestEntireProgramInCopybook.class,
   TestReplacingAppliedOneByOne.class,
   TestUnexpectedCharErrorShown.class,
