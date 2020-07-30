@@ -23,7 +23,7 @@ import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.TextDocumentSyncType;
+import com.ca.lsp.cobol.service.CopybookScanAnalysis;
 import com.ca.lsp.cobol.service.mocks.MockCopybookService;
 import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
@@ -201,6 +201,6 @@ public class UseCaseUtils {
 
     return injector
         .getInstance(CobolLanguageEngineFacade.class)
-        .analyze(DOCUMENT_URI, text, TextDocumentSyncType.DID_OPEN);
+        .analyze(DOCUMENT_URI, text, CopybookScanAnalysis.ENABLED);
   }
 }

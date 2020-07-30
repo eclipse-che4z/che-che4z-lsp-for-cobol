@@ -30,8 +30,8 @@ import static com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils.getNonE
 import static org.junit.Assert.assertEquals;
 
 public class CobolVariableCheckTest {
-  private static final String DID_OPEN = "DID_OPEN";
-  private static final String DID_CHANGE = "DID_CHANGE";
+  private static final String COPYBOOK_SCAN_ANALYSIS_ENABLED = "COPYBOOK_SCAN_ANALYSIS_ENABLED";
+  private static final String COPYBOOK_SCAN_ANALYSIS_DISABLED = "COPYBOOK_SCAN_ANALYSIS_DISABLED";
 
   /**
    * This test represent the semantic check for variable in PROCEDURE DIVISION section There are
@@ -119,12 +119,12 @@ public class CobolVariableCheckTest {
     ResultWithErrors<SemanticContext> result;
 
     // SCENARIO FOR DID_OPEN
-    result = engine.run("1", TEXT_TO_TEST, DID_OPEN);
+    result = engine.run("1", TEXT_TO_TEST, COPYBOOK_SCAN_ANALYSIS_ENABLED);
     Predicate<SyntaxError> syntaxErrorPredicate = item -> item.getSeverity() == 3;
     assertEquals(2, result.getErrors().stream().filter(syntaxErrorPredicate).count());
 
     // SCENARIO FOR DID_CHANGE
-    result = engine.run("1", TEXT_TO_TEST, DID_CHANGE);
+    result = engine.run("1", TEXT_TO_TEST, COPYBOOK_SCAN_ANALYSIS_DISABLED);
     assertEquals(2, result.getErrors().stream().filter(syntaxErrorPredicate).count());
   }
 

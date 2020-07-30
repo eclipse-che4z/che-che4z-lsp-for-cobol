@@ -175,16 +175,16 @@ public class CobolCleanExtraLanguageTest {
 
   @Test
   public void positiveErrorTest() {
-    CobolLanguageEngine engine = Guice.createInjector(new EngineModule(), new DatabusModule()).getInstance(CobolLanguageEngine.class);
+    CobolLanguageEngine engine =
+        Guice.createInjector(new EngineModule(), new DatabusModule())
+            .getInstance(CobolLanguageEngine.class);
     ResultWithErrors<SemanticContext> result;
 
-    // VERIFY THE SCENARIO FOR DID_OPEN
-    result = engine.run("1", TEXT_TO_TEST, "DID_OPEN");
+    result = engine.run("1", TEXT_TO_TEST, "ENABLED");
     Predicate<SyntaxError> syntaxErrorPredicate = item -> item.getSeverity() == 1;
     assertEquals(0, result.getErrors().stream().filter(syntaxErrorPredicate).count());
 
-    // VERIFY THE SCENARIO FOR DID_CHANGE
-    result = engine.run("1", TEXT_TO_TEST, "DID_CHANGE");
+    result = engine.run("1", TEXT_TO_TEST, "DISABLED");
     assertEquals(0, result.getErrors().stream().filter(syntaxErrorPredicate).count());
   }
 

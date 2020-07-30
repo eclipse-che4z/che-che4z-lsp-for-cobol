@@ -14,7 +14,7 @@
 package com.ca.lsp.cobol.service.delegates.validations;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.cobol.service.TextDocumentSyncType;
+import com.ca.lsp.cobol.service.CopybookScanAnalysis;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
@@ -61,11 +61,11 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   @Override
   public AnalysisResult analyze(
-      String uri, String text, TextDocumentSyncType textDocumentSyncType) {
+      String uri, String text, CopybookScanAnalysis copybookScanAnalysis) {
     if (isEmpty(text)) {
       return empty();
     }
-    return toAnalysisResult(engine.run(uri, text, textDocumentSyncType.toString()), uri);
+    return toAnalysisResult(engine.run(uri, text, copybookScanAnalysis.toString()), uri);
   }
 
   private static boolean isEmpty(String text) {

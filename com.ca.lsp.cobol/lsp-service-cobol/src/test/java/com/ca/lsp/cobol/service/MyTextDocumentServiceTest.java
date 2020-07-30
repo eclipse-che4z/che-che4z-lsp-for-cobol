@@ -38,8 +38,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
@@ -185,14 +183,16 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
      *  - document URI [correct|incorrect]
      */
 
-    // dynamic stubbing for did open event
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN)).thenReturn(resultNoErrors);
-    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DID_OPEN))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookScanAnalysis.ENABLED))
+        .thenReturn(resultNoErrors);
+    when(engine.analyze(
+            DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookScanAnalysis.ENABLED))
         .thenReturn(resultWithErrors);
 
-    // dynamic stubbing for did change event
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_CHANGE)).thenReturn(resultNoErrors);
-    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DID_CHANGE))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookScanAnalysis.DISABLED))
+        .thenReturn(resultNoErrors);
+    when(engine.analyze(
+            DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookScanAnalysis.DISABLED))
         .thenReturn(resultWithErrors);
 
     // create a service and verify is subscribed to the required event
@@ -299,7 +299,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
     verify(communications).notifyThatLoadingInProgress(uri);
-    verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
+    verify(engine, timeout(10000)).analyze(uri, textToAnalyse, CopybookScanAnalysis.ENABLED);
     verify(dataBus, timeout(10000))
         .postData(
             AnalysisFinishedEvent.builder().documentUri(uri).copybookUris(emptyList()).build());
@@ -314,7 +314,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       String text,
       String uri) {
 
-    verify(engine, timeout(10000).times(2)).analyze(uri, text, DID_OPEN);
+    verify(engine, timeout(10000).times(2)).analyze(uri, text, CopybookScanAnalysis.ENABLED);
     verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
   }
 
@@ -333,7 +333,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
 
     doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.empty()))
         .when(engine)
-        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN);
+        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookScanAnalysis.ENABLED);
 
     MyTextDocumentService service =
         new MyTextDocumentService(communications, engine, null, null, null, broker, null);
@@ -385,7 +385,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     copybookUsages.put("NESTED", singletonList(nestedLocation));
     copybookUsages.put("NESTED2", singletonList(nested2Location));
 
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookScanAnalysis.ENABLED))
         .thenReturn(
             new AnalysisResult(
                 emptyList(),

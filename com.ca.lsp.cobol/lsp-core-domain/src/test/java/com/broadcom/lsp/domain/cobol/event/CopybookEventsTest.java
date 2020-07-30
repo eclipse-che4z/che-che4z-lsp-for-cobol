@@ -37,7 +37,7 @@ public class CopybookEventsTest extends CopybookStorableProvider {
   private static final String COBOL_FILE_URI = "file:///C:/Users/test/Main.cbl";
 
   private static final String COPYBOOK_CONTENT = "000000 IDENTIFICATION DIVISION.";
-  private static final String DID_OPEN = "DID_OPEN";
+  private static final String COPYBOOK_ANALYSIS_ENABLED = "ENABLED";
 
   /** Test that the RequiredCopybookEvent DTO is correclty populated */
   @Test
@@ -90,7 +90,8 @@ public class CopybookEventsTest extends CopybookStorableProvider {
   }
 
   private String getRequireCopybookHeader() {
-    return new RequiredCopybookEvent(COPYBOOK_NAME, COBOL_FILE_URI, DID_OPEN).getHeader();
+    return new RequiredCopybookEvent(COPYBOOK_NAME, COBOL_FILE_URI, COPYBOOK_ANALYSIS_ENABLED)
+        .getHeader();
   }
 
   private String getFetchCopybookHeader() {

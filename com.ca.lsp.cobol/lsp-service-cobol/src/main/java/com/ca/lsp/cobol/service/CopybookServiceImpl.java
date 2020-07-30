@@ -34,7 +34,6 @@ import java.util.function.Consumer;
 
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.REQUIRED_COPYBOOK_EVENT;
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK_DOWNLOAD;
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK_RESOLVE;
 import static java.lang.String.join;
@@ -90,7 +89,7 @@ public class CopybookServiceImpl implements CopybookService {
 
   /**
    * Retrieve copybook content by its name, and the document name {@see RequiredCopybookEvent}. It
-   * will apply a file system calls only if the {@link TextDocumentSyncType is DID_OPEN} in order to
+   * will apply a file system calls only if the {@link CopybookScanAnalysis is DID_OPEN} in order to
    * avoid obtaining the copybooks with incomplete names.
    *
    * <p>The retrieved URIs stored in the cache. If the URI points to non-existing file, then the
@@ -113,7 +112,7 @@ public class CopybookServiceImpl implements CopybookService {
         copybookPaths.remove(requiredCopybookName);
       }
     }
-    if (DID_OPEN.name().equals(event.getTextDocumentSyncType())) {
+    if (CopybookScanAnalysis.ENABLED.name().equals(event.getCopybookScanAnalysis())) {
       String cobolFileName = files.getNameFromURI(event.getDocumentUri());
       settingsService
           .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, requiredCopybookName)
