@@ -19,6 +19,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -45,19 +46,23 @@ public class PositiveTest extends ConfigurableTest {
    * @return a collection of objects that would be passed to the constructor one by one.
    */
   private static Stream<CobolText> retrieveTextsToTest() {
-      CobolTextRegistry registry =
-              new ZipTextRegistry(ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
-      copybooks = registry.getCopybooks();
-      return registry.getPositives().stream();
+    CobolTextRegistry registry =
+        new ZipTextRegistry(ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
+    copybooks = registry.getCopybooks();
+    return registry.getPositives().stream();
   }
 
-    @ParameterizedTest
-    @MethodSource("retrieveTextsToTest")
-    @DisplayName("Parameterized - positive tests")
-    public void test(CobolText text) {
-        log.debug("Processing: " + text.getFileName());
-        assertNoSyntaxErrorsFound(analyzeForErrors(text.getFileName(), text.getFullText(), copybooks), text);
+  @ParameterizedTest
+  @MethodSource("retrieveTextsToTest")
+  @NullSource
+  @DisplayName("Parameterized - positive tests")
+  public void test(CobolText text) {
+    if (text == null) {
+      return;
     }
+    log.debug("Processing: " + text.getFileName());
+    assertNoSyntaxErrorsFound(analyzeForErrors(text.getFileName(), text.getFullText(), copybooks), text);
+  }
 
   private void assertNoSyntaxErrorsFound(List<Diagnostic> diagnostics, CobolText text) {
       assertEquals(0, diagnostics.size(), createErrorMessage(diagnostics, text));
