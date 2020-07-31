@@ -13,10 +13,9 @@
  *
  */
 
-package com.ca.lsp.core.cobol.engine;
+package com.ca.lsp.core.cobol.model;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.model.DocumentMapping;
 
 import java.util.List;
 import java.util.Map;
@@ -52,5 +51,7 @@ public class DocumentHierarchyLevel {
     index += length;
   }
 
-  public void initialForward() { index += ofNullable(shifts.get(index)).orElse(0);}
+  public void initialForward() {
+    index += ofNullable(shifts.get(index)).orElse(0);
+  }
 }

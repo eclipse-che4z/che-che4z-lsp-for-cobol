@@ -20,6 +20,7 @@ import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolLexer;
 import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PositionMappingUtils;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategy;
 import com.ca.lsp.core.cobol.visitor.CobolVisitor;
@@ -85,9 +86,11 @@ public class CobolLanguageEngine {
     parser.setErrorHandler(new CobolErrorStrategy());
 
     CobolParser.StartRuleContext tree = parser.startRule();
+
     Map<Token, Position> positionMapping =
-        Mapping.createPositionMapping(
-            tokens, extendedDocument.getResult().getDocumentMapping(), documentUri);
+        PositionMappingUtils.createPositionMapping(
+            tokens.getTokens(), extendedDocument.getResult().getDocumentMapping(), documentUri);
+
     CobolVisitor visitor = new CobolVisitor(extendedDocument.getResult(), positionMapping);
     visitor.visit(tree);
 

@@ -41,7 +41,7 @@ public class TestExtraneousInputEOFExpecting {
           + "INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, PURGE, READ, "
           + "RECEIVE, RELEASE, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT, "
           + "START, STOP, STRING, SUBTRACT, TERMINATE, TITLE, UNSTRING, WRITE, XML, "
-          + "DOT_FS, COPYENTRY, '*>CPYEXIT'}";
+          + "DOT_FS, COPYENTRY, COPYEXIT}";
 
   @Test
   public void test() {

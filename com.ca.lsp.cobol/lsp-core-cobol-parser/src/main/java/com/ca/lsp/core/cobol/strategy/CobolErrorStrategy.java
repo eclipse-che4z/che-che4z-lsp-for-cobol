@@ -17,9 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
-import static com.ca.lsp.core.cobol.parser.CobolParser.COPYENTRY;
-import static com.ca.lsp.core.cobol.parser.CobolParser.COPYEXIT;
-
 @Slf4j
 public class CobolErrorStrategy extends DefaultErrorStrategy {
 
