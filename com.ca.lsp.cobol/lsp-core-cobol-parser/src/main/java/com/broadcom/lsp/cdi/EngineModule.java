@@ -19,15 +19,13 @@ import com.broadcom.lsp.cdi.module.DefaultModule;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.GrammarPreprocessorImpl;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListenerFactory;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CopybookResolutionProvider;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.GrammarPreprocessorImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorCleanerServiceImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.ReplacingServiceImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.TokenUtilsImpl;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -44,6 +42,5 @@ public class EngineModule extends DefaultModule {
     install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));
     bind(ReplacingService.class).to(ReplacingServiceImpl.class);
     bind(TokenUtils.class).to(TokenUtilsImpl.class);
-    bind(PreprocessorCleanerService.class).to(PreprocessorCleanerServiceImpl.class);
   }
 }

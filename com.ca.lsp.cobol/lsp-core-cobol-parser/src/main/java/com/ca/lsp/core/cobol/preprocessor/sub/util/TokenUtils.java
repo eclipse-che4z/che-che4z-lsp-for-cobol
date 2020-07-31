@@ -15,13 +15,11 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
 /**
  * This utility class applies operations for tokens needed for syntax analysis, like extracting text
@@ -49,16 +47,6 @@ public interface TokenUtils {
   @Nonnull
   String retrieveTextIncludingHiddenTokens(
       @Nonnull ParseTree context, @Nonnull BufferedTokenStream tokens);
-
-  /**
-   * Split text into tokens and retrieve their positions
-   *
-   * @param uri - document URI to fill-in positions
-   * @param code - text to parse
-   * @return List of positions of the given text
-   */
-  @Nonnull
-  List<Position> retrievePositionsFromText(@Nonnull String uri, @Nonnull String code);
 
   /**
    * Check the given node in not end of file

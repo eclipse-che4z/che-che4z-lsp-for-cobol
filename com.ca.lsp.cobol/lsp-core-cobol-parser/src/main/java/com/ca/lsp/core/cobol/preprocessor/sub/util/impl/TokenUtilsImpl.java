@@ -14,28 +14,19 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
-import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.parser.CobolLexer;
-import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.parser.CobolParserBaseListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolHiddenTokenCollectorListenerImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.google.inject.Singleton;
 import org.antlr.v4.runtime.BufferedTokenStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Lexer.HIDDEN;
 import static org.antlr.v4.runtime.Token.EOF;
 
@@ -67,42 +58,8 @@ public class TokenUtilsImpl implements TokenUtils {
     return listener.read();
   }
 
-  @Nonnull
-  @Override
-  public List<Position> retrievePositionsFromText(@Nonnull String uri, @Nonnull String code) {
-    return retrieveTokens(code).getTokens().stream().map(toPosition(uri)).collect(toList());
-  }
-
   @Override
   public boolean notEOF(@Nonnull TerminalNode node) {
     return node.getSymbol().getType() != EOF;
-  }
-
-  @Nonnull
-  private CommonTokenStream retrieveTokens(@Nonnull String code) {
-    CobolLexer lexer = new CobolLexer(CharStreams.fromString(code));
-    lexer.removeErrorListeners();
-
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    CobolParser parser = new CobolParser(tokens);
-    parser.removeErrorListeners();
-
-    CobolParser.StartRuleContext tree = parser.startRule();
-
-    ParseTreeWalker walker = new ParseTreeWalker();
-    walker.walk(new CobolParserBaseListener(), tree);
-    return tokens;
-  }
-
-  @Nonnull
-  private Function<Token, Position> toPosition(@Nonnull String uri) {
-    return it ->
-        new Position(
-            uri,
-            it.getStartIndex(),
-            it.getStopIndex(),
-            it.getLine(),
-            it.getCharPositionInLine(),
-            it.getText());
   }
 }

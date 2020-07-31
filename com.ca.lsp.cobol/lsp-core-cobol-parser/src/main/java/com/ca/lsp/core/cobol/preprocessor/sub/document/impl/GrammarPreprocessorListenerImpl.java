@@ -20,8 +20,8 @@ import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListener;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.PreprocessorCleanerService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -63,11 +63,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
+  private final Deque<StringBuilder> contexts = new ArrayDeque<>();
   private final NamedSubContext copybooks = new NamedSubContext();
   private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
   private final Map<Integer, Integer> shifts = new HashMap<>();
 
-  private PreprocessorCleanerService cleaner;
+  private TokenUtils tokenUtils;
   private String documentUri;
   private BufferedTokenStream tokens;
   private String textDocumentSyncType;
@@ -82,7 +83,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       @Assisted BufferedTokenStream tokens,
       @Assisted Deque<CopybookUsage> copybookStack,
       @Assisted("textDocumentSyncType") String textDocumentSyncType,
-      PreprocessorCleanerService cleaner,
+      TokenUtils tokenUtils,
       CobolPreprocessor preprocessor,
       Provider<CopybookResolution> resolutions,
       ReplacingService replacingService) {
@@ -90,10 +91,11 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     this.tokens = tokens;
     this.copybookStack = copybookStack;
     this.textDocumentSyncType = textDocumentSyncType;
-    this.cleaner = cleaner;
+    this.tokenUtils = tokenUtils;
     this.preprocessor = preprocessor;
     this.resolutions = resolutions;
     this.replacingService = replacingService;
+    contexts.push(new StringBuilder());
   }
 
   @Nonnull
@@ -103,39 +105,39 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         documentUri,
         new DocumentMapping(
             tokens.getTokens().stream().map(toPosition()).collect(toList()), shifts));
-    return new ExtendedDocument(cleaner.read(), copybooks, nestedMappings);
+    return new ExtendedDocument(read(), copybooks, nestedMappings);
   }
 
   @Override
   public void enterCompilerOptions(@Nonnull CompilerOptionsContext ctx) {
     // push a new context for the COMPILER OPTIONS terminals
-    cleaner.push();
+    push();
   }
 
   @Override
   public void enterReplaceArea(@Nonnull ReplaceAreaContext ctx) {
-    cleaner.push();
+    push();
   }
 
   @Override
   public void enterReplaceByStatement(@Nonnull ReplaceByStatementContext ctx) {
-    cleaner.push();
+    push();
   }
 
   @Override
   public void enterReplaceOffStatement(@Nonnull ReplaceOffStatementContext ctx) {
-    cleaner.push();
+    push();
   }
 
   @Override
   public void enterCopyStatement(@Nonnull CopyStatementContext ctx) {
-    cleaner.push();
+    push();
   }
 
   @Override
   public void exitCompilerOptions(@Nonnull CompilerOptionsContext ctx) {
     // throw away COMPILER OPTIONS terminals
-    cleaner.pop();
+    pop();
   }
 
   @Override
@@ -174,27 +176,55 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void exitReplaceArea(@Nonnull ReplaceAreaContext ctx) {
     List<ReplaceClauseContext> replaceClauses = ctx.replaceByStatement().replaceClause();
 
-    String content = applyReplacing(cleaner.read(), replaceClauses);
+    String content = applyReplacing(read(), replaceClauses);
 
-    cleaner.pop();
-    cleaner.write(content);
+    pop();
+    write(content);
   }
 
   @Override
   public void exitReplaceByStatement(@Nonnull ReplaceByStatementContext ctx) {
     // throw away terminals
-    cleaner.pop();
+    pop();
   }
 
   @Override
   public void exitReplaceOffStatement(@Nonnull ReplaceOffStatementContext ctx) {
     // throw away REPLACE OFF terminals
-    cleaner.pop();
+    pop();
   }
 
   @Override
   public void visitTerminal(@Nonnull TerminalNode node) {
-    cleaner.writeToken(node, tokens);
+    int tokPos = node.getSourceInterval().a;
+    write(tokenUtils.retrieveHiddenTextToLeft(tokPos, tokens));
+
+    if (tokenUtils.notEOF(node)) {
+      write(node.getText());
+    }
+  }
+
+  @Nonnull
+  private StringBuilder peek() {
+    return ofNullable(contexts.peek())
+        .orElseThrow(() -> new IllegalStateException("Document structure corrupted"));
+  }
+
+  private void pop() {
+    contexts.pop();
+  }
+
+  private void push() {
+    contexts.push(new StringBuilder());
+  }
+
+  private void write(@Nonnull String text) {
+    peek().append(text);
+  }
+
+  @Nonnull
+  private String read() {
+    return peek().toString();
   }
 
   private List<ReplaceClauseContext> getReplacing(@Nonnull CopyStatementContext ctx) {
@@ -212,15 +242,15 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   private void writeCopybook(String copybookId, String copybookContent) {
     // throw away COPY terminals
-    cleaner.pop();
+    pop();
     // write copybook beginning trigger
-    cleaner.write(CPY_ENTER_TAG);
-    cleaner.write("<URI>");
-    cleaner.write(copybookId);
-    cleaner.write("</URI>");
-    cleaner.write(copybookContent);
+    write(CPY_ENTER_TAG);
+    write("<URI>");
+    write(copybookId);
+    write("</URI>");
+    write(copybookContent);
     // write copybook closing trigger
-    cleaner.write(CPY_EXIT_TAG);
+    write(CPY_EXIT_TAG);
   }
 
   private String applyReplacing(
