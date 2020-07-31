@@ -54,7 +54,6 @@ public class PositiveTest extends ConfigurableTest {
 
   @ParameterizedTest
   @MethodSource("retrieveTextsToTest")
-  @NullSource
   @DisplayName("Parameterized - positive tests")
   public void test(CobolText text) {
     if (text == null) {
