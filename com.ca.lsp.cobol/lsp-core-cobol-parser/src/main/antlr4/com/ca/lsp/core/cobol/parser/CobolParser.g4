@@ -960,7 +960,6 @@ dataDescriptionEntryExecSql
    : execSqlStatement+
    ;
 
-//TODO: make it beautiful
 dataDescriptionEntryCpy
    : COPYENTRY
    ;
@@ -1166,8 +1165,6 @@ statement
     terminateStatement | titleStatement | unstringStatement | writeStatement | xmlStatement | enterCpy | exitCpy
    ;
 
-
-//TODO: modify the copybook name rule to accept everything including keywords
 enterCpy
    : COPYENTRY
    ;
