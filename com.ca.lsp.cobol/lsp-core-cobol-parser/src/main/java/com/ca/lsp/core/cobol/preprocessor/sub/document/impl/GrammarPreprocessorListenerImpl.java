@@ -32,6 +32,7 @@ import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import javax.annotation.Nonnull;
@@ -138,6 +139,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void exitCompilerOptions(@Nonnull CompilerOptionsContext ctx) {
     // throw away COMPILER OPTIONS terminals
     pop();
+    accumulateExcludedStatementShift(ctx.getSourceInterval());
   }
 
   @Override
@@ -165,11 +167,15 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     collectNestedSemanticData(uri, copybookId, copybookDocument);
     writeCopybook(copybookId, copybookContent);
 
-    accumulateShift(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
+    accumulateCopybookShift(ctx.getSourceInterval());
   }
 
-  private void accumulateShift(int start, int stop) {
-    shifts.put(start - 1, stop - start + 1);
+  private void accumulateCopybookShift(Interval sourceInterval) {
+    shifts.put(sourceInterval.a - 1, sourceInterval.b - sourceInterval.a + 1);
+  }
+
+  private void accumulateExcludedStatementShift(Interval sourceInterval) {
+    shifts.put(sourceInterval.a - 1, sourceInterval.b - sourceInterval.a + 2);
   }
 
   @Override
