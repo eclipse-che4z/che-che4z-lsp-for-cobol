@@ -83,7 +83,7 @@ public class DocumentExtensionTests {
     verify(engine, timeout(10000).times(1)).analyze(uri, TEXT, TextDocumentSyncType.DID_OPEN);
 
     // dynamic stubbing in DID_CHANGE mode
-    when(engine.analyze(uri, TEXT, TextDocumentSyncType.DID_CHANGE))
+    when(engine.analyze(uri, INCORRECT_TEXT_EXAMPLE, TextDocumentSyncType.DID_CHANGE))
         .thenReturn(AnalysisResult.empty());
     fireDidChange(uri);
     verify(engine, timeout(10000))
