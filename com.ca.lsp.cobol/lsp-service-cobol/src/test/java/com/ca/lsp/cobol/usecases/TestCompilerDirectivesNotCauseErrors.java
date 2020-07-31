@@ -1,0 +1,58 @@
+/*
+ * Copyright (c) 2020 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ *
+ */
+
+package com.ca.lsp.cobol.usecases;
+
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
+
+/** This class checks that there are no errors shown for compiler directives on several lines */
+public class TestCompilerDirectivesNotCauseErrors {
+
+  private static final String TEXT =
+      "       PROCESS NODYNAM,CODEPAGE(1140),NSYMBOL(NATIONAL)\n"
+          + "       PROCESS ARITH(EXTEND),NOOPT,CICS\n"
+          + "      ******************************************************************\n"
+          + "      * TEST\n"
+          + "      ******************************************************************\n"
+          + "       IDENTIFICATION DIVISION.\n"
+          + "        PROGRAM-ID. TEST1.\n"
+          + "        AUTHOR. ANDREI.\n"
+          + "        INSTALLATION. 1234.\n"
+          + "        DATE-WRITTEN. 01/01/1970 6:00 PM.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       1 {$*PARENT}.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       MAINLINE SECTION.\n"
+          + "      * --------------------------------------------------------------\n"
+          + "      * MAINLINE\n"
+          + "      * --------------------------------------------------------------\n"
+          + "           PERFORM {#DISP1}\n"
+          + "           EXEC CICS RETURN\n"
+          + "           END-EXEC\n"
+          + "           .\n"
+          + "           {#*DISP1}.\n"
+          + "              DISPLAY 'HELLO'.\n"
+          + "       END PROGRAM 'TEST1'.";
+
+  @Test
+  public void test() {
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
+  }
+}

@@ -128,11 +128,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void enterTitleStatement(@Nonnull TitleStatementContext ctx) {
-    cleaner.push();
-  }
-
-  @Override
   public void enterCopyStatement(@Nonnull CopyStatementContext ctx) {
     cleaner.push();
   }
@@ -194,12 +189,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitReplaceOffStatement(@Nonnull ReplaceOffStatementContext ctx) {
     // throw away REPLACE OFF terminals
-    cleaner.pop();
-  }
-
-  @Override
-  public void exitTitleStatement(@Nonnull TitleStatementContext ctx) {
-    // throw away title statement
     cleaner.pop();
   }
 

@@ -11,22 +11,7 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((compilerOptions | copyStatement | skipNoStatement | replaceArea | titleStatement | NEWLINE)+ .*?)+ EOF
-   ;
-
-everything
-    : ~(ACCEPT | ADD | ALTER | CALL | CANCEL | CLOSE | COMPUTE | CONTINUE | DELETE | DISABLE | DISPLAY | DIVIDE | ENABLE | EXEC | EJECT |
-      ENTRY | EVALUATE | EXIT | GENERATE | GOBACK | GO | IF | INITIALIZE | INITIATE | INSPECT | MERGE | MULTIPLY | OPEN | PERFORM | PURGE | READ |
-      RECEIVE | RELEASE | RETURN | REWRITE | SEARCH | SEND | SET | SKIP1 | SKIP2 | SKIP3 | SORT | START | STOP | STRING | SUBTRACT | TERMINATE |
-      TITLE | UNSTRING | USE | WRITE | XML | DOT_FS | COPY | MOVE)*?
-    ;
-
-skipNoStatement
-   : (SKIP1 | SKIP2 | SKIP3) everything
-   ;
-
-titleStatement
-   : TITLE everything
+   : .*? ((compilerOptions | copyStatement | replaceArea | NEWLINE)+ .*?)+ EOF
    ;
 
 // compiler options
@@ -214,12 +199,6 @@ replaceSameElement
    : literal | cobolWord | pseudoText | charDataLine
    ;
 
-
-// skip statement
-skipStatement
-   : (SKIP1 | SKIP2 | SKIP3) DOT?
-   ;
-
 // literals
 pseudoText
    : DOUBLEEQUALCHAR charData? DOUBLEEQUALCHAR
@@ -289,7 +268,7 @@ charDataKeyword
    | QUOTE
    | RENT | REPLACING | RMODE
    | SEQ | SEQUENCE | SEP | SEPARATE | SHORT | SIZE | SOURCE | SP | SPACE | SPIE | SQL | SQLC | SQLCCSID | SS | SSR | SSRANGE | STD | SYSEIB | SZ
-   | TERM | TERMINAL | TEST | THREAD | TITLE | TRIG | TRUNC
+   | TERM | TERMINAL | TEST | THREAD | TRIG | TRUNC
    | UE | UPPER
    | VBREF
    | WD
