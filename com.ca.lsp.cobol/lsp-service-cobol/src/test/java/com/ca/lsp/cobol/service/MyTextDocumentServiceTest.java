@@ -38,6 +38,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import static com.ca.lsp.cobol.service.CopybookScanAnalysis.DISABLED;
+import static com.ca.lsp.cobol.service.CopybookScanAnalysis.ENABLED;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
@@ -49,6 +51,7 @@ import static org.mockito.Mockito.*;
 public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private static final String LANGUAGE = "COBOL";
+  private static final String EXT_SRC_DOC_URI = "file://.c4z/.extsrc/EXTSRC.cbl";
   private static final String CPY_DOCUMENT_URI = "file:///.copybooks/CPYTEST.cpy";
   private static final String PARENT_CPY_URI = "file:///.copybooks/PARENT.cpy";
   private static final String NESTED_CPY_URI = "file:///.copybooks/NESTED.cpy";
@@ -156,6 +159,60 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   /**
+   * This test verify that when an extended document is opened, the code is analyzed and the
+   * copybook analysis is disabled using {@link CopybookScanAnalysis#DISABLED}
+   */
+  @Test
+  public void disableCopybookAnalysisOnExtendedDoc() {
+    LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
+    MyTextDocumentService service = buildServiceWithMockEngine(engine);
+
+    service.didOpen(
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(EXT_SRC_DOC_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+
+    verify(engine).analyze(eq(EXT_SRC_DOC_URI), anyString(), eq(DISABLED));
+  }
+
+  private MyTextDocumentService buildServiceWithMockEngine(LanguageEngineFacade engine) {
+    return new MyTextDocumentService(
+        mock(Communications.class), engine, null, null, null, mock(DataBusBroker.class), null);
+  }
+
+  /**
+   * This test verify that when a document is opened in DID_OPEN mode, the code is analyzed and the
+   * copybook analysis is enabled using {@link CopybookScanAnalysis#ENABLED}
+   */
+  @Test
+  public void enableCopybooksOnDidOpenTest() {
+    LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
+    MyTextDocumentService service = buildServiceWithMockEngine(engine);
+
+    service.didOpen(
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+
+    verify(engine).analyze(eq(DOCUMENT_URI), anyString(), eq(ENABLED));
+  }
+
+  /**
+   * This test verify that when a document is updated in DID_CHANGE mode, the code is analyzed and
+   * the copybook analysis is enabled using {@link CopybookScanAnalysis#ENABLED}
+   */
+  @Test
+  public void enableCopybooksOnDidChangeTest() {
+    LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
+    MyTextDocumentService service = buildServiceWithMockEngine(engine);
+
+    service.didChange(
+        new DidChangeTextDocumentParams(
+            new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0),
+            List.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
+
+    verify(engine).analyze(eq(DOCUMENT_URI), anyString(), eq(DISABLED));
+  }
+
+  /**
    * This test checks that {@link MyTextDocumentService} is subscribed to the databus events and may
    * re-run analysis of the open documents if it receives a notification.
    */
@@ -189,10 +246,8 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
             DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookScanAnalysis.ENABLED))
         .thenReturn(resultWithErrors);
 
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookScanAnalysis.DISABLED))
-        .thenReturn(resultNoErrors);
-    when(engine.analyze(
-            DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookScanAnalysis.DISABLED))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DISABLED)).thenReturn(resultNoErrors);
+    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DISABLED))
         .thenReturn(resultWithErrors);
 
     // create a service and verify is subscribed to the required event
