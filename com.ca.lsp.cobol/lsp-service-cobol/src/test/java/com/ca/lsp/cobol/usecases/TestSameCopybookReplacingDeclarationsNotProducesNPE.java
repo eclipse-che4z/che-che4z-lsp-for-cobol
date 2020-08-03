@@ -38,8 +38,8 @@ public class TestSameCopybookReplacingDeclarationsNotProducesNPE {
           + "6      COPY {~REPL} REPLACING ==:TAG:== BY ==ABC==.\n"
           + "7      PROCEDURE DIVISION.\n"
           + "8      {#*MAINLINE}.\n"
-          + "9      MOVE 0 TO {$ABC-ID}.\n"
-          + "10     GOBACK. ";
+          + "9          MOVE 0 TO {$ABC-ID}.\n"
+          + "10         GOBACK. ";
 
   private static final String REPL = "       05 {$*:TAG:-ID^ABC-ID} PIC 9.\n";
   private static final String REPL_NAME = "REPL";

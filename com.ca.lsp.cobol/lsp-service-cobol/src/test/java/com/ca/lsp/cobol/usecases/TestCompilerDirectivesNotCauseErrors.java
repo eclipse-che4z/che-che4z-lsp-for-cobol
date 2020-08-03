@@ -47,7 +47,7 @@ public class TestCompilerDirectivesNotCauseErrors {
           + "           EXEC CICS RETURN\n"
           + "           END-EXEC\n"
           + "           .\n"
-          + "           {#*DISP1}.\n"
+          + "       {#*DISP1}.\n"
           + "              DISPLAY 'HELLO'.\n"
           + "       END PROGRAM 'TEST1'.";
 

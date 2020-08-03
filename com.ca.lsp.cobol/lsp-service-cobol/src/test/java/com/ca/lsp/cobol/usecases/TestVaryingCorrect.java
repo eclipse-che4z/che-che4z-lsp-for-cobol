@@ -43,14 +43,14 @@ public class TestVaryingCorrect {
           + "        PROCEDURE DIVISION.\r\n";
 
   private static final String VARYING_WITH_TWO_IDENTIFIERS =
-      "          PERFORM {#PROCEDURE-NAME-1} THROUGH {#PROCEDURE-NAME-2}\r\n"
+      "            PERFORM {#PROCEDURE-NAME-1} THROUGH {#PROCEDURE-NAME-2}\r\n"
           + "            VARYING {$IDENTIFIER-2} FROM {$IDENTIFIER-3}\r\n"
           + "            BY {$IDENTIFIER-4} UNTIL CONDITION-1\r\n"
           + "            AFTER {$IDENTIFIER-5} FROM {$IDENTIFIER-6}\r\n"
           + "            BY {$IDENTIFIER-7} UNTIL CONDITION-2.";
 
   private static final String VARYING_WITH_THREE_IDENTIFIERS =
-      "          PERFORM {#PROCEDURE-NAME-1} THROUGH {#PROCEDURE-NAME-2}\r\n"
+      "            PERFORM {#PROCEDURE-NAME-1} THROUGH {#PROCEDURE-NAME-2}\r\n"
           + "            VARYING {$IDENTIFIER-2} FROM {$IDENTIFIER-3}\r\n"
           + "            BY {$IDENTIFIER-4} UNTIL CONDITION-1\r\n"
           + "            AFTER {$IDENTIFIER-5} FROM {$IDENTIFIER-6}\r\n"

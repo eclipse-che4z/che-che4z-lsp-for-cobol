@@ -40,7 +40,7 @@ public class TestReplacingAppliedOneByOne {
           + "7      PROCEDURE DIVISION.\r\n"
           + "8      {#*MAINLINE}.\r\n"
           + "9          MOVE 1 TO {$JKL-ID} OF {$JKL-KEY}.\r\n"
-          + "10     GOBACK.";
+          + "10         GOBACK.";
 
   private static final String CUSTCOPY =
       "           05  {$*ABC-KEY^JKL-KEY}.\r\n"

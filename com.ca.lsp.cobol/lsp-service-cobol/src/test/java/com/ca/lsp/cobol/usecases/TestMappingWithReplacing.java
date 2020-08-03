@@ -40,7 +40,7 @@ public class TestMappingWithReplacing {
           + "       PROCEDURE DIVISION.\r\n"
           + "       {#*MAINLINE}.\r\n"
           + "           MOVE 1 TO {$CSTOUT-ID} OF {$CSTOUT-KEY} OF {$PARENT}.\r\n"
-          + "       GOBACK.";
+          + "           GOBACK.";
 
   private static final String CUSTCOPY =
       "           05  {$*:TAG:-KEY^CSTOUT-KEY}.\r\n"

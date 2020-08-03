@@ -91,7 +91,7 @@ public class CobolLanguageEngine {
         PositionMappingUtils.createPositionMapping(
             tokens.getTokens(), extendedDocument.getResult().getDocumentMapping(), documentUri);
 
-    CobolVisitor visitor = new CobolVisitor(extendedDocument.getResult(), positionMapping);
+    CobolVisitor visitor = new CobolVisitor(extendedDocument.getResult(), tokens, positionMapping);
     visitor.visit(tree);
 
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));

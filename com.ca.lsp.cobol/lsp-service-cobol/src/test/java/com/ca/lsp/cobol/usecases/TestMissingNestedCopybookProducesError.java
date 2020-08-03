@@ -38,8 +38,8 @@ public class TestMissingNestedCopybookProducesError {
           + "5      COPY {~REPL} REPLACING ==TAG== BY ==ABC==.\n"
           + "6      PROCEDURE DIVISION.\n"
           + "7      {#*MAINLINE}.\n"
-          + "8      MOVE 0 TO {$ABC-ID}.\n"
-          + "9      GOBACK. ";
+          + "8          MOVE 0 TO {$ABC-ID}.\n"
+          + "9          GOBACK. ";
 
   private static final String REPL =
       "       05 {$*TAG-ID^ABC-ID} PIC 9.\n" + "       COPY {~CPYNAME|missing}.";

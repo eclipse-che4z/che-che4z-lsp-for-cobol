@@ -35,8 +35,8 @@ public class TestProcedureDivisionInCopybook {
           + "4      01  {$*PARENT}.  COPY {~STRUCT1}.  \n"
           + "5      COPY {~PROCDIV}.\n"
           + "6      {#*MAINLINE}.\n"
-          + "7        MOVE 1 TO {$CHILD1}.\n"
-          + "8      GOBACK. ";
+          + "7          MOVE 1 TO {$CHILD1}.\n"
+          + "8          GOBACK. ";
 
   private static final String STRUCT1 = "           03  {$*CHILD1}         PIC 9   VALUE IS '0'.\n";
   private static final String PROCDIV = "       PROCEDURE DIVISION.";

@@ -37,13 +37,13 @@ public class TestMappingWithMultiDefinitions {
           + "       01 {$*PARENT2}. COPY {~STRUC}.\r\n"
           + "       COPY {~WITHNEST}.\r\n"
           + "       PROCEDURE DIVISION.\r\n"
-          + "       PERFORM {#MAIN-LINE}.\r\n"
+          + "           PERFORM {#MAIN-LINE}.\r\n"
           + "       COPY {~PARS}.\r\n"
           + "       {#*MAIN-LINE}.\r\n"
           + "           MOVE 00 TO {$CHILD2} OF {$PARENT}.\r\n"
           + "           MOVE 00 TO {$CHILD3-NESTED} OF {$PARENT-NESTED} OF {$PARENT3}.\r\n"
           + "           PERFORM {#PAR1}.\r\n"
-          + "       GOBACK.";
+          + "           GOBACK.";
 
   private static final String STRUC =
       "           02  {$*CHILD1}         PIC 9   VALUE IS '0'.\r\n"

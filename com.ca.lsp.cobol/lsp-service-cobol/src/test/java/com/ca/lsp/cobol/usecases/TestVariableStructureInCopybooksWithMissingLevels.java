@@ -35,7 +35,7 @@ public class TestVariableStructureInCopybooksWithMissingLevels {
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*PARENT}.   COPY {~STRUCT}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "       MOVE 00 TO {$CHILD1} OF {$PARENT}.";
+          + "           MOVE 00 TO {$CHILD1} OF {$PARENT}.";
 
   private static final String STRUCT =
       "       02  {$*PARENT2}.\n"

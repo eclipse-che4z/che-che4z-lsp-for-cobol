@@ -36,15 +36,15 @@ public class TestSeveralCopybooksInARow {
           + "       {#*MAIN-LINE}.\r\n"
           + "           MOVE 00 TO {$CHILD1} OF {$PARENT1}.\r\n"
           + "           MOVE 00 TO {$CHILD2} OF {$PARENT2}.\r\n"
-          + "       GOBACK.";
+          + "           GOBACK.";
 
   private static final String STRUC1 =
-      "           01  {$*PARENT1}.\r\n" + "           02  {$*CHILD1}         PIC 99.\r\n";
+      "         01  {$*PARENT1}.\r\n" + "           02  {$*CHILD1}         PIC 99.\r\n";
 
   private static final String STRUC1_NAME = "STRUC1";
 
   private static final String STRUC2 =
-      "           01  {$*PARENT2}.\r\n" + "           02  {$*CHILD2}         PIC 99.\r\n";
+      "         01  {$*PARENT2}.\r\n" + "           02  {$*CHILD2}         PIC 99.\r\n";
 
   private static final String STRUC2_NAME = "STRUC2";
 

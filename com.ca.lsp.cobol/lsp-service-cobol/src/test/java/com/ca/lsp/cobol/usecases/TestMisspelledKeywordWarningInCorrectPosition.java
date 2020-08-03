@@ -39,7 +39,7 @@ public class TestMisspelledKeywordWarningInCorrectPosition {
           + "4       COPY {~STRUC1}. \n"
           + "5      Procedure Division.\n"
           + "6      {#*000-Main-Logic}.\n"
-          + "7          {DISPLA|misspelled} {\"hello\"|hello}.\n"
+          + "7          {DISPLA|misspelled|area} {\"hello\"|hello}.\n"
           + "8          DISPLAY {$CHILD1} OF {$PARENT1}.\n"
           + "9      End program ProgramId.";
 
@@ -63,6 +63,9 @@ public class TestMisspelledKeywordWarningInCorrectPosition {
                 "A misspelled word, maybe you want to put DISPLAY",
                 Warning,
                 WARNING.getText()),
+            "area",
+            new Diagnostic(
+                null, "Following token must start in Area A: DISPLA", Warning, WARNING.getText()),
             "hello",
             new Diagnostic(
                 null, "Syntax error on '\"hello\"' expected SECTION", Error, ERROR.getText())));

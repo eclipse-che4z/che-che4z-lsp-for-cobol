@@ -37,7 +37,7 @@ public class TestVariableStructureIsBuiltWithCopybooks {
           + "       01  {$*PARENT1}.  COPY {~STRUCT}.\n"
           + "       01  {$*PARENT2}.  COPY {~STRUCT}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           {#*MAINLINE}.\n"
+          + "       {#*MAINLINE}.\n"
           + "           MOVE 00 TO {$CHILD} OF {$PARENT1}.\n"
           + "           MOVE 00 TO {$CHILD} OF {$PARENT2}.\n"
           + "           GOBACK.";

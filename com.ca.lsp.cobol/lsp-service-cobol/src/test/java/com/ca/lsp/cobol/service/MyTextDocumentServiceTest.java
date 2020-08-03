@@ -168,6 +168,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     Communications communications = mock(Communications.class);
     LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
     DataBusBroker broker = mock(DataBusBroker.class);
+
     Map<String, List<Diagnostic>> diagnosticsNoErrors = emptyMap();
     Map<String, List<Diagnostic>> diagnosticsWithErrors = createDefaultDiagnostics();
 
@@ -261,6 +262,22 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
             new Diagnostic(
                 new Range(new Position(0, 0), new Position(0, INCORRECT_TEXT_EXAMPLE.length())),
                 INCORRECT_TEXT_EXAMPLE)));
+  }
+  /**
+   * This test verify that when a {@link MyTextDocumentService#didClose(DidCloseTextDocumentParams)}
+   * is sent from the client to dispose a document, all the related diagnostic message are disposed
+   * from the document.
+   */
+  @Test
+  public void testDidCloseDisposeDiagnostics() {
+    Communications spyCommunications = spy(Communications.class);
+
+    DidCloseTextDocumentParams closedDocument =
+        new DidCloseTextDocumentParams(new TextDocumentIdentifier(DOCUMENT_URI));
+    service.didClose(closedDocument);
+
+    assertEquals(Collections.EMPTY_MAP, closeGetter(service));
+    verify(spyCommunications, atMost(1)).publishDiagnostics(Map.of(DOCUMENT_URI, List.of()));
   }
 
   private MyTextDocumentService verifyServiceStart(

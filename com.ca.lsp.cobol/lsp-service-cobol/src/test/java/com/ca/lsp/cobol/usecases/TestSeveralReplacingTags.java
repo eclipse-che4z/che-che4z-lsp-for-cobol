@@ -39,7 +39,7 @@ public class TestSeveralReplacingTags {
           + "7      PROCEDURE DIVISION.\r\n"
           + "8      {#*MAINLINE}.\r\n"
           + "9          MOVE 1 TO {$XYZA-ID} OF {$ABCD-KEY} OF {$PARENT}.\r\n"
-          + "10     GOBACK.";
+          + "10         GOBACK.";
 
   private static final String CUSTCOPY =
       "           05  {$*:TAG1:-KEY^ABCD-KEY}.\r\n"

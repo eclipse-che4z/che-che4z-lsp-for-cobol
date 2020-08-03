@@ -38,8 +38,8 @@ public class TestReplacingIdentifiersAppliedForFullTokens {
           + "7                          D BY VARE.\n"
           + "8      PROCEDURE DIVISION.\n"
           + "9      {#*MAINLINE}.\n"
-          + "10     MOVE 00 TO {$VARC} OF {$VARB}.\n"
-          + "11     GOBACK. ";
+          + "10         MOVE 00 TO {$VARC} OF {$VARB}.\n"
+          + "11         GOBACK. ";
 
   private static final String REPL =
       "0      01  {$*A^VARB}.\n"

@@ -20,6 +20,7 @@ import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.ca.lsp.core.cobol.utils.CustomToken;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -52,6 +53,7 @@ public class VisitorSemanticAnalysisTest {
     CobolVisitor visitor =
         new CobolVisitor(
             new ExtendedDocument(null, null, singletonMap("", null)),
+            null,
             Map.of(token, new Position("", 0, 0, 0, 0, "invalid")));
 
     visitor.visitQualifiedDataNameFormat1(mockMethod(token));
@@ -70,13 +72,17 @@ public class VisitorSemanticAnalysisTest {
   public void testMisspelledKeywordDistance() {
 
     CustomToken token = createNewToken(WRONG_TOKEN);
+    CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
+    when(node.getStart()).thenReturn(createNewToken(WRONG_TOKEN));
+    when(node.getStop()).thenReturn(createNewToken(WRONG_TOKEN));
+
+    CommonTokenStream tokenStream = mock(CommonTokenStream.class);
+
     CobolVisitor visitor =
         new CobolVisitor(
             new ExtendedDocument(null, null, singletonMap("", null)),
+            tokenStream,
             Map.of(token, new Position("", 0, 0, 0, 0, WRONG_TOKEN)));
-
-    CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
-    when(node.getStart()).thenReturn(createNewToken(WRONG_TOKEN));
 
     visitor.visitStatement(node);
 

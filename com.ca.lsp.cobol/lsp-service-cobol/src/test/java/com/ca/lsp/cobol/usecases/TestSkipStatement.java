@@ -39,7 +39,7 @@ public class TestSkipStatement {
           + "           END-PERFORM.\n"
           + "        SKIP2.\n"
           + "        {#*PROGB}.\n"
-          + "        EXIT.\n"
+          + "            EXIT.\n"
           + "        EJECT";
 
   @Test

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.WARNING;
 
 /**
  * This test checks if the parser recognizes typo on the "DIVISIONs" token. The correct is
@@ -34,9 +35,10 @@ public class TestSyntaxError {
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
-          + "        END PROGRAM test1.";
+          + "        END PROGRAM {test1|name}.";
 
-  private static final String MESSAGE = "Syntax error on 'DIVISIONs' expected DIVISION";
+  private static final String DIVISION = "Syntax error on 'DIVISIONs' expected DIVISION";
+  private static final String NAME = "There is an issue with PROGRAM-ID paragraph";
 
   @Test
   public void test() {
@@ -44,6 +46,10 @@ public class TestSyntaxError {
     UseCaseEngine.runTest(
         TEXT,
         List.of(),
-        Map.of("typo", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
+        Map.of(
+            "typo",
+            new Diagnostic(null, DIVISION, DiagnosticSeverity.Error, ERROR.getText()),
+            "name",
+            new Diagnostic(null, NAME, DiagnosticSeverity.Warning, WARNING.getText())));
   }
 }

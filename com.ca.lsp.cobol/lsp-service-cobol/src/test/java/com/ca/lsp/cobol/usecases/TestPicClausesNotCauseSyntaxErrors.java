@@ -39,7 +39,7 @@ public class TestPicClausesNotCauseSyntaxErrors {
           + "           MOVE 0 TO {$ABC-THREE} OF {$PARENT}.\n"
           + "           MOVE 0 TO {$ABC-FOUR} OF {$PARENT}.\n"
           + "           MOVE 0 TO {$ABC-FIVE} OF {$PARENT}.\n"
-          + "       GOBACK. ";
+          + "           GOBACK. ";
 
   private static final String REPL =
       "       05 {$*TAG-ONE^ABC-ONE} PIC 9(03)V99.\n"

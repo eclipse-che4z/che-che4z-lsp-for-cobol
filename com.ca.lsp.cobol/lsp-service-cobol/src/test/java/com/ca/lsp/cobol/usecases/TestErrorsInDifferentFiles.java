@@ -23,10 +23,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.*;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
+import static org.eclipse.lsp4j.DiagnosticSeverity.*;
 
 /**
  * Test syntax errors found in a copybook displayed in the according file. Here, variable definition
@@ -46,7 +45,7 @@ public class TestErrorsInDifferentFiles {
           + "8      End program ProgramId.";
 
   private static final String ASDASD =
-      "           03  {CHILD1|child1}         {PIC|pic} 9   VALUE IS '0'.";
+      "           {03|areaA1}  {CHILD1|child1|areaA2}         {PIC|pic} 9   VALUE IS '0'.";
 
   private static final String ASDASD_NAME = "ASDASD";
 
@@ -62,6 +61,12 @@ public class TestErrorsInDifferentFiles {
             new Diagnostic(null, "Syntax error on 'PIC' expected SECTION", Error, ERROR.getText()),
             "child1",
             new Diagnostic(
-                null, "Syntax error on 'CHILD1' expected SECTION", Error, ERROR.getText())));
+                null, "Syntax error on 'CHILD1' expected SECTION", Error, ERROR.getText()),
+            "areaA1",
+            new Diagnostic(
+                null, "Following token must start in Area A: 03", Warning, WARNING.getText()),
+            "areaA2",
+            new Diagnostic(
+                null, "Following token must start in Area A: CHILD1", Warning, WARNING.getText())));
   }
 }

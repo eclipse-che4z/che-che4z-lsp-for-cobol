@@ -38,7 +38,7 @@ public class TestSameCopybooksWithDifferentCases {
           + "       01  {$*PARENT}.   COPY {~STRUCT1}.\n"
           + "       COPY {~Struct1}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "       MOVE 00 TO {$CHILD1} OF {$PARENT}.";
+          + "           MOVE 00 TO {$CHILD1} OF {$PARENT}.";
 
   private static final String STRUCT1 =
       "       02  {$*PARENT2}.\n"

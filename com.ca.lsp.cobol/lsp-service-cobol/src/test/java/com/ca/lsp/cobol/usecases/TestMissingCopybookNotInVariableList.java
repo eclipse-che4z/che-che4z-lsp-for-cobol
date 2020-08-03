@@ -40,7 +40,7 @@ public class TestMissingCopybookNotInVariableList {
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*PARENT}. COPY {~CPYNAME|missing}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "       MOVE 00 TO {$CHILD1|invalid|invalid} OF {$PARENT}.";
+          + "           MOVE 00 TO {$CHILD1|invalid|invalid} OF {$PARENT}.";
 
   @Test
   public void test() {

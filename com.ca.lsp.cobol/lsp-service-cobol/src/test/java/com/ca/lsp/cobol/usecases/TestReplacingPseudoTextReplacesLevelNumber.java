@@ -39,8 +39,8 @@ public class TestReplacingPseudoTextReplacesLevelNumber {
           + "7                          ==AA-CHILD2==    BY ==EE-CHILD2==.\n"
           + "8      PROCEDURE DIVISION.\n"
           + "9      {#*MAINLINE}.\n"
-          + "10     MOVE 0 TO {$EE-CHILD1} OF {$EE-PARENT} OF {$PARENT}.\n"
-          + "11     GOBACK. ";
+          + "10         MOVE 0 TO {$EE-CHILD1} OF {$EE-PARENT} OF {$PARENT}.\n"
+          + "11         GOBACK. ";
 
   private static final String REPL =
       "0      {01^05}  {$*AA-PARENT^EE-PARENT}.\n"

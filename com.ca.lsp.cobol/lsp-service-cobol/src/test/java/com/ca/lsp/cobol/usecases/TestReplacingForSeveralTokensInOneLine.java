@@ -43,10 +43,10 @@ public class TestReplacingForSeveralTokensInOneLine {
           + "       PROCEDURE DIVISION.\r\n"
           + "       {#*MAIN-LINE}.\r\n"
           + "       COPY {~REPL} REPLACING ==:TAG:== BY ==ABC==.\r\n"
-          + "       GOBACK.";
+          + "           GOBACK.";
 
   private static final String REPL =
-      "          MOVE 10 TO {$:TAG:-CHILD^ABC-CHILD|invalid|invalid} OF {$:TAG:-PARENT^ABC-PARENT}";
+      "              MOVE 10 TO {$:TAG:-CHILD^ABC-CHILD|invalid|invalid} OF {$:TAG:-PARENT^ABC-PARENT}";
 
   private static final String REPL_NAME = "REPL";
   private static final String MESSAGE = "Invalid definition for: ABC-CHILD";

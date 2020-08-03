@@ -37,8 +37,8 @@ public class TestEntireProcedureDivisionInCopybook {
   private static final String PROGA =
       "0      PROCEDURE DIVISION.\n"
           + "1      {#*MAINLINE}.\n"
-          + "2        MOVE 1 TO {$CHILD1}.\n"
-          + "3      GOBACK. ";
+          + "2          MOVE 1 TO {$CHILD1}.\n"
+          + "3          GOBACK. ";
   private static final String STRUCT1 = "           03  {$*CHILD1}         PIC 9   VALUE IS '0'.\n";
 
   private static final String PROGA_NAME = "PROGA";
