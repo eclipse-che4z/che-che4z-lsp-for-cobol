@@ -25,7 +25,7 @@ import java.util.Map;
  * This test checks that document with multi-definitions parsed correctly and all the usages of
  * variables placed in one line found.
  */
-public class TestVariableUsedSeveralTimesInOneStatement {
+class TestVariableUsedSeveralTimesInOneStatement {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -41,7 +41,7 @@ public class TestVariableUsedSeveralTimesInOneStatement {
           + "       End program ProgramId.";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

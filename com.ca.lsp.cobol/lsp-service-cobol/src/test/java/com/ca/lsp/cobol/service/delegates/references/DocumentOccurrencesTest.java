@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** This class checks the expected behavior of Go to Definition request resolving. */
-public class DocumentOccurrencesTest extends ConfigurableTest {
+class DocumentOccurrencesTest extends ConfigurableTest {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -80,21 +80,20 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
   private TextDocumentService service;
 
   @BeforeEach
-  public void createService() {
+  void createService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
     MockCopybookService copybookService =
         LangServerCtx.getInjector().getInstance(MockCopybookService.class);
     copybookService.setCopybooks(
-        () ->
-            List.of(new CobolText("CPYBK1", COPYBOOK1), new CobolText("CPYBK2", COPYBOOK2)));
+        () -> List.of(new CobolText("CPYBK1", COPYBOOK1), new CobolText("CPYBK2", COPYBOOK2)));
     runTextValidation(service, TEXT);
     waitForDiagnostics(client);
   }
 
   @Test
-  public void testFindDefinitionForVariableReturnsTwoLocations()
+  void testFindDefinitionForVariableReturnsTwoLocations()
       throws ExecutionException, InterruptedException {
     List<? extends Location> locations = invokeDefinitionsRequest(INNER1_POSITION);
 
@@ -106,20 +105,18 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
   }
 
   @Test
-  public void testFindDefinitionForKeywordReturnsEmpty()
-      throws ExecutionException, InterruptedException {
+  void testFindDefinitionForKeywordReturnsEmpty() throws ExecutionException, InterruptedException {
     assertEquals(0, invokeDefinitionsRequest(DIVISION_POSITION).size());
   }
 
   @Test
-  public void testFindAllReferencesForKeywordReturnsEmpty()
+  void testFindAllReferencesForKeywordReturnsEmpty()
       throws ExecutionException, InterruptedException {
     assertEquals(0, invokeReferencesRequest(DIVISION_POSITION, true).size());
   }
 
   @Test
-  public void testFindAllReferencesIncludeDeclaration()
-      throws ExecutionException, InterruptedException {
+  void testFindAllReferencesIncludeDeclaration() throws ExecutionException, InterruptedException {
     List<? extends Location> locations = invokeReferencesRequest(INNER1_POSITION, true);
     assertEquals(4, locations.size());
 
@@ -130,8 +127,7 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
   }
 
   @Test
-  public void testFindAllReferencesExcludeDeclaration()
-      throws ExecutionException, InterruptedException {
+  void testFindAllReferencesExcludeDeclaration() throws ExecutionException, InterruptedException {
     List<? extends Location> locations = invokeReferencesRequest(INNER1_POSITION, false);
     assertEquals(2, locations.size());
     assertContainsRange(locations, range(16, 16, INNER1_LENGTH));
@@ -139,7 +135,7 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
   }
 
   @Test
-  public void testFindAllReferencesForStructure() throws ExecutionException, InterruptedException {
+  void testFindAllReferencesForStructure() throws ExecutionException, InterruptedException {
     List<? extends Location> locations = invokeReferencesRequest(OUTER1_POSITION, true);
     assertEquals(3, locations.size());
 
@@ -149,7 +145,7 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
   }
 
   @Test
-  public void testFindAllReferencesForParagraphIncludeDeclaration()
+  void testFindAllReferencesForParagraphIncludeDeclaration()
       throws ExecutionException, InterruptedException {
     List<? extends Location> locations = invokeReferencesRequest(TEST_POSITION, true);
     assertEquals(2, locations.size());
@@ -159,7 +155,7 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
   }
 
   @Test
-  public void testFindAllReferencesForParagraphIncludeDeclarationOneOccurrence()
+  void testFindAllReferencesForParagraphIncludeDeclarationOneOccurrence()
       throws ExecutionException, InterruptedException {
     List<? extends Location> locations = invokeReferencesRequest(MAIN_POSITION, true);
     assertEquals(1, locations.size());
@@ -168,14 +164,14 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
   }
 
   @Test
-  public void testFindDeclarationForParagraph() throws ExecutionException, InterruptedException {
+  void testFindDeclarationForParagraph() throws ExecutionException, InterruptedException {
     List<? extends Location> locations = invokeDefinitionsRequest(TEST_POSITION);
     assertEquals(1, locations.size());
     assertContainsRange(locations, range(15, 7, TEST_LENGTH));
   }
 
   @Test
-  public void testFindMultipleCopybookReferences() throws ExecutionException, InterruptedException {
+  void testFindMultipleCopybookReferences() throws ExecutionException, InterruptedException {
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK1, true);
     assertEquals(4, locations.size());
 
@@ -184,7 +180,7 @@ public class DocumentOccurrencesTest extends ConfigurableTest {
   }
 
   @Test
-  public void testFindSingleCopybookReference() throws ExecutionException, InterruptedException {
+  void testFindSingleCopybookReference() throws ExecutionException, InterruptedException {
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK2, true);
     assertEquals(3, locations.size());
 

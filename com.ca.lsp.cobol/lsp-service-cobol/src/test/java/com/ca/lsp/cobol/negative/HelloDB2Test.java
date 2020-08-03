@@ -29,12 +29,12 @@ import java.util.List;
  *
  * <p>35 IGYPS2121-S ""SQLCA"" was not defined as a data-name. The statement was discarded."
  */
-@Disabled("Unsupported while semantic analysis is not implemented")
+@Disabled("Unsupported while semantic analysis not implemented")
 public class HelloDB2Test extends NegativeTest {
   private static final String FILE_NAME = "HELLODB2.cbl";
   private static final int EXPECTED_ERRORS_NUMBER = 5;
 
-  public HelloDB2Test() {
+  HelloDB2Test() {
     super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
   }
 

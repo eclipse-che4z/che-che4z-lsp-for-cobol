@@ -34,11 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** This test verifies that cache can handle edge cases, e.g. missing elements. */
 @Slf4j
-public class DataBusGetFromCacheBadTest extends DatabusConfigProvider {
+class DataBusGetFromCacheBadTest extends DatabusConfigProvider {
   private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> databus;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
 
     databus.storeData(
@@ -80,7 +80,7 @@ public class DataBusGetFromCacheBadTest extends DatabusConfigProvider {
 
   @Test
   @SneakyThrows
-  public void getData() throws NoSuchElementException {
+  void getData() throws NoSuchElementException {
     Assertions.assertThrows(
         NoSuchElementException.class,
         () -> {

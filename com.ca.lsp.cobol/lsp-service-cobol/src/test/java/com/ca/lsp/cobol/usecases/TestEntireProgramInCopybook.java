@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /** This test checks that the grammar may process the entire program put into a copybook */
-public class TestEntireProgramInCopybook {
+class TestEntireProgramInCopybook {
   private static final String TEXT = "0       COPY {~PROGA}.";
 
   private static final String PROGA =
@@ -43,7 +43,7 @@ public class TestEntireProgramInCopybook {
   private static final String STRUCT1_NAME = "STRUCT1";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(new CobolText(PROGA_NAME, PROGA), new CobolText(STRUCT1_NAME, STRUCT1)),

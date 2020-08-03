@@ -32,10 +32,10 @@ import static org.mockito.Mockito.verify;
  * This class is a unit test for the {@link WatcherServiceImpl} and asserts that it creates correct
  * JSON object structures on each watching request.
  */
-public class WatcherServiceImplTest {
+class WatcherServiceImplTest {
 
   @Test
-  public void watchConfigurationChange() {
+  void watchConfigurationChange() {
     LanguageClient client = mock(LanguageClient.class);
     ClientProvider provider = new ClientProvider();
     provider.set(client);
@@ -56,7 +56,7 @@ public class WatcherServiceImplTest {
   }
 
   @Test
-  public void watchPredefinedFolder() {
+  void watchPredefinedFolder() {
     LanguageClient client = mock(LanguageClient.class);
     ClientProvider provider = new ClientProvider();
     provider.set(client);
@@ -70,7 +70,7 @@ public class WatcherServiceImplTest {
   }
 
   @Test
-  public void addWatchers() {
+  void addWatchers() {
     LanguageClient client = mock(LanguageClient.class);
     ClientProvider provider = new ClientProvider();
     provider.set(client);
@@ -91,7 +91,7 @@ public class WatcherServiceImplTest {
   }
 
   @Test
-  public void removeWatchers() {
+  void removeWatchers() {
     LanguageClient client = mock(LanguageClient.class);
     ClientProvider provider = new ClientProvider();
     provider.set(client);

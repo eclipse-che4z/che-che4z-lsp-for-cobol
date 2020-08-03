@@ -32,14 +32,14 @@ import static org.mockito.Mockito.when;
  * This test checks the logic of {@link CodeActions} delegate. It should collect the list of either
  * commands or code actions using the specific providers.
  */
-public class CodeActionsTest {
+class CodeActionsTest {
 
   /**
    * Check the {@link CodeActions} uses all the {@link CodeActionProvider} instances to collect the
    * list of code actions and commands.
    */
   @Test
-  public void collect() {
+  void collect() {
     CodeActionProvider provider1 = mock(CodeActionProvider.class);
     CodeActionProvider provider2 = mock(CodeActionProvider.class);
 

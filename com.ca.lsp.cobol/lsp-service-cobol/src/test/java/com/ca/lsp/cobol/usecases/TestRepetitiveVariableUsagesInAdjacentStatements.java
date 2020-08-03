@@ -25,7 +25,7 @@ import java.util.Map;
  * This test checks that document with multi-definitions parsed correctly and all the usages of
  * variables placed in a row retrieved.
  */
-public class TestRepetitiveVariableUsagesInAdjacentStatements {
+class TestRepetitiveVariableUsagesInAdjacentStatements {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -50,7 +50,7 @@ public class TestRepetitiveVariableUsagesInAdjacentStatements {
           + "       End program ProgramId.";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * in the line 6, but as designed the following token should be underscored as unexpected, because
  * in this case "PERORM" recognized as a variable.
  */
-public class TestCorrectErrorUnderscorePosition extends NegativeUseCase {
+class TestCorrectErrorUnderscorePosition extends NegativeUseCase {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\r\n"
@@ -42,7 +42,7 @@ public class TestCorrectErrorUnderscorePosition extends NegativeUseCase {
           + "            END-PERFORM.\r\n"
           + "            STOP RUN.";
 
-  public TestCorrectErrorUnderscorePosition() {
+  TestCorrectErrorUnderscorePosition() {
     super(TEXT);
   }
 

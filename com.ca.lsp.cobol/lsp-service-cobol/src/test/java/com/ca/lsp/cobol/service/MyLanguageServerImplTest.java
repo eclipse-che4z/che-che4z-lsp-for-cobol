@@ -34,14 +34,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /** This test asserts functions of the {@link MyLanguageServerImpl}, such as initialization. */
-public class MyLanguageServerImplTest {
+class MyLanguageServerImplTest {
 
   /**
    * Test the {@link MyLanguageServerImpl#initialized(InitializedParams)} method. Check that the
    * file system watchers registered correctly.
    */
   @Test
-  public void initialized() {
+  void initialized() {
     SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
 
@@ -70,7 +70,7 @@ public class MyLanguageServerImplTest {
    * there are only supported capabilities add to the {@link InitializeResult} instance.
    */
   @Test
-  public void initialize() {
+  void initialize() {
     MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, null);
     InitializeParams initializeParams = new InitializeParams();
 

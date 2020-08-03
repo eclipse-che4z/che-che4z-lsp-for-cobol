@@ -26,7 +26,7 @@ import java.util.Map;
  * This test checks that the REPLACING statement with several patterns specified does not cause any
  * syntax errors.
  */
-public class TestSeveralReplacingTags {
+class TestSeveralReplacingTags {
 
   private static final String TEXT =
       "0      IDENTIFICATION DIVISION.\r\n"
@@ -48,7 +48,7 @@ public class TestSeveralReplacingTags {
   private static final String CUSTCOPY_NAME = "CUSTCOPY";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(new CobolText(CUSTCOPY_NAME, CUSTCOPY)), Map.of());
   }
 }

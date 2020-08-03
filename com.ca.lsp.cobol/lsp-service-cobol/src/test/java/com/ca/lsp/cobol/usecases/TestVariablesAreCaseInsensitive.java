@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /** This test checks that the semantic analysis is case-insensitive. */
-public class TestVariablesAreCaseInsensitive {
+class TestVariablesAreCaseInsensitive {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -48,7 +48,7 @@ public class TestVariablesAreCaseInsensitive {
           + "       End program ProgramId.";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

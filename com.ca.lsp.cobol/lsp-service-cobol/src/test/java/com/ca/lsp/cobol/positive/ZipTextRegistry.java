@@ -28,9 +28,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-/**
- * Registry for Cobol source code files.
- */
+/** Registry for Cobol source code files. */
 @Singleton
 public class ZipTextRegistry implements CobolTextRegistry {
 

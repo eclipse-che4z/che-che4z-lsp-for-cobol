@@ -48,7 +48,7 @@ import static org.mockito.Mockito.*;
 
 /** This test checks the entry points of the {@link TextDocumentService} implementation. */
 @SuppressWarnings("unchecked")
-public class MyTextDocumentServiceTest extends ConfigurableTest {
+class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private static final String LANGUAGE = "COBOL";
   private static final String CPY_DOCUMENT_URI = "file:///.copybooks/CPYTEST.cpy";
@@ -64,14 +64,14 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   private TestLanguageClient client;
 
   @BeforeEach
-  public void createService() {
+  void createService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
   }
 
   @Test
-  public void testCompletion() {
+  void testCompletion() {
     openAndAwait();
     CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion =
         service.completion(
@@ -82,7 +82,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
-  public void testDidChange() {
+  void testDidChange() {
     List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
     service.didChange(
@@ -94,7 +94,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
-  public void testDidChangeOnCpyFiles() {
+  void testDidChangeOnCpyFiles() {
     List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
     MyTextDocumentService spyService = spy((MyTextDocumentService) service);
@@ -105,7 +105,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
-  public void testDidClose() {
+  void testDidClose() {
     openAndAwait();
     assertEquals(1, closeGetter(service).size());
     TextDocumentIdentifier testDocument = new TextDocumentIdentifier(DOCUMENT_URI);
@@ -115,7 +115,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
-  public void testDidSave() {
+  void testDidSave() {
     TextDocumentIdentifier saveDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
     DidSaveTextDocumentParams saveDocumentParams =
         new DidSaveTextDocumentParams(saveDocumentIdentifier);
@@ -127,7 +127,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
-  public void testIncorrectLanguageId() {
+  void testIncorrectLanguageId() {
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, "incorrectId", 1, TEXT_EXAMPLE)));
@@ -143,7 +143,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
-  public void testNotAllowedFileExtensionAnalysis() {
+  void testNotAllowedFileExtensionAnalysis() {
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(CPY_DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
@@ -162,7 +162,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
    * re-run analysis of the open documents if it receives a notification.
    */
   @Test
-  public void observerCallback() {
+  void observerCallback() {
 
     // configured mock object and diagnostic stubs
     Communications communications = mock(Communications.class);
@@ -235,7 +235,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
    * calls the {@link CodeActions#collect(CodeActionParams)}
    */
   @Test
-  public void testCodeActionsEndpoint() {
+  void testCodeActionsEndpoint() {
     DataBusBroker broker = mock(DataBusBroker.class);
     CodeActions actions = mock(CodeActions.class);
 
@@ -269,7 +269,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
    * from the document.
    */
   @Test
-  public void testDidCloseDisposeDiagnostics() {
+  void testDidCloseDisposeDiagnostics() {
     Communications spyCommunications = spy(Communications.class);
 
     DidCloseTextDocumentParams closedDocument =
@@ -327,7 +327,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
    * Communications#cancelProgressNotification(String)} is not called.
    */
   @Test
-  public void testImmediateClosingOfDocumentDoNotCauseNPE() {
+  void testImmediateClosingOfDocumentDoNotCauseNPE() {
     DataBusBroker broker = mock(DataBusBroker.class);
     Communications communications = mock(Communications.class);
     LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
@@ -353,7 +353,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   @Disabled("Not implemented yet")
   @Test
-  public void testHover() {
+  void testHover() {
     TextDocumentItem testHoverDocument =
         new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE);
     service.didOpen(new DidOpenTextDocumentParams(testHoverDocument));
@@ -373,7 +373,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
    * document URIs that contain nested copybooks, including the main document
    */
   @Test
-  public void testAnalysisFinishedNotification() {
+  void testAnalysisFinishedNotification() {
     DataBusBroker broker = mock(DataBusBroker.class);
     LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
     Communications communications = mock(Communications.class);

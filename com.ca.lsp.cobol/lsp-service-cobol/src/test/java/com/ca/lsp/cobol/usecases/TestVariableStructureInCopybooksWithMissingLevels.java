@@ -26,7 +26,7 @@ import java.util.Map;
  * error not thrown if there are no ambiguous definitions, even with skipped hierarchical levels on
  * usage.
  */
-public class TestVariableStructureInCopybooksWithMissingLevels {
+class TestVariableStructureInCopybooksWithMissingLevels {
 
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -45,7 +45,7 @@ public class TestVariableStructureInCopybooksWithMissingLevels {
   private static final String STRUCT_NAME = "STRUCT";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(new CobolText(STRUCT_NAME, STRUCT)), Map.of());
   }
 }

@@ -37,12 +37,12 @@ import java.util.List;
  * <p>100 IGYPS2072-S ""ST"" was invalid. Skipped to the next verb, period or procedure-name
  * definition."
  */
-@Disabled("Unsupported while semantic analysis is not implemented")
+@Disabled("Unsupported while semantic analysis not implemented")
 public class Chetest2Test extends NegativeTest {
   private static final String FILE_NAME = "CHETEST2.cbl";
   private static final int EXPECTED_ERRORS_NUMBER = 19;
 
-  public Chetest2Test() {
+  Chetest2Test() {
     super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
   }
 

@@ -30,7 +30,7 @@ import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ER
  *
  * <p>The REMARKS is an old syntax that is not supported anymore, so it should be marked as error.
  */
-public class TestRemarksAreUnsupported {
+class TestRemarksAreUnsupported {
 
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -54,7 +54,7 @@ public class TestRemarksAreUnsupported {
           + "       ENVIRONMENT DIVISION.";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(),

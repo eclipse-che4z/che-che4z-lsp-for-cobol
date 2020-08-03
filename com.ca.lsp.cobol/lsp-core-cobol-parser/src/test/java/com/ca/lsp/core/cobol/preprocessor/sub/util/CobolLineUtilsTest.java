@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This class is a unit test for {@link CobolLineUtils} and checks its utility methods. */
-public class CobolLineUtilsTest {
+class CobolLineUtilsTest {
 
   @Test
-  public void copyCobolLineWithContentArea() {
+  void copyCobolLineWithContentArea() {
     CobolLine line = new CobolLine();
     line.setCommentArea("000000");
     line.setContentAreaA("cont");
@@ -55,7 +55,7 @@ public class CobolLineUtilsTest {
   }
 
   @Test
-  public void copyCobolLineWithContentAreaLineIsSplitBetweenAreas() {
+  void copyCobolLineWithContentAreaLineIsSplitBetweenAreas() {
     CobolLine line = new CobolLine();
     line.setCommentArea("000000");
     line.setContentAreaA("cont");
@@ -72,7 +72,7 @@ public class CobolLineUtilsTest {
   }
 
   @Test
-  public void copyCobolLineWithIndicatorAndContentArea() {
+  void copyCobolLineWithIndicatorAndContentArea() {
     CobolLine line = new CobolLine();
     line.setCommentArea("000000");
     line.setIndicatorArea("*");
@@ -91,7 +91,7 @@ public class CobolLineUtilsTest {
   }
 
   @Test
-  public void copyCobolLineWithIndicatorArea() {
+  void copyCobolLineWithIndicatorArea() {
     CobolLine line = new CobolLine();
     line.setCommentArea("000000");
     line.setIndicatorArea("*");

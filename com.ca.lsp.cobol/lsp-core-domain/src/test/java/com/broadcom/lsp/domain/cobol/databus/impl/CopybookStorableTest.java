@@ -22,18 +22,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CopybookStorableTest extends CopybookStorableProvider {
+class CopybookStorableTest extends CopybookStorableProvider {
   private CopybookStorable storable = getDummyStorable();
 
   /** A storable object created is not already expired */
   @Test
-  public void testStorableNotExpired() {
+  void testStorableNotExpired() {
     assertFalse(storable.isExpired());
   }
 
   /** A storable object hit increase its hit value */
   @Test
-  public void testHitIncrement() {
+  void testHitIncrement() {
     // actual hit value
     int prevHit = storable.getHit();
     storable.match();

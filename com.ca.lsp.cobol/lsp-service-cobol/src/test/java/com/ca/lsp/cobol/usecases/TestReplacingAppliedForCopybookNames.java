@@ -26,7 +26,7 @@ import java.util.Map;
  * Test REPLACING statement changes nested copybook names. Here, CPYNAME should be replaced by
  * STRUCT1, so this copybook used.
  */
-public class TestReplacingAppliedForCopybookNames {
+class TestReplacingAppliedForCopybookNames {
 
   private static final String TEXT =
       "0      IDENTIFICATION DIVISION.\n"
@@ -48,7 +48,7 @@ public class TestReplacingAppliedForCopybookNames {
   private static final String STRUCT1_NAME = "STRUCT1";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(new CobolText(REPL_NAME, REPL), new CobolText(STRUCT1_NAME, STRUCT1)),

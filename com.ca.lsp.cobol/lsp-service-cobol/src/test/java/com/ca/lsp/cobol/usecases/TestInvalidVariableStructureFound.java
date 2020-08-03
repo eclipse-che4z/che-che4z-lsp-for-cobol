@@ -30,7 +30,7 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
  * is not a part of PARENT1 because they are on the same level, but on the line 8 they called the
  * way if CHILD1 was a part of PARENT1 structure. It is incorrect, so CHILD1 should be underlined.
  */
-public class TestInvalidVariableStructureFound {
+class TestInvalidVariableStructureFound {
   private static final String TEXT =
       "0      Identification Division. \n"
           + "1      Program-id.    ProgramId.\n"
@@ -46,7 +46,7 @@ public class TestInvalidVariableStructureFound {
   private static final String MESSAGE = "Invalid definition for: CHILD1";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT, List.of(), Map.of("1", new Diagnostic(null, MESSAGE, Information, INFO.getText())));
   }

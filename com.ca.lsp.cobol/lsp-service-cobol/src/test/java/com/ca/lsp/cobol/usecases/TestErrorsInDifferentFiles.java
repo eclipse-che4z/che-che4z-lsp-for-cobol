@@ -31,7 +31,7 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.*;
  * Test syntax errors found in a copybook displayed in the according file. Here, variable definition
  * in the copybook pasted to procedure division that is an error.
  */
-public class TestErrorsInDifferentFiles {
+class TestErrorsInDifferentFiles {
 
   private static final String TEXT =
       "0      Identification Division. \n"
@@ -50,7 +50,7 @@ public class TestErrorsInDifferentFiles {
   private static final String ASDASD_NAME = "ASDASD";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(new CobolText(ASDASD_NAME, ASDASD)),

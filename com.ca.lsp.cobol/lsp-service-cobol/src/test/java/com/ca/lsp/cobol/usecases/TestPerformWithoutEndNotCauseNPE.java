@@ -24,7 +24,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This use case checks that there is no NullPointerException thrown if END-PERFORM missing. */
-public class TestPerformWithoutEndNotCauseNPE extends NegativeUseCase {
+class TestPerformWithoutEndNotCauseNPE extends NegativeUseCase {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
@@ -37,7 +37,7 @@ public class TestPerformWithoutEndNotCauseNPE extends NegativeUseCase {
           + "       PERFORM MOVE 0 TO CHILD OF PARENT.\n"
           + "       GOBACK. ";
 
-  public TestPerformWithoutEndNotCauseNPE() {
+  TestPerformWithoutEndNotCauseNPE() {
     super(TEXT);
   }
 

@@ -25,7 +25,7 @@ import java.util.Map;
  * This test is looking for a clean implementation of a mechanism which can remove SQL, CICS, COPY
  * statements from COBOL code. If they are not removed then a syntax error thrown.
  */
-public class TestExtraLanguagesCleaned {
+class TestExtraLanguagesCleaned {
 
   private static final String TEXT =
       "000000  IDENTIFICATION DIVISION.\r\n"
@@ -96,7 +96,7 @@ public class TestExtraLanguagesCleaned {
           + "           \r\n";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

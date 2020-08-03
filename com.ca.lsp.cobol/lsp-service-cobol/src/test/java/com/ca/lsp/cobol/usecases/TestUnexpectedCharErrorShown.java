@@ -25,7 +25,7 @@ import java.util.Map;
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /** This test checks if the parser recognizes an unexpected symbol and shows it as an error. */
-public class TestUnexpectedCharErrorShown {
+class TestUnexpectedCharErrorShown {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION{%|typo}.\r\n"
@@ -37,7 +37,7 @@ public class TestUnexpectedCharErrorShown {
   private static final String MESSAGE = "Extraneous input '%' expected DOT_FS";
 
   @Test
-  public void test() {
+  void test() {
 
     UseCaseEngine.runTest(
         TEXT,

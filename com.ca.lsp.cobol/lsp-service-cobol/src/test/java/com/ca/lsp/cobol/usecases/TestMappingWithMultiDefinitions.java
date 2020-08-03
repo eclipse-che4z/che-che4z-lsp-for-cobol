@@ -26,7 +26,7 @@ import java.util.Map;
  * This test checks the positive scenario with building an extended document with correct positions
  * retrieval.
  */
-public class TestMappingWithMultiDefinitions {
+class TestMappingWithMultiDefinitions {
 
   private static final String DOCUMENT =
       "       IDENTIFICATION DIVISION.\r\n"
@@ -88,7 +88,7 @@ public class TestMappingWithMultiDefinitions {
   private static final String NESTED2_NAME = "NESTED2";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         DOCUMENT,
         List.of(

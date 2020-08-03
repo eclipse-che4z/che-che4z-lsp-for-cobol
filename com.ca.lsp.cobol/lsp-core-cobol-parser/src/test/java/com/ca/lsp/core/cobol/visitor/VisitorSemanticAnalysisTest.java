@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
  * found, then an error should be shown. Also, it should throw a suggestion if there is a typo in
  * keywords.
  */
-public class VisitorSemanticAnalysisTest {
+class VisitorSemanticAnalysisTest {
   private static final String WRONG_TOKEN = "MOVES";
   private static final String INVALID_VARIABLE = "invalid";
 
@@ -48,7 +48,7 @@ public class VisitorSemanticAnalysisTest {
    * semantic context.
    */
   @Test
-  public void testVariableDefinitionNotFound() {
+  void testVariableDefinitionNotFound() {
     CustomToken token = createNewToken(INVALID_VARIABLE);
     CobolVisitor visitor =
         new CobolVisitor(
@@ -69,7 +69,7 @@ public class VisitorSemanticAnalysisTest {
    * suggestion with the closest keyword.
    */
   @Test
-  public void testMisspelledKeywordDistance() {
+  void testMisspelledKeywordDistance() {
 
     CustomToken token = createNewToken(WRONG_TOKEN);
     CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);

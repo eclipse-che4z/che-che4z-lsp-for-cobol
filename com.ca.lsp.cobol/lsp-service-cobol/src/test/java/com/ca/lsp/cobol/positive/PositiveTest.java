@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * regressions. The complete error description with the file name logged.
  */
 @Slf4j
-public class PositiveTest extends ConfigurableTest {
+class PositiveTest extends ConfigurableTest {
   private static final String PATH_TO_TEST_RESOURCES = "filesToTestPath";
   private static List<CobolText> copybooks;
 
@@ -55,16 +55,18 @@ public class PositiveTest extends ConfigurableTest {
   @ParameterizedTest
   @MethodSource("retrieveTextsToTest")
   @DisplayName("Parameterized - positive tests")
-  public void test(CobolText text) {
+  @NullSource
+  void test(CobolText text) {
     if (text == null) {
       return;
     }
     log.debug("Processing: " + text.getFileName());
-    assertNoSyntaxErrorsFound(analyzeForErrors(text.getFileName(), text.getFullText(), copybooks), text);
+    assertNoSyntaxErrorsFound(
+        analyzeForErrors(text.getFileName(), text.getFullText(), copybooks), text);
   }
 
   private void assertNoSyntaxErrorsFound(List<Diagnostic> diagnostics, CobolText text) {
-      assertEquals(0, diagnostics.size(), createErrorMessage(diagnostics, text));
+    assertEquals(0, diagnostics.size(), createErrorMessage(diagnostics, text));
   }
 
   private String createErrorMessage(List<Diagnostic> diagnostics, CobolText text) {

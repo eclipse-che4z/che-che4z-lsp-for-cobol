@@ -29,7 +29,7 @@ import java.util.Map;
  * This test checks that there is no error thrown when there are several COPY statements one by one
  * with the same name in different cases.
  */
-public class TestSameCopybooksWithDifferentCases {
+class TestSameCopybooksWithDifferentCases {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
@@ -49,7 +49,7 @@ public class TestSameCopybooksWithDifferentCases {
   private static final String CPY_NAME = "STRUCT1";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(new CobolText(CPY_NAME, STRUCT1)), Map.of());
   }
 }

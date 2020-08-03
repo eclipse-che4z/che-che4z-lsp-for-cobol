@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /** This test checks that several COPY statements in a row won't cause mapping errors. */
-public class TestSeveralCopybooksInARow {
+class TestSeveralCopybooksInARow {
 
   private static final String DOCUMENT =
       "       IDENTIFICATION DIVISION.\r\n"
@@ -49,7 +49,7 @@ public class TestSeveralCopybooksInARow {
   private static final String STRUC2_NAME = "STRUC2";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         DOCUMENT,
         List.of(new CobolText(STRUC1_NAME, STRUC1), new CobolText(STRUC2_NAME, STRUC2)),

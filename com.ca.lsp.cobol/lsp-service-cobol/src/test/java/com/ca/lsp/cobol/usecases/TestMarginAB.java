@@ -23,8 +23,8 @@ import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUME
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
 import static org.junit.Assert.assertEquals;
 
-/** This test verifies if the margins are respected and warnings are thrown */
-public class TestMarginAB {
+/** This test verifies if the margins respected and warnings thrown */
+class TestMarginAB {
 
   /**
    * In TEXT_DIVISION_WRONG_PLACE string there are several DIVISIONS that are not in the right place
@@ -147,19 +147,19 @@ public class TestMarginAB {
           + "000000  END PROGRAM FILETOTEST.";
 
   @Test
-  public void checkForAreaA() {
+  void checkForAreaA() {
     AnalysisResult result = analyze(DOCUMENT_URI, TEXT_AREA_A, List.of());
     assertEquals(4, result.getDiagnostics().get(DOCUMENT_URI).size());
   }
 
   @Test
-  public void checkForAreaB() {
+  void checkForAreaB() {
     AnalysisResult result = analyze(DOCUMENT_URI, TEXT_AREA_B, List.of());
     assertEquals(4, result.getDiagnostics().get(DOCUMENT_URI).size());
   }
 
   @Test
-  public void checkCorrectProgramID() {
+  void checkCorrectProgramID() {
     AnalysisResult result = analyze(DOCUMENT_URI, TEXT_PROGRAM_ID, List.of());
 
     assertEquals(1, result.getDiagnostics().size());
@@ -169,7 +169,7 @@ public class TestMarginAB {
   }
 
   @Test
-  public void checkDeclaratives() {
+  void checkDeclaratives() {
     AnalysisResult result = analyze(DOCUMENT_URI, TEXT_DECLARATIVES, List.of());
 
     assertEquals(3, result.getDiagnostics().get(DOCUMENT_URI).size());

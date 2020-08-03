@@ -25,7 +25,7 @@ import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Test to check VariableCompletion */
-public class VariableCompletionTest {
+class VariableCompletionTest {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. ID1.\n"
@@ -46,7 +46,7 @@ public class VariableCompletionTest {
           + "       END PROGRAM ID1.";
 
   @Test
-  public void testVariableCompletion() {
+  void testVariableCompletion() {
     MyDocumentModel document = createModel();
     Set<Completion> completionSet = new HashSet<>();
     completionSet.add(new VariableCompletion());

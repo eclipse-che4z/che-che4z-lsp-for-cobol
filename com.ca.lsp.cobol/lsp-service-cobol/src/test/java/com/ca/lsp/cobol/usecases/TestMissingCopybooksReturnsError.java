@@ -25,7 +25,7 @@ import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ER
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** This test checks that if a copybook not found then error shown. */
-public class TestMissingCopybooksReturnsError {
+class TestMissingCopybooksReturnsError {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\r\n"
@@ -36,7 +36,7 @@ public class TestMissingCopybooksReturnsError {
           + "        PROCEDURE DIVISION.\r\n";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(),

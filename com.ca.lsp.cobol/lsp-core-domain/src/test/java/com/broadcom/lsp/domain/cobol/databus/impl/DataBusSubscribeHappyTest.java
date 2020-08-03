@@ -31,12 +31,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /** This test verifies that the observer is triggered by the event it is subscribed to. */
 @Slf4j
-public class DataBusSubscribeHappyTest extends DatabusConfigProvider {
+class DataBusSubscribeHappyTest extends DatabusConfigProvider {
 
   private DefaultDataBusBroker<RequiredCopybookEvent, RequiredCopybookEventSubscriber> databus;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
   }
 
@@ -50,7 +50,7 @@ public class DataBusSubscribeHappyTest extends DatabusConfigProvider {
 
   @Test
   @SneakyThrows
-  public void subscribe() {
+  void subscribe() {
     databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
     databus.postData(RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
     try {

@@ -24,7 +24,7 @@ import java.util.Map;
  * This test checks that there are no errors thrown if a string literal split and concatenated by a
  * concatenation line.
  */
-public class TestCobolStringWithContinuationLineConcatenatedCorrectly {
+class TestCobolStringWithContinuationLineConcatenatedCorrectly {
 
   private static final String TEXT =
       "000100 IDENTIFICATION DIVISION.\n"
@@ -48,7 +48,7 @@ public class TestCobolStringWithContinuationLineConcatenatedCorrectly {
   @Disabled("Continuation line cause a semantic error #414")
   // TODO: #414
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

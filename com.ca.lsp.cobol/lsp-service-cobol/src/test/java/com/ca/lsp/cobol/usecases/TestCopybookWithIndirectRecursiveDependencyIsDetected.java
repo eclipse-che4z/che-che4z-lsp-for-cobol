@@ -31,7 +31,7 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
  * This test checks the error shown if the copybook that is used in the COBOL file contains a link
  * to another one, that has a dependency to the first copybook.
  */
-public class TestCopybookWithIndirectRecursiveDependencyIsDetected {
+class TestCopybookWithIndirectRecursiveDependencyIsDetected {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\n"
@@ -52,7 +52,7 @@ public class TestCopybookWithIndirectRecursiveDependencyIsDetected {
       "Copybook declaration has more than 8 characters for: ";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(new CobolText(INNER_COPY_NAME, INNER_COPY), new CobolText(INDIRECT_NAME, INDIRECT)),

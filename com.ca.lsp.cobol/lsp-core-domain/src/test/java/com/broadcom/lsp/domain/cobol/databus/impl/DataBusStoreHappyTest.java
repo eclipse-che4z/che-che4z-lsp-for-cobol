@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** This tests verifies that serialization to a cache storable object works correctly. */
 @Slf4j
-public class DataBusStoreHappyTest extends DatabusConfigProvider {
+class DataBusStoreHappyTest extends DatabusConfigProvider {
   // cache dummy static content
   private static final String CPY_FIXED_NAME = "COPY-";
   private static final String CPY_FIXED_CONTENT = "FASDFASDFSF";
@@ -41,7 +41,7 @@ public class DataBusStoreHappyTest extends DatabusConfigProvider {
   private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> databus;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     // create a dummy Multimap
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
     fulfillDatabusCacheContent(databus.getCacheMaxSize());
@@ -62,7 +62,7 @@ public class DataBusStoreHappyTest extends DatabusConfigProvider {
 
   @Test
   @SneakyThrows
-  public void cacheData() {
+  void cacheData() {
     String newCopybookName = "COPY-" + (databus.getCacheMaxSize() + 1);
     assertFalse(
         databus.isStored(CopybookRepository.calculateUUID(new StringBuilder(newCopybookName))));
@@ -94,7 +94,7 @@ public class DataBusStoreHappyTest extends DatabusConfigProvider {
   }
 
   @Test
-  public void invalidateCacheTest() {
+  void invalidateCacheTest() {
     LOG.info("Current cache sizing is: " + databus.cacheSize());
     LOG.info("Apply cache invalidation...");
     databus.invalidateCache();
@@ -103,7 +103,7 @@ public class DataBusStoreHappyTest extends DatabusConfigProvider {
   }
 
   @Test
-  public void geteElementFromCache() {
+  void geteElementFromCache() {
     String element = "COPY-1";
     assertTrue(databus.isStored(CopybookRepository.calculateUUID(new StringBuilder(element))));
   }

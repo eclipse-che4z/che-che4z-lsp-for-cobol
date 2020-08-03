@@ -31,12 +31,12 @@ import static org.hamcrest.Matchers.hasToString;
 /**
  * This test checks the line preprocessing logic. Notice, that if there are less than 6 symbols in a
  * line, one space will be added during the preprocessing as a default indicator. All the symbols
- * after 80 should be removed and the new syntax error should be registered.
+ * after 80 should be removed, and the new syntax error should be registered.
  */
-public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
+class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
 
   @Test
-  public void testAllIndicators() {
+  void testAllIndicators() {
     List<String> lines = createTextToTest();
     String text = reduceLines(lines);
 
@@ -56,28 +56,28 @@ public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
 
   /** Empty string should not be processed. */
   @Test
-  public void testEmptyLine() {
+  void testEmptyLine() {
     ResultWithErrors<List<CobolLine>> processed = processText("");
     assertThat(processed.getResult(), hasSize(0));
     assertThat(processed.getErrors(), hasSize(0));
   }
 
   @Test
-  public void testTooShortString() {
+  void testTooShortString() {
     ResultWithErrors<List<CobolLine>> processed = processText("abc");
     assertThat(processed.getResult().get(0), hasToString("abc "));
     assertThat(processed.getErrors(), hasSize(0));
   }
 
   @Test
-  public void testOneSpace() {
+  void testOneSpace() {
     ResultWithErrors<List<CobolLine>> processed = processText(" ");
     assertThat(processed.getResult().get(0), hasToString("  "));
     assertThat(processed.getErrors(), hasSize(0));
   }
 
   @Test
-  public void testNoSpacesAddedIfIndicatorFieldFilled() {
+  void testNoSpacesAddedIfIndicatorFieldFilled() {
     String eightSpaces = "        ";
     ResultWithErrors<List<CobolLine>> processed = processText(eightSpaces);
     assertThat(processed.getResult().get(0), hasToString(eightSpaces));
@@ -86,7 +86,7 @@ public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
   }
 
   @Test
-  public void testSkipEmptyLineAtEnd() {
+  void testSkipEmptyLineAtEnd() {
     String firstLine =
         "000000 IDENTIFICATION DIVISION.                                         23323232";
     List<String> lines = Lists.newArrayList(firstLine, "");
@@ -98,7 +98,7 @@ public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
   }
 
   @Test
-  public void testEmptyLineAtMiddle() {
+  void testEmptyLineAtMiddle() {
     List<String> lines = new ArrayList<>();
     lines.add("000000 IDENTIFICATION DIVISION.                                         23323232");
     lines.add("");
@@ -113,7 +113,7 @@ public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
   }
 
   @Test
-  public void testTooLongStringIsCut() {
+  void testTooLongStringIsCut() {
     String tooLongString =
         "000000 IDENTIFICATION DIVISION.                                         23323232extra";
     String cutString =

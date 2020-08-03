@@ -25,12 +25,12 @@ import java.util.List;
  * <p>63 IGYDS0225-S An ""EXEC SQL"" statement was found, but the ""SQL"" compiler option was not in
  * effect. The statement was discarded."
  */
-@Disabled("Unsupported while semantic analysis is not implemented")
+@Disabled("Unsupported while semantic analysis not implemented")
 public class Marbles3Test extends NegativeTest {
   private static final String FILE_NAME = "MARBLES3.cbl";
   private static final int EXPECTED_ERRORS_NUMBER = 2;
 
-  public Marbles3Test() {
+  Marbles3Test() {
     super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
   }
 

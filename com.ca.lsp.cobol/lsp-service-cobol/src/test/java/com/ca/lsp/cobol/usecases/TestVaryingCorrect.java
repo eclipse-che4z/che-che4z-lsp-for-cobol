@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /** This use cases checks if varying with multiple identifiers works correctly. */
-public class TestVaryingCorrect {
+class TestVaryingCorrect {
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -66,7 +66,7 @@ public class TestVaryingCorrect {
   @ParameterizedTest
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - varying tests")
-  public void test(String text) {
+  void test(String text) {
     UseCaseEngine.runTest(text, List.of(), Map.of());
   }
 }

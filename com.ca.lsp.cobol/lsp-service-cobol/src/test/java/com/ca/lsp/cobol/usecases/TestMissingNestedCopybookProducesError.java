@@ -27,7 +27,7 @@ import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ER
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** Test missing nested copybooks produce syntax errors in parent copybooks. */
-public class TestMissingNestedCopybookProducesError {
+class TestMissingNestedCopybookProducesError {
 
   private static final String TEXT =
       "0      IDENTIFICATION DIVISION.\n"
@@ -46,7 +46,7 @@ public class TestMissingNestedCopybookProducesError {
   private static final String REPL_NAME = "REPL";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(new CobolText(REPL_NAME, REPL)),

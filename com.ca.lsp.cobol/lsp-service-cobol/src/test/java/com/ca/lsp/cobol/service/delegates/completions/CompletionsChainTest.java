@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /** This tests checks the order of completion elements: 1. Variables 2. Keywords */
-public class CompletionsChainTest extends ConfigurableTest {
+class CompletionsChainTest extends ConfigurableTest {
   private TextDocumentService service;
   private static final String TEXT =
       "       Identification Division. \n"
@@ -67,7 +67,7 @@ public class CompletionsChainTest extends ConfigurableTest {
           + "       End program ProgramId.";
 
   @BeforeEach
-  public void createService() {
+  void createService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
@@ -76,7 +76,7 @@ public class CompletionsChainTest extends ConfigurableTest {
   }
 
   @Test
-  public void testCompletionsOrder() throws ExecutionException, InterruptedException {
+  void testCompletionsOrder() throws ExecutionException, InterruptedException {
     List<CompletionItem> list = getCompletionItems(service, new Position(28, 22));
     assertFalse(list.isEmpty());
 

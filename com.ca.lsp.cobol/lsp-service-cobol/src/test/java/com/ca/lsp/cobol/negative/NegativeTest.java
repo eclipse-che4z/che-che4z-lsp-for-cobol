@@ -79,7 +79,7 @@ public abstract class NegativeTest extends ConfigurableTest {
         .orElseThrow(
             () ->
                 new IllegalArgumentException(
-                    "The specfied file " + fileName + " does not exist in the given archive"));
+                    "The specified file " + fileName + " does not exist in the given archive"));
   }
 
   private void assertErrorNumber(List<Diagnostic> diagnostics) {

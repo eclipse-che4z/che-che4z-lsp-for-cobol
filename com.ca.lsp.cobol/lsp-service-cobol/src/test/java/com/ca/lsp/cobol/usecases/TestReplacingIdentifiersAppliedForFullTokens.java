@@ -26,7 +26,7 @@ import java.util.Map;
  * Test REPLACING with literals applied only for full tokens. Here, applying "B BY VARC" should not
  * affect VARB
  */
-public class TestReplacingIdentifiersAppliedForFullTokens {
+class TestReplacingIdentifiersAppliedForFullTokens {
   private static final String TEXT =
       "0      IDENTIFICATION DIVISION.\n"
           + "1      PROGRAM-ID. TESTREPL.\n"
@@ -51,7 +51,7 @@ public class TestReplacingIdentifiersAppliedForFullTokens {
   private static final String REPL_NAME = "REPL";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(new CobolText(REPL_NAME, REPL)), Map.of());
   }
 }

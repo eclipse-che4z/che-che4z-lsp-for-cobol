@@ -26,7 +26,7 @@ import java.util.Map;
  * Test replacing with changing variable number returns a correct structure. Here, "01 AA-PARENT"
  * replaced by "05 EE-PARENT" that should change the structure to PARENT -> EE-PARENT
  */
-public class TestReplacingPseudoTextReplacesLevelNumber {
+class TestReplacingPseudoTextReplacesLevelNumber {
 
   private static final String TEXT =
       "0      IDENTIFICATION DIVISION.\n"
@@ -50,7 +50,7 @@ public class TestReplacingPseudoTextReplacesLevelNumber {
   private static final String REPL_NAME = "REPL";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(new CobolText(REPL_NAME, REPL)), Map.of());
   }
 }

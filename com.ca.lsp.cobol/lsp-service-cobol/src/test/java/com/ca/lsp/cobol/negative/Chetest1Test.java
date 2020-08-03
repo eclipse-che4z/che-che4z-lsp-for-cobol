@@ -29,12 +29,12 @@ import java.util.List;
  * <p>45 IGYDS1089-S ""DEENDING"" was invalid. Scanning was resumed at the next area ""A"" item,
  * level-number, or the start of the next clause."
  */
-@Disabled("Unsupported while semantic analysis is not implemented")
+@Disabled("Unsupported while semantic analysis not implemented")
 public class Chetest1Test extends NegativeTest {
   private static final String FILE_NAME = "CHETEST1.cbl";
   private static final int EXPECTED_ERRORS_NUMBER = 3;
 
-  public Chetest1Test() {
+  Chetest1Test() {
     super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
   }
 

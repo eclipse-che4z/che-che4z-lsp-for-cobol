@@ -32,11 +32,11 @@ import java.util.concurrent.TimeoutException;
  * notifications anymore.
  */
 @Slf4j
-public class DataBusUnSubscribeTest extends DatabusConfigProvider {
+class DataBusUnSubscribeTest extends DatabusConfigProvider {
   private DefaultDataBusBroker databus;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
   }
 
@@ -50,7 +50,7 @@ public class DataBusUnSubscribeTest extends DatabusConfigProvider {
 
   @Test
   @SneakyThrows
-  public void subscribe() throws TimeoutException {
+  void subscribe() throws TimeoutException {
     Assertions.assertThrows(
         TimeoutException.class,
         () -> {

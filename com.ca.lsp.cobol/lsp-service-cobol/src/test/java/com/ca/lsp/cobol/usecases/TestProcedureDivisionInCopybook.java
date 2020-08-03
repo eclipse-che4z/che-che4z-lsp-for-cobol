@@ -26,7 +26,7 @@ import java.util.Map;
  * This test checks the insertion of PROCEDURE DIVISION statement with a copybook doesn't produce
  * any error
  */
-public class TestProcedureDivisionInCopybook {
+class TestProcedureDivisionInCopybook {
   private static final String TEXT =
       "0       IDENTIFICATION DIVISION.\n"
           + "1      PROGRAM-ID. BKP92S1.        \n"
@@ -45,7 +45,7 @@ public class TestProcedureDivisionInCopybook {
   private static final String STRUCT1_NAME = "STRUCT1";
 
   @Test
-  public void assertAnalysisResult() {
+  void assertAnalysisResult() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(new CobolText(PROCDIV_NAME, PROCDIV), new CobolText(STRUCT1_NAME, STRUCT1)),

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /** This class checks that there are no errors shown for compiler directives on several lines */
-public class TestCompilerDirectivesNotCauseErrors {
+class TestCompilerDirectivesNotCauseErrors {
 
   private static final String TEXT =
       "       PROCESS NODYNAM,CODEPAGE(1140),NSYMBOL(NATIONAL)\n"
@@ -52,7 +52,7 @@ public class TestCompilerDirectivesNotCauseErrors {
           + "       END PROGRAM 'TEST1'.";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

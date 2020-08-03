@@ -26,7 +26,7 @@ import java.util.Map;
  * This test checks that there is no syntax error shown on a copybook usage when the copybook name
  * is a keyword (DETAIL in this case).
  */
-public class TestKeywordAsCopybookNotProducesNPE {
+class TestKeywordAsCopybookNotProducesNPE {
 
   private static final String TEXT =
       "0      Identification Division. \n"
@@ -47,7 +47,7 @@ public class TestKeywordAsCopybookNotProducesNPE {
   private static final String DETAIL_NAME = "DETAIL";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(new CobolText(DETAIL_NAME, DETAIL)), Map.of());
   }
 }

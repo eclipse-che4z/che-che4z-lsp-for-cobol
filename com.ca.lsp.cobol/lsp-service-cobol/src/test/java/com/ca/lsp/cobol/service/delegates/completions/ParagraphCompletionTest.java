@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Test to check ParagraphCompletion */
-public class ParagraphCompletionTest {
+class ParagraphCompletionTest {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -47,7 +47,7 @@ public class ParagraphCompletionTest {
    * then attempts to find the expected output
    */
   @Test
-  public void testParagraphCompletion() {
+  void testParagraphCompletion() {
     MyDocumentModel document = createModel();
 
     Set<Completion> completionSet = new HashSet<>();

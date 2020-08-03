@@ -45,7 +45,7 @@ import static org.mockito.Mockito.*;
  * requests.
  */
 @SuppressWarnings("unchecked")
-public class CopybookServiceTest {
+class CopybookServiceTest {
   private static final String VALID_CPY_NAME = "VALIDNAME";
   private static final String VALID_CPY_URI =
       "file:///c%3A/workspace/.c4z/.copybooks/VALIDNAME.CPY";
@@ -64,7 +64,7 @@ public class CopybookServiceTest {
   private Path parentPath = mock(Path.class);
 
   @BeforeEach
-  public void setupMocks() {
+  void setupMocks() {
     when(settingsService.getConfiguration("copybook-resolve", "document", VALID_CPY_NAME))
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(VALID_CPY_URI))));
     when(settingsService.getConfiguration("copybook-resolve", "document", INVALID_CPY_NAME))
@@ -86,7 +86,7 @@ public class CopybookServiceTest {
    * open" analysis.
    */
   @Test
-  public void testRequestWhileDidOpenProcessed() {
+  void testRequestWhileDidOpenProcessed() {
     CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
 
@@ -115,7 +115,7 @@ public class CopybookServiceTest {
    * open" analysis.
    */
   @Test
-  public void testResponseIfFileNotExists() {
+  void testResponseIfFileNotExists() {
     CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
 
@@ -141,7 +141,7 @@ public class CopybookServiceTest {
    * unable to resolve.
    */
   @Test
-  public void testRequestWhileDidChangeNotProcessed() {
+  void testRequestWhileDidChangeNotProcessed() {
     CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, null);
 
     copybookService.observerCallback(
@@ -159,7 +159,7 @@ public class CopybookServiceTest {
    * analysis thread.
    */
   @Test
-  public void testRequestWhenUriNotFoundProcessed() {
+  void testRequestWhenUriNotFoundProcessed() {
     CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
 
@@ -180,7 +180,7 @@ public class CopybookServiceTest {
    * analysis, and the URI cached.
    */
   @Test
-  public void testNoNewClientCallsOnDidChange() {
+  void testNoNewClientCallsOnDidChange() {
     CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
 
@@ -213,7 +213,7 @@ public class CopybookServiceTest {
 
   /** Test the cached URI deleted if the file is not available anymore. */
   @Test
-  public void testCacheInvalidatedIfUriUnavailable() {
+  void testCacheInvalidatedIfUriUnavailable() {
     CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
 
@@ -260,7 +260,7 @@ public class CopybookServiceTest {
    * to avoid dirty state
    */
   @Test
-  public void testCacheInvalidation() {
+  void testCacheInvalidation() {
     CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
 
@@ -298,7 +298,7 @@ public class CopybookServiceTest {
    * Test {@link CopybookService} responds even if the {@link SettingsService} return invalid result
    */
   @Test
-  public void testServiceRespondsIfClientSendsInvalidResult() {
+  void testServiceRespondsIfClientSendsInvalidResult() {
     CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
 
@@ -323,7 +323,7 @@ public class CopybookServiceTest {
    * events should not trigger downloading requests until new missed copybooks found.
    */
   @Test
-  public void testServiceSendsDownloadingRequestForAnalysisFinishedEvent() {
+  void testServiceSendsDownloadingRequestForAnalysisFinishedEvent() {
     CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
     verify(broker).subscribe(ANALYSIS_FINISHED_EVENT, copybookService);
@@ -399,7 +399,7 @@ public class CopybookServiceTest {
    * resolve all of them, including nested ones
    */
   @Test
-  public void testServiceSendsDownloadingRequestForAllNotResolvedCopybooks() {
+  void testServiceSendsDownloadingRequestForAllNotResolvedCopybooks() {
     CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
     verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
     verify(broker).subscribe(ANALYSIS_FINISHED_EVENT, copybookService);

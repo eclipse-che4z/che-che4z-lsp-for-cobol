@@ -32,7 +32,7 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
  * is no variable with name 'CPYNAME' in the defined variable list due to the copybook with this
  * name isn't resolved. There should be only 'PARENT'.
  */
-public class TestMissingCopybookNotInVariableList {
+class TestMissingCopybookNotInVariableList {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
@@ -43,7 +43,7 @@ public class TestMissingCopybookNotInVariableList {
           + "           MOVE 00 TO {$CHILD1|invalid|invalid} OF {$PARENT}.";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(),

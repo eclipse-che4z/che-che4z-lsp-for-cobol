@@ -29,7 +29,7 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
  * This test asserts syntax error on not defined variable. CHILD1 on line 6 is used, but not
  * defined, so it should be underlined.
  */
-public class TestMessageIfVariableNotDefined {
+class TestMessageIfVariableNotDefined {
   private static final String TEXT =
       "0      Identification Division. \n"
           + "1      Program-id.    ProgramId.\n"
@@ -43,7 +43,7 @@ public class TestMessageIfVariableNotDefined {
   private static final String MESSAGE = "Invalid definition for: CHILD1";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(),

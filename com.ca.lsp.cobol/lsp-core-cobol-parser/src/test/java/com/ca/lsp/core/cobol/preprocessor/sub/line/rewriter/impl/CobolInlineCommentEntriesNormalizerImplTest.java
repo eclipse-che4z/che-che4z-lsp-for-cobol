@@ -34,13 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * ProcessingConstants#COMMENT_TAG}. If the line doesn't have an ANTLR comment or has a space after
  * it, it should not be re-written.
  */
-public class CobolInlineCommentEntriesNormalizerImplTest {
+class CobolInlineCommentEntriesNormalizerImplTest {
 
   private static final String EMPTY_CONTENT_AREA_A = "    ";
 
   /** The line without a comment tag shouldn't be changed should not be changed */
   @Test
-  public void testNotMatchingLineIsNotChanged() {
+  void testNotMatchingLineIsNotChanged() {
     CobolLine normalLine = new CobolLine();
     normalLine.setSequenceArea(BLANK_SEQUENCE_AREA);
     normalLine.setIndicatorArea(WS);
@@ -59,7 +59,7 @@ public class CobolInlineCommentEntriesNormalizerImplTest {
    * The line with a comment tag, and a space after it shouldn't be changed should not be changed
    */
   @Test
-  public void testLineWithCommentAndSpaceIsNotChanged() {
+  void testLineWithCommentAndSpaceIsNotChanged() {
     CobolLine commentLine = new CobolLine();
     commentLine.setSequenceArea(BLANK_SEQUENCE_AREA);
     commentLine.setIndicatorArea(WS);
@@ -79,7 +79,7 @@ public class CobolInlineCommentEntriesNormalizerImplTest {
    * CobolInlineCommentEntriesNormalizerImpl} should add a space after this tag.
    */
   @Test
-  public void testLineWithCommentWithoutSpaceIsChanged() {
+  void testLineWithCommentWithoutSpaceIsChanged() {
     CobolLine commentLine = new CobolLine();
     commentLine.setSequenceArea(BLANK_SEQUENCE_AREA);
     commentLine.setIndicatorArea(WS);

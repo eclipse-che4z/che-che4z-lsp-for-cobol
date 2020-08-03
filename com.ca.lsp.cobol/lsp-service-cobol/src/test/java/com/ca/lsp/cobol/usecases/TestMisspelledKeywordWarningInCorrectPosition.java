@@ -29,7 +29,7 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
 
 /** This test checks that a misspelled keyword after a copybook usage is in the correct position */
-public class TestMisspelledKeywordWarningInCorrectPosition {
+class TestMisspelledKeywordWarningInCorrectPosition {
 
   private static final String TEXT =
       "0      Identification Division. \n"
@@ -52,7 +52,7 @@ public class TestMisspelledKeywordWarningInCorrectPosition {
   private static final String STRUC1_NAME = "STRUC1";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(new CobolText(STRUC1_NAME, STRUC1)),

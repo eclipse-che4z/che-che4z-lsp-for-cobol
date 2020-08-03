@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * databus.
  */
 @Slf4j
-public class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
+class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
   @Override
   public void observerCallback(DataEvent adaptedDataEvent) {
     waiter.assertTrue(getTargetEventType() == adaptedDataEvent.getEventType());
@@ -45,7 +45,7 @@ public class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
    */
   @Test
   @SneakyThrows
-  public void databusSubscriptionPositiveTest() {
+  void databusSubscriptionPositiveTest() {
     /*
      This positive test verify that a class subscribed to a specific DataEventType got a notification about that event.
      The main flow is explained below:

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /** This test checks that there are no errors on the "SKIP2" statement. */
-public class TestSkipStatement {
+class TestSkipStatement {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\n"
@@ -43,7 +43,7 @@ public class TestSkipStatement {
           + "        EJECT";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

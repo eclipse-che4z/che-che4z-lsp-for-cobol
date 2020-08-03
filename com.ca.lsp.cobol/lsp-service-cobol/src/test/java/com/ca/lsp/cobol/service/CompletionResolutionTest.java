@@ -38,16 +38,16 @@ import static org.junit.jupiter.api.Assertions.*;
  * does server manages different resolving requests, for example for the element that has
  * documentation provided, the one that has no documentation and an invalid request.
  */
-public class CompletionResolutionTest extends ConfigurableTest {
+class CompletionResolutionTest extends ConfigurableTest {
   private TextDocumentService service;
 
   @BeforeEach
-  public void createService() {
+  void createService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
   }
 
   @Test
-  public void testResolveCompletionItemExisting() {
+  void testResolveCompletionItemExisting() {
     CompletionItem unresolved = new CompletionItem("ADD");
 
     checkResolving(
@@ -59,13 +59,13 @@ public class CompletionResolutionTest extends ConfigurableTest {
   }
 
   @Test
-  public void testResolveCompletionItemNonExisting() {
+  void testResolveCompletionItemNonExisting() {
     CompletionItem unresolved = new CompletionItem("abcd");
     checkResolving(unresolved, c -> assertNull(c.getValue()));
   }
 
   @Test
-  public void testResolveCompletionItemEmpty() {
+  void testResolveCompletionItemEmpty() {
     CompletionItem unresolved = new CompletionItem();
     checkResolving(unresolved, c -> assertNull(c.getValue()));
   }

@@ -26,7 +26,7 @@ import java.util.Map;
  * This test verifies that several similar COPY statements with REPLACING does not produce
  * NullPointerException
  */
-public class TestSameCopybookReplacingDeclarationsNotProducesNPE {
+class TestSameCopybookReplacingDeclarationsNotProducesNPE {
 
   private static final String TEXT =
       "0      IDENTIFICATION DIVISION.\n"
@@ -45,7 +45,7 @@ public class TestSameCopybookReplacingDeclarationsNotProducesNPE {
   private static final String REPL_NAME = "REPL";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(new CobolText(REPL_NAME, REPL)), Map.of());
   }
 }

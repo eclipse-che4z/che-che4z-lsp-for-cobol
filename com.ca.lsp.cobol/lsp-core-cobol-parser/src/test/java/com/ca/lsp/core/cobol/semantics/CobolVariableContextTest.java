@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** Test for CobolVariableContextImpl */
-public class CobolVariableContextTest {
+class CobolVariableContextTest {
   private static final String LEVEL1 = "01";
   private static final String LEVEL2 = "02";
   private static final String LEVEL10 = "10";
@@ -65,7 +65,7 @@ public class CobolVariableContextTest {
   private List<Variable> variableList;
 
   @BeforeEach
-  public void createContext() {
+  void createContext() {
     context = new CobolVariableContext();
     var1 = new Variable(LEVEL1, VAR1); // 01
     var2 = new Variable(LEVEL2, VAR2); // 02
@@ -82,7 +82,7 @@ public class CobolVariableContextTest {
   }
 
   @Test
-  public void testDefine() {
+  void testDefine() {
     context.define(var1, ERROR_POSITION1);
     context.define(var2, ERROR_POSITION1);
     context.define(var3, ERROR_POSITION1);
@@ -97,14 +97,14 @@ public class CobolVariableContextTest {
   }
 
   @Test
-  public void testAddUsage() {
+  void testAddUsage() {
     context.addUsage(VAR1, ERROR_POSITION1);
     context.addUsage(VAR1, ERROR_POSITION2);
     assertEquals(2, context.getUsages().get(var1.getName()).size());
   }
 
   @Test
-  public void testGetNegative() {
+  void testGetNegative() {
     context.define(var1, ERROR_POSITION1);
     assertEquals(var1, context.get(VAR1));
     assertNull(context.get("null"));
@@ -112,7 +112,7 @@ public class CobolVariableContextTest {
   }
 
   @Test
-  public void testGetNames() {
+  void testGetNames() {
     context.define(var1, ERROR_POSITION1);
     context.define(var2, ERROR_POSITION1);
 
@@ -122,22 +122,22 @@ public class CobolVariableContextTest {
   }
 
   @Test
-  public void searchVariableInStructureHappyTest() {
+  void searchVariableInStructureHappyTest() {
     assertTrue(isVariableDefinedInStructure(variableList.get(0), "CHILD"));
   }
 
   @Test
-  public void searchVariableInStructureBadTest() {
+  void searchVariableInStructureBadTest() {
     assertFalse(isVariableDefinedInStructure(variableList.get(0), "CHILD222"));
   }
 
   @Test
-  public void getVariableByNameHappyTest() {
+  void getVariableByNameHappyTest() {
     assertNotNull(get(PARENT1));
   }
 
   @Test
-  public void getVariableByNameBadTest() {
+  void getVariableByNameBadTest() {
     assertNull(get("NEW-VARIABLE-NOT-CREATED"));
   }
 

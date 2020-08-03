@@ -35,7 +35,7 @@ import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.waitFo
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class TestFormatTrim extends ConfigurableTest {
+class TestFormatTrim extends ConfigurableTest {
   private static final String ID = "id";
 
   private TextDocumentService service;
@@ -51,7 +51,7 @@ public class TestFormatTrim extends ConfigurableTest {
           + "002800 INPUT-OUTPUT SECTION.                                            23323232  ";
 
   @BeforeEach
-  public void createService() {
+  void createService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
@@ -59,7 +59,7 @@ public class TestFormatTrim extends ConfigurableTest {
   }
 
   @Test
-  public void testTrimming() {
+  void testTrimming() {
     waitForDiagnostics(client);
     CompletableFuture<List<? extends TextEdit>> formatting =
         service.formatting(
@@ -74,7 +74,7 @@ public class TestFormatTrim extends ConfigurableTest {
   }
 
   @Test
-  public void testTrimmingBeforeDidOpenFinished() {
+  void testTrimmingBeforeDidOpenFinished() {
     CompletableFuture<List<? extends TextEdit>> formatting =
         service.formatting(
             new DocumentFormattingParams(

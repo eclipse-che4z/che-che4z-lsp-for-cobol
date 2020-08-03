@@ -23,14 +23,14 @@ import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
 import static com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** Testing that the cobol lines are formatted correctly before being used for token analysis */
-public class CobolLineIndicatorProcessorImplTest {
+/** Testing that the cobol lines formatted correctly before being used for token analysis */
+class CobolLineIndicatorProcessorImplTest {
 
   private static final String EMPTY_STRING = "";
 
   /** Testing Debug lines preformatting for Token analysis */
   @Test
-  public void debugLineTest() {
+  void debugLineTest() {
     CobolLine debugLine = new CobolLine();
     debugLine.setType(DEBUG);
     debugLine.setIndicatorArea(WS);
@@ -44,9 +44,9 @@ public class CobolLineIndicatorProcessorImplTest {
         WS + "         DEBUG LINE HERE", outcome.getIndicatorArea() + outcome.getContentArea());
   }
 
-  /** Testing normal lines preformatting for Token analysis */
+  /** Testing normal lines pre-formatting for Token analysis */
   @Test
-  public void normalLineTest() {
+  void normalLineTest() {
     CobolLine normalLine = new CobolLine();
     normalLine.setType(NORMAL);
     normalLine.setIndicatorArea(WS);
@@ -60,9 +60,9 @@ public class CobolLineIndicatorProcessorImplTest {
         WS + "             RANDOM TEXT , ", outcome.getIndicatorArea() + outcome.getContentArea());
   }
 
-  /** Testing Compiler Directive lines preformatting for Token analysis */
+  /** Testing Compiler Directive lines pre-formatting for Token analysis */
   @Test
-  public void compilerDirectiveTest() {
+  void compilerDirectiveTest() {
     CobolLine compilerDirectiveLine = new CobolLine();
     compilerDirectiveLine.setType(COMPILER_DIRECTIVE);
     compilerDirectiveLine.setIndicatorArea(WS);
@@ -75,9 +75,9 @@ public class CobolLineIndicatorProcessorImplTest {
     assertEquals(WS + EMPTY_STRING, outcome.getIndicatorArea() + outcome.getContentArea());
   }
 
-  /** Testing comment lines preformatting for Token analysis */
+  /** Testing comment lines pre-formatting for Token analysis */
   @Test
-  public void commentLineTest() {
+  void commentLineTest() {
     CobolLine commentLine = new CobolLine();
     commentLine.setType(COMMENT);
     commentLine.setIndicatorArea("*");
@@ -93,9 +93,9 @@ public class CobolLineIndicatorProcessorImplTest {
         outcome.getIndicatorArea() + outcome.getContentArea());
   }
 
-  /** Testing normal continuation line preformatting for Token analysis */
+  /** Testing normal continuation line pre-formatting for Token analysis */
   @Test
-  public void continuationLineTest() {
+  void continuationLineTest() {
     CobolLine startContinuationLine = new CobolLine();
     startContinuationLine.setType(NORMAL);
     startContinuationLine.setIndicatorArea(WS);
@@ -133,9 +133,9 @@ public class CobolLineIndicatorProcessorImplTest {
         outcomeList.get(2).getIndicatorArea() + outcomeList.get(2).getContentArea());
   }
 
-  /** Testing empty continuation line preformatting for Token analysis */
+  /** Testing empty continuation line pre-formatting for Token analysis */
   @Test
-  public void emptyContinuationLine() {
+  void emptyContinuationLine() {
     CobolLine continuationLine = new CobolLine();
     continuationLine.setType(NORMAL);
     continuationLine.setIndicatorArea(WS);
@@ -162,9 +162,9 @@ public class CobolLineIndicatorProcessorImplTest {
         outcomeList.get(1).getIndicatorArea() + outcomeList.get(1).getContentArea());
   }
 
-  /** Testing continuation lines with trailing comma preformatting for Token analysis */
+  /** Testing continuation lines with trailing comma pre-formatting for Token analysis */
   @Test
-  public void trailingCommaContinuationLineTest() {
+  void trailingCommaContinuationLineTest() {
     CobolLine startContinuationLine = new CobolLine();
     startContinuationLine.setType(NORMAL);
     startContinuationLine.setIndicatorArea(WS);
@@ -193,11 +193,11 @@ public class CobolLineIndicatorProcessorImplTest {
   }
 
   /**
-   * Testing a continuation line with no quotes at the start of the line preformatting for Token
+   * Testing a continuation line with no quotes at the start of the line pre-formatting for Token
    * analysis
    */
   @Test
-  public void continuationLineWithoutBeginningQuotes() {
+  void continuationLineWithoutBeginningQuotes() {
     CobolLine startContinuationLine = new CobolLine();
     startContinuationLine.setType(NORMAL);
     startContinuationLine.setIndicatorArea(WS);
@@ -228,11 +228,11 @@ public class CobolLineIndicatorProcessorImplTest {
   }
 
   /**
-   * Testing a continuation line with quotes at the start and end of the line preformatting for
+   * Testing a continuation line with quotes at the start and end of the line pre-formatting for
    * Token analysis
    */
   @Test
-  public void continuationLineWithOuterQuotes() {
+  void continuationLineWithOuterQuotes() {
     CobolLine startContinuationLine = new CobolLine();
     startContinuationLine.setType(NORMAL);
     startContinuationLine.setIndicatorArea(WS);

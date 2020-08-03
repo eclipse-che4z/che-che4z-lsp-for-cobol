@@ -26,7 +26,7 @@ import java.util.Map;
  * Test REPLACING statement not applied recursively. Here, the STRUCT1 copybook contains a variable
  * which name might replaced by the pattern, but it should not.
  */
-public class TestReplacingNotAppliedRecursively {
+class TestReplacingNotAppliedRecursively {
 
   private static final String TEXT =
       "0      IDENTIFICATION DIVISION.\n"
@@ -48,7 +48,7 @@ public class TestReplacingNotAppliedRecursively {
   private static final String STRUCT1_NAME = "STRUCT1";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(new CobolText(REPL_NAME, REPL), new CobolText(STRUCT1_NAME, STRUCT1)),

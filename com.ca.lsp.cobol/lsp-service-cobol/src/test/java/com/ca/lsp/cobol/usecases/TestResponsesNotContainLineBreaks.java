@@ -39,7 +39,7 @@ import static org.mockito.Mockito.*;
  * This test verifies that all the responses from server escaped from line breaks to prevent
  * incorrect parsing on the client side.
  */
-public class TestResponsesNotContainLineBreaks {
+class TestResponsesNotContainLineBreaks {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\n"
@@ -55,7 +55,7 @@ public class TestResponsesNotContainLineBreaks {
           + "            STOP RUN.";
 
   @Test
-  public void test() {
+  void test() {
     LanguageClient client = mock(LanguageClient.class);
     ArgumentCaptor<PublishDiagnosticsParams> captor = forClass(PublishDiagnosticsParams.class);
     FileSystemService files = mock(WorkspaceFileService.class);

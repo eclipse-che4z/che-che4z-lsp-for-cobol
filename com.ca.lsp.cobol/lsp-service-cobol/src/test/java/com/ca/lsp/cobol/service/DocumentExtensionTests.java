@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
  * extensions. If an extension of a document is unsupported (i.e. not "cob", "cbl" or "cobol"
  * ignoring case) then the according to notification should be sent.
  */
-public class DocumentExtensionTests {
+class DocumentExtensionTests {
   private static final String DOCUMENT_URI_BEGINNING = "file:///c%3A/workspace/document.";
   private static final String TEXT = "";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
@@ -44,18 +44,18 @@ public class DocumentExtensionTests {
   private LanguageEngineFacade engine;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     broker = mock(DataBusBroker.class);
     communications = mock(Communications.class);
     engine = mock(LanguageEngineFacade.class);
   }
 
   /**
-   * This test verify that supported cobol extensions are correctly analyzed by the underneath
-   * engine in both TextDocumentSync types [DID_OPEN|DID_CHANGE].
+   * This test verifies that supported cobol extensions correctly analyzed by the underneath engine
+   * in both TextDocumentSync types [DID_OPEN|DID_CHANGE].
    */
   @Test
-  public void testMatchingExtensions() {
+  void testMatchingExtensions() {
     checkExtensionMatches("cbl");
     checkExtensionMatches("CBL");
     checkExtensionMatches("cob");
@@ -65,7 +65,7 @@ public class DocumentExtensionTests {
   }
 
   @Test
-  public void testNonMatchingExtensions() {
+  void testNonMatchingExtensions() {
     checkExtensionNotMatches("cpy");
     checkExtensionNotMatches("CPY");
     checkExtensionNotMatches("txt");

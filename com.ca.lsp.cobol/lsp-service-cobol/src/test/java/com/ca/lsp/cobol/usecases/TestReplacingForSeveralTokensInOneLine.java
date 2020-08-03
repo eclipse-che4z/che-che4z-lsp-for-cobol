@@ -32,7 +32,7 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
  * the copybook content processed as CSTOUT-KEY and CSTOUT-ID. ABC-CHILD not defined, so there
  * should be the semantic error.
  */
-public class TestReplacingForSeveralTokensInOneLine {
+class TestReplacingForSeveralTokensInOneLine {
 
   private static final String DOCUMENT =
       "       IDENTIFICATION DIVISION.\r\n"
@@ -52,7 +52,7 @@ public class TestReplacingForSeveralTokensInOneLine {
   private static final String MESSAGE = "Invalid definition for: ABC-CHILD";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         DOCUMENT,
         List.of(new CobolText(REPL_NAME, REPL)),

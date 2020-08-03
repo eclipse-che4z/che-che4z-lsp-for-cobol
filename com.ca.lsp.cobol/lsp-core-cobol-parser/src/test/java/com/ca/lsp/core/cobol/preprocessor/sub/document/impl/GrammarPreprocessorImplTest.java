@@ -36,7 +36,7 @@ import static org.mockito.Mockito.*;
  * This test checks the logic of {@link GrammarPreprocessorImpl}, including building the extended
  * document, and merging the nested copybooks mappings.
  */
-public class GrammarPreprocessorImplTest {
+class GrammarPreprocessorImplTest {
 
   private static final String DOCUMENT = "document";
   private static final String TEXT = "COPY CPYNAME.";
@@ -49,7 +49,7 @@ public class GrammarPreprocessorImplTest {
   private static final Position COPY_POS = new Position(DOCUMENT, 0, 4, 0, 0, null);
 
   @Test
-  public void testBuildingExtendedDocument() {
+  void testBuildingExtendedDocument() {
     GrammarPreprocessorListenerImpl listener = mock(GrammarPreprocessorListenerImpl.class);
     GrammarPreprocessorListenerFactory factory = mock(GrammarPreprocessorListenerFactory.class);
 

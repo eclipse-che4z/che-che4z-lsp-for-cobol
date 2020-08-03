@@ -24,13 +24,13 @@ import static com.ca.lsp.core.cobol.preprocessor.sub.util.impl.CobolLineUtils.co
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
- * Unit test for class CobolCommentEntriesMarker. Checks that the lines with comment entries are
- * escaped and vice versa.
+ * Unit test for class CobolCommentEntriesMarker. Checks that the lines with comment entries escaped
+ * and vice versa.
  */
-public class CobolCommentEntriesMarkerImplTest {
+class CobolCommentEntriesMarkerImplTest {
 
   @Test
-  public void testLineWithTriggerEscaped() {
+  void testLineWithTriggerEscaped() {
     CobolLine line = new CobolLine();
     line.setSequenceArea(BLANK_SEQUENCE_AREA);
     line.setIndicatorArea(WS);
@@ -44,7 +44,7 @@ public class CobolCommentEntriesMarkerImplTest {
   }
 
   @Test
-  public void testLineWithoutTriggersNotChanged() {
+  void testLineWithoutTriggersNotChanged() {
     CobolLine line = new CobolLine();
     line.setSequenceArea(BLANK_SEQUENCE_AREA);
     line.setIndicatorArea(WS);
@@ -56,7 +56,7 @@ public class CobolCommentEntriesMarkerImplTest {
   }
 
   @Test
-  public void testLineWithTriggerInPreviousLineNotEscaped() {
+  void testLineWithTriggerInPreviousLineNotEscaped() {
     CobolLine line1 = new CobolLine();
     line1.setSequenceArea(BLANK_SEQUENCE_AREA);
     line1.setIndicatorArea(WS);

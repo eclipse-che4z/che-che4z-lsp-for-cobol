@@ -23,7 +23,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
+class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
   private static final String TEXT_TO_TEST =
       "078087                 PERFORM BBAB-MOVE-TO-DETAIL-MAP\r\n"
           + "078088                 MOVE -1 TO SNAMEDL\r\n"
@@ -46,7 +46,7 @@ public class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
           + "                       MOVE 'asd' NEXT LINE\r\n";
 
   @Test
-  public void test() {
+  void test() {
     ResultWithErrors<List<CobolLine>> result = super.processText(TEXT_TO_TEST);
     CobolLineWriter writer = new CobolLineWriterImpl();
     assertEquals(EXPECTED, writer.serialize(result.getResult()));

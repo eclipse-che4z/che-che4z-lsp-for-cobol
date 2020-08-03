@@ -24,7 +24,7 @@ import java.util.Map;
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /** This use case checks if extra symbols on one line do not cause any errors on the next line. */
-public class TestExtraSymbolsNotCauseErrorOnNextLine {
+class TestExtraSymbolsNotCauseErrorOnNextLine {
 
   private static final String TEXT =
       "000000 Identification DIVISION.                                         23323232{extra|1}\r\n" // Extra symbols at the end of this line
@@ -35,7 +35,7 @@ public class TestExtraSymbolsNotCauseErrorOnNextLine {
   private static final String MESSAGE = "The line doesn't match the fixed format";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(),

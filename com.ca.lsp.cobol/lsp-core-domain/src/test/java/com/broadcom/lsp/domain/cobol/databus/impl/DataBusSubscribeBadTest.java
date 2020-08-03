@@ -30,12 +30,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /** This test verifies that the observer is not triggered by the event it is not subscribed to. */
 @Slf4j
-public class DataBusSubscribeBadTest extends DatabusConfigProvider {
+class DataBusSubscribeBadTest extends DatabusConfigProvider {
 
   private DefaultDataBusBroker<RequiredCopybookEvent, RequiredCopybookEventSubscriber> databus;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
   }
 
@@ -48,7 +48,7 @@ public class DataBusSubscribeBadTest extends DatabusConfigProvider {
   }
 
   @Test
-  public void subscribe() {
+  void subscribe() {
     databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
     databus.postData(
         RequiredCopybookEvent.builder().name("REQUIRED_COPYBOOK_EVENT_SUBSCRIPTION TEST").build());

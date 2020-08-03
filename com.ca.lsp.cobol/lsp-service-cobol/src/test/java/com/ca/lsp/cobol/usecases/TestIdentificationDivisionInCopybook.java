@@ -26,7 +26,7 @@ import java.util.Map;
  * This test checks the insertion of IDENTIFICATION DIVISION statement with a copybook doesn't
  * produce any error
  */
-public class TestIdentificationDivisionInCopybook {
+class TestIdentificationDivisionInCopybook {
   private static final String TEXT =
       "0      COPY {~IDDIV}.\n"
           + "1      PROGRAM-ID. BKP92S1.        \n"
@@ -45,7 +45,7 @@ public class TestIdentificationDivisionInCopybook {
   private static final String STRUCT1_NAME = "STRUCT1";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(new CobolText(IDDIV_NAME, IDDIV), new CobolText(STRUCT1_NAME, STRUCT1)),

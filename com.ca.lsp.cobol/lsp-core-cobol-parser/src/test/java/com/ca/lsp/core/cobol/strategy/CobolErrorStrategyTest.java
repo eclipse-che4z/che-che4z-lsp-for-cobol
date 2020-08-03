@@ -26,9 +26,9 @@ import static org.mockito.Mockito.*;
  * Testing that the errors that are recognized at the end of file analysis are showing messages as
  * intended
  */
-public class CobolErrorStrategyTest {
+class CobolErrorStrategyTest {
   @Test
-  public void noViableAltExceptionTest() {
+  void noViableAltExceptionTest() {
     Parser recognizer = mock(Parser.class);
     TokenStream stream = mock(TokenStream.class);
     Token token = mock(Token.class);
@@ -47,7 +47,7 @@ public class CobolErrorStrategyTest {
   }
 
   @Test
-  public void inputMismatchExceptionTest() {
+  void inputMismatchExceptionTest() {
     Parser recognizer = mock(Parser.class);
     Token token = mock(Token.class);
     InputMismatchException errorMock = mock(InputMismatchException.class);
@@ -69,7 +69,7 @@ public class CobolErrorStrategyTest {
   }
 
   @Test
-  public void failedPredicateExceptionTest() throws NullPointerException {
+  void failedPredicateExceptionTest() throws NullPointerException {
     Assertions.assertThrows(
         NullPointerException.class,
         () -> {
@@ -83,7 +83,7 @@ public class CobolErrorStrategyTest {
   }
 
   @Test
-  public void unknownErrorTest() {
+  void unknownErrorTest() {
     Parser recognizer = mock(Parser.class);
     Token token = mock(Token.class);
     RecognitionException errorMock = mock(RecognitionException.class);

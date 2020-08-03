@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Testing Copybook autocomplete class, to determine if copybook names will be correctly detected
  * and shown in the autocomplete list
  */
-public class CopybookCompletionTest {
+class CopybookCompletionTest {
 
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -51,7 +51,7 @@ public class CopybookCompletionTest {
           + "       END PROGRAM ID1.";
 
   @Test
-  public void testCopybookCompletion() {
+  void testCopybookCompletion() {
     MyDocumentModel document = createModel();
     Set<Completion> completionSet = new HashSet<>();
     completionSet.add(new CopybookCompletion());

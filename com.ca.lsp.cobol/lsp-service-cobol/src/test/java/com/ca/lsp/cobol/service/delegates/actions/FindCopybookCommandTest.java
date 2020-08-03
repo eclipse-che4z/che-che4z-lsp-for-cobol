@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * Test {@link FindCopybookCommand} code action provider that resolves diagnostics for missing
  * copybooks.
  */
-public class FindCopybookCommandTest {
+class FindCopybookCommandTest {
 
   private static final String TITLE = "Resolve copybook";
   private static final String COPYBOOK_NAME = "CPYNAME";
@@ -48,7 +48,7 @@ public class FindCopybookCommandTest {
 
   /** Test a code action to resolve the required copybook created for the missing copybook error. */
   @Test
-  public void testCollectCommandsOrActionsPositive() {
+  void testCollectCommandsOrActionsPositive() {
     CodeActionProvider provider = new FindCopybookCommand();
 
     List<Diagnostic> diagnostics = singletonList(COPYBOOK_ERROR);
@@ -66,7 +66,7 @@ public class FindCopybookCommandTest {
 
   /** Test nothing created for a syntax error. */
   @Test
-  public void testCollectCommandsOrActionsNegative() {
+  void testCollectCommandsOrActionsNegative() {
 
     CodeActionProvider provider = new FindCopybookCommand();
 
@@ -82,7 +82,7 @@ public class FindCopybookCommandTest {
 
   /** Test only correct errors processed. */
   @Test
-  public void testCollectCommandsOrActionsMixed() {
+  void testCollectCommandsOrActionsMixed() {
     CodeActionProvider provider = new FindCopybookCommand();
 
     List<Diagnostic> diagnostics = Lists.newArrayList(SYNTAX_ERROR, COPYBOOK_ERROR);

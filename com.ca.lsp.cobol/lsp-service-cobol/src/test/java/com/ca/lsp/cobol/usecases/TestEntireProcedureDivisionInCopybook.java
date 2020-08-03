@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * This test checks that the grammar may process the entire procedure division put into a copybook
  */
-public class TestEntireProcedureDivisionInCopybook {
+class TestEntireProcedureDivisionInCopybook {
   private static final String TEXT =
       "0       IDENTIFICATION DIVISION.\n"
           + "1      PROGRAM-ID. BKP92S1.        \n"
@@ -45,7 +45,7 @@ public class TestEntireProcedureDivisionInCopybook {
   private static final String STRUCT1_NAME = "STRUCT1";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(new CobolText(PROGA_NAME, PROGA), new CobolText(STRUCT1_NAME, STRUCT1)),

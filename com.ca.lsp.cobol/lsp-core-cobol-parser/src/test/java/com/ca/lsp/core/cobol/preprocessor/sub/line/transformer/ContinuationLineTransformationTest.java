@@ -24,11 +24,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This test checks the continuation line transformation logic. */
-public class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTest {
+class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTest {
 
   /** POSITIVE TEXT: No text allowed in the content area A */
   @Test
-  public void testNoContentAreaAInContinuationLine() {
+  void testNoContentAreaAInContinuationLine() {
     String line = "000010-    NO CONTENT AREA ON THIS LINE";
     List<SyntaxError> errors = runTransformation(line);
     assertEquals(0, errors.size());
@@ -39,7 +39,7 @@ public class ContinuationLineTransformationTest extends AbstractCobolLinePreproc
    * syntax error
    */
   @Test
-  public void testContentAreaAInContinuationLine() {
+  void testContentAreaAInContinuationLine() {
     String line = "000010-THERE IS CONTENT AREA DEFINED HERE";
     List<SyntaxError> errors = runTransformation(line);
     assertEquals(1, errors.size());
@@ -50,7 +50,7 @@ public class ContinuationLineTransformationTest extends AbstractCobolLinePreproc
    * result: 0 Syntax Error
    */
   @Test
-  public void testContinuationLineCasePositive() {
+  void testContinuationLineCasePositive() {
     List<String> lines = new ArrayList<>();
     lines.add("000000 IDENTIFICATION DIVISION.                                         23323232");
     lines.add("000010 PROGRAM-ID. test1.                                               23323232");
@@ -69,7 +69,7 @@ public class ContinuationLineTransformationTest extends AbstractCobolLinePreproc
    * continuation line - Expected result: 1 Syntax Error
    */
   @Test
-  public void testContinuationLineCaseNegative() {
+  void testContinuationLineCaseNegative() {
 
     List<String> lines = new ArrayList<>();
     lines.add("000000 IDENTIFICATION DIVISION.                                         23323232");
@@ -86,7 +86,7 @@ public class ContinuationLineTransformationTest extends AbstractCobolLinePreproc
   }
 
   @Test
-  public void testQuotesInsideStringNotCauseError() {
+  void testQuotesInsideStringNotCauseError() {
     List<String> lines = new ArrayList<>();
 
     lines.add("       VALUE 'DFHCOMMAREA xmlns=\"http://www.BKP92S1O.com/schem'.");

@@ -48,7 +48,7 @@ import static junit.framework.TestCase.assertTrue;
  * objects in cache expected to be serializable.
  */
 @Slf4j
-public class TestCopybookCaching {
+class TestCopybookCaching {
   private final String COPYBOOK_NAME = "copy";
   private final String COPYBOOK_CONTENT = "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
 
@@ -60,7 +60,7 @@ public class TestCopybookCaching {
   private CopybookResolutionProvider resolution;
 
   @BeforeEach
-  public void init() {
+  void init() {
     Injector injector = Guice.createInjector(new DatabusModule(), new EngineModule());
     databus = injector.getInstance(DataBusBroker.class);
     resolution = injector.getInstance(CopybookResolutionProvider.class);
@@ -91,25 +91,25 @@ public class TestCopybookCaching {
   }
 
   @AfterEach
-  public void cleanup() {
+  void cleanup() {
     databus.invalidateCache();
   }
 
   @Test
-  public void serializeMultiMapInString() {
+  void serializeMultiMapInString() {
     log.info("Test serialization in String");
     assertTrue(MultiMapSerializableHelper.serializeInString(paragraphDefinitions).length() > 0);
   }
 
   @Test
-  public void serializeMultiMapInHashMap() {
+  void serializeMultiMapInHashMap() {
     log.info("Test serialization in HashMap");
     assertTrue(MultiMapSerializableHelper.serializeInHashMap(paragraphDefinitions).size() > 0);
   }
 
   /** This test verifies that after the analysis a specific copybook retrieved from the cache */
   @Test
-  public void analyzeCopybookFromCache() {
+  void analyzeCopybookFromCache() {
     // test the behavior on DID_OPEN
     assertDidOpenAnalysisFromCache();
     // test the behavior on DID_CHANGE
@@ -121,7 +121,7 @@ public class TestCopybookCaching {
    * filesystem and then is available in the cache.
    */
   @Test
-  public void analyzeCopybookFromCopybookService() {
+  void analyzeCopybookFromCopybookService() {
     // test the behavior on DID_OPEN
     assertDidOpenFromCopybookService();
     // test the behavior on DID_CHANGE

@@ -22,7 +22,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This use case checks if there is an error thrown if the END-PERFORM token is missing */
-public class TestEndPerformCausesError extends NegativeUseCase {
+class TestEndPerformCausesError extends NegativeUseCase {
 
   private static final String TEXT =
       "000100 IDENTIFICATION DIVISION.\n"
@@ -48,7 +48,7 @@ public class TestEndPerformCausesError extends NegativeUseCase {
           + "001300        000-START-EXIT.\n"
           + "001400            EXIT.";
 
-  public TestEndPerformCausesError() {
+  TestEndPerformCausesError() {
     super(TEXT);
   }
 

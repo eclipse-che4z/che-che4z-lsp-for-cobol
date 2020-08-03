@@ -28,7 +28,7 @@ import java.util.Map;
  * processed as CSTOUT-KEY and CSTOUT-ID, and those variables are available for "Go to Definition"
  * request.
  */
-public class TestMappingWithReplacing {
+class TestMappingWithReplacing {
 
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\r\n"
@@ -49,7 +49,7 @@ public class TestMappingWithReplacing {
   private static final String CUSTCOPY_NAME = "CUSTCOPY";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(new CobolText(CUSTCOPY_NAME, CUSTCOPY)), Map.of());
   }
 }

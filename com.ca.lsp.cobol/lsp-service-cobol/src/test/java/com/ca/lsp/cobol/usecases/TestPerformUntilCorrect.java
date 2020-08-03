@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /** This use cases checks if "PERFORM" with the "UNTIL" sentence processed correctly. */
-public class TestPerformUntilCorrect {
+class TestPerformUntilCorrect {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\r\n"
@@ -37,7 +37,7 @@ public class TestPerformUntilCorrect {
           + "           END-PERFORM.";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

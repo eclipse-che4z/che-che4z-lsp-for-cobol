@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  * event types and asserts that they created correctly.
  */
 @Slf4j
-public class CopybookEventSubscribersTest {
+class CopybookEventSubscribersTest {
   static class DatabusObserverTest implements EventObserver<DataEvent> {
     @Override
     public void observerCallback(DataEvent adaptedDataEvent) {
@@ -51,37 +51,37 @@ public class CopybookEventSubscribersTest {
   private DatabusObserverTest databusObserver;
 
   @BeforeEach
-  public void initObserver() {
+  void initObserver() {
     databusObserver = new DatabusObserverTest();
   }
 
   /** This test verifies that the RequiredCopybook factory creates a new RequiredCopybook event */
   @Test
-  public void testRequireSubscriberFactory() {
+  void testRequireSubscriberFactory() {
     assertEquals(REQCPY, getRequiredSubscriberFromFactory());
   }
 
   /** This test verifies that the FetchedCopybook factory creates a new FetchedCopybook event */
   @Test
-  public void testFetchSubscriberFactory() {
+  void testFetchSubscriberFactory() {
     assertEquals(FETCHEDCPY, getFetchedSubscriberFromFactory());
   }
 
   /** This test verifies that the Unknown factory creates a new Unknown event */
   @Test
-  public void testUnknownSubscriberFactory() {
+  void testUnknownSubscriberFactory() {
     assertEquals(UNKNOWN, getUnknownSubscriberFromFactory());
   }
 
   /** This test verifies that the RunAnalysis factory creates a new RunAnalysis event */
   @Test
-  public void testRunAnalysisSubscriberFactory() {
+  void testRunAnalysisSubscriberFactory() {
     assertEquals(RUN_ANALYSIS, getRunAnalysisSubscriberFromFactory());
   }
 
   /** This test verifies that a wrong factory isn't returned. */
   @Test
-  public void negativeTestSubscriberFactory() {
+  void negativeTestSubscriberFactory() {
     assertNotEquals(REQCPY, getFetchedSubscriberFromFactory());
     assertNotEquals(UNKNOWN, getFetchedSubscriberFromFactory());
 

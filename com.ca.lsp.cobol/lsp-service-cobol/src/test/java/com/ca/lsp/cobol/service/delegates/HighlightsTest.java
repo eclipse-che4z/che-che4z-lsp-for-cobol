@@ -75,7 +75,7 @@ public class HighlightsTest extends ConfigurableTest {
   private TextDocumentService service;
 
   @BeforeEach
-  public void initializeService() {
+  void initializeService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
@@ -84,7 +84,7 @@ public class HighlightsTest extends ConfigurableTest {
   }
 
   @Test
-  public void findHighlightsTest() throws InterruptedException, ExecutionException {
+  void findHighlightsTest() throws InterruptedException, ExecutionException {
     List<Range> documentHighlights =
         service
             .documentHighlight(

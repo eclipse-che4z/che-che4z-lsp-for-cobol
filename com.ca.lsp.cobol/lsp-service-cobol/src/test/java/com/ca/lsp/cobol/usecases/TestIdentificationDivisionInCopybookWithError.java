@@ -30,7 +30,7 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
  * This test checks the insertion of IDENTIFICATION DIVISION statement that contains a syntax error
  * in a copybook found and underlined correctly
  */
-public class TestIdentificationDivisionInCopybookWithError {
+class TestIdentificationDivisionInCopybookWithError {
   private static final String TEXT =
       "0      COPY {~IDDIV}.\n"
           + "1      PROGRAM-ID. BKP92S1.        \n"
@@ -51,7 +51,7 @@ public class TestIdentificationDivisionInCopybookWithError {
   private static final String MESSAGE = "Syntax error on 'DIVISIONs' expected DIVISION";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(new CobolText(IDDIV_NAME, IDDIV), new CobolText(STRUCT1_NAME, STRUCT1)),

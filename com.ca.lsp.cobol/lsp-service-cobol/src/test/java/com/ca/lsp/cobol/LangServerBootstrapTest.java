@@ -37,17 +37,17 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** This test check the logic of the application bootstrap */
-public class LangServerBootstrapTest {
+class LangServerBootstrapTest {
 
   private static final String PIPES = "pipeEnabled";
 
   @AfterEach
-  public void shutdownContext() {
+  void shutdownContext() {
     shutdown();
   }
 
   @Test
-  public void initCtx() {
+  void initCtx() {
     LangServerBootstrap.initCtx();
 
     // Bound class in Service module
@@ -60,25 +60,25 @@ public class LangServerBootstrapTest {
   }
 
   @Test
-  public void isPipeEnabledPositive() {
+  void isPipeEnabledPositive() {
     String[] args = new String[] {PIPES};
     assertTrue(LangServerBootstrap.isPipeEnabled(args));
   }
 
   @Test
-  public void isPipeEnabledUseSocket() {
+  void isPipeEnabledUseSocket() {
     String[] args = new String[] {};
     assertFalse(LangServerBootstrap.isPipeEnabled(args));
   }
 
   @Test
-  public void isPipeEnabledInvalidArgument() {
+  void isPipeEnabledInvalidArgument() {
     String[] args = new String[] {"invalidArgument"};
     assertFalse(LangServerBootstrap.isPipeEnabled(args));
   }
 
   @Test
-  public void createServerLauncherWithSocket() throws IOException {
+  void createServerLauncherWithSocket() throws IOException {
     LanguageServer server = new TestLanguageServer();
 
     newSingleThreadExecutor()
@@ -97,7 +97,7 @@ public class LangServerBootstrapTest {
   }
 
   @Test
-  public void createServerLauncher() {
+  void createServerLauncher() {
     LanguageServer server = new TestLanguageServer();
 
     Launcher<LanguageClient> launcher =
@@ -107,7 +107,7 @@ public class LangServerBootstrapTest {
   }
 
   @Test
-  public void startServer() throws IOException {
+  void startServer() throws IOException {
     Launcher<LanguageClient> launcher =
         LangServerBootstrap.launchServer(new String[] {PIPES}, new TestLanguageServer());
     assertNotNull(launcher.getRemoteProxy());

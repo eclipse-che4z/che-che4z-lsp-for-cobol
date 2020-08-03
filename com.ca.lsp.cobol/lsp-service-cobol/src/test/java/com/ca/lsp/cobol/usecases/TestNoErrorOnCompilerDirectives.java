@@ -39,8 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * <p>The CBL (PROCESS) statement must be placed before any comment lines or other
  * compiler-directing statements.
  */
-public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
-  public TestNoErrorOnCompilerDirectives() {
+class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
+  TestNoErrorOnCompilerDirectives() {
     super(null);
   }
 
@@ -67,43 +67,43 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
           + "024200 PROCEDURE DIVISION .                                             CM1014.2\r\n";
 
   @Test
-  public void testCorrectText() {
+  void testCorrectText() {
     setText("" + FOLLOWING_TEXT);
     super.test();
   }
 
   @Test
-  public void testCblWithoutNumbers() {
+  void testCblWithoutNumbers() {
     setText(CBL_WITHOUT_NUMBERS + FOLLOWING_TEXT);
     super.test();
   }
 
   @Test
-  public void testCblWithNumbers() {
+  void testCblWithNumbers() {
     setText(CBL_WITH_NUMBER + FOLLOWING_TEXT);
     super.test();
   }
 
   @Test
-  public void testProcessWithoutNumbers() {
+  void testProcessWithoutNumbers() {
     setText(PROCESS_WITHOUT_NUMBER + FOLLOWING_TEXT);
     super.test();
   }
 
   @Test
-  public void testProcessWithNumbers() {
+  void testProcessWithNumbers() {
     setText(PROCESS_WITH_NUMBER + FOLLOWING_TEXT);
     super.test();
   }
 
   @Test
-  public void testCblWithLongLine() {
+  void testCblWithLongLine() {
     setText(CBL_WITH_LONG_LINE + FOLLOWING_TEXT);
     super.test();
   }
 
   @Test
-  public void testProcessWithoutNumbersWithTypo() {
+  void testProcessWithoutNumbersWithTypo() {
     Range range =
         retrieveRange(analyzeForErrors(DOCUMENT_URI, PROCESS_WITHOUT_NUMBER_TYPO + FOLLOWING_TEXT));
     // TODO: Update this test when the compiler directives fully supported
@@ -115,7 +115,7 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
   }
 
   @Test
-  public void testProcessWithNumbersWithTypo() {
+  void testProcessWithNumbersWithTypo() {
     Range range =
         retrieveRange(analyzeForErrors(DOCUMENT_URI, PROCESS_WITH_NUMBER_TYPO + FOLLOWING_TEXT));
 
@@ -127,7 +127,7 @@ public class TestNoErrorOnCompilerDirectives extends PositiveUseCase {
 
   @Disabled("Feature is not yet supported")
   @Test
-  public void testLinesBeforeCblNotAllowed() {
+  void testLinesBeforeCblNotAllowed() {
     Range range = retrieveRange(analyzeForErrors(DOCUMENT_URI, FOLLOWING_TEXT + CBL_WITH_NUMBER));
 
     assertEquals(1, range.getStart().getLine());

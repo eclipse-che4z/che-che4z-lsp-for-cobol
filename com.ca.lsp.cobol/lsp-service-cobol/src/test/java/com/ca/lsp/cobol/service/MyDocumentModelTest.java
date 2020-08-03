@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class MyDocumentModelTest {
+class MyDocumentModelTest {
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1.\r\n"
@@ -39,72 +39,72 @@ public class MyDocumentModelTest {
   private MyDocumentModel model;
 
   @BeforeEach
-  public void createModel() {
+  void createModel() {
     model = new MyDocumentModel(TEXT, AnalysisResult.empty());
   }
 
   @Test
-  public void testGetText() {
+  void testGetText() {
     assertEquals(TEXT, model.getText());
   }
 
   @Test
-  public void testGetResolvedRoutes() {
+  void testGetResolvedRoutes() {
     assertEquals(LINES_NUMBER, model.getLines().size());
   }
 
   @Test
-  public void testGetFirstRoute() {
+  void testGetFirstRoute() {
     assertEquals(retrieveFirstTextLine(), model.getLine(0).getText());
   }
 
   @Test
-  public void testGetSecondRoute() {
+  void testGetSecondRoute() {
     assertEquals(retrieveSecondTextLine(), model.getLine(1).getText());
   }
 
   @Test
-  public void testGetNoLines() {
+  void testGetNoLines() {
     assertNull(model.getLine(-1));
   }
 
   @Test
-  public void testGetResolvedLines() {
+  void testGetResolvedLines() {
     assertEquals(LINES_NUMBER, model.getLines().size());
   }
 
   @Test
-  public void testGetTokenEmptyPosition() {
+  void testGetTokenEmptyPosition() {
     Position pos = new Position();
     assertEquals("", model.getTokenBeforePosition(pos));
   }
 
   @Test
-  public void testGetTokenInvalidPosition() {
+  void testGetTokenInvalidPosition() {
     Position pos = new Position(-1, -1);
     assertEquals("", model.getTokenBeforePosition(pos));
   }
 
   @Test
-  public void testGetTokenInvalidPositionWithCorrectLine() {
+  void testGetTokenInvalidPositionWithCorrectLine() {
     Position pos = new Position(3, -19);
     assertEquals("", model.getFullTokenAtPosition(pos));
   }
 
   @Test
-  public void testPositionAtDelimiter() {
+  void testPositionAtDelimiter() {
     Position pos = new Position(1, 19);
     assertEquals("", model.getTokenBeforePosition(pos));
   }
 
   @Test
-  public void testGetTokenInvalid() {
+  void testGetTokenInvalid() {
     Position pos = new Position(0, -1);
     assertEquals("", model.getTokenBeforePosition(pos));
   }
 
   @Test
-  public void testTokenRetrieving() {
+  void testTokenRetrieving() {
     MyDocumentModel model = new MyDocumentModel("a bc\r\nde", AnalysisResult.empty());
     assertEquals("", model.getTokenBeforePosition(new Position(0, 0)));
     assertEquals("a", model.getTokenBeforePosition(new Position(0, 1)));

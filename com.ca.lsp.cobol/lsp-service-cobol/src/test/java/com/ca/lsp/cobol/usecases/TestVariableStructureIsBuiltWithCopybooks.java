@@ -27,7 +27,7 @@ import java.util.Map;
  * 02. By idea this variable will be recognized as a child of PARENT variable. if not, there will be
  * an error thrown at CHILD OF PARENT statement.
  */
-public class TestVariableStructureIsBuiltWithCopybooks {
+class TestVariableStructureIsBuiltWithCopybooks {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
@@ -46,7 +46,7 @@ public class TestVariableStructureIsBuiltWithCopybooks {
   private static final String STRUCT_NAME = "STRUCT";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(new CobolText(STRUCT_NAME, STRUCT)), Map.of());
   }
 }

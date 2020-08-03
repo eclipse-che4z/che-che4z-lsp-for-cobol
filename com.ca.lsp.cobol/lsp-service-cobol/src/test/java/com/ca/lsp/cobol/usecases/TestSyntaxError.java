@@ -28,7 +28,7 @@ import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.WA
  * This test checks if the parser recognizes typo on the "DIVISIONs" token. The correct is
  * "DIVISION".
  */
-public class TestSyntaxError {
+class TestSyntaxError {
 
   private static final String TEXT =
       "        IDENTIFICATION {DIVISIONs|typo}.\r\n" // Typo on DIVISIONs
@@ -41,7 +41,7 @@ public class TestSyntaxError {
   private static final String NAME = "There is an issue with PROGRAM-ID paragraph";
 
   @Test
-  public void test() {
+  void test() {
 
     UseCaseEngine.runTest(
         TEXT,

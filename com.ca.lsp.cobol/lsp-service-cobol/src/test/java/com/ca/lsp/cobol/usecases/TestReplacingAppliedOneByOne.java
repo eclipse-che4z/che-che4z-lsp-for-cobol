@@ -27,7 +27,7 @@ import java.util.Map;
  * the resulting replacement. Here, 'ABC' replaced by 'DEF', 'DEF' by 'GHI', and 'GHI' by 'JKL' in a
  * row, so the variable ABC-ID should turn into JKL-ID.
  */
-public class TestReplacingAppliedOneByOne {
+class TestReplacingAppliedOneByOne {
 
   private static final String TEXT =
       "0      IDENTIFICATION DIVISION.\r\n"
@@ -48,7 +48,7 @@ public class TestReplacingAppliedOneByOne {
   private static final String CUSTCOPY_NAME = "CUSTCOPY";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(new CobolText(CUSTCOPY_NAME, CUSTCOPY)), Map.of());
   }
 }

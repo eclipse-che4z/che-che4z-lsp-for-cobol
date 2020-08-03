@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /** This test checks PIC clauses don't cause any syntax errors. */
-public class TestPicClausesNotCauseSyntaxErrors {
+class TestPicClausesNotCauseSyntaxErrors {
 
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -51,7 +51,7 @@ public class TestPicClausesNotCauseSyntaxErrors {
   private static final String REPL_NAME = "REPL";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(TEXT, List.of(new CobolText(REPL_NAME, REPL)), Map.of());
   }
 }

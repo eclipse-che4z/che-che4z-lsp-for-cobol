@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * This test checks that the undefined parent variable underlined while variable call hierarchy
  * check.
  */
-public class TestUndefinedParentVariableUnderlined {
+class TestUndefinedParentVariableUnderlined {
   private static final String TEXT =
       "0       IDENTIFICATION DIVISION.\r\n"
           + "1       PROGRAM-ID. TEST1.\r\n"
@@ -53,14 +53,14 @@ public class TestUndefinedParentVariableUnderlined {
   private static final String AGE = "AGE";
 
   @Test
-  public void assertSyncTypeNotChangesLogic() {
+  void assertSyncTypeNotChangesLogic() {
     assertEquals(
         analyze(DOCUMENT_URI, TEXT, List.of(), DID_OPEN),
         analyze(DOCUMENT_URI, TEXT, List.of(), DID_CHANGE));
   }
 
   @Test
-  public void assertAnalysisResult() {
+  void assertAnalysisResult() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(),

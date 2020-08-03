@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** This cache verifies the main logic of cache data management. */
 @Slf4j
-public class DataBusGetFromCacheHappyTest extends DatabusConfigProvider {
+class DataBusGetFromCacheHappyTest extends DatabusConfigProvider {
   // cache dummy static content
   private static final String CPY_FIXED_NAME = "COPY-";
   private static final String CPY_FIXED_CONTENT = "FASDFASDFSF";
@@ -41,7 +41,7 @@ public class DataBusGetFromCacheHappyTest extends DatabusConfigProvider {
   private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> databus;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
     fulfillDatabusCacheContent(databus.getCacheMaxSize());
   }
@@ -53,7 +53,7 @@ public class DataBusGetFromCacheHappyTest extends DatabusConfigProvider {
 
   @Test
   @SneakyThrows
-  public void getData() {
+  void getData() {
     String newCopybookName = "COPY-" + (databus.getCacheMaxSize() - 1);
 
     assertTrue(databus.isStored(CopybookRepository.calculateUUID(newCopybookName)));

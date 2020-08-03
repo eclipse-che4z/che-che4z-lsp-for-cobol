@@ -24,7 +24,7 @@ import java.util.Map;
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /** This use case checks if the absence of dot at the end recognized as an error. */
-public class TestExtraneousInputEOFExpecting {
+class TestExtraneousInputEOFExpecting {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\r\n"
@@ -44,7 +44,7 @@ public class TestExtraneousInputEOFExpecting {
           + "DOT_FS, COPYENTRY, COPYEXIT}";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(),

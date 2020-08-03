@@ -28,7 +28,7 @@ import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ER
  * This test checks that the error shown if the copybook that is used in the Cobol file contains a
  * link to itself.
  */
-public class TestCopybookWithRecursiveDependencyIsDetected {
+class TestCopybookWithRecursiveDependencyIsDetected {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION.\r\n"
@@ -43,7 +43,7 @@ public class TestCopybookWithRecursiveDependencyIsDetected {
   private static final String MESSAGE = "Recursive copybook declaration for: " + REC_CPY_NAME;
 
   @Test
-  public void test() {
+  void test() {
 
     UseCaseEngine.runTest(
         TEXT,

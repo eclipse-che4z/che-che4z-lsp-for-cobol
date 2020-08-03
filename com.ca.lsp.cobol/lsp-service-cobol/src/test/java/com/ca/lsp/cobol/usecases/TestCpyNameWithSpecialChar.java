@@ -28,7 +28,7 @@ import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ER
  * This test proves that special chars (@,#,$) in copybook name recognized correctly, and the error
  * appears because of the missing copybook.
  */
-public class TestCpyNameWithSpecialChar {
+class TestCpyNameWithSpecialChar {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -44,7 +44,7 @@ public class TestCpyNameWithSpecialChar {
   private static final String CODE = "MISSING_COPYBOOK";
 
   @Test
-  public void test() {
+  void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(),
