@@ -34,4 +34,14 @@ class PreprocessorStringUtilsTest {
     assertEquals(EXPECTED_STRING, PreprocessorStringUtils.trimQuotes(TEST_DOUBLE_QUOTE_STRING));
     assertEquals(EXPECTED_STRING, PreprocessorStringUtils.trimQuotes(EXPECTED_STRING));
   }
+
+  @Test
+  void noTrimQuotesInsideTest() {
+    assertEquals(
+        "TESTING 'NO' QUOTES WILL BE REMOVED",
+        PreprocessorStringUtils.trimQuotes("TESTING 'NO' QUOTES WILL BE REMOVED"));
+    assertEquals(
+        "TESTING \"NO\" QUOTES WILL BE REMOVED",
+        PreprocessorStringUtils.trimQuotes("TESTING \"NO\" QUOTES WILL BE REMOVED"));
+  }
 }

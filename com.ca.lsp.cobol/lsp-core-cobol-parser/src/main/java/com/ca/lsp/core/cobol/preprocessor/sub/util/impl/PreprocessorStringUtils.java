@@ -29,6 +29,6 @@ public class PreprocessorStringUtils {
    */
   @Nonnull
   public String trimQuotes(@Nonnull String line) {
-    return line.replaceAll("^[\"']|[\"']$", "");
+    return line.replaceAll("(?:^[\"'])|(?:[\"']$)", "");
   }
 }
