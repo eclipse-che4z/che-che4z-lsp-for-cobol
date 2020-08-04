@@ -98,7 +98,7 @@ public class SynchronousCopybookResolution
   @Override
   public void observerCallback(@Nonnull FetchedCopybookEvent event) {
     if (copybookName == null) {
-      LOG.warn("A disposed instance of copybook resolver used: " + toString());
+      LOG.debug("A disposed instance of copybook resolver used: " + toString());
       return;
     }
     String name = event.getName();
