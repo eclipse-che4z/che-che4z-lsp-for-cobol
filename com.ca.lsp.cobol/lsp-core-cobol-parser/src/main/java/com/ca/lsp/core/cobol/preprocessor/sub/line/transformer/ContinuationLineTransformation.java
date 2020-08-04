@@ -18,6 +18,7 @@ import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CONT_LINE_N
  * <p>If there is no hyphen (-) in the indicator area (column 7) of a line, the last character of
  * the preceding line is assumed to be followed by a space.
  */
+@Slf4j
 public class ContinuationLineTransformation implements CobolLinesTransformation {
   private static final int START_INDEX_AREA_A = 4;
   private static final int END_INDEX_CONTENT_AREA_A = 10;
@@ -166,28 +168,39 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
 
   private SyntaxError registerStringClosingError(
       String uri, int lineNumber, int cobolLineTrimmedLength) {
-    return SyntaxError.syntaxError()
-        .position(
-            new Position(
-                uri,
-                cobolLineTrimmedLength,
-                cobolLineTrimmedLength,
-                lineNumber,
-                cobolLineTrimmedLength,
-                null))
-        .suggestion("IGYDS1082-E A period was required.")
-        .severity(ERROR)
-        .build();
+    SyntaxError error =
+        SyntaxError.syntaxError()
+            .position(
+                new Position(
+                    uri,
+                    cobolLineTrimmedLength,
+                    cobolLineTrimmedLength,
+                    lineNumber,
+                    cobolLineTrimmedLength,
+                    null))
+            .suggestion("IGYDS1082-E A period was required.")
+            .severity(ERROR)
+            .build();
+
+    LOG.debug(
+        "Syntax error by ContinuationLineTransformation#registerStringClosingError: "
+            + error.toString());
+    return error;
   }
 
   private SyntaxError registerContinuationLineError(String uri, int lineNumber, int countingSpace) {
     int startPosition = END_INDEX_CONTENT_AREA_A - (START_INDEX_AREA_A - countingSpace) + 1;
-    return SyntaxError.syntaxError()
-        .position(
-            new Position(
-                uri, startPosition, END_INDEX_CONTENT_AREA_A, lineNumber, startPosition, null))
-        .suggestion("A continuation line cannot contain values in the Content Area A")
-        .severity(ERROR)
-        .build();
+    SyntaxError error =
+        SyntaxError.syntaxError()
+            .position(
+                new Position(
+                    uri, startPosition, END_INDEX_CONTENT_AREA_A, lineNumber, startPosition, null))
+            .suggestion("A continuation line cannot contain values in the Content Area A")
+            .severity(ERROR)
+            .build();
+    LOG.debug(
+        "Syntax error by ContinuationLineTransformation#registerContinuationLineError: "
+            + error.toString());
+    return error;
   }
 }

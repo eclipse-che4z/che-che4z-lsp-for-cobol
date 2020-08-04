@@ -358,32 +358,44 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private void reportRecursiveCopybook(CopybookUsage usage) {
-    errors.add(
+    SyntaxError error =
         SyntaxError.syntaxError()
             .severity(ERROR)
             .suggestion(format(RECURSION_DETECTED, usage.getName()))
             .position(usage.getPosition())
-            .build());
+            .build();
+    LOG.debug(
+        "Syntax error by GrammarPreprocessorListenerImpl#reportRecursiveCopybook: "
+            + error.toString());
+    errors.add(error);
   }
 
   private void reportMissingCopybooks(String copybookName, Position position) {
-    errors.add(
+    SyntaxError error =
         SyntaxError.syntaxError()
             .position(position)
             .suggestion(format(ERROR_SUGGESTION, copybookName))
             .severity(ERROR)
             .errorCode(MISSING_COPYBOOK)
-            .build());
+            .build();
+    LOG.debug(
+        "Syntax error by GrammarPreprocessorListenerImpl#reportMissingCopybooks: "
+            + error.toString());
+    errors.add(error);
   }
 
   private void checkCopybookNameLength(String copybookName, Position position) {
     if (copybookName.length() > 8) {
-      errors.add(
+      SyntaxError error =
           SyntaxError.syntaxError()
               .severity(INFO)
               .suggestion(format(COPYBOOK_OVER_8_CHARACTERS, copybookName))
               .position(position)
-              .build());
+              .build();
+      LOG.debug(
+          "Syntax error by GrammarPreprocessorListenerImpl#checkCopybookNameLength: "
+              + error.toString());
+      errors.add(error);
     }
   }
 }

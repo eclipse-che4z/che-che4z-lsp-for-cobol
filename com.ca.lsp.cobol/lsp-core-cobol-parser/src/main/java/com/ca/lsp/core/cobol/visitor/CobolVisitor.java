@@ -25,6 +25,7 @@ import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
@@ -44,6 +45,7 @@ import static java.util.Optional.ofNullable;
  * semantic context with defined elements to add the usages or throw a warning on an invalid
  * definition. If there is a misspelled keyword, the visitor finds it and throws a warning.
  */
+@Slf4j
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private static final String AREA_A_WARNING_MSG = "Following token must start in Area A: ";
   private static final String AREA_B_WARNING_MSG = "Following token must start in Area B: ";
@@ -339,6 +341,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
             .severity(WARNING)
             .build();
 
+    LOG.debug("Syntax error by CobolVisitor#throwException: " + syntaxError.toString());
     if (!errors.contains(syntaxError)) {
       errors.add(syntaxError);
     }
@@ -389,12 +392,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   private void reportVariableNotDefined(String dataName, Position start, Position stop) {
-    errors.add(
+    SyntaxError error =
         SyntaxError.syntaxError()
             .suggestion(INVALID_DEF_MSG + dataName)
             .severity(INFO)
             .position(getIntervalPosition(start, stop))
-            .build());
+            .build();
+    LOG.debug("Syntax error by CobolVisitor#reportVariableNotDefined: " + error.toString());
+    errors.add(error);
   }
 
   private void throwWarning(Token token) {
@@ -410,6 +415,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
             .severity(WARNING)
             .position(position)
             .build();
+    LOG.debug("Syntax error by CobolVisitor#reportMisspelledKeyword: " + error.toString());
     errors.add(error);
   }
 

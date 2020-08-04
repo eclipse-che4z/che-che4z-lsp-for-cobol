@@ -16,6 +16,7 @@ package com.ca.lsp.core.cobol.visitor;
 
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.RecognitionException;
@@ -27,6 +28,7 @@ import java.util.List;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.ERROR;
 
 /** This error listener registers syntax errors found by the COBOL parser. */
+@Slf4j
 public class ParserListener extends BaseErrorListener {
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
@@ -39,11 +41,14 @@ public class ParserListener extends BaseErrorListener {
       int charPositionInLine,
       String msg,
       RecognitionException e) {
-    errors.add(
+
+    SyntaxError error =
         SyntaxError.syntaxError()
             .offendedToken((CommonToken) offendingSymbol)
             .suggestion(msg)
             .severity(ERROR)
-            .build());
+            .build();
+    LOG.debug("Syntax error by CobolParser: " + error.toString());
+    errors.add(error);
   }
 }

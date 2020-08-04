@@ -97,7 +97,6 @@ public class CobolLanguageEngine {
 
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
     accumulatedErrors.addAll(visitor.getErrors());
-    accumulatedErrors.forEach(err -> LOG.debug(err.toString()));
 
     return new ResultWithErrors<>(visitor.getSemanticContext(), accumulatedErrors);
   }
