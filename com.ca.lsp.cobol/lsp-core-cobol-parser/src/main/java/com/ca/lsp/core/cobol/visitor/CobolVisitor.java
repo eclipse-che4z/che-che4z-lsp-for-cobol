@@ -28,6 +28,7 @@ import lombok.Getter;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -218,7 +219,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   @Override
   public Class visitParagraphName(ParagraphNameContext ctx) {
-    paragraphs.define(ctx.getText().toUpperCase(), getPosition(ctx.getStart()));
+    Position position = getPosition(ctx.getStart());
+    if (position != null) paragraphs.define(ctx.getText().toUpperCase(), position);
     return visitChildren(ctx);
   }
 
@@ -259,6 +261,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   private void defineVariable(String level, String name, Position position) {
+    if (position == null) return;
     variables.define(new Variable(level, name), position);
   }
 
@@ -309,7 +312,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     }
   }
 
-  private void throwException(String wrongToken, Position position, String message) {
+  private void throwException(String wrongToken, @Nullable Position position, String message) {
+    if (position == null) return;
     SyntaxError syntaxError =
         SyntaxError.syntaxError()
             .position(position)
@@ -322,11 +326,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     }
   }
 
+  @Nullable
   private Position getPosition(Token childToken) {
     return positionMapping.get(childToken);
   }
 
-  private void checkVariableDefinition(String name, Position position) {
+  private void checkVariableDefinition(String name, @Nullable Position position) {
+    if (position == null) return;
     if (!variables.contains(name)) {
       reportVariableNotDefined(name, position, position); // starts and finishes in one token
     }
@@ -342,13 +348,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
                 .orElse(null));
   }
 
-  private void checkVariableStructure(String parent, String child, Position position) {
+  private void checkVariableStructure(String parent, String child, @Nullable Position position) {
+    if (position == null) return;
     if (!variables.parentContainsSpecificChild(parent, child)) {
       reportVariableNotDefined(child, position, position);
     }
   }
 
-  private void addUsage(SubContext<?> langContext, String name, Position position) {
+  private void addUsage(SubContext<?> langContext, String name, @Nullable Position position) {
+    if (position == null) return;
     langContext.addUsage(name.toUpperCase(), position);
   }
 
@@ -377,6 +385,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   private void reportMisspelledKeyword(String suggestion, Position position) {
+    if (position == null) return;
     SyntaxError error =
         SyntaxError.syntaxError()
             .suggestion("A misspelled word, maybe you want to put " + suggestion)
@@ -388,6 +397,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private void areaAWarning(Token token) {
     Position position = getPosition(token);
+    if (position == null) return;
     if (position.getCharPositionInLine() > 10) {
       throwException(token.getText(), position, AREA_A_WARNING_MSG);
     }
