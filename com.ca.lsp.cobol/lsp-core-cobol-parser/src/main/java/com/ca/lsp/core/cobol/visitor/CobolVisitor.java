@@ -15,7 +15,6 @@
 package com.ca.lsp.core.cobol.visitor;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolParser.*;
@@ -23,11 +22,13 @@ import com.ca.lsp.core.cobol.parser.CobolParserBaseVisitor;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorStringUtils;
 import com.ca.lsp.core.cobol.semantics.CobolVariableContext;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
+import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
 import lombok.Getter;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,23 +54,40 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private static final String INVALID_DEF_MSG = "Invalid definition for: ";
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
-  @Getter private SubContext<String> paragraphs = new NamedSubContext();
-  @Getter private CobolVariableContext variables = new CobolVariableContext();
 
-  @Getter private NamedSubContext copybooks;
+  private SubContext<String> paragraphs = new NamedSubContext();
+  private CobolVariableContext variables = new CobolVariableContext();
 
   private String programName = null;
-  private CommonTokenStream tokenStream;
 
+  private NamedSubContext copybooks;
+  private CommonTokenStream tokenStream;
   private Map<Token, Position> positionMapping;
 
   public CobolVisitor(
-      ExtendedDocument extendedDocument,
-      CommonTokenStream tokenStream,
-      Map<Token, Position> positionMapping) {
-    copybooks = extendedDocument.getCopybooks();
+      @Nonnull NamedSubContext copybooks,
+      @Nonnull CommonTokenStream tokenStream,
+      @Nonnull Map<Token, Position> positionMapping) {
+    this.copybooks = copybooks;
     this.positionMapping = positionMapping;
     this.tokenStream = tokenStream;
+  }
+
+  /**
+   * Get the semantic context of the document as an output of th semantic analysis
+   *
+   * @return the semantic context of the document, containing all the definitions and usages of
+   *     paragraphs, variables and copybooks
+   */
+  @Nonnull
+  public SemanticContext getSemanticContext() {
+    return new SemanticContext(
+        variables.getDefinitions().asMap(),
+        variables.getUsages().asMap(),
+        paragraphs.getDefinitions().asMap(),
+        paragraphs.getUsages().asMap(),
+        copybooks.getDefinitions().asMap(),
+        copybooks.getUsages().asMap());
   }
 
   @Override

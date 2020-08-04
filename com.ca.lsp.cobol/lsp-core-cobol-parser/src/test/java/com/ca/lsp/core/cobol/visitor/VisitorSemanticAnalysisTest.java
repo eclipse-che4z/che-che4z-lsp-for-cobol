@@ -16,9 +16,9 @@
 package com.ca.lsp.core.cobol.visitor;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolParser;
+import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.ca.lsp.core.cobol.utils.CustomToken;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,6 @@ import java.util.Map;
 
 import static com.ca.lsp.core.cobol.parser.CobolParser.DataNameContext;
 import static com.ca.lsp.core.cobol.parser.CobolParser.QualifiedDataNameFormat1Context;
-import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -52,8 +51,8 @@ class VisitorSemanticAnalysisTest {
     CustomToken token = createNewToken(INVALID_VARIABLE);
     CobolVisitor visitor =
         new CobolVisitor(
-            new ExtendedDocument(null, null, singletonMap("", null)),
-            null,
+            new NamedSubContext(),
+            mock(CommonTokenStream.class),
             Map.of(token, new Position("", 0, 0, 0, 0, "invalid")));
 
     visitor.visitQualifiedDataNameFormat1(mockMethod(token));
@@ -73,14 +72,14 @@ class VisitorSemanticAnalysisTest {
 
     CustomToken token = createNewToken(WRONG_TOKEN);
     CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
-    when(node.getStart()).thenReturn(createNewToken(WRONG_TOKEN));
-    when(node.getStop()).thenReturn(createNewToken(WRONG_TOKEN));
+    when(node.getStart()).thenReturn(token);
+    when(node.getStop()).thenReturn(token);
 
     CommonTokenStream tokenStream = mock(CommonTokenStream.class);
 
     CobolVisitor visitor =
         new CobolVisitor(
-            new ExtendedDocument(null, null, singletonMap("", null)),
+            new NamedSubContext(),
             tokenStream,
             Map.of(token, new Position("", 0, 0, 0, 0, WRONG_TOKEN)));
 

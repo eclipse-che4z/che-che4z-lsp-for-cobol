@@ -68,13 +68,13 @@ public class CobolLanguageEngine {
   public ResultWithErrors<SemanticContext> run(
       @Nonnull String documentUri, @Nonnull String text, @Nonnull String textDocumentSyncType) {
 
-    ResultWithErrors<ExtendedDocument> extendedDocument =
+    ResultWithErrors<ExtendedDocument> preProcessorOutput =
         preprocessor.process(documentUri, text, textDocumentSyncType);
 
-    List<SyntaxError> accumulatedErrors = new ArrayList<>(extendedDocument.getErrors());
+    List<SyntaxError> accumulatedErrors = new ArrayList<>(preProcessorOutput.getErrors());
+    ExtendedDocument extendedDocument = preProcessorOutput.getResult();
 
-    CobolLexer lexer =
-        new CobolLexer(CharStreams.fromString(extendedDocument.getResult().getText()));
+    CobolLexer lexer = new CobolLexer(CharStreams.fromString(extendedDocument.getText()));
     lexer.removeErrorListeners();
 
     CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -89,26 +89,17 @@ public class CobolLanguageEngine {
 
     Map<Token, Position> positionMapping =
         PositionMappingUtils.createPositionMapping(
-            tokens.getTokens(), extendedDocument.getResult().getDocumentMapping(), documentUri);
+            tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri);
 
-    CobolVisitor visitor = new CobolVisitor(extendedDocument.getResult(), tokens, positionMapping);
+    CobolVisitor visitor =
+        new CobolVisitor(extendedDocument.getCopybooks(), tokens, positionMapping);
     visitor.visit(tree);
 
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
     accumulatedErrors.addAll(visitor.getErrors());
     accumulatedErrors.forEach(err -> LOG.debug(err.toString()));
 
-    return new ResultWithErrors<>(buildSemanticContext(visitor), accumulatedErrors);
-  }
-
-  private SemanticContext buildSemanticContext(@Nonnull CobolVisitor visitor) {
-    return new SemanticContext(
-        visitor.getVariables().getDefinitions().asMap(),
-        visitor.getVariables().getUsages().asMap(),
-        visitor.getParagraphs().getDefinitions().asMap(),
-        visitor.getParagraphs().getUsages().asMap(),
-        visitor.getCopybooks().getDefinitions().asMap(),
-        visitor.getCopybooks().getUsages().asMap());
+    return new ResultWithErrors<>(visitor.getSemanticContext(), accumulatedErrors);
   }
 
   @Nonnull
