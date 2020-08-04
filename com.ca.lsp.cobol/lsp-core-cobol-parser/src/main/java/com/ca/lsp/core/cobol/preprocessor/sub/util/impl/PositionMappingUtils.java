@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 
 import static com.ca.lsp.core.cobol.parser.CobolLexer.COPYENTRY;
 import static com.ca.lsp.core.cobol.parser.CobolLexer.COPYEXIT;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -41,8 +42,8 @@ import static java.util.Optional.ofNullable;
 @UtilityClass
 public class PositionMappingUtils {
 
-  private static final int URI_PREFIX_LENGTH = 15;
-  private static final int URI_SUFFIX_LENGTH = 6;
+  private static final int URI_PREFIX_LENGTH = CPY_ENTER_TAG.length() + CPY_URI_OPEN.length();
+  private static final int URI_SUFFIX_LENGTH = CPY_URI_CLOSE.length();
 
   /**
    * Map the tokens of the extended document to original ones using document mapping, collected by
@@ -59,7 +60,6 @@ public class PositionMappingUtils {
     Map<Token, Position> result = new HashMap<>();
     Deque<DocumentHierarchyLevel> documentHierarchyStack = new ArrayDeque<>();
     enterDocument(documentUri, documentPositions, documentHierarchyStack);
-    currentDocument(documentHierarchyStack).initialForward();
     tokens.forEach(mapToken(documentPositions, result, documentHierarchyStack));
     return result;
   }
@@ -85,6 +85,7 @@ public class PositionMappingUtils {
       Map<Token, Position> mappingAccumulator,
       Deque<DocumentHierarchyLevel> documentHierarchyStack) {
     Position position = currentDocument(documentHierarchyStack).getCurrent();
+    if (position == null) return;
     if (tokenMatches(token.getText(), position.getToken())) {
       mappingAccumulator.put(token, position);
       currentDocument(documentHierarchyStack).forward();

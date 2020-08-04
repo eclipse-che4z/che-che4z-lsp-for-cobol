@@ -31,10 +31,11 @@ public class DocumentHierarchyLevel {
     index = 0;
     positions = documentMapping.getPositions();
     shifts = documentMapping.getShifts();
+    initialForward();
   }
 
   public Position getCurrent() {
-    return positions.get(index);
+    return index < positions.size() ? positions.get(index) : null;
   }
 
   public void forward() {
@@ -51,7 +52,7 @@ public class DocumentHierarchyLevel {
     index += length;
   }
 
-  public void initialForward() {
+  private void initialForward() {
     index += ofNullable(shifts.get(index)).orElse(0);
   }
 }

@@ -42,8 +42,7 @@ import java.util.function.Function;
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.ERROR;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.INFO;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CPY_ENTER_TAG;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.CPY_EXIT_TAG;
+import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -251,9 +250,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     pop();
     // write copybook beginning trigger
     write(CPY_ENTER_TAG);
-    write("<URI>");
+    write(CPY_URI_OPEN);
     write(copybookId);
-    write("</URI>");
+    write(CPY_URI_CLOSE);
     write(copybookContent);
     // write copybook closing trigger
     write(CPY_EXIT_TAG);
