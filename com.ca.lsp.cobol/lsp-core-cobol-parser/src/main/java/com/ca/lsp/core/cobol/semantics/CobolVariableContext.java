@@ -20,6 +20,7 @@ import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ import static java.util.stream.Collectors.toList;
  * This class represents a structure to store variables of a COBOL program and build a variable
  * hierarchy.
  */
+@EqualsAndHashCode
 public class CobolVariableContext implements SubContext<Variable> {
   private static final int LEVEL_77 = 77;
   private static final int LEVEL_66 = 66;

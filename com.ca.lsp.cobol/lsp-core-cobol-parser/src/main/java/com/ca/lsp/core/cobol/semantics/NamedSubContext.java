@@ -18,7 +18,7 @@ package com.ca.lsp.core.cobol.semantics;
 import com.broadcom.lsp.domain.common.model.Position;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import lombok.Getter;
+import lombok.Value;
 
 import java.util.Collection;
 
@@ -26,11 +26,12 @@ import java.util.Collection;
  * This class represents a semantic sub-context for specific types of elements that have names and
  * stores their definitions and variables.
  */
+@Value
 public class NamedSubContext implements SubContext<String> {
 
-  @Getter private final Multimap<String, Position> definitions = HashMultimap.create();
+  private final Multimap<String, Position> definitions = HashMultimap.create();
 
-  @Getter private final Multimap<String, Position> usages = HashMultimap.create();
+  private final Multimap<String, Position> usages = HashMultimap.create();
 
   @Override
   public void define(String name, Position token) {

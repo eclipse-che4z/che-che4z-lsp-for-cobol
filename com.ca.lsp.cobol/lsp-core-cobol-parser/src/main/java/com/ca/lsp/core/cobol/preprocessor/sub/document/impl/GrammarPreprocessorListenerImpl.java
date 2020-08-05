@@ -63,7 +63,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
-  private final Deque<StringBuilder> contexts = new ArrayDeque<>();
+  private final Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
   private final NamedSubContext copybooks = new NamedSubContext();
   private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
   private final Map<Integer, Integer> shifts = new HashMap<>();
@@ -95,7 +95,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     this.preprocessor = preprocessor;
     this.resolutions = resolutions;
     this.replacingService = replacingService;
-    contexts.push(new StringBuilder());
+    textAccumulator.push(new StringBuilder());
   }
 
   @Nonnull
@@ -115,8 +115,23 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
+  public void exitCompilerOptions(@Nonnull CompilerOptionsContext ctx) {
+    // throw away COMPILER OPTIONS terminals
+    pop();
+    accumulateExcludedStatementShift(ctx.getSourceInterval());
+  }
+
+  @Override
   public void enterReplaceArea(@Nonnull ReplaceAreaContext ctx) {
     push();
+  }
+
+  @Override
+  public void exitReplaceArea(@Nonnull ReplaceAreaContext ctx) {
+    String content = applyReplacing(read(), ctx.replaceByStatement().replaceClause());
+
+    pop();
+    write(content);
   }
 
   @Override
@@ -125,20 +140,25 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
+  public void exitReplaceByStatement(@Nonnull ReplaceByStatementContext ctx) {
+    // throw away terminals
+    pop();
+  }
+
+  @Override
   public void enterReplaceOffStatement(@Nonnull ReplaceOffStatementContext ctx) {
     push();
   }
 
   @Override
-  public void enterCopyStatement(@Nonnull CopyStatementContext ctx) {
-    push();
+  public void exitReplaceOffStatement(@Nonnull ReplaceOffStatementContext ctx) {
+    // throw away REPLACE OFF terminals
+    pop();
   }
 
   @Override
-  public void exitCompilerOptions(@Nonnull CompilerOptionsContext ctx) {
-    // throw away COMPILER OPTIONS terminals
-    pop();
-    accumulateExcludedStatementShift(ctx.getSourceInterval());
+  public void enterCopyStatement(@Nonnull CopyStatementContext ctx) {
+    push();
   }
 
   @Override
@@ -169,36 +189,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     accumulateCopybookShift(ctx.getSourceInterval());
   }
 
-  private void accumulateCopybookShift(Interval sourceInterval) {
-    shifts.put(sourceInterval.a - 1, sourceInterval.b - sourceInterval.a + 1);
-  }
-
-  private void accumulateExcludedStatementShift(Interval sourceInterval) {
-    shifts.put(sourceInterval.a - 1, sourceInterval.b - sourceInterval.a + 2);
-  }
-
-  @Override
-  public void exitReplaceArea(@Nonnull ReplaceAreaContext ctx) {
-    List<ReplaceClauseContext> replaceClauses = ctx.replaceByStatement().replaceClause();
-
-    String content = applyReplacing(read(), replaceClauses);
-
-    pop();
-    write(content);
-  }
-
-  @Override
-  public void exitReplaceByStatement(@Nonnull ReplaceByStatementContext ctx) {
-    // throw away terminals
-    pop();
-  }
-
-  @Override
-  public void exitReplaceOffStatement(@Nonnull ReplaceOffStatementContext ctx) {
-    // throw away REPLACE OFF terminals
-    pop();
-  }
-
   @Override
   public void visitTerminal(@Nonnull TerminalNode node) {
     int tokPos = node.getSourceInterval().a;
@@ -209,18 +199,26 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     }
   }
 
+  private void accumulateCopybookShift(Interval sourceInterval) {
+    shifts.put(sourceInterval.a - 1, sourceInterval.b - sourceInterval.a + 1);
+  }
+
+  private void accumulateExcludedStatementShift(Interval sourceInterval) {
+    shifts.put(sourceInterval.a - 1, sourceInterval.b - sourceInterval.a + 2);
+  }
+
   @Nonnull
   private StringBuilder peek() {
-    return ofNullable(contexts.peek())
+    return ofNullable(textAccumulator.peek())
         .orElseThrow(() -> new IllegalStateException("Document structure corrupted"));
   }
 
   private void pop() {
-    contexts.pop();
+    textAccumulator.pop();
   }
 
   private void push() {
-    contexts.push(new StringBuilder());
+    textAccumulator.push(new StringBuilder());
   }
 
   private void write(@Nonnull String text) {
@@ -335,26 +333,26 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Nonnull
-  private Position retrievePosition(@Nonnull ParserRuleContext token) {
+  private Position retrievePosition(@Nonnull ParserRuleContext ctx) {
     return new Position(
         documentUri,
-        token.getStart().getStartIndex(),
-        token.getStop().getStopIndex(),
-        token.getStart().getLine(),
-        token.getStart().getCharPositionInLine(),
-        token.getStart().getText());
+        ctx.getStart().getStartIndex(),
+        ctx.getStop().getStopIndex(),
+        ctx.getStart().getLine(),
+        ctx.getStart().getCharPositionInLine(),
+        ctx.getStart().getText());
   }
 
   @Nonnull
   private Function<Token, Position> toPosition() {
-    return it ->
+    return token ->
         new Position(
             documentUri,
-            it.getStartIndex(),
-            it.getStopIndex(),
-            it.getLine(),
-            it.getCharPositionInLine(),
-            it.getText());
+            token.getStartIndex(),
+            token.getStopIndex(),
+            token.getLine(),
+            token.getCharPositionInLine(),
+            token.getText());
   }
 
   private void reportRecursiveCopybook(CopybookUsage usage) {
