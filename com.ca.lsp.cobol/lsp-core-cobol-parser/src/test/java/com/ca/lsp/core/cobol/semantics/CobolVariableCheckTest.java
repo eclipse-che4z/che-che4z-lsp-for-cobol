@@ -30,8 +30,8 @@ import static com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils.getNonE
 import static org.junit.Assert.assertEquals;
 
 public class CobolVariableCheckTest {
-  private static final String COPYBOOK_SCAN_ANALYSIS_ENABLED = "COPYBOOK_SCAN_ANALYSIS_ENABLED";
-  private static final String COPYBOOK_SCAN_ANALYSIS_DISABLED = "COPYBOOK_SCAN_ANALYSIS_DISABLED";
+  private static final String COPYBOOK_SCAN_ANALYSIS_ENABLED = "ENABLED";
+  private static final String COPYBOOK_SCAN_ANALYSIS_DISABLED = "DISABLED";
 
   /**
    * This test represent the semantic check for variable in PROCEDURE DIVISION section There are
