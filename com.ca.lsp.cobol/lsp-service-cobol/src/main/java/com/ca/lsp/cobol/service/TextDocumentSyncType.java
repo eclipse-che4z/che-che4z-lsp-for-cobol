@@ -15,7 +15,9 @@
 
 package com.ca.lsp.cobol.service;
 
-/** This class contains the kinds of document synchronizaton that could be sent from the client */
+/**
+ * This enum class contains the kind of document synchronizaton that could be sent from the client
+ */
 public enum TextDocumentSyncType {
   DID_OPEN,
   DID_CHANGE,

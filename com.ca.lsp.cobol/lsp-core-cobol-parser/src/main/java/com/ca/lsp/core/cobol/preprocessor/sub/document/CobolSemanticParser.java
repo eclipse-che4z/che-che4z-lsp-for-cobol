@@ -30,7 +30,7 @@ public interface CobolSemanticParser {
    *
    * @param code - COBOL program text to analyse
    * @param semanticContext - semantic context of the currently processed document to be filled in.
-   * @param copybookScanAnalysis - reflect the status of the copybook support (ENABLED|DISABLED)
+   * @param copybookScanAnalysis - reflects the status of the copybook support (ENABLED|DISABLED)
    * @return a PreprocessedInput - text and its semantic context with syntax errors if found or an
    *     empty list
    */
