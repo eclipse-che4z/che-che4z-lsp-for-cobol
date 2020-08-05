@@ -52,7 +52,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final String HINT_SRC_LABEL = "H";
   private static final int ERR_POS_INDEX = 1;
 
-  private CobolLanguageEngine engine;
+  private final CobolLanguageEngine engine;
 
   @Inject
   CobolLanguageEngineFacade(CobolLanguageEngine engine) {

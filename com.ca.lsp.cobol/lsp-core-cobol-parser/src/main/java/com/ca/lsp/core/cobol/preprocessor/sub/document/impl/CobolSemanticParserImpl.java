@@ -55,7 +55,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
       @Nonnull String uri,
       @Nonnull String code,
       @Nonnull SemanticContext semanticContext,
-      @Nonnull String textDocumentSyncType) {
+      @Nonnull String copybookScanAnalysis) {
     // run the lexer
     CobolPreprocessorLexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     // get a list of matched tokens
@@ -69,12 +69,12 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
 
     ParseTreeWalker walker = new ParseTreeWalker();
     CobolSemanticParserListener listener =
-        createDocumentParserListener(uri, tokens, semanticContext);
+        createDocumentParserListener(uri, tokens, semanticContext, copybookScanAnalysis);
     walker.walk(listener, startRule);
 
     // analyze contained copy books
     ResultWithErrors<List<CopybookSemanticContext>> contexts =
-        processCopybooks(uri, semanticContext, textDocumentSyncType);
+        processCopybooks(uri, semanticContext, copybookScanAnalysis);
 
     buildCompleteVariableStructure(semanticContext, contexts);
 
@@ -89,7 +89,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   private ResultWithErrors<List<CopybookSemanticContext>> processCopybooks(
       @Nonnull String documentUri,
       @Nonnull SemanticContext semanticContext,
-      String textDocumentSyncType) {
+      String copybookScanAnalysis) {
     Multimap<String, Position> copybookNames = semanticContext.getCopybooks().getUsages();
 
     if (copybookNames.isEmpty()) {
@@ -99,7 +99,7 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
         documentUri,
         copybookNames,
         semanticContext.getCopybookUsageTracker(),
-        textDocumentSyncType);
+        copybookScanAnalysis);
   }
 
   private void buildCompleteVariableStructure(
@@ -114,7 +114,8 @@ public class CobolSemanticParserImpl implements CobolSemanticParser {
   private CobolSemanticParserListener createDocumentParserListener(
       @Nonnull String uri,
       @Nonnull CommonTokenStream tokens,
-      @Nonnull SemanticContext semanticContext) {
-    return new CobolSemanticParserListenerImpl(uri, tokens, semanticContext);
+      @Nonnull SemanticContext semanticContext,
+      @Nonnull String copybookScanAnalysis) {
+    return new CobolSemanticParserListenerImpl(uri, tokens, semanticContext, copybookScanAnalysis);
   }
 }

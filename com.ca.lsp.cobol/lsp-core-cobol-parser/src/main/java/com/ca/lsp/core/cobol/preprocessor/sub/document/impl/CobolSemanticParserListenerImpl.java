@@ -54,12 +54,17 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private final String documentUri;
   private final BufferedTokenStream tokens;
   private final SemanticContext semanticContext;
+  private final String copybookScanAnalysis;
 
   CobolSemanticParserListenerImpl(
-      String documentUri, BufferedTokenStream tokens, SemanticContext semanticContext) {
+      String documentUri,
+      BufferedTokenStream tokens,
+      SemanticContext semanticContext,
+      String copybookScanAnalysis) {
     this.documentUri = documentUri;
     this.tokens = tokens;
     this.semanticContext = semanticContext;
+    this.copybookScanAnalysis = copybookScanAnalysis;
 
     preprocessorCleanerService = new PreprocessorCleanerServiceImpl();
   }
@@ -132,12 +137,15 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
     /*
      * define the copy book
      */
-    CopySourceContext copySource = ctx.copySource();
-    String copybookName = retrieveCopybookName(copySource);
-    Position position = retrievePosition(copySource);
-    defineCopybook(copybookName, position);
-    checkCopybookNameLength(copybookName, position);
-    this.preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens);
+
+    if (copybookScanAnalysis.equalsIgnoreCase("ENABLED")) {
+      CopySourceContext copySource = ctx.copySource();
+      String copybookName = retrieveCopybookName(copySource);
+      Position position = retrievePosition(copySource);
+      defineCopybook(copybookName, position);
+      checkCopybookNameLength(copybookName, position);
+    }
+    preprocessorCleanerService.excludeStatementFromText(ctx, COMMENT_TAG, tokens);
   }
 
   private void checkCopybookNameLength(String copybookName, Position position) {
@@ -184,7 +192,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
 
   @Nullable
   private String retrieveCopybookName(@Nonnull CopySourceContext copySource) {
-    final String copybookName;
+    String copybookName;
     if (copySource.cobolWord() != null) {
       copybookName = copySource.cobolWord().getText().toUpperCase();
     } else if (copySource.literal() != null) {

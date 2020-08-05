@@ -51,7 +51,7 @@ import static org.mockito.Mockito.*;
 public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private static final String LANGUAGE = "COBOL";
-  private static final String EXT_SRC_DOC_URI = "file://.c4z/.extsrc/EXTSRC.cbl";
+  private static final String EXT_SRC_DOC_URI = "file:///.c4z/.extsrcs/EXTSRC.cbl";
   private static final String CPY_DOCUMENT_URI = "file:///.copybooks/CPYTEST.cpy";
   private static final String PARENT_CPY_URI = "file:///.copybooks/PARENT.cpy";
   private static final String NESTED_CPY_URI = "file:///.copybooks/NESTED.cpy";
@@ -171,7 +171,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
         new DidOpenTextDocumentParams(
             new TextDocumentItem(EXT_SRC_DOC_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
 
-    verify(engine).analyze(eq(EXT_SRC_DOC_URI), anyString(), eq(DISABLED));
+    verify(engine, timeout(10000)).analyze(eq(EXT_SRC_DOC_URI), anyString(), eq(DISABLED));
   }
 
   private MyTextDocumentService buildServiceWithMockEngine(LanguageEngineFacade engine) {
@@ -192,7 +192,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
 
-    verify(engine).analyze(eq(DOCUMENT_URI), anyString(), eq(ENABLED));
+    verify(engine, timeout(10000)).analyze(eq(DOCUMENT_URI), anyString(), eq(ENABLED));
   }
 
   /**

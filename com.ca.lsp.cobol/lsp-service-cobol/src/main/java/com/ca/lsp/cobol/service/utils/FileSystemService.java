@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 /** This interface represents API for low-level file systems access */
 public interface FileSystemService {
@@ -73,4 +74,15 @@ public interface FileSystemService {
    */
   @Nonnull
   String decodeURI(@Nonnull String uri);
+
+  /**
+   * This method validate an URI to verify if is defined as extended document, accordining to a
+   * regex.
+   *
+   * @param uri document URI opened in the client
+   * @return true if the document is an extended document, false otherwise
+   */
+  static boolean isFileUnderExtendedSourceFolder(String uri) {
+    return Pattern.matches("file:///(?:(.*?/\\.c4z/\\.extsrcs/.+)|\\.c4z/\\.extsrcs/.+)", uri);
+  }
 }

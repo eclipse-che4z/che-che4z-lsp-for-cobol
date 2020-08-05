@@ -66,7 +66,7 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
       @Assisted("documentUri") String documentUri,
       @Assisted("copybookUsage") CopybookUsage copybookUsage,
       @Assisted("copybookUsageTracker") List<CopybookUsage> copybookUsageTracker,
-      @Assisted("textDocumentSyncType") String copybookScanAnalysis) {
+      @Assisted("copybookScanAnalysis") String copybookScanAnalysis) {
     this.documentUri = documentUri;
     this.copybookUsage = copybookUsage;
     copyBookName = copybookUsage.getName();

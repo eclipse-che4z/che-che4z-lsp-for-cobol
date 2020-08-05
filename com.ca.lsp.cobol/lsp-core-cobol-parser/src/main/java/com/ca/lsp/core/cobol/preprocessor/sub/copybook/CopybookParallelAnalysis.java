@@ -50,11 +50,11 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
       String documentUri,
       Multimap<String, Position> copybooks,
       List<CopybookUsage> copybookUsageTracker,
-      String textDocumentSyncType) {
+      String copybookScanAnalysis) {
 
     List<ResultWithErrors<CopybookSemanticContext>> contexts =
         runAnalysisAsynchronously(
-            documentUri, copybooks, copybookUsageTracker, textDocumentSyncType);
+            documentUri, copybooks, copybookUsageTracker, copybookScanAnalysis);
 
     List<SyntaxError> errors = createMissingCopybookErrors(copybooks, contexts);
 
@@ -67,10 +67,10 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
       String documentUri,
       Multimap<String, Position> copybooks,
       List<CopybookUsage> copybookUsageTracker,
-      String textDocumentSyncType) {
+      String copybookScanAnalysis) {
 
     return invokeAll(
-            createTasks(documentUri, copybooks, copybookUsageTracker, textDocumentSyncType))
+            createTasks(documentUri, copybooks, copybookUsageTracker, copybookScanAnalysis))
         .stream()
         .map(ForkJoinTask::join)
         .collect(toList());
@@ -127,7 +127,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
       String documentUri,
       Multimap<String, Position> names,
       List<CopybookUsage> copybookUsageTracker,
-      String textDocumentSyncType) {
+      String copybookScanAnalysis) {
 
     return names.asMap().entrySet().stream()
         .map(
@@ -136,7 +136,7 @@ public class CopybookParallelAnalysis implements CopybookAnalysis {
                     documentUri,
                     new CopybookUsage(it.getKey(), documentUri, it.getValue()),
                     copybookUsageTracker,
-                    textDocumentSyncType))
+                    copybookScanAnalysis))
         .collect(toList());
   }
 }

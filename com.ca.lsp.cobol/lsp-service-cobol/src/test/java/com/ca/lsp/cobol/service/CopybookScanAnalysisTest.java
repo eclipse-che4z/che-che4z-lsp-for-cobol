@@ -19,8 +19,11 @@ import static com.ca.lsp.cobol.service.CopybookScanAnalysis.*;
 import static org.junit.Assert.assertEquals;
 
 public class CopybookScanAnalysisTest {
-  private static final String EXT_SRC_DOC_URI = "file://.c4z/.extsrc/EXTSRC.cbl";
-  private static final String DOC_URI = "file://EXTSRC.cbl";
+  private static final String EXT_SRC_DOC_URI = "file:///c%3A/.c4z/.extsrcs/EXTSRC.cbl";
+  private static final String WRONG_EXT_SRC_DOC_URI = "file:///c%3A/.extsrcs/EXTSRC.cbl";
+  private static final String FAKE_EXT_SRC_DOC_URI =
+      "file:///c%3A/workspace/c4z.extsrcs.EXTSRC.cbl";
+  private static final String DOC_URI = "file:///c%3A/EXTSRC.cbl";
 
   /**
    * This test verify that when the input COBOL file is an extended document copybook analysis is
@@ -41,5 +44,24 @@ public class CopybookScanAnalysisTest {
   @Test
   public void disableCopybookOnNonExtendedDocumentInDidChange() {
     assertEquals(DISABLED, getCopybookScanAnalysis(DOC_URI, "DID_CHANGE"));
+  }
+
+  /**
+   * This test verify that a document that have a name that simulate the presence in the .extsrc
+   * folder (but is actually not included in any folder) is not recognized as an extended source
+   * file and the copybook analysis is enabled.
+   */
+  @Test
+  public void enableCopybookOnFakeURI() {
+    assertEquals(ENABLED, getCopybookScanAnalysis(FAKE_EXT_SRC_DOC_URI, "DID_OPEN"));
+  }
+
+  /**
+   * This test verify that if the document is defined in a bad structure (that not respect the
+   * requirements to be defined under .c4z/.extsrcs copybook analysis is not disabled
+   */
+  @Test
+  public void enableCopybookOnBadExtendedSourceFolders() {
+    assertEquals(ENABLED, getCopybookScanAnalysis(WRONG_EXT_SRC_DOC_URI, "DID_OPEN"));
   }
 }
