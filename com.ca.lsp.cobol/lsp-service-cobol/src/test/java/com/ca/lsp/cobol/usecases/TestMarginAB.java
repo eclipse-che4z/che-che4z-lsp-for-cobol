@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
 
-/** This test verifies if the margins are respected and warnings are thrown */
+/** This test verifies if the margins respected and warnings thrown */
 public class TestMarginAB {
 
   /**
@@ -170,7 +170,7 @@ public class TestMarginAB {
 
     assertEquals(3, result.getDiagnostics().size());
     assertEquals(
-        "Following token can not be on the same line with DECLARATIVE token: MAMA",
+        "The following token cannot be on the same line as a DECLARATIVE token: MAMA",
         result.getDiagnostics().get(1).getMessage());
   }
 }
