@@ -56,7 +56,7 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
   private transient CopybookUsage copybookUsage;
   private transient List<CopybookUsage> copybookUsageTracker;
   private transient CompletableFuture<String> waitForResolving;
-  private String copybookScanAnalysis;
+  private String copybookProcessingMode;
   private transient CobolPreprocessor preprocessor;
 
   @Inject
@@ -66,12 +66,12 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
       @Assisted("documentUri") String documentUri,
       @Assisted("copybookUsage") CopybookUsage copybookUsage,
       @Assisted("copybookUsageTracker") List<CopybookUsage> copybookUsageTracker,
-      @Assisted("copybookScanAnalysis") String copybookScanAnalysis) {
+      @Assisted("copybookProcessingMode") String copybookProcessingMode) {
     this.documentUri = documentUri;
     this.copybookUsage = copybookUsage;
     copyBookName = copybookUsage.getName();
     this.copybookUsageTracker = copybookUsageTracker;
-    this.copybookScanAnalysis = copybookScanAnalysis;
+    this.copybookProcessingMode = copybookProcessingMode;
     this.preprocessor = preprocessor;
     waitForResolving = new CompletableFuture<>();
     this.databus = databus;
@@ -97,7 +97,7 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
           RequiredCopybookEvent.builder()
               .name(copyBookName)
               .documentUri(documentUri)
-              .copybookScanAnalysis(copybookScanAnalysis)
+              .copybookProcessingMode(copybookProcessingMode)
               .build());
       semanticContext = parseCopybook();
       databus.unSubscribe(subscriber);
@@ -159,7 +159,7 @@ public class AnalyseCopybookTask extends RecursiveTask<ResultWithErrors<Copybook
             copybookUsage.getUri(),
             content,
             new SemanticContext(unmodifiableList(nextTrackerIteration)),
-            copybookScanAnalysis);
+            copybookProcessingMode);
     return new ResultWithErrors<>(
         preprocessedInput.getResult().getSemanticContext(), preprocessedInput.getErrors());
   }

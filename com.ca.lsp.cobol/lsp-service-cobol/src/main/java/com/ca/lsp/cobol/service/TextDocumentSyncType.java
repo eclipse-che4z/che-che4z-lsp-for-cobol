@@ -20,6 +20,5 @@ package com.ca.lsp.cobol.service;
  */
 public enum TextDocumentSyncType {
   DID_OPEN,
-  DID_CHANGE,
-  DID_CLOSE
+  DID_CHANGE
 }

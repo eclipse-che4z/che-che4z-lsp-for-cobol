@@ -77,16 +77,16 @@ public class DocumentExtensionTests {
     String uri = DOCUMENT_URI_BEGINNING + extension;
 
     // dynamic stubbing in DID_OPEN mode
-    when(engine.analyze(uri, TEXT, CopybookScanAnalysis.ENABLED))
+    when(engine.analyze(uri, TEXT, CopybookProcessingMode.ENABLED))
         .thenReturn(AnalysisResult.empty());
     fireDidOpen(extension, uri);
-    verify(engine, timeout(10000).times(1)).analyze(uri, TEXT, CopybookScanAnalysis.ENABLED);
+    verify(engine, timeout(10000).times(1)).analyze(uri, TEXT, CopybookProcessingMode.ENABLED);
 
-    when(engine.analyze(uri, TEXT, CopybookScanAnalysis.DISABLED))
+    when(engine.analyze(uri, TEXT, CopybookProcessingMode.DISABLED))
         .thenReturn(AnalysisResult.empty());
     fireDidChange(uri);
     verify(engine, timeout(10000))
-        .analyze(uri, INCORRECT_TEXT_EXAMPLE, CopybookScanAnalysis.DISABLED);
+        .analyze(uri, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.DISABLED);
   }
 
   private void checkExtensionNotMatches(String extension) {

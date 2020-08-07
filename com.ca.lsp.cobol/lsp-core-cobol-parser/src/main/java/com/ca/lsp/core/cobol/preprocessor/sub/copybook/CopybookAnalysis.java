@@ -28,5 +28,5 @@ public interface CopybookAnalysis {
       String documentUri,
       Multimap<String, Position> copybookNames,
       List<CopybookUsage> copybookUsageTracker,
-      String copybookScanAnalysis);
+      String copybookProcessingMode);
 }

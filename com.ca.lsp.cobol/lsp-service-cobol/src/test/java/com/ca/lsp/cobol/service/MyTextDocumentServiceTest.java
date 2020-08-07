@@ -38,8 +38,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import static com.ca.lsp.cobol.service.CopybookScanAnalysis.DISABLED;
-import static com.ca.lsp.cobol.service.CopybookScanAnalysis.ENABLED;
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.DISABLED;
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.ENABLED;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
@@ -51,7 +51,7 @@ import static org.mockito.Mockito.*;
 public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private static final String LANGUAGE = "COBOL";
-  private static final String EXT_SRC_DOC_URI = "file:///.c4z/.extsrcs/EXTSRC.cbl";
+  private static final String EXT_SRC_DOC_URI = "file://workspace/.c4z/.extsrcs/EXTSRC.cbl";
   private static final String CPY_DOCUMENT_URI = "file:///.copybooks/CPYTEST.cpy";
   private static final String PARENT_CPY_URI = "file:///.copybooks/PARENT.cpy";
   private static final String NESTED_CPY_URI = "file:///.copybooks/NESTED.cpy";
@@ -159,8 +159,8 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   /**
-   * This test verify that when an extended document is opened, the code is analyzed and the
-   * copybook analysis is disabled using {@link CopybookScanAnalysis#DISABLED}
+   * This test verifies that when an extended document is opened, the code is analyzed and the
+   * copybook analysis is disabled using {@link CopybookProcessingMode#DISABLED}
    */
   @Test
   public void disableCopybookAnalysisOnExtendedDoc() {
@@ -181,7 +181,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   /**
    * This test verify that when a document is opened in DID_OPEN mode, the code is analyzed and the
-   * copybook analysis is enabled using {@link CopybookScanAnalysis#ENABLED}
+   * copybook analysis is enabled using {@link CopybookProcessingMode#ENABLED}
    */
   @Test
   public void enableCopybooksOnDidOpenTest() {
@@ -197,7 +197,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   /**
    * This test verify that when a document is updated in DID_CHANGE mode, the code is analyzed and
-   * the copybook analysis is enabled using {@link CopybookScanAnalysis#ENABLED}
+   * the copybook analysis is enabled using {@link CopybookProcessingMode#ENABLED}
    */
   @Test
   public void enableCopybooksOnDidChangeTest() {
@@ -240,10 +240,10 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
      *  - document URI [correct|incorrect]
      */
 
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookScanAnalysis.ENABLED))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
         .thenReturn(resultNoErrors);
     when(engine.analyze(
-            DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookScanAnalysis.ENABLED))
+            DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
         .thenReturn(resultWithErrors);
 
     when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DISABLED)).thenReturn(resultNoErrors);
@@ -354,7 +354,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
     verify(communications).notifyThatLoadingInProgress(uri);
-    verify(engine, timeout(10000)).analyze(uri, textToAnalyse, CopybookScanAnalysis.ENABLED);
+    verify(engine, timeout(10000)).analyze(uri, textToAnalyse, CopybookProcessingMode.ENABLED);
     verify(dataBus, timeout(10000))
         .postData(
             AnalysisFinishedEvent.builder().documentUri(uri).copybookUris(emptyList()).build());
@@ -369,7 +369,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       String text,
       String uri) {
 
-    verify(engine, timeout(10000).times(2)).analyze(uri, text, CopybookScanAnalysis.ENABLED);
+    verify(engine, timeout(10000).times(2)).analyze(uri, text, CopybookProcessingMode.ENABLED);
     verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
   }
 
@@ -388,7 +388,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
 
     doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.empty()))
         .when(engine)
-        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookScanAnalysis.ENABLED);
+        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
 
     MyTextDocumentService service =
         new MyTextDocumentService(communications, engine, null, null, null, broker, null);
@@ -440,7 +440,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     copybookUsages.put("NESTED", singletonList(nestedLocation));
     copybookUsages.put("NESTED2", singletonList(nested2Location));
 
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookScanAnalysis.ENABLED))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
         .thenReturn(
             new AnalysisResult(
                 emptyList(),
