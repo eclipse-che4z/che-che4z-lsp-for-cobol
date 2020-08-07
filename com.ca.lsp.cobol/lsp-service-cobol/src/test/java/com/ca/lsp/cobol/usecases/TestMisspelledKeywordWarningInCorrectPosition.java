@@ -65,7 +65,7 @@ class TestMisspelledKeywordWarningInCorrectPosition {
                 WARNING.getText()),
             "area",
             new Diagnostic(
-                null, "Following token must start in Area A: DISPLA", Warning, WARNING.getText()),
+                null, "The following token must start in Area A: DISPLA", Warning, WARNING.getText()),
             "hello",
             new Diagnostic(
                 null, "Syntax error on '\"hello\"' expected SECTION", Error, ERROR.getText())));

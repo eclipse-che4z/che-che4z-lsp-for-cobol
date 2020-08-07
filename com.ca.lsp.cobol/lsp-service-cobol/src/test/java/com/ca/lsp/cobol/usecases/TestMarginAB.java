@@ -25,7 +25,6 @@ import static org.junit.Assert.assertEquals;
 
 /** This test verifies if the margins respected and warnings thrown */
 class TestMarginAB {
-
   /**
    * In TEXT_DIVISION_WRONG_PLACE string there are several DIVISIONS that are not in the right place
    */
@@ -174,7 +173,7 @@ class TestMarginAB {
 
     assertEquals(3, result.getDiagnostics().get(DOCUMENT_URI).size());
     assertEquals(
-        "Following token can not be on the same line with DECLARATIVE token: MAMA",
-        result.getDiagnostics().get(DOCUMENT_URI).get(1).getMessage());
+        "The following token cannot be on the same line as a DECLARATIVE token: MAMA",
+                result.getDiagnostics().get(DOCUMENT_URI).get(1).getMessage());
   }
 }

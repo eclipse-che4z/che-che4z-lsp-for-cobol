@@ -47,12 +47,12 @@ import static java.util.Optional.ofNullable;
  */
 @Slf4j
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {
-  private static final String AREA_A_WARNING_MSG = "Following token must start in Area A: ";
-  private static final String AREA_B_WARNING_MSG = "Following token must start in Area B: ";
+  private static final String AREA_A_WARNING_MSG = "The following token must start in Area A: ";
+  private static final String AREA_B_WARNING_MSG = "The following token must start in Area B: ";
   private static final String IDENTICAL_PROGRAM_MSG =
       "Program-name must be identical to the program-name of the corresponding PROGRAM-ID paragraph: ";
   private static final String DECLARATIVE_SAME_MSG =
-      "Following token can not be on the same line with DECLARATIVE token: ";
+      "The following token cannot be on the same line as a DECLARATIVE token: ";
   private static final String INVALID_DEF_MSG = "Invalid definition for: ";
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
