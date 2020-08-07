@@ -43,7 +43,7 @@ class TestReplacingPseudoTextReplacesLevelNumber {
           + "11         GOBACK. ";
 
   private static final String REPL =
-      "0      {01^05}  {$*AA-PARENT^EE-PARENT}.\n"
+      "0      {01^05} {$* AA-PARENT^EE-PARENT}.\n"
           + "1        10  {$*AA-CHILD1^EE-CHILD1}      PIC 9.\n"
           + "2        10  {$*AA-CHILD2^EE-CHILD2}    PIC X(1).";
 

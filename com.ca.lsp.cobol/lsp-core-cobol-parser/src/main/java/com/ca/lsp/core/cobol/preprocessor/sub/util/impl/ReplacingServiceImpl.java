@@ -15,20 +15,24 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
-import com.ca.lsp.core.cobol.parser.CobolPreprocessor.PseudoTextContext;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessor.ReplaceClauseContext;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessor.ReplacePseudoTextContext;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessor.ReplaceSameElementContext;
-import com.ca.lsp.core.cobol.model.ReplacingMapping;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.antlr.v4.runtime.BufferedTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
+import static com.ca.lsp.core.cobol.parser.CobolPreprocessor.ReplaceliteralContext;
+import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
 import static java.util.regex.Matcher.quoteReplacement;
@@ -41,6 +45,12 @@ import static org.apache.commons.lang3.StringUtils.split;
  */
 @Singleton
 public class ReplacingServiceImpl implements ReplacingService {
+  /**
+   * Look-before and look-ahead pattern to check that the token wrapped with separators, i.e.
+   * whitespaces, dots ot line breaks. Not includes separators to the found substring.
+   */
+  private static final String SEPARATE_TOKEN_PATTERN = "(?<=[\\.\\s\\r\\n])%s(?=[\\.\\s\\r\\n])";
+
   private TokenUtils tokenUtils;
 
   @Inject
@@ -54,24 +64,42 @@ public class ReplacingServiceImpl implements ReplacingService {
       @Nonnull List<ReplaceClauseContext> replaceClauses,
       @Nonnull BufferedTokenStream tokens) {
     return replaceClauses.stream()
-        .map(
-            it ->
-                new ReplacingMapping(
-                    it.replaceable().replaceSameElement(), it.replacement().replaceSameElement()))
-        .reduce(
-            text, (replaced, pattern) -> replace(replaced, pattern, tokens), (str1, str2) -> str2);
+        .map(toReplacingPatterns(tokens))
+        .reduce(text, this::replace, (str1, str2) -> str2);
   }
 
-  private String replace(String text, ReplacingMapping pattern, BufferedTokenStream tokens) {
-    return Pattern.compile(getReplaceablePattern(pattern.getReplaceable(), tokens))
-        .matcher(text)
-        .replaceAll(getReplacementPattern(pattern.getReplacement(), tokens));
+  private Function<ReplaceClauseContext, Pair<String, String>> toReplacingPatterns(
+      @Nonnull BufferedTokenStream tokens) {
+    return clause ->
+        ofNullable(clause.replaceliteral())
+            .map(literal -> retrieveReplaceLiteral(literal, tokens))
+            .orElse(
+                ofNullable(clause.replacePseudoText())
+                    .map(pseudoText -> retrieveReplacePseudoText(pseudoText, tokens))
+                    .orElse(null));
   }
 
-  private String getReplaceablePattern(ReplaceSameElementContext ctx, BufferedTokenStream tokens) {
-    return ofNullable(ctx.pseudoText())
-        .map(it -> getRegexFromReplaceable(extractPseudoText(it, tokens)))
-        .orElse(getPatternForTokens(ctx, tokens));
+  private Pair<String, String> retrieveReplaceLiteral(
+      ReplaceliteralContext ctx, BufferedTokenStream tokens) {
+    return Pair.of(
+        getPatternForTokens(ctx.replaceable().replaceSameElement(), tokens),
+        getReplacementPattern(ctx.replacement().replaceSameElement(), tokens));
+  }
+
+  private String getReplacementPattern(ReplaceSameElementContext ctx, BufferedTokenStream tokens) {
+    return quoteReplacement(extractPlainText(ctx, tokens));
+  }
+
+  private Pair<String, String> retrieveReplacePseudoText(
+      ReplacePseudoTextContext ctx, BufferedTokenStream tokens) {
+    return Pair.of(
+        // ignore number of whitespaces
+        extractPseudoText(ctx.pseudoReplaceable(), tokens).replace(" ", " +"),
+        extractPseudoText(ctx.pseudoReplacement(), tokens));
+  }
+
+  private String replace(String text, Pair<String, String> pattern) {
+    return Pattern.compile(pattern.getLeft()).matcher(text).replaceAll(pattern.getRight());
   }
 
   /**
@@ -82,17 +110,7 @@ public class ReplacingServiceImpl implements ReplacingService {
    * @return pattern that matches only full tokens
    */
   private String getPatternForTokens(ReplaceSameElementContext ctx, BufferedTokenStream tokens) {
-    return "(?<=[\\.\\s\\r\\n])"
-        + getRegexFromReplaceable(extractPlainText(ctx, tokens))
-        + "(?=[\\.\\s\\r\\n])";
-  }
-
-  private String getReplacementPattern(ReplaceSameElementContext ctx, BufferedTokenStream tokens) {
-
-    return quoteReplacement(
-        ofNullable(ctx.pseudoText())
-            .map(it -> extractPseudoText(it, tokens))
-            .orElse(extractPlainText(ctx, tokens)));
+    return format(SEPARATE_TOKEN_PATTERN, getRegexFromReplaceable(extractPlainText(ctx, tokens)));
   }
 
   private String extractPlainText(ReplaceSameElementContext ctx, BufferedTokenStream tokens) {
@@ -106,14 +124,30 @@ public class ReplacingServiceImpl implements ReplacingService {
     return "";
   }
 
-  private String extractPseudoText(PseudoTextContext pseudoTextCtx, BufferedTokenStream tokens) {
-    String pseudoText = tokenUtils.retrieveTextIncludingHiddenTokens(pseudoTextCtx, tokens).trim();
-    return pseudoText.replaceAll("^==", "").replaceAll("==$", "").trim();
+  /**
+   * Extract the pseudo text-based pattern for replacing in accordance with COBOL rules. Double
+   * equals chars should be removed at the beginning and at the end, all the whitespaces should be
+   * collapsed.
+   *
+   * @param pseudoTextCtx - context for pseudo text
+   * @param tokens - token to retrieve the pattern
+   * @return a pattern for replacing
+   */
+  private String extractPseudoText(ParseTree pseudoTextCtx, BufferedTokenStream tokens) {
+    return tokenUtils
+        .retrieveTextIncludingHiddenTokens(pseudoTextCtx, tokens)
+        .trim()
+        .replaceAll("^==", "")
+        .replaceAll("==$", "")
+        .replaceAll(" +", " ")
+        .trim();
   }
 
   /**
-   * Get a regex from string. Whitespace in Cobol replaceables matches line breaks. Hence, the
-   * replaceable search string has to be enhanced to a regex
+   * Get a regex from string. Whitespace in COBOL replaceable patterns matches line breaks. Hence,
+   * the replaceable search string has to be enhanced to a regex
+   *
+   * @return a regex for replaceable
    */
   private String getRegexFromReplaceable(String replaceable) {
     return stream(split(ofNullable(replaceable).orElse("")))

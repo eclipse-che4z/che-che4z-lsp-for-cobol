@@ -157,7 +157,6 @@ copyLibrary
    : literal | cobolWord
    ;
 
-
 // replace statement
 replacingPhrase
    : REPLACING NEWLINE* replaceClause+
@@ -176,7 +175,23 @@ replaceOffStatement
    ;
 
 replaceClause
-   : replaceable NEWLINE* BY NEWLINE* replacement (NEWLINE* directoryPhrase)? (NEWLINE* familyPhrase)?
+   : (replacePseudoText | replaceliteral) (NEWLINE* directoryPhrase)? (NEWLINE* familyPhrase)?
+   ;
+
+replaceliteral
+   : replaceable NEWLINE* BY NEWLINE* replacement
+   ;
+
+replacePseudoText
+   : pseudoReplaceable NEWLINE* BY NEWLINE* pseudoReplacement
+   ;
+
+pseudoReplaceable
+   : (DOUBLEEQUALCHAR .*? DOUBLEEQUALCHAR)
+   ;
+
+pseudoReplacement
+   : (DOUBLEEQUALCHAR .*? DOUBLEEQUALCHAR) | EMPTYPSEUDOTEXT
    ;
 
 directoryPhrase
@@ -196,12 +211,7 @@ replacement
    ;
 
 replaceSameElement
-   : literal | cobolWord | pseudoText | charDataLine
-   ;
-
-// literals
-pseudoText
-   : DOUBLEEQUALCHAR charData? DOUBLEEQUALCHAR
+   : literal | cobolWord | charDataLine
    ;
 
 charData
@@ -264,7 +274,7 @@ charDataKeyword
    | NSEQ | NSYMBOL | NS
    | NUM | NUMBER | NUMPROC
    | OBJ | OBJECT | ON | OF | OFF | OFFSET | OPMARGINS | OPSEQUENCE | OPTIMIZE | OP | OPT | OPTFILE | OPTIONS | OUT | OUTDD
-   | PFD | PGMN | PGMNAME | PPTDBG | PROCESS | PROLOG
+   | PFD | PGMN | PGMNAME | PIC | PICTURE | PPTDBG | PROCESS | PROLOG
    | QUOTE
    | RENT | REPLACING | RMODE
    | SEQ | SEQUENCE | SEP | SEPARATE | SHORT | SIZE | SOURCE | SP | SPACE | SPIE | SQL | SQLC | SQLCCSID | SS | SSR | SSRANGE | STD | SYSEIB | SZ

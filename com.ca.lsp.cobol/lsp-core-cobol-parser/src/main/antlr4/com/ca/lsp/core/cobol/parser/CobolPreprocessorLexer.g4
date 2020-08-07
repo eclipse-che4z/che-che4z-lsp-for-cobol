@@ -306,6 +306,7 @@ DOLLARCHAR : '$';
 DOT_FS : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ | '.' EOF;
 DOT : '.';
 DOUBLEEQUALCHAR : '==';
+EMPTYPSEUDOTEXT : '====';
 MINUSCHAR : '-';
 LESSTHANCHAR : '<';
 LESSTHANOREQUAL : '<=';
