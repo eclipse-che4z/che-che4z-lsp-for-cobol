@@ -55,12 +55,12 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   @Nonnull
   @Override
   public ResultWithErrors<PreprocessedInput> process(
-      @Nonnull String documentUri, @Nonnull String cobolSourceCode, String copybookScanAnalysis) {
+      @Nonnull String documentUri, @Nonnull String cobolSourceCode, String copybookProcessingMode) {
     return process(
         documentUri,
         cobolSourceCode,
         new SemanticContext(Collections.emptyList()),
-        copybookScanAnalysis);
+        copybookProcessingMode);
   }
 
   @Nonnull
@@ -69,7 +69,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
       @Nonnull String documentUri,
       @Nonnull String cobolCode,
       @Nonnull SemanticContext semanticContext,
-      @Nonnull String copybookScanAnalysis) {
+      @Nonnull String copybookProcessingMode) {
 
     ResultWithErrors<List<CobolLine>> lines = readLines(cobolCode, documentUri);
 
@@ -82,7 +82,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
     ResultWithErrors<PreprocessedInput> parsedDocument =
         semanticParser.processLines(
-            documentUri, cleanDocument, semanticContext, copybookScanAnalysis);
+            documentUri, cleanDocument, semanticContext, copybookProcessingMode);
 
     List<SyntaxError> errors = new ArrayList<>();
     errors.addAll(lines.getErrors());

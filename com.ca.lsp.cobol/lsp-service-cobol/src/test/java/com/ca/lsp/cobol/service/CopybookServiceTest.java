@@ -29,8 +29,8 @@ import java.nio.file.Path;
 
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.REQUIRED_COPYBOOK_EVENT;
-import static com.ca.lsp.cobol.service.CopybookScanAnalysis.DISABLED;
-import static com.ca.lsp.cobol.service.CopybookScanAnalysis.ENABLED;
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.DISABLED;
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.ENABLED;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_2_URI;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static java.util.Arrays.asList;
@@ -94,7 +94,7 @@ public class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
 
     verify(files).getNameFromURI(DOCUMENT_URI);
@@ -125,7 +125,7 @@ public class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
 
     verify(files).getNameFromURI(DOCUMENT_URI);
@@ -137,9 +137,9 @@ public class CopybookServiceTest {
 
   /**
    * Test the service should return the content of the copybook only when {@link
-   * CopybookScanAnalysis} is enabled. When the document is in change mode, the copybook name may be
-   * incomplete and due to this unable to resolve, so the {@link * CopybookScanAnalysis} should be
-   * disabled .
+   * CopybookProcessingMode} is enabled. When the document is in change mode, the copybook name may
+   * be incomplete and due to this unable to resolve, so the {@link * copybookProcessingMode} should
+   * be disabled .
    */
   @Test
   public void testRequestWhileCopybookAnalysisIsDisabled() {
@@ -149,7 +149,7 @@ public class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(DISABLED.name())
+            .copybookProcessingMode(DISABLED.name())
             .build());
 
     verify(broker).postData(FetchedCopybookEvent.builder().name(VALID_CPY_NAME).build());
@@ -168,7 +168,7 @@ public class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(INVALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
 
     verify(files).getNameFromURI(DOCUMENT_URI);
@@ -189,14 +189,14 @@ public class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
 
     copybookService.observerCallback(
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(DISABLED.name())
+            .copybookProcessingMode(DISABLED.name())
             .build());
 
     verify(files, times(2)).getContentByPath(cpyPath);
@@ -222,7 +222,7 @@ public class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
 
     verify(broker, timeout(10000))
@@ -240,7 +240,7 @@ public class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(DISABLED.name())
+            .copybookProcessingMode(DISABLED.name())
             .build());
 
     verify(files, times(1)).getContentByPath(cpyPath);
@@ -269,7 +269,7 @@ public class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
 
     copybookService.invalidateURICache();
@@ -278,7 +278,7 @@ public class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
 
     // Check the requests applied same logic
@@ -308,7 +308,7 @@ public class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
 
     verify(broker, timeout(10000).times(1))
@@ -338,20 +338,20 @@ public class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(INVALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
     copybookService.observerCallback(
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
     // Second document parsed
     copybookService.observerCallback(
         RequiredCopybookEvent.builder()
             .name(INVALID_2_CPY_NAME)
             .documentUri(DOCUMENT_2_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
 
     // Wait for all settingsService calls processed
@@ -420,20 +420,20 @@ public class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(INVALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
     copybookService.observerCallback(
         RequiredCopybookEvent.builder()
             .name(PARENT_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
     // Nested copybook declaration
     copybookService.observerCallback(
         RequiredCopybookEvent.builder()
             .name(NESTED_CPY_NAME)
             .documentUri(PARENT_CPY_URI)
-            .copybookScanAnalysis(ENABLED.name())
+            .copybookProcessingMode(ENABLED.name())
             .build());
 
     // Wait for all settingsService calls processed

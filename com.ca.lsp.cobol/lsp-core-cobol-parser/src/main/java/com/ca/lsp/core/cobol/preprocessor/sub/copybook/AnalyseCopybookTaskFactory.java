@@ -26,5 +26,5 @@ public interface AnalyseCopybookTaskFactory {
       @Assisted("documentUri") String documentUri,
       @Assisted("copybookUsage") CopybookUsage copybookUsage,
       @Assisted("copybookUsageTracker") List<CopybookUsage> copybookUsageTracker,
-      @Assisted("copybookScanAnalysis") String copybookScanAnalysis);
+      @Assisted("copybookProcessingMode") String copybookProcessingMode);
 }

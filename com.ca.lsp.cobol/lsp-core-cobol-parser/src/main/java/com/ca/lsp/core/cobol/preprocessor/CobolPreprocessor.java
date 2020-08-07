@@ -20,11 +20,11 @@ import com.ca.lsp.core.cobol.semantics.SemanticContext;
 /** The CobolPreprocessor is engaged in order to process, transform and parse the document */
 public interface CobolPreprocessor {
   ResultWithErrors<PreprocessedInput> process(
-      String documentUri, String cobolCode, String copybookScanAnalysis);
+      String documentUri, String cobolCode, String copybookProcessingMode);
 
   ResultWithErrors<PreprocessedInput> process(
       String documentUri,
       String cobolCode,
       SemanticContext semanticContext,
-      String copybookScanAnalysis);
+      String copybookProcessingMode);
 }

@@ -56,6 +56,6 @@ import org.junit.runners.Suite.SuiteClasses;
   ServerCommunicationsTest.class,
   FindCopybookCommandTest.class,
   WatcherServiceImplTest.class,
-  CopybookScanAnalysisTest.class
+  CopybookProcessingModeTest.class
 })
 public class AllTests {}

@@ -112,7 +112,7 @@ public class CopybookServiceImpl implements CopybookService {
         copybookPaths.remove(requiredCopybookName);
       }
     }
-    if (CopybookScanAnalysis.ENABLED.name().equals(event.getCopybookScanAnalysis())) {
+    if (CopybookProcessingMode.ENABLED.name().equals(event.getCopybookProcessingMode())) {
       String cobolFileName = files.getNameFromURI(event.getDocumentUri());
       settingsService
           .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, requiredCopybookName)

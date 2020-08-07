@@ -54,17 +54,17 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
   private final String documentUri;
   private final BufferedTokenStream tokens;
   private final SemanticContext semanticContext;
-  private final String copybookScanAnalysis;
+  private final String copybookProcessingMode;
 
   CobolSemanticParserListenerImpl(
       String documentUri,
       BufferedTokenStream tokens,
       SemanticContext semanticContext,
-      String copybookScanAnalysis) {
+      String copybookProcessingMode) {
     this.documentUri = documentUri;
     this.tokens = tokens;
     this.semanticContext = semanticContext;
-    this.copybookScanAnalysis = copybookScanAnalysis;
+    this.copybookProcessingMode = copybookProcessingMode;
 
     preprocessorCleanerService = new PreprocessorCleanerServiceImpl();
   }
@@ -138,7 +138,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
      * define the copy book
      */
 
-    if (copybookScanAnalysis.equalsIgnoreCase("ENABLED")) {
+    if (copybookProcessingMode.equals("ENABLED")) {
       CopySourceContext copySource = ctx.copySource();
       String copybookName = retrieveCopybookName(copySource);
       Position position = retrievePosition(copySource);

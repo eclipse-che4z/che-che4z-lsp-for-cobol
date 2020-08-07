@@ -14,10 +14,10 @@
  */
 package com.ca.lsp.cobol.service;
 
-import static com.ca.lsp.cobol.service.utils.FileSystemService.isFileUnderExtendedSourceFolder;
+import static com.ca.lsp.cobol.service.utils.WorkspaceFileService.isFileUnderExtendedSourceFolder;
 
 /** This enum class used to track text synchronization type for the processed document. */
-public enum CopybookScanAnalysis {
+public enum CopybookProcessingMode {
   ENABLED,
   DISABLED;
 
@@ -28,17 +28,18 @@ public enum CopybookScanAnalysis {
    * @param uri of the document opened in the editor by the client
    * @param textDocSyncType define the document sync mode that could be [{@link
    *     TextDocumentSyncType#DID_OPEN}|{@link TextDocumentSyncType#DID_CHANGE}]
-   * @return A value of that could be [{@link CopybookScanAnalysis#ENABLED}|{@link
-   *     CopybookScanAnalysis#DISABLED}]
+   * @return A value of that could be [{@link CopybookProcessingMode#ENABLED}|{@link
+   *     CopybookProcessingMode#DISABLED}]
    */
-  public static CopybookScanAnalysis getCopybookScanAnalysis(String uri, String textDocSyncType) {
+  public static CopybookProcessingMode getCopybookProcessingMode(
+      String uri, String textDocSyncType) {
 
-    return isFileUnderExtendedSourceFolder(uri)
+    return textDocSyncType.equals("DID_CHANGE")
         ? DISABLED
-        : getCopybookScanAnalysisByDocSync(textDocSyncType);
+        : getCopybookProcessingModeByDocSync(uri);
   }
 
-  private static CopybookScanAnalysis getCopybookScanAnalysisByDocSync(String textDocSyncType) {
-    return textDocSyncType.equalsIgnoreCase("DID_OPEN") ? ENABLED : DISABLED;
+  private static CopybookProcessingMode getCopybookProcessingModeByDocSync(String uri) {
+    return isFileUnderExtendedSourceFolder(uri) ? DISABLED : ENABLED;
   }
 }
