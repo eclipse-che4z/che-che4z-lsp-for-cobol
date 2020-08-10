@@ -39,23 +39,26 @@ class TestReplacingForSeveralTokensInOneLine {
           + "       PROGRAM-ID. TEST1.\r\n"
           + "       DATA DIVISION.\r\n"
           + "       WORKING-STORAGE SECTION.\r\n"
-          + "       01 {$*ABC-PARENT}.\r\n"
+          + "       01 {$*ABCDE-PARENT}.\r\n"
           + "       PROCEDURE DIVISION.\r\n"
           + "       {#*MAIN-LINE}.\r\n"
-          + "       COPY {~REPL} REPLACING ==:TAG:== BY ==ABC==.\r\n"
+          + "       COPY {~REPL} REPLACING ==:TAG:== BY ==ABCDE==.\r\n"
           + "           GOBACK.";
 
   private static final String REPL =
-      "              MOVE 10 TO {$:TAG:-CHILD^ABC-CHILD|invalid|invalid} OF {$:TAG:-PARENT^ABC-PARENT}";
+      "              MOVE 10 TO {_{$:TAG:-CHILD^ABCDE-CHILD|invalid} OF {$:TAG:-PARENT^ABCDE-PARENT}|struct_}";
 
   private static final String REPL_NAME = "REPL";
-  private static final String MESSAGE = "Invalid definition for: ABC-CHILD";
+  private static final String MESSAGE = "Invalid definition for: ABCDE-CHILD";
+  private static final String MESSAGE_STRUCTURE = "Invalid definition for: ABCDE-CHILD OF ABCDE-PARENT";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         DOCUMENT,
         List.of(new CobolText(REPL_NAME, REPL)),
-        Map.of("invalid", new Diagnostic(null, MESSAGE, Information, INFO.getText())));
+        Map.of(
+            "invalid", new Diagnostic(null, MESSAGE, Information, INFO.getText()),
+            "struct", new Diagnostic(null, MESSAGE_STRUCTURE, Information, INFO.getText())));
   }
 }

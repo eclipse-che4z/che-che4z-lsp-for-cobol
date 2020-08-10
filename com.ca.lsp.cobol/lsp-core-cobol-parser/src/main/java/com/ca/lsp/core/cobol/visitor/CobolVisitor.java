@@ -38,6 +38,7 @@ import java.util.Map;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.INFO;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.WARNING;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 
 /**
  * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
@@ -324,7 +325,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
       Position parentPosition = getPosition(parentToken);
 
       checkVariableDefinition(parent, parentPosition);
-      checkVariableStructure(parent, child, getPosition(childToken));
+      checkVariableStructure(parent, child, childToken, parentToken);
 
       childToken = parentToken;
       child = parent;
@@ -370,11 +371,22 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
                 .orElse(null));
   }
 
-  private void checkVariableStructure(String parent, String child, @Nullable Position position) {
-    if (position == null) return;
+  private void checkVariableStructure(
+      String parent, String child, Token childToken, Token parentToken) {
+    Position childPosition = getPosition(childToken);
+    Position parentPosition = getPosition(parentToken);
+    if (childPosition == null || parentPosition == null) return;
     if (!variables.parentContainsSpecificChild(parent, child)) {
-      reportVariableNotDefined(child, position, position);
+      reportVariableNotDefined(
+          extractErrorStatementText(childToken, parentToken), childPosition, parentPosition);
     }
+  }
+
+  private String extractErrorStatementText(Token childToken, Token parentToken) {
+    return tokenStream.getTokens(childToken.getTokenIndex(), parentToken.getTokenIndex()).stream()
+        .map(Token::getText)
+        .collect(joining())
+        .replaceAll(" +", " ");
   }
 
   private void addUsage(SubContext<?> langContext, String name, @Nullable Position position) {

@@ -23,9 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 
 /**
  * This test covers case when copybook that was not found appears as a variable. Assert that there
@@ -39,8 +37,7 @@ class TestMissingCopybookNotInVariableList {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*PARENT}. COPY {~CPYNAME|missing}.\n"
-          + "       PROCEDURE DIVISION.\n"
-          + "           MOVE 00 TO {$CHILD1|invalid|invalid} OF {$PARENT}.";
+          + "       PROCEDURE DIVISION.\n";
 
   @Test
   void test() {
@@ -50,8 +47,6 @@ class TestMissingCopybookNotInVariableList {
         Map.of(
             "missing",
             new Diagnostic(
-                null, "CPYNAME: Copybook not found", Error, ERROR.getText(), "MISSING_COPYBOOK"),
-            "invalid",
-            new Diagnostic(null, "Invalid definition for: CHILD1", Information, INFO.getText())));
+                null, "CPYNAME: Copybook not found", Error, ERROR.getText(), "MISSING_COPYBOOK")));
   }
 }

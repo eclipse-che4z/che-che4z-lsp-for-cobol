@@ -45,12 +45,12 @@ class TestUndefinedParentVariableUnderlined {
           + "6              10 {$*MAMA} PIC 99 VALUE 3.\r\n"
           + "7       PROCEDURE DIVISION.\r\n"
           + "8       {#*PROCB}.\r\n"
-          + "9           MOVE 10 TO {$MAMA} OF {$AGE|1} OF {$BORROWE|2}.\r\n"
+          + "9           MOVE 10 TO {$MAMA} OF {_{$AGE} OF {$BORROWE|2}|1_}.\r\n"
           + "10      END PROGRAM TEST1.";
 
   private static final String MESSAGE = "Invalid definition for: ";
   private static final String BORROWE = "BORROWE";
-  private static final String AGE = "AGE";
+  private static final String AGE = "AGE OF BORROWE";
 
   @Test
   void assertSyncTypeNotChangesLogic() {
