@@ -34,12 +34,12 @@ public enum CopybookProcessingMode {
   public static CopybookProcessingMode getCopybookProcessingMode(
       String uri, String textDocSyncType) {
 
-    return isFileUnderExtendedSourceFolder(uri)
+    return textDocSyncType.equals("DID_CHANGE")
         ? DISABLED
-        : getCopybookProcessingModeByDocSync(textDocSyncType);
+        : getCopybookProcessingModeByDocSync(uri);
   }
 
-  private static CopybookProcessingMode getCopybookProcessingModeByDocSync(String textDocSyncType) {
-    return textDocSyncType.equals("DID_OPEN") ? ENABLED : DISABLED;
+  private static CopybookProcessingMode getCopybookProcessingModeByDocSync(String uri) {
+    return isFileUnderExtendedSourceFolder(uri) ? DISABLED : ENABLED;
   }
 }
