@@ -43,6 +43,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.getCopybookProcessingMode;
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -234,7 +237,8 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text, TextDocumentSyncType.DID_OPEN);
+              AnalysisResult result =
+                  engine.analyze(uri, text, getCopybookProcessingMode(uri, DID_OPEN.name()));
               ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
               publishResult(uri, result);
             })
@@ -244,7 +248,8 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   void analyzeChanges(String uri, String text) {
     runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text, TextDocumentSyncType.DID_CHANGE);
+              AnalysisResult result =
+                  engine.analyze(uri, text, getCopybookProcessingMode(uri, DID_CHANGE.name()));
               registerDocument(uri, new MyDocumentModel(text, result));
               communications.publishDiagnostics(result.getDiagnostics());
             })

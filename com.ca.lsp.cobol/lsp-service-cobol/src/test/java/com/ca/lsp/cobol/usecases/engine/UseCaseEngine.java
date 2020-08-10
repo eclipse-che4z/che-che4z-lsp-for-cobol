@@ -16,6 +16,7 @@
 package com.ca.lsp.cobol.usecases.engine;
 
 import com.ca.lsp.cobol.positive.CobolText;
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.usecases.engine.parser.TestPreprocessorLexer;
 import com.ca.lsp.cobol.usecases.engine.parser.TestPreprocessorParser;
@@ -29,6 +30,7 @@ import org.eclipse.lsp4j.Location;
 import java.util.*;
 import java.util.function.Function;
 
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.ENABLED;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
@@ -89,7 +91,8 @@ public class UseCaseEngine {
   /**
    * Check if the language engine applies required syntax and semantic checks. All the semantic
    * elements in the given text, as well as syntax errors, should be wrapped with according tags.
-   * The same extraction operation applied also for the given copybooks.
+   * The same extraction operation applied also for the given copybooks. Copybooks processing
+   * enabled.
    *
    * <p>Expected diagnostics should contain the full of list of syntax and semantic
    * errors/warnings/info messages for the document and copybooks. Existing positions, if they are,
@@ -103,9 +106,34 @@ public class UseCaseEngine {
    */
   public void runTest(
       String text, List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics) {
+    runTest(text, copybooks, expectedDiagnostics, ENABLED);
+  }
+  /**
+   * Check if the language engine applies required syntax and semantic checks. All the semantic
+   * elements in the given text, as well as syntax errors, should be wrapped with according tags.
+   * The same extraction operation applied also for the given copybooks. The copybook processing
+   * mode relies on processingMode parameter.
+   *
+   * <p>Expected diagnostics should contain the full of list of syntax and semantic
+   * errors/warnings/info messages for the document and copybooks. Existing positions, if they are,
+   * for the diagnostics will be dropped and replaced with ones extracted by engine by their IDs.
+   *
+   * @param text - COBOL text to analyse. It will be cleaned up before analysis to exclude all the
+   *     technical tokens and collect syntax and semantic elements.
+   * @param copybooks - list of the copybooks used in the document
+   * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
+   *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
+   * @param processingMode - copybook processing mode
+   */
+  public void runTest(
+      String text,
+      List<CobolText> copybooks,
+      Map<String, Diagnostic> expectedDiagnostics,
+      CopybookProcessingMode processingMode) {
 
     PreprocessedDocument document = prepareDocument(text, copybooks, expectedDiagnostics);
-    AnalysisResult actual = analyze(DOCUMENT_URI, document.getText(), document.getCopybooks());
+    AnalysisResult actual =
+        analyze(DOCUMENT_URI, document.getText(), document.getCopybooks(), processingMode);
     TestData expected = document.getTestData();
 
     assertResultEquals(actual, expected);

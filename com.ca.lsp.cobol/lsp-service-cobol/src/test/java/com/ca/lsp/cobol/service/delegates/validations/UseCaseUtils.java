@@ -22,7 +22,7 @@ import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.ca.lsp.cobol.positive.CobolText;
-import com.ca.lsp.cobol.service.TextDocumentSyncType;
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.cobol.service.mocks.MockCopybookService;
 import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -182,7 +181,7 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(String fileName, String text, List<CobolText> copybooks) {
-    return analyze(fileName, text, copybooks, DID_OPEN);
+    return analyze(fileName, text, copybooks, CopybookProcessingMode.ENABLED);
   }
 
   /**
@@ -192,12 +191,15 @@ public class UseCaseUtils {
    * @param fileName - name of the processing file
    * @param text - text to analyze
    * @param copybooks - list of copybooks required for the analysis
-   * @param syncType - sync type for the analysis
+   * @param copybookProcessingMode - sync type for the analysis
    * @return the entire analysis result
    */
   @SuppressWarnings("unchecked")
   public static AnalysisResult analyze(
-      String fileName, String text, List<CobolText> copybooks, TextDocumentSyncType syncType) {
+      String fileName,
+      String text,
+      List<CobolText> copybooks,
+      CopybookProcessingMode copybookProcessingMode) {
     Injector injector = Guice.createInjector(new EngineModule(), new DatabusModule());
 
     DataBusBroker<FetchedCopybookEvent, RequiredCopybookEvent> broker =
@@ -206,6 +208,8 @@ public class UseCaseUtils {
     MockCopybookService mockCopybookService = new MockCopybookServiceImpl(broker);
     mockCopybookService.setCopybooks(() -> copybooks);
 
-    return injector.getInstance(CobolLanguageEngineFacade.class).analyze(fileName, text, syncType);
+    return injector
+        .getInstance(CobolLanguageEngineFacade.class)
+        .analyze(fileName, text, copybookProcessingMode);
   }
 }

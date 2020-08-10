@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.DISABLED;
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.ENABLED;
 import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
@@ -53,10 +53,10 @@ class TestUndefinedParentVariableUnderlined {
   private static final String AGE = "AGE OF BORROWE";
 
   @Test
-  void assertSyncTypeNotChangesLogic() {
+  void assertCopybookProcessingModeNotChangesLogic() {
     assertEquals(
-        analyze(DOCUMENT_URI, TEXT, List.of(), DID_OPEN),
-        analyze(DOCUMENT_URI, TEXT, List.of(), DID_CHANGE));
+        analyze(DOCUMENT_URI, TEXT, List.of(), ENABLED),
+        analyze(DOCUMENT_URI, TEXT, List.of(), DISABLED));
   }
 
   @Test

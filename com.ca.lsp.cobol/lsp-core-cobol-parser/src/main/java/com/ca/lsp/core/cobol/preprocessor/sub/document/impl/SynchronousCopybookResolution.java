@@ -62,7 +62,7 @@ public class SynchronousCopybookResolution
    *
    * @param copybookName - the name of the copybook to be retrieved
    * @param documentUri - the currently processing document that contains the copy statement
-   * @param syncType - text document synchronization type
+   * @param copybookProcessingMode - text document synchronization type
    * @return a CopybookModel that contains copybook name, its URI and the content; or null in case
    *     of severe issue.
    * @throws IllegalStateException if the instance reused.
@@ -70,7 +70,9 @@ public class SynchronousCopybookResolution
   @Nullable
   @Override
   public CopybookModel resolve(
-      @Nonnull String copybookName, @Nonnull String documentUri, @Nonnull String syncType) {
+      @Nonnull String copybookName,
+      @Nonnull String documentUri,
+      @Nonnull String copybookProcessingMode) {
     checkState();
 
     if (isCopybookInCache(copybookName)) {
@@ -84,7 +86,7 @@ public class SynchronousCopybookResolution
         RequiredCopybookEvent.builder()
             .name(copybookName)
             .documentUri(documentUri)
-            .textDocumentSyncType(syncType)
+            .copybookProcessingMode(copybookProcessingMode)
             .build());
     try {
       return waitForResolving.get();

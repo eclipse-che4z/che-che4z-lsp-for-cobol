@@ -28,5 +28,5 @@ public interface GrammarPreprocessorListenerFactory {
       @Nonnull @Assisted("uri") String uri,
       @Nonnull BufferedTokenStream tokens,
       @Nonnull Deque<CopybookUsage> copybookStack,
-      @Nonnull @Assisted("textDocumentSyncType") String textDocumentSyncType);
+      @Nonnull @Assisted("copybookProcessingMode") String textDocumentSyncType);
 }

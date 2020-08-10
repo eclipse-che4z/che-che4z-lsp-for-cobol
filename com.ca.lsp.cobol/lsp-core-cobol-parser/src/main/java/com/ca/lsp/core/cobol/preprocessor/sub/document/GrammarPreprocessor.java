@@ -30,7 +30,7 @@ public interface GrammarPreprocessor {
    * @param uri - the URI of the processing document
    * @param code - COBOL program text to analyse
    * @param copybookStack - stack, representing the hierarchy of nesting copybooks
-   * @param textDocumentSyncType - reflect the sync status of the document (DID_OPEN|DID_CHANGE)
+   * @param copybookProcessingMode - reflects the status of the copybook support (ENABLED|DISABLED)
    * @return extended document with copybooks and related errors
    */
   @Nonnull
@@ -38,5 +38,5 @@ public interface GrammarPreprocessor {
       @Nonnull String uri,
       @Nonnull String code,
       @Nonnull Deque<CopybookUsage> copybookStack,
-      @Nonnull String textDocumentSyncType);
+      @Nonnull String copybookProcessingMode);
 }

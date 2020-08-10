@@ -22,11 +22,11 @@ import java.util.Deque;
 /** The CobolPreprocessor is engaged in order to process, transform and parse the document */
 public interface CobolPreprocessor {
   ResultWithErrors<ExtendedDocument> process(
-      String documentUri,
-      String cobolCode,
-      Deque<CopybookUsage> copybookStack,
-      String textDocumentSyncType);
+      String documentUri, String cobolCode, String copybookProcessingMode);
 
   ResultWithErrors<ExtendedDocument> process(
-      String documentUri, String cobolCode, String textDocumentSyncType);
+      String documentUri,
+      String cobolCode,
+      Deque<CopybookUsage> semanticContext,
+      String copybookProcessingMode);
 }

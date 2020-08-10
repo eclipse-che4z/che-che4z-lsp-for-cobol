@@ -60,16 +60,16 @@ public class CobolLanguageEngine {
    *
    * @param documentUri unique resource identifier of the processed document
    * @param text the content of the document that should be processed
-   * @param textDocumentSyncType the document sync type that can be (DID_OPEN|DID_CHANGE)
+   * @param copybookProcessingMode the trigger for copybook scan (ENABLED|DISABLED)
    * @return Semantic information wrapper object and list of syntax error that might send back to
    *     the client
    */
   @Nonnull
   public ResultWithErrors<SemanticContext> run(
-      @Nonnull String documentUri, @Nonnull String text, @Nonnull String textDocumentSyncType) {
+      @Nonnull String documentUri, @Nonnull String text, @Nonnull String copybookProcessingMode) {
 
     ResultWithErrors<ExtendedDocument> preProcessorOutput =
-        preprocessor.process(documentUri, text, textDocumentSyncType);
+        preprocessor.process(documentUri, text, copybookProcessingMode);
 
     List<SyntaxError> accumulatedErrors = new ArrayList<>(preProcessorOutput.getErrors());
     ExtendedDocument extendedDocument = preProcessorOutput.getResult();

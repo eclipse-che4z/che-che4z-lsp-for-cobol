@@ -54,8 +54,8 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   @Nonnull
   @Override
   public ResultWithErrors<ExtendedDocument> process(
-      @Nonnull String documentUri, @Nonnull String cobolSourceCode, String textDocumentSyncType) {
-    return process(documentUri, cobolSourceCode, new ArrayDeque<>(), textDocumentSyncType);
+      @Nonnull String documentUri, @Nonnull String cobolSourceCode, String copybookProcessingMode) {
+    return process(documentUri, cobolSourceCode, new ArrayDeque<>(), copybookProcessingMode);
   }
 
   @Nonnull
@@ -64,7 +64,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
       @Nonnull String documentUri,
       @Nonnull String cobolCode,
       Deque<CopybookUsage> copybookStack,
-      @Nonnull String textDocumentSyncType) {
+      @Nonnull String copybookProcessingMode) {
 
     ResultWithErrors<List<CobolLine>> lines = readLines(cobolCode, documentUri);
 
@@ -77,7 +77,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 
     ResultWithErrors<ExtendedDocument> parsedDocument =
         grammarPreprocessor.buildExtendedDocument(
-            documentUri, code, copybookStack, textDocumentSyncType);
+            documentUri, code, copybookStack, copybookProcessingMode);
 
     List<SyntaxError> errors = new ArrayList<>();
     errors.addAll(lines.getErrors());

@@ -16,8 +16,8 @@ package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessor;
+import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListenerFactory;
@@ -47,7 +47,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
       @Nonnull String uri,
       @Nonnull String code,
       @Nonnull Deque<CopybookUsage> copybookStack,
-      @Nonnull String textDocumentSyncType) {
+      @Nonnull String copybookProcessingMode) {
     Lexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     lexer.removeErrorListeners();
 
@@ -60,7 +60,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
 
     ParseTreeWalker walker = new ParseTreeWalker();
     GrammarPreprocessorListener listener =
-        listenerFactory.create(uri, tokens, copybookStack, textDocumentSyncType);
+        listenerFactory.create(uri, tokens, copybookStack, copybookProcessingMode);
     walker.walk(listener, startRule);
 
     return new ResultWithErrors<>(listener.getResult(), listener.getErrors());

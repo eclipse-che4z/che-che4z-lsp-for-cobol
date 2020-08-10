@@ -71,7 +71,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private TokenUtils tokenUtils;
   private String documentUri;
   private BufferedTokenStream tokens;
-  private String textDocumentSyncType;
+  private String copybookProcessingMode;
   private CobolPreprocessor preprocessor;
   private Provider<CopybookResolution> resolutions;
   private Deque<CopybookUsage> copybookStack;
@@ -82,7 +82,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       @Assisted("uri") String documentUri,
       @Assisted BufferedTokenStream tokens,
       @Assisted Deque<CopybookUsage> copybookStack,
-      @Assisted("textDocumentSyncType") String textDocumentSyncType,
+      @Assisted("copybookProcessingMode") String copybookProcessingMode,
       TokenUtils tokenUtils,
       CobolPreprocessor preprocessor,
       Provider<CopybookResolution> resolutions,
@@ -90,7 +90,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     this.documentUri = documentUri;
     this.tokens = tokens;
     this.copybookStack = copybookStack;
-    this.textDocumentSyncType = textDocumentSyncType;
+    this.copybookProcessingMode = copybookProcessingMode;
     this.tokenUtils = tokenUtils;
     this.preprocessor = preprocessor;
     this.resolutions = resolutions;
@@ -163,6 +163,10 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitCopyStatement(@Nonnull CopyStatementContext ctx) {
+    if (copybookProcessingMode.equals("DISABLED")) {
+      pop();
+      return;
+    }
     CopySourceContext copySource = ctx.copySource();
     List<ReplaceClauseContext> replacing = getReplacing(ctx);
 
@@ -282,7 +286,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     }
 
     CopybookModel copybook =
-        resolutions.get().resolve(copybookName, documentUri, textDocumentSyncType);
+        resolutions.get().resolve(copybookName, documentUri, copybookProcessingMode);
 
     if (copybook == null || copybook.getContent() == null) {
       reportMissingCopybooks(copybookName, position);
@@ -300,7 +304,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       String copybookName, String uri, String content, Position position) {
     copybookStack.push(new CopybookUsage(copybookName, position));
     ResultWithErrors<ExtendedDocument> result =
-        preprocessor.process(uri, content, copybookStack, textDocumentSyncType);
+        preprocessor.process(uri, content, copybookStack, copybookProcessingMode);
     copybookStack.pop();
 
     errors.addAll(result.getErrors());
