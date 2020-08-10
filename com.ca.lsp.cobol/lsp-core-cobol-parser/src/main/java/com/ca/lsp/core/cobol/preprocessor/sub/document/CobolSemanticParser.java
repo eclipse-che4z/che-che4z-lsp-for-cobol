@@ -30,7 +30,7 @@ public interface CobolSemanticParser {
    *
    * @param code - COBOL program text to analyse
    * @param semanticContext - semantic context of the currently processed document to be filled in.
-   * @param textDocumentSyncType - reflect the sync status of the document (DID_OPEN|DID_CHANGE)
+   * @param copybookProcessingMode - reflects the status of the copybook support (ENABLED|DISABLED)
    * @return a PreprocessedInput - text and its semantic context with syntax errors if found or an
    *     empty list
    */
@@ -39,5 +39,5 @@ public interface CobolSemanticParser {
       @Nonnull String uri,
       @Nonnull String code,
       @Nonnull SemanticContext semanticContext,
-      String textDocumentSyncType);
+      String copybookProcessingMode);
 }

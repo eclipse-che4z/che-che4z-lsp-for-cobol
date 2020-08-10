@@ -52,7 +52,7 @@ public class DocumentExtensionTests {
 
   /**
    * This test verify that supported cobol extensions are correctly analyzed by the underneath
-   * engine in both TextDocumentSync types [DID_OPEN|DID_CHANGE].
+   * engine.
    */
   @Test
   public void testMatchingExtensions() {
@@ -77,17 +77,16 @@ public class DocumentExtensionTests {
     String uri = DOCUMENT_URI_BEGINNING + extension;
 
     // dynamic stubbing in DID_OPEN mode
-    when(engine.analyze(uri, TEXT, TextDocumentSyncType.DID_OPEN))
+    when(engine.analyze(uri, TEXT, CopybookProcessingMode.ENABLED))
         .thenReturn(AnalysisResult.empty());
     fireDidOpen(extension, uri);
-    verify(engine, timeout(10000).times(1)).analyze(uri, TEXT, TextDocumentSyncType.DID_OPEN);
+    verify(engine, timeout(10000).times(1)).analyze(uri, TEXT, CopybookProcessingMode.ENABLED);
 
-    // dynamic stubbing in DID_CHANGE mode
-    when(engine.analyze(uri, TEXT, TextDocumentSyncType.DID_CHANGE))
+    when(engine.analyze(uri, TEXT, CopybookProcessingMode.DISABLED))
         .thenReturn(AnalysisResult.empty());
     fireDidChange(uri);
     verify(engine, timeout(10000))
-        .analyze(uri, INCORRECT_TEXT_EXAMPLE, TextDocumentSyncType.DID_CHANGE);
+        .analyze(uri, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.DISABLED);
   }
 
   private void checkExtensionNotMatches(String extension) {

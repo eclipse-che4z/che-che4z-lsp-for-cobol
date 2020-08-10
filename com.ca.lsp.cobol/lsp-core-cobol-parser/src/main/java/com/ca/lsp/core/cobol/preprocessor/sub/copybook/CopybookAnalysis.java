@@ -16,8 +16,8 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.copybook;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
+import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.google.common.collect.Multimap;
 
@@ -28,5 +28,5 @@ public interface CopybookAnalysis {
       String documentUri,
       Multimap<String, Position> copybookNames,
       List<CopybookUsage> copybookUsageTracker,
-      String textDocumentSyncType);
+      String copybookProcessingMode);
 }

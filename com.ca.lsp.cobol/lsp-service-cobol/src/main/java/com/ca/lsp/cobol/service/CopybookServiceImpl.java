@@ -34,7 +34,6 @@ import java.util.function.Consumer;
 
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.REQUIRED_COPYBOOK_EVENT;
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK_DOWNLOAD;
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK_RESOLVE;
 import static java.lang.String.join;
@@ -113,7 +112,7 @@ public class CopybookServiceImpl implements CopybookService {
         copybookPaths.remove(requiredCopybookName);
       }
     }
-    if (DID_OPEN.name().equals(event.getTextDocumentSyncType())) {
+    if (CopybookProcessingMode.ENABLED.name().equals(event.getCopybookProcessingMode())) {
       String cobolFileName = files.getNameFromURI(event.getDocumentUri());
       settingsService
           .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, requiredCopybookName)

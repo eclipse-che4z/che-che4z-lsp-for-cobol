@@ -52,15 +52,15 @@ public class CobolLanguageEngine {
    *
    * @param documentUri unique resource identifier of the processed document
    * @param text the content of the document that should be processed
-   * @param textDocumentSyncType the document sync type that can be (DID_OPEN|DID_CHANGE)
+   * @param copybookProcessingMode the trigger for copybook scan (ENABLED|DISABLED)
    * @return Semantic information wrapper object and list of syntax error that might send back to
    *     the client
    */
   public ResultWithErrors<SemanticContext> run(
-      String documentUri, String text, String textDocumentSyncType) {
+      String documentUri, String text, String copybookProcessingMode) {
 
     ResultWithErrors<PreprocessedInput> preProcessedInput =
-        preprocessor.process(documentUri, text, textDocumentSyncType);
+        preprocessor.process(documentUri, text, copybookProcessingMode);
 
     CobolLexer lexer =
         new CobolLexer(CharStreams.fromString(preProcessedInput.getResult().getInput()));

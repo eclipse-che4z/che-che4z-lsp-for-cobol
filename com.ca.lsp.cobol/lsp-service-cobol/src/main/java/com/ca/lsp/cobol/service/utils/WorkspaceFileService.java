@@ -27,6 +27,7 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.lang.System.lineSeparator;
@@ -85,5 +86,17 @@ public class WorkspaceFileService implements FileSystemService {
       log.error("Cannot find file by given URI: " + uri, e);
       return null;
     }
+  }
+
+  /**
+   * This method validates an URI to verify if is defined as extended document, according to a
+   * regex.
+   *
+   * @param uri document URI opened in the client
+   * @return true if the document is an extended document, false otherwise
+   */
+  public static boolean isFileUnderExtendedSourceFolder(String uri) {
+    // the regex will match resources in the format [file://<FOLDER>/.c4z/.extsrcs/<DOCUMENT>]
+    return Pattern.matches("file://.*?\\.c4z/\\.extsrcs/.+", uri);
   }
 }
