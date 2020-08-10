@@ -54,6 +54,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private static final String DECLARATIVE_SAME_MSG =
       "The following token cannot be on the same line as a DECLARATIVE token: ";
   private static final String INVALID_DEF_MSG = "Invalid definition for: ";
+  private static final String MISSPELLED_WORD = "A misspelled word, maybe you want to put ";
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
 
@@ -411,7 +412,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     if (position == null) return;
     SyntaxError error =
         SyntaxError.syntaxError()
-            .suggestion("A misspelled word, maybe you want to put " + suggestion)
+            .suggestion(MISSPELLED_WORD + suggestion)
             .severity(WARNING)
             .position(position)
             .build();
