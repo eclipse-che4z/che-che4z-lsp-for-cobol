@@ -24,6 +24,7 @@ echo "Prepare for release $RELEASE"
 
 update_version () {
     sed -i "s/\"version\": \".*\"/\"version\": \"$1\"/g" package.json
+    sed -i "0,/\"version\": \".*\"/s//\"version\": \"$1\"/" package-lock.json
     sed -i "s/<revision>.*</<revision>$1</g" ../../com.ca.lsp.cobol/pom.xml
     sed -i "s/lsp-service-cobol-.*\.jar/lsp-service-cobol-$1.jar/g" server/note.md
     sed -i "s/cobol-language-support_.*\.vsix'/cobol-language-support_$1.vsix'/g" ../../Jenkinsfile
