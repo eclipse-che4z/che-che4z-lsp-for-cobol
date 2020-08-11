@@ -1,6 +1,22 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.13.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.12.0...0.13.0)
+
+#### Added
+
+- Syntax coloring
+- Support for the A and B margin areas
+
+#### Changed
+
+- Disabled copybook analysis for files in the extended source folder
+- Readme update
+
+#### Fixed
+
+- Closed documents no longer still show errors
+
 ## [0.12.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.11.1...0.12.0) (2020-07-07)
 
 #### Added
