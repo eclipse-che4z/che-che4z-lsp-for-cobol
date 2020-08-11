@@ -27,11 +27,10 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 - To enable automatic copybook retrieval, the following are required:
     - Configured TSO/E address space services, z/OS data set and file REST interface, and z/OS jobs REST interface. For more information, see [z/OS Requirements](https://docs.zowe.org/stable/user-guide/systemrequirements-zosmf.html#z-os-requirements).
     - [Zowe CLI z/OSMF profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) with credentials.
-- To enable outline view, a third-party COBOL extension is required. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
     
 ## Compatibility
 
-The COBOL Language Support extension is not compatible with other extensions that provide COBOL support, with the exception of Bitlang's COBOL extension. We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
+The COBOL Language Support extension is not compatible with other extensions that provide COBOL support. We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
 
 ## Features
 COBOL Language Support provides the following COBOL syntax awareness features:
@@ -59,17 +58,14 @@ The extension enables syntax highlighting for COBOL code.
 	
 ### Syntax Coloring
 Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, and paragraphs.
-
-### Outline View
-Outline view lets you navigate easily between different sections and divisions of your source code. 
-
-A third-party plugin is required to enable outline view. The Che4z basic stack and Code4z pack both contain Bitlang, which fulfils this requirement.
 	
 ## Copybook Support
 
 The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe CLI z/OSMF profile to automatically download them from the mainframe to your workspace. 
 
 You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and  data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the copybook's name. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
+
+Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
 
 ### Storing Copybooks Locally
 
