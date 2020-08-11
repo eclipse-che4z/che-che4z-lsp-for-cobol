@@ -74,10 +74,10 @@ public class SynchronousCopybookResolution
       @Nonnull String documentUri,
       @Nonnull String copybookProcessingMode) {
     checkState();
-
+    CopybookModel result = null;
     if (isCopybookInCache(copybookName)) {
       broker.unSubscribe(this);
-      return getContentFromCache(copybookName);
+      result = getContentFromCache(copybookName);
     }
 
     this.copybookName = copybookName;
@@ -89,12 +89,12 @@ public class SynchronousCopybookResolution
             .copybookProcessingMode(copybookProcessingMode)
             .build());
     try {
-      return waitForResolving.get();
+      result = waitForResolving.get();
     } catch (InterruptedException | ExecutionException e) {
       LOG.error("Error resolving copybook: ", e);
       currentThread().interrupt();
-      return null;
     }
+    return result;
   }
 
   @Override
