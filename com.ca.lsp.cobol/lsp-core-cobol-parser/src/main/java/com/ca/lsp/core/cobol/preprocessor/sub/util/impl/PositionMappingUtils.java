@@ -16,7 +16,6 @@
 package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
 import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.model.DocumentHierarchyLevel;
 import com.ca.lsp.core.cobol.model.DocumentMapping;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.Token;
