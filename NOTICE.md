@@ -13,11 +13,11 @@ of the Eclipse Public License 2.0 which is available at https://www.eclipse.org/
 
 # Copyright Holders
 
-* Copyright 2020 Broadcom.
+* Copyright 2019-2020 Broadcom.
 
 ## Third-party Content
 
-### Code snippet
+### Code Snippet
 
 COBOL Source colouriser for Visual Studio Code
  * Source: https://github.com/spgennard/vscode_cobol
