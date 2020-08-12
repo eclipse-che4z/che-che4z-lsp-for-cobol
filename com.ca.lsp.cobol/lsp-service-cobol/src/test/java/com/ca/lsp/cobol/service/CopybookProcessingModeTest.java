@@ -27,12 +27,12 @@ public class CopybookProcessingModeTest {
 
   /**
    * This test verify that when the input COBOL file is an extended document copybook analysis is
-   * disabled, indipendetly if the file is opened in {@link TextDocumentSyncType#DID_OPEN} or {@link
+   * skipped, indipendetly if the file is opened in {@link TextDocumentSyncType#DID_OPEN} or {@link
    * TextDocumentSyncType#DID_CHANGE}.
    */
   @Test
   public void disableCopybookOnExtendedDocument() {
-    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, "DID_OPEN"));
+    assertEquals(SKIP, getCopybookProcessingMode(EXT_SRC_DOC_URI, "DID_OPEN"));
     assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, "DID_CHANGE"));
   }
 

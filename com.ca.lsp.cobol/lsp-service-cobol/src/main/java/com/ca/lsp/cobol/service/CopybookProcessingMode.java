@@ -19,7 +19,8 @@ import static com.ca.lsp.cobol.service.utils.WorkspaceFileService.isFileUnderExt
 /** This enum class used to track text synchronization type for the processed document. */
 public enum CopybookProcessingMode {
   ENABLED,
-  DISABLED;
+  DISABLED,
+  SKIP;
 
   /**
    * This method verify if enable or disable copybook management based on two factors: 1) the file
@@ -29,7 +30,8 @@ public enum CopybookProcessingMode {
    * @param textDocSyncType define the document sync mode that could be [{@link
    *     TextDocumentSyncType#DID_OPEN}|{@link TextDocumentSyncType#DID_CHANGE}]
    * @return A value of that could be [{@link CopybookProcessingMode#ENABLED}|{@link
-   *     CopybookProcessingMode#DISABLED}]
+   *     CopybookProcessingMode#DISABLED} or {@link CopybookProcessingMode#SKIP}] if the document is
+   *     an extended document.
    */
   public static CopybookProcessingMode getCopybookProcessingMode(
       String uri, String textDocSyncType) {
@@ -40,6 +42,6 @@ public enum CopybookProcessingMode {
   }
 
   private static CopybookProcessingMode getCopybookProcessingModeByDocSync(String uri) {
-    return isFileUnderExtendedSourceFolder(uri) ? DISABLED : ENABLED;
+    return isFileUnderExtendedSourceFolder(uri) ? SKIP : ENABLED;
   }
 }
