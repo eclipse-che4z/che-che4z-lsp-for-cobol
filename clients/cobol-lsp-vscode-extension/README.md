@@ -99,6 +99,6 @@ The extension includes the following copybook support features:
 * Functionality to skip variable levels when called, reducing call time.
 * Find All References and Go To Definition functionalities.
     - **Find All References** identifies all occurrences of variables and paragraphs from copybooks in the code.
-    - **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element. If the definition is in a copybook, or the name of a copybook, the copybook opens.
+    - **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element. If the definition is in a copybook, the copybook opens.
     
 ![Go To Definition in a copybook](https://github.com/eclipse/che-che4z-lsp-for-cobol/raw/master/docs/images/CPYGoToDefinition.gif)
