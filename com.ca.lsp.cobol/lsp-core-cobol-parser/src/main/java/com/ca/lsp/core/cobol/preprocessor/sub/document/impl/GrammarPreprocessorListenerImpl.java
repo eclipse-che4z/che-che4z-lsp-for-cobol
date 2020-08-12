@@ -135,17 +135,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void enterReplaceByStatement(@Nonnull ReplaceByStatementContext ctx) {
-    push();
-  }
-
-  @Override
-  public void exitReplaceByStatement(@Nonnull ReplaceByStatementContext ctx) {
-    // throw away terminals
-    pop();
-  }
-
-  @Override
   public void enterReplaceOffStatement(@Nonnull ReplaceOffStatementContext ctx) {
     push();
   }
