@@ -11,6 +11,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 #### Changed
 
 - Disabled copybook analysis for files in the extended source folder
+- Migration from Java 8 to Java 11
 - Readme update
 
 #### Fixed
