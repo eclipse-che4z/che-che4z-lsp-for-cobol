@@ -14,6 +14,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Add margin A check for FD and SD level indicators #440
 * Performance improvement #425
 * Syntax coloring support #423
+* Java 11 migration #422
 
 ## [0.12.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.11.1...0.12.0) (2020-07-07)
 
