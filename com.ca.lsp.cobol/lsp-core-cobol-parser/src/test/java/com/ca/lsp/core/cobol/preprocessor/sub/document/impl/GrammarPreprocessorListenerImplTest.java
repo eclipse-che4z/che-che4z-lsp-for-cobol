@@ -52,36 +52,6 @@ class GrammarPreprocessorListenerImplTest {
   private static final String CPY_MODE_DISABLED = "DISABLED";
 
   @Test
-  void testReplaceOff() {
-    // given
-    TokenUtils tokenUtils = mock(TokenUtils.class);
-    ReplaceOffStatementContext replaceOffStatementContext = mock(ReplaceOffStatementContext.class);
-    BufferedTokenStream tokens = mock(BufferedTokenStream.class);
-
-    when(tokenUtils.retrieveHiddenTextToLeft(anyInt(), eq(tokens))).thenReturn(" ");
-    when(tokenUtils.notEOF(any(TerminalNode.class))).thenReturn(true);
-    // when
-    GrammarPreprocessorListenerImpl listener =
-        new GrammarPreprocessorListenerImpl(
-            DOCUMENT_URI, tokens, null, null, tokenUtils, null, null, null);
-
-    listener.enterReplaceOffStatement(replaceOffStatementContext);
-    listener.visitTerminal(node("REPLACE", 2));
-    listener.visitTerminal(node("OFF", 4));
-    listener.exitReplaceOffStatement(replaceOffStatementContext);
-    listener.visitTerminal(node("SMTH", 2));
-    // then
-    assertEquals(
-        new ExtendedDocument(
-            " SMTH",
-            new NamedSubContext(),
-            Map.of(DOCUMENT_URI, new DocumentMapping(List.of(), Map.of()))),
-        listener.getResult());
-
-    assertTrue(listener.getErrors().isEmpty());
-  }
-
-  @Test
   void testCopyStatementNoReplacing() {
     // given
     CopyStatementContext context = mock(CopyStatementContext.class);
