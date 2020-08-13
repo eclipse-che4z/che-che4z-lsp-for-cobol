@@ -16,6 +16,8 @@ package com.ca.lsp.cobol.service;
 import org.junit.Test;
 
 import static com.ca.lsp.cobol.service.CopybookProcessingMode.*;
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static org.junit.Assert.assertEquals;
 
 public class CopybookProcessingModeTest {
@@ -27,23 +29,17 @@ public class CopybookProcessingModeTest {
 
   /**
    * This test verify that when the input COBOL file is an extended document copybook analysis is
-   * disabled, indipendetly if the file is opened in {@link TextDocumentSyncType#DID_OPEN} or {@link
-   * TextDocumentSyncType#DID_CHANGE}.
+   * DISABLED.
    */
   @Test
   public void disableCopybookOnExtendedDocument() {
-    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, "DID_OPEN"));
-    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, "DID_CHANGE"));
+    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, DID_OPEN));
+    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, DID_CHANGE));
   }
 
   @Test
   public void enableCopybookOnNonExtendedDocumentInDidOpen() {
-    assertEquals(ENABLED, getCopybookProcessingMode(DOC_URI, "DID_OPEN"));
-  }
-
-  @Test
-  public void disableCopybookOnNonExtendedDocumentInDidChange() {
-    assertEquals(DISABLED, getCopybookProcessingMode(DOC_URI, "DID_CHANGE"));
+    assertEquals(ENABLED, getCopybookProcessingMode(DOC_URI, DID_OPEN));
   }
 
   /**
@@ -53,7 +49,7 @@ public class CopybookProcessingModeTest {
    */
   @Test
   public void enableCopybookOnFakeURI() {
-    assertEquals(ENABLED, getCopybookProcessingMode(FAKE_EXT_SRC_DOC_URI, "DID_OPEN"));
+    assertEquals(ENABLED, getCopybookProcessingMode(FAKE_EXT_SRC_DOC_URI, DID_OPEN));
   }
 
   /**
@@ -62,6 +58,6 @@ public class CopybookProcessingModeTest {
    */
   @Test
   public void enableCopybookOnBadExtendedSourceFolders() {
-    assertEquals(ENABLED, getCopybookProcessingMode(WRONG_EXT_SRC_DOC_URI, "DID_OPEN"));
+    assertEquals(ENABLED, getCopybookProcessingMode(WRONG_EXT_SRC_DOC_URI, DID_OPEN));
   }
 }

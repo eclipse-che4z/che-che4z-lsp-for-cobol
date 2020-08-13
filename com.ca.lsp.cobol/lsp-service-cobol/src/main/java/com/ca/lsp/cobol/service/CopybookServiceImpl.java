@@ -89,8 +89,8 @@ public class CopybookServiceImpl implements CopybookService {
 
   /**
    * Retrieve copybook content by its name, and the document name {@see RequiredCopybookEvent}. It
-   * will apply a file system calls only if the {@link TextDocumentSyncType is DID_OPEN} in order to
-   * avoid obtaining the copybooks with incomplete names.
+   * will apply a file system calls only if the in order to avoid obtaining the copybooks with
+   * incomplete names.
    *
    * <p>The retrieved URIs stored in the cache. If the URI points to non-existing file, then the
    * cache invalidated and new request applied.

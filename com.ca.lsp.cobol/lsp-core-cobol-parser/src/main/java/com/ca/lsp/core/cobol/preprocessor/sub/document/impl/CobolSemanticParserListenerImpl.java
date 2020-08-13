@@ -138,7 +138,7 @@ public class CobolSemanticParserListenerImpl extends CobolPreprocessorBaseListen
      * define the copy book
      */
 
-    if (copybookProcessingMode.equals("ENABLED")) {
+    if (!"DISABLED".equals(copybookProcessingMode)) {
       CopySourceContext copySource = ctx.copySource();
       String copybookName = retrieveCopybookName(copySource);
       Position position = retrievePosition(copySource);

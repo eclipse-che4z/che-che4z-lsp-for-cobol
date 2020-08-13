@@ -14,32 +14,40 @@
  */
 package com.ca.lsp.cobol.service;
 
+import javax.annotation.Nonnull;
+
 import static com.ca.lsp.cobol.service.utils.WorkspaceFileService.isFileUnderExtendedSourceFolder;
 
-/** This enum class used to track text synchronization type for the processed document. */
+/** This enum class used to allow or not the copybook analysis for the processed document. */
 public enum CopybookProcessingMode {
   ENABLED,
-  DISABLED;
+  DISABLED,
+  SKIP;
 
   /**
-   * This method verify if enable or disable copybook management based on two factors: 1) the file
-   * is an extended source file, 2) the file is open in DID_OPEN|DID_CHANGE
+   * This method allow to enable or disable copybook management based on two factors: 1) the file is
+   * an extended source file, 2) the file is open in DID_OPEN|DID_CHANGE
    *
    * @param uri of the document opened in the editor by the client
-   * @param textDocSyncType define the document sync mode that could be [{@link
-   *     TextDocumentSyncType#DID_OPEN}|{@link TextDocumentSyncType#DID_CHANGE}]
+   * @param textDocumentSyncType the sync type of the document [{@link
+   *     TextDocumentSyncType#DID_OPEN} or {@link TextDocumentSyncType#DID_CHANGE}]
    * @return A value of that could be [{@link CopybookProcessingMode#ENABLED}|{@link
-   *     CopybookProcessingMode#DISABLED}]
+   *     CopybookProcessingMode#DISABLED}] if the document is an extended document.
    */
   public static CopybookProcessingMode getCopybookProcessingMode(
-      String uri, String textDocSyncType) {
+      String uri, TextDocumentSyncType textDocumentSyncType) {
 
-    return textDocSyncType.equals("DID_CHANGE")
+    return isFileUnderExtendedSourceFolder(uri)
         ? DISABLED
-        : getCopybookProcessingModeByDocSync(uri);
+        : getProcessingModeByTextDocSyncType(textDocumentSyncType);
   }
 
-  private static CopybookProcessingMode getCopybookProcessingModeByDocSync(String uri) {
-    return isFileUnderExtendedSourceFolder(uri) ? DISABLED : ENABLED;
+  private static CopybookProcessingMode getProcessingModeByTextDocSyncType(
+      @Nonnull TextDocumentSyncType textDocumentSyncType) {
+    if (textDocumentSyncType == TextDocumentSyncType.DID_CHANGE) {
+      return SKIP;
+    } else {
+      return ENABLED;
+    }
   }
 }
