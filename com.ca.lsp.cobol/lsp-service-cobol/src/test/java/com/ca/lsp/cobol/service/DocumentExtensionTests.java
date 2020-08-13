@@ -86,7 +86,7 @@ public class DocumentExtensionTests {
         .thenReturn(AnalysisResult.empty());
     fireDidChange(uri);
     verify(engine, timeout(10000))
-        .analyze(uri, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
+        .analyze(uri, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.SKIP);
   }
 
   private void checkExtensionNotMatches(String extension) {
