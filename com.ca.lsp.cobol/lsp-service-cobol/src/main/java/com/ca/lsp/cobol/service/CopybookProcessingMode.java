@@ -35,7 +35,7 @@ public enum CopybookProcessingMode {
    *     CopybookProcessingMode#DISABLED}] if the document is an extended document.
    */
   public static CopybookProcessingMode getCopybookProcessingMode(
-      String uri, String textDocumentSyncType) {
+      String uri, TextDocumentSyncType textDocumentSyncType) {
 
     return isFileUnderExtendedSourceFolder(uri)
         ? DISABLED
@@ -43,8 +43,8 @@ public enum CopybookProcessingMode {
   }
 
   private static CopybookProcessingMode getProcessingModeByTextDocSyncType(
-      @Nonnull String textDocumentSyncType) {
-    if (textDocumentSyncType.equals("DID_CHANGE")) {
+      @Nonnull TextDocumentSyncType textDocumentSyncType) {
+    if (textDocumentSyncType == TextDocumentSyncType.DID_CHANGE) {
       return SKIP;
     } else {
       return ENABLED;

@@ -33,13 +33,13 @@ public class CopybookProcessingModeTest {
    */
   @Test
   public void disableCopybookOnExtendedDocument() {
-    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, DID_OPEN.name()));
-    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, DID_CHANGE.name()));
+    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, DID_OPEN));
+    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, DID_CHANGE));
   }
 
   @Test
   public void enableCopybookOnNonExtendedDocumentInDidOpen() {
-    assertEquals(ENABLED, getCopybookProcessingMode(DOC_URI, DID_OPEN.name()));
+    assertEquals(ENABLED, getCopybookProcessingMode(DOC_URI, DID_OPEN));
   }
 
   /**
@@ -49,7 +49,7 @@ public class CopybookProcessingModeTest {
    */
   @Test
   public void enableCopybookOnFakeURI() {
-    assertEquals(ENABLED, getCopybookProcessingMode(FAKE_EXT_SRC_DOC_URI, DID_OPEN.name()));
+    assertEquals(ENABLED, getCopybookProcessingMode(FAKE_EXT_SRC_DOC_URI, DID_OPEN));
   }
 
   /**
@@ -58,6 +58,6 @@ public class CopybookProcessingModeTest {
    */
   @Test
   public void enableCopybookOnBadExtendedSourceFolders() {
-    assertEquals(ENABLED, getCopybookProcessingMode(WRONG_EXT_SRC_DOC_URI, DID_OPEN.name()));
+    assertEquals(ENABLED, getCopybookProcessingMode(WRONG_EXT_SRC_DOC_URI, DID_OPEN));
   }
 }

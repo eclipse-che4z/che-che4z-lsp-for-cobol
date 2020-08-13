@@ -239,7 +239,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     runAsync(
             () -> {
               AnalysisResult result =
-                  engine.analyze(uri, text, getCopybookProcessingMode(uri, DID_OPEN.name()));
+                  engine.analyze(uri, text, getCopybookProcessingMode(uri, DID_OPEN));
               ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
               publishResult(uri, result);
             })
@@ -250,7 +250,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     runAsync(
             () -> {
               AnalysisResult result =
-                  engine.analyze(uri, text, getCopybookProcessingMode(uri, DID_CHANGE.name()));
+                  engine.analyze(uri, text, getCopybookProcessingMode(uri, DID_CHANGE));
               registerDocument(uri, new MyDocumentModel(text, result));
               communications.publishDiagnostics(uri, result.getDiagnostics());
             })
