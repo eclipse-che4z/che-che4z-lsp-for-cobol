@@ -38,7 +38,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import static com.ca.lsp.cobol.service.CopybookProcessingMode.*;
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.DISABLED;
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.ENABLED;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
@@ -170,7 +171,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
         new DidOpenTextDocumentParams(
             new TextDocumentItem(EXT_SRC_DOC_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
 
-    verify(engine, timeout(10000)).analyze(eq(EXT_SRC_DOC_URI), anyString(), eq(SKIP));
+    verify(engine, timeout(10000)).analyze(eq(EXT_SRC_DOC_URI), anyString(), eq(DISABLED));
   }
 
   private MyTextDocumentService buildServiceWithMockEngine(LanguageEngineFacade engine) {
@@ -208,7 +209,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
             new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0),
             List.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
 
-    verify(engine).analyze(eq(DOCUMENT_URI), anyString(), eq(DISABLED));
+    verify(engine).analyze(eq(DOCUMENT_URI), anyString(), eq(ENABLED));
   }
 
   /**

@@ -27,23 +27,17 @@ public class CopybookProcessingModeTest {
 
   /**
    * This test verify that when the input COBOL file is an extended document copybook analysis is
-   * skipped, indipendetly if the file is opened in {@link TextDocumentSyncType#DID_OPEN} or {@link
-   * TextDocumentSyncType#DID_CHANGE}.
+   * DISABLED.
    */
   @Test
   public void disableCopybookOnExtendedDocument() {
-    assertEquals(SKIP, getCopybookProcessingMode(EXT_SRC_DOC_URI, "DID_OPEN"));
-    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, "DID_CHANGE"));
+    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI));
+    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI));
   }
 
   @Test
   public void enableCopybookOnNonExtendedDocumentInDidOpen() {
-    assertEquals(ENABLED, getCopybookProcessingMode(DOC_URI, "DID_OPEN"));
-  }
-
-  @Test
-  public void disableCopybookOnNonExtendedDocumentInDidChange() {
-    assertEquals(DISABLED, getCopybookProcessingMode(DOC_URI, "DID_CHANGE"));
+    assertEquals(ENABLED, getCopybookProcessingMode(DOC_URI));
   }
 
   /**
@@ -53,7 +47,7 @@ public class CopybookProcessingModeTest {
    */
   @Test
   public void enableCopybookOnFakeURI() {
-    assertEquals(ENABLED, getCopybookProcessingMode(FAKE_EXT_SRC_DOC_URI, "DID_OPEN"));
+    assertEquals(ENABLED, getCopybookProcessingMode(FAKE_EXT_SRC_DOC_URI));
   }
 
   /**
@@ -62,6 +56,6 @@ public class CopybookProcessingModeTest {
    */
   @Test
   public void enableCopybookOnBadExtendedSourceFolders() {
-    assertEquals(ENABLED, getCopybookProcessingMode(WRONG_EXT_SRC_DOC_URI, "DID_OPEN"));
+    assertEquals(ENABLED, getCopybookProcessingMode(WRONG_EXT_SRC_DOC_URI));
   }
 }
