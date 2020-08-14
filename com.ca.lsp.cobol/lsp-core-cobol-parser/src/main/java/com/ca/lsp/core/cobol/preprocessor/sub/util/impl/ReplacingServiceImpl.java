@@ -22,6 +22,7 @@ import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.tuple.Pair;
@@ -44,12 +45,15 @@ import static org.apache.commons.lang3.StringUtils.split;
  * REPLACING and REPLACE statements.
  */
 @Singleton
+@Slf4j
 public class ReplacingServiceImpl implements ReplacingService {
   /**
    * Look-before and look-ahead pattern to check that the token wrapped with separators, i.e.
    * whitespaces, dots ot line breaks. Not includes separators to the found substring.
    */
   private static final String SEPARATE_TOKEN_PATTERN = "(?<=[\\.\\s\\r\\n])%s(?=[\\.\\s\\r\\n])";
+
+  private static final String ERROR_REPLACING = "Error replacing on text: %s with the pattern: %s";
 
   private TokenUtils tokenUtils;
 
@@ -99,7 +103,13 @@ public class ReplacingServiceImpl implements ReplacingService {
   }
 
   private String replace(String text, Pair<String, String> pattern) {
-    return Pattern.compile(pattern.getLeft()).matcher(text).replaceAll(pattern.getRight());
+    String result = text;
+    try {
+      result = Pattern.compile(pattern.getLeft()).matcher(text).replaceAll(pattern.getRight());
+    } catch (IndexOutOfBoundsException e) {
+      LOG.error(String.format(ERROR_REPLACING, text, pattern.toString()), e);
+    }
+    return result;
   }
 
   /**
