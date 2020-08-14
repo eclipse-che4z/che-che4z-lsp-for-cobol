@@ -63,7 +63,7 @@ Contrasting colors are used in displayed code for ease of identifying and distin
 
 The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe CLI z/OSMF profile to automatically download them from the mainframe to your workspace. 
 
-You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and  data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the copybook's name. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
+You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the copybook's name. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
 
 Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
 
@@ -110,6 +110,6 @@ The extension includes the following copybook support features:
 * Functionality to skip variable levels when called, reducing call time.
 * Find All References and Go To Definition functionalities.
     - **Find All References** identifies all occurrences of variables and paragraphs from copybooks in the code.
-    - **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element. If the definition is in a copybook, the copybook opens.
+    - **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element. If the definition is in a copybook, or the name of a copybook, the copybook opens.
 
 ![Go To Definition in a copybook](/docs/images/CPYGoToDefinition.gif)
