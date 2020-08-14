@@ -141,7 +141,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitCopyStatement(@Nonnull CopyStatementContext ctx) {
-    if (copybookProcessingMode.equals("DISABLED")) {
+    if ("DISABLED".equals(copybookProcessingMode)) {
       pop();
       return;
     }

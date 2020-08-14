@@ -81,11 +81,10 @@ class DocumentExtensionTests {
     fireDidOpen(extension, uri);
     verify(engine, timeout(10000).times(1)).analyze(uri, TEXT, CopybookProcessingMode.ENABLED);
 
-    when(engine.analyze(uri, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.DISABLED))
-        .thenReturn(AnalysisResult.empty());
+    when(engine.analyze(uri, TEXT, CopybookProcessingMode.SKIP)).thenReturn(AnalysisResult.empty());
     fireDidChange(uri);
     verify(engine, timeout(10000))
-        .analyze(uri, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.DISABLED);
+        .analyze(uri, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.SKIP);
   }
 
   private void checkExtensionNotMatches(String extension) {

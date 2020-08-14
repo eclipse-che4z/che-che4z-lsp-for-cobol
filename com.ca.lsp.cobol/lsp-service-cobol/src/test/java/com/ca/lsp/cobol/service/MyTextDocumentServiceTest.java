@@ -38,8 +38,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import static com.ca.lsp.cobol.service.CopybookProcessingMode.DISABLED;
-import static com.ca.lsp.cobol.service.CopybookProcessingMode.ENABLED;
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.*;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
@@ -209,7 +208,7 @@ class MyTextDocumentServiceTest extends ConfigurableTest {
             new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0),
             List.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
 
-    verify(engine).analyze(eq(DOCUMENT_URI), anyString(), eq(DISABLED));
+    verify(engine).analyze(eq(DOCUMENT_URI), anyString(), eq(SKIP));
   }
 
   /**

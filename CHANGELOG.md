@@ -1,6 +1,21 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.13.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.12.0...0.13.0)
+
+### Bug Fixes
+
+* Dispose diagnostic messages when user closes the document #434
+
+### Features
+
+* Disable copybook analysis for extended documents #448
+* Add support for Area A&B #437
+* Add margin A check for FD and SD level indicators #440
+* Performance improvement #425
+* Syntax coloring support #423
+* Java 11 migration #422
+
 ## [0.12.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.11.1...0.12.0) (2020-07-07)
 
 ### Bug Fixes
