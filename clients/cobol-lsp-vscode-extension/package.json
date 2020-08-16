@@ -121,8 +121,8 @@
         "test": "jest -w 1 --unhandled-rejections=strict"
     },
     "dependencies": {
-        "@zowe/imperative": "4.4.5",
-        "vscode-languageclient": "^5.2.1"
+        "@zowe/imperative": "4.7.4",
+        "vscode-languageclient": "5.2.1"
     },
     "devDependencies": {
         "@semantic-release/changelog": "^5.0.0",
