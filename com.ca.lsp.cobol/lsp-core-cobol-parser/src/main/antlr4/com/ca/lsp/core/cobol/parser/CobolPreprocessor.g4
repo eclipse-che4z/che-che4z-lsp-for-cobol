@@ -11,7 +11,7 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((compilerOptions | copyStatement | replaceArea | NEWLINE)+ .*?)+ EOF
+   : .*? ((compilerOptions | copyStatement | replaceArea)+ .*?)+ EOF
    ;
 
 // compiler options
@@ -159,7 +159,7 @@ copyLibrary
 
 // replace statement
 replacingPhrase
-   : REPLACING NEWLINE* replaceClause+
+   : REPLACING replaceClause+
    ;
 
 replaceArea
@@ -167,7 +167,7 @@ replaceArea
    ;
 
 replaceByStatement
-   : REPLACE (NEWLINE* replaceClause)+ DOT
+   : REPLACE (replaceClause)+ DOT
    ;
 
 replaceOffStatement
@@ -175,31 +175,31 @@ replaceOffStatement
    ;
 
 replaceClause
-   : (replacePseudoText | replaceliteral) (NEWLINE* directoryPhrase)? (NEWLINE* familyPhrase)?
+   : (replacePseudoText | replaceliteral) (directoryPhrase)? (familyPhrase)?
    ;
 
 replaceliteral
-   : replaceable NEWLINE* BY NEWLINE* replacement
+   : replaceable BY replacement
    ;
 
 replacePseudoText
-   : pseudoReplaceable NEWLINE* BY NEWLINE* pseudoReplacement
+   : pseudoReplaceable BY pseudoReplacement
    ;
 
 pseudoReplaceable
-   : (DOUBLEEQUALCHAR .*? DOUBLEEQUALCHAR)
+   : (DOUBLEEQUALCHAR ~DOUBLEEQUALCHAR*? DOUBLEEQUALCHAR)
    ;
 
 pseudoReplacement
-   : (DOUBLEEQUALCHAR .*? DOUBLEEQUALCHAR) | EMPTYPSEUDOTEXT
+   : (DOUBLEEQUALCHAR ~DOUBLEEQUALCHAR*? DOUBLEEQUALCHAR) | EMPTYPSEUDOTEXT
    ;
 
 directoryPhrase
-   : (OF | IN) NEWLINE* (literal | cobolWord)
+   : (OF | IN) (literal | cobolWord)
    ;
 
 familyPhrase
-   : ON NEWLINE* (literal | cobolWord)
+   : ON (literal | cobolWord)
    ;
 
 replaceable
@@ -215,7 +215,7 @@ replaceSameElement
    ;
 
 charData
-   : (charDataLine | NEWLINE)+
+   : (charDataLine)+
    ;
 
 charDataLine
