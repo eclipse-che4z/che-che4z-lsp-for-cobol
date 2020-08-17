@@ -19,21 +19,19 @@ import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-/**
- * This tests checks the order of completion elements: 1. Variables 2. Keywords
- */
-public class CompletionsChainTest extends ConfigurableTest {
+/** This tests checks the order of completion elements: 1. Variables 2. Keywords */
+class CompletionsChainTest extends ConfigurableTest {
   private TextDocumentService service;
   private static final String TEXT =
       "       Identification Division. \n"
@@ -68,8 +66,8 @@ public class CompletionsChainTest extends ConfigurableTest {
           + "       300-Say-Goodbye.\n"
           + "       End program ProgramId.";
 
-  @Before
-  public void createService() {
+  @BeforeEach
+  void createService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
@@ -78,7 +76,7 @@ public class CompletionsChainTest extends ConfigurableTest {
   }
 
   @Test
-  public void testCompletionsOrder() throws ExecutionException, InterruptedException {
+  void testCompletionsOrder() throws ExecutionException, InterruptedException {
     List<CompletionItem> list = getCompletionItems(service, new Position(28, 22));
     assertFalse(list.isEmpty());
 
@@ -90,7 +88,8 @@ public class CompletionsChainTest extends ConfigurableTest {
   private List<CompletionItem> getCompletionItems(TextDocumentService service, Position position)
       throws InterruptedException, ExecutionException {
     CompletableFuture<Either<List<CompletionItem>, CompletionList>> completions =
-        service.completion(new CompletionParams(new TextDocumentIdentifier(DOCUMENT_URI), position));
+        service.completion(
+            new CompletionParams(new TextDocumentIdentifier(DOCUMENT_URI), position));
 
     Either<List<CompletionItem>, CompletionList> either = completions.get();
     return either.getRight().getItems();

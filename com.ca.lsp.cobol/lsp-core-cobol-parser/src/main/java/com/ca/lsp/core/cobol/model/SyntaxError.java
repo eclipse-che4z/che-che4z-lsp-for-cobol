@@ -18,28 +18,32 @@ package com.ca.lsp.core.cobol.model;
 import com.broadcom.lsp.domain.common.model.Position;
 import lombok.Builder;
 import lombok.Value;
+import org.antlr.v4.runtime.Token;
 
 import java.util.List;
 
 @Value
 public class SyntaxError {
-  private final Position position;
-  private final List<String> ruleStack;
-  private final String suggestion;
-  private final int severity;
-  private final ErrorCode errorCode;
+  Position position;
+  List<String> ruleStack;
+  Token offendedToken;
+  String suggestion;
+  ErrorSeverity severity;
+  ErrorCode errorCode;
 
   // Please, don't use static imports for this method:
   // https://github.com/rzwitserloot/lombok/issues/2044
-  @Builder(builderMethodName = "syntaxError")
+  @Builder(builderMethodName = "syntaxError", toBuilder = true)
   public SyntaxError(
       Position position,
       List<String> ruleStack,
+      Token offendedToken,
       String suggestion,
-      int severity,
+      ErrorSeverity severity,
       ErrorCode errorCode) {
     this.position = position;
     this.ruleStack = ruleStack;
+    this.offendedToken = offendedToken;
     this.suggestion = suggestion;
     this.severity = severity;
     this.errorCode = errorCode;

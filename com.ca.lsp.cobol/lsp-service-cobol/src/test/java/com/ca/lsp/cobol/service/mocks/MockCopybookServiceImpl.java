@@ -28,10 +28,11 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
 
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.toURI;
+
 /**
- * This class used to mock the actual behavior of {@link
- * com.ca.lsp.cobol.service.CopybookService} and return stubs value not used to validate any
- * CopybookService functionality
+ * This class used to mock the actual behavior of {@link com.ca.lsp.cobol.service.CopybookService}
+ * and return stubs value not used to validate any CopybookService functionality
  */
 @Singleton
 @Slf4j
@@ -51,7 +52,8 @@ public class MockCopybookServiceImpl implements MockCopybookService {
   public void observerCallback(DataEvent event) {
     String name = ((RequiredCopybookEvent) event).getName();
     String content = getContentByCopybookName(((RequiredCopybookEvent) event).getName());
-    dataBus.postData(FetchedCopybookEvent.builder().name(name).uri(name).content(content).build());
+    dataBus.postData(
+        FetchedCopybookEvent.builder().name(name).uri(toURI(name)).content(content).build());
   }
 
   @Override

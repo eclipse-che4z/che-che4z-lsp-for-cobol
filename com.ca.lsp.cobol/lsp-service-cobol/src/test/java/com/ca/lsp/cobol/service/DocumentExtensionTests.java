@@ -21,8 +21,8 @@ import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
  * extensions. If an extension of a document is unsupported (i.e. not "cob", "cbl" or "cobol"
  * ignoring case) then the according to notification should be sent.
  */
-public class DocumentExtensionTests {
+class DocumentExtensionTests {
   private static final String DOCUMENT_URI_BEGINNING = "file:///c%3A/workspace/document.";
   private static final String TEXT = "";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
@@ -43,19 +43,18 @@ public class DocumentExtensionTests {
   private Communications communications;
   private LanguageEngineFacade engine;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     broker = mock(DataBusBroker.class);
     communications = mock(Communications.class);
     engine = mock(LanguageEngineFacade.class);
   }
 
   /**
-   * This test verify that supported cobol extensions are correctly analyzed by the underneath
-   * engine.
+   * This test verifies that supported cobol extensions correctly analyzed by the underneath engine
    */
   @Test
-  public void testMatchingExtensions() {
+  void testMatchingExtensions() {
     checkExtensionMatches("cbl");
     checkExtensionMatches("CBL");
     checkExtensionMatches("cob");
@@ -65,7 +64,7 @@ public class DocumentExtensionTests {
   }
 
   @Test
-  public void testNonMatchingExtensions() {
+  void testNonMatchingExtensions() {
     checkExtensionNotMatches("cpy");
     checkExtensionNotMatches("CPY");
     checkExtensionNotMatches("txt");

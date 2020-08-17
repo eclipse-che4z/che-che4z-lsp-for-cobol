@@ -22,47 +22,48 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.reflection.FieldSetter;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
-public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
+class CopybookRepositoryLRUTest extends CopybookStorableProvider {
   private CopybookRepositoryLRU repository;
   private static final int CACHE_SIZE = 4;
   private CopybookStorable storable = getDummyStorable();
   @Getter protected final Waiter waiter = new Waiter();
 
-  @Before
-  public void initRepository() {
+  @BeforeEach
+  void initRepository() {
     repository = new CopybookRepositoryLRU(CACHE_SIZE);
     repository.persist(storable);
   }
 
-  /** This test verify that getMaxSize() return the cache's prefilled size. */
+  /** This test verifies that getMaxSize() return the cache's pre-filled size. */
   @Test
-  public void testMaxSize() {
+  void testMaxSize() {
     assertEquals(CACHE_SIZE, repository.getCacheMaxSize());
   }
 
-  /** This test verify that cache cannot have negative size */
+  /** This test verifies that cache cannot have negative size */
   @Test
-  public void cacheSizeIsNotNegative() {
+  void cacheSizeIsNotNegative() {
     assertTrue(repository.getCacheMaxSize() >= 0);
   }
 
   /**
-   * This test verify that a CopybookStorable object is stored successfully in the cache. After call
-   * the persist method the cache size is increased by one
+   * This test verifies that a CopybookStorable object stored successfully in the cache. After
+   * calling the persist method, the cache size increased by one
    */
   @Test
-  public void testPersist() {
+  void testPersist() {
     var prevCacheSize = repository.size();
     repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
     assertEquals(repository.size(), prevCacheSize + 1);
@@ -75,7 +76,7 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
    * @throws NoSuchFieldException
    */
   @Test
-  public void testCacheExpiration() throws NoSuchFieldException {
+  void testCacheExpiration() throws NoSuchFieldException {
     var genDt = Instant.now().minus(4, ChronoUnit.HOURS).getEpochSecond();
     var storableCpy = new CopybookStorable("REMOVE", "URI", "DUMMY CONTENT");
 
@@ -94,13 +95,13 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
   /**
    * This test validates the cache sort mechanism, first is sorted by the hits and after by the time
    * in ms, it is worth to mention that we need to delay with 1ms the element in order to have a
-   * time difference at the creation moment, if not it will not differentiate and the order will be
+   * time difference at the creation moment, if not it will not differentiate, and the order will be
    * not the expected one
    *
    * @throws NoSuchFieldException
    */
   @Test
-  public void testCacheSort() throws NoSuchFieldException {
+  void testCacheSort() throws NoSuchFieldException {
     long genDt = Instant.now().minus(1, ChronoUnit.MILLIS).toEpochMilli();
 
     var elem1 = new CopybookStorable("NEW_STO3", "URI", "DUMMY CONTENT");
@@ -135,24 +136,28 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
     assertEquals(CACHE_SIZE, repository.size());
   }
 
-  /** This test validates that an exception is thrown if provided arguments are null. */
-  @Test(expected = IllegalArgumentException.class)
-  public void testNullArguments() {
-    repository.persist(new CopybookStorable(null, null, null));
-    repository.persist(null);
+  /** This test validates that an exception thrown if provided arguments are null. */
+  @Test
+  void testNullArguments() throws IllegalArgumentException {
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          repository.persist(new CopybookStorable(null, null, null));
+          repository.persist(null);
+        });
   }
 
   @Test
-  public void testWrongSearchedElement() {
+  void testWrongSearchedElement() {
     assertFalse(repository.isStored(storable.getName() + "wrong"));
   }
 
   /**
-   * This test verify that when a new element should be stored in a full cache, the oldest element
-   * is removed from the cache
+   * This test verifies that when a new element should be stored in a full cache, the oldest element
+   * removed from the cache
    */
   @Test
-  public void testCacheRotation() {
+  void testCacheRotation() {
     LOG.info("Cache sizing before NEW_STO = " + repository.size());
 
     repository.persist(new CopybookStorable("NEW_STO", "URI", "DUMMY CONTENT"));
@@ -176,52 +181,57 @@ public class CopybookRepositoryLRUTest extends CopybookStorableProvider {
   }
 
   /**
-   * This test verify that a string representation of the cache content is returned to the callee.
-   * If the cache is empty an empty string is returned
+   * This test verifies that a string representation of the cache content returned to the callee. If
+   * the cache is empty an empty string returned
    */
   @Test
-  public void testLogCacheContent() {
+  void testLogCacheContent() {
     assertNotNull(repository.logContent());
   }
 
   /**
-   * This test verify that a NoSuchElementException is thrown if the cache is empty or the element
-   * looking for doesn't exist.
+   * This test verifies that a NoSuchElementException is thrown if the cache is empty, or the
+   * element looking for doesn't exist.
    */
-  @Test(expected = NoSuchElementException.class)
+  @Test
   @SneakyThrows
-  public void testNoSuchElement() throws NoSuchElementException {
-    // search a not present element
-    assertTrue(
-        repository
-            .getCopybookStorableFromCache(CopybookRepository.calculateUUID("NOT-PRESENT-ITEM"))
-            .get()
-            .getName()
-            .equalsIgnoreCase("NOT-PRESENT-ITEM"));
+  void testNoSuchElement() throws NoSuchElementException {
+    Assertions.assertThrows(
+        NoSuchElementException.class,
+        () -> {
+          // search a not present element
+          assertTrue(
+              repository
+                  .getCopybookStorableFromCache(
+                      CopybookRepository.calculateUUID("NOT-PRESENT-ITEM"))
+                  .get()
+                  .getName()
+                  .equalsIgnoreCase("NOT-PRESENT-ITEM"));
+        });
   }
 
-  /** This test verify that for a not empty cache the top item is returned to the callee. */
+  /** This test verifies that for a not empty cache the top item returned to the callee. */
   @Test
-  public void testTopItem() {
+  void testTopItem() {
     assertNotNull(repository.topItem().get());
   }
 
-  /** This test verify that for a not empty cache the last item is returned to the callee. */
+  /** This test verifies that for a not empty cache the last item returned to the callee. */
   @Test
-  public void testLastItem() {
+  void testLastItem() {
     assertNotNull(repository.lastItem().get());
   }
 
-  /** This test verify that an element defined in the cache is retrieved correctly */
+  /** This test verifies that an element defined in the cache retrieved correctly */
   @Test
-  public void testStoredElement() {
+  void testStoredElement() {
     assertTrue(repository.isStored(new StringBuilder(storable.getName())));
     assertTrue(repository.isStored(storable.getName()));
   }
 
-  /** This test verify that the cache invalidation works correctly. */
+  /** This test verifies that the cache invalidation works correctly. */
   @Test
-  public void testCacheInvalidation() {
+  void testCacheInvalidation() {
     repository.invalidateCache();
     assertEquals(0, repository.size());
   }

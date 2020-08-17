@@ -16,19 +16,19 @@ package com.ca.lsp.cobol.utils;
 
 import com.ca.lsp.cobol.service.utils.FileSystemService;
 import com.ca.lsp.cobol.service.utils.WorkspaceFileService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This class contains unit test about utility methods provided for other components */
-public class FileSystemUtilsTest {
+class FileSystemUtilsTest {
 
   /**
    * This unit test verify that for a given URI with encoded special character, the decode operation
    * will return the original URI before the client encode it.
    */
   @Test
-  public void documentUriDecodingTest() {
+  void documentUriDecodingTest() {
     String decodedURI = "file:///user/COBOL/HLQ0001.DEMO.COBOL(MEMBFILE).cbl";
     FileSystemService service = new WorkspaceFileService();
     assertEquals(

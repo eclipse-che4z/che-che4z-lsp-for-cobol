@@ -941,7 +941,7 @@ otherLevel: LEVEL
 // end of data description utils ---------------------------
 
 dataDescriptionEntry
-   : dataDescriptionEntryFormat1 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat3 | dataDescriptionEntryExecSql
+   : dataDescriptionEntryFormat1 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat3 | dataDescriptionEntryExecSql | dataDescriptionEntryCpy | dataDescriptionExitCpy
    ;
 
 dataDescriptionEntryFormat1
@@ -957,7 +957,15 @@ dataDescriptionEntryFormat3
    ;
 
 dataDescriptionEntryExecSql
-   : EXECSQLLINE+ DOT_FS?
+   : execSqlStatement+
+   ;
+
+dataDescriptionEntryCpy
+   : COPYENTRY
+   ;
+
+dataDescriptionExitCpy
+   : COPYEXIT
    ;
    
 dataGroupUsageClause
@@ -1145,7 +1153,7 @@ paragraph
    ;
 
 sentence
-   : (statement* DOT_FS) | skipStatement+
+   : (statement* DOT_FS) | skipStatement+ | enterCpy | exitCpy
    ;
 
 statement
@@ -1154,7 +1162,15 @@ statement
     exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement | 
     multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | 
     sendStatement | serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | titleStatement | unstringStatement | writeStatement | xmlStatement
+    terminateStatement | titleStatement | unstringStatement | writeStatement | xmlStatement | enterCpy | exitCpy
+   ;
+
+enterCpy
+   : COPYENTRY
+   ;
+
+exitCpy
+   : COPYEXIT
    ;
 
 // accept statement
@@ -1458,21 +1474,20 @@ evaluateValue
    ;
 
 // exec cics statement
-
 execCicsStatement
-   : EXECCICSLINE+
+   : EXEC CICS ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exec sql statement
 
 execSqlStatement
-   : EXECSQLLINE+
+   : EXEC SQL ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exec sql ims statement
 
 execSqlImsStatement
-   : EXECSQLIMSLINE+
+   : EXEC SQLIMS ~END_EXEC*? END_EXEC DOT_FS?
    ;
 
 // exhibit statement

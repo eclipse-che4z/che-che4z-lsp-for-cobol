@@ -27,18 +27,19 @@ import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.services.LanguageClient;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+
+import static java.util.concurrent.CompletableFuture.runAsync;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp4j.MessageType.Error;
+import static org.eclipse.lsp4j.MessageType.Info;
 
 /**
- * This class serves the communications between server and client. It also allows to send delayable
+ * This class serves the communications between server and client. It also allows sending delayable
  * messages. Notice, that all the messages that are going to be sent from server to client should be
  * cleaned by removing line breaks to prevent incorrect parsing.
  */
@@ -58,21 +59,20 @@ public class ServerCommunications implements Communications {
 
   /**
    * This method raise a notification message back to the client if is unable to found a language
-   * engine for a given document id
+   * engine for a given document ID
    *
-   * @param languageType enum that represent the langugage type
+   * @param languageType enum that represent the language type
    */
   @Override
   public void notifyThatEngineNotFound(String languageType) {
-    CompletableFuture.runAsync(
+    runAsync(
         () ->
             showMessage(
-                MessageType.Error,
-                "Cannot find a language engine for the given language ID: " + languageType));
+                Error, "Cannot find a language engine for the given language ID: " + languageType));
   }
 
   /**
-   * The "work in progress" message should be shown after 3 seconds if the analysis is not finished
+   * The "work in progress" message should be shown after 3 seconds if the analysis not finished
    * yet. If cancelProgressNotification was invoked then the message won't be shown on the client.
    *
    * @param uri - uri of the document that is currently processed
@@ -84,26 +84,24 @@ public class ServerCommunications implements Communications {
     executor.schedule(
         () -> {
           if (uriInProgress.remove(decodedUri)) {
-            showMessage(
-                MessageType.Info, retrieveFileName(decodedUri) + ": Syntax analysis in progress");
+            showMessage(Info, retrieveFileName(decodedUri) + ": Syntax analysis in progress");
           }
         },
         3,
-        TimeUnit.SECONDS);
+        SECONDS);
   }
 
   /**
-   * Show a message that analysis is finished if there were no errors found
+   * Show a message that analysis finished if there were no errors found
    *
    * @param uri - uri of the document that is currently processed
    */
   @Override
   public void notifyThatDocumentAnalysed(String uri) {
-    CompletableFuture.runAsync(
+    runAsync(
         () ->
             logMessage(
-                MessageType.Info,
-                "No syntax errors detected in " + retrieveFileName(files.decodeURI(uri))));
+                Info, "No syntax errors detected in " + retrieveFileName(files.decodeURI(uri))));
   }
 
   /**
@@ -113,23 +111,21 @@ public class ServerCommunications implements Communications {
    */
   @Override
   public void notifyThatExtensionIsUnsupported(String extension) {
-    CompletableFuture.runAsync(
-        () ->
-            showMessage(
-                MessageType.Error, "The given document extension is unsupported: " + extension));
+    runAsync(() -> showMessage(Error, "The given document extension is unsupported: " + extension));
   }
 
   /**
-   * This method raise a diagnostic message to the client with syntax error retrivied by the Cobol
-   * LSP server
+   * This method raise a diagnostic message to the client with syntax error retrieved by the COBOL
+   * LSP server for related files.
    *
-   * @param uri document opened in the client
-   * @param diagnostics list populated by the language engine
+   * @param diagnostics map of URIs and errors populated by the language engine
    */
-  @Override
-  public void publishDiagnostics(String uri, List<Diagnostic> diagnostics) {
-    getClient()
-        .publishDiagnostics(new PublishDiagnosticsParams(files.decodeURI(uri), clean(diagnostics)));
+  public void publishDiagnostics(Map<String, List<Diagnostic>> diagnostics) {
+    diagnostics.forEach(
+        (uri, diagnostic) ->
+            getClient()
+                .publishDiagnostics(
+                    new PublishDiagnosticsParams(files.decodeURI(uri), clean(diagnostic))));
   }
 
   /**
@@ -159,8 +155,8 @@ public class ServerCommunications implements Communications {
     return uri.substring(uri.lastIndexOf('/') + 1);
   }
 
-  private List<Diagnostic> clean(List<Diagnostic> diagnostics) {
-    return diagnostics.stream().map(clean()).collect(Collectors.toList());
+  private List<Diagnostic> clean(Collection<Diagnostic> diagnostics) {
+    return diagnostics.stream().map(clean()).collect(toList());
   }
 
   private Function<Diagnostic, Diagnostic> clean() {

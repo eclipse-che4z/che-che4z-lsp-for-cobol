@@ -18,15 +18,16 @@ import lombok.Value;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Collections.emptyMap;
+
 @Value
 @AllArgsConstructor
 public class AnalysisResult {
-  private List<Diagnostic> diagnostics;
+  private Map<String, List<Diagnostic>> diagnostics;
   private Map<String, List<Location>> variableDefinitions;
   private Map<String, List<Location>> variableUsages;
   private Map<String, List<Location>> paragraphDefinitions;
@@ -36,13 +37,7 @@ public class AnalysisResult {
 
   public static AnalysisResult empty() {
     return new AnalysisResult(
-        Collections.emptyList(),
-        Collections.emptyMap(),
-        Collections.emptyMap(),
-        Collections.emptyMap(),
-        Collections.emptyMap(),
-        Collections.emptyMap(),
-        Collections.emptyMap());
+        emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap());
   }
 
   public Set<String> getVariables() {

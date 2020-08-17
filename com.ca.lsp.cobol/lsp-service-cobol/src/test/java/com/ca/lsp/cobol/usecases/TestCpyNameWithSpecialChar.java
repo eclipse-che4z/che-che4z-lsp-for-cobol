@@ -14,44 +14,41 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import org.eclipse.lsp4j.Range;
-import org.junit.Test;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /**
- * This test proves that special chars (@,#,$) in copybook name are recognized correctly and the
- * error appears because of the missing copybook.
+ * This test proves that special chars (@,#,$) in copybook name recognized correctly, and the error
+ * appears because of the missing copybook.
  */
-public class TestCpyNameWithSpecialChar extends NegativeUseCase {
+class TestCpyNameWithSpecialChar {
 
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
-          + "        01 VAR1.\r\n"
-          + "          02 VAR2.\r\n"
-          + "        COPY @SPE#-$.\r\n"
+          + "        01 {$*VAR1}.\r\n"
+          + "          02 {$*VAR2}.\r\n"
+          + "        COPY {~@SPE#-$|1}.\r\n"
           + "        PROCEDURE DIVISION.\r\n";
 
-  public TestCpyNameWithSpecialChar() {
-    super(TEXT);
-  }
+  private static final String MESSAGE = "@SPE#-$: Copybook not found";
+  private static final String CODE = "MISSING_COPYBOOK";
 
   @Test
-  public void test() {
-    super.test();
-  }
-
-  @Override
-  protected void assertRanges(List<Range> ranges) {
-    Range range = ranges.get(0);
-    assertEquals(6, range.getStart().getLine());
-    assertEquals(13, range.getStart().getCharacter());
-    assertEquals(6, range.getEnd().getLine());
-    assertEquals(20, range.getEnd().getCharacter());
+  void test() {
+    UseCaseEngine.runTest(
+        TEXT,
+        List.of(),
+        Map.of(
+            "1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText(), CODE)));
   }
 }

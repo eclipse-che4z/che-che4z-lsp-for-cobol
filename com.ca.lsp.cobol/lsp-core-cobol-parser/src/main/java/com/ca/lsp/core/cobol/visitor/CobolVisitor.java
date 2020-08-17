@@ -16,18 +16,29 @@ package com.ca.lsp.core.cobol.visitor;
 
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.model.Variable;
+import com.ca.lsp.core.cobol.parser.CobolParser.*;
 import com.ca.lsp.core.cobol.parser.CobolParserBaseVisitor;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorStringUtils;
+import com.ca.lsp.core.cobol.semantics.CobolVariableContext;
+import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.SubContext;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import static com.ca.lsp.core.cobol.parser.CobolParser.*;
+import static com.ca.lsp.core.cobol.model.ErrorSeverity.INFO;
+import static com.ca.lsp.core.cobol.model.ErrorSeverity.WARNING;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 
 /**
  * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
@@ -35,9 +46,8 @@ import static com.ca.lsp.core.cobol.parser.CobolParser.*;
  * semantic context with defined elements to add the usages or throw a warning on an invalid
  * definition. If there is a misspelled keyword, the visitor finds it and throws a warning.
  */
+@Slf4j
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {
-  private static final int WARNING_LEVEL = 2;
-  private static final int INFO_LEVEL = 3;
   private static final String AREA_A_WARNING_MSG = "The following token must start in Area A: ";
   private static final String AREA_B_WARNING_MSG = "The following token must start in Area B: ";
   private static final String IDENTICAL_PROGRAM_MSG =
@@ -45,25 +55,48 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private static final String DECLARATIVE_SAME_MSG =
       "The following token cannot be on the same line as a DECLARATIVE token: ";
   private static final String INVALID_DEF_MSG = "Invalid definition for: ";
+  private static final String MISSPELLED_WORD = "A misspelled word, maybe you want to put ";
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
 
+  private SubContext<String> paragraphs = new NamedSubContext();
+  private CobolVariableContext variables = new CobolVariableContext();
+
   private String programName = null;
-  private String documentUri;
-  private SemanticContext semanticContext;
+
+  private NamedSubContext copybooks;
   private CommonTokenStream tokenStream;
+  private Map<Token, Position> positionMapping;
 
   public CobolVisitor(
-      String documentUri, SemanticContext semanticContext, CommonTokenStream tokenStream) {
-    this.documentUri = documentUri;
-    this.semanticContext = semanticContext;
+      @Nonnull NamedSubContext copybooks,
+      @Nonnull CommonTokenStream tokenStream,
+      @Nonnull Map<Token, Position> positionMapping) {
+    this.copybooks = copybooks;
+    this.positionMapping = positionMapping;
     this.tokenStream = tokenStream;
+  }
+
+  /**
+   * Get the semantic context of the document as an output of th semantic analysis
+   *
+   * @return the semantic context of the document, containing all the definitions and usages of
+   *     paragraphs, variables and copybooks
+   */
+  @Nonnull
+  public SemanticContext getSemanticContext() {
+    return new SemanticContext(
+        variables.getDefinitions().asMap(),
+        variables.getUsages().asMap(),
+        paragraphs.getDefinitions().asMap(),
+        paragraphs.getUsages().asMap(),
+        copybooks.getDefinitions().asMap(),
+        copybooks.getUsages().asMap());
   }
 
   @Override
   public Class visitIdentificationDivision(IdentificationDivisionContext ctx) {
-    Token token = ctx.getStart();
-    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
@@ -77,74 +110,55 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   @Override
   public Class visitProcedureDivision(ProcedureDivisionContext ctx) {
-    Token token = ctx.getStart();
-    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitEnvironmentDivision(EnvironmentDivisionContext ctx) {
-    Token token = ctx.getStart();
-    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitDataDivision(DataDivisionContext ctx) {
-    Token token = ctx.getStart();
-    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitDataDivisionSection(DataDivisionSectionContext ctx) {
-    Token token = ctx.getStart();
-    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitEnvironmentDivisionBody(EnvironmentDivisionBodyContext ctx) {
-    Token token = ctx.getStart();
-    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitProcedureSectionHeader(ProcedureSectionHeaderContext ctx) {
-    Token token = ctx.getStart();
-    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitProcedureSection(ProcedureSectionContext ctx) {
-    Token token = ctx.getStart();
-    throwWarning(token.getText(), token.getLine(), token.getCharPositionInLine());
+    throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitParagraph(ParagraphContext ctx) {
-    Token token = ctx.getStart();
-    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
-    return visitChildren(ctx);
-  }
-
-  @Override
-  public Class visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
-    Token token = ctx.getStart();
-    String tokenText = token.getText();
-    if (tokenText.equals("01") || tokenText.equals("1") || tokenText.equals("77")) {
-      areaAWarning(ctx.start.getCharPositionInLine(), tokenText, token.getLine());
-    }
+    areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitFileDescriptionEntry(FileDescriptionEntryContext ctx) {
-    Token token = ctx.getStart();
-    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
@@ -163,17 +177,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     Token endToken = ctx.END().getSymbol();
 
     if (firstDeclLine == declarativeBody.getLine()) {
-      throwException(
-          declarativeBody.getText(),
-          declarativeBody.getLine(),
-          declarativeBody.getCharPositionInLine(),
-          DECLARATIVE_SAME_MSG,
-          WARNING_LEVEL);
+      throwException(declarativeBody.getText(), getPosition(declarativeBody), DECLARATIVE_SAME_MSG);
     }
 
-    areaAWarning(
-        firstDeclarative.getCharPositionInLine(), firstDeclarative.getText(), firstDeclLine);
-    areaAWarning(endToken.getCharPositionInLine(), endToken.getText(), endToken.getLine());
+    areaAWarning(firstDeclarative);
+    areaAWarning(endToken);
     return visitChildren(ctx);
   }
 
@@ -181,8 +189,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   public Class visitEndProgramStatement(EndProgramStatementContext ctx) {
     Token endProgramNameToken = ctx.programName().getStart();
     checkProgramName(endProgramNameToken);
-    Token token = ctx.getStart();
-    areaAWarning(ctx.start.getCharPositionInLine(), token.getText(), token.getLine());
+    areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
@@ -192,239 +199,270 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
         tokenStream.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
     areaBWarning(tokenList);
 
-    String wrongToken = ctx.getStart().getText();
-    throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
+    throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitIfThen(IfThenContext ctx) {
-    String wrongToken = ctx.getStart().getText();
-    throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
+    throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitIfElse(IfElseContext ctx) {
-    String wrongToken = ctx.getStart().getText();
-    throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
+    throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitPerformInlineStatement(PerformInlineStatementContext ctx) {
-    String wrongToken = ctx.getStart().getText();
-    throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
+    throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitSentence(SentenceContext ctx) {
-    String wrongToken = ctx.getStart().getText();
-    throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
+    throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitGeneralIdentifier(GeneralIdentifierContext ctx) {
-    String wrongToken = ctx.getStart().getText();
-    throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
+    throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitEvaluateWhenOther(EvaluateWhenOtherContext ctx) {
-    String wrongToken = ctx.getStart().getText();
-    throwWarning(wrongToken, ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
+    throwWarning(ctx.getStart());
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitParagraphName(ParagraphNameContext ctx) {
+    Position position = getPosition(ctx.getStart());
+    if (position != null) paragraphs.define(ctx.getText().toUpperCase(), position);
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
+    Token token = ctx.getStart();
+    String tokenText = token.getText();
+    if (tokenText.equals("01") || tokenText.equals("1") || tokenText.equals("77")) {
+      areaAWarning(token);
+    }
+    String levelNumber = ctx.otherLevel().getText();
+    ofNullable(ctx.dataName1())
+        .ifPresent(
+            variable ->
+                defineVariable(levelNumber, variable.getText(), getPosition(variable.getStart())));
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitDataDescriptionEntryFormat2(DataDescriptionEntryFormat2Context ctx) {
+
+    String levelNumber = ctx.LEVEL_NUMBER_66().getText();
+    ofNullable(ctx.dataName1())
+        .ifPresent(
+            variable ->
+                defineVariable(levelNumber, variable.getText(), getPosition(variable.getStart())));
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitDataDescriptionEntryFormat3(DataDescriptionEntryFormat3Context ctx) {
+    String levelNumber = ctx.LEVEL_NUMBER_88().getText();
+    ofNullable(ctx.dataName1())
+        .ifPresent(
+            variable ->
+                defineVariable(levelNumber, variable.getText(), getPosition(variable.getStart())));
+    return visitChildren(ctx);
+  }
+
+  private void defineVariable(String level, String name, Position position) {
+    if (position == null) return;
+    variables.define(new Variable(level, name), position);
+  }
+
+  @Override
+  public Class visitParagraphNameUsage(ParagraphNameUsageContext ctx) {
+    String name = ctx.getText().toUpperCase();
+    addUsage(paragraphs, name, getPosition(ctx.getStart()));
     return visitChildren(ctx);
   }
 
   @Override
   public Class visitQualifiedDataNameFormat1(QualifiedDataNameFormat1Context ctx) {
-    if (ctx.dataName() != null) {
-      String variable = ctx.dataName().getText().toUpperCase();
-      checkForVariable(
-          variable,
-          ctx.getStart().getLine(),
-          ctx.dataName().getStart().getCharPositionInLine(),
-          ctx);
-    }
+    ofNullable(ctx.dataName())
+        .map(it -> it.getText().toUpperCase())
+        .ifPresent(variable -> checkForVariable(variable, ctx));
     return visitChildren(ctx);
   }
 
-  public Class visitDataName2(
-      DataName2Context ctx, String child, int childStartLine, int childPositionInLine) {
-    if (checkForVariable(
-        ctx.getText(), ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), null)) {
-      checkParentContainsChildren(ctx.getText(), child, childStartLine, childPositionInLine);
-    }
-    return visitChildren(ctx);
-  }
+  private void checkForVariable(String variable, QualifiedDataNameFormat1Context ctx) {
+    Position position = getPosition(ctx.getStart());
+    checkVariableDefinition(variable, position);
+    addUsage(variables, variable, position);
 
-  public Class visitInData(
-      String child, int childStartLine, int childPositionInLine, InDataContext ctx) {
-    checkForDataName2(ctx.dataName2(), child, childStartLine, childPositionInLine);
-    return visitChildren(ctx);
-  }
-
-  public Class visitInTable(
-      String child, int childStartLine, int childPositionInLine, InTableContext ctx) {
-    checkForDataName2(ctx.tableCall().dataName2(), child, childStartLine, childPositionInLine);
-    return visitChildren(ctx);
-  }
-
-  @Override
-  public Class visitParagraphNameUsage(ParagraphNameUsageContext ctx) {
-    addUsage(semanticContext.getParagraphs(), ctx);
-    return visitChildren(ctx);
-  }
-
-  private void checkForDataName2(
-      DataName2Context ctx, String child, int childStartLine, int childPositionInLine) {
-    if (ctx != null) {
-      visitDataName2(ctx, child, childStartLine, childPositionInLine);
+    if (ctx.qualifiedInData() != null) {
+      iterateOverQualifiedDataNames(ctx, variable);
     }
   }
 
-  private void throwWarning(String wrongToken, int startLine, int charPositionInLine) {
-    MisspelledKeywordDistance.calculateDistance(wrongToken.toUpperCase())
-        .ifPresent(
-            correctWord ->
-                getSemanticError(wrongToken, startLine, charPositionInLine, correctWord));
+  private void iterateOverQualifiedDataNames(QualifiedDataNameFormat1Context ctx, String variable) {
+    String child = variable;
+    Token childToken = ctx.getStart();
+    for (QualifiedInDataContext node : ctx.qualifiedInData()) {
+
+      DataName2Context context = getDataName2Context(node);
+      if (context == null) continue;
+
+      String parent = context.getText().toUpperCase();
+      Token parentToken = context.getStart();
+      Position parentPosition = getPosition(parentToken);
+
+      checkVariableDefinition(parent, parentPosition);
+      checkVariableStructure(parent, child, childToken, parentToken);
+
+      childToken = parentToken;
+      child = parent;
+
+      addUsage(variables, child, parentPosition);
+    }
   }
 
-  private void throwException(
-      String wrongToken, int startLine, int charPositionInLine, String message, int severity) {
+  private void throwException(String wrongToken, @Nullable Position position, String message) {
+    if (position == null) return;
     SyntaxError syntaxError =
         SyntaxError.syntaxError()
-            .position(
-                new Position(
-                    documentUri,
-                    charPositionInLine,
-                    getWrongTokenStopPosition(wrongToken, charPositionInLine),
-                    startLine,
-                    charPositionInLine))
+            .position(position)
             .suggestion(message + wrongToken)
-            .severity(severity)
+            .severity(WARNING)
             .build();
 
+    LOG.debug("Syntax error by CobolVisitor#throwException: " + syntaxError.toString());
     if (!errors.contains(syntaxError)) {
       errors.add(syntaxError);
     }
   }
 
-  private void getSemanticError(
-      String wrongToken, int startLine, int charPositionInLine, String correctWord) {
-    errors.add(
-        SyntaxError.syntaxError()
-            .position(
-                new Position(
-                    documentUri,
-                    charPositionInLine,
-                    getWrongTokenStopPosition(wrongToken, charPositionInLine),
-                    startLine,
-                    charPositionInLine))
-            .suggestion("A misspelled word, maybe you want to put " + correctWord)
-            .severity(WARNING_LEVEL)
-            .build());
+  @Nullable
+  private Position getPosition(Token childToken) {
+    return positionMapping.get(childToken);
   }
 
-  private boolean checkForVariable(
-      String variable, int startLine, int charPositionInLine, ParserRuleContext ctx) {
-    if (!semanticContext.getVariables().contains(variable)) {
-      throwException(variable, startLine, charPositionInLine, INVALID_DEF_MSG, INFO_LEVEL);
-      return false;
-    } else if (ctx instanceof QualifiedDataNameFormat1Context
-        && ((QualifiedDataNameFormat1Context) ctx).qualifiedInData() != null) {
-      iterateOverQualifiedDataNames(
-          (QualifiedDataNameFormat1Context) ctx, variable, startLine, charPositionInLine);
-      addUsage(semanticContext.getVariables(), variable, ctx);
-    }
-    return true;
-  }
-
-  private void iterateOverQualifiedDataNames(
-      QualifiedDataNameFormat1Context ctx, String variable, int startLine, int charPositionInLine) {
-    for (QualifiedInDataContext node : ctx.qualifiedInData()) {
-      if (node.inData() != null) {
-        visitInData(variable, startLine, charPositionInLine, node.inData());
-        DataName2Context context = node.inData().dataName2();
-        variable = context.getText();
-        addUsage(semanticContext.getVariables(), context);
-      } else {
-        visitInTable(variable, startLine, charPositionInLine, node.inTable());
-        DataName2Context context = node.inTable().tableCall().dataName2();
-        variable = context.getText();
-        addUsage(semanticContext.getVariables(), context);
-      }
+  private void checkVariableDefinition(String name, @Nullable Position position) {
+    if (position == null) return;
+    if (!variables.contains(name)) {
+      reportVariableNotDefined(name, position, position); // starts and finishes in one token
     }
   }
 
-  private void checkParentContainsChildren(
-      String parent, String children, int startLine, int charPositionInLine) {
-    if (!semanticContext.getVariables().parentContainsSpecificChild(parent, children)) {
-      throwException(children, startLine, charPositionInLine, INVALID_DEF_MSG, INFO_LEVEL);
+  private DataName2Context getDataName2Context(QualifiedInDataContext node) {
+    return ofNullable(node.inData())
+        .map(InDataContext::dataName2)
+        .orElse(
+            ofNullable(node.inTable())
+                .map(InTableContext::tableCall)
+                .map(TableCallContext::dataName2)
+                .orElse(null));
+  }
+
+  private void checkVariableStructure(
+      String parent, String child, Token childToken, Token parentToken) {
+    Position childPosition = getPosition(childToken);
+    Position parentPosition = getPosition(parentToken);
+    if (childPosition == null || parentPosition == null) return;
+    if (!variables.parentContainsSpecificChild(parent, child)) {
+      reportVariableNotDefined(
+          extractErrorStatementText(childToken, parentToken), childPosition, parentPosition);
     }
   }
 
-  private void addUsage(SubContext<?> langContext, String name, ParserRuleContext ctx) {
-    langContext.addUsage(name.toUpperCase(), retrievePosition(ctx));
+  private String extractErrorStatementText(Token childToken, Token parentToken) {
+    return tokenStream.getTokens(childToken.getTokenIndex(), parentToken.getTokenIndex()).stream()
+        .map(Token::getText)
+        .collect(joining())
+        .replaceAll(" +", " ");
   }
 
-  private void addUsage(SubContext<?> langContext, ParserRuleContext ctx) {
-    langContext.addUsage(ctx.getText().toUpperCase(), retrievePosition(ctx));
+  private void addUsage(SubContext<?> langContext, String name, @Nullable Position position) {
+    if (position == null) return;
+    langContext.addUsage(name.toUpperCase(), position);
   }
 
-  private static int getWrongTokenStopPosition(String wrongToken, int charPositionInLine) {
-    return charPositionInLine + wrongToken.length() - 1;
-  }
-
-  private Position retrievePosition(ParserRuleContext ctx) {
+  private Position getIntervalPosition(Position start, Position stop) {
     return new Position(
-        documentUri,
-        ctx.getStart().getStartIndex(),
-        ctx.getStart().getStopIndex(),
-        ctx.getStart().getLine(),
-        ctx.getStart().getCharPositionInLine());
+        start.getDocumentURI(),
+        start.getStartPosition(),
+        stop.getStopPosition(),
+        start.getLine(),
+        start.getCharPositionInLine(),
+        start.getToken());
   }
 
-  private void areaAWarning(int charPosition, String token, int startLine) {
-    if (charPosition > 10) {
-      throwException(token, startLine, charPosition, AREA_A_WARNING_MSG, WARNING_LEVEL);
+  private void reportVariableNotDefined(String dataName, Position start, Position stop) {
+    SyntaxError error =
+        SyntaxError.syntaxError()
+            .suggestion(INVALID_DEF_MSG + dataName)
+            .severity(INFO)
+            .position(getIntervalPosition(start, stop))
+            .build();
+    LOG.debug("Syntax error by CobolVisitor#reportVariableNotDefined: " + error.toString());
+    errors.add(error);
+  }
+
+  private void throwWarning(Token token) {
+    MisspelledKeywordDistance.calculateDistance(token.getText().toUpperCase())
+        .ifPresent(correctWord -> reportMisspelledKeyword(correctWord, getPosition(token)));
+  }
+
+  private void reportMisspelledKeyword(String suggestion, Position position) {
+    if (position == null) return;
+    SyntaxError error =
+        SyntaxError.syntaxError()
+            .suggestion(MISSPELLED_WORD + suggestion)
+            .severity(WARNING)
+            .position(position)
+            .build();
+    LOG.debug("Syntax error by CobolVisitor#reportMisspelledKeyword: " + error.toString());
+    errors.add(error);
+  }
+
+  private void areaAWarning(Token token) {
+    Position position = getPosition(token);
+    if (position == null) return;
+    if (position.getCharPositionInLine() > 10) {
+      throwException(token.getText(), position, AREA_A_WARNING_MSG);
     }
   }
 
   private void areaBWarning(List<Token> tokenList) {
     for (Token token : tokenList) {
-      int charPosition = token.getCharPositionInLine();
+      Position position = getPosition(token);
+      if (position == null) continue;
+      int charPosition = position.getCharPositionInLine();
       if (charPosition > 6 && charPosition < 11 && token.getChannel() != 1) {
-        throwException(
-            token.getText(), token.getLine(), charPosition, AREA_B_WARNING_MSG, WARNING_LEVEL);
+        throwException(token.getText(), position, AREA_B_WARNING_MSG);
       }
     }
   }
 
   private void checkProgramName(Token token) {
     if (programName == null) {
-      throwException(
-          "",
-          token.getLine(),
-          token.getCharPositionInLine(),
-          "There is an issue with PROGRAM-ID paragraph",
-          WARNING_LEVEL);
+      throwException("", getPosition(token), "There is an issue with PROGRAM-ID paragraph");
     } else {
       checkProgramNameIdentical(token);
     }
   }
 
   private void checkProgramNameIdentical(Token token) {
-    if (!programName.equals(token.getText())) {
-      throwException(
-          programName,
-          token.getLine(),
-          token.getCharPositionInLine(),
-          IDENTICAL_PROGRAM_MSG,
-          WARNING_LEVEL);
+    String text = PreprocessorStringUtils.trimQuotes(token.getText());
+    if (!programName.equals(text)) {
+      throwException(programName, getPosition(token), IDENTICAL_PROGRAM_MSG);
     }
   }
 }

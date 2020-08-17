@@ -22,7 +22,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import java.util.List;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * This class is an abstract negative test case and should be instantiated with specifying concrete
  * Cobol files to test. Every heir should also override checkErrors() method to assert the
@@ -41,18 +41,21 @@ import static org.junit.Assert.assertEquals;
 public abstract class NegativeTest extends ConfigurableTest {
   private static final List<CobolText> TEXTS =
       LangServerCtx.getInjector().getInstance(CobolTextRegistry.class).getNegatives();
-
+  private String fileName;
   private String text;
   private int expectedErrorsNumber;
+  private List<CobolText> copybooks;
 
-  NegativeTest(String fileName, int expectedErrorsNumber) {
+  NegativeTest(String fileName, int expectedErrorsNumber, List<CobolText> copybooks) {
+    this.fileName = fileName;
     this.expectedErrorsNumber = expectedErrorsNumber;
     this.text = lookupFile(fileName);
+    this.copybooks = copybooks;
   }
 
   protected void test() {
 
-    List<Diagnostic> diagnostics = analyzeForErrors(text);
+    List<Diagnostic> diagnostics = analyzeForErrors(fileName, text, copybooks);
 
     assertErrorNumber(diagnostics);
 
@@ -76,7 +79,7 @@ public abstract class NegativeTest extends ConfigurableTest {
         .orElseThrow(
             () ->
                 new IllegalArgumentException(
-                    "The specfied file " + fileName + " does not exist in the given archive"));
+                    "The specified file " + fileName + " does not exist in the given archive"));
   }
 
   private void assertErrorNumber(List<Diagnostic> diagnostics) {

@@ -17,19 +17,18 @@ package com.ca.lsp.core.cobol.visitor;
 
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.SyntaxError;
-import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolParser;
-import com.ca.lsp.core.cobol.semantics.SemanticContext;
+import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.ca.lsp.core.cobol.utils.CustomToken;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.ca.lsp.core.cobol.parser.CobolParser.DataNameContext;
 import static com.ca.lsp.core.cobol.parser.CobolParser.QualifiedDataNameFormat1Context;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,21 +38,24 @@ import static org.mockito.Mockito.when;
  * found, then an error should be shown. Also, it should throw a suggestion if there is a typo in
  * keywords.
  */
-public class VisitorSemanticAnalysisTest {
+class VisitorSemanticAnalysisTest {
   private static final String WRONG_TOKEN = "MOVES";
-  private static final String INVALID_VARIABLE = "defined";
-  private static final String DEFINED_VARIABLE = "invalid";
-  private static final String LEVEL_NUMBER = "05";
-
-  private static final Position VARIABLE_POSITION = new Position("", 1, 1, 1, 1);
+  private static final String INVALID_VARIABLE = "invalid";
 
   /**
    * Check if there is an error shown the processing token if a variable do not present in the
    * semantic context.
    */
   @Test
-  public void testVariableDefinitionNotFound() {
-    CobolVisitor visitor = createVisitor(createSemanticContext(), INVALID_VARIABLE);
+  void testVariableDefinitionNotFound() {
+    CustomToken token = createNewToken(INVALID_VARIABLE);
+    CobolVisitor visitor =
+        new CobolVisitor(
+            new NamedSubContext(),
+            mock(CommonTokenStream.class),
+            Map.of(token, new Position("", 0, 0, 0, 0, "invalid")));
+
+    visitor.visitQualifiedDataNameFormat1(mockMethod(token));
 
     List<SyntaxError> errors = visitor.getErrors();
     assertEquals(1, errors.size());
@@ -61,66 +63,31 @@ public class VisitorSemanticAnalysisTest {
         "Invalid definition for: " + INVALID_VARIABLE.toUpperCase(), errors.get(0).getSuggestion());
   }
 
-  /** Check if the usage of the variable that present in the semantic context found correctly. */
-  @Test
-  public void testDefinedVariableUsageIsFound() {
-    SemanticContext semanticContext = createSemanticContext();
-    CobolVisitor visitor = createVisitor(semanticContext, DEFINED_VARIABLE);
-
-    assertEquals(
-        VARIABLE_POSITION,
-        semanticContext
-            .getVariables()
-            .getDefinitions()
-            .get(DEFINED_VARIABLE.toUpperCase())
-            .iterator()
-            .next());
-    assertEquals(0, visitor.getErrors().size());
-  }
-
   /**
    * Check if visitor calculates distance between a wrong token and a keyword and returns a
    * suggestion with the closest keyword.
    */
   @Test
-  public void testMisspelledKeywordDistance() {
+  void testMisspelledKeywordDistance() {
+
+    CustomToken token = createNewToken(WRONG_TOKEN);
     CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
-    when(node.getStart()).thenReturn(createNewToken(WRONG_TOKEN));
-    when(node.getStop()).thenReturn(createNewToken(WRONG_TOKEN));
+    when(node.getStart()).thenReturn(token);
+    when(node.getStop()).thenReturn(token);
 
     CommonTokenStream tokenStream = mock(CommonTokenStream.class);
 
-    CobolVisitor visitor = new CobolVisitor(null, null, tokenStream);
+    CobolVisitor visitor =
+        new CobolVisitor(
+            new NamedSubContext(),
+            tokenStream,
+            Map.of(token, new Position("", 0, 0, 0, 0, WRONG_TOKEN)));
 
     visitor.visitStatement(node);
 
     List<SyntaxError> errors = visitor.getErrors();
     assertEquals(1, errors.size());
     assertEquals("A misspelled word, maybe you want to put MOVE", errors.get(0).getSuggestion());
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testMisspelledKeywordDistanceWithException() {
-    CobolVisitor visitor = new CobolVisitor(null, null, null);
-    CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
-    visitor.visitStatement(node);
-  }
-
-  private CobolVisitor createVisitor(SemanticContext semanticContext, String variableName) {
-    CobolVisitor visitor = new CobolVisitor(null, semanticContext, null);
-    CustomToken token = createNewToken(variableName);
-
-    visitor.visitQualifiedDataNameFormat1(mockMethod(token));
-
-    return visitor;
-  }
-
-  private SemanticContext createSemanticContext() {
-    SemanticContext semanticContext = new SemanticContext(new ArrayList<>());
-    semanticContext
-        .getVariables()
-        .define(new Variable(LEVEL_NUMBER, DEFINED_VARIABLE), VARIABLE_POSITION);
-    return semanticContext;
   }
 
   private QualifiedDataNameFormat1Context mockMethod(CustomToken token) {

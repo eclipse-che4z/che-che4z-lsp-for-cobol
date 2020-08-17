@@ -15,9 +15,7 @@ package com.ca.lsp.cobol.positive;
 
 import lombok.Value;
 
-/**
- * This class is used to represent a Cobol program text.
- */
+/** This class used to represent a COBOL program text. */
 @Value
 public class CobolText {
   private String fileName;

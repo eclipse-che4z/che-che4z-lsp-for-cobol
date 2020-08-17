@@ -17,8 +17,8 @@ package com.ca.lsp.core.cobol.semantics;
 
 import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +26,10 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /** Test for CobolVariableContextImpl */
-public class CobolVariableContextTest {
+class CobolVariableContextTest {
   private static final String LEVEL1 = "01";
   private static final String LEVEL2 = "02";
   private static final String LEVEL10 = "10";
@@ -49,8 +49,8 @@ public class CobolVariableContextTest {
   private static final String VAR8 = "VAR8";
   private static final String PARENT1 = "PARENT1";
 
-  private static final Position ERROR_POSITION1 = new Position(null, 0, 3, 1, 5);
-  private static final Position ERROR_POSITION2 = new Position(null, 4, 8, 2, 5);
+  private static final Position ERROR_POSITION1 = new Position(null, 0, 3, 1, 5, null);
+  private static final Position ERROR_POSITION2 = new Position(null, 4, 8, 2, 5, null);
 
   private CobolVariableContext context;
   private Variable var1;
@@ -64,8 +64,8 @@ public class CobolVariableContextTest {
 
   private List<Variable> variableList;
 
-  @Before
-  public void createContext() {
+  @BeforeEach
+  void createContext() {
     context = new CobolVariableContext();
     var1 = new Variable(LEVEL1, VAR1); // 01
     var2 = new Variable(LEVEL2, VAR2); // 02
@@ -82,7 +82,7 @@ public class CobolVariableContextTest {
   }
 
   @Test
-  public void testDefine() {
+  void testDefine() {
     context.define(var1, ERROR_POSITION1);
     context.define(var2, ERROR_POSITION1);
     context.define(var3, ERROR_POSITION1);
@@ -97,14 +97,14 @@ public class CobolVariableContextTest {
   }
 
   @Test
-  public void testAddUsage() {
+  void testAddUsage() {
     context.addUsage(VAR1, ERROR_POSITION1);
     context.addUsage(VAR1, ERROR_POSITION2);
     assertEquals(2, context.getUsages().get(var1.getName()).size());
   }
 
   @Test
-  public void testGetNegative() {
+  void testGetNegative() {
     context.define(var1, ERROR_POSITION1);
     assertEquals(var1, context.get(VAR1));
     assertNull(context.get("null"));
@@ -112,7 +112,7 @@ public class CobolVariableContextTest {
   }
 
   @Test
-  public void testGetNames() {
+  void testGetNames() {
     context.define(var1, ERROR_POSITION1);
     context.define(var2, ERROR_POSITION1);
 
@@ -122,42 +122,23 @@ public class CobolVariableContextTest {
   }
 
   @Test
-  public void searchVariableInStructureHappyTest() {
+  void searchVariableInStructureHappyTest() {
     assertTrue(isVariableDefinedInStructure(variableList.get(0), "CHILD"));
   }
 
   @Test
-  public void searchVariableInStructureBadTest() {
+  void searchVariableInStructureBadTest() {
     assertFalse(isVariableDefinedInStructure(variableList.get(0), "CHILD222"));
   }
 
   @Test
-  public void getVariableByNameHappyTest() {
+  void getVariableByNameHappyTest() {
     assertNotNull(get(PARENT1));
   }
 
   @Test
-  public void getVariableByNameBadTest() {
+  void getVariableByNameBadTest() {
     assertNull(get("NEW-VARIABLE-NOT-CREATED"));
-  }
-
-  /**
-   * Test that {@link CobolVariableContext#removeUnresolvedCopybookMarks} removes all the variables
-   * that have level number '-1'.
-   */
-  @Test
-  public void removeUnresolvedCopybookMarksTest() {
-    CobolVariableContext context = new CobolVariableContext();
-    Position pos = new Position("doc", 0, 1, 0, 0);
-    String cpyMark = "cpyMark";
-
-    context.define(new Variable("-1", cpyMark), pos);
-    context.define(new Variable("0", "var1"), pos);
-    context.define(new Variable("1", "var2"), pos);
-    context.removeUnresolvedCopybookMarks();
-
-    assertEquals(2, context.getAll().size());
-    assertFalse(context.contains(cpyMark));
   }
 
   private boolean isVariableDefinedInStructure(Variable variable, String targetVariableName) {

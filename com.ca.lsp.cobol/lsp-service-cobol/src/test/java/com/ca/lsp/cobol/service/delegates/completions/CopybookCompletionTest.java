@@ -14,30 +14,21 @@
 
 package com.ca.lsp.cobol.service.delegates.completions;
 
-import static org.junit.Assert.*;
-
 import com.ca.lsp.cobol.service.MyDocumentModel;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.eclipse.lsp4j.CompletionItem;
-import org.eclipse.lsp4j.CompletionItemKind;
-import org.eclipse.lsp4j.CompletionParams;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
-import org.eclipse.lsp4j.TextDocumentIdentifier;
-import org.junit.Test;
+import org.eclipse.lsp4j.*;
+import org.junit.jupiter.api.Test;
+
+import java.util.*;
+
+import static java.util.Collections.emptyMap;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Testing Copybook autocomplete class, to determine if copybook names will be correctly detected
  * and shown in the autocomplete list
  */
-public class CopybookCompletionTest {
+class CopybookCompletionTest {
 
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -60,7 +51,7 @@ public class CopybookCompletionTest {
           + "       END PROGRAM ID1.";
 
   @Test
-  public void testCopybookCompletion() {
+  void testCopybookCompletion() {
     MyDocumentModel document = createModel();
     Set<Completion> completionSet = new HashSet<>();
     completionSet.add(new CopybookCompletion());
@@ -86,13 +77,7 @@ public class CopybookCompletionTest {
 
     AnalysisResult result =
         new AnalysisResult(
-            Collections.emptyList(),
-            Collections.emptyMap(),
-            Collections.emptyMap(),
-            Collections.emptyMap(),
-            Collections.emptyMap(),
-            Collections.emptyMap(),
-            copybookUsages);
+            emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), copybookUsages);
 
     return new MyDocumentModel(TEXT, result);
   }

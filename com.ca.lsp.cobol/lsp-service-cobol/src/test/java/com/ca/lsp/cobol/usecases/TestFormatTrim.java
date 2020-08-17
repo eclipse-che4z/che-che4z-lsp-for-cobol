@@ -18,8 +18,8 @@ import com.ca.lsp.cobol.ConfigurableTest;
 import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,10 +32,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.waitForDiagnostics;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
-public class TestFormatTrim extends ConfigurableTest {
+class TestFormatTrim extends ConfigurableTest {
   private static final String ID = "id";
 
   private TextDocumentService service;
@@ -50,8 +50,8 @@ public class TestFormatTrim extends ConfigurableTest {
           + "223d3& AUTHOR.\r\n"
           + "002800 INPUT-OUTPUT SECTION.                                            23323232  ";
 
-  @Before
-  public void createService() {
+  @BeforeEach
+  void createService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
@@ -59,7 +59,7 @@ public class TestFormatTrim extends ConfigurableTest {
   }
 
   @Test
-  public void testTrimming() {
+  void testTrimming() {
     waitForDiagnostics(client);
     CompletableFuture<List<? extends TextEdit>> formatting =
         service.formatting(
@@ -74,7 +74,7 @@ public class TestFormatTrim extends ConfigurableTest {
   }
 
   @Test
-  public void testTrimmingBeforeDidOpenFinished() {
+  void testTrimmingBeforeDidOpenFinished() {
     CompletableFuture<List<? extends TextEdit>> formatting =
         service.formatting(
             new DocumentFormattingParams(

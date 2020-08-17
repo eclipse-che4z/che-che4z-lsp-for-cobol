@@ -14,8 +14,10 @@
 
 package com.ca.lsp.cobol.negative;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 /**
  * 20 IGYLI0088-S The "COPY" statement was invalid. Expected "REPLACING", but found "02". The
@@ -27,15 +29,15 @@ import org.junit.Test;
  * <p>45 IGYDS1089-S ""DEENDING"" was invalid. Scanning was resumed at the next area ""A"" item,
  * level-number, or the start of the next clause."
  */
+@Disabled("Unsupported while semantic analysis not implemented")
 public class Chetest1Test extends NegativeTest {
   private static final String FILE_NAME = "CHETEST1.cbl";
   private static final int EXPECTED_ERRORS_NUMBER = 3;
 
-  public Chetest1Test() {
-    super(FILE_NAME, EXPECTED_ERRORS_NUMBER);
+  Chetest1Test() {
+    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
   }
 
-  @Ignore("Unsupported while semantic analysis is not implemented")
   @Test
   public void test() {
     super.test();

@@ -13,8 +13,10 @@
  */
 package com.ca.lsp.cobol.negative;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 /**
  * " IGYSC1428-W The ""TEST(DWARF)"" option was specified but the compiler return code was 8 or
@@ -23,15 +25,15 @@ import org.junit.Test;
  * <p>63 IGYDS0225-S An ""EXEC SQL"" statement was found, but the ""SQL"" compiler option was not in
  * effect. The statement was discarded."
  */
+@Disabled("Unsupported while semantic analysis not implemented")
 public class Marbles3Test extends NegativeTest {
   private static final String FILE_NAME = "MARBLES3.cbl";
   private static final int EXPECTED_ERRORS_NUMBER = 2;
 
-  public Marbles3Test() {
-    super(FILE_NAME, EXPECTED_ERRORS_NUMBER);
+  Marbles3Test() {
+    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
   }
 
-  @Ignore("Unsupported while semantic analysis is not implemented")
   @Test
   public void test() {
     super.test();

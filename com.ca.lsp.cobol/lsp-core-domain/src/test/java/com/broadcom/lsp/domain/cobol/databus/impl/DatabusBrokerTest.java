@@ -27,16 +27,15 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static com.broadcom.lsp.domain.cobol.databus.model.RegistryId.GENERAL_REGISTRY_ID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Slf4j
-public class DatabusBrokerTest extends CopybookStorableProvider
-    implements EventObserver<DataEvent> {
+class DatabusBrokerTest extends CopybookStorableProvider implements EventObserver<DataEvent> {
   @Getter @Setter private int hitCount;
   private static final DataEventType UNKNOWN_EVENT_TYPE = DataEventType.UNKNOWN_EVENT;
 
@@ -46,53 +45,53 @@ public class DatabusBrokerTest extends CopybookStorableProvider
 
   @Getter private final Waiter waiter = new Waiter();
 
-  @Before
-  public void initCache() {
+  @BeforeEach
+  void initCache() {
     // populate the cache with some data
     broker.storeData(dummyCopybook);
   }
 
   /**
-   * This test verify that the client can invalidate the databus internal cache using the broker.
+   * This test verifies that the client can invalidate the databus internal cache using the broker.
    */
   @Test
-  public void invalidateCacheTest() {
-    LOG.info("Cache size before the invalidate call = " + broker.cacheSize());
+  void invalidateCacheTest() {
+    LOG.info("Cache size before invalidate call = " + broker.cacheSize());
     broker.invalidateCache();
     assertEquals(0, broker.cacheSize());
   }
 
   /**
-   * This test verify that the client can grab the top item from the databus internal cache using
+   * This test verifies that the client can grab the top item from the databus internal cache using
    * the broker.
    */
   @Test
-  public void getLastItemTest() {
+  void getLastItemTest() {
     assertNotNull(broker.lastRecentlyUsed().get().getName());
   }
 
   /**
-   * This test verify that the client can grab the least item from the databus internal cache using
-   * the broker.
+   * This test verifies that the client can grab the least item from the databus internal cache
+   * using the broker.
    */
   @Test
-  public void getLeastItemTest() {
+  void getLeastItemTest() {
     assertNotNull(broker.leastRecentlyUsed().get().getName());
   }
 
   /**
-   * This test verify that the client can retrieve an element from the databus internal cache using
-   * the broker.
+   * This test verifies that the client can retrieve an element from the databus internal cache
+   * using the broker.
    */
   @Test
-  public void isElementStoredInCacheTest() {
+  void isElementStoredInCacheTest() {
     assertEquals(getDummyStorable().getName(), broker.getData(dummyCopybook.getId()).getName());
   }
 
-  /** This test verify that a client could subscribe for an event using the broker. */
+  /** This test verifies that a client could subscribe for an event using the broker. */
   @Test
   @SneakyThrows
-  public void subscribeTest() {
+  void subscribeTest() {
     /*
     The scenario for this test is described below:
       1. The observer object is subscribed for the UnknownEvent and its hitCount is equals to 0.
@@ -109,10 +108,10 @@ public class DatabusBrokerTest extends CopybookStorableProvider
     assertEquals(1, getHitCount());
   }
 
-  /** This test verify that a client could subscribe for an event using the general registry. */
+  /** This test verifies that a client could subscribe for an event using the general registry. */
   @Test
   @SneakyThrows
-  public void subscribeOnGeneralRegistryTest() {
+  void subscribeOnGeneralRegistryTest() {
     /*
        The scenario for this test is described below:
          1. The observer object is subscribed for the UnknownEvent on the general registry with an
@@ -133,10 +132,10 @@ public class DatabusBrokerTest extends CopybookStorableProvider
     assertEquals(1, getHitCount());
   }
 
-  /** This test verify that a class is able to unsubscribe for a specific event. */
+  /** This test verifies that a class is able to unsubscribe for a specific event. */
   @Test
   @SneakyThrows
-  public void unsubscribeTest() {
+  void unsubscribeTest() {
     /*
     The scenario for this test is described below:
       1. The observer object is subscribed for the UnknownEvent and its hitCount is equals to 0.
@@ -151,13 +150,13 @@ public class DatabusBrokerTest extends CopybookStorableProvider
     hitCount = 0;
     UnknownEventSubscriber subscriber = broker.subscribe(UNKNOWN_EVENT_TYPE, this);
 
-    // a new unknown event is published..
+    // a new unknown event published...
     broker.postData(UnknownEvent.builder().build());
     waiter.await(1000);
     // at that moment hitCount = 1
     broker.unSubscribe(subscriber);
 
-    // a new unknown event is published again and again..
+    // a new unknown event published again and again...
     broker.postData(UnknownEvent.builder().build());
     broker.postData(UnknownEvent.builder().build());
     broker.postData(UnknownEvent.builder().build());

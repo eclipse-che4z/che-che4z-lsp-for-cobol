@@ -20,19 +20,22 @@ import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.function.Predicate;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 /**
  * This class represents a structure to store variables of a COBOL program and build a variable
  * hierarchy.
  */
+@EqualsAndHashCode
 public class CobolVariableContext implements SubContext<Variable> {
   private static final int LEVEL_77 = 77;
   private static final int LEVEL_66 = 66;
@@ -45,16 +48,17 @@ public class CobolVariableContext implements SubContext<Variable> {
   public void define(Variable variable, Position position) {
     variables.add(variable);
     variableDefinitions.put(variable.getName(), position);
+    createRelationBetweenVariables();
   }
 
   @Override
-  public void addUsage(String variableName, Position position) {
-    variableUsages.put(variableName, position);
+  public void addUsage(String variable, Position position) {
+    variableUsages.put(variable, position);
   }
 
   @Override
   public List<Variable> getAll() {
-    return Collections.unmodifiableList(variables);
+    return unmodifiableList(variables);
   }
 
   @Override
@@ -73,42 +77,45 @@ public class CobolVariableContext implements SubContext<Variable> {
   }
 
   @Override
-  public void merge(String name, SubContext<Variable> subContext) {
+  public void merge(SubContext<Variable> subContext) {
     variableDefinitions.putAll(subContext.getDefinitions());
     variableUsages.putAll(subContext.getUsages());
-    buildVariableStructure(name, subContext);
   }
 
   public Variable get(String name) {
     return variables.stream()
-        .filter(
-            variable -> Optional.ofNullable(variable.getName()).orElse("").equalsIgnoreCase(name))
+        .filter(variable -> ofNullable(variable.getName()).orElse("").equalsIgnoreCase(name))
         .findFirst()
         .orElse(null);
   }
 
   /**
+   * Check if the given root variable contains a variable with a given name, even indirectly
+   *
    * @param rootVariableName the root variable from where start the deep search
    * @param targetVariableName the name of the variable to found in the variable tree
-   * @return a boolean true if the variable targetVaraible is present false otherwise
+   * @return true if the target variable presents or false otherwise
    */
   public boolean parentContainsSpecificChild(String rootVariableName, String targetVariableName) {
-    Variable rootVariable = get(rootVariableName);
-
-    if (rootVariable.getChildren().contains(targetVariableName)) {
-      return true;
-    } else {
-      for (String childVariableName : rootVariable.getChildren()) {
-        Variable childVariable = get(childVariableName);
-        if (childVariable != null) {
-          return parentContainsSpecificChild(childVariable.getName(), targetVariableName);
-        }
-      }
-    }
-    return false;
+    return ofNullable(get(rootVariableName))
+        .map(Variable::getChildren)
+        .map(
+            children ->
+                children.contains(targetVariableName)
+                    || checkAnyVariableContainsChild(children, targetVariableName))
+        .orElse(false);
   }
 
-  public void createRelationBetweenVariables() {
+  private boolean checkAnyVariableContainsChild(List<String> variables, String child) {
+    return variables.stream()
+        .map(this::get)
+        .filter(Objects::nonNull)
+        .map(variable -> parentContainsSpecificChild(variable.getName(), child))
+        .findAny()
+        .orElse(false);
+  }
+
+  private void createRelationBetweenVariables() {
     // variable with level number [ 77 ] are not part of list used to generate the structure because
     // it cannot be a group item but just an element item
     List<Variable> variableList =
@@ -124,18 +131,6 @@ public class CobolVariableContext implements SubContext<Variable> {
 
   private Predicate<Variable> levelPredicate(int level) {
     return v -> v.getLevelNumber() != level;
-  }
-
-  /**
-   * Remove all the copybook marks that were not resolved. Copybook mark is a variable with copybook
-   * name and level number '-1'. If copybook is missing, then this mark will stay here and should be
-   * deleted not to appear in the variable list.
-   */
-  public void removeUnresolvedCopybookMarks() {
-    List<Variable> unresolvedCopybooks =
-        variables.stream().filter(it -> it.getLevelNumber() == -1).collect(toList());
-    variables.removeAll(unresolvedCopybooks);
-    unresolvedCopybooks.forEach(it -> variableDefinitions.removeAll(it.getName()));
   }
 
   /**
@@ -200,29 +195,6 @@ public class CobolVariableContext implements SubContext<Variable> {
     v2.setParent(v1.getParent());
     if (v1.getParent() != null) {
       v1.getParent().getChildren().add(v2.getName());
-    }
-  }
-
-  /**
-   * Replace the copybook mark with a variable structure of this copybook. Copybook analyzer puts
-   * these marks into the context to show where the copybook variable structure should be built in
-   * respecting the main document structure.
-   *
-   * <p>Copybook mark is a variable with copybook name and level number '-1'.
-   *
-   * @param name - copybook name
-   * @param subContext - copybook context
-   */
-  private void buildVariableStructure(String name, SubContext<Variable> subContext) {
-    int indexOfCopybook = variables.indexOf(new Variable("-1", name));
-    if (indexOfCopybook == -1) {
-      variables.addAll(subContext.getAll());
-    }
-    variables.addAll(indexOfCopybook + 1, subContext.getAll());
-    variables.remove(indexOfCopybook);
-    variableDefinitions.removeAll(name);
-    if (variables.contains(new Variable("-1", name))) {
-      buildVariableStructure(name, subContext);
     }
   }
 }

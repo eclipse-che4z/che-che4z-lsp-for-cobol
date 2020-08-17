@@ -19,23 +19,23 @@ import com.ca.lsp.cobol.service.utils.FileSystemService;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.services.LanguageClient;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.*;
 
 /** This unit tests verifies the capabilities of {@link ServerCommunications} */
-public class ServerCommunicationsTest {
+class ServerCommunicationsTest {
   // TODO: Cover the rest of the methods
   /**
    * Method {@link ServerCommunications#notifyThatDocumentAnalysed(String)} should asynchronously
    * call logging on the client for a specific message with a document name retrieved from uri
    */
   @Test
-  public void testNotifyThatDocumentAnalysed() {
+  void testNotifyThatDocumentAnalysed() {
     assertDocumentAnalysedNotification(DOCUMENT_URI, "document.cbl");
     assertDocumentAnalysedNotification("document.cbl", "document.cbl");
     assertDocumentAnalysedNotification("", "");

@@ -15,40 +15,38 @@
 
 package com.ca.lsp.cobol.usecases;
 
-import com.ca.lsp.cobol.ConfigurableTest;
-import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp4j.Location;
-import org.junit.Test;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
-import static java.util.Collections.emptyList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
-/** This test covers case when copybook that was not found appears as a variable. */
-public class TestMissingCopybookNotInVariableList extends ConfigurableTest {
+/**
+ * This test covers case when copybook that was not found appears as a variable. Assert that there
+ * is no variable with name 'CPYNAME' in the defined variable list due to the copybook with this
+ * name isn't resolved. There should be only 'PARENT'.
+ */
+class TestMissingCopybookNotInVariableList {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 PARENT. COPY CPYNAME.\n"
-          + "       PROCEDURE DIVISION.\n"
-          + "       MOVE 00 TO CHILD1 OF PARENT.";
+          + "       01 {$*PARENT}. COPY {~CPYNAME|missing}.\n"
+          + "       PROCEDURE DIVISION.\n";
 
-  /**
-   * Assert that there is no variable with name 'CPYNAME' in the defined variable list due to the
-   * copybook with this name isn't resolved. There should be only 'PARENT'.
-   */
   @Test
-  public void test() {
-    AnalysisResult result = analyze(TEXT, emptyList());
-    Map<String, List<Location>> variableDefinitions = result.getVariableDefinitions();
-
-    assertEquals(variableDefinitions.keySet().toString(), 1, variableDefinitions.size());
-    assertTrue(variableDefinitions.keySet().toString(), variableDefinitions.containsKey("PARENT"));
+  void test() {
+    UseCaseEngine.runTest(
+        TEXT,
+        List.of(),
+        Map.of(
+            "missing",
+            new Diagnostic(
+                null, "CPYNAME: Copybook not found", Error, ERROR.getText(), "MISSING_COPYBOOK")));
   }
 }

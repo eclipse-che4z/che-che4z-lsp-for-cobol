@@ -25,8 +25,8 @@ public enum CopybookProcessingMode {
   SKIP;
 
   /**
-   * This method allow to enable or disable copybook management based on two factors: 1) the file is
-   * an extended source file, 2) the file is open in DID_OPEN|DID_CHANGE
+   * This method enables or disables copybook management based on two factors: 1) the file is an
+   * extended source file, 2) the file is open in DID_OPEN|DID_CHANGE
    *
    * @param uri of the document opened in the editor by the client
    * @param textDocumentSyncType the sync type of the document [{@link

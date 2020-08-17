@@ -17,6 +17,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +28,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-/**
- * Registry for Cobol source code files.
- */
+/** Registry for Cobol source code files. */
 @Singleton
 public class ZipTextRegistry implements CobolTextRegistry {
 
@@ -58,11 +57,12 @@ public class ZipTextRegistry implements CobolTextRegistry {
 
   @Inject
   public ZipTextRegistry(@Named("filesToTestPath") String pathToTestResources) {
-    assert (pathToTestResources != null);
-    try (InputStream zipFile = new FileInputStream(pathToTestResources)) {
-      collectFilesToTest(zipFile);
-    } catch (IOException e) {
-      log.error(e.getMessage());
+    if (StringUtils.isNotEmpty(pathToTestResources)) {
+      try (InputStream zipFile = new FileInputStream(pathToTestResources)) {
+        collectFilesToTest(zipFile);
+      } catch (IOException e) {
+        log.error(e.getMessage());
+      }
     }
   }
 

@@ -15,40 +15,38 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.positive.CobolText;
-import org.junit.Test;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.junit.jupiter.api.Test;
 
-import static java.util.Collections.singletonList;
+import java.util.List;
+import java.util.Map;
 
 /**
- * This test case checks that there is no semantic error when a variable structure is defined using
- * a copybook. Here COPYBOOK-CONTENT represents a copybook that has a variable definition with a
- * level 02. By idea this variable will be recognized as a child of PARENT variable. if not, there
- * will be an error thrown at CHILD OF PARENT statement.
+ * This test case checks that there is no semantic error when a variable structure defined using a
+ * copybook. Here COPYBOOK-CONTENT represents a copybook that has a variable definition with a level
+ * 02. By idea this variable will be recognized as a child of PARENT variable. if not, there will be
+ * an error thrown at CHILD OF PARENT statement.
  */
-public class TestVariableStructureIsBuiltWithCopybooks extends PositiveUseCase {
+class TestVariableStructureIsBuiltWithCopybooks {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01  PARENT1.  COPY COPYBOOK-CONTENT.\n"
-          + "       01  PARENT2.  COPY COPYBOOK-CONTENT.\n"
+          + "       01  {$*PARENT1}.  COPY {~STRUCT}.\n"
+          + "       01  {$*PARENT2}.  COPY {~STRUCT}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           MAINLINE.\n"
-          + "           MOVE 00 TO CHILD OF PARENT1.\n"
-          + "           MOVE 00 TO CHILD OF PARENT2.\n"
+          + "       {#*MAINLINE}.\n"
+          + "           MOVE 00 TO {$CHILD} OF {$PARENT1}.\n"
+          + "           MOVE 00 TO {$CHILD} OF {$PARENT2}.\n"
           + "           GOBACK.";
 
-  private static final String COPYBOOK_CONTENT = "       02 CHILD PIC X.";
+  private static final String STRUCT = "       02 {$*CHILD} PIC X.";
+  private static final String STRUCT_NAME = "STRUCT";
 
-  public TestVariableStructureIsBuiltWithCopybooks() {
-    super(TEXT);
-  }
-
-  @Override
   @Test
-  public void test() {
-    super.test(singletonList(new CobolText("COPYBOOK-CONTENT", COPYBOOK_CONTENT)));
+  void test() {
+    UseCaseEngine.runTest(TEXT, List.of(new CobolText(STRUCT_NAME, STRUCT)), Map.of());
   }
 }

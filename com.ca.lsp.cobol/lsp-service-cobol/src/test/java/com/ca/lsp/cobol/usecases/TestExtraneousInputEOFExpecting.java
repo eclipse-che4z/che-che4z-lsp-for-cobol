@@ -13,36 +13,41 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import org.eclipse.lsp4j.Range;
-import org.junit.Test;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
-/** This use case checks if the absence of dot at the end is being recognized as an error. */
-public class TestExtraneousInputEOFExpecting extends NegativeUseCase {
-
-  public TestExtraneousInputEOFExpecting() {
-    super(TEXT);
-  }
+/** This use case checks if the absence of dot at the end recognized as an error. */
+class TestExtraneousInputEOFExpecting {
 
   private static final String TEXT =
-      "        IDENTIFICATION DIVISION. \r\n"
+      "        IDENTIFICATION DIVISION.\r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
-          + "        WORKING-STORAGE SECTION.   \r\n"
+          + "        WORKING-STORAGE SECTION.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
-          + "           if (1 > 0) NEXT SENTENCE"; // No dot at the end of file
+          + "           if (1 > 0) NEXT SENTENCE{|1}"; // No dot at the end of file
+
+  private static final String MESSAGE =
+      "Extraneous input '<EOF>' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, "
+          + "COMPUTE, CONTINUE, DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, "
+          + "EVALUATE, EXEC, EXHIBIT, EXIT, GENERATE, GOBACK, GO, IF, INITIALIZE, "
+          + "INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, PURGE, READ, "
+          + "RECEIVE, RELEASE, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT, "
+          + "START, STOP, STRING, SUBTRACT, TERMINATE, TITLE, UNSTRING, WRITE, XML, "
+          + "DOT_FS, COPYENTRY, COPYEXIT}";
 
   @Test
-  public void test() {
-    super.test();
-  }
-
-  @Override
-  protected void assertRanges(List<Range> ranges) {
-    Range range = ranges.get(0);
-    assertEquals(35, range.getStart().getCharacter());
+  void test() {
+    UseCaseEngine.runTest(
+        TEXT,
+        List.of(),
+        Map.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

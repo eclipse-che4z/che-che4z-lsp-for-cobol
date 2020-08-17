@@ -23,7 +23,7 @@
             </pattern>
         </encoder>
     </appender>
-    <root level="warn">
+    <root level="${log.level:-ERROR}">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

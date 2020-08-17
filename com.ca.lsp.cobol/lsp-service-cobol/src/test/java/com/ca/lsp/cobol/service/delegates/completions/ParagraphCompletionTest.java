@@ -16,15 +16,16 @@ package com.ca.lsp.cobol.service.delegates.completions;
 import com.ca.lsp.cobol.service.MyDocumentModel;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static java.util.Collections.emptyMap;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Test to check ParagraphCompletion */
-public class ParagraphCompletionTest {
+class ParagraphCompletionTest {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -46,23 +47,24 @@ public class ParagraphCompletionTest {
    * then attempts to find the expected output
    */
   @Test
-  public void testParagraphCompletion() {
+  void testParagraphCompletion() {
     MyDocumentModel document = createModel();
 
     Set<Completion> completionSet = new HashSet<>();
     completionSet.add(new ParagraphCompletion());
     Completions completions = new Completions(completionSet);
-    List<CompletionItem> completionItems = completions.collectFor(document, createCompletionParams()).getItems();
+    List<CompletionItem> completionItems =
+        completions.collectFor(document, createCompletionParams()).getItems();
 
     assertEquals(2, completionItems.size());
     assertTrue(
-        "100-Test",
         completionItems.get(0).getLabel().contains("100-Test")
-            || completionItems.get(0).getLabel().contains("000-Main-Logic"));
+            || completionItems.get(0).getLabel().contains("000-Main-Logic"),
+        "100-Test");
     assertTrue(
-        "000-Main-Logic",
         completionItems.get(1).getLabel().contains("100-Test")
-            || completionItems.get(1).getLabel().contains("000-Main-Logic"));
+            || completionItems.get(1).getLabel().contains("000-Main-Logic"),
+        "000-Main-Logic");
 
     assertEquals(CompletionItemKind.Method, completionItems.get(0).getKind());
   }
@@ -84,13 +86,13 @@ public class ParagraphCompletionTest {
 
     AnalysisResult result =
         new AnalysisResult(
-            Collections.emptyList(),
-            Collections.emptyMap(),
-            Collections.emptyMap(),
+            emptyMap(),
+            emptyMap(),
+            emptyMap(),
             paragraphDefinitions,
-            Collections.emptyMap(),
-            Collections.emptyMap(),
-            Collections.emptyMap());
+            emptyMap(),
+            emptyMap(),
+            emptyMap());
 
     return new MyDocumentModel(TEXT, result);
   }

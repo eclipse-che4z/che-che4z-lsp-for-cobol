@@ -16,14 +16,16 @@ package com.ca.lsp.cobol.service.delegates.completions;
 import com.ca.lsp.cobol.service.MyDocumentModel;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Test to check VariableCompletion */
-public class VariableCompletionTest {
+class VariableCompletionTest {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. ID1.\n"
@@ -44,7 +46,7 @@ public class VariableCompletionTest {
           + "       END PROGRAM ID1.";
 
   @Test
-  public void testVariableCompletion() {
+  void testVariableCompletion() {
     MyDocumentModel document = createModel();
     Set<Completion> completionSet = new HashSet<>();
     completionSet.add(new VariableCompletion());
@@ -65,30 +67,26 @@ public class VariableCompletionTest {
     Map<String, List<Location>> variableDefinitions = new HashMap<>();
     variableDefinitions.put(
         "TBPARM1",
-        Collections.singletonList(
-            new Location(null, new Range(new Position(5, 9), new Position(5, 16)))));
+        singletonList(new Location(null, new Range(new Position(5, 9), new Position(5, 16)))));
     variableDefinitions.put(
         "TBPARM2",
-        Collections.singletonList(
-            new Location(null, new Range(new Position(6, 9), new Position(6, 16)))));
+        singletonList(new Location(null, new Range(new Position(6, 9), new Position(6, 16)))));
     variableDefinitions.put(
         "ATCDEM4",
-        Collections.singletonList(
-            new Location(null, new Range(new Position(7, 9), new Position(7, 16)))));
+        singletonList(new Location(null, new Range(new Position(7, 9), new Position(7, 16)))));
     variableDefinitions.put(
         "P1PARM1",
-        Collections.singletonList(
-            new Location(null, new Range(new Position(8, 9), new Position(8, 16)))));
+        singletonList(new Location(null, new Range(new Position(8, 9), new Position(8, 16)))));
 
     AnalysisResult result =
         new AnalysisResult(
-            Collections.emptyList(),
+            emptyMap(),
             variableDefinitions,
-            Collections.emptyMap(),
-            Collections.emptyMap(),
-            Collections.emptyMap(),
-            Collections.emptyMap(),
-            Collections.emptyMap());
+            emptyMap(),
+            emptyMap(),
+            emptyMap(),
+            emptyMap(),
+            emptyMap());
 
     return new MyDocumentModel(TEXT, result);
   }

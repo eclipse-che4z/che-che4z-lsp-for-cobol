@@ -19,11 +19,15 @@ import com.broadcom.lsp.cdi.module.DefaultModule;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.impl.CobolPreprocessorImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.AnalyseCopybookTaskFactory;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookAnalysis;
-import com.ca.lsp.core.cobol.preprocessor.sub.copybook.CopybookParallelAnalysis;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.CobolSemanticParser;
-import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CobolSemanticParserImpl;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessor;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListenerFactory;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CopybookResolutionProvider;
+import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.GrammarPreprocessorImpl;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.ReplacingServiceImpl;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.TokenUtilsImpl;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 /** This module provides DI bindings for COBOL language engine part. */
@@ -32,9 +36,11 @@ public class EngineModule extends DefaultModule {
   protected void configure() {
     bind(CobolLanguageEngine.class);
     bind(CobolPreprocessor.class).to(CobolPreprocessorImpl.class);
-    bind(CopybookAnalysis.class).to(CopybookParallelAnalysis.class);
-    install(new FactoryModuleBuilder().build(AnalyseCopybookTaskFactory.class));
     bind(CobolPreprocessor.class).to(CobolPreprocessorImpl.class);
-    bind(CobolSemanticParser.class).to(CobolSemanticParserImpl.class);
+    bind(GrammarPreprocessor.class).to(GrammarPreprocessorImpl.class);
+    bind(CopybookResolution.class).toProvider(CopybookResolutionProvider.class);
+    install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));
+    bind(ReplacingService.class).to(ReplacingServiceImpl.class);
+    bind(TokenUtils.class).to(TokenUtilsImpl.class);
   }
 }

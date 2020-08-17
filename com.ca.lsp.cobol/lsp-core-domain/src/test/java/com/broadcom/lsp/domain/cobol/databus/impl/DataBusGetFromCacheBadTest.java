@@ -23,21 +23,22 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** This test verifies that cache can handle edge cases, e.g. missing elements. */
 @Slf4j
-public class DataBusGetFromCacheBadTest extends DatabusConfigProvider {
+class DataBusGetFromCacheBadTest extends DatabusConfigProvider {
   private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> databus;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
 
     databus.storeData(
@@ -77,28 +78,32 @@ public class DataBusGetFromCacheBadTest extends DatabusConfigProvider {
     LOG.debug(String.format("Received : %s", adaptedDataEvent.getEventType().getId()));
   }
 
-  @Test(expected = NoSuchElementException.class)
+  @Test
   @SneakyThrows
-  public void getData() throws NoSuchElementException {
-    assertTrue(databus.isStored(CopybookRepository.calculateUUID("COPY40")));
-    LOG.debug(String.format("Cache content : %s", databus.printCache()));
-    Optional<CopybookStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
-    LOG.debug(
-        String.format(
-            "Least Recently Used item : %s  ID : %d",
-            leastRecentlyUsed.get().getName(), leastRecentlyUsed.get().getId()));
-    // Cache is Full
-    LOG.debug(
-        String.format(
-            "Cache STATUS --> MaxCacheSize: %d  ActualCacheSize: %d",
-            databus.getCacheMaxSize(), databus.cacheSize()));
-    LOG.debug(
-        String.format(
-            "Retrieving not existent item %s will throw NoSuchElementException ", "COPY20"));
-    assertTrue(
-        databus
-            .getData(CopybookRepository.calculateUUID("COPY20"))
-            .getName()
-            .equalsIgnoreCase("COPY20"));
+  void getData() throws NoSuchElementException {
+    Assertions.assertThrows(
+        NoSuchElementException.class,
+        () -> {
+          assertTrue(databus.isStored(CopybookRepository.calculateUUID("COPY40")));
+          LOG.debug(String.format("Cache content : %s", databus.printCache()));
+          Optional<CopybookStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
+          LOG.debug(
+              String.format(
+                  "Least Recently Used item : %s  ID : %d",
+                  leastRecentlyUsed.get().getName(), leastRecentlyUsed.get().getId()));
+          // Cache is Full
+          LOG.debug(
+              String.format(
+                  "Cache STATUS --> MaxCacheSize: %d  ActualCacheSize: %d",
+                  databus.getCacheMaxSize(), databus.cacheSize()));
+          LOG.debug(
+              String.format(
+                  "Retrieving not existent item %s will throw NoSuchElementException ", "COPY20"));
+          assertTrue(
+              databus
+                  .getData(CopybookRepository.calculateUUID("COPY20"))
+                  .getName()
+                  .equalsIgnoreCase("COPY20"));
+        });
   }
 }

@@ -15,13 +15,16 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
+import static org.junit.Assert.assertEquals;
 
 /** This test verifies if the margins respected and warnings thrown */
-public class TestMarginAB {
-
+class TestMarginAB {
   /**
    * In TEXT_DIVISION_WRONG_PLACE string there are several DIVISIONS that are not in the right place
    */
@@ -143,34 +146,34 @@ public class TestMarginAB {
           + "000000  END PROGRAM FILETOTEST.";
 
   @Test
-  public void checkForAreaA() {
-    AnalysisResult result = analyze(TEXT_AREA_A);
-    assertEquals(4, result.getDiagnostics().size());
+  void checkForAreaA() {
+    AnalysisResult result = analyze(DOCUMENT_URI, TEXT_AREA_A, List.of());
+    assertEquals(4, result.getDiagnostics().get(DOCUMENT_URI).size());
   }
 
   @Test
-  public void checkForAreaB() {
-    AnalysisResult result = analyze(TEXT_AREA_B);
-    assertEquals(4, result.getDiagnostics().size());
+  void checkForAreaB() {
+    AnalysisResult result = analyze(DOCUMENT_URI, TEXT_AREA_B, List.of());
+    assertEquals(4, result.getDiagnostics().get(DOCUMENT_URI).size());
   }
 
   @Test
-  public void checkCorrectProgramID() {
-    AnalysisResult result = analyze(TEXT_PROGRAM_ID);
+  void checkCorrectProgramID() {
+    AnalysisResult result = analyze(DOCUMENT_URI, TEXT_PROGRAM_ID, List.of());
 
     assertEquals(1, result.getDiagnostics().size());
     assertEquals(
         "Program-name must be identical to the program-name of the corresponding PROGRAM-ID paragraph: FILETOTEST",
-        result.getDiagnostics().get(0).getMessage());
+        result.getDiagnostics().get(DOCUMENT_URI).get(0).getMessage());
   }
 
   @Test
-  public void checkDeclaratives() {
-    AnalysisResult result = analyze(TEXT_DECLARATIVES);
+  void checkDeclaratives() {
+    AnalysisResult result = analyze(DOCUMENT_URI, TEXT_DECLARATIVES, List.of());
 
-    assertEquals(3, result.getDiagnostics().size());
+    assertEquals(3, result.getDiagnostics().get(DOCUMENT_URI).size());
     assertEquals(
         "The following token cannot be on the same line as a DECLARATIVE token: MAMA",
-        result.getDiagnostics().get(1).getMessage());
+                result.getDiagnostics().get(DOCUMENT_URI).get(1).getMessage());
   }
 }

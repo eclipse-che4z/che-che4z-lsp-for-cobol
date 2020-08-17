@@ -172,7 +172,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-
     // git FS URIs are not currently supported
     if (uri.startsWith(GIT_FS_URI)) {
       log.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
@@ -197,7 +196,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   public void didClose(DidCloseTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
     log.info(String.format("Document closing invoked on URI %s", uri));
-    communications.publishDiagnostics(uri, List.of());
+    communications.publishDiagnostics(Map.of(uri, List.of()));
     docs.remove(uri);
   }
 
@@ -252,7 +251,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
               AnalysisResult result =
                   engine.analyze(uri, text, getCopybookProcessingMode(uri, DID_CHANGE));
               registerDocument(uri, new MyDocumentModel(text, result));
-              communications.publishDiagnostics(uri, result.getDiagnostics());
+              communications.publishDiagnostics(result.getDiagnostics());
             })
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
   }
@@ -260,7 +259,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private void publishResult(String uri, AnalysisResult result) {
     notifyAnalysisFinished(uri, result.getCopybookUsages());
     communications.cancelProgressNotification(uri);
-    communications.publishDiagnostics(uri, result.getDiagnostics());
+    communications.publishDiagnostics(result.getDiagnostics());
     if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
   }
 
