@@ -28,34 +28,32 @@ import net.jodah.concurrentunit.Waiter;
 import java.util.concurrent.TimeoutException;
 
 /**
- * This class is an abstraction for databus tests. It uses {@link Waiter} to apply waiting for the
+ * This class is an abstraction for data bus tests. It uses {@link Waiter} to apply waiting for the
  * asynchronous tasks.
  */
 @Slf4j
-public abstract class DatabusConfigProvider implements EventObserver<DataEvent> {
-  public static final int WAITER_DELAY = 1000;
+abstract class DatabusConfigProvider implements EventObserver<DataEvent> {
+  private static final int WAITER_DELAY = 1000;
   @Getter protected final Waiter waiter = new Waiter();
   @Setter @Getter private DataEventType targetEventType;
   private DefaultDataBusBroker databus =
       new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
 
-  protected void databusSubscriptionForPositiveScenario(
-      DataEventType subscribedTo, DataEventType publishTo)
+  void databusSubscriptionForPositiveScenario(DataEventType subscribedTo, DataEventType publishTo)
       throws TimeoutException, InterruptedException {
     subscribeTo(subscribedTo);
     publishEvent(publishTo);
     waiter.await(WAITER_DELAY);
   }
 
-  protected void databusSubscriptionForNegativeScenario(
-      DataEventType subscribedTo, DataEventType publishTo)
+  void databusSubscriptionForNegativeScenario(DataEventType subscribedTo, DataEventType publishTo)
       throws TimeoutException, InterruptedException {
     subscribeTo(subscribedTo);
     publishEvent(publishTo);
     waiter.await(WAITER_DELAY);
   }
 
-  protected void databusUnsubscribeForPositiveScenario(DataEventType targetEvent)
+  void databusUnsubscribeForPositiveScenario(DataEventType targetEvent)
       throws TimeoutException, InterruptedException {
     Object subscriber = subscribeTo(targetEvent);
     publishEvent(targetEvent);
@@ -69,12 +67,12 @@ public abstract class DatabusConfigProvider implements EventObserver<DataEvent> 
     waiter.await(WAITER_DELAY);
   }
 
-  protected Object subscribeTo(DataEventType dataEventType) {
+  private Object subscribeTo(DataEventType dataEventType) {
     setTargetEventType(dataEventType);
     return databus.subscribe(dataEventType, this);
   }
 
-  protected void publishEvent(DataEventType dataEventType) {
+  private void publishEvent(DataEventType dataEventType) {
     databus.postData(CopybookEventFactory.createEventByEventType(dataEventType));
   }
 

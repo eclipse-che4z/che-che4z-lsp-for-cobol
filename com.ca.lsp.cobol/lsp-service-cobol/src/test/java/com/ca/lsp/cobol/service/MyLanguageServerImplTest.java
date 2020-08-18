@@ -19,7 +19,7 @@ import com.ca.lsp.core.cobol.model.ErrorCode;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp4j.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -30,18 +30,18 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /** This test asserts functions of the {@link MyLanguageServerImpl}, such as initialization. */
-public class MyLanguageServerImplTest {
+class MyLanguageServerImplTest {
 
   /**
    * Test the {@link MyLanguageServerImpl#initialized(InitializedParams)} method. Check that the
    * file system watchers registered correctly.
    */
   @Test
-  public void initialized() {
+  void initialized() {
     SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
 
@@ -70,7 +70,7 @@ public class MyLanguageServerImplTest {
    * there are only supported capabilities add to the {@link InitializeResult} instance.
    */
   @Test
-  public void initialize() {
+  void initialize() {
     MyLanguageServerImpl server = new MyLanguageServerImpl(null, null, null, null);
     InitializeParams initializeParams = new InitializeParams();
 

@@ -94,6 +94,7 @@ public class LangServerBootstrap {
       throws IOException {
     try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
       log.info("Language server started using socket communication on port [{}]", LSP_PORT);
+      log.info("Java version: " + Runtime.version());
       // wait for clients to connect
       Socket socket = serverSocket.accept();
       return createServerLauncher(server, socket.getInputStream(), socket.getOutputStream());

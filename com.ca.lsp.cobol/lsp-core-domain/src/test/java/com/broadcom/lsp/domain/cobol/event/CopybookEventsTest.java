@@ -21,12 +21,12 @@ import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
-public class CopybookEventsTest extends CopybookStorableProvider {
+class CopybookEventsTest extends CopybookStorableProvider {
   private static final String UNKNOWN_EVENT_MESSAGE = "Dummy event";
   private static final String REQCPY = "REQCPY";
   private static final String FETCHEDCPY = "FETCHEDCPY";
@@ -37,35 +37,35 @@ public class CopybookEventsTest extends CopybookStorableProvider {
   private static final String COBOL_FILE_URI = "file:///C:/Users/test/Main.cbl";
 
   private static final String COPYBOOK_CONTENT = "000000 IDENTIFICATION DIVISION.";
-  private static final String DID_OPEN = "DID_OPEN";
+  private static final String COPYBOOK_ANALYSIS_ENABLED = "ENABLED";
 
-  /** Test that the RequiredCopybookEvent DTO is correclty populated */
+  /** Test the RequiredCopybookEvent DTO is correctly populated */
   @Test
-  public void requestCopybookEventTest() {
+  void requestCopybookEventTest() {
     assertEquals(REQCPY, getRequireCopybookHeader());
   }
 
-  /** Test that the FetchedCopybookEvent DTO is correclty populated */
+  /** Test the FetchedCopybookEvent DTO is correctly populated */
   @Test
-  public void fetchCopybookEventTest() {
+  void fetchCopybookEventTest() {
     assertEquals(FETCHEDCPY, getFetchCopybookHeader());
   }
 
-  /** Test that the UnknownEvent DTO is correclty populated */
+  /** Test the UnknownEvent DTO is correctly populated */
   @Test
-  public void unknownEventTest() {
+  void unknownEventTest() {
     assertEquals(UNKNOWN, getUnknownCopybookHeader());
   }
 
-  /** Test that the RunAnalysisEvent DTO is correctly populated. */
+  /** Test the RunAnalysisEvent DTO is correctly populated. */
   @Test
-  public void runAnalysisTest() {
+  void runAnalysisTest() {
     assertEquals(RUN_ANALYSIS_EVENT, getRunAnalysisHeader());
   }
 
-  /** This test verify that the header of an event object doesn't return a wrong type */
+  /** This test verifies that the header of an event object doesn't return a wrong type */
   @Test
-  public void negativeTestEvent() {
+  void negativeTestEvent() {
     assertNotEquals(FETCHEDCPY, getUnknownCopybookHeader());
     assertNotEquals(REQCPY, getUnknownCopybookHeader());
     assertNotEquals(RUN_ANALYSIS_EVENT, getUnknownCopybookHeader());
@@ -79,9 +79,9 @@ public class CopybookEventsTest extends CopybookStorableProvider {
     assertNotEquals(RUN_ANALYSIS_EVENT, getFetchCopybookHeader());
   }
 
-  /** This test verify that a null header is not returned back from the callee. */
+  /** This test verifies that a null header not returned from the callee. */
   @Test
-  public void notNullValuesFromHeaderReturned() {
+  void notNullValuesFromHeaderReturned() {
     // assert that header is not null value
     assertNotNull(getUnknownCopybookHeader());
     assertNotNull(getRequireCopybookHeader());
@@ -90,7 +90,8 @@ public class CopybookEventsTest extends CopybookStorableProvider {
   }
 
   private String getRequireCopybookHeader() {
-    return new RequiredCopybookEvent(COPYBOOK_NAME, COBOL_FILE_URI, DID_OPEN).getHeader();
+    return new RequiredCopybookEvent(COPYBOOK_NAME, COBOL_FILE_URI, COPYBOOK_ANALYSIS_ENABLED)
+        .getHeader();
   }
 
   private String getFetchCopybookHeader() {

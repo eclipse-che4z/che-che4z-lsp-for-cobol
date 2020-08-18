@@ -31,4 +31,5 @@ public final class Position implements Serializable {
   private final int stopPosition;
   private final int line;
   private final int charPositionInLine;
+  private final String token;
 }

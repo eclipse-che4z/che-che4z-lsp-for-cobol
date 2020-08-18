@@ -18,18 +18,19 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This class contains all the unit tests related to the pubblish/subscribe pattern handled by the
  * databus.
  */
 @Slf4j
-public class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
+class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
   @Override
   public void observerCallback(DataEvent adaptedDataEvent) {
     waiter.assertTrue(getTargetEventType() == adaptedDataEvent.getEventType());
@@ -44,7 +45,7 @@ public class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
    */
   @Test
   @SneakyThrows
-  public void databusSubscriptionPositiveTest() {
+  void databusSubscriptionPositiveTest() {
     /*
      This positive test verify that a class subscribed to a specific DataEventType got a notification about that event.
      The main flow is explained below:
@@ -75,9 +76,9 @@ public class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
    * This test verify that the observerCallback will not be engaged caused by a different event
    * published on the databus.
    */
-  @Test(expected = TimeoutException.class)
+  @Test
   @SneakyThrows
-  public void databusSubscriptionNegativeTest() {
+  public void databusSubscriptionNegativeTest() throws TimeoutException {
     /*
      This negative test verify that a class subscribed to a specific DataEventType got a notification about a different event.
      In this scenario will check that a Timeout exception from the Waiter is thrown.
@@ -87,25 +88,33 @@ public class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
        3. The observerCallback() is never triggered because it was registered for theEvent but on the bus there is anotherDifferentEvent
        4. The waiter will throws a Timeout exception because it wasn't resumed by the observer.
     */
-    databusSubscriptionForNegativeScenario(
-        DataEventType.REQUIRED_COPYBOOK_EVENT, DataEventType.UNKNOWN_EVENT);
-    databusSubscriptionForNegativeScenario(
-        DataEventType.RUN_ANALYSIS_EVENT, DataEventType.UNKNOWN_EVENT);
-    databusSubscriptionForNegativeScenario(
-        DataEventType.FETCHED_COPYBOOK_EVENT, DataEventType.UNKNOWN_EVENT);
-    databusSubscriptionForNegativeScenario(
-        DataEventType.UNKNOWN_EVENT, DataEventType.FETCHED_COPYBOOK_EVENT);
-    databusSubscriptionForNegativeScenario(
-        DataEventType.FETCHED_SETTINGS_EVENT, DataEventType.UNKNOWN_EVENT);
+    Assertions.assertThrows(
+        TimeoutException.class,
+        () -> {
+          databusSubscriptionForNegativeScenario(
+              DataEventType.REQUIRED_COPYBOOK_EVENT, DataEventType.UNKNOWN_EVENT);
+          databusSubscriptionForNegativeScenario(
+              DataEventType.RUN_ANALYSIS_EVENT, DataEventType.UNKNOWN_EVENT);
+          databusSubscriptionForNegativeScenario(
+              DataEventType.FETCHED_COPYBOOK_EVENT, DataEventType.UNKNOWN_EVENT);
+          databusSubscriptionForNegativeScenario(
+              DataEventType.UNKNOWN_EVENT, DataEventType.FETCHED_COPYBOOK_EVENT);
+          databusSubscriptionForNegativeScenario(
+              DataEventType.FETCHED_SETTINGS_EVENT, DataEventType.UNKNOWN_EVENT);
+        });
   }
 
-  @Test(expected = TimeoutException.class)
+  @Test
   @SneakyThrows
-  public void databusUnsubscriptionPositiveTest() {
-    databusUnsubscribeForPositiveScenario(DataEventType.REQUIRED_COPYBOOK_EVENT);
-    databusUnsubscribeForPositiveScenario(DataEventType.FETCHED_COPYBOOK_EVENT);
-    databusUnsubscribeForPositiveScenario(DataEventType.RUN_ANALYSIS_EVENT);
-    databusUnsubscribeForPositiveScenario(DataEventType.UNKNOWN_EVENT);
-    databusUnsubscribeForPositiveScenario(DataEventType.FETCHED_SETTINGS_EVENT);
+  public void databusUnsubscriptionPositiveTest() throws TimeoutException {
+    Assertions.assertThrows(
+        TimeoutException.class,
+        () -> {
+          databusUnsubscribeForPositiveScenario(DataEventType.REQUIRED_COPYBOOK_EVENT);
+          databusUnsubscribeForPositiveScenario(DataEventType.FETCHED_COPYBOOK_EVENT);
+          databusUnsubscribeForPositiveScenario(DataEventType.RUN_ANALYSIS_EVENT);
+          databusUnsubscribeForPositiveScenario(DataEventType.UNKNOWN_EVENT);
+          databusUnsubscribeForPositiveScenario(DataEventType.FETCHED_SETTINGS_EVENT);
+        });
   }
 }

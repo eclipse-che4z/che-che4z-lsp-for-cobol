@@ -23,15 +23,16 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /** This cache verifies the main logic of cache data management. */
 @Slf4j
-public class DataBusGetFromCacheHappyTest extends DatabusConfigProvider {
+class DataBusGetFromCacheHappyTest extends DatabusConfigProvider {
   // cache dummy static content
   private static final String CPY_FIXED_NAME = "COPY-";
   private static final String CPY_FIXED_CONTENT = "FASDFASDFSF";
@@ -39,8 +40,8 @@ public class DataBusGetFromCacheHappyTest extends DatabusConfigProvider {
 
   private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> databus;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
     fulfillDatabusCacheContent(databus.getCacheMaxSize());
   }
@@ -52,10 +53,10 @@ public class DataBusGetFromCacheHappyTest extends DatabusConfigProvider {
 
   @Test
   @SneakyThrows
-  public void getData() {
+  void getData() {
     String newCopybookName = "COPY-" + (databus.getCacheMaxSize() - 1);
 
-    Assert.assertTrue(databus.isStored(CopybookRepository.calculateUUID(newCopybookName)));
+    assertTrue(databus.isStored(CopybookRepository.calculateUUID(newCopybookName)));
     LOG.debug(String.format("Cache content : %s", databus.printCache()));
     Optional<CopybookStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
     LOG.debug(
@@ -68,7 +69,7 @@ public class DataBusGetFromCacheHappyTest extends DatabusConfigProvider {
             "Cache STATUS --> MaxCacheSize: %d  ActualCacheSize: %d",
             databus.getCacheMaxSize(), databus.cacheSize()));
     LOG.debug(String.format("Retrieving item %s ", newCopybookName));
-    Assert.assertTrue(
+    assertTrue(
         databus
             .getData(CopybookRepository.calculateUUID(newCopybookName))
             .getName()

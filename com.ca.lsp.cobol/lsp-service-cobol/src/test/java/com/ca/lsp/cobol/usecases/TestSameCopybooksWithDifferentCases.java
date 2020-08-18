@@ -19,38 +19,37 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.positive.CobolText;
-import org.junit.Test;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.junit.jupiter.api.Test;
 
-import static java.util.Collections.singletonList;
+import java.util.List;
+import java.util.Map;
 
 /**
- * This test checks that there is no error thrown when there are several COPY statements onw by one
- * with one name in different cases.
+ * This test checks that there is no error thrown when there are several COPY statements one by one
+ * with the same name in different cases.
  */
-public class TestSameCopybooksWithDifferentCases extends PositiveUseCase {
+class TestSameCopybooksWithDifferentCases {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01  PARENT.   COPY STRUCT1.\n"
-          + "       COPY Struct1.\n"
+          + "       01  {$*PARENT}.   COPY {~STRUCT1}.\n"
+          + "       COPY {~Struct1}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "       MOVE 00 TO CHILD1 OF PARENT.";
+          + "           MOVE 00 TO {$CHILD1} OF {$PARENT}.";
 
   private static final String STRUCT1 =
-      "       02  PARENT2.\n"
-          + "           03  CHILD1         PIC 9   VALUE IS '0'.\n"
-          + "           03  CHILD2         PIC 9   VALUE IS '1'.\n"
-          + "           03  CHILD3         PIC 9   VALUE IS '2'.";
+      "       02  {$*PARENT2}.\n"
+          + "           03  {$*CHILD1}         PIC 9   VALUE IS '0'.\n"
+          + "           03  {$*CHILD2}         PIC 9   VALUE IS '1'.\n"
+          + "           03  {$*CHILD3}         PIC 9   VALUE IS '2'.";
 
-  public TestSameCopybooksWithDifferentCases() {
-    super(TEXT);
-  }
+  private static final String CPY_NAME = "STRUCT1";
 
-  @Override
   @Test
-  public void test() {
-    super.test(singletonList(new CobolText("STRUCT1", STRUCT1)));
+  void test() {
+    UseCaseEngine.runTest(TEXT, List.of(new CobolText(CPY_NAME, STRUCT1)), Map.of());
   }
 }

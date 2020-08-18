@@ -21,8 +21,9 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeoutException;
 
@@ -31,11 +32,11 @@ import java.util.concurrent.TimeoutException;
  * notifications anymore.
  */
 @Slf4j
-public class DataBusUnSubscribeTest extends DatabusConfigProvider {
+class DataBusUnSubscribeTest extends DatabusConfigProvider {
   private DefaultDataBusBroker databus;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
   }
 
@@ -47,17 +48,23 @@ public class DataBusUnSubscribeTest extends DatabusConfigProvider {
     waiter.resume();
   }
 
-  @Test(expected = TimeoutException.class)
+  @Test
   @SneakyThrows
-  public void subscribe() {
-    // Subscribe
-    Object subscriber = databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
-    databus.postData(RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
-    waiter.await(5000);
-    // Unsubscribe
-    databus.unSubscribe(subscriber);
-    databus.postData(RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
-    // wait undefined because no subscriber anymore
-    waiter.await(5000);
+  void subscribe() throws TimeoutException {
+    Assertions.assertThrows(
+        TimeoutException.class,
+        () -> {
+          // Subscribe
+          Object subscriber = databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
+          databus.postData(
+              RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
+          waiter.await(5000);
+          // Unsubscribe
+          databus.unSubscribe(subscriber);
+          databus.postData(
+              RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
+          // wait undefined because no subscriber anymore
+          waiter.await(5000);
+        });
   }
 }

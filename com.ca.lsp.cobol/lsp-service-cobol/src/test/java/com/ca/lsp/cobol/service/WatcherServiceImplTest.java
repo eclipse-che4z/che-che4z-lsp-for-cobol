@@ -18,13 +18,12 @@ package com.ca.lsp.cobol.service;
 import com.ca.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -33,10 +32,10 @@ import static org.mockito.Mockito.verify;
  * This class is a unit test for the {@link WatcherServiceImpl} and asserts that it creates correct
  * JSON object structures on each watching request.
  */
-public class WatcherServiceImplTest {
+class WatcherServiceImplTest {
 
   @Test
-  public void watchConfigurationChange() {
+  void watchConfigurationChange() {
     LanguageClient client = mock(LanguageClient.class);
     ClientProvider provider = new ClientProvider();
     provider.set(client);
@@ -57,7 +56,7 @@ public class WatcherServiceImplTest {
   }
 
   @Test
-  public void watchPredefinedFolder() {
+  void watchPredefinedFolder() {
     LanguageClient client = mock(LanguageClient.class);
     ClientProvider provider = new ClientProvider();
     provider.set(client);
@@ -71,15 +70,15 @@ public class WatcherServiceImplTest {
   }
 
   @Test
-  public void addWatchers() {
+  void addWatchers() {
     LanguageClient client = mock(LanguageClient.class);
     ClientProvider provider = new ClientProvider();
     provider.set(client);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider);
 
-    watcherService.addWatchers(asList("foo/bar", "baz", "bar\\foo"));
-    assertEquals(asList("foo/bar", "baz", "bar\\foo"), watcherService.getWatchingFolders());
+    watcherService.addWatchers(List.of("foo/bar", "baz", "bar\\foo"));
+    assertEquals(List.of("foo/bar", "baz", "bar\\foo"), watcherService.getWatchingFolders());
 
     verify(client).registerCapability(captor.capture());
     RegistrationParams params = captor.getValue();
@@ -92,17 +91,17 @@ public class WatcherServiceImplTest {
   }
 
   @Test
-  public void removeWatchers() {
+  void removeWatchers() {
     LanguageClient client = mock(LanguageClient.class);
     ClientProvider provider = new ClientProvider();
     provider.set(client);
     ArgumentCaptor<UnregistrationParams> captor = forClass(UnregistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider);
 
-    watcherService.addWatchers(asList("foo/bar", "baz", "bar\\foo"));
-    watcherService.removeWatchers(asList("non-existing", "foo/bar"));
+    watcherService.addWatchers(List.of("foo/bar", "baz", "bar\\foo"));
+    watcherService.removeWatchers(List.of("non-existing", "foo/bar"));
 
-    assertEquals(asList("baz", "bar\\foo"), watcherService.getWatchingFolders());
+    assertEquals(List.of("baz", "bar\\foo"), watcherService.getWatchingFolders());
 
     verify(client).unregisterCapability(captor.capture());
     UnregistrationParams params = captor.getValue();

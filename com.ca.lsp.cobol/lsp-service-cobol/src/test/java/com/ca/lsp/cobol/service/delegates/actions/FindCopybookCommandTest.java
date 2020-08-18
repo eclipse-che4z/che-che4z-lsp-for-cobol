@@ -15,11 +15,11 @@
 
 package com.ca.lsp.cobol.service.delegates.actions;
 
+import com.google.common.collect.Lists;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
@@ -27,14 +27,14 @@ import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
 import static java.util.Collections.singletonList;
 import static org.eclipse.lsp4j.CodeActionKind.QuickFix;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Test {@link FindCopybookCommand} code action provider that resolves diagnostics for missing
  * copybooks.
  */
-public class FindCopybookCommandTest {
+class FindCopybookCommandTest {
 
   private static final String TITLE = "Resolve copybook";
   private static final String COPYBOOK_NAME = "CPYNAME";
@@ -48,7 +48,7 @@ public class FindCopybookCommandTest {
 
   /** Test a code action to resolve the required copybook created for the missing copybook error. */
   @Test
-  public void testCollectCommandsOrActionsPositive() {
+  void testCollectCommandsOrActionsPositive() {
     CodeActionProvider provider = new FindCopybookCommand();
 
     List<Diagnostic> diagnostics = singletonList(COPYBOOK_ERROR);
@@ -66,7 +66,7 @@ public class FindCopybookCommandTest {
 
   /** Test nothing created for a syntax error. */
   @Test
-  public void testCollectCommandsOrActionsNegative() {
+  void testCollectCommandsOrActionsNegative() {
 
     CodeActionProvider provider = new FindCopybookCommand();
 
@@ -82,10 +82,10 @@ public class FindCopybookCommandTest {
 
   /** Test only correct errors processed. */
   @Test
-  public void testCollectCommandsOrActionsMixed() {
+  void testCollectCommandsOrActionsMixed() {
     CodeActionProvider provider = new FindCopybookCommand();
 
-    List<Diagnostic> diagnostics = Arrays.asList(SYNTAX_ERROR, COPYBOOK_ERROR);
+    List<Diagnostic> diagnostics = Lists.newArrayList(SYNTAX_ERROR, COPYBOOK_ERROR);
     CodeActionParams params =
         new CodeActionParams(
             new TextDocumentIdentifier(DOCUMENT_URI), RANGE, new CodeActionContext(diagnostics));

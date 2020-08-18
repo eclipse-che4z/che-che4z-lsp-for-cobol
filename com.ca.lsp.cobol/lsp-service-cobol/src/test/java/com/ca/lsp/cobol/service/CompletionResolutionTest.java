@@ -20,15 +20,15 @@ import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This test checks the logic of completion items resolution implemented by {@link
@@ -38,34 +38,34 @@ import static org.junit.Assert.*;
  * does server manages different resolving requests, for example for the element that has
  * documentation provided, the one that has no documentation and an invalid request.
  */
-public class CompletionResolutionTest extends ConfigurableTest {
+class CompletionResolutionTest extends ConfigurableTest {
   private TextDocumentService service;
 
-  @Before
-  public void createService() {
+  @BeforeEach
+  void createService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
   }
 
   @Test
-  public void testResolveCompletionItemExisting() {
+  void testResolveCompletionItemExisting() {
     CompletionItem unresolved = new CompletionItem("ADD");
 
     checkResolving(
         unresolved,
         c -> {
           assertNotNull(c.getValue());
-          assertFalse(c.getValue().isEmpty());
+          assertFalse(c.getValue().isBlank());
         });
   }
 
   @Test
-  public void testResolveCompletionItemNonExisting() {
+  void testResolveCompletionItemNonExisting() {
     CompletionItem unresolved = new CompletionItem("abcd");
     checkResolving(unresolved, c -> assertNull(c.getValue()));
   }
 
   @Test
-  public void testResolveCompletionItemEmpty() {
+  void testResolveCompletionItemEmpty() {
     CompletionItem unresolved = new CompletionItem();
     checkResolving(unresolved, c -> assertNull(c.getValue()));
   }

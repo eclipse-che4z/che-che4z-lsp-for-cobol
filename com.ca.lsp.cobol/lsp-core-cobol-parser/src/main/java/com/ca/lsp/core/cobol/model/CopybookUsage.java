@@ -17,12 +17,9 @@ import com.broadcom.lsp.domain.common.model.Position;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.Collection;
-
 @Data
 @AllArgsConstructor
 public class CopybookUsage {
   private String name;
-  private String uri;
-  private Collection<Position> usages;
+  private Position position;
 }

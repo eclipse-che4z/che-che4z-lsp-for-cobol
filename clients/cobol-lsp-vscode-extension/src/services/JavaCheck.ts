@@ -13,7 +13,7 @@
  */
 import * as cp from "child_process";
 
-const versionPattern = new RegExp('(java|openjdk) (version)? ?"?((9|[0-9][0-9])|(1|9|[0-9][0-9])\.(1|8|[0-9][0-9]).*).*');
+const versionPattern = new RegExp('(java|openjdk) (version)? ?"?((11|[1][2-9])|(11|[1][2-9])\.([0-9]|[0-9][0-9]).*).*');
 
 export class JavaCheck {
     public static isJavaVersionSupported(versionString: string) {
@@ -31,7 +31,7 @@ export class JavaCheck {
             });
             ls.on("error", (code: any) => {
                 if ("Error: spawn java ENOENT" === code.toString()) {
-                    reject("Java 8 is not found");
+                    reject("Java 11 is not found");
                 }
                 reject(code);
             });
@@ -39,8 +39,8 @@ export class JavaCheck {
                 if (code !== 0) {
                     reject("An error occurred when checking if Java was installed");
                 }
-                if(!resolved) {
-                    reject("Minimum expected Java version is 8");
+                if (!resolved) {
+                    reject("Minimum expected Java version is 11");
                 }
             });
         });

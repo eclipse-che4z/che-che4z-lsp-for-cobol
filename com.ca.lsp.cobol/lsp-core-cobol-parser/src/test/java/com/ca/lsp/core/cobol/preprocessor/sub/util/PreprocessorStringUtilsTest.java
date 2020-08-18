@@ -13,12 +13,13 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
-import org.junit.Test;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorStringUtils;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This test checks {@link PreprocessorStringUtils} utility functions. */
-public class PreprocessorStringUtilsTest {
+class PreprocessorStringUtilsTest {
 
   private static final String TEST_SINGLE_QUOTE_STRING =
       "\'TESTING IF ALL QUOTES WILL BE REMOVED\'";
@@ -28,9 +29,19 @@ public class PreprocessorStringUtilsTest {
 
   /** Test trimming leading quotes by {@link PreprocessorStringUtils#trimQuotes(String)} */
   @Test
-  public void trimQuotesTest() {
+  void trimQuotesTest() {
     assertEquals(EXPECTED_STRING, PreprocessorStringUtils.trimQuotes(TEST_SINGLE_QUOTE_STRING));
     assertEquals(EXPECTED_STRING, PreprocessorStringUtils.trimQuotes(TEST_DOUBLE_QUOTE_STRING));
     assertEquals(EXPECTED_STRING, PreprocessorStringUtils.trimQuotes(EXPECTED_STRING));
+  }
+
+  @Test
+  void noTrimQuotesInsideTest() {
+    assertEquals(
+        "TESTING 'NO' QUOTES WILL BE REMOVED",
+        PreprocessorStringUtils.trimQuotes("TESTING 'NO' QUOTES WILL BE REMOVED"));
+    assertEquals(
+        "TESTING \"NO\" QUOTES WILL BE REMOVED",
+        PreprocessorStringUtils.trimQuotes("TESTING \"NO\" QUOTES WILL BE REMOVED"));
   }
 }

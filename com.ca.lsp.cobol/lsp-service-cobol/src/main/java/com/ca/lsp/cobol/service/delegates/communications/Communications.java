@@ -19,13 +19,14 @@ package com.ca.lsp.cobol.service.delegates.communications;
 import org.eclipse.lsp4j.Diagnostic;
 
 import java.util.List;
+import java.util.Map;
 
 public interface Communications {
   void notifyThatLoadingInProgress(String uri);
 
   void notifyThatEngineNotFound(String languageType);
 
-  void publishDiagnostics(String uri, List<Diagnostic> diagnostics);
+  void publishDiagnostics(Map<String, List<Diagnostic>> diagnostics);
 
   void cancelProgressNotification(String uri);
 

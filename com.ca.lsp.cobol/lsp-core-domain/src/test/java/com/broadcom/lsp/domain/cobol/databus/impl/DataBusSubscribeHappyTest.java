@@ -22,21 +22,21 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /** This test verifies that the observer is triggered by the event it is subscribed to. */
 @Slf4j
-public class DataBusSubscribeHappyTest extends DatabusConfigProvider {
+class DataBusSubscribeHappyTest extends DatabusConfigProvider {
 
   private DefaultDataBusBroker<RequiredCopybookEvent, RequiredCopybookEventSubscriber> databus;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
   }
 
@@ -50,7 +50,7 @@ public class DataBusSubscribeHappyTest extends DatabusConfigProvider {
 
   @Test
   @SneakyThrows
-  public void subscribe() {
+  void subscribe() {
     databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
     databus.postData(RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
     try {

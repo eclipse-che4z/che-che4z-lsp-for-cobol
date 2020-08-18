@@ -32,7 +32,7 @@ public class CopybookStorableProvider implements EventObserver<DataEvent> {
   private static CopybookStorable STORABLE_INSTANCE =
       new CopybookStorable(COPYBOOK_NAME, COPYBOOK_URI, COPYBOOK_CONTENT);
 
-  public CopybookStorable getDummyStorable() {
+  protected CopybookStorable getDummyStorable() {
     return STORABLE_INSTANCE;
   }
 

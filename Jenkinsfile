@@ -6,7 +6,7 @@ kind: Pod
 spec:
   containers:
   - name: maven
-    image: maven:alpine
+    image: maven:3-openjdk-11
     command:
     - cat
     tty: true
@@ -164,7 +164,7 @@ pipeline {
                             dir('clients/cobol-lsp-vscode-extension') {
                                 sh 'npx vsce package'
                                 archiveArtifacts "*.vsix"
-                                sh 'mv cobol-language-support*.vsix cobol-language-support_0.12.0.vsix'
+                                sh 'mv cobol-language-support*.vsix cobol-language-support_0.13.0.vsix'
                             }
                         }
                     }

@@ -23,8 +23,8 @@ import com.ca.lsp.cobol.service.mocks.TestLanguageServer;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -34,20 +34,20 @@ import static com.broadcom.lsp.cdi.LangServerCtx.shutdown;
 import static com.google.inject.Key.get;
 import static com.google.inject.name.Names.named;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /** This test check the logic of the application bootstrap */
-public class LangServerBootstrapTest {
+class LangServerBootstrapTest {
 
   private static final String PIPES = "pipeEnabled";
 
-  @After
-  public void shutdownContext() {
+  @AfterEach
+  void shutdownContext() {
     shutdown();
   }
 
   @Test
-  public void initCtx() {
+  void initCtx() {
     LangServerBootstrap.initCtx();
 
     // Bound class in Service module
@@ -60,25 +60,25 @@ public class LangServerBootstrapTest {
   }
 
   @Test
-  public void isPipeEnabledPositive() {
+  void isPipeEnabledPositive() {
     String[] args = new String[] {PIPES};
     assertTrue(LangServerBootstrap.isPipeEnabled(args));
   }
 
   @Test
-  public void isPipeEnabledUseSocket() {
+  void isPipeEnabledUseSocket() {
     String[] args = new String[] {};
     assertFalse(LangServerBootstrap.isPipeEnabled(args));
   }
 
   @Test
-  public void isPipeEnabledInvalidArgument() {
+  void isPipeEnabledInvalidArgument() {
     String[] args = new String[] {"invalidArgument"};
     assertFalse(LangServerBootstrap.isPipeEnabled(args));
   }
 
   @Test
-  public void createServerLauncherWithSocket() throws IOException {
+  void createServerLauncherWithSocket() throws IOException {
     LanguageServer server = new TestLanguageServer();
 
     newSingleThreadExecutor()
@@ -97,7 +97,7 @@ public class LangServerBootstrapTest {
   }
 
   @Test
-  public void createServerLauncher() {
+  void createServerLauncher() {
     LanguageServer server = new TestLanguageServer();
 
     Launcher<LanguageClient> launcher =
@@ -107,7 +107,7 @@ public class LangServerBootstrapTest {
   }
 
   @Test
-  public void startServer() throws IOException {
+  void startServer() throws IOException {
     Launcher<LanguageClient> launcher =
         LangServerBootstrap.launchServer(new String[] {PIPES}, new TestLanguageServer());
     assertNotNull(launcher.getRemoteProxy());

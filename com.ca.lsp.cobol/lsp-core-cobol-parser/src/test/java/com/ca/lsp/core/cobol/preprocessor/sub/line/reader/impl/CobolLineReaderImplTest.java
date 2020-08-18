@@ -17,86 +17,88 @@ import com.ca.lsp.core.cobol.AbstractCobolLinePreprocessorTest;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
-import org.junit.Test;
+import com.google.common.collect.Lists;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.hasToString;
 
 /**
  * This test checks the line preprocessing logic. Notice, that if there are less than 6 symbols in a
  * line, one space will be added during the preprocessing as a default indicator. All the symbols
- * after 80 should be removed and the new syntax error should be registered.
+ * after 80 should be removed, and the new syntax error should be registered.
  */
-public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
+class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
 
   @Test
-  public void testAllIndicators() {
+  void testAllIndicators() {
     List<String> lines = createTextToTest();
     String text = reduceLines(lines);
 
     ResultWithErrors<List<CobolLine>> processed = processText(text);
 
-    assertEquals(lines.size(), processed.getResult().size());
+    assertThat(processed.getResult(), hasSize(lines.size()));
     for (int i = 0; i < lines.size(); i++) {
-      assertEquals(lines.get(i), processed.getResult().get(i).toString());
+      assertThat(processed.getResult().get(i), hasToString(lines.get(i)));
     }
 
-    assertEquals(1, processed.getErrors().size());
+    assertThat(processed.getErrors(), hasSize(1));
 
     SyntaxError syntaxError = processed.getErrors().get(0);
-    assertEquals(6, syntaxError.getPosition().getStartPosition());
-    assertEquals(11, syntaxError.getPosition().getLine());
+    assertThat(syntaxError.getPosition().getStartPosition(), is(6));
+    assertThat(syntaxError.getPosition().getLine(), is(11));
   }
 
   /** Empty string should not be processed. */
   @Test
-  public void testEmptyLine() {
+  void testEmptyLine() {
     ResultWithErrors<List<CobolLine>> processed = processText("");
-    assertEquals(0, processed.getResult().size());
-    assertEquals(0, processed.getErrors().size());
+    assertThat(processed.getResult(), hasSize(0));
+    assertThat(processed.getErrors(), hasSize(0));
   }
 
   @Test
-  public void testTooShortString() {
+  void testTooShortString() {
     ResultWithErrors<List<CobolLine>> processed = processText("abc");
-    assertEquals("abc ", processed.getResult().get(0).toString());
-    assertEquals(0, processed.getErrors().size());
+    assertThat(processed.getResult().get(0), hasToString("abc "));
+    assertThat(processed.getErrors(), hasSize(0));
   }
 
   @Test
-  public void testOneSpace() {
+  void testOneSpace() {
     ResultWithErrors<List<CobolLine>> processed = processText(" ");
-    assertEquals("  ", processed.getResult().get(0).toString());
-    assertEquals(0, processed.getErrors().size());
+    assertThat(processed.getResult().get(0), hasToString("  "));
+    assertThat(processed.getErrors(), hasSize(0));
   }
 
   @Test
-  public void testNoSpacesAddedIfIndicatorFieldFilled() {
+  void testNoSpacesAddedIfIndicatorFieldFilled() {
     String eightSpaces = "        ";
     ResultWithErrors<List<CobolLine>> processed = processText(eightSpaces);
-    assertEquals(eightSpaces, processed.getResult().get(0).toString());
+    assertThat(processed.getResult().get(0), hasToString(eightSpaces));
 
-    assertEquals(0, processed.getErrors().size());
+    assertThat(processed.getErrors(), hasSize(0));
   }
 
   @Test
-  public void testSkipEmptyLineAtEnd() {
+  void testSkipEmptyLineAtEnd() {
     String firstLine =
         "000000 IDENTIFICATION DIVISION.                                         23323232";
-    List<String> lines = new ArrayList<>();
-    lines.add(firstLine);
-    lines.add("");
+    List<String> lines = Lists.newArrayList(firstLine, "");
 
     ResultWithErrors<List<CobolLine>> processed = processText(reduceLines(lines));
 
-    assertEquals(1, processed.getResult().size());
-    assertEquals(firstLine, processed.getResult().get(0).toString());
+    assertThat(processed.getResult(), hasSize(1));
+    assertThat(processed.getResult().get(0), hasToString(firstLine));
   }
 
   @Test
-  public void testEmptyLineAtMiddle() {
+  void testEmptyLineAtMiddle() {
     List<String> lines = new ArrayList<>();
     lines.add("000000 IDENTIFICATION DIVISION.                                         23323232");
     lines.add("");
@@ -104,24 +106,24 @@ public class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
 
     ResultWithErrors<List<CobolLine>> processed = processText(reduceLines(lines));
 
-    assertEquals(3, processed.getResult().size());
-    assertEquals(" ", processed.getResult().get(1).toString());
+    assertThat(processed.getResult().size(), is(3));
+    assertThat(processed.getResult().get(1), hasToString(" "));
 
-    assertEquals(0, processed.getErrors().size());
+    assertThat(processed.getErrors(), hasSize(0));
   }
 
   @Test
-  public void testTooLongStringIsCut() {
+  void testTooLongStringIsCut() {
     String tooLongString =
         "000000 IDENTIFICATION DIVISION.                                         23323232extra";
     String cutString =
         "000000 IDENTIFICATION DIVISION.                                         23323232";
     ResultWithErrors<List<CobolLine>> processed = processText(tooLongString);
-    assertEquals(cutString, processed.getResult().get(0).toString());
+    assertThat(processed.getResult().get(0), hasToString(cutString));
 
-    assertEquals(1, processed.getErrors().size());
+    assertThat(processed.getErrors(), hasSize(1));
     SyntaxError syntaxError = processed.getErrors().get(0);
-    assertEquals(80, syntaxError.getPosition().getStartPosition());
+    assertThat(syntaxError.getPosition().getStartPosition(), is(80));
   }
 
   // END @Test methods

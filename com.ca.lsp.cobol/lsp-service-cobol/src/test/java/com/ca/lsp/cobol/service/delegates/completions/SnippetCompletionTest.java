@@ -16,58 +16,58 @@ package com.ca.lsp.cobol.service.delegates.completions;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.InsertTextFormat;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class SnippetCompletionTest {
+class SnippetCompletionTest {
   private static final String INSERT_TEXT = "WRITE ${1:item}";
   private static final String DOCUMENTATION_TEXT = "WRITE item";
   private static final String LABEL = "WRITE";
   private SnippetCompletion provider;
 
-  @Before
-  public void prepareProvider() {
+  @BeforeEach
+  void prepareProvider() {
     provider = new SnippetCompletion(new Snippets());
   }
 
   @Test
-  public void testGetCompletionSource() {
+  void testGetCompletionSource() {
     Collection<String> strings = provider.getCompletionSource(null);
     assertFalse(strings.isEmpty());
     assertTrue(strings.contains(LABEL));
   }
 
   @Test
-  public void testTryResolvePositive() {
+  void testTryResolvePositive() {
     assertEquals(DOCUMENTATION_TEXT, provider.tryResolve(LABEL));
   }
 
   @Test
-  public void testTryResolveNegative() {
+  void testTryResolveNegative() {
     assertNull(provider.tryResolve("non-existing string"));
   }
 
   @Test
-  public void testTryResolveNull() {
+  void testTryResolveNull() {
     assertNull(provider.tryResolve(null));
   }
 
   @Test
-  public void testGetSortOrderPrefix() {
+  void testGetSortOrderPrefix() {
     assertEquals("3", provider.getSortOrderPrefix());
   }
 
   @Test
-  public void testGetKind() {
+  void testGetKind() {
     assertEquals(CompletionItemKind.Snippet, provider.getKind());
   }
 
   @Test
-  public void testCustomize() {
+  void testCustomize() {
     CompletionItem item = new CompletionItem(LABEL);
     CompletionItem actual = provider.customize(item);
     assertEquals(LABEL, actual.getLabel());

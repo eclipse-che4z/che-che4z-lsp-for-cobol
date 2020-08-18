@@ -1,6 +1,29 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.13.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.12.0...0.13.0)
+
+#### Added
+
+- Syntax coloring
+- Support for the A and B margin areas
+- Support for REPLACING in COPY statements
+- Syntax analysis for copybooks
+
+#### Changed
+
+- Disabled copybook analysis for files in the extended source folder
+- Entire incorrect variable structure underlined
+- 'Go to Definition' for copybook names now opens the file
+- Migration from Java 8 to Java 11
+- Readme update
+
+#### Fixed
+
+- Closed documents no longer still show errors
+- Keywords allowed as copybook names
+- Technical tokens removed from completion suggestion for keywords
+
 ## [0.12.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.11.1...0.12.0) (2020-07-07)
 
 #### Added

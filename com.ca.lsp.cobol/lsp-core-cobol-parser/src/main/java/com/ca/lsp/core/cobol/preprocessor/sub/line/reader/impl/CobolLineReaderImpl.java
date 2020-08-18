@@ -20,6 +20,7 @@ import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReaderDelegate;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,6 +30,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.ca.lsp.core.cobol.model.ErrorSeverity.ERROR;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static java.util.regex.Pattern.compile;
 
@@ -39,6 +41,7 @@ import static java.util.regex.Pattern.compile;
  *
  * <p>Also, this class uses a compiler directives delegate to apply appropriate transformations.
  */
+@Slf4j
 public class CobolLineReaderImpl implements CobolLineReader {
   private static final int INDICATOR_AREA_INDEX = 6;
   private static final Pattern FIXED_FORMAT_PATTERN =
@@ -168,12 +171,21 @@ public class CobolLineReaderImpl implements CobolLineReader {
   @Nonnull
   private SyntaxError registerFormatError(
       @Nullable String uri, int lineNumber, int charPosition, int errorLength) {
-    return SyntaxError.syntaxError()
-        .suggestion("The line doesn't match the fixed format")
-        .severity(1)
-        .position(
-            new Position(
-                uri, charPosition, (charPosition + errorLength), lineNumber + 1, charPosition))
-        .build();
+    SyntaxError error =
+        SyntaxError.syntaxError()
+            .suggestion("The line doesn't match the fixed format")
+            .severity(ERROR)
+            .position(
+                new Position(
+                    uri,
+                    charPosition,
+                    (charPosition + errorLength) - 1,
+                    lineNumber + 1,
+                    charPosition,
+                    null))
+            .build();
+
+    LOG.debug("Syntax error by CobolLineReaderImpl#registerFormatError: " + error.toString());
+    return error;
   }
 }

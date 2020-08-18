@@ -13,34 +13,32 @@
  */
 package com.ca.lsp.cobol.usecases;
 
-import org.eclipse.lsp4j.Range;
-import org.junit.Test;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /** This use case checks if extra symbols on one line do not cause any errors on the next line. */
-public class TestExtraSymbolsNotCauseErrorOnNextLine extends NegativeUseCase {
-  public TestExtraSymbolsNotCauseErrorOnNextLine() {
-    super(TEXT);
-  }
+class TestExtraSymbolsNotCauseErrorOnNextLine {
 
   private static final String TEXT =
-      "000000 Identification DIVISION.                                         23323232extra\r\n" // Extra symbols at the end of this line
+      "000000 Identification DIVISION.                                         23323232{extra|1}\r\n" // Extra symbols at the end of this line
           + "002800 Program-ID.                                                      23323232\r\n" // Should not show an error on this line
           + "002800  HELLOWORLD.                                                     23323232\r\n"
           + "024200 PROCEDURE DIVISION .                                             CM1014.2";
 
-  @Test
-  public void test() {
-    super.test();
-  }
+  private static final String MESSAGE = "The line doesn't match the fixed format";
 
-  @Override
-  protected void assertRanges(List<Range> ranges) {
-    Range range = ranges.get(0);
-    assertEquals(80, range.getStart().getCharacter());
-    assertEquals(86, range.getEnd().getCharacter());
+  @Test
+  void test() {
+    UseCaseEngine.runTest(
+        TEXT,
+        List.of(),
+        Map.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

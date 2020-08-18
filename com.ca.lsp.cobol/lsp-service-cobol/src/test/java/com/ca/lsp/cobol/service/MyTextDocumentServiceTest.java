@@ -28,9 +28,9 @@ import com.ca.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.internal.stubbing.answers.AnswersWithDelay;
 
 import java.util.*;
@@ -38,19 +38,19 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.*;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /** This test checks the entry points of the {@link TextDocumentService} implementation. */
 @SuppressWarnings("unchecked")
-public class MyTextDocumentServiceTest extends ConfigurableTest {
+class MyTextDocumentServiceTest extends ConfigurableTest {
 
   private static final String LANGUAGE = "COBOL";
+  private static final String EXT_SRC_DOC_URI = "file://workspace/.c4z/.extsrcs/EXTSRC.cbl";
   private static final String CPY_DOCUMENT_URI = "file:///.copybooks/CPYTEST.cpy";
   private static final String PARENT_CPY_URI = "file:///.copybooks/PARENT.cpy";
   private static final String NESTED_CPY_URI = "file:///.copybooks/NESTED.cpy";
@@ -63,15 +63,15 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   private TextDocumentService service;
   private TestLanguageClient client;
 
-  @Before
-  public void createService() {
+  @BeforeEach
+  void createService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
   }
 
   @Test
-  public void testCompletion() {
+  void testCompletion() {
     openAndAwait();
     CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion =
         service.completion(
@@ -82,7 +82,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
-  public void testDidChange() {
+  void testDidChange() {
     List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
     service.didChange(
@@ -94,7 +94,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
-  public void testDidChangeOnCpyFiles() {
+  void testDidChangeOnCpyFiles() {
     List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
     MyTextDocumentService spyService = spy((MyTextDocumentService) service);
@@ -105,7 +105,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
-  public void testDidClose() {
+  void testDidClose() {
     openAndAwait();
     assertEquals(1, closeGetter(service).size());
     TextDocumentIdentifier testDocument = new TextDocumentIdentifier(DOCUMENT_URI);
@@ -115,7 +115,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
-  public void testDidSave() {
+  void testDidSave() {
     TextDocumentIdentifier saveDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
     DidSaveTextDocumentParams saveDocumentParams =
         new DidSaveTextDocumentParams(saveDocumentIdentifier);
@@ -127,7 +127,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
-  public void testIncorrectLanguageId() {
+  void testIncorrectLanguageId() {
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(DOCUMENT_URI, "incorrectId", 1, TEXT_EXAMPLE)));
@@ -143,7 +143,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   @Test
-  public void testNotAllowedFileExtensionAnalysis() {
+  void testNotAllowedFileExtensionAnalysis() {
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(CPY_DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
@@ -158,18 +158,73 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
   }
 
   /**
+   * This test verifies that when an extended document opened, the code analyzed, and the copybook
+   * analysis disabled using {@link CopybookProcessingMode#DISABLED}
+   */
+  @Test
+  void disableCopybookAnalysisOnExtendedDoc() {
+    LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
+    MyTextDocumentService service = buildServiceWithMockEngine(engine);
+
+    service.didOpen(
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(EXT_SRC_DOC_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+
+    verify(engine, timeout(10000)).analyze(eq(EXT_SRC_DOC_URI), anyString(), eq(DISABLED));
+  }
+
+  private MyTextDocumentService buildServiceWithMockEngine(LanguageEngineFacade engine) {
+    return new MyTextDocumentService(
+        mock(Communications.class), engine, null, null, null, mock(DataBusBroker.class), null);
+  }
+
+  /**
+   * This test verifies that when a document opened in DID_OPEN mode, the code analyzed, and the
+   * copybook analysis is enabled using {@link CopybookProcessingMode#ENABLED}
+   */
+  @Test
+  void enableCopybooksOnDidOpenTest() {
+    LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
+    MyTextDocumentService service = buildServiceWithMockEngine(engine);
+
+    service.didOpen(
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+
+    verify(engine, timeout(10000)).analyze(eq(DOCUMENT_URI), anyString(), eq(ENABLED));
+  }
+
+  /**
+   * This test verifies that when a document updated in DID_CHANGE mode, the code analyzed, and the
+   * copybook analysis enabled using {@link CopybookProcessingMode#ENABLED}
+   */
+  @Test
+  void enableCopybooksOnDidChangeTest() {
+    LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
+    MyTextDocumentService service = buildServiceWithMockEngine(engine);
+
+    service.didChange(
+        new DidChangeTextDocumentParams(
+            new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0),
+            List.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
+
+    verify(engine).analyze(eq(DOCUMENT_URI), anyString(), eq(SKIP));
+  }
+
+  /**
    * This test checks that {@link MyTextDocumentService} is subscribed to the databus events and may
    * re-run analysis of the open documents if it receives a notification.
    */
   @Test
-  public void observerCallback() {
+  void observerCallback() {
 
     // configured mock object and diagnostic stubs
     Communications communications = mock(Communications.class);
     LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
     DataBusBroker broker = mock(DataBusBroker.class);
-    List<Diagnostic> diagnosticsNoErrors = Collections.emptyList();
-    List<Diagnostic> diagnosticsWithErrors = createDefaultDiagnostics();
+
+    Map<String, List<Diagnostic>> diagnosticsNoErrors = emptyMap();
+    Map<String, List<Diagnostic>> diagnosticsWithErrors = createDefaultDiagnostics();
 
     // created two dummy analysis result, one with error and another without
     // those object will be used as result of dynamic stubbing stage
@@ -184,14 +239,14 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
      *  - document URI [correct|incorrect]
      */
 
-    // dynamic stubbing for did open event
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN)).thenReturn(resultNoErrors);
-    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DID_OPEN))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
+        .thenReturn(resultNoErrors);
+    when(engine.analyze(
+            DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
         .thenReturn(resultWithErrors);
 
-    // dynamic stubbing for did change event
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_CHANGE)).thenReturn(resultNoErrors);
-    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DID_CHANGE))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DISABLED)).thenReturn(resultNoErrors);
+    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DISABLED))
         .thenReturn(resultWithErrors);
 
     // create a service and verify is subscribed to the required event
@@ -229,12 +284,12 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
 
   /**
    * Test on the textDocument/codeAction request the {@link CodeActions} delegate called. The
-   * specific logic tested in {@link com.ca.lsp.cobol.service.delegates.actions.CodeActionsTest},
-   * here it is only to verify that the {@link MyTextDocumentService#codeAction(CodeActionParams)}
-   * calls the {@link CodeActions#collect(CodeActionParams)}
+   * specific logic tested in CodeActionsTest, here it is only to verify that the {@link
+   * MyTextDocumentService#codeAction(CodeActionParams)} calls the {@link
+   * CodeActions#collect(CodeActionParams)}
    */
   @Test
-  public void testCodeActionsEndpoint() {
+  void testCodeActionsEndpoint() {
     DataBusBroker broker = mock(DataBusBroker.class);
     CodeActions actions = mock(CodeActions.class);
 
@@ -254,11 +309,29 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     verify(actions).collect(params);
   }
 
-  private List<Diagnostic> createDefaultDiagnostics() {
-    return singletonList(
-        new Diagnostic(
-            new Range(new Position(0, 0), new Position(0, INCORRECT_TEXT_EXAMPLE.length())),
-            INCORRECT_TEXT_EXAMPLE));
+  private Map<String, List<Diagnostic>> createDefaultDiagnostics() {
+    return singletonMap(
+        DOCUMENT_URI,
+        singletonList(
+            new Diagnostic(
+                new Range(new Position(0, 0), new Position(0, INCORRECT_TEXT_EXAMPLE.length())),
+                INCORRECT_TEXT_EXAMPLE)));
+  }
+  /**
+   * This test verify that when a {@link MyTextDocumentService#didClose(DidCloseTextDocumentParams)}
+   * is sent from the client to dispose a document, all the related diagnostic message are disposed
+   * from the document.
+   */
+  @Test
+  void testDidCloseDisposeDiagnostics() {
+    Communications spyCommunications = spy(Communications.class);
+
+    DidCloseTextDocumentParams closedDocument =
+        new DidCloseTextDocumentParams(new TextDocumentIdentifier(DOCUMENT_URI));
+    service.didClose(closedDocument);
+
+    assertEquals(Collections.EMPTY_MAP, closeGetter(service));
+    verify(spyCommunications, atMost(1)).publishDiagnostics(Map.of(DOCUMENT_URI, List.of()));
   }
 
   private MyTextDocumentService verifyServiceStart(
@@ -274,29 +347,30 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
       Communications communications,
       LanguageEngineFacade engine,
       DataBusBroker dataBus,
-      List<Diagnostic> diagnostics,
+      Map<String, List<Diagnostic>> diagnostics,
       MyTextDocumentService service,
       String textToAnalyse,
       String uri) {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
     verify(communications).notifyThatLoadingInProgress(uri);
-    verify(engine, timeout(10000)).analyze(uri, textToAnalyse, DID_OPEN);
+    verify(engine, timeout(10000)).analyze(uri, textToAnalyse, CopybookProcessingMode.ENABLED);
     verify(dataBus, timeout(10000))
-        .postData(AnalysisFinishedEvent.builder().documentUri(uri).copybookUris(emptyList()).build());
+        .postData(
+            AnalysisFinishedEvent.builder().documentUri(uri).copybookUris(emptyList()).build());
     verify(communications, timeout(10000)).cancelProgressNotification(uri);
-    verify(communications, timeout(10000)).publishDiagnostics(uri, diagnostics);
+    verify(communications, timeout(10000)).publishDiagnostics(diagnostics);
   }
 
   private void verifyCallback(
       Communications communications,
       LanguageEngineFacade engine,
-      List<Diagnostic> diagnostics,
+      Map<String, List<Diagnostic>> diagnostics,
       String text,
       String uri) {
 
-    verify(engine, timeout(10000).times(2)).analyze(uri, text, DID_OPEN);
-    verify(communications, times(2)).publishDiagnostics(uri, diagnostics);
+    verify(engine, timeout(10000).times(2)).analyze(uri, text, CopybookProcessingMode.ENABLED);
+    verify(communications, times(2)).publishDiagnostics(diagnostics);
   }
 
   /**
@@ -307,14 +381,14 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
    * Communications#cancelProgressNotification(String)} is not called.
    */
   @Test
-  public void testImmediateClosingOfDocumentDoNotCauseNPE() {
+  void testImmediateClosingOfDocumentDoNotCauseNPE() {
     DataBusBroker broker = mock(DataBusBroker.class);
     Communications communications = mock(Communications.class);
     LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
 
     doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.empty()))
         .when(engine)
-        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN);
+        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
 
     MyTextDocumentService service =
         new MyTextDocumentService(communications, engine, null, null, null, broker, null);
@@ -331,9 +405,9 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     verify(communications, timeout(2000)).cancelProgressNotification(DOCUMENT_URI);
   }
 
-  @Ignore("Not implemented yet")
+  @Disabled("Not implemented yet")
   @Test
-  public void testHover() {
+  void testHover() {
     TextDocumentItem testHoverDocument =
         new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE);
     service.didOpen(new DidOpenTextDocumentParams(testHoverDocument));
@@ -353,7 +427,7 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
    * document URIs that contain nested copybooks, including the main document
    */
   @Test
-  public void testAnalysisFinishedNotification() {
+  void testAnalysisFinishedNotification() {
     DataBusBroker broker = mock(DataBusBroker.class);
     LanguageEngineFacade engine = mock(LanguageEngineFacade.class);
     Communications communications = mock(Communications.class);
@@ -366,10 +440,10 @@ public class MyTextDocumentServiceTest extends ConfigurableTest {
     copybookUsages.put("NESTED", singletonList(nestedLocation));
     copybookUsages.put("NESTED2", singletonList(nested2Location));
 
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DID_OPEN))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
         .thenReturn(
             new AnalysisResult(
-                emptyList(),
+                emptyMap(),
                 emptyMap(),
                 emptyMap(),
                 emptyMap(),

@@ -17,23 +17,23 @@ package com.broadcom.lsp.domain.cobol.databus.impl;
 
 import com.broadcom.lsp.domain.CopybookStorableProvider;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CopybookStorableTest extends CopybookStorableProvider {
+class CopybookStorableTest extends CopybookStorableProvider {
   private CopybookStorable storable = getDummyStorable();
 
   /** A storable object created is not already expired */
   @Test
-  public void testStorableNotExpired() {
+  void testStorableNotExpired() {
     assertFalse(storable.isExpired());
   }
 
   /** A storable object hit increase its hit value */
   @Test
-  public void testHitIncrement() {
+  void testHitIncrement() {
     // actual hit value
     int prevHit = storable.getHit();
     storable.match();

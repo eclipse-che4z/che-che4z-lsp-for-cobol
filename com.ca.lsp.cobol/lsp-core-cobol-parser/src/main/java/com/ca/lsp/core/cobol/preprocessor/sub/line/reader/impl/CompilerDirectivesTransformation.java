@@ -39,7 +39,7 @@ public class CompilerDirectivesTransformation implements CobolLineReaderDelegate
 
   private String cutTooLongString(String line) {
     if (line.length() == 80) {
-      line = line.substring(0, 72).trim();
+      line = line.substring(0, 72).strip();
     }
     return line;
   }

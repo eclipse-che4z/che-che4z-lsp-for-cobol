@@ -16,22 +16,24 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
-import com.ca.lsp.core.cobol.model.CopybookUsage;
-import com.ca.lsp.core.cobol.model.CopybookSemanticContext;
+import com.broadcom.lsp.domain.common.model.Position;
+import lombok.AllArgsConstructor;
 import lombok.Value;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
 
+/**
+ * THis class represents the entire semantic context of the current document, including its
+ * variables, paragraphs, copybooks etc., with their definitions and usages.
+ */
 @Value
+@AllArgsConstructor
 public class SemanticContext {
-  private CobolVariableContext variables = new CobolVariableContext();
-  private SubContext<String> paragraphs = new CobolNamedContext();
-  private SubContext<String> copybooks = new CobolNamedContext();
-  private List<CopybookUsage> copybookUsageTracker;
-
-  public void merge(CopybookSemanticContext semanticContext) {
-    variables.merge(semanticContext.getName(), semanticContext.getContext().getVariables());
-    paragraphs.merge(semanticContext.getName(), semanticContext.getContext().getParagraphs());
-    copybooks.merge(semanticContext.getName(), semanticContext.getContext().getCopybooks());
-  }
+  private Map<String, Collection<Position>> variableDefinitions;
+  private Map<String, Collection<Position>> variableUsages;
+  private Map<String, Collection<Position>> paragraphDefinitions;
+  private Map<String, Collection<Position>> paragraphUsages;
+  private Map<String, Collection<Position>> copybookDefinitions;
+  private Map<String, Collection<Position>> copybookUsages;
 }

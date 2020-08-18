@@ -84,6 +84,7 @@ CHANGED : C H A N G E D;
 CHANNEL : C H A N N E L;
 CHARACTER : C H A R A C T E R;
 CHARACTERS : C H A R A C T E R S;
+CICS : C I C S;
 CLASS : C L A S S;
 CLASS_ID : C L A S S MINUSCHAR I D;
 CLOB : C L O B;
@@ -174,8 +175,10 @@ DOWN : D O W N;
 DUPLICATES : D U P L I C A T E S;
 DYNAMIC : D Y N A M I C;
 EBCDIC : E B C D I C;
-EGCS : E G C S; // E X T E N S I O N
+EGCS : E G C S;
 EGI : E G I;
+EJECT: E J E C T -> channel(HIDDEN);
+EJECT_DOT: E J E C T DOT_FS-> channel(HIDDEN);
 ELSE : E L S E;
 EMI : E M I;
 EMPTY_CHECK : E M P T Y MINUSCHAR C H E C K;
@@ -189,6 +192,7 @@ END_COMPUTE : E N D MINUSCHAR C O M P U T E;
 END_DELETE : E N D MINUSCHAR D E L E T E;
 END_DIVIDE : E N D MINUSCHAR D I V I D E;
 END_EVALUATE : E N D MINUSCHAR E V A L U A T E;
+END_EXEC : E N D MINUSCHAR E X E C;
 END_IF : E N D MINUSCHAR I F;
 END_MULTIPLY : E N D MINUSCHAR M U L T I P L Y;
 END_OF_PAGE : E N D MINUSCHAR O F MINUSCHAR P A G E;
@@ -222,6 +226,7 @@ EVENT : E V E N T;
 EVERY : E V E R Y;
 EXCEPTION : E X C E P T I O N;
 EXCLUSIVE : E X C L U S I V E;
+EXEC : E X E C;
 EXHIBIT : E X H I B I T;
 EXIT : E X I T;
 EXPORT : E X P O R T;
@@ -485,6 +490,7 @@ SPACE : S P A C E;
 SPACES : S P A C E S;
 SPECIAL_NAMES : S P E C I A L MINUSCHAR N A M E S;
 SQL : S Q L;
+SQLIMS : S Q L I M S;
 STANDARD : S T A N D A R D;
 STANDARD_1 : S T A N D A R D MINUSCHAR '1';
 STANDARD_2 : S T A N D A R D MINUSCHAR '2';
@@ -577,9 +583,6 @@ DOUBLEQUOTE : '"';
 DOT_FS : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ | '.' EOF;
 DOT : '.';
 EQUALCHAR : '=';
-EXECCICSTAG : '*>EXECCICS';
-EXECSQLTAG : '*>EXECSQL';
-EXECSQLIMSTAG : '*>EXECSQLIMS';
 LESSTHANCHAR : '<';
 LESSTHANOREQUAL : '<=';
 LPARENCHAR : '(';
@@ -591,6 +594,8 @@ PLUSCHAR : '+';
 SINGLEQUOTE : '\'';
 RPARENCHAR : ')';
 SLASHCHAR : '/';
+COPYENTRY: ('*>CPYENTER<URI>' .*? '</URI>');
+COPYEXIT: '*>CPYEXIT' + NEWLINE;
 
 INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+;
 
@@ -599,16 +604,17 @@ NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT | COMMACHAR) DIGIT+ (('e' |
 NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
 
 IDENTIFIER : ([a-zA-Z0-9]+ ([-_]+ [a-zA-Z0-9]+)*);
+FILENAME : [a-zA-Z0-9]+ '.' [a-zA-Z0-9]+;
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
-EXECCICSLINE : EXECCICSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
-EXECSQLIMSLINE : EXECSQLIMSTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
-EXECSQLLINE : EXECSQLTAG WS ~('\n' | '\r' | '}')* ('\n' | '\r' | '}');
 COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
-COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
+COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*  -> channel(HIDDEN);
 WS : [ \t\f;]+ -> channel(HIDDEN);
 SEPARATOR : ', ' -> channel(HIDDEN);
+
+// treat all the non-processed tokens as errors
+ERRORCHAR : . ;
 
 fragment DIGIT: [0-9];
 

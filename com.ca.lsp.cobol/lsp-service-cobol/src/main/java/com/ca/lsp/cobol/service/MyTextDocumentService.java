@@ -43,6 +43,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.getCopybookProcessingMode;
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
+import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -169,7 +172,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-
     // git FS URIs are not currently supported
     if (uri.startsWith(GIT_FS_URI)) {
       log.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
@@ -193,7 +195,8 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didClose(DidCloseTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-    log.info("Document closing invoked");
+    log.info(String.format("Document closing invoked on URI %s", uri));
+    communications.publishDiagnostics(Map.of(uri, List.of()));
     docs.remove(uri);
   }
 
@@ -234,7 +237,8 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text, TextDocumentSyncType.DID_OPEN);
+              AnalysisResult result =
+                  engine.analyze(uri, text, getCopybookProcessingMode(uri, DID_OPEN));
               ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
               publishResult(uri, result);
             })
@@ -244,9 +248,10 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   void analyzeChanges(String uri, String text) {
     runAsync(
             () -> {
-              AnalysisResult result = engine.analyze(uri, text, TextDocumentSyncType.DID_CHANGE);
+              AnalysisResult result =
+                  engine.analyze(uri, text, getCopybookProcessingMode(uri, DID_CHANGE));
               registerDocument(uri, new MyDocumentModel(text, result));
-              communications.publishDiagnostics(uri, result.getDiagnostics());
+              communications.publishDiagnostics(result.getDiagnostics());
             })
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
   }
@@ -254,7 +259,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private void publishResult(String uri, AnalysisResult result) {
     notifyAnalysisFinished(uri, result.getCopybookUsages());
     communications.cancelProgressNotification(uri);
-    communications.publishDiagnostics(uri, result.getDiagnostics());
+    communications.publishDiagnostics(result.getDiagnostics());
     if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
   }
 

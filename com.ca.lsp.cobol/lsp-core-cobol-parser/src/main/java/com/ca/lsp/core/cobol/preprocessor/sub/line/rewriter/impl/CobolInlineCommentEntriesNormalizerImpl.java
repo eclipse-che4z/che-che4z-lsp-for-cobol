@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.COMMENT_TAG;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.WS;
-import static com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils.copyCobolLineWithContentArea;
+import static com.ca.lsp.core.cobol.preprocessor.sub.util.impl.CobolLineUtils.copyCobolLineWithContentArea;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.toList;
 

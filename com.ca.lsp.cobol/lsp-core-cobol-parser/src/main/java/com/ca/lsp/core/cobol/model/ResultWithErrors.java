@@ -17,10 +17,16 @@ package com.ca.lsp.core.cobol.model;
 
 import lombok.Value;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
+/**
+ * This value class represents a processing result of any type that may contain syntax errors.
+ *
+ * @param <T> - type of the processing result
+ */
 @Value
 public class ResultWithErrors<T> {
-  T result;
-  List<SyntaxError> errors;
+  @Nonnull T result;
+  @Nonnull List<SyntaxError> errors;
 }

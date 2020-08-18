@@ -16,7 +16,7 @@ package com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.impl;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.rewriter.CobolLineIndicatorProcessor;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.CobolLineUtils;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.CobolLineUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;

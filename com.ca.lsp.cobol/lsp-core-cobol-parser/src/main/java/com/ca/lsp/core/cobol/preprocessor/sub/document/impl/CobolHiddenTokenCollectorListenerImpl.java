@@ -13,44 +13,40 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
+import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
-
 /**
- * ANTLR listener, which collects visible as well as hidden tokens for a given
- * parse tree in a string buffer.
+ * ANTLR listener, which collects visible as well as hidden tokens for a given parse tree in a
+ * string buffer.
  */
 public class CobolHiddenTokenCollectorListenerImpl extends CobolPreprocessorBaseListener {
 
-	boolean firstTerminal = true;
+  private final StringBuilder outputBuffer = new StringBuilder();
 
-	private final StringBuilder outputBuffer = new StringBuilder();
+  private final BufferedTokenStream tokens;
+  private final TokenUtils tokenUtils;
 
-	private final BufferedTokenStream tokens;
+  public CobolHiddenTokenCollectorListenerImpl(TokenUtils tokenUtils, BufferedTokenStream tokens) {
+    this.tokenUtils = tokenUtils;
+    this.tokens = tokens;
+  }
 
-	public CobolHiddenTokenCollectorListenerImpl(final BufferedTokenStream tokens) {
-		this.tokens = tokens;
-	}
+  public String read() {
+    return outputBuffer.toString();
+  }
 
-	public String read() {
-		return outputBuffer.toString();
-	}
+  @Override
+  public void visitTerminal(TerminalNode node) {
+    if (outputBuffer.length() > 0) {
+      int tokPos = node.getSourceInterval().a;
+      outputBuffer.append(tokenUtils.retrieveHiddenTextToLeft(tokPos, tokens));
+    }
 
-	@Override
-	public void visitTerminal(final TerminalNode node) {
-		if (!firstTerminal) {
-			final int tokPos = node.getSourceInterval().a;
-			outputBuffer.append(TokenUtils.getHiddenTokensToLeft(tokPos, tokens));
-		}
-
-		if (!TokenUtils.isEOF(node)) {
-			final String text = node.getText();
-			outputBuffer.append(text);
-		}
-
-		firstTerminal = false;
-	}
+    if (tokenUtils.notEOF(node)) {
+      outputBuffer.append(node.getText());
+    }
+  }
 }

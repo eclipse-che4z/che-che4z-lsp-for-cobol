@@ -15,7 +15,7 @@ package com.ca.lsp.core.cobol.preprocessor;
 
 import lombok.experimental.UtilityClass;
 
-/** The constants in this class are used while the processing of COBOL code lines. */
+/** The constants in this class used while the processing of COBOL code lines. */
 @UtilityClass
 public final class ProcessingConstants {
   public static final String CHAR_ASTERISK = "*";
@@ -26,14 +26,14 @@ public final class ProcessingConstants {
   public static final String CHAR_SLASH = "/";
   public static final String COMMENT_ENTRY_TAG = "*>CE";
   public static final String COMMENT_TAG = "*>";
-  public static final String EXEC_CICS_TAG = "*>EXECCICS";
-  public static final String EXEC_END_TAG = "}";
-  public static final String EXEC_SQL_TAG = "*>EXECSQL";
-  public static final String EXEC_SQLIMS_TAG = "*>EXECSQLIMS";
   public static final String INDICATOR_FIELD = "([\\s*\\-/Dd$]{1})";
   public static final String CONTLINE_INDICATOR_FIELD = "([-]{1})";
   public static final String NEWLINE = "\r\n";
   public static final String WS = " ";
   public static final String CONT_LINE_NO_AREA_A_REGEX = "^(.{6})([-]{1})( ){4}(.*)";
   public static final String BLANK_SEQUENCE_AREA = "      ";
+  public static final String CPY_ENTER_TAG = "*>CPYENTER";
+  public static final String CPY_URI_OPEN = "<URI>";
+  public static final String CPY_URI_CLOSE = "</URI>";
+  public static final String CPY_EXIT_TAG = NEWLINE + "*>CPYEXIT" + NEWLINE;
 }

@@ -21,22 +21,28 @@ import com.google.common.collect.Multimap;
 
 import java.util.Collection;
 
+/**
+ * This class represents an abstract structure to store definitions and usages of semantic elements
+ * of a specific type regarding the currently processing document
+ *
+ * @param <T> - type of semantic elements to store
+ */
 public interface SubContext<T> {
   /**
    * Add defined language element to the context
    *
-   * @param name - a language element name
+   * @param element - a language element
    * @param position - position of the used element
    */
-  void define(T name, Position position);
+  void define(T element, Position position);
 
   /**
    * Add the position of a language element usage
    *
-   * @param name - a language element name
+   * @param element - a language element
    * @param position - position of the used element
    */
-  void addUsage(String name, Position position);
+  void addUsage(String element, Position position);
 
   /**
    * Get list of names of defined elements
@@ -59,6 +65,7 @@ public interface SubContext<T> {
    * @return - multimap of names to a list of positions of definitions
    */
   Multimap<String, Position> getDefinitions();
+
   /**
    * Get all the registered usage of the language elements
    *
@@ -66,5 +73,10 @@ public interface SubContext<T> {
    */
   Multimap<String, Position> getUsages();
 
-  void merge(String name, SubContext<T> subContext);
+  /**
+   * Copy the content of the given subContext into this one.
+   *
+   * @param subContext - a subContext that should be merged into this one.
+   */
+  void merge(SubContext<T> subContext);
 }

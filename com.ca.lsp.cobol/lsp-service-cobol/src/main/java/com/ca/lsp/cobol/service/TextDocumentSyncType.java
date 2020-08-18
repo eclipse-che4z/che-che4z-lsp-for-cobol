@@ -9,12 +9,15 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
  *
- *   Broadcom, Inc. - initial API and implementation
  */
+
 package com.ca.lsp.cobol.service;
 
-/** This enum class used to track text synchronization type for the processed document. */
+/**
+ * This enum class contains the kind of document synchronization that could be sent from the client
+ */
 public enum TextDocumentSyncType {
   DID_OPEN,
   DID_CHANGE

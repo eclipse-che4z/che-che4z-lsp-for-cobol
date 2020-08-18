@@ -27,7 +27,7 @@ import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.FileEvent;
 import org.eclipse.lsp4j.services.WorkspaceService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.List;
@@ -37,12 +37,11 @@ import java.util.concurrent.ExecutionException;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
 import static com.ca.lsp.core.cobol.model.ErrorCode.MISSING_COPYBOOK;
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.eclipse.lsp4j.FileChangeType.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.*;
 
@@ -52,13 +51,13 @@ import static org.mockito.Mockito.*;
  */
 @Slf4j
 @SuppressWarnings("unchecked")
-public class WorkspaceServiceTest {
+class WorkspaceServiceTest {
   /**
    * Test of the workspace/executeCommand entry point. Assert that on a MISSING_COPYBOOK the {@link
    * RequiredCopybookEvent} fired.
    */
   @Test
-  public void testExecuteCommand() {
+  void testExecuteCommand() {
     DataBusBroker broker = mock(DataBusBroker.class);
     String copybookName = "COPYBOOK";
 
@@ -68,7 +67,7 @@ public class WorkspaceServiceTest {
         service.executeCommand(
             new ExecuteCommandParams(
                 MISSING_COPYBOOK.name(),
-                asList(new JsonPrimitive(copybookName), new JsonPrimitive(DOCUMENT_URI))));
+                List.of(new JsonPrimitive(copybookName), new JsonPrimitive(DOCUMENT_URI))));
 
     try {
       assertNull(result.get());
@@ -84,7 +83,7 @@ public class WorkspaceServiceTest {
    * not recognized.
    */
   @Test
-  public void testExecuteNonExistingCommand() {
+  void testExecuteNonExistingCommand() {
     DataBusBroker broker = mock(DataBusBroker.class);
     WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, null);
 
@@ -101,7 +100,7 @@ public class WorkspaceServiceTest {
 
   /** Test a new watcher created when a new path add in setting.json */
   @Test
-  public void testChangeConfigurationNewPath() {
+  void testChangeConfigurationNewPath() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
@@ -133,7 +132,7 @@ public class WorkspaceServiceTest {
 
   /** Test no watchers added or removed when the path list not changed */
   @Test
-  public void testChangeConfigurationNoChangesInPaths() {
+  void testChangeConfigurationNoChangesInPaths() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
@@ -160,7 +159,7 @@ public class WorkspaceServiceTest {
 
   /** Test an existing watcher removed when its path doesn't exist in setting.json */
   @Test
-  public void testChangeConfigurationPathRemoved() {
+  void testChangeConfigurationPathRemoved() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     SettingsService settingsService = mock(SettingsService.class);
     WatcherService watchingService = mock(WatcherService.class);
@@ -190,7 +189,7 @@ public class WorkspaceServiceTest {
 
   /** Test no watchers added or removed when the path is empty */
   @Test
-  public void testChangeConfigurationNoPathToRegister() {
+  void testChangeConfigurationNoPathToRegister() {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     SettingsService settingsService = mock(SettingsService.class);
     WatcherService watchingService = mock(WatcherService.class);
@@ -215,7 +214,7 @@ public class WorkspaceServiceTest {
    * notifications
    */
   @Test
-  public void testDidChangeWatchedFilesExistingFileCreated() {
+  void testDidChangeWatchedFilesExistingFileCreated() {
     checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks/CpyName.cpy", Created));
   }
 
@@ -223,7 +222,7 @@ public class WorkspaceServiceTest {
    * This test verifies that the Workspace Service reacts on the file change watcher's notifications
    */
   @Test
-  public void testDidChangeWatchedFilesExistingFileChanged() {
+  void testDidChangeWatchedFilesExistingFileChanged() {
     checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks/CpyName.cpy", Changed));
   }
 
@@ -232,7 +231,7 @@ public class WorkspaceServiceTest {
    * notifications
    */
   @Test
-  public void testDidChangeWatchedFilesExistingFileDeleted() {
+  void testDidChangeWatchedFilesExistingFileDeleted() {
     checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks/CpyName.cpy", Deleted));
   }
 
@@ -241,7 +240,7 @@ public class WorkspaceServiceTest {
    * notifications
    */
   @Test
-  public void testDidChangeWatchedFilesFolderContentChanged() {
+  void testDidChangeWatchedFilesFolderContentChanged() {
     checkWatchers(new FileEvent("file:///c%3A/workspace/COBOL/.copybooks", Changed));
   }
 

@@ -23,19 +23,19 @@ import com.broadcom.lsp.domain.cobol.event.impl.RunAnalysisEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * This test checks functionality of event subscriber factory. It creates subscribers with required
  * event types and asserts that they created correctly.
  */
 @Slf4j
-public class CopybookEventSubscribersTest {
+class CopybookEventSubscribersTest {
   static class DatabusObserverTest implements EventObserver<DataEvent> {
     @Override
     public void observerCallback(DataEvent adaptedDataEvent) {
@@ -50,38 +50,38 @@ public class CopybookEventSubscribersTest {
 
   private DatabusObserverTest databusObserver;
 
-  @Before
-  public void initObserver() {
+  @BeforeEach
+  void initObserver() {
     databusObserver = new DatabusObserverTest();
   }
 
   /** This test verifies that the RequiredCopybook factory creates a new RequiredCopybook event */
   @Test
-  public void testRequireSubscriberFactory() {
+  void testRequireSubscriberFactory() {
     assertEquals(REQCPY, getRequiredSubscriberFromFactory());
   }
 
   /** This test verifies that the FetchedCopybook factory creates a new FetchedCopybook event */
   @Test
-  public void testFetchSubscriberFactory() {
+  void testFetchSubscriberFactory() {
     assertEquals(FETCHEDCPY, getFetchedSubscriberFromFactory());
   }
 
   /** This test verifies that the Unknown factory creates a new Unknown event */
   @Test
-  public void testUnknownSubscriberFactory() {
+  void testUnknownSubscriberFactory() {
     assertEquals(UNKNOWN, getUnknownSubscriberFromFactory());
   }
 
   /** This test verifies that the RunAnalysis factory creates a new RunAnalysis event */
   @Test
-  public void testRunAnalysisSubscriberFactory() {
+  void testRunAnalysisSubscriberFactory() {
     assertEquals(RUN_ANALYSIS, getRunAnalysisSubscriberFromFactory());
   }
 
   /** This test verifies that a wrong factory isn't returned. */
   @Test
-  public void negativeTestSubscriberFactory() {
+  void negativeTestSubscriberFactory() {
     assertNotEquals(REQCPY, getFetchedSubscriberFromFactory());
     assertNotEquals(UNKNOWN, getFetchedSubscriberFromFactory());
 

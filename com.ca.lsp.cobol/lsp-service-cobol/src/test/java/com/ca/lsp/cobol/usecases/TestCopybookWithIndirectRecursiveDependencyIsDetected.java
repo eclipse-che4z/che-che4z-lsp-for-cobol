@@ -15,49 +15,57 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp4j.Range;
-import org.junit.Test;
+import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
+import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
+
 /**
- * This test checks the error shown if the copybook that is used in the Cobol file contains a link
+ * This test checks the error shown if the copybook that is used in the COBOL file contains a link
  * to another one, that has a dependency to the first copybook.
  */
-public class TestCopybookWithIndirectRecursiveDependencyIsDetected extends NegativeUseCase {
+class TestCopybookWithIndirectRecursiveDependencyIsDetected {
 
   private static final String TEXT =
-      "        IDENTIFICATION DIVISION. \r\n"
-          + "        PROGRAM-ID. test1.\r\n"
-          + "        DATA DIVISION.\r\n"
-          + "        WORKING-STORAGE SECTION.\r\n"
-          + "        COPY INDIRECT-COPY.\n\n"
-          + "        PROCEDURE DIVISION.\n\n";
+      "        IDENTIFICATION DIVISION.\n"
+          + "        PROGRAM-ID. test1.\n"
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        COPY {~INDIRECT-COPY|1|3}.\n"
+          + "        PROCEDURE DIVISION.\n";
 
-  private static final String INDIRECT_COPY = "        COPY INNER-COPY.";
-  private static final String INNER_COPY = "        COPY INDIRECT-COPY.";
+  private static final String INDIRECT = "        COPY {~INNER-COPY|2|4}.";
+  private static final String INNER_COPY = "        COPY {~INDIRECT-COPY|3}.";
 
-  public TestCopybookWithIndirectRecursiveDependencyIsDetected() {
-    super(TEXT);
-  }
+  private static final String INDIRECT_NAME = "INDIRECT-COPY";
+  private static final String INNER_COPY_NAME = "INNER-COPY";
 
-  @Override
+  private static final String MESSAGE_RECURSION = "Recursive copybook declaration for: ";
+  private static final String MESSAGE_LONG_DECLARATION =
+      "Copybook declaration has more than 8 characters for: ";
+
   @Test
-  public void test() {
-    super.test(
-        Arrays.asList(
-            new CobolText("INNER-COPY", INNER_COPY),
-            new CobolText("INDIRECT-COPY", INDIRECT_COPY)));
-  }
-
-  @Override
-  protected void assertRanges(List<Range> ranges) {
-    Range range = ranges.get(0);
-    assertEquals(4, range.getStart().getLine());
-    assertEquals(13, range.getStart().getCharacter());
-    assertEquals(4, range.getEnd().getLine());
-    assertEquals(26, range.getEnd().getCharacter());
+  void test() {
+    UseCaseEngine.runTest(
+        TEXT,
+        List.of(new CobolText(INNER_COPY_NAME, INNER_COPY), new CobolText(INDIRECT_NAME, INDIRECT)),
+        Map.of(
+            "1",
+            new Diagnostic(null, MESSAGE_RECURSION + INDIRECT_NAME, Error, ERROR.getText()),
+            "2",
+            new Diagnostic(null, MESSAGE_RECURSION + INNER_COPY_NAME, Error, ERROR.getText()),
+            "3",
+            new Diagnostic(
+                null, MESSAGE_LONG_DECLARATION + INDIRECT_NAME, Information, INFO.getText()),
+            "4",
+            new Diagnostic(
+                null, MESSAGE_LONG_DECLARATION + INNER_COPY_NAME, Information, INFO.getText())));
   }
 }
