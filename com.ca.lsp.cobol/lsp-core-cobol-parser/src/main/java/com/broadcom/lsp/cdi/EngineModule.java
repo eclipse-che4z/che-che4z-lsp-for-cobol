@@ -25,9 +25,7 @@ import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListen
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CopybookResolutionProvider;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.GrammarPreprocessorImpl;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.ReplacingServiceImpl;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.TokenUtilsImpl;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 /** This module provides DI bindings for COBOL language engine part. */
@@ -41,6 +39,5 @@ public class EngineModule extends DefaultModule {
     bind(CopybookResolution.class).toProvider(CopybookResolutionProvider.class);
     install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));
     bind(ReplacingService.class).to(ReplacingServiceImpl.class);
-    bind(TokenUtils.class).to(TokenUtilsImpl.class);
   }
 }

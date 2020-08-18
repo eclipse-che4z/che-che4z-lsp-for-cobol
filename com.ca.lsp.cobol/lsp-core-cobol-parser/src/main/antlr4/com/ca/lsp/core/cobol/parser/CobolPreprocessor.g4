@@ -175,10 +175,10 @@ replaceOffStatement
    ;
 
 replaceClause
-   : (replacePseudoText | replaceliteral) (directoryPhrase)? (familyPhrase)?
+   : (replacePseudoText | replaceLiteral) (directoryPhrase)? (familyPhrase)?
    ;
 
-replaceliteral
+replaceLiteral
    : replaceable BY replacement
    ;
 
@@ -203,23 +203,19 @@ familyPhrase
    ;
 
 replaceable
-   : replaceSameElement
+   : literal | cobolWord | charDataLine
    ;
 
 replacement
-   : replaceSameElement
-   ;
-
-replaceSameElement
    : literal | cobolWord | charDataLine
    ;
 
 charData
-   : (charDataLine)+
+   : charDataLine
    ;
 
 charDataLine
-   : (cobolWord | literal | filename | TEXT | DOT | LPARENCHAR | RPARENCHAR)+
+   : (FILENAME | TEXT | DOT | LPARENCHAR | RPARENCHAR)+
    ;
 
 cobolWord
@@ -228,10 +224,6 @@ cobolWord
 
 literal
    : NONNUMERICLITERAL | NUMERICLITERAL
-   ;
-
-filename
-   : FILENAME
    ;
 
 charDataKeyword
