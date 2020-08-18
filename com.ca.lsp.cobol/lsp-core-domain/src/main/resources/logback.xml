@@ -16,7 +16,7 @@
   -->
 
 <configuration>
-    <property name="HOME_LOG" value="${user.home}/LSPCobol/logs/app.log"/>
+    <property name="HOME_LOG" value="${user.home}/Broadcom/LSPCobol/logs/app.log"/>
     <appender name="STDOUT"
               class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -29,7 +29,7 @@
         <file>${HOME_LOG}</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>./LSPCobol/logs/archived/app.%d{yyyy-MM-dd}.%i.log.zip
+            <fileNamePattern>./Broadcom/LSPCobol/logs/archived/app.%d{yyyy-MM-dd}.%i.log.zip
             </fileNamePattern>
             <maxFileSize>10MB</maxFileSize>
             <totalSizeCap>1GB</totalSizeCap>
