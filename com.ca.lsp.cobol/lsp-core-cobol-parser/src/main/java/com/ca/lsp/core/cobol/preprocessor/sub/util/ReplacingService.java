@@ -15,8 +15,7 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.util;
 
-import com.ca.lsp.core.cobol.parser.CobolPreprocessor.ReplaceClauseContext;
-import org.antlr.v4.runtime.BufferedTokenStream;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -27,13 +26,14 @@ public interface ReplacingService {
    * Replace given text by given patterns and tokens
    *
    * @param text - String to replace
-   * @param replaceClauses - replace clauses with patterns for replacement
-   * @param tokens - tokens needed to retrieve the full replacement token
+   * @param replacePatterns - list of patterns for replacement
    * @return a String with all the patterns applied one by one
    */
   @Nonnull
-  String applyReplacing(
-      @Nonnull String text,
-      @Nonnull List<ReplaceClauseContext> replaceClauses,
-      @Nonnull BufferedTokenStream tokens);
+  String applyReplacing(@Nonnull String text, @Nonnull List<Pair<String, String>> replacePatterns);
+
+  @Nonnull
+  Pair<String, String> getPseudoTextReplacingPattern(String clause);
+
+  Pair<String, String> getTokenReplacingPattern(String clause);
 }

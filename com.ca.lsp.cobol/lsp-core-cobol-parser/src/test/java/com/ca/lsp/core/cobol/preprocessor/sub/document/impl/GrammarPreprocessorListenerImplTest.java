@@ -20,7 +20,6 @@ import com.ca.lsp.core.cobol.model.*;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.ca.lsp.core.cobol.utils.CustomToken;
 import com.google.inject.Provider;
@@ -59,7 +58,6 @@ class GrammarPreprocessorListenerImplTest {
     CobolWordContext cobolWordContext = mock(CobolWordContext.class);
     CopybookResolution resolution = mock(CopybookResolution.class);
     BufferedTokenStream tokens = mock(BufferedTokenStream.class);
-    TokenUtils tokenUtils = mock(TokenUtils.class);
     ReplacingService replacingService = mock(ReplacingService.class);
     CobolPreprocessor preprocessor = mock(CobolPreprocessor.class);
 
@@ -85,10 +83,10 @@ class GrammarPreprocessorListenerImplTest {
 
     when(resolution.resolve(copyNameCapitalized, DOCUMENT_URI, CPY_MODE_ENABLED)).thenReturn(model);
 
-    when(tokenUtils.retrieveHiddenTextToLeft(anyInt(), eq(tokens))).thenReturn(" ");
-    when(tokenUtils.notEOF(any(TerminalNode.class))).thenReturn(true);
+//    when(tokenUtils.retrieveHiddenTextToLeft(anyInt(), eq(tokens))).thenReturn(" ");
+//    when(tokenUtils.notEOF(any(TerminalNode.class))).thenReturn(true);
 
-    when(replacingService.applyReplacing(any(String.class), any(List.class), eq(tokens)))
+    when(replacingService.applyReplacing(any(String.class), any(List.class)))
         .thenReturn(content);
 
     when(preprocessor.process(
@@ -112,7 +110,7 @@ class GrammarPreprocessorListenerImplTest {
             tokens,
             new ArrayDeque<>(),
             CPY_MODE_ENABLED,
-            tokenUtils,
+//            tokenUtils,
             preprocessor,
             resolutions,
             replacingService);
@@ -157,7 +155,6 @@ class GrammarPreprocessorListenerImplTest {
     CobolWordContext cobolWordContext = mock(CobolWordContext.class);
     CopybookResolution resolution = mock(CopybookResolution.class);
     BufferedTokenStream tokens = mock(BufferedTokenStream.class);
-    TokenUtils tokenUtils = mock(TokenUtils.class);
     ReplacingService replacingService = mock(ReplacingService.class);
     CobolPreprocessor preprocessor = mock(CobolPreprocessor.class);
     ReplacingPhraseContext replacingPhraseContext = mock(ReplacingPhraseContext.class);
@@ -186,14 +183,14 @@ class GrammarPreprocessorListenerImplTest {
     when(cobolWordContext.getText()).thenReturn(copyName);
     when(context.replacingPhrase()).thenReturn(replacingPhraseContext);
     when(replacingPhraseContext.replaceClause()).thenReturn(replaceClauseContexts);
-    when(replacingService.applyReplacing(eq(content), eq(replaceClauseContexts), eq(tokens)))
-        .thenReturn(replacedContent);
+//    when(replacingService.applyReplacing(eq(content), eq(replaceClauseContexts), eq(tokens)))
+//        .thenReturn(replacedContent);
     when(resolution.resolve(copyName, DOCUMENT_URI, CPY_MODE_ENABLED)).thenReturn(model);
 
     when(context.getSourceInterval()).thenReturn(new Interval(3, 6));
 
-    when(tokenUtils.retrieveHiddenTextToLeft(anyInt(), eq(tokens))).thenReturn(" ");
-    when(tokenUtils.notEOF(any(TerminalNode.class))).thenReturn(true);
+//    when(tokenUtils.retrieveHiddenTextToLeft(anyInt(), eq(tokens))).thenReturn(" ");
+//    when(tokenUtils.notEOF(any(TerminalNode.class))).thenReturn(true);
 
     when(preprocessor.process(
             eq(copyUri), eq(replacedContent), any(ArrayDeque.class), eq(CPY_MODE_ENABLED)))
@@ -232,7 +229,7 @@ class GrammarPreprocessorListenerImplTest {
             tokens,
             new ArrayDeque<>(),
             CPY_MODE_ENABLED,
-            tokenUtils,
+//            tokenUtils,
             preprocessor,
             resolutions,
             replacingService);
@@ -254,7 +251,6 @@ class GrammarPreprocessorListenerImplTest {
     CobolWordContext cobolWordContext = mock(CobolWordContext.class);
     CopybookResolution resolution = mock(CopybookResolution.class);
     BufferedTokenStream tokens = mock(BufferedTokenStream.class);
-    TokenUtils tokenUtils = mock(TokenUtils.class);
     ReplacingService replacingService = mock(ReplacingService.class);
     CobolPreprocessor preprocessor = mock(CobolPreprocessor.class);
 
@@ -275,10 +271,10 @@ class GrammarPreprocessorListenerImplTest {
 
     when(cobolWordContext.getText()).thenReturn(copyName);
 
-    when(tokenUtils.retrieveHiddenTextToLeft(anyInt(), eq(tokens))).thenReturn(" ");
-    when(tokenUtils.notEOF(any(TerminalNode.class))).thenReturn(true);
+//    when(tokenUtils.retrieveHiddenTextToLeft(anyInt(), eq(tokens))).thenReturn(" ");
+//    when(tokenUtils.notEOF(any(TerminalNode.class))).thenReturn(true);
 
-    when(replacingService.applyReplacing(any(String.class), any(List.class), eq(tokens)))
+    when(replacingService.applyReplacing(any(String.class), any(List.class)))
         .thenReturn("");
 
     when(preprocessor.process(eq(""), eq(""), any(ArrayDeque.class), eq(CPY_MODE_ENABLED)))
@@ -300,7 +296,7 @@ class GrammarPreprocessorListenerImplTest {
             tokens,
             copybookStack,
             CPY_MODE_ENABLED,
-            tokenUtils,
+//            tokenUtils,
             preprocessor,
             resolutions,
             replacingService);
@@ -355,17 +351,16 @@ class GrammarPreprocessorListenerImplTest {
     when(context.replacingPhrase()).thenReturn(null);
 
     BufferedTokenStream tokens = mock(BufferedTokenStream.class);
-    TokenUtils tokenUtils = mock(TokenUtils.class);
     when(context.getSourceInterval()).thenReturn(new Interval(3, 6));
 
-    when(tokenUtils.retrieveHiddenTextToLeft(anyInt(), eq(tokens))).thenReturn(" ");
-
-    when(tokenUtils.notEOF(any(TerminalNode.class))).thenReturn(true);
+//    when(tokenUtils.retrieveHiddenTextToLeft(anyInt(), eq(tokens))).thenReturn(" ");
+//
+//    when(tokenUtils.notEOF(any(TerminalNode.class))).thenReturn(true);
 
     when(resolution.resolve(copyName, DOCUMENT_URI, CPY_MODE_ENABLED)).thenReturn(null);
 
     ReplacingService replacingService = mock(ReplacingService.class);
-    when(replacingService.applyReplacing(any(String.class), any(List.class), eq(tokens)))
+    when(replacingService.applyReplacing(any(String.class), any(List.class)))
         .thenReturn("");
 
     CobolPreprocessor preprocessor = mock(CobolPreprocessor.class);
@@ -403,7 +398,7 @@ class GrammarPreprocessorListenerImplTest {
             tokens,
             new ArrayDeque<>(),
             CPY_MODE_ENABLED,
-            tokenUtils,
+//            tokenUtils,
             preprocessor,
             resolutions,
             replacingService);
@@ -426,15 +421,16 @@ class GrammarPreprocessorListenerImplTest {
   @Test
   void testCopybookProcessingDisabled() {
     BufferedTokenStream tokens = mock(BufferedTokenStream.class);
-    TokenUtils tokenUtils = mock(TokenUtils.class);
     CopyStatementContext context = mock(CopyStatementContext.class);
     GrammarPreprocessorListenerImpl listener =
         new GrammarPreprocessorListenerImpl(
-            DOCUMENT_URI, tokens, null, CPY_MODE_DISABLED, tokenUtils, null, null, null);
+            DOCUMENT_URI, tokens, null, CPY_MODE_DISABLED,
+//                tokenUtils,
+                null, null, null);
 
     when(context.getSourceInterval()).thenReturn(new Interval(3, 6));
-    when(tokenUtils.retrieveHiddenTextToLeft(anyInt(), any())).thenReturn(" ");
-    when(tokenUtils.notEOF(any(TerminalNode.class))).thenReturn(true);
+//    when(tokenUtils.retrieveHiddenTextToLeft(anyInt(), any())).thenReturn(" ");
+//    when(tokenUtils.notEOF(any(TerminalNode.class))).thenReturn(true);
 
     listener.visitTerminal(node("smth", 1));
     listener.enterCopyStatement(context);
@@ -459,17 +455,18 @@ class GrammarPreprocessorListenerImplTest {
     CompilerOptionsContext context = mock(CompilerOptionsContext.class);
 
     BufferedTokenStream tokens = mock(BufferedTokenStream.class);
-    TokenUtils tokenUtils = mock(TokenUtils.class);
     when(context.getSourceInterval()).thenReturn(new Interval(1, 4));
 
-    when(tokenUtils.retrieveHiddenTextToLeft(anyInt(), eq(tokens))).thenReturn("");
-    when(tokenUtils.retrieveHiddenTextToLeft(eq(7), eq(tokens))).thenReturn(" ");
-
-    when(tokenUtils.notEOF(any(TerminalNode.class))).thenReturn(true);
+//    when(tokenUtils.retrieveHiddenTextToLeft(anyInt(), eq(tokens))).thenReturn("");
+//    when(tokenUtils.retrieveHiddenTextToLeft(eq(7), eq(tokens))).thenReturn(" ");
+//
+//    when(tokenUtils.notEOF(any(TerminalNode.class))).thenReturn(true);
 
     GrammarPreprocessorListenerImpl listener =
         new GrammarPreprocessorListenerImpl(
-            DOCUMENT_URI, tokens, null, null, tokenUtils, null, null, null);
+            DOCUMENT_URI, tokens, null, null,
+//                tokenUtils,
+                null, null, null);
 
     listener.enterCompilerOptions(context);
     listener.visitTerminal(node("PROCESS", 1));
@@ -510,22 +507,23 @@ class GrammarPreprocessorListenerImplTest {
     BufferedTokenStream tokens = mock(BufferedTokenStream.class);
     when(tokens.getTokens()).thenReturn(List.of(token1, token2));
 
-    TokenUtils tokenUtils = mock(TokenUtils.class);
 
-    when(tokenUtils.retrieveHiddenTextToLeft(0, tokens)).thenReturn("");
-    when(tokenUtils.retrieveHiddenTextToLeft(2, tokens)).thenReturn(" ");
-    when(tokenUtils.retrieveHiddenTextToLeft(3, tokens)).thenReturn("");
-    when(tokenUtils.retrieveHiddenTextToLeft(5, tokens)).thenReturn("");
-
-    when(tokenUtils.notEOF(node1)).thenReturn(true);
-    when(tokenUtils.notEOF(node2)).thenReturn(true);
-    when(tokenUtils.notEOF(node3)).thenReturn(true);
-    when(tokenUtils.notEOF(node4)).thenReturn(true);
-    when(tokenUtils.notEOF(node5)).thenReturn(false);
+//    when(tokenUtils.retrieveHiddenTextToLeft(0, tokens)).thenReturn("");
+//    when(tokenUtils.retrieveHiddenTextToLeft(2, tokens)).thenReturn(" ");
+//    when(tokenUtils.retrieveHiddenTextToLeft(3, tokens)).thenReturn("");
+//    when(tokenUtils.retrieveHiddenTextToLeft(5, tokens)).thenReturn("");
+//
+//    when(tokenUtils.notEOF(node1)).thenReturn(true);
+//    when(tokenUtils.notEOF(node2)).thenReturn(true);
+//    when(tokenUtils.notEOF(node3)).thenReturn(true);
+//    when(tokenUtils.notEOF(node4)).thenReturn(true);
+//    when(tokenUtils.notEOF(node5)).thenReturn(false);
 
     GrammarPreprocessorListenerImpl listener =
         new GrammarPreprocessorListenerImpl(
-            DOCUMENT_URI, tokens, null, null, tokenUtils, null, null, null);
+            DOCUMENT_URI, tokens, null, null,
+//                tokenUtils,
+                null, null, null);
 
     listener.visitTerminal(node1);
     // token2 is going to be treated as hidden, so it won't be passed to visitTerminal directly and
