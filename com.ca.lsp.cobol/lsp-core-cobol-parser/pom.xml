@@ -122,6 +122,9 @@
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>4.7</version>
+				<configuration>
+					<libDirectory>${basedir}/src/main/antlr4/com/ca/lsp/core/cobol/parser</libDirectory>
+				</configuration>
 				<executions>
 					<execution>
 						<id>run antlr</id>

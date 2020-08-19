@@ -8,6 +8,7 @@
 
 parser grammar CobolParser;
 options {tokenVocab = CobolLexer;}
+import CICSParser;
    
 startRule : compilationUnit EOF;
 
@@ -1475,7 +1476,7 @@ evaluateValue
 
 // exec cics statement
 execCicsStatement
-   : EXEC CICS ~END_EXEC*? END_EXEC DOT_FS?
+   : EXEC CICS allRules resp_options? END_EXEC DOT_FS?
    ;
 
 // exec sql statement
@@ -2633,7 +2634,7 @@ commentEntry
    ;
    
 cobolWord
-   : IDENTIFIER 
+   : IDENTIFIER | cicsWords
    | ABORT | AS | ASCII | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | ATTRIBUTE | AUTO | AUTO_SKIP
    | BACKGROUND_COLOR | BACKGROUND_COLOUR | BEEP | BELL | BINARY | BIT | BLINK | BLOB | BOUNDS
    | CAPABLE | CCSVERSION | CHANGED | CHANNEL | CLOB | CLOSE_DISPOSITION | COBOL | COMMITMENT | CONTROL_POINT | CONVENTION | CRUNCH | CURSOR
