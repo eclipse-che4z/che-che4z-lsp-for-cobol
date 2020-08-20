@@ -54,7 +54,7 @@ class TestReplacingWithDifferentPatternsShowsError {
       "Syntax error on 'COPY' expected {<EOF>, LEVEL, '66', '88', "
           + "COMMUNICATION, DATA_BASE, END, EXEC, FILE, ID, IDENTIFICATION, "
           + "LINKAGE, LOCAL_STORAGE, PROCEDURE, PROGRAM_LIBRARY, REPORT, "
-          + "SCREEN, WORKING_STORAGE, COPYENTRY, COPYEXIT}";
+          + "SCREEN, WORKING_STORAGE}";
 
   @Test
   void test() {
