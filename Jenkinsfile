@@ -110,7 +110,7 @@ pipeline {
                                 sh 'mvn -version'
                                 sh 'set MAVEN_OPTS=-Xms1024m'
                                 sh 'mvn clean verify --no-transfer-progress'
-                                sh 'cp server/target/server-*.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
+                                sh 'cp target/server-*.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
                             }
                         }
                     }
