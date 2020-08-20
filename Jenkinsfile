@@ -106,11 +106,11 @@ pipeline {
                 stage('Build LSP server part') {
                     steps {
                         container('maven') {
-                            dir('com.ca.lsp.cobol') {
+                            dir('server') {
                                 sh 'mvn -version'
                                 sh 'set MAVEN_OPTS=-Xms1024m'
                                 sh 'mvn clean verify --no-transfer-progress'
-                                sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
+                                sh 'cp server/target/server-*.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
                             }
                         }
                     }
