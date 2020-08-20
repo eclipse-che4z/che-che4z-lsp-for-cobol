@@ -941,7 +941,7 @@ otherLevel: LEVEL
 // end of data description utils ---------------------------
 
 dataDescriptionEntry
-   : dataDescriptionEntryFormat1 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat3 | dataDescriptionEntryExecSql | dataDescriptionEntryCpy | dataDescriptionExitCpy
+   : dataDescriptionEntryFormat1 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat3 | dataDescriptionEntryExecSql
    ;
 
 dataDescriptionEntryFormat1
@@ -958,14 +958,6 @@ dataDescriptionEntryFormat3
 
 dataDescriptionEntryExecSql
    : execSqlStatement+
-   ;
-
-dataDescriptionEntryCpy
-   : COPYENTRY
-   ;
-
-dataDescriptionExitCpy
-   : COPYEXIT
    ;
    
 dataGroupUsageClause
@@ -1153,7 +1145,7 @@ paragraph
    ;
 
 sentence
-   : (statement* DOT_FS) | skipStatement+ | enterCpy | exitCpy
+   : (statement* DOT_FS) | skipStatement+
    ;
 
 statement
@@ -1162,15 +1154,7 @@ statement
     exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement | 
     multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | 
     sendStatement | serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | titleStatement | unstringStatement | writeStatement | xmlStatement | enterCpy | exitCpy
-   ;
-
-enterCpy
-   : COPYENTRY
-   ;
-
-exitCpy
-   : COPYEXIT
+    terminateStatement | titleStatement | unstringStatement | writeStatement | xmlStatement
    ;
 
 // accept statement
