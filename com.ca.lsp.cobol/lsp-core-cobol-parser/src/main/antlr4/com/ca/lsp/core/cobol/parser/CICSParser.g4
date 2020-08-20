@@ -29,8 +29,8 @@ allRules: cics_abend | cics_acquire | cics_add | cics_address | cics_allocate | 
           cics_wsaepr | cics_xctl
         ;
 
-resp_options: RESP LPARENCHAR IDENTIFIER RPARENCHAR resp2_option?;
-resp2_option: RESP2 LPARENCHAR IDENTIFIER RPARENCHAR;
+//resp_options: RESP LPARENCHAR IDENTIFIER RPARENCHAR resp2_option?;
+//resp2_option: RESP2 LPARENCHAR IDENTIFIER RPARENCHAR;
 
 
 /** ABEND: */

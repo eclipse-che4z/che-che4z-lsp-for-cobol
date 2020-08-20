@@ -1476,7 +1476,7 @@ evaluateValue
 
 // exec cics statement
 execCicsStatement
-   : EXEC CICS allRules resp_options? END_EXEC DOT_FS?
+   : EXEC CICS allRules END_EXEC DOT_FS?
    ;
 
 // exec sql statement

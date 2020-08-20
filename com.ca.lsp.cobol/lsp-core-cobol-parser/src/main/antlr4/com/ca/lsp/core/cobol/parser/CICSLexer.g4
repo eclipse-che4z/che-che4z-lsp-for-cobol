@@ -715,20 +715,87 @@ YYYYDDMM : Y Y Y Y D D M M;
 YYYYMMDD : Y Y Y Y M M D D;
 ZERO_DIGITAL : Z E R O '_' D I G I T A L;
 
-PLUSCHAR: '+';
-MINUSCHAR: '-';
+RESPCHAR: RESP LPARENCHAR IDENTIFIER RPARENCHAR -> channel(HIDDEN);
+RESP2CHAR: RESP2 LPARENCHAR IDENTIFIER RPARENCHAR -> channel(HIDDEN);
+
+// symbols
+AMPCHAR : '&';
+ASTERISKCHAR : '*';
+DOUBLEASTERISKCHAR : '**';
+COLONCHAR : ':';
+COMMACHAR : ',';
+COMMENTTAG : '*>';
+COMMENTENTRYTAG : '*>CE';
+DOLLARCHAR : '$';
+DOUBLEQUOTE : '"';
+// period full stopPosition
+DOT_FS : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ | '.' EOF;
+DOT : '.';
+EQUALCHAR : '=';
+LESSTHANCHAR : '<';
+LESSTHANOREQUAL : '<=';
+LPARENCHAR : '(';
+MINUSCHAR : '-';
+MORETHANCHAR : '>';
+MORETHANOREQUAL : '>=';
+NOTEQUALCHAR : '<>';
+PLUSCHAR : '+';
+SINGLEQUOTE : '\'';
+RPARENCHAR : ')';
+SLASHCHAR : '/';
+COPYENTRY: ('*>CPYENTER<URI>' .*? '</URI>');
+COPYEXIT: '*>CPYEXIT' + NEWLINE;
+
+INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+;
+
+NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
+
+NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
+
+IDENTIFIER : ([a-zA-Z0-9]+ ([-_]+ [a-zA-Z0-9]+)*);
+FILENAME : [a-zA-Z0-9]+ '.' [a-zA-Z0-9]+;
+
+// whitespace, line breaks, comments, ...
+NEWLINE : '\r'? '\n' -> channel(HIDDEN);
+COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
+COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*  -> channel(HIDDEN);
+WS : [ \t\f;]+ -> channel(HIDDEN);
+SEPARATOR : ', ' -> channel(HIDDEN);
+
+// treat all the non-processed tokens as errors
+ERRORCHAR : . ;
 
 FIRST_THREE_DIGITS: [1-3];
 FIRST_FOUR_DIGITS: [1-4];
 FIRST_EIGHT_DIGIT: [1-8];
 FIRST_24_DIGITS: [1-24];
-
-INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+;
 ZERO_DIGIT: '0';
 
-IDENTIFIER : ([a-zA-Z0-9]+ ([-_]+ [a-zA-Z0-9]+)*);
-FILENAME : [a-zA-Z0-9]+ '.' [a-zA-Z0-9]+;
 
+fragment HEXNUMBER :
+	X '"' [0-9A-F]+ '"'
+	| X '\'' [0-9A-F]+ '\''
+;
+
+fragment NULLTERMINATED :
+	Z '"' (~["\n\r] | '""' | '\'')* '"'
+	| Z '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
+
+fragment STRINGLITERAL :
+	'"' (~["\n\r] | '""' | '\'')* '"'
+	| '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
+
+fragment UNTRMSTRINGLITERAL :
+	'"' (~["\n\r] | '""' | '\'')*
+	| '\'' (~['\n\r] | '\'\'' | '"')*
+;
+
+fragment DBCSLITERAL :
+	[GN] '"' (~["\n\r] | '""' | '\'')* '"'
+	| [GN] '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
 
 fragment DIGIT: [0-9];
 // case insensitive chars
