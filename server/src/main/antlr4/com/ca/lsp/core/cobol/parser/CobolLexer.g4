@@ -13,6 +13,7 @@
  */
     
 lexer grammar CobolLexer;
+channels{TECHNICAL}
 
 LEVEL: ([1-9])|([0][1-9])|([1234][0-9])| '77';
 LEVEL_NUMBER_66 : '66';
@@ -594,8 +595,8 @@ PLUSCHAR : '+';
 SINGLEQUOTE : '\'';
 RPARENCHAR : ')';
 SLASHCHAR : '/';
-COPYENTRY: ('*>CPYENTER<URI>' .*? '</URI>');
-COPYEXIT: '*>CPYEXIT' + NEWLINE;
+COPYENTRY: ('*>CPYENTER<URI>' .*? '</URI>') -> channel(TECHNICAL);
+COPYEXIT: '*>CPYEXIT' + NEWLINE -> channel(TECHNICAL);
 
 INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+;
 
