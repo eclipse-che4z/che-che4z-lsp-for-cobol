@@ -34,7 +34,7 @@ class TestReplacingPseudoTextReplacesLevelNumber {
           + "2      DATA DIVISION.\n"
           + "3      WORKING-STORAGE SECTION.\n"
           + "4      01  {$*PARENT}.\n"
-          + "5      COPY {~REPL} REPLACING == 01 AA-PARENT == BY == 05  EE-PARENT ==\n"
+          + "5      COPY {~REPL} REPLACING == 01 AA-PARENT == by == 05  EE-PARENT ==\n"
           + "6                          ==AA-CHILD1==    BY ==EE-CHILD1==\n"
           + "7                          ==AA-CHILD2==    BY ==EE-CHILD2==.\n"
           + "8      PROCEDURE DIVISION.\n"

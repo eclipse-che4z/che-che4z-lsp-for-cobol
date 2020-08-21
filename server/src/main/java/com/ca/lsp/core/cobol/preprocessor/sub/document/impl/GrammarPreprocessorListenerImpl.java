@@ -21,7 +21,6 @@ import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListener;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.ReplacingService;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.TokenUtils;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -34,6 +33,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -44,9 +44,11 @@ import static com.ca.lsp.core.cobol.model.ErrorSeverity.ERROR;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.INFO;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static org.antlr.v4.runtime.Lexer.HIDDEN;
+import static org.antlr.v4.runtime.Token.EOF;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -56,6 +58,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 @Slf4j
 public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListener
     implements GrammarPreprocessorListener {
+
   private static final String RECURSION_DETECTED = "Recursive copybook declaration for: %s";
   private static final String COPYBOOK_OVER_8_CHARACTERS =
       "Copybook declaration has more than 8 characters for: %s";
@@ -64,11 +67,11 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
   private final Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
+  private final List<Pair<String, String>> replacingClauses = new ArrayList<>();
   private final NamedSubContext copybooks = new NamedSubContext();
   private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
   private final Map<Integer, Integer> shifts = new HashMap<>();
 
-  private TokenUtils tokenUtils;
   private String documentUri;
   private BufferedTokenStream tokens;
   private String copybookProcessingMode;
@@ -83,7 +86,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       @Assisted BufferedTokenStream tokens,
       @Assisted Deque<CopybookUsage> copybookStack,
       @Assisted("copybookProcessingMode") String copybookProcessingMode,
-      TokenUtils tokenUtils,
       CobolPreprocessor preprocessor,
       Provider<CopybookResolution> resolutions,
       ReplacingService replacingService) {
@@ -91,7 +93,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     this.tokens = tokens;
     this.copybookStack = copybookStack;
     this.copybookProcessingMode = copybookProcessingMode;
-    this.tokenUtils = tokenUtils;
     this.preprocessor = preprocessor;
     this.resolutions = resolutions;
     this.replacingService = replacingService;
@@ -128,7 +129,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitReplaceArea(@Nonnull ReplaceAreaContext ctx) {
-    String content = applyReplacing(read(), ctx.replaceByStatement().replaceClause());
+    String content = applyReplacing(read(), replacingClauses);
+    replacingClauses.clear();
 
     pop();
     write(content);
@@ -146,7 +148,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       return;
     }
     CopySourceContext copySource = ctx.copySource();
-    List<ReplaceClauseContext> replacing = getReplacing(ctx);
 
     String copybookName = retrieveCopybookName(copySource);
     Position position = retrievePosition(copySource);
@@ -154,8 +155,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
     String uri = model.getUri();
     String rawContent = model.getContent();
-    String copybookId = getCopybookId(uri, replacing);
-    String replacedContent = applyReplacing(rawContent, replacing);
+    String copybookId = getCopybookId(uri, replacingClauses);
+    String replacedContent = applyReplacing(rawContent, replacingClauses);
+    replacingClauses.clear();
 
     ExtendedDocument copybookDocument =
         processCopybook(copybookName, uri, replacedContent, position);
@@ -172,13 +174,42 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
+  public void enterReplaceLiteral(ReplaceLiteralContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitReplaceLiteral(ReplaceLiteralContext ctx) {
+    replacingClauses.add(replacingService.retrieveTokenReplacingPattern(read()));
+    pop();
+  }
+
+  @Override
+  public void enterReplacePseudoText(ReplacePseudoTextContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitReplacePseudoText(ReplacePseudoTextContext ctx) {
+    replacingClauses.add(replacingService.retrievePseudoTextReplacingPattern(read()));
+    pop();
+  }
+
+  @Override
   public void visitTerminal(@Nonnull TerminalNode node) {
     int tokPos = node.getSourceInterval().a;
-    write(tokenUtils.retrieveHiddenTextToLeft(tokPos, tokens));
+    write(retrieveHiddenTextToLeft(tokPos, tokens));
 
-    if (tokenUtils.notEOF(node)) {
+    if (node.getSymbol().getType() != EOF) {
       write(node.getText());
     }
+  }
+
+  private String retrieveHiddenTextToLeft(int tokPos, BufferedTokenStream tokens) {
+
+    return ofNullable(tokens.getHiddenTokensToLeft(tokPos, HIDDEN))
+        .map(it -> it.stream().map(Token::getText).collect(joining()))
+        .orElse("");
   }
 
   private void accumulateCopybookShift(Interval sourceInterval) {
@@ -212,12 +243,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     return peek().toString();
   }
 
-  private List<ReplaceClauseContext> getReplacing(@Nonnull CopyStatementContext ctx) {
-    return ofNullable(ctx.replacingPhrase())
-        .map(ReplacingPhraseContext::replaceClause)
-        .orElse(emptyList());
-  }
-
   private void collectNestedSemanticData(
       String uri, String copybookId, ExtendedDocument copybookDocument) {
     copybooks.merge(copybookDocument.getCopybooks());
@@ -238,16 +263,14 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     write(CPY_EXIT_TAG);
   }
 
-  private String applyReplacing(
-      String rawContent, List<ReplaceClauseContext> replaceClauseContexts) {
-    return replacingService.applyReplacing(rawContent, replaceClauseContexts, tokens);
+  private String applyReplacing(String rawContent, List<Pair<String, String>> replacePatterns) {
+    return replacingService.applyReplacing(rawContent, replacePatterns);
   }
 
-  private String getCopybookId(
-      String copybookURI, List<ReplaceClauseContext> replacingPhraseContexts) {
+  private String getCopybookId(String copybookURI, List<Pair<String, String>> replacingPatterns) {
     return copybookURI
-        + replacingPhraseContexts.stream()
-            .map(RuleContext::getText)
+        + replacingPatterns.stream()
+            .map(Object::toString)
             .reduce(String::concat)
             .orElse("")
             .replaceAll("[^a-zA-Z0-9]+", "")
