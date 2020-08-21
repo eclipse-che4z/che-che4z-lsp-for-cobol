@@ -14,7 +14,7 @@
 parser grammar CICSParser;
 options {tokenVocab = CobolLexer;}
 
-allRules: cics_abend | cics_acquire | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
+allRules: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
           cics_build | cics_cancel | cics_change | cics_change_task | cics_check | cics_connect | cics_converttime |
           cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
           cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
@@ -26,41 +26,93 @@ allRules: cics_abend | cics_acquire | cics_add | cics_address | cics_allocate | 
           cics_soapfault | cics_spoolclose | cics_spoolopen | cics_spoolread | cics_spoolwrite | cics_start |
           cics_startbr | cics_startbrowse | cics_suspend | cics_syncpoint | cics_test | cics_transform | cics_unlock |
           cics_update | cics_verify | cics_wait | cics_waitcics | cics_web | cics_write | cics_writeq | cics_wsacontext |
-          cics_wsaepr | cics_xctl | cics_converse
+          cics_wsaepr | cics_xctl | cics_converse | cics_abend | cics_acquire
         ;
 
-//resp_options: RESP LPARENCHAR IDENTIFIER RPARENCHAR resp2_option?;
-//resp2_option: RESP2 LPARENCHAR IDENTIFIER RPARENCHAR;
+/** RECEIVE: */
+cics_receive: RECEIVE (cics_receive_group | cics_receive_appc | cics_receive_lu61 | cics_partn | cics_rcv_map);
+cics_receive_group: cics_into? cics_fLength ASIS? BUFFER? NOTRUNCATE?;
+cics_receive_appc: (CONVID cics_name)? cics_into cics_fLength NOTRUNCATE? (STATE cics_cvda)?;
+cics_receive_lu61: (SESSION cics_name)? cics_into cics_fLength NOTRUNCATE?;
+cics_fLength: (LENGTH cics_data_area | FLENGTH cics_data_area) cics_maxlength?;
+
+cics_rcv_map: MAP (cics_receive_map | cics_receive_mappingdev);
+cics_receive_map: cics_name (MAPSET cics_name)? cics_into? ((TERMINAL ASIS? (INPARTN cics_name)?) | (FROM cics_data_area (LENGTH cics_data_value)?))?;
+cics_receive_mappingdev: cics_name MAPPINGDEV cics_data_value FROM cics_data_area (LENGTH cics_data_area)? (MAPSET cics_name)?  cics_into?;
+cics_partn: PARTN cics_data_area cics_partn_bms?;
+cics_partn_bms: cics_into LENGTH cics_data_value ASIS?;
+
+
+
+/** SEND: */
+cics_send: SEND (cics_send_group | cics_send_mro | cics_send_appc | cics_send_control | cics_send_map | cics_send_page | cics_send_partnset | cics_send_text);
+cics_send_group: cics_send_from (cics_send_from_wait | cics_send_from_ctlchar | cics_send_3600_01 | cics_send_2980);
+
+cics_send_from_wait: WAIT? (INVITE | LAST)? (cics_send_defaultmax | cics_send_lu23);
+cics_send_defaultmax: (CNOTCOMPL | DEFRESP)? STRFIELD? FMH?;
+cics_send_lu23: (cics_send_erase? (CTLCHAR cics_data_value)? | STRFIELD?) DEFRESP?;
+cics_send_from_ctlchar: (CTLCHAR cics_data_value)? (cics_send_3560_3270 | cics_send_2260);
+cics_send_3560_3270: WAIT? cics_send_erase? (INVITE | LAST)? (CNOTCOMPL | DEFRESP)? FMH?;
+cics_send_2260: (LINEADDR cics_data_value)? WAIT? LEAVEKB?;
+cics_send_3600_01: (LDC cics_name | FMH)? WAIT? (INVITE | LAST)? (CNOTCOMPL | DEFRESP)?;
+cics_send_2980: (PASSBK | CBUFF)?;
+cics_send_mro: (SESSION cics_name)? WAIT? (INVITE | LAST)? (ATTACHID cics_name)? (FROM cics_data_area)? (LENGTH cics_data_value | FLENGTH cics_data_value)? FMH? DEFRESP? (STATE cics_cvda)?;
+cics_send_appc: (CONVID cics_name)? cics_send_from? (INVITE | LAST)? (CONFIRM | WAIT)? (STATE cics_cvda)?;
+cics_send_control: CONTROL (cics_send_control_min | cics_send_control_std | cics_send_control_full);
+cics_send_control_min: cics_send_cursor? FORMFEED? (cics_send_erase | ERASEAUP)? PRINT? FREEKB? ALARM? FRSET?;
+cics_send_control_std: (MSR cics_data_value)? ((OUTPARTN cics_name)? (ACTPARTN cics_name)? | (LDC cics_name)?);
+cics_send_control_full: ACCUM? (cics_send_terminal | (SET cics_ref) | PAGING)? (REQID cics_name)? (HONEOM | L40 | L64 | L80)?;
+cics_send_map: MAP cics_name (cics_send_map_null | cics_send_map_mappingdev);
+cics_send_map_null: (cics_send_map_min | cics_send_map_std | cics_send_map_full);
+cics_send_map_min: (MAPSET cics_name)? (MAPONLY? | (FROM cics_data_area)? DATAONLY? (LENGTH cics_data_value)?) cics_send_cursor? FORMFEED? (cics_send_erase | ERASEAUP)? PRINT? FREEKB? ALARM? FRSET?;
+cics_send_map_std: NLEOM? (MSR cics_data_value)? (FMHPARM cics_name)? ((OUTPARTN cics_name)? (ACTPARTN cics_name)? | (LDC cics_name)?);
+cics_send_map_full: ACCUM? (cics_send_terminal | (SET cics_ref) | PAGING)? (REQID cics_name)? NOFLUSH? (HONEOM | L40 | L64 | L80)?;
+cics_send_map_mappingdev: MAPPINGDEV cics_data_value SET cics_ref (MAPSET cics_name)? (MAPONLY? | (FROM cics_data_area)? DATAONLY? (LENGTH cics_data_value)?) cics_send_cursor? FORMFEED? (ERASE | ERASEAUP)? PRINT? FREEKB? ALARM? FRSET?;
+cics_send_page: PAGE (RELEASE (TRANSID cics_name)? | RETAIN?) (TRAILER cics_data_area)? (SET cics_ref)? (cics_send_autopage | NOAUTOPAGE)? OPERPURGE? (FMHPARM cics_name)? LAST?;
+cics_send_partnset: PARTNSET cics_name?;
+cics_send_text: TEXT (cics_send_text_null | cics_send_text_mapped | cics_send_text_noedit);
+cics_send_text_null: (cics_send_text_std | cics_send_text_full);
+cics_send_text_std: FROM cics_data_area (LENGTH cics_data_value)? (CURSOR cics_data_value)? FORMFEED? cics_send_erase? PRINT? FREEKB? ALARM? NLEOM? (FMHPARM cics_name)? ((OUTPARTN cics_name)? (ACTPARTN cics_name)? | (LDC cics_name)?) (MSR cics_data_value)?;
+cics_send_text_full: (cics_send_terminal | (SET cics_ref) | PAGING)? (REQID cics_name)? (HEADER cics_data_area)? (TRAILER cics_data_area)? ((JUSTIFY cics_data_value) | JUSFIRST | JUSLAST)? ACCUM? (HONEOM | L40 | L64 | L80)?;
+cics_send_text_mapped: MAPPED FROM cics_data_area (LENGTH cics_data_value)? (cics_send_terminal | (SET cics_ref) | PAGING)? (REQID cics_name)?;
+cics_send_text_noedit: NOEDIT FROM cics_data_area (LENGTH cics_data_value)? cics_send_erase? PRINT? FREEKB? ALARM? (OUTPARTN cics_name)? (cics_send_terminal | PAGING)? (REQID cics_name)? (HONEOM | L40 | L64 | L80)?;
+
+cics_send_from: FROM cics_data_area (LENGTH cics_data_value | FLENGTH cics_data_value);
+cics_send_erase: ERASE (DEFAULT | ALTERNATE)?;
+cics_send_cursor: CURSOR cics_data_value?;
+cics_send_terminal: TERMINAL WAIT? LAST?;
+cics_send_autopage: AUTOPAGE (CURRENT | ALL)?;
 
 /** CONVERSE: */
 cics_converse: CONVERSE (cics_converse_appc | cics_converse_lu23_3270 | cics_converse_lu61 | cics_converse_mro | cics_cnv_group);
 
 cics_cnv_group: cics_converse_from_into_to (cics_converse_default | cics_converse_lu4 | cics_converse_scs | cics_converse_3601 | cics_converse_3614_3653_3767 | cics_converse_3650int_3770 | cics_converse_3650_3270 | cics_converse_3680_3790F | cics_converse_3790_3270 | cics_converse_2260);
-cics_converse_default: cics_maxlength NOTRUNCATE?;
-cics_converse_lu4:  DEFRESP? cics_maxlength FMH? NOTRUNCATE?;
-cics_converse_scs:   cics_maxlength DEFRESP? STRFIELD? NOTRUNCATE?;
-cics_converse_3601:  (LDC cics_name | FMH)? DEFRESP? cics_maxlength NOTRUNCATE?;
-cics_converse_3614_3653_3767:   DEFRESP? cics_maxlength NOTRUNCATE?;
-cics_converse_3650int_3770:   DEFRESP? FMH? cics_maxlength NOTRUNCATE?;
-cics_converse_3650_3270:   (CTLCHAR cics_data_value)?  cics_converse_erase? DEFRESP? FMH? cics_maxlength NOTRUNCATE?;
-cics_converse_3680_3790F:   FMH? DEFRESP? cics_maxlength NOTRUNCATE?;
+cics_converse_default: cics_maxlength? NOTRUNCATE?;
+cics_converse_lu4:  DEFRESP? cics_maxlength? FMH? NOTRUNCATE?;
+cics_converse_scs:   cics_maxlength? DEFRESP? STRFIELD? NOTRUNCATE?;
+cics_converse_3601:  (LDC cics_name | FMH)? DEFRESP? cics_maxlength? NOTRUNCATE?;
+cics_converse_3614_3653_3767:   DEFRESP? cics_maxlength? NOTRUNCATE?;
+cics_converse_3650int_3770:   DEFRESP? FMH? cics_maxlength? NOTRUNCATE?;
+cics_converse_3650_3270:   (CTLCHAR cics_data_value)?  cics_converse_erase? DEFRESP? FMH? cics_maxlength? NOTRUNCATE?;
+cics_converse_3680_3790F:   FMH? DEFRESP? cics_maxlength? NOTRUNCATE?;
 cics_converse_3790_3270:   DEFRESP? (CTLCHAR cics_data_value)? cics_converse_erase2?;
 cics_converse_2260:  cics_converse_default (CTLCHAR cics_data_value)? (LINEADDR cics_data_value)? LEAVEKB?;
 
 cics_converse_appc:  (CONVID cics_name)? cics_converse_from_into_to cics_converse_default (STATE cics_cvda)?;
-cics_converse_lu23_3270:  cics_converse_from_into (cics_converse_erase? (CTLCHAR cics_data_value)? | STRFIELD?) (TOLENGTH cics_data_area | TOFLENGTH cics_data_area) cics_maxlength DEFRESP? NOTRUNCATE? ASIS?;
-cics_converse_lu61:  cics_converse_from61? (CONVID cics_name | SESSION cics_name)? (ATTACHID cics_name)? (INTO cics_data_area | SET cics_ref) (TOLENGTH cics_data_area | TOFLENGTH cics_data_area) cics_maxlength NOTRUNCATE? DEFRESP?;
-cics_converse_mro:  (CONVID cics_name | SESSION cics_name)? (ATTACHID cics_name)? cics_converse_from61? (TOLENGTH cics_data_area | TOFLENGTH cics_data_area) cics_maxlength NOTRUNCATE? DEFRESP? (STATE cics_cvda)?;
+cics_converse_lu23_3270:  cics_converse_from_into (cics_converse_erase? (CTLCHAR cics_data_value)? | STRFIELD?) (TOLENGTH cics_data_area | TOFLENGTH cics_data_area) cics_maxlength? DEFRESP? NOTRUNCATE? ASIS?;
+cics_converse_lu61:  cics_converse_from61? (CONVID cics_name | SESSION cics_name)? (ATTACHID cics_name)? cics_into (TOLENGTH cics_data_area | TOFLENGTH cics_data_area) cics_maxlength? NOTRUNCATE? DEFRESP?;
+cics_converse_mro:  (CONVID cics_name | SESSION cics_name)? (ATTACHID cics_name)? cics_converse_from61? (TOLENGTH cics_data_area | TOFLENGTH cics_data_area) cics_maxlength? NOTRUNCATE? DEFRESP? (STATE cics_cvda)?;
 
 cics_converse_erase: ERASE (DEFAULT | ALTERNATE)?;
-cics_converse_erase2: cics_converse_erase cics_maxlength NOTRUNCATE?;
+cics_converse_erase2: cics_converse_erase cics_maxlength? NOTRUNCATE?;
 
 cics_converse_from: FROM cics_data_area (FROMLENGTH cics_data_value | FROMFLENGTH cics_data_value);
 cics_converse_from61: cics_converse_from FMH?;
 
-cics_converse_from_into: cics_converse_from (INTO cics_data_area | SET cics_ref);
+cics_into: (INTO cics_data_area | SET cics_ref);
+cics_converse_from_into: cics_converse_from cics_into;
 cics_converse_from_into_to: cics_converse_from_into (TOLENGTH cics_data_area | TOFLENGTH cics_data_area);
-cics_maxlength: (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)?;
+cics_maxlength: MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value;
 
 
 /** ABEND: */
@@ -247,7 +299,7 @@ cics_extract_certificate: CERTIFICATE cics_ref (LENGTH cics_data_area)? (SERIALN
                           (LOCALITY cics_ref)? (LOCALITYLEN cics_data_area)? (ORGANIZATION cics_ref)?
                           (ORGANIZATLEN cics_data_area)? (ORGUNIT cics_ref)? (ORGUNITLEN cics_data_area)?;
 
-cics_extract_logonmsg: LOGONMSG (INTO cics_data_area | SET cics_ref) LENGTH cics_data_area;
+cics_extract_logonmsg: LOGONMSG cics_into LENGTH cics_data_area;
 cics_extract_process: PROCESS cics_extract_procname? (CONVID cics_name)? (SYNCLEVEL cics_data_area)? cics_extract_piplist?;
 cics_extract_procname: PROCNAME cics_data_area PROCLENGTH cics_data_area (MAXPROCLEN cics_data_value)?;
 cics_extract_piplist: PIPLIST cics_ref PIPLENGTH cics_data_area;
@@ -305,7 +357,7 @@ cics_gds_process: PROCESS CONVID cics_name cics_extract_procname? (SYNCLEVEL cic
 cics_gds_free: FREE CONVID cics_name CONVDATA cics_data_area RETCODE cics_data_area (STATE cics_cvda)?;
 cics_gds_issue: ISSUE (ABEND | CONFIRMATION | ERROR | PREPARE | SIGNAL) CONVID cics_name CONVDATA cics_data_area
                 RETCODE cics_data_area (STATE cics_cvda)?;
-cics_gds_receive: RECEIVE CONVID cics_name (INTO cics_data_area | SET cics_ref) FLENGTH cics_data_area (MAXFLENGTH
+cics_gds_receive: RECEIVE CONVID cics_name cics_into FLENGTH cics_data_area (MAXFLENGTH
                   cics_data_value)? (BUFFER | LLID) CONVDATA cics_data_area RETCODE cics_data_area (STATE cics_cvda)?;
 cics_gds_send: SEND CONVID cics_name cics_gds_from? (INVITE | LAST)? (CONFIRM | WAIT)? CONVDATA cics_data_area RETCODE
                cics_data_area (STATE cics_cvda)?;
@@ -399,7 +451,7 @@ cics_issue_note: NOTE cics_issue_destid cics_issue_volume cics_issue_ridfld;
 cics_issue_pass: PASS LUNAME cics_name cics_issue_from? (LOGMODE cics_data_value | LOGONLOGMODE)? NOQUIESCE?;
 cics_issue_from: FROM cics_data_area LENGTH cics_data_value;
 cics_issue_query: QUERY cics_issue_destid cics_issue_volume?;
-cics_issue_receive: RECEIVE (INTO cics_data_area | SET cics_ref) (LENGTH cics_data_area)?;
+cics_issue_receive: RECEIVE cics_into (LENGTH cics_data_area)?;
 cics_issue_replace: REPLACE cics_issue_destid cics_issue_volume? FROM cics_data_area (LENGTH cics_data_value)? RIDFLD
                     cics_data_area (KEYLENGTH cics_data_value (KEYNUMBER cics_data_value)? | RRN) DEFRESP? NOWAIT?;
 cics_issue_send: SEND (cics_issue_destid | cics_issue_subaddr)? cics_issue_volume? FROM cics_data_area
@@ -463,20 +515,20 @@ cics_read_update: UPDATE (TOKEN cics_data_area)?;
 cics_read_keylength: KEYLENGTH cics_data_value GENERIC?;
 
 /** READNEXT */
-cics_readnext: READNEXT FILE cics_mama (INTO cics_data_area | SET cics_ref) (UNCOMMITTED | CONSISTENT | REPETABLE |
+cics_readnext: READNEXT FILE cics_mama cics_into (UNCOMMITTED | CONSISTENT | REPETABLE |
                UPDATE TOKEN cics_data_area)? RIDFLD cics_data_area (KEYLENGTH cics_data_value)? (REQID cics_data_value)?
                (cics_readnext_sysid | LENGTH cics_data_area)? (RBA | RRN | XRBA)? NOSUSPEND?;
 cics_readnext_sysid: SYSID cics_system (LENGTH cics_data_area)?;
 
 /** READPREV */
-cics_readprev: READPREV FILE cics_mama (INTO cics_data_area | SET cics_ref) (UNCOMMITTED | CONSISTENT | REPETABLE |
+cics_readprev: READPREV FILE cics_mama cics_into (UNCOMMITTED | CONSISTENT | REPETABLE |
                UPDATE TOKEN cics_data_area)? RIDFLD cics_data_area (KEYLENGTH cics_data_value)? (REQID cics_data_value)?
                cics_readnext_sysid? LENGTH cics_data_area (RBA | RRN | XRBA)? NOSUSPEND?;
 
 /** READQ TD / TS */
 cics_readq: READQ (cics_readq_td | cics_readq_ts);
-cics_readq_td: TD QUEUE cics_name (INTO cics_data_area | SET cics_ref) (LENGTH cics_data_area)? (SYSID cics_system)? NOSUSPEND?;
-cics_readq_ts: TS? (QUEUE cics_name | QNAME cics_name) (INTO cics_data_area | SET cics_ref) (LENGTH cics_data_area)?
+cics_readq_td: TD QUEUE cics_name cics_into (LENGTH cics_data_area)? (SYSID cics_system)? NOSUSPEND?;
+cics_readq_ts: TS? (QUEUE cics_name | QNAME cics_name) cics_into (LENGTH cics_data_area)?
                (NUMITEMS cics_data_area)? (NEXT | ITEM cics_data_value)? (SYSID cics_system)?;
 
 /** RECEIVE */
@@ -499,7 +551,7 @@ cics_resume: RESUME (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value);
 
 /** RETRIEVE - / REATTACH EVENT / SUBEVENT */
 cics_retrieve: RETRIEVE (cics_retrieve_null | cics_retrieve_event);
-cics_retrieve_null: (INTO cics_data_area | SET cics_ref) (LENGTH cics_data_area)? (RTRANSID cics_data_area)?
+cics_retrieve_null: cics_into (LENGTH cics_data_area)? (RTRANSID cics_data_area)?
                     (RTERMID cics_data_area)? (QUEUE cics_data_area)? WAIT?;
 cics_retrieve_event: (REATTACH | SUBEVENT cics_data_area) EVENT cics_data_area (EVENTTYPE cics_cvda)?;
 
@@ -705,13 +757,13 @@ cics_web_rnformfield: (FORMFIELD cics_data_area | QUERYPARM cics_data_area) NAME
 cics_web_rnhttpheader: HTTPHEADER cics_data_area NAMELENGTH cics_data_area (SESSTOKEN cics_data_value)?
                       VALUE cics_data_area VALUELENGTH cics_data_area;
 cics_web_receive: RECEIVE (cics_web_rserver | cics_web_rtocontainer | cics_web_rsesstoken);
-cics_web_rserver: (INTO cics_data_area | SET cics_ref) LENGTH cics_data_area (MAXLENGTH cics_data_value)? NOTRUNCATE? (TYPE cics_cvda)?
+cics_web_rserver: cics_into LENGTH cics_data_area (MAXLENGTH cics_data_value)? NOTRUNCATE? (TYPE cics_cvda)?
                   (SRVCONVERT | NOSRVCONVERT | SERVERCONV cics_cvda)? (CHARACTERSET cics_data_value)? (HOSTCODEPAGE cics_data_value)?
                   (BODYCHARSET cics_data_area)? (MEDIATYPE cics_data_value)?;
 cics_web_rtocontainer: TOCONTAINER cics_data_value (TOCHANNEL cics_data_value)? (TYPE cics_cvda)? (CHARACTERSET cics_data_value)?
                        (BODYCHARSET cics_data_area)? (MEDIATYPE cics_data_value)?;
 cics_web_rsesstoken: SESSTOKEN cics_data_value (MEDIATYPE cics_data_area)? (cics_web_rcbuffers | cics_web_rccontainers);
-cics_web_rcbuffers: cics_web_statuscode? (INTO cics_data_area | SET cics_ref) LENGTH cics_data_area (MAXLENGTH cics_data_value)?
+cics_web_rcbuffers: cics_web_statuscode? cics_into LENGTH cics_data_area (MAXLENGTH cics_data_value)?
                     NOTRUNCATE? (CLICONVERT | NOCLICONVERT | CLIENTCONV cics_cvda)? (BODYCHARSET cics_data_area)?;
 cics_web_statuscode: STATUSCODE cics_data_value cics_web_statustext;
 cics_web_rccontainers: cics_web_statustext? TOCONTAINER cics_data_value (TOCHANNEL cics_data_value)? (BODYCHARSET cics_data_area)?;
@@ -862,7 +914,7 @@ cics_hhmmss: LPARENCHAR hhmmss RPARENCHAR;
 cics_label: LPARENCHAR label RPARENCHAR;
 cics_value: LPARENCHAR ptr_value RPARENCHAR;
 
-cicsWord: cicsWords | IDENTIFIER;
+cicsWord: cicsWords | NONNUMERICLITERAL | NUMERICLITERAL | INTEGERLITERAL | IDENTIFIER;
 
 name: cicsWord;
 data_value: cicsWord;
