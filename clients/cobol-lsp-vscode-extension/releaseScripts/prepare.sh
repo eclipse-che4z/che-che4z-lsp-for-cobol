@@ -25,15 +25,15 @@ echo "Prepare for release $RELEASE"
 update_version () {
     sed -i "s/\"version\": \".*\"/\"version\": \"$1\"/g" package.json
     sed -i "0,/\"version\": \".*\"/s//\"version\": \"$1\"/" package-lock.json
-    sed -i "s/<revision>.*</<revision>$1</g" ../../com.ca.lsp.cobol/pom.xml
-    sed -i "s/lsp-service-cobol-.*\.jar/lsp-service-cobol-$1.jar/g" server/note.md
+    sed -i "s/<revision>.*</<revision>$1</g" ../../server/pom.xml
+    sed -i "s/server-.*\.jar/server-$1.jar/g" server/note.md
     sed -i "s/cobol-language-support_.*\.vsix'/cobol-language-support_$1.vsix'/g" ../../Jenkinsfile
     echo "Versions updated to $1"
 }
 
 update_version $RELEASE
 
-git add package.json ../../com.ca.lsp.cobol/pom.xml server/note.md ../../Jenkinsfile src/extension.ts
+git add package.json ../../server/pom.xml server/note.md ../../Jenkinsfile src/extension.ts
 git commit -s -m "chore(release): $RELEASE" -m "" -m "$RELEASE_NOTES"
 git push
 echo "Changes committed"
@@ -48,7 +48,7 @@ if [ "development" == "$CURRENT_BRANCH" ]; then
 
     git checkout development
     update_version "$SHORT_RELEASE+NEXT"
-    git add package.json ../../com.ca.lsp.cobol/pom.xml server/note.md ../../Jenkinsfile src/extension.ts
+    git add package.json ../../server/pom.xml server/note.md ../../Jenkinsfile src/extension.ts
     git commit -s -m "chore(release): Switch to development version"
     git push
     echo "Changes with devel version committed"
