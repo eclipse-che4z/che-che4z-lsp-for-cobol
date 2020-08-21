@@ -60,7 +60,7 @@ class PositiveTest extends ConfigurableTest {
     if (text == null) {
       return;
     }
-      LOG.debug("Processing: " + text.getFileName());
+    LOG.debug("Processing: " + text.getFileName());
     assertNoSyntaxErrorsFound(
         analyzeForErrors(text.getFileName(), text.getFullText(), copybooks), text);
   }
