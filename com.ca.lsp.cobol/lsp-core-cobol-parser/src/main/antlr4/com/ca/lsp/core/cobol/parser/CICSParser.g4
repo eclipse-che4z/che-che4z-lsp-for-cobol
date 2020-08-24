@@ -213,7 +213,9 @@ cics_define: DEFINE (cics_define_activity | cics_define_composite | cics_define_
              cics_define_input | cics_define_process | cics_define_timer);
 cics_define_activity: ACTIVITY cics_data_value (EVENT cics_data_value)? TRANSID cics_data_value
                       (PROGRAM cics_data_value)? (USERID cics_data_value)? (ACTIVITYID cics_data_area)?;
-cics_define_composite: COMPOSITE EVENT cics_data_value (AND | OR) SUBEVENT FIRST_EIGHT_DIGIT cics_data_value*;
+cics_define_composite: COMPOSITE EVENT cics_data_value (AND | OR) (subevent_option cics_data_value)*;
+subevent_option: SUBEVENT1 | SUBEVENT2 | SUBEVENT3 | SUBEVENT4 | SUBEVENT5 | SUBEVENT6 | SUBEVENT7 | SUBEVENT8;
+
 cics_define_counter: COUNTER cics_name (POOL cics_name)? cics_define_value? (MAXIMUM cics_data_value)?;
 cics_define_value: VALUE cics_data_value (MINIMUM cics_data_value)?;
 cics_define_dcounter: DCOUNTER cics_name (POOL cics_name)? cics_define_value? (MAXIMUM cics_data_area)?;
@@ -227,7 +229,7 @@ cics_define_at: AT (HOURS cics_data_value | MINUTES cics_data_value | SECONDS ci
 cics_define_on: ON YEAR cics_data_value (MONTH cics_data_value DAYOFMONTH cics_data_value | DAYOFYEAR cics_data_value);
 
 /** DELAY */
-cics_delay: DELAY (INTERVAL(ZERO_DIGITAL) | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_delay_for)? (REQID cics_name)?;
+cics_delay: DELAY (INTERVAL(ZERO_DIGIT) | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_delay_for)? (REQID cics_name)?;
 cics_delay_for: (FOR | UNTIL) (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value)+;
 
 /** DELETE (all of them) */
@@ -328,12 +330,12 @@ cics_force: FORCE TIMER cics_data_value (ACQUACTIVITY | ACQPROCESS)?;
 
 /** FORMATTIME */
 cics_formattime: FORMATTIME ABSTIME cics_data_area (DATE cics_data_area)? (FULLDATE cics_data_area)? (DATEFORM cics_data_area)?
-                 DATESEP(data_value?)? (DAYCOUNT cics_data_area)? (DAYOFMONTH cics_data_area)? (DAYOFWEEK cics_data_area)?
+                 (DATESEP data_value?)? (DAYCOUNT cics_data_area)? (DAYOFMONTH cics_data_area)? (DAYOFWEEK cics_data_area)?
                  (DDMMYY cics_data_area)? (DDMMYYYY cics_data_area)? (MILLISECONDS cics_data_area)? (MMDDYY cics_data_area)?
                  (MMDDYYYY cics_data_area)? (MONTHOFYEAR cics_data_area)? cics_formattime_time? (YEAR cics_data_area)?
                  (YYDDD cics_data_area)? (YYDDMM cics_data_area)? (YYYYDDD cics_data_area)? (YYYYDDMM cics_data_area)?
                  (YYYYMMDD cics_data_area)? (DATESTRING cics_data_area)? (STRINGFORMAT cics_cvda)?;
-cics_formattime_time: TIME cics_data_area TIMESEP(data_value?)?;
+cics_formattime_time: TIME cics_data_area (TIMESEP data_value?)?;
 
 /** FREE (all of them) */
 cics_free: FREE (CONVID cics_name | SESSION cics_name)? (STATE cics_cvda)?;
@@ -396,12 +398,16 @@ cics_getnext_process: PROCESS cics_data_area BROWSETOKEN cics_data_value (ACTIVI
 cics_handle: HANDLE (cics_handle_abend | cics_handle_aid | cics_handle_condition);
 cics_handle_abend: ABEND (CANCEL | PROGRAM cics_name | LABEL cics_label | RESET)?;
 cics_handle_aid: AID (ANYKEY (cics_label)? | CLEAR (cics_label)? | CLRPARTN (cics_label)? | ENTER (cics_label)? |
-                 LIGHTPEN (cics_label)? | OPERID  (cics_label)? | PA firstThreeDigits (cics_label)? | PF first24Digits
-                 (cics_label)? | TRIGGER  (cics_label)?)*;
-cics_handle_condition: CONDITION (condition label?)+;
+                 LIGHTPEN (cics_label)? | OPERID  (cics_label)? | pa_option (cics_label)? | pf_option (cics_label)? |
+                 TRIGGER  (cics_label)?)*;
+cics_handle_condition: CONDITION (mama cics_label?)+;
+
+pa_option: PA1 | PA2 | PA3;
+pf_option: PF1 | PF2 | PF3 | PF4 | PF5 | PF6 | PF7 | PF8 | PF9 | PF10 | PF11 | PF12 | PF13 | PF14 | PF15 | PF16 | PF17 |
+           PF18 | PF19 | PF20 | PF21 | PF22 | PF23 | PF24;
 
 /** IGNORE CONDITION */
-cics_ignore: IGNORE CONDITION condition+;
+cics_ignore: IGNORE CONDITION mama+;
 
 /** INQUIRE ACTIVITYID / CONTAINER / EVENT / PROCESS / TIMER */
 cics_inquire: INQUIRE (cics_inquire_activityid | cics_inquire_container | cics_inquire_event | cics_inquire_process |
@@ -433,7 +439,9 @@ cics_issue_abend: (ABEND | ERROR | PREPARE) (CONVID cics_name)? (STATE cics_cvda
 	/** ISSUE ABORT, ISSUE END and ISSUE WAIT are combined into one as they have the same syntax */
 cics_issue_abort: (ABORT | END | WAIT) (cics_issue_destid | cics_issue_subaddr)? cics_issue_volume?;
 cics_issue_destid: DESTID cics_data_value (DESTIDLENG cics_data_value)?;
-cics_issue_subaddr: SUBADDR cics_data_value (CONSOLE | PRINT | CARD | WPMEDIA FIRST_FOUR_DIGITS)?;
+cics_issue_subaddr: SUBADDR cics_data_value (CONSOLE | PRINT | CARD | wpemdia_option)?;
+wpemdia_option: WPMEDIA1 | WPMEDIA2 | WPMEDIA3 | WPMEDIA4;
+
 cics_issue_volume: VOLUME cics_data_value (VOLUMELENG cics_data_value)?;
 cics_issue_add: ADD cics_issue_destid cics_issue_volume FROM cics_data_value (LENGTH cics_data_value)?
                 (NUMREC cics_data_value)? DEFRESP? NOWAIT? cics_issue_ridfld?;
@@ -914,21 +922,44 @@ cics_hhmmss: LPARENCHAR hhmmss RPARENCHAR;
 cics_label: LPARENCHAR label RPARENCHAR;
 cics_value: LPARENCHAR ptr_value RPARENCHAR;
 
-cicsWord: cicsWords | NONNUMERICLITERAL | NUMERICLITERAL | INTEGERLITERAL | IDENTIFIER;
+cicsWord: cobolWord | NONNUMERICLITERAL | NUMERICLITERAL | INTEGERLITERAL | IDENTIFIER;
 
-name: cicsWord;
-data_value: cicsWord;
-data_area: cicsWord;
-cvda: cicsWord;
-systemName: cicsWord;
-ptr_ref: cicsWord;
-ptr_value: cicsWord;
-cics_document_set_symbollist: cicsWord;
-mama: cicsWord;
-label: cicsWord;
-hhmmss: cicsWord;
-today: cicsWord;
-condition: cicsWord;
+cobolWord
+   : IDENTIFIER | cicsWords
+   | ABORT | AS | ASCII | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | ATTRIBUTE | AUTO | AUTO_SKIP
+   | BACKGROUND_COLOR | BACKGROUND_COLOUR | BEEP | BELL | BINARY | BIT | BLINK | BLOB | BOUNDS
+   | CAPABLE | CCSVERSION | CHANGED | CHANNEL | CLOB | CLOSE_DISPOSITION | COBOL | COMMITMENT | CONTROL_POINT | CONVENTION | CRUNCH | CURSOR
+   | DBCLOB | DEFAULT | DEFAULT_DISPLAY | DEFINITION | DFHRESP | DFHVALUE | DISK | DONTCARE | DOUBLE
+   | EBCDIC | EMPTY_CHECK | ENTER | ENTRY_PROCEDURE | EOL | EOS | ERASE | ESCAPE | EVENT | EXCLUSIVE | EXPORT | EXTENDED
+   | FOREGROUND_COLOR | FOREGROUND_COLOUR | FULL | FUNCTIONNAME | FUNCTION_POINTER
+   | GRID
+   | HIGHLIGHT
+   | IMPLICIT | IMPORT | INTEGER | IN
+   | KEPT | KEYBOARD
+   | LANGUAGE | LB | LD | LEFTLINE | LENGTH_CHECK | LIBACCESS | LIBPARAMETER | LIBRARY | LIST | LOCAL | LONG_DATE | LONG_TIME | LOWER | LOWLIGHT
+   | MMDDYYYY
+   | NAMED | NATIONAL | NATIONAL_EDITED | NETWORK | NO_ECHO | NUMERIC_DATE | NUMERIC_TIME
+   | ODT | ORDERLY | OVERLINE | OWN | OF
+   | PASSWORD | PORT | PRINTER | PRIVATE | PROCESS | PROGRAM | PROMPT
+   | READER | REAL | RECEIVED | RECURSIVE | REF | REMOTE | REMOVE | REQUIRED | REVERSE_VIDEO
+   | SAVE | SECURE | SHARED | SHAREDBYALL | SHAREDBYRUNUNIT | SHARING | SHORT_DATE | SQL | SYMBOL
+   | TASK | THREAD | THREAD_LOCAL | TIMER | TODAYS_DATE | TODAYS_NAME | TRUNCATED | TYPEDEF
+   | UNDERLINE
+   | VIRTUAL
+   | WAIT
+   | YEAR | YYYYMMDD | YYYYDDD
+   | ZERO_FILL
+   ;
 
-firstThreeDigits: FIRST_THREE_DIGITS;
-first24Digits: FIRST_24_DIGITS;
+name: cicsWord+;
+data_value: cicsWord+;
+data_area: cicsWord+;
+cvda: cicsWord+;
+systemName: cicsWord+;
+ptr_ref: cicsWord+;
+ptr_value: cicsWord+;
+cics_document_set_symbollist: cicsWord+;
+mama: cicsWord+;
+label: cicsWord+;
+hhmmss: cicsWord+;
+today: cicsWord+;
