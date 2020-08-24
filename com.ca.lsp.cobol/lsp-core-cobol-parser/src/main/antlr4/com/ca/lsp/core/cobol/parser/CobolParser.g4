@@ -184,11 +184,11 @@ classClauseThrough
    ;
 
 classClauseFrom
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 classClauseTo
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 currencySignClause
@@ -612,23 +612,23 @@ screenDescriptionUnderlineClause
    ;
 
 screenDescriptionSizeClause
-   : SIZE IS? (generalIdentifier | integerLiteral)
+   : SIZE IS? (integerLiteral | generalIdentifier)
    ;
 
 screenDescriptionLineClause
-   : LINE (NUMBER? IS? (PLUS | PLUSCHAR | MINUSCHAR))? (generalIdentifier | integerLiteral)
+   : LINE (NUMBER? IS? (PLUS | PLUSCHAR | MINUSCHAR))? (integerLiteral | generalIdentifier)
    ;
 
 screenDescriptionColumnClause
-   : (COLUMN | COL) (NUMBER? IS? (PLUS | PLUSCHAR | MINUSCHAR))? (generalIdentifier | integerLiteral)
+   : (COLUMN | COL) (NUMBER? IS? (PLUS | PLUSCHAR | MINUSCHAR))? (integerLiteral | generalIdentifier)
    ;
 
 screenDescriptionForegroundColorClause
-   : (FOREGROUND_COLOR | FOREGROUND_COLOUR) IS? (generalIdentifier | integerLiteral)
+   : (FOREGROUND_COLOR | FOREGROUND_COLOUR) IS? (integerLiteral | generalIdentifier)
    ;
 
 screenDescriptionBackgroundColorClause
-   : (BACKGROUND_COLOR | BACKGROUND_COLOUR) IS? (generalIdentifier | integerLiteral)
+   : (BACKGROUND_COLOR | BACKGROUND_COLOUR) IS? (integerLiteral | generalIdentifier)
    ;
 
 screenDescriptionControlClause
@@ -644,7 +644,7 @@ screenDescriptionPictureClause
    ;
 
 screenDescriptionFromClause
-   : FROM (generalIdentifier | literal) screenDescriptionToClause?
+   : FROM (literal | generalIdentifier) screenDescriptionToClause?
    ;
 
 screenDescriptionToClause
@@ -684,7 +684,7 @@ screenDescriptionRequiredClause
    ;
 
 screenDescriptionPromptClause
-   : PROMPT CHARACTER? IS? (generalIdentifier | literal) screenDescriptionPromptOccursClause?
+   : PROMPT CHARACTER? IS? (literal | generalIdentifier) screenDescriptionPromptOccursClause?
    ;
 
 screenDescriptionPromptOccursClause
@@ -1112,7 +1112,7 @@ procedureDivisionByReferencePhrase
    ;
 
 procedureDivisionByReference
-   : (OPTIONAL? (generalIdentifier | fileName)) | ANY
+   : (OPTIONAL? (fileName | generalIdentifier)) | ANY
    ;
 
 procedureDivisionByValuePhrase
@@ -1120,7 +1120,7 @@ procedureDivisionByValuePhrase
    ;
 
 procedureDivisionByValue
-   : generalIdentifier | literal | ANY
+   : literal | generalIdentifier | ANY
    ;
 
 procedureDeclaratives
@@ -1215,7 +1215,7 @@ addCorrespondingStatement
    ;
 
 addFrom
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 addTo
@@ -1223,7 +1223,7 @@ addTo
    ;
 
 addToGiving
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 addGiving
@@ -1249,7 +1249,7 @@ alterProceedTo
 // call statement
 
 callStatement
-   : CALL (generalIdentifier | literal) callUsingPhrase? callGivingPhrase? onOverflowPhrase? onExceptionClause? notOnExceptionClause? END_CALL?
+   : CALL (literal | generalIdentifier) callUsingPhrase? callGivingPhrase? onOverflowPhrase? onExceptionClause? notOnExceptionClause? END_CALL?
    ;
 
 callUsingPhrase
@@ -1265,7 +1265,7 @@ callByReferencePhrase
    ;
 
 callByReference
-   : ((ADDRESS OF | INTEGER | STRING)? generalIdentifier | literal | fileName) | OMITTED
+   : ((ADDRESS OF | INTEGER | STRING)? literal | fileName | generalIdentifier) | OMITTED
    ;
 
 callByValuePhrase
@@ -1273,7 +1273,7 @@ callByValuePhrase
    ;
 
 callByValue
-   : (ADDRESS OF | LENGTH OF?)? (generalIdentifier | literal)
+   : (ADDRESS OF | LENGTH OF?)? (literal | generalIdentifier)
    ;
 
 callByContentPhrase
@@ -1281,7 +1281,7 @@ callByContentPhrase
    ;
 
 callByContent
-   : (ADDRESS OF | LENGTH OF?)? generalIdentifier | literal | OMITTED
+   : (ADDRESS OF | LENGTH OF?)? literal | generalIdentifier | OMITTED
    ;
 
 callGivingPhrase
@@ -1295,7 +1295,7 @@ cancelStatement
    ;
 
 cancelCall
-   : libraryName (BYTITLE | BYFUNCTION) | generalIdentifier | literal
+   : libraryName (BYTITLE | BYFUNCTION) | literal | generalIdentifier
    ;
 
 // close statement
@@ -1329,11 +1329,11 @@ closePortFileIOUsingCloseDisposition
    ;
 
 closePortFileIOUsingAssociatedData
-   : ASSOCIATED_DATA (generalIdentifier | integerLiteral)
+   : ASSOCIATED_DATA (integerLiteral | generalIdentifier)
    ;
 
 closePortFileIOUsingAssociatedDataLength
-   : ASSOCIATED_DATA_LENGTH OF? (generalIdentifier | integerLiteral)
+   : ASSOCIATED_DATA_LENGTH OF? (integerLiteral | generalIdentifier)
    ;
 
 // compute statement
@@ -1361,7 +1361,7 @@ deleteStatement
 // disable statement
 
 disableStatement
-   : DISABLE (INPUT TERMINAL? | I_O TERMINAL | OUTPUT) cdName WITH? KEY (generalIdentifier | literal)
+   : DISABLE (INPUT TERMINAL? | I_O TERMINAL | OUTPUT) cdName WITH? KEY (literal | generalIdentifier)
    ;
 
 // display statement
@@ -1371,11 +1371,11 @@ displayStatement
    ;
 
 displayOperand
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 displayAt
-   : AT (generalIdentifier | literal)
+   : AT (literal | generalIdentifier)
    ;
 
 displayUpon
@@ -1389,7 +1389,7 @@ displayWith
 // divide statement
 
 divideStatement
-   : DIVIDE (generalIdentifier | literal) (divideIntoStatement | divideIntoGivingStatement | divideByGivingStatement) divideRemainder? onSizeErrorPhrase? notOnSizeErrorPhrase? END_DIVIDE?
+   : DIVIDE (literal | generalIdentifier) (divideIntoStatement | divideIntoGivingStatement | divideByGivingStatement) divideRemainder? onSizeErrorPhrase? notOnSizeErrorPhrase? END_DIVIDE?
    ;
 
 divideIntoStatement
@@ -1397,11 +1397,11 @@ divideIntoStatement
    ;
 
 divideIntoGivingStatement
-   : INTO (generalIdentifier | literal) divideGivingPhrase?
+   : INTO (literal | generalIdentifier) divideGivingPhrase?
    ;
 
 divideByGivingStatement
-   : BY (generalIdentifier | literal) divideGivingPhrase?
+   : BY (literal | generalIdentifier) divideGivingPhrase?
    ;
 
 divideGivingPhrase
@@ -1439,7 +1439,7 @@ evaluateStatement
    ;
 
 evaluateSelect
-   : generalIdentifier | literal | arithmeticExpression | condition
+   : literal | arithmeticExpression | condition | generalIdentifier
    ;
 
 evaluateAlsoSelect
@@ -1471,7 +1471,7 @@ evaluateWhenOther
    ;
 
 evaluateValue
-   : generalIdentifier | literal | arithmeticExpression
+   : literal | arithmeticExpression | generalIdentifier
    ;
 
 // exec cics statement
@@ -1498,7 +1498,7 @@ exhibitStatement
    ;
 
 exhibitOperand
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 // exit statement
@@ -1558,7 +1558,7 @@ initializeReplacingPhrase
    ;
 
 initializeReplacingBy
-   : (ALPHABETIC | ALPHANUMERIC | ALPHANUMERIC_EDITED | NATIONAL | NATIONAL_EDITED | NUMERIC | NUMERIC_EDITED | DBCS | EGCS) DATA? BY (generalIdentifier | literal)
+   : (ALPHABETIC | ALPHANUMERIC | ALPHANUMERIC_EDITED | NATIONAL | NATIONAL_EDITED | NUMERIC | NUMERIC_EDITED | DBCS | EGCS) DATA? BY (literal | generalIdentifier)
    ;
 
 // initiate statement
@@ -1586,7 +1586,7 @@ inspectTallyingReplacingPhrase
    ;
 
 inspectConvertingPhrase
-   : CONVERTING (generalIdentifier | literal) inspectTo inspectBeforeAfter*
+   : CONVERTING (literal | generalIdentifier) inspectTo inspectBeforeAfter*
    ;
 
 inspectFor
@@ -1610,23 +1610,23 @@ inspectReplacingAllLeadings
    ;
 
 inspectAllLeading
-   : (generalIdentifier | literal) inspectBeforeAfter*
+   : (literal | generalIdentifier) inspectBeforeAfter*
    ;
 
 inspectReplacingAllLeading
-   : (generalIdentifier | literal) inspectBy inspectBeforeAfter*
+   : (literal | generalIdentifier) inspectBy inspectBeforeAfter*
    ;
 
 inspectBy
-   : BY (generalIdentifier | literal)
+   : BY (literal | generalIdentifier)
    ;
 
 inspectTo
-   : TO (generalIdentifier | literal)
+   : TO (literal | generalIdentifier)
    ;
 
 inspectBeforeAfter
-   : (BEFORE | AFTER) INITIAL? (generalIdentifier | literal)
+   : (BEFORE | AFTER) INITIAL? (literal | generalIdentifier)
    ;
 
 // merge statement
@@ -1682,7 +1682,7 @@ moveToStatement
    ;
 
 moveToSendingArea
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 moveCorrespondingToStatement
@@ -1696,7 +1696,7 @@ moveCorrespondingToSendingArea
 // multiply statement
 
 multiplyStatement
-   : MULTIPLY (generalIdentifier | literal) BY (multiplyRegular | multiplyGiving) onSizeErrorPhrase? notOnSizeErrorPhrase? END_MULTIPLY?
+   : MULTIPLY (literal | generalIdentifier) BY (multiplyRegular | multiplyGiving) onSizeErrorPhrase? notOnSizeErrorPhrase? END_MULTIPLY?
    ;
 
 multiplyRegular
@@ -1712,7 +1712,7 @@ multiplyGiving
    ;
 
 multiplyGivingOperand
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 multiplyGivingResult
@@ -1768,7 +1768,7 @@ performType
    ;
 
 performTimes
-   : (generalIdentifier | integerLiteral) TIMES
+   : (integerLiteral | generalIdentifier) TIMES
    ;
 
 performUntil
@@ -1784,7 +1784,7 @@ performVaryingClause
    ;
 
 performVaryingPhrase
-   : (generalIdentifier | literal) performFrom performBy performUntil
+   : (literal | generalIdentifier) performFrom performBy performUntil
    ;
 
 performAfter
@@ -1792,11 +1792,11 @@ performAfter
    ;
 
 performFrom
-   : FROM (generalIdentifier | indexName | literal)
+   : FROM (indexName | literal | generalIdentifier)
    ;
 
 performBy
-   : BY (generalIdentifier | literal)
+   : BY (literal | generalIdentifier)
    ;
 
 performTestClause
@@ -1920,7 +1920,7 @@ sendStatement
    ;
 
 sendStatementSync
-   : (generalIdentifier | literal) sendFromPhrase? sendWithPhrase? sendReplacingPhrase? sendAdvancingPhrase?
+   : (literal | generalIdentifier) sendFromPhrase? sendWithPhrase? sendReplacingPhrase? sendAdvancingPhrase?
    ;
 
 sendStatementAsync
@@ -1948,7 +1948,7 @@ sendAdvancingPage
    ;
 
 sendAdvancingLines
-   : (generalIdentifier | literal) (LINE | LINES)?
+   : (literal | generalIdentifier) (LINE | LINES)?
    ;
 
 sendAdvancingMnemonic
@@ -1974,11 +1974,11 @@ setTo
    ;
 
 setToValue
-   : ON | OFF | ENTRY (generalIdentifier | literal) | generalIdentifier | literal
+   : ON | OFF | ENTRY (literal | generalIdentifier) | literal | generalIdentifier
    ;
 
 setByValue
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 // service statement
@@ -2068,7 +2068,7 @@ stopStatement
    ;
 
 stopStatementGiving
-   : RUN (GIVING | RETURNING) (generalIdentifier | integerLiteral)
+   : RUN (GIVING | RETURNING) (integerLiteral | generalIdentifier)
    ;
 
 // string statement
@@ -2082,15 +2082,15 @@ stringSendingPhrase
    ;
 
 stringSending
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 stringDelimitedByPhrase
-   : DELIMITED BY? (SIZE | generalIdentifier | literal)
+   : DELIMITED BY? (SIZE | literal | generalIdentifier)
    ;
 
 stringForPhrase
-   : FOR (generalIdentifier | literal)
+   : FOR (literal | generalIdentifier)
    ;
 
 stringIntoPhrase
@@ -2120,7 +2120,7 @@ subtractCorrespondingStatement
    ;
 
 subtractSubtrahend
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 subtractMinuend
@@ -2128,7 +2128,7 @@ subtractMinuend
    ;
 
 subtractMinuendGiving
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 subtractGiving
@@ -2162,11 +2162,11 @@ unstringSendingPhrase
    ;
 
 unstringDelimitedByPhrase
-   : DELIMITED BY? ALL? (generalIdentifier | literal)
+   : DELIMITED BY? ALL? (literal | generalIdentifier)
    ;
 
 unstringOrAllPhrase
-   : OR ALL? (generalIdentifier | literal)
+   : OR ALL? (literal | generalIdentifier)
    ;
 
 unstringIntoPhrase
@@ -2222,7 +2222,7 @@ writeStatement
    ;
 
 writeFromPhrase
-   : FROM (generalIdentifier | literal)
+   : FROM (literal | generalIdentifier)
    ;
 
 writeAdvancingPhrase
@@ -2234,7 +2234,7 @@ writeAdvancingPage
    ;
 
 writeAdvancingLines
-   : (generalIdentifier | literal) (LINE | LINES)?
+   : (literal | generalIdentifier) (LINE | LINES)?
    ;
 
 writeAdvancingMnemonic
@@ -2346,7 +2346,7 @@ power
    ;
 
 basis
-   : LPARENCHAR arithmeticExpression RPARENCHAR | generalIdentifier | literal
+   : LPARENCHAR arithmeticExpression RPARENCHAR | literal | generalIdentifier
    ;
 
 // condition ----------------------------------
@@ -2553,10 +2553,6 @@ indexName
    : cobolWord
    ;
 
-languageName
-   : systemName
-   ;
-
 libraryName
    : cobolWord
    ;
@@ -2631,33 +2627,6 @@ specialRegister
 // comment entry
 commentEntry
    : COMMENTENTRYLINE+
-   ;
-   
-cobolWord
-   : IDENTIFIER | cicsWords
-   | ABORT | AS | ASCII | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | ATTRIBUTE | AUTO | AUTO_SKIP
-   | BACKGROUND_COLOR | BACKGROUND_COLOUR | BEEP | BELL | BINARY | BIT | BLINK | BLOB | BOUNDS
-   | CAPABLE | CCSVERSION | CHANGED | CHANNEL | CLOB | CLOSE_DISPOSITION | COBOL | COMMITMENT | CONTROL_POINT | CONVENTION | CRUNCH | CURSOR
-   | DBCLOB | DEFAULT | DEFAULT_DISPLAY | DEFINITION | DFHRESP | DFHVALUE | DISK | DONTCARE | DOUBLE
-   | EBCDIC | EMPTY_CHECK | ENTER | ENTRY_PROCEDURE | EOL | EOS | ERASE | ESCAPE | EVENT | EXCLUSIVE | EXPORT | EXTENDED
-   | FOREGROUND_COLOR | FOREGROUND_COLOUR | FULL | FUNCTIONNAME | FUNCTION_POINTER
-   | GRID
-   | HIGHLIGHT
-   | IMPLICIT | IMPORT | INTEGER
-   | KEPT | KEYBOARD
-   | LANGUAGE | LB | LD | LEFTLINE | LENGTH_CHECK | LIBACCESS | LIBPARAMETER | LIBRARY | LIST | LOCAL | LONG_DATE | LONG_TIME | LOWER | LOWLIGHT
-   | MMDDYYYY
-   | NAMED | NATIONAL | NATIONAL_EDITED | NETWORK | NO_ECHO | NUMERIC_DATE | NUMERIC_TIME
-   | ODT | ORDERLY | OVERLINE | OWN
-   | PASSWORD | PORT | PRINTER | PRIVATE | PROCESS | PROGRAM | PROMPT
-   | READER | REAL | RECEIVED | RECURSIVE | REF | REMOTE | REMOVE | REQUIRED | REVERSE_VIDEO
-   | SAVE | SECURE | SHARED | SHAREDBYALL | SHAREDBYRUNUNIT | SHARING | SHORT_DATE | SQL | SYMBOL
-   | TASK | THREAD | THREAD_LOCAL | TIMER | TODAYS_DATE | TODAYS_NAME | TRUNCATED | TYPEDEF
-   | UNDERLINE
-   | VIRTUAL
-   | WAIT
-   | YEAR | YYYYMMDD | YYYYDDD
-   | ZERO_FILL
    ;
 
 booleanLiteral
