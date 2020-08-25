@@ -55,7 +55,7 @@ class TestCorrectErrorUnderscorePosition extends NegativeUseCase {
   protected void assertDiagnostics(List<Diagnostic> diagnostics) {
     // The keywords between "PERORM" and "END-PERFORM" cannot be recognized, so they are marked as
     // errors
-    assertEquals(11, diagnostics.size(), "Number of diagnostics");
+    assertEquals(15, diagnostics.size(), "Number of diagnostics");
 
     Diagnostic diagnostic = diagnostics.get(0);
     assertEquals("Syntax error on 'VARYING' expected SECTION", diagnostic.getMessage());

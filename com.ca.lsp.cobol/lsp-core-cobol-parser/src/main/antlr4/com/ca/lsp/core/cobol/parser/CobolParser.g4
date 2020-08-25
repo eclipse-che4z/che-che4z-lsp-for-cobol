@@ -1249,7 +1249,7 @@ alterProceedTo
 // call statement
 
 callStatement
-   : CALL (literal | generalIdentifier) callUsingPhrase? callGivingPhrase? onOverflowPhrase? onExceptionClause? notOnExceptionClause? END_CALL?
+   : CALL (generalIdentifier | literal) callUsingPhrase? callGivingPhrase? onOverflowPhrase? onExceptionClause? notOnExceptionClause? END_CALL?
    ;
 
 callUsingPhrase
@@ -1792,7 +1792,7 @@ performAfter
    ;
 
 performFrom
-   : FROM (indexName | literal | generalIdentifier)
+   : FROM (literal | generalIdentifier)
    ;
 
 performBy

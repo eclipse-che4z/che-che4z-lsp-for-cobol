@@ -229,7 +229,7 @@ cics_define_at: AT (HOURS cics_data_value | MINUTES cics_data_value | SECONDS ci
 cics_define_on: ON YEAR cics_data_value (MONTH cics_data_value DAYOFMONTH cics_data_value | DAYOFYEAR cics_data_value);
 
 /** DELAY */
-cics_delay: DELAY (INTERVAL(ZERO_DIGIT) | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_delay_for)? (REQID cics_name)?;
+cics_delay: DELAY (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_delay_for)? (REQID cics_name)?;
 cics_delay_for: (FOR | UNTIL) (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value)+;
 
 /** DELETE (all of them) */
@@ -494,7 +494,7 @@ cics_point: POINT (CONVID cics_name | SESSION cics_name)?;
 cics_pop: POP HANDLE;
 
 /** POST */
-cics_post: POST (INTERVAL(ZERO_DIGIT) | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after)? SET cics_ref (REQID cics_name)?;
+cics_post: POST (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after)? SET cics_ref (REQID cics_name)?;
 cics_post_after: (AFTER | AT) (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value)+;
 
 /** PURGE MESSAGE */
@@ -581,7 +581,7 @@ cics_rewrite: REWRITE FILE cics_mama (TOKEN cics_data_area)? FROM cics_data_area
               LENGTH cics_data_value | LENGTH cics_data_value)? NOSUSPEND?;
 
 /** ROUTE */
-cics_route: ROUTE (INTERVAL(ZERO_DIGIT) | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after)? ERRTERM(name?)?
+cics_route: ROUTE (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after)? ERRTERM(name?)?
             (TITLE cics_data_area)? (LIST cics_data_area)? (OPCLASS cics_data_area)? (REQID cics_name)? (LDC cics_name)? NLEOM?;
 
 /** RUN */
@@ -641,7 +641,7 @@ cics_spoolwrite: SPOOLWRITE TOKEN cics_data_area FROM cics_data_area (FLENGTH ci
 /** START - / ATTACH / BREXIT / CHANNEL */
 cics_start: START (cics_start_transid | cics_start_attach | cics_start_brexit);
 cics_start_transid: TRANSID cics_name (cics_start_null | cics_start_channel);
-cics_start_null: (INTERVAL(ZERO_DIGIT) | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after)? (REQID cics_name)? cics_start_from?
+cics_start_null: (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after)? (REQID cics_name)? cics_start_from?
                  (TERMID cics_name | USERID cics_data_value)? (SYSID cics_system)? (RTRANSID cics_name)? (RTERMID cics_name)?
                  (QUEUE cics_name)? NOCHECK? PROTECT?;
 cics_start_from: FROM cics_data_area LENGTH cics_data_value FMH?;
@@ -650,6 +650,7 @@ cics_start_attach: ATTACH TRANSID cics_name cics_start_afrom?;
 cics_start_afrom: FROM cics_data_area (LENGTH cics_data_value)?;
 cics_start_brexit: BREXIT(name?) TRANSID cics_name cics_start_brdata? (USERID cics_data_value)?;
 cics_start_brdata: BRDATA cics_data_area (BRDATALENGTH cics_data_value)?;
+cics_zero_digit: LPARENCHAR ZERO_DIGIT RPARENCHAR;
 
 /** STARTBR */
 cics_startbr: STARTBR FILE cics_mama RIDFLD cics_data_area cics_startbr_keylength? (REQID cics_data_value)?

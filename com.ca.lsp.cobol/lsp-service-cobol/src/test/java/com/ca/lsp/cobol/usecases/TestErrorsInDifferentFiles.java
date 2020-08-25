@@ -45,7 +45,7 @@ class TestErrorsInDifferentFiles {
           + "8      End program ProgramId.";
 
   private static final String ASDASD =
-      "           {03|areaA1}  {CHILD1|child1|areaA2}         {PIC|pic} 9   VALUE IS '0'.";
+      "           {03|areaA1}  {CHILD1|child1|areaA3}  {PIC|pic} 9   {VALUE|areaA2} {IS|is} '0'.";
 
   private static final String ASDASD_NAME = "ASDASD";
 
@@ -62,11 +62,22 @@ class TestErrorsInDifferentFiles {
             "child1",
             new Diagnostic(
                 null, "Syntax error on 'CHILD1' expected SECTION", Error, ERROR.getText()),
+            "is",
+            new Diagnostic(null, "Syntax error on 'IS' expected SECTION", Error, ERROR.getText()),
             "areaA1",
             new Diagnostic(
                 null, "The following token must start in Area A: 03", Warning, WARNING.getText()),
             "areaA2",
             new Diagnostic(
-                null, "The following token must start in Area A: CHILD1", Warning, WARNING.getText())));
+                null,
+                "The following token must start in Area A: VALUE",
+                Warning,
+                WARNING.getText()),
+            "areaA3",
+            new Diagnostic(
+                null,
+                "The following token must start in Area A: CHILD1",
+                Warning,
+                WARNING.getText())));
   }
 }
