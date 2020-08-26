@@ -24,7 +24,7 @@ multiTokenError
    ;
 
 multiToken
-   : (word | copybookStatement | variableStatement | paragraphStatement | errorStatement | multiTokenError)+
+   : (word | copybookStatement | variableStatement | paragraphStatement | errorStatement | multiTokenError | TEXT)+
    ;
 
 errorStatement
