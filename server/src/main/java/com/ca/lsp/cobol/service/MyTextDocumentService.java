@@ -28,6 +28,7 @@ import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Builder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
@@ -35,10 +36,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
@@ -71,6 +69,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
 
   private final Map<String, MyDocumentModel> docs = new ConcurrentHashMap<>();
+  private final Map<String, CompletableFuture<List<DocumentSymbol>>> outlineMap = new ConcurrentHashMap<>();
 
   private Communications communications;
   private LanguageEngineFacade engine;
@@ -81,6 +80,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   private DataBusBroker dataBus;
 
   @Inject
+  @Builder
   MyTextDocumentService(
       Communications communications,
       LanguageEngineFacade engine,
@@ -172,6 +172,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
+    outlineMap.put(uri, new CompletableFuture<>());
     // git FS URIs are not currently supported
     if (uri.startsWith(GIT_FS_URI)) {
       LOG.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
@@ -185,6 +186,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   @Override
   public void didChange(DidChangeTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
+    outlineMap.put(uri, new CompletableFuture<>());
     String text = params.getContentChanges().get(0).getText();
     String fileExtension = extractExtension(uri);
     if (fileExtension != null && isCobolFile(fileExtension)) {
@@ -241,6 +243,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
                   engine.analyze(uri, text, getCopybookProcessingMode(uri, DID_OPEN));
               ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
               publishResult(uri, result);
+              outlineMap.get(uri).complete(result.getOutlineTree());
             })
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
   }
@@ -252,6 +255,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
                   engine.analyze(uri, text, getCopybookProcessingMode(uri, DID_CHANGE));
               registerDocument(uri, new MyDocumentModel(text, result));
               communications.publishDiagnostics(result.getDiagnostics());
+              outlineMap.get(uri).complete(result.getOutlineTree());
             })
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
   }
@@ -274,6 +278,16 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
                     .distinct()
                     .collect(toList()))
             .build());
+  }
+
+  @Override
+  public CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> documentSymbol(DocumentSymbolParams params) {
+    String uri = params.getTextDocument().getUri();
+    return outlineMap.get(uri)
+        .thenApply(documentSymbols -> documentSymbols.stream()
+            .map(Either::<SymbolInformation, DocumentSymbol>forRight)
+            .collect(toList()))
+        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("symbol analysis", uri)));
   }
 
   private void registerDocument(String uri, MyDocumentModel document) {

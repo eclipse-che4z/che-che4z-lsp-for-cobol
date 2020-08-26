@@ -82,6 +82,7 @@ public class MyLanguageServerImpl implements LanguageServer {
     capabilities.setDocumentHighlightProvider(TRUE);
     capabilities.setCodeActionProvider(TRUE);
     capabilities.setExecuteCommandProvider(collectExecuteCommandList());
+    capabilities.setDocumentSymbolProvider(TRUE);
 
     WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
     workspaceFoldersOptions.setSupported(TRUE);

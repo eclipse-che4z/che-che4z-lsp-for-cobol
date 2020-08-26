@@ -78,15 +78,7 @@ class VariableCompletionTest {
         "P1PARM1",
         singletonList(new Location(null, new Range(new Position(8, 9), new Position(8, 16)))));
 
-    AnalysisResult result =
-        new AnalysisResult(
-            emptyMap(),
-            variableDefinitions,
-            emptyMap(),
-            emptyMap(),
-            emptyMap(),
-            emptyMap(),
-            emptyMap());
+    AnalysisResult result = AnalysisResult.empty().toBuilder().variableDefinitions(variableDefinitions).build();
 
     return new MyDocumentModel(TEXT, result);
   }

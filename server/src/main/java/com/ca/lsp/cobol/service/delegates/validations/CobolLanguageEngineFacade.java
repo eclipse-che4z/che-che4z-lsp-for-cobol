@@ -59,7 +59,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
    *
    * @param uri - URI of the processing document to define positions and errors properly
    * @param text of document opened in the client editor
-   * @param textDocumentSyncType reflect the sync status of the document (DID_OPEN|DID_CHANGE)
+   * @param copybookProcessingMode reflect the copybook processing status of the document (ENABLED, DISABLED, SKIP)
    * @return a model containing full analysis result, e.g. errors and semantic elements
    */
   @Override
@@ -91,7 +91,8 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
         convertPositions(context.getParagraphDefinitions()),
         convertPositions(context.getParagraphUsages()),
         convertPositions(context.getCopybookDefinitions()),
-        convertPositions(context.getCopybookUsages()));
+        convertPositions(context.getCopybookUsages()),
+        context.getOutlineTree());
   }
 
   /**
