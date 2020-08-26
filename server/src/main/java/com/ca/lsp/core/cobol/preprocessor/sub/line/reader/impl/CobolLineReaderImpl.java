@@ -173,7 +173,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
       @Nullable String uri, int lineNumber, int charPosition, int errorLength) {
     SyntaxError error =
         SyntaxError.syntaxError()
-            .suggestion("The line doesn't match the fixed format")
+            .suggestion("Source text can not go past column 80.")
             .severity(ERROR)
             .position(
                 new Position(
