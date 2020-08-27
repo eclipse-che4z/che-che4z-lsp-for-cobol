@@ -21,5 +21,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class CopybookUsage {
   private String name;
+  private String copybookId;
   private Position position;
 }

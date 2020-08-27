@@ -496,6 +496,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private Position getIntervalPosition(Position start, Position stop) {
     return new Position(
         start.getDocumentURI(),
+        null,
         start.getStartPosition(),
         stop.getStopPosition(),
         start.getLine(),

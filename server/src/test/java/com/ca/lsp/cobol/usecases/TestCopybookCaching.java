@@ -52,8 +52,9 @@ class TestCopybookCaching {
   private final String COPYBOOK_NAME = "copy";
   private final String COPYBOOK_CONTENT = "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
 
-  private final Position POSITION_FIRST_OCCURRENCE = new Position(null, 0, 0, 0, 0, null);
-  private final Position POSITION_SECOND_OCCURRENCE = new Position(null, 10, 10, 10, 10, null);
+  private final Position POSITION_FIRST_OCCURRENCE = new Position(null, null, 0, 0, 0, 0, null);
+  private final Position POSITION_SECOND_OCCURRENCE =
+      new Position(null, null, 10, 10, 10, 10, null);
   private final Multimap<String, Position> paragraphDefinitions = HashMultimap.create();
 
   private DataBusBroker databus;
