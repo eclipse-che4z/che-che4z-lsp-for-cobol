@@ -51,6 +51,7 @@ class VisitorSemanticAnalysisTest {
     CustomToken token = createNewToken(INVALID_VARIABLE);
     CobolVisitor visitor =
         new CobolVisitor(
+            "",
             new NamedSubContext(),
             mock(CommonTokenStream.class),
             Map.of(token, new Position("", 0, 0, 0, 0, "invalid")));
@@ -79,6 +80,7 @@ class VisitorSemanticAnalysisTest {
 
     CobolVisitor visitor =
         new CobolVisitor(
+            "",
             new NamedSubContext(),
             tokenStream,
             Map.of(token, new Position("", 0, 0, 0, 0, WRONG_TOKEN)));

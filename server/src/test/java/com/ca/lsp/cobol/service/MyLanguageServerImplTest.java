@@ -94,6 +94,7 @@ class MyLanguageServerImplTest {
     assertTrue(capabilities.getDocumentFormattingProvider());
     assertTrue(capabilities.getDocumentHighlightProvider());
     assertTrue(capabilities.getCodeActionProvider());
+    assertTrue(capabilities.getDocumentSymbolProvider());
     assertEquals(
         stream(values()).map(ErrorCode::name).collect(toList()),
         capabilities.getExecuteCommandProvider().getCommands());
@@ -103,7 +104,6 @@ class MyLanguageServerImplTest {
     assertNull(capabilities.getHoverProvider());
     assertNull(capabilities.getRenameProvider());
     assertNull(capabilities.getWorkspaceSymbolProvider());
-    assertNull(capabilities.getDocumentSymbolProvider());
     assertNull(capabilities.getCodeLensProvider());
     assertNull(capabilities.getColorProvider());
     assertNull(capabilities.getTypeDefinitionProvider());

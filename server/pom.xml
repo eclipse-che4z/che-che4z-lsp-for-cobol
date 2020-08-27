@@ -36,7 +36,6 @@
         <guice.version>4.2.2</guice.version>
         <java.version>11</java.version>
         <junit-jupiter.version>5.6.0</junit-jupiter.version>
-        <junit.platform.version>1.5.2</junit.platform.version>
         <junit.platform.version>1.6.0</junit.platform.version>
         <logback.classic.version>1.2.3</logback.classic.version>
         <lombok.version>1.18.10</lombok.version>
