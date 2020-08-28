@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -97,6 +99,8 @@ public class CobolLanguageEngine {
 
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
     accumulatedErrors.addAll(visitor.getErrors());
+    accumulatedErrors.addAll(
+        collectErrorsForCopybooks(accumulatedErrors, extendedDocument.getCopyStatements()));
 
     return new ResultWithErrors<>(visitor.getSemanticContext(), accumulatedErrors);
   }
@@ -113,5 +117,29 @@ public class CobolLanguageEngine {
   @Nonnull
   private Function<SyntaxError, SyntaxError> convertError(@Nonnull Map<Token, Position> mapping) {
     return err -> err.toBuilder().position(mapping.get(err.getOffendedToken())).build();
+  }
+
+  private List<SyntaxError> collectErrorsForCopybooks(
+      List<SyntaxError> syntaxErrors, Map<String, Position> copyStatements) {
+    return syntaxErrors.stream()
+        .filter(shouldRaise())
+        .map(err -> raiseError(err, copyStatements))
+        .flatMap(List::stream)
+        .collect(toList());
+  }
+
+  private List<SyntaxError> raiseError(
+      SyntaxError syntaxError, Map<String, Position> copyStatements) {
+    return Stream.of(syntaxError)
+        .filter(shouldRaise())
+        .map(err -> err.toBuilder().position(copyStatements.get(err.getPosition().getCopybookId())))
+        .map(SyntaxError.SyntaxErrorBuilder::build)
+        .map(err -> Stream.concat(raiseError(err, copyStatements).stream(), Stream.of(err)))
+        .flatMap(Function.identity())
+        .collect(toList());
+  }
+
+  private Predicate<SyntaxError> shouldRaise() {
+    return err -> err.getPosition().getCopybookId() != null;
   }
 }

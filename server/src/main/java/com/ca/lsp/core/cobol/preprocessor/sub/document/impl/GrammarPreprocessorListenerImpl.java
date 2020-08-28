@@ -45,6 +45,7 @@ import static com.ca.lsp.core.cobol.model.ErrorSeverity.INFO;
 import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Lexer.HIDDEN;
@@ -71,6 +72,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private final NamedSubContext copybooks = new NamedSubContext();
   private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
   private final Map<Integer, Integer> shifts = new HashMap<>();
+  private final Map<String, Position> copyStatements = new HashMap<>();
 
   private String documentUri;
   private BufferedTokenStream tokens;
@@ -106,7 +108,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         documentUri,
         new DocumentMapping(
             tokens.getTokens().stream().map(toPosition()).collect(toList()), shifts));
-    return new ExtendedDocument(read(), copybooks, nestedMappings);
+    return new ExtendedDocument(read(), copybooks, nestedMappings, copyStatements);
   }
 
   @Override
@@ -155,18 +157,20 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
     String uri = model.getUri();
     String rawContent = model.getContent();
-    String copybookId = getCopybookId(uri, replacingClauses);
+
+    String copybookId = randomUUID().toString();
     String replacedContent = applyReplacing(rawContent, replacingClauses);
     replacingClauses.clear();
 
     ExtendedDocument copybookDocument =
-        processCopybook(copybookName, uri, replacedContent, position);
+        processCopybook(copybookName, uri, copybookId, replacedContent, position);
     String copybookContent = copybookDocument.getText();
 
     checkCopybookNameLength(copybookName, position);
     addCopybookUsage(copybookName, position);
     addCopybookDefinition(copybookName, uri);
 
+    collectCopyStatement(copybookId, retrieveCopybookStatementPosition(ctx));
     collectNestedSemanticData(uri, copybookId, copybookDocument);
     writeCopybook(copybookId, copybookContent);
 
@@ -243,9 +247,14 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     return peek().toString();
   }
 
+  private void collectCopyStatement(String copybookId, Position position) {
+    copyStatements.put(copybookId, position);
+  }
+
   private void collectNestedSemanticData(
       String uri, String copybookId, ExtendedDocument copybookDocument) {
     copybooks.merge(copybookDocument.getCopybooks());
+    copyStatements.putAll(copybookDocument.getCopyStatements());
     nestedMappings.putAll(copybookDocument.getDocumentMapping());
     nestedMappings.putIfAbsent(copybookId, nestedMappings.get(uri));
   }
@@ -265,16 +274,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   private String applyReplacing(String rawContent, List<Pair<String, String>> replacePatterns) {
     return replacingService.applyReplacing(rawContent, replacePatterns);
-  }
-
-  private String getCopybookId(String copybookURI, List<Pair<String, String>> replacingPatterns) {
-    return copybookURI
-        + replacingPatterns.stream()
-            .map(Object::toString)
-            .reduce(String::concat)
-            .orElse("")
-            .replaceAll("[^a-zA-Z0-9]+", "")
-            .trim();
   }
 
   private CopybookModel getCopyBookContent(String copybookName, Position position) {
@@ -302,8 +301,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private ExtendedDocument processCopybook(
-      String copybookName, String uri, String content, Position position) {
-    copybookStack.push(new CopybookUsage(copybookName, position));
+      String copybookName, String uri, String copybookId, String content, Position position) {
+    copybookStack.push(new CopybookUsage(copybookName, copybookId, position));
     ResultWithErrors<ExtendedDocument> result =
         preprocessor.process(uri, content, copybookStack, copybookProcessingMode);
     copybookStack.pop();
@@ -327,20 +326,37 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     return context.getText().toUpperCase();
   }
 
+  private String retrieveCopybookId() {
+    return ofNullable(copybookStack).map(Deque::peek).map(CopybookUsage::getCopybookId).orElse(null);
+  }
+
   private void addCopybookUsage(@Nonnull String copybookName, @Nonnull Position position) {
     copybooks.addUsage(copybookName, position);
   }
 
   private void addCopybookDefinition(String copybookName, String uri) {
     if (!(isEmpty(copybookName) || isEmpty(uri))) {
-      copybooks.define(copybookName, new Position(uri, 0, -1, 1, 0, null));
+      copybooks.define(copybookName, new Position(uri, null, 0, -1, 1, 0, null));
     }
+  }
+
+  @Nonnull
+  private Position retrieveCopybookStatementPosition(@Nonnull ParserRuleContext ctx) {
+    return new Position(
+        documentUri,
+        retrieveCopybookId(),
+        ctx.getStart().getStartIndex(),
+        ctx.getStop().getStartIndex(),
+        ctx.getStart().getLine(),
+        ctx.getStart().getCharPositionInLine(),
+        ctx.getStart().getText());
   }
 
   @Nonnull
   private Position retrievePosition(@Nonnull ParserRuleContext ctx) {
     return new Position(
         documentUri,
+        retrieveCopybookId(),
         ctx.getStart().getStartIndex(),
         ctx.getStop().getStopIndex(),
         ctx.getStart().getLine(),
@@ -353,6 +369,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     return token ->
         new Position(
             documentUri,
+            retrieveCopybookId(),
             token.getStartIndex(),
             token.getStopIndex(),
             token.getLine(),

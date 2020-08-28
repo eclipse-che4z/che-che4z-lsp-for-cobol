@@ -35,7 +35,7 @@ class TestMissingNestedCopybookProducesError {
           + "2      DATA DIVISION.\n"
           + "3      WORKING-STORAGE SECTION.\n"
           + "4      01  {$*PARENT}.\n"
-          + "5      COPY {~REPL} REPLACING ==TAG== BY ==ABC==.\n"
+          + "5      {_COPY {~REPL} REPLACING ==TAG== BY ==ABC==.|missing_}\n"
           + "6      PROCEDURE DIVISION.\n"
           + "7      {#*MAINLINE}.\n"
           + "8          MOVE 0 TO {$ABC-ID}.\n"

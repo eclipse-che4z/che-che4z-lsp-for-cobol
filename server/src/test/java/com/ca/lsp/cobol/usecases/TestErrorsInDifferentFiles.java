@@ -40,7 +40,7 @@ class TestErrorsInDifferentFiles {
           + "3      Working-Storage Section.\n"
           + "4      Procedure Division.\n"
           + "5      {#*000-Main-Logic}.\n"
-          + "6      COPY {~ASDASD}. \n"
+          + "6      {_COPY {~ASDASD}.|areaA1|areaA2|child1|pic_} \n"
           + "7          DISPLAY {$CHILD1|invalid}.\n"
           + "8      End program ProgramId.";
 

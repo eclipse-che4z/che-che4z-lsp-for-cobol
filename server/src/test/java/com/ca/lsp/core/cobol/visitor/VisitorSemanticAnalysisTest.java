@@ -54,7 +54,7 @@ class VisitorSemanticAnalysisTest {
             "",
             new NamedSubContext(),
             mock(CommonTokenStream.class),
-            Map.of(token, new Position("", 0, 0, 0, 0, "invalid")));
+            Map.of(token, new Position("", null, 0, 0, 0, 0, "invalid")));
 
     visitor.visitQualifiedDataNameFormat1(mockMethod(token));
 
@@ -83,7 +83,7 @@ class VisitorSemanticAnalysisTest {
             "",
             new NamedSubContext(),
             tokenStream,
-            Map.of(token, new Position("", 0, 0, 0, 0, WRONG_TOKEN)));
+            Map.of(token, new Position("", null, 0, 0, 0, 0, WRONG_TOKEN)));
 
     visitor.visitStatement(node);
 

@@ -23,7 +23,7 @@ import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
-import com.ca.lsp.core.cobol.semantics.outline.*;
+import com.ca.lsp.core.cobol.semantics.outline.NodeType;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
@@ -52,7 +52,7 @@ class CobolLanguageEngineTest {
     CobolPreprocessor preprocessor = mock(CobolPreprocessor.class);
     CobolLanguageEngine engine = new CobolLanguageEngine(preprocessor);
 
-    Position position = new Position(URI, 0, 0, 0, 0, "");
+    Position position = new Position(URI, null, 0, 0, 0, 0, "");
     SyntaxError error =
         SyntaxError.syntaxError()
             .position(position)
@@ -62,29 +62,46 @@ class CobolLanguageEngineTest {
 
     ExtendedDocument extendedDocument =
         new ExtendedDocument(
-            TEXT, new NamedSubContext(), Map.of(URI, new DocumentMapping(List.of(
-                new Position(URI, 0, 6, 1, 0, "       "),
-                new Position(URI, 7, 20, 1, 7, "IDENTIFICATION"),
-                new Position(URI, 21, 21, 1, 21, ""),
-                new Position(URI, 22, 29, 1, 22, "DIVISION"),
-                new Position(URI, 30, 30, 1, 30, ".")
-        ), Map.of())));
+            TEXT,
+            new NamedSubContext(),
+            Map.of(
+                URI,
+                new DocumentMapping(
+                    List.of(
+                        new Position(URI, null, 0, 6, 1, 0, "       "),
+                        new Position(URI, null, 7, 20, 1, 7, "IDENTIFICATION"),
+                        new Position(URI, null, 21, 21, 1, 21, ""),
+                        new Position(URI, null, 22, 29, 1, 22, "DIVISION"),
+                        new Position(URI, null, 30, 30, 1, 30, ".")),
+                    Map.of())),
+            Map.of());
 
     when(preprocessor.process(URI, TEXT, SYNC_TYPE))
         .thenReturn(new ResultWithErrors<>(extendedDocument, List.of(error)));
 
-    Range outlineRange = new Range(new org.eclipse.lsp4j.Position(0, 7), new org.eclipse.lsp4j.Position(0, 30));
-    List<DocumentSymbol> expectedOutlineTree = List.of(
-        new DocumentSymbol("PROGRAM", NodeType.PROGRAM.getSymbolKind(), outlineRange, outlineRange, "",
-            List.of(
-                new DocumentSymbol("IDENTIFICATION DIVISION", NodeType.DIVISION.getSymbolKind(),
-                    outlineRange, outlineRange, "", List.of())
-            ))
-    );
+    Range outlineRange =
+        new Range(new org.eclipse.lsp4j.Position(0, 7), new org.eclipse.lsp4j.Position(0, 30));
+    List<DocumentSymbol> expectedOutlineTree =
+        List.of(
+            new DocumentSymbol(
+                "PROGRAM",
+                NodeType.PROGRAM.getSymbolKind(),
+                outlineRange,
+                outlineRange,
+                "",
+                List.of(
+                    new DocumentSymbol(
+                        "IDENTIFICATION DIVISION",
+                        NodeType.DIVISION.getSymbolKind(),
+                        outlineRange,
+                        outlineRange,
+                        "",
+                        List.of()))));
 
     ResultWithErrors<SemanticContext> expected =
         new ResultWithErrors<>(
-            new SemanticContext(Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), expectedOutlineTree),
+            new SemanticContext(
+                Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), expectedOutlineTree),
             List.of(error));
 
     ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, SYNC_TYPE);

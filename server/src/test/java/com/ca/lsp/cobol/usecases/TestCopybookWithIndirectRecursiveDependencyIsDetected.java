@@ -38,10 +38,10 @@ class TestCopybookWithIndirectRecursiveDependencyIsDetected {
           + "        PROGRAM-ID. test1.\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
-          + "        COPY {~INDIRECT-COPY|1|3}.\n"
+          + "        {_COPY {~INDIRECT-COPY|1|3}.|2|3|4_}\n"
           + "        PROCEDURE DIVISION.\n";
 
-  private static final String INDIRECT = "        COPY {~INNER-COPY|2|4}.";
+  private static final String INDIRECT = "        {_COPY {~INNER-COPY|2|4}.|3_}";
   private static final String INNER_COPY = "        COPY {~INDIRECT-COPY|3}.";
 
   private static final String INDIRECT_NAME = "INDIRECT-COPY";

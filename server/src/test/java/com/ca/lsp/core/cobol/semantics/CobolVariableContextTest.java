@@ -49,8 +49,8 @@ class CobolVariableContextTest {
   private static final String VAR8 = "VAR8";
   private static final String PARENT1 = "PARENT1";
 
-  private static final Position ERROR_POSITION1 = new Position(null, 0, 3, 1, 5, null);
-  private static final Position ERROR_POSITION2 = new Position(null, 4, 8, 2, 5, null);
+  private static final Position ERROR_POSITION1 = new Position(null, null, 0, 3, 1, 5, null);
+  private static final Position ERROR_POSITION2 = new Position(null, null, 4, 8, 2, 5, null);
 
   private CobolVariableContext context;
   private Variable var1;

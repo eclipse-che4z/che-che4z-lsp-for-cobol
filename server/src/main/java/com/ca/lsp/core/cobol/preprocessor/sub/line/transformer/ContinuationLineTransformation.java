@@ -173,6 +173,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
             .position(
                 new Position(
                     uri,
+                    null,
                     cobolLineTrimmedLength,
                     cobolLineTrimmedLength,
                     lineNumber,
@@ -194,7 +195,13 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
         SyntaxError.syntaxError()
             .position(
                 new Position(
-                    uri, startPosition, END_INDEX_CONTENT_AREA_A, lineNumber, startPosition, null))
+                    uri,
+                    null,
+                    startPosition,
+                    END_INDEX_CONTENT_AREA_A,
+                    lineNumber,
+                    startPosition,
+                    null))
             .suggestion("A continuation line cannot contain values in the Content Area A")
             .severity(ERROR)
             .build();

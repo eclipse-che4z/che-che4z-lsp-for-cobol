@@ -44,9 +44,9 @@ class GrammarPreprocessorImplTest {
   private static final String SYNC_TYPE = "DID_OPEN";
   private static final String CPYNAME = "CPYNAME";
 
-  private static final Position RESULT_POS = new Position(CPYNAME, 0, 6, 0, 0, null);
-  private static final Position CPYNAME_POS = new Position(DOCUMENT, 5, 12, 0, 5, null);
-  private static final Position COPY_POS = new Position(DOCUMENT, 0, 4, 0, 0, null);
+  private static final Position RESULT_POS = new Position(CPYNAME, null, 0, 6, 0, 0, null);
+  private static final Position CPYNAME_POS = new Position(DOCUMENT, null, 5, 12, 0, 5, null);
+  private static final Position COPY_POS = new Position(DOCUMENT, null, 0, 4, 0, 0, null);
 
   @Test
   void testBuildingExtendedDocument() {
@@ -62,7 +62,8 @@ class GrammarPreprocessorImplTest {
     DocumentMapping cpyMapping = new DocumentMapping(List.of(RESULT_POS), Map.of());
 
     ExtendedDocument expectedDocument =
-        new ExtendedDocument(RESULT, copybooks, Map.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping));
+        new ExtendedDocument(
+            RESULT, copybooks, Map.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping), Map.of());
 
     when(factory.create(
             eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(SYNC_TYPE)))
