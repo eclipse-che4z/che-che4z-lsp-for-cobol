@@ -498,7 +498,7 @@ cics_issue_convid: CONVID cics_name (STATE cics_cvda)?;
 /** LINK / LINK ACQPROCESS / LINK ACTIVITY: */
 cics_link: LINK (cics_link_program | cics_link_acqprocess | cics_link_activity);
 cics_link_program: PROGRAM cics_name (cics_link_commarea | CHANNEL cics_name)? (cics_link_inputmsg |
-                   (SYSID cics_system)? SYNCONRETURN? (TRANSID cics_name)?)?;
+                   (SYSID cics_system) SYNCONRETURN (TRANSID cics_name))?;
 cics_link_commarea: COMMAREA cics_data_area (LENGTH cics_data_value)? (DATALENGTH cics_data_value)?;
 cics_link_inputmsg: INPUTMSG cics_data_area (INPUTMSGLEN cics_data_value)?;
 cics_link_acqprocess: ACQPROCESS (INPUTEVENT cics_data_value)?;
@@ -511,7 +511,7 @@ cics_load: LOAD PROGRAM cics_name (SET cics_ref)? (LENGTH cics_data_area | FLENG
 cics_monitor: MONITOR POINT cics_data_value DATA1 cics_data_area? DATA2 cics_data_area? (ENTRYNAME cics_data_area)?;
 
 /** MOVE CONTAINER (both) */
-cics_move: MOVE CONTAINER cics_data_value AS cics_data_value (cics_move_bts | cics_move_channel)?;
+cics_move: MOVE CONTAINER cics_data_value AS cics_data_value (cics_move_bts | cics_move_channel);
 cics_move_bts: (FROMPROCESS | FROMACTIVITY cics_data_value)? (TOPROCESS | TOACTIVITY cics_data_value)?;
 cics_move_channel: (CHANNEL cics_data_value)? (TOCHANNEL cics_data_value)?;
 
@@ -610,7 +610,7 @@ cics_rewrite: REWRITE FILE cics_mama (TOKEN cics_data_area)? FROM cics_data_area
               LENGTH cics_data_value | LENGTH cics_data_value)? NOSUSPEND?;
 
 /** ROUTE */
-cics_route: ROUTE (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after)? ERRTERM(name?)?
+cics_route: ROUTE (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after)? (ERRTERM cics_name?)?
             (TITLE cics_data_area)? (LIST cics_data_area)? (OPCLASS cics_data_area)? (REQID cics_name)? (LDC cics_name)? NLEOM?;
 
 /** RUN */
@@ -759,14 +759,14 @@ cics_web_converse: CONVERSE SESSTOKEN cics_data_value (PATH cics_data_area PATHL
 cics_web_querystring: QUERYSTRING cics_data_area QUERYSTRLEN cics_data_value;
 cics_web_tocontainer: TOCONTAINER cics_data_value (TOCHANNEL cics_data_value)?;
 cics_web_statustext: STATUSTEXT cics_data_area STATUSLEN cics_data_value;
-cics_web_body: (cics_web_doctoken | cics_web_from | cics_web_container);
+cics_web_body: cics_web_doctoken | cics_web_from | cics_web_container;
 cics_web_doctoken: DOCTOKEN cics_data_value (NODOCDELETE | DOCDELETE | DOCSTATUS cics_cvda)?;
 cics_web_from: FROM cics_data_area FROMLENGTH cics_data_value;
 cics_web_container: CONTAINER cics_data_value (CHANNEL cics_data_value)?;
 cics_web_credentials: cics_web_username? PASSWORD cics_data_value (PASSWORDLEN cics_data_value)?;
 cics_web_username: (NONE | BASICAUTH | AUTHENTICATE cics_cvda) USERNAME cics_data_value (USERNAMELEN cics_data_value)?;
-cics_web_translation: (CHARACTERSET cics_data_value)?
-                      (CLICONVERT | NOINCONVERT | NOOUTCONERT | NOCLICONVERT | CLIENTCONV cics_cvda)?;
+cics_web_translation: (CHARACTERSET cics_data_value)
+                      (CLICONVERT | NOINCONVERT | NOOUTCONERT | NOCLICONVERT | CLIENTCONV cics_cvda);
 cics_web_endbrowse: ENDBROWSE (FORMFIELD | cics_web_ehttpheader | QUERYPARM);
 cics_web_ehttpheader: HTTPHEADER (SESSTOKEN cics_data_value)?;
 cics_web_extract: EXTRACT (SCHEME cics_cvda)? cics_web_host? cics_web_httpmethod? cics_web_httpversion? cics_web_path?
@@ -818,7 +818,7 @@ cics_web_sclient: SESSTOKEN cics_data_value (GET | HEAD | POST | PUT | TRACE | O
                   (CLICONVERT | NOCLICONVERT | CLIENTCONV cics_cvda)? (CHARACTERSET cics_data_value)? (EXPECT | ACTION cics_cvda)?
                    (NOCLOSE | CLOSE | CLOSESTATUS cics_cvda)? cics_web_scauth?;
 cics_web_scbody: MEDIATYPE cics_data_value (cics_web_doctoken | cics_web_sfrom | cics_web_container)?;
-cics_web_scauth: (NONE | BASICAUTH | AUTHENTICATE cics_cvda)? cics_web_sccredentials?;
+cics_web_scauth: (NONE | BASICAUTH | AUTHENTICATE cics_cvda) cics_web_sccredentials;
 cics_web_sccredentials: USERNAME cics_data_value (USERNAMELEN cics_data_value)? PASSWORD cics_data_value (PASSWORDLEN cics_data_value)?;
 cics_web_startbrowse: STARTBROWSE (cics_web_sbformfield | cics_web_sbhttpheader | cics_web_sbqueryparm);
 cics_web_sbformfield: FORMFIELD(data_area?) (NAMELENGTH cics_data_area)? (CHARACTERSET cics_data_value)? (HOSTCODEPAGE cics_data_value)?;
