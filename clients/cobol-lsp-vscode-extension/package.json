@@ -76,6 +76,12 @@
                 }
             }
         ],
+        "snippets": [
+            {
+                "language": "COBOL",
+                "path": "./snippets.json"
+            }
+        ],
         "configuration": {
             "title": "Broadcom COBOL LSP",
             "properties": {
