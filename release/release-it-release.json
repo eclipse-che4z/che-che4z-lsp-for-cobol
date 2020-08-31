@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "before:init": ["git config user.email \"dont@write.here\"", "git config user.name \"Caring bot\""]
+  },
+  "github": {
+    "release": true
+  },
+  "git": {
+    "commitMessage": "Release: ${version}"
+  }, 
+  "npm": {
+          "publish": false
+  },
+  "plugins": {
+    ".release/version-extract.js": {
+
+    }
+  }
+}
