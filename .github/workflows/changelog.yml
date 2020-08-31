@@ -12,7 +12,6 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: '12'
-        check-latest: true
     - run: npm install --global release-it @release-it/conventional-changelog
     - run: release-it --ci --config release/release-it-changelog.json
       env:

@@ -12,7 +12,7 @@
           "publish": false
   },
   "plugins": {
-    ".release/version-extract.js": {
+    "../../release/version-extract.js": {
 
     }
   }

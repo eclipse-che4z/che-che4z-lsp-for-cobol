@@ -1,7 +1,6 @@
 {
   "hooks": {
-    "before:init": ["git config user.email \"dont@write.here\"", "git config user.name \"Caring bot\""],
-    "after:bump": "git checkout -- package.json package-lock.json"
+    "before:init": ["git config user.email \"dont@write.here\"", "git config user.name \"Caring bot\""]
   },
   "github": {
     "release": false
