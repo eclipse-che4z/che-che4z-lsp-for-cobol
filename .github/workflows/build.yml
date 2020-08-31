@@ -17,8 +17,8 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: '12'
-    - run: npm ci
-    - run: npx vsce package
+    - run: cd clients/cobol-lsp-vscode-extension; npm ci
+    - run: cd clients/cobol-lsp-vscode-extension; npx vsce package
     - name: Archive results
       uses: actions/upload-artifact@v2
       with:
