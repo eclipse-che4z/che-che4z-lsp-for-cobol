@@ -4,7 +4,7 @@
     "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "0.14.0",
+    "version": "0.15.1",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
