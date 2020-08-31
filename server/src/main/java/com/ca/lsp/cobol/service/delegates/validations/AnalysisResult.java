@@ -41,7 +41,14 @@ public class AnalysisResult {
 
   public static AnalysisResult empty() {
     return new AnalysisResult(
-        emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), List.of());
+        emptyMap(),
+        emptyMap(),
+        emptyMap(),
+        emptyMap(),
+        emptyMap(),
+        emptyMap(),
+        emptyMap(),
+        List.of());
   }
 
   public Set<String> getVariables() {

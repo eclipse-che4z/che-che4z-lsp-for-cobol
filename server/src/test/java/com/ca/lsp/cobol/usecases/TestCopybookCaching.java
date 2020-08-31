@@ -21,10 +21,10 @@ import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
-import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.mocks.MockCopybookService;
 import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
+import com.ca.lsp.core.cobol.model.Locality;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CopybookResolutionProvider;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.MultiMapSerializableHelper;
 import com.google.common.collect.HashMultimap;
@@ -32,6 +32,8 @@ import com.google.common.collect.Multimap;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,13 +51,15 @@ import static junit.framework.TestCase.assertTrue;
  */
 @Slf4j
 class TestCopybookCaching {
-  private final String COPYBOOK_NAME = "copy";
-  private final String COPYBOOK_CONTENT = "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
+  private static final String COPYBOOK_NAME = "copy";
+  private static final String COPYBOOK_CONTENT =
+      "000230 77  REPORT-STATUS           PIC 99 VALUE ZERO.";
 
-  private final Position POSITION_FIRST_OCCURRENCE = new Position(null, null, 0, 0, 0, 0, null);
-  private final Position POSITION_SECOND_OCCURRENCE =
-      new Position(null, null, 10, 10, 10, 10, null);
-  private final Multimap<String, Position> paragraphDefinitions = HashMultimap.create();
+  private static final Locality FIRST_OCCURRENCE =
+      Locality.builder().range(new Range(new Position(0, 0), new Position(0, 0))).build();
+  private static final Locality SECOND_OCCURRENCE =
+      Locality.builder().range(new Range(new Position(10, 10), new Position(10, 10))).build();
+  private static final Multimap<String, Locality> paragraphDefinitions = HashMultimap.create();
 
   private DataBusBroker databus;
   private CopybookResolutionProvider resolution;
@@ -72,8 +76,8 @@ class TestCopybookCaching {
 
   private void initParagraphDefinitions() {
     String paragraphName = "PARNAME";
-    paragraphDefinitions.put(paragraphName, POSITION_FIRST_OCCURRENCE);
-    paragraphDefinitions.put(paragraphName, POSITION_SECOND_OCCURRENCE);
+    paragraphDefinitions.put(paragraphName, FIRST_OCCURRENCE);
+    paragraphDefinitions.put(paragraphName, SECOND_OCCURRENCE);
   }
 
   private void predefineCache() {

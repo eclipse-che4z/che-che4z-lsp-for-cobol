@@ -15,16 +15,13 @@
 
 package com.ca.lsp.core.cobol.engine;
 
-import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.model.DocumentMapping;
-import com.ca.lsp.core.cobol.model.ExtendedDocument;
-import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.model.*;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.outline.NodeType;
 import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -52,10 +49,14 @@ class CobolLanguageEngineTest {
     CobolPreprocessor preprocessor = mock(CobolPreprocessor.class);
     CobolLanguageEngine engine = new CobolLanguageEngine(preprocessor);
 
-    Position position = new Position(URI, null, 0, 0, 0, 0, "");
+    Locality locality =
+        Locality.builder()
+            .uri(URI)
+            .range(new Range(new Position(0, 0), new Position(0, 0)))
+            .build();
     SyntaxError error =
         SyntaxError.syntaxError()
-            .position(position)
+            .locality(locality)
             .suggestion("suggestion")
             .severity(ERROR)
             .build();
@@ -68,11 +69,31 @@ class CobolLanguageEngineTest {
                 URI,
                 new DocumentMapping(
                     List.of(
-                        new Position(URI, null, 0, 6, 1, 0, "       "),
-                        new Position(URI, null, 7, 20, 1, 7, "IDENTIFICATION"),
-                        new Position(URI, null, 21, 21, 1, 21, ""),
-                        new Position(URI, null, 22, 29, 1, 22, "DIVISION"),
-                        new Position(URI, null, 30, 30, 1, 30, ".")),
+                        Locality.builder()
+                            .uri(URI)
+                            .range(new Range(new Position(0, 0), new Position(0, 7)))
+                            .token("       ")
+                            .build(),
+                        Locality.builder()
+                            .uri(URI)
+                            .range(new Range(new Position(0, 7), new Position(0, 20)))
+                            .token("IDENTIFICATION")
+                            .build(),
+                        Locality.builder()
+                            .uri(URI)
+                            .range(new Range(new Position(0, 21), new Position(0, 22)))
+                            .token(" ")
+                            .build(),
+                        Locality.builder()
+                            .uri(URI)
+                            .range(new Range(new Position(0, 22), new Position(0, 29)))
+                            .token("DIVISION")
+                            .build(),
+                        Locality.builder()
+                            .uri(URI)
+                            .range(new Range(new Position(0, 30), new Position(0, 31)))
+                            .token(".")
+                            .build()),
                     Map.of())),
             Map.of());
 

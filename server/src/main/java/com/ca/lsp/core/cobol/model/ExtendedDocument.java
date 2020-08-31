@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.core.cobol.model;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import lombok.Value;
 
@@ -24,5 +23,5 @@ public class ExtendedDocument {
   private String text;
   private NamedSubContext copybooks;
   private Map<String, DocumentMapping> documentMapping;
-  private Map<String, Position> copyStatements;
+  private Map<String, Locality> copyStatements;
 }
