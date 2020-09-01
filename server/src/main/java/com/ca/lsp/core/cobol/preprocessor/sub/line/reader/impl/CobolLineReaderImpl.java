@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.line.reader.impl;
 
-import com.broadcom.lsp.domain.common.model.Position;
+import com.ca.lsp.core.cobol.model.Locality;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
@@ -21,6 +21,8 @@ import com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReader;
 import com.ca.lsp.core.cobol.preprocessor.sub.line.reader.CobolLineReaderDelegate;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -175,15 +177,15 @@ public class CobolLineReaderImpl implements CobolLineReader {
         SyntaxError.syntaxError()
             .suggestion("Source text can not go past column 80.")
             .severity(ERROR)
-            .position(
-                new Position(
-                    uri,
-                    null,
-                    charPosition,
-                    (charPosition + errorLength) - 1,
-                    lineNumber + 1,
-                    charPosition,
-                    null))
+            .locality(
+                Locality.builder()
+                    .uri(uri)
+                    .range(
+                        new Range(
+                            new Position(lineNumber, charPosition),
+                            new Position(lineNumber, charPosition + errorLength)))
+                    .recognizer(CobolLineReaderImpl.class)
+                    .build())
             .build();
 
     LOG.debug("Syntax error by CobolLineReaderImpl#registerFormatError: " + error.toString());

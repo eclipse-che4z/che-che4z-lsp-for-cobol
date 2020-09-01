@@ -13,7 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
-import com.broadcom.lsp.domain.common.model.Position;
+import com.ca.lsp.core.cobol.model.Locality;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -25,7 +25,7 @@ import java.util.Set;
 
 @Slf4j
 public class MultiMapSerializableHelper {
-  private static final Map<String, Set<Position>> MAP = Maps.newHashMap();
+  private static final Map<String, Set<Locality>> MAP = Maps.newHashMap();
 
   private MultiMapSerializableHelper() {}
   /**
@@ -34,11 +34,11 @@ public class MultiMapSerializableHelper {
    * @param multimap of type [STRING -> LIST[object]]
    * @return a String that serialize the data in the multimap
    */
-  public static String serializeInString(Multimap<String, Position> multimap) {
-    Map<String, Set<Position>> map = createHashMapFromMultimap(multimap);
+  public static String serializeInString(Multimap<String, Locality> multimap) {
+    Map<String, Set<Locality>> map = createHashMapFromMultimap(multimap);
     StringBuilder stringBuilder = new StringBuilder();
 
-    for (Map.Entry<String, Set<Position>> entry : map.entrySet()) {
+    for (Map.Entry<String, Set<Locality>> entry : map.entrySet()) {
       stringBuilder.append(entry.getKey()).append(entry.getValue().toString());
     }
     LOG.info("STRING: " + stringBuilder.toString());
@@ -51,14 +51,14 @@ public class MultiMapSerializableHelper {
    * @param multimap of type [STRING -> LIST[object]]
    * @return a HashMap that serialize the data in the multimap
    */
-  public static Map<String, Set<Position>> serializeInHashMap(Multimap<String, Position> multimap) {
+  public static Map<String, Set<Locality>> serializeInHashMap(Multimap<String, Locality> multimap) {
     return createHashMapFromMultimap(multimap);
   }
 
-  private static Map<String, Set<Position>> createHashMapFromMultimap(
-      Multimap<String, Position> multimap) {
+  private static Map<String, Set<Locality>> createHashMapFromMultimap(
+      Multimap<String, Locality> multimap) {
 
-    for (Map.Entry<String, Collection<Position>> entry : multimap.asMap().entrySet()) {
+    for (Map.Entry<String, Collection<Locality>> entry : multimap.asMap().entrySet()) {
       MAP.put(entry.getKey(), ImmutableSet.copyOf(entry.getValue()));
     }
     LOG.info("MAP: " + MAP.toString());

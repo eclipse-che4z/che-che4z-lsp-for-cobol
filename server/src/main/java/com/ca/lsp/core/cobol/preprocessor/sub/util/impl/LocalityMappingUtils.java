@@ -15,7 +15,7 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
-import com.broadcom.lsp.domain.common.model.Position;
+import com.ca.lsp.core.cobol.model.Locality;
 import com.ca.lsp.core.cobol.model.DocumentMapping;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.Token;
@@ -39,7 +39,7 @@ import static java.util.Optional.ofNullable;
  * applied by string equity.
  */
 @UtilityClass
-public class PositionMappingUtils {
+public class LocalityMappingUtils {
 
   private static final int URI_PREFIX_LENGTH = CPY_ENTER_TAG.length() + CPY_URI_OPEN.length();
   private static final int URI_SUFFIX_LENGTH = CPY_URI_CLOSE.length();
@@ -54,9 +54,9 @@ public class PositionMappingUtils {
    * @param documentUri - URI of the current document
    * @return map of tokens and original positions.
    */
-  public Map<Token, Position> createPositionMapping(
+  public Map<Token, Locality> createPositionMapping(
       List<Token> tokens, Map<String, DocumentMapping> documentPositions, String documentUri) {
-    Map<Token, Position> result = new HashMap<>();
+    Map<Token, Locality> result = new HashMap<>();
     Deque<DocumentHierarchyLevel> documentHierarchyStack = new ArrayDeque<>();
     enterDocument(documentUri, documentPositions, documentHierarchyStack);
     tokens.forEach(mapToken(documentPositions, result, documentHierarchyStack));
@@ -65,7 +65,7 @@ public class PositionMappingUtils {
 
   private Consumer<Token> mapToken(
       Map<String, DocumentMapping> documentPositions,
-      Map<Token, Position> result,
+      Map<Token, Locality> result,
       Deque<DocumentHierarchyLevel> documentHierarchyStack) {
     return token -> {
       if (token.getType() == COPYENTRY) {
@@ -81,12 +81,12 @@ public class PositionMappingUtils {
 
   private void mapTokenToPosition(
       Token token,
-      Map<Token, Position> mappingAccumulator,
+      Map<Token, Locality> mappingAccumulator,
       Deque<DocumentHierarchyLevel> documentHierarchyStack) {
-    Position position = currentDocument(documentHierarchyStack).getCurrent();
-    if (position == null) return;
-    if (tokenMatches(token.getText(), position.getToken())) {
-      mappingAccumulator.put(token, position);
+    Locality locality = currentDocument(documentHierarchyStack).getCurrent();
+    if (locality == null) return;
+    if (tokenMatches(token.getText(), locality.getToken())) {
+      mappingAccumulator.put(token, locality);
       currentDocument(documentHierarchyStack).forward();
     } else {
       applyLookAhead(token, mappingAccumulator, documentHierarchyStack);
@@ -107,13 +107,13 @@ public class PositionMappingUtils {
    */
   private void applyLookAhead(
       Token token,
-      Map<Token, Position> mappingAccumulator,
+      Map<Token, Locality> mappingAccumulator,
       Deque<DocumentHierarchyLevel> documentHierarchyStack) {
-    List<Position> positionsInFront = currentDocument(documentHierarchyStack).lookahead();
+    List<Locality> positionsInFront = currentDocument(documentHierarchyStack).lookahead();
     for (int pos = 0; pos < positionsInFront.size(); pos++) {
-      Position forwardedPosition = positionsInFront.get(pos);
-      if (tokenMatches(token.getText(), forwardedPosition.getToken())) {
-        mappingAccumulator.put(token, forwardedPosition);
+      Locality forwardedLocality = positionsInFront.get(pos);
+      if (tokenMatches(token.getText(), forwardedLocality.getToken())) {
+        mappingAccumulator.put(token, forwardedLocality);
         currentDocument(documentHierarchyStack).forceForward(pos + 1);
         break;
       }

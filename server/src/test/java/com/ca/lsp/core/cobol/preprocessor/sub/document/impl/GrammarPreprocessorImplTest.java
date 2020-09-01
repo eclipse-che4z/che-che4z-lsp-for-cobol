@@ -15,12 +15,13 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.*;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListenerFactory;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import org.antlr.v4.runtime.BufferedTokenStream;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayDeque;
@@ -44,9 +45,21 @@ class GrammarPreprocessorImplTest {
   private static final String SYNC_TYPE = "DID_OPEN";
   private static final String CPYNAME = "CPYNAME";
 
-  private static final Position RESULT_POS = new Position(CPYNAME, null, 0, 6, 0, 0, null);
-  private static final Position CPYNAME_POS = new Position(DOCUMENT, null, 5, 12, 0, 5, null);
-  private static final Position COPY_POS = new Position(DOCUMENT, null, 0, 4, 0, 0, null);
+  private static final Locality RESULT_POS =
+      Locality.builder()
+          .uri(CPYNAME)
+          .range(new Range(new Position(0, 0), new Position(0, 6)))
+          .build();
+  private static final Locality CPYNAME_POS =
+      Locality.builder()
+          .uri(DOCUMENT)
+          .range(new Range(new Position(0, 5), new Position(0, 12)))
+          .build();
+  private static final Locality COPY_POS =
+      Locality.builder()
+          .uri(DOCUMENT)
+          .range(new Range(new Position(0, 0), new Position(0, 4)))
+          .build();
 
   @Test
   void testBuildingExtendedDocument() {
@@ -57,7 +70,7 @@ class GrammarPreprocessorImplTest {
     ArrayDeque<CopybookUsage> copybookStack = new ArrayDeque<>();
 
     NamedSubContext copybooks = new NamedSubContext();
-    copybooks.addUsage(CPYNAME, CPYNAME_POS);
+    copybooks.addUsage(CPYNAME, CPYNAME_POS.toLocation());
     DocumentMapping mainMapping = new DocumentMapping(List.of(CPYNAME_POS, COPY_POS), Map.of(0, 2));
     DocumentMapping cpyMapping = new DocumentMapping(List.of(RESULT_POS), Map.of());
 

@@ -13,14 +13,14 @@
  */
 package com.ca.lsp.core.cobol.engine;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.ExtendedDocument;
+import com.ca.lsp.core.cobol.model.Locality;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolLexer;
 import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PositionMappingUtils;
+import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.LocalityMappingUtils;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.strategy.CobolErrorStrategy;
 import com.ca.lsp.core.cobol.visitor.CobolVisitor;
@@ -89,8 +89,8 @@ public class CobolLanguageEngine {
 
     CobolParser.StartRuleContext tree = parser.startRule();
 
-    Map<Token, Position> positionMapping =
-        PositionMappingUtils.createPositionMapping(
+    Map<Token, Locality> positionMapping =
+        LocalityMappingUtils.createPositionMapping(
             tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri);
 
     CobolVisitor visitor =
@@ -107,20 +107,20 @@ public class CobolLanguageEngine {
 
   @Nonnull
   private List<SyntaxError> finalizeErrors(
-      @Nonnull List<SyntaxError> errors, @Nonnull Map<Token, Position> mapping) {
+      @Nonnull List<SyntaxError> errors, @Nonnull Map<Token, Locality> mapping) {
     return errors.stream()
         .map(convertError(mapping))
-        .filter(it -> it.getPosition() != null)
+        .filter(it -> it.getLocality() != null)
         .collect(toList());
   }
 
   @Nonnull
-  private Function<SyntaxError, SyntaxError> convertError(@Nonnull Map<Token, Position> mapping) {
-    return err -> err.toBuilder().position(mapping.get(err.getOffendedToken())).build();
+  private Function<SyntaxError, SyntaxError> convertError(@Nonnull Map<Token, Locality> mapping) {
+    return err -> err.toBuilder().locality(mapping.get(err.getOffendedToken())).build();
   }
 
   private List<SyntaxError> collectErrorsForCopybooks(
-      List<SyntaxError> syntaxErrors, Map<String, Position> copyStatements) {
+      List<SyntaxError> syntaxErrors, Map<String, Locality> copyStatements) {
     return syntaxErrors.stream()
         .filter(shouldRaise())
         .map(err -> raiseError(err, copyStatements))
@@ -129,10 +129,10 @@ public class CobolLanguageEngine {
   }
 
   private List<SyntaxError> raiseError(
-      SyntaxError syntaxError, Map<String, Position> copyStatements) {
+      SyntaxError syntaxError, Map<String, Locality> copyStatements) {
     return Stream.of(syntaxError)
         .filter(shouldRaise())
-        .map(err -> err.toBuilder().position(copyStatements.get(err.getPosition().getCopybookId())))
+        .map(err -> err.toBuilder().locality(copyStatements.get(err.getLocality().getCopybookId())))
         .map(SyntaxError.SyntaxErrorBuilder::build)
         .map(err -> Stream.concat(raiseError(err, copyStatements).stream(), Stream.of(err)))
         .flatMap(Function.identity())
@@ -140,6 +140,6 @@ public class CobolLanguageEngine {
   }
 
   private Predicate<SyntaxError> shouldRaise() {
-    return err -> err.getPosition().getCopybookId() != null;
+    return err -> err.getLocality().getCopybookId() != null;
   }
 }

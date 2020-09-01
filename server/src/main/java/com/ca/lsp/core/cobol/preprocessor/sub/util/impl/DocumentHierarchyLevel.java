@@ -15,7 +15,7 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
-import com.broadcom.lsp.domain.common.model.Position;
+import com.ca.lsp.core.cobol.model.Locality;
 import com.ca.lsp.core.cobol.model.DocumentMapping;
 
 import javax.annotation.Nonnull;
@@ -31,12 +31,12 @@ import java.util.Map;
  */
 class DocumentHierarchyLevel {
   private int index;
-  private List<Position> positions;
+  private List<Locality> localities;
   private Map<Integer, Integer> shifts;
 
   DocumentHierarchyLevel(@Nonnull DocumentMapping documentMapping) {
     index = 0;
-    positions = documentMapping.getPositions();
+    localities = documentMapping.getLocalities();
     shifts = documentMapping.getShifts();
     initialForward();
   }
@@ -47,8 +47,8 @@ class DocumentHierarchyLevel {
    * @return the current position or null.
    */
   @Nullable
-  public Position getCurrent() {
-    return index < positions.size() ? positions.get(index) : null;
+  public Locality getCurrent() {
+    return index < localities.size() ? localities.get(index) : null;
   }
 
   /** Increase the index by one or by shift if specified */
@@ -62,10 +62,10 @@ class DocumentHierarchyLevel {
    * @return sublist of positions to the end of the list or an empty list.
    */
   @Nonnull
-  List<Position> lookahead() {
-    int tail = positions.size() - index;
+  List<Locality> lookahead() {
+    int tail = localities.size() - index;
     if (tail < 1) return List.of();
-    return positions.subList(index, index + tail);
+    return localities.subList(index, index + tail);
   }
 
   /**
