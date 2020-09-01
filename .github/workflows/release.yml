@@ -1,14 +1,13 @@
 name: Release
 
-on:
-  workflow_dispatch:
-    branches:
-      - master
+on: workflow_dispatch
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+    - name: Check if the branch is master
+      run: [ "master" = ${GITHUB_REF#refs/heads/} ]
     - name: Checkout the code
       uses: actions/checkout@v2
     - name: Set up JDK 11
