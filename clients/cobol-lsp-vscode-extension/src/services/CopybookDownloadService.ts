@@ -46,9 +46,10 @@ export class CopybookDownloadService implements vscode.Disposable {
      * local workspaces and should be added in the download queue for copybooks that the LSP client will try
      * to download from MF
      * @param cobolFileName name of the document open in workspace
-     * @param copybookName name of the copybook required by the LSP server
+     * @param copybookNames list of names of the copybooks required by the LSP server
      */
     public async downloadCopybooks(cobolFileName: string, copybookNames: string[]): Promise<void> {
+        TelemetryService.registerEvent("Fetch copybook", ["COBOL", "copybook", "quickfix"], "Resolve a copybook that is not currently found");
         if (!checkWorkspace()) {
             return;
         }
@@ -58,11 +59,10 @@ export class CopybookDownloadService implements vscode.Disposable {
             return;
         }
         await this.resolver.addCopybookInQueue(copybookNames, profile);
-
     }
 
     public async start() {
-        //TODO: CREATE A RECORDING EVENT WITH START AND END METHOD..
+
         const startTime: number = Date.now();
         this.resolver.setQueue(this.queue);
         let done = false;

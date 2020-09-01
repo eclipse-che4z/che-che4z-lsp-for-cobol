@@ -13,16 +13,15 @@
  */
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
-import {EXTENSION_ID} from "../../constants";
+import {EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT} from "../../constants";
 import {ExtensionUtils} from "../settings/util/ExtensionUtils";
 import {TelemetryEvent} from "./model/TelemetryEvent";
 import {TelemetryReport} from "./TelemetryReport";
 
 export class TelemetryReporterImpl implements TelemetryReport {
-
     public static getInstance(): TelemetryReporterImpl {
         if (!TelemetryReporterImpl.instance) {
-            TelemetryReporterImpl.instance = new TelemetryReporterImpl();
+            TelemetryReporterImpl.instance = new TelemetryReporterImpl(ExtensionUtils.getTelemetryKeyId());
         }
         return TelemetryReporterImpl.instance;
     }
@@ -30,7 +29,6 @@ export class TelemetryReporterImpl implements TelemetryReport {
     private static instance: TelemetryReporterImpl;
 
     private static generateData(content: TelemetryEvent) {
-
         return {
             categories: content.getCategories().toString(),
             event: content.getEventName(),
@@ -42,25 +40,33 @@ export class TelemetryReporterImpl implements TelemetryReport {
         };
     }
 
+    private readonly telemetryKeyId: string;
     private reporter: TelemetryReporter;
 
-    // TODO: if key is invalid might be useful don't engage the reporter...
-    private constructor() {
-        this.reporter = new TelemetryReporter(EXTENSION_ID, ExtensionUtils.getPackageVersion(), ExtensionUtils.getTelemetryKeyId());
+    private constructor(telemetryKeyId: string) {
+        this.telemetryKeyId = telemetryKeyId;
+        this.reporter = new TelemetryReporter(EXTENSION_ID, ExtensionUtils.getPackageVersion(), telemetryKeyId);
         // TODO: remove after test on Che
-        vscode.window.showInformationMessage(ExtensionUtils.getTelemetryKeyId());
+        vscode.window.showInformationMessage(telemetryKeyId);
     }
 
     public reportEvent(content: TelemetryEvent): void {
-        this.reporter.sendTelemetryEvent(content.getEventName(), TelemetryReporterImpl.generateData(content));
+        if (this.isValidTelemetryKey()) {
+            this.reporter.sendTelemetryEvent(content.getEventName(), TelemetryReporterImpl.generateData(content));
+        }
     }
 
     public reportExceptionEvent(content: TelemetryEvent): void {
-        this.reporter.sendTelemetryErrorEvent(content.getEventName(), TelemetryReporterImpl.generateData(content));
+        if (this.isValidTelemetryKey()) {
+            this.reporter.sendTelemetryErrorEvent(content.getEventName(), TelemetryReporterImpl.generateData(content));
+        }
     }
 
     public dispose(): any {
         this.reporter.dispose();
     }
 
+    private isValidTelemetryKey(): boolean {
+        return this.telemetryKeyId !== TELEMETRY_DEFAULT_CONTENT;
+    }
 }

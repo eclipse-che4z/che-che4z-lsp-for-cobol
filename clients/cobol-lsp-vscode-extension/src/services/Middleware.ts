@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {CancellationToken, HandlerResult } from "vscode-jsonrpc";
+import {CancellationToken, HandlerResult} from "vscode-jsonrpc";
 import {ConfigurationParams, ConfigurationRequest} from "vscode-languageclient";
 import {CopybookDownloadService} from "./CopybookDownloadService";
 import {CopybookURI} from "./CopybookURI";
@@ -25,6 +25,7 @@ export class Middleware {
         const lastDot = params.lastIndexOf(".");
         return [params.substring(secondDot + 1, lastDot), params.substring(lastDot + 1)];
     }
+
     constructor(
         private copybookResolverURI: CopybookURI,
         private copybookDownloader: CopybookDownloadService) {
@@ -38,14 +39,14 @@ export class Middleware {
         if (params.items.length > 0) {
             const sectionName = params.items[0].section;
             if (sectionName.startsWith("broadcom-cobol-lsp.copybook-resolve")) {
-                //TODO: review if is useful send telemetry at this point - double check with requirements
+                // TODO: review if is useful send telemetry at this point - double check with requirements
                 TelemetryService.registerEvent("resolve local copybook", ["COBOL", "copyooks", "copybook-resolve"], "Resolve a copybook from local folders");
 
                 const [cobolFileName, copybookName] = Middleware.extractFileAndCopybookNames(sectionName);
                 return [await this.copybookResolverURI.resolveCopybookURI(copybookName, cobolFileName)];
             }
             if (sectionName.startsWith("broadcom-cobol-lsp.copybook-download")) {
-                //TODO: review if is useful send telemetry at this point - double check with requirements
+                // TODO: review if is useful send telemetry at this point - double check with requirements
                 TelemetryService.registerEvent("resolve copybook from MF", ["COBOL", "copyooks", "copybook-download"], "Resolve a copybook from external configuration");
 
                 const extractedNames = params.items.map(item => Middleware.extractFileAndCopybookNames(item.section));
