@@ -1,17 +1,4 @@
 {
-  "hooks": {
-    "before:init": ["git config user.email \"dont@write.here\"", "git config user.name \"Caring bot\""]
-  },
-  "github": {
-    "release": false
-  },
-  "git": {
-    "commitMessage": "Generate changelog for ${version}",
-    "tag": false
-  }, 
-  "npm": {
-          "publish": false
-  },
   "plugins": {
     "@release-it/conventional-changelog": {
       "preset": "angular",
