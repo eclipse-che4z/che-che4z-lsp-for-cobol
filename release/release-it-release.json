@@ -1,5 +1,6 @@
 {
   "hooks": {
+    "before:init": ["git config user.email \"dont@write.here\"", "git config user.name \"Caring bot\""],
     "after:bump": "npx vsce package"
   },
   "github": {
