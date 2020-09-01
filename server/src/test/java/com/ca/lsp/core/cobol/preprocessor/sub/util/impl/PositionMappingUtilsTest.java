@@ -64,16 +64,16 @@ class PositionMappingUtilsTest {
     Token exit = mock(Token.class);
 
     // Compiler directives should be skipped by predefined shift
-    Position positionToShift = new Position(copybook, 0, 0, 0, 0, "PROCESS");
-    Position position0 = new Position(copybook, 0, 0, 0, 0, "token0");
+    Position positionToShift = new Position(copybook, null, 0, 0, 0, 0, "PROCESS");
+    Position position0 = new Position(copybook, null, 0, 0, 0, 0, "token0");
     // dot should match trimmed tokens with dots
-    Position position1 = new Position(copybook, 0, 0, 0, 0, ".");
+    Position position1 = new Position(copybook, null, 0, 0, 0, 0, ".");
     // two non-matching tokens to test lookahead works for more than one position
-    Position positionNoMatch1 = new Position(copybook, 0, 0, 0, 0, "nomatch1");
-    Position positionNoMatch2 = new Position(copybook, 0, 0, 0, 0, "nomatch2");
-    Position position2 = new Position(copybook, 0, 0, 0, 0, "token1");
+    Position positionNoMatch1 = new Position(copybook, null, 0, 0, 0, 0, "nomatch1");
+    Position positionNoMatch2 = new Position(copybook, null, 0, 0, 0, 0, "nomatch2");
+    Position position2 = new Position(copybook, null, 0, 0, 0, 0, "token1");
     // EOF should match a blank token
-    Position positionEOF = new Position(copybook, 0, 0, 0, 0, "<EOF>");
+    Position positionEOF = new Position(copybook, null, 0, 0, 0, 0, "<EOF>");
 
     // COPYENTRY should move the processing to the next document level
     when(enter.getType()).thenReturn(COPYENTRY);

@@ -32,7 +32,7 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
  */
 class TestIdentificationDivisionInCopybookWithError {
   private static final String TEXT =
-      "0      COPY {~IDDIV}.\n"
+      "0      {_COPY {~IDDIV}.|1_}\n"
           + "1      PROGRAM-ID. BKP92S1.        \n"
           + "2      DATA DIVISION.              \n"
           + "3      WORKING-STORAGE SECTION.    \n"
