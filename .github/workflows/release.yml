@@ -15,7 +15,7 @@ jobs:
       with:
         java-version: 11
     - name: Build with Maven
-      run: cd server; mvn package -DskipTests
+      run: cd server; mvn package -DskipTests --no-transfer-progress
     - name: Copy jar into extension
       run: cp server/target/server.jar clients/cobol-lsp-vscode-extension/server
     - name: Set up Node 12
