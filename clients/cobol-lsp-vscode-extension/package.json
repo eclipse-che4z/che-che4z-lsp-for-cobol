@@ -122,7 +122,8 @@
     },
     "dependencies": {
         "@zowe/imperative": "4.7.4",
-        "vscode-languageclient": "5.2.1"
+        "vscode-languageclient": "5.2.1",
+        "vscode-extension-telemetry": "0.1.6"
     },
     "devDependencies": {
         "@semantic-release/changelog": "5.0.0",

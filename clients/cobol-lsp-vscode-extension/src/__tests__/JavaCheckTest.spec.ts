@@ -15,6 +15,7 @@
 import * as cp from "child_process";
 import {JavaCheck} from "../services/JavaCheck";
 
+jest.mock("../services/reporter/TelemetryService");
 describe("Checks Java version", () => {
     it("If Java version is supported", async () => {
         expect(JavaCheck.isJavaVersionSupported('openjdk version "11.0.1" 2018-10-16')).toBeTruthy();
@@ -29,8 +30,8 @@ describe("Checks Java version", () => {
         expect(JavaCheck.isJavaVersionSupported('openjdk version "1.11.0-internal"')).toBeFalsy();
         expect(JavaCheck.isJavaVersionSupported('java version "1.11.0_181"')).toBeFalsy();
         expect(JavaCheck.isJavaVersionSupported('java version "10.0.1" 2018-04-17')).toBeFalsy();
-        expect(JavaCheck.isJavaVersionSupported('java version "9.0.1"')).toBeFalsy();        
-        expect(JavaCheck.isJavaVersionSupported('openjdk version "1.8.0-internal"')).toBeFalsy();        
+        expect(JavaCheck.isJavaVersionSupported('java version "9.0.1"')).toBeFalsy();
+        expect(JavaCheck.isJavaVersionSupported('openjdk version "1.8.0-internal"')).toBeFalsy();
         expect(JavaCheck.isJavaVersionSupported('java version "1.8.0_131"')).toBeFalsy();
         expect(JavaCheck.isJavaVersionSupported('java version "1.8.0_181"')).toBeFalsy();
         expect(JavaCheck.isJavaVersionSupported('java version "1.7.0_131"')).toBeFalsy();

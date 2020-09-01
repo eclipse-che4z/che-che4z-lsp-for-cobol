@@ -40,6 +40,8 @@ beforeEach(() => {
     jest.clearAllMocks();
 });
 
+jest.mock("../services/reporter/TelemetryService");
+
 describe("Test fetchCopybook against bad and correct configurations", () => {
     const zoweApi: ZoweApi = new ZoweApi();
     const copybookDownloadService: CopybookDownloadService = new CopybookDownloadService(copybookFix, zoweApi, null, null);

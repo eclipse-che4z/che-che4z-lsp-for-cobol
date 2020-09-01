@@ -35,4 +35,4 @@ export const QUICKFIX_GOTOSETTINGS = "Open settings";
 export const COBOL_CBL_EXT = ".cbl";
 export const COBOL_COB_EXT = ".cob";
 export const COBOL_COBOL_EXT = ".cobol";
-
+export const EXTENSION_ID = "broadcommfd.cobol-language-support";

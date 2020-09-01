@@ -27,6 +27,7 @@ import {CopybookFix} from "./CopybookFix";
 import {checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath} from "./CopybooksPathGenerator";
 import {CopybookProfile, DownloadQueue} from "./DownloadQueue";
 import {ProfileService} from "./ProfileService";
+import {TelemetryService} from "./reporter/TelemetryService";
 import {ZoweApi} from "./ZoweApi";
 import {Type, ZoweError} from "./ZoweError";
 
@@ -61,13 +62,16 @@ export class CopybookDownloadService implements vscode.Disposable {
     }
 
     public async start() {
+        //TODO: CREATE A RECORDING EVENT WITH START AND END METHOD..
+        const startTime: number = Date.now();
         this.resolver.setQueue(this.queue);
         let done = false;
         const errors = new Set<string>();
         while (!done) {
             const element: CopybookProfile | undefined = await this.queue.pop();
-            if (!element) {
+            if (this.queue.length === 0) {
                 done = true;
+                TelemetryService.registerEvent("Download copybooks from MF", ["copybook", "COBOL", "experiment-tag"], "total time to search copybooks from MF", startTime, Date.now());
                 continue;
             }
             await vscode.window.withProgress(
@@ -123,6 +127,7 @@ export class CopybookDownloadService implements vscode.Disposable {
                         break;
                 }
             }
+            TelemetryService.registerExceptionEvent(undefined, errorMessage, ["copybook", "COBOL", "experiment-tag"]);
             vscode.window.showErrorMessage(errorMessage);
         }
     }
