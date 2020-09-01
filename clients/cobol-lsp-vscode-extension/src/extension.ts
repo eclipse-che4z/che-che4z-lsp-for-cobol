@@ -80,8 +80,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // create .gitignore file within .c4z folder
     createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
-    // TODO: add unit test for handle generation of telemetry file
-    createFileWithGivenPath(C4Z_FOLDER, "TELEMETRY_KEY", "DUMMY_KEY");
 
     context.subscriptions.push(copyBooksDownloader);
 

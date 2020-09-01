@@ -12,47 +12,41 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-
-
-import {C4Z_FOLDER} from "../constants";
 import {ExtensionUtils} from "../services/settings/util/ExtensionUtils";
 
-const fsPath = "tmp-ws";
-const scheme = "file";
-let wsPath: string;
-let c4zPath: string;
-let filePath: string;
+const INVALID_TELEMETRY_KEY: string = "INVALID_INSTRUMENTATION_KEY";
+
 jest.mock("vscode-extension-telemetry");
 jest.mock("fs-extra");
+
+function generatePath(...pathSegments) {
+    vscode.Uri.file = jest.fn().mockReturnValue({
+        fsPath: path.join(path.join(__dirname, "../../"), ...pathSegments),
+    });
+}
 
 describe("Test extension utility class", () => {
     beforeAll(() => {
         jest.clearAllMocks();
-        vscode.workspace.workspaceFolders = [{uri: {fsPath, scheme}} as any];
-        wsPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath);
-        c4zPath = path.join(wsPath, C4Z_FOLDER);
-        filePath = path.join(c4zPath, "TELEMETRY_KEY");
-
-    });
-    test("Given a not existent flat file that contais telemetry key, then a default string value is returned", () => {
-        (fs as any).existsSync = jest.fn().mockImplementation(() => {
-            return false;
-        });
-
-        expect(ExtensionUtils.getTelemetryKeyId()).toBe("GENERIC_INVALID_KEY");
     });
 
     test("Given an existent flat file that contains telemetry key, then the content of that file is not empty and is returned", async () => {
-        (fs as any).existsSync = jest.fn().mockImplementation(() => {
-            return true;
-        });
-        (ExtensionUtils as any).readContentFromFile = jest.fn().mockImplementation(() => {
-            return "KEY";
-        });
+        (ExtensionUtils as any).getExtensionPath = jest.fn().mockReturnValue(path.join(__dirname, "../../"));
+        generatePath("resources", "TELEMETRY_KEY");
 
-        expect(ExtensionUtils.getTelemetryKeyId()).not.toBe("GENERIC_INVALID_KEY");
+        // console.log(path.join(__dirname, "../../"));
+        // console.log(path.join(path.join(__dirname, "../../"), "resources", "TELEMETRY_KEY"));
+        // console.log(fs.existsSync(path.join(path.join(__dirname, "../../"), "resources", "TELEMETRY_KEY")));
+
+        expect(ExtensionUtils.getTelemetryKeyId()).not.toBe(INVALID_TELEMETRY_KEY);
+    });
+
+    test("Given a not existent file, then the constant value for invalid telemetry key is returned", () => {
+        (ExtensionUtils as any).getExtensionPath = jest.fn().mockReturnValue(path.join(__dirname, "../../"));
+        generatePath("bad", "resource", "TELEMETRY_KEY");
+
+        expect(ExtensionUtils.getTelemetryKeyId()).toBe(INVALID_TELEMETRY_KEY);
     });
 });

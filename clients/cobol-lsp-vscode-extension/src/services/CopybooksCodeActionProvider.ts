@@ -21,10 +21,13 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
                                     context: vscode.CodeActionContext,
                                     token: vscode.CancellationToken,
     ): Promise<Array<vscode.Command | vscode.CodeAction>> {
+        // TODO: From context we could get the number of diagnostic probl.
+        // TODO: Add telemetry when user click on quickfix (without select any other option)
         if (!this.shouldHaveCodeAction(context)) {
             return [];
         }
 
+        // TODO: Add quickfix action for a command.. (wrap in custom command?)
         const goToSettings = new vscode.CodeAction(QUICKFIX_GOTOSETTINGS, vscode.CodeActionKind.QuickFix);
         goToSettings.command = {
             command: "workbench.action.openSettings",

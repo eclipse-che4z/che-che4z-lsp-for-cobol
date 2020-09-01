@@ -14,12 +14,8 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import {URL} from "url";
 import * as vscode from "vscode";
-import {C4Z_FOLDER, EXTENSION_ID} from "../../../constants";
-import {SettingsUtils} from "./SettingsUtils";
-
-const TELEMETRY_KEY_FILENAME = "TELEMETRY_KEY";
+import {EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT} from "../../../constants";
 
 export class ExtensionUtils {
     /**
@@ -35,18 +31,19 @@ export class ExtensionUtils {
      * for collect telemetry event.
      */
     public static getTelemetryKeyId(): string {
-        let key: string = "GENERIC_INVALID_KEY";
-        for (const workspaceFolder of SettingsUtils.getWorkspacesURI()) {
-            const uri: URL = new URL(path.join(workspaceFolder, C4Z_FOLDER, TELEMETRY_KEY_FILENAME));
-
-            if (fs.existsSync(uri)) {
-                key = this.readContentFromFile(uri);
-            }
-        }
-        return key;
+        return fs.existsSync(this.getTelemetryResourcePath()) ? ExtensionUtils.readTelemetryFileContent() : TELEMETRY_DEFAULT_CONTENT;
     }
 
-    private static readContentFromFile(filePath: URL) {
-        return fs.readFileSync(filePath, "utf8");
+    private static getTelemetryResourcePath() {
+        return vscode.Uri.file(
+            path.join(this.getExtensionPath(), "resources", "TELEMETRY_KEY")).fsPath;
+    }
+
+    private static getExtensionPath(): string {
+        return vscode.extensions.getExtension(EXTENSION_ID).extensionPath;
+    }
+
+    private static readTelemetryFileContent(): string {
+        return fs.readFileSync(ExtensionUtils.getTelemetryResourcePath(), "utf8");
     }
 }

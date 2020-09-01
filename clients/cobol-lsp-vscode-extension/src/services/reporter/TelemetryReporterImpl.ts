@@ -11,6 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import {EXTENSION_ID} from "../../constants";
 import {ExtensionUtils} from "../settings/util/ExtensionUtils";
@@ -43,13 +44,14 @@ export class TelemetryReporterImpl implements TelemetryReport {
 
     private reporter: TelemetryReporter;
 
+    // TODO: if key is invalid might be useful don't engage the reporter...
     private constructor() {
         this.reporter = new TelemetryReporter(EXTENSION_ID, ExtensionUtils.getPackageVersion(), ExtensionUtils.getTelemetryKeyId());
-        console.log(ExtensionUtils.getTelemetryKeyId());
+        // TODO: remove after test on Che
+        vscode.window.showInformationMessage(ExtensionUtils.getTelemetryKeyId());
     }
 
     public reportEvent(content: TelemetryEvent): void {
-        console.log(TelemetryReporterImpl.generateData(content));
         this.reporter.sendTelemetryEvent(content.getEventName(), TelemetryReporterImpl.generateData(content));
     }
 
