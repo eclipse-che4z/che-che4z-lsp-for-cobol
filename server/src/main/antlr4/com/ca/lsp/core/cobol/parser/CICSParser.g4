@@ -545,9 +545,11 @@ cics_query_counter: (COUNTER cics_name | DCOUNTER cics_name) (POOL cics_name)? (
 cics_query_security: SECURITY (RESTYPE cics_data_value | RESCLASS cics_data_value RESIDLENGTH cics_data_value) RESID cics_data_value
                      (LOGMESSAGE cics_cvda)? (READ cics_cvda)? (UPDATE cics_cvda)? (CONTROL cics_cvda)? (ALTER cics_cvda)?;
 /** READ */
-cics_read: READ FILE cics_mama (UNCOMMITTED | CONSISTENT | REPEATABLE | cics_read_update)? (INTO cics_data_area |
-           SET cics_ref) RIDFLD cics_data_area cics_read_keylength? (SYSID cics_system LENGTH cics_data_area |
-           LENGTH cics_data_area)? (DEBKEY | DEBREC | RBA | RBN | XRBA)? (EQUAL | GTEC)? NOSUSPEND?;
+cics_read: READ (cics_file_name | UNCOMMITTED | CONSISTENT | REPEATABLE | cics_read_update )+
+          (cics_into_set | RIDFLD cics_data_area | cics_read_keylength | SYSID cics_system LENGTH cics_data_area |
+          LENGTH cics_data_area)+ (DEBKEY | DEBREC | RBA | RBN | XRBA)? (EQUAL | GTEC)? NOSUSPEND?;
+cics_file_name: FILE cics_mama;
+cics_into_set: INTO cics_data_area | SET cics_ref;
 cics_read_update: UPDATE (TOKEN cics_data_area)?;
 cics_read_keylength: KEYLENGTH cics_data_value GENERIC?;
 
