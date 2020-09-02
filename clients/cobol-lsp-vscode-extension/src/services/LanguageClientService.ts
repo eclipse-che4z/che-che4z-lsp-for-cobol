@@ -32,7 +32,7 @@ export class LanguageClientService {
 
     constructor(private middleware: Middleware) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
-        this.jarPath = `${ext.extensionPath}/server/server-${ext.packageJSON.version}.jar`;
+        this.jarPath = `${ext.extensionPath}/server/server.jar`;
     }
 
     public async checkPrerequisites(): Promise<void> {
