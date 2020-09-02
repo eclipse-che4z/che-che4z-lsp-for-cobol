@@ -110,7 +110,7 @@ pipeline {
                                 sh 'mvn -version'
                                 sh 'set MAVEN_OPTS=-Xms1024m'
                                 sh 'mvn clean verify --no-transfer-progress'
-                                sh 'cp target/server-*.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
+                                sh 'cp target/server.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
                             }
                         }
                     }
@@ -164,7 +164,6 @@ pipeline {
                             dir('clients/cobol-lsp-vscode-extension') {
                                 sh 'npx vsce package'
                                 archiveArtifacts "*.vsix"
-                                sh 'mv cobol-language-support*.vsix cobol-language-support_0.13.0+NEXT.vsix'
                             }
                         }
                     }
