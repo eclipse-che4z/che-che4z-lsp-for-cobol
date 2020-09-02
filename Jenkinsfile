@@ -158,10 +158,14 @@ pipeline {
                 stage('Client - Package') {
                     environment {
                         npm_config_cache = "$env.WORKSPACE"
+                        buildNumber = "$env.BUILD_NUMBER"
                     }
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
+                                if (env.BRANCH_NAME != 'master') {
+                                    sh 'sed -i "s/\\"version\\": \\"\\(.*\\)\\"/\\"version\\": \\"\\1+$branchName.$buildNumber\\"/g" package.json'
+                                }
                                 sh 'npx vsce package'
                                 archiveArtifacts "*.vsix"
                             }
