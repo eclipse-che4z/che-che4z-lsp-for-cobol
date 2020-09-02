@@ -153,19 +153,29 @@ pipeline {
                   }
                 }
 
-
-
-                stage('Client - Package') {
+                stage('Client - Change version') {
                     environment {
-                        npm_config_cache = "$env.WORKSPACE"
                         buildNumber = "$env.BUILD_NUMBER"
+                    }
+                    when {
+                        expression { branchName != 'master' }
                     }
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
-                                if (env.BRANCH_NAME != 'master') {
-                                    sh 'sed -i "s/\\"version\\": \\"\\(.*\\)\\"/\\"version\\": \\"\\1+$branchName.$buildNumber\\"/g" package.json'
-                                }
+                                sh 'sed -i "s/\\"version\\": \\"\\(.*\\)\\"/\\"version\\": \\"\\1+$branchName.$buildNumber\\"/g" package.json'
+                            }
+                        }
+                    }
+                }
+
+                stage('Client - Package') {
+                    environment {
+                        npm_config_cache = "$env.WORKSPACE"
+                    }
+                    steps {
+                        container('node') {
+                            dir('clients/cobol-lsp-vscode-extension') {
                                 sh 'npx vsce package'
                                 archiveArtifacts "*.vsix"
                             }
