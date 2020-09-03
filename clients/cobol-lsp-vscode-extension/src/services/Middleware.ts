@@ -16,7 +16,6 @@ import {CancellationToken, HandlerResult} from "vscode-jsonrpc";
 import {ConfigurationParams, ConfigurationRequest} from "vscode-languageclient";
 import {CopybookDownloadService} from "./CopybookDownloadService";
 import {CopybookURI} from "./CopybookURI";
-import {TelemetryService} from "./reporter/TelemetryService";
 
 export class Middleware {
     private static extractFileAndCopybookNames(params: string): [string, string] {
@@ -40,14 +39,14 @@ export class Middleware {
             const sectionName = params.items[0].section;
             if (sectionName.startsWith("broadcom-cobol-lsp.copybook-resolve")) {
                 // TODO: review if is useful send telemetry at this point - double check with requirements
-                TelemetryService.registerEvent("resolve local copybook", ["COBOL", "copyooks", "copybook-resolve"], "Resolve a copybook from local folders");
+                //TelemetryService.registerEvent("resolve local copybook", ["COBOL", "copyooks", "copybook-resolve"], "Resolve a copybook from local folders");
 
                 const [cobolFileName, copybookName] = Middleware.extractFileAndCopybookNames(sectionName);
                 return [await this.copybookResolverURI.resolveCopybookURI(copybookName, cobolFileName)];
             }
             if (sectionName.startsWith("broadcom-cobol-lsp.copybook-download")) {
                 // TODO: review if is useful send telemetry at this point - double check with requirements
-                TelemetryService.registerEvent("resolve copybook from MF", ["COBOL", "copyooks", "copybook-download"], "Resolve a copybook from external configuration");
+                //TelemetryService.registerEvent("resolve copybook from MF", ["COBOL", "copyooks", "copybook-download"], "Resolve a copybook from external configuration");
 
                 const extractedNames = params.items.map(item => Middleware.extractFileAndCopybookNames(item.section));
                 const copybookNames = extractedNames.map(names => names[1]);

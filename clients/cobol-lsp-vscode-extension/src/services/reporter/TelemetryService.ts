@@ -11,7 +11,9 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import {ExtensionUtils} from "../settings/util/ExtensionUtils";
 import {TelemetryEvent} from "./model/TelemetryEvent";
+import {TelemetryMeasurement} from "./model/TelemetryMeasurement";
 import {TelemetryFactory} from "./TelemetryFactory";
 
 function isValidEventName(eventName: string): boolean {
@@ -22,40 +24,54 @@ function isValidRootCause(rootCause: string): boolean {
     return rootCause !== undefined && rootCause.trim() !== "";
 }
 
-function createTelemetryEvent(eventName: string, categories: string[], notes: string, timeElapsed?: string, rootCause?: string) {
+function createTelemetryEvent(eventName: string, categories: string[], notes: string, rootCause?: string, telemetryMeasurement?: TelemetryMeasurement[]) {
     const telemetryEvent = new TelemetryEvent();
     telemetryEvent.setEventName(eventName);
     telemetryEvent.setCategories(resolveCategories(categories));
     telemetryEvent.setNotes(notes);
     telemetryEvent.setRootCause(rootCause);
-    telemetryEvent.setTimeElapsed(timeElapsed);
+    telemetryEvent.setMeasurements(telemetryMeasurement);
     return telemetryEvent;
+}
+
+function createTelemetryMeasurement(telemetryMeasurement: Map<string, number>): TelemetryMeasurement[] {
+    const result: TelemetryMeasurement[] = [];
+
+    if (!telemetryMeasurement) {
+        return result;
+    }
+
+    for (const [name, value] of telemetryMeasurement) {
+        result.push(new TelemetryMeasurement(name, value));
+    }
+    return result;
 }
 
 function resolveCategories(categories: string[]): string {
     return (categories) ? categories.toString() : "N.D";
 }
 
-function calculateTimeElapsed(startTime: number, endTime: number): string {
-    return (startTime && endTime) ? ((endTime - startTime) / 1000).toString() : "N.D";
-}
-
 export class TelemetryService {
-    public static registerEvent(eventName: string, categories?: string[], notes?: string, startTime?: number, endTime?: number) {
+    public static calculateTimeElapsed(startTime: number, endTime: number): number | undefined {
+        return ((startTime && endTime) && (endTime >= startTime)) ? ((endTime - startTime) / 1000) : undefined;
+    }
+
+    public static registerEvent(eventName: string, categories?: string[], notes?: string, telemetryMeasurementMap?: Map<string, number>) {
         // exit if event name is empty
         if (!isValidEventName(eventName)) {
             return;
         }
-
-        TelemetryFactory.getReporter().reportEvent(createTelemetryEvent(eventName, categories, notes, calculateTimeElapsed(startTime, endTime)));
+        console.log(eventName);
+        TelemetryFactory.getReporter().reportEvent(createTelemetryEvent(eventName, categories, notes, undefined, createTelemetryMeasurement(telemetryMeasurementMap)));
     }
 
-    public static registerExceptionEvent(eventName = "RuntimeException", rootCause: string, categories?: string[], notes?: string, startTime?: number, endTime?: number) {
+    public static registerExceptionEvent(eventName = "RuntimeException", rootCause: string, categories?: string[], notes?: string, telemetryMeasurement?: TelemetryMeasurement[]) {
         // exit if event name is empty
         if (!(isValidEventName(eventName) && isValidRootCause(rootCause))) {
             return;
         }
-        TelemetryFactory.getReporter().reportExceptionEvent(createTelemetryEvent(eventName, categories, notes, calculateTimeElapsed(startTime, endTime), rootCause));
+
+        TelemetryFactory.getReporter().reportExceptionEvent(createTelemetryEvent(eventName, categories, notes, ExtensionUtils.anonymizeContent(rootCause), telemetryMeasurement));
     }
 
 }

@@ -13,10 +13,15 @@
  */
 
 import * as fs from "fs";
+import {userInfo} from "os";
 import * as path from "path";
+import {sep} from "path";
 import * as vscode from "vscode";
 import {EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT} from "../../../constants";
 
+/**
+ * This class contains utility methods consumed within the application
+ */
 export class ExtensionUtils {
     /**
      * This method return the extension version declared into the package.json
@@ -34,6 +39,21 @@ export class ExtensionUtils {
         return fs.existsSync(this.getTelemetryResourcePath()) ? ExtensionUtils.readTelemetryFileContent() : TELEMETRY_DEFAULT_CONTENT;
     }
 
+    /**
+     * This method allows to anonymize the username value present in stack trace
+     * @param content stack trace
+     */
+    public static anonymizeContent(content: string): string {
+        return content.replace(new RegExp("\\" + sep + this.getUsername(), "g"), sep + "anonymous");
+    }
+
+    /**
+     * This method return the name of the runtime IDE if available or "N.D." otherwise
+     */
+    public static getIDEName(): string {
+        return (vscode.env) ? vscode.env.appName : "N.D.";
+    }
+
     private static getTelemetryResourcePath() {
         return vscode.Uri.file(
             path.join(this.getExtensionPath(), "resources", "TELEMETRY_KEY")).fsPath;
@@ -45,5 +65,9 @@ export class ExtensionUtils {
 
     private static readTelemetryFileContent(): string {
         return fs.readFileSync(ExtensionUtils.getTelemetryResourcePath(), "utf8");
+    }
+
+    private static getUsername(): string {
+        return userInfo().username;
     }
 }

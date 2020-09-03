@@ -12,13 +12,15 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import {TelemetryMeasurement} from "./TelemetryMeasurement";
+
 export class TelemetryEvent {
     private readonly timestamp: string;
     private eventName: string;
     private notes?: string;
     private rootCause?: string;
     private categories?: string[];
-    private timeElapsed?: string;
+    private measurements?: TelemetryMeasurement[];
 
     public constructor() {
         this.timestamp = new Date().toISOString();
@@ -60,11 +62,11 @@ export class TelemetryEvent {
         return this.categories;
     }
 
-    public getTimeElapsed(): string {
-        return this.timeElapsed;
+    public getMeasurements(): TelemetryMeasurement[] {
+        return this.measurements;
     }
 
-    public setTimeElapsed(timeElapsed: string): void {
-        this.timeElapsed = timeElapsed;
+    public setMeasurements(measurements: TelemetryMeasurement[]) {
+        this.measurements = measurements;
     }
 }

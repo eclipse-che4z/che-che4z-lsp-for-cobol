@@ -229,5 +229,20 @@ pipeline {
                 }
             }
         }
+        stage('Update telemetry key') {
+                    environment {
+                        MAGIC_CONSTANT = "THE REAL KEY"
+                    }
+                    when {
+                        expression { branchName == 'master' }
+                    }
+                    steps {
+                      container('node') {
+                          dir('clients/cobol-lsp-vscode-extension/resources') {
+                            sh 'echo "$MAGIC_CONSTANT" > $WORKSPACE/clients/cobol-lsp-vscode-extension/resources/TELEMETRY_KEY'
+                          }
+                      }
+                    }
+                }
     }
 }

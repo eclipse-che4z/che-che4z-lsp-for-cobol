@@ -1,0 +1,20 @@
+/*
+ * Copyright (c) 2020 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Broadcom, Inc. - initial API and implementation
+ */
+import * as vscode from "vscode";
+import {TelemetryService} from "../services/reporter/TelemetryService";
+
+export function gotoCopybookSettings(): void {
+    TelemetryService.registerEvent("open settings", ["COBOL", "copybook", "settings"], "User invoke the open settings quickfix to saw the copybook locations stored in settings file config.");
+    vscode.commands.executeCommand("workbench.action.openSettings", "broadcom-cobol-lsp");
+}

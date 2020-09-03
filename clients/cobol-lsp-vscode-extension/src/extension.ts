@@ -17,6 +17,7 @@ import * as vscode from "vscode";
 import {changeDefaultZoweProfile} from "./commands/ChangeDefaultZoweProfile";
 import {editDatasetPaths} from "./commands/EditDatasetPaths";
 import {fetchCopybookCommand} from "./commands/FetchCopybookCommand";
+import {gotoCopybookSettings} from "./commands/OpenSettingsCommand";
 import {C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID, SETTINGS_SECTION} from "./constants";
 import {CopybookDownloadService} from "./services/CopybookDownloadService";
 import {CopybookFix} from "./services/CopybookFix";
@@ -34,7 +35,6 @@ import {ZoweApi} from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
     initializeSettings();
-
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
 
     const zoweApi: ZoweApi = new ZoweApi();
@@ -74,6 +74,9 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
     context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths", () => {
         editDatasetPaths(pathsService);
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.goto-settings", () => {
+        gotoCopybookSettings();
     }));
 
     context.subscriptions.push(languageClientService.start());

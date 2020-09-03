@@ -16,6 +16,7 @@ import TelemetryReporter from "vscode-extension-telemetry";
 import {EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT} from "../../constants";
 import {ExtensionUtils} from "../settings/util/ExtensionUtils";
 import {TelemetryEvent} from "./model/TelemetryEvent";
+import {TelemetryMeasurement} from "./model/TelemetryMeasurement";
 import {TelemetryReport} from "./TelemetryReport";
 
 export class TelemetryReporterImpl implements TelemetryReport {
@@ -28,16 +29,31 @@ export class TelemetryReporterImpl implements TelemetryReport {
 
     private static instance: TelemetryReporterImpl;
 
-    private static generateData(content: TelemetryEvent) {
+    private static covertData(content: TelemetryEvent) {
         return {
             categories: content.getCategories().toString(),
             event: content.getEventName(),
-            IDE: "Theia on Che",
+            IDE: ExtensionUtils.getIDEName(),
             notes: content.getNotes(),
             timestamp: content.getTimestamp(),
             rootCause: content.getRootCause(),
-            timeElapsed_sec: content.getTimeElapsed(),
         };
+    }
+
+    private static convertMeasurements(content: TelemetryMeasurement[]): any {
+        if (!content) {
+            return undefined;
+        }
+        const result: any = [];
+
+        for (const measure of content) {
+            // avoid to push undefined values
+            if (measure.getMeasurementValue()) {
+                result[measure.getMeasurementName()] = measure.getMeasurementValue();
+            }
+        }
+
+        return result;
     }
 
     private readonly telemetryKeyId: string;
@@ -47,18 +63,21 @@ export class TelemetryReporterImpl implements TelemetryReport {
         this.telemetryKeyId = telemetryKeyId;
         this.reporter = new TelemetryReporter(EXTENSION_ID, ExtensionUtils.getPackageVersion(), telemetryKeyId);
         // TODO: remove after test on Che
+        vscode.window.showInformationMessage(ExtensionUtils.getIDEName());
         vscode.window.showInformationMessage(telemetryKeyId);
     }
 
     public reportEvent(content: TelemetryEvent): void {
         if (this.isValidTelemetryKey()) {
-            this.reporter.sendTelemetryEvent(content.getEventName(), TelemetryReporterImpl.generateData(content));
+            // TODO: we need to reset the counter?
+            console.log("send!");
+            this.reporter.sendTelemetryEvent(content.getEventName(), TelemetryReporterImpl.covertData(content), TelemetryReporterImpl.convertMeasurements(content.getMeasurements()));
         }
     }
 
     public reportExceptionEvent(content: TelemetryEvent): void {
         if (this.isValidTelemetryKey()) {
-            this.reporter.sendTelemetryErrorEvent(content.getEventName(), TelemetryReporterImpl.generateData(content));
+            this.reporter.sendTelemetryErrorEvent(content.getEventName(), TelemetryReporterImpl.covertData(content));
         }
     }
 

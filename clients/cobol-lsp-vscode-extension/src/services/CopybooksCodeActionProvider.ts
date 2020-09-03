@@ -29,10 +29,10 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
         }
 
         const goToSettings = new vscode.CodeAction(QUICKFIX_GOTOSETTINGS, vscode.CodeActionKind.QuickFix);
+
         goToSettings.command = {
-            command: "workbench.action.openSettings",
+            command: "broadcom-cobol-lsp.cpy-manager.goto-settings",
             title: QUICKFIX_GOTOSETTINGS,
-            arguments: ["broadcom-cobol-lsp"],
         };
         return [goToSettings];
     }

@@ -52,6 +52,10 @@
             {
                 "command": "broadcom-cobol-lsp.cpy-manager.edit-dataset-paths",
                 "title": "Edit dataset paths"
+            },
+            {
+                "command": "broadcom-cobol-lsp.cpy-manager.goto-settings",
+                "title": "Open Copybook location settings"
             }
         ],
         "languages": [

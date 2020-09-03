@@ -63,15 +63,15 @@ export class CopybookDownloadService implements vscode.Disposable {
 
     public async start() {
 
-        const startTime: number = Date.now();
+        let startTime: number = Date.now();
         this.resolver.setQueue(this.queue);
+
         let done = false;
         const errors = new Set<string>();
         while (!done) {
             const element: CopybookProfile | undefined = await this.queue.pop();
-            if (this.queue.length === 0) {
+            if (!element) {
                 done = true;
-                TelemetryService.registerEvent("Download copybooks from MF", ["copybook", "COBOL", "experiment-tag"], "total time to search copybooks from MF", startTime, Date.now());
                 continue;
             }
             await vscode.window.withProgress(
@@ -81,9 +81,21 @@ export class CopybookDownloadService implements vscode.Disposable {
                 },
                 async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
                     await this.handleQueue(element, errors, progress);
+
                     if (this.queue.length === 0 && errors.size > 0) {
                         this.createErrorMessageForCopybooks(errors);
                         errors.clear();
+                    }
+
+                    if (this.queue.length === 0) {
+                        console.log("Operation completed");
+
+                        //TODO: simplify API so that user just need to define [<property><value>]
+
+                        TelemetryService.registerEvent("Download copybooks from MF", ["copybook", "COBOL", "experiment-tag"], "total time to search copybooks on MF", new Map().set("time elapsed", TelemetryService.calculateTimeElapsed(startTime, Date.now())));
+                        //TelemetryService.registerEventWithTuples("Download copybooks from MF", ["copybook", "COBOL", "experiment-tag"], "total time to search copybooks on MF", [["time elapsed", TelemetryService.calculateTimeElapsed(startTime, Date.now())]]);
+                        // TODO: create method?
+                        startTime = 0;
                     }
                 });
         }
