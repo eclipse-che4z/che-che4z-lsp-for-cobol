@@ -48,7 +48,7 @@ cics_partn_bms: cics_into LENGTH cics_data_value ASIS?;
 
 /** SEND: */
 cics_send: SEND (cics_send_group | cics_send_mro | cics_send_appc | cics_send_control | cics_send_map | cics_send_page |
-           cics_send_partnset | cics_send_text);
+           cics_send_partnset | cics_send_text | cics_len_map);
 cics_send_group: cics_send_from (cics_send_from_wait | cics_send_from_ctlchar | cics_send_3600_01 | cics_send_2980);
 
 cics_send_from_wait: WAIT? (INVITE | LAST)? (cics_send_defaultmax | cics_send_lu23);
@@ -59,18 +59,19 @@ cics_send_3560_3270: WAIT? cics_send_erase? (INVITE | LAST)? (CNOTCOMPL | DEFRES
 cics_send_2260: (LINEADDR cics_data_value)? WAIT? LEAVEKB?;
 cics_send_3600_01: (LDC cics_name | FMH)? WAIT? (INVITE | LAST)? (CNOTCOMPL | DEFRESP)?;
 cics_send_2980: (PASSBK | CBUFF)?;
+cics_len_map: (LENGTH cics_data_value | FLENGTH cics_data_value)? cics_send_map;
 cics_send_mro: (SESSION cics_name)? WAIT? (INVITE | LAST)? (ATTACHID cics_name)? (FROM cics_data_area)?
                (LENGTH cics_data_value | FLENGTH cics_data_value)? FMH? DEFRESP? (STATE cics_cvda)?;
 cics_send_appc: (CONVID cics_name)? cics_send_from? (INVITE | LAST)? (CONFIRM | WAIT)? (STATE cics_cvda)?;
 cics_send_control: CONTROL (cics_send_control_min | cics_send_control_std | cics_send_control_full);
-cics_send_control_min: cics_send_cursor? FORMFEED? (cics_send_erase | ERASEAUP)? PRINT? FREEKB? ALARM? FRSET?;
+cics_send_control_min: (cics_send_cursor | FORMFEED | cics_send_erase | ERASEAUP | PRINT | FREEKB | ALARM | FRSET)+;
 cics_send_control_std: (MSR cics_data_value)? ((OUTPARTN cics_name)? (ACTPARTN cics_name)? | (LDC cics_name)?);
 cics_send_control_full: ACCUM? (cics_send_terminal | (SET cics_ref) | PAGING)? (REQID cics_name)?
                         (HONEOM | L40 | L64 | L80)?;
 cics_send_map: MAP cics_name (cics_send_map_null | cics_send_map_mappingdev);
 cics_send_map_null: (cics_send_map_min | cics_send_map_std | cics_send_map_full);
-cics_send_map_min: (MAPSET cics_name)? (MAPONLY? | (FROM cics_data_area)? DATAONLY? (LENGTH cics_data_value)?)
-                   cics_send_cursor? FORMFEED? (cics_send_erase | ERASEAUP)? PRINT? FREEKB? ALARM? FRSET?;
+cics_send_map_min: (MAPSET cics_name | MAPONLY | FROM cics_data_area | DATAONLY | LENGTH cics_data_value
+                   | cics_send_cursor | FORMFEED | cics_send_erase | ERASEAUP | PRINT | FREEKB | ALARM | FRSET)+;
 cics_send_map_std: NLEOM? (MSR cics_data_value)? (FMHPARM cics_name)? ((OUTPARTN cics_name)? (ACTPARTN cics_name)? |
                    (LDC cics_name)?);
 cics_send_map_full: ACCUM? (cics_send_terminal | (SET cics_ref) | PAGING)? (REQID cics_name)? NOFLUSH?
