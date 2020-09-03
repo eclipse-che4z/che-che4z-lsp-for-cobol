@@ -123,18 +123,6 @@
 		"description": "ENTRY statement",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"enum-id": {
-		"prefix": "enum-id",
-		"body": [
-			"*>> <summary>enum-id $1</summary>",
-			"enum-id. $1 as \"Status\".",
-			"    78 ${2:Item}  value ${3:1}.",
-			"end enum $1.",
-			""
-		],
-		"description": "enum-id",
-		"scope": "cobol"
-	},
 	"evaluate": {
 		"prefix": "evaluate",
 		"body": [
@@ -162,24 +150,6 @@
 		],
 		"description": "EVALUATE",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"exec-sql": {
-		"prefix": "exec",
-		"body": [
-			"exec sql include sqlca end-exec."
-		],
-		"description": "exec sql include",
-		"scope": "cobol,acucobol"
-	},
-	"exec-sql-begin": {
-		"prefix": "exec",
-		"body": [
-			"exec sql begin declare section end-exec.",
-			"$0",
-			"exec sql end declare section end-exec."
-		],
-		"description": "exec sql declare",
-		"scope": "cobol"
 	},
 	"if": {
 		"prefix": "if",
@@ -298,51 +268,6 @@
 		"description": "method-id",
 		"scope": "cobol"
 	},
-	"MFUnit Test": {
-		"prefix": "mfu,program-id",
-		"body": [
-			"       program-id. MFUT_${1:${TM_FILENAME_BASE/MFUT[_](.*)/$1/}}.",
-			"       working-storage section.",
-			"       copy \"mfunit.cpy\".",
-			"",
-			"       01 test-fail-count     binary-long value 0.",
-			"",
-			"       *> Testcase     : $1",
-			"       *>  Description : $2",
-			"       procedure division.",
-			"           $0",
-			"           if 1 not equal 1",
-			"               display \"Odd... 1 not equal 1?\"",
-			"               add 1 to test-fail-count",
-			"           end-if",
-			"",
-			"           if test-fail-count not equal 0",
-			"               call \"MFU_ASSERT_FAIL_Z\" using",
-			"                    by reference z\"$1 has failed\"",
-			"               end-call",
-			"           end-if",
-			"",
-			"           goback returning test-fail-count.",
-			"",
-			"       *> Startup for testcase $1",
-			"       entry \"MFUS_$1\".",
-			"           *> Open any files",
-			"           goback.",
-			"",
-			"       *> Teardown for testcase $1",
-			"       entry \"MFUE_$1\".",
-			"           *> Close any files/delete any temp files",
-			"           goback.",
-			"",
-			"       *> Metadata for testcase $1",
-			"       entry \"MFUM_$1\".",
-			"           move \"$2\" to MFU-MD-TESTCASE-DESCRIPTION",
-			"           goback.",
-			"       end program."
-		],
-		"description": "MFUNIT skelton program",
-		"scope": "cobol"
-	},
 	"multiply": {
 		"prefix": "multiply",
 		"body": [
@@ -419,154 +344,29 @@
 		"description": "INLINE PERFORM VARYING",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"IDENTIFICATION (CICS)": {
-		"prefix": "IDENTIFICATION",
-		"body": [
-			"        IDENTIFICATION DIVISION. ",
-			"        PROGRAM-ID. $1.",
-			"        DATA DIVISION.",
-			"        WORKING-STORAGE SECTION. ",
-			"        01 OUT-MSG.",
-			"         02 FILLER PIC X(6) VALUE \"Hello \". ",
-			"         02 MSG    PIC X(20).",
-			"        01 INP-MSG PIC X(20) VALUE \"What is your name? \".     ",
-			"        PROCEDURE DIVISION.",
-			"        PARA1.",
-			"            EXEC CICS",
-			"                 SEND FROM(INP-MSG)",
-			"                 ERASE",
-			"            END-EXEC",
-			"",
-			"            EXEC CICS",
-			"                 RECEIVE INTO (MSG)",
-			"            END-EXEC",
-			"",
-			"       *",
-			"            EXEC CICS",
-			"                 SEND FROM (OUT-MSG)",
-			"                 ERASE",
-			"            END-EXEC",
-			"",
-			"            EXEC CICS",
-			"                 RETURN",
-			"            END-EXEC.",
-			"",
-			"       *",
-			"        END PROGRAM $1.",
-			""
-		],
-		"description": "Template for program (CICS)",
-		"scope": "cobol"
-	},
-	"Minimum Line Sequential": {
-		"prefix": "identification",
-		"body": [
-			"       identification division.",
-			"       program-id. ${1:${TM_FILENAME/(.*)\\..+$/$1/}}.",
-			"",
-			"       environment division.",
-			"       input-output section.",
-			"        file-control.",
-			"        select ${2:cust} assign to '${4:$2}.txt'",
-			"        organization is line sequential.            ",
-			"",
-			"       data division.",
-			"       file section.",
-			"       fd $2.",
-			"       01 ${3:$2-file}.",
-			"        03 ${5:customer-id}    pic 9(5).",
-			"        03 ${6:customer-info}  pic x(65).",
-			"",
-			"       working-storage section.",
-			"       01 ws-eof       pic a. ",
-			"",
-			"       procedure division.",
-			"          open input $2.",
-			"             perform until ws-eof='Y'",
-			"                read $2",
-			"                   at end",
-			"                      move 'Y' to ws-eof",
-			"                   not at end",
-			"                      display ${5} \" => \" ${6}",
-			"                end-read",
-			"             end-perform",
-			"          close $2.",
-			"          $0",
-			"          goback.",
-			"",
-			"       end program $1.",
-			""
-		],
-		"description": "Minimum template File/Seq",
-		"scope": "cobol"
-	},
-	"Minimum mainframe program [uppercase]": {
-		"prefix": "IDENTIFICATION",
-		"body": [
-			"       IDENTIFICATION DIVISION.",
-			"       PROGRAM-ID. ${1:${1:${TM_FILENAME/(.*)\\..+$/$1/}}}.",
-			"       AUTHOR. $2.",
-			"       INSTALLATION.  ${3:where}.",
-			"       DATE-WRITTEN.  ${4:$CURRENT_DATE/$CURRENT_MONTH/$CURRENT_YEAR}.",
-			"       DATE-COMPILED. ${5:$4}.",
-			"       SECURITY.",
-			"       ENVIRONMENT DIVISION.",
-			"       CONFIGURATION SECTION.",
-			"       SOURCE-COMPUTER. ${6:pc}.",
-			"       OBJECT-COMPUTER. ${7:${6}}.",
-			"       SPECIAL-NAMES.",
-			"       INPUT-OUTPUT SECTION.",
-			"       FILE-CONTROL.",
-			"       DATA DIVISION.",
-			"        FILE SECTION.",
-			"        WORKING-STORAGE SECTION.",
-			"        LINKAGE SECTION.",
-			"       PROCEDURE DIVISION.",
-			"        DECLARATIVES.",
-			"        END DECLARATIVES.",
-			"        main-processing SECTION.",
-			"         mainline-paragraph.",
-			"             $0",
-			"             STOP RUN."
-		],
-		"description": "Template for mainframe",
-		"scope": "cobol"
-	},
-	"Skelton program": {
-		"prefix": "program-id",
-		"body": [
-			"       program-id. ${1:${TM_FILENAME/(.*)\\..+$/$1/}}.",
-			"",
-			"       environment division.",
-			"       configuration section.",
-			"",
-			"       data division.",
-			"       working-storage section.",
-			"",
-			"       procedure division.",
-			"           $0",
-			"           goback.",
-			"",
-			"       end program $1.",
-			""
-		],
-		"description": "Small template for program",
-		"scope": "cobol"
-	},
-	"Minimum program": {
-		"prefix": "program-id",
-		"body": [
-			"       program-id. ${1:${TM_FILENAME/(.*)\\..+$/$1/}}.",
-			"       procedure division.",
-			"           $0",
-			"           goback.",
-			"",
-			"       end program $1.",
-			""
-		],
-		"description": "Minimum template",
-		"scope": "cobol"
-	},
+    "shell": {
+        "prefix": "IDENTIFICATION",
+        "body": [
+            "       IDENTIFICATION DIVISION.",
+            "       PROGRAM-ID. ${1:${1:${TM_FILENAME/(.*)\\..+$/$1/}}}.",
+            "       ENVIRONMENT DIVISION.",
+            "       CONFIGURATION SECTION.",
+            "       SPECIAL-NAMES.",
+            "       INPUT-OUTPUT SECTION.",
+            "       FILE-CONTROL.",
+            "       DATA DIVISION.",
+            "        FILE SECTION.",
+            "        WORKING-STORAGE SECTION.",
+            "        LINKAGE SECTION.",
+            "       PROCEDURE DIVISION.",
+            "        main-processing SECTION.",
+            "         mainline-paragraph.",
+            "             $0",
+            "             STOP RUN."
+        ],
+        "description": "Template Program",
+        "scope": "cobol"
+    },
 	"property": {
 		"prefix": "property",
 		"body": [
@@ -600,34 +400,6 @@
 		"description": "SUBTRACT a FROM b GIVING c",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"try": {
-		"prefix": "try",
-		"body": [
-			"try",
-			"$2",
-			"catch ${1:Exception}",
-			"$0",
-			"end-try"
-		],
-		"description": "try catch",
-		"scope": "cobol"
-	},
-	"valuetype": {
-		"prefix": "valuetype-id",
-		"body": [
-			"valuetype-id $1 ${2:public}.",
-			"01 item string ${2:public}.",
-			"",
-			"method-id new ${2:public}.",
-			"procedure division.",
-			"   $0",
-			"end method.",
-			"",
-			"end valuetype."
-		],
-		"description": "valuetype",
-		"scope": "cobol"
-	},
 	"display": {
 		"prefix": "display",
 		"body": [
@@ -642,17 +414,6 @@
 			"DISPLAY \"$0\""
 		],
 		"description": "DISPLAY literal",
-		"scope": "cobol"
-	},
-	"select-to-section": {
-		"prefix": "perform",
-		"body": [
-			"$1 section.",
-			"   $TM_SELECTED_TEXT",
-			"$1-end section.",
-			"   exit section."
-		],
-		"description": "select-tosection",
 		"scope": "cobol"
 	},
 	"string": {
@@ -680,7 +441,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-abs": {
-		"prefix": ["function abs"],
+		"prefix": ["function-abs"],
 		"body": [
 			"function abs(${1:number})$0"
 		],
@@ -688,7 +449,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-acos": {
-		"prefix": ["function acos"],
+		"prefix": ["function-acos"],
 		"body": [
 			"function acos(${1:cosine})$0"
 		],
@@ -696,7 +457,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-annuity": {
-		"prefix": ["function annuity"],
+		"prefix": ["function-annuity"],
 		"body": [
 			"function annuity(${1:interest-rate},${2:number-of-periods})$0"
 		],
@@ -704,7 +465,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-asin": {
-		"prefix": ["function asin"],
+		"prefix": ["function-asin"],
 		"body": [
 			"function asin(${1:sine})$0"
 		],
@@ -712,23 +473,31 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-atan": {
-		"prefix": ["function atan"],
+		"prefix": ["function-atan"],
 		"body": [
 			"function atan(${1:tangent})$0"
 		],
 		"description": "function trigonometric arc-tangent, or inverse tangent, of tangent",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"function-boolean-of-integer": {
-		"prefix": ["function boolean-of-integer"],
-		"body": [
-			"function boolean-of-integer(${1:integer},${2:length})$0"
-		],
-		"description": "function boolean item of usage bit representing the binary value of integer; with the given length",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
+    "function-bit-of": {
+        "prefix": ["function-bit-of"],
+        "body": [
+            "function bit-of(${1:integer})$0"
+        ],
+        "description": "function to convert the argument to bits",
+        "scope": "cobol,acucobol,opencobol,gnucobol"
+    },
+    "function-bit-to-char": {
+        "prefix": ["function-bit-to-char"],
+        "body": [
+            "function bit-to-char(${1:integer})$0"
+        ],
+        "description": "function to convert bits to character",
+        "scope": "cobol,acucobol,opencobol,gnucobol"
+    },
 	"function-byte-length": {
-		"prefix": ["function byte-length"],
+		"prefix": ["function-byte-length"],
 		"body": [
 			"function byte-length(${1:integer})$0"
 		],
@@ -736,39 +505,15 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-char": {
-		"prefix": ["function char"],
+		"prefix": ["function-char"],
 		"body": [
 			"function char(${1:integer})$0"
 		],
 		"description": "function character in the ordinal position specified by integer, from the current alphanumeric collating sequence",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"function-char-national": {
-		"prefix": ["function char-national"],
-		"body": [
-			"function char-national(${1:integer})$0"
-		],
-		"description": "function character in the ordinal position specified by &lt;integer&gt; from the current national collating sequence",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"function-combined-datetime": {
-		"prefix": ["function combined-datetime"],
-		"body": [
-			"function combined-datetime(${1:integer-date},${2:standard-numeric-time})$0"
-		],
-		"description": "function combines integer-date and standard-numeric-time into a single numeric item from which both date and time components can be derived",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"function-concatenate": {
-		"prefix": ["function concatenate"],
-		"body": [
-			"function concatenate(${1:string1},${2:string2})$0"
-		],
-		"description": "function concatenates the string1.. string2 into a single string result",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"function-cos": {
-		"prefix": ["function cos"],
+		"prefix": ["function-cos"],
 		"body": [
 			"function cos(${1:angle})$0"
 		],
@@ -776,7 +521,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-currency-symbol": {
-		"prefix": ["function currency-symbol"],
+		"prefix": ["function-currency-symbol"],
 		"body": [
 			"function currency-symbol()$0"
 		],
@@ -784,71 +529,23 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-current-date": {
-		"prefix": ["function current-date"],
+		"prefix": ["function-current-date"],
 		"body": [
 			"function current-date(${1:date-and-time-format})$0"
 		],
 		"description": "function current date and time as 21-character value",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"function-formatted-date": {
-		"prefix": ["function formatted-date"],
-		"body": [
-			"function formatted-date(${1:date-format},${2:integer-date})$0"
-		],
-		"description": "function formatted-date",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"function-formatted-datetime": {
-		"prefix": ["function formatted-datetime"],
-		"body": [
-			"function formatted-datetime(${1:date-and-time-format},${2:integer-date},${3:standard-numeric-time},${4:offset_or_system_offset})$0"
-		],
-		"description": "function formatted-datetime",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"Function-formatted-time": {
-		"prefix": ["function formatted-time"],
-		"body": [
-			"function formatted-time(${1:time-format},${2:standard-numeric-time},${3:offset_or_system_offset})$0"
-		],
-		"description": "function formatted-time",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"function-fraction-part": {
-		"prefix": ["function fraction-part"],
-		"body": [
-			"function fraction-part(${1:number})$0"
-		],
-		"description": "portion of number that occurs to the right of the decimal point",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"function-highest-algebraic": {
-		"prefix": ["function highest-algebraic"],
-		"body": [
-			"function highest-algebraic(${1:numeric-identifier})$0"
-		],
-		"description": "highest value that could possibly be stored in the specified numeric-identifier",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"function-integer": {
-		"prefix": ["function integer"],
+		"prefix": ["function-integer"],
 		"body": [
 			"function integer(${1:number})$0"
 		],
 		"description": "greatest integer value that is less than or equal to number",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"function-integer-of-boolean": {
-		"prefix": ["function integer-of-boolean"],
-		"body": [
-			"dunction integer-of-boolean(${1:boolean-item})$0"
-		],
-		"description": "numeric value of boolean-item",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"function-integer-of-date": {
-		"prefix": ["function integer-of-date"],
+		"prefix": ["function-integer-of-date"],
 		"body": [
 			"function integer-of-date(${1:yyyymmdd})$0"
 		],
@@ -856,23 +553,15 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-integer-of-day": {
-		"prefix": ["function integer-of-day"],
+		"prefix": ["function-integer-of-day"],
 		"body": [
 			"function integer-of-day(${1:yyyymmdd})$0"
 		],
 		"description": "converts yyyymmdd to an internal integer-day",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"function-integer-of-formatted-date": {
-		"prefix": ["function integer-of-formatted-date"],
-		"body": [
-			"function integer-of-formatted-date(${1:format},${2:date})$0"
-		],
-		"description": "converts date in specified format to an internal integer",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"function-integer-part": {
-		"prefix": ["function integer-part"],
+		"prefix": ["function-integer-part"],
 		"body": [
 			"function integer-part(${1:number})$0"
 		],
@@ -880,55 +569,15 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-length": {
-		"prefix": ["function length"],
+		"prefix": ["function-length"],
 		"body": [
 			"function length(${1:item})$0"
 		],
 		"description": "returns the length (in character positions) of the specified item",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"function-length-an": {
-		"prefix": ["function length-an"],
-		"body": [
-			"function length-an(${1:item})$0"
-		],
-		"description": "returns the length (in bytes) of the specified item;",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"function-locale-compare": {
-		"prefix": ["function locale-compare"],
-		"body": [
-			"function locale-compare(${1:argument1},${2:argument2},${3:locale-optional})$0"
-		],
-		"description": "character '=' or '<' or '>' indicating the result of comparing argument1 and argument2 using a culturall",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"function-locale-date": {
-		"prefix": ["function locale-date"],
-		"body": [
-			"function locale-date(${1:yyyymmdd},${2:locale-optional})$0"
-		],
-		"description": "format yyyymmd; according to locale",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"function-locale-time": {
-		"prefix": ["function locale-time"],
-		"body": [
-			"function locale-time(${1:yyyymmdd},${2:locale-optional})$0"
-		],
-		"description": "format time; according to locale",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"function-locale-time-from-seconds": {
-		"prefix": ["function locale-time-from-seconds"],
-		"body": [
-			"function locale-time-from-seconds(${1:integer-time},${2:locale-optional})$0"
-		],
-		"description": "format integer-time (internal-format) according to locale",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"function-log": {
-		"prefix": ["function log"],
+		"prefix": ["function-log"],
 		"body": [
 			"function log(${1:number})$0"
 		],
@@ -936,7 +585,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-log10": {
-		"prefix": ["function log10"],
+		"prefix": ["function-log10"],
 		"body": [
 			"function log10(${1:number})$0"
 		],
@@ -944,23 +593,15 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-lowercase": {
-		"prefix": ["function lowercase"],
+		"prefix": ["function-lowercase"],
 		"body": [
 			"function lowercase(${1:string})$0"
 		],
 		"description": "character string that contains string with any uppercase letters replaced by their corresponding lowercase letters",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"function-lowest-algebraic": {
-		"prefix": ["function lowest-algebraic"],
-		"body": [
-			"function lowest-algebraic(${1:numeric-identifier})$0"
-		],
-		"description": "lowest value that could possibly be stored in the specified numeric-identifier",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"function-max": {
-		"prefix": ["function max"],
+		"prefix": ["function-max"],
 		"body": [
 			"function max(${1:number},${2:...})$0"
 		],
@@ -968,7 +609,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-mean": {
-		"prefix": ["function mean"],
+		"prefix": ["function-mean"],
 		"body": [
 			"function mean(${1:number},${2:...})$0"
 		],
@@ -976,7 +617,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-median": {
-		"prefix": ["function median"],
+		"prefix": ["function-median"],
 		"body": [
 			"function median(${1:number},${2:...})$0"
 		],
@@ -984,7 +625,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-midrange": {
-		"prefix": ["function midrange"],
+		"prefix": ["function-midrange"],
 		"body": [
 			"function midrange(${1:number},${2:...})$0"
 		],
@@ -992,7 +633,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-min": {
-		"prefix": ["function min"],
+		"prefix": ["function-min"],
 		"body": [
 			"function min(${1:number},${2:...})$0"
 		],
@@ -1000,47 +641,23 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-mod": {
-		"prefix": ["function mod"],
+		"prefix": ["function-mod"],
 		"body": [
 			"function mod(${1:value},${2:modulus})$0"
 		],
 		"description": "remainder from the division of value by modulus",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"function-monetary-decimal-point": {
-		"prefix": ["function monetary-decimal-point"],
-		"body": [
-			"function monetary-decimal-point()$0"
-		],
-		"description": "character used to separate the integer portion from the fractional part of a monetary currency value according to the current locale",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"function-monetary-thousands-separator": {
-		"prefix": ["function monetary-thousands-separator"],
-		"body": [
-			"function monetary-thousands-separator()$0"
-		],
-		"description": "character used to separate the thousands digit groupings in a monetary currency value according to the current locale",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"function-national-of": {
-		"prefix": ["function national-of"],
+		"prefix": ["function-national-of"],
 		"body": [
 			"function national-of(${1:alphanumeric-string},${2:replacement-char})$0"
 		],
 		"description": "convert alphanumeric-string to the national coded character set representation",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"function-numeric-thousands-separator": {
-		"prefix": ["function numeric-thousands-separator"],
-		"body": [
-			"function numeric-thousands-separator()$0"
-		],
-		"description": "character used to separate the thousands digit groupings in a numeric value according to the current locale",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"function-numval": {
-		"prefix": ["function numval"],
+		"prefix": ["function-numval"],
 		"body": [
 			"function numval(${1:string})$0"
 		],
@@ -1048,7 +665,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-numval-c": {
-		"prefix": ["function numval-c"],
+		"prefix": ["function-numval-c"],
 		"body": [
 			"function numval-c(${1:string},${2:currency-symbol}${3:,ANYCASE})$0"
 		],
@@ -1056,7 +673,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-numval-f": {
-		"prefix": ["function numval-f"],
+		"prefix": ["function-numval-f"],
 		"body": [
 			"function numval-f(${1:string})$0"
 		],
@@ -1064,7 +681,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-ord": {
-		"prefix": ["function ord"],
+		"prefix": ["function-ord"],
 		"body": [
 			"function ord(${1:char},${2:...})$0"
 		],
@@ -1072,7 +689,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-ord-max": {
-		"prefix": ["function ord-max"],
+		"prefix": ["function-ord-max"],
 		"body": [
 			"function ord-max(${1:char},${2:...})$0"
 		],
@@ -1080,7 +697,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-ord-min": {
-		"prefix": ["function ord-min"],
+		"prefix": ["function-ord-min"],
 		"body": [
 			"function ord-min(${1:char},${2:...})$0"
 		],
@@ -1088,7 +705,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-pi": {
-		"prefix": ["function pi"],
+		"prefix": ["function-pi"],
 		"body": [
 			"function pi()$0"
 		],
@@ -1097,7 +714,7 @@
 	},
 
 	"function-present-value": {
-		"prefix": ["function present-value"],
+		"prefix": ["function-present-value"],
 		"body": [
 			"function present-value(${1:discount-rate},${2:amount},${3:...})$0"
 		],
@@ -1105,7 +722,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-random": {
-		"prefix": ["function random"],
+		"prefix": ["function-random"],
 		"body": [
 			"function random(${1:seed})$0"
 		],
@@ -1113,7 +730,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-range": {
-		"prefix": ["function range"],
+		"prefix": ["function-range"],
 		"body": [
 			"function range(${1:argument},${2:...})$0"
 		],
@@ -1121,7 +738,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-rem": {
-		"prefix": ["function rem"],
+		"prefix": ["function-rem"],
 		"body": [
 			"function rem(${1:number},${2:divisor})$0"
 		],
@@ -1129,31 +746,15 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-reverse": {
-		"prefix": ["function reverse"],
+		"prefix": ["function-reverse"],
 		"body": [
 			"function reverse(${1:string})$0"
 		],
 		"description": "reverse representation with same length of string",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"function-seconds-from-formatted-time": {
-		"prefix": ["function seconds-from-formatted-time"],
-		"body": [
-			"function seconds-from-formatted-time(${1:format},${2:time})$0"
-		],
-		"description": "decode time according to format (a time format or a combined date and time format)",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"function-seconds-past-midnight": {
-		"prefix": ["function seconds-past-midnight"],
-		"body": [
-			"function seconds-past-midnight()$0"
-		],
-		"description": "current time of day expressed as the total number of elapsed seconds since midnight",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"function-sign": {
-		"prefix": ["function sign"],
+		"prefix": ["function-sign"],
 		"body": [
 			"function sign(${1:number})$0"
 		],
@@ -1161,7 +762,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-sin": {
-		"prefix": ["function sin"],
+		"prefix": ["function-sin"],
 		"body": [
 			"function sin(${1:angle})$0"
 		],
@@ -1169,7 +770,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-sqrt": {
-		"prefix": ["function sqrt"],
+		"prefix": ["function-sqrt"],
 		"body": [
 			"function sqrt(${1:number})$0"
 		],
@@ -1177,7 +778,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-tan": {
-		"prefix": ["function tan"],
+		"prefix": ["function-tan"],
 		"body": [
 			"function tan(${1:angle})$0"
 		],
@@ -1185,7 +786,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-upper-case": {
-		"prefix": ["function upper-case"],
+		"prefix": ["function-upper-case"],
 		"body": [
 			"function upper-case(${1:string})$0"
 		],
@@ -1194,7 +795,7 @@
 	},
 
 	"function-variance": {
-		"prefix": ["function variance"],
+		"prefix": ["function-variance"],
 		"body": [
 			"function variance(${1:number},${2:...})$0"
 		],
@@ -1202,7 +803,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"function-year-to-yyyy": {
-		"prefix": ["function year-to-yyyy"],
+		"prefix": ["function-year-to-yyyy"],
 		"body": [
 			"function year-to-yyyy(${1:yy},${2:[yy-cutoff, default: 50},${3:yy-execution-time, default: now})$0"
 		],
@@ -1221,7 +822,7 @@
 		"description": "CALL literal"
 	},
 	"FUNCTION-ABS": {
-		"prefix": ["fUNCTION ABS"],
+		"prefix": ["fUNCTION-ABS"],
 		"body": [
 			"FUNCTION ABS(${1:number})$0"
 		],
@@ -1229,7 +830,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-ACOS": {
-		"prefix": ["FUNCTION ACOS"],
+		"prefix": ["FUNCTION-ACOS"],
 		"body": [
 			"FUNCTION ACOS(${1:cosine})$0"
 		],
@@ -1237,7 +838,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-ANNUITY": {
-		"prefix": ["FUNCTION ANNUITY"],
+		"prefix": ["FUNCTION-ANNUITY"],
 		"body": [
 			"FUNCTION ANNUITY(${1:interest-rate},${2:number-of-periods})$0"
 		],
@@ -1245,7 +846,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-ASIN": {
-		"prefix": ["FUNCTION ASIN"],
+		"prefix": ["FUNCTION-ASIN"],
 		"body": [
 			"FUNCTION ASIN(${1:sine})$0"
 		],
@@ -1253,7 +854,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-ATAN": {
-		"prefix": ["fUNCTION ATAN"],
+		"prefix": ["fUNCTION-ATAN"],
 		"body": [
 			"FUNCTION ATAN(${1:tangent})$0"
 		],
@@ -1261,7 +862,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-BOOLEAN-OF-INTEGER": {
-		"prefix": ["FUNCTION BOOLEAN-OF-INTEGER"],
+		"prefix": ["FUNCTION-BOOLEAN-OF-INTEGER"],
 		"body": [
 			"FUNCTION BOOLEAN-OF-INTEGER(${1:integer},${2:length})$0"
 		],
@@ -1269,7 +870,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-BYTE-LENGTH": {
-		"prefix": ["FUNCTION BYTE-LENGTH"],
+		"prefix": ["FUNCTION-BYTE-LENGTH"],
 		"body": [
 			"FUNCTION BYTE-LENGTH(${1:integer})$0"
 		],
@@ -1277,39 +878,15 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-CHAR": {
-		"prefix": ["FUNCTION CHAR"],
+		"prefix": ["FUNCTION-CHAR"],
 		"body": [
 			"FUNCTION CHAR(${1:integer})$0"
 		],
 		"description": "function character in the ordinal position specified by integer, from the current alphanumeric collating sequence",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"FUNCTION-CHAR-NATIONAL": {
-		"prefix": ["function char-national"],
-		"body": [
-			"FUNCTION CHAR-NATIONAL(${1:integer})$0"
-		],
-		"description": "function character in the ordinal position specified by &lt;integer&gt; from the current national collating sequence",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"FUNCTION-COMBINED-DATETIME": {
-		"prefix": ["FUNCTION COMBINED-DATETIME"],
-		"body": [
-			"FUNCTION COMBINED-DATETIME(${1:integer-date},${2:standard-numeric-time})$0"
-		],
-		"description": "function combines integer-date and standard-numeric-time into a single numeric item from which both date and time components can be derived",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"FUNCTION-CONCATENATE": {
-		"prefix": ["FUNCTION CONCATENATE"],
-		"body": [
-			"function concatenate(${1:string1},${2:string2})$0"
-		],
-		"description": "function concatenates the string1.. string2 into a single string result",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"FUNCTION-COS": {
-		"prefix": ["FUNCTION COS"],
+		"prefix": ["FUNCTION-COS"],
 		"body": [
 			"FUNCTION COS(${1:angle})$0"
 		],
@@ -1317,7 +894,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-CURRENCY-SYMBOL": {
-		"prefix": ["FUNCTION CURRENCY-SYMBOL"],
+		"prefix": ["FUNCTION-CURRENCY-SYMBOL"],
 		"body": [
 			"FUNCTION CURRENCY-SYMBOL()$0"
 		],
@@ -1325,71 +902,23 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-CURRENT-DATE": {
-		"prefix": ["FUNCTION CURRENT-DATE"],
+		"prefix": ["FUNCTION-CURRENT-DATE"],
 		"body": [
 			"FUNCTION CURRENT-DATE(${1:date-and-time-format})$0"
 		],
 		"description": "function current date and time as 21-character value",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"FUNCTION-FORMATTED-DATE": {
-		"prefix": ["FUNCTION FORMATTED-DATE"],
-		"body": [
-			"FUNCTION FORMATTED-DATE(${1:date-format},${2:integer-date})$0"
-		],
-		"description": "function formatted-date",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"FUNCTION-FORMATTED-DATETIME": {
-		"prefix": ["FUNCTION FORMATTED-DATETIME"],
-		"body": [
-			"FUNCTION FORMATTED-DATETIME(${1:date-and-time-format},${2:integer-date},${3:standard-numeric-time},${4:offset_or_system_offset})$0"
-		],
-		"description": "function formatted-datetime",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"function-formatted-time": {
-		"prefix": ["function formatted-time"],
-		"body": [
-			"function formatted-time(${1:time-format},${2:standard-numeric-time},${3:offset_or_system_offset})$0"
-		],
-		"description": "function formatted-time",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"FUNCTION-FRACTION-PART": {
-		"prefix": ["FUNCTION FRACTION-PART"],
-		"body": [
-			"FUNCTION FRACTION-PART(${1:number})$0"
-		],
-		"description": "portion of number that occurs to the right of the decimal point",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"FUNCTION-HIGHEST-ALGEBRAIC": {
-		"prefix": ["FUNCTION HIGHEST-ALGEBRAIC"],
-		"body": [
-			"FUNCTION HIGHEST-ALGEBRAIC(${1:numeric-identifier})$0"
-		],
-		"description": "highest value that could possibly be stored in the specified numeric-identifier",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"FUNCTION-INTEGER": {
-		"prefix": ["FUNCTION INTEGER"],
+		"prefix": ["FUNCTION-INTEGER"],
 		"body": [
 			"FUNCTION INTEGER(${1:number})$0"
 		],
 		"description": "greatest integer value that is less than or equal to number",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"FUNCTION-INTEGER-OF-BOOLEAN": {
-		"prefix": ["FUNCTION INTEGER-OF-BOOLEAN"],
-		"body": [
-			"FUNCTION INTEGER-OF-BOOLEAN(${1:boolean-item})$0"
-		],
-		"description": "numeric value of boolean-item",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"FUNCTION-INTEGER-OF-DATE": {
-		"prefix": ["FUNCTION INTEGER-OF-DATE"],
+		"prefix": ["FUNCTION-INTEGER-OF-DATE"],
 		"body": [
 			"FUNCTION INTEGER-OF-DATE(${1:yyyymmdd})$0"
 		],
@@ -1397,23 +926,15 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-INTEGER-OF-DAY": {
-		"prefix": ["FUNCTION INTEGER-OF-DAY"],
+		"prefix": ["FUNCTION-INTEGER-OF-DAY"],
 		"body": [
 			"FUNCTION INTEGER-OF-DAY(${1:yyyymmdd})$0"
 		],
 		"description": "converts yyyymmdd to an internal integer-day",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"FUNCTION-INTEGER-OF-FORMATTED-DATE": {
-		"prefix": ["FUNCTION INTEGER-OF-FORMATTED-DATE"],
-		"body": [
-			"FUNCTION INTEGER-OF-FORMATTED-DATE(${1:format},${2:date})$0"
-		],
-		"description": "converts date in specified format to an internal integer",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"FUNCTION-INTEGER-PART": {
-		"prefix": ["FUNCTION INTEGER-PART"],
+		"prefix": ["FUNCTION-INTEGER-PART"],
 		"body": [
 			"FUNCTION INTEGER-PART(${1:number})$0"
 		],
@@ -1421,55 +942,15 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-LENGTH": {
-		"prefix": ["FUNCTION LENGTH"],
+		"prefix": ["FUNCTION-LENGTH"],
 		"body": [
 			"FUNCTION LENGTH(${1:item})$0"
 		],
 		"description": "returns the length (in character positions) of the specified item",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"FUNCTION-LENGTH-AN": {
-		"prefix": ["FUNCTION LENGTH-AN"],
-		"body": [
-			"FUNCTION LENGTH-AN(${1:item})$0"
-		],
-		"description": "returns the length (in bytes) of the specified item;",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"FUNCTION-LOCALE-COMPARE": {
-		"prefix": ["FUNCTION LOCALE-COMPARE"],
-		"body": [
-			"FUNCTION LOCALE-COMPARE(${1:argument1},${2:argument2},${3:locale-optional})$0"
-		],
-		"description": "character '=' or '<' or '>' indicating the result of comparing argument1 and argument2 using a culturall",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"FUNCTION-LOCALE-DATE": {
-		"prefix": ["FUNCTION LOCALE-DATE"],
-		"body": [
-			"FUNCTION LOCALE-DATE(${1:yyyymmdd},${2:locale-optional})$0"
-		],
-		"description": "format yyyymmd; according to locale",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"FUNCTION-LOCALE-TIME": {
-		"prefix": ["fUNCTION LOCALE-TIME"],
-		"body": [
-			"fUNCTION LOCALE-TIME(${1:yyyymmdd},${2:locale-optional})$0"
-		],
-		"description": "format time; according to locale",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"FUNCTION-LOCALE-TIME-FROM-SECONDS": {
-		"prefix": ["FUNCTION LOCALE-TIME-FROM-SECONDS"],
-		"body": [
-			"FUNCTION LOCALE-TIME-FROM-SECONDS(${1:integer-time},${2:locale-optional})$0"
-		],
-		"description": "format integer-time (internal-format) according to locale",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"FUNCTION-LOG": {
-		"prefix": ["FUNCTION LOG"],
+		"prefix": ["FUNCTION-LOG"],
 		"body": [
 			"FUNCTION LOG(${1:number})$0"
 		],
@@ -1477,7 +958,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-LOG10": {
-		"prefix": ["FUNCTION LOG10"],
+		"prefix": ["FUNCTION-LOG10"],
 		"body": [
 			"FUNCTION LOG10(${1:number})$0"
 		],
@@ -1485,23 +966,15 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-LOWERCASE": {
-		"prefix": ["FUNCTION LOWERCASE"],
+		"prefix": ["FUNCTION-LOWERCASE"],
 		"body": [
 			"FUNCTION LOWERCASE(${1:string})$0"
 		],
 		"description": "character string that contains string with any uppercase letters replaced by their corresponding lowercase letters",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"FUNCTION-LOWEST-ALGEBRAIC": {
-		"prefix": ["FUNCTION LOWEST-ALGEBRAIC"],
-		"body": [
-			"FUNCTION LOWEST-ALGEBRAIC(${1:numeric-identifier})$0"
-		],
-		"description": "lowest value that could possibly be stored in the specified numeric-identifier",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"FUNCTION-MAX": {
-		"prefix": ["FUNCTION MAX"],
+		"prefix": ["FUNCTION-MAX"],
 		"body": [
 			"FUNCTION MAX(${1:number},${2:...})$0"
 		],
@@ -1509,7 +982,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-MEAN": {
-		"prefix": ["FUNCTION MEAN"],
+		"prefix": ["FUNCTION-MEAN"],
 		"body": [
 			"FUNCTION MEAN(${1:number},${2:...})$0"
 		],
@@ -1517,7 +990,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-MEDIAN": {
-		"prefix": ["FUNCTION MEDIAN"],
+		"prefix": ["FUNCTION-MEDIAN"],
 		"body": [
 			"FUNCTION MEDIAN(${1:number},${2:...})$0"
 		],
@@ -1525,7 +998,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-MIDRANGE": {
-		"prefix": ["FUNCTION MIDRANGE"],
+		"prefix": ["FUNCTION-MIDRANGE"],
 		"body": [
 			"FUNCTION MIDRANGE(${1:number},${2:...})$0"
 		],
@@ -1533,7 +1006,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-MIN": {
-		"prefix": ["FUNCTION MIN"],
+		"prefix": ["FUNCTION-MIN"],
 		"body": [
 			"FUNCTION MIN(${1:number},${2:...})$0"
 		],
@@ -1541,47 +1014,23 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-MOD": {
-		"prefix": ["FUNCTION MOD"],
+		"prefix": ["FUNCTION-MOD"],
 		"body": [
 			"FUNCTION MOD(${1:value},${2:modulus})$0"
 		],
 		"description": "remainder from the division of value by modulus",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"FUNCTION-MONETARY-DECIMAL-POINT": {
-		"prefix": ["FUNCTION MONETARY-DECIMAL-POINT"],
-		"body": [
-			"FUNCTION MONETARY-DECIMAL-POINT()$0"
-		],
-		"description": "character used to separate the integer portion from the fractional part of a monetary currency value according to the current locale",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"FUNCTION-MONETARY-THOUSANDS-SEPARATOR": {
-		"prefix": ["FUNCTION MONETARY-THOUSANDS-SEPARATOR"],
-		"body": [
-			"FUNCTION MONETARY-THOUSANDS-SEPARATOR()$0"
-		],
-		"description": "character used to separate the thousands digit groupings in a monetary currency value according to the current locale",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"FUNCTION-NATIONAL-OF": {
-		"prefix": ["FUNCTION NATIONAL-OF"],
+		"prefix": ["FUNCTION-NATIONAL-OF"],
 		"body": [
 			"FUNCTION NATIONAL-OF(${1:alphanumeric-string},${2:replacement-char})$0"
 		],
 		"description": "convert alphanumeric-string to the national coded character set representation",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"FUNCTION-NUMERIC-THOUSANDS-SEPARATOR": {
-		"prefix": ["FUNCTION NUMERIC-THOUSANDS-SEPARATOR"],
-		"body": [
-			"FUNCTION NUMERIC-THOUSANDS-SEPARATOR()$0"
-		],
-		"description": "character used to separate the thousands digit groupings in a numeric value according to the current locale",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"FUNCTION-NUMVAL": {
-		"prefix": ["FUNCTION NUMVAL"],
+		"prefix": ["FUNCTION-NUMVAL"],
 		"body": [
 			"FUNCTION NUMVAL(${1:string})$0"
 		],
@@ -1589,7 +1038,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-NUMVAL-C": {
-		"prefix": ["FUNCTION NUMVAL-C"],
+		"prefix": ["FUNCTION-NUMVAL-C"],
 		"body": [
 			"FUNCTION NUMVAL-C(${1:string},${2:currency-symbol}${3:,ANYCASE})$0"
 		],
@@ -1597,7 +1046,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-NUMVAL-F": {
-		"prefix": ["FUNCTION NUMVAL-F"],
+		"prefix": ["FUNCTION-NUMVAL-F"],
 		"body": [
 			"FUNCTION NUMVAL-F(${1:string})$0"
 		],
@@ -1605,7 +1054,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-ORD": {
-		"prefix": ["FUNCTION ORD"],
+		"prefix": ["FUNCTION-ORD"],
 		"body": [
 			"FUNCTION ORD(${1:char},${2:...})$0"
 		],
@@ -1613,7 +1062,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-ORD-MAX": {
-		"prefix": ["fUNCTION ORD-MAX"],
+		"prefix": ["fUNCTION-ORD-MAX"],
 		"body": [
 			"fUNCTION ORD-MAX(${1:char},${2:...})$0"
 		],
@@ -1621,7 +1070,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-ORD-MIN": {
-		"prefix": ["FUNCTION ORD-MIN"],
+		"prefix": ["FUNCTION-ORD-MIN"],
 		"body": [
 			"FUNCTION ORD-MIN(${1:char},${2:...})$0"
 		],
@@ -1629,7 +1078,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-PI": {
-		"prefix": ["FUNCTION PI"],
+		"prefix": ["FUNCTION-PI"],
 		"body": [
 			"FUNCTION PI()$0"
 		],
@@ -1638,7 +1087,7 @@
 	},
 
 	"FUNCTION-PRESENT-VALUE": {
-		"prefix": ["fUNCTION PRESENT-VALUE"],
+		"prefix": ["fUNCTION-PRESENT-VALUE"],
 		"body": [
 			"fUNCTION PRESENT-VALUE(${1:discount-rate},${2:amount},${3:...})$0"
 		],
@@ -1646,7 +1095,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-RANDOM": {
-		"prefix": ["FUNCTION RANDOM"],
+		"prefix": ["FUNCTION-RANDOM"],
 		"body": [
 			"FUNCTION RANDOM(${1:seed})$0"
 		],
@@ -1654,7 +1103,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-RANGE": {
-		"prefix": ["FUNCTION RANGE"],
+		"prefix": ["FUNCTION-RANGE"],
 		"body": [
 			"FUNCTION RANGE(${1:argument},${2:...})$0"
 		],
@@ -1662,7 +1111,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-REM": {
-		"prefix": ["FUNCTION REM"],
+		"prefix": ["FUNCTION-REM"],
 		"body": [
 			"FUNCTION REM(${1:number},${2:divisor})$0"
 		],
@@ -1670,31 +1119,15 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-REVERSE": {
-		"prefix": ["FUNCTION REVERSE"],
+		"prefix": ["FUNCTION-REVERSE"],
 		"body": [
 			"FUNCTION REVERSE(${1:string})$0"
 		],
 		"description": "reverse representation with same length of string",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
-	"FUNCTION-SECONDS-FROM-FORMATTED-TIME": {
-		"prefix": ["FUNCTION SECONDS-FROM-FORMATTED-TIME"],
-		"body": [
-			"FUNCTION SECONDS-FROM-FORMATTED-TIME(${1:format},${2:time})$0"
-		],
-		"description": "decode time according to format (a time format or a combined date and time format)",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
-	"FUNCTION-SECONDS-PAST-MIDNIGHT": {
-		"prefix": ["FUNCTION SECONDS-PAST-MIDNIGHT"],
-		"body": [
-			"FUNCTION SECONDS-PAST-MIDNIGHT()$0"
-		],
-		"description": "current time of day expressed as the total number of elapsed seconds since midnight",
-		"scope": "cobol,acucobol,opencobol,gnucobol"
-	},
 	"FUNCTION-SIGN": {
-		"prefix": ["FUNCTION SIGN"],
+		"prefix": ["FUNCTION-SIGN"],
 		"body": [
 			"FUNCTION SIGN(${1:number})$0"
 		],
@@ -1702,7 +1135,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-SIN": {
-		"prefix": ["FUNCTION SIN"],
+		"prefix": ["FUNCTION-SIN"],
 		"body": [
 			"FUNCTION SIN(${1:angle})$0"
 		],
@@ -1710,7 +1143,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-SQRT": {
-		"prefix": ["FUNCTION SQRT"],
+		"prefix": ["FUNCTION-SQRT"],
 		"body": [
 			"FUNCTION SQRT(${1:number})$0"
 		],
@@ -1718,7 +1151,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-TAN": {
-		"prefix": ["FUNCTION TAN"],
+		"prefix": ["FUNCTION-TAN"],
 		"body": [
 			"FUNCTION TAN(${1:angle})$0"
 		],
@@ -1726,7 +1159,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-UPPER-CASE": {
-		"prefix": ["FUNCTION UPPER-CASE"],
+		"prefix": ["FUNCTION-UPPER-CASE"],
 		"body": [
 			"FUNCTION UPPER-CASE(${1:string})$0"
 		],
@@ -1735,7 +1168,7 @@
 	},
 
 	"FUNCTION-VARIANCE": {
-		"prefix": ["FUNCTION VARIANCE"],
+		"prefix": ["FUNCTION-VARIANCE"],
 		"body": [
 			"FUNCTION VARIANCE(${1:number},${2:...})$0"
 		],
@@ -1743,7 +1176,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
 	"FUNCTION-YEAR-TO-YYYY": {
-		"prefix": ["FUNCTION YEAR-TO-YYYY"],
+		"prefix": ["FUNCTION-YEAR-TO-YYYY"],
 		"body": [
 			"FUNCTION YEAR-TO-YYYY(${1:yy},${2:[yy-cutoff, default: 50},${3:yy-execution-time, default: now})$0"
 		],
@@ -1791,24 +1224,9 @@
 		],
 		"description": "EXIT PROGRAM"
 	},
-	"dialect": {
-		"prefix": "$set",
-		"body": [
-			"\\$set dialect\"${2|ans85,bs2000,bs2000-offload,cob370,cob371,cob372,entcobol,mf,mvs,os390,osvs,vsc21,vsc22,vsc23,vsc24|}\"",
-			"$0"
-		]
-	},
-	"sourceformat": {
-		"prefix": "$set",
-		"body": [
-			"\\$set sourceformat\"${2|free,variable,fixed|}\"",
-			"$0"
-		],
-		"scope": "cobol"
-	},
 	"IDENTIFICATION DIVISION" :
 	{
-		"prefix" : "IDENTIFICATION DIVISION",
+		"prefix" : "IDENTIFICATION-DIVISION",
 		"body" : [
 			"IDENTIFICATION DIVISION.",
 			"$0"
@@ -1817,7 +1235,7 @@
 	},
 	"identification division" :
 	{
-		"prefix" : "identification division",
+		"prefix" : "identification-division",
 		"body" : [
 			"identification division.",
 			"$0"
@@ -1826,7 +1244,7 @@
 	},
 	"environment division" :
 	{
-		"prefix" : "environment division",
+		"prefix" : "environment-division",
 		"body" : [
 			"environment division.",
 			"$0"
@@ -1834,7 +1252,7 @@
 	},
 	"ENVIRONMENT DIVISION" :
 	{
-		"prefix" : "ENVIRONMENT DIVISION",
+		"prefix" : "ENVIRONMENT-DIVISION",
 		"body" : [
 			"ENVIRONMENT DIVISION.",
 			"$0"
@@ -1842,7 +1260,7 @@
 	},
 	"DATA DIVISION" :
 	{
-		"prefix" : "DATA DIVISION",
+		"prefix" : "DATA-DIVISION",
 		"body" : [
 			"DATA DIVISION.",
 			"$0"
@@ -1850,7 +1268,7 @@
 	},
 	"data division" :
 	{
-		"prefix" : "data division",
+		"prefix" : "data-division",
 		"body" : [
 			"data division.",
 			"$0"
@@ -1886,7 +1304,7 @@
 	},
 	"LINKAGE SECTION " :
 	{
-		"prefix" : "LINKAGE SECTION",
+		"prefix" : "LINKAGE-SECTION",
 		"body" : [
 			"LINKAGE SECTION.",
 			"$0"
@@ -1895,7 +1313,7 @@
 	},
 	"linkage section." :
 	{
-		"prefix" : "linkage section",
+		"prefix" : "linkage-section",
 		"body" : [
 			"linkage section.",
 			"$0"
@@ -1903,7 +1321,7 @@
 	},
 	"PROCEDURE DIVISION" :
 	{
-		"prefix" : "PROCEDURE DIVISION",
+		"prefix" : "PROCEDURE-DIVISION",
 		"body" : [
 			"PROCEDURE DIVISION.",
 			"$0"
@@ -1911,7 +1329,7 @@
 	},
 	"procedure division" :
 	{
-		"prefix" : "procedure division",
+		"prefix" : "procedure-division",
 		"body" : [
 			"procedure division.",
 			"$0"
@@ -1920,7 +1338,7 @@
 	},
 	"PROGRAM-ID" :
 	{
-		"prefix" : "PROGRAM ID.",
+		"prefix" : "PROGRAM-ID.",
 		"body" : [
 			"PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/upcase}/}}.",
 			"$0"
@@ -1929,57 +1347,10 @@
 	},
 	"program-id" :
 	{
-		"prefix" : "program id. ",
+		"prefix" : "program-id. ",
 		"body" : [
 			"program-id. ${1:${TM_FILENAME/(.*)\\..+$/$1/}}.",
 			"$0"
-		],
-		"scope": "cobol"
-	},
-	"*>> <summary" :
-	{
-		"prefix" : "*>> <summary",
-		"body" : [
-			"*>> <summary>${1:XX is a method in the YY class.}",
-			"*>> <para>${2}</para>",
-			"*>> $0",
-			"*>> </summary>"
-		],
-		"scope": "cobol"
-	},
-	"<returns>":
-	{
-		"prefix" : "<returns>",
-		"body" : [
-			"<returns>${1:description}</returns>",
-			"*>> $0"
-		],
-		"scope": "cobol"
-	},
-	"<param" :
-	{
-		"prefix" : "<param>",
-		"body" : [
-			"<param name=\"${1:Int}\">${2}</param>",
-			"*>> $0"
-		],
-		"scope": "cobol"
-	},
-	"<exception" :
-	{
-		"prefix" : "<exception",
-		"body" :[
-			"<exception cref=\"${1:member}\">${2:description}</exception>",
-			"*>> $0"
-		],
-		"scope": "cobol"
-	},
-	"<value" :
-	{
-		"prefix" : "<value>",
-		"body" : [
-			"value>${1:property-description}</value>",
-			"*>> $0"
 		],
 		"scope": "cobol"
 	}
