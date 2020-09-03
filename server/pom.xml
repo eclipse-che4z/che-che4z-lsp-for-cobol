@@ -47,12 +47,11 @@
         <maven.coveralls.plugin.version>4.3.0</maven.coveralls.plugin.version>
         <maven.jacoco.plugin.version>0.8.5</maven.jacoco.plugin.version>
         <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
-        <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
         <maven.surefire.plugin.version>3.0.0-M3</maven.surefire.plugin.version>
         <mockito.core.version>2.23.0</mockito.core.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <revision>0.13.0+NEXT</revision>
+        <revision>1.0.0-SNAPSHOT</revision>
         <slf4j.api.version>1.7.25</slf4j.api.version>
     </properties>
 
@@ -202,19 +201,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>${maven.source.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${maven.resources.plugin.version}</version>
             </plugin>
@@ -237,6 +223,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
+                            <finalName>server</finalName>
                             <archive>
                                 <manifest>
                                     <mainClass>com.ca.lsp.cobol.LangServerBootstrap</mainClass>
