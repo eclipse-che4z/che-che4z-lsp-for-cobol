@@ -358,13 +358,13 @@ cics_extract_querystring: QUERYSTRING cics_data_area QUERYSTRLEN cics_data_area;
 cics_force: FORCE TIMER cics_data_value (ACQUACTIVITY | ACQPROCESS)?;
 
 /** FORMATTIME */
-cics_formattime: FORMATTIME ABSTIME cics_data_area (DATE cics_data_area)? (FULLDATE cics_data_area)? (DATEFORM cics_data_area)?
-                 (DATESEP data_value?)? (DAYCOUNT cics_data_area)? (DAYOFMONTH cics_data_area)? (DAYOFWEEK cics_data_area)?
-                 (DDMMYY cics_data_area)? (DDMMYYYY cics_data_area)? (MILLISECONDS cics_data_area)? (MMDDYY cics_data_area)?
-                 (MMDDYYYY cics_data_area)? (MONTHOFYEAR cics_data_area)? cics_formattime_time? (YEAR cics_data_area)?
-                 (YYDDD cics_data_area)? (YYDDMM cics_data_area)? (YYYYDDD cics_data_area)? (YYYYDDMM cics_data_area)?
-                 (YYYYMMDD cics_data_area)? (DATESTRING cics_data_area)? (STRINGFORMAT cics_cvda)?;
-cics_formattime_time: TIME cics_data_area (TIMESEP data_value?)?;
+cics_formattime: FORMATTIME ABSTIME cics_data_area (DATE cics_data_area | FULLDATE cics_data_area | DATEFORM cics_data_area
+                 | DATESEP (data_value | cics_data_area)? | DAYCOUNT cics_data_area | DAYOFMONTH cics_data_area | DAYOFWEEK cics_data_area
+                 | DDMMYY cics_data_area | DDMMYYYY cics_data_area | MILLISECONDS cics_data_area | MMDDYY cics_data_area
+                 | MMDDYYYY cics_data_area | MONTHOFYEAR cics_data_area | cics_formattime_time | YEAR cics_data_area
+                 | YYDDD cics_data_area | YYDDMM cics_data_area | YYYYDDD cics_data_area | YYYYDDMM cics_data_area
+                 | YYYYMMDD cics_data_area | DATESTRING cics_data_area | STRINGFORMAT cics_cvda)+;
+cics_formattime_time: TIME cics_data_area (TIMESEP (data_value | cics_data_area)?)?;
 
 /** FREE (all of them) */
 cics_free: FREE (CONVID cics_name | SESSION cics_name)? (STATE cics_cvda)?;
