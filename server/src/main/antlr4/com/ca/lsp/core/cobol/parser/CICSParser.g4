@@ -411,8 +411,8 @@ cics_get_dcounter: DCOUNTER cics_name (POOL cics_name)? VALUE cics_data_area cic
 cics_get_dincrement: INCREMENT cics_data_area REDUCE?;
 
 /** GETMAIN */
-cics_getmain: GETMAIN SET cics_ref (FLENGTH cics_data_value BELOW? | LENGTH cics_data_value) (INITIMG cics_data_value)?
-              SHARED? NOSUSPEND? (USERDATAKEY | CICSDATAKEY)?;
+cics_getmain: GETMAIN (SET cics_ref | FLENGTH cics_data_value BELOW? | LENGTH cics_data_value | INITIMG cics_data_value |
+              SHARED | NOSUSPEND | USERDATAKEY | CICSDATAKEY)+;
 
 /** GETNEXT ACTIVITY / CONTAINER / EVENT / PROCESS */
 cics_getnext: GETNEXT (cics_getnext_activity | CONTAINER cics_data_area BROWSETOKEN cics_data_value |
