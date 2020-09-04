@@ -672,13 +672,12 @@ cics_spoolwrite: SPOOLWRITE TOKEN cics_data_area FROM cics_data_area (FLENGTH ci
 /** START - / ATTACH / BREXIT / CHANNEL */
 cics_start: START (cics_start_transid | cics_start_attach | cics_start_brexit);
 cics_start_transid: TRANSID cics_name (cics_start_null | cics_start_channel);
-cics_start_null: (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after)? (REQID cics_name)? cics_start_from?
-                 (TERMID cics_name | USERID cics_data_value)? (SYSID cics_system)? (RTRANSID cics_name)? (RTERMID cics_name)?
-                 (QUEUE cics_name)? NOCHECK? PROTECT?;
-cics_start_from: FROM cics_data_area LENGTH cics_data_value FMH?;
+cics_start_null: ((INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after) | REQID cics_name | cics_start_from |
+                 (TERMID cics_name | USERID cics_data_value) | SYSID cics_system | RTRANSID cics_name | RTERMID cics_name |
+                 QUEUE cics_name | NOCHECK | PROTECT)+;
 cics_start_channel: CHANNEL cics_name (TERMID cics_name | USERID cics_data_value)? (SYSID cics_system)?;
-cics_start_attach: ATTACH TRANSID cics_name cics_start_afrom?;
-cics_start_afrom: FROM cics_data_area (LENGTH cics_data_value)?;
+cics_start_attach: ATTACH TRANSID cics_name cics_start_from?;
+cics_start_from: FROM (cics_data_area | data_area) (LENGTH cics_data_value)? FMH?;
 cics_start_brexit: BREXIT(name?) TRANSID cics_name cics_start_brdata? (USERID cics_data_value)?;
 cics_start_brdata: BRDATA cics_data_area (BRDATALENGTH cics_data_value)?;
 cics_zero_digit: LPARENCHAR ZERO_DIGIT RPARENCHAR;
