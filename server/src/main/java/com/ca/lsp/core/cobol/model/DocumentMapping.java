@@ -15,7 +15,6 @@
 
 package com.ca.lsp.core.cobol.model;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import lombok.Value;
 
 import java.util.List;
@@ -23,6 +22,6 @@ import java.util.Map;
 
 @Value
 public class DocumentMapping {
-  List<Position> positions;
+  List<Locality> localities;
   Map<Integer, Integer> shifts;
 }

@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -79,14 +78,7 @@ class VariableCompletionTest {
         singletonList(new Location(null, new Range(new Position(8, 9), new Position(8, 16)))));
 
     AnalysisResult result =
-        new AnalysisResult(
-            emptyMap(),
-            variableDefinitions,
-            emptyMap(),
-            emptyMap(),
-            emptyMap(),
-            emptyMap(),
-            emptyMap());
+        AnalysisResult.empty().toBuilder().variableDefinitions(variableDefinitions).build();
 
     return new MyDocumentModel(TEXT, result);
   }

@@ -84,15 +84,7 @@ class ParagraphCompletionTest {
         Collections.singletonList(
             new Location(null, new Range(new Position(10, 6), new Position(10, 14)))));
 
-    AnalysisResult result =
-        new AnalysisResult(
-            emptyMap(),
-            emptyMap(),
-            emptyMap(),
-            paragraphDefinitions,
-            emptyMap(),
-            emptyMap(),
-            emptyMap());
+    AnalysisResult result = AnalysisResult.empty().toBuilder().paragraphDefinitions(paragraphDefinitions).build();
 
     return new MyDocumentModel(TEXT, result);
   }

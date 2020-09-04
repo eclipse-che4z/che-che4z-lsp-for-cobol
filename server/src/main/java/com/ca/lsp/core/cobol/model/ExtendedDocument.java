@@ -23,4 +23,5 @@ public class ExtendedDocument {
   private String text;
   private NamedSubContext copybooks;
   private Map<String, DocumentMapping> documentMapping;
+  private Map<String, Locality> copyStatements;
 }

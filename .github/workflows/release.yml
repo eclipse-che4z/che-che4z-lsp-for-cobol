@@ -1,0 +1,32 @@
+name: Release
+
+on: workflow_dispatch
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check if the branch is master
+      run: "[ \"master\" = ${GITHUB_REF#refs/heads/} ]"
+    - name: Checkout the code
+      uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Build with Maven
+      run: cd server; mvn package -DskipTests --no-transfer-progress
+    - name: Copy jar into extension
+      run: cp server/target/server.jar clients/cobol-lsp-vscode-extension/server
+    - name: Set up Node 12
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12'
+    - name: Install release-it tool
+      run: npm install --global release-it
+    - name: Install Node dependencies
+      run: cd clients/cobol-lsp-vscode-extension; npm ci
+    - name: Make a release
+      run: cd clients/cobol-lsp-vscode-extension; export NODE_PATH=`npm root -g`; release-it --ci --config ../../release/release-it-release.json
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

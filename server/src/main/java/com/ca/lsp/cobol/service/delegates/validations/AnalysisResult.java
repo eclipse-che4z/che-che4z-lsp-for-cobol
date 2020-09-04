@@ -14,8 +14,10 @@
 package com.ca.lsp.cobol.service.delegates.validations;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Value;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;
@@ -26,6 +28,7 @@ import static java.util.Collections.emptyMap;
 
 @Value
 @AllArgsConstructor
+@Builder(toBuilder = true)
 public class AnalysisResult {
   private Map<String, List<Diagnostic>> diagnostics;
   private Map<String, List<Location>> variableDefinitions;
@@ -34,10 +37,18 @@ public class AnalysisResult {
   private Map<String, List<Location>> paragraphUsages;
   private Map<String, List<Location>> copybookDefinitions;
   private Map<String, List<Location>> copybookUsages;
+  private List<DocumentSymbol> outlineTree;
 
   public static AnalysisResult empty() {
     return new AnalysisResult(
-        emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap());
+        emptyMap(),
+        emptyMap(),
+        emptyMap(),
+        emptyMap(),
+        emptyMap(),
+        emptyMap(),
+        emptyMap(),
+        List.of());
   }
 
   public Set<String> getVariables() {

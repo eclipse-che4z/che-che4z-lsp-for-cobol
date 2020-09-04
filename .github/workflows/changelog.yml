@@ -1,0 +1,22 @@
+name: Changelog generation
+
+on: workflow_dispatch
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Install Node 12
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12'
+    - name: Install release-it tool
+      run: npm install --global release-it @release-it/conventional-changelog
+    - name: Generate changelog
+      run: release-it --ci --config release/release-it-changelog.json --dry-run
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

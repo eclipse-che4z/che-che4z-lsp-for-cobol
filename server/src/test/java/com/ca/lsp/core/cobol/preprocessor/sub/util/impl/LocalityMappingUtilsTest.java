@@ -15,10 +15,12 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.util.impl;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.DocumentMapping;
+import com.ca.lsp.core.cobol.model.Locality;
 import com.google.common.collect.Maps;
 import org.antlr.v4.runtime.Token;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -32,21 +34,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * This test checks the logic of {@link PositionMappingUtils}, including different document levels
+ * This test checks the logic of {@link LocalityMappingUtils}, including different document levels
  * and position shifts
  */
-class PositionMappingUtilsTest {
+class LocalityMappingUtilsTest {
 
   @Test
   void testEmptyMapping() {
     String uri = "doc.cbl";
     List<Token> tokens = List.of();
-    List<Position> positions = List.of();
+    List<Locality> localities = List.of();
     Map<Integer, Integer> shifts = Map.of();
-    Map<String, DocumentMapping> mappings = Map.of(uri, new DocumentMapping(positions, shifts));
+    Map<String, DocumentMapping> mappings = Map.of(uri, new DocumentMapping(localities, shifts));
 
-    Map<Token, Position> positionMapping =
-        PositionMappingUtils.createPositionMapping(tokens, mappings, uri);
+    Map<Token, Locality> positionMapping =
+        LocalityMappingUtils.createPositionMapping(tokens, mappings, uri);
 
     assertTrue(positionMapping.isEmpty());
   }
@@ -64,16 +66,20 @@ class PositionMappingUtilsTest {
     Token exit = mock(Token.class);
 
     // Compiler directives should be skipped by predefined shift
-    Position positionToShift = new Position(copybook, 0, 0, 0, 0, "PROCESS");
-    Position position0 = new Position(copybook, 0, 0, 0, 0, "token0");
+    Range range = new Range(new Position(0, 0), new Position(0, 0));
+    Locality localityToShift =
+        Locality.builder().uri(copybook).range(range).token("PROCESS").build();
+    Locality locality0 = Locality.builder().uri(copybook).range(range).token("token0").build();
     // dot should match trimmed tokens with dots
-    Position position1 = new Position(copybook, 0, 0, 0, 0, ".");
+    Locality locality1 = Locality.builder().uri(copybook).range(range).token(".").build();
     // two non-matching tokens to test lookahead works for more than one position
-    Position positionNoMatch1 = new Position(copybook, 0, 0, 0, 0, "nomatch1");
-    Position positionNoMatch2 = new Position(copybook, 0, 0, 0, 0, "nomatch2");
-    Position position2 = new Position(copybook, 0, 0, 0, 0, "token1");
+    Locality localityNoMatch1 =
+        Locality.builder().uri(copybook).range(range).token("nomatch1").build();
+    Locality localityNoMatch2 =
+        Locality.builder().uri(copybook).range(range).token("nomatch2").build();
+    Locality locality2 = Locality.builder().uri(copybook).range(range).token("token1").build();
     // EOF should match a blank token
-    Position positionEOF = new Position(copybook, 0, 0, 0, 0, "<EOF>");
+    Locality localityEOF = Locality.builder().uri(copybook).range(range).token("<EOF>").build();
 
     // COPYENTRY should move the processing to the next document level
     when(enter.getType()).thenReturn(COPYENTRY);
@@ -91,28 +97,28 @@ class PositionMappingUtilsTest {
     when(tokenEOF.getText()).thenReturn("\r\n");
 
     List<Token> tokens = List.of(enter, token0, token1, token2, tokenEOF, exit);
-    List<Position> positions = List.of();
-    List<Position> cpyPositions =
+    List<Locality> localities = List.of();
+    List<Locality> cpyLocalities =
         List.of(
-            positionToShift,
-            position0,
-            position1,
-            positionNoMatch1,
-            positionNoMatch2,
-            position2,
-            positionEOF);
+            localityToShift,
+            locality0,
+            locality1,
+            localityNoMatch1,
+            localityNoMatch2,
+            locality2,
+            localityEOF);
     // Shift to skip compiler directive
     Map<Integer, Integer> shifts = Map.of(0, 1);
     Map<String, DocumentMapping> mappings =
         Map.of(
             uri,
-            new DocumentMapping(positions, shifts),
+            new DocumentMapping(localities, shifts),
             copybook,
-            new DocumentMapping(cpyPositions, shifts));
+            new DocumentMapping(cpyLocalities, shifts));
 
-    Map<Token, Position> expected =
-        Map.of(token0, position0, token1, position1, token2, position2, tokenEOF, positionEOF);
-    Map<Token, Position> actual = PositionMappingUtils.createPositionMapping(tokens, mappings, uri);
+    Map<Token, Locality> expected =
+        Map.of(token0, locality0, token1, locality1, token2, locality2, tokenEOF, localityEOF);
+    Map<Token, Locality> actual = LocalityMappingUtils.createPositionMapping(tokens, mappings, uri);
 
     assertTrue(Maps.difference(expected, actual).areEqual());
   }
