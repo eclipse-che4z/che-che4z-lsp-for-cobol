@@ -345,7 +345,7 @@
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
     "shell": {
-        "prefix": "IDENTIFICATION",
+        "prefix": "shell",
         "body": [
             "       IDENTIFICATION DIVISION.",
             "       PROGRAM-ID. ${1:${1:${TM_FILENAME/(.*)\\..+$/$1/}}}.",
