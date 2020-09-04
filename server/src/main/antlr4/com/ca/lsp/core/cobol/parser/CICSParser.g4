@@ -261,7 +261,7 @@ cics_delay_for: (FOR | UNTIL) (HOURS cics_data_value | MINUTES cics_data_value |
 /** DELETE (all of them) */
 cics_delete: DELETE (cics_delete_file | ACTIVITY cics_data_value | cics_delete_container |cics_delete_counter |
              EVENT cics_data_value | TIMER cics_data_value);
-cics_delete_file: FILE cics_mama (TOKEN cics_data_area | cics_delete_ridfld)? (SYSID cics_system)? NOSUSPEND?
+cics_delete_file: cics_file_name (TOKEN cics_data_area | cics_delete_ridfld)? (SYSID cics_system)? NOSUSPEND?
                   (RBA | RRN)?;
 cics_delete_ridfld: RIDFLD cics_data_area cics_delete_keylength?;
 cics_delete_keylength: KEYLENGTH cics_data_value cics_delete_generic?;
@@ -303,7 +303,7 @@ cics_dump_from: FROM cics_data_area (LENGTH cics_data_value | FLENGTH cics_data_
 cics_dump_segmentlist: SEGMENTLIST cics_data_area LENGTHLIST cics_data_area NUMSEGMENTS cics_data_area;
 
 /** ENDBR */
-cics_endbr: ENDBR FILE cics_mama (REQID cics_data_value)? (SYSID cics_system)?;
+cics_endbr: ENDBR cics_file_name (REQID cics_data_value)? (SYSID cics_system)?;
 
 /** ENDBROWSE (all of them) */
 cics_endbrowse: ENDBROWSE (ACTIVITY | CONTAINER | EVENT | PROCESS) BROWSETOKEN cics_data_value;
@@ -549,19 +549,18 @@ cics_query_security: SECURITY (RESTYPE cics_data_value | RESCLASS cics_data_valu
 cics_read: READ (cics_file_name | UNCOMMITTED | CONSISTENT | REPEATABLE | cics_read_update )+
           (cics_into_set | RIDFLD cics_data_area | cics_read_keylength | SYSID cics_system LENGTH cics_data_area |
           LENGTH cics_data_area)+ (DEBKEY | DEBREC | RBA | RBN | XRBA)? (EQUAL | GTEC)? NOSUSPEND?;
-cics_file_name: FILE cics_mama;
 cics_into_set: INTO cics_data_area | SET cics_ref;
 cics_read_update: UPDATE (TOKEN cics_data_area)?;
 cics_read_keylength: KEYLENGTH cics_data_value GENERIC?;
 
 /** READNEXT */
-cics_readnext: READNEXT FILE cics_mama cics_into (UNCOMMITTED | CONSISTENT | REPETABLE |
+cics_readnext: READNEXT cics_file_name cics_into (UNCOMMITTED | CONSISTENT | REPETABLE |
                UPDATE TOKEN cics_data_area)? RIDFLD cics_data_area (KEYLENGTH cics_data_value)? (REQID cics_data_value)?
                (cics_readnext_sysid | LENGTH cics_data_area)? (RBA | RRN | XRBA)? NOSUSPEND?;
 cics_readnext_sysid: SYSID cics_system (LENGTH cics_data_area)?;
 
 /** READPREV */
-cics_readprev: READPREV FILE cics_mama cics_into (UNCOMMITTED | CONSISTENT | REPETABLE |
+cics_readprev: READPREV cics_file_name cics_into (UNCOMMITTED | CONSISTENT | REPETABLE |
                UPDATE TOKEN cics_data_area)? RIDFLD cics_data_area (KEYLENGTH cics_data_value)? (REQID cics_data_value)?
                cics_readnext_sysid? LENGTH cics_data_area (RBA | RRN | XRBA)? NOSUSPEND?;
 
@@ -582,7 +581,7 @@ cics_remove: REMOVE SUBEVENT cics_data_value EVENT cics_data_value;
 cics_reset: RESET (ACQPROCESS | ACTIVITY cics_data_value);
 
 /** RESETBR */
-cics_resetbr: RESETBR FILE cics_mama RIDFLD cics_data_area cics_resetbr_keylength? (REQID cics_data_value)?
+cics_resetbr: RESETBR cics_file_name RIDFLD cics_data_area cics_resetbr_keylength? (REQID cics_data_value)?
               (SYSID cics_system)? (GTEQ | EQUAL)? (RBA | RRN |XRBA)?;
 cics_resetbr_keylength: KEYLENGTH cics_data_value GENERIC?;
 
@@ -609,7 +608,7 @@ cics_rewind_counter: COUNTER cics_name (POOL cics_name)? (INCREMENT cics_data_va
 cics_rewind_dcounter: DCOUNTER cics_name (POOL cics_name)? (INCREMENT cics_data_area)?;
 
 /** REWRITE: */
-cics_rewrite: REWRITE FILE cics_mama (TOKEN cics_data_area)? FROM cics_data_area (SYSID cics_system
+cics_rewrite: REWRITE cics_file_name (TOKEN cics_data_area)? FROM cics_data_area (SYSID cics_system
               LENGTH cics_data_value | LENGTH cics_data_value)? NOSUSPEND?;
 
 /** ROUTE */
@@ -685,7 +684,7 @@ cics_start_brdata: BRDATA cics_data_area (BRDATALENGTH cics_data_value)?;
 cics_zero_digit: LPARENCHAR ZERO_DIGIT RPARENCHAR;
 
 /** STARTBR */
-cics_startbr: STARTBR FILE cics_mama RIDFLD cics_data_area cics_startbr_keylength? (REQID cics_data_value)?
+cics_startbr: STARTBR cics_file_name RIDFLD cics_data_area cics_startbr_keylength? (REQID cics_data_value)?
               (SYSID cics_system)? (DEBKEY | DEBREC | RBA | RBN | XRBA)? (GTEQ | EQUAL)?;
 cics_startbr_keylength: KEYLENGTH cics_data_value GENERIC?;
 
@@ -723,7 +722,7 @@ cics_transform_xmltodata: XMLTODATA CHANNEL cics_data_value (DATCONTAINER cics_d
                           cics_transform_typens? XMLCONTAINER cics_data_value (XMLTRANSFORM cics_name)?;
 
 /** UNLOCK */
-cics_unlock: UNLOCK FILE cics_mama (TOKEN cics_data_area)? (SYSID cics_system)?;
+cics_unlock: UNLOCK cics_file_name (TOKEN cics_data_area)? (SYSID cics_system)?;
 
 /** UPDATE COUNTER / DCOUNTER */
 cics_update: UPDATE (cics_update_counter | cics_update_dcounter);
@@ -832,7 +831,7 @@ cics_web_write: WRITE HTTPHEADER cics_data_area (NAMELENGTH cics_data_value)? (S
 
 /** WRITE / WRITE JOURNALNAME / WRITE OPERATOR */
 cics_write: WRITE (cics_write_file | cics_write_journalname | cics_write_operator);
-cics_write_file: FILE cics_mama MASSINSERT? FROM cics_data_area RIDFLD cics_data_area (KEYLENGTH cics_data_value)?
+cics_write_file: cics_file_name MASSINSERT? FROM cics_data_area RIDFLD cics_data_area (KEYLENGTH cics_data_value)?
                  (SYSID cics_system LENGTH cics_data_value | LENGTH cics_data_value)? (RBA | RBN | XRBA)? NOSUSPEND?;
 cics_write_journalname: JOURNALNAME cics_data_value JTYPEID cics_data_value FROM cics_data_area (FLENGTH cics_data_value)?
                         (REQID cics_data_area)? cics_write_prefix? WAIT? NOSUSPEND?;
@@ -870,6 +869,9 @@ cics_wsaepr: WSAEPR CREATE (EPRINTO cics_data_area | EPRSET cics_data_area) EPRL
 cics_xctl: XCTL PROGRAM cics_name (cics_xctl_commarea | CHANNEL cics_name)? cics_xctl_inputmsg?;
 cics_xctl_commarea: COMMAREA cics_data_area (LENGTH cics_data_value)?;
 cics_xctl_inputmsg: INPUTMSG cics_data_area (INPUTMSGLEN cics_data_value)?;
+
+/** FILE or DATASET */
+cics_file_name: (FILE | DATASET) cics_mama;
 
 cicsWords:  ABCODE | ABDUMP | ABEND | ABORT | ABPROGRAM | ABSTIME | ACEE | ACQACTIVITY | ACQPROCESS | ACQUACTIVITY |
             ACTION | ACTIVITY | ACTIVITYID | ADD | ADDRESS | AFTER | AID | ALLOCATE | ALTER | ALTSCRNHT | ALTSCRNWD |
