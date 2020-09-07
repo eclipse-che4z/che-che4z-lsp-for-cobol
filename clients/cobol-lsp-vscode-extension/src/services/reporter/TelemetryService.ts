@@ -50,7 +50,6 @@ export class TelemetryService {
         if (!isValidEventName(eventName)) {
             return;
         }
-        console.log(eventName);
         TelemetryFactory.getReporter().reportEvent(createTelemetryEvent(eventName, categories, notes, undefined, telemetryMeasurementMap));
 
     }

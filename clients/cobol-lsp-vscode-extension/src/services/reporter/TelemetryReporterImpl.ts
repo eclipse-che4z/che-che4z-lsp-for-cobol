@@ -52,7 +52,6 @@ export class TelemetryReporterImpl implements TelemetryReport {
                 result[key] = value;
             }
         }
-        console.log("time elapsed: " + result["time elapsed"]);
         return result;
     }
 
