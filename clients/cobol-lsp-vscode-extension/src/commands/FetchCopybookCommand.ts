@@ -12,7 +12,9 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import {CopybookDownloadService} from "../services/CopybookDownloadService";
+import {TelemetryService} from "../services/reporter/TelemetryService";
 
 export function fetchCopybookCommand(copybook: string, downloader: CopybookDownloadService, programName: string) {
+    TelemetryService.registerEvent("Fetch copybook", ["COBOL", "copybook", "quickfix"], "User try to resolve a copybook that is not currently found");
     downloader.downloadCopybooks(programName, [copybook]);
 }

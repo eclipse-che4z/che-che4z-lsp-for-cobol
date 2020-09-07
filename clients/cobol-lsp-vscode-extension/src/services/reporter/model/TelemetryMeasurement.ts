@@ -11,16 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-
-export class TelemetryMeasurement {
-    constructor(private name: string, private value: number) {
-    }
-
-    public getMeasurementName(): string {
-        return this.name;
-    }
-
-    public getMeasurementValue(): number {
-        return this.value;
-    }
-}
+export interface TelemetryMeasurement {
+    [key: string]: number;
+};

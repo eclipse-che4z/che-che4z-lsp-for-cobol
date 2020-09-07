@@ -22,11 +22,11 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
                                     context: vscode.CodeActionContext,
                                     token: vscode.CancellationToken,
     ): Promise<Array<vscode.Command | vscode.CodeAction>> {
-        TelemetryService.registerEvent("QuickFix for copybook activation", ["COBOL", "hover", "copybook", "quickfix"], "User hover a miss copybook");
-
         if (!this.shouldHaveCodeAction(context)) {
             return [];
         }
+        // Telemetry should be collected only if shouldHaveCodeAction is true
+        TelemetryService.registerEvent("QuickFix for copybook activation", ["COBOL", "hover", "copybook", "quickfix"], "User hover a miss copybook");
 
         const goToSettings = new vscode.CodeAction(QUICKFIX_GOTOSETTINGS, vscode.CodeActionKind.QuickFix);
 

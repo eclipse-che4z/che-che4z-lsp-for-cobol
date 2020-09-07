@@ -13,7 +13,6 @@
  */
 import {ExtensionUtils} from "../settings/util/ExtensionUtils";
 import {TelemetryEvent} from "./model/TelemetryEvent";
-import {TelemetryMeasurement} from "./model/TelemetryMeasurement";
 import {TelemetryFactory} from "./TelemetryFactory";
 
 function isValidEventName(eventName: string): boolean {
@@ -24,27 +23,17 @@ function isValidRootCause(rootCause: string): boolean {
     return rootCause !== undefined && rootCause.trim() !== "";
 }
 
-function createTelemetryEvent(eventName: string, categories: string[], notes: string, rootCause?: string, telemetryMeasurement?: TelemetryMeasurement[]) {
+function createTelemetryEvent(eventName: string, categories: string[], notes: string, rootCause?: string, telemetryMeasurement?: Map<string, number>) {
     const telemetryEvent = new TelemetryEvent();
     telemetryEvent.setEventName(eventName);
     telemetryEvent.setCategories(resolveCategories(categories));
     telemetryEvent.setNotes(notes);
     telemetryEvent.setRootCause(rootCause);
-    telemetryEvent.setMeasurements(telemetryMeasurement);
+
+    if (telemetryMeasurement) {
+        telemetryEvent.setMeasurements(telemetryMeasurement);
+    }
     return telemetryEvent;
-}
-
-function createTelemetryMeasurement(telemetryMeasurement: Map<string, number>): TelemetryMeasurement[] {
-    const result: TelemetryMeasurement[] = [];
-
-    if (!telemetryMeasurement) {
-        return result;
-    }
-
-    for (const [name, value] of telemetryMeasurement) {
-        result.push(new TelemetryMeasurement(name, value));
-    }
-    return result;
 }
 
 function resolveCategories(categories: string[]): string {
@@ -62,10 +51,11 @@ export class TelemetryService {
             return;
         }
         console.log(eventName);
-        TelemetryFactory.getReporter().reportEvent(createTelemetryEvent(eventName, categories, notes, undefined, createTelemetryMeasurement(telemetryMeasurementMap)));
+        TelemetryFactory.getReporter().reportEvent(createTelemetryEvent(eventName, categories, notes, undefined, telemetryMeasurementMap));
+
     }
 
-    public static registerExceptionEvent(eventName = "RuntimeException", rootCause: string, categories?: string[], notes?: string, telemetryMeasurement?: TelemetryMeasurement[]) {
+    public static registerExceptionEvent(eventName = "RuntimeException", rootCause: string, categories?: string[], notes?: string, telemetryMeasurement?: Map<string, number>) {
         // exit if event name is empty
         if (!(isValidEventName(eventName) && isValidRootCause(rootCause))) {
             return;

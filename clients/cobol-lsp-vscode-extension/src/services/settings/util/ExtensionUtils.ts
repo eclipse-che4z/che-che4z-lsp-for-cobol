@@ -64,7 +64,7 @@ export class ExtensionUtils {
     }
 
     private static readTelemetryFileContent(): string {
-        return fs.readFileSync(ExtensionUtils.getTelemetryResourcePath(), "utf8");
+        return fs.readFileSync(ExtensionUtils.getTelemetryResourcePath(), "utf8").replace(/(\r\n|\n|\r)/gm, "");
     }
 
     private static getUsername(): string {

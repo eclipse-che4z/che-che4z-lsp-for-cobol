@@ -49,7 +49,6 @@ export class CopybookDownloadService implements vscode.Disposable {
      * @param copybookNames list of names of the copybooks required by the LSP server
      */
     public async downloadCopybooks(cobolFileName: string, copybookNames: string[]): Promise<void> {
-        TelemetryService.registerEvent("Fetch copybook", ["COBOL", "copybook", "quickfix"], "Resolve a copybook that is not currently found");
         if (!checkWorkspace()) {
             return;
         }
@@ -88,12 +87,7 @@ export class CopybookDownloadService implements vscode.Disposable {
                     }
 
                     if (this.queue.length === 0) {
-                        console.log("Operation completed");
-
-                        //TODO: simplify API so that user just need to define [<property><value>]
-
                         TelemetryService.registerEvent("Download copybooks from MF", ["copybook", "COBOL", "experiment-tag"], "total time to search copybooks on MF", new Map().set("time elapsed", TelemetryService.calculateTimeElapsed(startTime, Date.now())));
-                        //TelemetryService.registerEventWithTuples("Download copybooks from MF", ["copybook", "COBOL", "experiment-tag"], "total time to search copybooks on MF", [["time elapsed", TelemetryService.calculateTimeElapsed(startTime, Date.now())]]);
                         // TODO: create method?
                         startTime = 0;
                     }
@@ -139,7 +133,7 @@ export class CopybookDownloadService implements vscode.Disposable {
                         break;
                 }
             }
-            TelemetryService.registerExceptionEvent(undefined, errorMessage, ["copybook", "COBOL", "experiment-tag"]);
+            TelemetryService.registerExceptionEvent(undefined, errorMessage, ["copybook", "COBOL", "experiment-tag"], "There is an issue with zowe api layer");
             vscode.window.showErrorMessage(errorMessage);
         }
     }

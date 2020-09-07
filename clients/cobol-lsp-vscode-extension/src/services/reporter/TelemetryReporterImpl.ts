@@ -40,19 +40,19 @@ export class TelemetryReporterImpl implements TelemetryReport {
         };
     }
 
-    private static convertMeasurements(content: TelemetryMeasurement[]): any {
+    private static convertMeasurements(content: Map<string, number>): TelemetryMeasurement {
         if (!content) {
             return undefined;
         }
-        const result: any = [];
 
-        for (const measure of content) {
-            // avoid to push undefined values
-            if (measure.getMeasurementValue()) {
-                result[measure.getMeasurementName()] = measure.getMeasurementValue();
+        const result: TelemetryMeasurement = {};
+
+        for (const [key, value] of content) {
+            if (value) {
+                result[key] = value;
             }
         }
-
+        console.log("time elapsed: " + result["time elapsed"]);
         return result;
     }
 
@@ -69,8 +69,6 @@ export class TelemetryReporterImpl implements TelemetryReport {
 
     public reportEvent(content: TelemetryEvent): void {
         if (this.isValidTelemetryKey()) {
-            // TODO: we need to reset the counter?
-            console.log("send!");
             this.reporter.sendTelemetryEvent(content.getEventName(), TelemetryReporterImpl.covertData(content), TelemetryReporterImpl.convertMeasurements(content.getMeasurements()));
         }
     }
