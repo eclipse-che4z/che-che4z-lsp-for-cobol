@@ -243,19 +243,20 @@ pipeline {
             }
         }
         stage('Update telemetry key') {
-                    environment {
-                        MAGIC_CONSTANT = "THE REAL KEY"
-                    }
-                    when {
-                        expression { branchName == 'master' }
-                    }
-                    steps {
-                      container('node') {
-                          dir('clients/cobol-lsp-vscode-extension/resources') {
-                            sh 'echo "$MAGIC_CONSTANT" > $WORKSPACE/clients/cobol-lsp-vscode-extension/resources/TELEMETRY_KEY'
-                          }
-                      }
-                    }
+          when {
+              //rollback after testing to: expression { branchName == 'master' }
+              expression { branchName == '472_telemetry' }
+          }
+          steps {
+            container('node') {
+
+                withCredentials([string(credentialsId: 'TELEMETRY_INSTRUMENTATION_KEY', variable: 'TELEMETRY_INSTRUMENTATION_KEY')]) {
+                  dir('clients/cobol-lsp-vscode-extension/resources') {
+                    sh 'echo ${TELEMETRY_INSTRUMENTATION_KEY} | base64 > $WORKSPACE/clients/cobol-lsp-vscode-extension/resources/TELEMETRY_KEY'
+                  }
                 }
+            }
+        }
+      }
     }
 }
