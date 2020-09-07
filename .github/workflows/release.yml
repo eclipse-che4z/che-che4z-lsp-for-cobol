@@ -23,7 +23,7 @@ jobs:
       with:
         node-version: '12'
     - name: Install release-it tool
-      run: npm install --global release-it
+      run: npm install --global release-it@13.7.0
     - name: Install Node dependencies
       run: cd clients/cobol-lsp-vscode-extension; npm ci
     - name: Make a release
