@@ -16,10 +16,10 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.Location;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,11 +32,11 @@ import java.util.Map;
 @Value
 @AllArgsConstructor
 public class SemanticContext {
-  private Map<String, Collection<Position>> variableDefinitions;
-  private Map<String, Collection<Position>> variableUsages;
-  private Map<String, Collection<Position>> paragraphDefinitions;
-  private Map<String, Collection<Position>> paragraphUsages;
-  private Map<String, Collection<Position>> copybookDefinitions;
-  private Map<String, Collection<Position>> copybookUsages;
+  private Map<String, Collection<Location>> variableDefinitions;
+  private Map<String, Collection<Location>> variableUsages;
+  private Map<String, Collection<Location>> paragraphDefinitions;
+  private Map<String, Collection<Location>> paragraphUsages;
+  private Map<String, Collection<Location>> copybookDefinitions;
+  private Map<String, Collection<Location>> copybookUsages;
   private List<DocumentSymbol> outlineTree;
 }

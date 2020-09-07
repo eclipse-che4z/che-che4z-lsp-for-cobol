@@ -14,21 +14,25 @@
 
 package com.ca.lsp.core.cobol.semantics.outline;
 
-import com.broadcom.lsp.domain.common.model.Position;
+import com.ca.lsp.core.cobol.model.Locality;
 import com.google.common.collect.Multimap;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 
+import static java.util.Optional.ofNullable;
+
 /**
  * The builder for constructing outline tree.
  *
- * Uses ParserRuleContext for finding the element's parent.
+ * <p>Uses ParserRuleContext for finding the element's parent.
  */
 @Slf4j
 public class OutlineTreeBuilder {
@@ -37,19 +41,20 @@ public class OutlineTreeBuilder {
   private Deque<VariableNode> variableNodes;
   private DocumentSymbol latestVariable;
   private String documentUri;
-  private Map<Token, Position> positionMapping;
+  private Map<Token, Locality> positionMapping;
 
-  public OutlineTreeBuilder(String documentUri, Map<Token, Position> positionMapping) {
+  public OutlineTreeBuilder(String documentUri, Map<Token, Locality> positionMapping) {
     this.documentUri = documentUri;
     this.positionMapping = positionMapping;
   }
 
   public void addProgram(ParserRuleContext parserRuleContext) {
     constructNode("PROGRAM", NodeType.PROGRAM, parserRuleContext)
-        .ifPresent(outlineNode -> {
-          rootNodes.add(outlineNode);
-          nodesByContext.put(parserRuleContext, outlineNode);
-        });
+        .ifPresent(
+            outlineNode -> {
+              rootNodes.add(outlineNode);
+              nodesByContext.put(parserRuleContext, outlineNode);
+            });
   }
 
   public void addNode(String name, NodeType nodeType, ParserRuleContext parserRuleContext) {
@@ -89,12 +94,14 @@ public class OutlineTreeBuilder {
     latestVariable = null;
   }
 
-  public void addVariable(int level, String name, NodeType nodeType, ParserRuleContext parserRuleContext) {
+  public void addVariable(
+      int level, String name, NodeType nodeType, ParserRuleContext parserRuleContext) {
     constructNode(name, nodeType, parserRuleContext)
         .ifPresent(outlineNode -> addVariable(level, outlineNode, parserRuleContext));
   }
 
-  private void addVariable(int level, DocumentSymbol outlineNode, ParserRuleContext parserRuleContext) {
+  private void addVariable(
+      int level, DocumentSymbol outlineNode, ParserRuleContext parserRuleContext) {
     while (!variableNodes.isEmpty() && variableNodes.peekLast().level >= level) {
       variableNodes.removeLast();
     }
@@ -113,23 +120,20 @@ public class OutlineTreeBuilder {
     } else {
       addNodeToParent(outlineNode, parserRuleContext);
     }
-    if (NodeType.STRUCT.getSymbolKind() == outlineNode.getKind() ||
-        NodeType.REDEFINES.getSymbolKind() == outlineNode.getKind()) {
+    if (NodeType.STRUCT.getSymbolKind() == outlineNode.getKind()
+        || NodeType.REDEFINES.getSymbolKind() == outlineNode.getKind()) {
       variableNodes.addLast(new VariableNode(level, outlineNode));
     }
   }
 
-  public List<DocumentSymbol> build(Multimap<String, Position> copybookUsages) {
+  public List<DocumentSymbol> build(Multimap<String, Location> copybookUsages) {
     rootNodes.forEach(this::recalculateStructRange);
-    for (Map.Entry<String, Position> copybook: copybookUsages.entries()) {
+    for (Map.Entry<String, Location> copybook : copybookUsages.entries()) {
       String name = copybook.getKey();
-      Position position = copybook.getValue();
-      Range outlineRange = new Range(
-          new org.eclipse.lsp4j.Position(position.getLine() - 1, position.getCharPositionInLine()),
-          new org.eclipse.lsp4j.Position(position.getLine() - 1, position.getCharPositionInLine() + name.length())
-      );
-      DocumentSymbol outlineNode = new DocumentSymbol("COPY " + name, NodeType.COPYBOOK.getSymbolKind(),
-          outlineRange, outlineRange, "", List.of());
+      Range range = copybook.getValue().getRange();
+      DocumentSymbol outlineNode =
+          new DocumentSymbol(
+              "COPY " + name, NodeType.COPYBOOK.getSymbolKind(), range, range, "", List.of());
       addOutlineNodeToTree(rootNodes, outlineNode);
     }
     return rootNodes;
@@ -138,12 +142,15 @@ public class OutlineTreeBuilder {
   private void recalculateStructRange(DocumentSymbol node) {
     node.getChildren().forEach(this::recalculateStructRange);
     if (node.getKind() == NodeType.STRUCT.getSymbolKind()) {
-      node.getRange().setEnd(node.getChildren().stream()
-          .map(DocumentSymbol::getRange)
-          .map(Range::getEnd)
-          .max(Comparator.comparingInt(org.eclipse.lsp4j.Position::getLine)
-              .thenComparingInt(org.eclipse.lsp4j.Position::getCharacter))
-          .orElse(node.getRange().getEnd()));
+      node.getRange()
+          .setEnd(
+              node.getChildren().stream()
+                  .map(DocumentSymbol::getRange)
+                  .map(Range::getEnd)
+                  .max(
+                      Comparator.comparingInt(Position::getLine)
+                          .thenComparingInt(Position::getCharacter))
+                  .orElse(node.getRange().getEnd()));
     }
   }
 
@@ -156,21 +163,26 @@ public class OutlineTreeBuilder {
             () -> outlineNodes.add(outlineNode));
   }
 
-  private Optional<DocumentSymbol> constructNode(String name, NodeType type, ParserRuleContext parserRuleContext) {
+  private Optional<DocumentSymbol> constructNode(
+      String name, NodeType type, ParserRuleContext parserRuleContext) {
     return extractRange(parserRuleContext)
-        .map(range -> new DocumentSymbol(name, type.getSymbolKind(), range, range, "", new ArrayList<>()));
+        .map(
+            range ->
+                new DocumentSymbol(
+                    name, type.getSymbolKind(), range, range, "", new ArrayList<>()));
   }
 
   private Optional<Range> extractRange(ParserRuleContext parserRuleContext) {
     return extractPosition(parserRuleContext.start)
-        .flatMap(start -> extractPosition(parserRuleContext.stop).map(stop -> new Range(start, stop)));
+        .flatMap(
+            start -> extractPosition(parserRuleContext.stop).map(stop -> new Range(start, stop)));
   }
 
-  private Optional<org.eclipse.lsp4j.Position> extractPosition(Token token) {
-    return Optional.ofNullable(positionMapping.get(token))
+  private Optional<Position> extractPosition(Token token) {
+    return ofNullable(positionMapping.get(token))
         // Filter positions only for the current document and ignore tokens from copybooks.
-        .filter(position -> position.getDocumentURI().equals(documentUri))
-        .map(position -> new org.eclipse.lsp4j.Position(position.getLine() - 1, position.getCharPositionInLine()));
+        .filter(locality -> locality.getUri().equals(documentUri))
+        .map(locality -> locality.getRange().getStart());
   }
 
   @Value

@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.cobol.service.delegates.validations;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.core.cobol.engine.CobolLanguageEngine;
 import com.ca.lsp.core.cobol.model.ErrorCode;
@@ -26,7 +25,6 @@ import com.google.inject.Singleton;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 import java.util.function.Function;
@@ -38,13 +36,12 @@ import static java.util.stream.Collectors.*;
 
 /**
  * This class is a facade that maps the result of the syntax and semantic analysis to a model
- * consumed by the LSP, i.e. convert {@link SyntaxError} to {@link Diagnostic}, positions to ones
- * protocol-related, and adjust semantic context.
+ * consumed by the LSP, i.e. convert {@link SyntaxError} to {@link Diagnostic} and adjust semantic
+ * context.
  */
 @Singleton
 public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   private static final int FIRST_LINE_SEQ_AND_EXTRA_OP = 8;
-  private static final int ERR_POS_INDEX = 1;
 
   private final CobolLanguageEngine engine;
 
@@ -59,7 +56,8 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
    *
    * @param uri - URI of the processing document to define positions and errors properly
    * @param text of document opened in the client editor
-   * @param copybookProcessingMode reflect the copybook processing status of the document (ENABLED, DISABLED, SKIP)
+   * @param copybookProcessingMode reflect the copybook processing status of the document (ENABLED,
+   *     DISABLED, SKIP)
    * @return a model containing full analysis result, e.g. errors and semantic elements
    */
   @Override
@@ -86,12 +84,12 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     return new AnalysisResult(
         collectDiagnosticsForAffectedDocuments(
             convertErrors(result.getErrors()), context.getCopybookDefinitions(), uri),
-        convertPositions(context.getVariableDefinitions()),
-        convertPositions(context.getVariableUsages()),
-        convertPositions(context.getParagraphDefinitions()),
-        convertPositions(context.getParagraphUsages()),
-        convertPositions(context.getCopybookDefinitions()),
-        convertPositions(context.getCopybookUsages()),
+        convertLocations(context.getVariableDefinitions()),
+        convertLocations(context.getVariableUsages()),
+        convertLocations(context.getParagraphDefinitions()),
+        convertLocations(context.getParagraphUsages()),
+        convertLocations(context.getCopybookDefinitions()),
+        convertLocations(context.getCopybookUsages()),
         context.getOutlineTree());
   }
 
@@ -107,12 +105,12 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
    */
   private Map<String, List<Diagnostic>> collectDiagnosticsForAffectedDocuments(
       Map<String, List<Diagnostic>> diagnostics,
-      Map<String, Collection<Position>> copybookDefinitions,
+      Map<String, Collection<Location>> copybookDefinitions,
       String uri) {
     Map<String, List<Diagnostic>> result = new HashMap<>(diagnostics);
     copybookDefinitions.values().stream()
         .flatMap(Collection::stream)
-        .map(Position::getDocumentURI)
+        .map(Location::getUri)
         .forEach(it -> result.putIfAbsent(it, emptyList()));
     result.putIfAbsent(uri, emptyList());
     return result;
@@ -120,9 +118,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private static Map<String, List<Diagnostic>> convertErrors(List<SyntaxError> errors) {
     return errors.stream()
-        .collect(
-            groupingBy(
-                err -> err.getPosition().getDocumentURI(), mapping(toDiagnostic(), toList())));
+        .collect(groupingBy(err -> err.getLocality().getUri(), mapping(toDiagnostic(), toList())));
   }
 
   private static Function<SyntaxError, Diagnostic> toDiagnostic() {
@@ -131,7 +127,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
       diagnostic.setSeverity(checkSeverity(err.getSeverity()));
       diagnostic.setSource(setupSourceInfo(err.getSeverity()));
       diagnostic.setMessage(err.getSuggestion());
-      diagnostic.setRange(convertRange(err.getPosition()));
+      diagnostic.setRange(err.getLocality().getRange());
       diagnostic.setCode(ofNullable(err.getErrorCode()).map(ErrorCode::name).orElse(null));
       return diagnostic;
     };
@@ -145,27 +141,8 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     return DiagnosticSeverity.forValue(severity.ordinal() + 1);
   }
 
-  private static Range convertRange(Position position) {
-    int positionLine = position.getLine() - ERR_POS_INDEX;
-    int cPosInLn = position.getCharPositionInLine();
-
-    return new Range(
-        new org.eclipse.lsp4j.Position(positionLine, cPosInLn),
-        new org.eclipse.lsp4j.Position(
-            positionLine,
-            ((position.getStopPosition() - position.getStartPosition())
-                + cPosInLn
-                + ERR_POS_INDEX)));
-  }
-
-  private Map<String, List<Location>> convertPositions(Map<String, Collection<Position>> source) {
-    return source.entrySet().stream().collect(toMap(Map.Entry::getKey, this::convertPosition));
-  }
-
-  private List<Location> convertPosition(Map.Entry<String, Collection<Position>> entry) {
-    return entry.getValue().stream()
-        .filter(Objects::nonNull)
-        .map(position -> new Location(position.getDocumentURI(), convertRange(position)))
-        .collect(toList());
+  private Map<String, List<Location>> convertLocations(Map<String, Collection<Location>> source) {
+    return source.entrySet().stream()
+        .collect(toMap(Map.Entry::getKey, it -> new ArrayList<>(it.getValue())));
   }
 }

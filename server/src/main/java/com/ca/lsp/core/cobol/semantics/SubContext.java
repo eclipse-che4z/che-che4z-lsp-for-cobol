@@ -16,8 +16,8 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import com.google.common.collect.Multimap;
+import org.eclipse.lsp4j.Location;
 
 import java.util.Collection;
 
@@ -32,17 +32,17 @@ public interface SubContext<T> {
    * Add defined language element to the context
    *
    * @param element - a language element
-   * @param position - position of the used element
+   * @param location - location of the used element
    */
-  void define(T element, Position position);
+  void define(T element, Location location);
 
   /**
    * Add the position of a language element usage
    *
    * @param element - a language element
-   * @param position - position of the used element
+   * @param location - location of the used element
    */
-  void addUsage(String element, Position position);
+  void addUsage(String element, Location location);
 
   /**
    * Get list of names of defined elements
@@ -55,23 +55,23 @@ public interface SubContext<T> {
    * Check if the context contains a language element with the provided name already defined
    *
    * @param name - a language element name to check
-   * @return true if the element is already defined
+   * @return true if the element already defined
    */
   boolean contains(String name);
 
   /**
    * Get all the definitions of the language elements
    *
-   * @return - multimap of names to a list of positions of definitions
+   * @return - multimap of names to a list of locations of definitions
    */
-  Multimap<String, Position> getDefinitions();
+  Multimap<String, Location> getDefinitions();
 
   /**
    * Get all the registered usage of the language elements
    *
-   * @return - multimap of names to a list of positions of usages
+   * @return - multimap of names to a list of locations of usages
    */
-  Multimap<String, Position> getUsages();
+  Multimap<String, Location> getUsages();
 
   /**
    * Copy the content of the given subContext into this one.

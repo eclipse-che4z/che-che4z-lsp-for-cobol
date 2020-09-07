@@ -15,12 +15,14 @@
 
 package com.ca.lsp.core.cobol.visitor;
 
-import com.broadcom.lsp.domain.common.model.Position;
+import com.ca.lsp.core.cobol.model.Locality;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.ca.lsp.core.cobol.utils.CustomToken;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -54,7 +56,12 @@ class VisitorSemanticAnalysisTest {
             "",
             new NamedSubContext(),
             mock(CommonTokenStream.class),
-            Map.of(token, new Position("", null, 0, 0, 0, 0, "invalid")));
+            Map.of(
+                token,
+                Locality.builder()
+                    .range(new Range(new Position(0, 0), new Position(0, 0)))
+                    .token(WRONG_TOKEN)
+                    .build()));
 
     visitor.visitQualifiedDataNameFormat1(mockMethod(token));
 
@@ -83,7 +90,12 @@ class VisitorSemanticAnalysisTest {
             "",
             new NamedSubContext(),
             tokenStream,
-            Map.of(token, new Position("", null, 0, 0, 0, 0, WRONG_TOKEN)));
+            Map.of(
+                token,
+                Locality.builder()
+                    .range(new Range(new Position(0, 0), new Position(0, 0)))
+                    .token(WRONG_TOKEN)
+                    .build()));
 
     visitor.visitStatement(node);
 
