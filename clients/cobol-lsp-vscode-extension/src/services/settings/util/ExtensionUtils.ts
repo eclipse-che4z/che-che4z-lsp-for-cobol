@@ -36,7 +36,7 @@ export class ExtensionUtils {
      * for collect telemetry event.
      */
     public static getTelemetryKeyId(): string {
-        return fs.existsSync(this.getTelemetryResourcePath()) ? ExtensionUtils.readTelemetryFileContent() : TELEMETRY_DEFAULT_CONTENT;
+        return fs.existsSync(this.getTelemetryResourcePath()) ? ExtensionUtils.getInstrumentationKey() : TELEMETRY_DEFAULT_CONTENT;
     }
 
     /**
@@ -63,8 +63,8 @@ export class ExtensionUtils {
         return vscode.extensions.getExtension(EXTENSION_ID).extensionPath;
     }
 
-    private static readTelemetryFileContent(): string {
-        return fs.readFileSync(ExtensionUtils.getTelemetryResourcePath(), "utf8").replace(/(\r\n|\n|\r)/gm, "");
+    private static getInstrumentationKey(): string {
+        return Buffer.from(fs.readFileSync(ExtensionUtils.getTelemetryResourcePath(), "utf8").replace(/(\r\n|\n|\r)/gm, ""), "base64").toString();
     }
 
     private static getUsername(): string {
