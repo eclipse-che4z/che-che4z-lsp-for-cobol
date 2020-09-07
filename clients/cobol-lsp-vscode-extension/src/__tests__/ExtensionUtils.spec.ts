@@ -29,7 +29,7 @@ function generatePath(...pathSegments) {
 }
 
 describe("Test extension utility class", () => {
-    beforeAll(() => {
+    beforeEach(() => {
         jest.clearAllMocks();
     });
 
