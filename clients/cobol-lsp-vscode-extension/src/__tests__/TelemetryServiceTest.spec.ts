@@ -33,6 +33,7 @@ function setupScenario() {
     ExtensionUtils.getIDEName = jest.fn().mockReturnValue("testingIde");
     ExtensionUtils.getPackageVersion = jest.fn().mockReturnValue("1.0");
     ExtensionUtils.getTelemetryKeyId = jest.fn().mockReturnValue("key_id_for_testing_purposes");
+    (ExtensionUtils as any).getUsername = jest.fn().mockReturnValue("USERNAME");
     jest.mock("vscode-extension-telemetry");
     spySendTelemetry = jest.spyOn(TelemetryReporter.prototype, "sendTelemetryEvent");
     spySendExceptionTelemetry = jest.spyOn(TelemetryReporter.prototype, "sendTelemetryErrorEvent");

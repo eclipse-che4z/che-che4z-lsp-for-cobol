@@ -29,10 +29,8 @@ function createTelemetryEvent(eventName: string, categories: string[], notes: st
     telemetryEvent.setCategories(resolveCategories(categories));
     telemetryEvent.setNotes(notes);
     telemetryEvent.setRootCause(rootCause);
+    telemetryEvent.setMeasurements(telemetryMeasurement);
 
-    if (telemetryMeasurement) {
-        telemetryEvent.setMeasurements(telemetryMeasurement);
-    }
     return telemetryEvent;
 }
 
