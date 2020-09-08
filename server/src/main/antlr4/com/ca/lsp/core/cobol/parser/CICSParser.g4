@@ -716,9 +716,9 @@ cics_transform_elemns: ELEMNS cics_data_area ELEMNSLEN cics_data_area;
 cics_transform_typenamens: cics_transform_typename cics_transform_typens;
 cics_transform_typename: TYPENAME cics_data_area TYPENAMELEN cics_data_area;
 cics_transform_typens: TYPENS cics_data_area TYPENSLEN cics_data_area;
-cics_transform_xmltodata: XMLTODATA CHANNEL cics_data_value (DATCONTAINER cics_data_value)? cics_transform_elemname?
-                          cics_transform_elemns? (NSCONTAINER cics_data_value)? cics_transform_typename?
-                          cics_transform_typens? XMLCONTAINER cics_data_value (XMLTRANSFORM cics_name)?;
+cics_transform_xmltodata: XMLTODATA (CHANNEL cics_data_value | DATCONTAINER cics_data_value | cics_transform_elemname |
+                          cics_transform_elemns | NSCONTAINER cics_data_value | cics_transform_typename |
+                          cics_transform_typens | XMLCONTAINER cics_data_value | XMLTRANSFORM cics_name)+;
 
 /** UNLOCK */
 cics_unlock: UNLOCK cics_file_name (TOKEN cics_data_area)? (SYSID cics_system)?;
