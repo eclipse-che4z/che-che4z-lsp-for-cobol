@@ -15,7 +15,7 @@ jobs:
       with:
         node-version: '12'
     - name: Install release-it tool
-      run: npm install --global release-it @release-it/conventional-changelog
+      run: npm install --global release-it@13.7.0 @release-it/conventional-changelog@1.1.4
     - name: Generate changelog
       run: release-it --ci --config release/release-it-changelog.json --dry-run
       env:

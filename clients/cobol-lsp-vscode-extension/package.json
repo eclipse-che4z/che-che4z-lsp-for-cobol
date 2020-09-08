@@ -4,7 +4,7 @@
     "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "0.13.0+NEXT",
+    "version": "0.13.0",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
@@ -78,6 +78,12 @@
                     "meta.embedded.block.sql": "sql",
                     "meta.embedded.block.html": "html"
                 }
+            }
+        ],
+        "snippets": [
+            {
+                "language": "COBOL",
+                "path": "./snippets.json"
             }
         ],
         "configuration": {
