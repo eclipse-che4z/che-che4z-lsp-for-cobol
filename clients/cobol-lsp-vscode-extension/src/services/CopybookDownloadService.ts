@@ -88,7 +88,6 @@ export class CopybookDownloadService implements vscode.Disposable {
 
                     if (this.queue.length === 0) {
                         TelemetryService.registerEvent("Download copybooks from MF", ["copybook", "COBOL", "experiment-tag"], "total time to search copybooks on MF", new Map().set("time elapsed", TelemetryService.calculateTimeElapsed(startTime, Date.now())));
-                        // TODO: create method?
                         startTime = 0;
                     }
                 });

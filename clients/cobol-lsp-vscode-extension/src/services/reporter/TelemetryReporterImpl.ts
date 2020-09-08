@@ -61,7 +61,6 @@ export class TelemetryReporterImpl implements TelemetryReport {
     private constructor(telemetryKeyId: string) {
         this.telemetryKeyId = telemetryKeyId;
         this.reporter = new TelemetryReporter(EXTENSION_ID, ExtensionUtils.getPackageVersion(), telemetryKeyId);
-        // TODO: remove after test on Che
         vscode.window.showInformationMessage(ExtensionUtils.getIDEName());
         vscode.window.showInformationMessage(telemetryKeyId);
     }

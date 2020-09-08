@@ -169,6 +169,24 @@ pipeline {
                     }
                 }
 
+                stage('Update telemetry key') {
+                    when {
+                        //rollback after testing to: expression { branchName == 'master' }
+                        expression { branchName == '472-Telemetry' }
+                    }
+
+                    steps{
+                        container('node') {
+                            dir('clients/cobol-lsp-vscode-extension') {
+                                //test telemetry key generation
+                                withCredentials([string(credentialsId: 'TELEMETRY_INSTRUMENTATION_KEY', variable: 'TELKEY')]) {
+                                    sh 'echo ${TELKEY}|base64 > resources/TELEMETRY_KEY'
+                                }
+                            }
+                        }
+                    }
+                }
+
                 stage('Client - Package') {
                     environment {
                         npm_config_cache = "$env.WORKSPACE"
@@ -242,21 +260,5 @@ pipeline {
                 }
             }
         }
-        stage('Update telemetry key') {
-          when {
-              //rollback after testing to: expression { branchName == 'master' }
-              expression { branchName == '472_telemetry' }
-          }
-          steps {
-            container('node') {
-
-                withCredentials([string(credentialsId: 'TELEMETRY_INSTRUMENTATION_KEY', variable: 'TELEMETRY_INSTRUMENTATION_KEY')]) {
-                  dir('clients/cobol-lsp-vscode-extension/resources') {
-                    sh 'echo ${TELEMETRY_INSTRUMENTATION_KEY} | base64 > $WORKSPACE/clients/cobol-lsp-vscode-extension/resources/TELEMETRY_KEY'
-                  }
-                }
-            }
-        }
-      }
     }
 }
