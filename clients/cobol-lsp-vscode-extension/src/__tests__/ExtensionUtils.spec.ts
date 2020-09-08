@@ -13,11 +13,13 @@
  */
 
 import * as path from "path";
+import {sep} from "path";
 import * as vscode from "vscode";
 import {ExtensionUtils} from "../services/settings/util/ExtensionUtils";
 
 const INVALID_TELEMETRY_KEY: string = "INVALID_INSTRUMENTATION_KEY";
-const USERNAME: string = "usernameToAnonymize";
+const FAKE_USERNAME: string = "usernameToAnonymize";
+const FAKE_ROOT_PATH = "C:" + sep + "Users" + sep + FAKE_USERNAME + "folder1" + sep + "folder2" + sep + "folder3" + sep;
 
 jest.mock("vscode-extension-telemetry");
 jest.mock("fs-extra");
@@ -48,24 +50,30 @@ describe("Test extension utility class", () => {
     });
 
     test("Given a verbose exception log content, then the information about the user is obfuscated", () => {
-        (ExtensionUtils as any).getUsername = jest.fn().mockReturnValue(USERNAME);
+        (ExtensionUtils as any).getUsername = jest.fn().mockReturnValue(FAKE_USERNAME);
+
+        // construct a cross-platform example path to validate the anonymization functionality
+        const fakePath = path.format(({
+            root: FAKE_ROOT_PATH,
+            base: "someFile.js",
+        }));
 
         const input = "Error: ENOENT: no such file or directory, scandir 'test'\n" +
             "\tat Object.readdirSync (fs.js:795:3)\n" +
             "\tat Object.<anonymous> (electron/js2c/asar.js:605:39)\n" +
             "\tat Object.readdirSync (electron/js2c/asar.js:605:39)\n" +
-            "\tat c:\\Users\\usernameToAnonymize\\folder1\\folder2\\folder3\\out\\extension.js:58:16\n" +
+            "\tat" + fakePath + ":58:16\n" +
             "\tat Generator.next (<anonymous>)\n" +
-            "\tat c:\\Users\\usernameToAnonymize\\folder1\\folder2\\folder3\\out\\extension.js:21:71\n" +
+            "\tat" + fakePath + ":21:71\n" +
             "\tat new Promise (<anonymous>)\n" +
-            "\tat c:\\Users\\usernameToAnonymize\\folder1\\folder2\\folder3\\out\\extension.js:17:12\n" +
-            "\tat activate (c:\\Users\\usernameToAnonymize\\folder1\\folder2\\folder3\\out\\extension.js:46:12)\n" +
-            "\tat Function._callActivateOptional (c:\\Program Files\\Microsoft VS Code\\resources\\app\\out\\vs\\workbench\\services\\extensions\\node\\extensionHostProcess.js:837:509)\n" +
-            "\tat Function._callActivate (c:\\Program Files\\Microsoft VS Code\\resources\\app\\out\\vs\\workbench\\services\\extensions\\node\\extensionHostProcess.js:837:160)\n" +
-            "\tat c:\\Program Files\\Microsoft VS Code\\resources\\app\\out\\vs\\workbench\\services\\extensions\\node\\extensionHostProcess.js:835:703\n" +
-            "\tat processTicksAndRejections (internal/process/task_queues.js:85:5)\n" +
+            "\tat" + fakePath + ":17:12\n" +
+            "\tat activate (" + fakePath + ":46:12)\n" +
+            "\tat Function._callActivateOptional (" + fakePath + ":837:509)\n" +
+            "\tat Function._callActivate (" + fakePath + ":837:160)\n" +
+            "\tat" + fakePath + ":835:703\n" +
+            "\tat processTicksAndRejections (" + fakePath + ":85:5)\n" +
             "\tat async Promise.all (index 0)\n";
 
-        expect(ExtensionUtils.anonymizeContent(input).includes(USERNAME)).toBeFalsy();
+        expect(ExtensionUtils.anonymizeContent(input).includes(FAKE_USERNAME)).toBeFalsy();
     });
 });
