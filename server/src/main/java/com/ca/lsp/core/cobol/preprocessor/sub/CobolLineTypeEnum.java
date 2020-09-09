@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub;
 
+/** This enum describes all the possible COBOL line types depending on the indicator area. */
 public enum CobolLineTypeEnum {
   BLANK,
   COMMENT,

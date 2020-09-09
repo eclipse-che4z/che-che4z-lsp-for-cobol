@@ -17,11 +17,10 @@ import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
- * Preprocessor, which converts strings with COBOL code into a specific entities; analyzes and
+ * Preprocessor, which converts strings with COBOL code into a specific entity; analyzes and
  * processes line indicators.
  */
 public interface CobolLineReader {
@@ -30,8 +29,8 @@ public interface CobolLineReader {
    *
    * @param uri - URI of the currently open document
    * @param lines - a String to be converted into CobolLine list
-   * @return List of COBOL lines with a list of errors if found or an empty list
+   * @return List of COBOL lines with a list of errors if found, or an empty list
    */
   @Nonnull
-  ResultWithErrors<List<CobolLine>> processLines(@Nullable String uri, @Nonnull String lines);
+  ResultWithErrors<List<CobolLine>> processLines(@Nonnull String uri, @Nonnull String lines);
 }
