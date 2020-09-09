@@ -32,7 +32,7 @@ class TestExtraSymbolsNotCauseErrorOnNextLine {
           + "002800  HELLOWORLD.                                                     23323232\r\n"
           + "024200 PROCEDURE DIVISION .                                             CM1014.2";
 
-  private static final String MESSAGE = "Source text can not go past column 80.";
+  private static final String MESSAGE = "Source text cannot go past column 80";
 
   @Test
   void test() {

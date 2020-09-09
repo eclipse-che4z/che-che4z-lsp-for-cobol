@@ -45,7 +45,7 @@ import static java.util.Optional.ofNullable;
 public class CobolLineReaderImpl implements CobolLineReader {
   private static final int INDICATOR_AREA_INDEX = 6;
   private static final int MAX_LINE_LENGTH = 80;
-  private static final String LONG_LINE_MSG = "Source text can not go past column 80.";
+  private static final String LONG_LINE_MSG = "Source text cannot go past column 80";
   private static final String INCORRECT_LINE_FORMAT_MSG = "Unexpected indicator area content";
   private static final Map<String, CobolLineTypeEnum> INDICATORS =
       Map.of(
