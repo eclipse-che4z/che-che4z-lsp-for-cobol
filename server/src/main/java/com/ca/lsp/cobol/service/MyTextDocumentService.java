@@ -213,10 +213,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
   }
 
   private void registerEngineAndAnalyze(String uri, String languageType, String text) {
-    String fileExtension = extractExtension(uri);
-    if (fileExtension != null && !isCobolFile(fileExtension)) {
-      communications.notifyThatExtensionIsUnsupported(fileExtension);
-    } else if (isCobolFile(languageType)) {
+    if (isCobolFile(languageType)) {
       communications.notifyThatLoadingInProgress(uri);
       analyzeDocumentFirstTime(uri, text);
     } else {
