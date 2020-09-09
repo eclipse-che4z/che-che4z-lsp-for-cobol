@@ -708,14 +708,14 @@ cics_test: TEST EVENT cics_data_value FIRESTATUS cics_cvda;
 
 /** TRANSFORM DATATOXML / XMLTODATA */
 cics_transform: TRANSFORM (cics_transform_datatoxml | cics_transform_xmltodata);
-cics_transform_datatoxml: DATATOXML CHANNEL cics_data_value DATCONTAINER cics_data_value cics_transform_elemname?
-                          cics_transform_elemns? cics_transform_typenamens? (XMLCONTAINER cics_data_value)?
-                          XMLTRANSFORM cics_name;
-cics_transform_elemname: ELEMNAME cics_data_area ELEMNAMELEN cics_data_area;
-cics_transform_elemns: ELEMNS cics_data_area ELEMNSLEN cics_data_area;
-cics_transform_typenamens: cics_transform_typename cics_transform_typens;
-cics_transform_typename: TYPENAME cics_data_area TYPENAMELEN cics_data_area;
-cics_transform_typens: TYPENS cics_data_area TYPENSLEN cics_data_area;
+cics_transform_datatoxml: DATATOXML (CHANNEL cics_data_value | DATCONTAINER cics_data_value | cics_transform_elemname
+                          cics_transform_elemns | cics_transform_typenamens | XMLCONTAINER cics_data_value |
+                          XMLTRANSFORM cics_name)+;
+cics_transform_typenamens: (cics_transform_typename | cics_transform_typens)+;
+cics_transform_typename: (TYPENAME cics_data_area | TYPENAMELEN cics_data_area)+;
+cics_transform_typens: (TYPENS cics_data_area | TYPENSLEN cics_data_area)+;
+cics_transform_elemns: (ELEMNS cics_data_area | ELEMNSLEN cics_data_area)+;
+cics_transform_elemname: (ELEMNAME cics_data_area | ELEMNAMELEN cics_data_area)+;
 cics_transform_xmltodata: XMLTODATA (CHANNEL cics_data_value | DATCONTAINER cics_data_value | cics_transform_elemname |
                           cics_transform_elemns | NSCONTAINER cics_data_value | cics_transform_typename |
                           cics_transform_typens | XMLCONTAINER cics_data_value | XMLTRANSFORM cics_name)+;
