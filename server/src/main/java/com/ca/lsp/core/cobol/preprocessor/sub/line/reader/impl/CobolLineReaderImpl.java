@@ -25,19 +25,17 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.ERROR;
-import static com.ca.lsp.core.cobol.preprocessor.ProcessingConstants.*;
-import static java.util.regex.Pattern.compile;
+import static com.ca.lsp.core.cobol.preprocessor.sub.CobolLineTypeEnum.*;
+import static java.util.Optional.ofNullable;
 
 /**
- * Preprocessor, which converts strings with COBOL code into a specific entities; analyzes and
+ * Preprocessor, which converts strings with COBOL code into a specific entity; analyzes and
  * processes line indicators. This implementation checks if the lines match the given format and
  * raises an error if not.
  *
@@ -46,14 +44,31 @@ import static java.util.regex.Pattern.compile;
 @Slf4j
 public class CobolLineReaderImpl implements CobolLineReader {
   private static final int INDICATOR_AREA_INDEX = 6;
-  private static final Pattern FIXED_FORMAT_PATTERN =
-      compile("^(.{6})" + INDICATOR_FIELD + "(.{0,4})(.{0,61})(.{0,8})");
+  private static final int MAX_LINE_LENGTH = 80;
+  private static final String LONG_LINE_MSG = "Source text can not go past column 80.";
+  private static final String INCORRECT_LINE_FORMAT_MSG = "Unexpected indicator area content";
+  private static final Map<String, CobolLineTypeEnum> INDICATORS =
+      Map.of(
+          "*",
+          COMMENT,
+          "/",
+          COMMENT,
+          "d",
+          DEBUG,
+          "D",
+          DEBUG,
+          "-",
+          CONTINUATION,
+          "$",
+          COMPILER_DIRECTIVE,
+          " ",
+          NORMAL);
 
   @Nonnull
   @Override
   public ResultWithErrors<List<CobolLine>> processLines(
-      @Nullable String documentURI, @Nonnull String lines) {
-    List<SyntaxError> errors = new ArrayList<>();
+      @Nonnull String documentURI, @Nonnull String lines) {
+    List<SyntaxError> accumulatedErrors = new ArrayList<>();
     List<CobolLine> result = new ArrayList<>();
     try (Scanner scanner = new Scanner(lines)) {
       String currentLine;
@@ -66,7 +81,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
         ResultWithErrors<CobolLine> output = parseLine(currentLine, documentURI, lineNumber);
 
         CobolLine currentCobolLine = output.getResult();
-        errors.addAll(output.getErrors());
+        accumulatedErrors.addAll(output.getErrors());
 
         currentCobolLine.setPredecessor(lastCobolLine);
         result.add(currentCobolLine);
@@ -75,38 +90,39 @@ public class CobolLineReaderImpl implements CobolLineReader {
         lastCobolLine = currentCobolLine;
       }
     }
-    return new ResultWithErrors<>(result, errors);
+    return new ResultWithErrors<>(result, accumulatedErrors);
   }
 
   @Nonnull
   private ResultWithErrors<CobolLine> parseLine(
-      @Nonnull String line, @Nullable String uri, int lineNumber) {
+      @Nonnull String line, @Nonnull String uri, int lineNumber) {
     CobolLine cobolLine = new CobolLine();
-
     line = getDelegate().apply(line);
 
-    Matcher matcher = FIXED_FORMAT_PATTERN.matcher(line);
-    ResultWithErrors<String> result = checkFormatCorrect(line, uri, lineNumber, matcher);
-    line = result.getResult();
+    ResultWithErrors<String> result = checkLineLength(line, uri, lineNumber);
+    String adjustedLine = result.getResult();
+    List<SyntaxError> errors = new ArrayList<>(result.getErrors());
 
-    if (line.length() > 0) {
-      for (int i = line.length(); i > 0; i--) {
+    if (adjustedLine.length() > 0) {
+      for (int i = adjustedLine.length(); i > 0; i--) {
         if (i > 72) {
-          cobolLine.setCommentArea(line.substring(72, i));
+          cobolLine.setCommentArea(adjustedLine.substring(72, i));
           i = 73;
         } else if (i > 11) {
-          cobolLine.setContentAreaB(line.substring(11, i));
+          cobolLine.setContentAreaB(adjustedLine.substring(11, i));
           i = 12;
         } else if (i > 7) {
-          cobolLine.setContentAreaA(line.substring(7, i));
+          cobolLine.setContentAreaA(adjustedLine.substring(7, i));
           i = 8;
         } else if (i > 6) {
-          String indicatorArea = line.substring(6, 7);
+          String indicatorArea = adjustedLine.substring(6, 7);
+          ResultWithErrors<CobolLineTypeEnum> type = determineType(indicatorArea, uri, lineNumber);
           cobolLine.setIndicatorArea(indicatorArea);
-          cobolLine.setType(determineType(indicatorArea));
+          cobolLine.setType(type.getResult());
+          errors.addAll(type.getErrors());
           i = 7;
         } else {
-          cobolLine.setSequenceArea(line.substring(0, i));
+          cobolLine.setSequenceArea(adjustedLine.substring(0, i));
           i = 0;
         }
       }
@@ -114,81 +130,59 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
     cobolLine.setNumber(lineNumber);
 
-    return new ResultWithErrors<>(cobolLine, result.getErrors());
+    return new ResultWithErrors<>(cobolLine, errors);
+  }
+
+  private ResultWithErrors<CobolLineTypeEnum> determineType(
+      String indicatorArea, String uri, int lineNumber) {
+    return ofNullable(INDICATORS.get(indicatorArea))
+        .map(it -> new ResultWithErrors<>(it, List.of()))
+        .orElse(
+            new ResultWithErrors<>(
+                NORMAL,
+                List.of(
+                    createError(
+                        uri,
+                        INCORRECT_LINE_FORMAT_MSG,
+                        lineNumber,
+                        INDICATOR_AREA_INDEX,
+                        INDICATOR_AREA_INDEX + 1))));
   }
 
   @Nonnull
-  private CobolLineTypeEnum determineType(@Nonnull String indicatorArea) {
-    CobolLineTypeEnum result;
-
-    switch (indicatorArea) {
-      case CHAR_D_UPPER:
-      case CHAR_D_LOWER:
-        result = CobolLineTypeEnum.DEBUG;
-        break;
-      case CHAR_MINUS:
-        result = CobolLineTypeEnum.CONTINUATION;
-        break;
-      case CHAR_ASTERISK:
-      case CHAR_SLASH:
-        result = CobolLineTypeEnum.COMMENT;
-        break;
-      case CHAR_DOLLAR_SIGN:
-        result = CobolLineTypeEnum.COMPILER_DIRECTIVE;
-        break;
-      case WS:
-      default:
-        result = CobolLineTypeEnum.NORMAL;
-        break;
-    }
-
-    return result;
-  }
-
-  @Nonnull
-  private ResultWithErrors<String> checkFormatCorrect(
-      @Nonnull String line, @Nullable String uri, int lineNumber, @Nonnull Matcher matcher) {
-    int errorLength = 0;
-    int charPosition;
+  private ResultWithErrors<String> checkLineLength(
+      @Nonnull String line, @Nonnull String uri, int lineNumber) {
     List<SyntaxError> errors = new ArrayList<>();
-    if (!matcher.matches() && line.length() > INDICATOR_AREA_INDEX) {
-      if (matcher.lookingAt()) {
-        charPosition = matcher.end();
-        errorLength = line.length() - 80;
-      } else {
-        charPosition =
-            INDICATOR_AREA_INDEX; // format error could appear at the indicator area index, for now
-      }
-      errors.add(registerFormatError(uri, lineNumber, charPosition, errorLength));
-      line = line.substring(0, line.length() - errorLength);
+    String result = line;
+    if (line.length() > MAX_LINE_LENGTH) {
+      errors.add(createError(uri, LONG_LINE_MSG, lineNumber, MAX_LINE_LENGTH, line.length()));
+      result = line.substring(0, MAX_LINE_LENGTH);
     }
-    return new ResultWithErrors<>(line, errors);
+    return new ResultWithErrors<>(result, errors);
   }
 
   @Nonnull
-  private CobolLineReaderDelegate getDelegate() {
-    return new CompilerDirectivesTransformation();
-  }
-
-  @Nonnull
-  private SyntaxError registerFormatError(
-      @Nullable String uri, int lineNumber, int charPosition, int errorLength) {
+  private SyntaxError createError(
+      @Nonnull String uri, @Nonnull String message, int lineNumber, int start, int stop) {
     SyntaxError error =
         SyntaxError.syntaxError()
-            .suggestion("Source text can not go past column 80.")
+            .suggestion(message)
             .severity(ERROR)
             .locality(
                 Locality.builder()
                     .uri(uri)
                     .range(
-                        new Range(
-                            new Position(lineNumber, charPosition),
-                            new Position(lineNumber, charPosition + errorLength)))
-                    .recognizer(CobolLineReaderImpl.class)
+                        new Range(new Position(lineNumber, start), new Position(lineNumber, stop)))
+                    .recognizer(getClass())
                     .build())
             .build();
 
     LOG.debug("Syntax error by CobolLineReaderImpl#registerFormatError: " + error.toString());
     return error;
+  }
+
+  @Nonnull
+  private CobolLineReaderDelegate getDelegate() {
+    return new CompilerDirectivesTransformation();
   }
 }
