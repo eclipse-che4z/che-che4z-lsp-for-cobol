@@ -63,6 +63,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
       "The following token cannot be on the same line as a DECLARATIVE token: ";
   private static final String INVALID_DEF_MSG = "Invalid definition for: ";
   private static final String MISSPELLED_WORD = "A misspelled word, maybe you want to put ";
+  private static final String PROGRAM_ID_ISSUE_MSG = "There is an issue with PROGRAM-ID paragraph";
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
 
@@ -114,11 +115,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   @Override
   public Class visitProgramIdParagraph(ProgramIdParagraphContext ctx) {
-    if (ctx.programName() != null) {
-      programName = ctx.programName().getText();
-      outlineTreeBuilder.renameProgram(programName, ctx);
-      outlineTreeBuilder.addNode(PROGRAM_ID_PREFIX + programName, NodeType.PROGRAM_ID, ctx);
-    }
+    ofNullable(ctx.programName())
+        .map(RuleContext::getText)
+        .map(PreprocessorStringUtils::trimQuotes)
+        .ifPresent(
+            name -> {
+              programName = name;
+              outlineTreeBuilder.renameProgram(name, ctx);
+              outlineTreeBuilder.addNode(PROGRAM_ID_PREFIX + name, NodeType.PROGRAM_ID, ctx);
+            });
     return visitChildren(ctx);
   }
 
@@ -570,8 +575,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private void checkProgramName(Token token) {
     if (programName == null) {
-      getLocality(token)
-          .ifPresent(it -> throwException("", it, "There is an issue with PROGRAM-ID paragraph"));
+      getLocality(token).ifPresent(it -> throwException("", it, PROGRAM_ID_ISSUE_MSG));
     } else {
       checkProgramNameIdentical(token);
     }

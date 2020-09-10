@@ -18,16 +18,8 @@ import lombok.experimental.UtilityClass;
 /** The constants in this class used while the processing of COBOL code lines. */
 @UtilityClass
 public final class ProcessingConstants {
-  public static final String CHAR_ASTERISK = "*";
-  public static final String CHAR_D_UPPER = "D";
-  public static final String CHAR_D_LOWER = "d";
-  public static final String CHAR_DOLLAR_SIGN = "$";
-  public static final String CHAR_MINUS = "-";
-  public static final String CHAR_SLASH = "/";
   public static final String COMMENT_ENTRY_TAG = "*>CE";
   public static final String COMMENT_TAG = "*>";
-  public static final String INDICATOR_FIELD = "([\\s*\\-/Dd$]{1})";
-  public static final String CONTLINE_INDICATOR_FIELD = "([-]{1})";
   public static final String NEWLINE = "\r\n";
   public static final String WS = " ";
   public static final String CONT_LINE_NO_AREA_A_REGEX = "^(.{6})([-]{1})( ){4}(.*)";

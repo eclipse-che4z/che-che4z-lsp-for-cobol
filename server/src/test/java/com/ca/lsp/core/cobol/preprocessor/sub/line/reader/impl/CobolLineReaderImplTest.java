@@ -19,6 +19,7 @@ import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.google.common.collect.Lists;
 import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -51,7 +52,9 @@ class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
     assertThat(processed.getErrors(), hasSize(1));
 
     SyntaxError syntaxError = processed.getErrors().get(0);
-    assertThat(syntaxError.getLocality().getRange().getStart(), is(new Position(10, 6)));
+    assertThat(
+        syntaxError.getLocality().getRange(),
+        is(new Range(new Position(10, 6), new Position(10, 7))));
   }
 
   /** Empty string should not be processed. */
