@@ -28,7 +28,6 @@ import {checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatase
 import {CopybookProfile, DownloadQueue} from "./DownloadQueue";
 import {ProfileService} from "./ProfileService";
 import {TelemetryService} from "./reporter/TelemetryService";
-import {ExtensionUtils} from "./settings/util/ExtensionUtils";
 import {ZoweApi} from "./ZoweApi";
 import {Type, ZoweError} from "./ZoweError";
 
@@ -88,7 +87,7 @@ export class CopybookDownloadService implements vscode.Disposable {
                     }
 
                     if (this.queue.length === 0) {
-                        TelemetryService.registerEvent("Download copybooks from MF", ["copybook", "COBOL", "experiment-tag"], "total time to search copybooks on MF", new Map().set("time elapsed", ExtensionUtils.calculateTimeElapsed(startTime, Date.now())));
+                        TelemetryService.registerEvent("Download copybooks from MF", ["copybook", "COBOL", "experiment-tag"], "total time to search copybooks on MF", new Map().set("time elapsed", TelemetryService.calculateTimeElapsed(startTime, Date.now())));
                         startTime = 0;
                     }
                 });

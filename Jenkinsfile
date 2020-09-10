@@ -171,8 +171,7 @@ pipeline {
 
                 stage('Update telemetry key') {
                     when {
-                        //rollback after testing to: expression { branchName == 'master' }
-                        expression { branchName == '472-Telemetry' }
+                        expression { branchName == 'master' }
                     }
 
                     steps{

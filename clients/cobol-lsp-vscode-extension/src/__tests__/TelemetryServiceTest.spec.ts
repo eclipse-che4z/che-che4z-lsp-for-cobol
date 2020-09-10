@@ -11,11 +11,16 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+
+import * as path from "path";
+import {sep} from "path";
 import TelemetryReporter from "vscode-extension-telemetry";
 import {TelemetryReporterImpl} from "../services/reporter/TelemetryReporterImpl";
 import {TelemetryService} from "../services/reporter/TelemetryService";
 import {ExtensionUtils} from "../services/settings/util/ExtensionUtils";
 
+const USERNAME: string = "usernameToAnonymize";
+const FAKE_ROOT_PATH = "C:" + sep + "Users" + sep + USERNAME + "folder1" + sep + "folder2" + sep + "folder3" + sep;
 let spySendTelemetry;
 let spySendExceptionTelemetry;
 jest.mock("vscode-extension-telemetry");
@@ -33,8 +38,8 @@ function runScenario(expectedNumberOfCalls, type: string, eventName?: string, ca
 function setupScenario() {
     ExtensionUtils.getIDEName = jest.fn().mockReturnValue("testingIde");
     ExtensionUtils.getPackageVersion = jest.fn().mockReturnValue("1.0");
-    TelemetryReporterImpl.getTelemetryKeyId = jest.fn().mockReturnValue("key_id_for_testing_purposes");
-    (ExtensionUtils as any).getUsername = jest.fn().mockReturnValue("USERNAME");
+    (TelemetryReporterImpl as any).getTelemetryKeyId = jest.fn().mockReturnValue("key_id_for_testing_purposes");
+    (TelemetryService as any).getUsername = jest.fn().mockReturnValue(USERNAME);
     jest.mock("vscode-extension-telemetry");
     spySendTelemetry = jest.spyOn(TelemetryReporter.prototype, "sendTelemetryEvent");
     spySendExceptionTelemetry = jest.spyOn(TelemetryReporter.prototype, "sendTelemetryErrorEvent");
@@ -55,8 +60,8 @@ describe("TelemetryService information are consistent before send them to the te
         runScenario(1, "log", "test");
     });
 
-    test("Given a fulfilled telemetry measuremnt event, the data is contained as part of a telemetry event and their data are sent to the telemetry server", () => {
-        runScenario(1, "log", "test the download", undefined, undefined, new Map().set("time elapsed", ExtensionUtils.calculateTimeElapsed(Date.now() - 100, Date.now())));
+    test("Given a fulfilled telemetry measurement event, the data is contained as part of a telemetry event and their data are sent to the telemetry server", () => {
+        runScenario(1, "log", "test the download", undefined, undefined, new Map().set("time elapsed", TelemetryService.calculateTimeElapsed(Date.now() - 100, Date.now())));
     });
 
     test("An empty telemetry object is not sent to the telemetry server", () => {
@@ -73,5 +78,35 @@ describe("TelemetryService information are consistent before send them to the te
 
     test("An exception telemetry event without root cause is not sent to the telemetry server", () => {
         runScenario(0, "exception", "runtimeException");
+    });
+});
+
+describe("Anonymize content", () => {
+    test("Given a verbose exception log content, then the information about the user is obfuscated", () => {
+        (TelemetryService as any).getUsername = jest.fn().mockReturnValue(USERNAME);
+
+        // construct a cross-platform example path to validate the anonymization functionality
+        const fakePath = path.format(({
+            root: FAKE_ROOT_PATH,
+            base: "someFile.js",
+        }));
+
+        const input = "Error: ENOENT: no such file or directory, scandir 'test'\n" +
+            "\tat Object.readdirSync (fs.js:795:3)\n" +
+            "\tat Object.<anonymous> (electron/js2c/asar.js:605:39)\n" +
+            "\tat Object.readdirSync (electron/js2c/asar.js:605:39)\n" +
+            "\tat" + fakePath + ":58:16\n" +
+            "\tat Generator.next (<anonymous>)\n" +
+            "\tat" + fakePath + ":21:71\n" +
+            "\tat new Promise (<anonymous>)\n" +
+            "\tat" + fakePath + ":17:12\n" +
+            "\tat activate (" + fakePath + ":46:12)\n" +
+            "\tat Function._callActivateOptional (" + fakePath + ":837:509)\n" +
+            "\tat Function._callActivate (" + fakePath + ":837:160)\n" +
+            "\tat" + fakePath + ":835:703\n" +
+            "\tat processTicksAndRejections (" + fakePath + ":85:5)\n" +
+            "\tat async Promise.all (index 0)\n";
+
+        expect((TelemetryService as any).anonymizeContent(input).includes(USERNAME)).toBeFalsy();
     });
 });

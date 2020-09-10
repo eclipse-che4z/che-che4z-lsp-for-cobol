@@ -31,6 +31,24 @@ export class TelemetryReporterImpl implements TelemetryReport {
 
     private static instance: TelemetryReporterImpl;
 
+    /**
+     * This method return the value of the instrumentation key necessary to create the telemetry reporter from an
+     * external file configuration. If the file doesn't exists it returns a generic value that will not be valid
+     * for collect telemetry event.
+     */
+    private static getTelemetryKeyId(): string {
+        return fs.existsSync(this.getTelemetryResourcePath()) ? this.getInstrumentationKey() : TELEMETRY_DEFAULT_CONTENT;
+    }
+
+    private static getTelemetryResourcePath() {
+        return vscode.Uri.file(
+            path.join(ExtensionUtils.getExtensionPath(), "resources", "TELEMETRY_KEY")).fsPath;
+    }
+
+    private static getInstrumentationKey(): string {
+        return Buffer.from(fs.readFileSync(this.getTelemetryResourcePath(), "utf8").replace(/(\r\n|\n|\r)/gm, ""), "base64").toString();
+    }
+
     private static covertData(content: TelemetryEvent) {
         return {
             categories: content.getCategories().toString(),
@@ -63,18 +81,24 @@ export class TelemetryReporterImpl implements TelemetryReport {
     private constructor(telemetryKeyId: string) {
         this.telemetryKeyId = telemetryKeyId;
         this.reporter = new TelemetryReporter(EXTENSION_ID, ExtensionUtils.getPackageVersion(), telemetryKeyId);
-        vscode.window.showInformationMessage(ExtensionUtils.getIDEName());
-        vscode.window.showInformationMessage(telemetryKeyId);
     }
 
     public reportEvent(content: TelemetryEvent): void {
         if (this.isValidTelemetryKey()) {
+            // TODO: remove after code review is done
+            console.log(TelemetryReporterImpl.covertData(content));
+            if (content.getMeasurements()) {
+                console.log(TelemetryReporterImpl.convertMeasurements(content.getMeasurements()));
+            }
+
             this.reporter.sendTelemetryEvent(content.getEventName(), TelemetryReporterImpl.covertData(content), TelemetryReporterImpl.convertMeasurements(content.getMeasurements()));
         }
     }
 
     public reportExceptionEvent(content: TelemetryEvent): void {
         if (this.isValidTelemetryKey()) {
+            // TODO: remove after code review is done
+            console.log(TelemetryReporterImpl.covertData(content));
             this.reporter.sendTelemetryErrorEvent(content.getEventName(), TelemetryReporterImpl.covertData(content));
         }
     }
@@ -86,24 +110,4 @@ export class TelemetryReporterImpl implements TelemetryReport {
     private isValidTelemetryKey(): boolean {
         return this.telemetryKeyId !== TELEMETRY_DEFAULT_CONTENT;
     }
-
-    //TODO: adjust position
-    /**
-     * This method return the value of the instrumentation key necessary to create the telemetry reporter from an
-     * external file configuration. If the file doesn't exists it returns a generic value that will not be valid
-     * for collect telemetry event.
-     */
-    public static getTelemetryKeyId(): string {
-        return fs.existsSync(this.getTelemetryResourcePath()) ? this.getInstrumentationKey() : TELEMETRY_DEFAULT_CONTENT;
-    }
-
-    private static getTelemetryResourcePath() {
-        return vscode.Uri.file(
-            path.join(ExtensionUtils.getExtensionPath(), "resources", "TELEMETRY_KEY")).fsPath;
-    }
-
-    private static getInstrumentationKey(): string {
-        return Buffer.from(fs.readFileSync(this.getTelemetryResourcePath(), "utf8").replace(/(\r\n|\n|\r)/gm, ""), "base64").toString();
-    }
-
 }
