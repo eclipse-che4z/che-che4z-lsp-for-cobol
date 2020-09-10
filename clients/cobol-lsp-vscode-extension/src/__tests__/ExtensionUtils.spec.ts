@@ -15,6 +15,7 @@
 import * as path from "path";
 import {sep} from "path";
 import * as vscode from "vscode";
+import {TelemetryReporterImpl} from "../services/reporter/TelemetryReporterImpl";
 import {ExtensionUtils} from "../services/settings/util/ExtensionUtils";
 
 const INVALID_TELEMETRY_KEY: string = "INVALID_INSTRUMENTATION_KEY";
@@ -39,14 +40,14 @@ describe("Test extension utility class", () => {
         (ExtensionUtils as any).getExtensionPath = jest.fn().mockReturnValue(path.join(__dirname, "../../"));
         generatePath("resources", "TELEMETRY_KEY");
 
-        expect(ExtensionUtils.getTelemetryKeyId()).not.toBe(INVALID_TELEMETRY_KEY);
+        expect(TelemetryReporterImpl.getTelemetryKeyId()).not.toBe(INVALID_TELEMETRY_KEY);
     });
 
     test("Given a not existent file, then the constant value for invalid telemetry key is returned", () => {
         (ExtensionUtils as any).getExtensionPath = jest.fn().mockReturnValue(path.join(__dirname, "../../"));
         generatePath("bad", "resource", "TELEMETRY_KEY");
 
-        expect(ExtensionUtils.getTelemetryKeyId()).toBe(INVALID_TELEMETRY_KEY);
+        expect(TelemetryReporterImpl.getTelemetryKeyId()).toBe(INVALID_TELEMETRY_KEY);
     });
 
     test("Given a verbose exception log content, then the information about the user is obfuscated", () => {

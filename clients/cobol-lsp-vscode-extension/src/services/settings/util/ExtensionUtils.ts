@@ -12,12 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "fs";
 import {userInfo} from "os";
-import * as path from "path";
 import {sep} from "path";
 import * as vscode from "vscode";
-import {EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT} from "../../../constants";
+import {EXTENSION_ID} from "../../../constants";
 
 /**
  * This class contains utility methods consumed within the application
@@ -40,15 +38,16 @@ export class ExtensionUtils {
         return vscode.extensions.getExtension(EXTENSION_ID).packageJSON.version;
     }
 
-    /**
-     * This method return the value of the instrumentation key necessary to create the telemetry reporter from an
-     * external file configuration. If the file doesn't exists it returns a generic value that will not be valid
-     * for collect telemetry event.
-     */
-    public static getTelemetryKeyId(): string {
-        return fs.existsSync(this.getTelemetryResourcePath()) ? ExtensionUtils.getInstrumentationKey() : TELEMETRY_DEFAULT_CONTENT;
-    }
+    // /**
+    //  * This method return the value of the instrumentation key necessary to create the telemetry reporter from an
+    //  * external file configuration. If the file doesn't exists it returns a generic value that will not be valid
+    //  * for collect telemetry event.
+    //  */
+    // public static getTelemetryKeyId(): string {
+    //     return fs.existsSync(this.getTelemetryResourcePath()) ? ExtensionUtils.getInstrumentationKey() : TELEMETRY_DEFAULT_CONTENT;
+    // }
 
+    // TODO: move to telemetry service
     /**
      * This method allows to anonymize the username value present in stack trace
      * @param content stack trace
@@ -64,18 +63,22 @@ export class ExtensionUtils {
         return (vscode.env) ? vscode.env.appName : "N.D.";
     }
 
-    private static getTelemetryResourcePath() {
-        return vscode.Uri.file(
-            path.join(this.getExtensionPath(), "resources", "TELEMETRY_KEY")).fsPath;
-    }
+    // private static getTelemetryResourcePath() {
+    //     return vscode.Uri.file(
+    //         path.join(this.getExtensionPath(), "resources", "TELEMETRY_KEY")).fsPath;
+    // }
 
-    private static getExtensionPath(): string {
+    // TODO: update javadoc
+    /**
+     *
+     */
+    public static getExtensionPath(): string {
         return vscode.extensions.getExtension(EXTENSION_ID).extensionPath;
     }
 
-    private static getInstrumentationKey(): string {
-        return Buffer.from(fs.readFileSync(ExtensionUtils.getTelemetryResourcePath(), "utf8").replace(/(\r\n|\n|\r)/gm, ""), "base64").toString();
-    }
+    // private static getInstrumentationKey(): string {
+    //     return Buffer.from(fs.readFileSync(ExtensionUtils.getTelemetryResourcePath(), "utf8").replace(/(\r\n|\n|\r)/gm, ""), "base64").toString();
+    // }
 
     private static getUsername(): string {
         return userInfo().username;

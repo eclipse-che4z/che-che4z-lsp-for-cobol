@@ -11,6 +11,8 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import * as fs from "fs";
+import * as path from "path";
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import {EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT} from "../../constants";
@@ -22,7 +24,7 @@ import {TelemetryReport} from "./TelemetryReport";
 export class TelemetryReporterImpl implements TelemetryReport {
     public static getInstance(): TelemetryReporterImpl {
         if (!TelemetryReporterImpl.instance) {
-            TelemetryReporterImpl.instance = new TelemetryReporterImpl(ExtensionUtils.getTelemetryKeyId());
+            TelemetryReporterImpl.instance = new TelemetryReporterImpl(this.getTelemetryKeyId());
         }
         return TelemetryReporterImpl.instance;
     }
@@ -84,4 +86,24 @@ export class TelemetryReporterImpl implements TelemetryReport {
     private isValidTelemetryKey(): boolean {
         return this.telemetryKeyId !== TELEMETRY_DEFAULT_CONTENT;
     }
+
+    //TODO: adjust position
+    /**
+     * This method return the value of the instrumentation key necessary to create the telemetry reporter from an
+     * external file configuration. If the file doesn't exists it returns a generic value that will not be valid
+     * for collect telemetry event.
+     */
+    public static getTelemetryKeyId(): string {
+        return fs.existsSync(this.getTelemetryResourcePath()) ? this.getInstrumentationKey() : TELEMETRY_DEFAULT_CONTENT;
+    }
+
+    private static getTelemetryResourcePath() {
+        return vscode.Uri.file(
+            path.join(ExtensionUtils.getExtensionPath(), "resources", "TELEMETRY_KEY")).fsPath;
+    }
+
+    private static getInstrumentationKey(): string {
+        return Buffer.from(fs.readFileSync(this.getTelemetryResourcePath(), "utf8").replace(/(\r\n|\n|\r)/gm, ""), "base64").toString();
+    }
+
 }

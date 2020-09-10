@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import TelemetryReporter from "vscode-extension-telemetry";
+import {TelemetryReporterImpl} from "../services/reporter/TelemetryReporterImpl";
 import {TelemetryService} from "../services/reporter/TelemetryService";
 import {ExtensionUtils} from "../services/settings/util/ExtensionUtils";
 
@@ -32,7 +33,7 @@ function runScenario(expectedNumberOfCalls, type: string, eventName?: string, ca
 function setupScenario() {
     ExtensionUtils.getIDEName = jest.fn().mockReturnValue("testingIde");
     ExtensionUtils.getPackageVersion = jest.fn().mockReturnValue("1.0");
-    ExtensionUtils.getTelemetryKeyId = jest.fn().mockReturnValue("key_id_for_testing_purposes");
+    TelemetryReporterImpl.getTelemetryKeyId = jest.fn().mockReturnValue("key_id_for_testing_purposes");
     (ExtensionUtils as any).getUsername = jest.fn().mockReturnValue("USERNAME");
     jest.mock("vscode-extension-telemetry");
     spySendTelemetry = jest.spyOn(TelemetryReporter.prototype, "sendTelemetryEvent");
