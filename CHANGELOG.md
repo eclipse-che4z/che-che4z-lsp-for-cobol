@@ -12,6 +12,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ### Features
 * Outline view support [#481](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/481)
+* Breadcrumb support [#487](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/487)
 * Provide default COBOL code snippets [#484](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/484)
 * Underscore the copy statement if it contains a syntax error [#450](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/450) 
 
