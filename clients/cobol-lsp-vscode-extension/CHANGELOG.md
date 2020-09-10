@@ -7,15 +7,15 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 - Outline view support
 - Breadcrumb support
-- Provide default COBOL code snippets
-- Underscore the copy statement if it contains a syntax error
+- Support for COBOL code snippets
+- Copy statement that contains a syntax error underlined
 
 #### Fixed
-- Allow multi-line errors underscoring GH-486
-- Fix a typo in DIVIDE-REMAINDER code snippets
-- Fix checking program ID with quotes
-- Fix incorrect indicator area error message
-- Fix syntax analysis termination with unexpected copy statements GH-464
+- Multi-line errors underscoring
+- Typo in DIVIDE-REMAINDER code snippets removed
+- Program ID with quotes checking
+- Incorrect indicator area error message
+- Syntax analysis termination with unexpected copy statements
 
 ## [0.13.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.12.0...0.13.0) (2020-08-18)
 
