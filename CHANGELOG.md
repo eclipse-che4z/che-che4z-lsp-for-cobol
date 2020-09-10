@@ -15,9 +15,6 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Provide default COBOL code snippets [#484](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/484) ([c98df71](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/c98df710f945cc25e849563e2f89a864db8d06c7))
 * Underscore the copy statement if it contains a syntax error [#450](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/450) ([082bbf7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/082bbf7765158ea4bc54ac31b41972c0938dbcc4))
 
-### Performance Improvements
-* Remove unnecessary token operations on replacing ([0a59352](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/0a593526182e9259dbb30e6a329363fe9686e8e0))
-
 ## [0.13.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.12.0...0.13.0) (2020-08-18)
 
 ### Bug Fixes
