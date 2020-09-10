@@ -1,0 +1,21 @@
+{
+  "hooks": {
+    "before:init": ["git config user.email \"dont@write.here\"", "git config user.name \"Caring bot\""],
+    "after:bump": "git add ../../CHANGELOG.md; npx vsce package"
+  },
+  "github": {
+    "release": true,
+    "assets": "cobol-language-support-*.vsix"
+  },
+  "git": {
+    "commitMessage": "Release: ${version}"
+  }, 
+  "npm": {
+          "publish": false
+  },
+  "plugins": {
+    "../../release/version-extract.js": {
+
+    }
+  }
+}

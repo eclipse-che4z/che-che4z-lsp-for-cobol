@@ -106,11 +106,11 @@ pipeline {
                 stage('Build LSP server part') {
                     steps {
                         container('maven') {
-                            dir('com.ca.lsp.cobol') {
+                            dir('server') {
                                 sh 'mvn -version'
                                 sh 'set MAVEN_OPTS=-Xms1024m'
                                 sh 'mvn clean verify --no-transfer-progress'
-                                sh 'cp lsp-service-cobol/target/lsp-service-cobol-*.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
+                                sh 'cp target/server.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
                             }
                         }
                     }
@@ -119,7 +119,7 @@ pipeline {
                 stage('SonarCloud') {
                     steps {
                         container('maven') {
-                            dir('com.ca.lsp.cobol') {
+                            dir('server') {
                                 withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
                                     sh "mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME} --no-transfer-progress"
                                 }
@@ -153,7 +153,21 @@ pipeline {
                   }
                 }
 
-
+                stage('Client - Change version') {
+                    environment {
+                        buildNumber = "$env.BUILD_NUMBER"
+                    }
+                    when {
+                        expression { branchName != 'master' }
+                    }
+                    steps {
+                        container('node') {
+                            dir('clients/cobol-lsp-vscode-extension') {
+                                sh 'sed -i "s/\\"version\\": \\"\\(.*\\)\\"/\\"version\\": \\"\\1+$branchName.$buildNumber\\"/g" package.json'
+                            }
+                        }
+                    }
+                }
 
                 stage('Client - Package') {
                     environment {
@@ -164,7 +178,6 @@ pipeline {
                             dir('clients/cobol-lsp-vscode-extension') {
                                 sh 'npx vsce package'
                                 archiveArtifacts "*.vsix"
-                                sh 'mv cobol-language-support*.vsix cobol-language-support_0.13.0.vsix'
                             }
                         }
                     }

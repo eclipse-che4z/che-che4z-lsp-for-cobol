@@ -76,6 +76,12 @@
                 }
             }
         ],
+        "snippets": [
+            {
+                "language": "COBOL",
+                "path": "./snippets.json"
+            }
+        ],
         "configuration": {
             "title": "Broadcom COBOL LSP",
             "properties": {
@@ -125,12 +131,9 @@
         "vscode-languageclient": "5.2.1"
     },
     "devDependencies": {
-        "@semantic-release/changelog": "5.0.0",
-        "@semantic-release/exec": "5.0.0",
         "@types/jest": "^24.0.18",
         "@types/node": "^12.6.2",
         "jest": "^24.9.0",
-        "semantic-release": "17.0.4",
         "ts-jest": "^24.0.2",
         "tslint": "^5.18.0",
         "tslint-sonarts": "^1.9.0",

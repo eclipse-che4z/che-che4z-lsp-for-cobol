@@ -3,9 +3,7 @@
 [![Build Status](https://ci.eclipse.org/che4z/buildStatus/icon?job=LSP+for+COBOL%2Fdevelopment)](https://ci.eclipse.org/che4z/job/LSP%20for%20COBOL/job/development/)
 [![GitHub issues](https://img.shields.io/github/issues-raw/eclipse/che-che4z-lsp-for-cobol)](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues)
 [![slack](https://img.shields.io/badge/chat-on%20Slack-blue)](https://join.slack.com/t/che4z/shared_invite/enQtNzk0MzA4NDMzOTIwLWIzMjEwMjJlOGMxNmMyNzQ1NWZlMzkxNmQ3M2VkYWNjMmE0MGQ0MjIyZmY3MTdhZThkZDg3NGNhY2FmZTEwNzQ)
-<a href="https://sonarcloud.io/dashboard?id=eclipse_che-che4z-lsp-for-cobol">
-<img src="https://sonarcloud.io/images/project_badges/sonarcloud-black.svg" width="94" height="20" href="" />
-</a>
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=eclipse_che-che4z-lsp-for-cobol&metric=alert_status)](https://sonarcloud.io/dashboard?id=eclipse_che-che4z-lsp-for-cobol)
 
 </div>
 
@@ -42,9 +40,10 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 - COBOL variables
 - COBOL paragraphs
 - Code Snippet
-- Copybook variables
-- Copybook paragraphs
+- Copybook variable and paragraph names
 - Names of copybooks that are used in the program
+
+The autocomplete feature is only available in the main COBOL file, not in copybooks.
 
 ![Autocomplete](/docs/images/CLSAutocorrect.gif)
 		
@@ -104,12 +103,29 @@ Copybooks downloaded from the mainframe using an older version of COBOL Language
 
 The extension includes the following copybook support features:
 
-* Semantic analysis for keywords, variables, and paragraphs across copybooks, to ensure and maintain compatibility of copybooks called in code.
+#### Syntax and Semantic Check
+
+Syntax and semantic analysis are enabled for keywords, variables, and paragraphs across all copybooks used in the COBOL file, to ensure and maintain compatibility of copybooks called in code.
+
+The semantic analysis feature takes into account `COPY REPLACING` statements which alter the content of copybooks when checking for errors.
+
+![Semantic check before and after a REPLACING statement](/docs/images/CPYReplacing.gif)
+
+#### Syntax Coloring
+
+Syntax coloring is automatically enabled for copybook files with the extension `.cpy`, as long as they are used in the main COBOL file.
+
+#### Go To Definition and Find All References
+
+The Find All References and Go To Definition functionalities are extended to work for occurrences of copybook names, variables and paragraphs in the main COBOL file.
+
+* **Find All References** identifies all occurrences of variables and paragraphs from copybooks in the code.
+* **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element. If the definition is in a copybook, or the name of a copybook, the copybook opens.
+
+![Go To Definition in a copybook](/docs/images/CPYGoToDefinition.gif)
+
+#### Other
+
 * Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.  
 * Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code. 
 * Functionality to skip variable levels when called, reducing call time.
-* Find All References and Go To Definition functionalities.
-    - **Find All References** identifies all occurrences of variables and paragraphs from copybooks in the code.
-    - **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element. If the definition is in a copybook, or the name of a copybook, the copybook opens.
-
-![Go To Definition in a copybook](/docs/images/CPYGoToDefinition.gif)
