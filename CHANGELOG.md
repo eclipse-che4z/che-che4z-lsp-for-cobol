@@ -1,6 +1,23 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.14.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.13.0...0.14.0) (2020-09-10)
+
+### Bug Fixes
+* Allow multi-line errors underscoring GH-486 ([b79bd82](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/b79bd82a1446e22316d3b4aec03e1cd9b1159a88)), closes [#486](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/486)
+* Fix a typo in DIVIDE-REMAINDER code snippets ([00cd27d](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/00cd27d1e63369d6695be05654bad7fdca4aa7a7))
+* Fix checking program ID with quotes [#477](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/477) ([2c247ff](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/2c247fff1766262a3651a8fa9a4e587b54af3921))
+* Fix incorrect indicator area error message [#494](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/494) ([5a6501e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/5a6501ead0feffb4038ce67424b04d2e28b82c21))
+* Fix syntax analysis termination with unexpected copy statements GH-464 ([6b0ad8e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/6b0ad8e5eabbd4f97edaa625184358255ae3e1f6)), closes [#464](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/464)
+
+### Features
+* Outline view support [#481](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/481) ([16ba495](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/16ba495c5226575a2d530a3c1bc9a9dec156d2d5))
+* Provide default COBOL code snippets [#484](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/484) ([c98df71](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/c98df710f945cc25e849563e2f89a864db8d06c7))
+* Underscore the copy statement if it contains a syntax error [#450](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/450) ([082bbf7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/082bbf7765158ea4bc54ac31b41972c0938dbcc4))
+
+### Performance Improvements
+* Remove unnecessary token operations on replacing ([0a59352](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/0a593526182e9259dbb30e6a329363fe9686e8e0))
+
 ## [0.13.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.12.0...0.13.0) (2020-08-18)
 
 ### Bug Fixes
