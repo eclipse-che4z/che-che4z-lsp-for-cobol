@@ -24,6 +24,16 @@ import {EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT} from "../../../constants";
  */
 export class ExtensionUtils {
     /**
+     *  This method calculate the time elapsed between two number representation of dates expressed as
+     *  number of milliseconds elapsed since January 1, 1970 00:00:00 UTC.
+     * @param startTime numeric represetation of a starting time
+     * @param endTime numeric representation of a ending time
+     */
+    public static calculateTimeElapsed(startTime: number, endTime: number): number | undefined {
+        return ((startTime && endTime) && (endTime >= startTime)) ? ((endTime - startTime) / 1000) : undefined;
+    }
+
+    /**
      * This method return the extension version declared into the package.json
      */
     public static getPackageVersion(): string {

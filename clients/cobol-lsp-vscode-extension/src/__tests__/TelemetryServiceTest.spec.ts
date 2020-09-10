@@ -55,7 +55,7 @@ describe("TelemetryService information are consistent before send them to the te
     });
 
     test("Given a fulfilled telemetry measuremnt event, the data is contained as part of a telemetry event and their data are sent to the telemetry server", () => {
-        runScenario(1, "log", "test the download", undefined, undefined, new Map().set("time elapsed", TelemetryService.calculateTimeElapsed(Date.now() - 100, Date.now())));
+        runScenario(1, "log", "test the download", undefined, undefined, new Map().set("time elapsed", ExtensionUtils.calculateTimeElapsed(Date.now() - 100, Date.now())));
     });
 
     test("An empty telemetry object is not sent to the telemetry server", () => {
