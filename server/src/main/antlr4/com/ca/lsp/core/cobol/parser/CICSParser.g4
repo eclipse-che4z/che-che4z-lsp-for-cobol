@@ -157,7 +157,7 @@ cics_address_set: (SET cics_data_area USING cics_ref |
 
 /** ALLOCATE (all of them) */
 cics_allocate: ALLOCATE (cics_allocate_sysid | cics_allocate_session | cics_allocate_partner);
-cics_allocate_sysid: SYSID cics_system (PROFILE cics_name | NOQUEUE | STATE cics_cvda)*;
+cics_allocate_sysid: SYSID cics_data_area (PROFILE cics_name | NOQUEUE | STATE cics_cvda)*;
 cics_allocate_session: SESSION  cics_name (PROFILE cics_name | NOQUEUE)*;
 cics_allocate_partner: PARTNER cics_name (NOQUEUE | STATE cics_cvda)*;
 
@@ -203,7 +203,7 @@ cics_build: BUILD ATTACH (ATTACHID cics_name | PROCESS cics_name | RESOURCE cics
 
 /** CANCEL (both of them) */
 cics_cancel: CANCEL (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS | cics_cancel_reqid)?;
-cics_cancel_reqid: REQID cics_name (SYSID cics_system |
+cics_cancel_reqid: REQID cics_name (SYSID cics_data_area |
                    TRANSID cics_name)*;
 
 /** CHANGE PHRASE / PASSWORD / TASK */
@@ -257,7 +257,7 @@ cics_delay_for: (FOR | UNTIL) (HOURS cics_data_value | MINUTES cics_data_value |
 /** DELETE (all of them) */
 cics_delete: DELETE (cics_delete_file | ACTIVITY cics_data_value | cics_delete_container |cics_delete_counter |
              EVENT cics_data_value | TIMER cics_data_value);
-cics_delete_file: cics_file_name (TOKEN cics_data_area | cics_delete_ridfld | SYSID cics_system | NOSUSPEND |
+cics_delete_file: cics_file_name (TOKEN cics_data_area | cics_delete_ridfld | SYSID cics_data_area | NOSUSPEND |
                   RBA | RRN)*;
 cics_delete_ridfld: RIDFLD cics_data_area cics_delete_keylength?;
 cics_delete_keylength: KEYLENGTH cics_data_value cics_delete_generic?;
@@ -267,7 +267,7 @@ cics_delete_container: CONTAINER cics_data_value (ACTIVITY cics_data_value | ACQ
 cics_delete_counter: (COUNTER cics_name | DCOUNTER cics_name) (POOL cics_name)?;
 
 /** DELETEQ TD/TS */
-cics_deleteq: DELETEQ (TD QUEUE cics_name | cics_deleteq_ts) (SYSID cics_system)?;
+cics_deleteq: DELETEQ (TD QUEUE cics_name | cics_deleteq_ts) (SYSID cics_data_area)?;
 cics_deleteq_ts: TS? (QUEUE cics_name | QNAME cics_name);
 
 /** DEQ */
@@ -298,7 +298,7 @@ cics_dump_from: FROM cics_data_area (LENGTH cics_data_value | FLENGTH cics_data_
 cics_dump_segmentlist: SEGMENTLIST cics_data_area LENGTHLIST cics_data_area NUMSEGMENTS cics_data_area;
 
 /** ENDBR */
-cics_endbr: ENDBR cics_file_name (REQID cics_data_value)? (SYSID cics_system)?;
+cics_endbr: ENDBR cics_file_name (REQID cics_data_value)? (SYSID cics_data_area)?;
 
 /** ENDBROWSE (all of them) */
 cics_endbrowse: ENDBROWSE (ACTIVITY | CONTAINER | EVENT | PROCESS) BROWSETOKEN cics_data_value;
@@ -339,7 +339,7 @@ cics_extract_servername: SERVERNAME cics_data_area SNAMELENGTH cics_data_area;
 cics_extract_clientaddr: CLIENTADDR cics_data_area CADDRLENGTH cics_data_area;
 cics_extract_serveraddr: SERVERADDR cics_data_area SADDRLENGTH cics_data_area;
 
-cics_extract_tct: TCT (NETNAME cics_name | SYSID cics_system | TERMID cics_data_area)+;
+cics_extract_tct: TCT (NETNAME cics_name | SYSID cics_data_area | TERMID cics_data_area)+;
 cics_extract_web: WEB (SCHEME cics_cvda | cics_extract_host | cics_extract_httpmethod | cics_extract_httpversion |
                   cics_extract_path | PORTNUMBER cics_data_area | cics_extract_querystring | REQUESTTYPE cics_cvda)+;
 cics_extract_host: HOST cics_data_area HOSTLENGTH cics_data_value (HOSTTYPE cics_cvda)?;
@@ -369,7 +369,7 @@ cics_freemain: FREEMAIN (DATA cics_data_area | DATAPOINTER cics_value);
 /** GDS (all) */
 cics_gds: GDS (cics_gds_allocate | cics_gds_assign | cics_gds_connect | cics_gds_extract | cics_gds_free |
           cics_gds_issue | cics_gds_receive | cics_gds_send | cics_gds_wait);
-cics_gds_allocate: ALLOCATE (SYSID cics_system | MODENAME cics_name | PARTNER cics_name | CONVID cics_data_area |
+cics_gds_allocate: ALLOCATE (SYSID cics_data_area | MODENAME cics_name | PARTNER cics_name | CONVID cics_data_area |
                    RETCORD cics_data_area | NOQUEUE | STATE cics_cvda)+;
 cics_gds_assign: ASSIGN (PRINCONVID cics_data_area | PRINSYSID cics_data_area | RETCODE cics_data_area)+;
 cics_gds_connect: CONNECT (PROCESS | CONVID cics_name | PROCNAME cics_name | PROCLENGTH cics_data_value | PARTNER cics_name |
@@ -490,7 +490,7 @@ cics_issue_convid: CONVID cics_name (STATE cics_cvda)?;
 /** LINK / LINK ACQPROCESS / LINK ACTIVITY: */
 cics_link: LINK (cics_link_program | cics_link_acqprocess | cics_link_activity);
 cics_link_program: PROGRAM cics_name (cics_link_commarea | CHANNEL cics_name | cics_link_inputmsg |
-                   SYSID cics_system | SYNCONRETURN | TRANSID cics_name)+;
+                   SYSID cics_data_area | SYNCONRETURN | TRANSID cics_name)+;
 cics_link_commarea: COMMAREA cics_data_area (LENGTH cics_data_value | DATALENGTH cics_data_value)*;
 cics_link_inputmsg: INPUTMSG cics_data_area (INPUTMSGLEN cics_data_value)?;
 cics_link_acqprocess: ACQPROCESS (INPUTEVENT cics_data_value)?;
@@ -538,7 +538,7 @@ cics_query_security: SECURITY (RESTYPE cics_data_value | RESCLASS cics_data_valu
                      LOGMESSAGE cics_cvda | READ cics_cvda | UPDATE cics_cvda | CONTROL cics_cvda | ALTER cics_cvda)+;
 /** READ */
 cics_read: READ (cics_file_name | UNCOMMITTED | CONSISTENT | REPEATABLE | cics_read_update |
-          cics_into_set | RIDFLD cics_data_area | cics_read_keylength | SYSID cics_system LENGTH cics_data_area |
+          cics_into_set | RIDFLD cics_data_area | cics_read_keylength | SYSID cics_data_area LENGTH cics_data_area |
           LENGTH cics_data_area | DEBKEY | DEBREC | RBA | RBN | XRBA | EQUAL | GTEC | NOSUSPEND)+;
 cics_into_set: INTO cics_data_area | SET cics_ref;
 cics_read_update: UPDATE (TOKEN cics_data_area)?;
@@ -548,7 +548,7 @@ cics_read_keylength: KEYLENGTH cics_data_value GENERIC?;
 cics_readnext: READNEXT cics_file_name cics_into (UNCOMMITTED | CONSISTENT | REPETABLE |
                UPDATE TOKEN cics_data_area | RIDFLD cics_data_area | KEYLENGTH cics_data_value | REQID cics_data_value |
                cics_readnext_sysid | LENGTH cics_data_area | RBA | RRN | XRBA | NOSUSPEND)+;
-cics_readnext_sysid: SYSID cics_system (LENGTH cics_data_area)?;
+cics_readnext_sysid: SYSID cics_data_area (LENGTH cics_data_area)?;
 
 /** READPREV */
 cics_readprev: READPREV cics_file_name (cics_into | UNCOMMITTED | CONSISTENT | REPETABLE |
@@ -557,9 +557,9 @@ cics_readprev: READPREV cics_file_name (cics_into | UNCOMMITTED | CONSISTENT | R
 
 /** READQ TD / TS */
 cics_readq: READQ (cics_readq_td | cics_readq_ts);
-cics_readq_td: TD QUEUE cics_name (cics_into | LENGTH cics_data_area | SYSID cics_system | NOSUSPEND)+;
+cics_readq_td: TD QUEUE cics_name (cics_into | LENGTH cics_data_area | SYSID cics_data_area | NOSUSPEND)+;
 cics_readq_ts: TS? (QUEUE cics_name | QNAME cics_name | cics_into | LENGTH cics_data_area | NUMITEMS cics_data_area |
-               NEXT | ITEM cics_data_value | SYSID cics_system)+;
+               NEXT | ITEM cics_data_value | SYSID cics_data_area)+;
 
 /** RELEASE */
 cics_release: RELEASE PROGRAM cics_name;
@@ -572,7 +572,7 @@ cics_reset: RESET (ACQPROCESS | ACTIVITY cics_data_value);
 
 /** RESETBR */
 cics_resetbr: RESETBR cics_file_name (RIDFLD cics_data_area | cics_resetbr_keylength | REQID cics_data_value |
-              SYSID cics_system | GTEQ | EQUAL | RBA | RRN |XRBA)+;
+              SYSID cics_data_area | GTEQ | EQUAL | RBA | RRN |XRBA)+;
 cics_resetbr_keylength: KEYLENGTH cics_data_value GENERIC?;
 
 /** RESUME */
@@ -598,7 +598,7 @@ cics_rewind_counter: COUNTER cics_name (POOL cics_name | INCREMENT cics_data_val
 cics_rewind_dcounter: DCOUNTER cics_name (POOL cics_name | INCREMENT cics_data_area)*;
 
 /** REWRITE: */
-cics_rewrite: REWRITE cics_file_name (TOKEN cics_data_area | FROM cics_data_area | SYSID cics_system
+cics_rewrite: REWRITE cics_file_name (TOKEN cics_data_area | FROM cics_data_area | SYSID cics_data_area
               LENGTH cics_data_value | LENGTH cics_data_value | NOSUSPEND)+;
 
 /** ROUTE */
@@ -662,9 +662,9 @@ cics_spoolwrite: SPOOLWRITE (TOKEN cics_data_area | FROM cics_data_area | FLENGT
 cics_start: START (cics_start_transid | cics_start_attach | cics_start_brexit);
 cics_start_transid: TRANSID cics_name (cics_start_null | cics_start_channel);
 cics_start_null: ((INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after) | REQID cics_name | cics_start_from |
-                 (TERMID cics_name | USERID cics_data_value) | SYSID cics_system | RTRANSID cics_name | RTERMID cics_name |
+                 (TERMID cics_name | USERID cics_data_value) | SYSID cics_data_area | RTRANSID cics_name | RTERMID cics_name |
                  QUEUE cics_name | NOCHECK | PROTECT)+;
-cics_start_channel: CHANNEL cics_name (TERMID cics_name | USERID cics_data_value | SYSID cics_system)*;
+cics_start_channel: CHANNEL cics_name (TERMID cics_name | USERID cics_data_value | SYSID cics_data_area)*;
 cics_start_attach: ATTACH TRANSID cics_name cics_start_from?;
 cics_start_from: FROM (cics_data_area | data_area | LENGTH cics_data_value | FMH)+;
 cics_start_brexit: BREXIT(name?) (TRANSID cics_name | cics_start_brdata |USERID cics_data_value)+;
@@ -673,7 +673,7 @@ cics_zero_digit: LPARENCHAR ZERO_DIGIT RPARENCHAR;
 
 /** STARTBR */
 cics_startbr: STARTBR cics_file_name (RIDFLD cics_data_area | cics_startbr_keylength | REQID cics_data_value |
-              SYSID cics_system | DEBKEY | DEBREC | RBA | RBN | XRBA | GTEQ | EQUAL)+;
+              SYSID cics_data_area | DEBKEY | DEBREC | RBA | RBN | XRBA | GTEQ | EQUAL)+;
 cics_startbr_keylength: KEYLENGTH cics_data_value GENERIC?;
 
 /** STARTBROWSE ACTIVITY / CONTAINER / EVENT / PROCESS */
@@ -710,7 +710,7 @@ cics_transform_xmltodata: XMLTODATA (CHANNEL cics_data_value | DATCONTAINER cics
                           cics_transform_typens | XMLCONTAINER cics_data_value | XMLTRANSFORM cics_name)+;
 
 /** UNLOCK */
-cics_unlock: UNLOCK cics_file_name (TOKEN cics_data_area | SYSID cics_system)*;
+cics_unlock: UNLOCK cics_file_name (TOKEN cics_data_area | SYSID cics_data_area)*;
 
 /** UPDATE COUNTER / DCOUNTER */
 cics_update: UPDATE (cics_update_counter | cics_update_dcounter);
@@ -819,7 +819,7 @@ cics_web_write: WRITE (HTTPHEADER cics_data_area | NAMELENGTH cics_data_value | 
 /** WRITE / WRITE JOURNALNAME / WRITE OPERATOR */
 cics_write: WRITE (cics_write_file | cics_write_journalname | cics_write_operator);
 cics_write_file: cics_file_name (MASSINSERT | FROM cics_data_area | RIDFLD cics_data_area | KEYLENGTH cics_data_value |
-                 SYSID cics_system | LENGTH cics_data_value | LENGTH cics_data_value | RBA | RBN | XRBA | NOSUSPEND)+;
+                 SYSID cics_data_area | LENGTH cics_data_value | LENGTH cics_data_value | RBA | RBN | XRBA | NOSUSPEND)+;
 cics_write_journalname: JOURNALNAME cics_data_value (JTYPEID cics_data_value | FROM cics_data_area | FLENGTH cics_data_value |
                         REQID cics_data_area | cics_write_prefix | WAIT | NOSUSPEND)+;
 cics_write_prefix: (PREFIX cics_data_value | PFXLENG cics_data_value)+;
@@ -830,9 +830,9 @@ cics_write_reply: REPLY cics_data_area (MAXLENGTH cics_data_value | REPLYLENGTH 
 
 /** WRITEQ TD/TS */
 cics_writeq: WRITEQ (cics_writeq_td | cics_writeq_ts);
-cics_writeq_td: TD (QUEUE cics_name | FROM cics_data_area | LENGTH cics_data_value | SYSID cics_system)+;
+cics_writeq_td: TD (QUEUE cics_name | FROM cics_data_area | LENGTH cics_data_value | SYSID cics_data_area)+;
 cics_writeq_ts: TS? (QUEUE cics_name | QNAME cics_name | FROM cics_data_area | LENGTH cics_data_value |
-                NUMITEMS cics_data_area | cics_writeq_item | SYSID cics_system | AUXILIARY | MAIN | NOSUSPEND)+;
+                NUMITEMS cics_data_area | cics_writeq_item | SYSID cics_data_area | AUXILIARY | MAIN | NOSUSPEND)+;
 cics_writeq_item: ITEM cics_data_area REWRITE?;
 
 /** WSACONTEXT BUILD / DELETE / GET */
@@ -945,7 +945,6 @@ cics_data_value: LPARENCHAR data_value RPARENCHAR;
 cics_cvda: LPARENCHAR cvda RPARENCHAR;
 cics_name: LPARENCHAR name RPARENCHAR;
 cics_ref: LPARENCHAR ptr_ref RPARENCHAR;
-cics_system: LPARENCHAR systemName RPARENCHAR;
 cics_mama: LPARENCHAR mama RPARENCHAR;
 cics_hhmmss: LPARENCHAR hhmmss RPARENCHAR;
 cics_label: LPARENCHAR label RPARENCHAR;
@@ -978,13 +977,12 @@ cobolWord
    | ZERO_FILL
    ;
 
-cicsWord: cobolWord | cics_cobol_intersected_words | NONNUMERICLITERAL | NUMERICLITERAL | INTEGERLITERAL | IDENTIFIER;
+cicsWord: generalIdentifier | cobolWord | cics_cobol_intersected_words | NONNUMERICLITERAL | NUMERICLITERAL | INTEGERLITERAL | IDENTIFIER;
 
 name: cicsWord+;
 data_value: cicsWord+;
 data_area: cicsWord+;
 cvda: cicsWord+;
-systemName: cicsWord+;
 ptr_ref: cicsWord+;
 ptr_value: cicsWord+;
 cics_document_set_symbollist: cicsWord+;
@@ -992,3 +990,279 @@ mama: cicsWord+;
 label: cicsWord+;
 hhmmss: cicsWord+;
 today: cicsWord+;
+
+// identifier ----------------------------------
+
+generalIdentifier
+   : qualifiedDataName | tableCall | functionCall | specialRegister
+   ;
+
+tableCall
+   : dataName2 (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
+   ;
+
+functionCall
+   : FUNCTION functionName (LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR)* referenceModifier?
+   ;
+
+referenceModifier
+   : LPARENCHAR characterPosition COLONCHAR length? RPARENCHAR
+   ;
+
+characterPosition
+   : arithmeticExpression
+   ;
+
+length
+   : arithmeticExpression
+   ;
+
+subscript
+   : ALL | integerLiteral | qualifiedDataName integerLiteral? | indexName integerLiteral? | arithmeticExpression
+   ;
+
+argument
+   : literal | generalIdentifier | qualifiedDataName integerLiteral? | indexName integerLiteral? | arithmeticExpression
+   ;
+
+// qualified data name ----------------------------------
+
+qualifiedDataName
+   : qualifiedDataNameFormat1 | qualifiedDataNameFormat2 | qualifiedDataNameFormat3 | qualifiedDataNameFormat4
+   ;
+
+qualifiedDataNameFormat1
+   : dataName (qualifiedInData+ inFile? | inFile)?
+   ;
+
+qualifiedDataNameFormat2
+   : paragraphName inSection
+   ;
+
+qualifiedDataNameFormat3
+   : textName inLibrary
+   ;
+
+qualifiedDataNameFormat4
+   : LINAGE_COUNTER inFile
+   ;
+
+qualifiedInData
+   : inData | inTable
+   ;
+
+specialRegister
+   : ADDRESS OF generalIdentifier
+   | DATE | DAY | DAY_OF_WEEK | DEBUG_CONTENTS | DEBUG_ITEM | DEBUG_LINE | DEBUG_NAME | DEBUG_SUB_1 | DEBUG_SUB_2 | DEBUG_SUB_3
+   | LENGTH OF? generalIdentifier | LINAGE_COUNTER | LINE_COUNTER
+   | PAGE_COUNTER
+   | RETURN_CODE
+   | SHIFT_IN | SHIFT_OUT | SORT_CONTROL | SORT_CORE_SIZE | SORT_FILE_SIZE | SORT_MESSAGE | SORT_MODE_SIZE | SORT_RETURN
+   | TALLY | TIME
+   | WHEN_COMPILED
+   ;
+
+// in ----------------------------------
+
+inData
+   : (IN | OF) dataName2
+   ;
+
+inFile
+   : (IN | OF) fileName
+   ;
+
+inMnemonic
+   : (IN | OF) mnemonicName
+   ;
+
+inSection
+   : (IN | OF) sectionName
+   ;
+
+inLibrary
+   : (IN | OF) libraryName
+   ;
+
+inTable
+   : (IN | OF) tableCall
+   ;
+
+// names ----------------------------------
+
+alphabetName
+   : cobolWord
+   ;
+
+assignmentName
+   : systemName
+   ;
+
+cdName
+   : cobolWord
+   ;
+
+className
+   : cobolWord
+   ;
+
+computerName
+   : systemName
+   ;
+
+conditionName
+   : cobolWord
+   ;
+
+dataName
+   : cobolWord
+   ;
+
+dataName1
+   : cobolWord
+   ;
+
+dataName2
+   : cobolWord
+   ;
+
+dataDescName
+   : FILLER | CURSOR | dataName
+   ;
+
+environmentName
+   : systemName
+   ;
+
+fileName
+   : cobolWord
+   ;
+
+functionName
+   : INTEGER | LENGTH | RANDOM | SUM | WHEN_COMPILED | cobolWord
+   ;
+
+indexName
+   : cobolWord
+   ;
+
+libraryName
+   : cobolWord
+   ;
+
+localName
+   : cobolWord
+   ;
+
+mnemonicName
+   : cobolWord
+   ;
+
+paragraphName
+   : cobolWord | integerLiteral
+   ;
+
+paragraphNameUsage
+   : cobolWord | integerLiteral
+   ;
+
+procedureName
+   : paragraphNameUsage inSection?
+   ;
+
+programName
+   : NONNUMERICLITERAL | cobolWord
+   ;
+
+recordName
+   : qualifiedDataName
+   ;
+
+reportName
+   : qualifiedDataName
+   ;
+
+screenName
+   : cobolWord
+   ;
+
+sectionName
+   : cobolWord | integerLiteral
+   ;
+
+systemName
+   : cobolWord
+   ;
+
+symbolicCharacter
+   : cobolWord
+   ;
+
+textName
+   : cobolWord
+   ;
+
+figurativeConstant
+   : ALL literal | HIGH_VALUE | HIGH_VALUES | LOW_VALUE | LOW_VALUES | NULL | NULLS | QUOTE | QUOTES | SPACE | SPACES | ZERO | ZEROS | ZEROES
+   ;
+
+booleanLiteral
+   : TRUE | FALSE
+   ;
+
+numericLiteral
+   : NUMERICLITERAL | ZERO | integerLiteral
+   ;
+
+cicsDfhRespLiteral
+   : DFHRESP LPARENCHAR (cobolWord | literal) RPARENCHAR
+   ;
+
+cicsDfhValueLiteral
+   : DFHVALUE LPARENCHAR (cobolWord | literal) RPARENCHAR
+   ;
+
+integerLiteral
+   : INTEGERLITERAL | otherLevel | LEVEL_NUMBER_66 | LEVEL_NUMBER_88
+   ;
+
+literal
+   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | cicsDfhRespLiteral | cicsDfhValueLiteral | charString
+   ;
+
+otherLevel: LEVEL
+   ;
+
+charString
+   : FINALCHARSTRING
+   ;
+
+// arithmetic expression ----------------------------------
+
+arithmeticExpression
+   : multDivs plusMinus*
+   ;
+
+plusMinus
+   : (PLUSCHAR | MINUSCHAR) multDivs
+   ;
+
+multDivs
+   : powers multDiv*
+   ;
+
+multDiv
+   : (ASTERISKCHAR | SLASHCHAR) powers
+   ;
+
+powers
+   : (PLUSCHAR | MINUSCHAR)? basis power*
+   ;
+
+power
+   : DOUBLEASTERISKCHAR basis
+   ;
+
+basis
+   : LPARENCHAR arithmeticExpression RPARENCHAR | literal | generalIdentifier
+   ;
