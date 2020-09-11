@@ -21,7 +21,6 @@ import com.google.common.eventbus.Subscribe;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /** A subscriber for {@link CopybookDepEvent} */
@@ -34,7 +33,6 @@ public class CopybookDepEventSubscriber {
 
   @Subscribe
   @AllowConcurrentEvents
-  @SneakyThrows
   public void onDataHandler(CopybookDepEvent eventType) {
     LOG.debug(eventType.getHeader());
     observer.observerCallback(eventType);

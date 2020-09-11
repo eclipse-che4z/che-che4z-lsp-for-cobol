@@ -21,7 +21,6 @@ import com.google.common.eventbus.Subscribe;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /** A subscriber for {@link AnalysisFinishedEvent} */
@@ -34,7 +33,6 @@ public class AnalysisFinishedEventSubscriber {
 
     @Subscribe
     @AllowConcurrentEvents
-    @SneakyThrows
     public void onDataHandler(AnalysisFinishedEvent eventType) {
         LOG.debug(eventType.getHeader());
         observer.observerCallback(eventType);

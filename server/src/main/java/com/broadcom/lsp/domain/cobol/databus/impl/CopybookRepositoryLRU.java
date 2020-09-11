@@ -24,7 +24,6 @@ import com.google.inject.name.Named;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 
@@ -56,7 +55,6 @@ public class CopybookRepositoryLRU implements CopybookRepository {
   }
 
   @Override
-  @SneakyThrows
   public synchronized void sortCache() {
     if (!isSort.get()) {
       cpyRepo.sort(storableComparator.reversed().thenComparing(timeComparator));
@@ -65,7 +63,6 @@ public class CopybookRepositoryLRU implements CopybookRepository {
   }
 
   @Override
-  @SneakyThrows
   public Optional<CopybookStorable> getCopybookStorableFromCache(@NonNull long uuid) {
     ArrayList<CopybookStorable> shallowCpy = (ArrayList<CopybookStorable>) cpyRepo.clone();
     Optional<CopybookStorable> cpy =
@@ -74,19 +71,16 @@ public class CopybookRepositoryLRU implements CopybookRepository {
     return cpy;
   }
 
-  @SneakyThrows
   private Optional<CopybookStorable> getCopybookStorableInstance(@NonNull long uuid) {
     return cpyRepo.stream().filter(copy -> uuid == copy.getId()).findAny();
   }
 
   @Override
-  @SneakyThrows
   public void setSort(boolean isSort) {
     this.isSort.set(isSort);
   }
 
   @Override
-  @SneakyThrows
   public synchronized void persist(@NonNull CopybookStorable deepCopy) {
     cpyRepo.removeIf(CopybookStorable::isExpired);
 
@@ -101,7 +95,6 @@ public class CopybookRepositoryLRU implements CopybookRepository {
   }
 
   @Override
-  @SneakyThrows
   public String logContent() {
     StringBuilder chars = new StringBuilder();
     cpyRepo.forEach(
@@ -114,37 +107,31 @@ public class CopybookRepositoryLRU implements CopybookRepository {
   }
 
   @Override
-  @SneakyThrows
   public int size() {
     return cpyRepo.size();
   }
 
-  @SneakyThrows
   public Optional<CopybookStorable> topItem() {
     return (cpyRepo.isEmpty()) ? Optional.empty() : Optional.of(cpyRepo.get(0));
   }
 
-  @SneakyThrows
   public Optional<CopybookStorable> lastItem() {
     return (cpyRepo.isEmpty()) ? Optional.empty() : Optional.of(cpyRepo.get(size() - 1));
   }
 
   @Override
-  @SneakyThrows
   public boolean isStored(@NonNull StringBuilder id) {
     long uuid = CopybookRepository.calculateUUID(id);
     return isStored(uuid);
   }
 
   @Override
-  @SneakyThrows
   public boolean isStored(@NonNull String id) {
     long uuid = CopybookRepository.calculateUUID(id);
     return isStored(uuid);
   }
 
   @Override
-  @SneakyThrows
   public synchronized boolean isStored(@NonNull long uuid) {
     Optional<CopybookStorable> cpy = getCopybookStorableInstance(uuid);
     if (cpy.isPresent()) {
