@@ -36,7 +36,7 @@ class TestExecCicsDatasetAllowedAsFileSynonym {
           + "       01  {$*RESPONSE}                             PIC 999.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC CICS STARTBR DATASET('EPSMORTF')\n"
-          + "                     RIDFLD(RID-LENGTH) RBA\n"
+          + "                     RIDFLD({$RID-LENGTH}) RBA\n"
           + "                     EQUAL\n"
           + "                     RESP(RESPONSE) END-EXEC.";
 
