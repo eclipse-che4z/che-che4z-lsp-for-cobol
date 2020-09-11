@@ -73,7 +73,8 @@ Before you write your COBOL code from scratch, search the snippet library for us
 ![Code snippets](/docs/images/Snippet.gif)
 
 You can also insert a code snippet by typing the name of the snippet in your code and clicking on the autocomplete text.
-	
+
+The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder.
 ## Copybook Support
 
 The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe CLI z/OSMF profile to automatically download them from the mainframe to your workspace. 
