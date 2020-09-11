@@ -39,6 +39,7 @@ export class TelemetryService {
         if (!this.isValidEventName(eventName)) {
             return;
         }
+
         TelemetryFactory.getReporter().reportEvent(this.createTelemetryEvent(eventName, categories, notes, undefined, telemetryMeasurement));
 
     }

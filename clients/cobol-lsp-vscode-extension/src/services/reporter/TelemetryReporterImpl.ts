@@ -46,7 +46,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
     }
 
     private static getInstrumentationKey(): string {
-        return Buffer.from(fs.readFileSync(this.getTelemetryResourcePath(), "utf8").replace(/(\r\n|\n|\r)/gm, ""), "base64").toString();
+        return Buffer.from(fs.readFileSync(this.getTelemetryResourcePath(), "utf8"), "base64").toString().trim();
     }
 
     private static covertData(content: TelemetryEvent) {
@@ -80,7 +80,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
 
     private constructor(telemetryKeyId: string) {
         this.telemetryKeyId = telemetryKeyId;
-        this.reporter = new TelemetryReporter(EXTENSION_ID, ExtensionUtils.getPackageVersion(), telemetryKeyId);
+        this.reporter = new TelemetryReporter(EXTENSION_ID, ExtensionUtils.getPackageVersion(), this.telemetryKeyId);
     }
 
     public reportEvent(content: TelemetryEvent): void {
