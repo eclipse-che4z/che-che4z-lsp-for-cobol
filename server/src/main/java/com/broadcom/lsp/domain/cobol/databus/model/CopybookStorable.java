@@ -20,7 +20,6 @@ import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -49,17 +48,14 @@ public class CopybookStorable implements Serializable {
     id = CopybookRepository.calculateUUID(new StringBuilder().append(name));
   }
 
-  @SneakyThrows
   public boolean isExpired() {
     return (Instant.now().toEpochMilli() - genDt) > TTU;
   }
 
-  @SneakyThrows
   public void match() {
     hit.incrementAndGet();
   }
 
-  @SneakyThrows
   public int getHit() {
     return hit.get();
   }

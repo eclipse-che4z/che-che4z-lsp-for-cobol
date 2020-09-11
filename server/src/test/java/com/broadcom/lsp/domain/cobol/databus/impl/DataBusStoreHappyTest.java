@@ -21,7 +21,6 @@ import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +60,6 @@ class DataBusStoreHappyTest extends DatabusConfigProvider {
   }
 
   @Test
-  @SneakyThrows
   void cacheData() {
     String newCopybookName = "COPY-" + (databus.getCacheMaxSize() + 1);
     assertFalse(

@@ -21,7 +21,6 @@ import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -79,7 +78,6 @@ class DataBusGetFromCacheBadTest extends DatabusConfigProvider {
   }
 
   @Test
-  @SneakyThrows
   void getData() throws NoSuchElementException {
     Assertions.assertThrows(
         NoSuchElementException.class,

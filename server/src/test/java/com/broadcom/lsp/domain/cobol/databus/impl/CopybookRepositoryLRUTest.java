@@ -19,7 +19,6 @@ import com.broadcom.lsp.domain.CopybookStorableProvider;
 import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
 import org.junit.jupiter.api.Assertions;
@@ -194,7 +193,6 @@ class CopybookRepositoryLRUTest extends CopybookStorableProvider {
    * element looking for doesn't exist.
    */
   @Test
-  @SneakyThrows
   void testNoSuchElement() throws NoSuchElementException {
     Assertions.assertThrows(
         NoSuchElementException.class,

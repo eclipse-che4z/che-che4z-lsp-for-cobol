@@ -20,7 +20,6 @@ import com.broadcom.lsp.domain.cobol.event.impl.RequiredCopybookEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,7 +48,6 @@ class DataBusSubscribeHappyTest extends DatabusConfigProvider {
   }
 
   @Test
-  @SneakyThrows
   void subscribe() {
     databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
     databus.postData(RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
