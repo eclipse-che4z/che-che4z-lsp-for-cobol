@@ -17,11 +17,11 @@
 package com.broadcom.lsp.domain.cobol.databus.api;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.databus.model.RegistryId;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
+import com.ca.lsp.core.cobol.model.CopybookModel;
 import com.google.inject.ImplementedBy;
 import lombok.NonNull;
 
@@ -53,11 +53,11 @@ public interface DataBusBroker<T extends DataEvent, S> {
 
   S getSubscriber(@NonNull DataEventType event, @NonNull EventObserver observer);
 
-  CopybookStorable storeData(@NonNull CopybookStorable dataEvent);
+  CopybookModel storeData(CopybookModel dataEvent);
 
-  CopybookStorable getData(@NonNull long uuid);
+  CopybookModel getData(String name);
 
-  boolean isStored(long uuid);
+  boolean isStored(String name);
 
   int cacheSize();
 

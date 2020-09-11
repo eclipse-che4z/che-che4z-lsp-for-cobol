@@ -26,5 +26,7 @@ public class DatabusModule extends DefaultModule {
     super.configure();
     bindConstant().annotatedWith(Names.named("ASYNC-MESS-DISPATCHER")).to(10);
     bindConstant().annotatedWith(Names.named("CACHE-MAX-SIZE")).to(500);
+    bindConstant().annotatedWith(Names.named("CACHE-DURATION")).to(3);
+    bindConstant().annotatedWith(Names.named("CACHE-TIME-UNIT")).to("HOURS");
   }
 }

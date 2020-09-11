@@ -36,7 +36,7 @@ class DataBusUnSubscribeTest extends DatabusConfigProvider {
 
   @BeforeEach
   void setUp() {
-    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
+    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3, 3, "HOURS"));
   }
 
   @Override
