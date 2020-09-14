@@ -109,7 +109,7 @@ class TestExecCicsSendStatementsArgumentsOrder {
           + "           EXEC CICS READ\n"
           + "                     FILE('PATMSTR')\n"
           + "                     INTO({$PAT})\n"
-          + "                     LENGTH(2964)\n"
+          + "                     LENGTH(2)\n"
           + "                     RIDFLD({$PATIENT-MASTER-REC})\n"
           + "                     RESP(WS-RESP)\n"
           + "           END-EXEC.\n"

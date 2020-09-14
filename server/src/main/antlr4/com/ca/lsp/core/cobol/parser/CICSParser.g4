@@ -973,7 +973,7 @@ cobolWord
    | ZERO_FILL
    ;
 
-cicsWord: generalIdentifier | cobolWord | cics_cobol_intersected_words | NONNUMERICLITERAL | NUMERICLITERAL | INTEGERLITERAL | IDENTIFIER;
+cicsWord: NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral | generalIdentifier | cobolWord | cics_cobol_intersected_words;
 name: cicsWord+;
 data_value: cicsWord+;
 data_area: cicsWord+;
@@ -1225,7 +1225,8 @@ literal
    : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | cicsDfhRespLiteral | cicsDfhValueLiteral | charString
    ;
 
-otherLevel: LEVEL
+otherLevel
+   : LEVEL_NUMBER
    ;
 
 charString

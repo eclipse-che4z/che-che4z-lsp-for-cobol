@@ -16,7 +16,7 @@ lexer grammar CobolLexer;
 import CICSLexer;
 channels{TECHNICAL}
 
-LEVEL: ([1-9])|([0][1-9])|([1234][0-9])| '77';
+LEVEL_NUMBER: ([1-9])|([0][1-9])|([1234][0-9])| '77';
 LEVEL_NUMBER_66 : '66';
 LEVEL_NUMBER_88 : '88';
 
