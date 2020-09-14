@@ -75,6 +75,7 @@ cics_send_map_full: (ACCUM | cics_send_terminal | SET cics_ref | PAGING | REQID 
 cics_send_map_mappingdev: MAPPINGDEV cics_data_value (SET cics_ref | MAPSET cics_name | MAPONLY | FROM cics_data_area |
                           DATAONLY | LENGTH cics_data_value | cics_send_cursor | FORMFEED | ERASE | ERASEAUP | PRINT |
                           FREEKB | ALARM | FRSET)+;
+
 cics_send_page: PAGE (RELEASE | TRANSID cics_name | RETAIN | TRAILER cics_data_area | SET cics_ref |
                 cics_send_autopage | NOAUTOPAGE | OPERPURGE | FMHPARM cics_name | LAST)*;
 cics_send_partnset: PARTNSET cics_name?;
@@ -978,7 +979,6 @@ cobolWord
    ;
 
 cicsWord: generalIdentifier | cobolWord | cics_cobol_intersected_words | NONNUMERICLITERAL | NUMERICLITERAL | INTEGERLITERAL | IDENTIFIER;
-
 name: cicsWord+;
 data_value: cicsWord+;
 data_area: cicsWord+;
