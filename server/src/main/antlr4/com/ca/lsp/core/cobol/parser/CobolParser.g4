@@ -931,13 +931,6 @@ libraryIsGlobalClause
    : IS? GLOBAL
    ;
 
-// data description entry ----------------------------------
-
-// data description utils ----------------------------------
-
-
-// end of data description utils ---------------------------
-
 dataDescriptionEntry
    : dataDescriptionEntryFormat1 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat3 | dataDescriptionEntryExecSql
    ;
