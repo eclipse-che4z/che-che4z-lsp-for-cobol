@@ -129,3 +129,24 @@ The Find All References and Go To Definition functionalities are extended to wor
 * Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.  
 * Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code. 
 * Functionality to skip variable levels when called, reducing call time.
+
+### Privacy Notice
+The extensions for Visual Studio Code developed by Broadcom Inc., including its corporate affiliates and subsidiaries, ("Broadcom") are provided free of charge, but in order to better understand and meet its users’ needs, Broadcom may collect, use, analyze and retain anonymous users’ metadata and interaction data, (collectively, “Usage Data”) and aggregate such Usage Data with similar  Usage Data of other Broadcom customers. Please, find more detailed information in License and Service Terms & Repository.
+
+This data collection uses built-in Microsoft VS Code Telemetry, which can be disabled, at your sole discretion, if you do not want to send Usage Data.
+
+Current release of COBOL Language Support will collect anonymous data for the following events:
+* Activation of this VS Code extension
+* Problem interaction
+* Quick Fix
+* Invalid ZOWE credentials
+* ZOWE connection issues
+* Java version issue
+
+Each such event is logged with the following information:
+* Event time
+* Operating system and version
+* Country or region
+* Anonymous user and session ID
+* Version numbers of Microsoft VS Code and COBOL Language Support
+
