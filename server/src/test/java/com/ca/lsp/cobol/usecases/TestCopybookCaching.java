@@ -18,15 +18,13 @@ package com.ca.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cdi.EngineModule;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
-import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.mocks.MockCopybookService;
 import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
+import com.ca.lsp.core.cobol.model.CopybookModel;
 import com.ca.lsp.core.cobol.model.Locality;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.CopybookResolutionProvider;
-import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.MultiMapSerializableHelper;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Guice;
@@ -81,12 +79,7 @@ class TestCopybookCaching {
   }
 
   private void predefineCache() {
-    databus.storeData(
-        CopybookStorable.builder()
-            .name(COPYBOOK_NAME)
-            .uri(COPYBOOK_NAME)
-            .content(COPYBOOK_CONTENT)
-            .build());
+    databus.storeData(new CopybookModel(COPYBOOK_NAME, COPYBOOK_NAME, COPYBOOK_CONTENT));
   }
 
   private void initWorkspaceService() {
@@ -98,18 +91,6 @@ class TestCopybookCaching {
   @AfterEach
   void cleanup() {
     databus.invalidateCache();
-  }
-
-  @Test
-  void serializeMultiMapInString() {
-    LOG.info("Test serialization in String");
-    assertTrue(MultiMapSerializableHelper.serializeInString(paragraphDefinitions).length() > 0);
-  }
-
-  @Test
-  void serializeMultiMapInHashMap() {
-    LOG.info("Test serialization in HashMap");
-    assertTrue(MultiMapSerializableHelper.serializeInHashMap(paragraphDefinitions).size() > 0);
   }
 
   /** This test verifies that after the analysis a specific copybook retrieved from the cache */
@@ -137,14 +118,14 @@ class TestCopybookCaching {
     LOG.info(databus.printCache());
     runAnalysis("DID_OPEN");
     LOG.info(databus.printCache());
-    assertPositiveHitFromCache();
+    assertStoredInCache();
   }
 
   private void assertDidChangeAnalysisFromCache() {
     LOG.info(databus.printCache());
     runAnalysis("DID_CHANGE");
     LOG.info(databus.printCache());
-    assertPositiveHitFromCache();
+    assertStoredInCache();
   }
 
   private void assertDidOpenFromCopybookService() {
@@ -162,13 +143,7 @@ class TestCopybookCaching {
   }
 
   private void assertStoredInCache() {
-    assertTrue(databus.isStored(CopybookRepository.calculateUUID(COPYBOOK_NAME)));
-  }
-
-  private void assertPositiveHitFromCache() {
-    assertTrue(
-        databus.getData(CopybookRepository.calculateUUID(new StringBuilder(COPYBOOK_NAME))).getHit()
-            > 0);
+    assertTrue(databus.isStored(COPYBOOK_NAME));
   }
 
   private void runAnalysis(String syncType) {

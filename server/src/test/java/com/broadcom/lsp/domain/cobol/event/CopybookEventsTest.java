@@ -15,7 +15,6 @@
  */
 package com.broadcom.lsp.domain.cobol.event;
 
-import com.broadcom.lsp.domain.CopybookStorableProvider;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
@@ -26,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
-class CopybookEventsTest extends CopybookStorableProvider {
+class CopybookEventsTest {
   private static final String UNKNOWN_EVENT_MESSAGE = "Dummy event";
   private static final String REQCPY = "REQCPY";
   private static final String FETCHEDCPY = "FETCHEDCPY";

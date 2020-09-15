@@ -15,13 +15,12 @@
  */
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.domain.CopybookStorableProvider;
-import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
+import com.ca.lsp.core.cobol.model.CopybookModel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -33,16 +32,16 @@ import java.util.concurrent.TimeoutException;
 
 import static com.broadcom.lsp.domain.cobol.databus.model.RegistryId.GENERAL_REGISTRY_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Slf4j
-class DatabusBrokerTest extends CopybookStorableProvider implements EventObserver<DataEvent> {
+class DatabusBrokerTest implements EventObserver<DataEvent> {
   @Getter @Setter private int hitCount;
   private static final DataEventType UNKNOWN_EVENT_TYPE = DataEventType.UNKNOWN_EVENT;
 
   private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> broker =
-      new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
-  private CopybookStorable dummyCopybook = getDummyStorable();
+      new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3, 3, "HOURS"));
+  private final CopybookModel dummyCopybook =
+      new CopybookModel("Test", "file:///C:/Users/test/Test.cbl", "000000 IDENTIFICATION DIVISION.");
 
   @Getter private final Waiter waiter = new Waiter();
 
@@ -63,30 +62,12 @@ class DatabusBrokerTest extends CopybookStorableProvider implements EventObserve
   }
 
   /**
-   * This test verifies that the client can grab the top item from the databus internal cache using
-   * the broker.
-   */
-  @Test
-  void getLastItemTest() {
-    assertNotNull(broker.lastRecentlyUsed().get().getName());
-  }
-
-  /**
-   * This test verifies that the client can grab the least item from the databus internal cache
-   * using the broker.
-   */
-  @Test
-  void getLeastItemTest() {
-    assertNotNull(broker.leastRecentlyUsed().get().getName());
-  }
-
-  /**
    * This test verifies that the client can retrieve an element from the databus internal cache
    * using the broker.
    */
   @Test
   void isElementStoredInCacheTest() {
-    assertEquals(getDummyStorable().getName(), broker.getData(dummyCopybook.getId()).getName());
+    assertEquals(dummyCopybook.getName(), broker.getData(dummyCopybook.getName()).getName());
   }
 
   /** This test verifies that a client could subscribe for an event using the broker. */
