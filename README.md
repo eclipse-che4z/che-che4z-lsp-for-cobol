@@ -131,17 +131,17 @@ The Find All References and Go To Definition functionalities are extended to wor
 * Functionality to skip variable levels when called, reducing call time.
 
 ### Privacy Notice
-The extensions for Visual Studio Code developed by Broadcom Inc., including its corporate affiliates and subsidiaries, ("Broadcom") are provided free of charge, but in order to better understand and meet its users’ needs, Broadcom may collect, use, analyze and retain anonymous users’ metadata and interaction data, (collectively, “Usage Data”) and aggregate such Usage Data with similar  Usage Data of other Broadcom customers. Please, find more detailed information in License and Service Terms & Repository.
+The extensions for Visual Studio Code developed by Broadcom Inc., including its corporate affiliates and subsidiaries, ("Broadcom") are provided free of charge, but in order to better understand and meet its users’ needs, Broadcom may collect, use, analyze and retain anonymous user metadata and interaction data, (collectively, “Usage Data”) and aggregate such Usage Data with similar Usage Data of other Broadcom customers. Please find more detailed information in License and Service Terms & Repository.
 
 This data collection uses built-in Microsoft VS Code Telemetry, which can be disabled, at your sole discretion, if you do not want to send Usage Data.
 
-Current release of COBOL Language Support will collect anonymous data for the following events:
+The current release of COBOL Language Support collects anonymous data for the following events:
 * Activation of this VS Code extension
 * Problem interaction
 * Quick Fix
 * Invalid ZOWE credentials
 * ZOWE connection issues
-* Java version issue
+* Java version issues
 
 Each such event is logged with the following information:
 * Event time
