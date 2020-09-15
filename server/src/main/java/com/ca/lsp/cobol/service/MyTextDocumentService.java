@@ -29,7 +29,6 @@ import com.ca.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Builder;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -168,7 +167,6 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
                     "code actions lookup", params.getTextDocument().getUri())));
   }
 
-  @SneakyThrows
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();

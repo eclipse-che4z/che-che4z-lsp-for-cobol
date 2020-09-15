@@ -37,53 +37,12 @@ spec:
       name: known-hosts
 """
 
-def kubernetes_test_config = """
-apiVersion: v1
-kind: Pod
-spec:
-  containers:
-  - name: theia
-    image: grianbrcom/theia4cobol:1.0.1
-    tty: true
-    command: [ "/bin/bash", "-c", "--" ]
-    args: [ "while true; do sleep 1000; done;" ]
-    resources:
-      limits:
-        memory: "2Gi"
-        cpu: "1"
-      requests:
-        memory: "2Gi"
-        cpu: "1"
-  - name: python
-    image: grianbrcom/python-firefox:1.0.1
-    tty: true
-    resources:
-      limits:
-        memory: "2Gi"
-        cpu: "1"
-      requests:
-        memory: "2Gi"
-        cpu: "1"
-  - name: jnlp
-    volumeMounts:
-    - name: volume-known-hosts
-      mountPath: /home/jenkins/.ssh
-  volumes:
-  - name: volume-known-hosts
-    configMap:
-      name: known-hosts
-"""
-
 def projectName = 'lsp-for-cobol'
 def kubeLabelPrefix = "${projectName}_pod_${env.BUILD_NUMBER}_${env.BRANCH_NAME}".replaceAll(/[^a-zA-Z0-9._-]+/,"")
 def kubeBuildLabel = "${kubeLabelPrefix}_build"
-def kubeTestLabel = "${kubeBuildLabel}_test"
 
 pipeline {
     agent none
-    parameters {
-        booleanParam(defaultValue: false, description: 'Run integration tests.', name: 'integrationTests')
-    }
     options {
         disableConcurrentBuilds()
         timestamps()
@@ -219,41 +178,6 @@ pipeline {
                                 '''
                                 echo "Deployed to https://$url"
                             }
-                        }
-                    }
-                }
-            }
-        }
-        stage('Integration testing') {
-            when {
-                expression { params.integrationTests }
-                beforeAgent true
-            }
-            agent {
-                kubernetes {
-                    label kubeTestLabel
-                    yaml kubernetes_test_config
-                }
-            }
-            steps {
-                container('theia') {
-                    dir('tests') {
-                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
-                        sh './theiaPrepare.sh'
-                    }
-                }
-                container('python') {
-                    dir('tests/theia_automation_lsp') {
-                        sh 'HOME=`pwd`/robot_home PYTHONPATH=`pwd` robot -i Rally -e NEED_UPDATE -e DEFECT_OPEN --variable HEADLESS:True --outputdir robot_output robot_suites/lsp/local/firefox_lsp_local.robot'
-                    }
-                }
-            }
-            post {
-                always {
-                    container('theia') {
-                        dir('tests') {
-                            sh './reportCollection.sh'
-                            archiveArtifacts "artifacts/**"
                         }
                     }
                 }

@@ -24,11 +24,12 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.TimeoutException;
 
 import static com.broadcom.lsp.domain.cobol.databus.model.RegistryId.GENERAL_REGISTRY_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -90,8 +91,7 @@ class DatabusBrokerTest extends CopybookStorableProvider implements EventObserve
 
   /** This test verifies that a client could subscribe for an event using the broker. */
   @Test
-  @SneakyThrows
-  void subscribeTest() {
+  void subscribeTest() throws TimeoutException, InterruptedException {
     /*
     The scenario for this test is described below:
       1. The observer object is subscribed for the UnknownEvent and its hitCount is equals to 0.
@@ -110,8 +110,7 @@ class DatabusBrokerTest extends CopybookStorableProvider implements EventObserve
 
   /** This test verifies that a client could subscribe for an event using the general registry. */
   @Test
-  @SneakyThrows
-  void subscribeOnGeneralRegistryTest() {
+  void subscribeOnGeneralRegistryTest() throws TimeoutException, InterruptedException {
     /*
        The scenario for this test is described below:
          1. The observer object is subscribed for the UnknownEvent on the general registry with an
@@ -134,8 +133,7 @@ class DatabusBrokerTest extends CopybookStorableProvider implements EventObserve
 
   /** This test verifies that a class is able to unsubscribe for a specific event. */
   @Test
-  @SneakyThrows
-  void unsubscribeTest() {
+  void unsubscribeTest() throws TimeoutException, InterruptedException {
     /*
     The scenario for this test is described below:
       1. The observer object is subscribed for the UnknownEvent and its hitCount is equals to 0.
