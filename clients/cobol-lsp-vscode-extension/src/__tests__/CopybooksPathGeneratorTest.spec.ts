@@ -14,14 +14,19 @@
 import * as path from "path";
 import * as vscode from "vscode";
 // tslint:disable-next-line: max-line-length
-import { checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath} from "../services/CopybooksPathGenerator";
+import {
+    checkWorkspace,
+    CopybooksPathGenerator,
+    createCopybookPath,
+    createDatasetPath
+} from "../services/copybook/CopybooksPathGenerator";
 
 describe("CopybooksPathGenerator tests", () => {
     const fsPath = "/projects";
     const profile = "profile";
     const dataset = "dataset";
     beforeEach(() => {
-        vscode.workspace.workspaceFolders = [{ uri: { fsPath } } as any];
+        vscode.workspace.workspaceFolders = [{uri: {fsPath}} as any];
     });
 
     it("creates copybook path", () => {

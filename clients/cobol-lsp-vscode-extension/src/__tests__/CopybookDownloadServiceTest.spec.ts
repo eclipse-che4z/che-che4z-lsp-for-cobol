@@ -16,9 +16,13 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
 import {C4Z_FOLDER, COPYBOOKS_FOLDER} from "../constants";
-import {CopybookDownloadService} from "../services/CopybookDownloadService";
-import {CopybookFix} from "../services/CopybookFix";
-import {CopybooksPathGenerator, createCopybookPath, createDatasetPath} from "../services/CopybooksPathGenerator";
+import {CopybookDownloadService} from "../services/copybook/CopybookDownloadService";
+import {CopybookFix} from "../services/copybook/CopybookFix";
+import {
+    CopybooksPathGenerator,
+    createCopybookPath,
+    createDatasetPath
+} from "../services/copybook/CopybooksPathGenerator";
 import {CopybookProfile} from "../services/DownloadQueue";
 import {ProfileService} from "../services/ProfileService";
 import {ZoweApi} from "../services/ZoweApi";

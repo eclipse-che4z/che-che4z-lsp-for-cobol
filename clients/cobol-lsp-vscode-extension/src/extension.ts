@@ -19,12 +19,12 @@ import {editDatasetPaths} from "./commands/EditDatasetPaths";
 import {fetchCopybookCommand} from "./commands/FetchCopybookCommand";
 import {gotoCopybookSettings} from "./commands/OpenSettingsCommand";
 import {C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID, SETTINGS_SECTION} from "./constants";
-import {CopybookDownloadService} from "./services/CopybookDownloadService";
-import {CopybookFix} from "./services/CopybookFix";
-import {CopybooksCodeActionProvider} from "./services/CopybooksCodeActionProvider";
-import {CopybooksPathGenerator} from "./services/CopybooksPathGenerator";
+import {CopybookDownloadService} from "./services/copybook/CopybookDownloadService";
+import {CopybookFix} from "./services/copybook/CopybookFix";
+import {CopybooksCodeActionProvider} from "./services/copybook/CopybooksCodeActionProvider";
+import {CopybooksPathGenerator} from "./services/copybook/CopybooksPathGenerator";
 
-import {CopybookURI} from "./services/CopybookURI";
+import {CopybookURI} from "./services/copybook/CopybookURI";
 import {LanguageClientService} from "./services/LanguageClientService";
 import {Middleware} from "./services/Middleware";
 import {PathsService} from "./services/PathsService";
@@ -50,7 +50,7 @@ export async function activate(context: vscode.ExtensionContext) {
         await languageClientService.checkPrerequisites();
     } catch (err) {
         vscode.window.showErrorMessage(err.toString());
-        TelemetryService.registerExceptionEvent("RuntimeException", err.toString(), ["bootstrap", "experiment-tag"], "Client have wrong Java version installed");
+        TelemetryService.registerExceptionEvent("RuntimeException", err.toString(), ["bootstrap", "experiment-tag"], "Client has wrong Java version installed");
 
         return;
     }

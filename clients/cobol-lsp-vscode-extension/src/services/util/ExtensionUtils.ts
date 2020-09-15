@@ -13,7 +13,7 @@
  */
 
 import * as vscode from "vscode";
-import {EXTENSION_ID} from "../../../constants";
+import {EXTENSION_ID} from "../../constants";
 
 /**
  * This class contains utility methods consumed within the application

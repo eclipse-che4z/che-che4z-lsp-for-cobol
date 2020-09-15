@@ -15,6 +15,7 @@ import {userInfo} from "os";
 import {sep} from "path";
 import {TelemetryEvent} from "./model/TelemetryEvent";
 import {TelemetryFactory} from "./TelemetryFactory";
+import {Utils} from "../util/Utils";
 
 export class TelemetryService {
     /**
@@ -35,13 +36,10 @@ export class TelemetryService {
      * @param notes optional brief description
      * @param telemetryMeasurement optional set of numeric data with a key name
      */
-    public static registerEvent(eventName: string, categories?: string[], notes?: string, telemetryMeasurement?: Map<string, number>) {
-        if (!this.isValidEventName(eventName)) {
-            return;
+    public static registerEvent(eventName: string, categories?: string[], notes?: string, telemetryMeasurement?: Map<string, number>): void {
+        if (this.isValidEventName(eventName)) {
+            TelemetryFactory.getReporter().reportEvent(this.createTelemetryEvent(eventName, categories, notes, undefined, telemetryMeasurement));
         }
-
-        TelemetryFactory.getReporter().reportEvent(this.createTelemetryEvent(eventName, categories, notes, undefined, telemetryMeasurement));
-
     }
 
     /**
@@ -53,35 +51,34 @@ export class TelemetryService {
      * @param notes optional brief description
      * @param telemetryMeasurement optional set of numeric data with a key name
      */
-    public static registerExceptionEvent(eventName = "RuntimeException", rootCause: string, categories?: string[], notes?: string, telemetryMeasurement?: Map<string, number>) {
-        if (!(this.isValidEventName(eventName) && this.isValidRootCause(rootCause))) {
-            return;
+    public static registerExceptionEvent(eventName = "RuntimeException", rootCause: string, categories?: string[], notes?: string, telemetryMeasurement?: Map<string, number>): void {
+        if (this.isValidEventName(eventName) && this.isValidRootCause(rootCause)) {
+            TelemetryFactory.getReporter().reportExceptionEvent(this.createTelemetryEvent(eventName, categories, notes, this.anonymizeContent(rootCause), telemetryMeasurement));
         }
 
-        TelemetryFactory.getReporter().reportExceptionEvent(this.createTelemetryEvent(eventName, categories, notes, this.anonymizeContent(rootCause), telemetryMeasurement));
     }
 
     private static isValidEventName(eventName: string): boolean {
         return eventName !== undefined && eventName.trim() !== "";
     }
 
-    private static createTelemetryEvent(eventName: string, categories: string[], notes: string, rootCause?: string, telemetryMeasurement?: Map<string, number>) {
+    private static createTelemetryEvent(eventName: string, categories: string[], notes: string, rootCause?: string, telemetryMeasurement?: Map<string, number>): TelemetryEvent {
         const telemetryEvent = new TelemetryEvent();
-        telemetryEvent.setEventName(eventName);
-        telemetryEvent.setCategories(this.resolveCategories(categories));
-        telemetryEvent.setNotes(notes);
-        telemetryEvent.setRootCause(rootCause);
-        telemetryEvent.setMeasurements(telemetryMeasurement);
+        telemetryEvent.eventName = eventName;
+        telemetryEvent.categories = this.resolveCategories(categories);
+        telemetryEvent.notes = notes;
+        telemetryEvent.rootCause = rootCause;
+        telemetryEvent.measurements = telemetryMeasurement;
 
         return telemetryEvent;
     }
 
-    private static resolveCategories(categories: string[]): string {
-        return (categories) ? categories.toString() : "N.D";
+    private static resolveCategories(categories: string[]): string[] {
+        return (categories) ? categories : ["N.D"];
     }
 
     private static isValidRootCause(rootCause: string): boolean {
-        return rootCause !== undefined && rootCause.trim() !== "";
+        return Utils.isNotNullOrUndefined(rootCause) && rootCause.trim() !== "";
     }
 
     /**

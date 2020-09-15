@@ -17,16 +17,16 @@ import {sep} from "path";
 import TelemetryReporter from "vscode-extension-telemetry";
 import {TelemetryReporterImpl} from "../services/reporter/TelemetryReporterImpl";
 import {TelemetryService} from "../services/reporter/TelemetryService";
-import {ExtensionUtils} from "../services/settings/util/ExtensionUtils";
+import {ExtensionUtils} from "../services/util/ExtensionUtils";
 
 const USERNAME: string = "usernameToAnonymize";
-const FAKE_ROOT_PATH = "C:" + sep + "Users" + sep + USERNAME + "folder1" + sep + "folder2" + sep + "folder3" + sep;
+const FAKE_ROOT_PATH: string = "C:" + sep + "Users" + sep + USERNAME + "folder1" + sep + "folder2" + sep + "folder3" + sep;
 let spySendTelemetry;
 let spySendExceptionTelemetry;
 jest.mock("vscode-extension-telemetry");
 
-function runScenario(expectedNumberOfCalls, type: string, eventName?: string, categories?: string[], rootCause?: string, telemetryMeasurements?: Map<string, number>) {
-    if (type === "log") {
+function runScenario(expectedNumberOfCalls, eventType: string, eventName?: string, categories?: string[], rootCause?: string, telemetryMeasurements?: Map<string, number>) {
+    if (eventType === "log") {
         TelemetryService.registerEvent(eventName, categories, undefined, telemetryMeasurements);
         expect(spySendTelemetry).toBeCalledTimes(expectedNumberOfCalls);
     } else {
@@ -61,7 +61,8 @@ describe("TelemetryService information are consistent before send them to the te
     });
 
     test("Given a fulfilled telemetry measurement event, the data is contained as part of a telemetry event and their data are sent to the telemetry server", () => {
-        runScenario(1, "log", "test the download", undefined, undefined, new Map().set("time elapsed", TelemetryService.calculateTimeElapsed(Date.now() - 100, Date.now())));
+        const startTime: number = Date.now();
+        runScenario(1, "log", "test the download", undefined, undefined, new Map().set("time elapsed", TelemetryService.calculateTimeElapsed(startTime - 100, startTime)));
     });
 
     test("An empty telemetry object is not sent to the telemetry server", () => {
@@ -79,6 +80,11 @@ describe("TelemetryService information are consistent before send them to the te
     test("An exception telemetry event without root cause is not sent to the telemetry server", () => {
         runScenario(0, "exception", "runtimeException");
     });
+
+    test("An exception telemetry event with a null root cause is not sent to the telemetry server", () => {
+        runScenario(0, "exception", "runtimeException", undefined, null);
+    });
+
 });
 
 describe("Anonymize content", () => {
@@ -86,12 +92,12 @@ describe("Anonymize content", () => {
         (TelemetryService as any).getUsername = jest.fn().mockReturnValue(USERNAME);
 
         // construct a cross-platform example path to validate the anonymization functionality
-        const fakePath = path.format(({
+        const fakePath: string = path.format(({
             root: FAKE_ROOT_PATH,
             base: "someFile.js",
         }));
 
-        const input = "Error: ENOENT: no such file or directory, scandir 'test'\n" +
+        const input: string = "Error: ENOENT: no such file or directory, scandir 'test'\n" +
             "\tat Object.readdirSync (fs.js:795:3)\n" +
             "\tat Object.<anonymous> (electron/js2c/asar.js:605:39)\n" +
             "\tat Object.readdirSync (electron/js2c/asar.js:605:39)\n" +

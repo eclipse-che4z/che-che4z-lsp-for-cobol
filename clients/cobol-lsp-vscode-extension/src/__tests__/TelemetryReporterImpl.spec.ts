@@ -15,7 +15,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import {TelemetryReporterImpl} from "../services/reporter/TelemetryReporterImpl";
-import {ExtensionUtils} from "../services/settings/util/ExtensionUtils";
+import {ExtensionUtils} from "../services/util/ExtensionUtils";
 
 const INVALID_TELEMETRY_KEY: string = "INVALID_INSTRUMENTATION_KEY";
 
@@ -28,19 +28,16 @@ function generatePath(...pathSegments) {
 describe("Telemetry key retrieval functionality is able to return a decoded existing key or a default string", () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        (ExtensionUtils as any).getExtensionPath = jest.fn().mockReturnValue(path.join(__dirname, "../../"));
     });
 
     test("Given an existent flat file that contains telemetry key, then the content of that file is not empty and is returned", async () => {
-        (ExtensionUtils as any).getExtensionPath = jest.fn().mockReturnValue(path.join(__dirname, "../../"));
         generatePath("resources", "TELEMETRY_KEY");
-
         expect((TelemetryReporterImpl as any).getTelemetryKeyId()).not.toBe(INVALID_TELEMETRY_KEY);
     });
 
     test("Given a not existent file, then the constant value for invalid telemetry key is returned", () => {
-        (ExtensionUtils as any).getExtensionPath = jest.fn().mockReturnValue(path.join(__dirname, "../../"));
         generatePath("bad", "resource", "TELEMETRY_KEY");
-
         expect((TelemetryReporterImpl as any).getTelemetryKeyId()).toBe(INVALID_TELEMETRY_KEY);
     });
 });

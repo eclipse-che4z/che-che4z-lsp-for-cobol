@@ -15,6 +15,6 @@ import * as vscode from "vscode";
 import {TelemetryService} from "../services/reporter/TelemetryService";
 
 export function gotoCopybookSettings(): void {
-    TelemetryService.registerEvent("open settings", ["COBOL", "copybook", "settings"], "User invoke the open settings quickfix to saw the copybook locations stored in settings file config.");
+    TelemetryService.registerEvent("open settings", ["COBOL", "copybook", "settings"], "The user invokes the open settings quick fix to see the copybook locations stored in the settings file");
     vscode.commands.executeCommand("workbench.action.openSettings", "broadcom-cobol-lsp");
 }

@@ -16,12 +16,11 @@ import {readdirSync} from "fs";
 import * as path from "path";
 import {URL} from "url";
 import * as vscode from "vscode";
-import {C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_LOCAL_KEY, PATHS_ZOWE, SETTINGS_SECTION} from "../constants";
-import {CopybookDownloadService} from "./CopybookDownloadService";
-import {ProfileService} from "./ProfileService";
-import {CopybookResolver} from "./settings/CopybookResolver";
-import {LocalCopybookResolver} from "./settings/LocalCopybookResolver";
-import {CopybookUtil} from "./settings/util/CopybookUtil";
+import {C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_LOCAL_KEY, PATHS_ZOWE, SETTINGS_SECTION} from "../../constants";
+import {ProfileService} from "../ProfileService";
+import {CopybookUtil} from "../util/CopybookUtil";
+import {CopybookResolver} from "./CopybookResolver";
+import {LocalCopybookResolver} from "./LocalCopybookResolver";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.

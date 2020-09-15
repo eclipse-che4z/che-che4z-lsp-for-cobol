@@ -13,7 +13,7 @@
  */
 
 import * as vscode from "vscode";
-import {DownloadQueue} from "./DownloadQueue";
+import {DownloadQueue} from "../DownloadQueue";
 
 export class CopybookFix {
     private queue: DownloadQueue = new DownloadQueue();

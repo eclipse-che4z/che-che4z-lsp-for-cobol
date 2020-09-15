@@ -14,8 +14,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import {URL} from "url";
+import {SettingsUtils} from "../util/SettingsUtils";
 import {CopybookResolver} from "./CopybookResolver";
-import {SettingsUtils} from "./util/SettingsUtils";
 
 /**
  * This class implement the resolution of paths defined into the configuration file in a list
@@ -45,7 +45,7 @@ export class LocalCopybookResolver implements CopybookResolver {
         return (list) ? this.resolveURIList(list).filter(uri => uri !== "") : [];
     }
 
-    private  resolveURIList(list: string[]): string[] {
+    private resolveURIList(list: string[]): string[] {
         const result: Set<string> = new Set<string>();
         list.filter(resource => resource !== "*").forEach(resource => {
             const URI: URL = LocalCopybookResolver.getURIFromResource(resource);

@@ -13,58 +13,58 @@
  */
 
 export class TelemetryEvent {
-    private readonly timestamp: string;
-    private eventName: string;
-    private notes?: string;
-    private rootCause?: string;
-    private categories?: string[];
-    private measurements?: Map<string, number>;
+    private readonly _timestamp;
+    private _eventName: string;
+    private _categories?: string[];
+    private _notes?: string;
+    private _rootCause?: string;
+    private _measurements?: Map<string, number>;
 
     public constructor() {
-        this.timestamp = new Date().toISOString();
+        this._timestamp = new Date().toISOString();
     }
 
-    public setEventName(reportType: string) {
-        this.eventName = reportType;
+    get timestamp() {
+        return this._timestamp;
     }
 
-    public getEventName(): string {
-        return this.eventName;
+    get eventName(): string {
+        return this._eventName;
     }
 
-    public setNotes(notes: string) {
-        this.notes = notes;
+    set eventName(eventName: string) {
+        this._eventName = eventName;
     }
 
-    public setCategories(...categories: string[]) {
-        this.categories = categories;
+    get categories(): string[] {
+        return this._categories;
     }
 
-    public setRootCause(rootCause: string) {
-        this.rootCause = rootCause;
+    set categories(value: string[]) {
+        this._categories = value;
     }
 
-    public getTimestamp(): string {
-        return this.timestamp;
+    get notes(): string {
+        return this._notes;
     }
 
-    public getNotes(): string {
-        return this.notes;
+    set notes(notes: string) {
+        this._notes = notes;
     }
 
-    public getRootCause(): string {
-        return this.rootCause;
+    get rootCause(): string {
+        return this._rootCause;
     }
 
-    public getCategories(): string[] {
-        return this.categories;
+    set rootCause(value: string) {
+        this._rootCause = value;
     }
 
-    public getMeasurements(): Map<string, number> {
-        return this.measurements;
+    get measurements(): Map<string, number> {
+        return this._measurements;
     }
 
-    public setMeasurements(measurements: Map<string, number>) {
-        this.measurements = measurements;
+    set measurements(value: Map<string, number>) {
+        this._measurements = value;
     }
 }

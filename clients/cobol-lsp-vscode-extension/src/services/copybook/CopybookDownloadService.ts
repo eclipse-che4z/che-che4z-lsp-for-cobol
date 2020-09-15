@@ -22,14 +22,14 @@ import {
     NO_PASSWORD_ERROR_MSG,
     PROCESS_DOWNLOAD_ERROR_MSG,
     PROFILE_NAME_PLACEHOLDER,
-} from "../constants";
+} from "../../constants";
+import {CopybookProfile, DownloadQueue} from "../DownloadQueue";
+import {ProfileService} from "../ProfileService";
+import {TelemetryService} from "../reporter/TelemetryService";
+import {ZoweApi} from "../ZoweApi";
+import {Type, ZoweError} from "../ZoweError";
 import {CopybookFix} from "./CopybookFix";
 import {checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath} from "./CopybooksPathGenerator";
-import {CopybookProfile, DownloadQueue} from "./DownloadQueue";
-import {ProfileService} from "./ProfileService";
-import {TelemetryService} from "./reporter/TelemetryService";
-import {ZoweApi} from "./ZoweApi";
-import {Type, ZoweError} from "./ZoweError";
 
 export class CopybookDownloadService implements vscode.Disposable {
     private queue: DownloadQueue = new DownloadQueue();

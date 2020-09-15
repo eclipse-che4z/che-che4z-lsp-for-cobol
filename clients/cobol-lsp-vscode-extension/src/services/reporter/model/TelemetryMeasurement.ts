@@ -13,4 +13,4 @@
  */
 export interface TelemetryMeasurement {
     [key: string]: number;
-};
+}

@@ -14,8 +14,8 @@
 
 import {CancellationToken, HandlerResult} from "vscode-jsonrpc";
 import {ConfigurationParams, ConfigurationRequest} from "vscode-languageclient";
-import {CopybookDownloadService} from "./CopybookDownloadService";
-import {CopybookURI} from "./CopybookURI";
+import {CopybookDownloadService} from "./copybook/CopybookDownloadService";
+import {CopybookURI} from "./copybook/CopybookURI";
 
 export class Middleware {
     private static extractFileAndCopybookNames(params: string): [string, string] {

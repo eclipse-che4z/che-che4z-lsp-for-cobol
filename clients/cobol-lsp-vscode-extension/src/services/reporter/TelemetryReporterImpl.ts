@@ -16,7 +16,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import {EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT} from "../../constants";
-import {ExtensionUtils} from "../settings/util/ExtensionUtils";
+import {ExtensionUtils} from "../util/ExtensionUtils";
 import {TelemetryEvent} from "./model/TelemetryEvent";
 import {TelemetryMeasurement} from "./model/TelemetryMeasurement";
 import {TelemetryReport} from "./TelemetryReport";
@@ -51,35 +51,31 @@ export class TelemetryReporterImpl implements TelemetryReport {
 
     private static covertData(content: TelemetryEvent) {
         return {
-            categories: content.getCategories().toString(),
-            event: content.getEventName(),
+            categories: content.categories.toString(),
+            event: content.eventName,
             IDE: ExtensionUtils.getIDEName(),
-            notes: content.getNotes(),
-            timestamp: content.getTimestamp(),
-            rootCause: content.getRootCause(),
+            notes: content.notes,
+            timestamp: content.timestamp,
+            rootCause: content.rootCause,
         };
     }
 
     private static convertMeasurements(content: Map<string, number>): TelemetryMeasurement {
-        if (!content) {
-            return undefined;
-        }
-
         const result: TelemetryMeasurement = {};
 
-        for (const [key, value] of content) {
-            if (value) {
-                result[key] = value;
+        if (content) {
+            for (const [key, value] of content) {
+                if (value) {
+                    result[key] = value;
+                }
             }
         }
         return result;
     }
 
-    private readonly telemetryKeyId: string;
     private reporter: TelemetryReporter;
 
-    private constructor(telemetryKeyId: string) {
-        this.telemetryKeyId = telemetryKeyId;
+    private constructor(private telemetryKeyId: string) {
         this.reporter = new TelemetryReporter(EXTENSION_ID, ExtensionUtils.getPackageVersion(), this.telemetryKeyId);
     }
 
@@ -87,11 +83,10 @@ export class TelemetryReporterImpl implements TelemetryReport {
         if (this.isValidTelemetryKey()) {
             // TODO: remove after code review is done
             console.log(TelemetryReporterImpl.covertData(content));
-            if (content.getMeasurements()) {
-                console.log(TelemetryReporterImpl.convertMeasurements(content.getMeasurements()));
+            if (content.measurements) {
+                console.log(TelemetryReporterImpl.convertMeasurements(content.measurements));
             }
-
-            this.reporter.sendTelemetryEvent(content.getEventName(), TelemetryReporterImpl.covertData(content), TelemetryReporterImpl.convertMeasurements(content.getMeasurements()));
+            this.reporter.sendTelemetryEvent(content.eventName, TelemetryReporterImpl.covertData(content), TelemetryReporterImpl.convertMeasurements(content.measurements));
         }
     }
 
@@ -99,7 +94,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
         if (this.isValidTelemetryKey()) {
             // TODO: remove after code review is done
             console.log(TelemetryReporterImpl.covertData(content));
-            this.reporter.sendTelemetryErrorEvent(content.getEventName(), TelemetryReporterImpl.covertData(content));
+            this.reporter.sendTelemetryErrorEvent(content.eventName, TelemetryReporterImpl.covertData(content));
         }
     }
 
