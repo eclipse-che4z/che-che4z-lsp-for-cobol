@@ -22,14 +22,11 @@ import {TelemetryMeasurement} from "./model/TelemetryMeasurement";
 import {TelemetryReport} from "./TelemetryReport";
 
 export class TelemetryReporterImpl implements TelemetryReport {
-    public static getInstance(): TelemetryReporterImpl {
-        if (!TelemetryReporterImpl.instance) {
-            TelemetryReporterImpl.instance = new TelemetryReporterImpl(this.getTelemetryKeyId());
-        }
-        return TelemetryReporterImpl.instance;
-    }
+    private static _INSTANCE: TelemetryReporterImpl = new TelemetryReporterImpl(TelemetryReporterImpl.getTelemetryKeyId());
 
-    private static instance: TelemetryReporterImpl;
+    static get INSTANCE(): TelemetryReporterImpl {
+        return this._INSTANCE;
+    }
 
     /**
      * This method return the value of the instrumentation key necessary to create the telemetry reporter from an
@@ -49,7 +46,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
         return Buffer.from(fs.readFileSync(this.getTelemetryResourcePath(), "utf8"), "base64").toString().trim();
     }
 
-    private static covertData(content: TelemetryEvent) {
+    private static convertData(content: TelemetryEvent) {
         return {
             categories: content.categories.toString(),
             event: content.eventName,
@@ -75,26 +72,26 @@ export class TelemetryReporterImpl implements TelemetryReport {
 
     private reporter: TelemetryReporter;
 
-    private constructor(private telemetryKeyId: string) {
+    constructor(private telemetryKeyId: string) {
         this.reporter = new TelemetryReporter(EXTENSION_ID, ExtensionUtils.getPackageVersion(), this.telemetryKeyId);
     }
 
     public reportEvent(content: TelemetryEvent): void {
         if (this.isValidTelemetryKey()) {
             // TODO: remove after code review is done
-            console.log(TelemetryReporterImpl.covertData(content));
+            console.log(TelemetryReporterImpl.convertData(content));
             if (content.measurements) {
                 console.log(TelemetryReporterImpl.convertMeasurements(content.measurements));
             }
-            this.reporter.sendTelemetryEvent(content.eventName, TelemetryReporterImpl.covertData(content), TelemetryReporterImpl.convertMeasurements(content.measurements));
+            this.reporter.sendTelemetryEvent(content.eventName, TelemetryReporterImpl.convertData(content), TelemetryReporterImpl.convertMeasurements(content.measurements));
         }
     }
 
     public reportExceptionEvent(content: TelemetryEvent): void {
         if (this.isValidTelemetryKey()) {
             // TODO: remove after code review is done
-            console.log(TelemetryReporterImpl.covertData(content));
-            this.reporter.sendTelemetryErrorEvent(content.eventName, TelemetryReporterImpl.covertData(content));
+            console.log(TelemetryReporterImpl.convertData(content));
+            this.reporter.sendTelemetryErrorEvent(content.eventName, TelemetryReporterImpl.convertData(content));
         }
     }
 

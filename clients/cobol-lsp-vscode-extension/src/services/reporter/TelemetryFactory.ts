@@ -17,6 +17,6 @@ import {TelemetryReporterImpl} from "./TelemetryReporterImpl";
 
 export class TelemetryFactory {
     public static getReporter(): TelemetryReport {
-        return TelemetryReporterImpl.getInstance();
+        return TelemetryReporterImpl.INSTANCE;
     }
 }

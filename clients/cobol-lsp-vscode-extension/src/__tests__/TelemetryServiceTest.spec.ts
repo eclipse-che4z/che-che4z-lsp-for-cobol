@@ -13,14 +13,13 @@
  */
 
 import * as path from "path";
-import {sep} from "path";
 import TelemetryReporter from "vscode-extension-telemetry";
 import {TelemetryReporterImpl} from "../services/reporter/TelemetryReporterImpl";
 import {TelemetryService} from "../services/reporter/TelemetryService";
 import {ExtensionUtils} from "../services/util/ExtensionUtils";
 
 const USERNAME: string = "usernameToAnonymize";
-const FAKE_ROOT_PATH: string = "C:" + sep + "Users" + sep + USERNAME + "folder1" + sep + "folder2" + sep + "folder3" + sep;
+const FAKE_ROOT_PATH: string = path.join("C:", "Users", USERNAME, "folder1", "folder2", "folder3");
 let spySendTelemetry;
 let spySendExceptionTelemetry;
 jest.mock("vscode-extension-telemetry");
@@ -40,7 +39,7 @@ function setupScenario() {
     ExtensionUtils.getPackageVersion = jest.fn().mockReturnValue("1.0");
     (TelemetryReporterImpl as any).getTelemetryKeyId = jest.fn().mockReturnValue("key_id_for_testing_purposes");
     (TelemetryService as any).getUsername = jest.fn().mockReturnValue(USERNAME);
-    jest.mock("vscode-extension-telemetry");
+
     spySendTelemetry = jest.spyOn(TelemetryReporter.prototype, "sendTelemetryEvent");
     spySendExceptionTelemetry = jest.spyOn(TelemetryReporter.prototype, "sendTelemetryErrorEvent");
 }
