@@ -315,12 +315,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitGeneralIdentifier(GeneralIdentifierContext ctx) {
-    throwWarning(ctx.getStart());
-    return visitChildren(ctx);
-  }
-
-  @Override
   public Class visitEvaluateWhenOther(EvaluateWhenOtherContext ctx) {
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
