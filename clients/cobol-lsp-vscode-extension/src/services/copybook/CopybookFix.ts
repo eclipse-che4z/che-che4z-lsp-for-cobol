@@ -32,7 +32,7 @@ export class CopybookFix {
         const actionSettings = "Change settings";
         const action = await vscode.window.showErrorMessage(title, actionSettings);
         if (action === actionSettings) {
-            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.goto-settings", "broadcom-cobol-lsp.cpy-manager");
+            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.goto-settings", "cpy-manager");
         }
     }
 
