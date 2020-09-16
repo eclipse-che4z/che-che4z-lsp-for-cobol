@@ -22,11 +22,14 @@ import {TelemetryMeasurement} from "./model/TelemetryMeasurement";
 import {TelemetryReport} from "./TelemetryReport";
 
 export class TelemetryReporterImpl implements TelemetryReport {
-    private static _INSTANCE: TelemetryReporterImpl = new TelemetryReporterImpl(TelemetryReporterImpl.getTelemetryKeyId());
-
-    static get INSTANCE(): TelemetryReporterImpl {
-        return this._INSTANCE;
+    public static getInstance(): TelemetryReporterImpl {
+        if (!TelemetryReporterImpl.instance) {
+            TelemetryReporterImpl.instance = new TelemetryReporterImpl(this.getTelemetryKeyId());
+        }
+        return TelemetryReporterImpl.instance;
     }
+
+    private static instance: TelemetryReporterImpl;
 
     /**
      * This method return the value of the instrumentation key necessary to create the telemetry reporter from an

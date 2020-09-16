@@ -14,15 +14,15 @@
 
 import * as path from "path";
 import TelemetryReporter from "vscode-extension-telemetry";
-import {TelemetryReporterImpl} from "../services/reporter/TelemetryReporterImpl";
 import {TelemetryService} from "../services/reporter/TelemetryService";
-import {ExtensionUtils} from "../services/util/ExtensionUtils";
+import {TelemetryReporterImpl} from "../services/reporter/TelemetryReporterImpl";
 
 const USERNAME: string = "usernameToAnonymize";
 const FAKE_ROOT_PATH: string = path.join("C:", "Users", USERNAME, "folder1", "folder2", "folder3");
 let spySendTelemetry;
 let spySendExceptionTelemetry;
 jest.mock("vscode-extension-telemetry");
+jest.mock("../services/util/ExtensionUtils");
 
 function runScenario(expectedNumberOfCalls, eventType: string, eventName?: string, categories?: string[], rootCause?: string, telemetryMeasurements?: Map<string, number>) {
     if (eventType === "log") {
@@ -35,11 +35,8 @@ function runScenario(expectedNumberOfCalls, eventType: string, eventName?: strin
 }
 
 function setupScenario() {
-    ExtensionUtils.getIDEName = jest.fn().mockReturnValue("testingIde");
-    ExtensionUtils.getPackageVersion = jest.fn().mockReturnValue("1.0");
     (TelemetryReporterImpl as any).getTelemetryKeyId = jest.fn().mockReturnValue("key_id_for_testing_purposes");
     (TelemetryService as any).getUsername = jest.fn().mockReturnValue(USERNAME);
-
     spySendTelemetry = jest.spyOn(TelemetryReporter.prototype, "sendTelemetryEvent");
     spySendExceptionTelemetry = jest.spyOn(TelemetryReporter.prototype, "sendTelemetryErrorEvent");
 }
