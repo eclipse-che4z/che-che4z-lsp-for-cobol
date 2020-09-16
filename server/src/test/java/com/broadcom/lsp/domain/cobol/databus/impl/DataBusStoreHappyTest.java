@@ -16,16 +16,13 @@
 
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
-import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
+import com.ca.lsp.core.cobol.model.CopybookModel;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,16 +39,11 @@ class DataBusStoreHappyTest extends DatabusConfigProvider {
   @BeforeEach
   void setUp() {
     // create a dummy Multimap
-    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
+    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3, 3, "HOURS"));
     fulfillDatabusCacheContent(databus.getCacheMaxSize());
 
     // add one more element
-    databus.storeData(
-        CopybookStorable.builder()
-            .name("COPY-COPYBOOK")
-            .content(CPY_FIXED_CONTENT)
-            .uri(CPY_FIXED_URI)
-            .build());
+    databus.storeData(new CopybookModel("COPY-COPYBOOK", CPY_FIXED_URI, CPY_FIXED_CONTENT));
   }
 
   @Override
@@ -62,14 +54,8 @@ class DataBusStoreHappyTest extends DatabusConfigProvider {
   @Test
   void cacheData() {
     String newCopybookName = "COPY-" + (databus.getCacheMaxSize() + 1);
-    assertFalse(
-        databus.isStored(CopybookRepository.calculateUUID(new StringBuilder(newCopybookName))));
+    assertFalse(databus.isStored(newCopybookName));
     LOG.debug(String.format("Cache content : %s", databus.printCache()));
-    Optional<CopybookStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
-    LOG.debug(
-        String.format(
-            "Least Recently Used item : %s  ID : %d",
-            leastRecentlyUsed.get().getName(), leastRecentlyUsed.get().getId()));
     // Cache is Full
     LOG.debug(
         String.format(
@@ -78,14 +64,8 @@ class DataBusStoreHappyTest extends DatabusConfigProvider {
     assertEquals(databus.getCacheMaxSize(), databus.cacheSize());
 
     LOG.debug(String.format("Storing new item %s ", newCopybookName));
-    databus.storeData(
-        CopybookStorable.builder()
-            .name(newCopybookName)
-            .content(CPY_FIXED_CONTENT)
-            .uri(CPY_FIXED_URI)
-            .build());
-    assertTrue(
-        databus.isStored(CopybookRepository.calculateUUID(new StringBuilder(newCopybookName))));
+    databus.storeData(new CopybookModel(newCopybookName, CPY_FIXED_URI, CPY_FIXED_CONTENT));
+    assertTrue(databus.isStored(newCopybookName));
     // Swapped
     assertEquals(databus.getCacheMaxSize(), databus.cacheSize());
     LOG.debug(String.format("Cache content : %s", databus.printCache()));
@@ -101,19 +81,14 @@ class DataBusStoreHappyTest extends DatabusConfigProvider {
   }
 
   @Test
-  void geteElementFromCache() {
+  void getElementFromCache() {
     String element = "COPY-1";
-    assertTrue(databus.isStored(CopybookRepository.calculateUUID(new StringBuilder(element))));
+    assertTrue(databus.isStored(element));
   }
 
   private void fulfillDatabusCacheContent(int cacheMaxSize) {
     for (int i = 0; i < cacheMaxSize; i++) {
-      databus.storeData(
-          CopybookStorable.builder()
-              .name(CPY_FIXED_NAME + i)
-              .content("FASDFASDFSF")
-              .uri("/var/tmp/worspace1")
-              .build());
+      databus.storeData(new CopybookModel(CPY_FIXED_NAME + i, "/var/tmp/worspace1", "FASDFASDFSF"));
     }
   }
 }

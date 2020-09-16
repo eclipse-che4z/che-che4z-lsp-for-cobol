@@ -17,47 +17,30 @@
 package com.broadcom.lsp.domain.cobol.databus.api;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.CopybookRepositoryLRU;
-import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
+import com.ca.lsp.core.cobol.model.CopybookModel;
 import com.google.inject.ImplementedBy;
 import lombok.NonNull;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /** This repository manages the caching of copybooks. */
 @ImplementedBy(CopybookRepositoryLRU.class)
 public interface CopybookRepository {
 
-  void sortCache();
-
-  static long calculateUUID(@NonNull StringBuilder uuid) {
-    return UUID.nameUUIDFromBytes(uuid.toString().getBytes()).getMostSignificantBits();
-  }
-
-  static long calculateUUID(@NonNull String uuid) {
-    return UUID.nameUUIDFromBytes(uuid.getBytes()).getMostSignificantBits();
-  }
-
-  Optional<CopybookStorable> getCopybookStorableFromCache(@NonNull long uuid);
-
-  void setSort(boolean isSort);
+  Optional<CopybookModel> getCopybookStorableFromCache(@NonNull String name);
 
   /**
    * The object to store should be a deep copy of the actual object.
    *
    * @param storable - object to store
    */
-  void persist(@NonNull CopybookStorable storable);
+  void persist(@NonNull CopybookModel storable);
 
   String logContent();
 
   int size();
 
-  boolean isStored(@NonNull StringBuilder id);
-
-  boolean isStored(@NonNull String id);
-
-  boolean isStored(@NonNull long uuid);
+  boolean isStored(@NonNull String name);
 
   void invalidateCache();
 }
