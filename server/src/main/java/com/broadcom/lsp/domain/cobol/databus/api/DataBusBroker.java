@@ -17,14 +17,13 @@
 package com.broadcom.lsp.domain.cobol.databus.api;
 
 import com.broadcom.lsp.domain.cobol.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.databus.model.RegistryId;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
+import com.ca.lsp.core.cobol.model.CopybookModel;
 import com.google.inject.ImplementedBy;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 
 /**
  * This interface represents API to work with databus.
@@ -35,50 +34,36 @@ import lombok.SneakyThrows;
 @ImplementedBy(DefaultDataBusBroker.class)
 public interface DataBusBroker<T extends DataEvent, S> {
 
-  @SneakyThrows
   void postData(@NonNull T dataEvent);
 
-  @SneakyThrows
   void postData(@NonNull RegistryId registryId, @NonNull T dataEvent);
 
-  @SneakyThrows
   @NonNull
   S subscribe(@NonNull S dataSubscriber);
 
-  @SneakyThrows
   @NonNull
   S subscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber);
 
-  @SneakyThrows
   @NonNull
   S subscribe(@NonNull DataEventType eventType, @NonNull EventObserver observer);
 
-  @SneakyThrows
   void unSubscribe(S dataSubscriber);
 
-  @SneakyThrows
   void unSubscribe(@NonNull RegistryId registryId, S dataSubscriber);
 
-  @SneakyThrows
   S getSubscriber(@NonNull DataEventType event, @NonNull EventObserver observer);
 
-  @SneakyThrows
-  CopybookStorable storeData(@NonNull CopybookStorable dataEvent);
+  CopybookModel storeData(CopybookModel dataEvent);
 
-  @SneakyThrows
-  CopybookStorable getData(@NonNull long uuid);
+  CopybookModel getData(String name);
 
-  @SneakyThrows
-  boolean isStored(long uuid);
+  boolean isStored(String name);
 
   int cacheSize();
 
-  @SneakyThrows
   int getCacheMaxSize();
 
-  @SneakyThrows
   String printCache();
 
-  @SneakyThrows
   void invalidateCache();
 }

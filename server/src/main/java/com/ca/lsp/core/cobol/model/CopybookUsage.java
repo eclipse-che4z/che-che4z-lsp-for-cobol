@@ -13,7 +13,6 @@
  */
 package com.ca.lsp.core.cobol.model;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -21,5 +20,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class CopybookUsage {
   private String name;
-  private Position position;
+  private String copybookId;
+  private Locality locality;
 }

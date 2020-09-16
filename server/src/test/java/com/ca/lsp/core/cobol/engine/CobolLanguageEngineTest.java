@@ -15,16 +15,13 @@
 
 package com.ca.lsp.core.cobol.engine;
 
-import com.broadcom.lsp.domain.common.model.Position;
-import com.ca.lsp.core.cobol.model.DocumentMapping;
-import com.ca.lsp.core.cobol.model.ExtendedDocument;
-import com.ca.lsp.core.cobol.model.ResultWithErrors;
-import com.ca.lsp.core.cobol.model.SyntaxError;
+import com.ca.lsp.core.cobol.model.*;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
-import com.ca.lsp.core.cobol.semantics.outline.*;
+import com.ca.lsp.core.cobol.semantics.outline.NodeType;
 import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -52,39 +49,80 @@ class CobolLanguageEngineTest {
     CobolPreprocessor preprocessor = mock(CobolPreprocessor.class);
     CobolLanguageEngine engine = new CobolLanguageEngine(preprocessor);
 
-    Position position = new Position(URI, 0, 0, 0, 0, "");
+    Locality locality =
+        Locality.builder()
+            .uri(URI)
+            .range(new Range(new Position(0, 0), new Position(0, 0)))
+            .build();
     SyntaxError error =
         SyntaxError.syntaxError()
-            .position(position)
+            .locality(locality)
             .suggestion("suggestion")
             .severity(ERROR)
             .build();
 
     ExtendedDocument extendedDocument =
         new ExtendedDocument(
-            TEXT, new NamedSubContext(), Map.of(URI, new DocumentMapping(List.of(
-                new Position(URI, 0, 6, 1, 0, "       "),
-                new Position(URI, 7, 20, 1, 7, "IDENTIFICATION"),
-                new Position(URI, 21, 21, 1, 21, ""),
-                new Position(URI, 22, 29, 1, 22, "DIVISION"),
-                new Position(URI, 30, 30, 1, 30, ".")
-        ), Map.of())));
+            TEXT,
+            new NamedSubContext(),
+            Map.of(
+                URI,
+                new DocumentMapping(
+                    List.of(
+                        Locality.builder()
+                            .uri(URI)
+                            .range(new Range(new Position(0, 0), new Position(0, 7)))
+                            .token("       ")
+                            .build(),
+                        Locality.builder()
+                            .uri(URI)
+                            .range(new Range(new Position(0, 7), new Position(0, 20)))
+                            .token("IDENTIFICATION")
+                            .build(),
+                        Locality.builder()
+                            .uri(URI)
+                            .range(new Range(new Position(0, 21), new Position(0, 22)))
+                            .token(" ")
+                            .build(),
+                        Locality.builder()
+                            .uri(URI)
+                            .range(new Range(new Position(0, 22), new Position(0, 29)))
+                            .token("DIVISION")
+                            .build(),
+                        Locality.builder()
+                            .uri(URI)
+                            .range(new Range(new Position(0, 30), new Position(0, 31)))
+                            .token(".")
+                            .build()),
+                    Map.of())),
+            Map.of());
 
     when(preprocessor.process(URI, TEXT, SYNC_TYPE))
         .thenReturn(new ResultWithErrors<>(extendedDocument, List.of(error)));
 
-    Range outlineRange = new Range(new org.eclipse.lsp4j.Position(0, 7), new org.eclipse.lsp4j.Position(0, 30));
-    List<DocumentSymbol> expectedOutlineTree = List.of(
-        new DocumentSymbol("PROGRAM", NodeType.PROGRAM.getSymbolKind(), outlineRange, outlineRange, "",
-            List.of(
-                new DocumentSymbol("IDENTIFICATION DIVISION", NodeType.DIVISION.getSymbolKind(),
-                    outlineRange, outlineRange, "", List.of())
-            ))
-    );
+    Range outlineRange =
+        new Range(new org.eclipse.lsp4j.Position(0, 7), new org.eclipse.lsp4j.Position(0, 30));
+    List<DocumentSymbol> expectedOutlineTree =
+        List.of(
+            new DocumentSymbol(
+                "PROGRAM",
+                NodeType.PROGRAM.getSymbolKind(),
+                outlineRange,
+                outlineRange,
+                "",
+                List.of(
+                    new DocumentSymbol(
+                        "IDENTIFICATION DIVISION",
+                        NodeType.DIVISION.getSymbolKind(),
+                        outlineRange,
+                        outlineRange,
+                        "",
+                        List.of()))));
 
     ResultWithErrors<SemanticContext> expected =
         new ResultWithErrors<>(
-            new SemanticContext(Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), expectedOutlineTree),
+            new SemanticContext(
+                Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), expectedOutlineTree),
             List.of(error));
 
     ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, SYNC_TYPE);

@@ -16,7 +16,6 @@ package com.broadcom.lsp.domain.cobol.databus.impl;
 
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -44,7 +43,6 @@ class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
    * event.
    */
   @Test
-  @SneakyThrows
   void databusSubscriptionPositiveTest() {
     /*
      This positive test verify that a class subscribed to a specific DataEventType got a notification about that event.
@@ -77,8 +75,7 @@ class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
    * published on the databus.
    */
   @Test
-  @SneakyThrows
-  public void databusSubscriptionNegativeTest() throws TimeoutException {
+  public void databusSubscriptionNegativeTest() {
     /*
      This negative test verify that a class subscribed to a specific DataEventType got a notification about a different event.
      In this scenario will check that a Timeout exception from the Waiter is thrown.
@@ -105,8 +102,7 @@ class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
   }
 
   @Test
-  @SneakyThrows
-  public void databusUnsubscriptionPositiveTest() throws TimeoutException {
+  public void databusUnsubscriptionPositiveTest() {
     Assertions.assertThrows(
         TimeoutException.class,
         () -> {

@@ -16,19 +16,16 @@
 
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
-import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
-import lombok.SneakyThrows;
+import com.ca.lsp.core.cobol.model.CopybookModel;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -39,38 +36,13 @@ class DataBusGetFromCacheBadTest extends DatabusConfigProvider {
 
   @BeforeEach
   void setUp() {
-    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
+    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3, 3, "HOURS"));
 
-    databus.storeData(
-        CopybookStorable.builder()
-            .name("COPY1")
-            .content("FASDFASDFSF")
-            .uri("/var/tmp/worspace1")
-            .build());
-    databus.storeData(
-        CopybookStorable.builder()
-            .name("COPY2")
-            .content("FASDFASDFSF")
-            .uri("/var/tmp/worspace1")
-            .build());
-    databus.storeData(
-        CopybookStorable.builder()
-            .name("COPY3")
-            .content("FASDFASDFSF")
-            .uri("/var/tmp/worspace1")
-            .build());
-    databus.storeData(
-        CopybookStorable.builder()
-            .name("COPY4")
-            .content("FASDFASDFSF")
-            .uri("/var/tmp/worspace1")
-            .build());
-    databus.storeData(
-        CopybookStorable.builder()
-            .name("COPY40")
-            .content("FASDFASDFSF")
-            .uri("/var/tmp/worspace1")
-            .build());
+    databus.storeData(new CopybookModel("COPY1", "/var/tmp/worspace1", "FASDFASDFSF"));
+    databus.storeData(new CopybookModel("COPY2", "/var/tmp/worspace1", "FASDFASDFSF"));
+    databus.storeData(new CopybookModel("COPY3", "/var/tmp/worspace1", "FASDFASDFSF"));
+    databus.storeData(new CopybookModel("COPY4", "/var/tmp/worspace1", "FASDFASDFSF"));
+    databus.storeData(new CopybookModel("COPY40", "/var/tmp/worspace1", "FASDFASDFSF"));
   }
 
   @Override
@@ -79,18 +51,12 @@ class DataBusGetFromCacheBadTest extends DatabusConfigProvider {
   }
 
   @Test
-  @SneakyThrows
   void getData() throws NoSuchElementException {
     Assertions.assertThrows(
         NoSuchElementException.class,
         () -> {
-          assertTrue(databus.isStored(CopybookRepository.calculateUUID("COPY40")));
+          assertTrue(databus.isStored("COPY40"));
           LOG.debug(String.format("Cache content : %s", databus.printCache()));
-          Optional<CopybookStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
-          LOG.debug(
-              String.format(
-                  "Least Recently Used item : %s  ID : %d",
-                  leastRecentlyUsed.get().getName(), leastRecentlyUsed.get().getId()));
           // Cache is Full
           LOG.debug(
               String.format(
@@ -101,7 +67,7 @@ class DataBusGetFromCacheBadTest extends DatabusConfigProvider {
                   "Retrieving not existent item %s will throw NoSuchElementException ", "COPY20"));
           assertTrue(
               databus
-                  .getData(CopybookRepository.calculateUUID("COPY20"))
+                  .getData("COPY20")
                   .getName()
                   .equalsIgnoreCase("COPY20"));
         });

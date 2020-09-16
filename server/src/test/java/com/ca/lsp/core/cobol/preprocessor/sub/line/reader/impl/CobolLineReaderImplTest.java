@@ -18,11 +18,14 @@ import com.ca.lsp.core.cobol.model.ResultWithErrors;
 import com.ca.lsp.core.cobol.model.SyntaxError;
 import com.ca.lsp.core.cobol.preprocessor.sub.CobolLine;
 import com.google.common.collect.Lists;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -43,15 +46,15 @@ class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
     ResultWithErrors<List<CobolLine>> processed = processText(text);
 
     assertThat(processed.getResult(), hasSize(lines.size()));
-    for (int i = 0; i < lines.size(); i++) {
-      assertThat(processed.getResult().get(i), hasToString(lines.get(i)));
-    }
+    range(0, lines.size())
+        .forEach(i -> assertThat(processed.getResult().get(i), hasToString(lines.get(i))));
 
     assertThat(processed.getErrors(), hasSize(1));
 
     SyntaxError syntaxError = processed.getErrors().get(0);
-    assertThat(syntaxError.getPosition().getStartPosition(), is(6));
-    assertThat(syntaxError.getPosition().getLine(), is(11));
+    assertThat(
+        syntaxError.getLocality().getRange(),
+        is(new Range(new Position(10, 6), new Position(10, 7))));
   }
 
   /** Empty string should not be processed. */
@@ -123,7 +126,7 @@ class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
 
     assertThat(processed.getErrors(), hasSize(1));
     SyntaxError syntaxError = processed.getErrors().get(0);
-    assertThat(syntaxError.getPosition().getStartPosition(), is(80));
+    assertThat(syntaxError.getLocality().getRange().getStart().getCharacter(), is(80));
   }
 
   // END @Test methods

@@ -25,7 +25,6 @@ import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
-import lombok.SneakyThrows;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,25 +59,21 @@ public abstract class AbstractDataBusBroker<T extends DataEvent, S> implements D
     registrySet.put(RegistryId.CPY_REGISTRY_ID.getId(), cpyRegistry);
   }
 
-  @SneakyThrows
   protected Optional<EventBus> seekRegistry(RegistryId registryId) {
     return Optional.ofNullable(registrySet.get(registryId.getId()));
   }
 
   @Override
-  @SneakyThrows
   public S getSubscriber(DataEventType event, EventObserver observer) {
     return (S) CopybookEventFactory.getFactory(event).create(observer);
   }
 
   @Override
-  @SneakyThrows
   public int getCacheMaxSize() {
     return getCopybookRepo().getCacheMaxSize();
   }
 
   @Override
-  @SneakyThrows
   public String printCache() {
     return getCopybookRepo().logContent();
   }

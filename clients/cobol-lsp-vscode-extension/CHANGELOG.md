@@ -1,6 +1,22 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.14.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.13.0...0.14.0) (2020-09-10)
+
+#### Added
+
+- Outline view support
+- Breadcrumb support
+- Support for COBOL code snippets
+- Copy statement that contains a syntax error underlined
+
+#### Fixed
+- Multi-line errors underscoring
+- Typo in DIVIDE-REMAINDER code snippets removed
+- Program ID with quotes checking
+- Incorrect indicator area error message
+- Syntax analysis termination with unexpected copy statements
+
 ## [0.13.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.12.0...0.13.0) (2020-08-18)
 
 #### Added

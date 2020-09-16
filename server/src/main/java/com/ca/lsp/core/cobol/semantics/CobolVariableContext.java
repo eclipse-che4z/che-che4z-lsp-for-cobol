@@ -16,11 +16,11 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import com.ca.lsp.core.cobol.model.Variable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import lombok.EqualsAndHashCode;
+import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,19 +42,19 @@ public class CobolVariableContext implements SubContext<Variable> {
   public static final int LEVEL_88 = 88;
 
   private final List<Variable> variables = new ArrayList<>();
-  private final Multimap<String, Position> variableDefinitions = HashMultimap.create();
-  private final Multimap<String, Position> variableUsages = HashMultimap.create();
+  private final Multimap<String, Location> variableDefinitions = HashMultimap.create();
+  private final Multimap<String, Location> variableUsages = HashMultimap.create();
 
   @Override
-  public void define(Variable variable, Position position) {
+  public void define(Variable variable, Location location) {
     variables.add(variable);
-    variableDefinitions.put(variable.getName(), position);
+    variableDefinitions.put(variable.getName(), location);
     createRelationBetweenVariables();
   }
 
   @Override
-  public void addUsage(String variable, Position position) {
-    variableUsages.put(variable, position);
+  public void addUsage(String variable, Location location) {
+    variableUsages.put(variable, location);
   }
 
   @Override
@@ -68,12 +68,12 @@ public class CobolVariableContext implements SubContext<Variable> {
   }
 
   @Override
-  public Multimap<String, Position> getDefinitions() {
+  public Multimap<String, Location> getDefinitions() {
     return variableDefinitions;
   }
 
   @Override
-  public Multimap<String, Position> getUsages() {
+  public Multimap<String, Location> getUsages() {
     return variableUsages;
   }
 

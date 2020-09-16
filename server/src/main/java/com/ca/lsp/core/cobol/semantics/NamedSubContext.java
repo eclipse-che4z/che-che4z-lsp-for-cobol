@@ -15,10 +15,10 @@
 
 package com.ca.lsp.core.cobol.semantics;
 
-import com.broadcom.lsp.domain.common.model.Position;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Value;
+import org.eclipse.lsp4j.Location;
 
 import java.util.Collection;
 
@@ -29,18 +29,18 @@ import java.util.Collection;
 @Value
 public class NamedSubContext implements SubContext<String> {
 
-  private final Multimap<String, Position> definitions = HashMultimap.create();
+  private final Multimap<String, Location> definitions = HashMultimap.create();
 
-  private final Multimap<String, Position> usages = HashMultimap.create();
+  private final Multimap<String, Location> usages = HashMultimap.create();
 
   @Override
-  public void define(String name, Position token) {
-    definitions.put(name, token);
+  public void define(String name, Location location) {
+    definitions.put(name, location);
   }
 
   @Override
-  public void addUsage(String name, Position token) {
-    usages.put(name, token);
+  public void addUsage(String name, Location location) {
+    usages.put(name, location);
   }
 
   @Override

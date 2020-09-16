@@ -15,9 +15,7 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
-import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
-import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
@@ -113,8 +111,9 @@ public class SynchronousCopybookResolution
     String content = event.getContent();
 
     broker.unSubscribe(this);
-    ofNullable(content).ifPresent(it -> broker.storeData(new CopybookStorable(name, uri, content)));
-    waitForResolving.complete(new CopybookModel(name, uri, content));
+    CopybookModel copybookModel = new CopybookModel(name, uri, content);
+    ofNullable(content).ifPresent(it -> broker.storeData(copybookModel));
+    waitForResolving.complete(copybookModel);
   }
 
   /**
@@ -130,16 +129,11 @@ public class SynchronousCopybookResolution
   }
 
   private boolean isCopybookInCache(@Nonnull String copyBookName) {
-    return broker.isStored(CopybookRepository.calculateUUID(copyBookName));
+    return broker.isStored(copyBookName);
   }
 
   @Nonnull
   private CopybookModel getContentFromCache(@Nonnull String name) {
-    return convertToModel(broker.getData(CopybookRepository.calculateUUID(name)));
-  }
-
-  @Nonnull
-  private CopybookModel convertToModel(@Nonnull CopybookStorable storable) {
-    return new CopybookModel(storable.getName(), storable.getUri(), storable.getContent());
+    return broker.getData(name);
   }
 }

@@ -19,7 +19,6 @@ package com.broadcom.lsp.domain.cobol.databus.impl;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +36,7 @@ class DataBusUnSubscribeTest extends DatabusConfigProvider {
 
   @BeforeEach
   void setUp() {
-    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
+    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3, 3, "HOURS"));
   }
 
   @Override
@@ -49,8 +48,7 @@ class DataBusUnSubscribeTest extends DatabusConfigProvider {
   }
 
   @Test
-  @SneakyThrows
-  void subscribe() throws TimeoutException {
+  void subscribe() {
     Assertions.assertThrows(
         TimeoutException.class,
         () -> {
