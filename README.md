@@ -39,7 +39,7 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 - COBOL keywords
 - COBOL variables
 - COBOL paragraphs
-- Code Snippet
+- Code Snippets
 - Copybook variable and paragraph names
 - Names of copybooks that are used in the program
 
@@ -57,7 +57,24 @@ The extension enables syntax highlighting for COBOL code.
 	
 ### Syntax Coloring
 Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, and paragraphs.
-	
+
+### Outline View and Breadcrumb View
+The extension enables outline view and breadcrumb view, which show the structure of elements within the program and allow easy navigation between them.
+
+### Code Snippets
+Before you write your COBOL code from scratch, search the snippet library for useful templates.
+
+**Follow these steps:**
+
+1. Press `F1` to open the command palette.
+2. Type **Insert Snippet** and press enter.
+3. Select the snippet that you want to insert.
+
+![Code snippets](/docs/images/Snippet.gif)
+
+You can also insert a code snippet by typing the name of the snippet in your code and clicking on the autocomplete text.
+
+The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder.
 ## Copybook Support
 
 The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe CLI z/OSMF profile to automatically download them from the mainframe to your workspace. 
