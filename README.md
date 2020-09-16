@@ -30,6 +30,8 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 The COBOL Language Support extension is not compatible with other extensions that provide COBOL support. We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
 
+The COBOL Language Support extension only supports IBM Enterprise COBOL. Other versions of COBOL are not supported.
+
 ## Features
 COBOL Language Support provides the following COBOL syntax awareness features:
 
