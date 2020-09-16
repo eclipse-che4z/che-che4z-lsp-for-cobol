@@ -45,8 +45,8 @@ class TestExecCicsStartStatementArgumentsOrder {
           + "                TRANSID({$PRINT-TRANSID}) \n"
           + "                TERMID({$CA-PRINTER})\n"
           + "                FROM({$ACCTDTLO})\n"
-          + "                RESP(RESPONSE)\n"
-          + "                RESP2(REASON-CODE)\n"
+          + "                RESP({$RESPONSE})\n"
+          + "                RESP2({$REASON-CODE})\n"
           + "           END-EXEC.";
 
   @Test

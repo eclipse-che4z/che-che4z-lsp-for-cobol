@@ -38,7 +38,7 @@ class TestExecCicsDatasetAllowedAsFileSynonym {
           + "           EXEC CICS STARTBR DATASET('EPSMORTF')\n"
           + "                     RIDFLD({$RID-LENGTH}) RBA\n"
           + "                     EQUAL\n"
-          + "                     RESP(RESPONSE) END-EXEC.";
+          + "                     RESP({$RESPONSE}) END-EXEC.";
 
   @Test
   void test() {
