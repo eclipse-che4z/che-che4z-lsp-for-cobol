@@ -51,7 +51,7 @@ class TestReplacingWithDifferentPatternsShowsError {
   private static final String NEW2_NAME = "NEW2";
 
   private static final String MESSAGE =
-      "Syntax error on 'COPY' expected {<EOF>, LEVEL, '66', '88', "
+      "Syntax error on 'COPY' expected {<EOF>, LEVEL_NUMBER, '66', '88', "
           + "COMMUNICATION, DATA_BASE, END, EXEC, FILE, ID, IDENTIFICATION, "
           + "LINKAGE, LOCAL_STORAGE, PROCEDURE, PROGRAM_LIBRARY, REPORT, "
           + "SCREEN, WORKING_STORAGE}";
