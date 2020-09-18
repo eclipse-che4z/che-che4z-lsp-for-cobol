@@ -13,9 +13,10 @@
  */
     
 lexer grammar CobolLexer;
+import CICSLexer;
 channels{TECHNICAL}
 
-LEVEL: ([1-9])|([0][1-9])|([1234][0-9])| '77';
+LEVEL_NUMBER: ([1-9])|([0][1-9])|([1234][0-9])| '77';
 LEVEL_NUMBER_66 : '66';
 LEVEL_NUMBER_88 : '88';
 
@@ -68,8 +69,8 @@ BLANK : B L A N K;
 BLINK : B L I N K;
 BLOB : B L O B;
 BLOCK : B L O C K;
-BOUNDS : B O U N D S;
 BOTTOM : B O T T O M;
+BOUNDS : B O U N D S;
 BY : B Y;
 BYFUNCTION : B Y F U N C T I O N;
 BYTITLE : B Y T I T L E;
@@ -95,20 +96,14 @@ CLOSE_DISPOSITION : C L O S E MINUSCHAR D I S P O S I T I O N;
 COBOL : C O B O L;
 CODE : C O D E;
 CODE_SET : C O D E MINUSCHAR S E T;
-COLLATING : C O L L A T I N G;
 COL : C O L;
+COLLATING : C O L L A T I N G;
 COLUMN : C O L U M N;
-COM_REG : C O M MINUSCHAR R E G;
 COMMA : C O M M A;
 COMMITMENT : C O M M I T M E N T;
 COMMON : C O M M O N;
 COMMUNICATION : C O M M U N I C A T I O N;
 COMP : C O M P;
-COMP_1 : C O M P MINUSCHAR '1';
-COMP_2 : C O M P MINUSCHAR '2';
-COMP_3 : C O M P MINUSCHAR '3';
-COMP_4 : C O M P MINUSCHAR '4';
-COMP_5 : C O M P MINUSCHAR '5';
 COMPUTATIONAL : C O M P U T A T I O N A L;
 COMPUTATIONAL_1 : C O M P U T A T I O N A L MINUSCHAR '1';
 COMPUTATIONAL_2 : C O M P U T A T I O N A L MINUSCHAR '2';
@@ -116,19 +111,28 @@ COMPUTATIONAL_3 : C O M P U T A T I O N A L MINUSCHAR '3';
 COMPUTATIONAL_4 : C O M P U T A T I O N A L MINUSCHAR '4';
 COMPUTATIONAL_5 : C O M P U T A T I O N A L MINUSCHAR '5';
 COMPUTE : C O M P U T E;
+COMP_1 : C O M P MINUSCHAR '1';
+COMP_2 : C O M P MINUSCHAR '2';
+COMP_3 : C O M P MINUSCHAR '3';
+COMP_4 : C O M P MINUSCHAR '4';
+COMP_5 : C O M P MINUSCHAR '5';
+COM_REG : C O M MINUSCHAR R E G;
 CONFIGURATION : C O N F I G U R A T I O N;
 CONTAINS : C O N T A I N S;
 CONTENT : C O N T E N T;
 CONTINUE : C O N T I N U E;
 CONTROL : C O N T R O L;
-CONTROL_POINT : C O N T R O L MINUSCHAR P O I N T;
 CONTROLS : C O N T R O L S;
+CONTROL_POINT : C O N T R O L MINUSCHAR P O I N T;
 CONVENTION : C O N V E N T I O N;
 CONVERTING : C O N V E R T I N G;
 COPY : C O P Y;
+COPYENTRY: ('*>CPYENTER<URI>' .*? '</URI>') -> channel(TECHNICAL);
+COPYEXIT: '*>CPYEXIT' + NEWLINE -> channel(TECHNICAL);
 CORR : C O R R;
 CORRESPONDING : C O R R E S P O N D I N G;
 COUNT : C O U N T;
+CR: C R;
 CRUNCH : C R U N C H;
 CURRENCY : C U R R E N C Y;
 CURSOR : C U R S O R;
@@ -139,9 +143,11 @@ DATE_COMPILED : D A T E MINUSCHAR C O M P I L E D;
 DATE_WRITTEN : D A T E MINUSCHAR W R I T T E N;
 DAY : D A Y;
 DAY_OF_WEEK : D A Y MINUSCHAR O F MINUSCHAR W E E K;
-DBCS : D B C S;
+DB: D B;
 DBCLOB : D B C L O B;
+DBCS : D B C S;
 DE : D E;
+DEBUGGING : D E B U G G I N G;
 DEBUG_CONTENTS : D E B U G MINUSCHAR C O N T E N T S;
 DEBUG_ITEM : D E B U G MINUSCHAR I T E M;
 DEBUG_LINE : D E B U G MINUSCHAR L I N E;
@@ -149,7 +155,6 @@ DEBUG_NAME : D E B U G MINUSCHAR N A M E;
 DEBUG_SUB_1 : D E B U G MINUSCHAR S U B MINUSCHAR '1';
 DEBUG_SUB_2 : D E B U G MINUSCHAR S U B MINUSCHAR '2';
 DEBUG_SUB_3 : D E B U G MINUSCHAR S U B MINUSCHAR '3';
-DEBUGGING : D E B U G G I N G;
 DECIMAL_POINT : D E C I M A L MINUSCHAR P O I N T;
 DECLARATIVES : D E C L A R A T I V E S;
 DEFAULT : D E F A U L T;
@@ -186,6 +191,7 @@ EMPTY_CHECK : E M P T Y MINUSCHAR C H E C K;
 ENABLE : E N A B L E;
 ENCODING: E N C O D I N G;
 END : E N D;
+ENDING : E N D I N F;
 END_ACCEPT : E N D MINUSCHAR A C C E P T;
 END_ADD : E N D MINUSCHAR A D D;
 END_CALL : E N D MINUSCHAR C A L L;
@@ -209,17 +215,16 @@ END_SUBTRACT : E N D MINUSCHAR S U B T R A C T;
 END_UNSTRING : E N D MINUSCHAR U N S T R I N G;
 END_WRITE : E N D MINUSCHAR W R I T E;
 END_XML : E N D MINUSCHAR X M L;
-ENDING : E N D I N F;
 ENTER : E N T E R;
 ENTRY : E N T R Y;
 ENTRY_PROCEDURE : E N T R Y MINUSCHAR P R O C E D U R E;
 ENVIRONMENT : E N V I R O N M E N T;
+EOL : E O L;
 EOP : E O P;
+EOS : E O S;
 EQUAL : E Q U A L;
 ERASE : E R A S E;
 ERROR : E R R O R;
-EOL : E O L;
-EOS : E O S;
 ESCAPE : E S C A P E;
 ESI : E S I;
 EVALUATE : E V A L U A T E;
@@ -251,10 +256,10 @@ FUNCTION : F U N C T I O N;
 FUNCTIONNAME : F U N C T I O N N A M E;
 FUNCTION_POINTER : F U N C T I O N MINUSCHAR P O I N T E R;
 GENERATE : G E N E R A T E;
-GOBACK : G O B A C K;
 GIVING : G I V I N G;
 GLOBAL : G L O B A L;
 GO : G O;
+GOBACK : G O B A C K;
 GREATER : G R E A T E R;
 GRID : G R I D;
 GROUP : G R O U P;
@@ -263,8 +268,6 @@ HEADING : H E A D I N G;
 HIGHLIGHT : H I G H L I G H T;
 HIGH_VALUE : H I G H MINUSCHAR V A L U E;
 HIGH_VALUES : H I G H MINUSCHAR V A L U E S;
-I_O : I MINUSCHAR O;
-I_O_CONTROL : I MINUSCHAR O MINUSCHAR C O N T R O L;
 ID : I D;
 IDENTIFICATION : I D E N T I F I C A T I O N;
 IF : I F;
@@ -286,6 +289,8 @@ INTO : I N T O;
 INVALID : I N V A L I D;
 INVOKE : I N V O K E;
 IS : I S;
+I_O : I MINUSCHAR O;
+I_O_CONTROL : I MINUSCHAR O MINUSCHAR C O N T R O L;
 JUST : J U S T;
 JUSTIFIED : J U S T I F I E D;
 KANJI : K A N J I;
@@ -342,8 +347,8 @@ NEGATIVE : N E G A T I V E;
 NETWORK : N E T W O R K;
 NEXT : N E X T;
 NO : N O;
-NO_ECHO : N O MINUSCHAR E C H O;
 NOT : N O T;
+NO_ECHO : N O MINUSCHAR E C H O;
 NULL : N U L L;
 NULLS : N U L L S;
 NUMBER : N U M B E R;
@@ -382,15 +387,15 @@ PIC : P I C  -> pushMode(PICTURECLAUSE);
 PICTURE : P I C T U R E -> pushMode(PICTURECLAUSE);
 PLUS : P L U S;
 POINTER : P O I N T E R;
+PORT : P O R T;
 POSITION : P O S I T I O N;
 POSITIVE : P O S I T I V E;
-PORT : P O R T;
 PRINTER : P R I N T E R;
 PRINTING : P R I N T I N G;
 PRIVATE : P R I V A T E;
 PROCEDURE : P R O C E D U R E;
-PROCEDURE_POINTER : P R O C E D U R E MINUSCHAR P O I N T E R;
 PROCEDURES : P R O C E D U R E S;
+PROCEDURE_POINTER : P R O C E D U R E MINUSCHAR P O I N T E R;
 PROCEED : P R O C E E D;
 PROCESS : P R O C E S S;
 PROCESSING: P R O C E S S I N G;
@@ -403,11 +408,10 @@ QUEUE : Q U E U E;
 QUOTE : Q U O T E;
 QUOTES : Q U O T E S;
 RANDOM : R A N D O M;
-READER : R E A D E R;
-REMOTE : R E M O T E;
 RD : R D;
-REAL : R E A L;
 READ : R E A D;
+READER : R E A D E R;
+REAL : R E A L;
 RECEIVE : R E C E I V E;
 RECEIVED : R E C E I V E D;
 RECORD : R E C O R D;
@@ -423,6 +427,7 @@ RELATIVE : R E L A T I V E;
 RELEASE : R E L E A S E;
 RELOAD: R E L O A D;
 REMAINDER : R E M A I N D E R;
+REMOTE : R E M O T E;
 REMOVAL : R E M O V A L;
 REMOVE : R E M O V E;
 RENAMES : R E N A M E S;
@@ -434,12 +439,12 @@ REPORTS : R E P O R T S;
 REQUIRED : R E Q U I R E D;
 RERUN : R E R U N;
 RESERVE : R E S E R V E;
-REVERSE_VIDEO : R E S E R V E MINUSCHAR V I D E O;
 RESET : R E S E T;
 RETURN : R E T U R N;
-RETURN_CODE : R E T U R N MINUSCHAR C O D E;
 RETURNING: R E T U R N I N G;
+RETURN_CODE : R E T U R N MINUSCHAR C O D E;
 REVERSED : R E V E R S E D;
+REVERSE_VIDEO : R E S E R V E MINUSCHAR V I D E O;
 REWIND : R E W I N D;
 REWRITE : R E W R I T E;
 RF : R F;
@@ -499,10 +504,10 @@ START : S T A R T;
 STATUS : S T A T U S;
 STOP : S T O P;
 STRING : S T R I N G;
+SUBTRACT : S U B T R A C T;
 SUB_QUEUE_1 : S U B MINUSCHAR Q U E U E MINUSCHAR '1';
 SUB_QUEUE_2 : S U B MINUSCHAR Q U E U E MINUSCHAR '2';
 SUB_QUEUE_3 : S U B MINUSCHAR Q U E U E MINUSCHAR '3';
-SUBTRACT : S U B T R A C T;
 SUM : S U M;
 SUPPRESS : S U P P R E S S;
 SYMBOL : S Y M B O L;
@@ -512,8 +517,8 @@ SYNCHRONIZED : S Y N C H R O N I Z E D;
 TABLE : T A B L E;
 TALLY : T A L L Y;
 TALLYING : T A L L Y I N G;
-TASK : T A S K;
 TAPE : T A P E;
+TASK : T A S K;
 TERMINAL : T E R M I N A L;
 TERMINATE : T E R M I N A T E;
 TEST : T E S T;
@@ -557,120 +562,16 @@ WHEN_COMPILED : W H E N MINUSCHAR C O M P I L E D;
 WITH : W I T H;
 WORDS : W O R D S;
 WORKING_STORAGE : W O R K I N G MINUSCHAR S T O R A G E;
-WRITE_ONLY : W R I T E MINUSCHAR O N L Y;
 WRITE : W R I T E;
+WRITE_ONLY : W R I T E MINUSCHAR O N L Y;
 XML: X M L;
 YEAR : Y E A R;
-YYYYMMDD : Y Y Y Y M M D D;
 YYYYDDD : Y Y Y Y D D D;
+YYYYMMDD : Y Y Y Y M M D D;
 ZERO : Z E R O;
-ZERO_FILL : Z E R O MINUSCHAR F I L L;
-ZEROS : Z E R O S;
 ZEROES : Z E R O E S;
-CR: C R;
-DB: D B;
-
-// symbols
-AMPCHAR : '&';
-ASTERISKCHAR : '*';
-DOUBLEASTERISKCHAR : '**';
-COLONCHAR : ':';
-COMMACHAR : ',';
-COMMENTTAG : '*>';
-COMMENTENTRYTAG : '*>CE';
-DOLLARCHAR : '$';
-DOUBLEQUOTE : '"';
-// period full stopPosition
-DOT_FS : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ | '.' EOF;
-DOT : '.';
-EQUALCHAR : '=';
-LESSTHANCHAR : '<';
-LESSTHANOREQUAL : '<=';
-LPARENCHAR : '(';
-MINUSCHAR : '-';
-MORETHANCHAR : '>';
-MORETHANOREQUAL : '>=';
-NOTEQUALCHAR : '<>';
-PLUSCHAR : '+';
-SINGLEQUOTE : '\'';
-RPARENCHAR : ')';
-SLASHCHAR : '/';
-COPYENTRY: ('*>CPYENTER<URI>' .*? '</URI>') -> channel(TECHNICAL);
-COPYEXIT: '*>CPYEXIT' + NEWLINE -> channel(TECHNICAL);
-
-INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+;
-
-NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
-
-NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
-
-IDENTIFIER : ([a-zA-Z0-9]+ ([-_]+ [a-zA-Z0-9]+)*);
-FILENAME : [a-zA-Z0-9]+ '.' [a-zA-Z0-9]+;
-
-// whitespace, line breaks, comments, ...
-NEWLINE : '\r'? '\n' -> channel(HIDDEN);
-COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
-COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*  -> channel(HIDDEN);
-WS : [ \t\f;]+ -> channel(HIDDEN);
-SEPARATOR : ', ' -> channel(HIDDEN);
-
-// treat all the non-processed tokens as errors
-ERRORCHAR : . ;
-
-fragment DIGIT: [0-9];
-
-fragment HEXNUMBER :
-	X '"' [0-9A-F]+ '"'
-	| X '\'' [0-9A-F]+ '\''
-;
-
-fragment NULLTERMINATED :
-	Z '"' (~["\n\r] | '""' | '\'')* '"'
-	| Z '\'' (~['\n\r] | '\'\'' | '"')* '\''
-;
-
-fragment STRINGLITERAL :
-	'"' (~["\n\r] | '""' | '\'')* '"'
-	| '\'' (~['\n\r] | '\'\'' | '"')* '\''
-;
-
-fragment UNTRMSTRINGLITERAL :
-	'"' (~["\n\r] | '""' | '\'')*
-	| '\'' (~['\n\r] | '\'\'' | '"')*
-;
-
-fragment DBCSLITERAL :
-	[GN] '"' (~["\n\r] | '""' | '\'')* '"'
-	| [GN] '\'' (~['\n\r] | '\'\'' | '"')* '\''
-;
-
-// case insensitive chars
-fragment A:('a'|'A');
-fragment B:('b'|'B');
-fragment C:('c'|'C');
-fragment D:('d'|'D');
-fragment E:('e'|'E');
-fragment F:('f'|'F');
-fragment G:('g'|'G');
-fragment H:('h'|'H');
-fragment I:('i'|'I');
-fragment J:('j'|'J');
-fragment K:('k'|'K');
-fragment L:('l'|'L');
-fragment M:('m'|'M');
-fragment N:('n'|'N');
-fragment O:('o'|'O');
-fragment P:('p'|'P');
-fragment Q:('q'|'Q');
-fragment R:('r'|'R');
-fragment S:('s'|'S');
-fragment T:('t'|'T');
-fragment U:('u'|'U');
-fragment V:('v'|'V');
-fragment W:('w'|'W');
-fragment X:('x'|'X');
-fragment Y:('y'|'Y');
-fragment Z:('z'|'Z');
+ZEROS : Z E R O S;
+ZERO_FILL : Z E R O MINUSCHAR F I L L;
 
 mode PICTURECLAUSE;
 FINALCHARSTRING: CHARSTRING+ ->popMode;

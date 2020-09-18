@@ -49,10 +49,10 @@ class TestPerformWithoutEndNotCauseNPE extends NegativeUseCase {
   @Override
   protected void assertDiagnostics(List<Diagnostic> diagnostics) {
     {
-      assertEquals(1, diagnostics.size(), "Number of diagnostics");
+      assertEquals(2, diagnostics.size(), "Number of diagnostics");
 
       Diagnostic diagnostic = diagnostics.get(0);
-      assertEquals("No viable alternative at input OF PARENT.\r\n       ", diagnostic.getMessage());
+      assertEquals("No viable alternative at input CHILD OF PARENT.\r\n       ", diagnostic.getMessage());
 
       Range range = diagnostic.getRange();
       assertEquals(8, range.getStart().getLine(), "Diagnostic start line");

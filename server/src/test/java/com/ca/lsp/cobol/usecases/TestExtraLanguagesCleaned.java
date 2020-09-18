@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This test is looking for a clean implementation of a mechanism which can remove SQL, CICS, COPY
+ * This test is looking for a clean implementation of a mechanism which can remove SQL and COPY
  * statements from COBOL code. If they are not removed then a syntax error thrown.
  */
 class TestExtraLanguagesCleaned {
@@ -42,6 +42,7 @@ class TestExtraLanguagesCleaned {
           + "000000         10 {$*STATE}    PIC X(2).\r\n"
           + "000000         10 {$*CITY}     PIC X(3).\r\n"
           + "000000     05 {$*OP-SYS}     PIC X(3).\r\n"
+          + "000000  01 {$*ERRORS} PIC 9.\r\n"
           + "000000  PROCEDURE DIVISION.\r\n"
           + "000000      MOVE 'ILCHIMVS' TO {$TASTRUCT}.\r\n"
           + "000000      MOVE 'ILSPR' TO {$LOC-ID}.\r\n"
@@ -75,9 +76,13 @@ class TestExtraLanguagesCleaned {
           + "000000             88 {$*retired}  VALUE 61 THRU 150.\r\n"
           + "000000     03 {$*SERGIU} PIC 9(7).\r\n"
           + "000000         88 {$*teenager}  VALUE 0  THRU 17.\r\n"
+          + "000000  01 {$*ERRORS} PIC 9.\r\n"
+          + "000000  01 {$*CRUD-PGM-NAME} PIC X(10).\r\n"
+          + "000000  01 {$*LINK-AREA} PIC X(10).\r\n"
+          + "       01  {$*RESPONSE}                             PIC 999.\n"
           + "000000  PROCEDURE DIVISION.\r\n"
           + "000000  {#*PROGB}.\r\n"
-          + "000000      EXEC CICS HANDLE CONDITION ERROR(ERRORS) END-EXEC.\r\n"
+          + "000000      EXEC CICS HANDLE CONDITION ERROR({$ERRORS}) END-EXEC.\r\n"
           + "000000      PERFORM WITH TEST BEFORE UNTIL {$TBPARM1} = 0\r\n"
           + "000000      SUBTRACT 1 FROM {$TBPARM1}\r\n"
           + "000000      CALL 'ATCDEM4'\r\n"
@@ -88,8 +93,8 @@ class TestExtraLanguagesCleaned {
           + "000000      PERFORM WITH TEST BEFORE UNTIL {$TBPARM2} = 0\r\n"
           + "000000      SUBTRACT 1 FROM {$TBPARM2}\r\n"
           + "000000      END-PERFORM.\r\n"
-          + "000000             EXEC CICS LINK PROGRAM(CRUD-PGM-NAME)\r\n"
-          + "000000      RESP(RESPONSE)COMMAREA(LINK-AREA) END-EXEC.\r\n"
+          + "000000             EXEC CICS LINK PROGRAM({$CRUD-PGM-NAME})\r\n"
+          + "000000      RESP(${RESPONSE})COMMAREA({$LINK-AREA}) END-EXEC.\r\n"
           + "000000 {#*PROCB}.\r\n"
           + "000000      MOVE 10 TO {$MAMA} OF {$AGE} OF {$BORROWER}.\r\n"
           + "000000  END PROGRAM ATCDEM3.\r\n"

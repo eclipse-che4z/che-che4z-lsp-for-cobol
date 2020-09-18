@@ -310,6 +310,9 @@
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>${maven.antlr4.plugin.version}</version>
+                <configuration>
+                    <libDirectory>${basedir}/src/main/antlr4/com/ca/lsp/core/cobol/parser</libDirectory>
+                </configuration>
                 <executions>
                     <execution>
                         <id>run antlr</id>
