@@ -14,8 +14,8 @@
 
 import * as path from "path";
 import TelemetryReporter from "vscode-extension-telemetry";
-import {TelemetryService} from "../services/reporter/TelemetryService";
 import {TelemetryReporterImpl} from "../services/reporter/TelemetryReporterImpl";
+import {TelemetryService} from "../services/reporter/TelemetryService";
 
 const USERNAME: string = "usernameToAnonymize";
 const FAKE_ROOT_PATH: string = path.join("C:", "Users", USERNAME, "folder1", "folder2", "folder3");
@@ -42,9 +42,6 @@ function setupScenario() {
 }
 
 describe("TelemetryService information are consistent before send them to the telemetry server", () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
     beforeAll(() => {
         setupScenario();
     });

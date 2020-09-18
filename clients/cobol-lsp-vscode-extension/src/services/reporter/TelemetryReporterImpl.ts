@@ -81,19 +81,12 @@ export class TelemetryReporterImpl implements TelemetryReport {
 
     public reportEvent(content: TelemetryEvent): void {
         if (this.isValidTelemetryKey()) {
-            // TODO: remove after code review is done
-            console.log(TelemetryReporterImpl.convertData(content));
-            if (content.measurements) {
-                console.log(TelemetryReporterImpl.convertMeasurements(content.measurements));
-            }
             this.reporter.sendTelemetryEvent(content.eventName, TelemetryReporterImpl.convertData(content), TelemetryReporterImpl.convertMeasurements(content.measurements));
         }
     }
 
     public reportExceptionEvent(content: TelemetryEvent): void {
         if (this.isValidTelemetryKey()) {
-            // TODO: remove after code review is done
-            console.log(TelemetryReporterImpl.convertData(content));
             this.reporter.sendTelemetryErrorEvent(content.eventName, TelemetryReporterImpl.convertData(content));
         }
     }
