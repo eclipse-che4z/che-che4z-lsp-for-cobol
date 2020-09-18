@@ -16,6 +16,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import {EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT} from "../../constants";
+
 import {ExtensionUtils} from "../util/ExtensionUtils";
 import {TelemetryEvent} from "./model/TelemetryEvent";
 import {TelemetryMeasurement} from "./model/TelemetryMeasurement";
