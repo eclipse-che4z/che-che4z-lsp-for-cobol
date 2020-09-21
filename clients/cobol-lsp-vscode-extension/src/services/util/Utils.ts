@@ -13,16 +13,16 @@
  */
 
 /**
- * This class collect utility methods for general purpose activities
+ * This class collects utility methods for general purpose activities
  */
 export class Utils {
     /**
-     * This method provide a quick way to assure that a string is not null or undefined.
+     * This method provides a quick way to verify if the input is null or undefined.
      * The idea is to have something similar to the util library {@link node.isNullOrUndefined} that is deprecated.
      * @param content the string value target of the validation
      * @return true if the content is not null or undefined, false otherwise
      */
-    public static isNotNullOrUndefined(content: string): boolean {
-        return content !== null && content !== undefined;
+    public static isNullOrUndefined(content: string): boolean {
+        return content === null || content === undefined;
     }
 }

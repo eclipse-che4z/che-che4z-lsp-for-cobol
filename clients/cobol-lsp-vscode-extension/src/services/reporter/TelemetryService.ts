@@ -78,7 +78,7 @@ export class TelemetryService {
     }
 
     private static isValidRootCause(rootCause: string): boolean {
-        return Utils.isNotNullOrUndefined(rootCause) && rootCause.trim() !== "";
+        return !(Utils.isNullOrUndefined(rootCause)) && rootCause.trim() !== "";
     }
 
     /**
