@@ -128,6 +128,23 @@ pipeline {
                     }
                 }
 
+                stage('Update telemetry key') {
+                    when {
+                        expression { branchName == 'master' }
+                    }
+
+                    steps{
+                        container('node') {
+                            dir('clients/cobol-lsp-vscode-extension') {
+                                //test telemetry key generation
+                                withCredentials([string(credentialsId: 'TELEMETRY_INSTRUMENTATION_KEY', variable: 'TELKEY')]) {
+                                    sh 'echo ${TELKEY}|base64 > resources/TELEMETRY_KEY'
+                                }
+                            }
+                        }
+                    }
+                }
+
                 stage('Client - Package') {
                     environment {
                         npm_config_cache = "$env.WORKSPACE"

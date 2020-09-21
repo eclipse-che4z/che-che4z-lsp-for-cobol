@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { Middleware } from "../services/Middleware";
+import {Middleware} from "../services/Middleware";
 
 function constructParams(sectionName: string): any {
     return {
@@ -21,6 +21,8 @@ function constructParams(sectionName: string): any {
         ],
     };
 }
+
+jest.mock("../services/reporter/TelemetryService");
 
 // tslint:disable: no-unused-expression no-string-literal
 describe("Copybook downloader", () => {
@@ -49,10 +51,12 @@ describe("Copybook downloader", () => {
         expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName", "USER.CLIST.COB");
     });
     it("Handle copybook download request", async () => {
-        const params = {items: [
-            "broadcom-cobol-lsp.copybook-download.cobFile.bookName",
-            "broadcom-cobol-lsp.copybook-download.cobFile.bookName2",
-        ].map(sectionName => ({section: sectionName}))};
+        const params = {
+            items: [
+                "broadcom-cobol-lsp.copybook-download.cobFile.bookName",
+                "broadcom-cobol-lsp.copybook-download.cobFile.bookName2",
+            ].map(sectionName => ({section: sectionName}))
+        };
         await expect(middleware.handleConfigurationRequest(params, null, null)).resolves.toEqual([]);
         expect(downloadCopybooksMock).toHaveBeenCalledWith("cobFile", ["bookName", "bookName2"]);
     });

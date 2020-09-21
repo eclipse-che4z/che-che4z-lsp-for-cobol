@@ -12,10 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {CancellationToken, HandlerResult } from "vscode-jsonrpc";
+import {CancellationToken, HandlerResult} from "vscode-jsonrpc";
 import {ConfigurationParams, ConfigurationRequest} from "vscode-languageclient";
-import {CopybookDownloadService} from "./CopybookDownloadService";
-import {CopybookURI} from "./CopybookURI";
+import {CopybookDownloadService} from "./copybook/CopybookDownloadService";
+import {CopybookURI} from "./copybook/CopybookURI";
 
 export class Middleware {
     private static extractFileAndCopybookNames(params: string): [string, string] {
@@ -24,6 +24,7 @@ export class Middleware {
         const lastDot = params.lastIndexOf(".");
         return [params.substring(secondDot + 1, lastDot), params.substring(lastDot + 1)];
     }
+
     constructor(
         private copybookResolverURI: CopybookURI,
         private copybookDownloader: CopybookDownloadService) {

@@ -14,11 +14,12 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
-import {C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_ZOWE, SETTINGS_SECTION} from "../constants";
-import { ProfileService } from "./ProfileService";
+import {C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_ZOWE, SETTINGS_SECTION} from "../../constants";
+import {ProfileService} from "../ProfileService";
 
 export class CopybooksPathGenerator {
-    constructor(private profileService: ProfileService) { }
+    constructor(private profileService: ProfileService) {
+    }
 
     async listUris(): Promise<vscode.Uri[]> {
         const result: vscode.Uri[] = [];

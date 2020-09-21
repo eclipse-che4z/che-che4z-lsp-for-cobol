@@ -14,9 +14,9 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
-import {CopybookURI} from "../services/CopybookURI";
+import {CopybookURI} from "../services/copybook/CopybookURI";
 import {ProfileService} from "../services/ProfileService";
-import {SettingsUtils} from "../services/settings/util/SettingsUtils";
+import {SettingsUtils} from "../services/util/SettingsUtils";
 import {ZoweApi} from "../services/ZoweApi";
 
 const zoweApi: ZoweApi = new ZoweApi();

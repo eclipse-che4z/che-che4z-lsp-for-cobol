@@ -16,7 +16,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import {C4Z_FOLDER, GITIGNORE_FILE} from "../constants";
 import {createFileWithGivenPath, initializeSettings} from "../services/Settings";
-import {SettingsUtils} from "../services/settings/util/SettingsUtils";
+import {SettingsUtils} from "../services/util/SettingsUtils";
 
 const fsPath = "tmp-ws";
 const scheme = "file";

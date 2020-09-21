@@ -17,22 +17,25 @@ import * as vscode from "vscode";
 import {changeDefaultZoweProfile} from "./commands/ChangeDefaultZoweProfile";
 import {editDatasetPaths} from "./commands/EditDatasetPaths";
 import {fetchCopybookCommand} from "./commands/FetchCopybookCommand";
+import {gotoCopybookSettings} from "./commands/OpenSettingsCommand";
 import {C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID, SETTINGS_SECTION} from "./constants";
-import {CopybookDownloadService} from "./services/CopybookDownloadService";
-import {CopybookFix} from "./services/CopybookFix";
-import {CopybooksCodeActionProvider} from "./services/CopybooksCodeActionProvider";
-import {CopybooksPathGenerator} from "./services/CopybooksPathGenerator";
+import {CopybookDownloadService} from "./services/copybook/CopybookDownloadService";
+import {CopybookFix} from "./services/copybook/CopybookFix";
+import {CopybooksCodeActionProvider} from "./services/copybook/CopybooksCodeActionProvider";
+import {CopybooksPathGenerator} from "./services/copybook/CopybooksPathGenerator";
 
-import {CopybookURI} from "./services/CopybookURI";
+import {CopybookURI} from "./services/copybook/CopybookURI";
 import {LanguageClientService} from "./services/LanguageClientService";
 import {Middleware} from "./services/Middleware";
 import {PathsService} from "./services/PathsService";
 import {ProfileService} from "./services/ProfileService";
+import {TelemetryService} from "./services/reporter/TelemetryService";
 import {createFileWithGivenPath, initializeSettings} from "./services/Settings";
 import {ZoweApi} from "./services/ZoweApi";
 
 export async function activate(context: vscode.ExtensionContext) {
     initializeSettings();
+    TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
 
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
@@ -47,6 +50,8 @@ export async function activate(context: vscode.ExtensionContext) {
         await languageClientService.checkPrerequisites();
     } catch (err) {
         vscode.window.showErrorMessage(err.toString());
+        TelemetryService.registerExceptionEvent("RuntimeException", err.toString(), ["bootstrap", "experiment-tag"], "Client has wrong Java version installed");
+
         return;
     }
 
@@ -69,6 +74,9 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
     context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths", () => {
         editDatasetPaths(pathsService);
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.goto-settings", () => {
+        gotoCopybookSettings();
     }));
 
     context.subscriptions.push(languageClientService.start());

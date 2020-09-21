@@ -22,13 +22,14 @@ import {
     NO_PASSWORD_ERROR_MSG,
     PROCESS_DOWNLOAD_ERROR_MSG,
     PROFILE_NAME_PLACEHOLDER,
-} from "../constants";
+} from "../../constants";
+import {CopybookProfile, DownloadQueue} from "../DownloadQueue";
+import {ProfileService} from "../ProfileService";
+import {TelemetryService} from "../reporter/TelemetryService";
+import {ZoweApi} from "../ZoweApi";
+import {Type, ZoweError} from "../ZoweError";
 import {CopybookFix} from "./CopybookFix";
 import {checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath} from "./CopybooksPathGenerator";
-import {CopybookProfile, DownloadQueue} from "./DownloadQueue";
-import {ProfileService} from "./ProfileService";
-import {ZoweApi} from "./ZoweApi";
-import {Type, ZoweError} from "./ZoweError";
 
 export class CopybookDownloadService implements vscode.Disposable {
     private queue: DownloadQueue = new DownloadQueue();
@@ -45,7 +46,7 @@ export class CopybookDownloadService implements vscode.Disposable {
      * local workspaces and should be added in the download queue for copybooks that the LSP client will try
      * to download from MF
      * @param cobolFileName name of the document open in workspace
-     * @param copybookName name of the copybook required by the LSP server
+     * @param copybookNames list of names of the copybooks required by the LSP server
      */
     public async downloadCopybooks(cobolFileName: string, copybookNames: string[]): Promise<void> {
         if (!checkWorkspace()) {
@@ -57,11 +58,13 @@ export class CopybookDownloadService implements vscode.Disposable {
             return;
         }
         await this.resolver.addCopybookInQueue(copybookNames, profile);
-
     }
 
     public async start() {
+
+        let startTime: number = Date.now();
         this.resolver.setQueue(this.queue);
+
         let done = false;
         const errors = new Set<string>();
         while (!done) {
@@ -77,9 +80,15 @@ export class CopybookDownloadService implements vscode.Disposable {
                 },
                 async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
                     await this.handleQueue(element, errors, progress);
+
                     if (this.queue.length === 0 && errors.size > 0) {
                         this.createErrorMessageForCopybooks(errors);
                         errors.clear();
+                    }
+
+                    if (this.queue.length === 0) {
+                        TelemetryService.registerEvent("Download copybooks from MF", ["copybook", "COBOL", "experiment-tag"], "total time to search copybooks on MF", new Map().set("time elapsed", TelemetryService.calculateTimeElapsed(startTime, Date.now())));
+                        startTime = 0;
                     }
                 });
         }
@@ -123,6 +132,7 @@ export class CopybookDownloadService implements vscode.Disposable {
                         break;
                 }
             }
+            TelemetryService.registerExceptionEvent(undefined, errorMessage, ["copybook", "COBOL", "experiment-tag"], "There is an issue with zowe api layer");
             vscode.window.showErrorMessage(errorMessage);
         }
     }

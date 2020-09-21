@@ -12,7 +12,8 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import {QUICKFIX_GOTOSETTINGS} from "../constants";
+import {QUICKFIX_GOTOSETTINGS} from "../../constants";
+import {TelemetryService} from "../reporter/TelemetryService";
 
 export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
 
@@ -24,12 +25,14 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
         if (!this.shouldHaveCodeAction(context)) {
             return [];
         }
+        // Telemetry should be collected only if shouldHaveCodeAction is true
+        TelemetryService.registerEvent("QuickFix for copybook activation", ["COBOL", "hover", "copybook", "quickfix"], "User try to understand the syntax error for a missing copybook");
 
         const goToSettings = new vscode.CodeAction(QUICKFIX_GOTOSETTINGS, vscode.CodeActionKind.QuickFix);
+
         goToSettings.command = {
-            command: "workbench.action.openSettings",
+            command: "broadcom-cobol-lsp.cpy-manager.goto-settings",
             title: QUICKFIX_GOTOSETTINGS,
-            arguments: ["broadcom-cobol-lsp"],
         };
         return [goToSettings];
     }

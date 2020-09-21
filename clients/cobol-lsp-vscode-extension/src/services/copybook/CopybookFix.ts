@@ -13,7 +13,7 @@
  */
 
 import * as vscode from "vscode";
-import {DownloadQueue} from "./DownloadQueue";
+import {DownloadQueue} from "../DownloadQueue";
 
 export class CopybookFix {
     private queue: DownloadQueue = new DownloadQueue();
@@ -32,7 +32,7 @@ export class CopybookFix {
         const actionSettings = "Change settings";
         const action = await vscode.window.showErrorMessage(title, actionSettings);
         if (action === actionSettings) {
-            vscode.commands.executeCommand("workbench.action.openSettings", "broadcom-cobol-lsp");
+            vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.goto-settings");
         }
     }
 

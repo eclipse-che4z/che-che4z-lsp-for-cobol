@@ -11,10 +11,10 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import {CopybookDownloadService} from "../services/copybook/CopybookDownloadService";
+import * as vscode from "vscode";
 import {TelemetryService} from "../services/reporter/TelemetryService";
 
-export function fetchCopybookCommand(copybook: string, downloader: CopybookDownloadService, programName: string) {
-    TelemetryService.registerEvent("Fetch copybook", ["COBOL", "copybook", "quickfix"], "The user tries to resolve a copybook that is not currently found");
-    downloader.downloadCopybooks(programName, [copybook]);
+export function gotoCopybookSettings(): void {
+    TelemetryService.registerEvent("Open copybook settings", ["COBOL", "copybook", "settings"], "The user invokes the open settings quick fix to see the copybook locations stored in the settings file");
+    vscode.commands.executeCommand("workbench.action.openSettings", "broadcom-cobol-lsp.cpy-manager");
 }
