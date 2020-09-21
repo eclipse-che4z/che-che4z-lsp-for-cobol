@@ -135,13 +135,13 @@ The extensions for Visual Studio Code developed by Broadcom Inc., including its 
 
 This data collection uses built-in Microsoft VS Code Telemetry, which can be disabled, at your sole discretion, if you do not want to send Usage Data.
 
-Current release of COBOL Language Support will collect anonymous data for the following events:
+The current release of COBOL Language Support collects anonymous data for the following events:
 * Activation of this VS Code extension
 * Problem interaction
 * Quick Fix
 * Invalid ZOWE credentials
 * ZOWE connection issues
-* Java version issue
+* Java version issues
 
 Each such event is logged with the following information:
 * Event time
