@@ -76,13 +76,12 @@ class TestExtraLanguagesCleaned {
           + "000000             88 {$*retired}  VALUE 61 THRU 150.\r\n"
           + "000000     03 {$*SERGIU} PIC 9(7).\r\n"
           + "000000         88 {$*teenager}  VALUE 0  THRU 17.\r\n"
-          + "000000  01 {$*ERRORS} PIC 9.\r\n"
           + "000000  01 {$*CRUD-PGM-NAME} PIC X(10).\r\n"
           + "000000  01 {$*LINK-AREA} PIC X(10).\r\n"
           + "       01  {$*RESPONSE}                             PIC 999.\n"
           + "000000  PROCEDURE DIVISION.\r\n"
           + "000000  {#*PROGB}.\r\n"
-          + "000000      EXEC CICS HANDLE CONDITION ERROR({$ERRORS}) END-EXEC.\r\n"
+          + "000000      EXEC CICS HANDLE CONDITION ERROR({#ERRORS}) END-EXEC.\r\n"
           + "000000      PERFORM WITH TEST BEFORE UNTIL {$TBPARM1} = 0\r\n"
           + "000000      SUBTRACT 1 FROM {$TBPARM1}\r\n"
           + "000000      CALL 'ATCDEM4'\r\n"
@@ -97,6 +96,8 @@ class TestExtraLanguagesCleaned {
           + "000000      RESP(${RESPONSE})COMMAREA({$LINK-AREA}) END-EXEC.\r\n"
           + "000000 {#*PROCB}.\r\n"
           + "000000      MOVE 10 TO {$MAMA} OF {$AGE} OF {$BORROWER}.\r\n"
+          + "000000 {#*ERRORS}.\r\n"
+          + "000000      DISPLAY 'Error'.\r\n"
           + "000000  END PROGRAM ATCDEM3.\r\n"
           + "           \r\n";
 

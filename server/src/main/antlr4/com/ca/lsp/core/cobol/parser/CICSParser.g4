@@ -919,7 +919,7 @@ cics_name: LPARENCHAR name RPARENCHAR;
 cics_ref: LPARENCHAR ptr_ref RPARENCHAR;
 cics_mama: LPARENCHAR mama RPARENCHAR;
 cics_hhmmss: LPARENCHAR hhmmss RPARENCHAR;
-cics_label: LPARENCHAR label RPARENCHAR;
+cics_label: LPARENCHAR paragraphNameUsage RPARENCHAR;
 cics_value: LPARENCHAR ptr_value RPARENCHAR;
 
 cobolWord
@@ -958,7 +958,6 @@ ptr_ref: cicsWord+;
 ptr_value: cicsWord+;
 cics_document_set_symbollist: cicsWord+;
 mama: cicsWord+;
-label: cicsWord+;
 hhmmss: cicsWord+;
 today: cicsWord+;
 
