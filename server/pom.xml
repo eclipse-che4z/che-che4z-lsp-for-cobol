@@ -197,6 +197,15 @@
                     <include>*.tokens</include>
                 </includes>
             </resource>
+            <resource>
+                <directory>src/test/antlr4</directory>
+                <excludes>
+                    <exclude>**</exclude>
+                </excludes>
+                <includes>
+                    <include>*.tokens</include>
+                </includes>
+            </resource>
         </resources>
         <plugins>
             <plugin>
@@ -286,6 +295,7 @@
                 <configuration>
                     <excludes>
                         <exclude>**/generated-sources/**/*</exclude>
+                        <exclude>**/generated-test-sources/**/*</exclude>
                         <exclude>**/com/ca/lsp/core/cobol/parser/**/*</exclude>
                         <exclude>**/com/broadcom/lsp/cdi/module/**/*</exclude>
                     </excludes>
@@ -310,10 +320,24 @@
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>${maven.antlr4.plugin.version}</version>
-                <configuration>
-                    <libDirectory>${basedir}/src/main/antlr4/com/ca/lsp/core/cobol/parser</libDirectory>
-                </configuration>
                 <executions>
+                    <execution>
+                        <id>build UseCasePreprocessorr</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                        <configuration>
+                            <generateTestSources>true</generateTestSources>
+                            <arguments>
+                                <argument>-package</argument>
+                                <argument>com.broadcom.usecase</argument>
+                            </arguments>
+                            <sourceDirectory>${basedir}/src/test/antlr4/com/broadcom/usecase</sourceDirectory>
+                            <listener>true</listener>
+                            <visitor>false</visitor>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>run antlr</id>
                         <phase>generate-sources</phase>
@@ -325,6 +349,7 @@
                                 <argument>-package</argument>
                                 <argument>com.ca.lsp.core.cobol.parser</argument>
                             </arguments>
+                            <sourceDirectory>${basedir}/src/main/antlr4/com/ca/lsp/core/cobol/parser</sourceDirectory>
                             <listener>true</listener>
                             <visitor>true</visitor>
                         </configuration>

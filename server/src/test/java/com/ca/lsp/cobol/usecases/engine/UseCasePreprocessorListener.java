@@ -15,7 +15,7 @@
 
 package com.ca.lsp.cobol.usecases.engine;
 
-import com.ca.lsp.core.cobol.parser.UseCasePreprocessorBaseListener;
+import com.broadcom.usecase.UseCasePreprocessorBaseListener;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static com.ca.lsp.core.cobol.parser.UseCasePreprocessorParser.*;
+import static com.broadcom.usecase.UseCasePreprocessorParser.*;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
