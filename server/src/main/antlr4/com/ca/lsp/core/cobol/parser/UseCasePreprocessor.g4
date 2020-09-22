@@ -13,7 +13,7 @@
  *
  */
 
-grammar TestPreprocessor;
+grammar UseCasePreprocessor;
 
 startRule
    : .*? ((copybookStatement | variableStatement | paragraphStatement | errorStatement | multiTokenError | NEWLINE)+ .*?)+ EOF
