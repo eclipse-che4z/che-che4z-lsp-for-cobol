@@ -15,7 +15,7 @@
 
 package com.ca.lsp.cobol.usecases.engine;
 
-import com.ca.lsp.cobol.usecases.engine.parser.TestPreprocessorBaseListener;
+import com.ca.lsp.core.cobol.parser.UseCasePreprocessorBaseListener;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static com.ca.lsp.cobol.usecases.engine.parser.TestPreprocessorParser.*;
+import static com.ca.lsp.core.cobol.parser.UseCasePreprocessorParser.*;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
@@ -40,9 +40,9 @@ import static org.antlr.v4.runtime.Lexer.HIDDEN;
 /**
  * This ANTLR listener removes all the technical tokens from the given text, extracts semantic
  * context and diagnostics applying correct positions. The grammar for this listener written inside
- * TestPreprocessor.g4
+ * UseCasePreprocessor.g4
  */
-public class TestPreprocessorListenerImpl extends TestPreprocessorBaseListener {
+public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
   private Map<String, List<Location>> variableDefinitions = new HashMap<>();
   private Map<String, List<Location>> variableUsages = new HashMap<>();
@@ -59,7 +59,7 @@ public class TestPreprocessorListenerImpl extends TestPreprocessorBaseListener {
   private String copybookName;
   private Map<String, Diagnostic> expectedDiagnostics;
 
-  TestPreprocessorListenerImpl(
+  UseCasePreprocessorListener(
       CommonTokenStream tokens,
       String documentName,
       String documentUri,
