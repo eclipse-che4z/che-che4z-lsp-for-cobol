@@ -15,9 +15,9 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.impl.GrammarPreprocessorListenerImpl;
-import com.google.inject.assistedinject.Assisted;
 import org.antlr.v4.runtime.BufferedTokenStream;
 
 import javax.annotation.Nonnull;
@@ -25,8 +25,8 @@ import java.util.Deque;
 
 public interface GrammarPreprocessorListenerFactory {
   GrammarPreprocessorListenerImpl create(
-      @Nonnull @Assisted("uri") String uri,
+      @Nonnull String uri,
       @Nonnull BufferedTokenStream tokens,
       @Nonnull Deque<CopybookUsage> copybookStack,
-      @Nonnull @Assisted("copybookProcessingMode") String textDocumentSyncType);
+      @Nonnull CopybookProcessingMode copybookProcessingMode);
 }

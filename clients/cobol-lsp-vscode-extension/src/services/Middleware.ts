@@ -17,14 +17,9 @@ import {ConfigurationParams, ConfigurationRequest} from "vscode-languageclient";
 import {CopybookDownloadService} from "./copybook/CopybookDownloadService";
 import {CopybookURI} from "./copybook/CopybookURI";
 
-export class Middleware {
-    private static extractFileAndCopybookNames(params: string): [string, string] {
-        const firstDot = params.indexOf(".");
-        const secondDot = params.indexOf(".", firstDot + 1);
-        const lastDot = params.lastIndexOf(".");
-        return [params.substring(secondDot + 1, lastDot), params.substring(lastDot + 1)];
-    }
+const PARAMS_REGEX = /^([^.]+)\.([^.]+)(\.(quiet|verbose))?\.(.+)\.([^.]+)$/
 
+export class Middleware {
     constructor(
         private copybookResolverURI: CopybookURI,
         private copybookDownloader: CopybookDownloadService) {
@@ -35,19 +30,42 @@ export class Middleware {
         token: CancellationToken,
         next: ConfigurationRequest.HandlerSignature): Promise<HandlerResult<any[], void>> {
 
-        if (params.items.length > 0) {
-            const sectionName = params.items[0].section;
-            if (sectionName.startsWith("broadcom-cobol-lsp.copybook-resolve")) {
-                const [cobolFileName, copybookName] = Middleware.extractFileAndCopybookNames(sectionName);
-                return [await this.copybookResolverURI.resolveCopybookURI(copybookName, cobolFileName)];
-            }
-            if (sectionName.startsWith("broadcom-cobol-lsp.copybook-download")) {
-                const extractedNames = params.items.map(item => Middleware.extractFileAndCopybookNames(item.section));
-                const copybookNames = extractedNames.map(names => names[1]);
-                this.copybookDownloader.downloadCopybooks(extractedNames[0][0], copybookNames);
-                return [];
+        const requestLines = params.items.map(item => Middleware.parseLine(item.section));
+        if (requestLines.length > 0 && requestLines[0] !== undefined && requestLines[0].prefix == "broadcom-cobol-lsp") {
+            switch (requestLines[0].command) {
+                case "copybook-resolve":
+                    return [await this.copybookResolverURI.resolveCopybookURI(requestLines[0].copybookName,
+                        requestLines[0].cobolFileName)]
+                case "copybook-download":
+                    const copybookNames = requestLines.map(requestLine => requestLine.copybookName);
+                    this.copybookDownloader.downloadCopybooks(requestLines[0].cobolFileName, copybookNames,
+                        requestLines[0].quiet);
+                    return [];
             }
         }
         return next(params, token);
     }
+
+    private static parseLine(line: string): RequestLine | undefined {
+        const match = PARAMS_REGEX.exec(line);
+        if (match !== null) {
+            return new RequestLine(
+                match[1],
+                match[2],
+                match[5],
+                match[6],
+                "verbose" != match[4]
+            );
+        }
+    }
+}
+
+export class RequestLine {
+    constructor(
+        readonly prefix: string,
+        readonly command: string,
+        readonly cobolFileName: string,
+        readonly copybookName: string,
+        readonly quiet: boolean
+    ) { }
 }

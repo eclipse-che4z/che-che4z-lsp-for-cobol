@@ -20,6 +20,7 @@ import com.broadcom.lsp.cdi.EngineModule;
 import com.broadcom.lsp.cdi.module.databus.DatabusModule;
 import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.ca.lsp.cobol.positive.CobolText;
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.cobol.service.mocks.MockCopybookService;
 import com.ca.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.ca.lsp.core.cobol.model.CopybookModel;
@@ -116,14 +117,14 @@ class TestCopybookCaching {
 
   private void assertDidOpenAnalysisFromCache() {
     LOG.info(databus.printCache());
-    runAnalysis("DID_OPEN");
+    runAnalysis(CopybookProcessingMode.ENABLED);
     LOG.info(databus.printCache());
     assertStoredInCache();
   }
 
   private void assertDidChangeAnalysisFromCache() {
     LOG.info(databus.printCache());
-    runAnalysis("DID_CHANGE");
+    runAnalysis(CopybookProcessingMode.SKIP);
     LOG.info(databus.printCache());
     assertStoredInCache();
   }
@@ -131,14 +132,14 @@ class TestCopybookCaching {
   private void assertDidOpenFromCopybookService() {
     // invalidate the cache in order to ask workspace manager to grab the content
     databus.invalidateCache();
-    runAnalysis("DID_OPEN");
+    runAnalysis(CopybookProcessingMode.ENABLED);
     assertStoredInCache();
   }
 
   private void assertDidChangeFromCopybookService() {
     // invalidate the cache in order to ask workspace manager to grab the content
     databus.invalidateCache();
-    runAnalysis("DID_CHANGE");
+    runAnalysis(CopybookProcessingMode.SKIP);
     assertStoredInCache();
   }
 
@@ -146,7 +147,7 @@ class TestCopybookCaching {
     assertTrue(databus.isStored(COPYBOOK_NAME));
   }
 
-  private void runAnalysis(String syncType) {
-    resolution.get().resolve(COPYBOOK_NAME, DOCUMENT_URI, syncType);
+  private void runAnalysis(CopybookProcessingMode copybookProcessingMode) {
+    resolution.get().resolve(COPYBOOK_NAME, DOCUMENT_URI, copybookProcessingMode);
   }
 }

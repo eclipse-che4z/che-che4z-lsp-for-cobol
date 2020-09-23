@@ -29,8 +29,7 @@ import java.nio.file.Path;
 
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.REQUIRED_COPYBOOK_EVENT;
-import static com.ca.lsp.cobol.service.CopybookProcessingMode.DISABLED;
-import static com.ca.lsp.cobol.service.CopybookProcessingMode.ENABLED;
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.*;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_2_URI;
 import static com.ca.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static java.util.Arrays.asList;
@@ -94,7 +93,7 @@ class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
 
     verify(files).getNameFromURI(DOCUMENT_URI);
@@ -125,7 +124,7 @@ class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
 
     verify(files).getNameFromURI(DOCUMENT_URI);
@@ -149,7 +148,7 @@ class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(DISABLED.name())
+            .copybookProcessingMode(DISABLED)
             .build());
 
     verify(broker).postData(FetchedCopybookEvent.builder().name(VALID_CPY_NAME).build());
@@ -168,7 +167,7 @@ class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(INVALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
 
     verify(files).getNameFromURI(DOCUMENT_URI);
@@ -189,14 +188,14 @@ class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
 
     copybookService.observerCallback(
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(DISABLED.name())
+            .copybookProcessingMode(DISABLED)
             .build());
 
     verify(files, times(2)).getContentByPath(cpyPath);
@@ -222,7 +221,7 @@ class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
 
     verify(broker, timeout(10000))
@@ -240,7 +239,7 @@ class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(DISABLED.name())
+            .copybookProcessingMode(DISABLED)
             .build());
 
     verify(files, times(1)).getContentByPath(cpyPath);
@@ -269,7 +268,7 @@ class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
 
     copybookService.invalidateURICache();
@@ -278,7 +277,7 @@ class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
 
     // Check the requests applied same logic
@@ -308,7 +307,7 @@ class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
 
     verify(broker, timeout(10000).times(1))
@@ -338,20 +337,20 @@ class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(INVALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
     copybookService.observerCallback(
         RequiredCopybookEvent.builder()
             .name(VALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
     // Second document parsed
     copybookService.observerCallback(
         RequiredCopybookEvent.builder()
             .name(INVALID_2_CPY_NAME)
             .documentUri(DOCUMENT_2_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
 
     // Wait for all settingsService calls processed
@@ -372,27 +371,30 @@ class CopybookServiceTest {
         AnalysisFinishedEvent.builder()
             .documentUri(DOCUMENT_URI)
             .copybookUris(emptyList())
+            .copybookProcessingMode(ENABLED)
             .build());
     verify(settingsService, times(1))
-        .getConfigurations(singletonList("copybook-download.document.INVALID"));
+        .getConfigurations(singletonList("copybook-download.quiet.document.INVALID"));
 
     // Others parsing done events for first document are not trigger settingsService
     copybookService.observerCallback(
         AnalysisFinishedEvent.builder()
             .documentUri(DOCUMENT_URI)
             .copybookUris(emptyList())
+            .copybookProcessingMode(ENABLED)
             .build());
     verify(settingsService, times(1))
-        .getConfigurations(singletonList("copybook-download.document.INVALID"));
+        .getConfigurations(singletonList("copybook-download.quiet.document.INVALID"));
 
     // Second document parsing done
     copybookService.observerCallback(
         AnalysisFinishedEvent.builder()
             .documentUri(DOCUMENT_2_URI)
             .copybookUris(emptyList())
+            .copybookProcessingMode(ENABLED)
             .build());
     verify(settingsService, times(1))
-        .getConfigurations(singletonList("copybook-download.document2.INVALID_2"));
+        .getConfigurations(singletonList("copybook-download.quiet.document2.INVALID_2"));
   }
 
   /**
@@ -420,20 +422,20 @@ class CopybookServiceTest {
         RequiredCopybookEvent.builder()
             .name(INVALID_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
     copybookService.observerCallback(
         RequiredCopybookEvent.builder()
             .name(PARENT_CPY_NAME)
             .documentUri(DOCUMENT_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
     // Nested copybook declaration
     copybookService.observerCallback(
         RequiredCopybookEvent.builder()
             .name(NESTED_CPY_NAME)
             .documentUri(PARENT_CPY_URI)
-            .copybookProcessingMode(ENABLED.name())
+            .copybookProcessingMode(ENABLED)
             .build());
 
     // Wait for all settingsService calls processed
@@ -456,10 +458,11 @@ class CopybookServiceTest {
         AnalysisFinishedEvent.builder()
             .documentUri(DOCUMENT_URI)
             .copybookUris(asList(PARENT_CPY_URI, DOCUMENT_URI))
+            .copybookProcessingMode(ENABLED)
             .build());
 
     verify(settingsService, times(1))
         .getConfigurations(
-            asList("copybook-download.document.nested", "copybook-download.document.INVALID"));
+            asList("copybook-download.quiet.document.nested", "copybook-download.quiet.document.INVALID"));
   }
 }

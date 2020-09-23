@@ -208,7 +208,7 @@ class MyTextDocumentServiceTest extends ConfigurableTest {
             new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0),
             List.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
 
-    verify(engine).analyze(eq(DOCUMENT_URI), anyString(), eq(SKIP));
+    verify(engine, timeout(1000)).analyze(eq(DOCUMENT_URI), anyString(), eq(SKIP));
   }
 
   /**
@@ -237,14 +237,14 @@ class MyTextDocumentServiceTest extends ConfigurableTest {
      *  - document URI [correct|incorrect]
      */
 
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, ENABLED))
         .thenReturn(resultNoErrors);
     when(engine.analyze(
-            DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
+            DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, ENABLED))
         .thenReturn(resultWithErrors);
 
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, DISABLED)).thenReturn(resultNoErrors);
-    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, DISABLED))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, SKIP)).thenReturn(resultNoErrors);
+    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, SKIP))
         .thenReturn(resultWithErrors);
 
     // create a service and verify is subscribed to the required event
@@ -353,7 +353,11 @@ class MyTextDocumentServiceTest extends ConfigurableTest {
     verify(engine, timeout(10000)).analyze(uri, textToAnalyse, CopybookProcessingMode.ENABLED);
     verify(dataBus, timeout(10000))
         .postData(
-            AnalysisFinishedEvent.builder().documentUri(uri).copybookUris(emptyList()).build());
+            AnalysisFinishedEvent.builder()
+                .documentUri(uri)
+                .copybookUris(emptyList())
+                .copybookProcessingMode(ENABLED)
+                .build());
     verify(communications, timeout(10000)).cancelProgressNotification(uri);
     verify(communications, timeout(10000)).publishDiagnostics(diagnostics);
   }
@@ -449,6 +453,7 @@ class MyTextDocumentServiceTest extends ConfigurableTest {
             AnalysisFinishedEvent.builder()
                 .documentUri(DOCUMENT_URI)
                 .copybookUris(asList(NESTED_CPY_URI, DOCUMENT_URI, PARENT_CPY_URI))
+                .copybookProcessingMode(ENABLED)
                 .build());
   }
 

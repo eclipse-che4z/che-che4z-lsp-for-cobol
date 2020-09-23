@@ -15,6 +15,7 @@
 
 package com.ca.lsp.core.cobol.engine;
 
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.core.cobol.model.*;
 import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
@@ -42,7 +43,7 @@ class CobolLanguageEngineTest {
 
   private static final String TEXT = "       IDENTIFICATION DIVISION.";
   private static final String URI = "document.cbl";
-  private static final String SYNC_TYPE = "DID_OPEN";
+  private static final CopybookProcessingMode PROCESSING_MODE = CopybookProcessingMode.ENABLED;
 
   @Test
   void testLanguageEngineRun() {
@@ -97,7 +98,7 @@ class CobolLanguageEngineTest {
                     Map.of())),
             Map.of());
 
-    when(preprocessor.process(URI, TEXT, SYNC_TYPE))
+    when(preprocessor.process(URI, TEXT, PROCESSING_MODE))
         .thenReturn(new ResultWithErrors<>(extendedDocument, List.of(error)));
 
     Range outlineRange =
@@ -125,7 +126,7 @@ class CobolLanguageEngineTest {
                 Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), expectedOutlineTree),
             List.of(error));
 
-    ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, SYNC_TYPE);
+    ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, PROCESSING_MODE);
 
     assertEquals(expected, actual);
   }

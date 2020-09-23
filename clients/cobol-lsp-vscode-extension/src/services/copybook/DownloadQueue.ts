@@ -13,13 +13,7 @@
  */
 
 export class CopybookProfile {
-    readonly copybook: string;
-    readonly profile: string;
-
-    constructor(copybook: string, profile: string) {
-        this.copybook = copybook;
-        this.profile = profile;
-    }
+    constructor(readonly copybook: string, readonly profile: string) {}
 
     public equals(other: CopybookProfile): boolean {
         return this.copybook == other.copybook && this.profile == other.profile;
@@ -57,6 +51,10 @@ export class DownloadQueue {
 
     public get length(): number {
         return this.queue.length;
+    }
+
+    public clean(): void {
+        this.queue = [];
     }
 
     public stop(): void {

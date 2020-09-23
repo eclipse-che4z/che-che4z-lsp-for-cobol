@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor;
 
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
@@ -22,11 +23,11 @@ import java.util.Deque;
 /** The CobolPreprocessor is engaged in order to process, transform and parse the document */
 public interface CobolPreprocessor {
   ResultWithErrors<ExtendedDocument> process(
-      String documentUri, String cobolCode, String copybookProcessingMode);
+      String documentUri, String cobolCode, CopybookProcessingMode copybookProcessingMode);
 
   ResultWithErrors<ExtendedDocument> process(
       String documentUri,
       String cobolCode,
       Deque<CopybookUsage> semanticContext,
-      String copybookProcessingMode);
+      CopybookProcessingMode copybookProcessingMode);
 }

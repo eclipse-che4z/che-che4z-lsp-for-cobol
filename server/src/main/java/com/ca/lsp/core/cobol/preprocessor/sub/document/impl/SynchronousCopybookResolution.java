@@ -19,6 +19,7 @@ import com.broadcom.lsp.domain.cobol.databus.api.DataBusBroker;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.core.cobol.model.CopybookModel;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.CopybookResolution;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +71,7 @@ public class SynchronousCopybookResolution
   public CopybookModel resolve(
       @Nonnull String copybookName,
       @Nonnull String documentUri,
-      @Nonnull String copybookProcessingMode) {
+      @Nonnull CopybookProcessingMode copybookProcessingMode) {
     checkState();
     CopybookModel result = null;
     if (isCopybookInCache(copybookName)) {

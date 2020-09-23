@@ -16,5 +16,5 @@ import {TelemetryService} from "../services/reporter/TelemetryService";
 
 export function fetchCopybookCommand(copybook: string, downloader: CopybookDownloadService, programName: string) {
     TelemetryService.registerEvent("Fetch copybook", ["COBOL", "copybook", "quickfix"], "The user tries to resolve a copybook that is not currently found");
-    downloader.downloadCopybooks(programName, [copybook]);
+    downloader.downloadCopybooks(programName, [copybook], false);
 }

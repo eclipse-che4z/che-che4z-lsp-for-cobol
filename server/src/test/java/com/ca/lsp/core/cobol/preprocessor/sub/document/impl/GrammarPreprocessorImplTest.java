@@ -15,6 +15,7 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.core.cobol.model.*;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessor;
 import com.ca.lsp.core.cobol.preprocessor.sub.document.GrammarPreprocessorListenerFactory;
@@ -42,7 +43,7 @@ class GrammarPreprocessorImplTest {
   private static final String DOCUMENT = "document";
   private static final String TEXT = "COPY CPYNAME.";
   private static final String RESULT = "RESULT";
-  private static final String SYNC_TYPE = "DID_OPEN";
+  private static final CopybookProcessingMode PROCESSING_MODE = CopybookProcessingMode.ENABLED;
   private static final String CPYNAME = "CPYNAME";
 
   private static final Locality RESULT_POS =
@@ -79,7 +80,7 @@ class GrammarPreprocessorImplTest {
             RESULT, copybooks, Map.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping), Map.of());
 
     when(factory.create(
-            eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(SYNC_TYPE)))
+            eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(PROCESSING_MODE)))
         .thenReturn(listener);
     when(listener.getErrors()).thenReturn(errors);
     when(listener.getResult()).thenReturn(expectedDocument);
@@ -87,10 +88,10 @@ class GrammarPreprocessorImplTest {
     GrammarPreprocessor preprocessor = new GrammarPreprocessorImpl(factory);
 
     ResultWithErrors<ExtendedDocument> extendedDocument =
-        preprocessor.buildExtendedDocument(DOCUMENT, TEXT, copybookStack, SYNC_TYPE);
+        preprocessor.buildExtendedDocument(DOCUMENT, TEXT, copybookStack, PROCESSING_MODE);
 
     verify(factory)
-        .create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(SYNC_TYPE));
+        .create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(PROCESSING_MODE));
     assertEquals(RESULT, extendedDocument.getResult().getText());
     assertEquals(copybooks, extendedDocument.getResult().getCopybooks());
     assertEquals(mainMapping, expectedDocument.getDocumentMapping().get(DOCUMENT));

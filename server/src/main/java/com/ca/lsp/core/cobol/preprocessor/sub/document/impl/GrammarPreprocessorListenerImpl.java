@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document.impl;
 
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.core.cobol.model.*;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessor.*;
 import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
@@ -78,7 +79,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   private String documentUri;
   private BufferedTokenStream tokens;
-  private String copybookProcessingMode;
+  private CopybookProcessingMode copybookProcessingMode;
   private CobolPreprocessor preprocessor;
   private Provider<CopybookResolution> resolutions;
   private Deque<CopybookUsage> copybookStack;
@@ -86,10 +87,10 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Inject
   GrammarPreprocessorListenerImpl(
-      @Assisted("uri") String documentUri,
+      @Assisted String documentUri,
       @Assisted BufferedTokenStream tokens,
       @Assisted Deque<CopybookUsage> copybookStack,
-      @Assisted("copybookProcessingMode") String copybookProcessingMode,
+      @Assisted CopybookProcessingMode copybookProcessingMode,
       CobolPreprocessor preprocessor,
       Provider<CopybookResolution> resolutions,
       ReplacingService replacingService) {
@@ -147,7 +148,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitCopyStatement(@Nonnull CopyStatementContext ctx) {
-    if ("DISABLED".equals(copybookProcessingMode)) {
+    if (!copybookProcessingMode.analyze) {
       pop();
       return;
     }
