@@ -15,12 +15,12 @@
 
 package com.ca.lsp.cobol.usecases.engine;
 
+import com.broadcom.usecase.UseCasePreprocessorLexer;
+import com.broadcom.usecase.UseCasePreprocessorParser;
+import com.broadcom.usecase.UseCasePreprocessorParser.StartRuleContext;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import com.ca.lsp.core.cobol.parser.UseCasePreprocessorLexer;
-import com.ca.lsp.core.cobol.parser.UseCasePreprocessorParser;
-import com.ca.lsp.core.cobol.parser.UseCasePreprocessorParser.StartRuleContext;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
