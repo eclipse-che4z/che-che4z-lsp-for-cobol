@@ -69,7 +69,7 @@ export class CopybookDownloadService implements vscode.Disposable {
                 return;
             }
         }
-        copybookNames.forEach(copybook => this.queue.push(copybook, profile));
+        copybookNames.forEach(copybook => this.queue.push(copybook, profile, quiet));
     }
 
     private static async showQueueLockedDialog(profileName: string): Promise<boolean> {
@@ -137,7 +137,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         while (this.queue.length > 0) {
             toDownload.push(await this.queue.pop());
         }
-        toDownload.map(cp => cp.copybook).forEach(cb => errors.add(cb));
+        toDownload.filter(cp => !cp.quiet).map(cp => cp.copybook).forEach(cb => errors.add(cb));
         try {
             for (const dataset of await this.pathGenerator.listDatasets()) {
                 await this.handleDataset(dataset, toDownload, errors, progress);
@@ -161,7 +161,9 @@ export class CopybookDownloadService implements vscode.Disposable {
                 }
             }
             TelemetryService.registerExceptionEvent(undefined, errorMessage, ["copybook", "COBOL", "experiment-tag"], "There is an issue with zowe api layer");
-            vscode.window.showErrorMessage(errorMessage);
+            if (CopybookDownloadService.needsUserNotification(toDownload)) {
+                vscode.window.showErrorMessage(errorMessage);
+            }
         }
     }
 
@@ -171,10 +173,12 @@ export class CopybookDownloadService implements vscode.Disposable {
         errors: Set<string>,
         progress: vscode.Progress<{ message?: string; increment?: number }>) {
         try {
-            progress.report({
-                message: "Looking in " + dataset + ". " + toDownload.length +
-                    " copybook(s) left.",
-            });
+            if (CopybookDownloadService.needsUserNotification(toDownload)) {
+                progress.report({
+                    message: "Looking in " + dataset + ". " + toDownload.length +
+                        " copybook(s) left.",
+                });
+            }
             for (const cp of toDownload) {
                 await this.handleCopybook(dataset, cp, errors);
             }
@@ -187,8 +191,14 @@ export class CopybookDownloadService implements vscode.Disposable {
                     throw e;
                 }
             }
-            vscode.window.showErrorMessage(errorMessage);
+            if (CopybookDownloadService.needsUserNotification(toDownload)) {
+                vscode.window.showErrorMessage(errorMessage);
+            }
         }
+    }
+
+    private static needsUserNotification(queue: CopybookProfile[]): boolean {
+        return queue.find(profile => !profile.quiet) !== undefined;
     }
 
     private async handleCopybook(dataset: string, cp: CopybookProfile, errors: Set<string>) {
@@ -201,7 +211,9 @@ export class CopybookDownloadService implements vscode.Disposable {
             if (e instanceof ZoweError) {
                 throw e;
             }
-            vscode.window.showErrorMessage(e.toString());
+            if (!cp.quiet) {
+                vscode.window.showErrorMessage(e.toString());
+            }
         }
     }
 
@@ -213,7 +225,9 @@ export class CopybookDownloadService implements vscode.Disposable {
             if (error instanceof ZoweError) {
                 throw error;
             }
-            CopybookDownloadService.processDownloadError("Can't read members of dataset: " + dataset);
+            if (!copybookProfile.quiet) {
+                CopybookDownloadService.processDownloadError("Can't read members of dataset: " + dataset);
+            }
             return false;
         }
         if (!members.includes(copybookProfile.copybook)) {
