@@ -16,8 +16,6 @@ package com.ca.lsp.cobol.service;
 import org.junit.jupiter.api.Test;
 
 import static com.ca.lsp.cobol.service.CopybookProcessingMode.*;
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
 import static org.junit.Assert.assertEquals;
 
 class CopybookProcessingModeTest {
@@ -33,13 +31,13 @@ class CopybookProcessingModeTest {
    */
   @Test
   void disableCopybookOnExtendedDocument() {
-    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, DID_OPEN));
-    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, DID_CHANGE));
+    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, ENABLED));
+    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, SKIP));
   }
 
   @Test
   void enableCopybookOnNonExtendedDocumentInDidOpen() {
-    assertEquals(ENABLED, getCopybookProcessingMode(DOC_URI, DID_OPEN));
+    assertEquals(ENABLED, getCopybookProcessingMode(DOC_URI, ENABLED));
   }
 
   /**
@@ -49,7 +47,7 @@ class CopybookProcessingModeTest {
    */
   @Test
   void enableCopybookOnFakeURI() {
-    assertEquals(ENABLED, getCopybookProcessingMode(FAKE_EXT_SRC_DOC_URI, DID_OPEN));
+    assertEquals(ENABLED, getCopybookProcessingMode(FAKE_EXT_SRC_DOC_URI, ENABLED));
   }
 
   /**
@@ -58,6 +56,6 @@ class CopybookProcessingModeTest {
    */
   @Test
   void enableCopybookOnBadExtendedSourceFolders() {
-    assertEquals(ENABLED, getCopybookProcessingMode(WRONG_EXT_SRC_DOC_URI, DID_OPEN));
+    assertEquals(ENABLED, getCopybookProcessingMode(WRONG_EXT_SRC_DOC_URI, ENABLED));
   }
 }

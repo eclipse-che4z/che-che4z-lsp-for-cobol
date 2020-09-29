@@ -15,27 +15,26 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
 import {
-    CONN_REFUSED_ERROR_MSG,
+    CONN_REFUSED_ERROR_MSG, DOWNLOAD_QUEUE_LOCKED_ERROR_MSG,
     DSN_NOT_FOUND_ERROR_MSG,
     DSN_PLACEHOLDER,
     INVALID_CREDENTIALS_ERROR_MSG,
     NO_PASSWORD_ERROR_MSG,
     PROCESS_DOWNLOAD_ERROR_MSG,
-    PROFILE_NAME_PLACEHOLDER,
+    PROFILE_NAME_PLACEHOLDER, UNLOCK_DOWNLOAD_QUEUE_MSG,
 } from "../../constants";
-import {CopybookProfile, DownloadQueue} from "../DownloadQueue";
+import {CopybookProfile, DownloadQueue} from "./DownloadQueue";
 import {ProfileService} from "../ProfileService";
 import {TelemetryService} from "../reporter/TelemetryService";
 import {ZoweApi} from "../ZoweApi";
 import {Type, ZoweError} from "../ZoweError";
-import {CopybookFix} from "./CopybookFix";
 import {checkWorkspace, CopybooksPathGenerator, createCopybookPath, createDatasetPath} from "./CopybooksPathGenerator";
 
 export class CopybookDownloadService implements vscode.Disposable {
     private queue: DownloadQueue = new DownloadQueue();
+    private lockedProfile: Set<string> = new Set();
 
     public constructor(
-        private resolver: CopybookFix,
         private zoweApi: ZoweApi,
         private profileService: ProfileService,
         private pathGenerator: CopybooksPathGenerator) {
@@ -47,31 +46,50 @@ export class CopybookDownloadService implements vscode.Disposable {
      * to download from MF
      * @param cobolFileName name of the document open in workspace
      * @param copybookNames list of names of the copybooks required by the LSP server
+     * @param quiet flag described that interaction with a user is not allowed
      */
-    public async downloadCopybooks(cobolFileName: string, copybookNames: string[]): Promise<void> {
+    public async downloadCopybooks(cobolFileName: string, copybookNames: string[], quiet: boolean = true): Promise<void> {
         if (!checkWorkspace()) {
             return;
         }
         const profile: string = await this.profileService.resolveProfile(cobolFileName);
         if (!profile) {
-            this.createErrorMessageForCopybooks(new Set<string>(copybookNames));
+            if (!quiet) {
+                CopybookDownloadService.createErrorMessageForCopybooks(new Set<string>(copybookNames));
+            }
             return;
         }
-        await this.resolver.addCopybookInQueue(copybookNames, profile);
+        if (this.lockedProfile.has(profile)) {
+            if (quiet) {
+                return;
+            }
+            if (await CopybookDownloadService.showQueueLockedDialog(profile)) {
+                this.lockedProfile.delete(profile);
+            } else {
+                return;
+            }
+        }
+        copybookNames.forEach(copybook => this.queue.push(copybook, profile));
+    }
+
+    private static async showQueueLockedDialog(profileName: string): Promise<boolean> {
+        const action = await vscode.window.showErrorMessage(
+            DOWNLOAD_QUEUE_LOCKED_ERROR_MSG.replace(PROFILE_NAME_PLACEHOLDER, profileName),
+            UNLOCK_DOWNLOAD_QUEUE_MSG);
+        return action === UNLOCK_DOWNLOAD_QUEUE_MSG;
     }
 
     public async start() {
-
-        let startTime: number = Date.now();
-        this.resolver.setQueue(this.queue);
-
-        let done = false;
+        let startTime: number | null = null;
         const errors = new Set<string>();
-        while (!done) {
+        while (true) {
             const element: CopybookProfile | undefined = await this.queue.pop();
             if (!element) {
-                done = true;
-                continue;
+                // undefined element means that service is disposed
+                return;
+            }
+            if (startTime === null) {
+                startTime = Date.now();
             }
             await vscode.window.withProgress(
                 {
@@ -82,20 +100,29 @@ export class CopybookDownloadService implements vscode.Disposable {
                     await this.handleQueue(element, errors, progress);
 
                     if (this.queue.length === 0 && errors.size > 0) {
-                        this.createErrorMessageForCopybooks(errors);
+                        CopybookDownloadService.createErrorMessageForCopybooks(errors);
                         errors.clear();
                     }
 
                     if (this.queue.length === 0) {
                         TelemetryService.registerEvent("Download copybooks from MF", ["copybook", "COBOL", "experiment-tag"], "total time to search copybooks on MF", new Map().set("time elapsed", TelemetryService.calculateTimeElapsed(startTime, Date.now())));
-                        startTime = 0;
+                        startTime = null;
                     }
                 });
         }
     }
 
-    private createErrorMessageForCopybooks(datasets: Set<string>) {
-        this.resolver.processDownloadError(PROCESS_DOWNLOAD_ERROR_MSG + Array.from(datasets));
+    private static createErrorMessageForCopybooks(datasets: Set<string>) {
+        CopybookDownloadService.processDownloadError(PROCESS_DOWNLOAD_ERROR_MSG + Array.from(datasets));
+    }
+
+    private static processDownloadError(title: string) {
+        const actionSettings = "Change settings";
+        vscode.window.showErrorMessage(title, actionSettings).then((action) => {
+            if (action === actionSettings) {
+                vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.goto-settings");
+            }
+        });
     }
 
     public dispose() {
@@ -121,14 +148,15 @@ export class CopybookDownloadService implements vscode.Disposable {
                 switch (e.type) {
                     case Type.InvalidCredentials:
                         errorMessage = INVALID_CREDENTIALS_ERROR_MSG.replace(PROFILE_NAME_PLACEHOLDER, element.profile);
+                        this.lockedProfile.add(element.profile);
+                        this.queue.clean();
+                        TelemetryService.registerEvent("invalidCredentials", ["copybook", "COBOL", "experiment-tag"], "Zowe credentials is not valid");
                         break;
                     case Type.ConnRefused:
                         errorMessage = CONN_REFUSED_ERROR_MSG.replace(PROFILE_NAME_PLACEHOLDER, element.profile);
                         break;
                     case Type.NoPassword:
                         errorMessage = NO_PASSWORD_ERROR_MSG.replace(PROFILE_NAME_PLACEHOLDER, element.profile);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -185,7 +213,7 @@ export class CopybookDownloadService implements vscode.Disposable {
             if (error instanceof ZoweError) {
                 throw error;
             }
-            await this.resolver.processDownloadError("Can't read members of dataset: " + dataset);
+            CopybookDownloadService.processDownloadError("Can't read members of dataset: " + dataset);
             return false;
         }
         if (!members.includes(copybookProfile.copybook)) {

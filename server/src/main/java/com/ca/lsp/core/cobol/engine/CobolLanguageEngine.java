@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.core.cobol.engine;
 
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.Locality;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
@@ -68,7 +69,7 @@ public class CobolLanguageEngine {
    */
   @Nonnull
   public ResultWithErrors<SemanticContext> run(
-      @Nonnull String documentUri, @Nonnull String text, @Nonnull String copybookProcessingMode) {
+      @Nonnull String documentUri, @Nonnull String text, @Nonnull CopybookProcessingMode copybookProcessingMode) {
 
     ResultWithErrors<ExtendedDocument> preProcessorOutput =
         preprocessor.process(documentUri, text, copybookProcessingMode);

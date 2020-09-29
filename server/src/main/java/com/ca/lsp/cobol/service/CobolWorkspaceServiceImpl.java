@@ -81,7 +81,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private Runnable executeCopybookFix(@Nonnull ExecuteCommandParams params) {
     return () -> {
       if (MISSING_COPYBOOK.name().equals(params.getCommand())) {
-        rerunAnalysis();
+        rerunAnalysis(true);
       }
     };
   }
@@ -104,7 +104,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     List<String> watchingFolders = watchingService.getWatchingFolders();
 
     updateWatchers(localFolders, watchingFolders);
-    rerunAnalysis();
+    rerunAnalysis(false);
     copybookService.invalidateURICache();
   }
 
@@ -124,13 +124,13 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    */
   @Override
   public void didChangeWatchedFiles(@Nonnull DidChangeWatchedFilesParams params) {
-    rerunAnalysis();
+    rerunAnalysis(false);
   }
 
-  private void rerunAnalysis() {
+  private void rerunAnalysis(boolean verbose) {
     dataBus.invalidateCache();
     LOG.info("Cache invalidated");
-    dataBus.postData(new RunAnalysisEvent());
+    dataBus.postData(new RunAnalysisEvent(verbose));
   }
 
   @Nonnull

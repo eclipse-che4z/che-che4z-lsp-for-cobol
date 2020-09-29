@@ -40,9 +40,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
-import static com.ca.lsp.cobol.service.CopybookProcessingMode.getCopybookProcessingMode;
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_CHANGE;
-import static com.ca.lsp.cobol.service.TextDocumentSyncType.DID_OPEN;
+import static com.ca.lsp.cobol.service.CopybookProcessingMode.*;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -207,7 +205,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
 
   @Override
   public void observerCallback(@Nonnull RunAnalysisEvent event) {
-    docs.forEach((key, value) -> analyzeDocumentFirstTime(key, value.getText()));
+    docs.forEach((key, value) -> analyzeDocumentFirstTime(key, value.getText(), event.verbose));
   }
 
   private void registerEngineAndAnalyze(String uri, String languageType, String text) {
@@ -216,7 +214,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
       communications.notifyThatExtensionIsUnsupported(fileExtension);
     } else if (isCobolFile(languageType)) {
       communications.notifyThatLoadingInProgress(uri);
-      analyzeDocumentFirstTime(uri, text);
+      analyzeDocumentFirstTime(uri, text, false);
     } else {
       communications.notifyThatEngineNotFound(languageType);
     }
@@ -233,14 +231,16 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
         .orElse(null);
   }
 
-  private void analyzeDocumentFirstTime(String uri, String text) {
+  private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
     registerDocument(uri, new MyDocumentModel(text, AnalysisResult.empty()));
     runAsync(
             () -> {
+              CopybookProcessingMode copybookProcessingMode =
+                  getCopybookProcessingMode(uri, userRequest ? ENABLED_VERBOSE : ENABLED);
               AnalysisResult result =
-                  engine.analyze(uri, text, getCopybookProcessingMode(uri, DID_OPEN));
+                  engine.analyze(uri, text, copybookProcessingMode);
               ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
-              publishResult(uri, result);
+              publishResult(uri, result, copybookProcessingMode);
               outlineMap.get(uri).complete(result.getOutlineTree());
             })
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
@@ -250,7 +250,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
     runAsync(
             () -> {
               AnalysisResult result =
-                  engine.analyze(uri, text, getCopybookProcessingMode(uri, DID_CHANGE));
+                  engine.analyze(uri, text, getCopybookProcessingMode(uri, SKIP));
               registerDocument(uri, new MyDocumentModel(text, result));
               communications.publishDiagnostics(result.getDiagnostics());
               outlineMap.get(uri).complete(result.getOutlineTree());
@@ -258,14 +258,15 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
   }
 
-  private void publishResult(String uri, AnalysisResult result) {
-    notifyAnalysisFinished(uri, result.getCopybookUsages());
+  private void publishResult(String uri, AnalysisResult result, CopybookProcessingMode copybookProcessingMode) {
+    notifyAnalysisFinished(uri, result.getCopybookUsages(), copybookProcessingMode);
     communications.cancelProgressNotification(uri);
     communications.publishDiagnostics(result.getDiagnostics());
     if (result.getDiagnostics().isEmpty()) communications.notifyThatDocumentAnalysed(uri);
   }
 
-  private void notifyAnalysisFinished(String uri, Map<String, List<Location>> copybooks) {
+  private void notifyAnalysisFinished(String uri, Map<String, List<Location>> copybooks,
+                                      CopybookProcessingMode copybookProcessingMode) {
     dataBus.postData(
         AnalysisFinishedEvent.builder()
             .documentUri(uri)
@@ -275,6 +276,7 @@ public class MyTextDocumentService implements TextDocumentService, EventObserver
                     .map(Location::getUri)
                     .distinct()
                     .collect(toList()))
+            .copybookProcessingMode(copybookProcessingMode)
             .build());
   }
 

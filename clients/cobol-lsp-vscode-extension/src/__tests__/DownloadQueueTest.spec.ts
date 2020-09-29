@@ -11,7 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { DownloadQueue } from "../services/DownloadQueue";
+import { DownloadQueue } from "../services/copybook/DownloadQueue";
 
 describe("Check download queue", () => {
     const element = "Test";

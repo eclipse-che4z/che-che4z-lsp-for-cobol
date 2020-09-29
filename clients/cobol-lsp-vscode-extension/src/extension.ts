@@ -20,7 +20,6 @@ import {fetchCopybookCommand} from "./commands/FetchCopybookCommand";
 import {gotoCopybookSettings} from "./commands/OpenSettingsCommand";
 import {C4Z_FOLDER, GITIGNORE_FILE, LANGUAGE_ID, SETTINGS_SECTION} from "./constants";
 import {CopybookDownloadService} from "./services/copybook/CopybookDownloadService";
-import {CopybookFix} from "./services/copybook/CopybookFix";
 import {CopybooksCodeActionProvider} from "./services/copybook/CopybooksCodeActionProvider";
 import {CopybooksPathGenerator} from "./services/copybook/CopybooksPathGenerator";
 
@@ -39,9 +38,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const zoweApi: ZoweApi = new ZoweApi();
     const profileService: ProfileService = new ProfileService(zoweApi);
-    const copybookFix: CopybookFix = new CopybookFix();
     const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
-    const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService(copybookFix, zoweApi, profileService, copybooksPathGenerator);
+    const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService(zoweApi, profileService, copybooksPathGenerator);
     const pathsService: PathsService = new PathsService();
     const middleware: Middleware = new Middleware(new CopybookURI(profileService), copyBooksDownloader);
     const languageClientService: LanguageClientService = new LanguageClientService(middleware);

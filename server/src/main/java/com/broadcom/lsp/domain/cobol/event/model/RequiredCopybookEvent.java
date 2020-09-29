@@ -16,6 +16,7 @@
 
 package com.broadcom.lsp.domain.cobol.event.model;
 
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,10 +30,10 @@ import lombok.NoArgsConstructor;
 public class RequiredCopybookEvent extends DataEvent {
   private String name;
   private String documentUri;
-  private String copybookProcessingMode;
+  private CopybookProcessingMode copybookProcessingMode;
 
   @Builder
-  public RequiredCopybookEvent(String name, String documentUri, String copybookProcessingMode) {
+  public RequiredCopybookEvent(String name, String documentUri, CopybookProcessingMode copybookProcessingMode) {
     super(DataEventType.REQUIRED_COPYBOOK_EVENT, DataEventType.REQUIRED_COPYBOOK_EVENT.getId());
     this.name = name;
     this.documentUri = documentUri;

@@ -66,7 +66,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     if (isEmpty(text)) {
       return empty();
     }
-    return toAnalysisResult(engine.run(uri, text, copybookProcessingMode.toString()), uri);
+    return toAnalysisResult(engine.run(uri, text, copybookProcessingMode), uri);
   }
 
   /**

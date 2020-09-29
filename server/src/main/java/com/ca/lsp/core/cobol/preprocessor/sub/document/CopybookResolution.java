@@ -15,6 +15,7 @@
 
 package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.core.cobol.model.CopybookModel;
 
 import javax.annotation.Nonnull;
@@ -28,10 +29,11 @@ public interface CopybookResolution {
    *
    * @param copybookName - the name of the copybook to be retrieved
    * @param documentUri - the currently processing document that contains the copy statement
-   * @param syncType - text document synchronization type
+   * @param copybookProcessingMode - text document synchronization type
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   @Nullable
   CopybookModel resolve(
-      @Nonnull String copybookName, @Nonnull String documentUri, @Nonnull String syncType);
+      @Nonnull String copybookName, @Nonnull String documentUri,
+      @Nonnull CopybookProcessingMode copybookProcessingMode);
 }
