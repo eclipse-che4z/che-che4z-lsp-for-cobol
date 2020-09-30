@@ -11,7 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { DownloadQueue } from "../services/DownloadQueue";
+import { DownloadQueue } from "../services/copybook/DownloadQueue";
 
 describe("Check download queue", () => {
     const element = "Test";
@@ -19,34 +19,40 @@ describe("Check download queue", () => {
     const elementExtra = "Test_Extra";
     it("can add elements to queue", async () => {
         const queue: DownloadQueue = new DownloadQueue();
-        queue.push(element, profile);
+        queue.push(element, profile, false);
         const e = await queue.pop();
-        expect(e).toEqual({ copybook: element, profile });
+        expect(e).toEqual({ copybook: element, profile, quiet:false });
         expect(0).toEqual(queue.length);
     });
     it("can wait", async () => {
         const queue: DownloadQueue = new DownloadQueue();
         const result = queue.pop().then(e => {
-            expect(e).toEqual({ copybook: element, profile });
+            expect(e).toEqual({ copybook: element, profile, quiet: true });
         });
-        queue.push(element, profile);
+        queue.push(element, profile, true);
         await result;
         expect(0).toEqual(queue.length);
     });
     it("can have more then one element", async () => {
         const queue: DownloadQueue = new DownloadQueue();
-        queue.push(element, profile);
-        queue.push(elementExtra, profile);
-        expect(await queue.pop()).toEqual({ copybook: elementExtra, profile });
+        queue.push(element, profile, true);
+        queue.push(elementExtra, profile, false);
+        expect(await queue.pop()).toEqual({ copybook: elementExtra, profile, quiet: false});
         expect(1).toEqual(queue.length);
-        expect(await queue.pop()).toEqual({ copybook: element, profile });
+        expect(await queue.pop()).toEqual({ copybook: element, profile, quiet: true });
         expect(0).toEqual(queue.length);
     });
     it("can ignore duplicates", async () => {
         const queue: DownloadQueue = new DownloadQueue();
-        queue.push(element, profile);
-        queue.push(element, profile);
+        queue.push(element, profile, false);
+        queue.push(element, profile, false);
         expect(1).toEqual(queue.length);
+    });
+    it("saves both elements with different quiet flag", async () => {
+        const queue: DownloadQueue = new DownloadQueue();
+        queue.push(element, profile, false);
+        queue.push(element, profile, true);
+        expect(2).toEqual(queue.length);
     });
     it("can stop", async () => {
         const queue: DownloadQueue = new DownloadQueue();

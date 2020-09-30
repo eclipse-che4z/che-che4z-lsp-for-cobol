@@ -8,6 +8,7 @@
 
 parser grammar CobolParser;
 options {tokenVocab = CobolLexer;}
+import CICSParser;
    
 startRule : compilationUnit EOF;
 
@@ -183,11 +184,11 @@ classClauseThrough
    ;
 
 classClauseFrom
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 classClauseTo
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 currencySignClause
@@ -611,23 +612,23 @@ screenDescriptionUnderlineClause
    ;
 
 screenDescriptionSizeClause
-   : SIZE IS? (generalIdentifier | integerLiteral)
+   : SIZE IS? (integerLiteral | generalIdentifier)
    ;
 
 screenDescriptionLineClause
-   : LINE (NUMBER? IS? (PLUS | PLUSCHAR | MINUSCHAR))? (generalIdentifier | integerLiteral)
+   : LINE (NUMBER? IS? (PLUS | PLUSCHAR | MINUSCHAR))? (integerLiteral | generalIdentifier)
    ;
 
 screenDescriptionColumnClause
-   : (COLUMN | COL) (NUMBER? IS? (PLUS | PLUSCHAR | MINUSCHAR))? (generalIdentifier | integerLiteral)
+   : (COLUMN | COL) (NUMBER? IS? (PLUS | PLUSCHAR | MINUSCHAR))? (integerLiteral | generalIdentifier)
    ;
 
 screenDescriptionForegroundColorClause
-   : (FOREGROUND_COLOR | FOREGROUND_COLOUR) IS? (generalIdentifier | integerLiteral)
+   : (FOREGROUND_COLOR | FOREGROUND_COLOUR) IS? (integerLiteral | generalIdentifier)
    ;
 
 screenDescriptionBackgroundColorClause
-   : (BACKGROUND_COLOR | BACKGROUND_COLOUR) IS? (generalIdentifier | integerLiteral)
+   : (BACKGROUND_COLOR | BACKGROUND_COLOUR) IS? (integerLiteral | generalIdentifier)
    ;
 
 screenDescriptionControlClause
@@ -643,7 +644,7 @@ screenDescriptionPictureClause
    ;
 
 screenDescriptionFromClause
-   : FROM (generalIdentifier | literal) screenDescriptionToClause?
+   : FROM (literal | generalIdentifier) screenDescriptionToClause?
    ;
 
 screenDescriptionToClause
@@ -683,7 +684,7 @@ screenDescriptionRequiredClause
    ;
 
 screenDescriptionPromptClause
-   : PROMPT CHARACTER? IS? (generalIdentifier | literal) screenDescriptionPromptOccursClause?
+   : PROMPT CHARACTER? IS? (literal | generalIdentifier) screenDescriptionPromptOccursClause?
    ;
 
 screenDescriptionPromptOccursClause
@@ -930,16 +931,6 @@ libraryIsGlobalClause
    : IS? GLOBAL
    ;
 
-// data description entry ----------------------------------
-
-// data description utils ----------------------------------
-
-
-otherLevel: LEVEL
-;
-
-// end of data description utils ---------------------------
-
 dataDescriptionEntry
    : dataDescriptionEntryFormat1 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat3 | dataDescriptionEntryExecSql
    ;
@@ -947,7 +938,7 @@ dataDescriptionEntry
 dataDescriptionEntryFormat1
    : otherLevel (FILLER | dataName1)? (dataGroupUsageClause | dataRedefinesClause | dataIntegerStringClause | dataExternalClause | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataPictureClause | dataCommonOwnLocalClause | dataTypeClause | dataUsingClause | dataUsageClause | dataValueClause | dataReceivedByClause | dataOccursClause | dataSignClause | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause | dataWithLowerBoundsClause | dataAlignedClause | dataRecordAreaClause)* (DOT_FS|DOT_FS2)
    ;
-   
+
 dataDescriptionEntryFormat2
    : LEVEL_NUMBER_66 dataName1 dataRenamesClause DOT_FS
    ;
@@ -959,10 +950,10 @@ dataDescriptionEntryFormat3
 dataDescriptionEntryExecSql
    : execSqlStatement+
    ;
-   
+
 dataGroupUsageClause
    : GROUP_USAGE IS? NATIONAL
-   ;   
+   ;
 
 dataAlignedClause
    : ALIGNED
@@ -1011,10 +1002,6 @@ dataPictureClause
 pictureString
    : charString
    ;
-   
-charString
-   : FINALCHARSTRING
-   ;   
 
 dataReceivedByClause
    : RECEIVED? BY? (CONTENT | REFERENCE | REF)
@@ -1103,7 +1090,7 @@ procedureDivisionByReferencePhrase
    ;
 
 procedureDivisionByReference
-   : (OPTIONAL? (generalIdentifier | fileName)) | ANY
+   : (OPTIONAL? (fileName | generalIdentifier)) | ANY
    ;
 
 procedureDivisionByValuePhrase
@@ -1111,7 +1098,7 @@ procedureDivisionByValuePhrase
    ;
 
 procedureDivisionByValue
-   : generalIdentifier | literal | ANY
+   : literal | generalIdentifier | ANY
    ;
 
 procedureDeclaratives
@@ -1150,19 +1137,19 @@ sentence
 
 statement
    : acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement | disableStatement |
-    displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement | execSqlStatement | execSqlImsStatement | 
-    exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement | 
-    multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | 
+    displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement | execSqlStatement | execSqlImsStatement |
+    exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement |
+    multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement |
     sendStatement | serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
     terminateStatement | titleStatement | unstringStatement | writeStatement | xmlStatement
    ;
 
 // accept statement
 
-acceptStatement	
+acceptStatement
    : ACCEPT generalIdentifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?
    ;
-   
+
 acceptFromDateStatement
    : FROM (DATE YYYYMMDD? | DAY YYYYDDD? | DAY_OF_WEEK | TIME | TIMER | TODAYS_DATE MMDDYYYY? | TODAYS_NAME | YEAR | YYYYMMDD | YYYYDDD)
    ;
@@ -1198,7 +1185,7 @@ addCorrespondingStatement
    ;
 
 addFrom
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 addTo
@@ -1206,7 +1193,7 @@ addTo
    ;
 
 addToGiving
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 addGiving
@@ -1248,7 +1235,7 @@ callByReferencePhrase
    ;
 
 callByReference
-   : ((ADDRESS OF | INTEGER | STRING)? generalIdentifier | literal | fileName) | OMITTED
+   : ((ADDRESS OF | INTEGER | STRING)? literal | fileName | generalIdentifier) | OMITTED
    ;
 
 callByValuePhrase
@@ -1256,7 +1243,7 @@ callByValuePhrase
    ;
 
 callByValue
-   : (ADDRESS OF | LENGTH OF?)? (generalIdentifier | literal)
+   : (ADDRESS OF | LENGTH OF?)? (literal | generalIdentifier)
    ;
 
 callByContentPhrase
@@ -1264,7 +1251,7 @@ callByContentPhrase
    ;
 
 callByContent
-   : (ADDRESS OF | LENGTH OF?)? generalIdentifier | literal | OMITTED
+   : (ADDRESS OF | LENGTH OF?)? literal | generalIdentifier | OMITTED
    ;
 
 callGivingPhrase
@@ -1278,7 +1265,7 @@ cancelStatement
    ;
 
 cancelCall
-   : libraryName (BYTITLE | BYFUNCTION) | generalIdentifier | literal
+   : libraryName (BYTITLE | BYFUNCTION) | literal | generalIdentifier
    ;
 
 // close statement
@@ -1312,11 +1299,11 @@ closePortFileIOUsingCloseDisposition
    ;
 
 closePortFileIOUsingAssociatedData
-   : ASSOCIATED_DATA (generalIdentifier | integerLiteral)
+   : ASSOCIATED_DATA (integerLiteral | generalIdentifier)
    ;
 
 closePortFileIOUsingAssociatedDataLength
-   : ASSOCIATED_DATA_LENGTH OF? (generalIdentifier | integerLiteral)
+   : ASSOCIATED_DATA_LENGTH OF? (integerLiteral | generalIdentifier)
    ;
 
 // compute statement
@@ -1344,7 +1331,7 @@ deleteStatement
 // disable statement
 
 disableStatement
-   : DISABLE (INPUT TERMINAL? | I_O TERMINAL | OUTPUT) cdName WITH? KEY (generalIdentifier | literal)
+   : DISABLE (INPUT TERMINAL? | I_O TERMINAL | OUTPUT) cdName WITH? KEY (literal | generalIdentifier)
    ;
 
 // display statement
@@ -1354,11 +1341,11 @@ displayStatement
    ;
 
 displayOperand
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 displayAt
-   : AT (generalIdentifier | literal)
+   : AT (literal | generalIdentifier)
    ;
 
 displayUpon
@@ -1372,7 +1359,7 @@ displayWith
 // divide statement
 
 divideStatement
-   : DIVIDE (generalIdentifier | literal) (divideIntoStatement | divideIntoGivingStatement | divideByGivingStatement) divideRemainder? onSizeErrorPhrase? notOnSizeErrorPhrase? END_DIVIDE?
+   : DIVIDE (literal | generalIdentifier) (divideIntoStatement | divideIntoGivingStatement | divideByGivingStatement) divideRemainder? onSizeErrorPhrase? notOnSizeErrorPhrase? END_DIVIDE?
    ;
 
 divideIntoStatement
@@ -1380,11 +1367,11 @@ divideIntoStatement
    ;
 
 divideIntoGivingStatement
-   : INTO (generalIdentifier | literal) divideGivingPhrase?
+   : INTO (literal | generalIdentifier) divideGivingPhrase?
    ;
 
 divideByGivingStatement
-   : BY (generalIdentifier | literal) divideGivingPhrase?
+   : BY (literal | generalIdentifier) divideGivingPhrase?
    ;
 
 divideGivingPhrase
@@ -1422,7 +1409,7 @@ evaluateStatement
    ;
 
 evaluateSelect
-   : generalIdentifier | literal | arithmeticExpression | condition
+   : literal | arithmeticExpression | condition | generalIdentifier
    ;
 
 evaluateAlsoSelect
@@ -1454,12 +1441,12 @@ evaluateWhenOther
    ;
 
 evaluateValue
-   : generalIdentifier | literal | arithmeticExpression
+   : literal | arithmeticExpression | generalIdentifier
    ;
 
 // exec cics statement
 execCicsStatement
-   : EXEC CICS ~END_EXEC*? END_EXEC DOT_FS?
+   : EXEC CICS allRules END_EXEC DOT_FS?
    ;
 
 // exec sql statement
@@ -1481,7 +1468,7 @@ exhibitStatement
    ;
 
 exhibitOperand
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 // exit statement
@@ -1541,7 +1528,7 @@ initializeReplacingPhrase
    ;
 
 initializeReplacingBy
-   : (ALPHABETIC | ALPHANUMERIC | ALPHANUMERIC_EDITED | NATIONAL | NATIONAL_EDITED | NUMERIC | NUMERIC_EDITED | DBCS | EGCS) DATA? BY (generalIdentifier | literal)
+   : (ALPHABETIC | ALPHANUMERIC | ALPHANUMERIC_EDITED | NATIONAL | NATIONAL_EDITED | NUMERIC | NUMERIC_EDITED | DBCS | EGCS) DATA? BY (literal | generalIdentifier)
    ;
 
 // initiate statement
@@ -1569,7 +1556,7 @@ inspectTallyingReplacingPhrase
    ;
 
 inspectConvertingPhrase
-   : CONVERTING (generalIdentifier | literal) inspectTo inspectBeforeAfter*
+   : CONVERTING (literal | generalIdentifier) inspectTo inspectBeforeAfter*
    ;
 
 inspectFor
@@ -1593,23 +1580,23 @@ inspectReplacingAllLeadings
    ;
 
 inspectAllLeading
-   : (generalIdentifier | literal) inspectBeforeAfter*
+   : (literal | generalIdentifier) inspectBeforeAfter*
    ;
 
 inspectReplacingAllLeading
-   : (generalIdentifier | literal) inspectBy inspectBeforeAfter*
+   : (literal | generalIdentifier) inspectBy inspectBeforeAfter*
    ;
 
 inspectBy
-   : BY (generalIdentifier | literal)
+   : BY (literal | generalIdentifier)
    ;
 
 inspectTo
-   : TO (generalIdentifier | literal)
+   : TO (literal | generalIdentifier)
    ;
 
 inspectBeforeAfter
-   : (BEFORE | AFTER) INITIAL? (generalIdentifier | literal)
+   : (BEFORE | AFTER) INITIAL? (literal | generalIdentifier)
    ;
 
 // merge statement
@@ -1665,7 +1652,7 @@ moveToStatement
    ;
 
 moveToSendingArea
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 moveCorrespondingToStatement
@@ -1679,7 +1666,7 @@ moveCorrespondingToSendingArea
 // multiply statement
 
 multiplyStatement
-   : MULTIPLY (generalIdentifier | literal) BY (multiplyRegular | multiplyGiving) onSizeErrorPhrase? notOnSizeErrorPhrase? END_MULTIPLY?
+   : MULTIPLY (literal | generalIdentifier) BY (multiplyRegular | multiplyGiving) onSizeErrorPhrase? notOnSizeErrorPhrase? END_MULTIPLY?
    ;
 
 multiplyRegular
@@ -1695,7 +1682,7 @@ multiplyGiving
    ;
 
 multiplyGivingOperand
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 multiplyGivingResult
@@ -1751,7 +1738,7 @@ performType
    ;
 
 performTimes
-   : (generalIdentifier | integerLiteral) TIMES
+   : (integerLiteral | generalIdentifier) TIMES
    ;
 
 performUntil
@@ -1767,7 +1754,7 @@ performVaryingClause
    ;
 
 performVaryingPhrase
-   : (generalIdentifier | literal) performFrom performBy performUntil
+   : (literal | generalIdentifier) performFrom performBy performUntil
    ;
 
 performAfter
@@ -1775,11 +1762,11 @@ performAfter
    ;
 
 performFrom
-   : FROM (generalIdentifier | indexName | literal)
+   : FROM (literal | generalIdentifier)
    ;
 
 performBy
-   : BY (generalIdentifier | literal)
+   : BY (literal | generalIdentifier)
    ;
 
 performTestClause
@@ -1903,7 +1890,7 @@ sendStatement
    ;
 
 sendStatementSync
-   : (generalIdentifier | literal) sendFromPhrase? sendWithPhrase? sendReplacingPhrase? sendAdvancingPhrase?
+   : (literal | generalIdentifier) sendFromPhrase? sendWithPhrase? sendReplacingPhrase? sendAdvancingPhrase?
    ;
 
 sendStatementAsync
@@ -1931,7 +1918,7 @@ sendAdvancingPage
    ;
 
 sendAdvancingLines
-   : (generalIdentifier | literal) (LINE | LINES)?
+   : (literal | generalIdentifier) (LINE | LINES)?
    ;
 
 sendAdvancingMnemonic
@@ -1957,11 +1944,11 @@ setTo
    ;
 
 setToValue
-   : ON | OFF | ENTRY (generalIdentifier | literal) | generalIdentifier | literal
+   : ON | OFF | ENTRY (literal | generalIdentifier) | literal | generalIdentifier
    ;
 
 setByValue
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 // service statement
@@ -1969,17 +1956,17 @@ setByValue
 serviceLabelStatement
    : SERVICE LABEL
    ;
-   
-serviceReloadStatement   
+
+serviceReloadStatement
    : SERVICE RELOAD generalIdentifier
    ;
-   
+
 // skip statement
 
 skipStatement
    : SKIP1|SKIP2|SKIP3 DOT_FS?
-   ;   
-   
+   ;
+
 // sort statement
 
 sortStatement
@@ -2051,7 +2038,7 @@ stopStatement
    ;
 
 stopStatementGiving
-   : RUN (GIVING | RETURNING) (generalIdentifier | integerLiteral)
+   : RUN (GIVING | RETURNING) (integerLiteral | generalIdentifier)
    ;
 
 // string statement
@@ -2065,15 +2052,15 @@ stringSendingPhrase
    ;
 
 stringSending
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 stringDelimitedByPhrase
-   : DELIMITED BY? (SIZE | generalIdentifier | literal)
+   : DELIMITED BY? (SIZE | literal | generalIdentifier)
    ;
 
 stringForPhrase
-   : FOR (generalIdentifier | literal)
+   : FOR (literal | generalIdentifier)
    ;
 
 stringIntoPhrase
@@ -2103,7 +2090,7 @@ subtractCorrespondingStatement
    ;
 
 subtractSubtrahend
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 subtractMinuend
@@ -2111,7 +2098,7 @@ subtractMinuend
    ;
 
 subtractMinuendGiving
-   : generalIdentifier | literal
+   : literal | generalIdentifier
    ;
 
 subtractGiving
@@ -2127,12 +2114,12 @@ subtractMinuendCorresponding
 terminateStatement
    : TERMINATE reportName
    ;
-   
+
 // title statement
 
 titleStatement
    : TITLE literal DOT_FS?
-   ;   
+   ;
 
 // unstring statement
 
@@ -2145,11 +2132,11 @@ unstringSendingPhrase
    ;
 
 unstringDelimitedByPhrase
-   : DELIMITED BY? ALL? (generalIdentifier | literal)
+   : DELIMITED BY? ALL? (literal | generalIdentifier)
    ;
 
 unstringOrAllPhrase
-   : OR ALL? (generalIdentifier | literal)
+   : OR ALL? (literal | generalIdentifier)
    ;
 
 unstringIntoPhrase
@@ -2205,7 +2192,7 @@ writeStatement
    ;
 
 writeFromPhrase
-   : FROM (generalIdentifier | literal)
+   : FROM (literal | generalIdentifier)
    ;
 
 writeAdvancingPhrase
@@ -2217,7 +2204,7 @@ writeAdvancingPage
    ;
 
 writeAdvancingLines
-   : (generalIdentifier | literal) (LINE | LINES)?
+   : (literal | generalIdentifier) (LINE | LINES)?
    ;
 
 writeAdvancingMnemonic
@@ -2231,32 +2218,32 @@ writeAtEndOfPagePhrase
 writeNotAtEndOfPagePhrase
    : NOT AT? (END_OF_PAGE | EOP) statement*
    ;
-   
-// xml statement 
+
+// xml statement
 
 xmlStatement
    : XML PARSE generalIdentifier xmlEncoding?  xmlNational?  xmlValidating? xmlProcessinProcedure xmlThru?  onExceptionClause?  notOnExceptionClause? END_XML?
-   ;   
-   
+   ;
+
 xmlEncoding
    : WITH? ENCODING  integerLiteral
    ;
-   
+
 xmlNational
    : RETURNING NATIONAL
-   ;   
-   
-xmlValidating   
+   ;
+
+xmlValidating
    : VALIDATING WITH? (generalIdentifier | FILE literal)
    ;
-   
+
 xmlThru
    : (THROUGH | THRU) procedureName
-   ;   
-   
+   ;
+
 xmlProcessinProcedure
    : PROCESSING PROCEDURE IS? procedureName
-   ;   
+   ;
 
 // statement phrases ----------------------------------
 
@@ -2300,36 +2287,6 @@ onExceptionClause
 
 notOnExceptionClause
    : NOT ON? EXCEPTION statement*
-   ;
-
-// arithmetic expression ----------------------------------
-
-arithmeticExpression
-   : multDivs plusMinus*
-   ;
-
-plusMinus  
-   : (PLUSCHAR | MINUSCHAR) multDivs
-   ;
-
-multDivs
-   : powers multDiv*
-   ;
-
-multDiv
-   : (ASTERISKCHAR | SLASHCHAR) powers
-   ;
-
-powers
-   : (PLUSCHAR | MINUSCHAR)? basis power*
-   ;
-
-power
-   : DOUBLEASTERISKCHAR basis
-   ;
-
-basis
-   : LPARENCHAR arithmeticExpression RPARENCHAR | generalIdentifier | literal
    ;
 
 // condition ----------------------------------
@@ -2392,278 +2349,7 @@ abbreviation
    : NOT? relationalOperator? (arithmeticExpression | LPARENCHAR arithmeticExpression abbreviation RPARENCHAR)
    ;
 
-// identifier ----------------------------------
-
-generalIdentifier
-   : qualifiedDataName | tableCall | functionCall | specialRegister
-   ;
-
-tableCall
-   : dataName2 (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
-   ;
-
-functionCall
-   : FUNCTION functionName (LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR)* referenceModifier?
-   ;
-
-referenceModifier
-   : LPARENCHAR characterPosition COLONCHAR length? RPARENCHAR
-   ;
-
-characterPosition
-   : arithmeticExpression
-   ;
-
-length
-   : arithmeticExpression
-   ;
-
-subscript
-   : ALL | integerLiteral | qualifiedDataName integerLiteral? | indexName integerLiteral? | arithmeticExpression
-   ;
-
-argument
-   : literal | generalIdentifier | qualifiedDataName integerLiteral? | indexName integerLiteral? | arithmeticExpression
-   ;
-
-// qualified data name ----------------------------------
-
-qualifiedDataName
-   : qualifiedDataNameFormat1 | qualifiedDataNameFormat2 | qualifiedDataNameFormat3 | qualifiedDataNameFormat4
-   ;
-
-qualifiedDataNameFormat1
-   : dataName (qualifiedInData+ inFile? | inFile)?
-   ;
-
-qualifiedDataNameFormat2
-   : paragraphName inSection
-   ;
-
-qualifiedDataNameFormat3
-   : textName inLibrary
-   ;
-
-qualifiedDataNameFormat4
-   : LINAGE_COUNTER inFile
-   ;
-
-qualifiedInData
-   : inData | inTable
-   ;
-
-// in ----------------------------------
-
-inData
-   : (IN | OF) dataName2
-   ;
-
-inFile
-   : (IN | OF) fileName
-   ;
-
-inMnemonic
-   : (IN | OF) mnemonicName
-   ;
-
-inSection
-   : (IN | OF) sectionName
-   ;
-
-inLibrary
-   : (IN | OF) libraryName
-   ;
-
-inTable
-   : (IN | OF) tableCall
-   ;
-
-// names ----------------------------------
-
-alphabetName
-   : cobolWord
-   ;
-
-assignmentName
-   : systemName
-   ;
-
-cdName
-   : cobolWord
-   ;
-
-className
-   : cobolWord
-   ;
-
-computerName
-   : systemName
-   ;
-
-conditionName
-   : cobolWord
-   ;
-
-dataName
-   : cobolWord
-   ;
-
-dataName1
-   : cobolWord
-   ;
-
-dataName2
-   : cobolWord
-   ;
-
-dataDescName
-   : FILLER | CURSOR | dataName
-   ;
-
-environmentName
-   : systemName
-   ;
-
-fileName
-   : cobolWord
-   ;
-
-functionName
-   : INTEGER | LENGTH | RANDOM | SUM | WHEN_COMPILED | cobolWord
-   ;
-
-indexName
-   : cobolWord
-   ;
-
-languageName
-   : systemName
-   ;
-
-libraryName
-   : cobolWord
-   ;
-
-localName
-   : cobolWord
-   ;
-
-mnemonicName
-   : cobolWord
-   ;
-
-paragraphName
-   : cobolWord | integerLiteral
-   ;
-
-paragraphNameUsage
-   : cobolWord | integerLiteral
-   ;
-
-procedureName
-   : paragraphNameUsage inSection?
-   ;
-
-programName
-   : NONNUMERICLITERAL | cobolWord
-   ;
-
-recordName
-   : qualifiedDataName
-   ;
-
-reportName
-   : qualifiedDataName
-   ;
-
-screenName
-   : cobolWord
-   ;
-
-sectionName
-   : cobolWord | integerLiteral
-   ;
-
-systemName
-   : cobolWord
-   ;
-
-symbolicCharacter
-   : cobolWord
-   ;
-
-textName
-   : cobolWord
-   ;
-
-figurativeConstant
-   : ALL literal | HIGH_VALUE | HIGH_VALUES | LOW_VALUE | LOW_VALUES | NULL | NULLS | QUOTE | QUOTES | SPACE | SPACES | ZERO | ZEROS | ZEROES
-   ;
-
-specialRegister
-   : ADDRESS OF generalIdentifier
-   | DATE | DAY | DAY_OF_WEEK | DEBUG_CONTENTS | DEBUG_ITEM | DEBUG_LINE | DEBUG_NAME | DEBUG_SUB_1 | DEBUG_SUB_2 | DEBUG_SUB_3
-   | LENGTH OF? generalIdentifier | LINAGE_COUNTER | LINE_COUNTER
-   | PAGE_COUNTER
-   | RETURN_CODE
-   | SHIFT_IN | SHIFT_OUT | SORT_CONTROL | SORT_CORE_SIZE | SORT_FILE_SIZE | SORT_MESSAGE | SORT_MODE_SIZE | SORT_RETURN
-   | TALLY | TIME
-   | WHEN_COMPILED
-   ;
-
 // comment entry
 commentEntry
    : COMMENTENTRYLINE+
    ;
-   
-cobolWord
-   : IDENTIFIER 
-   | ABORT | AS | ASCII | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | ATTRIBUTE | AUTO | AUTO_SKIP
-   | BACKGROUND_COLOR | BACKGROUND_COLOUR | BEEP | BELL | BINARY | BIT | BLINK | BLOB | BOUNDS
-   | CAPABLE | CCSVERSION | CHANGED | CHANNEL | CLOB | CLOSE_DISPOSITION | COBOL | COMMITMENT | CONTROL_POINT | CONVENTION | CRUNCH | CURSOR
-   | DBCLOB | DEFAULT | DEFAULT_DISPLAY | DEFINITION | DFHRESP | DFHVALUE | DISK | DONTCARE | DOUBLE
-   | EBCDIC | EMPTY_CHECK | ENTER | ENTRY_PROCEDURE | EOL | EOS | ERASE | ESCAPE | EVENT | EXCLUSIVE | EXPORT | EXTENDED
-   | FOREGROUND_COLOR | FOREGROUND_COLOUR | FULL | FUNCTIONNAME | FUNCTION_POINTER
-   | GRID
-   | HIGHLIGHT
-   | IMPLICIT | IMPORT | INTEGER
-   | KEPT | KEYBOARD
-   | LANGUAGE | LB | LD | LEFTLINE | LENGTH_CHECK | LIBACCESS | LIBPARAMETER | LIBRARY | LIST | LOCAL | LONG_DATE | LONG_TIME | LOWER | LOWLIGHT
-   | MMDDYYYY
-   | NAMED | NATIONAL | NATIONAL_EDITED | NETWORK | NO_ECHO | NUMERIC_DATE | NUMERIC_TIME
-   | ODT | ORDERLY | OVERLINE | OWN
-   | PASSWORD | PORT | PRINTER | PRIVATE | PROCESS | PROGRAM | PROMPT
-   | READER | REAL | RECEIVED | RECURSIVE | REF | REMOTE | REMOVE | REQUIRED | REVERSE_VIDEO
-   | SAVE | SECURE | SHARED | SHAREDBYALL | SHAREDBYRUNUNIT | SHARING | SHORT_DATE | SQL | SYMBOL
-   | TASK | THREAD | THREAD_LOCAL | TIMER | TODAYS_DATE | TODAYS_NAME | TRUNCATED | TYPEDEF
-   | UNDERLINE
-   | VIRTUAL
-   | WAIT
-   | YEAR | YYYYMMDD | YYYYDDD
-   | ZERO_FILL
-   ;
-
-booleanLiteral
-   : TRUE | FALSE
-   ;
-
-numericLiteral
-   : NUMERICLITERAL | ZERO | integerLiteral
-   ;
-
-cicsDfhRespLiteral
-   : DFHRESP LPARENCHAR (cobolWord | literal) RPARENCHAR
-   ;
-
-cicsDfhValueLiteral
-   : DFHVALUE LPARENCHAR (cobolWord | literal) RPARENCHAR
-   ;
-
-integerLiteral
-   : INTEGERLITERAL | otherLevel | LEVEL_NUMBER_66 | LEVEL_NUMBER_88
-   ;
-   
-literal
-   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | cicsDfhRespLiteral | cicsDfhValueLiteral | charString
-   ;  
-   

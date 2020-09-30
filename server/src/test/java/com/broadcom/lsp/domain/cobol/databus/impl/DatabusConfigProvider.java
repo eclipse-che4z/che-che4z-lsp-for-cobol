@@ -37,7 +37,7 @@ abstract class DatabusConfigProvider implements EventObserver<DataEvent> {
   @Getter protected final Waiter waiter = new Waiter();
   @Setter @Getter private DataEventType targetEventType;
   private DefaultDataBusBroker databus =
-      new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
+      new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3, 3, "HOURS"));
 
   void databusSubscriptionForPositiveScenario(DataEventType subscribedTo, DataEventType publishTo)
       throws TimeoutException, InterruptedException {

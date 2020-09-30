@@ -34,8 +34,7 @@ import java.util.function.Consumer;
 
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
 import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.REQUIRED_COPYBOOK_EVENT;
-import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK_DOWNLOAD;
-import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.COPYBOOK_RESOLVE;
+import static com.ca.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.lang.String.join;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -112,13 +111,13 @@ public class CopybookServiceImpl implements CopybookService {
         copybookPaths.remove(requiredCopybookName);
       }
     }
-    if (CopybookProcessingMode.ENABLED.name().equals(event.getCopybookProcessingMode())) {
+    if (event.getCopybookProcessingMode().analyze) {
       String cobolFileName = files.getNameFromURI(event.getDocumentUri());
       settingsService
           .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, requiredCopybookName)
-          .thenAccept(sendResponse(cobolFileName, requiredCopybookName));
+          .thenAccept(sendResponse(cobolFileName, requiredCopybookName, event.getCopybookProcessingMode()));
     } else {
-      sendResponse(requiredCopybookName, null, null);
+      dataBus.postData(FetchedCopybookEvent.builder().name(requiredCopybookName).build());
     }
   }
 
@@ -135,23 +134,32 @@ public class CopybookServiceImpl implements CopybookService {
     uris.add(documentUri);
     String document = files.getNameFromURI(documentUri);
 
-    List<String> copybooksToDownload =
-        uris.stream()
-            .map(files::getNameFromURI)
-            .map(copybooksForDownloading::remove)
-            .filter(Objects::nonNull)
-            .flatMap(Set::stream)
-            .map(copybook -> join(".", COPYBOOK_DOWNLOAD.label, document, copybook))
-            .collect(toList());
-    if (!copybooksToDownload.isEmpty()) {
-      settingsService.getConfigurations(copybooksToDownload);
+    if (event.getCopybookProcessingMode().download) {
+      List<String> copybooksToDownload =
+          uris.stream()
+              .map(files::getNameFromURI)
+              .map(copybooksForDownloading::remove)
+              .filter(Objects::nonNull)
+              .flatMap(Set::stream)
+              .map(copybook -> join(".", COPYBOOK_DOWNLOAD.label,
+                  getUserInteractionType(event.getCopybookProcessingMode()), document, copybook))
+              .collect(toList());
+      if (!copybooksToDownload.isEmpty()) {
+        settingsService.getConfigurations(copybooksToDownload);
+      }
     }
   }
 
-  private Consumer<List<Object>> sendResponse(String cobolFileName, String requiredCopybookName) {
+  private String getUserInteractionType(CopybookProcessingMode copybookProcessingMode) {
+    return copybookProcessingMode.userInteraction ? VERBOSE.label : QUIET.label;
+  }
+
+  private Consumer<List<Object>> sendResponse(String cobolFileName,
+                                              String requiredCopybookName,
+                                              CopybookProcessingMode copybookProcessingMode) {
     return result -> {
       String uri = retrieveURI(result);
-      if (uri.isEmpty()) {
+      if (uri.isEmpty() && copybookProcessingMode.download) {
         copybooksForDownloading
             .computeIfAbsent(cobolFileName, s -> ConcurrentHashMap.newKeySet())
             .add(requiredCopybookName);

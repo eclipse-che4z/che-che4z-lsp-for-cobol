@@ -16,17 +16,13 @@
 
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
-import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
-import lombok.SneakyThrows;
+import com.ca.lsp.core.cobol.model.CopybookModel;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,7 +38,7 @@ class DataBusGetFromCacheHappyTest extends DatabusConfigProvider {
 
   @BeforeEach
   void setUp() {
-    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3));
+    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3, 3, "HOURS"));
     fulfillDatabusCacheContent(databus.getCacheMaxSize());
   }
 
@@ -52,17 +48,11 @@ class DataBusGetFromCacheHappyTest extends DatabusConfigProvider {
   }
 
   @Test
-  @SneakyThrows
   void getData() {
     String newCopybookName = "COPY-" + (databus.getCacheMaxSize() - 1);
 
-    assertTrue(databus.isStored(CopybookRepository.calculateUUID(newCopybookName)));
+    assertTrue(databus.isStored(newCopybookName));
     LOG.debug(String.format("Cache content : %s", databus.printCache()));
-    Optional<CopybookStorable> leastRecentlyUsed = databus.lastRecentlyUsed();
-    LOG.debug(
-        String.format(
-            "Least Recently Used item : %s  ID : %d",
-            leastRecentlyUsed.get().getName(), leastRecentlyUsed.get().getId()));
     // Cache is Full
     LOG.debug(
         String.format(
@@ -71,24 +61,19 @@ class DataBusGetFromCacheHappyTest extends DatabusConfigProvider {
     LOG.debug(String.format("Retrieving item %s ", newCopybookName));
     assertTrue(
         databus
-            .getData(CopybookRepository.calculateUUID(newCopybookName))
+            .getData(newCopybookName)
             .getName()
             .equalsIgnoreCase(newCopybookName));
     LOG.debug(
         String.format(
             "Element Retrieved : %s",
-            databus.getData(CopybookRepository.calculateUUID(newCopybookName))));
+            databus.getData(newCopybookName)));
     LOG.debug(String.format("Cache content : %s", databus.printCache()));
   }
 
   private void fulfillDatabusCacheContent(int cacheMaxSize) {
     for (int i = 0; i < cacheMaxSize; i++) {
-      databus.storeData(
-          CopybookStorable.builder()
-              .name(CPY_FIXED_NAME + i)
-              .content(CPY_FIXED_CONTENT)
-              .uri(CPY_FIXED_URI)
-              .build());
+      databus.storeData(new CopybookModel(CPY_FIXED_NAME + i, CPY_FIXED_URI, CPY_FIXED_CONTENT));
     }
   }
 }

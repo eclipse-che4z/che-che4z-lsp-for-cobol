@@ -17,21 +17,19 @@
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
 import com.broadcom.lsp.domain.cobol.databus.api.CopybookRepository;
-import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
+import com.ca.lsp.core.cobol.model.CopybookModel;
+import com.google.common.base.Ticker;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.SerializationUtils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class manages the caching for copybooks in the databus applying the LRU (Last recently used)
@@ -41,123 +39,61 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Singleton
 public class CopybookRepositoryLRU implements CopybookRepository {
   @Getter private final int cacheMaxSize;
-  @Setter @NonNull private ArrayList<CopybookStorable> cpyRepo;
-  private final Comparator<CopybookStorable> storableComparator =
-      Comparator.comparingInt(CopybookStorable::getHit); // Time last recently used
-  private final Comparator<CopybookStorable> timeComparator =
-      Comparator.comparingLong(CopybookStorable::getGenDt);
-
-  @NonNull private final AtomicBoolean isSort = new AtomicBoolean(false);
+  private Cache<String, CopybookModel> cache;
 
   @Inject
-  public CopybookRepositoryLRU(@Named("CACHE-MAX-SIZE") int cacheSize) {
+  public CopybookRepositoryLRU(
+      @Named("CACHE-MAX-SIZE") int cacheSize,
+      @Named("CACHE-DURATION") int duration,
+      @Named("CACHE-TIME-UNIT") String timeUnitName) {
     cacheMaxSize = cacheSize;
-    cpyRepo = new ArrayList<>(cacheMaxSize);
+    buildCache(cacheSize, duration, timeUnitName, null);
   }
 
-  @Override
-  @SneakyThrows
-  public synchronized void sortCache() {
-    if (!isSort.get()) {
-      cpyRepo.sort(storableComparator.reversed().thenComparing(timeComparator));
+  /** For test purpose only */
+  CopybookRepositoryLRU(int cacheSize, int duration, String timeUnitName, Ticker ticker) {
+    cacheMaxSize = cacheSize;
+    buildCache(cacheSize, duration, timeUnitName, ticker);
+  }
+
+  private void buildCache(int cacheSize, int duration, String timeUnitName, Ticker ticker) {
+    var cacheBuilder = CacheBuilder.newBuilder()
+        .maximumSize(cacheSize)
+        .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName));
+    if (ticker != null) {
+        cacheBuilder.ticker(ticker);
     }
-    isSort.set(true);
+    cache = cacheBuilder.build();
   }
 
   @Override
-  @SneakyThrows
-  public Optional<CopybookStorable> getCopybookStorableFromCache(@NonNull long uuid) {
-    ArrayList<CopybookStorable> shallowCpy = (ArrayList<CopybookStorable>) cpyRepo.clone();
-    Optional<CopybookStorable> cpy =
-        shallowCpy.stream().filter(copy -> uuid == copy.getId()).findAny();
-    if (cpy.isPresent()) return cpy.map(SerializationUtils::clone);
-    return cpy;
-  }
-
-  @SneakyThrows
-  private Optional<CopybookStorable> getCopybookStorableInstance(@NonNull long uuid) {
-    return cpyRepo.stream().filter(copy -> uuid == copy.getId()).findAny();
+  public Optional<CopybookModel> getCopybookStorableFromCache(@NonNull String name) {
+    return Optional.ofNullable(cache.getIfPresent(name));
   }
 
   @Override
-  @SneakyThrows
-  public void setSort(boolean isSort) {
-    this.isSort.set(isSort);
+  public synchronized void persist(@NonNull CopybookModel copybookModel) {
+    cache.put(copybookModel.getName(), copybookModel);
   }
 
   @Override
-  @SneakyThrows
-  public synchronized void persist(@NonNull CopybookStorable deepCopy) {
-    cpyRepo.removeIf(CopybookStorable::isExpired);
-
-    if (!isStored(deepCopy.getId())) {
-      if (cpyRepo.size() < getCacheMaxSize()) {
-        cpyRepo.add(deepCopy);
-        return;
-      }
-      cpyRepo.remove(cpyRepo.size() - 1);
-      cpyRepo.add(deepCopy);
-    }
-  }
-
-  @Override
-  @SneakyThrows
   public String logContent() {
-    StringBuilder chars = new StringBuilder();
-    cpyRepo.forEach(
-        l ->
-            chars
-                .append(System.getProperty("line.separator"))
-                .append(l)
-                .append(System.getProperty("line.separator")));
-    return chars.toString();
+    return cache.asMap().toString();
   }
 
   @Override
-  @SneakyThrows
   public int size() {
-    return cpyRepo.size();
-  }
-
-  @SneakyThrows
-  public Optional<CopybookStorable> topItem() {
-    return (cpyRepo.isEmpty()) ? Optional.empty() : Optional.of(cpyRepo.get(0));
-  }
-
-  @SneakyThrows
-  public Optional<CopybookStorable> lastItem() {
-    return (cpyRepo.isEmpty()) ? Optional.empty() : Optional.of(cpyRepo.get(size() - 1));
+    return Math.toIntExact(cache.size());
   }
 
   @Override
-  @SneakyThrows
-  public boolean isStored(@NonNull StringBuilder id) {
-    long uuid = CopybookRepository.calculateUUID(id);
-    return isStored(uuid);
-  }
-
-  @Override
-  @SneakyThrows
-  public boolean isStored(@NonNull String id) {
-    long uuid = CopybookRepository.calculateUUID(id);
-    return isStored(uuid);
-  }
-
-  @Override
-  @SneakyThrows
-  public synchronized boolean isStored(@NonNull long uuid) {
-    Optional<CopybookStorable> cpy = getCopybookStorableInstance(uuid);
-    if (cpy.isPresent()) {
-      cpy.get().match();
-      setSort(false);
-    }
-    sortCache();
-    return cpy.isPresent();
+  public boolean isStored(@NonNull String name) {
+    return cache.getIfPresent(name) != null;
   }
 
   /** Method that remove all the elements from the cache */
   @Override
   public void invalidateCache() {
-    cpyRepo.clear();
+    cache.invalidateAll();
   }
 }

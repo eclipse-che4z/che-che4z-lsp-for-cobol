@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.impl;
 
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
@@ -54,7 +55,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
   @Nonnull
   @Override
   public ResultWithErrors<ExtendedDocument> process(
-      @Nonnull String documentUri, @Nonnull String cobolSourceCode, String copybookProcessingMode) {
+      @Nonnull String documentUri, @Nonnull String cobolSourceCode, CopybookProcessingMode copybookProcessingMode) {
     return process(documentUri, cobolSourceCode, new ArrayDeque<>(), copybookProcessingMode);
   }
 
@@ -64,7 +65,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
       @Nonnull String documentUri,
       @Nonnull String cobolCode,
       Deque<CopybookUsage> copybookStack,
-      @Nonnull String copybookProcessingMode) {
+      @Nonnull CopybookProcessingMode copybookProcessingMode) {
 
     ResultWithErrors<List<CobolLine>> lines = readLines(cobolCode, documentUri);
 

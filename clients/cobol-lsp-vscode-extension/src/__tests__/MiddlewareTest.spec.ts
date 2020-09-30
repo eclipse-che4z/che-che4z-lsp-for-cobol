@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { Middleware } from "../services/Middleware";
+import {Middleware, RequestLine} from "../services/Middleware";
 
 function constructParams(sectionName: string): any {
     return {
@@ -21,6 +21,8 @@ function constructParams(sectionName: string): any {
         ],
     };
 }
+
+jest.mock("../services/reporter/TelemetryService");
 
 // tslint:disable: no-unused-expression no-string-literal
 describe("Copybook downloader", () => {
@@ -49,12 +51,14 @@ describe("Copybook downloader", () => {
         expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName", "USER.CLIST.COB");
     });
     it("Handle copybook download request", async () => {
-        const params = {items: [
-            "broadcom-cobol-lsp.copybook-download.cobFile.bookName",
-            "broadcom-cobol-lsp.copybook-download.cobFile.bookName2",
-        ].map(sectionName => ({section: sectionName}))};
+        const params = {
+            items: [
+                "broadcom-cobol-lsp.copybook-download.quiet.cobFile.bookName",
+                "broadcom-cobol-lsp.copybook-download.quiet.cobFile.bookName2",
+            ].map(sectionName => ({section: sectionName}))
+        };
         await expect(middleware.handleConfigurationRequest(params, null, null)).resolves.toEqual([]);
-        expect(downloadCopybooksMock).toHaveBeenCalledWith("cobFile", ["bookName", "bookName2"]);
+        expect(downloadCopybooksMock).toHaveBeenCalledWith("cobFile", ["bookName", "bookName2"], true);
     });
     it("Call next for non cobol params", async () => {
         const params = constructParams("foo.bar");
@@ -68,4 +72,18 @@ describe("Copybook downloader", () => {
         expect(await middleware.handleConfigurationRequest(params, null, next)).toEqual(["next"]);
         expect(next).toHaveBeenCalledWith(params, null);
     });
+});
+
+const each = require("jest-each").default;
+describe("ParseLine() returns a RequestLine object or undefined in the following cases:", () => {
+    each([
+        ["pref.comm.file.copyname", new RequestLine("pref", "comm", "file", "copyname", true)],
+        ["pref.comm.file.with.dots.copyname", new RequestLine("pref", "comm", "file.with.dots", "copyname", true)],
+        ["pref.comm.quiet.file.copyname", new RequestLine("pref", "comm", "file", "copyname", true)],
+        ["pref.comm.verbose.file.copyname", new RequestLine("pref", "comm", "file", "copyname", false)],
+        ["pref.comm", undefined],
+        ["", undefined],
+    ]).it("when the input is '%s'", (line, expected) => {
+        expect((Middleware as any).parseLine(line)).toStrictEqual(expected);
+    })
 });

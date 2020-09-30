@@ -22,7 +22,15 @@ import static com.broadcom.lsp.domain.cobol.event.model.DataEventType.RUN_ANALYS
  * all the registered documents.
  */
 public class RunAnalysisEvent extends DataEvent {
+  public final boolean verbose;
+
   public RunAnalysisEvent() {
     super(RUN_ANALYSIS_EVENT, RUN_ANALYSIS_EVENT.getId());
+    this.verbose = false;
+  }
+
+  public RunAnalysisEvent(boolean verbose) {
+    super(RUN_ANALYSIS_EVENT, RUN_ANALYSIS_EVENT.getId());
+    this.verbose = verbose;
   }
 }

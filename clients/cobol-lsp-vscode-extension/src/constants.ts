@@ -21,6 +21,8 @@ export const GITIGNORE_FILE: string = ".gitignore";
 export const LANGUAGE_ID = "COBOL";
 export const PROCESS_DOWNLOAD_ERROR_MSG = "Some copybooks could not be located. Ensure your configuration contains correct paths to copybooks, including nested copybooks. Missing copybooks: ";
 export const PROFILE_NAME_PLACEHOLDER = "<profilename>";
+export const DOWNLOAD_QUEUE_LOCKED_ERROR_MSG = `Invalid credentials for profile: ${PROFILE_NAME_PLACEHOLDER}. Copybook retrieval is blocked. Ensure the profile contains correct credentials.`;
+export const UNLOCK_DOWNLOAD_QUEUE_MSG = "Unblock and retry";
 export const SEGMENT_PLACEHOLDER = "<segment>";
 export const NO_PASSWORD_ERROR_MSG = `No password in Zowe profile ${PROFILE_NAME_PLACEHOLDER}.`;
 export const CONN_REFUSED_ERROR_MSG = `Connection to mainframe using Zowe profile ${PROFILE_NAME_PLACEHOLDER} failed.`;
@@ -35,4 +37,5 @@ export const QUICKFIX_GOTOSETTINGS = "Open settings";
 export const COBOL_CBL_EXT = ".cbl";
 export const COBOL_COB_EXT = ".cob";
 export const COBOL_COBOL_EXT = ".cobol";
-
+export const EXTENSION_ID = "broadcommfd.cobol-language-support";
+export const TELEMETRY_DEFAULT_CONTENT = "INVALID_INSTRUMENTATION_KEY";

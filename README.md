@@ -30,6 +30,8 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 The COBOL Language Support extension is not compatible with other extensions that provide COBOL support. We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
 
+The COBOL Language Support extension only supports IBM Enterprise COBOL. Other versions of COBOL are not supported.
+
 ## Features
 COBOL Language Support provides the following COBOL syntax awareness features:
 
@@ -39,7 +41,8 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 - COBOL keywords
 - COBOL variables
 - COBOL paragraphs
-- Code Snippet
+- CICS keywords
+- Code Snippets
 - Copybook variable and paragraph names
 - Names of copybooks that are used in the program
 
@@ -50,6 +53,8 @@ The autocomplete feature is only available in the main COBOL file, not in copybo
 ### Syntax and Semantic Check for Code
 This feature checks for mistakes and errors in COBOL code. The syntax check feature reviews the whole content of the code and suggests fixes, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
 
+This feature is also enabled for CICS keywords and variables.
+
 ![Syntax check](/docs/images/CLSErrorHighlighting.gif)
 			
 ### Syntax Highlighting
@@ -57,7 +62,24 @@ The extension enables syntax highlighting for COBOL code.
 	
 ### Syntax Coloring
 Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, and paragraphs.
-	
+
+### Outline View and Breadcrumb View
+The extension enables outline view and breadcrumb view, which show the structure of elements within the program and allow easy navigation between them.
+
+### Code Snippets
+Before you write your COBOL code from scratch, search the snippet library for useful templates.
+
+**Follow these steps:**
+
+1. Press `F1` to open the command palette.
+2. Type **Insert Snippet** and press enter.
+3. Select the snippet that you want to insert.
+
+![Code snippets](/docs/images/Snippet.gif)
+
+You can also insert a code snippet by typing the name of the snippet in your code and clicking on the autocomplete text.
+
+The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder.
 ## Copybook Support
 
 The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe CLI z/OSMF profile to automatically download them from the mainframe to your workspace. 
@@ -74,7 +96,9 @@ You can store your copybooks locally in folders in your workspace and specify th
 
 1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
 2. Switch from **User** to **Workspace**.
-3. Under **Paths: Local**, specify the relative paths of the folders containing copybooks. The folders are searched in the order they are listed, so if two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
+3. Under **Paths: Local**, specify the paths of the folders containing copybooks. Ensure that you specify relative paths to the workspace root. Absolute paths are not supported.  
+   - **Tip:** To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
+   - The folders are searched in the order they are listed. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
 4. Open a program or project.  
    Copybook support features are now enabled.
 
@@ -129,3 +153,24 @@ The Find All References and Go To Definition functionalities are extended to wor
 * Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.  
 * Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code. 
 * Functionality to skip variable levels when called, reducing call time.
+
+### Privacy Notice
+The extensions for Visual Studio Code developed by Broadcom Inc., including its corporate affiliates and subsidiaries, ("Broadcom") are provided free of charge, but in order to better understand and meet its users’ needs, Broadcom may collect, use, analyze and retain anonymous users’ metadata and interaction data, (collectively, “Usage Data”) and aggregate such Usage Data with similar Usage Data of other Broadcom customers. Please find more detailed information in [License and Service Terms & Repository](https://www.broadcom.com/company/legal/licensing).
+
+This data collection uses built-in Microsoft VS Code Telemetry, which can be disabled, at your sole discretion, if you do not want to send Usage Data.
+
+The current release of COBOL Language Support collects anonymous data for the following events:
+* Activation of this VS Code extension
+* Problem interaction
+* Quick Fix
+* Invalid ZOWE credentials
+* ZOWE connection issues
+* Java version issues
+
+Each such event is logged with the following information:
+* Event time
+* Operating system and version
+* Country or region
+* Anonymous user and session ID
+* Version numbers of Microsoft VS Code and COBOL Language Support
+

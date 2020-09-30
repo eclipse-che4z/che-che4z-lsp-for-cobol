@@ -21,6 +21,8 @@ package com.ca.lsp.cobol.service.utils;
 public enum SettingsParametersEnum {
   COPYBOOK_RESOLVE("copybook-resolve"),
   COPYBOOK_DOWNLOAD("copybook-download"),
+  QUIET("quiet"),
+  VERBOSE("verbose"),
   DATASETS("cpy-manager.paths-dsn"),
   LOCAL_PATHS("cpy-manager.paths-local"),
   LSP_PREFIX("broadcom-cobol-lsp");

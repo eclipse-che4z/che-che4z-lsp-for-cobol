@@ -14,6 +14,7 @@
 
 package com.broadcom.lsp.domain.cobol.event.model;
 
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,11 +32,14 @@ import java.util.List;
 public class AnalysisFinishedEvent extends DataEvent {
   private String documentUri;
   private List<String> copybookUris;
+  private CopybookProcessingMode copybookProcessingMode;
 
   @Builder
-  public AnalysisFinishedEvent(String documentUri, List<String> copybookUris) {
+  public AnalysisFinishedEvent(String documentUri, List<String> copybookUris,
+                               CopybookProcessingMode copybookProcessingMode) {
     super(DataEventType.ANALYSIS_FINISHED_EVENT, DataEventType.ANALYSIS_FINISHED_EVENT.getId());
     this.documentUri = documentUri;
     this.copybookUris = copybookUris;
+    this.copybookProcessingMode = copybookProcessingMode;
   }
 }

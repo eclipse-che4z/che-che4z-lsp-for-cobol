@@ -15,8 +15,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import {PATHS_LOCAL_KEY, SETTINGS_SECTION} from "../constants";
-import {LocalCopybookResolver} from "../services/settings/LocalCopybookResolver";
-import {SettingsUtils} from "../services/settings/util/SettingsUtils";
+import {LocalCopybookResolver} from "../services/copybook/LocalCopybookResolver";
+import {SettingsUtils} from "../services/util/SettingsUtils";
 
 const settingsParser: LocalCopybookResolver = new LocalCopybookResolver();
 const STAR_LOCATION = "*";
@@ -44,7 +44,7 @@ describe("test parse method against bad setting configuration", () => {
     test("parse an empty setting file returns an empty list", () => {
         assertParseOf({}, 0);
     });
-    
+
 
     test("parse a setting file without the key 'LOCAL' return an empty list", () => {
         assertParseOf({"key": []}, 0);

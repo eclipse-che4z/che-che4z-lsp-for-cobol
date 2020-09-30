@@ -13,6 +13,7 @@
  */
 package com.ca.lsp.core.cobol.preprocessor.sub.document;
 
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.core.cobol.model.CopybookUsage;
 import com.ca.lsp.core.cobol.model.ExtendedDocument;
 import com.ca.lsp.core.cobol.model.ResultWithErrors;
@@ -38,5 +39,5 @@ public interface GrammarPreprocessor {
       @Nonnull String uri,
       @Nonnull String code,
       @Nonnull Deque<CopybookUsage> copybookStack,
-      @Nonnull String copybookProcessingMode);
+      @Nonnull CopybookProcessingMode copybookProcessingMode);
 }

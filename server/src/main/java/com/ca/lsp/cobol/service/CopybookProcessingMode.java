@@ -14,40 +14,35 @@
  */
 package com.ca.lsp.cobol.service;
 
-import javax.annotation.Nonnull;
-
 import static com.ca.lsp.cobol.service.utils.WorkspaceFileService.isFileUnderExtendedSourceFolder;
 
 /** This enum class used to allow or not the copybook analysis for the processed document. */
 public enum CopybookProcessingMode {
-  ENABLED,
-  DISABLED,
-  SKIP;
+  ENABLED(true, true, false),
+  DISABLED(false, false, false),
+  ENABLED_VERBOSE(true, true, true),
+  SKIP(true, false, false);
 
-  /**
-   * This method enables or disables copybook management based on two factors: 1) the file is an
-   * extended source file, 2) the file is open in DID_OPEN|DID_CHANGE
-   *
-   * @param uri of the document opened in the editor by the client
-   * @param textDocumentSyncType the sync type of the document [{@link
-   *     TextDocumentSyncType#DID_OPEN} or {@link TextDocumentSyncType#DID_CHANGE}]
-   * @return A value of that could be [{@link CopybookProcessingMode#ENABLED}|{@link
-   *     CopybookProcessingMode#DISABLED}] if the document is an extended document.
-   */
-  public static CopybookProcessingMode getCopybookProcessingMode(
-      String uri, TextDocumentSyncType textDocumentSyncType) {
+  public final boolean analyze;
+  public final boolean download;
+  public final boolean userInteraction;
 
-    return isFileUnderExtendedSourceFolder(uri)
-        ? DISABLED
-        : getProcessingModeByTextDocSyncType(textDocumentSyncType);
+  CopybookProcessingMode(boolean analyze, boolean download, boolean userInteraction) {
+    this.analyze = analyze;
+    this.download = download;
+    this.userInteraction = userInteraction;
   }
 
-  private static CopybookProcessingMode getProcessingModeByTextDocSyncType(
-      @Nonnull TextDocumentSyncType textDocumentSyncType) {
-    if (textDocumentSyncType == TextDocumentSyncType.DID_CHANGE) {
-      return SKIP;
-    } else {
-      return ENABLED;
-    }
+  /**
+   * This method disables copybook management if the file is an extended source file. Otherwise it will return
+   * provided processing mode.
+   *
+   * @param uri of the document opened in the editor by the client
+   * @param copybookProcessingMode desired processing mode
+   * @return a final copybook processing mode based on the file type.
+   */
+  public static CopybookProcessingMode getCopybookProcessingMode(
+      String uri, CopybookProcessingMode copybookProcessingMode) {
+    return isFileUnderExtendedSourceFolder(uri) ? DISABLED : copybookProcessingMode;
   }
 }

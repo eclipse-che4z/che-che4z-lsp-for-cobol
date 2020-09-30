@@ -16,21 +16,18 @@
 
 package com.broadcom.lsp.domain.cobol.databus.impl;
 
-import com.broadcom.lsp.domain.cobol.databus.model.CopybookStorable;
 import com.broadcom.lsp.domain.cobol.databus.model.RegistryId;
 import com.broadcom.lsp.domain.cobol.event.api.EventObserver;
 import com.broadcom.lsp.domain.cobol.event.model.DataEvent;
 import com.broadcom.lsp.domain.cobol.event.model.DataEventType;
+import com.ca.lsp.core.cobol.model.CopybookModel;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 /**
  * This class is the default implementation for databus broker. It uses a {@link
@@ -52,89 +49,65 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
   }
 
   @Override
-  @SneakyThrows
   protected CopybookRepositoryLRU getCopybookRepo() {
     return cpyRepo;
   }
 
   @Override
-  @SneakyThrows
   public void postData(@NonNull T dataEvent) {
     postData(dataEvent.getRegistryId(), dataEvent);
   }
 
   @Override
-  @SneakyThrows
   public void postData(@NonNull RegistryId registryId, @NonNull T dataEvent) {
     seekRegistry(registryId).ifPresent(it -> it.post(dataEvent));
   }
 
   @Override
-  @SneakyThrows
   public @NonNull S subscribe(@NonNull S dataSubscriber) {
     return subscribe(RegistryId.GENERAL_REGISTRY_ID, dataSubscriber);
   }
 
   @Override
-  @SneakyThrows
   public @NonNull S subscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber) {
     seekRegistry(registryId).ifPresent(it -> it.register(dataSubscriber));
     return dataSubscriber;
   }
 
   @Override
-  @SneakyThrows
   public @NonNull S subscribe(@NonNull DataEventType eventType, @NonNull EventObserver observer) {
     return subscribe(getSubscriber(eventType, observer));
   }
 
   @Override
-  @SneakyThrows
   public void unSubscribe(@NonNull S dataSubscriber) {
     unSubscribe(RegistryId.GENERAL_REGISTRY_ID, dataSubscriber);
   }
 
   @Override
-  @SneakyThrows
   public void unSubscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber) {
     seekRegistry(registryId).ifPresent(it -> it.unregister(dataSubscriber));
   }
 
   @Override
-  @SneakyThrows
-  public CopybookStorable storeData(@NonNull CopybookStorable storable) {
-    CopybookStorable deepCopy = SerializationUtils.clone(storable);
-    if (!isStored(deepCopy.getId())) getCopybookRepo().persist(deepCopy);
-    getCopybookRepo().setSort(false);
+  public CopybookModel storeData(@NonNull CopybookModel storable) {
+    getCopybookRepo().persist(storable);
     return storable;
   }
 
   @Override
-  @SneakyThrows
-  public CopybookStorable getData(@NonNull long uuid) {
+  public CopybookModel getData(@NonNull String name) {
     return getCopybookRepo()
-        .getCopybookStorableFromCache(uuid)
+        .getCopybookStorableFromCache(name)
         .orElseThrow(NoSuchElementException::new);
   }
 
   @Override
-  @SneakyThrows
-  public boolean isStored(@NonNull long uuid) {
-    return getCopybookRepo().isStored(uuid);
-  }
-
-  @SneakyThrows
-  public Optional<CopybookStorable> lastRecentlyUsed() {
-    return getCopybookRepo().topItem();
-  }
-
-  @SneakyThrows
-  public Optional<CopybookStorable> leastRecentlyUsed() {
-    return getCopybookRepo().lastItem();
+  public boolean isStored(@NonNull String name) {
+    return getCopybookRepo().isStored(name);
   }
 
   @Override
-  @SneakyThrows
   public void invalidateCache() {
     getCopybookRepo().invalidateCache();
   }

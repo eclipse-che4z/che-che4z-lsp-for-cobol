@@ -23,7 +23,6 @@ import com.google.common.eventbus.Subscribe;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /** A subscriber for {@link UnknownEvent} */
@@ -37,7 +36,6 @@ public class UnknownEventSubscriber {
 
   @Subscribe
   @AllowConcurrentEvents
-  @SneakyThrows
   public void onDataHandler(UnknownEvent eventType) {
     LOG.debug(eventType.getHeader());
     observer.observerCallback(eventType);

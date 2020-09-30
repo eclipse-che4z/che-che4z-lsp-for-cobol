@@ -15,12 +15,12 @@
 
 package com.ca.lsp.cobol.usecases.engine;
 
+import com.broadcom.usecase.UseCasePreprocessorLexer;
+import com.broadcom.usecase.UseCasePreprocessorParser;
+import com.broadcom.usecase.UseCasePreprocessorParser.StartRuleContext;
 import com.ca.lsp.cobol.positive.CobolText;
 import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
-import com.ca.lsp.cobol.usecases.engine.parser.TestPreprocessorLexer;
-import com.ca.lsp.cobol.usecases.engine.parser.TestPreprocessorParser;
-import com.ca.lsp.cobol.usecases.engine.parser.TestPreprocessorParser.StartRuleContext;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -171,19 +171,19 @@ public class UseCaseEngine {
       String text, String documentName, String uri, Map<String, Diagnostic> expectedDiagnostics) {
     int numberOfLines = text.split("\r\n|\r|\n").length;
 
-    TestPreprocessorLexer lexer = new TestPreprocessorLexer(fromString(text));
+    UseCasePreprocessorLexer lexer = new UseCasePreprocessorLexer(fromString(text));
     lexer.removeErrorListeners();
 
     CommonTokenStream tokens = new CommonTokenStream(lexer);
-    TestPreprocessorParser parser = new TestPreprocessorParser(tokens);
+    UseCasePreprocessorParser parser = new UseCasePreprocessorParser(tokens);
     parser.removeErrorListeners();
 
     StartRuleContext startRule = parser.startRule();
 
     ParseTreeWalker walker = new ParseTreeWalker();
 
-    TestPreprocessorListenerImpl listener =
-        new TestPreprocessorListenerImpl(
+    UseCasePreprocessorListener listener =
+        new UseCasePreprocessorListener(
             tokens, documentName, uri, numberOfLines, expectedDiagnostics);
     walker.walk(listener, startRule);
     return listener.getProcessingResult();

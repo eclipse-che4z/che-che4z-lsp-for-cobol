@@ -15,18 +15,18 @@
  */
 package com.broadcom.lsp.domain.cobol.event;
 
-import com.broadcom.lsp.domain.CopybookStorableProvider;
 import com.broadcom.lsp.domain.cobol.event.model.FetchedCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.domain.cobol.event.model.RunAnalysisEvent;
 import com.broadcom.lsp.domain.cobol.event.model.UnknownEvent;
+import com.ca.lsp.cobol.service.CopybookProcessingMode;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
-class CopybookEventsTest extends CopybookStorableProvider {
+class CopybookEventsTest {
   private static final String UNKNOWN_EVENT_MESSAGE = "Dummy event";
   private static final String REQCPY = "REQCPY";
   private static final String FETCHEDCPY = "FETCHEDCPY";
@@ -37,7 +37,7 @@ class CopybookEventsTest extends CopybookStorableProvider {
   private static final String COBOL_FILE_URI = "file:///C:/Users/test/Main.cbl";
 
   private static final String COPYBOOK_CONTENT = "000000 IDENTIFICATION DIVISION.";
-  private static final String COPYBOOK_ANALYSIS_ENABLED = "ENABLED";
+  private static final CopybookProcessingMode COPYBOOK_ANALYSIS_ENABLED = CopybookProcessingMode.ENABLED;
 
   /** Test the RequiredCopybookEvent DTO is correctly populated */
   @Test
