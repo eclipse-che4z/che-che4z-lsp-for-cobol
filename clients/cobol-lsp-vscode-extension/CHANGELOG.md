@@ -1,6 +1,21 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.15.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.14.0...0.15.0) (2020-09-30)
+
+#### Added
+- Syntax analysis for CICS statements
+- Telemetry event recording
+- CICS variables support
+- Locking copybook downloading queue in case of wrong mainframe credentials
+
+#### Changed
+- Showing missing copybook status only on demand
+
+#### Fixed
+- False-positive spell check for variable names
+- Coloring for CICS statements
+
 ## [0.14.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.13.0...0.14.0) (2020-09-10)
 
 #### Added
