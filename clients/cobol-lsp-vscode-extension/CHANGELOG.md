@@ -6,11 +6,11 @@ All notable changes to the COBOL Language Support extension are documented in th
 #### Added
 - Syntax analysis for CICS statements
 - Telemetry event recording
-- CICS variables support
-- Locking copybook downloading queue in case of wrong mainframe credentials
+- CICS variable support
 
 #### Changed
 - Showing missing copybook status only on demand
+- Copybook downloading queue locked in case of wrong mainframe credentials
 
 #### Fixed
 - False-positive spell check for variable names
