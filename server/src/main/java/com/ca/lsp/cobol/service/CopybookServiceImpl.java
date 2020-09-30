@@ -115,9 +115,9 @@ public class CopybookServiceImpl implements CopybookService {
       String cobolFileName = files.getNameFromURI(event.getDocumentUri());
       settingsService
           .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, requiredCopybookName)
-          .thenAccept(sendResponse(cobolFileName, requiredCopybookName));
+          .thenAccept(sendResponse(cobolFileName, requiredCopybookName, event.getCopybookProcessingMode()));
     } else {
-      sendResponse(requiredCopybookName, null, null);
+      dataBus.postData(FetchedCopybookEvent.builder().name(requiredCopybookName).build());
     }
   }
 
@@ -154,10 +154,12 @@ public class CopybookServiceImpl implements CopybookService {
     return copybookProcessingMode.userInteraction ? VERBOSE.label : QUIET.label;
   }
 
-  private Consumer<List<Object>> sendResponse(String cobolFileName, String requiredCopybookName) {
+  private Consumer<List<Object>> sendResponse(String cobolFileName,
+                                              String requiredCopybookName,
+                                              CopybookProcessingMode copybookProcessingMode) {
     return result -> {
       String uri = retrieveURI(result);
-      if (uri.isEmpty()) {
+      if (uri.isEmpty() && copybookProcessingMode.download) {
         copybooksForDownloading
             .computeIfAbsent(cobolFileName, s -> ConcurrentHashMap.newKeySet())
             .add(requiredCopybookName);
