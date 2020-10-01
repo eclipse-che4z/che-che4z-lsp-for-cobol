@@ -88,6 +88,8 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
         convertLocations(context.getVariableUsages()),
         convertLocations(context.getParagraphDefinitions()),
         convertLocations(context.getParagraphUsages()),
+        convertLocations(context.getConstantDefinitions()),
+        convertLocations(context.getConstantUsages()),
         convertLocations(context.getCopybookDefinitions()),
         convertLocations(context.getCopybookUsages()),
         context.getOutlineTree());

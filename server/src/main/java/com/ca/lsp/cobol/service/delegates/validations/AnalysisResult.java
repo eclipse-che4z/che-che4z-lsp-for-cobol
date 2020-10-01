@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static java.util.Collections.emptyMap;
-
+/**
+ * This class represents a semantic context of the analysed document. It contains a map of {@link
+ * Diagnostic} grouped by related documents, all the
+ */
 @Value
 @AllArgsConstructor
 @Builder(toBuilder = true)
@@ -35,24 +37,24 @@ public class AnalysisResult {
   private Map<String, List<Location>> variableUsages;
   private Map<String, List<Location>> paragraphDefinitions;
   private Map<String, List<Location>> paragraphUsages;
+  private Map<String, List<Location>> constantDefinitions;
+  private Map<String, List<Location>> constantUsages;
   private Map<String, List<Location>> copybookDefinitions;
   private Map<String, List<Location>> copybookUsages;
   private List<DocumentSymbol> outlineTree;
 
   public static AnalysisResult empty() {
     return new AnalysisResult(
-        emptyMap(),
-        emptyMap(),
-        emptyMap(),
-        emptyMap(),
-        emptyMap(),
-        emptyMap(),
-        emptyMap(),
+        Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(),
         List.of());
   }
 
   public Set<String> getVariables() {
     return variableDefinitions.keySet();
+  }
+
+  public Set<String> getConstants() {
+    return constantDefinitions.keySet();
   }
 
   public Set<String> getParagraphs() {

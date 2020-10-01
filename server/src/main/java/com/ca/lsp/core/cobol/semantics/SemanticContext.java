@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * THis class represents the entire semantic context of the current document, including its
+ * This class represents the entire semantic context of the current document, including its
  * variables, paragraphs, copybooks etc., with their definitions and usages.
  */
 @Value
@@ -36,6 +36,8 @@ public class SemanticContext {
   private Map<String, Collection<Location>> variableUsages;
   private Map<String, Collection<Location>> paragraphDefinitions;
   private Map<String, Collection<Location>> paragraphUsages;
+  private Map<String, Collection<Location>> constantDefinitions;
+  private Map<String, Collection<Location>> constantUsages;
   private Map<String, Collection<Location>> copybookDefinitions;
   private Map<String, Collection<Location>> copybookUsages;
   private List<DocumentSymbol> outlineTree;

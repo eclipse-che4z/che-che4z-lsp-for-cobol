@@ -21,11 +21,15 @@ import com.ca.lsp.core.cobol.preprocessor.CobolPreprocessor;
 import com.ca.lsp.core.cobol.semantics.NamedSubContext;
 import com.ca.lsp.core.cobol.semantics.SemanticContext;
 import com.ca.lsp.core.cobol.semantics.outline.NodeType;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -123,11 +127,54 @@ class CobolLanguageEngineTest {
     ResultWithErrors<SemanticContext> expected =
         new ResultWithErrors<>(
             new SemanticContext(
-                Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), expectedOutlineTree),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                getConstantDefinitions(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                expectedOutlineTree),
             List.of(error));
 
     ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, PROCESSING_MODE);
 
     assertEquals(expected, actual);
+  }
+
+  private Map<String, Collection<Location>> getConstantDefinitions() {
+    Location mockLocation = new Location();
+    Multimap<String, Location> result = HashMultimap.create();
+    result.put("EIBAID", mockLocation);
+    result.put("EIBATT", mockLocation);
+    result.put("EIBCALEN", mockLocation);
+    result.put("EIBCOMPL", mockLocation);
+    result.put("EIBCONF", mockLocation);
+    result.put("EIBCPOSN", mockLocation);
+    result.put("EIBDATE", mockLocation);
+    result.put("EIBDS", mockLocation);
+    result.put("EIBEOC", mockLocation);
+    result.put("EIBERR", mockLocation);
+    result.put("EIBERRCD", mockLocation);
+    result.put("EIBFMH", mockLocation);
+    result.put("EIBFN", mockLocation);
+    result.put("EIBFREE", mockLocation);
+    result.put("EIBNODAT", mockLocation);
+    result.put("EIBRCODE", mockLocation);
+    result.put("EIBRECV", mockLocation);
+    result.put("EIBREQID", mockLocation);
+    result.put("EIBRESP", mockLocation);
+    result.put("EIBRESP2", mockLocation);
+    result.put("EIBRLDBK", mockLocation);
+    result.put("EIBRSRCE", mockLocation);
+    result.put("EIBSIG", mockLocation);
+    result.put("EIBSYNC", mockLocation);
+    result.put("EIBSYNRB", mockLocation);
+    result.put("EIBTASKN", mockLocation);
+    result.put("EIBTIME", mockLocation);
+    result.put("EIBTRMID", mockLocation);
+    result.put("EIBTRNID", mockLocation);
+    return result.asMap();
   }
 }
