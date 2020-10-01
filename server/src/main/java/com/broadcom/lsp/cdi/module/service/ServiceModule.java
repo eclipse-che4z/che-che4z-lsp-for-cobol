@@ -91,6 +91,7 @@ public class ServiceModule extends DefaultModule {
     referenceBinding.addBinding().to(VariableLocations.class);
     referenceBinding.addBinding().to(ParagraphLocations.class);
     referenceBinding.addBinding().to(CopybookLocations.class);
+    referenceBinding.addBinding().to(ConstantLocations.class);
   }
 
   private void bindCodeActions() {
