@@ -9,50 +9,45 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ *    Broadcom, Inc. - initial API and implementation
+ *
  */
 package com.ca.lsp.cobol.service.delegates.completions;
 
 import com.ca.lsp.cobol.service.MyDocumentModel;
-import com.google.inject.Inject;
+import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import org.eclipse.lsp4j.CompletionItemKind;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Set;
 
+import static java.util.Optional.ofNullable;
+import static org.eclipse.lsp4j.CompletionItemKind.Constant;
+
+/** This class resolves the predefined variables' completion requests */
 @Singleton
-public class KeywordCompletion implements Completion {
-  private CompletionStorage keywords;
-
-  @Inject
-  KeywordCompletion(@Named("Keywords") CompletionStorage keywords) {
-    this.keywords = keywords;
-  }
+public class ConstantCompletion implements Completion {
 
   @Nonnull
   @Override
   public Collection<String> getCompletionSource(MyDocumentModel document) {
-    return keywords.getLabels();
-  }
-
-  @Nullable
-  @Override
-  public String tryResolve(@Nonnull String label) {
-    return keywords.getInformationFor(label);
+    return ofNullable(document)
+        .map(MyDocumentModel::getAnalysisResult)
+        .map(AnalysisResult::getConstants)
+        .orElse(Set.of());
   }
 
   @Nonnull
   @Override
   public String getSortOrderPrefix() {
-    return "5"; // Keywords should go after Copybooks in the completions list
+    return "3";
   }
 
   @Nonnull
   @Override
   public CompletionItemKind getKind() {
-    return CompletionItemKind.Keyword;
+    return Constant;
   }
 }

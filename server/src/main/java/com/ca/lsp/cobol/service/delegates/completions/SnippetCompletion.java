@@ -52,7 +52,7 @@ public class SnippetCompletion implements Completion {
   @Nonnull
   @Override
   public String getSortOrderPrefix() {
-    return "3";
+    return "4";
   }
 
   @Nonnull

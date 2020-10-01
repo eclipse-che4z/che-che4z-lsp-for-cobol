@@ -79,6 +79,7 @@ public class ServiceModule extends DefaultModule {
     completionBinding.addBinding().to(SnippetCompletion.class);
     completionBinding.addBinding().to(KeywordCompletion.class);
     completionBinding.addBinding().to(CopybookCompletion.class);
+    completionBinding.addBinding().to(ConstantCompletion.class);
 
     bind(CompletionStorage.class).annotatedWith(named("Keywords")).to(Keywords.class);
     bind(CompletionStorage.class).annotatedWith(named("Snippets")).to(Snippets.class);
