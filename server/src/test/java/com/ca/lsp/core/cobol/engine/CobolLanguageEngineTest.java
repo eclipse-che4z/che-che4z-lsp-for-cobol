@@ -175,6 +175,15 @@ class CobolLanguageEngineTest {
     result.put("EIBTIME", mockLocation);
     result.put("EIBTRMID", mockLocation);
     result.put("EIBTRNID", mockLocation);
+
+    result.put("XML-CODE", mockLocation);
+    result.put("XML-EVENT", mockLocation);
+    result.put("XML-NAMESPACE", mockLocation);
+    result.put("XML-NNAMESPACE", mockLocation);
+    result.put("XML-NAMESPACE-PREFIX", mockLocation);
+    result.put("XML-NNAMESPACE-PREFIX", mockLocation);
+    result.put("XML-NTEXT", mockLocation);
+    result.put("XML-TEXT", mockLocation);
     return result.asMap();
   }
 }

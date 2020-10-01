@@ -74,7 +74,15 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
           "EIBTASKN",
           "EIBTIME",
           "EIBTRMID",
-          "EIBTRNID");
+          "EIBTRNID",
+          "XML-CODE",
+          "XML-EVENT",
+          "XML-NAMESPACE",
+          "XML-NNAMESPACE",
+          "XML-NAMESPACE-PREFIX",
+          "XML-NNAMESPACE-PREFIX",
+          "XML-NTEXT",
+          "XML-TEXT");
   private Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
   private Map<String, List<Location>> variableDefinitions = new HashMap<>();
   private Map<String, List<Location>> variableUsages = new HashMap<>();
@@ -296,8 +304,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
   }
 
   private Map<String, List<Location>> getConstantDefinitions() {
-    List<Location> defaultLocation =
-        List.of(new Location());
+    List<Location> defaultLocation = List.of(new Location());
     return PREDEFINED_EIB_VARIABLES.stream()
         .collect(Collectors.toMap(it -> it, it -> defaultLocation));
   }
