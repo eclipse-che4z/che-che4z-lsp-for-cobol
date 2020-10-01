@@ -52,12 +52,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <li>* - Definition
  * <li>| - Diagnostic
  * <li>^ - Replacement
+ * <li>& - Constant (predefined variable)
  * <li>{_ _} - Multi-token error
  *
  *     <p>By default, tags treated as an element usage. With '*' specified the occurrence will be
  *     treated as a definition. For example, {$*VAR1} is a definition for VAR1, and {#PAR2} is a
  *     usage of PAR2. Copybook definitions are optional, by default they point to the beginning of
- *     the copybook.
+ *     the copybook. Predefined variables definitions are implicit, so they will present in the
+ *     according list by default. You may find this list in {@link UseCasePreprocessorListener}, so
+ *     don't forget to update it once new predefined variables added.
  *
  *     <p>Diagnostic is optional for semantic elements. To specify a semantic error, add '|', and
  *     the ID of the expected diagnostic at this position: {$CHILD|InvalidDefinition}. In this case,
