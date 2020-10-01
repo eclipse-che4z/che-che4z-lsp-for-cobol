@@ -77,6 +77,9 @@ public class PredefinedVariableContext implements SubContext<Variable> {
     VARIABLE_DEFINITIONS.put("XML-NNAMESPACE-PREFIX", MOCK_LOCATION);
     VARIABLE_DEFINITIONS.put("XML-NTEXT", MOCK_LOCATION);
     VARIABLE_DEFINITIONS.put("XML-TEXT", MOCK_LOCATION);
+
+    // JNI special register
+    VARIABLE_DEFINITIONS.put("JNIENVPTR", MOCK_LOCATION);
   }
 
   @Override

@@ -184,6 +184,8 @@ class CobolLanguageEngineTest {
     result.put("XML-NNAMESPACE-PREFIX", mockLocation);
     result.put("XML-NTEXT", mockLocation);
     result.put("XML-TEXT", mockLocation);
+
+    result.put("JNIENVPTR", mockLocation);
     return result.asMap();
   }
 }

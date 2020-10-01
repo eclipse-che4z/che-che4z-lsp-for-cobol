@@ -82,7 +82,8 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
           "XML-NAMESPACE-PREFIX",
           "XML-NNAMESPACE-PREFIX",
           "XML-NTEXT",
-          "XML-TEXT");
+          "XML-TEXT",
+          "JNIENVPTR");
   private Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
   private Map<String, List<Location>> variableDefinitions = new HashMap<>();
   private Map<String, List<Location>> variableUsages = new HashMap<>();
