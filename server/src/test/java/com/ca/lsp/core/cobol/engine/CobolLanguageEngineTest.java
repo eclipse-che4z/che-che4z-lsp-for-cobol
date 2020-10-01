@@ -186,6 +186,9 @@ class CobolLanguageEngineTest {
     result.put("XML-TEXT", mockLocation);
 
     result.put("JNIENVPTR", mockLocation);
+
+    result.put("JSON-CODE", mockLocation);
+    result.put("JSON-STATUS", mockLocation);
     return result.asMap();
   }
 }

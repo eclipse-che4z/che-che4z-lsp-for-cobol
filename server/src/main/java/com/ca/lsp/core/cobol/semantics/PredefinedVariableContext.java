@@ -80,6 +80,10 @@ public class PredefinedVariableContext implements SubContext<Variable> {
 
     // JNI special register
     VARIABLE_DEFINITIONS.put("JNIENVPTR", MOCK_LOCATION);
+
+    // JSON special registers
+    VARIABLE_DEFINITIONS.put("JSON-CODE", MOCK_LOCATION);
+    VARIABLE_DEFINITIONS.put("JSON-STATUS", MOCK_LOCATION);
   }
 
   @Override
