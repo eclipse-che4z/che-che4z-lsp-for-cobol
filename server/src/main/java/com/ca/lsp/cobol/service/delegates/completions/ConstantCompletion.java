@@ -23,6 +23,7 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Set;
 
+import static com.ca.lsp.cobol.service.delegates.completions.CompletionOrder.CONSTANTS;
 import static java.util.Optional.ofNullable;
 import static org.eclipse.lsp4j.CompletionItemKind.Constant;
 
@@ -42,7 +43,7 @@ public class ConstantCompletion implements Completion {
   @Nonnull
   @Override
   public String getSortOrderPrefix() {
-    return "3";
+    return CONSTANTS.prefix;
   }
 
   @Nonnull

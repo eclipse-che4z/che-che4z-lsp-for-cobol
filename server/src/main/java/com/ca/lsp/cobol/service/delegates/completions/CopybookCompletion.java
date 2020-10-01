@@ -16,12 +16,15 @@ package com.ca.lsp.cobol.service.delegates.completions;
 import com.ca.lsp.cobol.service.MyDocumentModel;
 import com.ca.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.google.inject.Singleton;
+import org.eclipse.lsp4j.CompletionItemKind;
+
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nonnull;
-import org.eclipse.lsp4j.CompletionItemKind;
+
+import static com.ca.lsp.cobol.service.delegates.completions.CompletionOrder.COPYBOOKS;
 
 /** implementation for adding copybook names in the autocomplete list as identified by the parser */
 @Singleton
@@ -40,7 +43,7 @@ public class CopybookCompletion implements Completion {
   @Nonnull
   @Override
   public String getSortOrderPrefix() {
-    return "2"; // copybooks are supposed to be the third in the completions list after paragraphs
+    return COPYBOOKS.prefix;
   }
 
   @Nonnull
