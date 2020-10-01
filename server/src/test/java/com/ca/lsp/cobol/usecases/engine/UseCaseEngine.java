@@ -203,6 +203,10 @@ public class UseCaseEngine {
     assertResult("Variable usages:", expected.getVariableUsages(), actual.getVariableUsages());
 
     assertResult(
+        "Constant definition:", expected.getConstantDefinitions(), actual.getConstantDefinitions());
+    assertResult("Constant usages:", expected.getConstantUsages(), actual.getConstantUsages());
+
+    assertResult(
         "Paragraph definition:",
         expected.getParagraphDefinitions(),
         actual.getParagraphDefinitions());

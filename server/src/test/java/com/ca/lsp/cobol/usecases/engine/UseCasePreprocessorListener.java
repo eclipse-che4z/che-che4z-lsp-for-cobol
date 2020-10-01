@@ -30,6 +30,7 @@ import org.eclipse.lsp4j.Range;
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.broadcom.usecase.UseCasePreprocessorParser.*;
 import static java.util.Collections.singletonList;
@@ -43,11 +44,43 @@ import static org.antlr.v4.runtime.Lexer.HIDDEN;
  * UseCasePreprocessor.g4
  */
 public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
+  private List<String> PREDEFINED_EIB_VARIABLES =
+      List.of(
+          "EIBAID",
+          "EIBATT",
+          "EIBCALEN",
+          "EIBCOMPL",
+          "EIBCONF",
+          "EIBCPOSN",
+          "EIBDATE",
+          "EIBDS",
+          "EIBEOC",
+          "EIBERR",
+          "EIBERRCD",
+          "EIBFMH",
+          "EIBFN",
+          "EIBFREE",
+          "EIBNODAT",
+          "EIBRCODE",
+          "EIBRECV",
+          "EIBREQID",
+          "EIBRESP",
+          "EIBRESP2",
+          "EIBRLDBK",
+          "EIBRSRCE",
+          "EIBSIG",
+          "EIBSYNC",
+          "EIBSYNRB",
+          "EIBTASKN",
+          "EIBTIME",
+          "EIBTRMID",
+          "EIBTRNID");
   private Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
   private Map<String, List<Location>> variableDefinitions = new HashMap<>();
   private Map<String, List<Location>> variableUsages = new HashMap<>();
   private Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
   private Map<String, List<Location>> paragraphUsages = new HashMap<>();
+  private Map<String, List<Location>> constantUsages = new HashMap<>();
   private Map<String, List<Location>> copybookDefinitions = new HashMap<>();
   private Map<String, List<Location>> copybookUsages = new HashMap<>();
 
@@ -90,6 +123,8 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
         variableUsages,
         paragraphDefinitions,
         paragraphUsages,
+        getConstantDefinitions(),
+        constantUsages,
         copybookDefinitions,
         copybookUsages);
   }
@@ -200,6 +235,26 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
   }
 
   @Override
+  public void enterConstantStatement(ConstantStatementContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitConstantStatement(ConstantStatementContext ctx) {
+    pop();
+    ofNullable(ctx.constantUsage())
+        .map(ConstantUsageContext::word)
+        .ifPresent(
+            it ->
+                processToken(
+                    it.identifier().getText(),
+                    ctx,
+                    it.replacement(),
+                    constantUsages,
+                    ctx.diagnostic()));
+  }
+
+  @Override
   public void enterMultiTokenError(MultiTokenErrorContext ctx) {
     // Write preceding hidden tokens here to simplify logic of position extraction
     write(getHiddenText(tokens.getHiddenTokensToLeft(ctx.start.getTokenIndex(), HIDDEN)));
@@ -238,6 +293,13 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
     if (node.getSymbol().getType() != EOF) {
       write(node.getText());
     }
+  }
+
+  private Map<String, List<Location>> getConstantDefinitions() {
+    List<Location> defaultLocation =
+        List.of(new Location());
+    return PREDEFINED_EIB_VARIABLES.stream()
+        .collect(Collectors.toMap(it -> it, it -> defaultLocation));
   }
 
   @Nonnull
