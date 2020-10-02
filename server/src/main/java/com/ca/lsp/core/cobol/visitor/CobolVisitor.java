@@ -427,6 +427,20 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     return visitChildren(ctx);
   }
 
+  @Override
+  public Class visitTableCall(TableCallContext ctx) {
+    ofNullable(ctx.dataName2())
+        .map(RuleContext::getText)
+        .map(String::toUpperCase)
+        .ifPresent(
+            variable -> {
+              Optional<Locality> locality = getLocality(ctx.getStart());
+              locality.ifPresent(it -> checkVariableDefinition(variable, it));
+              locality.map(Locality::toLocation).ifPresent(it -> addVariableUsage(variable, it));
+            });
+    return visitChildren(ctx);
+  }
+
   private void processDataOccursClause(int levelNumber, DataOccursClauseContext ctx) {
     ctx.indexName()
         .forEach(

@@ -16,33 +16,37 @@
 package com.ca.lsp.cobol.usecases;
 
 import com.ca.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * This test checks if the index definition does not produce the semantic error. Here: INDEXED BY
- * SUB1 should act as a definition for SUB1 variable.
- */
-class TestIndexDefinition {
+import static com.ca.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
+
+/** This test verifies that the definition checks applies to the table calls */
+class TestIncorrectTableCallUnderlined {
 
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
           + "       Data Division.\n"
           + "       Working-Storage Section.\n"
-          + "       01 {$*OVERLIMIT}.\n"
-          + "           03 FILLER OCCURS 30 TIMES INDEXED BY {$*SUB1}.\n"
-          + "           05 {$*OL-ACCT-NO} PIC X(8).\n"
           + "       Procedure Division.\n"
           + "       {#*000-Main-Logic}.\n"
-          + "           SET {$SUB1} TO 1.\n"
-          + "           MOVE 'ABC' TO {$OL-ACCT-NO}({$SUB1}).\n"
+          + "           MOVE 'ABC' TO {$OL-ACCT-NO|1}({$SUB1|2}).\n"
           + "       End program ProgramId.";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
+    UseCaseEngine.runTest(
+        TEXT,
+        List.of(),
+        Map.of(
+            "1",
+            new Diagnostic(null, "Invalid definition for: OL-ACCT-NO", Information, INFO.getText()),
+            "2",
+            new Diagnostic(null, "Invalid definition for: SUB1", Information, INFO.getText())));
   }
 }
