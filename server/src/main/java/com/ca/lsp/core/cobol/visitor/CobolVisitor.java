@@ -346,6 +346,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     String name = ofNullable(ctx.dataName1()).map(RuleContext::getText).orElse(FILLER_NAME);
     int level = Integer.parseInt(levelNumber);
     outlineTreeBuilder.addVariable(level, name, getDataDescriptionNodeType(ctx), ctx);
+    ofNullable(ctx.dataOccursClause())
+        .ifPresent(it -> it.forEach(occursClause -> processDataOccursClause(level, occursClause)));
     return visitChildren(ctx);
   }
 
@@ -423,6 +425,21 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
         .map(it -> it.getText().toUpperCase())
         .ifPresent(variable -> checkForVariable(variable, ctx));
     return visitChildren(ctx);
+  }
+
+  private void processDataOccursClause(int levelNumber, DataOccursClauseContext ctx) {
+    ctx.indexName()
+        .forEach(
+            variable -> {
+              getLocality(variable.getStart())
+                  .map(Locality::toLocation)
+                  .ifPresent(
+                      location ->
+                          defineVariable(
+                              Integer.toString(levelNumber), variable.getText(), location));
+
+              outlineTreeBuilder.addVariable(levelNumber, variable.getText(), NodeType.FIELD, ctx);
+            });
   }
 
   private void checkForVariable(String variable, QualifiedDataNameFormat1Context ctx) {
