@@ -23,6 +23,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 
+import static com.ca.lsp.cobol.service.delegates.completions.CompletionOrder.KEYWORDS;
+
 @Singleton
 public class KeywordCompletion implements Completion {
   private CompletionStorage keywords;
@@ -47,7 +49,7 @@ public class KeywordCompletion implements Completion {
   @Nonnull
   @Override
   public String getSortOrderPrefix() {
-    return "4"; // Keywords should go after Copybooks in the completions list
+    return KEYWORDS.prefix;
   }
 
   @Nonnull

@@ -10,6 +10,7 @@
  *
  * Contributors:
  *    Broadcom, Inc. - initial API and implementation
+ *
  */
 package com.ca.lsp.cobol.service.delegates.completions;
 
@@ -20,35 +21,34 @@ import org.eclipse.lsp4j.CompletionItemKind;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
-import static com.ca.lsp.cobol.service.delegates.completions.CompletionOrder.COPYBOOKS;
+import static com.ca.lsp.cobol.service.delegates.completions.CompletionOrder.CONSTANTS;
+import static java.util.Optional.ofNullable;
+import static org.eclipse.lsp4j.CompletionItemKind.Constant;
 
-/** implementation for adding copybook names in the autocomplete list as identified by the parser */
+/** This class resolves the predefined variables' completion requests */
 @Singleton
-public class CopybookCompletion implements Completion {
+public class ConstantCompletion implements Completion {
 
   @Nonnull
   @Override
   public Collection<String> getCompletionSource(MyDocumentModel document) {
-    return Optional.ofNullable(document)
+    return ofNullable(document)
         .map(MyDocumentModel::getAnalysisResult)
-        .map(AnalysisResult::getCopybookUsages)
-        .map(Map::keySet)
-        .orElse(Collections.emptySet());
+        .map(AnalysisResult::getConstants)
+        .orElse(Set.of());
   }
 
   @Nonnull
   @Override
   public String getSortOrderPrefix() {
-    return COPYBOOKS.prefix;
+    return CONSTANTS.prefix;
   }
 
   @Nonnull
   @Override
   public CompletionItemKind getKind() {
-    return CompletionItemKind.Class;
+    return Constant;
   }
 }

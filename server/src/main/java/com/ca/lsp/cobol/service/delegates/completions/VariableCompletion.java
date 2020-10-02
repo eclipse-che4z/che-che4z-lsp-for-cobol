@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
+import static com.ca.lsp.cobol.service.delegates.completions.CompletionOrder.VARIABLES;
+
 @Singleton
 public class VariableCompletion implements Completion {
 
@@ -38,7 +40,7 @@ public class VariableCompletion implements Completion {
   @Nonnull
   @Override
   public String getSortOrderPrefix() {
-    return "0"; // Variables are supposed to be the first in the completions list
+    return VARIABLES.prefix;
   }
 
   @Nonnull

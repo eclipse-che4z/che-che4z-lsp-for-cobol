@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
+import static com.ca.lsp.cobol.service.delegates.completions.CompletionOrder.PARAGRAPHS;
+
 @Singleton
 public class ParagraphCompletion implements Completion {
 
@@ -38,7 +40,7 @@ public class ParagraphCompletion implements Completion {
   @Nonnull
   @Override
   public String getSortOrderPrefix() {
-    return "1"; // paragraphs are supposed to be the second in the completions list
+    return PARAGRAPHS.prefix;
   }
 
   @Nonnull

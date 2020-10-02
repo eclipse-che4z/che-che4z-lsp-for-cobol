@@ -26,6 +26,8 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Optional;
 
+import static com.ca.lsp.cobol.service.delegates.completions.CompletionOrder.SNIPPETS;
+
 @Singleton
 public class SnippetCompletion implements Completion {
   private CompletionStorage snippets;
@@ -52,7 +54,7 @@ public class SnippetCompletion implements Completion {
   @Nonnull
   @Override
   public String getSortOrderPrefix() {
-    return "3";
+    return SNIPPETS.prefix;
   }
 
   @Nonnull

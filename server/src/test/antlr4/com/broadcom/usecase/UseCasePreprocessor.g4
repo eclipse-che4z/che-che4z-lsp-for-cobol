@@ -16,7 +16,7 @@
 grammar UseCasePreprocessor;
 
 startRule
-   : .*? ((copybookStatement | variableStatement | paragraphStatement | errorStatement | multiTokenError | NEWLINE)+ .*?)+ EOF
+   : .*? ((copybookStatement | variableStatement | paragraphStatement | constantStatement | errorStatement | multiTokenError | NEWLINE)+ .*?)+ EOF
    ;
 
 multiTokenError
@@ -24,7 +24,7 @@ multiTokenError
    ;
 
 multiToken
-   : (word | copybookStatement | variableStatement | paragraphStatement | errorStatement | multiTokenError | TEXT)+
+   : (word | copybookStatement | variableStatement | paragraphStatement | constantStatement | errorStatement | multiTokenError | TEXT)+
    ;
 
 errorStatement
@@ -53,6 +53,14 @@ variableUsage
 
 variableDefinition
    : VARIABLEDEFINITION word
+   ;
+
+constantStatement
+   : constantUsage diagnostic* STOP
+   ;
+
+constantUsage
+   : CONSTANTUSAGE word
    ;
 
 paragraphStatement
@@ -95,6 +103,7 @@ START : '{';
 STOP : '}';
 VARIABLEDEFINITION : START + '$*';
 VARIABLEUSAGE : START + '$';
+CONSTANTUSAGE : START + '&';
 PARAGRPHDEFINITION : START + '#*';
 PARAGRPHUSAGE : START + '#';
 COPYBOOKDEFINITION : START + '~*';

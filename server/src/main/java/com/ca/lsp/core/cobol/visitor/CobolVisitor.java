@@ -20,10 +20,7 @@ import com.ca.lsp.core.cobol.model.Variable;
 import com.ca.lsp.core.cobol.parser.CobolParser.*;
 import com.ca.lsp.core.cobol.parser.CobolParserBaseVisitor;
 import com.ca.lsp.core.cobol.preprocessor.sub.util.impl.PreprocessorStringUtils;
-import com.ca.lsp.core.cobol.semantics.CobolVariableContext;
-import com.ca.lsp.core.cobol.semantics.NamedSubContext;
-import com.ca.lsp.core.cobol.semantics.SemanticContext;
-import com.ca.lsp.core.cobol.semantics.SubContext;
+import com.ca.lsp.core.cobol.semantics.*;
 import com.ca.lsp.core.cobol.semantics.outline.NodeType;
 import com.ca.lsp.core.cobol.semantics.outline.OutlineTreeBuilder;
 import lombok.Getter;
@@ -69,6 +66,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private SubContext<String> paragraphs = new NamedSubContext();
   private CobolVariableContext variables = new CobolVariableContext();
+  private PredefinedVariableContext constants = new PredefinedVariableContext();
 
   private String programName = null;
 
@@ -101,6 +99,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
         variables.getUsages().asMap(),
         paragraphs.getDefinitions().asMap(),
         paragraphs.getUsages().asMap(),
+        constants.getDefinitions().asMap(),
+        constants.getUsages().asMap(),
         copybooks.getDefinitions().asMap(),
         copybooks.getUsages().asMap(),
         buildOutlineTree());
@@ -396,6 +396,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     variables.define(new Variable(level, name), location);
   }
 
+  private void addVariableUsage(String name, @Nonnull Location location) {
+    addUsage(constants.contains(name) ? constants : variables, name, location);
+  }
+
   private void addUsage(SubContext<?> langContext, String name, @Nonnull Location location) {
     langContext.addUsage(name.toUpperCase(), location);
   }
@@ -424,7 +428,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void checkForVariable(String variable, QualifiedDataNameFormat1Context ctx) {
     Optional<Locality> locality = getLocality(ctx.getStart());
     locality.ifPresent(it -> checkVariableDefinition(variable, it));
-    locality.map(Locality::toLocation).ifPresent(it -> addUsage(variables, variable, it));
+    locality.map(Locality::toLocation).ifPresent(it -> addVariableUsage(variable, it));
 
     if (ctx.qualifiedInData() != null) {
       iterateOverQualifiedDataNames(ctx, variable);
@@ -450,7 +454,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
       child = parent;
 
       Location parentLocation = parentLocality.map(Locality::toLocation).orElse(null);
-      if (parentLocation != null) addUsage(variables, child, parentLocation);
+      if (parentLocation != null) addVariableUsage(child, parentLocation);
     }
   }
 
@@ -473,7 +477,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   private void checkVariableDefinition(String name, @Nonnull Locality locality) {
-    if (!variables.contains(name)) {
+    if (!variables.contains(name) && !constants.contains(name)) {
       reportVariableNotDefined(name, locality, locality); // starts and finishes in one token
     }
   }
