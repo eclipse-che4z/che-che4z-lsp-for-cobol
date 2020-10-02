@@ -44,7 +44,7 @@ import static org.antlr.v4.runtime.Lexer.HIDDEN;
  * UseCasePreprocessor.g4
  */
 public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
-  private List<String> PREDEFINED_EIB_VARIABLES =
+  private List<String> PREDEFINED_VARIABLES =
       List.of(
           "EIBAID",
           "EIBATT",
@@ -308,7 +308,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
 
   private Map<String, List<Location>> getConstantDefinitions() {
     List<Location> defaultLocation = List.of(new Location());
-    return PREDEFINED_EIB_VARIABLES.stream()
+    return PREDEFINED_VARIABLES.stream()
         .collect(Collectors.toMap(it -> it, it -> defaultLocation));
   }
 
