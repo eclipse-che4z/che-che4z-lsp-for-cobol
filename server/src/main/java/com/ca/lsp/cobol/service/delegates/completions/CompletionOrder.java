@@ -15,16 +15,13 @@
 
 package com.ca.lsp.cobol.service.delegates.completions;
 
-import lombok.AllArgsConstructor;
-
 /** This enum explicitly defines the order for completions suggestions with sorting prefixes */
-@AllArgsConstructor
 public enum CompletionOrder {
-  VARIABLES("0"),
-  PARAGRAPHS("1"),
-  COPYBOOKS("2"),
-  CONSTANTS("3"),
-  SNIPPETS("4"),
-  KEYWORDS("5");
-  final String prefix;
+  VARIABLES,
+  PARAGRAPHS,
+  COPYBOOKS,
+  CONSTANTS,
+  SNIPPETS,
+  KEYWORDS;
+  final String prefix = String.valueOf(this.ordinal());
 }
