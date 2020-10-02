@@ -51,7 +51,7 @@ class TestExecCicsContainerStatementsArgumentsOrder {
           + "       {#*MAINLINE}.\n"
           + "           exec cics put container({$xml-cont})\n"
           + "                         channel({$outbound-channel})\n"
-          + "                         from(DFH-BODY(15:{$Scratch-len}))\n"
+          + "                         from({$DFH-BODY}(15:{$Scratch-len}))\n"
           + "                         flength({$Scratch-len})\n"
           + "                         resp({$COMMAND-RESP})\n"
           + "                         resp2({$COMMAND-RESP2})\n"
