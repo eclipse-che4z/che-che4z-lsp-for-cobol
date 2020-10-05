@@ -49,7 +49,7 @@ pipeline {
         disableConcurrentBuilds()
         timestamps()
         timeout(time: 3, unit: 'HOURS')
-        skipDefaultCheckout(false)
+        skipDefaultCheckout(true)
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '3'))
     }
     environment {
@@ -64,6 +64,12 @@ pipeline {
                 }
             }
             stages {
+                stage('Checkout'){
+                    steps {
+                        deleteDir()
+                        checkout scm
+                    }
+                }
                 stage('Build LSP server part') {
                     steps {
                         container('maven') {
