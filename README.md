@@ -173,4 +173,3 @@ Each such event is logged with the following information:
 * Country or region
 * Anonymous user and session ID
 * Version numbers of Microsoft VS Code and COBOL Language Support
-
