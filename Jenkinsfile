@@ -114,23 +114,6 @@ pipeline {
                   }
                 }
 
-                stage('SonarCloud analysis-Client') {
-                    environment {
-                        npm_config_cache = "$env.WORKSPACE"
-                        SONAR_BINARY_CACHE="$env.WORKSPACE"
-                    }
-                    steps {
-                        container('node-sonar') {
-                            dir('clients/cobol-lsp-vscode-extension') {
-                                sh 'npm i sonarqube-scanner'
-                                withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
-                                	sh "node_modules/sonarqube-scanner/dist/bin/sonar-scanner -Dsonar.projectKey=com.ca.lsp:com.ca.lsp.cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
-                                }
-                            }
-                        }
-                    }
-                }
-
                 stage('Client - Change version') {
                     environment {
                         buildNumber = "$env.BUILD_NUMBER"
@@ -177,6 +160,24 @@ pipeline {
                         }
                     }
                 }
+
+                stage('SonarCloud analysis-Client') {
+                    environment {
+                        npm_config_cache = "$env.WORKSPACE"
+                        SONAR_BINARY_CACHE="$env.WORKSPACE"
+                    }
+                    steps {
+                        container('node-sonar') {
+                            dir('clients/cobol-lsp-vscode-extension') {
+                                sh 'npm i sonarqube-scanner'
+                                withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
+                                	sh "node_modules/sonarqube-scanner/dist/bin/sonar-scanner -Dsonar.projectKey=com.ca.lsp:com.ca.lsp.cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
+                                }
+                            }
+                        }
+                    }
+                }
+
                 stage('Deploy') {
                     environment {
                         sshChe4z = "genie.che4z@projects-storage.eclipse.org"
