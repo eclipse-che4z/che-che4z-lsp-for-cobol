@@ -17,8 +17,10 @@ spec:
       requests:
         memory: "2Gi"
         cpu: "1"
-  - name: node
-    image: node:12.10.0-alpine
+  - name: node-sonar
+    image: sonarsource/sonarcloud-scan:1.2.1
+    command:
+    - cat
     tty: true
     resources:
       limits:
@@ -91,7 +93,7 @@ pipeline {
                         npm_config_cache = "$env.WORKSPACE"
                     }
                     steps {
-                        container('node') {
+                        container('node-sonar') {
                             dir('clients/cobol-lsp-vscode-extension') {
                                 sh 'npm ci'
                             }
@@ -104,7 +106,7 @@ pipeline {
                       npm_config_cache = "$env.WORKSPACE"
                   }
                   steps {
-                      container('node') {
+                      container('node-sonar') {
                           dir('clients/cobol-lsp-vscode-extension') {
                             sh 'npm t'
                           }
@@ -113,11 +115,16 @@ pipeline {
                 }
 
                 stage('SonarCloud analysis-Client') {
+                    environment {
+                        npm_config_cache = "$env.WORKSPACE"
+                        SONAR_BINARY_CACHE="$env.WORKSPACE"
+                    }
                     steps {
-                        container('sonarsource/sonarcloud-scan') {
+                        container('node-sonar') {
                             dir('clients/cobol-lsp-vscode-extension') {
+                                sh 'npm i sonarqube-scanner'
                                 withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
-                                    sh "${tool('SonarQubeScanner')}/bin/sonar-scanner -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol-TS -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME} --no-transfer-progress"
+                                	sh "node_modules/sonarqube-scanner/dist/bin/sonar-scanner -Dsonar.projectKey=com.ca.lsp:com.ca.lsp.cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
                                 }
                             }
                         }
@@ -132,7 +139,7 @@ pipeline {
                         expression { branchName != 'master' }
                     }
                     steps {
-                        container('node') {
+                        container('node-sonar') {
                             dir('clients/cobol-lsp-vscode-extension') {
                                 sh 'sed -i "s/\\"version\\": \\"\\(.*\\)\\"/\\"version\\": \\"\\1+$branchName.$buildNumber\\"/g" package.json'
                             }
@@ -146,7 +153,7 @@ pipeline {
                     }
 
                     steps{
-                        container('node') {
+                        container('node-sonar') {
                             dir('clients/cobol-lsp-vscode-extension') {
                                 //test telemetry key generation
                                 withCredentials([string(credentialsId: 'TELEMETRY_INSTRUMENTATION_KEY', variable: 'TELKEY')]) {
@@ -162,7 +169,7 @@ pipeline {
                         npm_config_cache = "$env.WORKSPACE"
                     }
                     steps {
-                        container('node') {
+                        container('node-sonar') {
                             dir('clients/cobol-lsp-vscode-extension') {
                                 sh 'npx vsce package'
                                 archiveArtifacts "*.vsix"
