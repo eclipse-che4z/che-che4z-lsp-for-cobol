@@ -114,10 +114,10 @@ pipeline {
 
                 stage('SonarCloud analysis-Client') {
                     steps {
-                        container('maven') {
+                        container('sonarsource/sonarcloud-scan') {
                             dir('clients/cobol-lsp-vscode-extension') {
                                 withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
-                                    sh "mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol-TS -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME} --no-transfer-progress"
+                                    sh "${tool('SonarQubeScanner')}/bin/sonar-scanner -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol-TS -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME} --no-transfer-progress"
                                 }
                             }
                         }
