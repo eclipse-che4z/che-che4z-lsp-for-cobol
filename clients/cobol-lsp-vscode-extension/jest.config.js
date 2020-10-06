@@ -16,7 +16,7 @@ module.exports = {
         "!**/node_modules/**",
         "!**/coverage/**"
      ],
-    //"testResultsProcessor": "jest-sonar-reporter",
+    "testResultsProcessor": "jest-sonar-reporter",
      "coverageThreshold": {
       "global": {
         "branches": 70,
