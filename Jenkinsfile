@@ -18,7 +18,7 @@ spec:
         memory: "2Gi"
         cpu: "1"
   - name: node
-    image: node:12.10.0-alpine
+    image: sonarsource/sonarcloud-scan:1.2.1
     command:
     - cat
     tty: true
