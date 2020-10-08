@@ -932,15 +932,31 @@ libraryIsGlobalClause
    ;
 
 dataDescriptionEntry
-   : dataDescriptionEntryFormat1 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat3 | dataDescriptionEntryExecSql
+   : dataDescriptionEntryFormat1
+   | dataDescriptionEntryFormat2
+   | dataDescriptionEntryFormat1Level77
+   | dataDescriptionEntryFormat3
+   | dataDescriptionEntryExecSql
    ;
 
 dataDescriptionEntryFormat1
-   : otherLevel (FILLER | dataName1)? (dataGroupUsageClause | dataRedefinesClause | dataIntegerStringClause | dataExternalClause | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataPictureClause | dataCommonOwnLocalClause | dataTypeClause | dataUsingClause | dataUsageClause | dataValueClause | dataReceivedByClause | dataOccursClause | dataSignClause | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause | dataWithLowerBoundsClause | dataAlignedClause | dataRecordAreaClause)* (DOT_FS|DOT_FS2)
+   : LEVEL_NUMBER (FILLER | dataName1)? (dataGroupUsageClause | dataRedefinesClause | dataIntegerStringClause
+   | dataExternalClause | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataPictureClause
+   | dataCommonOwnLocalClause | dataTypeClause | dataUsingClause | dataUsageClause | dataValueClause
+   | dataReceivedByClause | dataOccursClause | dataSignClause | dataSynchronizedClause | dataJustifiedClause
+   | dataBlankWhenZeroClause | dataWithLowerBoundsClause | dataAlignedClause | dataRecordAreaClause)* (DOT_FS|DOT_FS2)
    ;
 
 dataDescriptionEntryFormat2
    : LEVEL_NUMBER_66 dataName1 dataRenamesClause DOT_FS
+   ;
+
+dataDescriptionEntryFormat1Level77
+   : LEVEL_NUMBER_77 dataName1 (dataPictureClause | dataRedefinesClause | dataIntegerStringClause | dataExternalClause
+   | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataCommonOwnLocalClause | dataTypeClause
+   | dataUsingClause | dataUsageClause | dataValueClause | dataReceivedByClause | dataOccursClause | dataSignClause
+   | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause | dataWithLowerBoundsClause
+   | dataAlignedClause | dataRecordAreaClause)* (DOT_FS|DOT_FS2)
    ;
 
 dataDescriptionEntryFormat3

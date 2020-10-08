@@ -40,6 +40,7 @@ import java.util.Optional;
 
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.INFO;
 import static com.ca.lsp.core.cobol.model.ErrorSeverity.WARNING;
+import static com.ca.lsp.core.cobol.semantics.CobolVariableContext.LEVEL_77;
 import static com.ca.lsp.core.cobol.semantics.outline.OutlineNodeNames.*;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
@@ -332,10 +333,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   public Class visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
     Token token = ctx.getStart();
     String tokenText = token.getText();
-    if (tokenText.equals("01") || tokenText.equals("1") || tokenText.equals("77")) {
+    if (tokenText.equals("01") || tokenText.equals("1")) {
       areaAWarning(token);
     }
-    String levelNumber = ctx.otherLevel().getText();
+    String levelNumber = ctx.LEVEL_NUMBER().getText();
     ofNullable(ctx.dataName1())
         .ifPresent(
             variable ->
@@ -391,6 +392,27 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
                         location -> defineVariable(levelNumber, variable.getText(), location)));
     outlineTreeBuilder.addVariable(
         CobolVariableContext.LEVEL_88, ctx.dataName1().getText(), NodeType.FIELD_88, ctx);
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Class visitDataDescriptionEntryFormat1Level77(
+      DataDescriptionEntryFormat1Level77Context ctx) {
+    areaAWarning(ctx.getStart());
+    ofNullable(ctx.dataName1())
+        .ifPresent(
+            variable ->
+                getLocality(variable.getStart())
+                    .map(Locality::toLocation)
+                    .ifPresent(
+                        location ->
+                            defineVariable(
+                                String.valueOf(LEVEL_77), variable.getText(), location)));
+    String name = ofNullable(ctx.dataName1()).map(RuleContext::getText).orElse(FILLER_NAME);
+
+    outlineTreeBuilder.addVariable(LEVEL_77, name, NodeType.FIELD, ctx);
+    ofNullable(ctx.dataOccursClause())
+        .ifPresent(it -> it.forEach(occursClause -> processDataOccursClause(77, occursClause)));
     return visitChildren(ctx);
   }
 
