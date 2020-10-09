@@ -18,7 +18,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.ca.lsp</groupId>
+    <groupId>com.broadcom.lsp.cobol</groupId>
     <artifactId>server</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
@@ -235,7 +235,7 @@
                             <finalName>server</finalName>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.ca.lsp.cobol.LangServerBootstrap</mainClass>
+                                    <mainClass>com.broadcom.lsp.cobol.LangServerBootstrap</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
@@ -347,9 +347,9 @@
                         <configuration>
                             <arguments>
                                 <argument>-package</argument>
-                                <argument>com.ca.lsp.core.cobol.parser</argument>
+                                <argument>com.broadcom.lsp.cobol.core</argument>
                             </arguments>
-                            <sourceDirectory>${basedir}/src/main/antlr4/com/ca/lsp/core/cobol/parser</sourceDirectory>
+                            <sourceDirectory>src/main/antlr4/com/broadcom/lsp/cobol/core/parser</sourceDirectory>
                             <listener>true</listener>
                             <visitor>true</visitor>
                         </configuration>
