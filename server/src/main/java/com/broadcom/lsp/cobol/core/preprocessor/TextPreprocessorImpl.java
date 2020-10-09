@@ -15,11 +15,13 @@
 package com.broadcom.lsp.cobol.core.preprocessor;
 
 import com.broadcom.lsp.cobol.core.model.*;
-import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.*;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolCommentEntriesMarkerImpl;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolInlineCommentEntriesNormalizerImpl;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
@@ -112,7 +114,7 @@ public class TextPreprocessorImpl implements TextPreprocessor {
     return new CobolInlineCommentEntriesNormalizerImpl();
   }
 
-  private CobolLineIndicatorProcessor createLineIndicatorProcessor() {
+  private CobolLineReWriter createLineIndicatorProcessor() {
     return new CobolLineIndicatorProcessorImpl();
   }
 

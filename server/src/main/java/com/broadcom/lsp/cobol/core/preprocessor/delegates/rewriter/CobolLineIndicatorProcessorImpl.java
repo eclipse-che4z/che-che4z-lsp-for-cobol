@@ -25,7 +25,11 @@ import java.util.stream.Collectors;
 import static com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants.COMMENT_TAG;
 import static com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants.WS;
 
-public class CobolLineIndicatorProcessorImpl implements CobolLineIndicatorProcessor {
+/**
+ * This class processes the indicator area of COBOL lines checking if some operations should be
+ * applied on the content area.
+ */
+public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
 
   private static final String EMPTY_STRING = "";
   private static final int AREA_A_FILLER = 5;
@@ -34,17 +38,16 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineIndicatorProces
   private static final String LEADING_WHITESPACE = "^\\s+";
   private static final String TRAILING_WHITESPACE = "\\s+$";
 
+  /**
+   * Normalizes the lines by stripping the sequence number and line indicator, and interpreting the
+   * line indicator.
+   */
   @Override
   public List<CobolLine> processLines(final List<CobolLine> lines) {
     return lines.stream().map(this::processLine).collect(Collectors.toList());
   }
 
-  /**
-   * Normalizes a line by stripping the sequence number and line indicator, and interpreting the
-   * line indicator.
-   */
-  @Override
-  public CobolLine processLine(final CobolLine line) {
+  private CobolLine processLine(final CobolLine line) {
     final String conditionalRightTrimmedContentArea = conditionalRightTrimContentArea(line);
     final CobolLine result;
 
