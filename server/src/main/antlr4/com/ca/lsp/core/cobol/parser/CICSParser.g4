@@ -1193,15 +1193,11 @@ cicsDfhValueLiteral
    ;
 
 integerLiteral
-   : INTEGERLITERAL | otherLevel | LEVEL_NUMBER_66 | LEVEL_NUMBER_88
+   : INTEGERLITERAL | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_88
    ;
 
 literal
    : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | cicsDfhRespLiteral | cicsDfhValueLiteral | charString
-   ;
-
-otherLevel
-   : LEVEL_NUMBER
    ;
 
 charString
