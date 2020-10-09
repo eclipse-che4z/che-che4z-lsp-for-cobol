@@ -32,7 +32,7 @@ public interface StructuredVariable extends Variable {
   void addChild(Variable variable);
 
   /**
-   * Return a list of already defined nested variables
+   * Return an immutable list of already defined nested variables
    *
    * @return defined nested variables.
    */

@@ -23,6 +23,8 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.*;
+
 /**
  * This value class represents the Table variable that may have nested variables, and an optional
  * index
@@ -61,6 +63,6 @@ public class TableDataName implements StructuredVariable {
    * @return defined nested variables.
    */
   public List<Variable> getChildren() {
-    return new ArrayList<>(children);
+    return unmodifiableList(children);
   }
 }

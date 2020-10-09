@@ -22,6 +22,8 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.unmodifiableList;
+
 /**
  * This value class represents a group item COBOL variable. Group elements can have nested
  * variables. They cannot have neither PIC nor VALUE clauses. Can be the top element of the
@@ -54,6 +56,6 @@ public class GroupItem implements StructuredVariable {
    * @return defined nested variables.
    */
   public List<Variable> getChildren() {
-    return new ArrayList<>(children);
+    return unmodifiableList(children);
   }
 }

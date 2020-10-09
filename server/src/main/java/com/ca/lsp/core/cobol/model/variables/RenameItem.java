@@ -22,6 +22,8 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.unmodifiableList;
+
 /**
  * This value class represents a renaming data name entry, that has a level number 66. It may be one
  * a top level, but should trail a variable structure. It is used to regroup element items, e.g.
@@ -70,5 +72,14 @@ public class RenameItem implements StructuredVariable {
   @Override
   public void addChild(Variable variable) {
     throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Return a list of renamed elementary items
+   *
+   * @return re-defined nested variables.
+   */
+  public List<Variable> getChildren() {
+    return unmodifiableList(children);
   }
 }
