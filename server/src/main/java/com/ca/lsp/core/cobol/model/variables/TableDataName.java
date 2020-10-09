@@ -27,14 +27,13 @@ import java.util.List;
  * index
  */
 @Value
-public class Table implements StructuredVariable {
-
+public class TableDataName implements StructuredVariable {
   private String name;
   private int occursTimes;
   private IndexItem index;
   private List<Variable> children = new ArrayList<>();
 
-  public Table(@Nonnull String name, int occursTimes, @Nullable IndexItem index) {
+  public TableDataName(@Nonnull String name, int occursTimes, @Nullable IndexItem index) {
     this.name = name;
     this.occursTimes = occursTimes;
     this.index = index;

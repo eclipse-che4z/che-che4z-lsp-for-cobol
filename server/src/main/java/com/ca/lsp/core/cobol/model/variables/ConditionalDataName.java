@@ -25,7 +25,7 @@ import lombok.Value;
  */
 @Value
 @AllArgsConstructor
-public class ConditionalName implements Variable {
+public class ConditionalDataName implements Variable {
   private String name;
   private String value;
 }
