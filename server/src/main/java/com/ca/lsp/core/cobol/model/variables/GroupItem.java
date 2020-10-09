@@ -15,6 +15,7 @@
 
 package com.ca.lsp.core.cobol.model.variables;
 
+import com.ca.lsp.core.cobol.model.Locality;
 import lombok.Value;
 
 import javax.annotation.Nonnull;
@@ -29,10 +30,12 @@ import java.util.List;
 @Value
 public class GroupItem implements StructuredVariable {
   private String name;
+  private Locality definition;
   private List<Variable> children = new ArrayList<>();
 
-  public GroupItem(@Nonnull String name) {
+  public GroupItem(@Nonnull String name, @Nonnull Locality definition) {
     this.name = name;
+    this.definition = definition;
   }
 
   /**

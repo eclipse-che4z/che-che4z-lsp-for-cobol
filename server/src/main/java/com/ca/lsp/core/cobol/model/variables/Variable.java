@@ -14,9 +14,11 @@
  */
 package com.ca.lsp.core.cobol.model.variables;
 
+import com.ca.lsp.core.cobol.model.Locality;
+
 /**
- * This interface describes a COBOL Variable. Variable has a name, and a level number that shows its
- * position in the hierarchy.
+ * This interface describes a COBOL Variable. Variable has a name, a level number that shows its
+ * position in the hierarchy, and a unique definition locality.
  */
 public interface Variable {
   /**
@@ -25,4 +27,11 @@ public interface Variable {
    * @return String variable name
    */
   String getName();
+
+  /**
+   * Get definition locality
+   *
+   * @return the definition locality
+   */
+  Locality getDefinition();
 }

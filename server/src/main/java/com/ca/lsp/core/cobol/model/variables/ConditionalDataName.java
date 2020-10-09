@@ -15,6 +15,7 @@
 
 package com.ca.lsp.core.cobol.model.variables;
 
+import com.ca.lsp.core.cobol.model.Locality;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 
@@ -28,4 +29,5 @@ import lombok.Value;
 public class ConditionalDataName implements Variable {
   private String name;
   private String value;
+  private Locality definition;
 }

@@ -15,6 +15,7 @@
 
 package com.ca.lsp.core.cobol.model.variables;
 
+import com.ca.lsp.core.cobol.model.Locality;
 import lombok.Value;
 
 import javax.annotation.Nonnull;
@@ -31,11 +32,17 @@ public class TableDataName implements StructuredVariable {
   private String name;
   private int occursTimes;
   private IndexItem index;
+  private Locality definition;
   private List<Variable> children = new ArrayList<>();
 
-  public TableDataName(@Nonnull String name, int occursTimes, @Nullable IndexItem index) {
+  public TableDataName(
+      @Nonnull String name,
+      int occursTimes,
+      @Nonnull Locality definition,
+      @Nullable IndexItem index) {
     this.name = name;
     this.occursTimes = occursTimes;
+    this.definition = definition;
     this.index = index;
   }
 

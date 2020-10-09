@@ -15,6 +15,7 @@
 
 package com.ca.lsp.core.cobol.model.variables;
 
+import com.ca.lsp.core.cobol.model.Locality;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 
@@ -30,4 +31,5 @@ public class ElementItem implements Variable {
   private String name;
   private String picClause;
   private String value;
+  private Locality definition;
 }

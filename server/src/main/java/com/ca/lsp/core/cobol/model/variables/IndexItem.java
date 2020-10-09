@@ -15,15 +15,17 @@
 
 package com.ca.lsp.core.cobol.model.variables;
 
+import com.ca.lsp.core.cobol.model.Locality;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 
 /**
  * This value class represents an Index item. It is defined using INDEXED BY statement in a {@link
- * Table} declaration.
+ * TableDataName} declaration.
  */
 @Value
 @AllArgsConstructor
 public class IndexItem implements Variable {
   private String name;
+  private Locality definition;
 }
