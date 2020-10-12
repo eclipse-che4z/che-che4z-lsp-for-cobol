@@ -14,9 +14,9 @@
  */
 package com.broadcom.lsp.cobol.core.preprocessor.delegates;
 
+import com.broadcom.lsp.cobol.core.CobolPreprocessorListener;
 import com.broadcom.lsp.cobol.core.model.ExtendedDocument;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorListener;
 
 import java.util.List;
 

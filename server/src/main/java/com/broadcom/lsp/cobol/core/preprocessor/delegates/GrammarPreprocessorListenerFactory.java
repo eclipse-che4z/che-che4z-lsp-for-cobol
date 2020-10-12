@@ -22,7 +22,18 @@ import org.antlr.v4.runtime.BufferedTokenStream;
 import javax.annotation.Nonnull;
 import java.util.Deque;
 
+/** A factory for {@link GrammarPreprocessorListener} */
 public interface GrammarPreprocessorListenerFactory {
+  /**
+   * Create a new {@link GrammarPreprocessorListenerImpl} for pre-processing of a COBOL text with
+   * the grammar
+   *
+   * @param uri - URI of the document
+   * @param tokens - a stream of tokens by {@link CobolPreprocessorLexer}
+   * @param copybookStack - a stack representing the copybook hierarchy
+   * @param copybookProcessingMode - settings of copybook processing
+   * @return a new listener
+   */
   GrammarPreprocessorListenerImpl create(
       @Nonnull String uri,
       @Nonnull BufferedTokenStream tokens,

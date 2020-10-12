@@ -18,7 +18,17 @@ import com.broadcom.lsp.cobol.core.model.CobolLine;
 
 import java.util.List;
 
+/**
+ * This interface describes a class that should convert a list of COBOL lines to a String for the
+ * further processing
+ */
 public interface CobolLineWriter {
 
+  /**
+   * Convert a list of COBOL lines into one string
+   *
+   * @param lines - list of lines
+   * @return a string representation of the COBOL program
+   */
   String serialize(List<CobolLine> lines);
 }

@@ -22,6 +22,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 import java.util.stream.IntStream;
 
+/**
+ * This class serializes a list of COBOL lines into a String
+ */
 public class CobolLineWriterImpl implements CobolLineWriter {
 
   @Override

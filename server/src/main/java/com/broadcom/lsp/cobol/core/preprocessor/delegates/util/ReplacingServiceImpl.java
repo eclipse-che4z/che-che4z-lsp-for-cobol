@@ -71,7 +71,6 @@ public class ReplacingServiceImpl implements ReplacingService {
     return clause.split("(?i)BY");
   }
 
-  @Nonnull
   private boolean isPatternCorrect(@Nonnull String[] pattern) {
     return pattern.length == 2;
   }

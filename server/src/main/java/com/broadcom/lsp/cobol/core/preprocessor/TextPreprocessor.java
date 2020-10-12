@@ -26,6 +26,7 @@ import java.util.Deque;
  * the grammar
  */
 public interface TextPreprocessor {
+
   ResultWithErrors<ExtendedDocument> process(
       String documentUri, String cobolCode, CopybookProcessingMode copybookProcessingMode);
 
