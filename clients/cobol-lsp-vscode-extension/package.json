@@ -128,7 +128,8 @@
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "jest -w 1 --unhandled-rejections=strict"
+        "test": "jest -w 1 --unhandled-rejections=strict",
+        "coverage": "jest --coverage"
     },
     "dependencies": {
         "@zowe/imperative": "4.7.4",
@@ -139,6 +140,7 @@
         "@types/jest": "^24.0.18",
         "@types/node": "^12.6.2",
         "jest": "^24.9.0",
+        "jest-sonar-reporter": "^2.0.0",
         "ts-jest": "^24.0.2",
         "tslint": "^5.18.0",
         "tslint-sonarts": "^1.9.0",
