@@ -18,7 +18,9 @@ spec:
         memory: "2Gi"
         cpu: "1"
   - name: node
-    image: node:12.10.0-alpine
+    image: sonarsource/sonarcloud-scan:1.2.1
+    command:
+    - cat
     tty: true
     resources:
       limits:
@@ -47,7 +49,7 @@ pipeline {
         disableConcurrentBuilds()
         timestamps()
         timeout(time: 3, unit: 'HOURS')
-        skipDefaultCheckout(false)
+        skipDefaultCheckout(true)
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '3'))
     }
     environment {
@@ -62,6 +64,12 @@ pipeline {
                 }
             }
             stages {
+                stage('Checkout'){
+                    steps {
+                        deleteDir()
+                        checkout scm
+                    }
+                }
                 stage('Build LSP server part') {
                     steps {
                         container('maven') {
@@ -75,7 +83,7 @@ pipeline {
                     }
                 }
 
-                stage('SonarCloud') {
+                stage('SonarCloud analysis-Server') {
                     steps {
                         container('maven') {
                             dir('server') {
@@ -106,10 +114,27 @@ pipeline {
                   steps {
                       container('node') {
                           dir('clients/cobol-lsp-vscode-extension') {
-                            sh 'npm t'
+                            sh 'npm run coverage'
                           }
                       }
                   }
+                }
+
+                stage('SonarCloud analysis-Client') {
+                    environment {
+                        npm_config_cache = "$env.WORKSPACE"
+                        SONAR_BINARY_CACHE="$env.WORKSPACE"
+                    }
+                    steps {
+                        container('node') {
+                            dir('clients/cobol-lsp-vscode-extension') {
+                                sh 'npm i sonarqube-scanner'
+                                withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
+                                    sh "node_modules/sonarqube-scanner/dist/bin/sonar-scanner -Dsonar.projectKey=com.ca.lsp:com.ca.lsp.cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
+                                }
+                            }
+                        }
+                    }
                 }
 
                 stage('Client - Change version') {
@@ -158,6 +183,7 @@ pipeline {
                         }
                     }
                 }
+
                 stage('Deploy') {
                     environment {
                         sshChe4z = "genie.che4z@projects-storage.eclipse.org"

@@ -123,3 +123,4 @@ node_modules
 tools
 logs/app.log
 dist
+clients/cobol-lsp-vscode-extensiontest-report
