@@ -14,8 +14,8 @@
  */
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.impl;
 
-import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
 import com.broadcom.lsp.cobol.core.model.CobolLine;
+import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
 import org.junit.jupiter.api.Test;
 
@@ -39,10 +39,12 @@ class CobolLineIndicatorProcessorImplTest {
     debugLine.setContentAreaB("     DEBUG LINE HERE      ");
 
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
-    CobolLine outcome = processor.processLine(debugLine);
+    List<CobolLine> outcome = processor.processLines(List.of(debugLine));
+    CobolLine actual = outcome.get(0);
 
     assertEquals(
-        ProcessingConstants.WS + "         DEBUG LINE HERE", outcome.getIndicatorArea() + outcome.getContentArea());
+        ProcessingConstants.WS + "         DEBUG LINE HERE",
+        actual.getIndicatorArea() + actual.getContentArea());
   }
 
   /** Testing normal lines pre-formatting for Token analysis */
@@ -55,10 +57,13 @@ class CobolLineIndicatorProcessorImplTest {
     normalLine.setContentAreaB("         RANDOM TEXT ,  ");
 
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
-    CobolLine outcome = processor.processLine(normalLine);
+
+    List<CobolLine> outcome = processor.processLines(List.of(normalLine));
+    CobolLine actual = outcome.get(0);
 
     assertEquals(
-        ProcessingConstants.WS + "             RANDOM TEXT , ", outcome.getIndicatorArea() + outcome.getContentArea());
+        ProcessingConstants.WS + "             RANDOM TEXT , ",
+        actual.getIndicatorArea() + actual.getContentArea());
   }
 
   /** Testing Compiler Directive lines pre-formatting for Token analysis */
@@ -71,9 +76,11 @@ class CobolLineIndicatorProcessorImplTest {
     compilerDirectiveLine.setContentAreaB("DEFINE");
 
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
-    CobolLine outcome = processor.processLine(compilerDirectiveLine);
+    List<CobolLine> outcome = processor.processLines(List.of(compilerDirectiveLine));
+    CobolLine actual = outcome.get(0);
 
-    assertEquals(ProcessingConstants.WS + EMPTY_STRING, outcome.getIndicatorArea() + outcome.getContentArea());
+    assertEquals(
+        ProcessingConstants.WS + EMPTY_STRING, actual.getIndicatorArea() + actual.getContentArea());
   }
 
   /** Testing comment lines pre-formatting for Token analysis */
@@ -87,11 +94,12 @@ class CobolLineIndicatorProcessorImplTest {
 
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
 
-    CobolLine outcome = processor.processLine(commentLine);
+    List<CobolLine> outcome = processor.processLines(List.of(commentLine));
+    CobolLine actual = outcome.get(0);
 
     assertEquals(
         ProcessingConstants.COMMENT_TAG + ProcessingConstants.WS + "    THIS IS A COMMENT",
-        outcome.getIndicatorArea() + outcome.getContentArea());
+        actual.getIndicatorArea() + actual.getContentArea());
   }
 
   /** Testing normal continuation line pre-formatting for Token analysis */
@@ -221,11 +229,12 @@ class CobolLineIndicatorProcessorImplTest {
 
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
 
-    CobolLine outcome = processor.processLine(lastContinuationLine);
+    List<CobolLine> outcome = processor.processLines(List.of(lastContinuationLine));
+    CobolLine actual = outcome.get(0);
 
     assertEquals(
         ProcessingConstants.WS + "RANDOM TEXT SINGLE CONTINUATION LINE\"",
-        outcome.getIndicatorArea() + outcome.getContentArea());
+        actual.getIndicatorArea() + actual.getContentArea());
   }
 
   /**
@@ -256,10 +265,11 @@ class CobolLineIndicatorProcessorImplTest {
 
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
 
-    CobolLine outcome = processor.processLine(lastContinuationLine);
+    List<CobolLine> outcome = processor.processLines(List.of(lastContinuationLine));
+    CobolLine actual = outcome.get(0);
 
     assertEquals(
         ProcessingConstants.WS + "RANDOM TEXT SINGLE CONTINUATION LINE\"",
-        outcome.getIndicatorArea() + outcome.getContentArea());
+        actual.getIndicatorArea() + actual.getContentArea());
   }
 }

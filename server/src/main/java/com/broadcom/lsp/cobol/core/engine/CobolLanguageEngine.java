@@ -14,6 +14,8 @@
  */
 package com.broadcom.lsp.cobol.core.engine;
 
+import com.broadcom.lsp.cobol.core.CobolLexer;
+import com.broadcom.lsp.cobol.core.CobolParser;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.model.ExtendedDocument;
 import com.broadcom.lsp.cobol.core.model.Locality;
@@ -25,8 +27,6 @@ import com.broadcom.lsp.cobol.core.strategy.CobolErrorStrategy;
 import com.broadcom.lsp.cobol.core.visitor.CobolVisitor;
 import com.broadcom.lsp.cobol.core.visitor.ParserListener;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
-import com.ca.lsp.core.cobol.parser.CobolLexer;
-import com.ca.lsp.core.cobol.parser.CobolParser;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;

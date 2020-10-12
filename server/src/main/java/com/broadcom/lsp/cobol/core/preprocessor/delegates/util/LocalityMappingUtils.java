@@ -15,6 +15,9 @@
 
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.util;
 
+import com.broadcom.lsp.cobol.core.CobolLexer;
+import com.broadcom.lsp.cobol.core.CobolPreprocessorLexer;
+import com.broadcom.lsp.cobol.core.CobolPreprocessorListener;
 import com.broadcom.lsp.cobol.core.model.DocumentMapping;
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
@@ -25,8 +28,8 @@ import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static com.ca.lsp.core.cobol.parser.CobolLexer.COPYENTRY;
-import static com.ca.lsp.core.cobol.parser.CobolLexer.COPYEXIT;
+import static com.broadcom.lsp.cobol.core.CobolLexer.COPYENTRY;
+import static com.broadcom.lsp.cobol.core.CobolLexer.COPYEXIT;
 import static java.util.Optional.ofNullable;
 
 /**

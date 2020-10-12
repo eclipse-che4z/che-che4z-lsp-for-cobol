@@ -28,8 +28,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static com.ca.lsp.core.cobol.parser.CobolLexer.COPYENTRY;
-import static com.ca.lsp.core.cobol.parser.CobolLexer.COPYEXIT;
+import static com.broadcom.lsp.cobol.core.CobolLexer.COPYENTRY;
+import static com.broadcom.lsp.cobol.core.CobolLexer.COPYEXIT;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -84,7 +84,12 @@ class LocalityMappingUtilsTest {
 
     // COPYENTRY should move the processing to the next document level
     when(enter.getType()).thenReturn(COPYENTRY);
-    when(enter.getText()).thenReturn(ProcessingConstants.CPY_ENTER_TAG + ProcessingConstants.CPY_URI_OPEN + copybook + ProcessingConstants.CPY_URI_CLOSE);
+    when(enter.getText())
+        .thenReturn(
+            ProcessingConstants.CPY_ENTER_TAG
+                + ProcessingConstants.CPY_URI_OPEN
+                + copybook
+                + ProcessingConstants.CPY_URI_CLOSE);
     // COPYEXIT should move the previous to the previous document level
     when(exit.getType()).thenReturn(COPYEXIT);
 

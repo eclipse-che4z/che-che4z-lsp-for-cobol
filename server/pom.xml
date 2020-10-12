@@ -59,7 +59,7 @@
         <profile>
             <id>skip.nist.tests</id>
             <properties>
-                <exclude.tests>**/com/ca/lsp/test/*.java</exclude.tests>
+                <exclude.tests>**/com/broadcom/lsp/cobol/*.java</exclude.tests>
             </properties>
         </profile>
     </profiles>
@@ -276,7 +276,7 @@
                     <aggregate>true</aggregate>
                     <instrumentation>
                         <includes>
-                            <include>com/ca/lsp/**/*.class</include>
+                            <include>com/broadcom/lsp/**/*.class</include>
                         </includes>
                     </instrumentation>
                     <check/>
@@ -296,8 +296,8 @@
                     <excludes>
                         <exclude>**/generated-sources/**/*</exclude>
                         <exclude>**/generated-test-sources/**/*</exclude>
-                        <exclude>**/com/ca/lsp/core/cobol/parser/**/*</exclude>
-                        <exclude>**/com/broadcom/lsp/cdi/module/**/*</exclude>
+                        <exclude>**/com/broadcom/lsp/cobol/core/parser/**/*</exclude>
+                        <exclude>**/com/broadcom/lsp/cobol/domain/modules/**/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

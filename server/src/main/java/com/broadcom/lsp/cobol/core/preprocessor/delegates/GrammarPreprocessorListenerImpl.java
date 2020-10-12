@@ -14,7 +14,7 @@
  */
 package com.broadcom.lsp.cobol.core.preprocessor.delegates;
 
-import com.broadcom.lsp.cobol.core.model.SyntaxError;
+import com.broadcom.lsp.cobol.core.CobolPreprocessorBaseListener;
 import com.broadcom.lsp.cobol.core.model.*;
 import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
 import com.broadcom.lsp.cobol.core.preprocessor.TextPreprocessor;
@@ -22,8 +22,6 @@ import com.broadcom.lsp.cobol.core.preprocessor.delegates.resolution.CopybookRes
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessor.*;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorBaseListener;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
@@ -44,6 +42,7 @@ import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Function;
 
+import static com.broadcom.lsp.cobol.core.CobolPreprocessor.*;
 import static com.broadcom.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
 import static com.broadcom.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static com.broadcom.lsp.cobol.core.model.ErrorSeverity.INFO;

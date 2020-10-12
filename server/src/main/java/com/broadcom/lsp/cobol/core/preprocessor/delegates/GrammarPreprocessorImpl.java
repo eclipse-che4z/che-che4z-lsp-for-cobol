@@ -14,12 +14,12 @@
  */
 package com.broadcom.lsp.cobol.core.preprocessor.delegates;
 
+import com.broadcom.lsp.cobol.core.CobolPreprocessor;
+import com.broadcom.lsp.cobol.core.CobolPreprocessorLexer;
 import com.broadcom.lsp.cobol.core.model.CopybookUsage;
 import com.broadcom.lsp.cobol.core.model.ExtendedDocument;
 import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessor;
-import com.ca.lsp.core.cobol.parser.CobolPreprocessorLexer;
 import com.google.inject.Inject;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;

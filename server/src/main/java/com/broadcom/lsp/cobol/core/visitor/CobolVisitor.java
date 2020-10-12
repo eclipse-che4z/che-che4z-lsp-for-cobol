@@ -15,6 +15,8 @@
 
 package com.broadcom.lsp.cobol.core.visitor;
 
+import com.broadcom.lsp.cobol.core.CobolParser;
+import com.broadcom.lsp.cobol.core.CobolParserBaseVisitor;
 import com.broadcom.lsp.cobol.core.model.ErrorSeverity;
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
@@ -24,8 +26,6 @@ import com.broadcom.lsp.cobol.core.semantics.*;
 import com.broadcom.lsp.cobol.core.semantics.outline.NodeType;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineTreeBuilder;
-import com.ca.lsp.core.cobol.parser.CobolParser.*;
-import com.ca.lsp.core.cobol.parser.CobolParserBaseVisitor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -41,15 +41,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.broadcom.lsp.cobol.core.CobolParser.*;
 import static com.broadcom.lsp.cobol.core.semantics.CobolVariableContext.LEVEL_77;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 
 /**
  * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
- * abstract syntax tree built by {@link com.ca.lsp.core.cobol.parser.CobolParser}. It requires a
- * semantic context with defined elements to add the usages or throw a warning on an invalid
- * definition. If there is a misspelled keyword, the visitor finds it and throws a warning.
+ * abstract syntax tree built by {@link CobolParser}. It requires a semantic context with defined
+ * elements to add the usages or throw a warning on an invalid definition. If there is a misspelled
+ * keyword, the visitor finds it and throws a warning.
  */
 @Slf4j
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {

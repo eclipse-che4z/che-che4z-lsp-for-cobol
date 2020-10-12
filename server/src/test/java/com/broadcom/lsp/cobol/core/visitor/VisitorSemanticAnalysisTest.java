@@ -15,11 +15,11 @@
 
 package com.broadcom.lsp.cobol.core.visitor;
 
+import com.broadcom.lsp.cobol.core.CobolParser;
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
 import com.broadcom.lsp.cobol.core.utils.CustomToken;
-import com.ca.lsp.core.cobol.parser.CobolParser;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -28,8 +28,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static com.ca.lsp.core.cobol.parser.CobolParser.DataNameContext;
-import static com.ca.lsp.core.cobol.parser.CobolParser.QualifiedDataNameFormat1Context;
+import static com.broadcom.lsp.cobol.core.CobolParser.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -79,7 +78,7 @@ class VisitorSemanticAnalysisTest {
   void testMisspelledKeywordDistance() {
 
     CustomToken token = createNewToken(WRONG_TOKEN);
-    CobolParser.StatementContext node = mock(CobolParser.StatementContext.class);
+    StatementContext node = mock(StatementContext.class);
     when(node.getStart()).thenReturn(token);
     when(node.getStop()).thenReturn(token);
 
