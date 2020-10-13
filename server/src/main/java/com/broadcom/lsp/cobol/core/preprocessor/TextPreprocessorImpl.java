@@ -32,6 +32,12 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
+/**
+ * This class re-writes the content of the analyzing file to simplify the processing by the grammar,
+ * e.g. removes comments or cleans-up the comment and sequence areas. See the delegates for more
+ * details. As a result it returns the {@link ExtendedDocument}, e.g. one that has all the copybook
+ * content built inside the document text.
+ */
 @Slf4j
 @Singleton
 public class TextPreprocessorImpl implements TextPreprocessor {
@@ -61,6 +67,15 @@ public class TextPreprocessorImpl implements TextPreprocessor {
     this.indicatorProcessor = indicatorProcessor;
   }
 
+  /**
+   * Process the given source code by removing all the unnecessary tokens and building in the nested
+   * copybook content.
+   *
+   * @param documentUri - URI of the processing document
+   * @param cobolSourceCode - source code to analyze
+   * @param copybookProcessingMode - settings to control the copybook processing
+   * @return - the extended document of that text and all the found errors
+   */
   @Nonnull
   @Override
   public ResultWithErrors<ExtendedDocument> process(
@@ -70,12 +85,22 @@ public class TextPreprocessorImpl implements TextPreprocessor {
     return process(documentUri, cobolSourceCode, new ArrayDeque<>(), copybookProcessingMode);
   }
 
+  /**
+   * Process the given source code by removing all the unnecessary tokens and building in the nested
+   * copybook content with tracking the hierarchy of the text documents
+   *
+   * @param documentUri - URI of the processing document
+   * @param cobolCode - source code to analyze
+   * @param copybookStack - stack that contains the previous document hierarchy
+   * @param copybookProcessingMode - settings to control the copybook processing
+   * @return - the extended document of that text and all the found errors
+   */
   @Nonnull
   @Override
   public ResultWithErrors<ExtendedDocument> process(
       @Nonnull String documentUri,
       @Nonnull String cobolCode,
-      Deque<CopybookUsage> copybookStack,
+      @Nonnull Deque<CopybookUsage> copybookStack,
       @Nonnull CopybookProcessingMode copybookProcessingMode) {
 
     ResultWithErrors<List<CobolLine>> lines = readLines(cobolCode, documentUri);
