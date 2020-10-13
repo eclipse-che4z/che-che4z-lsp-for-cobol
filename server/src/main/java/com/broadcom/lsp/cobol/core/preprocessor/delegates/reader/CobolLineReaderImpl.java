@@ -47,8 +47,9 @@ public class CobolLineReaderImpl implements CobolLineReader {
   private static final int MAX_LINE_LENGTH = 80;
   private static final String LONG_LINE_MSG = "Source text cannot go past column 80";
   private static final String INCORRECT_LINE_FORMAT_MSG = "Unexpected indicator area content";
-  private static final Pattern COBOL_LINE_PATTERN = Pattern.compile(
-      "^(?<sequence>.{0,6})(?<indicator>.?)(?<contentA>.{0,4})(?<contentB>.{0,61})(?<comment>.{0,8})(?<extra>.*)$");
+  private static final Pattern COBOL_LINE_PATTERN =
+      Pattern.compile(
+          "^(?<sequence>.{0,6})(?<indicator>.?)(?<contentA>.{0,4})(?<contentB>.{0,61})(?<comment>.{0,8})(?<extra>.*)$");
   private static final Map<String, CobolLineTypeEnum> INDICATORS =
       Map.of(
           "*",
@@ -87,7 +88,8 @@ public class CobolLineReaderImpl implements CobolLineReader {
       while (scanner.hasNextLine()) {
         currentLine = scanner.nextLine();
 
-        ResultWithErrors<CobolLine> output = parseLine(currentLine, documentURI, lineNumber);
+        ResultWithErrors<CobolLine> output =
+            parseLine(delegate.apply(currentLine), documentURI, lineNumber);
 
         CobolLine currentCobolLine = output.getResult();
         accumulatedErrors.addAll(output.getErrors());
@@ -106,7 +108,6 @@ public class CobolLineReaderImpl implements CobolLineReader {
   private ResultWithErrors<CobolLine> parseLine(
       @Nonnull String line, @Nonnull String uri, int lineNumber) {
     CobolLine cobolLine = new CobolLine();
-    line = delegate.apply(line);
 
     List<SyntaxError> errors = new ArrayList<>();
 
