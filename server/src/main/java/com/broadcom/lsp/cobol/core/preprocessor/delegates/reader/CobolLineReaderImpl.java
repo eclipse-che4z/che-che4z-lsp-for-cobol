@@ -15,7 +15,8 @@
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.reader;
 
 import com.broadcom.lsp.cobol.core.model.*;
-import com.broadcom.lsp.cobol.core.model.SyntaxError;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -40,6 +41,7 @@ import static java.util.Optional.ofNullable;
  * <p>Also, this class uses a compiler directives delegate to apply appropriate transformations.
  */
 @Slf4j
+@Singleton
 public class CobolLineReaderImpl implements CobolLineReader {
   private static final int INDICATOR_AREA_INDEX = 6;
   private static final int MAX_LINE_LENGTH = 80;
@@ -63,6 +65,13 @@ public class CobolLineReaderImpl implements CobolLineReader {
           COMPILER_DIRECTIVE,
           " ",
           NORMAL);
+
+  private CobolLineReaderDelegate delegate;
+
+  @Inject
+  public CobolLineReaderImpl(CobolLineReaderDelegate delegate) {
+    this.delegate = delegate;
+  }
 
   @Nonnull
   @Override
@@ -97,7 +106,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
   private ResultWithErrors<CobolLine> parseLine(
       @Nonnull String line, @Nonnull String uri, int lineNumber) {
     CobolLine cobolLine = new CobolLine();
-    line = getDelegate().apply(line);
+    line = delegate.apply(line);
 
     List<SyntaxError> errors = new ArrayList<>();
 
@@ -161,10 +170,5 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
     LOG.debug("Syntax error by CobolLineReaderImpl#registerFormatError: " + error.toString());
     return error;
-  }
-
-  @Nonnull
-  private CobolLineReaderDelegate getDelegate() {
-    return new CompilerDirectivesTransformation();
   }
 }

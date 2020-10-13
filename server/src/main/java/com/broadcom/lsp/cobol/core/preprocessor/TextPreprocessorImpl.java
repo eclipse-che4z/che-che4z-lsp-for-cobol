@@ -17,18 +17,13 @@ package com.broadcom.lsp.cobol.core.preprocessor;
 import com.broadcom.lsp.cobol.core.model.*;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolCommentEntriesMarkerImpl;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolInlineCommentEntriesNormalizerImpl;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nonnull;
@@ -41,10 +36,29 @@ import java.util.List;
 @Singleton
 public class TextPreprocessorImpl implements TextPreprocessor {
   private GrammarPreprocessor grammarPreprocessor;
+  private CobolLineReader reader;
+  private CobolLineWriter writer;
+  private CobolLinesTransformation transformation;
+  private CobolLineReWriter entriesMarker;
+  private CobolLineReWriter entriesNormalizer;
+  private CobolLineReWriter indicatorProcessor;
 
   @Inject
-  public TextPreprocessorImpl(GrammarPreprocessor grammarPreprocessor) {
+  public TextPreprocessorImpl(
+      GrammarPreprocessor grammarPreprocessor,
+      CobolLineReader reader,
+      CobolLineWriter writer,
+      CobolLinesTransformation transformation,
+      @Named("entriesMarker") CobolLineReWriter entriesMarker,
+      @Named("entriesNormalizer") CobolLineReWriter entriesNormalizer,
+      @Named("indicatorProcessor") CobolLineReWriter indicatorProcessor) {
     this.grammarPreprocessor = grammarPreprocessor;
+    this.reader = reader;
+    this.writer = writer;
+    this.transformation = transformation;
+    this.entriesMarker = entriesMarker;
+    this.entriesNormalizer = entriesNormalizer;
+    this.indicatorProcessor = indicatorProcessor;
   }
 
   @Nonnull
@@ -71,7 +85,7 @@ public class TextPreprocessorImpl implements TextPreprocessor {
 
     List<CobolLine> rewrittenLines = rewriteLines(transformedLines.getResult());
 
-    String code = createLineWriter().serialize(rewrittenLines);
+    String code = writer.serialize(rewrittenLines);
 
     ResultWithErrors<ExtendedDocument> parsedDocument =
         grammarPreprocessor.buildExtendedDocument(
@@ -86,12 +100,12 @@ public class TextPreprocessorImpl implements TextPreprocessor {
   }
 
   private ResultWithErrors<List<CobolLine>> readLines(String cobolCode, String documentURI) {
-    return createLineReader().processLines(documentURI, cobolCode);
+    return reader.processLines(documentURI, cobolCode);
   }
 
   private ResultWithErrors<List<CobolLine>> transformLines(
       String documentURI, List<CobolLine> lines) {
-    return createContinuationLineProcessor().transformLines(documentURI, lines);
+    return transformation.transformLines(documentURI, lines);
   }
 
   /**
@@ -99,34 +113,9 @@ public class TextPreprocessorImpl implements TextPreprocessor {
    * have a unified line format.
    */
   private List<CobolLine> rewriteLines(List<CobolLine> lines) {
-    List<CobolLine> lineIndicatorProcessedLines =
-        createLineIndicatorProcessor().processLines(lines);
+    List<CobolLine> lineIndicatorProcessedLines = indicatorProcessor.processLines(lines);
     List<CobolLine> normalizedInlineCommentEntriesLines =
-        createInlineCommentEntriesNormalizer().processLines(lineIndicatorProcessedLines);
-    return createCommentEntriesMarker().processLines(normalizedInlineCommentEntriesLines);
-  }
-
-  private CobolLineReWriter createCommentEntriesMarker() {
-    return new CobolCommentEntriesMarkerImpl();
-  }
-
-  private CobolLineReWriter createInlineCommentEntriesNormalizer() {
-    return new CobolInlineCommentEntriesNormalizerImpl();
-  }
-
-  private CobolLineReWriter createLineIndicatorProcessor() {
-    return new CobolLineIndicatorProcessorImpl();
-  }
-
-  private CobolLinesTransformation createContinuationLineProcessor() {
-    return new ContinuationLineTransformation();
-  }
-
-  private CobolLineReader createLineReader() {
-    return new CobolLineReaderImpl();
-  }
-
-  private CobolLineWriter createLineWriter() {
-    return new CobolLineWriterImpl();
+        entriesNormalizer.processLines(lineIndicatorProcessedLines);
+    return entriesMarker.processLines(normalizedInlineCommentEntriesLines);
   }
 }

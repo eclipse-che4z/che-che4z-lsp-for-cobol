@@ -16,7 +16,9 @@
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.reader;
 
 import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
+import com.google.inject.Singleton;
 
+import javax.annotation.Nonnull;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,12 +26,14 @@ import java.util.regex.Pattern;
  * This delegate moves the compiler directives to the content area not to let the writer cut the
  * compiler directives, that are allowed in the comment area.
  */
+@Singleton
 public class CompilerDirectivesTransformation implements CobolLineReaderDelegate {
   private static final Pattern COMPILER_DIRECTIVE_LINE =
       Pattern.compile("(?i)(.{0,6} +|\\s*)(CBL|PROCESS) .+");
 
+  @Nonnull
   @Override
-  public String apply(String line) {
+  public String apply(@Nonnull String line) {
     final Matcher compilerConstantMatcher = COMPILER_DIRECTIVE_LINE.matcher(line);
     if (!compilerConstantMatcher.matches()) {
       return line;
