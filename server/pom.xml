@@ -18,7 +18,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.ca.lsp</groupId>
+    <groupId>com.broadcom.lsp.cobol</groupId>
     <artifactId>server</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
@@ -59,7 +59,7 @@
         <profile>
             <id>skip.nist.tests</id>
             <properties>
-                <exclude.tests>**/com/ca/lsp/test/*.java</exclude.tests>
+                <exclude.tests>**/com/broadcom/lsp/cobol/*.java</exclude.tests>
             </properties>
         </profile>
     </profiles>
@@ -235,7 +235,7 @@
                             <finalName>server</finalName>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.ca.lsp.cobol.LangServerBootstrap</mainClass>
+                                    <mainClass>com.broadcom.lsp.cobol.LangServerBootstrap</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
@@ -276,7 +276,7 @@
                     <aggregate>true</aggregate>
                     <instrumentation>
                         <includes>
-                            <include>com/ca/lsp/**/*.class</include>
+                            <include>com/broadcom/lsp/**/*.class</include>
                         </includes>
                     </instrumentation>
                     <check/>
@@ -296,8 +296,8 @@
                     <excludes>
                         <exclude>**/generated-sources/**/*</exclude>
                         <exclude>**/generated-test-sources/**/*</exclude>
-                        <exclude>**/com/ca/lsp/core/cobol/parser/**/*</exclude>
-                        <exclude>**/com/broadcom/lsp/cdi/module/**/*</exclude>
+                        <exclude>**/com/broadcom/lsp/cobol/core/parser/**/*</exclude>
+                        <exclude>**/com/broadcom/lsp/cobol/domain/modules/**/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -347,9 +347,9 @@
                         <configuration>
                             <arguments>
                                 <argument>-package</argument>
-                                <argument>com.ca.lsp.core.cobol.parser</argument>
+                                <argument>com.broadcom.lsp.cobol.core</argument>
                             </arguments>
-                            <sourceDirectory>${basedir}/src/main/antlr4/com/ca/lsp/core/cobol/parser</sourceDirectory>
+                            <sourceDirectory>src/main/antlr4/com/broadcom/lsp/cobol/core/parser</sourceDirectory>
                             <listener>true</listener>
                             <visitor>true</visitor>
                         </configuration>
