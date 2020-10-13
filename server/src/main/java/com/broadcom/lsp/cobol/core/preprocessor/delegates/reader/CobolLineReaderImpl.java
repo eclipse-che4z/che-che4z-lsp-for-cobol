@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.broadcom.lsp.cobol.core.model.CobolLineTypeEnum.*;
 import static com.broadcom.lsp.cobol.core.model.ErrorSeverity.ERROR;
@@ -43,6 +45,8 @@ public class CobolLineReaderImpl implements CobolLineReader {
   private static final int MAX_LINE_LENGTH = 80;
   private static final String LONG_LINE_MSG = "Source text cannot go past column 80";
   private static final String INCORRECT_LINE_FORMAT_MSG = "Unexpected indicator area content";
+  private static final Pattern COBOL_LINE_PATTERN = Pattern.compile(
+      "^(?<sequence>.{0,6})(?<indicator>.?)(?<contentA>.{0,4})(?<contentB>.{0,61})(?<comment>.{0,8})(?<extra>.*)$");
   private static final Map<String, CobolLineTypeEnum> INDICATORS =
       Map.of(
           "*",
@@ -95,33 +99,27 @@ public class CobolLineReaderImpl implements CobolLineReader {
     CobolLine cobolLine = new CobolLine();
     line = getDelegate().apply(line);
 
-    ResultWithErrors<String> result = checkLineLength(line, uri, lineNumber);
-    String adjustedLine = result.getResult();
-    List<SyntaxError> errors = new ArrayList<>(result.getErrors());
+    List<SyntaxError> errors = new ArrayList<>();
 
-    if (adjustedLine.length() > 0) {
-      for (int i = adjustedLine.length(); i > 0; i--) {
-        if (i > 72) {
-          cobolLine.setCommentArea(adjustedLine.substring(72, i));
-          i = 73;
-        } else if (i > 11) {
-          cobolLine.setContentAreaB(adjustedLine.substring(11, i));
-          i = 12;
-        } else if (i > 7) {
-          cobolLine.setContentAreaA(adjustedLine.substring(7, i));
-          i = 8;
-        } else if (i > 6) {
-          String indicatorArea = adjustedLine.substring(6, 7);
-          ResultWithErrors<CobolLineTypeEnum> type = determineType(indicatorArea, uri, lineNumber);
-          cobolLine.setIndicatorArea(indicatorArea);
-          cobolLine.setType(type.getResult());
-          errors.addAll(type.getErrors());
-          i = 7;
-        } else {
-          cobolLine.setSequenceArea(adjustedLine.substring(0, i));
-          i = 0;
-        }
+    Matcher matcher = COBOL_LINE_PATTERN.matcher(line);
+    if (matcher.matches()) {
+      cobolLine.setSequenceArea(matcher.group("sequence"));
+      String indicatorArea = matcher.group("indicator");
+      if (!indicatorArea.isEmpty()) {
+        ResultWithErrors<CobolLineTypeEnum> type = determineType(indicatorArea, uri, lineNumber);
+        cobolLine.setIndicatorArea(indicatorArea);
+        cobolLine.setType(type.getResult());
+        errors.addAll(type.getErrors());
       }
+      cobolLine.setContentAreaA(matcher.group("contentA"));
+      cobolLine.setContentAreaB(matcher.group("contentB"));
+      cobolLine.setCommentArea(matcher.group("comment"));
+      if (!matcher.group("extra").isEmpty()) {
+        errors.add(createError(uri, LONG_LINE_MSG, lineNumber, MAX_LINE_LENGTH, line.length()));
+      }
+    } else {
+      // It is impossible. Pattern must match any line.
+      LOG.error("The line '{}' can't be parsed.", line);
     }
 
     cobolLine.setNumber(lineNumber);
@@ -143,18 +141,6 @@ public class CobolLineReaderImpl implements CobolLineReader {
                         lineNumber,
                         INDICATOR_AREA_INDEX,
                         INDICATOR_AREA_INDEX + 1))));
-  }
-
-  @Nonnull
-  private ResultWithErrors<String> checkLineLength(
-      @Nonnull String line, @Nonnull String uri, int lineNumber) {
-    List<SyntaxError> errors = new ArrayList<>();
-    String result = line;
-    if (line.length() > MAX_LINE_LENGTH) {
-      errors.add(createError(uri, LONG_LINE_MSG, lineNumber, MAX_LINE_LENGTH, line.length()));
-      result = line.substring(0, MAX_LINE_LENGTH);
-    }
-    return new ResultWithErrors<>(result, errors);
   }
 
   @Nonnull
