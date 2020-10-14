@@ -15,7 +15,8 @@
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.reader;
 
 import com.broadcom.lsp.cobol.core.model.*;
-import com.broadcom.lsp.cobol.core.model.SyntaxError;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -40,13 +41,15 @@ import static java.util.Optional.ofNullable;
  * <p>Also, this class uses a compiler directives delegate to apply appropriate transformations.
  */
 @Slf4j
+@Singleton
 public class CobolLineReaderImpl implements CobolLineReader {
   private static final int INDICATOR_AREA_INDEX = 6;
   private static final int MAX_LINE_LENGTH = 80;
   private static final String LONG_LINE_MSG = "Source text cannot go past column 80";
   private static final String INCORRECT_LINE_FORMAT_MSG = "Unexpected indicator area content";
-  private static final Pattern COBOL_LINE_PATTERN = Pattern.compile(
-      "^(?<sequence>.{0,6})(?<indicator>.?)(?<contentA>.{0,4})(?<contentB>.{0,61})(?<comment>.{0,8})(?<extra>.*)$");
+  private static final Pattern COBOL_LINE_PATTERN =
+      Pattern.compile(
+          "^(?<sequence>.{0,6})(?<indicator>.?)(?<contentA>.{0,4})(?<contentB>.{0,61})(?<comment>.{0,8})(?<extra>.*)$");
   private static final Map<String, CobolLineTypeEnum> INDICATORS =
       Map.of(
           "*",
@@ -64,6 +67,13 @@ public class CobolLineReaderImpl implements CobolLineReader {
           " ",
           NORMAL);
 
+  private CobolLineReaderDelegate delegate;
+
+  @Inject
+  public CobolLineReaderImpl(CobolLineReaderDelegate delegate) {
+    this.delegate = delegate;
+  }
+
   @Nonnull
   @Override
   public ResultWithErrors<List<CobolLine>> processLines(
@@ -78,7 +88,8 @@ public class CobolLineReaderImpl implements CobolLineReader {
       while (scanner.hasNextLine()) {
         currentLine = scanner.nextLine();
 
-        ResultWithErrors<CobolLine> output = parseLine(currentLine, documentURI, lineNumber);
+        ResultWithErrors<CobolLine> output =
+            parseLine(delegate.apply(currentLine), documentURI, lineNumber);
 
         CobolLine currentCobolLine = output.getResult();
         accumulatedErrors.addAll(output.getErrors());
@@ -97,7 +108,6 @@ public class CobolLineReaderImpl implements CobolLineReader {
   private ResultWithErrors<CobolLine> parseLine(
       @Nonnull String line, @Nonnull String uri, int lineNumber) {
     CobolLine cobolLine = new CobolLine();
-    line = getDelegate().apply(line);
 
     List<SyntaxError> errors = new ArrayList<>();
 
@@ -161,10 +171,5 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
     LOG.debug("Syntax error by CobolLineReaderImpl#registerFormatError: " + error.toString());
     return error;
-  }
-
-  @Nonnull
-  private CobolLineReaderDelegate getDelegate() {
-    return new CompilerDirectivesTransformation();
   }
 }
