@@ -34,3 +34,5 @@ out/__tests__/**
 .releaserc.yaml
 releaseScripts
 node_modules
+.scannerwork
+_
