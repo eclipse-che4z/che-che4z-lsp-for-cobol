@@ -26,7 +26,6 @@ import org.junit.jupiter.params.provider.NullSource;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static java.lang.System.getProperty;
 import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,7 +48,7 @@ class PositiveTest extends ConfigurableTest {
    */
   private static Stream<CobolText> retrieveTextsToTest() {
     CobolTextRegistry registry =
-        new ZipTextRegistry(ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
+        new FolderTextRegistry(ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
     copybooks = registry.getCopybooks();
     return registry.getPositives().stream();
   }

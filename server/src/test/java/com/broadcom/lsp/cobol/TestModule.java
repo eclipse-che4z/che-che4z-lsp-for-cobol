@@ -24,8 +24,6 @@ import com.broadcom.lsp.cobol.service.mocks.MockCopybookService;
 import com.broadcom.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageServer;
-import com.broadcom.lsp.cobol.positive.CobolTextRegistry;
-import com.broadcom.lsp.cobol.positive.ZipTextRegistry;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActions;
 import com.broadcom.lsp.cobol.service.delegates.actions.FindCopybookCommand;
@@ -61,7 +59,6 @@ public class TestModule extends DefaultModule {
     bind(CopybookService.class).to(CopybookServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(CobolTextDocumentService.class);
-    bind(CobolTextRegistry.class).to(ZipTextRegistry.class);
     bind(WatcherService.class).to(WatcherServiceImpl.class);
     bind(FileSystemService.class).to(WorkspaceFileService.class);
     bind(String.class)
