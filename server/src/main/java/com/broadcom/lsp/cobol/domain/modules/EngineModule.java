@@ -37,12 +37,13 @@ import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.ReplacingServiceImpl;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
+import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 import static com.google.inject.name.Names.named;
 
 /** This module provides DI bindings for COBOL language engine part. */
-public class EngineModule extends DefaultModule {
+public class EngineModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(CobolLanguageEngine.class);
