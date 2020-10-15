@@ -35,4 +35,5 @@ out/__tests__/**
 releaseScripts
 node_modules
 .scannerwork
-_
+_/**
+?/**
