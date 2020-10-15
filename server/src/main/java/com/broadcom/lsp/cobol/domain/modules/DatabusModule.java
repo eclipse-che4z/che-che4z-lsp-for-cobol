@@ -15,13 +15,13 @@
 
 package com.broadcom.lsp.cobol.domain.modules;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
 /** This module provides DI bindings with default values for databus parameters. */
-public class DatabusModule extends DefaultModule {
+public class DatabusModule extends AbstractModule {
   @Override
   protected void configure() {
-    super.configure();
     bindConstant().annotatedWith(Names.named("ASYNC-MESS-DISPATCHER")).to(10);
     bindConstant().annotatedWith(Names.named("CACHE-MAX-SIZE")).to(500);
     bindConstant().annotatedWith(Names.named("CACHE-DURATION")).to(3);

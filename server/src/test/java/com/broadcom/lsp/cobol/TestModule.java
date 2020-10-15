@@ -14,7 +14,6 @@
  */
 package com.broadcom.lsp.cobol;
 
-import com.broadcom.lsp.cobol.domain.modules.DefaultModule;
 import com.broadcom.lsp.cobol.service.*;
 import com.broadcom.lsp.cobol.service.delegates.completions.*;
 import com.broadcom.lsp.cobol.service.delegates.references.*;
@@ -34,6 +33,7 @@ import com.broadcom.lsp.cobol.service.delegates.formations.Formations;
 import com.broadcom.lsp.cobol.service.delegates.formations.TrimFormation;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.broadcom.lsp.cobol.service.utils.WorkspaceFileService;
+import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -45,12 +45,11 @@ import static com.google.inject.name.Names.named;
 import static java.lang.System.getProperty;
 import static java.util.Optional.ofNullable;
 
-public class TestModule extends DefaultModule {
+public class TestModule extends AbstractModule {
   private static final String PATH_TO_TEST_RESOURCES = "filesToTestPath";
 
   @Override
   protected void configure() {
-    super.configure();
     bind(LanguageClient.class).to(TestLanguageClient.class);
     bind(LanguageServer.class).to(TestLanguageServer.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);

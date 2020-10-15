@@ -45,6 +45,7 @@ public class LangServerCtx {
     return singleInstance;
   }
 
+  @Synchronized
   public static void shutdown() {
     singleInstance = null;
     injector = null;
