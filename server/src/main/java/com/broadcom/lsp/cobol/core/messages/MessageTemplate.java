@@ -14,16 +14,12 @@
  */
 package com.broadcom.lsp.cobol.core.messages;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
 public class MessageTemplate {
-  private String key;
-  private String message;
+  String key;
+  String message;
 
   public boolean isValidKey() {
     return !key.equals(MessageService.INVALID_KEY);
