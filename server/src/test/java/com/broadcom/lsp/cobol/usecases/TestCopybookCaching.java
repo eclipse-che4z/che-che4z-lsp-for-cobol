@@ -15,17 +15,17 @@
 
 package com.broadcom.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cobol.domain.modules.EngineModule;
+import com.broadcom.lsp.cobol.core.model.CopybookModel;
+import com.broadcom.lsp.cobol.core.model.Locality;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.resolution.CopybookResolutionProvider;
+import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.modules.DatabusModule;
+import com.broadcom.lsp.cobol.domain.modules.EngineModule;
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import com.broadcom.lsp.cobol.service.mocks.MockCopybookService;
 import com.broadcom.lsp.cobol.service.mocks.MockCopybookServiceImpl;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.resolution.CopybookResolutionProvider;
-import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
-import com.broadcom.lsp.cobol.core.model.CopybookModel;
-import com.broadcom.lsp.cobol.core.model.Locality;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Guice;
@@ -38,7 +38,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static java.util.Collections.singletonList;
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This test checks the caching logic performed by copybook resolution. The cache invalidated before

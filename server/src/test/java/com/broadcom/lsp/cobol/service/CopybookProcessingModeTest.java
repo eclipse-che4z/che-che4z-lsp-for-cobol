@@ -14,10 +14,10 @@
  */
 package com.broadcom.lsp.cobol.service;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static com.broadcom.lsp.cobol.service.CopybookProcessingMode.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CopybookProcessingModeTest {
   private static final String EXT_SRC_DOC_URI = "file:///c%3A/.c4z/.extsrcs/EXTSRC.cbl";
@@ -32,13 +32,13 @@ class CopybookProcessingModeTest {
    */
   @Test
   void disableCopybookOnExtendedDocument() {
-    Assert.assertEquals(CopybookProcessingMode.DISABLED, CopybookProcessingMode.getCopybookProcessingMode(EXT_SRC_DOC_URI, CopybookProcessingMode.ENABLED));
-    Assert.assertEquals(CopybookProcessingMode.DISABLED, CopybookProcessingMode.getCopybookProcessingMode(EXT_SRC_DOC_URI, CopybookProcessingMode.SKIP));
+    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, ENABLED));
+    assertEquals(DISABLED, getCopybookProcessingMode(EXT_SRC_DOC_URI, SKIP));
   }
 
   @Test
   void enableCopybookOnNonExtendedDocumentInDidOpen() {
-    Assert.assertEquals(CopybookProcessingMode.ENABLED, CopybookProcessingMode.getCopybookProcessingMode(DOC_URI, CopybookProcessingMode.ENABLED));
+    assertEquals(ENABLED, getCopybookProcessingMode(DOC_URI, ENABLED));
   }
 
   /**
@@ -48,7 +48,7 @@ class CopybookProcessingModeTest {
    */
   @Test
   void enableCopybookOnFakeURI() {
-    Assert.assertEquals(CopybookProcessingMode.ENABLED, CopybookProcessingMode.getCopybookProcessingMode(FAKE_EXT_SRC_DOC_URI, CopybookProcessingMode.ENABLED));
+    assertEquals(ENABLED, getCopybookProcessingMode(FAKE_EXT_SRC_DOC_URI, ENABLED));
   }
 
   /**
@@ -57,6 +57,6 @@ class CopybookProcessingModeTest {
    */
   @Test
   void enableCopybookOnBadExtendedSourceFolders() {
-    Assert.assertEquals(CopybookProcessingMode.ENABLED, CopybookProcessingMode.getCopybookProcessingMode(WRONG_EXT_SRC_DOC_URI, CopybookProcessingMode.ENABLED));
+    assertEquals(ENABLED, getCopybookProcessingMode(WRONG_EXT_SRC_DOC_URI, ENABLED));
   }
 }
