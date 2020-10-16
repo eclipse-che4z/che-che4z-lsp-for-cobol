@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/** This class is an extension of {@link ResourceBundle.Control} to support JSON objects. */
 public class JSONResourceBundleControl extends ResourceBundle.Control {
 
   public static final String DEFAULT_LOCALE = "en";
