@@ -79,15 +79,11 @@ class JsonMessageServiceImplTest {
   void addMessageTemplates() {
     MessageService messageServiceTest = new JsonMessageServiceImpl("test");
     MessageTemplate messageTemplate1 = new MessageTemplate("random-1", "Just for testing !!!");
-    MessageTemplate messageTemplate2 =
-        new MessageTemplate("random-2", "Just for testing params : %s");
+    MessageTemplate messageTemplate2 = new MessageTemplate("random-2", "Just for testing params : %s");
     final List<MessageTemplate> messageTemplateList = List.of(messageTemplate1, messageTemplate2);
     messageServiceTest.addMessageTemplates(messageTemplateList);
-    assertEquals(
-        "Just for testing !!!", messageServiceTest.getMessage("random-1").getFormattedMessage());
-    assertEquals(
-        "Just for testing params : TADA!",
-        messageServiceTest.getMessage("random-2", "TADA!").getFormattedMessage());
+    assertEquals("Just for testing !!!", messageServiceTest.getMessage("random-1").getFormattedMessage());
+    assertEquals("Just for testing params : TADA!", messageServiceTest.getMessage("random-2", "TADA!").getFormattedMessage());
   }
 
   @Test
