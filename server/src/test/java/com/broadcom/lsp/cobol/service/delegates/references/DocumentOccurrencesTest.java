@@ -15,12 +15,12 @@
 
 package com.broadcom.lsp.cobol.service.delegates.references;
 
-import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.ConfigurableTest;
-import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
-import com.broadcom.lsp.cobol.service.mocks.MockCopybookService;
-import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
+import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.positive.CobolText;
+import com.broadcom.lsp.cobol.service.CopybookService;
+import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.Assertions;
@@ -84,10 +84,10 @@ class DocumentOccurrencesTest extends ConfigurableTest {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
-    MockCopybookService copybookService =
-        LangServerCtx.getInjector().getInstance(MockCopybookService.class);
-    copybookService.setCopybooks(
-        () -> List.of(new CobolText("CPYBK1", COPYBOOK1), new CobolText("CPYBK2", COPYBOOK2)));
+    CopybookService copybookService = LangServerCtx.getInjector().getInstance(CopybookService.class);
+    List.of(new CobolText("CPYBK1", COPYBOOK1), new CobolText("CPYBK2", COPYBOOK2)).stream()
+        .map(UseCaseUtils::toCopybookModel)
+        .forEach(copybookService::store);
     UseCaseUtils.runTextValidation(service, TEXT);
     UseCaseUtils.waitForDiagnostics(client);
   }

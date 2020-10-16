@@ -14,11 +14,9 @@
  */
 package com.broadcom.lsp.cobol.service;
 
-import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
-import com.broadcom.lsp.cobol.domain.event.model.FetchedCopybookEvent;
-import com.broadcom.lsp.cobol.domain.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.google.gson.JsonPrimitive;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,12 +26,15 @@ import java.net.URI;
 import java.nio.file.Path;
 
 import static com.broadcom.lsp.cobol.domain.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
-import static com.broadcom.lsp.cobol.domain.event.model.DataEventType.REQUIRED_COPYBOOK_EVENT;
+import static com.broadcom.lsp.cobol.service.CopybookProcessingMode.*;
+import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_2_URI;
+import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -70,7 +71,7 @@ class CopybookServiceTest {
     when(parentPath.toUri()).thenReturn(URI.create(PARENT_CPY_URI));
 
     when(files.getNameFromURI(VALID_CPY_URI)).thenReturn(VALID_CPY_NAME);
-    when(files.getNameFromURI(UseCaseUtils.DOCUMENT_URI)).thenReturn("document");
+    when(files.getNameFromURI(DOCUMENT_URI)).thenReturn("document");
     when(files.getPathFromURI(VALID_CPY_URI)).thenReturn(cpyPath);
     when(files.getContentByPath(cpyPath)).thenReturn(CONTENT);
     when(files.fileExists(cpyPath)).thenReturn(true);
@@ -83,72 +84,28 @@ class CopybookServiceTest {
    */
   @Test
   void testRequestWhileCopybookAnalysisActiveProcessed() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
-    verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
+    CopybookService copybookService = createCopybookService();
+    CopybookModel copybookModel = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, ENABLED);
 
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(VALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
-
-    verify(files).getNameFromURI(UseCaseUtils.DOCUMENT_URI);
+    assertEquals(new CopybookModel(VALID_CPY_NAME, VALID_CPY_URI, CONTENT), copybookModel);
+    verify(files).getNameFromURI(DOCUMENT_URI);
     verify(files).getPathFromURI(VALID_CPY_URI);
     verify(files).getContentByPath(cpyPath);
-
-    verify(broker, timeout(10000))
-        .postData(
-            FetchedCopybookEvent.builder()
-                .name(VALID_CPY_NAME)
-                .content(CONTENT)
-                .uri(VALID_CPY_URI)
-                .build());
   }
 
   /**
-   * Test a main positive scenario when the copybook exists, and the request invoked while copybbok
+   * Test a main positive scenario when the copybook exists, and the request invoked while copybook
    * analysis is enabled.
    */
   @Test
   void testResponseIfFileNotExists() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
-    verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
-
+    CopybookService copybookService = createCopybookService();
     when(files.getPathFromURI(VALID_CPY_URI)).thenReturn(null);
+    CopybookModel copybookModel = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, ENABLED);
 
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(VALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
-
-    verify(files).getNameFromURI(UseCaseUtils.DOCUMENT_URI);
+    assertEquals(new CopybookModel(VALID_CPY_NAME, null, null), copybookModel);
+    verify(files).getNameFromURI(DOCUMENT_URI);
     verify(files).getPathFromURI(VALID_CPY_URI);
-
-    verify(broker, timeout(10000))
-        .postData(FetchedCopybookEvent.builder().name(VALID_CPY_NAME).build());
-  }
-
-  /**
-   * Test the service should return the content of the copybook only when {@link
-   * CopybookProcessingMode} is enabled. When the document is in change mode, the copybook name may
-   * be incomplete and due to this unable to resolve, so the {@link CopybookProcessingMode} should
-   * be DISABLED.
-   */
-  @Test
-  void testRequestWhileCopybookAnalysisIsDisabled() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, null);
-
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(VALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.DISABLED)
-            .build());
-
-    verify(broker).postData(FetchedCopybookEvent.builder().name(VALID_CPY_NAME).build());
   }
 
   /**
@@ -157,99 +114,29 @@ class CopybookServiceTest {
    */
   @Test
   void testRequestWhenUriNotFoundProcessed() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
-    verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
+    CopybookService copybookService = createCopybookService();
+    CopybookModel copybookModel = copybookService.resolve(INVALID_CPY_NAME, DOCUMENT_URI, ENABLED);
 
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(INVALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
-
-    verify(files).getNameFromURI(UseCaseUtils.DOCUMENT_URI);
-    verify(broker, timeout(10000))
-        .postData(FetchedCopybookEvent.builder().name(INVALID_CPY_NAME).build());
+    assertEquals(new CopybookModel(INVALID_CPY_NAME, null, null), copybookModel);
+    verify(files).getNameFromURI(DOCUMENT_URI);
   }
 
   /**
    * Test no new file system calls invoked when the copybook resolved first time in "did open"
-   * analysis, and the URI cached.
+   * analysis, and the copybook cached.
    */
   @Test
   void testNoNewClientCallsOnDidChange() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
-    verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
-
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(VALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
-
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(VALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.DISABLED)
-            .build());
-
-    verify(files, times(2)).getContentByPath(cpyPath);
-    verify(files, times(1)).getNameFromURI(UseCaseUtils.DOCUMENT_URI);
-    verify(files, times(1)).getPathFromURI(VALID_CPY_URI);
-
-    verify(broker, timeout(10000).times(2))
-        .postData(
-            FetchedCopybookEvent.builder()
-                .name(VALID_CPY_NAME)
-                .content(CONTENT)
-                .uri(VALID_CPY_URI)
-                .build());
-  }
-
-  /** Test the cached URI deleted if the file is not available anymore. */
-  @Test
-  void testCacheInvalidatedIfUriUnavailable() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
-    verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
-
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(VALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
-
-    verify(broker, timeout(10000))
-        .postData(
-            FetchedCopybookEvent.builder()
-                .name(VALID_CPY_NAME)
-                .content(CONTENT)
-                .uri(VALID_CPY_URI)
-                .build());
-
-    // simulate the file deleted
-    when(files.fileExists(cpyPath)).thenReturn(false);
-
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(VALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.DISABLED)
-            .build());
+    CopybookService copybookService = createCopybookService();
+    CopybookModel copybookModelEnabled = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, ENABLED);
+    CopybookModel copybookModelSkipped = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, SKIP);
 
     verify(files, times(1)).getContentByPath(cpyPath);
-    verify(files, times(1)).getNameFromURI(UseCaseUtils.DOCUMENT_URI);
+    verify(files, times(1)).getNameFromURI(DOCUMENT_URI);
     verify(files, times(1)).getPathFromURI(VALID_CPY_URI);
 
-    verify(broker, timeout(10000))
-        .postData(
-            FetchedCopybookEvent.builder()
-                .name(VALID_CPY_NAME)
-                .content(CONTENT)
-                .uri(VALID_CPY_URI)
-                .build());
+    assertEquals(new CopybookModel(VALID_CPY_NAME, VALID_CPY_URI, CONTENT), copybookModelEnabled);
+    assertEquals(new CopybookModel(VALID_CPY_NAME, VALID_CPY_URI, CONTENT), copybookModelSkipped);
   }
 
   /**
@@ -258,36 +145,18 @@ class CopybookServiceTest {
    */
   @Test
   void testCacheInvalidation() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
-    verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
+    CopybookService copybookService = createCopybookService();
 
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(VALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
+    CopybookModel copybookModel = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, ENABLED);
+    assertEquals(new CopybookModel(VALID_CPY_NAME, VALID_CPY_URI, CONTENT), copybookModel);
 
-    copybookService.invalidateURICache();
+    copybookService.invalidateCache();
 
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(VALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
-
-    // Check the requests applied same logic
-    verify(broker, timeout(10000).times(2))
-        .postData(
-            FetchedCopybookEvent.builder()
-                .name(VALID_CPY_NAME)
-                .content(CONTENT)
-                .uri(VALID_CPY_URI)
-                .build());
+    copybookModel = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, ENABLED);
+    assertEquals(new CopybookModel(VALID_CPY_NAME, VALID_CPY_URI, CONTENT), copybookModel);
 
     verify(files, times(2)).getContentByPath(cpyPath);
-    verify(files, times(2)).getNameFromURI(UseCaseUtils.DOCUMENT_URI);
+    verify(files, times(2)).getNameFromURI(DOCUMENT_URI);
     verify(files, times(2)).getPathFromURI(VALID_CPY_URI);
   }
 
@@ -296,21 +165,12 @@ class CopybookServiceTest {
    */
   @Test
   void testServiceRespondsIfClientSendsInvalidResult() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
-    verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
-
+    CopybookService copybookService = createCopybookService();
     when(settingsService.getConfiguration(any())).thenReturn(completedFuture(null));
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(VALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
+    CopybookModel copybookModel = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, ENABLED);
 
-    verify(broker, timeout(10000).times(1))
-        .postData(FetchedCopybookEvent.builder().name(VALID_CPY_NAME).build());
-
-    verify(files, times(1)).getNameFromURI(UseCaseUtils.DOCUMENT_URI);
+    assertEquals(new CopybookModel(VALID_CPY_NAME, null, null), copybookModel);
+    verify(files, times(1)).getNameFromURI(DOCUMENT_URI);
   }
 
   /**
@@ -321,54 +181,30 @@ class CopybookServiceTest {
    */
   @Test
   void testServiceSendsDownloadingRequestForAnalysisFinishedEvent() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
-    verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
+    CopybookService copybookService = createCopybookService();
     verify(broker).subscribe(ANALYSIS_FINISHED_EVENT, copybookService);
 
-    when(files.getNameFromURI(UseCaseUtils.DOCUMENT_2_URI)).thenReturn("document2");
+    when(files.getNameFromURI(DOCUMENT_2_URI)).thenReturn("document2");
     when(settingsService.getConfiguration("copybook-resolve", "document2", INVALID_2_CPY_NAME))
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
 
     // First document parsed
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(INVALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(VALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
+    CopybookModel invalidCpy = copybookService.resolve(INVALID_CPY_NAME, DOCUMENT_URI, ENABLED);
+    CopybookModel validCpy = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, ENABLED);
     // Second document parsed
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(INVALID_2_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_2_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
+    CopybookModel invalidCpy2 = copybookService.resolve(INVALID_2_CPY_NAME, DOCUMENT_2_URI, ENABLED);
 
-    // Wait for all settingsService calls processed
-    verify(broker, timeout(10000))
-        .postData(
-            FetchedCopybookEvent.builder()
-                .name(VALID_CPY_NAME)
-                .content(CONTENT)
-                .uri(VALID_CPY_URI)
-                .build());
-    verify(broker, timeout(10000))
-        .postData(FetchedCopybookEvent.builder().name(INVALID_CPY_NAME).build());
-    verify(broker, timeout(10000))
-        .postData(FetchedCopybookEvent.builder().name(INVALID_2_CPY_NAME).build());
+    // Check that all copybook models are correct
+    assertEquals(new CopybookModel(VALID_CPY_NAME, VALID_CPY_URI, CONTENT), validCpy);
+    assertEquals(new CopybookModel(INVALID_CPY_NAME, null, null), invalidCpy);
+    assertEquals(new CopybookModel(INVALID_2_CPY_NAME, null, null), invalidCpy2);
 
     // First document parsing done
     copybookService.observerCallback(
         AnalysisFinishedEvent.builder()
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
+            .documentUri(DOCUMENT_URI)
             .copybookUris(emptyList())
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
+            .copybookProcessingMode(ENABLED)
             .build());
     verify(settingsService, times(1))
         .getConfigurations(singletonList("copybook-download.quiet.document.INVALID"));
@@ -376,9 +212,9 @@ class CopybookServiceTest {
     // Others parsing done events for first document are not trigger settingsService
     copybookService.observerCallback(
         AnalysisFinishedEvent.builder()
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
+            .documentUri(DOCUMENT_URI)
             .copybookUris(emptyList())
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
+            .copybookProcessingMode(ENABLED)
             .build());
     verify(settingsService, times(1))
         .getConfigurations(singletonList("copybook-download.quiet.document.INVALID"));
@@ -386,9 +222,9 @@ class CopybookServiceTest {
     // Second document parsing done
     copybookService.observerCallback(
         AnalysisFinishedEvent.builder()
-            .documentUri(UseCaseUtils.DOCUMENT_2_URI)
+            .documentUri(DOCUMENT_2_URI)
             .copybookUris(emptyList())
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
+            .copybookProcessingMode(ENABLED)
             .build());
     verify(settingsService, times(1))
         .getConfigurations(singletonList("copybook-download.quiet.document2.INVALID_2"));
@@ -400,8 +236,7 @@ class CopybookServiceTest {
    */
   @Test
   void testServiceSendsDownloadingRequestForAllNotResolvedCopybooks() {
-    CopybookService copybookService = new CopybookServiceImpl(broker, settingsService, files);
-    verify(broker).subscribe(REQUIRED_COPYBOOK_EVENT, copybookService);
+    CopybookService copybookService = createCopybookService();
     verify(broker).subscribe(ANALYSIS_FINISHED_EVENT, copybookService);
 
     when(files.getNameFromURI(PARENT_CPY_URI)).thenReturn(PARENT_CPY_NAME);
@@ -415,51 +250,31 @@ class CopybookServiceTest {
     when(settingsService.getConfiguration("copybook-resolve", "document", PARENT_CPY_NAME))
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(PARENT_CPY_URI))));
 
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(INVALID_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(PARENT_CPY_NAME)
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
+    CopybookModel invalidCpy = copybookService.resolve(INVALID_CPY_NAME, DOCUMENT_URI, ENABLED);
+    CopybookModel parentCpy = copybookService.resolve(PARENT_CPY_NAME, DOCUMENT_URI, ENABLED);
     // Nested copybook declaration
-    copybookService.observerCallback(
-        RequiredCopybookEvent.builder()
-            .name(NESTED_CPY_NAME)
-            .documentUri(PARENT_CPY_URI)
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-            .build());
+    CopybookModel nestedCpy = copybookService.resolve(NESTED_CPY_NAME, PARENT_CPY_URI, ENABLED);
 
-    // Wait for all settingsService calls processed
-    verify(broker, timeout(10000))
-        .postData(FetchedCopybookEvent.builder().name(INVALID_CPY_NAME).build());
-    verify(broker, timeout(10000))
-        .postData(
-            FetchedCopybookEvent.builder()
-                .name(PARENT_CPY_NAME)
-                .content(PARENT_CONTENT)
-                .uri(PARENT_CPY_URI)
-                .build());
-
-    verify(broker, timeout(10000))
-        .postData(FetchedCopybookEvent.builder().name(NESTED_CPY_NAME).build());
+    // Check that all copybook models are correct
+    assertEquals(new CopybookModel(INVALID_CPY_NAME, null, null), invalidCpy);
+    assertEquals(new CopybookModel(PARENT_CPY_NAME, PARENT_CPY_URI, PARENT_CONTENT), parentCpy);
+    assertEquals(new CopybookModel(NESTED_CPY_NAME, null, null), nestedCpy);
 
     // Notify that analysis finished sending the document URI and copybook names that have nested
     // copybooks
     copybookService.observerCallback(
         AnalysisFinishedEvent.builder()
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .copybookUris(asList(PARENT_CPY_URI, UseCaseUtils.DOCUMENT_URI))
-            .copybookProcessingMode(CopybookProcessingMode.ENABLED)
+            .documentUri(DOCUMENT_URI)
+            .copybookUris(asList(PARENT_CPY_URI, DOCUMENT_URI))
+            .copybookProcessingMode(ENABLED)
             .build());
 
     verify(settingsService, times(1))
         .getConfigurations(
             asList("copybook-download.quiet.document.nested", "copybook-download.quiet.document.INVALID"));
+  }
+
+  private CopybookService createCopybookService() {
+    return new CopybookServiceImpl(broker, settingsService, files, 3, 3, "HOURS");
   }
 }

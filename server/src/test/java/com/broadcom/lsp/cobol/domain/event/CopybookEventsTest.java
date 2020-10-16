@@ -14,11 +14,8 @@
  */
 package com.broadcom.lsp.cobol.domain.event;
 
-import com.broadcom.lsp.cobol.domain.event.model.FetchedCopybookEvent;
-import com.broadcom.lsp.cobol.domain.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.cobol.domain.event.model.RunAnalysisEvent;
 import com.broadcom.lsp.cobol.domain.event.model.UnknownEvent;
-import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
@@ -31,24 +28,6 @@ class CopybookEventsTest {
   private static final String FETCHEDCPY = "FETCHEDCPY";
   private static final String UNKNOWN = "UNKNOWN";
   private static final String RUN_ANALYSIS_EVENT = "RUN_ANALYSIS";
-  private static final String COPYBOOK_NAME = "Test";
-  private static final String COPYBOOK_URI = "file:///C:/Users/test/Test.cpy";
-  private static final String COBOL_FILE_URI = "file:///C:/Users/test/Main.cbl";
-
-  private static final String COPYBOOK_CONTENT = "000000 IDENTIFICATION DIVISION.";
-  private static final CopybookProcessingMode COPYBOOK_ANALYSIS_ENABLED = CopybookProcessingMode.ENABLED;
-
-  /** Test the RequiredCopybookEvent DTO is correctly populated */
-  @Test
-  void requestCopybookEventTest() {
-    assertEquals(REQCPY, getRequireCopybookHeader());
-  }
-
-  /** Test the FetchedCopybookEvent DTO is correctly populated */
-  @Test
-  void fetchCopybookEventTest() {
-    assertEquals(FETCHEDCPY, getFetchCopybookHeader());
-  }
 
   /** Test the UnknownEvent DTO is correctly populated */
   @Test
@@ -68,14 +47,6 @@ class CopybookEventsTest {
     assertNotEquals(FETCHEDCPY, getUnknownCopybookHeader());
     assertNotEquals(REQCPY, getUnknownCopybookHeader());
     assertNotEquals(RUN_ANALYSIS_EVENT, getUnknownCopybookHeader());
-
-    assertNotEquals(FETCHEDCPY, getRequireCopybookHeader());
-    assertNotEquals(UNKNOWN, getRequireCopybookHeader());
-    assertNotEquals(RUN_ANALYSIS_EVENT, getRequireCopybookHeader());
-
-    assertNotEquals(REQCPY, getFetchCopybookHeader());
-    assertNotEquals(UNKNOWN, getFetchCopybookHeader());
-    assertNotEquals(RUN_ANALYSIS_EVENT, getFetchCopybookHeader());
   }
 
   /** This test verifies that a null header not returned from the callee. */
@@ -83,18 +54,7 @@ class CopybookEventsTest {
   void notNullValuesFromHeaderReturned() {
     // assert that header is not null value
     assertNotNull(getUnknownCopybookHeader());
-    assertNotNull(getRequireCopybookHeader());
-    assertNotNull(getFetchCopybookHeader());
     assertNotNull(getRunAnalysisHeader());
-  }
-
-  private String getRequireCopybookHeader() {
-    return new RequiredCopybookEvent(COPYBOOK_NAME, COBOL_FILE_URI, COPYBOOK_ANALYSIS_ENABLED)
-        .getHeader();
-  }
-
-  private String getFetchCopybookHeader() {
-    return new FetchedCopybookEvent(COPYBOOK_NAME, COPYBOOK_URI, COPYBOOK_CONTENT).getHeader();
   }
 
   private String getUnknownCopybookHeader() {

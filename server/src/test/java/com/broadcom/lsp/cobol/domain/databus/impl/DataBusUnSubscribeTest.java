@@ -17,13 +17,15 @@ package com.broadcom.lsp.cobol.domain.databus.impl;
 
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
-import com.broadcom.lsp.cobol.domain.event.model.RequiredCopybookEvent;
+import com.broadcom.lsp.cobol.domain.event.model.RunAnalysisEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeoutException;
+
+import static com.broadcom.lsp.cobol.domain.databus.impl.DatabusTestConstants.WAITER_DELAY;
 
 /**
  * This test verifies that the object that was unsubscribed from the databus doesn't receive
@@ -35,14 +37,12 @@ class DataBusUnSubscribeTest extends DatabusConfigProvider {
 
   @BeforeEach
   void setUp() {
-    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3, 3, "HOURS"));
+    databus = new DefaultDataBusBroker<>(3);
   }
 
   @Override
   public void observerCallback(DataEvent adaptedDataEvent) {
-    waiter.assertTrue(DataEventType.REQUIRED_COPYBOOK_EVENT == adaptedDataEvent.getEventType());
-    LOG.debug(String.format("Received : %s", adaptedDataEvent.getEventType().getId()));
-    LOG.debug(String.format("Expected : %s", DataEventType.REQUIRED_COPYBOOK_EVENT.getId()));
+    waiter.assertTrue(DataEventType.RUN_ANALYSIS_EVENT == adaptedDataEvent.getEventType());
     waiter.resume();
   }
 
@@ -52,16 +52,14 @@ class DataBusUnSubscribeTest extends DatabusConfigProvider {
         TimeoutException.class,
         () -> {
           // Subscribe
-          Object subscriber = databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
-          databus.postData(
-              RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
-          waiter.await(5000);
+          Object subscriber = databus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
+          databus.postData(new RunAnalysisEvent());
+          waiter.await(WAITER_DELAY);
           // Unsubscribe
           databus.unSubscribe(subscriber);
-          databus.postData(
-              RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
+          databus.postData(new RunAnalysisEvent());
           // wait undefined because no subscriber anymore
-          waiter.await(5000);
+          waiter.await(WAITER_DELAY);
         });
   }
 }

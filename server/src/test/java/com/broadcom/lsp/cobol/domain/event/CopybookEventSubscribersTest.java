@@ -16,8 +16,6 @@ package com.broadcom.lsp.cobol.domain.event;
 
 import com.broadcom.lsp.cobol.domain.event.api.CopybookEventFactory;
 import com.broadcom.lsp.cobol.domain.event.api.EventObserver;
-import com.broadcom.lsp.cobol.domain.event.impl.FetchedCopybookEventSubscriber;
-import com.broadcom.lsp.cobol.domain.event.impl.RequiredCopybookEventSubscriber;
 import com.broadcom.lsp.cobol.domain.event.impl.RunAnalysisEventSubscriber;
 import com.broadcom.lsp.cobol.domain.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
@@ -44,7 +42,6 @@ class CopybookEventSubscribersTest {
 
   private static final String RUN_ANALYSIS = "RUN_ANALYSIS";
   private static final String REQCPY = "REQCPY";
-  private static final String FETCHEDCPY = "FETCHEDCPY";
   private static final String UNKNOWN = "UNKNOWN";
 
   private DatabusObserverTest databusObserver;
@@ -52,18 +49,6 @@ class CopybookEventSubscribersTest {
   @BeforeEach
   void initObserver() {
     databusObserver = new DatabusObserverTest();
-  }
-
-  /** This test verifies that the RequiredCopybook factory creates a new RequiredCopybook event */
-  @Test
-  void testRequireSubscriberFactory() {
-    assertEquals(REQCPY, getRequiredSubscriberFromFactory());
-  }
-
-  /** This test verifies that the FetchedCopybook factory creates a new FetchedCopybook event */
-  @Test
-  void testFetchSubscriberFactory() {
-    assertEquals(FETCHEDCPY, getFetchedSubscriberFromFactory());
   }
 
   /** This test verifies that the Unknown factory creates a new Unknown event */
@@ -81,33 +66,12 @@ class CopybookEventSubscribersTest {
   /** This test verifies that a wrong factory isn't returned. */
   @Test
   void negativeTestSubscriberFactory() {
-    assertNotEquals(REQCPY, getFetchedSubscriberFromFactory());
-    assertNotEquals(UNKNOWN, getFetchedSubscriberFromFactory());
-
-    assertNotEquals(FETCHEDCPY, getRequiredSubscriberFromFactory());
-    assertNotEquals(UNKNOWN, getRequiredSubscriberFromFactory());
-
     assertNotEquals(REQCPY, getUnknownSubscriberFromFactory());
-    assertNotEquals(RUN_ANALYSIS, getFetchedSubscriberFromFactory());
   }
 
   private String getUnknownSubscriberFromFactory() {
     return ((UnknownEventSubscriber)
             CopybookEventFactory.getFactory(DataEventType.UNKNOWN_EVENT).create(databusObserver))
-        .getEventType()
-        .getHeader();
-  }
-
-  private String getRequiredSubscriberFromFactory() {
-    return ((RequiredCopybookEventSubscriber)
-            CopybookEventFactory.getFactory(DataEventType.REQUIRED_COPYBOOK_EVENT).create(databusObserver))
-        .getEventType()
-        .getHeader();
-  }
-
-  private String getFetchedSubscriberFromFactory() {
-    return ((FetchedCopybookEventSubscriber)
-            CopybookEventFactory.getFactory(DataEventType.FETCHED_COPYBOOK_EVENT).create(databusObserver))
         .getEventType()
         .getHeader();
   }
