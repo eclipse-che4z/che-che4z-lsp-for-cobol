@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -105,7 +104,6 @@ public class JSONResourceBundleControl extends ResourceBundle.Control {
    */
   @Override
   public List<String> getFormats(String baseName) {
-    return Collections.unmodifiableList(
-        Collections.singletonList(SUPPORTED_RESOURCE_BUNDLE_EXTENSIONS));
+    return List.of(SUPPORTED_RESOURCE_BUNDLE_EXTENSIONS);
   }
 }

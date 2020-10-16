@@ -20,15 +20,13 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JsonMessageServiceImplTest {
 
-  public static final Optional<Locale> EN_LOCALE = Optional.of(new Locale("en", "en"));
-  public static final Optional<Locale> FR_LOCALE = Optional.of(new Locale("fr", "fr"));
-  private static MessageService messageService = new JsonMessageServiceImpl("test", EN_LOCALE);
+  public static final Locale FR_LOCALE = new Locale("fr", "fr");
+  private static MessageService messageService = new JsonMessageServiceImpl("test");
 
   @Test
   void whenValidMessageTemplateProvide_getFormattedMessage() {
@@ -49,8 +47,8 @@ class JsonMessageServiceImplTest {
 
     final ExternalizedMessage message1 = messageServiceFR.getMessage("2", "TEST_PARAM");
     assertEquals(
-            "French test with parameters. Received params is -> TEST_PARAM .",
-            message1.getFormattedMessage());
+        "French test with parameters. Received params is -> TEST_PARAM .",
+        message1.getFormattedMessage());
   }
 
   @Test
@@ -58,14 +56,13 @@ class JsonMessageServiceImplTest {
     Assertions.assertThrows(
         MissingResourceException.class,
         () -> {
-          MessageService messageServiceLocal = new JsonMessageServiceImpl("dummy", EN_LOCALE);
+          MessageService messageServiceLocal = new JsonMessageServiceImpl("dummy");
         });
   }
 
   @Test
   void whenEmptyMessageTemplateProvided_getException() {
-    MessageService messageServiceLocal =
-        new JsonMessageServiceImpl("Test_messageServiceEmptyFile", EN_LOCALE);
+    MessageService messageServiceLocal = new JsonMessageServiceImpl("Test_messageServiceEmptyFile");
     Assertions.assertThrows(
         MessageTemplateLoadException.class, () -> messageServiceLocal.getMessage("1"));
   }
@@ -80,16 +77,17 @@ class JsonMessageServiceImplTest {
 
   @Test
   void addMessageTemplates() {
+    MessageService messageServiceTest = new JsonMessageServiceImpl("test");
     MessageTemplate messageTemplate1 = new MessageTemplate("random-1", "Just for testing !!!");
     MessageTemplate messageTemplate2 =
         new MessageTemplate("random-2", "Just for testing params : %s");
     final List<MessageTemplate> messageTemplateList = List.of(messageTemplate1, messageTemplate2);
-    messageService.addMessageTemplates(messageTemplateList);
+    messageServiceTest.addMessageTemplates(messageTemplateList);
     assertEquals(
-        "Just for testing !!!", messageService.getMessage("random-1").getFormattedMessage());
+        "Just for testing !!!", messageServiceTest.getMessage("random-1").getFormattedMessage());
     assertEquals(
         "Just for testing params : TADA!",
-        messageService.getMessage("random-2", "TADA!").getFormattedMessage());
+        messageServiceTest.getMessage("random-2", "TADA!").getFormattedMessage());
   }
 
   @Test
@@ -104,7 +102,7 @@ class JsonMessageServiceImplTest {
 
   @Test
   void whenMultipleMsgServiceExist_thenSupportDuplicateKeys() {
-    MessageService messageService1 = new JsonMessageServiceImpl("test-2", EN_LOCALE);
+    MessageService messageService1 = new JsonMessageServiceImpl("test-2");
     final String formattedMessage = messageService1.getMessage("1").getFormattedMessage();
     assertEquals("This is a duplicate key test for diff msg service.", formattedMessage);
   }
@@ -112,6 +110,6 @@ class JsonMessageServiceImplTest {
   @Test
   void whenMultipleMsgJsonLoadedinOneService_thenDoNotSupportDuplicateKeys() {
     Assertions.assertThrows(
-        KeyAlreadyExistException.class, () -> messageService.loadMessages("test-2", EN_LOCALE));
+        KeyAlreadyExistException.class, () -> messageService.loadMessages("test-2"));
   }
 }

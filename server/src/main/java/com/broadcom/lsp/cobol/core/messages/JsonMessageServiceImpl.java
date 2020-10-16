@@ -22,14 +22,15 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.broadcom.lsp.cobol.core.messages.JSONResourceBundleControl.DEFAULT_LOCALE;
-
 /***
  * This class is a JSON implementation of {@link MessageService} . It loads the JSON messages into memory to be used latter on for logging.
  */
 @Slf4j
 public class JsonMessageServiceImpl implements MessageService {
 
+  public static final Locale DEFAULT_LOCALE =
+      new Locale(
+          JSONResourceBundleControl.DEFAULT_LOCALE, JSONResourceBundleControl.DEFAULT_LOCALE);
   private static final String KEYS_WITH_ID_ALREADY_EXISTS_MESSAGE =
       "Keys with id '{%s}' already exists.";
   private static final String RESOURCE_LOAD_EXCEPTION_MESSAGE =
@@ -39,8 +40,12 @@ public class JsonMessageServiceImpl implements MessageService {
       "No templates corresponding to key '{}' found.";
   private final Map<String, MessageTemplate> customMessagesMap = new HashMap<>();
 
-  public JsonMessageServiceImpl(String fileName, Optional<Locale> locale) {
+  public JsonMessageServiceImpl(String fileName, Locale locale) {
     loadMessages(fileName, locale);
+  }
+
+  public JsonMessageServiceImpl(String fileName) {
+    loadMessages(fileName, DEFAULT_LOCALE);
   }
 
   /***
@@ -86,20 +91,28 @@ public class JsonMessageServiceImpl implements MessageService {
    * @Throws {@link MissingResourceException}
    */
   @Override
-  public void loadMessages(String filename, Optional<Locale> locale) {
+  public void loadMessages(String filename, Locale locale) {
     ResourceBundle.Control control = new JSONResourceBundleControl();
-    ResourceBundle customResourceBundle =
-        ResourceBundle.getBundle(
-            filename, locale.orElse(new Locale(DEFAULT_LOCALE, DEFAULT_LOCALE)), control);
+    ResourceBundle customResourceBundle = ResourceBundle.getBundle(filename, locale, control);
     List<MessageTemplate> messageTemplateList =
         Collections.list(customResourceBundle.getKeys()).stream()
             .map(e -> (MessageTemplate) customResourceBundle.getObject(e))
             .collect(Collectors.toList());
-    this.addMessageTemplates(messageTemplateList);
+    addMessageTemplates(messageTemplateList);
+  }
+
+  /**
+   * This method loads an externalized message file.
+   *
+   * @param fileName path to the externalized message file.
+   */
+  @Override
+  public void loadMessages(String fileName) {
+    loadMessages(fileName, DEFAULT_LOCALE);
   }
 
   /***
-   * Adds a list of {@link MessageTemplate} to an existing object of {@link MessageService }
+   * Add a list of {@link MessageTemplate} to an existing object of {@link MessageService }
    * @param messageTemplateList list of {@link MessageTemplate} to be loaded in the memory, to be used
    *                            later on by calling {@link MessageService#getMessage(String, Object...)} .
    */
