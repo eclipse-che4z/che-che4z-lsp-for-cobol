@@ -85,10 +85,10 @@ public class JsonMessageServiceImpl implements MessageService {
    */
   @Override
   public void loadMessages(String filePath) {
-    try (final BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+    try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
       Gson gson = new Gson();
-      final MessageTemplate[] messageTemplates = gson.fromJson(reader, MessageTemplate[].class);
-      final List<MessageTemplate> messageTemplateList = List.of(messageTemplates);
+      MessageTemplate[] messageTemplates = gson.fromJson(reader, MessageTemplate[].class);
+      List<MessageTemplate> messageTemplateList = List.of(messageTemplates);
       this.addMessageTemplates(messageTemplateList);
     } catch (IOException exception) {
       throw new MessageTemplateLoadException(
@@ -109,14 +109,14 @@ public class JsonMessageServiceImpl implements MessageService {
 
   private void validateMessageTemplateKeys(List<MessageTemplate> messageTemplateList) {
     validateKeyDuplication(messageTemplateList);
-    final Set<String> existingKeySet = customMessagesMap.keySet();
-    final Set<String> toBeAddedKeys =
+    Set<String> existingKeySet = customMessagesMap.keySet();
+    Set<String> toBeAddedKeys =
         messageTemplateList.stream().map(MessageTemplate::getKey).collect(Collectors.toSet());
     verifyNoKeyDuplicationIn(toBeAddedKeys, existingKeySet);
   }
 
   private void verifyNoKeyDuplicationIn(Set<String> toBeAddedKeys, Set<String> existingKeySet) {
-    final Sets.SetView<String> intersection = Sets.intersection(toBeAddedKeys, existingKeySet);
+    Sets.SetView<String> intersection = Sets.intersection(toBeAddedKeys, existingKeySet);
     String errorMsg;
     if (!intersection.isEmpty()) {
       errorMsg =
