@@ -14,6 +14,10 @@
  */
 package com.broadcom.lsp.cobol.core.messages;
 
+/**
+ * Defines exception to be thrown when a problem is encountered while loading an externalized
+ * message file.
+ */
 public class MessageTemplateLoadException extends RuntimeException {
   public MessageTemplateLoadException(String format) {
     super(format);

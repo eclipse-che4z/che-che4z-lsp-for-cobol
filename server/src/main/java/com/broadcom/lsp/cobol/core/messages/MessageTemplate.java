@@ -16,6 +16,7 @@ package com.broadcom.lsp.cobol.core.messages;
 
 import lombok.Value;
 
+/** This class defined the template of an externalized message file. */
 @Value
 public class MessageTemplate {
   String key;

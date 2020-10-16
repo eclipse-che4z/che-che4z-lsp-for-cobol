@@ -14,6 +14,7 @@
  */
 package com.broadcom.lsp.cobol.core.messages;
 
+/** Exception to be thrown when a duplicate key is encountered in an externalized message file. */
 public class KeyAlreadyExistException extends RuntimeException {
   public KeyAlreadyExistException(String errorMsg) {
     super(errorMsg);

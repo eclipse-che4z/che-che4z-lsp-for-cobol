@@ -32,7 +32,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JsonMessageServiceImpl implements MessageService {
 
-  public static final String KEYS_WITH_ID_S_ALREADY_EXISTS = "Keys with id '{%s}' already exists.";
+  private static final String KEYS_WITH_ID_ALREADY_EXISTS_MESSAGE =
+      "Keys with id '{%s}' already exists.";
+  private static final String MESSAGE_LOAD_EXCEPTION_MESSAGE =
+      "Please load messages from a template json file before using message service."
+          + "Use loadMessages method provided by the MessageService class.";
+  private static final String KEY_NOT_FOUND_MESSAGE =
+      "No templates corresponding to key '{}' found.";
+  private static final String TEMPLATE_LOAD_EXCEPTION_MESSAGE =
+      "Problems encountered while loading MessageTemplate from path '%s'.";
   private final Map<String, MessageTemplate> customMessagesMap = new HashMap<>();
 
   public JsonMessageServiceImpl(String filePath) {
@@ -40,7 +48,7 @@ public class JsonMessageServiceImpl implements MessageService {
   }
 
   /***
-   *
+   *  This method return an {@link ExternalizedMessage} object passed on passed params from an message file.
    * @param key Key corresponds to the uniqueness of a messageTemplate.
    *            It's like an ID for the message. Every key must be unique.
    * @param parameters are the different arguments to be substituted in the message,
@@ -50,9 +58,7 @@ public class JsonMessageServiceImpl implements MessageService {
   @Override
   public ExternalizedMessage getMessage(@NonNull String key, @NonNull Object... parameters) {
     if (this.customMessagesMap.isEmpty()) {
-      throw new MessageTemplateLoadException(
-          "Please load messages from a template json file before using message service."
-              + "Use loadMessages method provided by the MessageService class.");
+      throw new MessageTemplateLoadException(MESSAGE_LOAD_EXCEPTION_MESSAGE);
     }
     MessageTemplate messageTemplate = validateMessageTemplateExists(key);
     if (!messageTemplate.isValidKey()) {
@@ -69,18 +75,17 @@ public class JsonMessageServiceImpl implements MessageService {
     return this.getMessageTemplate(key)
         .orElseGet(
             () -> {
-              LOG.error("No templates corresponding to key '{}' found.", key);
+              LOG.error(KEY_NOT_FOUND_MESSAGE, key);
               return invalidMessageTemplate();
             });
   }
 
   private MessageTemplate invalidMessageTemplate() {
-    return new MessageTemplate(
-        INVALID_KEY, INVALID_KEY_S_SUPPLIED_PLEASE_CHECK_THE_EXTERNALIZED_MESSAGE_FILES);
+    return new MessageTemplate(INVALID_KEY, INVALID_KEY_EXTERNALIZED_MESSAGE);
   }
 
   /***
-   *
+   * This methods verify and loads all messages from a provided message file.
    * @param filePath is the path from where we want to load messageTemplate files.
    */
   @Override
@@ -92,13 +97,12 @@ public class JsonMessageServiceImpl implements MessageService {
       this.addMessageTemplates(messageTemplateList);
     } catch (IOException exception) {
       throw new MessageTemplateLoadException(
-          String.format(
-              "Problems encountered while loading MessageTemplate from path '%s'.", filePath));
+          String.format(TEMPLATE_LOAD_EXCEPTION_MESSAGE, filePath));
     }
   }
 
   /***
-   *
+   * Adds a list of {@link MessageTemplate} to an existing object of {@link MessageService }
    * @param messageTemplateList list of {@link MessageTemplate} to be loaded in the memory, to be used
    *                            later on by calling {@link MessageService#getMessage(String, Object...)} .
    */
@@ -117,12 +121,11 @@ public class JsonMessageServiceImpl implements MessageService {
 
   private void verifyNoKeyDuplicationIn(Set<String> toBeAddedKeys, Set<String> existingKeySet) {
     Sets.SetView<String> intersection = Sets.intersection(toBeAddedKeys, existingKeySet);
-    String errorMsg;
     if (!intersection.isEmpty()) {
-      errorMsg =
+      throw new KeyAlreadyExistException(
           String.format(
-              KEYS_WITH_ID_S_ALREADY_EXISTS, StringUtils.joinWith(",", intersection.toArray()));
-      throw new KeyAlreadyExistException(errorMsg);
+              KEYS_WITH_ID_ALREADY_EXISTS_MESSAGE,
+              StringUtils.joinWith(",", intersection.toArray())));
     }
   }
 
@@ -138,7 +141,7 @@ public class JsonMessageServiceImpl implements MessageService {
 
     if (!duplicateKeys.isEmpty()) {
       String errorMsg =
-          String.format(KEYS_WITH_ID_S_ALREADY_EXISTS, StringUtils.join(duplicateKeys, ","));
+          String.format(KEYS_WITH_ID_ALREADY_EXISTS_MESSAGE, StringUtils.join(duplicateKeys, ","));
       throw new KeyAlreadyExistException(errorMsg);
     }
   }
