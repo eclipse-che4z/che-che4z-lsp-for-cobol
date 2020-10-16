@@ -14,6 +14,7 @@
  */
 package com.broadcom.lsp.cobol.core.strategy;
 
+import com.broadcom.lsp.cobol.core.messages.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,10 +28,10 @@ class JsonMessageServiceImplTest {
 
     @Test
     void whenValidMessageTemplateProvide_getFormattedMessage() {
-        final ExternalizeMessage message = messageService.getMessage("1");
+        final ExternalizedMessage message = messageService.getMessage("1");
         assertEquals("This is a test.", message.getFormattedMessage());
 
-        final ExternalizeMessage message1 = messageService.getMessage("2", "TEST_PARAM");
+        final ExternalizedMessage message1 = messageService.getMessage("2", "TEST_PARAM");
         assertEquals("This is a test for parameters. Received params is -> TEST_PARAM .", message1.getFormattedMessage());
     }
 
@@ -50,7 +51,7 @@ class JsonMessageServiceImplTest {
 
     @Test
     void whenInValidMessageTemplateKeyProvided_getInvalidMessageString() {
-        final ExternalizeMessage message = messageService.getMessage("3");
+        final ExternalizedMessage message = messageService.getMessage("3");
         String expectedString = "Invalid key '3' supplied. Please check the externalized message files.";
         assertEquals(expectedString, message.getFormattedMessage());
     }

@@ -12,20 +12,10 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package com.broadcom.lsp.cobol.core.strategy;
+package com.broadcom.lsp.cobol.core.messages;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class MessageTemplate {
-    private String key;
-    private String message;
-
-    public boolean isValidKey() {
-        return !key.equals(MessageService.INVALID_KEY);
-    }
+public class KeyAlreadyExistException extends RuntimeException {
+  public KeyAlreadyExistException(String errorMsg) {
+    super(errorMsg);
+  }
 }

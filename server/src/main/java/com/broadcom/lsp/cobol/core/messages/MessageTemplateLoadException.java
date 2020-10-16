@@ -12,10 +12,10 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package com.broadcom.lsp.cobol.core.strategy;
+package com.broadcom.lsp.cobol.core.messages;
 
-public class KeyAlreadyExistException extends RuntimeException {
-    public KeyAlreadyExistException(String errorMsg) {
-        super(errorMsg);
-    }
+public class MessageTemplateLoadException extends RuntimeException {
+  public MessageTemplateLoadException(String format) {
+    super(format);
+  }
 }
