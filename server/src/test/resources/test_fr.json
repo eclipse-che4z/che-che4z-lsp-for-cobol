@@ -1,0 +1,10 @@
+[
+  {
+    "key": "1",
+    "message": "French test selected."
+  },
+  {
+    "key": "2",
+    "message": "French test with parameters. Received params is -> %s ."
+  }
+]

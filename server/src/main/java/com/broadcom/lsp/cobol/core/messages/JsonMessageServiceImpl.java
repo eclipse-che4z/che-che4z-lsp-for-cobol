@@ -15,16 +15,14 @@
 package com.broadcom.lsp.cobol.core.messages;
 
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.broadcom.lsp.cobol.core.messages.JSONResourceBundleControl.DEFAULT_LOCALE;
 
 /***
  * This class is a JSON implementation of {@link MessageService} . It loads the JSON messages into memory to be used latter on for logging.
@@ -34,17 +32,15 @@ public class JsonMessageServiceImpl implements MessageService {
 
   private static final String KEYS_WITH_ID_ALREADY_EXISTS_MESSAGE =
       "Keys with id '{%s}' already exists.";
-  private static final String MESSAGE_LOAD_EXCEPTION_MESSAGE =
+  private static final String RESOURCE_LOAD_EXCEPTION_MESSAGE =
       "Please load messages from a template json file before using message service."
           + "Use loadMessages method provided by the MessageService class.";
   private static final String KEY_NOT_FOUND_MESSAGE =
       "No templates corresponding to key '{}' found.";
-  private static final String TEMPLATE_LOAD_EXCEPTION_MESSAGE =
-      "Problems encountered while loading MessageTemplate from path '%s'.";
   private final Map<String, MessageTemplate> customMessagesMap = new HashMap<>();
 
-  public JsonMessageServiceImpl(String filePath) {
-    loadMessages(filePath);
+  public JsonMessageServiceImpl(String fileName, Optional<Locale> locale) {
+    loadMessages(fileName, locale);
   }
 
   /***
@@ -58,7 +54,7 @@ public class JsonMessageServiceImpl implements MessageService {
   @Override
   public ExternalizedMessage getMessage(@NonNull String key, @NonNull Object... parameters) {
     if (this.customMessagesMap.isEmpty()) {
-      throw new MessageTemplateLoadException(MESSAGE_LOAD_EXCEPTION_MESSAGE);
+      throw new MessageTemplateLoadException(RESOURCE_LOAD_EXCEPTION_MESSAGE);
     }
     MessageTemplate messageTemplate = validateMessageTemplateExists(key);
     if (!messageTemplate.isValidKey()) {
@@ -86,19 +82,20 @@ public class JsonMessageServiceImpl implements MessageService {
 
   /***
    * This methods verify and loads all messages from a provided message file.
-   * @param filePath is the path from where we want to load messageTemplate files.
+   * @param filename is the path from where we want to load messageTemplate files.
+   * @Throws {@link MissingResourceException}
    */
   @Override
-  public void loadMessages(String filePath) {
-    try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-      Gson gson = new Gson();
-      MessageTemplate[] messageTemplates = gson.fromJson(reader, MessageTemplate[].class);
-      List<MessageTemplate> messageTemplateList = List.of(messageTemplates);
-      this.addMessageTemplates(messageTemplateList);
-    } catch (IOException exception) {
-      throw new MessageTemplateLoadException(
-          String.format(TEMPLATE_LOAD_EXCEPTION_MESSAGE, filePath));
-    }
+  public void loadMessages(String filename, Optional<Locale> locale) {
+    ResourceBundle.Control control = new JSONResourceBundleControl();
+    ResourceBundle customResourceBundle =
+        ResourceBundle.getBundle(
+            filename, locale.orElse(new Locale(DEFAULT_LOCALE, DEFAULT_LOCALE)), control);
+    List<MessageTemplate> messageTemplateList =
+        Collections.list(customResourceBundle.getKeys()).stream()
+            .map(e -> (MessageTemplate) customResourceBundle.getObject(e))
+            .collect(Collectors.toList());
+    this.addMessageTemplates(messageTemplateList);
   }
 
   /***

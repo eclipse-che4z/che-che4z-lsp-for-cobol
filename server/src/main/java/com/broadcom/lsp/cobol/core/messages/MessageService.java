@@ -15,6 +15,8 @@
 package com.broadcom.lsp.cobol.core.messages;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 /** This class sets the basic contract for any externalized message service to be implemented. */
 public interface MessageService {
@@ -38,7 +40,7 @@ public interface MessageService {
    *
    * @param filePath path to the externalized message file.
    */
-  void loadMessages(String filePath);
+  void loadMessages(String filePath, Optional<Locale> locale);
 
   /**
    * @param messageTemplateList loads List of {@link MessageTemplate} to an existing {@link

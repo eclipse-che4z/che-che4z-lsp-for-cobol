@@ -18,13 +18,17 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JsonMessageServiceImplTest {
 
-  private static MessageService messageService =
-      new JsonMessageServiceImpl("src/test/java/com/broadcom/lsp/cobol/core/messages/test.json");
+  public static final Optional<Locale> EN_LOCALE = Optional.of(new Locale("en", "en"));
+  public static final Optional<Locale> FR_LOCALE = Optional.of(new Locale("fr", "fr"));
+  private static MessageService messageService = new JsonMessageServiceImpl("test", EN_LOCALE);
 
   @Test
   void whenValidMessageTemplateProvide_getFormattedMessage() {
@@ -38,19 +42,30 @@ class JsonMessageServiceImplTest {
   }
 
   @Test
+  void whenValidMessageTemplateProvideFR_getFormattedMessage() {
+    MessageService messageServiceFR = new JsonMessageServiceImpl("test", FR_LOCALE);
+    final ExternalizedMessage message = messageServiceFR.getMessage("1");
+    assertEquals("French test selected.", message.getFormattedMessage());
+
+    final ExternalizedMessage message1 = messageServiceFR.getMessage("2", "TEST_PARAM");
+    assertEquals(
+            "French test with parameters. Received params is -> TEST_PARAM .",
+            message1.getFormattedMessage());
+  }
+
+  @Test
   void whenInValidMessageTemplatePathProvide_getException() {
     Assertions.assertThrows(
-        MessageTemplateLoadException.class,
+        MissingResourceException.class,
         () -> {
-          MessageService messageServiceLocal = new JsonMessageServiceImpl("dummy.json");
+          MessageService messageServiceLocal = new JsonMessageServiceImpl("dummy", EN_LOCALE);
         });
   }
 
   @Test
   void whenEmptyMessageTemplateProvided_getException() {
     MessageService messageServiceLocal =
-        new JsonMessageServiceImpl(
-            "src/test/java/com/broadcom/lsp/cobol/core/messages/Test_messageServiceEmptyFile.json");
+        new JsonMessageServiceImpl("Test_messageServiceEmptyFile", EN_LOCALE);
     Assertions.assertThrows(
         MessageTemplateLoadException.class, () -> messageServiceLocal.getMessage("1"));
   }
@@ -89,9 +104,7 @@ class JsonMessageServiceImplTest {
 
   @Test
   void whenMultipleMsgServiceExist_thenSupportDuplicateKeys() {
-    MessageService messageService1 =
-        new JsonMessageServiceImpl(
-            "src/test/java/com/broadcom/lsp/cobol/core/messages/test-2.json");
+    MessageService messageService1 = new JsonMessageServiceImpl("test-2", EN_LOCALE);
     final String formattedMessage = messageService1.getMessage("1").getFormattedMessage();
     assertEquals("This is a duplicate key test for diff msg service.", formattedMessage);
   }
@@ -99,9 +112,6 @@ class JsonMessageServiceImplTest {
   @Test
   void whenMultipleMsgJsonLoadedinOneService_thenDoNotSupportDuplicateKeys() {
     Assertions.assertThrows(
-        KeyAlreadyExistException.class,
-        () ->
-            messageService.loadMessages(
-                "src/test/java/com/broadcom/lsp/cobol/core/messages/test-2.json"));
+        KeyAlreadyExistException.class, () -> messageService.loadMessages("test-2", EN_LOCALE));
   }
 }
