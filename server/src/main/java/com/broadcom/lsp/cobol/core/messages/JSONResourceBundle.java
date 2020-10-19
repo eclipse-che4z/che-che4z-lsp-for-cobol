@@ -19,20 +19,15 @@ import com.google.gson.Gson;
 import java.io.BufferedInputStream;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /** This is a custom {@link ResourceBundle} to support JSON. */
 public class JSONResourceBundle extends ResourceBundle {
-  private final Map<String, MessageTemplate> props;
+  private final Map<?, ?> props;
 
   public JSONResourceBundle(BufferedInputStream bis) {
     Gson gson = new Gson();
     InputStreamReader reader = new InputStreamReader(bis);
-    MessageTemplate[] messageTemplates = gson.fromJson(reader, MessageTemplate[].class);
-    props =
-        Arrays.stream(messageTemplates)
-            .collect(Collectors.toMap(MessageTemplate::getKey, Function.identity()));
+    props = gson.fromJson(reader, Map.class);
   }
 
   /**
@@ -56,6 +51,6 @@ public class JSONResourceBundle extends ResourceBundle {
    */
   @Override
   public Enumeration<String> getKeys() {
-    return Collections.enumeration(props.keySet());
+    return Collections.enumeration((Set<String>)props.keySet());
   }
 }

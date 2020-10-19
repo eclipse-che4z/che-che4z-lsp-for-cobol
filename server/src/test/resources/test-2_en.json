@@ -1,10 +1,8 @@
-[
-  {
-    "key" : "1",
-    "message": "This is a duplicate key test for diff msg service."
-  },
-  {
-    "key" : "a.b.c",
-    "message": "Random test string."
-  }
-]
+{
+"1":{
+  "message": "This is a duplicate key test for diff msg service."
+},
+"a.b.c":{
+"message": "Random test string."
+}
+}

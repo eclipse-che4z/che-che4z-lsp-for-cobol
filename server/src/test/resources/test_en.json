@@ -1,10 +1,8 @@
-[
-  {
-    "key": "1",
+{
+  "1": {
     "message": "This is a test."
   },
-  {
-    "key": "2",
+  "2": {
     "message": "This is a test for parameters. Received params is -> %s ."
   }
-]
+}

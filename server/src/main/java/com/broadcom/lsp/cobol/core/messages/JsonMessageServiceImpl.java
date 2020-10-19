@@ -15,6 +15,7 @@
 package com.broadcom.lsp.cobol.core.messages;
 
 import com.google.common.collect.Sets;
+import com.google.gson.internal.LinkedTreeMap;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -96,7 +97,9 @@ public class JsonMessageServiceImpl implements MessageService {
     ResourceBundle customResourceBundle = ResourceBundle.getBundle(filename, locale, control);
     List<MessageTemplate> messageTemplateList =
         Collections.list(customResourceBundle.getKeys()).stream()
-            .map(e -> (MessageTemplate) customResourceBundle.getObject(e))
+            .map(
+                e ->
+                    new MessageTemplate(e, (String)((LinkedTreeMap) customResourceBundle.getObject(e)).get("message")))
             .collect(Collectors.toList());
     addMessageTemplates(messageTemplateList);
   }
