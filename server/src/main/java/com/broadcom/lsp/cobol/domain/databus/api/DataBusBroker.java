@@ -15,7 +15,6 @@
 
 package com.broadcom.lsp.cobol.domain.databus.api;
 
-import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import com.broadcom.lsp.cobol.domain.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.cobol.domain.databus.model.RegistryId;
 import com.broadcom.lsp.cobol.domain.event.api.EventObserver;
@@ -51,18 +50,4 @@ public interface DataBusBroker<T extends DataEvent, S> {
   void unSubscribe(@NonNull RegistryId registryId, S dataSubscriber);
 
   S getSubscriber(@NonNull DataEventType event, @NonNull EventObserver observer);
-
-  CopybookModel storeData(CopybookModel dataEvent);
-
-  CopybookModel getData(String name);
-
-  boolean isStored(String name);
-
-  int cacheSize();
-
-  int getCacheMaxSize();
-
-  String printCache();
-
-  void invalidateCache();
 }

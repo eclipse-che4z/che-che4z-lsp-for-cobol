@@ -14,17 +14,18 @@
  */
 package com.broadcom.lsp.cobol.service.delegates.validations;
 
-import com.broadcom.lsp.cobol.domain.modules.EngineModule;
+import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import com.broadcom.lsp.cobol.domain.modules.DatabusModule;
-import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
-import com.broadcom.lsp.cobol.service.mocks.MockCopybookService;
-import com.broadcom.lsp.cobol.service.mocks.MockCopybookServiceImpl;
-import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
-import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
-import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
-import com.broadcom.lsp.cobol.domain.event.model.FetchedCopybookEvent;
-import com.broadcom.lsp.cobol.domain.event.model.RequiredCopybookEvent;
+import com.broadcom.lsp.cobol.domain.modules.EngineModule;
 import com.broadcom.lsp.cobol.positive.CobolText;
+import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
+import com.broadcom.lsp.cobol.service.CopybookService;
+import com.broadcom.lsp.cobol.service.CopybookServiceImpl;
+import com.broadcom.lsp.cobol.service.SettingsService;
+import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
+import com.broadcom.lsp.cobol.service.utils.FileSystemService;
+import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.experimental.UtilityClass;
@@ -37,12 +38,16 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /** This utility class provides methods to run use cases with COBOL code examples. */
 @UtilityClass
@@ -198,16 +203,28 @@ public class UseCaseUtils {
       String text,
       List<CobolText> copybooks,
       CopybookProcessingMode copybookProcessingMode) {
-    Injector injector = Guice.createInjector(new EngineModule(), new DatabusModule());
+    SettingsService mockSettingsService = mock(SettingsService.class);
+    when(mockSettingsService.getConfiguration(any())).thenReturn(CompletableFuture.completedFuture(List.of()));
+    FileSystemService mockFileSystemService = mock(FileSystemService.class);
+    when(mockFileSystemService.getNameFromURI(any())).thenReturn("");
+    Injector injector = Guice.createInjector(new EngineModule(), new DatabusModule(), new AbstractModule() {
+      @Override
+      protected void configure() {
+        bind(CopybookService.class).to(CopybookServiceImpl.class);
+        bind(SettingsService.class).toInstance(mockSettingsService);
+        bind(FileSystemService.class).toInstance(mockFileSystemService);
+      }
+    });
 
-    DataBusBroker<FetchedCopybookEvent, RequiredCopybookEvent> broker =
-        injector.getInstance(DataBusBroker.class);
-
-    MockCopybookService mockCopybookService = new MockCopybookServiceImpl(broker);
-    mockCopybookService.setCopybooks(() -> copybooks);
+    CopybookService copybookService = injector.getInstance(CopybookService.class);
+    copybooks.stream().map(UseCaseUtils::toCopybookModel).forEach(copybookService::store);
 
     return injector
         .getInstance(CobolLanguageEngineFacade.class)
         .analyze(fileName, text, copybookProcessingMode);
+  }
+
+  public static CopybookModel toCopybookModel(CobolText cobolText) {
+    return new CopybookModel(cobolText.getFileName(), toURI(cobolText.getFileName()), cobolText.getFullText());
   }
 }

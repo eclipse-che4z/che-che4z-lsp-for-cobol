@@ -14,22 +14,22 @@
  */
 package com.broadcom.lsp.cobol.domain.databus.impl;
 
+import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import com.broadcom.lsp.cobol.domain.databus.model.RegistryId;
 import com.broadcom.lsp.cobol.domain.event.api.EventObserver;
 import com.broadcom.lsp.cobol.domain.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
 import com.broadcom.lsp.cobol.domain.event.model.UnknownEvent;
-import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeoutException;
 
+import static com.broadcom.lsp.cobol.domain.databus.impl.DatabusTestConstants.WAITER_DELAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
@@ -37,37 +37,11 @@ class DatabusBrokerTest implements EventObserver<DataEvent> {
   @Getter @Setter private int hitCount;
   private static final DataEventType UNKNOWN_EVENT_TYPE = DataEventType.UNKNOWN_EVENT;
 
-  private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> broker =
-      new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3, 3, "HOURS"));
+  private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> broker = new DefaultDataBusBroker<>(3);
   private final CopybookModel dummyCopybook =
       new CopybookModel("Test", "file:///C:/Users/test/Test.cbl", "000000 IDENTIFICATION DIVISION.");
 
   @Getter private final Waiter waiter = new Waiter();
-
-  @BeforeEach
-  void initCache() {
-    // populate the cache with some data
-    broker.storeData(dummyCopybook);
-  }
-
-  /**
-   * This test verifies that the client can invalidate the databus internal cache using the broker.
-   */
-  @Test
-  void invalidateCacheTest() {
-    LOG.info("Cache size before invalidate call = " + broker.cacheSize());
-    broker.invalidateCache();
-    assertEquals(0, broker.cacheSize());
-  }
-
-  /**
-   * This test verifies that the client can retrieve an element from the databus internal cache
-   * using the broker.
-   */
-  @Test
-  void isElementStoredInCacheTest() {
-    assertEquals(dummyCopybook.getName(), broker.getData(dummyCopybook.getName()).getName());
-  }
 
   /** This test verifies that a client could subscribe for an event using the broker. */
   @Test
@@ -84,7 +58,7 @@ class DatabusBrokerTest implements EventObserver<DataEvent> {
     broker.subscribe(UNKNOWN_EVENT_TYPE, this);
     // a new unknown event is published..
     broker.postData(UnknownEvent.builder().build());
-    waiter.await(5000);
+    waiter.await(WAITER_DELAY);
     assertEquals(1, getHitCount());
   }
 
@@ -107,7 +81,7 @@ class DatabusBrokerTest implements EventObserver<DataEvent> {
     broker.subscribe(RegistryId.GENERAL_REGISTRY_ID, unknownEventSubscriber);
     // a new unknown event is published..
     broker.postData(UnknownEvent.builder().build());
-    waiter.await(5000);
+    waiter.await(WAITER_DELAY);
     assertEquals(1, getHitCount());
   }
 
@@ -130,7 +104,7 @@ class DatabusBrokerTest implements EventObserver<DataEvent> {
 
     // a new unknown event published...
     broker.postData(UnknownEvent.builder().build());
-    waiter.await(1000);
+    waiter.await(WAITER_DELAY);
     // at that moment hitCount = 1
     broker.unSubscribe(subscriber);
 

@@ -19,8 +19,6 @@ import com.broadcom.lsp.cobol.service.delegates.completions.*;
 import com.broadcom.lsp.cobol.service.delegates.references.*;
 import com.broadcom.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
-import com.broadcom.lsp.cobol.service.mocks.MockCopybookService;
-import com.broadcom.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageServer;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActionProvider;
@@ -54,7 +52,6 @@ public class TestModule extends AbstractModule {
     bind(LanguageServer.class).to(TestLanguageServer.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
-    bind(MockCopybookService.class).to(MockCopybookServiceImpl.class);
     bind(CopybookService.class).to(CopybookServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(CobolTextDocumentService.class);

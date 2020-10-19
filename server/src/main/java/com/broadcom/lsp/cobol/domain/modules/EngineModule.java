@@ -25,8 +25,6 @@ import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderDelegate;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CompilerDirectivesTransformation;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.resolution.CopybookResolution;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.resolution.CopybookResolutionProvider;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolCommentEntriesMarkerImpl;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolInlineCommentEntriesNormalizerImpl;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
@@ -49,7 +47,6 @@ public class EngineModule extends AbstractModule {
     bind(CobolLanguageEngine.class);
     bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
     bind(GrammarPreprocessor.class).to(GrammarPreprocessorImpl.class);
-    bind(CopybookResolution.class).toProvider(CopybookResolutionProvider.class);
     install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));
     bind(ReplacingService.class).to(ReplacingServiceImpl.class);
     bind(CobolLineReader.class).to(CobolLineReaderImpl.class);
