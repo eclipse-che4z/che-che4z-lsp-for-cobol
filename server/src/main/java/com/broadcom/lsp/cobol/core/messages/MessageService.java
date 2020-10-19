@@ -14,15 +14,8 @@
  */
 package com.broadcom.lsp.cobol.core.messages;
 
-import java.util.List;
-import java.util.Locale;
-
 /** This class sets the basic contract for any externalized message service to be implemented. */
 public interface MessageService {
-
-  String INVALID_KEY = "invalid-key";
-  String INVALID_KEY_EXTERNALIZED_MESSAGE =
-      "Invalid key '%s' supplied. Please check the externalized message files.";
 
   /**
    * This method return an {@link ExternalizedMessage} based on passes key and params.
@@ -33,25 +26,4 @@ public interface MessageService {
    * @return {@link ExternalizedMessage}
    */
   ExternalizedMessage getMessage(String key, Object... parameters);
-
-  /**
-   * This method loads an externalized message file.
-   *
-   * @param fileName path to the externalized message file.
-   * @param locale locale of the file.
-   */
-  void loadMessages(String fileName, Locale locale);
-
-  /**
-   * This method loads an externalized message file.
-   *
-   * @param fileName path to the externalized message file.
-   */
-  void loadMessages(String fileName);
-
-  /**
-   * @param messageTemplateList loads List of {@link MessageTemplate} to an existing {@link
-   *     MessageService } object.
-   */
-  void addMessageTemplates(List<MessageTemplate> messageTemplateList);
 }

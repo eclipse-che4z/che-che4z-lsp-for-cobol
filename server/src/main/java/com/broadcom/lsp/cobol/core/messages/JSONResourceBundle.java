@@ -51,6 +51,6 @@ public class JSONResourceBundle extends ResourceBundle {
    */
   @Override
   public Enumeration<String> getKeys() {
-    return Collections.enumeration((Set<String>)props.keySet());
+    return Collections.enumeration((Set<String>) props.keySet());
   }
 }

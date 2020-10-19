@@ -17,7 +17,6 @@ package com.broadcom.lsp.cobol.core.messages;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
@@ -64,36 +63,12 @@ class JsonMessageServiceImplTest {
   void whenEmptyMessageTemplateProvided_getException() {
     MessageService messageServiceLocal = new JsonMessageServiceImpl("Test_messageServiceEmptyFile");
     Assertions.assertThrows(
-        MessageTemplateLoadException.class, () -> messageServiceLocal.getMessage("1"));
+        KeyNotFoundException.class, () -> messageServiceLocal.getMessage("1"));
   }
 
   @Test
   void whenInValidMessageTemplateKeyProvided_getInvalidMessageString() {
-    final ExternalizedMessage message = messageService.getMessage("3");
-    String expectedString =
-        "Invalid key '3' supplied. Please check the externalized message files.";
-    assertEquals(expectedString, message.getFormattedMessage());
-  }
-
-  @Test
-  void addMessageTemplates() {
-    MessageService messageServiceTest = new JsonMessageServiceImpl("test");
-    MessageTemplate messageTemplate1 = new MessageTemplate("random-1", "Just for testing !!!");
-    MessageTemplate messageTemplate2 = new MessageTemplate("random-2", "Just for testing params : %s");
-    final List<MessageTemplate> messageTemplateList = List.of(messageTemplate1, messageTemplate2);
-    messageServiceTest.addMessageTemplates(messageTemplateList);
-    assertEquals("Just for testing !!!", messageServiceTest.getMessage("random-1").getFormattedMessage());
-    assertEquals("Just for testing params : TADA!", messageServiceTest.getMessage("random-2", "TADA!").getFormattedMessage());
-  }
-
-  @Test
-  void whenMessageTemplateKeyAlreadyExist_thenThrowException() {
-    // KeyAlreadyExistException
-    MessageTemplate messageTemplate1 = new MessageTemplate("1", "Just for testing !!!");
-    final List<MessageTemplate> messageTemplateList = List.of(messageTemplate1);
-    Assertions.assertThrows(
-        KeyAlreadyExistException.class,
-        () -> messageService.addMessageTemplates(messageTemplateList));
+    Assertions.assertThrows(KeyNotFoundException.class, () -> messageService.getMessage("3"));
   }
 
   @Test
@@ -101,11 +76,5 @@ class JsonMessageServiceImplTest {
     MessageService messageService1 = new JsonMessageServiceImpl("test-2");
     final String formattedMessage = messageService1.getMessage("1").getFormattedMessage();
     assertEquals("This is a duplicate key test for diff msg service.", formattedMessage);
-  }
-
-  @Test
-  void whenMultipleMsgJsonLoadedinOneService_thenDoNotSupportDuplicateKeys() {
-    Assertions.assertThrows(
-        KeyAlreadyExistException.class, () -> messageService.loadMessages("test-2"));
   }
 }

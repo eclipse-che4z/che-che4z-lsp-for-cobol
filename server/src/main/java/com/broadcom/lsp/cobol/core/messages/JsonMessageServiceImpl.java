@@ -14,14 +14,13 @@
  */
 package com.broadcom.lsp.cobol.core.messages;
 
-import com.google.common.collect.Sets;
 import com.google.gson.internal.LinkedTreeMap;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /***
  * This class is a JSON implementation of {@link MessageService} . It loads the JSON messages into memory to be used latter on for logging.
@@ -29,24 +28,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JsonMessageServiceImpl implements MessageService {
 
-  public static final Locale DEFAULT_LOCALE =
-      new Locale(
-          JSONResourceBundleControl.DEFAULT_LOCALE, JSONResourceBundleControl.DEFAULT_LOCALE);
-  private static final String KEYS_WITH_ID_ALREADY_EXISTS_MESSAGE =
-      "Keys with id '{%s}' already exists.";
-  private static final String RESOURCE_LOAD_EXCEPTION_MESSAGE =
-      "Please load messages from a template json file before using message service."
-          + "Use loadMessages method provided by the MessageService class.";
-  private static final String KEY_NOT_FOUND_MESSAGE =
-      "No templates corresponding to key '{}' found.";
-  private final Map<String, MessageTemplate> customMessagesMap = new HashMap<>();
+  public static final Locale DEFAULT_LOCALE = new Locale(JSONResourceBundleControl.DEFAULT_LOCALE, JSONResourceBundleControl.DEFAULT_LOCALE);
+  private static final String MESSAGE_PARAMETER = "message";
+  private ResourceBundle customResourceBundle;
 
   public JsonMessageServiceImpl(String fileName, Locale locale) {
     loadMessages(fileName, locale);
   }
 
   public JsonMessageServiceImpl(String fileName) {
-    loadMessages(fileName, DEFAULT_LOCALE);
+    loadMessages(fileName);
   }
 
   /***
@@ -59,31 +50,15 @@ public class JsonMessageServiceImpl implements MessageService {
    */
   @Override
   public ExternalizedMessage getMessage(@NonNull String key, @NonNull Object... parameters) {
-    if (this.customMessagesMap.isEmpty()) {
-      throw new MessageTemplateLoadException(RESOURCE_LOAD_EXCEPTION_MESSAGE);
-    }
-    MessageTemplate messageTemplate = validateMessageTemplateExists(key);
-    if (!messageTemplate.isValidKey()) {
-      parameters = new Object[] {key};
-    }
+    if (!customResourceBundle.containsKey(key))
+      throw new KeyNotFoundException("Provided key " + key + " not found in the template.");
     return ExternalizedMessage.builder()
-        .messageTemplate(messageTemplate)
+        .messageTemplate(
+            new MessageTemplate(
+                key, (String) ((LinkedTreeMap) customResourceBundle.getObject(key)).get(MESSAGE_PARAMETER)))
         .parameters(parameters)
         .key(key)
         .build();
-  }
-
-  private MessageTemplate validateMessageTemplateExists(String key) {
-    return this.getMessageTemplate(key)
-        .orElseGet(
-            () -> {
-              LOG.error(KEY_NOT_FOUND_MESSAGE, key);
-              return invalidMessageTemplate();
-            });
-  }
-
-  private MessageTemplate invalidMessageTemplate() {
-    return new MessageTemplate(INVALID_KEY, INVALID_KEY_EXTERNALIZED_MESSAGE);
   }
 
   /***
@@ -91,17 +66,9 @@ public class JsonMessageServiceImpl implements MessageService {
    * @param filename is the path from where we want to load messageTemplate files.
    * @Throws {@link MissingResourceException}
    */
-  @Override
-  public void loadMessages(String filename, Locale locale) {
+  private void loadMessages(String filename, Locale locale) {
     ResourceBundle.Control control = new JSONResourceBundleControl();
-    ResourceBundle customResourceBundle = ResourceBundle.getBundle(filename, locale, control);
-    List<MessageTemplate> messageTemplateList =
-        Collections.list(customResourceBundle.getKeys()).stream()
-            .map(
-                e ->
-                    new MessageTemplate(e, (String)((LinkedTreeMap) customResourceBundle.getObject(e)).get("message")))
-            .collect(Collectors.toList());
-    addMessageTemplates(messageTemplateList);
+    customResourceBundle = ResourceBundle.getBundle(filename, locale, control);
   }
 
   /**
@@ -109,62 +76,7 @@ public class JsonMessageServiceImpl implements MessageService {
    *
    * @param fileName path to the externalized message file.
    */
-  @Override
-  public void loadMessages(String fileName) {
+  private void loadMessages(String fileName) {
     loadMessages(fileName, DEFAULT_LOCALE);
-  }
-
-  /***
-   * Add a list of {@link MessageTemplate} to an existing object of {@link MessageService }
-   * @param messageTemplateList list of {@link MessageTemplate} to be loaded in the memory, to be used
-   *                            later on by calling {@link MessageService#getMessage(String, Object...)} .
-   */
-  public void addMessageTemplates(List<MessageTemplate> messageTemplateList) {
-    validateMessageTemplateKeys(messageTemplateList);
-    messageTemplateList.forEach(element -> this.customMessagesMap.put(element.getKey(), element));
-  }
-
-  private void validateMessageTemplateKeys(List<MessageTemplate> messageTemplateList) {
-    validateKeyDuplication(messageTemplateList);
-    Set<String> existingKeySet = customMessagesMap.keySet();
-    Set<String> toBeAddedKeys =
-        messageTemplateList.stream().map(MessageTemplate::getKey).collect(Collectors.toSet());
-    verifyNoKeyDuplicationIn(toBeAddedKeys, existingKeySet);
-  }
-
-  private void verifyNoKeyDuplicationIn(Set<String> toBeAddedKeys, Set<String> existingKeySet) {
-    Sets.SetView<String> intersection = Sets.intersection(toBeAddedKeys, existingKeySet);
-    if (!intersection.isEmpty()) {
-      throw new KeyAlreadyExistException(
-          String.format(
-              KEYS_WITH_ID_ALREADY_EXISTS_MESSAGE,
-              StringUtils.joinWith(",", intersection.toArray())));
-    }
-  }
-
-  private void validateKeyDuplication(List<MessageTemplate> messageTemplateList) {
-    List<String> duplicateKeys =
-        messageTemplateList.stream()
-            .collect(Collectors.groupingBy(MessageTemplate::getKey, Collectors.counting()))
-            .entrySet()
-            .stream()
-            .filter(entry -> entry.getValue() > 1)
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toList());
-
-    if (!duplicateKeys.isEmpty()) {
-      String errorMsg =
-          String.format(KEYS_WITH_ID_ALREADY_EXISTS_MESSAGE, StringUtils.join(duplicateKeys, ","));
-      throw new KeyAlreadyExistException(errorMsg);
-    }
-  }
-
-  /***
-   *
-   * @param key message template key. This key needs to be unique.
-   * @return @{@link Optional} of {@link MessageTemplate} from messageService.
-   */
-  private Optional<MessageTemplate> getMessageTemplate(String key) {
-    return Optional.ofNullable(customMessagesMap.get(key));
   }
 }

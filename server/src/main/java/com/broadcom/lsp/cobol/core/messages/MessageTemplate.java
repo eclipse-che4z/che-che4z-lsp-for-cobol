@@ -21,13 +21,4 @@ import lombok.Value;
 public class MessageTemplate {
   String key;
   String message;
-
-  /**
-   * Tells is a {@link MessageTemplate} has a valid key.
-   *
-   * @return boolean
-   */
-  public boolean isValidKey() {
-    return !key.equals(MessageService.INVALID_KEY);
-  }
 }
