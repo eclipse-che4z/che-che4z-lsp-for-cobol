@@ -55,7 +55,9 @@ public class JsonMessageServiceImpl implements MessageService {
     return ExternalizedMessage.builder()
         .messageTemplate(
             new MessageTemplate(
-                key, (String) ((LinkedTreeMap) customResourceBundle.getObject(key)).get(MESSAGE_PARAMETER)))
+                key,
+                (String)
+                    ((LinkedTreeMap) customResourceBundle.getObject(key)).get(MESSAGE_PARAMETER)))
         .parameters(parameters)
         .key(key)
         .build();
