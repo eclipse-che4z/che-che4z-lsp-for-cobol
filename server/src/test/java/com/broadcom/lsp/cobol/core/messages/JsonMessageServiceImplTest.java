@@ -53,21 +53,17 @@ class JsonMessageServiceImplTest {
   @Test
   void whenInValidMessageTemplatePathProvide_getException() {
     Assertions.assertThrows(
-        MissingResourceException.class,
-        () -> {
-          MessageService messageServiceLocal = new JsonMessageServiceImpl("dummy");
-        });
+        MissingResourceException.class, () -> new JsonMessageServiceImpl("dummy"));
   }
 
   @Test
   void whenEmptyMessageTemplateProvided_getException() {
     MessageService messageServiceLocal = new JsonMessageServiceImpl("Test_messageServiceEmptyFile");
-    Assertions.assertThrows(
-        KeyNotFoundException.class, () -> messageServiceLocal.getMessage("1"));
+    Assertions.assertThrows(KeyNotFoundException.class, () -> messageServiceLocal.getMessage("1"));
   }
 
   @Test
-  void whenInValidMessageTemplateKeyProvided_getInvalidMessageString() {
+  void whenInValidMessageTemplateKeyProvided_getException() {
     Assertions.assertThrows(KeyNotFoundException.class, () -> messageService.getMessage("3"));
   }
 
