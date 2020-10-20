@@ -146,9 +146,9 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(CPY_DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
-    UseCaseUtils.await(() -> !client.getMessagesToShow().isEmpty());
+    UseCaseUtils.await(() -> !client.getMessagesToLog().isEmpty());
     assertTrue(
-        client.getMessagesToShow().stream()
+        client.getMessagesToLog().stream()
             .map((Function<MessageParams, Object>) MessageParams::getMessage)
             .anyMatch(
                 it ->
