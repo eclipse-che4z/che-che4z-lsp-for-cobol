@@ -14,7 +14,6 @@
  */
 package com.broadcom.lsp.cobol.core.messages;
 
-import com.google.gson.internal.LinkedTreeMap;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,8 +27,9 @@ import java.util.ResourceBundle;
 @Slf4j
 public class JsonMessageServiceImpl implements MessageService {
 
-  public static final Locale DEFAULT_LOCALE = new Locale(JSONResourceBundleControl.DEFAULT_LOCALE, JSONResourceBundleControl.DEFAULT_LOCALE);
-  private static final String MESSAGE_PARAMETER = "message";
+  public static final Locale DEFAULT_LOCALE =
+      new Locale(
+          JSONResourceBundleControl.DEFAULT_LOCALE, JSONResourceBundleControl.DEFAULT_LOCALE);
   private ResourceBundle customResourceBundle;
 
   public JsonMessageServiceImpl(String fileName, Locale locale) {
@@ -49,18 +49,16 @@ public class JsonMessageServiceImpl implements MessageService {
    * @return {@link ExternalizedMessage}
    */
   @Override
-  public ExternalizedMessage getMessage(@NonNull String key, @NonNull Object... parameters) {
+  public String getMessage(@NonNull String key, @NonNull Object... parameters) {
     if (!customResourceBundle.containsKey(key))
       throw new KeyNotFoundException("Provided key " + key + " not found in the template.");
     return ExternalizedMessage.builder()
         .messageTemplate(
             new MessageTemplate(
-                key,
-                (String)
-                    ((LinkedTreeMap) customResourceBundle.getObject(key)).get(MESSAGE_PARAMETER)))
+                key, ((MessageTemplate) customResourceBundle.getObject(key)).getMessage()))
         .parameters(parameters)
-        .key(key)
-        .build();
+        .build()
+        .getFormattedMessage();
   }
 
   /***

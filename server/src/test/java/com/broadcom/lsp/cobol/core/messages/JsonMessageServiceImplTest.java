@@ -29,25 +29,19 @@ class JsonMessageServiceImplTest {
 
   @Test
   void whenValidMessageTemplateProvide_getFormattedMessage() {
-    final ExternalizedMessage message = messageService.getMessage("1");
-    assertEquals("This is a test.", message.getFormattedMessage());
+    final String message = messageService.getMessage("1");
+    assertEquals("This is a test.", message);
 
-    final ExternalizedMessage message1 = messageService.getMessage("2", "TEST_PARAM");
-    assertEquals(
-        "This is a test for parameters. Received params is -> TEST_PARAM .",
-        message1.getFormattedMessage());
+    final String message1 = messageService.getMessage("2", "TEST_PARAM");
+    assertEquals("This is a test for parameters. Received params is -> TEST_PARAM .", message1);
   }
 
   @Test
   void whenValidMessageTemplateProvideFR_getFormattedMessage() {
     MessageService messageServiceFR = new JsonMessageServiceImpl("test", FR_LOCALE);
-    final ExternalizedMessage message = messageServiceFR.getMessage("1");
-    assertEquals("French test selected.", message.getFormattedMessage());
+    assertEquals("French test selected.", messageServiceFR.getMessage("1"));
 
-    final ExternalizedMessage message1 = messageServiceFR.getMessage("2", "TEST_PARAM");
-    assertEquals(
-        "French test with parameters. Received params is -> TEST_PARAM .",
-        message1.getFormattedMessage());
+    assertEquals("French test with parameters. Received params is -> TEST_PARAM .", messageServiceFR.getMessage("2", "TEST_PARAM"));
   }
 
   @Test
@@ -70,7 +64,7 @@ class JsonMessageServiceImplTest {
   @Test
   void whenMultipleMsgServiceExist_thenSupportDuplicateKeys() {
     MessageService messageService1 = new JsonMessageServiceImpl("test-2");
-    final String formattedMessage = messageService1.getMessage("1").getFormattedMessage();
+    final String formattedMessage = messageService1.getMessage("1");
     assertEquals("This is a duplicate key test for diff msg service.", formattedMessage);
   }
 }

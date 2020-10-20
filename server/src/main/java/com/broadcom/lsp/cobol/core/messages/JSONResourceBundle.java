@@ -15,19 +15,25 @@
 package com.broadcom.lsp.cobol.core.messages;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedInputStream;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 /** This is a custom {@link ResourceBundle} to support JSON. */
 public class JSONResourceBundle extends ResourceBundle {
-  private final Map<?, ?> props;
+  private final Map<String, MessageTemplate> props;
 
   public JSONResourceBundle(BufferedInputStream bis) {
     Gson gson = new Gson();
     InputStreamReader reader = new InputStreamReader(bis);
-    props = gson.fromJson(reader, Map.class);
+    Type propsType = new TypeToken<Map<String, MessageTemplate>>() {}.getType();
+    props = gson.fromJson(reader, propsType);
   }
 
   /**
@@ -51,6 +57,6 @@ public class JSONResourceBundle extends ResourceBundle {
    */
   @Override
   public Enumeration<String> getKeys() {
-    return Collections.enumeration((Set<String>) props.keySet());
+    return Collections.enumeration(props.keySet());
   }
 }

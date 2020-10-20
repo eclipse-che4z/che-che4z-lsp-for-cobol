@@ -25,7 +25,6 @@ import java.util.MissingFormatArgumentException;
 public class ExternalizedMessage {
   private final MessageTemplate messageTemplate;
   private final Object[] parameters;
-  private final String key;
 
   /***
    *

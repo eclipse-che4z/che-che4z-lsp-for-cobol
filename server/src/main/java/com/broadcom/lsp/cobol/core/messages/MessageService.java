@@ -23,7 +23,7 @@ public interface MessageService {
    * @param key Unique ID for each message in externalized message file.
    * @param parameters Arguments referenced by the format specifiers in the format * string in
    *     externalized message file.
-   * @return {@link ExternalizedMessage}
+   * @return {@link String}
    */
-  ExternalizedMessage getMessage(String key, Object... parameters);
+  String getMessage(String key, Object... parameters);
 }
