@@ -21,8 +21,10 @@ import com.broadcom.lsp.cobol.domain.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
 import com.broadcom.lsp.cobol.domain.event.model.UnknownEvent;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
 import org.junit.jupiter.api.Test;
@@ -34,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 class DatabusBrokerTest implements EventObserver<DataEvent> {
+  @Accessors(fluent = true, chain = false)
   @Getter @Setter private int hitCount;
   private static final DataEventType UNKNOWN_EVENT_TYPE = DataEventType.UNKNOWN_EVENT;
 
@@ -59,7 +62,7 @@ class DatabusBrokerTest implements EventObserver<DataEvent> {
     // a new unknown event is published..
     broker.postData(UnknownEvent.builder().build());
     waiter.await(WAITER_DELAY);
-    assertEquals(1, getHitCount());
+    assertEquals(1, hitCount());
   }
 
   /** This test verifies that a client could subscribe for an event using the general registry. */
@@ -82,7 +85,7 @@ class DatabusBrokerTest implements EventObserver<DataEvent> {
     // a new unknown event is published..
     broker.postData(UnknownEvent.builder().build());
     waiter.await(WAITER_DELAY);
-    assertEquals(1, getHitCount());
+    assertEquals(1, hitCount());
   }
 
   /** This test verifies that a class is able to unsubscribe for a specific event. */
@@ -114,7 +117,7 @@ class DatabusBrokerTest implements EventObserver<DataEvent> {
     broker.postData(UnknownEvent.builder().build());
 
     // verify that the hit count is still 1
-    assertEquals(1, getHitCount());
+    assertEquals(1, hitCount());
   }
 
   /**
@@ -125,7 +128,7 @@ class DatabusBrokerTest implements EventObserver<DataEvent> {
    */
   @Override
   public void observerCallback(DataEvent adaptedDataEvent) {
-    setHitCount(getHitCount() + 1);
+    hitCount(hitCount() + 1);
 
     LOG.debug(
         String.format(
