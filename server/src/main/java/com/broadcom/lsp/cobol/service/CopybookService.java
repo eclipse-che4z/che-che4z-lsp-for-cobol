@@ -14,14 +14,38 @@
  */
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import com.broadcom.lsp.cobol.domain.event.api.EventObserver;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
- * Provide API definition to search for copybooks files and define the workspace folder opened in
- * the client when the LSP server triggered.
+ * Provide API definition to search for copybooks files.
+ * The service also caches copybook to reduce filesystem load.
  */
 public interface CopybookService extends EventObserver<DataEvent> {
-  /** Remove all the stored copybook names and URIs. */
-  void invalidateURICache();
+  /** Remove all the stored copybook. */
+  void invalidateCache();
+
+  /**
+   * Retrieve and return the copybook by its name.
+   *
+   * @param copybookName - the name of the copybook to be retrieved
+   * @param documentUri - the currently processing document that contains the copy statement
+   * @param copybookProcessingMode - text document synchronization type
+   * @return a CopybookModel that contains copybook name, its URI and the content
+   */
+  CopybookModel resolve(
+      @Nonnull String copybookName,
+      @Nonnull String documentUri,
+      @Nonnull CopybookProcessingMode copybookProcessingMode);
+
+  /**
+   * Store the copybookModel in cache.
+   *
+   * @param copybookModel the copybook model
+   */
+  void store(CopybookModel copybookModel);
 }

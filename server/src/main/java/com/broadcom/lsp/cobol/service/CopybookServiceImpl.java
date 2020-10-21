@@ -14,31 +14,35 @@
  */
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
-import com.broadcom.lsp.cobol.domain.event.model.FetchedCopybookEvent;
-import com.broadcom.lsp.cobol.domain.event.model.RequiredCopybookEvent;
+import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonPrimitive;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.URI;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
+import java.util.concurrent.*;
 
 import static com.broadcom.lsp.cobol.domain.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
-import static com.broadcom.lsp.cobol.domain.event.model.DataEventType.REQUIRED_COPYBOOK_EVENT;
 import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.lang.String.join;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
-/** This service processes copybook requests and returns content by its name */
+/**
+ * This service processes copybook requests and returns content by its name.
+ * The service also caches copybook to reduce filesystem load.
+ */
 @Slf4j
 @Singleton
 @SuppressWarnings("unchecked")
@@ -47,77 +51,95 @@ public class CopybookServiceImpl implements CopybookService {
   private final SettingsService settingsService;
   private final FileSystemService files;
 
-  private final Map<String, Path> copybookPaths = new ConcurrentHashMap<>(8, 0.9f, 1);
   private final Map<String, Set<String>> copybooksForDownloading =
       new ConcurrentHashMap<>(8, 0.9f, 1);
 
+  private final Cache<String, CopybookModel> copybookCache;
+
   @Inject
   public CopybookServiceImpl(
-      DataBusBroker dataBus, SettingsService settingsService, FileSystemService files) {
+      DataBusBroker dataBus,
+      SettingsService settingsService,
+      FileSystemService files,
+      @Named("CACHE-MAX-SIZE") int cacheSize,
+      @Named("CACHE-DURATION") int duration,
+      @Named("CACHE-TIME-UNIT") String timeUnitName) {
     this.dataBus = dataBus;
     this.settingsService = settingsService;
     this.files = files;
-
-    dataBus.subscribe(REQUIRED_COPYBOOK_EVENT, this);
+    copybookCache = CacheBuilder.newBuilder()
+        .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName))
+        .maximumSize(cacheSize)
+        .build();
     dataBus.subscribe(ANALYSIS_FINISHED_EVENT, this);
   }
 
   @Override
-  public void invalidateURICache() {
-    copybookPaths.clear();
+  public void invalidateCache() {
     copybooksForDownloading.clear();
+    copybookCache.invalidateAll();
   }
 
   /**
-   * Depends on DataEvent type it will be handled with appropriate handler: {@link
-   * #handleRequiredCopybookEvent} or {@link #handleAnalysisFinishedEvent}.
+   * Retrieve and return the copybook by its name. Copybook may cached to limit interactions with
+   * the file system.
    *
-   * @param event the instance of {@link RequiredCopybookEvent} or {@link AnalysisFinishedEvent}
+   * Resolving works in synchronous way. Resolutions with different copybook names will not block each other.
+   *
+   * @param copybookName - the name of the copybook to be retrieved
+   * @param documentUri - the currently processing document that contains the copy statement
+   * @param copybookProcessingMode - text document synchronization type
+   * @return a CopybookModel that contains copybook name, its URI and the content
+   */
+  public CopybookModel resolve(
+      @Nonnull String copybookName,
+      @Nonnull String documentUri,
+      @Nonnull CopybookProcessingMode copybookProcessingMode) {
+    try {
+      return copybookCache.get(copybookName, () -> resolveSync(copybookName, documentUri, copybookProcessingMode));
+    } catch (ExecutionException e) {
+      LOG.error("Can't resolve copybook '{}'.", copybookName, e);
+      return new CopybookModel(copybookName, null, null);
+    }
+  }
+
+  @Override
+  public void store(CopybookModel copybookModel) {
+    copybookCache.put(copybookModel.getName(), copybookModel);
+  }
+
+  private CopybookModel resolveSync(
+      @Nonnull String copybookName,
+      @Nonnull String documentUri,
+      @Nonnull CopybookProcessingMode copybookProcessingMode) throws ExecutionException, InterruptedException {
+    String cobolFileName = files.getNameFromURI(documentUri);
+    String uri = retrieveURI(
+        settingsService.getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName).get());
+    if (uri.isEmpty()) {
+      if (copybookProcessingMode.download) {
+        copybooksForDownloading.computeIfAbsent(cobolFileName, s -> ConcurrentHashMap.newKeySet()).add(copybookName);
+      }
+      return new CopybookModel(copybookName, null, null);
+    }
+    Path file = files.getPathFromURI(uri);
+    if (files.fileExists(file)) {
+      return new CopybookModel(copybookName, uri, files.getContentByPath(file));
+    } else {
+      return new CopybookModel(copybookName, null, null);
+    }
+  }
+
+  /**
+   * Depends on DataEvent type it will be handled with {@link #handleAnalysisFinishedEvent} handler.
+   *
+   * @param event the instance of {@link AnalysisFinishedEvent}
    */
   @Override
   public void observerCallback(DataEvent event) {
-    if (event instanceof RequiredCopybookEvent) {
-      handleRequiredCopybookEvent((RequiredCopybookEvent) event);
-    } else if (event instanceof AnalysisFinishedEvent) {
+    if (event instanceof AnalysisFinishedEvent) {
       handleAnalysisFinishedEvent((AnalysisFinishedEvent) event);
     } else {
       LOG.error("Unexpected DataEvent: {}", event);
-    }
-  }
-
-  /**
-   * Retrieve copybook content by its name, and the document name {@see RequiredCopybookEvent}. It
-   * will apply a file system calls only if the in order to avoid obtaining the copybooks with
-   * incomplete names.
-   *
-   * <p>The retrieved URIs stored in the cache. If the URI points to non-existing file, then the
-   * cache invalidated and new request applied.
-   *
-   * <p>Replies with copybook content and its URI if exists, or with an empty response if the
-   * copybook not found. The response sends in any case.
-   *
-   * @param event - copybook request params
-   */
-  private void handleRequiredCopybookEvent(RequiredCopybookEvent event) {
-    String requiredCopybookName = event.getName();
-
-    if (copybookPaths.containsKey(requiredCopybookName)) {
-      Path file = copybookPaths.get(requiredCopybookName);
-      if (files.fileExists(file)) {
-        sendResponse(requiredCopybookName, files.getContentByPath(file), file);
-        return;
-      } else {
-        copybookPaths.remove(requiredCopybookName);
-      }
-    }
-    if (event.getCopybookProcessingMode().analyze) {
-      String cobolFileName = files.getNameFromURI(event.getDocumentUri());
-      settingsService
-          .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, requiredCopybookName)
-          .thenAccept(
-              sendResponse(cobolFileName, requiredCopybookName, event.getCopybookProcessingMode()));
-    } else {
-      dataBus.postData(FetchedCopybookEvent.builder().name(requiredCopybookName).build());
     }
   }
 
@@ -158,51 +180,6 @@ public class CopybookServiceImpl implements CopybookService {
 
   private String getUserInteractionType(CopybookProcessingMode copybookProcessingMode) {
     return copybookProcessingMode.userInteraction ? VERBOSE.label : QUIET.label;
-  }
-
-  private Consumer<List<Object>> sendResponse(
-      String cobolFileName,
-      String requiredCopybookName,
-      CopybookProcessingMode copybookProcessingMode) {
-    return result -> {
-      String uri = retrieveURI(result);
-      if (uri.isEmpty() && copybookProcessingMode.download) {
-        copybooksForDownloading
-            .computeIfAbsent(cobolFileName, s -> ConcurrentHashMap.newKeySet())
-            .add(requiredCopybookName);
-      }
-      dataBus.postData(fetchCopybook(requiredCopybookName, uri));
-    };
-  }
-
-  private void sendResponse(String requiredCopybookName, String content, Path path) {
-    dataBus.postData(
-        FetchedCopybookEvent.builder()
-            .name(requiredCopybookName)
-            .uri(toURI(path))
-            .content(content)
-            .build());
-  }
-
-  private FetchedCopybookEvent fetchCopybook(String requiredCopybookName, String uri) {
-    if (uri.isEmpty()) {
-      return FetchedCopybookEvent.builder().name(requiredCopybookName).build();
-    }
-    Path file = files.getPathFromURI(uri);
-    if (file == null) {
-      return FetchedCopybookEvent.builder().name(requiredCopybookName).build();
-    }
-    copybookPaths.put(requiredCopybookName, file);
-
-    return FetchedCopybookEvent.builder()
-        .name(requiredCopybookName)
-        .uri(toURI(file))
-        .content(files.getContentByPath(file))
-        .build();
-  }
-
-  private String toURI(Path file) {
-    return ofNullable(file).map(Path::toUri).map(URI::toString).orElse(null);
   }
 
   private String retrieveURI(List<Object> result) {

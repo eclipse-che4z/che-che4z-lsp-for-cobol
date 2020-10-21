@@ -15,7 +15,6 @@
 
 package com.broadcom.lsp.cobol.domain.databus.impl;
 
-import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import com.broadcom.lsp.cobol.domain.databus.model.RegistryId;
 import com.broadcom.lsp.cobol.domain.event.api.EventObserver;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
@@ -26,11 +25,8 @@ import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.NoSuchElementException;
-
 /**
- * This class is the default implementation for databus broker. It uses a {@link
- * CopybookRepositoryLRU} to perform caching operations.
+ * This class is the default implementation for databus broker.
  *
  * @param <T> - a data event class managed by the implementation
  * @param <S> - a subscriber class for this event
@@ -38,18 +34,10 @@ import java.util.NoSuchElementException;
 @Slf4j
 @Singleton
 public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBusBroker<T, S> {
-  @NonNull private final CopybookRepositoryLRU cpyRepo;
 
   @Inject
-  DefaultDataBusBroker(
-      @Named("ASYNC-MESS-DISPATCHER") int numberOfThreads, CopybookRepositoryLRU cpyRepo) {
+  DefaultDataBusBroker(@Named("ASYNC-MESS-DISPATCHER") int numberOfThreads) {
     super(numberOfThreads);
-    this.cpyRepo = cpyRepo;
-  }
-
-  @Override
-  protected CopybookRepositoryLRU getCopybookRepo() {
-    return cpyRepo;
   }
 
   @Override
@@ -86,28 +74,5 @@ public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBu
   @Override
   public void unSubscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber) {
     seekRegistry(registryId).ifPresent(it -> it.unregister(dataSubscriber));
-  }
-
-  @Override
-  public CopybookModel storeData(@NonNull CopybookModel storable) {
-    getCopybookRepo().persist(storable);
-    return storable;
-  }
-
-  @Override
-  public CopybookModel getData(@NonNull String name) {
-    return getCopybookRepo()
-        .getCopybookStorableFromCache(name)
-        .orElseThrow(NoSuchElementException::new);
-  }
-
-  @Override
-  public boolean isStored(@NonNull String name) {
-    return getCopybookRepo().isStored(name);
-  }
-
-  @Override
-  public void invalidateCache() {
-    getCopybookRepo().invalidateCache();
   }
 }

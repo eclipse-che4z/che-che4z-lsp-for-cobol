@@ -21,8 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This test verifies if the margins respected and warnings thrown */
 class TestMarginAB {
@@ -160,7 +159,8 @@ class TestMarginAB {
 
   @Test
   void checkCorrectProgramID() {
-    AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_PROGRAM_ID, List.of());
+    AnalysisResult result =
+        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_PROGRAM_ID, List.of());
 
     assertEquals(1, result.getDiagnostics().size());
     assertEquals(
@@ -170,11 +170,12 @@ class TestMarginAB {
 
   @Test
   void checkDeclaratives() {
-    AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_DECLARATIVES, List.of());
+    AnalysisResult result =
+        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_DECLARATIVES, List.of());
 
     assertEquals(3, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
     assertEquals(
         "The following token cannot be on the same line as a DECLARATIVE token: MAMA",
-                result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).get(1).getMessage());
+        result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).get(1).getMessage());
   }
 }

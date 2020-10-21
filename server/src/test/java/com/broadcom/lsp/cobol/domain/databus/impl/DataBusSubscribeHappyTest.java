@@ -15,43 +15,42 @@
 
 package com.broadcom.lsp.cobol.domain.databus.impl;
 
-import com.broadcom.lsp.cobol.domain.event.impl.RequiredCopybookEventSubscriber;
+import com.broadcom.lsp.cobol.domain.event.impl.RunAnalysisEventSubscriber;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
-import com.broadcom.lsp.cobol.domain.event.model.RequiredCopybookEvent;
+import com.broadcom.lsp.cobol.domain.event.model.RunAnalysisEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeoutException;
 
+import static com.broadcom.lsp.cobol.domain.databus.impl.DatabusTestConstants.WAITER_DELAY;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /** This test verifies that the observer is triggered by the event it is subscribed to. */
 @Slf4j
 class DataBusSubscribeHappyTest extends DatabusConfigProvider {
 
-  private DefaultDataBusBroker<RequiredCopybookEvent, RequiredCopybookEventSubscriber> databus;
+  private DefaultDataBusBroker<RunAnalysisEvent, RunAnalysisEventSubscriber> databus;
 
   @BeforeEach
   void setUp() {
-    databus = new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3, 3, "HOURS"));
+    databus = new DefaultDataBusBroker<>(3);
   }
 
   @Override
   public void observerCallback(DataEvent adaptedDataEvent) {
-    waiter.assertTrue(DataEventType.REQUIRED_COPYBOOK_EVENT == adaptedDataEvent.getEventType());
-    LOG.debug(String.format("Received : %s", adaptedDataEvent.getEventType().getId()));
-    LOG.debug(String.format("Expected : %s", DataEventType.REQUIRED_COPYBOOK_EVENT.getId()));
+    waiter.assertTrue(DataEventType.RUN_ANALYSIS_EVENT == adaptedDataEvent.getEventType());
     waiter.resume();
   }
 
   @Test
   void subscribe() {
-    databus.subscribe(DataEventType.REQUIRED_COPYBOOK_EVENT, this);
-    databus.postData(RequiredCopybookEvent.builder().name("CPYBUILD_SUBSCRIPTION TEST").build());
+    databus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
+    databus.postData(new RunAnalysisEvent());
     try {
-      waiter.await(5000);
+      waiter.await(WAITER_DELAY);
     } catch (TimeoutException | InterruptedException e) {
       fail("No events were received");
     }

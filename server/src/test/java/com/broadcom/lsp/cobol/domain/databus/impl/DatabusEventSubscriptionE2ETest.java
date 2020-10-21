@@ -34,8 +34,6 @@ class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
   @Override
   public void observerCallback(DataEvent adaptedDataEvent) {
     waiter.assertTrue(getTargetEventType() == adaptedDataEvent.getEventType());
-    LOG.debug(String.format("Received : %s", adaptedDataEvent.getEventType().getId()));
-    LOG.debug(String.format("Expected : %s", DataEventType.REQUIRED_COPYBOOK_EVENT.getId()));
     waiter.resume();
   }
 
@@ -56,10 +54,6 @@ class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
     */
 
     try {
-      databusSubscriptionForPositiveScenario(
-          DataEventType.REQUIRED_COPYBOOK_EVENT, DataEventType.REQUIRED_COPYBOOK_EVENT);
-      databusSubscriptionForPositiveScenario(
-          DataEventType.FETCHED_COPYBOOK_EVENT, DataEventType.FETCHED_COPYBOOK_EVENT);
       databusSubscriptionForPositiveScenario(
           DataEventType.UNKNOWN_EVENT, DataEventType.UNKNOWN_EVENT);
       databusSubscriptionForPositiveScenario(
@@ -90,13 +84,7 @@ class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
         TimeoutException.class,
         () -> {
           databusSubscriptionForNegativeScenario(
-              DataEventType.REQUIRED_COPYBOOK_EVENT, DataEventType.UNKNOWN_EVENT);
-          databusSubscriptionForNegativeScenario(
               DataEventType.RUN_ANALYSIS_EVENT, DataEventType.UNKNOWN_EVENT);
-          databusSubscriptionForNegativeScenario(
-              DataEventType.FETCHED_COPYBOOK_EVENT, DataEventType.UNKNOWN_EVENT);
-          databusSubscriptionForNegativeScenario(
-              DataEventType.UNKNOWN_EVENT, DataEventType.FETCHED_COPYBOOK_EVENT);
           databusSubscriptionForNegativeScenario(
               DataEventType.FETCHED_SETTINGS_EVENT, DataEventType.UNKNOWN_EVENT);
         });
@@ -107,8 +95,6 @@ class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
     Assertions.assertThrows(
         TimeoutException.class,
         () -> {
-          databusUnsubscribeForPositiveScenario(DataEventType.REQUIRED_COPYBOOK_EVENT);
-          databusUnsubscribeForPositiveScenario(DataEventType.FETCHED_COPYBOOK_EVENT);
           databusUnsubscribeForPositiveScenario(DataEventType.RUN_ANALYSIS_EVENT);
           databusUnsubscribeForPositiveScenario(DataEventType.UNKNOWN_EVENT);
           databusUnsubscribeForPositiveScenario(DataEventType.FETCHED_SETTINGS_EVENT);

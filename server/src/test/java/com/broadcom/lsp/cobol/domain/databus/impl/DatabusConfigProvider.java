@@ -26,17 +26,18 @@ import net.jodah.concurrentunit.Waiter;
 
 import java.util.concurrent.TimeoutException;
 
+import static com.broadcom.lsp.cobol.domain.databus.impl.DatabusTestConstants.WAITER_DELAY;
+
 /**
  * This class is an abstraction for data bus tests. It uses {@link Waiter} to apply waiting for the
  * asynchronous tasks.
  */
 @Slf4j
 abstract class DatabusConfigProvider implements EventObserver<DataEvent> {
-  private static final int WAITER_DELAY = 1000;
   @Getter protected final Waiter waiter = new Waiter();
   @Setter @Getter private DataEventType targetEventType;
   private DefaultDataBusBroker databus =
-      new DefaultDataBusBroker<>(3, new CopybookRepositoryLRU(3, 3, "HOURS"));
+      new DefaultDataBusBroker<>(3);
 
   void databusSubscriptionForPositiveScenario(DataEventType subscribedTo, DataEventType publishTo)
       throws TimeoutException, InterruptedException {
@@ -61,7 +62,7 @@ abstract class DatabusConfigProvider implements EventObserver<DataEvent> {
     // Unsubscribe
     databus.unSubscribe(subscriber);
     // publish the event again
-    publishEvent(DataEventType.REQUIRED_COPYBOOK_EVENT);
+    publishEvent(DataEventType.RUN_ANALYSIS_EVENT);
     // wait undefined because no subscriber anymore
     waiter.await(WAITER_DELAY);
   }

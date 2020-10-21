@@ -43,6 +43,12 @@ import static org.eclipse.lsp4j.MessageType.Info;
  */
 @Slf4j
 public class ServerCommunications implements Communications {
+
+  static final String CANNOT_FIND_LANGUAGE_ENGINE = "Cannot find a language engine for the given language ID: ";
+  static final String SYNTAX_ANALYSIS_IN_PROGRESS = ": Syntax analysis in progress";
+  static final String NO_SYNTAX_ERRORS = "No syntax errors detected in ";
+  static final String EXTENSION_UNSUPPORTED = "The given document extension is unsupported: ";
+
   private Provider<LanguageClient> provider;
   private FileSystemService files;
 
@@ -66,7 +72,7 @@ public class ServerCommunications implements Communications {
     runAsync(
         () ->
             showMessage(
-                Error, "Cannot find a language engine for the given language ID: " + languageType));
+                Error, CANNOT_FIND_LANGUAGE_ENGINE + languageType));
   }
 
   /**
@@ -82,7 +88,7 @@ public class ServerCommunications implements Communications {
     executor.schedule(
         () -> {
           if (uriInProgress.remove(decodedUri)) {
-            showMessage(Info, retrieveFileName(decodedUri) + ": Syntax analysis in progress");
+            showMessage(Info, retrieveFileName(decodedUri) + SYNTAX_ANALYSIS_IN_PROGRESS);
           }
         },
         3,
@@ -99,7 +105,7 @@ public class ServerCommunications implements Communications {
     runAsync(
         () ->
             logMessage(
-                Info, "No syntax errors detected in " + retrieveFileName(files.decodeURI(uri))));
+                Info, NO_SYNTAX_ERRORS + retrieveFileName(files.decodeURI(uri))));
   }
 
   /**
@@ -109,7 +115,7 @@ public class ServerCommunications implements Communications {
    */
   @Override
   public void notifyThatExtensionIsUnsupported(String extension) {
-    runAsync(() -> showMessage(Error, "The given document extension is unsupported: " + extension));
+    runAsync(() -> logMessage(Error, EXTENSION_UNSUPPORTED + extension));
   }
 
   /**
