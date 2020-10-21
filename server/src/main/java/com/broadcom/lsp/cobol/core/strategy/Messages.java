@@ -14,9 +14,10 @@
  */
 package com.broadcom.lsp.cobol.core.strategy;
 
+import lombok.Cleanup;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,13 +33,11 @@ public class Messages {
     return customMessages.get(key);
   }
 
+  @SneakyThrows
   Messages() {
     Properties props = new Properties();
-    try (InputStream propertiesStream = Messages.class.getResourceAsStream(MESSAGES_FILE_PATH)) {
-      props.load(propertiesStream);
-    } catch (IOException e) {
-      LOG.error(e.getMessage());
-    }
+    @Cleanup InputStream propertiesStream = Messages.class.getResourceAsStream(MESSAGES_FILE_PATH);
+    props.load(propertiesStream);
     fillMap(props);
   }
 

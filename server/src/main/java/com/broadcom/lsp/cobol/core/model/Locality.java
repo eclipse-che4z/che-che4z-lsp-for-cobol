@@ -14,7 +14,6 @@
  */
 package com.broadcom.lsp.cobol.core.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import org.eclipse.lsp4j.Location;
@@ -36,9 +35,8 @@ import org.eclipse.lsp4j.Range;
  * creating a range for a locality.
  */
 @Value
-@AllArgsConstructor
 @Builder
-public final class Locality {
+public class Locality {
   private String uri;
   private Range range;
   private String copybookId;

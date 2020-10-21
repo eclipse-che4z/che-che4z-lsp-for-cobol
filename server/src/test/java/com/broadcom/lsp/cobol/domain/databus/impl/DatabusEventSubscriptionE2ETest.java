@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
   @Override
   public void observerCallback(DataEvent adaptedDataEvent) {
-    waiter.assertTrue(getTargetEventType() == adaptedDataEvent.getEventType());
+    waiter.assertTrue(targetEventType() == adaptedDataEvent.getEventType());
     waiter.resume();
   }
 
