@@ -16,10 +16,10 @@ package com.broadcom.lsp.cobol.core.engine;
 
 import com.broadcom.lsp.cobol.core.CobolLexer;
 import com.broadcom.lsp.cobol.core.CobolParser;
-import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.model.ExtendedDocument;
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
+import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.preprocessor.TextPreprocessor;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import com.broadcom.lsp.cobol.core.semantics.SemanticContext;
@@ -73,12 +73,11 @@ public class CobolLanguageEngine {
       @Nonnull String documentUri,
       @Nonnull String text,
       @Nonnull CopybookProcessingMode copybookProcessingMode) {
-
-    ResultWithErrors<ExtendedDocument> preProcessorOutput =
-        preprocessor.process(documentUri, text, copybookProcessingMode);
-
-    List<SyntaxError> accumulatedErrors = new ArrayList<>(preProcessorOutput.getErrors());
-    ExtendedDocument extendedDocument = preProcessorOutput.getResult();
+    List<SyntaxError> accumulatedErrors = new ArrayList<>();
+    ExtendedDocument extendedDocument =
+        preprocessor
+            .process(documentUri, text, copybookProcessingMode)
+            .unwrap(accumulatedErrors::addAll);
 
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(extendedDocument.getText()));
     lexer.removeErrorListeners();
@@ -111,7 +110,7 @@ public class CobolLanguageEngine {
 
   @Nonnull
   private List<SyntaxError> finalizeErrors(
-          @Nonnull List<SyntaxError> errors, @Nonnull Map<Token, Locality> mapping) {
+      @Nonnull List<SyntaxError> errors, @Nonnull Map<Token, Locality> mapping) {
     return errors.stream()
         .map(convertError(mapping))
         .filter(it -> it.getLocality() != null)
@@ -124,7 +123,7 @@ public class CobolLanguageEngine {
   }
 
   private List<SyntaxError> collectErrorsForCopybooks(
-          List<SyntaxError> errors, Map<String, Locality> copyStatements) {
+      List<SyntaxError> errors, Map<String, Locality> copyStatements) {
     return errors.stream()
         .filter(shouldRaise())
         .map(err -> raiseError(err, copyStatements))
