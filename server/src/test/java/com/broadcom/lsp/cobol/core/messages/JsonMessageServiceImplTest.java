@@ -15,7 +15,6 @@
 package com.broadcom.lsp.cobol.core.messages;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,15 +27,14 @@ import static org.mockito.Mockito.when;
 
 class JsonMessageServiceImplTest {
 
-  public static final Locale FR_LOCALE = new Locale("fr", "fr");
   private static MessageService messageService;
   private LocaleStore localeMock;
 
   @BeforeEach
-  public void beforeAll(){
+  public void beforeAll() {
     localeMock = mock(LocaleStore.class);
     when(localeMock.getApplicationLocale()).thenReturn(new Locale("en"));
-    messageService = new JsonMessageServiceImpl("test", localeMock);
+    messageService = new JsonMessageServiceImpl("message/test", localeMock);
   }
 
   @Test
@@ -51,10 +49,12 @@ class JsonMessageServiceImplTest {
   @Test
   void whenValidMessageTemplateProvideFR_getFormattedMessage() {
     when(localeMock.getApplicationLocale()).thenReturn(new Locale("fr"));
-    MessageService messageServiceFR = new JsonMessageServiceImpl("test", localeMock);
+    MessageService messageServiceFR = new JsonMessageServiceImpl("message/test", localeMock);
     assertEquals("French test selected.", messageServiceFR.getMessage("1"));
 
-    assertEquals("French test with parameters. Received params is -> TEST_PARAM .", messageServiceFR.getMessage("2", "TEST_PARAM"));
+    assertEquals(
+        "French test with parameters. Received params is -> TEST_PARAM .",
+        messageServiceFR.getMessage("2", "TEST_PARAM"));
   }
 
   @Test
@@ -65,7 +65,8 @@ class JsonMessageServiceImplTest {
 
   @Test
   void whenEmptyMessageTemplateProvided_getException() {
-    MessageService messageServiceLocal = new JsonMessageServiceImpl("Test_messageServiceEmptyFile", localeMock);
+    MessageService messageServiceLocal =
+        new JsonMessageServiceImpl("message/Test_messageServiceEmptyFile", localeMock);
     Assertions.assertThrows(KeyNotFoundException.class, () -> messageServiceLocal.getMessage("1"));
   }
 
@@ -76,7 +77,7 @@ class JsonMessageServiceImplTest {
 
   @Test
   void whenMultipleMsgServiceExist_thenSupportDuplicateKeys() {
-    MessageService messageService1 = new JsonMessageServiceImpl("test-2", localeMock);
+    MessageService messageService1 = new JsonMessageServiceImpl("message/test-2", localeMock);
     final String formattedMessage = messageService1.getMessage("1", localeMock);
     assertEquals("This is a duplicate key test for diff msg service.", formattedMessage);
   }
