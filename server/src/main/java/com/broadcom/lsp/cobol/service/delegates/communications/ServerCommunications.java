@@ -113,6 +113,18 @@ public class ServerCommunications implements Communications {
   }
 
   /**
+   * show a supplied message to the client with the supplied {@link MessageType}
+   *
+   * @param messageType {@link MessageType}
+   * @param  message to be displayed at client end.
+   */
+  @Override
+  public void notifyGeneralMessage(MessageType messageType, String message) {
+    runAsync(() -> showMessage(messageType, message));
+  }
+
+
+  /**
    * This method raise a diagnostic message to the client with syntax error retrieved by the COBOL
    * LSP server for related files.
    *

@@ -26,7 +26,8 @@ public enum SettingsParametersEnum {
   VERBOSE("verbose"),
   DATASETS("cpy-manager.paths-dsn"),
   LOCAL_PATHS("cpy-manager.paths-local"),
-  LSP_PREFIX("broadcom-cobol-lsp");
+  LSP_PREFIX("broadcom-cobol-lsp"),
+  LOCALE("cpy-manager.locale");
 
   public final String label;
 

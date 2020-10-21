@@ -14,6 +14,8 @@
  */
 package com.broadcom.lsp.cobol.core.messages;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,17 +29,17 @@ import java.util.ResourceBundle;
 @Slf4j
 public class JsonMessageServiceImpl implements MessageService {
 
-  public static final Locale DEFAULT_LOCALE =
-      new Locale(
-          JSONResourceBundleControl.DEFAULT_LOCALE, JSONResourceBundleControl.DEFAULT_LOCALE);
+  private final ResourceBundle.Control resourceBundleControl = new JSONResourceBundleControl();
   private ResourceBundle customResourceBundle;
+  private String filename;
+  private LocaleStore localeStore;
 
-  public JsonMessageServiceImpl(String fileName, Locale locale) {
-    loadMessages(fileName, locale);
-  }
-
-  public JsonMessageServiceImpl(String fileName) {
-    loadMessages(fileName);
+  @Inject
+  public JsonMessageServiceImpl(
+      @Named("logFileLocation") String filename, LocaleStore localeStore) {
+    this.localeStore = localeStore;
+    this.filename = filename;
+    loadMessages(filename);
   }
 
   /***
@@ -67,8 +69,13 @@ public class JsonMessageServiceImpl implements MessageService {
    * @Throws {@link MissingResourceException}
    */
   private void loadMessages(String filename, Locale locale) {
-    ResourceBundle.Control control = new JSONResourceBundleControl();
-    customResourceBundle = ResourceBundle.getBundle(filename, locale, control);
+    customResourceBundle = ResourceBundle.getBundle(filename, locale, resourceBundleControl);
+    localeStore.subscribeToLocaleChange(this::reloadResourceBundle);
+  }
+
+  private void reloadResourceBundle(Locale locale) {
+    ResourceBundle.clearCache();
+    customResourceBundle = ResourceBundle.getBundle(this.filename, locale, resourceBundleControl);
   }
 
   /**
@@ -77,6 +84,6 @@ public class JsonMessageServiceImpl implements MessageService {
    * @param fileName path to the externalized message file.
    */
   private void loadMessages(String fileName) {
-    loadMessages(fileName, DEFAULT_LOCALE);
+    loadMessages(fileName, localeStore.getApplicationLocale());
   }
 }

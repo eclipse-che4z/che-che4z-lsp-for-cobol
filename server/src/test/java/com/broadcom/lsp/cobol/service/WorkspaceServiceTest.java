@@ -60,7 +60,7 @@ class WorkspaceServiceTest {
     DataBusBroker broker = mock(DataBusBroker.class);
     String copybookName = "COPYBOOK";
 
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, null);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, null, null);
 
     CompletableFuture<Object> result =
         service.executeCommand(
@@ -84,7 +84,7 @@ class WorkspaceServiceTest {
   @Test
   void testExecuteNonExistingCommand() {
     DataBusBroker broker = mock(DataBusBroker.class);
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, null);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, null, null);
 
     CompletableFuture<Object> result =
         service.executeCommand(new ExecuteCommandParams("Missing command name", emptyList()));
@@ -106,7 +106,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService);
+        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService, null);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     JsonArray arr = new JsonArray();
@@ -138,7 +138,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService);
+        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService, null);
 
     JsonArray arr = new JsonArray();
     String path = "foo/bar";
@@ -165,7 +165,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService);
+        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService, null);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     JsonArray arr = new JsonArray();
@@ -195,7 +195,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService);
+        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService, null);
 
     when(settingsService.getConfiguration(LOCAL_PATHS.label))
         .thenReturn(completedFuture(emptyList()));
@@ -246,7 +246,7 @@ class WorkspaceServiceTest {
   private void checkWatchers(FileEvent event) {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
 
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, null);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, null, null);
 
     DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));
     service.didChangeWatchedFiles(params);

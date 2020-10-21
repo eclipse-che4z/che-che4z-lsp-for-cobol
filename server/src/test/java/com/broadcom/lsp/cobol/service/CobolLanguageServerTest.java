@@ -54,7 +54,7 @@ class CobolLanguageServerTest {
     when(settingsService.toStrings(any())).thenCallRealMethod();
 
     CobolLanguageServer server =
-        new CobolLanguageServer(null, null, watchingService, settingsService);
+        new CobolLanguageServer(null, null, watchingService, settingsService, null);
 
     server.initialized(new InitializedParams());
 
@@ -71,7 +71,7 @@ class CobolLanguageServerTest {
    */
   @Test
   void initialize() {
-    CobolLanguageServer server = new CobolLanguageServer(null, null, null, null);
+    CobolLanguageServer server = new CobolLanguageServer(null, null, null, null, null);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));

@@ -14,6 +14,10 @@
  */
 package com.broadcom.lsp.cobol;
 
+import com.broadcom.lsp.cobol.core.messages.JsonMessageServiceImpl;
+import com.broadcom.lsp.cobol.core.messages.LocaleStore;
+import com.broadcom.lsp.cobol.core.messages.LocaleStoreImpl;
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.domain.modules.DefaultModule;
 import com.broadcom.lsp.cobol.service.*;
 import com.broadcom.lsp.cobol.service.delegates.completions.*;
@@ -64,6 +68,9 @@ public class TestModule extends DefaultModule {
     bind(String.class)
         .annotatedWith(named(PATH_TO_TEST_RESOURCES))
         .toProvider(() -> ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
+    bind(LocaleStore.class).to(LocaleStoreImpl.class);
+    bind(MessageService.class).to(JsonMessageServiceImpl.class);
+    bind(String.class).annotatedWith(named("logFileLocation")).toInstance("test");
 
     bind(SettingsService.class).to(SettingsServiceImpl.class);
 
