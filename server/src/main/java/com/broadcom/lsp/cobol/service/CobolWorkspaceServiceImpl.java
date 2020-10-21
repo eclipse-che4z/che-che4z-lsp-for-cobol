@@ -114,7 +114,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
 
     updateWatchers(localFolders, watchingFolders);
     rerunAnalysis(false);
-    copybookService.invalidateURICache();
   }
 
   private void updateWatchers(List<String> newPaths, List<String> existingPaths) {
@@ -137,7 +136,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
   }
 
   private void rerunAnalysis(boolean verbose) {
-    dataBus.invalidateCache();
+    copybookService.invalidateCache();
     LOG.info("Cache invalidated");
     dataBus.postData(new RunAnalysisEvent(verbose));
   }

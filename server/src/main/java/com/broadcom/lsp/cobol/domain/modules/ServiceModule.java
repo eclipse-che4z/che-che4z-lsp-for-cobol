@@ -34,6 +34,7 @@ import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade
 import com.broadcom.lsp.cobol.service.providers.ClientProvider;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.broadcom.lsp.cobol.service.utils.WorkspaceFileService;
+import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -46,10 +47,9 @@ import static com.google.inject.name.Names.named;
 
 /** This module provides DI bindings for service part. */
 @Slf4j
-public class ServiceModule extends DefaultModule {
+public class ServiceModule extends AbstractModule {
   @Override
   protected void configure() {
-    super.configure();
     bind(LanguageServer.class).to(CobolLanguageServer.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(CopybookService.class).to(CopybookServiceImpl.class);

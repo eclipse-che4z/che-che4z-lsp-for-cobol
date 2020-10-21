@@ -26,10 +26,6 @@ public interface CopybookEventFactory {
     switch (choice) {
       case UNKNOWN_EVENT:
         return new UnknownCopybookSubscriberFactory();
-      case FETCHED_COPYBOOK_EVENT:
-        return new FetchedCopybookSubscriberFactory();
-      case REQUIRED_COPYBOOK_EVENT:
-        return new RequiredCopybookSubscriberFactory();
       case RUN_ANALYSIS_EVENT:
         return new RunAnalysisSubscriberFactory();
       case FETCHED_SETTINGS_EVENT:
@@ -49,10 +45,6 @@ public interface CopybookEventFactory {
     switch (choice) {
       case UNKNOWN_EVENT:
         return UnknownEvent.builder().eventMessage("DUMMY_EVENT_NAME").build();
-      case FETCHED_COPYBOOK_EVENT:
-        return FetchedCopybookEvent.builder().build();
-      case REQUIRED_COPYBOOK_EVENT:
-        return RequiredCopybookEvent.builder().build();
       case RUN_ANALYSIS_EVENT:
         return new RunAnalysisEvent();
       case FETCHED_SETTINGS_EVENT:

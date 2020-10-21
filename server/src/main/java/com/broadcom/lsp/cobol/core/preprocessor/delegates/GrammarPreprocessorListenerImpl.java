@@ -18,12 +18,11 @@ import com.broadcom.lsp.cobol.core.CobolPreprocessorBaseListener;
 import com.broadcom.lsp.cobol.core.model.*;
 import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
 import com.broadcom.lsp.cobol.core.preprocessor.TextPreprocessor;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.resolution.CopybookResolution;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
+import com.broadcom.lsp.cobol.service.CopybookService;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -81,7 +80,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private BufferedTokenStream tokens;
   private CopybookProcessingMode copybookProcessingMode;
   private TextPreprocessor preprocessor;
-  private Provider<CopybookResolution> resolutions;
+  private CopybookService copybookService;
   private Deque<CopybookUsage> copybookStack;
   private ReplacingService replacingService;
 
@@ -92,14 +91,14 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       @Assisted Deque<CopybookUsage> copybookStack,
       @Assisted CopybookProcessingMode copybookProcessingMode,
       TextPreprocessor preprocessor,
-      Provider<CopybookResolution> resolutions,
+      CopybookService copybookService,
       ReplacingService replacingService) {
     this.documentUri = documentUri;
     this.tokens = tokens;
     this.copybookStack = copybookStack;
     this.copybookProcessingMode = copybookProcessingMode;
     this.preprocessor = preprocessor;
-    this.resolutions = resolutions;
+    this.copybookService = copybookService;
     this.replacingService = replacingService;
     textAccumulator.push(new StringBuilder());
   }
@@ -288,10 +287,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       return emptyModel(copybookName);
     }
 
-    CopybookModel copybook =
-        resolutions.get().resolve(copybookName, documentUri, copybookProcessingMode);
+    CopybookModel copybook = copybookService.resolve(copybookName, documentUri, copybookProcessingMode);
 
-    if (copybook == null || copybook.getContent() == null) {
+    if (copybook.getContent() == null) {
       reportMissingCopybooks(copybookName, locality);
       return emptyModel(copybookName);
     }

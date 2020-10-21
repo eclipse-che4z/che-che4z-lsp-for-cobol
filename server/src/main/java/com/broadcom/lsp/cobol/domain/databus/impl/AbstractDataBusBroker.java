@@ -66,21 +66,4 @@ public abstract class AbstractDataBusBroker<T extends DataEvent, S> implements D
   public S getSubscriber(DataEventType event, EventObserver observer) {
     return (S) CopybookEventFactory.getFactory(event).create(observer);
   }
-
-  @Override
-  public int getCacheMaxSize() {
-    return getCopybookRepo().getCacheMaxSize();
-  }
-
-  @Override
-  public String printCache() {
-    return getCopybookRepo().logContent();
-  }
-
-  @Override
-  public int cacheSize() {
-    return getCopybookRepo().size();
-  }
-
-  protected abstract CopybookRepositoryLRU getCopybookRepo();
 }

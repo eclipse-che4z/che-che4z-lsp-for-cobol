@@ -17,7 +17,6 @@ package com.broadcom.lsp.cobol.service;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.databus.impl.DefaultDataBusBroker;
-import com.broadcom.lsp.cobol.domain.event.model.RequiredCopybookEvent;
 import com.broadcom.lsp.cobol.domain.event.model.RunAnalysisEvent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
@@ -52,15 +51,15 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("unchecked")
 class WorkspaceServiceTest {
   /**
-   * Test of the workspace/executeCommand entry point. Assert that on a MISSING_COPYBOOK the {@link
-   * RequiredCopybookEvent} fired.
+   * Test of the workspace/executeCommand entry point.
    */
   @Test
   void testExecuteCommand() {
     DataBusBroker broker = mock(DataBusBroker.class);
+    CopybookService copybookService = mock(CopybookService.class);
     String copybookName = "COPYBOOK";
 
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, null, null);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, copybookService, null);
 
     CompletableFuture<Object> result =
         service.executeCommand(
@@ -73,7 +72,6 @@ class WorkspaceServiceTest {
     } catch (InterruptedException | ExecutionException e) {
       fail(e.getMessage());
     }
-    verify(broker, timeout(10000)).invalidateCache();
     verify(broker, timeout(10000)).postData(any(RunAnalysisEvent.class));
   }
 
@@ -84,7 +82,8 @@ class WorkspaceServiceTest {
   @Test
   void testExecuteNonExistingCommand() {
     DataBusBroker broker = mock(DataBusBroker.class);
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, null, null);
+    CopybookService copybookService = mock(CopybookService.class);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, copybookService, null);
 
     CompletableFuture<Object> result =
         service.executeCommand(new ExecuteCommandParams("Missing command name", emptyList()));
@@ -122,7 +121,7 @@ class WorkspaceServiceTest {
 
     verify(watchingService).addWatchers(watcherCaptor.capture());
     verify(watchingService).removeWatchers(emptyList());
-    verify(copybookService).invalidateURICache();
+    verify(copybookService).invalidateCache();
 
     assertEquals(path, watcherCaptor.getValue().get(0));
 
@@ -153,7 +152,7 @@ class WorkspaceServiceTest {
 
     verify(watchingService).addWatchers(emptyList());
     verify(watchingService).removeWatchers(emptyList());
-    verify(copybookService).invalidateURICache();
+    verify(copybookService).invalidateCache();
   }
 
   /** Test an existing watcher removed when its path doesn't exist in setting.json */
@@ -180,7 +179,7 @@ class WorkspaceServiceTest {
 
     verify(watchingService).addWatchers(emptyList());
     verify(watchingService).removeWatchers(watcherCaptor.capture());
-    verify(copybookService).invalidateURICache();
+    verify(copybookService).invalidateCache();
     assertEquals(path, watcherCaptor.getValue().get(0));
 
     verify(broker).postData(any(RunAnalysisEvent.class));
@@ -205,7 +204,7 @@ class WorkspaceServiceTest {
 
     verify(watchingService).addWatchers(emptyList());
     verify(watchingService).removeWatchers(emptyList());
-    verify(copybookService).invalidateURICache();
+    verify(copybookService).invalidateCache();
   }
 
   /**
@@ -245,13 +244,13 @@ class WorkspaceServiceTest {
 
   private void checkWatchers(FileEvent event) {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
+    CopybookService copybookService = mock(CopybookService.class);
 
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, null, null);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, copybookService, null);
 
     DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));
     service.didChangeWatchedFiles(params);
 
-    verify(broker).invalidateCache();
     verify(broker).postData(any(RunAnalysisEvent.class));
   }
 }

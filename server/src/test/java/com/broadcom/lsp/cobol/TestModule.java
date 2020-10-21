@@ -18,14 +18,11 @@ import com.broadcom.lsp.cobol.core.messages.JsonMessageServiceImpl;
 import com.broadcom.lsp.cobol.core.messages.LocaleStore;
 import com.broadcom.lsp.cobol.core.messages.LocaleStoreImpl;
 import com.broadcom.lsp.cobol.core.messages.MessageService;
-import com.broadcom.lsp.cobol.domain.modules.DefaultModule;
 import com.broadcom.lsp.cobol.service.*;
 import com.broadcom.lsp.cobol.service.delegates.completions.*;
 import com.broadcom.lsp.cobol.service.delegates.references.*;
 import com.broadcom.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
-import com.broadcom.lsp.cobol.service.mocks.MockCopybookService;
-import com.broadcom.lsp.cobol.service.mocks.MockCopybookServiceImpl;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageServer;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActionProvider;
@@ -38,6 +35,7 @@ import com.broadcom.lsp.cobol.service.delegates.formations.Formations;
 import com.broadcom.lsp.cobol.service.delegates.formations.TrimFormation;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.broadcom.lsp.cobol.service.utils.WorkspaceFileService;
+import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -49,17 +47,15 @@ import static com.google.inject.name.Names.named;
 import static java.lang.System.getProperty;
 import static java.util.Optional.ofNullable;
 
-public class TestModule extends DefaultModule {
+public class TestModule extends AbstractModule {
   private static final String PATH_TO_TEST_RESOURCES = "filesToTestPath";
 
   @Override
   protected void configure() {
-    super.configure();
     bind(LanguageClient.class).to(TestLanguageClient.class);
     bind(LanguageServer.class).to(TestLanguageServer.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
-    bind(MockCopybookService.class).to(MockCopybookServiceImpl.class);
     bind(CopybookService.class).to(CopybookServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(CobolTextDocumentService.class);

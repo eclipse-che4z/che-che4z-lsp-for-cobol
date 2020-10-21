@@ -25,8 +25,6 @@ import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderDelegate;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CompilerDirectivesTransformation;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.resolution.CopybookResolution;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.resolution.CopybookResolutionProvider;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolCommentEntriesMarkerImpl;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolInlineCommentEntriesNormalizerImpl;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
@@ -37,18 +35,18 @@ import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.ReplacingServiceImpl;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
+import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 import static com.google.inject.name.Names.named;
 
 /** This module provides DI bindings for COBOL language engine part. */
-public class EngineModule extends DefaultModule {
+public class EngineModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(CobolLanguageEngine.class);
     bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
     bind(GrammarPreprocessor.class).to(GrammarPreprocessorImpl.class);
-    bind(CopybookResolution.class).toProvider(CopybookResolutionProvider.class);
     install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));
     bind(ReplacingService.class).to(ReplacingServiceImpl.class);
     bind(CobolLineReader.class).to(CobolLineReaderImpl.class);
