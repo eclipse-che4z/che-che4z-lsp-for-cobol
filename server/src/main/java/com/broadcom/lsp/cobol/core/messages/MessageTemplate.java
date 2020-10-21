@@ -19,6 +19,5 @@ import lombok.Value;
 /** This class defined the template of an externalized message file. */
 @Value
 public class MessageTemplate {
-  String key;
   String message;
 }
