@@ -16,42 +16,155 @@
 package com.broadcom.lsp.cobol.service.delegates.communications;
 
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
-import org.eclipse.lsp4j.MessageParams;
-import org.eclipse.lsp4j.MessageType;
+import com.google.inject.Provider;
+import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.internal.util.reflection.FieldSetter;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.*;
+
+import static com.broadcom.lsp.cobol.service.delegates.communications.ServerCommunications.*;
 import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentCaptor.forClass;
+import static org.eclipse.lsp4j.MessageType.Error;
+import static org.eclipse.lsp4j.MessageType.Info;
 import static org.mockito.Mockito.*;
 
 /** This unit tests verifies the capabilities of {@link ServerCommunications} */
+@ExtendWith(MockitoExtension.class)
 class ServerCommunicationsTest {
-  // TODO: Cover the rest of the methods
+
+  private static final int TEST_TIMEOUT = 10000;
+
+  @Mock
+  private Provider<LanguageClient> provider;
+
+  @Mock
+  private LanguageClient client;
+
+  @Mock
+  private FileSystemService files;
+
+  @Mock
+  private HashSet<String> uriInProgress;
+
+  @InjectMocks
+  private ServerCommunications communications;
+
+  @BeforeEach
+  void init(TestInfo info) {
+    if (!"testCancelProgressNotification()".equals(info.getDisplayName())) {
+      when(provider.get()).thenReturn(client);
+    }
+  }
+
   /**
    * Method {@link ServerCommunications#notifyThatDocumentAnalysed(String)} should asynchronously
    * call logging on the client for a specific message with a document name retrieved from uri
    */
   @Test
-  void testNotifyThatDocumentAnalysed() {
+  void testNotifyThatDocumentAnalysed_multi_segment_uri() {
     assertDocumentAnalysedNotification(DOCUMENT_URI, "document.cbl");
     assertDocumentAnalysedNotification("document.cbl", "document.cbl");
     assertDocumentAnalysedNotification("", "");
   }
 
-  private void assertDocumentAnalysedNotification(String uri, String fileName) {
-    LanguageClient client = mock(LanguageClient.class);
-    FileSystemService files = mock(FileSystemService.class);
+  /**
+   * Method {@link ServerCommunications#notifyThatEngineNotFound(String)} should asynchronously
+   * populate message with a language type on the client
+   */
+  @Test
+  void testNotifyThatEngineNotFound() {
+    String data = UUID.randomUUID().toString();
+    communications.notifyThatEngineNotFound(data);
+    verify(client, timeout(TEST_TIMEOUT)).showMessage(eq(new MessageParams(Error, CANNOT_FIND_LANGUAGE_ENGINE + data)));
+  }
+
+  /**
+   * Method {@link ServerCommunications#notifyThatLoadingInProgress(String)} should asynchronously
+   * populate message with an URI on the client
+   */
+  @Test
+  void testNotifyThatLoadingInProgress() {
+    String data = UUID.randomUUID().toString();
+    when(files.decodeURI(data)).thenReturn(data);
+
+    communications.notifyThatLoadingInProgress(data);
+    verify(client, timeout(TEST_TIMEOUT)).showMessage(eq(new MessageParams(Info, data + SYNTAX_ANALYSIS_IN_PROGRESS)));
+  }
+
+  /**
+   * Method {@link ServerCommunications#notifyThatDocumentAnalysed(String)} should asynchronously
+   * call logging on the client for a specific message with an URI
+   */
+  @Test
+  void testNotifyThatDocumentAnalysed() {
+    String data = UUID.randomUUID().toString();
+    when(files.decodeURI(data)).thenReturn(data);
+
+    communications.notifyThatDocumentAnalysed(data);
+    verify(client, timeout(TEST_TIMEOUT)).logMessage(eq(new MessageParams(Info, NO_SYNTAX_ERRORS + data)));
+  }
+
+  /**
+   * Method {@link ServerCommunications#notifyThatExtensionIsUnsupported(String)} should asynchronously
+   * call logging on the client for a specific message with an extension
+   */
+  @Test
+  void testNotifyThatExtensionIsUnsupported() {
+    String data = UUID.randomUUID().toString();
+
+    communications.notifyThatExtensionIsUnsupported(data);
+    verify(client, timeout(TEST_TIMEOUT)).logMessage(eq(new MessageParams(Error, EXTENSION_UNSUPPORTED + data)));
+  }
+
+  /**
+   * Method {@link ServerCommunications#publishDiagnostics(Map)} should
+   * raise a diagnostic message to the client with syntax error retrieved by the COBOL
+   * LSP server for related files.
+   */
+  @Test
+  void testPublishDiagnostics() {
+    String uri = UUID.randomUUID().toString();
+
+    // Prepare diagnostic map
+    Diagnostic diagnostic = new Diagnostic(new Range(), "\r\ntest\r\n");
+    List<Diagnostic> diagnostics = List.of(diagnostic);
+
     when(files.decodeURI(uri)).thenReturn(uri);
-    ServerCommunications communications = new ServerCommunications(() -> client, files);
-    ArgumentCaptor<MessageParams> captor = forClass(MessageParams.class);
+    communications.publishDiagnostics(Map.of(uri, diagnostics));
+
+    // Check that cleanup was performed for Diagnostic message
+    diagnostic.setMessage("test");
+    verify(client, times(1)).publishDiagnostics(eq(new PublishDiagnosticsParams(uri, diagnostics)));
+  }
+
+  /**
+   * Method {@link ServerCommunications#cancelProgressNotification(String)} should
+   * destroy the popup notification that alert the user that the cobol analysis is still ongoing
+   */
+  @Test
+  void testCancelProgressNotification() throws NoSuchFieldException {
+    String uri = UUID.randomUUID().toString();
+    when(files.decodeURI(uri)).thenReturn(uri);
+
+    FieldSetter.setField(communications, communications.getClass().getDeclaredField("uriInProgress"), uriInProgress);
+    communications.cancelProgressNotification(uri);
+    verify(uriInProgress, times(1)).remove(uri);
+  }
+
+  private void assertDocumentAnalysedNotification(String uri, String fileName) {
+    client = mock(LanguageClient.class);
+    when(provider.get()).thenReturn(client);
+    when(files.decodeURI(uri)).thenReturn(uri);
 
     communications.notifyThatDocumentAnalysed(uri);
-    verify(client, timeout(10000).times(1)).logMessage(captor.capture());
-    assertEquals(
-        new MessageParams(MessageType.Info, "No syntax errors detected in " + fileName),
-        captor.getValue());
+    verify(client, timeout(TEST_TIMEOUT)).logMessage(eq(new MessageParams(MessageType.Info, NO_SYNTAX_ERRORS + fileName)));
   }
 }
