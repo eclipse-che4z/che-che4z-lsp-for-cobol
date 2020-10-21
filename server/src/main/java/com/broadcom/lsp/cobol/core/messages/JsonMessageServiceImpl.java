@@ -15,6 +15,7 @@
 package com.broadcom.lsp.cobol.core.messages;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import java.util.ResourceBundle;
  * This class is a JSON implementation of {@link MessageService} . It loads the JSON messages into memory to be used latter on for logging.
  */
 @Slf4j
+@Singleton
 public class JsonMessageServiceImpl implements MessageService {
 
   private final ResourceBundle.Control resourceBundleControl = new JSONResourceBundleControl();
@@ -36,7 +38,7 @@ public class JsonMessageServiceImpl implements MessageService {
 
   @Inject
   public JsonMessageServiceImpl(
-      @Named("logFileLocation") String filename, LocaleStore localeStore) {
+      @Named("resourceFileLocation") String filename, LocaleStore localeStore) {
     this.localeStore = localeStore;
     this.filename = filename;
     loadMessages(filename);

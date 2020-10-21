@@ -62,7 +62,7 @@ public class ServiceModule extends AbstractModule {
     bind(FileSystemService.class).to(WorkspaceFileService.class);
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(MessageService.class).to(JsonMessageServiceImpl.class);
-    bind(String.class).annotatedWith(named("logFileLocation")).toInstance("test");
+    bind(String.class).annotatedWith(named("resourceFileLocation")).toInstance("test");
 
     bindFormations();
     bindCompletions();
