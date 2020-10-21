@@ -104,9 +104,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
         .getConfiguration(LOCAL_PATHS.label)
         .thenAccept(it -> acceptSettingsChange(settingsService.toStrings(it)));
 
-    settingsService
-            .getConfiguration(LOCALE.label)
-            .thenAccept(localeStore.notifyLocaleStore());
+    settingsService.getConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
   }
 
   private void acceptSettingsChange(List<String> localFolders) {

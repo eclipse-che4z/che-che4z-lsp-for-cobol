@@ -135,9 +135,11 @@ public final class LocaleStoreImpl implements LocaleStore {
   @Override
   public Consumer<List<Object>> notifyLocaleStore() {
     return clientLocale -> {
-      Object jsonLocaleNode = Iterables.getFirst(clientLocale, "");
-      if (jsonLocaleNode instanceof JsonPrimitive) {
-        updateLocale((JsonPrimitive) jsonLocaleNode);
+      if (Objects.nonNull(clientLocale)) {
+        Object jsonLocaleNode = Iterables.getFirst(clientLocale, "");
+        if (jsonLocaleNode instanceof JsonPrimitive) {
+          updateLocale((JsonPrimitive) jsonLocaleNode);
+        }
       }
     };
   }
