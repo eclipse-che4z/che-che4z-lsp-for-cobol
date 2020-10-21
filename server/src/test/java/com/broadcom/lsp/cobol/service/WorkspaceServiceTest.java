@@ -177,7 +177,7 @@ class WorkspaceServiceTest {
     LocaleStore localeStore = mock(LocaleStore.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService, null);
+        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService, localeStore);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     JsonArray arr = new JsonArray();
@@ -191,7 +191,7 @@ class WorkspaceServiceTest {
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
-    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
+    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(localeStore));
 
     verify(watchingService).addWatchers(emptyList());
     verify(watchingService).removeWatchers(watcherCaptor.capture());
@@ -211,7 +211,7 @@ class WorkspaceServiceTest {
     LocaleStore localeStore = mock(LocaleStore.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService, null);
+        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService, localeStore);
 
     when(settingsService.getConfiguration(LOCAL_PATHS.label))
         .thenReturn(completedFuture(emptyList()));
