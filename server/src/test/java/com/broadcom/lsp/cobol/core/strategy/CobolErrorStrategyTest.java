@@ -40,7 +40,7 @@ class CobolErrorStrategyTest {
     NoViableAltException error =
         new NoViableAltException(recognizer, stream, token, token, null, null);
     CobolErrorStrategy strategy = new CobolErrorStrategy(messageService);
-    when(messageService.getMessage(matches("ErrorStrategy.reportNoViableAlternative"), anyString()))
+    when(messageService.getMessage(matches("ErrorStrategy.rulereportNoViableAlternative"), anyString()))
         .thenReturn("No viable alternative at input text");
 
     when(recognizer.getInputStream()).thenReturn(stream);
@@ -69,7 +69,7 @@ class CobolErrorStrategyTest {
     when(errorMock.getExpectedTokens()).thenReturn(intervalSet);
     when(errorMock.getOffendingToken()).thenReturn(token);
     when(messageService.getMessage(
-            matches("ErrorStrategy.reportInputMismatch"), anyString(), anyString()))
+            matches("ErrorStrategy.rulereportInputMismatch"), anyString(), anyString()))
         .thenReturn("Syntax error on '<0>' expected text");
     strategy.reportError(recognizer, errorMock);
     verify(recognizer)
