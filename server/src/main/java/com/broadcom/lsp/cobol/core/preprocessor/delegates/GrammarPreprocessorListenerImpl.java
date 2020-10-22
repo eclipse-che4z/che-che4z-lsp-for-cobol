@@ -303,13 +303,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private ExtendedDocument processCopybook(
       String copybookName, String uri, String copybookId, String content, Locality locality) {
     copybookStack.push(new CopybookUsage(copybookName, copybookId, locality));
-    ResultWithErrors<ExtendedDocument> result =
-        preprocessor.process(uri, content, copybookStack, copybookProcessingMode);
+    ExtendedDocument result =
+        preprocessor
+            .process(uri, content, copybookStack, copybookProcessingMode)
+            .unwrap(errors::addAll);
     copybookStack.pop();
-
-    errors.addAll(result.getErrors());
-
-    return result.getResult();
+    return result;
   }
 
   private CopybookModel emptyModel(String copybookName) {

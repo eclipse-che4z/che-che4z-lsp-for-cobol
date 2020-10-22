@@ -16,7 +16,6 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
-import lombok.AllArgsConstructor;
 import lombok.Value;
 
 /**
@@ -26,7 +25,6 @@ import lombok.Value;
  * levels for this element are 01-49.
  */
 @Value
-@AllArgsConstructor
 public class ElementItem implements Variable {
   private String name;
   private String picClause;

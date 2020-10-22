@@ -78,12 +78,11 @@ public class CobolLanguageEngine {
       @Nonnull String documentUri,
       @Nonnull String text,
       @Nonnull CopybookProcessingMode copybookProcessingMode) {
-
-    ResultWithErrors<ExtendedDocument> preProcessorOutput =
-        preprocessor.process(documentUri, text, copybookProcessingMode);
-
-    List<SyntaxError> accumulatedErrors = new ArrayList<>(preProcessorOutput.getErrors());
-    ExtendedDocument extendedDocument = preProcessorOutput.getResult();
+    List<SyntaxError> accumulatedErrors = new ArrayList<>();
+    ExtendedDocument extendedDocument =
+        preprocessor
+            .process(documentUri, text, copybookProcessingMode)
+            .unwrap(accumulatedErrors::addAll);
 
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(extendedDocument.getText()));
     lexer.removeErrorListeners();
@@ -116,7 +115,7 @@ public class CobolLanguageEngine {
 
   @Nonnull
   private List<SyntaxError> finalizeErrors(
-          @Nonnull List<SyntaxError> errors, @Nonnull Map<Token, Locality> mapping) {
+      @Nonnull List<SyntaxError> errors, @Nonnull Map<Token, Locality> mapping) {
     return errors.stream()
         .map(convertError(mapping))
         .filter(it -> it.getLocality() != null)
@@ -129,7 +128,7 @@ public class CobolLanguageEngine {
   }
 
   private List<SyntaxError> collectErrorsForCopybooks(
-          List<SyntaxError> errors, Map<String, Locality> copyStatements) {
+      List<SyntaxError> errors, Map<String, Locality> copyStatements) {
     return errors.stream()
         .filter(shouldRaise())
         .map(err -> raiseError(err, copyStatements))

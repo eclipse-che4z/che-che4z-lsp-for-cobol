@@ -102,26 +102,20 @@ public class TextPreprocessorImpl implements TextPreprocessor {
       @Nonnull String cobolCode,
       @Nonnull Deque<CopybookUsage> copybookStack,
       @Nonnull CopybookProcessingMode copybookProcessingMode) {
+    List<SyntaxError> errors = new ArrayList<>();
 
-    ResultWithErrors<List<CobolLine>> lines = readLines(cobolCode, documentUri);
-
-    ResultWithErrors<List<CobolLine>> transformedLines =
-        transformLines(documentUri, lines.getResult());
-
-    List<CobolLine> rewrittenLines = rewriteLines(transformedLines.getResult());
+    List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
+    List<CobolLine> transformedLines = transformLines(documentUri, lines).unwrap(errors::addAll);
+    List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
 
     String code = writer.serialize(rewrittenLines);
 
-    ResultWithErrors<ExtendedDocument> parsedDocument =
-        grammarPreprocessor.buildExtendedDocument(
-            documentUri, code, copybookStack, copybookProcessingMode);
+    ExtendedDocument parsedDocument =
+        grammarPreprocessor
+            .buildExtendedDocument(documentUri, code, copybookStack, copybookProcessingMode)
+            .unwrap(errors::addAll);
 
-    List<SyntaxError> errors = new ArrayList<>();
-    errors.addAll(lines.getErrors());
-    errors.addAll(transformedLines.getErrors());
-    errors.addAll(parsedDocument.getErrors());
-
-    return new ResultWithErrors<>(parsedDocument.getResult(), errors);
+    return new ResultWithErrors<>(parsedDocument, errors);
   }
 
   private ResultWithErrors<List<CobolLine>> readLines(String cobolCode, String documentURI) {

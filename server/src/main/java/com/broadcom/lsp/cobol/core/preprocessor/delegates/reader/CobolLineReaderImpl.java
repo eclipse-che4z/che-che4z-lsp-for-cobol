@@ -88,12 +88,9 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
       while (scanner.hasNextLine()) {
         currentLine = scanner.nextLine();
-
-        ResultWithErrors<CobolLine> output =
-            parseLine(delegate.apply(currentLine), documentURI, lineNumber);
-
-        CobolLine currentCobolLine = output.getResult();
-        accumulatedErrors.addAll(output.getErrors());
+        CobolLine currentCobolLine =
+            parseLine(delegate.apply(currentLine), documentURI, lineNumber)
+                .unwrap(accumulatedErrors::addAll);
 
         currentCobolLine.setPredecessor(lastCobolLine);
         result.add(currentCobolLine);
@@ -117,10 +114,10 @@ public class CobolLineReaderImpl implements CobolLineReader {
       cobolLine.setSequenceArea(matcher.group("sequence"));
       String indicatorArea = matcher.group("indicator");
       if (!indicatorArea.isEmpty()) {
-        ResultWithErrors<CobolLineTypeEnum> type = determineType(indicatorArea, uri, lineNumber);
+        CobolLineTypeEnum type =
+            determineType(indicatorArea, uri, lineNumber).unwrap(errors::addAll);
         cobolLine.setIndicatorArea(indicatorArea);
-        cobolLine.setType(type.getResult());
-        errors.addAll(type.getErrors());
+        cobolLine.setType(type);
       }
       cobolLine.setContentAreaA(matcher.group("contentA"));
       cobolLine.setContentAreaB(matcher.group("contentB"));

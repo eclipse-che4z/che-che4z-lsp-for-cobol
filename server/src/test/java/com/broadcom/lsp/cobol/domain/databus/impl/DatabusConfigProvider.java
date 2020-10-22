@@ -21,6 +21,7 @@ import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.concurrentunit.Waiter;
 
@@ -35,9 +36,12 @@ import static com.broadcom.lsp.cobol.domain.databus.impl.DatabusTestConstants.WA
 @Slf4j
 abstract class DatabusConfigProvider implements EventObserver<DataEvent> {
   @Getter protected final Waiter waiter = new Waiter();
-  @Setter @Getter private DataEventType targetEventType;
-  private DefaultDataBusBroker databus =
-      new DefaultDataBusBroker<>(3);
+
+  @Accessors(chain = true, fluent = true)
+  @Setter @Getter
+  private DataEventType targetEventType;
+
+  private DefaultDataBusBroker databus = new DefaultDataBusBroker<>(3);
 
   void databusSubscriptionForPositiveScenario(DataEventType subscribedTo, DataEventType publishTo)
       throws TimeoutException, InterruptedException {
@@ -68,8 +72,7 @@ abstract class DatabusConfigProvider implements EventObserver<DataEvent> {
   }
 
   private Object subscribeTo(DataEventType dataEventType) {
-    setTargetEventType(dataEventType);
-    return databus.subscribe(dataEventType, this);
+    return databus.subscribe(dataEventType, targetEventType(dataEventType));
   }
 
   private void publishEvent(DataEventType dataEventType) {
