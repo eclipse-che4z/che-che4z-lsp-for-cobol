@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class JsonMessageServiceImplTest {
+class PropertiesMessageServiceTest {
 
   private static MessageService messageService;
   private LocaleStore localeMock;
@@ -34,7 +34,7 @@ class JsonMessageServiceImplTest {
   public void beforeAll() {
     localeMock = mock(LocaleStore.class);
     when(localeMock.getApplicationLocale()).thenReturn(new Locale("en"));
-    messageService = new JsonMessageServiceImpl("message/test", localeMock);
+    messageService = new PropertiesMessageService("message/test", localeMock);
   }
 
   @Test
@@ -49,7 +49,7 @@ class JsonMessageServiceImplTest {
   @Test
   void whenValidMessageTemplateProvideFR_getFormattedMessage() {
     when(localeMock.getApplicationLocale()).thenReturn(new Locale("fr"));
-    MessageService messageServiceFR = new JsonMessageServiceImpl("message/test", localeMock);
+    MessageService messageServiceFR = new PropertiesMessageService("message/test", localeMock);
     assertEquals("French test selected.", messageServiceFR.getMessage("1"));
 
     assertEquals(
@@ -60,24 +60,20 @@ class JsonMessageServiceImplTest {
   @Test
   void whenInValidMessageTemplatePathProvide_getException() {
     Assertions.assertThrows(
-        MissingResourceException.class, () -> new JsonMessageServiceImpl("dummy", localeMock));
+        MissingResourceException.class, () -> new PropertiesMessageService("dummy", localeMock));
   }
 
   @Test
   void whenEmptyMessageTemplateProvided_getException() {
     MessageService messageServiceLocal =
-        new JsonMessageServiceImpl("message/Test_messageServiceEmptyFile", localeMock);
-    Assertions.assertThrows(KeyNotFoundException.class, () -> messageServiceLocal.getMessage("1"));
-  }
-
-  @Test
-  void whenInValidMessageTemplateKeyProvided_getException() {
-    Assertions.assertThrows(KeyNotFoundException.class, () -> messageService.getMessage("3"));
+        new PropertiesMessageService("message/Test_messageServiceEmptyFile", localeMock);
+    Assertions.assertThrows(
+        MissingResourceException.class, () -> messageServiceLocal.getMessage("1"));
   }
 
   @Test
   void whenMultipleMsgServiceExist_thenSupportDuplicateKeys() {
-    MessageService messageService1 = new JsonMessageServiceImpl("message/test-2", localeMock);
+    MessageService messageService1 = new PropertiesMessageService("message/test-2", localeMock);
     final String formattedMessage = messageService1.getMessage("1", localeMock);
     assertEquals("This is a duplicate key test for diff msg service.", formattedMessage);
   }
