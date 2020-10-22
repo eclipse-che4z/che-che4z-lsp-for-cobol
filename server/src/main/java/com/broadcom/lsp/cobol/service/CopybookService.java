@@ -19,11 +19,10 @@ import com.broadcom.lsp.cobol.domain.event.api.EventObserver;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
- * Provide API definition to search for copybooks files.
- * The service also caches copybook to reduce filesystem load.
+ * Provide API definition to search for copybooks files. The service also caches copybook to reduce
+ * filesystem load.
  */
 public interface CopybookService extends EventObserver<DataEvent> {
   /** Remove all the stored copybook. */
