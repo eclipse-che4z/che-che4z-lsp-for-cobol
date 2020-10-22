@@ -287,7 +287,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       return emptyModel(copybookName);
     }
 
-    CopybookModel copybook = copybookService.resolve(copybookName, documentUri, copybookProcessingMode);
+    CopybookModel copybook =
+        copybookService.resolve(copybookName, documentUri, copybookProcessingMode);
 
     if (copybook.getContent() == null) {
       reportMissingCopybooks(copybookName, locality);
@@ -304,13 +305,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private ExtendedDocument processCopybook(
       String copybookName, String uri, String copybookId, String content, Locality locality) {
     copybookStack.push(new CopybookUsage(copybookName, copybookId, locality));
-    ResultWithErrors<ExtendedDocument> result =
-        preprocessor.process(uri, content, copybookStack, copybookProcessingMode);
+    ExtendedDocument result =
+        preprocessor
+            .process(uri, content, copybookStack, copybookProcessingMode)
+            .unwrap(errors::addAll);
     copybookStack.pop();
-
-    errors.addAll(result.getErrors());
-
-    return result.getResult();
+    return result;
   }
 
   private CopybookModel emptyModel(String copybookName) {

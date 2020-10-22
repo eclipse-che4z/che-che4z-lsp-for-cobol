@@ -18,7 +18,6 @@ import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
-import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -28,11 +27,12 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.extern.slf4j.Slf4j;
 
-import lombok.NonNull;
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static com.broadcom.lsp.cobol.domain.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
 import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.*;
@@ -40,14 +40,12 @@ import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
 
 /**
- * This service processes copybook requests and returns content by its name.
- * The service also caches copybook to reduce filesystem load.
+ * This service processes copybook requests and returns content by its name. The service also caches
+ * copybook to reduce filesystem load.
  */
 @Slf4j
 @Singleton
-@SuppressWarnings("unchecked")
 public class CopybookServiceImpl implements CopybookService {
-  private final DataBusBroker dataBus;
   private final SettingsService settingsService;
   private final FileSystemService files;
 
@@ -64,13 +62,13 @@ public class CopybookServiceImpl implements CopybookService {
       @Named("CACHE-MAX-SIZE") int cacheSize,
       @Named("CACHE-DURATION") int duration,
       @Named("CACHE-TIME-UNIT") String timeUnitName) {
-    this.dataBus = dataBus;
     this.settingsService = settingsService;
     this.files = files;
-    copybookCache = CacheBuilder.newBuilder()
-        .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName))
-        .maximumSize(cacheSize)
-        .build();
+    copybookCache =
+        CacheBuilder.newBuilder()
+            .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName))
+            .maximumSize(cacheSize)
+            .build();
     dataBus.subscribe(ANALYSIS_FINISHED_EVENT, this);
   }
 
@@ -84,7 +82,8 @@ public class CopybookServiceImpl implements CopybookService {
    * Retrieve and return the copybook by its name. Copybook may cached to limit interactions with
    * the file system.
    *
-   * Resolving works in synchronous way. Resolutions with different copybook names will not block each other.
+   * <p>Resolving works in synchronous way. Resolutions with different copybook names will not block
+   * each other.
    *
    * @param copybookName - the name of the copybook to be retrieved
    * @param documentUri - the currently processing document that contains the copy statement
@@ -92,11 +91,12 @@ public class CopybookServiceImpl implements CopybookService {
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   public CopybookModel resolve(
-      @NonNull String copybookName,
-      @NonNull String documentUri,
-      @NonNull CopybookProcessingMode copybookProcessingMode) {
+      @Nonnull String copybookName,
+      @Nonnull String documentUri,
+      @Nonnull CopybookProcessingMode copybookProcessingMode) {
     try {
-      return copybookCache.get(copybookName, () -> resolveSync(copybookName, documentUri, copybookProcessingMode));
+      return copybookCache.get(
+          copybookName, () -> resolveSync(copybookName, documentUri, copybookProcessingMode));
     } catch (ExecutionException e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
       return new CopybookModel(copybookName, null, null);
@@ -109,15 +109,21 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private CopybookModel resolveSync(
-      @NonNull String copybookName,
-      @NonNull String documentUri,
-      @NonNull CopybookProcessingMode copybookProcessingMode) throws ExecutionException, InterruptedException {
+      @Nonnull String copybookName,
+      @Nonnull String documentUri,
+      @Nonnull CopybookProcessingMode copybookProcessingMode)
+      throws ExecutionException, InterruptedException {
     String cobolFileName = files.getNameFromURI(documentUri);
-    String uri = retrieveURI(
-        settingsService.getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName).get());
+    String uri =
+        retrieveURI(
+            settingsService
+                .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
+                .get());
     if (uri.isEmpty()) {
       if (copybookProcessingMode.download) {
-        copybooksForDownloading.computeIfAbsent(cobolFileName, s -> ConcurrentHashMap.newKeySet()).add(copybookName);
+        copybooksForDownloading
+            .computeIfAbsent(cobolFileName, s -> ConcurrentHashMap.newKeySet())
+            .add(copybookName);
       }
       return new CopybookModel(copybookName, null, null);
     }

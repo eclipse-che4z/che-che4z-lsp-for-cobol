@@ -16,10 +16,10 @@ package com.broadcom.lsp.cobol.core.engine;
 
 import com.broadcom.lsp.cobol.core.CobolLexer;
 import com.broadcom.lsp.cobol.core.CobolParser;
-import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.model.ExtendedDocument;
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
+import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.preprocessor.TextPreprocessor;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import com.broadcom.lsp.cobol.core.semantics.SemanticContext;
@@ -34,7 +34,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
-import lombok.NonNull;
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -68,17 +68,16 @@ public class CobolLanguageEngine {
    * @return Semantic information wrapper object and list of syntax error that might send back to
    *     the client
    */
-  @NonNull
+  @Nonnull
   public ResultWithErrors<SemanticContext> run(
-      @NonNull String documentUri,
-      @NonNull String text,
-      @NonNull CopybookProcessingMode copybookProcessingMode) {
-
-    ResultWithErrors<ExtendedDocument> preProcessorOutput =
-        preprocessor.process(documentUri, text, copybookProcessingMode);
-
-    List<SyntaxError> accumulatedErrors = new ArrayList<>(preProcessorOutput.getErrors());
-    ExtendedDocument extendedDocument = preProcessorOutput.getResult();
+      @Nonnull String documentUri,
+      @Nonnull String text,
+      @Nonnull CopybookProcessingMode copybookProcessingMode) {
+    List<SyntaxError> accumulatedErrors = new ArrayList<>();
+    ExtendedDocument extendedDocument =
+        preprocessor
+            .process(documentUri, text, copybookProcessingMode)
+            .unwrap(accumulatedErrors::addAll);
 
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(extendedDocument.getText()));
     lexer.removeErrorListeners();
@@ -109,22 +108,22 @@ public class CobolLanguageEngine {
     return new ResultWithErrors<>(visitor.getSemanticContext(), accumulatedErrors);
   }
 
-  @NonNull
+  @Nonnull
   private List<SyntaxError> finalizeErrors(
-          @NonNull List<SyntaxError> errors, @NonNull Map<Token, Locality> mapping) {
+      @Nonnull List<SyntaxError> errors, @Nonnull Map<Token, Locality> mapping) {
     return errors.stream()
         .map(convertError(mapping))
         .filter(it -> it.getLocality() != null)
         .collect(toList());
   }
 
-  @NonNull
-  private Function<SyntaxError, SyntaxError> convertError(@NonNull Map<Token, Locality> mapping) {
+  @Nonnull
+  private Function<SyntaxError, SyntaxError> convertError(@Nonnull Map<Token, Locality> mapping) {
     return err -> err.toBuilder().locality(mapping.get(err.getOffendedToken())).build();
   }
 
   private List<SyntaxError> collectErrorsForCopybooks(
-          List<SyntaxError> errors, Map<String, Locality> copyStatements) {
+      List<SyntaxError> errors, Map<String, Locality> copyStatements) {
     return errors.stream()
         .filter(shouldRaise())
         .map(err -> raiseError(err, copyStatements))
