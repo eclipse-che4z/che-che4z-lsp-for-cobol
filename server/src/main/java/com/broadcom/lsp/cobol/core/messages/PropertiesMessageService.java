@@ -19,7 +19,8 @@ public class PropertiesMessageService implements MessageService {
   private ResourceBundle resourceBundle;
 
   @Inject
-  public PropertiesMessageService(@Named("resourceFileLocation") String baseName, LocaleStore localeStore) {
+  public PropertiesMessageService(
+      @Named("resourceFileLocation") String baseName, LocaleStore localeStore) {
     this.baseName = baseName;
     this.localeStore = localeStore;
     resourceBundle = ResourceBundle.getBundle(baseName, localeStore.getApplicationLocale());

@@ -42,13 +42,13 @@ class LocaleStoreImplTest {
 
   @Test
   void WhenNoLocaleSet_thenDefaultToENLocale() {
-    assertEquals(LocaleEnum.EN, localeStore.getLocale());
+    assertEquals(LocaleEnum.EN, localeStore.getSupportedLocale());
   }
 
   @Test
   void whenValidLocaleUpdated_thenExpectUpdatedLocale() {
     localeStore.updateLocale("fr");
-    assertEquals(LocaleEnum.FR, localeStore.getLocale());
+    assertEquals(LocaleEnum.FR, localeStore.getSupportedLocale());
   }
 
   @Test
@@ -63,13 +63,13 @@ class LocaleStoreImplTest {
   @Test
   void testUpdateLocaleWithLocaleEnumArg() {
     localeStore.updateLocale(LocaleEnum.EN);
-    assertEquals(LocaleEnum.EN, localeStore.getLocale());
+    assertEquals(LocaleEnum.EN, localeStore.getSupportedLocale());
   }
 
   @Test
   void testUpdateLocaleWithJsonPrimitiveArg() {
     localeStore.updateLocale(new JsonPrimitive("en"));
-    assertEquals(LocaleEnum.EN, localeStore.getLocale());
+    assertEquals(LocaleEnum.EN, localeStore.getSupportedLocale());
   }
 
   @Test
@@ -78,7 +78,7 @@ class LocaleStoreImplTest {
     Consumer<List<Object>> listConsumer = localeStore.notifyLocaleStore();
     List<Object> mockArg = List.of(new JsonPrimitive("FR"));
     listConsumer.accept(mockArg);
-    assertEquals(LocaleEnum.FR, localeStore.getLocale());
+    assertEquals(LocaleEnum.FR, localeStore.getSupportedLocale());
   }
 
   @Test

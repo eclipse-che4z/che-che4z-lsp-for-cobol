@@ -14,6 +14,7 @@
  */
 package com.broadcom.lsp.cobol.service.delegates.validations;
 
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import com.broadcom.lsp.cobol.domain.modules.DatabusModule;
 import com.broadcom.lsp.cobol.domain.modules.EngineModule;
@@ -28,12 +29,14 @@ import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import lombok.experimental.UtilityClass;
 import org.awaitility.Awaitility;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.TextDocumentItem;
+import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import java.util.List;
@@ -46,6 +49,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -204,17 +208,25 @@ public class UseCaseUtils {
       List<CobolText> copybooks,
       CopybookProcessingMode copybookProcessingMode) {
     SettingsService mockSettingsService = mock(SettingsService.class);
-    when(mockSettingsService.getConfiguration(any())).thenReturn(CompletableFuture.completedFuture(List.of()));
+    when(mockSettingsService.getConfiguration(any()))
+        .thenReturn(CompletableFuture.completedFuture(List.of()));
+
+    LanguageClient languageClient = mock(LanguageClient.class);
     FileSystemService mockFileSystemService = mock(FileSystemService.class);
     when(mockFileSystemService.getNameFromURI(any())).thenReturn("");
-    Injector injector = Guice.createInjector(new EngineModule(), new DatabusModule(), new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(CopybookService.class).to(CopybookServiceImpl.class);
-        bind(SettingsService.class).toInstance(mockSettingsService);
-        bind(FileSystemService.class).toInstance(mockFileSystemService);
-      }
-    });
+    Injector injector =
+        Guice.createInjector(
+            new EngineModule(),
+            new DatabusModule(),
+            new AbstractModule() {
+              @Override
+              protected void configure() {
+                bind(CopybookService.class).to(CopybookServiceImpl.class);
+                bind(SettingsService.class).toInstance(mockSettingsService);
+                bind(FileSystemService.class).toInstance(mockFileSystemService);
+                bind(LanguageClient.class).toInstance(languageClient);
+              }
+            });
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
     copybooks.stream().map(UseCaseUtils::toCopybookModel).forEach(copybookService::store);
@@ -225,6 +237,7 @@ public class UseCaseUtils {
   }
 
   public static CopybookModel toCopybookModel(CobolText cobolText) {
-    return new CopybookModel(cobolText.getFileName(), toURI(cobolText.getFileName()), cobolText.getFullText());
+    return new CopybookModel(
+        cobolText.getFileName(), toURI(cobolText.getFileName()), cobolText.getFullText());
   }
 }

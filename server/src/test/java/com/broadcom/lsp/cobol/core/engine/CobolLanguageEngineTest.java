@@ -17,15 +17,14 @@ package com.broadcom.lsp.cobol.core.engine;
 
 import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.*;
-import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.preprocessor.TextPreprocessor;
-import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
 import com.broadcom.lsp.cobol.core.semantics.SemanticContext;
 import com.broadcom.lsp.cobol.core.semantics.outline.NodeType;
+import com.broadcom.lsp.cobol.core.strategy.CobolErrorStrategy;
+import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -38,6 +37,7 @@ import java.util.Map;
 
 import static com.broadcom.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -56,9 +56,11 @@ class CobolLanguageEngineTest {
   void testLanguageEngineRun() {
     TextPreprocessor preprocessor = mock(TextPreprocessor.class);
     MessageService mockMessageService = mock(MessageService.class);
-    DefaultErrorStrategy defaultErrorStrategy = mock(DefaultErrorStrategy.class);
-    CobolLanguageEngine engine = new CobolLanguageEngine(preprocessor, defaultErrorStrategy,mockMessageService);
-
+    CobolErrorStrategy cobolErrorStrategy = new CobolErrorStrategy();
+    cobolErrorStrategy.setMessageService(mockMessageService);
+    CobolLanguageEngine engine =
+        new CobolLanguageEngine(preprocessor, cobolErrorStrategy, mockMessageService);
+    when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()
             .uri(URI)

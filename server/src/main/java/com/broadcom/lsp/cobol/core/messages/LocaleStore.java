@@ -33,7 +33,7 @@ public interface LocaleStore {
    *
    * @return {@link LocaleEnum}
    */
-  LocaleEnum getLocale();
+  LocaleEnum getSupportedLocale();
 
   /**
    * Update the locale for an application.

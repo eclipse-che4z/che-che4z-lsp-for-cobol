@@ -46,7 +46,7 @@ public final class LocaleStoreImpl implements LocaleStore {
   private final Lock writeLock = readWriteLock.writeLock();
   private final Locale defaultLocale = new Locale("en", "en");
   private Communications communication;
-  private LocaleEnum locale;
+  private LocaleEnum supportedLocale;
   private List<Consumer<Locale>> notifyList = new ArrayList<>();
 
   @Inject
@@ -60,21 +60,21 @@ public final class LocaleStoreImpl implements LocaleStore {
    * @return {@link LocaleEnum}
    */
   @Override
-  public LocaleEnum getLocale() {
+  public LocaleEnum getSupportedLocale() {
     readLock.lock();
     try {
-      if (Objects.isNull(locale))
+      if (Objects.isNull(supportedLocale))
         return Enum.valueOf(LocaleEnum.class, defaultLocale.getCountry().toUpperCase());
-      return locale;
+      return supportedLocale;
     } finally {
       readLock.unlock();
     }
   }
 
-  private void setLocale(LocaleEnum locale) {
+  private void setSupportedLocale(LocaleEnum supportedLocale) {
     writeLock.lock();
     try {
-      this.locale = locale;
+      this.supportedLocale = supportedLocale;
     } finally {
       writeLock.unlock();
     }
@@ -89,7 +89,7 @@ public final class LocaleStoreImpl implements LocaleStore {
   public void updateLocale(String locale) {
     try {
       LocaleEnum localeEnum = Enum.valueOf(LocaleEnum.class, locale.toUpperCase());
-      setLocale(localeEnum);
+      setSupportedLocale(localeEnum);
       Locale updatedLocale = new Locale(locale);
       notifyList.forEach(consumer -> consumer.accept(updatedLocale));
     } catch (IllegalArgumentException e) {
@@ -105,7 +105,7 @@ public final class LocaleStoreImpl implements LocaleStore {
   @Override
   public void updateLocale(LocaleEnum locale) {
     try {
-      setLocale(locale);
+      setSupportedLocale(locale);
     } catch (IllegalArgumentException e) {
       handleUnSupportedLocale(locale.getLabel());
     }
@@ -114,7 +114,8 @@ public final class LocaleStoreImpl implements LocaleStore {
   private void handleUnSupportedLocale(String locale) {
     String errMsg = "Supplied " + locale + " locale is not supported yet.";
     LOG.error(errMsg);
-    communication.notifyGeneralMessage(MessageType.Error, errMsg);
+    if (Objects.nonNull(communication))
+      communication.notifyGeneralMessage(MessageType.Error, errMsg);
   }
 
   /**
@@ -150,8 +151,8 @@ public final class LocaleStoreImpl implements LocaleStore {
    * @return {@link Locale }
    */
   public Locale getApplicationLocale() {
-    if (Objects.isNull(locale)) return defaultLocale;
-    return new Locale(locale.getLabel(), locale.getLabel());
+    if (Objects.isNull(supportedLocale)) return defaultLocale;
+    return new Locale(supportedLocale.getLabel(), supportedLocale.getLabel());
   }
 
   /**

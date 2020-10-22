@@ -82,7 +82,7 @@ class ServerCommunicationsTest {
   @Test
   void testNotifyThatEngineNotFound() {
     String data = UUID.randomUUID().toString();
-    when(messageService.getMessage("Communications.noLangEngine", anyString()))
+    when(messageService.getMessage(anyString(), anyString()))
         .thenReturn("Cannot find a language engine for the given language ID: %s");
     communications.notifyThatEngineNotFound(data);
     verify(client, timeout(TEST_TIMEOUT))
@@ -100,7 +100,7 @@ class ServerCommunicationsTest {
   void testNotifyThatLoadingInProgress() {
     String data = UUID.randomUUID().toString();
     when(files.decodeURI(data)).thenReturn(data);
-    when(messageService.getMessage("Communications.syntaxAnalysisInProgress", anyString()))
+    when(messageService.getMessage(anyString(), anyString()))
         .thenReturn("%s : Syntax analysis in progress");
 
     communications.notifyThatLoadingInProgress(data);
@@ -120,7 +120,7 @@ class ServerCommunicationsTest {
   void testNotifyThatDocumentAnalysed() {
     String data = UUID.randomUUID().toString();
     when(files.decodeURI(data)).thenReturn(data);
-    when(messageService.getMessage("Communications.noSyntaxError", anyString()))
+    when(messageService.getMessage(anyString(), anyString()))
         .thenReturn("No syntax errors detected in %s");
     communications.notifyThatDocumentAnalysed(data);
     verify(client, timeout(TEST_TIMEOUT))
@@ -137,7 +137,7 @@ class ServerCommunicationsTest {
   @Test
   void testNotifyThatExtensionIsUnsupported() {
     String data = UUID.randomUUID().toString();
-    when(messageService.getMessage("Communications.extUnsupported", anyString()))
+    when(messageService.getMessage(anyString(), anyString()))
         .thenReturn("The given document extension is unsupported: %s");
     communications.notifyThatExtensionIsUnsupported(data);
     verify(client, timeout(TEST_TIMEOUT))
@@ -186,7 +186,7 @@ class ServerCommunicationsTest {
     client = mock(LanguageClient.class);
     when(provider.get()).thenReturn(client);
     when(files.decodeURI(uri)).thenReturn(uri);
-    when(messageService.getMessage("Communications.noSyntaxError", anyString()))
+    when(messageService.getMessage(anyString(), anyString()))
         .thenReturn("No syntax errors detected in %s");
     communications.notifyThatDocumentAnalysed(uri);
     verify(client, timeout(TEST_TIMEOUT))

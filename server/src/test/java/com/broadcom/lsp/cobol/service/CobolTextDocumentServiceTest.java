@@ -62,12 +62,14 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
 
   private TextDocumentService service;
   private TestLanguageClient client;
+  private MessageService mockMessageService;
 
   @BeforeEach
   void createService() {
     service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
     client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
     client.clean();
+    mockMessageService = mock(MessageService.class);
   }
 
   @Test
@@ -250,7 +252,7 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
 
     // create a service and verify is subscribed to the required event
     CobolTextDocumentService service = verifyServiceStart(communications, engine, broker);
-
+    when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     // simulate the call to the didOpen for two different document one with and one without errors
     verifyDidOpen(
         communications, engine, broker, diagnosticsNoErrors, service, TEXT_EXAMPLE, UseCaseUtils.DOCUMENT_URI);
@@ -298,7 +300,9 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
 
     when(actions.collect(params)).thenReturn(expected);
 
-    CobolTextDocumentService service = CobolTextDocumentService.builder().dataBus(broker).actions(actions).build();
+    MessageService mockMessageService = mock(MessageService.class);
+    CobolTextDocumentService service = CobolTextDocumentService.builder().dataBus(broker).actions(actions).messageService(mockMessageService).build();
+    when(mockMessageService.getMessage(anyString(),anyString(),anyString())).thenReturn("");
     try {
       assertEquals(expected, service.codeAction(params).get());
     } catch (InterruptedException | ExecutionException e) {
@@ -334,7 +338,7 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
 
   private CobolTextDocumentService verifyServiceStart(
       Communications communications, LanguageEngineFacade engine, DataBusBroker broker) {
-    CobolTextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).build();
+    CobolTextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).messageService(mockMessageService).build();
 
     verify(broker).subscribe(DataEventType.RUN_ANALYSIS_EVENT, service);
     return service;
@@ -390,8 +394,8 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
     doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.empty()))
         .when(engine)
         .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
-
-    CobolTextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).build();
+    when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
+    CobolTextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).messageService(mockMessageService).build();
 
     service.didOpen(
         new DidOpenTextDocumentParams(
@@ -442,8 +446,8 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
 
     when(engine.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
         .thenReturn(AnalysisResult.empty().toBuilder().copybookUsages(copybookUsages).build());
-
-    CobolTextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).build();
+    when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
+    CobolTextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).messageService(mockMessageService).build();
 
     service.didOpen(
         new DidOpenTextDocumentParams(

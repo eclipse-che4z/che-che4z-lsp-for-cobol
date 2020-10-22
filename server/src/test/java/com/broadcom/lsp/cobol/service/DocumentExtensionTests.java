@@ -15,6 +15,7 @@
 
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
@@ -42,12 +43,14 @@ class DocumentExtensionTests {
   private DataBusBroker broker;
   private Communications communications;
   private LanguageEngineFacade engine;
+  private MessageService mockMessageService;
 
   @BeforeEach
   void setUp() {
     broker = mock(DataBusBroker.class);
     communications = mock(Communications.class);
     engine = mock(LanguageEngineFacade.class);
+    mockMessageService = mock(MessageService.class);
   }
 
   /**
@@ -82,6 +85,7 @@ class DocumentExtensionTests {
     verify(engine, timeout(10000).times(1)).analyze(uri, TEXT, CopybookProcessingMode.ENABLED);
 
     when(engine.analyze(uri, TEXT, CopybookProcessingMode.SKIP)).thenReturn(AnalysisResult.empty());
+    when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     fireDidChange(uri);
     verify(engine, timeout(10000))
         .analyze(uri, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.SKIP);
@@ -93,7 +97,7 @@ class DocumentExtensionTests {
   }
 
   private void fireDidOpen(String extension, String uri) {
-    TextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).build();
+    TextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).messageService(mockMessageService).build();
     service.didOpen(new DidOpenTextDocumentParams(new TextDocumentItem(uri, extension, 0, TEXT)));
   }
 
@@ -101,7 +105,7 @@ class DocumentExtensionTests {
     List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
 
-    TextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).build();
+    TextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).messageService(mockMessageService).build();
     service.didChange(
         new DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier(uri, 0), textEdits));
   }

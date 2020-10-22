@@ -23,12 +23,15 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 @Slf4j
 public class CobolErrorStrategy extends DefaultErrorStrategy {
 
-  private final MessageService messageService;
+  private MessageService messageService;
 
   @Inject
   public CobolErrorStrategy(MessageService messageService) {
     this.messageService = messageService;
   }
+
+  // for test
+  public CobolErrorStrategy(){}
 
   private static String getRule(Parser recognizer) {
     return recognizer.getRuleInvocationStack().get(0);
@@ -36,6 +39,11 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
 
   private String getOffendingToken(InputMismatchException e) {
     return getTokenErrorDisplay(e.getOffendingToken());
+  }
+
+  // for test
+  public void setMessageService(MessageService messageService) {
+    this.messageService = messageService;
   }
 
   private String getExpectedToken(Parser recognizer, InputMismatchException e) {
