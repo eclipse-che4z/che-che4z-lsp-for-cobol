@@ -30,6 +30,7 @@ import static org.mockito.Mockito.*;
  */
 class CobolErrorStrategyTest {
   private MessageService messageService = mock(MessageService.class);
+
   @Test
   void noViableAltExceptionTest() {
     Parser recognizer = mock(Parser.class);
@@ -39,6 +40,8 @@ class CobolErrorStrategyTest {
     NoViableAltException error =
         new NoViableAltException(recognizer, stream, token, token, null, null);
     CobolErrorStrategy strategy = new CobolErrorStrategy(messageService);
+    when(messageService.getMessage(matches("ErrorStrategy.reportNoViableAlternative"), anyString()))
+        .thenReturn("No viable alternative at input text");
 
     when(recognizer.getInputStream()).thenReturn(stream);
     when(stream.getText(token, token)).thenReturn("text");
@@ -65,7 +68,9 @@ class CobolErrorStrategyTest {
     when(intervalSet.toString(vocab)).thenReturn("text");
     when(errorMock.getExpectedTokens()).thenReturn(intervalSet);
     when(errorMock.getOffendingToken()).thenReturn(token);
-
+    when(messageService.getMessage(
+            matches("ErrorStrategy.reportInputMismatch"), anyString(), anyString()))
+        .thenReturn("Syntax error on '<0>' expected text");
     strategy.reportError(recognizer, errorMock);
     verify(recognizer)
         .notifyErrorListeners(token, "Syntax error on '<0>' expected text", errorMock);

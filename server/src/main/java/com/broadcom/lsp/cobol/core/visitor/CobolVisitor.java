@@ -607,7 +607,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void areaAWarning(Token token) {
     getLocality(token)
         .filter(it -> it.getRange().getStart().getCharacter() > 10)
-        .ifPresent(it -> throwException(token.getText(), it, messageService.getMessage("CobolVisitor.AreaBWarningMsg")));
+        .ifPresent(it -> throwException(token.getText(), it, messageService.getMessage("CobolVisitor.AreaAWarningMsg")));
   }
 
   private void areaBWarning(List<Token> tokenList) {
