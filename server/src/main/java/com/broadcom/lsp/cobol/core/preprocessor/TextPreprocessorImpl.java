@@ -26,7 +26,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -76,11 +76,11 @@ public class TextPreprocessorImpl implements TextPreprocessor {
    * @param copybookProcessingMode - settings to control the copybook processing
    * @return - the extended document of that text and all the found errors
    */
-  @Nonnull
+  @NonNull
   @Override
   public ResultWithErrors<ExtendedDocument> process(
-      @Nonnull String documentUri,
-      @Nonnull String cobolSourceCode,
+      @NonNull String documentUri,
+      @NonNull String cobolSourceCode,
       CopybookProcessingMode copybookProcessingMode) {
     return process(documentUri, cobolSourceCode, new ArrayDeque<>(), copybookProcessingMode);
   }
@@ -95,13 +95,13 @@ public class TextPreprocessorImpl implements TextPreprocessor {
    * @param copybookProcessingMode - settings to control the copybook processing
    * @return - the extended document of that text and all the found errors
    */
-  @Nonnull
+  @NonNull
   @Override
   public ResultWithErrors<ExtendedDocument> process(
-      @Nonnull String documentUri,
-      @Nonnull String cobolCode,
-      @Nonnull Deque<CopybookUsage> copybookStack,
-      @Nonnull CopybookProcessingMode copybookProcessingMode) {
+      @NonNull String documentUri,
+      @NonNull String cobolCode,
+      @NonNull Deque<CopybookUsage> copybookStack,
+      @NonNull CopybookProcessingMode copybookProcessingMode) {
     List<SyntaxError> errors = new ArrayList<>();
 
     List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
