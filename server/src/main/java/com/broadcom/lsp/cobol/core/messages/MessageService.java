@@ -18,7 +18,7 @@ package com.broadcom.lsp.cobol.core.messages;
 public interface MessageService {
 
   /**
-   * This method return an {@link ExternalizedMessage} based on passes key and params.
+   * This method return an {@link String} based on passes key and params.
    *
    * @param key Unique ID for each message in externalized message file.
    * @param parameters Arguments referenced by the format specifiers in the format * string in

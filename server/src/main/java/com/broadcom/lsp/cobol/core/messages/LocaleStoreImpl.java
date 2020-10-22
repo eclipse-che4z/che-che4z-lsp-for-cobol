@@ -90,7 +90,7 @@ public final class LocaleStoreImpl implements LocaleStore {
     try {
       LocaleEnum localeEnum = Enum.valueOf(LocaleEnum.class, locale.toUpperCase());
       setLocale(localeEnum);
-      Locale updatedLocale = new Locale(localeEnum.getLabel());
+      Locale updatedLocale = new Locale(locale);
       notifyList.forEach(consumer -> consumer.accept(updatedLocale));
     } catch (IllegalArgumentException e) {
       handleUnSupportedLocale(locale);

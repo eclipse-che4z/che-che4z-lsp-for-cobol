@@ -14,10 +14,7 @@
  */
 package com.broadcom.lsp.cobol;
 
-import com.broadcom.lsp.cobol.core.messages.JsonMessageServiceImpl;
-import com.broadcom.lsp.cobol.core.messages.LocaleStore;
-import com.broadcom.lsp.cobol.core.messages.LocaleStoreImpl;
-import com.broadcom.lsp.cobol.core.messages.MessageService;
+import com.broadcom.lsp.cobol.core.messages.*;
 import com.broadcom.lsp.cobol.service.*;
 import com.broadcom.lsp.cobol.service.delegates.completions.*;
 import com.broadcom.lsp.cobol.service.delegates.references.*;
@@ -65,7 +62,7 @@ public class TestModule extends AbstractModule {
         .annotatedWith(named(PATH_TO_TEST_RESOURCES))
         .toProvider(() -> ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
-    bind(MessageService.class).to(JsonMessageServiceImpl.class);
+    bind(MessageService.class).to(PropertiesMessageService.class);
     bind(String.class).annotatedWith(named("resourceFileLocation")).toInstance("test");
 
     bind(SettingsService.class).to(SettingsServiceImpl.class);

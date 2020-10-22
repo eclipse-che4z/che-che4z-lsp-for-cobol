@@ -15,7 +15,7 @@
 package com.broadcom.lsp.cobol.core.messages;
 
 /**
- * Enum list of supported locale.
+ * Enum list of supported locale by application.
  */
 public enum LocaleEnum {
     EN("en"),

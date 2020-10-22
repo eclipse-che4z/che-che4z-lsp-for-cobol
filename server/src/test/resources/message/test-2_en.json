@@ -1,8 +1,0 @@
-{
-"1":{
-  "message": "This is a duplicate key test for diff msg service."
-},
-"a.b.c":{
-"message": "Random test string."
-}
-}

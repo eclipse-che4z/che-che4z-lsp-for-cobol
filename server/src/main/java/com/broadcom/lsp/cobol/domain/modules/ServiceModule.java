@@ -14,10 +14,7 @@
  */
 package com.broadcom.lsp.cobol.domain.modules;
 
-import com.broadcom.lsp.cobol.core.messages.JsonMessageServiceImpl;
-import com.broadcom.lsp.cobol.core.messages.LocaleStore;
-import com.broadcom.lsp.cobol.core.messages.LocaleStoreImpl;
-import com.broadcom.lsp.cobol.core.messages.MessageService;
+import com.broadcom.lsp.cobol.core.messages.*;
 import com.broadcom.lsp.cobol.service.*;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActions;
@@ -61,7 +58,7 @@ public class ServiceModule extends AbstractModule {
     bind(WatcherService.class).to(WatcherServiceImpl.class);
     bind(FileSystemService.class).to(WorkspaceFileService.class);
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
-    bind(MessageService.class).to(JsonMessageServiceImpl.class);
+    bind(MessageService.class).to(PropertiesMessageService.class);
     bind(String.class).annotatedWith(named("resourceFileLocation")).toInstance("message/messages");
 
     bindFormations();

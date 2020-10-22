@@ -1,8 +1,0 @@
-{
-  "1": {
-    "message": "This is a test."
-  },
-  "2": {
-    "message": "This is a test for parameters. Received params is -> %s ."
-  }
-}
