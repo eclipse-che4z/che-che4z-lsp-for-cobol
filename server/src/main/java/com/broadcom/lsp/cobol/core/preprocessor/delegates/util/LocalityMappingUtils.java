@@ -24,7 +24,7 @@ import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.Token;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -152,7 +152,7 @@ public class LocalityMappingUtils {
    * @param documentHierarchyStack - stack of processing documents
    * @return the current document hierarchy level element
    */
-  @Nonnull
+  @NonNull
   private DocumentHierarchyLevel currentDocument(
       Deque<DocumentHierarchyLevel> documentHierarchyStack) {
     return ofNullable(documentHierarchyStack.peek())

@@ -19,13 +19,13 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import org.eclipse.lsp4j.services.LanguageClient;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 
 @Singleton
 public class ClientProvider implements Provider<LanguageClient> {
   private LanguageClient client;
 
-  public void set(@Nonnull LanguageClient client) {
+  public void set(@NonNull LanguageClient client) {
     this.client = client;
   }
 

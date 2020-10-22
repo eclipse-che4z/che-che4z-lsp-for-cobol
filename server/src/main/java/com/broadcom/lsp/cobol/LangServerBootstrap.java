@@ -26,7 +26,7 @@ import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -62,7 +62,7 @@ public class LangServerBootstrap {
   }
 
   private void start(
-      @Nonnull String[] args, @Nonnull LanguageServer server, @Nonnull ClientProvider provider)
+      @NonNull String[] args, @NonNull LanguageServer server, @NonNull ClientProvider provider)
       throws IOException, InterruptedException, ExecutionException {
     try {
       Launcher<LanguageClient> launcher = launchServer(args, server);
@@ -78,18 +78,18 @@ public class LangServerBootstrap {
     }
   }
 
-  Launcher<LanguageClient> launchServer(@Nonnull String[] args, @Nonnull LanguageServer server)
+  Launcher<LanguageClient> launchServer(@NonNull String[] args, @NonNull LanguageServer server)
       throws IOException {
     return isPipeEnabled(args)
         ? createServerLauncher(server, System.in, System.out)
         : createServerLauncherWithSocket(server);
   }
 
-  boolean isPipeEnabled(@Nonnull String[] args) {
+  boolean isPipeEnabled(@NonNull String[] args) {
     return args.length > 0 && PIPE_ARG.equals(args[0]);
   }
 
-  Launcher<LanguageClient> createServerLauncherWithSocket(@Nonnull LanguageServer server)
+  Launcher<LanguageClient> createServerLauncherWithSocket(@NonNull LanguageServer server)
       throws IOException {
     try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
       LOG.info("Language server started using socket communication on port [{}]", LSP_PORT);
@@ -101,7 +101,7 @@ public class LangServerBootstrap {
   }
 
   Launcher<LanguageClient> createServerLauncher(
-      @Nonnull LanguageServer server, @Nonnull InputStream in, @Nonnull OutputStream out) {
+      @NonNull LanguageServer server, @NonNull InputStream in, @NonNull OutputStream out) {
     return LSPLauncher.createServerLauncher(server, in, out);
   }
 }

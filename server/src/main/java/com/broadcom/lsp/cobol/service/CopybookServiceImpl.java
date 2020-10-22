@@ -28,7 +28,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.*;
@@ -92,9 +92,9 @@ public class CopybookServiceImpl implements CopybookService {
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   public CopybookModel resolve(
-      @Nonnull String copybookName,
-      @Nonnull String documentUri,
-      @Nonnull CopybookProcessingMode copybookProcessingMode) {
+      @NonNull String copybookName,
+      @NonNull String documentUri,
+      @NonNull CopybookProcessingMode copybookProcessingMode) {
     try {
       return copybookCache.get(copybookName, () -> resolveSync(copybookName, documentUri, copybookProcessingMode));
     } catch (ExecutionException e) {
@@ -109,9 +109,9 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private CopybookModel resolveSync(
-      @Nonnull String copybookName,
-      @Nonnull String documentUri,
-      @Nonnull CopybookProcessingMode copybookProcessingMode) throws ExecutionException, InterruptedException {
+      @NonNull String copybookName,
+      @NonNull String documentUri,
+      @NonNull CopybookProcessingMode copybookProcessingMode) throws ExecutionException, InterruptedException {
     String cobolFileName = files.getNameFromURI(documentUri);
     String uri = retrieveURI(
         settingsService.getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName).get());

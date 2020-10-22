@@ -34,7 +34,7 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -208,7 +208,7 @@ public class CobolTextDocumentService
   }
 
   @Override
-  public void observerCallback(@Nonnull RunAnalysisEvent event) {
+  public void observerCallback(@NonNull RunAnalysisEvent event) {
     docs.forEach((key, value) -> analyzeDocumentFirstTime(key, value.getText(), event.verbose));
   }
 

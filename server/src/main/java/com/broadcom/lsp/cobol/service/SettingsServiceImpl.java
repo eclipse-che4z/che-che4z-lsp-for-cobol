@@ -26,7 +26,7 @@ import org.eclipse.lsp4j.ConfigurationItem;
 import org.eclipse.lsp4j.ConfigurationParams;
 import org.eclipse.lsp4j.services.LanguageClient;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -45,15 +45,15 @@ public class SettingsServiceImpl implements SettingsService {
     this.clientProvider = clientProvider;
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public CompletableFuture<List<Object>> getConfiguration(@Nonnull String... param) {
+  public CompletableFuture<List<Object>> getConfiguration(@NonNull String... param) {
     return getConfigurations(singletonList(Joiner.on(".").join(param)));
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public CompletableFuture<List<Object>> getConfigurations(@Nonnull List<String> sections) {
+  public CompletableFuture<List<Object>> getConfigurations(@NonNull List<String> sections) {
     return clientProvider
         .get()
         .configuration(
@@ -64,9 +64,9 @@ public class SettingsServiceImpl implements SettingsService {
                     .collect(toList())));
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public List<String> toStrings(@Nonnull List<Object> objects) {
+  public List<String> toStrings(@NonNull List<Object> objects) {
     return objects.stream()
         .map(obj -> (JsonArray) obj)
         .flatMap(Streams::stream)
@@ -74,8 +74,8 @@ public class SettingsServiceImpl implements SettingsService {
         .collect(toList());
   }
 
-  @Nonnull
-  private static ConfigurationItem buildConfigurationItem(@Nonnull String section) {
+  @NonNull
+  private static ConfigurationItem buildConfigurationItem(@NonNull String section) {
     ConfigurationItem item = new ConfigurationItem();
     item.setSection(section);
     item.setScopeUri(null);

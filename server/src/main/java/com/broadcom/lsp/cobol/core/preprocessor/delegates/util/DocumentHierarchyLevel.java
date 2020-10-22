@@ -18,7 +18,7 @@ package com.broadcom.lsp.cobol.core.preprocessor.delegates.util;
 import com.broadcom.lsp.cobol.core.model.DocumentMapping;
 import com.broadcom.lsp.cobol.core.model.Locality;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ class DocumentHierarchyLevel {
   private List<Locality> localities;
   private Map<Integer, Integer> shifts;
 
-  DocumentHierarchyLevel(@Nonnull DocumentMapping documentMapping) {
+  DocumentHierarchyLevel(@NonNull DocumentMapping documentMapping) {
     index = 0;
     localities = documentMapping.getLocalities();
     shifts = documentMapping.getShifts();
@@ -61,7 +61,7 @@ class DocumentHierarchyLevel {
    *
    * @return sublist of positions to the end of the list or an empty list.
    */
-  @Nonnull
+  @NonNull
   List<Locality> lookahead() {
     int tail = localities.size() - index;
     if (tail < 1) return List.of();

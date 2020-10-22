@@ -17,7 +17,7 @@ package com.broadcom.lsp.cobol.core.model;
 
 import lombok.Value;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 
 /**
@@ -27,6 +27,6 @@ import java.util.List;
  */
 @Value
 public class ResultWithErrors<T> {
-  @Nonnull T result;
-  @Nonnull List<SyntaxError> errors;
+  @NonNull T result;
+  @NonNull List<SyntaxError> errors;
 }

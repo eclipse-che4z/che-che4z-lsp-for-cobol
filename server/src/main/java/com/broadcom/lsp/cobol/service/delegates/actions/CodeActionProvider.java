@@ -21,7 +21,7 @@ import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 
 /**
@@ -36,6 +36,6 @@ public interface CodeActionProvider {
    * @param params - a request params
    * @return a list of commands or code actions
    */
-  @Nonnull
-  List<Either<Command, CodeAction>> collectCommandsOrActions(@Nonnull CodeActionParams params);
+  @NonNull
+  List<Either<Command, CodeAction>> collectCommandsOrActions(@NonNull CodeActionParams params);
 }
