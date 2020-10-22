@@ -15,6 +15,7 @@
 
 package com.broadcom.lsp.cobol.core.engine;
 
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.*;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.preprocessor.TextPreprocessor;
@@ -24,6 +25,7 @@ import com.broadcom.lsp.cobol.core.semantics.SemanticContext;
 import com.broadcom.lsp.cobol.core.semantics.outline.NodeType;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -53,7 +55,9 @@ class CobolLanguageEngineTest {
   @Test
   void testLanguageEngineRun() {
     TextPreprocessor preprocessor = mock(TextPreprocessor.class);
-    CobolLanguageEngine engine = new CobolLanguageEngine(preprocessor);
+    MessageService mockMessageService = mock(MessageService.class);
+    DefaultErrorStrategy defaultErrorStrategy = mock(DefaultErrorStrategy.class);
+    CobolLanguageEngine engine = new CobolLanguageEngine(preprocessor, defaultErrorStrategy,mockMessageService);
 
     Locality locality =
         Locality.builder()

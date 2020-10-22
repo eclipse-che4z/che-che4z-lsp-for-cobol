@@ -14,6 +14,7 @@
  */
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.ConfigurableTest;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -173,8 +174,9 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
   }
 
   private CobolTextDocumentService buildServiceWithMockEngine(LanguageEngineFacade engine) {
+    MessageService mockMessageService = mock(MessageService.class);
     return new CobolTextDocumentService(
-        mock(Communications.class), engine, null, null, null, mock(DataBusBroker.class), null);
+        mock(Communications.class), engine, null, null, null, mock(DataBusBroker.class), null, mockMessageService);
   }
 
   /**

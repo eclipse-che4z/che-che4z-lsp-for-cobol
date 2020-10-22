@@ -35,8 +35,10 @@ import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.ReplacingServiceImpl;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
+import com.broadcom.lsp.cobol.core.strategy.CobolErrorStrategy;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
 
 import static com.google.inject.name.Names.named;
 
@@ -53,6 +55,7 @@ public class EngineModule extends AbstractModule {
     bind(CobolLineReaderDelegate.class).to(CompilerDirectivesTransformation.class);
     bind(CobolLineWriter.class).to(CobolLineWriterImpl.class);
     bind(CobolLinesTransformation.class).to(ContinuationLineTransformation.class);
+    bind(DefaultErrorStrategy.class).to(CobolErrorStrategy.class);
 
     bind(CobolLineReWriter.class)
         .annotatedWith(named("entriesMarker"))

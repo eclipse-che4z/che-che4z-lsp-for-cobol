@@ -14,6 +14,7 @@
  */
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.event.api.EventObserver;
 import com.broadcom.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
@@ -43,7 +44,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
-import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.runAsync;
@@ -66,12 +66,12 @@ public class CobolTextDocumentService
     implements TextDocumentService, EventObserver<RunAnalysisEvent> {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
   private static final String GIT_FS_URI = "gitfs:/";
-  private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
+  public static final String DESC_ERROR_MSG = "CobolTextDocumentService.descErrorMsg";
 
   private final Map<String, CobolDocumentModel> docs = new ConcurrentHashMap<>();
   private final Map<String, CompletableFuture<List<DocumentSymbol>>> outlineMap =
       new ConcurrentHashMap<>();
-
+  private final MessageService messageService;
   private Communications communications;
   private LanguageEngineFacade engine;
   private Formations formations;
@@ -89,7 +89,8 @@ public class CobolTextDocumentService
       Completions completions,
       Occurrences occurrences,
       DataBusBroker dataBus,
-      CodeActions actions) {
+      CodeActions actions,
+      MessageService messageService) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -97,6 +98,7 @@ public class CobolTextDocumentService
     this.occurrences = occurrences;
     this.actions = actions;
     this.dataBus = dataBus;
+    this.messageService = messageService;
 
     dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
@@ -112,7 +114,9 @@ public class CobolTextDocumentService
     return CompletableFuture.<Either<List<CompletionItem>, CompletionList>>supplyAsync(
             () -> Either.forRight(completions.collectFor(docs.get(uri), params)))
         .whenComplete(
-            reportExceptionIfThrown(createDescriptiveErrorMessage("completion lookup", uri)));
+            reportExceptionIfThrown(
+                messageService.getMessage(
+                        DESC_ERROR_MSG, "completion lookup", uri)));
   }
 
   @Override
@@ -120,7 +124,10 @@ public class CobolTextDocumentService
     return supplyAsync(() -> completions.resolveDocumentationFor(unresolved))
         .whenComplete(
             reportExceptionIfThrown(
-                createDescriptiveErrorMessage("completion resolving", unresolved.getLabel())));
+                messageService.getMessage(
+                        DESC_ERROR_MSG,
+                    "completion resolving",
+                    unresolved.getLabel())));
   }
 
   @Override
@@ -130,7 +137,9 @@ public class CobolTextDocumentService
     return CompletableFuture.<List<? extends Location>>supplyAsync(
             () -> occurrences.findDefinitions(docs.get(uri), position))
         .whenComplete(
-            reportExceptionIfThrown(createDescriptiveErrorMessage("definitions resolving", uri)));
+            reportExceptionIfThrown(
+                messageService.getMessage(
+                    DESC_ERROR_MSG, "definitions resolving", uri)));
   }
 
   @Override
@@ -139,7 +148,9 @@ public class CobolTextDocumentService
     return CompletableFuture.<List<? extends Location>>supplyAsync(
             () -> occurrences.findReferences(docs.get(uri), params, params.getContext()))
         .whenComplete(
-            reportExceptionIfThrown(createDescriptiveErrorMessage("references resolving", uri)));
+            reportExceptionIfThrown(
+                messageService.getMessage(
+                    DESC_ERROR_MSG, "references resolving", uri)));
   }
 
   @Override
@@ -149,7 +160,9 @@ public class CobolTextDocumentService
     return CompletableFuture.<List<? extends DocumentHighlight>>supplyAsync(
             () -> occurrences.findHighlights(docs.get(uri), position))
         .whenComplete(
-            reportExceptionIfThrown(createDescriptiveErrorMessage("document highlighting", uri)));
+            reportExceptionIfThrown(
+                messageService.getMessage(
+                    DESC_ERROR_MSG, "document highlighting", uri)));
   }
 
   @Override
@@ -157,7 +170,10 @@ public class CobolTextDocumentService
     String uri = params.getTextDocument().getUri();
     CobolDocumentModel model = docs.get(uri);
     return CompletableFuture.<List<? extends TextEdit>>supplyAsync(() -> formations.format(model))
-        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("formatting", uri)));
+        .whenComplete(
+            reportExceptionIfThrown(
+                messageService.getMessage(
+                    DESC_ERROR_MSG, "formatting", uri)));
   }
 
   @Override
@@ -165,8 +181,10 @@ public class CobolTextDocumentService
     return supplyAsync(() -> actions.collect(params))
         .whenComplete(
             reportExceptionIfThrown(
-                createDescriptiveErrorMessage(
-                    "code actions lookup", params.getTextDocument().getUri())));
+                messageService.getMessage(
+                    DESC_ERROR_MSG,
+                    "code actions lookup",
+                    params.getTextDocument().getUri())));
   }
 
   @Override
@@ -175,7 +193,7 @@ public class CobolTextDocumentService
     outlineMap.put(uri, new CompletableFuture<>());
     // git FS URIs are not currently supported
     if (uri.startsWith(GIT_FS_URI)) {
-      LOG.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
+      LOG.warn(messageService.getMessage("CobolTextDocumentService.GifsURINotSupported", uri));
     }
 
     String text = params.getTextDocument().getText();
@@ -250,7 +268,10 @@ public class CobolTextDocumentService
               publishResult(uri, result, copybookProcessingMode);
               outlineMap.get(uri).complete(result.getOutlineTree());
             })
-        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
+        .whenComplete(
+            reportExceptionIfThrown(
+                messageService.getMessage(
+                    DESC_ERROR_MSG, "analysis", uri)));
   }
 
   void analyzeChanges(String uri, String text) {
@@ -266,7 +287,10 @@ public class CobolTextDocumentService
               communications.publishDiagnostics(result.getDiagnostics());
               outlineMap.get(uri).complete(result.getOutlineTree());
             })
-        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
+        .whenComplete(
+            reportExceptionIfThrown(
+                messageService.getMessage(
+                    DESC_ERROR_MSG, "analysis", uri)));
   }
 
   private void publishResult(
@@ -306,15 +330,13 @@ public class CobolTextDocumentService
                     .map(Either::<SymbolInformation, DocumentSymbol>forRight)
                     .collect(toList()))
         .whenComplete(
-            reportExceptionIfThrown(createDescriptiveErrorMessage("symbol analysis", uri)));
+            reportExceptionIfThrown(
+                messageService.getMessage(
+                    DESC_ERROR_MSG, "symbol analysis", uri)));
   }
 
   private void registerDocument(String uri, CobolDocumentModel document) {
     docs.put(uri, document);
-  }
-
-  private String createDescriptiveErrorMessage(String action, String uri) {
-    return format("An exception thrown while applying %s for %s:", action, uri);
   }
 
   private BiConsumer<Object, Throwable> reportExceptionIfThrown(String message) {

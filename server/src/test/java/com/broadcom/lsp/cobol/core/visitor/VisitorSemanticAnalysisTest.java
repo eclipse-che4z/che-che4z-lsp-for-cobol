@@ -16,6 +16,7 @@
 package com.broadcom.lsp.cobol.core.visitor;
 
 import com.broadcom.lsp.cobol.core.CobolParser;
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
@@ -50,6 +51,7 @@ class VisitorSemanticAnalysisTest {
   @Test
   void testVariableDefinitionNotFound() {
     CustomToken token = createNewToken(INVALID_VARIABLE);
+    MessageService mockMessageService = mock(MessageService.class);
     CobolVisitor visitor =
         new CobolVisitor(
             "",
@@ -60,7 +62,8 @@ class VisitorSemanticAnalysisTest {
                 Locality.builder()
                     .range(new Range(new Position(0, 0), new Position(0, 0)))
                     .token(WRONG_TOKEN)
-                    .build()));
+                    .build()),
+                mockMessageService);
 
     visitor.visitQualifiedDataNameFormat1(mockMethod(token));
 
@@ -81,6 +84,7 @@ class VisitorSemanticAnalysisTest {
     StatementContext node = mock(StatementContext.class);
     when(node.getStart()).thenReturn(token);
     when(node.getStop()).thenReturn(token);
+    MessageService messageService = mock(MessageService.class);
 
     CommonTokenStream tokenStream = mock(CommonTokenStream.class);
 
@@ -94,7 +98,7 @@ class VisitorSemanticAnalysisTest {
                 Locality.builder()
                     .range(new Range(new Position(0, 0), new Position(0, 0)))
                     .token(WRONG_TOKEN)
-                    .build()));
+                    .build()), messageService);
 
     visitor.visitStatement(node);
 

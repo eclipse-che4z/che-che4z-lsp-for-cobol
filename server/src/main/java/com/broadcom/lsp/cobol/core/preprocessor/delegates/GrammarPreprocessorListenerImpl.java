@@ -15,6 +15,7 @@
 package com.broadcom.lsp.cobol.core.preprocessor.delegates;
 
 import com.broadcom.lsp.cobol.core.CobolPreprocessorBaseListener;
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.*;
 import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
 import com.broadcom.lsp.cobol.core.preprocessor.TextPreprocessor;
@@ -45,7 +46,6 @@ import static com.broadcom.lsp.cobol.core.CobolPreprocessor.*;
 import static com.broadcom.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
 import static com.broadcom.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static com.broadcom.lsp.cobol.core.model.ErrorSeverity.INFO;
-import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.joining;
@@ -61,11 +61,6 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 @Slf4j
 public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListener
     implements GrammarPreprocessorListener {
-
-  private static final String RECURSION_DETECTED = "Recursive copybook declaration for: %s";
-  private static final String COPYBOOK_OVER_8_CHARACTERS =
-      "Copybook declaration has more than 8 characters for: %s";
-  private static final String ERROR_SUGGESTION = "%s: Copybook not found";
 
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
@@ -83,6 +78,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private CopybookService copybookService;
   private Deque<CopybookUsage> copybookStack;
   private ReplacingService replacingService;
+  private final MessageService messageService;
 
   @Inject
   GrammarPreprocessorListenerImpl(
@@ -92,7 +88,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       @Assisted CopybookProcessingMode copybookProcessingMode,
       TextPreprocessor preprocessor,
       CopybookService copybookService,
-      ReplacingService replacingService) {
+      ReplacingService replacingService,
+      MessageService messageService) {
     this.documentUri = documentUri;
     this.tokens = tokens;
     this.copybookStack = copybookStack;
@@ -101,6 +98,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     this.copybookService = copybookService;
     this.replacingService = replacingService;
     textAccumulator.push(new StringBuilder());
+    this.messageService = messageService;
   }
 
   @Nonnull
@@ -287,7 +285,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       return emptyModel(copybookName);
     }
 
-    CopybookModel copybook = copybookService.resolve(copybookName, documentUri, copybookProcessingMode);
+    CopybookModel copybook =
+        copybookService.resolve(copybookName, documentUri, copybookProcessingMode);
 
     if (copybook.getContent() == null) {
       reportMissingCopybooks(copybookName, locality);
@@ -397,7 +396,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     SyntaxError error =
         SyntaxError.syntaxError()
             .severity(ERROR)
-            .suggestion(format(RECURSION_DETECTED, usage.getName()))
+            .suggestion(messageService.getMessage("GrammarPreprocessorListener.recursionDetected",usage.getName()))
             .locality(usage.getLocality())
             .build();
     LOG.debug(
@@ -410,7 +409,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     SyntaxError error =
         SyntaxError.syntaxError()
             .locality(locality)
-            .suggestion(format(ERROR_SUGGESTION, copybookName))
+            .suggestion(messageService.getMessage("GrammarPreprocessorListener.errorSuggestion", copybookName))
             .severity(ERROR)
             .errorCode(MISSING_COPYBOOK)
             .build();
@@ -425,7 +424,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       SyntaxError error =
           SyntaxError.syntaxError()
               .severity(INFO)
-              .suggestion(format(COPYBOOK_OVER_8_CHARACTERS, copybookName))
+              .suggestion(messageService.getMessage("GrammarPreprocessorListener.copyBkOver8Chars", copybookName))
               .locality(locality)
               .build();
       LOG.debug(

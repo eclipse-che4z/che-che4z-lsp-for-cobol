@@ -15,6 +15,7 @@
 
 package com.broadcom.lsp.cobol.service.delegates.communications;
 
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.google.inject.Provider;
 import org.eclipse.lsp4j.*;
@@ -28,9 +29,11 @@ import org.mockito.Mock;
 import org.mockito.internal.util.reflection.FieldSetter;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import static com.broadcom.lsp.cobol.service.delegates.communications.ServerCommunications.*;
 import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp4j.MessageType.Error;
 import static org.eclipse.lsp4j.MessageType.Info;
@@ -42,20 +45,17 @@ class ServerCommunicationsTest {
 
   private static final int TEST_TIMEOUT = 10000;
 
-  @Mock
-  private Provider<LanguageClient> provider;
+  @Mock private Provider<LanguageClient> provider;
 
-  @Mock
-  private LanguageClient client;
+  @Mock private LanguageClient client;
 
-  @Mock
-  private FileSystemService files;
+  @Mock private FileSystemService files;
 
-  @Mock
-  private HashSet<String> uriInProgress;
+  @Mock private HashSet<String> uriInProgress;
 
-  @InjectMocks
-  private ServerCommunications communications;
+  @InjectMocks private ServerCommunications communications;
+
+  @Mock private MessageService messageService;
 
   @BeforeEach
   void init(TestInfo info) {
@@ -82,8 +82,14 @@ class ServerCommunicationsTest {
   @Test
   void testNotifyThatEngineNotFound() {
     String data = UUID.randomUUID().toString();
+    when(messageService.getMessage("Communications.noLangEngine", anyString()))
+        .thenReturn("Cannot find a language engine for the given language ID: %s");
     communications.notifyThatEngineNotFound(data);
-    verify(client, timeout(TEST_TIMEOUT)).showMessage(eq(new MessageParams(Error, CANNOT_FIND_LANGUAGE_ENGINE + data)));
+    verify(client, timeout(TEST_TIMEOUT))
+        .showMessage(
+            eq(
+                new MessageParams(
+                    Error, messageService.getMessage("Communications.noLangEngine", data))));
   }
 
   /**
@@ -94,9 +100,16 @@ class ServerCommunicationsTest {
   void testNotifyThatLoadingInProgress() {
     String data = UUID.randomUUID().toString();
     when(files.decodeURI(data)).thenReturn(data);
+    when(messageService.getMessage("Communications.syntaxAnalysisInProgress", anyString()))
+        .thenReturn("%s : Syntax analysis in progress");
 
     communications.notifyThatLoadingInProgress(data);
-    verify(client, timeout(TEST_TIMEOUT)).showMessage(eq(new MessageParams(Info, data + SYNTAX_ANALYSIS_IN_PROGRESS)));
+    verify(client, timeout(TEST_TIMEOUT))
+        .showMessage(
+            eq(
+                new MessageParams(
+                    Info,
+                    messageService.getMessage("Communications.syntaxAnalysisInProgress", data))));
   }
 
   /**
@@ -107,27 +120,36 @@ class ServerCommunicationsTest {
   void testNotifyThatDocumentAnalysed() {
     String data = UUID.randomUUID().toString();
     when(files.decodeURI(data)).thenReturn(data);
-
+    when(messageService.getMessage("Communications.noSyntaxError", anyString()))
+        .thenReturn("No syntax errors detected in %s");
     communications.notifyThatDocumentAnalysed(data);
-    verify(client, timeout(TEST_TIMEOUT)).logMessage(eq(new MessageParams(Info, NO_SYNTAX_ERRORS + data)));
+    verify(client, timeout(TEST_TIMEOUT))
+        .logMessage(
+            eq(
+                new MessageParams(
+                    Info, messageService.getMessage("Communications.noSyntaxError", data))));
   }
 
   /**
-   * Method {@link ServerCommunications#notifyThatExtensionIsUnsupported(String)} should asynchronously
-   * call logging on the client for a specific message with an extension
+   * Method {@link ServerCommunications#notifyThatExtensionIsUnsupported(String)} should
+   * asynchronously call logging on the client for a specific message with an extension
    */
   @Test
   void testNotifyThatExtensionIsUnsupported() {
     String data = UUID.randomUUID().toString();
-
+    when(messageService.getMessage("Communications.extUnsupported", anyString()))
+        .thenReturn("The given document extension is unsupported: %s");
     communications.notifyThatExtensionIsUnsupported(data);
-    verify(client, timeout(TEST_TIMEOUT)).logMessage(eq(new MessageParams(Error, EXTENSION_UNSUPPORTED + data)));
+    verify(client, timeout(TEST_TIMEOUT))
+        .logMessage(
+            eq(
+                new MessageParams(
+                    Error, messageService.getMessage("Communications.extUnsupported", data))));
   }
 
   /**
-   * Method {@link ServerCommunications#publishDiagnostics(Map)} should
-   * raise a diagnostic message to the client with syntax error retrieved by the COBOL
-   * LSP server for related files.
+   * Method {@link ServerCommunications#publishDiagnostics(Map)} should raise a diagnostic message
+   * to the client with syntax error retrieved by the COBOL LSP server for related files.
    */
   @Test
   void testPublishDiagnostics() {
@@ -146,15 +168,16 @@ class ServerCommunicationsTest {
   }
 
   /**
-   * Method {@link ServerCommunications#cancelProgressNotification(String)} should
-   * destroy the popup notification that alert the user that the cobol analysis is still ongoing
+   * Method {@link ServerCommunications#cancelProgressNotification(String)} should destroy the popup
+   * notification that alert the user that the cobol analysis is still ongoing
    */
   @Test
   void testCancelProgressNotification() throws NoSuchFieldException {
     String uri = UUID.randomUUID().toString();
     when(files.decodeURI(uri)).thenReturn(uri);
 
-    FieldSetter.setField(communications, communications.getClass().getDeclaredField("uriInProgress"), uriInProgress);
+    FieldSetter.setField(
+        communications, communications.getClass().getDeclaredField("uriInProgress"), uriInProgress);
     communications.cancelProgressNotification(uri);
     verify(uriInProgress, times(1)).remove(uri);
   }
@@ -163,8 +186,14 @@ class ServerCommunicationsTest {
     client = mock(LanguageClient.class);
     when(provider.get()).thenReturn(client);
     when(files.decodeURI(uri)).thenReturn(uri);
-
+    when(messageService.getMessage("Communications.noSyntaxError", anyString()))
+        .thenReturn("No syntax errors detected in %s");
     communications.notifyThatDocumentAnalysed(uri);
-    verify(client, timeout(TEST_TIMEOUT)).logMessage(eq(new MessageParams(MessageType.Info, NO_SYNTAX_ERRORS + fileName)));
+    verify(client, timeout(TEST_TIMEOUT))
+        .logMessage(
+            eq(
+                new MessageParams(
+                    MessageType.Info,
+                    messageService.getMessage("Communications.noSyntaxError", fileName))));
   }
 }
