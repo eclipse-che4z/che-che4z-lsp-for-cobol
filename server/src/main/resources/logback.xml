@@ -42,7 +42,7 @@
         </encoder>
     </appender>
 
-    <root level="${log.level:-ERROR}">
+    <root level="${log.level:-ALL}">
         <appender-ref ref="FILE-ROLLING"/>
         <appender-ref ref="STDOUT"/>
     </root>
