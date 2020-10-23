@@ -34,9 +34,9 @@ import java.util.function.Consumer;
 /**
  * Concrete implementation for {@link LocaleStore}
  *
- * <p>* Stores the locale for entire application and is single point of contact for all locale
- * related issues. This class update application locale, notify subscriber in case of locale update
- * and returns currently set locale.
+ * <p>Stores the locale for entire application and is single point of contact for all locale related
+ * issues. This class update application locale, notify subscriber in case of locale update and
+ * returns currently set locale.
  */
 @Slf4j
 @Singleton
