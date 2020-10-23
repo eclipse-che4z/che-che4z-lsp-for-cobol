@@ -64,10 +64,10 @@ public final class LocaleStoreImpl implements LocaleStore {
     readLock.lock();
     try {
       if (Objects.isNull(supportedLocale))
-        return Enum.valueOf(LocaleEnum.class, defaultLocale.getCountry().toUpperCase());
+        supportedLocale = Enum.valueOf(LocaleEnum.class, defaultLocale.getCountry().toUpperCase());
+      return supportedLocale;
     } finally {
       readLock.unlock();
-      return supportedLocale;
     }
   }
 
