@@ -191,9 +191,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
             .severity(ERROR)
             .build();
 
-    LOG.debug(
-        messageService.getMessage(
-            "ContinuationLineTransformation.registerStringClosingError", error.toString()));
+    LOG.debug("Syntax error by ContinuationLineTransformation#registerStringClosingError: {}", error.toString());
     return error;
   }
 
@@ -215,9 +213,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
                     "ContinuationLineTransformation.continuationLineContentAreaA"))
             .severity(ERROR)
             .build();
-    LOG.debug(
-        messageService.getMessage(
-            "ContinuationLineTransformation.registerContinuationLineError", error.toString()));
+    LOG.debug("Syntax error by ContinuationLineTransformation#registerContinuationLineError: {}", error.toString());
     return error;
   }
 }

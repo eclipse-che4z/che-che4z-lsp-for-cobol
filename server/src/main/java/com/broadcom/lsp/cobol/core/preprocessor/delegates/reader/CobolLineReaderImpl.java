@@ -173,8 +173,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
                     .build())
             .build();
 
-    LOG.debug(
-        messageService.getMessage("CobolLineReaderImpl.registerFormatError", error.toString()));
+    LOG.debug("Syntax error by CobolLineReaderImpl#registerFormatError: {}", error.toString());
     return error;
   }
 }
