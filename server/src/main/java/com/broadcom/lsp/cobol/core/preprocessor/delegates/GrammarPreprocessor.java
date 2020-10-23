@@ -19,7 +19,7 @@ import com.broadcom.lsp.cobol.core.model.ExtendedDocument;
 import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.Deque;
 
 /** This interface represents service to build the extended document */
@@ -35,10 +35,10 @@ public interface GrammarPreprocessor {
    * @param copybookProcessingMode - reflects the status of the copybook support (ENABLED|DISABLED)
    * @return extended document with copybooks and related errors
    */
-  @Nonnull
+  @NonNull
   ResultWithErrors<ExtendedDocument> buildExtendedDocument(
-      @Nonnull String uri,
-      @Nonnull String code,
-      @Nonnull Deque<CopybookUsage> copybookStack,
-      @Nonnull CopybookProcessingMode copybookProcessingMode);
+      @NonNull String uri,
+      @NonNull String code,
+      @NonNull Deque<CopybookUsage> copybookStack,
+      @NonNull CopybookProcessingMode copybookProcessingMode);
 }

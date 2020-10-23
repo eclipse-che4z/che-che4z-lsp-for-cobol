@@ -18,7 +18,7 @@ package com.broadcom.lsp.cobol.service.delegates.references;
 import com.broadcom.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.Location;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 import java.util.Map;
 
@@ -28,20 +28,20 @@ import java.util.Map;
  */
 public class ConstantLocations implements SemanticLocations {
 
-  @Nonnull
+  @NonNull
   @Override
-  public Map<String, List<Location>> references(@Nonnull CobolDocumentModel document) {
+  public Map<String, List<Location>> references(@NonNull CobolDocumentModel document) {
     return document.getAnalysisResult().getConstantUsages();
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Map<String, List<Location>> definitions(@Nonnull CobolDocumentModel document) {
+  public Map<String, List<Location>> definitions(@NonNull CobolDocumentModel document) {
     return Map.of();
   }
 
   @Override
-  public boolean containsToken(@Nonnull CobolDocumentModel document, @Nonnull String token) {
+  public boolean containsToken(@NonNull CobolDocumentModel document, @NonNull String token) {
     return document.getAnalysisResult().getConstantDefinitions().keySet().stream()
         .anyMatch(token::equalsIgnoreCase);
   }

@@ -15,12 +15,12 @@
 
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.reader;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 
 /**
  * This interface represents a reader delegate that may apply some special operations over Strings
  */
 public interface CobolLineReaderDelegate {
-  @Nonnull
-  String apply(@Nonnull String line);
+  @NonNull
+  String apply(@NonNull String line);
 }

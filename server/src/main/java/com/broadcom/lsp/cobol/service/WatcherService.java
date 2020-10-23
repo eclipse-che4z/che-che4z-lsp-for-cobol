@@ -15,7 +15,7 @@
 
 package com.broadcom.lsp.cobol.service;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 
 /**
@@ -36,7 +36,7 @@ public interface WatcherService {
    *
    * @param paths - folders inside workspace to watch
    */
-  void addWatchers(@Nonnull List<String> paths);
+  void addWatchers(@NonNull List<String> paths);
 
   /**
    * Stop watching all types of file system changes in folders with given paths relative to
@@ -44,13 +44,13 @@ public interface WatcherService {
    *
    * @param paths - folders inside workspace to stop watching
    */
-  void removeWatchers(@Nonnull List<String> paths);
+  void removeWatchers(@NonNull List<String> paths);
 
   /**
    * Get a list of paths of registered custom watchers not including .copybooks folder
    *
    * @return a list of paths that has registered watchers
    */
-  @Nonnull
+  @NonNull
   List<String> getWatchingFolders();
 }

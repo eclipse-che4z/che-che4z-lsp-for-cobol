@@ -19,7 +19,7 @@ import com.broadcom.lsp.cobol.core.model.CopybookUsage;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import org.antlr.v4.runtime.BufferedTokenStream;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.Deque;
 
 /** A factory for {@link GrammarPreprocessorListener} */
@@ -35,8 +35,8 @@ public interface GrammarPreprocessorListenerFactory {
    * @return a new listener
    */
   GrammarPreprocessorListenerImpl create(
-      @Nonnull String uri,
-      @Nonnull BufferedTokenStream tokens,
-      @Nonnull Deque<CopybookUsage> copybookStack,
-      @Nonnull CopybookProcessingMode copybookProcessingMode);
+      @NonNull String uri,
+      @NonNull BufferedTokenStream tokens,
+      @NonNull Deque<CopybookUsage> copybookStack,
+      @NonNull CopybookProcessingMode copybookProcessingMode);
 }

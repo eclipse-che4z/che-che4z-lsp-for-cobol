@@ -17,7 +17,7 @@ package com.broadcom.lsp.cobol.service.delegates.references;
 import com.broadcom.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.Location;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +34,8 @@ public interface SemanticLocations {
    * @param document - document model that contains a semantic context
    * @return map with a token name and list of locations of the elements of the required type
    */
-  @Nonnull
-  Map<String, List<Location>> references(@Nonnull CobolDocumentModel document);
+  @NonNull
+  Map<String, List<Location>> references(@NonNull CobolDocumentModel document);
 
   /**
    * Retrieve the map with a token names and list of locations of the elements of the required type
@@ -44,8 +44,8 @@ public interface SemanticLocations {
    * @param document - document model that contains a semantic context
    * @return map with a token name and list of locations of the elements of the required type
    */
-  @Nonnull
-  Map<String, List<Location>> definitions(@Nonnull CobolDocumentModel document);
+  @NonNull
+  Map<String, List<Location>> definitions(@NonNull CobolDocumentModel document);
 
   /**
    * Check if the given document model contains the given token in its element definitions
@@ -53,5 +53,5 @@ public interface SemanticLocations {
    * @param document - document model that contains a semantic context
    * @return true if an element with the given name is defined
    */
-  boolean containsToken(@Nonnull CobolDocumentModel document, @Nonnull String token);
+  boolean containsToken(@NonNull CobolDocumentModel document, @NonNull String token);
 }

@@ -20,7 +20,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.eclipse.lsp4j.CompletionItemKind;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 
@@ -35,7 +35,7 @@ public class KeywordCompletion implements Completion {
     this.keywords = keywords;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Collection<String> getCompletionSource(CobolDocumentModel document) {
     return keywords.getLabels();
@@ -43,17 +43,17 @@ public class KeywordCompletion implements Completion {
 
   @Nullable
   @Override
-  public String tryResolve(@Nonnull String label) {
+  public String tryResolve(@NonNull String label) {
     return keywords.getInformationFor(label);
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public String getSortOrderPrefix() {
     return KEYWORDS.prefix;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public CompletionItemKind getKind() {
     return CompletionItemKind.Keyword;

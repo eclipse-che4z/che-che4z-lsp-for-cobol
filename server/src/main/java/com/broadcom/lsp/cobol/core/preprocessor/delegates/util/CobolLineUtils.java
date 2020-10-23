@@ -18,7 +18,7 @@ package com.broadcom.lsp.cobol.core.preprocessor.delegates.util;
 import com.broadcom.lsp.cobol.core.model.CobolLine;
 import lombok.experimental.UtilityClass;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.function.Predicate;
 
 /** The utility class for CobolLine operations, e.g. copy in different ways */
@@ -32,9 +32,9 @@ public class CobolLineUtils {
    * @param line - line to be copied.
    * @return a new line with a given content and the rest fields from the given line
    */
-  @Nonnull
+  @NonNull
   public static CobolLine copyCobolLineWithContentArea(
-      @Nonnull String contentArea, @Nonnull CobolLine line) {
+      @NonNull String contentArea, @NonNull CobolLine line) {
     CobolLine cobolLine = copyCobolLine(line);
     cobolLine.setContentAreaA(extractContentAreaA(contentArea));
     cobolLine.setContentAreaB(extractContentAreaB(contentArea));
@@ -49,9 +49,9 @@ public class CobolLineUtils {
    * @return a new line with a given content and the indicator area and the rest fields from the
    *     given line
    */
-  @Nonnull
+  @NonNull
   public CobolLine copyCobolLineWithIndicatorAndContentArea(
-      @Nonnull String indicatorArea, @Nonnull String contentArea, @Nonnull CobolLine line) {
+      @NonNull String indicatorArea, @NonNull String contentArea, @NonNull CobolLine line) {
     CobolLine cobolLine = copyCobolLine(line);
     cobolLine.setIndicatorArea(indicatorArea);
     cobolLine.setContentAreaA(extractContentAreaA(contentArea));
@@ -65,16 +65,16 @@ public class CobolLineUtils {
    * @param line - line to be copied.
    * @return a new line with a indicator area and the rest fields from the given line
    */
-  @Nonnull
+  @NonNull
   public CobolLine copyCobolLineWithIndicatorArea(
-      @Nonnull String indicatorArea, @Nonnull CobolLine line) {
+      @NonNull String indicatorArea, @NonNull CobolLine line) {
     CobolLine cobolLine = copyCobolLine(line);
     cobolLine.setIndicatorArea(indicatorArea);
     return cobolLine;
   }
 
-  @Nonnull
-  private CobolLine copyCobolLine(@Nonnull CobolLine line) {
+  @NonNull
+  private CobolLine copyCobolLine(@NonNull CobolLine line) {
     CobolLine cobolLine = new CobolLine();
     cobolLine.setSequenceArea(line.getSequenceArea());
     cobolLine.setIndicatorArea(line.getIndicatorArea());
@@ -88,21 +88,21 @@ public class CobolLineUtils {
     return cobolLine;
   }
 
-  @Nonnull
-  private String extractContentAreaA(@Nonnull String contentArea) {
+  @NonNull
+  private String extractContentAreaA(@NonNull String contentArea) {
     return contentArea.length() > 4 ? contentArea.substring(0, 4) : contentArea;
   }
 
-  @Nonnull
-  private String extractContentAreaB(@Nonnull String contentArea) {
+  @NonNull
+  private String extractContentAreaB(@NonNull String contentArea) {
     return contentArea.length() > 4 ? contentArea.substring(4) : "";
   }
 
-  public long getEmptyLinesCount(@Nonnull String txt) {
+  public long getEmptyLinesCount(@NonNull String txt) {
     return txt.lines().filter(String::isBlank).count();
   }
 
-  public long getNonEmptyLinesCount(@Nonnull String txt) {
+  public long getNonEmptyLinesCount(@NonNull String txt) {
     return txt.lines().filter(Predicate.not(String::isEmpty)).count();
   }
 }

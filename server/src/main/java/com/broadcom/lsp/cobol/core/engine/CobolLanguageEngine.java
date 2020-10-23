@@ -34,7 +34,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -68,11 +68,11 @@ public class CobolLanguageEngine {
    * @return Semantic information wrapper object and list of syntax error that might send back to
    *     the client
    */
-  @Nonnull
+  @NonNull
   public ResultWithErrors<SemanticContext> run(
-      @Nonnull String documentUri,
-      @Nonnull String text,
-      @Nonnull CopybookProcessingMode copybookProcessingMode) {
+      @NonNull String documentUri,
+      @NonNull String text,
+      @NonNull CopybookProcessingMode copybookProcessingMode) {
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =
         preprocessor
@@ -108,17 +108,17 @@ public class CobolLanguageEngine {
     return new ResultWithErrors<>(visitor.getSemanticContext(), accumulatedErrors);
   }
 
-  @Nonnull
+  @NonNull
   private List<SyntaxError> finalizeErrors(
-      @Nonnull List<SyntaxError> errors, @Nonnull Map<Token, Locality> mapping) {
+      @NonNull List<SyntaxError> errors, @NonNull Map<Token, Locality> mapping) {
     return errors.stream()
         .map(convertError(mapping))
         .filter(it -> it.getLocality() != null)
         .collect(toList());
   }
 
-  @Nonnull
-  private Function<SyntaxError, SyntaxError> convertError(@Nonnull Map<Token, Locality> mapping) {
+  @NonNull
+  private Function<SyntaxError, SyntaxError> convertError(@NonNull Map<Token, Locality> mapping) {
     return err -> err.toBuilder().locality(mapping.get(err.getOffendedToken())).build();
   }
 

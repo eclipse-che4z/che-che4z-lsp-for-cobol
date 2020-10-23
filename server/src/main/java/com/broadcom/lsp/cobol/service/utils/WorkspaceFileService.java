@@ -18,7 +18,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -46,15 +46,15 @@ public class WorkspaceFileService implements FileSystemService {
     return file != null && file.toFile().exists();
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public String decodeURI(@Nonnull String uri) {
+  public String decodeURI(@NonNull String uri) {
     return URLDecoder.decode(uri, StandardCharsets.UTF_8);
   }
 
   @Nullable
   @Override
-  public String getNameFromURI(@Nonnull String uri) {
+  public String getNameFromURI(@NonNull String uri) {
     try {
       return FilenameUtils.getBaseName(Paths.get(new URI(uri)).getFileName().toString());
     } catch (URISyntaxException e) {
@@ -65,7 +65,7 @@ public class WorkspaceFileService implements FileSystemService {
 
   @Nullable
   @Override
-  public String getContentByPath(@Nonnull Path path) {
+  public String getContentByPath(@NonNull Path path) {
     try (Stream<String> stream = Files.lines(path)) {
       return stream.reduce((s1, s2) -> s1 + lineSeparator() + s2).orElse("");
     } catch (IOException e) {
@@ -76,7 +76,7 @@ public class WorkspaceFileService implements FileSystemService {
 
   @Override
   @Nullable
-  public Path getPathFromURI(@Nonnull String uri) {
+  public Path getPathFromURI(@NonNull String uri) {
     try {
       return Paths.get(new URI(uri).normalize());
     } catch (URISyntaxException e) {

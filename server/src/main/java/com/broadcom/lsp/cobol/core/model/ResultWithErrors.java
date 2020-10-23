@@ -17,7 +17,7 @@ package com.broadcom.lsp.cobol.core.model;
 
 import lombok.Value;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -28,8 +28,8 @@ import java.util.function.Consumer;
  */
 @Value
 public class ResultWithErrors<T> {
-  @Nonnull T result;
-  @Nonnull List<SyntaxError> errors;
+  @NonNull T result;
+  @NonNull List<SyntaxError> errors;
 
   /**
    * Consume the found errors and return the result. May be used as <code>

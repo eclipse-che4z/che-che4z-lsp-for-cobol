@@ -27,7 +27,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -124,7 +124,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
    *
    * @return a {@link TestData} of the processing
    */
-  @Nonnull
+  @NonNull
   TestData getProcessingResult() {
     return new TestData(
         peek().toString(),
@@ -312,7 +312,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
         .collect(Collectors.toMap(it -> it, it -> defaultLocation));
   }
 
-  @Nonnull
+  @NonNull
   private StringBuilder peek() {
     return ofNullable(contexts.peek())
         .orElseThrow(() -> new IllegalStateException("Document structure corrupted"));
@@ -326,7 +326,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
     contexts.push(new StringBuilder());
   }
 
-  private void write(@Nonnull String text) {
+  private void write(@NonNull String text) {
     peek().append(text);
   }
 
