@@ -45,13 +45,13 @@ public final class LocaleStoreImpl implements LocaleStore {
   private final Lock readLock = readWriteLock.readLock();
   private final Lock writeLock = readWriteLock.writeLock();
   private final Locale defaultLocale = new Locale("en", "en");
-  private Communications communication;
+  private Communications communications;
   private LocaleEnum supportedLocale;
   private List<Consumer<Locale>> notifyList = new ArrayList<>();
 
   @Inject
   public LocaleStoreImpl(Communications communications) {
-    this.communication = communications;
+    this.communications = communications;
   }
 
   /**
@@ -65,9 +65,9 @@ public final class LocaleStoreImpl implements LocaleStore {
     try {
       if (Objects.isNull(supportedLocale))
         return Enum.valueOf(LocaleEnum.class, defaultLocale.getCountry().toUpperCase());
-      return supportedLocale;
     } finally {
       readLock.unlock();
+      return supportedLocale;
     }
   }
 
@@ -114,8 +114,8 @@ public final class LocaleStoreImpl implements LocaleStore {
   private void handleUnSupportedLocale(String locale) {
     String errMsg = "Supplied " + locale + " locale is not supported yet.";
     LOG.error(errMsg);
-    if (Objects.nonNull(communication))
-      communication.notifyGeneralMessage(MessageType.Error, errMsg);
+    if (Objects.nonNull(communications))
+      communications.notifyGeneralMessage(MessageType.Error, errMsg);
   }
 
   /**

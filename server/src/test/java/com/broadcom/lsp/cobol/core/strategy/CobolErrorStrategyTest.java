@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.MissingResourceException;
 
 import static org.mockito.Mockito.*;
 
@@ -40,7 +41,10 @@ class CobolErrorStrategyTest {
     NoViableAltException error =
         new NoViableAltException(recognizer, stream, token, token, null, null);
     CobolErrorStrategy strategy = new CobolErrorStrategy(messageService);
-    when(messageService.getMessage(matches("ErrorStrategy.rulereportNoViableAlternative"), anyString()))
+    when(messageService.getMessage(
+            matches("ErrorStrategy.rulereportNoViableAlternative"), anyString()))
+        .thenThrow(MissingResourceException.class);
+    when(messageService.getMessage(matches("ErrorStrategy.reportNoViableAlternative"), anyString()))
         .thenReturn("No viable alternative at input text");
 
     when(recognizer.getInputStream()).thenReturn(stream);
@@ -70,6 +74,9 @@ class CobolErrorStrategyTest {
     when(errorMock.getOffendingToken()).thenReturn(token);
     when(messageService.getMessage(
             matches("ErrorStrategy.rulereportInputMismatch"), anyString(), anyString()))
+        .thenThrow(MissingResourceException.class);
+    when(messageService.getMessage(
+            matches("ErrorStrategy.reportInputMismatch"), anyString(), anyString()))
         .thenReturn("Syntax error on '<0>' expected text");
     strategy.reportError(recognizer, errorMock);
     verify(recognizer)

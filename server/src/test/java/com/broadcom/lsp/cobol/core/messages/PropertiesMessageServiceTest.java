@@ -33,7 +33,7 @@ class PropertiesMessageServiceTest {
   @BeforeEach
   public void beforeAll() {
     localeMock = mock(LocaleStore.class);
-    when(localeMock.getApplicationLocale()).thenReturn(new Locale("en"));
+    when(localeMock.getApplicationLocale()).thenReturn(Locale.ENGLISH);
     messageService = new PropertiesMessageService("message/test", localeMock);
   }
 
@@ -48,7 +48,7 @@ class PropertiesMessageServiceTest {
 
   @Test
   void whenValidMessageTemplateProvideFR_getFormattedMessage() {
-    when(localeMock.getApplicationLocale()).thenReturn(new Locale("fr"));
+    when(localeMock.getApplicationLocale()).thenReturn(Locale.FRENCH);
     MessageService messageServiceFR = new PropertiesMessageService("message/test", localeMock);
     assertEquals("French test selected.", messageServiceFR.getMessage("1"));
 
