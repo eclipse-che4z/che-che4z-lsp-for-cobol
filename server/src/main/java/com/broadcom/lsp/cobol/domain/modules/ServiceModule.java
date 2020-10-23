@@ -14,7 +14,6 @@
  */
 package com.broadcom.lsp.cobol.domain.modules;
 
-import com.broadcom.lsp.cobol.core.messages.*;
 import com.broadcom.lsp.cobol.service.*;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActions;
