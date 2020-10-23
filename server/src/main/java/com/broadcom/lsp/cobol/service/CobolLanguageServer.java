@@ -24,7 +24,7 @@ import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
@@ -76,8 +76,8 @@ public class CobolLanguageServer implements LanguageServer {
   }
 
   @Override
-  @Nonnull
-  public CompletableFuture<InitializeResult> initialize(@Nonnull InitializeParams params) {
+  @NonNull
+  public CompletableFuture<InitializeResult> initialize(@NonNull InitializeParams params) {
     ServerCapabilities capabilities = new ServerCapabilities();
 
     capabilities.setTextDocumentSync(Full);
@@ -133,7 +133,7 @@ public class CobolLanguageServer implements LanguageServer {
         .thenAccept(it -> watchingService.addWatchers(settingsService.toStrings(it)));
   }
 
-  @Nonnull
+  @NonNull
   private ExecuteCommandOptions collectExecuteCommandList() {
     return new ExecuteCommandOptions(
         stream(ErrorCode.values()).map(ErrorCode::name).collect(toList()));

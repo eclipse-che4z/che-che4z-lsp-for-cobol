@@ -38,7 +38,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.*;
 import java.util.function.Function;
 
@@ -101,7 +101,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     this.messageService = messageService;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public ExtendedDocument getResult() {
     nestedMappings.put(
@@ -112,25 +112,25 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void enterCompilerOptions(@Nonnull CompilerOptionsContext ctx) {
+  public void enterCompilerOptions(@NonNull CompilerOptionsContext ctx) {
     // push a new context for the COMPILER OPTIONS terminals
     push();
   }
 
   @Override
-  public void exitCompilerOptions(@Nonnull CompilerOptionsContext ctx) {
+  public void exitCompilerOptions(@NonNull CompilerOptionsContext ctx) {
     // throw away COMPILER OPTIONS terminals
     pop();
     accumulateExcludedStatementShift(ctx.getSourceInterval());
   }
 
   @Override
-  public void enterReplaceArea(@Nonnull ReplaceAreaContext ctx) {
+  public void enterReplaceArea(@NonNull ReplaceAreaContext ctx) {
     push();
   }
 
   @Override
-  public void exitReplaceArea(@Nonnull ReplaceAreaContext ctx) {
+  public void exitReplaceArea(@NonNull ReplaceAreaContext ctx) {
     String content = applyReplacing(read(), replacingClauses);
     replacingClauses.clear();
 
@@ -139,12 +139,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void enterCopyStatement(@Nonnull CopyStatementContext ctx) {
+  public void enterCopyStatement(@NonNull CopyStatementContext ctx) {
     push();
   }
 
   @Override
-  public void exitCopyStatement(@Nonnull CopyStatementContext ctx) {
+  public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
     if (!copybookProcessingMode.analyze) {
       pop();
       return;
@@ -200,7 +200,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void visitTerminal(@Nonnull TerminalNode node) {
+  public void visitTerminal(@NonNull TerminalNode node) {
     int tokPos = node.getSourceInterval().a;
     write(retrieveHiddenTextToLeft(tokPos, tokens));
 
@@ -224,7 +224,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     shifts.put(sourceInterval.a - 1, sourceInterval.b - sourceInterval.a + 2);
   }
 
-  @Nonnull
+  @NonNull
   private StringBuilder peek() {
     return ofNullable(textAccumulator.peek())
         .orElseThrow(() -> new IllegalStateException("Document structure corrupted"));
@@ -238,11 +238,11 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     textAccumulator.push(new StringBuilder());
   }
 
-  private void write(@Nonnull String text) {
+  private void write(@NonNull String text) {
     peek().append(text);
   }
 
-  @Nonnull
+  @NonNull
   private String read() {
     return peek().toString();
   }
@@ -315,13 +315,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     return new CopybookModel(copybookName, "", "");
   }
 
-  @Nonnull
-  private String retrieveCopybookName(@Nonnull CopySourceContext copySource) {
+  @NonNull
+  private String retrieveCopybookName(@NonNull CopySourceContext copySource) {
     return retrieveCopybookName(
         Optional.<RuleContext>ofNullable(copySource.cobolWord()).orElse(copySource.literal()));
   }
 
-  private String retrieveCopybookName(@Nonnull RuleContext context) {
+  private String retrieveCopybookName(@NonNull RuleContext context) {
     return context.getText().toUpperCase();
   }
 
@@ -332,7 +332,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         .orElse(null);
   }
 
-  private void addCopybookUsage(@Nonnull String copybookName, @Nonnull Locality locality) {
+  private void addCopybookUsage(@NonNull String copybookName, @NonNull Locality locality) {
     copybooks.addUsage(copybookName, locality.toLocation());
   }
 
@@ -343,8 +343,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     }
   }
 
-  @Nonnull
-  private Locality retrieveCopybookStatementPosition(@Nonnull ParserRuleContext ctx) {
+  @NonNull
+  private Locality retrieveCopybookStatementPosition(@NonNull ParserRuleContext ctx) {
     return Locality.builder()
         .uri(documentUri)
         .copybookId(retrieveCopybookId())
@@ -359,8 +359,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         .build();
   }
 
-  @Nonnull
-  private Locality retrievePosition(@Nonnull ParserRuleContext ctx) {
+  @NonNull
+  private Locality retrievePosition(@NonNull ParserRuleContext ctx) {
     return Locality.builder()
         .uri(documentUri)
         .copybookId(retrieveCopybookId())
@@ -369,7 +369,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         .build();
   }
 
-  @Nonnull
+  @NonNull
   private Function<Token, Locality> toPosition() {
     return token ->
         Locality.builder()

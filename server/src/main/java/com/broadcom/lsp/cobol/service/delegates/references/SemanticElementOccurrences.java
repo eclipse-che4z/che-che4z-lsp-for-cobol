@@ -18,7 +18,7 @@ import com.broadcom.lsp.cobol.service.CobolDocumentModel;
 import com.google.inject.Inject;
 import org.eclipse.lsp4j.*;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
@@ -42,19 +42,19 @@ public class SemanticElementOccurrences implements Occurrences {
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public List<Location> findDefinitions(
-      @Nullable CobolDocumentModel document, @Nonnull TextDocumentPositionParams position) {
+      @Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
     if (document == null) return Collections.emptyList();
     return collectLocations(document, position, it -> it.definitions(document));
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public List<Location> findReferences(
       @Nullable CobolDocumentModel document,
-      @Nonnull TextDocumentPositionParams position,
-      @Nonnull ReferenceContext context) {
+      @NonNull TextDocumentPositionParams position,
+      @NonNull ReferenceContext context) {
     if (document == null) return Collections.emptyList();
     List<Location> result = collectLocations(document, position, it -> it.references(document));
     if (context.isIncludeDeclaration()) {
@@ -64,9 +64,9 @@ public class SemanticElementOccurrences implements Occurrences {
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public List<DocumentHighlight> findHighlights(
-      @Nullable CobolDocumentModel document, @Nonnull TextDocumentPositionParams position) {
+      @Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
     if (document == null) return Collections.emptyList();
     return findReferences(document, position, new ReferenceContext(true)).stream()
         .filter(byUri(position))
@@ -74,11 +74,11 @@ public class SemanticElementOccurrences implements Occurrences {
         .collect(Collectors.toList());
   }
 
-  @Nonnull
+  @NonNull
   private List<Location> collectLocations(
-      @Nonnull CobolDocumentModel document,
-      @Nonnull TextDocumentPositionParams position,
-      @Nonnull Function<SemanticLocations, Map<String, List<Location>>> getOccurrences) {
+      @NonNull CobolDocumentModel document,
+      @NonNull TextDocumentPositionParams position,
+      @NonNull Function<SemanticLocations, Map<String, List<Location>>> getOccurrences) {
     String token = retrieveToken(document, position.getPosition());
     return semanticLocations.stream()
         .filter(it -> it.containsToken(document, token))
@@ -88,9 +88,9 @@ public class SemanticElementOccurrences implements Occurrences {
         .collect(Collectors.toList());
   }
 
-  @Nonnull
+  @NonNull
   private Function<Map<String, List<Location>>, List<Location>> retrieveLocationsFor(
-      @Nonnull String token) {
+      @NonNull String token) {
     return occurrences ->
         occurrences.entrySet().stream()
             .filter(it -> it.getKey().equalsIgnoreCase(token))
@@ -99,18 +99,18 @@ public class SemanticElementOccurrences implements Occurrences {
             .collect(Collectors.toList());
   }
 
-  @Nonnull
-  private static Predicate<Location> byUri(@Nonnull TextDocumentPositionParams position) {
+  @NonNull
+  private static Predicate<Location> byUri(@NonNull TextDocumentPositionParams position) {
     return location -> location.getUri().equals(position.getTextDocument().getUri());
   }
 
-  @Nonnull
+  @NonNull
   private static Function<Location, DocumentHighlight> toDocumentHighlight() {
     return location -> new DocumentHighlight(location.getRange(), DocumentHighlightKind.Text);
   }
 
-  @Nonnull
-  private String retrieveToken(@Nonnull CobolDocumentModel document, @Nonnull Position position) {
+  @NonNull
+  private String retrieveToken(@NonNull CobolDocumentModel document, @NonNull Position position) {
     return document.getFullTokenAtPosition(position);
   }
 }

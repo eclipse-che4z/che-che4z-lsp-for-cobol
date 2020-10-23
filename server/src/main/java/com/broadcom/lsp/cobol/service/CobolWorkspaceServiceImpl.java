@@ -27,7 +27,7 @@ import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
@@ -75,15 +75,15 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    * @param params - parameters of a command to be executed
    * @return a WorkspaceEdit or null if no edits required
    */
-  @Nonnull
+  @NonNull
   @Override
-  public CompletableFuture<Object> executeCommand(@Nonnull ExecuteCommandParams params) {
+  public CompletableFuture<Object> executeCommand(@NonNull ExecuteCommandParams params) {
     runAsync(executeCopybookFix(params)).whenComplete(reportExceptionIfFound(params));
 
     return completedFuture(null);
   }
 
-  private Runnable executeCopybookFix(@Nonnull ExecuteCommandParams params) {
+  private Runnable executeCopybookFix(@NonNull ExecuteCommandParams params) {
     return () -> {
       if (MISSING_COPYBOOK.name().equals(params.getCommand())) {
         rerunAnalysis(true);
@@ -129,7 +129,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    *     sent from the client to the server.
    */
   @Override
-  public void didChangeWatchedFiles(@Nonnull DidChangeWatchedFilesParams params) {
+  public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) {
     rerunAnalysis(false);
   }
 
@@ -139,9 +139,9 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
     dataBus.postData(new RunAnalysisEvent(verbose));
   }
 
-  @Nonnull
+  @NonNull
   private BiConsumer<Object, Throwable> reportExceptionIfFound(
-      @Nonnull ExecuteCommandParams params) {
+      @NonNull ExecuteCommandParams params) {
     return (res, ex) ->
         ofNullable(ex)
             .ifPresent(

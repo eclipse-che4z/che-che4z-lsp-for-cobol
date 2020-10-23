@@ -17,7 +17,7 @@ package com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter;
 import com.broadcom.lsp.cobol.core.model.CobolLine;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.CobolLineUtils;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -41,19 +41,19 @@ public class CobolInlineCommentEntriesNormalizerImpl implements CobolLineReWrite
    * @return list of normalized lines
    */
   @Override
-  @Nonnull
-  public List<CobolLine> processLines(@Nonnull List<CobolLine> lines) {
+  @NonNull
+  public List<CobolLine> processLines(@NonNull List<CobolLine> lines) {
     return lines.stream().map(this::normalizeLine).collect(toList());
   }
 
-  @Nonnull
-  private CobolLine normalizeLine(@Nonnull CobolLine line) {
+  @NonNull
+  private CobolLine normalizeLine(@NonNull CobolLine line) {
     if (isNormal(line)) return line;
     String newContentArea = line.getContentArea().replace(COMMENT_TAG, COMMENT_TAG + WS);
     return CobolLineUtils.copyCobolLineWithContentArea(newContentArea, line);
   }
 
-  private boolean isNormal(@Nonnull CobolLine line) {
+  private boolean isNormal(@NonNull CobolLine line) {
     return !DENORMALIZED_COMMENT_ENTRY.matcher(line.getContentArea()).find();
   }
 }

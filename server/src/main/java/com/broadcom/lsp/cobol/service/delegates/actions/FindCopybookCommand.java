@@ -21,7 +21,7 @@ import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 import java.util.function.Function;
 
@@ -39,10 +39,10 @@ import static org.eclipse.lsp4j.CodeActionKind.QuickFix;
 public class FindCopybookCommand implements CodeActionProvider {
   private static final String TITLE = "Resolve copybook";
 
-  @Nonnull
+  @NonNull
   @Override
   public List<Either<Command, CodeAction>> collectCommandsOrActions(
-      @Nonnull CodeActionParams params) {
+      @NonNull CodeActionParams params) {
     return params.getContext().getDiagnostics().stream()
         .filter(it -> it.getCode() != null)
         .filter(it -> MISSING_COPYBOOK.equals(valueOf(it.getCode())))
@@ -51,8 +51,8 @@ public class FindCopybookCommand implements CodeActionProvider {
         .collect(toList());
   }
 
-  @Nonnull
-  private Function<Diagnostic, CodeAction> toCodeAction(@Nonnull CodeActionParams params) {
+  @NonNull
+  private Function<Diagnostic, CodeAction> toCodeAction(@NonNull CodeActionParams params) {
     return it -> {
       CodeAction action = new CodeAction(TITLE);
       action.setDiagnostics(singletonList(it));
@@ -62,16 +62,16 @@ public class FindCopybookCommand implements CodeActionProvider {
     };
   }
 
-  @Nonnull
-  private Command createCommand(@Nonnull CodeActionParams params, @Nonnull Diagnostic it) {
+  @NonNull
+  private Command createCommand(@NonNull CodeActionParams params, @NonNull Diagnostic it) {
     return new Command(
         TITLE,
         MISSING_COPYBOOK.name(),
         asList(retrieveCopybookName(it), params.getTextDocument().getUri()));
   }
 
-  @Nonnull
-  private String retrieveCopybookName(@Nonnull Diagnostic it) {
+  @NonNull
+  private String retrieveCopybookName(@NonNull Diagnostic it) {
     String message = it.getMessage();
     return message.substring(0, message.indexOf(':'));
   }

@@ -18,7 +18,7 @@ import com.broadcom.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 
@@ -39,7 +39,7 @@ public interface Completion {
    * @param document - object that contains text and analysis output
    * @return collection of strings to be converted into completion items
    */
-  @Nonnull
+  @NonNull
   Collection<String> getCompletionSource(@Nullable CobolDocumentModel document);
 
   /**
@@ -49,7 +49,7 @@ public interface Completion {
    * @return the description for the label or null if not resolved
    */
   @Nullable
-  default String tryResolve(@Nonnull String label) {
+  default String tryResolve(@NonNull String label) {
     return null;
   }
 
@@ -58,7 +58,7 @@ public interface Completion {
    *
    * @return a string containing number for proper sorting
    */
-  @Nonnull
+  @NonNull
   String getSortOrderPrefix();
 
   /**
@@ -66,7 +66,7 @@ public interface Completion {
    *
    * @return CompletionItemKind for the provided completions
    */
-  @Nonnull
+  @NonNull
   CompletionItemKind getKind();
 
   /**
@@ -76,8 +76,8 @@ public interface Completion {
    * @param item - a CompletionItem to be customized
    * @return a CompletionItem item with some special values set or the given item in the other case
    */
-  @Nonnull
-  default CompletionItem customize(@Nonnull CompletionItem item) {
+  @NonNull
+  default CompletionItem customize(@NonNull CompletionItem item) {
     return item;
   }
 }

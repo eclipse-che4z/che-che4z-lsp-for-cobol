@@ -19,7 +19,7 @@ import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.google.inject.Singleton;
 import org.eclipse.lsp4j.CompletionItemKind;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -31,7 +31,7 @@ import static com.broadcom.lsp.cobol.service.delegates.completions.CompletionOrd
 @Singleton
 public class CopybookCompletion implements Completion {
 
-  @Nonnull
+  @NonNull
   @Override
   public Collection<String> getCompletionSource(CobolDocumentModel document) {
     return Optional.ofNullable(document)
@@ -41,13 +41,13 @@ public class CopybookCompletion implements Completion {
         .orElse(Collections.emptySet());
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public String getSortOrderPrefix() {
     return COPYBOOKS.prefix;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public CompletionItemKind getKind() {
     return CompletionItemKind.Class;

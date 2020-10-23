@@ -19,7 +19,7 @@ import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.google.inject.Singleton;
 import org.eclipse.lsp4j.CompletionItemKind;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.Collection;
 import java.util.Set;
 
@@ -30,7 +30,7 @@ import static org.eclipse.lsp4j.CompletionItemKind.Constant;
 @Singleton
 public class ConstantCompletion implements Completion {
 
-  @Nonnull
+  @NonNull
   @Override
   public Collection<String> getCompletionSource(CobolDocumentModel document) {
     return ofNullable(document)
@@ -39,13 +39,13 @@ public class ConstantCompletion implements Completion {
         .orElse(Set.of());
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public String getSortOrderPrefix() {
     return CompletionOrder.CONSTANTS.prefix;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public CompletionItemKind getKind() {
     return Constant;

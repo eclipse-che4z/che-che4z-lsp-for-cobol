@@ -17,7 +17,7 @@ package com.broadcom.lsp.cobol.core.preprocessor.delegates.util;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 
 /** This service applies replacing for given text by replace clauses and tokens. */
@@ -29,8 +29,8 @@ public interface ReplacingService {
    * @param replacePatterns - list of patterns for replacement
    * @return a String with all the patterns applied one by one
    */
-  @Nonnull
-  String applyReplacing(@Nonnull String text, @Nonnull List<Pair<String, String>> replacePatterns);
+  @NonNull
+  String applyReplacing(@NonNull String text, @NonNull List<Pair<String, String>> replacePatterns);
 
   /**
    * Retrieve pseudo-text replacing pattern from the given string. If the pseudo text consist of
@@ -40,8 +40,8 @@ public interface ReplacingService {
    *     ==replacement=="
    * @return pair of cleaned-up replaceable and replacement
    */
-  @Nonnull
-  Pair<String, String> retrievePseudoTextReplacingPattern(@Nonnull String clause);
+  @NonNull
+  Pair<String, String> retrievePseudoTextReplacingPattern(@NonNull String clause);
 
   /**
    * Retrieve full-token replacing pattern from the given string.
@@ -50,6 +50,6 @@ public interface ReplacingService {
    *     replacement"
    * @return pair of cleaned-up replaceable and replacement
    */
-  @Nonnull
-  Pair<String, String> retrieveTokenReplacingPattern(@Nonnull String clause);
+  @NonNull
+  Pair<String, String> retrieveTokenReplacingPattern(@NonNull String clause);
 }

@@ -19,7 +19,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -42,36 +42,36 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   private static final String ERROR_REPLACING = "Error replacing on text: %s with the pattern: %s";
 
-  @Nonnull
+  @NonNull
   public String applyReplacing(
-      @Nonnull String text, @Nonnull List<Pair<String, String>> replacePatterns) {
+      @NonNull String text, @NonNull List<Pair<String, String>> replacePatterns) {
     return replacePatterns.stream().reduce(text, this::replace, (str1, str2) -> str2);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Pair<String, String> retrievePseudoTextReplacingPattern(@Nonnull String clause) {
+  public Pair<String, String> retrievePseudoTextReplacingPattern(@NonNull String clause) {
     String[] pattern = retrievePattern(clause);
     return isPatternCorrect(pattern)
         ? Pair.of(extractPseudoText(pattern[0]).replace(" ", " +"), extractPseudoText(pattern[1]))
         : Pair.of("", "");
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Pair<String, String> retrieveTokenReplacingPattern(@Nonnull String clause) {
+  public Pair<String, String> retrieveTokenReplacingPattern(@NonNull String clause) {
     String[] pattern = retrievePattern(clause);
     return isPatternCorrect(pattern)
         ? Pair.of(getPatternForFullTokens(pattern[0]), getReplacementPattern(pattern[1]))
         : Pair.of("", "");
   }
 
-  @Nonnull
-  private String[] retrievePattern(@Nonnull String clause) {
+  @NonNull
+  private String[] retrievePattern(@NonNull String clause) {
     return clause.split("(?i)BY");
   }
 
-  private boolean isPatternCorrect(@Nonnull String[] pattern) {
+  private boolean isPatternCorrect(@NonNull String[] pattern) {
     return pattern.length == 2;
   }
 
@@ -80,8 +80,8 @@ public class ReplacingServiceImpl implements ReplacingService {
    *
    * @return pattern that matches only full tokens
    */
-  @Nonnull
-  private String getPatternForFullTokens(@Nonnull String text) {
+  @NonNull
+  private String getPatternForFullTokens(@NonNull String text) {
     return format(SEPARATE_TOKEN_PATTERN, text.trim());
   }
 
@@ -91,8 +91,8 @@ public class ReplacingServiceImpl implements ReplacingService {
    *
    * @return a regex for replaceable
    */
-  @Nonnull
-  private String getReplacementPattern(@Nonnull String text) {
+  @NonNull
+  private String getReplacementPattern(@NonNull String text) {
     return quoteReplacement(text.trim());
   }
 
@@ -104,13 +104,13 @@ public class ReplacingServiceImpl implements ReplacingService {
    * @param text a pseudo-text string
    * @return a pattern for replacing
    */
-  @Nonnull
-  private String extractPseudoText(@Nonnull String text) {
+  @NonNull
+  private String extractPseudoText(@NonNull String text) {
     return text.trim().replaceAll("^==", "").replaceAll("==$", "").replaceAll(" +", " ").trim();
   }
 
-  @Nonnull
-  private String replace(@Nonnull String text, @Nonnull Pair<String, String> pattern) {
+  @NonNull
+  private String replace(@NonNull String text, @NonNull Pair<String, String> pattern) {
     String result = text;
     try {
       result = Pattern.compile(pattern.getLeft()).matcher(text).replaceAll(pattern.getRight());

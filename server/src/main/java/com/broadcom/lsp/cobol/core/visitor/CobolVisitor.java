@@ -36,7 +36,7 @@ import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +55,15 @@ import static java.util.stream.Collectors.joining;
  */
 @Slf4j
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {
+  private static final String AREA_A_WARNING_MSG = "The following token must start in Area A: ";
+  private static final String AREA_B_WARNING_MSG = "The following token must start in Area B: ";
+  private static final String IDENTICAL_PROGRAM_MSG =
+      "Program-name must be identical to the program-name of the corresponding PROGRAM-ID paragraph: ";
+  private static final String DECLARATIVE_SAME_MSG =
+      "The following token cannot be on the same line as a DECLARATIVE token: ";
+  private static final String INVALID_DEF_MSG = "Invalid definition for: ";
+  private static final String MISSPELLED_WORD = "A misspelled word, maybe you want to put ";
+  private static final String PROGRAM_ID_ISSUE_MSG = "There is an issue with PROGRAM-ID paragraph";
 
   @Getter private List<SyntaxError> errors = new ArrayList<>();
 
@@ -71,10 +80,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private MessageService messageService;
 
   public CobolVisitor(
-      @Nonnull String documentUri,
-      @Nonnull NamedSubContext copybooks,
-      @Nonnull CommonTokenStream tokenStream,
-      @Nonnull Map<Token, Locality> positionMapping,
+      @NonNull String documentUri,
+      @NonNull NamedSubContext copybooks,
+      @NonNull CommonTokenStream tokenStream,
+      @NonNull Map<Token, Locality> positionMapping,
       MessageService messageService) {
     this.copybooks = copybooks;
     this.positionMapping = positionMapping;
@@ -89,7 +98,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
    * @return the semantic context of the document, containing all the definitions and usages of
    *     paragraphs, variables and copybooks
    */
-  @Nonnull
+  @NonNull
   public SemanticContext getSemanticContext() {
     return new SemanticContext(
         variables.getDefinitions().asMap(),
@@ -216,7 +225,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
       getLocality(declarativeBody)
           .ifPresent(
               locality ->
-                  throwException(declarativeBody.getText(), locality, messageService.getMessage("CobolVisitor.declarativeSameMsg")));
+                  throwException(declarativeBody.getText(), locality, DECLARATIVE_SAME_MSG));
     }
 
     areaAWarning(firstDeclarative);
@@ -415,15 +424,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     return visitChildren(ctx);
   }
 
-  private void defineVariable(String level, String name, @Nonnull Location location) {
+  private void defineVariable(String level, String name, @NonNull Location location) {
     variables.define(new Variable(level, name), location);
   }
 
-  private void addVariableUsage(String name, @Nonnull Location location) {
+  private void addVariableUsage(String name, @NonNull Location location) {
     addUsage(constants.contains(name) ? constants : variables, name, location);
   }
 
-  private void addUsage(SubContext<?> langContext, String name, @Nonnull Location location) {
+  private void addUsage(SubContext<?> langContext, String name, @NonNull Location location) {
     langContext.addUsage(name.toUpperCase(), location);
   }
 
@@ -510,7 +519,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     }
   }
 
-  private void throwException(String wrongToken, @Nonnull Locality locality, String message) {
+  private void throwException(String wrongToken, @NonNull Locality locality, String message) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .locality(locality)
@@ -528,7 +537,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     return ofNullable(positionMapping.get(childToken));
   }
 
-  private void checkVariableDefinition(String name, @Nonnull Locality locality) {
+  private void checkVariableDefinition(String name, @NonNull Locality locality) {
     if (!variables.contains(name) && !constants.contains(name)) {
       reportVariableNotDefined(name, locality, locality); // starts and finishes in one token
     }

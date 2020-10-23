@@ -201,7 +201,6 @@ public class UseCaseUtils {
    * @param copybookProcessingMode - sync type for the analysis
    * @return the entire analysis result
    */
-  @SuppressWarnings("unchecked")
   public static AnalysisResult analyze(
       String fileName,
       String text,

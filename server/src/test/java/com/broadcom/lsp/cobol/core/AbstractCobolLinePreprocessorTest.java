@@ -29,7 +29,7 @@ public abstract class AbstractCobolLinePreprocessorTest {
   protected ResultWithErrors<List<CobolLine>> processText(String text) {
     MessageService mockMessageService = mock(MessageService.class);
     CobolLineReader reader = new CobolLineReaderImpl(line -> line, mockMessageService);
-    return reader.processLines(null, text);
+    return reader.processLines("", text);
   }
 
   protected String reduceLines(List<String> lines) {
