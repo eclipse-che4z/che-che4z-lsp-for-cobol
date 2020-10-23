@@ -22,7 +22,7 @@ import lombok.Synchronized;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +61,7 @@ public class WatcherServiceImpl implements WatcherService {
     this.clientProvider = clientProvider;
   }
 
-  @Nonnull
+  @NonNull
   public List<String> getWatchingFolders() {
     return unmodifiableList(folderWatchers);
   }
@@ -84,7 +84,7 @@ public class WatcherServiceImpl implements WatcherService {
 
   @Override
   @Synchronized
-  public void addWatchers(@Nonnull List<String> paths) {
+  public void addWatchers(@NonNull List<String> paths) {
     register(
         paths.stream()
             .map(
@@ -103,7 +103,7 @@ public class WatcherServiceImpl implements WatcherService {
 
   @Override
   @Synchronized
-  public void removeWatchers(@Nonnull List<String> paths) {
+  public void removeWatchers(@NonNull List<String> paths) {
     List<String> removedWatchers = paths.stream().filter(folderWatchers::remove).collect(toList());
     if (!removedWatchers.isEmpty()) {
       clientProvider

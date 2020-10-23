@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -74,10 +74,10 @@ public class CobolLineReaderImpl implements CobolLineReader {
     this.delegate = delegate;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public ResultWithErrors<List<CobolLine>> processLines(
-      @Nonnull String documentURI, @Nonnull String lines) {
+      @NonNull String documentURI, @NonNull String lines) {
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     List<CobolLine> result = new ArrayList<>();
     try (Scanner scanner = new Scanner(lines)) {
@@ -101,9 +101,9 @@ public class CobolLineReaderImpl implements CobolLineReader {
     return new ResultWithErrors<>(result, accumulatedErrors);
   }
 
-  @Nonnull
+  @NonNull
   private ResultWithErrors<CobolLine> parseLine(
-      @Nonnull String line, @Nonnull String uri, int lineNumber) {
+      @NonNull String line, @NonNull String uri, int lineNumber) {
     CobolLine cobolLine = new CobolLine();
 
     List<SyntaxError> errors = new ArrayList<>();
@@ -150,9 +150,9 @@ public class CobolLineReaderImpl implements CobolLineReader {
                         INDICATOR_AREA_INDEX + 1))));
   }
 
-  @Nonnull
+  @NonNull
   private SyntaxError createError(
-      @Nonnull String uri, @Nonnull String message, int lineNumber, int start, int stop) {
+      @NonNull String uri, @NonNull String message, int lineNumber, int start, int stop) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .suggestion(message)

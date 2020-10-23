@@ -35,7 +35,7 @@ import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,10 +78,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private Map<Token, Locality> positionMapping;
 
   public CobolVisitor(
-      @Nonnull String documentUri,
-      @Nonnull NamedSubContext copybooks,
-      @Nonnull CommonTokenStream tokenStream,
-      @Nonnull Map<Token, Locality> positionMapping) {
+      @NonNull String documentUri,
+      @NonNull NamedSubContext copybooks,
+      @NonNull CommonTokenStream tokenStream,
+      @NonNull Map<Token, Locality> positionMapping) {
     this.copybooks = copybooks;
     this.positionMapping = positionMapping;
     this.tokenStream = tokenStream;
@@ -94,7 +94,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
    * @return the semantic context of the document, containing all the definitions and usages of
    *     paragraphs, variables and copybooks
    */
-  @Nonnull
+  @NonNull
   public SemanticContext getSemanticContext() {
     return new SemanticContext(
         variables.getDefinitions().asMap(),
@@ -420,15 +420,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     return visitChildren(ctx);
   }
 
-  private void defineVariable(String level, String name, @Nonnull Location location) {
+  private void defineVariable(String level, String name, @NonNull Location location) {
     variables.define(new Variable(level, name), location);
   }
 
-  private void addVariableUsage(String name, @Nonnull Location location) {
+  private void addVariableUsage(String name, @NonNull Location location) {
     addUsage(constants.contains(name) ? constants : variables, name, location);
   }
 
-  private void addUsage(SubContext<?> langContext, String name, @Nonnull Location location) {
+  private void addUsage(SubContext<?> langContext, String name, @NonNull Location location) {
     langContext.addUsage(name.toUpperCase(), location);
   }
 
@@ -515,7 +515,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     }
   }
 
-  private void throwException(String wrongToken, @Nonnull Locality locality, String message) {
+  private void throwException(String wrongToken, @NonNull Locality locality, String message) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .locality(locality)
@@ -533,7 +533,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     return ofNullable(positionMapping.get(childToken));
   }
 
-  private void checkVariableDefinition(String name, @Nonnull Locality locality) {
+  private void checkVariableDefinition(String name, @NonNull Locality locality) {
     if (!variables.contains(name) && !constants.contains(name)) {
       reportVariableNotDefined(name, locality, locality); // starts and finishes in one token
     }

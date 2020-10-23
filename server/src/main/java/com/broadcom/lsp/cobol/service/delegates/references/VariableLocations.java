@@ -17,26 +17,26 @@ package com.broadcom.lsp.cobol.service.delegates.references;
 import com.broadcom.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.Location;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 import java.util.Map;
 
 /** This class is a provider for locations of variables defined and/or used in the document */
 public class VariableLocations implements SemanticLocations {
-  @Nonnull
+  @NonNull
   @Override
-  public Map<String, List<Location>> references(@Nonnull CobolDocumentModel document) {
+  public Map<String, List<Location>> references(@NonNull CobolDocumentModel document) {
     return document.getAnalysisResult().getVariableUsages();
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Map<String, List<Location>> definitions(@Nonnull CobolDocumentModel document) {
+  public Map<String, List<Location>> definitions(@NonNull CobolDocumentModel document) {
     return document.getAnalysisResult().getVariableDefinitions();
   }
 
   @Override
-  public boolean containsToken(@Nonnull CobolDocumentModel document, @Nonnull String token) {
+  public boolean containsToken(@NonNull CobolDocumentModel document, @NonNull String token) {
     return document.getAnalysisResult().getVariableDefinitions().keySet().stream()
         .anyMatch(token::equalsIgnoreCase);
   }

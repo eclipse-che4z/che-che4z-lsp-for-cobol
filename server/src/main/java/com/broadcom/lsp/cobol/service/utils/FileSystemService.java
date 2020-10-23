@@ -15,7 +15,7 @@
 
 package com.broadcom.lsp.cobol.service.utils;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -34,7 +34,7 @@ public interface FileSystemService {
    * @throws IllegalArgumentException if the URI of WorkspaceFolder is not valid
    */
   @Nullable
-  Path getPathFromURI(@Nonnull String uri);
+  Path getPathFromURI(@NonNull String uri);
 
   /**
    * This method extracts the name of a file from a valid {@link URI} and return the name back to
@@ -45,7 +45,7 @@ public interface FileSystemService {
    *     caught.
    */
   @Nullable
-  String getNameFromURI(@Nonnull String uri);
+  String getNameFromURI(@NonNull String uri);
 
   /**
    * Retrieve the content of the file as a string.
@@ -54,7 +54,7 @@ public interface FileSystemService {
    * @return content of the file as String representation
    */
   @Nullable
-  String getContentByPath(@Nonnull Path file);
+  String getContentByPath(@NonNull Path file);
 
   /**
    * Check if the file with the given path exists
@@ -71,6 +71,6 @@ public interface FileSystemService {
    * @param uri provided by the {@link org.eclipse.lsp4j.services.TextDocumentService}
    * @return a new String decoded with UTF8
    */
-  @Nonnull
-  String decodeURI(@Nonnull String uri);
+  @NonNull
+  String decodeURI(@NonNull String uri);
 }

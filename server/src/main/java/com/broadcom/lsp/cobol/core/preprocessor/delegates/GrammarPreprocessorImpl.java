@@ -24,7 +24,7 @@ import com.google.inject.Inject;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.Deque;
 
 /**
@@ -40,13 +40,13 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
     this.listenerFactory = listenerFactory;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public ResultWithErrors<ExtendedDocument> buildExtendedDocument(
-      @Nonnull String uri,
-      @Nonnull String code,
-      @Nonnull Deque<CopybookUsage> copybookStack,
-      @Nonnull CopybookProcessingMode copybookProcessingMode) {
+      @NonNull String uri,
+      @NonNull String code,
+      @NonNull Deque<CopybookUsage> copybookStack,
+      @NonNull CopybookProcessingMode copybookProcessingMode) {
     Lexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     lexer.removeErrorListeners();
 

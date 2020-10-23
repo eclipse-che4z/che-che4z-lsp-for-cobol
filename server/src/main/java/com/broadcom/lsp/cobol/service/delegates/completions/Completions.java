@@ -24,7 +24,7 @@ import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.MarkupContent;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
@@ -69,9 +69,9 @@ public class Completions {
    *     document
    * @return a CompletionList with completion suggestions that do not contain documentation
    */
-  @Nonnull
+  @NonNull
   public CompletionList collectFor(
-      @Nullable CobolDocumentModel document, @Nonnull CompletionParams params) {
+      @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
     return new CompletionList(true, collectCompletions(document, params));
   }
 
@@ -83,8 +83,8 @@ public class Completions {
    * @param unresolved - CompletionItem to be resolved
    * @return the given CompletionItem with resolved documentation
    */
-  @Nonnull
-  public CompletionItem resolveDocumentationFor(@Nonnull CompletionItem unresolved) {
+  @NonNull
+  public CompletionItem resolveDocumentationFor(@NonNull CompletionItem unresolved) {
     unresolved.setDocumentation(
         wrapWithMarkup(
             providers.stream()
@@ -96,7 +96,7 @@ public class Completions {
     return unresolved;
   }
 
-  @Nonnull
+  @NonNull
   private MarkupContent wrapWithMarkup(@Nullable String desc) {
     MarkupContent markupContent = new MarkupContent();
     markupContent.setKind("markdown");
@@ -104,9 +104,9 @@ public class Completions {
     return markupContent;
   }
 
-  @Nonnull
+  @NonNull
   private List<CompletionItem> collectCompletions(
-      @Nullable CobolDocumentModel document, @Nonnull CompletionParams params) {
+      @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
     String token = retrieveToken(document, params);
     return providers
         .parallelStream()
@@ -118,9 +118,9 @@ public class Completions {
         .collect(Collectors.toList());
   }
 
-  @Nonnull
+  @NonNull
   private String retrieveToken(
-      @Nullable CobolDocumentModel document, @Nonnull CompletionParams params) {
+      @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
     return Optional.ofNullable(document)
         .map(it -> it.getTokenBeforePosition(params.getPosition()))
         .orElse("");
@@ -132,13 +132,13 @@ public class Completions {
    * @param token - The string that the checking string should start with
    * @return Predicate that may be used in Stream.filter()
    */
-  @Nonnull
-  private Predicate<String> startsWithIgnoreCase(@Nonnull String token) {
+  @NonNull
+  private Predicate<String> startsWithIgnoreCase(@NonNull String token) {
     return word -> word.regionMatches(true, 0, token, 0, token.length());
   }
 
-  @Nonnull
-  private Function<String, CompletionItem> convertToCompletionItem(@Nonnull Completion it) {
+  @NonNull
+  private Function<String, CompletionItem> convertToCompletionItem(@NonNull Completion it) {
     return word -> {
       CompletionItem item = new CompletionItem();
       item.setLabel(word);

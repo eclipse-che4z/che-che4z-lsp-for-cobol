@@ -17,7 +17,7 @@ package com.broadcom.lsp.cobol.core.preprocessor.delegates.reader;
 import com.broadcom.lsp.cobol.core.model.CobolLine;
 import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 
 /**
@@ -32,6 +32,6 @@ public interface CobolLineReader {
    * @param lines - a String to be converted into CobolLine list
    * @return List of COBOL lines with a list of errors if found, or an empty list
    */
-  @Nonnull
-  ResultWithErrors<List<CobolLine>> processLines(@Nonnull String uri, @Nonnull String lines);
+  @NonNull
+  ResultWithErrors<List<CobolLine>> processLines(@NonNull String uri, @NonNull String lines);
 }

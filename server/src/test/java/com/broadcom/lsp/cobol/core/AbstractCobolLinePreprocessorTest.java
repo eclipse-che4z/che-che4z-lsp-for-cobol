@@ -25,7 +25,7 @@ public abstract class AbstractCobolLinePreprocessorTest {
 
   protected ResultWithErrors<List<CobolLine>> processText(String text) {
     CobolLineReader reader = new CobolLineReaderImpl(line -> line);
-    return reader.processLines(null, text);
+    return reader.processLines("", text);
   }
 
   protected String reduceLines(List<String> lines) {
