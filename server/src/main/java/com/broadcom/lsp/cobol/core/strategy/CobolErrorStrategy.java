@@ -16,6 +16,7 @@ package com.broadcom.lsp.cobol.core.strategy;
 
 import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -23,6 +24,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import java.util.MissingResourceException;
 
 @Slf4j
+@Singleton
 public class CobolErrorStrategy extends DefaultErrorStrategy {
 
   private static final String REPORT_INPUT_MISMATCH = "reportInputMismatch";

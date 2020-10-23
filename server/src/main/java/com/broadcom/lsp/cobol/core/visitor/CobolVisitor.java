@@ -68,7 +68,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private CommonTokenStream tokenStream;
   private OutlineTreeBuilder outlineTreeBuilder;
   private Map<Token, Locality> positionMapping;
-  private final MessageService messageService;
+  private MessageService messageService;
 
   public CobolVisitor(
       @Nonnull String documentUri,

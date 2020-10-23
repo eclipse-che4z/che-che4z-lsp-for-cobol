@@ -47,7 +47,7 @@ public class ServerCommunications implements Communications {
 
   private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(5);
   private final Set<String> uriInProgress = new HashSet<>();
-  private final MessageService messageService;
+  private MessageService messageService;
   private Provider<LanguageClient> provider;
   private FileSystemService files;
 

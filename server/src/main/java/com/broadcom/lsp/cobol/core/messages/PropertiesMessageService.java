@@ -14,8 +14,8 @@ import java.util.ResourceBundle;
 @Singleton
 public class PropertiesMessageService implements MessageService {
 
-  private final String baseName;
-  private final LocaleStore localeStore;
+  private String baseName;
+  private LocaleStore localeStore;
   private ResourceBundle resourceBundle;
 
   @Inject

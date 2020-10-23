@@ -54,8 +54,8 @@ import static java.util.stream.Collectors.toList;
 public class CobolLanguageEngine {
 
   private TextPreprocessor preprocessor;
-  private final DefaultErrorStrategy defaultErrorStrategy;
-  private final MessageService messageService;
+  private DefaultErrorStrategy defaultErrorStrategy;
+  private MessageService messageService;
 
   @Inject
   public CobolLanguageEngine(TextPreprocessor preprocessor, DefaultErrorStrategy defaultErrorStrategy, MessageService messageService) {

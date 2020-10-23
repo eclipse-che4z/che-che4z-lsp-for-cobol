@@ -35,8 +35,8 @@ import java.util.function.Consumer;
  * Concrete implementation for {@link LocaleStore}
  *
  * <p>* Stores the locale for entire application and is single point of contact for all locale
- * related * issues. This class update application locale, notify subscriber in case of locale
- * update and * returns currently set locale.
+ * related issues. This class update application locale, notify subscriber in case of locale update
+ * and returns currently set locale.
  */
 @Slf4j
 @Singleton
@@ -88,7 +88,7 @@ public final class LocaleStoreImpl implements LocaleStore {
   @Override
   public void updateLocale(String locale) {
     try {
-      LocaleEnum localeEnum = Enum.valueOf(LocaleEnum.class, locale.toUpperCase());
+      LocaleEnum localeEnum = LocaleEnum.valueOf(locale.toUpperCase());
       setSupportedLocale(localeEnum);
       Locale updatedLocale = new Locale(locale);
       notifyList.forEach(consumer -> consumer.accept(updatedLocale));

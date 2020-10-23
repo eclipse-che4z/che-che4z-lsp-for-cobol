@@ -71,7 +71,7 @@ public class CobolTextDocumentService
   private final Map<String, CobolDocumentModel> docs = new ConcurrentHashMap<>();
   private final Map<String, CompletableFuture<List<DocumentSymbol>>> outlineMap =
       new ConcurrentHashMap<>();
-  private final MessageService messageService;
+  private MessageService messageService;
   private Communications communications;
   private LanguageEngineFacade engine;
   private Formations formations;

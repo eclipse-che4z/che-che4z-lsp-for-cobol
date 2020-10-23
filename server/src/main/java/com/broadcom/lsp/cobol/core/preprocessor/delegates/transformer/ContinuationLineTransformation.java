@@ -48,7 +48,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private static final Pattern CONTINUATION_LINE_PATTERN =
       Pattern.compile(ProcessingConstants.CONT_LINE_NO_AREA_A_REGEX);
 
-  private final MessageService messageService;
+  private MessageService messageService;
 
   @Inject
   public ContinuationLineTransformation(MessageService messageService) {

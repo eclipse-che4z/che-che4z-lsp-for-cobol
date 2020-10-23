@@ -66,8 +66,8 @@ public class CobolLineReaderImpl implements CobolLineReader {
           " ",
           NORMAL);
 
-  private final CobolLineReaderDelegate delegate;
-  private final MessageService messageService;
+  private CobolLineReaderDelegate delegate;
+  private MessageService messageService;
 
   @Inject
   public CobolLineReaderImpl(CobolLineReaderDelegate delegate, MessageService messageService) {

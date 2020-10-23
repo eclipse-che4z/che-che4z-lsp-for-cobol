@@ -57,9 +57,6 @@ public class ServiceModule extends AbstractModule {
     bind(SettingsService.class).to(SettingsServiceImpl.class);
     bind(WatcherService.class).to(WatcherServiceImpl.class);
     bind(FileSystemService.class).to(WorkspaceFileService.class);
-    bind(LocaleStore.class).to(LocaleStoreImpl.class);
-    bind(MessageService.class).to(PropertiesMessageService.class);
-    bind(String.class).annotatedWith(named("resourceFileLocation")).toInstance("message/messages");
 
     bindFormations();
     bindCompletions();

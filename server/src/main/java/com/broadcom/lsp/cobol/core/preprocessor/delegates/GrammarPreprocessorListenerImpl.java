@@ -78,7 +78,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private CopybookService copybookService;
   private Deque<CopybookUsage> copybookStack;
   private ReplacingService replacingService;
-  private final MessageService messageService;
+  private MessageService messageService;
 
   @Inject
   GrammarPreprocessorListenerImpl(
