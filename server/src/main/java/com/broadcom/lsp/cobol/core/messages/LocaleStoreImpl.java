@@ -65,10 +65,10 @@ public final class LocaleStoreImpl implements LocaleStore {
     try {
       if (Objects.isNull(supportedLocale))
         supportedLocale = Enum.valueOf(LocaleEnum.class, defaultLocale.getCountry().toUpperCase());
-      return supportedLocale;
     } finally {
       readLock.unlock();
     }
+    return supportedLocale;
   }
 
   private void setSupportedLocale(LocaleEnum supportedLocale) {
