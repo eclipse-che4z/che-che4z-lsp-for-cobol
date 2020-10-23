@@ -92,6 +92,6 @@ class LocaleStoreImplTest {
   @Test
   void testSubscribeToLocaleChange() {
     Assertions.assertDoesNotThrow(() -> localeStore.subscribeToLocaleChange(System.out::println));
-    Assertions.assertDoesNotThrow(() -> localeStore.updateLocale("fr"));
+    Assertions.assertDoesNotThrow(() -> localeStore.updateLocale("en"));
   }
 }
