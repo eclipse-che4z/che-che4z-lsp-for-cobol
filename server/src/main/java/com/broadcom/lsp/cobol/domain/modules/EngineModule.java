@@ -65,7 +65,7 @@ public class EngineModule extends AbstractModule {
     bind(MessageService.class).to(PropertiesMessageService.class);
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
-    bind(String.class).annotatedWith(named("resourceFileLocation")).toInstance("message/messages");
+    bind(String.class).annotatedWith(named("resourceFileLocation")).toInstance("resourceBundles/messages");
 
 
     bind(CobolLineReWriter.class)

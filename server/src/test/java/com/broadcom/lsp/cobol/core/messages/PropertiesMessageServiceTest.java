@@ -34,7 +34,7 @@ class PropertiesMessageServiceTest {
   public void beforeAll() {
     localeMock = mock(LocaleStore.class);
     when(localeMock.getApplicationLocale()).thenReturn(Locale.ENGLISH);
-    messageService = new PropertiesMessageService("message/test", localeMock);
+    messageService = new PropertiesMessageService("resourceBundles/test", localeMock);
   }
 
   @Test
@@ -49,7 +49,7 @@ class PropertiesMessageServiceTest {
   @Test
   void whenValidMessageTemplateProvideFR_getFormattedMessage() {
     when(localeMock.getApplicationLocale()).thenReturn(Locale.FRENCH);
-    MessageService messageServiceFR = new PropertiesMessageService("message/test", localeMock);
+    MessageService messageServiceFR = new PropertiesMessageService("resourceBundles/test", localeMock);
     assertEquals("French test selected.", messageServiceFR.getMessage("1"));
 
     assertEquals(
@@ -66,14 +66,14 @@ class PropertiesMessageServiceTest {
   @Test
   void whenEmptyMessageTemplateProvided_getException() {
     MessageService messageServiceLocal =
-        new PropertiesMessageService("message/Test_messageServiceEmptyFile", localeMock);
+        new PropertiesMessageService("resourceBundles/Test_messageServiceEmptyFile", localeMock);
     Assertions.assertThrows(
         MissingResourceException.class, () -> messageServiceLocal.getMessage("1"));
   }
 
   @Test
   void whenMultipleMsgServiceExist_thenSupportDuplicateKeys() {
-    MessageService messageService1 = new PropertiesMessageService("message/test-2", localeMock);
+    MessageService messageService1 = new PropertiesMessageService("resourceBundles/test-2", localeMock);
     final String formattedMessage = messageService1.getMessage("1", localeMock);
     assertEquals("This is a duplicate key test for diff msg service.", formattedMessage);
   }

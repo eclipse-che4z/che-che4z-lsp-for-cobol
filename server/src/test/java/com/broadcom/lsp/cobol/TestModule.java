@@ -63,7 +63,7 @@ public class TestModule extends AbstractModule {
         .toProvider(() -> ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(MessageService.class).to(PropertiesMessageService.class);
-    bind(String.class).annotatedWith(named("resourceFileLocation")).toInstance("message/messages");
+    bind(String.class).annotatedWith(named("resourceFileLocation")).toInstance("resourceBundles/messages");
 
     bind(SettingsService.class).to(SettingsServiceImpl.class);
 
