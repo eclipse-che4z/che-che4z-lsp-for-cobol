@@ -21,6 +21,7 @@ import com.broadcom.lsp.cobol.core.model.CobolLine;
 import com.google.common.collect.Lists;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

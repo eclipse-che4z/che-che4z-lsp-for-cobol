@@ -15,8 +15,8 @@
 
 package com.broadcom.lsp.cobol.service;
 
-import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.ConfigurableTest;
+import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -62,12 +62,6 @@ class CompletionResolutionTest extends ConfigurableTest {
   @Test
   void testResolveCompletionItemNonExisting() {
     CompletionItem unresolved = new CompletionItem("abcd");
-    checkResolving(unresolved, c -> assertNull(c.getValue()));
-  }
-
-  @Test
-  void testResolveCompletionItemEmpty() {
-    CompletionItem unresolved = new CompletionItem();
     checkResolving(unresolved, c -> assertNull(c.getValue()));
   }
 

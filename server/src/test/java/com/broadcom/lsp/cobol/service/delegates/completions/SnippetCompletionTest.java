@@ -17,6 +17,7 @@ package com.broadcom.lsp.cobol.service.delegates.completions;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.InsertTextFormat;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +55,11 @@ class SnippetCompletionTest {
 
   @Test
   void testTryResolveNull() {
-    assertNull(provider.tryResolve(null));
+    Assertions.assertThrows(
+            IllegalArgumentException.class,
+        () -> {
+          provider.tryResolve(null);
+        });
   }
 
   @Test
