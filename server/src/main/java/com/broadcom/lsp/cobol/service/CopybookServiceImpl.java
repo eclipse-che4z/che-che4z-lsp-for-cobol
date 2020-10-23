@@ -25,9 +25,9 @@ import com.google.gson.JsonPrimitive;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import lombok.NonNull;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -111,14 +111,19 @@ public class CopybookServiceImpl implements CopybookService {
   private CopybookModel resolveSync(
       @NonNull String copybookName,
       @NonNull String documentUri,
-      @NonNull CopybookProcessingMode copybookProcessingMode)
-      throws ExecutionException, InterruptedException {
+      @NonNull CopybookProcessingMode copybookProcessingMode) {
     String cobolFileName = files.getNameFromURI(documentUri);
-    String uri =
-        retrieveURI(
-            settingsService
-                .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
-                .get());
+    String uri;
+    try {
+      uri =
+          retrieveURI(
+              settingsService
+                  .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
+                  .get());
+    } catch (InterruptedException | ExecutionException e) {
+      LOG.error("Error resolving copybook name: ", e);
+      return new CopybookModel(copybookName, null, null);
+    }
     if (uri.isEmpty()) {
       if (copybookProcessingMode.download) {
         copybooksForDownloading
