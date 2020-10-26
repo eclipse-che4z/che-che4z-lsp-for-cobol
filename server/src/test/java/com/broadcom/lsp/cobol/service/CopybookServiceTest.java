@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 
 import static com.broadcom.lsp.cobol.domain.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
 import static com.broadcom.lsp.cobol.service.CopybookProcessingMode.*;
@@ -272,6 +273,19 @@ class CopybookServiceTest {
     verify(settingsService, times(1))
         .getConfigurations(
             asList("copybook-download.quiet.document.nested", "copybook-download.quiet.document.INVALID"));
+  }
+
+  /**
+   * Test the service will work correctly in case the middleware throw an error.
+   */
+  @Test
+  void testResolveGetsStubWhenConfigurationThrowAnError() {
+    when(settingsService.getConfiguration("copybook-resolve", "document", VALID_CPY_NAME))
+        .thenReturn(CompletableFuture.failedFuture(new NullPointerException()));
+    CopybookService copybookService = createCopybookService();
+    CopybookModel copybookModel = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, ENABLED);
+
+    assertEquals(new CopybookModel(VALID_CPY_NAME, null, null), copybookModel);
   }
 
   private CopybookService createCopybookService() {
