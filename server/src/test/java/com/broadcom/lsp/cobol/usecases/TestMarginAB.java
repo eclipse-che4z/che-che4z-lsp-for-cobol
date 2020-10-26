@@ -148,13 +148,13 @@ class TestMarginAB {
   @Test
   void checkForAreaA() {
     AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_AREA_A, List.of());
-    assertEquals(4, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
+    assertEquals(5, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
   }
 
   @Test
   void checkForAreaB() {
     AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_AREA_B, List.of());
-    assertEquals(4, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
+    assertEquals(5, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
   }
 
   @Test
