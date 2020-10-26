@@ -15,6 +15,7 @@
 package com.broadcom.lsp.cobol.service;
 
 import com.broadcom.lsp.cobol.core.messages.LocaleStore;
+import com.broadcom.lsp.cobol.core.messages.LogLevelUtils;
 import com.broadcom.lsp.cobol.core.model.ErrorCode;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.event.model.RunAnalysisEvent;
@@ -33,8 +34,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 import static com.broadcom.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
-import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.LOCALE;
-import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
+import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.runAsync;
@@ -105,6 +105,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
         .thenAccept(it -> acceptSettingsChange(settingsService.toStrings(it)));
 
     settingsService.getConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
+    settingsService.getConfiguration(LOGGING_LEVEL.label).thenAccept(LogLevelUtils.updateLogLevel());
   }
 
   private void acceptSettingsChange(List<String> localFolders) {
