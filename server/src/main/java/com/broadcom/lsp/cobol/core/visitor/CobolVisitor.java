@@ -17,6 +17,7 @@ package com.broadcom.lsp.cobol.core.visitor;
 
 import com.broadcom.lsp.cobol.core.CobolParser;
 import com.broadcom.lsp.cobol.core.CobolParserBaseVisitor;
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.ErrorSeverity;
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
@@ -76,16 +77,19 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private CommonTokenStream tokenStream;
   private OutlineTreeBuilder outlineTreeBuilder;
   private Map<Token, Locality> positionMapping;
+  private MessageService messageService;
 
   public CobolVisitor(
       @NonNull String documentUri,
       @NonNull NamedSubContext copybooks,
       @NonNull CommonTokenStream tokenStream,
-      @NonNull Map<Token, Locality> positionMapping) {
+      @NonNull Map<Token, Locality> positionMapping,
+      MessageService messageService) {
     this.copybooks = copybooks;
     this.positionMapping = positionMapping;
     this.tokenStream = tokenStream;
     outlineTreeBuilder = new OutlineTreeBuilder(documentUri, positionMapping);
+    this.messageService = messageService;
   }
 
   /**
@@ -581,7 +585,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void reportVariableNotDefined(String dataName, Locality start, Locality stop) {
     SyntaxError error =
         SyntaxError.syntaxError()
-            .suggestion(INVALID_DEF_MSG + dataName)
+            .suggestion(messageService.getMessage("CobolVisitor.invalidDefMsg", dataName))
             .severity(ErrorSeverity.INFO)
             .locality(getIntervalPosition(start, stop))
             .build();
@@ -601,7 +605,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     if (locality == null) return;
     SyntaxError error =
         SyntaxError.syntaxError()
-            .suggestion(MISSPELLED_WORD + suggestion)
+            .suggestion(messageService.getMessage("CobolVisitor.misspelledWord", suggestion))
             .severity(ErrorSeverity.WARNING)
             .locality(locality)
             .build();
@@ -612,7 +616,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void areaAWarning(Token token) {
     getLocality(token)
         .filter(it -> it.getRange().getStart().getCharacter() > 10)
-        .ifPresent(it -> throwException(token.getText(), it, AREA_A_WARNING_MSG));
+        .ifPresent(it -> throwException(token.getText(), it, messageService.getMessage("CobolVisitor.AreaAWarningMsg")));
   }
 
   private void areaBWarning(List<Token> tokenList) {
@@ -623,14 +627,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
                     locality -> {
                       int charPosition = locality.getRange().getStart().getCharacter();
                       if (charPosition > 6 && charPosition < 11 && token.getChannel() != 1) {
-                        throwException(token.getText(), locality, AREA_B_WARNING_MSG);
+                        throwException(token.getText(), locality, messageService.getMessage("CobolVisitor.AreaBWarningMsg"));
                       }
                     }));
   }
 
   private void checkProgramName(Token token) {
     if (programName == null) {
-      getLocality(token).ifPresent(it -> throwException("", it, PROGRAM_ID_ISSUE_MSG));
+      getLocality(token).ifPresent(it -> throwException("", it, messageService.getMessage("CobolVisitor.progIDIssueMsg")));
     } else {
       checkProgramNameIdentical(token);
     }
@@ -639,7 +643,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void checkProgramNameIdentical(Token token) {
     String text = PreprocessorStringUtils.trimQuotes(token.getText());
     if (!programName.equals(text)) {
-      getLocality(token).ifPresent(it -> throwException(programName, it, IDENTICAL_PROGRAM_MSG));
+      getLocality(token).ifPresent(it -> throwException(programName, it, messageService.getMessage("CobolVisitor.identicalProgMsg")));
     }
   }
 }

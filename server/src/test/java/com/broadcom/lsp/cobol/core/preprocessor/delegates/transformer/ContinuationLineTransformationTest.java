@@ -14,6 +14,7 @@
  */
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.transformer;
 
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.CobolLine;
 import com.broadcom.lsp.cobol.core.AbstractCobolLinePreprocessorTest;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 /** This test checks the continuation line transformation logic. */
 class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTest {
@@ -102,8 +104,8 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
 
   private List<SyntaxError> runTransformation(String text) {
     List<CobolLine> lines = convertToCobolLines(text);
-
-    ContinuationLineTransformation transformation = new ContinuationLineTransformation();
+    MessageService mockMessageService = mock(MessageService.class);
+    ContinuationLineTransformation transformation = new ContinuationLineTransformation(mockMessageService);
     return transformation.transformLines(null, lines).getErrors();
   }
 
