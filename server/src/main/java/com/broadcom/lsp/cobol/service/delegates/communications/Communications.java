@@ -15,6 +15,7 @@
 package com.broadcom.lsp.cobol.service.delegates.communications;
 
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.MessageType;
 
 import java.util.List;
 import java.util.Map;
@@ -31,4 +32,6 @@ public interface Communications {
   void notifyThatDocumentAnalysed(String uri);
 
   void notifyThatExtensionIsUnsupported(String extension);
+
+  void notifyGeneralMessage(MessageType messageType, String errorMessage);
 }

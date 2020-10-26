@@ -15,10 +15,10 @@
 
 package com.broadcom.lsp.cobol.service;
 
-import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
-import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.service.delegates.communications.Communications;
+import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
+import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.BeforeEach;
@@ -93,7 +93,12 @@ class DocumentExtensionTests {
   }
 
   private void fireDidOpen(String extension, String uri) {
-    TextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).build();
+    TextDocumentService service =
+        CobolTextDocumentService.builder()
+            .communications(communications)
+            .engine(engine)
+            .dataBus(broker)
+            .build();
     service.didOpen(new DidOpenTextDocumentParams(new TextDocumentItem(uri, extension, 0, TEXT)));
   }
 
@@ -101,7 +106,12 @@ class DocumentExtensionTests {
     List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
 
-    TextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).build();
+    TextDocumentService service =
+        CobolTextDocumentService.builder()
+            .communications(communications)
+            .engine(engine)
+            .dataBus(broker)
+            .build();
     service.didChange(
         new DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier(uri, 0), textEdits));
   }

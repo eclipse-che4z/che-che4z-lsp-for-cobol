@@ -14,30 +14,54 @@
  */
 package com.broadcom.lsp.cobol.core.strategy;
 
+import com.broadcom.lsp.cobol.core.messages.MessageService;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
+import java.util.MissingResourceException;
+
 @Slf4j
+@Singleton
 public class CobolErrorStrategy extends DefaultErrorStrategy {
 
-  private static final Messages customMessages = new Messages();
   private static final String REPORT_INPUT_MISMATCH = "reportInputMismatch";
   private static final String REPORT_NO_VIABLE_ALTERNATIVE = "reportNoViableAlternative";
   private static final String REPORT_UNWANTED_TOKEN = "reportUnwantedToken";
   private static final String REPORT_MISSING_TOKEN = "reportMissingToken";
 
-  private static String parseCustomMessage(String standardMsg, String methodName, String rule) {
-    String customMsg = customMessages.getValueForKey(rule.concat(methodName));
-    return checkIfMessageExist(standardMsg, customMsg);
+  private MessageService messageService;
+
+  @Inject
+  public CobolErrorStrategy(MessageService messageService) {
+    this.messageService = messageService;
   }
 
-  private static String checkIfMessageExist(String standardMsg, String customMsg) {
-    return (customMsg == null) ? standardMsg : customMsg;
+  // for test
+  public CobolErrorStrategy() {}
+
+  private static String getRule(Parser recognizer) {
+    return recognizer.getRuleInvocationStack().get(0);
+  }
+
+  private String parseCustomMessage(String methodName, String rule, String... params) {
+    String messageKey = "ErrorStrategy.".concat(rule.concat(methodName));
+    try {
+      return messageService.getMessage(messageKey, params);
+    } catch (MissingResourceException e1) {
+      return messageService.getMessage("ErrorStrategy.".concat(methodName), params);
+    }
   }
 
   private String getOffendingToken(InputMismatchException e) {
     return getTokenErrorDisplay(e.getOffendingToken());
+  }
+
+  // for test
+  public void setMessageService(MessageService messageService) {
+    this.messageService = messageService;
   }
 
   private String getExpectedToken(Parser recognizer, InputMismatchException e) {
@@ -47,14 +71,6 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     } else {
       return e.getExpectedTokens().toString(recognizer.getVocabulary());
     }
-  }
-
-  private static String getStandardMessage(String exceptionName) {
-    return customMessages.getValueForKey(exceptionName);
-  }
-
-  private static String getRule(Parser recognizer) {
-    return recognizer.getRuleInvocationStack().get(0);
   }
 
   @Override
@@ -81,11 +97,9 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
   @Override
   protected void reportInputMismatch(Parser recognizer, InputMismatchException e) {
     String msg =
-        String.format(
-            parseCustomMessage(
-                getStandardMessage(REPORT_INPUT_MISMATCH),
-                REPORT_INPUT_MISMATCH,
-                getRule(recognizer)),
+        parseCustomMessage(
+            REPORT_INPUT_MISMATCH,
+            getRule(recognizer),
             getOffendingToken(e),
             getExpectedToken(recognizer, e));
     recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
@@ -101,14 +115,8 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     } else {
       input = "<unknown input>";
     }
-    String msg =
-        String.format(
-            parseCustomMessage(
-                getStandardMessage(REPORT_NO_VIABLE_ALTERNATIVE),
-                REPORT_NO_VIABLE_ALTERNATIVE,
-                getRule(recognizer)),
-            input,
-            null);
+
+    String msg = parseCustomMessage(REPORT_NO_VIABLE_ALTERNATIVE, getRule(recognizer), input);
     recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
   }
 
@@ -121,11 +129,9 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     Token t = recognizer.getCurrentToken();
     String tokenName = getTokenErrorDisplay(t);
     String msg =
-        String.format(
-            parseCustomMessage(
-                getStandardMessage(REPORT_UNWANTED_TOKEN),
-                REPORT_UNWANTED_TOKEN,
-                getRule(recognizer)),
+        parseCustomMessage(
+            REPORT_UNWANTED_TOKEN,
+            getRule(recognizer),
             tokenName,
             getExpectedToken(recognizer, null));
     recognizer.notifyErrorListeners(t, msg, null);
@@ -140,11 +146,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     Token t = recognizer.getCurrentToken();
     String rule = getRule(recognizer);
     String msg =
-        String.format(
-            parseCustomMessage(
-                getStandardMessage(REPORT_MISSING_TOKEN), REPORT_MISSING_TOKEN, rule),
-            getExpectedToken(recognizer, null),
-            rule);
+        parseCustomMessage(REPORT_MISSING_TOKEN, rule, getExpectedToken(recognizer, null), rule);
     recognizer.notifyErrorListeners(t, msg, null);
   }
 }

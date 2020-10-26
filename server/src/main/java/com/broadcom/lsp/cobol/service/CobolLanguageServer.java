@@ -14,6 +14,7 @@
  */
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.core.messages.LocaleStore;
 import com.broadcom.lsp.cobol.core.model.ErrorCode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -27,6 +28,7 @@ import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
+import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.LOCALE;
 import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
@@ -47,17 +49,20 @@ public class CobolLanguageServer implements LanguageServer {
   private WorkspaceService workspaceService;
   private WatcherService watchingService;
   private SettingsService settingsService;
+  private LocaleStore localeStore;
 
   @Inject
   CobolLanguageServer(
       TextDocumentService textService,
       WorkspaceService workspaceService,
       WatcherService watchingService,
-      SettingsService settingsService) {
+      SettingsService settingsService,
+      LocaleStore localeStore) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
     this.settingsService = settingsService;
+    this.localeStore = localeStore;
   }
 
   @Override
@@ -105,6 +110,11 @@ public class CobolLanguageServer implements LanguageServer {
     watchingService.watchConfigurationChange();
     watchingService.watchPredefinedFolder();
     addLocalFilesWatcher();
+    getLocaleFromClient();
+  }
+
+  private void getLocaleFromClient() {
+    settingsService.getConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
   }
 
   @Override

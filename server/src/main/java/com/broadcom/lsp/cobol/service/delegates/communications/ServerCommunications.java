@@ -15,6 +15,7 @@
 
 package com.broadcom.lsp.cobol.service.delegates.communications;
 
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -44,21 +45,18 @@ import static org.eclipse.lsp4j.MessageType.Info;
 @Slf4j
 public class ServerCommunications implements Communications {
 
-  static final String CANNOT_FIND_LANGUAGE_ENGINE = "Cannot find a language engine for the given language ID: ";
-  static final String SYNTAX_ANALYSIS_IN_PROGRESS = ": Syntax analysis in progress";
-  static final String NO_SYNTAX_ERRORS = "No syntax errors detected in ";
-  static final String EXTENSION_UNSUPPORTED = "The given document extension is unsupported: ";
-
+  private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(5);
+  private final Set<String> uriInProgress = new HashSet<>();
+  private MessageService messageService;
   private Provider<LanguageClient> provider;
   private FileSystemService files;
 
-  private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(5);
-  private final Set<String> uriInProgress = new HashSet<>();
-
   @Inject
-  public ServerCommunications(Provider<LanguageClient> provider, FileSystemService files) {
+  public ServerCommunications(
+      Provider<LanguageClient> provider, FileSystemService files, MessageService messageService) {
     this.provider = provider;
     this.files = files;
+    this.messageService = messageService;
   }
 
   /**
@@ -72,7 +70,7 @@ public class ServerCommunications implements Communications {
     runAsync(
         () ->
             showMessage(
-                Error, CANNOT_FIND_LANGUAGE_ENGINE + languageType));
+                Error, messageService.getMessage("Communications.noLangEngine", languageType)));
   }
 
   /**
@@ -88,7 +86,10 @@ public class ServerCommunications implements Communications {
     executor.schedule(
         () -> {
           if (uriInProgress.remove(decodedUri)) {
-            showMessage(Info, retrieveFileName(decodedUri) + SYNTAX_ANALYSIS_IN_PROGRESS);
+            showMessage(
+                Info,
+                messageService.getMessage(
+                    "Communications.syntaxAnalysisInProgress", retrieveFileName(decodedUri)));
           }
         },
         3,
@@ -105,7 +106,9 @@ public class ServerCommunications implements Communications {
     runAsync(
         () ->
             logMessage(
-                Info, NO_SYNTAX_ERRORS + retrieveFileName(files.decodeURI(uri))));
+                Info,
+                messageService.getMessage(
+                    "Communications.noSyntaxError", retrieveFileName(files.decodeURI(uri)))));
   }
 
   /**
@@ -115,7 +118,21 @@ public class ServerCommunications implements Communications {
    */
   @Override
   public void notifyThatExtensionIsUnsupported(String extension) {
-    runAsync(() -> logMessage(Error, EXTENSION_UNSUPPORTED + extension));
+    runAsync(
+        () ->
+            logMessage(
+                Error, messageService.getMessage("Communications.extUnsupported", extension)));
+  }
+
+  /**
+   * show a supplied message to the client with the supplied {@link MessageType}
+   *
+   * @param messageType {@link MessageType}
+   * @param message to be displayed at client end.
+   */
+  @Override
+  public void notifyGeneralMessage(MessageType messageType, String message) {
+    runAsync(() -> showMessage(messageType, message));
   }
 
   /**

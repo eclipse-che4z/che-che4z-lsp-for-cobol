@@ -14,9 +14,10 @@
  */
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.transformer;
 
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.*;
-import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
+import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp4j.Position;
@@ -46,6 +47,13 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private static final int END_INDEX_CONTENT_AREA_A = 10;
   private static final Pattern CONTINUATION_LINE_PATTERN =
       Pattern.compile(ProcessingConstants.CONT_LINE_NO_AREA_A_REGEX);
+
+  private MessageService messageService;
+
+  @Inject
+  public ContinuationLineTransformation(MessageService messageService) {
+    this.messageService = messageService;
+  }
 
   @Override
   public ResultWithErrors<List<CobolLine>> transformLines(
@@ -179,13 +187,11 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
                             new Position(lineNumber - 1, cobolLineTrimmedLength + 1)))
                     .recognizer(ContinuationLineTransformation.class)
                     .build())
-            .suggestion("IGYDS1082-E A period was required.")
+            .suggestion(messageService.getMessage("ContinuationLineTransformation.periodRequired"))
             .severity(ERROR)
             .build();
 
-    LOG.debug(
-        "Syntax error by ContinuationLineTransformation#registerStringClosingError: "
-            + error.toString());
+    LOG.debug("Syntax error by ContinuationLineTransformation#registerStringClosingError: {}", error.toString());
     return error;
   }
 
@@ -202,12 +208,12 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
                             new Position(lineNumber - 1, END_INDEX_CONTENT_AREA_A)))
                     .recognizer(ContinuationLineTransformation.class)
                     .build())
-            .suggestion("A continuation line cannot contain values in the Content Area A")
+            .suggestion(
+                messageService.getMessage(
+                    "ContinuationLineTransformation.continuationLineContentAreaA"))
             .severity(ERROR)
             .build();
-    LOG.debug(
-        "Syntax error by ContinuationLineTransformation#registerContinuationLineError: "
-            + error.toString());
+    LOG.debug("Syntax error by ContinuationLineTransformation#registerContinuationLineError: {}", error.toString());
     return error;
   }
 }
