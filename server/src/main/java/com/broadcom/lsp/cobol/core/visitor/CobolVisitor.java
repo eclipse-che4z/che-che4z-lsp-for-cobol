@@ -27,7 +27,8 @@ import com.broadcom.lsp.cobol.core.semantics.*;
 import com.broadcom.lsp.cobol.core.semantics.outline.NodeType;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineTreeBuilder;
-import lombok.Getter;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RuleContext;
@@ -37,10 +38,9 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
 import lombok.NonNull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.broadcom.lsp.cobol.core.CobolParser.*;
 import static com.broadcom.lsp.cobol.core.semantics.CobolVariableContext.LEVEL_77;
@@ -55,19 +55,15 @@ import static java.util.stream.Collectors.joining;
  */
 @Slf4j
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {
-  private static final String AREA_A_WARNING_MSG = "The following token must start in Area A: ";
-  private static final String AREA_B_WARNING_MSG = "The following token must start in Area B: ";
-  private static final String IDENTICAL_PROGRAM_MSG =
-      "Program-name must be identical to the program-name of the corresponding PROGRAM-ID paragraph: ";
   private static final String DECLARATIVE_SAME_MSG =
       "The following token cannot be on the same line as a DECLARATIVE token: ";
-  private static final String INVALID_DEF_MSG = "Invalid definition for: ";
-  private static final String MISSPELLED_WORD = "A misspelled word, maybe you want to put ";
-  private static final String PROGRAM_ID_ISSUE_MSG = "There is an issue with PROGRAM-ID paragraph";
 
-  @Getter private List<SyntaxError> errors = new ArrayList<>();
+  private List<SyntaxError> errors = new ArrayList<>();
 
   private SubContext<String> paragraphs = new NamedSubContext();
+  private Multimap<String, Locality> paragraphUsageLocalities = HashMultimap.create();
+  private Multimap<String, Locality> paragraphDefinitionLocalities = HashMultimap.create();
+
   private CobolVariableContext variables = new CobolVariableContext();
   private PredefinedVariableContext constants = new PredefinedVariableContext();
 
@@ -110,6 +106,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
         copybooks.getDefinitions().asMap(),
         copybooks.getUsages().asMap(),
         buildOutlineTree());
+  }
+
+  @NonNull
+  public List<SyntaxError> getErrors() {
+    List<SyntaxError> result = new ArrayList<>(errors);
+    result.addAll(generateParagraphErrors());
+
+    return result;
   }
 
   @Override
@@ -190,6 +194,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   public Class visitProcedureSection(ProcedureSectionContext ctx) {
     throwWarning(ctx.getStart());
     outlineTreeBuilder.addNode(ctx.getStart().getText(), NodeType.PROCEDURE_SECTION, ctx);
+
+    String name = ctx.getStart().getText().toUpperCase();
+    getLocality(ctx.getStart())
+        .ifPresent(locality -> paragraphDefinitionLocalities.put(name, locality));
     return visitChildren(ctx);
   }
 
@@ -329,9 +337,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   @Override
   public Class visitParagraphName(ParagraphNameContext ctx) {
+    String name = ctx.getText().toUpperCase();
     getLocality(ctx.getStart())
-        .map(Locality::toLocation)
-        .ifPresent(it -> paragraphs.define(ctx.getText().toUpperCase(), it));
+        .ifPresent(locality -> addParagraphDefinition(name, locality));
     return visitChildren(ctx);
   }
 
@@ -436,12 +444,21 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     langContext.addUsage(name.toUpperCase(), location);
   }
 
+  private void addParagraphUsage(String name, @NonNull Locality locality) {
+    paragraphs.addUsage(name, locality.toLocation());
+    paragraphUsageLocalities.put(name, locality);
+  }
+
+  private void addParagraphDefinition(String name, @NonNull Locality locality) {
+    paragraphs.define(name, locality.toLocation());
+    paragraphDefinitionLocalities.put(name, locality);
+  }
+
   @Override
   public Class visitParagraphNameUsage(ParagraphNameUsageContext ctx) {
     String name = ctx.getText().toUpperCase();
     getLocality(ctx.getStart())
-        .map(Locality::toLocation)
-        .ifPresent(it -> addUsage(paragraphs, name, it));
+        .ifPresent(l -> addParagraphUsage(name, l));
     return visitChildren(ctx);
   }
 
@@ -646,4 +663,27 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
       getLocality(token).ifPresent(it -> throwException(programName, it, messageService.getMessage("CobolVisitor.identicalProgMsg")));
     }
   }
+
+  private List<SyntaxError> generateParagraphErrors() {
+    Set<String> definitions = new HashSet<>(paragraphDefinitionLocalities.keySet());
+    Set<String> usages = new HashSet<>(paragraphUsageLocalities.keySet());
+
+    usages.removeAll(definitions);
+
+    return usages.stream()
+        .flatMap(
+            name ->
+                paragraphUsageLocalities.get(name).stream()
+                    .map(
+                        locality ->
+                            SyntaxError.syntaxError()
+                                .suggestion(
+                                    messageService.getMessage(
+                                        "CobolVisitor.paragraphNotDefined", name))
+                                .severity(ErrorSeverity.ERROR)
+                                .locality(locality)
+                                .build()))
+        .collect(Collectors.toList());
+  }
+
 }
