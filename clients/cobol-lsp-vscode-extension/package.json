@@ -98,7 +98,7 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "Default list of local paths to search for copybooks",
+                    "description": "Default list of relative local paths to search for copybooks",
                     "uniqueItems": true
                 },
                 "broadcom-cobol-lsp.cpy-manager.paths-dsn": {
