@@ -29,6 +29,8 @@ import java.util.function.Consumer;
  *
  * <p>IMPORTANT: This class relies on the concrete implementations by logback. SLF4J don't expose
  * any contract to update the log level on runtime.
+ *
+ * <p>In case of wrong input, log level defaults to {@link ch.qos.logback.classic.Level#ERROR}
  */
 @UtilityClass
 public class LogLevel {
