@@ -35,8 +35,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static com.broadcom.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
-import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.LOCALE;
-import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
+import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -119,6 +118,8 @@ class WorkspaceServiceTest {
             .thenReturn(completedFuture(singletonList(arr)));
     when(settingsService.getConfiguration(LOCALE.label))
             .thenReturn(completedFuture(singletonList("LOCALE")));
+    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+            .thenReturn(completedFuture(singletonList("INFO")));
     when(settingsService.toStrings(any())).thenCallRealMethod();
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
@@ -155,6 +156,8 @@ class WorkspaceServiceTest {
         .thenReturn(completedFuture(singletonList(arr)));
     when(settingsService.getConfiguration(LOCALE.label))
             .thenReturn(completedFuture(singletonList("LOCALE")));
+    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+            .thenReturn(completedFuture(singletonList("INFO")));
     when(settingsService.toStrings(any())).thenCallRealMethod();
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
@@ -188,6 +191,8 @@ class WorkspaceServiceTest {
         .thenReturn(completedFuture(emptyList()));
     when(settingsService.getConfiguration(LOCALE.label))
             .thenReturn(completedFuture(singletonList("LOCALE")));
+    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+            .thenReturn(completedFuture(singletonList("INFO")));
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
@@ -217,6 +222,8 @@ class WorkspaceServiceTest {
         .thenReturn(completedFuture(emptyList()));
     when(settingsService.getConfiguration(LOCALE.label))
             .thenReturn(completedFuture(singletonList("LOCALE")));
+    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+            .thenReturn(completedFuture(singletonList("INFO")));
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
