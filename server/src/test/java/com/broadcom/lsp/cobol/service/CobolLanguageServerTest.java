@@ -21,14 +21,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.LOCALE;
-import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
 import static com.broadcom.lsp.cobol.core.model.ErrorCode.values;
+import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -59,6 +57,8 @@ class CobolLanguageServerTest {
     when(localeStore.notifyLocaleStore()).thenReturn(System.out::println);
     when(settingsService.getConfiguration(LOCALE.label))
             .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+            .thenReturn(completedFuture(List.of("INFO")));
 
     CobolLanguageServer server =
         new CobolLanguageServer(null, null, watchingService, settingsService, localeStore);
