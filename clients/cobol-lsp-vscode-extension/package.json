@@ -128,7 +128,7 @@
                         "TRACE level logs informational events of very low importance",
                         "ALL level is used to turn on all logging"
                     ],
-                    "description": "log level for COBOL LSP server."
+                    "description": "The logging level for COBOL LS backend"
                 }
             }
         },
