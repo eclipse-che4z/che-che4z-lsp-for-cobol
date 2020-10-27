@@ -1251,7 +1251,7 @@ callByReferencePhrase
    ;
 
 callByReference
-   : ((ADDRESS OF | INTEGER | STRING)? literal | fileName | generalIdentifier) | OMITTED
+   : ((ADDRESS OF | INTEGER | STRING)? literal | generalIdentifier | fileName) | OMITTED
    ;
 
 callByValuePhrase
