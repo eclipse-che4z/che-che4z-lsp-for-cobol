@@ -33,15 +33,17 @@ import java.util.function.Consumer;
  * <p>In case of wrong input, log level defaults to {@link ch.qos.logback.classic.Level#ERROR}
  */
 @UtilityClass
-public class LogLevel {
+public class LogLevelUtils {
 
   private static final ch.qos.logback.classic.Logger rootLogger =
       (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+  private static final String NOT_SUPPORTED_MSG = " : not supported for log level update";
 
   /**
    * Update loglevel for the entire application.
    *
    * @return Consumer#List#Object , currently supports List#String and List#JsonPrimitive
+   * @throws IllegalArgumentException currently supports only List#String and List#JsonPrimitive
    */
   public static Consumer<List<Object>> updateLogLevel() {
     return loglevel -> {
@@ -49,9 +51,11 @@ public class LogLevel {
         Object localeNode = Iterables.getFirst(loglevel, "");
         if (localeNode instanceof JsonPrimitive) {
           updateLogLevel((JsonPrimitive) localeNode);
-        }
-        if (localeNode instanceof String) {
+        } else if (localeNode instanceof String) {
           updateLogLevel((String) localeNode);
+        } else {
+          throw new IllegalArgumentException(
+              localeNode.getClass().getCanonicalName() + NOT_SUPPORTED_MSG);
         }
       }
     };

@@ -15,7 +15,7 @@
 package com.broadcom.lsp.cobol.service;
 
 import com.broadcom.lsp.cobol.core.messages.LocaleStore;
-import com.broadcom.lsp.cobol.core.messages.LogLevel;
+import com.broadcom.lsp.cobol.core.messages.LogLevelUtils;
 import com.broadcom.lsp.cobol.core.model.ErrorCode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -117,7 +117,7 @@ public class CobolLanguageServer implements LanguageServer {
   private void getLogLevelFromClient() {
     settingsService
         .getConfiguration(LOGGING_LEVEL.label)
-        .thenAccept(LogLevel.updateLogLevel());
+        .thenAccept(LogLevelUtils.updateLogLevel());
   }
 
   private void getLocaleFromClient() {

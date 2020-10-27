@@ -38,8 +38,8 @@ import static org.mockito.Mockito.*;
 class CobolLanguageServerTest {
 
   /**
-   * Test the {@link CobolLanguageServer#initialized(InitializedParams)} method. Check that the
-   * file system watchers registered correctly.
+   * Test the {@link CobolLanguageServer#initialized(InitializedParams)} method. Check that the file
+   * system watchers registered correctly.
    */
   @Test
   void initialized() {
@@ -56,9 +56,9 @@ class CobolLanguageServerTest {
     when(settingsService.toStrings(any())).thenCallRealMethod();
     when(localeStore.notifyLocaleStore()).thenReturn(System.out::println);
     when(settingsService.getConfiguration(LOCALE.label))
-            .thenReturn(completedFuture(singletonList(arr)));
+        .thenReturn(completedFuture(singletonList(arr)));
     when(settingsService.getConfiguration(LOGGING_LEVEL.label))
-            .thenReturn(completedFuture(List.of("INFO")));
+        .thenReturn(completedFuture(List.of("INFO")));
 
     CobolLanguageServer server =
         new CobolLanguageServer(null, null, watchingService, settingsService, localeStore);
