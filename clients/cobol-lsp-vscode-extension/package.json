@@ -129,11 +129,6 @@
                         "ALL level is used to turn on all logging"
                     ],
                     "description": "log level for COBOL LSP server."
-                },
-                "broadcom-cobol-lsp.locale": {
-                    "type": "string",
-                    "default": "en",
-                    "description": "locale for the COBOL LSP server."
                 }
             }
         },
