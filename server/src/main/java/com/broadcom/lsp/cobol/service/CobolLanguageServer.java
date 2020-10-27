@@ -15,6 +15,7 @@
 package com.broadcom.lsp.cobol.service;
 
 import com.broadcom.lsp.cobol.core.messages.LocaleStore;
+import com.broadcom.lsp.cobol.core.messages.LogLevelUtils;
 import com.broadcom.lsp.cobol.core.model.ErrorCode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -28,8 +29,7 @@ import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
-import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.LOCALE;
-import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
+import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
@@ -111,6 +111,13 @@ public class CobolLanguageServer implements LanguageServer {
     watchingService.watchPredefinedFolder();
     addLocalFilesWatcher();
     getLocaleFromClient();
+    getLogLevelFromClient();
+  }
+
+  private void getLogLevelFromClient() {
+    settingsService
+        .getConfiguration(LOGGING_LEVEL.label)
+        .thenAccept(LogLevelUtils.updateLogLevel());
   }
 
   private void getLocaleFromClient() {
