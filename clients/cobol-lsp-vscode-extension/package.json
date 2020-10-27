@@ -114,26 +114,21 @@
                     "default": "ERROR",
                     "enum": [
                         "ERROR",
-                        "DEBUG",
-                        "INFO",
                         "WARN",
+                        "INFO",
+                        "DEBUG",
                         "TRACE",
                         "ALL"
                     ],
                     "enumDescriptions": [
                         "ERROR level logs error events which may or not be fatal to the application",
-                        "DEBUG level logs informational events of very low importance",
-                        "INFO level logs informational messages highlighting overall progress of the application",
                         "WARN level logs potentially harmful situations",
+                        "INFO level logs informational messages highlighting overall progress of the application",
+                        "DEBUG level logs informational events of very low importance",
                         "TRACE level logs informational events of very low importance",
                         "ALL level is used to turn on all logging"
                     ],
                     "description": "log level for COBOL LSP server."
-                },
-                "broadcom-cobol-lsp.locale": {
-                    "type": "string",
-                    "default": "en",
-                    "description": "locale for the COBOL LSP server."
                 }
             }
         },
