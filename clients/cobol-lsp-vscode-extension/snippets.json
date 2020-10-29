@@ -83,6 +83,38 @@
 		"description": "COPY REPLACING",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
+	"exec-sql-include": {
+		"prefix": "exec-sql-include",
+		"body": [
+			"exec sql include ${1:sqlstatement.cpy} end-exec."
+		],
+		"description": "exec sql include",
+		"scope": "cobol,acucobol"
+	},
+	"EXEC-SQL-INCLUDE": {
+		"prefix": "EXEC-SQL-INCLUDE",
+		"body": [
+			"EXEC SQL INCLUDE ${1:sqlstatement.cpy} END-EXEC."
+		],
+		"description": "EXEC SQL INCLUDE",
+		"scope": "cobol,acucobol"
+	},
+	"exec-cics": {
+		"prefix": "exec-cics",
+		"body": [
+			"exec cics ${1:cics-statement} end-exec."
+		],
+		"description": "exec cics statement",
+		"scope": "cobol,acucobol"
+	},
+	"EXEC-CICS": {
+		"prefix": "EXEC-CICS",
+		"body": [
+			"EXEC CICS ${1:CICS-STATEMENT} END-EXEC."
+		],
+		"description": "EXEC CICS STATEMENT",
+		"scope": "cobol,acucobol"
+	},
 	"divide": {
 		"prefix": "divide",
 		"body": [
