@@ -11,7 +11,7 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((compilerOptions | copyStatement | replaceArea)+ .*?)+ EOF
+   : .*? ((compilerOptions | copyStatement | includeStatement | replaceArea)+ .*?)+ EOF
    ;
 
 // compiler options
@@ -147,6 +147,11 @@ compilerOption
 // copy statement
 copyStatement
    : COPY copySource (directoryPhrase | familyPhrase | replacingPhrase | SUPPRESS)? DOT_FS
+   ;
+
+// sql include statement
+includeStatement
+   :EXEC SQL INCLUDE copySource END_EXEC DOT_FS
    ;
 
 copySource
