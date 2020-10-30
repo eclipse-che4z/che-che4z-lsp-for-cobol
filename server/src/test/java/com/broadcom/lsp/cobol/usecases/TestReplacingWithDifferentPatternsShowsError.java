@@ -50,8 +50,8 @@ class TestReplacingWithDifferentPatternsShowsError {
   private static final String NEW2_NAME = "NEW2";
 
   private static final String MESSAGE =
-      "Syntax error on 'COPY' expected {<EOF>, LEVEL_NUMBER, '66', '77', '88', "
-          + "COMMUNICATION, DATA_BASE, END, EXEC, FILE, ID, IDENTIFICATION, "
+      "Syntax error on 'COPY' expected {<EOF>, LEVEL_NUMBER, '66', '77', "
+          + "'88', DATA_BASE, END, EXEC, FILE, ID, IDENTIFICATION, "
           + "LINKAGE, LOCAL_STORAGE, PROCEDURE, PROGRAM_LIBRARY, REPORT, "
           + "SCREEN, WORKING_STORAGE}";
 
@@ -60,6 +60,9 @@ class TestReplacingWithDifferentPatternsShowsError {
     UseCaseEngine.runTest(
         TEXT,
         List.of(new CobolText(NEW2_NAME, NEW2)),
-        Map.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
+        Map.of(
+            "1",
+            new Diagnostic(
+                null, MESSAGE, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
   }
 }

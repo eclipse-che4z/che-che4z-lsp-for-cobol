@@ -289,13 +289,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitCommunicationSection(CommunicationSectionContext ctx) {
-    outlineTreeBuilder.addNode(OutlineNodeNames.COMMUNICATION_SECTION, NodeType.SECTION, ctx);
-    outlineTreeBuilder.initVariables();
-    return visitChildren(ctx);
-  }
-
-  @Override
   public Class visitStatement(StatementContext ctx) {
     List<Token> tokenList =
         tokenStream.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());

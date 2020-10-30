@@ -358,7 +358,7 @@ dataDivision
    ;
 
 dataDivisionSection
-   : fileSection | dataBaseSection | workingStorageSection | linkageSection | communicationSection | localStorageSection | screenSection | reportSection | programLibrarySection
+   : fileSection | dataBaseSection | workingStorageSection | linkageSection | localStorageSection | screenSection | reportSection | programLibrarySection
    ;
 
 // -- file section ----------------------------------
@@ -483,84 +483,6 @@ workingStorageSection
 
 linkageSection
    : LINKAGE SECTION DOT_FS dataDescriptionEntry*
-   ;
-
-// -- communication section ----------------------------------
-
-communicationSection
-   : COMMUNICATION SECTION DOT_FS (communicationDescriptionEntry | dataDescriptionEntry)*
-   ;
-
-communicationDescriptionEntry
-   : communicationDescriptionEntryFormat1 | communicationDescriptionEntryFormat2 | communicationDescriptionEntryFormat3
-   ;
-
-communicationDescriptionEntryFormat1
-   : CD cdName FOR? INITIAL? INPUT ((symbolicQueueClause | symbolicSubQueueClause | messageDateClause | messageTimeClause | symbolicSourceClause | textLengthClause | endKeyClause | statusKeyClause | messageCountClause) | dataDescName)* DOT_FS
-   ;
-
-communicationDescriptionEntryFormat2
-   : CD cdName FOR? OUTPUT (destinationCountClause | textLengthClause | statusKeyClause | destinationTableClause | errorKeyClause | symbolicDestinationClause)* DOT_FS
-   ;
-
-communicationDescriptionEntryFormat3
-   : CD cdName FOR? INITIAL I_O ((messageDateClause | messageTimeClause | symbolicTerminalClause | textLengthClause | endKeyClause | statusKeyClause) | dataDescName)* DOT_FS
-   ;
-
-destinationCountClause
-   : DESTINATION COUNT IS? dataDescName
-   ;
-
-destinationTableClause
-   : DESTINATION TABLE OCCURS integerLiteral TIMES (INDEXED BY indexName+)?
-   ;
-
-endKeyClause
-   : END KEY IS? dataDescName
-   ;
-
-errorKeyClause
-   : ERROR KEY IS? dataDescName
-   ;
-
-messageCountClause
-   : MESSAGE? COUNT IS? dataDescName
-   ;
-
-messageDateClause
-   : MESSAGE DATE IS? dataDescName
-   ;
-
-messageTimeClause
-   : MESSAGE TIME IS? dataDescName
-   ;
-
-statusKeyClause
-   : STATUS KEY IS? dataDescName
-   ;
-
-symbolicDestinationClause
-   : SYMBOLIC? DESTINATION IS? dataDescName
-   ;
-
-symbolicQueueClause
-   : SYMBOLIC? QUEUE IS? dataDescName
-   ;
-
-symbolicSourceClause
-   : SYMBOLIC? SOURCE IS? dataDescName
-   ;
-
-symbolicTerminalClause
-   : SYMBOLIC? TERMINAL IS? dataDescName
-   ;
-
-symbolicSubQueueClause
-   : SYMBOLIC? (SUB_QUEUE_1 | SUB_QUEUE_2 | SUB_QUEUE_3) IS? dataDescName
-   ;
-
-textLengthClause
-   : TEXT LENGTH IS? dataDescName
    ;
 
 // -- local storage section ----------------------------------
