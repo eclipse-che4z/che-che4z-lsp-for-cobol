@@ -18,7 +18,7 @@ import com.broadcom.lsp.cobol.core.model.CobolLine;
 import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.CobolLineUtils;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,13 +41,13 @@ public class CobolCommentEntriesMarkerImpl implements CobolLineReWriter {
       compile("([ \\t]*)(" + join("|", TRIGGERS_START) + ")(.+)", CASE_INSENSITIVE);
 
   @Override
-  public List<CobolLine> processLines(@Nonnull List<CobolLine> lines) {
+  public List<CobolLine> processLines(@NonNull List<CobolLine> lines) {
     return lines.stream().map(this::escapeCommentEntry).collect(Collectors.toList());
   }
 
   /** Escapes in a given line a potential comment entry. */
-  @Nonnull
-  private CobolLine escapeCommentEntry(@Nonnull CobolLine line) {
+  @NonNull
+  private CobolLine escapeCommentEntry(@NonNull CobolLine line) {
     Matcher matcher = COMMENT_ENTRY_TRIGGER_LINE.matcher(line.getContentArea());
 
     if (!matcher.matches()) return line;

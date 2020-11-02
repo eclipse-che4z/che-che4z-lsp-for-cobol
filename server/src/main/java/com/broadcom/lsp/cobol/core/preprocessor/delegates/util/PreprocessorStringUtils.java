@@ -16,7 +16,7 @@ package com.broadcom.lsp.cobol.core.preprocessor.delegates.util;
 
 import lombok.experimental.UtilityClass;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 
 /** This utility class provides functions that are useful for pre-processing a COBOL document */
 @UtilityClass
@@ -27,8 +27,8 @@ public class PreprocessorStringUtils {
    * @param line - string to process
    * @return a string without leading quote char
    */
-  @Nonnull
-  public String trimQuotes(@Nonnull String line) {
+  @NonNull
+  public String trimQuotes(@NonNull String line) {
     return line.replaceAll("(?:^[\"'])|(?:[\"']$)", "");
   }
 }

@@ -22,7 +22,7 @@ import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.InsertTextFormat;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Optional;
@@ -38,7 +38,7 @@ public class SnippetCompletion implements Completion {
     this.snippets = snippets;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Collection<String> getCompletionSource(CobolDocumentModel document) {
     return snippets.getLabels();
@@ -46,27 +46,27 @@ public class SnippetCompletion implements Completion {
 
   @Nullable
   @Override
-  public String tryResolve(@Nonnull String label) {
+  public String tryResolve(@NonNull String label) {
     return Optional.ofNullable(snippets.getInformationFor(label))
         .map(string -> string.replaceAll("[${\\d:}]", ""))
         .orElse(null);
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public String getSortOrderPrefix() {
     return SNIPPETS.prefix;
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public CompletionItem customize(@Nonnull CompletionItem item) {
+  public CompletionItem customize(@NonNull CompletionItem item) {
     item.setInsertText(snippets.getInformationFor(item.getLabel()));
     item.setInsertTextFormat(InsertTextFormat.Snippet);
     return item;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public CompletionItemKind getKind() {
     return CompletionItemKind.Snippet;

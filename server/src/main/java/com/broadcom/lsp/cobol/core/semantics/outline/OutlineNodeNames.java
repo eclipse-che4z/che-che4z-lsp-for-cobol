@@ -31,5 +31,4 @@ public class OutlineNodeNames {
   public final String FILE_SECTION = "FILE SECTION";
   public final String LINKAGE_SECTION = "LINKAGE SECTION";
   public final String LOCAL_STORAGE_SECTION = "LOCAL STORAGE SECTION";
-  public final String COMMUNICATION_SECTION = "COMMUNICATION SECTION";
 }

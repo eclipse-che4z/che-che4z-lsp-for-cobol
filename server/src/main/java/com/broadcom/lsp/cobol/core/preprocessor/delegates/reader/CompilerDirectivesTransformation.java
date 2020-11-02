@@ -17,7 +17,7 @@ package com.broadcom.lsp.cobol.core.preprocessor.delegates.reader;
 
 import com.google.inject.Singleton;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.regex.Pattern;
 
 import static com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants.BLANK_SEQUENCE_AREA;
@@ -32,9 +32,9 @@ public class CompilerDirectivesTransformation implements CobolLineReaderDelegate
   private static final Pattern COMPILER_DIRECTIVE_LINE =
       Pattern.compile("(?i)(.{0,6} +|\\s*)(CBL|PROCESS) .+");
 
-  @Nonnull
+  @NonNull
   @Override
-  public String apply(@Nonnull String line) {
+  public String apply(@NonNull String line) {
     return COMPILER_DIRECTIVE_LINE.matcher(line).matches()
         ? moveContentFromCommentArea(cutTooLongString(line))
         : line;

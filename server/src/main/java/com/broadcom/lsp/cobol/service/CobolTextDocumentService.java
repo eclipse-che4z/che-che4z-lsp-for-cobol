@@ -29,12 +29,12 @@ import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Builder;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -71,7 +71,6 @@ public class CobolTextDocumentService
   private final Map<String, CobolDocumentModel> docs = new ConcurrentHashMap<>();
   private final Map<String, CompletableFuture<List<DocumentSymbol>>> outlineMap =
       new ConcurrentHashMap<>();
-
   private Communications communications;
   private LanguageEngineFacade engine;
   private Formations formations;
@@ -197,7 +196,7 @@ public class CobolTextDocumentService
   @Override
   public void didClose(DidCloseTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
-    LOG.info(String.format("Document closing invoked on URI %s", uri));
+    LOG.info(format("Document closing invoked on URI %s", uri));
     communications.publishDiagnostics(Map.of(uri, List.of()));
     docs.remove(uri);
   }
@@ -208,7 +207,7 @@ public class CobolTextDocumentService
   }
 
   @Override
-  public void observerCallback(@Nonnull RunAnalysisEvent event) {
+  public void observerCallback(@NonNull RunAnalysisEvent event) {
     docs.forEach((key, value) -> analyzeDocumentFirstTime(key, value.getText(), event.verbose));
   }
 

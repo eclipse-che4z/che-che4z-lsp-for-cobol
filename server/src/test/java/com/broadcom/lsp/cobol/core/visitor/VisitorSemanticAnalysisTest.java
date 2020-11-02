@@ -15,7 +15,7 @@
 
 package com.broadcom.lsp.cobol.core.visitor;
 
-import com.broadcom.lsp.cobol.core.CobolParser;
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
@@ -30,6 +30,7 @@ import java.util.Map;
 
 import static com.broadcom.lsp.cobol.core.CobolParser.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,6 +51,10 @@ class VisitorSemanticAnalysisTest {
   @Test
   void testVariableDefinitionNotFound() {
     CustomToken token = createNewToken(INVALID_VARIABLE);
+    MessageService mockMessageService = mock(MessageService.class);
+    when(mockMessageService.getMessage(
+            matches("CobolVisitor.invalidDefMsg"), matches(INVALID_VARIABLE.toUpperCase())))
+        .thenReturn("Invalid definition for: INVALID");
     CobolVisitor visitor =
         new CobolVisitor(
             "",
@@ -60,7 +65,8 @@ class VisitorSemanticAnalysisTest {
                 Locality.builder()
                     .range(new Range(new Position(0, 0), new Position(0, 0)))
                     .token(WRONG_TOKEN)
-                    .build()));
+                    .build()),
+            mockMessageService);
 
     visitor.visitQualifiedDataNameFormat1(mockMethod(token));
 
@@ -81,7 +87,9 @@ class VisitorSemanticAnalysisTest {
     StatementContext node = mock(StatementContext.class);
     when(node.getStart()).thenReturn(token);
     when(node.getStop()).thenReturn(token);
-
+    MessageService messageService = mock(MessageService.class);
+    when(messageService.getMessage(matches("CobolVisitor.misspelledWord"), matches("MOVE")))
+        .thenReturn("A misspelled word, maybe you want to put MOVE");
     CommonTokenStream tokenStream = mock(CommonTokenStream.class);
 
     CobolVisitor visitor =
@@ -94,7 +102,8 @@ class VisitorSemanticAnalysisTest {
                 Locality.builder()
                     .range(new Range(new Position(0, 0), new Position(0, 0)))
                     .token(WRONG_TOKEN)
-                    .build()));
+                    .build()),
+            messageService);
 
     visitor.visitStatement(node);
 

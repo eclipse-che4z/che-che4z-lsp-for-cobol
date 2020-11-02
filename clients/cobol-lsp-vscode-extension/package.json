@@ -98,7 +98,7 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "Default list of local paths to search for copybooks",
+                    "description": "Default list of relative local paths to search for copybooks",
                     "uniqueItems": true
                 },
                 "broadcom-cobol-lsp.cpy-manager.paths-dsn": {
@@ -108,6 +108,27 @@
                     },
                     "description": "Default list of datasets to search for copybooks",
                     "uniqueItems": true
+                },
+                "broadcom-cobol-lsp.logging.level.root": {
+                    "type": "string",
+                    "default": "ERROR",
+                    "enum": [
+                        "ERROR",
+                        "WARN",
+                        "INFO",
+                        "DEBUG",
+                        "TRACE",
+                        "ALL"
+                    ],
+                    "enumDescriptions": [
+                        "ERROR level logs error events which may or not be fatal to the application",
+                        "WARN level logs potentially harmful situations",
+                        "INFO level logs informational messages highlighting overall progress of the application",
+                        "DEBUG level logs informational events of very low importance",
+                        "TRACE level logs informational events of very low importance",
+                        "ALL level is used to turn on all logging"
+                    ],
+                    "description": "The logging level for COBOL LS backend"
                 }
             }
         },

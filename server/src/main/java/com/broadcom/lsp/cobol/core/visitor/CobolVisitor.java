@@ -17,6 +17,7 @@ package com.broadcom.lsp.cobol.core.visitor;
 
 import com.broadcom.lsp.cobol.core.CobolParser;
 import com.broadcom.lsp.cobol.core.CobolParserBaseVisitor;
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.ErrorSeverity;
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
@@ -26,7 +27,8 @@ import com.broadcom.lsp.cobol.core.semantics.*;
 import com.broadcom.lsp.cobol.core.semantics.outline.NodeType;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineTreeBuilder;
-import lombok.Getter;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RuleContext;
@@ -35,11 +37,10 @@ import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import lombok.NonNull;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.broadcom.lsp.cobol.core.CobolParser.*;
 import static com.broadcom.lsp.cobol.core.semantics.CobolVariableContext.LEVEL_77;
@@ -54,19 +55,15 @@ import static java.util.stream.Collectors.joining;
  */
 @Slf4j
 public class CobolVisitor extends CobolParserBaseVisitor<Class> {
-  private static final String AREA_A_WARNING_MSG = "The following token must start in Area A: ";
-  private static final String AREA_B_WARNING_MSG = "The following token must start in Area B: ";
-  private static final String IDENTICAL_PROGRAM_MSG =
-      "Program-name must be identical to the program-name of the corresponding PROGRAM-ID paragraph: ";
   private static final String DECLARATIVE_SAME_MSG =
       "The following token cannot be on the same line as a DECLARATIVE token: ";
-  private static final String INVALID_DEF_MSG = "Invalid definition for: ";
-  private static final String MISSPELLED_WORD = "A misspelled word, maybe you want to put ";
-  private static final String PROGRAM_ID_ISSUE_MSG = "There is an issue with PROGRAM-ID paragraph";
 
-  @Getter private List<SyntaxError> errors = new ArrayList<>();
+  private List<SyntaxError> errors = new ArrayList<>();
 
   private SubContext<String> paragraphs = new NamedSubContext();
+  private Multimap<String, Locality> paragraphUsageLocalities = HashMultimap.create();
+  private Multimap<String, Locality> paragraphDefinitionLocalities = HashMultimap.create();
+
   private CobolVariableContext variables = new CobolVariableContext();
   private PredefinedVariableContext constants = new PredefinedVariableContext();
 
@@ -76,16 +73,19 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private CommonTokenStream tokenStream;
   private OutlineTreeBuilder outlineTreeBuilder;
   private Map<Token, Locality> positionMapping;
+  private MessageService messageService;
 
   public CobolVisitor(
-      @Nonnull String documentUri,
-      @Nonnull NamedSubContext copybooks,
-      @Nonnull CommonTokenStream tokenStream,
-      @Nonnull Map<Token, Locality> positionMapping) {
+      @NonNull String documentUri,
+      @NonNull NamedSubContext copybooks,
+      @NonNull CommonTokenStream tokenStream,
+      @NonNull Map<Token, Locality> positionMapping,
+      MessageService messageService) {
     this.copybooks = copybooks;
     this.positionMapping = positionMapping;
     this.tokenStream = tokenStream;
     outlineTreeBuilder = new OutlineTreeBuilder(documentUri, positionMapping);
+    this.messageService = messageService;
   }
 
   /**
@@ -94,7 +94,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
    * @return the semantic context of the document, containing all the definitions and usages of
    *     paragraphs, variables and copybooks
    */
-  @Nonnull
+  @NonNull
   public SemanticContext getSemanticContext() {
     return new SemanticContext(
         variables.getDefinitions().asMap(),
@@ -106,6 +106,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
         copybooks.getDefinitions().asMap(),
         copybooks.getUsages().asMap(),
         buildOutlineTree());
+  }
+
+  @NonNull
+  public List<SyntaxError> getErrors() {
+    List<SyntaxError> result = new ArrayList<>(errors);
+    result.addAll(generateParagraphErrors());
+
+    return result;
   }
 
   @Override
@@ -186,6 +194,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   public Class visitProcedureSection(ProcedureSectionContext ctx) {
     throwWarning(ctx.getStart());
     outlineTreeBuilder.addNode(ctx.getStart().getText(), NodeType.PROCEDURE_SECTION, ctx);
+
+    String name = ctx.getStart().getText().toUpperCase();
+    getLocality(ctx.getStart())
+        .ifPresent(locality -> paragraphDefinitionLocalities.put(name, locality));
     return visitChildren(ctx);
   }
 
@@ -277,13 +289,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitCommunicationSection(CommunicationSectionContext ctx) {
-    outlineTreeBuilder.addNode(OutlineNodeNames.COMMUNICATION_SECTION, NodeType.SECTION, ctx);
-    outlineTreeBuilder.initVariables();
-    return visitChildren(ctx);
-  }
-
-  @Override
   public Class visitStatement(StatementContext ctx) {
     List<Token> tokenList =
         tokenStream.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
@@ -325,9 +330,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   @Override
   public Class visitParagraphName(ParagraphNameContext ctx) {
+    String name = ctx.getText().toUpperCase();
     getLocality(ctx.getStart())
-        .map(Locality::toLocation)
-        .ifPresent(it -> paragraphs.define(ctx.getText().toUpperCase(), it));
+        .ifPresent(locality -> addParagraphDefinition(name, locality));
     return visitChildren(ctx);
   }
 
@@ -420,24 +425,33 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     return visitChildren(ctx);
   }
 
-  private void defineVariable(String level, String name, @Nonnull Location location) {
+  private void defineVariable(String level, String name, @NonNull Location location) {
     variables.define(new Variable(level, name), location);
   }
 
-  private void addVariableUsage(String name, @Nonnull Location location) {
+  private void addVariableUsage(String name, @NonNull Location location) {
     addUsage(constants.contains(name) ? constants : variables, name, location);
   }
 
-  private void addUsage(SubContext<?> langContext, String name, @Nonnull Location location) {
+  private void addUsage(SubContext<?> langContext, String name, @NonNull Location location) {
     langContext.addUsage(name.toUpperCase(), location);
+  }
+
+  private void addParagraphUsage(String name, @NonNull Locality locality) {
+    paragraphs.addUsage(name, locality.toLocation());
+    paragraphUsageLocalities.put(name, locality);
+  }
+
+  private void addParagraphDefinition(String name, @NonNull Locality locality) {
+    paragraphs.define(name, locality.toLocation());
+    paragraphDefinitionLocalities.put(name, locality);
   }
 
   @Override
   public Class visitParagraphNameUsage(ParagraphNameUsageContext ctx) {
     String name = ctx.getText().toUpperCase();
     getLocality(ctx.getStart())
-        .map(Locality::toLocation)
-        .ifPresent(it -> addUsage(paragraphs, name, it));
+        .ifPresent(l -> addParagraphUsage(name, l));
     return visitChildren(ctx);
   }
 
@@ -515,7 +529,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     }
   }
 
-  private void throwException(String wrongToken, @Nonnull Locality locality, String message) {
+  private void throwException(String wrongToken, @NonNull Locality locality, String message) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .locality(locality)
@@ -533,7 +547,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     return ofNullable(positionMapping.get(childToken));
   }
 
-  private void checkVariableDefinition(String name, @Nonnull Locality locality) {
+  private void checkVariableDefinition(String name, @NonNull Locality locality) {
     if (!variables.contains(name) && !constants.contains(name)) {
       reportVariableNotDefined(name, locality, locality); // starts and finishes in one token
     }
@@ -581,7 +595,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void reportVariableNotDefined(String dataName, Locality start, Locality stop) {
     SyntaxError error =
         SyntaxError.syntaxError()
-            .suggestion(INVALID_DEF_MSG + dataName)
+            .suggestion(messageService.getMessage("CobolVisitor.invalidDefMsg", dataName))
             .severity(ErrorSeverity.INFO)
             .locality(getIntervalPosition(start, stop))
             .build();
@@ -601,7 +615,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     if (locality == null) return;
     SyntaxError error =
         SyntaxError.syntaxError()
-            .suggestion(MISSPELLED_WORD + suggestion)
+            .suggestion(messageService.getMessage("CobolVisitor.misspelledWord", suggestion))
             .severity(ErrorSeverity.WARNING)
             .locality(locality)
             .build();
@@ -612,7 +626,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void areaAWarning(Token token) {
     getLocality(token)
         .filter(it -> it.getRange().getStart().getCharacter() > 10)
-        .ifPresent(it -> throwException(token.getText(), it, AREA_A_WARNING_MSG));
+        .ifPresent(it -> throwException(token.getText(), it, messageService.getMessage("CobolVisitor.AreaAWarningMsg")));
   }
 
   private void areaBWarning(List<Token> tokenList) {
@@ -623,14 +637,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
                     locality -> {
                       int charPosition = locality.getRange().getStart().getCharacter();
                       if (charPosition > 6 && charPosition < 11 && token.getChannel() != 1) {
-                        throwException(token.getText(), locality, AREA_B_WARNING_MSG);
+                        throwException(token.getText(), locality, messageService.getMessage("CobolVisitor.AreaBWarningMsg"));
                       }
                     }));
   }
 
   private void checkProgramName(Token token) {
     if (programName == null) {
-      getLocality(token).ifPresent(it -> throwException("", it, PROGRAM_ID_ISSUE_MSG));
+      getLocality(token).ifPresent(it -> throwException("", it, messageService.getMessage("CobolVisitor.progIDIssueMsg")));
     } else {
       checkProgramNameIdentical(token);
     }
@@ -639,7 +653,30 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void checkProgramNameIdentical(Token token) {
     String text = PreprocessorStringUtils.trimQuotes(token.getText());
     if (!programName.equals(text)) {
-      getLocality(token).ifPresent(it -> throwException(programName, it, IDENTICAL_PROGRAM_MSG));
+      getLocality(token).ifPresent(it -> throwException(programName, it, messageService.getMessage("CobolVisitor.identicalProgMsg")));
     }
   }
+
+  private List<SyntaxError> generateParagraphErrors() {
+    Set<String> definitions = new HashSet<>(paragraphDefinitionLocalities.keySet());
+    Set<String> usages = new HashSet<>(paragraphUsageLocalities.keySet());
+
+    usages.removeAll(definitions);
+
+    return usages.stream()
+        .flatMap(
+            name ->
+                paragraphUsageLocalities.get(name).stream()
+                    .map(
+                        locality ->
+                            SyntaxError.syntaxError()
+                                .suggestion(
+                                    messageService.getMessage(
+                                        "CobolVisitor.paragraphNotDefined", name))
+                                .severity(ErrorSeverity.ERROR)
+                                .locality(locality)
+                                .build()))
+        .collect(Collectors.toList());
+  }
+
 }

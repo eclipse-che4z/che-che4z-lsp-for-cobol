@@ -14,6 +14,7 @@
  */
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.reader;
 
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -21,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +46,6 @@ import static java.util.Optional.ofNullable;
 public class CobolLineReaderImpl implements CobolLineReader {
   private static final int INDICATOR_AREA_INDEX = 6;
   private static final int MAX_LINE_LENGTH = 80;
-  private static final String LONG_LINE_MSG = "Source text cannot go past column 80";
-  private static final String INCORRECT_LINE_FORMAT_MSG = "Unexpected indicator area content";
   private static final Pattern COBOL_LINE_PATTERN =
       Pattern.compile(
           "^(?<sequence>.{0,6})(?<indicator>.?)(?<contentA>.{0,4})(?<contentB>.{0,61})(?<comment>.{0,8})(?<extra>.*)$");
@@ -68,16 +67,18 @@ public class CobolLineReaderImpl implements CobolLineReader {
           NORMAL);
 
   private CobolLineReaderDelegate delegate;
+  private MessageService messageService;
 
   @Inject
-  public CobolLineReaderImpl(CobolLineReaderDelegate delegate) {
+  public CobolLineReaderImpl(CobolLineReaderDelegate delegate, MessageService messageService) {
     this.delegate = delegate;
+    this.messageService = messageService;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public ResultWithErrors<List<CobolLine>> processLines(
-      @Nonnull String documentURI, @Nonnull String lines) {
+      @NonNull String documentURI, @NonNull String lines) {
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     List<CobolLine> result = new ArrayList<>();
     try (Scanner scanner = new Scanner(lines)) {
@@ -87,12 +88,9 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
       while (scanner.hasNextLine()) {
         currentLine = scanner.nextLine();
-
-        ResultWithErrors<CobolLine> output =
-            parseLine(delegate.apply(currentLine), documentURI, lineNumber);
-
-        CobolLine currentCobolLine = output.getResult();
-        accumulatedErrors.addAll(output.getErrors());
+        CobolLine currentCobolLine =
+            parseLine(delegate.apply(currentLine), documentURI, lineNumber)
+                .unwrap(accumulatedErrors::addAll);
 
         currentCobolLine.setPredecessor(lastCobolLine);
         result.add(currentCobolLine);
@@ -104,9 +102,9 @@ public class CobolLineReaderImpl implements CobolLineReader {
     return new ResultWithErrors<>(result, accumulatedErrors);
   }
 
-  @Nonnull
+  @NonNull
   private ResultWithErrors<CobolLine> parseLine(
-      @Nonnull String line, @Nonnull String uri, int lineNumber) {
+      @NonNull String line, @NonNull String uri, int lineNumber) {
     CobolLine cobolLine = new CobolLine();
 
     List<SyntaxError> errors = new ArrayList<>();
@@ -116,16 +114,22 @@ public class CobolLineReaderImpl implements CobolLineReader {
       cobolLine.setSequenceArea(matcher.group("sequence"));
       String indicatorArea = matcher.group("indicator");
       if (!indicatorArea.isEmpty()) {
-        ResultWithErrors<CobolLineTypeEnum> type = determineType(indicatorArea, uri, lineNumber);
+        CobolLineTypeEnum type =
+            determineType(indicatorArea, uri, lineNumber).unwrap(errors::addAll);
         cobolLine.setIndicatorArea(indicatorArea);
-        cobolLine.setType(type.getResult());
-        errors.addAll(type.getErrors());
+        cobolLine.setType(type);
       }
       cobolLine.setContentAreaA(matcher.group("contentA"));
       cobolLine.setContentAreaB(matcher.group("contentB"));
       cobolLine.setCommentArea(matcher.group("comment"));
       if (!matcher.group("extra").isEmpty()) {
-        errors.add(createError(uri, LONG_LINE_MSG, lineNumber, MAX_LINE_LENGTH, line.length()));
+        errors.add(
+            createError(
+                uri,
+                messageService.getMessage("CobolLineReaderImpl.longLineMsg"),
+                lineNumber,
+                MAX_LINE_LENGTH,
+                line.length()));
       }
     } else {
       // It is impossible. Pattern must match any line.
@@ -147,15 +151,15 @@ public class CobolLineReaderImpl implements CobolLineReader {
                 List.of(
                     createError(
                         uri,
-                        INCORRECT_LINE_FORMAT_MSG,
+                        messageService.getMessage("CobolLineReaderImpl.incorrectLineFormat"),
                         lineNumber,
                         INDICATOR_AREA_INDEX,
                         INDICATOR_AREA_INDEX + 1))));
   }
 
-  @Nonnull
+  @NonNull
   private SyntaxError createError(
-      @Nonnull String uri, @Nonnull String message, int lineNumber, int start, int stop) {
+      @NonNull String uri, @NonNull String message, int lineNumber, int start, int stop) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .suggestion(message)
@@ -169,7 +173,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
                     .build())
             .build();
 
-    LOG.debug("Syntax error by CobolLineReaderImpl#registerFormatError: " + error.toString());
+    LOG.debug("Syntax error by CobolLineReaderImpl#registerFormatError: {}", error.toString());
     return error;
   }
 }

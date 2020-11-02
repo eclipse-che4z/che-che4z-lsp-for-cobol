@@ -15,6 +15,7 @@
 
 package com.broadcom.lsp.cobol.usecases;
 
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.service.delegates.communications.ServerCommunications;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
@@ -59,8 +60,9 @@ class TestResponsesNotContainLineBreaks {
     ArgumentCaptor<PublishDiagnosticsParams> captor = forClass(PublishDiagnosticsParams.class);
     FileSystemService files = mock(WorkspaceFileService.class);
     when(files.decodeURI(anyString())).thenCallRealMethod();
+    MessageService mockMessageService = mock(MessageService.class);
 
-    ServerCommunications communications = new ServerCommunications(() -> client, files);
+    ServerCommunications communications = new ServerCommunications(() -> client, files, mockMessageService);
 
     communications.publishDiagnostics(
         singletonMap(UseCaseUtils.DOCUMENT_URI, UseCaseUtils.analyzeForErrors(UseCaseUtils.DOCUMENT_URI, TEXT)));

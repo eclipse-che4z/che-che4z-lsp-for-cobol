@@ -14,6 +14,8 @@
  */
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.core.messages.LocaleStore;
+import com.broadcom.lsp.cobol.core.messages.LogLevelUtils;
 import com.broadcom.lsp.cobol.core.model.ErrorCode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -23,11 +25,11 @@ import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
-import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
+import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
@@ -47,17 +49,20 @@ public class CobolLanguageServer implements LanguageServer {
   private WorkspaceService workspaceService;
   private WatcherService watchingService;
   private SettingsService settingsService;
+  private LocaleStore localeStore;
 
   @Inject
   CobolLanguageServer(
       TextDocumentService textService,
       WorkspaceService workspaceService,
       WatcherService watchingService,
-      SettingsService settingsService) {
+      SettingsService settingsService,
+      LocaleStore localeStore) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
     this.settingsService = settingsService;
+    this.localeStore = localeStore;
   }
 
   @Override
@@ -71,8 +76,8 @@ public class CobolLanguageServer implements LanguageServer {
   }
 
   @Override
-  @Nonnull
-  public CompletableFuture<InitializeResult> initialize(@Nonnull InitializeParams params) {
+  @NonNull
+  public CompletableFuture<InitializeResult> initialize(@NonNull InitializeParams params) {
     ServerCapabilities capabilities = new ServerCapabilities();
 
     capabilities.setTextDocumentSync(Full);
@@ -105,6 +110,18 @@ public class CobolLanguageServer implements LanguageServer {
     watchingService.watchConfigurationChange();
     watchingService.watchPredefinedFolder();
     addLocalFilesWatcher();
+    getLocaleFromClient();
+    getLogLevelFromClient();
+  }
+
+  private void getLogLevelFromClient() {
+    settingsService
+        .getConfiguration(LOGGING_LEVEL.label)
+        .thenAccept(LogLevelUtils.updateLogLevel());
+  }
+
+  private void getLocaleFromClient() {
+    settingsService.getConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
   }
 
   @Override
@@ -123,7 +140,7 @@ public class CobolLanguageServer implements LanguageServer {
         .thenAccept(it -> watchingService.addWatchers(settingsService.toStrings(it)));
   }
 
-  @Nonnull
+  @NonNull
   private ExecuteCommandOptions collectExecuteCommandList() {
     return new ExecuteCommandOptions(
         stream(ErrorCode.values()).map(ErrorCode::name).collect(toList()));

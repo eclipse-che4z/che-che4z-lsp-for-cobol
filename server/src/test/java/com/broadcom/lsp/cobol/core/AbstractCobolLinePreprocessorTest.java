@@ -14,6 +14,7 @@
  */
 package com.broadcom.lsp.cobol.core;
 
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.CobolLine;
 import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
@@ -21,11 +22,20 @@ import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public abstract class AbstractCobolLinePreprocessorTest {
 
   protected ResultWithErrors<List<CobolLine>> processText(String text) {
-    CobolLineReader reader = new CobolLineReaderImpl(line -> line);
-    return reader.processLines(null, text);
+    MessageService mockMessageService = mock(MessageService.class);
+    CobolLineReader reader = new CobolLineReaderImpl(line -> line, mockMessageService);
+    when(mockMessageService.getMessage(matches("CobolLineReaderImpl.incorrectLineFormat")))
+        .thenReturn("Unexpected indicator area content");
+    when(mockMessageService.getMessage(matches("CobolLineReaderImpl.longLineMsg")))
+            .thenReturn("Source text cannot go past column 80");
+    return reader.processLines("", text);
   }
 
   protected String reduceLines(List<String> lines) {

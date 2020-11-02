@@ -18,12 +18,11 @@ import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import com.broadcom.lsp.cobol.domain.event.api.EventObserver;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import lombok.NonNull;
 
 /**
- * Provide API definition to search for copybooks files.
- * The service also caches copybook to reduce filesystem load.
+ * Provide API definition to search for copybooks files. The service also caches copybook to reduce
+ * filesystem load.
  */
 public interface CopybookService extends EventObserver<DataEvent> {
   /** Remove all the stored copybook. */
@@ -38,9 +37,9 @@ public interface CopybookService extends EventObserver<DataEvent> {
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   CopybookModel resolve(
-      @Nonnull String copybookName,
-      @Nonnull String documentUri,
-      @Nonnull CopybookProcessingMode copybookProcessingMode);
+      @NonNull String copybookName,
+      @NonNull String documentUri,
+      @NonNull CopybookProcessingMode copybookProcessingMode);
 
   /**
    * Store the copybookModel in cache.

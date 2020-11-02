@@ -17,6 +17,7 @@ package com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.impl;
 import com.broadcom.lsp.cobol.core.model.CobolLine;
 import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -32,7 +33,7 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing Debug lines preformatting for Token analysis */
   @Test
   void debugLineTest() {
-    CobolLine debugLine = new CobolLine();
+    val debugLine = new CobolLine();
     debugLine.setType(DEBUG);
     debugLine.setIndicatorArea(ProcessingConstants.WS);
     debugLine.setContentAreaA("    ");
@@ -50,7 +51,7 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing normal lines pre-formatting for Token analysis */
   @Test
   void normalLineTest() {
-    CobolLine normalLine = new CobolLine();
+    val normalLine = new CobolLine();
     normalLine.setType(NORMAL);
     normalLine.setIndicatorArea(ProcessingConstants.WS);
     normalLine.setContentAreaA("    ");
@@ -69,7 +70,7 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing Compiler Directive lines pre-formatting for Token analysis */
   @Test
   void compilerDirectiveTest() {
-    CobolLine compilerDirectiveLine = new CobolLine();
+    val compilerDirectiveLine = new CobolLine();
     compilerDirectiveLine.setType(COMPILER_DIRECTIVE);
     compilerDirectiveLine.setIndicatorArea(ProcessingConstants.WS);
     compilerDirectiveLine.setContentAreaA("    ");
@@ -86,7 +87,7 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing comment lines pre-formatting for Token analysis */
   @Test
   void commentLineTest() {
-    CobolLine commentLine = new CobolLine();
+    val commentLine = new CobolLine();
     commentLine.setType(COMMENT);
     commentLine.setIndicatorArea("*");
     commentLine.setContentAreaA("    ");
@@ -105,19 +106,19 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing normal continuation line pre-formatting for Token analysis */
   @Test
   void continuationLineTest() {
-    CobolLine startContinuationLine = new CobolLine();
+    val startContinuationLine = new CobolLine();
     startContinuationLine.setType(NORMAL);
     startContinuationLine.setIndicatorArea(ProcessingConstants.WS);
     startContinuationLine.setContentAreaA("    ");
     startContinuationLine.setContentAreaB("       \"RANDOM TEXT   ");
 
-    CobolLine middleContinuationLine = new CobolLine();
+    val middleContinuationLine = new CobolLine();
     middleContinuationLine.setType(CONTINUATION);
     middleContinuationLine.setIndicatorArea("-");
     middleContinuationLine.setContentAreaA("    ");
     middleContinuationLine.setContentAreaB("        \"RANDOM TEXT   ");
 
-    CobolLine lastContinuationLine = new CobolLine();
+    val lastContinuationLine = new CobolLine();
     lastContinuationLine.setType(CONTINUATION);
     lastContinuationLine.setIndicatorArea("-");
     lastContinuationLine.setContentAreaA("    ");
@@ -145,13 +146,13 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing empty continuation line pre-formatting for Token analysis */
   @Test
   void emptyContinuationLine() {
-    CobolLine continuationLine = new CobolLine();
+    val continuationLine = new CobolLine();
     continuationLine.setType(NORMAL);
     continuationLine.setIndicatorArea(ProcessingConstants.WS);
     continuationLine.setContentAreaA("    ");
     continuationLine.setContentAreaB("       \"RANDOM TEXT   ");
 
-    CobolLine emptyContinuationLine = new CobolLine();
+    val emptyContinuationLine = new CobolLine();
     emptyContinuationLine.setType(CONTINUATION);
     emptyContinuationLine.setIndicatorArea("-");
     emptyContinuationLine.setContentAreaA("    ");
@@ -174,13 +175,13 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing continuation lines with trailing comma pre-formatting for Token analysis */
   @Test
   void trailingCommaContinuationLineTest() {
-    CobolLine startContinuationLine = new CobolLine();
+    val startContinuationLine = new CobolLine();
     startContinuationLine.setType(NORMAL);
     startContinuationLine.setIndicatorArea(ProcessingConstants.WS);
     startContinuationLine.setContentAreaA("    ");
     startContinuationLine.setContentAreaB("       \"RANDOM TEXT   ");
 
-    CobolLine trailingCommaContinuationLine = new CobolLine();
+    val trailingCommaContinuationLine = new CobolLine();
     trailingCommaContinuationLine.setType(CONTINUATION);
     trailingCommaContinuationLine.setIndicatorArea("-");
     trailingCommaContinuationLine.setContentAreaA("    ");
@@ -207,18 +208,18 @@ class CobolLineIndicatorProcessorImplTest {
    */
   @Test
   void continuationLineWithoutBeginningQuotes() {
-    CobolLine startContinuationLine = new CobolLine();
+    val startContinuationLine = new CobolLine();
     startContinuationLine.setType(NORMAL);
     startContinuationLine.setIndicatorArea(ProcessingConstants.WS);
     startContinuationLine.setContentAreaB("       \"RANDOM TEXT   ");
 
-    CobolLine quoteContinuationLine = new CobolLine();
+    val quoteContinuationLine = new CobolLine();
     quoteContinuationLine.setType(CONTINUATION);
     quoteContinuationLine.setIndicatorArea("-");
     quoteContinuationLine.setContentAreaA("    ");
     quoteContinuationLine.setContentAreaB("          \"RANDOM TEXT SINGLE CONTINUATION LINE\"");
 
-    CobolLine lastContinuationLine = new CobolLine();
+    val lastContinuationLine = new CobolLine();
     lastContinuationLine.setType(CONTINUATION);
     lastContinuationLine.setIndicatorArea("-");
     lastContinuationLine.setContentAreaA("    ");
@@ -243,18 +244,18 @@ class CobolLineIndicatorProcessorImplTest {
    */
   @Test
   void continuationLineWithOuterQuotes() {
-    CobolLine startContinuationLine = new CobolLine();
+    val startContinuationLine = new CobolLine();
     startContinuationLine.setType(NORMAL);
     startContinuationLine.setIndicatorArea(ProcessingConstants.WS);
     startContinuationLine.setContentAreaB("       \"RANDOM TEXT   ");
 
-    CobolLine quoteContinuationLine = new CobolLine();
+    val quoteContinuationLine = new CobolLine();
     quoteContinuationLine.setType(CONTINUATION);
     quoteContinuationLine.setIndicatorArea("-");
     quoteContinuationLine.setContentAreaA("    ");
     quoteContinuationLine.setContentAreaB("          \"RANDOM TEXT SINGLE CONTINUATION LINE\"");
 
-    CobolLine lastContinuationLine = new CobolLine();
+    val lastContinuationLine = new CobolLine();
     lastContinuationLine.setType(CONTINUATION);
     lastContinuationLine.setIndicatorArea("-");
     lastContinuationLine.setContentAreaA("    ");
@@ -266,7 +267,7 @@ class CobolLineIndicatorProcessorImplTest {
     CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
 
     List<CobolLine> outcome = processor.processLines(List.of(lastContinuationLine));
-    CobolLine actual = outcome.get(0);
+    val actual = outcome.get(0);
 
     assertEquals(
         ProcessingConstants.WS + "RANDOM TEXT SINGLE CONTINUATION LINE\"",

@@ -16,14 +16,14 @@ package com.broadcom.lsp.cobol.core.engine;
 
 import com.broadcom.lsp.cobol.core.CobolLexer;
 import com.broadcom.lsp.cobol.core.CobolParser;
-import com.broadcom.lsp.cobol.core.model.SyntaxError;
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.ExtendedDocument;
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
+import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.preprocessor.TextPreprocessor;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import com.broadcom.lsp.cobol.core.semantics.SemanticContext;
-import com.broadcom.lsp.cobol.core.strategy.CobolErrorStrategy;
 import com.broadcom.lsp.cobol.core.visitor.CobolVisitor;
 import com.broadcom.lsp.cobol.core.visitor.ParserListener;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
@@ -32,9 +32,10 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.Token;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,10 +54,14 @@ import static java.util.stream.Collectors.toList;
 public class CobolLanguageEngine {
 
   private TextPreprocessor preprocessor;
+  private DefaultErrorStrategy defaultErrorStrategy;
+  private MessageService messageService;
 
   @Inject
-  public CobolLanguageEngine(TextPreprocessor preprocessor) {
+  public CobolLanguageEngine(TextPreprocessor preprocessor, DefaultErrorStrategy defaultErrorStrategy, MessageService messageService) {
     this.preprocessor = preprocessor;
+    this.defaultErrorStrategy = defaultErrorStrategy;
+    this.messageService = messageService;
   }
 
   /**
@@ -68,17 +73,16 @@ public class CobolLanguageEngine {
    * @return Semantic information wrapper object and list of syntax error that might send back to
    *     the client
    */
-  @Nonnull
+  @NonNull
   public ResultWithErrors<SemanticContext> run(
-      @Nonnull String documentUri,
-      @Nonnull String text,
-      @Nonnull CopybookProcessingMode copybookProcessingMode) {
-
-    ResultWithErrors<ExtendedDocument> preProcessorOutput =
-        preprocessor.process(documentUri, text, copybookProcessingMode);
-
-    List<SyntaxError> accumulatedErrors = new ArrayList<>(preProcessorOutput.getErrors());
-    ExtendedDocument extendedDocument = preProcessorOutput.getResult();
+      @NonNull String documentUri,
+      @NonNull String text,
+      @NonNull CopybookProcessingMode copybookProcessingMode) {
+    List<SyntaxError> accumulatedErrors = new ArrayList<>();
+    ExtendedDocument extendedDocument =
+        preprocessor
+            .process(documentUri, text, copybookProcessingMode)
+            .unwrap(accumulatedErrors::addAll);
 
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(extendedDocument.getText()));
     lexer.removeErrorListeners();
@@ -89,7 +93,7 @@ public class CobolLanguageEngine {
     CobolParser parser = new CobolParser(tokens);
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
-    parser.setErrorHandler(new CobolErrorStrategy());
+    parser.setErrorHandler(defaultErrorStrategy);
 
     CobolParser.StartRuleContext tree = parser.startRule();
 
@@ -98,7 +102,7 @@ public class CobolLanguageEngine {
             tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri);
 
     CobolVisitor visitor =
-        new CobolVisitor(documentUri, extendedDocument.getCopybooks(), tokens, positionMapping);
+        new CobolVisitor(documentUri, extendedDocument.getCopybooks(), tokens, positionMapping, messageService);
     visitor.visit(tree);
 
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
@@ -109,22 +113,22 @@ public class CobolLanguageEngine {
     return new ResultWithErrors<>(visitor.getSemanticContext(), accumulatedErrors);
   }
 
-  @Nonnull
+  @NonNull
   private List<SyntaxError> finalizeErrors(
-          @Nonnull List<SyntaxError> errors, @Nonnull Map<Token, Locality> mapping) {
+      @NonNull List<SyntaxError> errors, @NonNull Map<Token, Locality> mapping) {
     return errors.stream()
         .map(convertError(mapping))
         .filter(it -> it.getLocality() != null)
         .collect(toList());
   }
 
-  @Nonnull
-  private Function<SyntaxError, SyntaxError> convertError(@Nonnull Map<Token, Locality> mapping) {
+  @NonNull
+  private Function<SyntaxError, SyntaxError> convertError(@NonNull Map<Token, Locality> mapping) {
     return err -> err.toBuilder().locality(mapping.get(err.getOffendedToken())).build();
   }
 
   private List<SyntaxError> collectErrorsForCopybooks(
-          List<SyntaxError> errors, Map<String, Locality> copyStatements) {
+      List<SyntaxError> errors, Map<String, Locality> copyStatements) {
     return errors.stream()
         .filter(shouldRaise())
         .map(err -> raiseError(err, copyStatements))

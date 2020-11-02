@@ -41,7 +41,9 @@ class TestVaryingCorrect {
           + "        01 {$*IDENTIFIER-8}.\r\n"
           + "        01 {$*IDENTIFIER-9}.\r\n"
           + "        01 {$*IDENTIFIER-10}.\r\n"
-          + "        PROCEDURE DIVISION.\r\n";
+          + "        PROCEDURE DIVISION.\r\n"
+          + "        {#*PROCEDURE-NAME-1}.\r\n"
+          + "        {#*PROCEDURE-NAME-2}.\r\n";
 
   private static final String VARYING_WITH_TWO_IDENTIFIERS =
       "            PERFORM {#PROCEDURE-NAME-1} THROUGH {#PROCEDURE-NAME-2}\r\n"

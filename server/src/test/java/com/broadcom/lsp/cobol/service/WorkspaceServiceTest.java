@@ -14,10 +14,11 @@
  */
 package com.broadcom.lsp.cobol.service;
 
-import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import com.broadcom.lsp.cobol.core.messages.LocaleStore;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.cobol.domain.event.model.RunAnalysisEvent;
+import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +34,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
 import static com.broadcom.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
+import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -59,7 +60,7 @@ class WorkspaceServiceTest {
     CopybookService copybookService = mock(CopybookService.class);
     String copybookName = "COPYBOOK";
 
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, copybookService);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, copybookService, null);
 
     CompletableFuture<Object> result =
         service.executeCommand(
@@ -83,7 +84,7 @@ class WorkspaceServiceTest {
   void testExecuteNonExistingCommand() {
     DataBusBroker broker = mock(DataBusBroker.class);
     CopybookService copybookService = mock(CopybookService.class);
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, copybookService);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, copybookService, null);
 
     CompletableFuture<Object> result =
         service.executeCommand(new ExecuteCommandParams("Missing command name", emptyList()));
@@ -103,9 +104,10 @@ class WorkspaceServiceTest {
     SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
     CopybookService copybookService = mock(CopybookService.class);
+    LocaleStore localeStore = mock(LocaleStore.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService);
+        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService, localeStore);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     JsonArray arr = new JsonArray();
@@ -113,15 +115,21 @@ class WorkspaceServiceTest {
     arr.add(new JsonPrimitive(path));
 
     when(settingsService.getConfiguration(LOCAL_PATHS.label))
-        .thenReturn(completedFuture(singletonList(arr)));
+            .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.getConfiguration(LOCALE.label))
+            .thenReturn(completedFuture(singletonList("LOCALE")));
+    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+            .thenReturn(completedFuture(singletonList("INFO")));
     when(settingsService.toStrings(any())).thenCallRealMethod();
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
+    when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
 
     verify(watchingService).addWatchers(watcherCaptor.capture());
     verify(watchingService).removeWatchers(emptyList());
     verify(copybookService).invalidateCache();
+    verify(localeStore).notifyLocaleStore();
 
     assertEquals(path, watcherCaptor.getValue().get(0));
 
@@ -135,9 +143,10 @@ class WorkspaceServiceTest {
     SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
     CopybookService copybookService = mock(CopybookService.class);
+    LocaleStore localeStore = mock(LocaleStore.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService);
+        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService, localeStore);
 
     JsonArray arr = new JsonArray();
     String path = "foo/bar";
@@ -145,14 +154,20 @@ class WorkspaceServiceTest {
 
     when(settingsService.getConfiguration(LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.getConfiguration(LOCALE.label))
+            .thenReturn(completedFuture(singletonList("LOCALE")));
+    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+            .thenReturn(completedFuture(singletonList("INFO")));
     when(settingsService.toStrings(any())).thenCallRealMethod();
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
+    when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
 
     verify(watchingService).addWatchers(emptyList());
     verify(watchingService).removeWatchers(emptyList());
     verify(copybookService).invalidateCache();
+    verify(localeStore).notifyLocaleStore();
   }
 
   /** Test an existing watcher removed when its path doesn't exist in setting.json */
@@ -162,9 +177,10 @@ class WorkspaceServiceTest {
     SettingsService settingsService = mock(SettingsService.class);
     WatcherService watchingService = mock(WatcherService.class);
     CopybookService copybookService = mock(CopybookService.class);
+    LocaleStore localeStore = mock(LocaleStore.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService);
+        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService, localeStore);
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     JsonArray arr = new JsonArray();
@@ -173,9 +189,14 @@ class WorkspaceServiceTest {
 
     when(settingsService.getConfiguration(LOCAL_PATHS.label))
         .thenReturn(completedFuture(emptyList()));
+    when(settingsService.getConfiguration(LOCALE.label))
+            .thenReturn(completedFuture(singletonList("LOCALE")));
+    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+            .thenReturn(completedFuture(singletonList("INFO")));
     when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
+    when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
-    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
+    workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(localeStore));
 
     verify(watchingService).addWatchers(emptyList());
     verify(watchingService).removeWatchers(watcherCaptor.capture());
@@ -192,13 +213,19 @@ class WorkspaceServiceTest {
     SettingsService settingsService = mock(SettingsService.class);
     WatcherService watchingService = mock(WatcherService.class);
     CopybookService copybookService = mock(CopybookService.class);
+    LocaleStore localeStore = mock(LocaleStore.class);
 
     WorkspaceService workspaceService =
-        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService);
+        new CobolWorkspaceServiceImpl(broker, settingsService, watchingService, copybookService, localeStore);
 
     when(settingsService.getConfiguration(LOCAL_PATHS.label))
         .thenReturn(completedFuture(emptyList()));
+    when(settingsService.getConfiguration(LOCALE.label))
+            .thenReturn(completedFuture(singletonList("LOCALE")));
+    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+            .thenReturn(completedFuture(singletonList("INFO")));
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
+    when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(null));
 
@@ -246,7 +273,7 @@ class WorkspaceServiceTest {
     DefaultDataBusBroker broker = mock(DefaultDataBusBroker.class);
     CopybookService copybookService = mock(CopybookService.class);
 
-    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, copybookService);
+    WorkspaceService service = new CobolWorkspaceServiceImpl(broker, null, null, copybookService, null);
 
     DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));
     service.didChangeWatchedFiles(params);

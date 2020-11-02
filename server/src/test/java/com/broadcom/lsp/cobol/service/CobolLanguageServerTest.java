@@ -15,6 +15,7 @@
 
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.core.messages.LocaleStore;
 import com.broadcom.lsp.cobol.core.model.ErrorCode;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
@@ -24,8 +25,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.LOCAL_PATHS;
 import static com.broadcom.lsp.cobol.core.model.ErrorCode.values;
+import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -37,13 +38,14 @@ import static org.mockito.Mockito.*;
 class CobolLanguageServerTest {
 
   /**
-   * Test the {@link CobolLanguageServer#initialized(InitializedParams)} method. Check that the
-   * file system watchers registered correctly.
+   * Test the {@link CobolLanguageServer#initialized(InitializedParams)} method. Check that the file
+   * system watchers registered correctly.
    */
   @Test
   void initialized() {
     SettingsService settingsService = mock(SettingsServiceImpl.class);
     WatcherService watchingService = mock(WatcherService.class);
+    LocaleStore localeStore = mock(LocaleStore.class);
 
     JsonArray arr = new JsonArray();
     String path = "foo/bar";
@@ -52,16 +54,23 @@ class CobolLanguageServerTest {
     when(settingsService.getConfiguration(LOCAL_PATHS.label))
         .thenReturn(completedFuture(singletonList(arr)));
     when(settingsService.toStrings(any())).thenCallRealMethod();
+    when(localeStore.notifyLocaleStore()).thenReturn(System.out::println);
+    when(settingsService.getConfiguration(LOCALE.label))
+        .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.getConfiguration(LOGGING_LEVEL.label))
+        .thenReturn(completedFuture(List.of("INFO")));
 
     CobolLanguageServer server =
-        new CobolLanguageServer(null, null, watchingService, settingsService);
+        new CobolLanguageServer(null, null, watchingService, settingsService, localeStore);
 
     server.initialized(new InitializedParams());
 
     verify(watchingService).watchConfigurationChange();
     verify(watchingService).watchPredefinedFolder();
     verify(settingsService).getConfiguration(LOCAL_PATHS.label);
+    verify(settingsService).getConfiguration(LOCALE.label);
     verify(watchingService).addWatchers(singletonList(path));
+    verify(localeStore).notifyLocaleStore();
   }
 
   /**
@@ -71,7 +80,7 @@ class CobolLanguageServerTest {
    */
   @Test
   void initialize() {
-    CobolLanguageServer server = new CobolLanguageServer(null, null, null, null);
+    CobolLanguageServer server = new CobolLanguageServer(null, null, null, null, null);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));

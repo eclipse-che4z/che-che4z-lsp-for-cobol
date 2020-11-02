@@ -14,18 +14,19 @@
  */
 package com.broadcom.lsp.cobol.service;
 
-import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.ConfigurableTest;
-import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
-import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
-import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
-import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
+import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
 import com.broadcom.lsp.cobol.domain.event.model.RunAnalysisEvent;
+import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActions;
 import com.broadcom.lsp.cobol.service.delegates.communications.Communications;
+import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
+import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
+import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -115,7 +116,8 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
 
   @Test
   void testDidSave() {
-    TextDocumentIdentifier saveDocumentIdentifier = new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI);
+    TextDocumentIdentifier saveDocumentIdentifier =
+        new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI);
     DidSaveTextDocumentParams saveDocumentParams =
         new DidSaveTextDocumentParams(saveDocumentIdentifier);
     service.didOpen(
@@ -169,7 +171,8 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
         new DidOpenTextDocumentParams(
             new TextDocumentItem(EXT_SRC_DOC_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
 
-    verify(engine, timeout(10000)).analyze(eq(EXT_SRC_DOC_URI), anyString(), eq(CopybookProcessingMode.DISABLED));
+    verify(engine, timeout(10000))
+        .analyze(eq(EXT_SRC_DOC_URI), anyString(), eq(CopybookProcessingMode.DISABLED));
   }
 
   private CobolTextDocumentService buildServiceWithMockEngine(LanguageEngineFacade engine) {
@@ -190,7 +193,8 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
         new DidOpenTextDocumentParams(
             new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
 
-    verify(engine, timeout(10000)).analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.ENABLED));
+    verify(engine, timeout(10000))
+        .analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.ENABLED));
   }
 
   /**
@@ -207,12 +211,13 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
             new VersionedTextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI, 0),
             List.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
 
-    verify(engine, timeout(1000)).analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.SKIP));
+    verify(engine, timeout(1000))
+        .analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.SKIP));
   }
 
   /**
-   * This test checks that {@link CobolTextDocumentService} is subscribed to the databus events and may
-   * re-run analysis of the open documents if it receives a notification.
+   * This test checks that {@link CobolTextDocumentService} is subscribed to the databus events and
+   * may re-run analysis of the open documents if it receives a notification.
    */
   @Test
   void observerCallback() {
@@ -227,8 +232,10 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
 
     // created two dummy analysis result, one with error and another without
     // those object will be used as result of dynamic stubbing stage
-    AnalysisResult resultNoErrors = AnalysisResult.builder().diagnostics(diagnosticsNoErrors).build();
-    AnalysisResult resultWithErrors = AnalysisResult.builder().diagnostics(diagnosticsWithErrors).build();
+    AnalysisResult resultNoErrors =
+        AnalysisResult.builder().diagnostics(diagnosticsNoErrors).build();
+    AnalysisResult resultWithErrors =
+        AnalysisResult.builder().diagnostics(diagnosticsWithErrors).build();
 
     /*
      * Defined dynamic response based on the possible combinations available when the document analyzed:
@@ -242,16 +249,23 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
             DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
         .thenReturn(resultWithErrors);
 
-    when(engine.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.SKIP)).thenReturn(resultNoErrors);
-    when(engine.analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.SKIP))
+    when(engine.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.SKIP))
+        .thenReturn(resultNoErrors);
+    when(engine.analyze(
+            DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.SKIP))
         .thenReturn(resultWithErrors);
 
     // create a service and verify is subscribed to the required event
     CobolTextDocumentService service = verifyServiceStart(communications, engine, broker);
-
     // simulate the call to the didOpen for two different document one with and one without errors
     verifyDidOpen(
-        communications, engine, broker, diagnosticsNoErrors, service, TEXT_EXAMPLE, UseCaseUtils.DOCUMENT_URI);
+        communications,
+        engine,
+        broker,
+        diagnosticsNoErrors,
+        service,
+        TEXT_EXAMPLE,
+        UseCaseUtils.DOCUMENT_URI);
     verifyDidOpen(
         communications,
         engine,
@@ -270,7 +284,8 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
             - analysis invoked two times (because two documents opened previously)
             - the diagnostic published exactly 2 times after the syntax/semantic analysis invoked.
             */
-    verifyCallback(communications, engine, diagnosticsNoErrors, TEXT_EXAMPLE, UseCaseUtils.DOCUMENT_URI);
+    verifyCallback(
+        communications, engine, diagnosticsNoErrors, TEXT_EXAMPLE, UseCaseUtils.DOCUMENT_URI);
     verifyCallback(
         communications,
         engine,
@@ -296,7 +311,10 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
 
     when(actions.collect(params)).thenReturn(expected);
 
-    CobolTextDocumentService service = CobolTextDocumentService.builder().dataBus(broker).actions(actions).build();
+    MessageService mockMessageService = mock(MessageService.class);
+    CobolTextDocumentService service =
+        CobolTextDocumentService.builder().dataBus(broker).actions(actions).build();
+    when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     try {
       assertEquals(expected, service.codeAction(params).get());
     } catch (InterruptedException | ExecutionException e) {
@@ -314,9 +332,9 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
                 INCORRECT_TEXT_EXAMPLE)));
   }
   /**
-   * This test verify that when a {@link CobolTextDocumentService#didClose(DidCloseTextDocumentParams)}
-   * is sent from the client to dispose a document, all the related diagnostic message are disposed
-   * from the document.
+   * This test verify that when a {@link
+   * CobolTextDocumentService#didClose(DidCloseTextDocumentParams)} is sent from the client to
+   * dispose a document, all the related diagnostic message are disposed from the document.
    */
   @Test
   void testDidCloseDisposeDiagnostics() {
@@ -327,12 +345,18 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
     service.didClose(closedDocument);
 
     assertEquals(Collections.EMPTY_MAP, closeGetter(service));
-    verify(spyCommunications, atMost(1)).publishDiagnostics(Map.of(UseCaseUtils.DOCUMENT_URI, List.of()));
+    verify(spyCommunications, atMost(1))
+        .publishDiagnostics(Map.of(UseCaseUtils.DOCUMENT_URI, List.of()));
   }
 
   private CobolTextDocumentService verifyServiceStart(
       Communications communications, LanguageEngineFacade engine, DataBusBroker broker) {
-    CobolTextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).build();
+    CobolTextDocumentService service =
+        CobolTextDocumentService.builder()
+            .communications(communications)
+            .engine(engine)
+            .dataBus(broker)
+            .build();
 
     verify(broker).subscribe(DataEventType.RUN_ANALYSIS_EVENT, service);
     return service;
@@ -388,8 +412,12 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
     doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.empty()))
         .when(engine)
         .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
-
-    CobolTextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).build();
+    CobolTextDocumentService service =
+        CobolTextDocumentService.builder()
+            .communications(communications)
+            .engine(engine)
+            .dataBus(broker)
+            .build();
 
     service.didOpen(
         new DidOpenTextDocumentParams(
@@ -397,7 +425,8 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
 
     assertEquals(1, service.getDocs().size());
 
-    service.didClose(new DidCloseTextDocumentParams(new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI)));
+    service.didClose(
+        new DidCloseTextDocumentParams(new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI)));
     assertEquals(0, service.getDocs().size());
 
     verify(communications, timeout(2000)).cancelProgressNotification(UseCaseUtils.DOCUMENT_URI);
@@ -410,7 +439,8 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
         new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE);
     service.didOpen(new DidOpenTextDocumentParams(testHoverDocument));
     Position testHoverPosition = new Position(0, 2);
-    TextDocumentIdentifier testTextDocumentIdentifier = new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI);
+    TextDocumentIdentifier testTextDocumentIdentifier =
+        new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI);
     TextDocumentPositionParams testHoverPositionParams =
         new TextDocumentPositionParams(testTextDocumentIdentifier, testHoverPosition);
     try {
@@ -440,8 +470,12 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
 
     when(engine.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
         .thenReturn(AnalysisResult.empty().toBuilder().copybookUsages(copybookUsages).build());
-
-    CobolTextDocumentService service = CobolTextDocumentService.builder().communications(communications).engine(engine).dataBus(broker).build();
+    CobolTextDocumentService service =
+        CobolTextDocumentService.builder()
+            .communications(communications)
+            .engine(engine)
+            .dataBus(broker)
+            .build();
 
     service.didOpen(
         new DidOpenTextDocumentParams(

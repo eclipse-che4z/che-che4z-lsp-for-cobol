@@ -21,7 +21,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.ReferenceContext;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -41,9 +41,9 @@ public interface Occurrences {
    * @return list of locations of the definitions for the required token or empty list if token is
    *     empty or not of a supported type
    */
-  @Nonnull
+  @NonNull
   List<Location> findDefinitions(
-      @Nullable CobolDocumentModel document, @Nonnull TextDocumentPositionParams position);
+      @Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position);
 
   /**
    * Resolve project-wide references for the symbol denoted by the given text document position. The
@@ -55,11 +55,11 @@ public interface Occurrences {
    * @return list of locations of the references for the required token or empty list if token is
    *     empty or not of a supported type
    */
-  @Nonnull
+  @NonNull
   List<Location> findReferences(
       @Nullable CobolDocumentModel document,
-      @Nonnull TextDocumentPositionParams position,
-      @Nonnull ReferenceContext context);
+      @NonNull TextDocumentPositionParams position,
+      @NonNull ReferenceContext context);
 
   /**
    * Resolve a document highlights for a given text document position. Return the highlight
@@ -70,7 +70,7 @@ public interface Occurrences {
    * @return list of document highlights for the required token or empty list if token is empty or
    *     not of a supported type
    */
-  @Nonnull
+  @NonNull
   List<DocumentHighlight> findHighlights(
-      @Nullable CobolDocumentModel document, @Nonnull TextDocumentPositionParams position);
+      @Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position);
 }
