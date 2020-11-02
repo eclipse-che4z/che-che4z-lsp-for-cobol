@@ -26,6 +26,7 @@ import com.broadcom.lsp.cobol.service.CopybookService;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -38,7 +39,6 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import lombok.NonNull;
 import java.util.*;
 import java.util.function.Function;
 
@@ -69,7 +69,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private final NamedSubContext copybooks = new NamedSubContext();
   private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
   private final Map<Integer, Integer> shifts = new HashMap<>();
-  private final Map<String, Locality> copyStatements = new HashMap<>();
+  //used for both copy and sql-include statements
+  private final Map<String, Locality> copybookStatements = new HashMap<>();
 
   private String documentUri;
   private BufferedTokenStream tokens;
@@ -108,7 +109,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         documentUri,
         new DocumentMapping(
             tokens.getTokens().stream().map(toPosition()).collect(toList()), shifts));
-    return new ExtendedDocument(read(), copybooks, nestedMappings, copyStatements);
+    return new ExtendedDocument(read(), copybooks, nestedMappings, copybookStatements);
   }
 
   @Override
@@ -145,36 +146,50 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
+    collectAndAccumulateCopybookData(ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval());
+  }
+
+
+  @Override public void enterIncludeStatement(@NonNull IncludeStatementContext ctx) {
+    push();
+  }
+
+  @Override public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
+    collectAndAccumulateCopybookData(ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval());
+  }
+
+  private void collectAndAccumulateCopybookData(CopySourceContext copySource, Locality copybookStatementPosition,  Interval sourceInterval) {
     if (!copybookProcessingMode.analyze) {
       pop();
       return;
     }
-    CopySourceContext copySource = ctx.copySource();
 
     String copybookName = retrieveCopybookName(copySource);
     Locality locality = retrievePosition(copySource);
     CopybookModel model = getCopyBookContent(copybookName, locality);
 
     String uri = model.getUri();
-    String rawContent = model.getContent();
+    String content = model.getContent();
+
+    if (!replacingClauses.isEmpty()) {
+      content = applyReplacing(content, replacingClauses);
+      replacingClauses.clear();
+    }
 
     String copybookId = randomUUID().toString();
-    String replacedContent = applyReplacing(rawContent, replacingClauses);
-    replacingClauses.clear();
-
     ExtendedDocument copybookDocument =
-        processCopybook(copybookName, uri, copybookId, replacedContent, locality);
+            processCopybook(copybookName, uri, copybookId, content, locality);
     String copybookContent = copybookDocument.getText();
 
     checkCopybookNameLength(copybookName, locality);
     addCopybookUsage(copybookName, locality);
     addCopybookDefinition(copybookName, uri);
 
-    collectCopyStatement(copybookId, retrieveCopybookStatementPosition(ctx));
+    collectCopybookStatement(copybookId, copybookStatementPosition);
     collectNestedSemanticData(uri, copybookId, copybookDocument);
     writeCopybook(copybookId, copybookContent);
 
-    accumulateCopybookShift(ctx.getSourceInterval());
+    accumulateCopybookShift(sourceInterval);
   }
 
   @Override
@@ -242,19 +257,18 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     peek().append(text);
   }
 
-  @NonNull
   private String read() {
     return peek().toString();
   }
 
-  private void collectCopyStatement(String copybookId, Locality locality) {
-    copyStatements.put(copybookId, locality);
+  private void collectCopybookStatement(String copybookId, Locality locality) {
+    copybookStatements.put(copybookId, locality);
   }
 
   private void collectNestedSemanticData(
       String uri, String copybookId, ExtendedDocument copybookDocument) {
     copybooks.merge(copybookDocument.getCopybooks());
-    copyStatements.putAll(copybookDocument.getCopyStatements());
+    copybookStatements.putAll(copybookDocument.getCopyStatements());
     nestedMappings.putAll(copybookDocument.getDocumentMapping());
     nestedMappings.putIfAbsent(copybookId, nestedMappings.get(uri));
   }
