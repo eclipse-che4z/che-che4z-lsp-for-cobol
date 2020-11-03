@@ -15,7 +15,7 @@ module.exports = {
         "resources/**/*.{js,jsx,ts}",
         "!**/node_modules/**",
         "!**/coverage/**",
-        "!src/_tests_/*.ts"
+        "!src/__tests__/*.ts"
      ],
     "testResultsProcessor": "jest-sonar-reporter",
      "coverageThreshold": {
