@@ -58,7 +58,7 @@ describe("LanguageClientService negative scenario.", () => {
     test("LSP port not defined and jar path doesn't exists", async () => {
         await expect(new LanguageClientService(undefined).checkPrerequisites())
         .rejects.toThrowError("LSP server for COBOL not found");
-});
+}, 10000);
 });
 
 const SERVER_STARTED_MSG = "server started";

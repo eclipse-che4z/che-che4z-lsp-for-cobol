@@ -15,6 +15,10 @@
 import * as fs from "fs-extra";
 import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
+import {changeDefaultZoweProfile} from "../commands/ChangeDefaultZoweProfile";
+import {editDatasetPaths} from "../commands/EditDatasetPaths";
+import {fetchCopybookCommand} from "../commands/FetchCopybookCommand";
+import {gotoCopybookSettings} from "../commands/OpenSettingsCommand";
 import {activate} from "../extension";
 import {CopybookDownloadService} from "../services/copybook/CopybookDownloadService";
 import {CopybooksCodeActionProvider} from "../services/copybook/CopybooksCodeActionProvider";
@@ -27,6 +31,11 @@ import {TelemetryService} from "../services/reporter/TelemetryService";
 import {createFileWithGivenPath, initializeSettings} from "../services/Settings";
 import {ZoweApi} from "../services/ZoweApi";
 
+jest.mock("../commands/ChangeDefaultZoweProfile");
+jest.mock("../commands/EditDatasetPaths");
+jest.mock("../commands/FetchCopybookCommand");
+jest.mock("../commands/OpenSettingsCommand");
+
 jest.mock("../services/Settings", () => ({
     createFileWithGivenPath: jest.fn(),
     initializeSettings: jest.fn(),
@@ -36,7 +45,7 @@ jest.mock("../commands/FetchCopybookCommand", () => ({
 }));
 jest.mock("vscode", () => ({
     commands: {
-        registerCommand : jest.fn().mockImplementation((...args) => args),
+        registerCommand : jest.fn().mockImplementation((command, callback) => callback()),
     },
     extensions: {
         getExtension: jest.fn().mockReturnValue({extensionPath: "/test"}),
@@ -71,9 +80,7 @@ fs.existsSync = jest.fn().mockReturnValue(true);
 new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
 
 const context: any = {
-    subscriptions: {
-      push: jest.fn(),
-    },
+    subscriptions: [],
   };
 
 const zoweApi: ZoweApi = new ZoweApi();
@@ -87,10 +94,8 @@ copyBooksDownloader.start = jest.fn().mockReturnValue("started");
 
 beforeEach(() => {
     jest.clearAllMocks();
-    context.subscriptions.push.mockReset();
+    context.subscriptions = [];
   });
-
-(vscode.commands as any).registerCommand = jest.fn().mockImplementation((...args) => args);
 
 describe("Check plugin extension for cobol starts successfully.", () => {
 
@@ -109,15 +114,20 @@ describe("Check plugin extension for cobol starts successfully.", () => {
         expect(TelemetryService.registerEvent).toHaveBeenCalledWith("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
 
         expect(vscode.workspace.onDidChangeConfiguration).toBeCalled();
-        expect(context.subscriptions.push.mock.calls[0]).toContain("onDidChangeConfiguration");
+        expect(context.subscriptions[0]).toContain("onDidChangeConfiguration");
 
         expect(vscode.commands.registerCommand).toBeCalledTimes(4);
+
+        expect(fetchCopybookCommand).toHaveBeenCalled();
+        expect(changeDefaultZoweProfile).toHaveBeenCalled();
+        expect(editDatasetPaths).toHaveBeenCalled();
+        expect(gotoCopybookSettings).toHaveBeenCalled();
+
         expect(createFileWithGivenPath).toHaveBeenCalledTimes(1);
 
         expect(vscode.languages.registerCodeActionsProvider)
         .toBeCalledWith({scheme: "file", language: "COBOL"}, expect.any(CopybooksCodeActionProvider));
 
-        expect(context.subscriptions.push).toHaveBeenCalledTimes(8);
     });
 });
 
