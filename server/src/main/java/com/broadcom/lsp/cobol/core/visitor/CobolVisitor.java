@@ -29,15 +29,16 @@ import com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineTreeBuilder;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.RuleNode;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
-
-import lombok.NonNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -679,4 +680,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
         .collect(Collectors.toList());
   }
 
+  // NOTE: CobolVisitor is not managed by Guice DI, so can't use annotation here.
+  @Override
+  public Class visitChildren(RuleNode node) {
+    if(Thread.interrupted()) {
+      LOG.debug("visitChildren method interrupted by user");
+      throw new ParseCancellationException("Parsing interrupted by user.");
+    }
+    return super.visitChildren(node);
+  }
 }

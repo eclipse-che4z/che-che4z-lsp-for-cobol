@@ -14,6 +14,8 @@
  */
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
+import com.broadcom.lsp.cobol.core.annotation.CheckThreadInterruption;
 import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
@@ -25,9 +27,9 @@ import com.google.gson.JsonPrimitive;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import lombok.NonNull;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,7 +47,7 @@ import static java.util.stream.Collectors.toList;
  */
 @Slf4j
 @Singleton
-public class CopybookServiceImpl implements CopybookService {
+public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspect {
   private final SettingsService settingsService;
   private final FileSystemService files;
 
@@ -90,6 +92,7 @@ public class CopybookServiceImpl implements CopybookService {
    * @param copybookProcessingMode - text document synchronization type
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
+  @CheckThreadInterruption
   public CopybookModel resolve(
       @NonNull String copybookName,
       @NonNull String documentUri,
@@ -108,7 +111,8 @@ public class CopybookServiceImpl implements CopybookService {
     copybookCache.put(copybookModel.getName(), copybookModel);
   }
 
-  private CopybookModel resolveSync(
+  @CheckThreadInterruption
+  CopybookModel resolveSync(
       @NonNull String copybookName,
       @NonNull String documentUri,
       @NonNull CopybookProcessingMode copybookProcessingMode)

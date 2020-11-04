@@ -14,6 +14,8 @@
  */
 package com.broadcom.lsp.cobol.core.preprocessor;
 
+import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
+import com.broadcom.lsp.cobol.core.annotation.CheckThreadInterruption;
 import com.broadcom.lsp.cobol.core.model.*;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
@@ -24,9 +26,9 @@ import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import lombok.NonNull;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -40,7 +42,7 @@ import java.util.List;
  */
 @Slf4j
 @Singleton
-public class TextPreprocessorImpl implements TextPreprocessor {
+public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAspect {
   private GrammarPreprocessor grammarPreprocessor;
   private CobolLineReader reader;
   private CobolLineWriter writer;
@@ -97,6 +99,7 @@ public class TextPreprocessorImpl implements TextPreprocessor {
    */
   @NonNull
   @Override
+  @CheckThreadInterruption
   public ResultWithErrors<ExtendedDocument> process(
       @NonNull String documentUri,
       @NonNull String cobolCode,
