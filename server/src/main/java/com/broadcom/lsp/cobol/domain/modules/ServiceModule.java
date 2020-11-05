@@ -14,6 +14,9 @@
  */
 package com.broadcom.lsp.cobol.domain.modules;
 
+import com.broadcom.lsp.cobol.core.annotation.CheckThreadInterruption;
+import com.broadcom.lsp.cobol.core.annotation.HandleThreadInterruption;
+import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import com.broadcom.lsp.cobol.service.*;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActions;
@@ -31,6 +34,7 @@ import com.broadcom.lsp.cobol.service.providers.ClientProvider;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.broadcom.lsp.cobol.service.utils.WorkspaceFileService;
 import com.google.inject.AbstractModule;
+import com.google.inject.matcher.Matchers;
 import com.google.inject.multibindings.Multibinder;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -61,6 +65,11 @@ public class ServiceModule extends AbstractModule {
     bindCompletions();
     bindReferences();
     bindCodeActions();
+
+    bindInterceptor(
+        Matchers.subclassesOf(ThreadInterruptAspect.class),
+        Matchers.annotatedWith(CheckThreadInterruption.class),
+        new HandleThreadInterruption());
   }
 
   private void bindFormations() {
@@ -74,6 +83,7 @@ public class ServiceModule extends AbstractModule {
     Multibinder<Completion> completionBinding = newSetBinder(binder(), Completion.class);
     completionBinding.addBinding().to(VariableCompletion.class);
     completionBinding.addBinding().to(ParagraphCompletion.class);
+    completionBinding.addBinding().to(SectionCompletion.class);
     completionBinding.addBinding().to(SnippetCompletion.class);
     completionBinding.addBinding().to(KeywordCompletion.class);
     completionBinding.addBinding().to(CopybookCompletion.class);
@@ -89,6 +99,7 @@ public class ServiceModule extends AbstractModule {
         newSetBinder(binder(), SemanticLocations.class);
     referenceBinding.addBinding().to(VariableLocations.class);
     referenceBinding.addBinding().to(ParagraphLocations.class);
+    referenceBinding.addBinding().to(SectionLocations.class);
     referenceBinding.addBinding().to(CopybookLocations.class);
     referenceBinding.addBinding().to(ConstantLocations.class);
   }

@@ -132,18 +132,12 @@ class CobolLanguageEngineTest {
                         List.of()))));
 
     ResultWithErrors<SemanticContext> expected =
-        new ResultWithErrors<>(
-            new SemanticContext(
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                getConstantDefinitions(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                expectedOutlineTree),
-            List.of(error));
+            new ResultWithErrors<>(
+                    SemanticContext.builder()
+                            .constantDefinitions(getConstantDefinitions())
+                            .outlineTree(expectedOutlineTree)
+                            .build(),
+                    List.of(error));
 
     ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, PROCESSING_MODE);
 

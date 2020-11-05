@@ -12,17 +12,10 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
+package com.broadcom.lsp.cobol.core.annotation;
 
-package com.broadcom.lsp.cobol.service.delegates.completions;
-
-/** This enum explicitly defines the order for completions suggestions with sorting prefixes */
-public enum CompletionOrder {
-  VARIABLES,
-  PARAGRAPHS,
-  SECTIONS,
-  COPYBOOKS,
-  CONSTANTS,
-  SNIPPETS,
-  KEYWORDS;
-  final String prefix = String.valueOf(this.ordinal());
-}
+/**
+ * This is a marker interface. Implementing this class would enable the {@link
+ * CheckThreadInterruption} annotation to be used for member methods of the class.
+ */
+public interface ThreadInterruptAspect {}

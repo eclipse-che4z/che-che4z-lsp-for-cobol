@@ -25,15 +25,17 @@ import java.util.Map;
 /** This data class defines output of use-case text preprocessor */
 @Value
 class TestData {
-  private String text;
-  private String copybookName;
-  private Map<String, List<Diagnostic>> diagnostics;
-  private Map<String, List<Location>> variableDefinitions;
-  private Map<String, List<Location>> variableUsages;
-  private Map<String, List<Location>> paragraphDefinitions;
-  private Map<String, List<Location>> paragraphUsages;
-  private Map<String, List<Location>> constantDefinitions;
-  private Map<String, List<Location>> constantUsages;
-  private Map<String, List<Location>> copybookDefinitions;
-  private Map<String, List<Location>> copybookUsages;
+  String text;
+  String copybookName;
+  Map<String, List<Diagnostic>> diagnostics;
+  Map<String, List<Location>> variableDefinitions;
+  Map<String, List<Location>> variableUsages;
+  Map<String, List<Location>> paragraphDefinitions;
+  Map<String, List<Location>> paragraphUsages;
+  Map<String, List<Location>> sectionDefinitions;
+  Map<String, List<Location>> sectionUsages;
+  Map<String, List<Location>> constantDefinitions;
+  Map<String, List<Location>> constantUsages;
+  Map<String, List<Location>> copybookDefinitions;
+  Map<String, List<Location>> copybookUsages;
 }
