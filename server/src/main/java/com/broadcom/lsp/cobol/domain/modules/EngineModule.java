@@ -40,11 +40,13 @@ import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.ReplacingServiceI
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
 import com.broadcom.lsp.cobol.core.strategy.CobolErrorStrategy;
+import com.broadcom.lsp.cobol.core.visitor.InterruptingTreeListener;
 import com.broadcom.lsp.cobol.service.delegates.communications.Communications;
 import com.broadcom.lsp.cobol.service.delegates.communications.ServerCommunications;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 import static com.google.inject.name.Names.named;
 
@@ -65,8 +67,10 @@ public class EngineModule extends AbstractModule {
     bind(MessageService.class).to(PropertiesMessageService.class);
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
-    bind(String.class).annotatedWith(named("resourceFileLocation")).toInstance("resourceBundles/messages");
-
+    bind(ParseTreeListener.class).to(InterruptingTreeListener.class);
+    bind(String.class)
+        .annotatedWith(named("resourceFileLocation"))
+        .toInstance("resourceBundles/messages");
 
     bind(CobolLineReWriter.class)
         .annotatedWith(named("entriesMarker"))
