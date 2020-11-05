@@ -91,6 +91,8 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
   private Map<String, List<Location>> variableUsages = new HashMap<>();
   private Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
   private Map<String, List<Location>> paragraphUsages = new HashMap<>();
+  private Map<String, List<Location>> sectionDefinitions = new HashMap<>();
+  private Map<String, List<Location>> sectionUsages = new HashMap<>();
   private Map<String, List<Location>> constantUsages = new HashMap<>();
   private Map<String, List<Location>> copybookDefinitions = new HashMap<>();
   private Map<String, List<Location>> copybookUsages = new HashMap<>();
@@ -134,6 +136,8 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
         variableUsages,
         paragraphDefinitions,
         paragraphUsages,
+        sectionDefinitions,
+        sectionUsages,
         getConstantDefinitions(),
         constantUsages,
         copybookDefinitions,
@@ -243,6 +247,36 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
                     it.replacement(),
                     paragraphDefinitions,
                     ctx.diagnostic()));
+  }
+
+  @Override
+  public void enterSectionStatement(SectionStatementContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitSectionStatement(SectionStatementContext ctx) {
+    pop();
+    ofNullable(ctx.sectionUsage())
+            .map(SectionUsageContext::word)
+            .ifPresent(
+                    it ->
+                            processToken(
+                                    it.identifier().getText(),
+                                    ctx,
+                                    it.replacement(),
+                                    sectionUsages,
+                                    ctx.diagnostic()));
+    ofNullable(ctx.sectionDefinition())
+            .map(SectionDefinitionContext::word)
+            .ifPresent(
+                    it ->
+                            processToken(
+                                    it.identifier().getText(),
+                                    ctx,
+                                    it.replacement(),
+                                    sectionDefinitions,
+                                    ctx.diagnostic()));
   }
 
   @Override

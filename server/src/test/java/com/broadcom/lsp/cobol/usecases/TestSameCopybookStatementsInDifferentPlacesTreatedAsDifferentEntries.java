@@ -16,7 +16,6 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.positive.CobolText;
-import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,10 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
+import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.WARNING;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
 
 /**
  * Test several copy statements treated as different entries, so if one of them contains a syntax
@@ -33,7 +35,6 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
  * syntax error, so this exact statement should be underlined.
  */
 class TestSameCopybookStatementsInDifferentPlacesTreatedAsDifferentEntries {
-
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TESTREPL.\n"
@@ -42,12 +43,11 @@ class TestSameCopybookStatementsInDifferentPlacesTreatedAsDifferentEntries {
           + "       01  {$*PARENT}.\n"
           + "       COPY {~REPL}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "       {_COPY {~REPL}.|1|3_}\n"
           + "       {#*MAINLINE}. \n"
           + "           MOVE 0 TO {$TAG-ID}.\n"
+          + "           MOVE {_COPY {~REPL}.|1|2|3_}\n"
           + "           GOBACK. ";
-
-  private static final String REPL = "       05 {$*TAG-ID|1} {PIC|3} 9.\n";
+  private static final String REPL = "       {05|1} {$*TAG-ID|2|3} PIC 9.\n";
   private static final String REPL_NAME = "REPL";
 
   @Test
@@ -58,9 +58,20 @@ class TestSameCopybookStatementsInDifferentPlacesTreatedAsDifferentEntries {
         Map.of(
             "1",
             new Diagnostic(
-                null, "Syntax error on 'TAG-ID' expected SECTION", Error, SourceInfoLevels.ERROR.getText(), null),
+                null,
+                "The following token must start in Area B: 05",
+                Warning,
+                WARNING.getText(),
+                null),
+            "2",
+            new Diagnostic(
+                null, "Missing token TO at moveToStatement", Error, ERROR.getText(), null),
             "3",
             new Diagnostic(
-                null, "Syntax error on 'PIC' expected SECTION", Error, SourceInfoLevels.ERROR.getText(), null)));
+                null,
+                "The following token must start in Area B: TAG-ID",
+                Warning,
+                WARNING.getText(),
+                null)));
   }
 }

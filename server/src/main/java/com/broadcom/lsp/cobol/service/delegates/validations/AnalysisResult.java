@@ -14,40 +14,36 @@
  */
 package com.broadcom.lsp.cobol.service.delegates.validations;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class represents a semantic context of the analysed document. It contains a map of {@link
  * Diagnostic} grouped by related documents, all the
  */
 @Value
-@AllArgsConstructor
 @Builder(toBuilder = true)
 public class AnalysisResult {
-  private Map<String, List<Diagnostic>> diagnostics;
-  private Map<String, List<Location>> variableDefinitions;
-  private Map<String, List<Location>> variableUsages;
-  private Map<String, List<Location>> paragraphDefinitions;
-  private Map<String, List<Location>> paragraphUsages;
-  private Map<String, List<Location>> constantDefinitions;
-  private Map<String, List<Location>> constantUsages;
-  private Map<String, List<Location>> copybookDefinitions;
-  private Map<String, List<Location>> copybookUsages;
-  private List<DocumentSymbol> outlineTree;
+  @Builder.Default Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> variableDefinitions = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> variableUsages = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> paragraphUsages = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> sectionDefinitions = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> sectionUsages = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> constantDefinitions = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> constantUsages = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> copybookDefinitions = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> copybookUsages = new HashMap<>();
+  @Builder.Default List<DocumentSymbol> outlineTree = new ArrayList<>();
 
   public static AnalysisResult empty() {
-    return new AnalysisResult(
-        Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(),
-        List.of());
+    return AnalysisResult.builder().build();
   }
 
   public Set<String> getVariables() {
@@ -60,5 +56,9 @@ public class AnalysisResult {
 
   public Set<String> getParagraphs() {
     return paragraphDefinitions.keySet();
+  }
+
+  public Set<String> getSections() {
+    return sectionDefinitions.keySet();
   }
 }

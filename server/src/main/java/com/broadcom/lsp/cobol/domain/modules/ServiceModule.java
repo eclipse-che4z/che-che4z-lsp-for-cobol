@@ -83,6 +83,7 @@ public class ServiceModule extends AbstractModule {
     Multibinder<Completion> completionBinding = newSetBinder(binder(), Completion.class);
     completionBinding.addBinding().to(VariableCompletion.class);
     completionBinding.addBinding().to(ParagraphCompletion.class);
+    completionBinding.addBinding().to(SectionCompletion.class);
     completionBinding.addBinding().to(SnippetCompletion.class);
     completionBinding.addBinding().to(KeywordCompletion.class);
     completionBinding.addBinding().to(CopybookCompletion.class);
@@ -98,6 +99,7 @@ public class ServiceModule extends AbstractModule {
         newSetBinder(binder(), SemanticLocations.class);
     referenceBinding.addBinding().to(VariableLocations.class);
     referenceBinding.addBinding().to(ParagraphLocations.class);
+    referenceBinding.addBinding().to(SectionLocations.class);
     referenceBinding.addBinding().to(CopybookLocations.class);
     referenceBinding.addBinding().to(ConstantLocations.class);
   }

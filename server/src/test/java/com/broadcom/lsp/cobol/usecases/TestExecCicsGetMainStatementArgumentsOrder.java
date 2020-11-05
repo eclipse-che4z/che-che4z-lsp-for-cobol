@@ -45,18 +45,18 @@ class TestExecCicsGetMainStatementArgumentsOrder {
           + "                    LENGTH(LENGTH OF {$DFHCOMMAREA})\n"
           + "                    SET   (ADDRESS OF {$DFHCOMMAREA})\n"
           + "                    END-EXEC\n"
-          + "               PERFORM {#SEND-EMPTY-MENU}\n"
+          + "               PERFORM {@SEND-EMPTY-MENU}\n"
           + "           ELSE\n"
           + "               EVALUATE TRUE\n"
           + "               WHEN {$SENT-MENU}\n"
-          + "                    PERFORM {#SEND-EMPTY-MENU}\n"
+          + "                    PERFORM {@SEND-EMPTY-MENU}\n"
           + "               WHEN OTHER\n"
-          + "                    PERFORM {#UNEXPECTED-ERROR}\n"
+          + "                    PERFORM {@UNEXPECTED-ERROR}\n"
           + "               END-EVALUATE\n"
           + "           END-IF.\n"
-          + "       SEND-EMPTY-MENU SECTION.\n"
+          + "       {@*SEND-EMPTY-MENU} SECTION.\n"
           + "           DISPLAY \"HELLO\".\n"
-          + "       UNEXPECTED-ERROR SECTION.\n"
+          + "       {@*UNEXPECTED-ERROR} SECTION.\n"
           + "           DISPLAY \"HELLO\".";
 
   @Test

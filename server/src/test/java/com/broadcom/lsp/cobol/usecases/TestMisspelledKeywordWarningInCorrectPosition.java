@@ -38,7 +38,7 @@ class TestMisspelledKeywordWarningInCorrectPosition {
           + "4       COPY {~STRUC1}. \n"
           + "5      Procedure Division.\n"
           + "6      {#*000-Main-Logic}.\n"
-          + "7          {DISPLA|misspelled|area} {\"hello\"|hello}.\n"
+          + "7          {@*DISPLA|misspelled|area} {\"hello\"|hello}.\n"
           + "8          DISPLAY {$CHILD1} OF {$PARENT1}.\n"
           + "9      End program ProgramId.";
 

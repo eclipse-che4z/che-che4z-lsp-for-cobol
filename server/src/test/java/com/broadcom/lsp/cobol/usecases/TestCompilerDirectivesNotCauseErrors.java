@@ -39,7 +39,7 @@ class TestCompilerDirectivesNotCauseErrors {
           + "       WORKING-STORAGE SECTION.\n"
           + "       1 {$*PARENT}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "       MAINLINE SECTION.\n"
+          + "       {@*MAINLINE} SECTION.\n"
           + "      * --------------------------------------------------------------\n"
           + "      * MAINLINE\n"
           + "      * --------------------------------------------------------------\n"
