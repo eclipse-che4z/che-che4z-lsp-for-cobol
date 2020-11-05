@@ -274,6 +274,29 @@ dbs_merge: MERGE INTO (dbs_table_name | dbs_view_name) dbs_merge_correlation? db
     dbs_merge_insert: INSERT (LPARENCHAR dbs_column_name (COMMACHAR dbs_column_name)* RPARENCHAR)? VALUES (dbs_expression | DEFAULT | NULL | LPARENCHAR (dbs_expression | DEFAULT | NULL) (COMMACHAR (dbs_expression | DEFAULT | NULL))* RPARENCHAR);
 
 /*OPEN */
+dbs_open: OPEN dbs_cursor_name (USING (DESCRIPTOR dbs_descriptor_name) | (dbs_variable | dbs_array_variable LSQUAREBRACKET dbs_array_index RSQUAREBRACKET) (COMMACHAR (dbs_variable | dbs_array_variable LSQUAREBRACKET dbs_array_index RSQUAREBRACKET))*);
+
+/*PREPARE */
+dbs_prepare: PREPARE dbs_statement_name (INTO dbs_descriptor_name (USING (NAMES | LABELS | ANY | BOTH))?)? (FROM dbs_string_expression | (ATTRIBUTES dbs_attr_host_variable)? FROM dbs_variable);
+
+/*REFRESH TABLE */
+dbs_refresh: REFRESH TABLE dbs_table_name (QUERYNO dbs_integer);
+
+/* RELEASE (both) */
+dbs_release: RELEASE (dbs_location_name | dbs_host_variable | CURRENT | ALL SQL? | TO? SAVEPOINT dbs_savepoint_name);
+
+/*RENAME */
+dbs_rename: RENAME (TABLE? dbs_table_name TO dbs_table_identifier | INDEX dbs_index_name TO dbs_index_identifier);
+
+/*REVOKE (all) */
+
+/*ROLLBACK */
+dbs_rollback: ROLLBACK WORK? (TO SAVEPOINT dbs_savepoint_name?)?;
+
+/*SAVEPOINT */
+dbs_savepoint: SAVEPOINT dbs_savepoint_name UNIQUE? ON ROLLBACK RETAIN (CURSORS (ON ROLLBACK RETAIN LOCKS)? | LOCKS ON ROLLBACK RETAIN CURSORS);
+
+/*SELECT (both) */
 
 /*these bits are copied for future work */
 /*EXAMPLE OPTION LIST (from CREATE FUNCTION)*/
