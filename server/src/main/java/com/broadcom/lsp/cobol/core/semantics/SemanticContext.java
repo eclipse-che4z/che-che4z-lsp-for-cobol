@@ -16,28 +16,30 @@
 package com.broadcom.lsp.cobol.core.semantics;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Value;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class represents the entire semantic context of the current document, including its
  * variables, paragraphs, copybooks etc., with their definitions and usages.
  */
 @Value
+@Builder
 @AllArgsConstructor
 public class SemanticContext {
-  private Map<String, Collection<Location>> variableDefinitions;
-  private Map<String, Collection<Location>> variableUsages;
-  private Map<String, Collection<Location>> paragraphDefinitions;
-  private Map<String, Collection<Location>> paragraphUsages;
-  private Map<String, Collection<Location>> constantDefinitions;
-  private Map<String, Collection<Location>> constantUsages;
-  private Map<String, Collection<Location>> copybookDefinitions;
-  private Map<String, Collection<Location>> copybookUsages;
-  private List<DocumentSymbol> outlineTree;
+  @Builder.Default Map<String, Collection<Location>> variableDefinitions = new HashMap<>();
+  @Builder.Default Map<String, Collection<Location>> variableUsages = new HashMap<>();
+  @Builder.Default Map<String, Collection<Location>> paragraphDefinitions = new HashMap<>();
+  @Builder.Default Map<String, Collection<Location>> paragraphUsages = new HashMap<>();
+  @Builder.Default Map<String, Collection<Location>> sectionDefinitions = new HashMap<>();
+  @Builder.Default Map<String, Collection<Location>> sectionUsages = new HashMap<>();
+  @Builder.Default Map<String, Collection<Location>> constantDefinitions = new HashMap<>();
+  @Builder.Default Map<String, Collection<Location>> constantUsages = new HashMap<>();
+  @Builder.Default Map<String, Collection<Location>> copybookDefinitions = new HashMap<>();
+  @Builder.Default Map<String, Collection<Location>> copybookUsages = new HashMap<>();
+  @Builder.Default List<DocumentSymbol> outlineTree=new ArrayList<>();
 }

@@ -45,7 +45,7 @@ class TestErrorsInDifferentFiles {
           + "8      End program ProgramId.";
 
   private static final String ASDASD =
-      "           {03|areaA1}  {CHILD1|child1|areaA2}         {PIC|pic} 9   VALUE IS '0'.";
+      "           {@*03|areaA1}  {@*CHILD1|child1|areaA2}         {PIC|pic} 9   VALUE IS '0'.";
 
   private static final String ASDASD_NAME = "ASDASD";
 

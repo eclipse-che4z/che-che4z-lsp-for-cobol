@@ -19,6 +19,7 @@ package com.broadcom.lsp.cobol.service.delegates.completions;
 public enum CompletionOrder {
   VARIABLES,
   PARAGRAPHS,
+  SECTIONS,
   COPYBOOKS,
   CONSTANTS,
   SNIPPETS,

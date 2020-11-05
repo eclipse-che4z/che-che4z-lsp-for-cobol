@@ -47,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>Tags:
  * <li>$ - Variable
  * <li># - Paragraph
+ * <li>@ - Section
  * <li>~ - Copybook
  * <li>* - Definition
  * <li>| - Diagnostic
@@ -209,10 +210,12 @@ public class UseCaseEngine {
     assertResult("Constant usages:", expected.getConstantUsages(), actual.getConstantUsages());
 
     assertResult(
-        "Paragraph definition:",
-        expected.getParagraphDefinitions(),
-        actual.getParagraphDefinitions());
-    assertResult("Paragraph usage:", expected.getParagraphUsages(), actual.getParagraphUsages());
+        "Paragraph definition:", expected.getParagraphDefinitions(), actual.getParagraphDefinitions());
+    assertResult("Paragraph usages:", expected.getParagraphUsages(), actual.getParagraphUsages());
+
+    assertResult(
+        "Section definition:", expected.getSectionDefinitions(), actual.getSectionDefinitions());
+    assertResult("Section usages:", expected.getSectionUsages(), actual.getSectionUsages());
   }
 
   private void assertDiagnostics(
@@ -257,6 +260,8 @@ public class UseCaseEngine {
       mergeMaps(accumulator.getCopybookUsages(), copybookTestData.getCopybookUsages());
       mergeMaps(accumulator.getParagraphDefinitions(), copybookTestData.getParagraphDefinitions());
       mergeMaps(accumulator.getParagraphUsages(), copybookTestData.getParagraphUsages());
+      mergeMaps(accumulator.getSectionDefinitions(), copybookTestData.getSectionDefinitions());
+      mergeMaps(accumulator.getSectionUsages(), copybookTestData.getSectionUsages());
       mergeMaps(accumulator.getVariableDefinitions(), copybookTestData.getVariableDefinitions());
       mergeMaps(accumulator.getVariableUsages(), copybookTestData.getVariableUsages());
       mergeMaps(accumulator.getDiagnostics(), copybookTestData.getDiagnostics());
