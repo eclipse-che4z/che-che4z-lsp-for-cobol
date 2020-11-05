@@ -16,6 +16,8 @@ package com.broadcom.lsp.cobol.core.engine;
 
 import com.broadcom.lsp.cobol.core.CobolLexer;
 import com.broadcom.lsp.cobol.core.CobolParser;
+import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
+import com.broadcom.lsp.cobol.core.annotation.CheckThreadInterruption;
 import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.ExtendedDocument;
 import com.broadcom.lsp.cobol.core.model.Locality;
@@ -29,13 +31,13 @@ import com.broadcom.lsp.cobol.core.visitor.ParserListener;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.Token;
 
-import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,14 +53,17 @@ import static java.util.stream.Collectors.toList;
  */
 @Slf4j
 @Singleton
-public class CobolLanguageEngine {
+public class CobolLanguageEngine implements ThreadInterruptAspect {
 
   private TextPreprocessor preprocessor;
   private DefaultErrorStrategy defaultErrorStrategy;
   private MessageService messageService;
 
   @Inject
-  public CobolLanguageEngine(TextPreprocessor preprocessor, DefaultErrorStrategy defaultErrorStrategy, MessageService messageService) {
+  public CobolLanguageEngine(
+      TextPreprocessor preprocessor,
+      DefaultErrorStrategy defaultErrorStrategy,
+      MessageService messageService) {
     this.preprocessor = preprocessor;
     this.defaultErrorStrategy = defaultErrorStrategy;
     this.messageService = messageService;
@@ -74,6 +79,7 @@ public class CobolLanguageEngine {
    *     the client
    */
   @NonNull
+  @CheckThreadInterruption
   public ResultWithErrors<SemanticContext> run(
       @NonNull String documentUri,
       @NonNull String text,
@@ -90,7 +96,7 @@ public class CobolLanguageEngine {
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     ParserListener listener = new ParserListener();
 
-    CobolParser parser = new CobolParser(tokens);
+    CobolParser parser = getCobolParser(tokens);
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
     parser.setErrorHandler(defaultErrorStrategy);
@@ -98,11 +104,11 @@ public class CobolLanguageEngine {
     CobolParser.StartRuleContext tree = parser.startRule();
 
     Map<Token, Locality> positionMapping =
-        LocalityMappingUtils.createPositionMapping(
-            tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri);
+        getPositionMapping(documentUri, extendedDocument, tokens);
 
     CobolVisitor visitor =
-        new CobolVisitor(documentUri, extendedDocument.getCopybooks(), tokens, positionMapping, messageService);
+        new CobolVisitor(
+            documentUri, extendedDocument.getCopybooks(), tokens, positionMapping, messageService);
     visitor.visit(tree);
 
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
@@ -111,6 +117,18 @@ public class CobolLanguageEngine {
         collectErrorsForCopybooks(accumulatedErrors, extendedDocument.getCopyStatements()));
 
     return new ResultWithErrors<>(visitor.getSemanticContext(), accumulatedErrors);
+  }
+
+  @CheckThreadInterruption
+  CobolParser getCobolParser(CommonTokenStream tokens) {
+    return new CobolParser(tokens);
+  }
+
+  @CheckThreadInterruption
+  Map<Token, Locality> getPositionMapping(
+      String documentUri, ExtendedDocument extendedDocument, CommonTokenStream tokens) {
+    return LocalityMappingUtils.createPositionMapping(
+        tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri);
   }
 
   @NonNull
