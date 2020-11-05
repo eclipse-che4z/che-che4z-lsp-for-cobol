@@ -32,7 +32,6 @@ import static com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants.WS;
 public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
 
   private static final String EMPTY_STRING = "";
-  private static final int AREA_A_FILLER = 5;
   private static final String DOUBLE_QUOTE_LITERAL = "\"([^\"]|\"\"|'')*\"";
   private static final String SINGLE_QUOTE_LITERAL = "'([^']|''|\"\")*'";
   private static final String LEADING_WHITESPACE = "^\\s+";
@@ -135,9 +134,7 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
       /* As fallback trim leading whitespace. We also need to remove the starting quotes if exist */
       result =
           CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-              WS,
-              trimLeadingWhitespace(conditionalRightTrimmedContentArea.substring(AREA_A_FILLER)),
-              line);
+              WS, trimLeadingWhitespace(conditionalRightTrimmedContentArea), line);
     }
     return result;
   }

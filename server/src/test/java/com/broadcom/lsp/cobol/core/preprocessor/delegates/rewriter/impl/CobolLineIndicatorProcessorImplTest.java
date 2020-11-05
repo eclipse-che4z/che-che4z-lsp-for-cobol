@@ -273,4 +273,24 @@ class CobolLineIndicatorProcessorImplTest {
         ProcessingConstants.WS + "RANDOM TEXT SINGLE CONTINUATION LINE\"",
         actual.getIndicatorArea() + actual.getContentArea());
   }
+
+  /**
+   * Test no {@link StringIndexOutOfBoundsException} thrown if the parsing line not formatted and
+   * contains '-' in the indicator area.
+   */
+  @Test
+  void noExceptionOnNotFormattedLine() {
+    val notFormattedLine = new CobolLine();
+    notFormattedLine.setContentAreaA("END.");
+    notFormattedLine.setIndicatorArea("-");
+    notFormattedLine.setSequenceArea(" P-ADD");
+    notFormattedLine.setType(CONTINUATION);
+
+    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    List<CobolLine> outcome = processor.processLines(List.of(notFormattedLine));
+    val actual = outcome.get(0);
+
+    assertEquals(
+        ProcessingConstants.WS + "END.", actual.getIndicatorArea() + actual.getContentArea());
+  }
 }
