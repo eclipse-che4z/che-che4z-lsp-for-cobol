@@ -250,7 +250,7 @@ dbs_label: LABEL ON (dbs_label_sing | dbs_label_loop);
 dbs_lock: LOCK TABLE dbs_table_name (PARTITION dbs_integer)? IN (SHARE | EXCLUSIVE) MODE;
 
 /*MERGE */
-dbs_merge: MERGE INTO (dbs_table_name | dbs_view_name) dbs_merge_correlation? dbs_merge_include? USING (dbs_table_reference |dbs_merge_values) ON dbs_search_condition (WHEN NOT? MATCHED (AND dbs_search_condition)? THEN (dbs_signal_statement | dbs_merge_update | DELETE | dbs_merge_insert))+ (ELSE IGNORE)? (NOT ATOMIC CONTINUE ON SQLEXCEPTION)? (QUERYNO dbs_integer)?;
+dbs_merge: MERGE INTO (dbs_table_name | dbs_view_name) dbs_merge_correlation? dbs_merge_include? USING (dbs_table_reference |dbs_merge_values) ON dbs_search_condition (WHEN NOT? MATCHED (AND dbs_search_condition)? THEN (dbs_signal | dbs_merge_update | DELETE | dbs_merge_insert))+ (ELSE IGNORE)? (NOT ATOMIC CONTINUE ON SQLEXCEPTION)? (QUERYNO dbs_integer)?;
     dbs_merge_correlation: AS? dbs_correlation_name (LPARENCHAR dbs_column_name (COMMACHAR dbs_column_name)* RPARENCHAR)?;
     dbs_merge_include: INCLUDE LPARENCHAR dbs_column_name (dbs_merge_built_in_type | dbs_distinct_type) (COMMACHAR dbs_column_name (dbs_merge_built_in_type | dbs_distinct_type))* RPARENCHAR;
         dbs_merge_built_in_type: (dbs_merge_bit_int | dbs_merge_bit_decimal | dbs_merge_bit_float | dbs_merge_bit_decfloat | dbs_merge_bit_char | dbs_merge_bit_varchar | dbs_merge_bit_graphic | dbs_merge_bit_vargraphic | dbs_merge_bit_binary | dbs_merge_bit_varbinary | DATE | TIME | dbs_merge_bit_timestamp );
@@ -298,9 +298,49 @@ dbs_savepoint: SAVEPOINT dbs_savepoint_name UNIQUE? ON ROLLBACK RETAIN (CURSORS 
 
 /*SELECT (both) */
 
+/*SET (all) */
+
+/*SIGNAL - this is a statement and is referenced in other rules*/
+dbs_signal: dbs_label? SIGNAL (dbs_sql_condition_name | SQLSTATE VALUE? (dbs_sqlstate_string_constant | dbs_sql_variable_name | dbs_sql_parameter_name)) (SET MESSAGE_TEXT EQUALCHAR)? dbs_diagnostic_string_expression;
+
+/*TRANSFER OWNERSHIP */
+dbs_transfer: TRANSFER OWNERSHIP OF (DATABASE dbs_database_name | INDEX dbs_index_name | STOGROUP dbs_stogroup_name | TABLE dbs_table_name | TABLESPACE dbs_database_name? dbs_table_space_name | VIEW dbs_view_name) TO (ROLE dbs_role_name | USER dbs_authorization_name | SESSION_USER) REVOKE PRIVELEGES;
+
+/*TRUNCATE */
+dbs_truncate: TRUNCATE TABLE? dbs_table_name ((DROP | REUSE) STORAGE)? ((IGNORE | RESTRICT WHEN) DELETE TRIGGERS)? IMMEDIATE?;
+
+/*UPDATE */
+dbs_update: UPDATE (dbs_table_name | dbs_view_name) (dbs_update_searched | dbs_update_positioned); 
+    dbs_update_searched: dbs_update_period? dbs_correlation_name? dbs_update_include? SET dbs_update_assignment (COMMACHAR dbs_update_assignment)* (WHERE dbs_search_condition)? (WITH (RR|RS|CS) | SKIP LOCKED DATA)* (QUERYNO dbs_integer);
+        dbs_update_period: FOR PORTION OF BUSINESS_TIME (FROM dbs_value TO dbs_value | BETWEEN dbs_value AND dbs_value);
+        dbs_update_include: INCLUDE LPARENCHAR dbs_column_name (dbs_update_built_in_type | dbs_distinct_type) (COMMACHAR dbs_column_name (dbs_update_built_in_type | dbs_distinct_type))* RPARENCHAR;
+            dbs_update_built_in_type: (dbs_update_bit_int | dbs_update_bit_decimal | dbs_update_bit_float | dbs_update_bit_decfloat | dbs_update_bit_char | dbs_update_bit_varchar | dbs_update_bit_graphic | dbs_update_bit_vargraphic | dbs_update_bit_binary | dbs_update_bit_varbinary | DATE | TIME | dbs_update_bit_timestamp );
+                dbs_update_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
+                dbs_update_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR dbs_integer (COMMACHAR dbs_integer)? RPARENCHAR)?;
+                dbs_update_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
+                dbs_update_bit_decfloat: DECFLOAT (LPARENCHAR (NUMBER_34 | NUMBER_16) RPARENCHAR)?;
+                dbs_update_bit_char: (CHARACTER | CHAR) (VARYING dbs_update_bit_varchara | (LPARENCHAR dbs_integer RPARENCHAR)? (FOR BIT DATA)?);
+                dbs_update_bit_varchar: VARCHAR dbs_update_bit_varchara;
+                    dbs_update_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR (FOR BIT DATA)?;
+                dbs_update_bit_graphic: GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)?;
+                dbs_update_bit_vargraphic: VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR;
+                dbs_update_bit_binary: BINARY (VARYING LPARENCHAR dbs_integer RPARENCHAR | (LPARENCHAR dbs_integer RPARENCHAR)?);
+                dbs_update_bit_varbinary: VARBINARY LPARENCHAR dbs_integer RPARENCHAR;
+                dbs_update_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;  
+        dbs_update_assignment: (dbs_column_name EQUALCHAR (dbs_expression | DEFAULT | NULL) | LPARENCHAR dbs_column_name (COMMA dbs_column_name)* RPARENCHAR EQUALCHAR LPARENCHAR (dbs_row_fullselect | dbs_unpack_function_invocation | (dbs_expression | DEFAULT | NULL) (COMMACHAR (dbs_expression | DEFAULT | NULL))*) RPARENCHAR);
+    dbs_update_positioned: dbs_correlation_name? SET dbs_update_assignment (COMMACHAR dbs_update_assignment)* WHERE CURRENT OF dbs_cursor_name (FOR ROW (dbs_host_variable | dbs_integer_constant) OF ROWSET)?;
+
+/*VALUES (both) */
+dbs_values: VALUES (dbs_values_null | dbs_values_into);
+    dbs_values_null: (dbs_expression | LPARENCHAR dbs_expression (COMMACHAR dbs_expression)* RPARENCHAR);
+    dbs_values_into: (dbs_expression | NULL | LPARENCHAR (dbs_expression | NULL) (COMMACHAR (dbs_expression | NULL))* RPARENCHAR) INTO (dbs_values_target (COMMACHAR dbs_values_target)* |dbs_array_variable LSQUAREBRACKET dbs_array_index RSQUAREBRACKET);
+        dbs_values_target: (dbs_global_variable_name | dbs_host_variable_name | dbs_sql_parameter_name | dbs_sql_variable_name | dbs_transition_variable_name);
+
+/*WHENEVER */
+dbs_whenever: WHENEVER (NOT FOUND | SQLERROR | SQLWARNING) (CONTINUE | (GOTO | GO TO) COLONCHAR? dbs_host_label);
+
 /*these bits are copied for future work */
 /*EXAMPLE OPTION LIST (from CREATE FUNCTION)*/
 dbs_option_list: (LANGUAGE SQL)? (SPECIFIC dbs_specific_name)? (NOT? DETERMINISTIC)? (NO? EXTERNAL ACTION)? (READS SQL DATA | CONTAINS SQL | MODIFIES SQL DATA)? ((CALLED | RETURNS NULL) ON NULL INPUT)? (STATIC DISPATCH)? ((ALLOW | DISALLOW) PARALLEL)? ((ALLOW | DISALLOW | DISABLE) DEBUG MODE)? (PARAMETER CCSID (ASCII | EBCDIC | UNICODE))? (QUALIFIER dbs_schema_name)? (PACKAGE OWNER dbs_authorization_name)? (ASUTIME (LIMIT dbs_integer | NO LIMIT))? ((INHERIT | DEFAULT) SPECIAL REGISTERS)? (WLM ENVIRONMENT FOR DEBUG MODE dbs_name)? (CURRENT DATA (YES | NO))? (DEGREE (NUMBER_1 | ANY))? (CONCURRENT ACESS RESOLUTION (USE CURRENTLY COMMITTED | WAIT FOR OUTCOME))? (DYNAMICRULES (RUN | BIND | DEFINEBIND | DEFINERUN | INVOKEBIND | INVOKERUN))? (APPLICATION ENCODING SCHEME (ASCII | EBCDIC | UNICODE))? ((WITH | WITHOUT) EXPLAIN)? ((WITH | WITHOUT) IMMEDIATE WRITE)? (ISOLATION LEVEL (CS | RS | RR | UR))? (OPTHINT (DOUBLEQUOTE | dbs_string_constant))? (QUERY ACCELERATION (NONE | ENABLE (WITH FAILBACK)? | ELIGIBLE | ALL))? (GET_ACCEL_ARCHIVE (YES | NO))? (ACCELERATION WAITFORDATA dbs_nnnn_m)? (ACCELERATOR dbs_accelerator_name)? (SQL PATH (dbs_schema_name (COMMACHAR dbs_schema_name)* | SYSTEM PATH | SESSION? USER))?(REOPT (NONE | ALWAYS | ONCE))? (VALIDATE (RUN | BIND))? (ROUNDING (DEC_ROUND_CEILING | DEC_ROUND_DOWN | DEC_ROUND_FLOOR | DEC_ROUND_HALF_DOWN | DEC_ROUND_HALF_EVEN | DEC_ROUND_HALF_UP | DEC_ROUND_UP))? (DATE FORMAT (ISO | EUR | USA | JIS | LOCAL))? (DECIMAL LPARENCHAR (NUMBER_15 | NUMBER_31) (COMMACHAR dbs_s)? RPARENCHAR)? (FOR UPDATE CLAUSE (REQUIRED | OPTIONAL))? (TIME FORMAT (ISO | EUR | USA | JIS | LOCAL))? (NOT? SECURED)? (BUSINESS_TIME SENSITIVE (YES | NO))? (SYSTEM_TIME SENSITIVE (YES | NO))? (ARCHIVE SENSITIVE (YES | NO))? (APPLCOMPAT dbs_level)? (CONCENTRATE STATEMENTS (OFF | WITH LITERALS))?;
 
-/*STATEMENTS - these may be used in multiple rules*/
-dbs_signal_statement: dbs_label? SIGNAL (dbs_sql_condition_name | SQLSTATE VALUE? (dbs_sqlstate_string_constant | dbs_sql_variable_name | dbs_sql_parameter_name)) (SET MESSAGE_TEXT EQUALCHAR)? dbs_diagnostic_string_expression;
+/*STATEMENTS - */
