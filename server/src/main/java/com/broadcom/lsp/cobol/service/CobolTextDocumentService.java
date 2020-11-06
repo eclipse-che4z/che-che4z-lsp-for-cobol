@@ -39,8 +39,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 import java.util.function.BiConsumer;
 
 import static java.lang.String.format;
@@ -67,10 +66,11 @@ public class CobolTextDocumentService
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
   private static final String GIT_FS_URI = "gitfs:/";
   private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
-
   private final Map<String, CobolDocumentModel> docs = new ConcurrentHashMap<>();
   private final Map<String, CompletableFuture<List<DocumentSymbol>>> outlineMap =
       new ConcurrentHashMap<>();
+  private final Map<String, Future<?>> futureMap = new ConcurrentHashMap<>();
+  private final ExecutorService threadPool = Executors.newCachedThreadPool();
   private Communications communications;
   private LanguageEngineFacade engine;
   private Formations formations;
@@ -102,6 +102,10 @@ public class CobolTextDocumentService
 
   Map<String, CobolDocumentModel> getDocs() {
     return new HashMap<>(docs);
+  }
+
+  Map<String, Future<?>> getFutureMap() {
+    return new HashMap<>(futureMap);
   }
 
   @Override
@@ -197,8 +201,15 @@ public class CobolTextDocumentService
   public void didClose(DidCloseTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
     LOG.info(format("Document closing invoked on URI %s", uri));
+    interruptAnalysis(uri);
     communications.publishDiagnostics(Map.of(uri, List.of()));
+    communications.cancelProgressNotification(uri);
     docs.remove(uri);
+    clearAnalysedFutureObject(uri);
+  }
+
+  private void interruptAnalysis(String uri) {
+    if (futureMap.containsKey(uri)) futureMap.get(uri).cancel(true);
   }
 
   @Override
@@ -234,22 +245,32 @@ public class CobolTextDocumentService
         .orElse(null);
   }
 
+  private void clearAnalysedFutureObject(String uri) {
+    futureMap.remove(uri);
+  }
+
   private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
     registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.empty()));
-    runAsync(
+    Future<?> docAnalysisFuture = threadPool.submit(
             () -> {
-              CopybookProcessingMode copybookProcessingMode =
-                  CopybookProcessingMode.getCopybookProcessingMode(
-                      uri,
-                      userRequest
-                          ? CopybookProcessingMode.ENABLED_VERBOSE
-                          : CopybookProcessingMode.ENABLED);
-              AnalysisResult result = engine.analyze(uri, text, copybookProcessingMode);
-              ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
-              publishResult(uri, result, copybookProcessingMode);
-              outlineMap.get(uri).complete(result.getOutlineTree());
-            })
-        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
+              try {
+                CopybookProcessingMode copybookProcessingMode =
+                        CopybookProcessingMode.getCopybookProcessingMode(
+                                uri,
+                                userRequest
+                                        ? CopybookProcessingMode.ENABLED_VERBOSE
+                                        : CopybookProcessingMode.ENABLED);
+                AnalysisResult result = engine.analyze(uri, text, copybookProcessingMode);
+                ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
+                publishResult(uri, result, copybookProcessingMode);
+                outlineMap.get(uri).complete(result.getOutlineTree());
+              } catch (Exception e) {
+                reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri));
+              } finally {
+                clearAnalysedFutureObject(uri);
+              }
+            });
+    futureMap.put(uri, docAnalysisFuture);
   }
 
   void analyzeChanges(String uri, String text) {

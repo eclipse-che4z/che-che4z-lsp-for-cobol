@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import static com.broadcom.lsp.cobol.service.delegates.completions.CompletionOrder.SNIPPETS;
 import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -82,7 +83,7 @@ class CompletionsChainTest extends ConfigurableTest {
     assertFalse(list.isEmpty());
 
     assertEquals(CompletionItemKind.Variable, list.get(0).getKind());
-    assertEquals(CompletionItemKind.Snippet, list.get(1).getKind());
+    assertEquals(CompletionItemKind.Snippet, list.get(2).getKind());
     assertEquals(CompletionItemKind.Keyword, list.get(list.size() - 1).getKind());
   }
 

@@ -42,6 +42,8 @@ import java.util.function.Function;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -423,11 +425,14 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
         new DidOpenTextDocumentParams(
             new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
 
-    assertEquals(1, service.getDocs().size());
+    assertThat(service.getDocs().entrySet(), hasSize(1));
+    assertThat(service.getFutureMap().entrySet(), hasSize(1));
 
     service.didClose(
         new DidCloseTextDocumentParams(new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI)));
-    assertEquals(0, service.getDocs().size());
+
+    assertThat(service.getDocs().entrySet(), hasSize(0));
+    assertThat(service.getFutureMap().entrySet(), hasSize(0));
 
     verify(communications, timeout(2000)).cancelProgressNotification(UseCaseUtils.DOCUMENT_URI);
   }

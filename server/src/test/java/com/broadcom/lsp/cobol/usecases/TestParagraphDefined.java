@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-/** This test checks that performing not defined section causes a diagnostic error */
-class TestParagraphSectionDefined {
+/** This test checks that performing defined paragraph processed correctly */
+class TestParagraphDefined {
   private static final String TEXT =
 "       IDENTIFICATION DIVISION.\n" +
         "          PROGRAM-ID. TEST1.\n" +
@@ -16,7 +16,7 @@ class TestParagraphSectionDefined {
         "          PROCEDURE DIVISION.\n" +
         "            PERFORM {#GET-DATA}.\n" +
         "            STOP RUN.\n" +
-        "          GET-DATA SECTION.\n" +
+        "          {#*GET-DATA}.\n" +
         "            DISPLAY \"\".";
     @Test
     void test() {

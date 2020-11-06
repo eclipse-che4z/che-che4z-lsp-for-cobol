@@ -16,15 +16,17 @@ package com.broadcom.lsp.cobol.core.preprocessor.delegates;
 
 import com.broadcom.lsp.cobol.core.CobolPreprocessor;
 import com.broadcom.lsp.cobol.core.CobolPreprocessorLexer;
+import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
+import com.broadcom.lsp.cobol.core.annotation.CheckThreadInterruption;
 import com.broadcom.lsp.cobol.core.model.CopybookUsage;
 import com.broadcom.lsp.cobol.core.model.ExtendedDocument;
 import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.google.inject.Inject;
+import lombok.NonNull;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import lombok.NonNull;
 import java.util.Deque;
 
 /**
@@ -32,7 +34,7 @@ import java.util.Deque;
  * returns an extended document with all the available copybooks included, with their definitions
  * and usages specified, as well as related errors.
  */
-public class GrammarPreprocessorImpl implements GrammarPreprocessor {
+public class GrammarPreprocessorImpl implements GrammarPreprocessor, ThreadInterruptAspect {
   private GrammarPreprocessorListenerFactory listenerFactory;
 
   @Inject
@@ -42,6 +44,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
 
   @NonNull
   @Override
+  @CheckThreadInterruption
   public ResultWithErrors<ExtendedDocument> buildExtendedDocument(
       @NonNull String uri,
       @NonNull String code,

@@ -25,6 +25,7 @@ import com.broadcom.lsp.cobol.core.strategy.CobolErrorStrategy;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -57,9 +58,10 @@ class CobolLanguageEngineTest {
     TextPreprocessor preprocessor = mock(TextPreprocessor.class);
     MessageService mockMessageService = mock(MessageService.class);
     CobolErrorStrategy cobolErrorStrategy = new CobolErrorStrategy();
+    ParseTreeListener treeListener = mock(ParseTreeListener.class);
     cobolErrorStrategy.setMessageService(mockMessageService);
     CobolLanguageEngine engine =
-        new CobolLanguageEngine(preprocessor, cobolErrorStrategy, mockMessageService);
+        new CobolLanguageEngine(preprocessor, cobolErrorStrategy, mockMessageService, treeListener);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()
@@ -132,18 +134,12 @@ class CobolLanguageEngineTest {
                         List.of()))));
 
     ResultWithErrors<SemanticContext> expected =
-        new ResultWithErrors<>(
-            new SemanticContext(
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                getConstantDefinitions(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                expectedOutlineTree),
-            List.of(error));
+            new ResultWithErrors<>(
+                    SemanticContext.builder()
+                            .constantDefinitions(getConstantDefinitions())
+                            .outlineTree(expectedOutlineTree)
+                            .build(),
+                    List.of(error));
 
     ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, PROCESSING_MODE);
 
