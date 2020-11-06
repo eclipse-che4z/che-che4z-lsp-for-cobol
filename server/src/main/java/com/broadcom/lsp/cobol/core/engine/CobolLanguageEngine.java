@@ -37,6 +37,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,20 +54,24 @@ import static java.util.stream.Collectors.toList;
  */
 @Slf4j
 @Singleton
+@SuppressWarnings("WeakerAccess")
 public class CobolLanguageEngine implements ThreadInterruptAspect {
 
   private TextPreprocessor preprocessor;
   private DefaultErrorStrategy defaultErrorStrategy;
   private MessageService messageService;
+  private ParseTreeListener treeListener;
 
   @Inject
   public CobolLanguageEngine(
       TextPreprocessor preprocessor,
       DefaultErrorStrategy defaultErrorStrategy,
-      MessageService messageService) {
+      MessageService messageService,
+      ParseTreeListener treeListener) {
     this.preprocessor = preprocessor;
     this.defaultErrorStrategy = defaultErrorStrategy;
     this.messageService = messageService;
+    this.treeListener = treeListener;
   }
 
   /**
@@ -100,6 +105,7 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
     parser.setErrorHandler(defaultErrorStrategy);
+    parser.addParseListener(treeListener);
 
     CobolParser.StartRuleContext tree = parser.startRule();
 
