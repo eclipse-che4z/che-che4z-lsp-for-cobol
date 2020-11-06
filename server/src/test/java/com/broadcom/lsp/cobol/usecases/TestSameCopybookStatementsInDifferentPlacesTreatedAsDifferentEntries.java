@@ -18,36 +18,26 @@ package com.broadcom.lsp.cobol.usecases;
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
 import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.WARNING;
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
 
 /**
  * Test several copy statements treated as different entries, so if one of them contains a syntax
- * errors, it will be shown only on the copy statement that produces the error. Here: one of two
- * "COPY REPL" statements places in the procedure division, that is, according to its content, a
- * syntax error, so this exact statement should be underlined.
+ * errors, it will be shown only on the copy statement that produces the error. Here: duplicated
+ * DATA DIVISION is a syntax error, but it is shown only on the second copybook entry.
  */
 class TestSameCopybookStatementsInDifferentPlacesTreatedAsDifferentEntries {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TESTREPL.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "       01  {$*PARENT}.\n"
           + "       COPY {~REPL}.\n"
-          + "       PROCEDURE DIVISION.\n"
-          + "       {#*MAINLINE}. \n"
-          + "           MOVE 0 TO {$TAG-ID}.\n"
-          + "           MOVE {_COPY {~REPL}.|1|2|3_}\n"
-          + "           GOBACK. ";
-  private static final String REPL = "       {05|1} {$*TAG-ID|2|3} PIC 9.\n";
+          + "       {_COPY {~REPL}.|1_}\n";
+  private static final String REPL = "       {DATA|1} DIVISION.\n";
   private static final String REPL_NAME = "REPL";
 
   @Test
@@ -59,19 +49,10 @@ class TestSameCopybookStatementsInDifferentPlacesTreatedAsDifferentEntries {
             "1",
             new Diagnostic(
                 null,
-                "The following token must start in Area B: 05",
-                Warning,
-                WARNING.getText(),
-                null),
-            "2",
-            new Diagnostic(
-                null, "Missing token TO at moveToStatement", Error, ERROR.getText(), null),
-            "3",
-            new Diagnostic(
-                null,
-                "The following token must start in Area B: TAG-ID",
-                Warning,
-                WARNING.getText(),
+                "Syntax error on 'DATA' expected {<EOF>, END, FILE, ID, "
+                    + "IDENTIFICATION, LINKAGE, LOCAL_STORAGE, PROCEDURE, WORKING_STORAGE}",
+                DiagnosticSeverity.Error,
+                ERROR.getText(),
                 null)));
   }
 }
