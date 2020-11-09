@@ -122,7 +122,7 @@ dbs_drop: DROP (dbs_drop_alias_designator | dbs_drop_database | dbs_drop_functio
         dbs_drop_public_alias_designator: PUBLIC ALIAS dbs_alias_name FOR SEQUENCE;
         dbs_drop_nonpub_alias_designator: ALIAS dbs_alias_name (FOR (TABLE | SEQUENCE))?;
     dbs_drop_database: DATABASE dbs_database_name;
-    dbs_drop_function: FUNCTION dbs_function_name (LPARENCHAR (dbs_drop_parameter_type (COMMACHAR dbs_drop_parameter_type)*)? RPARENCHAR)? RESTRICT?
+    dbs_drop_function: FUNCTION dbs_function_name (LPARENCHAR (dbs_drop_parameter_type (COMMACHAR dbs_drop_parameter_type)*)? RPARENCHAR)? RESTRICT?;
         dbs_drop_parameter_type: (dbs_drop_built_in_type | dbs_distinct_type_name | dbs_array_type_name) (AS LOCATOR)?;
             dbs_drop_built_in_type: (dbs_drop_bit_int | dbs_drop_bit_decimal | dbs_drop_bit_float | dbs_drop_bit_decfloat | dbs_drop_bit_char | dbs_drop_bit_clob | dbs_drop_bit_varchar | dbs_drop_bit_graphic | dbs_drop_bit_binary | DATE | TIME | dbs_drop_bit_timestamp | ROWID | XML);
                     dbs_drop_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
