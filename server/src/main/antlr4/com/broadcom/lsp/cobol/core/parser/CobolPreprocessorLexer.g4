@@ -238,6 +238,7 @@ QUOTE : Q U O T E;
 RENT : R E N T;
 REPLACE : R E P L A C E;
 REPLACING : R E P L A C I N G;
+RES : R E S;
 RMODE : R M O D E;
 RPARENCHAR : ')';
 SEP : S E P;
