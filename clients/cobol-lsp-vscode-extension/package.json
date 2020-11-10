@@ -132,7 +132,7 @@
         "coverage": "jest --coverage"
     },
     "dependencies": {
-        "@zowe/imperative": "4.7.4",
+        "@zowe/imperative": "4.8.1",
         "vscode-languageclient": "5.2.1",
         "vscode-extension-telemetry": "0.1.6"
     },
