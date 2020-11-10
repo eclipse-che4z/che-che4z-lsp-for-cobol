@@ -251,21 +251,22 @@ public class CobolTextDocumentService
 
   private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
     registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.empty()));
-    Future<?> docAnalysisFuture = threadPool.submit(
+    Future<?> docAnalysisFuture =
+        threadPool.submit(
             () -> {
               try {
                 CopybookProcessingMode copybookProcessingMode =
-                        CopybookProcessingMode.getCopybookProcessingMode(
-                                uri,
-                                userRequest
-                                        ? CopybookProcessingMode.ENABLED_VERBOSE
-                                        : CopybookProcessingMode.ENABLED);
+                    CopybookProcessingMode.getCopybookProcessingMode(
+                        uri,
+                        userRequest
+                            ? CopybookProcessingMode.ENABLED_VERBOSE
+                            : CopybookProcessingMode.ENABLED);
                 AnalysisResult result = engine.analyze(uri, text, copybookProcessingMode);
                 ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
                 publishResult(uri, result, copybookProcessingMode);
                 outlineMap.get(uri).complete(result.getOutlineTree());
               } catch (Exception e) {
-                reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri));
+                LOG.error(createDescriptiveErrorMessage("analysis", uri), e);
               } finally {
                 clearAnalysedFutureObject(uri);
               }
