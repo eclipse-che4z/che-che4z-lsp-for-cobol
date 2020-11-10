@@ -15,6 +15,7 @@
 
 package com.broadcom.lsp.cobol.usecases.engine;
 
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import com.broadcom.usecase.UseCasePreprocessorBaseListener;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -186,7 +187,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
       CopybookStatementContext ctx, Map<String, List<Location>> copybookUsages) {
     return it ->
         processToken(
-            it.cpyName().getText(), ctx, it.replacement(), copybookUsages, ctx.diagnostic());
+            PreprocessorStringUtils.trimQuotes(it.cpyName().getText().toUpperCase()), ctx, it.replacement(), copybookUsages, ctx.diagnostic());
   }
 
   @Override
