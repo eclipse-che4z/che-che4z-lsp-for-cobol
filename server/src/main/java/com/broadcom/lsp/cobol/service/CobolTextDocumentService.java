@@ -45,7 +45,6 @@ import java.util.function.BiConsumer;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.stream.Collectors.toList;
 
@@ -193,6 +192,7 @@ public class CobolTextDocumentService
     String text = params.getContentChanges().get(0).getText();
     String fileExtension = extractExtension(uri);
     if (fileExtension != null && isCobolFile(fileExtension)) {
+      interruptAnalysis(uri);
       analyzeChanges(uri, text);
     }
   }
@@ -209,7 +209,10 @@ public class CobolTextDocumentService
   }
 
   private void interruptAnalysis(String uri) {
-    if (futureMap.containsKey(uri)) futureMap.get(uri).cancel(true);
+    if (futureMap.containsKey(uri)) {
+      LOG.debug("Analysis for uri: " + uri + " is interrupted.");
+      futureMap.get(uri).cancel(true);
+    }
   }
 
   @Override
@@ -271,23 +274,34 @@ public class CobolTextDocumentService
                 clearAnalysedFutureObject(uri);
               }
             });
+    registerToFutureMap(uri, docAnalysisFuture);
+  }
+
+  private void registerToFutureMap(String uri, Future<?> docAnalysisFuture) {
     futureMap.put(uri, docAnalysisFuture);
   }
 
   void analyzeChanges(String uri, String text) {
-    runAsync(
+    Future<?> analyseSubmitFuture =
+        threadPool.submit(
             () -> {
-              AnalysisResult result =
-                  engine.analyze(
-                      uri,
-                      text,
-                      CopybookProcessingMode.getCopybookProcessingMode(
-                          uri, CopybookProcessingMode.SKIP));
-              registerDocument(uri, new CobolDocumentModel(text, result));
-              communications.publishDiagnostics(result.getDiagnostics());
-              outlineMap.get(uri).complete(result.getOutlineTree());
-            })
-        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("analysis", uri)));
+              try {
+                AnalysisResult result =
+                    engine.analyze(
+                        uri,
+                        text,
+                        CopybookProcessingMode.getCopybookProcessingMode(
+                            uri, CopybookProcessingMode.SKIP));
+                registerDocument(uri, new CobolDocumentModel(text, result));
+                communications.publishDiagnostics(result.getDiagnostics());
+                outlineMap.get(uri).complete(result.getOutlineTree());
+              } catch (Exception ex) {
+                LOG.error(createDescriptiveErrorMessage("analysis", uri), ex);
+              } finally {
+                clearAnalysedFutureObject(uri);
+              }
+            });
+    registerToFutureMap(uri, analyseSubmitFuture);
   }
 
   private void publishResult(
