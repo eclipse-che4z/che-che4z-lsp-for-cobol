@@ -58,7 +58,7 @@ cics_send_3600_01: (LDC cics_name | FMH | WAIT | INVITE | LAST | CNOTCOMPL | DEF
 cics_send_2980: (PASSBK | CBUFF)?;
 cics_len_map: ((LENGTH cics_data_value | FLENGTH cics_data_value) | cics_send_map | cics_resp)+;
 cics_send_mro: (SESSION cics_name | WAIT | INVITE | LAST | ATTACHID cics_name | FROM cics_data_area |
-               LENGTH cics_data_value | FLENGTH cics_data_value | FMH | DEFRESP | STATE cics_cvda | cics_resp)*;
+               LENGTH cics_data_value | FLENGTH cics_data_value | FMH | DEFRESP | STATE cics_cvda | cics_send_erase | cics_resp)*;
 cics_send_appc: (CONVID cics_name | cics_send_from | INVITE | LAST | CONFIRM | WAIT | STATE cics_cvda | cics_resp)*;
 cics_send_control: CONTROL (cics_send_control_min | cics_send_control_std | cics_send_control_full);
 cics_send_control_min: (cics_send_cursor | FORMFEED | cics_send_erase | ERASEAUP | PRINT | FREEKB | ALARM | FRSET | cics_resp)+;

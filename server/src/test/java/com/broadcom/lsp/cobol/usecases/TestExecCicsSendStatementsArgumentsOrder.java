@@ -136,6 +136,9 @@ class TestExecCicsSendStatementsArgumentsOrder {
           + "                RESP({$RESPONSE})\n"
           + "                RESP2({$REASON-CODE})\n"
           + "           END-EXEC.\n"
+          + "           EXEC CICS SEND ERASE FROM ({$MESSAGE-AREA}) WAIT\n"
+          + "                LENGTH ({$MESSAGE-LENGTH})\n"
+          + "           END-EXEC.\n"
           + "           GOBACK.";
 
   @Test
