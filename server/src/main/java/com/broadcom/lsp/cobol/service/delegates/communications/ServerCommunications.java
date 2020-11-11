@@ -16,6 +16,7 @@
 package com.broadcom.lsp.cobol.service.delegates.communications;
 
 import com.broadcom.lsp.cobol.core.messages.MessageService;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -27,7 +28,6 @@ import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.services.LanguageClient;
 
 import java.util.*;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
@@ -45,7 +45,7 @@ import static org.eclipse.lsp4j.MessageType.Info;
 @Slf4j
 public class ServerCommunications implements Communications {
 
-  private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(5);
+  private CustomThreadPoolExecutor customExecutor;
   private final Set<String> uriInProgress = new HashSet<>();
   private MessageService messageService;
   private Provider<LanguageClient> provider;
@@ -53,10 +53,14 @@ public class ServerCommunications implements Communications {
 
   @Inject
   public ServerCommunications(
-      Provider<LanguageClient> provider, FileSystemService files, MessageService messageService) {
+      Provider<LanguageClient> provider,
+      FileSystemService files,
+      MessageService messageService,
+      CustomThreadPoolExecutor customExecutor) {
     this.provider = provider;
     this.files = files;
     this.messageService = messageService;
+    this.customExecutor = customExecutor;
   }
 
   /**
@@ -83,7 +87,7 @@ public class ServerCommunications implements Communications {
   public void notifyThatLoadingInProgress(String uri) {
     String decodedUri = files.decodeURI(uri);
     uriInProgress.add(decodedUri);
-    executor.schedule(
+    customExecutor.getScheduledThreadPoolExecutor().schedule(
         () -> {
           if (uriInProgress.remove(decodedUri)) {
             showMessage(

@@ -43,6 +43,8 @@ import com.broadcom.lsp.cobol.core.strategy.CobolErrorStrategy;
 import com.broadcom.lsp.cobol.core.visitor.InterruptingTreeListener;
 import com.broadcom.lsp.cobol.service.delegates.communications.Communications;
 import com.broadcom.lsp.cobol.service.delegates.communications.ServerCommunications;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
@@ -54,6 +56,7 @@ import static com.google.inject.name.Names.named;
 public class EngineModule extends AbstractModule {
   @Override
   protected void configure() {
+    bind(CustomThreadPoolExecutor.class).to(CustomThreadPoolExecutorService.class);
     bind(CobolLanguageEngine.class);
     bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
     bind(GrammarPreprocessor.class).to(GrammarPreprocessorImpl.class);

@@ -18,6 +18,7 @@ package com.broadcom.lsp.cobol.domain.databus.impl;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
 import com.broadcom.lsp.cobol.domain.event.model.RunAnalysisEvent;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,7 @@ class DataBusUnSubscribeTest extends DatabusConfigProvider {
 
   @BeforeEach
   void setUp() {
-    databus = new DefaultDataBusBroker<>(3);
+    databus = new DefaultDataBusBroker<>(new CustomThreadPoolExecutorService(3, 4, 60, 5));
   }
 
   @Override
