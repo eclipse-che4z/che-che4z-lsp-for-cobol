@@ -15,28 +15,24 @@
 
 package com.broadcom.lsp.cobol;
 
-import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.service.CobolLanguageServer;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageServer;
 import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
+import com.google.inject.Injector;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.Socket;
 
-import static com.broadcom.lsp.cobol.domain.modules.LangServerCtx.getInjector;
-import static com.broadcom.lsp.cobol.domain.modules.LangServerCtx.shutdown;
 import static com.google.inject.Key.get;
 import static com.google.inject.name.Names.named;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 /** This test check the logic of the application bootstrap */
 class LangServerBootstrapTest {
@@ -52,20 +48,15 @@ class LangServerBootstrapTest {
     customExecutor = new CustomThreadPoolExecutorService(4, 5, 60, 3);
   }
 
-  @AfterEach
-  void shutdownContext() {
-    shutdown();
-  }
-
   @Test
   void initCtx() {
-    LangServerBootstrap.initCtx();
+    Injector injector = LangServerBootstrap.initCtx();
 
     // Bound class in Service module
-    CobolLanguageServer server = getInjector().getInstance(CobolLanguageServer.class);
-    CustomThreadPoolExecutor customExecutor = LangServerCtx.getInjector().getInstance(CustomThreadPoolExecutor.class);
+    CobolLanguageServer server = injector.getInstance(CobolLanguageServer.class);
+    CustomThreadPoolExecutor customExecutor = injector.getInstance(CustomThreadPoolExecutor.class);
     // Bound constant in Databus module
-    Integer cacheSize = getInjector().getInstance(get(Integer.class, named("CACHE-MAX-SIZE")));
+    Integer cacheSize = injector.getInstance(get(Integer.class, named("CACHE-MAX-SIZE")));
 
     assertNotNull(server);
     assertNotNull(customExecutor);

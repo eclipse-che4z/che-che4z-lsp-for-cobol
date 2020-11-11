@@ -14,7 +14,6 @@
  */
 package com.broadcom.lsp.cobol.service.delegates.completions;
 
-import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.ConfigurableTest;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
 import org.eclipse.lsp4j.*;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static com.broadcom.lsp.cobol.service.delegates.completions.CompletionOrder.SNIPPETS;
 import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -70,8 +68,8 @@ class CompletionsChainTest extends ConfigurableTest {
 
   @BeforeEach
   void createService() {
-    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
-    TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    service = injector.getInstance(TextDocumentService.class);
+    TestLanguageClient client = injector.getInstance(TestLanguageClient.class);
     client.clean();
     runTextValidation(service, TEXT);
     waitForDiagnostics(client);

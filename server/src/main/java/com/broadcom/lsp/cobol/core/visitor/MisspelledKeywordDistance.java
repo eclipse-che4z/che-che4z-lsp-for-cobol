@@ -28,7 +28,6 @@ import static java.util.Comparator.comparingInt;
  */
 @UtilityClass
 class MisspelledKeywordDistance {
-  // TODO: Convert to singleton and provide injection
 
   private static final KeywordSuggestions KEYWORDS = new KeywordSuggestions();
   private static final LevenshteinDistance DISTANCE = LevenshteinDistance.getDefaultInstance();

@@ -15,7 +15,6 @@
 
 package com.broadcom.lsp.cobol.service.delegates;
 
-import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.ConfigurableTest;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
@@ -38,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Testing Document Highlighting with a variable, position is passed in INNER1_POSITION and the
  * EXPECTED_RANGES is where the expected highlighting is to be enabled
  */
-public class HighlightsTest extends ConfigurableTest {
+class HighlightsTest extends ConfigurableTest {
   private static final String TEXT =
       "       Identification Division. \n"
           + "       Program-id.    ProgramId.\n"
@@ -77,8 +76,8 @@ public class HighlightsTest extends ConfigurableTest {
 
   @BeforeEach
   void initializeService() {
-    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
-    TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    service = injector.getInstance(TextDocumentService.class);
+    TestLanguageClient client = injector.getInstance(TestLanguageClient.class);
     client.clean();
     runTextValidation(service, TEXT);
     waitForDiagnostics(client);
@@ -91,7 +90,8 @@ public class HighlightsTest extends ConfigurableTest {
             .documentHighlight(
                 new TextDocumentPositionParams(
                     new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), INNER1_POSITION))
-            .get().stream()
+            .get()
+            .stream()
             .map(DocumentHighlight::getRange)
             .collect(Collectors.toList());
     assertEquals(EXPECTED_RANGES.size(), documentHighlights.size());

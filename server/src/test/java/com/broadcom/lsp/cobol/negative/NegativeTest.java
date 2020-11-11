@@ -14,17 +14,15 @@
  */
 package com.broadcom.lsp.cobol.negative;
 
-import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.ConfigurableTest;
 import com.broadcom.lsp.cobol.positive.CobolText;
-import com.broadcom.lsp.cobol.positive.CobolTextRegistry;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
 
 import java.util.List;
 
-import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * This class is an abstract negative test case and should be instantiated with specifying concrete
  * Cobol files to test. Every heir should also override checkErrors() method to assert the
@@ -41,8 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * <p>S - Severe
  */
 public abstract class NegativeTest extends ConfigurableTest {
-  private static final List<CobolText> TEXTS =
-      LangServerCtx.getInjector().getInstance(CobolTextRegistry.class).getNegatives();
+
+  private static final List<CobolText> TEXTS = retrieveTextsRegistry().getNegatives();
   private String fileName;
   private String text;
   private int expectedErrorsNumber;

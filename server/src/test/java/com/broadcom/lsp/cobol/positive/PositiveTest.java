@@ -26,8 +26,6 @@ import org.junit.jupiter.params.provider.NullSource;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static java.lang.System.getProperty;
-import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -37,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @Slf4j
 class PositiveTest extends ConfigurableTest {
-  private static final String PATH_TO_TEST_RESOURCES = "filesToTestPath";
   private static List<CobolText> copybooks;
 
   /**
@@ -47,10 +44,9 @@ class PositiveTest extends ConfigurableTest {
    * @return a collection of objects that would be passed to the constructor one by one.
    */
   private static Stream<CobolText> retrieveTextsToTest() {
-    CobolTextRegistry registry =
-        new FolderTextRegistry(ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
-    copybooks = registry.getCopybooks();
-    return registry.getPositives().stream();
+    CobolTextRegistry cobolTextRegistry = retrieveTextsRegistry();
+    copybooks = cobolTextRegistry.getCopybooks();
+    return cobolTextRegistry.getPositives().stream();
   }
 
   @ParameterizedTest
