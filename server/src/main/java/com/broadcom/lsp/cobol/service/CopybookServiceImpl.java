@@ -14,13 +14,14 @@
  */
 package com.broadcom.lsp.cobol.service;
 
-import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import com.broadcom.lsp.cobol.core.annotation.CheckThreadInterruption;
+import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
+import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonPrimitive;
@@ -35,6 +36,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static com.broadcom.lsp.cobol.domain.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
 import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.*;
@@ -47,6 +49,7 @@ import static java.util.stream.Collectors.toList;
  */
 @Slf4j
 @Singleton
+@SuppressWarnings("WeakerAccess")
 public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspect {
   private final SettingsService settingsService;
   private final FileSystemService files;
@@ -102,7 +105,7 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
           copybookName, () -> resolveSync(copybookName, documentUri, copybookProcessingMode));
     } catch (ExecutionException e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
-      return new CopybookModel(copybookName, null, null);
+      return CopybookModel.empty(copybookName);
     }
   }
 
@@ -111,32 +114,32 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
     copybookCache.put(copybookModel.getName(), copybookModel);
   }
 
+  /**
+   * Resolve the copybook content synchronously. Resolutions with different copybook names will not
+   * block each other. The returning copybook model may be null if a copybook could not be resolved.
+   *
+   * @param copybookName - the name of the copybook to be retrieved
+   * @param documentUri - the currently processing document that contains the copy statement
+   * @param copybookProcessingMode - text document synchronization type
+   * @return a CopybookModel that contains copybook name, its URI and the content or an empty
+   *     copybook if could not be resolved.
+   */
   @CheckThreadInterruption
   CopybookModel resolveSync(
       @NonNull String copybookName,
       @NonNull String documentUri,
-      @NonNull CopybookProcessingMode copybookProcessingMode)
-      throws ExecutionException, InterruptedException {
+      @NonNull CopybookProcessingMode copybookProcessingMode) {
     String cobolFileName = files.getNameFromURI(documentUri);
-    String uri =
-        retrieveURI(
-            settingsService
-                .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
-                .get());
-    if (uri.isEmpty()) {
-      if (copybookProcessingMode.download) {
-        copybooksForDownloading
-            .computeIfAbsent(cobolFileName, s -> ConcurrentHashMap.newKeySet())
-            .add(copybookName);
-      }
-      return new CopybookModel(copybookName, null, null);
+    String uri = retrieveURI(copybookName, cobolFileName);
+    if (Strings.isNullOrEmpty(uri)) {
+      collectForDownloading(copybookName, copybookProcessingMode, cobolFileName);
+      return CopybookModel.empty(copybookName);
     }
     Path file = files.getPathFromURI(uri);
-    if (files.fileExists(file)) {
-      return new CopybookModel(copybookName, uri, files.getContentByPath(file));
-    } else {
-      return new CopybookModel(copybookName, null, null);
+    if (!files.fileExists(file)) {
+      return CopybookModel.empty(copybookName);
     }
+    return new CopybookModel(copybookName, uri, files.getContentByPath(file));
   }
 
   /**
@@ -151,6 +154,33 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
     } else {
       LOG.error("Unexpected DataEvent: {}", event);
     }
+  }
+
+  private void collectForDownloading(
+      @NonNull String copybookName,
+      @NonNull CopybookProcessingMode copybookProcessingMode,
+      String cobolFileName) {
+    if (copybookProcessingMode.download) {
+      copybooksForDownloading
+          .computeIfAbsent(cobolFileName, s -> ConcurrentHashMap.newKeySet())
+          .add(copybookName);
+    }
+  }
+
+  private String retrieveURI(@NonNull String copybookName, String cobolFileName) {
+    try {
+      return retrieveURI(
+          settingsService
+              .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
+              .get());
+    } catch (InterruptedException | ExecutionException e) { // NOSONAR
+      LOG.error(
+          String.format(
+              "An error occurred while resolving copybook name %s for %s",
+              copybookName, cobolFileName),
+          e);
+    }
+    return null;
   }
 
   /**
@@ -173,19 +203,22 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
               .map(copybooksForDownloading::remove)
               .filter(Objects::nonNull)
               .flatMap(Set::stream)
-              .map(
-                  copybook ->
-                      join(
-                          ".",
-                          COPYBOOK_DOWNLOAD.label,
-                          getUserInteractionType(event.getCopybookProcessingMode()),
-                          document,
-                          copybook))
+              .map(joinCopybookPath(event, document))
               .collect(toList());
       if (!copybooksToDownload.isEmpty()) {
         settingsService.getConfigurations(copybooksToDownload);
       }
     }
+  }
+
+  private Function<String, String> joinCopybookPath(AnalysisFinishedEvent event, String document) {
+    return copybook ->
+        join(
+            ".",
+            COPYBOOK_DOWNLOAD.label,
+            getUserInteractionType(event.getCopybookProcessingMode()),
+            document,
+            copybook);
   }
 
   private String getUserInteractionType(CopybookProcessingMode copybookProcessingMode) {

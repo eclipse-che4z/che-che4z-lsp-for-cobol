@@ -26,4 +26,15 @@ public class CopybookModel {
   private String name;
   private String uri;
   private String content;
+
+  /**
+   * Create an empty {@link CopybookModel} that contains only the name if the content could not be
+   * resolved
+   *
+   * @param name - a copybook name
+   * @return an empty {@link CopybookModel} instance
+   */
+  public static CopybookModel empty(String name) {
+    return new CopybookModel(name, null, null);
+  }
 }
