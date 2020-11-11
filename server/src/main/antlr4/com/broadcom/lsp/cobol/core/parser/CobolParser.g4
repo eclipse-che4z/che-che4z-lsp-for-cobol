@@ -707,7 +707,7 @@ statement
     exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement |
     multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement |
     sendStatement | serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | titleStatement | unstringStatement | writeStatement | xmlStatement
+    terminateStatement | unstringStatement | writeStatement | xmlStatement
    ;
 
 // accept statement
@@ -1679,12 +1679,6 @@ subtractMinuendCorresponding
 
 terminateStatement
    : TERMINATE reportName
-   ;
-
-// title statement
-
-titleStatement
-   : TITLE literal DOT_FS?
    ;
 
 // unstring statement
