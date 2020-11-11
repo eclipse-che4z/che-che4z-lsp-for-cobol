@@ -108,7 +108,7 @@ cpyIdentifier
    ;
 
 cpyName
-   : IDENTIFIER | COPYBOOKNAME
+   : IDENTIFIER | COPYBOOKNAME | QUOTED_COPYBOOKNAME | STRINGLITERAL
    ;
 
 START : '{';
@@ -131,6 +131,7 @@ STRINGLITERAL : ["] ~["]* ["];
 IDENTIFIER : [a-zA-Z0-9:]+ ([-_]+ [a-zA-Z0-9:]+)*;
 
 COPYBOOKNAME : [a-zA-Z0-9#@$]+ ([-_]+ [a-zA-Z0-9#@$]+)*;
+QUOTED_COPYBOOKNAME : '\'' + COPYBOOKNAME + '\'';
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);

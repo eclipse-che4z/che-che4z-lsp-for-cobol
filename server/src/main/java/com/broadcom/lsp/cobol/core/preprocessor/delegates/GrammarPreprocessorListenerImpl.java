@@ -19,6 +19,7 @@ import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.*;
 import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
 import com.broadcom.lsp.cobol.core.preprocessor.TextPreprocessor;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
@@ -336,7 +337,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private String retrieveCopybookName(@NonNull RuleContext context) {
-    return context.getText().toUpperCase();
+    return PreprocessorStringUtils.trimQuotes(context.getText().toUpperCase());
   }
 
   private String retrieveCopybookId() {
