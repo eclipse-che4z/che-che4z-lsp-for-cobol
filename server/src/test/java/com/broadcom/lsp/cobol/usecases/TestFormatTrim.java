@@ -14,7 +14,6 @@
  */
 package com.broadcom.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.ConfigurableTest;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
@@ -53,8 +52,8 @@ class TestFormatTrim extends ConfigurableTest {
 
   @BeforeEach
   void createService() {
-    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
-    client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    service = injector.getInstance(TextDocumentService.class);
+    client = injector.getInstance(TestLanguageClient.class);
     client.clean();
     service.didOpen(new DidOpenTextDocumentParams(new TextDocumentItem(ID, "COBOL", 1, TEXT)));
   }
@@ -90,9 +89,9 @@ class TestFormatTrim extends ConfigurableTest {
 
   private List<TextEdit> trim(String text) {
     try (BufferedReader bufReader = new BufferedReader(new StringReader(text))) {
-      String line = null;
+      String line;
       int k = 0;
-      List<TextEdit> array = new ArrayList<TextEdit>();
+      List<TextEdit> array = new ArrayList<>();
       while ((line = bufReader.readLine()) != null) {
         String newLine = rtrim(line);
         array.add(

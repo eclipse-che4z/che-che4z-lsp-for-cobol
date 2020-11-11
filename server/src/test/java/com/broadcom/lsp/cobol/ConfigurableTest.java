@@ -14,20 +14,29 @@
  */
 package com.broadcom.lsp.cobol;
 
-import com.broadcom.lsp.cobol.domain.modules.EngineModule;
-import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.domain.modules.DatabusModule;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import com.broadcom.lsp.cobol.domain.modules.EngineModule;
+import com.broadcom.lsp.cobol.positive.CobolTextRegistry;
+import com.broadcom.lsp.cobol.positive.FolderTextRegistry;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import org.junit.jupiter.api.TestInstance;
 
+import static java.lang.System.getProperty;
+import static java.util.Optional.ofNullable;
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class ConfigurableTest {
-  @BeforeAll
-  public static void setUp() {
-    LangServerCtx.getGuiceCtx(new TestModule(), new EngineModule(), new DatabusModule());
-  }
+  protected static final String PATH_TO_TEST_RESOURCES = "filesToTestPath";
+  protected Injector injector =
+      Guice.createInjector(new TestModule(), new EngineModule(), new DatabusModule());
 
-  @AfterAll
-  public static void tearDown() {
-    LangServerCtx.shutdown();
+  /**
+   * Retrieve {@link CobolTextRegistry} using file-based implementation.
+   *
+   * @return {@link CobolTextRegistry}.
+   */
+  public static CobolTextRegistry retrieveTextsRegistry() {
+    return new FolderTextRegistry(ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
   }
 }
