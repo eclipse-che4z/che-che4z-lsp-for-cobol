@@ -18,6 +18,7 @@ package com.broadcom.lsp.cobol.usecases;
 import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.service.delegates.communications.ServerCommunications;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.broadcom.lsp.cobol.service.utils.WorkspaceFileService;
 import org.eclipse.lsp4j.Diagnostic;
@@ -28,7 +29,6 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 
-import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -62,10 +62,17 @@ class TestResponsesNotContainLineBreaks {
     when(files.decodeURI(anyString())).thenCallRealMethod();
     MessageService mockMessageService = mock(MessageService.class);
 
-    ServerCommunications communications = new ServerCommunications(() -> client, files, mockMessageService);
+    ServerCommunications communications =
+        new ServerCommunications(
+            () -> client,
+            files,
+            mockMessageService,
+            new CustomThreadPoolExecutorService(3, 4, 60, 5));
 
     communications.publishDiagnostics(
-        singletonMap(UseCaseUtils.DOCUMENT_URI, UseCaseUtils.analyzeForErrors(UseCaseUtils.DOCUMENT_URI, TEXT)));
+        singletonMap(
+            UseCaseUtils.DOCUMENT_URI,
+            UseCaseUtils.analyzeForErrors(UseCaseUtils.DOCUMENT_URI, TEXT)));
 
     verify(client).publishDiagnostics(captor.capture());
     List<Diagnostic> diagnostics = captor.getValue().getDiagnostics();

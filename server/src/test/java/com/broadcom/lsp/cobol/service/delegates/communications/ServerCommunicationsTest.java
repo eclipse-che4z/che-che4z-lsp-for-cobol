@@ -16,11 +16,13 @@
 package com.broadcom.lsp.cobol.service.delegates.communications;
 
 import com.broadcom.lsp.cobol.core.messages.MessageService;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.google.inject.Provider;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +35,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp4j.MessageType.Error;
@@ -56,6 +60,9 @@ class ServerCommunicationsTest {
   @InjectMocks private ServerCommunications communications;
 
   @Mock private MessageService messageService;
+
+  @Mock private CustomThreadPoolExecutor customExecutor;
+  @Mock private ScheduledExecutorService executor;
 
   @BeforeEach
   void init(TestInfo info) {
@@ -100,6 +107,9 @@ class ServerCommunicationsTest {
   void testNotifyThatLoadingInProgress() {
     String data = UUID.randomUUID().toString();
     when(files.decodeURI(data)).thenReturn(data);
+    when(customExecutor.getScheduledThreadPoolExecutor())
+        .thenReturn(Executors.newScheduledThreadPool(5));
+
     when(messageService.getMessage(anyString(), anyString()))
         .thenReturn("%s : Syntax analysis in progress");
 

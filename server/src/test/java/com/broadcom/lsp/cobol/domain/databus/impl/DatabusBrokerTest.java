@@ -21,7 +21,7 @@ import com.broadcom.lsp.cobol.domain.event.impl.UnknownEventSubscriber;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
 import com.broadcom.lsp.cobol.domain.event.model.UnknownEvent;
-import lombok.AccessLevel;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -37,12 +37,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Slf4j
 class DatabusBrokerTest implements EventObserver<DataEvent> {
   @Accessors(fluent = true, chain = false)
-  @Getter @Setter private int hitCount;
+  @Getter
+  @Setter
+  private int hitCount;
+
   private static final DataEventType UNKNOWN_EVENT_TYPE = DataEventType.UNKNOWN_EVENT;
 
-  private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> broker = new DefaultDataBusBroker<>(3);
+  private DefaultDataBusBroker<UnknownEvent, UnknownEventSubscriber> broker =
+      new DefaultDataBusBroker<>(new CustomThreadPoolExecutorService(3, 4, 60, 5));
   private final CopybookModel dummyCopybook =
-      new CopybookModel("Test", "file:///C:/Users/test/Test.cbl", "000000 IDENTIFICATION DIVISION.");
+      new CopybookModel(
+          "Test", "file:///C:/Users/test/Test.cbl", "000000 IDENTIFICATION DIVISION.");
 
   @Getter private final Waiter waiter = new Waiter();
 
