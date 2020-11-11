@@ -16,7 +16,6 @@
 package com.broadcom.lsp.cobol.service.delegates.references;
 
 import com.broadcom.lsp.cobol.ConfigurableTest;
-import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.service.CopybookService;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
@@ -81,10 +80,10 @@ class DocumentOccurrencesTest extends ConfigurableTest {
 
   @BeforeEach
   void createService() {
-    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
-    TestLanguageClient client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    service = injector.getInstance(TextDocumentService.class);
+    TestLanguageClient client = injector.getInstance(TestLanguageClient.class);
     client.clean();
-    CopybookService copybookService = LangServerCtx.getInjector().getInstance(CopybookService.class);
+    CopybookService copybookService = injector.getInstance(CopybookService.class);
     List.of(new CobolText("CPYBK1", COPYBOOK1), new CobolText("CPYBK2", COPYBOOK2)).stream()
         .map(UseCaseUtils::toCopybookModel)
         .forEach(copybookService::store);

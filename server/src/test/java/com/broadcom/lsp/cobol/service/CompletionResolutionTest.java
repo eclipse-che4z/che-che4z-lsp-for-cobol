@@ -16,7 +16,6 @@
 package com.broadcom.lsp.cobol.service;
 
 import com.broadcom.lsp.cobol.ConfigurableTest;
-import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -44,7 +43,7 @@ class CompletionResolutionTest extends ConfigurableTest {
 
   @BeforeEach
   void createService() {
-    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
+    service = injector.getInstance(TextDocumentService.class);
   }
 
   @Test

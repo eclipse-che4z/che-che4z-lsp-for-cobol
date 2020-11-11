@@ -24,7 +24,7 @@ public class FolderTextRegistry implements CobolTextRegistry {
   private final ListMultimap<String, CobolText> texts = ArrayListMultimap.create();
 
   @SneakyThrows
-  FolderTextRegistry(String pathToTestResources) {
+  public FolderTextRegistry(String pathToTestResources) {
     if (StringUtils.isNotEmpty(pathToTestResources)) collectFilesToTest(pathToTestResources);
   }
 

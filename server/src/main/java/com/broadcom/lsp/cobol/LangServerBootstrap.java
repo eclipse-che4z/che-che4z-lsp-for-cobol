@@ -16,10 +16,11 @@ package com.broadcom.lsp.cobol;
 
 import com.broadcom.lsp.cobol.domain.modules.DatabusModule;
 import com.broadcom.lsp.cobol.domain.modules.EngineModule;
-import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.domain.modules.ServiceModule;
 import com.broadcom.lsp.cobol.service.providers.ClientProvider;
 import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -52,17 +53,16 @@ public class LangServerBootstrap {
 
   public static void main(String[] args)
       throws ExecutionException, InterruptedException, IOException {
-    initCtx();
-    LanguageServer server = LangServerCtx.getInjector().getInstance(LanguageServer.class);
-    ClientProvider provider = LangServerCtx.getInjector().getInstance(ClientProvider.class);
-    CustomThreadPoolExecutor customExecutor =
-        LangServerCtx.getInjector().getInstance(CustomThreadPoolExecutor.class);
+    Injector injector = initCtx();
+    LanguageServer server = injector.getInstance(LanguageServer.class);
+    ClientProvider provider = injector.getInstance(ClientProvider.class);
+    CustomThreadPoolExecutor customExecutor = injector.getInstance(CustomThreadPoolExecutor.class);
 
     start(args, server, provider, customExecutor.getThreadPoolExecutor());
   }
 
-  void initCtx() {
-    LangServerCtx.getGuiceCtx(new ServiceModule(), new EngineModule(), new DatabusModule());
+  Injector initCtx() {
+    return Guice.createInjector(new ServiceModule(), new EngineModule(), new DatabusModule());
   }
 
   private void start(
