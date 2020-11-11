@@ -31,6 +31,8 @@ import com.broadcom.lsp.cobol.service.delegates.references.*;
 import com.broadcom.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.broadcom.lsp.cobol.service.providers.ClientProvider;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.broadcom.lsp.cobol.service.utils.WorkspaceFileService;
 import com.google.inject.AbstractModule;
@@ -50,6 +52,7 @@ import static com.google.inject.name.Names.named;
 public class ServiceModule extends AbstractModule {
   @Override
   protected void configure() {
+    bind(CustomThreadPoolExecutor.class).to(CustomThreadPoolExecutorService.class);
     bind(LanguageServer.class).to(CobolLanguageServer.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(CopybookService.class).to(CopybookServiceImpl.class);

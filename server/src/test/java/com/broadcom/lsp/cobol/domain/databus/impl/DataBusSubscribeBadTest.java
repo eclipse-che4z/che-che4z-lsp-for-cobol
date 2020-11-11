@@ -19,6 +19,7 @@ import com.broadcom.lsp.cobol.domain.event.impl.AnalysisFinishedEventSubscriber;
 import com.broadcom.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,7 @@ class DataBusSubscribeBadTest extends DatabusConfigProvider {
 
   @BeforeEach
   void setUp() {
-    databus = new DefaultDataBusBroker<>(3);
+    databus = new DefaultDataBusBroker<>(new CustomThreadPoolExecutorService(3, 4, 60, 5));
   }
 
   @Override

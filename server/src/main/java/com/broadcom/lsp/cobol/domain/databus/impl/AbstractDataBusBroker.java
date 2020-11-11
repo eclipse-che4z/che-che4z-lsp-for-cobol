@@ -22,6 +22,7 @@ import com.broadcom.lsp.cobol.domain.event.api.EventObserver;
 import com.broadcom.lsp.cobol.domain.event.impl.DeadEventSubscriber;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 
@@ -29,11 +30,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /** This class spawns the cache registries and manage the databus interactions. */
 public abstract class AbstractDataBusBroker<T extends DataEvent, S> implements DataBusBroker<T, S> {
-  private ExecutorService executor;
   private EventBus generalRegistry;
   private EventBus scannerRegistry;
   private EventBus fetcherRegistry;
@@ -42,8 +41,8 @@ public abstract class AbstractDataBusBroker<T extends DataEvent, S> implements D
   private DeadEventSubscriber recycleBin = new DeadEventSubscriber();
   private Map<String, EventBus> registrySet = new HashMap<>();
 
-  public AbstractDataBusBroker(int numberOfThreads) {
-    executor = Executors.newFixedThreadPool(numberOfThreads);
+  public AbstractDataBusBroker(CustomThreadPoolExecutor customExecutor) {
+    ExecutorService executor = customExecutor.getThreadPoolExecutor();
     generalRegistry = new AsyncEventBus(RegistryId.GENERAL_REGISTRY_ID.getId(), executor);
     scannerRegistry = new AsyncEventBus(RegistryId.SCANNER_REGISTRY_ID.getId(), executor);
     fetcherRegistry = new AsyncEventBus(RegistryId.FETCHER_REGISTRY_ID.getId(), executor);
