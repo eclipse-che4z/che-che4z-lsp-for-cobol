@@ -15,6 +15,7 @@
 
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.ConfigurableTest;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.service.delegates.communications.Communications;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -34,7 +35,7 @@ import static org.mockito.Mockito.*;
  * extensions. If an extension of a document is unsupported (i.e. not "cob", "cbl" or "cobol"
  * ignoring case) then the according to notification should be sent.
  */
-class DocumentExtensionTests {
+class DocumentExtensionTests extends ConfigurableTest {
   private static final String DOCUMENT_URI_BEGINNING = "file:///c%3A/workspace/document.";
   private static final String TEXT = "";
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
@@ -98,6 +99,7 @@ class DocumentExtensionTests {
             .communications(communications)
             .engine(engine)
             .dataBus(broker)
+            .executors(getCustomExecutor())
             .build();
     service.didOpen(new DidOpenTextDocumentParams(new TextDocumentItem(uri, extension, 0, TEXT)));
   }
@@ -111,6 +113,7 @@ class DocumentExtensionTests {
             .communications(communications)
             .engine(engine)
             .dataBus(broker)
+            .executors(getCustomExecutor())
             .build();
     service.didChange(
         new DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier(uri, 0), textEdits));

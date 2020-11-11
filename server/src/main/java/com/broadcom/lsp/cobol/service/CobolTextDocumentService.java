@@ -14,6 +14,8 @@
  */
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.core.annotation.CheckServerShutdownState;
+import com.broadcom.lsp.cobol.core.annotation.DisposableService;
 import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.event.api.EventObserver;
 import com.broadcom.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
@@ -26,6 +28,7 @@ import com.broadcom.lsp.cobol.service.delegates.formations.Formations;
 import com.broadcom.lsp.cobol.service.delegates.references.Occurrences;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Builder;
@@ -39,7 +42,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
 
 import static java.lang.String.format;
@@ -61,7 +66,7 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 @Singleton
 public class CobolTextDocumentService
-    implements TextDocumentService, EventObserver<RunAnalysisEvent> {
+    implements TextDocumentService, EventObserver<RunAnalysisEvent>, DisposableService {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
   private static final String GIT_FS_URI = "gitfs:/";
   private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
@@ -69,7 +74,6 @@ public class CobolTextDocumentService
   private final Map<String, CompletableFuture<List<DocumentSymbol>>> outlineMap =
       new ConcurrentHashMap<>();
   private final Map<String, Future<?>> futureMap = new ConcurrentHashMap<>();
-  private final ExecutorService threadPool = Executors.newCachedThreadPool();
   private Communications communications;
   private LanguageEngineFacade engine;
   private Formations formations;
@@ -77,6 +81,7 @@ public class CobolTextDocumentService
   private Occurrences occurrences;
   private CodeActions actions;
   private DataBusBroker dataBus;
+  private CustomThreadPoolExecutor executors;
 
   @Inject
   @Builder
@@ -87,7 +92,8 @@ public class CobolTextDocumentService
       Completions completions,
       Occurrences occurrences,
       DataBusBroker dataBus,
-      CodeActions actions) {
+      CodeActions actions,
+      CustomThreadPoolExecutor executors) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -95,6 +101,7 @@ public class CobolTextDocumentService
     this.occurrences = occurrences;
     this.actions = actions;
     this.dataBus = dataBus;
+    this.executors = executors;
 
     dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
@@ -108,63 +115,77 @@ public class CobolTextDocumentService
   }
 
   @Override
+  @CheckServerShutdownState
   public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
       CompletionParams params) {
     String uri = params.getTextDocument().getUri();
     return CompletableFuture.<Either<List<CompletionItem>, CompletionList>>supplyAsync(
-            () -> Either.forRight(completions.collectFor(docs.get(uri), params)))
+            () -> Either.forRight(completions.collectFor(docs.get(uri), params)),
+            executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("completion lookup", uri)));
   }
 
   @Override
+  @CheckServerShutdownState
   public CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem unresolved) {
-    return supplyAsync(() -> completions.resolveDocumentationFor(unresolved))
+    return supplyAsync(
+            () -> completions.resolveDocumentationFor(unresolved),
+            executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(
                 createDescriptiveErrorMessage("completion resolving", unresolved.getLabel())));
   }
 
   @Override
+  @CheckServerShutdownState
   public CompletableFuture<List<? extends Location>> definition(
       TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
     return CompletableFuture.<List<? extends Location>>supplyAsync(
-            () -> occurrences.findDefinitions(docs.get(uri), position))
+            () -> occurrences.findDefinitions(docs.get(uri), position),
+            executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("definitions resolving", uri)));
   }
 
   @Override
+  @CheckServerShutdownState
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
     String uri = params.getTextDocument().getUri();
     return CompletableFuture.<List<? extends Location>>supplyAsync(
-            () -> occurrences.findReferences(docs.get(uri), params, params.getContext()))
+            () -> occurrences.findReferences(docs.get(uri), params, params.getContext()),
+            executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("references resolving", uri)));
   }
 
   @Override
+  @CheckServerShutdownState
   public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
       TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
     return CompletableFuture.<List<? extends DocumentHighlight>>supplyAsync(
-            () -> occurrences.findHighlights(docs.get(uri), position))
+            () -> occurrences.findHighlights(docs.get(uri), position),
+            executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("document highlighting", uri)));
   }
 
   @Override
+  @CheckServerShutdownState
   public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
     String uri = params.getTextDocument().getUri();
     CobolDocumentModel model = docs.get(uri);
-    return CompletableFuture.<List<? extends TextEdit>>supplyAsync(() -> formations.format(model))
+    return CompletableFuture.<List<? extends TextEdit>>supplyAsync(
+            () -> formations.format(model), executors.getThreadPoolExecutor())
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("formatting", uri)));
   }
 
   @Override
+  @CheckServerShutdownState
   public CompletableFuture<List<Either<Command, CodeAction>>> codeAction(CodeActionParams params) {
-    return supplyAsync(() -> actions.collect(params))
+    return supplyAsync(() -> actions.collect(params), executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(
                 createDescriptiveErrorMessage(
@@ -172,6 +193,7 @@ public class CobolTextDocumentService
   }
 
   @Override
+  @CheckServerShutdownState
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
     outlineMap.put(uri, new CompletableFuture<>());
@@ -186,6 +208,7 @@ public class CobolTextDocumentService
   }
 
   @Override
+  @CheckServerShutdownState
   public void didChange(DidChangeTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
     outlineMap.put(uri, new CompletableFuture<>());
@@ -198,6 +221,7 @@ public class CobolTextDocumentService
   }
 
   @Override
+  @CheckServerShutdownState
   public void didClose(DidCloseTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
     LOG.info(format("Document closing invoked on URI %s", uri));
@@ -216,11 +240,13 @@ public class CobolTextDocumentService
   }
 
   @Override
+  @CheckServerShutdownState
   public void didSave(DidSaveTextDocumentParams params) {
     LOG.info("Document saved...");
   }
 
   @Override
+  @CheckServerShutdownState
   public void observerCallback(@NonNull RunAnalysisEvent event) {
     docs.forEach((key, value) -> analyzeDocumentFirstTime(key, value.getText(), event.verbose));
   }
@@ -255,25 +281,27 @@ public class CobolTextDocumentService
   private void analyzeDocumentFirstTime(String uri, String text, boolean userRequest) {
     registerDocument(uri, new CobolDocumentModel(text, AnalysisResult.empty()));
     Future<?> docAnalysisFuture =
-        threadPool.submit(
-            () -> {
-              try {
-                CopybookProcessingMode copybookProcessingMode =
-                    CopybookProcessingMode.getCopybookProcessingMode(
-                        uri,
-                        userRequest
-                            ? CopybookProcessingMode.ENABLED_VERBOSE
-                            : CopybookProcessingMode.ENABLED);
-                AnalysisResult result = engine.analyze(uri, text, copybookProcessingMode);
-                ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
-                publishResult(uri, result, copybookProcessingMode);
-                outlineMap.get(uri).complete(result.getOutlineTree());
-              } catch (Exception e) {
-                LOG.error(createDescriptiveErrorMessage("analysis", uri), e);
-              } finally {
-                clearAnalysedFutureObject(uri);
-              }
-            });
+        executors
+            .getThreadPoolExecutor()
+            .submit(
+                () -> {
+                  try {
+                    CopybookProcessingMode copybookProcessingMode =
+                        CopybookProcessingMode.getCopybookProcessingMode(
+                            uri,
+                            userRequest
+                                ? CopybookProcessingMode.ENABLED_VERBOSE
+                                : CopybookProcessingMode.ENABLED);
+                    AnalysisResult result = engine.analyze(uri, text, copybookProcessingMode);
+                    ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
+                    publishResult(uri, result, copybookProcessingMode);
+                    outlineMap.get(uri).complete(result.getOutlineTree());
+                  } catch (Exception e) {
+                    LOG.error(createDescriptiveErrorMessage("analysis", uri), e);
+                  } finally {
+                    clearAnalysedFutureObject(uri);
+                  }
+                });
     registerToFutureMap(uri, docAnalysisFuture);
   }
 
@@ -283,24 +311,26 @@ public class CobolTextDocumentService
 
   void analyzeChanges(String uri, String text) {
     Future<?> analyseSubmitFuture =
-        threadPool.submit(
-            () -> {
-              try {
-                AnalysisResult result =
-                    engine.analyze(
-                        uri,
-                        text,
-                        CopybookProcessingMode.getCopybookProcessingMode(
-                            uri, CopybookProcessingMode.SKIP));
-                registerDocument(uri, new CobolDocumentModel(text, result));
-                communications.publishDiagnostics(result.getDiagnostics());
-                outlineMap.get(uri).complete(result.getOutlineTree());
-              } catch (Exception ex) {
-                LOG.error(createDescriptiveErrorMessage("analysis", uri), ex);
-              } finally {
-                clearAnalysedFutureObject(uri);
-              }
-            });
+        executors
+            .getThreadPoolExecutor()
+            .submit(
+                () -> {
+                  try {
+                    AnalysisResult result =
+                        engine.analyze(
+                            uri,
+                            text,
+                            CopybookProcessingMode.getCopybookProcessingMode(
+                                uri, CopybookProcessingMode.SKIP));
+                    registerDocument(uri, new CobolDocumentModel(text, result));
+                    communications.publishDiagnostics(result.getDiagnostics());
+                    outlineMap.get(uri).complete(result.getOutlineTree());
+                  } catch (Exception ex) {
+                    LOG.error(createDescriptiveErrorMessage("analysis", uri), ex);
+                  } finally {
+                    clearAnalysedFutureObject(uri);
+                  }
+                });
     registerToFutureMap(uri, analyseSubmitFuture);
   }
 

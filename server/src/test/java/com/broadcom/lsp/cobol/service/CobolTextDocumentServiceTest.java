@@ -26,8 +26,10 @@ import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
+import com.broadcom.lsp.cobol.service.mocks.TestLanguageServer;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -60,14 +62,17 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
   private static final String INCORRECT_TEXT_EXAMPLE = "       IDENTIFICATION DIVISIONs.";
   private static final String DOCUMENT_WITH_ERRORS_URI =
       "file:///c%3A/workspace/incorrect_document.cbl";
+  private static final String SHUTDOWN_RESPONSE = "InvalidRequest";
 
   private TextDocumentService service;
   private TestLanguageClient client;
+  private LanguageServer server;
 
   @BeforeEach
   void createService() {
     service = injector.getInstance(TextDocumentService.class);
     client = injector.getInstance(TestLanguageClient.class);
+    server = injector.getInstance(LanguageServer.class);
     client.clean();
   }
 
@@ -177,8 +182,12 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
   }
 
   private CobolTextDocumentService buildServiceWithMockEngine(LanguageEngineFacade engine) {
-    return new CobolTextDocumentService(
-        mock(Communications.class), engine, null, null, null, mock(DataBusBroker.class), null);
+    return CobolTextDocumentService.builder()
+        .communications(mock(Communications.class))
+        .engine(engine)
+        .dataBus(mock(DataBusBroker.class))
+        .executors(getCustomExecutor())
+        .build();
   }
 
   /**
@@ -314,7 +323,11 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
 
     MessageService mockMessageService = mock(MessageService.class);
     CobolTextDocumentService service =
-        CobolTextDocumentService.builder().dataBus(broker).actions(actions).build();
+        CobolTextDocumentService.builder()
+            .dataBus(broker)
+            .actions(actions)
+            .executors(getCustomExecutor())
+            .build();
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     try {
       assertEquals(expected, service.codeAction(params).get());
@@ -357,6 +370,7 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
             .communications(communications)
             .engine(engine)
             .dataBus(broker)
+            .executors(getCustomExecutor())
             .build();
 
     verify(broker).subscribe(DataEventType.RUN_ANALYSIS_EVENT, service);
@@ -418,6 +432,7 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
             .communications(communications)
             .engine(engine)
             .dataBus(broker)
+            .executors(getCustomExecutor())
             .build();
 
     service.didOpen(
@@ -434,6 +449,54 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
     assertThat(service.getFutureMap().entrySet(), hasSize(0));
 
     verify(communications, timeout(2000)).cancelProgressNotification(UseCaseUtils.DOCUMENT_URI);
+  }
+
+  /**
+   * This method tests that after a shutdown request, {@link TextDocumentService} always return
+   * SHUTDOWN_RESPONSE
+   *
+   * @throws ExecutionException
+   * @throws InterruptedException
+   */
+  @Test
+  void whenShutdownIsFired_ThenNewRequestReturnInvalidResponse()
+      throws ExecutionException, InterruptedException {
+
+    server.shutdown();
+    assertEquals(0, ((DisposableLanguageServer) server).getExitCode());
+
+    CodeActionParams params =
+        new CodeActionParams(new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), null, null);
+    CompletionParams completionParams =
+        new CompletionParams(
+            new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), new Position(0, 8));
+
+    Position position = new Position(0, 2);
+    TextDocumentIdentifier testTextDocumentIdentifier =
+        new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI);
+    TextDocumentPositionParams positionParams =
+        new TextDocumentPositionParams(testTextDocumentIdentifier, position);
+    ReferenceParams referenceParams = new ReferenceParams();
+
+    assertEquals(SHUTDOWN_RESPONSE, service.codeAction(params).get()); // NOSONAR
+    assertEquals(SHUTDOWN_RESPONSE, service.definition(positionParams).get()); // NOSONAR
+    assertEquals(SHUTDOWN_RESPONSE, service.completion(completionParams).get()); // NOSONAR
+    assertEquals(SHUTDOWN_RESPONSE, service.references(referenceParams).get()); // NOSONAR
+    assertEquals(SHUTDOWN_RESPONSE, service.documentHighlight(positionParams).get()); // NOSONAR
+    assertEquals(
+        SHUTDOWN_RESPONSE, service.formatting(new DocumentFormattingParams()).get()); // NOSONAR
+
+    List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
+    textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
+    service.didChange(
+        new DidChangeTextDocumentParams(
+            new VersionedTextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI, 0), textEdits));
+
+    service.didClose(
+        new DidCloseTextDocumentParams(new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI)));
+
+    ((TestLanguageServer) server).revokeShutdown();
+    assertEquals(1, ((DisposableLanguageServer) server).getExitCode());
   }
 
   @Disabled("Not implemented yet")
@@ -479,6 +542,7 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
             .communications(communications)
             .engine(engine)
             .dataBus(broker)
+            .executors(getCustomExecutor())
             .build();
 
     service.didOpen(
