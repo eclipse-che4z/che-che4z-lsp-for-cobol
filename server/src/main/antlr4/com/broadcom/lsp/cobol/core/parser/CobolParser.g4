@@ -698,7 +698,7 @@ paragraph
    ;
 
 sentence
-   : (statement* DOT_FS) | skipStatement+
+   : (statement* DOT_FS)
    ;
 
 statement
@@ -1525,12 +1525,6 @@ serviceLabelStatement
 
 serviceReloadStatement
    : SERVICE RELOAD generalIdentifier
-   ;
-
-// skip statement
-
-skipStatement
-   : SKIP1|SKIP2|SKIP3 DOT_FS?
    ;
 
 // sort statement
