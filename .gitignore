@@ -101,6 +101,9 @@ local.properties
 # Tern plugin
 .tern-project
 
+# ANTLR plugin
+/server/gen
+
 # TeXlipse plugin
 .texlipse
 
