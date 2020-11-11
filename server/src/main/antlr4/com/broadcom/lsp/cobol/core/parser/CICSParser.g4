@@ -1116,10 +1116,6 @@ libraryName
    : cobolWord
    ;
 
-localName
-   : cobolWord
-   ;
-
 mnemonicName
    : cobolWord
    ;
