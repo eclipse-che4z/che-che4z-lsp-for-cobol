@@ -33,7 +33,7 @@ import java.util.List;
 @Data
 @Slf4j
 public class CobolDocumentModel {
-  private static final String DELIMITER = "[ .\\[\\]()<>,*]+";
+  private static final String DELIMITER = "[ .\\[\\]()<>,*\"']+";
   private final List<Line> lines = new ArrayList<>();
   private final String text;
   private AnalysisResult analysisResult;

@@ -15,19 +15,20 @@
 
 package com.broadcom.lsp.cobol;
 
-import com.broadcom.lsp.cobol.service.mocks.TestLanguageServer;
 import com.broadcom.lsp.cobol.service.CobolLanguageServer;
+import com.broadcom.lsp.cobol.service.mocks.TestLanguageServer;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
+import com.google.inject.Injector;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.Socket;
 
-import static com.broadcom.lsp.cobol.domain.modules.LangServerCtx.getInjector;
-import static com.broadcom.lsp.cobol.domain.modules.LangServerCtx.shutdown;
 import static com.google.inject.Key.get;
 import static com.google.inject.name.Names.named;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
@@ -38,21 +39,27 @@ class LangServerBootstrapTest {
 
   private static final String PIPES = "pipeEnabled";
 
-  @AfterEach
-  void shutdownContext() {
-    shutdown();
+  private LanguageServer server;
+  private CustomThreadPoolExecutor customExecutor;
+
+  @BeforeEach
+  void setUp() {
+    server = new TestLanguageServer();
+    customExecutor = new CustomThreadPoolExecutorService(4, 5, 60, 3);
   }
 
   @Test
   void initCtx() {
-    LangServerBootstrap.initCtx();
+    Injector injector = LangServerBootstrap.initCtx();
 
     // Bound class in Service module
-    CobolLanguageServer server = getInjector().getInstance(CobolLanguageServer.class);
+    CobolLanguageServer server = injector.getInstance(CobolLanguageServer.class);
+    CustomThreadPoolExecutor customExecutor = injector.getInstance(CustomThreadPoolExecutor.class);
     // Bound constant in Databus module
-    Integer cacheSize = getInjector().getInstance(get(Integer.class, named("CACHE-MAX-SIZE")));
+    Integer cacheSize = injector.getInstance(get(Integer.class, named("CACHE-MAX-SIZE")));
 
     assertNotNull(server);
+    assertNotNull(customExecutor);
     assertNotNull(cacheSize);
   }
 
@@ -76,8 +83,6 @@ class LangServerBootstrapTest {
 
   @Test
   void createServerLauncherWithSocket() throws IOException {
-    LanguageServer server = new TestLanguageServer();
-
     newSingleThreadExecutor()
         .submit(
             () -> {
@@ -88,17 +93,18 @@ class LangServerBootstrapTest {
                 fail(e.getMessage());
               }
             });
-    Launcher<LanguageClient> launcher = LangServerBootstrap.createServerLauncherWithSocket(server);
+    Launcher<LanguageClient> launcher =
+        LangServerBootstrap.createServerLauncherWithSocket(
+            server, customExecutor.getThreadPoolExecutor());
 
     assertNotNull(launcher.getRemoteProxy());
   }
 
   @Test
   void createServerLauncher() {
-    LanguageServer server = new TestLanguageServer();
-
     Launcher<LanguageClient> launcher =
-        LangServerBootstrap.createServerLauncher(server, System.in, System.out);
+        LangServerBootstrap.createServerLauncher(
+            server, System.in, System.out, customExecutor.getThreadPoolExecutor());
 
     assertNotNull(launcher.getRemoteProxy());
   }
@@ -106,7 +112,8 @@ class LangServerBootstrapTest {
   @Test
   void startServer() throws IOException {
     Launcher<LanguageClient> launcher =
-        LangServerBootstrap.launchServer(new String[] {PIPES}, new TestLanguageServer());
+        LangServerBootstrap.launchServer(
+            new String[] {PIPES}, server, customExecutor.getThreadPoolExecutor());
     assertNotNull(launcher.getRemoteProxy());
   }
 }

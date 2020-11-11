@@ -22,9 +22,12 @@ import com.google.inject.name.Names;
 public class DatabusModule extends AbstractModule {
   @Override
   protected void configure() {
-    bindConstant().annotatedWith(Names.named("ASYNC-MESS-DISPATCHER")).to(10);
     bindConstant().annotatedWith(Names.named("CACHE-MAX-SIZE")).to(500);
     bindConstant().annotatedWith(Names.named("CACHE-DURATION")).to(3);
     bindConstant().annotatedWith(Names.named("CACHE-TIME-UNIT")).to("HOURS");
+    bindConstant().annotatedWith(Names.named("CORE-POOL-SIZE")).to(4);
+    bindConstant().annotatedWith(Names.named("MAX-POOL-SIZE")).to(10);
+    bindConstant().annotatedWith(Names.named("KEEP-ALIVE-TIME-IN-SECONDS")).to(60);
+    bindConstant().annotatedWith(Names.named("CORE-POOL-SIZE-FOR-SCHEDULED-POOL")).to(5);
   }
 }

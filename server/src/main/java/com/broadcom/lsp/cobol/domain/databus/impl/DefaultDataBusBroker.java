@@ -19,9 +19,9 @@ import com.broadcom.lsp.cobol.domain.databus.model.RegistryId;
 import com.broadcom.lsp.cobol.domain.event.api.EventObserver;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,8 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBusBroker<T, S> {
 
   @Inject
-  DefaultDataBusBroker(@Named("ASYNC-MESS-DISPATCHER") int numberOfThreads) {
-    super(numberOfThreads);
+  DefaultDataBusBroker(CustomThreadPoolExecutor customExecutor) {
+    super(customExecutor);
   }
 
   @Override

@@ -19,6 +19,7 @@ import com.broadcom.lsp.cobol.domain.event.api.CopybookEventFactory;
 import com.broadcom.lsp.cobol.domain.event.api.EventObserver;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -38,10 +39,12 @@ abstract class DatabusConfigProvider implements EventObserver<DataEvent> {
   @Getter protected final Waiter waiter = new Waiter();
 
   @Accessors(chain = true, fluent = true)
-  @Setter @Getter
+  @Setter
+  @Getter
   private DataEventType targetEventType;
 
-  private DefaultDataBusBroker databus = new DefaultDataBusBroker<>(3);
+  private DefaultDataBusBroker databus =
+      new DefaultDataBusBroker<>(new CustomThreadPoolExecutorService(3, 4, 60, 5));
 
   void databusSubscriptionForPositiveScenario(DataEventType subscribedTo, DataEventType publishTo)
       throws TimeoutException, InterruptedException {

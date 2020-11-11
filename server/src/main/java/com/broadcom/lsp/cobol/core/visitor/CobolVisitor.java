@@ -27,8 +27,6 @@ import com.broadcom.lsp.cobol.core.semantics.*;
 import com.broadcom.lsp.cobol.core.semantics.outline.NodeType;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineTreeBuilder;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -40,8 +38,10 @@ import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.broadcom.lsp.cobol.core.CobolParser.*;
 import static com.broadcom.lsp.cobol.core.semantics.CobolVariableContext.LEVEL_77;

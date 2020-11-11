@@ -20,7 +20,6 @@ import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
 import com.broadcom.lsp.cobol.domain.event.model.RunAnalysisEvent;
-import com.broadcom.lsp.cobol.domain.modules.LangServerCtx;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActions;
 import com.broadcom.lsp.cobol.service.delegates.communications.Communications;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -67,8 +66,8 @@ class CobolTextDocumentServiceTest extends ConfigurableTest {
 
   @BeforeEach
   void createService() {
-    service = LangServerCtx.getInjector().getInstance(TextDocumentService.class);
-    client = LangServerCtx.getInjector().getInstance(TestLanguageClient.class);
+    service = injector.getInstance(TextDocumentService.class);
+    client = injector.getInstance(TestLanguageClient.class);
     client.clean();
   }
 
