@@ -17,6 +17,7 @@ package com.broadcom.lsp.cobol.core.semantics.outline;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.google.common.collect.Multimap;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -36,18 +37,16 @@ import static java.util.Optional.ofNullable;
  * <p>Uses ParserRuleContext for finding the element's parent.
  */
 @Slf4j
+@RequiredArgsConstructor
 public class OutlineTreeBuilder {
-  private List<DocumentSymbol> rootNodes = new ArrayList<>();
-  private Map<ParserRuleContext, DocumentSymbol> nodesByContext = new HashMap<>();
   private Deque<VariableNode> variableNodes;
   private DocumentSymbol latestVariable;
-  private String documentUri;
-  private Map<Token, Locality> positionMapping;
 
-  public OutlineTreeBuilder(String documentUri, Map<Token, Locality> positionMapping) {
-    this.documentUri = documentUri;
-    this.positionMapping = positionMapping;
-  }
+  private final List<DocumentSymbol> rootNodes = new ArrayList<>();
+  private final Map<ParserRuleContext, DocumentSymbol> nodesByContext = new HashMap<>();
+
+  private final String documentUri;
+  private final Map<Token, Locality> positionMapping;
 
   public void addProgram(ParserRuleContext parserRuleContext) {
     constructNode("PROGRAM", NodeType.PROGRAM, parserRuleContext)
@@ -187,7 +186,7 @@ public class OutlineTreeBuilder {
   }
 
   @Value
-  private class VariableNode {
+  private static class VariableNode {
     int level;
     DocumentSymbol outlineNode;
   }

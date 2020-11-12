@@ -38,10 +38,7 @@ import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.broadcom.lsp.cobol.core.CobolParser.*;
 import static com.broadcom.lsp.cobol.core.semantics.CobolVariableContext.LEVEL_77;
@@ -568,8 +565,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     }
   }
 
-  private String extractErrorStatementText(Token childToken, Token parentToken) {
-    return tokenStream.getTokens(childToken.getTokenIndex(), parentToken.getTokenIndex()).stream()
+  private String extractErrorStatementText(@NonNull Token childToken, @NonNull Token parentToken) {
+    List<Token> tokenList = tokenStream.getTokens(childToken.getTokenIndex(), parentToken.getTokenIndex());
+
+    return Optional.ofNullable(tokenList).stream()
+        .flatMap(Collection::stream)
         .map(Token::getText)
         .collect(joining())
         .replaceAll(" +", " ");
@@ -620,7 +620,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
         .ifPresent(it -> throwException(token.getText(), it, messageService.getMessage("CobolVisitor.AreaAWarningMsg")));
   }
 
-  private void areaBWarning(List<Token> tokenList) {
+  private void areaBWarning(@NonNull List<Token> tokenList) {
     tokenList.forEach(
         token ->
             getLocality(token)
