@@ -478,7 +478,7 @@ linkageSection
 // -- local storage section ----------------------------------
 
 localStorageSection
-   : LOCAL_STORAGE SECTION DOT_FS (LD localName DOT_FS)? dataDescriptionEntry*
+   : LOCAL_STORAGE SECTION DOT_FS dataDescriptionEntry*
    ;
 
 dataDescriptionEntry
@@ -698,7 +698,7 @@ paragraph
    ;
 
 sentence
-   : (statement* DOT_FS) | skipStatement+
+   : (statement* DOT_FS)
    ;
 
 statement
@@ -707,7 +707,7 @@ statement
     exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement |
     multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement |
     sendStatement | serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | titleStatement | unstringStatement | writeStatement | xmlStatement
+    terminateStatement | unstringStatement | writeStatement | xmlStatement
    ;
 
 // accept statement
@@ -1527,12 +1527,6 @@ serviceReloadStatement
    : SERVICE RELOAD generalIdentifier
    ;
 
-// skip statement
-
-skipStatement
-   : SKIP1|SKIP2|SKIP3 DOT_FS?
-   ;
-
 // sort statement
 
 sortStatement
@@ -1679,12 +1673,6 @@ subtractMinuendCorresponding
 
 terminateStatement
    : TERMINATE reportName
-   ;
-
-// title statement
-
-titleStatement
-   : TITLE literal DOT_FS?
    ;
 
 // unstring statement

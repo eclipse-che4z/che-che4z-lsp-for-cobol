@@ -16,6 +16,8 @@ lexer grammar CobolLexer;
 import CICSLexer;
 channels{TECHNICAL}
 
+TITLESTATEMENT : (T I T L E ' '+ .*? NEWLINE) -> skip;
+
 LEVEL_NUMBER: ([1-9])|([0][1-9])|([1234][0-9]);
 LEVEL_NUMBER_66 : '66';
 LEVEL_NUMBER_77 : '77';
@@ -424,9 +426,9 @@ SHIFT_OUT : S H I F T MINUSCHAR O U T;
 SHORT_DATE : S H O R T MINUSCHAR D A T E;
 SIGN : S I G N;
 SIZE : S I Z E;
-SKIP1: S K I P '1';
-SKIP2: S K I P '2';
-SKIP3: S K I P '3';
+SKIP1: S K I P '1' -> skip;
+SKIP2: S K I P '2' -> skip;
+SKIP3: S K I P '3' -> skip;
 SORT : S O R T;
 SORT_CONTROL : S O R T MINUSCHAR C O N T R O L;
 SORT_CORE_SIZE : S O R T MINUSCHAR C O R E MINUSCHAR S I Z E;
