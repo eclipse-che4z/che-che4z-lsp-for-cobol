@@ -54,6 +54,7 @@ beforeEach(() => {
 });
 
 jest.mock("../services/reporter/TelemetryService");
+jest.mock("../services/ProfileService");
 
 describe("Test fetchCopybook against bad and correct configurations", () => {
     const zoweApi: ZoweApi = new ZoweApi();
