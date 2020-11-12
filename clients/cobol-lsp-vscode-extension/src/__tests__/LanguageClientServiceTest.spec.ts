@@ -51,29 +51,29 @@ const SERVER_ID = "COBOL";
 
 beforeEach(() => {
     jest.clearAllMocks();
-});
-
-describe("LanguageClientService negative scenario.", () => {
-
-    test("LSP port not defined and jar path doesn't exists", async () => {
-        await expect(new LanguageClientService(undefined).checkPrerequisites())
-        .rejects.toThrowError("LSP server for COBOL not found");
-}, 10000);
+    vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(0);
 });
 
 const SERVER_STARTED_MSG = "server started";
 const SERVER_STOPPED_MSG = "server stopped";
 describe("LanguageClientService positive scenario", () => {
-
     beforeEach(() => {
-        jest.clearAllMocks();
         languageClientService = new LanguageClientService(middleware);
         new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
+        vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(0);
         fs.existsSync = jest.fn().mockReturnValue(true);
     });
 
     test("Test LanguageClientService checkPrerequisites passes", async () => {
-        expect(async () => await languageClientService.checkPrerequisites()).not.toThrowError();
+        let message = false;
+        fs.existsSync = jest.fn().mockReturnValue(true);
+        vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(9999);
+        try {
+            await languageClientService.checkPrerequisites();
+        } catch (error) {
+            message = error;
+        }
+        expect(message).toBeFalsy();
     });
 
     test("Test LanguageClientService starts language client", () => {
@@ -116,5 +116,17 @@ describe("LanguageClientService positive scenario", () => {
         languageClientService.start();
         const returnedValue = await languageClientService.stop();
         expect(returnedValue).toBe(SERVER_STOPPED_MSG);
+    });
+});
+
+describe("LanguageClientService negative scenario.", () => {
+
+    test("LSP port not defined and jar path doesn't exists", async () => {
+        fs.existsSync = jest.fn().mockReturnValue(false);
+        try {
+            await new LanguageClientService(undefined).checkPrerequisites();
+        } catch (error) {
+            expect(error.toString()).toBe("Error: LSP server for COBOL not found");
+        }
     });
 });
