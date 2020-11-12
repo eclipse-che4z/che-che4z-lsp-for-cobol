@@ -62,10 +62,16 @@ describe("LanguageClientService negative scenario.", () => {
 });
 
 const SERVER_STARTED_MSG = "server started";
+const SERVER_STOPPED_MSG = "server stopped";
 describe("LanguageClientService positive scenario", () => {
-    languageClientService = new LanguageClientService(middleware);
-    new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
-    fs.existsSync = jest.fn().mockReturnValue(true);
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        languageClientService = new LanguageClientService(middleware);
+        new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
+        fs.existsSync = jest.fn().mockReturnValue(true);
+    });
+
     test("Test LanguageClientService checkPrerequisites passes", async () => {
         expect(async () => await languageClientService.checkPrerequisites()).not.toThrowError();
     });
@@ -88,8 +94,7 @@ describe("LanguageClientService positive scenario", () => {
         });
     });
 
-    test("Test LanguageClientService starts language server is started when port is provided", () => {
-        jest.clearAllMocks();
+    test("LanguageClientService starts the language server when port is provided", () => {
         new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
         vscode.workspace.getConfiguration(expect.any(String)).get = jest.fn().mockReturnValue(9999);
         LanguageClient.prototype.start = jest.fn().mockReturnValue(SERVER_STARTED_MSG);
@@ -103,5 +108,13 @@ describe("LanguageClientService positive scenario", () => {
                 },
             },
         });
+    });
+
+    test("Test LanguageClientService fire a stop() command on LanguageClient", async () => {
+        LanguageClient.prototype.stop = jest.fn().mockReturnValue(SERVER_STOPPED_MSG);
+        // start the server, before shutdown.
+        languageClientService.start();
+        const returnedValue = await languageClientService.stop();
+        expect(returnedValue).toBe(SERVER_STOPPED_MSG);
     });
 });

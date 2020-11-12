@@ -14,9 +14,7 @@
  */
 package com.broadcom.lsp.cobol.domain.modules;
 
-import com.broadcom.lsp.cobol.core.annotation.CheckThreadInterruption;
-import com.broadcom.lsp.cobol.core.annotation.HandleThreadInterruption;
-import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
+import com.broadcom.lsp.cobol.core.annotation.*;
 import com.broadcom.lsp.cobol.service.*;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActions;
@@ -73,6 +71,13 @@ public class ServiceModule extends AbstractModule {
         Matchers.subclassesOf(ThreadInterruptAspect.class),
         Matchers.annotatedWith(CheckThreadInterruption.class),
         new HandleThreadInterruption());
+
+    HandleShutdownState handleShutdownState = new HandleShutdownState();
+    requestInjection(handleShutdownState);
+    bindInterceptor(
+        Matchers.subclassesOf(DisposableService.class),
+            (new NonSyntheticMethodMatcher()).and(Matchers.annotatedWith(CheckServerShutdownState.class)),
+        handleShutdownState);
   }
 
   private void bindFormations() {

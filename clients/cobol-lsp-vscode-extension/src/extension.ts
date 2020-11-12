@@ -32,18 +32,17 @@ import {TelemetryService} from "./services/reporter/TelemetryService";
 import {createFileWithGivenPath, initializeSettings} from "./services/Settings";
 import {ZoweApi} from "./services/ZoweApi";
 
+const zoweApi: ZoweApi = new ZoweApi();
+const profileService: ProfileService = new ProfileService(zoweApi);
+const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
+const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService(zoweApi, profileService, copybooksPathGenerator);
+const pathsService: PathsService = new PathsService();
+const middleware: Middleware = new Middleware(new CopybookURI(profileService), copyBooksDownloader);
+const languageClientService: LanguageClientService = new LanguageClientService(middleware);
+
 export async function activate(context: vscode.ExtensionContext) {
     initializeSettings();
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
-
-    const zoweApi: ZoweApi = new ZoweApi();
-    const profileService: ProfileService = new ProfileService(zoweApi);
-    const copybooksPathGenerator: CopybooksPathGenerator = new CopybooksPathGenerator(profileService);
-    const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService(zoweApi, profileService, copybooksPathGenerator);
-    const pathsService: PathsService = new PathsService();
-    const middleware: Middleware = new Middleware(new CopybookURI(profileService), copyBooksDownloader);
-    const languageClientService: LanguageClientService = new LanguageClientService(middleware);
-
     try {
         await languageClientService.checkPrerequisites();
     } catch (err) {
@@ -88,4 +87,8 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerCodeActionsProvider(
             {scheme: "file", language: LANGUAGE_ID},
             new CopybooksCodeActionProvider()));
+}
+
+export function deactivate() {
+    return Promise.resolve(languageClientService.stop());
 }

@@ -29,6 +29,7 @@ import {Middleware} from "./Middleware";
 
 export class LanguageClientService {
     private readonly jarPath: string;
+    private languageClient: LanguageClient;
 
     constructor(private middleware: Middleware) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
@@ -43,11 +44,23 @@ export class LanguageClientService {
     }
 
     public start(): vscode.Disposable {
-        const languageClient = new LanguageClient(LANGUAGE_ID,
-            "LSP extension for " + LANGUAGE_ID + " language",
-            this.createServerOptions(this.jarPath),
-            this.createClientOptions());
-        return languageClient.start();
+        return this.getLanguageClient().start();
+    }
+
+    public stop(): Thenable<void> {
+        if (this.languageClient) {
+            return Promise.resolve(this.getLanguageClient().stop());
+        }
+    }
+
+    private getLanguageClient() {
+        if (!this.languageClient) {
+            this.languageClient = new LanguageClient(LANGUAGE_ID,
+                "LSP extension for " + LANGUAGE_ID + " language",
+                this.createServerOptions(this.jarPath),
+                this.createClientOptions());
+        }
+        return this.languageClient;
     }
 
     private getLspPort(): number | undefined {
