@@ -150,7 +150,7 @@
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "jest -w 1 --unhandled-rejections=strict",
-        "coverage": "jest --coverage"
+        "coverage": "jest --coverage --runInBand"
     },
     "dependencies": {
         "@zowe/imperative": "4.7.4",

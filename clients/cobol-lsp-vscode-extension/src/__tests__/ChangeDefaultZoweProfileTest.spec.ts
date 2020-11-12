@@ -15,6 +15,8 @@
 import {changeDefaultZoweProfile} from "../commands/ChangeDefaultZoweProfile";
 import { ProfileService } from "../services/ProfileService";
 import {ZoweApi} from "../services/ZoweApi";
+
+jest.mock("../services/ProfileService");
 const profileService: ProfileService = new ProfileService(new ZoweApi());
 profileService.getProfileFromMultiple = jest.fn();
 
