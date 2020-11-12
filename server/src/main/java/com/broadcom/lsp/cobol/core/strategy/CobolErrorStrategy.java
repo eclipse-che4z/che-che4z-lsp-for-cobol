@@ -17,11 +17,13 @@ package com.broadcom.lsp.cobol.core.strategy;
 import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.MissingResourceException;
+import java.util.Optional;
 
 @Slf4j
 @Singleton
@@ -64,13 +66,14 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     this.messageService = messageService;
   }
 
-  private String getExpectedToken(Parser recognizer, InputMismatchException e) {
-    if (e == null) {
-      IntervalSet expecting = getExpectedTokens(recognizer);
-      return expecting.toString(recognizer.getVocabulary());
-    } else {
-      return e.getExpectedTokens().toString(recognizer.getVocabulary());
-    }
+  private String getExpectedToken(@NonNull Parser recognizer, InputMismatchException e) {
+    IntervalSet expecting = Optional.ofNullable(e)
+        .map(RecognitionException::getExpectedTokens)
+        .orElse(getExpectedTokens(recognizer));
+
+    return Optional.ofNullable(expecting)
+        .map(exp -> exp.toString(recognizer.getVocabulary()))
+        .orElse("");
   }
 
   @Override
