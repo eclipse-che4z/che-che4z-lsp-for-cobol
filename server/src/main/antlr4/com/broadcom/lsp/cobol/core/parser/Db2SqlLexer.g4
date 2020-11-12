@@ -11,8 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-
-
 lexer grammar Db2SqlLexer;
 import CICSLexer;
 
@@ -28,123 +26,271 @@ LINE_COMMENT:                        (
                                        | '--' ('\r'? '\n' | EOF)
                                      ) -> channel(HIDDEN);
 
-
-// Keywords
-// Common Keywords
+// DB2 SQL Reserved Keywords
 ABSOLUTE : A B S O L U T E;
 ACCELERATION : A C C E L E R A T I O N;
 ACCELERATOR : A C C E L E R A T O R;
-ACESS : A C E S S;
+ACCESS : A C C E S S;
+ACTIVATE : A C T I V A T E;
 ACTIVE : A C T I V E;
+ADA : A D A;
 AFTER : A F T E R;
 ALIAS : A L I A S;
 ALL : A L L;
 ALLOW : A L L O W;
+ALTERIN : A L T E R I N;
 ALWAYS : A L W A Y S;
+ANY : A N Y;
+APPEND : A P P E N D;
 APPLCOMPAT : A P P L C O M P A T;
 APPLICATION : A P P L I C A T I O N;
 ARCHIVE : A R C H I V E;
+ARE : A R E;
+ASC : A S C;
 ASCII : A S C I I;
+ASSERTION : A S S E R T I O N;
 ASSOCIATE : A S S O C I A T E;
 ASUTIME : A S U T I M E;
 ATOMIC : A T O M I C;
+AUTHID : A U T H I D;
+AUTHORIZATION : A U T H O R I Z A T I O N;
+AUTOMATIC : A U T O M A T I C;
+AVG : A V G;
 BEFORE : B E F O R E;
 BEGIN : B E G I N;
 BETWEEN : B E T W E E N;
 BIGINT : B I G I N T;
-BINARY : B I N A R Y;
 BIND : B I N D;
+BINDADD : B I N D A D D;
+BIT_LENGTH: B I T UNDERSCORECHAR L E N G T H;
 BLOB : B L O B;
+BLOCKED : B L O C K E D;
 BOTH : B O T H;
-BUSINESS_TIME : B U S I N E S S UNDERSCORE_CHAR T I M E;
+BUFFERPOOL : B U F F E R P O O L;
+BUFFERPOOLS : B U F F E R P O O L S;
+BUSINESS_TIME : B U S I N E S S UNDERSCORECHAR T I M E;
+BY : B Y;
+CACHE: C A C H E;
 CALL : C A L L;
 CALLED : C A L L E D;
-CATALOG_NAME: C A T A L O G UNDERSCORE_CHAR N A M E;
+CALLER : C A L L E R;
+CAPTURE : C A P T U R E;
+CARDINALITY : C A R D I N A L I T Y;
+CASCADE : C A S C A D E;
+CASE : C A S E;
+CAST : C A S T;
+CATALOG : C A T A L O G;
+CATALOG_NAME: C A T A L O G UNDERSCORECHAR N A M E;
+CHANGED : C H A N G E D;
+CHANGES : C H A N G E S;
+CHAR_LENGTH : C H A R UNDERSCORECHAR L E N G T H;
+CHARACTER : C H A R A C T E R;
+CHARACTER_LENGTH : C H A R A C T E R UNDERSCORECHAR L E N G T H;
+CHECKED : C H E C K E D;
 CLAUSE : C L A U S E;
 CLOB : C L O B;
+CLUSTER : C L U S T E R;
+COBOL : C O B O L;
+//COLLATE : COLLATE;
+//COLLATION : COLLATION;
+COLLECT : C O L L E C T;
 COLLECTION : C O L L E C T I O N;
+COLLID : C O L L I D;
 COLUMN : C O L U M N;
 COMMENT : C O M M E N T;
 COMMIT : C O M M I T;
 COMMITTED: C O M M I T T E D;
+COMPARISONS : C O M P A R I S O N S;
+CONCAT : C O N C A T;
 CONCENTRATE : C O N C E N T R A T E;
 CONCURRENT : C O N C U R R E N T;
-CONDITION_NUMBER : C O N D I T I O N UNDERSCORE_CHAR N U M B E R;
+CONDITION_NUMBER : C O N D I T I O N UNDERSCORECHAR N U M B E R;
 CONNECTION : C O N N E C T I O N;
+CONNECTION_NAME : C O N N E C T I O N UNDERSCORECHAR N A M E;
+CONSERVATIVE : C O N S E R V A T I V E;
+CONSTRAINT : C O N S T R A I N T;
+CONSTRAINTS : C O N S T R A I N T S;
 CONTAINS : C O N T A I N S;
 CONTEXT : C O N T E X T;
 CONTINUE : C O N T I N U E;
+CONVERT : C O N V E R T;
+CORR : C O R R;
+CORRELATION : C O R R E L A T I O N;
+CORRESPONDING : C O R R E S P O N D I N G;
+COUNT : C O U N T;
+COUNT_BIG : C O U N T UNDERSCORECHAR B I G;
+CPU :  C P U;
+CREATEIN : C R E A T E I N;
+CREATETAB : C R E A T E T A B;
+CROSS : C R O S S;
 CS : C S;
+CUBE : C U B E;
+CURRENT_DATE : C U R R E N T UNDERSCORECHAR D A T E;
+CURRENT_PATH : C U R R E N T UNDERSCORECHAR P A T H;
+CURRENT_SCHEMA : C U R R E N T UNDERSCORECHAR S C H E M A;
+CURRENT_SERVER : C U R R E N T UNDERSCORECHAR S E R V E R;
+CURRENT_SQLID : C U R R E N T UNDERSCORECHAR S Q L I D;
+CURRENT_TIME : C U R R E N T UNDERSCORECHAR TIME;
+CURRENT_TIMESTAMP : C U R R E N T UNDERSCORECHAR TIMESTAMP;
+CURRENT_TIMEZONE : C U R R E N T UNDERSCORECHAR TIMEZONE;
+CURRENT_USER : C U R R E N T UNDERSCORECHAR U S E R;
 CURRENTLY : C U R R E N T L Y;
-CURSOR_NAME : C U R S O R UNDERSCORE_CHAR N A M E;
+CURSOR : C U R S O R;
+CURSOR_NAME : C U R S O R UNDERSCORECHAR N A M E;
 CURSORS : C U R S O R S;
-DATA : D A T A;
+CYCLE : C Y C L E;
 DATABASE : D A T A B A S E;
-DATE : D A T E;
+DATALINK : D A T A L I N K;
+DAY : D A Y;
+DB : D B;
+DB2DARI : D B '2' D A R I;
+DB2GENERAL : D B '2' G E N E R A L;
+DB2GENRL : D B '2' G E N R L;
+DB2SQL : D B '2' S Q L;
+DBADM : D B A D M;
 DBCLOB : D B C L O B;
+DBINFO : D B I N F O;
+DEADLOCKS : D E A D L O C K S;
+DEALLOCATE : D E A L L O C A T E;
 DEBUG : D E B U G;
 DEC : D E C;
 DECFLOAT : D E C F L O A T;
 DECIMAL : D E C I M A L;
 DECLARE : D E C L A R E;
 DEFAULT : D E F A U L T;
+DEFAULTS : D E F A U L T S;
+DEFER : D E F E R;
+DEFERRABLE : D E F E R R A B L E;
+DEFERRED : D E F E R R E D;
 DEFINEBIND : D E F I N E B I N D;
 DEFINERUN : D E F I N E R U N;
+DEFINITION : D E F I N I T I O N;
 DEGREE : D E G R E E;
-DELETE : D E L E T E;
+DESC : D E S C;
 DESCRIBE : D E S C R I B E;
 DESCRIPTOR : D E S C R I P T O R;
 DETERMINISTIC : D E T E R M I N I S T I C;
 DIAGNOSTICS : D I A G N O S T I C S;
+DIMENSIONS : D I M E N S I O N S;
 DISABLE : D I S A B L E;
 DISALLOW : D I S A L L O W;
 DISPATCH : D I S P A T C H;
+DISTINCT : D I S T I N C T;
+DO : D O;
+DOMAIN : D O M A I N;
 DOUBLE : D O U B L E;
 DOUBLEQUOTE : D O U B L E Q U O T E;
 DROP : D R O P;
+DROPIN : D R O P I N;
 DYNAMIC : D Y N A M I C;
 DYNAMICRULES : D Y N A M I C R U L E S;
+//EACH : EACH;
 EBCDIC : E B C D I C;
 ELIGIBLE : E L I G I B L E;
 ELSE : E L S E;
+ELSEIF : E L S E I F;
+EMPTY : E M P T Y;
 ENABLE : E N A B L E;
 ENCODING : E N C O D I N G;
+END_EXEC : E N D MINUSCHAR E X E C;
 ENVIRONMENT : E N V I R O N M E N T;
 EQUALCHAR : E Q U A L C H A R;
+ESCAPE : E S C A P E;
 EUR : E U R;
+EXACT : E X A C T;
+EXCEPT : E X C E P T;
 EXCHANGE : E X C H A N G E;
+EXCLUDE : E X C L U D E;
+EXCLUDING : E X C L U D I N G;
 EXCLUSIVE : E X C L U S I V E;
+EXEC : E X E C;
 EXECUTE : E X E C U T E;
+EXISTS : E X I S T S;
+EXIT : E X I T;
 EXPLAIN : E X P L A I N;
+EXTENDED : E X T E N D E D;
+EXTENSION : E X T E N S I O N;
+EXTERNAL : E X T E R N A L;
 FAILBACK : F A I L B A C K;
+FALSE : F A L S E;
+FEDERATED : F E D E R A T E D;
+FENCED : F E N C E D;
 FETCH : F E T C H;
+FINAL : F I N A L;
 FIRST : F I R S T;
 FLOAT : F L O A T;
-FOR : F O R;
+FLUSH : F L U S H;
+FOLLOWING : F O L L O W I N G;
+FOREIGN : F O R E I G N;
 FORMAT : F O R M A T;
+FORTRAN : F O R T R A N;
+FOUND : F O U N D;
+FREEPAGE : F R E E P A G E;
+FS : F S;
+//FULL : FULL;
 FUNCTION : F U N C T I O N;
-GET_ACCEL_ARCHIVE : G E T UNDERSCORE_CHAR A C C E L UNDERSCORE_CHAR A R C H I V E;
+GBPCACHE : G B P C A C H E;
+GENERAL : G E N E R A L;
+GENERATE : G E N E R A T E;
+GENERATED : G E N E R A T E D;
+GET_ACCEL_ARCHIVE : G E T UNDERSCORECHAR A C C E L UNDERSCORECHAR A R C H I V E;
+GLOBAL : G L O B A L;
+GO : G O;
+GOTO : G O T O;
+GRANT : G R A N T;
 GRAPHIC : G R A P H I C;
-HOLD : H O L D;
+GROUP : G R O U P;
+GROUPING : G R O U P I N G;
+HANDLER : H A N D L E R;
+HAVING : H A V I N G;
+HOUR : H O U R;
+//IDENTITY : IDENTITY;
+IF : I F;
+IMPLICIT_SCHEMA : I M P L I C I T UNDERSCORECHAR S C H E M A;
 IN : I N;
 INCLUDE : I N C L U D E;
+INCLUDING : I N C L U D I N G;
 INDEX : I N D E X;
+INDEXES : I N D E X E S;
+INDICATOR : I N D I C A T O R;
 INHERIT : I N H E R I T;
+INITIAL_INSTS : I N I T I A L UNDERSCORECHAR I N S T S;
+INITIAL_IOS : I N I T I A L UNDERSCORECHAR I O S;
+INITIALLY : I N I T I A L L Y;
+INNER : I N N E R;
+INOUT : I N O U T;
 INSENSITIVE : I N S E N S I T I V E;
+INSTEAD : I N S T E A D;
+INSTS_PER_ARGBYTE : I N S T S UNDERSCORECHAR P E R UNDERSCORECHAR A R G B Y T E;
+INSTS_PER_INVOC : I N S T S UNDERSCORECHAR P E R UNDERSCORECHAR I N V O C;
 INT : I N T;
 INTEGER : I N T E G E R;
-INTO : I N T O;
+INTEGRITY : I N T E G R I T Y;
+INTERSECT : I N T E RS E C T;
 INVALID : I N V A L I D;
 INVOKEBIND : I N V O K E B I N D;
 INVOKERUN : I N V O K E R U N;
+IOS_PER_ARGBYTE : I O S UNDERSCORECHAR P E R UNDERSCORECHAR A R G B Y T E;
+IOS_PER_INVOC : I O S UNDERSCORECHAR P E R UNDERSCORECHAR I N V O C;
 IS : I S;
 ISO : I S O;
 ISOLATION : I S O L A T I O N;
+ITERATE : I T E R A T E;
+JAVA : J A V A;
 JIS : J I S;
+JOIN : J O I N;
+KEY : K E Y;
+KEYS : K E Y S;
 LABELS : L A B E L S;
 LANGUAGE : L A N G U A G E;
 LARGE : L A R G E;
+LEADING : L E A D I N G;
+//LEAVE : LEAVE;
+LEFT : L E F T;
+LIBRARY : L I B R A R Y;
+LIKE : L I K E;
 LIMIT : L I M I T;
+LINKTYPE : L I N K T Y P E;
 LITERALS : L I T E R A L S;
 LOCAL : L O C A L;
 LOCATOR : L O C A T O R;
@@ -152,1580 +298,348 @@ LOCATORS : L O C A T O R S;
 LOCK : L O C K;
 LOCKED : L O C K E D;
 LOCKS : L O C K S;
+LOCKSIZE : L O C K S I Z E;
+LOGGED : L O G G E D;
+LONG : L O N G;
+LONGVAR : L O N G V A R;
+LOOP : L O O P;
+LOWER :L O W E R;
+MAINTAINED : M A I N T A I N E D;
+MAPPING : M A P P I N G;
 MASK : M A S K;
+MATCH : M A T C H;
+MAX : M A X;
+MAXVALUE : M A X V A L U E;
 MERGE : M E R G E;
-MESSAGE_TEXT: M E S S A G E UNDERSCORE_CHAR T E X T;
+MESSAGE_TEXT: M E S S A G E UNDERSCORECHAR T E X T;
+MICROSECOND : M I C R O S E C O N D;
+MICROSECONDS : M I C R O S E C O N D S;
+MINUTE : M I N U T E S;
+MINVALUE : M I N V A L U E;
 MIXED : M I X E D;
 MODIFIES :  M O D I F I E S;
-MORE : M O R E;
+MODULE : M O D U L E;
+MONTHS : M O N T H S;
+NAMED : N A M E D;
 NAMES : N A M E S;
-NEXT : N E X T;
+NATIONAL : N A T I O N A L;
+NATURAL : N A T U R A L;
+NCHAR : N C H A R;
+NEW : N E W;
+NEW_TABLE : N E W UNDERSCORECHAR T A B L E;
+NEXTVAL : N E X T V A L;
+NICKNAME : N I C K N A M E;
 NO : N O;
+NOCACHE : N O C A C H E;
+NOCYCLE : N O C Y C L E;
+NODE : N O M A X V A L U E;
+NOMINVALUE : N O M I N V A L U E;
+NOORDER : N O O R D E R;
 NOT : N O T;
 NULL : N U L L;
+NULLS : N U L L S;
+NULLABLE : N U L L A B L E;
 NUMBER : N U M B E R;
 NUMERIC : N U M E R I C;
 OBJECT : O B J E C T;
 OF : O F;
 OFF : O F F;
+OLD : O L D;
+OLD_TABLE : O L D UNDERSCORECHAR T A B L E;
+OLE : O L E;
+OLEDB : O L E D B;
 ONCE : O N C E;
+ONLINE : O N L I N E;
+ONLY : O N L Y;
 OPEN : O P E N;
 OPTHINT : O P T H I N T;
+//OPTIMIZATION : OPTIMIZATION;
+OPTIMIZE : O P T I M I Z E;
 OPTIONAL : O P T I O N A L;
+ORDER : O R D E R;
+OUT : O U T;
 OUTCOME : O U T C O M E;
+OUTER : O U T E R;
+OUTPUT : O U T P U T;
+OVER : O V E R;
+OVERLAPS : O V E R L A P S;
 OVERRIDING : O V E R R I D I N G;
 PACKAGE : P A C K A G E;
+PAD : P A D;
 PARALLEL : P A R A L L E L;
+PARAMETER : P A R A M E T E R;
+PARTIAL : P A R T I A L;
 PARTITION : P A R T I T I O N;
+PARTITIONING : P A R T I T I O N I N G;
+PASCAL : P A S C A L;
+//PASSTHRU : PASSTHRU;
+PCTFREE : P C T F R E E;
+PERCENT_ARGBYTES : P E R C E N T UNDERSCORECHAR A R G B Y T E S;
 PERMISSION : P E R M I S S I O N;
+PIECESIZE : P I E C E S I Z E;
+PIPE : P I P E;
 PLAN : P L A N;
-
-PORTION
-PORTION
-PRECISION
-PRECISION
-PREPARE
-PREPARE
-PRIOR
-PRIOR
-PROCEDURE
-PROCEDURE
-PUBLIC
-PUBLIC
-QL
-QL
-QUALIFIER
-QUALIFIER
-QUERY
-QUERY
-QUERYNO
-QUERYNO
-READS
-READS
-REAL
-REAL
-REFRESH
-REFRESH
-REGISTERS
-REGISTERS
-RELATIVE
-RELATIVE
-RELEASE
-RELEASE
-RENAME
-RENAME
-REOPT
-REOPT
-REQUIRED
-REQUIRED
-RESET
-RESET
-RESOLUTION
-RESOLUTION
-RESTRICT
-RESTRICT
-RESULT
-RESULT
-RETAIN
-RETAIN
-RETURNED_SQLSTATE
-RETURNED_SQLSTATE
-RETURNS
-RETURNS
-ROLE
-ROLE
-ROLLBACK
-ROLLBACK
-ROUNDING
-ROUNDING
-ROW
-ROW
-ROW_COUNT
-ROW_COUNT
-ROWID
-ROWID
-ROWS
-ROWS
-ROWSET
-ROWSET
-RPARENCHAR
-RPARENCHAR
-RPARENCHAR
-RPARENCHAR
-RPARENCHAR
-RPARENCHAR
-RPARENCHAR
-RR
-RR
-RS
-RS
-RSQUAREBRACKET
-RSQUAREBRACKET
-RUN
-RUN
-SAVEPOINT
-SAVEPOINT
-SBCS
-SBCS
-SCHEME
-SCHEME
-SECTION
-SECTION
-SECURED
-SECURED
-SENSITIVE
-SENSITIVE
-SEQUENCE
-SEQUENCE
-SERVER_NAME
-SERVER_NAME
-SESSION
-SESSION
-SET
-SET
-SHARE
-SHARE
-SIGNAL
-SIGNAL
-SINGLEQUOTE
-SINGLEQUOTE
-SKIP
-SKIP
-SMALLINT
-SMALLINT
-SPECIAL
-SPECIAL
-SPECIFIC
-SPECIFIC
-SQL
-SQL
-SQL
-SQL
-SQLCA
-SQLCA
-SQLEXCEPTION
-SQLEXCEPTION
-SQLSTATE
-SQLSTATE
-STABILIZED
-STABILIZED
-STACKED
-STACKED
-STARTING
-STARTING
-STATEMENT
-STATEMENT
-STATEMENTS
-STATIC
-STATIC
-STMTCACHE
-STMTCACHE
-STMTID
-STMTID
-STMTTOKEN
-STMTTOKEN
-STOGROUP
-STOGROUP
-SYNONYM
-SYNONYM
-SYSTEM
-SYSTEM
-SYSTEM_TIME
-SYSTEM_TIME
-TABLE
-TABLE
-TABLESPACE
-TABLESPACE
-THEN
-THEN
-TIME
-TIME
-TIME
-TIME
-TIMESTAMP
-TIMESTAMP
-TO
-TO
-TRIGGER
-TRIGGER
-TRUSTED
-TRUSTED
-TYPE
-TYPE
-UNICODE
-UNICODE
-UNIQUE
-UNIQUE
-UPDATE
-UPDATE
-USA
-USA
-USE
-USE
-USER
-USER
-USING
-USING
-VALIDATE
-VALIDATE
-VALUE
-VALUE
-VALUE
-VALUE
-VALUES
-VALUES
-VARBINARY
-VARBINARY
-VARCHAR
-VARCHAR
-VARGRAPHIC
-VARGRAPHIC
-VARGRAPHIC
-VARIABLE
-VARIABLE
-VARYING
-VARYING
-VERSION
-VERSION
-VIEW
-VIEW
-WAIT
-WAIT
-WAITFORDATA
-WAITFORDATA
-WHERE
-WHERE
-WITH
-WITH
-WITHOUT
-WITHOUT
-WLM
-WLM
-WORK
-WORK
-WRITE
-WRITE
-XML
-XML
-YES
-YES
-ZONE
-ZONE
-ZONE
-ZONEABSOLUTE
-
-
-ADD:                                 'ADD';
-ALL:                                 'ALL';
-ALTER:                               'ALTER';
-ALWAYS:                              'ALWAYS';
-ANALYZE:                             'ANALYZE';
-AND:                                 'AND';
-AS:                                  'AS';
-ASC:                                 'ASC';
-BEFORE:                              'BEFORE';
-BETWEEN:                             'BETWEEN';
-BOTH:                                'BOTH';
-BY:                                  'BY';
-CALL:                                'CALL';
-CASCADE:                             'CASCADE';
-CASE:                                'CASE';
-CAST:                                'CAST';
-CHANGE:                              'CHANGE';
-CHARACTER:                           'CHARACTER';
-CHECK:                               'CHECK';
-COLLATE:                             'COLLATE';
-COLUMN:                              'COLUMN';
-CONDITION:                           'CONDITION';
-CONSTRAINT:                          'CONSTRAINT';
-CONTINUE:                            'CONTINUE';
-CONVERT:                             'CONVERT';
-CREATE:                              'CREATE';
-CROSS:                               'CROSS';
-CURRENT:                             'CURRENT';
-CURRENT_USER:                        'CURRENT_USER';
-CURSOR:                              'CURSOR';
-DATABASE:                            'DATABASE';
-DATABASES:                           'DATABASES';
-DECLARE:                             'DECLARE';
-DEFAULT:                             'DEFAULT';
-DELAYED:                             'DELAYED';
-DELETE:                              'DELETE';
-DESC:                                'DESC';
-DESCRIBE:                            'DESCRIBE';
-DETERMINISTIC:                       'DETERMINISTIC';
-DIAGNOSTICS:                         'DIAGNOSTICS';
-DISTINCT:                            'DISTINCT';
-DISTINCTROW:                         'DISTINCTROW';
-DROP:                                'DROP';
-EACH:                                'EACH';
-ELSE:                                'ELSE';
-ELSEIF:                              'ELSEIF';
-ENCLOSED:                            'ENCLOSED';
-ESCAPED:                             'ESCAPED';
-EXISTS:                              'EXISTS';
-EXIT:                                'EXIT';
-EXPLAIN:                             'EXPLAIN';
-FALSE:                               'FALSE';
-FETCH:                               'FETCH';
-FOR:                                 'FOR';
-FORCE:                               'FORCE';
-FOREIGN:                             'FOREIGN';
-FROM:                                'FROM';
-FULLTEXT:                            'FULLTEXT';
-GENERATED:                           'GENERATED';
-GET:                                 'GET';
-GRANT:                               'GRANT';
-GROUP:                               'GROUP';
-HAVING:                              'HAVING';
-HIGH_PRIORITY:                       'HIGH_PRIORITY';
-IF:                                  'IF';
-IGNORE:                              'IGNORE';
-IN:                                  'IN';
-INDEX:                               'INDEX';
-INFILE:                              'INFILE';
-INNER:                               'INNER';
-INOUT:                               'INOUT';
-INSERT:                              'INSERT';
-INTERVAL:                            'INTERVAL';
-INTO:                                'INTO';
-IS:                                  'IS';
-ITERATE:                             'ITERATE';
-JOIN:                                'JOIN';
-KEY:                                 'KEY';
-KEYS:                                'KEYS';
-KILL:                                'KILL';
-LEADING:                             'LEADING';
-LEAVE:                               'LEAVE';
-LEFT:                                'LEFT';
-LIKE:                                'LIKE';
-LIMIT:                               'LIMIT';
-LINEAR:                              'LINEAR';
-LINES:                               'LINES';
-LOAD:                                'LOAD';
-LOCK:                                'LOCK';
-LOOP:                                'LOOP';
-LOW_PRIORITY:                        'LOW_PRIORITY';
-MASTER_BIND:                         'MASTER_BIND';
-MASTER_SSL_VERIFY_SERVER_CERT:       'MASTER_SSL_VERIFY_SERVER_CERT';
-MATCH:                               'MATCH';
-MAXVALUE:                            'MAXVALUE';
-MODIFIES:                            'MODIFIES';
-NATURAL:                             'NATURAL';
-NOT:                                 'NOT';
-NO_WRITE_TO_BINLOG:                  'NO_WRITE_TO_BINLOG';
-NULL_LITERAL:                        'NULL';
-NUMBER:                              'NUMBER';
-ON:                                  'ON';
-OPTIMIZE:                            'OPTIMIZE';
-OPTION:                              'OPTION';
-OPTIONALLY:                          'OPTIONALLY';
-OR:                                  'OR';
-ORDER:                               'ORDER';
-OUT:                                 'OUT';
-OUTER:                               'OUTER';
-OUTFILE:                             'OUTFILE';
-PARTITION:                           'PARTITION';
-PRIMARY:                             'PRIMARY';
-PROCEDURE:                           'PROCEDURE';
-PURGE:                               'PURGE';
-RANGE:                               'RANGE';
-READ:                                'READ';
-READS:                               'READS';
-REFERENCES:                          'REFERENCES';
-REGEXP:                              'REGEXP';
-RELEASE:                             'RELEASE';
-RENAME:                              'RENAME';
-REPEAT:                              'REPEAT';
-REPLACE:                             'REPLACE';
-REQUIRE:                             'REQUIRE';
-RESIGNAL:                            'RESIGNAL';
-RESTRICT:                            'RESTRICT';
-RETURN:                              'RETURN';
-REVOKE:                              'REVOKE';
-RIGHT:                               'RIGHT';
-RLIKE:                               'RLIKE';
-SCHEMA:                              'SCHEMA';
-SCHEMAS:                             'SCHEMAS';
-SELECT:                              'SELECT';
-SET:                                 'SET';
-SEPARATOR:                           'SEPARATOR';
-SHOW:                                'SHOW';
-SIGNAL:                              'SIGNAL';
-SPATIAL:                             'SPATIAL';
-SQL:                                 'SQL';
-SQLEXCEPTION:                        'SQLEXCEPTION';
-SQLSTATE:                            'SQLSTATE';
-SQLWARNING:                          'SQLWARNING';
-SQL_BIG_RESULT:                      'SQL_BIG_RESULT';
-SQL_CALC_FOUND_ROWS:                 'SQL_CALC_FOUND_ROWS';
-SQL_SMALL_RESULT:                    'SQL_SMALL_RESULT';
-SSL:                                 'SSL';
-STACKED:                             'STACKED';
-STARTING:                            'STARTING';
-STRAIGHT_JOIN:                       'STRAIGHT_JOIN';
-TABLE:                               'TABLE';
-TERMINATED:                          'TERMINATED';
-THEN:                                'THEN';
-TO:                                  'TO';
-TRAILING:                            'TRAILING';
-TRIGGER:                             'TRIGGER';
-TRUE:                                'TRUE';
-UNDO:                                'UNDO';
-UNION:                               'UNION';
-UNIQUE:                              'UNIQUE';
-UNLOCK:                              'UNLOCK';
-UNSIGNED:                            'UNSIGNED';
-UPDATE:                              'UPDATE';
-USAGE:                               'USAGE';
-USE:                                 'USE';
-USING:                               'USING';
-VALUES:                              'VALUES';
-WHEN:                                'WHEN';
-WHERE:                               'WHERE';
-WHILE:                               'WHILE';
-WITH:                                'WITH';
-WRITE:                               'WRITE';
-XOR:                                 'XOR';
-ZEROFILL:                            'ZEROFILL';
-
-
-// DATA TYPE Keywords
-
-TINYINT:                             'TINYINT';
-SMALLINT:                            'SMALLINT';
-MEDIUMINT:                           'MEDIUMINT';
-MIDDLEINT:                           'MIDDLEINT';
-INT:                                 'INT';
-INT1:                                'INT1';
-INT2:                                'INT2';
-INT3:                                'INT3';
-INT4:                                'INT4';
-INT8:                                'INT8';
-INTEGER:                             'INTEGER';
-BIGINT:                              'BIGINT';
-REAL:                                'REAL';
-DOUBLE:                              'DOUBLE';
-PRECISION:                           'PRECISION';
-FLOAT:                               'FLOAT';
-FLOAT4:                              'FLOAT4';
-FLOAT8:                              'FLOAT8';
-DECIMAL:                             'DECIMAL';
-DEC:                                 'DEC';
-NUMERIC:                             'NUMERIC';
-DATE:                                'DATE';
-TIME:                                'TIME';
-TIMESTAMP:                           'TIMESTAMP';
-DATETIME:                            'DATETIME';
-YEAR:                                'YEAR';
-CHAR:                                'CHAR';
-VARCHAR:                             'VARCHAR';
-NVARCHAR:                            'NVARCHAR';
-NATIONAL:                            'NATIONAL';
-BINARY:                              'BINARY';
-VARBINARY:                           'VARBINARY';
-TINYBLOB:                            'TINYBLOB';
-BLOB:                                'BLOB';
-MEDIUMBLOB:                          'MEDIUMBLOB';
-LONG:                                'LONG';
-LONGBLOB:                            'LONGBLOB';
-TINYTEXT:                            'TINYTEXT';
-TEXT:                                'TEXT';
-MEDIUMTEXT:                          'MEDIUMTEXT';
-LONGTEXT:                            'LONGTEXT';
-ENUM:                                'ENUM';
-VARYING:                             'VARYING';
-SERIAL:                              'SERIAL';
-
-
-// Interval type Keywords
-
-YEAR_MONTH:                          'YEAR_MONTH';
-DAY_HOUR:                            'DAY_HOUR';
-DAY_MINUTE:                          'DAY_MINUTE';
-DAY_SECOND:                          'DAY_SECOND';
-HOUR_MINUTE:                         'HOUR_MINUTE';
-HOUR_SECOND:                         'HOUR_SECOND';
-MINUTE_SECOND:                       'MINUTE_SECOND';
-SECOND_MICROSECOND:                  'SECOND_MICROSECOND';
-MINUTE_MICROSECOND:                  'MINUTE_MICROSECOND';
-HOUR_MICROSECOND:                    'HOUR_MICROSECOND';
-DAY_MICROSECOND:                     'DAY_MICROSECOND';
-
-// JSON keywords
-JSON_VALID:                          'JSON_VALID';
-JSON_SCHEMA_VALID:                   'JSON_SCHEMA_VALID';
-
-// Group function Keywords
-
-AVG:                                 'AVG';
-BIT_AND:                             'BIT_AND';
-BIT_OR:                              'BIT_OR';
-BIT_XOR:                             'BIT_XOR';
-COUNT:                               'COUNT';
-GROUP_CONCAT:                        'GROUP_CONCAT';
-MAX:                                 'MAX';
-MIN:                                 'MIN';
-STD:                                 'STD';
-STDDEV:                              'STDDEV';
-STDDEV_POP:                          'STDDEV_POP';
-STDDEV_SAMP:                         'STDDEV_SAMP';
-SUM:                                 'SUM';
-VAR_POP:                             'VAR_POP';
-VAR_SAMP:                            'VAR_SAMP';
-VARIANCE:                            'VARIANCE';
-
-// Common function Keywords
-
-CURRENT_DATE:                        'CURRENT_DATE';
-CURRENT_TIME:                        'CURRENT_TIME';
-CURRENT_TIMESTAMP:                   'CURRENT_TIMESTAMP';
-LOCALTIME:                           'LOCALTIME';
-CURDATE:                             'CURDATE';
-CURTIME:                             'CURTIME';
-DATE_ADD:                            'DATE_ADD';
-DATE_SUB:                            'DATE_SUB';
-EXTRACT:                             'EXTRACT';
-LOCALTIMESTAMP:                      'LOCALTIMESTAMP';
-NOW:                                 'NOW';
-POSITION:                            'POSITION';
-SUBSTR:                              'SUBSTR';
-SUBSTRING:                           'SUBSTRING';
-SYSDATE:                             'SYSDATE';
-TRIM:                                'TRIM';
-UTC_DATE:                            'UTC_DATE';
-UTC_TIME:                            'UTC_TIME';
-UTC_TIMESTAMP:                       'UTC_TIMESTAMP';
-
-// Keywords, but can be ID
-// Common Keywords, but can be ID
-
-ACCOUNT:                             'ACCOUNT';
-ACTION:                              'ACTION';
-AFTER:                               'AFTER';
-AGGREGATE:                           'AGGREGATE';
-ALGORITHM:                           'ALGORITHM';
-ANY:                                 'ANY';
-AT:                                  'AT';
-AUTHORS:                             'AUTHORS';
-AUTOCOMMIT:                          'AUTOCOMMIT';
-AUTOEXTEND_SIZE:                     'AUTOEXTEND_SIZE';
-AUTO_INCREMENT:                      'AUTO_INCREMENT';
-AVG_ROW_LENGTH:                      'AVG_ROW_LENGTH';
-BEGIN:                               'BEGIN';
-BINLOG:                              'BINLOG';
-BIT:                                 'BIT';
-BLOCK:                               'BLOCK';
-BOOL:                                'BOOL';
-BOOLEAN:                             'BOOLEAN';
-BTREE:                               'BTREE';
-CACHE:                               'CACHE';
-CASCADED:                            'CASCADED';
-CHAIN:                               'CHAIN';
-CHANGED:                             'CHANGED';
-CHANNEL:                             'CHANNEL';
-CHECKSUM:                            'CHECKSUM';
-PAGE_CHECKSUM:                       'PAGE_CHECKSUM';
-CIPHER:                              'CIPHER';
-CLASS_ORIGIN:                        'CLASS_ORIGIN';
-CLIENT:                              'CLIENT';
-CLOSE:                               'CLOSE';
-COALESCE:                            'COALESCE';
-CODE:                                'CODE';
-COLUMNS:                             'COLUMNS';
-COLUMN_FORMAT:                       'COLUMN_FORMAT';
-COLUMN_NAME:                         'COLUMN_NAME';
-COMMENT:                             'COMMENT';
-COMMIT:                              'COMMIT';
-COMPACT:                             'COMPACT';
-COMPLETION:                          'COMPLETION';
-COMPRESSED:                          'COMPRESSED';
-COMPRESSION:                         'COMPRESSION';
-CONCURRENT:                          'CONCURRENT';
-CONNECTION:                          'CONNECTION';
-CONSISTENT:                          'CONSISTENT';
-CONSTRAINT_CATALOG:                  'CONSTRAINT_CATALOG';
-CONSTRAINT_SCHEMA:                   'CONSTRAINT_SCHEMA';
-CONSTRAINT_NAME:                     'CONSTRAINT_NAME';
-CONTAINS:                            'CONTAINS';
-CONTEXT:                             'CONTEXT';
-CONTRIBUTORS:                        'CONTRIBUTORS';
-COPY:                                'COPY';
-CPU:                                 'CPU';
-CURSOR_NAME:                         'CURSOR_NAME';
-DATA:                                'DATA';
-DATAFILE:                            'DATAFILE';
-DEALLOCATE:                          'DEALLOCATE';
-DEFAULT_AUTH:                        'DEFAULT_AUTH';
-DEFINER:                             'DEFINER';
-DELAY_KEY_WRITE:                     'DELAY_KEY_WRITE';
-DES_KEY_FILE:                        'DES_KEY_FILE';
-DIRECTORY:                           'DIRECTORY';
-DISABLE:                             'DISABLE';
-DISCARD:                             'DISCARD';
-DISK:                                'DISK';
-DO:                                  'DO';
-DUMPFILE:                            'DUMPFILE';
-DUPLICATE:                           'DUPLICATE';
-DYNAMIC:                             'DYNAMIC';
-ENABLE:                              'ENABLE';
-ENCRYPTION:                          'ENCRYPTION';
-END:                                 'END';
-ENDS:                                'ENDS';
-ENGINE:                              'ENGINE';
-ENGINES:                             'ENGINES';
-ERROR:                               'ERROR';
-ERRORS:                              'ERRORS';
-ESCAPE:                              'ESCAPE';
-EVEN:                                'EVEN';
-EVENT:                               'EVENT';
-EVENTS:                              'EVENTS';
-EVERY:                               'EVERY';
-EXCHANGE:                            'EXCHANGE';
-EXCLUSIVE:                           'EXCLUSIVE';
-EXPIRE:                              'EXPIRE';
-EXPORT:                              'EXPORT';
-EXTENDED:                            'EXTENDED';
-EXTENT_SIZE:                         'EXTENT_SIZE';
-FAST:                                'FAST';
-FAULTS:                              'FAULTS';
-FIELDS:                              'FIELDS';
-FILE_BLOCK_SIZE:                     'FILE_BLOCK_SIZE';
-FILTER:                              'FILTER';
-FIRST:                               'FIRST';
-FIXED:                               'FIXED';
-FLUSH:                               'FLUSH';
-FOLLOWS:                             'FOLLOWS';
-FOUND:                               'FOUND';
-FULL:                                'FULL';
-FUNCTION:                            'FUNCTION';
-GENERAL:                             'GENERAL';
-GLOBAL:                              'GLOBAL';
-GRANTS:                              'GRANTS';
-GROUP_REPLICATION:                   'GROUP_REPLICATION';
-HANDLER:                             'HANDLER';
-HASH:                                'HASH';
-HELP:                                'HELP';
-HOST:                                'HOST';
-HOSTS:                               'HOSTS';
-IDENTIFIED:                          'IDENTIFIED';
-IGNORE_SERVER_IDS:                   'IGNORE_SERVER_IDS';
-IMPORT:                              'IMPORT';
-INDEXES:                             'INDEXES';
-INITIAL_SIZE:                        'INITIAL_SIZE';
-INPLACE:                             'INPLACE';
-INSERT_METHOD:                       'INSERT_METHOD';
-INSTALL:                             'INSTALL';
-INSTANCE:                            'INSTANCE';
-INVISIBLE:                           'INVISIBLE';
-INVOKER:                             'INVOKER';
-IO:                                  'IO';
-IO_THREAD:                           'IO_THREAD';
-IPC:                                 'IPC';
-ISOLATION:                           'ISOLATION';
-ISSUER:                              'ISSUER';
-JSON:                                'JSON';
-KEY_BLOCK_SIZE:                      'KEY_BLOCK_SIZE';
-LANGUAGE:                            'LANGUAGE';
-LAST:                                'LAST';
-LEAVES:                              'LEAVES';
-LESS:                                'LESS';
-LEVEL:                               'LEVEL';
-LIST:                                'LIST';
-LOCAL:                               'LOCAL';
-LOGFILE:                             'LOGFILE';
-LOGS:                                'LOGS';
-MASTER:                              'MASTER';
-MASTER_AUTO_POSITION:                'MASTER_AUTO_POSITION';
-MASTER_CONNECT_RETRY:                'MASTER_CONNECT_RETRY';
-MASTER_DELAY:                        'MASTER_DELAY';
-MASTER_HEARTBEAT_PERIOD:             'MASTER_HEARTBEAT_PERIOD';
-MASTER_HOST:                         'MASTER_HOST';
-MASTER_LOG_FILE:                     'MASTER_LOG_FILE';
-MASTER_LOG_POS:                      'MASTER_LOG_POS';
-MASTER_PASSWORD:                     'MASTER_PASSWORD';
-MASTER_PORT:                         'MASTER_PORT';
-MASTER_RETRY_COUNT:                  'MASTER_RETRY_COUNT';
-MASTER_SSL:                          'MASTER_SSL';
-MASTER_SSL_CA:                       'MASTER_SSL_CA';
-MASTER_SSL_CAPATH:                   'MASTER_SSL_CAPATH';
-MASTER_SSL_CERT:                     'MASTER_SSL_CERT';
-MASTER_SSL_CIPHER:                   'MASTER_SSL_CIPHER';
-MASTER_SSL_CRL:                      'MASTER_SSL_CRL';
-MASTER_SSL_CRLPATH:                  'MASTER_SSL_CRLPATH';
-MASTER_SSL_KEY:                      'MASTER_SSL_KEY';
-MASTER_TLS_VERSION:                  'MASTER_TLS_VERSION';
-MASTER_USER:                         'MASTER_USER';
-MAX_CONNECTIONS_PER_HOUR:            'MAX_CONNECTIONS_PER_HOUR';
-MAX_QUERIES_PER_HOUR:                'MAX_QUERIES_PER_HOUR';
-MAX_ROWS:                            'MAX_ROWS';
-MAX_SIZE:                            'MAX_SIZE';
-MAX_UPDATES_PER_HOUR:                'MAX_UPDATES_PER_HOUR';
-MAX_USER_CONNECTIONS:                'MAX_USER_CONNECTIONS';
-MEDIUM:                              'MEDIUM';
-MEMBER:                              'MEMBER';
-MERGE:                               'MERGE';
-MESSAGE_TEXT:                        'MESSAGE_TEXT';
-MID:                                 'MID';
-MIGRATE:                             'MIGRATE';
-MIN_ROWS:                            'MIN_ROWS';
-MODE:                                'MODE';
-MODIFY:                              'MODIFY';
-MUTEX:                               'MUTEX';
-MYSQL:                               'MYSQL';
-MYSQL_ERRNO:                         'MYSQL_ERRNO';
-NAME:                                'NAME';
-NAMES:                               'NAMES';
-NCHAR:                               'NCHAR';
-NEVER:                               'NEVER';
-NEXT:                                'NEXT';
-NO:                                  'NO';
-NODEGROUP:                           'NODEGROUP';
-NONE:                                'NONE';
-OFFLINE:                             'OFFLINE';
-OFFSET:                              'OFFSET';
-OF:                                  'OF';
-OJ:                                  'OJ';
-OLD_PASSWORD:                        'OLD_PASSWORD';
-ONE:                                 'ONE';
-ONLINE:                              'ONLINE';
-ONLY:                                'ONLY';
-OPEN:                                'OPEN';
-OPTIMIZER_COSTS:                     'OPTIMIZER_COSTS';
-OPTIONS:                             'OPTIONS';
-OWNER:                               'OWNER';
-PACK_KEYS:                           'PACK_KEYS';
-PAGE:                                'PAGE';
-PARSER:                              'PARSER';
-PARTIAL:                             'PARTIAL';
-PARTITIONING:                        'PARTITIONING';
-PARTITIONS:                          'PARTITIONS';
-PASSWORD:                            'PASSWORD';
-PHASE:                               'PHASE';
-PLUGIN:                              'PLUGIN';
-PLUGIN_DIR:                          'PLUGIN_DIR';
-PLUGINS:                             'PLUGINS';
-PORT:                                'PORT';
-PRECEDES:                            'PRECEDES';
-PREPARE:                             'PREPARE';
-PRESERVE:                            'PRESERVE';
-PREV:                                'PREV';
-PROCESSLIST:                         'PROCESSLIST';
-PROFILE:                             'PROFILE';
-PROFILES:                            'PROFILES';
-PROXY:                               'PROXY';
-QUERY:                               'QUERY';
-QUICK:                               'QUICK';
-REBUILD:                             'REBUILD';
-RECOVER:                             'RECOVER';
-REDO_BUFFER_SIZE:                    'REDO_BUFFER_SIZE';
-REDUNDANT:                           'REDUNDANT';
-RELAY:                               'RELAY';
-RELAY_LOG_FILE:                      'RELAY_LOG_FILE';
-RELAY_LOG_POS:                       'RELAY_LOG_POS';
-RELAYLOG:                            'RELAYLOG';
-REMOVE:                              'REMOVE';
-REORGANIZE:                          'REORGANIZE';
-REPAIR:                              'REPAIR';
-REPLICATE_DO_DB:                     'REPLICATE_DO_DB';
-REPLICATE_DO_TABLE:                  'REPLICATE_DO_TABLE';
-REPLICATE_IGNORE_DB:                 'REPLICATE_IGNORE_DB';
-REPLICATE_IGNORE_TABLE:              'REPLICATE_IGNORE_TABLE';
-REPLICATE_REWRITE_DB:                'REPLICATE_REWRITE_DB';
-REPLICATE_WILD_DO_TABLE:             'REPLICATE_WILD_DO_TABLE';
-REPLICATE_WILD_IGNORE_TABLE:         'REPLICATE_WILD_IGNORE_TABLE';
-REPLICATION:                         'REPLICATION';
-RESET:                               'RESET';
-RESUME:                              'RESUME';
-RETURNED_SQLSTATE:                   'RETURNED_SQLSTATE';
-RETURNS:                             'RETURNS';
-ROLE:                                'ROLE';
-ROLLBACK:                            'ROLLBACK';
-ROLLUP:                              'ROLLUP';
-ROTATE:                              'ROTATE';
-ROW:                                 'ROW';
-ROWS:                                'ROWS';
-ROW_FORMAT:                          'ROW_FORMAT';
-SAVEPOINT:                           'SAVEPOINT';
-SCHEDULE:                            'SCHEDULE';
-SECURITY:                            'SECURITY';
-SERVER:                              'SERVER';
-SESSION:                             'SESSION';
-SHARE:                               'SHARE';
-SHARED:                              'SHARED';
-SIGNED:                              'SIGNED';
-SIMPLE:                              'SIMPLE';
-SLAVE:                               'SLAVE';
-SLOW:                                'SLOW';
-SNAPSHOT:                            'SNAPSHOT';
-SOCKET:                              'SOCKET';
-SOME:                                'SOME';
-SONAME:                              'SONAME';
-SOUNDS:                              'SOUNDS';
-SOURCE:                              'SOURCE';
-SQL_AFTER_GTIDS:                     'SQL_AFTER_GTIDS';
-SQL_AFTER_MTS_GAPS:                  'SQL_AFTER_MTS_GAPS';
-SQL_BEFORE_GTIDS:                    'SQL_BEFORE_GTIDS';
-SQL_BUFFER_RESULT:                   'SQL_BUFFER_RESULT';
-SQL_CACHE:                           'SQL_CACHE';
-SQL_NO_CACHE:                        'SQL_NO_CACHE';
-SQL_THREAD:                          'SQL_THREAD';
-START:                               'START';
-STARTS:                              'STARTS';
-STATS_AUTO_RECALC:                   'STATS_AUTO_RECALC';
-STATS_PERSISTENT:                    'STATS_PERSISTENT';
-STATS_SAMPLE_PAGES:                  'STATS_SAMPLE_PAGES';
-STATUS:                              'STATUS';
-STOP:                                'STOP';
-STORAGE:                             'STORAGE';
-STORED:                              'STORED';
-STRING:                              'STRING';
-SUBCLASS_ORIGIN:                     'SUBCLASS_ORIGIN';
-SUBJECT:                             'SUBJECT';
-SUBPARTITION:                        'SUBPARTITION';
-SUBPARTITIONS:                       'SUBPARTITIONS';
-SUSPEND:                             'SUSPEND';
-SWAPS:                               'SWAPS';
-SWITCHES:                            'SWITCHES';
-TABLE_NAME:                          'TABLE_NAME';
-TABLESPACE:                          'TABLESPACE';
-TEMPORARY:                           'TEMPORARY';
-TEMPTABLE:                           'TEMPTABLE';
-THAN:                                'THAN';
-TRADITIONAL:                         'TRADITIONAL';
-TRANSACTION:                         'TRANSACTION';
-TRANSACTIONAL:                       'TRANSACTIONAL';
-TRIGGERS:                            'TRIGGERS';
-TRUNCATE:                            'TRUNCATE';
-UNDEFINED:                           'UNDEFINED';
-UNDOFILE:                            'UNDOFILE';
-UNDO_BUFFER_SIZE:                    'UNDO_BUFFER_SIZE';
-UNINSTALL:                           'UNINSTALL';
-UNKNOWN:                             'UNKNOWN';
-UNTIL:                               'UNTIL';
-UPGRADE:                             'UPGRADE';
-USER:                                'USER';
-USE_FRM:                             'USE_FRM';
-USER_RESOURCES:                      'USER_RESOURCES';
-VALIDATION:                          'VALIDATION';
-VALUE:                               'VALUE';
-VARIABLES:                           'VARIABLES';
-VIEW:                                'VIEW';
-VIRTUAL:                             'VIRTUAL';
-VISIBLE:                             'VISIBLE';
-WAIT:                                'WAIT';
-WARNINGS:                            'WARNINGS';
-WITHOUT:                             'WITHOUT';
-WORK:                                'WORK';
-WRAPPER:                             'WRAPPER';
-X509:                                'X509';
-XA:                                  'XA';
-XML:                                 'XML';
-
-
-// Date format Keywords
-
-EUR:                                 'EUR';
-USA:                                 'USA';
-JIS:                                 'JIS';
-ISO:                                 'ISO';
-INTERNAL:                            'INTERNAL';
-
-
-// Interval type Keywords
-
-QUARTER:                             'QUARTER';
-MONTH:                               'MONTH';
-DAY:                                 'DAY';
-HOUR:                                'HOUR';
-MINUTE:                              'MINUTE';
-WEEK:                                'WEEK';
-SECOND:                              'SECOND';
-MICROSECOND:                         'MICROSECOND';
-
-
-// PRIVILEGES
-
-TABLES:                              'TABLES';
-ROUTINE:                             'ROUTINE';
-EXECUTE:                             'EXECUTE';
-FILE:                                'FILE';
-PROCESS:                             'PROCESS';
-RELOAD:                              'RELOAD';
-SHUTDOWN:                            'SHUTDOWN';
-SUPER:                               'SUPER';
-PRIVILEGES:                          'PRIVILEGES';
-APPLICATION_PASSWORD_ADMIN:          'APPLICATION_PASSWORD_ADMIN';
-AUDIT_ADMIN:                         'AUDIT_ADMIN';
-BACKUP_ADMIN:                        'BACKUP_ADMIN';
-BINLOG_ADMIN:                        'BINLOG_ADMIN';
-BINLOG_ENCRYPTION_ADMIN:             'BINLOG_ENCRYPTION_ADMIN';
-CLONE_ADMIN:                         'CLONE_ADMIN';
-CONNECTION_ADMIN:                    'CONNECTION_ADMIN';
-ENCRYPTION_KEY_ADMIN:                'ENCRYPTION_KEY_ADMIN';
-FIREWALL_ADMIN:                      'FIREWALL_ADMIN';
-FIREWALL_USER:                       'FIREWALL_USER';
-GROUP_REPLICATION_ADMIN:             'GROUP_REPLICATION_ADMIN';
-INNODB_REDO_LOG_ARCHIVE:             'INNODB_REDO_LOG_ARCHIVE';
-NDB_STORED_USER:                     'NDB_STORED_USER';
-PERSIST_RO_VARIABLES_ADMIN:          'PERSIST_RO_VARIABLES_ADMIN';
-REPLICATION_APPLIER:                 'REPLICATION_APPLIER';
-REPLICATION_SLAVE_ADMIN:             'REPLICATION_SLAVE_ADMIN';
-RESOURCE_GROUP_ADMIN:                'RESOURCE_GROUP_ADMIN';
-RESOURCE_GROUP_USER:                 'RESOURCE_GROUP_USER';
-ROLE_ADMIN:                          'ROLE_ADMIN';
-SESSION_VARIABLES_ADMIN:             QUOTE_SYMB? 'SESSION_VARIABLES_ADMIN' QUOTE_SYMB?;
-SET_USER_ID:                         'SET_USER_ID';
-SHOW_ROUTINE:                        'SHOW_ROUTINE';
-SYSTEM_VARIABLES_ADMIN:              'SYSTEM_VARIABLES_ADMIN';
-TABLE_ENCRYPTION_ADMIN:              'TABLE_ENCRYPTION_ADMIN';
-VERSION_TOKEN_ADMIN:                 'VERSION_TOKEN_ADMIN';
-XA_RECOVER_ADMIN:                    'XA_RECOVER_ADMIN';
-
-
-// Charsets
-
-ARMSCII8:                            'ARMSCII8';
-ASCII:                               'ASCII';
-BIG5:                                'BIG5';
-CP1250:                              'CP1250';
-CP1251:                              'CP1251';
-CP1256:                              'CP1256';
-CP1257:                              'CP1257';
-CP850:                               'CP850';
-CP852:                               'CP852';
-CP866:                               'CP866';
-CP932:                               'CP932';
-DEC8:                                'DEC8';
-EUCJPMS:                             'EUCJPMS';
-EUCKR:                               'EUCKR';
-GB2312:                              'GB2312';
-GBK:                                 'GBK';
-GEOSTD8:                             'GEOSTD8';
-GREEK:                               'GREEK';
-HEBREW:                              'HEBREW';
-HP8:                                 'HP8';
-KEYBCS2:                             'KEYBCS2';
-KOI8R:                               'KOI8R';
-KOI8U:                               'KOI8U';
-LATIN1:                              'LATIN1';
-LATIN2:                              'LATIN2';
-LATIN5:                              'LATIN5';
-LATIN7:                              'LATIN7';
-MACCE:                               'MACCE';
-MACROMAN:                            'MACROMAN';
-SJIS:                                'SJIS';
-SWE7:                                'SWE7';
-TIS620:                              'TIS620';
-UCS2:                                'UCS2';
-UJIS:                                'UJIS';
-UTF16:                               'UTF16';
-UTF16LE:                             'UTF16LE';
-UTF32:                               'UTF32';
-UTF8:                                'UTF8';
-UTF8MB3:                             'UTF8MB3';
-UTF8MB4:                             'UTF8MB4';
-
-
-// DB Engines
-
-ARCHIVE:                             'ARCHIVE';
-BLACKHOLE:                           'BLACKHOLE';
-CSV:                                 'CSV';
-FEDERATED:                           'FEDERATED';
-INNODB:                              'INNODB';
-MEMORY:                              'MEMORY';
-MRG_MYISAM:                          'MRG_MYISAM';
-MYISAM:                              'MYISAM';
-NDB:                                 'NDB';
-NDBCLUSTER:                          'NDBCLUSTER';
-PERFORMANCE_SCHEMA:                  'PERFORMANCE_SCHEMA';
-TOKUDB:                              'TOKUDB';
-
-
-// Transaction Levels
-
-REPEATABLE:                          'REPEATABLE';
-COMMITTED:                           'COMMITTED';
-UNCOMMITTED:                         'UNCOMMITTED';
-SERIALIZABLE:                        'SERIALIZABLE';
-
-
-// Spatial data types
-
-GEOMETRYCOLLECTION:                  'GEOMETRYCOLLECTION';
-GEOMCOLLECTION:                      'GEOMCOLLECTION';
-GEOMETRY:                            'GEOMETRY';
-LINESTRING:                          'LINESTRING';
-MULTILINESTRING:                     'MULTILINESTRING';
-MULTIPOINT:                          'MULTIPOINT';
-MULTIPOLYGON:                        'MULTIPOLYGON';
-POINT:                               'POINT';
-POLYGON:                             'POLYGON';
-
-
-// Common function names
-
-ABS:                                 'ABS';
-ACOS:                                'ACOS';
-ADDDATE:                             'ADDDATE';
-ADDTIME:                             'ADDTIME';
-AES_DECRYPT:                         'AES_DECRYPT';
-AES_ENCRYPT:                         'AES_ENCRYPT';
-AREA:                                'AREA';
-ASBINARY:                            'ASBINARY';
-ASIN:                                'ASIN';
-ASTEXT:                              'ASTEXT';
-ASWKB:                               'ASWKB';
-ASWKT:                               'ASWKT';
-ASYMMETRIC_DECRYPT:                  'ASYMMETRIC_DECRYPT';
-ASYMMETRIC_DERIVE:                   'ASYMMETRIC_DERIVE';
-ASYMMETRIC_ENCRYPT:                  'ASYMMETRIC_ENCRYPT';
-ASYMMETRIC_SIGN:                     'ASYMMETRIC_SIGN';
-ASYMMETRIC_VERIFY:                   'ASYMMETRIC_VERIFY';
-ATAN:                                'ATAN';
-ATAN2:                               'ATAN2';
-BENCHMARK:                           'BENCHMARK';
-BIN:                                 'BIN';
-BIT_COUNT:                           'BIT_COUNT';
-BIT_LENGTH:                          'BIT_LENGTH';
-BUFFER:                              'BUFFER';
-CATALOG_NAME:                        'CATALOG_NAME';
-CEIL:                                'CEIL';
-CEILING:                             'CEILING';
-CENTROID:                            'CENTROID';
-CHARACTER_LENGTH:                    'CHARACTER_LENGTH';
-CHARSET:                             'CHARSET';
-CHAR_LENGTH:                         'CHAR_LENGTH';
-COERCIBILITY:                        'COERCIBILITY';
-COLLATION:                           'COLLATION';
-COMPRESS:                            'COMPRESS';
-CONCAT:                              'CONCAT';
-CONCAT_WS:                           'CONCAT_WS';
-CONNECTION_ID:                       'CONNECTION_ID';
-CONV:                                'CONV';
-CONVERT_TZ:                          'CONVERT_TZ';
-COS:                                 'COS';
-COT:                                 'COT';
-CRC32:                               'CRC32';
-CREATE_ASYMMETRIC_PRIV_KEY:          'CREATE_ASYMMETRIC_PRIV_KEY';
-CREATE_ASYMMETRIC_PUB_KEY:           'CREATE_ASYMMETRIC_PUB_KEY';
-CREATE_DH_PARAMETERS:                'CREATE_DH_PARAMETERS';
-CREATE_DIGEST:                       'CREATE_DIGEST';
-CROSSES:                             'CROSSES';
-DATEDIFF:                            'DATEDIFF';
-DATE_FORMAT:                         'DATE_FORMAT';
-DAYNAME:                             'DAYNAME';
-DAYOFMONTH:                          'DAYOFMONTH';
-DAYOFWEEK:                           'DAYOFWEEK';
-DAYOFYEAR:                           'DAYOFYEAR';
-DECODE:                              'DECODE';
-DEGREES:                             'DEGREES';
-DES_DECRYPT:                         'DES_DECRYPT';
-DES_ENCRYPT:                         'DES_ENCRYPT';
-DIMENSION:                           'DIMENSION';
-DISJOINT:                            'DISJOINT';
-ELT:                                 'ELT';
-ENCODE:                              'ENCODE';
-ENCRYPT:                             'ENCRYPT';
-ENDPOINT:                            'ENDPOINT';
-ENVELOPE:                            'ENVELOPE';
-EQUALS:                              'EQUALS';
-EXP:                                 'EXP';
-EXPORT_SET:                          'EXPORT_SET';
-EXTERIORRING:                        'EXTERIORRING';
-EXTRACTVALUE:                        'EXTRACTVALUE';
-FIELD:                               'FIELD';
-FIND_IN_SET:                         'FIND_IN_SET';
-FLOOR:                               'FLOOR';
-FORMAT:                              'FORMAT';
-FOUND_ROWS:                          'FOUND_ROWS';
-FROM_BASE64:                         'FROM_BASE64';
-FROM_DAYS:                           'FROM_DAYS';
-FROM_UNIXTIME:                       'FROM_UNIXTIME';
-GEOMCOLLFROMTEXT:                    'GEOMCOLLFROMTEXT';
-GEOMCOLLFROMWKB:                     'GEOMCOLLFROMWKB';
-GEOMETRYCOLLECTIONFROMTEXT:          'GEOMETRYCOLLECTIONFROMTEXT';
-GEOMETRYCOLLECTIONFROMWKB:           'GEOMETRYCOLLECTIONFROMWKB';
-GEOMETRYFROMTEXT:                    'GEOMETRYFROMTEXT';
-GEOMETRYFROMWKB:                     'GEOMETRYFROMWKB';
-GEOMETRYN:                           'GEOMETRYN';
-GEOMETRYTYPE:                        'GEOMETRYTYPE';
-GEOMFROMTEXT:                        'GEOMFROMTEXT';
-GEOMFROMWKB:                         'GEOMFROMWKB';
-GET_FORMAT:                          'GET_FORMAT';
-GET_LOCK:                            'GET_LOCK';
-GLENGTH:                             'GLENGTH';
-GREATEST:                            'GREATEST';
-GTID_SUBSET:                         'GTID_SUBSET';
-GTID_SUBTRACT:                       'GTID_SUBTRACT';
-HEX:                                 'HEX';
-IFNULL:                              'IFNULL';
-INET6_ATON:                          'INET6_ATON';
-INET6_NTOA:                          'INET6_NTOA';
-INET_ATON:                           'INET_ATON';
-INET_NTOA:                           'INET_NTOA';
-INSTR:                               'INSTR';
-INTERIORRINGN:                       'INTERIORRINGN';
-INTERSECTS:                          'INTERSECTS';
-ISCLOSED:                            'ISCLOSED';
-ISEMPTY:                             'ISEMPTY';
-ISNULL:                              'ISNULL';
-ISSIMPLE:                            'ISSIMPLE';
-IS_FREE_LOCK:                        'IS_FREE_LOCK';
-IS_IPV4:                             'IS_IPV4';
-IS_IPV4_COMPAT:                      'IS_IPV4_COMPAT';
-IS_IPV4_MAPPED:                      'IS_IPV4_MAPPED';
-IS_IPV6:                             'IS_IPV6';
-IS_USED_LOCK:                        'IS_USED_LOCK';
-LAST_INSERT_ID:                      'LAST_INSERT_ID';
-LCASE:                               'LCASE';
-LEAST:                               'LEAST';
-LENGTH:                              'LENGTH';
-LINEFROMTEXT:                        'LINEFROMTEXT';
-LINEFROMWKB:                         'LINEFROMWKB';
-LINESTRINGFROMTEXT:                  'LINESTRINGFROMTEXT';
-LINESTRINGFROMWKB:                   'LINESTRINGFROMWKB';
-LN:                                  'LN';
-LOAD_FILE:                           'LOAD_FILE';
-LOCATE:                              'LOCATE';
-LOG:                                 'LOG';
-LOG10:                               'LOG10';
-LOG2:                                'LOG2';
-LOWER:                               'LOWER';
-LPAD:                                'LPAD';
-LTRIM:                               'LTRIM';
-MAKEDATE:                            'MAKEDATE';
-MAKETIME:                            'MAKETIME';
-MAKE_SET:                            'MAKE_SET';
-MASTER_POS_WAIT:                     'MASTER_POS_WAIT';
-MBRCONTAINS:                         'MBRCONTAINS';
-MBRDISJOINT:                         'MBRDISJOINT';
-MBREQUAL:                            'MBREQUAL';
-MBRINTERSECTS:                       'MBRINTERSECTS';
-MBROVERLAPS:                         'MBROVERLAPS';
-MBRTOUCHES:                          'MBRTOUCHES';
-MBRWITHIN:                           'MBRWITHIN';
-MD5:                                 'MD5';
-MLINEFROMTEXT:                       'MLINEFROMTEXT';
-MLINEFROMWKB:                        'MLINEFROMWKB';
-MONTHNAME:                           'MONTHNAME';
-MPOINTFROMTEXT:                      'MPOINTFROMTEXT';
-MPOINTFROMWKB:                       'MPOINTFROMWKB';
-MPOLYFROMTEXT:                       'MPOLYFROMTEXT';
-MPOLYFROMWKB:                        'MPOLYFROMWKB';
-MULTILINESTRINGFROMTEXT:             'MULTILINESTRINGFROMTEXT';
-MULTILINESTRINGFROMWKB:              'MULTILINESTRINGFROMWKB';
-MULTIPOINTFROMTEXT:                  'MULTIPOINTFROMTEXT';
-MULTIPOINTFROMWKB:                   'MULTIPOINTFROMWKB';
-MULTIPOLYGONFROMTEXT:                'MULTIPOLYGONFROMTEXT';
-MULTIPOLYGONFROMWKB:                 'MULTIPOLYGONFROMWKB';
-NAME_CONST:                          'NAME_CONST';
-NULLIF:                              'NULLIF';
-NUMGEOMETRIES:                       'NUMGEOMETRIES';
-NUMINTERIORRINGS:                    'NUMINTERIORRINGS';
-NUMPOINTS:                           'NUMPOINTS';
-OCT:                                 'OCT';
-OCTET_LENGTH:                        'OCTET_LENGTH';
-ORD:                                 'ORD';
-OVERLAPS:                            'OVERLAPS';
-PERIOD_ADD:                          'PERIOD_ADD';
-PERIOD_DIFF:                         'PERIOD_DIFF';
-PI:                                  'PI';
-POINTFROMTEXT:                       'POINTFROMTEXT';
-POINTFROMWKB:                        'POINTFROMWKB';
-POINTN:                              'POINTN';
-POLYFROMTEXT:                        'POLYFROMTEXT';
-POLYFROMWKB:                         'POLYFROMWKB';
-POLYGONFROMTEXT:                     'POLYGONFROMTEXT';
-POLYGONFROMWKB:                      'POLYGONFROMWKB';
-POW:                                 'POW';
-POWER:                               'POWER';
-QUOTE:                               'QUOTE';
-RADIANS:                             'RADIANS';
-RAND:                                'RAND';
-RANDOM_BYTES:                        'RANDOM_BYTES';
-RELEASE_LOCK:                        'RELEASE_LOCK';
-REVERSE:                             'REVERSE';
-ROUND:                               'ROUND';
-ROW_COUNT:                           'ROW_COUNT';
-RPAD:                                'RPAD';
-RTRIM:                               'RTRIM';
-SEC_TO_TIME:                         'SEC_TO_TIME';
-SESSION_USER:                        'SESSION_USER';
-SHA:                                 'SHA';
-SHA1:                                'SHA1';
-SHA2:                                'SHA2';
-SCHEMA_NAME:                         'SCHEMA_NAME';
-SIGN:                                'SIGN';
-SIN:                                 'SIN';
-SLEEP:                               'SLEEP';
-SOUNDEX:                             'SOUNDEX';
-SQL_THREAD_WAIT_AFTER_GTIDS:         'SQL_THREAD_WAIT_AFTER_GTIDS';
-SQRT:                                'SQRT';
-SRID:                                'SRID';
-STARTPOINT:                          'STARTPOINT';
-STRCMP:                              'STRCMP';
-STR_TO_DATE:                         'STR_TO_DATE';
-ST_AREA:                             'ST_AREA';
-ST_ASBINARY:                         'ST_ASBINARY';
-ST_ASTEXT:                           'ST_ASTEXT';
-ST_ASWKB:                            'ST_ASWKB';
-ST_ASWKT:                            'ST_ASWKT';
-ST_BUFFER:                           'ST_BUFFER';
-ST_CENTROID:                         'ST_CENTROID';
-ST_CONTAINS:                         'ST_CONTAINS';
-ST_CROSSES:                          'ST_CROSSES';
-ST_DIFFERENCE:                       'ST_DIFFERENCE';
-ST_DIMENSION:                        'ST_DIMENSION';
-ST_DISJOINT:                         'ST_DISJOINT';
-ST_DISTANCE:                         'ST_DISTANCE';
-ST_ENDPOINT:                         'ST_ENDPOINT';
-ST_ENVELOPE:                         'ST_ENVELOPE';
-ST_EQUALS:                           'ST_EQUALS';
-ST_EXTERIORRING:                     'ST_EXTERIORRING';
-ST_GEOMCOLLFROMTEXT:                 'ST_GEOMCOLLFROMTEXT';
-ST_GEOMCOLLFROMTXT:                  'ST_GEOMCOLLFROMTXT';
-ST_GEOMCOLLFROMWKB:                  'ST_GEOMCOLLFROMWKB';
-ST_GEOMETRYCOLLECTIONFROMTEXT:       'ST_GEOMETRYCOLLECTIONFROMTEXT';
-ST_GEOMETRYCOLLECTIONFROMWKB:        'ST_GEOMETRYCOLLECTIONFROMWKB';
-ST_GEOMETRYFROMTEXT:                 'ST_GEOMETRYFROMTEXT';
-ST_GEOMETRYFROMWKB:                  'ST_GEOMETRYFROMWKB';
-ST_GEOMETRYN:                        'ST_GEOMETRYN';
-ST_GEOMETRYTYPE:                     'ST_GEOMETRYTYPE';
-ST_GEOMFROMTEXT:                     'ST_GEOMFROMTEXT';
-ST_GEOMFROMWKB:                      'ST_GEOMFROMWKB';
-ST_INTERIORRINGN:                    'ST_INTERIORRINGN';
-ST_INTERSECTION:                     'ST_INTERSECTION';
-ST_INTERSECTS:                       'ST_INTERSECTS';
-ST_ISCLOSED:                         'ST_ISCLOSED';
-ST_ISEMPTY:                          'ST_ISEMPTY';
-ST_ISSIMPLE:                         'ST_ISSIMPLE';
-ST_LINEFROMTEXT:                     'ST_LINEFROMTEXT';
-ST_LINEFROMWKB:                      'ST_LINEFROMWKB';
-ST_LINESTRINGFROMTEXT:               'ST_LINESTRINGFROMTEXT';
-ST_LINESTRINGFROMWKB:                'ST_LINESTRINGFROMWKB';
-ST_NUMGEOMETRIES:                    'ST_NUMGEOMETRIES';
-ST_NUMINTERIORRING:                  'ST_NUMINTERIORRING';
-ST_NUMINTERIORRINGS:                 'ST_NUMINTERIORRINGS';
-ST_NUMPOINTS:                        'ST_NUMPOINTS';
-ST_OVERLAPS:                         'ST_OVERLAPS';
-ST_POINTFROMTEXT:                    'ST_POINTFROMTEXT';
-ST_POINTFROMWKB:                     'ST_POINTFROMWKB';
-ST_POINTN:                           'ST_POINTN';
-ST_POLYFROMTEXT:                     'ST_POLYFROMTEXT';
-ST_POLYFROMWKB:                      'ST_POLYFROMWKB';
-ST_POLYGONFROMTEXT:                  'ST_POLYGONFROMTEXT';
-ST_POLYGONFROMWKB:                   'ST_POLYGONFROMWKB';
-ST_SRID:                             'ST_SRID';
-ST_STARTPOINT:                       'ST_STARTPOINT';
-ST_SYMDIFFERENCE:                    'ST_SYMDIFFERENCE';
-ST_TOUCHES:                          'ST_TOUCHES';
-ST_UNION:                            'ST_UNION';
-ST_WITHIN:                           'ST_WITHIN';
-ST_X:                                'ST_X';
-ST_Y:                                'ST_Y';
-SUBDATE:                             'SUBDATE';
-SUBSTRING_INDEX:                     'SUBSTRING_INDEX';
-SUBTIME:                             'SUBTIME';
-SYSTEM_USER:                         'SYSTEM_USER';
-TAN:                                 'TAN';
-TIMEDIFF:                            'TIMEDIFF';
-TIMESTAMPADD:                        'TIMESTAMPADD';
-TIMESTAMPDIFF:                       'TIMESTAMPDIFF';
-TIME_FORMAT:                         'TIME_FORMAT';
-TIME_TO_SEC:                         'TIME_TO_SEC';
-TOUCHES:                             'TOUCHES';
-TO_BASE64:                           'TO_BASE64';
-TO_DAYS:                             'TO_DAYS';
-TO_SECONDS:                          'TO_SECONDS';
-UCASE:                               'UCASE';
-UNCOMPRESS:                          'UNCOMPRESS';
-UNCOMPRESSED_LENGTH:                 'UNCOMPRESSED_LENGTH';
-UNHEX:                               'UNHEX';
-UNIX_TIMESTAMP:                      'UNIX_TIMESTAMP';
-UPDATEXML:                           'UPDATEXML';
-UPPER:                               'UPPER';
-UUID:                                'UUID';
-UUID_SHORT:                          'UUID_SHORT';
-VALIDATE_PASSWORD_STRENGTH:          'VALIDATE_PASSWORD_STRENGTH';
-VERSION:                             'VERSION';
-WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS:   'WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS';
-WEEKDAY:                             'WEEKDAY';
-WEEKOFYEAR:                          'WEEKOFYEAR';
-WEIGHT_STRING:                       'WEIGHT_STRING';
-WITHIN:                              'WITHIN';
-YEARWEEK:                            'YEARWEEK';
-Y_FUNCTION:                          'Y';
-X_FUNCTION:                          'X';
+PLI : P L I;
+PORTION : P O R T I O N;
+POSITION : P O S I T I O N;
+PRECEDING : P R E C E D I N G;
+PRECISION : P R E C I S I O N;
+PRESERVE : P R E S E R V E;
+PRIMARY : P R I M A R Y;
+PRIOR : P R I O R;
+PRIQTY : P R I Q T Y;
+PRIVILEGES : P R I V I L E G E S;
+PROCEDURE : P R O C E D U R E;
+PROGRAM : P R O G R A M;
+PROTOCOL : P R O T O C O L;
+PUBLIC : P U B L I C;
+QUALIFIER : Q U A L I F I E R;
+QUERYNO : Q U E R Y N O;
+RANGE : R A N G E;
+READ : R E A D;
+READS : R E A D S;
+REAL : R E A L;
+RECOMMEND : R E C O M M E N D;
+RECOVERY : R E C O V E R Y;
+REF : R E F;
+REFERENCE : R E F E R E N C E;
+REFERENCES : R E F E R E N C E S;
+REFERENCING : R E F E R E N C I N G;
+REFRESH : R E F R E S H;
+REGISTERS : R E G I S T E R S;
+RELATIVE : R E L A T I V E;
+RENAME : R E N A M E;
+REOPT : R E O P T;
+REPEAT : R E P E A T;
+REPEATABLE : R E P E A T A B L E;
+REPLICATED : R E P L I C A T E D;
+REQUIRED : R E Q U I R E D;
+RESIDENT : R E S I D E N T;
+RESIGNAL : R E S I G N A L;
+RESOLUTION : R E S O L U T I O N;
+RESOLVE : R E S O L V E;
+RESTORE : R E S T O R E;
+RESTRICT : R E S T R I C T;
+RESULT : R E S U L T;
+RESULT_SET_LOCATOR : R E S U L T UNDERSCORECHAR S E T UNDERSCORECHAR L O C A T O R;
+RETURN_STATUS : R E T U R N UNDERSCORECHAR S T A T U S;
+RETURNED_SQLSTATE : R E T U R N E D UNDERSCORECHAR S Q L S T A T E;
+RETURNS : R E T U R N S;
+REVOKE : R E V O K E;
+RIGHT : R I G H T;
+ROLLUP : R O L L U P;
+ROUNDING : R O U N D I N G;
+ROUTINE : R O U T I N E;
+ROW : R O W;
+ROW_COUNT : R O W UNDERSCORECHAR C O U N T;
+ROWID : R O W I D;
+ROWS : R O W S;
+ROWSET : R O W S E T;
+RR : R R;
+RS : R S;
+SAVEPOINT : S A V E P O I N T;
+SBCS : S B C S;
+SCALE : S C A L E;
+SCHEMA : S C H E M A;
+SCRATCHPAD : S C R A T C H P A D;
+SCROLL : S C R O L L;
+SEARCH : S E A R C H;
+SECOND : S E C O N D;
+SECONDS : S E C O N D S;
+SECQTY : S E C Q T Y;
+SECTION : S E C T I O N;
+SECURED : S E C U R E D;
+SELECT : S E L E C T;
+SELECTIVITY : S E L E C T I V I T Y;
+SELF : S E L F;
+SENSITIVE : S E N S I T I V E;
+SEQUENCE : S E Q U E N C E;
+SERIALIZABLE : S E R I A L I Z A B L E;
+SERVER_NAME : S E R V E R UNDERSCORECHAR N A M E;
+SESSION_USER : S E S S I O N UNDERSCORECHAR U S E R;
+SETS : S E T S;
+SHARE : S H A R E;
+SHRLEVEL : S H R L E V E L;
+SIGNAL : S I G N A  L;
+SIMPLE : S I M P L E;
+SIZE : S I Z E;
+SMALLINT : S M A L L I N T;
+SNAPSHOT : S N A P S H O T;
+SOME : S O M E;
+SPECIAL : S P E C I A L;
+SPECIFIC : S P E C I F I C;
+SQL : S Q L;
+SQLCA : S Q L C A;
+SQLCODE : S Q L C O D E;
+SQLDA : S Q L D A;
+SQLERROR : S Q L E R R O R;
+SQLEXCEPTION : S Q L E X C E P T I O N;
+SQLID : S Q L I D;
+SQLSTATE : S Q L S T A T E;
+SQLWARNING : S Q L W A R N I N G;
+STABILIZED : S T A B I L I Z E D;
+STACKED : S T A C K E D;
+STARTING : S T A R T I N G;
+STATEMENT : S T A T E M E N T;
+STATEMENTS : S T A T E M E N T S;
+STATIC : S T A T I C;
+STATISTICS : S T A T I S T I C S;
+STAY : S T A Y;
+STMTCACHE : S T M T C A C H E;
+STMTID : S T M T I D;
+STMTTOKEN : S T M T T O K E N;
+STOGROUP : S T O G R O U P;
+STORAGE : S T O R A G E;
+STORED : S T O R E D;
+STYLE : S T Y L E;
+SUB : S U B;
+SUBSTRING : S U B S T R I N G;
+SUMMARY : S U M M A R Y;
+SWITCH : S W I T C H;
+SYNONYM : S Y N O N Y M;
+SYSTEM : S Y S T E M;
+SYSTEM_TIME : S Y S T E M UNDERSCORECHAR T I M E;
+SYSTEM_USER : S Y S T E M UNDERSCORECHAR U S E R;
+TABLE : T A B L E;
+TABLE_NAME : T A B L E UNDERSCORECHAR N A M E;
+TABLESPACE : T A B L E S P A C E;
+TABLESPACES : T A B L E S P A C E S;
+TEMPLATE : T E M P L A T E;
+TEMPORARY : T E M P O R A R Y;
+THEN : T H E N;
+THREADSAFE : T H R E A D S A F E;
+TIMESTAMP : T I M E S T A M P;
+TIMEZONE : T I M E Z O N E;
+TIMEZONE_HOUR : T I M E Z O N E UNDERSCORECHAR H O U R;
+TIMEZONE_MINUTE : T I M E Z O N E UNDERSCORECHAR M I N U T E;
+TRAILING : T R A I L I N G;
+TRANSLATE : T R A N S L A T E;
+TRANSLATION : T R A N S L A T I O N;
+TREAT : T R E A T;
+TRIM : T R I M;
+//TRUE : TRUE;
+TRUSTED : T R U S T E D;
+TYPE : T Y P E;
+UNBOUNDED : U N B O U N D E D;
+UNDER : U N D E R;
+UNDO : U N D O;
+UNICODE : U N I C O D E;
+UNION : U N I O N;
+UNIQUE : U N I Q U E;
+UNKNOWN : U N K N O W N;
+UPPER : U P P E R;
+USA : U S A;
+USAGE : U S A G E;
+USE : U S E;
+USER : U S E R;
+VALIDATE : V A L I D A T E;
+VALUES : V A L U E S;
+VARBINARY : V A R B I N A R Y;
+VARCHAR : V A R C H A R;
+VARGRAPHIC : V A R G R A P H I C;
+VARIABLE : V A R I A B L E;
+VARIANT : V A R I A N T;
+VARYING : V A R Y I N G;
+VCAT : V C A T;
+VERSION : V E R S I O N;
+VIEW : V I E W;
+VOLATILE : V O L A T I L E;
+WAITFORDATA : W A I T F O R D A T A;
+WHEN : W H E N;
+WHENEVER : W H E N E V E R;
+WHERE : W H E R E;
+WHILE : W H I L E;
+WITH : W I T H;
+WITHOUT : W I T H O U T;
+WLM : W L M;
+WORK : W O R K;
+WRAPPER : W R A P P E R;
+XML : X M L;
+YEARS : Y E A R S;
+YES : Y E S;
+ZONE : Z O N E;
 
 
 
-// Operators
-// Operators. Assigns
-
-VAR_ASSIGN:                          ':=';
-PLUS_ASSIGN:                         '+=';
-MINUS_ASSIGN:                        '-=';
-MULT_ASSIGN:                         '*=';
-DIV_ASSIGN:                          '/=';
-MOD_ASSIGN:                          '%=';
-AND_ASSIGN:                          '&=';
-XOR_ASSIGN:                          '^=';
-OR_ASSIGN:                           '|=';
-
-
-// Operators. Arithmetics
-
-STAR:                                '*';
-DIVIDE:                              '/';
-MODULE:                              '%';
-PLUS:                                '+';
-MINUSMINUS:                          '--';
-MINUS:                               '-';
-DIV:                                 'DIV';
-MOD:                                 'MOD';
-
-
-// Operators. Comparation
-
-EQUAL_SYMBOL:                        '=';
-GREATER_SYMBOL:                      '>';
-LESS_SYMBOL:                         '<';
-EXCLAMATION_SYMBOL:                  '!';
-
-
-// Operators. Bit
-
-BIT_NOT_OP:                          '~';
-BIT_OR_OP:                           '|';
-BIT_AND_OP:                          '&';
-BIT_XOR_OP:                          '^';
 
 
 // Constructors symbols
 
-DOT:                                 '.';
-LR_BRACKET:                          '(';
-RR_BRACKET:                          ')';
-COMMA:                               ',';
-SEMI:                                ';';
-AT_SIGN:                             '@';
-ZERO_DECIMAL:                        '0';
-ONE_DECIMAL:                         '1';
-TWO_DECIMAL:                         '2';
-SINGLE_QUOTE_SYMB:                   '\'';
-DOUBLE_QUOTE_SYMB:                   '"';
-REVERSE_QUOTE_SYMB:                  '`';
-COLON_SYMB:                          ':';
-
-UNDERSCORE_CHAR : '-';
-LSQUAREBRACKET : '[';
-RSQUAREBRACKET : ']';
-
-fragment QUOTE_SYMB
-    : SINGLE_QUOTE_SYMB | DOUBLE_QUOTE_SYMB | REVERSE_QUOTE_SYMB
-    ;
-
-
-
-// Charsets
-
-CHARSET_REVERSE_QOUTE_STRING:        '`' CHARSET_NAME '`';
-
-
-
-// File's sizes
-
-
-FILESIZE_LITERAL:                    DEC_DIGIT+ ('K'|'M'|'G'|'T');
-
-
-
-// Literal Primitives
-
-
-START_NATIONAL_STRING_LITERAL:       'N' SQUOTA_STRING;
-STRING_LITERAL:                      DQUOTA_STRING | SQUOTA_STRING | BQUOTA_STRING;
-DECIMAL_LITERAL:                     DEC_DIGIT+;
-HEXADECIMAL_LITERAL:                 'X' '\'' (HEX_DIGIT HEX_DIGIT)+ '\''
-                                     | '0X' HEX_DIGIT+;
-
-REAL_LITERAL:                        (DEC_DIGIT+)? '.' DEC_DIGIT+
-                                     | DEC_DIGIT+ '.' EXPONENT_NUM_PART
-                                     | (DEC_DIGIT+)? '.' (DEC_DIGIT+ EXPONENT_NUM_PART)
-                                     | DEC_DIGIT+ EXPONENT_NUM_PART;
-NULL_SPEC_LITERAL:                   '\\' 'N';
-BIT_STRING:                          BIT_STRING_L;
-STRING_CHARSET_NAME:                 '_' CHARSET_NAME;
+ATCHAR :             '@';
+LSQUAREBRACKET :     '[';
+RSQUAREBRACKET :     ']';
+REVERSEQUOTECHAR :   '`';
+SEMICOLONCHAR :      ';';
+UNDERSCORECHAR :     '-';
 
 
 
 
-// Hack for dotID
-// Prevent recognize string:         .123somelatin AS ((.123), FLOAT_LITERAL), ((somelatin), ID)
-//  it must recoginze:               .123somelatin AS ((.), DOT), (123somelatin, ID)
-
-DOT_ID:                              '.' ID_LITERAL;
-
-
-
-// Identifiers
-
-ID:                                  ID_LITERAL;
-// DOUBLE_QUOTE_ID:                  '"' ~'"'+ '"';
-REVERSE_QUOTE_ID:                    '`' ~'`'+ '`';
-STRING_USER_NAME:                    (
-                                       SQUOTA_STRING | DQUOTA_STRING
-                                       | BQUOTA_STRING | ID_LITERAL
-                                     ) '@'
-                                     (
-                                       SQUOTA_STRING | DQUOTA_STRING
-                                       | BQUOTA_STRING | ID_LITERAL
-                                     );
-LOCAL_ID:                            '@'
-                                (
-                                  [A-Z0-9._$]+
-                                  | SQUOTA_STRING
-                                  | DQUOTA_STRING
-                                  | BQUOTA_STRING
-                                );
-GLOBAL_ID:                           '@' '@'
-                                (
-                                  [A-Z0-9._$]+
-                                  | BQUOTA_STRING
-                                );
+DB2_AUTHENTICATION_TYPE : 'Z';
+DB2_AUTHORIZATION_ID : 'Z';
+DB2_CONNECTION_STATE : 'Z';
+DB2_CONNECTION_STATUS : 'Z';
+DB2_ENCRYPTION_TYPE : 'Z';
+DB2_ERROR_CODE_ : 'Z';
+DB2_GET_DIAGNOSTICS_DIAGNOSTICS : 'Z';
+DB2_INTERNAL_ERROR_POINTER : 'Z';
+DB2_LAST_ROW : 'Z';
+DB2_LINE_NUMBER : 'Z';
+DB2_MESSAGE_ID : 'Z';
+DB2_MODULE_DETECTING_ERROR : 'Z';
+DB2_NUMBER_PARAMETER_MARKERS : 'Z';
+DB2_NUMBER_RESULT_SETS : 'Z';
+DB2_NUMBER_ROWS : 'Z';
+DB2_ORDINAL_TOKEN_ : 'Z';
+DB2_PRODUCT_ID : 'Z';
+DB2_REASON_CODE : 'Z';
+DB2_RETURN_STATUS : 'Z';
+DB2_RETURNED_SQLCODE : 'Z';
+DB2_ROW_NUBER : 'Z';
+DB2_SERVER_CLASS_NAME : 'Z';
+DB2_SQL_ATTR_CURSOR_HOLD : 'Z';
+DB2_SQL_ATTR_CURSOR_ROWSET : 'Z';
+DB2_SQL_ATTR_CURSOR_SCROLLABLE : 'Z';
+DB2_SQL_ATTR_CURSOR_SENSITIVITY : 'Z';
+DB2_SQL_ATTR_CURSOR_TYPE : 'Z';
+DB2_SQL_NESTING_LEVEL : 'Z';
+DB2_SQLERRD_ : 'Z';
+DB2_SQLERRD_SET : 'Z';
+DB2_TOKEN_COUNT : 'Z';
 
 
-// Fragments for Literal primitives
+DEC_ROUND_CEILING : 'Z';
+DEC_ROUND_DOWN : 'Z';
+DEC_ROUND_FLOOR : 'Z';
+DEC_ROUND_HALF_DOWN : 'Z';
+DEC_ROUND_HALF_EVEN : 'Z';
+DEC_ROUND_HALF_UP : 'Z';
+DEC_ROUND_UP : 'Z';
 
-fragment CHARSET_NAME:               ARMSCII8 | ASCII | BIG5 | BINARY | CP1250
-                                     | CP1251 | CP1256 | CP1257 | CP850
-                                     | CP852 | CP866 | CP932 | DEC8 | EUCJPMS
-                                     | EUCKR | GB2312 | GBK | GEOSTD8 | GREEK
-                                     | HEBREW | HP8 | KEYBCS2 | KOI8R | KOI8U
-                                     | LATIN1 | LATIN2 | LATIN5 | LATIN7
-                                     | MACCE | MACROMAN | SJIS | SWE7 | TIS620
-                                     | UCS2 | UJIS | UTF16 | UTF16LE | UTF32
-                                     | UTF8 | UTF8MB3 | UTF8MB4;
-
-fragment EXPONENT_NUM_PART:          'E' [-+]? DEC_DIGIT+;
-fragment ID_LITERAL:                 [A-Z_$0-9]*?[A-Z_$]+?[A-Z_$0-9]*;
-fragment DQUOTA_STRING:              '"' ( '\\'. | '""' | ~('"'| '\\') )* '"';
-fragment SQUOTA_STRING:              '\'' ('\\'. | '\'\'' | ~('\'' | '\\'))* '\'';
-fragment BQUOTA_STRING:              '`' ( '\\'. | '``' | ~('`'|'\\'))* '`';
-fragment HEX_DIGIT:                  [0-9A-F];
-fragment DEC_DIGIT:                  [0-9];
-fragment BIT_STRING_L:               'B' '\'' [01]+ '\'';
-
-
-
-// Last tokens must generate Errors
-
-ERROR_RECONGNIGION:                  .    -> channel(ERRORCHANNEL);
+NUMBER_0 : '0';
+NUMBER_1 : '1';
+NUMBER_14 : '14';
+NUMBER_15 : '15';
+NUMBER_16 : '16';
+NUMBER_30 : '30';
+NUMBER_31 : '31';
+NUMBER_33 : '33';
+NUMBER_34 : '34';
 
 
 
 
-DB2_AUTHENTICATION_TYPE
-DB2_AUTHENTICATION_TYPE
-DB2_AUTHORIZATION_ID
-DB2_AUTHORIZATION_ID
-DB2_CONNECTION_STATE
-DB2_CONNECTION_STATE
-DB2_CONNECTION_STATUS
-DB2_CONNECTION_STATUS
-DB2_ENCRYPTION_TYPE
-DB2_ENCRYPTION_TYPE
-DB2_ERROR_CODE_
-DB2_ERROR_CODE_
-DB2_GET_DIAGNOSTICS_DIAGNOSTICS
-DB2_GET_DIAGNOSTICS_DIAGNOSTICS
-DB2_INTERNAL_ERROR_POINTER
-DB2_INTERNAL_ERROR_POINTER
-DB2_LAST_ROW
-DB2_LAST_ROW
-DB2_LINE_NUMBER
-DB2_LINE_NUMBER
-DB2_MESSAGE_ID
-DB2_MESSAGE_ID
-DB2_MODULE_DETECTING_ERROR
-DB2_MODULE_DETECTING_ERROR
-DB2_NUMBER_PARAMETER_MARKERS
-DB2_NUMBER_PARAMETER_MARKERS
-DB2_NUMBER_RESULT_SETS
-DB2_NUMBER_RESULT_SETS
-DB2_NUMBER_ROWS
-DB2_NUMBER_ROWS
-DB2_ORDINAL_TOKEN_
-DB2_ORDINAL_TOKEN_
-DB2_PRODUCT_ID
-DB2_PRODUCT_ID
-DB2_REASON_CODE
-DB2_REASON_CODE
-DB2_RETURN_STATUS
-DB2_RETURN_STATUS
-DB2_RETURNED_SQLCODE
-DB2_RETURNED_SQLCODE
-DB2_ROW_NUBER
-DB2_ROW_NUBER
-DB2_SERVER_CLASS_NAME
-DB2_SERVER_CLASS_NAME
-DB2_SQL_ATTR_CURSOR_HOLD
-DB2_SQL_ATTR_CURSOR_HOLD
-DB2_SQL_ATTR_CURSOR_ROWSET
-DB2_SQL_ATTR_CURSOR_ROWSET
-DB2_SQL_ATTR_CURSOR_SCROLLABLE
-DB2_SQL_ATTR_CURSOR_SCROLLABLE
-DB2_SQL_ATTR_CURSOR_SENSITIVITY
-DB2_SQL_ATTR_CURSOR_SENSITIVITY
-DB2_SQL_ATTR_CURSOR_TYPE
-DB2_SQL_ATTR_CURSOR_TYPE
-DB2_SQL_NESTING_LEVEL
-DB2_SQL_NESTING_LEVEL
-DB2_SQLERRD_
-DB2_SQLERRD_
-DB2_SQLERRD_SET
-DB2_SQLERRD_SET
-DB2_TOKEN_COUNT
-DB2_TOKEN_COUNT
-
-
-DEC_ROUND_CEILING
-DEC_ROUND_CEILING
-DEC_ROUND_DOWN
-DEC_ROUND_DOWN
-DEC_ROUND_FLOOR
-DEC_ROUND_FLOOR
-DEC_ROUND_HALF_DOWN
-DEC_ROUND_HALF_DOWN
-DEC_ROUND_HALF_EVEN
-DEC_ROUND_HALF_EVEN
-DEC_ROUND_HALF_UP
-DEC_ROUND_HALF_UP
-DEC_ROUND_UP
-DEC_ROUND_UP
-
-
-NUMBER_0 = '0'
-NUMBER_1 = '1'
-NUMBER_14 = '14'
-NUMBER_15
-NUMBER_15
-NUMBER_16
-NUMBER_30
-NUMBER_31
-NUMBER_33
-NUMBER_33
-NUMBER_34
-NUMBER_34
-
-
-G : G
+/*
+G : 'G'
 
 K | M | G
 K | M | G
 K | M | G
+
+PRECISION ?
+
 K | M | G
 K | M | G
 K | M | G
+*/
+
