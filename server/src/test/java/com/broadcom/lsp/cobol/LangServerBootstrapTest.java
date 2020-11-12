@@ -17,8 +17,7 @@ package com.broadcom.lsp.cobol;
 
 import com.broadcom.lsp.cobol.service.CobolLanguageServer;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageServer;
-import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
-import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
+import com.broadcom.lsp.cobol.service.providers.ClientProvider;
 import com.google.inject.Injector;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -40,12 +39,10 @@ class LangServerBootstrapTest {
   private static final String PIPES = "pipeEnabled";
 
   private LanguageServer server;
-  private CustomThreadPoolExecutor customExecutor;
 
   @BeforeEach
   void setUp() {
     server = new TestLanguageServer();
-    customExecutor = new CustomThreadPoolExecutorService(4, 5, 60, 3);
   }
 
   @Test
@@ -54,12 +51,12 @@ class LangServerBootstrapTest {
 
     // Bound class in Service module
     CobolLanguageServer server = injector.getInstance(CobolLanguageServer.class);
-    CustomThreadPoolExecutor customExecutor = injector.getInstance(CustomThreadPoolExecutor.class);
+    ClientProvider clientProvider = injector.getInstance(ClientProvider.class);
     // Bound constant in Databus module
     Integer cacheSize = injector.getInstance(get(Integer.class, named("CACHE-MAX-SIZE")));
 
     assertNotNull(server);
-    assertNotNull(customExecutor);
+    assertNotNull(clientProvider);
     assertNotNull(cacheSize);
   }
 
@@ -93,9 +90,7 @@ class LangServerBootstrapTest {
                 fail(e.getMessage());
               }
             });
-    Launcher<LanguageClient> launcher =
-        LangServerBootstrap.createServerLauncherWithSocket(
-            server, customExecutor.getThreadPoolExecutor());
+    Launcher<LanguageClient> launcher = LangServerBootstrap.createServerLauncherWithSocket(server);
 
     assertNotNull(launcher.getRemoteProxy());
   }
@@ -103,8 +98,7 @@ class LangServerBootstrapTest {
   @Test
   void createServerLauncher() {
     Launcher<LanguageClient> launcher =
-        LangServerBootstrap.createServerLauncher(
-            server, System.in, System.out, customExecutor.getThreadPoolExecutor());
+        LangServerBootstrap.createServerLauncher(server, System.in, System.out);
 
     assertNotNull(launcher.getRemoteProxy());
   }
@@ -112,8 +106,7 @@ class LangServerBootstrapTest {
   @Test
   void startServer() throws IOException {
     Launcher<LanguageClient> launcher =
-        LangServerBootstrap.launchServer(
-            new String[] {PIPES}, server, customExecutor.getThreadPoolExecutor());
+        LangServerBootstrap.launchServer(new String[] {PIPES}, server);
     assertNotNull(launcher.getRemoteProxy());
   }
 }

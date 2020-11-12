@@ -18,7 +18,6 @@ import com.broadcom.lsp.cobol.domain.modules.DatabusModule;
 import com.broadcom.lsp.cobol.domain.modules.EngineModule;
 import com.broadcom.lsp.cobol.domain.modules.ServiceModule;
 import com.broadcom.lsp.cobol.service.providers.ClientProvider;
-import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.NonNull;
@@ -35,7 +34,6 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 
 /**
  * This class is an entry point for the application. It initializes the DI context and runs the
@@ -56,9 +54,8 @@ public class LangServerBootstrap {
     Injector injector = initCtx();
     LanguageServer server = injector.getInstance(LanguageServer.class);
     ClientProvider provider = injector.getInstance(ClientProvider.class);
-    CustomThreadPoolExecutor customExecutor = injector.getInstance(CustomThreadPoolExecutor.class);
 
-    start(args, server, provider, customExecutor.getThreadPoolExecutor());
+    start(args, server, provider);
   }
 
   Injector initCtx() {
@@ -66,13 +63,10 @@ public class LangServerBootstrap {
   }
 
   private void start(
-      @NonNull String[] args,
-      @NonNull LanguageServer server,
-      @NonNull ClientProvider provider,
-      @NonNull ExecutorService executorService)
+      @NonNull String[] args, @NonNull LanguageServer server, @NonNull ClientProvider provider)
       throws IOException, InterruptedException, ExecutionException {
     try {
-      Launcher<LanguageClient> launcher = launchServer(args, server, executorService);
+      Launcher<LanguageClient> launcher = launchServer(args, server);
       provider.set(launcher.getRemoteProxy());
       // suspend the main thread on listening
       launcher.startListening().get();
@@ -82,42 +76,33 @@ public class LangServerBootstrap {
     } catch (IOException e) {
       LOG.error("Unable to start server using socket communication on port [{}]", LSP_PORT);
       throw e;
-    } finally {
-      executorService.shutdown();
     }
   }
 
-  Launcher<LanguageClient> launchServer(
-      @NonNull String[] args,
-      @NonNull LanguageServer server,
-      @NonNull ExecutorService executorService)
+  Launcher<LanguageClient> launchServer(@NonNull String[] args, @NonNull LanguageServer server)
       throws IOException {
     return isPipeEnabled(args)
-        ? createServerLauncher(server, System.in, System.out, executorService)
-        : createServerLauncherWithSocket(server, executorService);
+        ? createServerLauncher(server, System.in, System.out)
+        : createServerLauncherWithSocket(server);
   }
 
   boolean isPipeEnabled(@NonNull String[] args) {
     return args.length > 0 && PIPE_ARG.equals(args[0]);
   }
 
-  Launcher<LanguageClient> createServerLauncherWithSocket(
-      @NonNull LanguageServer server, @NonNull ExecutorService executorService) throws IOException {
+  Launcher<LanguageClient> createServerLauncherWithSocket(@NonNull LanguageServer server)
+      throws IOException {
     try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
       LOG.info("Language server started using socket communication on port [{}]", LSP_PORT);
       LOG.info("Java version: " + Runtime.version());
       // wait for clients to connect
       Socket socket = serverSocket.accept();
-      return createServerLauncher(
-          server, socket.getInputStream(), socket.getOutputStream(), executorService);
+      return createServerLauncher(server, socket.getInputStream(), socket.getOutputStream());
     }
   }
 
   Launcher<LanguageClient> createServerLauncher(
-      @NonNull LanguageServer server,
-      @NonNull InputStream in,
-      @NonNull OutputStream out,
-      @NonNull ExecutorService executorService) {
-    return LSPLauncher.createServerLauncher(server, in, out, executorService, null);
+      @NonNull LanguageServer server, @NonNull InputStream in, @NonNull OutputStream out) {
+    return LSPLauncher.createServerLauncher(server, in, out);
   }
 }

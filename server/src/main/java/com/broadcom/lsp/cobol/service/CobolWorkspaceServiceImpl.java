@@ -14,6 +14,8 @@
  */
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.core.annotation.CheckServerShutdownState;
+import com.broadcom.lsp.cobol.core.annotation.DisposableService;
 import com.broadcom.lsp.cobol.core.messages.LocaleStore;
 import com.broadcom.lsp.cobol.core.messages.LogLevelUtils;
 import com.broadcom.lsp.cobol.core.model.ErrorCode;
@@ -46,7 +48,7 @@ import static java.util.stream.Collectors.toList;
  */
 @Slf4j
 @Singleton
-public class CobolWorkspaceServiceImpl implements WorkspaceService {
+public class CobolWorkspaceServiceImpl implements WorkspaceService, DisposableService {
   private DataBusBroker dataBus;
   private SettingsService settingsService;
   private WatcherService watchingService;
@@ -77,6 +79,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    */
   @NonNull
   @Override
+  @CheckServerShutdownState
   public CompletableFuture<Object> executeCommand(@NonNull ExecuteCommandParams params) {
     runAsync(executeCopybookFix(params)).whenComplete(reportExceptionIfFound(params));
 
@@ -99,6 +102,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    * @param params - LSPSpecification -> The actual changed settings; Actually -> null all the time.
    */
   @Override
+  @CheckServerShutdownState
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
     settingsService
         .getConfiguration(LOCAL_PATHS.label)
@@ -130,6 +134,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService {
    *     sent from the client to the server.
    */
   @Override
+  @CheckServerShutdownState
   public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) {
     rerunAnalysis(false);
   }

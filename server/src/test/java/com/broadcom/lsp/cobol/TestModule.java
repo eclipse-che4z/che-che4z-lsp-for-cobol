@@ -14,25 +14,32 @@
  */
 package com.broadcom.lsp.cobol;
 
-import com.broadcom.lsp.cobol.core.messages.*;
+import com.broadcom.lsp.cobol.core.annotation.*;
+import com.broadcom.lsp.cobol.core.messages.LocaleStore;
+import com.broadcom.lsp.cobol.core.messages.LocaleStoreImpl;
+import com.broadcom.lsp.cobol.core.messages.MessageService;
+import com.broadcom.lsp.cobol.core.messages.PropertiesMessageService;
 import com.broadcom.lsp.cobol.service.*;
-import com.broadcom.lsp.cobol.service.delegates.completions.*;
-import com.broadcom.lsp.cobol.service.delegates.references.*;
-import com.broadcom.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
-import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
-import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
-import com.broadcom.lsp.cobol.service.mocks.TestLanguageServer;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActions;
 import com.broadcom.lsp.cobol.service.delegates.actions.FindCopybookCommand;
 import com.broadcom.lsp.cobol.service.delegates.communications.Communications;
 import com.broadcom.lsp.cobol.service.delegates.communications.ServerCommunications;
+import com.broadcom.lsp.cobol.service.delegates.completions.*;
 import com.broadcom.lsp.cobol.service.delegates.formations.Formation;
 import com.broadcom.lsp.cobol.service.delegates.formations.Formations;
 import com.broadcom.lsp.cobol.service.delegates.formations.TrimFormation;
+import com.broadcom.lsp.cobol.service.delegates.references.*;
+import com.broadcom.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
+import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
+import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
+import com.broadcom.lsp.cobol.service.mocks.TestLanguageServer;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.broadcom.lsp.cobol.service.utils.WorkspaceFileService;
 import com.google.inject.AbstractModule;
+import com.google.inject.matcher.Matchers;
 import com.google.inject.multibindings.Multibinder;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -49,6 +56,7 @@ public class TestModule extends AbstractModule {
 
   @Override
   protected void configure() {
+    bind(CustomThreadPoolExecutor.class).to(CustomThreadPoolExecutorService.class);
     bind(LanguageClient.class).to(TestLanguageClient.class);
     bind(LanguageServer.class).to(TestLanguageServer.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
@@ -63,7 +71,9 @@ public class TestModule extends AbstractModule {
         .toProvider(() -> ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse(""));
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(MessageService.class).to(PropertiesMessageService.class);
-    bind(String.class).annotatedWith(named("resourceFileLocation")).toInstance("resourceBundles/messages");
+    bind(String.class)
+        .annotatedWith(named("resourceFileLocation"))
+        .toInstance("resourceBundles/messages");
 
     bind(SettingsService.class).to(SettingsServiceImpl.class);
 
@@ -71,6 +81,18 @@ public class TestModule extends AbstractModule {
     bindCompletions();
     bindReferences();
     bindCodeActions();
+
+    bindInterceptor(
+        Matchers.subclassesOf(ThreadInterruptAspect.class),
+        Matchers.annotatedWith(CheckThreadInterruption.class),
+        new HandleThreadInterruption());
+
+    HandleShutdownState handleShutdownState = new HandleShutdownState();
+    requestInjection(handleShutdownState);
+    bindInterceptor(
+        Matchers.subclassesOf(DisposableService.class),
+            (new NonSyntheticMethodMatcher()).and(Matchers.annotatedWith(CheckServerShutdownState.class)),
+        handleShutdownState);
   }
 
   private void bindFormations() {
