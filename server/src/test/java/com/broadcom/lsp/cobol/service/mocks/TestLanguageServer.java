@@ -14,7 +14,9 @@
  */
 package com.broadcom.lsp.cobol.service.mocks;
 
+import com.broadcom.lsp.cobol.service.DisposableLanguageServer;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -24,7 +26,9 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 import java.util.concurrent.CompletableFuture;
 
 /** Mock implementation of language server. Only for testing purposes. */
-public class TestLanguageServer implements LanguageServer {
+@Singleton
+public class TestLanguageServer implements LanguageServer, DisposableLanguageServer {
+  private int exitCode = 1;
 
   @Inject
   public TestLanguageServer() {}
@@ -36,6 +40,7 @@ public class TestLanguageServer implements LanguageServer {
 
   @Override
   public CompletableFuture<Object> shutdown() {
+    exitCode = 0;
     return null;
   }
 
@@ -52,5 +57,14 @@ public class TestLanguageServer implements LanguageServer {
   @Override
   public WorkspaceService getWorkspaceService() {
     return null;
+  }
+
+  @Override
+  public int getExitCode() {
+    return exitCode;
+  }
+
+  public void revokeShutdown() {
+    exitCode = 1;
   }
 }

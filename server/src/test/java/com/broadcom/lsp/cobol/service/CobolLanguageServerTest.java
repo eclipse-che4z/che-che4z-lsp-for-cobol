@@ -17,13 +17,17 @@ package com.broadcom.lsp.cobol.service;
 
 import com.broadcom.lsp.cobol.core.messages.LocaleStore;
 import com.broadcom.lsp.cobol.core.model.ErrorCode;
+import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.services.TextDocumentService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 import static com.broadcom.lsp.cobol.core.model.ErrorCode.values;
 import static com.broadcom.lsp.cobol.service.utils.SettingsParametersEnum.*;
@@ -36,6 +40,16 @@ import static org.mockito.Mockito.*;
 
 /** This test asserts functions of the {@link CobolLanguageServer}, such as initialization. */
 class CobolLanguageServerTest {
+
+  private static CustomThreadPoolExecutor customExecutor;
+
+  @BeforeAll
+  static void init() {
+    customExecutor = mock(CustomThreadPoolExecutor.class);
+    when(customExecutor.getThreadPoolExecutor()).thenReturn(Executors.newFixedThreadPool(3));
+    when(customExecutor.getScheduledThreadPoolExecutor())
+        .thenReturn(Executors.newSingleThreadScheduledExecutor());
+  }
 
   /**
    * Test the {@link CobolLanguageServer#initialized(InitializedParams)} method. Check that the file
@@ -59,9 +73,9 @@ class CobolLanguageServerTest {
         .thenReturn(completedFuture(singletonList(arr)));
     when(settingsService.getConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(List.of("INFO")));
-
     CobolLanguageServer server =
-        new CobolLanguageServer(null, null, watchingService, settingsService, localeStore);
+        new CobolLanguageServer(
+            null, null, watchingService, settingsService, localeStore, customExecutor);
 
     server.initialized(new InitializedParams());
 
@@ -80,7 +94,8 @@ class CobolLanguageServerTest {
    */
   @Test
   void initialize() {
-    CobolLanguageServer server = new CobolLanguageServer(null, null, null, null, null);
+    CobolLanguageServer server =
+        new CobolLanguageServer(null, null, null, null, null, customExecutor);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
@@ -92,6 +107,17 @@ class CobolLanguageServerTest {
     } catch (InterruptedException | ExecutionException e) {
       fail(e.getMessage());
     }
+  }
+
+  /** Test change in server exit status upon shutdown call. */
+  @Test
+  void shutdown() {
+    TextDocumentService textDocumentService = mock(CobolTextDocumentService.class);
+    CobolLanguageServer server =
+        new CobolLanguageServer(textDocumentService, null, null, null, null, customExecutor);
+    assertEquals(1, server.getExitCode());
+    server.shutdown();
+    assertEquals(0, server.getExitCode());
   }
 
   private void checkOnlySupportedCapabilitiesAreSet(ServerCapabilities capabilities) {
