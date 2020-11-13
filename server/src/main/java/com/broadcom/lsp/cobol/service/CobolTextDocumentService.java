@@ -29,6 +29,7 @@ import com.broadcom.lsp.cobol.service.delegates.references.Occurrences;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Builder;
@@ -106,10 +107,12 @@ public class CobolTextDocumentService
     dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
 
+  @VisibleForTesting
   Map<String, CobolDocumentModel> getDocs() {
     return new HashMap<>(docs);
   }
 
+  @VisibleForTesting
   Map<String, Future<?>> getFutureMap() {
     return new HashMap<>(futureMap);
   }

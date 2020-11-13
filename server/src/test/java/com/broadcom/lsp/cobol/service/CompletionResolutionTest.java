@@ -15,7 +15,6 @@
 
 package com.broadcom.lsp.cobol.service;
 
-import com.broadcom.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -29,6 +28,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * This test checks the logic of completion items resolution implemented by {@link
@@ -38,17 +40,26 @@ import static org.junit.jupiter.api.Assertions.*;
  * does server manages different resolving requests, for example for the element that has
  * documentation provided, the one that has no documentation and an invalid request.
  */
-class CompletionResolutionTest extends ConfigurableTest {
+class CompletionResolutionTest {
   private TextDocumentService service;
 
   @BeforeEach
   void createService() {
-    service = injector.getInstance(TextDocumentService.class);
+    service = mock(TextDocumentService.class);
   }
 
   @Test
   void testResolveCompletionItemExisting() {
     CompletionItem unresolved = new CompletionItem("ADD");
+
+    CompletionItem completionItem = new CompletionItem("TEST");
+    completionItem.setDocumentation("TEST_DOC");
+    MarkupContent markupContent = new MarkupContent();
+    markupContent.setKind("TEST_KIND");
+    markupContent.setValue("TEST_VAL");
+    completionItem.setDocumentation(markupContent);
+    when(service.resolveCompletionItem(any(CompletionItem.class)))
+        .thenReturn(CompletableFuture.completedFuture(completionItem));
 
     checkResolving(
         unresolved,
@@ -60,6 +71,12 @@ class CompletionResolutionTest extends ConfigurableTest {
 
   @Test
   void testResolveCompletionItemNonExisting() {
+    CompletionItem completionItem = new CompletionItem("TEST");
+    completionItem.setDocumentation("TEST_DOC");
+    completionItem.setDocumentation(new MarkupContent());
+    when(service.resolveCompletionItem(any(CompletionItem.class)))
+        .thenReturn(CompletableFuture.completedFuture(completionItem));
+
     CompletionItem unresolved = new CompletionItem("abcd");
     checkResolving(unresolved, c -> assertNull(c.getValue()));
   }

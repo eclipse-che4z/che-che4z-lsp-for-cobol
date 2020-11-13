@@ -14,84 +14,62 @@
  */
 package com.broadcom.lsp.cobol.service.delegates.completions;
 
-import com.broadcom.lsp.cobol.ConfigurableTest;
-import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
+import com.broadcom.lsp.cobol.service.CobolDocumentModel;
+import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
-import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.Answer;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.Map;
+import java.util.Set;
 
-import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
+import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /** This tests checks the order of completion elements: 1. Variables 2. Keywords */
-class CompletionsChainTest extends ConfigurableTest {
-  private TextDocumentService service;
-  private static final String TEXT =
-      "       Identification Division. \n"
-          + "       Program-id.    ProgramId.\n"
-          + "       Data Division.\n"
-          + "       Working-Storage Section.\n"
-          + "       01   Feedback. \n"
-          + "        02   Fb-severity      PIC 9(4) Binary. \n"
-          + "        02   Ab-detail        PIC X(10).\n"
-          + "       77   Dest-output       PIC S9(9) Binary.\n"
-          + "       77   Lildate           PIC S9(9) Binary.\n"
-          + "       77   Lilsecs           COMP-2.\n"
-          + "       77   Greg              PIC X(17).\n"
-          + "       01   Pattern.\n"
-          + "        02                    PIC 9(4) Binary Value 45.\n"
-          + "        02                    PIC X(45) Value \"\".\n"
-          + "       77   Start-Msg         PIC X(80) Value \"\".\n"
-          + "       77   Ending-Msg        PIC X(80) Value \"\".\n"
-          + "       01 Msg.\n"
-          + "         02 Stringlen         PIC S9(4) Binary.\n"
-          + "         02 Str               .\n"
-          + "          03                  PIC X Occurs 1 to 80 times\n"
-          + "                                     Depending on Stringlen.\n"
-          + "       Procedure Division.\n"
-          + "       000-Main-Logic.\n"
-          + "           Perform 100-Say-Hello.\n"
-          + "           Perform 200-Get-Date.\n"
-          + "           Perform 300-Say-Goodbye.\n"
-          + "           Stop Run.\n"
-          + "       100-Say-Hello. f\n"
-          + "       200-Get-Date. A\n"
-          + "       300-Say-Goodbye.\n"
-          + "       End program ProgramId.";
+class CompletionsChainTest {
+
+  private final CobolDocumentModel MODEL =
+      new CobolDocumentModel(
+          "TOKEN",
+          AnalysisResult.builder()
+              .variableDefinitions(Map.of("TOKEN_0", List.of(new Location())))
+              .build());
+  private Completions completions;
 
   @BeforeEach
   void createService() {
-    service = injector.getInstance(TextDocumentService.class);
-    TestLanguageClient client = injector.getInstance(TestLanguageClient.class);
-    client.clean();
-    runTextValidation(service, TEXT);
-    waitForDiagnostics(client);
+    VariableCompletion variableCompletion = new VariableCompletion();
+    KeywordCompletion keywordCompletion = mock(KeywordCompletion.class);
+    when(keywordCompletion.getCompletionSource(any(CobolDocumentModel.class)))
+        .thenReturn(List.of("TOKEN_1", "TOKEN_2"));
+    when(keywordCompletion.getKind()).thenReturn(CompletionItemKind.Keyword);
+    when(keywordCompletion.getSortOrderPrefix()).thenReturn("4");
+    when(keywordCompletion.customize(any(CompletionItem.class)))
+        .thenAnswer((Answer<CompletionItem>) invocation -> invocation.getArgument(0));
+
+    completions = new Completions(Set.of(variableCompletion, keywordCompletion));
   }
 
   @Test
-  void testCompletionsOrder() throws ExecutionException, InterruptedException {
-    List<CompletionItem> list = getCompletionItems(service, new Position(28, 22));
+  void testCompletionsOrder() {
+    List<CompletionItem> list = getCompletionItems(new Position(0, 5)).getItems();
+    list.sort(Comparator.comparing(CompletionItem::getSortText));
     assertFalse(list.isEmpty());
-
+    assertEquals(3, list.size());
     assertEquals(CompletionItemKind.Variable, list.get(0).getKind());
-    assertEquals(CompletionItemKind.Snippet, list.get(2).getKind());
     assertEquals(CompletionItemKind.Keyword, list.get(list.size() - 1).getKind());
   }
 
-  private List<CompletionItem> getCompletionItems(TextDocumentService service, Position position)
-      throws InterruptedException, ExecutionException {
-    CompletableFuture<Either<List<CompletionItem>, CompletionList>> completions =
-        service.completion(
-            new CompletionParams(new TextDocumentIdentifier(DOCUMENT_URI), position));
-
-    Either<List<CompletionItem>, CompletionList> either = completions.get();
-    return either.getRight().getItems();
+  private CompletionList getCompletionItems(Position position) {
+    return completions.collectFor(
+        MODEL, new CompletionParams(new TextDocumentIdentifier(DOCUMENT_URI), position));
   }
 }

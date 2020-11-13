@@ -15,28 +15,21 @@
 
 package com.broadcom.lsp.cobol.service.delegates.references;
 
-import org.eclipse.lsp4j.Location;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-/** This test checks the predefined variables locations provider logic */
-class ConstantLocationsTest extends AbstractReferenceTest {
+/** Test {@link CopybookLocations} */
+class CopybookLocationsTest extends AbstractReferenceTest {
 
   @BeforeEach
-  void setup() {
-    this.provider = new ConstantLocations();
+  void setUp() {
+    this.provider = new CopybookLocations();
   }
 
-  @Override
   @Test
-  void definitions() {
-    Map<String, List<Location>> definitions = provider.definitions(MODEL);
-    assertTrue(definitions.isEmpty());
+  void containsToken() {
+    assertFalse(provider.containsToken(MODEL, "non-expected"));
   }
 }
