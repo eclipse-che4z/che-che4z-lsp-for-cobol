@@ -42,7 +42,7 @@ class TestReplacingForSeveralTokensInOneLine {
           + "       01 {$*ABCDE-PARENT}.\r\n"
           + "       PROCEDURE DIVISION.\r\n"
           + "       {#*MAIN-LINE}.\r\n"
-          + "       COPY {~REPL} REPLACING ==:TAG:== BY ==ABCDE==.\r\n"
+          + "       {_COPY {~REPL} REPLACING ==:TAG:== BY ==ABCDE==.|invalid|struct_}\r\n"
           + "           GOBACK.";
 
   private static final String REPL =

@@ -438,8 +438,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   @Override
   public Class visitParagraphNameUsage(ParagraphNameUsageContext ctx) {
     String name = ctx.getText().toUpperCase();
-    getLocality(ctx.getStart())
-        .ifPresent(l -> groupContext.addCandidateUsage(name, l));
+    getLocality(ctx.getStart()).ifPresent(l -> groupContext.addCandidateUsage(name, l));
     return visitChildren(ctx);
   }
 
@@ -566,7 +565,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   private String extractErrorStatementText(@NonNull Token childToken, @NonNull Token parentToken) {
-    List<Token> tokenList = tokenStream.getTokens(childToken.getTokenIndex(), parentToken.getTokenIndex());
+    List<Token> tokenList =
+        tokenStream.getTokens(childToken.getTokenIndex(), parentToken.getTokenIndex());
 
     return Optional.ofNullable(tokenList).stream()
         .flatMap(Collection::stream)
@@ -580,6 +580,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
         .uri(start.getUri())
         .range(new Range(start.getRange().getStart(), stop.getRange().getEnd()))
         .recognizer(CobolVisitor.class)
+        .copybookId(start.getCopybookId())
         .build();
   }
 
@@ -617,7 +618,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void areaAWarning(Token token) {
     getLocality(token)
         .filter(it -> it.getRange().getStart().getCharacter() > 10)
-        .ifPresent(it -> throwException(token.getText(), it, messageService.getMessage("CobolVisitor.AreaAWarningMsg")));
+        .ifPresent(
+            it ->
+                throwException(
+                    token.getText(),
+                    it,
+                    messageService.getMessage("CobolVisitor.AreaAWarningMsg")));
   }
 
   private void areaBWarning(@NonNull List<Token> tokenList) {
@@ -628,14 +634,20 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
                     locality -> {
                       int charPosition = locality.getRange().getStart().getCharacter();
                       if (charPosition > 6 && charPosition < 11 && token.getChannel() != 1) {
-                        throwException(token.getText(), locality, messageService.getMessage("CobolVisitor.AreaBWarningMsg"));
+                        throwException(
+                            token.getText(),
+                            locality,
+                            messageService.getMessage("CobolVisitor.AreaBWarningMsg"));
                       }
                     }));
   }
 
   private void checkProgramName(Token token) {
     if (programName == null) {
-      getLocality(token).ifPresent(it -> throwException("", it, messageService.getMessage("CobolVisitor.progIDIssueMsg")));
+      getLocality(token)
+          .ifPresent(
+              it ->
+                  throwException("", it, messageService.getMessage("CobolVisitor.progIDIssueMsg")));
     } else {
       checkProgramNameIdentical(token);
     }
@@ -644,14 +656,18 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private void checkProgramNameIdentical(Token token) {
     String text = PreprocessorStringUtils.trimQuotes(token.getText());
     if (!programName.equals(text)) {
-      getLocality(token).ifPresent(it -> throwException(programName, it, messageService.getMessage("CobolVisitor.identicalProgMsg")));
+      getLocality(token)
+          .ifPresent(
+              it ->
+                  throwException(
+                      programName, it, messageService.getMessage("CobolVisitor.identicalProgMsg")));
     }
   }
 
   // NOTE: CobolVisitor is not managed by Guice DI, so can't use annotation here.
   @Override
   public Class visitChildren(RuleNode node) {
-    if(Thread.interrupted()) {
+    if (Thread.interrupted()) {
       LOG.debug("visitChildren method interrupted by user");
       throw new ParseCancellationException("Parsing interrupted by user.");
     }
