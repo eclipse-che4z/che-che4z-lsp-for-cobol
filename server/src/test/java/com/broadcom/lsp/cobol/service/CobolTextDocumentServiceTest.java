@@ -126,14 +126,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   }
 
   @Test
-  void testIncorrectLanguageId() {
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, "incorrectId", 1, TEXT_EXAMPLE)));
-    verify(communications).notifyThatEngineNotFound("incorrectId");
-  }
-
-  @Test
   void testDidSave() {
     TextDocumentIdentifier saveDocumentIdentifier =
         new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI);

@@ -31,6 +31,7 @@
     ],
     "activationEvents": [
         "onLanguage:COBOL",
+        "onLanguage:COBOL Copybook",
         "workspaceContains:/.c4z"
     ],
     "icon": "resources/logo.png",
@@ -63,9 +64,14 @@
                 "id": "COBOL",
                 "extensions": [
                     ".cbl",
-                    ".cpy",
                     ".cob",
                     ".cobol"
+                ]
+            },
+            {
+                "id": "COBOL Copybook",
+                "extensions": [
+                    ".cpy"
                 ]
             }
         ],
@@ -78,11 +84,24 @@
                     "meta.embedded.block.sql": "sql",
                     "meta.embedded.block.html": "html"
                 }
+            },
+            {
+                "language": "COBOL Copybook",
+                "scopeName": "source.cobol",
+                "path": "./syntaxes/COBOL.tmLanguage.json",
+                "embeddedLanguages": {
+                    "meta.embedded.block.sql": "sql",
+                    "meta.embedded.block.html": "html"
+                }
             }
         ],
         "snippets": [
             {
                 "language": "COBOL",
+                "path": "./snippets.json"
+            },
+            {
+                "language": "COBOL Copybook",
                 "path": "./snippets.json"
             }
         ],
