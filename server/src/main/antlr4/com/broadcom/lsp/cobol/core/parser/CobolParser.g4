@@ -8,7 +8,7 @@
 
 parser grammar CobolParser;
 options {tokenVocab = CobolLexer;}
-import CICSParser;
+import Db2SqlParser;
    
 startRule : compilationUnit EOF;
 
@@ -1016,9 +1016,8 @@ execCicsStatement
    ;
 
 // exec sql statement
-
 execSqlStatement
-   : EXEC SQL ~END_EXEC*? END_EXEC DOT_FS?
+   : EXEC SQL allSqlRules END_EXEC DOT_FS?
    ;
 
 // exec sql ims statement
