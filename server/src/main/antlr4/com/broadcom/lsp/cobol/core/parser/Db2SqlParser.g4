@@ -40,9 +40,8 @@ dbs_associate: ASSOCIATE (RESULT SET)? (LOCATOR | LOCATORS) dbs_rs_locator_varia
 dbs_begin: BEGIN DECLARE SECTION;
 
 /*CALL */
-//?
-dbs_call: CALL (dbs_procedure_name | dbs_variable) (LPARENCHAR dbs_expression (COMMACHAR dbs_expression)* | NULL |
-          TABLE dbs_transition_table_name RPARENCHAR | USING DESCRIPTOR dbs_descriptor_name)?;
+dbs_call: CALL (dbs_procedure_name | dbs_variable) (USING DESCRIPTOR dbs_descriptor_name | LPARENCHAR dbs_call_loop? RPARENCHAR)?;
+dbs_call_loop: (dbs_expression | NULL | TABLE dbs_transition_table_name) (COMMACHAR (dbs_expression | NULL | TABLE dbs_transition_table_name))*;
 
 /*CLOSE */
 dbs_close: CLOSE dbs_cursor_name;
