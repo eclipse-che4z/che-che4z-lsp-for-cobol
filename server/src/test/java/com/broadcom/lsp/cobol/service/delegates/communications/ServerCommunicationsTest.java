@@ -22,7 +22,6 @@ import com.google.inject.Provider;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp4j.MessageType.Error;
@@ -62,7 +60,6 @@ class ServerCommunicationsTest {
   @Mock private MessageService messageService;
 
   @Mock private CustomThreadPoolExecutor customExecutor;
-  @Mock private ScheduledExecutorService executor;
 
   @BeforeEach
   void init(TestInfo info) {
@@ -80,23 +77,6 @@ class ServerCommunicationsTest {
     assertDocumentAnalysedNotification(DOCUMENT_URI, "document.cbl");
     assertDocumentAnalysedNotification("document.cbl", "document.cbl");
     assertDocumentAnalysedNotification("", "");
-  }
-
-  /**
-   * Method {@link ServerCommunications#notifyThatEngineNotFound(String)} should asynchronously
-   * populate message with a language type on the client
-   */
-  @Test
-  void testNotifyThatEngineNotFound() {
-    String data = UUID.randomUUID().toString();
-    when(messageService.getMessage(anyString(), anyString()))
-        .thenReturn("Cannot find a language engine for the given language ID: %s");
-    communications.notifyThatEngineNotFound(data);
-    verify(client, timeout(TEST_TIMEOUT))
-        .showMessage(
-            eq(
-                new MessageParams(
-                    Error, messageService.getMessage("Communications.noLangEngine", data))));
   }
 
   /**

@@ -126,14 +126,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   }
 
   @Test
-  void testIncorrectLanguageId() {
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, "incorrectId", 1, TEXT_EXAMPLE)));
-    verify(communications).notifyThatEngineNotFound("incorrectId");
-  }
-
-  @Test
   void testDidSave() {
     TextDocumentIdentifier saveDocumentIdentifier =
         new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI);
@@ -151,6 +143,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(CPY_DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+    assertTrue(service.getOutlineMap().get(CPY_DOCUMENT_URI).isDone());
     verify(communications).notifyThatExtensionIsUnsupported(anyString());
   }
 
