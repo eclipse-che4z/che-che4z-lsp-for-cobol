@@ -117,6 +117,11 @@ public class CobolTextDocumentService
     return new HashMap<>(futureMap);
   }
 
+  @VisibleForTesting
+  public Map<String, CompletableFuture<List<DocumentSymbol>>> getOutlineMap() {
+    return outlineMap;
+  }
+
   @Override
   @CheckServerShutdownState
   public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
@@ -256,6 +261,10 @@ public class CobolTextDocumentService
   private void registerEngineAndAnalyze(String uri, String text) {
     String fileExtension = extractExtension(uri);
     if (fileExtension != null && !isCobolFile(fileExtension)) {
+      outlineMap.computeIfPresent(uri, (k,v) -> {
+        v.complete(List.of(new DocumentSymbol()));
+        return v;
+      });
       communications.notifyThatExtensionIsUnsupported(fileExtension);
     } else {
       communications.notifyThatLoadingInProgress(uri);

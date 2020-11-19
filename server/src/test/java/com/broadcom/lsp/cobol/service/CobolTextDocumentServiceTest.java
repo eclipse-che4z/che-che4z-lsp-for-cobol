@@ -143,6 +143,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(CPY_DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+    assertTrue(service.getOutlineMap().get(CPY_DOCUMENT_URI).isDone());
     verify(communications).notifyThatExtensionIsUnsupported(anyString());
   }
 
