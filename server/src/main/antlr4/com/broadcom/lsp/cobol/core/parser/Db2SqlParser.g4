@@ -344,7 +344,6 @@ dbs_merge_assignment: (dbs_column_name EQUALCHAR (dbs_expression | DEFAULT | NUL
 dbs_merge_insert: INSERT (LPARENCHAR dbs_column_name (COMMACHAR dbs_column_name)* RPARENCHAR)? VALUES (dbs_expression | DEFAULT | NULL |
         LPARENCHAR (dbs_expression | DEFAULT | NULL) (COMMACHAR (dbs_expression | DEFAULT | NULL))* RPARENCHAR);
 
-dbs_table_reference: literal+; //?
 
 /*OPEN */
 dbs_open: OPEN dbs_cursor_name (USING (DESCRIPTOR dbs_descriptor_name) | (dbs_variable | dbs_array_variable
@@ -353,7 +352,6 @@ dbs_open: OPEN dbs_cursor_name (USING (DESCRIPTOR dbs_descriptor_name) | (dbs_va
 /*PREPARE */
 dbs_prepare: PREPARE dbs_statement_name (INTO dbs_descriptor_name (USING (NAMES | LABELS | ANY | BOTH))?)? (FROM dbs_string_expression | (ATTRIBUTES dbs_attr_host_variable)? FROM dbs_variable);
 
-dbs_attr_host_variable: literal+; //?
 
 /*REFRESH TABLE */
 dbs_refresh: REFRESH TABLE dbs_table_name (QUERYNO dbs_integer);
@@ -366,8 +364,6 @@ dbs_savepoint_name: literal+; //?
 /*RENAME */
 dbs_rename: RENAME (TABLE? dbs_table_name TO dbs_table_identifier | INDEX dbs_index_name TO dbs_index_identifier);
 
-dbs_table_identifier: literal+; //?
-dbs_index_identifier: literal+; //?
 
 /*REVOKE (all) */
 
@@ -389,9 +385,6 @@ dbs_set: literal+; //?
 dbs_signal: dbs_label? SIGNAL (dbs_sql_condition_name | SQLSTATE VALUE? (dbs_sqlstate_string_constant | dbs_sql_variable_name |
             dbs_sql_parameter_name)) (SET MESSAGE_TEXT EQUALCHAR)? dbs_diagnostic_string_expression;
 
-dbs_sql_condition_name: literal+; //?
-dbs_sqlstate_string_constant: literal+; //?
-dbs_diagnostic_string_expression: literal+; //?
 
 /*TRANSFER OWNERSHIP */
 dbs_transfer: TRANSFER OWNERSHIP OF (DATABASE dbs_database_name | INDEX dbs_index_name | STOGROUP dbs_stogroup_name |
@@ -461,79 +454,157 @@ dbs_option_list: (LANGUAGE SQL)? (SPECIFIC dbs_specific_name)? (NOT? DETERMINIST
 
 
 
+sqlWord: NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral | generalIdentifier |
+            cobolWord | cics_cobol_intersected_words | db2sql_intersected_words | db2sql_only_words;
+
+
+db2sql_intersected_words: ACCESS | ALL | ANY | APPLY | ARE | AS | ASCII | AT | BEFORE | BINARY | BIT | BLOB | BY |
+                            CALL | CHANGED | CHARACTER | CLOB | COBOL | CONTAINS | CONTINUE | CONTROL | COPY | CORR |
+                            CORRESPONDING | COUNT | CURSOR | DATA | DATE | DAY | DB | DBCLOB | DEFAULT | DEFINITION |
+                            DELETE | DISABLE | DOUBLE | DYNAMIC | EBCDIC | ELSE | ENABLE | END | END_EXEC | ERASE |
+                            ESCAPE | EVENT | EXCEPTION | EXCLUSIVE | EXEC | EXTENDED | EXTERNAL | FALSE | FILE | FIRST |
+                            FOR | FROM | FUNCTION | GENERATE | GLOBAL | GO | IF | IN | INDEX | INTEGER | INTO | KEY |
+                            LANGUAGE | LAST | LEADING | LEFT | LENGTH | LIBRARY | LOCAL | LOCK | MERGE | MODE | NAMED |
+                            NATIONAL | NEXT | NO | NOT | NULL | NULLS | NUMERIC |OF | OFF | ON | OPTIONAL | OR | ORDER |
+                            OUTPUT | PASSWORD | POSITION | PROCEDURE | PROGRAM | READ | REAL | REF | REFERENCE | REFERENCES |
+                            RELATIVE | RELEASE | REPLACE | RESET | RETURN RIGHT | RUN | SEARCH | SECTION | SELECT | SET | SPACE |
+                            SQL | START | THEN | TIME | TO TRAILING | TRUE | TYPE | UNTIL | USAGE | USE | USING | VALUE |
+                            VALUES | VARYING | WHEN | WITH | WRITE | XML | YEAR;
+
+
+db2sql_only_words: ABSOLUTE | ACCELERATION | ACCELERATOR | ACTIVATE | ACTIVE | ADA | ALIAS | ALLOW | ALTERIN | ALWAYS | APPEND |
+                            APPLCOMPAT | APPLICATION | ARCHIVE | ASC | ASSERTION | ASSOCIATE | ASUTIME | ATOMIC | AUTHID |
+                            AUTHORIZATION | AUTOMATIC | AVG | BEGIN | BETWEEN | BIGINT | BIND | BINDADD | BIT_LENGTH | BLOCKED |
+                            BOTH | BUFFERPOOL | BUFFERPOOLS | BUSINESS_TIME | CACHE | CALLED | CALLER | CAPTURE | CARDINALITY |
+                            CASCADE | CASE | CAST | CATALOG | CATALOG_NAME | CHANGES | CHAR_LENGTH | CHARACTER_LENGTH |
+                            CHECKED | CLAUSE | CLUSTER | COLLATE | COLLATION | COLLECT | COLLECTION | COLLID | COLUMN | COMMENT |
+                            COMMIT | COMMITTED | COMPARISONS | CONCAT | CONCENTRATE | CONCURRENT | CONDITION_NUMBER | CONNECTION |
+                            CONNECTION_NAME | CONSERVATIVE | CONSTRAINT | CONSTRAINTS | CONTEXT | CONVERT | CORRELATION | COUNT_BIG |
+                            CPU | CREATEIN | C R E A T E I N | CREATETAB | CROSS | CS | CUBE | CURRENT_DATE | CURRENT_PATH |
+                            CURRENT_SCHEMA | CURRENT_SERVER | CURRENT_SQLID | CURRENT_TIME | CURRENT_TIMESTAMP | CURRENT_TIMEZONE |
+                            CURRENT_USER | CURRENTLY | CURSOR_NAME | CURSORS | CYCLE | DATABASE | DATALINK | DB2_AUTHENTICATION_TYPE |
+                            DB2_AUTHORIZATION_ID | DB2_CONNECTION_STATE | DB2_CONNECTION_STATUS | DB2_ENCRYPTION_TYPE | DB2_ERROR_CODE1 |
+                            DB2_ERROR_CODE2 | DB2_ERROR_CODE3 | DB2_ERROR_CODE4 | DB2_GET_DIAGNOSTICS_DIAGNOSTICS | DB2_INTERNAL_ERROR_POINTER |
+                            DB2_LAST_ROW | DB2_LINE_NUMBER | DB2_MESSAGE_ID | DB2_MODULE_DETECTING_ERROR | DB2_NUMBER_PARAMETER_MARKERS | DB2_NUMBER_RESULT_SETS |
+                            DB2_NUMBER_ROWS | DB2_ORDINAL_TOKEN1 | DB2_ORDINAL_TOKEN2 | DB2_ORDINAL_TOKEN3 | DB2_ORDINAL_TOKEN4 | DB2_PRODUCT_ID |
+                            DB2_REASON_CODE | DB2_RETURN_STATUS | DB2_RETURNED_SQLCODE | DB2_ROW_NUMBER | DB2_SERVER_CLASS_NAME | DB2_SQL_ATTR_CURSOR_HOLD |
+                            DB2_SQL_ATTR_CURSOR_ROWSET | DB2_SQL_ATTR_CURSOR_SCROLLABLE | DB2_SQL_ATTR_CURSOR_SENSITIVITY | DB2_SQL_ATTR_CURSOR_TYPE |
+                            DB2_SQL_NESTING_LEVEL | DB2_SQLERRD1 | DB2_SQLERRD2 | DB2_SQLERRD3 | DB2_SQLERRD4 | DB2_SQLERRD5 | DB2_SQLERRD6 |
+                            DB2_SQLERRD_SET | DB2_TOKEN_COUNT | DB2DARI | DB2GENERAL | DB2GENRL | DB2SQL | DBADM | DBINFO | DEADLOCKS | DEALLOCATE |
+                            DEBUG | DEC | DEC_ROUND_CEILING | DEC_ROUND_DOWN | DEC_ROUND_FLOOR | DEC_ROUND_HALF_DOWN | DEC_ROUND_HALF_EVEN |
+                            DEC_ROUND_HALF_UP | DEC_ROUND_UP | DECFLOAT | DECIMAL | DECLARE | DEFAULTS | DEFER | DEFERRABLE | DEFERRED | DEFINEBIND |
+                            DEFINERUN | DEGREE | DESC | DESCRIBE | DESCRIPTOR | DETERMINISTIC | DIAGNOSTICS | DIMENSIONS | DISALLOW |
+                            DISPATCH | DISTINCT | DO | DOMAIN | DOUBLEQUOTE | DROP | DROPIN | DYNAMICRULES | EACH | ELIGIBLE |
+                            ELSEIF | EMPTY | ENCODING | ENVIRONMENT | EQUALCHAR | EUR | EXACT | EXCEPT | EXCHANGE | EXCLUDE | EXCLUDING |
+                            EXECUTE | EXISTS | EXIT | EXPLAIN | EXTENSION | FAILBACK | FEDERATED | FENCED | FETCH | FINAL | FIRST | FLOAT |
+                            FLUSH | FOLLOWING | FOREIGN | FORMAT | FORTRAN | FOUND | FREEPAGE | FS | FULL | GBPCACHE | GENERAL | GENERATED |
+                            GET_ACCEL_ARCHIVE | GOTO | GRANT | GRAPHIC | GROUP | GROUPING | HANDLER | HAVING | HOUR | IDENTITY | IMPLICIT_SCHEMA |
+                            INCLUDE | INCLUDING | INDEXES | INDICATOR | INHERIT | INITIAL_INSTS | INITIAL_IOS | INITIALLY | INNER | INOUT |
+                            INSENSITIVE | INSTEAD | INSTS_PER_ARGBYTE | INSTS_PER_INVOC | INT | INTEGRITY | INTERSECT | INVALID | INVOKEBIND |
+                            INVOKERUN | IOS_PER_ARGBYTE | IOS_PER_INVOC | IS | ISO | ISOLATION | ITERATE | JAVA | JIS | JOIN | KEYS |
+                            LABELS | LARGE | LEAVE | LIKE | LIMIT | LINKTYPE | LITERALS | LOCATOR | LOCATORS | LOCKED | LOCKS | LOCKSIZE |
+                            LOGGED | LONG | LONGVAR | LOOP | LOWER | MAINTAINED | MAPPING | MASK | MATCH | MAX | MAXVALUE | MESSAGE_TEXT | MICROSECOND |
+                            MICROSECONDS | MINUTE | MINVALUE | MIXED | MODIFIES | MODULE | MONTHS | NAMES | NATURAL | NCHAR | NEW | NEW_TABLE |
+                            NEXTVAL | NICKNAME | NOCACHE | NOCYCLE | NODE | NOMINVALUE | NOORDER | NULLABLE | NUMBER | OBJECT | OCTETS |
+                            CODEUNITS32 | OLD | OLD_TABLE | OLE | OLEDB | ONCE | ONLINE | ONLY | OPTHINT | OPTIMIZATION | OPTIMIZE | OUT |
+                            OUTCOME | OUTER | OVER | OVERLAPS | OVERRIDING | PACKAGE | PAD | PARALLEL | PARAMETER | PARTIAL | PARTITION |
+                            PARTITIONING | PASCAL | PASSTHRU | PCTFREE | PERCENT_ARGBYTES | PERMISSION | PIECESIZE | PIPE | PLAN | PLI | PORTION |
+                            PRECEDING | PRECISION | PRESERVE | PRIMARY | PRIOR | PRIQTY | PRIVILEGES | PROTOCOL | PUBLIC | QUALIFIER | QUERYNO |
+                            RANGE | READS | RECOMMEND | RECOVERY | REFERENCING | REFRESH | REGISTERS | RENAME | REOPT | REPEAT | REPLICATED |
+                            REQUIRED | RESIDENT | RESIGNAL | RESOLUTION | RESOLVE | RESTORE | RESTRICT | RESULT_SET_LOCATOR | RETURN_STATUS |
+                            RETURNED_SQLSTATE | RETURNS | REVOKE | ROLLUP | ROUNDING | ROUTINE | ROW | ROW_COUNT | ROWID | ROWS | ROWSET |
+                            RR | RS | SAVEPOINT | SBCS | SCALE | SCHEMA | SCRATCHPAD | SCROLL | SECOND | SECQTY | SECURED | SELECTIVITY |
+                            SELF | SENSITIVE | SEQUENCE | SERIALIZABLE | SERVER_NAME | SESSION_USER | SETS | SHARE | SHRLEVEL | SIGNAL |
+                            SIMPLE | SIZE | SMALLINT | SNAPSHOT | SOME | SPECIAL | SPECIFIC | SQLCA | SQLCODE | SQLDA | SQLERROR | SQLEXCEPTION |
+                            SQLID | SQLSTATE | SQLWARNING | STABILIZED | STACKED | STARTING | STATEMENT | STATEMENTS | STATIC | STATISTICS |
+                            STAY | STMTCACHE | STMTID | STMTTOKEN | STOGROUP | STORED | STYLE | SUB | SUBSTR | SUBSTRING | SUMMARY |
+                            SWITCH | SYNONYM | SYSTEM | SYSTEM_TIME | SYSTEM_USER | TABLE | TABLE_NAME | TABLESPACE | TABLESPACES | TEMPORARY |
+                            THREADSAFE | TIMESTAMP | TIMEZONE | TIMEZONE_HOUR | TIMEZONE_MINUTE | TRANSLATE | TRANSLATION | TREAT | TRIM |
+                            TRUSTED | UNBOUNDED | UNDER | UNDO | UNICODE | UNION | UNIQUE | UNKNOWN | UPPER | USA | USER | VALIDATE | VARBINARY |
+                            VARCHAR | VARGRAPHIC | VARIABLE | VARIANT | VCAT | VERSION | VIEW | VOLATILE | WAITFORDATA | WHENEVER | WHERE |
+                            WHILE | WITHOUT | WLM | WORK | WRAPPER | YEARS | YES | ZONE;
+
+
 //Variables
-dbs_accelerator_name: literal+; //?
-dbs_alias_name: literal+; //?
-dbs_array_index: literal+; //?
-dbs_array_type_name: literal+; //?
-dbs_array_variable: literal+; //?
-dbs_authorization_name: literal+; //?
-dbs_collection_id_package_name: literal+; //?
-dbs_collection_name: literal+; //?
-dbs_column_name: literal+; //?
-dbs_common_table_expression: literal+; //?
-dbs_context: literal+; //?
-dbs_copy_id: literal+; //?
-dbs_correlation_name: literal+; //?
-dbs_cursor_name: literal+; //?
-dbs_database_name: literal+; //?
-dbs_descriptor_name: literal+; //?
-dbs_distinct_type: literal+; //?
-dbs_distinct_type_name: literal+; //?
-dbs_explainable_sql_statement: literal+; //?
-dbs_expression: literal+; //?
-dbs_fetch_clause: literal+; //?
-dbs_fullselect: literal+; //?
-dbs_function_name: literal+; //?
-dbs_global_variable_name: literal+; //?
-dbs_host_label: literal+; //?
-dbs_host_variable: literal+; //?
-dbs_host_variable_array: literal+; //?
-dbs_host_variable_name: literal+; //?
-dbs_id_host_variable: literal+; //?
-dbs_include_data_type: literal+; //?
-dbs_index_name: literal+; //?
-dbs_integer: literal+; //?
-dbs_integer_constant: literal+; //?
-dbs_level: literal+; //?
-dbs_location_name: literal+; //?
-dbs_mask_name: literal+; //?
-dbs_member_name: literal+; //?
-dbs_name: literal+; //?
-dbs_nnnn_m: literal+; //?
-dbs_package_name: literal+; //?
-dbs_permission_name: literal+; //?
-dbs_plan_name: literal+; //?
-dbs_procedure_name: literal+; //?
-dbs_role_name: literal+; //?
-dbs_routine_version_id: literal+; //?
-dbs_row_fullselect: literal+; //?
-dbs_rs_locator_variable: literal+; //?
-dbs_s: literal+; //?
-dbs_schema_name: literal+; //?
-dbs_search_condition: literal+; //?
-dbs_sequence_name: literal+; //?
-dbs_specific_name: literal+; //?
-dbs_sql_parameter_name: literal+; //?
-dbs_sql_variable_name: literal+; //?
-dbs_statement_name: literal+; //?
-dbs_stogroup_name: literal+; //?
-dbs_string_constant: literal+; //?
-dbs_string_expression: literal+; //?
-dbs_synonym: literal+; //?
-dbs_table_name: literal+; //?
-dbs_table_space_name: literal+; //?
-dbs_token_host_variable: literal+; //?
-dbs_transition_table_name: literal+; //?
-dbs_transition_variable_name: literal+; //?
-dbs_trigger_name: literal+; //?
-dbs_type_name: literal+; //?
-dbs_unpack_function_invocation: literal+; //?
-dbs_value: literal+; //?
-dbs_variable: literal+; //?
-dbs_variable_name: literal+; //?
-dbs_version_id: literal+; //?
-dbs_version_name: literal+; //?
-dbs_view_name: literal+; //?
+dbs_accelerator_name: sqlWord+; //?
+dbs_alias_name: sqlWord+; //?
+dbs_array_index: INTEGER;   //?
+dbs_array_type_name: sqlWord+; //?
+dbs_array_variable: sqlWord+; //?
+dbs_attr_host_variable: literal+; //?
+dbs_authorization_name: sqlWord+; //?IDENTIFIER
+dbs_collection_id_package_name: sqlWord+; //?
+dbs_collection_name: sqlWord+; //?
+dbs_column_name: sqlWord+; //?
+dbs_common_table_expression: sqlWord+; //?
+dbs_context: sqlWord+; //?
+dbs_copy_id: sqlWord+; //?
+dbs_correlation_name: sqlWord+; //?
+dbs_cursor_name: sqlWord+; //?
+dbs_database_name: sqlWord+; //?
+dbs_descriptor_name: sqlWord+; //?
+dbs_diagnostic_string_expression: literal+; //?
+dbs_distinct_type: sqlWord+; //?
+dbs_distinct_type_name: sqlWord+; //?
+dbs_explainable_sql_statement: sqlWord+; //?
+dbs_expression: sqlWord+; //?
+dbs_fetch_clause: sqlWord+; //?
+dbs_fullselect: sqlWord+; //?
+dbs_function_name: sqlWord+; //?
+dbs_global_variable_name: sqlWord+; //?
+dbs_host_label: sqlWord+; //?
+dbs_host_variable: sqlWord+; //?
+dbs_host_variable_array: sqlWord+; //?
+dbs_host_variable_name: sqlWord+; //?
+dbs_id_host_variable: sqlWord+; //?
+dbs_include_data_type: sqlWord+; //?
+dbs_index_identifier: literal+; //?
+dbs_index_name: sqlWord+; //?
+dbs_integer: sqlWord+; //?
+dbs_integer_constant: sqlWord+; //?
+dbs_level: sqlWord+; //?
+dbs_location_name: sqlWord+; //?
+dbs_mask_name: sqlWord+; //?
+dbs_member_name: sqlWord+; //?
+dbs_name: sqlWord+; //?
+dbs_nnnn_m: sqlWord+; //?
+dbs_package_name: sqlWord+; //?
+dbs_permission_name: sqlWord+; //?
+dbs_plan_name: sqlWord+; //?
+dbs_procedure_name: sqlWord+; //?
+dbs_role_name: sqlWord+; //?
+dbs_routine_version_id: sqlWord+; //?
+dbs_row_fullselect: sqlWord+; //?
+dbs_rs_locator_variable: sqlWord+; //?
+dbs_s: sqlWord+; //?
+dbs_schema_name: sqlWord+; //?
+dbs_search_condition: sqlWord+; //?
+dbs_sequence_name: sqlWord+; //?
+dbs_specific_name: sqlWord+; //?
+dbs_sql_condition_name: literal+; //?
+dbs_sql_parameter_name: sqlWord+; //?
+dbs_sql_variable_name: sqlWord+; //?
+dbs_sqlstate_string_constant: literal+; //?
+dbs_statement_name: sqlWord+; //?
+dbs_stogroup_name: sqlWord+; //?
+dbs_string_constant: sqlWord+; //?
+dbs_string_expression: sqlWord+; //?
+dbs_synonym: sqlWord+; //?
+dbs_table_identifier: literal+; //?
+dbs_table_name: sqlWord+; //?
+dbs_table_reference: literal+; //?
+dbs_table_space_name: sqlWord+; //?
+dbs_token_host_variable: sqlWord+; //?
+dbs_transition_table_name: sqlWord+; //?
+dbs_transition_variable_name: sqlWord+; //?
+dbs_trigger_name: sqlWord+; //?
+dbs_type_name: sqlWord+; //?
+dbs_unpack_function_invocation: sqlWord+; //?
+dbs_value: sqlWord+; //?
+dbs_variable: sqlWord+; //?
+dbs_variable_name: sqlWord+; //?
+dbs_version_id: sqlWord+; //?
+dbs_version_name: sqlWord+; //?
+dbs_view_name: sqlWord+; //?
 
 /*STATEMENTS - */
