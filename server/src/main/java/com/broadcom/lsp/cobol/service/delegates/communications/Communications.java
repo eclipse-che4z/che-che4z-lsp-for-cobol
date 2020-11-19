@@ -23,8 +23,6 @@ import java.util.Map;
 public interface Communications {
   void notifyThatLoadingInProgress(String uri);
 
-  void notifyThatEngineNotFound(String languageType);
-
   void publishDiagnostics(Map<String, List<Diagnostic>> diagnostics);
 
   void cancelProgressNotification(String uri);

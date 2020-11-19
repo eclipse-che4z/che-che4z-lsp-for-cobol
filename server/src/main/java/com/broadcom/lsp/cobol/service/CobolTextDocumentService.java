@@ -117,6 +117,11 @@ public class CobolTextDocumentService
     return new HashMap<>(futureMap);
   }
 
+  @VisibleForTesting
+  public Map<String, CompletableFuture<List<DocumentSymbol>>> getOutlineMap() {
+    return outlineMap;
+  }
+
   @Override
   @CheckServerShutdownState
   public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
@@ -206,8 +211,7 @@ public class CobolTextDocumentService
     }
 
     String text = params.getTextDocument().getText();
-    String langId = params.getTextDocument().getLanguageId();
-    registerEngineAndAnalyze(uri, langId, text);
+    registerEngineAndAnalyze(uri, text);
   }
 
   @Override
@@ -254,15 +258,17 @@ public class CobolTextDocumentService
     docs.forEach((key, value) -> analyzeDocumentFirstTime(key, value.getText(), event.verbose));
   }
 
-  private void registerEngineAndAnalyze(String uri, String languageType, String text) {
+  private void registerEngineAndAnalyze(String uri, String text) {
     String fileExtension = extractExtension(uri);
     if (fileExtension != null && !isCobolFile(fileExtension)) {
+      outlineMap.computeIfPresent(uri, (k,v) -> {
+        v.complete(List.of(new DocumentSymbol()));
+        return v;
+      });
       communications.notifyThatExtensionIsUnsupported(fileExtension);
-    } else if (isCobolFile(languageType)) {
+    } else {
       communications.notifyThatLoadingInProgress(uri);
       analyzeDocumentFirstTime(uri, text, false);
-    } else {
-      communications.notifyThatEngineNotFound(languageType);
     }
   }
 
