@@ -16,11 +16,11 @@
 package com.broadcom.lsp.cobol.service.delegates.communications;
 
 import com.broadcom.lsp.cobol.core.messages.MessageService;
+import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.google.inject.Provider;
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -47,9 +47,9 @@ class ServerCommunicationsTest {
 
   private static final int TEST_TIMEOUT = 10000;
 
-  @Mock private Provider<LanguageClient> provider;
+  @Mock private Provider<CobolLanguageClient> provider;
 
-  @Mock private LanguageClient client;
+  @Mock private CobolLanguageClient client;
 
   @Mock private FileSystemService files;
 
@@ -173,7 +173,7 @@ class ServerCommunicationsTest {
   }
 
   private void assertDocumentAnalysedNotification(String uri, String fileName) {
-    client = mock(LanguageClient.class);
+    client = mock(CobolLanguageClient.class);
     when(provider.get()).thenReturn(client);
     when(files.decodeURI(uri)).thenReturn(uri);
     when(messageService.getMessage(anyString(), anyString()))

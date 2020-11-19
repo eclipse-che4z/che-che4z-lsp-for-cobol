@@ -26,6 +26,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 import java.util.function.Function;
@@ -33,6 +35,7 @@ import java.util.function.Function;
 import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.antlr.v4.runtime.CharStreams.fromString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -53,6 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <li>| - Diagnostic
  * <li>^ - Replacement
  * <li>& - Constant (predefined variable)
+ * <li>% - Subroutine
  * <li>{_ _} - Multi-token error
  *
  *     <p>By default, tags treated as an element usage. With '*' specified the occurrence will be
@@ -102,15 +106,16 @@ public class UseCaseEngine {
    * for the diagnostics will be dropped and replaced with ones extracted by engine by their IDs.
    *
    * @param text - COBOL text to analyse. It will be cleaned up before analysis to exclude all the
-   *     technical tokens and collect syntax and semantic elements.
+   *     technical tokens and collect syntax and semantic elements
    * @param copybooks - list of the copybooks used in the document
    * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
    *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
    */
   public void runTest(
       String text, List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics) {
-    runTest(text, copybooks, expectedDiagnostics, CopybookProcessingMode.ENABLED);
+    runTest(text, copybooks, expectedDiagnostics, List.of(), CopybookProcessingMode.ENABLED);
   }
+
   /**
    * Check if the language engine applies required syntax and semantic checks. All the semantic
    * elements in the given text, as well as syntax errors, should be wrapped with according tags.
@@ -122,24 +127,58 @@ public class UseCaseEngine {
    * for the diagnostics will be dropped and replaced with ones extracted by engine by their IDs.
    *
    * @param text - COBOL text to analyse. It will be cleaned up before analysis to exclude all the
-   *     technical tokens and collect syntax and semantic elements.
+   *     technical tokens and collect syntax and semantic elements
    * @param copybooks - list of the copybooks used in the document
    * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
    *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
+   * @param subroutineNames - list of subroutine names used in the document
+   */
+  public void runTest(
+      String text,
+      List<CobolText> copybooks,
+      Map<String, Diagnostic> expectedDiagnostics,
+      List<String> subroutineNames) {
+    runTest(text, copybooks, expectedDiagnostics, subroutineNames, CopybookProcessingMode.ENABLED);
+  }
+
+  /**
+   * Check if the language engine applies required syntax and semantic checks. All the semantic
+   * elements in the given text, as well as syntax errors, should be wrapped with according tags.
+   * The same extraction operation applied also for the given copybooks. The copybook processing
+   * mode relies on processingMode parameter.
+   *
+   * <p>Expected diagnostics should contain the full of list of syntax and semantic
+   * errors/warnings/info messages for the document and copybooks. Existing positions, if they are,
+   * for the diagnostics will be dropped and replaced with ones extracted by engine by their IDs.
+   *
+   * @param text - COBOL text to analyse. It will be cleaned up before analysis to exclude all the
+   *     technical tokens and collect syntax and semantic elements
+   * @param copybooks - list of the copybooks used in the document
+   * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
+   *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
+   * @param subroutineNames - list of subroutine names used in the document
    * @param processingMode - copybook processing mode
    */
   public void runTest(
       String text,
       List<CobolText> copybooks,
       Map<String, Diagnostic> expectedDiagnostics,
+      List<String> subroutineNames,
       CopybookProcessingMode processingMode) {
 
     PreprocessedDocument document = prepareDocument(text, copybooks, expectedDiagnostics);
     AnalysisResult actual =
-        analyze(DOCUMENT_URI, document.getText(), document.getCopybooks(), processingMode);
-    TestData expected = document.getTestData();
-
+        analyze(DOCUMENT_URI, document.getText(), document.getCopybooks(), subroutineNames, processingMode);
+    TestData expected = document.getTestData().toBuilder()
+        .subroutineDefinitions(makeSubroutinesDefinitions(subroutineNames))
+        .build();
     assertResultEquals(actual, expected);
+  }
+
+  private Map<String, List<Location>> makeSubroutinesDefinitions(List<String> subroutineNames) {
+    Range fileStart = new Range(new Position(0, 0), new Position(0, 0));
+    return subroutineNames.stream()
+        .collect(toMap(Function.identity(), name -> List.of(new Location("URI:" + name, fileStart))));
   }
 
   private PreprocessedDocument prepareDocument(
@@ -216,6 +255,9 @@ public class UseCaseEngine {
     assertResult(
         "Section definition:", expected.getSectionDefinitions(), actual.getSectionDefinitions());
     assertResult("Section usages:", expected.getSectionUsages(), actual.getSectionUsages());
+
+    assertResult("Subroutine definitions: ", expected.getSubroutineDefinitions(), actual.getSubroutineDefinitions());
+    assertResult("Subroutine usage:", expected.getSubroutineUsages(), actual.getSubroutineUsages());
   }
 
   private void assertDiagnostics(

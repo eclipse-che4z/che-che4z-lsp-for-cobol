@@ -16,6 +16,7 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.core.messages.MessageService;
+import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.broadcom.lsp.cobol.service.delegates.communications.ServerCommunications;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
@@ -23,7 +24,6 @@ import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.broadcom.lsp.cobol.service.utils.WorkspaceFileService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
-import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -56,7 +56,7 @@ class TestResponsesNotContainLineBreaks {
 
   @Test
   void test() {
-    LanguageClient client = mock(LanguageClient.class);
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
     ArgumentCaptor<PublishDiagnosticsParams> captor = forClass(PublishDiagnosticsParams.class);
     FileSystemService files = mock(WorkspaceFileService.class);
     when(files.decodeURI(anyString())).thenCallRealMethod();

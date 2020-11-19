@@ -15,12 +15,12 @@
 
 package com.broadcom.lsp.cobol;
 
+import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.broadcom.lsp.cobol.service.CobolLanguageServer;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageServer;
 import com.broadcom.lsp.cobol.service.providers.ClientProvider;
 import com.google.inject.Injector;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
-import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,14 +90,14 @@ class LangServerBootstrapTest {
                 fail(e.getMessage());
               }
             });
-    Launcher<LanguageClient> launcher = LangServerBootstrap.createServerLauncherWithSocket(server);
+    Launcher<CobolLanguageClient> launcher = LangServerBootstrap.createServerLauncherWithSocket(server);
 
     assertNotNull(launcher.getRemoteProxy());
   }
 
   @Test
   void createServerLauncher() {
-    Launcher<LanguageClient> launcher =
+    Launcher<CobolLanguageClient> launcher =
         LangServerBootstrap.createServerLauncher(server, System.in, System.out);
 
     assertNotNull(launcher.getRemoteProxy());
@@ -105,7 +105,7 @@ class LangServerBootstrapTest {
 
   @Test
   void startServer() throws IOException {
-    Launcher<LanguageClient> launcher =
+    Launcher<CobolLanguageClient> launcher =
         LangServerBootstrap.launchServer(new String[] {PIPES}, server);
     assertNotNull(launcher.getRemoteProxy());
   }

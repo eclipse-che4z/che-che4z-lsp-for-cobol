@@ -26,9 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This test checks that the undefined parent variable underlined while variable call hierarchy
@@ -55,8 +53,8 @@ class TestUndefinedParentVariableUnderlined {
   @Test
   void assertCopybookProcessingModeNotChangesLogic() {
     Assertions.assertEquals(
-        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, List.of(), CopybookProcessingMode.ENABLED),
-        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, List.of(), CopybookProcessingMode.DISABLED));
+        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, List.of(), List.of(), CopybookProcessingMode.ENABLED),
+        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, List.of(), List.of(), CopybookProcessingMode.DISABLED));
   }
 
   @Test

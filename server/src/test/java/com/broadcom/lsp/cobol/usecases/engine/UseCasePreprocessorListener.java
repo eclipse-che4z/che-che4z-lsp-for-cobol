@@ -97,6 +97,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
   private Map<String, List<Location>> constantUsages = new HashMap<>();
   private Map<String, List<Location>> copybookDefinitions = new HashMap<>();
   private Map<String, List<Location>> copybookUsages = new HashMap<>();
+  private Map<String, List<Location>> subroutineUsages = new HashMap<>();
 
   private Deque<StringBuilder> contexts = new ArrayDeque<>();
 
@@ -142,7 +143,9 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
         getConstantDefinitions(),
         constantUsages,
         copybookDefinitions,
-        copybookUsages);
+        copybookUsages,
+        Map.of(),
+        subroutineUsages);
   }
 
   @Override
@@ -301,6 +304,27 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
   }
 
   @Override
+  public void enterSubroutineStatement(SubroutineStatementContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitSubroutineStatement(SubroutineStatementContext ctx) {
+    pop();
+    ofNullable(ctx.subroutineUsage())
+        .ifPresent(
+            it ->
+                processToken(
+                    it.STRINGLITERAL().getText(),
+                    ctx,
+                    it.replacement(),
+                    subroutineUsages,
+                    ctx.diagnostic(),
+                    true
+                ));
+  }
+
+  @Override
   public void enterMultiTokenError(MultiTokenErrorContext ctx) {
     // Write preceding hidden tokens here to simplify logic of position extraction
     write(getHiddenText(tokens.getHiddenTokensToLeft(ctx.start.getTokenIndex(), HIDDEN)));
@@ -385,11 +409,27 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
       ReplacementContext replacement,
       Map<String, List<Location>> storage,
       List<DiagnosticContext> diagnosticIds) {
+    processToken(text, ctx, replacement, storage, diagnosticIds, false);
+  }
+
+  private void processToken(
+      String text,
+      ParserRuleContext ctx,
+      ReplacementContext replacement,
+      Map<String, List<Location>> storage,
+      List<DiagnosticContext> diagnosticIds,
+      boolean stripQuotes) {
 
     String replacementText =
         ofNullable(replacement).map(it -> it.identifier().getText()).orElse(text);
     Range range = retrieveRange(ctx, replacementText);
-    ofNullable(storage).ifPresent(it -> addTokenLocation(it, replacementText.toUpperCase(), range));
+    ofNullable(storage).ifPresent(it -> {
+      String storedText = replacementText;
+      if (stripQuotes) {
+        storedText = PreprocessorStringUtils.trimQuotes(storedText);
+      }
+      addTokenLocation(it, storedText.toUpperCase(), range);
+    });
 
     ofNullable(replacement).ifPresent(addPositionShift());
     lineShifts[getLine(ctx.start)] += text.length() - replacementText.length();

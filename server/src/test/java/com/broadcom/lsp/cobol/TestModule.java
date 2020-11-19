@@ -19,6 +19,7 @@ import com.broadcom.lsp.cobol.core.messages.LocaleStore;
 import com.broadcom.lsp.cobol.core.messages.LocaleStoreImpl;
 import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.messages.PropertiesMessageService;
+import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.broadcom.lsp.cobol.service.*;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActions;
@@ -41,7 +42,6 @@ import com.broadcom.lsp.cobol.service.utils.WorkspaceFileService;
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.multibindings.Multibinder;
-import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
@@ -57,7 +57,7 @@ public class TestModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(CustomThreadPoolExecutor.class).to(CustomThreadPoolExecutorService.class);
-    bind(LanguageClient.class).to(TestLanguageClient.class);
+    bind(CobolLanguageClient.class).to(TestLanguageClient.class);
     bind(LanguageServer.class).to(TestLanguageServer.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
@@ -76,6 +76,7 @@ public class TestModule extends AbstractModule {
         .toInstance("resourceBundles/messages");
 
     bind(SettingsService.class).to(SettingsServiceImpl.class);
+    bind(SubroutineService.class).to(SubroutineServiceImpl.class);
 
     bindFormations();
     bindCompletions();
@@ -123,6 +124,7 @@ public class TestModule extends AbstractModule {
     referenceBinding.addBinding().to(ParagraphLocations.class);
     referenceBinding.addBinding().to(SectionLocations.class);
     referenceBinding.addBinding().to(CopybookLocations.class);
+    referenceBinding.addBinding().to(SubroutineLocations.class);
   }
 
   private void bindCodeActions() {

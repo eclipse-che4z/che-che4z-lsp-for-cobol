@@ -14,9 +14,9 @@
  */
 package com.broadcom.lsp.cobol.service.mocks;
 
+import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.google.inject.Singleton;
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.services.LanguageClient;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * from the server. May respond on the showMessageRequest using the given messages in the Iterator.
  */
 @Singleton
-public class TestLanguageClient implements LanguageClient {
+public class TestLanguageClient implements CobolLanguageClient {
   private List<Object> receivedTelemetry = new ArrayList<>();
   private List<PublishDiagnosticsParams> receivedDiagnostics = new ArrayList<>();
   private List<MessageParams> messagesToShow = new ArrayList<>();

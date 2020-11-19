@@ -15,14 +15,14 @@
 
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.Synchronized;
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.services.LanguageClient;
 
-import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,10 +54,10 @@ public class WatcherServiceImpl implements WatcherService {
 
   private final List<String> folderWatchers = new ArrayList<>();
 
-  private final Provider<LanguageClient> clientProvider;
+  private final Provider<CobolLanguageClient> clientProvider;
 
   @Inject
-  WatcherServiceImpl(Provider<LanguageClient> clientProvider) {
+  WatcherServiceImpl(Provider<CobolLanguageClient> clientProvider) {
     this.clientProvider = clientProvider;
   }
 

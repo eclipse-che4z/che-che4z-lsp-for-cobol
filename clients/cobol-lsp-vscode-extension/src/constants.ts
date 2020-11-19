@@ -11,10 +11,11 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-export const SETTINGS_SECTION: string = "broadcom-cobol-lsp.cpy-manager";
+export const SETTINGS_CPY_SECTION: string = "broadcom-cobol-lsp.cpy-manager";
 
 export const PATHS_LOCAL_KEY = "paths-local";
 export const PATHS_ZOWE = "paths-dsn";
+export const SETTINGS_SUBROUTINE_LOCAL_KEY = "broadcom-cobol-lsp.subroutine-manager.paths-local";
 export const C4Z_FOLDER: string = ".c4z";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
 export const GITIGNORE_FILE: string = ".gitignore";
@@ -34,8 +35,11 @@ export const DSN_NOMORE_8CHARS = "Dataset name segment can't be more than 8 char
 export const DSN_START_PROHIBITED_CHAR = `Dataset name segment: ${SEGMENT_PLACEHOLDER} starts with a prohibited character.`;
 export const DSN_CONTAINS_PROHIBITED_CHAR = `Dataset name segment: ${SEGMENT_PLACEHOLDER} contains a prohibited character.`;
 export const QUICKFIX_GOTOSETTINGS = "Open settings";
-export const COBOL_CBL_EXT = ".cbl";
-export const COBOL_COB_EXT = ".cob";
-export const COBOL_COBOL_EXT = ".cobol";
+export const COBOL_CBL_EXT = ".CBL";
+export const COBOL_COB_EXT = ".COB";
+export const COBOL_COBOL_EXT = ".COBOL";
+export const COBOL_EXT_ARRAY = [COBOL_CBL_EXT, COBOL_COB_EXT, COBOL_COBOL_EXT];
+export const COPYBOOK_CPY_EXT = ".CPY";
+export const COPYBOOK_EXT_ARRAY = [COPYBOOK_CPY_EXT];
 export const EXTENSION_ID = "broadcommfd.cobol-language-support";
 export const TELEMETRY_DEFAULT_CONTENT = "INVALID_INSTRUMENTATION_KEY";

@@ -128,6 +128,14 @@
                     "description": "Default list of datasets to search for copybooks",
                     "uniqueItems": true
                 },
+                "broadcom-cobol-lsp.subroutine-manager.paths-local": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of relative local paths to search for subroutines",
+                    "uniqueItems": true
+                },
                 "broadcom-cobol-lsp.logging.level.root": {
                     "type": "string",
                     "default": "ERROR",

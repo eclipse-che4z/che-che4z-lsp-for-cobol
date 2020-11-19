@@ -20,6 +20,7 @@ import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
 import com.broadcom.lsp.cobol.core.utils.CustomToken;
+import com.broadcom.lsp.cobol.service.SubroutineService;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -66,7 +67,8 @@ class VisitorSemanticAnalysisTest {
                     .range(new Range(new Position(0, 0), new Position(0, 0)))
                     .token(WRONG_TOKEN)
                     .build()),
-            mockMessageService);
+            mockMessageService,
+            mock(SubroutineService.class));
 
     visitor.visitQualifiedDataNameFormat1(mockMethod(token));
 
@@ -103,7 +105,8 @@ class VisitorSemanticAnalysisTest {
                     .range(new Range(new Position(0, 0), new Position(0, 0)))
                     .token(WRONG_TOKEN)
                     .build()),
-            messageService);
+            messageService,
+            mock(SubroutineService.class));
 
     visitor.visitStatement(node);
 

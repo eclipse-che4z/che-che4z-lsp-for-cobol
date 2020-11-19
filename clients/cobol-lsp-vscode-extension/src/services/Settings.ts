@@ -15,11 +15,11 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { SETTINGS_SECTION } from "../constants";
+import { SETTINGS_CPY_SECTION } from "../constants";
 
 export function initializeSettings() {
-    const configuration = vscode.workspace.getConfiguration(SETTINGS_SECTION);
-    const properties = Object.keys(vscode.workspace.getConfiguration().get(SETTINGS_SECTION));
+    const configuration = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION);
+    const properties = Object.keys(vscode.workspace.getConfiguration().get(SETTINGS_CPY_SECTION));
 
     if (properties.every(isUndefinedInWorkspace)) {
         properties.forEach(property => {
@@ -29,7 +29,7 @@ export function initializeSettings() {
 }
 
 function isUndefinedInWorkspace(property: string): boolean {
-    return vscode.workspace.getConfiguration(SETTINGS_SECTION).inspect(property).workspaceValue === undefined;
+    return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).inspect(property).workspaceValue === undefined;
 }
 
 /**

@@ -74,7 +74,7 @@ class ConstantCompletionTest {
 
   @Test
   void getSortOrderPrefix() {
-    assertEquals("4", completion.getSortOrderPrefix());
+    assertEquals("5", completion.getSortOrderPrefix());
   }
 
   @Test

@@ -14,7 +14,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import {PATHS_LOCAL_KEY, SETTINGS_SECTION} from "../constants";
+import {PATHS_LOCAL_KEY, SETTINGS_CPY_SECTION} from "../constants";
 import {LocalCopybookResolver} from "../services/copybook/LocalCopybookResolver";
 import {SettingsUtils} from "../services/util/SettingsUtils";
 
@@ -140,7 +140,7 @@ function assertResourceContent(list: string[], expectedSizeList: number) {
 
 function resolveCopybooksFromJSON(json: string): string[] {
     if (SettingsUtils.isValidJSON(json)) {
-        return settingsParser.resolve(JSON.parse(json)[SETTINGS_SECTION + "." + PATHS_LOCAL_KEY]);
+        return settingsParser.resolve(JSON.parse(json)[SETTINGS_CPY_SECTION + "." + PATHS_LOCAL_KEY]);
     }
     return [];
 }

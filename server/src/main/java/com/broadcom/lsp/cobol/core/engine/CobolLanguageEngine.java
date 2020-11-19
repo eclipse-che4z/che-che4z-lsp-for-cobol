@@ -29,6 +29,7 @@ import com.broadcom.lsp.cobol.core.semantics.SemanticContext;
 import com.broadcom.lsp.cobol.core.visitor.CobolVisitor;
 import com.broadcom.lsp.cobol.core.visitor.ParserListener;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
+import com.broadcom.lsp.cobol.service.SubroutineService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
@@ -61,17 +62,20 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
   private DefaultErrorStrategy defaultErrorStrategy;
   private MessageService messageService;
   private ParseTreeListener treeListener;
+  private SubroutineService subroutineService;
 
   @Inject
   public CobolLanguageEngine(
       TextPreprocessor preprocessor,
       DefaultErrorStrategy defaultErrorStrategy,
       MessageService messageService,
-      ParseTreeListener treeListener) {
+      ParseTreeListener treeListener,
+      SubroutineService subroutineService) {
     this.preprocessor = preprocessor;
     this.defaultErrorStrategy = defaultErrorStrategy;
     this.messageService = messageService;
     this.treeListener = treeListener;
+    this.subroutineService = subroutineService;
   }
 
   /**
@@ -114,7 +118,7 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
 
     CobolVisitor visitor =
         new CobolVisitor(
-            documentUri, extendedDocument.getCopybooks(), tokens, positionMapping, messageService);
+            documentUri, extendedDocument.getCopybooks(), tokens, positionMapping, messageService, subroutineService);
     visitor.visit(tree);
 
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
