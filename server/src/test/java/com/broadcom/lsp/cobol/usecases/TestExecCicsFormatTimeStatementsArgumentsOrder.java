@@ -44,6 +44,7 @@ class TestExecCicsFormatTimeStatementsArgumentsOrder {
           + "           EXEC CICS FORMATTIME\n"
           + "                     ABSTIME({$WS-TIME})\n"
           + "                     MMDDYY({$DATEO})\n"
+          + "                     YYMMDD({$DATEO})\n"
           + "                     DATESEP('/')\n"
           + "                     TIME({$TIMEO})\n"
           + "                     TIMESEP(':')\n"
