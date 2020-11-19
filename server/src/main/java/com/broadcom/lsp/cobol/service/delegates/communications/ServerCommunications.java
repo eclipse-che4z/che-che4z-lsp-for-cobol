@@ -28,7 +28,6 @@ import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.services.LanguageClient;
 
 import java.util.*;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
@@ -64,20 +63,6 @@ public class ServerCommunications implements Communications {
   }
 
   /**
-   * This method raise a notification message back to the client if is unable to found a language
-   * engine for a given document ID
-   *
-   * @param languageType enum that represent the language type
-   */
-  @Override
-  public void notifyThatEngineNotFound(String languageType) {
-    runAsync(
-        () ->
-            showMessage(
-                Error, messageService.getMessage("Communications.noLangEngine", languageType)));
-  }
-
-  /**
    * The "work in progress" message should be shown after 3 seconds if the analysis not finished
    * yet. If cancelProgressNotification was invoked then the message won't be shown on the client.
    *
@@ -87,17 +72,19 @@ public class ServerCommunications implements Communications {
   public void notifyThatLoadingInProgress(String uri) {
     String decodedUri = files.decodeURI(uri);
     uriInProgress.add(decodedUri);
-    customExecutor.getScheduledThreadPoolExecutor().schedule(
-        () -> {
-          if (uriInProgress.remove(decodedUri)) {
-            showMessage(
-                Info,
-                messageService.getMessage(
-                    "Communications.syntaxAnalysisInProgress", retrieveFileName(decodedUri)));
-          }
-        },
-        3,
-        SECONDS);
+    customExecutor
+        .getScheduledThreadPoolExecutor()
+        .schedule(
+            () -> {
+              if (uriInProgress.remove(decodedUri)) {
+                showMessage(
+                    Info,
+                    messageService.getMessage(
+                        "Communications.syntaxAnalysisInProgress", retrieveFileName(decodedUri)));
+              }
+            },
+            3,
+            SECONDS);
   }
 
   /**

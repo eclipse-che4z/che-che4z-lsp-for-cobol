@@ -206,8 +206,7 @@ public class CobolTextDocumentService
     }
 
     String text = params.getTextDocument().getText();
-    String langId = params.getTextDocument().getLanguageId();
-    registerEngineAndAnalyze(uri, langId, text);
+    registerEngineAndAnalyze(uri, text);
   }
 
   @Override
@@ -254,15 +253,13 @@ public class CobolTextDocumentService
     docs.forEach((key, value) -> analyzeDocumentFirstTime(key, value.getText(), event.verbose));
   }
 
-  private void registerEngineAndAnalyze(String uri, String languageType, String text) {
+  private void registerEngineAndAnalyze(String uri, String text) {
     String fileExtension = extractExtension(uri);
     if (fileExtension != null && !isCobolFile(fileExtension)) {
       communications.notifyThatExtensionIsUnsupported(fileExtension);
-    } else if (isCobolFile(languageType)) {
+    } else {
       communications.notifyThatLoadingInProgress(uri);
       analyzeDocumentFirstTime(uri, text, false);
-    } else {
-      communications.notifyThatEngineNotFound(languageType);
     }
   }
 
