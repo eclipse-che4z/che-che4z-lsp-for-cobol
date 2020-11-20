@@ -154,6 +154,21 @@ The Find All References and Go To Definition functionalities are extended to wor
 * Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code. 
 * Functionality to skip variable levels when called, reducing call time.
 
+## Troubleshooting
+
+To generate a troubleshooting log for the LSP server, specify a value for the parameter **broadcom-cobol-lsp.logging.level.root** in the extension settings. Allowed values are:
+
+* ERROR
+* WARN
+* INFO
+* DEBUG
+* TRACE
+* ALL
+
+These values are ordered from returning the least information ("ERROR"; errors only) to the most information ("ALL"; all details).
+
+Troubleshooting logs are stored on your local machine in the subfolder \LSPCobol\logs within your user home directory.
+
 ### Privacy Notice
 The extensions for Visual Studio Code developed by Broadcom Inc., including its corporate affiliates and subsidiaries, ("Broadcom") are provided free of charge, but in order to better understand and meet its users’ needs, Broadcom may collect, use, analyze and retain anonymous users’ metadata and interaction data, (collectively, “Usage Data”) and aggregate such Usage Data with similar Usage Data of other Broadcom customers. Please find more detailed information in [License and Service Terms & Repository](https://www.broadcom.com/company/legal/licensing).
 
