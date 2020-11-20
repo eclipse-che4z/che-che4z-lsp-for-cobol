@@ -45,7 +45,7 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 - Code Snippets
 - Copybook variable and paragraph names
 - Names of copybooks that are used in the program
-- Names of locally-stored subroutines
+- Names of locally-stored subroutines that are used in the program
 
 The autocomplete feature is only available in the main COBOL file, not in copybooks.
 
