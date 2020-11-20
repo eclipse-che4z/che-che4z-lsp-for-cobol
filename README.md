@@ -167,7 +167,7 @@ To generate a troubleshooting log for the LSP server, specify a value for the pa
 
 These values are ordered from returning the least information ("ERROR"; errors only) to the most information ("ALL"; all details).
 
-Troubleshooting logs are stored on your local machine in the subfolder \LSPCobol\logs within your user home directory.
+Troubleshooting logs are stored in the subfolder **\LSPCobol\logs** within your user home directory.
 
 ## Privacy Notice
 The extensions for Visual Studio Code developed by Broadcom Inc., including its corporate affiliates and subsidiaries, ("Broadcom") are provided free of charge, but in order to better understand and meet its users’ needs, Broadcom may collect, use, analyze and retain anonymous users’ metadata and interaction data, (collectively, “Usage Data”) and aggregate such Usage Data with similar Usage Data of other Broadcom customers. Please find more detailed information in [License and Service Terms & Repository](https://www.broadcom.com/company/legal/licensing).
