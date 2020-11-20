@@ -655,7 +655,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private void checkProgramNameIdentical(Token token) {
     String text = PreprocessorStringUtils.trimQuotes(token.getText());
-    if (!programName.equals(text)) {
+    if (!programName.equalsIgnoreCase(text)) {
       getLocality(token)
           .ifPresent(
               it ->
