@@ -45,6 +45,7 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 - Code Snippets
 - Copybook variable and paragraph names
 - Names of copybooks that are used in the program
+- Names of locally-stored subroutines
 
 The autocomplete feature is only available in the main COBOL file, not in copybooks.
 
@@ -80,6 +81,23 @@ Before you write your COBOL code from scratch, search the snippet library for us
 You can also insert a code snippet by typing the name of the snippet in your code and clicking on the autocomplete text.
 
 The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder.
+
+## Subroutine Support
+
+The COBOL Language Support extension supports subroutines specified in CALL statements if the called program is stored in a local folder in your workspace. The Go To Definition and Find All References functionalities, as well as autocomplete, are extended to work for names of subroutines. 
+
+To enable subroutine support, specify the paths of folders containing subroutine files in your workspace extension settings.
+
+**Follow these steps:**
+
+1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
+2. Switch from **User** to **Workspace**.
+3. Under **Subroutine-manager: Paths-local**, specify the paths of the folders containing subroutines. Ensure that you specify relative paths to the workspace root. Absolute paths are not supported.  
+   - **Tip:** To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
+   - The folders are searched in the order they are listed. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
+4. Open a program or project.  
+   Subroutine support features are now enabled.
+
 ## Copybook Support
 
 The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe CLI z/OSMF profile to automatically download them from the mainframe to your workspace. 
@@ -96,7 +114,7 @@ You can store your copybooks locally in folders in your workspace and specify th
 
 1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
 2. Switch from **User** to **Workspace**.
-3. Under **Paths: Local**, specify the paths of the folders containing copybooks. Ensure that you specify relative paths to the workspace root. Absolute paths are not supported.  
+3. Under **Cpy-manager: Paths-local**, specify the paths of the folders containing copybooks. Ensure that you specify relative paths to the workspace root. Absolute paths are not supported.  
    - **Tip:** To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
    - The folders are searched in the order they are listed. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
 4. Open a program or project.  
@@ -111,7 +129,7 @@ You can also set up automatic copybook retrieval from the mainframe to download 
 1. Ensure that you have a [Zowe CLI z/OSMF profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) configured, with credentials defined.
 2. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
 3. Switch from **User** to **Workspace**.
-4. Under **Paths: Dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
+4. Under **Cpy-manager: Paths-dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
 5. Under **Profile**, enter the name of your Zowe CLI z/OSMF profile.
 6. Open a program or project.  
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets that you specified in step 3.  
