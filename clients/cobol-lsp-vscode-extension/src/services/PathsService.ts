@@ -20,21 +20,21 @@ import {
     DSN_START_PROHIBITED_CHAR,
     PATHS_ZOWE,
     SEGMENT_PLACEHOLDER,
-    SETTINGS_SECTION
+    SETTINGS_CPY_SECTION
 } from "../constants";
 
 export class PathsService {
 
     async listPathDatasets(): Promise<string[]> {
-        if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has(PATHS_ZOWE)) {
+        if (!vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).has(PATHS_ZOWE)) {
             await vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
             return [];
         }
-        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);
     }
 
     setPathDatasets(paths: string[]) {
-        vscode.workspace.getConfiguration(SETTINGS_SECTION).update(PATHS_ZOWE, paths);
+        vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).update(PATHS_ZOWE, paths);
     }
 }
 

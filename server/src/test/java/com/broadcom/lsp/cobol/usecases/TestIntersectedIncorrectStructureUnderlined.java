@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;

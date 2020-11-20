@@ -23,6 +23,7 @@ import com.broadcom.lsp.cobol.core.semantics.SemanticContext;
 import com.broadcom.lsp.cobol.core.semantics.outline.NodeType;
 import com.broadcom.lsp.cobol.core.strategy.CobolErrorStrategy;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
+import com.broadcom.lsp.cobol.service.SubroutineService;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -61,7 +62,8 @@ class CobolLanguageEngineTest {
     ParseTreeListener treeListener = mock(ParseTreeListener.class);
     cobolErrorStrategy.setMessageService(mockMessageService);
     CobolLanguageEngine engine =
-        new CobolLanguageEngine(preprocessor, cobolErrorStrategy, mockMessageService, treeListener);
+        new CobolLanguageEngine(preprocessor, cobolErrorStrategy, mockMessageService, treeListener,
+            mock(SubroutineService.class));
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
         Locality.builder()

@@ -16,6 +16,7 @@
 package com.broadcom.lsp.cobol.service.delegates.communications;
 
 import com.broadcom.lsp.cobol.core.messages.MessageService;
+import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.google.inject.Inject;
@@ -25,7 +26,6 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
-import org.eclipse.lsp4j.services.LanguageClient;
 
 import java.util.*;
 import java.util.function.Function;
@@ -47,12 +47,12 @@ public class ServerCommunications implements Communications {
   private CustomThreadPoolExecutor customExecutor;
   private final Set<String> uriInProgress = new HashSet<>();
   private MessageService messageService;
-  private Provider<LanguageClient> provider;
+  private Provider<CobolLanguageClient> provider;
   private FileSystemService files;
 
   @Inject
   public ServerCommunications(
-      Provider<LanguageClient> provider,
+      Provider<CobolLanguageClient> provider,
       FileSystemService files,
       MessageService messageService,
       CustomThreadPoolExecutor customExecutor) {
@@ -158,7 +158,7 @@ public class ServerCommunications implements Communications {
     getClient().logMessage(new MessageParams(type, clean(message)));
   }
 
-  private LanguageClient getClient() {
+  private CobolLanguageClient getClient() {
     return provider.get();
   }
 

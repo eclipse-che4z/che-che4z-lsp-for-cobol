@@ -54,6 +54,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService, DisposableSe
   private WatcherService watchingService;
   private CopybookService copybookService;
   private LocaleStore localeStore;
+  private SubroutineService subroutineService;
 
   @Inject
   public CobolWorkspaceServiceImpl(
@@ -61,12 +62,14 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService, DisposableSe
       SettingsService settingsService,
       WatcherService watchingService,
       CopybookService copybookService,
-      LocaleStore localeStore) {
+      LocaleStore localeStore,
+      SubroutineService subroutineService) {
     this.dataBus = dataBus;
     this.settingsService = settingsService;
     this.watchingService = watchingService;
     this.copybookService = copybookService;
     this.localeStore = localeStore;
+    this.subroutineService = subroutineService;
   }
 
   /**
@@ -105,7 +108,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService, DisposableSe
   @CheckServerShutdownState
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
     settingsService
-        .getConfiguration(LOCAL_PATHS.label)
+        .getConfiguration(CPY_LOCAL_PATHS.label)
         .thenAccept(it -> acceptSettingsChange(settingsService.toStrings(it)));
 
     settingsService.getConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
@@ -141,6 +144,7 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService, DisposableSe
 
   private void rerunAnalysis(boolean verbose) {
     copybookService.invalidateCache();
+    subroutineService.invalidateCache();
     LOG.info("Cache invalidated");
     dataBus.postData(new RunAnalysisEvent(verbose));
   }

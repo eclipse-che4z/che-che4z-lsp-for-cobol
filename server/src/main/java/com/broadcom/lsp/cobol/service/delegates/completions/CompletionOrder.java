@@ -21,6 +21,7 @@ public enum CompletionOrder {
   PARAGRAPHS,
   SECTIONS,
   COPYBOOKS,
+  SUBROUTINES,
   CONSTANTS,
   SNIPPETS,
   KEYWORDS;

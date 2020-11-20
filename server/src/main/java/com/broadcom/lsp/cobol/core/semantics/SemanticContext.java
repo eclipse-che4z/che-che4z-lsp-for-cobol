@@ -41,5 +41,7 @@ public class SemanticContext {
   @Builder.Default Map<String, Collection<Location>> constantUsages = new HashMap<>();
   @Builder.Default Map<String, Collection<Location>> copybookDefinitions = new HashMap<>();
   @Builder.Default Map<String, Collection<Location>> copybookUsages = new HashMap<>();
+  @Builder.Default Map<String, Collection<Location>> subroutinesDefinitions = new HashMap<>();
+  @Builder.Default Map<String, Collection<Location>> subroutinesUsages = new HashMap<>();
   @Builder.Default List<DocumentSymbol> outlineTree=new ArrayList<>();
 }

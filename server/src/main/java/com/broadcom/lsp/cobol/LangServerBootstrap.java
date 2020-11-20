@@ -17,6 +17,7 @@ package com.broadcom.lsp.cobol;
 import com.broadcom.lsp.cobol.domain.modules.DatabusModule;
 import com.broadcom.lsp.cobol.domain.modules.EngineModule;
 import com.broadcom.lsp.cobol.domain.modules.ServiceModule;
+import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.broadcom.lsp.cobol.service.providers.ClientProvider;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -25,7 +26,6 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
-import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 
 import java.io.IOException;
@@ -66,7 +66,7 @@ public class LangServerBootstrap {
       @NonNull String[] args, @NonNull LanguageServer server, @NonNull ClientProvider provider)
       throws IOException, InterruptedException, ExecutionException {
     try {
-      Launcher<LanguageClient> launcher = launchServer(args, server);
+      Launcher<CobolLanguageClient> launcher = launchServer(args, server);
       provider.set(launcher.getRemoteProxy());
       // suspend the main thread on listening
       launcher.startListening().get();
@@ -79,7 +79,7 @@ public class LangServerBootstrap {
     }
   }
 
-  Launcher<LanguageClient> launchServer(@NonNull String[] args, @NonNull LanguageServer server)
+  Launcher<CobolLanguageClient> launchServer(@NonNull String[] args, @NonNull LanguageServer server)
       throws IOException {
     return isPipeEnabled(args)
         ? createServerLauncher(server, System.in, System.out)
@@ -90,7 +90,7 @@ public class LangServerBootstrap {
     return args.length > 0 && PIPE_ARG.equals(args[0]);
   }
 
-  Launcher<LanguageClient> createServerLauncherWithSocket(@NonNull LanguageServer server)
+  Launcher<CobolLanguageClient> createServerLauncherWithSocket(@NonNull LanguageServer server)
       throws IOException {
     try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
       LOG.info("Language server started using socket communication on port [{}]", LSP_PORT);
@@ -101,8 +101,13 @@ public class LangServerBootstrap {
     }
   }
 
-  Launcher<LanguageClient> createServerLauncher(
+  Launcher<CobolLanguageClient> createServerLauncher(
       @NonNull LanguageServer server, @NonNull InputStream in, @NonNull OutputStream out) {
-    return LSPLauncher.createServerLauncher(server, in, out);
+    return new LSPLauncher.Builder<CobolLanguageClient>()
+        .setLocalService(server)
+        .setRemoteInterface(CobolLanguageClient.class)
+        .setInput(in)
+        .setOutput(out)
+        .create();
   }
 }

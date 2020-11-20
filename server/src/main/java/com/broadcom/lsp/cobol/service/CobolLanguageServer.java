@@ -182,7 +182,10 @@ public class CobolLanguageServer implements LanguageServer, DisposableLanguageSe
 
   private void addLocalFilesWatcher() {
     settingsService
-        .getConfiguration(LOCAL_PATHS.label)
+        .getConfiguration(CPY_LOCAL_PATHS.label)
+        .thenAccept(it -> watchingService.addWatchers(settingsService.toStrings(it)));
+    settingsService
+        .getConfiguration(SUBROUTINE_LOCAL_PATHS.label)
         .thenAccept(it -> watchingService.addWatchers(settingsService.toStrings(it)));
   }
 

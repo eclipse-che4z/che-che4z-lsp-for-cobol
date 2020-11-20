@@ -36,7 +36,7 @@ class TestSkipStatement {
           + "       SKIP1\n"
           + "           PERFORM WITH TEST BEFORE UNTIL {$ID0} = 0\n"
           + "             SUBTRACT 1 FROM {$TAPARM1}\n"
-          + "             CALL 'ID1'\n"
+          + "             CALL {%'ID1'}\n"
           + "           END-PERFORM.\n"
           + "        SKIP2.\n"
           + "        {#*PROGB}.\n"
@@ -45,6 +45,6 @@ class TestSkipStatement {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of(), List.of("ID1"));
   }
 }

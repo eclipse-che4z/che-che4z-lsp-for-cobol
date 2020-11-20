@@ -11,68 +11,15 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as fs from "fs";
-import {readdirSync} from "fs";
-import * as path from "path";
-import {URL} from "url";
 import * as vscode from "vscode";
-import {C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_LOCAL_KEY, PATHS_ZOWE, SETTINGS_SECTION} from "../../constants";
+import {C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_LOCAL_KEY, PATHS_ZOWE, SETTINGS_CPY_SECTION, COPYBOOK_EXT_ARRAY} from "../../constants";
 import {ProfileService} from "../ProfileService";
-import {CopybookUtil} from "../util/CopybookUtil";
-import {CopybookResolver} from "./CopybookResolver";
-import {LocalCopybookResolver} from "./LocalCopybookResolver";
+import {searchInWorkspace} from "../util/FSUtils";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
  */
 export class CopybookURI {
-    /**
-     * This method scan the list of folders as given input and find the required copybook name within the folder.
-     * If found returns its URI representation
-     * @param copybookName name of the copybook asked by the server
-     * @param targetFolders list of folders from where to search the copybook
-     */
-    public static searchInWorkspace(copybookName: string, targetFolders: string[]): string {
-        const copybookResolver: CopybookResolver = new LocalCopybookResolver();
-        const localFolderList: string[] = copybookResolver.resolve(targetFolders);
-        for (const folder of localFolderList) {
-            let uri: URL = this.getURIFrom(folder, copybookName);
-
-            if (fs.existsSync(uri)) {
-                return uri.href;
-            } else {
-                uri = this.getURIFrom(folder, copybookName, CopybookUtil.getValidCopybookExtensionList());
-                if (fs.existsSync(uri)) {
-                    return uri.href;
-                }
-            }
-        }
-    }
-
-    /**
-     * This method is responsible to return an URI without extension if the extension is not provided or an URI
-     * that contains an allowed extension.
-     * @param folder is the first part of the URI referred to the folder defined in the setting.json
-     * @param copybookName is the name of copybook identified by the LSP server that needs to be found locally
-     * or downloaded
-     * @param extensions an optional parameter to produce an URI of an allowed extension list, verifyng that
-     * this URI really exists on FS.
-     */
-    private static getURIFrom(folder: string, copybookName: string, extensions?: string[]): URL {
-        if (!extensions) {
-            return new URL(path.join(folder, copybookName));
-        }
-
-        const fileList = readdirSync(new URL(folder));
-
-        for (const extension of extensions) {
-            const copybookFileWithExtension = copybookName + "." + extension;
-            if (fileList.find(filename => filename === copybookFileWithExtension)) {
-                return new URL(path.join(folder, copybookFileWithExtension));
-            }
-        }
-
-    }
 
     constructor(private profileService: ProfileService) {
     }
@@ -89,10 +36,14 @@ export class CopybookURI {
     public async resolveCopybookURI(copybookName: string, cobolProgramName: string): Promise<string> {
         // check on local paths provided by the user
         let result: string;
-        result = CopybookURI.searchInWorkspace(copybookName, vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_LOCAL_KEY));
+        result = searchInWorkspace(copybookName,
+            vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_LOCAL_KEY),
+            COPYBOOK_EXT_ARRAY);
         // check in subfolders under .copybooks (copybook downloaded from MF)
         if (!result) {
-            result = CopybookURI.searchInWorkspace(copybookName, this.createPathForCopybookDownloaded(await this.profileService.resolveProfile(cobolProgramName)));
+            result = searchInWorkspace(copybookName,
+                this.createPathForCopybookDownloaded(await this.profileService.resolveProfile(cobolProgramName)),
+                COPYBOOK_EXT_ARRAY);
         }
         return result || "";
     }
@@ -105,7 +56,7 @@ export class CopybookURI {
      */
     private createPathForCopybookDownloaded(profile: string): string[] {
         let result: string[] = [];
-        const datasets: string[] = vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);
+        const datasets: string[] = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);
         if (profile && datasets) {
             result = Object.assign([], datasets);
             result.forEach((value, index) => result[index] = C4Z_FOLDER + "/" + COPYBOOKS_FOLDER + "/" + profile + "/" + value);
