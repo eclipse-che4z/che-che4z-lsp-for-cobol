@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.analyze;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This test checks that Outline tree has correct lines numbers for elements */

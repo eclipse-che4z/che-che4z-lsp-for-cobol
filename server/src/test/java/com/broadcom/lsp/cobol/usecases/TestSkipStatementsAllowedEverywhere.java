@@ -44,6 +44,6 @@ class TestSkipStatementsAllowedEverywhere {
 
   @Test
   void assertCopybookProcessingModeNotChangesLogic() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of(), CopybookProcessingMode.DISABLED);
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of(), List.of(), CopybookProcessingMode.DISABLED);
   }
 }

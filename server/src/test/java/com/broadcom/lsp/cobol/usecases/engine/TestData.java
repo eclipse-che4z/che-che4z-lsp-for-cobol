@@ -15,6 +15,7 @@
 
 package com.broadcom.lsp.cobol.usecases.engine;
 
+import lombok.Builder;
 import lombok.Value;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 /** This data class defines output of use-case text preprocessor */
 @Value
+@Builder(toBuilder = true)
 class TestData {
   String text;
   String copybookName;
@@ -38,4 +40,6 @@ class TestData {
   Map<String, List<Location>> constantUsages;
   Map<String, List<Location>> copybookDefinitions;
   Map<String, List<Location>> copybookUsages;
+  Map<String, List<Location>> subroutineDefinitions;
+  Map<String, List<Location>> subroutineUsages;
 }

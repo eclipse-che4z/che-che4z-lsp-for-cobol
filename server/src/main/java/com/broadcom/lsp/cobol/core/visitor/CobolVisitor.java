@@ -27,6 +27,9 @@ import com.broadcom.lsp.cobol.core.semantics.*;
 import com.broadcom.lsp.cobol.core.semantics.outline.NodeType;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineTreeBuilder;
+import com.broadcom.lsp.cobol.service.SubroutineService;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -34,8 +37,11 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.RuleNode;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.*;
@@ -44,6 +50,7 @@ import static com.broadcom.lsp.cobol.core.CobolParser.*;
 import static com.broadcom.lsp.cobol.core.semantics.CobolVariableContext.LEVEL_77;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
@@ -61,6 +68,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private final CobolVariableContext variables = new CobolVariableContext();
   private final PredefinedVariableContext constants = new PredefinedVariableContext();
   private final GroupContext groupContext = new GroupContext();
+  private final Multimap<String, Location> subroutineUsages = HashMultimap.create();
 
   private String programName = null;
 
@@ -69,18 +77,21 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private final OutlineTreeBuilder outlineTreeBuilder;
   private final Map<Token, Locality> positionMapping;
   private final MessageService messageService;
+  private final SubroutineService subroutineService;
 
   public CobolVisitor(
       @NonNull String documentUri,
       @NonNull NamedSubContext copybooks,
       @NonNull CommonTokenStream tokenStream,
       @NonNull Map<Token, Locality> positionMapping,
-      MessageService messageService) {
+      MessageService messageService,
+      SubroutineService subroutineService) {
     this.copybooks = copybooks;
     this.positionMapping = positionMapping;
     this.tokenStream = tokenStream;
     outlineTreeBuilder = new OutlineTreeBuilder(documentUri, positionMapping);
     this.messageService = messageService;
+    this.subroutineService = subroutineService;
   }
 
   /**
@@ -102,6 +113,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
         .constantUsages(constants.getUsages().asMap())
         .copybookDefinitions(copybooks.getDefinitions().asMap())
         .copybookUsages(copybooks.getUsages().asMap())
+        .subroutinesDefinitions(getSubroutineDefinition())
+        .subroutinesUsages(subroutineUsages.asMap())
         .outlineTree(buildOutlineTree())
         .build();
   }
@@ -468,6 +481,21 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     return visitChildren(ctx);
   }
 
+  @Override
+  public Class visitCallStatement(CallStatementContext ctx) {
+    if (ctx.literal() != null) {
+      String subroutineName = PreprocessorStringUtils.trimQuotes(ctx.literal().getText()).toUpperCase();
+      var locality = getLocality(ctx.literal().getStart());
+      locality.ifPresent(it -> {
+        if (subroutineService.getUri(subroutineName).isEmpty()) {
+          reportSubroutineNotDefined(subroutineName, it);
+        }
+      });
+      locality.map(Locality::toLocation).ifPresent(location -> subroutineUsages.put(subroutineName, location));
+    }
+    return visitChildren(ctx);
+  }
+
   private void processDataOccursClause(int levelNumber, DataOccursClauseContext ctx) {
     ctx.indexName()
         .forEach(
@@ -595,6 +623,17 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
     errors.add(error);
   }
 
+  private void reportSubroutineNotDefined(String name, Locality locality) {
+    SyntaxError error =
+        SyntaxError.syntaxError()
+            .suggestion(messageService.getMessage("CobolVisitor.subroutineNotFound", name))
+            .severity(ErrorSeverity.INFO)
+            .locality(getIntervalPosition(locality, locality))
+            .build();
+    LOG.debug("Syntax error by CobolVisitor#reportSubroutineNotDefined: " + error.toString());
+    errors.add(error);
+  }
+
   private void throwWarning(Token token) {
     MisspelledKeywordDistance.calculateDistance(token.getText().toUpperCase())
         .ifPresent(
@@ -655,7 +694,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   private void checkProgramNameIdentical(Token token) {
     String text = PreprocessorStringUtils.trimQuotes(token.getText());
-    if (!programName.equals(text)) {
+    if (!programName.equalsIgnoreCase(text)) {
       getLocality(token)
           .ifPresent(
               it ->
@@ -672,5 +711,16 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
       throw new ParseCancellationException("Parsing interrupted by user.");
     }
     return super.visitChildren(node);
+  }
+
+  private Map<String, Collection<Location>> getSubroutineDefinition() {
+    return subroutineUsages.keySet().stream()
+        .map(name -> new ImmutablePair<>(name, subroutineService.getUri(name)))
+        .filter(pair -> pair.getValue().isPresent())
+        .collect(toMap(Pair::getKey, CobolVisitor::getSubroutineLocation));
+  }
+
+  private static Collection<Location> getSubroutineLocation(ImmutablePair<String, Optional<String>> subroutinePair) {
+    return List.of(new Location(subroutinePair.getValue().get(), new Range(new Position(), new Position())));
   }
 }

@@ -31,14 +31,14 @@ public class TestCallVariableUsages {
           + "       Working-Storage Section.\n"
           + "       01 {$*Variable} PIC 9(9).\n"
           + "       Procedure Division.\n"
-          + "           call \"foobar\" using {$VARIABLE}.\n"
-          + "           call \"foobar\" using by VALUE {$VARIABLE}.\n"
-          + "           call \"foobar\" using by content {$VARIABLE}.\n"
-          + "           call \"foobar\" using by reference {$VARIABLE}.\n"
+          + "           call {%\"foobar\"} using {$VARIABLE}.\n"
+          + "           call {%\"foobar\"} using by VALUE {$Variable}.\n"
+          + "           call {%\"foobar\"} using by content {$VARIABLE}.\n"
+          + "           call {%\"foobar\"} using by reference {$VARIABLE}.\n"
           + "       End program HELLO-WORLD.";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of(), List.of("FOOBAR"));
   }
 }

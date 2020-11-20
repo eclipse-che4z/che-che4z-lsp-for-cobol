@@ -34,11 +34,11 @@ class TestPerformUntilCorrect {
           + "       {#*PROGA}.\r\n"
           + "           PERFORM WITH TEST BEFORE UNTIL {$ID0} = 0\r\n"
           + "             SUBTRACT 1 FROM {$TAPARM1}\r\n"
-          + "             CALL 'ID1'\r\n"
+          + "             CALL {%'ID1'}\r\n"
           + "           END-PERFORM.";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of(), List.of("ID1"));
   }
 }

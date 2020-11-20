@@ -25,7 +25,8 @@ public enum SettingsParametersEnum {
   QUIET("quiet"),
   VERBOSE("verbose"),
   DATASETS("cpy-manager.paths-dsn"),
-  LOCAL_PATHS("cpy-manager.paths-local"),
+  CPY_LOCAL_PATHS("cpy-manager.paths-local"),
+  SUBROUTINE_LOCAL_PATHS("subroutine-manager.paths-local"),
   LSP_PREFIX("broadcom-cobol-lsp"),
   LOCALE("locale"),
   LOGGING_LEVEL("logging.level.root");

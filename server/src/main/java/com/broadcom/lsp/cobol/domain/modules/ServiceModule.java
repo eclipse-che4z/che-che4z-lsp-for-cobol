@@ -15,6 +15,7 @@
 package com.broadcom.lsp.cobol.domain.modules;
 
 import com.broadcom.lsp.cobol.core.annotation.*;
+import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.broadcom.lsp.cobol.service.*;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActionProvider;
 import com.broadcom.lsp.cobol.service.delegates.actions.CodeActions;
@@ -37,7 +38,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.multibindings.Multibinder;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
@@ -57,10 +57,11 @@ public class ServiceModule extends AbstractModule {
     bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
     bind(TextDocumentService.class).to(CobolTextDocumentService.class);
-    bind(LanguageClient.class).toProvider(ClientProvider.class);
+    bind(CobolLanguageClient.class).toProvider(ClientProvider.class);
     bind(SettingsService.class).to(SettingsServiceImpl.class);
     bind(WatcherService.class).to(WatcherServiceImpl.class);
     bind(FileSystemService.class).to(WorkspaceFileService.class);
+    bind(SubroutineService.class).to(SubroutineServiceImpl.class);
 
     bindFormations();
     bindCompletions();
@@ -96,6 +97,7 @@ public class ServiceModule extends AbstractModule {
     completionBinding.addBinding().to(KeywordCompletion.class);
     completionBinding.addBinding().to(CopybookCompletion.class);
     completionBinding.addBinding().to(ConstantCompletion.class);
+    completionBinding.addBinding().to(SubroutineCompletion.class);
 
     bind(CompletionStorage.class).annotatedWith(named("Keywords")).to(Keywords.class);
     bind(CompletionStorage.class).annotatedWith(named("Snippets")).to(Snippets.class);
@@ -110,6 +112,7 @@ public class ServiceModule extends AbstractModule {
     referenceBinding.addBinding().to(SectionLocations.class);
     referenceBinding.addBinding().to(CopybookLocations.class);
     referenceBinding.addBinding().to(ConstantLocations.class);
+    referenceBinding.addBinding().to(SubroutineLocations.class);
   }
 
   private void bindCodeActions() {
