@@ -504,11 +504,15 @@ SPECIFIC : S P E C I F I C;
 SQL : S Q L;
 SQLCA : S Q L C A;
 SQLCODE : S Q L C O D E;
+SQLD : S Q L D;
 SQLDA : S Q L D A;
+SQLDABC : S Q L D A B C;
 SQLERROR : S Q L E R R O R;
 SQLEXCEPTION : S Q L E X C E P T I O N;
 SQLID : S Q L I D;
+SQLN : S Q L N;
 SQLSTATE : S Q L S T A T E;
+SQLVAR : S Q L V A R;
 SQLWARNING : S Q L W A R N I N G;
 STABILIZED : S T A B I L I Z E D;
 STACKED : S T A C K E D;
@@ -597,6 +601,10 @@ RSQUAREBRACKET :     ']';
 REVERSEQUOTECHAR :   '`';
 SEMICOLONCHAR :      ';';
 UNDERSCORECHAR :     '-';
+STRING_CONST : [a-zA-Z0-9]+;
+SQL_IDENTIFIER : ([a-zA-Z_%]+ ([-_%@#$]+ [a-zA-Z0-9]+)*);
+VERSION_ID : ([0-9]+ ([a-zA-Z0-9]+)*);
+
 
 
 NUMBER_0 : '0';

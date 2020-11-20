@@ -454,7 +454,7 @@ dbs_option_list: (LANGUAGE SQL)? (SPECIFIC dbs_specific_name)? (NOT? DETERMINIST
 
 
 
-sqlWord: NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral | generalIdentifier |
+db2sql_word: NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral | generalIdentifier |
             cobolWord | cics_cobol_intersected_words | db2sql_intersected_words | db2sql_only_words;
 
 
@@ -462,7 +462,7 @@ db2sql_intersected_words: ACCESS | ALL | ANY | APPLY | ARE | AS | ASCII | AT | B
                             CALL | CHANGED | CHARACTER | CLOB | COBOL | CONTAINS | CONTINUE | CONTROL | COPY | CORR |
                             CORRESPONDING | COUNT | CURSOR | DATA | DATE | DAY | DB | DBCLOB | DEFAULT | DEFINITION |
                             DELETE | DISABLE | DOUBLE | DYNAMIC | EBCDIC | ELSE | ENABLE | END | END_EXEC | ERASE |
-                            ESCAPE | EVENT | EXCEPTION | EXCLUSIVE | EXEC | EXTENDED | EXTERNAL | FALSE | FILE | FIRST |
+                            ESCAPE | EVENT | EXCEPTION | VARYING | EXCLUSIVE | EXEC | EXTENDED | EXTERNAL | FALSE | FILE | FIRST |
                             FOR | FROM | FUNCTION | GENERATE | GLOBAL | GO | IF | IN | INDEX | INTEGER | INTO | KEY |
                             LANGUAGE | LAST | LEADING | LEFT | LENGTH | LIBRARY | LOCAL | LOCK | MERGE | MODE | NAMED |
                             NATIONAL | NEXT | NO | NOT | NULL | NULLS | NUMERIC |OF | OFF | ON | OPTIONAL | OR | ORDER |
@@ -526,85 +526,88 @@ db2sql_only_words: ABSOLUTE | ACCELERATION | ACCELERATOR | ACTIVATE | ACTIVE | A
 
 
 //Variables
-dbs_accelerator_name: sqlWord+; //?
-dbs_alias_name: sqlWord+; //?
-dbs_array_index: INTEGER;   //?
-dbs_array_type_name: sqlWord+; //?
-dbs_array_variable: sqlWord+; //?
+dbs_accelerator_name: db2sql_word+; //?
+dbs_alias_name: SQL_IDENTIFIER;
+dbs_array_index: INTEGER;
+dbs_array_type_name: SQL_IDENTIFIER;
+dbs_array_variable: db2sql_word+; //?
 dbs_attr_host_variable: literal+; //?
-dbs_authorization_name: sqlWord+; //?IDENTIFIER
-dbs_collection_id_package_name: sqlWord+; //?
-dbs_collection_name: sqlWord+; //?
-dbs_column_name: sqlWord+; //?
-dbs_common_table_expression: sqlWord+; //?
-dbs_context: sqlWord+; //?
-dbs_copy_id: sqlWord+; //?
-dbs_correlation_name: sqlWord+; //?
-dbs_cursor_name: sqlWord+; //?
-dbs_database_name: sqlWord+; //?
-dbs_descriptor_name: sqlWord+; //?
+dbs_authorization_name: SQL_IDENTIFIER;
+dbs_collection_id_package_name: FILENAME;
+dbs_collection_name: db2sql_word+; //?
+dbs_column_name: SQL_IDENTIFIER;
+dbs_common_table_expression: db2sql_word+; //?
+dbs_context: SQL_IDENTIFIER;
+dbs_copy_id: db2sql_word+; //?
+dbs_correlation_name: db2sql_word+; //?
+dbs_cursor_name: SQL_IDENTIFIER;
+dbs_database_name: db2sql_word+; //?
+dbs_descriptor_name: SQLD | SQLDABC | SQLN | SQLVAR; //SQLDA
 dbs_diagnostic_string_expression: literal+; //?
-dbs_distinct_type: sqlWord+; //?
-dbs_distinct_type_name: sqlWord+; //?
-dbs_explainable_sql_statement: sqlWord+; //?
-dbs_expression: sqlWord+; //?
-dbs_fetch_clause: sqlWord+; //?
-dbs_fullselect: sqlWord+; //?
-dbs_function_name: sqlWord+; //?
-dbs_global_variable_name: sqlWord+; //?
-dbs_host_label: sqlWord+; //?
-dbs_host_variable: sqlWord+; //?
-dbs_host_variable_array: sqlWord+; //?
-dbs_host_variable_name: sqlWord+; //?
-dbs_id_host_variable: sqlWord+; //?
-dbs_include_data_type: sqlWord+; //?
+dbs_distinct_type: db2sql_word+; //?
+dbs_distinct_type_name: SQL_IDENTIFIER;
+dbs_explainable_sql_statement: db2sql_word+; //?
+dbs_expression: IN | INOUT | OUT;  //????
+
+
+dbs_fetch_clause: db2sql_word+; //?
+dbs_fullselect: db2sql_word+; //?
+dbs_function_name: SQL_IDENTIFIER;
+
+dbs_global_variable_name: db2sql_word+; //?
+dbs_host_label: db2sql_word+; //?
+dbs_host_variable: FILENAME;
+dbs_host_variable_array: db2sql_word+; //?
+dbs_host_variable_name: db2sql_word+; //?
+dbs_id_host_variable: db2sql_word+; //?
+dbs_include_data_type: db2sql_word+; //?
 dbs_index_identifier: literal+; //?
-dbs_index_name: sqlWord+; //?
-dbs_integer: sqlWord+; //?
-dbs_integer_constant: sqlWord+; //?
-dbs_level: sqlWord+; //?
-dbs_location_name: sqlWord+; //?
-dbs_mask_name: sqlWord+; //?
-dbs_member_name: sqlWord+; //?
-dbs_name: sqlWord+; //?
-dbs_nnnn_m: sqlWord+; //?
-dbs_package_name: sqlWord+; //?
-dbs_permission_name: sqlWord+; //?
-dbs_plan_name: sqlWord+; //?
-dbs_procedure_name: sqlWord+; //?
-dbs_role_name: sqlWord+; //?
-dbs_routine_version_id: sqlWord+; //?
-dbs_row_fullselect: sqlWord+; //?
-dbs_rs_locator_variable: sqlWord+; //?
-dbs_s: sqlWord+; //?
-dbs_schema_name: sqlWord+; //?
-dbs_search_condition: sqlWord+; //?
-dbs_sequence_name: sqlWord+; //?
-dbs_specific_name: sqlWord+; //?
+dbs_index_name: SQL_IDENTIFIER;
+dbs_integer: INTEGERLITERAL;
+dbs_integer_constant: db2sql_word+; //?
+dbs_level: db2sql_word+; //?
+dbs_location_name: VARCHAR | CHAR; //not greater than 16
+dbs_mask_name: SQL_IDENTIFIER;
+dbs_member_name: db2sql_word+; //?
+dbs_name: db2sql_word+; //?
+dbs_nnnn_m: db2sql_word+; //?
+dbs_package_name: db2sql_word+; //?
+dbs_permission_name: SQL_IDENTIFIER;
+dbs_plan_name: SQL_IDENTIFIER;
+dbs_procedure_name: SQL_IDENTIFIER;
+dbs_role_name: SQL_IDENTIFIER;
+dbs_routine_version_id: STRING_CONST;
+dbs_row_fullselect: db2sql_word+; //?
+dbs_rs_locator_variable: SQL_IDENTIFIER;
+dbs_s: db2sql_word+; //?
+dbs_schema_name: db2sql_word+; //?
+dbs_search_condition: db2sql_word+; //?
+dbs_sequence_name: SQL_IDENTIFIER;
+dbs_specific_name: SQL_IDENTIFIER;
 dbs_sql_condition_name: literal+; //?
-dbs_sql_parameter_name: sqlWord+; //?
-dbs_sql_variable_name: sqlWord+; //?
+dbs_sql_parameter_name: db2sql_word+; //?
+dbs_sql_variable_name: db2sql_word+; //?
 dbs_sqlstate_string_constant: literal+; //?
-dbs_statement_name: sqlWord+; //?
-dbs_stogroup_name: sqlWord+; //?
-dbs_string_constant: sqlWord+; //?
-dbs_string_expression: sqlWord+; //?
-dbs_synonym: sqlWord+; //?
+dbs_statement_name: db2sql_word+; //?
+dbs_stogroup_name: db2sql_word+; //?
+dbs_string_constant: STRING_CONST; //not bigger than 762
+dbs_string_expression: db2sql_word+; //?
+dbs_synonym: db2sql_word+; //?
 dbs_table_identifier: literal+; //?
-dbs_table_name: sqlWord+; //?
+dbs_table_name: SQL_IDENTIFIER;
 dbs_table_reference: literal+; //?
-dbs_table_space_name: sqlWord+; //?
-dbs_token_host_variable: sqlWord+; //?
-dbs_transition_table_name: sqlWord+; //?
-dbs_transition_variable_name: sqlWord+; //?
-dbs_trigger_name: sqlWord+; //?
-dbs_type_name: sqlWord+; //?
-dbs_unpack_function_invocation: sqlWord+; //?
-dbs_value: sqlWord+; //?
-dbs_variable: sqlWord+; //?
-dbs_variable_name: sqlWord+; //?
-dbs_version_id: sqlWord+; //?
-dbs_version_name: sqlWord+; //?
-dbs_view_name: sqlWord+; //?
+dbs_table_space_name: db2sql_word+;
+dbs_token_host_variable: db2sql_word+; //?
+dbs_transition_table_name: SQL_IDENTIFIER;
+dbs_transition_variable_name: db2sql_word+; //?
+dbs_trigger_name: SQL_IDENTIFIER;
+dbs_type_name: STRING_CONST;
+dbs_unpack_function_invocation: db2sql_word+; //?
+dbs_value: db2sql_word+; //?
+dbs_variable: VARCHAR | CHAR; //not greater than 254
+dbs_variable_name: SQL_IDENTIFIER;
+dbs_version_id: VERSION_ID;
+dbs_version_name: db2sql_word+; //?
+dbs_view_name: SQL_IDENTIFIER;
 
 /*STATEMENTS - */
