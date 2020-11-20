@@ -1133,7 +1133,7 @@ procedureName
    ;
 
 programName
-   : NONNUMERICLITERAL | cobolWord
+   : NONNUMERICLITERAL | cobolWord | cics_cobol_intersected_words
    ;
 
 recordName
