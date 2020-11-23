@@ -789,7 +789,7 @@ callStatement
    ;
 
 callUsingPhrase
-   : USING callUsingParameter+
+   : USING callUsingParameter (COMMACHAR? callUsingParameter)*
    ;
 
 callUsingParameter
