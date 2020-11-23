@@ -1,7 +1,15 @@
 {
   "hooks": {
-    "before:init": ["git config user.email \"dont@write.here\"", "git config user.name \"Caring bot\""],
-    "after:bump": "git add ../../CHANGELOG.md; npx vsce package"
+    "before:init": [
+      "git config user.email \"dont@write.here\"",
+      "git config user.name \"Caring bot\""
+    ],
+    "after:bump": [
+      "git add ../../CHANGELOG.md",
+      "echo $THE_KEY > resources/TELEMETRY_KEY",
+      "npx vsce package",
+      "git checkout -- resources/TELEMETRY_KEY"
+    ]
   },
   "github": {
     "release": true,
