@@ -26,10 +26,12 @@ import {ConfigurationWorkspaceMiddleware} from "vscode-languageclient/lib/config
 import {LANGUAGE_ID} from "../constants";
 import {JavaCheck} from "./JavaCheck";
 import {Middleware} from "./Middleware";
+import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
 
 export class LanguageClientService {
     private readonly jarPath: string;
     private languageClient: LanguageClient;
+    private handlers: {(languageClient: LanguageClient): void}[] = [];
 
     constructor(private middleware: Middleware) {
         const ext = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
@@ -43,8 +45,24 @@ export class LanguageClientService {
         }
     }
 
+    public addNotificationHandler(method: string, handler: GenericNotificationHandler): void {
+        this.handlers.push(languageClient => languageClient.onNotification(method, handler));
+    }
+
+    public addRequestHandler<R, E>(method: string, handler: GenericRequestHandler<R, E>): void {
+        this.handlers.push(languageClient => languageClient.onRequest(method, handler));
+    }
+
     public start(): vscode.Disposable {
+        this.initHandlers();
         return this.getLanguageClient().start();
+    }
+
+    private initHandlers() {
+        const languageClient = this.getLanguageClient();
+        for (let handler of this.handlers) {
+            languageClient.onReady().then(() => handler(languageClient));
+        }
     }
 
     public stop(): Thenable<void> {

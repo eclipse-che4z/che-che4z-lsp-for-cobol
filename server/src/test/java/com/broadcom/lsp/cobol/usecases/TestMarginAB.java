@@ -57,7 +57,7 @@ class TestMarginAB {
           + "000000  PROGA.\n"
           + "000000     PERFORM WITH TEST BEFORE UNTIL TAPARM1 = 0\n"
           + "000000       SUBTRACT 1 FROM TAPARM1\n"
-          + "000000       CALL 'ATCDEM3'\n"
+          + "000000       CALL ATCDEM3\n"
           + "000000     END-PERFORM\n"
           + "000000     IF TAPARM2 = 0\n"
           + "000000       PERFORM PROCA\n"
@@ -90,7 +90,7 @@ class TestMarginAB {
           + "000000  PROGA.\n"
           + "000000  PERFORM WITH TEST BEFORE UNTIL TAPARM1 = 0\n" // starting area A instead of B
           + "000000       SUBTRACT 1 FROM TAPARM1\n"
-          + "000000       CALL 'ATCDEM3'\n"
+          + "000000       CALL ATCDEM3\n"
           + "000000     END-PERFORM\n"
           + "000000     IF TAPARM2 = 0\n"
           + "000000       PERFORM PROCA\n"

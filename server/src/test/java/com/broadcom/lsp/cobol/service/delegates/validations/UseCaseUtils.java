@@ -14,29 +14,24 @@
  */
 package com.broadcom.lsp.cobol.service.delegates.validations;
 
-import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.CopybookModel;
 import com.broadcom.lsp.cobol.domain.modules.DatabusModule;
 import com.broadcom.lsp.cobol.domain.modules.EngineModule;
+import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.broadcom.lsp.cobol.positive.CobolText;
-import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
-import com.broadcom.lsp.cobol.service.CopybookService;
-import com.broadcom.lsp.cobol.service.CopybookServiceImpl;
-import com.broadcom.lsp.cobol.service.SettingsService;
+import com.broadcom.lsp.cobol.service.*;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Provider;
 import lombok.experimental.UtilityClass;
 import org.awaitility.Awaitility;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.TextDocumentItem;
-import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 import java.util.List;
@@ -49,7 +44,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -188,7 +182,21 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(String fileName, String text, List<CobolText> copybooks) {
-    return analyze(fileName, text, copybooks, CopybookProcessingMode.ENABLED);
+    return analyze(fileName, text, copybooks, List.of(), CopybookProcessingMode.ENABLED);
+  }
+
+  /**
+   * Analyze the given text using a real language engine providing copybooks required for the
+   * analysis
+   *
+   * @param fileName - name of the processing file
+   * @param text - text to analyze
+   * @param copybooks - list of copybooks required for the analysis
+   * @param subroutineNames - list of available subroutine names
+   * @return the entire analysis result
+   */
+  public static AnalysisResult analyze(String fileName, String text, List<CobolText> copybooks, List<String> subroutineNames) {
+    return analyze(fileName, text, copybooks, subroutineNames, CopybookProcessingMode.ENABLED);
   }
 
   /**
@@ -198,6 +206,7 @@ public class UseCaseUtils {
    * @param fileName - name of the processing file
    * @param text - text to analyze
    * @param copybooks - list of copybooks required for the analysis
+   * @param subroutineNames - list of available subroutine names
    * @param copybookProcessingMode - sync type for the analysis
    * @return the entire analysis result
    */
@@ -205,12 +214,13 @@ public class UseCaseUtils {
       String fileName,
       String text,
       List<CobolText> copybooks,
+      List<String> subroutineNames,
       CopybookProcessingMode copybookProcessingMode) {
     SettingsService mockSettingsService = mock(SettingsService.class);
     when(mockSettingsService.getConfiguration(any()))
         .thenReturn(CompletableFuture.completedFuture(List.of()));
 
-    LanguageClient languageClient = mock(LanguageClient.class);
+    CobolLanguageClient languageClient = mock(CobolLanguageClient.class);
     FileSystemService mockFileSystemService = mock(FileSystemService.class);
     when(mockFileSystemService.getNameFromURI(any())).thenReturn("");
     Injector injector =
@@ -223,12 +233,16 @@ public class UseCaseUtils {
                 bind(CopybookService.class).to(CopybookServiceImpl.class);
                 bind(SettingsService.class).toInstance(mockSettingsService);
                 bind(FileSystemService.class).toInstance(mockFileSystemService);
-                bind(LanguageClient.class).toInstance(languageClient);
+                bind(CobolLanguageClient.class).toInstance(languageClient);
+                bind(SubroutineService.class).to(SubroutineServiceImpl.class);
               }
             });
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
     copybooks.stream().map(UseCaseUtils::toCopybookModel).forEach(copybookService::store);
+
+    SubroutineService subroutines = injector.getInstance(SubroutineService.class);
+    subroutineNames.forEach(name -> subroutines.store(name, "URI:" + name));
 
     return injector
         .getInstance(CobolLanguageEngineFacade.class)

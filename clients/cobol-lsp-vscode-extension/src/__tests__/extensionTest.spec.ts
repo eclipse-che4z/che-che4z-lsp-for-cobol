@@ -12,36 +12,27 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "fs-extra";
 import * as vscode from "vscode";
-import { LanguageClient } from "vscode-languageclient";
 import {changeDefaultZoweProfile} from "../commands/ChangeDefaultZoweProfile";
 import {editDatasetPaths} from "../commands/EditDatasetPaths";
 import {fetchCopybookCommand} from "../commands/FetchCopybookCommand";
 import {gotoCopybookSettings} from "../commands/OpenSettingsCommand";
 import {activate} from "../extension";
-import {CopybookDownloadService} from "../services/copybook/CopybookDownloadService";
 import {CopybooksCodeActionProvider} from "../services/copybook/CopybooksCodeActionProvider";
-import {CopybookURI} from "../services/copybook/CopybookURI";
-import {JavaCheck} from "../services/JavaCheck";
 import {LanguageClientService} from "../services/LanguageClientService";
-import {Middleware} from "../services/Middleware";
-import {ProfileService} from "../services/ProfileService";
 import {TelemetryService} from "../services/reporter/TelemetryService";
 import {createFileWithGivenPath, initializeSettings} from "../services/Settings";
-import {ZoweApi} from "../services/ZoweApi";
 
 jest.mock("../commands/ChangeDefaultZoweProfile");
 jest.mock("../commands/EditDatasetPaths");
 jest.mock("../commands/FetchCopybookCommand");
 jest.mock("../commands/OpenSettingsCommand");
+jest.mock("../services/LanguageClientService");
+jest.mock("../services/copybook/CopybookDownloadService");
 
 jest.mock("../services/Settings", () => ({
     createFileWithGivenPath: jest.fn(),
     initializeSettings: jest.fn(),
-}));
-jest.mock("../commands/FetchCopybookCommand", () => ({
-    fetchCopybookCommand: jest.fn(),
 }));
 jest.mock("vscode", () => ({
     commands: {
@@ -66,47 +57,21 @@ jest.mock("vscode", () => ({
     }));
 
 jest.mock("../services/ProfileService");
-jest.mock("../services/copybook/CopybooksPathGenerator");
-jest.mock("../services/ProfileService");
-jest.mock("../services/copybook/CopybookURI");
 jest.mock("vscode-languageclient", () => ({
     LanguageClient: jest.fn(),
 }));
-
-jest.mock("../services/Middleware");
-jest.mock("../services/PathsService");
 jest.mock("../services/reporter/TelemetryService");
-fs.existsSync = jest.fn().mockReturnValue(true);
-new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
 
 const context: any = {
     subscriptions: [],
   };
 
-const zoweApi: ZoweApi = new ZoweApi();
-const profileService: ProfileService = new ProfileService(zoweApi);
-const copyBooksDownloader: CopybookDownloadService = new CopybookDownloadService(zoweApi, null, null);
-const middleware: Middleware = new Middleware(new CopybookURI(profileService), copyBooksDownloader);
-const languageClientService: LanguageClientService = new LanguageClientService(middleware);
-languageClientService.checkPrerequisites = jest.fn(() => Promise.resolve());
-languageClientService.start = jest.fn().mockResolvedValue(true);
-copyBooksDownloader.start = jest.fn().mockReturnValue("started");
-
 beforeEach(() => {
     jest.clearAllMocks();
     context.subscriptions = [];
-  });
+});
 
 describe("Check plugin extension for cobol starts successfully.", () => {
-
-    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-        get: jest.fn().mockReturnValue(999),
-    });
-    LanguageClient.prototype.start = jest.fn().mockReturnValue("server started");
-    copyBooksDownloader.start = jest.fn().mockReturnValue(true);
-    jest.mock("../services/LanguageClientService", () => ({ languageClientService }));
-    jest.mock("../services/copybook/CopybookDownloadService", () => ({ copyBooksDownloader }));
-    fs.existsSync = jest.fn().mockReturnValue(true);
 
     test("start extension", async () => {
         await activate(context);
@@ -133,20 +98,16 @@ describe("Check plugin extension for cobol starts successfully.", () => {
 
 describe("Check plugin extension for cobol fails.", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
-    });
-
-    fs.existsSync = jest.fn().mockReturnValue(false);
-    copyBooksDownloader.start = jest.fn().mockReturnValue(true);
-    jest.mock("../services/LanguageClientService", () => ({ languageClientService }));
-    jest.mock("../services/copybook/CopybookDownloadService", () => ({ copyBooksDownloader }));
+        (LanguageClientService as any).mockImplementation(() => {
+            return {
+                checkPrerequisites: () => {
+                    throw new Error("The error");
+                }
+            }
+        });
+    })
 
     test("start fails.", async () => {
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            get: jest.fn().mockReturnValue(0),
-        });
-        vscode.window.showErrorMessage = jest.fn();
-
         await activate(context);
         expect(initializeSettings).toHaveBeenCalledTimes(1);
         expect(TelemetryService.registerEvent).toHaveBeenCalledWith("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");

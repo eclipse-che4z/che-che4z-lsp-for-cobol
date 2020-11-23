@@ -40,6 +40,8 @@ public class AnalysisResult {
   @Builder.Default Map<String, List<Location>> constantUsages = new HashMap<>();
   @Builder.Default Map<String, List<Location>> copybookDefinitions = new HashMap<>();
   @Builder.Default Map<String, List<Location>> copybookUsages = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> subroutineDefinitions = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> subroutineUsages = new HashMap<>();
   @Builder.Default List<DocumentSymbol> outlineTree = new ArrayList<>();
 
   public static AnalysisResult empty() {

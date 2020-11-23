@@ -16,7 +16,7 @@ import {IProfile} from "@zowe/imperative";
 import * as path from "path";
 import * as vscode from "vscode";
 import {Disposable} from "vscode-languageclient";
-import {COBOL_CBL_EXT, COBOL_COB_EXT, COBOL_COBOL_EXT, SETTINGS_SECTION} from "../constants";
+import {COBOL_CBL_EXT, COBOL_COB_EXT, COBOL_COBOL_EXT, SETTINGS_CPY_SECTION} from "../constants";
 import {ProfilesMap, ZoweApi} from "./ZoweApi";
 
 const DEFAULT_STATUS_TEXT = "CPY profile: undefined";
@@ -24,7 +24,7 @@ const DEFAULT_STATUS_TEXT = "CPY profile: undefined";
 export class ProfileService implements Disposable {
 
     private static isCobolProgram(fsPath: string) {
-        const ext = path.extname(fsPath).toLocaleLowerCase();
+        const ext = path.extname(fsPath).toLocaleUpperCase();
         return [COBOL_CBL_EXT, COBOL_COB_EXT, COBOL_COBOL_EXT].includes(ext);
     }
 
@@ -55,7 +55,7 @@ export class ProfileService implements Disposable {
             {placeHolder: "Select a zowe profile to search for copybooks", canPickMany: false});
         if (selectedProfile) {
             // TODO Switch to program specific profiles
-            await vscode.workspace.getConfiguration(SETTINGS_SECTION).update("profiles",
+            await vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).update("profiles",
                 selectedProfile.label, false);
             return selectedProfile.label;
         }
@@ -119,7 +119,7 @@ export class ProfileService implements Disposable {
 
     private tryGetProfileFromSettings(profiles: ProfilesMap): string | undefined {
         // TODO switch from single profile to program specific profile
-        const profile: string = vscode.workspace.getConfiguration(SETTINGS_SECTION).get("profiles");
+        const profile: string = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get("profiles");
 
         if (profiles[profile]) {
             return profile;

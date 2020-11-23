@@ -18,12 +18,14 @@ import {CopybookURI} from "../services/copybook/CopybookURI";
 import {ProfileService} from "../services/ProfileService";
 import {SettingsUtils} from "../services/util/SettingsUtils";
 import {ZoweApi} from "../services/ZoweApi";
+import * as fsUtils from "../services/util/FSUtils";
+import {COPYBOOK_EXT_ARRAY} from "../constants";
 
 const zoweApi: ZoweApi = new ZoweApi();
 const profileService: ProfileService = new ProfileService(zoweApi);
 const copybookURI: CopybookURI = new CopybookURI(profileService);
 const copybookName: string = "NSTCOPY1";
-const copybookNameWithExtension: string = "NSTCOPY2.cpy";
+const copybookNameWithExtension: string = "NSTCOPY2.CPY";
 const CPY_FOLDER_NAME = ".cobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
 SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + __dirname]);
@@ -71,27 +73,27 @@ afterAll(() => {
 });
 describe("Resolve local copybook against bad configuration of target folders", () => {
     test("given an undefined value as list of folders, the copybook is not retrieved", () => {
-        expect(CopybookURI.searchInWorkspace(copybookName, undefined)).toBe(undefined);
+        expect(fsUtils.searchInWorkspace(copybookName, undefined, COPYBOOK_EXT_ARRAY)).toBe(undefined);
     });
     test("given an empty list of folders, the copybook is not retrieved", () => {
-        expect(CopybookURI.searchInWorkspace(copybookName, [])).toBe(undefined);
+        expect(fsUtils.searchInWorkspace(copybookName, [], COPYBOOK_EXT_ARRAY)).toBe(undefined);
     });
     test("given a folder that not contains copybooks, the target copybook is not retrieved", () => {
-        expect(CopybookURI.searchInWorkspace(copybookName, [__dirname])).toBe(undefined);
+        expect(fsUtils.searchInWorkspace(copybookName, [__dirname], COPYBOOK_EXT_ARRAY)).toBe(undefined);
     });
     test("given a not empty folder, a copybook that is not present in that folder is not retrivied and the uri returned is undefined", () => {
-        expect(CopybookURI.searchInWorkspace("NSTCPY2", [CPY_FOLDER_NAME])).toBeUndefined();
+        expect(fsUtils.searchInWorkspace("NSTCPY2", [CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeUndefined();
     });
 });
 describe("Resolve local copybook present in one or more folders specified by the user", () => {
     test("given a folder that contains the target copybook, it is found and its uri is returned", () => {
-        expect(CopybookURI.searchInWorkspace(copybookName, [CPY_FOLDER_NAME])).toBeDefined();
+        expect(fsUtils.searchInWorkspace(copybookName, [CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
     });
     test("given two times the same folder that contains the target copybook, one uri is still returned", () => {
-        expect(CopybookURI.searchInWorkspace(copybookName, [CPY_FOLDER_NAME])).toBeDefined();
+        expect(fsUtils.searchInWorkspace(copybookName, [CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
     });
     test("Given a copybook with extension on filesystem, the uri is correctly returned", () => {
-        expect(CopybookURI.searchInWorkspace("NSTCOPY2", [CPY_FOLDER_NAME])).toBeDefined();
+        expect(fsUtils.searchInWorkspace("NSTCOPY2", [CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
     });
 });
 describe("With invalid input parameters, the list of URI that represent copybook downloaded are not generated", () => {
@@ -116,7 +118,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
         });
     }
 
-    const spySearchInWorkspace = jest.spyOn(CopybookURI, "searchInWorkspace");
+    const spySearchInWorkspace = jest.spyOn(fsUtils, "searchInWorkspace");
     test("With only a local folder defined in the settings.json, the search is applied locally", async () => {
         vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
             get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),

@@ -11,31 +11,15 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as fs from "fs";
-import * as path from "path";
 import {URL} from "url";
-import {SettingsUtils} from "../util/SettingsUtils";
 import {CopybookResolver} from "./CopybookResolver";
+import { getURIFromResource } from "../util/FSUtils";
 
 /**
  * This class implement the resolution of paths defined into the configuration file in a list
  * of URIs that are present on the filesystem
  */
 export class LocalCopybookResolver implements CopybookResolver {
-
-    /**
-     * This function construct an URI from a valid resource provided from the setting configuration
-     * @param resource represent the file to search within the workspace folder list
-     * @return an URI representation of the file or undefined if not found
-     */
-    private static getURIFromResource(resource: string): URL {
-        for (const workspaceFolder of SettingsUtils.getWorkspacesURI()) {
-            const uri: URL = new URL(path.join(workspaceFolder, resource));
-            if (fs.existsSync(uri)) {
-                return uri;
-            }
-        }
-    }
 
     /**
      * @param list the provided list of physical path defined by the user or undefined
@@ -48,7 +32,7 @@ export class LocalCopybookResolver implements CopybookResolver {
     private resolveURIList(list: string[]): string[] {
         const result: Set<string> = new Set<string>();
         list.filter(resource => resource !== "*").forEach(resource => {
-            const URI: URL = LocalCopybookResolver.getURIFromResource(resource);
+            const URI: URL = getURIFromResource(resource);
             if (URI !== undefined) {
                 result.add(URI.href);
             }

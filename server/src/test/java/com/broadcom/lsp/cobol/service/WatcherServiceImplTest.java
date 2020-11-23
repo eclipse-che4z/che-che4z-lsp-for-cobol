@@ -15,9 +15,9 @@
 
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.broadcom.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -36,7 +36,7 @@ class WatcherServiceImplTest {
 
   @Test
   void watchConfigurationChange() {
-    LanguageClient client = mock(LanguageClient.class);
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
     ClientProvider provider = new ClientProvider();
     provider.set(client);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
@@ -57,7 +57,7 @@ class WatcherServiceImplTest {
 
   @Test
   void watchPredefinedFolder() {
-    LanguageClient client = mock(LanguageClient.class);
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
     ClientProvider provider = new ClientProvider();
     provider.set(client);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
@@ -71,7 +71,7 @@ class WatcherServiceImplTest {
 
   @Test
   void addWatchers() {
-    LanguageClient client = mock(LanguageClient.class);
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
     ClientProvider provider = new ClientProvider();
     provider.set(client);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
@@ -92,7 +92,7 @@ class WatcherServiceImplTest {
 
   @Test
   void removeWatchers() {
-    LanguageClient client = mock(LanguageClient.class);
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
     ClientProvider provider = new ClientProvider();
     provider.set(client);
     ArgumentCaptor<UnregistrationParams> captor = forClass(UnregistrationParams.class);

@@ -14,6 +14,7 @@
  */
 package com.broadcom.lsp.cobol.service;
 
+import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
@@ -21,12 +22,11 @@ import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.ConfigurationItem;
 import org.eclipse.lsp4j.ConfigurationParams;
-import org.eclipse.lsp4j.services.LanguageClient;
 
-import lombok.NonNull;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -38,10 +38,10 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 @Singleton
 public class SettingsServiceImpl implements SettingsService {
-  private Provider<LanguageClient> clientProvider;
+  private Provider<CobolLanguageClient> clientProvider;
 
   @Inject
-  SettingsServiceImpl(Provider<LanguageClient> clientProvider) {
+  SettingsServiceImpl(Provider<CobolLanguageClient> clientProvider) {
     this.clientProvider = clientProvider;
   }
 

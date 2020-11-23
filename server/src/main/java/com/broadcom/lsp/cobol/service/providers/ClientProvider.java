@@ -15,22 +15,21 @@
 
 package com.broadcom.lsp.cobol.service.providers;
 
+import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import org.eclipse.lsp4j.services.LanguageClient;
-
 import lombok.NonNull;
 
 @Singleton
-public class ClientProvider implements Provider<LanguageClient> {
-  private LanguageClient client;
+public class ClientProvider implements Provider<CobolLanguageClient> {
+  private CobolLanguageClient client;
 
-  public void set(@NonNull LanguageClient client) {
+  public void set(@NonNull CobolLanguageClient client) {
     this.client = client;
   }
 
   @Override
-  public LanguageClient get() {
+  public CobolLanguageClient get() {
     return client;
   }
 }

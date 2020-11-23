@@ -16,7 +16,7 @@
 grammar UseCasePreprocessor;
 
 startRule
-   : .*? ((copybookStatement | variableStatement | paragraphStatement | sectionStatement | constantStatement | errorStatement | multiTokenError | NEWLINE)+ .*?)+ EOF
+   : .*? ((copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement | constantStatement | errorStatement | multiTokenError | NEWLINE)+ .*?)+ EOF
    ;
 
 multiTokenError
@@ -24,7 +24,7 @@ multiTokenError
    ;
 
 multiToken
-   : (word | copybookStatement | variableStatement | paragraphStatement | sectionStatement | constantStatement | errorStatement | multiTokenError | TEXT)+
+   : (word | copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement | constantStatement | errorStatement | multiTokenError | TEXT)+
    ;
 
 errorStatement
@@ -87,6 +87,14 @@ sectionDefinition
    : SECTIONDEFINITION word
    ;
 
+subroutineStatement
+   : subroutineUsage diagnostic* STOP
+   ;
+
+subroutineUsage
+   : SUBROUTINEUSAGE STRINGLITERAL replacement?
+   ;
+
 diagnostic
    : DIAGNOSTICSTART identifier
    ;
@@ -122,12 +130,13 @@ SECTIONDEFINITION : START + '@*';
 SECTIONUSAGE : START + '@';
 COPYBOOKDEFINITION : START + '~*';
 COPYBOOKUSAGE : START + '~';
+SUBROUTINEUSAGE : START + '%';
 DIAGNOSTICSTART : '|';
 REPLACEMENTSTART : '^';
 MULTITOKENSTART : START + '_';
 MULTITOKENSTOP : '_' + STOP;
 
-STRINGLITERAL : ["] ~["]* ["];
+STRINGLITERAL : ['"] ~['"]* ['"];
 IDENTIFIER : [a-zA-Z0-9:]+ ([-_]+ [a-zA-Z0-9:]+)*;
 
 COPYBOOKNAME : [a-zA-Z0-9#@$]+ ([-_]+ [a-zA-Z0-9#@$]+)*;
