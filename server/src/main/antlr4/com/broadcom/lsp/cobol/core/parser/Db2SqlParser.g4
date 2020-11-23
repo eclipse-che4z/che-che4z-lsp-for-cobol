@@ -51,7 +51,6 @@ dbs_comment: COMMENT ON (dbs_comment_multiple_column_list | (dbs_comment_alias_d
              dbs_comment_function | dbs_comment_index | dbs_comment_package | dbs_comment_plan | dbs_comment_procedure |
              dbs_comment_role | dbs_comment_sequence | dbs_comment_table | dbs_comment_trigger | dbs_comment_trusted |
              dbs_comment_type | dbs_comment_mask | dbs_comment_permission | dbs_comment_variable) IS dbs_string_constant);
-//?
 dbs_comment_multiple_column_list: (dbs_table_name | dbs_view_name) LPARENCHAR dbs_column_name IS
                                   dbs_string_constant (COMMACHAR dbs_column_name IS dbs_string_constant)* RPARENCHAR;
 dbs_comment_alias_designator: (dbs_comment_public_alias_designator | dbs_comment_nonpub_alias_designator);
@@ -106,6 +105,8 @@ dbs_connect_authorization: USER dbs_host_variable USING dbs_host_variable;
 /*CREATE (all) */
 dbs_create: literal+; //?
 
+dbs_create_distinct_type : CREATE DISTINCT TYPE SQL_IDENTIFIER AS dbs_distinct_type;
+
 /*DECLARE (all) */
 dbs_declare: literal+; //?
 
@@ -130,7 +131,7 @@ dbs_delete_bit_binary: (BINARY VARYING? | VARBINARY) (LPARENCHAR dbs_integer RPA
 dbs_delete_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
 dbs_delete_assignment_clause: (dbs_delete_assignment_clause_whole | dbs_delete_assignment_clause_part);
 dbs_delete_assignment_clause_whole: dbs_column_name EQUALCHAR (dbs_expression | NULL) (COMMACHAR dbs_column_name EQUALCHAR (dbs_expression | NULL))*;
-dbs_delete_assignment_clause_part: LPARENCHAR dbs_column_name (COMMACHAR dbs_column_name)* RPARENCHAR EQUALCHAR LPARENCHAR (dbs_row_fullselect | (dbs_expression |
+dbs_delete_assignment_clause_part: LPARENCHAR dbs_column_name (COMMACHAR dbs_column_name)* RPARENCHAR EQUALCHAR LPARENCHAR (dbs_select_row_fullselect | (dbs_expression |
                                    NULL) (COMMACHAR (dbs_expression | NULL)*)) RPARENCHAR;
 dbs_delete_isolation_clause: WITH (RR | RS | CS);
 dbs_delete_noperiod: dbs_correlation_name? dbs_delete_include_column? (SET dbs_delete_assignment_clause)? (WHERE dbs_search_condition)?
@@ -340,7 +341,7 @@ dbs_merge_values_multi: (dbs_expression | dbs_host_variable_array | NULL | LPARE
         NULL) (COMMACHAR (dbs_expression | dbs_host_variable_array | NULL))* RPARENCHAR) FOR (dbs_host_variable | dbs_integer_constant) ROWS;
 dbs_merge_update: UPDATE SET dbs_merge_assignment (COMMACHAR dbs_merge_assignment)*;
 dbs_merge_assignment: (dbs_column_name EQUALCHAR (dbs_expression | DEFAULT | NULL) | LPARENCHAR dbs_column_name (COMMA dbs_column_name)*
-        RPARENCHAR EQUALCHAR LPARENCHAR (dbs_row_fullselect | (dbs_expression | DEFAULT | NULL) (COMMACHAR (dbs_expression | DEFAULT | NULL))*) RPARENCHAR);
+        RPARENCHAR EQUALCHAR LPARENCHAR (dbs_select_row_fullselect | (dbs_expression | DEFAULT | NULL) (COMMACHAR (dbs_expression | DEFAULT | NULL))*) RPARENCHAR);
 dbs_merge_insert: INSERT (LPARENCHAR dbs_column_name (COMMACHAR dbs_column_name)* RPARENCHAR)? VALUES (dbs_expression | DEFAULT | NULL |
         LPARENCHAR (dbs_expression | DEFAULT | NULL) (COMMACHAR (dbs_expression | DEFAULT | NULL))* RPARENCHAR);
 
@@ -378,7 +379,16 @@ dbs_savepoint: SAVEPOINT dbs_savepoint_name UNIQUE? ON ROLLBACK RETAIN (CURSORS 
 /*SET (all) */
 //?
 dbs_revoke: literal+; //?
+
+/*SET (all)*/
 dbs_select: literal+; //?
+
+/*Queries Subselects (all)*/
+dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCHAR DOT ASTERISKCHAR AS LPARENCHAR dbs_field_name db2sql_data_types (COMMACHAR dbs_field_name db2sql_data_types)* RPARENCHAR;
+dbs_select_row_fullselect: literal+; //TBD
+
+
+
 dbs_set: literal+; //?
 
 /*SIGNAL - this is a statement and is referenced in other rules*/
@@ -417,7 +427,7 @@ dbs_update_bit_binary: BINARY (VARYING LPARENCHAR dbs_integer RPARENCHAR | (LPAR
 dbs_update_bit_varbinary: VARBINARY LPARENCHAR dbs_integer RPARENCHAR;
 dbs_update_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
 dbs_update_assignment: (dbs_column_name EQUALCHAR (dbs_expression | DEFAULT | NULL) | LPARENCHAR dbs_column_name
-                    (COMMA dbs_column_name)* RPARENCHAR EQUALCHAR LPARENCHAR (dbs_row_fullselect | dbs_unpack_function_invocation |
+                    (COMMA dbs_column_name)* RPARENCHAR EQUALCHAR LPARENCHAR (dbs_select_row_fullselect | dbs_select_unpack_function_invocation |
                     (dbs_expression | DEFAULT | NULL) (COMMACHAR (dbs_expression | DEFAULT | NULL))*) RPARENCHAR);
 dbs_update_positioned: dbs_correlation_name? SET dbs_update_assignment (COMMACHAR dbs_update_assignment)* WHERE CURRENT OF
                     dbs_cursor_name (FOR ROW (dbs_host_variable | dbs_integer_constant) OF ROWSET)?;
@@ -454,8 +464,11 @@ dbs_option_list: (LANGUAGE SQL)? (SPECIFIC dbs_specific_name)? (NOT? DETERMINIST
 
 
 
-db2sql_word: NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral | generalIdentifier |
+all_words: NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral | generalIdentifier |
             cobolWord | cics_cobol_intersected_words | db2sql_intersected_words | db2sql_only_words;
+
+
+db2sql_words: db2sql_only_words | db2sql_intersected_words;
 
 
 db2sql_intersected_words: ACCESS | ALL | ANY | APPLY | ARE | AS | ASCII | AT | BEFORE | BINARY | BIT | BLOB | BY |
@@ -520,94 +533,104 @@ db2sql_only_words: ABSOLUTE | ACCELERATION | ACCELERATOR | ACTIVATE | ACTIVE | A
                             STAY | STMTCACHE | STMTID | STMTTOKEN | STOGROUP | STORED | STYLE | SUB | SUBSTR | SUBSTRING | SUMMARY |
                             SWITCH | SYNONYM | SYSTEM | SYSTEM_TIME | SYSTEM_USER | TABLE | TABLE_NAME | TABLESPACE | TABLESPACES | TEMPORARY |
                             THREADSAFE | TIMESTAMP | TIMEZONE | TIMEZONE_HOUR | TIMEZONE_MINUTE | TRANSLATE | TRANSLATION | TREAT | TRIM |
-                            TRUSTED | UNBOUNDED | UNDER | UNDO | UNICODE | UNION | UNIQUE | UNKNOWN | UPPER | USA | USER | VALIDATE | VARBINARY |
+                            TRUSTED | UNBOUNDED | UNDER | UNDO | UNICODE | UNION | UNIQUE | UNKNOWN | UNPACK | UPPER | USA | USER | VALIDATE | VARBINARY |
                             VARCHAR | VARGRAPHIC | VARIABLE | VARIANT | VCAT | VERSION | VIEW | VOLATILE | WAITFORDATA | WHENEVER | WHERE |
                             WHILE | WITHOUT | WLM | WORK | WRAPPER | YEARS | YES | ZONE;
 
 
+db2sql_data_types: db2sql_unpack_data_types | VARCHAR | GRAPHIC | VARBINARY CLOB | BLOB | DBCLOB |  INT |
+                    FLOAT | DEC | NUMERIC | DECFLOAT | NATIONAL | ASCII | EBCDIC | DBCLOB | ROWID;
+
+db2sql_unpack_data_types: SMALLINT | INTEGER | BIGINT | REAL | DOUBLE | DECIMAL | CHAR | CHARACTER | VARBINARY | BINARY | TIMESTAMP | DATE | TIME;
+
+db2sql_data_value: all_words+;
+
 //Variables
-dbs_accelerator_name: db2sql_word+; //?
+dbs_accelerator_name: all_words+; //?
 dbs_alias_name: SQL_IDENTIFIER;
 dbs_array_index: INTEGER;
 dbs_array_type_name: SQL_IDENTIFIER;
-dbs_array_variable: db2sql_word+; //?
+dbs_array_variable: all_words+; //?
 dbs_attr_host_variable: literal+; //?
 dbs_authorization_name: SQL_IDENTIFIER;
 dbs_collection_id_package_name: FILENAME;
-dbs_collection_name: db2sql_word+; //?
+dbs_collection_name: all_words+; //?
 dbs_column_name: SQL_IDENTIFIER;
-dbs_common_table_expression: db2sql_word+; //?
+dbs_common_table_expression: all_words+; //?
 dbs_context: SQL_IDENTIFIER;
-dbs_copy_id: db2sql_word+; //?
-dbs_correlation_name: db2sql_word+; //?
+dbs_copy_id: all_words+; //?
+dbs_correlation_name: SQL_IDENTIFIER;
 dbs_cursor_name: SQL_IDENTIFIER;
-dbs_database_name: db2sql_word+; //?
+dbs_database_name: all_words+; //?
 dbs_descriptor_name: SQLD | SQLDABC | SQLN | SQLVAR; //SQLDA
 dbs_diagnostic_string_expression: literal+; //?
-dbs_distinct_type: db2sql_word+; //?
+dbs_distinct_type: db2sql_data_types+;
 dbs_distinct_type_name: SQL_IDENTIFIER;
-dbs_explainable_sql_statement: db2sql_word+; //?
-dbs_expression: IN | INOUT | OUT;  //????
+dbs_explainable_sql_statement: all_words+; //?
 
+//TODO
+dbs_expression: dbs_expr_list | expr_in | expr_out | expr_inout;
+expr_in : IN LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR?;
+expr_out : OUT LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR?;
+expr_inout : INOUT LPARENCHAR? SQL_IDENTIFIER (COMMACHAR dbs_expression)* RPARENCHAR?;
+dbs_expr_list: LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR?;
 
-dbs_fetch_clause: db2sql_word+; //?
-dbs_fullselect: db2sql_word+; //?
+dbs_fetch_clause: all_words+; //?
+dbs_field_name: SQL_IDENTIFIER;
+dbs_fullselect: all_words+; //?
 dbs_function_name: SQL_IDENTIFIER;
-
-dbs_global_variable_name: db2sql_word+; //?
-dbs_host_label: db2sql_word+; //?
+dbs_global_variable_name: all_words+; //?
+dbs_host_label: all_words+; //?
 dbs_host_variable: FILENAME;
-dbs_host_variable_array: db2sql_word+; //?
-dbs_host_variable_name: db2sql_word+; //?
-dbs_id_host_variable: db2sql_word+; //?
-dbs_include_data_type: db2sql_word+; //?
+dbs_host_variable_array: all_words+; //?
+dbs_host_variable_name: all_words+; //?
+dbs_id_host_variable: all_words+; //?
+dbs_include_data_type: all_words+; //?
 dbs_index_identifier: literal+; //?
 dbs_index_name: SQL_IDENTIFIER;
 dbs_integer: INTEGERLITERAL;
-dbs_integer_constant: db2sql_word+; //?
-dbs_level: db2sql_word+; //?
+dbs_integer_constant: INTEGERLITERAL; //range 1 - 32767
+dbs_level: all_words+; //?
 dbs_location_name: VARCHAR | CHAR; //not greater than 16
 dbs_mask_name: SQL_IDENTIFIER;
-dbs_member_name: db2sql_word+; //?
-dbs_name: db2sql_word+; //?
-dbs_nnnn_m: db2sql_word+; //?
-dbs_package_name: db2sql_word+; //?
+dbs_member_name: all_words+; //?
+dbs_name: all_words+; //?
+dbs_nnnn_m: all_words+; //?
+dbs_package_name: all_words+; //?
 dbs_permission_name: SQL_IDENTIFIER;
 dbs_plan_name: SQL_IDENTIFIER;
 dbs_procedure_name: SQL_IDENTIFIER;
-dbs_role_name: SQL_IDENTIFIER;
-dbs_routine_version_id: STRING_CONST;
-dbs_row_fullselect: db2sql_word+; //?
+dbs_role_name: SQL_IDENTIFIER+;
+dbs_routine_version_id: ALPHANUMERIC_TEXT;
 dbs_rs_locator_variable: SQL_IDENTIFIER;
-dbs_s: db2sql_word+; //?
-dbs_schema_name: db2sql_word+; //?
-dbs_search_condition: db2sql_word+; //?
+dbs_s: all_words+; //?
+dbs_schema_name: all_words+; //?
+dbs_search_condition: all_words+; //?
 dbs_sequence_name: SQL_IDENTIFIER;
 dbs_specific_name: SQL_IDENTIFIER;
 dbs_sql_condition_name: literal+; //?
-dbs_sql_parameter_name: db2sql_word+; //?
-dbs_sql_variable_name: db2sql_word+; //?
+dbs_sql_parameter_name: all_words+; //?
+dbs_sql_variable_name: all_words+; //?
 dbs_sqlstate_string_constant: literal+; //?
-dbs_statement_name: db2sql_word+; //?
-dbs_stogroup_name: db2sql_word+; //?
-dbs_string_constant: STRING_CONST; //not bigger than 762
-dbs_string_expression: db2sql_word+; //?
-dbs_synonym: db2sql_word+; //?
+dbs_statement_name: all_words+; //?
+dbs_stogroup_name: all_words+; //?
+dbs_string_constant: ALPHANUMERIC_TEXT; //not bigger than 762
+dbs_string_expression: all_words+; //?
+dbs_synonym: all_words+; //?
 dbs_table_identifier: literal+; //?
 dbs_table_name: SQL_IDENTIFIER;
 dbs_table_reference: literal+; //?
-dbs_table_space_name: db2sql_word+;
-dbs_token_host_variable: db2sql_word+; //?
+dbs_table_space_name: all_words+;
+dbs_token_host_variable: all_words+; //?
 dbs_transition_table_name: SQL_IDENTIFIER;
-dbs_transition_variable_name: db2sql_word+; //?
+dbs_transition_variable_name: all_words+; //?
 dbs_trigger_name: SQL_IDENTIFIER;
-dbs_type_name: STRING_CONST;
-dbs_unpack_function_invocation: db2sql_word+; //?
-dbs_value: db2sql_word+; //?
+dbs_type_name: ALPHANUMERIC_TEXT;
+dbs_value: db2sql_data_value;
 dbs_variable: VARCHAR | CHAR; //not greater than 254
 dbs_variable_name: SQL_IDENTIFIER;
 dbs_version_id: VERSION_ID;
-dbs_version_name: db2sql_word+; //?
-dbs_view_name: SQL_IDENTIFIER;
+dbs_version_name: ALPHANUMERIC_TEXT | FILENAME;
+dbs_view_name: SQL_IDENTIFIER+;
 
 /*STATEMENTS - */

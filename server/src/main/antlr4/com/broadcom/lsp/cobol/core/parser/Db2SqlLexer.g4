@@ -562,6 +562,7 @@ UNICODE : U N I C O D E;
 UNION : U N I O N;
 UNIQUE : U N I Q U E;
 UNKNOWN : U N K N O W N;
+UNPACK : U N P A C K;
 UPPER : U P P E R;
 USA : U S A;
 USAGE : U S A G E;
@@ -601,7 +602,7 @@ RSQUAREBRACKET :     ']';
 REVERSEQUOTECHAR :   '`';
 SEMICOLONCHAR :      ';';
 UNDERSCORECHAR :     '-';
-STRING_CONST : [a-zA-Z0-9]+;
+ALPHANUMERIC_TEXT : [a-zA-Z0-9]+;
 SQL_IDENTIFIER : ([a-zA-Z_%]+ ([-_%@#$]+ [a-zA-Z0-9]+)*);
 VERSION_ID : ([0-9]+ ([a-zA-Z0-9]+)*);
 
