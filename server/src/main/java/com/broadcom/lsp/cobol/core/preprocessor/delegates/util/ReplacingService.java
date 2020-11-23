@@ -15,9 +15,9 @@
 
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.util;
 
+import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
 
-import lombok.NonNull;
 import java.util.List;
 
 /** This service applies replacing for given text by replace clauses and tokens. */
@@ -44,6 +44,17 @@ public interface ReplacingService {
   Pair<String, String> retrievePseudoTextReplacingPattern(@NonNull String clause);
 
   /**
+   * Retrieve pseudo-text replacing pattern from the given string. If the pseudo text consist of
+   * whitespaces, or is empty, the empty pattern returns.
+   *
+   * @param clause - string representation of the replacing clause in the format "replaceable BY
+   *     ==replacement=="
+   * @return pair of cleaned-up replaceable and replacement
+   */
+  @NonNull
+  Pair<String, String> retrievePseudoTextReplacingLiteralPattern(@NonNull String clause);
+
+  /**
    * Retrieve full-token replacing pattern from the given string.
    *
    * @param clause - string representation of the replacing clause in the format "replaceable BY
@@ -52,4 +63,14 @@ public interface ReplacingService {
    */
   @NonNull
   Pair<String, String> retrieveTokenReplacingPattern(@NonNull String clause);
+
+  /**
+   * Retrieve full-token replacing pattern from the given string.
+   *
+   * @param clause - string representation of the replacing clause in the format "==replaceable== BY
+   *     replacement"
+   * @return pair of cleaned-up replaceable and replacement
+   */
+  @NonNull
+  Pair<String, String> retrieveTokenReplacingPseudoTextPattern(@NonNull String clause);
 }

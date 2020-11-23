@@ -179,7 +179,7 @@ replaceOffStatement
    ;
 
 replaceClause
-   : (replacePseudoText | replaceLiteral) (directoryPhrase)? (familyPhrase)?
+   : (replacePseudoText | replaceLiteral | replacePseudoTextByLiteral | replaceLiteralByPseudoText) (directoryPhrase)? (familyPhrase)?
    ;
 
 replaceLiteral
@@ -189,6 +189,15 @@ replaceLiteral
 replacePseudoText
    : pseudoReplaceable BY pseudoReplacement
    ;
+
+replacePseudoTextByLiteral
+   : pseudoReplaceable BY replacement
+   ;
+
+replaceLiteralByPseudoText
+   : replaceable BY pseudoReplacement
+   ;
+
 
 pseudoReplaceable
    : (DOUBLEEQUALCHAR ~DOUBLEEQUALCHAR*? DOUBLEEQUALCHAR)

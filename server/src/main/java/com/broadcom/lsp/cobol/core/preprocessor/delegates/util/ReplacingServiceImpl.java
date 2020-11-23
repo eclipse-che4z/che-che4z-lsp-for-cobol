@@ -16,10 +16,10 @@
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.util;
 
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 
-import lombok.NonNull;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -57,12 +57,31 @@ public class ReplacingServiceImpl implements ReplacingService {
         : Pair.of("", "");
   }
 
+  @Override
+  public @NonNull Pair<String, String> retrievePseudoTextReplacingLiteralPattern(
+      @NonNull String clause) {
+    String[] pattern = retrievePattern(clause);
+    return isPatternCorrect(pattern)
+        ? Pair.of(getPatternForFullTokens(pattern[0]), extractPseudoText(pattern[1]))
+        : Pair.of("", "");
+  }
+
   @NonNull
   @Override
   public Pair<String, String> retrieveTokenReplacingPattern(@NonNull String clause) {
     String[] pattern = retrievePattern(clause);
     return isPatternCorrect(pattern)
         ? Pair.of(getPatternForFullTokens(pattern[0]), getReplacementPattern(pattern[1]))
+        : Pair.of("", "");
+  }
+
+  @Override
+  public @NonNull Pair<String, String> retrieveTokenReplacingPseudoTextPattern(
+      @NonNull String clause) {
+    String[] pattern = retrievePattern(clause);
+    return isPatternCorrect(pattern)
+        ? Pair.of(
+            extractPseudoText(pattern[0]).replace(" ", " +"), getReplacementPattern(pattern[1]))
         : Pair.of("", "");
   }
 

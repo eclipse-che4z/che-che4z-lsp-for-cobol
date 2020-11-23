@@ -87,4 +87,44 @@ class ReplacingServiceImplTest {
         Pair.of("(?<=[\\.\\s\\r\\n])A(?=[\\.\\s\\r\\n])", "B"),
         replacingService.retrieveTokenReplacingPattern("\r\nA bY \r\n  B "));
   }
+
+  /**
+   * Test the way service retrieves the replacing pattern when a literals is replaced by a pseudo
+   * text. It should remove all the equals chars and provide a trimmed regex that matches expected
+   * token sequence ignoring the number of whitespaces. If the pseudo text consist of whitespaces,
+   * or is empty, the empty pattern should return.
+   */
+  @Test
+  void testRetrievePseudoTextReplacingLiteralPattern() {
+    ReplacingService replacingService = new ReplacingServiceImpl();
+    assertEquals(
+        Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"),
+        replacingService.retrievePseudoTextReplacingLiteralPattern("01 BY ==05=="));
+    assertEquals(Pair.of("", ""), replacingService.retrievePseudoTextReplacingLiteralPattern(""));
+    assertEquals(
+        Pair.of("(?<=[\\.\\s\\r\\n])IDENTIFICATION(?=[\\.\\s\\r\\n])", "DIVISION"),
+        replacingService.retrievePseudoTextReplacingLiteralPattern(
+            "IDENTIFICATION by ==DIVISION=="));
+    assertEquals(
+        Pair.of("(?<=[\\.\\s\\r\\n])1(?=[\\.\\s\\r\\n])", ""),
+        replacingService.retrievePseudoTextReplacingLiteralPattern("1 by ==\n      \r\n   =="));
+  }
+
+  /**
+   * Test the way service retrieves the replacing pattern when a pseudo text is replaced by a
+   * literal text. It should provide a trimmed regex that matches expected token if it is wrapped
+   * with whitespaces, line breaks or dots.
+   */
+  @Test
+  void testRetrieveTokenReplacingPseudoTextPattern() {
+    ReplacingService replacingService = new ReplacingServiceImpl();
+    assertEquals(
+        Pair.of("01", "05"),
+        replacingService.retrieveTokenReplacingPseudoTextPattern("==  01  == BY 05"));
+    assertEquals(Pair.of("", ""), replacingService.retrievePseudoTextReplacingPattern(""));
+    assertEquals(
+        Pair.of("a +b +\nc", "1"),
+        replacingService.retrievePseudoTextReplacingPattern("==a   b  \nc== bY 1"));
+    assertEquals(Pair.of("", ""), replacingService.retrievePseudoTextReplacingPattern(""));
+  }
 }

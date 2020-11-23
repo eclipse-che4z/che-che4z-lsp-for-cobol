@@ -216,6 +216,28 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
+  public void enterReplacePseudoTextByLiteral(ReplacePseudoTextByLiteralContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitReplacePseudoTextByLiteral(ReplacePseudoTextByLiteralContext ctx) {
+    replacingClauses.add(replacingService.retrievePseudoTextReplacingLiteralPattern(read()));
+    pop();
+  }
+
+  @Override
+  public void enterReplaceLiteralByPseudoText(ReplaceLiteralByPseudoTextContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitReplaceLiteralByPseudoText(ReplaceLiteralByPseudoTextContext ctx) {
+    replacingClauses.add(replacingService.retrieveTokenReplacingPseudoTextPattern(read()));
+    pop();
+  }
+
+  @Override
   public void visitTerminal(@NonNull TerminalNode node) {
     int tokPos = node.getSourceInterval().a;
     write(retrieveHiddenTextToLeft(tokPos, tokens));
