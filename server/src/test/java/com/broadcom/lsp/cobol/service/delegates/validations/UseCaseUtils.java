@@ -20,28 +20,19 @@ import com.broadcom.lsp.cobol.domain.modules.EngineModule;
 import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.service.*;
-import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
-import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.experimental.UtilityClass;
-import org.awaitility.Awaitility;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.DidOpenTextDocumentParams;
-import org.eclipse.lsp4j.TextDocumentItem;
-import org.eclipse.lsp4j.services.TextDocumentService;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -55,89 +46,9 @@ public class UseCaseUtils {
 
   private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.c4z/.copybooks/";
   private static final String CPY_URI_SUFFIX = ".cpy";
-  private static final String LANGUAGE = "cbl";
-
-  private static final long MAX_TIME_TO_WAIT = 60000L;
-  private static final long TIME_TO_POLL = 10L;
-  private static final TimeUnit TIME_UNIT = MILLISECONDS;
 
   public static String toURI(String name) {
     return CPY_URI_PREFIX + name + CPY_URI_SUFFIX;
-  }
-
-  /**
-   * Perform validation of the given text on the service.
-   *
-   * @param service - TextDocumentService instance to validate the text
-   * @param text - COBOL text to be tested
-   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
-   */
-  @Deprecated
-  public static void runTextValidation(TextDocumentService service, String text) {
-    service.didOpen(
-        new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, text)));
-  }
-
-  /**
-   * Await when the client will receive the needed message. Uses Supplier to check if the event
-   * occurred. WARNING: use only in the thread that has been used to run the server. This
-   * implementation uses the default time to await. Checker example: await( () -> { return
-   * !client.getReceivedDiagnostics().isEmpty(); });
-   *
-   * @param checker - Lambda returning boolean, that will be used to check if the event occurred.
-   *     Should return false if result has not appeared.
-   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
-   */
-  @Deprecated
-  public static void await(Callable<Boolean> checker) {
-    await(checker, MAX_TIME_TO_WAIT, "");
-  }
-
-  /**
-   * Await when the client will receive the needed message. Uses Supplier to check if the event
-   * occurred. WARNING: use only in the thread that has been used to run the server. This
-   * implementation uses the default time to await. Checker example: await( () -> { return
-   * !client.getReceivedDiagnostics().isEmpty(); });
-   *
-   * @param checker - Lambda returning boolean, that will be used to check if the event occurred.
-   *     Should return false if result has not appeared.
-   * @param description - the TestLanguageClient that should receive the diagnostics
-   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
-   */
-  @Deprecated
-  private static void await(Callable<Boolean> checker, String description) {
-    await(checker, MAX_TIME_TO_WAIT, description);
-  }
-
-  /**
-   * Await when the client will receive the needed message. Uses Supplier to check if the event
-   * occurred. WARNING: use only in the thread that has been used to run the server. Checker
-   * example: await( () -> { return !client.getReceivedDiagnostics().isEmpty(); });
-   *
-   * @param checker - Lambda returning boolean, that will be used to check if the event occurred.
-   *     Should return false if result has not appeared.
-   * @param time - the maximum time to wait
-   * @param description - the TestLanguageClient that should receive the diagnostics
-   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
-   */
-  @Deprecated
-  private static void await(Callable<Boolean> checker, Long time, String description) {
-    Awaitility.await(description)
-        .pollDelay(TIME_TO_POLL, TIME_UNIT)
-        .atMost(time, TIME_UNIT)
-        .until(checker);
-  }
-
-  /**
-   * Await when the client will receive the diagnostics in case if there are some syntax or format
-   * errors.
-   *
-   * @param client - the TestLanguageClient that should receive the diagnostics
-   * @deprecated - try using analyze, analyzeForErrors, or {@link UseCaseEngine}
-   */
-  @Deprecated
-  public static void waitForDiagnostics(TestLanguageClient client) {
-    await(() -> !client.getReceivedDiagnostics().isEmpty(), "");
   }
 
   /**
@@ -195,7 +106,8 @@ public class UseCaseUtils {
    * @param subroutineNames - list of available subroutine names
    * @return the entire analysis result
    */
-  public static AnalysisResult analyze(String fileName, String text, List<CobolText> copybooks, List<String> subroutineNames) {
+  public static AnalysisResult analyze(
+      String fileName, String text, List<CobolText> copybooks, List<String> subroutineNames) {
     return analyze(fileName, text, copybooks, subroutineNames, CopybookProcessingMode.ENABLED);
   }
 
