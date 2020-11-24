@@ -103,7 +103,62 @@ dbs_connect: CONNECT (TO (dbs_location_name | dbs_host_variable) dbs_connect_aut
 dbs_connect_authorization: USER dbs_host_variable USING dbs_host_variable;
 
 /*CREATE (all) */
-dbs_create: literal+; //?
+dbs_create: dbs_create_alias | dbs_create_aux_table | dbs_create_db | dbs_create_function_compiled |
+            dbs_create_function_ext_scalar | dbs_create_function_ext_table | dbs_create_function_inline_scalar | dbs_create_function_sourced |
+            dbs_create_function_sql_table | dbs_create_global_temp_table | dbs_create_index | dbs_create_lob_tablespace | dbs_create_mask |
+            dbs_create_permission | dbs_create_procedure | dbs_create_procedure_ext | dbs_create_procedure_native_sql | dbs_create_role |
+            dbs_create_sequence | dbs_create_stogroup | dbs_create_synonym | dbs_create_table | dbs_create_tablespace | dbs_create_trigger_advanced |
+            dbs_create_trigger_basic | dbs_create_trusted_context | dbs_create_type | dbs_create_type_array | dbs_create_type_distinct |
+            dbs_create_variable | dbs_create_view;
+
+dbs_create_alias: CREATE PUBLIC? ALIAS (dbs_create_alias_table_alias | dbs_create_alias_sequence_alias);
+dbs_create_alias_table_alias: dbs_alias_name FOR TABLE? (dbs_table_name | dbs_view_name | dbs_alias_name2);
+dbs_create_alias_sequence_alias: dbs_alias_name FOR SEQUENCE dbs_sequence_name;
+dbs_create_aux_table: CREATE (AUXILIARY | AUX) TABLE dbs_table_name IN dbs_database_name? dbs_table_space_name
+                    STORIES dbs_table_name (APPEND NO | (APPEND YES)? )? COLUMN dbs_column_name (PART dbs_integer)?;
+
+dbs_create_db: CREATE DATABASE (BUFFERPOOL dbs_bp_name | INDEXBP dbs_bp_name | dbs_create_db_workfile | dbs_create_db_stogroup dbs_create_db_ccsid)?;
+dbs_create_db_workfile: AS WORKFILE (FOR dbs_member_name)?;
+dbs_create_db_stogroup: STOGROUP (SYSDEFLT | dbs_stogroup_name);
+dbs_create_db_ccsid: CCSID (ASCII | EBCDIC | UNICODE);
+
+dbs_create_function: CREATE FUNCTION;
+dbs_create_function_compiled: dbs_create_function dbs_function_name (LPARENCHAR dbs_create_function_param_decl (COMMACHAR dbs_create_function_param_decl)* RPARENCHAR)
+                                (dbs_create_function_func_def | WRAPPED dbs_obfuscated_statement_text);
+dbs_create_function_param_decl: dbs_parameter_name dbs_create_function_param_type;
+dbs_create_function_param_type: (common_built_in_type | dbs_distinct_type_name | dbs_array_type_name) | (TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR);
+dbs_create_function_func_def: RETURNS common_built_in_type (VERSION V1 | VERSION dbs_routine_version_id)? dbs_option_list? dbs_control_statement;
+
+
+dbs_create_function_ext_scalar: literal+; //?
+dbs_create_function_ext_table: literal+; //?
+dbs_create_function_inline_scalar: literal+; //?
+dbs_create_function_sourced: literal+; //?
+dbs_create_function_sql_table: literal+; //?
+dbs_create_global_temp_table: literal+; //?
+dbs_create_index: literal+; //?
+dbs_create_lob_tablespace: literal+; //?
+dbs_create_mask: literal+; //?
+dbs_create_permission: literal+; //?
+dbs_create_procedure: literal+; //?
+dbs_create_procedure_ext: literal+; //?
+dbs_create_procedure_native_sql: literal+; //?
+dbs_create_role: literal+; //?
+dbs_create_sequence: literal+; //?
+dbs_create_stogroup: literal+; //?
+dbs_create_synonym: literal+; //?
+dbs_create_table: literal+; //?
+dbs_create_tablespace: literal+; //?
+dbs_create_trigger_advanced: literal+; //?
+dbs_create_trigger_basic: literal+; //?
+dbs_create_trusted_context: literal+; //?
+dbs_create_type: literal+; //?
+dbs_create_type_array: literal+; //?
+dbs_create_type_distinct: literal+; //?
+dbs_create_variable: literal+; //?
+dbs_create_view: literal+; //?
+
+
 
 dbs_create_distinct_type : CREATE DISTINCT TYPE SQL_IDENTIFIER AS dbs_distinct_type;
 
@@ -158,25 +213,7 @@ dbs_drop_public_alias_designator: PUBLIC ALIAS dbs_alias_name FOR SEQUENCE;
 dbs_drop_nonpub_alias_designator: ALIAS dbs_alias_name (FOR (TABLE | SEQUENCE))?;
 dbs_drop_database: DATABASE dbs_database_name;
 dbs_drop_function: FUNCTION dbs_function_name (LPARENCHAR (dbs_drop_parameter_type (COMMACHAR dbs_drop_parameter_type)*)? RPARENCHAR)? RESTRICT?;
-dbs_drop_parameter_type: (dbs_drop_built_in_type | dbs_distinct_type_name | dbs_array_type_name) (AS LOCATOR)?;
-dbs_drop_built_in_type: (dbs_drop_bit_int | dbs_drop_bit_decimal | dbs_drop_bit_float | dbs_drop_bit_decfloat |
-                        dbs_drop_bit_char | dbs_drop_bit_clob | dbs_drop_bit_varchar | dbs_drop_bit_graphic |
-                        dbs_drop_bit_binary | DATE | TIME | dbs_drop_bit_timestamp | ROWID | XML);
-dbs_drop_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
-dbs_drop_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR dbs_integer (COMMACHAR dbs_integer)? RPARENCHAR)?;
-dbs_drop_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
-dbs_drop_bit_decfloat: DECFLOAT (LPARENCHAR (NUMBER_34 | NUMBER_16) RPARENCHAR)?;
-dbs_drop_bit_char: (CHARACTER | CHAR) (VARYING dbs_drop_bit_varchara | LARGE OBJECT dbs_drop_bit_cloba | LPARENCHAR dbs_integer RPARENCHAR dbs_drop_bit_charopts);
-dbs_drop_bit_charopts: (CCSID (ASCII | EBCDIC | UNICODE))? (FOR (SBCS | MIXED | BIT) DATA)?;
-dbs_drop_bit_varchar: VARCHAR dbs_drop_bit_varchara;
-dbs_drop_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR dbs_drop_bit_charopts;
-dbs_drop_bit_clob: CLOB dbs_drop_bit_cloba;
-dbs_drop_bit_cloba: (LPARENCHAR dbs_integer (K | M | G)? RPARENCHAR)? (CCSID (ASCII | EBCDIC | UNICODE))? (FOR (SBCS | MIXED ) DATA)?;
-dbs_drop_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR |
-                        DBCLOB (LPARENCHAR dbs_integer (K | M | G)? RPARENCHAR)?) (CCSID (ASCII | EBCDIC | UNICODE))?;
-dbs_drop_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR |
-                    (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer (K | M | G)? RPARENCHAR)?);
-dbs_drop_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
+dbs_drop_parameter_type: (common_built_in_type | dbs_distinct_type_name | dbs_array_type_name) (AS LOCATOR)?;
 dbs_drop_specific: SPECIFIC FUNCTION dbs_specific_name RESTRICT?;
 dbs_drop_index: INDEX dbs_index_name;
 dbs_drop_mask: MASK dbs_mask_name;
@@ -381,7 +418,7 @@ dbs_savepoint: SAVEPOINT dbs_savepoint_name UNIQUE? ON ROLLBACK RETAIN (CURSORS 
 dbs_revoke: literal+; //?
 
 /*SET (all)*/
-dbs_select: literal+; //?
+dbs_select: dbs_select_unpack_function_invocation | dbs_select_row_fullselect;
 
 /*Queries Subselects (all)*/
 dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCHAR DOT ASTERISKCHAR AS LPARENCHAR dbs_field_name db2sql_data_types (COMMACHAR dbs_field_name db2sql_data_types)* RPARENCHAR;
@@ -442,9 +479,27 @@ dbs_values_target: (dbs_global_variable_name | dbs_host_variable_name | dbs_sql_
 /*WHENEVER */
 dbs_whenever: WHENEVER (NOT FOUND | SQLERROR | SQLWARNING) (CONTINUE | (GOTO | GO TO) COLONCHAR? dbs_host_label);
 
-/*these bits are copied for future work */
-/*EXAMPLE OPTION LIST (from CREATE FUNCTION)*/
-//?
+
+common_built_in_type: (common_bit_int | common_bit_decimal | common_bit_float | common_bit_decfloat |
+                        common_bit_char | common_bit_clob | common_bit_varchar | common_bit_graphic |
+                        common_bit_binary | DATE | TIME | common_bit_timestamp | ROWID | XML);
+common_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
+common_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR dbs_integer (COMMACHAR dbs_integer)? RPARENCHAR)?;
+common_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
+common_bit_decfloat: DECFLOAT (LPARENCHAR (NUMBER_34 | NUMBER_16) RPARENCHAR)?;
+common_bit_char: (CHARACTER | CHAR) (VARYING common_bit_varandchar | LARGE OBJECT common_bit_clobandobj | LPARENCHAR dbs_integer RPARENCHAR common_bit_charopts);
+common_bit_charopts: (CCSID (ASCII | EBCDIC | UNICODE))? (FOR (SBCS | MIXED | BIT) DATA)?;
+common_bit_varchar: VARCHAR common_bit_varandchar;
+common_bit_varandchar: LPARENCHAR dbs_integer RPARENCHAR common_bit_charopts;
+common_bit_clob: CLOB common_bit_clobandobj;
+common_bit_clobandobj: (LPARENCHAR dbs_integer (K | M | G)? RPARENCHAR)? (CCSID (ASCII | EBCDIC | UNICODE))? (FOR (SBCS | MIXED ) DATA)?;
+common_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR |
+                        DBCLOB (LPARENCHAR dbs_integer (K | M | G)? RPARENCHAR)?) (CCSID (ASCII | EBCDIC | UNICODE))?;
+common_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR |
+                    (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer (K | M | G)? RPARENCHAR)?);
+common_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
+
+
 dbs_option_list: (LANGUAGE SQL)? (SPECIFIC dbs_specific_name)? (NOT? DETERMINISTIC)? (NO? EXTERNAL ACTION)? (READS SQL DATA |
                 CONTAINS SQL | MODIFIES SQL DATA)? ((CALLED | RETURNS NULL) ON NULL INPUT)? (STATIC DISPATCH)? ((ALLOW | DISALLOW)
                 PARALLEL)? ((ALLOW | DISALLOW | DISABLE) DEBUG MODE)? (PARAMETER CCSID (ASCII | EBCDIC | UNICODE))? (QUALIFIER
@@ -462,7 +517,11 @@ dbs_option_list: (LANGUAGE SQL)? (SPECIFIC dbs_specific_name)? (NOT? DETERMINIST
                 FORMAT (ISO | EUR | USA | JIS | LOCAL))? (NOT? SECURED)? (BUSINESS_TIME SENSITIVE (YES | NO))? (SYSTEM_TIME
                 SENSITIVE (YES | NO))? (ARCHIVE SENSITIVE (YES | NO))? (APPLCOMPAT dbs_level)? (CONCENTRATE STATEMENTS (OFF | WITH LITERALS))?;
 
-
+//TODO
+dbs_control_statement: all_words+;
+//                        assignment_statement | dbs_call | case_statement | compund_statement | get_diagnostics_statement |
+//                        goto_statement | if_statement | iterate_statement | leave_statement | loop_statement | repeat_statement |
+//                        resignal_statement |return_statement | signal_statement | while_statement;
 
 all_words: NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral | generalIdentifier |
             cobolWord | cics_cobol_intersected_words | db2sql_intersected_words | db2sql_only_words;
@@ -471,7 +530,7 @@ all_words: NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral | generalIdentifi
 db2sql_words: db2sql_only_words | db2sql_intersected_words;
 
 
-db2sql_intersected_words: ACCESS | ALL | ANY | APPLY | ARE | AS | ASCII | AT | BEFORE | BINARY | BIT | BLOB | BY |
+db2sql_intersected_words: ACCESS | ALL | ANY | APPLY | ARE | AS | ASCII | AT | AUXILIARY | BEFORE | BINARY | BIT | BLOB | BY |
                             CALL | CHANGED | CHARACTER | CLOB | COBOL | CONTAINS | CONTINUE | CONTROL | COPY | CORR |
                             CORRESPONDING | COUNT | CURSOR | DATA | DATE | DAY | DB | DBCLOB | DEFAULT | DEFINITION |
                             DELETE | DISABLE | DOUBLE | DYNAMIC | EBCDIC | ELSE | ENABLE | END | END_EXEC | ERASE |
@@ -487,7 +546,7 @@ db2sql_intersected_words: ACCESS | ALL | ANY | APPLY | ARE | AS | ASCII | AT | B
 
 db2sql_only_words: ABSOLUTE | ACCELERATION | ACCELERATOR | ACTIVATE | ACTIVE | ADA | ALIAS | ALLOW | ALTERIN | ALWAYS | APPEND |
                             APPLCOMPAT | APPLICATION | ARCHIVE | ASC | ASSERTION | ASSOCIATE | ASUTIME | ATOMIC | AUTHID |
-                            AUTHORIZATION | AUTOMATIC | AVG | BEGIN | BETWEEN | BIGINT | BIND | BINDADD | BIT_LENGTH | BLOCKED |
+                            AUTHORIZATION | AUTOMATIC | AVG | AUX | BEGIN | BETWEEN | BIGINT | BIND | BINDADD | BIT_LENGTH | BLOCKED |
                             BOTH | BUFFERPOOL | BUFFERPOOLS | BUSINESS_TIME | CACHE | CALLED | CALLER | CAPTURE | CARDINALITY |
                             CASCADE | CASE | CAST | CATALOG | CATALOG_NAME | CHANGES | CHAR_LENGTH | CHARACTER_LENGTH |
                             CHECKED | CLAUSE | CLUSTER | COLLATE | COLLATION | COLLECT | COLLECTION | COLLID | COLUMN | COMMENT |
@@ -520,7 +579,7 @@ db2sql_only_words: ABSOLUTE | ACCELERATION | ACCELERATOR | ACTIVATE | ACTIVE | A
                             MICROSECONDS | MINUTE | MINVALUE | MIXED | MODIFIES | MODULE | MONTHS | NAMES | NATURAL | NCHAR | NEW | NEW_TABLE |
                             NEXTVAL | NICKNAME | NOCACHE | NOCYCLE | NODE | NOMINVALUE | NOORDER | NULLABLE | NUMBER | OBJECT | OCTETS |
                             CODEUNITS32 | OLD | OLD_TABLE | OLE | OLEDB | ONCE | ONLINE | ONLY | OPTHINT | OPTIMIZATION | OPTIMIZE | OUT |
-                            OUTCOME | OUTER | OVER | OVERLAPS | OVERRIDING | PACKAGE | PAD | PARALLEL | PARAMETER | PARTIAL | PARTITION |
+                            OUTCOME | OUTER | OVER | OVERLAPS | OVERRIDING | PACKAGE | PAD | PARALLEL | PARAMETER | PART | PARTIAL | PARTITION |
                             PARTITIONING | PASCAL | PASSTHRU | PCTFREE | PERCENT_ARGBYTES | PERMISSION | PIECESIZE | PIPE | PLAN | PLI | PORTION |
                             PRECEDING | PRECISION | PRESERVE | PRIMARY | PRIOR | PRIQTY | PRIVILEGES | PROTOCOL | PUBLIC | QUALIFIER | QUERYNO |
                             RANGE | READS | RECOMMEND | RECOVERY | REFERENCING | REFRESH | REGISTERS | RENAME | REOPT | REPEAT | REPLICATED |
@@ -530,7 +589,7 @@ db2sql_only_words: ABSOLUTE | ACCELERATION | ACCELERATOR | ACTIVATE | ACTIVE | A
                             SELF | SENSITIVE | SEQUENCE | SERIALIZABLE | SERVER_NAME | SESSION_USER | SETS | SHARE | SHRLEVEL | SIGNAL |
                             SIMPLE | SIZE | SMALLINT | SNAPSHOT | SOME | SPECIAL | SPECIFIC | SQLCA | SQLCODE | SQLDA | SQLERROR | SQLEXCEPTION |
                             SQLID | SQLSTATE | SQLWARNING | STABILIZED | STACKED | STARTING | STATEMENT | STATEMENTS | STATIC | STATISTICS |
-                            STAY | STMTCACHE | STMTID | STMTTOKEN | STOGROUP | STORED | STYLE | SUB | SUBSTR | SUBSTRING | SUMMARY |
+                            STAY | STMTCACHE | STMTID | STMTTOKEN | STOGROUP | STORED | STORES | STYLE | SUB | SUBSTR | SUBSTRING | SUMMARY |
                             SWITCH | SYNONYM | SYSTEM | SYSTEM_TIME | SYSTEM_USER | TABLE | TABLE_NAME | TABLESPACE | TABLESPACES | TEMPORARY |
                             THREADSAFE | TIMESTAMP | TIMEZONE | TIMEZONE_HOUR | TIMEZONE_MINUTE | TRANSLATE | TRANSLATION | TREAT | TRIM |
                             TRUSTED | UNBOUNDED | UNDER | UNDO | UNICODE | UNION | UNIQUE | UNKNOWN | UNPACK | UPPER | USA | USER | VALIDATE | VARBINARY |
@@ -548,11 +607,13 @@ db2sql_data_value: all_words+;
 //Variables
 dbs_accelerator_name: all_words+; //?
 dbs_alias_name: SQL_IDENTIFIER;
+dbs_alias_name2: SQL_IDENTIFIER; //must not be an alias that exists at the current server
 dbs_array_index: INTEGER;
 dbs_array_type_name: SQL_IDENTIFIER;
 dbs_array_variable: all_words+; //?
 dbs_attr_host_variable: literal+; //?
 dbs_authorization_name: SQL_IDENTIFIER;
+dbs_bp_name: SQL_IDENTIFIER;
 dbs_collection_id_package_name: FILENAME;
 dbs_collection_name: all_words+; //?
 dbs_column_name: SQL_IDENTIFIER;
@@ -578,7 +639,7 @@ dbs_expr_list: LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR
 dbs_fetch_clause: all_words+; //?
 dbs_field_name: SQL_IDENTIFIER;
 dbs_fullselect: all_words+; //?
-dbs_function_name: SQL_IDENTIFIER;
+dbs_function_name: SQL_IDENTIFIER; //must not be any of the following system-reserved keywords
 dbs_global_variable_name: all_words+; //?
 dbs_host_label: all_words+; //?
 dbs_host_variable: FILENAME;
@@ -593,10 +654,12 @@ dbs_integer_constant: INTEGERLITERAL; //range 1 - 32767
 dbs_level: all_words+; //?
 dbs_location_name: VARCHAR | CHAR; //not greater than 16
 dbs_mask_name: SQL_IDENTIFIER;
-dbs_member_name: all_words+; //?
+dbs_member_name: SQL_IDENTIFIER;
 dbs_name: all_words+; //?
 dbs_nnnn_m: all_words+; //?
+dbs_obfuscated_statement_text: ALPHANUMERIC_TEXT;
 dbs_package_name: all_words+; //?
+dbs_parameter_name: SQL_IDENTIFIER;
 dbs_permission_name: SQL_IDENTIFIER;
 dbs_plan_name: SQL_IDENTIFIER;
 dbs_procedure_name: SQL_IDENTIFIER;
@@ -613,7 +676,7 @@ dbs_sql_parameter_name: all_words+; //?
 dbs_sql_variable_name: all_words+; //?
 dbs_sqlstate_string_constant: literal+; //?
 dbs_statement_name: all_words+; //?
-dbs_stogroup_name: all_words+; //?
+dbs_stogroup_name: SQL_IDENTIFIER;
 dbs_string_constant: ALPHANUMERIC_TEXT; //not bigger than 762
 dbs_string_expression: all_words+; //?
 dbs_synonym: all_words+; //?
