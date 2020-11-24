@@ -58,8 +58,6 @@ class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
           DataEventType.UNKNOWN_EVENT, DataEventType.UNKNOWN_EVENT);
       databusSubscriptionForPositiveScenario(
           DataEventType.RUN_ANALYSIS_EVENT, DataEventType.RUN_ANALYSIS_EVENT);
-      databusSubscriptionForPositiveScenario(
-          DataEventType.FETCHED_SETTINGS_EVENT, DataEventType.FETCHED_SETTINGS_EVENT);
     } catch (TimeoutException | InterruptedException e) {
       fail();
     }
@@ -70,7 +68,7 @@ class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
    * published on the databus.
    */
   @Test
-  public void databusSubscriptionNegativeTest() {
+  void databusSubscriptionNegativeTest() {
     /*
      This negative test verify that a class subscribed to a specific DataEventType got a notification about a different event.
      In this scenario will check that a Timeout exception from the Waiter is thrown.
@@ -85,19 +83,16 @@ class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
         () -> {
           databusSubscriptionForNegativeScenario(
               DataEventType.RUN_ANALYSIS_EVENT, DataEventType.UNKNOWN_EVENT);
-          databusSubscriptionForNegativeScenario(
-              DataEventType.FETCHED_SETTINGS_EVENT, DataEventType.UNKNOWN_EVENT);
         });
   }
 
   @Test
-  public void databusUnsubscriptionPositiveTest() {
+  void databusUnsubscriptionPositiveTest() {
     Assertions.assertThrows(
         TimeoutException.class,
         () -> {
           databusUnsubscribeForPositiveScenario(DataEventType.RUN_ANALYSIS_EVENT);
           databusUnsubscribeForPositiveScenario(DataEventType.UNKNOWN_EVENT);
-          databusUnsubscribeForPositiveScenario(DataEventType.FETCHED_SETTINGS_EVENT);
         });
   }
 }
