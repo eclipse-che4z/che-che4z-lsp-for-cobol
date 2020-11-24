@@ -474,7 +474,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
     service.definition(
         new TextDocumentPositionParams(
-            new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), new Position()));
+            new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), new Position())).get();
     verify(occurrences)
         .findDefinitions(any(CobolDocumentModel.class), any(TextDocumentPositionParams.class));
   }
@@ -498,7 +498,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     ReferenceParams referenceParams = new ReferenceParams();
     referenceParams.setContext(new ReferenceContext(true));
     referenceParams.setTextDocument(new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI));
-    service.references(referenceParams);
+    service.references(referenceParams).get();
     verify(occurrences)
         .findReferences(
             any(CobolDocumentModel.class),

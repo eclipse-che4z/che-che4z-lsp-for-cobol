@@ -23,6 +23,8 @@ import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.util.concurrent.ExecutionError;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.gson.JsonPrimitive;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -100,7 +102,7 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
     try {
       return copybookCache.get(
           copybookName, () -> resolveSync(copybookName, documentUri, copybookProcessingMode));
-    } catch (ExecutionException e) {
+    } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
       return new CopybookModel(copybookName, null, null);
     }
