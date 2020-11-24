@@ -103,8 +103,8 @@ dbs_connect: CONNECT (TO (dbs_location_name | dbs_host_variable) dbs_connect_aut
 dbs_connect_authorization: USER dbs_host_variable USING dbs_host_variable;
 
 /*CREATE (all) */
-dbs_create: dbs_create_alias | dbs_create_aux_table | dbs_create_db | dbs_create_function_compiled |
-            dbs_create_function_ext_scalar | dbs_create_function_ext_table | dbs_create_function_inline_scalar | dbs_create_function_sourced |
+dbs_create: dbs_create_alias | dbs_create_aux_table | dbs_create_db | dbs_create_function_compiled_scalar | dbs_create_function_ext_scalar |
+            dbs_create_function_ext_table | dbs_create_function_inline_scalar | dbs_create_function_sourced |
             dbs_create_function_sql_table | dbs_create_global_temp_table | dbs_create_index | dbs_create_lob_tablespace | dbs_create_mask |
             dbs_create_permission | dbs_create_procedure | dbs_create_procedure_ext | dbs_create_procedure_native_sql | dbs_create_role |
             dbs_create_sequence | dbs_create_stogroup | dbs_create_synonym | dbs_create_table | dbs_create_tablespace | dbs_create_trigger_advanced |
@@ -123,14 +123,17 @@ dbs_create_db_stogroup: STOGROUP (SYSDEFLT | dbs_stogroup_name);
 dbs_create_db_ccsid: CCSID (ASCII | EBCDIC | UNICODE);
 
 dbs_create_function: CREATE FUNCTION;
-dbs_create_function_compiled: dbs_create_function dbs_function_name (LPARENCHAR dbs_create_function_param_decl (COMMACHAR dbs_create_function_param_decl)* RPARENCHAR)
-                                (dbs_create_function_func_def | WRAPPED dbs_obfuscated_statement_text);
+dbs_create_function_compiled_scalar: dbs_create_function dbs_function_name LPARENCHAR dbs_create_function_param_decl
+        (COMMACHAR dbs_create_function_param_decl)* RPARENCHAR (dbs_create_function_func_def | WRAPPED dbs_obfuscated_statement_text);
 dbs_create_function_param_decl: dbs_parameter_name dbs_create_function_param_type;
 dbs_create_function_param_type: (common_built_in_type | dbs_distinct_type_name | dbs_array_type_name) | (TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR);
 dbs_create_function_func_def: RETURNS common_built_in_type (VERSION V1 | VERSION dbs_routine_version_id)? dbs_option_list? dbs_control_statement;
+//AS LOCATOR can be specified only for a LOB
+dbs_create_function_ext_scalar: dbs_create_function dbs_function_name LPARENCHAR dbs_create_function_ext_param_decl (COMMACHAR dbs_create_function_ext_param_decl)* RPARENCHAR
+                            RETURNS (common_built_in_type (AS LOCATOR)?  | common_built_in_type CAST FROM common_built_in_type (AS LOCATOR)?) dbs_option_list_ext;
+dbs_create_function_ext_param_decl: dbs_parameter_name? (dbs_create_function_ext_param_type (AS LOCATOR)? | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR);
+dbs_create_function_ext_param_type: common_built_in_type | dbs_distinct_type_name;
 
-
-dbs_create_function_ext_scalar: literal+; //?
 dbs_create_function_ext_table: literal+; //?
 dbs_create_function_inline_scalar: literal+; //?
 dbs_create_function_sourced: literal+; //?
@@ -517,6 +520,15 @@ dbs_option_list: (LANGUAGE SQL)? (SPECIFIC dbs_specific_name)? (NOT? DETERMINIST
                 FORMAT (ISO | EUR | USA | JIS | LOCAL))? (NOT? SECURED)? (BUSINESS_TIME SENSITIVE (YES | NO))? (SYSTEM_TIME
                 SENSITIVE (YES | NO))? (ARCHIVE SENSITIVE (YES | NO))? (APPLCOMPAT dbs_level)? (CONCENTRATE STATEMENTS (OFF | WITH LITERALS))?;
 
+dbs_option_list_ext: (SPECIFIC dbs_specific_name)? (PARAMETER ( CCSID (ASCII | EBCDIC | UNICODE) | VARCHAR (NULTERM | STRUCTURE) )*)? |
+                EXTERNAL ( NAME( dbs_ext_program_name | SQL_IDENTIFIER))? LANGUAGE (ASSEMBLE | C | COBOL | JAVA | PLI) PARAMETER STYLE (SQL | JAVA)
+                (NOT)? DETERMINISTIC FENCED? (RETURNS NULL | CALLED) ON NULL INPUT ((READS | MODIFIES ) SQL DATA | (CONTAINS | NO) SQL)? ( (NO)? EXTERNAL ACTION)?
+                (NO PACKAGE PATH | PACKAGE PATH dbs_package_path )? (NO SCRATCHPAD | SCRATCHPAD (NUMBER_100 | INTEGER)?)? ((NO)? FINAL CALL)?
+                ((ALLOW | DISALLOW) PARALLEL)? ((NO)? DBINFO)? (NO COLLID | COLLID dbs_collection_id_package_name)? (WLM ENVIRONMENT (dbs_wlm_env_name | LPARENCHAR dbs_wlm_env_name RPARENCHAR ))?
+                 (ASUTIME NO LIMIT | ASUTIME LIMIT INTEGER)? (STAY RESIDENT (YES | NO)?)? (PROGRAM TYPE (SUB | MAIN))? (SECURITY (DB2 | (USER | DEFINER)))?
+                 (STOP AFTER (SYSTEM DEFAULT FAILURES | INTEGER FAILURES) | CONTINUE AFTER FAILURE)? (RUN OPTIONS dbs_runtime_options)?
+                  ((INHERIT | DEFAULT)  SPECIAL REGISTERS)? (STATIC DISPATCH)? ((NOT)? SECURED)? ;
+
 //TODO
 dbs_control_statement: all_words+;
 //                        assignment_statement | dbs_call | case_statement | compund_statement | get_diagnostics_statement |
@@ -604,6 +616,14 @@ db2sql_unpack_data_types: SMALLINT | INTEGER | BIGINT | REAL | DOUBLE | DECIMAL 
 
 db2sql_data_value: all_words+;
 
+//TODO
+dbs_expression: dbs_expr_list | expr_in | expr_out | expr_inout;
+expr_in : IN LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR?;
+expr_out : OUT LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR?;
+expr_inout : INOUT LPARENCHAR? SQL_IDENTIFIER (COMMACHAR dbs_expression)* RPARENCHAR?;
+dbs_expr_list: LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR?;
+
+
 //Variables
 dbs_accelerator_name: all_words+; //?
 dbs_alias_name: SQL_IDENTIFIER;
@@ -628,14 +648,7 @@ dbs_diagnostic_string_expression: literal+; //?
 dbs_distinct_type: db2sql_data_types+;
 dbs_distinct_type_name: SQL_IDENTIFIER;
 dbs_explainable_sql_statement: all_words+; //?
-
-//TODO
-dbs_expression: dbs_expr_list | expr_in | expr_out | expr_inout;
-expr_in : IN LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR?;
-expr_out : OUT LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR?;
-expr_inout : INOUT LPARENCHAR? SQL_IDENTIFIER (COMMACHAR dbs_expression)* RPARENCHAR?;
-dbs_expr_list: LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR?;
-
+dbs_ext_program_name: SQL_IDENTIFIER;//If LANGUAGE is JAVA
 dbs_fetch_clause: all_words+; //?
 dbs_field_name: SQL_IDENTIFIER;
 dbs_fullselect: all_words+; //?
@@ -659,6 +672,7 @@ dbs_name: all_words+; //?
 dbs_nnnn_m: all_words+; //?
 dbs_obfuscated_statement_text: ALPHANUMERIC_TEXT;
 dbs_package_name: all_words+; //?
+dbs_package_path: FILENAME+; //If package-path contains SESSION_USER (or USER), PATH, or PACKAGE PATH
 dbs_parameter_name: SQL_IDENTIFIER;
 dbs_permission_name: SQL_IDENTIFIER;
 dbs_plan_name: SQL_IDENTIFIER;
@@ -666,6 +680,7 @@ dbs_procedure_name: SQL_IDENTIFIER;
 dbs_role_name: SQL_IDENTIFIER+;
 dbs_routine_version_id: ALPHANUMERIC_TEXT;
 dbs_rs_locator_variable: SQL_IDENTIFIER;
+dbs_runtime_options: VARCHAR; //no longer than 254 bytes
 dbs_s: all_words+; //?
 dbs_schema_name: all_words+; //?
 dbs_search_condition: all_words+; //?
@@ -694,6 +709,7 @@ dbs_variable: VARCHAR | CHAR; //not greater than 254
 dbs_variable_name: SQL_IDENTIFIER;
 dbs_version_id: VERSION_ID;
 dbs_version_name: ALPHANUMERIC_TEXT | FILENAME;
-dbs_view_name: SQL_IDENTIFIER+;
+dbs_view_name: SQL_IDENTIFIER;
+dbs_wlm_env_name: SQL_IDENTIFIER;
 
 /*STATEMENTS - */
