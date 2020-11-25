@@ -6,8 +6,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 #### Added
 * Support for subroutines
 * Support for INCLUDE in EXEC SQL for copybooks
-* Language features support for predefined variables
-* Language features support for sections
+* Language features support for sections and predefined variables
 * Index variable definition support
 * Code snippets for EXEC SQL INCLUDE and EXEC CICS
 * JNIENVPTR, JSON and XML special register support
@@ -17,8 +16,9 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Deprecated sections support removed
 * "Unsupported file" notification moved into "Problems" console
 * Semantic analysis for paragraphs improved
-* Copybook coloring may work without syntax analysis
+* Copybook coloring might work without syntax analysis
 * Document analysis interrupts on closing request
+* Readme update
 
 #### Fixed
 * Analysis termination on a client exception
