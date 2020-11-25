@@ -165,13 +165,29 @@ dbs_create_global_temp_table_col_def: dbs_column_name  common_built_in_type (NOT
 dbs_create_index: CREATE (UNIQUE (WHERE NOT NULL)?)? INDEX dbs_index_name ON (dbs_create_index_table_def | dbs_aux_table_name)  dbs_create_index_table_other_opt;
 dbs_create_index_table_def: dbs_table_name LPARENCHAR dbs_create_index_table_def_body (COMMACHAR dbs_create_index_table_def_body)* (COMMACHAR BUSINESS_TIME  (WITHOUT | WITH) OVERLAPS ) RPARENCHAR;
 dbs_create_index_table_def_body: (dbs_column_name | key_expression) (ASC | DESC | RANDOM);
-dbs_create_index_table_other_opt: dbs_create_index_table_other_opt_xml? (INCLUDE dbs_column_name LPARENCHAR (COMMACHAR dbs_column_name)* RPARENCHAR) dbs_create_index_table_other_opt_detail;
-dbs_create_index_table_other_opt_xml: literal+; //?
-dbs_create_index_table_other_opt_detail: literal+; //?
+dbs_create_index_table_other_opt: xml_index_specification? (INCLUDE dbs_column_name LPARENCHAR (COMMACHAR dbs_column_name)* RPARENCHAR) dbs_create_index_table_other_opt_part1 dbs_create_index_table_other_opt_part2 dbs_create_index_table_other_opt_part3;
+xml_index_specification: GENERATE (KEY | KEYS) USING XMLPATTERN xml_pattern_clause AS sql_data_type;
+xml_pattern_clause: prolog? pattern_expression;
+prolog: (DECLARE NAMESPACE NCNAME  EQUALCHAR dbs_namespace_name SEMICOLONCHAR | DECLARE DEFAULT ELEMENT NAMESPACE dbs_namespace_name SEMICOLONCHAR)*;
+pattern_expression: ( (SLASHCHAR | DOUBLESLASHCHAR)  )*; //TBD ?
+dbs_create_index_table_other_opt_part1: ((NOT)? CLUSTER | PARTITIONED | (NOT)? PADDED using_specification free_specification gbpcache_specification (DEFINE (YES | NO)  COMPRESS (YES | NO) (INCLUDE | EXCLUDE) NULL KEYS))*;
+dbs_create_index_table_other_opt_part2: (PARTITION BY (RANGE)? LPARENCHAR (partition_using_specification (COMMACHAR  partition_using_specification))* RPARENCHAR)?;
+dbs_create_index_table_other_opt_part3: (BUFFERPOOL dbs_bp_name | CLOSE (YES | NO) | DEFER (NO | YES) | DSSIZE INTEGER G | PIECESIZE INTEGER (K | M | G) | COPY (NO | YES))*;
+partition_using_specification: partition_element (using_specification | free_specification | gbpcache_specification | DSSIZE INTEGER G)?;
+using_specification: USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name (PRIQTY (NUMBER_12 | INTEGER)? | SECQTY INTEGER | ERASE (YES | NO)?)*);
+free_specification: ( (FREEPAGE (NUMBER_0 | INTEGER) | PCTFREE  (NUMBER_10 | INTEGER)))*;
+gbpcache_specification: GBPCACHE (CHANGED | ALL) | NONE;
+partition_element: PARTITION INTEGER (ENDING (AT)? LPARENCHAR (dbs_string_constant | MAXVALUE | MINVALUE)*  RPARENCHAR (INCLUSIVE)? )?;
 
-dbs_create_lob_tablespace: literal+; //?
-dbs_create_mask: literal+; //?
-dbs_create_permission: literal+; //?
+dbs_create_lob_tablespace: CREATE LOB  dbs_table_space_name dbs_create_lob_tablespace_def*;
+dbs_create_lob_tablespace_def: IN (DSNDB04 | dbs_database_name) (BUFFERPOOL dbs_bp_name)? CLOSE (YES | NO) COMPRESS (YES | NO) | DEFINE  (YES | NO) DSSIZE (NUMBER_4 G | INTEGER G) gbpcache_block?
+                            LOCKMAX (SYSTEM | INTEGER) locksize_block?  NOT? LOGGED using_block?;
+gbpcache_block: (GBPCACHE (CHANGED | ALL | SYSTEM | NONE))?;
+locksize_block: (LOCKSIZE (ANY | LOB))?;
+using_block: USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name (PRIQTY INTEGER | SECQTY INTEGER | ERASE (YES | NO)?)*);
+
+dbs_create_mask: CREATE MASK dbs_mask_name ON dbs_table_name ((AS)? dbs_correlation_name)? FOR COLUMN dbs_column_name RETURN case_expression (DISABLE | ENABLE);
+dbs_create_permission: CREATE PERMISSION dbs_permission_name ON dbs_table_name ((AS)? dbs_correlation_name)? FOR ROWS WHERE dbs_search_condition ENFORCED FOR ALL ACCESS  (DISABLE | ENABLE);
 dbs_create_procedure: literal+; //?
 dbs_create_procedure_ext: literal+; //?
 dbs_create_procedure_native_sql: literal+; //?
@@ -535,6 +551,8 @@ common_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYIN
                     (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer (K | M | G)? RPARENCHAR)?);
 common_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
 
+sql_data_type: SQL (VARCHAR (LPARENCHAR dbs_integer RPARENCHAR) | DECFLOAT (LPARENCHAR (NUMBER_34) RPARENCHAR)? | DATE | TIMESTAMP (LPARENCHAR (NUMBER_12) RPARENCHAR)? );
+
 
 dbs_option_list: (LANGUAGE SQL)? (SPECIFIC dbs_specific_name)? (NOT? DETERMINISTIC)? (NO? EXTERNAL ACTION)? (READS SQL DATA |
                 CONTAINS SQL | MODIFIES SQL DATA)? ((CALLED | RETURNS NULL) ON NULL INPUT)? (STATIC DISPATCH)? ((ALLOW | DISALLOW)
@@ -662,6 +680,7 @@ expr_out : OUT LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR
 expr_inout : INOUT LPARENCHAR? SQL_IDENTIFIER (COMMACHAR dbs_expression)* RPARENCHAR?;
 dbs_expr_list: LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR?;
 key_expression: all_words+; //?
+case_expression: all_words+; //?
 
 
 //Variables
@@ -675,6 +694,7 @@ dbs_attr_host_variable: literal+; //?
 dbs_authorization_name: SQL_IDENTIFIER;
 dbs_aux_table_name: SQL_IDENTIFIER;
 dbs_bp_name: SQL_IDENTIFIER;
+dbs_catalog_name: SQL_IDENTIFIER;
 dbs_collection_id_package_name: FILENAME;
 dbs_collection_name: all_words+; //?
 dbs_column_name: SQL_IDENTIFIER;
@@ -703,13 +723,16 @@ dbs_id_host_variable: all_words+; //?
 dbs_include_data_type: all_words+; //?
 dbs_index_identifier: literal+; //?
 dbs_index_name: SQL_IDENTIFIER;
-dbs_integer: INTEGERLITERAL;
+dbs_integer: INTEGER;
 dbs_integer_constant: INTEGERLITERAL; //range 1 - 32767
 dbs_level: all_words+; //?
 dbs_location_name: VARCHAR | CHAR; //not greater than 16
 dbs_mask_name: SQL_IDENTIFIER;
 dbs_member_name: SQL_IDENTIFIER;
 dbs_name: all_words+; //?
+dbs_namespace_name: VARCHAR;
+dbs_namespace_url: VARCHAR;
+dbs_namespace_prefix: VARCHAR;
 dbs_nnnn_m: all_words+; //?
 dbs_obfuscated_statement_text: ALPHANUMERIC_TEXT;
 dbs_package_name: all_words+; //?
