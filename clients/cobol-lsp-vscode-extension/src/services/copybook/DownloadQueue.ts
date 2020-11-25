@@ -26,9 +26,8 @@ export class DownloadQueue {
 
     public push(copybook: string, profile: string, quiet: boolean): void {
         if (this.resolve) {
-            const r = this.resolve;
+            this.resolve(new CopybookProfile(copybook, profile, quiet));
             this.resolve = undefined;
-            r(new CopybookProfile(copybook, profile, quiet));
         } else {
             const copybookProfile = new CopybookProfile(copybook, profile, quiet);
             for (const item of this.queue) {
