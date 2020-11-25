@@ -123,23 +123,52 @@ dbs_create_db_stogroup: STOGROUP (SYSDEFLT | dbs_stogroup_name);
 dbs_create_db_ccsid: CCSID (ASCII | EBCDIC | UNICODE);
 
 dbs_create_function: CREATE FUNCTION;
-dbs_create_function_compiled_scalar: dbs_create_function dbs_function_name LPARENCHAR dbs_create_function_param_decl
-        (COMMACHAR dbs_create_function_param_decl)* RPARENCHAR (dbs_create_function_func_def | WRAPPED dbs_obfuscated_statement_text);
+dbs_create_function_compiled_scalar: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_param_decl
+        (COMMACHAR dbs_create_function_param_decl)*)? RPARENCHAR (dbs_create_function_func_def | WRAPPED dbs_obfuscated_statement_text);
 dbs_create_function_param_decl: dbs_parameter_name dbs_create_function_param_type;
 dbs_create_function_param_type: (common_built_in_type | dbs_distinct_type_name | dbs_array_type_name) | (TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR);
 dbs_create_function_func_def: RETURNS common_built_in_type (VERSION V1 | VERSION dbs_routine_version_id)? dbs_option_list? dbs_control_statement;
 //AS LOCATOR can be specified only for a LOB
-dbs_create_function_ext_scalar: dbs_create_function dbs_function_name LPARENCHAR dbs_create_function_ext_param_decl (COMMACHAR dbs_create_function_ext_param_decl)* RPARENCHAR
+
+dbs_create_function_ext_scalar: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_ext_param_decl (COMMACHAR dbs_create_function_ext_param_decl)*)? RPARENCHAR
                             RETURNS (common_built_in_type (AS LOCATOR)?  | common_built_in_type CAST FROM common_built_in_type (AS LOCATOR)?) dbs_option_list_ext;
 dbs_create_function_ext_param_decl: dbs_parameter_name? (dbs_create_function_ext_param_type (AS LOCATOR)? | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR);
 dbs_create_function_ext_param_type: common_built_in_type | dbs_distinct_type_name;
 
-dbs_create_function_ext_table: literal+; //?
-dbs_create_function_inline_scalar: literal+; //?
-dbs_create_function_sourced: literal+; //?
-dbs_create_function_sql_table: literal+; //?
-dbs_create_global_temp_table: literal+; //?
-dbs_create_index: literal+; //?
+dbs_create_function_ext_table: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_ext_param_decl (COMMACHAR dbs_create_function_ext_param_decl)*)? RPARENCHAR
+                            RETURNS (dbs_create_function_ext_table_desc  | GENERIC TABLE) dbs_option_list_ext_table;
+dbs_create_function_ext_table_desc: TABLE LPARENCHAR dbs_create_function_ext_table_body  (COMMACHAR  dbs_create_function_ext_table_body)* RPARENCHAR;
+dbs_create_function_ext_table_body: dbs_column_name common_built_in_type (AS LOCATOR)?;
+
+dbs_create_function_inline_scalar: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_ext_param_decl (COMMACHAR dbs_create_function_ext_param_decl)*)? RPARENCHAR
+                                 (dbs_create_function_func_inl_def | WRAPPED dbs_obfuscated_statement_text);
+dbs_create_function_func_inl_def: RETURNS common_built_in_type (LANGUAGE SQL)? dbs_option_list_inl_def dbs_create_function_func_inl_sql_routine;
+dbs_create_function_func_inl_sql_routine: RETRUN dbs_control_statement;//TODO
+
+dbs_create_function_sourced: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_sourced_param_decl (COMMACHAR dbs_create_function_sourced_param_decl)*)? RPARENCHAR
+                             RETURNS common_built_in_type (AS LOCATOR)? (SPECIFIC dbs_specific_name)? (PARAMETER CCSID (ASCII | EBCDIC | UNICODE))
+                             (SOURCE ( dbs_function_name (dbs_create_function_sourced_param_type (COMMACHAR dbs_create_function_sourced_param_type)*)?  | SPECIFIC dbs_specific_name));
+dbs_create_function_sourced_param_decl: (dbs_parameter_name)? dbs_create_function_sourced_param_type;
+dbs_create_function_sourced_param_type: (common_built_in_type | dbs_distinct_type_name) (AS LOCATOR)?  | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR;
+
+dbs_create_function_sql_table: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_sql_table_param_decl (COMMACHAR dbs_create_function_sql_table_param_decl)*)? RPARENCHAR
+                                                             (dbs_create_function_sql_func_def | WRAPPED dbs_obfuscated_statement_text);
+dbs_create_function_sql_table_param_decl: (dbs_parameter_name)? dbs_create_function_sql_table_param_type;
+dbs_create_function_sql_table_param_type: (common_built_in_type | dbs_distinct_type_name)  | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR;
+dbs_create_function_sql_func_def: RETURNS TABLE LPARENCHAR  dbs_column_name common_built_in_type (COMMACHAR dbs_column_name common_built_in_type)* RPARENCHAR dbs_option_list_inl_def dbs_create_function_func_sql_routine;
+dbs_create_function_func_sql_routine: RETRUN dbs_control_statement | BEGIN ATOMIC RETURN dbs_control_statement END;//TODO
+
+dbs_create_global_temp_table: dbs_create_function dbs_function_name (LPARENCHAR (dbs_create_global_temp_table_col_def (COMMACHAR dbs_create_global_temp_table_col_def)*) RPARENCHAR | LIKE (dbs_table_name | dbs_view_name))
+                                (CCSID (ASCII | EBCDIC | UNICODE))?;
+dbs_create_global_temp_table_col_def: dbs_column_name  common_built_in_type (NOT NULL);//common_built_in_type2
+
+dbs_create_index: CREATE (UNIQUE (WHERE NOT NULL)?)? INDEX dbs_index_name ON (dbs_create_index_table_def | dbs_aux_table_name)  dbs_create_index_table_other_opt;
+dbs_create_index_table_def: dbs_table_name LPARENCHAR dbs_create_index_table_def_body (COMMACHAR dbs_create_index_table_def_body)* (COMMACHAR BUSINESS_TIME  (WITHOUT | WITH) OVERLAPS ) RPARENCHAR;
+dbs_create_index_table_def_body: (dbs_column_name | key_expression) (ASC | DESC | RANDOM);
+dbs_create_index_table_other_opt: dbs_create_index_table_other_opt_xml? (INCLUDE dbs_column_name LPARENCHAR (COMMACHAR dbs_column_name)* RPARENCHAR) dbs_create_index_table_other_opt_detail;
+dbs_create_index_table_other_opt_xml: literal+; //?
+dbs_create_index_table_other_opt_detail: literal+; //?
+
 dbs_create_lob_tablespace: literal+; //?
 dbs_create_mask: literal+; //?
 dbs_create_permission: literal+; //?
@@ -486,6 +515,10 @@ dbs_whenever: WHENEVER (NOT FOUND | SQLERROR | SQLWARNING) (CONTINUE | (GOTO | G
 common_built_in_type: (common_bit_int | common_bit_decimal | common_bit_float | common_bit_decfloat |
                         common_bit_char | common_bit_clob | common_bit_varchar | common_bit_graphic |
                         common_bit_binary | DATE | TIME | common_bit_timestamp | ROWID | XML);
+common_built_in_type2: (common_bit_int | common_bit_decimal | common_bit_float | common_bit_decfloat |
+                        common_bit_char | common_bit_clob | common_bit_varchar | common_bit_graphic |
+                        common_bit_binary | DATE | TIME | common_bit_timestamp | ROWID | XML);
+
 common_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
 common_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR dbs_integer (COMMACHAR dbs_integer)? RPARENCHAR)?;
 common_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
@@ -528,6 +561,12 @@ dbs_option_list_ext: (SPECIFIC dbs_specific_name)? (PARAMETER ( CCSID (ASCII | E
                  (ASUTIME NO LIMIT | ASUTIME LIMIT INTEGER)? (STAY RESIDENT (YES | NO)?)? (PROGRAM TYPE (SUB | MAIN))? (SECURITY (DB2 | (USER | DEFINER)))?
                  (STOP AFTER (SYSTEM DEFAULT FAILURES | INTEGER FAILURES) | CONTINUE AFTER FAILURE)? (RUN OPTIONS dbs_runtime_options)?
                   ((INHERIT | DEFAULT)  SPECIAL REGISTERS)? (STATIC DISPATCH)? ((NOT)? SECURED)? ;
+
+
+dbs_option_list_ext_table: dbs_option_list_ext; //TBD
+
+dbs_option_list_inl_def:  (SPECIFIC dbs_specific_name)? (PARAMETER CCSID (ASCII | EBCDIC | UNICODE)) ((NOT)? DETERMINISTIC)? ( (NO)? EXTERNAL ACTION)?
+                          (READ SQL DATA | CONTAINS SQL)? (STATIC DISPATCH)? (CALLED ON NULL INPUT)? ((NOT)? SECURED)?;
 
 //TODO
 dbs_control_statement: all_words+;
@@ -622,6 +661,7 @@ expr_in : IN LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR?;
 expr_out : OUT LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR?;
 expr_inout : INOUT LPARENCHAR? SQL_IDENTIFIER (COMMACHAR dbs_expression)* RPARENCHAR?;
 dbs_expr_list: LPARENCHAR? SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR?;
+key_expression: all_words+; //?
 
 
 //Variables
@@ -633,6 +673,7 @@ dbs_array_type_name: SQL_IDENTIFIER;
 dbs_array_variable: all_words+; //?
 dbs_attr_host_variable: literal+; //?
 dbs_authorization_name: SQL_IDENTIFIER;
+dbs_aux_table_name: SQL_IDENTIFIER;
 dbs_bp_name: SQL_IDENTIFIER;
 dbs_collection_id_package_name: FILENAME;
 dbs_collection_name: all_words+; //?
