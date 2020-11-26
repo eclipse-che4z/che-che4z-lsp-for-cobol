@@ -662,11 +662,26 @@ UNDERSCORECHAR :     '_';
 PIPECHAR : '||';
 QUESTIONMARK : '?';
 PERCENT : '%';
-ALPHANUMERIC_TEXT : [a-zA-Z0-9]+;
-SQL_IDENTIFIER : ([a-zA-Z_%]+ ([-_%@#$]+ [a-zA-Z0-9]+)*);
+SQL_IDENTIFIER : ([A-Z] [A-Z0-9_]*) | STRINGLITERAL;   //https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sqlidentifiers.html
 VERSION_ID : ([0-9]+ ([a-zA-Z0-9]+)*);
+ALPHANUMERIC_TEXT : [a-zA-Z0-9]+;
+HOSTNAME_IDENTIFIER : [a-zA-Z0-9._@:]+;
+POSITIVEINTEGERLITERAL: PLUSCHAR? DIGIT+;
+TIMESTAMPLITERAL: DIGIT DIGIT '.' DIGIT DIGIT '.' DIGIT DIGIT | // hh.mm.ss;
+                  DIGIT DIGIT '.' DIGIT DIGIT (A M | P M) | //hh:mm AM /PM
+                  DIGIT DIGIT '.' DIGIT DIGIT ':' DIGIT DIGIT |// hh.mm:ss
+                  DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT '.'  DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT;//hh:mm:ss.nnnnnn
+DATELITERAL: '\'' (DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT | //yyyy-mm-dd
+                   DIGIT DIGIT '/' DIGIT DIGIT '/' DIGIT DIGIT DIGIT DIGIT | //mm/dd/yyyy
+                   DIGIT DIGIT '.' DIGIT DIGIT '.' DIGIT DIGIT DIGIT DIGIT |//dd.mm.yyyy
+                   DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT DIGIT DIGIT) TIMESTAMPLITERAL? '\'';//yyyy-mm-dd
 
+QUAD: ZERO_DIGIT  HEXNUMBER+
+| ZERO_DIGIT OCT_DIGIT+
+| DIGIT+
+;
 
+IP4: QUAD DOT QUAD DOT QUAD DOT QUAD+;
 
 NUMBER_0 : ZERO_DIGIT;
 NUMBER_1 : '1';
@@ -696,3 +711,6 @@ fragment GRAHICCHAR :
 	G X '"' [0-9A-F]+ '"'
 	| G X '\'' [0-9A-F]+ '\''
 ;
+
+fragment
+OCT_DIGIT        : [0-8] ;

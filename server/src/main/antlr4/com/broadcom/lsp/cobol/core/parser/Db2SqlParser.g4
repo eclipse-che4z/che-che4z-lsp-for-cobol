@@ -57,7 +57,7 @@ dbs_alter_function_add: ADD VERSION dbs_routine_version_id dbs_alter_function_ro
 dbs_alter_function_activate: ACTIVATE VERSION dbs_routine_version_id;
 dbs_alter_function_regen: REGENERATE (ACTIVE VERSION | VERSION dbs_routine_version_id) (USING APPLICATION COMPATIBILITY dbs_applcompat_value)?;
 dbs_alter_function_drop: DROP VERSION dbs_routine_version_id;
-dbs_alter_function_routine: LPARENCHAR (dbs_parameter_name (dbs_alter_function_bit | dbs_distinct_type_name | dbs_array_type_name) (COMMACHAR (dbs_alter_function_bit | dbs_distinct_type_name | dbs_array_type_name))*)? RPARENCHAR RETURNS dbs_alter_function_bit dbs_alter_function_compopts? dbs_sql_control_statement ;
+dbs_alter_function_routine: LPARENCHAR (dbs_parameter_name (dbs_alter_function_bit | dbs_distinct_type_name | dbs_array_type_name) (COMMACHAR (dbs_alter_function_bit | dbs_distinct_type_name | dbs_array_type_name))*)? RPARENCHAR RETURNS dbs_alter_function_bit dbs_alter_function_compopts? dbs_sql_control_statement;
 dbs_alter_function_compopts: (NOT? DETERMINISTIC | NO? EXTERNAL ACTION | ((READS|MODIFIES) SQL DATA | CONTAINS SQL) | (CALLED|RETURNS NULL) ON NULL INPUT | STATIC DISPATCH | (ALLOW|DISALLOW) PARALLEL | (DISALLOW|ALLOW|DISABLE) DEBUG MODE | QUALIFIER dbs_schema_name | PACKAGE OWNER dbs_authorization_name | ASUTIME (NO LIMIT | LIMIT dbs_integer) | (INHERIT|DEFAULT) SPECIAL REGISTERS | WLM ENVIRONMENT FOR DEBUG MODE dbs_name | CURRENT DATA (YES|NO) | DEGREE (NUMBER_1 | ANY) | CONCURRENT ACCESS RESOLUTION (USE CURRENTLY COMMITTED | WAIT FOR OUTCOME) | DYNAMICRULES (RUN|BIND|DEFINEBIND|DEFINERUN|INVOKEBIND|INVOKERUN) | APPLICATION ENCODING SCHEME (ASCII|EBCDIC|UNICODE) | (WITH|WITHOUT) EXPLAIN | (WITH|WITHOUT) IMMEDIATE WRITE | ISOLATION LEVEL (CS|RS|RR|UR) | OPTHINT (DOUBLEQUOTE|dbs_string_constant) | SQL PATH (dbs_schema_name | SESSION? USER | SYSTEM PATH) (COMMACHAR (dbs_schema_name | SESSION? USER | SYSTEM PATH))* | QUERY ACCELERATION (NONE|ELIGIBLE|ALL|ENABLE (WITH FAILBACK)?) | GET_ACCEL_ARCHIVE (YES|NO) | ACCELERATION WAITFORDATA dbs_nnnn_m | ACCELERATOR dbs_accelerator_name | REOPT (NONE|ALWAYS|ONCE) | VALIDATE (RUN|BIND) | ROUNDING (DEC_ROUND_CEILING|DEC_ROUND_DOWN|DEC_ROUND_FLOOR|DEC_ROUND_HALF_DOWN|DEC_ROUND_HALF_EVEN|DEC_ROUND_HALF_UP|DEC_ROUND_UP) | DATE FORMAT (ISO|EUR|USA|JIS|LOCAL) | NOT? SECURED | BUSINESS_TIME SENSITIVE (YES|NO) | SYSTEM_TIME SENSITIVE (YES|NO) | ARCHIVE SENSITIVE (YES|NO) | APPLCOMPAT dbs_applcompat_value | (OFF | CONCENTRATE STATEMENTS (WITH LITERALS)?))+; /*java fix needed to add "one each" rule */
 dbs_alter_function_inline: (SPECIFIC FUNCTION dbs_specific_name | FUNCTION dbs_function_name (LPARENCHAR ((dbs_alter_function_bit | XML | dbs_distinct_type_name) (COMMACHAR (dbs_alter_function_bit | XML | dbs_distinct_type_name))*)? RPARENCHAR)?) dbs_alter_function_inlineopts; /*this is for both "inlined SQL scalar" and "SQL table" as they are basically identical - only two extra options in "table" */
 dbs_alter_function_inlineopts: (NOT? DETERMINISTIC | NO? EXTERNAL ACTION | (CONTAINS SQL|READS SQL DATA) | STATIC DISPATCH | CALLED ON NULL INPUT | NOT? SECURED | INHERIT SPECIAL REGISTERS | CARDINALITY dbs_integer)+; /*java fix required to add "one each" rule */
@@ -936,9 +936,9 @@ CURRENT TEMPORAL BUSINESS_TIME | CURRENT TEMPORAL SYSTEM_TIME | (CURRENT TIME | 
 (SESSION_USER | USER) );
 
 
-db2sql_data_value: all_words+;//
-dbs_accelerator_name: all_words+; //?
-dbs_address_value: all_words+;//?
+db2sql_data_value: DATELITERAL;
+dbs_accelerator_name: ALPHANUMERIC_TEXT; // - 1
+dbs_address_value: IP4 | HOSTNAME_IDENTIFIER ;// - 1
 dbs_alias_name2: SQL_IDENTIFIER; //must not be an alias that exists at the current server
 dbs_alias_name: SQL_IDENTIFIER;
 dbs_applcompat_value: all_words+; //?
@@ -981,7 +981,9 @@ dbs_encryption_value: all_words+;//?;
 dbs_explainable_sql_statement: all_words+; //?
 dbs_ext_program_name: SQL_IDENTIFIER;//If LANGUAGE is JAVA
 dbs_external_program_name:all_words+; //?
-dbs_fetch_clause: all_words+; //?
+//REF: https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_fetchclause.html
+// ?? Should we support LIMIT?
+dbs_fetch_clause: FETCH (FIRST | NEXT) POSITIVEINTEGERLITERAL? (ROW | ROWS) ONLY;
 dbs_field_name: SQL_IDENTIFIER;
 dbs_fullselect: all_words+; //?
 dbs_function_name: SQL_IDENTIFIER; //must not be any of the following system-reserved keywords
@@ -1036,7 +1038,8 @@ dbs_sc_name: all_words+;//?
 dbs_scalar_fullselect : LPARENCHAR dbs_fullselect RPARENCHAR;
 dbs_schema_location: all_words+;//?
 dbs_schema_name: all_words+; //?
-dbs_search_condition: all_words+; //?
+dbs_search_condition: NOT? dbs_basic_predicate (SELECTIVITY dbs_integer_constant)? ((AND|OR) NOT?
+                      (dbs_basic_predicate | dbs_search_condition))*; //? change this to predicate after the predicate is defined.
 dbs_seclabel_name: all_words+;//?
 dbs_sequence_name: SQL_IDENTIFIER;
 dbs_servauth_value: all_words+;//?
