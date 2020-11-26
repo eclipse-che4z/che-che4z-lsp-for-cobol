@@ -354,7 +354,48 @@ dbs_create_view: literal+; //?
 dbs_create_distinct_type : CREATE DISTINCT TYPE SQL_IDENTIFIER AS dbs_distinct_type;
 
 /*DECLARE (all) */
-dbs_declare: literal+; //?
+dbs_declare: DECLARE (dbs_declare_cursor | dbs_declare_global | dbs_declare_statement | dbs_declare_table | dbs_declare_variable);
+
+dbs_declare_cursor: dbs_cursor_name ((NO|ASENSITIVE|INSENSITIVE|SENSITIVE (DYNAMIC|STATIC)?) SCROLL)? CURSOR ((WITH|WITHOUT) HOLD | (WITHOUT RETURN|WITH RETURN TO (CALLER|CLIENT)) | (WITH|WITHOUT) ROWSET POSITIONING)* /*java fix needed to add "one each" rule */  FOR (dbs_select | dbs_statement_name);
+
+dbs_declare_global: GLOBAL TEMPORARY TABLE dbs_table_name (LPARENCHAR dbs_declare_global_coldef (COMMACHAR dbs_declare_global_coldef)* RPARENCHAR | (LIKE (dbs_table_name | dbs_view_name) | AS LPARENCHAR dbs_fullselect RPARENCHAR WITH NO DATA) dbs_declare_global_copyopts) (CCSID (ASCII|EBCDIC|UNICODE) | ON COMMIT ((DELETE|PRESERVE) ROWS | DROP TABLE) | (LOGGED | NOT LOGGED (ON ROLLBACK (DELETE|PRESERVE) ROWS)?))*; /*java fix needed to add "one each" rule */ 
+dbs_declare_global_coldef: dbs_column_name (dbs_distinct_type_name | dbs_declare_global_bit) (WITH? DEFAULT (dbs_constant | SESSION_USER | USER | CURRENT SQLID | NULL)? | GENERATED (ALWAYS|BY DEFAULT) (AS IDENTITY (LPARENCHAR dbs_declare_global_idopts (COMMACHAR? dbs_declare_global_idopts)* RPARENCHAR)?)? | NOT NULL)*; /*java fix needed to add "one each" rule */
+dbs_declare_global_bit: (dbs_declare_global_bit_int | dbs_declare_global_bit_decimal | dbs_declare_global_bit_float | dbs_declare_global_bit_decfloat | dbs_declare_global_bit_char |
+                            dbs_declare_global_bit_varchar | dbs_declare_global_bit_graphic | dbs_declare_global_bit_binary | DATE | TIME | dbs_declare_global_bit_timestamp );
+dbs_declare_global_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
+dbs_declare_global_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR dbs_integer (COMMACHAR dbs_integer)? RPARENCHAR)?;
+dbs_declare_global_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
+dbs_declare_global_bit_decfloat: DECFLOAT (LPARENCHAR (NUMBER_34 | NUMBER_16) RPARENCHAR)?;
+dbs_declare_global_bit_char: (CHARACTER | CHAR) (VARYING dbs_declare_global_bit_varchara | LPARENCHAR dbs_integer RPARENCHAR) dbs_declare_global_bit_charopts?;
+dbs_declare_global_bit_charopts: (FOR (SBCS|MIXED|BIT) DATA | CCSID NUMBER_1208)?;
+dbs_declare_global_bit_varchar: VARCHAR dbs_declare_global_bit_varchara;
+dbs_declare_global_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR dbs_declare_global_bit_charopts?;
+dbs_declare_global_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR) (CCSID NUMBER_1200)?;
+dbs_declare_global_bit_binary: (BINARY VARYING? | VARBINARY) (LPARENCHAR dbs_integer RPARENCHAR)?;
+dbs_declare_global_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
+dbs_declare_global_idopts: (START WITH dbs_numeric constant | INCREMENT BY dbs_numeric_constant |  NO (MAXVALUE|MINVALUE|CACHE) | (MAXVALUE|MINVALUE) dbs_numeric_constant | NO? CYCLE |  CACHE dbs_integer_constant);
+dbs_declare_global_copyopts: (dbs_declare_global_identity dbs_declare_global_defaults? | dbs_declare_global_defaults dbs_declare_global_identity?)?;
+dbs_declare_global_defaults: (USING TYPE DEFAULTS | (INCLUDING|EXCLUDING) COLUMN? DEFAULTS);
+dbs_declare_global_identity: (EXCLUDING|INCLUDING) IDENTITY (COLUMN ATTRIBUTES)?;
+
+dbs_declare_statement: dbs_statement_name (COMMACHAR dbs_statement_name)* STATEMENT;
+
+dbs_declare_table: (dbs_table_name | dbs_view_name) TABLE LPARENCHAR dbs_declare_table_loop (COMMACHAR dbs_declare_table_loop)* RPARENCHAR;
+dbs_declare_table_loop: dbs_column_name (dbs_distinct_type_name | dbs_declare_table_bit) (NOT NULL (WITH DEFAULT)?)?;
+dbs_declare_table_bit: (dbs_declare_table_bit_int | dbs_declare_table_bit_decimal | dbs_declare_table_bit_float | dbs_declare_table_bit_decfloat | dbs_declare_table_bit_char | dbs_declare_table_bit_clob | dbs_declare_table_bit_varchar | dbs_declare_table_bit_graphic | dbs_declare_table_bit_binary | DATE | TIME | TIMESTAMP | ROWID | XML);
+dbs_declare_table_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
+dbs_declare_table_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR dbs_integer (COMMACHAR dbs_integer)? RPARENCHAR)?;
+dbs_declare_table_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
+dbs_declare_table_bit_decfloat: DECFLOAT (LPARENCHAR (NUMBER_34 | NUMBER_16) RPARENCHAR)?;
+dbs_declare_table_bit_char: (CHARACTER | CHAR) (VARYING dbs_declare_table_bit_varchara | LARGE OBJECT dbs_declare_table_bit_cloba | LPARENCHAR dbs_integer RPARENCHAR);
+dbs_declare_table_bit_varchar: VARCHAR dbs_declare_table_bit_varchara;
+dbs_declare_table_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR;
+dbs_declare_table_bit_clob: CLOB dbs_declare_table_bit_cloba;
+dbs_declare_table_bit_cloba: (LPARENCHAR dbs_integer (K | M | G)? RPARENCHAR)?;
+dbs_declare_table_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR | DBCLOB (LPARENCHAR dbs_integer (K | M | G)? RPARENCHAR)?);
+dbs_declare_table_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer (K | M | G)? RPARENCHAR)?);
+
+dbs_declare_variable: dbs_host_variable (COMMACHAR dbs_host_variable)* VARIABLE (CCSID (dbs_integer_constant | (EBCDIC|ASCII|UNICODE) (FOR (SBCS|MIXED|BIT) DATA)?))?;
 
 /*DELETE */
 dbs_delete: DELETE FROM (dbs_table_name | dbs_view_name) (dbs_delete_period | dbs_delete_noperiod | dbs_delete_positioned);
