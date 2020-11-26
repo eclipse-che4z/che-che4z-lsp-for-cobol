@@ -1,6 +1,32 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.16.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.15.0...0.16.0) (2020-11-26)
+
+#### Added
+* Support for subroutines
+* Support for INCLUDE in EXEC SQL for copybooks
+* Language features support for sections and predefined variables
+* Index variable definition support
+* Code snippets for EXEC SQL INCLUDE and EXEC CICS
+* JNIENVPTR, JSON and XML special register support
+* Setting log level for the server from the client
+
+#### Changed
+* Deprecated sections support removed
+* "Unsupported file" notification moved into "Problems" console
+* Semantic analysis for paragraphs improved
+* Copybook coloring might work without syntax analysis
+* Document analysis interrupts on closing request
+* Readme update
+
+#### Fixed
+* Analysis termination on a client exception
+* Exception logging after analysis
+* Exposing semantic errors from copybooks to the document
+* Table call variable recognition
+* Many false-positive syntax errors
+
 ## [0.15.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.14.0...0.15.0) (2020-09-30)
 
 #### Added

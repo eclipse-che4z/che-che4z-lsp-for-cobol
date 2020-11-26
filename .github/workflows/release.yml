@@ -15,7 +15,8 @@ jobs:
       with:
         java-version: 11
     - name: Build with Maven
-      run: cd server; mvn package -DskipTests --no-transfer-progress
+      working-directory: server
+      run: mvn package -DskipTests --no-transfer-progress
     - name: Copy jar into extension
       run: cp server/target/server.jar clients/cobol-lsp-vscode-extension/server
     - name: Set up Node 12
@@ -25,8 +26,11 @@ jobs:
     - name: Install release-it tool
       run: npm install --global release-it@13.7.0
     - name: Install Node dependencies
-      run: cd clients/cobol-lsp-vscode-extension; npm ci
+      working-directory: clients/cobol-lsp-vscode-extension
+      run: npm ci
     - name: Make a release
-      run: cd clients/cobol-lsp-vscode-extension; export NODE_PATH=`npm root -g`; release-it --ci --config ../../release/release-it-release.json
+      working-directory: clients/cobol-lsp-vscode-extension
+      run: export NODE_PATH=`npm root -g`; release-it --ci --config ../../release/release-it-release.json
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        THE_KEY: ${{ secrets.TELEMETRY_INSTRUMENTATION_KEY }}

@@ -288,6 +288,16 @@ class CopybookServiceTest {
     assertEquals(new CopybookModel(VALID_CPY_NAME, null, null), copybookModel);
   }
 
+  @Test
+  void testThatMiddlewareThrowsRuntimeException() {
+    when(settingsService.getConfiguration("copybook-resolve", "document", VALID_CPY_NAME))
+        .thenThrow(new RuntimeException("Something is wrong"));
+    CopybookService copybookService = createCopybookService();
+    CopybookModel copybookModel = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, ENABLED);
+
+    assertEquals(new CopybookModel(VALID_CPY_NAME, null, null), copybookModel);
+  }
+
   private CopybookService createCopybookService() {
     return new CopybookServiceImpl(broker, settingsService, files, 3, 3, "HOURS");
   }

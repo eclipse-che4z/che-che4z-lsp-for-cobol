@@ -498,11 +498,11 @@ dataDescriptionEntryFormat1
    ;
 
 dataDescriptionEntryFormat2
-   : LEVEL_NUMBER_66 dataName1 dataRenamesClause DOT_FS
+   : LEVEL_NUMBER_66 (FILLER | dataName1)? dataRenamesClause DOT_FS
    ;
 
 dataDescriptionEntryFormat1Level77
-   : LEVEL_NUMBER_77 dataName1 (dataPictureClause | dataRedefinesClause | dataIntegerStringClause | dataExternalClause
+   : LEVEL_NUMBER_77 (FILLER | dataName1)? (dataPictureClause | dataRedefinesClause | dataIntegerStringClause | dataExternalClause
    | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataCommonOwnLocalClause | dataTypeClause
    | dataUsingClause | dataUsageClause | dataValueClause | dataReceivedByClause | dataOccursClause | dataSignClause
    | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause | dataWithLowerBoundsClause
@@ -510,7 +510,7 @@ dataDescriptionEntryFormat1Level77
    ;
 
 dataDescriptionEntryFormat3
-   : LEVEL_NUMBER_88 dataName1 dataValueClause DOT_FS
+   : LEVEL_NUMBER_88 (FILLER | dataName1)? dataValueClause DOT_FS
    ;
 
 dataDescriptionEntryExecSql
@@ -789,7 +789,7 @@ callStatement
    ;
 
 callUsingPhrase
-   : USING callUsingParameter+
+   : USING callUsingParameter (COMMACHAR? callUsingParameter)*
    ;
 
 callUsingParameter

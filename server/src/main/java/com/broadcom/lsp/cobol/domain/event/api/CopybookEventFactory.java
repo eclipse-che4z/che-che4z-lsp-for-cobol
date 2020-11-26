@@ -15,7 +15,9 @@
 
 package com.broadcom.lsp.cobol.domain.event.api;
 
-import com.broadcom.lsp.cobol.domain.event.factory.*;
+import com.broadcom.lsp.cobol.domain.event.factory.AnalysisFinishedSubscriberFactory;
+import com.broadcom.lsp.cobol.domain.event.factory.RunAnalysisSubscriberFactory;
+import com.broadcom.lsp.cobol.domain.event.factory.UnknownCopybookSubscriberFactory;
 import com.broadcom.lsp.cobol.domain.event.model.*;
 
 import java.util.NoSuchElementException;
@@ -28,10 +30,6 @@ public interface CopybookEventFactory {
         return new UnknownCopybookSubscriberFactory();
       case RUN_ANALYSIS_EVENT:
         return new RunAnalysisSubscriberFactory();
-      case FETCHED_SETTINGS_EVENT:
-        return new FetchedSettingsSubscriberFactory();
-      case COPYBOOK_DEP_EVENT:
-        return new CopybookDepSubscriberFactory();
       case ANALYSIS_FINISHED_EVENT:
         return new AnalysisFinishedSubscriberFactory();
 
@@ -47,10 +45,6 @@ public interface CopybookEventFactory {
         return UnknownEvent.builder().eventMessage("DUMMY_EVENT_NAME").build();
       case RUN_ANALYSIS_EVENT:
         return new RunAnalysisEvent();
-      case FETCHED_SETTINGS_EVENT:
-        return FetchedSettingsEvent.builder().build();
-      case COPYBOOK_DEP_EVENT:
-        return CopybookDepEvent.builder().build();
       case ANALYSIS_FINISHED_EVENT:
         return AnalysisFinishedEvent.builder().build();
       default:
