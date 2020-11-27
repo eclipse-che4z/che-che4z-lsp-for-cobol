@@ -14,7 +14,7 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
-import {C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_ZOWE, SETTINGS_SECTION} from "../../constants";
+import {C4Z_FOLDER, COPYBOOKS_FOLDER, PATHS_ZOWE, SETTINGS_CPY_SECTION} from "../../constants";
 import {ProfileService} from "../ProfileService";
 
 export class CopybooksPathGenerator {
@@ -34,11 +34,11 @@ export class CopybooksPathGenerator {
     }
 
     async listDatasets(): Promise<string[]> {
-        if (!vscode.workspace.getConfiguration(SETTINGS_SECTION).has(PATHS_ZOWE)) {
+        if (!vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).has(PATHS_ZOWE)) {
             vscode.window.showErrorMessage("Please, specify DATASET paths for copybooks in settings.");
             return [];
         }
-        return vscode.workspace.getConfiguration(SETTINGS_SECTION).get(PATHS_ZOWE);
+        return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).get(PATHS_ZOWE);
     }
 }
 

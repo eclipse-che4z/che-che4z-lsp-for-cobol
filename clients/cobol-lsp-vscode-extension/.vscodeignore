@@ -33,3 +33,6 @@ anonymous-cli-metrics.json
 out/__tests__/**
 .releaserc.yaml
 releaseScripts
+.scannerwork
+_/**
+?/**

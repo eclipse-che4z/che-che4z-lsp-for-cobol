@@ -101,6 +101,9 @@ local.properties
 # Tern plugin
 .tern-project
 
+# ANTLR plugin
+/server/gen
+
 # TeXlipse plugin
 .texlipse
 
@@ -123,3 +126,4 @@ node_modules
 tools
 logs/app.log
 dist
+clients/cobol-lsp-vscode-extensiontest-report

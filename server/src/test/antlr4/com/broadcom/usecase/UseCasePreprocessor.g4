@@ -16,7 +16,7 @@
 grammar UseCasePreprocessor;
 
 startRule
-   : .*? ((copybookStatement | variableStatement | paragraphStatement | errorStatement | multiTokenError | NEWLINE)+ .*?)+ EOF
+   : .*? ((copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement | constantStatement | errorStatement | multiTokenError | NEWLINE)+ .*?)+ EOF
    ;
 
 multiTokenError
@@ -24,7 +24,7 @@ multiTokenError
    ;
 
 multiToken
-   : (word | copybookStatement | variableStatement | paragraphStatement | errorStatement | multiTokenError | TEXT)+
+   : (word | copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement | constantStatement | errorStatement | multiTokenError | TEXT)+
    ;
 
 errorStatement
@@ -55,8 +55,20 @@ variableDefinition
    : VARIABLEDEFINITION word
    ;
 
+constantStatement
+   : constantUsage diagnostic* STOP
+   ;
+
+constantUsage
+   : CONSTANTUSAGE word
+   ;
+
 paragraphStatement
    : (paragraphUsage | paragraphDefinition) diagnostic* STOP
+   ;
+
+sectionStatement
+   : (sectionUsage | sectionDefinition) diagnostic* STOP
    ;
 
 paragraphUsage
@@ -65,6 +77,22 @@ paragraphUsage
 
 paragraphDefinition
    : PARAGRPHDEFINITION word
+   ;
+
+sectionUsage
+   : SECTIONUSAGE word
+   ;
+
+sectionDefinition
+   : SECTIONDEFINITION word
+   ;
+
+subroutineStatement
+   : subroutineUsage diagnostic* STOP
+   ;
+
+subroutineUsage
+   : SUBROUTINEUSAGE STRINGLITERAL replacement?
    ;
 
 diagnostic
@@ -88,26 +116,31 @@ cpyIdentifier
    ;
 
 cpyName
-   : IDENTIFIER | COPYBOOKNAME
+   : IDENTIFIER | COPYBOOKNAME | QUOTED_COPYBOOKNAME | STRINGLITERAL
    ;
 
 START : '{';
 STOP : '}';
 VARIABLEDEFINITION : START + '$*';
 VARIABLEUSAGE : START + '$';
+CONSTANTUSAGE : START + '&';
 PARAGRPHDEFINITION : START + '#*';
 PARAGRPHUSAGE : START + '#';
+SECTIONDEFINITION : START + '@*';
+SECTIONUSAGE : START + '@';
 COPYBOOKDEFINITION : START + '~*';
 COPYBOOKUSAGE : START + '~';
+SUBROUTINEUSAGE : START + '%';
 DIAGNOSTICSTART : '|';
 REPLACEMENTSTART : '^';
 MULTITOKENSTART : START + '_';
 MULTITOKENSTOP : '_' + STOP;
 
-STRINGLITERAL : ["] ~["]* ["];
+STRINGLITERAL : ['"] ~['"]* ['"];
 IDENTIFIER : [a-zA-Z0-9:]+ ([-_]+ [a-zA-Z0-9:]+)*;
 
 COPYBOOKNAME : [a-zA-Z0-9#@$]+ ([-_]+ [a-zA-Z0-9#@$]+)*;
+QUOTED_COPYBOOKNAME : '\'' + COPYBOOKNAME + '\'';
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
