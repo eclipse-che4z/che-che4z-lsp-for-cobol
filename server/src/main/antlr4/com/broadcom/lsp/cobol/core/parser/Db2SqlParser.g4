@@ -105,7 +105,7 @@ dbs_alter_sequence_loop: (RESTART (WITH dbs_numeric_constant)? | (INCREMENT BY|M
 /*ALTER STOGROUP */
 dbs_alter_stogroup: STOGROUP dbs_stogroup_name (NO KEY LABEL | KEY LABEL dbs_key_label_name | (ADD|REMOVE) VOLUMES LPARENCHAR (dbs_volume_id (COMMACHAR dbs_volume_id)* | QUOTE ASTERISKCHAR QUOTE (COMMACHAR QUOTE ASTERISKCHAR QUOTE)*) RPARENCHAR)+ (DATACLAS dbs_dc_name)? (MGMTCLAS dbs_mc_name)? (STORCLAS dbs_sc_name)?;
 /*ALTER TABLE */
-dbs_alter_table: TABLE dbs_table_name (dbs_alter_table_add | dbs_alter_table_alter | dbs_alter_table_rename | dbs_alter_table_drop | dbs_alter_table_rotate | DATA CAPTURE (NONE|CHANGES) | NOT? VOLATILE CARDINALITY? | (ACTIVATE|DEACTIVATE) (ROW|COLUMN) ACCESS CONTROL | APPEND (NO|YES) | AUDIT (NONE|CHANGES|ALL) | VALIDPROC (dbs_program_name | NULL) | ENABLE ARCHIVE USE dbs_archive_table_name | DISABLE ARCHIVE | NO KEY LABEL | KEY LABEL dbs_key_label_name)+;
+dbs_alter_table: TABLE dbs_table_name (dbs_alter_table_add | dbs_alter_table_alter | dbs_alter_table_rename | dbs_alter_table_drop | dbs_alter_table_rotate | DATA CAPTURE (NONE|CHANGES) | NOT? VOLATILE CARDINALITY? | (ACTIVATE|DEACTIVATE) (ROW|COLUMN) ACCESS CONTROL | APPEND (NO|YES) | AUDIT (NONE|CHANGES|ALL) | VALIDPROC (dbs_program_name | NULL) | ENABLE ARCHIVE USE dbs_table_name | DISABLE ARCHIVE | NO KEY LABEL | KEY LABEL dbs_key_label_name)+;
 dbs_alter_table_add: ADD (COLUMN? dbs_alter_table_coldef | dbs_alter_table_unique | dbs_alter_table_referential | dbs_alter_table_check | PARTITION (BY dbs_alter_table_partitioning | dbs_alter_table_partition)? | SYSTEM? VERSIONING USE HISTORY TABLE dbs_history_table_name (ON DELETE ADD EXTRA ROW)? (MATERIALIZED? QUERY)? dbs_alter_table_mq | CLONE dbs_clone_table_name | RESTRICT ON DROP);
 dbs_alter_table_coldef: dbs_column_name (dbs_distinct_type_name | dbs_alter_table_bit)? (dbs_alter_table_defclause | NOT NULL | dbs_alter_table_check | dbs_alter_table_refclause | dbs_alter_table_generated | IMPLICITLY HIDDEN | AS SECURITY LABEL | FIELDPROC dbs_program_name (LPARENCHAR dbs_constant (COMMACHAR dbs_constant)* RPARENCHAR)? | INLINE LENGTH dbs_integer)*;
 dbs_alter_table_bit: (dbs_alter_table_bit_int | dbs_alter_table_bit_decimal | dbs_alter_table_bit_float | dbs_alter_table_bit_decfloat | dbs_alter_table_bit_char | dbs_alter_table_bit_clob | dbs_alter_table_bit_varchar | dbs_alter_table_bit_graphic | dbs_alter_table_bit_binary | DATE | TIME | dbs_alter_table_bit_timestamp | ROWID | dbs_alter_table_bit_xml);
@@ -125,7 +125,7 @@ dbs_alter_table_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((
 dbs_alter_table_bit_xml: XML (LPARENCHAR XMLSCHEMA dbs_alter_table_bit_xmlspec (ELEMENT dbs_element_name)? (COMMACHAR dbs_alter_table_bit_xmlspec (ELEMENT dbs_element_name)?)* RPARENCHAR)?;
 dbs_alter_table_bit_xmlspec: (ID dbs_registered_xml_schema_name | (URL dbs_target_namespace | NO NAMESPACE) (LOCATION dbs_schema_location)?);
 dbs_alter_table_defclause: WITH? DEFAULT (dbs_constant | SESSION_USER | USER | CURRENT SQLID | NULL | dbs_cast_function_name LPARENCHAR (dbs_constant | SESSION_USER | USER | CURRENT SQLID | NULL) RPARENCHAR)?;
-dbs_alter_table_check: (CONSTRAINT dbs_constraint_name)? CHECK LPARENCHAR dbs_check_condition RPARENCHAR;
+dbs_alter_table_check: (CONSTRAINT dbs_constraint_name)? CHECK LPARENCHAR dbs_search_condition RPARENCHAR;
 dbs_alter_table_refclause: REFERENCES dbs_table_name (LPARENCHAR dbs_column_name (PERIOD BUSINESS_TIME)? (COMMACHAR dbs_column_name (PERIOD BUSINESS_TIME)?)* RPARENCHAR)? (ON DELETE (RESTRICT|NO ACTION | CASCADE | SET NULL))? (NOT? ENFORCED)? (ENABLE QUERY OPTIMIZATION)?;
 dbs_alter_table_generated: GENERATED ((ALWAYS | BY DEFAULT)? (dbs_alter_table_asid | FOR EACH ROW ON UPDATE AS ROW CHANGE TIMESTAMP)? | ALWAYS? (AS TRANSACTION START ID | AS ROW (BEGIN|START|END) | AS LPARENCHAR dbs_non_deterministic_expression RPARENCHAR)?);
 dbs_alter_table_asid: AS IDENTITY (LPARENCHAR dbs_alter_table_asid_loop (COMMACHAR? dbs_alter_table_asid_loop)* RPARENCHAR)?;
@@ -417,6 +417,7 @@ dbs_create_variable: literal+; //?
 dbs_create_view: literal+; //?
 
 
+
 dbs_create_distinct_type : CREATE DISTINCT TYPE SQL_IDENTIFIER AS dbs_distinct_type;
 
 /*DECLARE (all) */
@@ -424,7 +425,7 @@ dbs_declare: DECLARE (dbs_declare_cursor | dbs_declare_global | dbs_declare_stat
 
 dbs_declare_cursor: dbs_cursor_name ((NO|ASENSITIVE|INSENSITIVE|SENSITIVE (DYNAMIC|STATIC)?) SCROLL)? CURSOR ((WITH|WITHOUT) HOLD | (WITHOUT RETURN|WITH RETURN TO (CALLER|CLIENT)) | (WITH|WITHOUT) ROWSET POSITIONING)* /*java fix needed to add "one each" rule */  FOR (dbs_select | dbs_statement_name);
 
-dbs_declare_global: GLOBAL TEMPORARY TABLE dbs_table_name (LPARENCHAR dbs_declare_global_coldef (COMMACHAR dbs_declare_global_coldef)* RPARENCHAR | (LIKE (dbs_table_name | dbs_view_name) | AS LPARENCHAR dbs_fullselect RPARENCHAR WITH NO DATA) dbs_declare_global_copyopts) (CCSID (ASCII|EBCDIC|UNICODE) | ON COMMIT ((DELETE|PRESERVE) ROWS | DROP TABLE) | (LOGGED | NOT LOGGED (ON ROLLBACK (DELETE|PRESERVE) ROWS)?))*; /*java fix needed to add "one each" rule */ 
+dbs_declare_global: GLOBAL TEMPORARY TABLE dbs_table_name (LPARENCHAR dbs_declare_global_coldef (COMMACHAR dbs_declare_global_coldef)* RPARENCHAR | (LIKE (dbs_table_name | dbs_view_name) | AS LPARENCHAR dbs_fullselect RPARENCHAR WITH NO DATA) dbs_declare_global_copyopts) (CCSID (ASCII|EBCDIC|UNICODE) | ON COMMIT ((DELETE|PRESERVE) ROWS | DROP TABLE) | (LOGGED | NOT LOGGED (ON ROLLBACK (DELETE|PRESERVE) ROWS)?))*; /*java fix needed to add "one each" rule */
 dbs_declare_global_coldef: dbs_column_name (dbs_distinct_type_name | dbs_declare_global_bit) (WITH? DEFAULT (dbs_constant | SESSION_USER | USER | CURRENT SQLID | NULL)? | GENERATED (ALWAYS|BY DEFAULT) (AS IDENTITY (LPARENCHAR dbs_declare_global_idopts (COMMACHAR? dbs_declare_global_idopts)* RPARENCHAR)?)? | NOT NULL)*; /*java fix needed to add "one each" rule */
 dbs_declare_global_bit: (dbs_declare_global_bit_int | dbs_declare_global_bit_decimal | dbs_declare_global_bit_float | dbs_declare_global_bit_decfloat | dbs_declare_global_bit_char |
                             dbs_declare_global_bit_varchar | dbs_declare_global_bit_graphic | dbs_declare_global_bit_binary | DATE | TIME | dbs_declare_global_bit_timestamp );
@@ -721,6 +722,33 @@ dbs_select: dbs_select_unpack_function_invocation | dbs_select_row_fullselect;
 /*Queries Subselects (all)*/
 dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCHAR DOT ASTERISKCHAR AS LPARENCHAR dbs_field_name db2sql_data_types (COMMACHAR dbs_field_name db2sql_data_types)* RPARENCHAR;
 dbs_select_row_fullselect: literal+; //TBD
+dbs_subselect: dbs_select_clause dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause?
+dbs_orderby_clause? dbs_offset_clause? dbs_fetch_clause;
+dbs_select_clause: SELECT (ALL | DISTNCT)? ( ASTERISKCHAR | dbs_select_item (COMMACHAR dbs_select_item)*);
+dbs_select_item: (dbs_expression AS? SQL_IDENTIFIER? | dbs_unpacked_row | dbs_generic_name SELECT_ALL);
+dbs_unpacked_row: dbs_select_unpack_function_invocation SELECT_ALL AS LPARENCHAR (dbs_generic_name db2sql_data_types)
+(COMMACHAR dbs_generic_name db2sql_data_types)* RPARENCHAR;
+dbs_from_clause: FROM dbs_table_reference (COMMACHAR dbs_table_reference)*;
+dbs_where_clause: WHERE dbs_search_condition;
+dbs_groupby_alternatives: (dbs_grouping_expression| dbs_groupingset_alternative);
+dbs_groupby_clause: GROUP BY dbs_groupby_alternatives (COMMACHAR dbs_groupby_alternatives)*;
+dbs_groupingset_alternative: (dbs_grouping_sets | dbs_super_group);
+dbs_groupingset_alternative_list: dbs_groupingset_alternative (COMMACHAR dbs_groupingset_alternative)* ;
+dbs_grouping_sets: GROUPING SETS LPARENCHAR (dbs_groupingset_alternative_list | LPARENCHAR dbs_groupingset_alternative_list RPARENCHAR)  RPARENCHAR;
+dbs_super_group: (ROLLUP | CUBE) LPARENCHAR dbs_grouping_expression_list? RPARENCHAR;
+dbs_grouping_expression_alternative: dbs_grouping_expression | LPARENCHAR dbs_grouping_expression (COMMACHAR dbs_grouping_expression)* RPARENCHAR;
+dbs_grouping_expression_list: dbs_grouping_expression_alternative (COMMACHAR dbs_grouping_expression_alternative)*;
+dbs_grouping_expression: dbs_expression; // TODO
+dbs_having_clause: HAVING dbs_search_condition;
+dbs_orderby_clause: ORDER BY (INPUT SEQUENCE | ORDER OF dbs_table_designator | dbs_sort_key (ASC | DESC)? (COMMACHAR dbs_sort_key (ASC | DESC)?)*);
+dbs_sort_key: dbs_column_name | INTEGERLITERAL | dbs_sort_key_expression;
+dbs_offset_clause: OFFSET INTEGERLITERAL (ROW | ROWS);
+
+dbs_fullselect: (dbs_subselect | LPARENCHAR dbs_fullselect RPARENCHAR | dbs_value_clause)
+((UNION|EXCEPT|INTERSECT) (DISTINCT|ALL)? (dbs_subselect | LPARENCHAR dbs_fullselect RPARENCHAR))*
+dbs_orderby_clause? dbs_offset_clause? dbs_fetch_clause?;
+
+dbs_value_clause: VALUES dbs_sequence_reference | LPARENCHAR dbs_sequence_reference (COMMACHAR dbs_sequence_reference)* RPARENCHAR;
 
 
 
@@ -876,11 +904,20 @@ dbs_expression: ('+'|'-')? (dbs_function_invocation |
 dbs_expression_operator: (CONCAT | PIPECHAR | SLASHCHAR | ASTERISKCHAR | PLUSCHAR | MINUSCHAR);
 
 dbs_expressions: dbs_expression (dbs_expression_operator dbs_expression)*;
-//https://www.ibm.com/support/knowledgecenter/SSEPEK_11.0.0/sqlref/src/tpc/db2z_predicatesoverview.html
-dbs_basic_predicate: dbs_expression (EQUALCHAR|NOTEQUALCHAR|LESSTHANCHAR |MORETHANCHAR |MORETHANOREQUAL|LESSTHANOREQUAL) dbs_expression;
-// TODO: predicates
-//dbs_predicate: (dbs_basic_predicate | dbs_quantified_predicate | dbs_array_exists_predicate | dbs_between_predicate | dbs_distinct_predicate | dbs_exist_predicate | dbs_in_predicate | dbs_like_predicate | dbs_null_predicate| dbs_xml_exist_predicate ) ;
-dbs_searched_when_clause : (WHEN dbs_basic_predicate THEN (dbs_result_expression1 | NULL))+;
+//https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_predicatesoverview.html
+dbs_predicate_condition: (EQUALCHAR|NOTEQUALCHAR|LESSTHANCHAR |MORETHANCHAR |MORETHANOREQUAL|LESSTHANOREQUAL);
+dbs_basic_predicate: dbs_expression dbs_predicate_condition dbs_expression;
+dbs_quantified_predicate: dbs_expression dbs_predicate_condition (SOME|ANY|ALL)  LPARENCHAR dbs_select RPARENCHAR;
+dbs_array_exists_predicate: ARRAY_EXISTS LPARENCHAR SQL_IDENTIFIER COMMACHAR DIGIT+ RPARENCHAR;
+dbs_between_predicate: dbs_expression NOT? BETWEEN dbs_expression AND dbs_expression;
+dbs_distinct_predicate: dbs_expression IS NOT? DISTINCT FROM dbs_expression;
+dbs_exist_predicate: EXISTS LPARENCHAR dbs_select RPARENCHAR;
+dbs_in_predicate: dbs_expression NOT? IN LPARENCHAR (dbs_select| dbs_expression (COMMACHAR dbs_expression)*) RPARENCHAR;
+dbs_like_predicate: SQL_IDENTIFIER NOT? LIKE dbs_expression (ESCAPE dbs_expression)?;
+dbs_null_predicate: dbs_expression IS NOT? NULL;
+dbs_predicate: (dbs_basic_predicate | dbs_quantified_predicate | dbs_array_exists_predicate | dbs_between_predicate |
+ dbs_distinct_predicate | dbs_exist_predicate | dbs_in_predicate | dbs_like_predicate | dbs_null_predicate ) ;
+dbs_searched_when_clause : (WHEN dbs_predicate THEN (dbs_result_expression1 | NULL))+;
 
 dbs_function_invocation : dbs_function_name LPARENCHAR (ALL | DISTINCT)? (TABLE dbs_transition_table_name |
 dbs_expression (COMMACHAR dbs_expression)*)? RPARENCHAR;
@@ -1051,57 +1088,56 @@ dbs_accelerator_name: ALPHANUMERIC_TEXT; // - 1
 dbs_address_value: IP4 | HOSTNAME_IDENTIFIER ;// - 1
 dbs_alias_name2: SQL_IDENTIFIER; //must not be an alias that exists at the current server
 dbs_alias_name: SQL_IDENTIFIER;
-dbs_applcompat_value: all_words+; //?
-dbs_archive_table_name: all_words+;//?
+dbs_applcompat_value: FUNCTION_LEVEL_10 | FUNCTION_LEVEL_11 | FUNCTION_LEVEL_12;
 dbs_array_index: INTEGER;
 dbs_array_type_name: SQL_IDENTIFIER;
-dbs_array_variable: all_words+; //?
-dbs_attr_host_variable: literal+; //?
+dbs_array_variable: SQL_IDENTIFIER; //? symentic analysis should see that this is of type array.
+dbs_attr_host_variable: HOSTNAME_IDENTIFIER | NUMERICLITERAL ; // VARCHAR(128)
 dbs_authorization_name: SQL_IDENTIFIER;
 dbs_aux_table_name: SQL_IDENTIFIER;
 dbs_begin_column_name: all_words+;//? as AS ROW BEGIN
 dbs_binary_string_constant: BXNUMBER;
 dbs_bp_name: SQL_IDENTIFIER;
 dbs_case_expression : CASE (dbs_simple_when_clause | dbs_searched_when_clause) (ELSE NULL | ELSE dbs_result_expression1)? END ;
-dbs_cast_function_name: all_words+;//?
+dbs_cast_function_name: SQL_IDENTIFIER;//
 dbs_catalog_name: SQL_IDENTIFIER;
-dbs_ccsid_value: all_words+; //?
+dbs_ccsid_value: DIGIT+; //
 dbs_character_string_constant: HEXNUMBER | STRINGLITERAL;
-dbs_check_condition: all_words+;//?
-dbs_clone_table_name: all_words+;//?
-dbs_collection_id: all_words+; //?
+dbs_clone_table_name: SQL_IDENTIFIER;//? ALPHANUMERIC_TEXT | STRINGLITERAL
+dbs_collection_id: ALPHANUMERIC_TEXT; //?
 dbs_collection_id_package_name: FILENAME;
-dbs_collection_name: all_words+; //?
-dbs_column_name: SQL_IDENTIFIER;
-dbs_common_table_expression: all_words+; //?
+dbs_collection_name: SQL_IDENTIFIER; // SQLIDENTIFIER are case sensitive. allows only uppercase or quoted string as per doc.
+dbs_generic_name: STRINGLITERAL | ALPHANUMERIC_TEXT;
+dbs_column_name: dbs_generic_name (DOT dbs_generic_name)?;
+dbs_common_table_expression: SQL_IDENTIFIER LPARENCHAR SQL_IDENTIFIER (COMMACHAR SQL_IDENTIFIER)* RPARENCHAR AS dbs_select; // https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_commontableexpression.html#db2z_sql_commontableexpression
 dbs_constant : (dbs_string_constant | dbs_integer_constant);
-dbs_constraint_name: all_words+;//?
+dbs_constraint_name: SQL_IDENTIFIER;//?
 dbs_context: SQL_IDENTIFIER;
-dbs_context_name: all_words+;//?
+dbs_context_name: SQL_IDENTIFIER;//?
 dbs_copy_id: all_words+; //?
 dbs_correlation_name: SQL_IDENTIFIER;
 dbs_cursor_name: SQL_IDENTIFIER;
-dbs_database_name: all_words+; //?
-dbs_dc_name: all_words+;//?
+dbs_database_name: SQL_IDENTIFIER; //?
+dbs_dc_name: SQL_IDENTIFIER;// lenght must be < 9
 dbs_descriptor_name: SQLD | SQLDABC | SQLN | SQLVAR; //SQLDA
-dbs_diagnostic_string_expression: literal+; //?
+dbs_diagnostic_string_expression: STRINGLITERAL; //?
 dbs_distinct_type: db2sql_data_types+;
 dbs_distinct_type_name: SQL_IDENTIFIER;
-dbs_element_name: all_words+;//?
 dbs_end_column_name: all_words+;//?defined as AS ROW END
-dbs_encryption_value: all_words+;//?;
-dbs_explainable_sql_statement: all_words+; //?
+dbs_element_name: ALPHANUMERIC_TEXT;//
+dbs_encryption_value: NONE | LOW | HIGH;//
+dbs_explainable_sql_statement: ( dbs_allocate | dbs_alter | dbs_associate | dbs_fetch | dbs_insert | dbs_label | dbs_lock | dbs_merge | dbs_open |
+ dbs_prepare | dbs_refresh | dbs_release | dbs_rename | dbs_select | dbs_truncate | dbs_select | dbs_set | dbs_delete | dbs_drop); //?
 dbs_ext_program_name: SQL_IDENTIFIER;//If LANGUAGE is JAVA
-dbs_external_program_name:all_words+; //?
+dbs_external_program_name: ALPHANUMERIC_TEXT; //?
 //REF: https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_fetchclause.html
 // ?? Should we support LIMIT?
 dbs_fetch_clause: FETCH (FIRST | NEXT) POSITIVEINTEGERLITERAL? (ROW | ROWS) ONLY;
 dbs_field_name: SQL_IDENTIFIER;
-dbs_fullselect: all_words+; //?
 dbs_function_name: SQL_IDENTIFIER; //must not be any of the following system-reserved keywords
 dbs_global_variable_name: all_words+; //?
 dbs_graphic_string_constant: GRAPHICUNICODE | GRAHICCHAR;
-dbs_history_table_name: all_words+;//?
+dbs_history_table_name: dbs_table_name;//?
 dbs_host_label: all_words+; //?
 dbs_host_variable: FILENAME;
 dbs_host_variable_array: all_words+; //?
@@ -1152,8 +1188,8 @@ dbs_sc_name: all_words+;//?
 dbs_scalar_fullselect : LPARENCHAR dbs_fullselect RPARENCHAR;
 dbs_schema_location: all_words+;//?
 dbs_schema_name: all_words+; //?
-dbs_search_condition: NOT? dbs_basic_predicate (SELECTIVITY dbs_integer_constant)? ((AND|OR) NOT?
-                      (dbs_basic_predicate | dbs_search_condition))*; //? change this to predicate after the predicate is defined.
+dbs_search_condition: NOT? dbs_predicate (SELECTIVITY dbs_integer_constant)? ((AND|OR) NOT?
+                      (dbs_predicate | dbs_search_condition))*; //? change this to predicate after the predicate is defined.
 dbs_seclabel_name: all_words+;//?
 dbs_sequence_name: SQL_IDENTIFIER;
 dbs_servauth_value: all_words+;//?
@@ -1173,7 +1209,7 @@ dbs_string_expression: all_words+; //?
 dbs_synonym: all_words+; //?
 dbs_table_identifier: literal+; //?
 dbs_table_name: SQL_IDENTIFIER;
-dbs_table_reference: literal+; //?
+dbs_table_reference: literal+; //? https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_tablereference.html
 dbs_table_space_name: all_words+;//
 dbs_target_namespace: all_words+;//?
 dbs_token_host_variable: all_words+; //?
