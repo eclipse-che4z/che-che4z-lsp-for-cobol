@@ -50,14 +50,14 @@ dbs_alter_function_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (B
 dbs_alter_function_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
 dbs_alter_function_external: (SPECIFIC FUNCTION dbs_specific_name | FUNCTION dbs_function_name (LPARENCHAR ((dbs_alter_function_bit | dbs_distinct_type_name) (AS LOCATOR)? (COMMACHAR (dbs_alter_function_bit | dbs_distinct_type_name) (AS LOCATOR)?)*)? RPARENCHAR)?) dbs_alter_function_extopts;
 dbs_alter_function_extopts: (EXTERNAL NAME (dbs_external_program_name | dbs_identifier) | LANGUAGE (ASSEMBLE|C|COBOL|JAVA|PLI) | PARAMETER STYLE (SQL|JAVA) | NOT? DETERMINISTIC | (RETURNS NULL|CALLED) ON NULL INPUT | ((MODIFIES|READS) SQL DATA | (CONTAINS|NO) SQL) | NO? EXTERNAL ACTION | (PACKAGE PATH dbs_package_path | NO PACKAGE PATH) | (NO SCRATCHPAD | SCRATCHPAD dbs_length) | NO? FINAL CALL | (ALLOW|DISALLOW) PARALLEL | NO? DBINFO | CARDINALITY dbs_integer | (NO COLLID | COLLID dbs_collection_id) | WLM ENVIRONMENT | (dbs_name | LPARENCHAR dbs_name COMMACHAR ASTERISKCHAR RPARENCHAR) | ASUTIME (NO LIMIT | LIMIT dbs_integer) | STAY RESIDENT (YES|NO) | PROGRAM TYPE (SUB|MAIN) | SECURITY (DB2|USER|DEFINER) | (STOP AFTER (SYSTEM DEFAULT|dbs_integer) FAILURES | CONTINUE AFTER FAILURE) | RUN OPTIONS  dbs_run_time_options | (INHERIT|DEFAULT) SPECIAL REGISTERS | STATIC DISPATCH | NOT? SECURED)+; /*java fix required to add "one each" rule */
-dbs_alter_function_compiled: (SPECIFIC FUNCTION dbs_specific_name | FUNCTION dbs_function_name (LPARENCHAR ((dbs_alter_function_bit | XML | dbs_array_type_name | dbs_distinct_type_name) (COMMACHAR (dbs_alter_function_bit | XML | dbs_array_type_name | dbs_distinct_type_name))*)? RPARENCHAR)?) (dbs_alter_function_alter | dbs_alter_function_replace | dbs_alter_function_add | dbs_alter_function_activate | dbs_alter_function_regen | dbs_alter_function_drop);
+dbs_alter_function_compiled: (SPECIFIC FUNCTION dbs_specific_name | FUNCTION dbs_function_name (LPARENCHAR ((dbs_alter_function_bit | XML | data_type_arr_or_distinct) (COMMACHAR (dbs_alter_function_bit | XML | data_type_arr_or_distinct))*)? RPARENCHAR)?) (dbs_alter_function_alter | dbs_alter_function_replace | dbs_alter_function_add | dbs_alter_function_activate | dbs_alter_function_regen | dbs_alter_function_drop);
 dbs_alter_function_alter: ALTER? (ACTIVE VERSION | ALL VERSIONS | VERSION dbs_routine_version_id) dbs_alter_function_compopts;
 dbs_alter_function_replace: REPLACE (ACTIVE VERSION | VERSION dbs_routine_version_id) dbs_alter_function_routine;
 dbs_alter_function_add: ADD VERSION dbs_routine_version_id dbs_alter_function_routine;
 dbs_alter_function_activate: ACTIVATE VERSION dbs_routine_version_id;
 dbs_alter_function_regen: REGENERATE (ACTIVE VERSION | VERSION dbs_routine_version_id) (USING APPLICATION COMPATIBILITY dbs_applcompat_value)?;
 dbs_alter_function_drop: DROP VERSION dbs_routine_version_id;
-dbs_alter_function_routine: LPARENCHAR (dbs_parameter_name (dbs_alter_function_bit | dbs_distinct_type_name | dbs_array_type_name) (COMMACHAR (dbs_alter_function_bit | dbs_distinct_type_name | dbs_array_type_name))*)? RPARENCHAR RETURNS dbs_alter_function_bit dbs_alter_function_compopts? dbs_sql_control_statement;
+dbs_alter_function_routine: LPARENCHAR (dbs_parameter_name (dbs_alter_function_bit | data_type_arr_or_distinct) (COMMACHAR (dbs_alter_function_bit | data_type_arr_or_distinct))*)? RPARENCHAR RETURNS dbs_alter_function_bit dbs_alter_function_compopts? dbs_sql_control_statement;
 dbs_alter_function_compopts: (NOT? DETERMINISTIC | NO? EXTERNAL ACTION | ((READS|MODIFIES) SQL DATA | CONTAINS SQL) | (CALLED|RETURNS NULL) ON NULL INPUT | STATIC DISPATCH | (ALLOW|DISALLOW) PARALLEL | (DISALLOW|ALLOW|DISABLE) DEBUG MODE | QUALIFIER dbs_schema_name | PACKAGE OWNER dbs_authorization_name | ASUTIME (NO LIMIT | LIMIT dbs_integer) | (INHERIT|DEFAULT) SPECIAL REGISTERS | WLM ENVIRONMENT FOR DEBUG MODE dbs_name | CURRENT DATA (YES|NO) | DEGREE (NUMBER_1 | ANY) | CONCURRENT ACCESS RESOLUTION (USE CURRENTLY COMMITTED | WAIT FOR OUTCOME) | DYNAMICRULES (RUN|BIND|DEFINEBIND|DEFINERUN|INVOKEBIND|INVOKERUN) | APPLICATION ENCODING SCHEME (ASCII|EBCDIC|UNICODE) | (WITH|WITHOUT) EXPLAIN | (WITH|WITHOUT) IMMEDIATE WRITE | ISOLATION LEVEL (CS|RS|RR|UR) | OPTHINT (DOUBLEQUOTE|dbs_string_constant) | SQL PATH (dbs_schema_name | SESSION? USER | SYSTEM PATH) (COMMACHAR (dbs_schema_name | SESSION? USER | SYSTEM PATH))* | QUERY ACCELERATION (NONE|ELIGIBLE|ALL|ENABLE (WITH FAILBACK)?) | GET_ACCEL_ARCHIVE (YES|NO) | ACCELERATION WAITFORDATA dbs_nnnn_m | ACCELERATOR dbs_accelerator_name | REOPT (NONE|ALWAYS|ONCE) | VALIDATE (RUN|BIND) | ROUNDING (DEC_ROUND_CEILING|DEC_ROUND_DOWN|DEC_ROUND_FLOOR|DEC_ROUND_HALF_DOWN|DEC_ROUND_HALF_EVEN|DEC_ROUND_HALF_UP|DEC_ROUND_UP) | DATE FORMAT (ISO|EUR|USA|JIS|LOCAL) | NOT? SECURED | BUSINESS_TIME SENSITIVE (YES|NO) | SYSTEM_TIME SENSITIVE (YES|NO) | ARCHIVE SENSITIVE (YES|NO) | APPLCOMPAT dbs_applcompat_value | (OFF | CONCENTRATE STATEMENTS (WITH LITERALS)?))+; /*java fix needed to add "one each" rule */
 dbs_alter_function_inline: (SPECIFIC FUNCTION dbs_specific_name | FUNCTION dbs_function_name (LPARENCHAR ((dbs_alter_function_bit | XML | dbs_distinct_type_name) (COMMACHAR (dbs_alter_function_bit | XML | dbs_distinct_type_name))*)? RPARENCHAR)?) dbs_alter_function_inlineopts; /*this is for both "inlined SQL scalar" and "SQL table" as they are basically identical - only two extra options in "table" */
 dbs_alter_function_inlineopts: (NOT? DETERMINISTIC | NO? EXTERNAL ACTION | (CONTAINS SQL|READS SQL DATA) | STATIC DISPATCH | CALLED ON NULL INPUT | NOT? SECURED | INHERIT SPECIAL REGISTERS | CARDINALITY dbs_integer)+; /*java fix required to add "one each" rule */
@@ -80,7 +80,7 @@ dbs_alter_procedure_external: (DYNAMIC RESULT SETS dbs_integer | EXTERNAL NAME (
 dbs_alter_procedure_alter: ALTER? (ACTIVE VERSION | ALL VERSIONS | VERSION dbs_routine_version_id)? dbs_alter_procedure_options;
 dbs_alter_procedure_options: (NOT? DETERMINISTIC | ((MODIFIES|READS) SQL DATA | CONTAINS SQL) | CALLED ON NULL INPUT | DYNAMIC RESULT SETS dbs_integer | (DISALLOW|ALLOW|DISABLE) DEBUG MODE | PARAMETER CCSID (ASCII|EBCDIC|UNICODE) | QUALIFIER dbs_schema_name | PACKAGE OWNER dbs_authorization_name | ASUTIME (NO LIMIT | LIMIT dbs_integer) | ((COMMIT ON RETURN (YES|NO)) | AUTONOMOUS) | (INHERIT|DEFAULT) SPECIAL REGISTERS | WLM ENVIRONMENT FOR DEBUG MODE dbs_name | (DEFER|NODEFER) PREPARE | CURRENT DATA (YES|NO) | DEGREE (NUMBER_1|ANY) | CONCURRENT ACCESS RESOLUTION (USE CURRENTLY COMMITTED | WAIT FOR OUTCOME) | DYNAMICRULES (RUN|BIND|DEFINERUN|DEFINEBIND|INVOKERUN|INVOKEBIND) | APPLICATION ENCODING SCHEME (ASCII|EBCDIC|UNICODE) | (WITH|WITHOUT) EXPLAIN | (WITH|WITHOUT) IMMEDIATE WRITE | ISOLATION LEVEL (CS|RS|RR|UR) | (WITH|WITHOUT) KEEP DYNAMIC | OPTHINT (DOUBLEQUOTE|dbs_string_constant) | SQL PATH (dbs_schema_name | SYSTEM PATH | SESSION? USER) (COMMACHAR (dbs_schema_name | SYSTEM PATH | SESSION? USER))* | RELEASE AT (COMMIT | DEALLOCATE) | QUERY ACCELERATION (NONE|ELIGIBLE|ALL|ENABLE (WITH FAILBACK)?) | GET_ACCEL_ARCHIVE (YES|NO) | ACCELERATION WAITFORDATA dbs_nnnn_m | ACCELERATOR dbs_accelerator_name | REOPT (NONE|ALWAYS|ONCE) | VALIDATE (RUN|BIND) | ROUNDING (DEC_ROUND_CEILING|DEC_ROUND_DOWN|DEC_ROUND_FLOOR|DEC_ROUND_HALF_DOWN|DEC_ROUND_HALF_EVEN|DEC_ROUND_HALF_UP|DEC_ROUND_UP) | DATE FORMAT (ISO|EUR|USA|JIS|LOCAL) | DECIMAL LPARENCHAR (NUMBER_15|NUMBER_31) (COMMACHAR dbs_s)? | FOR UPDATE CLAUSE (REQUIRED|OPTIONAL) | TIME FORMAT (ISO|EUR|USA|JIS|LOCAL) | BUSINESS_TIME SENSITIVE (YES|NO) | SYSTEM_TIME SENSITIVE (YES|NO) | ARCHIVE SENSITIVE (YES|NO) | APPLCOMPAT dbs_applcompat_value | CONCENTRATE STATEMENTS (OFF|WITH LITERALS))*; /*java fix needed to add "one each" rule */
 dbs_alter_procedure_replace: REPLACE (ACTIVE VERSION | VERSION dbs_routine_version_id)? (LPARENCHAR dbs_alter_procedure_paramdec (COMMACHAR dbs_alter_procedure_paramdec)* RPARENCHAR)? dbs_alter_procedure_options dbs_sql_routine_body; /*SQL-routine-body to be defined once all other statements are done */
-dbs_alter_procedure_paramdec: (IN|OUT|INOUT)? dbs_parameter_name (dbs_alter_procedure_bit | dbs_distinct_type_name | dbs_array_type_name);
+dbs_alter_procedure_paramdec: (IN|OUT|INOUT)? dbs_parameter_name (dbs_alter_procedure_bit | data_type_arr_or_distinct);
 dbs_alter_procedure_bit: (dbs_alter_procedure_bit_int | dbs_alter_procedure_bit_decimal | dbs_alter_procedure_bit_float | dbs_alter_procedure_bit_decfloat | dbs_alter_procedure_bit_char | dbs_alter_procedure_bit_clob | dbs_alter_procedure_bit_varchar | dbs_alter_procedure_bit_graphic | dbs_alter_procedure_bit_binary | DATE | TIME | dbs_alter_procedure_bit_timestamp | XML);
 dbs_alter_procedure_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
 dbs_alter_procedure_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR dbs_integer (COMMACHAR dbs_integer)? RPARENCHAR)?;
@@ -203,7 +203,7 @@ dbs_comment_column: COLUMN (dbs_table_name | dbs_view_name) dbs_column_name;
 dbs_comment_function: dbs_comment_function_designator (ACTIVE VERSION | VERSION dbs_routine_version_id)?;
 dbs_comment_function_designator: (FUNCTION dbs_function_name (LPARENCHAR dbs_comment_parameter_type
                                  (COMMACHAR dbs_comment_parameter_type)* RPARENCHAR)? | SPECIFIC FUNCTION dbs_specific_name);
-dbs_comment_parameter_type: (dbs_comment_built_in_type | dbs_distinct_type_name | dbs_array_type_name) (AS LOCATOR)?;
+dbs_comment_parameter_type: (dbs_comment_built_in_type | data_type_arr_or_distinct) (AS LOCATOR)?;
 dbs_comment_built_in_type: (dbs_comment_bit_int | dbs_comment_bit_decimal | dbs_comment_bit_float | dbs_comment_bit_decfloat |
                             dbs_comment_bit_char | dbs_comment_bit_clob | dbs_comment_bit_varchar | dbs_comment_bit_graphic |
                             dbs_comment_bit_binary | DATE | TIME | dbs_comment_bit_timestamp | ROWID);
@@ -267,7 +267,7 @@ dbs_create_function: CREATE FUNCTION;
 dbs_create_function_compiled_scalar: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_param_decl
         (COMMACHAR dbs_create_function_param_decl)*)? RPARENCHAR (dbs_create_function_func_def | WRAPPED dbs_obfuscated_statement_text);
 dbs_create_function_param_decl: dbs_parameter_name dbs_create_function_param_type;
-dbs_create_function_param_type: (common_built_in_type | dbs_distinct_type_name | dbs_array_type_name) | (TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR);
+dbs_create_function_param_type: data_type | (TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR);
 dbs_create_function_func_def: RETURNS common_built_in_type (VERSION V1 | VERSION dbs_routine_version_id)? dbs_option_list? dbs_control_statement;//AS LOCATOR can be specified only for a LOB
 //CREATE EXTERNAL SQL SCALAR FUNCTION
 dbs_create_function_ext_scalar: dbs_create_function dbs_function_name LPARENCHAR (function_param_decl (COMMACHAR function_param_decl)*)? RPARENCHAR
@@ -338,7 +338,7 @@ dbs_create_procedure_ext_ptype:  (common_built_in_type | dbs_distinct_type_name)
 //CREATE PERMISSION - NATIVE
 dbs_create_procedure_native_sql: CREATE (OR REPLCAE)? PROCEDURE dbs_procedure_name  (LPARENCHAR dbs_create_procedure_native_pdecl (COMMACHAR dbs_create_procedure_native_pdecl)* RPARENCHAR)? procedure_def | WRAPPED dbs_obfuscated_statement_text;
 dbs_create_procedure_native_pdecl: (IN OUT INOUT)? (dbs_parameter_name) dbs_create_procedure_native_ptype;
-dbs_create_procedure_native_ptype: (common_built_in_type | dbs_distinct_type_name |  dbs_array_type_name)  | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR;//built-in-type change
+dbs_create_procedure_native_ptype: data_type  | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR;//built-in-type change
 procedure_def: (VERSION (V1 | dbs_routine_version_id))?  dbs_option_list_proc_native dbs_sql_routine_body; //check SQL routine if finished
 //CREATE ROLE
 dbs_create_role: CREATE ROLE dbs_role_name;
@@ -726,35 +726,58 @@ dbs_rename: RENAME (TABLE? dbs_table_name TO dbs_table_identifier | INDEX dbs_in
 
 
 /*REVOKE (all) */
-dbs_create: dbs_revoke_coll_prvg | dbs_revoke_db_prvg | dbs_func_or_proc_prvg | dbs_revoke_pack_prvg | dbs_revoke_plan_prvg | dbs_revoke_schema_prvg | dbs_revoke_seq_prvg  | dbs_revoke_system_prvg | dbs_revoke_table_or_view_prvg |  | dbs_revoke_type_or_jar_prvg  | dbs_revoke_var_prvg | | dbs_revoke_use_prvg;
-//REVOKE COLLECTION PRIVILEGES
-dbs_revoke_coll_prvg: REVOKE dbs_authorization_specification FROM auth_name_loop  (BY (ALL | auth_name_or_role  (COMMACHAR auth_name_or_role)*))? (NOT? INCLUDING DEPENDENT PRIVILEGES)? RESTRICT?;
-auth_name_loop: auth_name_or_role | PUBLIC (COMMACHAR auth_name_loop | PUBLIC)*;
+dbs_create: dbs_revoke_coll_prvg | dbs_revoke_db_prvg | dbs_func_or_proc_prvg | dbs_revoke_pack_prvg | dbs_revoke_plan_prvg | dbs_revoke_schema_prvg | dbs_revoke_seq_prvg  | dbs_revoke_system_prvg | dbs_revoke_table_or_view_prvg |  dbs_revoke_type_or_jar_prvg  | dbs_revoke_var_prvg | dbs_revoke_use_prvg;
+//REVOKE
+dbs_revoke_coll_prvg: REVOKE dbs_authorization_specification FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
+auth_name_loop_pub: auth_name_or_role | PUBLIC (COMMACHAR auth_name_loop_pub | PUBLIC)*;
+auth_name_loop_all: BY (ALL | auth_name_or_role  (COMMACHAR auth_name_or_role)*);
 auth_name_or_role: dbs_authorization_name | ROLE dbs_role_name;
+dependent_privileges: NOT? INCLUDING DEPENDENT PRIVILEGES;
+//REVOKE COLLECTION PRIVILEGES
+dbs_revoke_coll_prvg: REVOKE (CREATE | PACKADM) (IN | ON) COLLECTION (db_coll_id_loop | ASTERISKCHAR) FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+db_coll_id_loop: dbs_collection_id (COMMACHAR dbs_collection_id)*;
 //REVOKE DATABASE PRIVILEGES
-dbs_revoke_db_prvg: REVOKE;
-one_of_db_privileges: A; // db2sql_privileges;
-
+dbs_revoke_db_prvg: REVOKE db2sql_db_privileges (COMMACHAR db2sql_db_privileges)* ON DATABASE db_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+db_name_loop: dbs_database_name (COMMACHAR dbs_database_name)*;
 //REVOKE FUNCTION OR PROCEDURE PRIVILEGES
-dbs_revoke_func_or_proc_prvg: A; // db2sql_privileges;
+dbs_revoke_func_or_proc_prvg:  REVOKE EXECUTE ON function_or_procedure  FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
+function_or_procedure: (FUNCTION (db_function_name_body_loop | ASTERISKCHAR) | SPECIFIC FUNCTION db_specific_name_loop) | PROCEDURE db_procedure_name_loop;
+db_function_name_body_loop: dbs_function_name param_loop (COMMACHAR dbs_function_name param_loop)*;
+param_loop: LPARENCHAR param_type (COMMACHAR param_type)*  RPARENCHAR;
+param_type: data_type (AS LOCATOR)?; //AS LOCATOR can be specified only for a LOB data type
+db_specific_name_loop: dbs_specific_name (COMMACHAR dbs_specific_name)*;
+db_procedure_name_loop: dbs_procedure_name (COMMACHAR dbs_procedure_name)*;
 //REVOKE PACKAGE PRIVILEGES
-dbs_revoke_pack_prvg: A; // db2sql_privileges;
+dbs_revoke_pack_prvg:  REVOKE (ALL | revoke_opt_loop) ON PACKAGE package_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+revoke_opt_loop: revoke_opt (COMMACHAR revoke_opt)*;
+revoke_opt: BIND | COPY | EXECUTE | RUN;
+package_name_loop: package_name (COMMACHAR package_name)*;
+package_name: dbs_collection_id DOT (dbs_package_name | RPARENCHAR);
 //REVOKE PLAN PRIVILEGES
-dbs_revoke_plan_prvg: A; // db2sql_privileges;
+dbs_revoke_plan_prvg: REVOKE (BIND | EXECUTE) (COMMACHAR (BIND | EXECUTE))* ON PLAN plan_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+plan_name_loop: dbs_plan_name (COMMACHAR dbs_plan_name)*;
 //REVOKE SCHEMA PRIVILEGES
-dbs_revoke_schema_prvg: A; // db2sql_privileges;
+dbs_revoke_schema_prvg: REVOKE revoke_schema_opt_loop ON SCHEMA schema_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+revoke_schema_opt_loop: revoke_schema_opt (COMMACHAR revoke_schema_opt)*;
+revoke_schema_opt: ALTERIN | CREATEIN | DROPIN;
+schema_name_loop: dbs_schema_name (COMMACHAR dbs_schema_name)*;
 //REVOKE SEQUENCE PRIVILEGES
-dbs_revoke_seq_prvg: A; // db2sql_privileges;
+dbs_revoke_seq_prvg: REVOKE revoke_seq_opt_loop ON SEQUENCE seq_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
+revoke_seq_opt_loop: revoke_seq_opt (COMMACHAR revoke_seq_opt)*;
+revoke_seq_opt: ALTER | USAGE | SELECT;
+seq_name_loop: dbs_sequence_name (COMMACHAR dbs_sequence_name)*;
 //REVOKE SYSTEM PRIVILEGES
-dbs_revoke_system_prvg: A; // db2sql_privileges;
+dbs_revoke_system_prvg: REVOKE db2sql_system_privileges (COMMACHAR db2sql_system_privileges)*  (ON SYSTEM)? FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 //REVOKE TABLE OR VIEW PRIVILEGES
-dbs_revoke_table_or_view_prvg: A; // db2sql_privileges;
+dbs_revoke_table_or_view_prvg: REVOKE (ALL PRIVILEGES? | db2sql_table_view_privileges (COMMACHAR db2sql_table_view_privileges)*)  ON TABLE? table_or_view_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+table_or_view_name_loop: (dbs_table_name | dbs_view_name) (COMMACHAR (dbs_table_name | dbs_view_name))*;
+
 //REVOKE TYPE OR JAR PRIVILEGES
 dbs_revoke_type_or_jar_prvg: A; // db2sql_privileges;
 //REVOKE VARIABLE PRIVILEGES
 dbs_revoke_var_prvg: A; // db2sql_privileges;
 //REVOKE USE PRIVILEGES
-dbs_revoke_use_prvg;: A; // db2sql_privileges;
+dbs_revoke_use_prvg: A; // db2sql_privileges;
 
 
 /*ROLLBACK */
@@ -856,7 +879,8 @@ dbs_values_target: (dbs_global_variable_name | dbs_host_variable_name | dbs_sql_
 /*WHENEVER */
 dbs_whenever: WHENEVER (NOT FOUND | SQLERROR | SQLWARNING) (CONTINUE | (GOTO | GO TO) COLONCHAR? dbs_host_label);
 
-
+data_type: (common_built_in_type | data_type_arr_or_distinct);
+data_type_arr_or_distinct: dbs_array_type_name | dbs_distinct_type_name;
 common_built_in_type_core: (common_bit_int | common_bit_decimal | common_bit_float | common_bit_decfloat |
                         common_bit_char | common_bit_clob | common_bit_varchar | common_bit_graphic |
                         common_bit_binary | DATE | TIME | common_bit_timestamp );
@@ -1052,7 +1076,11 @@ all_words: NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral | generalIdentifi
 
 db2sql_words: db2sql_only_words | db2sql_intersected_words;
 
-db2sql_privileges: DBADM | DBCTRL | DBMAINT | CREATETAB | CREATETS | DISPLAYDB | IMAGCOPY | RECOVERDB | REORG | REPAIR | STARTDB | STATS | STOPDB;
+db2sql_db_privileges: DBADM | DBCTRL | DBMAINT | CREATETAB | CREATETS | DISPLAYDB | IMAGCOPY | RECOVERDB | REORG | REPAIR | STARTDB | STATS | STOPDB;
+db2sql_system_privileges: ACCESSCTRL | ARCHIVE | BINDADD | BINDAGENT | BSDS | CREATEALIAS | CREATEDBA | CREATEDBC CREATESG | CREATETMTAB | CREATE_SECURE_OBJECT |
+                         DATAACCESS | DBADM | DEBUGSESSION | DISPLAY | EXPLAIN | MONITOR1 | MONITOR2 | RECOVER | SQLADM | STOPALL | STOSPACE | SYSADM | SYSCTRL | SYSOPR | TRACE;
+
+db2sql_table_view_privileges: ALTER | DELETE | INDEX | INSERT | REFERENCES | SELECT | TRIGGER | UPDATE;
 
 db2sql_intersected_words: ACCESS | ALL | ANY | APPLY | ARE | AS | ASCII | AT | AUXILIARY | BEFORE | BINARY | BIT | BLOB | BY |
                             CALL | CHANGED | CHARACTER | CLOB | COBOL | CONTAINS | CONTINUE | CONTROL | COPY | CORR |
