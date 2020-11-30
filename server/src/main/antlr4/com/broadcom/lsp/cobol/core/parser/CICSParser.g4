@@ -412,7 +412,7 @@ cics_getnext_container: (CONTAINER cics_data_area | BROWSETOKEN cics_data_value 
 /** HANDLE CONDITION / HANDLE AID / HANDLE ABEND: */
 cics_handle: HANDLE (cics_handle_abend | cics_handle_aid | cics_handle_condition);
 cics_handle_abend: ABEND (CANCEL | PROGRAM cics_name | LABEL cics_label | RESET | cics_resp)*;
-cics_handle_aid: AID (ANYKEY (cics_label)? | CLEAR (cics_label)? | CLRPARTN (cics_label)? | ENTER (cics_label)? |
+cics_handle_aid: AID (ANYKEY (cics_label)? | CLEAR (empty_parens | cics_label)? | CLRPARTN (cics_label)? | ENTER (cics_label)? |
                  LIGHTPEN (cics_label)? | OPERID  (cics_label)? | pa_option (cics_label)? | pf_option (cics_label)? |
                  TRIGGER  (cics_label)? | cics_resp)*;
 cics_handle_condition: CONDITION (mama cics_label? | cics_resp)+;
@@ -921,6 +921,7 @@ cics_mama: LPARENCHAR mama RPARENCHAR;
 cics_hhmmss: LPARENCHAR hhmmss RPARENCHAR;
 cics_label: LPARENCHAR paragraphNameUsage RPARENCHAR;
 cics_value: LPARENCHAR ptr_value RPARENCHAR;
+empty_parens: LPARENCHAR RPARENCHAR;
 
 cobolWord
    : IDENTIFIER | cics_only_words
