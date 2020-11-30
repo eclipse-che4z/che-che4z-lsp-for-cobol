@@ -16,6 +16,7 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 
@@ -27,5 +28,16 @@ import lombok.Value;
 @AllArgsConstructor
 public class IndexItem implements Variable {
   private String name;
+  private String qualifier;
   private Locality definition;
+
+  @Override
+  public Variable rename(String renameItemName) {
+    return new IndexItem(
+        name, VariableUtils.renameQualifier(qualifier, renameItemName), definition);
+  }
+  @Override
+  public boolean isRenameable() {
+    return false;
+  }
 }

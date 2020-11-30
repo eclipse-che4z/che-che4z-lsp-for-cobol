@@ -16,7 +16,7 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
-import lombok.AllArgsConstructor;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import lombok.Value;
 
 /**
@@ -25,9 +25,20 @@ import lombok.Value;
  * clause.
  */
 @Value
-@AllArgsConstructor
 public class ConditionalDataName implements Variable {
   private String name;
-  private String value;
+  private String qualifier;
   private Locality definition;
+  private String value;
+
+  @Override
+  public Variable rename(String renameItemName) {
+    return new ConditionalDataName(
+        name, VariableUtils.renameQualifier(qualifier, renameItemName), definition, value);
+  }
+
+  @Override
+  public boolean isRenameable() {
+    return true;
+  }
 }

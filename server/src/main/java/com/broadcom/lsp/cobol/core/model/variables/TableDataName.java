@@ -16,53 +16,35 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import lombok.Value;
 
-import lombok.NonNull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Collections.unmodifiableList;
-
-/**
- * This value class represents the Table variable that may have nested variables, and an optional
- * index
- */
+/** This value class represents the Table variable that may have an optional index */
 @Value
-public class TableDataName implements StructuredVariable {
+public class TableDataName implements Variable, TableDeclaration {
   private String name;
-  private int occursTimes;
-  private IndexItem index;
+  private String qualifier;
   private Locality definition;
-  private List<Variable> children = new ArrayList<>();
+  private String picClause;
+  private String value;
+  private int occursTimes;
+  private List<IndexItem> indexes;
 
-  public TableDataName(
-      @NonNull String name,
-      int occursTimes,
-      @NonNull Locality definition,
-      @Nullable IndexItem index) {
-    this.name = name;
-    this.occursTimes = occursTimes;
-    this.definition = definition;
-    this.index = index;
+  @Override
+  public Variable rename(String renameItemName) {
+    return new TableDataName(
+        name,
+        VariableUtils.renameQualifier(qualifier, renameItemName),
+        definition,
+        picClause,
+        value,
+        occursTimes,
+        indexes);
   }
-
-  /**
-   * Add a new nested variable to this one
-   *
-   * @param child - a nested variable. Can be a group or element item.
-   */
-  public void addChild(Variable child) {
-    children.add(child);
-  }
-
-  /**
-   * Return a list of already defined nested variables
-   *
-   * @return defined nested variables.
-   */
-  public List<Variable> getChildren() {
-    return unmodifiableList(children);
+  @Override
+  public boolean isRenameable() {
+    return false;
   }
 }

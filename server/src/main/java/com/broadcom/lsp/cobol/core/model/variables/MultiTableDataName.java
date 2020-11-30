@@ -17,47 +17,52 @@ package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This value class represents an element item COBOL variable. It has a PIC clause representing its
- * type, and an optional VALUE clause that stores an explicitly defined value; both as Strings.
- * Element items cannot have nested variables, but may be a top element with level 01. Allowed
- * levels for this element are 01-49.
+ * This value class represents the multi-dimensional Table variable that may have nested variables,
+ * and an optional index
  */
 @Value
-public class ElementItem implements Variable {
+@EqualsAndHashCode(callSuper = true)
+public class MultiTableDataName extends StructuredVariable implements TableDeclaration {
   private String name;
   private String qualifier;
   private Locality definition;
-  private String picClause;
-  private String value;
-  private List<ConditionalDataName> conditionalDataNames = new ArrayList<>();
+  private int occursTimes;
+  private List<IndexItem> indexes;
 
-  /**
-   * Add a nested {@link ConditionalDataName} item (level 88) for this {@link ElementItem}
-   *
-   * @param child - nested Conditional data name item
-   */
-  public void addConditionalChild(ConditionalDataName child) {
-    conditionalDataNames.add(child);
+  public MultiTableDataName(
+      int number,
+      String name,
+      String qualifier,
+      Locality definition,
+      int occursTimes,
+      List<IndexItem> indexes) {
+    super(number);
+    this.name = name;
+    this.qualifier = qualifier;
+    this.definition = definition;
+    this.occursTimes = occursTimes;
+    this.indexes = indexes;
   }
 
   @Override
   public Variable rename(String renameItemName) {
-    return new ElementItem(
+    return new MultiTableDataName(
+        levelNumber,
         name,
         VariableUtils.renameQualifier(qualifier, renameItemName),
         definition,
-        picClause,
-        value);
+        occursTimes,
+        indexes);
   }
 
   @Override
   public boolean isRenameable() {
-    return true;
+    return false;
   }
 }

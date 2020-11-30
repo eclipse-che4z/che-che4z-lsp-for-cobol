@@ -17,10 +17,9 @@ package com.broadcom.lsp.cobol.core.model.variables;
 import com.broadcom.lsp.cobol.core.model.Locality;
 
 /**
- * This interface describes a COBOL Variable. Variable has a name, a level number that shows its
- * position in the hierarchy, and a unique definition locality.
+ * This interface describes a COBOL Variable. Variable has a name and a unique definition locality.
  */
-public interface Variable {
+public interface Variable extends Renameable {
   /**
    * Get name of the variable
    *
@@ -34,4 +33,13 @@ public interface Variable {
    * @return the definition locality
    */
   Locality getDefinition();
+
+  /**
+   * Get qualifier of this variable. Contains the variable hierarchy top-down string representation
+   * and this variable name; separated by whitespace. May be not unique on definition, required to
+   * be unique on referencing.
+   *
+   * @return string qualifier
+   */
+  String getQualifier();
 }
