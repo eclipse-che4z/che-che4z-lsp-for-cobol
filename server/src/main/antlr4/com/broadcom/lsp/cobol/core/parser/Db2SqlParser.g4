@@ -261,7 +261,7 @@ sequence_alias: dbs_alias_name FOR SEQUENCE dbs_sequence_name;
 dbs_create_aux_table: CREATE (AUXILIARY | AUX) TABLE dbs_table_name IN dbs_database_name? dbs_table_space_name
                     STORIES dbs_table_name (APPEND NO | (APPEND YES)? )? COLUMN dbs_column_name (PART dbs_integer)?;
 //CREATE DB
-dbs_create_db: CREATE DATABASE (BUFFERPOOL dbs_bp_name | INDEXBP dbs_bp_name | AS WORKFILE (FOR dbs_member_name)? | STOGROUP (SYSDEFLT | dbs_stogroup_name) | CCSID oneof_encoding)*;
+dbs_create_db: CREATE DATABASE (BUFFERPOOL dbs_bp_name | INDEXBP dbs_bp_name | AS WORKFILE (FOR dbs_member_name)? | STOGROUP (SYSDEFLT | dbs_stogroup_name) | CCSID oneof_encoding)*;//1 same clause must not be specified more than one time
 //CREATE COMPILED SQL SCALAR FUNCTION
 dbs_create_function: CREATE FUNCTION;
 dbs_create_function_compiled_scalar: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_param_decl
@@ -270,17 +270,17 @@ dbs_create_function_param_decl: dbs_parameter_name dbs_create_function_param_typ
 dbs_create_function_param_type: (common_built_in_type | dbs_distinct_type_name | dbs_array_type_name) | (TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR);
 dbs_create_function_func_def: RETURNS common_built_in_type (VERSION V1 | VERSION dbs_routine_version_id)? dbs_option_list? dbs_control_statement;//AS LOCATOR can be specified only for a LOB
 //CREATE EXTERNAL SQL SCALAR FUNCTION
-dbs_create_function_ext_scalar: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_ext_param_decl (COMMACHAR dbs_create_function_ext_param_decl)*)? RPARENCHAR
-                            RETURNS (common_built_in_type (AS LOCATOR)?  | common_built_in_type CAST FROM common_built_in_type (AS LOCATOR)?) dbs_option_list_ext;
-dbs_create_function_ext_param_decl: dbs_parameter_name? (dbs_create_function_ext_param_type (AS LOCATOR)? | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR);
-dbs_create_function_ext_param_type: common_built_in_type | dbs_distinct_type_name;
-
-dbs_create_function_ext_table: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_ext_param_decl (COMMACHAR dbs_create_function_ext_param_decl)*)? RPARENCHAR
+dbs_create_function_ext_scalar: dbs_create_function dbs_function_name LPARENCHAR (function_param_decl (COMMACHAR function_param_decl)*)? RPARENCHAR
+                            RETURNS (common_built_in_type_core5 (AS LOCATOR)?  | common_built_in_type_core5 CAST FROM common_built_in_type_core5 (AS LOCATOR)?) dbs_option_list_ext;
+function_param_decl: dbs_parameter_name? (ext_data_type (AS LOCATOR)? | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR);
+ext_data_type: common_built_in_type_core5 | dbs_distinct_type_name;
+//CREATE EXTERNAL TABLE FUNCTION
+dbs_create_function_ext_table: dbs_create_function dbs_function_name LPARENCHAR (function_param_decl (COMMACHAR function_param_decl)*)? RPARENCHAR
                             RETURNS (dbs_create_function_ext_table_desc  | GENERIC TABLE) dbs_option_list_ext_table;
 dbs_create_function_ext_table_desc: TABLE LPARENCHAR dbs_create_function_ext_table_body  (COMMACHAR  dbs_create_function_ext_table_body)* RPARENCHAR;
 dbs_create_function_ext_table_body: dbs_column_name common_built_in_type (AS LOCATOR)?;
 //CREATE INLINE SQL SCALAR FUNCTION
-dbs_create_function_inline_scalar: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_ext_param_decl (COMMACHAR dbs_create_function_ext_param_decl)*)? RPARENCHAR
+dbs_create_function_inline_scalar: dbs_create_function dbs_function_name LPARENCHAR (function_param_decl (COMMACHAR function_param_decl)*)? RPARENCHAR
                                  (dbs_create_function_func_inl_def | WRAPPED dbs_obfuscated_statement_text);
 dbs_create_function_func_inl_def: RETURNS common_built_in_type (LANGUAGE SQL)? dbs_option_list_inl_def dbs_create_function_func_inl_sql_routine;
 dbs_create_function_func_inl_sql_routine: RETRUN dbs_control_statement;//TODO
@@ -838,6 +838,7 @@ common_built_in_type2: (common_bit_int | common_bit_decimal | common_bit_float |
                         common_bit_binary | DATE | TIME | common_bit_timestamp | ROWID | XML);
 common_built_in_type_core3: common_built_in_type_core | ROWID | XML (LPARENCHAR xml_type_modifier RPARENCHAR)?;
 common_built_in_type4: common_bit_integer | (VARCHAR | (CHARACTER | CHAR) VARYING) LPARENCHAR dbs_integer  RPARENCHAR (CCSID oneof_encoding)? (FOR (SBCS | MIXED | BIT));
+common_built_in_type_core5:  common_built_in_type_core | ROWID;
 common_built_in_type_source: common_built_in_type_core;//TBD
 
 common_bit_integer: INTEGER | INT;
