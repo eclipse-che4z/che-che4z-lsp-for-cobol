@@ -726,7 +726,36 @@ dbs_rename: RENAME (TABLE? dbs_table_name TO dbs_table_identifier | INDEX dbs_in
 
 
 /*REVOKE (all) */
-//dbs_revoke: REVOKE dbs_authorization_specification
+dbs_create: dbs_revoke_coll_prvg | dbs_revoke_db_prvg | dbs_func_or_proc_prvg | dbs_revoke_pack_prvg | dbs_revoke_plan_prvg | dbs_revoke_schema_prvg | dbs_revoke_seq_prvg  | dbs_revoke_system_prvg | dbs_revoke_table_or_view_prvg |  | dbs_revoke_type_or_jar_prvg  | dbs_revoke_var_prvg | | dbs_revoke_use_prvg;
+//REVOKE COLLECTION PRIVILEGES
+dbs_revoke_coll_prvg: REVOKE dbs_authorization_specification FROM auth_name_loop  (BY (ALL | auth_name_or_role  (COMMACHAR auth_name_or_role)*))? (NOT? INCLUDING DEPENDENT PRIVILEGES)? RESTRICT?;
+auth_name_loop: auth_name_or_role | PUBLIC (COMMACHAR auth_name_loop | PUBLIC)*;
+auth_name_or_role: dbs_authorization_name | ROLE dbs_role_name;
+//REVOKE DATABASE PRIVILEGES
+dbs_revoke_db_prvg: REVOKE;
+one_of_db_privileges: A; // db2sql_privileges;
+
+//REVOKE FUNCTION OR PROCEDURE PRIVILEGES
+dbs_revoke_func_or_proc_prvg: A; // db2sql_privileges;
+//REVOKE PACKAGE PRIVILEGES
+dbs_revoke_pack_prvg: A; // db2sql_privileges;
+//REVOKE PLAN PRIVILEGES
+dbs_revoke_plan_prvg: A; // db2sql_privileges;
+//REVOKE SCHEMA PRIVILEGES
+dbs_revoke_schema_prvg: A; // db2sql_privileges;
+//REVOKE SEQUENCE PRIVILEGES
+dbs_revoke_seq_prvg: A; // db2sql_privileges;
+//REVOKE SYSTEM PRIVILEGES
+dbs_revoke_system_prvg: A; // db2sql_privileges;
+//REVOKE TABLE OR VIEW PRIVILEGES
+dbs_revoke_table_or_view_prvg: A; // db2sql_privileges;
+//REVOKE TYPE OR JAR PRIVILEGES
+dbs_revoke_type_or_jar_prvg: A; // db2sql_privileges;
+//REVOKE VARIABLE PRIVILEGES
+dbs_revoke_var_prvg: A; // db2sql_privileges;
+//REVOKE USE PRIVILEGES
+dbs_revoke_use_prvg;: A; // db2sql_privileges;
+
 
 /*ROLLBACK */
 dbs_rollback: ROLLBACK WORK? (TO SAVEPOINT dbs_savepoint_name?)?;
@@ -1023,6 +1052,7 @@ all_words: NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral | generalIdentifi
 
 db2sql_words: db2sql_only_words | db2sql_intersected_words;
 
+db2sql_privileges: DBADM | DBCTRL | DBMAINT | CREATETAB | CREATETS | DISPLAYDB | IMAGCOPY | RECOVERDB | REORG | REPAIR | STARTDB | STATS | STOPDB;
 
 db2sql_intersected_words: ACCESS | ALL | ANY | APPLY | ARE | AS | ASCII | AT | AUXILIARY | BEFORE | BINARY | BIT | BLOB | BY |
                             CALL | CHANGED | CHARACTER | CLOB | COBOL | CONTAINS | CONTINUE | CONTROL | COPY | CORR |
