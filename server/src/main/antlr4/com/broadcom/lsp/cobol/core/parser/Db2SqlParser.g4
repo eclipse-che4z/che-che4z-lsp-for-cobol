@@ -726,6 +726,7 @@ dbs_rename: RENAME (TABLE? dbs_table_name TO dbs_table_identifier | INDEX dbs_in
 
 
 /*REVOKE (all) */
+//dbs_revoke: REVOKE dbs_authorization_specification
 
 /*ROLLBACK */
 dbs_rollback: ROLLBACK WORK? (TO SAVEPOINT dbs_savepoint_name?)?;
@@ -736,8 +737,6 @@ dbs_savepoint: SAVEPOINT dbs_savepoint_name UNIQUE? ON ROLLBACK RETAIN (CURSORS 
 /*SELECT (both) */
 
 /*SET (all) */
-//?
-dbs_revoke: literal+; //?
 
 /*SET (all)*/
 dbs_select: dbs_select_unpack_function_invocation | dbs_select_row_fullselect;
@@ -1122,6 +1121,7 @@ dbs_array_type_name: SQL_IDENTIFIER;
 dbs_array_variable: SQL_IDENTIFIER; //? symentic analysis should see that this is of type array.
 dbs_attr_host_variable: HOSTNAME_IDENTIFIER | NUMERICLITERAL ; // VARCHAR(128)
 dbs_authorization_name: SQL_IDENTIFIER;
+dbs_authorization_specification: all_words+; //?
 dbs_aux_table_name: SQL_IDENTIFIER;
 dbs_begin_column_name: all_words+;//? as AS ROW BEGIN
 dbs_binary_string_constant: BXNUMBER;
