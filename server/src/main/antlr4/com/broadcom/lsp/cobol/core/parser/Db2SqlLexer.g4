@@ -330,6 +330,7 @@ GROUPING : G R O U P I N G;
 HANDLER : H A N D L E R;
 HAVING : H A V I N G;
 HINT: H I N T;
+HIGH : H I G H;
 HOUR : H O U R;
 IDENTITY : I D E N T I T Y;
 IF : I F;
@@ -396,6 +397,7 @@ LOGGED : L O G G E D;
 LONG : L O N G;
 LONGVAR : L O N G V A R;
 LOOP : L O O P;
+LOW : L O W;
 LOWER :L O W E R;
 MAINTAINED : M A I N T A I N E D;
 MAPPING : M A P P I N G;
@@ -463,6 +465,7 @@ OPTIMIZATION : O P T I M I Z A T I O N;
 OPTIMIZE : O P T I M I Z E;
 OPTIONAL : O P T I O N A L;
 ORDER : O R D E R;
+ORIGINAL : O R I G I N A L;
 OUT : O U T;
 OUTCOME : O U T C O M E;
 OUTER : O U T E R;
@@ -675,6 +678,7 @@ USE : U S E;
 USER : U S E R;
 V1 : V '1';
 VALIDATE : V A L I D A T E;
+VALIDPROC: V A L I D P R O C;
 VALUES : V A L U E S;
 VARBINARY : V A R B I N A R Y;
 VARCHAR : V A R C H A R;
@@ -723,7 +727,7 @@ SQL_IDENTIFIER : ([A-Z] [A-Z0-9_]*) | STRINGLITERAL;   //https://www.ibm.com/sup
 VERSION_ID : ([0-9]+ ([a-zA-Z0-9]+)*);
 ALPHANUMERIC_TEXT : [a-zA-Z0-9]+;
 POSITIVEINTEGERLITERAL: PLUSCHAR? DIGIT+;
-HOSTNAME_IDENTIFIER : [a-zA-Z0-9._@:-]+;
+HOSTNAME_IDENTIFIER : ([a-zA-Z0-9._@:-] | '/')+;
 TIMESTAMPLITERAL: DIGIT DIGIT '.' DIGIT DIGIT '.' DIGIT DIGIT | // hh.mm.ss;
                   DIGIT DIGIT '.' DIGIT DIGIT (A M | P M) | //hh:mm AM /PM
                   DIGIT DIGIT '.' DIGIT DIGIT ':' DIGIT DIGIT |// hh.mm:ss
@@ -777,3 +781,6 @@ fragment GRAHICCHAR :
 
 fragment
 OCT_DIGIT        : [0-8] ;
+
+fragment
+DIGIT_GREATER_THEN_ZERO : [1-9];
