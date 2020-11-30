@@ -144,7 +144,7 @@ The semantic analysis feature takes into account `COPY REPLACING` statements whi
 
 #### Syntax Coloring
 
-Syntax coloring is automatically enabled for copybook files with the extension `.cpy`, as long as they are used in the main COBOL file.
+Syntax coloring is automatically enabled for copybook files with the extension `.cpy`, as long as they are used in the main COBOL file. You can also select the **COBOL Copybook** language mode to enable syntax coloring for copybook files.
 
 #### Go To Definition and Find All References
 
