@@ -45,7 +45,7 @@ To build extension run:
 
 ```$ cd clients/cobol-lsp-vscode-extension && npm install && npm run compile```
 
-To enable debug logging to the console, while you run the Java part in IDE change your run configuration. 
+You need to change the run configuration in your IDE to enable logging to the console while debugging the Java part. 
 Add `-Dlogback.configurationFile=server/localDev/logback.xml` to your `VM options` parameter. 
 The value can be `localDev/logback.xml` if the `server` folder is a root folder for your project.
 
@@ -79,4 +79,3 @@ Also, If you have some not obvious changes, it would be nice to provide a longer
 Contact the project developers.
 
 * supportChe4z.pdl@broadcom.com
-
