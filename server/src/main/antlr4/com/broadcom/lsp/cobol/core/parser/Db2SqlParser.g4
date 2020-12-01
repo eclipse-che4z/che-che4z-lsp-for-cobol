@@ -954,12 +954,57 @@ dbs_option_list_inl_def:  (SPECIFIC dbs_specific_name)? (PARAMETER CCSID oneof_e
 
 
 /// STATEMENTS ///
-//TODO
-dbs_control_statement: all_words+;
-//                        assignment_statement | dbs_call | case_statement | compund_statement | get_diagnostics_statement |
-//                        goto_statement | if_statement | iterate_statement | leave_statement | loop_statement | repeat_statement |
-//                        resignal_statement |return_statement | signal_statement | while_statement;
+dbs_control_statement: dbs_assignment_statement | dbs_call_control | dbs_case_statement_pl_sql | dbs_compund_statement | dbs_for_statement | dbs_get |
+                        dbs_goto_statement | dbs_if_statement | dbs_iterate_statement | dbs_leave_statement | dbs_loop_statement | dbs_repeat_statement |
+                        dbs_resignal_statement |dbs_return_statement | dbs_signal_statement | dbs_while_statement;
+
+dbs_assignment_statement : SET (dbs_sql_parameter_name | dbs_sql_variable_name) EQUALCHAR (CURRENT SERVER | CURRENT PACKAGESET | CURRENT PACKAGE PATH | dbs_expression | NULL);
+dbs_procedure_argument_list : dbs_sql_variable_name| dbs_sql_parameter_name | dbs_expression| NULL;
+dbs_call_control : (dbs_key_label_name COLONCHAR)? CALL dbs_procedure_name (LPARENCHAR dbs_procedure_argument_list (COMMACHAR dbs_procedure_argument_list)*  RPARENCHAR)?;
+dbs_case_statement_pl_sql: (dbs_key_label_name COLONCHAR)? CASE (dbs_simple_when_clause_pl_sql | dbs_searched_when_clause_pl_sql) ELSE (dbs_sql_procedure_statement SEMICOLONCHAR)+ END CASE;
+dbs_simple_when_clause_pl_sql: dbs_expressions (WHEN dbs_expressions THEN (dbs_sql_procedure_statement SEMICOLONCHAR)+)+;
+dbs_searched_when_clause_pl_sql: (WHEN dbs_search_condition THEN (dbs_sql_procedure_statement SEMICOLONCHAR)+)+;
+dbs_compund_statement: (dbs_key_label_name COLONCHAR)? BEGIN (NOT ATOMIC | ATOMIC)? ((dbs_sql_variable_declaration|dbs_sql_condition_declaration| dbs_return_code_declaration) SEMICOLONCHAR)*
+ (dbs_declare_statement SEMICOLONCHAR)* (DECLARE dbs_declare_cursor SEMICOLONCHAR)* (dbs_handler_declaration SEMICOLONCHAR)* (dbs_sql_procedure_statement SEMICOLONCHAR)* END dbs_key_label_name; // check the labelname matches.
+dbs_sql_variable_declaration: DECLARE dbs_sql_variable_name (COMMACHAR dbs_sql_variable_name)* (RESULT_SET_LOCATOR VARYING | dbs_insert_data_type (DEFAULT NULL | CONSTANT NULL | (DEFAULT | CONSTANT) dbs_constant)?) ;
+dbs_sql_condition_declaration: DECLARE dbs_sql_condition_name CONDITION FOR (SQLSTATE VALUE?)? dbs_string_constant;
+dbs_return_code_declaration: DECLARE (SQLSTATE (CHAR LPARENCHAR NUMBER_5 RPARENCHAR | CHARACTER LPARENCHAR NUMBER_5 RPARENCHAR) (DEFAULT dbs_string_constant)? | SQLCODE (INTEGER | INT) (DEFAULT dbs_integer_constant)?);
+dbs_handler_declaration: DECLARE (CONTINUE | EXIT) HANDLER FOR (dbs_specific_condition_value | dbs_general_condition_value) dbs_sql_procedure_statement;
+dbs_specific_condition_value: (SQLSTATE VALUE? dbs_string_constant | dbs_sql_condition_name) (COMMACHAR (SQLSTATE VALUE? dbs_string_constant | dbs_sql_condition_name))*;
+dbs_general_condition_value: (SQLEXCEPTION | SQLWARNING | NOT FOUND) (COMMACHAR  (SQLEXCEPTION | SQLWARNING | NOT FOUND))*;
+dbs_for_statement: (dbs_key_label_name COLONCHAR)? FOR (dbs_for_loop_name AS)? (dbs_cursor_name CURSOR (WITHOUT HOLD | WITH HOLD) FOR)? dbs_select_clause DO (dbs_sql_procedure_statement SEMICOLONCHAR)+ END FOR  dbs_key_label_name; // check label name matches
+dbs_for_loop_name: dbs_generic_name;
+dbs_goto_statement: (dbs_key_label_name COLONCHAR)? GOTO dbs_key_label_name;
+dbs_if_else_conditional_statement: dbs_search_condition THEN (dbs_sql_procedure_statement SEMICOLONCHAR)+;
+dbs_if_statement: (dbs_key_label_name COLONCHAR)? IF dbs_if_else_conditional_statement (ELSEIF dbs_if_else_conditional_statement )* (ELSE (dbs_sql_procedure_statement SEMICOLONCHAR)+)? END IF;
+dbs_iterate_statement: (dbs_key_label_name COLONCHAR)? ITERATE dbs_key_label_name;
+dbs_leave_statement: (dbs_key_label_name COLONCHAR)? LEAVE dbs_key_label_name;
+dbs_loop_statement:  (dbs_key_label_name COLONCHAR)? LOOP (dbs_sql_procedure_statement SEMICOLONCHAR)+ END LOOP dbs_key_label_name?; // label name should match
+dbs_repeat_statement:  (dbs_key_label_name COLONCHAR)? REPEAT (dbs_sql_procedure_statement SEMICOLONCHAR)+ UNTIL dbs_search_condition END REPEAT dbs_key_label_name?; // check that label name matches.
+dbs_signal_arg1: (SQLSTATE VALUE? (dbs_sqlstate_string_constant | dbs_sql_variable_name | dbs_sql_parameter_name)| dbs_sql_condition_name);
+dbs_resignal_statement: (dbs_key_label_name COLONCHAR)? RESIGNAL (dbs_signal_arg1 dbs_signal_information? )?;
+dbs_signal_information:SET MESSAGE_TEXT EQUALCHAR dbs_diagnostic_string_expression | LPARENCHAR dbs_diagnostic_string_expression RPARENCHAR;
+dbs_return_statement: (dbs_key_label_name COLONCHAR)? RETURN (dbs_expression | NULL | dbs_fullselect);
+dbs_signal_statement: (dbs_key_label_name COLONCHAR)?  SIGNAL dbs_signal_arg1 dbs_signal_information;
+dbs_while_statement: (dbs_key_label_name COLONCHAR)? WHILE dbs_search_condition DO (dbs_sql_procedure_statement SEMICOLONCHAR)+ END WHILE dbs_key_label_name?;
 /// End STATEMENTS ///
+
+/// DB2 SQL PROCEDURE STATEMENT//////
+// ref - https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sqlprocedurestatement4nativesqlpl.html#db2z_sqlprocedurestatement4nativesqlpl//
+dbs_sql_procedure_statement: (dbs_sql_control_statement | dbs_allocate | dbs_alter_database | dbs_alter_function | dbs_alter_index | dbs_alter_mask | dbs_alter_permission
+ | dbs_alter_procedure | dbs_alter_sequence | dbs_alter_stogroup | dbs_alter_table | dbs_alter_tablespace | dbs_alter_trigger | dbs_alter_trusted | dbs_alter_view
+ | dbs_associate | dbs_call | dbs_close | dbs_comment | dbs_commit | dbs_connect | dbs_create_alias | dbs_create_db |
+ dbs_create_function | dbs_create_global_temp_table | dbs_create_index | dbs_create_procedure_ext | dbs_create_role | dbs_create_sequence
+ | dbs_create_stogroup | dbs_create_alias | dbs_create_table | dbs_create_tablespace | dbs_create_trusted_context | dbs_create_type_array |
+ dbs_create_type_distinct | dbs_create_variable | dbs_create_view) (dbs_declare_cursor | dbs_declare_global | dbs_delete | dbs_drop |
+ dbs_exchange | dbs_execute | dbs_execute_immediate | dbs_fetch| dbs_get | dbs_grant | dbs_insert | dbs_label |
+ dbs_lock | dbs_merge | dbs_open | dbs_prepare | dbs_refresh | dbs_release | dbs_rename | dbs_revoke | dbs_rollback | dbs_savepoint |
+ dbs_select_into | dbs_set | dbs_truncate | dbs_update | dbs_values_into);
+
+dbs_select_into: ; //TODO ref - https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_selectinto.html
+
+
+/// END SQL PROCEDURE STATEMENT ///
 
 //TODO
 //dbs_expression: dbs_expr_list | expr_in | expr_out | expr_inout;
@@ -1186,7 +1231,7 @@ dbs_attr_host_variable: HOSTNAME_IDENTIFIER | NUMERICLITERAL ; // VARCHAR(128)
 dbs_authorization_name: SQL_IDENTIFIER;
 dbs_authorization_specification: all_words+; //?
 dbs_aux_table_name: SQL_IDENTIFIER;
-dbs_begin_column_name: all_words+;//? as AS ROW BEGIN
+dbs_begin_column_name: dbs_generic_name;//must be defined as DATE or TIMESTAMP(6) WITHOUT TIME ZONE
 dbs_binary_string_constant: BXNUMBER;
 dbs_bp_name: SQL_IDENTIFIER;
 dbs_case_expression : CASE (dbs_simple_when_clause | dbs_searched_when_clause) (ELSE NULL | ELSE dbs_result_expression1)? END ;
@@ -1205,7 +1250,7 @@ dbs_constant : (dbs_string_constant | dbs_integer_constant);
 dbs_constraint_name: SQL_IDENTIFIER;//?
 dbs_context: SQL_IDENTIFIER;
 dbs_context_name: SQL_IDENTIFIER;//?
-dbs_copy_id: all_words+; //?
+dbs_copy_id: CURRENT | PREVIOUS | ORIGINAL; //
 dbs_correlation_name: SQL_IDENTIFIER;
 dbs_cursor_name: SQL_IDENTIFIER;
 dbs_database_name: SQL_IDENTIFIER; //?
@@ -1291,7 +1336,7 @@ dbs_simple_when_clause: (WHEN dbs_expression THEN (dbs_result_expression1 | NULL
 dbs_smallint: MINUSCHAR? DIGIT DIGIT?;// -1 to 99
 dbs_specific_name: SQL_IDENTIFIER;
 dbs_sql_condition_name: dbs_generic_name; // No particular spec found in doc. Specifies the name of the condition.
-dbs_sql_control_statement: dbs_control_statement; // TODO : linked to control statement
+dbs_sql_control_statement: dbs_control_statement; //
 dbs_sql_parameter_name: dbs_generic_name; //
 dbs_sql_routine_body: all_words+;// TODO: SQL-routine-body to be defined once all other statements are done
 dbs_sql_variable_name: dbs_generic_name; //?
