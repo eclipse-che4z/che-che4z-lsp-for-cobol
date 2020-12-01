@@ -221,6 +221,8 @@ cics_check_activity: (ACQPROCESS | ACTIVITY cics_data_value | ACQACTIVITY | COMP
                      ABPROGRAM cics_data_area | MODE cics_cvda | SUSPSTATUS cics_cvda | cics_resp)+;
 cics_check_timer: TIMER cics_data_value cics_resp? STATUS cics_cvda cics_resp?;
 
+cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN ;
+
 /** CONNECT PROCESS */
 cics_connect: CONNECT PROCESS (CONVID cics_name | SESSION cics_name | PROCNAME cics_data_area |
               PROCLENGTH cics_data_value | PARTNER cics_name | cics_connect_piplist | SYNCLEVEL |
@@ -415,14 +417,14 @@ cics_handle_abend: ABEND (CANCEL | PROGRAM cics_name | LABEL cics_label | RESET 
 cics_handle_aid: AID (ANYKEY (cics_label)? | CLEAR (cics_label)? | CLRPARTN (cics_label)? | ENTER (cics_label)? |
                  LIGHTPEN (cics_label)? | OPERID  (cics_label)? | pa_option (cics_label)? | pf_option (cics_label)? |
                  TRIGGER  (cics_label)? | cics_resp)*;
-cics_handle_condition: CONDITION (mama cics_label? | cics_resp)+;
+cics_handle_condition: CONDITION ((cics_conditions | mama) cics_label? | cics_resp)+;
 
 pa_option: PA1 | PA2 | PA3;
 pf_option: PF1 | PF2 | PF3 | PF4 | PF5 | PF6 | PF7 | PF8 | PF9 | PF10 | PF11 | PF12 | PF13 | PF14 | PF15 | PF16 | PF17 |
            PF18 | PF19 | PF20 | PF21 | PF22 | PF23 | PF24;
 
 /** IGNORE CONDITION */
-cics_ignore: IGNORE (CONDITION | mama | cics_resp)+;
+cics_ignore: IGNORE CONDITION (cics_conditions | mama | cics_resp)+;
 
 /** INQUIRE ACTIVITYID / CONTAINER / EVENT / PROCESS / TIMER */
 cics_inquire: INQUIRE (cics_inquire_activityid | cics_inquire_container | cics_inquire_event | cics_inquire_process |
@@ -1177,11 +1179,11 @@ numericLiteral
    ;
 
 cicsDfhRespLiteral
-   : DFHRESP LPARENCHAR (cobolWord | literal) RPARENCHAR
+   : DFHRESP LPARENCHAR (cics_conditions | cobolWord | literal) RPARENCHAR
    ;
 
 cicsDfhValueLiteral
-   : DFHVALUE LPARENCHAR (cobolWord | literal) RPARENCHAR
+   : DFHVALUE LPARENCHAR (cics_conditions | cobolWord | literal) RPARENCHAR
    ;
 
 integerLiteral
