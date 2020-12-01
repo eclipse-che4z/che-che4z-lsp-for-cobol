@@ -1242,6 +1242,7 @@ dbs_index_identifier: ALPHANUMERIC_TEXT; //?
 dbs_index_name: SQL_IDENTIFIER;
 dbs_integer: INTEGER;
 dbs_integer_constant: INTEGERLITERAL; //range 1 - 32767
+dbs_jar_name: all_words+; //?
 dbs_jobname_value: ALPHANUMERIC_TEXT;//?
 dbs_key_label_name: ALPHANUMERIC_TEXT;//?
 dbs_length: DIGIT+; //length must be between 1 and 32767. The default value is 100 bytes.
