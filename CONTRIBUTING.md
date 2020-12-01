@@ -45,6 +45,10 @@ To build extension run:
 
 ```$ cd clients/cobol-lsp-vscode-extension && npm install && npm run compile```
 
+To enable debug logging to the console, while you run the Java part in IDE change your run configuration. 
+Add `-Dlogback.configurationFile=server/localDev/logback.xml` to your `VM options` parameter. 
+The value can be `localDev/logback.xml` if the `server` folder is a root folder for your project.
+
 ## Start contributing
 
 Before contributing to the project, fork the repository and clone it, or add it as a new remote if you have already cloned the original repository. All the commits should be pushed to the fork in order to open pull requests from it.
