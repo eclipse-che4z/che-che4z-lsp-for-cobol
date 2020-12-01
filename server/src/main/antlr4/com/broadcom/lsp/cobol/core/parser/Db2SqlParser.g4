@@ -726,11 +726,11 @@ dbs_rename: RENAME (TABLE? dbs_table_name TO dbs_table_identifier | INDEX dbs_in
 
 
 /*REVOKE (all) */
-dbs_revoke: dbs_revoke_aut | dbs_revoke_coll_prvg | dbs_revoke_db_prvg | dbs_revoke_func_or_proc_prvg | dbs_revoke_pack_prvg | dbs_revoke_plan_prvg | dbs_revoke_schema_prvg | dbs_revoke_seq_prvg  | dbs_revoke_system_prvg | dbs_revoke_table_or_view_prvg |  dbs_revoke_type_or_jar_prvg  | dbs_revoke_var_prvg | dbs_revoke_use_prvg;
+dbs_revoke: dbs_revoke_authorized_spec | dbs_revoke_coll_prvg | dbs_revoke_db_prvg | dbs_revoke_func_or_proc_prvg | dbs_revoke_pack_prvg | dbs_revoke_plan_prvg | dbs_revoke_schema_prvg | dbs_revoke_seq_prvg  | dbs_revoke_system_prvg | dbs_revoke_table_or_view_prvg |  dbs_revoke_type_or_jar_prvg  | dbs_revoke_var_prvg | dbs_revoke_use_prvg;
 //REVOKE
-dbs_revoke_aut: REVOKE dbs_authorization_specification FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
-auth_name_loop_pub: auth_name_or_role | PUBLIC (COMMACHAR auth_name_loop_pub | PUBLIC)*;
-auth_name_loop_all: BY (ALL | auth_name_or_role  (COMMACHAR auth_name_or_role)*);
+dbs_revoke_authorized_spec: REVOKE dbs_authorization_specification FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
+auth_name_loop_pub: (auth_name_or_role | PUBLIC) (COMMACHAR auth_name_loop_pub | PUBLIC)*;
+auth_name_loop_all: BY (ALL | auth_name_or_role (COMMACHAR auth_name_or_role)*);
 auth_name_or_role: dbs_authorization_name | ROLE dbs_role_name;
 dependent_privileges: NOT? INCLUDING DEPENDENT PRIVILEGES;
 //REVOKE COLLECTION PRIVILEGES
@@ -752,7 +752,7 @@ dbs_revoke_pack_prvg:  REVOKE (ALL | revoke_opt_loop) ON PACKAGE package_name_lo
 revoke_opt_loop: revoke_opt (COMMACHAR revoke_opt)*;
 revoke_opt: BIND | COPY | EXECUTE | RUN;
 package_name_loop: package_name (COMMACHAR package_name)*;
-package_name: dbs_collection_id DOT (dbs_package_name | RPARENCHAR);
+package_name: dbs_collection_id DOT (dbs_package_name | ASTERISKCHAR);
 //REVOKE PLAN PRIVILEGES
 dbs_revoke_plan_prvg: REVOKE (BIND | EXECUTE) (COMMACHAR (BIND | EXECUTE))* ON PLAN plan_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 plan_name_loop: dbs_plan_name (COMMACHAR dbs_plan_name)*;
@@ -771,14 +771,19 @@ dbs_revoke_system_prvg: REVOKE db2sql_system_privileges (COMMACHAR db2sql_system
 //REVOKE TABLE OR VIEW PRIVILEGES
 dbs_revoke_table_or_view_prvg: REVOKE (ALL PRIVILEGES? | db2sql_table_view_privileges (COMMACHAR db2sql_table_view_privileges)*)  ON TABLE? table_or_view_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 table_or_view_name_loop: (dbs_table_name | dbs_view_name) (COMMACHAR (dbs_table_name | dbs_view_name))*;
-
 //REVOKE TYPE OR JAR PRIVILEGES
-dbs_revoke_type_or_jar_prvg: A; // db2sql_privileges;
+dbs_revoke_type_or_jar_prvg: REVOKE USAGE ON (TYPE type_name_loop | JAR jar_name_loop)  FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
+type_name_loop: dbs_type_name  (COMMACHAR dbs_type_name)*;
+jar_name_loop: dbs_jar_name (COMMACHAR dbs_jar_name)*;
 //REVOKE VARIABLE PRIVILEGES
-dbs_revoke_var_prvg: A; // db2sql_privileges;
+dbs_revoke_var_prvg: REVOKE (ALL PRIVILEGES? | read_write_loop) ON VARIABLE FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+read_write_loop: READ WRITE (COMMACHAR READ WRITE)*;
 //REVOKE USE PRIVILEGES
-dbs_revoke_use_prvg: A; // db2sql_privileges;
-
+dbs_revoke_use_prvg: REVOKE USE OF (BUFFERPOOL bpname_loop | ALL BUFFERPOOLS | STOGROUP stogroup_name_loop | TABLESPACE tblspace_name_loop) FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+bpname_loop: dbs_bp_name (COMMACHAR dbs_bp_name)*;
+stogroup_name_loop: dbs_stogroup_name (COMMACHAR dbs_stogroup_name)*;
+tblspace_name_loop: tblspace_name_name (COMMACHAR tblspace_name_name)*;
+tblspace_name_name: (dbs_database_name DOT)? dbs_table_space_name;
 
 /*ROLLBACK */
 dbs_rollback: ROLLBACK WORK? (TO SAVEPOINT dbs_savepoint_name?)?;
@@ -1237,6 +1242,7 @@ dbs_index_identifier: literal+; //?
 dbs_index_name: SQL_IDENTIFIER;
 dbs_integer: INTEGER;
 dbs_integer_constant: INTEGERLITERAL; //range 1 - 32767
+dbs_jar_name: all_words+;//?
 dbs_jobname_value: all_words+;//?
 dbs_key_label_name: all_words+;//?
 dbs_length: all_words+; //?
