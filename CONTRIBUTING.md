@@ -39,7 +39,7 @@ $ git clone https://github.com/eclipse/che-che4z-lsp-for-cobol.git
 
 To build server run:
 
-```$ cd com.ca.lsp.cobol && mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify test-compile```
+```$ cd server && mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify test-compile```
 
 To build extension run:
 
