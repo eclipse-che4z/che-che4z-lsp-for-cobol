@@ -734,7 +734,7 @@ auth_name_loop_all: BY (ALL | auth_name_or_role  (COMMACHAR auth_name_or_role)*)
 auth_name_or_role: dbs_authorization_name | ROLE dbs_role_name;
 dependent_privileges: NOT? INCLUDING DEPENDENT PRIVILEGES;
 //REVOKE COLLECTION PRIVILEGES
-dbs_revoke_coll_prvg: REVOKE (CREATE | PACKADM) (IN | ON) COLLECTION (db_coll_id_loop | ASTERISKCHAR) FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+dbs_revoke_coll_prvg : REVOKE (CREATE | PACKADM) (IN | ON) COLLECTION (db_coll_id_loop | ASTERISKCHAR) FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 db_coll_id_loop: dbs_collection_id (COMMACHAR dbs_collection_id)*;
 //REVOKE DATABASE PRIVILEGES
 dbs_revoke_db_prvg: REVOKE db2sql_db_privileges (COMMACHAR db2sql_db_privileges)* ON DATABASE db_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
@@ -951,9 +951,14 @@ dbs_option_list_inl_def:  (SPECIFIC dbs_specific_name)? (PARAMETER CCSID oneof_e
 /// STATEMENTS ///
 //TODO
 dbs_control_statement: all_words+;
-//                        assignment_statement | dbs_call | case_statement | compund_statement | get_diagnostics_statement |
+//dbs_control_statement: dbs_assignment_statement | dbs_call_control | case_statement | compund_statement | get_diagnostics_statement |
 //                        goto_statement | if_statement | iterate_statement | leave_statement | loop_statement | repeat_statement |
 //                        resignal_statement |return_statement | signal_statement | while_statement;
+//
+//dbs_assignment_statement : SET (dbs_sql_parameter_name | dbs_sql_variable_name) EQUALCHAR (CURRENT SERVER | CURRENT PACKAGESET | CURRENT PACKAGE PATH | dbs_expression | NULL);
+//dbs_procedure_argument_list : dbs_sql_variable_name| dbs_sql_parameter_name | dbs_expression| NULL;
+//dbs_call_control : CALL dbs_procedure_name (LPARENCHAR dbs_procedure_argument_list (COMMACHAR dbs_procedure_argument_list)*  RPARENCHAR)?;
+//dbs_case_statement: CASE (dbs_simple_when_clause | dbs_searched_when_clause) (ELSE dbs_sql_pr)? END CASE;
 /// End STATEMENTS ///
 
 //TODO
@@ -1181,7 +1186,7 @@ dbs_attr_host_variable: HOSTNAME_IDENTIFIER | NUMERICLITERAL ; // VARCHAR(128)
 dbs_authorization_name: SQL_IDENTIFIER;
 dbs_authorization_specification: all_words+; //?
 dbs_aux_table_name: SQL_IDENTIFIER;
-dbs_begin_column_name: all_words+;//? as AS ROW BEGIN
+dbs_begin_column_name: dbs_generic_name;//must be defined as DATE or TIMESTAMP(6) WITHOUT TIME ZONE
 dbs_binary_string_constant: BXNUMBER;
 dbs_bp_name: SQL_IDENTIFIER;
 dbs_case_expression : CASE (dbs_simple_when_clause | dbs_searched_when_clause) (ELSE NULL | ELSE dbs_result_expression1)? END ;
@@ -1200,7 +1205,7 @@ dbs_constant : (dbs_string_constant | dbs_integer_constant);
 dbs_constraint_name: SQL_IDENTIFIER;//?
 dbs_context: SQL_IDENTIFIER;
 dbs_context_name: SQL_IDENTIFIER;//?
-dbs_copy_id: all_words+; //?
+dbs_copy_id: CURRENT | PREVIOUS | ORIGINAL; //
 dbs_correlation_name: SQL_IDENTIFIER;
 dbs_cursor_name: SQL_IDENTIFIER;
 dbs_database_name: SQL_IDENTIFIER; //?
@@ -1210,11 +1215,11 @@ dbs_diagnostic_string_expression: STRINGLITERAL; //?
 dbs_distinct_type: db2sql_data_types+;
 dbs_distinct_type_name: SQL_IDENTIFIER;
 dbs_dpsegsz_param: all_words+;//DPSEGSZ value, divisible by 4
-dbs_end_column_name: all_words+;//?defined as AS ROW END
+dbs_end_column_name: dbs_generic_name;//?defined as AS ROW END
 dbs_element_name: ALPHANUMERIC_TEXT;//
 dbs_encryption_value: NONE | LOW | HIGH;//
 dbs_explainable_sql_statement: ( dbs_allocate | dbs_alter | dbs_associate | dbs_fetch | dbs_insert | dbs_label | dbs_lock | dbs_merge | dbs_open |
- dbs_prepare | dbs_refresh | dbs_release | dbs_rename | dbs_select | dbs_truncate | dbs_select | dbs_set | dbs_delete | dbs_drop); //?
+ dbs_prepare | dbs_refresh | dbs_release | dbs_rename | dbs_select | dbs_truncate | dbs_select | dbs_set | dbs_delete | dbs_drop); // RE-CHECK
 dbs_ext_program_name: SQL_IDENTIFIER;//If LANGUAGE is JAVA
 dbs_external_program_name: ALPHANUMERIC_TEXT; //?
 //REF: https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_fetchclause.html
@@ -1222,89 +1227,90 @@ dbs_external_program_name: ALPHANUMERIC_TEXT; //?
 dbs_fetch_clause: FETCH (FIRST | NEXT) POSITIVEINTEGERLITERAL? (ROW | ROWS) ONLY;
 dbs_field_name: SQL_IDENTIFIER;
 dbs_function_name: SQL_IDENTIFIER; //must not be any of the following system-reserved keywords
-dbs_global_variable_name: all_words+; //?
+dbs_global_variable_name: dbs_generic_name; //?
 dbs_graphic_string_constant: GRAPHICUNICODE | GRAHICCHAR;
 dbs_history_table_name: dbs_table_name;//?
-dbs_host_label: all_words+; //?
+dbs_host_label: ALPHANUMERIC_TEXT; //?
 dbs_host_variable: FILENAME;
-dbs_host_variable_array: all_words+; //?
-dbs_host_variable_name: all_words+; //?
-dbs_id_host_variable: all_words+; //?
-dbs_identifier: all_words+; //?
-dbs_imptkmod_param: all_words+; //? IMPTKMOD subsystem parameter specifies the default value
-dbs_include_data_type: all_words+; //?
-dbs_index_identifier: literal+; //?
+dbs_host_variable_array: ALPHANUMERIC_TEXT; // variable array must be defined in the application program
+dbs_host_variable_name: ALPHANUMERIC_TEXT; // can't find good reference. https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_fetch.html
+dbs_id_host_variable: NUMERICLITERAL; //?
+dbs_identifier: SQL_IDENTIFIER; //?
+dbs_imptkmod_param: YES | NO; //? IMPTKMOD subsystem parameter specifies the default value//https://www.ibm.com/support/knowledgecenter/en/SSEPEK_12.0.0/inst/src/tpc/db2z_ipf_imptkmod.html
+dbs_include_data_type: all_words+; // TODO earlier link dbs_insert_data_type
+dbs_index_identifier: ALPHANUMERIC_TEXT; //?
 dbs_index_name: SQL_IDENTIFIER;
 dbs_integer: INTEGER;
 dbs_integer_constant: INTEGERLITERAL; //range 1 - 32767
-dbs_jobname_value: all_words+;//?
-dbs_key_label_name: all_words+;//?
-dbs_length: all_words+; //?
-dbs_level: all_words+; //?
+dbs_jobname_value: ALPHANUMERIC_TEXT;//?
+dbs_key_label_name: ALPHANUMERIC_TEXT;//?
+dbs_length: DIGIT+; //length must be between 1 and 32767. The default value is 100 bytes.
+dbs_level: NUMBER_0 | NUMBER_1 | NUMBER_2; //Level 0, supported only for CREATE
 dbs_location_name: VARCHAR | CHAR; //not greater than 16
 dbs_mask_name: SQL_IDENTIFIER;
-dbs_mc_name: all_words+;//?
+dbs_mc_name: ALPHANUMERIC_TEXT;// must be 1-8 characters in length
 dbs_member_name: SQL_IDENTIFIER;
-dbs_name: all_words+; //?
+dbs_name: SQL_IDENTIFIER; // name of the WLM environment is an SQL identifier
 dbs_namespace_name: VARCHAR;
 dbs_namespace_prefix: VARCHAR;
 dbs_namespace_url: VARCHAR;
-dbs_nnnn_m: all_words+; //?
-dbs_non_deterministic_expression: all_words+;//?
-dbs_numeric_constant: all_words+;//?
-dbs_obfuscated_statement_text: ALPHANUMERIC_TEXT;
-dbs_package_name: all_words+; //?
+dbs_nnnn_m: DIGIT DIGIT? DIGIT? DIGIT? DOT DIGIT; //?
+dbs_non_deterministic_expression: DATA CHANGE OPERATION | dbs_special_register | dbs_session_variable;
+dbs_session_variable : SYSIBM DOT PACKAGE_NAME | SYSIBM DOT PACKAGE_SCHEMA | SYSIBM DOT PACKAGE_VERSION;
+dbs_numeric_constant: NUMERICLITERAL;// numeric literal without non-zero digits to the right of the decimal point.
+dbs_obfuscated_statement_text: all_words+ ; //encoded statement, can have all words but meaning would change.
+dbs_package_name: HOSTNAME_IDENTIFIER | STRINGLITERAL; //
 dbs_package_path: FILENAME+; //If package-path contains SESSION_USER (or USER), PATH, or PACKAGE PATH
-dbs_pageset_pagenum_param: all_words+; //?  PAGESET_PAGENUM subsystem parameter specifies the default value.
+dbs_pageset_pagenum_param: ABSOLUTE | '\'' A '\'' | RELATIVE | '\'' R '\''; //  PAGESET_PAGENUM subsystem parameter specifies the default value.
 dbs_parameter_marker: ( QUESTIONMARK | COLONCHAR dbs_variable);
 dbs_parameter_name: SQL_IDENTIFIER;
 dbs_permission_name: SQL_IDENTIFIER;
 dbs_plan_name: SQL_IDENTIFIER;
 dbs_procedure_name: SQL_IDENTIFIER;
-dbs_profile_name: all_words+;//?
-dbs_program_name: all_words+;//?
-dbs_registered_xml_schema_name: all_words+;//?
-dbs_result_expression1: NONNUMERICLITERAL | NUMERICLITERAL;
+dbs_profile_name: STRINGLITERAL;//
+dbs_program_name: STRINGLITERAL | NUMERICLITERAL;// Can't find much n the docs.
+dbs_registered_xml_schema_name: SQL_IDENTIFIER;// relational-identifier - https://www.ibm.com/support/knowledgecenter/en/SSEPEK_12.0.0/comref/src/tpc/db2z_clpregisterxmlschemasyntax.html
+dbs_result_expression1: NONNUMERICLITERAL | NUMERICLITERAL;//TODO
 dbs_role_name: SQL_IDENTIFIER+;
 dbs_routine_version_id: ALPHANUMERIC_TEXT;
 dbs_rs_locator_variable: SQL_IDENTIFIER;
-dbs_run_time_options: all_words+; //?
+dbs_run_time_options: STRINGLITERAL; // a character string that is no longer than 254 bytes
 dbs_runtime_options: VARCHAR; //no longer than 254 bytes
-dbs_s: all_words+; //?
-dbs_sc_name: all_words+;//?
+dbs_s: DIGIT_GREATER_THAN_ZERO ; // a number between 1 and 9
+dbs_sc_name: ALPHANUMERIC_TEXT;// must be from 1-8 characters in length
 dbs_scalar_fullselect : LPARENCHAR dbs_fullselect RPARENCHAR;
-dbs_schema_location: all_words+;//?
-dbs_schema_name: all_words+; //?
+dbs_schema_location: HOSTNAME_IDENTIFIER;//
+dbs_schema_name: ALPHANUMERIC_TEXT; //?
 dbs_search_condition: NOT? dbs_predicate (SELECTIVITY dbs_integer_constant)? ((AND|OR) NOT?
                       (dbs_predicate | dbs_search_condition))*; //? change this to predicate after the predicate is defined.
-dbs_seclabel_name: all_words+;//?
+dbs_seclabel_name: ALPHANUMERIC_TEXT;// couldn't find much. Seems like an identifier defined in RACF. Keeping alphanumberic.
 dbs_sequence_name: SQL_IDENTIFIER;
-dbs_servauth_value: all_words+;//?
+dbs_servauth_value: STRINGLITERAL;// servauth-value is an EBCDIC 64 byte RACF SERVAUTH CLASS resource name. servauth-value must be left justified in the string constant.
 dbs_simple_when_clause: (WHEN dbs_expression THEN (dbs_result_expression1 | NULL))+;
-dbs_smallint: all_words+;//?
+dbs_smallint: MINUSCHAR? DIGIT DIGIT?;// -1 to 99
 dbs_specific_name: SQL_IDENTIFIER;
-dbs_sql_condition_name: literal+; //?
-dbs_sql_control_statement: all_words+; //?
-dbs_sql_parameter_name: all_words+; //?
-dbs_sql_routine_body: all_words+;//?
-dbs_sql_variable_name: all_words+; //?
-dbs_sqlstate_string_constant: literal+; //?
-dbs_statement_name: all_words+; //?
+dbs_sql_condition_name: dbs_generic_name; // No particular spec found in doc. Specifies the name of the condition.
+dbs_sql_control_statement: dbs_control_statement; // TODO : linked to control statement
+dbs_sql_parameter_name: dbs_generic_name; //
+dbs_sql_routine_body: all_words+;// TODO: SQL-routine-body to be defined once all other statements are done
+dbs_sql_variable_name: dbs_generic_name; //?
+dbs_sqlstate_string_constant: STRINGLITERAL; //?
+dbs_statement_name: dbs_generic_name; // TODO : Can't find much but seems a generic name should satify the need.
 dbs_stogroup_name: SQL_IDENTIFIER;
 dbs_string_constant: dbs_binary_string_constant | dbs_character_string_constant | dbs_graphic_string_constant;
-dbs_string_expression: all_words+; //?
-dbs_synonym: all_words+; //?
-dbs_table_identifier: literal+; //?
+dbs_string_expression: all_words+; // string-expression is only supported for PLI. Some info on(but not much help) https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_prepare.html
+dbs_synonym: SQL_IDENTIFIER; //
+dbs_table_identifier: SQL_IDENTIFIER; //
 dbs_table_name: SQL_IDENTIFIER;
-dbs_table_reference: literal+; //? https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_tablereference.html
-dbs_table_space_name: all_words+;//
-dbs_target_namespace: all_words+;//?
-dbs_token_host_variable: all_words+; //?
+dbs_table_reference: literal+; //TODO https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_tablereference.html
+dbs_table_space_name: SQL_IDENTIFIER;
+dbs_target_namespace: HOSTNAME_IDENTIFIER;//
+dbs_token_host_variable: dbs_generic_name; // DB2 SQL variable name.
 dbs_transition_table_name: SQL_IDENTIFIER;
-dbs_transition_variable_name: all_words+; //?
+dbs_transition_variable_name: dbs_generic_name; //
 dbs_trigger_name: SQL_IDENTIFIER;
-dbs_trigger_version_id: all_words+;//?
-dbs_triggered_sql_statement: all_words+;//?;
+dbs_trigger_version_id: SQL_IDENTIFIER;// up to 64 EBCDIC bytes. Ref- https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_namingconventions.html
+dbs_triggered_sql_statement: all_words+;// TODO : A lot to read. https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sqlplnativeintro.html /https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_altertriggeradvanced.html
 dbs_triggered_sql_statement_adv: all_words+;//?;
 dbs_triggered_sql_statement_basic: all_words+;//?; https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_createtrigger.html
 dbs_type_name: ALPHANUMERIC_TEXT;
@@ -1314,6 +1320,6 @@ dbs_variable_name: SQL_IDENTIFIER;
 dbs_version_id: VERSION_ID;
 dbs_version_name: ALPHANUMERIC_TEXT | FILENAME;
 dbs_view_name: SQL_IDENTIFIER;
-dbs_volume_id: all_words+;//?
+dbs_volume_id: STRINGLITERAL;// volume-id is the volume serial number of a storage volume.It can have a maximum of six characters and is specified as an identifier or a string constant.
 dbs_wlm_env_name: SQL_IDENTIFIER;
 /////// End Variables /////////////
