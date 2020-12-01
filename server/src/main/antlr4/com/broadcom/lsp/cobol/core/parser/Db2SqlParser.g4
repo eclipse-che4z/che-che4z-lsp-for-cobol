@@ -734,7 +734,7 @@ auth_name_loop_all: BY (ALL | auth_name_or_role  (COMMACHAR auth_name_or_role)*)
 auth_name_or_role: dbs_authorization_name | ROLE dbs_role_name;
 dependent_privileges: NOT? INCLUDING DEPENDENT PRIVILEGES;
 //REVOKE COLLECTION PRIVILEGES
-dbs_revoke_coll_prvg_CHECK : REVOKE (CREATE | PACKADM) (IN | ON) COLLECTION (db_coll_id_loop | ASTERISKCHAR) FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+dbs_revoke_coll_prvg : REVOKE (CREATE | PACKADM) (IN | ON) COLLECTION (db_coll_id_loop | ASTERISKCHAR) FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 db_coll_id_loop: dbs_collection_id (COMMACHAR dbs_collection_id)*;
 //REVOKE DATABASE PRIVILEGES
 dbs_revoke_db_prvg: REVOKE db2sql_db_privileges (COMMACHAR db2sql_db_privileges)* ON DATABASE db_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
@@ -1276,7 +1276,7 @@ dbs_routine_version_id: ALPHANUMERIC_TEXT;
 dbs_rs_locator_variable: SQL_IDENTIFIER;
 dbs_run_time_options: STRINGLITERAL; // a character string that is no longer than 254 bytes
 dbs_runtime_options: VARCHAR; //no longer than 254 bytes
-dbs_s: DIGIT_GREATER_THEN_ZERO ; // a number between 1 and 9
+dbs_s: DIGIT_GREATER_THAN_ZERO ; // a number between 1 and 9
 dbs_sc_name: ALPHANUMERIC_TEXT;// must be from 1-8 characters in length
 dbs_scalar_fullselect : LPARENCHAR dbs_fullselect RPARENCHAR;
 dbs_schema_location: HOSTNAME_IDENTIFIER;//
@@ -1322,5 +1322,4 @@ dbs_version_name: ALPHANUMERIC_TEXT | FILENAME;
 dbs_view_name: SQL_IDENTIFIER;
 dbs_volume_id: STRINGLITERAL;// volume-id is the volume serial number of a storage volume.It can have a maximum of six characters and is specified as an identifier or a string constant.
 dbs_wlm_env_name: SQL_IDENTIFIER;
-dbs_func_or_proc_prvg: all_words+;
 /////// End Variables /////////////

@@ -783,4 +783,4 @@ fragment
 OCT_DIGIT        : [0-8] ;
 
 fragment
-DIGIT_GREATER_THEN_ZERO : [1-9];
+DIGIT_GREATER_THAN_ZERO : [1-9];
