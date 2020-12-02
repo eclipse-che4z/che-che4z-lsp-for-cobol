@@ -808,9 +808,7 @@ dbs_savepoint: SAVEPOINT dbs_savepoint_name UNIQUE? ON ROLLBACK RETAIN (CURSORS 
 
 /*SELECT (both) */
 
-/*SET (all) */
 
-/*SET (all)*/
 dbs_select: dbs_select_unpack_function_invocation | dbs_select_row_fullselect;
 
 /*Queries Subselects (all)*/
@@ -841,12 +839,84 @@ dbs_offset_clause: OFFSET INTEGERLITERAL (ROW | ROWS);
 dbs_fullselect: (dbs_subselect | LPARENCHAR dbs_fullselect RPARENCHAR | dbs_value_clause)
 ((UNION|EXCEPT|INTERSECT) (DISTINCT|ALL)? (dbs_subselect | LPARENCHAR dbs_fullselect RPARENCHAR))*
 dbs_orderby_clause? dbs_offset_clause? dbs_fetch_clause?;
-
 dbs_value_clause: VALUES dbs_sequence_reference | LPARENCHAR dbs_sequence_reference (COMMACHAR dbs_sequence_reference)* RPARENCHAR;
 
+/*SET (all) */
+dbs_set: SET  (dbs_set_connection | dbs_set_assign | dbs_set_current_accel | dbs_set_current_app_compatibility | dbs_set_current_app_enc_schema |
+         dbs_set_current_debug_mode |dbs_set_decfloat_round_mode | dbs_set_current_degree | dbs_set_current_explain_mode | dbs_set_current_get_accel_archive | dbs_set_current_local_ctype |
+         dbs_set_current_maintained_table_type_optmz | dbs_set_current_optmz_hint | dbs_set_current_pckg_path | dbs_set_current_pckg_set | dbs_set_current_precision |
+         dbs_set_current_query_accel | dbs_set_current_query_accel_wfdata | dbs_set_current_refresh_age | dbs_set_current_routine_version | dbs_set_current_rules | dbs_set_current_sqlid |
+         dbs_set_current_temp_business_time | dbs_set_current_temp_system_time | dbs_set_current_enc_pwd | dbs_set_path | dbs_set_schema | dbs_set_session_tz);
 
-
-dbs_set: literal+; //?
+//SET CONNECTION
+dbs_set_connection: CONNECTION (dbs_location_name | dbs_host_variable);
+//SET ASSIGNMENT STATEMENT
+dbs_set_assign: (target_variable EQUALCHAR CURRENT (PACKAGESET | PACKAGE PATH |  SERVER) | dbs_array_variable_name LSQUAREBRACKET dbs_array_variable_name RSQUAREBRACKET EQUALCHAR (dbs_expression | NULL) | target_variable_loop);
+target_variable: (dbs_global_variable_name | dbs_host_variable_name | dbs_sql_parameter_name | dbs_sql_variable_name | dbs_transition_variable_name);
+target_variable_eq_opt:  (dbs_expression | NULL | DEFAULT);
+target_variable_eq_opt_loop:  target_variable_eq_opt (COMMACHAR target_variable_eq_opt)*;
+target_variable_val_loop: LPARENCHAR target_variable (COMMACHAR target_variable)*  RPARENCHAR;
+target_variable_vals_loop: LPARENCHAR (target_variable_eq_opt_loop | dbs_subselect | VALUES (target_variable_eq_opt | LPARENCHAR target_variable_eq_opt_loop RPARENCHAR)) RPARENCHAR;//1 2 3
+target_variable_opts: (target_variable EQUALCHAR target_variable_eq_opt | target_variable_val_loop  EQUALCHAR target_variable_vals_loop);
+target_variable_loop: target_variable_opts (COMMACHAR target_variable_opts)*;
+//SET CURRENT ACCELERATOR
+dbs_set_current_accel: CURRENT ACCELERATOR EQUALCHAR (dbs_accelerator_name | dbs_host_variable);
+//SET CURRENT APPLICATION COMPATIBILITY
+dbs_set_current_app_compatibility: CURRENT APPLICATION COMPATIBILITY EQUALCHAR? (dbs_string_constant | dbs_variable);
+//SET CURRENT APPLICATION ENCODING SCHEMA
+dbs_set_current_app_enc_schema: CURRENT APPLICATION? ENCODING SCHEME EQUALCHAR? (dbs_string_constant | dbs_host_variable);
+//SET CURRENT DEBUG MODE
+dbs_set_current_debug_mode: CURRENT DEBUG MODE APPLICATION? (dbs_host_variable | DISALLOW | ALLOW | DISABLE);
+//SET CURRENT DECFLOAT ROUNDING MODE
+dbs_set_decfloat_round_mode: CURRENT DECFLOAT ROUNDING MODE EQUALCHAR? (dbs_rounding_mode | dbs_string_constant | dbs_host_variable);
+dbs_rounding_mode: ROUND_CEILING | ROUND_DOWN | ROUND_FLOOR | ROUND_HALF_DOWN | ROUND_HALF_EVEN | ROUND_HALF_UP | ROUND_UP;
+//SET CURRENT DEGREE
+dbs_set_current_degree: CURRENT DEGREE EQUALCHAR? (dbs_string_constant | dbs_host_variable);
+//SET CURRENT EXPLAIN MODE
+dbs_set_current_explain_mode: CURRENT EXPLAIN MODE EQUALCHAR? dbs_mod_opts;
+dbs_mod_opts: (NO | YES | EXPLAIN | dbs_host_variable);
+//SET CURRENT GET_ACCEL_ARCHIVE
+dbs_set_current_get_accel_archive: CURRENT GET_ACCEL_ARCHIVE EQUALCHAR? dbs_mod_opts;
+//SET CURRENT LOCALE LC_TYPE
+dbs_set_current_local_ctype: (CURRENT LOCALE? LC_CTYPE | CURRENT_LC_CTYPE) EQUALCHAR? (dbs_string_constant | dbs_host_variable);
+//SET CURRENT MAINTAINED TABLE TYPES FOR OPTIMIZATION
+dbs_set_current_maintained_table_type_optmz: CURRENT MAINTAINED TABLE? TYPES (FOR OPTIMIZATION)? EQUALCHAR? (ALL | NONE | SYSTEM | USER | dbs_host_variable);
+//SET CURRENT OPTIMIZATION HINT
+dbs_set_current_optmz_hint: CURRENT OPTIMIZATION HINT EQUALCHAR? (dbs_string_constant | dbs_host_variable);
+//SET CURRENT PACKAGE PATH
+dbs_set_current_pckg_path: CURRENT PACKAGE PATH EQUALCHAR? pckg_path_opts_loop;
+pckg_path_opts: (dbs_collection_id | (SESSION_USER | USER) | CURRENT PACKAGE PATH | CURRENT PATH | dbs_host_variable | dbs_string_constant);
+pckg_path_opts_loop: pckg_path_opts (COMMACHAR pckg_path_opts)*;
+//SET CURRENT PACKAGE SET
+dbs_set_current_pckg_set: CURRENT PACKAGESET EQUALCHAR? ((SESSION_USER | USER) | dbs_string_constant | dbs_host_variable);
+//SET CURRENT PRECISION
+dbs_set_current_precision:  CURRENT PRECISION EQUALCHAR? (dbs_string_constant | dbs_host_variable);
+//SET CURRENT QUERY ACCELERATION
+dbs_set_current_query_accel: CURRENT QUERY ACCELERATION EQUALCHAR? (NONE | ENABLE | ENABLE WITH FAILBACK | ELIGIBLE | ALL | dbs_host_variable);
+//SET CURRENT QUERY ACCELARATION WAITFORDATA
+dbs_set_current_query_accel_wfdata: CURRENT QUERY ACCELERATION WAITFORDATA EQUALCHAR? (dbs_decimal_const | dbs_variable);
+//SET CURRENT REFRESH AGE
+dbs_set_current_refresh_age: CURRENT REFRESH AGE EQUALCHAR? (dbs_numeric_constant | ANY | dbs_host_variable);
+//SET CURRENT ROUTINE VERSION
+dbs_set_current_routine_version: CURRENT ROUTINE VERSION EQUALCHAR? (dbs_routine_version_id | dbs_host_variable | dbs_string_constant);
+//SET CURRENT RULES
+dbs_set_current_rules: CURRENT RULES EQUALCHAR? (dbs_string_constant | dbs_host_variable);
+//SET CURRENT SQLID
+dbs_set_current_sqlid: CURRENT SQLID EQUALCHAR? ( (SESSION_USER | USER) dbs_string_constant | dbs_host_variable);
+//SET CURRENT TEMPORAL BUSINESS_TIME
+dbs_set_current_temp_business_time: CURRENT TEMPORAL BUSINESS_TIME EQUALCHAR? (NULL | dbs_expression);
+//SET CURRENT TEMPORAL SYSTEM_TIME
+dbs_set_current_temp_system_time: CURRENT TEMPORAL SYSTEM_TIME EQUALCHAR? (NULL | dbs_expression);
+//SET CURRENT ENCRIPTION PASSWORD
+dbs_set_current_enc_pwd: ENCRYPTION PASSWORD EQUALCHAR? (dbs_password_variable | dbs_password_string_constant) (WITH HINT EQUALCHAR? (dbs_hint_variable | dbs_hint_string_constant))?;
+//SET PATH
+dbs_set_path: (CURRENT)? PATH EQUALCHAR? set_path_opts_loop;
+set_path_opts: (dbs_schema_name | SYSTEM PATH | (SESSION_USER | USER) | CURRENT? PATH | CURRENT PACKAGE PATH | dbs_host_variable | dbs_string_constant);
+set_path_opts_loop: set_path_opts (COMMACHAR set_path_opts)*;
+//SET SCHEMA
+dbs_set_schema: (CURRENT? SCHEMA | CURRENT_SCHEMA) EQUALCHAR? (dbs_schema_name | (SESSION_USER | USER) | dbs_host_variable | dbs_string_constant | DEFAULT);
+//SET SESSION TIME ZONE
+dbs_set_session_tz : SESSION? TIME ZONE EQUALCHAR? (dbs_string_constant | dbs_variable);
 
 /*SIGNAL - this is a statement and is referenced in other rules*/
 dbs_signal: dbs_label? SIGNAL (dbs_sql_condition_name | SQLSTATE VALUE? (dbs_sqlstate_string_constant | dbs_sql_variable_name |
@@ -1242,6 +1312,7 @@ dbs_applcompat_value: FUNCTION_LEVEL_10 | FUNCTION_LEVEL_11 | FUNCTION_LEVEL_12;
 dbs_array_index: INTEGER;
 dbs_array_type_name: SQL_IDENTIFIER;
 dbs_array_variable: SQL_IDENTIFIER; //? symentic analysis should see that this is of type array.
+dbs_array_variable_name: all_words+; //?;
 dbs_attr_host_variable: HOSTNAME_IDENTIFIER | NUMERICLITERAL ; // VARCHAR(128)
 dbs_authorization_name: SQL_IDENTIFIER;
 dbs_authorization_specification: all_words+; //?
@@ -1268,6 +1339,7 @@ dbs_context_name: SQL_IDENTIFIER;//?
 dbs_copy_id: CURRENT | PREVIOUS | ORIGINAL; //
 dbs_correlation_name: SQL_IDENTIFIER;
 dbs_cursor_name: SQL_IDENTIFIER;
+dbs_decimal_const: all_words+; //? nnnn.m
 dbs_database_name: SQL_IDENTIFIER; //?
 dbs_dc_name: SQL_IDENTIFIER;// lenght must be < 9
 dbs_descriptor_name: SQLD | SQLDABC | SQLN | SQLVAR; //SQLDA
@@ -1284,6 +1356,8 @@ dbs_ext_program_name: SQL_IDENTIFIER;//If LANGUAGE is JAVA
 dbs_external_program_name: ALPHANUMERIC_TEXT; //?
 //REF: https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_fetchclause.html
 // ?? Should we support LIMIT?
+dbs_hint_variable:  all_words+;
+dbs_hint_string_constant:  all_words+;
 dbs_fetch_clause: FETCH (FIRST | NEXT) POSITIVEINTEGERLITERAL? (ROW | ROWS) ONLY;
 dbs_field_name: SQL_IDENTIFIER;
 dbs_function_name: SQL_IDENTIFIER; //must not be any of the following system-reserved keywords
@@ -1321,6 +1395,8 @@ dbs_session_variable : SYSIBM DOT PACKAGE_NAME | SYSIBM DOT PACKAGE_SCHEMA | SYS
 dbs_numeric_constant: NUMERICLITERAL;// numeric literal without non-zero digits to the right of the decimal point.
 dbs_obfuscated_statement_text: all_words+ ; //encoded statement, can have all words but meaning would change.
 dbs_package_name: HOSTNAME_IDENTIFIER | STRINGLITERAL; //
+dbs_password_variable: all_words+; //?
+dbs_password_string_constant: all_words+; //?
 dbs_package_path: FILENAME+; //If package-path contains SESSION_USER (or USER), PATH, or PACKAGE PATH
 dbs_pageset_pagenum_param: ABSOLUTE | '\'' A '\'' | RELATIVE | '\'' R '\''; //  PAGESET_PAGENUM subsystem parameter specifies the default value.
 dbs_parameter_marker: ( QUESTIONMARK | COLONCHAR dbs_variable);
