@@ -15,6 +15,7 @@
 
 package com.broadcom.lsp.cobol.core.model.variables;
 
+import com.broadcom.lsp.cobol.core.model.Locality;
 import lombok.NonNull;
 
 import java.util.ArrayList;
@@ -26,11 +27,12 @@ import static java.util.Collections.unmodifiableList;
  * This interface represents a structured variable that may contain children ones. The children may
  * be variables or also structures.
  */
-public abstract class StructuredVariable implements Variable {
+public abstract class StructuredVariable extends AbstractVariable {
   private List<Variable> children = new ArrayList<>();
   int levelNumber;
 
-  StructuredVariable(int levelNumber) {
+  StructuredVariable(String name, String qualifier, Locality definition, int levelNumber) {
+    super(name, qualifier, definition);
     this.levelNumber = levelNumber;
   }
 

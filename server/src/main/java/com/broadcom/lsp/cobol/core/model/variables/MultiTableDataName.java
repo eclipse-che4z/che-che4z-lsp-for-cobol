@@ -29,9 +29,6 @@ import java.util.List;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class MultiTableDataName extends StructuredVariable implements TableDeclaration {
-  private String name;
-  private String qualifier;
-  private Locality definition;
   private int occursTimes;
   private List<IndexItem> indexes;
 
@@ -42,10 +39,7 @@ public class MultiTableDataName extends StructuredVariable implements TableDecla
       Locality definition,
       int occursTimes,
       List<IndexItem> indexes) {
-    super(number);
-    this.name = name;
-    this.qualifier = qualifier;
-    this.definition = definition;
+    super(name, qualifier, definition, number);
     this.occursTimes = occursTimes;
     this.indexes = indexes;
   }

@@ -28,15 +28,9 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class GroupItem extends StructuredVariable {
-  private String name;
-  private String qualifier;
-  private Locality definition;
 
   public GroupItem(int number, String name, String qualifier, Locality definition) {
-    super(number);
-    this.name = name;
-    this.qualifier = qualifier;
-    this.definition = definition;
+    super(name, qualifier, definition, number);
   }
 
   @Override

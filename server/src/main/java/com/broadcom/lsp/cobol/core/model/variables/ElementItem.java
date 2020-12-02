@@ -17,6 +17,8 @@ package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.Value;
 
 import java.util.ArrayList;
@@ -29,13 +31,18 @@ import java.util.List;
  * levels for this element are 01-49.
  */
 @Value
-public class ElementItem implements Variable {
-  private String name;
-  private String qualifier;
-  private Locality definition;
+@EqualsAndHashCode(callSuper = true)
+public class ElementItem extends AbstractVariable {
   private String picClause;
   private String value;
-  private List<ConditionalDataName> conditionalDataNames = new ArrayList<>();
+  @Getter private List<ConditionalDataName> conditionalDataNames = new ArrayList<>();
+
+  public ElementItem(
+      String name, String qualifier, Locality definition, String picClause, String value) {
+    super(name, qualifier, definition);
+    this.picClause = picClause;
+    this.value = value;
+  }
 
   /**
    * Add a nested {@link ConditionalDataName} item (level 88) for this {@link ElementItem}

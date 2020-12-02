@@ -17,20 +17,34 @@ package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 import java.util.List;
 
 /** This value class represents the Table variable that may have an optional index */
 @Value
-public class TableDataName implements Variable, TableDeclaration {
-  private String name;
-  private String qualifier;
-  private Locality definition;
+@EqualsAndHashCode(callSuper = true)
+public class TableDataName extends AbstractVariable implements TableDeclaration {
   private String picClause;
   private String value;
   private int occursTimes;
   private List<IndexItem> indexes;
+
+  public TableDataName(
+      String name,
+      String qualifier,
+      Locality definition,
+      String picClause,
+      String value,
+      int occursTimes,
+      List<IndexItem> indexes) {
+    super(name, qualifier, definition);
+    this.picClause = picClause;
+    this.value = value;
+    this.occursTimes = occursTimes;
+    this.indexes = indexes;
+  }
 
   @Override
   public Variable rename(String renameItemName) {
@@ -43,6 +57,7 @@ public class TableDataName implements Variable, TableDeclaration {
         occursTimes,
         indexes);
   }
+
   @Override
   public boolean isRenameable() {
     return false;

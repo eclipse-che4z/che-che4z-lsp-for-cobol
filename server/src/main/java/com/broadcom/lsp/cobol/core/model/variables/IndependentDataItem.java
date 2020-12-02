@@ -17,6 +17,7 @@ package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
@@ -25,12 +26,17 @@ import lombok.Value;
  * explicitly defined value; both as Strings. They cannot produce a structure in any way.
  */
 @Value
-public class IndependentDataItem implements Variable {
-  private String name;
-  private String qualifier;
-  private Locality definition;
+@EqualsAndHashCode(callSuper = true)
+public class IndependentDataItem extends AbstractVariable {
   private String picClause;
   private String value;
+
+  public IndependentDataItem(
+      String name, String qualifier, Locality definition, String picClause, String value) {
+    super(name, qualifier, definition);
+    this.picClause = picClause;
+    this.value = value;
+  }
 
   @Override
   public Variable rename(String renameItemName) {
@@ -41,6 +47,7 @@ public class IndependentDataItem implements Variable {
         picClause,
         value);
   }
+
   @Override
   public boolean isRenameable() {
     return false;

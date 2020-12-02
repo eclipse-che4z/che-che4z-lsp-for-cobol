@@ -33,19 +33,13 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class RenameItem extends StructuredVariable {
   private static final int LEVEL_NUMBER = 66;
-  private String name;
-  private String qualifier;
-  private Locality definition;
 
   public RenameItem(
       @NonNull String name,
       @NonNull String qualifier,
       @NonNull Locality definition,
       @NonNull List<Variable> renamedChildren) {
-    super(LEVEL_NUMBER);
-    this.name = name;
-    this.qualifier = qualifier;
-    this.definition = definition;
+    super(name, qualifier, definition, LEVEL_NUMBER);
     renamedChildren.forEach(this::addChild);
   }
 
