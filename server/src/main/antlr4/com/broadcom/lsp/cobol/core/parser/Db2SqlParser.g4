@@ -261,7 +261,7 @@ dbs_create_aux_table: (AUXILIARY | AUX) TABLE dbs_table_name IN dbs_database_nam
 //CREATE DB
 dbs_create_db: DATABASE (BUFFERPOOL dbs_bp_name | INDEXBP dbs_bp_name | AS WORKFILE (FOR dbs_member_name)? | STOGROUP (SYSDEFLT | dbs_stogroup_name) | CCSID oneof_encoding)*;//1 same clause must not be specified more than one time
 //CREATE FUNCTION (ALL)
-dbs_create_function: FUNCTION dbs_function_name LPARENCHAR (dbs_create_function_compiled_scalar | dbs_create_function_ext_scalar | dbs_create_function_ext_table | dbs_create_function_inline_scalar | dbs_create_function_sourced | dbs_create_function_sql_table | );
+dbs_create_function: FUNCTION dbs_function_name LPARENCHAR (dbs_create_function_compiled_scalar | dbs_create_function_ext_scalar | dbs_create_function_ext_table | dbs_create_function_inline_scalar | dbs_create_function_sourced | dbs_create_function_sql_table);
 //CREATE COMPILED SQL SCALAR FUNCTION
 dbs_create_function_compiled_scalar: (dbs_create_function_param_decl
         (COMMACHAR dbs_create_function_param_decl)*)? RPARENCHAR (dbs_create_function_func_def | WRAPPED dbs_obfuscated_statement_text);
