@@ -1346,7 +1346,7 @@ dbs_descriptor_name: SQLD | SQLDABC | SQLN | SQLVAR; //SQLDA
 dbs_diagnostic_string_expression: STRINGLITERAL; //?
 dbs_distinct_type: db2sql_data_types+;
 dbs_distinct_type_name: SQL_IDENTIFIER;
-dbs_dpsegsz_param: all_words+;//DPSEGSZ value, divisible by 4
+dbs_dpsegsz_param: all_words+;// TODO DPSEGSZ value, divisible by 4
 dbs_end_column_name: dbs_generic_name;//?defined as AS ROW END
 dbs_element_name: ALPHANUMERIC_TEXT;//
 dbs_encryption_value: NONE | LOW | HIGH;//
@@ -1360,7 +1360,7 @@ dbs_hint_variable:  all_words+;
 dbs_hint_string_constant:  all_words+;
 dbs_fetch_clause: FETCH (FIRST | NEXT) POSITIVEINTEGERLITERAL? (ROW | ROWS) ONLY;
 dbs_field_name: SQL_IDENTIFIER;
-dbs_function_name: SQL_IDENTIFIER; //must not be any of the following system-reserved keywords
+dbs_function_name: SQL_IDENTIFIER; //must not be any of the  system-reserved keywords
 dbs_global_variable_name: dbs_generic_name; //?
 dbs_graphic_string_constant: GRAPHICUNICODE | GRAHICCHAR;
 dbs_history_table_name: dbs_table_name;//?
@@ -1376,7 +1376,7 @@ dbs_index_identifier: ALPHANUMERIC_TEXT; //?
 dbs_index_name: SQL_IDENTIFIER;
 dbs_integer: INTEGER;
 dbs_integer_constant: INTEGERLITERAL; //range 1 - 32767
-dbs_jar_name: all_words+; //?
+dbs_jar_name: all_words+; //? TODO
 dbs_jobname_value: ALPHANUMERIC_TEXT;//?
 dbs_key_label_name: ALPHANUMERIC_TEXT;//?
 dbs_length: DIGIT+; //length must be between 1 and 32767. The default value is 100 bytes.
@@ -1393,7 +1393,7 @@ dbs_nnnn_m: DIGIT DIGIT? DIGIT? DIGIT? DOT DIGIT; //?
 dbs_non_deterministic_expression: DATA CHANGE OPERATION | dbs_special_register | dbs_session_variable;
 dbs_session_variable : SYSIBM DOT PACKAGE_NAME | SYSIBM DOT PACKAGE_SCHEMA | SYSIBM DOT PACKAGE_VERSION;
 dbs_numeric_constant: NUMERICLITERAL;// numeric literal without non-zero digits to the right of the decimal point.
-dbs_obfuscated_statement_text: all_words+ ; //encoded statement, can have all words but meaning would change.
+dbs_obfuscated_statement_text: all_words+ ; // CONFUSING encoded statement, can have all words but meaning would change.
 dbs_package_name: HOSTNAME_IDENTIFIER | STRINGLITERAL; //
 dbs_password_variable: all_words+; //?
 dbs_password_string_constant: all_words+; //?
@@ -1430,12 +1430,12 @@ dbs_sql_condition_name: dbs_generic_name; // No particular spec found in doc. Sp
 dbs_sql_control_statement: dbs_control_statement; //
 dbs_sql_parameter_name: dbs_generic_name; //
 dbs_sql_routine_body: all_words+;// TODO: SQL-routine-body to be defined once all other statements are done
-dbs_sql_variable_name: dbs_generic_name; //?
-dbs_sqlstate_string_constant: STRINGLITERAL; //?
+dbs_sql_variable_name: dbs_generic_name; //
+dbs_sqlstate_string_constant: STRINGLITERAL; //? TODO: CHECK
 dbs_statement_name: dbs_generic_name; // TODO : Can't find much but seems a generic name should satify the need.
 dbs_stogroup_name: SQL_IDENTIFIER;
 dbs_string_constant: dbs_binary_string_constant | dbs_character_string_constant | dbs_graphic_string_constant;
-dbs_string_expression: all_words+; // string-expression is only supported for PLI. Some info on(but not much help) https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_prepare.html
+dbs_string_expression: all_words+; // TODO string-expression is only supported for PLI. Some info on(but not much help) https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_prepare.html
 dbs_synonym: SQL_IDENTIFIER; //
 dbs_table_identifier: SQL_IDENTIFIER; //
 dbs_table_name: SQL_IDENTIFIER;
@@ -1448,8 +1448,8 @@ dbs_transition_variable_name: dbs_generic_name; //
 dbs_trigger_name: SQL_IDENTIFIER;
 dbs_trigger_version_id: SQL_IDENTIFIER;// up to 64 EBCDIC bytes. Ref- https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_namingconventions.html
 dbs_triggered_sql_statement: all_words+;// TODO : A lot to read. https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sqlplnativeintro.html /https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_altertriggeradvanced.html
-dbs_triggered_sql_statement_adv: all_words+;//?;
-dbs_triggered_sql_statement_basic: all_words+;//?; https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_createtrigger.html
+dbs_triggered_sql_statement_adv: all_words+;//? TODO;
+dbs_triggered_sql_statement_basic: all_words+;//?; TODO https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_createtrigger.html
 dbs_type_name: ALPHANUMERIC_TEXT;
 dbs_value: db2sql_data_value;
 dbs_variable : ( dbs_host_variable | dbs_transition_variable_name | dbs_sql_variable_name | dbs_global_variable_name );
