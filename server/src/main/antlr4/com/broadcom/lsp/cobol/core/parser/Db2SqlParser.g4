@@ -637,7 +637,7 @@ dbs_grant_system: db2sql_system_privileges (COMMACHAR db2sql_system_privileges)*
 dbs_grant_table: (ALL PRIVILEGES? | db2sql_table_view_privileges (COMMACHAR db2sql_table_view_privileges)*) ON TABLE? (dbs_table_name | dbs_view_name) (COMMACHAR (dbs_table_name | dbs_view_name))* TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
 dbs_grant_type: USAGE ON (TYPE dbs_type_name (COMMACHAR dbs_type_name)* | JAR dbs_jar_name (COMMACHAR dbs_jar_name)*) TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
 dbs_grant_variable: (ALL PRIVILEGES? | (READ|WRITE) (COMMACHAR (READ|WRITE))*) ON VARIABLE dbs_variable_name TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
-dbs_grant_use: USE OF (BUFFERPOOL dbs_bpname (COMMACHAR dbs_bpname)* | ALL BUFFERPOOLS | STOGROUP dbs_stogroup_name (COMMACHAR dbs_stogroup_name)* | TABLESPACE (dbs_database_name DOT)? dbs_table_space_name (COMMACHAR (dbs_database_name DOT)? dbs_table_space_name)*) (WITH GRANT OPTION)?;
+dbs_grant_use: USE OF (BUFFERPOOL dbs_bp_name  (COMMACHAR dbs_bp_name)* | ALL BUFFERPOOLS | STOGROUP dbs_stogroup_name (COMMACHAR dbs_stogroup_name)* | TABLESPACE (dbs_database_name DOT)? dbs_table_space_name (COMMACHAR (dbs_database_name DOT)? dbs_table_space_name)*) (WITH GRANT OPTION)?;
 
 
 /*HOLD LOCATOR */
