@@ -246,63 +246,62 @@ dbs_connect: CONNECT (TO (dbs_location_name | dbs_host_variable) dbs_connect_aut
 dbs_connect_authorization: USER dbs_host_variable USING dbs_host_variable;
 
 /*CREATE (all) */
-dbs_create: dbs_create_alias | dbs_create_aux_table | dbs_create_db | dbs_create_function_compiled_scalar | dbs_create_function_ext_scalar |
-            dbs_create_function_ext_table | dbs_create_function_inline_scalar | dbs_create_function_sourced |
-            dbs_create_function_sql_table | dbs_create_global_temp_table | dbs_create_index | dbs_create_lob_tablespace | dbs_create_mask |
+dbs_create: CREATE (dbs_create_alias | dbs_create_aux_table | dbs_create_db | dbs_create_function | dbs_create_global_temp_table | dbs_create_index | dbs_create_lob_tablespace | dbs_create_mask |
             dbs_create_permission |  dbs_create_procedure_ext | dbs_create_procedure_native_sql | dbs_create_role |
             dbs_create_sequence | dbs_create_stogroup | dbs_create_table | dbs_create_tablespace | dbs_create_trigger_advanced |
             dbs_create_trigger_basic | dbs_create_trusted_context | dbs_create_type_array | dbs_create_type_distinct |
-            dbs_create_variable | dbs_create_view;
+            dbs_create_variable | dbs_create_view);
 //CREATE ALIAS
-dbs_create_alias: CREATE PUBLIC? ALIAS (table_alias | sequence_alias);
+dbs_create_alias: PUBLIC? ALIAS (table_alias | sequence_alias);
 table_alias: dbs_alias_name FOR TABLE? (dbs_table_name | dbs_view_name | dbs_alias_name2);
 sequence_alias: dbs_alias_name FOR SEQUENCE dbs_sequence_name;
 //CREATE AUX TABLE
-dbs_create_aux_table: CREATE (AUXILIARY | AUX) TABLE dbs_table_name IN dbs_database_name? dbs_table_space_name
+dbs_create_aux_table: (AUXILIARY | AUX) TABLE dbs_table_name IN dbs_database_name? dbs_table_space_name
                     STORIES dbs_table_name (APPEND NO | (APPEND YES)? )? COLUMN dbs_column_name (PART dbs_integer)?;
 //CREATE DB
-dbs_create_db: CREATE DATABASE (BUFFERPOOL dbs_bp_name | INDEXBP dbs_bp_name | AS WORKFILE (FOR dbs_member_name)? | STOGROUP (SYSDEFLT | dbs_stogroup_name) | CCSID oneof_encoding)*;//1 same clause must not be specified more than one time
+dbs_create_db: DATABASE (BUFFERPOOL dbs_bp_name | INDEXBP dbs_bp_name | AS WORKFILE (FOR dbs_member_name)? | STOGROUP (SYSDEFLT | dbs_stogroup_name) | CCSID oneof_encoding)*;//1 same clause must not be specified more than one time
+//CREATE FUNCTION (ALL)
+dbs_create_function: FUNCTION dbs_function_name LPARENCHAR (dbs_create_function_compiled_scalar | dbs_create_function_ext_scalar | dbs_create_function_ext_table | dbs_create_function_inline_scalar | dbs_create_function_sourced | dbs_create_function_sql_table | );
 //CREATE COMPILED SQL SCALAR FUNCTION
-dbs_create_function: CREATE FUNCTION;
-dbs_create_function_compiled_scalar: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_param_decl
+dbs_create_function_compiled_scalar: (dbs_create_function_param_decl
         (COMMACHAR dbs_create_function_param_decl)*)? RPARENCHAR (dbs_create_function_func_def | WRAPPED dbs_obfuscated_statement_text);
 dbs_create_function_param_decl: dbs_parameter_name dbs_create_function_param_type;
 dbs_create_function_param_type: data_type | (TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR);
 dbs_create_function_func_def: RETURNS common_built_in_type (VERSION V1 | VERSION dbs_routine_version_id)? dbs_option_list? dbs_control_statement;//AS LOCATOR can be specified only for a LOB
 //CREATE EXTERNAL SQL SCALAR FUNCTION
-dbs_create_function_ext_scalar: dbs_create_function dbs_function_name LPARENCHAR (function_param_decl (COMMACHAR function_param_decl)*)? RPARENCHAR
+dbs_create_function_ext_scalar: (function_param_decl (COMMACHAR function_param_decl)*)? RPARENCHAR
                             RETURNS (common_built_in_type_core5 (AS LOCATOR)?  | common_built_in_type_core5 CAST FROM common_built_in_type_core5 (AS LOCATOR)?) dbs_option_list_ext;
 function_param_decl: dbs_parameter_name? (ext_data_type (AS LOCATOR)? | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR);
 ext_data_type: common_built_in_type_core5 | dbs_distinct_type_name;
 //CREATE EXTERNAL TABLE FUNCTION
-dbs_create_function_ext_table: dbs_create_function dbs_function_name LPARENCHAR (function_param_decl (COMMACHAR function_param_decl)*)? RPARENCHAR
+dbs_create_function_ext_table: (function_param_decl (COMMACHAR function_param_decl)*)? RPARENCHAR
                             RETURNS (dbs_create_function_ext_table_desc  | GENERIC TABLE) dbs_option_list_ext_table;
 dbs_create_function_ext_table_desc: TABLE LPARENCHAR dbs_create_function_ext_table_body  (COMMACHAR  dbs_create_function_ext_table_body)* RPARENCHAR;
 dbs_create_function_ext_table_body: dbs_column_name common_built_in_type (AS LOCATOR)?;
 //CREATE INLINE SQL SCALAR FUNCTION
-dbs_create_function_inline_scalar: dbs_create_function dbs_function_name LPARENCHAR (function_param_decl (COMMACHAR function_param_decl)*)? RPARENCHAR
+dbs_create_function_inline_scalar: (function_param_decl (COMMACHAR function_param_decl)*)? RPARENCHAR
                                  (dbs_create_function_func_inl_def | WRAPPED dbs_obfuscated_statement_text);
 dbs_create_function_func_inl_def: RETURNS common_built_in_type (LANGUAGE SQL)? dbs_option_list_inl_def dbs_create_function_func_inl_sql_routine;
 dbs_create_function_func_inl_sql_routine: RETRUN dbs_control_statement;//TODO
 //CREATE SOURCED FUNCTION
-dbs_create_function_sourced: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_sourced_param_decl (COMMACHAR dbs_create_function_sourced_param_decl)*)? RPARENCHAR
+dbs_create_function_sourced: (dbs_create_function_sourced_param_decl (COMMACHAR dbs_create_function_sourced_param_decl)*)? RPARENCHAR
                              RETURNS common_built_in_type (AS LOCATOR)? (SPECIFIC dbs_specific_name)? (PARAMETER CCSID oneof_encoding)
                              (SOURCE ( dbs_function_name (dbs_create_function_sourced_param_type (COMMACHAR dbs_create_function_sourced_param_type)*)?  | SPECIFIC dbs_specific_name));
 dbs_create_function_sourced_param_decl: (dbs_parameter_name)? dbs_create_function_sourced_param_type;
 dbs_create_function_sourced_param_type: (common_built_in_type | dbs_distinct_type_name) (AS LOCATOR)?  | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR;
 //CREATE FUNCTION - SQL TABLE
-dbs_create_function_sql_table: dbs_create_function dbs_function_name LPARENCHAR (dbs_create_function_sql_table_param_decl (COMMACHAR dbs_create_function_sql_table_param_decl)*)? RPARENCHAR
+dbs_create_function_sql_table: (dbs_create_function_sql_table_param_decl (COMMACHAR dbs_create_function_sql_table_param_decl)*)? RPARENCHAR
                                                              (dbs_create_function_sql_func_def | WRAPPED dbs_obfuscated_statement_text);
 dbs_create_function_sql_table_param_decl: (dbs_parameter_name)? dbs_create_function_sql_table_param_type;
 dbs_create_function_sql_table_param_type: (common_built_in_type | dbs_distinct_type_name)  | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR;
 dbs_create_function_sql_func_def: RETURNS TABLE LPARENCHAR  dbs_column_name common_built_in_type (COMMACHAR dbs_column_name common_built_in_type)* RPARENCHAR dbs_option_list_inl_def dbs_create_function_func_sql_routine;
 dbs_create_function_func_sql_routine: RETRUN dbs_control_statement | BEGIN ATOMIC RETURN dbs_control_statement END;//TODO
 //CREATE GLOBAL TEMP TABLE
-dbs_create_global_temp_table: CREATE GLOBAL TEMPORARY TABLE  dbs_table_name LPARENCHAR (dbs_create_global_temp_table_col_def (COMMACHAR dbs_create_global_temp_table_col_def)*) RPARENCHAR | LIKE (dbs_table_name | dbs_view_name)
+dbs_create_global_temp_table: GLOBAL TEMPORARY TABLE  dbs_table_name LPARENCHAR (dbs_create_global_temp_table_col_def (COMMACHAR dbs_create_global_temp_table_col_def)*) RPARENCHAR | LIKE (dbs_table_name | dbs_view_name)
                                 (CCSID oneof_encoding)?;
 dbs_create_global_temp_table_col_def: dbs_column_name  common_built_in_type (NOT NULL);//common_built_in_type2
 //CREATE INDEX
-dbs_create_index: CREATE (UNIQUE (WHERE NOT NULL)?)? INDEX dbs_index_name ON (dbs_create_index_table_def | dbs_aux_table_name)  dbs_create_index_table_other_opt;
+dbs_create_index: (UNIQUE (WHERE NOT NULL)?)? INDEX dbs_index_name ON (dbs_create_index_table_def | dbs_aux_table_name)  dbs_create_index_table_other_opt;
 dbs_create_index_table_def: dbs_table_name LPARENCHAR dbs_create_index_table_def_body (COMMACHAR dbs_create_index_table_def_body)* (COMMACHAR BUSINESS_TIME  (WITHOUT | WITH) OVERLAPS ) RPARENCHAR;
 dbs_create_index_table_def_body: (dbs_column_name | dbs_expression) (ASC | DESC | RANDOM);
 dbs_create_index_table_other_opt: xml_index_specification? (INCLUDE dbs_column_name LPARENCHAR (COMMACHAR dbs_column_name)* RPARENCHAR) other_opt_part1 other_opt_part2 other_opt_part3;
@@ -321,38 +320,38 @@ partition_element: PARTITION INTEGER (ENDING AT? partition_element_loop (INCLUSI
 partition_element_loop:  LPARENCHAR const_options (COMMACHAR const_options)*  RPARENCHAR;
 const_options: dbs_string_constant | MAXVALUE | MINVALUE;
 //CREATE LOB TABLESPACE
-dbs_create_lob_tablespace: CREATE LOB TABLESPACE dbs_table_space_name dbs_create_lob_tablespace_def*;
+dbs_create_lob_tablespace: LOB TABLESPACE dbs_table_space_name dbs_create_lob_tablespace_def*;
 dbs_create_lob_tablespace_def: IN (DSNDB04 | dbs_database_name) (BUFFERPOOL dbs_bp_name)? CLOSE yes_or_no COMPRESS yes_or_no | DEFINE yes_or_no DSSIZE (NUMBER_4 G | INTEGER G) gbpcache_block?
                             LOCKMAX (SYSTEM | INTEGER) locksize_block?  NOT? LOGGED using_block?;
 gbpcache_block: GBPCACHE (CHANGED | ALL | SYSTEM | NONE);
 locksize_block: (LOCKSIZE (ANY | LOB))?;
 using_block: USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name (PRIQTY INTEGER | SECQTY INTEGER | ERASE yes_or_no?)*);
 //CREATE MASK
-dbs_create_mask: CREATE MASK dbs_mask_name ON dbs_table_name ((AS)? dbs_correlation_name)? FOR COLUMN dbs_column_name RETURN dbs_case_expression (DISABLE | ENABLE);
+dbs_create_mask: MASK dbs_mask_name ON dbs_table_name ((AS)? dbs_correlation_name)? FOR COLUMN dbs_column_name RETURN dbs_case_expression (DISABLE | ENABLE);
 //CREATE PERMISSION
-dbs_create_permission: CREATE PERMISSION dbs_permission_name ON dbs_table_name ((AS)? dbs_correlation_name)? FOR ROWS WHERE dbs_search_condition ENFORCED FOR ALL ACCESS  (DISABLE | ENABLE);
+dbs_create_permission: PERMISSION dbs_permission_name ON dbs_table_name ((AS)? dbs_correlation_name)? FOR ROWS WHERE dbs_search_condition ENFORCED FOR ALL ACCESS  (DISABLE | ENABLE);
 //CREATE PERMISSION - EXTTERNAL
-dbs_create_procedure_ext: CREATE (OR REPLCAE)? dbs_procedure_name  (LPARENCHAR dbs_create_procedure_ext_pdecl (COMMACHAR dbs_create_procedure_ext_pdecl)* RPARENCHAR)? dbs_option_list_proc_ext;
+dbs_create_procedure_ext: (OR REPLACE)? dbs_procedure_name  (LPARENCHAR dbs_create_procedure_ext_pdecl (COMMACHAR dbs_create_procedure_ext_pdecl)* RPARENCHAR)? dbs_option_list_proc_ext;
 dbs_create_procedure_ext_pdecl: (IN OUT INOUT)? (dbs_parameter_name)? dbs_create_procedure_ext_ptype;
 dbs_create_procedure_ext_ptype:  (common_built_in_type | dbs_distinct_type_name) (AS LOCATOR)?  | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR; //built-in-type change
 //CREATE PERMISSION - NATIVE
-dbs_create_procedure_native_sql: CREATE (OR REPLCAE)? PROCEDURE dbs_procedure_name  (LPARENCHAR dbs_create_procedure_native_pdecl (COMMACHAR dbs_create_procedure_native_pdecl)* RPARENCHAR)? procedure_def | WRAPPED dbs_obfuscated_statement_text;
+dbs_create_procedure_native_sql: (OR REPLACE)? PROCEDURE dbs_procedure_name  (LPARENCHAR dbs_create_procedure_native_pdecl (COMMACHAR dbs_create_procedure_native_pdecl)* RPARENCHAR)? procedure_def | WRAPPED dbs_obfuscated_statement_text;
 dbs_create_procedure_native_pdecl: (IN OUT INOUT)? (dbs_parameter_name) dbs_create_procedure_native_ptype;
 dbs_create_procedure_native_ptype: data_type  | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR;//built-in-type change
 procedure_def: (VERSION (V1 | dbs_routine_version_id))?  dbs_option_list_proc_native dbs_sql_routine_body; //check SQL routine if finished
 //CREATE ROLE
-dbs_create_role: CREATE ROLE dbs_role_name;
+dbs_create_role: ROLE dbs_role_name;
 //CREATE SEQUENCE
-dbs_create_sequence: CREATE SEQUENCE dbs_sequence_name dbs_create_sequence_body*;
+dbs_create_sequence: SEQUENCE dbs_sequence_name dbs_create_sequence_body*;
 dbs_create_sequence_body: AS (INTEGER | dbs_distinct_type_name | common_bit_int | common_bit_decimal) START WITH dbs_numeric_constant INCREMENT BY (NUMBER_1 | dbs_numeric_constant)
                 NO? MINVALUE dbs_numeric_constant | NO MAXVALUE | MAXVALUE dbs_numeric_constant NO? CYCLE | CACHE (NUMBER_20 | dbs_integer_constant) | NO CACHE | NO? ORDER;
 //CREATE STOGROUP
-dbs_create_stogroup: CREATE STOGROUP dbs_stogroup_name (VOLUMES LPARENCHAR dbs_volume_loop RPARENCHAR)? VCAT dbs_volume_cat;
+dbs_create_stogroup: STOGROUP dbs_stogroup_name (VOLUMES LPARENCHAR dbs_volume_loop RPARENCHAR)? VCAT dbs_volume_cat;
 dbs_volume_loop:  dbs_volume_loop (COMMACHAR dbs_volume_loop)+ | ASTERISKCHAR (COMMACHAR ASTERISKCHAR)+;
 dbs_volume_cat: dbs_catalog_name (DATACLAS dbs_dc_name)? (MGMTCLAS dbs_mc_name)? (STORCLAS dbs_sc_name)? (NO? KEY LABEL dbs_key_label_name?)?;
 //CREATE SYNONYM deprecated, use CREATE ALIAS
 //CREATE TABLE
-dbs_create_table: CREATE TABLE dbs_table_name (dbs_create_table_elements_def (COMMACHAR dbs_create_table_elements_def)* RPARENCHAR | LIKE (dbs_table_name | dbs_view_name) copy_options? |
+dbs_create_table: TABLE dbs_table_name (dbs_create_table_elements_def (COMMACHAR dbs_create_table_elements_def)* RPARENCHAR | LIKE (dbs_table_name | dbs_view_name) copy_options? |
     as_result_table copy_options? | materialized_query_def) dbs_create_table_data_def*;
 dbs_create_table_elements_def: columnn_def | period_def | unique_constraint | referential_constraint | check_constraint;
 columnn_def: dbs_column_name (common_built_in_type_core3 | dbs_distinct_type_name ) columnn_def_body;//built-in-type change
@@ -397,7 +396,7 @@ yes_or_no: (YES | NO);
 k_m_g: (K | M | G);
 oneof_encoding: (ASCII | EBCDIC | UNICODE);
 //CREATE TABLESPACE
-dbs_create_tablespace: CREATE TABLESPACE QUESTIONMARK dbs_table_space_name dbs_create_tablespace_opts*;
+dbs_create_tablespace: TABLESPACE QUESTIONMARK dbs_table_space_name dbs_create_tablespace_opts*;
 dbs_create_tablespace_opts : IN (DSNDB04  | dbs_database_name) | BUFFERPOOL dbs_bp_name | partition_by_growth_spec  | partition_by_range_spec | dbs_dpsegsz_param |
                SEGSIZE dbs_integer | DSSIZE (NUMBER_4  | dbs_integer) G  | CCSID oneof_encoding | CLOSE yes_or_no | COMPRESS no_or_yes | DEFINE no_or_yes | free_block  |  gbpcache_block
                | INSERT ALGORITHM (NUMBER_0 | NUMBER_1 | NUMBER_2) | LOCKMAX (SYSTEM | dbs_integer) | locksize_block_tbl  | TRACKMOD (yes_or_no | dbs_imptkmod_param) | using_block;
@@ -408,7 +407,7 @@ partitions_opts: PARTITION dbs_integer (using_block | free_block  gbpcache_block
 free_block: (FREEPAGE  (NUMBER_0 | dbs_integer) | PCTFREE NUMBER_5 | PCTFREE (dbs_smallint (FOR UPDATE dbs_smallint)?)?)+;
 locksize_block_tbl: LOCKSIZE (ANY | TABLESPACE | PAGE | ROW);
 //CREATE TRIGGER ADVANCED
-dbs_create_trigger_advanced: CREATE (OR REPLACE)? TRIGGER dbs_trigger_name (trigger_definition | WRAPPED dbs_obfuscated_statement_text);
+dbs_create_trigger_advanced: (OR REPLACE)? TRIGGER dbs_trigger_name (trigger_definition | WRAPPED dbs_obfuscated_statement_text);
 trigger_definition: (VERSION (V1 | dbs_trigger_version_id))? trigger_activation_time trigger_event ON (dbs_table_name | dbs_view_name) |
             referencing_opts?  trigger_granularity dbs_option_list_trigger? triggered_action;
 referencing_opts: REFERENCING (OLD ROW? AS? dbs_correlation_name | NEW ROW? AS? dbs_correlation_name | OLD_TABLE AS? dbs_table_identifier | NEW_TABLE AS? dbs_identifier)+;
@@ -418,12 +417,12 @@ trigger_granularity: (FOR EACH (STATEMENT | ROW))?;
 triggered_action: (WHEN dbs_search_condition)? sql_trigger_body;
 sql_trigger_body: dbs_sql_control_statement | dbs_triggered_sql_statement_adv;
 //CREATE TRIGGER BASIC
-dbs_create_trigger_basic: CREATE TRIGGER dbs_trigger_name (trigger_definition_basic | WRAPPED dbs_obfuscated_statement_text);
+dbs_create_trigger_basic: TRIGGER dbs_trigger_name (trigger_definition_basic | WRAPPED dbs_obfuscated_statement_text);
 trigger_definition_basic: trigger_activation_time trigger_event ON (dbs_table_name | dbs_view_name) | referencing_opts?  trigger_granularity MODE DB2SQL ( NOT? SECURED)? triggered_action_basic;
 triggered_action_basic: (WHEN dbs_search_condition)? sql_trigger_body_basic;
 sql_trigger_body_basic:  dbs_triggered_sql_statement_basic | BEGIN ATOMIC (dbs_triggered_sql_statement_basic SEMICOLONCHAR)+;
 //CREATE TRUSTED CONTEXT
-dbs_create_trusted_context: CREATE TRUSTED CONTEXT dbs_context_name BASED UPON CONNECTION USING SYSTEM AUTHID dbs_authorization_name (NO DEFAULT ROLE |
+dbs_create_trusted_context: TRUSTED CONTEXT dbs_context_name BASED UPON CONNECTION USING SYSTEM AUTHID dbs_authorization_name (NO DEFAULT ROLE |
                 DEFAULT ROLE dbs_role_name (WITHOUT ROLE AS OBJECT OWNER | WITH ROLE AS OBJECT OWNER AND QUALIFIER))?
                 (DISABLE | ENABLE)? (NO DEFAULT SECURITY LABEL | DEFAULT SECURITY LABEL dbs_seclabel_name) ATTRIBUTES attributes_opt with_user_opt;
 attributes_opt: LPARENCHAR (attributes_opt_loop_body (COMMACHAR attributes_opt_loop_body)* | jobname_opt_loop_body (COMMACHAR jobname_opt_loop_body)*) RPARENCHAR;
@@ -433,14 +432,14 @@ with_user_opt:  (WITH USE FOR with_user_loop_body (COMMACHAR with_user_loop_body
 with_user_loop_body: dbs_authorization_name user_options? | EXTERNAL SECURITY PROFILE dbs_profile_name user_options? | PUBLIC (WITHOUT | WITH) AUTHENTICATION;
 user_options: (ROLE dbs_role_name)? ( dbs_seclabel_name)? ((WITHOUT | WITH) AUTHENTICATION)?;
 //CREATE TYPE ARRAY
-dbs_create_type_array: CREATE TYPE dbs_array_type_name AS common_built_in_type_core ARRAY LSQUAREBRACKET (INTEGER_MAX |dbs_integer_constant | common_built_in_type4)? RSQUAREBRACKET  ;
+dbs_create_type_array: TYPE dbs_array_type_name AS common_built_in_type_core ARRAY LSQUAREBRACKET (INTEGER_MAX |dbs_integer_constant | common_built_in_type4)? RSQUAREBRACKET  ;
 //CREATE TYPE DISTINCT
-dbs_create_type_distinct: CREATE TYPE dbs_distinct_type_name AS common_built_in_type_source (INLINE LENGTH dbs_integer)?;
-dbs_create_distinct_type : CREATE DISTINCT TYPE SQL_IDENTIFIER AS dbs_distinct_type;
+dbs_create_type_distinct: TYPE dbs_distinct_type_name AS common_built_in_type_source (INLINE LENGTH dbs_integer)?;
+dbs_create_distinct_type : DISTINCT TYPE SQL_IDENTIFIER AS dbs_distinct_type;
 //CREATE VARIABLE
-dbs_create_variable: CREATE VARIABLE dbs_variable_name (common_built_in_type_core | dbs_array_type_name) (DEFAULT NULL | DEFAULT (dbs_constant | dbs_special_register) )?;
+dbs_create_variable: VARIABLE dbs_variable_name (common_built_in_type_core | dbs_array_type_name) (DEFAULT NULL | DEFAULT (dbs_constant | dbs_special_register) )?;
 //CREATE VIEW
-dbs_create_view: CREATE VIEW dbs_view_name column_loop? AS tbl_expr_loop?  dbs_fullselect (WITH (CASCADED | LOCAL)? CHECK OPTION)?;
+dbs_create_view: VIEW dbs_view_name column_loop? AS tbl_expr_loop?  dbs_fullselect (WITH (CASCADED | LOCAL)? CHECK OPTION)?;
 tbl_expr_loop: WITH dbs_common_table_expression COMMACHAR dbs_common_table_expression*;
 
 /*DECLARE (all) */
@@ -623,7 +622,23 @@ dbs_get_combi_loop: (STATEMENT | (CONDITION | CONNECTION) (dbs_variable | dbs_in
 2. CONDITION and CONNECTION can only be specified once if variable or integer is also not specified. */
 
 /*GRANT (all) */
-dbs_grant: literal+; //?
+dbs_grant: GRANT (dbs_grant_null | dbs_grant_collection | dbs_grant_function | dbs_grant_package | dbs_grant_plan | dbs_grant_schema | dbs_grant_sequence | dbs_grant_system | dbs_grant_table | dbs_grant_type | dbs_grant_variable | dbs_grant_use);
+dbs_grant_authloop: (dbs_authorization_name | ROLE dbs_role_name | PUBLIC);
+dbs_grant_null: dbs_authorization_specification TO dbs_grant_authloop (COMMACHAR (dbs_authorization_name | ROLE dbs_role_name | PUBLIC))* (WITH GRANT OPTION)?;
+dbs_grant_collection: (CREATE|PACKADM) (ON|IN) COLLECTION (ASTERISKCHAR | dbs_collection_id (COMMACHAR dbs_collection_id)*) TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
+dbs_grant_database: db2sql_db_privileges (COMMACHAR db2sql_db_privileges)* ON DATABASE dbs_database_name (COMMACHAR dbs_database_name)* TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
+dbs_grant_function: EXECUTE ON (PROCEDURE (ASTERISKCHAR | dbs_procedure_name (COMMACHAR dbs_procedure_name)*) | SPECIFIC FUNCTION dbs_specific_name (COMMACHAR dbs_specific_name)* | dbs_grant_function_loop (COMMACHAR dbs_grant_function_loop)*) TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
+dbs_grant_function_loop: dbs_function_name (LPARENCHAR (data_type (AS LOCATOR)? (COMMACHAR data_type (AS LOCATOR)?)*)? RPARENCHAR)?;
+dbs_grant_package: (ALL | (BIND|COPY|EXECUTE|RUN) (COMMACHAR (BIND|COPY|EXECUTE|RUN))*) ON PACKAGE dbs_collection_id (dbs_package_name|ASTERISKCHAR) (COMMACHAR dbs_collection_id (dbs_package_name|ASTERISKCHAR))* TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
+dbs_grant_plan: (BIND|EXECUTE) (COMMACHAR (BIND|EXECUTE))* ON PLAN dbs_plan_name (COMMACHAR dbs_plan_name)* TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
+dbs_grant_schema: (ALTERIN|CREATEIN|DROPIN) (COMMACHAR (ALTERIN|CREATEIN|DROPIN))* ON SCHEMA (ASTERISKCHAR|dbs_schema_name (COMMACHAR dbs_schema_name)*) TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
+dbs_grant_sequence: (ALTER|USAGE|SELECT) (COMMACHAR (ALTER|USAGE|SELECT))* ON SEQUENCE dbs_sequence_name (COMMACHAR dbs_sequence_name)* TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
+dbs_grant_system: db2sql_system_privileges (COMMACHAR db2sql_system_privileges)* (ON SYSTEM)? TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
+dbs_grant_table: (ALL PRIVILEGES? | db2sql_table_view_privileges (COMMACHAR db2sql_table_view_privileges)*) ON TABLE? (dbs_table_name | dbs_view_name) (COMMACHAR (dbs_table_name | dbs_view_name))* TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
+dbs_grant_type: USAGE ON (TYPE dbs_type_name (COMMACHAR dbs_type_name)* | JAR dbs_jar_name (COMMACHAR dbs_jar_name)*) TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
+dbs_grant_variable: (ALL PRIVILEGES? | (READ|WRITE) (COMMACHAR (READ|WRITE))*) ON VARIABLE dbs_variable_name TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
+dbs_grant_use: USE OF (BUFFERPOOL dbs_bpname (COMMACHAR dbs_bpname)* | ALL BUFFERPOOLS | STOGROUP dbs_stogroup_name (COMMACHAR dbs_stogroup_name)* | TABLESPACE (dbs_database_name DOT)? dbs_table_space_name (COMMACHAR (dbs_database_name DOT)? dbs_table_space_name)*) (WITH GRANT OPTION)?;
+
 
 /*HOLD LOCATOR */
 dbs_hold: HOLD LOCATOR dbs_host_variable (COMMACHAR dbs_host_variable)*;
@@ -726,21 +741,21 @@ dbs_rename: RENAME (TABLE? dbs_table_name TO dbs_table_identifier | INDEX dbs_in
 
 
 /*REVOKE (all) */
-dbs_revoke: dbs_revoke_authorized_spec | dbs_revoke_coll_prvg | dbs_revoke_db_prvg | dbs_revoke_func_or_proc_prvg | dbs_revoke_pack_prvg | dbs_revoke_plan_prvg | dbs_revoke_schema_prvg | dbs_revoke_seq_prvg  | dbs_revoke_system_prvg | dbs_revoke_table_or_view_prvg |  dbs_revoke_type_or_jar_prvg  | dbs_revoke_var_prvg | dbs_revoke_use_prvg;
+dbs_revoke: REVOKE (dbs_revoke_authorized_spec | dbs_revoke_coll_prvg | dbs_revoke_db_prvg | dbs_revoke_func_or_proc_prvg | dbs_revoke_pack_prvg | dbs_revoke_plan_prvg | dbs_revoke_schema_prvg | dbs_revoke_seq_prvg  | dbs_revoke_system_prvg | dbs_revoke_table_or_view_prvg |  dbs_revoke_type_or_jar_prvg  | dbs_revoke_var_prvg | dbs_revoke_use_prvg);
 //REVOKE
-dbs_revoke_authorized_spec: REVOKE dbs_authorization_specification FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
+dbs_revoke_authorized_spec: dbs_authorization_specification FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
 auth_name_loop_pub: (auth_name_or_role | PUBLIC) (COMMACHAR auth_name_loop_pub | PUBLIC)*;
 auth_name_loop_all: BY (ALL | auth_name_or_role (COMMACHAR auth_name_or_role)*);
 auth_name_or_role: dbs_authorization_name | ROLE dbs_role_name;
 dependent_privileges: NOT? INCLUDING DEPENDENT PRIVILEGES;
 //REVOKE COLLECTION PRIVILEGES
-dbs_revoke_coll_prvg : REVOKE (CREATE | PACKADM) (IN | ON) COLLECTION (db_coll_id_loop | ASTERISKCHAR) FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+dbs_revoke_coll_prvg : (CREATE | PACKADM) (IN | ON) COLLECTION (db_coll_id_loop | ASTERISKCHAR) FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 db_coll_id_loop: dbs_collection_id (COMMACHAR dbs_collection_id)*;
 //REVOKE DATABASE PRIVILEGES
-dbs_revoke_db_prvg: REVOKE db2sql_db_privileges (COMMACHAR db2sql_db_privileges)* ON DATABASE db_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+dbs_revoke_db_prvg: db2sql_db_privileges (COMMACHAR db2sql_db_privileges)* ON DATABASE db_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 db_name_loop: dbs_database_name (COMMACHAR dbs_database_name)*;
 //REVOKE FUNCTION OR PROCEDURE PRIVILEGES
-dbs_revoke_func_or_proc_prvg:  REVOKE EXECUTE ON function_or_procedure  FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
+dbs_revoke_func_or_proc_prvg:  EXECUTE ON function_or_procedure  FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
 function_or_procedure: (FUNCTION (db_function_name_body_loop | ASTERISKCHAR) | SPECIFIC FUNCTION db_specific_name_loop) | PROCEDURE db_procedure_name_loop;
 db_function_name_body_loop: dbs_function_name param_loop (COMMACHAR dbs_function_name param_loop)*;
 param_loop: LPARENCHAR param_type (COMMACHAR param_type)*  RPARENCHAR;
@@ -748,38 +763,38 @@ param_type: data_type (AS LOCATOR)?; //AS LOCATOR can be specified only for a LO
 db_specific_name_loop: dbs_specific_name (COMMACHAR dbs_specific_name)*;
 db_procedure_name_loop: dbs_procedure_name (COMMACHAR dbs_procedure_name)*;
 //REVOKE PACKAGE PRIVILEGES
-dbs_revoke_pack_prvg:  REVOKE (ALL | revoke_opt_loop) ON PACKAGE package_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+dbs_revoke_pack_prvg: (ALL | revoke_opt_loop) ON PACKAGE package_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 revoke_opt_loop: revoke_opt (COMMACHAR revoke_opt)*;
 revoke_opt: BIND | COPY | EXECUTE | RUN;
 package_name_loop: package_name (COMMACHAR package_name)*;
 package_name: dbs_collection_id DOT (dbs_package_name | ASTERISKCHAR);
 //REVOKE PLAN PRIVILEGES
-dbs_revoke_plan_prvg: REVOKE (BIND | EXECUTE) (COMMACHAR (BIND | EXECUTE))* ON PLAN plan_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+dbs_revoke_plan_prvg: (BIND | EXECUTE) (COMMACHAR (BIND | EXECUTE))* ON PLAN plan_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 plan_name_loop: dbs_plan_name (COMMACHAR dbs_plan_name)*;
 //REVOKE SCHEMA PRIVILEGES
-dbs_revoke_schema_prvg: REVOKE revoke_schema_opt_loop ON SCHEMA schema_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+dbs_revoke_schema_prvg: revoke_schema_opt_loop ON SCHEMA schema_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 revoke_schema_opt_loop: revoke_schema_opt (COMMACHAR revoke_schema_opt)*;
 revoke_schema_opt: ALTERIN | CREATEIN | DROPIN;
 schema_name_loop: dbs_schema_name (COMMACHAR dbs_schema_name)*;
 //REVOKE SEQUENCE PRIVILEGES
-dbs_revoke_seq_prvg: REVOKE revoke_seq_opt_loop ON SEQUENCE seq_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
+dbs_revoke_seq_prvg: revoke_seq_opt_loop ON SEQUENCE seq_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
 revoke_seq_opt_loop: revoke_seq_opt (COMMACHAR revoke_seq_opt)*;
 revoke_seq_opt: ALTER | USAGE | SELECT;
 seq_name_loop: dbs_sequence_name (COMMACHAR dbs_sequence_name)*;
 //REVOKE SYSTEM PRIVILEGES
-dbs_revoke_system_prvg: REVOKE db2sql_system_privileges (COMMACHAR db2sql_system_privileges)*  (ON SYSTEM)? FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+dbs_revoke_system_prvg: db2sql_system_privileges (COMMACHAR db2sql_system_privileges)*  (ON SYSTEM)? FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 //REVOKE TABLE OR VIEW PRIVILEGES
-dbs_revoke_table_or_view_prvg: REVOKE (ALL PRIVILEGES? | db2sql_table_view_privileges (COMMACHAR db2sql_table_view_privileges)*)  ON TABLE? table_or_view_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+dbs_revoke_table_or_view_prvg: (ALL PRIVILEGES? | db2sql_table_view_privileges (COMMACHAR db2sql_table_view_privileges)*)  ON TABLE? table_or_view_name_loop FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 table_or_view_name_loop: (dbs_table_name | dbs_view_name) (COMMACHAR (dbs_table_name | dbs_view_name))*;
 //REVOKE TYPE OR JAR PRIVILEGES
-dbs_revoke_type_or_jar_prvg: REVOKE USAGE ON (TYPE type_name_loop | JAR jar_name_loop)  FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
+dbs_revoke_type_or_jar_prvg: USAGE ON (TYPE type_name_loop | JAR jar_name_loop)  FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
 type_name_loop: dbs_type_name  (COMMACHAR dbs_type_name)*;
 jar_name_loop: dbs_jar_name (COMMACHAR dbs_jar_name)*;
 //REVOKE VARIABLE PRIVILEGES
-dbs_revoke_var_prvg: REVOKE (ALL PRIVILEGES? | read_write_loop) ON VARIABLE FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+dbs_revoke_var_prvg: (ALL PRIVILEGES? | read_write_loop) ON VARIABLE FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 read_write_loop: READ WRITE (COMMACHAR READ WRITE)*;
 //REVOKE USE PRIVILEGES
-dbs_revoke_use_prvg: REVOKE USE OF (BUFFERPOOL bpname_loop | ALL BUFFERPOOLS | STOGROUP stogroup_name_loop | TABLESPACE tblspace_name_loop) FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
+dbs_revoke_use_prvg: USE OF (BUFFERPOOL bpname_loop | ALL BUFFERPOOLS | STOGROUP stogroup_name_loop | TABLESPACE tblspace_name_loop) FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
 bpname_loop: dbs_bp_name (COMMACHAR dbs_bp_name)*;
 stogroup_name_loop: dbs_stogroup_name (COMMACHAR dbs_stogroup_name)*;
 tblspace_name_loop: tblspace_name_name (COMMACHAR tblspace_name_name)*;
