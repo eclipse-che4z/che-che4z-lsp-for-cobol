@@ -31,7 +31,7 @@ public abstract class StructuredVariable extends AbstractVariable {
   private List<Variable> children = new ArrayList<>();
   int levelNumber;
 
-  StructuredVariable(String name, String qualifier, Locality definition, int levelNumber) {
+  StructuredVariable(int levelNumber, String name, String qualifier, Locality definition) {
     super(name, qualifier, definition);
     this.levelNumber = levelNumber;
   }
@@ -63,10 +63,5 @@ public abstract class StructuredVariable extends AbstractVariable {
    */
   public int getLevelNumber() {
     return levelNumber;
-  }
-
-  @Override
-  public boolean isRenameable() {
-    return levelNumber != 1;
   }
 }

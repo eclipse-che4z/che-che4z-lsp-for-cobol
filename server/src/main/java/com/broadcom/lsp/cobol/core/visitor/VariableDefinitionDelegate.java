@@ -40,7 +40,6 @@ import static com.broadcom.lsp.cobol.core.model.ErrorSeverity.WARNING;
 import static com.broadcom.lsp.cobol.core.visitor.DataDivisionSection.NOT_INITIALIZED;
 import static java.lang.String.format;
 import static java.util.Optional.*;
-import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -319,20 +318,27 @@ class VariableDefinitionDelegate {
   }
 
   private List<Variable> renameVariables(String renameVariableName, List<Variable> children) {
-    List<Variable> renamedVariables =
-        children.stream().map(it -> it.rename(renameVariableName)).collect(toList());
-    renamedVariables.stream()
-        .filter(not(Renameable::isRenameable))
-        .forEach(
-            it ->
-                addError(messages.getMessage(CANNOT_BE_RENAMED, it.getName()), it.getDefinition()));
-    return renamedVariables;
+    return children.stream()
+        .map(renameVariable(renameVariableName))
+        .filter(Objects::nonNull)
+        .collect(toList());
   }
 
   private void reportChildrenNotFound(DataRenamesClauseContext renamesClause, String stopName) {
     addError(
         messages.getMessage(CHILD_TO_RENAME_NOT_FOUND, stopName),
         positions.get(renamesClause.qualifiedDataName().getStart()));
+  }
+
+  private Function<Variable, Variable> renameVariable(String renameVariableName) {
+    return it ->
+        ofNullable(it.rename(renameVariableName))
+            .orElseGet(
+                () -> {
+                  addError(
+                      messages.getMessage(CANNOT_BE_RENAMED, it.getName()), it.getDefinition());
+                  return null;
+                });
   }
 
   private Function<TableDataName, Variable> storeIndexVariables() {

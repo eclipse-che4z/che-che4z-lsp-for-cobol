@@ -26,19 +26,14 @@ package com.broadcom.lsp.cobol.core.model.variables;
 public interface Renameable {
 
   /**
-   * Check if this variable allows renaming depending on its type.
-   *
-   * @return true if a variable of that type allows renaming
-   */
-  boolean isRenameable();
-
-  /**
    * Create a new variable which qualifier points to a different structure. Effectively, copy the
    * variable to add it as a child to the variable with the given name. Used in RENAME clause.
-   * Should be implemented even if the variable doesn't allow renaming.
+   * Should return null if the variable type doesn't allow renaming
    *
    * @param renameItemName - the name of the new structure
-   * @return a new variable with a different qualifier
+   * @return a new variable with a different qualifier or null if not renameable
    */
-  Variable rename(String renameItemName);
+  default Variable rename(String renameItemName) {
+    return null;
+  }
 }

@@ -16,7 +16,6 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
@@ -36,20 +35,5 @@ public class IndependentDataItem extends AbstractVariable {
     super(name, qualifier, definition);
     this.picClause = picClause;
     this.value = value;
-  }
-
-  @Override
-  public Variable rename(String renameItemName) {
-    return new IndependentDataItem(
-        name,
-        VariableUtils.renameQualifier(qualifier, renameItemName),
-        definition,
-        picClause,
-        value);
-  }
-
-  @Override
-  public boolean isRenameable() {
-    return false;
   }
 }

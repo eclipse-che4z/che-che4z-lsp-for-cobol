@@ -16,7 +16,6 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
@@ -30,16 +29,5 @@ import lombok.Value;
 public class SpecialName extends AbstractVariable {
   public SpecialName(String name, String qualifier, Locality definition) {
     super(name, qualifier, definition);
-  }
-
-  @Override
-  public boolean isRenameable() {
-    return false;
-  }
-
-  @Override
-  public Variable rename(String renameItemName) {
-    return new SpecialName(
-        name, VariableUtils.renameQualifier(qualifier, renameItemName), definition);
   }
 }

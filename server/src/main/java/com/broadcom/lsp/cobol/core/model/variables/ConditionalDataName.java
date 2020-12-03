@@ -40,9 +40,4 @@ public class ConditionalDataName extends AbstractVariable {
     return new ConditionalDataName(
         name, VariableUtils.renameQualifier(qualifier, renameItemName), definition, value);
   }
-
-  @Override
-  public boolean isRenameable() {
-    return true;
-  }
 }

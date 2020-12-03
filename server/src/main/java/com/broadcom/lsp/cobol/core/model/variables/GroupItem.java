@@ -29,13 +29,18 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = true)
 public class GroupItem extends StructuredVariable {
 
-  public GroupItem(int number, String name, String qualifier, Locality definition) {
-    super(name, qualifier, definition, number);
+  public GroupItem(int levelNumber, String name, String qualifier, Locality definition) {
+    super(levelNumber, name, qualifier, definition);
   }
 
   @Override
   public Variable rename(String renameItemName) {
-    return new GroupItem(
-        levelNumber, name, VariableUtils.renameQualifier(qualifier, renameItemName), definition);
+    return levelNumber == 1
+        ? null
+        : new GroupItem(
+            levelNumber,
+            name,
+            VariableUtils.renameQualifier(qualifier, renameItemName),
+            definition);
   }
 }

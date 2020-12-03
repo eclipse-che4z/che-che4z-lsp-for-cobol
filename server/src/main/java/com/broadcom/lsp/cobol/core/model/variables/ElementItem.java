@@ -62,9 +62,4 @@ public class ElementItem extends AbstractVariable {
         picClause,
         value);
   }
-
-  @Override
-  public boolean isRenameable() {
-    return true;
-  }
 }

@@ -16,7 +16,6 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
@@ -39,18 +38,7 @@ public class RenameItem extends StructuredVariable {
       @NonNull String qualifier,
       @NonNull Locality definition,
       @NonNull List<Variable> renamedChildren) {
-    super(name, qualifier, definition, LEVEL_NUMBER);
+    super(LEVEL_NUMBER, name, qualifier, definition);
     renamedChildren.forEach(this::addChild);
-  }
-
-  @Override
-  public boolean isRenameable() {
-    return false;
-  }
-
-  @Override
-  public Variable rename(String renameItemName) {
-    return new RenameItem(
-        name, VariableUtils.renameQualifier(qualifier, renameItemName), definition, getChildren());
   }
 }
