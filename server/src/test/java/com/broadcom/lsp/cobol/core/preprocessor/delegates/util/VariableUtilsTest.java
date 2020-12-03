@@ -43,7 +43,7 @@ class VariableUtilsTest {
   void renameQualifierOneValue() {
     String qualifier = "CHILD";
     String renameItem = "PARENT1";
-    String expected = "CHILD";
+    String expected = "PARENT1";
     assertEquals(expected, VariableUtils.renameQualifier(qualifier, renameItem));
   }
 

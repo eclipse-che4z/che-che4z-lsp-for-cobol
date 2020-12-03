@@ -20,6 +20,7 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 import java.util.Deque;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
 
@@ -34,8 +35,7 @@ public class VariableUtils {
    * @return qualifier for a renamed variable
    */
   public @NonNull String renameQualifier(@NonNull String qualifier, @NonNull String renameItem) {
-    int index = qualifier.indexOf(' ');
-    return index == -1 ? qualifier : renameItem + qualifier.substring(index);
+    return qualifier.replaceFirst("[^ ]+", renameItem);
   }
 
   /**
@@ -47,10 +47,8 @@ public class VariableUtils {
    */
   public @NonNull String createQualifier(
       @NonNull Deque<StructuredVariable> structure, @NonNull String name) {
-    return structure.stream()
-            .map(StructuredVariable::getName)
-            .map(it -> it + " ")
-            .collect(joining())
-        + name;
+    return Optional.ofNullable(structure.peekLast())
+        .map(it -> it.getQualifier() + " ")
+        .orElse("") + name;
   }
 }
