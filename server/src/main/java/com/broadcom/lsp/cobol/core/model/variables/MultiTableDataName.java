@@ -19,21 +19,27 @@ import com.broadcom.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
+import java.util.List;
+
 /**
- * This value class represents an independent element item COBOL variable, that has a level number
- * 77. It should always have a PIC clause representing its type, and a VALUE clause that stores an
- * explicitly defined value; both as Strings. They cannot produce a structure in any way.
+ * This value class represents the multi-dimensional Table variable that may have nested variables,
+ * and an optional index
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class IndependentDataItem extends AbstractVariable {
-  private String picClause;
-  private String value;
+public class MultiTableDataName extends StructuredVariable implements TableDeclaration {
+  private int occursTimes;
+  private List<IndexItem> indexes;
 
-  public IndependentDataItem(
-      String name, String qualifier, Locality definition, String picClause, String value) {
-    super(name, qualifier, definition);
-    this.picClause = picClause;
-    this.value = value;
+  public MultiTableDataName(
+      int levelNumber,
+      String name,
+      String qualifier,
+      Locality definition,
+      int occursTimes,
+      List<IndexItem> indexes) {
+    super(levelNumber, name, qualifier, definition);
+    this.occursTimes = occursTimes;
+    this.indexes = indexes;
   }
 }

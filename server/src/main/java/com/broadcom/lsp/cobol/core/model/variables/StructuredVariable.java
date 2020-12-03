@@ -15,13 +15,26 @@
 
 package com.broadcom.lsp.cobol.core.model.variables;
 
+import com.broadcom.lsp.cobol.core.model.Locality;
+import lombok.NonNull;
+
+import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Collections.unmodifiableList;
 
 /**
  * This interface represents a structured variable that may contain children ones. The children may
  * be variables or also structures.
  */
-public interface StructuredVariable extends Variable {
+public abstract class StructuredVariable extends AbstractVariable {
+  private List<Variable> children = new ArrayList<>();
+  int levelNumber;
+
+  StructuredVariable(int levelNumber, String name, String qualifier, Locality definition) {
+    super(name, qualifier, definition);
+    this.levelNumber = levelNumber;
+  }
 
   /**
    * Add a new nested variable to this structure
@@ -29,12 +42,26 @@ public interface StructuredVariable extends Variable {
    * @param variable - a nested variable. Can be a group or element, or all the other allowed type
    *     item.
    */
-  void addChild(Variable variable);
+  public void addChild(@NonNull Variable variable) {
+    children.add(variable);
+  }
 
   /**
    * Return an immutable list of already defined nested variables
    *
    * @return defined nested variables.
    */
-  List<Variable> getChildren();
+  @NonNull
+  public List<Variable> getChildren() {
+    return unmodifiableList(children);
+  }
+
+  /**
+   * Get the level number of this structure that determines its hierarchy
+   *
+   * @return level number
+   */
+  public int getLevelNumber() {
+    return levelNumber;
+  }
 }

@@ -16,13 +16,11 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.Value;
 
-import lombok.NonNull;
-import java.util.ArrayList;
 import java.util.List;
-
-import static java.util.Collections.unmodifiableList;
 
 /**
  * This value class represents a renaming data name entry, that has a level number 66. It may be one
@@ -31,55 +29,16 @@ import static java.util.Collections.unmodifiableList;
  * operations.
  */
 @Value
-public class RenameItem implements StructuredVariable {
-  private String name;
-  private Locality definition;
-  private List<Variable> children = new ArrayList<>();
+@EqualsAndHashCode(callSuper = true)
+public class RenameItem extends StructuredVariable {
+  private static final int LEVEL_NUMBER = 66;
 
-  public RenameItem(@NonNull String name, @NonNull Locality definition) {
-    this.name = name;
-    this.definition = definition;
-  }
-
-  /**
-   * Add the given variable to the children list of this variable
-   *
-   * @param variable - a variable to copy
-   */
-  public void rename(Variable variable) {
-    children.add(variable);
-  }
-
-  /**
-   * Add the given variable range to the children list of this variable. This method does not check
-   * if the given variable range is correct - it should be assured by the client code.
-   *
-   * @param groupItem - a parent variable of the structure to copy
-   * @param start - the start element of the structure range to copy
-   * @param stop - the stop element of the structure range to copy
-   */
-  public void renameThru(GroupItem groupItem, Variable start, Variable stop) {
-    List<Variable> childrenToRename = groupItem.getChildren();
-    children.addAll(
-        childrenToRename.subList(childrenToRename.indexOf(start), childrenToRename.indexOf(stop)));
-  }
-
-  /**
-   * Not supported for this type of variable
-   *
-   * @param variable - a variable to add
-   */
-  @Override
-  public void addChild(Variable variable) {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Return a list of renamed elementary items
-   *
-   * @return re-defined nested variables.
-   */
-  public List<Variable> getChildren() {
-    return unmodifiableList(children);
+  public RenameItem(
+      @NonNull String name,
+      @NonNull String qualifier,
+      @NonNull Locality definition,
+      @NonNull List<Variable> renamedChildren) {
+    super(LEVEL_NUMBER, name, qualifier, definition);
+    renamedChildren.forEach(this::addChild);
   }
 }
