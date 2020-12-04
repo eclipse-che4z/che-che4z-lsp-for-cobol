@@ -593,11 +593,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   private DataName2Context getDataName2Context(QualifiedInDataContext node) {
     return ofNullable(node.inData())
         .map(InDataContext::dataName2)
-        .orElse(
-            ofNullable(node.inTable())
-                .map(InTableContext::tableCall)
-                .map(TableCallContext::dataName2)
-                .orElse(null));
+        .orElseGet(
+            () ->
+                ofNullable(node.inTable())
+                    .map(InTableContext::tableCall)
+                    .map(TableCallContext::dataName2)
+                    .orElse(null));
   }
 
   private void checkVariableStructure(

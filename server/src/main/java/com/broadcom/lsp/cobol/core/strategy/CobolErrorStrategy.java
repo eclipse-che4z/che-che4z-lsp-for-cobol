@@ -67,9 +67,10 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
   }
 
   private String getExpectedToken(@NonNull Parser recognizer, InputMismatchException e) {
-    IntervalSet expecting = Optional.ofNullable(e)
-        .map(RecognitionException::getExpectedTokens)
-        .orElse(getExpectedTokens(recognizer));
+    IntervalSet expecting =
+        Optional.ofNullable(e)
+            .map(RecognitionException::getExpectedTokens)
+            .orElseGet(() -> getExpectedTokens(recognizer));
 
     return Optional.ofNullable(expecting)
         .map(exp -> exp.toString(recognizer.getVocabulary()))
