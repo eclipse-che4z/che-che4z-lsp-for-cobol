@@ -348,8 +348,10 @@
                             <arguments>
                                 <argument>-package</argument>
                                 <argument>com.broadcom.usecase</argument>
+                                <argument>-o</argument>
+                                <argument>target/generated-sources/antlr4/com/broadcom/usecase</argument>
                             </arguments>
-                            <sourceDirectory>${basedir}/src/test/antlr4/com/broadcom/usecase</sourceDirectory>
+                            <sourceDirectory>src/test/antlr4/com/broadcom/usecase</sourceDirectory>
                             <listener>true</listener>
                             <visitor>false</visitor>
                         </configuration>
@@ -364,6 +366,8 @@
                             <arguments>
                                 <argument>-package</argument>
                                 <argument>com.broadcom.lsp.cobol.core</argument>
+                                <argument>-o</argument>
+                                <argument>target/generated-sources/antlr4/com/broadcom/lsp/cobol/core</argument>
                             </arguments>
                             <sourceDirectory>src/main/antlr4/com/broadcom/lsp/cobol/core/parser</sourceDirectory>
                             <listener>true</listener>

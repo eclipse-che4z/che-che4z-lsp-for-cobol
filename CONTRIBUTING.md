@@ -39,11 +39,15 @@ $ git clone https://github.com/eclipse/che-che4z-lsp-for-cobol.git
 
 To build server run:
 
-```$ cd com.ca.lsp.cobol && mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify test-compile```
+```$ cd server && mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify test-compile```
 
 To build extension run:
 
 ```$ cd clients/cobol-lsp-vscode-extension && npm install && npm run compile```
+
+You need to change the run configuration in your IDE to enable logging to the console while debugging the Java part. 
+Add `-Dlogback.configurationFile=server/localDev/logback.xml` to your `VM options` parameter. 
+The value can be `localDev/logback.xml` if the `server` folder is a root folder for your project.
 
 ## Start contributing
 
@@ -75,4 +79,3 @@ Also, If you have some not obvious changes, it would be nice to provide a longer
 Contact the project developers.
 
 * supportChe4z.pdl@broadcom.com
-

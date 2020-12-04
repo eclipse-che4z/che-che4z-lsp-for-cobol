@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.16.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.16.0...0.16.1) (2020-12-04)
+
+### Bug Fixes
+* Fix analysis termination on handled client exceptions [#643](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/643)
+* Fix a syntax error on HANDLE AID CLEAR() [#670](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/670)
+
 ## [0.16.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.15.0...0.16.0) (2020-11-27)
 
 ### Bug Fixes
