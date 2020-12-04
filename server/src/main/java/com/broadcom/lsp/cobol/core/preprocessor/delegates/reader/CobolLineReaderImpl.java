@@ -18,11 +18,11 @@ import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -145,16 +145,17 @@ public class CobolLineReaderImpl implements CobolLineReader {
       String indicatorArea, String uri, int lineNumber) {
     return ofNullable(INDICATORS.get(indicatorArea))
         .map(it -> new ResultWithErrors<>(it, List.of()))
-        .orElse(
-            new ResultWithErrors<>(
-                NORMAL,
-                List.of(
-                    createError(
-                        uri,
-                        messageService.getMessage("CobolLineReaderImpl.incorrectLineFormat"),
-                        lineNumber,
-                        INDICATOR_AREA_INDEX,
-                        INDICATOR_AREA_INDEX + 1))));
+        .orElseGet(
+            () ->
+                new ResultWithErrors<>(
+                    NORMAL,
+                    List.of(
+                        createError(
+                            uri,
+                            messageService.getMessage("CobolLineReaderImpl.incorrectLineFormat"),
+                            lineNumber,
+                            INDICATOR_AREA_INDEX,
+                            INDICATOR_AREA_INDEX + 1))));
   }
 
   @NonNull
