@@ -34,32 +34,18 @@ dbs_alter: ALTER (dbs_alter_database | dbs_alter_function | dbs_alter_index | db
 dbs_alter_database: DATABASE dbs_database_name (BUFFERPOOL dbs_bp_name | INDEXBP dbs_bp_name | STOGROUP dbs_stogroup_name | CCSID dbs_ccsid_value)+;
 /*ALTER FUNCTION */
 dbs_alter_function: (dbs_alter_function_external | dbs_alter_function_compiled | dbs_alter_function_inline);
-dbs_alter_function_bit: (dbs_alter_function_bit_int | dbs_alter_function_bit_decimal | dbs_alter_function_bit_float | dbs_alter_function_bit_decfloat | dbs_alter_function_bit_char | dbs_alter_function_bit_clob | dbs_alter_function_bit_varchar | dbs_alter_function_bit_graphic | dbs_alter_function_bit_binary | DATE | TIME | dbs_alter_function_bit_timestamp | ROWID);
-dbs_alter_function_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
-dbs_alter_function_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR dbs_integer (COMMACHAR dbs_integer)? RPARENCHAR)?;
-dbs_alter_function_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
-dbs_alter_function_bit_decfloat: DECFLOAT (LPARENCHAR (NUMBER_34 | NUMBER_16) RPARENCHAR)?;
-dbs_alter_function_bit_char: (CHARACTER | CHAR) (VARYING dbs_alter_function_bit_varchara | LARGE OBJECT dbs_alter_function_bit_cloba | LPARENCHAR dbs_integer RPARENCHAR dbs_alter_function_bit_charopts);
-dbs_alter_function_bit_charopts: (CCSID oneof_encoding)? (FOR (SBCS | MIXED | BIT) DATA)?;
-dbs_alter_function_bit_varchar: VARCHAR dbs_alter_function_bit_varchara;
-dbs_alter_function_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR dbs_alter_function_bit_charopts;
-dbs_alter_function_bit_clob: CLOB dbs_alter_function_bit_cloba;
-dbs_alter_function_bit_cloba: (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)? (CCSID oneof_encoding)? (FOR (SBCS | MIXED ) DATA)?;
-dbs_alter_function_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR | DBCLOB (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?) (CCSID oneof_encoding)?;
-dbs_alter_function_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
-dbs_alter_function_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
-dbs_alter_function_external: (SPECIFIC FUNCTION dbs_specific_name | FUNCTION dbs_function_name (LPARENCHAR ((dbs_alter_function_bit | dbs_distinct_type_name) (AS LOCATOR)? (COMMACHAR (dbs_alter_function_bit | dbs_distinct_type_name) (AS LOCATOR)?)*)? RPARENCHAR)?) dbs_alter_function_extopts;
+dbs_alter_function_external: (SPECIFIC FUNCTION dbs_specific_name | FUNCTION dbs_function_name (LPARENCHAR ((common_built_in_type_core5 | dbs_distinct_type_name) (AS LOCATOR)? (COMMACHAR (common_built_in_type_core5 | dbs_distinct_type_name) (AS LOCATOR)?)*)? RPARENCHAR)?) dbs_alter_function_extopts;
 dbs_alter_function_extopts: (EXTERNAL NAME (dbs_external_program_name | dbs_identifier) | LANGUAGE (ASSEMBLE|C|COBOL|JAVA|PLI) | PARAMETER STYLE (SQL|JAVA) | NOT? DETERMINISTIC | (RETURNS NULL|CALLED) ON NULL INPUT | ((MODIFIES|READS) SQL DATA | (CONTAINS|NO) SQL) | NO? EXTERNAL ACTION | (PACKAGE PATH dbs_package_path | NO PACKAGE PATH) | (NO SCRATCHPAD | SCRATCHPAD dbs_length) | NO? FINAL CALL | (ALLOW|DISALLOW) PARALLEL | NO? DBINFO | CARDINALITY dbs_integer | (NO COLLID | COLLID dbs_collection_id) | WLM ENVIRONMENT | (dbs_name | LPARENCHAR dbs_name COMMACHAR ASTERISKCHAR RPARENCHAR) | ASUTIME (NO LIMIT | LIMIT dbs_integer) | STAY RESIDENT (YES|NO) | PROGRAM TYPE (SUB|MAIN) | SECURITY (DB2|USER|DEFINER) | (STOP AFTER (SYSTEM DEFAULT|dbs_integer) FAILURES | CONTINUE AFTER FAILURE) | RUN OPTIONS  dbs_run_time_options | (INHERIT|DEFAULT) SPECIAL REGISTERS | STATIC DISPATCH | NOT? SECURED)+; /*java fix required to add "one each" rule */
-dbs_alter_function_compiled: (SPECIFIC FUNCTION dbs_specific_name | FUNCTION dbs_function_name (LPARENCHAR ((dbs_alter_function_bit | XML | data_type_arr_or_distinct) (COMMACHAR (dbs_alter_function_bit | XML | data_type_arr_or_distinct))*)? RPARENCHAR)?) (dbs_alter_function_alter | dbs_alter_function_replace | dbs_alter_function_add | dbs_alter_function_activate | dbs_alter_function_regen | dbs_alter_function_drop);
+dbs_alter_function_compiled: (SPECIFIC FUNCTION dbs_specific_name | FUNCTION dbs_function_name (LPARENCHAR ((common_built_in_type_core5 | XML | data_type_arr_or_distinct) (COMMACHAR (common_built_in_type_core5 | XML | data_type_arr_or_distinct))*)? RPARENCHAR)?) (dbs_alter_function_alter | dbs_alter_function_replace | dbs_alter_function_add | dbs_alter_function_activate | dbs_alter_function_regen | dbs_alter_function_drop);
 dbs_alter_function_alter: ALTER? (ACTIVE VERSION | ALL VERSIONS | VERSION dbs_routine_version_id) dbs_alter_function_compopts;
 dbs_alter_function_replace: REPLACE (ACTIVE VERSION | VERSION dbs_routine_version_id) dbs_alter_function_routine;
 dbs_alter_function_add: ADD VERSION dbs_routine_version_id dbs_alter_function_routine;
 dbs_alter_function_activate: ACTIVATE VERSION dbs_routine_version_id;
 dbs_alter_function_regen: REGENERATE (ACTIVE VERSION | VERSION dbs_routine_version_id) (USING APPLICATION COMPATIBILITY dbs_applcompat_value)?;
 dbs_alter_function_drop: DROP VERSION dbs_routine_version_id;
-dbs_alter_function_routine: LPARENCHAR (dbs_parameter_name (dbs_alter_function_bit | data_type_arr_or_distinct) (COMMACHAR (dbs_alter_function_bit | data_type_arr_or_distinct))*)? RPARENCHAR RETURNS dbs_alter_function_bit dbs_alter_function_compopts? dbs_sql_control_statement;
+dbs_alter_function_routine: LPARENCHAR (dbs_parameter_name (common_built_in_type_core5 | data_type_arr_or_distinct) (COMMACHAR (common_built_in_type_core5 | data_type_arr_or_distinct))*)? RPARENCHAR RETURNS common_built_in_type_core5 dbs_alter_function_compopts? dbs_sql_control_statement;
 dbs_alter_function_compopts: (NOT? DETERMINISTIC | NO? EXTERNAL ACTION | ((READS|MODIFIES) SQL DATA | CONTAINS SQL) | (CALLED|RETURNS NULL) ON NULL INPUT | STATIC DISPATCH | (ALLOW|DISALLOW) PARALLEL | (DISALLOW|ALLOW|DISABLE) DEBUG MODE | QUALIFIER dbs_schema_name | PACKAGE OWNER dbs_authorization_name | ASUTIME (NO LIMIT | LIMIT dbs_integer) | (INHERIT|DEFAULT) SPECIAL REGISTERS | WLM ENVIRONMENT FOR DEBUG MODE dbs_name | CURRENT DATA (YES|NO) | DEGREE (NUMBER_1 | ANY) | CONCURRENT ACCESS RESOLUTION (USE CURRENTLY COMMITTED | WAIT FOR OUTCOME) | DYNAMICRULES (RUN|BIND|DEFINEBIND|DEFINERUN|INVOKEBIND|INVOKERUN) | APPLICATION ENCODING SCHEME (ASCII|EBCDIC|UNICODE) | (WITH|WITHOUT) EXPLAIN | (WITH|WITHOUT) IMMEDIATE WRITE | ISOLATION LEVEL (CS|RS|RR|UR) | OPTHINT (DOUBLEQUOTE|dbs_string_constant) | SQL PATH (dbs_schema_name | SESSION? USER | SYSTEM PATH) (COMMACHAR (dbs_schema_name | SESSION? USER | SYSTEM PATH))* | QUERY ACCELERATION (NONE|ELIGIBLE|ALL|ENABLE (WITH FAILBACK)?) | GET_ACCEL_ARCHIVE (YES|NO) | ACCELERATION WAITFORDATA dbs_nnnn_m | ACCELERATOR dbs_accelerator_name | REOPT (NONE|ALWAYS|ONCE) | VALIDATE (RUN|BIND) | ROUNDING (DEC_ROUND_CEILING|DEC_ROUND_DOWN|DEC_ROUND_FLOOR|DEC_ROUND_HALF_DOWN|DEC_ROUND_HALF_EVEN|DEC_ROUND_HALF_UP|DEC_ROUND_UP) | DATE FORMAT (ISO|EUR|USA|JIS|LOCAL) | NOT? SECURED | BUSINESS_TIME SENSITIVE (YES|NO) | SYSTEM_TIME SENSITIVE (YES|NO) | ARCHIVE SENSITIVE (YES|NO) | APPLCOMPAT dbs_applcompat_value | (OFF | CONCENTRATE STATEMENTS (WITH LITERALS)?))+; /*java fix needed to add "one each" rule */
-dbs_alter_function_inline: (SPECIFIC FUNCTION dbs_specific_name | FUNCTION dbs_function_name (LPARENCHAR ((dbs_alter_function_bit | XML | dbs_distinct_type_name) (COMMACHAR (dbs_alter_function_bit | XML | dbs_distinct_type_name))*)? RPARENCHAR)?) dbs_alter_function_inlineopts; /*this is for both "inlined SQL scalar" and "SQL table" as they are basically identical - only two extra options in "table" */
+dbs_alter_function_inline: (SPECIFIC FUNCTION dbs_specific_name | FUNCTION dbs_function_name (LPARENCHAR ((common_built_in_type_core5 | XML | dbs_distinct_type_name) (COMMACHAR (common_built_in_type_core5 | XML | dbs_distinct_type_name))*)? RPARENCHAR)?) dbs_alter_function_inlineopts; /*this is for both "inlined SQL scalar" and "SQL table" as they are basically identical - only two extra options in "table" */
 dbs_alter_function_inlineopts: (NOT? DETERMINISTIC | NO? EXTERNAL ACTION | (CONTAINS SQL|READS SQL DATA) | STATIC DISPATCH | CALLED ON NULL INPUT | NOT? SECURED | INHERIT SPECIAL REGISTERS | CARDINALITY dbs_integer)+; /*java fix required to add "one each" rule */
 /*ALTER INDEX */
 dbs_alter_index: INDEX dbs_index_name (REGENERATE (USING APPLICATION COMPATIBILITY dbs_applcompat_value)? /*included as a separate piped option due to nb 2 in IBM doc*/ | (BUFFERPOOL dbs_bp_name | CLOSE (YES|NO) | COPY (YES|NO) | DSSIZE dbs_integer G | PIECESIZE dbs_integer (K|M|G) | dbs_alter_index_using | dbs_alter_index_free | dbs_alter_index_gbpcache | NOT? CLUSTER | NOT? PADDED | COMPRESS (YES|NO) | dbs_alter_index_add)+ dbs_alter_index_alter?);
@@ -203,26 +189,7 @@ dbs_comment_column: COLUMN (dbs_table_name | dbs_view_name) dbs_column_name;
 dbs_comment_function: dbs_comment_function_designator (ACTIVE VERSION | VERSION dbs_routine_version_id)?;
 dbs_comment_function_designator: (FUNCTION dbs_function_name (LPARENCHAR dbs_comment_parameter_type
                                  (COMMACHAR dbs_comment_parameter_type)* RPARENCHAR)? | SPECIFIC FUNCTION dbs_specific_name);
-dbs_comment_parameter_type: (dbs_comment_built_in_type | data_type_arr_or_distinct) (AS LOCATOR)?;
-dbs_comment_built_in_type: (dbs_comment_bit_int | dbs_comment_bit_decimal | dbs_comment_bit_float | dbs_comment_bit_decfloat |
-                            dbs_comment_bit_char | dbs_comment_bit_clob | dbs_comment_bit_varchar | dbs_comment_bit_graphic |
-                            dbs_comment_bit_binary | DATE | TIME | dbs_comment_bit_timestamp | ROWID);
-dbs_comment_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
-dbs_comment_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR dbs_integer (COMMACHAR dbs_integer)? RPARENCHAR)?;
-dbs_comment_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
-dbs_comment_bit_decfloat: DECFLOAT (LPARENCHAR (NUMBER_34 | NUMBER_16) RPARENCHAR)?;
-dbs_comment_bit_char: (CHARACTER | CHAR) (VARYING dbs_comment_bit_varchara | LARGE OBJECT dbs_comment_bit_cloba |
-                       LPARENCHAR dbs_integer RPARENCHAR dbs_comment_bit_charopts);
-dbs_comment_bit_charopts: (CCSID oneof_encoding)? (FOR (SBCS | MIXED | BIT) DATA)?;
-dbs_comment_bit_varchar: VARCHAR dbs_comment_bit_varchara;
-dbs_comment_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR dbs_comment_bit_charopts;
-dbs_comment_bit_clob: CLOB dbs_comment_bit_cloba;
-dbs_comment_bit_cloba: (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)? dbs_comment_bit_charopts;
-dbs_comment_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR |
-                         DBCLOB (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?) (CCSID oneof_encoding)?;
-dbs_comment_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR
-                        dbs_integer RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
-dbs_comment_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
+dbs_comment_parameter_type: (common_built_in_type_core5 | data_type_arr_or_distinct) (AS LOCATOR)?;
 dbs_comment_index: INDEX dbs_index_name;
 dbs_comment_package: dbs_collection_id_package_name (VERSION? dbs_version_id)?;
 dbs_comment_plan: PLAN dbs_plan_name;
@@ -492,19 +459,7 @@ dbs_delete_period: dbs_delete_period_clause dbs_correlation_name? dbs_delete_inc
                     (WHERE dbs_search_condition)? (dbs_delete_isolation_clause | SKIP LOCKED DATA)* (QUERYNO dbs_integer)?;
 dbs_delete_period_clause: FOR PORTION OF BUSINESS_TIME (FROM dbs_value TO dbs_value | BETWEEN dbs_value AND dbs_value)?;
 dbs_delete_include_column: INCLUDE LPARENCHAR dbs_column_name dbs_delete_data_type (COMMACHAR dbs_column_name dbs_delete_data_type)* RPARENCHAR;
-dbs_delete_data_type: (dbs_delete_built_in_type | dbs_distinct_type);
-dbs_delete_built_in_type: (dbs_delete_bit_int | dbs_delete_bit_decimal | dbs_delete_bit_float | dbs_delete_bit_decfloat | dbs_delete_bit_char |
-                            dbs_delete_bit_varchar | dbs_delete_bit_graphic | dbs_delete_bit_binary | DATE | TIME | dbs_delete_bit_timestamp );
-dbs_delete_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
-dbs_delete_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR dbs_integer (COMMACHAR dbs_integer)? RPARENCHAR)?;
-dbs_delete_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
-dbs_delete_bit_decfloat: DECFLOAT (LPARENCHAR (NUMBER_34 | NUMBER_16) RPARENCHAR)?;
-dbs_delete_bit_char: (CHARACTER | CHAR) (VARYING dbs_delete_bit_varchara | LPARENCHAR dbs_integer RPARENCHAR) (FOR BIT DATA)?;
-dbs_delete_bit_varchar: VARCHAR dbs_delete_bit_varchara;
-dbs_delete_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR (FOR BIT DATA)?;
-dbs_delete_bit_graphic: (GRAPHIC | VARGRAPHIC) (LPARENCHAR dbs_integer RPARENCHAR)?;
-dbs_delete_bit_binary: (BINARY VARYING? | VARBINARY) (LPARENCHAR dbs_integer RPARENCHAR)?;
-dbs_delete_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
+dbs_delete_data_type: (common_short_built_in_type | dbs_distinct_type);
 dbs_delete_assignment_clause: (dbs_delete_assignment_clause_whole | dbs_delete_assignment_clause_part);
 dbs_delete_assignment_clause_whole: dbs_column_name EQUALCHAR (dbs_expression | NULL) (COMMACHAR dbs_column_name EQUALCHAR (dbs_expression | NULL))*;
 dbs_delete_assignment_clause_part: LPARENCHAR dbs_column_name (COMMACHAR dbs_column_name)* RPARENCHAR EQUALCHAR LPARENCHAR (dbs_select_row_fullselect | (dbs_expression |
@@ -651,22 +606,7 @@ dbs_insert: INSERT INTO (dbs_table_name | dbs_view_name) (LPARENCHAR dbs_column_
             dbs_insert_include? (OVERRIDING USER VALUE)? (dbs_insert_values | dbs_insert_fullselect);
 dbs_insert_include: INCLUDE LPARENCHAR dbs_column_name dbs_include_data_type (COMMACHAR dbs_column_name dbs_include_data_type)* RPARENCHAR;
 //?
-dbs_insert_data_type: (dbs_insert_built_in_type | dbs_distinct_type);
-dbs_insert_built_in_type: (dbs_insert_bit_int | dbs_insert_bit_decimal | dbs_insert_bit_float | dbs_insert_bit_decfloat |
-                            dbs_insert_bit_char | dbs_insert_bit_varchar | dbs_insert_bit_graphic | dbs_insert_bit_vargraphic |
-                            dbs_insert_bit_binary | dbs_insert_bit_varbinary | DATE | TIME | dbs_insert_bit_timestamp );
-dbs_insert_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
-dbs_insert_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR dbs_integer (COMMACHAR dbs_integer)? RPARENCHAR)?;
-dbs_insert_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
-dbs_insert_bit_decfloat: DECFLOAT (LPARENCHAR (NUMBER_34 | NUMBER_16) RPARENCHAR)?;
-dbs_insert_bit_char: (CHARACTER | CHAR) (VARYING dbs_insert_bit_varchara | LPARENCHAR dbs_integer RPARENCHAR (FOR BIT DATA)?);
-dbs_insert_bit_varchar: VARCHAR dbs_insert_bit_varchara;
-dbs_insert_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR (FOR BIT DATA)?;
-dbs_insert_bit_graphic: GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)?;
-dbs_insert_bit_vargraphic: VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR;
-dbs_insert_bit_binary: BINARY (VARYING LPARENCHAR dbs_integer RPARENCHAR | (LPARENCHAR dbs_integer RPARENCHAR)?);
-dbs_insert_bit_varbinary: VARBINARY LPARENCHAR dbs_integer RPARENCHAR;
-dbs_insert_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
+dbs_insert_data_type: (common_short_built_in_type | dbs_distinct_type);
 dbs_insert_values: VALUES (dbs_insert_values_single | dbs_insert_values_multi);
 dbs_insert_values_single: (dbs_expression | DEFAULT | NULL | dbs_insert_values_sgloop);
 dbs_insert_values_sgloop: LPARENCHAR (dbs_expression | DEFAULT | NULL) (COMMACHAR (dbs_expression | DEFAULT | NULL))* RPARENCHAR;
@@ -692,22 +632,8 @@ dbs_merge: MERGE INTO (dbs_table_name | dbs_view_name) dbs_merge_correlation? db
         dbs_merge_values) ON dbs_search_condition (WHEN NOT? MATCHED (AND dbs_search_condition)? THEN (dbs_signal |
         dbs_merge_update | DELETE | dbs_merge_insert))+ (ELSE IGNORE)? (NOT ATOMIC CONTINUE ON SQLEXCEPTION)? (QUERYNO dbs_integer)?;
 dbs_merge_correlation: AS? dbs_correlation_name (LPARENCHAR dbs_column_name (COMMACHAR dbs_column_name)* RPARENCHAR)?;
-dbs_merge_include: INCLUDE LPARENCHAR dbs_column_name (dbs_merge_built_in_type | dbs_distinct_type) (COMMACHAR
-        dbs_column_name (dbs_merge_built_in_type | dbs_distinct_type))* RPARENCHAR;
-dbs_merge_built_in_type: (dbs_merge_bit_int | dbs_merge_bit_decimal | dbs_merge_bit_float | dbs_merge_bit_decfloat | dbs_merge_bit_char |
-        dbs_merge_bit_varchar | dbs_merge_bit_graphic | dbs_merge_bit_vargraphic | dbs_merge_bit_binary | dbs_merge_bit_varbinary | DATE | TIME | dbs_merge_bit_timestamp );
-dbs_merge_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
-dbs_merge_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR dbs_integer (COMMACHAR dbs_integer)? RPARENCHAR)?;
-dbs_merge_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
-dbs_merge_bit_decfloat: DECFLOAT (LPARENCHAR (NUMBER_34 | NUMBER_16) RPARENCHAR)?;
-dbs_merge_bit_char: (CHARACTER | CHAR) (VARYING dbs_merge_bit_varchara | LPARENCHAR dbs_integer RPARENCHAR (FOR BIT DATA)?);
-dbs_merge_bit_varchar: VARCHAR dbs_merge_bit_varchara;
-dbs_merge_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR (FOR BIT DATA)?;
-dbs_merge_bit_graphic: GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)?;
-dbs_merge_bit_vargraphic: VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR;
-dbs_merge_bit_binary: BINARY (VARYING LPARENCHAR dbs_integer RPARENCHAR | (LPARENCHAR dbs_integer RPARENCHAR)?);
-dbs_merge_bit_varbinary: VARBINARY LPARENCHAR dbs_integer RPARENCHAR;
-dbs_merge_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
+dbs_merge_include: INCLUDE LPARENCHAR dbs_column_name (common_short_built_in_type | dbs_distinct_type) (COMMACHAR
+        dbs_column_name (common_short_built_in_type | dbs_distinct_type))* RPARENCHAR;
 dbs_merge_values: LPARENCHAR VALUES (dbs_merge_values_sing | dbs_merge_values_multi) RPARENCHAR AS? dbs_correlation_name
         LPARENCHAR dbs_column_name (COMMACHAR dbs_column_name)* RPARENCHAR;
 dbs_merge_values_sing: (dbs_expression | NULL | LPARENCHAR (dbs_expression | NULL) (COMMACHAR (dbs_expression | NULL))* RPARENCHAR);
@@ -936,23 +862,8 @@ dbs_update: UPDATE (dbs_table_name | dbs_view_name) (dbs_update_searched | dbs_u
 dbs_update_searched: dbs_update_period? dbs_correlation_name? dbs_update_include? SET dbs_update_assignment (COMMACHAR
                     dbs_update_assignment)* (WHERE dbs_search_condition)? (WITH (RR|RS|CS) | SKIP LOCKED DATA)* (QUERYNO dbs_integer);
 dbs_update_period: FOR PORTION OF BUSINESS_TIME (FROM dbs_value TO dbs_value | BETWEEN dbs_value AND dbs_value);
-dbs_update_include: INCLUDE LPARENCHAR dbs_column_name (dbs_update_built_in_type | dbs_distinct_type) (COMMACHAR
-                    dbs_column_name (dbs_update_built_in_type | dbs_distinct_type))* RPARENCHAR;
-dbs_update_built_in_type: (dbs_update_bit_int | dbs_update_bit_decimal | dbs_update_bit_float | dbs_update_bit_decfloat |
-                    dbs_update_bit_char | dbs_update_bit_varchar | dbs_update_bit_graphic | dbs_update_bit_vargraphic |
-                    dbs_update_bit_binary | dbs_update_bit_varbinary | DATE | TIME | dbs_update_bit_timestamp );
-dbs_update_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
-dbs_update_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR dbs_integer (COMMACHAR dbs_integer)? RPARENCHAR)?;
-dbs_update_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
-dbs_update_bit_decfloat: DECFLOAT (LPARENCHAR (NUMBER_34 | NUMBER_16) RPARENCHAR)?;
-dbs_update_bit_char: (CHARACTER | CHAR) (VARYING dbs_update_bit_varchara | (LPARENCHAR dbs_integer RPARENCHAR)? (FOR BIT DATA)?);
-dbs_update_bit_varchar: VARCHAR dbs_update_bit_varchara;
-dbs_update_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR (FOR BIT DATA)?;
-dbs_update_bit_graphic: GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)?;
-dbs_update_bit_vargraphic: VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR;
-dbs_update_bit_binary: BINARY (VARYING LPARENCHAR dbs_integer RPARENCHAR | (LPARENCHAR dbs_integer RPARENCHAR)?);
-dbs_update_bit_varbinary: VARBINARY LPARENCHAR dbs_integer RPARENCHAR;
-dbs_update_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
+dbs_update_include: INCLUDE LPARENCHAR dbs_column_name (common_short_built_in_type | dbs_distinct_type) (COMMACHAR
+                    dbs_column_name (common_short_built_in_type | dbs_distinct_type))* RPARENCHAR;
 dbs_update_assignment: (dbs_column_name EQUALCHAR (dbs_expression | DEFAULT | NULL) | LPARENCHAR dbs_column_name
                     (COMMA dbs_column_name)* RPARENCHAR EQUALCHAR LPARENCHAR (dbs_select_row_fullselect | dbs_select_unpack_function_invocation |
                     (dbs_expression | DEFAULT | NULL) (COMMACHAR (dbs_expression | DEFAULT | NULL))*) RPARENCHAR);
@@ -999,6 +910,15 @@ common_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC L
 common_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR |
                     (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
 common_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
+
+/*built in type with no LOBs used in DELETE, INSERT, MERGE, UPDATE */
+common_short_built_in_type: (common_bit_int | common_bit_decimal | common_bit_float | common_bit_decfloat | common_short_bit_char |
+                            common_short_bit_varchar | common_short_bit_graphic | common_short_bit_binary | DATE | TIME | common_bit_timestamp );
+common_short_bit_char: (CHARACTER | CHAR) (VARYING common_short_bit_varchara | LPARENCHAR dbs_integer RPARENCHAR) (FOR BIT DATA)?;
+common_short_bit_varchar: VARCHAR common_short_bit_varchara;
+common_short_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR (FOR BIT DATA)?;
+common_short_bit_graphic: (GRAPHIC | VARGRAPHIC) (LPARENCHAR dbs_integer RPARENCHAR)?;
+common_short_bit_binary: (BINARY VARYING? | VARBINARY) (LPARENCHAR dbs_integer RPARENCHAR)?;
 
 sql_data_type: SQL (VARCHAR (LPARENCHAR dbs_integer RPARENCHAR) | DECFLOAT (LPARENCHAR (NUMBER_34) RPARENCHAR)? | DATE | TIMESTAMP (LPARENCHAR (NUMBER_12) RPARENCHAR)? );
 
