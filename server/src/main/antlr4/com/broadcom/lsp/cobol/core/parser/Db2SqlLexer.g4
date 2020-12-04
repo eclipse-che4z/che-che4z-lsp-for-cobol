@@ -465,6 +465,7 @@ OPTIMIZATION : O P T I M I Z A T I O N;
 OPTIMIZE : O P T I M I Z E;
 OPTIONAL : O P T I O N A L;
 ORDER : O R D E R;
+ORDINALITY : O R D I N A L I T Y;
 ORIGINAL : O R I G I N A L;
 OUT : O U T;
 OUTCOME : O U T C O M E;
@@ -677,6 +678,7 @@ UPPER : U P P E R;
 USA : U S A;
 USAGE : U S A G E;
 USE : U S E;
+UNNEST : U N N E S T;
 USER : U S E R;
 V1 : V '1';
 VALIDATE : V A L I D A T E;
@@ -729,7 +731,7 @@ SQL_IDENTIFIER : ([A-Z] [A-Z0-9_]*) | STRINGLITERAL;   //https://www.ibm.com/sup
 VERSION_ID : ([0-9]+ ([a-zA-Z0-9]+)*);
 ALPHANUMERIC_TEXT : [a-zA-Z0-9]+;
 POSITIVEINTEGERLITERAL: PLUSCHAR? DIGIT+;
-HOSTNAME_IDENTIFIER : ([a-zA-Z0-9._@:-] | '/')+;
+HOSTNAME_IDENTIFIER : ([a-zA-Z0-9_@-] | '/' | COLONCHAR | DOT)+;
 TIMESTAMPLITERAL: DIGIT DIGIT '.' DIGIT DIGIT '.' DIGIT DIGIT | // hh.mm.ss;
                   DIGIT DIGIT '.' DIGIT DIGIT (A M | P M) | //hh:mm AM /PM
                   DIGIT DIGIT '.' DIGIT DIGIT ':' DIGIT DIGIT |// hh.mm:ss
@@ -751,6 +753,8 @@ NUMBER_1 : '1';
 NUMBER_2 : '2';
 NUMBER_4 : '4';
 NUMBER_5 : '5';
+NUMBER_6 : '6';
+NUMBER_8 : '8';
 NUMBER_10 : '10';
 NUMBER_12: '12';
 NUMBER_14 : '14';
@@ -783,6 +787,7 @@ fragment GRAHICCHAR :
 
 fragment
 OCT_DIGIT        : [0-8] ;
+
 
 fragment
 DIGIT_GREATER_THAN_ZERO : [1-9];
