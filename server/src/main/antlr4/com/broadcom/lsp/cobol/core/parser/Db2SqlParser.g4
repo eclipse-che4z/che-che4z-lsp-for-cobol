@@ -65,7 +65,7 @@ dbs_alter_procedure: PROCEDURE dbs_procedure_name (dbs_alter_procedure_external 
 dbs_alter_procedure_external: (DYNAMIC RESULT SETS dbs_integer | EXTERNAL NAME (dbs_external_program_name | dbs_identifier) | LANGUAGE (ASSEMBLE | C | COBOL | JAVA | PLI | REXX) | PARAMETER STYLE (SQL | GENERAL (WITH NULLS)? | JAVA) | NOT? DETERMINISTIC | (PACKAGE PATH dbs_package_path | NO PACKAGE PATH) | ((MODIFIES|READS) SQL DATA | (CONTAINS|NO) SQL) | NO? DBINFO | (NO COLLID | COLLID dbs_collection_id) | WLM ENVIRONMENT (dbs_name | LPARENCHAR dbs_name COMMACHAR ASTERISKCHAR RPARENCHAR) | ASUTIME (NO LIMIT | LIMIT dbs_integer) | STAY RESIDENT (YES|NO) | PROGRAM TYPE (SUB|MAIN) | SECURITY (DB2|USER|DEFINER) | RUN OPTIONS dbs_run_time_options | COMMIT ON RETURN (YES|NO) | (INHERIT|DEFAULT) SPECIAL REGISTERS | CALLED ON NULL INPUT | (STOP AFTER (SYSTEM DEFAULT|dbs_integer) FAILURES | CONTINUE AFTER FAILURE) | (DISALLOW|ALLOW|DISABLE) DEBUG MODE)+; /*java fix needed to add "once each" rule */
 dbs_alter_procedure_alter: ALTER? (ACTIVE VERSION | ALL VERSIONS | VERSION dbs_routine_version_id)? dbs_alter_procedure_options;
 dbs_alter_procedure_options: (NOT? DETERMINISTIC | ((MODIFIES|READS) SQL DATA | CONTAINS SQL) | CALLED ON NULL INPUT | DYNAMIC RESULT SETS dbs_integer | (DISALLOW|ALLOW|DISABLE) DEBUG MODE | PARAMETER CCSID (ASCII|EBCDIC|UNICODE) | QUALIFIER dbs_schema_name | PACKAGE OWNER dbs_authorization_name | ASUTIME (NO LIMIT | LIMIT dbs_integer) | ((COMMIT ON RETURN (YES|NO)) | AUTONOMOUS) | (INHERIT|DEFAULT) SPECIAL REGISTERS | WLM ENVIRONMENT FOR DEBUG MODE dbs_name | (DEFER|NODEFER) PREPARE | CURRENT DATA (YES|NO) | DEGREE (NUMBER_1|ANY) | CONCURRENT ACCESS RESOLUTION (USE CURRENTLY COMMITTED | WAIT FOR OUTCOME) | DYNAMICRULES (RUN|BIND|DEFINERUN|DEFINEBIND|INVOKERUN|INVOKEBIND) | APPLICATION ENCODING SCHEME (ASCII|EBCDIC|UNICODE) | (WITH|WITHOUT) EXPLAIN | (WITH|WITHOUT) IMMEDIATE WRITE | ISOLATION LEVEL (CS|RS|RR|UR) | (WITH|WITHOUT) KEEP DYNAMIC | OPTHINT (DOUBLEQUOTE|dbs_string_constant) | SQL PATH (dbs_schema_name | SYSTEM PATH | SESSION? USER) (COMMACHAR (dbs_schema_name | SYSTEM PATH | SESSION? USER))* | RELEASE AT (COMMIT | DEALLOCATE) | QUERY ACCELERATION (NONE|ELIGIBLE|ALL|ENABLE (WITH FAILBACK)?) | GET_ACCEL_ARCHIVE (YES|NO) | ACCELERATION WAITFORDATA dbs_nnnn_m | ACCELERATOR dbs_accelerator_name | REOPT (NONE|ALWAYS|ONCE) | VALIDATE (RUN|BIND) | ROUNDING (DEC_ROUND_CEILING|DEC_ROUND_DOWN|DEC_ROUND_FLOOR|DEC_ROUND_HALF_DOWN|DEC_ROUND_HALF_EVEN|DEC_ROUND_HALF_UP|DEC_ROUND_UP) | DATE FORMAT (ISO|EUR|USA|JIS|LOCAL) | DECIMAL LPARENCHAR (NUMBER_15|NUMBER_31) (COMMACHAR dbs_s)? | FOR UPDATE CLAUSE (REQUIRED|OPTIONAL) | TIME FORMAT (ISO|EUR|USA|JIS|LOCAL) | BUSINESS_TIME SENSITIVE (YES|NO) | SYSTEM_TIME SENSITIVE (YES|NO) | ARCHIVE SENSITIVE (YES|NO) | APPLCOMPAT dbs_applcompat_value | CONCENTRATE STATEMENTS (OFF|WITH LITERALS))*; /*java fix needed to add "one each" rule */
-dbs_alter_procedure_replace: REPLACE (ACTIVE VERSION | VERSION dbs_routine_version_id)? (LPARENCHAR dbs_alter_procedure_paramdec (COMMACHAR dbs_alter_procedure_paramdec)* RPARENCHAR)? dbs_alter_procedure_options dbs_sql_routine_body; /*SQL-routine-body to be defined once all other statements are done */
+dbs_alter_procedure_replace: REPLACE (ACTIVE VERSION | VERSION dbs_routine_version_id)? (LPARENCHAR dbs_alter_procedure_paramdec (COMMACHAR dbs_alter_procedure_paramdec)* RPARENCHAR)? dbs_alter_procedure_options dbs_sql_procedure_statement; 
 dbs_alter_procedure_paramdec: (IN|OUT|INOUT)? dbs_parameter_name (dbs_alter_procedure_bit | data_type_arr_or_distinct);
 dbs_alter_procedure_bit: (dbs_alter_procedure_bit_int | dbs_alter_procedure_bit_decimal | dbs_alter_procedure_bit_float | dbs_alter_procedure_bit_decfloat | dbs_alter_procedure_bit_char | dbs_alter_procedure_bit_clob | dbs_alter_procedure_bit_varchar | dbs_alter_procedure_bit_graphic | dbs_alter_procedure_bit_binary | DATE | TIME | dbs_alter_procedure_bit_timestamp | XML);
 dbs_alter_procedure_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
@@ -81,7 +81,7 @@ dbs_alter_procedure_bit_cloba: (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)? (FOR 
 dbs_alter_procedure_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR | DBCLOB (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?) (CCSID oneof_encoding)?;
 dbs_alter_procedure_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
 dbs_alter_procedure_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITHOUT | WITH) TIME ZONE)?;
-dbs_alter_procedure_add: ADD VERSION dbs_routine_version_id (LPARENCHAR dbs_alter_procedure_paramdec (COMMACHAR dbs_alter_procedure_paramdec)* RPARENCHAR)? dbs_alter_procedure_options dbs_sql_routine_body;
+dbs_alter_procedure_add: ADD VERSION dbs_routine_version_id (LPARENCHAR dbs_alter_procedure_paramdec (COMMACHAR dbs_alter_procedure_paramdec)* RPARENCHAR)? dbs_alter_procedure_options dbs_sql_procedure_statement;
 dbs_alter_procedure_activate: ACTIVATE VERSION dbs_routine_version_id;
 dbs_alter_procedure_regen: REGENERATE (ACTIVE VERSION | VERSION dbs_routine_version_id)? (USING APPLICATION COMPATIBILITY dbs_applcompat_value);
 dbs_alter_procedure_drop: DROP VERSION dbs_routine_version_id;
@@ -115,7 +115,7 @@ dbs_alter_table_check: (CONSTRAINT dbs_constraint_name)? CHECK LPARENCHAR dbs_se
 common_reference_clause: REFERENCES dbs_table_name (LPARENCHAR dbs_column_name (PERIOD BUSINESS_TIME)? (COMMACHAR dbs_column_name (PERIOD BUSINESS_TIME)?)* RPARENCHAR)? (ON DELETE (RESTRICT | NO ACTION | CASCADE | SET NULL))? (NOT? ENFORCED)? (ENABLE QUERY OPTIMIZATION)?;
 dbs_alter_table_generated: GENERATED ((ALWAYS | BY DEFAULT)? (common_as_identity_clause | FOR EACH ROW ON UPDATE AS ROW CHANGE TIMESTAMP)? | ALWAYS? (AS TRANSACTION START ID | AS ROW (BEGIN|START|END) | AS LPARENCHAR dbs_non_deterministic_expression RPARENCHAR)?);
 common_as_identity_clause: AS IDENTITY (LPARENCHAR dbs_alter_table_asid_loop (COMMACHAR? dbs_alter_table_asid_loop)* RPARENCHAR)?;
-dbs_alter_table_asid_loop: (START WITH dbs_numeric_constant | INCREMENT BY dbs_numeric_constant | NO MINIVALUE | MINIVALUE dbs_numeric_constant | NO? CYCLE | NO CACHE | CACHE dbs_numeric_constant | NO? ORDER);
+dbs_alter_table_asid_loop: (START WITH dbs_numeric_constant | INCREMENT BY dbs_numeric_constant | NO MINVALUE | MINVALUE dbs_numeric_constant | NO? CYCLE | NO CACHE | CACHE dbs_numeric_constant | NO? ORDER);
 dbs_alter_table_unique: (CONSTRAINT dbs_constraint_name)? (PRIMARY KEY | UNIQUE) LPARENCHAR dbs_column_name (COMMACHAR dbs_column_name)* (COMMACHAR BUSINESS_TIME WITHOUT OVERLAPS)? RPARENCHAR;
 dbs_alter_table_referential: (CONSTRAINT dbs_constraint_name)? FOREIGN KEY LPARENCHAR dbs_column_name (PERIOD BUSINESS_TIME)? (COMMACHAR dbs_column_name (PERIOD BUSINESS_TIME)?)* RPARENCHAR common_reference_clause;
 dbs_alter_table_partitioning: RANGE? LPARENCHAR dbs_column_name (NULLS LAST)? (ASC|DESC)? (COMMACHAR dbs_column_name (NULLS LAST)? (ASC|DESC)?)* RPARENCHAR LPARENCHAR dbs_alter_table_partition (COMMACHAR dbs_alter_table_partition)* RPARENCHAR;
@@ -123,7 +123,7 @@ dbs_alter_table_partition: PARTITION dbs_integer ENDING AT? LPARENCHAR (dbs_cons
 dbs_alter_table_mq: LPARENCHAR dbs_fullselect RPARENCHAR DATA INITIALLY DEFERRED REFRESH DEFERRED (MAINTAINED BY (SYSTEM|USER) ((ENABLE|DISABLE) QUERY OPTIMIZATION)? | (ENABLE|DISABLE) QUERY OPTIMIZATION (MAINTAINED BY (SYSTEM|USER))?);
 dbs_alter_table_alter: ALTER (COLUMN? dbs_alter_table_colalt | PARTITION dbs_integer dbs_alter_table_partition | MATERIALIZED? QUERY dbs_alter_table_mq);
 dbs_alter_table_colalt: dbs_column_name (DROP DEFAULT | SET (DATA TYPE dbs_alter_table_bit (INLINE LENGTH dbs_integer)? | dbs_alter_table_defclause | INLINE LENGTH dbs_integer | dbs_alter_table_idalt | GENERATED ((ALWAYS | BY DEFAULT) dbs_alter_table_idalt? | ALWAYS? (AS TRANSACTION START ID | AS ROW (BEGIN|START|END)))));
-dbs_alter_table_idalt: (RESTART (WITH dbs_numeric_constant)? | SET (INCREMENT BY dbs_numeric_constant | NO MINIVALUE | MINIVALUE dbs_numeric_constant | NO? CYCLE | NO CACHE | CACHE dbs_integer_constant | NO? ORDER))+;
+dbs_alter_table_idalt: (RESTART (WITH dbs_numeric_constant)? | SET (INCREMENT BY dbs_numeric_constant | NO MINVALUE | MINVALUE dbs_numeric_constant | NO? CYCLE | NO CACHE | CACHE dbs_integer_constant | NO? ORDER))+;
 dbs_alter_table_rename: RENAME COLUMN dbs_column_name TO dbs_column_name;
 dbs_alter_table_drop: DROP (COLUMN? dbs_column_name RESTRICT | PRIMARY KEY | (UNIQUE|FOREIGN KEY|CHECK|CONSTRAINT) dbs_constraint_name | SYSTEM? VERSIONING | MATERIALIZED? QUERY | CLONE | RESTRICT ON DROP);
 dbs_alter_table_rotate: ROTATE PARTITION (FIRST | dbs_integer) TO LAST ENDING AT? LPARENCHAR (dbs_constant | MAXVALUE | MINVALUE) (COMMACHAR (dbs_constant | MAXVALUE | MINVALUE))* RPARENCHAR INCLUSIVE? RESET;
@@ -224,7 +224,7 @@ table_alias: dbs_alias_name FOR TABLE? (dbs_table_name | dbs_view_name | dbs_ali
 sequence_alias: dbs_alias_name FOR SEQUENCE dbs_sequence_name;
 //CREATE AUX TABLE
 dbs_create_aux_table: (AUXILIARY | AUX) TABLE dbs_table_name IN dbs_database_name? dbs_table_space_name
-                    STORIES dbs_table_name (APPEND NO | (APPEND YES)? )? COLUMN dbs_column_name (PART dbs_integer)?;
+                    STORIES dbs_table_name (APPEND (YES|NO))? COLUMN dbs_column_name (PART dbs_integer)?;
 //CREATE DB
 dbs_create_db: DATABASE (BUFFERPOOL dbs_bp_name | INDEXBP dbs_bp_name | AS WORKFILE (FOR dbs_member_name)? | STOGROUP (SYSDEFLT | dbs_stogroup_name) | CCSID oneof_encoding)*;//1 same clause must not be specified more than one time
 //CREATE FUNCTION (ALL)
@@ -234,7 +234,7 @@ dbs_create_function_compiled_scalar: (dbs_create_function_param_decl
         (COMMACHAR dbs_create_function_param_decl)*)? RPARENCHAR (dbs_create_function_func_def | WRAPPED dbs_obfuscated_statement_text);
 dbs_create_function_param_decl: dbs_parameter_name dbs_create_function_param_type;
 dbs_create_function_param_type: data_type | (TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR);
-dbs_create_function_func_def: RETURNS common_built_in_type (VERSION V1 | VERSION dbs_routine_version_id)? dbs_option_list? dbs_control_statement;//AS LOCATOR can be specified only for a LOB
+dbs_create_function_func_def: RETURNS common_built_in_type (VERSION dbs_routine_version_id)? dbs_option_list? dbs_control_statement;//AS LOCATOR can be specified only for a LOB
 //CREATE EXTERNAL SQL SCALAR FUNCTION
 dbs_create_function_ext_scalar: (function_param_decl (COMMACHAR function_param_decl)*)? RPARENCHAR
                             RETURNS (common_built_in_type_core5 (AS LOCATOR)?  | common_built_in_type_core5 CAST FROM common_built_in_type_core5 (AS LOCATOR)?) dbs_option_list_ext;
@@ -249,11 +249,11 @@ dbs_create_function_ext_table_body: dbs_column_name common_built_in_type (AS LOC
 dbs_create_function_inline_scalar: (function_param_decl (COMMACHAR function_param_decl)*)? RPARENCHAR
                                  (dbs_create_function_func_inl_def | WRAPPED dbs_obfuscated_statement_text);
 dbs_create_function_func_inl_def: RETURNS common_built_in_type (LANGUAGE SQL)? dbs_option_list_inl_def dbs_create_function_func_inl_sql_routine;
-dbs_create_function_func_inl_sql_routine: RETRUN dbs_control_statement;//TODO
+dbs_create_function_func_inl_sql_routine: RETURN dbs_control_statement;//TODO
 //CREATE SOURCED FUNCTION
 dbs_create_function_sourced: (dbs_create_function_sourced_param_decl (COMMACHAR dbs_create_function_sourced_param_decl)*)? RPARENCHAR
-                             RETURNS common_built_in_type (AS LOCATOR)? (SPECIFIC dbs_specific_name)? (PARAMETER CCSID oneof_encoding)
-                             (SOURCE ( dbs_function_name (dbs_create_function_sourced_param_type (COMMACHAR dbs_create_function_sourced_param_type)*)?  | SPECIFIC dbs_specific_name));
+                             RETURNS common_built_in_type (AS LOCATOR)? (SPECIFIC dbs_specific_name)? (PARAMETER CCSID oneof_encoding)?
+                             SOURCE (dbs_function_name (dbs_create_function_sourced_param_type (COMMACHAR dbs_create_function_sourced_param_type)*)?  | SPECIFIC dbs_specific_name);
 dbs_create_function_sourced_param_decl: (dbs_parameter_name)? dbs_create_function_sourced_param_type;
 dbs_create_function_sourced_param_type: (common_built_in_type | dbs_distinct_type_name) (AS LOCATOR)?  | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR;
 //CREATE FUNCTION - SQL TABLE
@@ -262,7 +262,7 @@ dbs_create_function_sql_table: (dbs_create_function_sql_table_param_decl (COMMAC
 dbs_create_function_sql_table_param_decl: (dbs_parameter_name)? dbs_create_function_sql_table_param_type;
 dbs_create_function_sql_table_param_type: (common_built_in_type | dbs_distinct_type_name)  | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR;
 dbs_create_function_sql_func_def: RETURNS TABLE LPARENCHAR  dbs_column_name common_built_in_type (COMMACHAR dbs_column_name common_built_in_type)* RPARENCHAR dbs_option_list_inl_def dbs_create_function_func_sql_routine;
-dbs_create_function_func_sql_routine: RETRUN dbs_control_statement | BEGIN ATOMIC RETURN dbs_control_statement END;//TODO
+dbs_create_function_func_sql_routine: RETURN dbs_control_statement | BEGIN ATOMIC RETURN dbs_control_statement END;//TODO
 //CREATE GLOBAL TEMP TABLE
 dbs_create_global_temp_table: GLOBAL TEMPORARY TABLE  dbs_table_name LPARENCHAR (dbs_create_global_temp_table_col_def (COMMACHAR dbs_create_global_temp_table_col_def)*) RPARENCHAR | LIKE (dbs_table_name | dbs_view_name)
                                 (CCSID oneof_encoding)?;
@@ -276,46 +276,46 @@ xml_index_specification: GENERATE (KEY | KEYS) USING XMLPATTERN xml_pattern_clau
 xml_pattern_clause: prolog? pattern_expression;
 prolog: (DECLARE NAMESPACE NCNAME  EQUALCHAR dbs_namespace_name SEMICOLONCHAR | DECLARE DEFAULT ELEMENT NAMESPACE dbs_namespace_name SEMICOLONCHAR)*;
 pattern_expression: ( (SLASHCHAR | DOUBLESLASHCHAR)  )*; //TBD ?
-other_opt_part1: ((NOT)? CLUSTER | PARTITIONED | (NOT)? PADDED using_specification free_specification gbpcache_specification (DEFINE yes_or_no  COMPRESS yes_or_no (INCLUDE | EXCLUDE) NULL KEYS))*;
+other_opt_part1: ((NOT)? CLUSTER | PARTITIONED | (NOT)? PADDED | using_specification | free_specification | gbpcache_specification | DEFINE yes_or_no |  COMPRESS yes_or_no | (INCLUDE | EXCLUDE) NULL KEYS)*;
 other_opt_part2: (PARTITION BY (RANGE)? LPARENCHAR (partition_using_specification (COMMACHAR  partition_using_specification))* RPARENCHAR)?;
-other_opt_part3: (BUFFERPOOL dbs_bp_name | CLOSE yes_or_no | DEFER no_or_yes | DSSIZE INTEGER G | PIECESIZE INTEGER k_m_g | COPY no_or_yes)*;
-partition_using_specification: partition_element (using_specification | free_specification | gbpcache_specification | DSSIZE INTEGER G)?;
-using_specification: USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name (PRIQTY (NUMBER_12 | INTEGER)? | SECQTY INTEGER | ERASE yes_or_no?)*);
-free_specification: ( (FREEPAGE (NUMBER_0 | INTEGER) | PCTFREE  (NUMBER_10 | INTEGER)))*;
+other_opt_part3: (BUFFERPOOL dbs_bp_name | CLOSE yes_or_no | DEFER no_or_yes | DSSIZE dbs_integer G | PIECESIZE dbs_integer k_m_g | COPY no_or_yes)*;
+partition_using_specification: partition_element (using_specification | free_specification | gbpcache_specification | DSSIZE dbs_integer G)?;
+using_specification: USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name (PRIQTY dbs_integer? | SECQTY dbs_integer | ERASE yes_or_no?)*);
+free_specification: (FREEPAGE dbs_integer | PCTFREE  dbs_integer)*;
 gbpcache_specification: GBPCACHE (CHANGED | ALL) | NONE;
-partition_element: PARTITION INTEGER (ENDING AT? partition_element_loop (INCLUSIVE)? )?;
+partition_element: PARTITION dbs_integer (ENDING AT? partition_element_loop (INCLUSIVE)? )?;
 partition_element_loop:  LPARENCHAR const_options (COMMACHAR const_options)*  RPARENCHAR;
 const_options: dbs_string_constant | MAXVALUE | MINVALUE;
 //CREATE LOB TABLESPACE
 dbs_create_lob_tablespace: LOB TABLESPACE dbs_table_space_name dbs_create_lob_tablespace_def*;
-dbs_create_lob_tablespace_def: IN (DSNDB04 | dbs_database_name) (BUFFERPOOL dbs_bp_name)? CLOSE yes_or_no COMPRESS yes_or_no | DEFINE yes_or_no DSSIZE (NUMBER_4 G | INTEGER G) gbpcache_block?
-                            LOCKMAX (SYSTEM | INTEGER) locksize_block?  NOT? LOGGED using_block?;
+dbs_create_lob_tablespace_def: (IN dbs_database_name | BUFFERPOOL dbs_bp_name | CLOSE yes_or_no | COMPRESS yes_or_no | DEFINE yes_or_no | DSSIZE dbs_integer G | gbpcache_block |
+                            LOCKMAX (SYSTEM | dbs_integer) | locksize_block | NOT? LOGGED | using_block)*; /*java fix */
 gbpcache_block: GBPCACHE (CHANGED | ALL | SYSTEM | NONE);
 locksize_block: (LOCKSIZE (ANY | LOB))?;
-using_block: USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name (PRIQTY INTEGER | SECQTY INTEGER | ERASE yes_or_no?)*);
+using_block: USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name (PRIQTY dbs_integer | SECQTY dbs_integer | ERASE yes_or_no?)*);
 //CREATE MASK
-dbs_create_mask: MASK dbs_mask_name ON dbs_table_name ((AS)? dbs_correlation_name)? FOR COLUMN dbs_column_name RETURN dbs_case_expression (DISABLE | ENABLE);
+dbs_create_mask: MASK dbs_mask_name ON dbs_table_name (AS? dbs_correlation_name)? FOR COLUMN dbs_column_name RETURN dbs_case_expression (DISABLE | ENABLE)?;
 //CREATE PERMISSION
-dbs_create_permission: PERMISSION dbs_permission_name ON dbs_table_name ((AS)? dbs_correlation_name)? FOR ROWS WHERE dbs_search_condition ENFORCED FOR ALL ACCESS  (DISABLE | ENABLE);
-//CREATE PERMISSION - EXTTERNAL
+dbs_create_permission: PERMISSION dbs_permission_name ON dbs_table_name (AS? dbs_correlation_name)? FOR ROWS WHERE dbs_search_condition ENFORCED FOR ALL ACCESS  (DISABLE | ENABLE)?;
+//CREATE PERMISSION - EXTERNAL
 dbs_create_procedure_ext: (OR REPLACE)? dbs_procedure_name  (LPARENCHAR dbs_create_procedure_ext_pdecl (COMMACHAR dbs_create_procedure_ext_pdecl)* RPARENCHAR)? dbs_option_list_proc_ext;
-dbs_create_procedure_ext_pdecl: (IN OUT INOUT)? (dbs_parameter_name)? dbs_create_procedure_ext_ptype;
+dbs_create_procedure_ext_pdecl: (IN | OUT | INOUT)? dbs_parameter_name? dbs_create_procedure_ext_ptype;
 dbs_create_procedure_ext_ptype:  (common_built_in_type | dbs_distinct_type_name) (AS LOCATOR)?  | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR; //built-in-type change
 //CREATE PERMISSION - NATIVE
 dbs_create_procedure_native_sql: (OR REPLACE)? PROCEDURE dbs_procedure_name  (LPARENCHAR dbs_create_procedure_native_pdecl (COMMACHAR dbs_create_procedure_native_pdecl)* RPARENCHAR)? procedure_def | WRAPPED dbs_obfuscated_statement_text;
 dbs_create_procedure_native_pdecl: (IN OUT INOUT)? (dbs_parameter_name) dbs_create_procedure_native_ptype;
 dbs_create_procedure_native_ptype: data_type  | TABLE LIKE (dbs_table_name | dbs_view_name) AS LOCATOR;//built-in-type change
-procedure_def: (VERSION (V1 | dbs_routine_version_id))?  dbs_option_list_proc_native dbs_sql_routine_body; //check SQL routine if finished
+procedure_def: (VERSION dbs_routine_version_id)?  dbs_option_list_proc_native dbs_sql_procedure_statement;
 //CREATE ROLE
 dbs_create_role: ROLE dbs_role_name;
 //CREATE SEQUENCE
 dbs_create_sequence: SEQUENCE dbs_sequence_name dbs_create_sequence_body*;
-dbs_create_sequence_body: AS (INTEGER | dbs_distinct_type_name | common_bit_int | common_bit_decimal) START WITH dbs_numeric_constant INCREMENT BY (NUMBER_1 | dbs_numeric_constant)
-                NO? MINVALUE dbs_numeric_constant | NO MAXVALUE | MAXVALUE dbs_numeric_constant NO? CYCLE | CACHE (NUMBER_20 | dbs_integer_constant) | NO CACHE | NO? ORDER;
+dbs_create_sequence_body: AS (INTEGER | dbs_distinct_type_name | common_bit_int | common_bit_decimal) | START WITH dbs_numeric_constant | INCREMENT BY dbs_numeric_constant |
+                (NO MINVALUE | MINVALUE dbs_numeric_constant) | (NO MAXVALUE | MAXVALUE dbs_numeric_constant) | NO? CYCLE | (CACHE dbs_integer_constant | NO CACHE) | NO? ORDER;
 //CREATE STOGROUP
 dbs_create_stogroup: STOGROUP dbs_stogroup_name (VOLUMES LPARENCHAR dbs_volume_loop RPARENCHAR)? VCAT dbs_volume_cat;
-dbs_volume_loop:  dbs_volume_loop (COMMACHAR dbs_volume_loop)+ | ASTERISKCHAR (COMMACHAR ASTERISKCHAR)+;
-dbs_volume_cat: dbs_catalog_name (DATACLAS dbs_dc_name)? (MGMTCLAS dbs_mc_name)? (STORCLAS dbs_sc_name)? (NO? KEY LABEL dbs_key_label_name?)?;
+dbs_volume_loop:  dbs_volume_loop (COMMACHAR dbs_volume_loop)* | ASTERISKCHAR (COMMACHAR ASTERISKCHAR)*;
+dbs_volume_cat: dbs_catalog_name (DATACLAS dbs_dc_name)? (MGMTCLAS dbs_mc_name)? (STORCLAS dbs_sc_name)? (NO KEY LABEL | KEY LABEL dbs_key_label_name)?;
 //CREATE SYNONYM deprecated, use CREATE ALIAS
 //CREATE TABLE
 dbs_create_table: TABLE dbs_table_name (dbs_create_table_elements_def (COMMACHAR dbs_create_table_elements_def)* RPARENCHAR | LIKE (dbs_table_name | dbs_view_name) copy_options? |
@@ -325,40 +325,40 @@ columnn_def: dbs_column_name (common_built_in_type_core3 | dbs_distinct_type_nam
 columnn_def_body: (NOT NULL | generated_clause | column_constraint | column_def_clause | FIELDPROC  dbs_program_name field_prog_loop? |  AS SECURITY LABEL | IMPLICITLY HIDDEN | INLINE LENGTH dbs_integer)*;
 column_def_clause : WITH? DEFAULT default_options?;
 xml_type_modifier: XMLSCHEMA  xml_type_modifier_body (COMMACHAR xml_type_modifier_body)*;
-xml_type_modifier_body: xml_schema_spec (ELEMENET dbs_element_name)?;
+xml_type_modifier_body: xml_schema_spec (ELEMENT dbs_element_name)?;
 xml_schema_spec: ID dbs_registered_xml_schema_name | (URL dbs_target_namespace | NO NAMESPACE) (LOCATION dbs_schema_location)?;
-generated_clause: (GENERATED (ALWAYS | BY DEFAULT)  (common_as_identity_clause | as_row_change_timestamp_clause)? ) | ( GENERATED  ALWAYS? as_row_transaction_start_id_clause |  as_row_transaction_timestamp_clause |  as_generated_expression_clause);
+generated_clause: GENERATED (ALWAYS | BY DEFAULT)?  (common_as_identity_clause | as_row_change_timestamp_clause)? | GENERATED  ALWAYS? (as_row_transaction_start_id_clause |  as_row_transaction_timestamp_clause |  as_generated_expression_clause);
 as_row_change_timestamp_clause: FOR EACH ROW ON UPDATE AS ROW CHANGE TIMESTAMP;
 as_row_transaction_start_id_clause: AS TRANSACTION START ID;
-as_row_transaction_timestamp_clause: AS ROW (BEGIN | START) | END;
+as_row_transaction_timestamp_clause: AS ROW (BEGIN | START | END);
 as_generated_expression_clause: AS LPARENCHAR non_deterministic_expression RPARENCHAR;
 non_deterministic_expression: DATA CHANGE OPERATION | special_register | session_variable;
-special_register: CURRENT CLIENT_ACCTNG | CURRENT CLIENT_APPLNAME | CURRENT CLIENT_CORR_TOKEN | CURRENT CLIENT_USERID | CURRENT CLIENT_WRKSTNNAME | CURRENT SERVER | CURRENT SQLID | SESSION_USER;
-session_variable: SYSIBM DOT PACKAGE_NAME | SYSIBM DOT PACKAGE_SCHEMA | SYSIBM DOT PACKAGE_VERSION;
+special_register: CURRENT CLIENT_ACCTNG | CURRENT CLIENT_APPLNAME | CURRENT CLIENT_CORR_TOKEN | CURRENT CLIENT_USERID | CURRENT CLIENT_WRKSTNNAME | CURRENT SERVER | CURRENT SQLID | SESSION_USER | USER;
+session_variable: SYSIBM DOT (PACKAGE_NAME | PACKAGE_SCHEMA | PACKAGE_VERSION);
 default_options: default_options_vals | dbs_cast_function_name LPARENCHAR default_options_vals RPARENCHAR;
 default_options_vals: dbs_constant | (SESSION_USER | USER) | CURRENT | CURRENT SQLID | NULL;
 field_prog_loop: LPARENCHAR dbs_constant (COMMACHAR dbs_constant)* RPARENCHAR;
-column_constraint: (CONSTRAINT dbs_constraint_name)? (PRIMARY KEY | UNIQUE | common_reference_clause | CHECH LPARENCHAR  dbs_search_condition RPARENCHAR);
+column_constraint: (CONSTRAINT dbs_constraint_name)? (PRIMARY KEY | UNIQUE | common_reference_clause | CHECK LPARENCHAR  dbs_search_condition RPARENCHAR)?;
 period_def: PERIOD FOR? ( SYSTEM_TIME LPARENCHAR dbs_begin_column_name COMMACHAR dbs_end_column_name   RPARENCHAR | BUSINESS_TIME LPARENCHAR dbs_begin_column_name COMMACHAR dbs_end_column_name (EXCLUSIVE | INCLUSIVE)?  RPARENCHAR  );
 unique_constraint: (CONSTRAINT dbs_constraint_name)? (PRIMARY KEY | UNIQUE) LPARENCHAR dbs_column_name COMMACHAR dbs_column_name* (COMMACHAR BUSINESS_TIME WITHOUT OVERLAPS )? RPARENCHAR;
 referential_constraint: (CONSTRAINT dbs_constraint_name)?  FOREIGN KEY LPARENCHAR referential_constraint_body  RPARENCHAR common_reference_clause;
 referential_constraint_body: LPARENCHAR dbs_column_name (COMMACHAR PERIOD BUSINESS_TIME)? (COMMACHAR dbs_column_name (COMMACHAR PERIOD BUSINESS_TIME)?)*  RPARENCHAR;
 check_constraint: (CONSTRAINT dbs_constraint_name)? CHECK LPARENCHAR  dbs_search_condition RPARENCHAR;
-copy_options: ( (EXCLUDING | INCLUDING)? IDENTITY (COLUMN ATTRIBUTES)? | (EXCLUDING | INCLUDING)? ROW CHANGE TIMESTAMP (COLUMN ATTRIBUTES)?  | ((EXCLUDING COLUMN? | INCLUDING COLUMN? DEFAULTS) | USING TYPE DEFAULTS) | EXCLUDING XML TYPE MODIFIERS)+;
+copy_options: ( (EXCLUDING | INCLUDING) IDENTITY (COLUMN ATTRIBUTES)? | (EXCLUDING | INCLUDING) ROW CHANGE TIMESTAMP (COLUMN ATTRIBUTES)?  | ((EXCLUDING|INCLUDING) COLUMN? DEFAULTS | USING TYPE DEFAULTS) | EXCLUDING XML TYPE MODIFIERS)+;
 as_result_table: common_loop_and_fullselect RPARENCHAR WITH NO DATA;
 common_loop_and_fullselect: column_loop?  AS LPARENCHAR dbs_fullselect;
-column_loop: LPARENCHAR dbs_column_name COMMACHAR dbs_column_name* RPARENCHAR;
+column_loop: LPARENCHAR dbs_column_name (COMMACHAR dbs_column_name)* RPARENCHAR;
 materialized_query_def: common_loop_and_fullselect refreshable_table_options;
 refreshable_table_options: DATA INITIALLY DEFERRED REFRESH DEFERRED ( MAINTAINED (BY SYSTEM | BY USER) | (ENABLE | DISABLE) QUERY OPTIMIZATION)*;
-dbs_create_table_data_def: in_clause_def | partitioning_clause | organization_clause | EDITPROC dbs_program_name  (WITH | WITHOUT)? ROW ATTRIBUTES  | VALIDPROC  dbs_program_name | AUDIT (NONE | CHANGES | ALL)
-                    | OBID dbs_integer | DATA CAPTURE (NONE | CHANGES)? | WITH RESTRICT ON DROP | CCSID oneof_encoding |  NOT VOLATILE CARDINALITY? | VOLATILE CARDINALITY? | NOT? LOGGED | COMPRESS no_or_yes? | APPEND no_or_yes | DSSIZE dbs_integer G | BUFFERPOOL dbs_bp_name |  MEMBER CLUSTER
-                     | TRACKMOD (yes_or_no | dbs_imptkmod_param)  | PAGENUM (dbs_pageset_pagenum_param | RELATIVE | ABSOLUTE)? | NO? KEY LABEL  ;
+dbs_create_table_data_def: in_clause_def | partitioning_clause | organization_clause | EDITPROC dbs_program_name (WITH | WITHOUT) ROW ATTRIBUTES  | VALIDPROC  dbs_program_name | AUDIT (NONE | CHANGES | ALL)
+                    | OBID dbs_integer | DATA CAPTURE (NONE | CHANGES)? | WITH RESTRICT ON DROP | CCSID oneof_encoding |  NOT? VOLATILE CARDINALITY? | NOT? LOGGED | COMPRESS no_or_yes | APPEND no_or_yes | DSSIZE dbs_integer G | BUFFERPOOL dbs_bp_name |  MEMBER CLUSTER
+                     | TRACKMOD (yes_or_no | dbs_imptkmod_param)  | PAGENUM (dbs_pageset_pagenum_param | RELATIVE | ABSOLUTE) | (NO KEY LABEL | KEY LABEL dbs_key_label_name) ;
 in_clause_def: (IN dbs_table_name? dbs_table_space_name | IN DATABASE dbs_database_name | IN ACCELERATOR dbs_accelerator_name);
 partitioning_clause:  PARTITION BY (RANGE? LPARENCHAR partition_expression (COMMACHAR partition_expression)*  RPARENCHAR  LPARENCHAR partitioning_element (COMMACHAR partitioning_element)*  RPARENCHAR  |  SIZE (EVERY dbs_integer G)?);
 partition_expression: dbs_column_name (NULLS LAST)? (ASC | DESC)?;
 partitioning_element: PARTITION dbs_integer ENDING AT? partition_element_loop partition_hash_space? INCLUSIVE?;
 partition_hash_space: HASH SPACE dbs_integer k_m_g;
-organization_clause: ORGANIZE BY HASH UNIQUE column_loop (HASH SPACE ( NUMBER_64 M | k_m_g))?;
+organization_clause: ORGANIZE BY HASH UNIQUE column_loop partition_hash_space?;
 no_or_yes: (NO | YES);
 yes_or_no: (YES | NO);
 k_m_g: (K | M | G);
@@ -366,13 +366,13 @@ oneof_encoding: (ASCII | EBCDIC | UNICODE);
 //CREATE TABLESPACE
 dbs_create_tablespace: TABLESPACE QUESTIONMARK dbs_table_space_name dbs_create_tablespace_opts*;
 dbs_create_tablespace_opts : IN (DSNDB04  | dbs_database_name) | BUFFERPOOL dbs_bp_name | partition_by_growth_spec  | partition_by_range_spec | dbs_dpsegsz_param |
-               SEGSIZE dbs_integer | DSSIZE (NUMBER_4  | dbs_integer) G  | CCSID oneof_encoding | CLOSE yes_or_no | COMPRESS no_or_yes | DEFINE no_or_yes | free_block  |  gbpcache_block
+               SEGSIZE dbs_integer | DSSIZE dbs_integer G  | CCSID oneof_encoding | CLOSE yes_or_no | COMPRESS no_or_yes | DEFINE no_or_yes | free_block  |  gbpcache_block
                | INSERT ALGORITHM (NUMBER_0 | NUMBER_1 | NUMBER_2) | LOCKMAX (SYSTEM | dbs_integer) | locksize_block_tbl  | TRACKMOD (yes_or_no | dbs_imptkmod_param) | using_block;
-partition_by_growth_spec: MAXPARTITIONS (NUMBER_256 | dbs_integer (NUMPARTS (NUMBER_1 | dbs_integer))?);
+partition_by_growth_spec: MAXPARTITIONS (NUMBER_256 | dbs_integer (NUMPARTS dbs_integer)?);
 partition_by_range_spec: NUMPARTS dbs_integer partition_by_range_spec_body*;
 partition_by_range_spec_body: LPARENCHAR partitions_opts (COMMACHAR partitions_opts)*  RPARENCHAR | PAGENUM (dbs_pageset_pagenum_param | ABSOLUTE | RELATIVE);
-partitions_opts: PARTITION dbs_integer (using_block | free_block  gbpcache_block | COMPRESS  yes_or_no  | dbs_imptkmod_param | TRACKMOD yes_or_no | DSSIZE (NUMBER_4 | dbs_integer) G)+;
-free_block: (FREEPAGE  (NUMBER_0 | dbs_integer) | PCTFREE NUMBER_5 | PCTFREE (dbs_smallint (FOR UPDATE dbs_smallint)?)?)+;
+partitions_opts: PARTITION dbs_integer (using_block | free_block  gbpcache_block | COMPRESS  yes_or_no  | dbs_imptkmod_param | TRACKMOD yes_or_no | DSSIZE dbs_integer G)+;
+free_block: (FREEPAGE  dbs_integer | PCTFREE (dbs_smallint (FOR UPDATE dbs_smallint)?)?)+;
 locksize_block_tbl: LOCKSIZE (ANY | TABLESPACE | PAGE | ROW);
 //CREATE TRIGGER ADVANCED
 dbs_create_trigger_advanced: (OR REPLACE)? TRIGGER dbs_trigger_name (trigger_definition | WRAPPED dbs_obfuscated_statement_text);
@@ -743,7 +743,7 @@ dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCH
 dbs_select_row_fullselect: literal+; //TBD
 dbs_subselect: dbs_select_clause dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause?
 dbs_orderby_clause? dbs_offset_clause? dbs_fetch_clause;
-dbs_select_clause: SELECT (ALL | DISTNCT)? ( ASTERISKCHAR | dbs_select_item (COMMACHAR dbs_select_item)*);
+dbs_select_clause: SELECT (ALL | DISTINCT)? ( ASTERISKCHAR | dbs_select_item (COMMACHAR dbs_select_item)*);
 dbs_select_item: (dbs_expression AS? SQL_IDENTIFIER? | dbs_unpacked_row | dbs_generic_name SELECT_ALL);
 dbs_unpacked_row: dbs_select_unpack_function_invocation SELECT_ALL AS LPARENCHAR (dbs_generic_name db2sql_data_types)
 (COMMACHAR dbs_generic_name db2sql_data_types)* RPARENCHAR;
@@ -853,7 +853,7 @@ dbs_signal: dbs_label? SIGNAL (dbs_sql_condition_name | SQLSTATE VALUE? (dbs_sql
 /*TRANSFER OWNERSHIP */
 dbs_transfer: TRANSFER OWNERSHIP OF (DATABASE dbs_database_name | INDEX dbs_index_name | STOGROUP dbs_stogroup_name |
                 TABLE dbs_table_name | TABLESPACE dbs_database_name? dbs_table_space_name | VIEW dbs_view_name) TO (ROLE dbs_role_name |
-                USER dbs_authorization_name | SESSION_USER) REVOKE PRIVELEGES;
+                USER dbs_authorization_name | SESSION_USER) REVOKE PRIVILEGES;
 
 /*TRUNCATE */
 dbs_truncate: TRUNCATE TABLE? dbs_table_name ((DROP | REUSE) STORAGE)? ((IGNORE | RESTRICT WHEN) DELETE TRIGGERS)? IMMEDIATE?;
@@ -997,15 +997,15 @@ dbs_while_statement: (dbs_key_label_name COLONCHAR)? WHILE dbs_search_condition 
 
 /// DB2 SQL PROCEDURE STATEMENT//////
 // ref - https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sqlprocedurestatement4nativesqlpl.html#db2z_sqlprocedurestatement4nativesqlpl//
-dbs_sql_procedure_statement: (dbs_sql_control_statement | dbs_allocate | dbs_alter_database | dbs_alter_function | dbs_alter_index | dbs_alter_mask | dbs_alter_permission
- | dbs_alter_procedure | dbs_alter_sequence | dbs_alter_stogroup | dbs_alter_table | dbs_alter_tablespace | dbs_alter_trigger | dbs_alter_trusted | dbs_alter_view
- | dbs_associate | dbs_call | dbs_close | dbs_comment | dbs_commit | dbs_connect | dbs_create_alias | dbs_create_db |
+dbs_sql_procedure_statement: (dbs_sql_control_statement | dbs_allocate | ALTER (dbs_alter_database | dbs_alter_function | dbs_alter_index | dbs_alter_mask | dbs_alter_permission
+ | dbs_alter_procedure | dbs_alter_sequence | dbs_alter_stogroup | dbs_alter_table | dbs_alter_tablespace | dbs_alter_trigger | dbs_alter_trusted | dbs_alter_view)
+ | dbs_associate | dbs_call | dbs_close | dbs_comment | dbs_commit | dbs_connect | CREATE (dbs_create_alias | dbs_create_db |
  dbs_create_function | dbs_create_global_temp_table | dbs_create_index | dbs_create_procedure_ext | dbs_create_role | dbs_create_sequence
  | dbs_create_stogroup | dbs_create_alias | dbs_create_table | dbs_create_tablespace | dbs_create_trusted_context | dbs_create_type_array |
- dbs_create_type_distinct | dbs_create_variable | dbs_create_view) (dbs_declare_cursor | dbs_declare_global | dbs_delete | dbs_drop |
- dbs_exchange | dbs_execute | dbs_execute_immediate | dbs_fetch| dbs_get | dbs_grant | dbs_insert | dbs_label |
+ dbs_create_type_distinct | dbs_create_variable | dbs_create_view) | DECLARE (dbs_declare_cursor | dbs_declare_global) | dbs_delete | dbs_drop |
+ dbs_exchange | dbs_execute | dbs_fetch | dbs_get | dbs_grant | dbs_insert | dbs_label |
  dbs_lock | dbs_merge | dbs_open | dbs_prepare | dbs_refresh | dbs_release | dbs_rename | dbs_revoke | dbs_rollback | dbs_savepoint |
- dbs_select_into | dbs_set | dbs_truncate | dbs_update | dbs_values_into);
+ dbs_select_into | dbs_set | dbs_truncate | dbs_update | VALUES dbs_values_into);
 
 dbs_select_into: ; //TODO ref - https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_sql_selectinto.html
 
@@ -1120,6 +1120,7 @@ dbs_OLAP_specification: dbs_ordered_OLAP_specification |
 dbs_table_designator: all_words+; //?
 dbs_row_change_expression: ROW CHANGE (TIMESTAMP | TOKEN) FOR dbs_table_designator;
 dbs_sequence_reference: (NEXT| PREVIOUS) VALUE FOR dbs_sequence_name;
+
 /////////////////DBS EXPRESSION ENDS///////////////////
 
 
@@ -1349,7 +1350,6 @@ dbs_specific_name: SQL_IDENTIFIER;
 dbs_sql_condition_name: dbs_generic_name; // No particular spec found in doc. Specifies the name of the condition.
 dbs_sql_control_statement: dbs_control_statement; //
 dbs_sql_parameter_name: dbs_generic_name; //
-dbs_sql_routine_body: all_words+;// TODO: SQL-routine-body to be defined once all other statements are done
 dbs_sql_variable_name: dbs_generic_name; //
 dbs_sqlstate_string_constant: STRINGLITERAL; //
 dbs_statement_name: dbs_generic_name; // Can't find much but seems a generic name should satify the need.
