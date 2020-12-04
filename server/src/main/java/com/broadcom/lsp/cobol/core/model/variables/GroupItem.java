@@ -16,13 +16,9 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
-
-import lombok.NonNull;
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.util.Collections.unmodifiableList;
 
 /**
  * This value class represents a group item COBOL variable. Group elements can have nested
@@ -30,32 +26,21 @@ import static java.util.Collections.unmodifiableList;
  * structure with level 01, as well as nested ones with higher level numbers.
  */
 @Value
-public class GroupItem implements StructuredVariable {
-  private String name;
-  private Locality definition;
-  private List<Variable> children = new ArrayList<>();
+@EqualsAndHashCode(callSuper = true)
+public class GroupItem extends StructuredVariable {
 
-  public GroupItem(@NonNull String name, @NonNull Locality definition) {
-    this.name = name;
-    this.definition = definition;
+  public GroupItem(int levelNumber, String name, String qualifier, Locality definition) {
+    super(levelNumber, name, qualifier, definition);
   }
 
-  /**
-   * Add a new nested variable to this structure
-   *
-   * @param child - a nested variable. Can be a group or element, or all the other allowed type
-   *     item.
-   */
-  public void addChild(Variable child) {
-    children.add(child);
-  }
-
-  /**
-   * Return a list of already defined nested variables
-   *
-   * @return defined nested variables.
-   */
-  public List<Variable> getChildren() {
-    return unmodifiableList(children);
+  @Override
+  public Variable rename(String renameItemName) {
+    return levelNumber == 1
+        ? null
+        : new GroupItem(
+            levelNumber,
+            name,
+            VariableUtils.renameQualifier(qualifier, renameItemName),
+            definition);
   }
 }

@@ -15,23 +15,52 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
+import lombok.NonNull;
+
+import java.util.List;
 
 /**
- * This interface describes a COBOL Variable. Variable has a name, a level number that shows its
- * position in the hierarchy, and a unique definition locality.
+ * This interface describes a COBOL Variable. Variable has a name and a unique definition locality.
  */
-public interface Variable {
+public interface Variable extends Renameable {
   /**
    * Get name of the variable
    *
    * @return String variable name
    */
+  @NonNull
   String getName();
 
   /**
-   * Get definition locality
+   * Get qualifier of this variable. Contains the variable hierarchy top-down string representation
+   * and this variable name; separated by whitespace. May be not unique on definition, required to
+   * be unique on referencing
    *
-   * @return the definition locality
+   * @return string qualifier
    */
+  @NonNull
+  String getQualifier();
+
+  /**
+   * Get definition locality for this variable. The definition is unique
+   *
+   * @return the definition {@link Locality}
+   */
+  @NonNull
   Locality getDefinition();
+
+  /**
+   * Get list of usage localities for this variable
+   *
+   * @return list of usage {@link Locality}
+   */
+  @NonNull
+  List<Locality> getUsages();
+
+  /**
+   * Store a usage of this variable
+   *
+   * @param usage - a {@link Locality} of this variable usage
+   */
+  void addUsage(@NonNull Locality usage);
 }

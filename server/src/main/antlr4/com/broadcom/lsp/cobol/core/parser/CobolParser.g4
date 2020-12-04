@@ -490,7 +490,7 @@ dataDescriptionEntry
    ;
 
 dataDescriptionEntryFormat1
-   : LEVEL_NUMBER (FILLER | dataName1)? (dataGroupUsageClause | dataRedefinesClause | dataIntegerStringClause
+   : LEVEL_NUMBER entryName? (dataGroupUsageClause | dataRedefinesClause | dataIntegerStringClause
    | dataExternalClause | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataPictureClause
    | dataCommonOwnLocalClause | dataTypeClause | dataUsingClause | dataUsageClause | dataValueClause
    | dataReceivedByClause | dataOccursClause | dataSignClause | dataSynchronizedClause | dataJustifiedClause
@@ -498,11 +498,11 @@ dataDescriptionEntryFormat1
    ;
 
 dataDescriptionEntryFormat2
-   : LEVEL_NUMBER_66 (FILLER | dataName1)? dataRenamesClause DOT_FS
+   : LEVEL_NUMBER_66 entryName? dataRenamesClause DOT_FS
    ;
 
 dataDescriptionEntryFormat1Level77
-   : LEVEL_NUMBER_77 (FILLER | dataName1)? (dataPictureClause | dataRedefinesClause | dataIntegerStringClause | dataExternalClause
+   : LEVEL_NUMBER_77 entryName? (dataPictureClause | dataRedefinesClause | dataIntegerStringClause | dataExternalClause
    | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataCommonOwnLocalClause | dataTypeClause
    | dataUsingClause | dataUsageClause | dataValueClause | dataReceivedByClause | dataOccursClause | dataSignClause
    | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause | dataWithLowerBoundsClause
@@ -510,7 +510,11 @@ dataDescriptionEntryFormat1Level77
    ;
 
 dataDescriptionEntryFormat3
-   : LEVEL_NUMBER_88 (FILLER | dataName1)? dataValueClause DOT_FS
+   : LEVEL_NUMBER_88 entryName? dataValueClause DOT_FS
+   ;
+
+entryName
+   : (FILLER | dataName1)
    ;
 
 dataDescriptionEntryExecSql
@@ -582,7 +586,11 @@ dataRedefinesClause
    ;
 
 dataRenamesClause
-   : RENAMES qualifiedDataName ((THROUGH | THRU) qualifiedDataName)?
+   : RENAMES qualifiedDataName thruDataName?
+   ;
+
+thruDataName
+   : (THROUGH | THRU) qualifiedDataName
    ;
 
 dataSignClause
@@ -614,7 +622,11 @@ dataUsingClause
    ;
 
 dataValueClause
-   : ((VALUE | VALUES) (IS | ARE)?) dataValueInterval (COMMACHAR? dataValueInterval)*
+   : ((VALUE | VALUES) (IS | ARE)?) dataValueClauseLiteral
+   ;
+
+dataValueClauseLiteral
+   : dataValueInterval (COMMACHAR? dataValueInterval)*
    ;
 
 dataValueInterval

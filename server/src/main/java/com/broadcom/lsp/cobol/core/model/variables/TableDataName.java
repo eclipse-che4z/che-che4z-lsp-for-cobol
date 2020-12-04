@@ -16,53 +16,32 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
-import lombok.NonNull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Collections.unmodifiableList;
-
-/**
- * This value class represents the Table variable that may have nested variables, and an optional
- * index
- */
+/** This value class represents the Table variable that may have an optional index */
 @Value
-public class TableDataName implements StructuredVariable {
-  private String name;
+@EqualsAndHashCode(callSuper = true)
+public class TableDataName extends AbstractVariable implements TableDeclaration {
+  private String picClause;
+  private String value;
   private int occursTimes;
-  private IndexItem index;
-  private Locality definition;
-  private List<Variable> children = new ArrayList<>();
+  private List<IndexItem> indexes;
 
   public TableDataName(
-      @NonNull String name,
+      String name,
+      String qualifier,
+      Locality definition,
+      String picClause,
+      String value,
       int occursTimes,
-      @NonNull Locality definition,
-      @Nullable IndexItem index) {
-    this.name = name;
+      List<IndexItem> indexes) {
+    super(name, qualifier, definition);
+    this.picClause = picClause;
+    this.value = value;
     this.occursTimes = occursTimes;
-    this.definition = definition;
-    this.index = index;
-  }
-
-  /**
-   * Add a new nested variable to this one
-   *
-   * @param child - a nested variable. Can be a group or element item.
-   */
-  public void addChild(Variable child) {
-    children.add(child);
-  }
-
-  /**
-   * Return a list of already defined nested variables
-   *
-   * @return defined nested variables.
-   */
-  public List<Variable> getChildren() {
-    return unmodifiableList(children);
+    this.indexes = indexes;
   }
 }

@@ -20,20 +20,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
- * This value class represents an independent element item COBOL variable, that has a level number
- * 77. It should always have a PIC clause representing its type, and a VALUE clause that stores an
- * explicitly defined value; both as Strings. They cannot produce a structure in any way.
+ * This value class represents a special name. They may substitute environment names in the
+ * SPECIAL-NAMES paragraph. They should are a special type of variable, allowed in certain
+ * statements.
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class IndependentDataItem extends AbstractVariable {
-  private String picClause;
-  private String value;
-
-  public IndependentDataItem(
-      String name, String qualifier, Locality definition, String picClause, String value) {
+public class SpecialName extends AbstractVariable {
+  public SpecialName(String name, String qualifier, Locality definition) {
     super(name, qualifier, definition);
-    this.picClause = picClause;
-    this.value = value;
   }
 }
