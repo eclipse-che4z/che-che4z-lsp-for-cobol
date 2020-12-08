@@ -28,7 +28,9 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
     
 ## Compatibility
 
-The COBOL Language Support extension is not compatible with other extensions that provide COBOL support. We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
+The COBOL Language Support extension extension is supported on Visual Studio Code and Eclipse Che.
+
+This extension is not compatible with other extensions that provide COBOL support. We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
 
 The COBOL Language Support extension only supports IBM Enterprise COBOL. Other versions of COBOL are not supported.
 
