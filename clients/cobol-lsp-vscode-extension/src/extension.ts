@@ -29,7 +29,7 @@ import {Middleware} from "./services/Middleware";
 import {PathsService} from "./services/PathsService";
 import {ProfileService} from "./services/ProfileService";
 import {TelemetryService} from "./services/reporter/TelemetryService";
-import {createFileWithGivenPath, initializeSettings} from "./services/Settings";
+import {createFileWithGivenPath} from "./services/Settings";
 import {ZoweApi} from "./services/ZoweApi";
 import {resolveSubroutineURI} from "./services/util/SubroutineUtils";
 
@@ -53,7 +53,6 @@ function initialize() {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-    initializeSettings();
     initialize();
     TelemetryService.registerEvent("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
     try {

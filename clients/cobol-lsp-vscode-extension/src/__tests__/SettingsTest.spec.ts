@@ -15,7 +15,7 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
 import {C4Z_FOLDER, GITIGNORE_FILE} from "../constants";
-import {createFileWithGivenPath, initializeSettings} from "../services/Settings";
+import {createFileWithGivenPath} from "../services/Settings";
 import {SettingsUtils} from "../services/util/SettingsUtils";
 
 const fsPath = "tmp-ws";
@@ -35,51 +35,6 @@ afterAll(() => {
     if (fs.existsSync(wsPath)) {
         fs.remove(wsPath);
     }
-});
-
-describe("Settings initialization tests", () => {
-
-    it("Update all settings if not present in workspace", async () => {
-        const updateSettings = jest.fn();
-        const inspectSettings = jest.fn().mockReturnValue({workspaceValue: undefined});
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            update: updateSettings,
-            get: jest.fn().mockReturnValueOnce({prop1: "val1", prop2: "val2", prop3: "val3"})
-                .mockReturnValueOnce("val1")
-                .mockReturnValueOnce("val2")
-                .mockReturnValueOnce("val3"),
-            inspect: inspectSettings
-        });
-
-        initializeSettings();
-
-        expect(inspectSettings).toHaveBeenCalledTimes(3);
-        expect(updateSettings).toHaveBeenCalledWith("prop1", "val1", vscode.ConfigurationTarget.Workspace);
-        expect(updateSettings).toHaveBeenCalledWith("prop2", "val2", vscode.ConfigurationTarget.Workspace);
-        expect(updateSettings).toHaveBeenCalledWith("prop3", "val3", vscode.ConfigurationTarget.Workspace);
-        expect(updateSettings).toHaveBeenCalledTimes(3);
-    });
-
-    it("Update no settings if one present in workspace", async () => {
-        const updateSettings = jest.fn();
-        const inspectSettings = jest.fn().mockReturnValueOnce({workspaceValue: undefined})
-            .mockReturnValueOnce({workspaceValue: "val2"})
-            .mockReturnValueOnce({workspaceValue: undefined});
-        vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-            update: updateSettings,
-            get: jest.fn().mockReturnValueOnce({prop1: "val1", prop2: "val2", prop3: "val3"})
-                .mockReturnValueOnce("val1")
-                .mockReturnValueOnce("val2")
-                .mockReturnValueOnce("val3"),
-            inspect: inspectSettings
-        });
-
-        initializeSettings();
-
-        expect(inspectSettings).toHaveBeenCalledTimes(2);
-        expect(updateSettings).toHaveBeenCalledTimes(0);
-    });
-
 });
 
 describe(".gitignore file in .c4z folder tests", () => {

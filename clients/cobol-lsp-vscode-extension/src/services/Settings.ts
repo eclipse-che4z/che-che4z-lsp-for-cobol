@@ -17,21 +17,6 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { SETTINGS_CPY_SECTION } from "../constants";
 
-export function initializeSettings() {
-    const configuration = vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION);
-    const properties = Object.keys(vscode.workspace.getConfiguration().get(SETTINGS_CPY_SECTION));
-
-    if (properties.every(isUndefinedInWorkspace)) {
-        properties.forEach(property => {
-            configuration.update(property, configuration.get(property), vscode.ConfigurationTarget.Workspace);
-        });
-    }
-}
-
-function isUndefinedInWorkspace(property: string): boolean {
-    return vscode.workspace.getConfiguration(SETTINGS_CPY_SECTION).inspect(property).workspaceValue === undefined;
-}
-
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
  * (e.g. workspace/.c4z) with given  pattern

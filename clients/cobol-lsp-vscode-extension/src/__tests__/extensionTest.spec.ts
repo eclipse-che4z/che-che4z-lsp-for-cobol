@@ -21,7 +21,7 @@ import {activate} from "../extension";
 import {CopybooksCodeActionProvider} from "../services/copybook/CopybooksCodeActionProvider";
 import {LanguageClientService} from "../services/LanguageClientService";
 import {TelemetryService} from "../services/reporter/TelemetryService";
-import {createFileWithGivenPath, initializeSettings} from "../services/Settings";
+import {createFileWithGivenPath} from "../services/Settings";
 
 jest.mock("../commands/ChangeDefaultZoweProfile");
 jest.mock("../commands/EditDatasetPaths");
@@ -75,7 +75,6 @@ describe("Check plugin extension for cobol starts successfully.", () => {
 
     test("start extension", async () => {
         await activate(context);
-        expect(initializeSettings).toHaveBeenCalledTimes(1);
         expect(TelemetryService.registerEvent).toHaveBeenCalledWith("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
 
         expect(vscode.workspace.onDidChangeConfiguration).toBeCalled();
@@ -109,7 +108,6 @@ describe("Check plugin extension for cobol fails.", () => {
 
     test("start fails.", async () => {
         await activate(context);
-        expect(initializeSettings).toHaveBeenCalledTimes(1);
         expect(TelemetryService.registerEvent).toHaveBeenCalledWith("log", ["bootstrap", "experiment-tag"], "Extension activation event was triggered");
         expect(vscode.window.showErrorMessage).toBeCalledTimes(1);
     });
