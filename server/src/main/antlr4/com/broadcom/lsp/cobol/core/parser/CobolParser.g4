@@ -77,7 +77,7 @@ environmentDivision
    ;
 
 environmentDivisionBody
-   : configurationSection | specialNamesParagraph | inputOutputSection
+   : configurationSection | specialNamesParagraph | inputOutputSection | idmsControlSection
    ;
 
 // -- configuration section ----------------------------------
@@ -350,6 +350,57 @@ applyWriteOnlyClause
 commitmentControlClause
    : COMMITMENT CONTROL FOR? fileName
    ;
+
+// -- idms control section ----------------------------------
+
+idmsControlSection
+   : IDMS_CONTROL SECTION DOT_FS idmsControlSectionParagraph
+   ;
+
+// - idms control section paragraph ----------------------------------
+idmsControlSectionParagraph
+   : protocolParagraph (ssNamesLengthParagraph | idmsRecordLocationParagraph)*
+   ;
+
+protocolParagraph
+   : PROTOCOL DOT_FS? protocolEntry? 
+   ;
+
+protocolEntry
+   : modeClause DEBUG? endClause?
+   ;
+
+modeClause
+   : MODE IS? cobolWord
+   ;
+
+ssNamesLengthParagraph
+   : SSNAMES LENGTH IS? ss_names_length endClause?
+   ;
+
+idmsRecordLocationParagraph
+   : IDMS_RECORDS withinClause endClause?
+   ;
+
+withinClause
+   : (withinEntry | MANUAL) levelsClause?
+   ;
+
+withinEntry
+   : WITHIN (WORKING_STORAGE | LINKAGE) SECTION?
+   ;
+
+levelsClause
+   : LEVELS? INCREMENTED BY? LEVEL_NUMBER
+   ;
+
+endClause
+    : DOT_FS | SEMICOLON_FS
+    ;
+
+ss_names_length
+       : {_input.LT(1).getText().matches("16|18")}? LEVEL_NUMBER
+       ;
 
 // --- data division --------------------------------------------------------------------
 
