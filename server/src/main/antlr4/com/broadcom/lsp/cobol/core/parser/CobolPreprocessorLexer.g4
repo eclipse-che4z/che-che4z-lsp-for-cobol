@@ -322,13 +322,24 @@ SINGLEQUOTE : '\'';
 SLASHCHAR : '/';
 
 // literals
-NONNUMERICLITERAL : STRINGLITERAL | HEXNUMBER;
-NUMERICLITERAL : [0-9]+;
-INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? NUMERICLITERAL;
+
+INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+;
+
+NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
+
+NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
+
+IDENTIFIER : [a-zA-Z0-9#@$]+ ([-_]+ [a-zA-Z0-9#@$]+)*;
+FILENAME : [a-zA-Z0-9]+ '.' [a-zA-Z0-9]+;
 
 fragment HEXNUMBER :
 	X '"' [0-9A-F]+ '"'
 	| X '\'' [0-9A-F]+ '\''
+;
+
+fragment NULLTERMINATED :
+	Z '"' (~["\n\r] | '""' | '\'')* '"'
+	| Z '\'' (~['\n\r] | '\'\'' | '"')* '\''
 ;
 
 fragment STRINGLITERAL :
@@ -336,8 +347,15 @@ fragment STRINGLITERAL :
 	| '\'' (~['\n\r] | '\'\'' | '"')* '\''
 ;
 
-IDENTIFIER : [a-zA-Z0-9#@$]+ ([-_]+ [a-zA-Z0-9#@$]+)*;
-FILENAME : [a-zA-Z0-9]+ '.' [a-zA-Z0-9]+;
+fragment UNTRMSTRINGLITERAL :
+	'"' (~["\n\r] | '""' | '\'')*
+	| '\'' (~['\n\r] | '\'\'' | '"')*
+;
+
+fragment DBCSLITERAL :
+	[GN] '"' (~["\n\r] | '""' | '\'')* '"'
+	| [GN] '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
@@ -350,6 +368,7 @@ SEPARATOR : ', ' -> channel(HIDDEN);
 // treat all the non-processed tokens as errors
 ERRORCHAR : . ;
 
+fragment DIGIT: [0-9];
 // case insensitive chars
 fragment A:('a'|'A');
 fragment B:('b'|'B');
