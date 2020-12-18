@@ -20,7 +20,7 @@ class TestTitleStatement {
           + "          PROCEDURE DIVISION.\n";
 
   private static final String TITLE = "                TITLE 'title'. \n";
-  private static final String END = "          END PROGRAM TITLETEST'. \n";
+  private static final String END = "          END PROGRAM 'TITLETEST'. \n";
 
   @Test
   void testTitleBeforeIdDivision() {

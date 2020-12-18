@@ -93,7 +93,7 @@ class TestExtraLanguagesCleaned {
           + "000000      SUBTRACT 1 FROM {$TBPARM2}\r\n"
           + "000000      END-PERFORM.\r\n"
           + "000000             EXEC CICS LINK PROGRAM({$CRUD-PGM-NAME})\r\n"
-          + "000000      RESP(${RESPONSE})COMMAREA({$LINK-AREA}) END-EXEC.\r\n"
+          + "000000      RESP({$RESPONSE})COMMAREA({$LINK-AREA}) END-EXEC.\r\n"
           + "000000 {#*PROCB}.\r\n"
           + "000000      MOVE 10 TO {$MAMA} OF {$AGE} OF {$BORROWER}.\r\n"
           + "000000 {#*ERRORS}.\r\n"
