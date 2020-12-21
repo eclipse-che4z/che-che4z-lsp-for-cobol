@@ -410,7 +410,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     SyntaxError error =
         SyntaxError.syntaxError()
             .severity(ERROR)
-            .suggestion(messageService.getMessage("GrammarPreprocessorListener.recursionDetected",usage.getName()))
+            .suggestion(messageService.getMessage("GrammarPreprocessorListener.recursionDetected", usage.getName()))
             .locality(usage.getLocality())
             .build();
     LOG.debug(

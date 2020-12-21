@@ -35,7 +35,7 @@ import java.util.function.Consumer;
 @UtilityClass
 public class LogLevelUtils {
 
-  private static final ch.qos.logback.classic.Logger rootLogger =
+  private static final ch.qos.logback.classic.Logger ROOT_LOGGER =
       (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
   private static final String NOT_SUPPORTED_MSG = " : not supported for log level update";
 
@@ -81,6 +81,6 @@ public class LogLevelUtils {
     ch.qos.logback.classic.Level logLevel =
         ch.qos.logback.classic.Level.toLevel(
             level.toUpperCase(), ch.qos.logback.classic.Level.ERROR);
-    rootLogger.setLevel(logLevel);
+    ROOT_LOGGER.setLevel(logLevel);
   }
 }

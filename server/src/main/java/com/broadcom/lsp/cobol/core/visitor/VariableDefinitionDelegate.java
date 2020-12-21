@@ -419,7 +419,7 @@ class VariableDefinitionDelegate {
   }
 
   private void defineVariable(VariableDefinitionContext variableDefinitionContext,
-                              Function<VariableDefinitionContext, Variable> ... matchers) {
+                              Function<VariableDefinitionContext, Variable>... matchers) {
     Arrays.stream(matchers)
         .map(matcher -> matcher.apply(variableDefinitionContext))
         .filter(Objects::nonNull)
@@ -428,7 +428,7 @@ class VariableDefinitionDelegate {
             // TODO: add check that value does not exceed PIC length
             ofNullable(structureStack.peek()).ifPresent(it -> it.addChild(variable));
             if (variable instanceof StructuredVariable) {
-              structureStack.push((StructuredVariable)variable);
+              structureStack.push((StructuredVariable) variable);
             }
             variables.push(variable);
         });

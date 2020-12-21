@@ -29,4 +29,4 @@ import java.lang.annotation.*;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface CheckServerShutdownState {}
+public @interface CheckServerShutdownState { }
