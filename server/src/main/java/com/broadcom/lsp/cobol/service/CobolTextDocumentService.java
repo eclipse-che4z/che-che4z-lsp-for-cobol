@@ -261,7 +261,7 @@ public class CobolTextDocumentService
   private void registerEngineAndAnalyze(String uri, String text) {
     String fileExtension = extractExtension(uri);
     if (fileExtension != null && !isCobolFile(fileExtension)) {
-      outlineMap.computeIfPresent(uri, (k,v) -> {
+      outlineMap.computeIfPresent(uri, (k, v) -> {
         v.complete(List.of(new DocumentSymbol()));
         return v;
       });

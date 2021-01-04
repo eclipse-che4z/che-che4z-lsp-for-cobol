@@ -17,6 +17,7 @@ package com.broadcom.lsp.cobol.core.strategy;
 import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.*;
@@ -27,6 +28,8 @@ import java.util.Optional;
 
 @Slf4j
 @Singleton
+// for test
+@NoArgsConstructor
 public class CobolErrorStrategy extends DefaultErrorStrategy {
 
   private static final String REPORT_INPUT_MISMATCH = "reportInputMismatch";
@@ -41,14 +44,11 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     this.messageService = messageService;
   }
 
-  // for test
-  public CobolErrorStrategy() {}
-
   private static String getRule(Parser recognizer) {
     return recognizer.getRuleInvocationStack().get(0);
   }
 
-  private String parseCustomMessage(String methodName, String rule, String... params) {
+  private String parseCustomMessage(String methodName, String rule, Object... params) {
     String messageKey = "ErrorStrategy.".concat(rule.concat(methodName));
     try {
       return messageService.getMessage(messageKey, params);

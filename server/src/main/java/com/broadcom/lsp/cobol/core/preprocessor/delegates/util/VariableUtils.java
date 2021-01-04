@@ -22,8 +22,6 @@ import lombok.experimental.UtilityClass;
 import java.util.Deque;
 import java.util.Optional;
 
-import static java.util.stream.Collectors.joining;
-
 /** This util class applies operations over variable qualifiers */
 @UtilityClass
 public class VariableUtils {
