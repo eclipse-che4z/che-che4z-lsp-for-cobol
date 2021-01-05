@@ -18,4 +18,4 @@ package com.broadcom.lsp.cobol.core.annotation;
  * This is a marker interface. Implementing this class would enable the {@link
  * CheckThreadInterruption} annotation to be used for member methods of the class.
  */
-public interface ThreadInterruptAspect {}
+public interface ThreadInterruptAspect { }

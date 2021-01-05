@@ -59,7 +59,7 @@ import static java.util.stream.Collectors.toMap;
  * keyword, the visitor finds it and throws a warning.
  */
 @Slf4j
-public class CobolVisitor extends CobolParserBaseVisitor<Class> {
+public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   private static final String DECLARATIVE_SAME_MSG =
       "The following token cannot be on the same line as a DECLARATIVE token: ";
 
@@ -128,14 +128,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitIdentificationDivision(IdentificationDivisionContext ctx) {
+  public Void visitIdentificationDivision(IdentificationDivisionContext ctx) {
     areaAWarning(ctx.getStart());
     outlineTreeBuilder.addNode(OutlineNodeNames.IDENTIFICATION_DIVISION, NodeType.DIVISION, ctx);
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitProgramIdParagraph(ProgramIdParagraphContext ctx) {
+  public Void visitProgramIdParagraph(ProgramIdParagraphContext ctx) {
     ofNullable(ctx.programName())
         .map(RuleContext::getText)
         .map(PreprocessorStringUtils::trimQuotes)
@@ -150,59 +150,59 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitProcedureDivision(ProcedureDivisionContext ctx) {
+  public Void visitProcedureDivision(ProcedureDivisionContext ctx) {
     areaAWarning(ctx.getStart());
     outlineTreeBuilder.addNode(OutlineNodeNames.PROCEDURE_DIVISION, NodeType.DIVISION, ctx);
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitEnvironmentDivision(EnvironmentDivisionContext ctx) {
+  public Void visitEnvironmentDivision(EnvironmentDivisionContext ctx) {
     areaAWarning(ctx.getStart());
     outlineTreeBuilder.addNode(OutlineNodeNames.ENVIRONMENT_DIVISION, NodeType.DIVISION, ctx);
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitDataDivision(DataDivisionContext ctx) {
+  public Void visitDataDivision(DataDivisionContext ctx) {
     areaAWarning(ctx.getStart());
     outlineTreeBuilder.addNode(OutlineNodeNames.DATA_DIVISION, NodeType.DIVISION, ctx);
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitDataDivisionSection(DataDivisionSectionContext ctx) {
+  public Void visitDataDivisionSection(DataDivisionSectionContext ctx) {
     areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitEnvironmentDivisionBody(EnvironmentDivisionBodyContext ctx) {
+  public Void visitEnvironmentDivisionBody(EnvironmentDivisionBodyContext ctx) {
     areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitProcedureSectionHeader(ProcedureSectionHeaderContext ctx) {
+  public Void visitProcedureSectionHeader(ProcedureSectionHeaderContext ctx) {
     areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitWorkingStorageSection(WorkingStorageSectionContext ctx) {
+  public Void visitWorkingStorageSection(WorkingStorageSectionContext ctx) {
     outlineTreeBuilder.addNode(OutlineNodeNames.WORKING_STORAGE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitProgramUnit(ProgramUnitContext ctx) {
+  public Void visitProgramUnit(ProgramUnitContext ctx) {
     outlineTreeBuilder.addProgram(ctx);
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitProcedureSection(ProcedureSectionContext ctx) {
+  public Void visitProcedureSection(ProcedureSectionContext ctx) {
     throwWarning(ctx.getStart());
     outlineTreeBuilder.addNode(ctx.getStart().getText(), NodeType.PROCEDURE_SECTION, ctx);
 
@@ -213,14 +213,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitParagraph(ParagraphContext ctx) {
+  public Void visitParagraph(ParagraphContext ctx) {
     areaAWarning(ctx.getStart());
     outlineTreeBuilder.addNode(ctx.getStart().getText(), NodeType.PROCEDURE, ctx);
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitFileDescriptionEntry(FileDescriptionEntryContext ctx) {
+  public Void visitFileDescriptionEntry(FileDescriptionEntryContext ctx) {
     areaAWarning(ctx.getStart());
     outlineTreeBuilder.addNode(ctx.fileName().getText(), NodeType.FILE, ctx);
     return visitChildren(ctx);
@@ -234,7 +234,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
    * the keywords END DECLARATIVES, no text can appear before the following section header.
    */
   @Override
-  public Class visitProcedureDeclaratives(ProcedureDeclarativesContext ctx) {
+  public Void visitProcedureDeclaratives(ProcedureDeclarativesContext ctx) {
     Token firstDeclarative = ctx.getStart();
     int firstDeclLine = firstDeclarative.getLine();
     Token declarativeBody = ctx.procedureDeclarative(0).getStart();
@@ -253,7 +253,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitEndProgramStatement(EndProgramStatementContext ctx) {
+  public Void visitEndProgramStatement(EndProgramStatementContext ctx) {
     Token endProgramNameToken = ctx.programName().getStart();
     checkProgramName(endProgramNameToken);
     areaAWarning(ctx.getStart());
@@ -261,46 +261,46 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitConfigurationSection(ConfigurationSectionContext ctx) {
+  public Void visitConfigurationSection(ConfigurationSectionContext ctx) {
     outlineTreeBuilder.addNode(OutlineNodeNames.CONFIGURATION_SECTION, NodeType.SECTION, ctx);
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitInputOutputSection(InputOutputSectionContext ctx) {
+  public Void visitInputOutputSection(InputOutputSectionContext ctx) {
     outlineTreeBuilder.addNode(OutlineNodeNames.INPUT_OUTPUT_SECTION, NodeType.SECTION, ctx);
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitSelectClause(SelectClauseContext ctx) {
+  public Void visitSelectClause(SelectClauseContext ctx) {
     outlineTreeBuilder.addNode(ctx.fileName().getText(), NodeType.FILE, ctx);
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitFileSection(FileSectionContext ctx) {
+  public Void visitFileSection(FileSectionContext ctx) {
     outlineTreeBuilder.addNode(OutlineNodeNames.FILE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitLinkageSection(LinkageSectionContext ctx) {
+  public Void visitLinkageSection(LinkageSectionContext ctx) {
     outlineTreeBuilder.addNode(OutlineNodeNames.LINKAGE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitLocalStorageSection(LocalStorageSectionContext ctx) {
+  public Void visitLocalStorageSection(LocalStorageSectionContext ctx) {
     outlineTreeBuilder.addNode(OutlineNodeNames.LOCAL_STORAGE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitStatement(StatementContext ctx) {
+  public Void visitStatement(StatementContext ctx) {
     List<Token> tokenList =
         tokenStream.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
     areaBWarning(tokenList);
@@ -310,37 +310,37 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitIfThen(IfThenContext ctx) {
+  public Void visitIfThen(IfThenContext ctx) {
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitIfElse(IfElseContext ctx) {
+  public Void visitIfElse(IfElseContext ctx) {
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitPerformInlineStatement(PerformInlineStatementContext ctx) {
+  public Void visitPerformInlineStatement(PerformInlineStatementContext ctx) {
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitSentence(SentenceContext ctx) {
+  public Void visitSentence(SentenceContext ctx) {
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitEvaluateWhenOther(EvaluateWhenOtherContext ctx) {
+  public Void visitEvaluateWhenOther(EvaluateWhenOtherContext ctx) {
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
   @Override
-  public Class visitParagraphName(ParagraphNameContext ctx) {
+  public Void visitParagraphName(ParagraphNameContext ctx) {
     String name = ctx.getText().toUpperCase();
     getLocality(ctx.getStart())
         .ifPresent(locality -> groupContext.addParagraphDefinition(name, locality));
@@ -348,7 +348,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
+  public Void visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
     Token token = ctx.getStart();
     String tokenText = token.getText();
     if (tokenText.equals("01") || tokenText.equals("1")) {
@@ -389,7 +389,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitDataDescriptionEntryFormat2(DataDescriptionEntryFormat2Context ctx) {
+  public Void visitDataDescriptionEntryFormat2(DataDescriptionEntryFormat2Context ctx) {
     String levelNumber = ctx.LEVEL_NUMBER_66().getText();
     ofNullable(ctx.entryName())
         .map(EntryNameContext::dataName1)
@@ -409,7 +409,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitDataDescriptionEntryFormat3(DataDescriptionEntryFormat3Context ctx) {
+  public Void visitDataDescriptionEntryFormat3(DataDescriptionEntryFormat3Context ctx) {
     String levelNumber = ctx.LEVEL_NUMBER_88().getText();
     ofNullable(ctx.entryName())
         .map(EntryNameContext::dataName1)
@@ -429,7 +429,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitDataDescriptionEntryFormat1Level77(
+  public Void visitDataDescriptionEntryFormat1Level77(
       DataDescriptionEntryFormat1Level77Context ctx) {
     areaAWarning(ctx.getStart());
     ofNullable(ctx.entryName())
@@ -467,7 +467,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitParagraphNameUsage(ParagraphNameUsageContext ctx) {
+  public Void visitParagraphNameUsage(ParagraphNameUsageContext ctx) {
     String name = ctx.getText().toUpperCase();
     getLocality(ctx.getStart()).ifPresent(l -> groupContext.addCandidateUsage(name, l));
     return visitChildren(ctx);
@@ -478,7 +478,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitQualifiedDataNameFormat1(QualifiedDataNameFormat1Context ctx) {
+  public Void visitQualifiedDataNameFormat1(QualifiedDataNameFormat1Context ctx) {
     ofNullable(ctx.dataName())
         .map(it -> it.getText().toUpperCase())
         .ifPresent(variable -> checkForVariable(variable, ctx));
@@ -486,7 +486,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitTableCall(TableCallContext ctx) {
+  public Void visitTableCall(TableCallContext ctx) {
     ofNullable(ctx.dataName2())
         .map(RuleContext::getText)
         .map(String::toUpperCase)
@@ -500,7 +500,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
   }
 
   @Override
-  public Class visitCallStatement(CallStatementContext ctx) {
+  public Void visitCallStatement(CallStatementContext ctx) {
     if (ctx.literal() != null) {
       String subroutineName =
           PreprocessorStringUtils.trimQuotes(ctx.literal().getText()).toUpperCase();
@@ -728,7 +728,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Class> {
 
   // NOTE: CobolVisitor is not managed by Guice DI, so can't use annotation here.
   @Override
-  public Class visitChildren(RuleNode node) {
+  public Void visitChildren(RuleNode node) {
     if (Thread.interrupted()) {
       LOG.debug("visitChildren method interrupted by user");
       throw new ParseCancellationException("Parsing interrupted by user.");

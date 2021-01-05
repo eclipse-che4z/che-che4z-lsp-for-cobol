@@ -12,14 +12,3 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-
-package com.broadcom.lsp.cobol.core.annotation;
-
-/**
- * {@link DisposableService} is a marker interface to mark all services which are disposable after a
- * shutdown call on LSP server.
- *
- * <p>Use {@link com.broadcom.lsp.cobol.core.annotation.CheckServerShutdownState} annotation on each
- * service methods to mark them disposed after a shutdown call.
- */
-public interface DisposableService { }
