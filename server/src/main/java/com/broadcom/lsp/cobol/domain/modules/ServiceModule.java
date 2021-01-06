@@ -62,10 +62,10 @@ public class ServiceModule extends AbstractModule {
     bind(WatcherService.class).to(WatcherServiceImpl.class);
     bind(FileSystemService.class).to(WorkspaceFileService.class);
     bind(SubroutineService.class).to(SubroutineServiceImpl.class);
+    bind(Occurrences.class).to(ElementOccurrences.class);
 
     bindFormations();
     bindCompletions();
-    bindReferences();
     bindCodeActions();
 
     bindInterceptor(
@@ -101,18 +101,6 @@ public class ServiceModule extends AbstractModule {
 
     bind(CompletionStorage.class).annotatedWith(named("Keywords")).to(Keywords.class);
     bind(CompletionStorage.class).annotatedWith(named("Snippets")).to(Snippets.class);
-  }
-
-  private void bindReferences() {
-    bind(Occurrences.class).to(SemanticElementOccurrences.class);
-    Multibinder<SemanticLocations> referenceBinding =
-        newSetBinder(binder(), SemanticLocations.class);
-    referenceBinding.addBinding().to(VariableLocations.class);
-    referenceBinding.addBinding().to(ParagraphLocations.class);
-    referenceBinding.addBinding().to(SectionLocations.class);
-    referenceBinding.addBinding().to(CopybookLocations.class);
-    referenceBinding.addBinding().to(ConstantLocations.class);
-    referenceBinding.addBinding().to(SubroutineLocations.class);
   }
 
   private void bindCodeActions() {
