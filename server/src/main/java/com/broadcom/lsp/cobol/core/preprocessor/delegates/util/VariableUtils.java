@@ -45,8 +45,19 @@ public class VariableUtils {
    */
   public @NonNull String createQualifier(
       @NonNull Deque<StructuredVariable> structure, @NonNull String name) {
-    return Optional.ofNullable(structure.peekLast())
-        .map(it -> it.getQualifier() + " ")
-        .orElse("") + name;
+    return Optional.ofNullable(structure.peekFirst())
+            .map(it -> it.getQualifier() + "  ")
+            .orElse(" ")
+        + name;
+  }
+
+  /**
+   * Create a qualifier from the given name assuming an empty structure
+   *
+   * @param name - the name of this variable
+   * @return qualifier for this variable
+   */
+  public @NonNull String createQualifier(@NonNull String name) {
+    return " " + name;
   }
 }

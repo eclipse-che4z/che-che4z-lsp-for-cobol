@@ -51,7 +51,7 @@ class VariableUtilsTest {
   @Test
   void createQualifierForTop() {
     String name = "VARNAME";
-    assertEquals(name, VariableUtils.createQualifier(new ArrayDeque<>(), name));
+    assertEquals(" " +name, VariableUtils.createQualifier(new ArrayDeque<>(), name));
   }
 
   /**
@@ -65,9 +65,9 @@ class VariableUtilsTest {
     Deque<StructuredVariable> structure =
         new ArrayDeque<>(
             List.of(
-                new GroupItem(1, "TOP", "TOP", locality),
-                new GroupItem(2, "PARENT", "TOP PARENT", locality)));
-    assertEquals("TOP PARENT VARNAME", VariableUtils.createQualifier(structure, name));
+                new GroupItem(2, "PARENT", "TOP  PARENT", locality, null),
+                new GroupItem(1, "TOP", "TOP", locality, null)));
+    assertEquals("TOP  PARENT  VARNAME", VariableUtils.createQualifier(structure, name));
   }
 
   /** Test qualifier for variable with an empty name contains only structure elements */
@@ -78,8 +78,8 @@ class VariableUtilsTest {
     Deque<StructuredVariable> structure =
         new ArrayDeque<>(
             List.of(
-                new GroupItem(1, "TOP", "TOP", locality),
-                new GroupItem(2, "PARENT", "TOP PARENT", locality)));
-    assertEquals("TOP PARENT ", VariableUtils.createQualifier(structure, name));
+                new GroupItem(2, "PARENT", "TOP  PARENT", locality, null),
+                new GroupItem(1, "TOP", "TOP", locality, null)));
+    assertEquals("TOP  PARENT  ", VariableUtils.createQualifier(structure, name));
   }
 }
