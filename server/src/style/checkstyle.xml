@@ -73,19 +73,22 @@
 
         <!-- Checks for Javadoc comments.                     -->
         <!-- See https://checkstyle.org/config_javadoc.html -->
-        <!-- <module name="InvalidJavadocPosition"/>-->
+         <module name="InvalidJavadocPosition"/>
         <!-- <module name="JavadocMethod"/>-->
         <!-- <module name="JavadocType"/>-->
         <!-- <module name="JavadocVariable"/>-->
         <!-- <module name="JavadocStyle"/>-->
         <!-- <module name="MissingJavadocMethod"/>-->
+        <module name="MissingJavadocType">
+            <property name="scope" value="package"/>
+        </module>
 
         <!-- Checks for Naming Conventions.                  -->
         <!-- See https://checkstyle.org/config_naming.html -->
         <module name="ConstantName"/>
         <module name="LocalFinalVariableName"/>
         <module name="LocalVariableName"/>
-        <!-- <module name="MemberName"/> -->
+        <module name="MemberName"/>
         <module name="MethodName"/>
         <module name="PackageName"/>
         <module name="ParameterName"/>
@@ -114,7 +117,14 @@
         <module name="ParenPad"/>
         <module name="TypecastParenPad"/>
         <module name="WhitespaceAfter"/>
-        <module name="WhitespaceAround"/>
+        <module name="WhitespaceAround">
+            <property name="allowEmptyConstructors" value="true"/>
+            <property name="allowEmptyMethods" value="true"/>
+            <property name="allowEmptyTypes" value="true"/>
+            <property name="allowEmptyLoops" value="true"/>
+            <property name="allowEmptyLambdas" value="true"/>
+            <property name="allowEmptyCatches" value="true"/>
+        </module>
 
         <!-- Modifier Checks                                    -->
         <!-- See https://checkstyle.org/config_modifiers.html -->

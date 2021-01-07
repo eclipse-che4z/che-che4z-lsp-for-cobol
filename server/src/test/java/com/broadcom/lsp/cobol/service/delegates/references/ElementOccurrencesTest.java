@@ -32,9 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Test {@link ElementOccurrences}
  */
 class ElementOccurrencesTest {
-    private static String URI = "uri";
-    private static String URI2 = "uri2";
-    private static String ELEMENT_NAME = "foo";
+    private static final String URI = "uri";
+    private static final String URI2 = "uri2";
+    private static final String ELEMENT_NAME = "foo";
 
     @Test
     void simpleCaseOfDefinitionsAndUsages() {

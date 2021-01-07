@@ -25,6 +25,7 @@ import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/** Test to check SnippetCompletion */
 class SnippetCompletionTest {
   private static final String INSERT_TEXT = "WRITE ${1:item}";
   private static final String DOCUMENTATION_TEXT = "WRITE item";
