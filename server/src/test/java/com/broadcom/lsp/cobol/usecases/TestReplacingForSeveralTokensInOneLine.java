@@ -16,15 +16,15 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.positive.CobolText;
-import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
+import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /**
  * This test verifies that the replacing statement changes the variable names following one by one,
@@ -39,18 +39,17 @@ class TestReplacingForSeveralTokensInOneLine {
           + "       PROGRAM-ID. TEST1.\r\n"
           + "       DATA DIVISION.\r\n"
           + "       WORKING-STORAGE SECTION.\r\n"
-          + "       01 {$*ABCDE-PARENT}.\r\n"
+          + "       01 {$*ABCDE-PARENT} PIC 9.\r\n"
           + "       PROCEDURE DIVISION.\r\n"
           + "       {#*MAIN-LINE}.\r\n"
-          + "       {_COPY {~REPL} REPLACING ==:TAG:== BY ==ABCDE==.|invalid|struct_}\r\n"
+          + "       {_COPY {~REPL} REPLACING ==:TAG:== BY ==ABCDE==.|invalid_}\r\n"
           + "           GOBACK.";
 
   private static final String REPL =
-      "              MOVE 10 TO {_{$:TAG:-CHILD^ABCDE-CHILD|invalid} OF {$:TAG:-PARENT^ABCDE-PARENT}|struct_}";
+      "              MOVE 10 TO {:TAG:-CHILD^ABCDE-CHILD|invalid} OF {:TAG:-PARENT^ABCDE-PARENT}";
 
   private static final String REPL_NAME = "REPL";
   private static final String MESSAGE = "Invalid definition for: ABCDE-CHILD";
-  private static final String MESSAGE_STRUCTURE = "Invalid definition for: ABCDE-CHILD OF ABCDE-PARENT";
 
   @Test
   void test() {
@@ -58,7 +57,6 @@ class TestReplacingForSeveralTokensInOneLine {
         DOCUMENT,
         List.of(new CobolText(REPL_NAME, REPL)),
         Map.of(
-            "invalid", new Diagnostic(null, MESSAGE, Information, SourceInfoLevels.INFO.getText()),
-            "struct", new Diagnostic(null, MESSAGE_STRUCTURE, Information, SourceInfoLevels.INFO.getText())));
+            "invalid", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

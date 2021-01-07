@@ -32,7 +32,7 @@ class TestSqlIncludeStatementNotFoundCopybook {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*PARENT}. EXEC SQL INCLUDE {~CPYNAME|missing} END-EXEC.\n"
+          + "       EXEC SQL INCLUDE {~CPYNAME|missing} END-EXEC.\n"
           + "       PROCEDURE DIVISION.";
 
   @Test

@@ -39,7 +39,6 @@ class TestSyntaxErrorTraversedThroughHierarchy {
           + "       PROGRAM-ID. TESTREPL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01  {$*PARENT}.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       {_COPY {~CONT}.|1|2_}\n"
           + "       {#*MAINLINE}. \n"

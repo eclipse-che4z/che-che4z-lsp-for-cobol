@@ -37,7 +37,7 @@ class TestCompilerDirectivesNotCauseErrors {
           + "        DATE-WRITTEN. 01/01/1970 6:00 PM.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       1 {$*PARENT}.\n"
+          + "       1 {$*PARENT} PIC 9.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       {@*MAINLINE} SECTION.\n"
           + "      * --------------------------------------------------------------\n"

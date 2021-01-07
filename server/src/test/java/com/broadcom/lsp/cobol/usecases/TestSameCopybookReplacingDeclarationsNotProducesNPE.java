@@ -29,17 +29,16 @@ import java.util.Map;
 class TestSameCopybookReplacingDeclarationsNotProducesNPE {
 
   private static final String TEXT =
-      "0      IDENTIFICATION DIVISION.\n"
-          + "1      PROGRAM-ID. TESTREPL.\n"
-          + "2      DATA DIVISION.\n"
-          + "3      WORKING-STORAGE SECTION.\n"
-          + "4      01  {$*PARENT}.\n"
-          + "5      COPY {~REPL} REPLACING ==:TAG:== BY ==ABC==.\n"
-          + "6      COPY {~REPL} REPLACING ==:TAG:== BY ==ABC==.\n"
-          + "7      PROCEDURE DIVISION.\n"
-          + "8      {#*MAINLINE}.\n"
-          + "9          MOVE 0 TO {$ABC-ID}.\n"
-          + "10         GOBACK. ";
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TESTREPL.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01  {$*PARENT}.\n"
+          + "       COPY {~REPL} REPLACING ==:TAG:== BY ==ABC==.\n"
+          + "       COPY {~REPL} REPLACING ==:TAG:== BY ==ABC==.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       {#*MAINLINE}.\n"
+          + "           GOBACK. ";
 
   private static final String REPL = "       05 {$*:TAG:-ID^ABC-ID} PIC 9.\n";
   private static final String REPL_NAME = "REPL";

@@ -15,15 +15,15 @@
 
 package com.broadcom.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
+import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /** This test verifies that the definition checks applies to the table calls */
 class TestIncorrectTableCallUnderlined {
@@ -35,7 +35,7 @@ class TestIncorrectTableCallUnderlined {
           + "       Working-Storage Section.\n"
           + "       Procedure Division.\n"
           + "       {#*000-Main-Logic}.\n"
-          + "           MOVE 'ABC' TO {$OL-ACCT-NO|1}({$SUB1|2}).\n"
+          + "           MOVE 'ABC' TO {OL-ACCT-NO|1}({SUB1|2}).\n"
           + "       End program ProgramId.";
 
   @Test
@@ -45,8 +45,13 @@ class TestIncorrectTableCallUnderlined {
         List.of(),
         Map.of(
             "1",
-            new Diagnostic(null, "Invalid definition for: OL-ACCT-NO", Information, SourceInfoLevels.INFO.getText()),
+            new Diagnostic(
+                null,
+                "Invalid definition for: OL-ACCT-NO",
+                DiagnosticSeverity.Error,
+                ERROR.getText()),
             "2",
-            new Diagnostic(null, "Invalid definition for: SUB1", Information, SourceInfoLevels.INFO.getText())));
+            new Diagnostic(
+                null, "Invalid definition for: SUB1", DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

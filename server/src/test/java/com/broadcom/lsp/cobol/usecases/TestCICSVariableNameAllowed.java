@@ -29,7 +29,7 @@ class TestCICSVariableNameAllowed {
           + "        PROGRAM-ID. TEST1.\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
-          + "        01 {$*CICS}.\n" // CICS variable name allowed
+          + "        01 {$*CICS} PIC 9.\n" // CICS variable name allowed
           + "        PROCEDURE DIVISION.\n"
           + "        {#*CICS}.\n" // CICS paragraphName allowed
           + "        END PROGRAM TEST1.";

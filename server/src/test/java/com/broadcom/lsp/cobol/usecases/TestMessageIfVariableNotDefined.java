@@ -15,15 +15,15 @@
 
 package com.broadcom.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
+import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /**
  * This test asserts syntax error on not defined variable. CHILD1 on line 6 is used, but not
@@ -37,7 +37,7 @@ class TestMessageIfVariableNotDefined {
           + "3      Working-Storage Section.\n"
           + "4      Procedure Division.\n"
           + "5      {#*000-Main-Logic}.\n"
-          + "6          MOVE 0 TO {$CHILD1|notDefined}.\n"
+          + "6          MOVE 0 TO {CHILD1|notDefined}.\n"
           + "7      End program ProgramId.";
 
   private static final String MESSAGE = "Invalid definition for: CHILD1";
@@ -47,6 +47,8 @@ class TestMessageIfVariableNotDefined {
     UseCaseEngine.runTest(
         TEXT,
         List.of(),
-        Map.of("notDefined", new Diagnostic(null, MESSAGE, Information, SourceInfoLevels.INFO.getText())));
+        Map.of(
+            "notDefined",
+            new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }
