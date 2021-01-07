@@ -409,7 +409,7 @@ dataDivision
    ;
 
 dataDivisionSection
-   : fileSection | workingStorageSection | linkageSection | localStorageSection
+   : fileSection | workingStorageSection | linkageSection | localStorageSection | schemaSection | mapSection
    ;
 
 // -- file section ----------------------------------
@@ -695,6 +695,33 @@ dataValueIntervalTo
 dataWithLowerBoundsClause
    : WITH? LOWER BOUNDS
    ;
+// -- schema section ----------------------------------
+
+schemaSection
+   : SCHEMA SECTION DOT_FS schemaDBEntry
+   ;
+
+schemaDBEntry
+   : DB cobolWord WITHIN cobolWord versionClause? DOT_FS
+   ;
+
+// -- map section ----------------------------------
+
+mapSection
+   : MAP SECTION DOT_FS maxFieldListClause? mapClause+
+   ;
+
+maxFieldListClause
+   :  MAX FIELD LIST IS? integerLiteral DOT_FS?
+   ;
+
+mapClause
+    : MAP cobolWord versionClause? (TYPE IS? (STANDARD | EXTENDED) PAGING?)? DOT_FS?
+    ;
+
+versionClause
+    : VERSION integerLiteral
+    ;
 
 // --- procedure division --------------------------------------------------------------------
 
