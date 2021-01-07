@@ -637,11 +637,11 @@ dataRedefinesClause
    ;
 
 dataRenamesClause
-   : RENAMES qualifiedDataName thruDataName?
+   : RENAMES dataName thruDataName?
    ;
 
 thruDataName
-   : (THROUGH | THRU) qualifiedDataName
+   : (THROUGH | THRU) dataName
    ;
 
 dataSignClause
