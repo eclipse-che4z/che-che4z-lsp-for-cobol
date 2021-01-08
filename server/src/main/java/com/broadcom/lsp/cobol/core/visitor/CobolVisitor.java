@@ -49,8 +49,8 @@ import org.eclipse.lsp4j.Range;
 import java.util.*;
 
 import static com.broadcom.lsp.cobol.core.CobolParser.*;
-import static com.broadcom.lsp.cobol.core.semantics.CobolVariableContext.LEVEL_77;
 import static com.broadcom.lsp.cobol.core.visitor.DataDivisionSection.FILE;
+import static com.broadcom.lsp.cobol.core.visitor.VariableDefinitionDelegate.*;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
@@ -410,7 +410,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
             .map(EntryNameContext::dataName1)
             .map(RuleContext::getText)
             .orElse(OutlineNodeNames.FILLER_NAME);
-    outlineTreeBuilder.addVariable(CobolVariableContext.LEVEL_66, name, NodeType.FIELD_66, ctx);
+    outlineTreeBuilder.addVariable(LEVEL_66, name, NodeType.FIELD_66, ctx);
     return visitChildren(ctx);
   }
 
@@ -422,7 +422,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
             .map(EntryNameContext::dataName1)
             .map(RuleContext::getText)
             .orElse(OutlineNodeNames.FILLER_NAME);
-    outlineTreeBuilder.addVariable(CobolVariableContext.LEVEL_88, name, NodeType.FIELD_88, ctx);
+    outlineTreeBuilder.addVariable(LEVEL_88, name, NodeType.FIELD_88, ctx);
     return visitChildren(ctx);
   }
 

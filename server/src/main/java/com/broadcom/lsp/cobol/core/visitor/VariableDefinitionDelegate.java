@@ -56,6 +56,10 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 @RequiredArgsConstructor
 class VariableDefinitionDelegate {
+  static final int LEVEL_66 = 66;
+  static final int LEVEL_77 = 77;
+  static final int LEVEL_88 = 88;
+
   private static final String EMPTY_STRUCTURE_MSG = "semantics.emptyStructure";
   private static final String TOO_MANY_CLAUSES_MSG = "semantics.tooManyClauses";
   private static final String PREVIOUS_WITHOUT_PIC_FOR_88 = "semantics.previousWithoutPicFor88";
@@ -69,10 +73,6 @@ class VariableDefinitionDelegate {
       "semantics.definitionNotAllowedInSection";
 
   private static final ErrorSeverity SEVERITY = ERROR;
-
-  private static final int LEVEL_66 = 66;
-  private static final int LEVEL_77 = 77;
-  private static final int LEVEL_88 = 88;
 
   // TODO: make Value a separate class that accepts:
   // TODO: 1. literal
