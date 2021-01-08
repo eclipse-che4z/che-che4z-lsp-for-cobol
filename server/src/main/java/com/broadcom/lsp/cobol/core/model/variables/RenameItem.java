@@ -18,6 +18,7 @@ package com.broadcom.lsp.cobol.core.model.variables;
 import com.broadcom.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.Value;
 
 import java.util.List;
@@ -29,16 +30,27 @@ import java.util.List;
  * operations.
  */
 @Value
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class RenameItem extends StructuredVariable {
   private static final int LEVEL_NUMBER = 66;
 
-  public RenameItem(
-      @NonNull String name,
-      @NonNull String qualifier,
-      @NonNull Locality definition,
-      @NonNull List<Variable> renamedChildren) {
-    super(LEVEL_NUMBER, name, qualifier, definition);
-    renamedChildren.forEach(this::addChild);
+  public RenameItem(@NonNull String name, @NonNull String qualifier, @NonNull Locality definition) {
+    super(LEVEL_NUMBER, name, qualifier, definition, null);
+  }
+
+  @Override
+  public boolean isConditional() {
+    return false;
+  }
+
+  @Override
+  public void addConditionName(ConditionDataName variable) {
+    throw new UnsupportedOperationException("This variable is not conditional");
+  }
+
+  @Override
+  public List<ConditionDataName> getConditionNames() {
+    return List.of();
   }
 }

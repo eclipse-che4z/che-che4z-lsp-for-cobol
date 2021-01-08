@@ -72,7 +72,7 @@ class VisitorSemanticAnalysisTest {
 
     visitor.visitQualifiedDataNameFormat1(mockMethod(token));
 
-    List<SyntaxError> errors = visitor.getErrors();
+    List<SyntaxError> errors = visitor.finishAnalysis().getErrors();
     assertEquals(1, errors.size());
     assertEquals(
         "Invalid definition for: " + INVALID_VARIABLE.toUpperCase(), errors.get(0).getSuggestion());
@@ -110,13 +110,14 @@ class VisitorSemanticAnalysisTest {
 
     visitor.visitStatement(node);
 
-    List<SyntaxError> errors = visitor.getErrors();
+    List<SyntaxError> errors = visitor.finishAnalysis().getErrors();
     assertEquals(1, errors.size());
     assertEquals("A misspelled word, maybe you want to put MOVE", errors.get(0).getSuggestion());
   }
 
   private QualifiedDataNameFormat1Context mockMethod(CustomToken token) {
     QualifiedDataNameFormat1Context node = mock(QualifiedDataNameFormat1Context.class);
+
     DataNameContext nodeData = mock(DataNameContext.class);
 
     when(node.dataName()).thenReturn(nodeData);

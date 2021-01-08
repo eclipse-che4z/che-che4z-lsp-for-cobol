@@ -30,6 +30,8 @@ public abstract class AbstractVariable implements Variable {
   @Getter protected final String qualifier;
   @Getter protected final Locality definition;
   private final List<Locality> usages = new ArrayList<>();
+  private final List<ConditionDataName> conditionChildren = new ArrayList<>();
+  private Variable parent;
 
   @Override
   public @NonNull List<Locality> getUsages() {
@@ -39,5 +41,24 @@ public abstract class AbstractVariable implements Variable {
   @Override
   public void addUsage(@NonNull Locality usage) {
     usages.add(usage);
+  }
+
+  public Variable getParent() {
+    return parent;
+  }
+
+  @Override
+  public boolean isConditional() {
+    return true;
+  }
+
+  @Override
+  public void addConditionName(ConditionDataName variable) {
+    conditionChildren.add(variable);
+  }
+
+  @Override
+  public List<ConditionDataName> getConditionNames() {
+    return conditionChildren;
   }
 }

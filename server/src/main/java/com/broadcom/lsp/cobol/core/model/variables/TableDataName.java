@@ -17,31 +17,37 @@ package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.Value;
 
 import java.util.List;
 
 /** This value class represents the Table variable that may have an optional index */
 @Value
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class TableDataName extends AbstractVariable implements TableDeclaration {
-  private String picClause;
-  private String value;
-  private int occursTimes;
-  private List<IndexItem> indexes;
+  String picClause;
+  String value;
+  int occursTimes;
+  List<IndexItem> indexes;
+  UsageFormat usageFormat;
 
   public TableDataName(
       String name,
       String qualifier,
       Locality definition,
+      Variable parent,
       String picClause,
       String value,
       int occursTimes,
-      List<IndexItem> indexes) {
-    super(name, qualifier, definition);
+      List<IndexItem> indexes,
+      UsageFormat usageFormat) {
+    super(name, qualifier, definition, parent);
     this.picClause = picClause;
     this.value = value;
     this.occursTimes = occursTimes;
     this.indexes = indexes;
+    this.usageFormat = usageFormat;
   }
 }

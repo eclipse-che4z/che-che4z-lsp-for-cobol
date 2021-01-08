@@ -17,6 +17,7 @@ package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.Value;
 
 /**
@@ -25,14 +26,15 @@ import lombok.Value;
  * explicitly defined value; both as Strings. They cannot produce a structure in any way.
  */
 @Value
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class IndependentDataItem extends AbstractVariable {
-  private String picClause;
-  private String value;
+public class IndependentDataItem extends AbstractVariable implements Conditional {
+  String picClause;
+  String value;
 
   public IndependentDataItem(
       String name, String qualifier, Locality definition, String picClause, String value) {
-    super(name, qualifier, definition);
+    super(name, qualifier, definition, null);
     this.picClause = picClause;
     this.value = value;
   }
