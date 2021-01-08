@@ -176,6 +176,6 @@ class TestMarginAB {
     assertEquals(3, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
     assertEquals(
         "The following token cannot be on the same line as a DECLARATIVE token: MAMA",
-        result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).get(1).getMessage());
+        result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).get(0).getMessage());
   }
 }

@@ -20,6 +20,7 @@ import com.broadcom.lsp.cobol.core.CobolPreprocessorLexer;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Assertions;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 
@@ -48,7 +50,7 @@ class TestXmlQueryNotTerminatesSemanticAnalysis {
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       LINKAGE SECTION.\n"
-          + "       01 {$*VARNAME} PIC 9.\n"
+          + "       01 VARNAME PIC 9.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL\n"
           + "            SELECT COALESCE (SUM( XMLCAST(\n"
@@ -76,7 +78,7 @@ class TestXmlQueryNotTerminatesSemanticAnalysis {
         new Diagnostic(
             new Range(new Position(19, 21), new Position(19, 29)),
             "Invalid definition for: VARNAME1",
-            Information,
-            INFO.getText()));
+            DiagnosticSeverity.Error,
+            ERROR.getText()));
   }
 }
