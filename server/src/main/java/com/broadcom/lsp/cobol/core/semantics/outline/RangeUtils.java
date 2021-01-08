@@ -20,6 +20,9 @@ import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
+/**
+ * The utility class for work with document positions and ranges.
+ */
 @UtilityClass
 public class RangeUtils {
 

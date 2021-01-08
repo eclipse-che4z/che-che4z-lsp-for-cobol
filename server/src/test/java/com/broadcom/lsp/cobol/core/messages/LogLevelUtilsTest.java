@@ -57,7 +57,7 @@ class LogLevelUtilsTest {
   private static class DummyElement {
     private final String info;
 
-    public DummyElement(String info) {
+    DummyElement(String info) {
       this.info = info;
     }
   }

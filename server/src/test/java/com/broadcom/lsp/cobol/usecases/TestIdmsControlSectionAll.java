@@ -51,7 +51,7 @@ class TestIdmsControlSectionAll {
             "            PROTOCOL. SUBSCHEMA-NAMES LENGTH IS 16\r\n"
                     + "            IDMS-RECORDS WITHIN WORKING-STORAGE LEVELS INCREMENTED 18";
 
-    private static final String IDMSCS_WITH_ONLY_PROTOCOL=
+    private static final String IDMSCS_WITH_ONLY_PROTOCOL =
             "            PROTOCOL.";
 
     private static final String IDMSCS_WITH_SSN_LEN_ERROR =

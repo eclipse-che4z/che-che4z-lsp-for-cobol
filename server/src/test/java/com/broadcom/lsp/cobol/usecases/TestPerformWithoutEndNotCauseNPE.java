@@ -48,7 +48,6 @@ class TestPerformWithoutEndNotCauseNPE extends NegativeUseCase {
 
   @Override
   protected void assertDiagnostics(List<Diagnostic> diagnostics) {
-    {
       assertEquals(2, diagnostics.size(), "Number of diagnostics");
 
       Diagnostic diagnostic = diagnostics.get(0);
@@ -59,6 +58,5 @@ class TestPerformWithoutEndNotCauseNPE extends NegativeUseCase {
       assertEquals(40, range.getStart().getCharacter(), "Diagnostic start character");
       assertEquals(8, range.getEnd().getLine(), "Diagnostic end line");
       assertEquals(50, range.getEnd().getCharacter(), "Diagnostic end character");
-    }
   }
 }

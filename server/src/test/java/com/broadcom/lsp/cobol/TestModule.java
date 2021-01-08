@@ -51,6 +51,7 @@ import static com.google.inject.name.Names.named;
 import static java.lang.System.getProperty;
 import static java.util.Optional.ofNullable;
 
+/** This module provides DI bindings for testing. */
 public class TestModule extends AbstractModule {
   private static final String PATH_TO_TEST_RESOURCES = "filesToTestPath";
 

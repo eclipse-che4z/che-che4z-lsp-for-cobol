@@ -22,4 +22,24 @@
     <suppress checks="NewlineAtEndOfFile"
               files="Test_messageServiceEmptyFile_en.properties"/>
     <suppress checks="RightCurly" files="CobolLineIndicatorProcessorImpl.java"/>
+    <suppress checks="MethodName" files="[/\\]test[/\\]"/>
+
+    <!-- Temporal suppressions they MUST be fixed -->
+    <suppress checks="MissingJavadocType" files="ClientProvider.java"/>
+    <suppress checks="MissingJavadocType" files="Communications.java"/>
+    <suppress checks="MissingJavadocType" files="Formation.java"/>
+    <suppress checks="MissingJavadocType" files="Formations.java"/>
+    <suppress checks="MissingJavadocType" files="TrimFormation.java"/>
+    <suppress checks="MissingJavadocType" files="CompletionStorage.java"/>
+    <suppress checks="MissingJavadocType" files="LanguageEngineFacade.java"/>
+    <suppress checks="MissingJavadocType" files="CobolErrorStrategy.java"/>
+    <suppress checks="MissingJavadocType" files="CopybookSubscriber.java"/>
+    <suppress checks="MissingJavadocType" files="VariableLocationsTest.java"/>
+    <suppress checks="MissingJavadocType" files="CobolTextRegistry.java"/>
+    <suppress checks="MissingJavadocType" files="CopybooksMock.java"/>
+    <suppress checks="MissingJavadocType" files="AbstractCobolLinePreprocessorTest.java"/>
+    <suppress checks="MissingJavadocType" files="CustomToken.java"/>
+    <suppress checks="MissingJavadocType" files="DatabusTestConstants.java"/>
+    <suppress checks="MissingJavadocType" files="CopybookEventsTest.java"/>
+    <suppress checks="MissingJavadocType" files="DatabusBrokerTest.java"/>
 </suppressions>

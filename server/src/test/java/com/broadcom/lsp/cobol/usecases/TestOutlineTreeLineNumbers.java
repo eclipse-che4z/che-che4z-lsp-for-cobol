@@ -30,12 +30,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /** This test checks that Outline tree has correct lines numbers for elements */
 public class TestOutlineTreeLineNumbers {
   private static final String TEXT =
-      "00     IDENTIFICATION DIVISION.\n" +
-          "01     DATA DIVISION.\n" +
-          "02     WORKING-STORAGE SECTION.\n" +
-          "03     01 STRUCTNAME.\n" +
-          "04     03 VARNAME  PIC X(20).\n" +
-          "05     COPY BAR.";
+      "00     IDENTIFICATION DIVISION.\n"
+          + "01     DATA DIVISION.\n"
+          + "02     WORKING-STORAGE SECTION.\n"
+          + "03     01 STRUCTNAME.\n"
+          + "04     03 VARNAME  PIC X(20).\n"
+          + "05     COPY BAR.";
 
   @Test
   void test() {

@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+/** This test check functions of the {@link CobolDocumentModel}. */
 class CobolDocumentModelTest {
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \r\n"

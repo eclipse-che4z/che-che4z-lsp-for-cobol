@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/** Test to check CobolLineWriterImpl */
 class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
   private static final String TEXT_TO_TEST =
       "078087                 PERFORM BBAB-MOVE-TO-DETAIL-MAP\r\n"

@@ -29,6 +29,7 @@ import java.util.Optional;
 
 import static com.broadcom.lsp.cobol.service.delegates.completions.CompletionOrder.SNIPPETS;
 
+/** implementation for adding snippets in the autocomplete list */
 @Singleton
 public class SnippetCompletion implements Completion {
   private CompletionStorage snippets;

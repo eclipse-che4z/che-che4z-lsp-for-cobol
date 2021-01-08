@@ -26,6 +26,7 @@ import java.util.Collection;
 
 import static com.broadcom.lsp.cobol.service.delegates.completions.CompletionOrder.KEYWORDS;
 
+/** implementation for adding keywords in the autocomplete list */
 @Singleton
 public class KeywordCompletion implements Completion {
   private CompletionStorage keywords;
