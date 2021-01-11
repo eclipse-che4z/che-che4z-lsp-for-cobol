@@ -301,7 +301,7 @@ class VariableDefinitionDelegate {
   }
 
   @Nullable
-  private Conditional getConditionalContainer() {
+  private Variable getConditionalContainer() {
     return ofNullable(variables.peek())
         .filter(Conditional::isConditional)
         .orElseGet(
@@ -421,7 +421,7 @@ class VariableDefinitionDelegate {
     if (variable.getContainer() == null) {
       variable.setQualifier(retrieveQualifier(variable.getName()));
     } else {
-      variable.setQualifier(variable.getContainer() + " " + variable.getName());
+      variable.setQualifier(variable.getContainer().getQualifier() + " " + variable.getName());
     }
   }
 
@@ -458,7 +458,7 @@ class VariableDefinitionDelegate {
   }
 
   private void updateConditionalContainer(VariableDefinitionContext variable) {
-    Conditional container = getConditionalContainer();
+    Variable container = getConditionalContainer();
     variable.setContainer(container);
     if (container == null) {
       addError(
@@ -647,7 +647,7 @@ class VariableDefinitionDelegate {
     List<DataValueClauseContext> valueClauses;
     List<DataUsageClauseContext> usageClauses;
     String valueClauseTest;
-    Conditional container;
+    Variable container;
     DataRenamesClauseContext renamesClauseContext;
     UsageFormat usageFormat;
   }
