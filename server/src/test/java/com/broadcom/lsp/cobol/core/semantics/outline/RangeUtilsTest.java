@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/** Test to check RangeUtils */
 class RangeUtilsTest {
   private Position firstLine = new Position(1, 0);
   private Position secondLine = new Position(2, 0);

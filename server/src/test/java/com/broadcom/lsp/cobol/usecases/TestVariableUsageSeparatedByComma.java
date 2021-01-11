@@ -40,6 +40,6 @@ class TestVariableUsageSeparatedByComma {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of(),List.of("SMTH"));
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of(), List.of("SMTH"));
   }
 }

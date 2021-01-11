@@ -29,9 +29,12 @@ import static org.mockito.Mockito.*;
  * This test checks the entry points of the {@link SubroutineServiceImpl} implementation.
  */
 public class SubroutineServiceImplTest {
+  private static final String NAME = "NAME";
+  private static final String PRESENT_FILE = "existing";
+  private static final String MISSING_FILE = "nonExisting";
+
   @Test
   void subroutinesUriCached() {
-    String NAME = "NAME";
     CobolLanguageClient languageClient = mock(CobolLanguageClient.class);
     when(languageClient.resolveSubroutine(any()))
         .thenReturn(CompletableFuture.completedFuture("URI1"))
@@ -53,8 +56,6 @@ public class SubroutineServiceImplTest {
 
   @Test
   void subroutinesCachedEmptyResult() {
-    String PRESENT_FILE = "existing";
-    String MISSING_FILE = "nonExisting";
     CobolLanguageClient languageClient = mock(CobolLanguageClient.class);
     when(languageClient.resolveSubroutine(PRESENT_FILE)).thenReturn(CompletableFuture.completedFuture("URI"));
     when(languageClient.resolveSubroutine(MISSING_FILE)).thenReturn(CompletableFuture.completedFuture(null));
