@@ -31,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
-import org.eclipse.lsp4j.Range;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -324,14 +323,6 @@ class VariableDefinitionDelegate {
     return clause.getText().replaceAll(clause.getStart().getText(), "").trim();
   }
 
-  @NonNull
-  private <T extends ParserRuleContext> Locality retrieveRangeLocality(@NonNull List<T> clauses) {
-    Locality start = positions.get(clauses.get(0).getStart());
-    Locality end = positions.get(clauses.get(clauses.size() - 1).getStop());
-    Range range = new Range(start.getRange().getStart(), end.getRange().getEnd());
-    return Locality.builder().uri(start.getUri()).range(range).build();
-  }
-
   private int retrieveOccursTimes(@NonNull DataOccursClauseContext dataOccursClauseContexts) {
     return Integer.parseInt(dataOccursClauseContexts.integerLiteral().getText());
   }
@@ -426,26 +417,25 @@ class VariableDefinitionDelegate {
   }
 
   private void checkPictureClauseIsSingle(VariableDefinitionContext variable) {
-    checkClauseIsSingle(variable.getPicClauses());
+    checkClauseIsSingle(variable.getDefinition(), variable.getPicClauses(), "PICTURE");
   }
 
   private void checkOccursClauseIsSingle(VariableDefinitionContext variable) {
-    checkClauseIsSingle(variable.getOccursClauses());
+    checkClauseIsSingle(variable.getDefinition(), variable.getOccursClauses(), "OCCURS");
   }
 
   private void checkValueClauseIsSingle(VariableDefinitionContext variable) {
-    checkClauseIsSingle(variable.getValueClauses());
+    checkClauseIsSingle(variable.getDefinition(), variable.getValueClauses(), "VALUE");
   }
 
   private void checkUsageClauseIsSingle(VariableDefinitionContext variable) {
-    checkClauseIsSingle(variable.getUsageClauses());
+    checkClauseIsSingle(variable.getDefinition(), variable.getUsageClauses(), "USAGE");
   }
 
-  private void checkClauseIsSingle(List<? extends ParserRuleContext> clauses) {
+  private void checkClauseIsSingle(
+      Locality locality, List<? extends ParserRuleContext> clauses, String clause) {
     if (clauses.size() > 1) {
-      addError(
-          messages.getMessage(TOO_MANY_CLAUSES_MSG, clauses.get(0).getStart().getText()),
-          retrieveRangeLocality(clauses));
+      addError(messages.getMessage(TOO_MANY_CLAUSES_MSG, clause), locality);
     }
   }
 
@@ -576,7 +566,7 @@ class VariableDefinitionDelegate {
             variable.getName(),
             variable.getQualifier(),
             variable.getDefinition(),
-            (Variable) variable.getContainer(),
+            variable.getContainer(),
             variable.getValueClauseTest());
     Optional.ofNullable(variable.getContainer())
         .ifPresent(container -> container.addConditionName(result));
