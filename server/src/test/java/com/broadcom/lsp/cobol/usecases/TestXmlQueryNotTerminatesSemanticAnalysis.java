@@ -29,8 +29,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
-import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 
 /**
  * This test checks that an XML Query that has gaps in concatenation and variable calls with '$'

@@ -51,7 +51,7 @@ class VariableUtilsTest {
   @Test
   void createQualifierForTop() {
     String name = "VARNAME";
-    assertEquals(" " +name, VariableUtils.createQualifier(new ArrayDeque<>(), name));
+    assertEquals(" " + name, VariableUtils.createQualifier(new ArrayDeque<>(), name));
   }
 
   /**
