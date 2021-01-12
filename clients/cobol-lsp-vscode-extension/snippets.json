@@ -83,6 +83,22 @@
 		"description": "COPY REPLACING",
 		"scope": "cobol,acucobol,opencobol,gnucobol"
 	},
+	"exec-sql": {
+		"prefix": "exec-sql",
+		"body": [
+			"exec sql ${1:sql-statement} end-exec."
+		],
+		"description": "exec sql statement",
+		"scope": "cobol,acucobol"
+	},
+	"EXEC-SQL": {
+		"prefix": "EXEC-SQL",
+		"body": [
+			"EXEC SQL ${1:SQL-STATEMENT} END-EXEC."
+		],
+		"description": "EXEC SQL STATEMENT",
+		"scope": "cobol,acucobol"
+	},
 	"exec-sql-include": {
 		"prefix": "exec-sql-include",
 		"body": [

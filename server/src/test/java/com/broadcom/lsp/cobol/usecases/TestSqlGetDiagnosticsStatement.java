@@ -15,37 +15,29 @@
 
 package com.broadcom.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-
-/** This test checks sql include statement if it is defined correctly. */
-class TestSqlIncludeStatementNotDefinedCorrectly {
+/** This test checks if sql GET DIAGNOSTICS statement works correctly. */
+class TestSqlGetDiagnosticsStatement {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*SQLCA}.\n"
-          + "       EXEC  INCLUDE STRUCT1 END-EXEC.{|1}";
+          + "       EXEC SQL\n"
+          + "        GET CURRENT DIAGNOSTICS CONDITION 1 \n"
+          + "            msg_text = MESSAGE_TEXT;\n"
+          + "        \n"
+          + "        GET STACKED DIAGNOSTICS CONDITION 1 \n"
+          + "             divide_error = MESSAGE_TEXT;\n"
+          + "       END-EXEC.";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(
-        TEXT,
-        List.of(),
-        Map.of(
-            "1",
-            new Diagnostic(
-                null,
-                "Missing token SQL at execSqlStatement",
-                Error,
-                SourceInfoLevels.ERROR.getText())));
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

@@ -35,19 +35,21 @@ class TestExtraneousInputEOFExpecting {
           + "           if (1 > 0) NEXT SENTENCE{|1}"; // No dot at the end of file
 
   private static final String MESSAGE =
-      "Extraneous input '<EOF>' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, "
-          + "COMPUTE, CONTINUE, DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, "
-          + "EVALUATE, EXEC, EXHIBIT, EXIT, GENERATE, GO, GOBACK, IF, INITIALIZE, "
-          + "INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, PURGE, READ, "
-          + "RECEIVE, RELEASE, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT, "
-          + "START, STOP, STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, "
-          + "DOT_FS}";
+      "Extraneous input '<EOF>' expected {ACCEPT, CANCEL, CLOSE, COMPUTE, DISPLAY, DIVIDE, "
+          + "EVALUATE, EXHIBIT, GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MULTIPLY, PERFORM, "
+          + "PURGE, SERVICE, SORT, STOP, STRING, SUBTRACT, TERMINATE, UNSTRING, CALL, CONTINUE, "
+          + "DISABLE, ENABLE, EXIT, GENERATE, GO, MERGE, SEARCH, XML, ADD, ALTER, DELETE, ENTRY, "
+          + "MOVE, OPEN, READ, RECEIVE, RELEASE, RETURN, REWRITE, SEND, SET, START, EXEC_SQL, EXEC, "
+          + "WRITE, DOT_FS}";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
         List.of(),
-        Map.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
+        Map.of(
+            "1",
+            new Diagnostic(
+                null, MESSAGE, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
   }
 }

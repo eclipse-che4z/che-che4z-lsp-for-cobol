@@ -15,37 +15,26 @@
 
 package com.broadcom.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+/** This test checks if sql CONNECT statement works correctly. */
+class TestSqlConnectStatement {
 
-/** This test checks sql include statement if it is defined correctly. */
-class TestSqlIncludeStatementNotDefinedCorrectly {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*SQLCA}.\n"
-          + "       EXEC  INCLUDE STRUCT1 END-EXEC.{|1}";
+          + "       EXEC SQL\n"
+          + "         CONNECT TO :LOCNAME USER :USER_AUTHID USING :USER_PASSWORD \n"
+          + "       END-EXEC.\n";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(
-        TEXT,
-        List.of(),
-        Map.of(
-            "1",
-            new Diagnostic(
-                null,
-                "Missing token SQL at execSqlStatement",
-                Error,
-                SourceInfoLevels.ERROR.getText())));
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }
