@@ -33,7 +33,7 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*SQLCA}.\n"
-          + "       EXEC  INCLUDE STRUCT1 END-EXEC.{|1}";
+          + "       EXEC  {INCLUDE|1} STRUCT1 END-EXEC.";
 
   @Test
   void test() {

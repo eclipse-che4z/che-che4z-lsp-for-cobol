@@ -1103,13 +1103,12 @@ evaluateValue
 // exec cics statement
 execCicsStatement
    : EXEC CICS allRules END_EXEC DOT_FS?
-   | EXEC allRules END_EXEC DOT_FS? {notifyErrorListeners("Missing token CICS at execCicsStatement");}
    ;
 
 // exec sql statement
 execSqlStatement
    : EXEC_SQL allSqlRules END_EXEC DOT_FS?
-   | EXEC allSqlRules END_EXEC DOT_FS?{notifyErrorListeners("Missing token SQL at execSqlStatement");}
+   | (EXEC | SQL) {notifyErrorListeners("Missing token EXEC or SQL at execSqlStatement");} allSqlRules END_EXEC DOT_FS?
    ;
 
 // exec sql ims statement
