@@ -34,7 +34,6 @@ import com.google.common.collect.Multimap;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -83,6 +82,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   private final MessageService messageService;
   private final SubroutineService subroutineService;
   private final VariableDefinitionDelegate variablesDelegate;
+  private final VariableUsageDelegate variableUsageDelegate;
 
   public CobolVisitor(
       @NonNull String documentUri,
@@ -98,6 +98,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
     this.subroutineService = subroutineService;
     outlineTreeBuilder = new OutlineTreeBuilder(documentUri, positionMapping);
     variablesDelegate = new VariableDefinitionDelegate(positionMapping, messageService);
+    variableUsageDelegate = new VariableUsageDelegate(positionMapping, messageService);
   }
 
   /**
@@ -109,6 +110,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   @NonNull
   public ResultWithErrors<SemanticContext> finishAnalysis() {
     if (!variablesDelegate.isResultCollected()) finishVariableDefinition();
+    errors.addAll(variableUsageDelegate.updateUsageAndGenerateErrors(definedVariables));
     errors.addAll(groupContext.generateParagraphErrors(messageService));
     return new ResultWithErrors<>(
         SemanticContext.builder()
@@ -455,22 +457,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   public Void visitQualifiedDataNameFormat1(QualifiedDataNameFormat1Context ctx) {
     String dataName =
         ofNullable(ctx.dataName()).map(RuleContext::getText).map(String::toUpperCase).orElse("");
-    Locality locality = getLocality(ctx.dataName().getStart()).orElse(null);
-    if (constants.contains(dataName)) {
-      constants.addUsage(dataName, locality.toLocation());
-      return visitChildren(ctx);
-    }
-    List<QualifiedInDataContext> hierarchy = ctx.qualifiedInData();
-    List<Variable> foundVariables = findVariable(createQualifier(dataName, hierarchy));
-
-    if (foundVariables.size() == 1) {
-      Variable variable = foundVariables.get(0);
-      variable.addUsage(locality);
-
-      addParentVariablesUsage(collectParentVariables(hierarchy), variable);
-    } else {
-      reportInvalidDefinition(dataName, locality);
-    }
+    getLocality(ctx.dataName().getStart()).ifPresent(locality -> {
+      if (constants.contains(dataName))
+        constants.addUsage(dataName, locality.toLocation());
+      else
+        variableUsageDelegate.handleDataName(dataName, locality, ctx);
+    });
     return visitChildren(ctx);
   }
 
@@ -478,68 +470,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   public Void visitTableCall(TableCallContext ctx) {
     String dataName =
         ofNullable(ctx.dataName2()).map(RuleContext::getText).map(String::toUpperCase).orElse("");
-    Locality locality = getLocality(ctx.dataName2().getStart()).orElse(null);
-    if (constants.contains(dataName)) {
-      constants.addUsage(dataName, locality.toLocation());
-      return visitChildren(ctx);
-    }
-    String qualifier = ".* " + dataName;
-    List<Variable> foundVariables = findVariable(qualifier);
-
-    if (foundVariables.size() == 1) {
-      Variable variable = foundVariables.get(0);
-      variable.addUsage(locality);
-    } else {
-      reportInvalidDefinition(dataName, locality);
-    }
+    getLocality(ctx.dataName2().getStart()).ifPresent(locality -> {
+      if (constants.contains(dataName))
+        constants.addUsage(dataName, locality.toLocation());
+      else
+        variableUsageDelegate.handleTableCall(dataName, locality);
+    });
     return visitChildren(ctx);
-  }
-
-  private List<Variable> findVariable(String qualifier) {
-    return definedVariables.stream()
-        .filter(it -> it.getQualifier().matches(qualifier))
-        .collect(toList());
-  }
-
-  private void addParentVariablesUsage(Map<String, Token> parentVariables, Variable variable) {
-    Variable parent = variable.getParent();
-    while (parent != null) {
-      ofNullable(parentVariables.get(parent.getName()))
-          .map(positionMapping::get)
-          .ifPresent(parent::addUsage);
-      parent = parent.getParent();
-    }
-  }
-
-  private Map<String, Token> collectParentVariables(List<QualifiedInDataContext> hierarchy) {
-    Map<String, Token> parentVariables =
-        hierarchy.stream()
-            .map(QualifiedInDataContext::inData)
-            .filter(Objects::nonNull)
-            .map(InDataContext::dataName2)
-            .collect(toMap(it -> it.getText().toUpperCase(), ParserRuleContext::getStart));
-
-    parentVariables.putAll(
-        hierarchy.stream()
-            .map(QualifiedInDataContext::inTable)
-            .filter(Objects::nonNull)
-            .map(InTableContext::tableCall)
-            .collect(toMap(it -> it.getText().toUpperCase(), ParserRuleContext::getStart)));
-    return parentVariables;
-  }
-
-  private String createQualifier(String dataName, List<QualifiedInDataContext> hierarchy) {
-    String hierarchicalQualifier =
-        hierarchy.stream()
-            .map(this::getDataName2Context)
-            .map(RuleContext::getText)
-            .map(String::toUpperCase)
-            .reduce((s1, s2) -> s2 + " .* " + s1)
-            .orElse("");
-
-    return hierarchicalQualifier.isEmpty()
-        ? ".* " + dataName
-        : ".* " + hierarchicalQualifier + " .* " + dataName;
   }
 
   @Override
@@ -579,17 +516,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
     return ofNullable(positionMapping.get(childToken));
   }
 
-  private DataName2Context getDataName2Context(QualifiedInDataContext node) {
-    return ofNullable(node.inData())
-        .map(InDataContext::dataName2)
-        .orElseGet(
-            () ->
-                ofNullable(node.inTable())
-                    .map(InTableContext::tableCall)
-                    .map(TableCallContext::dataName2)
-                    .orElse(null));
-  }
-
   private Locality getIntervalPosition(Locality start, Locality stop) {
     return Locality.builder()
         .uri(start.getUri())
@@ -607,17 +533,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
             .locality(getIntervalPosition(locality, locality))
             .build();
     LOG.debug("Syntax error by CobolVisitor#reportSubroutineNotDefined: " + error.toString());
-    errors.add(error);
-  }
-
-  private void reportInvalidDefinition(String dataName, Locality locality) {
-    SyntaxError error =
-        SyntaxError.syntaxError()
-            .suggestion(messageService.getMessage("CobolVisitor.invalidDefMsg", dataName))
-            .severity(ErrorSeverity.ERROR)
-            .locality(locality)
-            .build();
-    LOG.debug("Syntax error by CobolVisitor#reportInvalidDefinition: " + error.toString());
     errors.add(error);
   }
 
