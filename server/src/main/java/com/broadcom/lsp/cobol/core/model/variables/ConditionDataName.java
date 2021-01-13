@@ -16,7 +16,6 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
@@ -38,16 +37,6 @@ public class ConditionDataName extends AbstractVariable {
       String name, String qualifier, Locality definition, Variable parent, String value) {
     super(name, qualifier, definition, parent);
     this.value = value;
-  }
-
-  @Override
-  public Variable rename(RenameItem newParent) {
-    return new ConditionDataName(
-        name,
-        VariableUtils.renameQualifier(qualifier, newParent.name),
-        definition,
-        newParent,
-        value);
   }
 
   @Override

@@ -46,7 +46,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * This class processes the variable definition contexts. It accumulates the variable structures to
  * track the nesting, and the qualifiers that also rely on the structure. Pay attention, that the
- * <code>create*</code> methods are NOT pure, they share a state and rely on the context.
+ * <code>define*</code> methods are NOT pure, they share a state and rely on the context.
  *
  * <p>Qualifiers used to check the variable usages and may be used to check the uniqueness of the
  * reference using a regex, e.g. PARENT.*CHILD may check this usage even if there are intermediate
@@ -194,14 +194,15 @@ class VariableDefinitionDelegate {
             .antlrClass(ctx.getClass())
             .starting(positions.get(ctx.LEVEL_NUMBER_66().getSymbol()))
             .renamesClauseContext(ctx.dataRenamesClause())
+            .precedingStructure(structureStack.peekLast())
             .build();
 
+    closePreviousStructure();
     setFillerNameIfNeeded(variableDefinitionContext);
     checkVariableTypeAllowed(variableDefinitionContext);
     checkTopElementNumber(variableDefinitionContext);
     updateQualifier(variableDefinitionContext);
-
-    defineVariable(variableDefinitionContext, this::renameItemMatcher);
+    variables.push(renameItemMatcher(variableDefinitionContext));
   }
 
   /**
@@ -273,30 +274,6 @@ class VariableDefinitionDelegate {
 
   private Optional<Variable> retrieveChild(List<Variable> childrenToRename, String stopName) {
     return childrenToRename.stream().filter(it -> it.getName().equals(stopName)).findFirst();
-  }
-
-  private List<Variable> renameVariables(RenameItem newParent, List<Variable> children) {
-    return children.stream()
-        .map(renameVariable(newParent))
-        .filter(Objects::nonNull)
-        .collect(toList());
-  }
-
-  private void reportChildrenNotFound(DataRenamesClauseContext renamesClause, String stopName) {
-    addError(
-        messages.getMessage(CHILD_TO_RENAME_NOT_FOUND, stopName),
-        positions.get(renamesClause.dataName().getStart()));
-  }
-
-  private Function<Variable, Variable> renameVariable(RenameItem newParent) {
-    return it ->
-        ofNullable(it.rename(newParent))
-            .orElseGet(
-                () -> {
-                  addError(
-                      messages.getMessage(CANNOT_BE_RENAMED, it.getName()), it.getDefinition());
-                  return null;
-                });
   }
 
   @Nullable
@@ -584,42 +561,85 @@ class VariableDefinitionDelegate {
   }
 
   private List<Variable> extractChildrenToRename(VariableDefinitionContext variable) {
-    StructuredVariable structure = structureStack.getFirst();
-    Variable previousVariable = variables.peek();
-    if (structure == null || previousVariable == null) {
-      addError(messages.getMessage(NO_STRUCTURE_BEFORE_RENAME), variable.getDefinition());
+    Locality definition = variable.getDefinition();
+    if (variable.getPrecedingStructure() == null) {
+      addError(messages.getMessage(NO_STRUCTURE_BEFORE_RENAME), definition);
       return List.of();
     }
-    List<Variable> previousChildren = structure.getChildren();
+    StructuredVariable structure = variable.getPrecedingStructure();
+    List<Variable> previousChildren = collectChildrenToRename(structure);
+
     DataRenamesClauseContext renamesClause = variable.getRenamesClauseContext();
     String startName = renamesClause.dataName().getText();
     Optional<Variable> start = retrieveChild(previousChildren, startName);
     if (start.isEmpty()) {
-      reportChildrenNotFound(renamesClause, startName);
+      reportChildrenNotFound(startName, definition);
       return List.of();
     }
+
+    Variable startVar = start.get();
+    Locality startUsage = positions.get(renamesClause.dataName().getStart());
     if (renamesClause.thruDataName() == null) {
-      start.get().addUsage(positions.get(renamesClause.dataName().getStart()));
-      return List.of(start.get());
+      startVar.addUsage(startUsage);
+      return List.of(startVar);
     }
+
     String stopName = renamesClause.thruDataName().dataName().getText();
     Optional<Variable> stop = retrieveChild(previousChildren, stopName);
     if (stop.isEmpty()) {
-      reportChildrenNotFound(renamesClause, stopName);
-      start.get().addUsage(positions.get(renamesClause.dataName().getStart()));
-      return List.of(start.get());
-    }
-    int fromIndex = previousChildren.indexOf(start.get());
-    int toIndex = previousChildren.indexOf(stop.get());
-    if (toIndex <= fromIndex) {
-      addError(INCORRECT_CHILDREN_ORDER, variable.getDefinition());
-      start.get().addUsage(positions.get(renamesClause.dataName().getStart()));
-      return List.of(start.get());
+      reportChildrenNotFound(stopName, definition);
+      startVar.addUsage(startUsage);
+      return List.of(startVar);
     }
 
-    start.get().addUsage(positions.get(renamesClause.dataName().getStart()));
-    stop.get().addUsage(positions.get(renamesClause.thruDataName().dataName().getStart()));
-    return previousChildren.subList(fromIndex, toIndex);
+    Variable stopVar = stop.get();
+    Locality stopUsage = positions.get(renamesClause.thruDataName().dataName().getStart());
+    int toIndex = previousChildren.indexOf(stopVar);
+    int fromIndex = previousChildren.indexOf(startVar);
+    if (toIndex <= fromIndex) {
+      addError(messages.getMessage(INCORRECT_CHILDREN_ORDER), definition);
+      startVar.addUsage(startUsage);
+      stopVar.addUsage(stopUsage);
+      return List.of();
+    }
+
+    startVar.addUsage(startUsage);
+    stopVar.addUsage(stopUsage);
+    return previousChildren.subList(fromIndex, toIndex + 1);
+  }
+
+  private List<Variable> collectChildrenToRename(StructuredVariable structure) {
+    List<Variable> result = new ArrayList<>();
+    for (Variable child : structure.getChildren()) {
+      result.add(child);
+      if (child instanceof StructuredVariable) {
+        result.addAll(collectChildrenToRename((StructuredVariable) child));
+      }
+    }
+    return result;
+  }
+
+  private List<Variable> renameVariables(RenameItem newParent, List<Variable> children) {
+    return children.stream()
+        .map(renameVariable(newParent))
+        .filter(Objects::nonNull)
+        .collect(toList());
+  }
+
+  private Function<Variable, Variable> renameVariable(RenameItem newParent) {
+    return it ->
+        ofNullable(it.rename(newParent))
+            .orElseGet(
+                () -> {
+                  addError(
+                      messages.getMessage(CANNOT_BE_RENAMED, it.getName()),
+                      newParent.getDefinition());
+                  return null;
+                });
+  }
+
+  private void reportChildrenNotFound(String stopName, Locality locality) {
+    addError(messages.getMessage(CHILD_TO_RENAME_NOT_FOUND, stopName), locality);
   }
 
   /** This data class used for temporal storage ANTLR parsed variables. */
@@ -640,5 +660,6 @@ class VariableDefinitionDelegate {
     Variable container;
     DataRenamesClauseContext renamesClauseContext;
     UsageFormat usageFormat;
+    StructuredVariable precedingStructure;
   }
 }

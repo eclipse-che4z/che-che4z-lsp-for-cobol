@@ -16,6 +16,7 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
@@ -49,5 +50,19 @@ public class TableDataName extends AbstractVariable implements TableDeclaration 
     this.occursTimes = occursTimes;
     this.indexes = indexes;
     this.usageFormat = usageFormat;
+  }
+
+  @Override
+  public Variable rename(RenameItem newParent) {
+    return new TableDataName(
+        name,
+        VariableUtils.renameQualifier(qualifier, newParent.name),
+        definition,
+        newParent,
+        picClause,
+        value,
+        occursTimes,
+        indexes,
+        usageFormat);
   }
 }

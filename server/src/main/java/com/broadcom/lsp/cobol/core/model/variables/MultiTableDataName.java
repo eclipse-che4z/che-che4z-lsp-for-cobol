@@ -16,6 +16,7 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
@@ -47,5 +48,18 @@ public class MultiTableDataName extends StructuredVariable implements TableDecla
     this.occursTimes = occursTimes;
     this.indexes = indexes;
     this.usageFormat = usageFormat;
+  }
+
+  @Override
+  public Variable rename(RenameItem newParent) {
+    return new MultiTableDataName(
+        levelNumber,
+        name,
+        VariableUtils.renameQualifier(qualifier, newParent.name),
+        definition,
+        newParent,
+        occursTimes,
+        indexes,
+        usageFormat);
   }
 }
