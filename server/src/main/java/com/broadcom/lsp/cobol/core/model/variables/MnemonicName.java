@@ -30,8 +30,8 @@ import java.util.List;
 @Value
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class SpecialName extends AbstractVariable {
-  public SpecialName(String name, String qualifier, Locality definition) {
+public class MnemonicName extends AbstractVariable {
+  public MnemonicName(String name, String qualifier, Locality definition) {
     super(name, qualifier, definition, null);
   }
 

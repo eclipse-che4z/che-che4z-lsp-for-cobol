@@ -144,7 +144,9 @@ specialNamesParagraph
    ;
 
 specialNameClause
-   : channelClause | odtClause | alphabetClause | classClause | currencySignClause | decimalPointClause | symbolicCharactersClause | environmentSwitchNameClause | defaultDisplaySignClause | defaultComputationalSignClause | reserveNetworkClause
+   : channelClause | odtClause | alphabetClause | classClause | currencySignClause
+   | decimalPointClause | symbolicCharactersClause | environmentSwitchNameClause
+   | defaultDisplaySignClause | defaultComputationalSignClause | reserveNetworkClause
    ;
 
 alphabetClause

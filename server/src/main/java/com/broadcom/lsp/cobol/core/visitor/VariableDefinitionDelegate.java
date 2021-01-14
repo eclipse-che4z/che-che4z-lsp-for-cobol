@@ -23,7 +23,10 @@ import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.model.variables.*;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -232,6 +235,22 @@ class VariableDefinitionDelegate {
   }
 
   /**
+   * Create and accumulate a variable for mnemonic name out of the given context. Add errors if the
+   * variable definition contains is invalid
+   *
+   * @param ctx - a {@link EnvironmentSwitchNameClauseContext} to retrieve the variable
+   */
+  void defineVariable(EnvironmentSwitchNameClauseContext ctx) {
+    String name = retrieveName(ctx.mnemonicName());
+    variables.push(
+        new MnemonicName(
+            name,
+            VariableUtils.createQualifier(name),
+            retrieveDefinition(
+                Optional.<ParserRuleContext>ofNullable(ctx.mnemonicName()).orElse(ctx))));
+  }
+
+  /**
    * Change the currently processing section. Checks if the preceding variable structure is correct
    *
    * @param section - the currently processing section
@@ -262,6 +281,10 @@ class VariableDefinitionDelegate {
   }
 
   private String retrieveName(EntryNameContext context) {
+    return ofNullable(context).map(RuleContext::getText).map(String::toUpperCase).orElse(null);
+  }
+
+  private String retrieveName(MnemonicNameContext context) {
     return ofNullable(context).map(RuleContext::getText).map(String::toUpperCase).orElse(null);
   }
 

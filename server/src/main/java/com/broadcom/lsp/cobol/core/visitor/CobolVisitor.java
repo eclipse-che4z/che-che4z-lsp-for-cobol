@@ -24,7 +24,10 @@ import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.model.variables.Variable;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
-import com.broadcom.lsp.cobol.core.semantics.*;
+import com.broadcom.lsp.cobol.core.semantics.GroupContext;
+import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
+import com.broadcom.lsp.cobol.core.semantics.PredefinedVariableContext;
+import com.broadcom.lsp.cobol.core.semantics.SemanticContext;
 import com.broadcom.lsp.cobol.core.semantics.outline.NodeType;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineTreeBuilder;
@@ -405,6 +408,17 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   }
 
   @Override
+  public Void visitEnvironmentSwitchNameClause(EnvironmentSwitchNameClauseContext ctx) {
+    variablesDelegate.defineVariable(ctx);
+    String name =
+        ofNullable(ctx.mnemonicName())
+            .map(RuleContext::getText)
+            .orElse(OutlineNodeNames.FILLER_NAME);
+    outlineTreeBuilder.addNode(name, NodeType.MNEMONIC_NAME, ctx);
+    return visitChildren(ctx);
+  }
+
+  @Override
   public Void visitDataDescriptionEntryFormat2(DataDescriptionEntryFormat2Context ctx) {
     variablesDelegate.defineVariable(ctx);
     String name =
@@ -457,12 +471,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   public Void visitQualifiedDataNameFormat1(QualifiedDataNameFormat1Context ctx) {
     String dataName =
         ofNullable(ctx.dataName()).map(RuleContext::getText).map(String::toUpperCase).orElse("");
-    getLocality(ctx.dataName().getStart()).ifPresent(locality -> {
-      if (constants.contains(dataName))
-        constants.addUsage(dataName, locality.toLocation());
-      else
-        variableUsageDelegate.handleDataName(dataName, locality, ctx);
-    });
+    getLocality(ctx.dataName().getStart())
+        .ifPresent(
+            locality -> {
+              if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
+              else variableUsageDelegate.handleDataName(dataName, locality, ctx);
+            });
     return visitChildren(ctx);
   }
 
@@ -470,12 +484,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   public Void visitTableCall(TableCallContext ctx) {
     String dataName =
         ofNullable(ctx.dataName2()).map(RuleContext::getText).map(String::toUpperCase).orElse("");
-    getLocality(ctx.dataName2().getStart()).ifPresent(locality -> {
-      if (constants.contains(dataName))
-        constants.addUsage(dataName, locality.toLocation());
-      else
-        variableUsageDelegate.handleTableCall(dataName, locality);
-    });
+    getLocality(ctx.dataName2().getStart())
+        .ifPresent(
+            locality -> {
+              if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
+              else variableUsageDelegate.handleTableCall(dataName, locality);
+            });
     return visitChildren(ctx);
   }
 
