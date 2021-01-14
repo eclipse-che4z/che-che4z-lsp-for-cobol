@@ -17,11 +17,19 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.core.CobolLexer;
 import com.broadcom.lsp.cobol.core.CobolPreprocessorLexer;
-import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
+import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
+
+import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 
 /**
  * This test checks that an XML Query that has gaps in concatenation and variable calls with '$'
@@ -35,55 +43,41 @@ import java.util.Map;
  * semantic analyzer could not find a token for variable usages, producing unexpected behavior.
  */
 class TestXmlQueryNotTerminatesSemanticAnalysis {
-  // TODO check if below commented syntax is valid.
-  //  private static final String TEXT =
-  //          "       IDENTIFICATION DIVISION.\n"
-  //                  + "       PROGRAM-ID. TEST1.\n"
-  //                  + "       ENVIRONMENT DIVISION.\n"
-  //                  + "       DATA DIVISION.\n"
-  //                  + "       LINKAGE SECTION.\n"
-  //                  + "       01 {$*VARNAME} PIC 9.\n"
-  //                  + "       PROCEDURE DIVISION.\n"
-  //                  + "           EXEC SQL\n"
-  //                  + "            SELECT COALESCE (SUM( XMLCAST(\n"
-  //                  + "            XMLQUERY(\n"
-  //                  + "            \"declare default element namespace 'smth';\n"
-  //                  + "\n"
-  //                  + "      -     \"/Invoice[cac:PaymentMeans/cbc:id1=$PAYMENTDATE]/\n"
-  //                  + "      -     \"cac:id2/cbc:id3\"\n"
-  //                  + "            PASSING DOCUMENT\n"
-  //                  + "            , :ID1 AS PAYMENTDATE)\n"
-  //                  + "            AS DECIMAL(9,2) )) ,0) INTO :ID2\n"
-  //                  + "            FROM DB.NAME\n"
-  //                  + "            END-EXEC.\n"
-  //                  + "           MOVE 0 TO VARNAME1.\n"
-  //                  + "           GOBACK. ";
   private static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. TEST1.\n"
-          + "       ENVIRONMENT DIVISION.\n"
-          + "       DATA DIVISION.\n"
-          + "       LINKAGE SECTION.\n"
-          + "       01 {$*VARNAME} PIC 9.\n"
-          + "       PROCEDURE DIVISION.\n"
-          + "           EXEC SQL\n"
-          + "            SELECT COALESCE (SUM( XMLCAST(\n"
-          + "            XMLQUERY(\n"
-          + "            \"declare default element namespace 'smth';\n"
-          + "      -     \"/Invoice[cac:PaymentMeans/cbc:id1=$PAYMENTDATE]/\n"
-          + "      -     \"cac:id2/cbc:id3\"\n"
-          + "      -     PASSING DOCUMENT\n"
-          + "            , :ID1 AS PAYMENTDATE)\n"
-          + "            AS DECIMAL(9,2) )) ,0) INTO :ID2\n"
-          + "            FROM DB.NAME\n"
-          + "            END-EXEC.\n"
-          + "           MOVE 0 TO {$VARNAME}.\n"
-          + "           GOBACK. ";
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. TEST1.\n"
+                  + "       ENVIRONMENT DIVISION.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       LINKAGE SECTION.\n"
+                  + "       01 {$*VARNAME} PIC 9.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           EXEC SQL\n"
+                  + "            SELECT COALESCE (SUM( XMLCAST(\n"
+                  + "            XMLQUERY(\n"
+                  + "            \"declare default element namespace 'smth';\n"
+                  + "\n"
+                  + "      -     \"/Invoice[cac:PaymentMeans/cbc:id1=$PAYMENTDATE]/\n"
+                  + "      -     \"cac:id2/cbc:id3\"\n"
+                  + "            PASSING DOCUMENT\n"
+                  + "            , :ID1 AS PAYMENTDATE)\n"
+                  + "            AS DECIMAL(9,2) )) ,0) INTO :ID2\n"
+                  + "            FROM DB.NAME\n"
+                  + "            END-EXEC.\n"
+                  + "           MOVE 0 TO VARNAME1.\n"
+                  + "           GOBACK. ";
 
-  @Test
+  @Disabled("Needed a lot invetigation")
   void test() {
     // TODO: after #619 fixed, all the false-positive diagnostics should disappear and this test
     // should be refactored using UseCaseEngine
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
+    AnalysisResult actual = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, List.of());
+    List<Diagnostic> diagnostics = actual.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI);
+    Assertions.assertEquals(
+            diagnostics.get(diagnostics.size() - 1),
+            new Diagnostic(
+                    new Range(new Position(19, 21), new Position(19, 29)),
+                    "Invalid definition for: VARNAME1",
+                    Information,
+                    INFO.getText()));
   }
 }
