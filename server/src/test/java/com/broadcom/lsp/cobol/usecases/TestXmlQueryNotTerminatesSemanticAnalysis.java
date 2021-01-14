@@ -24,7 +24,6 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -44,40 +43,40 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
  */
 class TestXmlQueryNotTerminatesSemanticAnalysis {
   private static final String TEXT =
-          "       IDENTIFICATION DIVISION.\n"
-                  + "       PROGRAM-ID. TEST1.\n"
-                  + "       ENVIRONMENT DIVISION.\n"
-                  + "       DATA DIVISION.\n"
-                  + "       LINKAGE SECTION.\n"
-                  + "       01 {$*VARNAME} PIC 9.\n"
-                  + "       PROCEDURE DIVISION.\n"
-                  + "           EXEC SQL\n"
-                  + "            SELECT COALESCE (SUM( XMLCAST(\n"
-                  + "            XMLQUERY(\n"
-                  + "            \"declare default element namespace 'smth';\n"
-                  + "\n"
-                  + "      -     \"/Invoice[cac:PaymentMeans/cbc:id1=$PAYMENTDATE]/\n"
-                  + "      -     \"cac:id2/cbc:id3\"\n"
-                  + "            PASSING DOCUMENT\n"
-                  + "            , :ID1 AS PAYMENTDATE)\n"
-                  + "            AS DECIMAL(9,2) )) ,0) INTO :ID2\n"
-                  + "            FROM DB.NAME\n"
-                  + "            END-EXEC.\n"
-                  + "           MOVE 0 TO VARNAME1.\n"
-                  + "           GOBACK. ";
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       LINKAGE SECTION.\n"
+          + "       01 {$*VARNAME} PIC 9.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "            SELECT COALESCE (SUM( XMLCAST(\n"
+          + "            XMLQUERY(\n"
+          + "            \"declare default element namespace 'smth';\n"
+          + "\n"
+          + "      -     \"/Invoice[cac:PaymentMeans/cbc:id1=$PAYMENTDATE]/\n"
+          + "      -     \"cac:id2/cbc:id3\"\n"
+          + "            PASSING DOCUMENT\n"
+          + "            , :ID1 AS PAYMENTDATE)\n"
+          + "            AS DECIMAL(9,2) )) ,0) INTO :ID2\n"
+          + "            FROM DB.NAME\n"
+          + "            END-EXEC.\n"
+          + "           MOVE 0 TO VARNAME1.\n"
+          + "           GOBACK. ";
 
-  @Disabled("Needed a lot invetigation")
+  @Disabled("Needed a lot further investigation")
   void test() {
     // TODO: after #619 fixed, all the false-positive diagnostics should disappear and this test
     // should be refactored using UseCaseEngine
     AnalysisResult actual = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, List.of());
     List<Diagnostic> diagnostics = actual.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI);
     Assertions.assertEquals(
-            diagnostics.get(diagnostics.size() - 1),
-            new Diagnostic(
-                    new Range(new Position(19, 21), new Position(19, 29)),
-                    "Invalid definition for: VARNAME1",
-                    Information,
-                    INFO.getText()));
+        diagnostics.get(diagnostics.size() - 1),
+        new Diagnostic(
+            new Range(new Position(19, 21), new Position(19, 29)),
+            "Invalid definition for: VARNAME1",
+            Information,
+            INFO.getText()));
   }
 }
