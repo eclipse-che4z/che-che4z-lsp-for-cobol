@@ -201,6 +201,7 @@ dbs_alter_tablespace: TABLESPACE dbs_database_name? dbs_table_space_name (DROP P
                       dbs_alter_tablespace_move /*these first five are piped separately from the big loop due to note 1 in IBM doc*/ | (BUFFERPOOL dbs_bp_name | CCSID dbs_ccsid_value | CLOSE (YES|NO) | COMPRESS (YES|NO) |
                       INSERT ALGORITHM dbs_level | LOCKMAX (SYSTEM | dbs_integer) | LOCKSIZE (ANY | TABLESPACE | TABLE | PAGE | ROW | LOB) | NOT? LOGGED | MAXROWS dbs_integer | MAXPARTITIONS dbs_integer |
                       MEMBER CLUSTER (YES|NO) | TRACKMOD (YES|NO) | dbs_alter_tablespace_using | dbs_alter_tablespace_free | dbs_alter_tablespace_gbpcache)+) dbs_alter_tablespace_alter?;
+
 dbs_alter_tablespace_move: MOVE TABLE dbs_table_name TO TABLESPACE (dbs_database_name DOT)? dbs_table_space_name;
 dbs_alter_tablespace_using: (USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name) | (PRIQTY | SECQTY) dbs_integer | ERASE (YES|NO))+;
 dbs_alter_tablespace_free: (FREEPAGE dbs_integer | PCTFREE dbs_smallint? (FOR UPDATE dbs_smallint)?)+;
@@ -1677,7 +1678,7 @@ dbs_joined_table : (dbs_table_reference (INNER | (LEFT | RIGHT | FULL) OUTER?)? 
 dbs_join_condition: dbs_inner_left_outer_join | dbs_full_join_expression;
 dbs_inner_left_outer_join : dbs_search_condition;
 dbs_full_join_expression : (dbs_column_name | dbs_cast_specification) | COALESCE LPARENCHAR (dbs_column_name | dbs_cast_specification) (COMMACHAR dbs_column_name | COMMACHAR dbs_cast_specification)+ RPARENCHAR;
-dbs_table_space_name: T=dbs_sql_identifier {validateLength($T.text, "table space name", 8);};
+dbs_table_space_name: T=dbs_sql_identifier {if($T.text.split("\\.").length > 1){validateLength($T.text.split("\\.")[0], "database name", 8);validateLength($T.text.split("\\.")[1], "table space name", 8);} else {validateLength($T.text, "table space name", 8);}};
 dbs_target_namespace: dbs_hostname_identifier;
 dbs_token_host_variable: dbs_generic_name;
 dbs_transition_table_name: dbs_sql_identifier;
