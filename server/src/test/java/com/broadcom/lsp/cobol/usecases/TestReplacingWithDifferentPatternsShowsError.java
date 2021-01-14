@@ -51,7 +51,7 @@ class TestReplacingWithDifferentPatternsShowsError {
 
   private static final String MESSAGE =
       "Syntax error on 'COPY' expected {<EOF>, ID, IDENTIFICATION, LINKAGE, LOCAL_STORAGE,"
-          + " WORKING_STORAGE, PROCEDURE, SCHEMA, END, FILE, MAP, EXEC_SQL, EXEC, LEVEL_NUMBER, '66', '77', '88'}";
+          + " WORKING_STORAGE, PROCEDURE, SCHEMA, END, FILE, MAP, SQL, EXEC_SQL, EXEC, LEVEL_NUMBER, '66', '77', '88'}";
 
   @Test
   void test() {

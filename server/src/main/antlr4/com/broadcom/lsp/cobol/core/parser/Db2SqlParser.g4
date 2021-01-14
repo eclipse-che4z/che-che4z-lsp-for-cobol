@@ -17,7 +17,7 @@ options {tokenVocab = Db2SqlLexer;}
 
 
 @parser::members {
-    public void isValid(String input, String value) {
+    public void validateValue(String input, String value) {
       if(!input.equals(value)) {
             notifyErrorListeners(input + " not allowed. It should be  " + value);
       }
@@ -500,15 +500,15 @@ triggered_action_basic: (WHEN dbs_search_condition)? sql_trigger_body_basic;
 sql_trigger_body_basic:  (dbs_triggered_sql_statement_basic | BEGIN ATOMIC (dbs_triggered_sql_statement_basic SEMICOLON_FS)+ END);
 
 //CREATE TRUSTED CONTEXT
-dbs_create_trusted_context: TRUSTED CONTEXT dbs_context_name BASED UPON CONNECTION USING SYSTEM AUTHID dbs_authorization_name (NO DEFAULT ROLE |
-           DEFAULT ROLE dbs_role_name (WITHOUT ROLE AS OBJECT OWNER | WITH ROLE AS OBJECT OWNER AND QUALIFIER)? |
-           DISABLE | ENABLE | NO DEFAULT SECURITY LABEL | DEFAULT SECURITY LABEL dbs_seclabel_name | ATTRIBUTES attributes_opt | with_user_opt)+;
+dbs_create_trusted_context: TRUSTED CONTEXT dbs_context_name BASED UPON CONNECTION USING SYSTEM AUTHID dbs_authorization_name
+           (NO DEFAULT ROLE | DEFAULT ROLE dbs_role_name (WITHOUT ROLE AS OBJECT OWNER | WITH ROLE AS OBJECT OWNER AND QUALIFIER)?)?
+           (DISABLE | ENABLE)? (NO DEFAULT SECURITY LABEL | DEFAULT SECURITY LABEL dbs_seclabel_name)? ATTRIBUTES attributes_opt with_user_opt;
 attributes_opt: LPARENCHAR (attributes_opt_loop_body (COMMACHAR attributes_opt_loop_body)* | jobname_opt_loop_body (COMMACHAR jobname_opt_loop_body)*) RPARENCHAR;
-attributes_opt_loop_body: ADDRESS dbs_address_value | ENCRYPTION dbs_encryption_value | SERVAUTH dbs_jobname_value;
+attributes_opt_loop_body: (ADDRESS dbs_address_value | ENCRYPTION dbs_encryption_value | SERVAUTH dbs_jobname_value);
 jobname_opt_loop_body: JOBNAME dbs_jobname_value;
-with_user_opt:  (WITH USE FOR with_user_loop_body (COMMACHAR with_user_loop_body)*);
-with_user_loop_body: dbs_authorization_name user_options | EXTERNAL SECURITY PROFILE dbs_profile_name user_options | PUBLIC without_or_with AUTHENTICATION;
-user_options: (ROLE dbs_role_name | dbs_seclabel_name | without_or_with AUTHENTICATION)?;
+with_user_opt:  (WITH USE FOR with_user_loop_body (COMMACHAR with_user_loop_body)*)?;
+with_user_loop_body: (dbs_authorization_name user_options | EXTERNAL SECURITY PROFILE dbs_profile_name user_options? | PUBLIC without_or_with AUTHENTICATION);
+user_options: (ROLE dbs_role_name | SECURITY LABEL dbs_seclabel_name | without_or_with AUTHENTICATION);
 
 //CREATE TYPE ARRAY
 dbs_create_type_array: TYPE dbs_array_type_name AS common_built_in_type_core ARRAY LSQUAREBRACKET (dbs_integer_max | dbs_integer_constant | common_built_in_type2)? RSQUAREBRACKET  ;
@@ -1522,7 +1522,7 @@ dbs_case_expression : CASE (dbs_simple_when_clause | dbs_searched_when_clause) (
 dbs_cast_function_name: dbs_sql_identifier;
 dbs_catalog_name: dbs_sql_identifier;
 dbs_ccsid_value: INTEGERLITERAL;
-dbs_character_string_constant: CHAR_STRING_CONSTANT | dbs_char_a;
+dbs_character_string_constant: CHAR_STRING_CONSTANT;
 dbs_clone_table_name: dbs_sql_identifier;
 dbs_collection_id: IDENTIFIER;
 dbs_collection_id_package_name: FILENAME;
@@ -1568,7 +1568,7 @@ dbs_imptkmod_param: YES | NO;
 dbs_include_data_type: dbs_alter_procedure_bit_int | dbs_alter_procedure_bit_decimal | dbs_alter_procedure_bit_float | dbs_alter_procedure_bit_decfloat | dbs_alter_procedure_bit_char | dbs_alter_procedure_bit_graphic | dbs_alter_procedure_bit_varchar | DATE | TIME | dbs_alter_procedure_bit_timestamp;
 dbs_index_identifier: IDENTIFIER;
 dbs_index_name: dbs_sql_identifier;
-dbs_integer: db2sql_integerLiterals | INTEGERLITERAL | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88;
+dbs_integer: INTEGERLITERAL | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88;
 dbs_integer_constant: dbs_integer | NUMERICLITERAL; //range 1 - 32767
 dbs_jar_name: dbs_hostname_identifier;
 dbs_jobname_value: IDENTIFIER | NONNUMERICLITERAL;
@@ -1690,35 +1690,25 @@ dbs_view_name: dbs_hostname_identifier? dbs_sql_identifier;
 dbs_volume_id: IDENTIFIER;
 dbs_pieceSize : IDENTIFIER {if(!$IDENTIFIER.text.matches("\\d+[MmGgKk]")) { notifyErrorListeners( $IDENTIFIER.text+" not allowed. Piecesize should be in KB,MB or GB.");}};
 dbs_sql_identifier: NONNUMERICLITERAL | IDENTIFIER | FILENAME | FILENAME (DOT IDENTIFIER)* | DSNDB04 | TRANSACTION | RECORDS;
-db2sql_integerLiterals : dbs_integer1 | dbs_integer2 | dbs_integer4 | dbs_integer5 | dbs_integer6 |
-                         dbs_integer8 | dbs_integer10 | dbs_integer12 | dbs_integer14 | dbs_integer15 | dbs_integer16 |
-                         dbs_integer20 | dbs_integer30 | dbs_integer31 | dbs_integer33 | dbs_integer34 | dbs_integer64 |
-                         dbs_integer100 | dbs_integer256 | dbs_integer1200 | dbs_integer1208 | dbs_integer_max;
 
-dbs_integer0: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "0");};
-dbs_integer1: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "1");};
-dbs_integer2: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "2");};
-dbs_integer4: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "4");};
-dbs_integer5: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "5");};
-dbs_integer6: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "6");};
-dbs_integer8: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "8");};
-dbs_integer10: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "10");};
-dbs_integer12: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "12");};
-dbs_integer14: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "14");};
-dbs_integer15: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "15");};
-dbs_integer16: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "16");};
-dbs_integer20: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "20");};
-dbs_integer30: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "30");};
-dbs_integer31: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "31");};
-dbs_integer33: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "33");};
-dbs_integer34: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "34");};
-dbs_integer64: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "64");};
-dbs_integer100: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "100");};
-dbs_integer256: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "256");};
-dbs_integer1200: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "1200");};
-dbs_integer1208: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "1208");};
-dbs_integer_max: LEVEL_NUMBER  {isValid($LEVEL_NUMBER.text, "2147483647");};
-dbs_char_a: NONNUMERICLITERAL  {isValid($NONNUMERICLITERAL.text, "A");};
-dbs_char_n: NONNUMERICLITERAL  {isValid($NONNUMERICLITERAL.text, "N");};
-dbs_char_r: NONNUMERICLITERAL  {isValid($NONNUMERICLITERAL.text, "R");};
+dbs_integer0: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "0");};
+dbs_integer1: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "1");};
+dbs_integer2: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "2");};
+dbs_integer4: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "4");};
+dbs_integer5: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "5");};
+dbs_integer6: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "6");};
+dbs_integer8: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "8");};
+dbs_integer12: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "12");};
+dbs_integer15: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "15");};
+dbs_integer16: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "16");};
+dbs_integer31: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "31");};
+dbs_integer34: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "34");};
+dbs_integer100: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "100");};
+dbs_integer256: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "256");};
+dbs_integer1200: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "1200");};
+dbs_integer1208: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "1208");};
+dbs_integer_max: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "2147483647");};
+dbs_char_a: NONNUMERICLITERAL  {validateValue($NONNUMERICLITERAL.text, "A");};
+dbs_char_n: NONNUMERICLITERAL  {validateValue($NONNUMERICLITERAL.text, "N");};
+dbs_char_r: NONNUMERICLITERAL  {validateValue($NONNUMERICLITERAL.text, "R");};
 /////// End Variables /////////////

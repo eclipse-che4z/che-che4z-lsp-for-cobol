@@ -44,7 +44,7 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
             "1",
             new Diagnostic(
                 null,
-                "Missing token SQL at execSqlStatement",
+                "Missing token EXEC or SQL at execSqlStatement",
                 Error,
                 SourceInfoLevels.ERROR.getText())));
   }
