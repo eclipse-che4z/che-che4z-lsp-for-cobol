@@ -1106,9 +1106,9 @@ execCicsStatement
    ;
 
 // exec sql statement
-
 execSqlStatement
-   : EXEC SQL ~END_EXEC*? END_EXEC DOT_FS?
+   : EXEC_SQL allSqlRules END_EXEC DOT_FS?
+   | (EXEC | SQL) {notifyErrorListeners("Missing token EXEC or SQL at execSqlStatement");} allSqlRules END_EXEC DOT_FS?
    ;
 
 // exec sql ims statement
@@ -1728,7 +1728,7 @@ subtractStatement
    ;
 
 subtractFromStatement
-   : subtractSubtrahend+ FROM subtractMinuend+
+   :  subtractSubtrahend+ FROM subtractMinuend+
    ;
 
 subtractFromGivingStatement

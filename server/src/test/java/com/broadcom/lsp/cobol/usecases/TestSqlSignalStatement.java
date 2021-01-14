@@ -15,37 +15,26 @@
 
 package com.broadcom.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-
-/** This test checks sql include statement if it is defined correctly. */
-class TestSqlIncludeStatementNotDefinedCorrectly {
+/** This test checks if sql SIGNAL statement works correctly. */
+class TestSqlSignalStatement {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*SQLCA}.\n"
-          + "       EXEC  {INCLUDE|1} STRUCT1 END-EXEC.";
+          + "       EXEC SQL\n"
+          + "        SIGNAL SQLSTATE '75002'\n"
+          + "         SET MESSAGE_TEXT = 'Customer number is not known';\n"
+          + "       END-EXEC.";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(
-        TEXT,
-        List.of(),
-        Map.of(
-            "1",
-            new Diagnostic(
-                null,
-                "Missing token EXEC or SQL at execSqlStatement",
-                Error,
-                SourceInfoLevels.ERROR.getText())));
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }
