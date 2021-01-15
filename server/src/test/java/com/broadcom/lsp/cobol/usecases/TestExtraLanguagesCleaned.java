@@ -16,6 +16,7 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -101,6 +102,7 @@ class TestExtraLanguagesCleaned {
           + "000000  END PROGRAM ATCDEM3.\r\n"
           + "           \r\n";
 
+  @Disabled("Invalid until #730 implemented")
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, List.of(), Map.of());
