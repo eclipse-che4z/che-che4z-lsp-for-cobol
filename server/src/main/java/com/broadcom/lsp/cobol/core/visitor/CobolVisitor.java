@@ -71,7 +71,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
 
   private final List<SyntaxError> errors = new ArrayList<>();
 
-  private final Collection<Variable> definedVariables = new ArrayList<>();
   private final PredefinedVariableContext constants = new PredefinedVariableContext();
   private final GroupContext groupContext = new GroupContext();
   private final Multimap<String, Location> subroutineUsages = HashMultimap.create();
@@ -112,13 +111,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
    */
   @NonNull
   public ResultWithErrors<SemanticContext> finishAnalysis() {
-    if (!variablesDelegate.isResultCollected()) finishVariableDefinition();
+    Collection<Variable> definedVariables =
+        variablesDelegate.finishDefinitionAnalysis().unwrap(errors::addAll);
     errors.addAll(variableUsageDelegate.updateUsageAndGenerateErrors(definedVariables));
     errors.addAll(groupContext.generateParagraphErrors(messageService));
     return new ResultWithErrors<>(
         SemanticContext.builder()
-            .variableDefinitions(collectVariableDefinitions())
-            .variableUsages(collectVariableUsages())
+            .variableDefinitions(collectVariableDefinitions(definedVariables))
+            .variableUsages(collectVariableUsages(definedVariables))
             .paragraphDefinitions(groupContext.getParagraphDefinitions())
             .paragraphUsages(groupContext.getParagraphUsages())
             .sectionDefinitions(groupContext.getSectionDefinitions())
@@ -134,7 +134,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
         errors);
   }
 
-  private Map<String, Collection<Location>> collectVariableDefinitions() {
+  private Map<String, Collection<Location>> collectVariableDefinitions(
+      Collection<Variable> definedVariables) {
     Multimap<String, Location> definitions = HashMultimap.create();
     definedVariables.stream()
         .filter(not(it -> it.getName().equals(OutlineNodeNames.FILLER_NAME)))
@@ -142,7 +143,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
     return definitions.asMap();
   }
 
-  private Map<String, Collection<Location>> collectVariableUsages() {
+  private Map<String, Collection<Location>> collectVariableUsages(
+      Collection<Variable> definedVariables) {
     Multimap<String, Location> usages = HashMultimap.create();
     definedVariables.forEach(
         it ->
@@ -177,12 +179,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   public Void visitProcedureDivision(ProcedureDivisionContext ctx) {
     areaAWarning(ctx.getStart());
     outlineTreeBuilder.addNode(OutlineNodeNames.PROCEDURE_DIVISION, NodeType.DIVISION, ctx);
-    finishVariableDefinition();
     return visitChildren(ctx);
-  }
-
-  private void finishVariableDefinition() {
-    definedVariables.addAll(variablesDelegate.finishDefinitionAnalysis().unwrap(errors::addAll));
   }
 
   @Override

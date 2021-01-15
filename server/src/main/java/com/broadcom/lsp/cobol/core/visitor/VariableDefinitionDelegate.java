@@ -268,16 +268,7 @@ class VariableDefinitionDelegate {
   @NonNull
   ResultWithErrors<Collection<Variable>> finishDefinitionAnalysis() {
     switchSection(NOT_INITIALIZED);
-    return new ResultWithErrors<>(variables, errors);
-  }
-
-  /**
-   * Check if the variable definition result has already been collected.
-   *
-   * @return true if the client code has already collected the result.
-   */
-  boolean isResultCollected() {
-    return section == NOT_INITIALIZED;
+    return new ResultWithErrors<>(new ArrayList<>(variables), new ArrayList<>(errors));
   }
 
   private String retrieveName(EntryNameContext context) {
