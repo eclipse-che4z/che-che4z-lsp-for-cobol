@@ -51,10 +51,9 @@ class TestRemarksSectionIsUnsupported {
             "unsupported",
             new Diagnostic(
                 null,
-                "Syntax error on 'REMARKS' expected "
-                    + "{<EOF>, AUTHOR, DATA, DATE_COMPILED, DATE_WRITTEN, END, "
-                    + "ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, "
-                    + "SECURITY, COMMENTENTRYLINE}",
+                "Syntax error on 'REMARKS' expected {<EOF>, AUTHOR, "
+                    + "DATE_COMPILED, DATE_WRITTEN, ID, IDENTIFICATION, INSTALLATION, "
+                    + "ENVIRONMENT, PROCEDURE, DATA, END, SECURITY, COMMENTENTRYLINE}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

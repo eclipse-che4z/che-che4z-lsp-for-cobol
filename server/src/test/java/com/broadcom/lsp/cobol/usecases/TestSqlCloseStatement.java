@@ -15,37 +15,32 @@
 
 package com.broadcom.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-
-/** This test checks sql include statement if it is defined correctly. */
-class TestSqlIncludeStatementNotDefinedCorrectly {
+/** This test checks if sql CLOSE statement works correctly. */
+class TestSqlCloseStatement {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*SQLCA} PIC X(10).\n"
-          + "       EXEC  {INCLUDE|1} STRUCT1 END-EXEC.";
+          + "       EXEC SQL\n"
+          + "         DECLARE C1 CURSOR FOR\n"
+          + "         SELECT DEPTNO, DEPTNAME, MGRNO\n"
+          + "         FROM DSN8C10.DEPT\n"
+          + "         WHERE ADMRDEPT = 'A00';\n"
+          + "         OPEN C1;\n"
+          + "         FETCH C1 INTO :DNUM, :DNAME, :MNUM;\n"
+          + "         \n"
+          + "         CLOSE C1;\n"
+          + "       END-EXEC.";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(
-        TEXT,
-        List.of(),
-        Map.of(
-            "1",
-            new Diagnostic(
-                null,
-                "Missing token EXEC or SQL at execSqlStatement",
-                Error,
-                SourceInfoLevels.ERROR.getText())));
+    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
   }
 }

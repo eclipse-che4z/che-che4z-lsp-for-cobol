@@ -12,10 +12,10 @@ spec:
     tty: true
     resources:
       limits:
-        memory: "2Gi"
+        memory: "3Gi"
         cpu: "1"
       requests:
-        memory: "2Gi"
+        memory: "3Gi"
         cpu: "1"
   - name: node
     image: sonarsource/sonarcloud-scan:1.2.1
@@ -24,10 +24,10 @@ spec:
     tty: true
     resources:
       limits:
-        memory: "2Gi"
+        memory: "1Gi"
         cpu: "1"
       requests:
-        memory: "2Gi"
+        memory: "1Gi"
         cpu: "1"
   - name: jnlp
     volumeMounts:
