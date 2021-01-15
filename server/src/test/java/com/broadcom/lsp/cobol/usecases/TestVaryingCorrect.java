@@ -27,39 +27,42 @@ import java.util.stream.Stream;
 class TestVaryingCorrect {
 
   private static final String BOILERPLATE =
-      "        IDENTIFICATION DIVISION. \r\n"
-          + "        PROGRAM-ID. test1.\r\n"
-          + "        DATA DIVISION.\r\n"
-          + "        WORKING-STORAGE SECTION.\r\n"
-          + "        01 {$*IDENTIFIER-1} PIC 9.\r\n"
-          + "        01 {$*IDENTIFIER-2} PIC 9.\r\n"
-          + "        01 {$*IDENTIFIER-3} PIC 9.\r\n"
-          + "        01 {$*IDENTIFIER-4} PIC 9.\r\n"
-          + "        01 {$*IDENTIFIER-5} PIC 9.\r\n"
-          + "        01 {$*IDENTIFIER-6} PIC 9.\r\n"
-          + "        01 {$*IDENTIFIER-7} PIC 9.\r\n"
-          + "        01 {$*IDENTIFIER-8} PIC 9.\r\n"
-          + "        01 {$*IDENTIFIER-9} PIC 9.\r\n"
-          + "        01 {$*IDENTIFIER-10} PIC 9.\r\n"
-          + "        PROCEDURE DIVISION.\r\n"
-          + "        {#*PROCEDURE-NAME-1}.\r\n"
-          + "        {#*PROCEDURE-NAME-2}.\r\n";
+      "        IDENTIFICATION DIVISION. \n"
+          + "        PROGRAM-ID. test1.\n"
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        01 {$*IDENTIFIER-1} PIC 9.\n"
+          + "        01 {$*IDENTIFIER-2} PIC 9.\n"
+          + "        01 {$*IDENTIFIER-3} PIC 9.\n"
+          + "        01 {$*IDENTIFIER-4} PIC 9.\n"
+          + "        01 {$*IDENTIFIER-5} PIC 9.\n"
+          + "        01 {$*IDENTIFIER-6} PIC 9.\n"
+          + "        01 {$*IDENTIFIER-7} PIC 9.\n"
+          + "        01 {$*IDENTIFIER-8} PIC 9.\n"
+          + "        01 {$*IDENTIFIER-9} PIC 9.\n"
+          + "        01 {$*IDENTIFIER-10} PIC 9.\n"
+          + "            88 {$*CONDITION-1} VALUE 1.\n"
+          + "            88 {$*CONDITION-2} VALUE 2.\n"
+          + "            88 {$*CONDITION-3} VALUE 3.\n"
+          + "        PROCEDURE DIVISION.\n"
+          + "        {#*PROCEDURE-NAME-1}.\n"
+          + "        {#*PROCEDURE-NAME-2}.\n";
 
   private static final String VARYING_WITH_TWO_IDENTIFIERS =
-      "            PERFORM {#PROCEDURE-NAME-1} THROUGH {#PROCEDURE-NAME-2}\r\n"
-          + "            VARYING {$IDENTIFIER-2} FROM {$IDENTIFIER-3}\r\n"
-          + "            BY {$IDENTIFIER-4} UNTIL CONDITION-1\r\n"
-          + "            AFTER {$IDENTIFIER-5} FROM {$IDENTIFIER-6}\r\n"
-          + "            BY {$IDENTIFIER-7} UNTIL CONDITION-2.";
+      "            PERFORM {#PROCEDURE-NAME-1} THROUGH {#PROCEDURE-NAME-2}\n"
+          + "            VARYING {$IDENTIFIER-2} FROM {$IDENTIFIER-3}\n"
+          + "            BY {$IDENTIFIER-4} UNTIL {$CONDITION-1}\n"
+          + "            AFTER {$IDENTIFIER-5} FROM {$IDENTIFIER-6}\n"
+          + "            BY {$IDENTIFIER-7} UNTIL {$CONDITION-2}.";
 
   private static final String VARYING_WITH_THREE_IDENTIFIERS =
-      "            PERFORM {#PROCEDURE-NAME-1} THROUGH {#PROCEDURE-NAME-2}\r\n"
-          + "            VARYING {$IDENTIFIER-2} FROM {$IDENTIFIER-3}\r\n"
-          + "            BY {$IDENTIFIER-4} UNTIL CONDITION-1\r\n"
-          + "            AFTER {$IDENTIFIER-5} FROM {$IDENTIFIER-6}\r\n"
-          + "            BY {$IDENTIFIER-7} UNTIL CONDITION-2\r\n"
-          + "            AFTER {$IDENTIFIER-8} FROM {$IDENTIFIER-9}\r\n"
-          + "            BY {$IDENTIFIER-10} UNTIL CONDITION-3.";
+      "            PERFORM {#PROCEDURE-NAME-1} THROUGH {#PROCEDURE-NAME-2}\n"
+          + "            VARYING {$IDENTIFIER-2} FROM {$IDENTIFIER-3}\n"
+          + "            BY {$IDENTIFIER-4} UNTIL {$CONDITION-1}\n"
+          + "            AFTER {$IDENTIFIER-5} FROM {$IDENTIFIER-6}\n"
+          + "            BY {$IDENTIFIER-7} UNTIL {$CONDITION-2}\n"
+          + "            AFTER {$IDENTIFIER-8} FROM {$IDENTIFIER-9}\n"
+          + "            BY {$IDENTIFIER-10} UNTIL {$CONDITION-3}.";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

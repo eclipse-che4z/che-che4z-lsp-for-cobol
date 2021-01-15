@@ -409,7 +409,7 @@ class VariableDefinitionDelegate {
     if (variable.getContainer() == null) {
       variable.setQualifier(retrieveQualifier(variable.getName()));
     } else {
-      variable.setQualifier(variable.getContainer().getQualifier() + " " + variable.getName());
+      variable.setQualifier(variable.getContainer().getQualifier() + "  " + variable.getName());
     }
   }
 

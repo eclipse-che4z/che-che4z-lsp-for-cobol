@@ -131,6 +131,7 @@ class TestMarginAB {
           + "000000         10 STATE    PIC X(2).\n"
           + "000000         10 CITY     PIC X(3).\n"
           + "000000     05 OP-SYS     PIC X(3).\n"
+          + "000000       88 READY-TRACE VALUE 0.\n"
           + "000000 PROCEDURE DIVISION.\n"
           + "000000 DECLARATIVES. MAMA\n" // after DECLARATIVES keyword no other token is allowed
           + "000000 COBOL-DEBUG SECTION.\n"

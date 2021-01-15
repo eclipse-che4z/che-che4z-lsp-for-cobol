@@ -494,6 +494,22 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   }
 
   @Override
+  public Void visitConditionNameReference(ConditionNameReferenceContext ctx) {
+    String dataName =
+        ofNullable(ctx.conditionName())
+            .map(RuleContext::getText)
+            .map(String::toUpperCase)
+            .orElse("");
+    getLocality(ctx.conditionName().getStart())
+        .ifPresent(
+            locality -> {
+              if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
+              else variableUsageDelegate.handleConditionCall(dataName, locality, ctx);
+            });
+    return visitChildren(ctx);
+  }
+
+  @Override
   public Void visitCallStatement(CallStatementContext ctx) {
     if (ctx.literal() != null) {
       String subroutineName =
