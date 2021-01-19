@@ -20,13 +20,13 @@ options {tokenVocab = Db2SqlLexer;}
     private static final String MAXLENGHT_MSG = "Max length limit of %s bytes allowed for %s.";
 
     public void validateValue(String input, String value) {
-      if(!input.equals(value)) {
+      if(input!=null && !input.equals(value)) {
             notifyErrorListeners(input + " not allowed. It should be  " + value);
       }
     }
 
     public void validateLength(String input, String objectType, int validLength) {
-      if(input.length() > validLength) {
+      if(input!=null && input.length() > validLength) {
               notifyErrorListeners(String.format(MAXLENGHT_MSG, validLength, objectType));
       }
     }
@@ -1536,7 +1536,7 @@ dbs_clone_table_name: T=dbs_sql_identifier {validateLength($T.text, "clone table
 dbs_collection_id: IDENTIFIER;
 dbs_collection_id_package_name: FILENAME;
 dbs_collection_name: T=dbs_sql_identifier {validateLength($T.text, "collection name", 128);}; // SQLIDENTIFIER are case sensitive. allows only uppercase or quoted string as per doc.
-dbs_generic_name: ACTIVITY | ADDRESS |AVG | COLOR | COUNT | DOCUMENT | FILENAME | GROUP | HOUR | HOURS | ID | IN | IDENTIFIER | LOCATION | LOCATOR | MAX | MIN | MONTH | NAME | NONNUMERICLITERAL | YEAR | DATE | DAY | SERVER | STATE | SQLCODE | TRANSACTION | TYPE | V1 ; //TODO try to include all cics_cobol_intersected_words/ cics_only_words
+dbs_generic_name: ACTIVITY | ADDRESS |AVG | COLOR | COUNT | COMMENT | DOCUMENT | FILENAME | GROUP | HOUR | HOURS | ID | IN | IDENTIFIER | LOCATION | LOCATOR | MAX | MIN | MONTH | NAME | NONNUMERICLITERAL | YEAR | DATE | DAY | SERVER | STATE | SQLCODE | TRANSACTION | TYPE | V1 ; //TODO try to include all cics_cobol_intersected_words/ cics_only_words
 dbs_column_name: (dbs_generic_name DOT)? T=dbs_generic_name {validateLength($T.text, "column name", 30);};
 dbs_constant : (dbs_string_constant | dbs_integer_constant | DATELITERAL);
 dbs_constraint_name: T=dbs_sql_identifier {validateLength($T.text, "constraint name", 128);};
