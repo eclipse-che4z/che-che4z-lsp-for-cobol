@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -48,7 +48,7 @@ class TestXmlQueryNotTerminatesSemanticAnalysis {
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       LINKAGE SECTION.\n"
-          + "       01 {$*VARNAME} PIC 9.\n"
+          + "       01 VARNAME PIC 9.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL\n"
           + "            SELECT COALESCE (SUM( XMLCAST(\n"
@@ -65,7 +65,7 @@ class TestXmlQueryNotTerminatesSemanticAnalysis {
           + "           MOVE 0 TO VARNAME1.\n"
           + "           GOBACK. ";
 
-  @Disabled("Needed a lot further investigation")
+  @Test
   void test() {
     // TODO: after #619 fixed, all the false-positive diagnostics should disappear and this test
     // should be refactored using UseCaseEngine

@@ -68,6 +68,7 @@ END_EXEC : E N D MINUSCHAR E X E C;
 ENGLISH : E N G L I S H;
 EPILOG : E P I L O G;
 EXCI : E X C I;
+EXEC_SQL: EXEC WS SQL;
 EXEC : E X E C;
 EXIT : E X I T;
 EXP : E X P;
@@ -308,6 +309,7 @@ COMMENTENTRYTAG : '*>CE';
 COMMACHAR : ',';
 DOLLARCHAR : '$';
 DOT_FS : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ | '.' EOF;
+SEMICOLON_FS : ';' ('\r' | '\n' | '\f' | '\t' | ' ')+ | ';' EOF;
 DOT : '.';
 DOUBLEEQUALCHAR : '==';
 EMPTYPSEUDOTEXT : '====';
@@ -320,6 +322,7 @@ NOTEQUALCHAR : '<>';
 PLUSCHAR : '+';
 SINGLEQUOTE : '\'';
 SLASHCHAR : '/';
+SELECT_ALL : '.*';
 
 // literals
 
