@@ -18,6 +18,7 @@ import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.ErrorSeverity;
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
+import com.broadcom.lsp.cobol.core.model.VariableUsageUtils;
 import com.broadcom.lsp.cobol.core.model.variables.Variable;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -29,8 +30,6 @@ import org.antlr.v4.runtime.Token;
 import java.util.*;
 
 import static com.broadcom.lsp.cobol.core.CobolParser.*;
-import static com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils.INTERMEDIATE_QUALIFIER_PLACEHOLDER;
-import static com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils.QUALIFIER_PLACEHOLDER_PREFIX;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -42,7 +41,7 @@ import static java.util.stream.Collectors.toMap;
 @Slf4j
 @RequiredArgsConstructor
 class VariableUsageDelegate {
-  private List<VariableUsage> variableUsages = new ArrayList<>();
+  private final List<VariableUsage> variableUsages = new ArrayList<>();
   private final Map<Token, Locality> positionMapping;
   private final MessageService messageService;
 
@@ -55,11 +54,9 @@ class VariableUsageDelegate {
    */
   void handleDataName(String dataName, Locality locality, QualifiedDataNameFormat1Context ctx) {
     List<QualifiedInDataContext> hierarchy = ctx.qualifiedInData();
-    String qualifier =
-        createQualifier(
-            dataName, hierarchy.stream().map(this::getDataName2Context).collect(toList()));
+    List<String> parents = createPatentsList(hierarchy.stream().map(this::getDataName2Context).collect(toList()));
     Map<String, Token> parentVariables = collectParentVariablesFromDataAndTable(hierarchy);
-    variableUsages.add(new VariableUsage(dataName, qualifier, locality, parentVariables));
+    variableUsages.add(new VariableUsage(dataName, parents, locality, parentVariables));
   }
 
   /**
@@ -70,11 +67,10 @@ class VariableUsageDelegate {
    * @param ctx the ANTLR variable context
    */
   void handleConditionCall(String dataName, Locality locality, ConditionNameReferenceContext ctx) {
-    List<DataName2Context> hierarchy =
-        ctx.inData().stream().map(InDataContext::dataName2).collect(toList());
-    String qualifier = createQualifier(dataName, hierarchy);
+    List<DataName2Context> hierarchy = ctx.inData().stream().map(InDataContext::dataName2).collect(toList());
+    List<String> parents = createPatentsList(hierarchy);
     Map<String, Token> parentVariables = collectParentVariablesFromInData(hierarchy);
-    variableUsages.add(new VariableUsage(dataName, qualifier, locality, parentVariables));
+    variableUsages.add(new VariableUsage(dataName, parents, locality, parentVariables));
   }
 
   /**
@@ -84,8 +80,7 @@ class VariableUsageDelegate {
    * @param locality the variable text position
    */
   void handleTableCall(String dataName, Locality locality) {
-    variableUsages.add(
-        new VariableUsage(dataName, QUALIFIER_PLACEHOLDER_PREFIX + dataName, locality, Map.of()));
+    variableUsages.add(new VariableUsage(dataName, List.of(), locality, Map.of()));
   }
 
   /**
@@ -95,9 +90,11 @@ class VariableUsageDelegate {
    * @return the list of usage errors
    */
   List<SyntaxError> updateUsageAndGenerateErrors(Collection<Variable> definedVariables) {
+    Map<String, List<Variable>> convertedVariables = VariableUsageUtils.convertDefinedVariables(definedVariables);
     List<SyntaxError> errors = new ArrayList<>();
     for (VariableUsage variableUsage : variableUsages) {
-      List<Variable> foundVariables = findVariable(definedVariables, variableUsage.searchQualifier);
+      List<Variable> foundVariables =
+          VariableUsageUtils.findVariables(convertedVariables, variableUsage.name, variableUsage.parents);
       if (foundVariables.size() == 1) {
         Variable variable = foundVariables.get(0);
         variable.addUsage(variableUsage.locality);
@@ -109,26 +106,11 @@ class VariableUsageDelegate {
     return errors;
   }
 
-  private List<Variable> findVariable(Collection<Variable> definedVariables, String qualifier) {
-    return definedVariables.stream()
-        .filter(it -> it.getQualifier().matches(qualifier))
-        .collect(toList());
-  }
-
-  private String createQualifier(String dataName, List<DataName2Context> hierarchy) {
-    String hierarchicalQualifier =
-        hierarchy.stream()
+  private List<String> createPatentsList(List<DataName2Context> hierarchy) {
+    return hierarchy.stream()
             .map(RuleContext::getText)
             .map(String::toUpperCase)
-            .reduce((s1, s2) -> s2 + INTERMEDIATE_QUALIFIER_PLACEHOLDER + s1)
-            .orElse("");
-
-    return hierarchicalQualifier.isEmpty()
-        ? QUALIFIER_PLACEHOLDER_PREFIX + dataName
-        : QUALIFIER_PLACEHOLDER_PREFIX
-            + hierarchicalQualifier
-            + INTERMEDIATE_QUALIFIER_PLACEHOLDER
-            + dataName;
+            .collect(toList());
   }
 
   private Map<String, Token> collectParentVariablesFromDataAndTable(
@@ -190,7 +172,7 @@ class VariableUsageDelegate {
   @Value
   private static class VariableUsage {
     String name;
-    String searchQualifier;
+    List<String> parents;
     Locality locality;
     Map<String, Token> parentVariables;
   }

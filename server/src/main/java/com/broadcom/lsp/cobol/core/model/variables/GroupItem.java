@@ -16,7 +16,6 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
@@ -32,8 +31,8 @@ import static com.broadcom.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEV
 public class GroupItem extends StructuredVariable {
 
   public GroupItem(
-      int levelNumber, String name, String qualifier, Locality definition, Variable parent) {
-    super(levelNumber, name, qualifier, definition, parent);
+      int levelNumber, String name, Locality definition, Variable parent) {
+    super(levelNumber, name, definition, parent);
   }
 
   @Override
@@ -43,7 +42,6 @@ public class GroupItem extends StructuredVariable {
         : new GroupItem(
             levelNumber,
             name,
-            VariableUtils.renameQualifier(qualifier, newParent.name),
             definition,
             newParent);
   }

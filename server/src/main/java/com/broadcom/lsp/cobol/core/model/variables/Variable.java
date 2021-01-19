@@ -32,16 +32,6 @@ public interface Variable extends Renameable, Conditional {
   String getName();
 
   /**
-   * Get qualifier of this variable. Contains the variable hierarchy top-down string representation
-   * and this variable name; separated by whitespace. May be not unique on definition, required to
-   * be unique on referencing
-   *
-   * @return string qualifier
-   */
-  @NonNull
-  String getQualifier();
-
-  /**
    * Get definition locality for this variable. The definition is unique
    *
    * @return the definition {@link Locality}

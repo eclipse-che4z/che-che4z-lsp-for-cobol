@@ -16,7 +16,6 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
@@ -35,13 +34,12 @@ public class ElementItem extends AbstractVariable {
 
   public ElementItem(
       String name,
-      String qualifier,
       Locality definition,
       Variable parent,
       String picClause,
       String value,
       UsageFormat usageFormat) {
-    super(name, qualifier, definition, parent);
+    super(name, definition, parent);
     this.picClause = picClause;
     this.value = value;
     this.usageFormat = usageFormat;
@@ -51,7 +49,6 @@ public class ElementItem extends AbstractVariable {
   public Variable rename(RenameItem newParent) {
     return new ElementItem(
         name,
-        VariableUtils.renameQualifier(qualifier, newParent.name),
         definition,
         newParent,
         picClause,

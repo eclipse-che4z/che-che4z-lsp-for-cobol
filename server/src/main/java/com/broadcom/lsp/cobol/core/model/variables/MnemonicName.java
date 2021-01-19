@@ -31,8 +31,8 @@ import java.util.List;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class MnemonicName extends AbstractVariable {
-  public MnemonicName(String name, String qualifier, Locality definition) {
-    super(name, qualifier, definition, null);
+  public MnemonicName(String name, Locality definition) {
+    super(name, definition, null);
   }
 
   @Override
