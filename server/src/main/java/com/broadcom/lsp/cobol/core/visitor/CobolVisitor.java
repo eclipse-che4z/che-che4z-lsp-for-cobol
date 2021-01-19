@@ -70,7 +70,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
       "The following token cannot be on the same line as a DECLARATIVE token: ";
 
   private final List<SyntaxError> errors = new ArrayList<>();
-
   private final PredefinedVariableContext constants = new PredefinedVariableContext();
   private final GroupContext groupContext = new GroupContext();
   private final Multimap<String, Location> subroutineUsages = HashMultimap.create();
@@ -585,7 +584,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
 
   private void areaAWarning(Token token) {
     getLocality(token)
-        .filter(it -> it.getRange().getStart().getCharacter() > 10)
+        .filter(it -> it.getRange().getStart().getCharacter() > AREA_A_FINISH)
         .ifPresent(
             it ->
                 throwException(

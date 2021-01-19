@@ -54,10 +54,12 @@ import static java.util.stream.Collectors.toList;
  */
 @Slf4j
 @RequiredArgsConstructor
-class VariableDefinitionDelegate {
-  static final int LEVEL_66 = 66;
+public class VariableDefinitionDelegate {
+  public static final int LEVEL_01 = 1;
+  public static final int LEVEL_66 = 66;
   static final int LEVEL_77 = 77;
   static final int LEVEL_88 = 88;
+  static final int AREA_A_FINISH = 10;
 
   private static final String EMPTY_STRUCTURE_MSG = "semantics.emptyStructure";
   private static final String TOO_MANY_CLAUSES_MSG = "semantics.tooManyClauses";
@@ -268,7 +270,10 @@ class VariableDefinitionDelegate {
   }
 
   private String retrieveName(RuleContext context) {
-    return ofNullable(context).map(RuleContext::getText).map(String::toUpperCase).orElse(OutlineNodeNames.FILLER_NAME);
+    return ofNullable(context)
+        .map(RuleContext::getText)
+        .map(String::toUpperCase)
+        .orElse(OutlineNodeNames.FILLER_NAME);
   }
 
   private String retrieveQualifier(String name) {
@@ -361,8 +366,8 @@ class VariableDefinitionDelegate {
   }
 
   private void checkStartingArea(VariableDefinitionContext variable) {
-    if ((variable.getNumber() == 1 || variable.getNumber() == LEVEL_77)
-        && variable.getStarting().getRange().getStart().getCharacter() > 10) {
+    if ((variable.getNumber() == LEVEL_01 || variable.getNumber() == LEVEL_77)
+        && variable.getStarting().getRange().getStart().getCharacter() > AREA_A_FINISH) {
       addError(
           messages.getMessage(AREA_A_WARNING, variable.getName()), variable.getStarting(), WARNING);
     }
@@ -374,7 +379,11 @@ class VariableDefinitionDelegate {
 
   private void checkTopElementNumber(VariableDefinitionContext variable) {
     int number = variable.getNumber();
-    if (number == 1 || number == LEVEL_66 || number == LEVEL_77 || number == LEVEL_88) return;
+    // Level 88 is not allowed as a top element, but it may follow a 77 or 01 elementary item, so it
+    // may produce a false-positive semantic error. The reason is that elementary items are not
+    // stored in the structure stack, and the 88 may be falsy treated as a top element.
+    if (number == LEVEL_01 || number == LEVEL_66 || number == LEVEL_77 || number == LEVEL_88)
+      return;
     if (structureStack.isEmpty())
       addError(
           messages.getMessage(NUMBER_NOT_ALLOWED_AT_TOP, variable.getName()),

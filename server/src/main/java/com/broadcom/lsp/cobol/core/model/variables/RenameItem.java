@@ -23,6 +23,8 @@ import lombok.Value;
 
 import java.util.List;
 
+import static com.broadcom.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVEL_66;
+
 /**
  * This value class represents a renaming data name entry, that has a level number 66. It may be one
  * a top level, but should trail a variable structure. It is used to regroup element items, e.g.
@@ -33,10 +35,9 @@ import java.util.List;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class RenameItem extends StructuredVariable {
-  private static final int LEVEL_NUMBER = 66;
 
   public RenameItem(@NonNull String name, @NonNull String qualifier, @NonNull Locality definition) {
-    super(LEVEL_NUMBER, name, qualifier, definition, null);
+    super(LEVEL_66, name, qualifier, definition, null);
   }
 
   @Override

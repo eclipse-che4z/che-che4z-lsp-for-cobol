@@ -20,6 +20,8 @@ import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
+import static com.broadcom.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVEL_01;
+
 /**
  * This value class represents a group item COBOL variable. Group elements can have nested
  * variables. They cannot have neither PIC nor VALUE clauses. Can be the top element of the
@@ -36,7 +38,7 @@ public class GroupItem extends StructuredVariable {
 
   @Override
   public Variable rename(RenameItem newParent) {
-    return levelNumber == 1
+    return levelNumber == LEVEL_01
         ? null
         : new GroupItem(
             levelNumber,

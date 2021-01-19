@@ -25,6 +25,11 @@ import java.util.Optional;
 /** This util class applies operations over variable qualifiers */
 @UtilityClass
 public class VariableUtils {
+  public static final String INTERMEDIATE_QUALIFIER_PLACEHOLDER = " .* ";
+  public static final String QUALIFIER_PLACEHOLDER_PREFIX = ".* ";
+  private static final String QUALIFIER_PARTS_DELIMITER = "  ";
+  private static final String QUALIFIER_PREFIX = " ";
+
   /**
    * Change the qualifier of a renamed variable. Note: it is applicable only for RENAME clauses.
    *
@@ -46,8 +51,8 @@ public class VariableUtils {
   public @NonNull String createQualifier(
       @NonNull Deque<StructuredVariable> structure, @NonNull String name) {
     return Optional.ofNullable(structure.peekFirst())
-            .map(it -> it.getQualifier() + "  ")
-            .orElse(" ")
+            .map(it -> it.getQualifier() + QUALIFIER_PARTS_DELIMITER)
+            .orElse(QUALIFIER_PREFIX)
         + name;
   }
 
@@ -58,6 +63,6 @@ public class VariableUtils {
    * @return qualifier for this variable
    */
   public @NonNull String createQualifier(@NonNull String name) {
-    return " " + name;
+    return QUALIFIER_PREFIX + name;
   }
 }

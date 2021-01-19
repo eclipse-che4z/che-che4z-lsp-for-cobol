@@ -29,6 +29,8 @@ import org.antlr.v4.runtime.Token;
 import java.util.*;
 
 import static com.broadcom.lsp.cobol.core.CobolParser.*;
+import static com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils.INTERMEDIATE_QUALIFIER_PLACEHOLDER;
+import static com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils.QUALIFIER_PLACEHOLDER_PREFIX;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -82,7 +84,8 @@ class VariableUsageDelegate {
    * @param locality the variable text position
    */
   void handleTableCall(String dataName, Locality locality) {
-    variableUsages.add(new VariableUsage(dataName, ".* " + dataName, locality, Map.of()));
+    variableUsages.add(
+        new VariableUsage(dataName, QUALIFIER_PLACEHOLDER_PREFIX + dataName, locality, Map.of()));
   }
 
   /**
@@ -117,12 +120,15 @@ class VariableUsageDelegate {
         hierarchy.stream()
             .map(RuleContext::getText)
             .map(String::toUpperCase)
-            .reduce((s1, s2) -> s2 + " .* " + s1)
+            .reduce((s1, s2) -> s2 + INTERMEDIATE_QUALIFIER_PLACEHOLDER + s1)
             .orElse("");
 
     return hierarchicalQualifier.isEmpty()
-        ? ".* " + dataName
-        : ".* " + hierarchicalQualifier + " .* " + dataName;
+        ? QUALIFIER_PLACEHOLDER_PREFIX + dataName
+        : QUALIFIER_PLACEHOLDER_PREFIX
+            + hierarchicalQualifier
+            + INTERMEDIATE_QUALIFIER_PLACEHOLDER
+            + dataName;
   }
 
   private Map<String, Token> collectParentVariablesFromDataAndTable(
