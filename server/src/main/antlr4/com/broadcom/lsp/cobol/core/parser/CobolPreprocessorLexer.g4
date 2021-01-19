@@ -363,7 +363,6 @@ COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
 COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
 WS : [ \t\f;]+ -> channel(HIDDEN);
 TEXT : ~('\n' | '\r');
-SEPARATOR : ', ' -> channel(HIDDEN);
 
 // treat all the non-processed tokens as errors
 ERRORCHAR : . ;

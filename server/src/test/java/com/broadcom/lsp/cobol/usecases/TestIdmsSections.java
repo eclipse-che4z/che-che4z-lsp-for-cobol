@@ -14,11 +14,7 @@
  */
 package com.broadcom.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 

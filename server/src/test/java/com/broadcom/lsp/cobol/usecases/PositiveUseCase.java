@@ -20,7 +20,6 @@ import org.eclipse.lsp4j.Diagnostic;
 
 import java.util.List;
 
-import static com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils.analyzeForErrors;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

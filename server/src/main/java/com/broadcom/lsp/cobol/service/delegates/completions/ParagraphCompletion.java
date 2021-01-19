@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import static com.broadcom.lsp.cobol.service.delegates.completions.CompletionOrder.PARAGRAPHS;
 
+/** implementation for adding paragraph names in the autocomplete list as identified by the parser */
 @Singleton
 public class ParagraphCompletion implements Completion {
 

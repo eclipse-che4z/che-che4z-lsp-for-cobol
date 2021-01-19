@@ -30,24 +30,24 @@ import static org.mockito.Mockito.when;
 /** Test {@link Formations} class */
 class FormationsTest {
 
-  private final Formation formation_1 = mock(Formation.class);
-  private final Formation formation_2 = mock(Formation.class);
-  private final Formations formations = new Formations(Set.of(formation_1, formation_2));
+  private static final Formation FORMATION_1 = mock(Formation.class);
+  private static final Formation FORMATION_2 = mock(Formation.class);
+  private static final Formations FORMATIONS = new Formations(Set.of(FORMATION_1, FORMATION_2));
 
   @Test
   void WhenCobolDocumentModelNull_thenFormatReturnsEmptyList() {
-    List<TextEdit> format = formations.format(null);
+    List<TextEdit> format = FORMATIONS.format(null);
     assertEquals(0, format.size());
   }
 
   @Test
   void WhenCobolDocumentModelNonNull_thenFormatReturnsFormattedString() {
     CobolDocumentModel model = new CobolDocumentModel("SAMPLE TEXT FOR TEST");
-    List<TextEdit> response_1 = List.of(new TextEdit());
-    List<TextEdit> response_2 = List.of(new TextEdit(), new TextEdit());
-    when(formation_1.format(anyList())).thenReturn(response_1);
-    when(formation_2.format(anyList())).thenReturn(response_2);
-    List<TextEdit> format = formations.format(model);
+    List<TextEdit> response1 = List.of(new TextEdit());
+    List<TextEdit> response2 = List.of(new TextEdit(), new TextEdit());
+    when(FORMATION_1.format(anyList())).thenReturn(response1);
+    when(FORMATION_2.format(anyList())).thenReturn(response2);
+    List<TextEdit> format = FORMATIONS.format(model);
     // expect a flattened list of 2 responses.
     assertEquals(3, format.size());
   }

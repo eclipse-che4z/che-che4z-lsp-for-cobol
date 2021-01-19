@@ -20,6 +20,7 @@ import com.broadcom.lsp.cobol.domain.event.api.EventObserver;
 import com.broadcom.lsp.cobol.domain.event.impl.AnalysisFinishedEventSubscriber;
 import com.broadcom.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
 
+/** This class is a factory for {@link AnalysisFinishedEventSubscriber} */
 public class AnalysisFinishedSubscriberFactory
     implements CopybookSubscriber<AnalysisFinishedEventSubscriber> {
 

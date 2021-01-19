@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 /** This tests checks the order of completion elements: 1. Variables 2. Keywords */
 class CompletionsChainTest {
 
-  private final CobolDocumentModel MODEL =
+  private static final CobolDocumentModel MODEL =
       new CobolDocumentModel(
           "TOKEN",
           AnalysisResult.builder()

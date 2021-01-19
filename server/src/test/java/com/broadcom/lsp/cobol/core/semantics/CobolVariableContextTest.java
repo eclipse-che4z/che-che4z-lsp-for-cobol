@@ -51,7 +51,7 @@ class CobolVariableContextTest {
   private static final String PARENT1 = "PARENT1";
 
   private static final Location ERROR_LOCALITY_1 = new Location(null, new Range(new Position(0, 5), new Position(0, 6)));
-  private static final Location ERROR_LOCALITY_2 =new Location(null, new Range(new Position(4, 5), new Position(0, 7)));
+  private static final Location ERROR_LOCALITY_2 = new Location(null, new Range(new Position(4, 5), new Position(0, 7)));
 
   private CobolVariableContext context;
   private Variable var1;

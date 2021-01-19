@@ -14,7 +14,6 @@
  */
 package com.broadcom.lsp.cobol.core.annotation;
 
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

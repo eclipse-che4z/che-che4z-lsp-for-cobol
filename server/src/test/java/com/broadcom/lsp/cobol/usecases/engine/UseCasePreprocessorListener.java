@@ -45,7 +45,7 @@ import static org.antlr.v4.runtime.Lexer.HIDDEN;
  * UseCasePreprocessor.g4
  */
 public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
-  private List<String> PREDEFINED_VARIABLES =
+  private static final List<String> PREDEFINED_VARIABLES =
       List.of(
           "EIBAID",
           "EIBATT",

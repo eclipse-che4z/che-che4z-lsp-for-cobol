@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  */
 @Slf4j
 class CopybookEventSubscribersTest {
-  static class DatabusObserverTest implements EventObserver<DataEvent> {
+  private static class DatabusObserverTest implements EventObserver<DataEvent> {
     @Override
     public void observerCallback(DataEvent adaptedDataEvent) {
       LOG.debug("CALLBACK WORKS!");
