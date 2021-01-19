@@ -25,27 +25,27 @@ import java.util.Map;
 import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /** This test checks that variable can be used before its definition. */
-public class TestVariableInFileControl {
-    private static final String TEXT =
-        "       IDENTIFICATION DIVISION.\n"
-            + "          PROGRAM-ID. TEST.\n"
-            + "       ENVIRONMENT DIVISION.\n"
-            + "       INPUT-OUTPUT SECTION.\n"
-            + "       FILE-CONTROL.\n"
-            + "           SELECT FOO FILE STATUS IS {$BAR}.\n"
-            + "           SELECT FOO FILE STATUS IS {BAZ|1}.\n"
-            + "       DATA DIVISION.\n"
-            + "       WORKING-STORAGE SECTION.\n"
-            + "       01  {$*BAR}  PIC  X(2).";
+class TestVariableInFileControl {
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "          PROGRAM-ID. TEST.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       INPUT-OUTPUT SECTION.\n"
+          + "       FILE-CONTROL.\n"
+          + "           SELECT FOO FILE STATUS IS {$BAR}.\n"
+          + "           SELECT FOO FILE STATUS IS {BAZ|1}.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01  {$*BAR}  PIC  X(2).";
 
-    @Test
-    void test() {
-        UseCaseEngine.runTest(TEXT, List.of(), Map.of(
-            "1", new Diagnostic(
-                null,
-                "Invalid definition for: BAZ",
-                DiagnosticSeverity.Error,
-                ERROR.getText())
-        ));
-    }
+  @Test
+  void test() {
+    UseCaseEngine.runTest(
+        TEXT,
+        List.of(),
+        Map.of(
+            "1",
+            new Diagnostic(
+                null, "Invalid definition for: BAZ", DiagnosticSeverity.Error, ERROR.getText())));
+  }
 }

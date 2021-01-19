@@ -120,7 +120,6 @@ class VariableDefinitionDelegate {
             .build();
 
     // TODO: Add check that name does not present in the predefined variables list (? - to check)
-    setFillerNameIfNeeded(variableDefinitionContext);
     checkVariableTypeAllowed(variableDefinitionContext);
     checkStartingArea(variableDefinitionContext);
     closePreviousStructureIfNeeded(variableDefinitionContext);
@@ -166,7 +165,6 @@ class VariableDefinitionDelegate {
             .usageClauses(ctx.dataUsageClause())
             .build();
 
-    setFillerNameIfNeeded(variableDefinitionContext);
     checkVariableTypeAllowed(variableDefinitionContext);
     checkStartingArea(variableDefinitionContext);
     checkUsageClauseIsSingle(variableDefinitionContext);
@@ -198,7 +196,6 @@ class VariableDefinitionDelegate {
             .build();
 
     closePreviousStructure();
-    setFillerNameIfNeeded(variableDefinitionContext);
     checkVariableTypeAllowed(variableDefinitionContext);
     checkTopElementNumber(variableDefinitionContext);
     updateQualifier(variableDefinitionContext);
@@ -224,7 +221,6 @@ class VariableDefinitionDelegate {
             .valueClauses(List.of(ctx.dataValueClause()))
             .build();
 
-    setFillerNameIfNeeded(variableDefinitionContext);
     checkVariableTypeAllowed(variableDefinitionContext);
     checkTopElementNumber(variableDefinitionContext);
     setValueClauseText(variableDefinitionContext);
@@ -271,12 +267,8 @@ class VariableDefinitionDelegate {
     return new ResultWithErrors<>(new ArrayList<>(variables), new ArrayList<>(errors));
   }
 
-  private String retrieveName(EntryNameContext context) {
-    return ofNullable(context).map(RuleContext::getText).map(String::toUpperCase).orElse(null);
-  }
-
-  private String retrieveName(MnemonicNameContext context) {
-    return ofNullable(context).map(RuleContext::getText).map(String::toUpperCase).orElse(null);
+  private String retrieveName(RuleContext context) {
+    return ofNullable(context).map(RuleContext::getText).map(String::toUpperCase).orElse(OutlineNodeNames.FILLER_NAME);
   }
 
   private String retrieveQualifier(String name) {
@@ -299,7 +291,6 @@ class VariableDefinitionDelegate {
                     .orElse(null));
   }
 
-  @NonNull
   private Locality retrieveDefinition(ParserRuleContext context) {
     return ofNullable(context).map(ParserRuleContext::getStart).map(positions::get).orElse(null);
   }
@@ -361,12 +352,6 @@ class VariableDefinitionDelegate {
     errors.add(error);
     LOG.debug(
         format("Syntax error defined by %s: %s", getClass().getSimpleName(), error.toString()));
-  }
-
-  private void setFillerNameIfNeeded(VariableDefinitionContext variable) {
-    if (variable.getName() == null) {
-      variable.setName(OutlineNodeNames.FILLER_NAME);
-    }
   }
 
   private void checkVariableTypeAllowed(VariableDefinitionContext variable) {
