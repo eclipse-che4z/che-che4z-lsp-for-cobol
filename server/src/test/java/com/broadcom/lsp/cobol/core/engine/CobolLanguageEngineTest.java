@@ -62,7 +62,11 @@ class CobolLanguageEngineTest {
     ParseTreeListener treeListener = mock(ParseTreeListener.class);
     cobolErrorStrategy.setMessageService(mockMessageService);
     CobolLanguageEngine engine =
-        new CobolLanguageEngine(preprocessor, cobolErrorStrategy, mockMessageService, treeListener,
+        new CobolLanguageEngine(
+            preprocessor,
+            cobolErrorStrategy,
+            mockMessageService,
+            treeListener,
             mock(SubroutineService.class));
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
@@ -136,12 +140,12 @@ class CobolLanguageEngineTest {
                         List.of()))));
 
     ResultWithErrors<SemanticContext> expected =
-            new ResultWithErrors<>(
-                    SemanticContext.builder()
-                            .constantDefinitions(getConstantDefinitions())
-                            .outlineTree(expectedOutlineTree)
-                            .build(),
-                    List.of(error));
+        new ResultWithErrors<>(
+            SemanticContext.builder()
+                .constantDefinitions(getConstantDefinitions())
+                .outlineTree(expectedOutlineTree)
+                .build(),
+            List.of(error));
 
     ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, PROCESSING_MODE);
 

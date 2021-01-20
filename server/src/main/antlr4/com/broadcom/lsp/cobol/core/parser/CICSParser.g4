@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 parser grammar CICSParser;
-options {tokenVocab = CobolLexer;}
+options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
 import Db2SqlParser;
 
 allRules: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
