@@ -33,9 +33,8 @@ import java.util.List;
 public class ConditionDataName extends AbstractVariable {
   String value;
 
-  public ConditionDataName(
-      String name, String qualifier, Locality definition, Variable parent, String value) {
-    super(name, qualifier, definition, parent);
+  public ConditionDataName(String name, Locality definition, Variable parent, String value) {
+    super(name, definition, parent);
     this.value = value;
   }
 

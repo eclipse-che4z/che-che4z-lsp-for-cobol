@@ -33,8 +33,8 @@ public class IndependentDataItem extends AbstractVariable implements Conditional
   String value;
 
   public IndependentDataItem(
-      String name, String qualifier, Locality definition, String picClause, String value) {
-    super(name, qualifier, definition, null);
+      String name, Locality definition, String picClause, String value) {
+    super(name, definition, null);
     this.picClause = picClause;
     this.value = value;
   }

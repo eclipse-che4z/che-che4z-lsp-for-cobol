@@ -21,7 +21,6 @@ import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.model.variables.*;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 import lombok.Builder;
 import lombok.Data;
@@ -47,10 +46,6 @@ import static java.util.stream.Collectors.toList;
  * This class processes the variable definition contexts. It accumulates the variable structures to
  * track the nesting, and the qualifiers that also rely on the structure. Pay attention, that the
  * <code>define*</code> methods are NOT pure, they share a state and rely on the context.
- *
- * <p>Qualifiers used to check the variable usages and may be used to check the uniqueness of the
- * reference using a regex, e.g. PARENT.*CHILD may check this usage even if there are intermediate
- * levels in the given structure. Qualifiers stored in top-down order.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -126,7 +121,6 @@ public class VariableDefinitionDelegate {
     checkStartingArea(variableDefinitionContext);
     closePreviousStructureIfNeeded(variableDefinitionContext);
     checkTopElementNumber(variableDefinitionContext);
-    updateQualifier(variableDefinitionContext);
     checkPictureClauseIsSingle(variableDefinitionContext);
     checkOccursClauseIsSingle(variableDefinitionContext);
     checkValueClauseIsSingle(variableDefinitionContext);
@@ -171,7 +165,6 @@ public class VariableDefinitionDelegate {
     checkStartingArea(variableDefinitionContext);
     checkUsageClauseIsSingle(variableDefinitionContext);
     checkTopElementNumber(variableDefinitionContext);
-    updateQualifier(variableDefinitionContext);
     closePreviousStructure();
 
     defineVariable(variableDefinitionContext, this::independentDataItemMatcher);
@@ -200,7 +193,6 @@ public class VariableDefinitionDelegate {
     closePreviousStructure();
     checkVariableTypeAllowed(variableDefinitionContext);
     checkTopElementNumber(variableDefinitionContext);
-    updateQualifier(variableDefinitionContext);
     variables.push(renameItemMatcher(variableDefinitionContext));
   }
 
@@ -227,7 +219,6 @@ public class VariableDefinitionDelegate {
     checkTopElementNumber(variableDefinitionContext);
     setValueClauseText(variableDefinitionContext);
     updateConditionalContainer(variableDefinitionContext);
-    updateQualifier(variableDefinitionContext);
 
     defineVariable(variableDefinitionContext, this::conditionalDataNameMatcher);
   }
@@ -243,7 +234,6 @@ public class VariableDefinitionDelegate {
     variables.push(
         new MnemonicName(
             name,
-            VariableUtils.createQualifier(name),
             retrieveDefinition(
                 Optional.<ParserRuleContext>ofNullable(ctx.mnemonicName()).orElse(ctx))));
   }
@@ -274,10 +264,6 @@ public class VariableDefinitionDelegate {
         .map(RuleContext::getText)
         .map(String::toUpperCase)
         .orElse(OutlineNodeNames.FILLER_NAME);
-  }
-
-  private String retrieveQualifier(String name) {
-    return VariableUtils.createQualifier(structureStack, name);
   }
 
   private Optional<Variable> retrieveChild(List<Variable> childrenToRename, String stopName) {
@@ -318,7 +304,6 @@ public class VariableDefinitionDelegate {
             it ->
                 new IndexItem(
                     it.getText().toUpperCase(),
-                    VariableUtils.createQualifier(it.getText().toUpperCase()),
                     positions.get(it.start)))
         .collect(toList());
   }
@@ -390,14 +375,6 @@ public class VariableDefinitionDelegate {
           variable.getDefinition());
   }
 
-  private void updateQualifier(VariableDefinitionContext variable) {
-    if (variable.getContainer() == null) {
-      variable.setQualifier(retrieveQualifier(variable.getName()));
-    } else {
-      variable.setQualifier(variable.getContainer().getQualifier() + "  " + variable.getName());
-    }
-  }
-
   private void checkPictureClauseIsSingle(VariableDefinitionContext variable) {
     checkClauseIsSingle(variable.getDefinition(), variable.getPicClauses(), "PICTURE");
   }
@@ -465,7 +442,6 @@ public class VariableDefinitionDelegate {
           new MultiTableDataName(
               variable.getNumber(),
               variable.getName(),
-              variable.getQualifier(),
               variable.getDefinition(),
               structureStack.peek(),
               retrieveOccursTimes(variable.getOccursClauses().get(0)),
@@ -484,7 +460,6 @@ public class VariableDefinitionDelegate {
       return new GroupItem(
           variable.getNumber(),
           variable.getName(),
-          variable.getQualifier(),
           variable.getDefinition(),
           structureStack.peek());
     }
@@ -497,7 +472,6 @@ public class VariableDefinitionDelegate {
       TableDataName tableDataName =
           new TableDataName(
               variable.getName(),
-              variable.getQualifier(),
               variable.getDefinition(),
               structureStack.peek(),
               retrievePicText(variable.getPicClauses()),
@@ -516,7 +490,6 @@ public class VariableDefinitionDelegate {
         && variable.getOccursClauses().isEmpty()) {
       return new ElementItem(
           variable.getName(),
-          variable.getQualifier(),
           variable.getDefinition(),
           structureStack.peek(),
           retrievePicText(variable.getPicClauses()),
@@ -536,7 +509,6 @@ public class VariableDefinitionDelegate {
     }
     return new IndependentDataItem(
         variable.getName(),
-        variable.getQualifier(),
         variable.getDefinition(),
         picClause,
         variable.getValueClauseTest());
@@ -546,7 +518,6 @@ public class VariableDefinitionDelegate {
     ConditionDataName result =
         new ConditionDataName(
             variable.getName(),
-            variable.getQualifier(),
             variable.getDefinition(),
             variable.getContainer(),
             variable.getValueClauseTest());
@@ -557,7 +528,7 @@ public class VariableDefinitionDelegate {
 
   private Variable renameItemMatcher(VariableDefinitionContext variable) {
     RenameItem renameItem =
-        new RenameItem(variable.getName(), variable.getQualifier(), variable.getDefinition());
+        new RenameItem(variable.getName(), variable.getDefinition());
     List<Variable> renamedVariables =
         renameVariables(renameItem, extractChildrenToRename(variable));
     renamedVariables.forEach(variables::push);
@@ -656,7 +627,6 @@ public class VariableDefinitionDelegate {
     Locality definition;
     Class<? extends ParserRuleContext> antlrClass;
     Locality starting;
-    String qualifier;
     List<DataPictureClauseContext> picClauses;
     List<DataOccursClauseContext> occursClauses;
     List<DataValueClauseContext> valueClauses;

@@ -32,8 +32,8 @@ public abstract class StructuredVariable extends AbstractVariable {
   int levelNumber;
 
   StructuredVariable(
-      int levelNumber, String name, String qualifier, Locality definition, Variable parent) {
-    super(name, qualifier, definition, parent);
+      int levelNumber, String name, Locality definition, Variable parent) {
+    super(name, definition, parent);
     this.levelNumber = levelNumber;
   }
 

@@ -27,7 +27,6 @@ import java.util.List;
 @AllArgsConstructor
 public abstract class AbstractVariable implements Variable {
   @Getter protected final String name;
-  @Getter protected final String qualifier;
   @Getter protected final Locality definition;
   private final List<Locality> usages = new ArrayList<>();
   private final List<ConditionDataName> conditionChildren = new ArrayList<>();
