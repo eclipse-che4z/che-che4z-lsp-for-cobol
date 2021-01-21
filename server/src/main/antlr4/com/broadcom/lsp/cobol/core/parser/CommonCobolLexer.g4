@@ -814,7 +814,7 @@ ASTERISKCHAR : '*';
 DOUBLEASTERISKCHAR : '**';
 COLONCHAR : ':';
 COMMA_EOF : ',' EOF {!sqlFlag}? ->skip;
-COMMA_LB : ',' ('\r' | '\n' | '\f' | '\t' | ' ')+ {!sqlFlag}? ->skip;
+COMMA_LB : ',' ('\r' | '\n' | '\f' | '\t' | ' ')+ {!sqlFlag}? -> channel(HIDDEN);
 COMMACHAR : ',';
 COMMENTTAG : '*>';
 COMMENTENTRYTAG : '*>CE';
@@ -867,7 +867,7 @@ NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
 COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*  -> channel(HIDDEN);
 WS : [ \t\f;]+ -> channel(HIDDEN);
-SEPARATOR : ', ' {!sqlFlag}?  -> channel(HIDDEN);
+SEPARATOR : ', ' {!sqlFlag}? -> channel(HIDDEN);
 
 //SQL comments
 SQLLINECOMMENT
