@@ -159,10 +159,14 @@ public class VariableDefinitionDelegate {
             .picClauses(ctx.dataPictureClause())
             .valueClauses(ctx.dataValueClause())
             .usageClauses(ctx.dataUsageClause())
+            .occursClauses(ctx.dataOccursClause())
             .build();
 
     checkVariableTypeAllowed(variableDefinitionContext);
     checkStartingArea(variableDefinitionContext);
+    checkPictureClauseIsSingle(variableDefinitionContext);
+    checkOccursClauseIsSingle(variableDefinitionContext);
+    checkValueClauseIsSingle(variableDefinitionContext);
     checkUsageClauseIsSingle(variableDefinitionContext);
     checkTopElementNumber(variableDefinitionContext);
     closePreviousStructure();
@@ -300,11 +304,7 @@ public class VariableDefinitionDelegate {
   @NonNull
   private List<IndexItem> retrieveIndexItem(@NonNull DataOccursClauseContext clause) {
     return clause.indexName().stream()
-        .map(
-            it ->
-                new IndexItem(
-                    it.getText().toUpperCase(),
-                    positions.get(it.start)))
+        .map(it -> new IndexItem(it.getText().toUpperCase(), positions.get(it.start)))
         .collect(toList());
   }
 
@@ -508,10 +508,7 @@ public class VariableDefinitionDelegate {
       picClause = retrievePicText(variable.getPicClauses());
     }
     return new IndependentDataItem(
-        variable.getName(),
-        variable.getDefinition(),
-        picClause,
-        variable.getValueClauseTest());
+        variable.getName(), variable.getDefinition(), picClause, variable.getValueClauseTest());
   }
 
   private Variable conditionalDataNameMatcher(VariableDefinitionContext variable) {
@@ -527,8 +524,7 @@ public class VariableDefinitionDelegate {
   }
 
   private Variable renameItemMatcher(VariableDefinitionContext variable) {
-    RenameItem renameItem =
-        new RenameItem(variable.getName(), variable.getDefinition());
+    RenameItem renameItem = new RenameItem(variable.getName(), variable.getDefinition());
     List<Variable> renamedVariables =
         renameVariables(renameItem, extractChildrenToRename(variable));
     renamedVariables.forEach(variables::push);
