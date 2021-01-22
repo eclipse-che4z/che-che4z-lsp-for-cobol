@@ -44,6 +44,7 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 - COBOL variables
 - COBOL paragraphs
 - CICS keywords
+- DB2 SQL keywords
 - Code Snippets
 - Copybook variable and paragraph names
 - Names of copybooks that are used in the program
@@ -56,7 +57,7 @@ The autocomplete feature is only available in the main COBOL file, not in copybo
 ### Syntax and Semantic Check for Code
 This feature checks for mistakes and errors in COBOL code. The syntax check feature reviews the whole content of the code and suggests fixes, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
 
-This feature is also enabled for CICS keywords and variables.
+This feature is also enabled for CICS and DB2 SQL keywords and variables.
 
 ![Syntax check](/docs/images/CLSErrorHighlighting.gif)
 			
