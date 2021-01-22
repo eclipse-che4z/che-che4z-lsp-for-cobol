@@ -652,7 +652,7 @@ dbs_execute_varloop: (dbs_variable | dbs_array_variable LSQUAREBRACKET dbs_array
 dbs_execute_hostloop: (dbs_host_variable_array | dbs_host_variable) (COMMACHAR (dbs_host_variable_array |
                         dbs_host_variable))* (FOR (dbs_host_variable | dbs_integer_constant) ROWS)?;
 dbs_execute_descriptor: DESCRIPTOR dbs_descriptor_name (FOR (dbs_host_variable | dbs_integer_constant) ROWS)?;
-dbs_execute_immediate: IMMEDIATE (dbs_variable | dbs_string_expression);
+dbs_execute_immediate: IMMEDIATE (dbs_variable | dbs_string_expression) (dbs_expression_operator (dbs_variable | dbs_string_expression))*;
 
 
 /*EXPLAIN */
