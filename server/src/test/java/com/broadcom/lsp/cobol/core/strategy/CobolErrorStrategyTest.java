@@ -85,16 +85,12 @@ class CobolErrorStrategyTest {
 
   @Test
   void failedPredicateExceptionTest() throws NullPointerException {
+    Parser recognizer = mock(Parser.class);
+    FailedPredicateException errorMock = mock(FailedPredicateException.class);
+
+    CobolErrorStrategy strategy = new CobolErrorStrategy(messageService);
     Assertions.assertThrows(
-        NullPointerException.class,
-        () -> {
-          Parser recognizer = mock(Parser.class);
-          FailedPredicateException errorMock = mock(FailedPredicateException.class);
-
-          CobolErrorStrategy strategy = new CobolErrorStrategy(messageService);
-
-          strategy.reportError(recognizer, errorMock);
-        });
+        NullPointerException.class, () -> strategy.reportError(recognizer, errorMock));
   }
 
   @Test

@@ -7,7 +7,8 @@
 */
 
 parser grammar CobolParser;
-options {tokenVocab = CobolLexer;}
+options {tokenVocab = CobolLexer;  superClass = MessageServiceParser;}
+
 import CICSParser;
    
 startRule : compilationUnit EOF;
@@ -401,7 +402,8 @@ endClause
     ;
 
 ss_names_length
-       : {_input.LT(1).getText().matches("16|18")}? LEVEL_NUMBER
+       : {if(!_input.LT(1).getText().matches("16|18")) { notifyError("cobolParser.subSchemaNameLength", _input.LT(1).getText());}}
+       LEVEL_NUMBER
        ;
 
 // --- data division --------------------------------------------------------------------
@@ -821,18 +823,32 @@ sentence
    ;
 
 statement
-   : acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement | disableStatement |
-    displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement | execSqlStatement | execSqlImsStatement |
-    exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement |
-    multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement |
-    sendStatement | serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | unstringStatement | writeStatement | xmlStatement
+   : abendCodeStatement | acceptStatement | addStatement | alterStatement | attachTaskCodeStatement | bindStatement |  callStatement | cancelStatement | changePriorityStatement |
+    closeStatement | computeStatement | continueStatement | deleteStatement | disableStatement | displayStatement | divideStatement | enableStatement | entryStatement |
+    evaluateStatement | exhibitStatement | execCicsStatement | execSqlStatement | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement |
+    ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement |
+    purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement | serviceReloadStatement |
+    serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement | unstringStatement |
+    writeStatement | xmlStatement
    ;
+// abend code statement
+
+abendCodeStatement
+    : ABEND CODE (literal | generalIdentifier) abendCodeDumpClause? abendCodeExitClause?
+    ;
+
+abendCodeDumpClause
+    : (DUMP | NODUMP)
+    ;
+
+abendCodeExitClause
+    : EXITS (INVOKED | IGNORED)
+    ;
 
 // accept statement
 
 acceptStatement
-   : ACCEPT generalIdentifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?
+   : ACCEPT (acceptIdmsDcClause | (generalIdentifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?))
    ;
 
 acceptFromDateStatement
@@ -847,9 +863,29 @@ acceptFromEscapeKeyStatement
    : FROM ESCAPE KEY
    ;
 
+acceptIdmsDcClause
+   : acceptTransactionStatisticsClause | ((LTERM ID | PTERM ID | SCREENSIZE | SYSTEM ID | SYSVERSION | TASK CODE | TASK ID | USER ID) INTO generalIdentifier)
+   ;
+
 acceptMessageCountStatement
    : MESSAGE? COUNT
    ;
+
+acceptTransactionStatisticsClause
+    : TRANSACTION STATISTICS acceptTransactionStatisticsWriteClause? acceptTransactionStatisticsIntoClause? acceptTransactionStatisticsLengthClause?
+    ;
+
+acceptTransactionStatisticsWriteClause
+    : (WRITE | NOWRITE)
+    ;
+
+acceptTransactionStatisticsIntoClause
+    : INTO generalIdentifier
+    ;
+
+acceptTransactionStatisticsLengthClause
+    : LENGTH (integerLiteral | generalIdentifier)
+    ;
 
 // add statement
 
@@ -900,6 +936,42 @@ alterStatement
 alterProceedTo
    : procedureName TO (PROCEED TO)? procedureName
    ;
+
+// accept transaction statistics statement
+
+attachTaskCodeStatement
+    : ATTACH TASK CODE (generalIdentifier | literal) attachTaskCodePriorityClause? attachTaskCodeWaitClause?
+    ;
+
+attachTaskCodePriorityClause
+    : PRIORITY (priorityLiteral | generalIdentifier)
+    ;
+
+attachTaskCodeWaitClause
+    : (WAIT | NOWAIT)
+    ;
+
+priorityLiteral
+    : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
+    ;
+
+// bind statement
+
+bindStatement
+    : BIND (bindTaskClause | bindTransactionClause)
+    ;
+
+bindTaskClause
+    : TASK bindTaskStatementNodenameClause?
+    ;
+
+bindTaskStatementNodenameClause
+    : NODENAME (generalIdentifier | literal)
+    ;
+
+bindTransactionClause
+    : TRANSACTION STATISTICS
+    ;
 
 // call statement
 
@@ -952,6 +1024,16 @@ cancelStatement
 cancelCall
    : libraryName (BYTITLE | BYFUNCTION) | literal | generalIdentifier
    ;
+
+// change priority statement
+
+changePriorityStatement
+    : CHANGE PRIORITY TO? (changePriorityLiteral | generalIdentifier)
+    ;
+
+changePriorityLiteral
+    : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
+    ;
 
 // close statement
 
@@ -1137,7 +1219,7 @@ execCicsStatement
 // exec sql statement
 execSqlStatement
    : EXEC_SQL allSqlRules END_EXEC DOT_FS?
-   | (EXEC | SQL) {notifyErrorListeners("Missing token EXEC or SQL at execSqlStatement");} allSqlRules END_EXEC DOT_FS?
+   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} allSqlRules END_EXEC DOT_FS?
    ;
 
 // exec sql ims statement
