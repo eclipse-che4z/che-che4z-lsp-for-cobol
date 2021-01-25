@@ -34,12 +34,7 @@ class TestExtraneousInputEOFExpecting {
           + "        PROCEDURE DIVISION.\r\n"
           + "           if (1 > 0) NEXT SENTENCE{|1}"; // No dot at the end of file
 
-  private static final String MESSAGE =
-      "Extraneous input '<EOF>' expected {ACCEPT, CANCEL, CLOSE, COMPUTE, DISPLAY, DIVIDE, EVALUATE, EXHIBIT, "
-          + "GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MULTIPLY, PERFORM, PURGE, SERVICE, SORT, STOP, STRING, "
-          + "SUBTRACT, TERMINATE, UNSTRING, BIND, CALL, CONTINUE, DISABLE, ENABLE, EXIT, GENERATE, GO, MERGE, "
-          + "SEARCH, XML, ABEND, ADD, ALTER, ATTACH, CHANGE, DELETE, ENTRY, MOVE, OPEN, READ, RECEIVE, RELEASE, "
-          + "RETURN, REWRITE, SEND, SET, START, SQL, EXEC_SQL, EXEC, WRITE, DOT_FS}";
+  private static final String MESSAGE = "Unexpected end of file";
 
   @Test
   void test() {
