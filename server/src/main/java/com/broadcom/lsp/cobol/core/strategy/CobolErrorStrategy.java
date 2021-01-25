@@ -15,16 +15,20 @@
 package com.broadcom.lsp.cobol.core.strategy;
 
 import com.broadcom.lsp.cobol.core.messages.MessageService;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
-import java.util.MissingResourceException;
-import java.util.Optional;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
@@ -36,6 +40,30 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
   private static final String REPORT_NO_VIABLE_ALTERNATIVE = "reportNoViableAlternative";
   private static final String REPORT_UNWANTED_TOKEN = "reportUnwantedToken";
   private static final String REPORT_MISSING_TOKEN = "reportMissingToken";
+  private static final String SPECIAL_TOKEN_HANDLING_FILEPATH = "SpecialTokenHandling.properties";
+  private static final LinkedHashMap<String, String> SPECIAL_TOKEN_HANDLING_MAP;
+  private static final String MSG_DELIMITER = ", ";
+  private static final String MSG_PREFIX = "{";
+  private static final String MSG_SUFFIX = "}";
+
+  static {
+    Properties props = new Properties();
+    try (InputStream ins =
+        CobolErrorStrategy.class.getResourceAsStream(SPECIAL_TOKEN_HANDLING_FILEPATH)) {
+      props.load(ins);
+    } catch (IOException exception) {
+      LOG.error("SpecialTokenHandling didn't load.", exception);
+      props.setProperty("_", "-");
+    }
+    SPECIAL_TOKEN_HANDLING_MAP =
+        props.entrySet().stream()
+            .collect(
+                Collectors.toMap(
+                    ele -> (String) ele.getKey(),
+                    ele -> (String) ele.getValue(),
+                    (a, b) -> b,
+                    LinkedHashMap::new));
+  }
 
   private MessageService messageService;
 
@@ -61,7 +89,12 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     return getTokenErrorDisplay(e.getOffendingToken());
   }
 
+  public MessageService getMessageService() {
+    return messageService;
+  }
+
   // for test
+  @VisibleForTesting
   public void setMessageService(MessageService messageService) {
     this.messageService = messageService;
   }
@@ -72,9 +105,23 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
             .map(RecognitionException::getExpectedTokens)
             .orElseGet(() -> getExpectedTokens(recognizer));
 
-    return Optional.ofNullable(expecting)
-        .map(exp -> exp.toString(recognizer.getVocabulary()))
-        .orElse("");
+    String expectedTokens =
+        Optional.ofNullable(expecting)
+            .map(exp -> exp.toString(recognizer.getVocabulary()))
+            .orElse("");
+
+    for (Map.Entry<String, String> entry : SPECIAL_TOKEN_HANDLING_MAP.entrySet()) {
+      expectedTokens = expectedTokens.replace(entry.getKey(), entry.getValue());
+    }
+
+    return fixEmptyTokens(expectedTokens);
+  }
+
+  private String fixEmptyTokens(String expectedTokens) {
+    return expectedTokens
+        .replace(", ,", MSG_DELIMITER)
+        .replace("{ ,", MSG_PREFIX)
+        .replace(", }", MSG_SUFFIX);
   }
 
   @Override
@@ -131,13 +178,21 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     }
     beginErrorCondition(recognizer);
     Token t = recognizer.getCurrentToken();
-    String tokenName = getTokenErrorDisplay(t);
-    String msg =
-        parseCustomMessage(
-            REPORT_UNWANTED_TOKEN,
-            getRule(recognizer),
-            tokenName,
-            getExpectedToken(recognizer, null));
+    String erroneousToken = getTokenErrorDisplay(t);
+    String msg;
+    if (erroneousToken.equals("'<EOF>'")) {
+      msg = messageService.getMessage("ErrorStrategy.endOfFile");
+    } else {
+      String tokenName =
+          SPECIAL_TOKEN_HANDLING_MAP.getOrDefault(
+              erroneousToken.substring(1, erroneousToken.length() - 1), getTokenErrorDisplay(t));
+      msg =
+          parseCustomMessage(
+              REPORT_UNWANTED_TOKEN,
+              getRule(recognizer),
+              tokenName,
+              getExpectedToken(recognizer, null));
+    }
     recognizer.notifyErrorListeners(t, msg, null);
   }
 

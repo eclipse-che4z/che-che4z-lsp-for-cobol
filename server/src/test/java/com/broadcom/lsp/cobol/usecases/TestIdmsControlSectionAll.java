@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 /** These test for variations of valid IDMS-CONTROL SECTION definitions */
 class TestIdmsControlSectionAll {
 
-    private static final String MESSAGE_1 = "rule ss_names_length failed predicate: {_input.LT(1).getText().matches(\"16|18\")}?";
+    private static final String MESSAGE_1 = "The length 17 is not allowed. Allowed values are 16, 18.";
 
     private static final String BOILERPLATE =
             "        IDENTIFICATION DIVISION. \r\n"
