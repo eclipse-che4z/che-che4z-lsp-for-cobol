@@ -34,7 +34,8 @@
         <exclude.tests>nothing.to.exclude</exclude.tests>
         <google.guava.version>28.1-jre</google.guava.version>
         <guice.version>4.2.2</guice.version>
-        <java.version>11</java.version>
+        <java.version>8</java.version>
+        <java.tests.version>11</java.tests.version>
         <junit-jupiter.version>5.6.0</junit-jupiter.version>
         <junit.platform.version>1.6.0</junit.platform.version>
         <logback.classic.version>1.2.3</logback.classic.version>
@@ -235,8 +236,29 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <release>${java.version}</release>
+                    <release>${java.tests.version}</release>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <release>${java.version}</release>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>process-test-sources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <configuration>
+                            <release>${java.tests.version}</release>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

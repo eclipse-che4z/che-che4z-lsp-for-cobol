@@ -49,7 +49,7 @@ public class SubroutineServiceImpl implements SubroutineService {
     cache = CacheBuilder.newBuilder()
         .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName))
         .maximumSize(cacheSize)
-        .build(new CacheLoader<>() {
+        .build(new CacheLoader<String, Optional<String>>() {
           @Override
           public Optional<String> load(String key) throws Exception {
             return Optional.ofNullable(clientProvider.get().resolveSubroutine(key).get());

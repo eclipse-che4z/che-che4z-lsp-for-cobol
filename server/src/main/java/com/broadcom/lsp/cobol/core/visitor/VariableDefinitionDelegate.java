@@ -22,6 +22,7 @@ import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.model.variables.*;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames;
+import com.google.common.collect.ImmutableList;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -209,7 +210,7 @@ public class VariableDefinitionDelegate {
                     Optional.<ParserRuleContext>ofNullable(ctx.entryName()).orElse(ctx)))
             .antlrClass(ctx.getClass())
             .starting(positions.get(ctx.LEVEL_NUMBER_88().getSymbol()))
-            .valueClauses(List.of(ctx.dataValueClause()))
+            .valueClauses(ImmutableList.of(ctx.dataValueClause()))
             .build();
 
     checkTopElementNumber(variableDefinitionContext);
@@ -520,7 +521,7 @@ public class VariableDefinitionDelegate {
     Locality definition = variable.getDefinition();
     if (variable.getPrecedingStructure() == null) {
       addError(messages.getMessage(NO_STRUCTURE_BEFORE_RENAME), definition);
-      return List.of();
+      return ImmutableList.of();
     }
     StructuredVariable structure = variable.getPrecedingStructure();
     List<Variable> previousChildren = collectChildrenToRename(structure);
@@ -528,24 +529,24 @@ public class VariableDefinitionDelegate {
     DataRenamesClauseContext renamesClause = variable.getRenamesClauseContext();
     String startName = renamesClause.dataName().getText();
     Optional<Variable> start = retrieveChild(previousChildren, startName);
-    if (start.isEmpty()) {
+    if (!start.isPresent()) {
       reportChildrenNotFound(startName, definition);
-      return List.of();
+      return ImmutableList.of();
     }
 
     Variable startVar = start.get();
     Locality startUsage = positions.get(renamesClause.dataName().getStart());
     if (renamesClause.thruDataName() == null) {
       startVar.addUsage(startUsage);
-      return List.of(startVar);
+      return ImmutableList.of(startVar);
     }
 
     String stopName = renamesClause.thruDataName().dataName().getText();
     Optional<Variable> stop = retrieveChild(previousChildren, stopName);
-    if (stop.isEmpty()) {
+    if (!stop.isPresent()) {
       reportChildrenNotFound(stopName, definition);
       startVar.addUsage(startUsage);
-      return List.of(startVar);
+      return ImmutableList.of(startVar);
     }
 
     Variable stopVar = stop.get();
@@ -556,7 +557,7 @@ public class VariableDefinitionDelegate {
       addError(messages.getMessage(INCORRECT_CHILDREN_ORDER), definition);
       startVar.addUsage(startUsage);
       stopVar.addUsage(stopUsage);
-      return List.of();
+      return ImmutableList.of();
     }
 
     startVar.addUsage(startUsage);

@@ -41,7 +41,7 @@ public class CompilerDirectivesTransformation implements CobolLineReaderDelegate
   }
 
   private String cutTooLongString(String line) {
-    return line.length() == 80 ? line.substring(0, 72).strip() : line;
+    return line.length() == 80 ? line.substring(0, 72).trim() : line;
   }
 
   private String moveContentFromCommentArea(String line) {
