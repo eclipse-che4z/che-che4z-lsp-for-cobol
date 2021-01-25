@@ -52,4 +52,9 @@ public class ConditionDataName extends AbstractVariable {
   public List<ConditionDataName> getConditionNames() {
     return List.of();
   }
+
+  @Override
+  public Variable rename(RenameItem newParent) {
+    return new ConditionDataName(name, definition, newParent, value);
+  }
 }
