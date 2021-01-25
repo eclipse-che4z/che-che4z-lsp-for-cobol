@@ -51,7 +51,6 @@ import java.util.*;
 
 import static com.broadcom.lsp.cobol.core.CobolParser.*;
 import static com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames.*;
-import static com.broadcom.lsp.cobol.core.visitor.DataDivisionSection.FILE;
 import static com.broadcom.lsp.cobol.core.visitor.VariableDefinitionDelegate.*;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Predicate.not;
@@ -216,7 +215,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   public Void visitWorkingStorageSection(WorkingStorageSectionContext ctx) {
     outlineTreeBuilder.addNode(WORKING_STORAGE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
-    variablesDelegate.switchSection(DataDivisionSection.WORKING_STORAGE);
+    variablesDelegate.notifySectionChanged();
     return visitChildren(ctx);
   }
 
@@ -307,7 +306,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   public Void visitFileSection(FileSectionContext ctx) {
     outlineTreeBuilder.addNode(FILE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
-    variablesDelegate.switchSection(FILE);
+    variablesDelegate.notifySectionChanged();
     return visitChildren(ctx);
   }
 
@@ -315,7 +314,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   public Void visitLinkageSection(LinkageSectionContext ctx) {
     outlineTreeBuilder.addNode(LINKAGE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
-    variablesDelegate.switchSection(DataDivisionSection.LINKAGE);
+    variablesDelegate.notifySectionChanged();
     return visitChildren(ctx);
   }
 
@@ -323,7 +322,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   public Void visitLocalStorageSection(LocalStorageSectionContext ctx) {
     outlineTreeBuilder.addNode(LOCAL_STORAGE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
-    variablesDelegate.switchSection(DataDivisionSection.LOCAL_STORAGE);
+    variablesDelegate.notifySectionChanged();
     return visitChildren(ctx);
   }
 

@@ -37,7 +37,6 @@ import java.util.function.Function;
 
 import static com.broadcom.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static com.broadcom.lsp.cobol.core.model.ErrorSeverity.WARNING;
-import static com.broadcom.lsp.cobol.core.visitor.DataDivisionSection.NOT_INITIALIZED;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -65,8 +64,6 @@ public class VariableDefinitionDelegate {
   private static final String CHILD_TO_RENAME_NOT_FOUND = "semantics.childToRenameNotFound";
   private static final String INCORRECT_CHILDREN_ORDER = "semantics.incorrectChildrenOrder";
   private static final String CANNOT_BE_RENAMED = "semantics.cannotBeRenamed";
-  private static final String DEFINITION_NOT_ALLOWED_IN_SECTION =
-      "semantics.definitionNotAllowedInSection";
 
   private static final ErrorSeverity SEVERITY = ERROR;
 
@@ -78,7 +75,6 @@ public class VariableDefinitionDelegate {
   private Deque<StructuredVariable> structureStack = new ArrayDeque<>();
   private Deque<Variable> variables = new ArrayDeque<>();
   private List<SyntaxError> errors = new ArrayList<>();
-  private DataDivisionSection section = NOT_INITIALIZED;
 
   private final Map<Token, Locality> positions;
   private final MessageService messages;
@@ -117,7 +113,6 @@ public class VariableDefinitionDelegate {
             .build();
 
     // TODO: Add check that name does not present in the predefined variables list (? - to check)
-    checkVariableTypeAllowed(variableDefinitionContext);
     checkStartingArea(variableDefinitionContext);
     closePreviousStructureIfNeeded(variableDefinitionContext);
     checkTopElementNumber(variableDefinitionContext);
@@ -162,7 +157,6 @@ public class VariableDefinitionDelegate {
             .occursClauses(ctx.dataOccursClause())
             .build();
 
-    checkVariableTypeAllowed(variableDefinitionContext);
     checkStartingArea(variableDefinitionContext);
     checkPictureClauseIsSingle(variableDefinitionContext);
     checkOccursClauseIsSingle(variableDefinitionContext);
@@ -195,7 +189,6 @@ public class VariableDefinitionDelegate {
             .build();
 
     closePreviousStructure();
-    checkVariableTypeAllowed(variableDefinitionContext);
     checkTopElementNumber(variableDefinitionContext);
     variables.push(renameItemMatcher(variableDefinitionContext));
   }
@@ -219,7 +212,6 @@ public class VariableDefinitionDelegate {
             .valueClauses(List.of(ctx.dataValueClause()))
             .build();
 
-    checkVariableTypeAllowed(variableDefinitionContext);
     checkTopElementNumber(variableDefinitionContext);
     setValueClauseText(variableDefinitionContext);
     updateConditionalContainer(variableDefinitionContext);
@@ -243,12 +235,10 @@ public class VariableDefinitionDelegate {
   }
 
   /**
-   * Change the currently processing section. Checks if the preceding variable structure is correct
-   *
-   * @param section - the currently processing section
+   * Notify the variable delegate that the processing moved to another section in order to track the
+   * structure correctness
    */
-  void switchSection(@NonNull DataDivisionSection section) {
-    this.section = section;
+  void notifySectionChanged() {
     closePreviousStructure();
   }
 
@@ -259,7 +249,7 @@ public class VariableDefinitionDelegate {
    */
   @NonNull
   ResultWithErrors<Collection<Variable>> finishDefinitionAnalysis() {
-    switchSection(NOT_INITIALIZED);
+    closePreviousStructure();
     return new ResultWithErrors<>(new ArrayList<>(variables), new ArrayList<>(errors));
   }
 
@@ -342,12 +332,6 @@ public class VariableDefinitionDelegate {
     errors.add(error);
     LOG.debug(
         format("Syntax error defined by %s: %s", getClass().getSimpleName(), error.toString()));
-  }
-
-  private void checkVariableTypeAllowed(VariableDefinitionContext variable) {
-    if (!section.allowsVariableType(variable.getAntlrClass())) {
-      addError(messages.getMessage(DEFINITION_NOT_ALLOWED_IN_SECTION), variable.getDefinition());
-    }
   }
 
   private void checkStartingArea(VariableDefinitionContext variable) {
