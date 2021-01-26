@@ -21,6 +21,13 @@ import lombok.NonNull;
  * This interface represents a reader delegate that may apply some special operations over Strings
  */
 public interface CobolLineReaderDelegate {
+
+  /**
+   * Convert the line and apply any transformations if needed.
+   *
+   * @param line the initial line
+   * @return converting result
+   */
   @NonNull
   String apply(@NonNull String line);
 }

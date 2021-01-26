@@ -38,7 +38,7 @@ class WatcherServiceImplTest {
   void watchConfigurationChange() {
     CobolLanguageClient client = mock(CobolLanguageClient.class);
     ClientProvider provider = new ClientProvider();
-    provider.set(client);
+    provider.setClient(client);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider);
 
@@ -59,7 +59,7 @@ class WatcherServiceImplTest {
   void watchPredefinedFolder() {
     CobolLanguageClient client = mock(CobolLanguageClient.class);
     ClientProvider provider = new ClientProvider();
-    provider.set(client);
+    provider.setClient(client);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider);
 
@@ -73,7 +73,7 @@ class WatcherServiceImplTest {
   void addWatchers() {
     CobolLanguageClient client = mock(CobolLanguageClient.class);
     ClientProvider provider = new ClientProvider();
-    provider.set(client);
+    provider.setClient(client);
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider);
 
@@ -94,7 +94,7 @@ class WatcherServiceImplTest {
   void removeWatchers() {
     CobolLanguageClient client = mock(CobolLanguageClient.class);
     ClientProvider provider = new ClientProvider();
-    provider.set(client);
+    provider.setClient(client);
     ArgumentCaptor<UnregistrationParams> captor = forClass(UnregistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider);
 

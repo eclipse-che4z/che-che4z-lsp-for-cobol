@@ -36,7 +36,7 @@ public class MarblesTest extends NegativeTest {
   }
 
   @Test
-  public void test() {
-    super.test();
+  void testIt() {
+    test();
   }
 }
