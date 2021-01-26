@@ -15,7 +15,11 @@
 
 package com.broadcom.lsp.cobol.core.model.variables;
 
-import java.util.stream.Stream;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * This enum class represents all the supported usage formats. UNDEFINED means that the usage format
@@ -48,6 +52,14 @@ public enum UsageFormat {
   FUNCTION_POINTER,
   UNDEFINED;
 
+  private static final Map<String, UsageFormat> MAP;
+
+  static {
+    MAP =
+        Arrays.stream(values())
+            .collect(toMap(it -> it.toString().replace("_", "-"), Function.identity()));
+  }
+
   /**
    * Determine the usage format by the given text. Return UNDEFINED if the value cannot be found.
    *
@@ -55,9 +67,6 @@ public enum UsageFormat {
    * @return an {@link UsageFormat} instance of required type or UNDEFINED
    */
   public static UsageFormat of(String text) {
-    return Stream.of(values())
-        .filter(it -> it.name().equalsIgnoreCase(text.replace("-", "_")))
-        .findFirst()
-        .orElse(UNDEFINED);
+    return MAP.getOrDefault(text.toUpperCase(), UNDEFINED);
   }
 }
