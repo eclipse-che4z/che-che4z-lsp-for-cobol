@@ -193,7 +193,10 @@ class TestOutlineTree {
                     "ENVIRONMENT DIVISION",
                     NodeType.DIVISION,
                     nested(
-                        node("CONFIGURATION SECTION", NodeType.SECTION),
+                        node(
+                            "CONFIGURATION SECTION",
+                            NodeType.SECTION,
+                            nested(node("TOP-OF-PAGE", NodeType.MNEMONIC_NAME))),
                         node(
                             "INPUT-OUTPUT SECTION",
                             NodeType.SECTION,

@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * This interface describes a COBOL Variable. Variable has a name and a unique definition locality.
  */
-public interface Variable extends Renameable {
+public interface Variable extends Renameable, Conditional {
   /**
    * Get name of the variable
    *
@@ -30,16 +30,6 @@ public interface Variable extends Renameable {
    */
   @NonNull
   String getName();
-
-  /**
-   * Get qualifier of this variable. Contains the variable hierarchy top-down string representation
-   * and this variable name; separated by whitespace. May be not unique on definition, required to
-   * be unique on referencing
-   *
-   * @return string qualifier
-   */
-  @NonNull
-  String getQualifier();
 
   /**
    * Get definition locality for this variable. The definition is unique
@@ -63,4 +53,11 @@ public interface Variable extends Renameable {
    * @param usage - a {@link Locality} of this variable usage
    */
   void addUsage(@NonNull Locality usage);
+
+  /**
+   * Get the parent of this variable in the hierarchy
+   *
+   * @return parent {@link Variable}
+   */
+  Variable getParent();
 }

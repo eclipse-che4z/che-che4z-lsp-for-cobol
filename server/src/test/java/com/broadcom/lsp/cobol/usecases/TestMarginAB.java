@@ -41,7 +41,7 @@ class TestMarginAB {
           + "000000     RECORD CONTAINS 113 CHARACTERS\n"
           + "000000     DATA RECORD IS BILL-LADING-RECORD.\n"
           + "000000  WORKING-STORAGE SECTION.\n"
-          + "000000  01 TAPARM1.\n"
+          + "000000  01 TAPARM1      PIC 9.\n"
           + "000000  01 TAPARM2      PIC 99 VALUE 2.\n"
           + "000000  01 ATCDEM3      PIC X(7) VALUE 'ATCDEM3'.\n"
           + "000000  01 P1PARM1      PIC 99 VALUE 0.\n"
@@ -74,7 +74,7 @@ class TestMarginAB {
           + "000000  AUTHOR. SERGIU ILIE.\n"
           + "000000 DATA DIVISION.\n"
           + "000000  WORKING-STORAGE SECTION.\n"
-          + "000000  01 TAPARM1.\n"
+          + "000000  01 TAPARM1      PIC 9.\n"
           + "000000  01 TAPARM2      PIC 99 VALUE 2.\n"
           + "000000  01 ATCDEM3      PIC X(7) VALUE 'ATCDEM3'.\n"
           + "000000  01 P1PARM1      PIC 99 VALUE 0.\n"
@@ -131,6 +131,7 @@ class TestMarginAB {
           + "000000         10 STATE    PIC X(2).\n"
           + "000000         10 CITY     PIC X(3).\n"
           + "000000     05 OP-SYS     PIC X(3).\n"
+          + "000000       88 READY-TRACE VALUE 0.\n"
           + "000000 PROCEDURE DIVISION.\n"
           + "000000 DECLARATIVES. MAMA\n" // after DECLARATIVES keyword no other token is allowed
           + "000000 COBOL-DEBUG SECTION.\n"
@@ -176,6 +177,6 @@ class TestMarginAB {
     assertEquals(3, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
     assertEquals(
         "The following token cannot be on the same line as a DECLARATIVE token: MAMA",
-        result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).get(1).getMessage());
+        result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).get(0).getMessage());
   }
 }

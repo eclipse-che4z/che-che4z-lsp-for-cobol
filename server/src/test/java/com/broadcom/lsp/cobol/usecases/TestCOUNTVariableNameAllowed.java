@@ -29,7 +29,7 @@ class TestCOUNTVariableNameAllowed {
           + "        PROGRAM-ID. TEST1.\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
-          + "        01 {$*COUNT}.\n" // COUNT variable name allowed
+          + "        01 {$*COUNT} PIC 9.\n" // COUNT variable name allowed
           + "        PROCEDURE DIVISION.\n"
           + "        {#*COUNT}.\n" // COUNT paragraphName allowed
           + "        END PROGRAM TEST1.";

@@ -338,6 +338,8 @@ PLUSCHAR : '+';
 SINGLEQUOTE : '\'';
 SLASHCHAR : '/';
 SQLLINECOMMENTCHAR: '--';
+PIPECHAR : '||';
+SELECT_ALL : '.*';
 
 // literals
 SINGLEDIGITLITERAL : DIGIT {sqlFlag}? ;
@@ -349,7 +351,7 @@ NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT | COMMACHAR) DIGIT+ (('e' |
 NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
 
 IDENTIFIER : [a-zA-Z0-9#@$]+ ([-_]+ [a-zA-Z0-9#@$]+)*;
-FILENAME : [a-zA-Z0-9]+ '.' [a-zA-Z0-9]+;
+FILENAME : [_a-zA-Z0-9]+ '.' [_a-zA-Z0-9]+;
 
 OCTDIGITS : OCT_DIGIT {sqlFlag}? ;
 HEX_NUMBERS : HEXNUMBER {sqlFlag}? ;
@@ -386,6 +388,7 @@ COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
 WS : [ \t\f;]+ -> channel(HIDDEN);
 TEXT : ~('\n' | '\r');
 SEPARATOR : ', ' {!sqlFlag}? -> channel(HIDDEN);
+SEMICOLON_FS : ';' ('\r' | '\n' | '\f' | '\t' | ' ')+ | ';' EOF;
 
 //SQL comments
 SQLLINECOMMENT

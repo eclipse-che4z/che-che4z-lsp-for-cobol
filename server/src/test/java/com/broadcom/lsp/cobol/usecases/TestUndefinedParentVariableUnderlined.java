@@ -16,17 +16,17 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
-import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
+import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /**
  * This test checks that the undefined parent variable underlined while variable call hierarchy
@@ -43,18 +43,22 @@ class TestUndefinedParentVariableUnderlined {
           + "6              10 {$*MAMA} PIC 99 VALUE 3.\r\n"
           + "7       PROCEDURE DIVISION.\r\n"
           + "8       {#*PROCB}.\r\n"
-          + "9           MOVE 10 TO {$MAMA} OF {_{$AGE} OF {$BORROWE|2}|1_}.\r\n"
+          + "9           MOVE 10 TO {MAMA|1} OF AGE OF BORROWE.\r\n"
           + "10      END PROGRAM TEST1.";
 
-  private static final String MESSAGE = "Invalid definition for: ";
-  private static final String BORROWE = "BORROWE";
-  private static final String AGE = "AGE OF BORROWE";
+  private static final String MESSAGE = "Invalid definition for: MAMA";
 
   @Test
   void assertCopybookProcessingModeNotChangesLogic() {
     Assertions.assertEquals(
-        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, List.of(), List.of(), CopybookProcessingMode.ENABLED),
-        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, List.of(), List.of(), CopybookProcessingMode.DISABLED));
+        UseCaseUtils.analyze(
+            UseCaseUtils.DOCUMENT_URI, TEXT, List.of(), List.of(), CopybookProcessingMode.ENABLED),
+        UseCaseUtils.analyze(
+            UseCaseUtils.DOCUMENT_URI,
+            TEXT,
+            List.of(),
+            List.of(),
+            CopybookProcessingMode.DISABLED));
   }
 
   @Test
@@ -62,10 +66,6 @@ class TestUndefinedParentVariableUnderlined {
     UseCaseEngine.runTest(
         TEXT,
         List.of(),
-        Map.of(
-            "1",
-            new Diagnostic(null, MESSAGE + AGE, Information, SourceInfoLevels.INFO.getText()),
-            "2",
-            new Diagnostic(null, MESSAGE + BORROWE, Information, SourceInfoLevels.INFO.getText())));
+        Map.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

@@ -37,7 +37,7 @@ class TestReplacingWithDifferentPatternsShowsError {
           + "       PROGRAM-ID. TESTREPL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01  {$*PARENT}.\n"
+          + "       01  {$*PARENT} PIC 9.\n"
           + "       {COPY|1} REPL REPLACING ==TAG== BY DEF. \n"
           + "       PROCEDURE DIVISION.\n"
           + "       MAINLINE.\n"

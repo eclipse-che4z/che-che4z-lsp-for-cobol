@@ -145,7 +145,9 @@ specialNamesParagraph
    ;
 
 specialNameClause
-   : channelClause | odtClause | alphabetClause | classClause | currencySignClause | decimalPointClause | symbolicCharactersClause | environmentSwitchNameClause | defaultDisplaySignClause | defaultComputationalSignClause | reserveNetworkClause
+   : channelClause | odtClause | alphabetClause | classClause | currencySignClause
+   | decimalPointClause | symbolicCharactersClause | environmentSwitchNameClause
+   | defaultDisplaySignClause | defaultComputationalSignClause | reserveNetworkClause
    ;
 
 alphabetClause
@@ -639,11 +641,11 @@ dataRedefinesClause
    ;
 
 dataRenamesClause
-   : RENAMES qualifiedDataName thruDataName?
+   : RENAMES dataName thruDataName?
    ;
 
 thruDataName
-   : (THROUGH | THRU) qualifiedDataName
+   : (THROUGH | THRU) dataName
    ;
 
 dataSignClause
@@ -667,7 +669,34 @@ dataTypeDefClause
    ;
 
 dataUsageClause
-   : (USAGE IS?)? (BINARY (TRUNCATED | EXTENDED)? | BIT | COMP | COMP_1 | COMP_2 | COMP_3 | COMP_4 | COMP_5 | COMPUTATIONAL | COMPUTATIONAL_1 | COMPUTATIONAL_2 | COMPUTATIONAL_3 | COMPUTATIONAL_4 | COMPUTATIONAL_5 | CONTROL_POINT | DATE | DISPLAY | DISPLAY_1 | DOUBLE | EVENT | FUNCTION_POINTER | INDEX | KANJI | LOCK | NATIONAL | PACKED_DECIMAL | POINTER | PROCEDURE_POINTER | REAL | SQL | TASK)
+   : (USAGE IS?)? usageFormat
+   ;
+
+usageFormat
+   : BINARY NATIVE?
+   | COMP NATIVE?
+   | COMP_1 NATIVE?
+   | COMP_2 NATIVE?
+   | COMP_3 NATIVE?
+   | COMP_4 NATIVE?
+   | COMP_5 NATIVE?
+   | COMPUTATIONAL NATIVE?
+   | COMPUTATIONAL_1 NATIVE?
+   | COMPUTATIONAL_2 NATIVE?
+   | COMPUTATIONAL_3 NATIVE?
+   | COMPUTATIONAL_4 NATIVE?
+   | COMPUTATIONAL_5 NATIVE?
+   | DISPLAY NATIVE?
+   | DISPLAY_1 NATIVE?
+   | INDEX
+   | NATIONAL NATIVE?
+   | UTF_8 NATIVE?
+   | OBJECT REFERENCE cobolWord?
+   | PACKED_DECIMAL NATIVE?
+   | POINTER
+   | POINTER_32
+   | PROCEDURE_POINTER
+   | FUNCTION_POINTER
    ;
 
 dataUsingClause

@@ -38,7 +38,7 @@ class TestAccept {
           + "        01 {$*SCREENSIZE_WK}.\r\n"
           + "           05 {$*SCREENSIZE_WK1} PIC S9(4) COMP.\r\n"
           + "           05 {$*SCREENSIZE_WK2} PIC S9(4) COMP.\r\n"
-          + "        01 {$*STATS} PIC S9(4) COMP.\r\n"
+          + "        01 {$*STATS1} PIC S9(4) COMP.\r\n"
           + "        PROCEDURE DIVISION. \r\n";
 
   private static final String ACCEPT_IDMS_DC_LTERM = "            ACCEPT LTERM ID INTO {$LTERMID}.\r\n";

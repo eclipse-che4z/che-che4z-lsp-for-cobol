@@ -16,8 +16,8 @@ package com.broadcom.lsp.cobol.core.engine;
 
 import com.broadcom.lsp.cobol.core.CobolLexer;
 import com.broadcom.lsp.cobol.core.CobolParser;
-import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import com.broadcom.lsp.cobol.core.annotation.CheckThreadInterruption;
+import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.ExtendedDocument;
 import com.broadcom.lsp.cobol.core.model.Locality;
@@ -118,15 +118,20 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
 
     CobolVisitor visitor =
         new CobolVisitor(
-            documentUri, extendedDocument.getCopybooks(), tokens, positionMapping, messageService, subroutineService);
+            documentUri,
+            extendedDocument.getCopybooks(),
+            tokens,
+            positionMapping,
+            messageService,
+            subroutineService);
     visitor.visit(tree);
 
+    SemanticContext context = visitor.finishAnalysis().unwrap(accumulatedErrors::addAll);
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
-    accumulatedErrors.addAll(visitor.getErrors());
     accumulatedErrors.addAll(
         collectErrorsForCopybooks(accumulatedErrors, extendedDocument.getCopyStatements()));
 
-    return new ResultWithErrors<>(visitor.getSemanticContext(), accumulatedErrors);
+    return new ResultWithErrors<>(context, accumulatedErrors);
   }
 
   @CheckThreadInterruption

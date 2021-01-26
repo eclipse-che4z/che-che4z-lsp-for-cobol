@@ -36,7 +36,7 @@ class TestMissingCopybookNotInVariableList {
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*PARENT}. COPY {~CPYNAME|missing}.\n"
+          + "       01 {$*PARENT|nopic}. COPY {~CPYNAME|missing}.\n"
           + "       PROCEDURE DIVISION.\n";
 
   @Test
@@ -47,6 +47,16 @@ class TestMissingCopybookNotInVariableList {
         Map.of(
             "missing",
             new Diagnostic(
-                null, "CPYNAME: Copybook not found", Error, SourceInfoLevels.ERROR.getText(), "MISSING_COPYBOOK")));
+                null,
+                "CPYNAME: Copybook not found",
+                Error,
+                SourceInfoLevels.ERROR.getText(),
+                "MISSING_COPYBOOK"),
+            "nopic",
+            new Diagnostic(
+                null,
+                "A \"PICTURE\" clause was not found for elementary item PARENT",
+                Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

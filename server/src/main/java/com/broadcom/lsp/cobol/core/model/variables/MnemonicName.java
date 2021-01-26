@@ -17,7 +17,10 @@ package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.Value;
+
+import java.util.List;
 
 /**
  * This value class represents a special name. They may substitute environment names in the
@@ -25,9 +28,25 @@ import lombok.Value;
  * statements.
  */
 @Value
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class SpecialName extends AbstractVariable {
-  public SpecialName(String name, String qualifier, Locality definition) {
-    super(name, qualifier, definition);
+public class MnemonicName extends AbstractVariable {
+  public MnemonicName(String name, Locality definition) {
+    super(name, definition, null);
+  }
+
+  @Override
+  public boolean isConditional() {
+    return false;
+  }
+
+  @Override
+  public void addConditionName(ConditionDataName variable) {
+    throw new UnsupportedOperationException("This variable is not conditional");
+  }
+
+  @Override
+  public List<ConditionDataName> getConditionNames() {
+    return List.of();
   }
 }
