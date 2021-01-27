@@ -47,6 +47,12 @@ public class UseCaseUtils {
   private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.c4z/.copybooks/";
   private static final String CPY_URI_SUFFIX = ".cpy";
 
+  /**
+   * Construct the file URI from provided file name
+   *
+   * @param name the copybook name without extension
+   * @return the URI
+   */
   public static String toURI(String name) {
     return CPY_URI_PREFIX + name + CPY_URI_SUFFIX;
   }
@@ -161,6 +167,12 @@ public class UseCaseUtils {
         .analyze(fileName, text, copybookProcessingMode);
   }
 
+  /**
+   * Convert CobolText into CopybookModel.
+   *
+   * @param cobolText the CobolText instance
+   * @return the CopybookModel instance
+   */
   public static CopybookModel toCopybookModel(CobolText cobolText) {
     return new CopybookModel(
         cobolText.getFileName(), toURI(cobolText.getFileName()), cobolText.getFullText());

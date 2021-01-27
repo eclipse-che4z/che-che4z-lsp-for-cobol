@@ -27,6 +27,14 @@ import static java.util.stream.Collectors.groupingBy;
  */
 @UtilityClass
 public class VariableUsageUtils {
+
+  /**
+   * Convert given defined variables into map, convenient for later search in findVariables function.
+   * The defined variables can be converted once and used for all subsequent searches.
+   *
+   * @param definedVariables the collection with defined variables
+   * @return the converted representation
+   */
   public static Map<String, List<Variable>> convertDefinedVariables(Collection<Variable> definedVariables) {
     return definedVariables.stream().collect(groupingBy(Variable::getName));
   }

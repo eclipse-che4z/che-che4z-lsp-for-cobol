@@ -43,6 +43,7 @@ public class ReplacingServiceImpl implements ReplacingService {
   private static final String ERROR_REPLACING = "Error replacing on text: %s with the pattern: %s";
 
   @NonNull
+  @Override
   public String applyReplacing(
       @NonNull String text, @NonNull List<Pair<String, String>> replacePatterns) {
     return replacePatterns.stream().reduce(text, this::replace, (str1, str2) -> str2);

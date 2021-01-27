@@ -24,7 +24,7 @@ import lombok.NonNull;
 public class ClientProvider implements Provider<CobolLanguageClient> {
   private CobolLanguageClient client;
 
-  public void set(@NonNull CobolLanguageClient client) {
+  public void setClient(@NonNull CobolLanguageClient client) {
     this.client = client;
   }
 

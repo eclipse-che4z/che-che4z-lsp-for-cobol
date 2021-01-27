@@ -98,10 +98,22 @@ public class CobolLineUtils {
     return contentArea.length() > 4 ? contentArea.substring(4) : "";
   }
 
+  /**
+   * Count empty lines in the text.
+   *
+   * @param txt multiline text
+   * @return the number of empty lines
+   */
   public long getEmptyLinesCount(@NonNull String txt) {
     return txt.lines().filter(String::isBlank).count();
   }
 
+  /**
+   * Count non empty lines in the text.
+   *
+   * @param txt multiline text
+   * @return the number of empty lines
+   */
   public long getNonEmptyLinesCount(@NonNull String txt) {
     return txt.lines().filter(Predicate.not(String::isEmpty)).count();
   }

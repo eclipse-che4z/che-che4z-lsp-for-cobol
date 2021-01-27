@@ -48,7 +48,7 @@ public class Chetest2Test extends NegativeTest {
   }
 
   @Test
-  public void test() {
-    super.test();
+  void testIt() {
+    test();
   }
 }

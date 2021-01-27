@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * Mock implementation of language client. Only for testing purposes. Collects the received messages
@@ -67,38 +66,9 @@ public class TestLanguageClient implements CobolLanguageClient {
     messagesToLog.add(message);
   }
 
-  /** Return the received telemetry objects */
-  public List<Object> getReceivedTelemetry() {
-    return receivedTelemetry;
-  }
-
-  /** Return the received diagnostic messages */
-  public List<PublishDiagnosticsParams> getReceivedDiagnostics() {
-    return receivedDiagnostics;
-  }
-
-  /** Return the extracted diagnostic messages */
-  public List<Diagnostic> getDiagnostics() {
-    return receivedDiagnostics.get(0).getDiagnostics().stream()
-        .filter(item -> item.getSeverity().getValue() == 1)
-        .collect(Collectors.toList());
-  }
-
-  /** Return the received messages to be shown */
-  public List<MessageParams> getMessagesToShow() {
-    return messagesToShow;
-  }
-
-  /** Return the received messages to be logged */
-  public List<MessageParams> getMessagesToLog() {
-    return messagesToLog;
-  }
-
-  /** Set the iterator of messages that should be send as a respond in the given order */
-  public void setResponseIterator(Iterator<MessageActionItem> responseIterator) {
-    this.responseIterator = responseIterator;
-  }
-
+  /**
+   * Clean the client state.
+   */
   public void clean() {
     receivedTelemetry.clear();
     receivedDiagnostics.clear();
