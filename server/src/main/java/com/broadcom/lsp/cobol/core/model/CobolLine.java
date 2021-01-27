@@ -17,6 +17,10 @@ package com.broadcom.lsp.cobol.core.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+
 /**
  * This class represents a structure for a COBOL code line that is used for parsing. The format is
  * 'fixed', standard ANSI / IBM reference. Each line 80 chars.<br>
@@ -29,7 +33,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class CobolLine {
+public class CobolLine implements Iterable<CobolLine> {
   private String commentArea = "";
   private String contentAreaA = "";
   private String contentAreaB = "";
@@ -83,5 +87,36 @@ public class CobolLine {
   @Override
   public String toString() {
     return sequenceArea + indicatorArea + contentAreaA + contentAreaB + commentArea;
+  }
+
+  @Override
+  public Iterator<CobolLine> iterator() {
+    return new CobolLineIterator(this);
+  }
+
+  private static class CobolLineIterator implements Iterator<CobolLine> {
+    private CobolLine nxtItr;
+
+    CobolLineIterator(CobolLine cobolLine) {
+      nxtItr = cobolLine;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return Objects.nonNull(nxtItr);
+    }
+
+    @Override
+    public CobolLine next() {
+      if (Objects.isNull(nxtItr)) throw new NoSuchElementException();
+      CobolLine next = nxtItr;
+      nxtItr = nxtItr.getSuccessor();
+      return next;
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException("Remove() non Supported for CobolLine.");
+    }
   }
 }
