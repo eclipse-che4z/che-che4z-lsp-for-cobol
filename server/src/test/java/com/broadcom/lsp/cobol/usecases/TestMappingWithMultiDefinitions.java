@@ -73,11 +73,11 @@ class TestMappingWithMultiDefinitions {
 
   private static final String PARS =
       "       {#*PAR1}.\r\n"
-          + "           IF {$CHILD1} EQUAL TO 1\r\n"
+          + "           IF {$CHILD1} OF {$PARENT} EQUAL TO 1\r\n"
           + "           THEN\r\n"
-          + "               MOVE 10 TO {$CHILD2}\r\n"
+          + "               MOVE 10 TO {$CHILD2} OF {$PARENT}\r\n"
           + "           ELSE\r\n"
-          + "               MOVE 11 TO {$CHILD2}\r\n"
+          + "               MOVE 11 TO {$CHILD2} OF {$PARENT}\r\n"
           + "           END-IF.\r\n";
 
   private static final String STRUC_NAME = "STRUC";

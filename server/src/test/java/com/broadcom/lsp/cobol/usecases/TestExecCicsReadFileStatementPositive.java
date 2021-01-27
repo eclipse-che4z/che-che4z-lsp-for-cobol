@@ -42,7 +42,7 @@ class TestExecCicsReadFileStatementPositive {
           + "               20  {$*RCODE}           PIC 9(9)  COMP.\n"
           + "               20  {$*KEYNUM}           PIC 9(9)  COMP.\n"
           + "       01  {$*FILEA}.\n"
-          + "           05  {$*COMM-AREA}           PIC 9(9)  COMP.\n"
+          + "           05  {$*COMM-AREA}.\n"
           + "             10 {$*NUMB}           PIC 9(9)  COMP.\n"
           + "               20  {$*FILEA-TEMP}           PIC 9(9)  COMP.\n"
           + "               20  {$*LOGA}           PIC 9(9)  COMP.\n"

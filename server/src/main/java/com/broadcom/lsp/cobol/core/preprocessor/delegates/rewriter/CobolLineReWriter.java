@@ -24,5 +24,11 @@ import java.util.List;
  */
 public interface CobolLineReWriter {
 
+  /**
+   * Apply some changes on each line.
+   *
+   * @param lines cobol lines
+   * @return the same amount of lines
+   */
   List<CobolLine> processLines(List<CobolLine> lines);
 }

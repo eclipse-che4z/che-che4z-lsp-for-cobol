@@ -32,7 +32,7 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*SQLCA}.\n"
+          + "       01 {$*SQLCA} PIC X(10).\n"
           + "       EXEC  {INCLUDE|1} STRUCT1 END-EXEC.";
 
   @Test

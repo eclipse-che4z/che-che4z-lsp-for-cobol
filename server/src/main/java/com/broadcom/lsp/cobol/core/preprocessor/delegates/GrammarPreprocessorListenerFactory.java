@@ -15,6 +15,7 @@
 
 package com.broadcom.lsp.cobol.core.preprocessor.delegates;
 
+import com.broadcom.lsp.cobol.core.CobolPreprocessorLexer;
 import com.broadcom.lsp.cobol.core.model.CopybookUsage;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import org.antlr.v4.runtime.BufferedTokenStream;

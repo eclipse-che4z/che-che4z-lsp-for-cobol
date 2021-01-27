@@ -32,7 +32,7 @@ class TestCopybookNotProcessedInExtendedSource {
           + "        PROGRAM-ID. TEST1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
-          + "        01 {$*PARENT}.\r\n"
+          + "        01 {$*PARENT} PIC 9.\r\n"
           + "        COPY CPB.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
           + "        {#*PROCB}.\r\n"

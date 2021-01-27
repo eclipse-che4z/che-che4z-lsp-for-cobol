@@ -36,7 +36,7 @@ class TestCpyNameWithSpecialChar {
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
           + "        01 {$*VAR1}.\r\n"
-          + "          02 {$*VAR2}.\r\n"
+          + "          02 {$*VAR2} PIC 9.\r\n"
           + "        COPY {~@SPE#-$|1}.\r\n"
           + "        PROCEDURE DIVISION.\r\n";
 

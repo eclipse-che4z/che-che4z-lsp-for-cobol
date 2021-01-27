@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * This test checks that parser collect variable usages in call statement correctly.
  */
-public class TestCallVariableUsages {
+class TestCallVariableUsages {
   private static final String TEXT =
       "       Identification Division.\n"
           + "       Program-id. HELLO-WORLD.\n"

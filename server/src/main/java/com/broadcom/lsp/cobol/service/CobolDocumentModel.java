@@ -49,7 +49,7 @@ public class CobolDocumentModel {
     parse(text);
   }
 
-  public Line getLine(int number) {
+  Line getLine(int number) {
     return lines.stream().filter(line -> line.getNumber() == number).findFirst().orElse(null);
   }
 
@@ -57,7 +57,7 @@ public class CobolDocumentModel {
    * Return a word at the specified position or an empty string.
    *
    * @param position - the position object containing line and char number.
-   * @return
+   * @return the word at the specified position.
    */
   public String getTokenBeforePosition(Position position) {
     Line route = getLine(position.getLine());
@@ -67,7 +67,7 @@ public class CobolDocumentModel {
     return retrieveTokenBeginning(position, route);
   }
 
-  public String getFullTokenAtPosition(Position position) {
+  String getFullTokenAtPosition(Position position) {
     Line route = getLine(position.getLine());
     if (route == null) {
       return "";

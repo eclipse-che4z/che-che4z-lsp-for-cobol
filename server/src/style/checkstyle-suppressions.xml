@@ -42,4 +42,17 @@
     <suppress checks="MissingJavadocType" files="DatabusTestConstants.java"/>
     <suppress checks="MissingJavadocType" files="CopybookEventsTest.java"/>
     <suppress checks="MissingJavadocType" files="DatabusBrokerTest.java"/>
+    <suppress checks="MissingJavadocMethod" files="Communications.java"/>
+    <suppress checks="MissingJavadocMethod" files="Formation.java"/>
+    <suppress checks="MissingJavadocMethod" files="Formations.java"/>
+    <suppress checks="MissingJavadocMethod" files="TextPreprocessor.java"/>
+    <suppress checks="MissingJavadocMethod" files="DataBusBroker.java"/>
+    <suppress checks="MissingJavadocMethod" files="UnknownEventSubscriber.java"/>
+    <suppress checks="MissingJavadocMethod" files="AnalysisFinishedEventSubscriber.java"/>
+    <suppress checks="MissingJavadocMethod" files="DeadEventSubscriber.java"/>
+    <suppress checks="MissingJavadocMethod" files="RunAnalysisEventSubscriber.java"/>
+    <suppress checks="MissingJavadocMethod" files="CopybookSubscriber.java"/>
+    <suppress checks="MissingJavadocMethod" files="EventObserver.java"/>
+    <suppress checks="MissingJavadocMethod" files="CopybookEventFactory.java"/>
+
 </suppressions>

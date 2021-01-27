@@ -29,7 +29,7 @@ class TextJniEnvSpecialRegister {
           + "       Program-id.    ProgramId.\n"
           + "       Data Division.\n"
           + "       Working-Storage Section.\n"
-          + "       01   {$*JNIEnv}. \n"
+          + "       01   {$*JNIEnv} PIC 9. \n"
           + "       Procedure Division.\n"
           + "       {#*000-Main-Logic}.\n"
           + "            Set address of {$JNIEnv} to {&JNIEnvPtr}.\n"
