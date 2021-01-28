@@ -168,7 +168,7 @@ public class OutlineTreeBuilder {
       Range range = copybook.getValue().getRange();
       DocumentSymbol outlineNode =
           new DocumentSymbol(
-              "COPY " + name, NodeType.COPYBOOK.getSymbolKind(), range, range, "", List.of());
+              "COPY " + name, NodeType.COPYBOOK.getSymbolKind(), range, range, "", Collections.emptyList());
       addOutlineNodeToTree(rootNodes, outlineNode);
     }
     return rootNodes;
@@ -190,12 +190,14 @@ public class OutlineTreeBuilder {
   }
 
   private void addOutlineNodeToTree(List<DocumentSymbol> outlineNodes, DocumentSymbol outlineNode) {
-    outlineNodes.stream()
+    Optional<DocumentSymbol> document = outlineNodes.stream()
         .filter(it -> RangeUtils.isInsideRange(it, outlineNode))
-        .findFirst()
-        .ifPresentOrElse(
-            it -> addOutlineNodeToTree(it.getChildren(), outlineNode),
-            () -> outlineNodes.add(outlineNode));
+        .findFirst();
+    if (document.isPresent()) {
+      addOutlineNodeToTree(document.get().getChildren(), outlineNode);
+    } else {
+      outlineNodes.add(outlineNode);
+    }
   }
 
   private Optional<DocumentSymbol> constructNode(

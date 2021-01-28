@@ -16,6 +16,7 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
+import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
@@ -52,6 +53,6 @@ public class RenameItem extends StructuredVariable {
 
   @Override
   public List<ConditionDataName> getConditionNames() {
-    return List.of();
+    return ImmutableList.of();
   }
 }

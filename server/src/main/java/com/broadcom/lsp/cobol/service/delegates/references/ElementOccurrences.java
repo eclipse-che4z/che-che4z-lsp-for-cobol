@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,13 +62,17 @@ public class ElementOccurrences implements Occurrences {
 
     private static Element findElementByPosition(CobolDocumentModel document, TextDocumentPositionParams position) {
         AnalysisResult result = document.getAnalysisResult();
-        return findElementByPosition(result.getVariableDefinitions(), result.getVariableUsages(), position)
-                .or(() -> findElementByPosition(result.getParagraphDefinitions(), result.getParagraphUsages(), position))
-                .or(() -> findElementByPosition(result.getSectionDefinitions(), result.getSectionUsages(), position))
-                .or(() -> findElementByPosition(result.getConstantDefinitions(), result.getConstantUsages(), position))
-                .or(() -> findElementByPosition(result.getCopybookDefinitions(), result.getCopybookUsages(), position))
-                .or(() -> findElementByPosition(result.getSubroutineDefinitions(), result.getSubroutineUsages(), position))
-                .orElseGet(() -> new Element(List.of(), List.of()));
+        return Stream.<Supplier<Optional<Element>>>of(
+            () -> findElementByPosition(result.getVariableDefinitions(), result.getVariableUsages(), position),
+            () -> findElementByPosition(result.getParagraphDefinitions(), result.getParagraphUsages(), position),
+            () -> findElementByPosition(result.getSectionDefinitions(), result.getSectionUsages(), position),
+            () -> findElementByPosition(result.getConstantDefinitions(), result.getConstantUsages(), position),
+            () -> findElementByPosition(result.getCopybookDefinitions(), result.getCopybookUsages(), position),
+            () -> findElementByPosition(result.getSubroutineDefinitions(), result.getSubroutineUsages(), position))
+            .map(Supplier::get)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst().orElse(new Element(Collections.emptyList(), Collections.emptyList()));
     }
 
     @Value
@@ -84,7 +89,9 @@ public class ElementOccurrences implements Occurrences {
                 .filter(entry -> entry.getValue().stream().anyMatch(location -> isInside(position, location)))
                 .findFirst()
                 .map(Map.Entry::getKey)
-                .map(name -> new Element(definitions.getOrDefault(name, List.of()), usages.getOrDefault(name, List.of())));
+                .map(name -> new Element(
+                    definitions.getOrDefault(name, Collections.emptyList()),
+                    usages.getOrDefault(name, Collections.emptyList())));
     }
 
     static boolean isInside(TextDocumentPositionParams position, Location location) {

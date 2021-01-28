@@ -21,6 +21,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -48,7 +49,12 @@ public class WorkspaceFileService implements FileSystemService {
   @NonNull
   @Override
   public String decodeURI(@NonNull String uri) {
-    return URLDecoder.decode(uri, StandardCharsets.UTF_8);
+    try {
+      return URLDecoder.decode(uri, StandardCharsets.UTF_8.toString());
+    } catch (UnsupportedEncodingException e) {
+      LOG.error("Can't decode URI", e);
+      throw new RuntimeException("UTF-8 charset is unsupported", e);
+    }
   }
 
   @Nullable

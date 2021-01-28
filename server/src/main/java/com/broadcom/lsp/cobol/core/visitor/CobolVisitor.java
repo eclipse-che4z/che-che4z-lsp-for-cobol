@@ -53,7 +53,6 @@ import static com.broadcom.lsp.cobol.core.CobolParser.*;
 import static com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames.*;
 import static com.broadcom.lsp.cobol.core.visitor.VariableDefinitionDelegate.*;
 import static java.util.Optional.ofNullable;
-import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -136,7 +135,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
       Collection<Variable> definedVariables) {
     Multimap<String, Location> definitions = HashMultimap.create();
     definedVariables.stream()
-        .filter(not(it -> FILLER_NAME.equals(it.getName())))
+        .filter(it -> !FILLER_NAME.equals(it.getName()))
         .forEach(it -> definitions.put(it.getName(), it.getDefinition().toLocation()));
     return definitions.asMap();
   }
@@ -505,10 +504,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
     if (ctx.literal() != null) {
       String subroutineName =
           PreprocessorStringUtils.trimQuotes(ctx.literal().getText()).toUpperCase();
-      var locality = getLocality(ctx.literal().getStart());
+      Optional<Locality> locality = getLocality(ctx.literal().getStart());
       locality.ifPresent(
           it -> {
-            if (subroutineService.getUri(subroutineName).isEmpty()) {
+            if (!subroutineService.getUri(subroutineName).isPresent()) {
               reportSubroutineNotDefined(subroutineName, it);
             }
           });
@@ -645,7 +644,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
 
   private static Collection<Location> getSubroutineLocation(
       ImmutablePair<String, Optional<String>> subroutinePair) {
-    return List.of(
+    return Collections.singletonList(
         new Location(subroutinePair.getValue().get(), new Range(new Position(), new Position())));
   }
 }
