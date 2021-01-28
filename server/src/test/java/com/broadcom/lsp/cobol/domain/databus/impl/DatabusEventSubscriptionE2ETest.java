@@ -18,11 +18,11 @@ package com.broadcom.lsp.cobol.domain.databus.impl;
 import com.broadcom.lsp.cobol.domain.event.model.DataEvent;
 import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeoutException;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -78,7 +78,7 @@ class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
        3. The observerCallback() is never triggered because it was registered for theEvent but on the bus there is anotherDifferentEvent
        4. The waiter will throws a Timeout exception because it wasn't resumed by the observer.
     */
-    Assertions.assertThrows(
+    assertThrows(
         TimeoutException.class,
         () -> {
           databusSubscriptionForNegativeScenario(
@@ -88,11 +88,11 @@ class DatabusEventSubscriptionE2ETest extends DatabusConfigProvider {
 
   @Test
   void databusUnsubscriptionPositiveTest() {
-    Assertions.assertThrows(
+    assertThrows(
         TimeoutException.class,
-        () -> {
-          databusUnsubscribeForPositiveScenario(DataEventType.RUN_ANALYSIS_EVENT);
-          databusUnsubscribeForPositiveScenario(DataEventType.UNKNOWN_EVENT);
-        });
+        () -> databusUnsubscribeForPositiveScenario(DataEventType.RUN_ANALYSIS_EVENT));
+    assertThrows(
+        TimeoutException.class,
+        () -> databusUnsubscribeForPositiveScenario(DataEventType.UNKNOWN_EVENT));
   }
 }

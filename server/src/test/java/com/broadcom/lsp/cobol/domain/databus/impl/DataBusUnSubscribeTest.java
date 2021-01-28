@@ -20,13 +20,14 @@ import com.broadcom.lsp.cobol.domain.event.model.DataEventType;
 import com.broadcom.lsp.cobol.domain.event.model.RunAnalysisEvent;
 import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeoutException;
 
 import static com.broadcom.lsp.cobol.domain.databus.impl.DatabusTestConstants.WAITER_DELAY;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This test verifies that the object that was unsubscribed from the databus doesn't receive
@@ -49,13 +50,17 @@ class DataBusUnSubscribeTest extends DatabusConfigProvider {
 
   @Test
   void subscribe() {
-    Assertions.assertThrows(
+    Object subscriber = databus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
+    // Subscribe
+    databus.postData(new RunAnalysisEvent());
+    try {
+      waiter.await(WAITER_DELAY);
+    } catch (TimeoutException | InterruptedException e) {
+      fail(e);
+    }
+    assertThrows(
         TimeoutException.class,
         () -> {
-          // Subscribe
-          Object subscriber = databus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
-          databus.postData(new RunAnalysisEvent());
-          waiter.await(WAITER_DELAY);
           // Unsubscribe
           databus.unSubscribe(subscriber);
           databus.postData(new RunAnalysisEvent());
