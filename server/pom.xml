@@ -55,16 +55,6 @@
         <slf4j.api.version>1.7.25</slf4j.api.version>
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
     </properties>
-
-    <profiles>
-        <profile>
-            <id>skip.nist.tests</id>
-            <properties>
-                <exclude.tests>**/com/broadcom/lsp/cobol/*.java</exclude.tests>
-            </properties>
-        </profile>
-    </profiles>
-
     <dependencies>
         <dependency>
             <groupId>org.antlr</groupId>
