@@ -15,7 +15,6 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -33,21 +32,19 @@ class TestCobolStringWithContinuationLineConcatenatedCorrectly {
           + "000301 AUTHOR.       A PROGRAMMER.\n"
           + "000000 DATA DIVISION.\n"
           + "000000 WORKING-STORAGE SECTION.\n"
-          + "000000  01 {$*ID1}.\n"
-          + "000000  01 {$*ID2}.\n"
+          + "000000  01 {$*ID1} PIC 9(9).\n"
+          + "000000  01 {$*ID2} PIC 9(9).\n"
           + "000400 PROCEDURE DIVISION.\n"
           + "078070 {#*000-MAIN}.\n"
           + "078076     EVALUATE TRUE\n"
           + "078081         WHEN {$ID1}\n"
-          + "078089                 MOVE 'PRESS \"CLEAR\" OR \"ENTER\" TO RETURN TO THE M\n"
+          + "078089                 MOVE 'PRESS CLEAR OR ENTER TO RETURN TO THE M\n"
           + "078089-                     'ENU WHEN FINISHED' TO {$ID2}\n"
           + "078091                 PERFORM {#PROGRAM2}\n"
           + "000000     END-EVALUATE.\n"
           + "000000 {#*PROGRAM2}.\n"
-          + "000000  DISPLAY 'HELLO'.";
+          + "        END PROGRAM TEST1.";
 
-  @Disabled("Continuation line cause a semantic error #414")
-  // TODO: #414
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, List.of(), Map.of());

@@ -15,6 +15,7 @@
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.transformer;
 
 import com.broadcom.lsp.cobol.core.model.CobolLine;
+import com.broadcom.lsp.cobol.core.model.ProcessedCobolLines;
 import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
 
 import java.util.List;
@@ -32,5 +33,6 @@ public interface CobolLinesTransformation {
    * @param lines document lines for transformation
    * @return the transformation result
    */
-  ResultWithErrors<List<CobolLine>> transformLines(String documentURI, List<CobolLine> lines);
+  ResultWithErrors<ProcessedCobolLines> transformLines(
+      String documentURI, List<CobolLine> lines);
 }

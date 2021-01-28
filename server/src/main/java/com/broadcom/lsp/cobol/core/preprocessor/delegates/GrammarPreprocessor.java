@@ -14,12 +14,14 @@
  */
 package com.broadcom.lsp.cobol.core.preprocessor.delegates;
 
+import com.broadcom.lsp.cobol.core.model.CobolLine;
 import com.broadcom.lsp.cobol.core.model.CopybookUsage;
 import com.broadcom.lsp.cobol.core.model.ExtendedDocument;
 import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
-
+import com.google.common.collect.Multimap;
 import lombok.NonNull;
+
 import java.util.Deque;
 
 /** This interface represents service to build the extended document */
@@ -33,6 +35,8 @@ public interface GrammarPreprocessor {
    * @param code - COBOL program text to analyse
    * @param copybookStack - stack, representing the hierarchy of nesting copybooks
    * @param copybookProcessingMode - reflects the status of the copybook support (ENABLED|DISABLED)
+   * @param positionCorrectionMap - contains mapping between the modified new line in document as
+   *     per preprocessing to the actual {@link CobolLine} in the document
    * @return extended document with copybooks and related errors
    */
   @NonNull
@@ -40,5 +44,6 @@ public interface GrammarPreprocessor {
       @NonNull String uri,
       @NonNull String code,
       @NonNull Deque<CopybookUsage> copybookStack,
-      @NonNull CopybookProcessingMode copybookProcessingMode);
+      @NonNull CopybookProcessingMode copybookProcessingMode,
+      Multimap<Integer, CobolLine> positionCorrectionMap);
 }

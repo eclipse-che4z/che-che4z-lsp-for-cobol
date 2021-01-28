@@ -16,13 +16,14 @@
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.impl;
 
 import com.broadcom.lsp.cobol.core.model.*;
-import com.broadcom.lsp.cobol.core.model.SyntaxError;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorListenerImpl;
-import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorListenerFactory;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorListenerImpl;
 import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
+import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -64,6 +65,7 @@ class GrammarPreprocessorImplTest {
           .uri(DOCUMENT)
           .range(new Range(new Position(0, 0), new Position(0, 4)))
           .build();
+  private Multimap<Integer, CobolLine> positionCorrectionMap = ArrayListMultimap.create();
 
   @Test
   void testBuildingExtendedDocument() {
@@ -83,7 +85,11 @@ class GrammarPreprocessorImplTest {
             RESULT, copybooks, Map.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping), Map.of());
 
     when(factory.create(
-            eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(PROCESSING_MODE)))
+            eq(DOCUMENT),
+            any(BufferedTokenStream.class),
+            eq(copybookStack),
+            eq(PROCESSING_MODE),
+            eq(positionCorrectionMap)))
         .thenReturn(listener);
     when(listener.getErrors()).thenReturn(errors);
     when(listener.getResult()).thenReturn(expectedDocument);
@@ -91,10 +97,16 @@ class GrammarPreprocessorImplTest {
     GrammarPreprocessor preprocessor = new GrammarPreprocessorImpl(factory);
 
     ResultWithErrors<ExtendedDocument> extendedDocument =
-        preprocessor.buildExtendedDocument(DOCUMENT, TEXT, copybookStack, PROCESSING_MODE);
+        preprocessor.buildExtendedDocument(
+            DOCUMENT, TEXT, copybookStack, PROCESSING_MODE, positionCorrectionMap);
 
     verify(factory)
-        .create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(PROCESSING_MODE));
+        .create(
+            eq(DOCUMENT),
+            any(BufferedTokenStream.class),
+            eq(copybookStack),
+            eq(PROCESSING_MODE),
+            eq(positionCorrectionMap));
     assertEquals(RESULT, extendedDocument.getResult().getText());
     assertEquals(copybooks, extendedDocument.getResult().getCopybooks());
     assertEquals(mainMapping, expectedDocument.getDocumentMapping().get(DOCUMENT));

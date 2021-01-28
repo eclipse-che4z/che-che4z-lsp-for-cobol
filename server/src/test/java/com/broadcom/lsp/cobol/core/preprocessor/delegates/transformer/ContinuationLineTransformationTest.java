@@ -14,9 +14,9 @@
  */
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.transformer;
 
+import com.broadcom.lsp.cobol.core.AbstractCobolLinePreprocessorTest;
 import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.CobolLine;
-import com.broadcom.lsp.cobol.core.AbstractCobolLinePreprocessorTest;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import org.junit.jupiter.api.Test;
 
@@ -105,7 +105,8 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
   private List<SyntaxError> runTransformation(String text) {
     List<CobolLine> lines = convertToCobolLines(text);
     MessageService mockMessageService = mock(MessageService.class);
-    ContinuationLineTransformation transformation = new ContinuationLineTransformation(mockMessageService);
+    ContinuationLineTransformation transformation =
+        new ContinuationLineTransformation(mockMessageService);
     return transformation.transformLines(null, lines).getErrors();
   }
 

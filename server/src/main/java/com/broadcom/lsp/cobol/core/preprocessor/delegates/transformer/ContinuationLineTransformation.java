@@ -17,6 +17,8 @@ package com.broadcom.lsp.cobol.core.preprocessor.delegates.transformer;
 import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.*;
 import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -57,22 +59,26 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   }
 
   @Override
-  public ResultWithErrors<List<CobolLine>> transformLines(
+  public ResultWithErrors<ProcessedCobolLines> transformLines(
       String documentURI, List<CobolLine> lines) {
     List<CobolLine> result = new ArrayList<>();
     List<SyntaxError> errors = new ArrayList<>();
+    Multimap<Integer, CobolLine> positionCorrectionMap = ArrayListMultimap.create();
     CobolLine previousLine = null;
     for (int i = 0; i < lines.size(); i++) {
       CobolLine cobolLine = lines.get(i);
 
-      ofNullable(checkContinuationLine(documentURI, i, cobolLine)).ifPresent(errors::add);
+      ofNullable(checkContinuationLine(documentURI, i, cobolLine, positionCorrectionMap))
+          .ifPresent(errors::add);
       ofNullable(checkIfStringClosedCorrectly(previousLine, documentURI, i, cobolLine))
           .ifPresent(errors::add);
 
       previousLine = cobolLine;
       result.add(cobolLine);
     }
-    return new ResultWithErrors<>(result, errors);
+
+    return new ResultWithErrors<>(
+        new ProcessedCobolLines(result, positionCorrectionMap), errors);
   }
 
   /**
@@ -80,15 +86,30 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
    *
    * @return a SyntaxError if there is a continuation line error or null if not
    */
-  private SyntaxError checkContinuationLine(String uri, int lineNumber, CobolLine cobolLine) {
+  private SyntaxError checkContinuationLine(
+      String uri,
+      int lineNumber,
+      CobolLine cobolLine,
+      Multimap<Integer, CobolLine> positionCorrectionMap) {
     if (CobolLineTypeEnum.CONTINUATION.equals(cobolLine.getType())) {
 
       adjustBlankOrCommentLines(cobolLine);
 
+      if (Objects.nonNull(cobolLine.getPredecessor()))
+        positionCorrectionMap.put(getContinuedLine(cobolLine).getNumber(), cobolLine);
       // invoke method for noContentInAreaA
       return checkContentAreaAWithContinuationLine(cobolLine, uri, lineNumber);
     }
     return null;
+  }
+
+  private CobolLine getContinuedLine(CobolLine cobolLine) {
+    CobolLine continuedLine = cobolLine.getPredecessor();
+    while (continuedLine.getType() == CobolLineTypeEnum.CONTINUATION
+        || continuedLine.getType() == CobolLineTypeEnum.COMMENT) {
+      continuedLine = continuedLine.getPredecessor();
+    }
+    return continuedLine;
   }
 
   private void adjustBlankOrCommentLines(CobolLine cobolLine) {

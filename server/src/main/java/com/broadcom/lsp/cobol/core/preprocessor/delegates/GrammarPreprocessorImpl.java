@@ -16,12 +16,14 @@ package com.broadcom.lsp.cobol.core.preprocessor.delegates;
 
 import com.broadcom.lsp.cobol.core.CobolPreprocessor;
 import com.broadcom.lsp.cobol.core.CobolPreprocessorLexer;
-import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import com.broadcom.lsp.cobol.core.annotation.CheckThreadInterruption;
+import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
+import com.broadcom.lsp.cobol.core.model.CobolLine;
 import com.broadcom.lsp.cobol.core.model.CopybookUsage;
 import com.broadcom.lsp.cobol.core.model.ExtendedDocument;
 import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import lombok.NonNull;
 import org.antlr.v4.runtime.*;
@@ -49,7 +51,8 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor, ThreadInter
       @NonNull String uri,
       @NonNull String code,
       @NonNull Deque<CopybookUsage> copybookStack,
-      @NonNull CopybookProcessingMode copybookProcessingMode) {
+      @NonNull CopybookProcessingMode copybookProcessingMode,
+      Multimap<Integer, CobolLine> positionCorrectionMap) {
     Lexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     lexer.removeErrorListeners();
 
@@ -62,7 +65,8 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor, ThreadInter
 
     ParseTreeWalker walker = new ParseTreeWalker();
     GrammarPreprocessorListener listener =
-        listenerFactory.create(uri, tokens, copybookStack, copybookProcessingMode);
+        listenerFactory.create(
+            uri, tokens, copybookStack, copybookProcessingMode, positionCorrectionMap);
     walker.walk(listener, startRule);
 
     return new ResultWithErrors<>(listener.getResult(), listener.getErrors());

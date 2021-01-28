@@ -24,6 +24,7 @@ import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.broadcom.lsp.cobol.service.CopybookService;
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import lombok.Getter;
@@ -35,6 +36,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -63,6 +65,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListener
     implements GrammarPreprocessorListener {
 
+  private static final int INDICATOR_POSITION = 7;
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
   private final Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
@@ -73,14 +76,15 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   // used for both copy and sql-include statements
   private final Map<String, Locality> copybookStatements = new HashMap<>();
 
-  private String documentUri;
-  private BufferedTokenStream tokens;
-  private CopybookProcessingMode copybookProcessingMode;
-  private TextPreprocessor preprocessor;
-  private CopybookService copybookService;
-  private Deque<CopybookUsage> copybookStack;
-  private ReplacingService replacingService;
-  private MessageService messageService;
+  private final String documentUri;
+  private final BufferedTokenStream tokens;
+  private final CopybookProcessingMode copybookProcessingMode;
+  private final TextPreprocessor preprocessor;
+  private final CopybookService copybookService;
+  private final Deque<CopybookUsage> copybookStack;
+  private final ReplacingService replacingService;
+  private final MessageService messageService;
+  private final Multimap<Integer, CobolLine> positionCorrectionMap;
 
   @Inject
   GrammarPreprocessorListenerImpl(
@@ -88,6 +92,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       @Assisted BufferedTokenStream tokens,
       @Assisted Deque<CopybookUsage> copybookStack,
       @Assisted CopybookProcessingMode copybookProcessingMode,
+      @Assisted Multimap<Integer, CobolLine> positionCorrectionMap,
       TextPreprocessor preprocessor,
       CopybookService copybookService,
       ReplacingService replacingService,
@@ -96,6 +101,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     this.tokens = tokens;
     this.copybookStack = copybookStack;
     this.copybookProcessingMode = copybookProcessingMode;
+    this.positionCorrectionMap = positionCorrectionMap;
     this.preprocessor = preprocessor;
     this.copybookService = copybookService;
     this.replacingService = replacingService;
@@ -399,14 +405,43 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @NonNull
   private Function<Token, Locality> toPosition() {
-    return token ->
-        Locality.builder()
-            .uri(documentUri)
-            .copybookId(retrieveCopybookId())
-            .range(new Range(getStartPosition(token), getStopPosition(token)))
-            .token(token.getText())
-            .recognizer(GrammarPreprocessorListenerImpl.class)
-            .build();
+    return this::getLocality;
+  }
+
+  private Locality getLocality(Token token) {
+    Position startPosition;
+    Position stopPosition;
+    if (isTokenRepositioned(token)) {
+      Collection<CobolLine> continueCobolLines = positionCorrectionMap.get(token.getLine() - 1);
+      CobolLine continueCobolLine = continueCobolLines.stream()
+              .filter(cl -> cl.getContentArea().contains(token.getText()))
+              .findFirst().get();
+      int horizontalCoordinate =
+              continueCobolLine.getContentArea().indexOf(token.getText()) + INDICATOR_POSITION;
+      int verticalCoordinate = continueCobolLine.getNumber();
+      startPosition = new Position(verticalCoordinate, horizontalCoordinate);
+      stopPosition =
+          new Position(
+              verticalCoordinate,
+              horizontalCoordinate + token.getStopIndex() - token.getStartIndex() + 1);
+    } else {
+      startPosition = getStartPosition(token);
+      stopPosition = getStopPosition(token);
+    }
+    return Locality.builder()
+        .uri(documentUri)
+        .copybookId(retrieveCopybookId())
+        .range(new Range(startPosition, stopPosition))
+        .token(token.getText())
+        .recognizer(GrammarPreprocessorListenerImpl.class)
+        .build();
+  }
+
+  private boolean isTokenRepositioned(Token token) {
+    return StringUtils.isNotBlank(token.getText())
+        && positionCorrectionMap.containsKey(token.getLine() - 1)
+        && positionCorrectionMap.get(token.getLine() - 1).stream()
+            .anyMatch(cl -> cl.getContentArea().contains(token.getText()));
   }
 
   private Position getStartPosition(Token token) {

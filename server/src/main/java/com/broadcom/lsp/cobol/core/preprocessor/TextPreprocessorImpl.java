@@ -14,8 +14,8 @@
  */
 package com.broadcom.lsp.cobol.core.preprocessor;
 
-import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import com.broadcom.lsp.cobol.core.annotation.CheckThreadInterruption;
+import com.broadcom.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import com.broadcom.lsp.cobol.core.model.*;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
@@ -29,10 +29,7 @@ import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class re-writes the content of the analyzing file to simplify the processing by the grammar,
@@ -108,14 +105,16 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
     List<SyntaxError> errors = new ArrayList<>();
 
     List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
-    List<CobolLine> transformedLines = transformLines(documentUri, lines).unwrap(errors::addAll);
-    List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
+    ProcessedCobolLines transformedLines =
+        transformLines(documentUri, lines).unwrap(errors::addAll);
+    List<CobolLine> rewrittenLines = rewriteLines(transformedLines.getCobolLines());
 
     String code = writer.serialize(rewrittenLines);
 
     ExtendedDocument parsedDocument =
         grammarPreprocessor
-            .buildExtendedDocument(documentUri, code, copybookStack, copybookProcessingMode)
+            .buildExtendedDocument(
+                documentUri, code, copybookStack, copybookProcessingMode, transformedLines.getPositionCorrectionMap())
             .unwrap(errors::addAll);
 
     return new ResultWithErrors<>(parsedDocument, errors);
@@ -125,7 +124,7 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
     return reader.processLines(documentURI, cobolCode);
   }
 
-  private ResultWithErrors<List<CobolLine>> transformLines(
+  private ResultWithErrors<ProcessedCobolLines> transformLines(
       String documentURI, List<CobolLine> lines) {
     return transformation.transformLines(documentURI, lines);
   }
