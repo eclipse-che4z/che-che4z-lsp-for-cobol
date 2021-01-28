@@ -20,6 +20,7 @@ import com.broadcom.lsp.cobol.core.model.Locality;
 
 import lombok.NonNull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +65,7 @@ class DocumentHierarchyLevel {
   @NonNull
   List<Locality> lookahead() {
     int tail = localities.size() - index;
-    if (tail < 1) return List.of();
+    if (tail < 1) return Collections.emptyList();
     return localities.subList(index, index + tail);
   }
 

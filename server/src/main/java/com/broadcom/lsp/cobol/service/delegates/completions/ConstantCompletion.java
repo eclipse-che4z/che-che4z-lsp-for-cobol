@@ -21,7 +21,7 @@ import org.eclipse.lsp4j.CompletionItemKind;
 
 import lombok.NonNull;
 import java.util.Collection;
-import java.util.Set;
+import java.util.Collections;
 
 import static java.util.Optional.ofNullable;
 import static org.eclipse.lsp4j.CompletionItemKind.Constant;
@@ -36,7 +36,7 @@ public class ConstantCompletion implements Completion {
     return ofNullable(document)
         .map(CobolDocumentModel::getAnalysisResult)
         .map(AnalysisResult::getConstants)
-        .orElse(Set.of());
+        .orElse(Collections.emptySet());
   }
 
   @NonNull

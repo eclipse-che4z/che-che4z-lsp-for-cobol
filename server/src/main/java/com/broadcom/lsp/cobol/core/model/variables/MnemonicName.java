@@ -16,6 +16,7 @@
 package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
+import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
@@ -47,6 +48,6 @@ public class MnemonicName extends AbstractVariable {
 
   @Override
   public List<ConditionDataName> getConditionNames() {
-    return List.of();
+    return ImmutableList.of();
   }
 }

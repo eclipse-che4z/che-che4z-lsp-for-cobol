@@ -80,7 +80,7 @@ class VariableUsageDelegate {
    * @param locality the variable text position
    */
   void handleTableCall(String dataName, Locality locality) {
-    variableUsages.add(new VariableUsage(dataName, List.of(), locality, Map.of()));
+    variableUsages.add(new VariableUsage(dataName, Collections.emptyList(), locality, Collections.emptyMap()));
   }
 
   /**

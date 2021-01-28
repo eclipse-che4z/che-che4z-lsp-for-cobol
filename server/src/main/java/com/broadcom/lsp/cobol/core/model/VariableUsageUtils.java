@@ -15,6 +15,7 @@
 package com.broadcom.lsp.cobol.core.model;
 
 import com.broadcom.lsp.cobol.core.model.variables.Variable;
+import com.google.common.collect.ImmutableList;
 import lombok.experimental.UtilityClass;
 
 import java.util.*;
@@ -50,7 +51,7 @@ public class VariableUsageUtils {
    */
   public static List<Variable> findVariables(
       Map<String, List<Variable>> definedVariables, String name, List<String> parents) {
-    return definedVariables.getOrDefault(name, List.of()).stream()
+    return definedVariables.getOrDefault(name, ImmutableList.of()).stream()
         .filter(it -> checkParents(it, parents))
         .collect(Collectors.toList());
   }
