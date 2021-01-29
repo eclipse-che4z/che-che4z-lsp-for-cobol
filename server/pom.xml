@@ -230,7 +230,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>compile</id>
+                        <id>default-compile</id>
                         <goals>
                             <goal>compile</goal>
                         </goals>
@@ -239,8 +239,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>test-compile</id>
-                        <phase>process-test-sources</phase>
+                        <id>default-testCompile</id>
                         <goals>
                             <goal>testCompile</goal>
                         </goals>
@@ -280,9 +279,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
-                    <forkMode>always</forkMode>
-                    <forkCount>3</forkCount>
-                    <reuseForks>true</reuseForks>
+                    <parallel>all</parallel>
                     <systemProperties>
                         <property>
                             <name>filesToTestPath</name>
