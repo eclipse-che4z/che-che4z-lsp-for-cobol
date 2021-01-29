@@ -230,7 +230,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>compile</id>
+                        <id>default-compile</id>
                         <goals>
                             <goal>compile</goal>
                         </goals>
@@ -239,8 +239,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>test-compile</id>
-                        <phase>process-test-sources</phase>
+                        <id>default-testCompile</id>
                         <goals>
                             <goal>testCompile</goal>
                         </goals>
