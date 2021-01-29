@@ -52,6 +52,7 @@ import java.util.*;
 import static com.broadcom.lsp.cobol.core.CobolParser.*;
 import static com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames.*;
 import static com.broadcom.lsp.cobol.core.visitor.VariableDefinitionDelegate.*;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -644,7 +645,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
 
   private static Collection<Location> getSubroutineLocation(
       ImmutablePair<String, Optional<String>> subroutinePair) {
-    return Collections.singletonList(
-        new Location(subroutinePair.getValue().get(), new Range(new Position(), new Position())));
+    return subroutinePair
+        .getValue()
+        .map(it -> new Location(it, new Range(new Position(), new Position())))
+        .map(Collections::singletonList)
+        .orElse(emptyList());
   }
 }
