@@ -1,4 +1,4 @@
-# Changelog*
+# Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
 ## [0.17.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.16.1...0.17.0) (2021-02-01)
