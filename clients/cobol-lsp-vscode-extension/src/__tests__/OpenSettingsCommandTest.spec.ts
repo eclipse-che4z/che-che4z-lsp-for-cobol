@@ -27,5 +27,5 @@ test("check gotoCopybookSettings calls telemetry services and vscode execute com
     gotoCopybookSettings();
 
     expect(TelemetryService.registerEvent).toBeCalledWith("Open copybook settings", ["COBOL", "copybook", "settings"], "The user invokes the open settings quick fix to see the copybook locations stored in the settings file");
-    expect(vscode.commands.executeCommand).toBeCalledWith("workbench.action.openSettings", "broadcom-cobol-lsp.cpy-manager");
+    expect(vscode.commands.executeCommand).toBeCalledWith("workbench.action.openSettings", "cobol-lsp.cpy-manager");
 });

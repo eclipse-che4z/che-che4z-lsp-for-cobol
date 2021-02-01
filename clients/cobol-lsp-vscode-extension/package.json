@@ -39,23 +39,23 @@
     "contributes": {
         "commands": [
             {
-                "command": "broadcom-cobol-lsp.cpy-manager.redownload",
+                "command": "cobol-lsp.cpy-manager.redownload",
                 "title": "Redownload all copybooks"
             },
             {
-                "command": "broadcom-cobol-lsp.cpy-manager.fetch-copybook",
+                "command": "cobol-lsp.cpy-manager.fetch-copybook",
                 "title": "Fetch copybook"
             },
             {
-                "command": "broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile",
+                "command": "cobol-lsp.cpy-manager.change-default-zowe-profile",
                 "title": "Change default Zowe profile"
             },
             {
-                "command": "broadcom-cobol-lsp.cpy-manager.edit-dataset-paths",
+                "command": "cobol-lsp.cpy-manager.edit-dataset-paths",
                 "title": "Edit dataset paths"
             },
             {
-                "command": "broadcom-cobol-lsp.cpy-manager.goto-settings",
+                "command": "cobol-lsp.cpy-manager.goto-settings",
                 "title": "Open Copybook location settings"
             }
         ],
@@ -106,13 +106,13 @@
             }
         ],
         "configuration": {
-            "title": "Broadcom COBOL LSP",
+            "title": "COBOL Language Support",
             "properties": {
-                "broadcom-cobol-lsp.cpy-manager.profiles": {
+                "cobol-lsp.cpy-manager.profiles": {
                     "type": "string",
                     "description": "Current default profile for copybook downloader"
                 },
-                "broadcom-cobol-lsp.cpy-manager.paths-local": {
+                "cobol-lsp.cpy-manager.paths-local": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -120,7 +120,7 @@
                     "description": "Default list of relative local paths to search for copybooks",
                     "uniqueItems": true
                 },
-                "broadcom-cobol-lsp.cpy-manager.paths-dsn": {
+                "cobol-lsp.cpy-manager.paths-dsn": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -128,7 +128,7 @@
                     "description": "Default list of datasets to search for copybooks",
                     "uniqueItems": true
                 },
-                "broadcom-cobol-lsp.subroutine-manager.paths-local": {
+                "cobol-lsp.subroutine-manager.paths-local": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -136,7 +136,7 @@
                     "description": "List of relative local paths to search for subroutines",
                     "uniqueItems": true
                 },
-                "broadcom-cobol-lsp.logging.level.root": {
+                "cobol-lsp.logging.level.root": {
                     "type": "string",
                     "default": "ERROR",
                     "enum": [
