@@ -1,5 +1,27 @@
-# Changelog
+# Changelog*
 All notable changes to the COBOL Language Support extension are documented in this file.
+
+## [0.17.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.16.1...0.17.0) (2021-02-01)
+
+#### Added
+* Syntax analysis for DB2 SQL statements
+* Support for DB2 SQL build-in-function keywords
+* IDMS DML support for IDMS-CONTROL, SCHEMA and MAP sections
+* Support for five additional IDMS DML commands
+* Mnemonic name definition support
+* Java 8 support
+
+#### Changed
+* Remove prepopulation of settings.json with empty parameters for copybook support
+* Readme update
+
+#### Fixed
+* Improve semantic analysis for variables
+* Improve heirarchical variable search
+* Semantic analysis stop after XML query
+* Semantic error on structure calls
+* MAPFAIL semantic error in HANDLE-CONDITION
+* Variable recognition fail on ambiguity
 
 ## [0.16.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.16.0...0.16.1) (2020-12-04)
 
