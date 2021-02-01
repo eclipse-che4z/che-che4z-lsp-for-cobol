@@ -16,6 +16,8 @@ package com.broadcom.lsp.cobol.service.delegates.references;
 
 import com.broadcom.lsp.cobol.service.CobolDocumentModel;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,18 +44,18 @@ class ElementOccurrencesTest {
         Location usage = new Location(URI, new Range(new Position(3, 0), new Position(3, 5)));
         Position insideUsage = new Position(3, 1);
         AnalysisResult analysisResult = AnalysisResult.builder()
-                .variableDefinitions(Map.of(ELEMENT_NAME, List.of(definition)))
-                .variableUsages(Map.of(ELEMENT_NAME, List.of(usage)))
+                .variableDefinitions(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(definition)))
+                .variableUsages(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(usage)))
                 .build();
         CobolDocumentModel cobolDocumentModel = new CobolDocumentModel("", analysisResult);
         TextDocumentPositionParams textDocumentPositionParams =
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage);
         ElementOccurrences elementOccurrences = new ElementOccurrences();
-        assertEquals(List.of(definition),
+        assertEquals(ImmutableList.of(definition),
                 elementOccurrences.findDefinitions(cobolDocumentModel, textDocumentPositionParams));
-        assertEquals(List.of(usage),
+        assertEquals(ImmutableList.of(usage),
                 elementOccurrences.findReferences(cobolDocumentModel, textDocumentPositionParams, new ReferenceContext(false)));
-        assertEquals(List.of(usage, definition),
+        assertEquals(ImmutableList.of(usage, definition),
                 elementOccurrences.findReferences(cobolDocumentModel, textDocumentPositionParams, new ReferenceContext(true)));
     }
 
@@ -66,13 +68,13 @@ class ElementOccurrencesTest {
         Location usageInOtherFile = new Location(URI2, new Range(new Position(3, 0), new Position(3, 5)));
         Position insideUsage = new Position(3, 1);
         AnalysisResult analysisResult = AnalysisResult.builder()
-                .variableDefinitions(Map.of(ELEMENT_NAME, List.of(definition)))
-                .variableUsages(Map.of(ELEMENT_NAME, List.of(usage, usageInOtherFile)))
+                .variableDefinitions(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(definition)))
+                .variableUsages(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(usage, usageInOtherFile)))
                 .build();
         List<DocumentHighlight> highlights = new ElementOccurrences().findHighlights(
                 new CobolDocumentModel("", analysisResult),
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage));
-        List<DocumentHighlight> expectedHighlights = List.of(
+        List<DocumentHighlight> expectedHighlights = ImmutableList.of(
                 new DocumentHighlight(usageRange, DocumentHighlightKind.Text),
                 new DocumentHighlight(definitionRange, DocumentHighlightKind.Text));
         assertEquals(expectedHighlights, highlights);
@@ -80,9 +82,9 @@ class ElementOccurrencesTest {
 
     static Stream<Arguments> variousData() {
         Location definition = new Location(URI, new Range(new Position(1, 2), new Position(2, 5)));
-        Map<String, List<Location>> definitionMap = Map.of(ELEMENT_NAME, List.of(definition));
+        Map<String, List<Location>> definitionMap = ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(definition));
         Location usage = new Location(URI, new Range(new Position(3, 0), new Position(3, 5)));
-        Map<String, List<Location>> usageMap = Map.of(ELEMENT_NAME, List.of(usage));
+        Map<String, List<Location>> usageMap = ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(usage));
         Location usageInOtherFile = new Location(URI2, new Range(new Position(3, 0), new Position(3, 5)));
         Position insideDefinition = new Position(1, 5);
         Position insideUsage = new Position(3, 1);
@@ -91,84 +93,84 @@ class ElementOccurrencesTest {
                 Arguments.of(
                         AnalysisResult.builder().variableDefinitions(definitionMap).variableUsages(usageMap).build(),
                         insideUsage,
-                        List.of(usage)),
+                        ImmutableList.of(usage)),
                 // find variables usage by definition position
                 Arguments.of(
                         AnalysisResult.builder().variableDefinitions(definitionMap).variableUsages(usageMap).build(),
                         insideDefinition,
-                        List.of(usage)),
+                        ImmutableList.of(usage)),
                 // same position from other URI
                 Arguments.of(
                         AnalysisResult.builder().variableDefinitions(definitionMap)
-                                .variableUsages(Map.of(ELEMENT_NAME, List.of(usageInOtherFile))).build(),
+                                .variableUsages(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(usageInOtherFile))).build(),
                         insideUsage,
-                        List.of()),
+                        ImmutableList.of()),
                 // find paragraph usage by usage position
                 Arguments.of(
                         AnalysisResult.builder().paragraphDefinitions(definitionMap).paragraphUsages(usageMap).build(),
                         insideUsage,
-                        List.of(usage)),
+                        ImmutableList.of(usage)),
                 // find paragraph usage by definition position
                 Arguments.of(
                         AnalysisResult.builder().paragraphDefinitions(definitionMap).paragraphUsages(usageMap).build(),
                         insideDefinition,
-                        List.of(usage)),
+                        ImmutableList.of(usage)),
                 // find section usage by usage position
                 Arguments.of(
                         AnalysisResult.builder().sectionDefinitions(definitionMap).sectionUsages(usageMap).build(),
                         insideUsage,
-                        List.of(usage)),
+                        ImmutableList.of(usage)),
                 // find section usage by definition position
                 Arguments.of(
                         AnalysisResult.builder().sectionDefinitions(definitionMap).sectionUsages(usageMap).build(),
                         insideDefinition,
-                        List.of(usage)),
+                        ImmutableList.of(usage)),
                 // find constant usage by usage position
                 Arguments.of(
                         AnalysisResult.builder().constantDefinitions(definitionMap).constantUsages(usageMap).build(),
                         insideUsage,
-                        List.of(usage)),
+                        ImmutableList.of(usage)),
                 // find constant usage by definition position
                 Arguments.of(
                         AnalysisResult.builder().constantDefinitions(definitionMap).constantUsages(usageMap).build(),
                         insideDefinition,
-                        List.of(usage)),
+                        ImmutableList.of(usage)),
                 // find copybook usage by usage position
                 Arguments.of(
                         AnalysisResult.builder().copybookDefinitions(definitionMap).copybookUsages(usageMap).build(),
                         insideUsage,
-                        List.of(usage)),
+                        ImmutableList.of(usage)),
                 // find copybook usage by definition position
                 Arguments.of(
                         AnalysisResult.builder().copybookDefinitions(definitionMap).copybookUsages(usageMap).build(),
                         insideDefinition,
-                        List.of(usage)),
+                        ImmutableList.of(usage)),
                 // find subroutine usage by usage position
                 Arguments.of(
                         AnalysisResult.builder().subroutineDefinitions(definitionMap).subroutineUsages(usageMap).build(),
                         insideUsage,
-                        List.of(usage)),
+                        ImmutableList.of(usage)),
                 // find subroutine usage by definition position
                 Arguments.of(
                         AnalysisResult.builder().subroutineDefinitions(definitionMap).subroutineUsages(usageMap).build(),
                         insideDefinition,
-                        List.of(usage)),
+                        ImmutableList.of(usage)),
                 // find all variables usages in all files by usage position
                 Arguments.of(
                         AnalysisResult.builder().variableDefinitions(definitionMap).variableUsages(
-                                Map.of(ELEMENT_NAME, List.of(usage, usageInOtherFile))
+                                ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(usage, usageInOtherFile))
                         ).build(),
                         insideUsage,
-                        List.of(usage, usageInOtherFile)),
+                        ImmutableList.of(usage, usageInOtherFile)),
                 // give only needed usage even if other kind use the same name
                 Arguments.of(
                         AnalysisResult.builder()
                                 .variableDefinitions(definitionMap)
                                 .variableUsages(usageMap)
-                                .paragraphUsages(Map.of(ELEMENT_NAME, List.of(usageInOtherFile)))
+                                .paragraphUsages(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(usageInOtherFile)))
                                 .build(),
                         insideUsage,
-                        List.of(usage))
+                        ImmutableList.of(usage))
                 );
     }
 

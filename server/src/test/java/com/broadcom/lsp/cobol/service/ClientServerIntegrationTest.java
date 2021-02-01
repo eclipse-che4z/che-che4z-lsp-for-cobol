@@ -20,6 +20,7 @@ import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageClient;
 import com.broadcom.lsp.cobol.service.mocks.TestLanguageServer;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -146,7 +147,7 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
 
   private void setUpCopybook() throws ExecutionException, InterruptedException {
     client.clean();
-    List.of(new CobolText("CPYBK1", COPYBOOK1), new CobolText("CPYBK2", COPYBOOK2)).stream()
+    ImmutableList.of(new CobolText("CPYBK1", COPYBOOK1), new CobolText("CPYBK2", COPYBOOK2)).stream()
         .map(UseCaseUtils::toCopybookModel)
         .forEach(copybookService::store);
     service.didOpen(

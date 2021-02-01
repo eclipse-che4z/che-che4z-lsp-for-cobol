@@ -16,12 +16,11 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
@@ -74,36 +73,36 @@ class TestDuplicatedStatementInDefinitionProduceErrors {
 
   @Test
   void testDuplicatedPicProducesError() {
-    UseCaseEngine.runTest(BOILERPLATE + DUPLICATED_PIC, List.of(), Map.of("1", DIAGNOSTIC_PIC));
+    UseCaseEngine.runTest(BOILERPLATE + DUPLICATED_PIC, ImmutableList.of(), ImmutableMap.of("1", DIAGNOSTIC_PIC));
   }
 
   @Test
   void testDuplicatedValueProducesError() {
-    UseCaseEngine.runTest(BOILERPLATE + DUPLICATED_VALUE, List.of(), Map.of("1", DIAGNOSTIC_VALUE));
+    UseCaseEngine.runTest(BOILERPLATE + DUPLICATED_VALUE, ImmutableList.of(), ImmutableMap.of("1", DIAGNOSTIC_VALUE));
   }
 
   @Test
   void testDuplicatedUsageProducesError() {
-    UseCaseEngine.runTest(BOILERPLATE + DUPLICATED_USAGE, List.of(), Map.of("1", DIAGNOSTIC_USAGE));
+    UseCaseEngine.runTest(BOILERPLATE + DUPLICATED_USAGE, ImmutableList.of(), ImmutableMap.of("1", DIAGNOSTIC_USAGE));
   }
 
   @Test
   void testDuplicatedOccursProducesError() {
     UseCaseEngine.runTest(
-        BOILERPLATE + DUPLICATED_OCCURS, List.of(), Map.of("1", DIAGNOSTIC_OCCURS));
+        BOILERPLATE + DUPLICATED_OCCURS, ImmutableList.of(), ImmutableMap.of("1", DIAGNOSTIC_OCCURS));
   }
 
   @Test
   void testDuplicatedMixedStatementsProduceError() {
     UseCaseEngine.runTest(
         BOILERPLATE + DUPLICATED_MIX,
-        List.of(),
-        Map.of("1", DIAGNOSTIC_PIC, "2", DIAGNOSTIC_VALUE, "3", DIAGNOSTIC_USAGE));
+        ImmutableList.of(),
+        ImmutableMap.of("1", DIAGNOSTIC_PIC, "2", DIAGNOSTIC_VALUE, "3", DIAGNOSTIC_USAGE));
   }
 
   @Test
   void testDuplicatedStatementsWithoutTheUsageTokenProduceCorrectError() {
     UseCaseEngine.runTest(
-        BOILERPLATE + DUPLICATED_USAGE_WITHOUT_TOKEN, List.of(), Map.of("1", DIAGNOSTIC_USAGE));
+        BOILERPLATE + DUPLICATED_USAGE_WITHOUT_TOKEN, ImmutableList.of(), ImmutableMap.of("1", DIAGNOSTIC_USAGE));
   }
 }

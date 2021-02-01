@@ -15,6 +15,7 @@
 
 package com.broadcom.lsp.cobol.core.semantics.outline;
 
+import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -23,12 +24,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /** Test to check RangeUtils */
 class RangeUtilsTest {
@@ -65,7 +63,7 @@ class RangeUtilsTest {
       int startLine, int startSymbol, int stopLine, int stopSymbol) {
     Range range =
         new Range(new Position(startLine, startSymbol), new Position(stopLine, stopSymbol));
-    return new DocumentSymbol("", NodeType.FIELD.getSymbolKind(), range, range, "", List.of());
+    return new DocumentSymbol("", NodeType.FIELD.getSymbolKind(), range, range, "", ImmutableList.of());
   }
 
   static Stream<Arguments> provideData() {

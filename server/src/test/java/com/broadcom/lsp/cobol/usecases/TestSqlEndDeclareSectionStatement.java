@@ -17,10 +17,9 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /** This test checks if sql END DECLARE SECTION statement works correctly. */
 class TestSqlEndDeclareSectionStatement {
@@ -48,6 +47,6 @@ class TestSqlEndDeclareSectionStatement {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(new CobolText("STUDENT", STUDENT_REC)), Map.of());
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(new CobolText("STUDENT", STUDENT_REC)), ImmutableMap.of());
   }
 }

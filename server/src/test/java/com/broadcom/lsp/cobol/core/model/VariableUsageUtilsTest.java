@@ -17,6 +17,7 @@ package com.broadcom.lsp.cobol.core.model;
 
 import com.broadcom.lsp.cobol.core.model.variables.ElementItem;
 import com.broadcom.lsp.cobol.core.model.variables.Variable;
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -30,8 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class VariableUsageUtilsTest {
   @Test
   void empty() {
-    Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(List.of());
-    assertTrue(VariableUsageUtils.findVariables(definedVariables, "foo", List.of()).isEmpty());
+    Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(ImmutableList.of());
+    assertTrue(VariableUsageUtils.findVariables(definedVariables, "foo", ImmutableList.of()).isEmpty());
   }
 
   @Test
@@ -45,7 +46,7 @@ class VariableUsageUtilsTest {
                 var("FOO")))
     );
     Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(variables);
-    List<Variable> found = VariableUsageUtils.findVariables(definedVariables, "FOO", List.of());
+    List<Variable> found = VariableUsageUtils.findVariables(definedVariables, "FOO", ImmutableList.of());
     checkQualifiers(found, "FOO", "BAR FOO", "BAR BAZ FOO");
   }
 
@@ -60,7 +61,7 @@ class VariableUsageUtilsTest {
                 var("FOO")))
     );
     Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(variables);
-    List<Variable> found = VariableUsageUtils.findVariables(definedVariables, "FOO", List.of("BAR"));
+    List<Variable> found = VariableUsageUtils.findVariables(definedVariables, "FOO", ImmutableList.of("BAR"));
     checkQualifiers(found, "BAR FOO", "BAR BAZ FOO");
   }
 
@@ -80,18 +81,18 @@ class VariableUsageUtilsTest {
                 var("BAR")))
     );
     Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(variables);
-    List<Variable> found = VariableUsageUtils.findVariables(definedVariables, "BAR", List.of("BAZ", "FOO"));
+    List<Variable> found = VariableUsageUtils.findVariables(definedVariables, "BAR", ImmutableList.of("BAZ", "FOO"));
     checkQualifiers(found, "FOO BAZ BAR", "FOO BAZ QWE BAR", "FOO QWE BAZ BAR");
   }
 
   private static void checkQualifiers(List<Variable> variables, String... qualifiers) {
-    assertEquals(Set.of(qualifiers),
+    assertEquals(Arrays.stream(qualifiers).collect(Collectors.toSet()),
         variables.stream().map(VariableUsageUtilsTest::getQualifier).collect(Collectors.toSet()));
   }
 
   private static List<Variable> collectVariables(Function<Variable, List<Variable>>... factories) {
     List<Variable> result = new ArrayList<>();
-    for (var factory: factories)
+    for (Function<Variable, List<Variable>> factory: factories)
       result.addAll(factory.apply(null));
     return result;
   }
@@ -101,7 +102,7 @@ class VariableUsageUtilsTest {
       List<Variable> result = new ArrayList<>();
       Variable it = new ElementItem(name, Locality.builder().build(), parent, "", "", null);
       result.add(it);
-      for (var factory: factories)
+      for (Function<Variable, List<Variable>> factory: factories)
         result.addAll(factory.apply(it));
       return result;
     };

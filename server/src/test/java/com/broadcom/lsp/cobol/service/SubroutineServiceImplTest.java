@@ -15,13 +15,12 @@
 package com.broadcom.lsp.cobol.service;
 
 import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -46,7 +45,7 @@ public class SubroutineServiceImplTest {
     assertEquals("URI1", subroutineService.getUri(NAME).get());
     // second get returns the same cached object
     assertEquals("URI1", subroutineService.getUri(NAME).get());
-    assertEquals(List.of(NAME), subroutineService.getNames());
+    assertEquals(ImmutableList.of(NAME), subroutineService.getNames());
     subroutineService.invalidateCache();
     assertTrue(subroutineService.getNames().isEmpty());
     assertEquals("URI2", subroutineService.getUri(NAME).get());
@@ -63,11 +62,11 @@ public class SubroutineServiceImplTest {
     SubroutineService subroutineService =
         new SubroutineServiceImpl(() -> languageClient, 3, 3, "HOURS");
     assertEquals("URI", subroutineService.getUri(PRESENT_FILE).get());
-    assertTrue(subroutineService.getUri(MISSING_FILE).isEmpty());
+    assertFalse(subroutineService.getUri(MISSING_FILE).isPresent());
     // the service must use cache instead of language client
-    assertTrue(subroutineService.getUri(MISSING_FILE).isEmpty());
+    assertFalse(subroutineService.getUri(MISSING_FILE).isPresent());
 
-    assertEquals(List.of(PRESENT_FILE), subroutineService.getNames());
+    assertEquals(ImmutableList.of(PRESENT_FILE), subroutineService.getNames());
 
     verify(languageClient, times(1)).resolveSubroutine(PRESENT_FILE);
     verify(languageClient, times(1)).resolveSubroutine(MISSING_FILE);

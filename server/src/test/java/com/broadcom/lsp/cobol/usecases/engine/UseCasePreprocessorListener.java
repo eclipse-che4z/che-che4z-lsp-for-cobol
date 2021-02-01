@@ -17,6 +17,9 @@ package com.broadcom.lsp.cobol.usecases.engine;
 
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import com.broadcom.usecase.UseCasePreprocessorBaseListener;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import lombok.NonNull;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -28,7 +31,6 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import lombok.NonNull;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -46,7 +48,7 @@ import static org.antlr.v4.runtime.Lexer.HIDDEN;
  */
 public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private static final List<String> PREDEFINED_VARIABLES =
-      List.of(
+      ImmutableList.of(
           "EIBAID",
           "EIBATT",
           "EIBCALEN",
@@ -144,7 +146,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
         constantUsages,
         copybookDefinitions,
         copybookUsages,
-        Map.of(),
+        ImmutableMap.of(),
         subroutineUsages);
   }
 
@@ -366,7 +368,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
   }
 
   private Map<String, List<Location>> getConstantDefinitions() {
-    List<Location> defaultLocation = List.of(new Location());
+    List<Location> defaultLocation = ImmutableList.of(new Location());
     return PREDEFINED_VARIABLES.stream()
         .collect(Collectors.toMap(it -> it, it -> defaultLocation));
   }

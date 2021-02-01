@@ -16,6 +16,8 @@ package com.broadcom.lsp.cobol.service.delegates.completions;
 
 import com.broadcom.lsp.cobol.service.CobolDocumentModel;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 
@@ -50,13 +52,13 @@ class SectionCompletionTest {
     void testSectionCompletion() {
         CobolDocumentModel document = createModel();
 
-        Completions completions = new Completions(Set.of(new SectionCompletion()));
+        Completions completions = new Completions(ImmutableSet.of(new SectionCompletion()));
         List<CompletionItem> completionItems =
                 completions.collectFor(document, createCompletionParams()).getItems();
 
         assertEquals(2, completionItems.size());
-        checkContains(completionItems.get(0), List.of("100-Test", "000-Main-Logic"));
-        checkContains(completionItems.get(1), List.of("100-Test", "000-Main-Logic"));
+        checkContains(completionItems.get(0), ImmutableList.of("100-Test", "000-Main-Logic"));
+        checkContains(completionItems.get(1), ImmutableList.of("100-Test", "000-Main-Logic"));
 
         assertEquals(CompletionItemKind.Function, completionItems.get(0).getKind());
     }

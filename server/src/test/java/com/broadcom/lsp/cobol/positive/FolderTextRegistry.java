@@ -18,9 +18,11 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -71,7 +73,7 @@ public class FolderTextRegistry implements CobolTextRegistry {
     }
 
     try {
-      CobolText loadCobolText = new CobolText(cleanup(name), Files.readString(path));
+      CobolText loadCobolText = new CobolText(cleanup(name), FileUtils.readFileToString(path.toFile(), StandardCharsets.UTF_8));
       texts.put(folder, loadCobolText);
     } catch (IOException e) {
       LOG.warn("Unable to load file: {}, skipped", path);

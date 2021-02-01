@@ -14,11 +14,12 @@
  */
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.impl;
 
+import com.broadcom.lsp.cobol.core.model.CobolLine;
 import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolCommentEntriesMarkerImpl;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.CobolLineUtils;
-import com.broadcom.lsp.cobol.core.model.CobolLine;
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -77,7 +78,7 @@ class CobolCommentEntriesMarkerImplTest {
 
     CobolLineReWriter marker = new CobolCommentEntriesMarkerImpl();
 
-    List<CobolLine> processedLines = marker.processLines(List.of(line1, line2));
+    List<CobolLine> processedLines = marker.processLines(ImmutableList.of(line1, line2));
     assertEquals(expected, processedLines.get(0));
     assertEquals(line2, processedLines.get(1));
   }

@@ -18,11 +18,10 @@ package com.broadcom.lsp.cobol.usecases;
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
@@ -54,8 +53,8 @@ class TestSyntaxErrorTraversedThroughHierarchy {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(new CobolText(REPL_NAME, REPL), new CobolText(CONT_NAME, CONT)),
-        Map.of(
+        ImmutableList.of(new CobolText(REPL_NAME, REPL), new CobolText(CONT_NAME, CONT)),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
                 null, "Syntax error on 'TAG-ID' expected SECTION", Error, SourceInfoLevels.ERROR.getText(), null),
