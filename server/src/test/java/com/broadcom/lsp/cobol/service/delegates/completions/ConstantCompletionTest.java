@@ -17,15 +17,14 @@ package com.broadcom.lsp.cobol.service.delegates.completions;
 
 import com.broadcom.lsp.cobol.service.CobolDocumentModel;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -41,7 +40,7 @@ class ConstantCompletionTest {
     assertThat(
         completion.getCompletionSource(
             new CobolDocumentModel(
-                "", AnalysisResult.builder().constantDefinitions(Map.of()).build())),
+                "", AnalysisResult.builder().constantDefinitions(ImmutableMap.of()).build())),
         is(empty()));
   }
 
@@ -53,23 +52,23 @@ class ConstantCompletionTest {
                 "",
                 AnalysisResult.builder()
                     .constantDefinitions(
-                        Map.of(
+                        ImmutableMap.of(
                             "expected1",
-                            List.of(
+                            ImmutableList.of(
                                 new Location(
                                     "uri", new Range(new Position(0, 1), new Position(1, 2))),
                                 new Location(
                                     "uri2", new Range(new Position(3, 4), new Position(5, 6)))),
                             "expected2",
-                            List.of()))
+                            ImmutableList.of()))
                     .constantUsages(
-                        Map.of(
+                        ImmutableMap.of(
                             "non-expected",
-                            List.of(
+                            ImmutableList.of(
                                 new Location(
                                     "uri", new Range(new Position(0, 1), new Position(1, 2))))))
                     .build())),
-        Set.of("expected2", "expected1"));
+        ImmutableSet.of("expected2", "expected1"));
   }
 
   @Test

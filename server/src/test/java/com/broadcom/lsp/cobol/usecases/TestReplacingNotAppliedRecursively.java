@@ -17,10 +17,9 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Test REPLACING statement not applied recursively. Here, the STRUCT1 copybook contains a variable
@@ -51,7 +50,7 @@ class TestReplacingNotAppliedRecursively {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(new CobolText(REPL_NAME, REPL), new CobolText(STRUCT1_NAME, STRUCT1)),
-        Map.of());
+        ImmutableList.of(new CobolText(REPL_NAME, REPL), new CobolText(STRUCT1_NAME, STRUCT1)),
+        ImmutableMap.of());
   }
 }

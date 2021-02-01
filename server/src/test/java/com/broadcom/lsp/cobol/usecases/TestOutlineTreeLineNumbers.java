@@ -17,6 +17,8 @@ package com.broadcom.lsp.cobol.usecases;
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import lombok.Value;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.junit.jupiter.api.Test;
@@ -39,18 +41,18 @@ public class TestOutlineTreeLineNumbers {
 
   @Test
   void test() {
-    AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, List.of(
+    AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, ImmutableList.of(
         new CobolText("BAR", "")
     ));
-    Map<String, LineRange> expectedRanges = Map.of(
-        "PROGRAM", new LineRange(0, 4),
-        "IDENTIFICATION DIVISION", new LineRange(0, 0),
-        "DATA DIVISION", new LineRange(1, 4),
-        "WORKING-STORAGE SECTION", new LineRange(2, 4),
-        "STRUCTNAME", new LineRange(3, 4),
-        "VARNAME", new LineRange(4, 4),
-        "COPY BAR", new LineRange(5, 5)
-    );
+    Map<String, LineRange> expectedRanges = new ImmutableMap.Builder<String, LineRange>()
+        .put("PROGRAM", new LineRange(0, 4))
+        .put("IDENTIFICATION DIVISION", new LineRange(0, 0))
+        .put("DATA DIVISION", new LineRange(1, 4))
+        .put("WORKING-STORAGE SECTION", new LineRange(2, 4))
+        .put("STRUCTNAME", new LineRange(3, 4))
+        .put("VARNAME", new LineRange(4, 4))
+        .put("COPY BAR", new LineRange(5, 5))
+        .build();
     assertEquals(expectedRanges, extractLineRange(result.getOutlineTree()));
   }
 

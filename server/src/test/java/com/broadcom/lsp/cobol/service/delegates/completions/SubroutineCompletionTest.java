@@ -18,11 +18,11 @@ import com.broadcom.lsp.cobol.service.CobolDocumentModel;
 import com.broadcom.lsp.cobol.service.SubroutineService;
 import com.broadcom.lsp.cobol.service.SubroutineServiceImpl;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
+import com.google.common.collect.ImmutableSet;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,7 +38,7 @@ public class SubroutineCompletionTest {
     CobolDocumentModel document = new CobolDocumentModel(TEXT, AnalysisResult.empty());
     CompletionParams params = new CompletionParams(new TextDocumentIdentifier("id"), new Position(1, 16));
 
-    List<CompletionItem> completionItems = new Completions(Set.of(subroutineCompletion))
+    List<CompletionItem> completionItems = new Completions(ImmutableSet.of(subroutineCompletion))
         .collectFor(document, params).getItems();
 
     assertEquals(1, completionItems.size());

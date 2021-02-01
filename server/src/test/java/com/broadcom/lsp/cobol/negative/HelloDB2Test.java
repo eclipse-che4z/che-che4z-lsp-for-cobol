@@ -14,10 +14,9 @@
  */
 package com.broadcom.lsp.cobol.negative;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 /**
  * " IGYSC1428-W The ""TEST(DWARF)"" option was specified but the compiler return code was 8 or
@@ -36,7 +35,7 @@ public class HelloDB2Test extends NegativeTest {
   private static final int EXPECTED_ERRORS_NUMBER = 5;
 
   HelloDB2Test() {
-    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
+    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, ImmutableList.of());
   }
 
   @Test

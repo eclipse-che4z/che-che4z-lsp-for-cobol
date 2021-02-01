@@ -17,12 +17,11 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /** This test checks that 66 is not allowed as a conditional data name */
 class TestNotConditionalErrorOn66 {
@@ -42,8 +41,8 @@ class TestNotConditionalErrorOn66 {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(),
-        Map.of(
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
                 null,

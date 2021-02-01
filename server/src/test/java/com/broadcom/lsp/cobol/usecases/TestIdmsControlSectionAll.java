@@ -16,14 +16,14 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 /** These test for variations of valid IDMS-CONTROL SECTION definitions */
@@ -69,7 +69,7 @@ class TestIdmsControlSectionAll {
     @MethodSource("textsToTest")
     @DisplayName("Parameterized - varying tests")
     void test(String text) {
-        UseCaseEngine.runTest(text, List.of(), Map.of("1",
+        UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of("1",
                 new Diagnostic(null, MESSAGE_1, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
     }
 }

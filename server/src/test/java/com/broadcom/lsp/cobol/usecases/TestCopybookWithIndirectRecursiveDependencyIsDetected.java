@@ -18,11 +18,10 @@ package com.broadcom.lsp.cobol.usecases;
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
@@ -55,8 +54,8 @@ class TestCopybookWithIndirectRecursiveDependencyIsDetected {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(new CobolText(INNER_COPY_NAME, INNER_COPY), new CobolText(INDIRECT_NAME, INDIRECT)),
-        Map.of(
+        ImmutableList.of(new CobolText(INNER_COPY_NAME, INNER_COPY), new CobolText(INDIRECT_NAME, INDIRECT)),
+        ImmutableMap.of(
             "1",
             new Diagnostic(null, MESSAGE_RECURSION + INDIRECT_NAME, Error, SourceInfoLevels.ERROR.getText()),
             "2",

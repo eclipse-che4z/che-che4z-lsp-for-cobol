@@ -281,7 +281,9 @@ class CopybookServiceTest {
   @Test
   void testResolveGetsStubWhenConfigurationThrowAnError() {
     when(settingsService.getConfiguration("copybook-resolve", "document", VALID_CPY_NAME))
-        .thenReturn(CompletableFuture.failedFuture(new NullPointerException()));
+        .thenReturn(CompletableFuture.supplyAsync(() -> {
+          throw new NullPointerException();
+        }));
     CopybookService copybookService = createCopybookService();
     CopybookModel copybookModel = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, ENABLED);
 

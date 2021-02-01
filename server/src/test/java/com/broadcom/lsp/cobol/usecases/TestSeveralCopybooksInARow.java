@@ -17,10 +17,9 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /** This test checks that several COPY statements in a row won't cause mapping errors. */
 class TestSeveralCopybooksInARow {
@@ -52,7 +51,7 @@ class TestSeveralCopybooksInARow {
   void test() {
     UseCaseEngine.runTest(
         DOCUMENT,
-        List.of(new CobolText(STRUC1_NAME, STRUC1), new CobolText(STRUC2_NAME, STRUC2)),
-        Map.of());
+        ImmutableList.of(new CobolText(STRUC1_NAME, STRUC1), new CobolText(STRUC2_NAME, STRUC2)),
+        ImmutableMap.of());
   }
 }

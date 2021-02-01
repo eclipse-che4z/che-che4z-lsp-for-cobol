@@ -18,13 +18,12 @@ package com.broadcom.lsp.cobol.usecases;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
@@ -52,12 +51,12 @@ class TestUndefinedParentVariableUnderlined {
   void assertCopybookProcessingModeNotChangesLogic() {
     Assertions.assertEquals(
         UseCaseUtils.analyze(
-            UseCaseUtils.DOCUMENT_URI, TEXT, List.of(), List.of(), CopybookProcessingMode.ENABLED),
+            UseCaseUtils.DOCUMENT_URI, TEXT, ImmutableList.of(), ImmutableList.of(), CopybookProcessingMode.ENABLED),
         UseCaseUtils.analyze(
             UseCaseUtils.DOCUMENT_URI,
             TEXT,
-            List.of(),
-            List.of(),
+            ImmutableList.of(),
+            ImmutableList.of(),
             CopybookProcessingMode.DISABLED));
   }
 
@@ -65,7 +64,7 @@ class TestUndefinedParentVariableUnderlined {
   void assertAnalysisResult() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(),
-        Map.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
+        ImmutableList.of(),
+        ImmutableMap.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

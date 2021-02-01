@@ -15,6 +15,7 @@
 package com.broadcom.lsp.cobol.core.messages;
 
 import com.broadcom.lsp.cobol.service.delegates.communications.Communications;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonPrimitive;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,7 +78,7 @@ class LocaleStoreImplTest {
   void testNotifyLocaleStore() {
     localeStore.updateLocale("en");
     Consumer<List<Object>> listConsumer = localeStore.notifyLocaleStore();
-    List<Object> mockArg = List.of(new JsonPrimitive("EN"));
+    List<Object> mockArg = ImmutableList.of(new JsonPrimitive("EN"));
     listConsumer.accept(mockArg);
     assertEquals(LocaleEnum.EN, localeStore.getSupportedLocale());
   }

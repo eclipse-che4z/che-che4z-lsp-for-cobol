@@ -17,9 +17,8 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -148,20 +147,20 @@ class TestMarginAB {
 
   @Test
   void checkForAreaA() {
-    AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_AREA_A, List.of());
+    AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_AREA_A, ImmutableList.of());
     assertEquals(5, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
   }
 
   @Test
   void checkForAreaB() {
-    AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_AREA_B, List.of());
+    AnalysisResult result = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_AREA_B, ImmutableList.of());
     assertEquals(5, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
   }
 
   @Test
   void checkCorrectProgramID() {
     AnalysisResult result =
-        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_PROGRAM_ID, List.of());
+        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_PROGRAM_ID, ImmutableList.of());
 
     assertEquals(1, result.getDiagnostics().size());
     assertEquals(
@@ -172,7 +171,7 @@ class TestMarginAB {
   @Test
   void checkDeclaratives() {
     AnalysisResult result =
-        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_DECLARATIVES, List.of());
+        UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_DECLARATIVES, ImmutableList.of());
 
     assertEquals(3, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
     assertEquals(

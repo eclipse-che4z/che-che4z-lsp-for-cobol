@@ -16,11 +16,12 @@
 package com.broadcom.lsp.cobol.service.delegates.formations;
 
 import com.broadcom.lsp.cobol.service.CobolDocumentModel;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.eclipse.lsp4j.TextEdit;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -32,7 +33,7 @@ class FormationsTest {
 
   private static final Formation FORMATION_1 = mock(Formation.class);
   private static final Formation FORMATION_2 = mock(Formation.class);
-  private static final Formations FORMATIONS = new Formations(Set.of(FORMATION_1, FORMATION_2));
+  private static final Formations FORMATIONS = new Formations(ImmutableSet.of(FORMATION_1, FORMATION_2));
 
   @Test
   void WhenCobolDocumentModelNull_thenFormatReturnsEmptyList() {
@@ -43,8 +44,8 @@ class FormationsTest {
   @Test
   void WhenCobolDocumentModelNonNull_thenFormatReturnsFormattedString() {
     CobolDocumentModel model = new CobolDocumentModel("SAMPLE TEXT FOR TEST");
-    List<TextEdit> response1 = List.of(new TextEdit());
-    List<TextEdit> response2 = List.of(new TextEdit(), new TextEdit());
+    List<TextEdit> response1 = ImmutableList.of(new TextEdit());
+    List<TextEdit> response2 = ImmutableList.of(new TextEdit(), new TextEdit());
     when(FORMATION_1.format(anyList())).thenReturn(response1);
     when(FORMATION_2.format(anyList())).thenReturn(response2);
     List<TextEdit> format = FORMATIONS.format(model);

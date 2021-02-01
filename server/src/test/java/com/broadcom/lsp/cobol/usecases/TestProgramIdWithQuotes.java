@@ -15,11 +15,10 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import java.util.List;
-import java.util.Map;
 
 /** This use case checks that the program ID check works correctly even with quotes */
 class TestProgramIdWithQuotes {
@@ -61,6 +60,6 @@ class TestProgramIdWithQuotes {
         TEXT_WITH_END_QUOTED
       })
   void test(String text) {
-    UseCaseEngine.runTest(text, List.of(), Map.of());
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
   }
 }

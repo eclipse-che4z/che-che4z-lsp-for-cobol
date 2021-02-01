@@ -15,10 +15,9 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This test checks that the title before and after IDENTIFICATION DIVISION processed successfully
@@ -38,17 +37,17 @@ class TestTitleStatement {
 
   @Test
   void testTitleBeforeIdDivision() {
-    UseCaseEngine.runTest(TITLE + TEXT1 + TEXT2 + END, List.of(), Map.of());
+    UseCaseEngine.runTest(TITLE + TEXT1 + TEXT2 + END, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
   void testTitleAfterDataDivision() {
-    UseCaseEngine.runTest(TEXT1 + TITLE + TEXT2 + END, List.of(), Map.of());
+    UseCaseEngine.runTest(TEXT1 + TITLE + TEXT2 + END, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
   void testTitleAfterProcedureDivision() {
-    UseCaseEngine.runTest(TEXT1 + TEXT2 + TITLE + END, List.of(), Map.of());
+    UseCaseEngine.runTest(TEXT1 + TEXT2 + TITLE + END, ImmutableList.of(), ImmutableMap.of());
   }
 
 }

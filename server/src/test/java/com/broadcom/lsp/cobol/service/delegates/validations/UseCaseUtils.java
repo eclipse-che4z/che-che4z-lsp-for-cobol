@@ -21,6 +21,7 @@ import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.service.*;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -99,7 +100,7 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(String fileName, String text, List<CobolText> copybooks) {
-    return analyze(fileName, text, copybooks, List.of(), CopybookProcessingMode.ENABLED);
+    return analyze(fileName, text, copybooks, ImmutableList.of(), CopybookProcessingMode.ENABLED);
   }
 
   /**
@@ -136,7 +137,7 @@ public class UseCaseUtils {
       CopybookProcessingMode copybookProcessingMode) {
     SettingsService mockSettingsService = mock(SettingsService.class);
     when(mockSettingsService.getConfiguration(any()))
-        .thenReturn(CompletableFuture.completedFuture(List.of()));
+        .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
 
     CobolLanguageClient languageClient = mock(CobolLanguageClient.class);
     FileSystemService mockFileSystemService = mock(FileSystemService.class);
