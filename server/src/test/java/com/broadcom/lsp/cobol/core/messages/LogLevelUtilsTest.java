@@ -15,13 +15,12 @@
 package com.broadcom.lsp.cobol.core.messages;
 
 import ch.qos.logback.classic.Level;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonPrimitive;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -36,13 +35,13 @@ class LogLevelUtilsTest {
   void updateLogLevel() {
     ch.qos.logback.classic.Logger logger =
         (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-    LogLevelUtils.updateLogLevel().accept(List.of("DEBUG"));
+    LogLevelUtils.updateLogLevel().accept(ImmutableList.of("DEBUG"));
     assertEquals(Level.DEBUG, logger.getLevel());
 
-    LogLevelUtils.updateLogLevel().accept(List.of("INFO"));
+    LogLevelUtils.updateLogLevel().accept(ImmutableList.of("INFO"));
     assertEquals(Level.INFO, logger.getLevel());
 
-    LogLevelUtils.updateLogLevel().accept(List.of(new JsonPrimitive("ERROR")));
+    LogLevelUtils.updateLogLevel().accept(ImmutableList.of(new JsonPrimitive("ERROR")));
     assertEquals(Level.ERROR, logger.getLevel());
   }
 
@@ -51,7 +50,7 @@ class LogLevelUtilsTest {
   void whenUnSupportedObjectPassed_thenThrowException() {
     Assertions.assertThrows(
         IllegalArgumentException.class,
-        () -> LogLevelUtils.updateLogLevel().accept(List.of(new DummyElement("INFO"))));
+        () -> LogLevelUtils.updateLogLevel().accept(ImmutableList.of(new DummyElement("INFO"))));
   }
 
   private static class DummyElement {

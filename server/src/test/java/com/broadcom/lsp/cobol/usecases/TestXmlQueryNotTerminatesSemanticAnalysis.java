@@ -19,6 +19,7 @@ import com.broadcom.lsp.cobol.core.CobolLexer;
 import com.broadcom.lsp.cobol.core.CobolPreprocessorLexer;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Position;
@@ -69,7 +70,7 @@ class TestXmlQueryNotTerminatesSemanticAnalysis {
   void test() {
     // TODO: after #619 fixed, all the false-positive diagnostics should disappear and this test
     // should be refactored using UseCaseEngine
-    AnalysisResult actual = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, List.of());
+    AnalysisResult actual = UseCaseUtils.analyze(UseCaseUtils.DOCUMENT_URI, TEXT, ImmutableList.of());
     List<Diagnostic> diagnostics = actual.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI);
     Assertions.assertEquals(
         diagnostics.get(diagnostics.size() - 1),

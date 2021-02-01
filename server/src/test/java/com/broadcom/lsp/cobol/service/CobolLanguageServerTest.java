@@ -18,6 +18,7 @@ package com.broadcom.lsp.cobol.service;
 import com.broadcom.lsp.cobol.core.messages.LocaleStore;
 import com.broadcom.lsp.cobol.core.model.ErrorCode;
 import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp4j.*;
@@ -72,9 +73,9 @@ class CobolLanguageServerTest {
     when(settingsService.getConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList(arr)));
     when(settingsService.getConfiguration(SUBROUTINE_LOCAL_PATHS.label))
-        .thenReturn(completedFuture(List.of()));
+        .thenReturn(completedFuture(ImmutableList.of()));
     when(settingsService.getConfiguration(LOGGING_LEVEL.label))
-        .thenReturn(completedFuture(List.of("INFO")));
+        .thenReturn(completedFuture(ImmutableList.of("INFO")));
     CobolLanguageServer server =
         new CobolLanguageServer(
             null, null, watchingService, settingsService, localeStore, customExecutor);

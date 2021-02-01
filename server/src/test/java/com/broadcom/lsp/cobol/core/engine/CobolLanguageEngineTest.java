@@ -25,6 +25,8 @@ import com.broadcom.lsp.cobol.core.strategy.CobolErrorStrategy;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.broadcom.lsp.cobol.service.SubroutineService;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp4j.DocumentSymbol;
@@ -85,10 +87,10 @@ class CobolLanguageEngineTest {
         new ExtendedDocument(
             TEXT,
             new NamedSubContext(),
-            Map.of(
+            ImmutableMap.of(
                 URI,
                 new DocumentMapping(
-                    List.of(
+                    ImmutableList.of(
                         Locality.builder()
                             .uri(URI)
                             .range(new Range(new Position(0, 0), new Position(0, 7)))
@@ -114,30 +116,30 @@ class CobolLanguageEngineTest {
                             .range(new Range(new Position(0, 30), new Position(0, 31)))
                             .token(".")
                             .build()),
-                    Map.of())),
-            Map.of());
+                    ImmutableMap.of())),
+            ImmutableMap.of());
 
     when(preprocessor.process(URI, TEXT, PROCESSING_MODE))
-        .thenReturn(new ResultWithErrors<>(extendedDocument, List.of(error)));
+        .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));
 
     Range outlineRange =
         new Range(new org.eclipse.lsp4j.Position(0, 7), new org.eclipse.lsp4j.Position(0, 30));
     List<DocumentSymbol> expectedOutlineTree =
-        List.of(
+        ImmutableList.of(
             new DocumentSymbol(
                 "PROGRAM",
                 NodeType.PROGRAM.getSymbolKind(),
                 outlineRange,
                 outlineRange,
                 "",
-                List.of(
+                ImmutableList.of(
                     new DocumentSymbol(
                         "IDENTIFICATION DIVISION",
                         NodeType.DIVISION.getSymbolKind(),
                         outlineRange,
                         outlineRange,
                         "",
-                        List.of()))));
+                        ImmutableList.of()))));
 
     ResultWithErrors<SemanticContext> expected =
         new ResultWithErrors<>(
@@ -145,7 +147,7 @@ class CobolLanguageEngineTest {
                 .constantDefinitions(getConstantDefinitions())
                 .outlineTree(expectedOutlineTree)
                 .build(),
-            List.of(error));
+            ImmutableList.of(error));
 
     ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, PROCESSING_MODE);
 

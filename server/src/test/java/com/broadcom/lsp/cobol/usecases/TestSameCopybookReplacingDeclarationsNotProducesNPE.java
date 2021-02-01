@@ -17,10 +17,9 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This test verifies that several similar COPY statements with REPLACING does not produce
@@ -45,6 +44,6 @@ class TestSameCopybookReplacingDeclarationsNotProducesNPE {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(new CobolText(REPL_NAME, REPL)), Map.of());
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(new CobolText(REPL_NAME, REPL)), ImmutableMap.of());
   }
 }

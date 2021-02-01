@@ -21,13 +21,13 @@ import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
 import com.broadcom.lsp.cobol.core.utils.CustomToken;
 import com.broadcom.lsp.cobol.service.SubroutineService;
+import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.broadcom.lsp.cobol.core.CobolParser.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,7 +61,7 @@ class VisitorSemanticAnalysisTest {
             "",
             new NamedSubContext(),
             mock(CommonTokenStream.class),
-            Map.of(
+            ImmutableMap.of(
                 token,
                 Locality.builder()
                     .range(new Range(new Position(0, 0), new Position(0, 0)))
@@ -99,7 +99,7 @@ class VisitorSemanticAnalysisTest {
             "",
             new NamedSubContext(),
             tokenStream,
-            Map.of(
+            ImmutableMap.of(
                 token,
                 Locality.builder()
                     .range(new Range(new Position(0, 0), new Position(0, 0)))

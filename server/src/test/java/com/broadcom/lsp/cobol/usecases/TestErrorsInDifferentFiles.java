@@ -18,11 +18,10 @@ package com.broadcom.lsp.cobol.usecases;
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
@@ -53,40 +52,20 @@ class TestErrorsInDifferentFiles {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(new CobolText(ASDASD_NAME, ASDASD)),
-        Map.of(
-            "invalid",
-            new Diagnostic(
-                null, "Invalid definition for: CHILD1", Error, SourceInfoLevels.ERROR.getText()),
-            "pic",
-            new Diagnostic(
-                null,
-                "Syntax error on 'PIC' expected SECTION",
-                Error,
-                SourceInfoLevels.ERROR.getText()),
-            "child1",
-            new Diagnostic(
-                null,
-                "Syntax error on 'CHILD1' expected SECTION",
-                Error,
-                SourceInfoLevels.ERROR.getText()),
-            "is",
-            new Diagnostic(
-                null,
-                "Syntax error on 'IS' expected SECTION",
-                Error,
-                SourceInfoLevels.ERROR.getText()),
-            "areaA1",
-            new Diagnostic(
-                null,
-                "The following token must start in Area A: 03",
-                Warning,
-                SourceInfoLevels.WARNING.getText()),
-            "areaA2",
-            new Diagnostic(
-                null,
-                "The following token must start in Area A: CHILD1",
-                Warning,
-                SourceInfoLevels.WARNING.getText())));
+        ImmutableList.of(new CobolText(ASDASD_NAME, ASDASD)),
+        new ImmutableMap.Builder<String, Diagnostic>()
+            .put("invalid", new Diagnostic(
+                null, "Invalid definition for: CHILD1", Error, SourceInfoLevels.ERROR.getText()))
+            .put("pic", new Diagnostic(
+                null, "Syntax error on 'PIC' expected SECTION", Error, SourceInfoLevels.ERROR.getText()))
+            .put("child1", new Diagnostic(
+                null, "Syntax error on 'CHILD1' expected SECTION", Error, SourceInfoLevels.ERROR.getText()))
+            .put("is", new Diagnostic(
+                null, "Syntax error on 'IS' expected SECTION", Error, SourceInfoLevels.ERROR.getText()))
+            .put("areaA1", new Diagnostic(
+                null, "The following token must start in Area A: 03", Warning, SourceInfoLevels.WARNING.getText()))
+            .put("areaA2", new Diagnostic(
+                null, "The following token must start in Area A: CHILD1", Warning, SourceInfoLevels.WARNING.getText()))
+            .build());
   }
 }

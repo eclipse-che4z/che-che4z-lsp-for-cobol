@@ -17,10 +17,9 @@ package com.broadcom.lsp.cobol.core.preprocessor.delegates.util.impl;
 
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.ReplacingServiceImpl;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -40,11 +39,11 @@ class ReplacingServiceImplTest {
         "   05\n\r.   .CHILD201\r\n.",
         replacingService.applyReplacing(
             "   01\n\r.   .CHILD101\r\n.",
-            List.of(
+            ImmutableList.of(
                 Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"), // .
                 Pair.of("CHILD1", "CHILD2"))));
 
-    assertEquals("01 ABC.", replacingService.applyReplacing("01 ABC.", List.of(Pair.of("", ""))));
+    assertEquals("01 ABC.", replacingService.applyReplacing("01 ABC.", ImmutableList.of(Pair.of("", ""))));
   }
 
   /**

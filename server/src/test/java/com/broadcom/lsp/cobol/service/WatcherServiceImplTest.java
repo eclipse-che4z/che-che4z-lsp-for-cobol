@@ -17,6 +17,7 @@ package com.broadcom.lsp.cobol.service;
 
 import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.broadcom.lsp.cobol.service.providers.ClientProvider;
+import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -77,8 +78,8 @@ class WatcherServiceImplTest {
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider);
 
-    watcherService.addWatchers(List.of("foo/bar", "baz", "bar\\foo"));
-    assertEquals(List.of("foo/bar", "baz", "bar\\foo"), watcherService.getWatchingFolders());
+    watcherService.addWatchers(ImmutableList.of("foo/bar", "baz", "bar\\foo"));
+    assertEquals(ImmutableList.of("foo/bar", "baz", "bar\\foo"), watcherService.getWatchingFolders());
 
     verify(client).registerCapability(captor.capture());
     RegistrationParams params = captor.getValue();
@@ -98,10 +99,10 @@ class WatcherServiceImplTest {
     ArgumentCaptor<UnregistrationParams> captor = forClass(UnregistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider);
 
-    watcherService.addWatchers(List.of("foo/bar", "baz", "bar\\foo"));
-    watcherService.removeWatchers(List.of("non-existing", "foo/bar"));
+    watcherService.addWatchers(ImmutableList.of("foo/bar", "baz", "bar\\foo"));
+    watcherService.removeWatchers(ImmutableList.of("non-existing", "foo/bar"));
 
-    assertEquals(List.of("baz", "bar\\foo"), watcherService.getWatchingFolders());
+    assertEquals(ImmutableList.of("baz", "bar\\foo"), watcherService.getWatchingFolders());
 
     verify(client).unregisterCapability(captor.capture());
     UnregistrationParams params = captor.getValue();

@@ -16,10 +16,9 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This test checks that the copybook name with quotes processed successfully
@@ -40,12 +39,12 @@ class TestCopybookNameWithQuotes {
 
   @Test
   void assertCopybookWithQuotesProcessing() {
-    UseCaseEngine.runTest(TEXT + QUITES_LOWERCASE, List.of(new CobolText("CPBTEST", COPYBOOK)), Map.of());
+    UseCaseEngine.runTest(TEXT + QUITES_LOWERCASE, ImmutableList.of(new CobolText("CPBTEST", COPYBOOK)), ImmutableMap.of());
   }
 
   @Test
   void assertCopybookWithDoubleQuotesProcessing() {
-    UseCaseEngine.runTest(TEXT + DOUBLE_QUITES, List.of(new CobolText("CPBTEST", COPYBOOK)), Map.of());
+    UseCaseEngine.runTest(TEXT + DOUBLE_QUITES, ImmutableList.of(new CobolText("CPBTEST", COPYBOOK)), ImmutableMap.of());
   }
 
 }

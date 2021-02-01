@@ -16,12 +16,12 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 /** This test checks if sql LABEL statement works correctly. */
@@ -56,6 +56,6 @@ class TestSqlLabelStatement {
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - sql label  statements tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, List.of(), Map.of());
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
   }
 }

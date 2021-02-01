@@ -17,10 +17,9 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This test checks if sql include statement works correctly when there are several INCLUDE
@@ -49,7 +48,7 @@ class TestSqlIncludeStatementUsingRepeatedly {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(new CobolText(CPY_NAME1, STRUCT1), new CobolText(CPY_NAME2, STRUCT2)),
-        Map.of());
+        ImmutableList.of(new CobolText(CPY_NAME1, STRUCT1), new CobolText(CPY_NAME2, STRUCT2)),
+        ImmutableMap.of());
   }
 }

@@ -14,10 +14,9 @@
  */
 package com.broadcom.lsp.cobol.negative;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 /**
  * " 57 IGYDS1089-S ""INDXED"" was invalid. Scanning was resumed at the next area ""A"" item,
@@ -44,7 +43,7 @@ public class Chetest2Test extends NegativeTest {
   private static final int EXPECTED_ERRORS_NUMBER = 19;
 
   Chetest2Test() {
-    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
+    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, ImmutableList.of());
   }
 
   @Test

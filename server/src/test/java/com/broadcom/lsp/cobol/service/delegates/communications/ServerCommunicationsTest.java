@@ -19,6 +19,8 @@ import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.jrpc.CobolLanguageClient;
 import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.broadcom.lsp.cobol.service.utils.FileSystemService;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Provider;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -147,10 +149,10 @@ class ServerCommunicationsTest {
 
     // Prepare diagnostic map
     Diagnostic diagnostic = new Diagnostic(new Range(), "\r\ntest\r\n");
-    List<Diagnostic> diagnostics = List.of(diagnostic);
+    List<Diagnostic> diagnostics = ImmutableList.of(diagnostic);
 
     when(files.decodeURI(uri)).thenReturn(uri);
-    communications.publishDiagnostics(Map.of(uri, diagnostics));
+    communications.publishDiagnostics(ImmutableMap.of(uri, diagnostics));
 
     // Check that cleanup was performed for Diagnostic message
     diagnostic.setMessage("test");
