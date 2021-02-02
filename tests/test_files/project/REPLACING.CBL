@@ -1,0 +1,10 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. TESTREPL.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  PARENT.
+       COPY REPL.
+       PROCEDURE DIVISION.
+       MAINLINE.
+           MOVE 0 TO ABC-ID.
+           GOBACK. 
