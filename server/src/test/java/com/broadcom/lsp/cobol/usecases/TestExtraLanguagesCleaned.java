@@ -16,10 +16,10 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This test is looking for a clean implementation of a mechanism which can remove SQL and COPY
@@ -33,7 +33,7 @@ class TestExtraLanguagesCleaned {
           + "000000  AUTHOR. SERGIU ILIE.\r\n"
           + "000000   DATA DIVISION.\r\n"
           + "000000  WORKING-STORAGE SECTION.\r\n"
-          + "000000  01 {$*TAPARM1}.\r\n"
+          + "000000  01 {$*TAPARM1}      PIC 99.\r\n"
           + "000000  01 {$*TAPARM2}      PIC 99 VALUE 2.\r\n"
           + "000000  01 {$*ATCDEM3}      PIC X(7) VALUE 'ATCDEM3'.\r\n"
           + "000000  01 {$*P1PARM1}      PIC 99 VALUE 0.\r\n"
@@ -69,8 +69,8 @@ class TestExtraLanguagesCleaned {
           + "000000  01 {$*ATCDEM4}      PIC X(7) VALUE 'ATCDEM4'.\r\n"
           + "000000  01 {$*P1PARM1}      PIC 99 VALUE 0.\r\n"
           + "000000  01   {$*BORROWER}.\r\n"
-          + "000000     05 {$*AGE}                   PIC 9(3).\r\n"
-          + "000000         10 {$*MAMA} PIC 99 VALUE 3.\r\n"
+          + "000000     05 {$*AGE}.\r\n"
+          + "000000         10 {$*MAMA} PIC 99.\r\n"
           + "000000             88 {$*teenager}  VALUE 0  THRU 17.\r\n"
           + "000000             88 {$*adult}    VALUE 18 THRU 60.\r\n"
           + "000000             88 {$*retired}  VALUE 61 THRU 150.\r\n"
@@ -93,7 +93,7 @@ class TestExtraLanguagesCleaned {
           + "000000      SUBTRACT 1 FROM {$TBPARM2}\r\n"
           + "000000      END-PERFORM.\r\n"
           + "000000             EXEC CICS LINK PROGRAM({$CRUD-PGM-NAME})\r\n"
-          + "000000      RESP(${RESPONSE})COMMAREA({$LINK-AREA}) END-EXEC.\r\n"
+          + "000000      RESP({$RESPONSE})COMMAREA({$LINK-AREA}) END-EXEC.\r\n"
           + "000000 {#*PROCB}.\r\n"
           + "000000      MOVE 10 TO {$MAMA} OF {$AGE} OF {$BORROWER}.\r\n"
           + "000000 {#*ERRORS}.\r\n"
@@ -101,8 +101,9 @@ class TestExtraLanguagesCleaned {
           + "000000  END PROGRAM ATCDEM3.\r\n"
           + "           \r\n";
 
+  @Disabled("Invalid until #730 implemented")
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 }

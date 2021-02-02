@@ -1,6 +1,15 @@
+<div id="header" align="center">
+
+[![Build Status](https://ci.eclipse.org/che4z/buildStatus/icon?job=LSP+for+COBOL%2Fdevelopment)](https://ci.eclipse.org/che4z/job/LSP%20for%20COBOL/job/development/)
+[![GitHub issues](https://img.shields.io/github/issues-raw/eclipse/che-che4z-lsp-for-cobol)](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues)
+[![slack](https://img.shields.io/badge/chat-on%20Slack-blue)](https://communityinviter.com/apps/che4z/code4z)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=eclipse_che-che4z-lsp-for-cobol&metric=alert_status)](https://sonarcloud.io/dashboard?id=eclipse_che-che4z-lsp-for-cobol)
+
+</div>
+
 # COBOL Language Support
 
-COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using a Zowe CLI z/OSMF profile to automatically retrieve copybooks used in your programs and store them in your workspace.
+COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using a Zowe CLI z/OSMF profile to automatically retrieve copybooks used in your programs and store them in your workspace. 
 
 COBOL Language Support recognizes files with the extensions `.cob` and `.cbl` as COBOL files.
 
@@ -12,14 +21,18 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 ## Prerequisites
 
-- Java version 11 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
+- Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.xml).
 - To enable automatic copybook retrieval, the following are required:
     - Configured TSO/E address space services, z/OS data set and file REST interface, and z/OS jobs REST interface. For more information, see [z/OS Requirements](https://docs.zowe.org/stable/user-guide/systemrequirements-zosmf.html#z-os-requirements).
     - [Zowe CLI z/OSMF profile](https://docs.zowe.org/stable/user-guide/cli-configuringcli.html) with credentials.
-
+    
 ## Compatibility
 
-The COBOL Language Support extension is not compatible with other extensions that provide COBOL support. We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
+The COBOL Language Support extension is supported on Visual Studio Code and Eclipse Che.
+
+This extension is not compatible with other extensions that provide COBOL support. We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
+
+The COBOL Language Support extension only supports IBM Enterprise COBOL. Other versions of COBOL are not supported.
 
 ## Features
 COBOL Language Support provides the following COBOL syntax awareness features:
@@ -31,6 +44,7 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 - COBOL variables
 - COBOL paragraphs
 - CICS keywords
+- DB2 SQL keywords
 - Code Snippets
 - Copybook variable and paragraph names
 - Names of copybooks that are used in the program
@@ -43,7 +57,7 @@ The autocomplete feature is only available in the main COBOL file, not in copybo
 ### Syntax and Semantic Check for Code
 This feature checks for mistakes and errors in COBOL code. The syntax check feature reviews the whole content of the code and suggests fixes, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
 
-This feature is also enabled for CICS keywords and variables.
+This feature is also enabled for CICS and DB2 SQL keywords and variables.
 
 ![Syntax check](/docs/images/CLSErrorHighlighting.gif)
 			
@@ -91,13 +105,13 @@ To enable subroutine support, specify the paths of folders containing subroutine
 
 The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If your copybooks are stored in mainframe data sets, you can use a Zowe CLI z/OSMF profile to automatically download them from the mainframe to your workspace. 
 
-You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the copybook's name. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
+You can use copybooks stored in local folders, mainframe data sets or both. To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a mainframe data set, the one in the local folder is used.
 
 Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
 
 ### Storing Copybooks Locally
 
-You can store your copybooks locally in folders in your workspace and specify those folder paths in your workspace extension settings. Ensure that the file names of your locally stored copybooks are in upper case, for example `BOOK1.CPY` and not `book1.CPY`.
+You can store your copybooks locally in folders in your workspace and specify those folder paths in your workspace extension settings.
 
 **Follow these steps:**
 

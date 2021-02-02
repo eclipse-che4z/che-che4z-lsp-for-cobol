@@ -16,10 +16,9 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /** This test checks that COUNT variable name is allowed. */
 class TestCOUNTVariableNameAllowed {
@@ -29,13 +28,13 @@ class TestCOUNTVariableNameAllowed {
           + "        PROGRAM-ID. TEST1.\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
-          + "        01 {$*COUNT}.\n" // COUNT variable name allowed
+          + "        01 {$*COUNT} PIC 9.\n" // COUNT variable name allowed
           + "        PROCEDURE DIVISION.\n"
           + "        {#*COUNT}.\n" // COUNT paragraphName allowed
           + "        END PROGRAM TEST1.";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 }

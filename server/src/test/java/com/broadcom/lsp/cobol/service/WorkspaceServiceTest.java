@@ -19,6 +19,7 @@ import com.broadcom.lsp.cobol.domain.databus.api.DataBusBroker;
 import com.broadcom.lsp.cobol.domain.databus.impl.DefaultDataBusBroker;
 import com.broadcom.lsp.cobol.domain.event.model.RunAnalysisEvent;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +68,7 @@ class WorkspaceServiceTest {
         service.executeCommand(
             new ExecuteCommandParams(
                 MISSING_COPYBOOK.name(),
-                List.of(new JsonPrimitive(copybookName), new JsonPrimitive(UseCaseUtils.DOCUMENT_URI))));
+                ImmutableList.of(new JsonPrimitive(copybookName), new JsonPrimitive(UseCaseUtils.DOCUMENT_URI))));
 
     try {
       assertNull(result.get());

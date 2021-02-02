@@ -15,16 +15,12 @@
 
 package com.broadcom.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
@@ -35,19 +31,19 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*SQLCA}.\n"
+          + "       01 {$*SQLCA} PIC X(10).\n"
           + "       EXEC  {INCLUDE|1} STRUCT1 END-EXEC.";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(),
-        Map.of(
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
                 null,
-                "Missing token SQL at execSqlStatement",
+                "Missing token EXEC or SQL at execSqlStatement",
                 Error,
                 SourceInfoLevels.ERROR.getText())));
   }

@@ -51,6 +51,7 @@ import static com.google.inject.name.Names.named;
 import static java.lang.System.getProperty;
 import static java.util.Optional.ofNullable;
 
+/** This module provides DI bindings for testing. */
 public class TestModule extends AbstractModule {
   private static final String PATH_TO_TEST_RESOURCES = "filesToTestPath";
 
@@ -77,10 +78,10 @@ public class TestModule extends AbstractModule {
 
     bind(SettingsService.class).to(SettingsServiceImpl.class);
     bind(SubroutineService.class).to(SubroutineServiceImpl.class);
+    bind(Occurrences.class).to(ElementOccurrences.class);
 
     bindFormations();
     bindCompletions();
-    bindReferences();
     bindCodeActions();
 
     bindInterceptor(
@@ -114,17 +115,6 @@ public class TestModule extends AbstractModule {
 
     bind(CompletionStorage.class).annotatedWith(named("Keywords")).to(Keywords.class);
     bind(CompletionStorage.class).annotatedWith(named("Snippets")).to(Snippets.class);
-  }
-
-  private void bindReferences() {
-    bind(Occurrences.class).to(SemanticElementOccurrences.class);
-    Multibinder<SemanticLocations> referenceBinding =
-        newSetBinder(binder(), SemanticLocations.class);
-    referenceBinding.addBinding().to(VariableLocations.class);
-    referenceBinding.addBinding().to(ParagraphLocations.class);
-    referenceBinding.addBinding().to(SectionLocations.class);
-    referenceBinding.addBinding().to(CopybookLocations.class);
-    referenceBinding.addBinding().to(SubroutineLocations.class);
   }
 
   private void bindCodeActions() {

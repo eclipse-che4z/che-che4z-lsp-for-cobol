@@ -34,7 +34,7 @@
         <exclude.tests>nothing.to.exclude</exclude.tests>
         <google.guava.version>28.1-jre</google.guava.version>
         <guice.version>4.2.2</guice.version>
-        <java.version>11</java.version>
+        <java.version>8</java.version>
         <junit-jupiter.version>5.6.0</junit-jupiter.version>
         <junit.platform.version>1.6.0</junit.platform.version>
         <logback.classic.version>1.2.3</logback.classic.version>
@@ -53,17 +53,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <revision>1.0.0-SNAPSHOT</revision>
         <slf4j.api.version>1.7.25</slf4j.api.version>
+        <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
     </properties>
-
-    <profiles>
-        <profile>
-            <id>skip.nist.tests</id>
-            <properties>
-                <exclude.tests>**/com/broadcom/lsp/cobol/*.java</exclude.tests>
-            </properties>
-        </profile>
-    </profiles>
-
     <dependencies>
         <dependency>
             <groupId>org.antlr</groupId>
@@ -267,9 +258,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
-                    <forkMode>always</forkMode>
-                    <forkCount>3</forkCount>
-                    <reuseForks>true</reuseForks>
+                    <parallel>all</parallel>
                     <systemProperties>
                         <property>
                             <name>filesToTestPath</name>
@@ -349,7 +338,7 @@
                                 <argument>-package</argument>
                                 <argument>com.broadcom.usecase</argument>
                                 <argument>-o</argument>
-                                <argument>target/generated-sources/antlr4/com/broadcom/usecase</argument>
+                                <argument>${basedir}/target/generated-sources/antlr4/com/broadcom/usecase</argument>
                             </arguments>
                             <sourceDirectory>src/test/antlr4/com/broadcom/usecase</sourceDirectory>
                             <listener>true</listener>
@@ -367,12 +356,34 @@
                                 <argument>-package</argument>
                                 <argument>com.broadcom.lsp.cobol.core</argument>
                                 <argument>-o</argument>
-                                <argument>target/generated-sources/antlr4/com/broadcom/lsp/cobol/core</argument>
+                                <argument>${basedir}/target/generated-sources/antlr4/com/broadcom/lsp/cobol/core</argument>
                             </arguments>
                             <sourceDirectory>src/main/antlr4/com/broadcom/lsp/cobol/core/parser</sourceDirectory>
                             <listener>true</listener>
                             <visitor>true</visitor>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven.checkstyle.plugin.version}</version>
+                <configuration>
+                    <configLocation>src/style/checkstyle.xml</configLocation>
+                    <encoding>UTF-8</encoding>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

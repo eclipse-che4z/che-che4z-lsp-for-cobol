@@ -16,10 +16,9 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /** This test checks that the JNIENVPTR doesn't produce a syntax error */
 class TextJniEnvSpecialRegister {
@@ -29,7 +28,7 @@ class TextJniEnvSpecialRegister {
           + "       Program-id.    ProgramId.\n"
           + "       Data Division.\n"
           + "       Working-Storage Section.\n"
-          + "       01   {$*JNIEnv}. \n"
+          + "       01   {$*JNIEnv} PIC 9. \n"
           + "       Procedure Division.\n"
           + "       {#*000-Main-Logic}.\n"
           + "            Set address of {$JNIEnv} to {&JNIEnvPtr}.\n"
@@ -37,6 +36,6 @@ class TextJniEnvSpecialRegister {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 }

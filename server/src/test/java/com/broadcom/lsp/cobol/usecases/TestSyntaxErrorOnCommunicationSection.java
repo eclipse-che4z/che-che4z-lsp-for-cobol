@@ -16,12 +16,11 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
@@ -38,13 +37,13 @@ class TestSyntaxErrorOnCommunicationSection {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(),
-        Map.of(
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
                 null,
-                "Syntax error on 'COMMUNICATION' expected {<EOF>, END, FILE, ID, IDENTIFICATION, "
-                    + "LINKAGE, LOCAL_STORAGE, PROCEDURE, WORKING_STORAGE}",
+                "Syntax error on 'COMMUNICATION' expected {<EOF>, ID, IDENTIFICATION, LINKAGE, LOCAL-STORAGE,"
+                    + " WORKING-STORAGE, PROCEDURE, SCHEMA, END, FILE, MAP}",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
   }

@@ -21,15 +21,16 @@ import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
 import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.model.variables.*;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.VariableUtils;
 import com.broadcom.lsp.cobol.core.semantics.outline.OutlineNodeNames;
+import com.google.common.collect.ImmutableList;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
-import org.eclipse.lsp4j.Range;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -37,23 +38,24 @@ import java.util.function.Function;
 
 import static com.broadcom.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static com.broadcom.lsp.cobol.core.model.ErrorSeverity.WARNING;
-import static com.broadcom.lsp.cobol.core.visitor.DataDivisionSection.NOT_INITIALIZED;
 import static java.lang.String.format;
-import static java.util.Optional.*;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 /**
  * This class processes the variable definition contexts. It accumulates the variable structures to
  * track the nesting, and the qualifiers that also rely on the structure. Pay attention, that the
- * <code>create*</code> methods are NOT pure, they share a state and rely on the context.
- *
- * <p>Qualifiers used to check the variable usages and may be used to check the uniqueness of the
- * reference using a regex, e.g. PARENT.*CHILD may check this usage even if there are intermediate
- * levels in the given structure. Qualifiers stored in top-down order.
+ * <code>define*</code> methods are NOT pure, they share a state and rely on the context.
  */
 @Slf4j
 @RequiredArgsConstructor
-class VariableDefinitionDelegate {
+public class VariableDefinitionDelegate {
+  public static final int LEVEL_01 = 1;
+  public static final int LEVEL_66 = 66;
+  static final int LEVEL_77 = 77;
+  static final int LEVEL_88 = 88;
+  static final int AREA_A_FINISH = 10;
+
   private static final String EMPTY_STRUCTURE_MSG = "semantics.emptyStructure";
   private static final String TOO_MANY_CLAUSES_MSG = "semantics.tooManyClauses";
   private static final String PREVIOUS_WITHOUT_PIC_FOR_88 = "semantics.previousWithoutPicFor88";
@@ -63,14 +65,8 @@ class VariableDefinitionDelegate {
   private static final String CHILD_TO_RENAME_NOT_FOUND = "semantics.childToRenameNotFound";
   private static final String INCORRECT_CHILDREN_ORDER = "semantics.incorrectChildrenOrder";
   private static final String CANNOT_BE_RENAMED = "semantics.cannotBeRenamed";
-  private static final String DEFINITION_NOT_ALLOWED_IN_SECTION =
-      "semantics.definitionNotAllowedInSection";
 
   private static final ErrorSeverity SEVERITY = ERROR;
-
-  private static final int LEVEL_66 = 66;
-  private static final int LEVEL_77 = 77;
-  private static final int LEVEL_88 = 88;
 
   // TODO: make Value a separate class that accepts:
   // TODO: 1. literal
@@ -78,10 +74,8 @@ class VariableDefinitionDelegate {
   // TODO: 3. REFERENCE data-name
   // TODO: Make PIC a separate class that may validate the given value
   private Deque<StructuredVariable> structureStack = new ArrayDeque<>();
-  // TODO: Check variable uniquity on usage by qualifier
   private Deque<Variable> variables = new ArrayDeque<>();
   private List<SyntaxError> errors = new ArrayList<>();
-  private DataDivisionSection section = NOT_INITIALIZED;
 
   private final Map<Token, Locality> positions;
   private final MessageService messages;
@@ -104,71 +98,42 @@ class VariableDefinitionDelegate {
     // TODO: 8. redefining one may be group when RE is element
     // TODO: 9. cannot contain VALUE
 
-    int number = Integer.parseInt(ctx.LEVEL_NUMBER().getText());
+    VariableDefinitionContext variableDefinitionContext =
+        VariableDefinitionContext.builder()
+            .number(Integer.parseInt(ctx.LEVEL_NUMBER().getText()))
+            .name(retrieveName(ctx.entryName()))
+            .definition(
+                retrieveDefinition(
+                    Optional.<ParserRuleContext>ofNullable(ctx.entryName()).orElse(ctx)))
+            .antlrClass(ctx.getClass())
+            .starting(positions.get(ctx.LEVEL_NUMBER().getSymbol()))
+            .picClauses(ctx.dataPictureClause())
+            .occursClauses(ctx.dataOccursClause())
+            .valueClauses(ctx.dataValueClause())
+            .usageClauses(ctx.dataUsageClause())
+            .build();
 
     // TODO: Add check that name does not present in the predefined variables list (? - to check)
-    String name = retrieveName(ctx.entryName());
-    Locality definition = retrieveDefinition(ctx.entryName());
-
-    checkVariableTypeAllowed(ctx.getClass(), definition);
-    checkStartingArea(number, positions.get(ctx.LEVEL_NUMBER().getSymbol()));
-    closePreviousStructureIfNeeded(number);
-    checkTopElementNumber(number, definition);
-
-    String qualifier = retrieveQualifier(name);
-
-    Optional<DataPictureClauseContext> picClause = retrieveClause(ctx.dataPictureClause());
-    Optional<DataOccursClauseContext> occursClause = retrieveClause(ctx.dataOccursClause());
+    checkStartingArea(variableDefinitionContext);
+    closePreviousStructureIfNeeded(variableDefinitionContext);
+    checkTopElementNumber(variableDefinitionContext);
+    checkPictureClauseIsSingle(variableDefinitionContext);
+    checkOccursClauseIsSingle(variableDefinitionContext);
+    checkValueClauseIsSingle(variableDefinitionContext);
+    checkUsageClauseIsSingle(variableDefinitionContext);
+    setValueClauseText(variableDefinitionContext);
     // TODO: check the same way that the other clauses are singular or absent
 
-    Variable variable;
-    if (picClause.isEmpty()) {
-      StructuredVariable structuredVariable =
-          occursClause
-              .<StructuredVariable>map(
-                  it ->
-                      new MultiTableDataName(
-                          number,
-                          name,
-                          qualifier,
-                          definition,
-                          retrieveOccursTimes(occursClause.get()),
-                          retrieveIndexItem(occursClause.get())))
-              .orElse(new GroupItem(number, qualifier, name, definition));
-
-      structureStack.push(structuredVariable);
-      variable = structuredVariable;
-    } else {
-      // TODO: add check that the following items do not have VALUE:
-      // TODO: 1. JUSTIFIED
-      // TODO: 2. SYNCHRONIZED
-      // TODO: 3. USAGE (not USAGE IN DISPLAY)
-      String valueClauseText =
-          retrieveClause(ctx.dataValueClause())
-              .map(DataValueClauseContext::dataValueClauseLiteral)
-              .map(ParserRuleContext::getText)
-              .orElse("");
-
-      String picClauseText = retrievePicText(picClause.get());
-      variable =
-          occursClause
-              .map(
-                  occurs ->
-                      new TableDataName(
-                          name,
-                          qualifier,
-                          definition,
-                          picClauseText,
-                          valueClauseText,
-                          retrieveOccursTimes(occurs),
-                          retrieveIndexItem(occurs)))
-              .map(storeIndexVariables())
-              .orElse(new ElementItem(name, qualifier, definition, picClauseText, valueClauseText));
-
-      // TODO: add check that value does not exceed PIC length
-      ofNullable(structureStack.peek()).ifPresent(it -> it.addChild(variable));
-    }
-    variables.push(variable);
+    defineVariable(
+        variableDefinitionContext,
+        this::multiTableDataNameMatcher,
+        this::groupItemMatcher,
+        // TODO: add check that the following items do not have VALUE:
+        // TODO: 1. JUSTIFIED
+        // TODO: 2. SYNCHRONIZED
+        // TODO: 3. USAGE (not USAGE IN DISPLAY)
+        this::tableDataNameMatcher,
+        this::elementItemMatcher);
   }
 
   /**
@@ -178,30 +143,30 @@ class VariableDefinitionDelegate {
    * @param ctx - a {@link DataDescriptionEntryFormat1Level77Context} to retrieve the variable
    */
   void defineVariable(@NonNull DataDescriptionEntryFormat1Level77Context ctx) {
-    String name = retrieveName(ctx.entryName());
-    Locality definition = retrieveDefinition(ctx.entryName());
+    VariableDefinitionContext variableDefinitionContext =
+        VariableDefinitionContext.builder()
+            .number(LEVEL_77)
+            .name(retrieveName(ctx.entryName()))
+            .definition(
+                retrieveDefinition(
+                    Optional.<ParserRuleContext>ofNullable(ctx.entryName()).orElse(ctx)))
+            .antlrClass(ctx.getClass())
+            .starting(positions.get(ctx.LEVEL_NUMBER_77().getSymbol()))
+            .picClauses(ctx.dataPictureClause())
+            .valueClauses(ctx.dataValueClause())
+            .usageClauses(ctx.dataUsageClause())
+            .occursClauses(ctx.dataOccursClause())
+            .build();
 
-    checkVariableTypeAllowed(ctx.getClass(), definition);
-    checkStartingArea(LEVEL_77, positions.get(ctx.LEVEL_NUMBER_77().getSymbol()));
+    checkStartingArea(variableDefinitionContext);
+    checkPictureClauseIsSingle(variableDefinitionContext);
+    checkOccursClauseIsSingle(variableDefinitionContext);
+    checkValueClauseIsSingle(variableDefinitionContext);
+    checkUsageClauseIsSingle(variableDefinitionContext);
+    checkTopElementNumber(variableDefinitionContext);
     closePreviousStructure();
-    checkTopElementNumber(LEVEL_77, definition);
 
-    String qualifier = retrieveQualifier(name);
-    String picClause =
-        retrieveClause(ctx.dataPictureClause()).map(this::retrievePicText).orElse("");
-
-    if (picClause.isEmpty()) {
-      addError(messages.getMessage(EMPTY_STRUCTURE_MSG, name), definition);
-    }
-
-    String valueClauseText =
-        retrieveClause(ctx.dataValueClause())
-            .map(DataValueClauseContext::dataValueClauseLiteral)
-            .map(ParserRuleContext::getText)
-            .orElse("");
-
-    variables.push(
-        new IndependentDataItem(name, qualifier, definition, picClause, valueClauseText));
+    defineVariable(variableDefinitionContext, this::independentDataItemMatcher);
   }
 
   /**
@@ -211,49 +176,22 @@ class VariableDefinitionDelegate {
    * @param ctx - a {@link DataDescriptionEntryFormat2Context} to retrieve the variable
    */
   void defineVariable(@NonNull DataDescriptionEntryFormat2Context ctx) {
-    String name = retrieveName(ctx.entryName());
-    Locality definition = retrieveDefinition(ctx.entryName());
-    String qualifier = retrieveQualifier(name);
-    checkVariableTypeAllowed(ctx.getClass(), definition);
-    checkTopElementNumber(LEVEL_66, definition);
-    StructuredVariable structure = structureStack.getFirst();
-    Variable previousVariable = variables.peek();
-    if (structure == null || previousVariable == null) {
-      addError(messages.getMessage(NO_STRUCTURE_BEFORE_RENAME), definition);
-      variables.push(new RenameItem(name, qualifier, definition, List.of()));
-      return;
-    }
+    VariableDefinitionContext variableDefinitionContext =
+        VariableDefinitionContext.builder()
+            .number(LEVEL_66)
+            .name(retrieveName(ctx.entryName()))
+            .definition(
+                retrieveDefinition(
+                    Optional.<ParserRuleContext>ofNullable(ctx.entryName()).orElse(ctx)))
+            .antlrClass(ctx.getClass())
+            .starting(positions.get(ctx.LEVEL_NUMBER_66().getSymbol()))
+            .renamesClauseContext(ctx.dataRenamesClause())
+            .precedingStructure(structureStack.peekLast())
+            .build();
+
     closePreviousStructure();
-
-    List<Variable> childrenToRename;
-    List<Variable> previousChildren = structure.getChildren();
-    DataRenamesClauseContext renamesClause = ctx.dataRenamesClause();
-    String startName = renamesClause.qualifiedDataName().getText();
-    Optional<Variable> start = retrieveChild(previousChildren, startName);
-    if (start.isEmpty()) {
-      childrenToRename = List.of();
-      reportChildrenNotFound(renamesClause, startName);
-    } else if (renamesClause.thruDataName() != null) {
-      String stopName = renamesClause.thruDataName().qualifiedDataName().getText();
-      Optional<Variable> stop = retrieveChild(previousChildren, stopName);
-      if (stop.isEmpty()) {
-        reportChildrenNotFound(renamesClause, stopName);
-        childrenToRename = List.of(start.get());
-      } else {
-        int fromIndex = previousChildren.indexOf(start.get());
-        int toIndex = previousChildren.indexOf(stop.get());
-        if (toIndex <= fromIndex) {
-          addError(INCORRECT_CHILDREN_ORDER, definition);
-          childrenToRename = List.of(start.get());
-        } else childrenToRename = previousChildren.subList(fromIndex, toIndex);
-      }
-    } else {
-      childrenToRename = List.of(start.get());
-    }
-    List<Variable> renamedVariables = renameVariables(name, childrenToRename);
-
-    variables.push(new RenameItem(name, qualifier, definition, renamedVariables));
-    renamedVariables.forEach(variables::push);
+    checkTopElementNumber(variableDefinitionContext);
+    variables.push(renameItemMatcher(variableDefinitionContext));
   }
 
   /**
@@ -263,34 +201,45 @@ class VariableDefinitionDelegate {
    * @param ctx - a {@link DataDescriptionEntryFormat3Context} to retrieve the variable
    */
   void defineVariable(@NonNull DataDescriptionEntryFormat3Context ctx) {
-    String name = retrieveName(ctx.entryName());
-    Locality definition = retrieveDefinition(ctx.entryName());
-    String valueClauseText = ctx.dataValueClause().dataValueClauseLiteral().getText();
-    ElementItem container = getConditionalContainer();
+    VariableDefinitionContext variableDefinitionContext =
+        VariableDefinitionContext.builder()
+            .number(LEVEL_88)
+            .name(retrieveName(ctx.entryName()))
+            .definition(
+                retrieveDefinition(
+                    Optional.<ParserRuleContext>ofNullable(ctx.entryName()).orElse(ctx)))
+            .antlrClass(ctx.getClass())
+            .starting(positions.get(ctx.LEVEL_NUMBER_88().getSymbol()))
+            .valueClauses(ImmutableList.of(ctx.dataValueClause()))
+            .build();
 
-    checkVariableTypeAllowed(ctx.getClass(), definition);
-    checkTopElementNumber(LEVEL_88, definition);
+    checkTopElementNumber(variableDefinitionContext);
+    setValueClauseText(variableDefinitionContext);
+    updateConditionalContainer(variableDefinitionContext);
 
-    ConditionalDataName variable;
-    if (container == null) {
-      addError(messages.getMessage(PREVIOUS_WITHOUT_PIC_FOR_88, name), definition);
-      String qualifier = retrieveQualifier(name);
-      variable = new ConditionalDataName(name, qualifier, definition, valueClauseText);
-    } else {
-      String qualifier = container.getQualifier() + " " + name;
-      variable = new ConditionalDataName(name, qualifier, definition, valueClauseText);
-      container.addConditionalChild(variable);
-    }
-    variables.push(variable);
+    defineVariable(variableDefinitionContext, this::conditionalDataNameMatcher);
   }
 
   /**
-   * Change the currently processing section. Checks if the preceding variable structure is correct
+   * Create and accumulate a variable for mnemonic name out of the given context. Add errors if the
+   * variable definition contains is invalid
    *
-   * @param section - the currently processing section
+   * @param ctx - a {@link EnvironmentSwitchNameClauseContext} to retrieve the variable
    */
-  void switchSection(@NonNull DataDivisionSection section) {
-    this.section = section;
+  void defineVariable(EnvironmentSwitchNameClauseContext ctx) {
+    String name = retrieveName(ctx.mnemonicName());
+    variables.push(
+        new MnemonicName(
+            name,
+            retrieveDefinition(
+                Optional.<ParserRuleContext>ofNullable(ctx.mnemonicName()).orElse(ctx))));
+  }
+
+  /**
+   * Notify the variable delegate that the processing moved to another section in order to track the
+   * structure correctness
+   */
+  void notifySectionChanged() {
     closePreviousStructure();
   }
 
@@ -301,111 +250,58 @@ class VariableDefinitionDelegate {
    */
   @NonNull
   ResultWithErrors<Collection<Variable>> finishDefinitionAnalysis() {
-    switchSection(NOT_INITIALIZED);
-    return new ResultWithErrors<>(variables, errors);
+    closePreviousStructure();
+    return new ResultWithErrors<>(new ArrayList<>(variables), new ArrayList<>(errors));
   }
 
-  private String retrieveName(EntryNameContext context) {
-    return ofNullable(context).map(RuleContext::getText).orElse(OutlineNodeNames.FILLER_NAME);
-  }
-
-  private String retrieveQualifier(String name) {
-    return VariableUtils.createQualifier(structureStack, name);
+  private String retrieveName(RuleContext context) {
+    return ofNullable(context)
+        .map(RuleContext::getText)
+        .map(String::toUpperCase)
+        .orElse(OutlineNodeNames.FILLER_NAME);
   }
 
   private Optional<Variable> retrieveChild(List<Variable> childrenToRename, String stopName) {
     return childrenToRename.stream().filter(it -> it.getName().equals(stopName)).findFirst();
   }
 
-  private List<Variable> renameVariables(String renameVariableName, List<Variable> children) {
-    return children.stream()
-        .map(renameVariable(renameVariableName))
-        .filter(Objects::nonNull)
-        .collect(toList());
-  }
-
-  private void reportChildrenNotFound(DataRenamesClauseContext renamesClause, String stopName) {
-    addError(
-        messages.getMessage(CHILD_TO_RENAME_NOT_FOUND, stopName),
-        positions.get(renamesClause.qualifiedDataName().getStart()));
-  }
-
-  private Function<Variable, Variable> renameVariable(String renameVariableName) {
-    return it ->
-        ofNullable(it.rename(renameVariableName))
-            .orElseGet(
-                () -> {
-                  addError(
-                      messages.getMessage(CANNOT_BE_RENAMED, it.getName()), it.getDefinition());
-                  return null;
-                });
-  }
-
-  private Function<TableDataName, Variable> storeIndexVariables() {
-    return table -> {
-      table.getIndexes().forEach(variables::push);
-      return table;
-    };
-  }
-
-  private void checkTopElementNumber(int number, Locality definition) {
-    if (number == 1 || number == LEVEL_66 || number == LEVEL_77) return;
-    addError(messages.getMessage(NUMBER_NOT_ALLOWED_AT_TOP), definition);
-  }
-
-  private void checkVariableTypeAllowed(Class variableType, Locality definition) {
-    if (!section.allowsVariableType(variableType)) {
-      addError(messages.getMessage(DEFINITION_NOT_ALLOWED_IN_SECTION), definition);
-    }
-  }
-
   @Nullable
-  private ElementItem getConditionalContainer() {
-    return (ElementItem)
-        ofNullable(variables.peek())
-            .filter(it -> it instanceof ElementItem)
-            .filter(it -> ((ElementItem) it).getValue().isEmpty())
-            .orElse(null);
+  private Variable getConditionalContainer() {
+    return ofNullable(variables.peek())
+        .filter(Conditional::isConditional)
+        .orElseGet(
+            () ->
+                ofNullable(variables.peek())
+                    .filter(it -> it instanceof ConditionDataName)
+                    .map(Variable::getParent)
+                    .orElse(null));
+  }
+
+  private Locality retrieveDefinition(ParserRuleContext context) {
+    return ofNullable(context).map(ParserRuleContext::getStart).map(positions::get).orElse(null);
   }
 
   @NonNull
-  private Locality retrieveDefinition(EntryNameContext context) {
-    return positions.get(context.start);
-  }
-
-  @NonNull
-  private String retrievePicText(@NonNull DataPictureClauseContext picClause) {
-    return picClause.getText().replaceAll(picClause.getStart().getText(), "");
-  }
-
-  @NonNull
-  private <T extends ParserRuleContext> Optional<T> retrieveClause(@NonNull List<T> clauses) {
-    if (clauses.isEmpty()) return empty();
-    if (clauses.size() > 1) {
-      addError(
-          messages.getMessage(TOO_MANY_CLAUSES_MSG, clauses.get(0).getStart().getText()),
-          retrieveRangeLocality(clauses));
-    }
-    return of(clauses.get(0));
-  }
-
-  @NonNull
-  private <T extends ParserRuleContext> Locality retrieveRangeLocality(@NonNull List<T> clauses) {
-    Locality start = positions.get(clauses.get(0).getStart());
-    Locality end = positions.get(clauses.get(clauses.size() - 1).getStop());
-    Range range = new Range(start.getRange().getStart(), end.getRange().getEnd());
-    return Locality.builder().uri(start.getUri()).range(range).build();
+  private String retrievePicText(List<DataPictureClauseContext> clauses) {
+    if (clauses.isEmpty()) return "";
+    DataPictureClauseContext clause = clauses.get(0);
+    return clause.getText().replaceAll(clause.getStart().getText(), "").trim();
   }
 
   private int retrieveOccursTimes(@NonNull DataOccursClauseContext dataOccursClauseContexts) {
-    return Integer.parseInt(dataOccursClauseContexts.integerLiteral().toString());
+    return Integer.parseInt(dataOccursClauseContexts.integerLiteral().getText());
   }
 
   @NonNull
   private List<IndexItem> retrieveIndexItem(@NonNull DataOccursClauseContext clause) {
     return clause.indexName().stream()
-        .map(it -> new IndexItem(it.getText(), it.getText(), positions.get(it.start)))
+        .map(it -> new IndexItem(it.getText().toUpperCase(), positions.get(it.start)))
         .collect(toList());
+  }
+
+  private UsageFormat retrieveUsageFormat(List<DataUsageClauseContext> clauses) {
+    if (clauses.isEmpty()) return UsageFormat.UNDEFINED;
+    return UsageFormat.of(clauses.get(0).usageFormat().getStart().getText());
   }
 
   private void closePreviousStructure() {
@@ -415,17 +311,12 @@ class VariableDefinitionDelegate {
   private void closePreviousStructureIfNeeded(int number) {
     ofNullable(structureStack.peek())
         .filter(it -> it.getChildren().isEmpty())
+        .filter(it -> it.getLevelNumber() >= number)
         .ifPresent(
             it ->
                 addError(
                     messages.getMessage(EMPTY_STRUCTURE_MSG, it.getName()), it.getDefinition()));
     structureStack.removeIf(it -> it.getLevelNumber() >= number);
-  }
-
-  private void checkStartingArea(int number, @NonNull Locality locality) {
-    if ((number == 1 || number == LEVEL_77) && locality.getRange().getStart().getCharacter() > 10) {
-      addError(AREA_A_WARNING, locality, WARNING);
-    }
   }
 
   private void addError(String suggestion, Locality locality) {
@@ -442,5 +333,289 @@ class VariableDefinitionDelegate {
     errors.add(error);
     LOG.debug(
         format("Syntax error defined by %s: %s", getClass().getSimpleName(), error.toString()));
+  }
+
+  private void checkStartingArea(VariableDefinitionContext variable) {
+    if ((variable.getNumber() == LEVEL_01 || variable.getNumber() == LEVEL_77)
+        && variable.getStarting().getRange().getStart().getCharacter() > AREA_A_FINISH) {
+      addError(
+          messages.getMessage(AREA_A_WARNING, variable.getName()), variable.getStarting(), WARNING);
+    }
+  }
+
+  private void closePreviousStructureIfNeeded(VariableDefinitionContext variable) {
+    closePreviousStructureIfNeeded(variable.getNumber());
+  }
+
+  private void checkTopElementNumber(VariableDefinitionContext variable) {
+    int number = variable.getNumber();
+    // Level 88 is not allowed as a top element, but it may follow a 77 or 01 elementary item, so it
+    // may produce a false-positive semantic error. The reason is that elementary items are not
+    // stored in the structure stack, and the 88 may be falsy treated as a top element.
+    if (number == LEVEL_01 || number == LEVEL_66 || number == LEVEL_77 || number == LEVEL_88)
+      return;
+    if (structureStack.isEmpty())
+      addError(
+          messages.getMessage(NUMBER_NOT_ALLOWED_AT_TOP, variable.getName()),
+          variable.getDefinition());
+  }
+
+  private void checkPictureClauseIsSingle(VariableDefinitionContext variable) {
+    checkClauseIsSingle(variable.getDefinition(), variable.getPicClauses(), "PICTURE");
+  }
+
+  private void checkOccursClauseIsSingle(VariableDefinitionContext variable) {
+    checkClauseIsSingle(variable.getDefinition(), variable.getOccursClauses(), "OCCURS");
+  }
+
+  private void checkValueClauseIsSingle(VariableDefinitionContext variable) {
+    checkClauseIsSingle(variable.getDefinition(), variable.getValueClauses(), "VALUE");
+  }
+
+  private void checkUsageClauseIsSingle(VariableDefinitionContext variable) {
+    checkClauseIsSingle(variable.getDefinition(), variable.getUsageClauses(), "USAGE");
+  }
+
+  private void checkClauseIsSingle(
+      Locality locality, List<? extends ParserRuleContext> clauses, String clause) {
+    if (clauses.size() > 1) {
+      addError(messages.getMessage(TOO_MANY_CLAUSES_MSG, clause), locality);
+    }
+  }
+
+  private void setValueClauseText(VariableDefinitionContext variable) {
+    String valueClauseText = "";
+    if (!variable.getValueClauses().isEmpty()) {
+      valueClauseText = variable.getValueClauses().get(0).dataValueClauseLiteral().getText();
+    }
+    variable.setValueClauseTest(valueClauseText);
+  }
+
+  private void updateConditionalContainer(VariableDefinitionContext variable) {
+    Variable container = getConditionalContainer();
+    variable.setContainer(container);
+    if (container == null) {
+      addError(
+          messages.getMessage(PREVIOUS_WITHOUT_PIC_FOR_88, variable.getName()),
+          variable.getDefinition());
+    }
+  }
+
+  private void defineVariable(
+      VariableDefinitionContext variableDefinitionContext,
+      Function<VariableDefinitionContext, Variable>... matchers) {
+    Arrays.stream(matchers)
+        .map(matcher -> matcher.apply(variableDefinitionContext))
+        .filter(Objects::nonNull)
+        .findFirst()
+        .ifPresent(
+            variable -> {
+              // TODO: add check that value does not exceed PIC length
+              ofNullable(structureStack.peek()).ifPresent(it -> it.addChild(variable));
+              if (variable instanceof StructuredVariable) {
+                structureStack.push((StructuredVariable) variable);
+              }
+              variables.push(variable);
+            });
+  }
+
+  private Variable multiTableDataNameMatcher(VariableDefinitionContext variable) {
+    if (variable.getPicClauses().isEmpty()
+        && !variable.getOccursClauses().isEmpty()
+        && variable.getUsageClauses().isEmpty()) {
+      MultiTableDataName result =
+          new MultiTableDataName(
+              variable.getNumber(),
+              variable.getName(),
+              variable.getDefinition(),
+              structureStack.peek(),
+              retrieveOccursTimes(variable.getOccursClauses().get(0)),
+              retrieveIndexItem(variable.getOccursClauses().get(0)),
+              retrieveUsageFormat(variable.getUsageClauses()));
+      result.getIndexes().forEach(variables::push);
+      return result;
+    }
+    return null;
+  }
+
+  private Variable groupItemMatcher(VariableDefinitionContext variable) {
+    if (variable.getPicClauses().isEmpty()
+        && variable.getOccursClauses().isEmpty()
+        && variable.getUsageClauses().isEmpty()) {
+      return new GroupItem(
+          variable.getNumber(),
+          variable.getName(),
+          variable.getDefinition(),
+          structureStack.peek());
+    }
+    return null;
+  }
+
+  private Variable tableDataNameMatcher(VariableDefinitionContext variable) {
+    if ((!variable.getPicClauses().isEmpty() || !variable.getUsageClauses().isEmpty())
+        && !variable.getOccursClauses().isEmpty()) {
+      TableDataName tableDataName =
+          new TableDataName(
+              variable.getName(),
+              variable.getDefinition(),
+              structureStack.peek(),
+              retrievePicText(variable.getPicClauses()),
+              variable.getValueClauseTest(),
+              retrieveOccursTimes(variable.getOccursClauses().get(0)),
+              retrieveIndexItem(variable.getOccursClauses().get(0)),
+              retrieveUsageFormat(variable.getUsageClauses()));
+      tableDataName.getIndexes().forEach(variables::push);
+      return tableDataName;
+    }
+    return null;
+  }
+
+  private Variable elementItemMatcher(VariableDefinitionContext variable) {
+    if ((!variable.getPicClauses().isEmpty() || !variable.getUsageClauses().isEmpty())
+        && variable.getOccursClauses().isEmpty()) {
+      return new ElementItem(
+          variable.getName(),
+          variable.getDefinition(),
+          structureStack.peek(),
+          retrievePicText(variable.getPicClauses()),
+          variable.getValueClauseTest(),
+          retrieveUsageFormat(variable.getUsageClauses()));
+    }
+    return null;
+  }
+
+  private Variable independentDataItemMatcher(VariableDefinitionContext variable) {
+    String picClause = "";
+    if (variable.getPicClauses().isEmpty()) {
+      addError(
+          messages.getMessage(EMPTY_STRUCTURE_MSG, variable.getName()), variable.getDefinition());
+    } else {
+      picClause = retrievePicText(variable.getPicClauses());
+    }
+    return new IndependentDataItem(
+        variable.getName(), variable.getDefinition(), picClause, variable.getValueClauseTest());
+  }
+
+  private Variable conditionalDataNameMatcher(VariableDefinitionContext variable) {
+    ConditionDataName result =
+        new ConditionDataName(
+            variable.getName(),
+            variable.getDefinition(),
+            variable.getContainer(),
+            variable.getValueClauseTest());
+    Optional.ofNullable(variable.getContainer())
+        .ifPresent(container -> container.addConditionName(result));
+    return result;
+  }
+
+  private Variable renameItemMatcher(VariableDefinitionContext variable) {
+    RenameItem renameItem = new RenameItem(variable.getName(), variable.getDefinition());
+    List<Variable> renamedVariables =
+        renameVariables(renameItem, extractChildrenToRename(variable));
+    renamedVariables.forEach(variables::push);
+    renamedVariables.forEach(renameItem::addChild);
+    return renameItem;
+  }
+
+  private List<Variable> extractChildrenToRename(VariableDefinitionContext variable) {
+    Locality definition = variable.getDefinition();
+    if (variable.getPrecedingStructure() == null) {
+      addError(messages.getMessage(NO_STRUCTURE_BEFORE_RENAME), definition);
+      return ImmutableList.of();
+    }
+    StructuredVariable structure = variable.getPrecedingStructure();
+    List<Variable> previousChildren = collectChildrenToRename(structure);
+
+    DataRenamesClauseContext renamesClause = variable.getRenamesClauseContext();
+    String startName = renamesClause.dataName().getText();
+    Optional<Variable> start = retrieveChild(previousChildren, startName);
+    if (!start.isPresent()) {
+      reportChildrenNotFound(startName, definition);
+      return ImmutableList.of();
+    }
+
+    Variable startVar = start.get();
+    Locality startUsage = positions.get(renamesClause.dataName().getStart());
+    if (renamesClause.thruDataName() == null) {
+      startVar.addUsage(startUsage);
+      return ImmutableList.of(startVar);
+    }
+
+    String stopName = renamesClause.thruDataName().dataName().getText();
+    Optional<Variable> stop = retrieveChild(previousChildren, stopName);
+    if (!stop.isPresent()) {
+      reportChildrenNotFound(stopName, definition);
+      startVar.addUsage(startUsage);
+      return ImmutableList.of(startVar);
+    }
+
+    Variable stopVar = stop.get();
+    Locality stopUsage = positions.get(renamesClause.thruDataName().dataName().getStart());
+    int toIndex = previousChildren.indexOf(stopVar);
+    int fromIndex = previousChildren.indexOf(startVar);
+    if (toIndex <= fromIndex) {
+      addError(messages.getMessage(INCORRECT_CHILDREN_ORDER), definition);
+      startVar.addUsage(startUsage);
+      stopVar.addUsage(stopUsage);
+      return ImmutableList.of();
+    }
+
+    startVar.addUsage(startUsage);
+    stopVar.addUsage(stopUsage);
+    return previousChildren.subList(fromIndex, toIndex + 1);
+  }
+
+  private List<Variable> collectChildrenToRename(StructuredVariable structure) {
+    List<Variable> result = new ArrayList<>();
+    for (Variable child : structure.getChildren()) {
+      result.add(child);
+      if (child instanceof StructuredVariable) {
+        result.addAll(collectChildrenToRename((StructuredVariable) child));
+      }
+    }
+    return result;
+  }
+
+  private List<Variable> renameVariables(RenameItem newParent, List<Variable> children) {
+    return children.stream()
+        .map(renameVariable(newParent))
+        .filter(Objects::nonNull)
+        .collect(toList());
+  }
+
+  private Function<Variable, Variable> renameVariable(RenameItem newParent) {
+    return it ->
+        ofNullable(it.rename(newParent))
+            .orElseGet(
+                () -> {
+                  addError(
+                      messages.getMessage(CANNOT_BE_RENAMED, it.getName()),
+                      newParent.getDefinition());
+                  return null;
+                });
+  }
+
+  private void reportChildrenNotFound(String stopName, Locality locality) {
+    addError(messages.getMessage(CHILD_TO_RENAME_NOT_FOUND, stopName), locality);
+  }
+
+  /** This data class used for temporal storage ANTLR parsed variables. */
+  @Data
+  @Builder
+  private static class VariableDefinitionContext {
+    int number;
+    String name;
+    Locality definition;
+    Class<? extends ParserRuleContext> antlrClass;
+    Locality starting;
+    List<DataPictureClauseContext> picClauses;
+    List<DataOccursClauseContext> occursClauses;
+    List<DataValueClauseContext> valueClauses;
+    List<DataUsageClauseContext> usageClauses;
+    String valueClauseTest;
+    Variable container;
+    DataRenamesClauseContext renamesClauseContext;
+    UsageFormat usageFormat;
+    StructuredVariable precedingStructure;
   }
 }

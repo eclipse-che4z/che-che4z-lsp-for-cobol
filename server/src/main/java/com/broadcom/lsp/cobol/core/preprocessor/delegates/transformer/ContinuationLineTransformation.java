@@ -25,6 +25,7 @@ import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,7 +48,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private static final int END_INDEX_CONTENT_AREA_A = 10;
   private static final Pattern CONTINUATION_LINE_PATTERN =
       Pattern.compile(ProcessingConstants.CONT_LINE_NO_AREA_A_REGEX);
-
+  private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("\\s*");
   private MessageService messageService;
 
   @Inject
@@ -82,10 +83,29 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private SyntaxError checkContinuationLine(String uri, int lineNumber, CobolLine cobolLine) {
     if (CobolLineTypeEnum.CONTINUATION.equals(cobolLine.getType())) {
 
+      adjustBlankOrCommentLines(cobolLine);
+
       // invoke method for noContentInAreaA
       return checkContentAreaAWithContinuationLine(cobolLine, uri, lineNumber);
     }
     return null;
+  }
+
+  private void adjustBlankOrCommentLines(CobolLine cobolLine) {
+    if (Objects.nonNull(cobolLine.getPredecessor())) {
+      while (isBlankLine(cobolLine.getPredecessor())
+          || cobolLine.getPredecessor().getType() == CobolLineTypeEnum.COMMENT) {
+        CobolLine blankOrCommentLine = cobolLine.getPredecessor();
+        cobolLine.setPredecessor(cobolLine.getPredecessor().getPredecessor());
+        blankOrCommentLine.setSuccessor(cobolLine.getSuccessor());
+        cobolLine.setSuccessor(blankOrCommentLine);
+      }
+      cobolLine.getPredecessor().setSuccessor(cobolLine);
+    }
+  }
+
+  private boolean isBlankLine(CobolLine cobolLine) {
+    return BLANK_LINE_PATTERN.matcher(cobolLine.toString()).matches();
   }
 
   /**
@@ -120,6 +140,8 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
    */
   private SyntaxError checkIfStringClosedCorrectly(
       CobolLine previousCobolLine, String uri, int lineNumber, CobolLine currentCobolLine) {
+    if (isBlankLine(currentCobolLine) || currentCobolLine.getType() == CobolLineTypeEnum.COMMENT)
+      return null;
     if (checkIfLineHasUnclosedString(previousCobolLine)
         && !CobolLineTypeEnum.CONTINUATION.equals(currentCobolLine.getType())) {
       // there is a string not closed correctly - I'll raise an error
@@ -191,7 +213,9 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
             .severity(ERROR)
             .build();
 
-    LOG.debug("Syntax error by ContinuationLineTransformation#registerStringClosingError: {}", error.toString());
+    LOG.debug(
+        "Syntax error by ContinuationLineTransformation#registerStringClosingError: {}",
+        error.toString());
     return error;
   }
 
@@ -213,7 +237,9 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
                     "ContinuationLineTransformation.continuationLineContentAreaA"))
             .severity(ERROR)
             .build();
-    LOG.debug("Syntax error by ContinuationLineTransformation#registerContinuationLineError: {}", error.toString());
+    LOG.debug(
+        "Syntax error by ContinuationLineTransformation#registerContinuationLineError: {}",
+        error.toString());
     return error;
   }
 }

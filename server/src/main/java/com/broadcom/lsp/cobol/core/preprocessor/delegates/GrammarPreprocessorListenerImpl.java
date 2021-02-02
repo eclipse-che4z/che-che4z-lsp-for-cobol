@@ -70,7 +70,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private final NamedSubContext copybooks = new NamedSubContext();
   private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
   private final Map<Integer, Integer> shifts = new HashMap<>();
-  //used for both copy and sql-include statements
+  // used for both copy and sql-include statements
   private final Map<String, Locality> copybookStatements = new HashMap<>();
 
   private String documentUri;
@@ -147,19 +147,23 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
-    collectAndAccumulateCopybookData(ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval());
+    collectAndAccumulateCopybookData(
+        ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval());
   }
 
-
-  @Override public void enterIncludeStatement(@NonNull IncludeStatementContext ctx) {
+  @Override
+  public void enterIncludeStatement(@NonNull IncludeStatementContext ctx) {
     push();
   }
 
-  @Override public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
-    collectAndAccumulateCopybookData(ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval());
+  @Override
+  public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
+    collectAndAccumulateCopybookData(
+        ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval());
   }
 
-  private void collectAndAccumulateCopybookData(CopySourceContext copySource, Locality copybookStatementPosition,  Interval sourceInterval) {
+  private void collectAndAccumulateCopybookData(
+      CopySourceContext copySource, Locality copybookStatementPosition, Interval sourceInterval) {
     if (!copybookProcessingMode.analyze) {
       pop();
       return;
@@ -179,7 +183,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
     String copybookId = randomUUID().toString();
     ExtendedDocument copybookDocument =
-            processCopybook(copybookName, uri, copybookId, content, locality);
+        processCopybook(copybookName, uri, copybookId, content, locality);
     String copybookContent = copybookDocument.getText();
 
     checkCopybookNameLength(copybookName, locality);
@@ -222,12 +226,21 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
     if (node.getSymbol().getType() != EOF) {
       write(node.getText());
+    } else {
+      write(retrieveHiddenTextToRight(tokPos, tokens));
     }
   }
 
   private String retrieveHiddenTextToLeft(int tokPos, BufferedTokenStream tokens) {
 
     return ofNullable(tokens.getHiddenTokensToLeft(tokPos, HIDDEN))
+        .map(it -> it.stream().map(Token::getText).collect(joining()))
+        .orElse("");
+  }
+
+  private String retrieveHiddenTextToRight(int tokPos, BufferedTokenStream tokens) {
+
+    return ofNullable(tokens.getHiddenTokensToRight(tokPos, HIDDEN))
         .map(it -> it.stream().map(Token::getText).collect(joining()))
         .orElse("");
   }
@@ -410,7 +423,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     SyntaxError error =
         SyntaxError.syntaxError()
             .severity(ERROR)
-            .suggestion(messageService.getMessage("GrammarPreprocessorListener.recursionDetected",usage.getName()))
+            .suggestion(
+                messageService.getMessage(
+                    "GrammarPreprocessorListener.recursionDetected", usage.getName()))
             .locality(usage.getLocality())
             .build();
     LOG.debug(
@@ -423,7 +438,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     SyntaxError error =
         SyntaxError.syntaxError()
             .locality(locality)
-            .suggestion(messageService.getMessage("GrammarPreprocessorListener.errorSuggestion", copybookName))
+            .suggestion(
+                messageService.getMessage(
+                    "GrammarPreprocessorListener.errorSuggestion", copybookName))
             .severity(ERROR)
             .errorCode(MISSING_COPYBOOK)
             .build();
@@ -438,7 +455,9 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       SyntaxError error =
           SyntaxError.syntaxError()
               .severity(INFO)
-              .suggestion(messageService.getMessage("GrammarPreprocessorListener.copyBkOver8Chars", copybookName))
+              .suggestion(
+                  messageService.getMessage(
+                      "GrammarPreprocessorListener.copyBkOver8Chars", copybookName))
               .locality(locality)
               .build();
       LOG.debug(

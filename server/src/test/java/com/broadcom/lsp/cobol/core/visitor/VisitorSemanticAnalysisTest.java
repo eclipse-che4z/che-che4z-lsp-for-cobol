@@ -21,13 +21,13 @@ import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
 import com.broadcom.lsp.cobol.core.utils.CustomToken;
 import com.broadcom.lsp.cobol.service.SubroutineService;
+import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.broadcom.lsp.cobol.core.CobolParser.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,7 +61,7 @@ class VisitorSemanticAnalysisTest {
             "",
             new NamedSubContext(),
             mock(CommonTokenStream.class),
-            Map.of(
+            ImmutableMap.of(
                 token,
                 Locality.builder()
                     .range(new Range(new Position(0, 0), new Position(0, 0)))
@@ -72,7 +72,7 @@ class VisitorSemanticAnalysisTest {
 
     visitor.visitQualifiedDataNameFormat1(mockMethod(token));
 
-    List<SyntaxError> errors = visitor.getErrors();
+    List<SyntaxError> errors = visitor.finishAnalysis().getErrors();
     assertEquals(1, errors.size());
     assertEquals(
         "Invalid definition for: " + INVALID_VARIABLE.toUpperCase(), errors.get(0).getSuggestion());
@@ -99,7 +99,7 @@ class VisitorSemanticAnalysisTest {
             "",
             new NamedSubContext(),
             tokenStream,
-            Map.of(
+            ImmutableMap.of(
                 token,
                 Locality.builder()
                     .range(new Range(new Position(0, 0), new Position(0, 0)))
@@ -110,13 +110,14 @@ class VisitorSemanticAnalysisTest {
 
     visitor.visitStatement(node);
 
-    List<SyntaxError> errors = visitor.getErrors();
+    List<SyntaxError> errors = visitor.finishAnalysis().getErrors();
     assertEquals(1, errors.size());
     assertEquals("A misspelled word, maybe you want to put MOVE", errors.get(0).getSuggestion());
   }
 
   private QualifiedDataNameFormat1Context mockMethod(CustomToken token) {
     QualifiedDataNameFormat1Context node = mock(QualifiedDataNameFormat1Context.class);
+
     DataNameContext nodeData = mock(DataNameContext.class);
 
     when(node.dataName()).thenReturn(nodeData);

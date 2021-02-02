@@ -12,10 +12,10 @@ spec:
     tty: true
     resources:
       limits:
-        memory: "2Gi"
+        memory: "3Gi"
         cpu: "1"
       requests:
-        memory: "2Gi"
+        memory: "3Gi"
         cpu: "1"
   - name: node
     image: sonarsource/sonarcloud-scan:1.2.1
@@ -24,10 +24,10 @@ spec:
     tty: true
     resources:
       limits:
-        memory: "2Gi"
+        memory: "1Gi"
         cpu: "1"
       requests:
-        memory: "2Gi"
+        memory: "1Gi"
         cpu: "1"
   - name: jnlp
     volumeMounts:
@@ -88,7 +88,7 @@ pipeline {
                         container('maven') {
                             dir('server') {
                                 withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
-                                    sh "mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME} --no-transfer-progress"
+                                    sh 'mvn sonar:sonar -Dsonar.projectKey=eclipse_che-che4z-lsp-for-cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${BRANCH_NAME} --no-transfer-progress'
                                 }
                             }
                         }
@@ -130,7 +130,7 @@ pipeline {
                             dir('clients/cobol-lsp-vscode-extension') {
                                 sh 'npm i sonarqube-scanner'
                                 withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONARCLOUD_TOKEN')]) {
-                                    sh "node_modules/sonarqube-scanner/dist/bin/sonar-scanner -Dsonar.projectKey=com.ca.lsp:com.ca.lsp.cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${env.BRANCH_NAME}"
+                                    sh 'node_modules/sonarqube-scanner/dist/bin/sonar-scanner -Dsonar.projectKey=com.ca.lsp:com.ca.lsp.cobol -Dsonar.organization=eclipse -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONARCLOUD_TOKEN} -Dsonar.branch.name=${BRANCH_NAME}'
                                 }
                             }
                         }

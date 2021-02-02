@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/** Test to check PropertiesMessageService */
 class PropertiesMessageServiceTest {
 
   private static MessageService messageService;

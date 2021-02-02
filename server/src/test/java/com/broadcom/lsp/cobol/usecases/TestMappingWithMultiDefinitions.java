@@ -17,10 +17,9 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This test checks the positive scenario with building an extended document with correct positions
@@ -73,11 +72,11 @@ class TestMappingWithMultiDefinitions {
 
   private static final String PARS =
       "       {#*PAR1}.\r\n"
-          + "           IF {$CHILD1} EQUAL TO 1\r\n"
+          + "           IF {$CHILD1} OF {$PARENT} EQUAL TO 1\r\n"
           + "           THEN\r\n"
-          + "               MOVE 10 TO {$CHILD2}\r\n"
+          + "               MOVE 10 TO {$CHILD2} OF {$PARENT}\r\n"
           + "           ELSE\r\n"
-          + "               MOVE 11 TO {$CHILD2}\r\n"
+          + "               MOVE 11 TO {$CHILD2} OF {$PARENT}\r\n"
           + "           END-IF.\r\n";
 
   private static final String STRUC_NAME = "STRUC";
@@ -91,13 +90,13 @@ class TestMappingWithMultiDefinitions {
   void test() {
     UseCaseEngine.runTest(
         DOCUMENT,
-        List.of(
+        ImmutableList.of(
             new CobolText(STRUC_NAME, STRUC),
             new CobolText(WITHNEST_NAME, WITHNEST),
             new CobolText(NESTED_NAME, NESTED),
             new CobolText(NESTED1_NAME, NESTED1),
             new CobolText(NESTED2_NAME, NESTED2),
             new CobolText(PARS_NAME, PARS)),
-        Map.of());
+        ImmutableMap.of());
   }
 }

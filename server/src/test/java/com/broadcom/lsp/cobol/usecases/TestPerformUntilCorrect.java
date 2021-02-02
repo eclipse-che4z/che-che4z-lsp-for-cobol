@@ -15,10 +15,9 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /** This use cases checks if "PERFORM" with the "UNTIL" sentence processed correctly. */
 class TestPerformUntilCorrect {
@@ -28,8 +27,8 @@ class TestPerformUntilCorrect {
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
-          + "        01 {$*ID0}.\r\n"
-          + "        01 {$*TAPARM1}.\r\n"
+          + "        01 {$*ID0} PIC 9.\r\n"
+          + "        01 {$*TAPARM1} PIC 9.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
           + "       {#*PROGA}.\r\n"
           + "           PERFORM WITH TEST BEFORE UNTIL {$ID0} = 0\r\n"
@@ -39,6 +38,6 @@ class TestPerformUntilCorrect {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of(), List.of("ID1"));
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of("ID1"));
   }
 }

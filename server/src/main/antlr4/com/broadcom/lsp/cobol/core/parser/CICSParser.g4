@@ -12,7 +12,8 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 parser grammar CICSParser;
-options {tokenVocab = CobolLexer;}
+options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
+import Db2SqlParser;
 
 allRules: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
           cics_build | cics_cancel | cics_change | cics_change_task | cics_check | cics_connect | cics_converttime |
@@ -221,6 +222,8 @@ cics_check_activity: (ACQPROCESS | ACTIVITY cics_data_value | ACQACTIVITY | COMP
                      ABPROGRAM cics_data_area | MODE cics_cvda | SUSPSTATUS cics_cvda | cics_resp)+;
 cics_check_timer: TIMER cics_data_value cics_resp? STATUS cics_cvda cics_resp?;
 
+cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN ;
+
 /** CONNECT PROCESS */
 cics_connect: CONNECT PROCESS (CONVID cics_name | SESSION cics_name | PROCNAME cics_data_area |
               PROCLENGTH cics_data_value | PARTNER cics_name | cics_connect_piplist | SYNCLEVEL |
@@ -415,14 +418,14 @@ cics_handle_abend: ABEND (CANCEL | PROGRAM cics_name | LABEL cics_label | RESET 
 cics_handle_aid: AID (ANYKEY (cics_label)? | CLEAR (empty_parens | cics_label)? | CLRPARTN (cics_label)? | ENTER (cics_label)? |
                  LIGHTPEN (cics_label)? | OPERID  (cics_label)? | pa_option (cics_label)? | pf_option (cics_label)? |
                  TRIGGER  (cics_label)? | cics_resp)*;
-cics_handle_condition: CONDITION (mama cics_label? | cics_resp)+;
+cics_handle_condition: CONDITION ((cics_conditions | mama) cics_label? | cics_resp)+;
 
 pa_option: PA1 | PA2 | PA3;
 pf_option: PF1 | PF2 | PF3 | PF4 | PF5 | PF6 | PF7 | PF8 | PF9 | PF10 | PF11 | PF12 | PF13 | PF14 | PF15 | PF16 | PF17 |
            PF18 | PF19 | PF20 | PF21 | PF22 | PF23 | PF24;
 
 /** IGNORE CONDITION */
-cics_ignore: IGNORE (CONDITION | mama | cics_resp)+;
+cics_ignore: IGNORE CONDITION (cics_conditions | mama | cics_resp)+;
 
 /** INQUIRE ACTIVITYID / CONTAINER / EVENT / PROCESS / TIMER */
 cics_inquire: INQUIRE (cics_inquire_activityid | cics_inquire_container | cics_inquire_event | cics_inquire_process |
@@ -903,7 +906,7 @@ cics_only_words: ABCODE | ABDUMP | ABEND | ABPROGRAM | ABSTIME | ACEE | ACQACTIV
            ;
 
 cics_cobol_intersected_words
-    : ABORT | ADD | ADDRESS | AFTER | ALTER | AND | AS | ASSIGN | AT | BINARY | BIT | CANCEL | CHANNEL | CLASS | CLOSE
+    : ABORT | ADD | ADDRESS | AFTER | ALTER | AND | AS | ASSIGN | AT | BINARY | CANCEL | CHANNEL | CLASS | CLOSE
     | CONTROL | COPY | DATA | DATE | DELETE | DELIMITER | DETAIL | END | ENTER | ENTRY | EQUAL | ERASE | ERROR | EVENT
     | EXCEPTION | EXTERNAL | FILE | FOR | FROM | INPUT | INTO | INVOKE | LABEL | LAST | LENGTH | LINE | LIST | MESSAGE
     | MMDDYYYY | MODE | MOVE | NEXT | ON | OPEN | OR | ORGANIZATION | OUTPUT | PAGE | PARSE | PASSWORD | PF | PROCESS
@@ -924,24 +927,25 @@ cics_value: LPARENCHAR ptr_value RPARENCHAR;
 empty_parens: LPARENCHAR RPARENCHAR;
 
 cobolWord
-   : IDENTIFIER | cics_only_words
-   | ABORT | AS | ASCII | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH
-   | BINARY | BIT | BLOB | BOUNDS
-   | CAPABLE | CCSVERSION | CHANGED | CHANNEL | CLOB | CLOSE_DISPOSITION | COBOL | COMMITMENT | CONTROL_POINT | CONVENTION | COUNT | CRUNCH | CURSOR
-   | DBCLOB | DEFAULT | DEFAULT_DISPLAY | DEFINITION | DFHRESP | DFHVALUE | DISK | DOUBLE
-   | EBCDIC | ENTER | ERASE | ESCAPE | EVENT | EXCLUSIVE | EXTENDED
+   : IDENTIFIER | cics_only_words | db2sql_only_words1
+   | ABEND | ABORT | AS | ASCII | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | ATTACH
+   | BINARY | BIND | BIT | BLOB | BOUNDS
+   | CAPABLE | CCSVERSION | CHANGE | CHANGED | CHANNEL | CLOB | CLOSE_DISPOSITION | COBOL | CODE | COMMITMENT | CONVENTION | COUNT | CRUNCH | CURSOR
+   | DBCLOB | DEFAULT | DEFAULT_DISPLAY | DEFINITION | DFHRESP | DFHVALUE | DISK | DOUBLE | DUMP
+   | EBCDIC | ENTER | ERASE | ESCAPE | EVENT | EXCLUSIVE | EXITS | EXTENDED
    | FUNCTION_POINTER
-   | IMPLICIT | INTEGER | IN
+   | ID | IGNORED | IMPLICIT | INTEGER | INTO | INVOKED| IN
    | KEPT | KEYBOARD
-   | LANGUAGE | LIBRARY | LIST | LOCAL | LONG_DATE | LONG_TIME | LOWER
-   | MMDDYYYY
-   | NAMED | NATIONAL | NATIONAL_EDITED | NETWORK | NUMERIC_DATE | NUMERIC_TIME
-   | ODT | ORDERLY | OWN | OF
-   | PASSWORD | PORT | PRINTER | PROCESS | PROGRAM
+   | LANGUAGE | LIBRARY | LIST | LOCAL | LONG_DATE | LONG_TIME | LOWER | LTERM
+   | MMDDYYYY | MAX
+   | NAMED | NATIONAL | NATIONAL_EDITED | NETWORK | NODENAME | NODUMP | NOWAIT | NOWRITE | NUMERIC_DATE | NUMERIC_TIME
+   | ODT | ORDERLY | OWN | OF | OBJECT | POINTER_32
+   | PASSWORD | PORT | PRINTER | PRIORITY | PROCESS | PROGRAM | PTERM
    | READER | REAL | RECEIVED | RECURSIVE | REF | REMOTE | REMOVE
-   | SAVE | SHARED | SHORT_DATE | SQL | SYMBOL
-   | TASK | THREAD | THREAD_LOCAL | TIMER | TODAYS_DATE | TODAYS_NAME | TRUNCATED | TYPEDEF
-   | VIRTUAL
+   | SAVE | SCHEMA | SCREENSIZE | SHARED | SHORT_DATE | SQL | STATISTICS | STATS | SYMBOL | SYSVERSION | SYSTEM
+   | TASK | THREAD | THREAD_LOCAL | TIMER | TODAYS_DATE | TODAYS_NAME | TRANSACTION | TRUNCATED | TYPEDEF
+   | USER | UTF_8
+   | VERSION | VIRTUAL
    | WAIT
    | YEAR | YYYYMMDD | YYYYDDD
    ;
@@ -1178,11 +1182,11 @@ numericLiteral
    ;
 
 cicsDfhRespLiteral
-   : DFHRESP LPARENCHAR (cobolWord | literal) RPARENCHAR
+   : DFHRESP LPARENCHAR (cics_conditions | cobolWord | literal) RPARENCHAR
    ;
 
 cicsDfhValueLiteral
-   : DFHVALUE LPARENCHAR (cobolWord | literal) RPARENCHAR
+   : DFHVALUE LPARENCHAR (cics_conditions | cobolWord | literal) RPARENCHAR
    ;
 
 integerLiteral
@@ -1190,7 +1194,7 @@ integerLiteral
    ;
 
 literal
-   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | cicsDfhRespLiteral | cicsDfhValueLiteral | charString
+   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | cicsDfhRespLiteral | cicsDfhValueLiteral | charString | DATELITERAL
    ;
 
 charString

@@ -64,6 +64,9 @@ public class TestLanguageServer implements LanguageServer, DisposableLanguageSer
     return exitCode;
   }
 
+  /**
+   * Revoke shutdown for testing purpose.
+   */
   public void revokeShutdown() {
     exitCode = 1;
   }

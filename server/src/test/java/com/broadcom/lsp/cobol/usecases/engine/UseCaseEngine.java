@@ -15,12 +15,13 @@
 
 package com.broadcom.lsp.cobol.usecases.engine;
 
+import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.broadcom.usecase.UseCasePreprocessorLexer;
 import com.broadcom.usecase.UseCasePreprocessorParser;
 import com.broadcom.usecase.UseCasePreprocessorParser.StartRuleContext;
-import com.broadcom.lsp.cobol.positive.CobolText;
+import com.google.common.collect.ImmutableList;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -113,7 +114,7 @@ public class UseCaseEngine {
    */
   public void runTest(
       String text, List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics) {
-    runTest(text, copybooks, expectedDiagnostics, List.of(), CopybookProcessingMode.ENABLED);
+    runTest(text, copybooks, expectedDiagnostics, ImmutableList.of(), CopybookProcessingMode.ENABLED);
   }
 
   /**
@@ -178,7 +179,7 @@ public class UseCaseEngine {
   private Map<String, List<Location>> makeSubroutinesDefinitions(List<String> subroutineNames) {
     Range fileStart = new Range(new Position(0, 0), new Position(0, 0));
     return subroutineNames.stream()
-        .collect(toMap(Function.identity(), name -> List.of(new Location("URI:" + name, fileStart))));
+        .collect(toMap(Function.identity(), name -> ImmutableList.of(new Location("URI:" + name, fileStart))));
   }
 
   private PreprocessedDocument prepareDocument(

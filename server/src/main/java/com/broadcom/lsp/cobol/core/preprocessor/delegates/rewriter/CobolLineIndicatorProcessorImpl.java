@@ -19,8 +19,10 @@ import com.broadcom.lsp.cobol.core.model.CobolLineTypeEnum;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.CobolLineUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants.COMMENT_TAG;
 import static com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants.WS;
@@ -43,7 +45,14 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
    */
   @Override
   public List<CobolLine> processLines(final List<CobolLine> lines) {
-    return lines.stream().map(this::processLine).collect(Collectors.toList());
+    List<CobolLine> result = new ArrayList<>();
+    if (!lines.isEmpty()) {
+      result =
+          StreamSupport.stream(lines.get(0).spliterator(), false)
+              .map(this::processLine)
+              .collect(Collectors.toList());
+    }
+    return result;
   }
 
   private CobolLine processLine(final CobolLine line) {

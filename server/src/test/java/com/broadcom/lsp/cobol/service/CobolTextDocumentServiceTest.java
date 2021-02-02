@@ -24,6 +24,8 @@ import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import com.broadcom.lsp.cobol.service.mocks.MockTextDocumentService;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -74,7 +76,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     CompletionItem completionItem = new CompletionItem();
     completionItem.setLabel("test");
     when(completions.collectFor(any(CobolDocumentModel.class), any(CompletionParams.class)))
-        .thenReturn(new CompletionList(true, List.of(completionItem)));
+        .thenReturn(new CompletionList(true, ImmutableList.of(completionItem)));
 
     openDocument(service);
 
@@ -192,7 +194,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     service.didChange(
         new DidChangeTextDocumentParams(
             new VersionedTextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI, 0),
-            List.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
+            ImmutableList.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
     service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
     verify(engine, timeout(1000))
         .analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.SKIP));
@@ -320,7 +322,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
     assertEquals(Collections.EMPTY_MAP, closeGetter(service));
     verify(spyCommunications, atMost(1))
-        .publishDiagnostics(Map.of(UseCaseUtils.DOCUMENT_URI, List.of()));
+        .publishDiagnostics(ImmutableMap.of(UseCaseUtils.DOCUMENT_URI, ImmutableList.of()));
   }
 
   private CobolTextDocumentService verifyServiceStart() {
@@ -490,7 +492,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
             any(CobolDocumentModel.class),
             any(TextDocumentPositionParams.class),
             any(ReferenceContext.class)))
-        .thenReturn(List.of());
+        .thenReturn(ImmutableList.of());
 
     service.didOpen(
         new DidOpenTextDocumentParams(

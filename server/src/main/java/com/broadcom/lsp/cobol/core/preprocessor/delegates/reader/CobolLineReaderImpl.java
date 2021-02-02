@@ -16,17 +16,15 @@ package com.broadcom.lsp.cobol.core.preprocessor.delegates.reader;
 
 import com.broadcom.lsp.cobol.core.messages.MessageService;
 import com.broadcom.lsp.cobol.core.model.*;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import lombok.NonNull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,21 +48,15 @@ public class CobolLineReaderImpl implements CobolLineReader {
       Pattern.compile(
           "^(?<sequence>.{0,6})(?<indicator>.?)(?<contentA>.{0,4})(?<contentB>.{0,61})(?<comment>.{0,8})(?<extra>.*)$");
   private static final Map<String, CobolLineTypeEnum> INDICATORS =
-      Map.of(
-          "*",
-          COMMENT,
-          "/",
-          COMMENT,
-          "d",
-          DEBUG,
-          "D",
-          DEBUG,
-          "-",
-          CONTINUATION,
-          "$",
-          COMPILER_DIRECTIVE,
-          " ",
-          NORMAL);
+      new ImmutableMap.Builder<String, CobolLineTypeEnum>()
+          .put("*", COMMENT)
+          .put("/", COMMENT)
+          .put("d", DEBUG)
+          .put("D", DEBUG)
+          .put("-", CONTINUATION)
+          .put("$", COMPILER_DIRECTIVE)
+          .put(" ", NORMAL)
+          .build();
 
   private CobolLineReaderDelegate delegate;
   private MessageService messageService;
@@ -144,17 +136,18 @@ public class CobolLineReaderImpl implements CobolLineReader {
   private ResultWithErrors<CobolLineTypeEnum> determineType(
       String indicatorArea, String uri, int lineNumber) {
     return ofNullable(INDICATORS.get(indicatorArea))
-        .map(it -> new ResultWithErrors<>(it, List.of()))
-        .orElse(
-            new ResultWithErrors<>(
-                NORMAL,
-                List.of(
-                    createError(
-                        uri,
-                        messageService.getMessage("CobolLineReaderImpl.incorrectLineFormat"),
-                        lineNumber,
-                        INDICATOR_AREA_INDEX,
-                        INDICATOR_AREA_INDEX + 1))));
+        .map(it -> new ResultWithErrors<>(it, Collections.emptyList()))
+        .orElseGet(
+            () ->
+                new ResultWithErrors<>(
+                    NORMAL,
+                    Collections.singletonList(
+                        createError(
+                            uri,
+                            messageService.getMessage("CobolLineReaderImpl.incorrectLineFormat"),
+                            lineNumber,
+                            INDICATOR_AREA_INDEX,
+                            INDICATOR_AREA_INDEX + 1))));
   }
 
   @NonNull

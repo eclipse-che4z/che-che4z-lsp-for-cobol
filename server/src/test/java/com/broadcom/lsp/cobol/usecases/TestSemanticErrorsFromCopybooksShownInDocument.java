@@ -17,14 +17,13 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Map;
-
-import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.INFO;
-import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
+import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /**
  * This test checks that semantic errors that appear in a copybook exposed in the COBOL document on
@@ -41,16 +40,17 @@ class TestSemanticErrorsFromCopybooksShownInDocument {
           + "           {_COPY {~MOVE}.|1_}\n"
           + "           GOBACK.";
 
-  private static final String MOVE = "             MOVE 0 to {$SMTH|1}.";
+  private static final String MOVE = "             MOVE 0 to {SMTH|1}.";
   private static final String MOVE_NAME = "MOVE";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(new CobolText(MOVE_NAME, MOVE)),
-        Map.of(
+        ImmutableList.of(new CobolText(MOVE_NAME, MOVE)),
+        ImmutableMap.of(
             "1",
-            new Diagnostic(null, "Invalid definition for: SMTH", Information, INFO.getText())));
+            new Diagnostic(
+                null, "Invalid definition for: SMTH", DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

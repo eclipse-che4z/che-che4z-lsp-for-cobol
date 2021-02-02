@@ -19,7 +19,9 @@ import com.broadcom.lsp.cobol.core.model.CobolLine;
 import lombok.experimental.UtilityClass;
 
 import lombok.NonNull;
-import java.util.function.Predicate;
+
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 /** The utility class for CobolLine operations, e.g. copy in different ways */
 @UtilityClass
@@ -98,11 +100,27 @@ public class CobolLineUtils {
     return contentArea.length() > 4 ? contentArea.substring(4) : "";
   }
 
+  /**
+   * Count empty lines in the text.
+   *
+   * @param txt multiline text
+   * @return the number of empty lines
+   */
   public long getEmptyLinesCount(@NonNull String txt) {
-    return txt.lines().filter(String::isBlank).count();
+    return textLines(txt).filter(String::isEmpty).count();
   }
 
+  /**
+   * Count non empty lines in the text.
+   *
+   * @param txt multiline text
+   * @return the number of empty lines
+   */
   public long getNonEmptyLinesCount(@NonNull String txt) {
-    return txt.lines().filter(Predicate.not(String::isEmpty)).count();
+    return textLines(txt).filter(it -> !it.isEmpty()).count();
+  }
+
+  private static Stream<String> textLines(String txt) {
+    return Arrays.stream(txt.split(System.getProperty("line.separator")));
   }
 }

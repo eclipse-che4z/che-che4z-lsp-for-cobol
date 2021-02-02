@@ -16,12 +16,11 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /** This use case checks if the absence of dot at the end recognized as an error. */
 class TestExtraneousInputEOFExpecting {
@@ -34,20 +33,16 @@ class TestExtraneousInputEOFExpecting {
           + "        PROCEDURE DIVISION.\r\n"
           + "           if (1 > 0) NEXT SENTENCE{|1}"; // No dot at the end of file
 
-  private static final String MESSAGE =
-      "Extraneous input '<EOF>' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, "
-          + "COMPUTE, CONTINUE, DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, "
-          + "EVALUATE, EXEC, EXHIBIT, EXIT, GENERATE, GO, GOBACK, IF, INITIALIZE, "
-          + "INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, PURGE, READ, "
-          + "RECEIVE, RELEASE, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT, "
-          + "START, STOP, STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, "
-          + "DOT_FS}";
+  private static final String MESSAGE = "Unexpected end of file";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(),
-        Map.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null, MESSAGE, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
   }
 }

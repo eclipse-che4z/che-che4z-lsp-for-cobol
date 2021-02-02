@@ -16,10 +16,9 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This test checks the positive scenario of using SEND in EXEC CICS statement. Note, the order of
@@ -34,7 +33,7 @@ class TestExecCicsSendStatementsArgumentsOrder {
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01  {$*PATIENT-MASTER-REC}.\n"
+          + "       01  {$*PATIENT-MASTER-REC} PIC S9(4).\n"
           + "       01  {$*MESSAGE-LENGTH}             PIC S9(4) COMP.\n"
           + "       01  {$*MESSAGE-AREA}               PIC X(80).\n"
           + "       01  {$*COMMAREA1}.\n"
@@ -55,7 +54,6 @@ class TestExecCicsSendStatementsArgumentsOrder {
           + "       01  {$*AXDB2}               PIC X(80).\n"
           + "       01  {$*RESPONSE}                             PIC 999.\n"
           + "       01  {$*REASON-CODE}                             PIC 999.\n"
-          + "       01  {$*WS-RESP}                             PIC 999.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       {#*0100-SEND}.\n"
           + "           EXEC CICS ASKTIME\n"
@@ -143,6 +141,6 @@ class TestExecCicsSendStatementsArgumentsOrder {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 }

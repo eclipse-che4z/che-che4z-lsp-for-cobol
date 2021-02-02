@@ -17,10 +17,9 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This test checks that the copybook not processed if this document is an extended document. Here:
@@ -32,7 +31,7 @@ class TestCopybookNotProcessedInExtendedSource {
           + "        PROGRAM-ID. TEST1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        WORKING-STORAGE SECTION.\r\n"
-          + "        01 {$*PARENT}.\r\n"
+          + "        01 {$*PARENT} PIC 9.\r\n"
           + "        COPY CPB.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
           + "        {#*PROCB}.\r\n"
@@ -41,6 +40,6 @@ class TestCopybookNotProcessedInExtendedSource {
 
   @Test
   void assertCopybookProcessingModeNotChangesLogic() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of(), List.of(), CopybookProcessingMode.DISABLED);
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), CopybookProcessingMode.DISABLED);
   }
 }

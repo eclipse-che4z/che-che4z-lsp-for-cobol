@@ -65,7 +65,7 @@ class CompletionResolutionTest {
         unresolved,
         c -> {
           assertNotNull(c.getValue());
-          assertFalse(c.getValue().isBlank());
+          assertFalse(c.getValue().isEmpty());
         });
   }
 

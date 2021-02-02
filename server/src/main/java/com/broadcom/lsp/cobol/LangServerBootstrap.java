@@ -49,6 +49,11 @@ public class LangServerBootstrap {
   private static final Integer LSP_PORT = 1044;
   private static final String PIPE_ARG = "pipeEnabled";
 
+  /**
+   * The entry point for the application.
+   *
+   * @param args command line arguments
+   */
   public static void main(String[] args)
       throws ExecutionException, InterruptedException, IOException {
     Injector injector = initCtx();
@@ -67,7 +72,7 @@ public class LangServerBootstrap {
       throws IOException, InterruptedException, ExecutionException {
     try {
       Launcher<CobolLanguageClient> launcher = launchServer(args, server);
-      provider.set(launcher.getRemoteProxy());
+      provider.setClient(launcher.getRemoteProxy());
       // suspend the main thread on listening
       launcher.startListening().get();
     } catch (ExecutionException e) {
@@ -94,7 +99,7 @@ public class LangServerBootstrap {
       throws IOException {
     try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
       LOG.info("Language server started using socket communication on port [{}]", LSP_PORT);
-      LOG.info("Java version: " + Runtime.version());
+      LOG.info("Java version: " + System.getProperty("java.version"));
       // wait for clients to connect
       Socket socket = serverSocket.accept();
       return createServerLauncher(server, socket.getInputStream(), socket.getOutputStream());

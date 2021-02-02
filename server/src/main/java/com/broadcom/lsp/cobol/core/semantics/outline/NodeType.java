@@ -38,6 +38,7 @@ public enum NodeType {
   SECTION(Object),
   STRUCT(Struct),
   REDEFINES(Constant),
+  MNEMONIC_NAME(Variable),
   FIELD(Variable),
   FIELD_66(Variable),
   FIELD_88(EnumMember),

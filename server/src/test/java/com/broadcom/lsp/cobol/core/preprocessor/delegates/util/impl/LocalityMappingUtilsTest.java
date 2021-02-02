@@ -19,6 +19,8 @@ import com.broadcom.lsp.cobol.core.model.DocumentMapping;
 import com.broadcom.lsp.cobol.core.model.Locality;
 import com.broadcom.lsp.cobol.core.preprocessor.ProcessingConstants;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp4j.Position;
@@ -43,10 +45,10 @@ class LocalityMappingUtilsTest {
   @Test
   void testEmptyMapping() {
     String uri = "doc.cbl";
-    List<Token> tokens = List.of();
-    List<Locality> localities = List.of();
-    Map<Integer, Integer> shifts = Map.of();
-    Map<String, DocumentMapping> mappings = Map.of(uri, new DocumentMapping(localities, shifts));
+    List<Token> tokens = ImmutableList.of();
+    List<Locality> localities = ImmutableList.of();
+    Map<Integer, Integer> shifts = ImmutableMap.of();
+    Map<String, DocumentMapping> mappings = ImmutableMap.of(uri, new DocumentMapping(localities, shifts));
 
     Map<Token, Locality> positionMapping =
         LocalityMappingUtils.createPositionMapping(tokens, mappings, uri);
@@ -102,10 +104,10 @@ class LocalityMappingUtilsTest {
     when(tokenEOF.getType()).thenReturn(3);
     when(tokenEOF.getText()).thenReturn("\r\n");
 
-    List<Token> tokens = List.of(enter, token0, token1, token2, tokenEOF, exit);
-    List<Locality> localities = List.of();
+    List<Token> tokens = ImmutableList.of(enter, token0, token1, token2, tokenEOF, exit);
+    List<Locality> localities = ImmutableList.of();
     List<Locality> cpyLocalities =
-        List.of(
+        ImmutableList.of(
             localityToShift,
             locality0,
             locality1,
@@ -114,16 +116,16 @@ class LocalityMappingUtilsTest {
             locality2,
             localityEOF);
     // Shift to skip compiler directive
-    Map<Integer, Integer> shifts = Map.of(0, 1);
+    Map<Integer, Integer> shifts = ImmutableMap.of(0, 1);
     Map<String, DocumentMapping> mappings =
-        Map.of(
+        ImmutableMap.of(
             uri,
             new DocumentMapping(localities, shifts),
             copybook,
             new DocumentMapping(cpyLocalities, shifts));
 
     Map<Token, Locality> expected =
-        Map.of(token0, locality0, token1, locality1, token2, locality2, tokenEOF, localityEOF);
+        ImmutableMap.of(token0, locality0, token1, locality1, token2, locality2, tokenEOF, localityEOF);
     Map<Token, Locality> actual = LocalityMappingUtils.createPositionMapping(tokens, mappings, uri);
 
     assertTrue(Maps.difference(expected, actual).areEqual());

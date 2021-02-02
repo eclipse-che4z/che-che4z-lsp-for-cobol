@@ -1,12 +1,28 @@
+/*
+ * Copyright (c) 2020 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ *
+ */
 package com.broadcom.lsp.cobol.positive;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -57,7 +73,7 @@ public class FolderTextRegistry implements CobolTextRegistry {
     }
 
     try {
-      CobolText loadCobolText = new CobolText(cleanup(name), Files.readString(path));
+      CobolText loadCobolText = new CobolText(cleanup(name), FileUtils.readFileToString(path.toFile(), StandardCharsets.UTF_8));
       texts.put(folder, loadCobolText);
     } catch (IOException e) {
       LOG.warn("Unable to load file: {}, skipped", path);

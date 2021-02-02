@@ -18,12 +18,11 @@ package com.broadcom.lsp.cobol.usecases;
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This test checks grammar does not consume more tokens than necessary in REPLACING statement.
@@ -37,7 +36,7 @@ class TestReplacingWithDifferentPatternsShowsError {
           + "       PROGRAM-ID. TESTREPL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01  {$*PARENT}.\n"
+          + "       01  {$*PARENT} PIC 9.\n"
           + "       {COPY|1} REPL REPLACING ==TAG== BY DEF. \n"
           + "       PROCEDURE DIVISION.\n"
           + "       MAINLINE.\n"
@@ -50,15 +49,15 @@ class TestReplacingWithDifferentPatternsShowsError {
   private static final String NEW2_NAME = "NEW2";
 
   private static final String MESSAGE =
-      "Syntax error on 'COPY' expected {<EOF>, LEVEL_NUMBER, '66', '77', '88', END, "
-          + "EXEC, FILE, ID, IDENTIFICATION, LINKAGE, LOCAL_STORAGE, PROCEDURE, WORKING_STORAGE}";
+      "Syntax error on 'COPY' expected {<EOF>, ID, IDENTIFICATION, LINKAGE, LOCAL-STORAGE, WORKING-STORAGE, PROCEDURE, "
+          + "SCHEMA, END, FILE, MAP, SQL, 'EXEC SQL', EXEC, '01-49', '66', '77', '88'}";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(new CobolText(NEW2_NAME, NEW2)),
-        Map.of(
+        ImmutableList.of(new CobolText(NEW2_NAME, NEW2)),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
                 null, MESSAGE, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));

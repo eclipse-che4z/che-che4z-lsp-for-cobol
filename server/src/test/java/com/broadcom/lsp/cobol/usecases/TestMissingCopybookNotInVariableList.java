@@ -17,11 +17,10 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
@@ -36,17 +35,27 @@ class TestMissingCopybookNotInVariableList {
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*PARENT}. COPY {~CPYNAME|missing}.\n"
+          + "       01 {$*PARENT|nopic}. COPY {~CPYNAME|missing}.\n"
           + "       PROCEDURE DIVISION.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(),
-        Map.of(
+        ImmutableList.of(),
+        ImmutableMap.of(
             "missing",
             new Diagnostic(
-                null, "CPYNAME: Copybook not found", Error, SourceInfoLevels.ERROR.getText(), "MISSING_COPYBOOK")));
+                null,
+                "CPYNAME: Copybook not found",
+                Error,
+                SourceInfoLevels.ERROR.getText(),
+                "MISSING_COPYBOOK"),
+            "nopic",
+            new Diagnostic(
+                null,
+                "A \"PICTURE\" clause was not found for elementary item PARENT",
+                Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

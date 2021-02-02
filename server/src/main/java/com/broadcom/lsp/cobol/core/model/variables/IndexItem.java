@@ -17,6 +17,7 @@ package com.broadcom.lsp.cobol.core.model.variables;
 
 import com.broadcom.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.Value;
 
 /**
@@ -24,9 +25,10 @@ import lombok.Value;
  * TableDataName} declaration.
  */
 @Value
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class IndexItem extends AbstractVariable {
-  public IndexItem(String name, String qualifier, Locality definition) {
-    super(name, qualifier, definition);
+  public IndexItem(String name, Locality definition) {
+    super(name, definition, null);
   }
 }

@@ -16,13 +16,14 @@
 package com.broadcom.lsp.cobol.core.preprocessor.delegates.impl;
 
 import com.broadcom.lsp.cobol.core.model.*;
-import com.broadcom.lsp.cobol.core.model.SyntaxError;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl;
-import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorListenerImpl;
-import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorListenerFactory;
+import com.broadcom.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorListenerImpl;
 import com.broadcom.lsp.cobol.core.semantics.NamedSubContext;
+import com.broadcom.lsp.cobol.service.CopybookProcessingMode;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -30,7 +31,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayDeque;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -75,12 +75,12 @@ class GrammarPreprocessorImplTest {
 
     NamedSubContext copybooks = new NamedSubContext();
     copybooks.addUsage(CPYNAME, CPYNAME_POS.toLocation());
-    DocumentMapping mainMapping = new DocumentMapping(List.of(CPYNAME_POS, COPY_POS), Map.of(0, 2));
-    DocumentMapping cpyMapping = new DocumentMapping(List.of(RESULT_POS), Map.of());
+    DocumentMapping mainMapping = new DocumentMapping(ImmutableList.of(CPYNAME_POS, COPY_POS), ImmutableMap.of(0, 2));
+    DocumentMapping cpyMapping = new DocumentMapping(ImmutableList.of(RESULT_POS), ImmutableMap.of());
 
     ExtendedDocument expectedDocument =
         new ExtendedDocument(
-            RESULT, copybooks, Map.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping), Map.of());
+            RESULT, copybooks, ImmutableMap.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping), ImmutableMap.of());
 
     when(factory.create(
             eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(PROCESSING_MODE)))

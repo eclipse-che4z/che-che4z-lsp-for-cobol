@@ -16,10 +16,9 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This test checks the positive scenario of using READ FILE and WRITE FILE in EXEC CICS statement.
@@ -42,7 +41,7 @@ class TestExecCicsReadFileStatementPositive {
           + "               20  {$*RCODE}           PIC 9(9)  COMP.\n"
           + "               20  {$*KEYNUM}           PIC 9(9)  COMP.\n"
           + "       01  {$*FILEA}.\n"
-          + "           05  {$*COMM-AREA}           PIC 9(9)  COMP.\n"
+          + "           05  {$*COMM-AREA}.\n"
           + "             10 {$*NUMB}           PIC 9(9)  COMP.\n"
           + "               20  {$*FILEA-TEMP}           PIC 9(9)  COMP.\n"
           + "               20  {$*LOGA}           PIC 9(9)  COMP.\n"
@@ -86,6 +85,6 @@ class TestExecCicsReadFileStatementPositive {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 }

@@ -30,10 +30,10 @@ public interface Renameable {
    * variable to add it as a child to the variable with the given name. Used in RENAME clause.
    * Should return null if the variable type doesn't allow renaming
    *
-   * @param renameItemName - the name of the new structure
+   * @param newParent - the name of the new structure
    * @return a new variable with a different qualifier or null if not renameable
    */
-  default Variable rename(String renameItemName) {
+  default Variable rename(RenameItem newParent) {
     return null;
   }
 }

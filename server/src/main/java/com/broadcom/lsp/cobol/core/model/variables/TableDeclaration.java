@@ -38,4 +38,12 @@ public interface TableDeclaration {
    * @return int of occurs times
    */
   int getOccursTimes();
+
+  /**
+   * Get USAGE FORMAT of this table declaration
+   *
+   * @return a UsageFormat instance
+   */
+  @NonNull
+  UsageFormat getUsageFormat();
 }

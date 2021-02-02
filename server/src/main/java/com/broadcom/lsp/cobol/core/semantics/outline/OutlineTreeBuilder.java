@@ -48,6 +48,11 @@ public class OutlineTreeBuilder {
   private final String documentUri;
   private final Map<Token, Locality> positionMapping;
 
+  /**
+   * Add program node to outline tree.
+   *
+   * @param parserRuleContext the ANTLR parser context
+   */
   public void addProgram(ParserRuleContext parserRuleContext) {
     constructNode("PROGRAM", NodeType.PROGRAM, parserRuleContext)
         .ifPresent(
@@ -57,6 +62,13 @@ public class OutlineTreeBuilder {
             });
   }
 
+  /**
+   * Add a node to outline tree.
+   *
+   * @param name the node name
+   * @param nodeType the node type
+   * @param parserRuleContext the ANTLR parser context
+   */
   public void addNode(String name, NodeType nodeType, ParserRuleContext parserRuleContext) {
     constructNode(name, nodeType, parserRuleContext)
         .ifPresent(outlineNode -> addNodeToParent(outlineNode, parserRuleContext));
@@ -76,6 +88,12 @@ public class OutlineTreeBuilder {
     rootNodes.add(outlineNode);
   }
 
+  /**
+   * Rename the program node in outline tree.
+   *
+   * @param name the new name of the program node
+   * @param parserRuleContext the ANTLR parser context
+   */
   public void renameProgram(String name, ParserRuleContext parserRuleContext) {
     ParserRuleContext parent = parserRuleContext.getParent();
     while (parent != null) {
@@ -89,11 +107,22 @@ public class OutlineTreeBuilder {
     LOG.warn("Can't rename program '{}'. Program node is not found.", name);
   }
 
+  /**
+   * Initialize internal variable state. Should be running in after new section starts.
+   */
   public void initVariables() {
     variableNodes = new ArrayDeque<>();
     latestVariable = null;
   }
 
+  /**
+   * Add a variable into the outline tree.
+   *
+   * @param level the variable level
+   * @param name the variable name
+   * @param nodeType the node type
+   * @param parserRuleContext the ANTLR parser context
+   */
   public void addVariable(
       int level, String name, NodeType nodeType, ParserRuleContext parserRuleContext) {
     constructNode(name, nodeType, parserRuleContext)
@@ -126,6 +155,12 @@ public class OutlineTreeBuilder {
     }
   }
 
+  /**
+   * Build an outline tree view.
+   *
+   * @param copybookUsages copybooks that must be added into the final outline tree view
+   * @return the outline tree view in LSP4J format
+   */
   public List<DocumentSymbol> build(Multimap<String, Location> copybookUsages) {
     rootNodes.forEach(this::recalculateStructRange);
     for (Map.Entry<String, Location> copybook : copybookUsages.entries()) {
@@ -133,7 +168,7 @@ public class OutlineTreeBuilder {
       Range range = copybook.getValue().getRange();
       DocumentSymbol outlineNode =
           new DocumentSymbol(
-              "COPY " + name, NodeType.COPYBOOK.getSymbolKind(), range, range, "", List.of());
+              "COPY " + name, NodeType.COPYBOOK.getSymbolKind(), range, range, "", Collections.emptyList());
       addOutlineNodeToTree(rootNodes, outlineNode);
     }
     return rootNodes;
@@ -155,12 +190,14 @@ public class OutlineTreeBuilder {
   }
 
   private void addOutlineNodeToTree(List<DocumentSymbol> outlineNodes, DocumentSymbol outlineNode) {
-    outlineNodes.stream()
+    Optional<DocumentSymbol> document = outlineNodes.stream()
         .filter(it -> RangeUtils.isInsideRange(it, outlineNode))
-        .findFirst()
-        .ifPresentOrElse(
-            it -> addOutlineNodeToTree(it.getChildren(), outlineNode),
-            () -> outlineNodes.add(outlineNode));
+        .findFirst();
+    if (document.isPresent()) {
+      addOutlineNodeToTree(document.get().getChildren(), outlineNode);
+    } else {
+      outlineNodes.add(outlineNode);
+    }
   }
 
   private Optional<DocumentSymbol> constructNode(

@@ -30,6 +30,7 @@ import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.broadcom.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import com.broadcom.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Builder;
@@ -39,10 +40,7 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -233,7 +231,7 @@ public class CobolTextDocumentService
     String uri = params.getTextDocument().getUri();
     LOG.info(format("Document closing invoked on URI %s", uri));
     interruptAnalysis(uri);
-    communications.publishDiagnostics(Map.of(uri, List.of()));
+    communications.publishDiagnostics(ImmutableMap.of(uri, Collections.emptyList()));
     communications.cancelProgressNotification(uri);
     docs.remove(uri);
     clearAnalysedFutureObject(uri);
@@ -261,8 +259,8 @@ public class CobolTextDocumentService
   private void registerEngineAndAnalyze(String uri, String text) {
     String fileExtension = extractExtension(uri);
     if (fileExtension != null && !isCobolFile(fileExtension)) {
-      outlineMap.computeIfPresent(uri, (k,v) -> {
-        v.complete(List.of(new DocumentSymbol()));
+      outlineMap.computeIfPresent(uri, (k, v) -> {
+        v.complete(Collections.singletonList(new DocumentSymbol()));
         return v;
       });
       communications.notifyThatExtensionIsUnsupported(fileExtension);

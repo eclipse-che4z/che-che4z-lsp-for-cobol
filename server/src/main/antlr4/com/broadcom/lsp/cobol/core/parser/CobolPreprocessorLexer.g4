@@ -14,7 +14,17 @@
 
 lexer grammar CobolPreprocessorLexer;
 
+@lexer::members {
+    boolean sqlFlag = false;
+    String lastTokenText = null;
+    public void emit(Token token) {
+        super.emit(token);
+        lastTokenText = token.getText();
+    }
+}
+
 // keywords
+ACTIVITY : A C T I V I T Y {!sqlFlag}?;
 ADATA : A D A T A;
 ADV : A D V;
 ALIAS : A L I A S;
@@ -36,6 +46,7 @@ CICS : C I C S;
 CO : C O;
 COBOL2 : C O B O L '2';
 COBOL3 : C O B O L '3';
+CODE : C O D E {!sqlFlag}?;
 CODEPAGE : C O D E P A G E;
 COMPAT : C O M P A T;
 COMPILE : C O M P I L E;
@@ -64,7 +75,9 @@ DYNAM : D Y N A M;
 EDF : E D F;
 EJPD : E J P D;
 EN : E N;
-END_EXEC : E N D MINUSCHAR E X E C;
+END_EXEC : E N D MINUSCHAR E X E C {sqlFlag = false;};
+ENDING : E N D I N G {!sqlFlag}?;
+EXEC_SQL: EXEC WS SQL {sqlFlag = true;};
 ENGLISH : E N G L I S H;
 EPILOG : E P I L O G;
 EXCI : E X C I;
@@ -83,7 +96,7 @@ GDS : G D S;
 GRAPHIC : G R A P H I C;
 HOOK : H O O K;
 IN : I N;
-INCLUDE: I N C L U D E;
+INCLUDE : {if(lastTokenText.equals("EXEC SQL")) {sqlFlag = false;}} I N C L U D E;
 INTDATE : I N T D A T E;
 JA : J A;
 JP : J P;
@@ -235,10 +248,12 @@ PGMNAME : P G M N A M E;
 PROCESS : P R O C E S S;
 PROLOG : P R O L O G;
 QUOTE : Q U O T E;
+RECORDS : R E C O R D S {!sqlFlag}?;
 RENT : R E N T;
 REPLACE : R E P L A C E;
 REPLACING : R E P L A C I N G;
 RES : R E S;
+RESUME : R E S U M E {!sqlFlag}?;
 RMODE : R M O D E;
 RPARENCHAR : ')';
 SEP : S E P;
@@ -305,6 +320,8 @@ X_CHAR : X;
 ASTERISKCHAR : '*';
 COMMENTTAG : '*>';
 COMMENTENTRYTAG : '*>CE';
+COMMA_EOF : ',' EOF {!sqlFlag}? ->skip;
+COMMA_LB : ',' ('\r' | '\n' | '\f' | '\t' | ' ')+ {!sqlFlag}? -> channel(HIDDEN);
 COMMACHAR : ',';
 DOLLARCHAR : '$';
 DOT_FS : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ | '.' EOF;
@@ -320,15 +337,33 @@ NOTEQUALCHAR : '<>';
 PLUSCHAR : '+';
 SINGLEQUOTE : '\'';
 SLASHCHAR : '/';
+SQLLINECOMMENTCHAR: '--';
+PIPECHAR : '||';
+SELECT_ALL : '.*';
 
 // literals
-NONNUMERICLITERAL : STRINGLITERAL | HEXNUMBER;
-NUMERICLITERAL : [0-9]+;
-INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? NUMERICLITERAL;
+SINGLEDIGITLITERAL : DIGIT {sqlFlag}? ;
+
+INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+;
+
+NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
+
+NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
+
+IDENTIFIER : [a-zA-Z0-9#@$]+ ([-_]+ [a-zA-Z0-9#@$]+)*;
+FILENAME : [_a-zA-Z0-9]+ '.' [_a-zA-Z0-9]+;
+
+OCTDIGITS : OCT_DIGIT {sqlFlag}? ;
+HEX_NUMBERS : HEXNUMBER {sqlFlag}? ;
 
 fragment HEXNUMBER :
 	X '"' [0-9A-F]+ '"'
 	| X '\'' [0-9A-F]+ '\''
+;
+
+fragment NULLTERMINATED :
+	Z '"' (~["\n\r] | '""' | '\'')* '"'
+	| Z '\'' (~['\n\r] | '\'\'' | '"')* '\''
 ;
 
 fragment STRINGLITERAL :
@@ -336,8 +371,15 @@ fragment STRINGLITERAL :
 	| '\'' (~['\n\r] | '\'\'' | '"')* '\''
 ;
 
-IDENTIFIER : [a-zA-Z0-9#@$]+ ([-_]+ [a-zA-Z0-9#@$]+)*;
-FILENAME : [a-zA-Z0-9]+ '.' [a-zA-Z0-9]+;
+fragment UNTRMSTRINGLITERAL :
+	'"' (~["\n\r] | '""' | '\'')*
+	| '\'' (~['\n\r] | '\'\'' | '"')*
+;
+
+fragment DBCSLITERAL :
+	[GN] '"' (~["\n\r] | '""' | '\'')* '"'
+	| [GN] '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
@@ -345,11 +387,20 @@ COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
 COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
 WS : [ \t\f;]+ -> channel(HIDDEN);
 TEXT : ~('\n' | '\r');
-SEPARATOR : ', ' -> channel(HIDDEN);
+SEPARATOR : ', ' {!sqlFlag}? -> channel(HIDDEN);
+SEMICOLON_FS : ';' ('\r' | '\n' | '\f' | '\t' | ' ')+ | ';' EOF;
+
+//SQL comments
+SQLLINECOMMENT
+	:	SQLLINECOMMENTCHAR ~[\r\n]* NEWLINE {sqlFlag}? -> channel(HIDDEN)
+	;
 
 // treat all the non-processed tokens as errors
 ERRORCHAR : . ;
 
+fragment
+OCT_DIGIT        : [0-8] ;
+fragment DIGIT: OCT_DIGIT | [9];
 // case insensitive chars
 fragment A:('a'|'A');
 fragment B:('b'|'B');

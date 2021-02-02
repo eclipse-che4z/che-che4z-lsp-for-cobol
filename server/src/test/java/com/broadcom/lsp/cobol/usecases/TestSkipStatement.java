@@ -16,10 +16,9 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /** This test checks that there are no errors on the "SKIP2" statement. */
 class TestSkipStatement {
@@ -29,8 +28,8 @@ class TestSkipStatement {
           + "        PROGRAM-ID. SKIP_TEST.\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
-          + "        01 {$*ID0}.\n"
-          + "        01 {$*TAPARM1}.\n"
+          + "        01 {$*ID0} PIC 9.\n"
+          + "        01 {$*TAPARM1} PIC 9.\n"
           + "        PROCEDURE DIVISION.\n"
           + "       {#*PROGA}.\n"
           + "       SKIP1\n"
@@ -45,6 +44,6 @@ class TestSkipStatement {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of(), List.of("ID1"));
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of("ID1"));
   }
 }

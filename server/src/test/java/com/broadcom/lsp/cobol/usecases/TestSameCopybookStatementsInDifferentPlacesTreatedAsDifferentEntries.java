@@ -17,12 +17,11 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 import static com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
@@ -44,13 +43,13 @@ class TestSameCopybookStatementsInDifferentPlacesTreatedAsDifferentEntries {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(new CobolText(REPL_NAME, REPL)),
-        Map.of(
+        ImmutableList.of(new CobolText(REPL_NAME, REPL)),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
                 null,
-                "Syntax error on 'DATA' expected {<EOF>, END, FILE, ID, "
-                    + "IDENTIFICATION, LINKAGE, LOCAL_STORAGE, PROCEDURE, WORKING_STORAGE}",
+                "Syntax error on 'DATA' expected {<EOF>, ID, IDENTIFICATION, LINKAGE, LOCAL-STORAGE, WORKING-STORAGE, "
+                    + "PROCEDURE, SCHEMA, END, FILE, MAP}",
                 DiagnosticSeverity.Error,
                 ERROR.getText(),
                 null)));

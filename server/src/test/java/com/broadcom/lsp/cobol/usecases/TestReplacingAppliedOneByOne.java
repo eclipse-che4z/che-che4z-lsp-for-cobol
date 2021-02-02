@@ -17,10 +17,9 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This test checks that the REPLACING statement applied one by one will be collapsed to show only
@@ -30,17 +29,18 @@ import java.util.Map;
 class TestReplacingAppliedOneByOne {
 
   private static final String TEXT =
-      "0      IDENTIFICATION DIVISION.\r\n"
-          + "1      PROGRAM-ID. TEST1.\r\n"
-          + "2      DATA DIVISION.\r\n"
-          + "3      WORKING-STORAGE SECTION.\r\n"
-          + "4      COPY {~CUSTCOPY} REPLACING ==ABC== BY ==DEF==\r\n"
-          + "5                              ==DEF== BY ==GHI==\r\n"
-          + "6                              ==GHI== BY ==JKL==.\r\n"
-          + "7      PROCEDURE DIVISION.\r\n"
-          + "8      {#*MAINLINE}.\r\n"
-          + "9          MOVE 1 TO {$JKL-ID} OF {$JKL-KEY}.\r\n"
-          + "10         GOBACK.";
+      "       IDENTIFICATION DIVISION.\r\n"
+          + "       PROGRAM-ID. TEST1.\r\n"
+          + "       DATA DIVISION.\r\n"
+          + "       WORKING-STORAGE SECTION.\r\n"
+          + "       01 {$*PARENT}.\r\n"
+          + "       COPY {~CUSTCOPY} REPLACING ==ABC== BY ==DEF==\r\n"
+          + "                               ==DEF== BY ==GHI==\r\n"
+          + "                               ==GHI== BY ==JKL==.\r\n"
+          + "       PROCEDURE DIVISION.\r\n"
+          + "       {#*MAINLINE}.\r\n"
+          + "           MOVE 1 TO {$JKL-ID} OF {$JKL-KEY}.\r\n"
+          + "           GOBACK.";
 
   private static final String CUSTCOPY =
       "           05  {$*ABC-KEY^JKL-KEY}.\r\n"
@@ -49,6 +49,6 @@ class TestReplacingAppliedOneByOne {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(new CobolText(CUSTCOPY_NAME, CUSTCOPY)), Map.of());
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(new CobolText(CUSTCOPY_NAME, CUSTCOPY)), ImmutableMap.of());
   }
 }

@@ -44,6 +44,11 @@ public class AnalysisResult {
   @Builder.Default Map<String, List<Location>> subroutineUsages = new HashMap<>();
   @Builder.Default List<DocumentSymbol> outlineTree = new ArrayList<>();
 
+  /**
+   * Construct empty AnalysisResult.
+   *
+   * @return an empty analysis result
+   */
   public static AnalysisResult empty() {
     return AnalysisResult.builder().build();
   }

@@ -15,10 +15,9 @@
 
 package com.broadcom.lsp.cobol.negative;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 /**
  * 20 IGYLI0088-S The "COPY" statement was invalid. Expected "REPLACING", but found "02". The
@@ -36,11 +35,11 @@ public class Chetest1Test extends NegativeTest {
   private static final int EXPECTED_ERRORS_NUMBER = 3;
 
   Chetest1Test() {
-    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, List.of());
+    super(FILE_NAME, EXPECTED_ERRORS_NUMBER, ImmutableList.of());
   }
 
   @Test
-  public void test() {
-    super.test();
+  void testIt() {
+    test();
   }
 }

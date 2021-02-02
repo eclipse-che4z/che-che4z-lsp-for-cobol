@@ -22,4 +22,4 @@ package com.broadcom.lsp.cobol.core.annotation;
  * <p>Use {@link com.broadcom.lsp.cobol.core.annotation.CheckServerShutdownState} annotation on each
  * service methods to mark them disposed after a shutdown call.
  */
-public interface DisposableService {}
+public interface DisposableService { }

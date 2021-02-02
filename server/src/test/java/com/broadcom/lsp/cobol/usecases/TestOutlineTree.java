@@ -18,6 +18,7 @@ import com.broadcom.lsp.cobol.core.semantics.outline.NodeType;
 import com.broadcom.lsp.cobol.positive.CobolText;
 import com.broadcom.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.broadcom.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.junit.jupiter.api.Test;
 
@@ -131,7 +132,7 @@ class TestOutlineTree {
   @Test
   void test() {
     List<CobolText> copybooks =
-        List.of(
+        ImmutableList.of(
             new CobolText("FOO", ""),
             new CobolText("BAR", "000100     01 HIDE-IT PIC 9(9)."),
             new CobolText("BAZ", ""));
@@ -193,7 +194,10 @@ class TestOutlineTree {
                     "ENVIRONMENT DIVISION",
                     NodeType.DIVISION,
                     nested(
-                        node("CONFIGURATION SECTION", NodeType.SECTION),
+                        node(
+                            "CONFIGURATION SECTION",
+                            NodeType.SECTION,
+                            nested(node("TOP-OF-PAGE", NodeType.MNEMONIC_NAME))),
                         node(
                             "INPUT-OUTPUT SECTION",
                             NodeType.SECTION,
@@ -297,7 +301,7 @@ class TestOutlineTree {
   }
 
   private DocumentSymbol node(String name, NodeType nodeType) {
-    return node(name, nodeType, List.of());
+    return node(name, nodeType, ImmutableList.of());
   }
 
   private DocumentSymbol node(String name, NodeType nodeType, List<DocumentSymbol> nested) {

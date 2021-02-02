@@ -7,7 +7,8 @@
 */
 
 parser grammar CobolParser;
-options {tokenVocab = CobolLexer;}
+options {tokenVocab = CobolLexer;  superClass = MessageServiceParser;}
+
 import CICSParser;
    
 startRule : compilationUnit EOF;
@@ -77,7 +78,7 @@ environmentDivision
    ;
 
 environmentDivisionBody
-   : configurationSection | specialNamesParagraph | inputOutputSection
+   : configurationSection | specialNamesParagraph | inputOutputSection | idmsControlSection
    ;
 
 // -- configuration section ----------------------------------
@@ -144,7 +145,9 @@ specialNamesParagraph
    ;
 
 specialNameClause
-   : channelClause | odtClause | alphabetClause | classClause | currencySignClause | decimalPointClause | symbolicCharactersClause | environmentSwitchNameClause | defaultDisplaySignClause | defaultComputationalSignClause | reserveNetworkClause
+   : channelClause | odtClause | alphabetClause | classClause | currencySignClause
+   | decimalPointClause | symbolicCharactersClause | environmentSwitchNameClause
+   | defaultDisplaySignClause | defaultComputationalSignClause | reserveNetworkClause
    ;
 
 alphabetClause
@@ -351,6 +354,58 @@ commitmentControlClause
    : COMMITMENT CONTROL FOR? fileName
    ;
 
+// -- idms control section ----------------------------------
+
+idmsControlSection
+   : IDMS_CONTROL SECTION DOT_FS idmsControlSectionParagraph
+   ;
+
+// - idms control section paragraph ----------------------------------
+idmsControlSectionParagraph
+   : protocolParagraph (ssNamesLengthParagraph | idmsRecordLocationParagraph)*
+   ;
+
+protocolParagraph
+   : PROTOCOL DOT_FS? protocolEntry? 
+   ;
+
+protocolEntry
+   : modeClause DEBUG? endClause?
+   ;
+
+modeClause
+   : MODE IS? cobolWord
+   ;
+
+ssNamesLengthParagraph
+   : SSNAMES LENGTH IS? ss_names_length endClause?
+   ;
+
+idmsRecordLocationParagraph
+   : IDMS_RECORDS withinClause endClause?
+   ;
+
+withinClause
+   : (withinEntry | MANUAL) levelsClause?
+   ;
+
+withinEntry
+   : WITHIN (WORKING_STORAGE | LINKAGE) SECTION?
+   ;
+
+levelsClause
+   : LEVELS? INCREMENTED BY? LEVEL_NUMBER
+   ;
+
+endClause
+    : DOT_FS | SEMICOLON_FS
+    ;
+
+ss_names_length
+       : {if(!_input.LT(1).getText().matches("16|18")) { notifyError("cobolParser.subSchemaNameLength", _input.LT(1).getText());}}
+       LEVEL_NUMBER
+       ;
+
 // --- data division --------------------------------------------------------------------
 
 dataDivision
@@ -358,7 +413,7 @@ dataDivision
    ;
 
 dataDivisionSection
-   : fileSection | workingStorageSection | linkageSection | localStorageSection
+   : fileSection | workingStorageSection | linkageSection | localStorageSection | schemaSection | mapSection
    ;
 
 // -- file section ----------------------------------
@@ -586,11 +641,11 @@ dataRedefinesClause
    ;
 
 dataRenamesClause
-   : RENAMES qualifiedDataName thruDataName?
+   : RENAMES dataName thruDataName?
    ;
 
 thruDataName
-   : (THROUGH | THRU) qualifiedDataName
+   : (THROUGH | THRU) dataName
    ;
 
 dataSignClause
@@ -614,7 +669,34 @@ dataTypeDefClause
    ;
 
 dataUsageClause
-   : (USAGE IS?)? (BINARY (TRUNCATED | EXTENDED)? | BIT | COMP | COMP_1 | COMP_2 | COMP_3 | COMP_4 | COMP_5 | COMPUTATIONAL | COMPUTATIONAL_1 | COMPUTATIONAL_2 | COMPUTATIONAL_3 | COMPUTATIONAL_4 | COMPUTATIONAL_5 | CONTROL_POINT | DATE | DISPLAY | DISPLAY_1 | DOUBLE | EVENT | FUNCTION_POINTER | INDEX | KANJI | LOCK | NATIONAL | PACKED_DECIMAL | POINTER | PROCEDURE_POINTER | REAL | SQL | TASK)
+   : (USAGE IS?)? usageFormat
+   ;
+
+usageFormat
+   : BINARY NATIVE?
+   | COMP NATIVE?
+   | COMP_1 NATIVE?
+   | COMP_2 NATIVE?
+   | COMP_3 NATIVE?
+   | COMP_4 NATIVE?
+   | COMP_5 NATIVE?
+   | COMPUTATIONAL NATIVE?
+   | COMPUTATIONAL_1 NATIVE?
+   | COMPUTATIONAL_2 NATIVE?
+   | COMPUTATIONAL_3 NATIVE?
+   | COMPUTATIONAL_4 NATIVE?
+   | COMPUTATIONAL_5 NATIVE?
+   | DISPLAY NATIVE?
+   | DISPLAY_1 NATIVE?
+   | INDEX
+   | NATIONAL NATIVE?
+   | UTF_8 NATIVE?
+   | OBJECT REFERENCE cobolWord?
+   | PACKED_DECIMAL NATIVE?
+   | POINTER
+   | POINTER_32
+   | PROCEDURE_POINTER
+   | FUNCTION_POINTER
    ;
 
 dataUsingClause
@@ -644,6 +726,33 @@ dataValueIntervalTo
 dataWithLowerBoundsClause
    : WITH? LOWER BOUNDS
    ;
+// -- schema section ----------------------------------
+
+schemaSection
+   : SCHEMA SECTION DOT_FS schemaDBEntry
+   ;
+
+schemaDBEntry
+   : DB cobolWord WITHIN cobolWord versionClause? DOT_FS
+   ;
+
+// -- map section ----------------------------------
+
+mapSection
+   : MAP SECTION DOT_FS maxFieldListClause? mapClause+
+   ;
+
+maxFieldListClause
+   :  MAX FIELD LIST IS? integerLiteral DOT_FS?
+   ;
+
+mapClause
+    : MAP cobolWord versionClause? (TYPE IS? (STANDARD | EXTENDED) PAGING?)? DOT_FS?
+    ;
+
+versionClause
+    : VERSION integerLiteral
+    ;
 
 // --- procedure division --------------------------------------------------------------------
 
@@ -714,18 +823,32 @@ sentence
    ;
 
 statement
-   : acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement | disableStatement |
-    displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement | execSqlStatement | execSqlImsStatement |
-    exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement |
-    multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement |
-    sendStatement | serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | unstringStatement | writeStatement | xmlStatement
+   : abendCodeStatement | acceptStatement | addStatement | alterStatement | attachTaskCodeStatement | bindStatement |  callStatement | cancelStatement | changePriorityStatement |
+    closeStatement | computeStatement | continueStatement | deleteStatement | disableStatement | displayStatement | divideStatement | enableStatement | entryStatement |
+    evaluateStatement | exhibitStatement | execCicsStatement | execSqlStatement | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement |
+    ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement |
+    purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement | serviceReloadStatement |
+    serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement | unstringStatement |
+    writeStatement | xmlStatement
    ;
+// abend code statement
+
+abendCodeStatement
+    : ABEND CODE (literal | generalIdentifier) abendCodeDumpClause? abendCodeExitClause?
+    ;
+
+abendCodeDumpClause
+    : (DUMP | NODUMP)
+    ;
+
+abendCodeExitClause
+    : EXITS (INVOKED | IGNORED)
+    ;
 
 // accept statement
 
 acceptStatement
-   : ACCEPT generalIdentifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?
+   : ACCEPT (acceptIdmsDcClause | (generalIdentifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?))
    ;
 
 acceptFromDateStatement
@@ -740,9 +863,29 @@ acceptFromEscapeKeyStatement
    : FROM ESCAPE KEY
    ;
 
+acceptIdmsDcClause
+   : acceptTransactionStatisticsClause | ((LTERM ID | PTERM ID | SCREENSIZE | SYSTEM ID | SYSVERSION | TASK CODE | TASK ID | USER ID) INTO generalIdentifier)
+   ;
+
 acceptMessageCountStatement
    : MESSAGE? COUNT
    ;
+
+acceptTransactionStatisticsClause
+    : TRANSACTION STATISTICS acceptTransactionStatisticsWriteClause? acceptTransactionStatisticsIntoClause? acceptTransactionStatisticsLengthClause?
+    ;
+
+acceptTransactionStatisticsWriteClause
+    : (WRITE | NOWRITE)
+    ;
+
+acceptTransactionStatisticsIntoClause
+    : INTO generalIdentifier
+    ;
+
+acceptTransactionStatisticsLengthClause
+    : LENGTH (integerLiteral | generalIdentifier)
+    ;
 
 // add statement
 
@@ -793,6 +936,42 @@ alterStatement
 alterProceedTo
    : procedureName TO (PROCEED TO)? procedureName
    ;
+
+// accept transaction statistics statement
+
+attachTaskCodeStatement
+    : ATTACH TASK CODE (generalIdentifier | literal) attachTaskCodePriorityClause? attachTaskCodeWaitClause?
+    ;
+
+attachTaskCodePriorityClause
+    : PRIORITY (priorityLiteral | generalIdentifier)
+    ;
+
+attachTaskCodeWaitClause
+    : (WAIT | NOWAIT)
+    ;
+
+priorityLiteral
+    : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
+    ;
+
+// bind statement
+
+bindStatement
+    : BIND (bindTaskClause | bindTransactionClause)
+    ;
+
+bindTaskClause
+    : TASK bindTaskStatementNodenameClause?
+    ;
+
+bindTaskStatementNodenameClause
+    : NODENAME (generalIdentifier | literal)
+    ;
+
+bindTransactionClause
+    : TRANSACTION STATISTICS
+    ;
 
 // call statement
 
@@ -845,6 +1024,16 @@ cancelStatement
 cancelCall
    : libraryName (BYTITLE | BYFUNCTION) | literal | generalIdentifier
    ;
+
+// change priority statement
+
+changePriorityStatement
+    : CHANGE PRIORITY TO? (changePriorityLiteral | generalIdentifier)
+    ;
+
+changePriorityLiteral
+    : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
+    ;
 
 // close statement
 
@@ -1028,9 +1217,9 @@ execCicsStatement
    ;
 
 // exec sql statement
-
 execSqlStatement
-   : EXEC SQL ~END_EXEC*? END_EXEC DOT_FS?
+   : EXEC_SQL allSqlRules END_EXEC DOT_FS?
+   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} allSqlRules END_EXEC DOT_FS?
    ;
 
 // exec sql ims statement
@@ -1650,7 +1839,7 @@ subtractStatement
    ;
 
 subtractFromStatement
-   : subtractSubtrahend+ FROM subtractMinuend+
+   :  subtractSubtrahend+ FROM subtractMinuend+
    ;
 
 subtractFromGivingStatement

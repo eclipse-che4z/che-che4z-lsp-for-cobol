@@ -16,10 +16,9 @@
 package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /** This class checks that there are no errors shown for compiler directives on several lines */
 class TestCompilerDirectivesNotCauseErrors {
@@ -37,7 +36,7 @@ class TestCompilerDirectivesNotCauseErrors {
           + "        DATE-WRITTEN. 01/01/1970 6:00 PM.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       1 {$*PARENT}.\n"
+          + "       1 {$*PARENT} PIC 9.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       {@*MAINLINE} SECTION.\n"
           + "      * --------------------------------------------------------------\n"
@@ -53,6 +52,6 @@ class TestCompilerDirectivesNotCauseErrors {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, List.of(), Map.of());
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 }

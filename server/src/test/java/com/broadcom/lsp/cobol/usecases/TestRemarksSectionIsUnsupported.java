@@ -17,12 +17,11 @@ package com.broadcom.lsp.cobol.usecases;
 
 import com.broadcom.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This test checks that the remarks section is not marked as a comment, and the syntax analysis
@@ -46,15 +45,13 @@ class TestRemarksSectionIsUnsupported {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        List.of(),
-        Map.of(
+        ImmutableList.of(),
+        ImmutableMap.of(
             "unsupported",
             new Diagnostic(
                 null,
-                "Syntax error on 'REMARKS' expected "
-                    + "{<EOF>, AUTHOR, DATA, DATE_COMPILED, DATE_WRITTEN, END, "
-                    + "ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, "
-                    + "SECURITY, COMMENTENTRYLINE}",
+                "Syntax error on 'REMARKS' expected {<EOF>, AUTHOR, DATE-COMPILED, DATE-WRITTEN, ID, IDENTIFICATION, INSTALLATION, "
+                    + "ENVIRONMENT, PROCEDURE, DATA, END, SECURITY}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }
