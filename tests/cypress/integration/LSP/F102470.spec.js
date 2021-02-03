@@ -30,19 +30,19 @@ context('This is F102470 spec', () => {
 
   describe('US708186 Check work with subroutines', () => {
     it('Error check in subroutine resolution', () => {
-      cy.openFile('CALL.cbl').goToLine(8);
+      cy.openFile('CALL.cbl').goToLine(21);
       cy.getCurrentLine().should('not.have.class', '.squiggly-error');
-      cy.goToLine(10);
+      cy.goToLine(23);
       cy.getCurrentLine().should('not.have.class', '.squiggly-error');
-      cy.goToLine(9);
-      cy.getCurrentLineErrors({ expectedLine: 9, errorType: 'info' })
+      cy.goToLine(22);
+      cy.getCurrentLineErrors({ expectedLine: 22, errorType: 'info' })
         .getHoverErrorMessage()
         .contains('SUB2: Subroutine not found');
     });
 
     it('Go to definition for subroutine', () => {
-      cy.openFile('CALL.cbl').goToLine(8);
-      cy.getLineByNumber(8).findText('SUB1').goToDefinition();
+      cy.openFile('CALL.cbl').goToLine(21);
+      cy.getLineByNumber(21).findText('SUB1').goToDefinition();
       cy.getCurrentTab().should('contain.text', 'SUB1.cob');
     });
 

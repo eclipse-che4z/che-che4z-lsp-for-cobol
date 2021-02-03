@@ -150,7 +150,7 @@ context('This is a Copybook spec', () => {
       cy.openFile('USERC1N1.cbl');
       cy.getLineByNumber(42).findText('User-Phone-Mobile.').goToDefinition();
       cy.getCurrentTab().should('contain.text', 'BOOK2N.cpy');
-      cy.getCurrentLineNumber().should('eq', 6);
+      cy.getCurrentLineNumber().should('eq', 19);
       cy.getCurrentLine().contains('05 User-Phone-Mobile PIC 9(6).');
     });
   });
@@ -163,7 +163,7 @@ context('This is a Copybook spec', () => {
       cy.openFile('USERC1N1.cbl');
       cy.getLineByNumber(42).findText('User-Phone-Mobile.').type('{ctrl}', { release: false, delay: 2500 }).click();
       cy.getCurrentTab().should('contain.text', 'BOOK2N.cpy');
-      cy.getCurrentLineNumber().should('eq', 6);
+      cy.getCurrentLineNumber().should('eq', 19);
       cy.getCurrentLine().contains('05 User-Phone-Mobile PIC 9(6).');
     });
   });
@@ -189,7 +189,7 @@ context('This is a Copybook spec', () => {
             .each(($referenceMatch) => {
               cy.wrap($referenceMatch).click();
               cy.getCurrentLineNumber().then((lineNumber) => {
-                expect(lineNumber).to.be.oneOf([6, 42, 51]);
+                expect(lineNumber).to.be.oneOf([19, 42, 51]);
               });
             });
         });
@@ -234,7 +234,7 @@ context('This is a Copybook spec', () => {
     });
   });
 
-  describe('TC288744 Underscore a copy statement if its copybook contains error: nested copybooks', () => {
+  describe.skip('TC288744 Underscore a copy statement if its copybook contains error: nested copybooks', () => {
     afterEach(() => {
       cy.closeFolder('.copybooks');
     });
@@ -255,8 +255,8 @@ context('This is a Copybook spec', () => {
             expect($content).to.contain.text(message);
           });
         });
-      cy.openFolder('testing').openFilePermanent('A.cpy').goToLine(1).wait(500);
-      cy.getCurrentLineErrors({ expectedLine: 1 }).getHoverErrorMessage().eq(0);
+      cy.openFolder('testing').openFilePermanent('A.cpy').goToLine(14).wait(500);
+      cy.getCurrentLineErrors({ expectedLine: 14 }).getHoverErrorMessage().eq(0);
       cy.get('div.monaco-editor-hover-content').should(($content) => {
         [
           "Syntax error on 'WORK-VARIABLES' expected SECTION",

@@ -32,7 +32,7 @@ context('This is F101836 spec', () => {
       cy.getOutlineViewTreeContainer().contains('COPY AST');
       cy.expandOutlineElement('PROCEDURE DIVISION');
       cy.getOutlineViewTreeContainer().contains('MAINLINE');
-      cy.goToLine(5);
+      cy.goToLine(18);
       cy.getCurrentLine().type('{end}{leftArrow}{backspace}{backspace}BC', { delay: 200 });
       cy.getOutlineViewTreeContainer().contains('COPY ABC');
     });

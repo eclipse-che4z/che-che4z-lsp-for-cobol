@@ -75,25 +75,25 @@ context('This is a F97476 spec', () => {
     });
     it('Checks REPLACING feature twice for one variable', () => {
       cy.openFile('REPLACING.CBL');
-      cy.goToLine(9);
+      cy.goToLine(22);
       cy.get('.squiggly-error')
         .should('have.length', 1)
         .getElementLineNumber()
         .then((lineNumber) => {
-          expect(lineNumber).to.be.equal(9);
+          expect(lineNumber).to.be.equal(22);
           cy.getLineByNumber(lineNumber).contains('ABC-ID');
         });
-      cy.getLineByNumber(6)
+      cy.getLineByNumber(19)
         .contains('COPY REPL.')
         .type('{end}{backspace} REPLACING ==TAG== BY ==ABC== {enter}       ==ABC== by ==XYZ==.', { delay: 100 });
-      cy.getLineByNumber(10)
+      cy.getLineByNumber(23)
         .contains('ABC-ID')
         .type('{end}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace} XYZ-ID.', {
           delay: 100,
         });
 
       cy.get('.squiggly-error').should('not.exist');
-      cy.getLineByNumber(10).findText('XYZ-ID').goToDefinition();
+      cy.getLineByNumber(23).findText('XYZ-ID').goToDefinition();
       cy.getCurrentTab().should('have.text', 'REPL');
       // cy.get('.view-overlays .symbolHighlight');
       cy.getCurrentLineNumber().should('eq', 1);
@@ -126,27 +126,27 @@ context('This is a F97476 spec', () => {
       cy.get('.theia-button.main').click();
 
       cy.openFile('REPLACING.CBL');
-      cy.goToLine(9);
+      cy.goToLine(22);
       cy.get('.squiggly-error')
         .should('have.length', 1)
         .getElementLineNumber()
         .then((lineNumber) => {
-          expect(lineNumber).to.be.equal(9);
+          expect(lineNumber).to.be.equal(22);
           cy.getLineByNumber(lineNumber).contains('ABC-ID');
         });
-      cy.getLineByNumber(6)
+      cy.getLineByNumber(19)
         .contains('COPY REPL.')
         .type('{end}{backspace}  REPLACING ==TAG== BY ==ABC== {enter} ==TAR== by ==XYZ==.', { delay: 100 });
-      cy.getLineByNumber(10).contains('MOVE 0 TO ABC-ID.').type('{end}{enter} MOVE 0 TO XYZ-ID.');
+      cy.getLineByNumber(23).contains('MOVE 0 TO ABC-ID.').type('{end}{enter} MOVE 0 TO XYZ-ID.');
       cy.get('.squiggly-error').should('not.exist');
 
-      cy.getLineByNumber(10).findText('ABC-ID').goToDefinition();
+      cy.getLineByNumber(23).findText('ABC-ID').goToDefinition();
       cy.getCurrentTab().should('have.text', 'REPL');
       cy.get('.view-overlays .symbolHighlight');
       cy.getCurrentLineNumber().should('eq', 1);
       cy.getCurrentLine().contains('05 TAG-ID PIC 9.').closeCurrentTab();
 
-      cy.getLineByNumber(11).findText('XYZ-ID').goToDefinition();
+      cy.getLineByNumber(24).findText('XYZ-ID').goToDefinition();
       cy.getCurrentTab().should('have.text', 'REPL');
       cy.get('.view-overlays .symbolHighlight');
       cy.getCurrentLineNumber().should('eq', 2);
@@ -319,7 +319,7 @@ context('This is a F97476 spec', () => {
     });
     it('Checks replace by arithmetic operations', () => {
       cy.openFile('PAYLIB.CBL').goToLine(37);
-      cy.getCurrentLine().type('{end}{backspace}{backspace}{backspace}{backspace}{backspace}*3== .').wait(200);
+      cy.getCurrentLine().type('{end}{backspace}{backspace}{backspace}{backspace}{backspace}*3== .', {delay: 300}).wait(1000);
       cy.getCurrentLineErrors({ expectedLine: 37 })
         .getHoverErrorMessage()
         .contains("Syntax error on '*' expected SECTION");
@@ -339,10 +339,11 @@ context('This is a F97476 spec', () => {
         'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
         'broadcom-cobol-lsp.cpy-manager.profiles': '',
       });
+      cy.writeFile('test_files/project/testing/MORECOOL.CPY', '       IDENTIFICATION DIVISION.');
     });
 
     afterEach(() => {
-      cy.writeFile('test_files/project/testing/MORECOOL.CPY', '       IDENTIFICATION DIVISION.');
+      cy.task('deleteFile', 'test_files/project/testing/MORECOOL.CPY');
     });
 
     it('Checks replace by arithmetic operations', () => {
