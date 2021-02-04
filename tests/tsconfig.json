@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "es6",
+    "baseUrl": "node_modules",
+    "lib": ["es6", "dom"],
+    "types": ["cypress", "@eclipse/che-che4z/tests"],
+    "noEmit": true
+  },
+  "include": [
+    "cypress/**/*.ts",
+    "cypress/**/*.js"
+  ]
+}
