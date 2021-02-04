@@ -10,6 +10,7 @@ Automate functional tests running on Theia with Cypress.io in COBOL LS.
 #### Procedure:
 
 1. Install yarn
+
    You can test it, e.g. <code>yarn --version</code>
 
 2. Install all dependencies
@@ -20,7 +21,7 @@ Automate functional tests running on Theia with Cypress.io in COBOL LS.
 
 - Add commands files from https://github.com/eclipse/che-che4z/tree/master/tests (check instructions in README). For some reason it is not working as expected [installation](https://github.com/eclipse/che-che4z/blob/ab4789702b0ca6ec7061c0eb5417c4c45bcdf32d/tests/package.json#L12), so we should do it manually:
 
-  <code>.\node_modules\.bin\tsc --build  .\node_modules\@eclipse\che-che4z\tests\tsconfig.json</code>
+  <code> npm run ts:build </code>
 
 - Refer to https://github.com/eclipse-theia/theia/blob/master/doc/Developing.md
 - For Windows specific:
@@ -36,9 +37,9 @@ Automate functional tests running on Theia with Cypress.io in COBOL LS.
 
   #### Run Theia in docker:
 
-  <code>sudo docker run -it --rm -p 3000:3000 -v /home/$USER/$project/plugins/:/home/theia/plugins -v /home/$USER/$project/test_files/project/:/home/project --name theia theiaide/theia-java:1.5.0</code>
+  <code>sudo docker run -it --rm -p 3000:3000 -v /home/$USER/$project/plugins/:/home/theia/plugins -v /home/$USER/$project/test_files/project/:/home/project --name theia theiaide/theia-{java or full}:1.5.0</code>
 
-  or
+  OR
 
   #### Run builded Theia:
 
@@ -50,14 +51,16 @@ Automate functional tests running on Theia with Cypress.io in COBOL LS.
 4. Run Cypress
 
 If you are running in interactive mode, and you want to run only one test, add `.only` to the specific test case, e.g.
-` describe.only(...)` or ` it.only(...)`. For more information, check this link: https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Excluding-and-Including-Tests
+` describe.only(...)` or ` it.only(...)`. For more information, check this [link](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Excluding-and-Including-Tests)
+
+Helpful [VS Code extension](https://marketplace.visualstudio.com/items?itemName=ub1que.add-only). Add `.only` extension does exactly what it claims to do. It filters your test by adding `.only` keyword to your `it()` block. It’s about 1 second faster than typing it yourself. 
 
 | Command Description                                                                            | LSP                                                                                                                 |
 | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Run in interactive mode                                                                        | `.\node_modules\.bin\cypress open `                                                                 |
-| Run in CLI mode **ALL** spec files in specific folder with Chrome browser                      | `.\node_modules\.bin\cypress run --spec '.\cypress\integration\LSP\*' --browser chrome`            |
-| Run in CLI mode **ALL** spec files in specific folder with Chrome browser in **headless** mode | `.\node_modules\.bin\cypress run --spec '.\cypress\integration\LSP\*' --browser chrome --headless` |
-| Run in CLI mode **SPECIFIC** spec file in specific folder with Chrome browser                  | `.\node_modules\.bin\cypress run --spec '.\cypress\integration\LSP\lsp.spec.js' --browser chrome `  |
+| Run in interactive mode                                                                        | `npm run cy:open`                                                                |
+| Run in CLI mode **ALL** spec files in specific folder with Chrome browser                      |`npm run cy:run:all`   |
+| Run in CLI mode **ALL** spec files in specific folder with Chrome browser in **headless** mode | `npm run cy:run:all:headless`  |
+| Run in CLI mode **SPECIFIC** spec file in specific folder with Chrome browser                  | `npm run cy:run -- --spec .\cypress\integration\LSP\copybook.spec.js --browser chrome`   |
 
 #### Test Retries
 
@@ -67,7 +70,7 @@ Check this page: https://docs.cypress.io/guides/guides/test-retries.html#Introdu
 
 | Command Description         | LSP                                                                                      |
 | --------------------------- | ---------------------------------------------------------------------------------------- |
-| baseURL in interactive mode | `.\node_modules\.bin\cypress open  --config baseUrl=http://<IP>:<port>/` |
+| baseURL in interactive mode | `npm run cy:open -- --config baseUrl=http://<IP>:<port>/` |
 
 5. Add new tests
 
@@ -83,4 +86,4 @@ And finally add the test directly to the `cypress/integration/LSP/{PUT_NAME_HERE
 
 Pre-commit is enabled. Also you can run `eslint` before commiting anything, then run manually this command:
 
-`.\node_modules\.bin\eslint .`
+`npm run lint`
