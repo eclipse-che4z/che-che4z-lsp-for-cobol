@@ -1,0 +1,25 @@
+{
+  "baseUrl": "http://localhost:3000/",
+  "defaultCommandTimeout": 30000,
+  "env": {
+      "appLoadTimeout": 30000,
+      "username": "",
+      "password": "",
+      "plugin": "",
+      "zowe": "",
+      "cicsUser1": "",
+      "cicsPass1": "",
+      "cicsUser2": "",
+      "cicsPass2": "",
+      "cicsApplId": "",
+      "interTestPort": "",
+      "convertedJCL": "",
+      "originalJCL": "",
+      "dap_cb": ""
+  },
+  "retries":  {
+    "runMode": 2,
+    "openMode": 2
+  },
+  "supportFile": "cypress/support/index.ts"
+}
