@@ -1,7 +1,14 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [0.17.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.16.0...0.17.1) (2021-02-10)
+## [0.17.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.17.0...0.17.1) (2021-02-10)
+
+### Features
+* Add COPY IDMS support [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([9911e95](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9911e95d672a57f27c7f3303e68e65c1e6ab0bf2))
+* Add NPM scripts ([316e7e5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/316e7e51721a65d5a85e4cb89119b05b7fbb6dea))
+* Initial commit for the UI regression suite ([9869f97](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9869f976a7a67e45082154c9ff3ebc0d5e457e2f))
+
+## [0.17.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.16.1...0.17.0) (2021-02-02)
 
 ### Bug Fixes
 * Fix semantic analysis stop after XML query ([d26b848](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d26b8481111bb3ade6eb40f89e8282383583aea3)), closes [#706](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/706)
@@ -25,9 +32,6 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Refactor the references support ([cb5d3a2](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/cb5d3a24846bf9a050ee03ae6cab0f92a604eff8)), closes [#702](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/702)
 * Remove prepopulating of settings.json with empty parameters for copybooks support ([c67e75e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/c67e75ea035c6cc9ad8904448ff3863f33944498)), closes [#701](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/701)
 * Support variable references in FILE-CONTROL ([805bf71](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/805bf7185d5fa0178a07eb1db9c5ce40d1c911d5)), closes [#718](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/718)
-* Add COPY IDMS support [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([9911e95](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9911e95d672a57f27c7f3303e68e65c1e6ab0bf2))
-* Add NPM scripts ([316e7e5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/316e7e51721a65d5a85e4cb89119b05b7fbb6dea))
-* Initial commit for the UI regression suite ([9869f97](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9869f976a7a67e45082154c9ff3ebc0d5e457e2f))
 
 ### Performance Improvements
 * Improve hierarchical variable search ([513322c](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/513322c6d4460ff31e03631d22a5fc451e4642b1))
