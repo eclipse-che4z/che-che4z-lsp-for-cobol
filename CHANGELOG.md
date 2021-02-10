@@ -9,6 +9,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Fix variable recognition fail on ambguity ([86b1423](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/86b1423107ec0cfc948d9fd6bf48fb24c3926b1e)), closes [#496](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/496)
 * Fix variable usages in conditions [#729](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/729) ([8f76b70](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/8f76b707c1047bc6b16fd19e4abd1d9e48af65dc))
 * Fix MAPFAIL semantic error in HANDLE CONDITION [#668](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/668)
+* Fix false-positive syntax error on SQL keywords used as variables [#766](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/766)
 
 ### Features
 * Add IDMS DML support for IDMS-CONTROL section [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([a23722a](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a23722a89a83f987cdcf3d1a27f178b528447115))
