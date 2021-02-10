@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.17.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.17.0...0.17.1) (2021-02-10)
+
+### Features
+* Add COPY IDMS support [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([9911e95](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9911e95d672a57f27c7f3303e68e65c1e6ab0bf2))
+* Add NPM scripts ([316e7e5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/316e7e51721a65d5a85e4cb89119b05b7fbb6dea))
+* Initial commit for the UI regression suite ([9869f97](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9869f976a7a67e45082154c9ff3ebc0d5e457e2f))
+
 ## [0.17.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.16.1...0.17.0) (2021-02-02)
 
 ### Bug Fixes
