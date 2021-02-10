@@ -1,7 +1,12 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [0.17.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.16.1...0.17.1) (2021-02-10)
+## [0.17.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.17.0...0.17.1) (2021-02-10)
+
+#### Added
+* COPY IDMS Support
+
+## [0.17.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.16.1...0.17.0) (2021-02-02)
 
 #### Added
 * Syntax analysis for DB2 SQL statements
@@ -9,7 +14,6 @@ All notable changes to the COBOL Language Support extension are documented in th
 * IDMS DML support for IDMS-CONTROL, SCHEMA and MAP sections
 * Support for five additional IDMS DML commands
 * Mnemonic name definition support
-* COPY IDMS Support
 
 #### Changed
 * Remove prepopulation of settings.json with empty parameters for copybook support
