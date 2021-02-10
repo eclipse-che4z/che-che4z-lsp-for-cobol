@@ -318,6 +318,7 @@ X_CHAR : X;
 
 // symbols
 ASTERISKCHAR : '*';
+DOUBLEASTERISKCHAR : '**';
 COMMENTTAG : '*>';
 COMMENTENTRYTAG : '*>CE';
 COMMA_EOF : ',' EOF {!sqlFlag}? ->skip;

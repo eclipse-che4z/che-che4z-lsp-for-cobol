@@ -1,0 +1,449 @@
+/**
+ * Copyright (c) 2021 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+
+ * SPDX-License-Identifier: EPL-2.0
+
+ * Contributors:
+ *  Broadcom, Inc. - initial API and implementation
+ */
+
+/// <reference types="Cypress" />
+//@ts-ignore
+/// <reference types="../../support/" />
+
+context('This is a LSP spec', () => {
+  describe.skip('TC152046 Nominal - check syntax Ok message', () => {
+    // Some Theia specific issues
+    // Let's skip this test until enough time to play with Theia
+    it('Checks that when opening Cobol file with correct syntax there is an appropriate message is shown', () => {
+      cy.openFileExplorer();
+      cy.openFile('USER1.cbl');
+      cy.getLSPOutput().contains('No syntax errors detected in USER1.cbl');
+    });
+  });
+
+  describe('TC152048 Cobol file is recognized by LSP', () => {
+    it('Cobol file is recognized by LSP - Cobol type is shown in status bar', () => {
+      cy.openFile('USER1.cbl');
+      cy.get('.right.area .hasCommand[title="Select Language Mode"]').should('contain.text', 'COBOL');
+    });
+  });
+
+  describe('TC152049 Navigate through definitions', () => {
+    it('Checks behavior of go to definition action', () => {
+      cy.openFile('USER1.cbl');
+      cy.getLineByNumber(29).findText('100-Print-User.').goToDefinition();
+      cy.getCurrentLineNumber().should('eq', 32);
+    });
+  });
+
+  describe('TC152080 Find all references from the word begin', () => {
+    it('Checks that LSP can find all references and navigate by them', () => {
+      cy.openFile('USER1.cbl');
+      cy.getLineByNumber(21).findText('User-Address.').type('{ctrl}{leftArrow}').goToDefinition();
+      cy.get('.monaco-tl-contents')
+        .should('have.length', 3)
+        .each(($el) => {
+          cy.wrap($el).click();
+          cy.getPreviewCurrentLineNumber().then((lineNumber) => {
+            expect(lineNumber).to.be.oneOf([21, 35, 43]);
+          });
+        });
+    });
+  });
+
+  describe('TC152080 Find all references from the word middle', () => {
+    it('Checks that LSP can find all references and navigate by them', () => {
+      cy.openFile('USER1.cbl');
+      cy.getLineByNumber(21).findText('User-Address.').goToDefinition();
+      cy.get('.monaco-tl-contents')
+        .should('have.length', 3)
+        .each(($el) => {
+          cy.wrap($el).click();
+          cy.getPreviewCurrentLineNumber().then((lineNumber) => {
+            expect(lineNumber).to.be.oneOf([21, 35, 43]);
+          });
+        });
+    });
+  });
+
+  describe.skip('TC152047 Error case - file has syntax errors', () => {
+    it('Checks that when opening Cobol file with correct syntax there is NO message about correct syntax', () => {
+      cy.openFile('USER1.cbl').wait(4000);
+      cy.openFile('USER2.cbl');
+      cy.getLSPOutput().should('not.have.text', 'No syntax errors detected in USER2.cbl');
+    });
+  });
+
+  describe('TC152052 Syntax Errors are marked in file', () => {
+    it('Checks that error lines are marked in a file', () => {
+      cy.openFile('USER2.cbl');
+      cy.get('.squiggly-error')
+        .should('have.length', 1)
+        .getElementLineNumber()
+        .then((lineNumber) => {
+          expect(lineNumber).to.be.equal(15);
+          cy.getLineByNumber(lineNumber).contains('Program1-id');
+        });
+    });
+  });
+
+  describe('TC152051 Syntax Errors have more detailed hints', () => {
+    it('Syntax Errors have more detailed hints', () => {
+      cy.openFile('USER2.cbl');
+      cy.get('.squiggly-error')
+        .getElementLineNumber()
+        .then((lineNumber) => {
+          expect(lineNumber).to.be.equal(15);
+          cy.getLineByNumber(lineNumber).children('span').click().trigger('mousemove');
+        });
+      cy.get('div.monaco-editor-hover-content').contains("Syntax error on 'Program1-id' expected PROGRAM-ID");
+    });
+  });
+
+  describe('TC152050 Semantic Errors also marked in file', () => {
+    it('Checks that Semantic Errors also marked in file', () => {
+      cy.openFile('USER2.cbl');
+      cy.goToLine(40);
+      cy.get('.squiggly-error')
+        .should('have.length', 1)
+        .getElementLineNumber()
+        .then((lineNumber) => {
+          expect(lineNumber).to.be.equal(40);
+          cy.getLineByNumber(lineNumber).contains('User-City1');
+        });
+    });
+  });
+
+  describe('TC152053 Semantic Errors also have hints', () => {
+    it('Checks that semantic errors have detailed hints', () => {
+      cy.openFile('USER2.cbl');
+      cy.goToLine(40);
+      cy.get('.squiggly-error')
+        .getElementLineNumber()
+        .then((lineNumber) => {
+          expect(lineNumber).to.be.equal(40);
+          cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
+        });
+      cy.get('div.monaco-editor-hover-content').contains('Invalid definition for: USER-CITY1');
+    });
+  });
+
+  describe('TC152054 Auto format of right trailing spaces', () => {
+    it('Checks that auto format removed sight trailing spaces', () => {
+      cy.openFile('USER2.cbl');
+      cy.getLineByNumber(35)
+        .as('currentLine')
+        .invoke('text')
+        .then((originalText) => {
+          cy.get('@currentLine').type('{end}        ', { delay: 100 });
+          cy.formatDocument();
+          cy.getLineByNumber(35).should('have.text', originalText);
+        });
+    });
+  });
+
+  describe('TC152058 Autocomplete functionality with snippets navigation', () => {
+    it('Checks auto complete functionality, also with navigation by snippets', () => {
+      cy.openFile('USER2.cbl');
+      cy.goToLine(40);
+      cy.getCurrentLine().type('{end}{enter}');
+      cy.getCurrentLine().type('{ctrl} ').type('A'); // Ctrl+Space
+      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('ADD id TO id').click();
+      cy.focused()
+        .as('input')
+        .then(() => {
+          cy.get('@input').type('1').trigger('keydown', { key: 'Tab', code: 'Tab' });
+          cy.get('@input').type('Str');
+        });
+      cy.getCurrentLine().contains('ADD 1 TO Str');
+      cy.closeCurrentTab();
+    });
+  });
+
+  describe('TC288736 error message for 80chars limit', () => {
+    it('Source text can not go past column 80.  ', () => {
+      cy.openFile('TEST.CBL');
+      cy.goToLine(22);
+      cy.getCurrentLine()
+        .type('{end}')
+        .type('{enter}oi3Bd5kC1f3nMFp0IWg62ZZgWMxHPJnuLWm4DqplZDzMIX69C6vjeL24YbobdQnoQsDenL35omljznHd0l1fP')
+        .wait(500);
+      cy.getMainEditor()
+        .getCurrentLineOverlay()
+        .find('.squiggly-error')
+        .then(($error) => {
+          cy.wrap($error).getElementLineNumber().should('eq', 23);
+          cy.getCurrentLine().trigger('mousemove', $error[0].offsetLeft, $error[0].offsetTop);
+        });
+      cy.get('div.monaco-editor-hover-content').contains('Source text cannot go past column 80');
+    });
+  });
+
+  describe.skip('TC314392 LOG level', () => {
+    // Theia doesn't show settings.json correctly
+    beforeEach(() => {
+      cy.writeFile('test_files/project/.theia/settings.json', {
+        'broadcom-cobol-lsp.cpy-manager.paths-local': [],
+        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
+        'broadcom-cobol-lsp.cpy-manager.profiles': '',
+      });
+    });
+    afterEach(() => {
+      cy.closeFolder('.theia');
+    });
+
+    it('Lets check structure in settings.json file ', () => {
+      cy.openFolder('.theia').openFile('settings.json').goToLine(4);
+      cy.getCurrentLine().type('{end}{enter}').wait(500);
+      cy.getCurrentLine().type('"broadcom-cobol-lsp.logging.level.root": "ERROR"');
+      cy.getCurrentLine().should('not.have.class', '.squiggly-info');
+      cy.getCurrentLine().type('{end}{backspace}1"');
+      cy.getMainEditor()
+        .getCurrentLineOverlay()
+        .find('.squiggly-info')
+        .then(($error) => {
+          cy.wrap($error).getElementLineNumber().should('eq', 4);
+          cy.getCurrentLine().trigger('mousemove', $error[0].offsetLeft, $error[0].offsetTop);
+        });
+      cy.get('div.monaco-editor-hover-content').contains(
+        'Value is not accepted. Valid values: "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL".',
+      );
+    });
+  });
+
+  describe('TC266094 Underline the entire incorrect variable structure', () => {
+    it('This test checks that parser can find and underline an incorrect variable structure.', () => {
+      cy.openFile('VAR.cbl').goToLine(23).wait(3000);
+      cy.getMainEditor()
+        .getCurrentLineOverlay()
+        .find('.squiggly-error')
+        .then(($info) => {
+          cy.wrap($info).getElementLineNumber().should('eq', 23);
+          cy.getCurrentLine().trigger('mousemove', $info[0].offsetLeft, $info[0].offsetTop);
+        });
+      cy.get('div.monaco-editor-hover-content').contains('Invalid definition for: CHILD1');
+      cy.goToLine(24).wait(2000);
+      cy.getMainEditor()
+        .getCurrentLineOverlay()
+        .find('.squiggly-error')
+        .then(($info) => {
+          cy.wrap($info).getElementLineNumber().should('eq', 24);
+          cy.getCurrentLine().trigger('mousemove', $info[0].offsetLeft, $info[0].offsetTop);
+        });
+      cy.get('div.monaco-editor-hover-content').should(($content) => {
+        ['Invalid definition for: CHILD2'].forEach((message) => {
+          expect($content).to.contain.text(message);
+        });
+      });
+
+      cy.getMainEditor()
+        .getCurrentLineOverlay()
+        .find('.squiggly-error')
+        .then(($info) => {
+          cy.wrap($info).getElementLineNumber().should('eq', 24);
+          cy.getCurrentLine().type('{end}').trigger('mousemove', $info[0].offsetLeft, $info[0].offsetTop);
+          cy.get('div.monaco-editor-hover-content').contains('Invalid definition for: CHILD2');
+        });
+    });
+  });
+
+  describe('TC314614 paragraph is not defined', () => {
+    beforeEach(() => {
+      cy.writeFile(
+        'test_files/project/CALC-DATA.cbl',
+        `       IDENTIFICATION DIVISION. 
+        PROGRAM-ID. VARS. 
+        DATA DIVISION. 
+        PROCEDURE DIVISION.
+             PERFORM GET-DATA.
+             PERFORM CALC_DATA.
+            STOP RUN.
+        GET-DATA SECTION.
+            DISPLAY FIRST-VAR.
+        CALC_DATA.
+            DISPLAY FIRST-VAR.`,
+      );
+    });
+
+    it('Checks Syntax and Semantic Errors from Copybooks', () => {
+      cy.openFile('USERC1N2.cbl').goToLine(32);
+      cy.getCurrentLine().should('not.have.class', '.squiggly-error');
+      cy.goToLine(35);
+      cy.getCurrentLine().type('{end}{backspace}{backspace}');
+      cy.goToLine(32).wait(500);
+      cy.getCurrentLineErrors({ expectedLine: 32 })
+        .getHoverErrorMessage()
+        .contains('The following paragraph is not defined: 100-PRINT-USER');
+
+      cy.openFile('CALC-DATA.cbl').goToLine(8);
+      cy.getCurrentLine().type(
+        '{end}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}1 SECTION.',
+        { delay: 200 },
+      );
+      cy.goToLine(5);
+      cy.getCurrentLineErrors({ expectedLine: 5 })
+        .getHoverErrorMessage()
+        .contains('The following paragraph is not defined: GET-DATA');
+      cy.goToLine(10);
+      cy.getCurrentLine().type('{end}{backspace}{backspace}1.');
+      cy.goToLine(6).wait(500);
+      cy.getCurrentLineErrors({ expectedLine: 6 })
+        .getHoverErrorMessage()
+        .contains('The following paragraph is not defined: CALC_DATA');
+    });
+  });
+
+  describe('TC314736 Semantic analysis for Sections', () => {
+    beforeEach(() => {
+      cy.writeFile(
+        'test_files/project/CALC-DATA.cbl',
+        `       IDENTIFICATION DIVISION. 
+        PROGRAM-ID. VARS. 
+        DATA DIVISION. 
+        PROCEDURE DIVISION.
+             PERFORM GET-DATA.
+             PERFORM CALC_DATA.
+            STOP RUN.
+        GET-DATA SECTION.
+            DISPLAY FIRST-VAR.
+        CALC_DATA.
+            DISPLAY FIRST-VAR.`,
+      );
+    });
+
+    it('Checks Syntax and Semantic Errors from Copybooks', () => {
+      cy.openFile('CALC-DATA.cbl').goToLine(5);
+      cy.getLineByNumber(5).findText('GET-DATA').goToDefinition();
+      cy.getCurrentLineNumber().should('eq', 8);
+      cy.getCurrentLine().contains('GET-DATA SECTION.');
+      cy.getLineByNumber(8).findText('GET-DATA').click('right');
+      cy.focused().type('{leftarrow}', { delay: 200 }).goToReferences();
+      cy.wait(500).getCurrentLineNumber().should('eq', 5);
+      cy.getCurrentLine().contains('PERFORM GET-DATA.');
+    });
+  });
+
+  describe('TC250114 Implement syntax coloring', () => {
+    const getCurrentLineSpanWidth = () => {
+      return cy
+        .getCurrentLine()
+        .find('span')
+        .then(($line) => {
+          return $line[0].offsetWidth;
+        });
+    };
+
+    const getRulerOffsetLeft = (index) => {
+      return cy
+        .get('.view-rulers')
+        .children()
+        .eq(index)
+        .then(($ruler) => {
+          return $ruler[0].offsetLeft;
+        });
+    };
+
+    it('Lets check the positions of rulers ', () => {
+      cy.openFile('TEST.CBL').goToLine(24);
+      cy.getCurrentLine().type('{end}{enter}');
+      [
+        '{selectall}      >',
+        '{selectall}          >',
+        '{selectall}                                                                       >',
+        '{selectall}                                                                               >',
+      ].forEach((text, index) => {
+        cy.getCurrentLine().type(text);
+        getCurrentLineSpanWidth().then((width) => {
+          getRulerOffsetLeft(index).then((rulerOffset) => {
+            expect(width).to.be.closeTo(rulerOffset, 1);
+          });
+        });
+      });
+    });
+  });
+
+  describe('TC289633 Provide default COBOL code snippets  - basic scenario', () => {
+    const fileName = 'CALC-DATA';
+
+    beforeEach(() => {
+      cy.writeFile(`test_files/project/${fileName}.cbl`, 's');
+    });
+
+    afterEach(() => {
+      cy.deleteFile(`${fileName}.cbl`);
+    });
+    it('Checks Syntax and Semantic Errors from Copybooks', () => {
+      cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
+      cy.getCurrentLine().type('{selectall}shell').wait(500);
+      cy.get('.suggest-widget.visible').click();
+      cy.getLineByNumber(2).contains(`PROGRAM-ID. ${fileName}.`);
+      cy.getLineByNumber(8).contains('DATA DIVISION.');
+      cy.getLineByNumber(16).contains('STOP RUN.');
+    });
+  });
+
+  describe('TC289635 Provide default COBOL code snippets', () => {
+    const fileName = 'CALC-DATA';
+
+    beforeEach(() => {
+      cy.writeFile(`test_files/project/${fileName}.cbl`, 's');
+    });
+
+    it('Checks Syntax and Semantic Errors from Copybooks', () => {
+      cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
+      cy.getCurrentLine().type('{selectall}shell').wait(500);
+      cy.get('.suggest-widget.visible').click();
+      cy.goToLine(15).getCurrentLine().type('COPY ABC.');
+      cy.getCurrentLineErrors({ expectedLine: 15 }).eq(0).getHoverErrorMessage().contains('ABC: Copybook not found');
+      cy.getCurrentLine().type('{end}{enter}');
+      cy.getCurrentLine().type('FUNCTION-CO');
+      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('FUNCTION-COS');
+      //lower case
+      cy.getCurrentLine().type('{selectall}function-co', { delay: 200 });
+      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('function-cos');
+    });
+  });
+
+  describe('TC152049 Navigate through definitions', () => {
+    it('Checks behavior of go to definition action', () => {
+      cy.openFile('USER1.cbl');
+      cy.getLineByNumber(14).type('{home}{enter}');
+      cy.goToLine(14).getCurrentLine().type('TITLE "something"');
+      cy.getLineByNumber(14).should('not.have.class', '.squiggly-error');
+      cy.getLineByNumber(14).type('{home}{enter}');
+      cy.goToLine(14).getCurrentLine().type('TITLE "something"');
+    });
+  });
+
+  describe('TC315355 Server Rejects Outline Request for Unsupported Files', () => {
+    it('Request should be rejected immediately', () => {
+      cy.writeFile('test_files/project/some_text.txt', '');
+      cy.openFile('some_text.txt');
+      cy.changeLangMode('COBOL');
+      cy.get('.view-lines').eq(1).type('{ctrl}{shift}I');
+      cy.get('.theia-TreeContainer').contains('No outline information available.');
+    });
+  });
+
+  describe('TC315392 PROGRAM-ID Check Is Not Case Sensitive', () => {
+    it('Checks Syntax and Semantic Errors from Copybooks', () => {
+      cy.openFile('USER1.cbl');
+      cy.getLineByNumber(49).type('{selectall}{backspace}        End program hello-world.');
+      cy.getCurrentLineOverlay().children().should('not.have.class', '.squiggly-warning');
+      cy.getLineByNumber(41).type('{end}{backspace}{backspace}.');
+      cy.getMainEditor().find('.squiggly-warning');
+      cy.getCurrentLineOverlay()
+        .children()
+        .then((children) => {
+          return children.toArray().some((child) => child.classList.contains('squiggly-warning'));
+        })
+        .should('be.true');
+    });
+  });
+});

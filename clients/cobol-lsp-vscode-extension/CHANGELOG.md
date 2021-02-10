@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.17.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.17.0...0.17.1) (2021-02-10)
+
+#### Added
+* COPY IDMS Support
+
+#### Fixed
+* False-positive syntax error on SQL keywords used as variables
+
 ## [0.17.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.16.1...0.17.0) (2021-02-02)
 
 #### Added
