@@ -37,7 +37,7 @@ class TestSkipStatementsAllowedEverywhere {
           + "        PROCEDURE DIVISION.\n"
           + "        {#*PROCB}.\n"
           + "            MOVE 0 TO {$VARNAME}\n"
-          + "        SKIP2\n"
+          + "        SKIP2.\n"
           + "            MOVE 0 TO {$VARNAME}.\n"
           + "        SKIP3\n";
 
