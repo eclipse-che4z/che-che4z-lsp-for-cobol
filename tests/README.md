@@ -7,13 +7,13 @@ Automate functional tests running on Theia with Cypress.io in COBOL LS.
 - Windows Environment
 - Linux Environment
 
-#### Procedure:
+## Procedure:
 
-1. Install yarn
+## 1. Install `yarn`
 
    You can test it, e.g. <code>yarn --version</code>
 
-2. Install all dependencies
+## 2. Install all dependencies
 
    <code> cd /your/project/path (where you cloned the repository)</code>
 
@@ -27,7 +27,9 @@ Automate functional tests running on Theia with Cypress.io in COBOL LS.
 - For Windows specific:
   https://github.com/eclipse-theia/theia/blob/master/doc/Developing.md#building-on-windows
 
-3. Prepare the Theia environment for test suites
+If you are using VS Code, you can reload the window. Go to `View > Command Palette` or `Shift+Cmd+P` on OS X and `Ctrl+Shift+P` on Windows and type `reload window`.
+
+## 3. Prepare the Theia environment for test suites
 
 :information_source: **Note**:
 
@@ -48,7 +50,7 @@ Automate functional tests running on Theia with Cypress.io in COBOL LS.
   yarn start IntegrationTests/test_files/project/ --hostname=0.0.0.0
   ```
 
-4. Run Cypress
+## 4. Run Cypress
 
 If you are running in interactive mode, and you want to run only one test, add `.only` to the specific test case, e.g.
 ` describe.only(...)` or ` it.only(...)`. For more information, check this [link](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Excluding-and-Including-Tests)
@@ -60,11 +62,11 @@ Helpful [VS Code extension](https://marketplace.visualstudio.com/items?itemName=
 | Run in interactive mode                                                                        | `npm run cy:open`                                                                |
 | Run in CLI mode **ALL** spec files in specific folder with Chrome browser                      |`npm run cy:run:all`   |
 | Run in CLI mode **ALL** spec files in specific folder with Chrome browser in **headless** mode | `npm run cy:run:all:headless`  |
-| Run in CLI mode **SPECIFIC** spec file in specific folder with Chrome browser                  | `npm run cy:run -- --spec .\cypress\integration\LSP\copybook.spec.js --browser chrome`   |
+| Run in CLI mode **SPECIFIC** spec file in specific folder with Chrome browser                  | `npm run cy:run -- --spec cypress/integration/LSP/copybook.spec.js --browser chrome`   |
 
 #### Test Retries
 
-Check this page: https://docs.cypress.io/guides/guides/test-retries.html#Introduction. Cypress v5.x has test retries ability by default. Global configuration can be found in `cypress.json` file.
+Check this page: https://docs.cypress.io/guides/guides/test-retries.html#Introduction. Cypress >=5.x has test retries ability by default. Global configuration can be found in `cypress.json` file.
 
 :information_source: **Note**: by default Cypress expects the Theia is running on `localhost:3000`. If your Theia server runs on different URL, you could provide it in command line:
 
@@ -72,7 +74,17 @@ Check this page: https://docs.cypress.io/guides/guides/test-retries.html#Introdu
 | --------------------------- | ---------------------------------------------------------------------------------------- |
 | baseURL in interactive mode | `npm run cy:open -- --config baseUrl=http://<IP>:<port>/` |
 
-5. Add new tests
+## 5. Generate report
+
+To generate a HTML report after you run the test. 
+
+Run `npm run generate:html:report` for final test report.`generate:html:report` combines the 2 commands: `merge:reports` abd `create:html:report` into one. 
+
+The `merge:reports` command will merge all the json files from our `cypress/report` directory and store them in a new file called `cypress-tests-report.json`. 
+
+The `create:html:report` command will generate the html report from `cypress-tests-report.json` and save it a new directory `cypress/reports/final_report`.
+
+## 6. Add new tests
 
 Please check this page: https://docs.cypress.io/guides/references/best-practices.html
 
