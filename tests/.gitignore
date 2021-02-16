@@ -17,6 +17,10 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 debug.log
+mochawesome-report
+reports/
+bash_scripts
+cypress-tests-report*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
