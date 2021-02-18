@@ -364,4 +364,53 @@ context('This is a Copybook spec', () => {
       cy.changeLangMode('COBOL Copybook');
     });
   });
+
+  describe('TC318696 Load copybooks outside the workspace', () => {
+    const copyBookNotFound = () => {
+      return cy
+        .openFile('USERC1F.cbl')
+        .goToLine(19)
+        .getCurrentLineErrors({ expectedLine: 19 })
+        .eq(0)
+        .getHoverErrorMessage()
+        .contains('BOOK3: Copybook not found');
+    };
+
+    const writeFile = (folder) => {
+      return cy.writeFile('test_files/project/.theia/settings.json', {
+        'broadcom-cobol-lsp.cpy-manager.paths-local': [`${folder}`],
+        'broadcom-cobol-lsp .cpy-manager.paths-dsn': [],
+        'broadcom-cobol-lsp.cpy-manager.profiles': '',
+      });
+    };
+    const notHaveSyntaxError = () => {
+      return cy.openFile('USERC1F.cbl').getLineByNumber(19).should('not.have.class', '.squiggly-error');
+    };
+    it('specify copybooks outside the current workspace ../test', () => {
+      copyBookNotFound();
+      writeFile('../test');
+      cy.closeCurrentTab();
+      notHaveSyntaxError();
+    });
+    it('specify copybooks outside the current workspace /home/test', () => {
+      writeFile('/home/test');
+      notHaveSyntaxError();
+    });
+    it('specify copybooks outside the current workspace ../test/files', () => {
+      writeFile('../test/files');
+      notHaveSyntaxError();
+    });
+    it('specify copybooks outside the current workspace /test', () => {
+      writeFile('/test');
+      copyBookNotFound();
+    });
+    it('specify copybooks outside the current workspace ./test', () => {
+      writeFile('./test');
+      copyBookNotFound();
+    });
+    it('specify copybooks outside the current workspace ./test/files', () => {
+      writeFile('./test/files');
+      copyBookNotFound();
+    });
+  });
 });
