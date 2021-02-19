@@ -159,8 +159,9 @@ public class UseCaseEngine {
    *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
    * @param subroutineNames - list of subroutine names used in the document
    * @param processingMode - copybook processing mode
+   * @return analysis result object
    */
-  public void runTest(
+  public AnalysisResult runTest(
       String text,
       List<CobolText> copybooks,
       Map<String, Diagnostic> expectedDiagnostics,
@@ -174,6 +175,7 @@ public class UseCaseEngine {
         .subroutineDefinitions(makeSubroutinesDefinitions(subroutineNames))
         .build();
     assertResultEquals(actual, expected);
+    return actual;
   }
 
   private Map<String, List<Location>> makeSubroutinesDefinitions(List<String> subroutineNames) {
