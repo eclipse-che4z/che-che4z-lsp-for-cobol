@@ -75,6 +75,29 @@ class GroupContextTest {
     assertEquals(0, groupContext.generateParagraphErrors(messageService).size());
   }
 
+  @Test
+  void testParagraphRange() {
+    Location location = mock(Location.class);
+    GroupContext context = new GroupContext();
+    context.addParagraphRange("test_paragraph", location);
+    checkRange(context.getParagraphRanges(), "test_paragraph", location);
+  }
+
+  @Test
+  void testSectionRange() {
+    Location location = mock(Location.class);
+    GroupContext context = new GroupContext();
+    context.addSectionRange("test_section", location);
+    checkRange(context.getSectionRanges(), "test_section", location);
+  }
+
+  private void checkRange(Map<String, Collection<Location>> map, String name, Location expected) {
+    assertEquals(1, map.size());
+
+    Location range = map.get(name).iterator().next();
+    assertEquals(expected, range);
+  }
+
   private GroupContext prepareGroup(Locality locality) {
     GroupContext context = new GroupContext();
     context.addCandidateUsage("test", locality);
@@ -89,5 +112,4 @@ class GroupContextTest {
     Location actualLocation = usages.get("test").iterator().next();
     assertEquals(expectedLocation, actualLocation);
   }
-
 }
