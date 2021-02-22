@@ -376,7 +376,7 @@ context('This is a Copybook spec', () => {
         .contains('BOOK3: Copybook not found');
     };
 
-    const writeFile = (folder) => {
+    const setPathsLocalSetting = (folder) => {
       return cy.writeFile('test_files/project/.theia/settings.json', {
         'broadcom-cobol-lsp.cpy-manager.paths-local': [`${folder}`],
         'broadcom-cobol-lsp .cpy-manager.paths-dsn': [],
@@ -388,28 +388,28 @@ context('This is a Copybook spec', () => {
     };
     it('specify copybooks outside the current workspace ../test', () => {
       copyBookNotFound();
-      writeFile('../test');
+      setPathsLocalSetting('../test');
       cy.closeCurrentTab();
       notHaveSyntaxError();
     });
     it('specify copybooks outside the current workspace /home/test', () => {
-      writeFile('/home/test');
+      setPathsLocalSetting('/home/test');
       notHaveSyntaxError();
     });
     it('specify copybooks outside the current workspace ../test/files', () => {
-      writeFile('../test/files');
+      setPathsLocalSetting('../test/files');
       notHaveSyntaxError();
     });
     it('specify copybooks outside the current workspace /test', () => {
-      writeFile('/test');
+      setPathsLocalSetting('/test');
       copyBookNotFound();
     });
     it('specify copybooks outside the current workspace ./test', () => {
-      writeFile('./test');
+      setPathsLocalSetting('./test');
       copyBookNotFound();
     });
     it('specify copybooks outside the current workspace ./test/files', () => {
-      writeFile('./test/files');
+      setPathsLocalSetting('./test/files');
       copyBookNotFound();
     });
   });
