@@ -23,35 +23,40 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-/** These test for variations of valid BIND statements */
-class TestBind {
+/** These test for variations of valid CHECK TERMINAL statements */
+class TestCheckTerminal {
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
-          + "        01 {$*WK_NODENAME} PIC X(8) SYNC.\r\n"
+          + "        01 {$*WK_VARB1} PIC X(8) SYNC.\r\n"
+          + "        01 {$*WK_VARB2} PIC X(8) SYNC.\r\n"
+          + "        01 {$*WK_LENGTH} PIC X(8) SYNC.\r\n"
           + "        PROCEDURE DIVISION. \r\n";
 
-  private static final String BIND_TASK = "           BIND TASK.\r\n";
+  private static final String CHECK_TERMINAL =
+      "           CHECK TERMINAL INTO {$WK_VARB1} MAX LENGTH {$WK_VARB2}.\r\n";
 
-  private static final String BIND_TASK_NODENAME_VARIABLE =
-      "           MOVE 'TESTNODE' TO {$WK_NODENAME}.\r\n"
-          + "           BIND TASK NODENAME {$WK_NODENAME}.\r\n";
+  private static final String CHECK_TERMINAL_TO_ALL_PARMS =
+      "           CHECK TERMINAL GET STORAGE INTO {$WK_VARB1} TO {$WK_VARB2}\r\n"
+    + "           RETURN LENGTH INTO {$WK_LENGTH}.\r\n";
 
-  private static final String BIND_TASK_NODENAME_LITERAL =
-      "           BIND TASK NODENAME 'TESTNODE'.\r\n";
+  private static final String CHECK_TERMINAL_MAXLENGTH_VARB_ALL_PARMS =
+      "           CHECK TERMINAL GET STORAGE INTO {$WK_VARB1} MAX LENGTH {$WK_VARB2}\r\n"
+    + "           RETURN LENGTH INTO {$WK_LENGTH}.\r\n";
 
-  private static final String BIND_TRANSACTION_STATISTICS =
-      "            BIND TRANSACTION STATISTICS.\r\n";
+  private static final String CHECK_TERMINAL_MAXLENGTH_LITERAL_ALL_PARMS =
+      "           CHECK TERMINAL GET STORAGE INTO {$WK_VARB1} MAX LENGTH '120'\r\n"
+    + "           RETURN LENGTH INTO {$WK_LENGTH}.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
-        BOILERPLATE + BIND_TASK,
-        BOILERPLATE + BIND_TASK_NODENAME_VARIABLE,
-        BOILERPLATE + BIND_TASK_NODENAME_LITERAL,
-        BOILERPLATE + BIND_TRANSACTION_STATISTICS);
+        BOILERPLATE + CHECK_TERMINAL,
+        BOILERPLATE + CHECK_TERMINAL_TO_ALL_PARMS,
+        BOILERPLATE + CHECK_TERMINAL_MAXLENGTH_VARB_ALL_PARMS,
+        BOILERPLATE + CHECK_TERMINAL_MAXLENGTH_LITERAL_ALL_PARMS);
   }
 
   @ParameterizedTest
