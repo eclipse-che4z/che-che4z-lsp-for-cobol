@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -179,6 +180,7 @@ class TestReplacingWithDifferentPatternsShowsError {
           + "XMLTRANSFORM, XRBA, YEAR, YYDDD, YYDDMM, YYYYDDD, YYYYDDMM, YYYYMMDD, ZERO-DIGITAL, '.', "
           + "'01-49', '66', '77', '88', IDENTIFIER}";
 
+  @Disabled("Needs changing the logic")
   @Test
   void test() {
     UseCaseEngine.runTest(
