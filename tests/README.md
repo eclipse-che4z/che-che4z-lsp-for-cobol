@@ -36,10 +36,10 @@ If you are using VS Code, you can reload the window. Go to `View > Command Palet
 - In order to run the LS COBOL LOCAL test suite, open a workspace in Theia, and put the test COBOL files in the root folder of that opened workspace.
 
 - The test COBOL files can be found in the `test_files/project` subdirectory of a project. Theia version is `1.5.0.`
-
+Beside the workpsace loading, also we need to mount the `test` folder in order to run `TC318696`. 
   #### Run Theia in docker:
 
-  <code>sudo docker run -it --rm -p 3000:3000 -v /home/$USER/$project/plugins/:/home/theia/plugins -v /home/$USER/$project/test_files/project/:/home/project --name theia theiaide/theia-{java or full}:1.5.0</code>
+  <code>sudo docker run -it --rm -p 3000:3000 -v /home/$USER/$project/plugins/:/home/theia/plugins -v /home/$USER/che-che4z-lsp-for-cobol/tests/test_files/project/:/home/project -v /home/$USER/che-che4z-lsp-for-cobol/tests/test_files/test:/home/test --name theia theiaide/theia-{java or full}:1.5.0</code>
 
   OR
 
@@ -47,7 +47,7 @@ If you are using VS Code, you can reload the window. Go to `View > Command Palet
 
   ```
   cd theia/examples/browser
-  yarn start IntegrationTests/test_files/project/ --hostname=0.0.0.0
+  yarn start /home/$USER/che-che4z-lsp-for-cobol/tests/test_files/project/ --hostname=0.0.0.0
   ```
 
 ## 4. Run Cypress
