@@ -64,7 +64,7 @@
 
     <!-- Checks for Headers                                -->
     <!-- See https://checkstyle.org/config_header.html   -->
-     <module name="Header">
+     <module name="RegexpHeader">
        <property name="headerFile" value="src/style/javaHeader.txt"/>
        <property name="fileExtensions" value="java"/>
      </module>
