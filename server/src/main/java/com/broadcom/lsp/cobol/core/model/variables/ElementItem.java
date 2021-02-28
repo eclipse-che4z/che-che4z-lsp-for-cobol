@@ -38,8 +38,8 @@ public class ElementItem extends AbstractVariable {
       Variable parent,
       String picClause,
       String value,
-      UsageFormat usageFormat) {
-    super(name, definition, parent);
+      UsageFormat usageFormat, String scopeName) {
+    super(name, definition, parent, scopeName);
     this.picClause = picClause;
     this.value = value;
     this.usageFormat = usageFormat;
@@ -53,6 +53,6 @@ public class ElementItem extends AbstractVariable {
         newParent,
         picClause,
         value,
-        usageFormat);
+        usageFormat, getScopeName());
   }
 }

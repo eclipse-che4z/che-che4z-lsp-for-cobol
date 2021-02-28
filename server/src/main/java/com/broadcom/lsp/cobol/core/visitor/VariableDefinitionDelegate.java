@@ -80,13 +80,28 @@ public class VariableDefinitionDelegate {
   private final Map<Token, Locality> positions;
   private final MessageService messages;
 
+  void defineVariable(ParserRuleContext ctx, String scopeName) {
+    if (ctx instanceof DataDescriptionEntryFormat1Context) {
+      defineVariable((DataDescriptionEntryFormat1Context) ctx, scopeName);
+    } else if (ctx instanceof DataDescriptionEntryFormat1Level77Context) {
+      defineVariable((DataDescriptionEntryFormat1Level77Context) ctx, scopeName);
+    } else if (ctx instanceof DataDescriptionEntryFormat2Context) {
+      defineVariable((DataDescriptionEntryFormat2Context) ctx, scopeName);
+    } else if (ctx instanceof DataDescriptionEntryFormat3Context) {
+      defineVariable((DataDescriptionEntryFormat3Context) ctx, scopeName);
+    } else if (ctx instanceof EnvironmentSwitchNameClauseContext) {
+      defineVariable((EnvironmentSwitchNameClauseContext) ctx, scopeName);
+    } else {
+      LOG.error("ctx passed is wrong.");
+    }
+  }
   /**
    * Create and accumulate a variable of level 01-49 out of the given context. Add errors if the
    * variable definition contains is invalid
    *
    * @param ctx - a {@link DataDescriptionEntryFormat1Context} to retrieve the variable
    */
-  void defineVariable(@NonNull DataDescriptionEntryFormat1Context ctx) {
+  private void defineVariable(@NonNull DataDescriptionEntryFormat1Context ctx, String scopeName) {
     // TODO: add support for the REDEFINES clause:
     // TODO: 1. redefined variable defined
     // TODO: 2. add variable usage for REDEFINES
@@ -111,8 +126,9 @@ public class VariableDefinitionDelegate {
             .occursClauses(ctx.dataOccursClause())
             .valueClauses(ctx.dataValueClause())
             .usageClauses(ctx.dataUsageClause())
+                .scopeName(scopeName)
+                .globalClause(ctx.dataGlobalClause())
             .build();
-
     // TODO: Add check that name does not present in the predefined variables list (? - to check)
     checkStartingArea(variableDefinitionContext);
     closePreviousStructureIfNeeded(variableDefinitionContext);
@@ -142,7 +158,7 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link DataDescriptionEntryFormat1Level77Context} to retrieve the variable
    */
-  void defineVariable(@NonNull DataDescriptionEntryFormat1Level77Context ctx) {
+  private void defineVariable(@NonNull DataDescriptionEntryFormat1Level77Context ctx, String scopeName) {
     VariableDefinitionContext variableDefinitionContext =
         VariableDefinitionContext.builder()
             .number(LEVEL_77)
@@ -156,6 +172,7 @@ public class VariableDefinitionDelegate {
             .valueClauses(ctx.dataValueClause())
             .usageClauses(ctx.dataUsageClause())
             .occursClauses(ctx.dataOccursClause())
+                .scopeName(scopeName)
             .build();
 
     checkStartingArea(variableDefinitionContext);
@@ -175,7 +192,7 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link DataDescriptionEntryFormat2Context} to retrieve the variable
    */
-  void defineVariable(@NonNull DataDescriptionEntryFormat2Context ctx) {
+  private void defineVariable(@NonNull DataDescriptionEntryFormat2Context ctx, String scopeName) {
     VariableDefinitionContext variableDefinitionContext =
         VariableDefinitionContext.builder()
             .number(LEVEL_66)
@@ -187,11 +204,13 @@ public class VariableDefinitionDelegate {
             .starting(positions.get(ctx.LEVEL_NUMBER_66().getSymbol()))
             .renamesClauseContext(ctx.dataRenamesClause())
             .precedingStructure(structureStack.peekLast())
+                .scopeName(scopeName)
             .build();
 
     closePreviousStructure();
     checkTopElementNumber(variableDefinitionContext);
-    variables.push(renameItemMatcher(variableDefinitionContext));
+    Variable variable = renameItemMatcher(variableDefinitionContext);
+    variables.push(variable);
   }
 
   /**
@@ -200,7 +219,7 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link DataDescriptionEntryFormat3Context} to retrieve the variable
    */
-  void defineVariable(@NonNull DataDescriptionEntryFormat3Context ctx) {
+  private void defineVariable(@NonNull DataDescriptionEntryFormat3Context ctx, String scopeName) {
     VariableDefinitionContext variableDefinitionContext =
         VariableDefinitionContext.builder()
             .number(LEVEL_88)
@@ -211,6 +230,7 @@ public class VariableDefinitionDelegate {
             .antlrClass(ctx.getClass())
             .starting(positions.get(ctx.LEVEL_NUMBER_88().getSymbol()))
             .valueClauses(ImmutableList.of(ctx.dataValueClause()))
+                .scopeName(scopeName)
             .build();
 
     checkTopElementNumber(variableDefinitionContext);
@@ -226,13 +246,15 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link EnvironmentSwitchNameClauseContext} to retrieve the variable
    */
-  void defineVariable(EnvironmentSwitchNameClauseContext ctx) {
+  private void defineVariable(EnvironmentSwitchNameClauseContext ctx, String scopeName) {
     String name = retrieveName(ctx.mnemonicName());
-    variables.push(
+    MnemonicName mnemonicVariable =
         new MnemonicName(
             name,
+            scopeName,
             retrieveDefinition(
-                Optional.<ParserRuleContext>ofNullable(ctx.mnemonicName()).orElse(ctx))));
+                Optional.<ParserRuleContext>ofNullable(ctx.mnemonicName()).orElse(ctx)));
+    variables.push(mnemonicVariable);
   }
 
   /**
@@ -293,9 +315,9 @@ public class VariableDefinitionDelegate {
   }
 
   @NonNull
-  private List<IndexItem> retrieveIndexItem(@NonNull DataOccursClauseContext clause) {
+  private List<IndexItem> retrieveIndexItem(@NonNull DataOccursClauseContext clause, String scopeName) {
     return clause.indexName().stream()
-        .map(it -> new IndexItem(it.getText().toUpperCase(), positions.get(it.start)))
+        .map(it -> new IndexItem(it.getText().toUpperCase(), positions.get(it.start), scopeName))
         .collect(toList());
   }
 
@@ -430,9 +452,10 @@ public class VariableDefinitionDelegate {
               variable.getDefinition(),
               structureStack.peek(),
               retrieveOccursTimes(variable.getOccursClauses().get(0)),
-              retrieveIndexItem(variable.getOccursClauses().get(0)),
-              retrieveUsageFormat(variable.getUsageClauses()));
+              retrieveIndexItem(variable.getOccursClauses().get(0), variable.getScopeName()),
+              retrieveUsageFormat(variable.getUsageClauses()), variable.getScopeName());
       result.getIndexes().forEach(variables::push);
+      updateVariableScope(variable, result);
       return result;
     }
     return null;
@@ -442,13 +465,25 @@ public class VariableDefinitionDelegate {
     if (variable.getPicClauses().isEmpty()
         && variable.getOccursClauses().isEmpty()
         && variable.getUsageClauses().isEmpty()) {
-      return new GroupItem(
-          variable.getNumber(),
-          variable.getName(),
-          variable.getDefinition(),
-          structureStack.peek());
+
+      GroupItem groupItem = new GroupItem(
+              variable.getNumber(),
+              variable.getName(),
+              variable.getDefinition(),
+              structureStack.peek(), variable.getScopeName());
+      updateVariableScope(variable, groupItem);
+      return groupItem;
     }
     return null;
+  }
+
+  private void updateVariableScope(
+      VariableDefinitionContext variableDefinitionContext, Variable variable) {
+    boolean isCurrentVariableLocal =
+            !Objects.nonNull(variableDefinitionContext.getGlobalClause()) || variableDefinitionContext.getGlobalClause().isEmpty();
+    boolean isParentGlobal =
+            Objects.nonNull(variable.getParent()) && variable.getParent().isGlobal();
+    if (!isCurrentVariableLocal || isParentGlobal) variable.updateScope(NameSpaceScope.GLOBAL);
   }
 
   private Variable tableDataNameMatcher(VariableDefinitionContext variable) {
@@ -462,9 +497,10 @@ public class VariableDefinitionDelegate {
               retrievePicText(variable.getPicClauses()),
               variable.getValueClauseTest(),
               retrieveOccursTimes(variable.getOccursClauses().get(0)),
-              retrieveIndexItem(variable.getOccursClauses().get(0)),
-              retrieveUsageFormat(variable.getUsageClauses()));
+              retrieveIndexItem(variable.getOccursClauses().get(0), variable.getScopeName()),
+              retrieveUsageFormat(variable.getUsageClauses()), variable.getScopeName());
       tableDataName.getIndexes().forEach(variables::push);
+      updateVariableScope(variable, tableDataName);
       return tableDataName;
     }
     return null;
@@ -473,13 +509,15 @@ public class VariableDefinitionDelegate {
   private Variable elementItemMatcher(VariableDefinitionContext variable) {
     if ((!variable.getPicClauses().isEmpty() || !variable.getUsageClauses().isEmpty())
         && variable.getOccursClauses().isEmpty()) {
-      return new ElementItem(
-          variable.getName(),
-          variable.getDefinition(),
-          structureStack.peek(),
-          retrievePicText(variable.getPicClauses()),
-          variable.getValueClauseTest(),
-          retrieveUsageFormat(variable.getUsageClauses()));
+      ElementItem elementItem = new ElementItem(
+              variable.getName(),
+              variable.getDefinition(),
+              structureStack.peek(),
+              retrievePicText(variable.getPicClauses()),
+              variable.getValueClauseTest(),
+              retrieveUsageFormat(variable.getUsageClauses()), variable.getScopeName());
+      updateVariableScope(variable, elementItem);
+      return elementItem;
     }
     return null;
   }
@@ -493,7 +531,7 @@ public class VariableDefinitionDelegate {
       picClause = retrievePicText(variable.getPicClauses());
     }
     return new IndependentDataItem(
-        variable.getName(), variable.getDefinition(), picClause, variable.getValueClauseTest());
+        variable.getName(), variable.getDefinition(), picClause, variable.getValueClauseTest(), variable.getScopeName());
   }
 
   private Variable conditionalDataNameMatcher(VariableDefinitionContext variable) {
@@ -502,14 +540,14 @@ public class VariableDefinitionDelegate {
             variable.getName(),
             variable.getDefinition(),
             variable.getContainer(),
-            variable.getValueClauseTest());
+            variable.getValueClauseTest(), variable.getScopeName());
     Optional.ofNullable(variable.getContainer())
         .ifPresent(container -> container.addConditionName(result));
     return result;
   }
 
   private Variable renameItemMatcher(VariableDefinitionContext variable) {
-    RenameItem renameItem = new RenameItem(variable.getName(), variable.getDefinition());
+    RenameItem renameItem = new RenameItem(variable.getName(), variable.getDefinition(), variable.getScopeName());
     List<Variable> renamedVariables =
         renameVariables(renameItem, extractChildrenToRename(variable));
     renamedVariables.forEach(variables::push);
@@ -612,10 +650,12 @@ public class VariableDefinitionDelegate {
     List<DataOccursClauseContext> occursClauses;
     List<DataValueClauseContext> valueClauses;
     List<DataUsageClauseContext> usageClauses;
+    List<DataGlobalClauseContext> globalClause;
     String valueClauseTest;
     Variable container;
     DataRenamesClauseContext renamesClauseContext;
     UsageFormat usageFormat;
     StructuredVariable precedingStructure;
+    String scopeName;
   }
 }

@@ -18,7 +18,10 @@ package com.broadcom.lsp.cobol.core.visitor;
 import com.broadcom.lsp.cobol.core.CobolParser;
 import com.broadcom.lsp.cobol.core.CobolParserBaseVisitor;
 import com.broadcom.lsp.cobol.core.messages.MessageService;
-import com.broadcom.lsp.cobol.core.model.*;
+import com.broadcom.lsp.cobol.core.model.ErrorSeverity;
+import com.broadcom.lsp.cobol.core.model.Locality;
+import com.broadcom.lsp.cobol.core.model.ResultWithErrors;
+import com.broadcom.lsp.cobol.core.model.SyntaxError;
 import com.broadcom.lsp.cobol.core.model.variables.Variable;
 import com.broadcom.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import com.broadcom.lsp.cobol.core.semantics.GroupContext;
@@ -40,6 +43,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.text.RandomStringGenerator;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -70,9 +74,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   private final PredefinedVariableContext constants = new PredefinedVariableContext();
   private final GroupContext groupContext = new GroupContext();
   private final Multimap<String, Location> subroutineUsages = HashMultimap.create();
-
-  private String programName = null;
-
   private final NamedSubContext copybooks;
   private final CommonTokenStream tokenStream;
   private final OutlineTreeBuilder outlineTreeBuilder;
@@ -81,6 +82,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   private final SubroutineService subroutineService;
   private final VariableDefinitionDelegate variablesDelegate;
   private final VariableUsageDelegate variableUsageDelegate;
+  private final LinkedList<String> currentScopeChain = new LinkedList<>();
+  private String programName = null;
 
   public CobolVisitor(
       @NonNull String documentUri,
@@ -97,6 +100,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
     outlineTreeBuilder = new OutlineTreeBuilder(documentUri, positionMapping);
     variablesDelegate = new VariableDefinitionDelegate(positionMapping, messageService);
     variableUsageDelegate = new VariableUsageDelegate(positionMapping, messageService);
+  }
+
+  private static Collection<Location> getSubroutineLocation(
+      ImmutablePair<String, Optional<String>> subroutinePair) {
+    return subroutinePair
+        .getValue()
+        .map(it -> new Location(it, new Range(new Position(), new Position())))
+        .map(Collections::singletonList)
+        .orElse(emptyList());
   }
 
   /**
@@ -168,8 +180,16 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
               programName = name;
               outlineTreeBuilder.renameProgram(name, ctx);
               outlineTreeBuilder.addNode(PROGRAM_ID_PREFIX + name, NodeType.PROGRAM_ID, ctx);
+              currentScopeChain.add(programName + getRandomSuffix(10));
             });
+    if (Objects.isNull(programName)) currentScopeChain.add(getRandomSuffix(10));
     return visitChildren(ctx);
+  }
+
+  private String getRandomSuffix(int length) {
+    RandomStringGenerator generator =
+        new RandomStringGenerator.Builder().withinRange('a', 'z').build();
+    return generator.generate(length);
   }
 
   @Override
@@ -304,6 +324,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   public Void visitEndProgramStatement(EndProgramStatementContext ctx) {
     Token endProgramNameToken = ctx.programName().getStart();
     checkProgramName(endProgramNameToken);
+    if (!currentScopeChain.isEmpty()) currentScopeChain.remove(currentScopeChain.size() - 1);
     areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
@@ -400,7 +421,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
 
   @Override
   public Void visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
-    variablesDelegate.defineVariable(ctx);
+    checkScopeChainInitialized(); // scopeChain not initialized is highly unlikely, but still handle
+    // it.
+    variablesDelegate.defineVariable(ctx, currentScopeChain.getLast());
     String name =
         ofNullable(ctx.entryName())
             .map(EntryNameContext::dataName1)
@@ -410,6 +433,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
     int level = Integer.parseInt(levelNumber);
     outlineTreeBuilder.addVariable(level, name, getDataDescriptionNodeType(ctx), ctx);
     return visitChildren(ctx);
+  }
+
+  private void checkScopeChainInitialized() {
+    if (currentScopeChain.isEmpty()) {
+      currentScopeChain.add(getRandomSuffix(10));
+    }
   }
 
   private NodeType getDataDescriptionNodeType(DataDescriptionEntryFormat1Context ctx) {
@@ -427,7 +456,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
 
   @Override
   public Void visitEnvironmentSwitchNameClause(EnvironmentSwitchNameClauseContext ctx) {
-    variablesDelegate.defineVariable(ctx);
+    checkScopeChainInitialized(); // scopeChain not initialized is highly unlikely, but still handle
+    // it.
+    variablesDelegate.defineVariable(ctx, currentScopeChain.getLast());
     String name = ofNullable(ctx.mnemonicName()).map(RuleContext::getText).orElse(FILLER_NAME);
     outlineTreeBuilder.addNode(name, NodeType.MNEMONIC_NAME, ctx);
     return visitChildren(ctx);
@@ -435,7 +466,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
 
   @Override
   public Void visitDataDescriptionEntryFormat2(DataDescriptionEntryFormat2Context ctx) {
-    variablesDelegate.defineVariable(ctx);
+    checkScopeChainInitialized(); // scopeChain not initialized is highly unlikely, but still handle
+    // it.
+    variablesDelegate.defineVariable(ctx, currentScopeChain.getLast());
     String name =
         ofNullable(ctx.entryName())
             .map(EntryNameContext::dataName1)
@@ -447,7 +480,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
 
   @Override
   public Void visitDataDescriptionEntryFormat3(DataDescriptionEntryFormat3Context ctx) {
-    variablesDelegate.defineVariable(ctx);
+    checkScopeChainInitialized(); // scopeChain not initialized is highly unlikely, but still handle
+    // it.
+    variablesDelegate.defineVariable(ctx, currentScopeChain.getLast());
     String name =
         ofNullable(ctx.entryName())
             .map(EntryNameContext::dataName1)
@@ -460,7 +495,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   @Override
   public Void visitDataDescriptionEntryFormat1Level77(
       DataDescriptionEntryFormat1Level77Context ctx) {
-    variablesDelegate.defineVariable(ctx);
+    checkScopeChainInitialized(); // scopeChain not initialized is highly unlikely, but still handle
+    // it.
+    variablesDelegate.defineVariable(ctx, currentScopeChain.getLast());
     String name =
         ofNullable(ctx.entryName())
             .map(EntryNameContext::dataName1)
@@ -490,7 +527,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
         .ifPresent(
             locality -> {
               if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
-              else variableUsageDelegate.handleDataName(dataName, locality, ctx);
+              else
+                variableUsageDelegate.handleDataName(
+                    dataName, locality, ctx, new LinkedList<>(currentScopeChain));
             });
     return visitChildren(ctx);
   }
@@ -503,7 +542,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
         .ifPresent(
             locality -> {
               if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
-              else variableUsageDelegate.handleTableCall(dataName, locality);
+              else
+                variableUsageDelegate.handleTableCall(
+                    dataName, locality, new LinkedList<>(currentScopeChain));
             });
     return visitChildren(ctx);
   }
@@ -519,7 +560,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
         .ifPresent(
             locality -> {
               if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
-              else variableUsageDelegate.handleConditionCall(dataName, locality, ctx);
+              else
+                variableUsageDelegate.handleConditionCall(
+                    dataName, locality, ctx, new LinkedList<>(currentScopeChain));
             });
     return visitChildren(ctx);
   }
@@ -629,7 +672,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   }
 
   private void checkProgramName(Token token) {
-    if (programName == null) {
+    if (currentScopeChain.isEmpty()) {
       getLocality(token)
           .ifPresent(
               it ->
@@ -641,7 +684,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
 
   private void checkProgramNameIdentical(Token token) {
     String text = PreprocessorStringUtils.trimQuotes(token.getText());
-    if (!programName.equalsIgnoreCase(text)) {
+    String currentScope = currentScopeChain.getLast();
+    if (!currentScope.substring(0, currentScope.length() - 10).equalsIgnoreCase(text)) {
       getLocality(token)
           .ifPresent(
               it ->
@@ -665,14 +709,5 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
         .map(name -> new ImmutablePair<>(name, subroutineService.getUri(name)))
         .filter(pair -> pair.getValue().isPresent())
         .collect(toMap(Pair::getKey, CobolVisitor::getSubroutineLocation));
-  }
-
-  private static Collection<Location> getSubroutineLocation(
-      ImmutablePair<String, Optional<String>> subroutinePair) {
-    return subroutinePair
-        .getValue()
-        .map(it -> new Location(it, new Range(new Position(), new Position())))
-        .map(Collections::singletonList)
-        .orElse(emptyList());
   }
 }

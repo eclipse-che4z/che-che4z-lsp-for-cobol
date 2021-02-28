@@ -41,8 +41,8 @@ public class TableDataName extends AbstractVariable implements TableDeclaration 
       String value,
       int occursTimes,
       List<IndexItem> indexes,
-      UsageFormat usageFormat) {
-    super(name, definition, parent);
+      UsageFormat usageFormat, String scopeName) {
+    super(name, definition, parent, scopeName);
     this.picClause = picClause;
     this.value = value;
     this.occursTimes = occursTimes;
@@ -60,6 +60,6 @@ public class TableDataName extends AbstractVariable implements TableDeclaration 
         value,
         occursTimes,
         indexes,
-        usageFormat);
+        usageFormat, getScopeName());
   }
 }

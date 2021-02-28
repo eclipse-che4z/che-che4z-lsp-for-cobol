@@ -28,7 +28,7 @@ import lombok.Value;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class IndexItem extends AbstractVariable {
-  public IndexItem(String name, Locality definition) {
-    super(name, definition, null);
+  public IndexItem(String name, Locality definition, String scopeName) {
+    super(name, definition, null, scopeName);
   }
 }

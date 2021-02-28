@@ -29,88 +29,108 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** This test check functions of the {@link VariableUsageUtils}. */
 class VariableUsageUtilsTest {
-  @Test
-  void empty() {
-    Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(ImmutableList.of());
-    assertTrue(VariableUsageUtils.findVariables(definedVariables, "foo", ImmutableList.of()).isEmpty());
-  }
+    @Test
+    void empty() {
+        Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(ImmutableList.of());
+        assertTrue(VariableUsageUtils.findVariables(definedVariables, "foo", ImmutableList.of(),
+                new LinkedList<>()).isEmpty());
+    }
 
-  @Test
-  void findByNameWithAnyParent() {
-    List<Variable> variables = collectVariables(
-        var("FOO"),
-        var("BAR",
-            var("FOO",
-                var("BAZ")),
-            var("BAZ",
-                var("FOO")))
-    );
-    Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(variables);
-    List<Variable> found = VariableUsageUtils.findVariables(definedVariables, "FOO", ImmutableList.of());
-    checkQualifiers(found, "FOO", "BAR FOO", "BAR BAZ FOO");
-  }
+    @Test
+    void findByNameWithAnyParent() {
+        List<Variable> variables = collectVariables(
+                var("FOO", "scope"),
+                var("BAR", "scope",
+                        var("FOO", "scope",
+                                var("BAZ", "scope")),
+                        var("BAZ", "scope",
+                                var("FOO", "scope")))
+        );
+        Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(variables);
+        List<Variable> found = VariableUsageUtils.findVariables(definedVariables, "FOO", ImmutableList.of(),
+                new LinkedList<>(ImmutableList.of("scope")));
+        checkQualifiers(found, "FOO", "BAR FOO", "BAR BAZ FOO");
+    }
 
-  @Test
-  void findByNameAndParent() {
-    List<Variable> variables = collectVariables(
-        var("FOO"),
-        var("BAR",
-            var("FOO",
-                var("BAZ")),
-            var("BAZ",
-                var("FOO")))
-    );
-    Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(variables);
-    List<Variable> found = VariableUsageUtils.findVariables(definedVariables, "FOO", ImmutableList.of("BAR"));
-    checkQualifiers(found, "BAR FOO", "BAR BAZ FOO");
-  }
+    @Test
+    void findByNameAndParent() {
+        List<Variable> variables = collectVariables(
+                var("FOO", "scope"),
+                var("BAR", "scope",
+                        var("FOO", "scope",
+                                var("BAZ", "scope")),
+                        var("BAZ", "scope",
+                                var("FOO", "scope")))
+        );
+        Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(variables);
+        List<Variable> found = VariableUsageUtils.findVariables(definedVariables, "FOO", ImmutableList.of("BAR"), new LinkedList<>(ImmutableList.of("scope")));
+        checkQualifiers(found, "BAR FOO", "BAR BAZ FOO");
+    }
 
-  @Test
-  void findByNameAndTwoParents() {
-    List<Variable> variables = collectVariables(
-        var("FOO",
-            var("BAZ",
-                var("BAR"),
-                var("QWE",
-                    var("BAR"))),
-            var("QWE",
-                var("BAZ",
-                    var("BAR")))),
-        var("BAZ",
-            var("FOO",
-                var("BAR")))
-    );
-    Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(variables);
-    List<Variable> found = VariableUsageUtils.findVariables(definedVariables, "BAR", ImmutableList.of("BAZ", "FOO"));
-    checkQualifiers(found, "FOO BAZ BAR", "FOO BAZ QWE BAR", "FOO QWE BAZ BAR");
-  }
+    @Test
+    void findByNameAndTwoParents() {
+        List<Variable> variables = collectVariables(
+                var("FOO", "scope",
+                        var("BAZ", "scope",
+                                var("BAR", "scope"),
+                                var("QWE", "scope",
+                                        var("BAR", "scope"))),
+                        var("QWE", "scope",
+                                var("BAZ", "scope",
+                                        var("BAR", "scope")))),
+                var("BAZ", "scope",
+                        var("FOO", "scope",
+                                var("BAR", "scope")))
+        );
+        Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(variables);
+        List<Variable> found = VariableUsageUtils.findVariables(definedVariables, "BAR", ImmutableList.of("BAZ", "FOO"), new LinkedList<>(ImmutableList.of("scope")));
+        checkQualifiers(found, "FOO BAZ BAR", "FOO BAZ QWE BAR", "FOO QWE BAZ BAR");
+    }
 
-  private static void checkQualifiers(List<Variable> variables, String... qualifiers) {
-    assertEquals(Arrays.stream(qualifiers).collect(Collectors.toSet()),
-        variables.stream().map(VariableUsageUtilsTest::getQualifier).collect(Collectors.toSet()));
-  }
+    @Test
+    void findByNameByScopeAndParent() {
+        List<Variable> variables = collectVariables(
+                var("FOO", "scope1"),
+                var("BAR", "scope1",
+                        var("FOO", "scope2",
+                                var("BAZ", "scope2")),
+                        var("BAZ", "scope3",
+                                var("FOO", "scope3")))
+        );
 
-  private static List<Variable> collectVariables(Function<Variable, List<Variable>>... factories) {
-    List<Variable> result = new ArrayList<>();
-    for (Function<Variable, List<Variable>> factory: factories)
-      result.addAll(factory.apply(null));
-    return result;
-  }
+        Map<String, List<Variable>> definedVariables = VariableUsageUtils.convertDefinedVariables(variables);
+        List<Variable> found = VariableUsageUtils.findVariables(definedVariables, "FOO", ImmutableList.of("BAR"),
+                new LinkedList<>(ImmutableList.of("scope2")));
+        assertEquals(1, found.size());
 
-  private static Function<Variable, List<Variable>> var(String name, Function<Variable, List<Variable>>... factories) {
+    }
+    private static void checkQualifiers(List<Variable> variables, String... qualifiers) {
+        assertEquals(Arrays.stream(qualifiers).collect(Collectors.toSet()),
+                variables.stream().map(VariableUsageUtilsTest::getQualifier).collect(Collectors.toSet()));
+    }
+
+    private static List<Variable> collectVariables(Function<Variable, List<Variable>>... factories) {
+        List<Variable> result = new ArrayList<>();
+        for (Function<Variable, List<Variable>> factory: factories)
+            result.addAll(factory.apply(null));
+        return result;
+    }
+
+  private static Function<Variable, List<Variable>> var(
+      String name, String scopeName, Function<Variable, List<Variable>>... factories) {
     return (Variable parent) -> {
       List<Variable> result = new ArrayList<>();
-      Variable it = new ElementItem(name, Locality.builder().build(), parent, "", "", null);
+      Variable it =
+          new ElementItem(name, Locality.builder().build(), parent, "", "", null, scopeName);
       result.add(it);
-      for (Function<Variable, List<Variable>> factory: factories)
-        result.addAll(factory.apply(it));
+      for (Function<Variable, List<Variable>> factory : factories) result.addAll(factory.apply(it));
       return result;
     };
   }
 
-  private static String getQualifier(Variable variable) {
-    return Optional.ofNullable(variable.getParent())
-        .map(it -> getQualifier(it) + " ")
-        .orElse("") + variable.getName();
-  }
+    private static String getQualifier(Variable variable) {
+        return Optional.ofNullable(variable.getParent())
+                .map(it -> getQualifier(it) + " ")
+                .orElse("") + variable.getName();
+    }
 }

@@ -60,4 +60,25 @@ public interface Variable extends Renameable, Conditional {
    * @return parent {@link Variable}
    */
   Variable getParent();
+
+  /**
+   * Returns the namespace of a variable.
+   *
+   * @return strings
+   */
+  String getScopeName();
+
+  /**
+   * Check if a variable is in a GLOBAL namespace.
+   *
+   * @return boolean
+   */
+  boolean isGlobal();
+
+  /**
+   * Update the namespace of a variable.
+   *
+   * @param scope {@link NameSpaceScope}
+   */
+  void updateScope(NameSpaceScope scope);
 }

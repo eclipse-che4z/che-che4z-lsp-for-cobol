@@ -34,8 +34,8 @@ import java.util.List;
 public class ConditionDataName extends AbstractVariable {
   String value;
 
-  public ConditionDataName(String name, Locality definition, Variable parent, String value) {
-    super(name, definition, parent);
+  public ConditionDataName(String name, Locality definition, Variable parent, String value, String scopeName) {
+    super(name, definition, parent, scopeName);
     this.value = value;
   }
 
@@ -56,6 +56,6 @@ public class ConditionDataName extends AbstractVariable {
 
   @Override
   public Variable rename(RenameItem newParent) {
-    return new ConditionDataName(name, definition, newParent, value);
+    return new ConditionDataName(name, definition, newParent, value, getScopeName());
   }
 }

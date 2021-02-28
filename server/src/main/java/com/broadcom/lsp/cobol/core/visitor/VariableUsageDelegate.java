@@ -52,11 +52,16 @@ class VariableUsageDelegate {
    * @param locality the variable text position
    * @param ctx the ANTLR variable context
    */
-  void handleDataName(String dataName, Locality locality, QualifiedDataNameFormat1Context ctx) {
+  void handleDataName(
+      String dataName,
+      Locality locality,
+      QualifiedDataNameFormat1Context ctx,
+      LinkedList<String> scopeChain) {
     List<QualifiedInDataContext> hierarchy = ctx.qualifiedInData();
-    List<String> parents = createPatentsList(hierarchy.stream().map(this::getDataName2Context).collect(toList()));
+    List<String> parents =
+        createPatentsList(hierarchy.stream().map(this::getDataName2Context).collect(toList()));
     Map<String, Token> parentVariables = collectParentVariablesFromDataAndTable(hierarchy);
-    variableUsages.add(new VariableUsage(dataName, parents, locality, parentVariables));
+    variableUsages.add(new VariableUsage(dataName, parents, locality, parentVariables, scopeChain));
   }
 
   /**
@@ -66,11 +71,16 @@ class VariableUsageDelegate {
    * @param locality the variable text position
    * @param ctx the ANTLR variable context
    */
-  void handleConditionCall(String dataName, Locality locality, ConditionNameReferenceContext ctx) {
-    List<DataName2Context> hierarchy = ctx.inData().stream().map(InDataContext::dataName2).collect(toList());
+  void handleConditionCall(
+      String dataName,
+      Locality locality,
+      ConditionNameReferenceContext ctx,
+      LinkedList<String> scopeChain) {
+    List<DataName2Context> hierarchy =
+        ctx.inData().stream().map(InDataContext::dataName2).collect(toList());
     List<String> parents = createPatentsList(hierarchy);
     Map<String, Token> parentVariables = collectParentVariablesFromInData(hierarchy);
-    variableUsages.add(new VariableUsage(dataName, parents, locality, parentVariables));
+    variableUsages.add(new VariableUsage(dataName, parents, locality, parentVariables, scopeChain));
   }
 
   /**
@@ -79,8 +89,10 @@ class VariableUsageDelegate {
    * @param dataName the variable name
    * @param locality the variable text position
    */
-  void handleTableCall(String dataName, Locality locality) {
-    variableUsages.add(new VariableUsage(dataName, Collections.emptyList(), locality, Collections.emptyMap()));
+  void handleTableCall(String dataName, Locality locality, LinkedList<String> scopeChain) {
+    variableUsages.add(
+        new VariableUsage(
+            dataName, Collections.emptyList(), locality, Collections.emptyMap(), scopeChain));
   }
 
   /**
@@ -90,11 +102,16 @@ class VariableUsageDelegate {
    * @return the list of usage errors
    */
   List<SyntaxError> updateUsageAndGenerateErrors(Collection<Variable> definedVariables) {
-    Map<String, List<Variable>> convertedVariables = VariableUsageUtils.convertDefinedVariables(definedVariables);
+    Map<String, List<Variable>> convertedVariables =
+        VariableUsageUtils.convertDefinedVariables(definedVariables);
     List<SyntaxError> errors = new ArrayList<>();
     for (VariableUsage variableUsage : variableUsages) {
       List<Variable> foundVariables =
-          VariableUsageUtils.findVariables(convertedVariables, variableUsage.name, variableUsage.parents);
+          VariableUsageUtils.findVariables(
+              convertedVariables,
+              variableUsage.name,
+              variableUsage.parents,
+              variableUsage.getScopeChain());
       if (foundVariables.size() == 1) {
         Variable variable = foundVariables.get(0);
         variable.addUsage(variableUsage.locality);
@@ -107,10 +124,7 @@ class VariableUsageDelegate {
   }
 
   private List<String> createPatentsList(List<DataName2Context> hierarchy) {
-    return hierarchy.stream()
-            .map(RuleContext::getText)
-            .map(String::toUpperCase)
-            .collect(toList());
+    return hierarchy.stream().map(RuleContext::getText).map(String::toUpperCase).collect(toList());
   }
 
   private Map<String, Token> collectParentVariablesFromDataAndTable(
@@ -175,5 +189,6 @@ class VariableUsageDelegate {
     List<String> parents;
     Locality locality;
     Map<String, Token> parentVariables;
+    LinkedList<String> scopeChain;
   }
 }

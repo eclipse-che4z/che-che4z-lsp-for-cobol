@@ -31,8 +31,8 @@ import static com.broadcom.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEV
 public class GroupItem extends StructuredVariable {
 
   public GroupItem(
-      int levelNumber, String name, Locality definition, Variable parent) {
-    super(levelNumber, name, definition, parent);
+      int levelNumber, String name, Locality definition, Variable parent, String scopeName) {
+    super(levelNumber, name, definition, parent, scopeName);
   }
 
   @Override
@@ -43,6 +43,6 @@ public class GroupItem extends StructuredVariable {
             levelNumber,
             name,
             definition,
-            newParent);
+            newParent, getScopeName());
   }
 }

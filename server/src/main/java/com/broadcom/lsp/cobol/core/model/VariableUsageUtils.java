@@ -23,20 +23,19 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
-/**
- * The class take all defined variables and search through them by partial qualifier
- */
+/** The class take all defined variables and search through them by partial qualifier */
 @UtilityClass
 public class VariableUsageUtils {
 
   /**
-   * Convert given defined variables into map, convenient for later search in findVariables function.
-   * The defined variables can be converted once and used for all subsequent searches.
+   * Convert given defined variables into map, convenient for later search in findVariables
+   * function. The defined variables can be converted once and used for all subsequent searches.
    *
    * @param definedVariables the collection with defined variables
    * @return the converted representation
    */
-  public static Map<String, List<Variable>> convertDefinedVariables(Collection<Variable> definedVariables) {
+  public static Map<String, List<Variable>> convertDefinedVariables(
+      Collection<Variable> definedVariables) {
     return definedVariables.stream().collect(groupingBy(Variable::getName));
   }
 
@@ -45,23 +44,45 @@ public class VariableUsageUtils {
    *
    * @param definedVariables the map with all defined variables
    * @param name the name of variable
-   * @param parents the list of parents in order they appear in COBOL.
-   *                Ex.: CHILD OF PARENT1 OF PARENT2 => ["PARENT1", "PARENT2"]
+   * @param parents the list of parents in order they appear in COBOL. Ex.: CHILD OF PARENT1 OF
+   *     PARENT2 => ["PARENT1", "PARENT2"]
+   * @param scopeChain a {@link LinkedList} of {@link String} representing the hierarchy of position
+   *     of current program in the analysed cobol file.
    * @return the list of all matched variables
    */
   public static List<Variable> findVariables(
-      Map<String, List<Variable>> definedVariables, String name, List<String> parents) {
-    return definedVariables.getOrDefault(name, ImmutableList.of()).stream()
-        .filter(it -> checkParents(it, parents))
-        .collect(Collectors.toList());
+      Map<String, List<Variable>> definedVariables,
+      String name,
+      List<String> parents,
+      LinkedList<String> scopeChain) {
+
+    if (scopeChain.isEmpty()) return Collections.emptyList();
+    Map<String, List<Variable>> scopedVariableMap =
+        definedVariables.getOrDefault(name, ImmutableList.of()).stream()
+            .filter(it -> checkParents(it, parents))
+            .collect(groupingBy(Variable::getScopeName));
+
+    if (scopedVariableMap.containsKey(scopeChain.getLast())) return scopedVariableMap.get(scopeChain.getLast());
+
+    Iterator<String> stringIterator = scopeChain.descendingIterator();
+    stringIterator.next();
+    while (stringIterator.hasNext()) {
+      String nextScope = stringIterator.next();
+      if (scopedVariableMap.containsKey(nextScope)) {
+        return scopedVariableMap.get(nextScope).stream()
+            .filter(Variable::isGlobal)
+            .collect(Collectors.toList());
+      }
+    }
+
+    return Collections.emptyList();
   }
 
   private static boolean checkParents(Variable variable, List<String> parents) {
     for (String parent : parents) {
       do {
         variable = variable.getParent();
-        if (variable == null)
-          return false;
+        if (variable == null) return false;
       } while (!variable.getName().equals(parent));
     }
     return true;

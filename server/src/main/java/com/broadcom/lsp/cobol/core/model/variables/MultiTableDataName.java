@@ -41,8 +41,8 @@ public class MultiTableDataName extends StructuredVariable implements TableDecla
       Variable parent,
       int occursTimes,
       List<IndexItem> indexes,
-      UsageFormat usageFormat) {
-    super(levelNumber, name, definition, parent);
+      UsageFormat usageFormat, String scopeName) {
+    super(levelNumber, name, definition, parent, scopeName);
     this.occursTimes = occursTimes;
     this.indexes = indexes;
     this.usageFormat = usageFormat;
@@ -57,6 +57,6 @@ public class MultiTableDataName extends StructuredVariable implements TableDecla
         newParent,
         occursTimes,
         indexes,
-        usageFormat);
+        usageFormat, getScopeName());
   }
 }

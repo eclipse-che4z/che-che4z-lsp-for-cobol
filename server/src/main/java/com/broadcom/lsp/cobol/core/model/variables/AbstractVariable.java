@@ -31,6 +31,13 @@ public abstract class AbstractVariable implements Variable {
   private final List<Locality> usages = new ArrayList<>();
   private final List<ConditionDataName> conditionChildren = new ArrayList<>();
   private Variable parent;
+  private String scopeName;
+  private NameSpaceScope scope;
+
+  protected AbstractVariable(String name, Locality definition, Variable parent, String scopeName) {
+    // default the variables to LOCAL scope unless otherwise updated.
+    this(name, definition, parent, scopeName, NameSpaceScope.LOCAL);
+  }
 
   @Override
   public @NonNull List<Locality> getUsages() {
@@ -59,5 +66,20 @@ public abstract class AbstractVariable implements Variable {
   @Override
   public List<ConditionDataName> getConditionNames() {
     return conditionChildren;
+  }
+
+  @Override
+  public String getScopeName() {
+    return scopeName;
+  }
+
+  @Override
+  public boolean isGlobal() {
+    return this.scope == NameSpaceScope.GLOBAL;
+  }
+
+  @Override
+  public void updateScope(NameSpaceScope scope) {
+    this.scope = scope;
   }
 }
