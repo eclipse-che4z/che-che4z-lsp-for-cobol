@@ -873,7 +873,8 @@ statement
    ;
 
 idmsStatements
-    : copyIdmsBinds | copyIdmsModule | abendCodeStatement | attachTaskCodeStatement | bindStatement | changePriorityStatement
+    : copyIdmsBinds | copyIdmsModule | abendCodeStatement | attachTaskCodeStatement | bindStatement | changePriorityStatement | checkTerminalStatement | commitStatement |
+     endStatement | endpageStatement | finishStatement
     ;
 
 // abend code statement
@@ -989,7 +990,7 @@ attachTaskCodeStatement
     ;
 
 attachTaskCodePriorityClause
-    : PRIORITY (priorityLiteral | generalIdentifier)
+    : PRIORITY (numericLiteral | generalIdentifier)
     ;
 
 attachTaskCodeWaitClause
@@ -1073,11 +1074,37 @@ cancelCall
 // change priority statement
 
 changePriorityStatement
-    : CHANGE PRIORITY TO? (changePriorityLiteral | generalIdentifier)
+    : CHANGE PRIORITY TO? (numericLiteral | generalIdentifier)
     ;
 
 changePriorityLiteral
     : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
+    ;
+
+// check terminal statement
+
+checkTerminalStatement
+    : CHECK TERMINAL checkTerminalGetStorageClause? INTO generalIdentifier (checkTerminalIntoClause | checkTerminalMaxLengthClause) checkTerminalReturnLengthClause?
+    ;
+
+checkTerminalGetStorageClause
+    : GET STORAGE
+    ;
+
+checkTerminalIntoClause
+    : TO generalIdentifier
+    ;
+
+checkTerminalMaxLengthClause
+    : MAX LENGTH (generalIdentifier | checkTerminalMaxLengthLiteral)
+    ;
+
+checkTerminalMaxLengthLiteral
+    : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
+    ;
+
+checkTerminalReturnLengthClause
+    : RETURN LENGTH INTO? generalIdentifier
     ;
 
 // close statement
@@ -1118,6 +1145,12 @@ closePortFileIOUsingAssociatedDataLength
    : ASSOCIATED_DATA_LENGTH OF? (integerLiteral | generalIdentifier)
    ;
 
+// commit statement
+
+commitStatement
+   : COMMIT TASK? ALL?
+   ;
+
 // compute statement
 
 computeStatement
@@ -1146,7 +1179,27 @@ copyIdmsModule
 // delete statement
 
 deleteStatement
-   : DELETE fileName RECORD? invalidKeyPhrase? notInvalidKeyPhrase? END_DELETE?
+   : DELETE (deleteFilenameClause | deleteQueueClause | deleteScratchClause)
+   ;
+
+deleteFilenameClause
+   : fileName RECORD? invalidKeyPhrase? notInvalidKeyPhrase? END_DELETE?
+   ;
+
+deleteQueueClause
+   : QUEUE deleteQueueIdClause? (CURRENT | ALL)?
+   ;
+
+deleteQueueIdClause
+   : ID (generalIdentifier | literal)
+   ;
+
+deleteScratchClause
+   : SCRATCH deleteScratchIdClause? (CURRENT | FIRST | LAST | NEXT | PRIOR | ALL | RECORD ID generalIdentifier)? (RETURN RECORD ID INTO? generalIdentifier)?
+   ;
+
+deleteScratchIdClause
+   : AREA ID (generalIdentifier | literal)
    ;
 
 // disable statement
@@ -1215,6 +1268,18 @@ divideRemainder
 
 enableStatement
    : ENABLE (INPUT TERMINAL? | I_O TERMINAL | OUTPUT) cdName WITH? KEY (literal | generalIdentifier)
+   ;
+
+// end statement
+
+endStatement
+   : END LINE TERMINAL SESSION
+   ;
+
+// endpage statement
+
+endpageStatement
+   : ENDPAGE SESSION?
    ;
 
 // entry statement
@@ -1296,6 +1361,12 @@ exhibitOperand
 
 exitStatement
    : EXIT PROGRAM?
+   ;
+
+// finish statement
+
+finishStatement
+   : FINISH TASK
    ;
 
 // generate statement
