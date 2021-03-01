@@ -11,11 +11,11 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-export const SETTINGS_CPY_SECTION: string = "broadcom-cobol-lsp.cpy-manager";
+export const SETTINGS_CPY_SECTION: string = "cobol-lsp.cpy-manager";
 
 export const PATHS_LOCAL_KEY = "paths-local";
 export const PATHS_ZOWE = "paths-dsn";
-export const SETTINGS_SUBROUTINE_LOCAL_KEY = "broadcom-cobol-lsp.subroutine-manager.paths-local";
+export const SETTINGS_SUBROUTINE_LOCAL_KEY = "cobol-lsp.subroutine-manager.paths-local";
 export const C4Z_FOLDER: string = ".c4z";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
 export const GITIGNORE_FILE: string = ".gitignore";

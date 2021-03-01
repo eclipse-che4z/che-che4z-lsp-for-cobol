@@ -31,7 +31,7 @@ export class Middleware {
         next: ConfigurationRequest.HandlerSignature): Promise<HandlerResult<any[], void>> {
 
         const requestLines = params.items.map(item => Middleware.parseLine(item.section));
-        if (requestLines.length > 0 && requestLines[0] !== undefined && requestLines[0].prefix == "broadcom-cobol-lsp") {
+        if (requestLines.length > 0 && requestLines[0] !== undefined && requestLines[0].prefix == "cobol-lsp") {
             switch (requestLines[0].command) {
                 case "copybook-resolve":
                     return [await this.copybookResolverURI.resolveCopybookURI(requestLines[0].copybookName,

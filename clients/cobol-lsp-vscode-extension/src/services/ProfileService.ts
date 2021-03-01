@@ -112,7 +112,7 @@ export class ProfileService implements Disposable {
 
     private createStatusBarItem() {
         this.defaultProfileStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
-        this.defaultProfileStatusBarItem.command = "broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile";
+        this.defaultProfileStatusBarItem.command = "cobol-lsp.cpy-manager.change-default-zowe-profile";
         this.updateStatusBar();
         this.defaultProfileStatusBarItem.show();
     }
