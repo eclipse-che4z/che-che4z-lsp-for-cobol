@@ -36,6 +36,7 @@ class TestSkipStatement {
           + "           PERFORM WITH TEST BEFORE UNTIL {$ID0} = 0\n"
           + "             SUBTRACT 1 FROM {$TAPARM1}\n"
           + "             CALL {%'ID1'}\n"
+          + "       SKIP1.\n"
           + "           END-PERFORM.\n"
           + "        SKIP2.\n"
           + "        {#*PROGB}.\n"

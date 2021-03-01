@@ -12,10 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {URL} from "url";
+import * as urlUtil from "url";
 import * as path from "path";
-import {readdirSync, existsSync} from "fs";
-import {SettingsUtils} from "./SettingsUtils";
+import { readdirSync, existsSync } from "fs";
+import { SettingsUtils } from "./SettingsUtils";
 import * as fs from "fs";
 
 /**
@@ -27,19 +27,19 @@ import * as fs from "fs";
  * this URI really exists on FS.
  *
  */
-export function getURIFrom(folder: string, entityName: string, extensions?: string[]): URL {
+export function getURIFrom(folder: string, entityName: string, extensions?: string[]): urlUtil.URL {
     if (!extensions) {
-        const url = new URL(path.join(folder, entityName));
+        const url = new urlUtil.URL(path.join(folder, entityName));
         if (existsSync(url)) {
             return url;
         }
     } else {
-        const fileList = readdirSync(new URL(folder));
+        const fileList = readdirSync(new urlUtil.URL(folder));
         for (const extension of extensions) {
             const copybookFileWithExtension = (entityName + extension).toUpperCase();
             const found = fileList.find(filename => filename.toUpperCase() === copybookFileWithExtension.toUpperCase())
             if (found) {
-                return new URL(path.join(folder, found));
+                return new urlUtil.URL(path.join(folder, found));
             }
         }
     }
@@ -50,9 +50,11 @@ export function getURIFrom(folder: string, entityName: string, extensions?: stri
  * @param resource represent the file to search within the workspace folder list
  * @return an URI representation of the file or undefined if not found
  */
-export function getURIFromResource(resource: string): URL {
+export function getURIFromResource(resource: string): urlUtil.URL {
     for (const workspaceFolder of SettingsUtils.getWorkspacesURI()) {
-        const uri: URL = new URL(path.join(workspaceFolder, resource));
+        const uri: urlUtil.URL = (path.resolve(resource) === path.normalize(resource))
+            ? urlUtil.pathToFileURL(resource) :
+            new urlUtil.URL(path.normalize(path.join(workspaceFolder, resource)));
         if (fs.existsSync(uri)) {
             return uri;
         }
@@ -70,10 +72,10 @@ export function searchInWorkspace(entityName: string, targetFolders: string[], e
     if (targetFolders) {
         const localFolderList: string[] = targetFolders
             .map(getURIFromResource)
-            .filter((url: URL) => url !== undefined)
-            .map((url: URL) => url.href);
+            .filter((url: urlUtil.URL) => url !== undefined)
+            .map((url: urlUtil.URL) => url.href);
         for (const folder of localFolderList) {
-            let uri: URL = getURIFrom(folder, entityName);
+            let uri: urlUtil.URL = getURIFrom(folder, entityName);
             if (!uri) {
                 uri = getURIFrom(folder, entityName, extensions);
             }

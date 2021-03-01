@@ -32,7 +32,10 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class GroupContext {
   private final Multimap<String, Location> sections = HashMultimap.create();
+  private final Multimap<String, Location> sectionRanges = HashMultimap.create();
+
   private final Multimap<String, Location> paragraphs = HashMultimap.create();
+  private final Multimap<String, Location> paragraphsRanges = HashMultimap.create();
 
   private final Multimap<String, Locality> candidateUsageLocalities = HashMultimap.create();
 
@@ -46,12 +49,30 @@ public class GroupContext {
   }
 
   /**
+   * Adds a section range
+   * @param name is a section name
+   * @param location is a section location where it's range is a range of a section
+   */
+  public void addSectionRange(String name, Location location) {
+    sectionRanges.put(name, location);
+  }
+
+  /**
    * Adds a paragraph definition to the context
    * @param name is a paragraph name
    * @param locality is a paragraph locality
    */
   public void addParagraphDefinition(String name, Locality locality) {
     paragraphs.put(name, locality.toLocation());
+  }
+
+  /**
+   * Adds a paragraph range
+   * @param name is a paragraph name
+   * @param location is a paragraph location when it's range is a range of a paragraph
+   */
+  public void addParagraphRange(String name, Location location) {
+    paragraphsRanges.put(name, location);
   }
 
   /**
@@ -88,11 +109,27 @@ public class GroupContext {
   }
 
   /**
+   * Prepares and returns paragraphs ranges structure
+   * @return a map with a token and a collection of token locations
+   */
+  public Map<String, Collection<Location>> getParagraphRanges() {
+    return paragraphsRanges.asMap();
+  }
+
+  /**
    * Prepares and returns sections usages structure
    * @return a map with a token and a collection of token locations
    */
   public Map<String, Collection<Location>> getSectionUsages() {
     return prepareUsages(sections.keySet());
+  }
+
+  /**
+   * Prepares and returns sections ranges structure
+   * @return a map with a token and a collection of token locations
+   */
+  public Map<String, Collection<Location>> getSectionRanges() {
+    return sectionRanges.asMap();
   }
 
   /**
@@ -132,5 +169,4 @@ public class GroupContext {
         .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
             .map(Locality::toLocation).collect(Collectors.toList())));
   }
-
 }

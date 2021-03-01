@@ -34,8 +34,10 @@ public class AnalysisResult {
   @Builder.Default Map<String, List<Location>> variableUsages = new HashMap<>();
   @Builder.Default Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
   @Builder.Default Map<String, List<Location>> paragraphUsages = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> paragraphRange = new HashMap<>();
   @Builder.Default Map<String, List<Location>> sectionDefinitions = new HashMap<>();
   @Builder.Default Map<String, List<Location>> sectionUsages = new HashMap<>();
+  @Builder.Default Map<String, List<Location>> sectionRange = new HashMap<>();
   @Builder.Default Map<String, List<Location>> constantDefinitions = new HashMap<>();
   @Builder.Default Map<String, List<Location>> constantUsages = new HashMap<>();
   @Builder.Default Map<String, List<Location>> copybookDefinitions = new HashMap<>();

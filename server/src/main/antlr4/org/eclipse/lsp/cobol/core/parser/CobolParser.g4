@@ -10,7 +10,7 @@ parser grammar CobolParser;
 options {tokenVocab = CobolLexer;  superClass = MessageServiceParser;}
 
 import CICSParser;
-   
+
 startRule : compilationUnit EOF;
 
 compilationUnit
@@ -378,7 +378,7 @@ modeClause
    ;
 
 ssNamesLengthParagraph
-   : SSNAMES LENGTH IS? ss_names_length endClause?
+   : SUBSCHEMA_NAMES LENGTH IS? ss_names_length endClause?
    ;
 
 idmsRecordLocationParagraph
@@ -398,7 +398,7 @@ levelsClause
    ;
 
 endClause
-    : DOT_FS | SEMICOLON_FS
+    : (DOT_FS | SEMICOLON_FS)
     ;
 
 ss_names_length
@@ -419,8 +419,12 @@ dataDivisionSection
 // -- file section ----------------------------------
 
 fileSection
-   : FILE SECTION DOT_FS fileDescriptionEntry*
+   : FILE SECTION DOT_FS fileSectionParagraph*
    ;
+
+fileSectionParagraph
+    : (fileDescriptionEntry | copyIdmsFileEntry)+
+    ;
 
 fileDescriptionEntry
    : (FD | SD) fileName (DOT_FS? fileDescriptionEntryClause)* DOT_FS dataDescriptionEntry*
@@ -518,6 +522,10 @@ reportClause
    : (REPORT IS? | REPORTS ARE?) reportName+
    ;
 
+copyIdmsFileEntry
+    : COPY IDMS FILE cobolWord versionClause? DOT_FS?
+    ;
+
 // -- working storage section ----------------------------------
 
 workingStorageSection
@@ -542,6 +550,7 @@ dataDescriptionEntry
    | dataDescriptionEntryFormat1Level77
    | dataDescriptionEntryFormat3
    | dataDescriptionEntryExecSql
+   | dataDescriptionEntryCopyIdms
    ;
 
 dataDescriptionEntryFormat1
@@ -726,6 +735,36 @@ dataValueIntervalTo
 dataWithLowerBoundsClause
    : WITH? LOWER BOUNDS
    ;
+
+dataDescriptionEntryCopyIdms
+    : LEVEL_NUMBER? COPY IDMS (copyIdmsEntity | copyIdmsRecordName | copyIdmsLrName |
+    copyIdmsLrCtrl| copyMapName)+
+    ;
+
+copyIdmsEntity
+    : (SUBSCHEMA_AREANAMES | SUBSCHEMA_CONTROL | SUBSCHEMA_CTRL | SUBSCHEMA_DESCRIPTION |
+    SUBSCHEMA_DML_LR_DESCRIPTION | SUBSCHEMA_LR_CONTROL | SUBSCHEMA_LR_DESCRIPTION |
+    SUBSCHEMA_LR_NAMES | SUBSCHEMA_LR_RECORDS | SUBSCHEMA_NAMES | SUBSCHEMA_RECNAMES |
+    SUBSCHEMA_RECORDS | SUBSCHEMA_SETNAMES | SUBSCHEMA_NAME | MAPS | MAP CONTROLS |
+    MAP RECORDS) DOT_FS?
+    ;
+
+copyIdmsRecordName
+    : RECORD? dataName (versionClause | dataRedefinesClause)* DOT_FS?
+    ;
+
+copyIdmsLrName
+    : LR dataName dataRedefinesClause? DOT_FS?
+    ;
+
+copyIdmsLrCtrl
+    : SUBSCHEMA_LR_CTRL (SIZE IS? integerLiteral)? DOT_FS?
+    ;
+
+copyMapName
+    : MAP (CONTROL dataName | dataName) DOT_FS?
+    ;
+//TODO: Throw an error if the rules is triggered on the COPY IDMS MAP without data name specified".
 // -- schema section ----------------------------------
 
 schemaSection
@@ -733,7 +772,7 @@ schemaSection
    ;
 
 schemaDBEntry
-   : DB cobolWord WITHIN cobolWord versionClause? DOT_FS
+   : DB dataName WITHIN dataName versionClause? DOT_FS
    ;
 
 // -- map section ----------------------------------
@@ -747,7 +786,7 @@ maxFieldListClause
    ;
 
 mapClause
-    : MAP cobolWord versionClause? (TYPE IS? (STANDARD | EXTENDED) PAGING?)? DOT_FS?
+    : MAP dataName versionClause? (TYPE IS? (STANDARD | EXTENDED) PAGING?)? DOT_FS?
     ;
 
 versionClause
@@ -793,8 +832,9 @@ procedureDeclaratives
    ;
 
 procedureDeclarative
-   : procedureSectionHeader DOT_FS useStatement DOT_FS paragraphs
-   ;
+     : procedureSectionHeader DOT_FS (useStatement DOT_FS | copyIdmsModule) paragraphs |
+     copyIdmsModule
+     ;
 
 procedureSectionHeader
    : sectionName SECTION integerLiteral?
@@ -819,18 +859,24 @@ paragraph
    ;
 
 sentence
-   : (statement* DOT_FS)
+   : (statement* DOT_FS | idmsStatements endClause?)+
    ;
 
 statement
-   : abendCodeStatement | acceptStatement | addStatement | alterStatement | attachTaskCodeStatement | bindStatement |  callStatement | cancelStatement | changePriorityStatement |
-    closeStatement | computeStatement | continueStatement | deleteStatement | disableStatement | displayStatement | divideStatement | enableStatement | entryStatement |
-    evaluateStatement | exhibitStatement | execCicsStatement | execSqlStatement | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement |
-    ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement |
-    purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement | serviceReloadStatement |
+   : acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
+    disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement |
+    execSqlStatement | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
+    initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
+    readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement | serviceReloadStatement |
     serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement | unstringStatement |
     writeStatement | xmlStatement
    ;
+
+idmsStatements
+    : copyIdmsBinds | copyIdmsModule | abendCodeStatement | attachTaskCodeStatement | bindStatement | changePriorityStatement | checkTerminalStatement | commitStatement |
+     endStatement | endpageStatement | finishStatement
+    ;
+
 // abend code statement
 
 abendCodeStatement
@@ -944,7 +990,7 @@ attachTaskCodeStatement
     ;
 
 attachTaskCodePriorityClause
-    : PRIORITY (priorityLiteral | generalIdentifier)
+    : PRIORITY (numericLiteral | generalIdentifier)
     ;
 
 attachTaskCodeWaitClause
@@ -1028,11 +1074,37 @@ cancelCall
 // change priority statement
 
 changePriorityStatement
-    : CHANGE PRIORITY TO? (changePriorityLiteral | generalIdentifier)
+    : CHANGE PRIORITY TO? (numericLiteral | generalIdentifier)
     ;
 
 changePriorityLiteral
     : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
+    ;
+
+// check terminal statement
+
+checkTerminalStatement
+    : CHECK TERMINAL checkTerminalGetStorageClause? INTO generalIdentifier (checkTerminalIntoClause | checkTerminalMaxLengthClause) checkTerminalReturnLengthClause?
+    ;
+
+checkTerminalGetStorageClause
+    : GET STORAGE
+    ;
+
+checkTerminalIntoClause
+    : TO generalIdentifier
+    ;
+
+checkTerminalMaxLengthClause
+    : MAX LENGTH (generalIdentifier | checkTerminalMaxLengthLiteral)
+    ;
+
+checkTerminalMaxLengthLiteral
+    : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
+    ;
+
+checkTerminalReturnLengthClause
+    : RETURN LENGTH INTO? generalIdentifier
     ;
 
 // close statement
@@ -1073,6 +1145,12 @@ closePortFileIOUsingAssociatedDataLength
    : ASSOCIATED_DATA_LENGTH OF? (integerLiteral | generalIdentifier)
    ;
 
+// commit statement
+
+commitStatement
+   : COMMIT TASK? ALL?
+   ;
+
 // compute statement
 
 computeStatement
@@ -1089,10 +1167,39 @@ continueStatement
    : CONTINUE
    ;
 
+// copy idms statement in procedure section
+copyIdmsBinds
+    : COPY IDMS (SUBSCHEMA_BINDS | SUBSCHEMA_RECORD_BINDS | MAP_BINDS ) endClause?
+    ;
+
+copyIdmsModule
+    : COPY IDMS MODULE? dataName versionClause? endClause?
+    ;
+
 // delete statement
 
 deleteStatement
-   : DELETE fileName RECORD? invalidKeyPhrase? notInvalidKeyPhrase? END_DELETE?
+   : DELETE (deleteFilenameClause | deleteQueueClause | deleteScratchClause)
+   ;
+
+deleteFilenameClause
+   : fileName RECORD? invalidKeyPhrase? notInvalidKeyPhrase? END_DELETE?
+   ;
+
+deleteQueueClause
+   : QUEUE deleteQueueIdClause? (CURRENT | ALL)?
+   ;
+
+deleteQueueIdClause
+   : ID (generalIdentifier | literal)
+   ;
+
+deleteScratchClause
+   : SCRATCH deleteScratchIdClause? (CURRENT | FIRST | LAST | NEXT | PRIOR | ALL | RECORD ID generalIdentifier)? (RETURN RECORD ID INTO? generalIdentifier)?
+   ;
+
+deleteScratchIdClause
+   : AREA ID (generalIdentifier | literal)
    ;
 
 // disable statement
@@ -1161,6 +1268,18 @@ divideRemainder
 
 enableStatement
    : ENABLE (INPUT TERMINAL? | I_O TERMINAL | OUTPUT) cdName WITH? KEY (literal | generalIdentifier)
+   ;
+
+// end statement
+
+endStatement
+   : END LINE TERMINAL SESSION
+   ;
+
+// endpage statement
+
+endpageStatement
+   : ENDPAGE SESSION?
    ;
 
 // entry statement
@@ -1242,6 +1361,12 @@ exhibitOperand
 
 exitStatement
    : EXIT PROGRAM?
+   ;
+
+// finish statement
+
+finishStatement
+   : FINISH TASK
    ;
 
 // generate statement

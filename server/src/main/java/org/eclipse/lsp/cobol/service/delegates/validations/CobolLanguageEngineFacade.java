@@ -85,18 +85,20 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     return new AnalysisResult(
         collectDiagnosticsForAffectedDocuments(
             convertErrors(result.getErrors()), context.getCopybookDefinitions(), uri),
-        convertLocations(context.getVariableDefinitions()),
-        convertLocations(context.getVariableUsages()),
-        convertLocations(context.getParagraphDefinitions()),
-        convertLocations(context.getParagraphUsages()),
-        convertLocations(context.getSectionDefinitions()),
-        convertLocations(context.getSectionUsages()),
-        convertLocations(context.getConstantDefinitions()),
-        convertLocations(context.getConstantUsages()),
-        convertLocations(context.getCopybookDefinitions()),
-        convertLocations(context.getCopybookUsages()),
-        convertLocations(context.getSubroutinesDefinitions()),
-        convertLocations(context.getSubroutinesUsages()),
+        convertEntities(context.getVariableDefinitions()),
+        convertEntities(context.getVariableUsages()),
+        convertEntities(context.getParagraphDefinitions()),
+        convertEntities(context.getParagraphUsages()),
+        convertEntities(context.getParagraphRanges()),
+        convertEntities(context.getSectionDefinitions()),
+        convertEntities(context.getSectionUsages()),
+        convertEntities(context.getSectionRanges()),
+        convertEntities(context.getConstantDefinitions()),
+        convertEntities(context.getConstantUsages()),
+        convertEntities(context.getCopybookDefinitions()),
+        convertEntities(context.getCopybookUsages()),
+        convertEntities(context.getSubroutinesDefinitions()),
+        convertEntities(context.getSubroutinesUsages()),
         context.getOutlineTree());
   }
 
@@ -148,7 +150,7 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
     return DiagnosticSeverity.forValue(severity.ordinal() + 1);
   }
 
-  private Map<String, List<Location>> convertLocations(Map<String, Collection<Location>> source) {
+  private <T> Map<String, List<T>> convertEntities(Map<String, Collection<T>> source) {
     return source.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, it -> new ArrayList<>(it.getValue())));
   }

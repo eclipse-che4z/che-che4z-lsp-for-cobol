@@ -36,6 +36,7 @@ import com.google.common.collect.Multimap;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -119,8 +120,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
             .variableUsages(collectVariableUsages(definedVariables))
             .paragraphDefinitions(groupContext.getParagraphDefinitions())
             .paragraphUsages(groupContext.getParagraphUsages())
+            .paragraphRanges(groupContext.getParagraphRanges())
             .sectionDefinitions(groupContext.getSectionDefinitions())
             .sectionUsages(groupContext.getSectionUsages())
+            .sectionRanges(groupContext.getSectionRanges())
             .constantDefinitions(constants.getDefinitions().asMap())
             .constantUsages(constants.getUsages().asMap())
             .copybookDefinitions(copybooks.getDefinitions().asMap())
@@ -228,6 +231,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   @Override
   public Void visitProcedureSection(ProcedureSectionContext ctx) {
     throwWarning(ctx.getStart());
+    addSectionRange(ctx);
     outlineTreeBuilder.addNode(ctx.getStart().getText(), NodeType.PROCEDURE_SECTION, ctx);
 
     String name = ctx.getStart().getText().toUpperCase();
@@ -239,8 +243,31 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
   @Override
   public Void visitParagraph(ParagraphContext ctx) {
     areaAWarning(ctx.getStart());
+    addParagraphRange(ctx);
+
     outlineTreeBuilder.addNode(ctx.getStart().getText(), NodeType.PROCEDURE, ctx);
     return visitChildren(ctx);
+  }
+
+  private void addSectionRange(ParserRuleContext ctx) {
+    String name = ctx.getStart().getText().toUpperCase();
+    getRange(ctx).ifPresent(range -> groupContext.addSectionRange(name, range));
+  }
+
+  private void addParagraphRange(ParserRuleContext ctx) {
+    String name = ctx.getStart().getText().toUpperCase();
+    getRange(ctx).ifPresent(range -> groupContext.addParagraphRange(name, range));
+  }
+
+  private Optional<Location> getRange(ParserRuleContext ctx) {
+    Optional<Locality> start = getLocality(ctx.getStart());
+    Optional<Locality> end = getLocality(ctx.getStop());
+
+    if (start.isPresent() && end.isPresent()) {
+      Range range = new Range(start.get().getRange().getStart(), end.get().getRange().getEnd());
+      return Optional.of(new Location(start.get().getUri(), range));
+    }
+    return Optional.empty();
   }
 
   @Override

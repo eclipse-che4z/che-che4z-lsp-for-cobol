@@ -1,6 +1,44 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [0.17.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.17.0...0.17.1) (2021-02-10)
+
+### Features
+* Add COPY IDMS support [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([9911e95](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9911e95d672a57f27c7f3303e68e65c1e6ab0bf2))
+* Add NPM scripts ([316e7e5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/316e7e51721a65d5a85e4cb89119b05b7fbb6dea))
+* Initial commit for the UI regression suite ([9869f97](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9869f976a7a67e45082154c9ff3ebc0d5e457e2f))
+
+### Bug Fixes
+* Fix false-positive syntax error on SQL keywords used as variables [#766](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/766)
+
+## [0.17.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.16.1...0.17.0) (2021-02-02)
+
+### Bug Fixes
+* Fix semantic analysis stop after XML query ([d26b848](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d26b8481111bb3ade6eb40f89e8282383583aea3)), closes [#706](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/706)
+* Fix semantic error on structure calls [#504](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/504) ([896ec1f](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/896ec1f558f4071e4cc46a3572274f779c867233))
+* Fix variable recognition fail on ambguity ([86b1423](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/86b1423107ec0cfc948d9fd6bf48fb24c3926b1e)), closes [#496](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/496)
+* Fix variable usages in conditions [#729](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/729) ([8f76b70](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/8f76b707c1047bc6b16fd19e4abd1d9e48af65dc))
+* Fix MAPFAIL semantic error in HANDLE CONDITION [#668](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/668)
+
+### Features
+* Add IDMS DML support for IDMS-CONTROL section [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([a23722a](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a23722a89a83f987cdcf3d1a27f178b528447115))
+* Add IDMS DML support for SCHEMA and MAP sections [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([1b69d49](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/1b69d49810d5a757601a3ee4bfb229a85cf6dc8f))
+* Add mnemonic name definition support [#627](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/627) ([c8faa4d](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/c8faa4dc203d81752eff539ee484f587918c7923))
+* Add support for 5 IDMS DML commands [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([0aa5281](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/0aa52818d8f57086198138de65c9c4688663b220))
+* Adjust Generated Error Messages ([86b63a5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/86b63a591a9738f13c40b8a164c5e80d7f098958))
+* Add DB2 SQL Variable Length check [#723](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/723) ([91c857d](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/91c857d958174303b930666d8e682a38fecc1955))
+* Extend the grammar to contain all the SQL keywords [#568](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/568) ([cbfe74f](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/cbfe74fd895f98736718b9e87c37d766c674bf21))
+* Extend DB2 SQL build-in-function Keywords [#722](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/722) ([f8e8178](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f8e81787b5ec2f1708900e70c5ca65cb685729b8))
+* Improve semantic analysis for variables ([d41083e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d41083e501ba203282daa25f2c62b8b43b015e43)), closes [#717](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/717)
+* Make it run for Java 8 ([1bc3598](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/1bc3598ed471719297ab5ef65b506f2562036700))
+* Refactor the references support ([cb5d3a2](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/cb5d3a24846bf9a050ee03ae6cab0f92a604eff8)), closes [#702](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/702)
+* Remove prepopulating of settings.json with empty parameters for copybooks support ([c67e75e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/c67e75ea035c6cc9ad8904448ff3863f33944498)), closes [#701](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/701)
+* Support variable references in FILE-CONTROL ([805bf71](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/805bf7185d5fa0178a07eb1db9c5ce40d1c911d5)), closes [#718](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/718)
+
+### Performance Improvements
+* Improve hierarchical variable search ([513322c](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/513322c6d4460ff31e03631d22a5fc451e4642b1))
+* Memorize usage format names ([dfc6103](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/dfc61038bc2651785492ac072a0dbde7bb5902d8))
+
 ## [0.16.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.16.0...0.16.1) (2020-12-04)
 
 ### Bug Fixes

@@ -26,11 +26,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-/** These test for variations of valid ABEND CODE statements */
+/** These test for variations of valid ATTACH statements */
 class TestAttachTaskCode {
 
   private static final String MESSAGE_1 =
-      "No viable alternative at input '1XX'";
+      "Invalid definition for: 1XX";
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -53,10 +53,10 @@ class TestAttachTaskCode {
           + "           ATTACH TASK CODE 'TASKCODE' PRIORITY {$WK_PRIORITY}.\r\n";
 
   private static final String ATTACH_TASK_CODE_PRIORITY_LITERAL =
-      "           ATTACH TASK CODE 'TASKCODE' PRIORITY '123'.\r\n";
+      "           ATTACH TASK CODE 'TASKCODE' PRIORITY 123.\r\n";
 
   private static final String ATTACH_TASK_CODE_PRIORITY_INVALID_LITERAL =
-      "           ATTACH TASK CODE 'TASKCODE' PRIORITY {'1XX'|1}.\r\n";
+      "           ATTACH TASK CODE 'TASKCODE' PRIORITY {1XX|1}.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

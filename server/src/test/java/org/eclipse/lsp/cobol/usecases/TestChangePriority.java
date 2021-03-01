@@ -26,10 +26,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-/** These test for variations of valid ABEND CODE statements */
+/** These test for variations of valid CHANGE PRIORITY statements */
 class TestChangePriority {
 
-  private static final String MESSAGE_1 = "No viable alternative at input '1X3'";
+  private static final String MESSAGE_1 = "Invalid definition for: 1X3";
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -44,10 +44,10 @@ class TestChangePriority {
           + "            CHANGE PRIORITY TO {$WK_PRIORITY}.\r\n";
 
   private static final String CHANGE_PRIORITY_TO_LITERAL =
-      "           CHANGE PRIORITY TO '123'.\r\n";
+      "           CHANGE PRIORITY TO 123.\r\n";
 
   private static final String CHANGE_PRIORITY_TO_LITERAL_INVALID =
-      "           CHANGE PRIORITY TO {'1X3'|1}.\r\n";
+      "           CHANGE PRIORITY TO {1X3|1}.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

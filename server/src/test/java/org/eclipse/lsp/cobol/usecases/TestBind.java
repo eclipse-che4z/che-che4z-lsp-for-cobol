@@ -23,7 +23,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-/** These test for variations of valid ABEND CODE statements */
+/** These test for variations of valid BIND statements */
 class TestBind {
 
   private static final String BOILERPLATE =
