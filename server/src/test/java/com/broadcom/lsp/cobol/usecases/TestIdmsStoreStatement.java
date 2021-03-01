@@ -23,28 +23,23 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-/** These test for variations of valid FINISH statements */
-class TestFinish {
+/** Test IDMS Store DML statements */
+class TestIdmsStoreStatement {
 
-  private static final String BOILERPLATE =
-      "        IDENTIFICATION DIVISION. \r\n"
-          + "        PROGRAM-ID. test1. \r\n"
-          + "        DATA DIVISION. \r\n"
-          + "        WORKING-STORAGE SECTION. \r\n"
-          + "        PROCEDURE DIVISION. \r\n";
+  private static final String DEFS =
+      "        IDENTIFICATION DIVISION.\n"
+          + "        PROGRAM-ID. test1.\n"
+          + "       PROCEDURE DIVISION.\n";
 
-  private static final String FINISH_TASK = "           FINISH TASK.\r\n";
-
-  private static final String FINISH = "           FINISH.\r\n";
+  private static final String STOR1 = DEFS + "           STORE EMPLOYEE.\n";
 
   private static Stream<String> textsToTest() {
-
-    return Stream.of(BOILERPLATE + FINISH_TASK, BOILERPLATE + FINISH);
+    return Stream.of(STOR1);
   }
 
   @ParameterizedTest
   @MethodSource("textsToTest")
-  @DisplayName("Parameterized - varying tests")
+  @DisplayName("Parameterized - idms store test")
   void test(String text) {
     UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
   }
