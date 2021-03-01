@@ -41,20 +41,20 @@ describe("Copybook downloader", () => {
     });
 
     it("Handle copybook request", async () => {
-        const params = constructParams("broadcom-cobol-lsp.copybook-resolve.cobFile.bookName");
+        const params = constructParams("cobol-lsp.copybook-resolve.cobFile.bookName");
         expect(await middleware.handleConfigurationRequest(params, null, null)).toEqual(["copybookUri"]);
         expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName", "cobFile");
     });
     it("Handle copybook request for name with dots", async () => {
-        const params = constructParams("broadcom-cobol-lsp.copybook-resolve.USER.CLIST.COB.bookName");
+        const params = constructParams("cobol-lsp.copybook-resolve.USER.CLIST.COB.bookName");
         expect(await middleware.handleConfigurationRequest(params, null, null)).toEqual(["copybookUri"]);
         expect(resolveCopybookURIMock).toHaveBeenCalledWith("bookName", "USER.CLIST.COB");
     });
     it("Handle copybook download request", async () => {
         const params = {
             items: [
-                "broadcom-cobol-lsp.copybook-download.quiet.cobFile.bookName",
-                "broadcom-cobol-lsp.copybook-download.quiet.cobFile.bookName2",
+                "cobol-lsp.copybook-download.quiet.cobFile.bookName",
+                "cobol-lsp.copybook-download.quiet.cobFile.bookName2",
             ].map(sectionName => ({section: sectionName}))
         };
         await expect(middleware.handleConfigurationRequest(params, null, null)).resolves.toEqual([]);
@@ -67,7 +67,7 @@ describe("Copybook downloader", () => {
         expect(next).toHaveBeenCalledWith(params, null);
     });
     it("Call next for unexpected second qualifier", async () => {
-        const params = constructParams("broadcom-cobol-lsp.bar");
+        const params = constructParams("cobol-lsp.bar");
         const next = jest.fn().mockReturnValue(["next"]);
         expect(await middleware.handleConfigurationRequest(params, null, next)).toEqual(["next"]);
         expect(next).toHaveBeenCalledWith(params, null);

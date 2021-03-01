@@ -120,7 +120,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         const actionSettings = "Change settings";
         vscode.window.showErrorMessage(title, actionSettings).then((action) => {
             if (action === actionSettings) {
-                vscode.commands.executeCommand("broadcom-cobol-lsp.cpy-manager.goto-settings");
+                vscode.commands.executeCommand("cobol-lsp.cpy-manager.goto-settings");
             }
         });
     }

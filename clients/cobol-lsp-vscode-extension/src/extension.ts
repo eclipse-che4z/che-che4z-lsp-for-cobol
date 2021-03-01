@@ -75,16 +75,16 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
 
     // Commands
-    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
         fetchCopybookCommand(copybook, copyBooksDownloader, programName);
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile", () => {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.change-default-zowe-profile", () => {
         changeDefaultZoweProfile(profileService);
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths", () => {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.edit-dataset-paths", () => {
         editDatasetPaths(pathsService);
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.goto-settings", () => {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings", () => {
         gotoCopybookSettings();
     }));
 
