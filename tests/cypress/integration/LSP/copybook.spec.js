@@ -18,24 +18,7 @@
 
 context('This is a Copybook spec', () => {
   beforeEach(() => {
-    cy.writeFile('test_files/project/.theia/settings.json', {
-      'broadcom-cobol-lsp.cpy-manager.paths-local': [
-        '.copybooks/zowe-profile-1/DATA.SET.PATH1',
-        '.copybooks/zowe-profile-1/DATA.SET.PATH2',
-        'testing',
-      ],
-      'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-      'broadcom-cobol-lsp.cpy-manager.profiles': '',
-    });
-    cy.writeFile('test_files/project/.vscode/settings.json', {
-      'broadcom-cobol-lsp.cpy-manager.paths-local': [
-        '.copybooks/zowe-profile-1/DATA.SET.PATH1',
-        '.copybooks/zowe-profile-1/DATA.SET.PATH2',
-        'testing',
-      ],
-      'broadcom-cobol-lsp .cpy-manager.paths-dsn': [],
-      'broadcom-cobol-lsp.cpy-manager.profiles': '',
-    });
+    cy.updateConfigs('basic');
   });
 
   describe.skip('TC174655 Copybook - Nominal', () => {
@@ -346,6 +329,7 @@ context('This is a Copybook spec', () => {
   describe('TC314935 Copybook with Name in Quotes is Recognized', () => {
     it('Copybook with Name in Quotes is Recognized', () => {
       cy.openFile('VAR.cbl');
+      cy.goToLine(21);
       cy.getLineByNumber(21).type("{end}{enter}COPY 'BBB'.").wait(500);
       cy.getCurrentLineErrors({ expectedLine: 22 }).eq(0).getHoverErrorMessage().contains('BBB: Copybook not found');
       cy.getLineByNumber(22).type('{end}{enter}COPY "BBB".').wait(500);

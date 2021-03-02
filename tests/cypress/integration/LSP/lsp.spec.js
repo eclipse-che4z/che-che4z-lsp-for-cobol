@@ -188,11 +188,7 @@ context('This is a LSP spec', () => {
   describe.skip('TC314392 LOG level', () => {
     // Theia doesn't show settings.json correctly
     beforeEach(() => {
-      cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': [],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
+      cy.updateConfigs('empty');
     });
     afterEach(() => {
       cy.closeFolder('.theia');
@@ -322,8 +318,7 @@ context('This is a LSP spec', () => {
       cy.getLineByNumber(5).findText('GET-DATA').goToDefinition();
       cy.getCurrentLineNumber().should('eq', 8);
       cy.getCurrentLine().contains('GET-DATA SECTION.');
-      cy.getLineByNumber(8).findText('GET-DATA').click('right');
-      cy.focused().type('{leftarrow}', { delay: 200 }).goToReferences();
+      cy.getLineByNumber(8).findText('GET-DATA').goToReferences();
       cy.wait(500).getCurrentLineNumber().should('eq', 5);
       cy.getCurrentLine().contains('PERFORM GET-DATA.');
     });

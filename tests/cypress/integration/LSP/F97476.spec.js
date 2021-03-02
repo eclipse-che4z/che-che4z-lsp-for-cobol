@@ -21,17 +21,7 @@
 context('This is a F97476 spec', () => {
   describe.skip('TC248045 Replacing Basic Scenario', () => {
     beforeEach(() => {
-      cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
-
-      cy.writeFile('test_files/project/.vscode/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
+      cy.updateConfigs('testing');
     });
     afterEach(() => {
       cy.closeCurrentTab();
@@ -61,17 +51,7 @@ context('This is a F97476 spec', () => {
 
   describe('TC248087 Replacing twice for one variable', () => {
     beforeEach(() => {
-      cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
-
-      cy.writeFile('test_files/project/.vscode/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
+      cy.updateConfigs('testing');
     });
     it('Checks REPLACING feature twice for one variable', () => {
       cy.openFile('REPLACING.CBL');
@@ -105,17 +85,7 @@ context('This is a F97476 spec', () => {
 
   describe('TC248130 Several REPLACING patterns in one COPY statement', () => {
     beforeEach(() => {
-      cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
-
-      cy.writeFile('test_files/project/.vscode/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
+      cy.updateConfigs('testing');
     });
     afterEach(() => {
       cy.writeFile('test_files/project/testing/REPL', '       05 TAG-ID PIC 9.');
@@ -158,17 +128,7 @@ context('This is a F97476 spec', () => {
 
   describe.skip('TC248131 Several COPY statements with replacing', () => {
     beforeEach(() => {
-      cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
-
-      cy.writeFile('test_files/project/.vscode/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
+      cy.updateConfigs('testing');
     });
     afterEach(() => {
       cy.writeFile('test_files/project/testing/REPL', '       05 TAG-ID PIC 9.');
@@ -224,17 +184,7 @@ context('This is a F97476 spec', () => {
 
   describe.skip('TC248135 REPLACING - check paragraph present', () => {
     beforeEach(() => {
-      cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
-
-      cy.writeFile('test_files/project/.vscode/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
+      cy.updateConfigs('testing');
     });
     afterEach(() => {
       cy.writeFile('test_files/project/testing/REPL', '       05 TAG-ID PIC 9.');
@@ -252,17 +202,7 @@ context('This is a F97476 spec', () => {
 
   describe.skip('TC248135 REPLACING - check paragraph present', () => {
     beforeEach(() => {
-      cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
-
-      cy.writeFile('test_files/project/.vscode/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
+      cy.updateConfigs('testing');
     });
     it('Check completion suggestions for variables(paragraphs) being replaced', () => {
       cy.openFile('REPLA.CBL').goToLine(8);
@@ -274,17 +214,7 @@ context('This is a F97476 spec', () => {
 
   describe.skip('TC250747 [Mapping] Support building of the extended document - Basic Scenario', () => {
     beforeEach(() => {
-      cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
-
-      cy.writeFile('test_files/project/.vscode/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
+      cy.updateConfigs('testing');
     });
     it('Check completion suggestions for variables(paragraphs) being replaced', () => {
       cy.openFile('PAYLIB.CBL').goToLine(33);
@@ -305,21 +235,13 @@ context('This is a F97476 spec', () => {
 
   describe('TC250946 [Mapping] Support building of the extended document - Replace by arithmetic operations', () => {
     beforeEach(() => {
-      cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
-
-      cy.writeFile('test_files/project/.vscode/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
+      cy.updateConfigs('testing');
     });
     it('Checks replace by arithmetic operations', () => {
       cy.openFile('PAYLIB.CBL').goToLine(37);
-      cy.getCurrentLine().type('{end}{backspace}{backspace}{backspace}{backspace}{backspace}*3== .', {delay: 300}).wait(1000);
+      cy.getLineByNumber(37)
+        .type('{end}{backspace}{backspace}{backspace}{backspace}{backspace}*3== .', { delay: 300 })
+        .wait(1000);
       cy.getCurrentLineErrors({ expectedLine: 37 })
         .getHoverErrorMessage()
         .contains("Syntax error on '*' expected SECTION");
@@ -328,17 +250,7 @@ context('This is a F97476 spec', () => {
 
   describe('TC250950 [Mapping] Parser Does React on CPY Exit Tag', () => {
     beforeEach(() => {
-      cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
-
-      cy.writeFile('test_files/project/.vscode/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
+      cy.updateConfigs('testing');
       cy.writeFile('test_files/project/testing/MORECOOL.CPY', '       IDENTIFICATION DIVISION.');
     });
 
@@ -367,17 +279,7 @@ context('This is a F97476 spec', () => {
   describe.skip('TC250951 [Mapping] Show Syntax and Semantic Errors from Copybooks', () => {
     // manual scenario is now working
     beforeEach(() => {
-      cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
-
-      cy.writeFile('test_files/project/.vscode/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
+      cy.updateConfigs('testing');
       cy.writeFile('test_files/project/testing/REPL.cpy', 'MOVE.');
     });
 
