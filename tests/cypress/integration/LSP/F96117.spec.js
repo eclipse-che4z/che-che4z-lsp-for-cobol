@@ -41,11 +41,7 @@ context('This is a F96117 spec', () => {
 
   describe('TC247555 Check predefined structure in settings.json', () => {
     beforeEach(() => {
-      cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': [],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
+      cy.updateConfigs('empty');
     });
     afterEach(() => {
       cy.closeFolder('.theia');
@@ -55,20 +51,16 @@ context('This is a F96117 spec', () => {
       cy.openFolder('.theia').openFile('settings.json');
       cy.get('.view-line').then(($line) => {
         cy.wrap($line).eq(0).should('have.text', '{');
-        cy.wrap($line).eq(1).contains('"broadcom-cobol-lsp.cpy-manager.paths-local": [],');
-        cy.wrap($line).eq(2).contains('"broadcom-cobol-lsp.cpy-manager.paths-dsn": [],');
-        cy.wrap($line).eq(3).contains('"broadcom-cobol-lsp.cpy-manager.profiles": ""');
+        cy.wrap($line).eq(1).contains('"broadcom-cobol-lsp.cpy-manager.profiles": ""');
+        cy.wrap($line).eq(2).contains('"broadcom-cobol-lsp.cpy-manager.paths-local": [],');
+        cy.wrap($line).eq(3).contains('"broadcom-cobol-lsp.cpy-manager.paths-dsn": []');
         cy.wrap($line).eq(4).should('have.text', '}');
       });
     });
   });
 
   beforeEach(() => {
-    cy.writeFile('test_files/project/.theia/settings.json', {
-      'broadcom-cobol-lsp.cpy-manager.paths-local': ['testing'],
-      'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-      'broadcom-cobol-lsp.cpy-manager.profiles': '',
-    });
+    cy.updateConfigs('testing');
   });
 
   describe('TC248015 - Quick Fix" actions', () => {
@@ -209,11 +201,7 @@ context('This is a F96117 spec', () => {
 
   describe.skip('TC247997 Info message for copybooks cannot be downloaded', () => {
     beforeEach(() => {
-      cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': [],
-        'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
-      });
+      cy.updateConfigs('empty');
     });
 
     afterEach(() => {
