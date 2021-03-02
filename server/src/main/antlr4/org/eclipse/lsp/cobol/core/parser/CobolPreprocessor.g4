@@ -11,7 +11,7 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((compilerOptions | copyStatement | includeStatement | replaceArea)+ .*?)+ EOF
+   : .*? ((compilerOptions | copyStatement | includeStatement | replaceArea )+ .*?)* EOF
    ;
 
 // compiler options
@@ -145,7 +145,7 @@ compilerOption
 
 // copy statement
 copyStatement
-   : COPY copySource (directoryPhrase | familyPhrase | replacingPhrase | SUPPRESS)? DOT_FS
+   : COPY copySource (replacingPhrase | SUPPRESS)? DOT_FS
    ;
 
 // sql include statement
@@ -179,7 +179,7 @@ replaceOffStatement
    ;
 
 replaceClause
-   : (replacePseudoText | replaceLiteral) (directoryPhrase)? (familyPhrase)?
+   : (replacePseudoText | replaceLiteral)
    ;
 
 replaceLiteral
@@ -187,15 +187,17 @@ replaceLiteral
    ;
 
 replacePseudoText
-   : pseudoReplaceable BY pseudoReplacement
+   : (LEADING | TRAILING)? pseudoReplaceable BY pseudoReplacement
    ;
 
 pseudoReplaceable
-   : (DOUBLEEQUALCHAR ~DOUBLEEQUALCHAR*? DOUBLEEQUALCHAR)
+   : (openingPseudoTextDelimiter ~DOUBLEEQUALCHAR*? closingPseudoTextDelimiter)
    ;
 
+openingPseudoTextDelimiter: DOUBLEEQUALCHAR;
+closingPseudoTextDelimiter: DOUBLEEQUALCHAR (COMMACHAR | DOT| DOT_FS | SEMICOLON | SEMICOLON_FS)?;
 pseudoReplacement
-   : (DOUBLEEQUALCHAR ~DOUBLEEQUALCHAR*? DOUBLEEQUALCHAR) | EMPTYPSEUDOTEXT
+   : (openingPseudoTextDelimiter ~DOUBLEEQUALCHAR*? closingPseudoTextDelimiter) | EMPTYPSEUDOTEXT
    ;
 
 directoryPhrase
@@ -207,11 +209,23 @@ familyPhrase
    ;
 
 replaceable
+   : literal | cobolWord | charDataLine | functionCall
+   ;
+
+functionCall
+   : FUNCTION functionName (LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR)
+   ;
+
+functionName
+   : literal | cobolWord | charDataLine
+   ;
+
+argument
    : literal | cobolWord | charDataLine
    ;
 
 replacement
-   : literal | cobolWord | charDataLine
+   : literal | cobolWord | charDataLine | functionCall
    ;
 
 charData

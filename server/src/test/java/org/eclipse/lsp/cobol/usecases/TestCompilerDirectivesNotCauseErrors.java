@@ -15,9 +15,12 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
 /** This class checks that there are no errors shown for compiler directives on several lines */
@@ -50,8 +53,28 @@ class TestCompilerDirectivesNotCauseErrors {
           + "              DISPLAY 'HELLO'.\n"
           + "       END PROGRAM 'TEST1'.";
 
+  private static final String TEXT_WRONG_SEQUENCE =
+      "{a|1}12     PROCESS CICS('COBOL3,APOST,SP')                                \n"
+          + "       Identification Division.\n"
+          + "       Program-Id. 'ACTDCNVI'.";
+
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  //Ref: https://www.ibm.com/support/knowledgecenter/SS6SG3_6.3.0/lr/ref/rlcdscbl.html
+  @Test
+  void test_error_on_wrongSequenceNo() {
+    UseCaseEngine.runTest(
+        TEXT_WRONG_SEQUENCE,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "The first character of the sequence number must be numeric.",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

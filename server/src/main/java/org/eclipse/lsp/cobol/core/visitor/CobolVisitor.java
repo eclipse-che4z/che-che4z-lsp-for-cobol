@@ -15,6 +15,18 @@
 
 package org.eclipse.lsp.cobol.core.visitor;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.RuleNode;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
@@ -31,18 +43,6 @@ import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.semantics.outline.OutlineTreeBuilder;
 import org.eclipse.lsp.cobol.service.SubroutineService;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.antlr.v4.runtime.tree.RuleNode;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -50,13 +50,13 @@ import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 
-import static org.eclipse.lsp.cobol.core.CobolParser.*;
-import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.*;
-import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.*;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.eclipse.lsp.cobol.core.CobolParser.*;
+import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.*;
+import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.*;
 
 /**
  * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
@@ -141,6 +141,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
     Multimap<String, Location> definitions = HashMultimap.create();
     definedVariables.stream()
         .filter(it -> !FILLER_NAME.equals(it.getName()))
+        .filter(it -> Objects.nonNull(it.getDefinition()))
         .forEach(it -> definitions.put(it.getName(), it.getDefinition().toLocation()));
     return definitions.asMap();
   }

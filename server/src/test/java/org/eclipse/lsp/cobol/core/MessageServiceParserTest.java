@@ -15,18 +15,17 @@
 
 package org.eclipse.lsp.cobol.core;
 
+import org.antlr.v4.runtime.Parser;
 import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
-import org.antlr.v4.runtime.Parser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Locale;
-import java.util.MissingResourceException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -60,9 +59,7 @@ class MessageServiceParserTest {
   }
 
   @Test
-  void whenInvalidKeyIsPassed_thenExpectMissingResourceException() {
-    Assertions.assertThrows(
-        MissingResourceException.class,
-        () -> ((MessageServiceParser) mockParser).notifyError("dummy"));
+  void whenInvalidKeyIsPassed_thenExpectNoException() {
+    Assertions.assertDoesNotThrow(() -> ((MessageServiceParser) mockParser).notifyError("dummy"));
   }
 }

@@ -14,9 +14,14 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -29,11 +34,11 @@ class TestTitleStatement {
           + "          DATA DIVISION.\n";
 
   private static final String TEXT2 =
-            "          WORKING-STORAGE SECTION.\n"
-          + "          PROCEDURE DIVISION.\n";
+      "          WORKING-STORAGE SECTION.\n" + "          PROCEDURE DIVISION.\n";
 
-  private static final String TITLE = "                TITLE 'title'. \n";
+  private static final String TITLE = "                TITLE 'title'. \r\n";
   private static final String END = "          END PROGRAM 'TITLETEST'. \n";
+  private static final String TITLE_WITHOUT_STMT = "                {TITLE|1} .\n";
 
   @Test
   void testTitleBeforeIdDivision() {
@@ -50,4 +55,17 @@ class TestTitleStatement {
     UseCaseEngine.runTest(TEXT1 + TEXT2 + TITLE + END, ImmutableList.of(), ImmutableMap.of());
   }
 
+  @Test
+  void testTitleWithNoTitleStatement() {
+    UseCaseEngine.runTest(
+        TEXT1 + TEXT2 + TITLE_WITHOUT_STMT + END,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(new Position(5, 16), new Position(5, 25)),
+                "Title statement missing for TITLE compiler directive.",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
+  }
 }

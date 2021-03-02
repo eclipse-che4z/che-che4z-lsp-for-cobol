@@ -191,6 +191,7 @@ MORETHANCHAR : '>';
 MORETHANOREQUAL : '>=';
 NOTEQUALCHAR : '<>';
 PLUSCHAR : '+';
+SEMICOLON : ';';
 SEMICOLON_FS : ';' ('\r' | '\n' | '\f' | '\t' | ' ')+ | ';' EOF;
 SINGLEQUOTE : '\'';
 RPARENCHAR : ')';

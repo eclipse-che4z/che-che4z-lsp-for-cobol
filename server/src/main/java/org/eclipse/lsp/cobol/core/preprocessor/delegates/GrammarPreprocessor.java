@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
@@ -21,6 +22,7 @@ import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 
 import lombok.NonNull;
 import java.util.Deque;
+import java.util.List;
 
 /** This interface represents service to build the extended document */
 public interface GrammarPreprocessor {
@@ -33,6 +35,8 @@ public interface GrammarPreprocessor {
    * @param code - COBOL program text to analyse
    * @param copybookStack - stack, representing the hierarchy of nesting copybooks
    * @param copybookProcessingMode - reflects the status of the copybook support (ENABLED|DISABLED)
+   * @param recursiveReplaceStmtStack - stack, representing the hierarchy of nested copy replace statements
+   *
    * @return extended document with copybooks and related errors
    */
   @NonNull
@@ -40,5 +44,6 @@ public interface GrammarPreprocessor {
       @NonNull String uri,
       @NonNull String code,
       @NonNull Deque<CopybookUsage> copybookStack,
-      @NonNull CopybookProcessingMode copybookProcessingMode);
+      @NonNull CopybookProcessingMode copybookProcessingMode,
+      @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack);
 }

@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
@@ -28,6 +29,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.util.Deque;
+import java.util.List;
 
 /**
  * This class runs pre-processing for COBOL using CobolPreprocessor.g4 grammar file. As a result, it
@@ -45,11 +47,13 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor, ThreadInter
   @NonNull
   @Override
   @CheckThreadInterruption
-  public ResultWithErrors<ExtendedDocument> buildExtendedDocument(
+  public ResultWithErrors<ExtendedDocument>
+  buildExtendedDocument(
       @NonNull String uri,
       @NonNull String code,
       @NonNull Deque<CopybookUsage> copybookStack,
-      @NonNull CopybookProcessingMode copybookProcessingMode) {
+      @NonNull CopybookProcessingMode copybookProcessingMode,
+      @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
     Lexer lexer = new CobolPreprocessorLexer(CharStreams.fromString(code));
     lexer.removeErrorListeners();
 
@@ -62,7 +66,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor, ThreadInter
 
     ParseTreeWalker walker = new ParseTreeWalker();
     GrammarPreprocessorListener listener =
-        listenerFactory.create(uri, tokens, copybookStack, copybookProcessingMode);
+        listenerFactory.create(uri, tokens, copybookStack, copybookProcessingMode, recursiveReplaceStmtStack);
     walker.walk(listener, startRule);
 
     return new ResultWithErrors<>(listener.getResult(), listener.getErrors());

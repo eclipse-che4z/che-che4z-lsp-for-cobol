@@ -14,6 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.engine;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
@@ -30,15 +39,6 @@ import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.SubroutineService;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +104,7 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
 
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     ParserListener listener = new ParserListener();
+    lexer.addErrorListener(listener);
 
     CobolParser parser = getCobolParser(tokens);
     parser.removeErrorListeners();
@@ -157,7 +158,15 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
 
   @NonNull
   private Function<SyntaxError, SyntaxError> convertError(@NonNull Map<Token, Locality> mapping) {
-    return err -> err.toBuilder().locality(mapping.get(err.getOffendedToken())).build();
+    return err ->
+        err.toBuilder()
+            .locality(
+                mapping.getOrDefault(
+                    err.getOffendedToken(),
+                    LocalityMappingUtils.getNearestLocality(err.getOffendedToken(), mapping)
+                        .orElse(null)))
+            .suggestion(messageService.getMessage(err.getSuggestion()))
+            .build();
   }
 
   private List<SyntaxError> collectErrorsForCopybooks(
@@ -174,8 +183,7 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
         .filter(shouldRaise())
         .map(err -> err.toBuilder().locality(copyStatements.get(err.getLocality().getCopybookId())))
         .map(SyntaxError.SyntaxErrorBuilder::build)
-        .map(err -> Stream.concat(raiseError(err, copyStatements).stream(), Stream.of(err)))
-        .flatMap(Function.identity())
+        .flatMap(err -> Stream.concat(raiseError(err, copyStatements).stream(), Stream.of(err)))
         .collect(toList());
   }
 

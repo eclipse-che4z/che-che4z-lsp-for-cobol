@@ -27,11 +27,11 @@ import java.util.stream.Stream;
 class TestEndpage {
 
   private static final String BOILERPLATE =
-      "        IDENTIFICATION DIVISION. \r\n"
-          + "        PROGRAM-ID. test1. \r\n"
-          + "        DATA DIVISION. \r\n"
-          + "        WORKING-STORAGE SECTION. \r\n"
-          + "        PROCEDURE DIVISION. \r\n";
+          "        IDENTIFICATION DIVISION. \r\n"
+                  + "        PROGRAM-ID. test1. \r\n"
+                  + "        DATA DIVISION. \r\n"
+                  + "        WORKING-STORAGE SECTION. \r\n"
+                  + "        PROCEDURE DIVISION. \r\n";
 
   private static final String ENDPAGE = "           ENDPAGE.\r\n";
 
