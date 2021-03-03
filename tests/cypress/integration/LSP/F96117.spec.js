@@ -51,9 +51,9 @@ context('This is a F96117 spec', () => {
       cy.openFolder('.theia').openFile('settings.json');
       cy.get('.view-line').then(($line) => {
         cy.wrap($line).eq(0).should('have.text', '{');
-        cy.wrap($line).eq(1).contains('"broadcom-cobol-lsp.cpy-manager.profiles": ""');
-        cy.wrap($line).eq(2).contains('"broadcom-cobol-lsp.cpy-manager.paths-local": [],');
-        cy.wrap($line).eq(3).contains('"broadcom-cobol-lsp.cpy-manager.paths-dsn": []');
+        cy.wrap($line).eq(1).contains('"cobol-lsp.cpy-manager.profiles": ""');
+        cy.wrap($line).eq(2).contains('"cobol-lsp.cpy-manager.paths-local": [],');
+        cy.wrap($line).eq(3).contains('"cobol-lsp.cpy-manager.paths-dsn": []');
         cy.wrap($line).eq(4).should('have.text', '}');
       });
     });
@@ -90,12 +90,12 @@ context('This is a F96117 spec', () => {
       cy.getLineByNumber(19).findText('BOOK3').click().type('{ctrl}{.}');
       cy.get('.p-Widget.p-Menu').contains('Open settings').click();
 
-      //Open 'Preferences', filter with broadcom-cobol-lsp, and find in 'User' tab 3 fields (Dsn, Local and Profiles)
-      cy.get('input.settings-search-input.theia-input').type('broadcom-cobol-lsp');
+      //Open 'Preferences', filter with cobol-lsp, and find in 'User' tab 3 fields (Dsn, Local and Profiles)
+      cy.get('input.settings-search-input.theia-input').type('cobol-lsp');
       cy.get('.p-TabBar-tab.preferences-scope-tab').contains('User').click();
-      cy.get('#broadcom-cobol-lsp\\.cpy-manager\\.paths-dsn-editor').find('.preference-array-input');
-      cy.get('#broadcom-cobol-lsp\\.cpy-manager\\.profiles-editor').find('.pref-input .theia-input');
-      cy.get('#broadcom-cobol-lsp\\.cpy-manager\\.paths-local-editor .preference-array-input');
+      cy.get('#cobol-lsp\\.cpy-manager\\.paths-dsn-editor').find('.preference-array-input');
+      cy.get('#cobol-lsp\\.cpy-manager\\.profiles-editor').find('.pref-input .theia-input');
+      cy.get('#cobol-lsp\\.cpy-manager\\.paths-local-editor .preference-array-input');
     });
   });
 
@@ -117,9 +117,9 @@ context('This is a F96117 spec', () => {
             .click();
         });
 
-      //Open 'Preferences', filter with broadcom-cobol-lsp, and find in 'User' tab 'Local' and
+      //Open 'Preferences', filter with cobol-lsp, and find in 'User' tab 'Local' and
       // add 'testing' folder to local copybooks
-      cy.get('input.settings-search-input.theia-input').type('broadcom-cobol-lsp');
+      cy.get('input.settings-search-input.theia-input').type('cobol-lsp');
       cy.get('.p-TabBar-tab.preferences-scope-tab').contains('Workspace').click();
       cy.addCopybookLocal('testing');
       cy.closeCurrentTab();

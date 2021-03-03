@@ -197,7 +197,7 @@ context('This is a LSP spec', () => {
     it('Lets check structure in settings.json file ', () => {
       cy.openFolder('.theia').openFile('settings.json').goToLine(4);
       cy.getCurrentLine().type('{end}{enter}').wait(500);
-      cy.getCurrentLine().type('"broadcom-cobol-lsp.logging.level.root": "ERROR"');
+      cy.getCurrentLine().type('"cobol-lsp.logging.level.root": "ERROR"');
       cy.getCurrentLine().should('not.have.class', '.squiggly-info');
       cy.getCurrentLine().type('{end}{backspace}1"');
       cy.getMainEditor()

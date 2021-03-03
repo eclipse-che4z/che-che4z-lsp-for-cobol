@@ -1,9 +1,9 @@
 {
-    "broadcom-cobol-lsp.cpy-manager.profiles": "",
-    "broadcom-cobol-lsp.cpy-manager.paths-local": [
+    "cobol-lsp.cpy-manager.profiles": "",
+    "cobol-lsp.cpy-manager.paths-local": [
         ".copybooks/zowe-profile-1/DATA.SET.PATH1",
         ".copybooks/zowe-profile-1/DATA.SET.PATH2",
         "testing"
       ],
-    "broadcom-cobol-lsp.cpy-manager.paths-dsn": []
+    "cobol-lsp.cpy-manager.paths-dsn": []
 }
