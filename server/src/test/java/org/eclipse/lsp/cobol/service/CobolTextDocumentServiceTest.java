@@ -26,6 +26,8 @@ import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.eclipse.lsp.cobol.service.mocks.MockTextDocumentService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -323,6 +325,28 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     assertEquals(Collections.EMPTY_MAP, closeGetter(service));
     verify(spyCommunications, atMost(1))
         .publishDiagnostics(ImmutableMap.of(UseCaseUtils.DOCUMENT_URI, ImmutableList.of()));
+  }
+
+  /**
+   * This test verify that when a {@link
+   * CobolTextDocumentService#analysis(JsonObject)} (JsonObject)} is sent from the client to
+   * get analysis result, it processes properly.
+   */
+  @Test
+  void testAnalysis() throws ExecutionException, InterruptedException {
+    doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.empty()))
+        .when(engine)
+        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
+
+    service.didOpen(
+        new DidOpenTextDocumentParams(
+            new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
+
+    JsonObject json = new JsonObject();
+    json.add("uri", new JsonPrimitive(UseCaseUtils.DOCUMENT_URI));
+
+    AnalysisResult result = service.analysis(json).get();
+    assertNotNull(result);
   }
 
   private CobolTextDocumentService verifyServiceStart() {

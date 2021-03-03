@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.event.api.EventObserver;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.event.model.DataEventType;
+import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
 import org.eclipse.lsp.cobol.domain.event.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
@@ -31,6 +32,8 @@ import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Builder;
@@ -65,7 +68,8 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 @Singleton
 public class CobolTextDocumentService
-    implements TextDocumentService, EventObserver<RunAnalysisEvent>, DisposableService {
+    implements TextDocumentService, EventObserver<RunAnalysisEvent>, DisposableService,
+        ExtendedApiService {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
   private static final String GIT_FS_URI = "gitfs:/";
   private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
@@ -254,6 +258,17 @@ public class CobolTextDocumentService
   @CheckServerShutdownState
   public void observerCallback(@NonNull RunAnalysisEvent event) {
     docs.forEach((key, value) -> analyzeDocumentFirstTime(key, value.getText(), event.verbose));
+  }
+
+  @Override
+  @CheckServerShutdownState
+  public CompletableFuture<AnalysisResult> analysis(@NonNull JsonObject json) {
+    AnalysisResultEvent event = new Gson().fromJson(json.toString(), AnalysisResultEvent.class);
+    return CompletableFuture.supplyAsync(
+        () -> Optional.ofNullable(docs.get(event.getUri())).map(CobolDocumentModel::getAnalysisResult).orElse(null),
+        executors.getThreadPoolExecutor())
+        .whenComplete(
+            reportExceptionIfThrown(createDescriptiveErrorMessage("analysis retrieving", event.getUri())));
   }
 
   private void registerEngineAndAnalyze(String uri, String text) {
