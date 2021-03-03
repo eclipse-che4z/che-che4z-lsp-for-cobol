@@ -82,7 +82,7 @@ export class LanguageClientService {
     }
 
     private getLspPort(): number | undefined {
-        return +vscode.workspace.getConfiguration().get("broadcom-cobol-lsp.server.port");
+        return +vscode.workspace.getConfiguration().get("cobol-lsp.server.port");
     }
 
     private createClientOptions(): LanguageClientOptions {

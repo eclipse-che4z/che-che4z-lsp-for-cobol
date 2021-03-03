@@ -20,14 +20,8 @@
 
 context('This is F102470 spec', () => {
   beforeEach(() => {
-    cy.writeFile('test_files/project/.theia/settings.json', {
-      'broadcom-cobol-lsp.subroutine-manager.paths-local': ['subroutines'],
-    });
-    cy.writeFile('test_files/project/.vscode/settings.json', {
-      'broadcom-cobol-lsp.subroutine-manager.paths-local': ['subroutines'],
-    });
+    cy.updateConfigs('subroutines');
   });
-
   describe('US708186 Check work with subroutines', () => {
     it('Error check in subroutine resolution', () => {
       cy.openFile('CALL.cbl').goToLine(21);

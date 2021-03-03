@@ -18,7 +18,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.broadcom.lsp.cobol</groupId>
+    <groupId>org.eclipse.lsp.cobol</groupId>
     <artifactId>server</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
@@ -242,7 +242,7 @@
                             <finalName>server</finalName>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.broadcom.lsp.cobol.LangServerBootstrap</mainClass>
+                                    <mainClass>org.eclipse.lsp.cobol.LangServerBootstrap</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
@@ -281,7 +281,7 @@
                     <aggregate>true</aggregate>
                     <instrumentation>
                         <includes>
-                            <include>com/broadcom/lsp/**/*.class</include>
+                            <include>org/eclipse/lsp/**/*.class</include>
                         </includes>
                     </instrumentation>
                     <check/>
@@ -301,8 +301,8 @@
                     <excludes>
                         <exclude>**/generated-sources/**/*</exclude>
                         <exclude>**/generated-test-sources/**/*</exclude>
-                        <exclude>**/com/broadcom/lsp/cobol/core/parser/**/*</exclude>
-                        <exclude>**/com/broadcom/lsp/cobol/domain/modules/**/*</exclude>
+                        <exclude>**/org/eclipse/lsp/cobol/core/parser/**/*</exclude>
+                        <exclude>**/org/eclipse/lsp/cobol/domain/modules/**/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -336,11 +336,11 @@
                             <generateTestSources>true</generateTestSources>
                             <arguments>
                                 <argument>-package</argument>
-                                <argument>com.broadcom.usecase</argument>
+                                <argument>org.eclipse.usecase</argument>
                                 <argument>-o</argument>
-                                <argument>${basedir}/target/generated-sources/antlr4/com/broadcom/usecase</argument>
+                                <argument>${basedir}/target/generated-sources/antlr4/org/eclipse/usecase</argument>
                             </arguments>
-                            <sourceDirectory>src/test/antlr4/com/broadcom/usecase</sourceDirectory>
+                            <sourceDirectory>src/test/antlr4/org/eclipse/usecase</sourceDirectory>
                             <listener>true</listener>
                             <visitor>false</visitor>
                         </configuration>
@@ -354,11 +354,11 @@
                         <configuration>
                             <arguments>
                                 <argument>-package</argument>
-                                <argument>com.broadcom.lsp.cobol.core</argument>
+                                <argument>org.eclipse.lsp.cobol.core</argument>
                                 <argument>-o</argument>
-                                <argument>${basedir}/target/generated-sources/antlr4/com/broadcom/lsp/cobol/core</argument>
+                                <argument>${basedir}/target/generated-sources/antlr4/org/eclipse/lsp/cobol/core</argument>
                             </arguments>
-                            <sourceDirectory>src/main/antlr4/com/broadcom/lsp/cobol/core/parser</sourceDirectory>
+                            <sourceDirectory>src/main/antlr4/org/eclipse/lsp/cobol/core/parser</sourceDirectory>
                             <listener>true</listener>
                             <visitor>true</visitor>
                         </configuration>

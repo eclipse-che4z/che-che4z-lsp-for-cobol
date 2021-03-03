@@ -14,7 +14,7 @@
 import * as vscode from "vscode";
 import { PathsService, validateDatasetNames } from "../services/PathsService";
 
-// command for "broadcom-cobol-lsp.cpy-manager.edit-dataset-paths"
+// command for "cobol-lsp.cpy-manager.edit-dataset-paths"
 export async function editDatasetPaths(pathsService: PathsService) {
     const result = await vscode.window.showInputBox({
         "ignoreFocusOut": true,

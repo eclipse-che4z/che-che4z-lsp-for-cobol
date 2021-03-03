@@ -177,7 +177,7 @@ The Find All References and Go To Definition functionalities are extended to wor
 
 ## Troubleshooting
 
-To generate a troubleshooting log for the LSP server, specify a value for the parameter **broadcom-cobol-lsp.logging.level.root** in the extension settings. Specify one of the following values:
+To generate a troubleshooting log for the LSP server, specify a value for the parameter **cobol-lsp.logging.level.root** in the extension settings. Specify one of the following values:
 
 * ERROR
 * WARN
