@@ -20,6 +20,7 @@ import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Collections.unmodifiableList;
 
@@ -29,12 +30,10 @@ import static java.util.Collections.unmodifiableList;
  */
 public abstract class StructuredVariable extends AbstractVariable {
   private List<Variable> children = new ArrayList<>();
-  int levelNumber;
 
   StructuredVariable(
       int levelNumber, String name, Locality definition, Variable parent) {
-    super(name, definition, parent);
-    this.levelNumber = levelNumber;
+    super(levelNumber, name, definition, parent);
   }
 
   /**
@@ -57,12 +56,17 @@ public abstract class StructuredVariable extends AbstractVariable {
     return unmodifiableList(children);
   }
 
-  /**
-   * Get the level number of this structure that determines its hierarchy
-   *
-   * @return level number
-   */
-  public int getLevelNumber() {
-    return levelNumber;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    StructuredVariable that = (StructuredVariable) o;
+    return Objects.equals(children, that.children);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), children);
   }
 }

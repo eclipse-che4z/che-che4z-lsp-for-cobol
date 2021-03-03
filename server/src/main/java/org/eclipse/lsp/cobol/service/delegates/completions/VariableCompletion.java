@@ -35,7 +35,7 @@ public class VariableCompletion implements Completion {
   public Collection<String> getCompletionSource(CobolDocumentModel document) {
     return Optional.ofNullable(document)
         .map(CobolDocumentModel::getAnalysisResult)
-        .map(AnalysisResult::getVariables)
+        .map(AnalysisResult::getVariableNames)
         .orElse(Collections.emptySet());
   }
 

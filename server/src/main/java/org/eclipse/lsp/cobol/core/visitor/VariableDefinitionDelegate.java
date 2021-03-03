@@ -52,8 +52,8 @@ import static java.util.stream.Collectors.toList;
 public class VariableDefinitionDelegate {
   public static final int LEVEL_01 = 1;
   public static final int LEVEL_66 = 66;
-  static final int LEVEL_77 = 77;
-  static final int LEVEL_88 = 88;
+  public static final int LEVEL_77 = 77;
+  public static final int LEVEL_88 = 88;
   static final int AREA_A_FINISH = 10;
 
   private static final String EMPTY_STRUCTURE_MSG = "semantics.emptyStructure";
@@ -228,8 +228,10 @@ public class VariableDefinitionDelegate {
    */
   void defineVariable(EnvironmentSwitchNameClauseContext ctx) {
     String name = retrieveName(ctx.mnemonicName());
+    String systemName = ctx.environmentName().getText();
     variables.push(
         new MnemonicName(
+            systemName,
             name,
             retrieveDefinition(
                 Optional.<ParserRuleContext>ofNullable(ctx.mnemonicName()).orElse(ctx))));
@@ -293,9 +295,9 @@ public class VariableDefinitionDelegate {
   }
 
   @NonNull
-  private List<IndexItem> retrieveIndexItem(@NonNull DataOccursClauseContext clause) {
+  private List<IndexItem> retrieveIndexItem(int levelNumber, @NonNull DataOccursClauseContext clause) {
     return clause.indexName().stream()
-        .map(it -> new IndexItem(it.getText().toUpperCase(), positions.get(it.start)))
+        .map(it -> new IndexItem(levelNumber, it.getText().toUpperCase(), positions.get(it.start)))
         .collect(toList());
   }
 
@@ -386,7 +388,11 @@ public class VariableDefinitionDelegate {
   private void setValueClauseText(VariableDefinitionContext variable) {
     String valueClauseText = "";
     if (!variable.getValueClauses().isEmpty()) {
-      valueClauseText = variable.getValueClauses().get(0).dataValueClauseLiteral().getText();
+      DataValueIntervalContext intervalContext = variable.getValueClauses().get(0).dataValueClauseLiteral()
+          .dataValueInterval(0);
+      valueClauseText = intervalContext.dataValueIntervalFrom().getText();
+      Optional.ofNullable(intervalContext.dataValueIntervalTo())
+          .ifPresent(context -> variable.setThruValue(context.literal().getText()));
     }
     variable.setValueClauseTest(valueClauseText);
   }
@@ -430,7 +436,7 @@ public class VariableDefinitionDelegate {
               variable.getDefinition(),
               structureStack.peek(),
               retrieveOccursTimes(variable.getOccursClauses().get(0)),
-              retrieveIndexItem(variable.getOccursClauses().get(0)),
+              retrieveIndexItem(variable.getNumber(), variable.getOccursClauses().get(0)),
               retrieveUsageFormat(variable.getUsageClauses()));
       result.getIndexes().forEach(variables::push);
       return result;
@@ -456,13 +462,14 @@ public class VariableDefinitionDelegate {
         && !variable.getOccursClauses().isEmpty()) {
       TableDataName tableDataName =
           new TableDataName(
+              variable.getNumber(),
               variable.getName(),
               variable.getDefinition(),
               structureStack.peek(),
               retrievePicText(variable.getPicClauses()),
               variable.getValueClauseTest(),
               retrieveOccursTimes(variable.getOccursClauses().get(0)),
-              retrieveIndexItem(variable.getOccursClauses().get(0)),
+              retrieveIndexItem(variable.getNumber(), variable.getOccursClauses().get(0)),
               retrieveUsageFormat(variable.getUsageClauses()));
       tableDataName.getIndexes().forEach(variables::push);
       return tableDataName;
@@ -474,6 +481,7 @@ public class VariableDefinitionDelegate {
     if ((!variable.getPicClauses().isEmpty() || !variable.getUsageClauses().isEmpty())
         && variable.getOccursClauses().isEmpty()) {
       return new ElementItem(
+          variable.getNumber(),
           variable.getName(),
           variable.getDefinition(),
           structureStack.peek(),
@@ -502,7 +510,8 @@ public class VariableDefinitionDelegate {
             variable.getName(),
             variable.getDefinition(),
             variable.getContainer(),
-            variable.getValueClauseTest());
+            variable.getValueClauseTest(),
+            variable.getThruValue());
     Optional.ofNullable(variable.getContainer())
         .ifPresent(container -> container.addConditionName(result));
     return result;
@@ -613,6 +622,7 @@ public class VariableDefinitionDelegate {
     List<DataValueClauseContext> valueClauses;
     List<DataUsageClauseContext> usageClauses;
     String valueClauseTest;
+    String thruValue;
     Variable container;
     DataRenamesClauseContext renamesClauseContext;
     UsageFormat usageFormat;

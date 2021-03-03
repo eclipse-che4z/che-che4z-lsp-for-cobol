@@ -131,6 +131,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
             .subroutinesDefinitions(getSubroutineDefinition())
             .subroutinesUsages(subroutineUsages.asMap())
             .outlineTree(buildOutlineTree())
+            .variables(definedVariables)
             .build(),
         errors);
   }

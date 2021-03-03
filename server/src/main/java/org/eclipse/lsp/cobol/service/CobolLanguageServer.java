@@ -101,6 +101,7 @@ public class CobolLanguageServer implements LanguageServer, DisposableLanguageSe
     capabilities.setCodeActionProvider(TRUE);
     capabilities.setExecuteCommandProvider(collectExecuteCommandList());
     capabilities.setDocumentSymbolProvider(TRUE);
+    capabilities.setHoverProvider(TRUE);
 
     WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
     workspaceFoldersOptions.setSupported(TRUE);

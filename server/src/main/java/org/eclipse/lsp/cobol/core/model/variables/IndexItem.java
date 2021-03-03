@@ -28,7 +28,25 @@ import lombok.Value;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class IndexItem extends AbstractVariable {
-  public IndexItem(String name, Locality definition) {
-    super(name, definition, null);
+  public IndexItem(int levelNumber, String name, Locality definition) {
+    super(levelNumber, name, definition, null);
+  }
+  public IndexItem(int leverNumber, String name, Locality definition, Variable parent) {
+    super(leverNumber, name, definition, parent);
+  }
+
+  /**
+   * Create a new instance on IndexItem with updated parent link.
+   *
+   * @param parent a new parent
+   * @return the new instance with updated parent
+   */
+  public IndexItem updateParent(Variable parent) {
+    return new IndexItem(levelNumber, name, definition, parent);
+  }
+
+  @Override
+  public String getFormattedDisplayLine() {
+    return "INDEXED BY " + name;
   }
 }
