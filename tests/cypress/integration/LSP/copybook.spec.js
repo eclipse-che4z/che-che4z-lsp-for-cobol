@@ -362,9 +362,9 @@ context('This is a Copybook spec', () => {
 
     const setPathsLocalSetting = (folder) => {
       return cy.writeFile('test_files/project/.theia/settings.json', {
-        'broadcom-cobol-lsp.cpy-manager.paths-local': [`${folder}`],
-        'broadcom-cobol-lsp .cpy-manager.paths-dsn': [],
-        'broadcom-cobol-lsp.cpy-manager.profiles': '',
+        'cobol-lsp.cpy-manager.paths-local': [`${folder}`],
+        'cobol-lsp .cpy-manager.paths-dsn': [],
+        'cobol-lsp.cpy-manager.profiles': '',
       });
     };
     const notHaveSyntaxError = () => {
