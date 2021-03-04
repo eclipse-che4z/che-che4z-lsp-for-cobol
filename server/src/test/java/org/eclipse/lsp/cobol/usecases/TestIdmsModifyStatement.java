@@ -12,35 +12,24 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package com.broadcom.lsp.cobol.usecases;
+package org.eclipse.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 
 /** Test IDMS Modify DML statements */
 class TestIdmsModifyStatement {
 
-  private static final String DEFS =
+  private static final String TEXT =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
-          + "       PROCEDURE DIVISION.\n";
+          + "       PROCEDURE DIVISION.\n"
+          + "       MODIFY EMPLOYEE.\n";
 
-  private static final String MODI1 = DEFS + "           MODIFY EMPLOYEE.\n";
-
-  private static Stream<String> textsToTest() {
-    return Stream.of(MODI1);
-  }
-
-  @ParameterizedTest
-  @MethodSource("textsToTest")
-  @DisplayName("Parameterized - idms modify test")
-  void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+  @Test
+  void test() {
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 }

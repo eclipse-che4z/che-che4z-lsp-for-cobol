@@ -12,9 +12,9 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package com.broadcom.lsp.cobol.usecases;
+package org.eclipse.lsp.cobol.usecases;
 
-import com.broadcom.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
