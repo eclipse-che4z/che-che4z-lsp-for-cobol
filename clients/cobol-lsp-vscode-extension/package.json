@@ -66,13 +66,15 @@
                     ".cbl",
                     ".cob",
                     ".cobol"
-                ]
+                ],
+                "configuration": "./syntaxes/lang-config.json"
             },
             {
                 "id": "COBOL Copybook",
                 "extensions": [
                     ".cpy"
-                ]
+                ],
+                "configuration": "./syntaxes/lang-config.json"
             }
         ],
         "grammars": [
