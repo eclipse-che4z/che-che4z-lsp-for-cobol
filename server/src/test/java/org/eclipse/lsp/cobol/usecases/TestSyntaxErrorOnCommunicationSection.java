@@ -43,7 +43,7 @@ class TestSyntaxErrorOnCommunicationSection {
             new Diagnostic(
                 null,
                 "Syntax error on 'COMMUNICATION' expected {<EOF>, ID, IDENTIFICATION, LINKAGE, LOCAL-STORAGE,"
-                    + " WORKING-STORAGE, PROCEDURE, SCHEMA, END, FILE, MAP}",
+                    + " WORKING-STORAGE, MAP, PROCEDURE, SCHEMA, END, FILE}",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
   }
