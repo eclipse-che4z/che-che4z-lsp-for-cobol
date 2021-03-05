@@ -127,8 +127,8 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
                 .get());
     if (uri.isEmpty()) {
       if (copybookProcessingMode.download && cobolFileName != null) {
-        copybooksForDownloading.computeIfAbsent(cobolFileName, s -> ConcurrentHashMap.newKeySet())
-            .add(copybookName);
+        Optional.ofNullable(copybooksForDownloading.computeIfAbsent(cobolFileName, s -> ConcurrentHashMap.newKeySet()))
+            .ifPresent(it -> it.add(copybookName));
       }
       return new CopybookModel(copybookName, null, null);
     }

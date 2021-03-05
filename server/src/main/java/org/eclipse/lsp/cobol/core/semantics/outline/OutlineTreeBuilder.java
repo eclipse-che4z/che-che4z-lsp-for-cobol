@@ -131,7 +131,7 @@ public class OutlineTreeBuilder {
 
   private void addVariable(
       int level, DocumentSymbol outlineNode, ParserRuleContext parserRuleContext) {
-    while (!variableNodes.isEmpty() && variableNodes.peekLast().level >= level) {
+    while (Optional.ofNullable(variableNodes.peekLast()).map(it -> it.level >= level).orElse(false)) {
       variableNodes.removeLast();
     }
     VariableNode groupItem = variableNodes.peekLast();
