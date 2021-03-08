@@ -265,7 +265,10 @@ public class CobolTextDocumentService
   public CompletableFuture<AnalysisResult> analysis(@NonNull JsonObject json) {
     AnalysisResultEvent event = new Gson().fromJson(json.toString(), AnalysisResultEvent.class);
     return CompletableFuture.supplyAsync(
-        () -> Optional.ofNullable(docs.get(event.getUri())).map(CobolDocumentModel::getAnalysisResult).orElse(null),
+        () -> Optional.ofNullable(event)
+            .map(it -> docs.get(event.getUri()))
+            .map(CobolDocumentModel::getAnalysisResult)
+            .orElse(null),
         executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("analysis retrieving", event.getUri())));
