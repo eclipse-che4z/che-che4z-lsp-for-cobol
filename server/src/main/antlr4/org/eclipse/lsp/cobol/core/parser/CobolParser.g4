@@ -374,7 +374,7 @@ protocolEntry
    ;
 
 modeClause
-   : MODE IS? cobolWord
+   : MODE IS? dataName
    ;
 
 ssNamesLengthParagraph
@@ -523,7 +523,7 @@ reportClause
    ;
 
 copyIdmsFileEntry
-    : COPY IDMS FILE cobolWord versionClause? DOT_FS?
+    : COPY IDMS FILE idms_copy_entity_name versionClause? DOT_FS?
     ;
 
 // -- working storage section ----------------------------------
@@ -750,11 +750,11 @@ copyIdmsEntity
     ;
 
 copyIdmsRecordName
-    : RECORD? dataName (versionClause | dataRedefinesClause)* DOT_FS?
+    : RECORD? idms_copy_entity_name (versionClause | dataRedefinesClause)* DOT_FS?
     ;
 
 copyIdmsLrName
-    : LR dataName dataRedefinesClause? DOT_FS?
+    : LR idms_copy_entity_name dataRedefinesClause? DOT_FS?
     ;
 
 copyIdmsLrCtrl
@@ -762,7 +762,7 @@ copyIdmsLrCtrl
     ;
 
 copyMapName
-    : MAP (CONTROL dataName | dataName) DOT_FS?
+    : MAP (CONTROL idms_copy_entity_name | idms_copy_entity_name) DOT_FS?
     ;
 //TODO: Throw an error if the rules is triggered on the COPY IDMS MAP without data name specified".
 // -- schema section ----------------------------------
@@ -772,7 +772,7 @@ schemaSection
    ;
 
 schemaDBEntry
-   : DB dataName WITHIN dataName versionClause? DOT_FS
+   : DB idms_subschema_name WITHIN idms_schema_name versionClause? DOT_FS
    ;
 
 // -- map section ----------------------------------
@@ -786,7 +786,7 @@ maxFieldListClause
    ;
 
 mapClause
-    : MAP dataName versionClause? (TYPE IS? (STANDARD | EXTENDED) PAGING?)? DOT_FS?
+    : MAP idms_map_name versionClause? (TYPE IS? (STANDARD | EXTENDED) PAGING?)? DOT_FS?
     ;
 
 versionClause
@@ -874,7 +874,8 @@ statement
 
 idmsStatements
     : copyIdmsBinds | copyIdmsModule | abendCodeStatement | attachTaskCodeStatement | bindStatement | changePriorityStatement | checkTerminalStatement | commitStatement |
-     endStatement | endpageStatement | finishStatement
+     connectStatement | disconnectStatement | endStatement | endpageStatement | eraseStatement | findStatement | finishStatement | getStatement | keepStatement |
+     modifyStatement | obtainStatement | readyStatement | rollbackStatement | storeStatement
     ;
 
 // abend code statement
@@ -1004,7 +1005,15 @@ priorityLiteral
 // bind statement
 
 bindStatement
-    : BIND (bindTaskClause | bindTransactionClause)
+    : BIND (bindTaskClause | bindTransactionClause | bindRunUnitClause | bindMapClause | bindProcedureClause)
+    ;
+
+bindMapClause
+    : MAP idms_map_name (RECORD idms_db_entity_name (TO (NULL | generalIdentifier))?)?
+    ;
+
+bindProcedureClause
+    : PROCEDURE FOR idms_procedure_name TO generalIdentifier
     ;
 
 bindTaskClause
@@ -1017,6 +1026,14 @@ bindTaskStatementNodenameClause
 
 bindTransactionClause
     : TRANSACTION STATISTICS
+    ;
+
+bindRunUnitClause
+    : RUN_UNIT (FOR generalIdentifier)? (DBNODE bindDbNodeName)? (DBNAME bindDbNodeName)? (DICTNODE bindDbNodeName)? (DICTNAME bindDbNodeName)?
+    ;
+
+bindDbNodeName
+    : literal | generalIdentifier
     ;
 
 // call statement
@@ -1161,6 +1178,12 @@ computeStore
    : generalIdentifier ROUNDED?
    ;
 
+// connect statement
+
+connectStatement
+   : CONNECT idms_db_entity_name TO idms_db_entity_name
+   ;
+
 // continue statement
 
 continueStatement
@@ -1173,7 +1196,7 @@ copyIdmsBinds
     ;
 
 copyIdmsModule
-    : COPY IDMS MODULE? dataName versionClause? endClause?
+    : COPY IDMS MODULE? idms_copy_entity_name versionClause? endClause?
     ;
 
 // delete statement
@@ -1206,6 +1229,12 @@ deleteScratchIdClause
 
 disableStatement
    : DISABLE (INPUT TERMINAL? | I_O TERMINAL | OUTPUT) cdName WITH? KEY (literal | generalIdentifier)
+   ;
+
+// disconnect statement
+
+disconnectStatement
+   : DISCONNECT idms_db_entity_name FROM idms_db_entity_name
    ;
 
 // display statement
@@ -1287,6 +1316,11 @@ endpageStatement
 entryStatement
    : ENTRY literal (USING generalIdentifier+)?
    ;
+// erase statement
+
+eraseStatement
+   : ERASE idms_db_entity_name ((PERMANENT | SELECTIVE | ALL) MEMBERS)?
+   ;
 
 // evaluate statement
 
@@ -1363,10 +1397,48 @@ exitStatement
    : EXIT PROGRAM?
    ;
 
+// find statement
+
+findStatement
+   : FIND keepClause? findObtainClause
+   ;
+
+keepClause
+    : KEEP EXCLUSIVE?
+    ;
+
+findObtainClause
+    : calcClause | currentClause | ownerClause | recnameClause | dbkeyClause | positionClause
+    ;
+
+calcClause
+    : (CALC | ANY | DUPLICATE) idms_db_entity_name
+    ;
+
+currentClause
+    : CURRENT idms_db_entity_name? (WITHIN idms_db_entity_name)?
+    ;
+
+ownerClause
+    : OWNER WITHIN idms_db_entity_name
+    ;
+
+recnameClause
+    : idms_db_entity_name (DB_KEY IS? generalIdentifier | WITHIN idms_db_entity_name CURRENT? USING generalIdentifier)
+    ;
+
+dbkeyClause
+    : DB_KEY IS? generalIdentifier (PAGE_INFO generalIdentifier)?
+    ;
+
+positionClause
+    : (NEXT | PRIOR | FIRST | LAST | (integerLiteral | generalIdentifier)) idms_db_entity_name? WITHIN idms_db_entity_name
+    ;
+
 // finish statement
 
 finishStatement
-   : FINISH TASK
+   : FINISH TASK?
    ;
 
 // generate statement
@@ -1374,6 +1446,11 @@ finishStatement
 generateStatement
    : GENERATE reportName
    ;
+
+// get statement
+getStatement
+    : GET idms_db_entity_name?
+    ;
 
 // goback statement
 
@@ -1491,6 +1568,12 @@ inspectBeforeAfter
    : (BEFORE | AFTER) INITIAL? (literal | generalIdentifier)
    ;
 
+// keep statement
+
+keepStatement
+    : KEEP EXCLUSIVE? currentClause
+    ;
+
 // merge statement
 
 mergeStatement
@@ -1532,6 +1615,11 @@ mergeGivingPhrase
 mergeGiving
    : fileName (LOCK | SAVE | NO REWIND | CRUNCH | RELEASE | WITH REMOVE CRUNCH)?
    ;
+
+// modify statement
+modifyStatement
+    : MODIFY idms_db_entity_name
+    ;
 
 // move statement
 
@@ -1579,6 +1667,12 @@ multiplyGivingOperand
 
 multiplyGivingResult
    : generalIdentifier ROUNDED?
+   ;
+
+// obtain statement
+
+obtainStatement
+   : OBTAIN keepClause? findObtainClause
    ;
 
 // open statement
@@ -1689,6 +1783,11 @@ readKey
    : KEY IS? qualifiedDataName
    ;
 
+// ready statement
+readyStatement
+    : READY idms_db_entity_name? (USAGE_MODE IS? (PROTECTED | EXCLUSIVE)? (RETRIEVAL | UPDATE))?
+    ;
+
 // receive statement
 
 receiveStatement
@@ -1760,6 +1859,11 @@ rewriteStatement
 rewriteFrom
    : FROM generalIdentifier
    ;
+
+// rollback statement
+rollbackStatement
+    : ROLLBACK TASK? CONTINUE?
+    ;
 
 // search statement
 
@@ -1926,6 +2030,11 @@ stopStatement
 stopStatementGiving
    : RUN (GIVING | RETURNING) (integerLiteral | generalIdentifier)
    ;
+
+// store statement
+storeStatement
+    : STORE idms_db_entity_name
+    ;
 
 // string statement
 
@@ -2233,3 +2342,27 @@ abbreviation
 commentEntry
    : COMMENTENTRYLINE+
    ;
+
+idms_map_name
+    : T=dataName {validateLength($T.text, "map name", 8);}
+    ;
+
+idms_copy_entity_name
+    : T=dataName {validateLength($T.text, "copy entity name", 32);}
+    ;
+
+idms_db_entity_name
+    : T=dataName {validateLength($T.text, "db entity name", 16);}
+    ;
+
+idms_procedure_name
+    : T=dataName {validateLength($T.text, "procedure name", 8);}
+    ;
+
+idms_schema_name
+    : T=dataName {validateLength($T.text, "schema name", 8);}
+    ;
+
+idms_subschema_name
+    : T=dataName {validateLength($T.text, "subschema name", 8);}
+    ;
