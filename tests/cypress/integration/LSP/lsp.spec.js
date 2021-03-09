@@ -18,9 +18,7 @@
 
 context('This is a LSP spec', () => {
   describe.skip('TC152046 Nominal - check syntax Ok message', () => {
-    it(
-      ['flaky_theia'],
-      'Checks that when opening Cobol file with correct syntax there is an appropriate message is shown',
+    it(['flaky_theia'], 'Checks that when opening Cobol file with correct syntax there is an appropriate message is shown',
       () => {
         cy.openFileExplorer();
         cy.openFile('USER1.cbl');
@@ -75,9 +73,7 @@ context('This is a LSP spec', () => {
   });
 
   describe.skip('TC152047 Error case - file has syntax errors', () => {
-    it(
-      ['flaky_theia'],
-      'Checks that when opening Cobol file with correct syntax there is NO message about correct syntax',
+    it(['flaky_theia'], 'Checks that when opening Cobol file with correct syntax there is NO message about correct syntax',
       () => {
         cy.openFile('USER1.cbl').wait(4000);
         cy.openFile('USER2.cbl');
