@@ -15,12 +15,14 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /** This value class represents the Table variable that may have an optional index */
 @Value
@@ -34,6 +36,7 @@ public class TableDataName extends AbstractVariable implements TableDeclaration 
   UsageFormat usageFormat;
 
   public TableDataName(
+      int levelNumber,
       String name,
       Locality definition,
       Variable parent,
@@ -42,17 +45,18 @@ public class TableDataName extends AbstractVariable implements TableDeclaration 
       int occursTimes,
       List<IndexItem> indexes,
       UsageFormat usageFormat) {
-    super(name, definition, parent);
+    super(levelNumber, name, definition, parent);
     this.picClause = picClause;
     this.value = value;
     this.occursTimes = occursTimes;
-    this.indexes = indexes;
+    this.indexes = indexes.stream().map(it -> it.updateParent(this)).collect(Collectors.toList());
     this.usageFormat = usageFormat;
   }
 
   @Override
   public Variable rename(RenameItem newParent) {
     return new TableDataName(
+        levelNumber,
         name,
         definition,
         newParent,
@@ -61,5 +65,18 @@ public class TableDataName extends AbstractVariable implements TableDeclaration 
         occursTimes,
         indexes,
         usageFormat);
+  }
+
+  @Override
+  public String getFormattedDisplayLine() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append(String.format("%1$02d %2$s OCCURS %3$d TIMES", levelNumber, name, occursTimes));
+    if (picClause != null)
+      stringBuilder.append(" PIC ").append(picClause);
+    if (usageFormat != UsageFormat.UNDEFINED)
+      stringBuilder.append(" USAGE ").append(usageFormat);
+    if (StringUtils.isNoneBlank(value))
+      stringBuilder.append(" VALUE ").append(value);
+    return stringBuilder.append(".").toString();
   }
 }

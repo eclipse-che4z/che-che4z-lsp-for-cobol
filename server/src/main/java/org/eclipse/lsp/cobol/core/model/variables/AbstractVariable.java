@@ -22,10 +22,12 @@ import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /** This abstract class implements the functionality that is common for all the variables. */
 @AllArgsConstructor
 public abstract class AbstractVariable implements Variable {
+  @Getter protected final int levelNumber;
   @Getter protected final String name;
   @Getter protected final Locality definition;
   private final List<Locality> usages = new ArrayList<>();
@@ -57,7 +59,30 @@ public abstract class AbstractVariable implements Variable {
   }
 
   @Override
+  public String getFormattedDisplayLine() {
+    return String.format("%1$02d %2$s.", levelNumber, name);
+  }
+
+  @Override
   public List<ConditionDataName> getConditionNames() {
     return conditionChildren;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    AbstractVariable that = (AbstractVariable) o;
+    return levelNumber == that.levelNumber
+        && Objects.equals(name, that.name)
+        && Objects.equals(definition, that.definition)
+        && Objects.equals(usages, that.usages)
+        && Objects.equals(conditionChildren, that.conditionChildren)
+        && Objects.equals(parent, that.parent);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(levelNumber, name, definition, usages, conditionChildren, parent);
   }
 }

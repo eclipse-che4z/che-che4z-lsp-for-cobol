@@ -16,9 +16,7 @@
 package org.eclipse.lsp.cobol.core.semantics.outline;
 
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp4j.DocumentSymbol;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.*;
 
 /**
  * The utility class for work with document positions and ranges.
@@ -90,5 +88,17 @@ public class RangeUtils {
    */
   public boolean isBefore(Position after, Position before) {
     return compareTo(after, before) < 0;
+  }
+
+  /**
+   * Tests if text document position located inside the location.
+   * @param position - the document position
+   * @param location - en element location
+   * @return true if position is inside the location.
+   */
+  public boolean isInside(TextDocumentPositionParams position, Location location) {
+    return position.getTextDocument().getUri().equals(location.getUri())
+        && !isBefore(position.getPosition(), location.getRange().getStart())
+        && !isAfter(position.getPosition(), location.getRange().getEnd());
   }
 }

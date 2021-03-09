@@ -26,6 +26,7 @@ import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
+import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
@@ -85,6 +86,7 @@ public class CobolTextDocumentService
   private CodeActions actions;
   private DataBusBroker dataBus;
   private CustomThreadPoolExecutor executors;
+  private HoverProvider hoverProvider;
 
   @Inject
   @Builder
@@ -96,7 +98,8 @@ public class CobolTextDocumentService
       Occurrences occurrences,
       DataBusBroker dataBus,
       CodeActions actions,
-      CustomThreadPoolExecutor executors) {
+      CustomThreadPoolExecutor executors,
+      HoverProvider hoverProvider) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -105,6 +108,7 @@ public class CobolTextDocumentService
     this.actions = actions;
     this.dataBus = dataBus;
     this.executors = executors;
+    this.hoverProvider = hoverProvider;
 
     dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
@@ -397,6 +401,17 @@ public class CobolTextDocumentService
                     .collect(toList()))
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("symbol analysis", uri)));
+  }
+
+  @Override
+  public CompletableFuture<Hover> hover(TextDocumentPositionParams position) {
+    String uri = position.getTextDocument().getUri();
+    return CompletableFuture.<Hover>supplyAsync(
+        () -> hoverProvider.getHover(docs.get(uri), position),
+        executors.getThreadPoolExecutor())
+        .whenComplete(
+            reportExceptionIfThrown(createDescriptiveErrorMessage("getting hover", uri)));
+
   }
 
   private void registerDocument(String uri, CobolDocumentModel document) {

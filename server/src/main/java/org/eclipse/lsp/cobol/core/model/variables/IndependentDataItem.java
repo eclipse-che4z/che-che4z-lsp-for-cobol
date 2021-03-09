@@ -15,10 +15,13 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
+
+import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVEL_77;
 
 /**
  * This value class represents an independent element item COBOL variable, that has a level number
@@ -34,8 +37,19 @@ public class IndependentDataItem extends AbstractVariable implements Conditional
 
   public IndependentDataItem(
       String name, Locality definition, String picClause, String value) {
-    super(name, definition, null);
+    super(LEVEL_77, name, definition, null);
     this.picClause = picClause;
     this.value = value;
+  }
+
+  @Override
+  public String getFormattedDisplayLine() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append(String.format("%1$02d %2$s", levelNumber, name));
+    if (picClause != null)
+      stringBuilder.append(" PIC ").append(picClause);
+    if (StringUtils.isNoneBlank(value))
+      stringBuilder.append(" VALUE ").append(value);
+    return stringBuilder.append(".").toString();
   }
 }

@@ -86,18 +86,12 @@ public class ElementOccurrences implements Occurrences {
             Map<String, List<Location>> usages,
             TextDocumentPositionParams position) {
         return Stream.concat(definitions.entrySet().stream(), usages.entrySet().stream())
-                .filter(entry -> entry.getValue().stream().anyMatch(location -> isInside(position, location)))
+                .filter(entry -> entry.getValue().stream().anyMatch(location -> RangeUtils.isInside(position, location)))
                 .findFirst()
                 .map(Map.Entry::getKey)
                 .map(name -> new Element(
                     definitions.getOrDefault(name, Collections.emptyList()),
                     usages.getOrDefault(name, Collections.emptyList())));
-    }
-
-    static boolean isInside(TextDocumentPositionParams position, Location location) {
-        return position.getTextDocument().getUri().equals(location.getUri())
-                && !RangeUtils.isBefore(position.getPosition(), location.getRange().getStart())
-                && !RangeUtils.isAfter(position.getPosition(), location.getRange().getEnd());
     }
 
     @NonNull
