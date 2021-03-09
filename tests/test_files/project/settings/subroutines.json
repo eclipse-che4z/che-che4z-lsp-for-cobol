@@ -1,5 +1,3 @@
 {
-    "cobol-lsp.cpy-manager.profiles": "",
-    "cobol-lsp.cpy-manager.paths-local": ["subroutines"],
-    "cobol-lsp.cpy-manager.paths-dsn": []
+    "cobol-lsp.subroutine-manager.paths-local": ["subroutines"]
 }

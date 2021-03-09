@@ -20,7 +20,7 @@
 
 context('This is F101836 spec', () => {
   describe('US683174 Support for Outline view #481', () => {
-    it('TC250151 Support for Outline view', () => {
+    it(['smoke'], 'TC250151 Support for Outline view', () => {
       cy.openFile('outline.cbl');
       cy.openOutlineView();
       cy.getOutlineViewTreeContainer().contains('PROGRAM: ABCDEF');
