@@ -15,6 +15,7 @@
 import * as fs from "fs";
 import * as net from "net";
 import * as vscode from "vscode";
+import { Location } from "vscode";
 import {
     ConfigurationParams,
     ConfigurationRequest,
@@ -27,6 +28,13 @@ import {LANGUAGE_ID} from "../constants";
 import {JavaCheck} from "./JavaCheck";
 import {Middleware} from "./Middleware";
 import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
+
+export type AnalysisResult = {
+    paragraphRange: Map<string, Location[]>;
+    paragraphUsages: Map<string, Location[]>;
+    sectionRange: Map<string, Location[]>;
+    sectionUsages: Map<string, Location[]>;
+}
 
 export class LanguageClientService {
     private readonly jarPath: string;
@@ -51,6 +59,11 @@ export class LanguageClientService {
 
     public addRequestHandler<R, E>(method: string, handler: GenericRequestHandler<R, E>): void {
         this.handlers.push(languageClient => languageClient.onRequest(method, handler));
+    }
+
+    public async retrieveAnalysis(uri: string): Promise<AnalysisResult> {
+        const languageClient = this.getLanguageClient();
+        return languageClient.sendRequest("extended/analysis", { uri: uri });
     }
 
     public start(): vscode.Disposable {
