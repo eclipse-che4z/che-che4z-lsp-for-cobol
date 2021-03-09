@@ -23,7 +23,7 @@ context('This is F95834 spec', () => {
     cy.updateConfigs('basic');
   });
   describe('TC314771 Support INCLUDE in EXEC SQL to build extended document', () => {
-    it('Checks EXEC SQL with copybooks', () => {
+    it(['smoke'], 'Checks EXEC SQL with copybooks', () => {
       cy.openFile('TEST.CBL').goToLine(21);
       cy.getCurrentLine().type('exec-sql-include');
       cy.get('[widgetid="editor.widget.suggestWidget"]').contains('exec-sql-include').click();

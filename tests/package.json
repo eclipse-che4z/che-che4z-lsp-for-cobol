@@ -11,6 +11,7 @@
     "babel-loader": "^8.1.0",
     "cypress-iframe": "^1.0.1",
     "cypress-multi-reporters": "^1.4.0",
+    "cypress-tags": "^0.0.20",
     "cypress-xpath": "^1.6.1",
     "debug": "^3.2.0",
     "eslint": "^7.6.0",

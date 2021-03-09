@@ -18,24 +18,26 @@
 
 context('This is a LSP spec', () => {
   describe.skip('TC152046 Nominal - check syntax Ok message', () => {
-    // Some Theia specific issues
-    // Let's skip this test until enough time to play with Theia
-    it('Checks that when opening Cobol file with correct syntax there is an appropriate message is shown', () => {
-      cy.openFileExplorer();
-      cy.openFile('USER1.cbl');
-      cy.getLSPOutput().contains('No syntax errors detected in USER1.cbl');
-    });
+    it(
+      ['flaky_theia'],
+      'Checks that when opening Cobol file with correct syntax there is an appropriate message is shown',
+      () => {
+        cy.openFileExplorer();
+        cy.openFile('USER1.cbl');
+        cy.getLSPOutput().contains('No syntax errors detected in USER1.cbl');
+      },
+    );
   });
 
   describe('TC152048 Cobol file is recognized by LSP', () => {
-    it('Cobol file is recognized by LSP - Cobol type is shown in status bar', () => {
+    it(['smoke'], 'Cobol file is recognized by LSP - Cobol type is shown in status bar', () => {
       cy.openFile('USER1.cbl');
       cy.get('.right.area .hasCommand[title="Select Language Mode"]').should('contain.text', 'COBOL');
     });
   });
 
   describe('TC152049 Navigate through definitions', () => {
-    it('Checks behavior of go to definition action', () => {
+    it(['smoke'], 'Checks behavior of go to definition action', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(29).findText('100-Print-User.').goToDefinition();
       cy.getCurrentLineNumber().should('eq', 32);
@@ -43,7 +45,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152080 Find all references from the word begin', () => {
-    it('Checks that LSP can find all references and navigate by them', () => {
+    it(['smoke'], 'Checks that LSP can find all references and navigate by them', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(21).findText('User-Address.').type('{ctrl}{leftArrow}').goToDefinition();
       cy.get('.monaco-tl-contents')
@@ -58,7 +60,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152080 Find all references from the word middle', () => {
-    it('Checks that LSP can find all references and navigate by them', () => {
+    it(['smoke'], 'Checks that LSP can find all references and navigate by them', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(21).findText('User-Address.').goToDefinition();
       cy.get('.monaco-tl-contents')
@@ -73,15 +75,19 @@ context('This is a LSP spec', () => {
   });
 
   describe.skip('TC152047 Error case - file has syntax errors', () => {
-    it('Checks that when opening Cobol file with correct syntax there is NO message about correct syntax', () => {
-      cy.openFile('USER1.cbl').wait(4000);
-      cy.openFile('USER2.cbl');
-      cy.getLSPOutput().should('not.have.text', 'No syntax errors detected in USER2.cbl');
-    });
+    it(
+      ['flaky_theia'],
+      'Checks that when opening Cobol file with correct syntax there is NO message about correct syntax',
+      () => {
+        cy.openFile('USER1.cbl').wait(4000);
+        cy.openFile('USER2.cbl');
+        cy.getLSPOutput().should('not.have.text', 'No syntax errors detected in USER2.cbl');
+      },
+    );
   });
 
   describe('TC152052 Syntax Errors are marked in file', () => {
-    it('Checks that error lines are marked in a file', () => {
+    it(['smoke'], 'Checks that error lines are marked in a file', () => {
       cy.openFile('USER2.cbl');
       cy.get('.squiggly-error')
         .should('have.length', 1)
@@ -94,7 +100,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152051 Syntax Errors have more detailed hints', () => {
-    it('Syntax Errors have more detailed hints', () => {
+    it(['smoke'], 'Syntax Errors have more detailed hints', () => {
       cy.openFile('USER2.cbl');
       cy.get('.squiggly-error')
         .getElementLineNumber()
@@ -107,7 +113,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152050 Semantic Errors also marked in file', () => {
-    it('Checks that Semantic Errors also marked in file', () => {
+    it(['smoke'], 'Checks that Semantic Errors also marked in file', () => {
       cy.openFile('USER2.cbl');
       cy.goToLine(40);
       cy.get('.squiggly-error')
@@ -121,7 +127,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152053 Semantic Errors also have hints', () => {
-    it('Checks that semantic errors have detailed hints', () => {
+    it(['smoke'], 'Checks that semantic errors have detailed hints', () => {
       cy.openFile('USER2.cbl');
       cy.goToLine(40);
       cy.get('.squiggly-error')
@@ -135,7 +141,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152054 Auto format of right trailing spaces', () => {
-    it('Checks that auto format removed sight trailing spaces', () => {
+    it(['smoke'], 'Checks that auto format removed sight trailing spaces', () => {
       cy.openFile('USER2.cbl');
       cy.getLineByNumber(35)
         .as('currentLine')
@@ -149,7 +155,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152058 Autocomplete functionality with snippets navigation', () => {
-    it('Checks auto complete functionality, also with navigation by snippets', () => {
+    it(['smoke'], 'Checks auto complete functionality, also with navigation by snippets', () => {
       cy.openFile('USER2.cbl');
       cy.goToLine(40);
       cy.getCurrentLine().type('{end}{enter}');
@@ -167,7 +173,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC288736 error message for 80chars limit', () => {
-    it('Source text can not go past column 80.  ', () => {
+    it(['smoke'], 'Source text can not go past column 80.  ', () => {
       cy.openFile('TEST.CBL');
       cy.goToLine(22);
       cy.getCurrentLine()
@@ -194,7 +200,7 @@ context('This is a LSP spec', () => {
       cy.closeFolder('.theia');
     });
 
-    it('Lets check structure in settings.json file ', () => {
+    it(['flaky_theia'], 'Lets check structure in settings.json file ', () => {
       cy.openFolder('.theia').openFile('settings.json').goToLine(4);
       cy.getCurrentLine().type('{end}{enter}').wait(500);
       cy.getCurrentLine().type('"cobol-lsp.logging.level.root": "ERROR"');
@@ -214,7 +220,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC266094 Underline the entire incorrect variable structure', () => {
-    it('This test checks that parser can find and underline an incorrect variable structure.', () => {
+    it(['smoke'], 'This test checks that parser can find and underline an incorrect variable structure.', () => {
       cy.openFile('VAR.cbl').goToLine(23).wait(3000);
       cy.getMainEditor()
         .getCurrentLineOverlay()
@@ -313,7 +319,7 @@ context('This is a LSP spec', () => {
       );
     });
 
-    it('Checks Syntax and Semantic Errors from Copybooks', () => {
+    it(['smoke'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('CALC-DATA.cbl').goToLine(5);
       cy.getLineByNumber(5).findText('GET-DATA').goToDefinition();
       cy.getCurrentLineNumber().should('eq', 8);
@@ -344,7 +350,7 @@ context('This is a LSP spec', () => {
         });
     };
 
-    it('Lets check the positions of rulers ', () => {
+    it(['smoke'], 'Lets check the positions of rulers ', () => {
       cy.openFile('TEST.CBL').goToLine(24);
       cy.getCurrentLine().type('{end}{enter}');
       [
@@ -373,7 +379,7 @@ context('This is a LSP spec', () => {
     afterEach(() => {
       cy.deleteFile(`${fileName}.cbl`);
     });
-    it('Checks Syntax and Semantic Errors from Copybooks', () => {
+    it(['smoke'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
       cy.getCurrentLine().type('{selectall}shell').wait(500);
       cy.get('.suggest-widget.visible').click();
@@ -417,7 +423,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC315355 Server Rejects Outline Request for Unsupported Files', () => {
-    it('Request should be rejected immediately', () => {
+    it(['smoke'], 'Request should be rejected immediately', () => {
       cy.writeFile('test_files/project/some_text.txt', '');
       cy.openFile('some_text.txt');
       cy.changeLangMode('COBOL');
