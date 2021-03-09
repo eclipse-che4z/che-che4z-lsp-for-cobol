@@ -63,6 +63,7 @@ Helpful [VS Code extension](https://marketplace.visualstudio.com/items?itemName=
 | Run in CLI mode **ALL** spec files in specific folder with Chrome browser                      |`npm run cy:run:all`   |
 | Run in CLI mode **ALL** spec files in specific folder with Chrome browser in **headless** mode | `npm run cy:run:all:headless`  |
 | Run in CLI mode **SPECIFIC** spec file in specific folder with Chrome browser                  | `npm run cy:run -- --spec cypress/integration/LSP/copybook.spec.js --browser chrome`   |
+| Run in CLI mode  **ALL** spec files in specific folder with Chrome browser in **headless** mode with video recording on| `npm run cy:run:all:headless -- --config video=true`|
 
 #### Test Retries
 
@@ -116,7 +117,7 @@ and then
 ```
 npm run cy:run:all
 ```
-
+ By default, `flaky`, `flaky_theia`, `bug` and `investigation` are excluded from the cypress run. 
 ## 7. Add new tests
 
 Please check this page: https://docs.cypress.io/guides/references/best-practices.html
