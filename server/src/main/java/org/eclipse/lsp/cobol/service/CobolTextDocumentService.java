@@ -268,14 +268,14 @@ public class CobolTextDocumentService
   @CheckServerShutdownState
   public CompletableFuture<AnalysisResult> analysis(@NonNull JsonObject json) {
     AnalysisResultEvent event = new Gson().fromJson(json.toString(), AnalysisResultEvent.class);
+    String uri = Optional.ofNullable(event).map(AnalysisResultEvent::getUri).orElse("");
     return CompletableFuture.supplyAsync(
-        () -> Optional.ofNullable(event)
-            .map(it -> docs.get(event.getUri()))
+        () -> Optional.ofNullable(docs.get(uri))
             .map(CobolDocumentModel::getAnalysisResult)
             .orElse(null),
         executors.getThreadPoolExecutor())
         .whenComplete(
-            reportExceptionIfThrown(createDescriptiveErrorMessage("analysis retrieving", event.getUri())));
+            reportExceptionIfThrown(createDescriptiveErrorMessage("analysis retrieving", uri)));
   }
 
   private void registerEngineAndAnalyze(String uri, String text) {
