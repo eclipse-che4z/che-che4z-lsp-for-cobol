@@ -46,16 +46,13 @@ function createFile(filename: string, folderPath: string): string {
 }
 
 function createDirectory(targetPath: string) {
-
     fs.mkdirSync(targetPath, { recursive: true });
 }
 
-function removeFolder(pathFile: string) {
-    fs.remove(pathFile);
-}
-
-function removeNonEmptyFolder(targetPath: string) {
-    fs.rmdirSync(targetPath, { recursive: true });
+function removeFolder(targetPath: string) {
+    if (fs.existsSync(targetPath)) {
+        fs.remove(targetPath);
+    }
 }
 
 function buildResultArrayFrom(settingsMockValue: string[], profileName: string): number {
@@ -105,7 +102,7 @@ describe("Resolve local copybook present in one or more folders specified by the
         createDirectory(dir);
         createFile(copybookNameWithExtension, dir);
         expect(fsUtils.searchInWorkspace("NSTCOPY2", [RELATIVE_CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
-        removeNonEmptyFolder(dir);
+        removeFolder(dir);
     });
     test("Given a valid absolute path for copybook with extension on filesystem, the uri is correctly returned", () => {
         expect(fsUtils.searchInWorkspace("NSTCOPY2", [path.normalize(folderPath)], COPYBOOK_EXT_ARRAY)).toBeDefined();
