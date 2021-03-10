@@ -73,7 +73,7 @@ class VariableHoverTest {
     Hover hover = variableHover.getHover(model, position5and5);
     assertNotNull(hover);
     MarkedString markedString = hover.getContents().getLeft().get(0).getRight();
-    assertEquals("COBOL", markedString.getLanguage());
+    assertEquals("cobol", markedString.getLanguage());
     assertEquals("01 TEST PIC 9.", markedString.getValue());
   }
 
@@ -101,7 +101,7 @@ class VariableHoverTest {
     Hover hover = variableHover.getHover(model, position5and5);
     assertNotNull(hover);
     MarkedString markedString = hover.getContents().getLeft().get(0).getRight();
-    assertEquals("COBOL", markedString.getLanguage());
+    assertEquals("cobol", markedString.getLanguage());
     assertEquals(result, markedString.getValue());
   }
 
