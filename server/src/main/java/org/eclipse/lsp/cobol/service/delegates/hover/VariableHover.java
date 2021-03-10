@@ -54,7 +54,8 @@ public class VariableHover implements HoverProvider {
     for (String childLine: childrenDescriptions(variable))
       lines.add(prefix + childLine);
     return new Hover(ImmutableList.of(Either.forRight(
-        new MarkedString("COBOL", String.join("\n", lines)))));
+        // Hover coloring didn't work if the language is "COBOL" (our language ID)
+        new MarkedString("cobol", String.join("\n", lines)))));
   }
 
   private static Variable findVariableByPosition(Collection<Variable> variables, TextDocumentPositionParams position) {
