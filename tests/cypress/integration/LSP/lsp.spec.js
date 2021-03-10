@@ -18,7 +18,9 @@
 
 context('This is a LSP spec', () => {
   describe.skip('TC152046 Nominal - check syntax Ok message', () => {
-    it(['flaky_theia'], 'Checks that when opening Cobol file with correct syntax there is an appropriate message is shown',
+    it(
+      ['flaky_theia'],
+      'Checks that when opening Cobol file with correct syntax there is an appropriate message is shown',
       () => {
         cy.openFileExplorer();
         cy.openFile('USER1.cbl');
@@ -73,7 +75,9 @@ context('This is a LSP spec', () => {
   });
 
   describe.skip('TC152047 Error case - file has syntax errors', () => {
-    it(['flaky_theia'], 'Checks that when opening Cobol file with correct syntax there is NO message about correct syntax',
+    it(
+      ['flaky_theia'],
+      'Checks that when opening Cobol file with correct syntax there is NO message about correct syntax',
       () => {
         cy.openFile('USER1.cbl').wait(4000);
         cy.openFile('USER2.cbl');
@@ -442,5 +446,37 @@ context('This is a LSP spec', () => {
         })
         .should('be.true');
     });
+  });
+
+  describe('TC319689 Hover over variable shows its hierarchy definition', () => {
+    /**
+     * Get hover over the variable
+     *
+     * @example hoverOverVariable(35, 'REC-1-2-1.', '01 REC-1.  05 REC-1-2.    10 REC-1-2-1 PIC 9.');
+     */
+    const hoverOverVariable = (line, text, hierarchy) => {
+      return cy
+        .getLineByNumber(line)
+        .findText(text)
+        .click()
+        .trigger('mousemove')
+        .get('div.monaco-editor-hover-content')
+        .contains(hierarchy);
+    };
+    it(
+      ['smoke'],
+      'Checks a variable definition with a snippet of its structure when user hovers over the variable.',
+      () => {
+        cy.openFile('HOVER.CBL');
+        hoverOverVariable(48, 'REC-1-2-1.', '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9.');
+        hoverOverVariable(18, 'TOP-OF-PAGE', 'C01 IS TOP-OF-PAGE.');
+        hoverOverVariable(29, 'TERMS-RECORD.', '01 TERMS-RECORD. 05 TERMS-KEY PIC 9(3). 05 FILLER PIC X(68).');
+        hoverOverVariable(30, 'TERMS-KEY', '01 TERMS-RECORD. 05 TERMS-KEY PIC 9(3).');
+        hoverOverVariable(31, 'filler', '01 TERMS-RECORD. 05 FILLER PIC X(68).');
+        hoverOverVariable(35, 'filler', '01 TERMS-RECORD. 05 FILLER PIC X(69).');
+        hoverOverVariable(39, 'REC-1.', '01 REC-1. 05 REC-1-1 PIC 9(6). 05 REC-1-2.');
+        hoverOverVariable(44, 'SUPPLr', '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9. 88 SUPPLR VALUE 2 THRU 4.');
+      },
+    );
   });
 });
