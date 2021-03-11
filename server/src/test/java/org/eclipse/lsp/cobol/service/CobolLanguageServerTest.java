@@ -139,7 +139,7 @@ class CobolLanguageServerTest {
 
     assertNull(capabilities.getWorkspace().getWorkspaceFolders().getChangeNotifications());
     assertNull(capabilities.getDocumentRangeFormattingProvider());
-    assertNull(capabilities.getHoverProvider());
+    assertTrue(capabilities.getHoverProvider());
     assertNull(capabilities.getRenameProvider());
     assertNull(capabilities.getWorkspaceSymbolProvider());
     assertNull(capabilities.getCodeLensProvider());

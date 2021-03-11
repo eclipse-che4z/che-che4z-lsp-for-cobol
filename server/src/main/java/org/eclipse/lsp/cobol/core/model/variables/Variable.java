@@ -23,6 +23,14 @@ import java.util.List;
  * This interface describes a COBOL Variable. Variable has a name and a unique definition locality.
  */
 public interface Variable extends Renameable, Conditional {
+
+  /**
+   * Get level number of the variable
+   *
+   * @return the level number
+   */
+  int getLevelNumber();
+
   /**
    * Get name of the variable
    *
@@ -60,4 +68,11 @@ public interface Variable extends Renameable, Conditional {
    * @return parent {@link Variable}
    */
   Variable getParent();
+
+  /**
+   * Get user friendly variable description.
+   *
+   * @return the string with described variable.
+   */
+  String getFormattedDisplayLine();
 }

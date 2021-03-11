@@ -26,34 +26,34 @@ import java.util.stream.Stream;
 class TestIdmsSections {
 
   private static final String BOILERPLATE =
-      "        IDENTIFICATION DIVISION. \r\n"
-          + "        PROGRAM-ID. test1.\r\n"
-          + "        ENVIRONMENT DIVISION.\r\n";
+      "        IDENTIFICATION DIVISION.\n"
+          + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n";
 
   private static final String IDMSSS_WITH_ALL_CLAUSES =
-      "        IDMS-CONTROL SECTION.\r\n"
-          + "            PROTOCOL. MODE ABC\r\n"
-          + "            SUBSCHEMA-NAMES LENGTH 18\r\n"
-          + "            IDMS-RECORDS WITHIN WORKING-STORAGE.\r\n"
-          + "        DATA DIVISION.\r\n"
-          + "       SCHEMA SECTION.\r\n"
-          + "            DB EMPSS01 WITHIN ENPSCHM VERSION 1234.\r\n";
+      "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE ABC\n"
+          + "            SUBSCHEMA-NAMES LENGTH 18\n"
+          + "            IDMS-RECORDS WITHIN WORKING-STORAGE.\n"
+          + "        DATA DIVISION.\n"
+          + "       SCHEMA SECTION.\n"
+          + "            DB EMPSS01 WITHIN ENPSCHM VERSION 1234.\n";
 
   /** This test should fail because the subschema-name length is max 8 characters */
   private static final String IDMSSS_NO_CS_NO_VERSION =
-      "        DATA DIVISION.\r\n"
-          + "        SCHEMA SECTION.\r\n"
-          + "            DB EMPSS0123 WITHIN ENPSCHM.\r\n";
+      "        DATA DIVISION.\n"
+          + "        SCHEMA SECTION.\n"
+          + "            DB EMPSS012 WITHIN EMPSCHM.\n";
 
   private static final String IDMSMS_WITH_ALL_CLAUSES =
-      "        DATA DIVISION.\r\n"
-          + "        SCHEMA SECTION.\r\n"
-          + "            DB EMPSS0123 WITHIN ENPSCHM.\r\n"
-          + "        MAP SECTION.\r\n"
-          + "        MAX FIELD LIST IS 12 \r\n"
-          + "        MAP MAP1 TYPE IS EXTENDED PAGING.\r\n"
-          + "        MAP MAP2\r\n"
-          + "        MAP MAP3 TYPE STANDARD.\r\n";
+      "        DATA DIVISION.\n"
+          + "        SCHEMA SECTION.\n"
+          + "            DB EMPSS012 WITHIN EMPSCHM.\n"
+          + "        MAP SECTION.\n"
+          + "        MAX FIELD LIST IS 12 \n"
+          + "        MAP MAP1 TYPE IS EXTENDED PAGING.\n"
+          + "        MAP MAP2\n"
+          + "        MAP MAP3 TYPE STANDARD.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

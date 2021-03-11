@@ -20,17 +20,21 @@ import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.event.api.EventObserver;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.event.model.DataEventType;
+import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
 import org.eclipse.lsp.cobol.domain.event.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
+import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Builder;
@@ -65,7 +69,8 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 @Singleton
 public class CobolTextDocumentService
-    implements TextDocumentService, EventObserver<RunAnalysisEvent>, DisposableService {
+    implements TextDocumentService, EventObserver<RunAnalysisEvent>, DisposableService,
+        ExtendedApiService {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
   private static final String GIT_FS_URI = "gitfs:/";
   private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
@@ -81,6 +86,7 @@ public class CobolTextDocumentService
   private CodeActions actions;
   private DataBusBroker dataBus;
   private CustomThreadPoolExecutor executors;
+  private HoverProvider hoverProvider;
 
   @Inject
   @Builder
@@ -92,7 +98,8 @@ public class CobolTextDocumentService
       Occurrences occurrences,
       DataBusBroker dataBus,
       CodeActions actions,
-      CustomThreadPoolExecutor executors) {
+      CustomThreadPoolExecutor executors,
+      HoverProvider hoverProvider) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -101,6 +108,7 @@ public class CobolTextDocumentService
     this.actions = actions;
     this.dataBus = dataBus;
     this.executors = executors;
+    this.hoverProvider = hoverProvider;
 
     dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
   }
@@ -256,6 +264,20 @@ public class CobolTextDocumentService
     docs.forEach((key, value) -> analyzeDocumentFirstTime(key, value.getText(), event.verbose));
   }
 
+  @Override
+  @CheckServerShutdownState
+  public CompletableFuture<AnalysisResult> analysis(@NonNull JsonObject json) {
+    AnalysisResultEvent event = new Gson().fromJson(json.toString(), AnalysisResultEvent.class);
+    String uri = Optional.ofNullable(event).map(AnalysisResultEvent::getUri).orElse("");
+    return CompletableFuture.supplyAsync(
+        () -> Optional.ofNullable(docs.get(uri))
+            .map(CobolDocumentModel::getAnalysisResult)
+            .orElse(null),
+        executors.getThreadPoolExecutor())
+        .whenComplete(
+            reportExceptionIfThrown(createDescriptiveErrorMessage("analysis retrieving", uri)));
+  }
+
   private void registerEngineAndAnalyze(String uri, String text) {
     String fileExtension = extractExtension(uri);
     if (fileExtension != null && !isCobolFile(fileExtension)) {
@@ -379,6 +401,17 @@ public class CobolTextDocumentService
                     .collect(toList()))
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("symbol analysis", uri)));
+  }
+
+  @Override
+  public CompletableFuture<Hover> hover(TextDocumentPositionParams position) {
+    String uri = position.getTextDocument().getUri();
+    return CompletableFuture.<Hover>supplyAsync(
+        () -> hoverProvider.getHover(docs.get(uri), position),
+        executors.getThreadPoolExecutor())
+        .whenComplete(
+            reportExceptionIfThrown(createDescriptiveErrorMessage("getting hover", uri)));
+
   }
 
   private void registerDocument(String uri, CobolDocumentModel document) {

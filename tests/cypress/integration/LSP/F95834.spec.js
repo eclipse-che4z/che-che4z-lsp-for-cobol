@@ -20,27 +20,10 @@
 
 context('This is F95834 spec', () => {
   beforeEach(() => {
-    cy.writeFile('test_files/project/.theia/settings.json', {
-      'broadcom-cobol-lsp.cpy-manager.paths-local': [
-        '.copybooks/zowe-profile-1/DATA.SET.PATH1',
-        '.copybooks/zowe-profile-1/DATA.SET.PATH2',
-        'testing',
-      ],
-      'broadcom-cobol-lsp.cpy-manager.paths-dsn': [],
-      'broadcom-cobol-lsp.cpy-manager.profiles': '',
-    });
-    cy.writeFile('test_files/project/.vscode/settings.json', {
-      'broadcom-cobol-lsp.cpy-manager.paths-local': [
-        '.copybooks/zowe-profile-1/DATA.SET.PATH1',
-        '.copybooks/zowe-profile-1/DATA.SET.PATH2',
-        'testing',
-      ],
-      'broadcom-cobol-lsp .cpy-manager.paths-dsn': [],
-      'broadcom-cobol-lsp.cpy-manager.profiles': '',
-    });
+    cy.updateConfigs('basic');
   });
   describe('TC314771 Support INCLUDE in EXEC SQL to build extended document', () => {
-    it('Checks EXEC SQL with copybooks', () => {
+    it(['smoke'], 'Checks EXEC SQL with copybooks', () => {
       cy.openFile('TEST.CBL').goToLine(21);
       cy.getCurrentLine().type('exec-sql-include');
       cy.get('[widgetid="editor.widget.suggestWidget"]').contains('exec-sql-include').click();

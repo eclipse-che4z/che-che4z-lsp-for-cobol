@@ -32,8 +32,10 @@ import java.util.List;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class MnemonicName extends AbstractVariable {
-  public MnemonicName(String name, Locality definition) {
-    super(name, definition, null);
+  private String systemName;
+  public MnemonicName(String systemName, String name, Locality definition) {
+    super(-1, name, definition, null);
+    this.systemName = systemName;
   }
 
   @Override
@@ -49,5 +51,10 @@ public class MnemonicName extends AbstractVariable {
   @Override
   public List<ConditionDataName> getConditionNames() {
     return ImmutableList.of();
+  }
+
+  @Override
+  public String getFormattedDisplayLine() {
+    return String.format("%1$s IS %2$s.", systemName, name);
   }
 }

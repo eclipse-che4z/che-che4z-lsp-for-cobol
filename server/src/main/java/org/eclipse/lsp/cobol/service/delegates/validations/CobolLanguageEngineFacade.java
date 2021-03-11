@@ -99,7 +99,8 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
         convertEntities(context.getCopybookUsages()),
         convertEntities(context.getSubroutinesDefinitions()),
         convertEntities(context.getSubroutinesUsages()),
-        context.getOutlineTree());
+        context.getOutlineTree(),
+        context.getVariables());
   }
 
   /**

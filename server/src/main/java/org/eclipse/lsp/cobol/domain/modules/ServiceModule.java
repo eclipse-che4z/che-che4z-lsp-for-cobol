@@ -26,6 +26,8 @@ import org.eclipse.lsp.cobol.service.delegates.completions.*;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formation;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp.cobol.service.delegates.formations.TrimFormation;
+import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
+import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.service.delegates.references.*;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
@@ -63,6 +65,7 @@ public class ServiceModule extends AbstractModule {
     bind(FileSystemService.class).to(WorkspaceFileService.class);
     bind(SubroutineService.class).to(SubroutineServiceImpl.class);
     bind(Occurrences.class).to(ElementOccurrences.class);
+    bind(HoverProvider.class).to(VariableHover.class);
 
     bindFormations();
     bindCompletions();

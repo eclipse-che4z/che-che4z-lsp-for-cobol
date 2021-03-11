@@ -21,6 +21,7 @@ import lombok.ToString;
 import lombok.Value;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This value class represents the multi-dimensional Table variable that may have nested variables,
@@ -44,7 +45,7 @@ public class MultiTableDataName extends StructuredVariable implements TableDecla
       UsageFormat usageFormat) {
     super(levelNumber, name, definition, parent);
     this.occursTimes = occursTimes;
-    this.indexes = indexes;
+    this.indexes = indexes.stream().map(it -> it.updateParent(this)).collect(Collectors.toList());
     this.usageFormat = usageFormat;
   }
 
@@ -58,5 +59,14 @@ public class MultiTableDataName extends StructuredVariable implements TableDecla
         occursTimes,
         indexes,
         usageFormat);
+  }
+
+  @Override
+  public String getFormattedDisplayLine() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append(String.format("%1$02d %2$s OCCURS %3$d TIMES", levelNumber, name, occursTimes));
+    if (usageFormat != UsageFormat.UNDEFINED)
+      stringBuilder.append(" USAGE ").append(usageFormat);
+    return stringBuilder.append(".").toString();
   }
 }

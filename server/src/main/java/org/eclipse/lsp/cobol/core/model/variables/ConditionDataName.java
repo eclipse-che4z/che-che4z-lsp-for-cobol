@@ -23,6 +23,8 @@ import lombok.Value;
 
 import java.util.List;
 
+import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVEL_88;
+
 /**
  * This value class represents a conditional data name entry, that has a level number 88. It cannot
  * be a top element in the structure. It always contains a variable name and a value, but not PIC
@@ -33,10 +35,12 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class ConditionDataName extends AbstractVariable {
   String value;
+  String valueTo;
 
-  public ConditionDataName(String name, Locality definition, Variable parent, String value) {
-    super(name, definition, parent);
+  public ConditionDataName(String name, Locality definition, Variable parent, String value, String valueTo) {
+    super(LEVEL_88, name, definition, parent);
     this.value = value;
+    this.valueTo = valueTo;
   }
 
   @Override
@@ -56,6 +60,15 @@ public class ConditionDataName extends AbstractVariable {
 
   @Override
   public Variable rename(RenameItem newParent) {
-    return new ConditionDataName(name, definition, newParent, value);
+    return new ConditionDataName(name, definition, newParent, value, valueTo);
+  }
+
+  @Override
+  public String getFormattedDisplayLine() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append(String.format("%1$02d %2$s VALUE %3$s", levelNumber, name, value));
+    if (valueTo != null)
+      stringBuilder.append(" THRU ").append(valueTo);
+    return stringBuilder.append(".").toString();
   }
 }

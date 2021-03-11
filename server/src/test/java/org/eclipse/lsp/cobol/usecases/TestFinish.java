@@ -35,8 +35,11 @@ class TestFinish {
 
   private static final String FINISH_TASK = "           FINISH TASK.\r\n";
 
+  private static final String FINISH = "           FINISH.\r\n";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(BOILERPLATE + FINISH_TASK);
+
+    return Stream.of(BOILERPLATE + FINISH_TASK, BOILERPLATE + FINISH);
   }
 
   @ParameterizedTest

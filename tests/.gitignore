@@ -21,6 +21,9 @@ mochawesome-report
 reports/
 bash_scripts
 cypress-tests-report*
+.vscode
+.theia
+statistics.txt
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

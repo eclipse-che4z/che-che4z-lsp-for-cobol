@@ -63,6 +63,7 @@ Helpful [VS Code extension](https://marketplace.visualstudio.com/items?itemName=
 | Run in CLI mode **ALL** spec files in specific folder with Chrome browser                      |`npm run cy:run:all`   |
 | Run in CLI mode **ALL** spec files in specific folder with Chrome browser in **headless** mode | `npm run cy:run:all:headless`  |
 | Run in CLI mode **SPECIFIC** spec file in specific folder with Chrome browser                  | `npm run cy:run -- --spec cypress/integration/LSP/copybook.spec.js --browser chrome`   |
+| Run in CLI mode  **ALL** spec files in specific folder with Chrome browser in **headless** mode with video recording on| `npm run cy:run:all:headless -- --config video=true`|
 
 #### Test Retries
 
@@ -84,7 +85,40 @@ The `merge:reports` command will merge all the json files from our `cypress/repo
 
 The `create:html:report` command will generate the html report from `cypress-tests-report.json` and save it a new directory `cypress/reports/final_report`.
 
-## 6. Add new tests
+## 6. Test tags
+We are using custom tags to slice up Cypress test runs. Check the tags bellow in the table
+
+| Tag | Description |
+| ----|-------------|
+| **smoke**| Include or exlude smoke tests.|
+|**flaky** |Include or exclude flaky tests.|
+|**flaky_theia**| Include or exclude tests in Theia which has some problems|
+|**bug**| Include or exclude tests which found bugs in the product|
+|**investigation**| Include or exclude tests under investigation|
+
+### Usage
+Select tests by passing a comma separated list of tags to the Cypress environment variable `CYPRESS_INCLUDE_TAGS`, e.g.,
+```
+CYPRESS_INCLUDE_TAGS=smoke npm run cy:run:all
+```
+Skip tests by passing a comma separated list of tags to the Cypress environment variable `CYPRESS_EXCLUDE_TAGS`.
+```
+CYPRESS_EXCLUDE_TAGS=flaky,bug npm run cy:run:all
+```
+Combine the two for more complex testing strategies.
+```
+CYPRESS_INCLUDE_TAGS=smoke CYPRESS_EXCLUDE_TAGS=flaky,bug npm run cy:run:all
+```
+On Windows it can be performed as
+```
+set CYPRESS_EXCLUDE_TAGS=flaky
+```
+and then
+```
+npm run cy:run:all
+```
+ By default, `flaky`, `flaky_theia`, `bug` and `investigation` are excluded from the cypress run. 
+## 7. Add new tests
 
 Please check this page: https://docs.cypress.io/guides/references/best-practices.html
 

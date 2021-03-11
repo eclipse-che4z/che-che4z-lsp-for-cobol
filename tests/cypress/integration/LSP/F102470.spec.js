@@ -20,16 +20,10 @@
 
 context('This is F102470 spec', () => {
   beforeEach(() => {
-    cy.writeFile('test_files/project/.theia/settings.json', {
-      'broadcom-cobol-lsp.subroutine-manager.paths-local': ['subroutines'],
-    });
-    cy.writeFile('test_files/project/.vscode/settings.json', {
-      'broadcom-cobol-lsp.subroutine-manager.paths-local': ['subroutines'],
-    });
+    cy.updateConfigs('subroutines');
   });
-
   describe('US708186 Check work with subroutines', () => {
-    it('Error check in subroutine resolution', () => {
+    it(['smoke'], 'Error check in subroutine resolution', () => {
       cy.openFile('CALL.cbl').goToLine(21);
       cy.getCurrentLine().should('not.have.class', '.squiggly-error');
       cy.goToLine(23);
@@ -40,15 +34,15 @@ context('This is F102470 spec', () => {
         .contains('SUB2: Subroutine not found');
     });
 
-    it('Go to definition for subroutine', () => {
+    it(['smoke'], 'Go to definition for subroutine', () => {
       cy.openFile('CALL.cbl').goToLine(21);
       cy.getLineByNumber(21).findText('SUB1').goToDefinition();
       cy.getCurrentTab().should('contain.text', 'SUB1.cob');
     });
 
-    it.skip('Autocomplete contains only locally available subroutines', () => {
+    it(['smoke'], 'Autocomplete contains only locally available subroutines', () => {
       cy.openFile('CALL.cbl');
-      cy.goToLine(10);
+      cy.goToLine(23);
       cy.getCurrentLine().type('{end}{enter}');
       cy.getCurrentLine().type('{ctrl} ').type('SUB'); // Ctrl+Space
       cy.get('[widgetid="editor.widget.suggestWidget"]').contains('SUB1');

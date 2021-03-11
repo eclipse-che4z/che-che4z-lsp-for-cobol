@@ -9,7 +9,8 @@
         { "include": "#picture" },
         { "include": "#sql-block" },
         { "include": "#cobol-keywords" },
-        { "include": "#common-cobol-keywords" }
+        { "include": "#common-cobol-keywords" },
+        { "include": "#db2-sql-keywords" }
     ],
     "repository": {
         "comment-line": {
