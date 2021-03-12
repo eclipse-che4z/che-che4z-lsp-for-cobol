@@ -14,7 +14,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Add COBOL world pattern to IDE editor ([37213a7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/37213a7ae6dd26b8367e3f5cc4a26d9bf3392928)), closes [#798](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/798)
 * Add IDMS DML support for DB statements [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([#790](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/790)) ([08574f7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/08574f7b53728e20b49cf2c9aedb10d7e75d0b5d))
 * Add support for IDMS DML commands [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([f8ca612](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f8ca61261fe9a737bcdd7289c094040e0aa5b6bb))
-* Hover over variable shows its hierarchy definition ([d7084ec](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d7084ec5a227f09e8a6e99592ce2af71569088be)), closes [#757](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/757)
+* Make hovering over a variable show its hierarchy definition ([d7084ec](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d7084ec5a227f09e8a6e99592ce2af71569088be)), closes [#757](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/757)
 * Support copybooks outside the current workspace [#755](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/755) ([0d3baa6](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/0d3baa6376674234012a816bc594c3635c281a2d))
 
 ## [0.17.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.17.0...0.17.1) (2021-02-10)
