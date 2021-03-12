@@ -95,11 +95,13 @@ To enable subroutine support, specify the paths of folders containing subroutine
 
 1. Open the **Extensions** tab, click the cog icon next to **COBOL Language Support** and select **Extension Settings** to open the COBOL Language Support extension settings. 
 2. Switch from **User** to **Workspace**.
-3. Under **Subroutine-manager: Paths-local**, specify the paths of the folders containing subroutines. Ensure that you specify relative paths to the workspace root. Absolute paths are not supported.  
-   - **Tip:** To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
-   - The folders are searched in the order they are listed. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
+3. Under **Subroutine-manager: Paths-local**, specify the paths of the folders containing subroutines.
+   - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**. 
+   - The folders are searched in the order they are listed. If two folders contain a subroutine with the same file name, the one from the folder higher on the list is used.
 4. Open a program or project.  
    Subroutine support features are now enabled.
+   
+If you specify your subroutine folders using absolute paths or paths containing `../` or `./`, the subroutine folders are not watched for changes. You might need to resolve names of recently added files in your code manually. 
 
 ## Copybook Support
 
