@@ -6,14 +6,15 @@ All notable changes to the COBOL Language Support extension are documented in th
 ### Bug Fixes
 * Add color to hover message ([f15e867](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f15e867c0d3af03f75012b40ca6c83360e04f35e))
 * Add coloring for divisions ([988fd45](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/988fd457fe447b7c84846301e423648485314fca)), closes [#796](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/796)
-* Fix misspelled Keyword Warning Shown on a Correct Token [#760](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/760) ([8958921](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/8958921e2073847ab1cccb344556e491cf502c34))
+* Fix misspelled keyword warning shown on a correct token [#760](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/760) ([8958921](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/8958921e2073847ab1cccb344556e491cf502c34))
+* Fix terminating SKIP compiler directive with a period. ([ef52f7e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ef52f7e07ae5a7bdf8cdd9e93c9eb2782649f991))
+
 
 ### Features
 * Add COBOL world pattern to IDE editor ([37213a7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/37213a7ae6dd26b8367e3f5cc4a26d9bf3392928)), closes [#798](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/798)
-* Add IDMS DML support for DB statements part 1 [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([#790](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/790)) ([08574f7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/08574f7b53728e20b49cf2c9aedb10d7e75d0b5d))
+* Add IDMS DML support for DB statements [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([#790](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/790)) ([08574f7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/08574f7b53728e20b49cf2c9aedb10d7e75d0b5d))
 * Add support for IDMS DML commands [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([f8ca612](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f8ca61261fe9a737bcdd7289c094040e0aa5b6bb))
 * Hover over variable shows its hierarchy definition ([d7084ec](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d7084ec5a227f09e8a6e99592ce2af71569088be)), closes [#757](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/757)
-* SKIP compiler directive can be terminated with a separator period. ([ef52f7e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ef52f7e07ae5a7bdf8cdd9e93c9eb2782649f991))
 * Support copybooks outside the current workspace [#755](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/755) ([0d3baa6](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/0d3baa6376674234012a816bc594c3635c281a2d))
 
 ## [0.17.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.17.0...0.17.1) (2021-02-10)
