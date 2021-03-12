@@ -587,6 +587,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<Void> {
 
   private void throwWarning(Token token) {
     MisspelledKeywordDistance.calculateDistance(token.getText().toUpperCase())
+            .filter(it -> !it.equalsIgnoreCase(token.getText()))
         .ifPresent(
             correctWord ->
                 getLocality(token)

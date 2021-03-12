@@ -42,7 +42,6 @@ class MisspelledKeywordDistance {
     return KEYWORDS.getSuggestions().stream()
         .map(item -> new Object[] {item, DISTANCE.apply(wrongToken, item)})
         .sorted(comparingInt(o -> (int) o[1]))
-        .filter(item -> !wrongToken.equals(item[0]))
         .filter(item -> (int) item[1] < 2)
         .map(item -> item[0].toString())
         .findFirst();

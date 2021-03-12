@@ -31,7 +31,9 @@ class KeywordSuggestions {
 
   KeywordSuggestions() {
     Properties props = new Properties();
-    try (InputStream keywords = KeywordSuggestions.class.getResourceAsStream("Keywords.txt")) {
+    try (InputStream keywords =
+        KeywordSuggestions.class.getResourceAsStream(
+            "/org/eclipse/lsp/cobol/service/delegates/completions/LanguageKeywords.txt")) {
       props.load(keywords);
       suggestions = props.stringPropertyNames();
     } catch (IOException e) {

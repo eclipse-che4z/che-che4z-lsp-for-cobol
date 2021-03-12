@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package com.broadcom.lsp.cobol.usecases;
+package org.eclipse.lsp.cobol.usecases;
 
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;

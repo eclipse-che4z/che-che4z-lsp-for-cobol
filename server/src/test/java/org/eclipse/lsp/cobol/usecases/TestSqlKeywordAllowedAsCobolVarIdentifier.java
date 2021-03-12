@@ -13,7 +13,7 @@
  *
  */
 
-package com.broadcom.lsp.cobol.usecases;
+package org.eclipse.lsp.cobol.usecases;
 
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
