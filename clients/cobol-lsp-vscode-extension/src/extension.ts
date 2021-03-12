@@ -24,7 +24,7 @@ import {CopybooksCodeActionProvider} from "./services/copybook/CopybooksCodeActi
 import {CopybooksPathGenerator} from "./services/copybook/CopybooksPathGenerator";
 
 import {CopybookURI} from "./services/copybook/CopybookURI";
-import {LanguageClientService} from "./services/LanguageClientService";
+import {AnalysisResult, LanguageClientService} from "./services/LanguageClientService";
 import {Middleware} from "./services/Middleware";
 import {PathsService} from "./services/PathsService";
 import {ProfileService} from "./services/ProfileService";
@@ -75,16 +75,16 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
 
     // Commands
-    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.fetch-copybook", (copybook, programName) => {
         fetchCopybookCommand(copybook, copyBooksDownloader, programName);
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.change-default-zowe-profile", () => {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.change-default-zowe-profile", () => {
         changeDefaultZoweProfile(profileService);
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.edit-dataset-paths", () => {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.edit-dataset-paths", () => {
         editDatasetPaths(pathsService);
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("broadcom-cobol-lsp.cpy-manager.goto-settings", () => {
+    context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings", () => {
         gotoCopybookSettings();
     }));
 
@@ -102,6 +102,13 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerCodeActionsProvider(
             {scheme: "file", language: LANGUAGE_ID},
             new CopybooksCodeActionProvider()));
+
+    // 'export' public api-surface
+    return {
+        analysis(uri: string): Promise<AnalysisResult> {
+            return languageClientService.retrieveAnalysis(uri);
+        }
+    };
 }
 
 export function deactivate() {

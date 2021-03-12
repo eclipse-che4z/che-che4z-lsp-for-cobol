@@ -14,12 +14,12 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
-import {CopybookURI} from "../services/copybook/CopybookURI";
-import {ProfileService} from "../services/ProfileService";
-import {SettingsUtils} from "../services/util/SettingsUtils";
-import {ZoweApi} from "../services/ZoweApi";
+import { CopybookURI } from "../services/copybook/CopybookURI";
+import { ProfileService } from "../services/ProfileService";
+import { SettingsUtils } from "../services/util/SettingsUtils";
+import { ZoweApi } from "../services/ZoweApi";
 import * as fsUtils from "../services/util/FSUtils";
-import {COPYBOOK_EXT_ARRAY} from "../constants";
+import { COPYBOOK_EXT_ARRAY } from "../constants";
 
 const zoweApi: ZoweApi = new ZoweApi();
 const profileService: ProfileService = new ProfileService(zoweApi);
@@ -27,6 +27,7 @@ const copybookURI: CopybookURI = new CopybookURI(profileService);
 const copybookName: string = "NSTCOPY1";
 const copybookNameWithExtension: string = "NSTCOPY2.CPY";
 const CPY_FOLDER_NAME = ".cobcopy";
+const RELATIVE_CPY_FOLDER_NAME = "../relativeCobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
 SettingsUtils.getWorkspacesURI = jest.fn().mockReturnValue(["file://" + __dirname]);
 profileService.resolveProfile = jest.fn().mockReturnValue("PRF");
@@ -35,7 +36,7 @@ vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
 });
 
 // file utils
-function createFile(filename: string): string {
+function createFile(filename: string, folderPath: string): string {
     fs.writeFileSync(path.join(folderPath, filename), "Some dummy content", err => {
         if (err) {
             return null;
@@ -45,12 +46,13 @@ function createFile(filename: string): string {
 }
 
 function createDirectory(targetPath: string) {
-
-    fs.mkdirSync(targetPath, {recursive: true});
+    fs.mkdirSync(targetPath, { recursive: true });
 }
 
-function removeFolder(pathFile: string) {
-    fs.remove(pathFile);
+function removeFolder(targetPath: string) {
+    if (fs.existsSync(targetPath)) {
+        fs.remove(targetPath);
+    }
 }
 
 function buildResultArrayFrom(settingsMockValue: string[], profileName: string): number {
@@ -65,8 +67,8 @@ beforeEach(() => {
 });
 beforeAll(() => {
     createDirectory(folderPath);
-    createFile(copybookName);
-    createFile(copybookNameWithExtension);
+    createFile(copybookName, folderPath);
+    createFile(copybookNameWithExtension, folderPath);
 });
 afterAll(() => {
     return removeFolder(folderPath);
@@ -94,6 +96,16 @@ describe("Resolve local copybook present in one or more folders specified by the
     });
     test("Given a copybook with extension on filesystem, the uri is correctly returned", () => {
         expect(fsUtils.searchInWorkspace("NSTCOPY2", [CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
+    });
+    test("Given a valid relative path for copybook with extension on filesystem, the uri is correctly returned", () => {
+        const dir = path.join(__dirname, RELATIVE_CPY_FOLDER_NAME);
+        createDirectory(dir);
+        createFile(copybookNameWithExtension, dir);
+        expect(fsUtils.searchInWorkspace("NSTCOPY2", [RELATIVE_CPY_FOLDER_NAME], COPYBOOK_EXT_ARRAY)).toBeDefined();
+        removeFolder(dir);
+    });
+    test("Given a valid absolute path for copybook with extension on filesystem, the uri is correctly returned", () => {
+        expect(fsUtils.searchInWorkspace("NSTCOPY2", [path.normalize(folderPath)], COPYBOOK_EXT_ARRAY)).toBeDefined();
     });
 });
 describe("With invalid input parameters, the list of URI that represent copybook downloaded are not generated", () => {
@@ -136,9 +148,9 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     });
     test("With both local and dsn references defined in the settings.json, the search is applied on local resources" +
         "first", async () => {
-        provideMockValueForLocalAndDSN(CPY_FOLDER_NAME, "");
-        const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
-        expect(uri).not.toBe("");
-        expect(spySearchInWorkspace).toBeCalledTimes(1);
-    });
+            provideMockValueForLocalAndDSN(CPY_FOLDER_NAME, "");
+            const uri: string = await copybookURI.resolveCopybookURI(copybookName, "PRGNAME");
+            expect(uri).not.toBe("");
+            expect(spySearchInWorkspace).toBeCalledTimes(1);
+        });
 });

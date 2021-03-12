@@ -11,7 +11,10 @@
  * Contributors:
  *  Broadcom, Inc. - initial API and implementation
  */
-/// <reference types="cypress" />
+
+/// <reference types='cypress' />
+/// <reference types='cypress-tags' />
+
 // ***********************************************************
 // This example plugins/index.js can be used to load plugins
 //
@@ -22,11 +25,12 @@
 // https://on.cypress.io/plugins-guide
 // ***********************************************************
 
-const fs = require('fs-extra')
-
+const fs = require('fs-extra');
 
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
+
+const tagify = require('cypress-tags');
 
 /**
  * @type {Cypress.PluginConfig}
@@ -35,22 +39,22 @@ module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
 
- // Workaround when running in headless mode with Chrome browser
+  // Workaround when running in headless mode with Chrome browser
   on('before:browser:launch', (browser, launchOptions) => {
     if (browser.name === 'chrome' && browser.isHeadless) {
       launchOptions.args.push('--disable-gpu');
-      return launchOptions
+      return launchOptions;
     }
-  })
-
+  });
+  on('file:preprocessor', tagify(config));
   on('task', {
-    deleteFile (filename) {
-      fs.removeSync(filename)
-      return null
+    deleteFile(filename) {
+      fs.removeSync(filename);
+      return null;
     },
-    
-    isFileExists (filename) {
-      return fs.existsSync(filename)
-    }
-  })
-}
+
+    isFileExists(filename) {
+      return fs.existsSync(filename);
+    },
+  });
+};

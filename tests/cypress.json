@@ -1,6 +1,7 @@
 {
   "baseUrl": "http://localhost:3000/",
   "defaultCommandTimeout": 30000,
+  "video": false,
   "env": {
       "appLoadTimeout": 30000,
       "username": "",
@@ -21,5 +22,12 @@
     "runMode": 2,
     "openMode": 2
   },
-  "supportFile": "cypress/support/index.ts"
+  "supportFile": "cypress/support/index.ts",
+  "reporter": "mochawesome",
+  "reporterOptions": {
+    "reportDir": "cypress/reports",
+    "overwrite": false,
+    "html": false,
+    "json": true
+  }
 }
