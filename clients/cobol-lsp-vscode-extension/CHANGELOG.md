@@ -1,14 +1,14 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-# [0.18.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.17.1...0.18.0) (2021-03-12)
+## [0.18.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.17.1...0.18.0) (2021-03-12)
 
-### Added
+#### Added
 * Support for copybooks outside the current workspace
 * IDMS DML support for DB statements
 * Support for IDMS DML commands
 
-### Changed
+#### Changed
 * Hover over variable shows its hierarchy definition
 * Readme update
 
