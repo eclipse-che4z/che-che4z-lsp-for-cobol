@@ -6,8 +6,8 @@ All notable changes to the COBOL Language Support extension are documented in th
 ### Bug Fixes
 * Add color to hover message ([f15e867](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f15e867c0d3af03f75012b40ca6c83360e04f35e))
 * Add coloring for divisions ([988fd45](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/988fd457fe447b7c84846301e423648485314fca)), closes [#796](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/796)
-* Fix misspelled keyword warning shown on a correct token [#760](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/760) ([8958921](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/8958921e2073847ab1cccb344556e491cf502c34))
-* Fix terminating SKIP compiler directive with a period. ([ef52f7e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ef52f7e07ae5a7bdf8cdd9e93c9eb2782649f991))
+* Fix autocomplete for identifiers separated with dashes [#760](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/760) ([8958921](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/8958921e2073847ab1cccb344556e491cf502c34))
+* Fix terminating SKIP compiler directive with a period ([ef52f7e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ef52f7e07ae5a7bdf8cdd9e93c9eb2782649f991))
 
 
 ### Features
