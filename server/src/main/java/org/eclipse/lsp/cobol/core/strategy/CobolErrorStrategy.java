@@ -14,20 +14,22 @@
  */
 package org.eclipse.lsp.cobol.core.strategy;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -78,11 +80,10 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
 
   private String parseCustomMessage(String methodName, String rule, Object... params) {
     String messageKey = "ErrorStrategy.".concat(rule.concat(methodName));
-    try {
-      return messageService.getMessage(messageKey, params);
-    } catch (MissingResourceException e1) {
+    String message = messageService.getMessage(messageKey, params);
+    if (message.equals(messageKey))
       return messageService.getMessage("ErrorStrategy.".concat(methodName), params);
-    }
+    return message;
   }
 
   private String getOffendingToken(InputMismatchException e) {

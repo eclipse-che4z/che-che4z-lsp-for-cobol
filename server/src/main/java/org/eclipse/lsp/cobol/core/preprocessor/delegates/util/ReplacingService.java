@@ -18,6 +18,8 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 import org.apache.commons.lang3.tuple.Pair;
 
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+
 import java.util.List;
 
 /** This service applies replacing for given text by replace clauses and tokens. */
@@ -38,10 +40,10 @@ public interface ReplacingService {
    *
    * @param clause - string representation of the replacing clause in the format "==replaceable== BY
    *     ==replacement=="
-   * @return pair of cleaned-up replaceable and replacement
+   * @return {@link ResultWithErrors} of pair of cleaned-up replaceable and replacement
    */
   @NonNull
-  Pair<String, String> retrievePseudoTextReplacingPattern(@NonNull String clause);
+  ResultWithErrors<Pair<String, String>> retrievePseudoTextReplacingPattern(@NonNull String clause);
 
   /**
    * Retrieve full-token replacing pattern from the given string.

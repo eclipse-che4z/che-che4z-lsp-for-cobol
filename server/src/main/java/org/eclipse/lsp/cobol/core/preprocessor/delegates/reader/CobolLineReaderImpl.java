@@ -14,13 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.reader;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.*;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -28,9 +28,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Optional.ofNullable;
 import static org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum.*;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
-import static java.util.Optional.ofNullable;
 
 /**
  * Preprocessor, which converts strings with COBOL code into a specific entity; analyzes and
@@ -58,8 +58,8 @@ public class CobolLineReaderImpl implements CobolLineReader {
           .put(" ", NORMAL)
           .build();
 
-  private CobolLineReaderDelegate delegate;
-  private MessageService messageService;
+  private final CobolLineReaderDelegate delegate;
+  private final MessageService messageService;
 
   @Inject
   public CobolLineReaderImpl(CobolLineReaderDelegate delegate, MessageService messageService) {
@@ -80,8 +80,9 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
       while (scanner.hasNextLine()) {
         currentLine = scanner.nextLine();
+        String processedLine = delegate.apply(currentLine, documentURI, lineNumber).unwrap(accumulatedErrors::addAll);
         CobolLine currentCobolLine =
-            parseLine(delegate.apply(currentLine), documentURI, lineNumber)
+            parseLine(processedLine, documentURI, lineNumber)
                 .unwrap(accumulatedErrors::addAll);
 
         currentCobolLine.setPredecessor(lastCobolLine);
@@ -150,6 +151,15 @@ public class CobolLineReaderImpl implements CobolLineReader {
                             INDICATOR_AREA_INDEX + 1))));
   }
 
+  /**
+   *
+   * @param uri the document URI
+   * @param message the error message
+   * @param lineNumber the error lineNumber
+   * @param start the error start position
+   * @param stop the error stop position
+   * @return the {@link SyntaxError}
+   */
   @NonNull
   private SyntaxError createError(
       @NonNull String uri, @NonNull String message, int lineNumber, int start, int stop) {

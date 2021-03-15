@@ -19,6 +19,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
@@ -60,6 +61,10 @@ public class PropertiesMessageService implements MessageService {
    */
   @Override
   public String getMessage(String key, Object... parameters) {
-    return String.format(resourceBundle.getString(key), parameters);
+    try {
+      return String.format(resourceBundle.getString(key), parameters);
+    } catch (MissingResourceException e) {
+      return key;
+    }
   }
 }

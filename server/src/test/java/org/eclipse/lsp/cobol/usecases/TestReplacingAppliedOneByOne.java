@@ -34,17 +34,17 @@ class TestReplacingAppliedOneByOne {
           + "       DATA DIVISION.\r\n"
           + "       WORKING-STORAGE SECTION.\r\n"
           + "       01 {$*PARENT}.\r\n"
-          + "       COPY {~CUSTCOPY} REPLACING ==ABC== BY ==DEF==\r\n"
-          + "                               ==DEF== BY ==GHI==\r\n"
-          + "                               ==GHI== BY ==JKL==.\r\n"
+          + "       COPY {~CUSTCOPY} REPLACING ==:ABC:== BY ==:DEF:==\r\n"
+          + "                               ==:DEF:== BY ==:GHI:==\r\n"
+          + "                               ==:GHI:== BY ==JKL==.\r\n"
           + "       PROCEDURE DIVISION.\r\n"
           + "       {#*MAINLINE}.\r\n"
           + "           MOVE 1 TO {$JKL-ID} OF {$JKL-KEY}.\r\n"
           + "           GOBACK.";
 
   private static final String CUSTCOPY =
-      "           05  {$*ABC-KEY^JKL-KEY}.\r\n"
-          + "               10  {$*ABC-ID^JKL-ID}             PIC 9.\r\n";
+      "           05  {$*:ABC:-KEY^JKL-KEY}.\r\n"
+          + "               10  {$*:ABC:-ID^JKL-ID}             PIC 9.\r\n";
   private static final String CUSTCOPY_NAME = "CUSTCOPY";
 
   @Test

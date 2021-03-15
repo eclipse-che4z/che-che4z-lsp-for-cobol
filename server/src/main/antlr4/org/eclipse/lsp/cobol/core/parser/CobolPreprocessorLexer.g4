@@ -22,6 +22,14 @@ lexer grammar CobolPreprocessorLexer;
         lastTokenText = token.getText();
     }
 }
+// compiler directive tokens
+TITLESTATEMENT : (TITLE ' '+ .*? NEWLINE)  ;
+
+CONTROL_DIRECTIVE: ASTERISKCHAR (CONTROL | CBL) ((' '| COMMACHAR)
+                  (SOURCE | NO SOURCE | LIST | NO LIST | MAP | NO MAP
+                  | IDENTIFIER? ))+  DOT?;
+
+ENTER_STMT: ENTER ' '+ IDENTIFIER? IDENTIFIER? DOT ;
 
 // keywords
 ACTIVITY : A C T I V I T Y {!sqlFlag}?;
@@ -50,6 +58,7 @@ CODE : C O D E {!sqlFlag}?;
 CODEPAGE : C O D E P A G E;
 COMPAT : C O M P A T;
 COMPILE : C O M P I L E;
+CONTROL: C O N T R O L;
 COPY : C O P Y;
 CP : C P;
 CPP : C P P;
@@ -77,6 +86,7 @@ EJPD : E J P D;
 EN : E N;
 END_EXEC : E N D MINUSCHAR E X E C {sqlFlag = false;};
 ENDING : E N D I N G {!sqlFlag}?;
+ENTER: E N T E R;
 EXEC_SQL: EXEC WS SQL {sqlFlag = true;};
 ENGLISH : E N G L I S H;
 EPILOG : E P I L O G;
@@ -92,6 +102,7 @@ FLAG : F L A G;
 FLAGSTD : F L A G S T D;
 FSRT : F S R T;
 FULL : F U L L;
+FUNCTION: F U N C T I O N;
 GDS : G D S;
 GRAPHIC : G R A P H I C;
 HOOK : H O O K;
@@ -104,6 +115,7 @@ KA : K A;
 LANG : L A N G;
 LANGUAGE : L A N G U A G E;
 LC : L C;
+LEADING: L E A D I N G;
 LEASM : L E A S M;
 LENGTH : L E N G T H;
 LIB : L I B;
@@ -279,7 +291,9 @@ SZ : S Z;
 TERM : T E R M;
 TERMINAL : T E R M I N A L;
 TEST : T E S T;
+TITLE: T I T L E;
 THREAD : T H R E A D;
+TRAILING: T R A I L I N G;
 TRIG : T R I G;
 TRUNC : T R U N C;
 UE : U E;
@@ -389,6 +403,7 @@ COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
 WS : [ \t\f;]+ -> channel(HIDDEN);
 TEXT : ~('\n' | '\r');
 SEPARATOR : ', ' {!sqlFlag}? -> channel(HIDDEN);
+SEMICOLON: ';';
 SEMICOLON_FS : ';' ('\r' | '\n' | '\f' | '\t' | ' ')+ | ';' EOF;
 
 //SQL comments

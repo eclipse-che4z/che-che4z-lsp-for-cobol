@@ -15,6 +15,8 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.impl;
 
+import lombok.NonNull;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl;
@@ -30,6 +32,7 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -72,6 +75,7 @@ class GrammarPreprocessorImplTest {
 
     List<SyntaxError> errors = emptyList();
     ArrayDeque<CopybookUsage> copybookStack = new ArrayDeque<>();
+    @NonNull Deque<List<Pair<String, String>>> replaceStmtStack = new ArrayDeque<>();
 
     NamedSubContext copybooks = new NamedSubContext();
     copybooks.addUsage(CPYNAME, CPYNAME_POS.toLocation());
@@ -83,7 +87,7 @@ class GrammarPreprocessorImplTest {
             RESULT, copybooks, ImmutableMap.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping), ImmutableMap.of());
 
     when(factory.create(
-            eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(PROCESSING_MODE)))
+            eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(PROCESSING_MODE), eq(replaceStmtStack)))
         .thenReturn(listener);
     when(listener.getErrors()).thenReturn(errors);
     when(listener.getResult()).thenReturn(expectedDocument);
@@ -91,10 +95,10 @@ class GrammarPreprocessorImplTest {
     GrammarPreprocessor preprocessor = new GrammarPreprocessorImpl(factory);
 
     ResultWithErrors<ExtendedDocument> extendedDocument =
-        preprocessor.buildExtendedDocument(DOCUMENT, TEXT, copybookStack, PROCESSING_MODE);
+        preprocessor.buildExtendedDocument(DOCUMENT, TEXT, copybookStack, PROCESSING_MODE, replaceStmtStack);
 
     verify(factory)
-        .create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(PROCESSING_MODE));
+        .create(eq(DOCUMENT), any(BufferedTokenStream.class), eq(copybookStack), eq(PROCESSING_MODE), eq(replaceStmtStack));
     assertEquals(RESULT, extendedDocument.getResult().getText());
     assertEquals(copybooks, extendedDocument.getResult().getCopybooks());
     assertEquals(mainMapping, expectedDocument.getDocumentMapping().get(DOCUMENT));

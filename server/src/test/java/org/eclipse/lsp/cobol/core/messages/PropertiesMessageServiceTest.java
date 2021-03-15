@@ -65,11 +65,10 @@ class PropertiesMessageServiceTest {
   }
 
   @Test
-  void whenEmptyMessageTemplateProvided_getException() {
+  void whenEmptyMessageTemplateProvided_getNoException_getKeyInstead() {
     MessageService messageServiceLocal =
         new PropertiesMessageService("resourceBundles/Test_messageServiceEmptyFile", localeMock);
-    Assertions.assertThrows(
-        MissingResourceException.class, () -> messageServiceLocal.getMessage("1"));
+    assertEquals("1", messageServiceLocal.getMessage("1"));
   }
 
   @Test
