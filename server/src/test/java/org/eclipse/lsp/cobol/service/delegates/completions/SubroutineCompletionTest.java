@@ -14,11 +14,11 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import com.google.common.collect.ImmutableSet;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import com.google.common.collect.ImmutableSet;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Test to check SubroutineCompletion */
-public class SubroutineCompletionTest {
+class SubroutineCompletionTest {
   private static final String TEXT = "       CALL 'SUB\n";
 
   @Test
@@ -36,10 +36,13 @@ public class SubroutineCompletionTest {
     subroutineService.store("SUBCALL", "");
     SubroutineCompletion subroutineCompletion = new SubroutineCompletion(subroutineService);
     CobolDocumentModel document = new CobolDocumentModel(TEXT, AnalysisResult.empty());
-    CompletionParams params = new CompletionParams(new TextDocumentIdentifier("id"), new Position(1, 16));
+    CompletionParams params =
+        new CompletionParams(new TextDocumentIdentifier("id"), new Position(1, 16));
 
-    List<CompletionItem> completionItems = new Completions(ImmutableSet.of(subroutineCompletion))
-        .collectFor(document, params).getItems();
+    List<CompletionItem> completionItems =
+        new Completions(ImmutableSet.of(subroutineCompletion))
+            .collectFor(document, params)
+            .getItems();
 
     assertEquals(1, completionItems.size());
     assertEquals("SUBCALL", completionItems.get(0).getLabel());

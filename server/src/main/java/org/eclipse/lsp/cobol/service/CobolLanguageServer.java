@@ -93,7 +93,7 @@ public class CobolLanguageServer implements LanguageServer, DisposableLanguageSe
     ServerCapabilities capabilities = new ServerCapabilities();
 
     capabilities.setTextDocumentSync(Full);
-    capabilities.setCompletionProvider(new CompletionOptions(true, emptyList()));
+    capabilities.setCompletionProvider(new CompletionOptions(false, emptyList()));
     capabilities.setDefinitionProvider(TRUE);
     capabilities.setReferencesProvider(TRUE);
     capabilities.setDocumentFormattingProvider(TRUE);

@@ -12,6 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
+
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
@@ -19,7 +20,6 @@ import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
-import org.eclipse.lsp4j.InsertTextFormat;
 import org.eclipse.lsp4j.MarkupContent;
 import org.junit.jupiter.api.Test;
 
@@ -29,30 +29,40 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** Test to check SnippetCompletion */
-class SnippetCompletionTest {
-  private static final String INSERT_TEXT = "WRITE ${1:item}";
-  private static final String DOCUMENTATION_TEXT = "WRITE item";
-  private static final String LABEL = "WRITE";
+/**
+ * This test {@link KeywordCompletion} asserts that filtration and preparing the keyword completion
+ * suggestions works correctly
+ */
+class KeywordCompletionTest {
+  private static final String DOCUMENTATION_TEXT =
+      "The ACCEPT statement transfers data or system date-related information into the "
+          + "data area referenced by the specified identifier.\r\n\r\n"
+          + "[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/"
+          + "com.ibm.cobol62.ent.doc/PGandLR/ref/rlpsacce.htm)\r\n\r\n"
+          + "© Copyright IBM Corporation 1994, 2019.\r\n\r\n"
+          + "U.S. Government Users Restricted Rights - "
+          + "Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.";
+  private static final String LABEL = "ACCEPT";
 
-  private SnippetCompletion completion = new SnippetCompletion(new Snippets());
+  private KeywordCompletion completion = new KeywordCompletion(new Keywords());
 
   @Test
   void testCompletionEmptyResult() {
     assertThat(
         completion.getCompletionItems(
-            "Wr", new CobolDocumentModel("", AnalysisResult.builder().build())),
+            "accep", new CobolDocumentModel("", AnalysisResult.builder().build())),
         is(createExpected()));
   }
 
   @Test
   void testCompletionNull() {
-    assertThat(completion.getCompletionItems("WR", null), is(createExpected()));
+    assertThat(completion.getCompletionItems("Accep", null), is(createExpected()));
   }
 
   @Test
   void testCompletionMock() {
-    assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
+    assertEquals(
+        createExpected(), completion.getCompletionItems("ACCEP", MockCompletionModel.MODEL));
   }
 
   private List<CompletionItem> createExpected() {
@@ -65,11 +75,10 @@ class SnippetCompletionTest {
     doc.setKind("markdown");
     CompletionItem item = new CompletionItem(LABEL);
     item.setLabel(LABEL);
-    item.setInsertText(INSERT_TEXT);
-    item.setInsertTextFormat(InsertTextFormat.Snippet);
+    item.setInsertText(LABEL);
     item.setDocumentation(doc);
-    item.setKind(CompletionItemKind.Snippet);
-    item.setSortText("6" + LABEL);
+    item.setKind(CompletionItemKind.Keyword);
+    item.setSortText("7" + LABEL);
     return item;
   }
 }

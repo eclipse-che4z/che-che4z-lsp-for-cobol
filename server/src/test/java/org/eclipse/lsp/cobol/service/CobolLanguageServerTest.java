@@ -126,7 +126,6 @@ class CobolLanguageServerTest {
   private void checkOnlySupportedCapabilitiesAreSet(ServerCapabilities capabilities) {
     assertEquals(TextDocumentSyncKind.Full, capabilities.getTextDocumentSync().getLeft());
     assertTrue(capabilities.getWorkspace().getWorkspaceFolders().getSupported());
-    assertTrue(capabilities.getCompletionProvider().getResolveProvider());
     assertTrue(capabilities.getDefinitionProvider());
     assertTrue(capabilities.getReferencesProvider());
     assertTrue(capabilities.getDocumentFormattingProvider());
@@ -137,6 +136,7 @@ class CobolLanguageServerTest {
         stream(values()).map(ErrorCode::name).collect(toList()),
         capabilities.getExecuteCommandProvider().getCommands());
 
+    assertFalse(capabilities.getCompletionProvider().getResolveProvider());
     assertNull(capabilities.getWorkspace().getWorkspaceFolders().getChangeNotifications());
     assertNull(capabilities.getDocumentRangeFormattingProvider());
     assertTrue(capabilities.getHoverProvider());
