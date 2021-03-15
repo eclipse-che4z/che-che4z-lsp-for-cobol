@@ -14,12 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 
 import java.util.Deque;
+import java.util.List;
 
 /**
  * This interface describes the text preprocessor which prepares the given string for analysis by
@@ -34,5 +36,6 @@ public interface TextPreprocessor {
       String documentUri,
       String cobolCode,
       Deque<CopybookUsage> semanticContext,
-      CopybookProcessingMode copybookProcessingMode);
+      CopybookProcessingMode copybookProcessingMode,
+      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack);
 }

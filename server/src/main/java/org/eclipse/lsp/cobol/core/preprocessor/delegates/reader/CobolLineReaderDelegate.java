@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.reader;
 
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 
 /**
  * This interface represents a reader delegate that may apply some special operations over Strings
@@ -23,11 +24,12 @@ import lombok.NonNull;
 public interface CobolLineReaderDelegate {
 
   /**
-   * Convert the line and apply any transformations if needed.
-   *
    * @param line the initial line
+   * @param uri document uri
+   * @param lineNumber the lineNumber
    * @return converting result
    */
   @NonNull
-  String apply(@NonNull String line);
+  ResultWithErrors<String> apply(
+      @NonNull String line, @NonNull String uri, @NonNull int lineNumber);
 }

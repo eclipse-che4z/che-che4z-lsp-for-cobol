@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
 import org.eclipse.lsp.cobol.core.model.*;
@@ -84,7 +85,7 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
       @NonNull String documentUri,
       @NonNull String cobolSourceCode,
       CopybookProcessingMode copybookProcessingMode) {
-    return process(documentUri, cobolSourceCode, new ArrayDeque<>(), copybookProcessingMode);
+    return process(documentUri, cobolSourceCode, new ArrayDeque<>(), copybookProcessingMode, new ArrayDeque<>());
   }
 
   /**
@@ -104,7 +105,8 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
       @NonNull String documentUri,
       @NonNull String cobolCode,
       @NonNull Deque<CopybookUsage> copybookStack,
-      @NonNull CopybookProcessingMode copybookProcessingMode) {
+      @NonNull CopybookProcessingMode copybookProcessingMode,
+      @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
     List<SyntaxError> errors = new ArrayList<>();
 
     List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
@@ -115,7 +117,7 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
 
     ExtendedDocument parsedDocument =
         grammarPreprocessor
-            .buildExtendedDocument(documentUri, code, copybookStack, copybookProcessingMode)
+            .buildExtendedDocument(documentUri, code, copybookStack, copybookProcessingMode, recursiveReplaceStmtStack)
             .unwrap(errors::addAll);
 
     return new ResultWithErrors<>(parsedDocument, errors);

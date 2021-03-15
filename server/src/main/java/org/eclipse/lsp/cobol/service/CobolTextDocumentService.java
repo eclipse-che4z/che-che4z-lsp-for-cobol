@@ -14,13 +14,22 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.annotation.CheckServerShutdownState;
 import org.eclipse.lsp.cobol.core.annotation.DisposableService;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.event.api.EventObserver;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
-import org.eclipse.lsp.cobol.domain.event.model.DataEventType;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
+import org.eclipse.lsp.cobol.domain.event.model.DataEventType;
 import org.eclipse.lsp.cobol.domain.event.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
@@ -31,15 +40,6 @@ import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -69,7 +69,9 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 @Singleton
 public class CobolTextDocumentService
-    implements TextDocumentService, EventObserver<RunAnalysisEvent>, DisposableService,
+    implements TextDocumentService,
+        EventObserver<RunAnalysisEvent>,
+        DisposableService,
         ExtendedApiService {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
   private static final String GIT_FS_URI = "gitfs:/";
@@ -138,17 +140,6 @@ public class CobolTextDocumentService
             executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("completion lookup", uri)));
-  }
-
-  @Override
-  @CheckServerShutdownState
-  public CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem unresolved) {
-    return supplyAsync(
-            () -> completions.resolveDocumentationFor(unresolved),
-            executors.getThreadPoolExecutor())
-        .whenComplete(
-            reportExceptionIfThrown(
-                createDescriptiveErrorMessage("completion resolving", unresolved.getLabel())));
   }
 
   @Override
@@ -270,10 +261,11 @@ public class CobolTextDocumentService
     AnalysisResultEvent event = new Gson().fromJson(json.toString(), AnalysisResultEvent.class);
     String uri = Optional.ofNullable(event).map(AnalysisResultEvent::getUri).orElse("");
     return CompletableFuture.supplyAsync(
-        () -> Optional.ofNullable(docs.get(uri))
-            .map(CobolDocumentModel::getAnalysisResult)
-            .orElse(null),
-        executors.getThreadPoolExecutor())
+            () ->
+                Optional.ofNullable(docs.get(uri))
+                    .map(CobolDocumentModel::getAnalysisResult)
+                    .orElse(null),
+            executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("analysis retrieving", uri)));
   }
@@ -281,10 +273,12 @@ public class CobolTextDocumentService
   private void registerEngineAndAnalyze(String uri, String text) {
     String fileExtension = extractExtension(uri);
     if (fileExtension != null && !isCobolFile(fileExtension)) {
-      outlineMap.computeIfPresent(uri, (k, v) -> {
-        v.complete(Collections.singletonList(new DocumentSymbol()));
-        return v;
-      });
+      outlineMap.computeIfPresent(
+          uri,
+          (k, v) -> {
+            v.complete(Collections.singletonList(new DocumentSymbol()));
+            return v;
+          });
       communications.notifyThatExtensionIsUnsupported(fileExtension);
     } else {
       communications.notifyThatLoadingInProgress(uri);
@@ -407,11 +401,9 @@ public class CobolTextDocumentService
   public CompletableFuture<Hover> hover(TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
     return CompletableFuture.<Hover>supplyAsync(
-        () -> hoverProvider.getHover(docs.get(uri), position),
-        executors.getThreadPoolExecutor())
-        .whenComplete(
-            reportExceptionIfThrown(createDescriptiveErrorMessage("getting hover", uri)));
-
+            () -> hoverProvider.getHover(docs.get(uri), position),
+            executors.getThreadPoolExecutor())
+        .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("getting hover", uri)));
   }
 
   private void registerDocument(String uri, CobolDocumentModel document) {

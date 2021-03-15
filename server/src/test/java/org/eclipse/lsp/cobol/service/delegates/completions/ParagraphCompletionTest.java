@@ -14,78 +14,58 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.CompletionItemKind;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Test to check ParagraphCompletion */
+/**
+ * This test {@link ParagraphCompletion} asserts that filtration and preparing the paragraph
+ * completion suggestions works correctly
+ */
 class ParagraphCompletionTest {
-  private static final String TEXT =
-      "       Identification Division. \n"
-          + "       Program-id.    ProgramId.\n"
-          + "       Data Division.\n"
-          + "       Working-Storage Section.\n"
-          + "       01   outer1.\n"
-          + "        02   INNER1      PIC 9(4) Binary. \n"
-          + "        02   inner2      PIC X(10).\n"
-          + "       Procedure Division.\n"
-          + "       000-Main-Logic.\n"
-          + "           Perform 100-Test.\n"
-          + "           Stop Run.\n"
-          + "       100-Test.\n"
-          + "           Move INNER1 of OUTER1 to Str.\n"
-          + "       End program ProgramId.";
+  private Completion completion = new ParagraphCompletion();
 
-  /**
-   * this test creates a test document, scans it for paragraph names, adds them to completionItems,
-   * then attempts to find the expected output
-   */
   @Test
-  void testParagraphCompletion() {
-    CobolDocumentModel document = createModel();
-
-    Set<Completion> completionSet = new HashSet<>();
-    completionSet.add(new ParagraphCompletion());
-    Completions completions = new Completions(completionSet);
-    List<CompletionItem> completionItems =
-        completions.collectFor(document, createCompletionParams()).getItems();
-
-    assertEquals(2, completionItems.size());
-    assertTrue(
-        completionItems.get(0).getLabel().contains("100-Test")
-            || completionItems.get(0).getLabel().contains("000-Main-Logic"),
-        "100-Test");
-    assertTrue(
-        completionItems.get(1).getLabel().contains("100-Test")
-            || completionItems.get(1).getLabel().contains("000-Main-Logic"),
-        "000-Main-Logic");
-
-    assertEquals(CompletionItemKind.Method, completionItems.get(0).getKind());
+  void testCompletionEmptyResult() {
+    assertThat(
+        completion.getCompletionItems(
+            "smth",
+            new CobolDocumentModel(
+                "", AnalysisResult.builder().paragraphDefinitions(ImmutableMap.of()).build())),
+        is(empty()));
   }
 
-  private CompletionParams createCompletionParams() {
-    return new CompletionParams(new TextDocumentIdentifier("id"), new Position(8, 0));
+  @Test
+  void testCompletionNull() {
+    assertThat(completion.getCompletionItems("smth", null), is(empty()));
   }
 
-  private CobolDocumentModel createModel() {
-    Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
-    paragraphDefinitions.put(
-        "000-Main-Logic",
-        Collections.singletonList(
-            new Location(null, new Range(new Position(7, 6), new Position(7, 20)))));
-    paragraphDefinitions.put(
-        "100-Test",
-        Collections.singletonList(
-            new Location(null, new Range(new Position(10, 6), new Position(10, 14)))));
+  @Test
+  void testCompletionMock() {
+    assertEquals(createExpected(), completion.getCompletionItems("pa", MockCompletionModel.MODEL));
+  }
 
-    AnalysisResult result = AnalysisResult.empty().toBuilder().paragraphDefinitions(paragraphDefinitions).build();
+  private List<CompletionItem> createExpected() {
+    return ImmutableList.of(createItem("parD1"), createItem("ParD2"));
+  }
 
-    return new CobolDocumentModel(TEXT, result);
+  private CompletionItem createItem(String name) {
+    CompletionItem item = new CompletionItem(name);
+    item.setLabel(name);
+    item.setInsertText(name);
+    item.setKind(CompletionItemKind.Method);
+    item.setSortText("1" + name);
+    return item;
   }
 }

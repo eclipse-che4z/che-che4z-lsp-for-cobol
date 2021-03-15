@@ -15,11 +15,14 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.util.impl;
 
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingServiceImpl;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingServiceImpl;
 import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -43,7 +46,8 @@ class ReplacingServiceImplTest {
                 Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"), // .
                 Pair.of("CHILD1", "CHILD2"))));
 
-    assertEquals("01 ABC.", replacingService.applyReplacing("01 ABC.", ImmutableList.of(Pair.of("", ""))));
+    assertEquals(
+        "01 ABC.", replacingService.applyReplacing("01 ABC.", ImmutableList.of(Pair.of("", ""))));
   }
 
   /**
@@ -56,14 +60,29 @@ class ReplacingServiceImplTest {
   void retrievePseudoTextReplacingPattern() {
     ReplacingService replacingService = new ReplacingServiceImpl();
     assertEquals(
-        Pair.of("01", "05"),
+        new ResultWithErrors<>(
+            Pair.of(
+                "(\\(|:|[.,;]\\s)?(?<=^|[.,;]\\s|\\s|[\\(:])01(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)[\\):,;]?",
+                "05"),
+            Collections.emptyList()),
         replacingService.retrievePseudoTextReplacingPattern("==  01  == BY == 05   =="));
-    assertEquals(Pair.of("", ""), replacingService.retrievePseudoTextReplacingPattern(""));
     assertEquals(
-        Pair.of("a +b +\nc", ""),
+        new ResultWithErrors<>(Pair.of("", ""), Collections.emptyList()),
+        replacingService.retrievePseudoTextReplacingPattern(""));
+    assertEquals(
+        new ResultWithErrors<>(
+            Pair.of(
+                "(\\(|:|[.,;]\\s)?(?<=^|[.,;]\\s|\\s|[\\(:])a +b +\n"
+                    + "c(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)[\\):,;]?",
+                ""),
+            Collections.emptyList()),
         replacingService.retrievePseudoTextReplacingPattern("==a   b  \nc== bY ===="));
     assertEquals(
-        Pair.of("1", ""),
+        new ResultWithErrors<>(
+            Pair.of(
+                "(\\(|:|[.,;]\\s)?(?<=^|[.,;]\\s|\\s|[\\(:])1(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)[\\):,;]?",
+                ""),
+            Collections.emptyList()),
         replacingService.retrievePseudoTextReplacingPattern("==1== by ==\n      \r\n   =="));
   }
 

@@ -14,40 +14,50 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.google.inject.Singleton;
+import lombok.NonNull;
+import org.eclipse.lsp.cobol.core.model.variables.Variable;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 
-import lombok.NonNull;
+import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.function.Predicate;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.VARIABLES;
 
-/** implementation for adding variable names in the autocomplete list as identified by the parser */
+/**
+ * This completion provider returns all the defined variables as completion suggestions and their
+ * definition as documentation
+ */
 @Singleton
 public class VariableCompletion implements Completion {
 
-  @NonNull
   @Override
-  public Collection<String> getCompletionSource(CobolDocumentModel document) {
-    return Optional.ofNullable(document)
-        .map(CobolDocumentModel::getAnalysisResult)
-        .map(AnalysisResult::getVariableNames)
-        .orElse(Collections.emptySet());
+  public @NonNull Collection<CompletionItem> getCompletionItems(
+      @NonNull String token, @Nullable CobolDocumentModel document) {
+    if (document == null) return emptyList();
+    return document.getAnalysisResult().getVariables().stream()
+        .filter(matchNames(token))
+        .map(this::toVariableCompletionItem)
+        .collect(toList());
   }
 
-  @NonNull
-  @Override
-  public String getSortOrderPrefix() {
-    return VARIABLES.prefix;
+  private Predicate<Variable> matchNames(@NonNull String token) {
+    return it -> it.getName().regionMatches(true, 0, token, 0, token.length());
   }
 
-  @NonNull
-  @Override
-  public CompletionItemKind getKind() {
-    return CompletionItemKind.Variable;
+  private CompletionItem toVariableCompletionItem(Variable it) {
+    String name = it.getName();
+    CompletionItem item = new CompletionItem(name);
+    item.setLabel(name);
+    item.setInsertText(name);
+    item.setSortText(VARIABLES.prefix + name);
+    item.setDocumentation(DocumentationUtils.collectDescription(it));
+    item.setKind(CompletionItemKind.Variable);
+    return item;
   }
 }

@@ -34,14 +34,14 @@ class TestMissingNestedCopybookProducesError {
           + "2      DATA DIVISION.\n"
           + "3      WORKING-STORAGE SECTION.\n"
           + "4      01  {$*PARENT}.\n"
-          + "5      {_COPY {~REPL} REPLACING ==TAG== BY ==ABC==.|missing_}\n"
+          + "5      {_COPY {~REPL} REPLACING ==:TAG:== BY ==ABC== .|missing_}\n"
           + "6      PROCEDURE DIVISION.\n"
           + "7      {#*MAINLINE}.\n"
           + "8          MOVE 0 TO {$ABC-ID}.\n"
           + "9          GOBACK. ";
 
   private static final String REPL =
-      "       05 {$*TAG-ID^ABC-ID} PIC 9.\n" + "       COPY {~CPYNAME|missing}.";
+      "         05 {$*:TAG:-ID^ABC-ID} PIC 9.\n" + "       COPY {~CPYNAME|missing}.";
   private static final String REPL_NAME = "REPL";
 
   @Test

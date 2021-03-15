@@ -14,40 +14,39 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.google.inject.Singleton;
-import org.eclipse.lsp4j.CompletionItemKind;
-
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp4j.CompletionItem;
+
+import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.PARAGRAPHS;
+import static org.eclipse.lsp4j.CompletionItemKind.Method;
 
-/** implementation for adding paragraph names in the autocomplete list as identified by the parser */
+/** This completion provider returns paragraphs from this document as completion suggestions */
 @Singleton
 public class ParagraphCompletion implements Completion {
 
-  @NonNull
   @Override
-  public Collection<String> getCompletionSource(CobolDocumentModel document) {
-    return Optional.ofNullable(document)
-        .map(CobolDocumentModel::getAnalysisResult)
-        .map(AnalysisResult::getParagraphs)
-        .orElse(Collections.emptySet());
+  public @NonNull Collection<CompletionItem> getCompletionItems(
+      @NonNull String token, @Nullable CobolDocumentModel document) {
+    if (document == null) return emptyList();
+    return document.getAnalysisResult().getParagraphs().stream()
+        .filter(DocumentationUtils.startsWithIgnoreCase(token))
+        .map(this::toParagraphCompletion)
+        .collect(toList());
   }
 
-  @NonNull
-  @Override
-  public String getSortOrderPrefix() {
-    return PARAGRAPHS.prefix;
-  }
-
-  @NonNull
-  @Override
-  public CompletionItemKind getKind() {
-    return CompletionItemKind.Method;
+  private CompletionItem toParagraphCompletion(String name) {
+    CompletionItem item = new CompletionItem(name);
+    item.setLabel(name);
+    item.setInsertText(name);
+    item.setSortText(PARAGRAPHS.prefix + name);
+    item.setKind(Method);
+    return item;
   }
 }

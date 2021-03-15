@@ -15,9 +15,65 @@
 lexer grammar CobolLexer;
 import CICSLexer;
 channels{TECHNICAL}
+@header {
+  import java.util.regex.Matcher;
+  import java.util.regex.Pattern;
+  import org.apache.commons.lang3.StringUtils;
+}
+@lexer::members {
+    private static final Pattern titlePattern =
+        Pattern.compile("TITLE\\s*(.*?)\\.?\\s\\n.*", Pattern.CASE_INSENSITIVE);
+    private void checkTitlePresent()
+    {
+      String input = _input.getText(Interval.of(_tokenStartCharIndex, _input.index()));
+      if (input!=null)
+      {
+        Matcher matcher = titlePattern.matcher(input);
+          if(matcher.matches() && matcher.group(1).isEmpty())
+           reportWrongArguments("lexer.titleCompilerDirective");
+      }
+    }
+    private void reportWrongArguments(String msg) {
+        ANTLRErrorListener listener = getErrorListenerDispatch();
+        String text = _input.getText(Interval.of(_tokenStartCharIndex, _input.index()));
+	    int stop = _input.index();
+	    if(text.contains("\r")) {
+		   stop--;
+	    }
+        CommonToken lspToken = new CommonTokenFactory().create(_tokenFactorySourcePair, _type, text,
+	         					_channel, _input.index()-text.length()+1,
+	         					stop,
+	        					_tokenStartLine, _tokenStartCharPositionInLine);
+        lspToken.setTokenIndex(_tokenStartCharPositionInLine);
+        lspToken.setText(text.replace("\r","").replace("\n",""));
+        listener.syntaxError(this, lspToken, _tokenStartLine,
+         	         _tokenStartCharPositionInLine, msg, null);
+    }
 
-TITLESTATEMENT : (T I T L E ' '+ .*? NEWLINE) -> skip;
+    private void checkLanguageNamePresent()
+    {
+      String input = _input
+                     .getText(Interval.of(_tokenStartCharIndex, _input.index()))
+                     .replace("\r","").replace("\n","").trim();
+      if(StringUtils.isBlank(input.substring(5, input.length()-1)))
+          reportWrongArguments("lexer.langMissingEnterDirective");
+    }
+}
 
+// compiler directive tokens
+TITLESTATEMENT : (TITLE ' '+ .*? NEWLINE) {checkTitlePresent();} -> channel(TECHNICAL);
+
+CONTROL_DIRECTIVE: ASTERISKCHAR (CONTROL | CBL) ((' '| COMMACHAR)
+                  (SOURCE | NO SOURCE | LIST | NO LIST | MAP | NO MAP
+                  | IDENTIFIER? {reportWrongArguments("lexer.controlDirectiveWrongArgs");})
+                  )+ DOT?-> channel(TECHNICAL);
+
+ENTER_STMT: E N T E R ' '+ IDENTIFIER? {checkLanguageNamePresent();} IDENTIFIER?  DOT -> channel(TECHNICAL);
+EJECT: E J E C T -> channel(HIDDEN);
+EJECT_DOT: E J E C T DOT_FS-> channel(HIDDEN);
+SKIP1 : S K I P '1' DOT_FS? -> skip;
+SKIP2 : S K I P '2' DOT_FS? -> skip;
+SKIP3 : S K I P '3' DOT_FS?-> skip;
 
 // keywords
 ACCEPT : A C C E P T;
@@ -52,6 +108,7 @@ BYTITLE : B Y T I T L E;
 CALC : C A L C;
 CANCEL : C A N C E L;
 CAPABLE : C A P A B L E;
+CBL : C B L;
 CCSVERSION : C C S V E R S I O N;
 CHAINING : C H A I N I N G;
 CHARACTERS : C H A R A C T E R S;
@@ -124,8 +181,6 @@ DUPLICATE : D U P L I C A T E;
 DUPLICATES : D U P L I C A T E S;
 EGCS : E G C S;
 EGI : E G I;
-EJECT: E J E C T -> channel(HIDDEN);
-EJECT_DOT: E J E C T DOT_FS-> channel(HIDDEN);
 EMI : E M I;
 ENCODING: E N C O D I N G;
 END_ACCEPT : E N D MINUSCHAR A C C E P T;
@@ -310,9 +365,6 @@ SHIFT_IN : S H I F T MINUSCHAR I N;
 SHIFT_OUT : S H I F T MINUSCHAR O U T;
 SHORT_DATE : S H O R T MINUSCHAR D A T E;
 SIGN : S I G N;
-SKIP1 : S K I P '1' DOT_FS? -> skip;
-SKIP2 : S K I P '2' DOT_FS? -> skip;
-SKIP3 : S K I P '3' DOT_FS?-> skip;
 SORT : S O R T;
 SORT_CONTROL : S O R T MINUSCHAR C O N T R O L;
 SORT_CORE_SIZE : S O R T MINUSCHAR C O R E MINUSCHAR S I Z E;

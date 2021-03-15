@@ -15,13 +15,15 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates;
 
+import lombok.NonNull;
+import org.antlr.v4.runtime.BufferedTokenStream;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
-import org.antlr.v4.runtime.BufferedTokenStream;
 
-import lombok.NonNull;
 import java.util.Deque;
+import java.util.List;
 
 /** A factory for {@link GrammarPreprocessorListener} */
 public interface GrammarPreprocessorListenerFactory {
@@ -33,11 +35,14 @@ public interface GrammarPreprocessorListenerFactory {
    * @param tokens - a stream of tokens by {@link CobolPreprocessorLexer}
    * @param copybookStack - a stack representing the copybook hierarchy
    * @param copybookProcessingMode - settings of copybook processing
+   * @param recursiveReplaceStmtStack - a stack representing the replace clause hierarchy
+   *
    * @return a new listener
    */
   GrammarPreprocessorListenerImpl create(
       @NonNull String uri,
       @NonNull BufferedTokenStream tokens,
       @NonNull Deque<CopybookUsage> copybookStack,
-      @NonNull CopybookProcessingMode copybookProcessingMode);
+      @NonNull CopybookProcessingMode copybookProcessingMode,
+      @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack);
 }

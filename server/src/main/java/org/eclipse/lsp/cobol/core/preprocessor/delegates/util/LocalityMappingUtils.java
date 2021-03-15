@@ -15,22 +15,23 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+import org.antlr.v4.runtime.Token;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorListener;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
-import lombok.experimental.UtilityClass;
-import org.antlr.v4.runtime.Token;
 
-import lombok.NonNull;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static java.util.Optional.ofNullable;
 import static org.eclipse.lsp.cobol.core.CobolLexer.COPYENTRY;
 import static org.eclipse.lsp.cobol.core.CobolLexer.COPYEXIT;
-import static java.util.Optional.ofNullable;
 
 /**
  * This class maps positions of extended document to the original ones.
@@ -183,5 +184,36 @@ public class LocalityMappingUtils {
     String trimmedToken = token.trim();
     return trimmedToken.equals(positionText)
         || trimmedToken.equals(positionText.replace("<EOF>", ""));
+  }
+
+  /**
+   * Use this method when a token is not found the the Token to Locality mapping. This method tries
+   * to find the nearest locality for a provided token.
+   *
+   * <p>For e.g. A token at line position 0, char start index 3, char end index 6 is passed( value -
+   * TES). But the same token is not present in the mapping. Then this method tries to find the
+   * nearest relevant token. And matches to token TEST, which is at position 0, and char start index
+   * at 3 and char end index is 7
+   *
+   * @param referenceToken tokens of type {@link org.antlr.v4.runtime.CommonToken} provided by
+   *     {@link CobolLexer}
+   * @param mapping A Map of Token to Locality for a document in analysis.
+   * @return Locality for a passed token.
+   */
+  public Optional<Locality> getNearestLocality(
+      Token referenceToken, @NonNull Map<Token, Locality> mapping) {
+    if (Objects.isNull(referenceToken)) return Optional.empty();
+    String normalizeTokenText = StringUtils.normalizeSpace(referenceToken.getText());
+    return mapping.entrySet().stream()
+        .filter(
+            entry -> StringUtils.normalizeSpace(entry.getKey().getText())
+                    .contains(normalizeTokenText)
+                && entry.getKey().getCharPositionInLine()
+                    == referenceToken.getCharPositionInLine()
+                && entry.getKey().getLine() == referenceToken.getLine()
+                && entry.getKey().getStartIndex() <= referenceToken.getStartIndex()
+                && entry.getKey().getStopIndex() >= referenceToken.getStopIndex())
+        .map(Map.Entry::getValue)
+        .findFirst();
   }
 }

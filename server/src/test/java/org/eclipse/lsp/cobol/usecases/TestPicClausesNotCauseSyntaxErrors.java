@@ -30,7 +30,7 @@ class TestPicClausesNotCauseSyntaxErrors {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*PARENT}.\n"
-          + "       COPY {~REPL} REPLACING ==TAG== BY ==ABC==.\n"
+          + "       COPY {~REPL} REPLACING ==:TAG:== BY ==ABC==.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       {#*MAINLINE}.\n"
           + "           MOVE 0 TO {$ABC-ONE} OF {$PARENT}.\n"
@@ -41,12 +41,12 @@ class TestPicClausesNotCauseSyntaxErrors {
           + "           GOBACK. ";
 
   private static final String REPL =
-      "       05 {$*TAG-ONE^ABC-ONE} PIC 9(03)V99.\n"
-          + "       05 {$*TAG-TWO^ABC-TWO} PIC X(20).\n"
-          + "       05 {$*TAG-THREE^ABC-THREE} PIC X VALUE 'N'.\n"
-          + "       05 {$*TAG-FOUR^ABC-FOUR} OCCURS 3 TIMES.\n"
+      "       05 {$*:TAG:-ONE^ABC-ONE} PIC 9(03)V99.\n"
+          + "       05 {$*:TAG:-TWO^ABC-TWO} PIC X(20).\n"
+          + "       05 {$*:TAG:-THREE^ABC-THREE} PIC X VALUE 'N'.\n"
+          + "       05 {$*:TAG:-FOUR^ABC-FOUR} OCCURS 3 TIMES.\n"
           + "       10 FILLER PIC X(10) VALUE '1000000000'. \n"
-          + "       05 {$*TAG-FIVE^ABC-FIVE} PIC 9(6)V9(2).\n";
+          + "       05 {$*:TAG:-FIVE^ABC-FIVE} PIC 9(6)V9(2).\n";
   private static final String REPL_NAME = "REPL";
 
   @Test
