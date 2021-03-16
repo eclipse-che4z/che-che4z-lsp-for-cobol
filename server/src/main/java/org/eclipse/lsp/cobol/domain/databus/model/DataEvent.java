@@ -13,12 +13,8 @@
  *
  */
 
-package org.eclipse.lsp.cobol.domain.event.api;
+package org.eclipse.lsp.cobol.domain.databus.model;
 
-/**
- * This interface implements the Observer pattern for the databus. It provides a callback method to
- * perform some action if the required event is populated.
- */
-public interface EventObserver<O> {
-  void observerCallback(O adaptedDataEvent);
+/** The interface for all the events handled by the databus */
+public interface DataEvent {
 }

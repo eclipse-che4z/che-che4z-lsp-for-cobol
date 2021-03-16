@@ -14,15 +14,9 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
-import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
-import org.eclipse.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
-import org.eclipse.lsp.cobol.domain.event.model.DataEvent;
-import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.gson.JsonPrimitive;
@@ -31,6 +25,12 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
+import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
+import org.eclipse.lsp.cobol.core.model.CopybookModel;
+import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
+import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
+import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -38,10 +38,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static org.eclipse.lsp.cobol.domain.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
 /**
  * This service processes copybook requests and returns content by its name. The service also caches
@@ -73,7 +72,7 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
             .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName))
             .maximumSize(cacheSize)
             .build();
-    dataBus.subscribe(ANALYSIS_FINISHED_EVENT, this);
+    dataBus.subscribe(this);
   }
 
   @Override
@@ -141,27 +140,14 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
   }
 
   /**
-   * Depends on DataEvent type it will be handled with {@link #handleAnalysisFinishedEvent} handler.
-   *
-   * @param event the instance of {@link AnalysisFinishedEvent}
-   */
-  @Override
-  public void observerCallback(DataEvent event) {
-    if (event instanceof AnalysisFinishedEvent) {
-      handleAnalysisFinishedEvent((AnalysisFinishedEvent) event);
-    } else {
-      LOG.error("Unexpected DataEvent: {}", event);
-    }
-  }
-
-  /**
    * Sends downloading requests to the Client for copybooks not presented locally, if any.
    *
    * <p>A list of missed copybooks grouped by document URI, including nested copybooks.
    *
    * @param event - document analysis done
    */
-  private void handleAnalysisFinishedEvent(AnalysisFinishedEvent event) {
+  @Subscribe
+  public void handleAnalysisFinishedEvent(AnalysisFinishedEvent event) {
     Set<String> uris = new HashSet<>(event.getCopybookUris());
     String documentUri = event.getDocumentUri();
     uris.add(documentUri);

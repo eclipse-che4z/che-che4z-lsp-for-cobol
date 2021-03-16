@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -26,11 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.annotation.CheckServerShutdownState;
 import org.eclipse.lsp.cobol.core.annotation.DisposableService;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
-import org.eclipse.lsp.cobol.domain.event.api.EventObserver;
-import org.eclipse.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
+import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
+import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
-import org.eclipse.lsp.cobol.domain.event.model.DataEventType;
-import org.eclipse.lsp.cobol.domain.event.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
@@ -70,7 +69,6 @@ import static java.util.stream.Collectors.toList;
 @Singleton
 public class CobolTextDocumentService
     implements TextDocumentService,
-        EventObserver<RunAnalysisEvent>,
         DisposableService,
         ExtendedApiService {
   private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
@@ -112,7 +110,7 @@ public class CobolTextDocumentService
     this.executors = executors;
     this.hoverProvider = hoverProvider;
 
-    dataBus.subscribe(DataEventType.RUN_ANALYSIS_EVENT, this);
+    dataBus.subscribe(this);
   }
 
   @VisibleForTesting
@@ -249,10 +247,15 @@ public class CobolTextDocumentService
     LOG.info("Document saved...");
   }
 
-  @Override
+  /**
+   * Handle RunAnalysisEvent from the DataBus.
+   *
+   * @param event a RunAnalysisEvent
+   */
+  @Subscribe
   @CheckServerShutdownState
-  public void observerCallback(@NonNull RunAnalysisEvent event) {
-    docs.forEach((key, value) -> analyzeDocumentFirstTime(key, value.getText(), event.verbose));
+  public void onRunAnalysisEventCallback(@NonNull RunAnalysisEvent event) {
+    docs.forEach((key, value) -> analyzeDocumentFirstTime(key, value.getText(), event.isVerbose()));
   }
 
   @Override
