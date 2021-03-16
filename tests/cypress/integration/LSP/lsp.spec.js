@@ -13,6 +13,7 @@
  */
 
 /// <reference types="Cypress" />
+
 //@ts-ignore
 /// <reference types="../../support/" />
 
@@ -478,5 +479,37 @@ context('This is a LSP spec', () => {
         hoverOverVariable(44, 'SUPPLr', '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9. 88 SUPPLR VALUE 2 THRU 4.');
       },
     );
+  });
+
+  describe('TC319969 Provide the variables definition as documentation', () => {
+    /**
+     * Get hover over the variable in autocomplete
+     *
+     * @example varDifinitionAutocomplete('ADSF', '01 SOMETHING. 03 ADFSF OCCURS 30 TIMES. 05 OL-NO PIC X(8).');;
+     */
+    const varDifinitionAutocomplete = (variable, documentation) => {
+      return cy
+        .getLineByNumber(48)
+        .type('{end}{enter}')
+        .getCurrentLine()
+        .type('{ctrl} ')
+        .type(`${variable}{ctrl} `)
+        .get('.monaco-scrollable-element .docs')
+        .contains(documentation);
+    };
+    it(['smoke'], 'Checks variable definition into VSC autocomplete documentation.', () => {
+      cy.openFile('HOVER.CBL');
+      varDifinitionAutocomplete('ADSF', '01 SOMETHING. 03 ADFSF OCCURS 30 TIMES. 05 OL-NO PIC X(8).');
+      varDifinitionAutocomplete('FILE-RECORD', '01 FILE-RECORD PIC X(113).');
+      varDifinitionAutocomplete('FILLER', '01 TERMS-RECORD. 05 FILLER PIC X(69).');
+      varDifinitionAutocomplete('HEADER', '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9. 88 HEADER VALUE 1 THRU 4.');
+      varDifinitionAutocomplete('REC-1', '01 REC-1. 05 REC-1-1 PIC 9(6). 05 REC-1-2.');
+      varDifinitionAutocomplete('REC-1-1', '01 REC-1. 05 REC-1-1 PIC 9(6).');
+      varDifinitionAutocomplete(
+        'REC-1-2',
+        '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9. 88 HEADER VALUE 1 THRU 4. 88 SUPPLR VALUE 2 THRU 4. 88 WREHOUSE VALUE 3.',
+      );
+      varDifinitionAutocomplete('TOP-OF-PAGE', 'C01 IS TOP-OF-PAGE.');
+    });
   });
 });
