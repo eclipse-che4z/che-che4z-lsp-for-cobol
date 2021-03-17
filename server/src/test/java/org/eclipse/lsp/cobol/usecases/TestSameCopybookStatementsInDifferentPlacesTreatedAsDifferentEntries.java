@@ -15,10 +15,10 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
@@ -48,8 +48,8 @@ class TestSameCopybookStatementsInDifferentPlacesTreatedAsDifferentEntries {
             "1",
             new Diagnostic(
                 null,
-                "Syntax error on 'DATA' expected {<EOF>, ID, IDENTIFICATION, LINKAGE, LOCAL-STORAGE, WORKING-STORAGE, "
-                    + "MAP, PROCEDURE, SCHEMA, END, FILE}",
+                "Syntax error on 'DATA' expected {<EOF>, ID, IDENTIFICATION, LOCAL-STORAGE, WORKING-STORAGE, "
+                        + "PROCEDURE, SCHEMA, END, FILE, LINKAGE, MAP}",
                 DiagnosticSeverity.Error,
                 ERROR.getText(),
                 null)));

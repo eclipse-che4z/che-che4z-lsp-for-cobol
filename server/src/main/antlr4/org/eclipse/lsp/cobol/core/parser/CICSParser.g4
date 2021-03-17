@@ -15,7 +15,7 @@ parser grammar CICSParser;
 options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
 import Db2SqlParser;
 
-allRules: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
+allCicsRules: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
           cics_build | cics_cancel | cics_change | cics_change_task | cics_check | cics_connect | cics_converttime |
           cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
           cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
