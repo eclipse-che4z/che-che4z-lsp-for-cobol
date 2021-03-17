@@ -37,5 +37,6 @@ public interface TextPreprocessor {
       String cobolCode,
       Deque<CopybookUsage> semanticContext,
       CopybookProcessingMode copybookProcessingMode,
-      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack);
+      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
+      List<Pair<String, String>> replacingClauses);
 }
