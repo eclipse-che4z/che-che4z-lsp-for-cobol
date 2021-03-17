@@ -15,9 +15,8 @@
 package org.eclipse.lsp.cobol.service;
 
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
-import org.eclipse.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
-import org.eclipse.lsp.cobol.domain.event.model.DataEventType;
-import org.eclipse.lsp.cobol.domain.event.model.RunAnalysisEvent;
+import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
+import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -265,7 +264,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
     // after the simulation for triggering the observer callback verify that the analysis method
     // (more in general the document analysis stage) is triggered
-    service.observerCallback(new RunAnalysisEvent());
+    service.onRunAnalysisEventCallback(new RunAnalysisEvent());
 
     /* After sending a message on the data bus we'll verify that the document analyzed by the preprocessor.
     More in detail we'll check:
@@ -352,7 +351,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   private CobolTextDocumentService verifyServiceStart() {
     CobolTextDocumentService service = getMockedTextDocumentService();
 
-    verify(broker).subscribe(DataEventType.RUN_ANALYSIS_EVENT, service);
+    verify(broker).subscribe(service);
     return service;
   }
 

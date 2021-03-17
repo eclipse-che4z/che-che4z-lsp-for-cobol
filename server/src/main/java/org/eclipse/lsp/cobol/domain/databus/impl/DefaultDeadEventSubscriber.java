@@ -13,30 +13,21 @@
  *
  */
 
-package org.eclipse.lsp.cobol.domain.event.impl;
+package org.eclipse.lsp.cobol.domain.databus.impl;
 
-import org.eclipse.lsp.cobol.domain.event.api.EventObserver;
-import org.eclipse.lsp.cobol.domain.event.model.UnknownEvent;
 import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.Subscribe;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.domain.databus.api.DeadEventSubscriber;
 
-/** A subscriber for {@link UnknownEvent} */
+/** This subscriber manages the events that cannot be handled. */
 @Slf4j
-@RequiredArgsConstructor
-public class UnknownEventSubscriber {
-
-  @Getter @NonNull private EventObserver observer;
-
-  @NonNull @Getter private UnknownEvent eventType;
-
+public class DefaultDeadEventSubscriber implements DeadEventSubscriber {
+  @Override
   @Subscribe
   @AllowConcurrentEvents
-  public void onDataHandler(UnknownEvent eventType) {
-    LOG.debug(eventType.getHeader());
-    observer.observerCallback(eventType);
+  public void handleDeadEvent(DeadEvent event) {
+    LOG.warn(String.format("DROPPED Event : %s", event.getEvent().toString()));
   }
 }
