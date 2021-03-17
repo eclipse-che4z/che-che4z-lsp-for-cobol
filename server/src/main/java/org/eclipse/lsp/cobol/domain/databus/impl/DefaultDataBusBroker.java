@@ -15,64 +15,49 @@
 
 package org.eclipse.lsp.cobol.domain.databus.impl;
 
-import org.eclipse.lsp.cobol.domain.databus.model.RegistryId;
-import org.eclipse.lsp.cobol.domain.event.api.EventObserver;
-import org.eclipse.lsp.cobol.domain.event.model.DataEvent;
-import org.eclipse.lsp.cobol.domain.event.model.DataEventType;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import com.google.common.eventbus.AsyncEventBus;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
+import org.eclipse.lsp.cobol.domain.databus.api.DeadEventSubscriber;
+import org.eclipse.lsp.cobol.domain.databus.model.DataEvent;
+import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+
+import java.util.concurrent.ExecutorService;
 
 /**
  * This class is the default implementation for databus broker.
- *
- * @param <T> - a data event class managed by the implementation
- * @param <S> - a subscriber class for this event
  */
 @Slf4j
 @Singleton
-public class DefaultDataBusBroker<T extends DataEvent, S> extends AbstractDataBusBroker<T, S> {
+public class DefaultDataBusBroker implements DataBusBroker {
+  private EventBus eventBus;
 
   @Inject
-  DefaultDataBusBroker(CustomThreadPoolExecutor customExecutor) {
-    super(customExecutor);
+  DefaultDataBusBroker(CustomThreadPoolExecutor customExecutor, DeadEventSubscriber deadEventSubscriber) {
+    ExecutorService executor = customExecutor.getThreadPoolExecutor();
+    eventBus = new AsyncEventBus(executor);
+    eventBus.register(deadEventSubscriber);
   }
 
   @Override
-  public void postData(@NonNull T dataEvent) {
-    postData(dataEvent.getRegistryId(), dataEvent);
+  public void postData(@NonNull DataEvent dataEvent) {
+    LOG.debug("Post data: {}", dataEvent);
+    eventBus.post(dataEvent);
   }
 
   @Override
-  public void postData(@NonNull RegistryId registryId, @NonNull T dataEvent) {
-    seekRegistry(registryId).ifPresent(it -> it.post(dataEvent));
+  public void subscribe(@NonNull Object dataSubscriber) {
+    LOG.debug("Subscription: {}", dataSubscriber);
+    eventBus.register(dataSubscriber);
   }
 
   @Override
-  public @NonNull S subscribe(@NonNull S dataSubscriber) {
-    return subscribe(RegistryId.GENERAL_REGISTRY_ID, dataSubscriber);
-  }
-
-  @Override
-  public @NonNull S subscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber) {
-    seekRegistry(registryId).ifPresent(it -> it.register(dataSubscriber));
-    return dataSubscriber;
-  }
-
-  @Override
-  public @NonNull S subscribe(@NonNull DataEventType eventType, @NonNull EventObserver observer) {
-    return subscribe(getSubscriber(eventType, observer));
-  }
-
-  @Override
-  public void unSubscribe(@NonNull S dataSubscriber) {
-    unSubscribe(RegistryId.GENERAL_REGISTRY_ID, dataSubscriber);
-  }
-
-  @Override
-  public void unSubscribe(@NonNull RegistryId registryId, @NonNull S dataSubscriber) {
-    seekRegistry(registryId).ifPresent(it -> it.unregister(dataSubscriber));
+  public void unSubscribe(@NonNull Object dataSubscriber) {
+    LOG.debug("Unsubscription: {}", dataSubscriber);
+    eventBus.unregister(dataSubscriber);
   }
 }

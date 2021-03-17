@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.service;
 import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.impl.DefaultDataBusBroker;
-import org.eclipse.lsp.cobol.domain.event.model.RunAnalysisEvent;
+import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;

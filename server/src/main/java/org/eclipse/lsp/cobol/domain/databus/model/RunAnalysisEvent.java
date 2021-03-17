@@ -13,24 +13,23 @@
  *
  */
 
-package org.eclipse.lsp.cobol.domain.event.model;
+package org.eclipse.lsp.cobol.domain.databus.model;
 
-import static org.eclipse.lsp.cobol.domain.event.model.DataEventType.RUN_ANALYSIS_EVENT;
+import lombok.Value;
 
 /**
  * This class is a signal object to show that it is needed to run the syntax and semantic again for
  * all the registered documents.
  */
-public class RunAnalysisEvent extends DataEvent {
-  public final boolean verbose;
+@Value
+public class RunAnalysisEvent implements DataEvent {
+  private boolean verbose;
 
   public RunAnalysisEvent() {
-    super(RUN_ANALYSIS_EVENT, RUN_ANALYSIS_EVENT.getId());
     this.verbose = false;
   }
 
   public RunAnalysisEvent(boolean verbose) {
-    super(RUN_ANALYSIS_EVENT, RUN_ANALYSIS_EVENT.getId());
     this.verbose = verbose;
   }
 }

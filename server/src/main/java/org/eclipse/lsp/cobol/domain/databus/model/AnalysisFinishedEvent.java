@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.domain.event.model;
+package org.eclipse.lsp.cobol.domain.databus.model;
 
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import lombok.Builder;
@@ -30,7 +30,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @Data
-public class AnalysisFinishedEvent extends DataEvent {
+public class AnalysisFinishedEvent implements DataEvent {
   private String documentUri;
   private List<String> copybookUris;
   private CopybookProcessingMode copybookProcessingMode;
@@ -40,7 +40,6 @@ public class AnalysisFinishedEvent extends DataEvent {
       String documentUri,
       List<String> copybookUris,
       CopybookProcessingMode copybookProcessingMode) {
-    super(DataEventType.ANALYSIS_FINISHED_EVENT, DataEventType.ANALYSIS_FINISHED_EVENT.getId());
     this.documentUri = documentUri;
     this.copybookUris = copybookUris;
     this.copybookProcessingMode = copybookProcessingMode;

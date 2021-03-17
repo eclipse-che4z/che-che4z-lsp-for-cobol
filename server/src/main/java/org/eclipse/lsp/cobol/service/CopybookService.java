@@ -15,8 +15,6 @@
 package org.eclipse.lsp.cobol.service;
 
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.domain.event.api.EventObserver;
-import org.eclipse.lsp.cobol.domain.event.model.DataEvent;
 
 import lombok.NonNull;
 
@@ -24,7 +22,7 @@ import lombok.NonNull;
  * Provide API definition to search for copybooks files. The service also caches copybook to reduce
  * filesystem load.
  */
-public interface CopybookService extends EventObserver<DataEvent> {
+public interface CopybookService {
   /** Remove all the stored copybook. */
   void invalidateCache();
 

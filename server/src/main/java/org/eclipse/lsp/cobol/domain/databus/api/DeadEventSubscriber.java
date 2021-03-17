@@ -12,23 +12,22 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-
 package org.eclipse.lsp.cobol.domain.databus.api;
 
+import com.google.common.eventbus.DeadEvent;
 import com.google.inject.ImplementedBy;
-import lombok.NonNull;
-import org.eclipse.lsp.cobol.domain.databus.impl.DefaultDataBusBroker;
-import org.eclipse.lsp.cobol.domain.databus.model.DataEvent;
+import org.eclipse.lsp.cobol.domain.databus.impl.DefaultDeadEventSubscriber;
 
 /**
- * This interface represents API to work with databus.
+ * This subscriber manages the events that cannot be handled.
  */
-@ImplementedBy(DefaultDataBusBroker.class)
-public interface DataBusBroker {
+@ImplementedBy(DefaultDeadEventSubscriber.class)
+public interface DeadEventSubscriber {
 
-  void postData(@NonNull DataEvent dataEvent);
-
-  void subscribe(@NonNull Object dataSubscriber);
-
-  void unSubscribe(@NonNull Object dataSubscriber);
+  /**
+   * Handle event that have no listeners.
+   *
+   * @param event not handled event
+   */
+  void handleDeadEvent(DeadEvent event);
 }

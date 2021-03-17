@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.service;
 
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
-import org.eclipse.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
+import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import com.google.gson.JsonPrimitive;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,6 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
-import static org.eclipse.lsp.cobol.domain.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.*;
 import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_2_URI;
 import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
@@ -182,8 +181,8 @@ class CopybookServiceTest {
    */
   @Test
   void testServiceSendsDownloadingRequestForAnalysisFinishedEvent() {
-    CopybookService copybookService = createCopybookService();
-    verify(broker).subscribe(ANALYSIS_FINISHED_EVENT, copybookService);
+    CopybookServiceImpl copybookService = createCopybookService();
+    verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(DOCUMENT_2_URI)).thenReturn("document2");
     when(settingsService.getConfiguration("copybook-resolve", "document2", INVALID_2_CPY_NAME))
@@ -201,7 +200,7 @@ class CopybookServiceTest {
     assertEquals(new CopybookModel(INVALID_2_CPY_NAME, null, null), invalidCpy2);
 
     // First document parsing done
-    copybookService.observerCallback(
+    copybookService.handleAnalysisFinishedEvent(
         AnalysisFinishedEvent.builder()
             .documentUri(DOCUMENT_URI)
             .copybookUris(emptyList())
@@ -211,7 +210,7 @@ class CopybookServiceTest {
         .getConfigurations(singletonList("copybook-download.quiet.document.INVALID"));
 
     // Others parsing done events for first document are not trigger settingsService
-    copybookService.observerCallback(
+    copybookService.handleAnalysisFinishedEvent(
         AnalysisFinishedEvent.builder()
             .documentUri(DOCUMENT_URI)
             .copybookUris(emptyList())
@@ -221,7 +220,7 @@ class CopybookServiceTest {
         .getConfigurations(singletonList("copybook-download.quiet.document.INVALID"));
 
     // Second document parsing done
-    copybookService.observerCallback(
+    copybookService.handleAnalysisFinishedEvent(
         AnalysisFinishedEvent.builder()
             .documentUri(DOCUMENT_2_URI)
             .copybookUris(emptyList())
@@ -237,8 +236,8 @@ class CopybookServiceTest {
    */
   @Test
   void testServiceSendsDownloadingRequestForAllNotResolvedCopybooks() {
-    CopybookService copybookService = createCopybookService();
-    verify(broker).subscribe(ANALYSIS_FINISHED_EVENT, copybookService);
+    CopybookServiceImpl copybookService = createCopybookService();
+    verify(broker).subscribe(copybookService);
 
     when(files.getNameFromURI(PARENT_CPY_URI)).thenReturn(PARENT_CPY_NAME);
     when(files.getPathFromURI(PARENT_CPY_URI)).thenReturn(parentPath);
@@ -263,7 +262,7 @@ class CopybookServiceTest {
 
     // Notify that analysis finished sending the document URI and copybook names that have nested
     // copybooks
-    copybookService.observerCallback(
+    copybookService.handleAnalysisFinishedEvent(
         AnalysisFinishedEvent.builder()
             .documentUri(DOCUMENT_URI)
             .copybookUris(asList(PARENT_CPY_URI, DOCUMENT_URI))
@@ -300,7 +299,7 @@ class CopybookServiceTest {
     assertEquals(new CopybookModel(VALID_CPY_NAME, null, null), copybookModel);
   }
 
-  private CopybookService createCopybookService() {
+  private CopybookServiceImpl createCopybookService() {
     return new CopybookServiceImpl(broker, settingsService, files, 3, 3, "HOURS");
   }
 }
