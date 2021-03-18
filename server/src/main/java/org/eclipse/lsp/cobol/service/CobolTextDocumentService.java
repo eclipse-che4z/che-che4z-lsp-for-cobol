@@ -260,13 +260,19 @@ public class CobolTextDocumentService
 
   @Override
   @CheckServerShutdownState
-  public CompletableFuture<AnalysisResult> analysis(@NonNull JsonObject json) {
+  public CompletableFuture<ExtendedApiResult> analysis(@NonNull JsonObject json) {
     AnalysisResultEvent event = new Gson().fromJson(json.toString(), AnalysisResultEvent.class);
     String uri = Optional.ofNullable(event).map(AnalysisResultEvent::getUri).orElse("");
     return CompletableFuture.supplyAsync(
             () ->
                 Optional.ofNullable(docs.get(uri))
                     .map(CobolDocumentModel::getAnalysisResult)
+                    .map(ar -> new ExtendedApiResult(ar.getParagraphDefinitions(),
+                        ar.getParagraphUsages(),
+                        ar.getParagraphRange(),
+                        ar.getSectionDefinitions(),
+                        ar.getSectionUsages(),
+                        ar.getSectionRange()))
                     .orElse(null),
             executors.getThreadPoolExecutor())
         .whenComplete(
