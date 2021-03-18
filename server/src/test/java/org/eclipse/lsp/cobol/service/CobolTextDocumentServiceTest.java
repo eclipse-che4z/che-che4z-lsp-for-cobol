@@ -65,7 +65,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
   @BeforeEach
   void setupService() {
-    service = getMockedTextDocumentService();
+    service = getMockedTextDocumentServiceUsingSameThread();
   }
 
   @Test
@@ -163,8 +163,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         new DidOpenTextDocumentParams(
             new TextDocumentItem(EXT_SRC_DOC_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
     service.getFutureMap().get(EXT_SRC_DOC_URI).get();
-    verify(engine, timeout(10000))
-        .analyze(eq(EXT_SRC_DOC_URI), anyString(), eq(CopybookProcessingMode.DISABLED));
+    verify(engine).analyze(eq(EXT_SRC_DOC_URI), anyString(), eq(CopybookProcessingMode.DISABLED));
   }
 
   /**
@@ -179,8 +178,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         new DidOpenTextDocumentParams(
             new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
     service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
-    verify(engine, timeout(10000))
-        .analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.ENABLED));
+    verify(engine).analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.ENABLED));
   }
 
   /**
@@ -191,14 +189,13 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void enableCopybooksOnDidChangeTest() throws ExecutionException, InterruptedException {
     when(engine.analyze(anyString(), anyString(), any(CopybookProcessingMode.class)))
         .thenReturn(AnalysisResult.empty());
-    lenient().doNothing().when(communications).publishDiagnostics(anyMap());
+    doNothing().when(communications).publishDiagnostics(anyMap());
     service.didChange(
         new DidChangeTextDocumentParams(
             new VersionedTextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI, 0),
             ImmutableList.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
     service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
-    verify(engine, timeout(1000))
-        .analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.SKIP));
+    verify(engine).analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.SKIP));
   }
 
   /**
@@ -223,24 +220,14 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
      *  - document URI [correct|incorrect]
      */
 
-    lenient()
-        .when(
-            engine.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
-        .thenReturn(resultNoErrors);
-    lenient()
-        .when(
-            engine.analyze(
-                DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
-        .thenReturn(resultWithErrors);
-
-    lenient()
-        .when(engine.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.SKIP))
-        .thenReturn(resultNoErrors);
-    lenient()
-        .when(
-            engine.analyze(
-                DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.SKIP))
-        .thenReturn(resultWithErrors);
+    doReturn(resultNoErrors).when(engine)
+        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
+    doReturn(resultWithErrors).when(engine)
+        .analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
+    doReturn(resultNoErrors).when(engine)
+        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.SKIP);
+    doReturn(resultWithErrors).when(engine)
+        .analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.SKIP);
 
     // create a service and verify is subscribed to the required event
     CobolTextDocumentService service = verifyServiceStart();
@@ -257,6 +244,21 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         communications,
         engine,
         broker,
+        diagnosticsWithErrors,
+        service,
+        INCORRECT_TEXT_EXAMPLE,
+        DOCUMENT_WITH_ERRORS_URI);
+
+    verifyDidChange(
+        communications,
+        engine,
+        diagnosticsNoErrors,
+        service,
+        TEXT_EXAMPLE,
+        UseCaseUtils.DOCUMENT_URI);
+    verifyDidChange(
+        communications,
+        engine,
         diagnosticsWithErrors,
         service,
         INCORRECT_TEXT_EXAMPLE,
@@ -349,7 +351,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   }
 
   private CobolTextDocumentService verifyServiceStart() {
-    CobolTextDocumentService service = getMockedTextDocumentService();
+    CobolTextDocumentService service = getMockedTextDocumentServiceUsingSameThread();
 
     verify(broker).subscribe(service);
     return service;
@@ -366,16 +368,32 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
     verify(communications).notifyThatLoadingInProgress(uri);
-    verify(engine, timeout(10000)).analyze(uri, textToAnalyse, CopybookProcessingMode.ENABLED);
-    verify(dataBus, timeout(10000))
+    verify(engine).analyze(uri, textToAnalyse, CopybookProcessingMode.ENABLED);
+    verify(dataBus)
         .postData(
             AnalysisFinishedEvent.builder()
                 .documentUri(uri)
                 .copybookUris(emptyList())
                 .copybookProcessingMode(CopybookProcessingMode.ENABLED)
                 .build());
-    verify(communications, timeout(10000)).cancelProgressNotification(uri);
-    verify(communications, timeout(10000)).publishDiagnostics(diagnostics);
+    verify(communications).cancelProgressNotification(uri);
+    verify(communications).publishDiagnostics(diagnostics);
+  }
+
+  // We don't send anything in dataBus when didChange analysis finished
+  private void verifyDidChange(
+      Communications communications,
+      LanguageEngineFacade engine,
+      Map<String, List<Diagnostic>> diagnostics,
+      CobolTextDocumentService service,
+      String textToAnalyse,
+      String uri) {
+    int newVersion = 2;
+    service.didChange(
+        new DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier(uri, newVersion),
+            ImmutableList.of(new TextDocumentContentChangeEvent(textToAnalyse))));
+    verify(engine).analyze(uri, textToAnalyse, CopybookProcessingMode.SKIP);
+    verify(communications, times(2)).publishDiagnostics(diagnostics);
   }
 
   private void verifyCallback(
@@ -385,8 +403,12 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
       String text,
       String uri) {
 
-    verify(engine, timeout(10000).times(2)).analyze(uri, text, CopybookProcessingMode.ENABLED);
-    verify(communications, times(2)).publishDiagnostics(diagnostics);
+    // for didOpen and after RunAnalysisEvent
+    verify(engine, times(2)).analyze(uri, text, CopybookProcessingMode.ENABLED);
+    // for didChange
+    verify(engine, times(1)).analyze(uri, text, CopybookProcessingMode.SKIP);
+    // all three above produces the same diagnostics
+    verify(communications, times(3)).publishDiagnostics(diagnostics);
   }
 
   /**
@@ -398,8 +420,9 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    */
   @Test
   void testImmediateClosingOfDocumentDoNotCauseNPE() {
+    service = getMockedTextDocumentServiceUsingSeparateThread();
 
-    doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.empty()))
+    lenient().doAnswer(new AnswersWithDelay(10000, invocation -> AnalysisResult.empty()))
         .when(engine)
         .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
 
@@ -459,7 +482,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         new DidOpenTextDocumentParams(
             new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
 
-    verify(broker, timeout(10000))
+    verify(broker)
         .postData(
             AnalysisFinishedEvent.builder()
                 .documentUri(UseCaseUtils.DOCUMENT_URI)
