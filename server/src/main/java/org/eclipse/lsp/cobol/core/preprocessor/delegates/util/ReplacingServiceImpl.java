@@ -51,7 +51,7 @@ public class ReplacingServiceImpl implements ReplacingService {
   private static final String SEPARATE_TOKEN_PATTERN = "(?<=[\\.\\s\\r\\n])%s(?=[\\.\\s\\r\\n])";
 
   private static final Pattern LEAD_OR_TRAIL_CLAUSE =
-      Pattern.compile("\\s*(LEADING| TRAILING).*", Pattern.CASE_INSENSITIVE);
+      Pattern.compile("\\s*(LEADING|TRAILING).*", Pattern.CASE_INSENSITIVE);
 
   private static final Pattern FUNCTION_IDENTIFIER =
       Pattern.compile("\\s*function\\s+\\w+\\([^)]*+\\)", Pattern.CASE_INSENSITIVE);
@@ -220,9 +220,8 @@ public class ReplacingServiceImpl implements ReplacingService {
     SearchPattern searchPattern = SearchPattern.EXACT;
     Matcher matcher = LEAD_OR_TRAIL_CLAUSE.matcher(clause);
     if (matcher.matches()) {
-      if (matcher.group(1).trim().equalsIgnoreCase("LEADING"))
-        searchPattern = SearchPattern.STARTS_WITH;
-      else if (matcher.group(1).trim().equalsIgnoreCase("TRAILING"))
+      if (matcher.group(1).equalsIgnoreCase("LEADING")) searchPattern = SearchPattern.STARTS_WITH;
+      else if (matcher.group(1).equalsIgnoreCase("TRAILING"))
         searchPattern = SearchPattern.ENDS_WITH;
       clause = matcher.group(0).replace(matcher.group(1), "");
     }

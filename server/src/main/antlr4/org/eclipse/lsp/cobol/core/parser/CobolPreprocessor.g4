@@ -11,7 +11,7 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((compilerOptions | copyStatement | includeStatement | replaceArea )+ .*?)* EOF
+   : .*? ((compilerOptions | copyStatement | includeStatement | replaceAreaStart | replaceOffStatement )+ .*?)* EOF
    ;
 
 // compiler options
@@ -166,16 +166,12 @@ replacingPhrase
    : REPLACING replaceClause+
    ;
 
-replaceArea
-   : replaceByStatement (copyStatement | charData)* replaceOffStatement?
-   ;
-
-replaceByStatement
-   : REPLACE (replaceClause)+ DOT
+replaceAreaStart
+   : REPLACE (replacePseudoText)+ DOT_FS
    ;
 
 replaceOffStatement
-   : REPLACE OFF DOT
+   : REPLACE OFF DOT_FS
    ;
 
 replaceClause
@@ -200,14 +196,6 @@ pseudoReplacement
    : (openingPseudoTextDelimiter ~DOUBLEEQUALCHAR*? closingPseudoTextDelimiter) | EMPTYPSEUDOTEXT
    ;
 
-directoryPhrase
-   : (OF | IN) (literal | cobolWord)
-   ;
-
-familyPhrase
-   : ON (literal | cobolWord)
-   ;
-
 replaceable
    : literal | cobolWord | charDataLine | functionCall
    ;
@@ -226,10 +214,6 @@ argument
 
 replacement
    : literal | cobolWord | charDataLine | functionCall
-   ;
-
-charData
-   : charDataLine
    ;
 
 charDataLine

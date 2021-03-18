@@ -85,7 +85,8 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
       @NonNull String documentUri,
       @NonNull String cobolSourceCode,
       CopybookProcessingMode copybookProcessingMode) {
-    return process(documentUri, cobolSourceCode, new ArrayDeque<>(), copybookProcessingMode, new ArrayDeque<>());
+    return process(documentUri, cobolSourceCode, new ArrayDeque<>(), copybookProcessingMode, new ArrayDeque<>(),
+            new ArrayList<>());
   }
 
   /**
@@ -106,7 +107,8 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
       @NonNull String cobolCode,
       @NonNull Deque<CopybookUsage> copybookStack,
       @NonNull CopybookProcessingMode copybookProcessingMode,
-      @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack) {
+      @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
+      @NonNull List<Pair<String, String>> replacingClauses) {
     List<SyntaxError> errors = new ArrayList<>();
 
     List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
@@ -117,7 +119,8 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
 
     ExtendedDocument parsedDocument =
         grammarPreprocessor
-            .buildExtendedDocument(documentUri, code, copybookStack, copybookProcessingMode, recursiveReplaceStmtStack)
+            .buildExtendedDocument(documentUri, code, copybookStack, copybookProcessingMode,
+                    recursiveReplaceStmtStack, replacingClauses)
             .unwrap(errors::addAll);
 
     return new ResultWithErrors<>(parsedDocument, errors);
