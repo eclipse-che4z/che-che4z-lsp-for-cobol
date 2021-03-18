@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
+import org.eclipse.lsp.cobol.service.utils.TestThreadPoolExecutor;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -40,8 +41,28 @@ public class MockTextDocumentService {
   @Mock protected Occurrences occurrences;
   @Mock protected Formations formations;
 
-  /** Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing. */
-  protected CobolTextDocumentService getMockedTextDocumentService() {
+  /**
+   * Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing.
+   * All tasks run synchronously.
+   */
+  protected CobolTextDocumentService getMockedTextDocumentServiceUsingSameThread() {
+    return CobolTextDocumentService.builder()
+        .communications(communications)
+        .engine(engine)
+        .dataBus(broker)
+        .completions(completions)
+        .actions(actions)
+        .occurrences(occurrences)
+        .formations(formations)
+        .executors(new TestThreadPoolExecutor())
+        .build();
+  }
+
+  /**
+   * Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing.
+   * Tasks run in the separate thread.
+   */
+  protected CobolTextDocumentService getMockedTextDocumentServiceUsingSeparateThread() {
     return CobolTextDocumentService.builder()
         .communications(communications)
         .engine(engine)

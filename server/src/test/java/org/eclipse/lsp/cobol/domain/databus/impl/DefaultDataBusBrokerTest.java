@@ -20,16 +20,10 @@ import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.api.DeadEventSubscriber;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
+import org.eclipse.lsp.cobol.service.utils.TestThreadPoolExecutor;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.concurrent.AbstractExecutorService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test {@link DefaultDataBusBroker}
@@ -40,7 +34,7 @@ class DefaultDataBusBrokerTest {
     AnalysisFinishedEventSubscriber analysisFinishedEventSubscriber = new AnalysisFinishedEventSubscriber();
     RunAnalysisEventSubscriber runAnalysisEventSubscriber = new RunAnalysisEventSubscriber();
     DeadSubscriber deadSubscriber = new DeadSubscriber();
-    DataBusBroker dataBus = new DefaultDataBusBroker(customThreadPoolExecutor, deadSubscriber);
+    DataBusBroker dataBus = new DefaultDataBusBroker(new TestThreadPoolExecutor(), deadSubscriber);
     dataBus.subscribe(analysisFinishedEventSubscriber);
     dataBus.subscribe(runAnalysisEventSubscriber);
     dataBus.postData(new AnalysisFinishedEvent());
@@ -54,7 +48,7 @@ class DefaultDataBusBrokerTest {
   @Test
   void testDeadSubscriber() {
     DeadSubscriber deadSubscriber = new DeadSubscriber();
-    DataBusBroker dataBus = new DefaultDataBusBroker(customThreadPoolExecutor, deadSubscriber);
+    DataBusBroker dataBus = new DefaultDataBusBroker(new TestThreadPoolExecutor(), deadSubscriber);
     dataBus.postData(new RunAnalysisEvent());
     assertEquals(1, deadSubscriber.hits);
   }
@@ -63,7 +57,7 @@ class DefaultDataBusBrokerTest {
   void testUnsubscribe() {
     RunAnalysisEventSubscriber runAnalysisEventSubscriber = new RunAnalysisEventSubscriber();
     DeadSubscriber deadSubscriber = new DeadSubscriber();
-    DataBusBroker dataBus = new DefaultDataBusBroker(customThreadPoolExecutor, deadSubscriber);
+    DataBusBroker dataBus = new DefaultDataBusBroker(new TestThreadPoolExecutor(), deadSubscriber);
     dataBus.subscribe(runAnalysisEventSubscriber);
     dataBus.postData(new RunAnalysisEvent());
     assertEquals(1, runAnalysisEventSubscriber.hits);
@@ -73,49 +67,6 @@ class DefaultDataBusBrokerTest {
     assertEquals(1, runAnalysisEventSubscriber.hits);
     assertEquals(1, deadSubscriber.hits);
   }
-
-  // This executor runs everything in the same thread
-  private CustomThreadPoolExecutor customThreadPoolExecutor = new CustomThreadPoolExecutor() {
-    @Override
-    public ExecutorService getThreadPoolExecutor() {
-      return new AbstractExecutorService() {
-        @Override
-        public void shutdown() {
-
-        }
-
-        @Override
-        public List<Runnable> shutdownNow() {
-          return null;
-        }
-
-        @Override
-        public boolean isShutdown() {
-          return false;
-        }
-
-        @Override
-        public boolean isTerminated() {
-          return false;
-        }
-
-        @Override
-        public boolean awaitTermination(long l, TimeUnit timeUnit) throws InterruptedException {
-          return false;
-        }
-
-        @Override
-        public void execute(Runnable runnable) {
-          runnable.run();
-        }
-      };
-    }
-
-    @Override
-    public ScheduledExecutorService getScheduledThreadPoolExecutor() {
-      return null;
-    }
-  };
 
   private static class AnalysisFinishedEventSubscriber {
     public int hits = 0;
