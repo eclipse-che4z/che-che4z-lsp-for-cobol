@@ -28,7 +28,6 @@ import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp4j.Position;
@@ -158,7 +157,7 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
     String content = applyReplacing(read(), replacingClauses);
     replacingClauses.clear();
     mergeAndUpdateTopTwoElement(
-        content + PreprocessorStringUtils.getMaskedTextPreservingNewLine(replaceOffStmt, " "));
+        content + replaceOffStmt);
   }
 
   private String applyReplacing(String rawContent, List<Pair<String, String>> replacePatterns) {

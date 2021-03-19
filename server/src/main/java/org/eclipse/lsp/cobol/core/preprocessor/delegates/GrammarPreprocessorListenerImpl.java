@@ -122,7 +122,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public ExtendedDocument getResult() {
     if (!replacingClauses.isEmpty()) {
       String replaceableStmt = peek().toString();
-      String content = handleReplace(replaceableStmt, "");
+      String content = handleReplace(replaceableStmt);
       mergeAndUpdateTopTwoElement(content);
     }
     nestedMappings.put(
@@ -273,11 +273,20 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     accumulateExcludedStatementShift(ctx.getSourceInterval());
   }
 
-  private String handleReplace(String replaceableStmt, String replaceOffStmt) {
-    String content = applyReplacing(replaceableStmt, replacingClauses);
-    return content
-        + PreprocessorStringUtils.getMaskedTextPreservingNewLine(
-            replaceOffStmt, ProcessingConstants.WS);
+  @Override
+  public void enterReplaceOffStatement(ReplaceOffStatementContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitReplaceOffStatement(ReplaceOffStatementContext ctx) {
+    replacingClauses.clear();
+    pop();
+    accumulateExcludedStatementShift(ctx.getSourceInterval());
+  }
+
+  private String handleReplace(String replaceableStmt) {
+    return applyReplacing(replaceableStmt, replacingClauses);
   }
 
   @Override
