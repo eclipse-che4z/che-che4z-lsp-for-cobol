@@ -33,6 +33,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.CopybookService;
@@ -45,9 +46,7 @@ import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
 import static java.util.UUID.randomUUID;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static org.antlr.v4.runtime.Lexer.HIDDEN;
 import static org.antlr.v4.runtime.Token.EOF;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
@@ -65,11 +64,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   private static final String HYPHEN = "-";
   private static final String UNDERSCORE = "_";
-  private static final String SYNTAX_ERROR_CHECK_COPYBOOK_NAME = "Syntax error by GrammarPreprocessorListenerImpl#checkCopybookName: ";
+  private static final String SYNTAX_ERROR_CHECK_COPYBOOK_NAME =
+      "Syntax error by GrammarPreprocessorListenerImpl#checkCopybookName: ";
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
   private final Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
-  private final List<Pair<String, String>> replacingClauses = new ArrayList<>();
+  private final List<Pair<String, String>> copyReplacingClauses = new ArrayList<>();
+  private final List<Pair<String, String>> replacingClauses;
   private final NamedSubContext copybooks = new NamedSubContext();
   private final Map<String, DocumentMapping> nestedMappings = new HashMap<>();
   private final Map<Integer, Integer> shifts = new HashMap<>();
@@ -93,6 +94,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       @Assisted Deque<CopybookUsage> copybookStack,
       @Assisted CopybookProcessingMode copybookProcessingMode,
       @Assisted Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
+      @Assisted List<Pair<String, String>> replacingClauses,
       TextPreprocessor preprocessor,
       CopybookService copybookService,
       ReplacingService replacingService,
@@ -107,16 +109,27 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     textAccumulator.push(new StringBuilder());
     this.messageService = messageService;
     this.recursiveReplaceStmtStack = recursiveReplaceStmtStack;
+    this.replacingClauses = replacingClauses;
+  }
+
+  @Override
+  public Deque<StringBuilder> getTextAccumulator() {
+    return textAccumulator;
   }
 
   @NonNull
   @Override
   public ExtendedDocument getResult() {
+    if (!replacingClauses.isEmpty()) {
+      String replaceableStmt = peek().toString();
+      String content = handleReplace(replaceableStmt, "");
+      mergeAndUpdateTopTwoElement(content);
+    }
     nestedMappings.put(
         documentUri,
         new DocumentMapping(
             tokens.getTokens().stream().map(toPosition()).collect(toList()), shifts));
-    return new ExtendedDocument(read(), copybooks, nestedMappings, copybookStatements);
+    return new ExtendedDocument(accumulate(), copybooks, nestedMappings, copybookStatements);
   }
 
   @Override
@@ -130,20 +143,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     // throw away COMPILER OPTIONS terminals
     pop();
     accumulateExcludedStatementShift(ctx.getSourceInterval());
-  }
-
-  @Override
-  public void enterReplaceArea(@NonNull ReplaceAreaContext ctx) {
-    push();
-  }
-
-  @Override
-  public void exitReplaceArea(@NonNull ReplaceAreaContext ctx) {
-    String content = applyReplacing(read(), replacingClauses);
-    replacingClauses.clear();
-
-    pop();
-    write(content);
   }
 
   @Override
@@ -184,11 +183,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     String copybookId = randomUUID().toString();
     // In a chain of copy statement, there could be only one replacing phrase
 
-    if (!replacingClauses.isEmpty()) recursiveReplaceStmtStack.add(replacingClauses);
+    if (!copyReplacingClauses.isEmpty()) recursiveReplaceStmtStack.add(copyReplacingClauses);
     if (!recursiveReplaceStmtStack.isEmpty()) {
       for (List<Pair<String, String>> clause : recursiveReplaceStmtStack)
         content = applyReplacing(content, clause);
     }
+
     checkRecursiveReplaceStatement(recursiveReplaceStmtStack.size(), copybookName, locality);
 
     ExtendedDocument copybookDocument =
@@ -214,7 +214,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
           locality,
           ERROR,
           "GrammarPreprocessorListener.copyBkNestedReplaceStmt",
-              SYNTAX_ERROR_CHECK_COPYBOOK_NAME);
+          SYNTAX_ERROR_CHECK_COPYBOOK_NAME);
   }
 
   @Override
@@ -224,7 +224,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   @Override
   public void exitReplaceLiteral(ReplaceLiteralContext ctx) {
-    replacingClauses.add(replacingService.retrieveTokenReplacingPattern(read()));
+    copyReplacingClauses.add(replacingService.retrieveTokenReplacingPattern(read()));
     pop();
   }
 
@@ -238,8 +238,11 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     @NonNull
     ResultWithErrors<Pair<String, String>> clauseResponse =
         replacingService.retrievePseudoTextReplacingPattern(read());
-    if (clauseResponse.getErrors().isEmpty()) replacingClauses.add(clauseResponse.getResult());
-    else {
+    if (clauseResponse.getErrors().isEmpty()) {
+      if (ctx.getParent() instanceof ReplaceClauseContext)
+        copyReplacingClauses.add(clauseResponse.getResult());
+      else replacingClauses.add(clauseResponse.getResult());
+    } else {
       clauseResponse
           .getErrors()
           .forEach(
@@ -260,29 +263,33 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
+  public void enterReplaceAreaStart(ReplaceAreaStartContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitReplaceAreaStart(ReplaceAreaStartContext ctx) {
+    pop();
+    accumulateExcludedStatementShift(ctx.getSourceInterval());
+  }
+
+  private String handleReplace(String replaceableStmt, String replaceOffStmt) {
+    String content = applyReplacing(replaceableStmt, replacingClauses);
+    return content
+        + PreprocessorStringUtils.getMaskedTextPreservingNewLine(
+            replaceOffStmt, ProcessingConstants.WS);
+  }
+
+  @Override
   public void visitTerminal(@NonNull TerminalNode node) {
     int tokPos = node.getSourceInterval().a;
-    write(retrieveHiddenTextToLeft(tokPos, tokens));
+    write(TokenUtils.retrieveHiddenTextToLeft(tokPos, tokens));
 
     if (node.getSymbol().getType() != EOF) {
       write(node.getText());
     } else {
-      write(retrieveHiddenTextToRight(tokPos, tokens));
+      write(TokenUtils.retrieveHiddenTextToRight(tokPos, tokens));
     }
-  }
-
-  private String retrieveHiddenTextToLeft(int tokPos, BufferedTokenStream tokens) {
-
-    return ofNullable(tokens.getHiddenTokensToLeft(tokPos, HIDDEN))
-        .map(it -> it.stream().map(Token::getText).collect(joining()))
-        .orElse("");
-  }
-
-  private String retrieveHiddenTextToRight(int tokPos, BufferedTokenStream tokens) {
-
-    return ofNullable(tokens.getHiddenTokensToRight(tokPos, HIDDEN))
-        .map(it -> it.stream().map(Token::getText).collect(joining()))
-        .orElse("");
   }
 
   private void accumulateCopybookShift(Interval sourceInterval) {
@@ -291,28 +298,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   private void accumulateExcludedStatementShift(Interval sourceInterval) {
     shifts.put(sourceInterval.a - 1, sourceInterval.b - sourceInterval.a + 2);
-  }
-
-  @NonNull
-  private StringBuilder peek() {
-    return ofNullable(textAccumulator.peek())
-        .orElseThrow(() -> new IllegalStateException("Document structure corrupted"));
-  }
-
-  private void pop() {
-    textAccumulator.pop();
-  }
-
-  private void push() {
-    textAccumulator.push(new StringBuilder());
-  }
-
-  private void write(@NonNull String text) {
-    peek().append(text);
-  }
-
-  private String read() {
-    return peek().toString();
   }
 
   private void collectCopybookStatement(String copybookId, Locality locality) {
@@ -373,7 +358,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     copybookStack.push(new CopybookUsage(copybookName, copybookId, locality));
     ExtendedDocument result =
         preprocessor
-            .process(uri, content, copybookStack, copybookProcessingMode, recursiveReplaceStmtStack)
+            .process(
+                uri,
+                content,
+                copybookStack,
+                copybookProcessingMode,
+                recursiveReplaceStmtStack,
+                replacingClauses)
             .unwrap(errors::addAll);
     copybookStack.pop();
     if (Objects.nonNull(recursiveReplaceStmtStack.peek())) recursiveReplaceStmtStack.pop();
@@ -492,7 +483,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
           locality,
           INFO,
           "GrammarPreprocessorListener.copyBkOver8Chars",
-              SYNTAX_ERROR_CHECK_COPYBOOK_NAME);
+          SYNTAX_ERROR_CHECK_COPYBOOK_NAME);
     }
     // The first or last character must not be a hyphen.
     if (copybookName.startsWith(HYPHEN) || copybookName.endsWith(HYPHEN)) {
@@ -501,7 +492,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
           locality,
           ERROR,
           "GrammarPreprocessorListener.copyBkStartsOrEndsWithHyphen",
-              SYNTAX_ERROR_CHECK_COPYBOOK_NAME);
+          SYNTAX_ERROR_CHECK_COPYBOOK_NAME);
     }
 
     // copybook Name can't contain _
@@ -511,7 +502,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
           locality,
           ERROR,
           "GrammarPreprocessorListener.copyBkContainsUnderScore",
-              SYNTAX_ERROR_CHECK_COPYBOOK_NAME);
+          SYNTAX_ERROR_CHECK_COPYBOOK_NAME);
   }
 
   private void addCopybookError(

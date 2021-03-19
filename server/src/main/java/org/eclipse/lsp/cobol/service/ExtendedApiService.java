@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.service;
 
 import com.google.gson.JsonObject;
 import lombok.NonNull;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 
@@ -35,5 +34,5 @@ public interface ExtendedApiService {
    * @return Future object with retrieved analysis result
   */
   @JsonRequest
-  CompletableFuture<AnalysisResult> analysis(@NonNull JsonObject json);
+  CompletableFuture<ExtendedApiResult> analysis(@NonNull JsonObject json);
 }
