@@ -39,7 +39,7 @@ If you are using VS Code, you can reload the window. Go to `View > Command Palet
 Beside the workpsace loading, also we need to mount the `test` folder in order to run `TC318696`. 
   #### Run Theia in docker:
 
-  <code>sudo docker run -it --rm -p 3000:3000 -v /home/$USER/$project/plugins/:/home/theia/plugins -v /home/$USER/che-che4z-lsp-for-cobol/tests/test_files/project/:/home/project -v /home/$USER/che-che4z-lsp-for-cobol/tests/test_files/test:/home/test --name theia theiaide/theia-{java or full}:1.5.0</code>
+  <code>sudo docker run -it --rm -p 3000:3000 -v /home/$USER/$project/plugins/:/home/theia/plugins -v /home/$USER/che-che4z-lsp-for-cobol/tests/test_files/project/:/home/project -v /home/$USER/che-che4z-lsp-for-cobol/tests/test_files/test:/home/test --name theia theiaide/theia-{java or full}:1.5.0 -v  /home/$USER/che-che4z-lsp-for-cobol/tests/test_files/zowe:/home/theia/.zowe </code>
 
   OR
 
