@@ -37,7 +37,7 @@ public class CobolLine implements Iterable<CobolLine> {
   private String commentArea = "";
   private String contentAreaA = "";
   private String contentAreaB = "";
-  private String indicatorArea = " ";
+  private String indicatorArea = "";
   private int number;
   private CobolLine predecessor;
   private String sequenceArea = "";

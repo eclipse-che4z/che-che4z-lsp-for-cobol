@@ -69,14 +69,14 @@ class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
   @Test
   void testTooShortString() {
     ResultWithErrors<List<CobolLine>> processed = processText("abc");
-    assertThat(processed.getResult().get(0), hasToString("abc "));
+    assertThat(processed.getResult().get(0), hasToString("abc"));
     assertThat(processed.getErrors(), hasSize(0));
   }
 
   @Test
   void testOneSpace() {
     ResultWithErrors<List<CobolLine>> processed = processText(" ");
-    assertThat(processed.getResult().get(0), hasToString("  "));
+    assertThat(processed.getResult().get(0), hasToString(" "));
     assertThat(processed.getErrors(), hasSize(0));
   }
 
@@ -111,7 +111,7 @@ class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
     ResultWithErrors<List<CobolLine>> processed = processText(reduceLines(lines));
 
     assertThat(processed.getResult().size(), is(3));
-    assertThat(processed.getResult().get(1), hasToString(" "));
+    assertThat(processed.getResult().get(1), hasToString(""));
 
     assertThat(processed.getErrors(), hasSize(0));
   }

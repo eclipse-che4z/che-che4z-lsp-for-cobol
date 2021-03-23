@@ -14,10 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.CobolLineUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +60,9 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
     final CobolLine result;
 
     switch (line.getType()) {
+      case PREPROCESSED:
+        result = line;
+        break;
       case CONTINUATION:
         result = processContinuationLine(line, conditionalRightTrimmedContentArea);
         break;
