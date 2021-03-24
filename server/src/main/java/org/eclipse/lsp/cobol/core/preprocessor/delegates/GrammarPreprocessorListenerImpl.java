@@ -183,7 +183,10 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     String copybookId = randomUUID().toString();
     // In a chain of copy statement, there could be only one replacing phrase
 
-    if (!copyReplacingClauses.isEmpty()) recursiveReplaceStmtStack.add(copyReplacingClauses);
+    if (!copyReplacingClauses.isEmpty()) {
+      recursiveReplaceStmtStack.add(new ArrayList<>(copyReplacingClauses));
+      copyReplacingClauses.clear();
+    }
     if (!recursiveReplaceStmtStack.isEmpty()) {
       for (List<Pair<String, String>> clause : recursiveReplaceStmtStack)
         content = applyReplacing(content, clause);
