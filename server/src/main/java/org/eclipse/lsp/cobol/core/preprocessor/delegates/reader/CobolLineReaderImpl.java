@@ -49,7 +49,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
       Pattern.compile(
           "^(?<sequence>.{0,6})(?<indicator>.?)(?<contentA>.{0,4})(?<contentB>.{0,61})(?<comment>.{0,8})(?<extra>.*)$");
   private static final Pattern COMPILER_DIRECTIVE_LINE =
-      Pattern.compile("(?i)(.{0,6} +|\\s*)(CBL|PROCESS) .+");
+      Pattern.compile("(?i)(.{0,6} +|\\s*+)(?<directives>(CBL|PROCESS) .+)");
   private static final Map<String, CobolLineTypeEnum> INDICATORS =
       new ImmutableMap.Builder<String, CobolLineTypeEnum>()
           .put("*", COMMENT)
@@ -101,11 +101,13 @@ public class CobolLineReaderImpl implements CobolLineReader {
     List<SyntaxError> errors = new ArrayList<>();
     CobolLine cobolLine;
 
-    Matcher matcher = COBOL_LINE_PATTERN.matcher(line);
-    if (COMPILER_DIRECTIVE_LINE.matcher(line).matches()) {
-      cobolLine = processCompilerDirectives(line, uri, lineNumber).unwrap(errors::addAll);
-    } else if (matcher.matches()) {
-      cobolLine = processNormalLine(line, uri, lineNumber, matcher).unwrap(errors::addAll);
+    Matcher usualLine = COBOL_LINE_PATTERN.matcher(line);
+    Matcher directivesLine = COMPILER_DIRECTIVE_LINE.matcher(line);
+    if (directivesLine.matches()) {
+      cobolLine =
+          processCompilerDirectives(line, uri, lineNumber, directivesLine).unwrap(errors::addAll);
+    } else if (usualLine.matches()) {
+      cobolLine = processNormalLine(line, uri, lineNumber, usualLine).unwrap(errors::addAll);
     } else {
       // It is impossible. Pattern must match any line.
       LOG.error("The line '{}' can't be parsed.", line);
@@ -118,13 +120,14 @@ public class CobolLineReaderImpl implements CobolLineReader {
   }
 
   private ResultWithErrors<CobolLine> processCompilerDirectives(
-      @NonNull String line, @NonNull String uri, int lineNumber) {
+      @NonNull String line, @NonNull String uri, int lineNumber, @NonNull Matcher matcher) {
     List<SyntaxError> errors = new ArrayList<>();
-    int contentStart = getLineContentStart(line);
+    int contentStart = matcher.start("directives");
+    String directives = matcher.group("directives");
     checkSequenceArea(line, uri, lineNumber, contentStart).ifPresent(errors::add);
     checkLineLength(line, uri, lineNumber).ifPresent(errors::add);
     CobolLine cobolLine = new CobolLine();
-    cobolLine.setContentAreaA(cleanupString(line, contentStart));
+    cobolLine.setContentAreaA(cleanupString(directives, contentStart));
     cobolLine.setType(PREPROCESSED);
     return new ResultWithErrors<>(cobolLine, errors);
   }
@@ -146,8 +149,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
   }
 
   private String cleanupString(@NonNull String line, int contentStart) {
-    String lineWithoutSequence =
-        StringUtils.repeat(' ', contentStart) + line.substring(contentStart);
+    String lineWithoutSequence = StringUtils.repeat(' ', contentStart) + line;
     return lineWithoutSequence.length() > 72
         ? lineWithoutSequence.substring(0, 72)
         : lineWithoutSequence;
@@ -204,13 +206,6 @@ public class CobolLineReaderImpl implements CobolLineReader {
     return contentStart < ProcessingConstants.INDICATOR_AREA
         || StringUtils.isBlank(line.substring(0, contentStart))
         || Character.isDigit(line.charAt(0));
-  }
-
-  private int getLineContentStart(String line) {
-    int cbl = line.toUpperCase().indexOf("CBL");
-    int process = line.toUpperCase().indexOf("PROCESS");
-    int max = Math.max(cbl, process);
-    return max == -1 ? 0 : max;
   }
 
   /**

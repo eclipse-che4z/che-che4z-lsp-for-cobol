@@ -34,10 +34,8 @@ import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.WS;
 public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
 
   private static final String EMPTY_STRING = "";
-  private static final String DOUBLE_QUOTE_LITERAL = "\"([^\"]|\"\"|'')*\"";
-  private static final String SINGLE_QUOTE_LITERAL = "'([^']|''|\"\")*'";
-  private static final String LEADING_WHITESPACE = "^\\s+";
-  private static final String TRAILING_WHITESPACE = "\\s+$";
+  private static final String DOUBLE_QUOTE_LITERAL = "\"([^\"]|\"\"|'')*+\"";
+  private static final String SINGLE_QUOTE_LITERAL = "'([^']|''|\"\")*+'";
 
   /**
    * Normalizes the lines by stripping the sequence number and line indicator, and interpreting the
@@ -206,10 +204,10 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
   }
 
   private String trimLeadingWhitespace(final String contentArea) {
-    return contentArea.replaceAll(LEADING_WHITESPACE, EMPTY_STRING);
+    return StringUtils.stripStart(contentArea, " ");
   }
 
   private String trimTrailingWhitespace(final String contentArea) {
-    return contentArea.replaceAll(TRAILING_WHITESPACE, EMPTY_STRING);
+    return StringUtils.stripEnd(contentArea, " ");
   }
 }
