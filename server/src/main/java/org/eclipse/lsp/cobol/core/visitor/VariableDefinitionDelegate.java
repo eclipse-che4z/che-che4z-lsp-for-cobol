@@ -86,7 +86,7 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link DataDescriptionEntryFormat1Context} to retrieve the variable
    */
-  void defineVariable(@NonNull DataDescriptionEntryFormat1Context ctx) {
+  public void defineVariable(@NonNull DataDescriptionEntryFormat1Context ctx) {
     // TODO: add support for the REDEFINES clause:
     // TODO: 1. redefined variable defined
     // TODO: 2. add variable usage for REDEFINES
@@ -142,7 +142,7 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link DataDescriptionEntryFormat1Level77Context} to retrieve the variable
    */
-  void defineVariable(@NonNull DataDescriptionEntryFormat1Level77Context ctx) {
+  public void defineVariable(@NonNull DataDescriptionEntryFormat1Level77Context ctx) {
     VariableDefinitionContext variableDefinitionContext =
         VariableDefinitionContext.builder()
             .number(LEVEL_77)
@@ -175,7 +175,7 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link DataDescriptionEntryFormat2Context} to retrieve the variable
    */
-  void defineVariable(@NonNull DataDescriptionEntryFormat2Context ctx) {
+  public void defineVariable(@NonNull DataDescriptionEntryFormat2Context ctx) {
     VariableDefinitionContext variableDefinitionContext =
         VariableDefinitionContext.builder()
             .number(LEVEL_66)
@@ -200,7 +200,7 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link DataDescriptionEntryFormat3Context} to retrieve the variable
    */
-  void defineVariable(@NonNull DataDescriptionEntryFormat3Context ctx) {
+  public void defineVariable(@NonNull DataDescriptionEntryFormat3Context ctx) {
     VariableDefinitionContext variableDefinitionContext =
         VariableDefinitionContext.builder()
             .number(LEVEL_88)
@@ -226,7 +226,7 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link EnvironmentSwitchNameClauseContext} to retrieve the variable
    */
-  void defineVariable(EnvironmentSwitchNameClauseContext ctx) {
+  public void defineVariable(EnvironmentSwitchNameClauseContext ctx) {
     String name = retrieveName(ctx.mnemonicName());
     String systemName = ctx.environmentName().getText();
     variables.push(
@@ -241,7 +241,7 @@ public class VariableDefinitionDelegate {
    * Notify the variable delegate that the processing moved to another section in order to track the
    * structure correctness
    */
-  void notifySectionChanged() {
+  public void notifySectionChanged() {
     closePreviousStructure();
   }
 
@@ -251,7 +251,7 @@ public class VariableDefinitionDelegate {
    * @return the defined variables and found errors
    */
   @NonNull
-  ResultWithErrors<Collection<Variable>> finishDefinitionAnalysis() {
+  public ResultWithErrors<Collection<Variable>> finishDefinitionAnalysis() {
     closePreviousStructure();
     return new ResultWithErrors<>(new ArrayList<>(variables), new ArrayList<>(errors));
   }
