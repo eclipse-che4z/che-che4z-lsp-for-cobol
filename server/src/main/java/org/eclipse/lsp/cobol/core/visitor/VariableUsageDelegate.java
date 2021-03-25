@@ -40,7 +40,7 @@ import static java.util.stream.Collectors.toMap;
  */
 @Slf4j
 @RequiredArgsConstructor
-class VariableUsageDelegate {
+public class VariableUsageDelegate {
   private final List<VariableUsage> variableUsages = new ArrayList<>();
   private final Map<Token, Locality> positionMapping;
   private final MessageService messageService;
@@ -52,7 +52,7 @@ class VariableUsageDelegate {
    * @param locality the variable text position
    * @param ctx the ANTLR variable context
    */
-  void handleDataName(String dataName, Locality locality, QualifiedDataNameFormat1Context ctx) {
+  public void handleDataName(String dataName, Locality locality, QualifiedDataNameFormat1Context ctx) {
     List<QualifiedInDataContext> hierarchy = ctx.qualifiedInData();
     List<String> parents = createPatentsList(hierarchy.stream().map(this::getDataName2Context).collect(toList()));
     Map<String, Token> parentVariables = collectParentVariablesFromDataAndTable(hierarchy);
@@ -66,7 +66,7 @@ class VariableUsageDelegate {
    * @param locality the variable text position
    * @param ctx the ANTLR variable context
    */
-  void handleConditionCall(String dataName, Locality locality, ConditionNameReferenceContext ctx) {
+  public void handleConditionCall(String dataName, Locality locality, ConditionNameReferenceContext ctx) {
     List<DataName2Context> hierarchy = ctx.inData().stream().map(InDataContext::dataName2).collect(toList());
     List<String> parents = createPatentsList(hierarchy);
     Map<String, Token> parentVariables = collectParentVariablesFromInData(hierarchy);
@@ -79,7 +79,7 @@ class VariableUsageDelegate {
    * @param dataName the variable name
    * @param locality the variable text position
    */
-  void handleTableCall(String dataName, Locality locality) {
+  public void handleTableCall(String dataName, Locality locality) {
     variableUsages.add(new VariableUsage(dataName, Collections.emptyList(), locality, Collections.emptyMap()));
   }
 
@@ -89,7 +89,7 @@ class VariableUsageDelegate {
    * @param definedVariables the collection of COBOL variables
    * @return the list of usage errors
    */
-  List<SyntaxError> updateUsageAndGenerateErrors(Collection<Variable> definedVariables) {
+  public List<SyntaxError> updateUsageAndGenerateErrors(Collection<Variable> definedVariables) {
     Map<String, List<Variable>> convertedVariables = VariableUsageUtils.convertDefinedVariables(definedVariables);
     List<SyntaxError> errors = new ArrayList<>();
     for (VariableUsage variableUsage : variableUsages) {

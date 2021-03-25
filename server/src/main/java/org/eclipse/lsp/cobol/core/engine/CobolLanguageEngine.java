@@ -32,6 +32,7 @@ import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
@@ -125,8 +126,9 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
             positionMapping,
             messageService,
             subroutineService);
-    visitor.visit(tree);
-
+    Node rootNode = visitor.visit(tree).get(0);
+    SyntaxTreeEngine syntaxTreeEngine = new SyntaxTreeEngine(rootNode, positionMapping, messageService);
+    accumulatedErrors.addAll(syntaxTreeEngine.processTree());
     SemanticContext context = visitor.finishAnalysis().unwrap(accumulatedErrors::addAll);
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
     accumulatedErrors.addAll(
