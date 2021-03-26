@@ -68,10 +68,7 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 @Singleton
 public class CobolTextDocumentService
-    implements TextDocumentService,
-        DisposableService,
-        ExtendedApiService {
-  private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
+    implements TextDocumentService, DisposableService, ExtendedApiService {
   private static final String GIT_FS_URI = "gitfs:/";
   private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
   private final Map<String, CobolDocumentModel> docs = new ConcurrentHashMap<>();
@@ -206,7 +203,8 @@ public class CobolTextDocumentService
     }
 
     String text = params.getTextDocument().getText();
-    registerEngineAndAnalyze(uri, text);
+    communications.notifyThatLoadingInProgress(uri);
+    analyzeDocumentFirstTime(uri, text, false);
   }
 
   @Override
@@ -215,11 +213,8 @@ public class CobolTextDocumentService
     String uri = params.getTextDocument().getUri();
     outlineMap.put(uri, new CompletableFuture<>());
     String text = params.getContentChanges().get(0).getText();
-    String fileExtension = extractExtension(uri);
-    if (fileExtension != null && isCobolFile(fileExtension)) {
-      interruptAnalysis(uri);
-      analyzeChanges(uri, text);
-    }
+    interruptAnalysis(uri);
+    analyzeChanges(uri, text);
   }
 
   @Override
@@ -267,43 +262,19 @@ public class CobolTextDocumentService
             () ->
                 Optional.ofNullable(docs.get(uri))
                     .map(CobolDocumentModel::getAnalysisResult)
-                    .map(ar -> new ExtendedApiResult(ar.getParagraphDefinitions(),
-                        ar.getParagraphUsages(),
-                        ar.getParagraphRange(),
-                        ar.getSectionDefinitions(),
-                        ar.getSectionUsages(),
-                        ar.getSectionRange()))
+                    .map(
+                        ar ->
+                            new ExtendedApiResult(
+                                ar.getParagraphDefinitions(),
+                                ar.getParagraphUsages(),
+                                ar.getParagraphRange(),
+                                ar.getSectionDefinitions(),
+                                ar.getSectionUsages(),
+                                ar.getSectionRange()))
                     .orElse(null),
             executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("analysis retrieving", uri)));
-  }
-
-  private void registerEngineAndAnalyze(String uri, String text) {
-    String fileExtension = extractExtension(uri);
-    if (fileExtension != null && !isCobolFile(fileExtension)) {
-      outlineMap.computeIfPresent(
-          uri,
-          (k, v) -> {
-            v.complete(Collections.singletonList(new DocumentSymbol()));
-            return v;
-          });
-      communications.notifyThatExtensionIsUnsupported(fileExtension);
-    } else {
-      communications.notifyThatLoadingInProgress(uri);
-      analyzeDocumentFirstTime(uri, text, false);
-    }
-  }
-
-  private boolean isCobolFile(String identifier) {
-    return COBOL_IDS.contains(identifier.toLowerCase());
-  }
-
-  private String extractExtension(String uri) {
-    return ofNullable(uri)
-        .filter(it -> it.indexOf('.') > -1)
-        .map(it -> it.substring(it.lastIndexOf('.') + 1))
-        .orElse(null);
   }
 
   private void clearAnalysedFutureObject(String uri) {
