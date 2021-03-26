@@ -20,7 +20,6 @@ import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.matches;
@@ -31,10 +30,7 @@ public abstract class AbstractCobolLinePreprocessorTest {
 
   protected ResultWithErrors<List<CobolLine>> processText(String text) {
     MessageService mockMessageService = mock(MessageService.class);
-    CobolLineReader reader =
-        new CobolLineReaderImpl(
-            (line, uri, lineNumber) -> new ResultWithErrors<>(line, Collections.emptyList()),
-            mockMessageService);
+    CobolLineReader reader = new CobolLineReaderImpl(mockMessageService);
     when(mockMessageService.getMessage(matches("CobolLineReaderImpl.incorrectLineFormat")))
         .thenReturn("Unexpected indicator area content");
     when(mockMessageService.getMessage(matches("CobolLineReaderImpl.longLineMsg")))

@@ -14,10 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.CobolLineUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +34,8 @@ import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.WS;
 public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
 
   private static final String EMPTY_STRING = "";
-  private static final String DOUBLE_QUOTE_LITERAL = "\"([^\"]|\"\"|'')*\"";
-  private static final String SINGLE_QUOTE_LITERAL = "'([^']|''|\"\")*'";
-  private static final String LEADING_WHITESPACE = "^\\s+";
-  private static final String TRAILING_WHITESPACE = "\\s+$";
+  private static final String DOUBLE_QUOTE_LITERAL = "\"([^\"]|\"\"|'')*+\"";
+  private static final String SINGLE_QUOTE_LITERAL = "'([^']|''|\"\")*+'";
 
   /**
    * Normalizes the lines by stripping the sequence number and line indicator, and interpreting the
@@ -60,6 +58,9 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
     final CobolLine result;
 
     switch (line.getType()) {
+      case PREPROCESSED:
+        result = line;
+        break;
       case CONTINUATION:
         result = processContinuationLine(line, conditionalRightTrimmedContentArea);
         break;
@@ -203,10 +204,10 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
   }
 
   private String trimLeadingWhitespace(final String contentArea) {
-    return contentArea.replaceAll(LEADING_WHITESPACE, EMPTY_STRING);
+    return StringUtils.stripStart(contentArea, " ");
   }
 
   private String trimTrailingWhitespace(final String contentArea) {
-    return contentArea.replaceAll(TRAILING_WHITESPACE, EMPTY_STRING);
+    return StringUtils.stripEnd(contentArea, " ");
   }
 }
