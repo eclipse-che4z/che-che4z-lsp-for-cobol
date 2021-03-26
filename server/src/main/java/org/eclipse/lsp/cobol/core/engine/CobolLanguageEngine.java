@@ -127,7 +127,7 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
             messageService,
             subroutineService);
     Node rootNode = visitor.visit(tree).get(0);
-    SyntaxTreeEngine syntaxTreeEngine = new SyntaxTreeEngine(rootNode, positionMapping, messageService);
+    SyntaxTreeEngine syntaxTreeEngine = new SyntaxTreeEngine(rootNode);
     accumulatedErrors.addAll(syntaxTreeEngine.processTree());
     SemanticContext context = visitor.finishAnalysis().unwrap(accumulatedErrors::addAll);
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));

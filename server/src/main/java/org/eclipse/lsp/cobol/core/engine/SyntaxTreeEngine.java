@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2021 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -14,16 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.engine;
 
-import org.antlr.v4.runtime.Token;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.*;
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
-import org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate;
-import org.eclipse.lsp.cobol.core.visitor.VariableUsageDelegate;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -31,13 +25,9 @@ import java.util.stream.Collectors;
  */
 public class SyntaxTreeEngine {
   private final Node rootNode;
-  private final Map<Token, Locality> positionMapping;
-  private final MessageService messageService;
 
-  public SyntaxTreeEngine(Node rootNode, Map<Token, Locality> positionMapping, MessageService messageService) {
+  public SyntaxTreeEngine(Node rootNode) {
     this.rootNode = rootNode;
-    this.positionMapping = positionMapping;
-    this.messageService = messageService;
   }
 
   /**
@@ -46,54 +36,10 @@ public class SyntaxTreeEngine {
    * @return the list of syntax errors.
    */
   public List<SyntaxError> processTree() {
+    rootNode.getDepthFirstStream().forEach(Node::process);
     return rootNode.getDepthFirstStream()
-        .filter(it -> it.getNodeType() == NodeType.PROGRAM)
-        .map(it -> processProgram((ProgramNode) it))
+        .map(Node::getErrors)
         .flatMap(List::stream)
         .collect(Collectors.toList());
-  }
-
-  private List<SyntaxError> processProgram(ProgramNode programNode) {
-    VariableDefinitionDelegate variablesDelegate = new VariableDefinitionDelegate(positionMapping, messageService);
-    VariableUsageDelegate variableUsageDelegate = new VariableUsageDelegate(positionMapping, messageService);
-    programNode.getDepthFirstStream()
-        .forEach(node -> {
-          if (node.getNodeType() == NodeType.SECTION) {
-            variablesDelegate.notifySectionChanged();
-          }
-          if (node.getNodeType() == NodeType.ANTLR_VARIABLE_DEFINITION) {
-            AntlrVariableDefinitionNode definitionNode = (AntlrVariableDefinitionNode) node;
-            Optional.ofNullable(definitionNode.getFormat1Context()).ifPresent(variablesDelegate::defineVariable);
-            Optional.ofNullable(definitionNode.getFormat1Level77Context()).ifPresent(variablesDelegate::defineVariable);
-            Optional.ofNullable(definitionNode.getFormat2Context()).ifPresent(variablesDelegate::defineVariable);
-            Optional.ofNullable(definitionNode.getFormat3Context()).ifPresent(variablesDelegate::defineVariable);
-            Optional.ofNullable(definitionNode.getSwitchNameClauseContext()).ifPresent(variablesDelegate::defineVariable);
-          }
-        });
-    programNode.getDepthFirstStream()
-        .filter(it -> it.getNodeType() == NodeType.VARIABLE_USAGE)
-        .forEach(node -> {
-          VariableUsageNode variableUsage = (VariableUsageNode) node;
-          switch (variableUsage.getVariableUsageType()) {
-            case DATA_NAME:
-              variableUsageDelegate.handleDataName(variableUsage.getDataName(), variableUsage.getLocality(),
-                  variableUsage.getDataNameFormat1Context());
-              break;
-            case TABLE_CALL:
-              variableUsageDelegate.handleTableCall(variableUsage.getDataName(), variableUsage.getLocality());
-              break;
-            case CONDITION_CALL:
-              variableUsageDelegate.handleConditionCall(variableUsage.getDataName(), variableUsage.getLocality(),
-                  variableUsage.getNameReferenceContext());
-              break;
-            default:
-              // No other variable usage types exist, this is unreachable, but just in case.
-              break;
-          }
-        });
-    List<SyntaxError> errors = new ArrayList<>();
-    Collection<Variable> definedVariables = variablesDelegate.finishDefinitionAnalysis().unwrap(errors::addAll);
-    errors.addAll(variableUsageDelegate.updateUsageAndGenerateErrors(definedVariables));
-    return errors;
   }
 }

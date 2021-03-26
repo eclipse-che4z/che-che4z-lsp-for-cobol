@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2021 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -24,4 +24,6 @@ public enum NodeType {
   VARIABLE_DEFINITION,
   VARIABLE_USAGE,
   ANTLR_VARIABLE_DEFINITION,
+  PROGRAM_ID,
+  PROGRAM_END,
 }

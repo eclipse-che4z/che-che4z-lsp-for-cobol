@@ -14,22 +14,23 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate;
 import org.eclipse.lsp4j.Location;
 
 /**
- * The class represents section context in COBOL.
+ * The class represents program ID.
  */
-public class SectionNode extends Node {
-  public SectionNode(Location location) {
-    super(location, NodeType.SECTION);
+public class ProgramIdNode extends Node {
+  private final String id;
+
+  public ProgramIdNode(Location location, String id) {
+    super(location, NodeType.PROGRAM_ID);
+    this.id = id;
   }
 
   @Override
   public void process() {
     getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
-        .map(ProgramNode::getVariableDefinitionDelegate)
-        .ifPresent(VariableDefinitionDelegate::notifySectionChanged);
+        .ifPresent(it -> it.setProgramName(id));
   }
 }

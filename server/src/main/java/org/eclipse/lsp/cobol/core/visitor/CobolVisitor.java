@@ -75,9 +75,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final PredefinedVariableContext constants = new PredefinedVariableContext();
   private final GroupContext groupContext = new GroupContext();
   private final Multimap<String, Location> subroutineUsages = HashMultimap.create();
-
-  private String programName = null;
-
   private final NamedSubContext copybooks;
   private final CommonTokenStream tokenStream;
   private final OutlineTreeBuilder outlineTreeBuilder;
@@ -173,16 +170,17 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitProgramIdParagraph(ProgramIdParagraphContext ctx) {
+    List<Node> result = new ArrayList<>();
     ofNullable(ctx.programName())
         .map(RuleContext::getText)
         .map(PreprocessorStringUtils::trimQuotes)
         .ifPresent(
             name -> {
-              programName = name;
+              result.add(new ProgramIdNode(getRange(ctx).orElse(null), name));
               outlineTreeBuilder.renameProgram(name, ctx);
               outlineTreeBuilder.addNode(PROGRAM_ID_PREFIX + name, NodeType.PROGRAM_ID, ctx);
             });
-    return visitChildren(ctx);
+    return result;
   }
 
   @Override
@@ -237,7 +235,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitProgramUnit(ProgramUnitContext ctx) {
     outlineTreeBuilder.addProgram(ctx);
-    Node program = new ProgramNode(getRange(ctx).orElse(null));
+    Node program = new ProgramNode(getRange(ctx).orElse(null), positionMapping, messageService);
     visitChildren(ctx).forEach(program::addChild);
     return ImmutableList.of(program);
   }
@@ -320,9 +318,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitEndProgramStatement(EndProgramStatementContext ctx) {
     Token endProgramNameToken = ctx.programName().getStart();
-    checkProgramName(endProgramNameToken);
+    String id = PreprocessorStringUtils.trimQuotes(endProgramNameToken.getText());
     areaAWarning(ctx.getStart());
-    return visitChildren(ctx);
+    return ImmutableList.of(new ProgramEndNode(getLocality(endProgramNameToken).orElse(null), id, messageService));
   }
 
   @Override
@@ -676,28 +674,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                             messageService.getMessage("CobolVisitor.AreaBWarningMsg"));
                       }
                     }));
-  }
-
-  private void checkProgramName(Token token) {
-    if (programName == null) {
-      getLocality(token)
-          .ifPresent(
-              it ->
-                  throwException("", it, messageService.getMessage("CobolVisitor.progIDIssueMsg")));
-    } else {
-      checkProgramNameIdentical(token);
-    }
-  }
-
-  private void checkProgramNameIdentical(Token token) {
-    String text = PreprocessorStringUtils.trimQuotes(token.getText());
-    if (!programName.equalsIgnoreCase(text)) {
-      getLocality(token)
-          .ifPresent(
-              it ->
-                  throwException(
-                      programName, it, messageService.getMessage("CobolVisitor.identicalProgMsg")));
-    }
   }
 
   // NOTE: CobolVisitor is not managed by Guice DI, so can't use annotation here.
