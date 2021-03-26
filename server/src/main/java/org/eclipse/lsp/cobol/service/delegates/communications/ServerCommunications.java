@@ -15,13 +15,13 @@
 
 package org.eclipse.lsp.cobol.service.delegates.communications;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
@@ -33,7 +33,6 @@ import java.util.function.Function;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp4j.MessageType.Error;
 import static org.eclipse.lsp4j.MessageType.Info;
 
 /**
@@ -100,19 +99,6 @@ public class ServerCommunications implements Communications {
                 Info,
                 messageService.getMessage(
                     "Communications.noSyntaxError", retrieveFileName(files.decodeURI(uri)))));
-  }
-
-  /**
-   * Show a message that the document with the given extension cannot be parsed.
-   *
-   * @param extension - the given document extension
-   */
-  @Override
-  public void notifyThatExtensionIsUnsupported(String extension) {
-    runAsync(
-        () ->
-            logMessage(
-                Error, messageService.getMessage("Communications.extUnsupported", extension)));
   }
 
   /**
