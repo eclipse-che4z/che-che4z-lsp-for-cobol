@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2021 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
@@ -84,5 +86,20 @@ public abstract class Node {
   public Optional<Node> getNearestParentByType(NodeType type) {
     if (nodeType == type) return Optional.of(this);
     return Optional.ofNullable(parent).flatMap(it -> it.getNearestParentByType(type));
+  }
+
+  /**
+   * Updates parents on internal node state after tree construction.
+   */
+  public void process() {}
+
+  /**
+   * Return list of errors if any.
+   * Must be called after process.
+   *
+   * @return the list of errors
+   */
+  public List<SyntaxError> getErrors() {
+    return ImmutableList.of();
   }
 }
