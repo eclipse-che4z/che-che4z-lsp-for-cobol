@@ -32,6 +32,7 @@ import {TelemetryService} from "./services/reporter/TelemetryService";
 import {createFileWithGivenPath} from "./services/Settings";
 import {ZoweApi} from "./services/ZoweApi";
 import {resolveSubroutineURI} from "./services/util/SubroutineUtils";
+import {executeSmartTab} from "./commands/SmartTabCommand";
 
 let zoweApi: ZoweApi;
 let profileService: ProfileService;
@@ -86,6 +87,9 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
     context.subscriptions.push(vscode.commands.registerCommand("cobol-lsp.cpy-manager.goto-settings", () => {
         gotoCopybookSettings();
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("tab", () => {
+        executeSmartTab();
     }));
 
     // Custom client handlers
