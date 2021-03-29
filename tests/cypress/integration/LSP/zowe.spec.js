@@ -32,7 +32,7 @@ context('This is a Zowe integration spec file', () => {
     return cy.goToLine(line).getCurrentLineErrors({ expectedLine: line }).getHoverErrorMessage().contains(message);
   }
 
-  function addCopybookAndgetHoverMessage(line, copybook, message) {
+  function addCopybookAndGetHoverMessage(line, copybook, message) {
     return cy
       .getLineByNumber(48)
       .type(`{end}{enter}             COPY ${copybook}.`)
@@ -53,7 +53,7 @@ context('This is a Zowe integration spec file', () => {
   describe('TC219568 Copybook is (semi) automatically downloaded', () => {
     it(['zowe'], 'Checks that copybook was downloaded', () => {
       cy.openFile('HOVER.CBL');
-      addCopybookAndgetHoverMessage(49, 'TEST', 'TEST: Copybook not found');
+      addCopybookAndGetHoverMessage(49, 'TEST', 'TEST: Copybook not found');
       cy.task('isFileExists', TEST).should('be.false');
       cy.updateConfigs('clist_local');
       getHoverMessage(49, 'TEST: Copybook not found');
@@ -64,7 +64,7 @@ context('This is a Zowe integration spec file', () => {
   describe('TC219569 Nested Copybook is (semi) automatically downloaded', () => {
     it(['zowe'], 'Checks that nested copybooks were downloaded', () => {
       cy.openFile('HOVER.CBL');
-      addCopybookAndgetHoverMessage(49, 'ASTRO', 'ASTRO: Copybook not found');
+      addCopybookAndGetHoverMessage(49, 'ASTRO', 'ASTRO: Copybook not found');
 
       cy.updateConfigs('clist_local');
 
@@ -80,7 +80,7 @@ context('This is a Zowe integration spec file', () => {
   describe('TC219570 Nested Copybook is (semi) automatically downloaded', () => {
     it(['zowe'], 'Cobol file has a syntax error in case copybook is missing ', () => {
       cy.openFile('HOVER.CBL');
-      addCopybookAndgetHoverMessage(49, 'NOTFOUND', 'NOTFOUND: Copybook not found');
+      addCopybookAndGetHoverMessage(49, 'NOTFOUND', 'NOTFOUND: Copybook not found');
       cy.updateConfigs('clist_local');
       resolveCopybook(49, 'NOTFOUND');
       popupMsg('Missing copybooks: NOTFOUND');
@@ -91,7 +91,7 @@ context('This is a Zowe integration spec file', () => {
   describe('TC219571 Cobol file has a syntax error in case nested copybook is missing ', () => {
     it(['zowe'], 'Checks nested copybook missing', () => {
       cy.openFile('HOVER.CBL');
-      addCopybookAndgetHoverMessage(49, 'COPYNF', 'COPYNF: Copybook not found');
+      addCopybookAndGetHoverMessage(49, 'COPYNF', 'COPYNF: Copybook not found');
 
       cy.updateConfigs('clist_local');
 
@@ -109,7 +109,7 @@ context('This is a Zowe integration spec file', () => {
     it(['zowe'], 'Wrong profile credentials - one profile', () => {
       cy.openFile('HOVER.CBL');
 
-      addCopybookAndgetHoverMessage(49, 'NOTFOUND', 'NOTFOUND: Copybook not found');
+      addCopybookAndGetHoverMessage(49, 'NOTFOUND', 'NOTFOUND: Copybook not found');
 
       resolveCopybook(49, 'NOTFOUND');
       popupMsg('Missing copybooks: NOTFOUND');
@@ -136,7 +136,7 @@ context('This is a Zowe integration spec file', () => {
     });
     it(['zowe'], 'Verify that server detects a no Pass credential response.', () => {
       cy.openFile('HOVER.CBL');
-      addCopybookAndgetHoverMessage(49, 'ASTRO', 'ASTRO: Copybook not found');
+      addCopybookAndGetHoverMessage(49, 'ASTRO', 'ASTRO: Copybook not found');
       resolveCopybook(49, 'ASTRO');
       popupMsg('No password in Zowe profile noPass.');
 
@@ -154,7 +154,7 @@ context('This is a Zowe integration spec file', () => {
     });
     it(['zowe'], 'Wrong profile credentials - change to a valid profile', () => {
       cy.openFile('HOVER.CBL');
-      addCopybookAndgetHoverMessage(49, 'ASTRO', 'ASTRO: Copybook not found').wait(500);
+      addCopybookAndGetHoverMessage(49, 'ASTRO', 'ASTRO: Copybook not found').wait(500);
       resolveCopybook(49, 'ASTRO');
       popupMsg('Incorrect credentials in Zowe profile wrongPass.');
 
@@ -172,7 +172,7 @@ context('This is a Zowe integration spec file', () => {
     });
     it(['zowe'], 'Wrong profile credentials - change from invalid  profile to noPass and vice versa', () => {
       cy.openFile('HOVER.CBL');
-      addCopybookAndgetHoverMessage(49, 'ASTRO', 'ASTRO: Copybook not found').wait(500);
+      addCopybookAndGetHoverMessage(49, 'ASTRO', 'ASTRO: Copybook not found').wait(500);
       resolveCopybook(49, 'ASTRO');
       popupMsg('Incorrect credentials in Zowe profile wrongPass.');
       cy.task('isFileExists', ASTRO).should('be.false');
@@ -191,7 +191,7 @@ context('This is a Zowe integration spec file', () => {
     });
     it(['zowe'], 'Get 501 error', () => {
       cy.openFile('HOVER.CBL');
-      addCopybookAndgetHoverMessage(49, 'ERR', 'ERR: Copybook not found').wait(500);
+      addCopybookAndGetHoverMessage(49, 'ERR', 'ERR: Copybook not found').wait(500);
       resolveCopybook(49, 'ERR');
       popupMsg('Error: Rest API failure with HTTP(S) status 501');
       cy.task('isFileExists', ERR).should('be.false');
@@ -204,7 +204,7 @@ context('This is a Zowe integration spec file', () => {
     });
     it(['zowe'], 'Nested Recursive Copybooks are downloaded and error is shown', () => {
       cy.openFile('HOVER.CBL');
-      addCopybookAndgetHoverMessage(49, 'RECUR1', 'RECUR1: Copybook not found').wait(500);
+      addCopybookAndGetHoverMessage(49, 'RECUR1', 'RECUR1: Copybook not found').wait(500);
       resolveCopybook(49, 'RECUR1');
       resolveCopybook(49, 'RECUR1');
       getHoverMessage(49, 'Recursive copybook declaration for: RECUR2');

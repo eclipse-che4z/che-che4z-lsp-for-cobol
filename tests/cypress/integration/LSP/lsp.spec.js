@@ -428,7 +428,7 @@ context('This is a LSP spec', () => {
       cy.writeFile('test_files/project/some_text.txt', '');
       cy.openFile('some_text.txt');
       cy.changeLangMode('COBOL');
-      cy.get('.view-lines').eq(1).type('{ctrl}{shift}I');
+      cy.get('.view-lines').type('{ctrl}{shift}I');
       cy.get('.theia-TreeContainer').contains('No outline information available.');
     });
   });

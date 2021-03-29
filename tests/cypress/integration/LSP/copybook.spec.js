@@ -21,8 +21,10 @@ context('This is a Copybook spec', () => {
     cy.updateConfigs('basic');
   });
 
-  describe.skip('TC174655 Copybook - Nominal', () => {
-    it(['flaky_theia'],'Checks that when opening Cobol file with correct reference to copybook, there is syntax ok message shown',
+  describe('TC174655 Copybook - Nominal', () => {
+    it(
+      ['flaky_theia'],
+      'Checks that when opening Cobol file with correct reference to copybook, there is syntax ok message shown',
       () => {
         cy.openFile('USER1.cbl');
         cy.openFile('USERC1N1.cbl');
@@ -32,7 +34,9 @@ context('This is a Copybook spec', () => {
   });
 
   describe.skip('Copybook - not exist: no syntax ok message', () => {
-    it(['flaky_theia'],'Checks that when opening Cobol file which refers to non-existent copybook, syntax ok message does not appear and copybook is underlined',
+    it(
+      ['flaky_theia'],
+      'Checks that when opening Cobol file which refers to non-existent copybook, syntax ok message does not appear and copybook is underlined',
       () => {
         cy.openFile('USERC1N1.cbl').wait(1000);
         cy.openFile('USERC1F.cbl');
@@ -203,19 +207,16 @@ context('This is a Copybook spec', () => {
       ['smoke'],
       'Checks that LSP can dynamically detect appearance of copybook and rescan cobol file on the fly',
       () => {
-        cy.openFile('USERC1F.cbl');
-        cy.get('.squiggly-error').should('have.length', 2).getElementLineNumber().should('eq', 19);
         cy.readFile('test_files/project/.copybooks/zowe-profile-1/DATA.SET.PATH2/BOOK3T.cpy').then((text) => {
           cy.writeFile('test_files/project/.copybooks/zowe-profile-1/DATA.SET.PATH2/BOOK3.cpy', text);
         });
         cy.openFolder('.copybooks/zowe-profile-1/DATA.SET.PATH2');
-        cy.closeCurrentTab();
         cy.openFile('USERC1F.cbl');
         cy.get('.squiggly-error').should('not.exist');
         cy.deleteFile('BOOK3.cpy');
         cy.closeCurrentTab();
         cy.openFile('USERC1F.cbl');
-        cy.get('.squiggly-error').should('have.length', 1).getElementLineNumber().should('eq', 19);
+        cy.get('.squiggly-error').should('have.length', 2).getElementLineNumber().should('eq', 19);
       },
     );
   });
@@ -241,12 +242,12 @@ context('This is a Copybook spec', () => {
     );
   });
 
-  describe.skip('TC288744 Underscore a copy statement if its copybook contains error: nested copybooks', () => {
+  describe('TC288744 Underscore a copy statement if its copybook contains error: nested copybooks', () => {
     afterEach(() => {
       cy.closeFolder('.copybooks');
     });
 
-    it(['flaky_theia'], 'Underscore a copy statement if its copybook contains error with nested copybooks', () => {
+    it(['smoke'], 'Underscore a copy statement if its copybook contains error with nested copybooks', () => {
       cy.openFile('TEST.CBL').goToLine(22);
       cy.getCurrentLine().type('{end}', { delay: 200 }).type('{enter}    COPY A.', { delay: 200 });
       cy.getCurrentLineErrors({ expectedLine: 23 })
@@ -334,7 +335,7 @@ context('This is a Copybook spec', () => {
   describe('TC314393 Variable usage should be found in a CALL statement', () => {
     it(['smoke'], 'The variable used in a CALL statement should be found in the references list.', () => {
       cy.openFile('HELLO-WORLD.cbl');
-      cy.getLineByNumber(23).findText('VARIABLE.').goToReferences();
+      cy.getLineByNumber(23).findText('VARIABLE').goToReferences();
       cy.get('.zone-widget')
         .as('referenceWidget')
         .then(($referenceWidget) => {
