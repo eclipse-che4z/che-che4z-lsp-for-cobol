@@ -23,7 +23,7 @@ const DEFAULT_STATUS_TEXT = "CPY profile: undefined";
 
 export class ProfileService implements Disposable {
 
-    private static isCobolProgram(fsPath: string) {
+    public static isCobolProgram(fsPath: string) {
         const ext = path.extname(fsPath).toLocaleUpperCase();
         return [COBOL_CBL_EXT, COBOL_COB_EXT, COBOL_COBOL_EXT].includes(ext);
     }

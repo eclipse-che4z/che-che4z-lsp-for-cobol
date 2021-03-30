@@ -23,6 +23,7 @@ import {LanguageClientService} from "../services/LanguageClientService";
 import {TelemetryService} from "../services/reporter/TelemetryService";
 import {createFileWithGivenPath} from "../services/Settings";
 
+jest.mock("../commands/SmartTabCommand");
 jest.mock("../commands/ChangeDefaultZoweProfile");
 jest.mock("../commands/EditDatasetPaths");
 jest.mock("../commands/FetchCopybookCommand");
