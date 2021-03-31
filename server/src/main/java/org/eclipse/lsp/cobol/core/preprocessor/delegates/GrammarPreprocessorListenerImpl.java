@@ -133,19 +133,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void enterCompilerOptions(@NonNull CompilerOptionsContext ctx) {
-    // push a new context for the COMPILER OPTIONS terminals
-    push();
-  }
-
-  @Override
-  public void exitCompilerOptions(@NonNull CompilerOptionsContext ctx) {
-    // throw away COMPILER OPTIONS terminals
-    pop();
-    accumulateExcludedStatementShift(ctx.getSourceInterval());
-  }
-
-  @Override
   public void enterCopyStatement(@NonNull CopyStatementContext ctx) {
     push();
   }
