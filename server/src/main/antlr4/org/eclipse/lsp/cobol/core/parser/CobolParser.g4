@@ -896,7 +896,8 @@ abendCodeExitClause
 // accept statement
 
 acceptStatement
-   : ACCEPT (acceptIdmsDcClause | (generalIdentifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?))
+   : ACCEPT (acceptIdmsDcClause | acceptIdmsDbClause |
+   (generalIdentifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?))
    ;
 
 acceptFromDateStatement
@@ -933,6 +934,23 @@ acceptTransactionStatisticsIntoClause
 
 acceptTransactionStatisticsLengthClause
     : LENGTH (integerLiteral | generalIdentifier)
+    ;
+
+acceptIdmsDbClause
+    : generalIdentifier ((FROM acceptIdmsDbOptions) | FOR idms_db_entity_name)
+    ;
+
+acceptIdmsDbOptions
+    : (idms_procedure_name PROCEDURE) | currencyPageInfo | (idms_db_entity_name acceptIdmsTypes) |
+     (IDMS_STATISTICS (EXTENDED generalIdentifier)?)
+    ;
+
+acceptIdmsTypes
+    : (BIND | ((NEXT | PRIOR |OWNER)? currencyPageInfo))
+    ;
+
+currencyPageInfo
+    : CURRENCY (PAGE_INFO generalIdentifier)?
     ;
 
 // add statement
@@ -1002,7 +1020,7 @@ attachTaskCodeWaitClause
 // bind statement
 
 bindStatement
-    : BIND (bindTaskClause | bindTransactionClause | bindRunUnitClause | bindMapClause | bindProcedureClause)
+    : BIND (bindTaskClause | bindTransactionClause | bindRunUnitClause | bindMapClause | bindProcedureClause |bindRecordClause)
     ;
 
 bindMapClause
@@ -1027,6 +1045,10 @@ bindTransactionClause
 
 bindRunUnitClause
     : RUN_UNIT (FOR generalIdentifier)? (DBNODE bindDbNodeName)? (DBNAME bindDbNodeName)? (DICTNODE bindDbNodeName)? (DICTNAME bindDbNodeName)?
+    ;
+
+bindRecordClause
+    : (idms_db_entity_name (TO generalIdentifier)?) | (generalIdentifier WITH idms_db_entity_name)
     ;
 
 bindDbNodeName
@@ -1495,7 +1517,11 @@ dbkeyClause
     ;
 
 positionClause
-    : (NEXT | PRIOR | FIRST | LAST | (integerLiteral | generalIdentifier)) idms_db_entity_name? WITHIN idms_db_entity_name
+    : (orderClause | (integerLiteral | generalIdentifier)) idms_db_entity_name? WITHIN idms_db_entity_name
+    ;
+
+orderClause
+    : ( NEXT | PRIOR | FIRST | LAST )
     ;
 
 // finish statement
@@ -1598,7 +1624,7 @@ goToDependingOnStatement
 // if statement
 
 ifStatement
-   : IF condition ifThen ifElse? END_IF?
+   : IF (idmsIfCondition | condition) ifThen ifElse? END_IF?
    ;
 
 ifThen
@@ -1608,6 +1634,18 @@ ifThen
 ifElse
    : ELSE (NEXT SENTENCE | statement+?)
    ;
+
+idmsIfCondition
+   : (idms_db_entity_name idmsIfEmpty) | (idmsIfMember)
+   ;
+
+idmsIfEmpty
+    : IS? NOT? EMPTY
+    ;
+
+idmsIfMember
+    : NOT? idms_db_entity_name MEMBER
+    ;
 
 // initialize statement
 
@@ -2064,12 +2102,21 @@ releaseStatement
 // return statement
 
 returnStatement
-   : RETURN fileName RECORD? returnInto? atEndPhrase notAtEndPhrase? END_RETURN?
+   : RETURN (cobolReturn | idmsReturn)
+   ;
+
+cobolReturn
+   : fileName RECORD? returnInto? atEndPhrase notAtEndPhrase? END_RETURN?
    ;
 
 returnInto
    : INTO qualifiedDataName
    ;
+
+idmsReturn
+    : generalIdentifier FROM idms_db_entity_name (CURRENCY | orderClause CURRENCY? | USING generalIdentifier)
+      (KEY INTO? generalIdentifier)?
+    ;
 
 // rewrite statement
 
