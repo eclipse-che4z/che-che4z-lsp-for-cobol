@@ -14,13 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
 /**
  * The node represents a variable definition. This is a stub and must be rewritten.
  */
 public class VariableDefinitionNode extends Node {
-  public VariableDefinitionNode(Location location) {
-    super(location, NodeType.VARIABLE_DEFINITION);
+  public VariableDefinitionNode(Locality locality) {
+    super(locality, NodeType.VARIABLE_DEFINITION);
   }
 }

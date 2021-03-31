@@ -14,23 +14,23 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
 /**
  * The class represents program ID.
  */
 public class ProgramIdNode extends Node {
-  private final String id;
+  private final String programId;
 
-  public ProgramIdNode(Location location, String id) {
-    super(location, NodeType.PROGRAM_ID);
-    this.id = id;
+  public ProgramIdNode(Locality locality, String programId) {
+    super(locality, NodeType.PROGRAM_ID);
+    this.programId = programId;
   }
 
   @Override
   public void process() {
     getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
-        .ifPresent(it -> it.setProgramName(id));
+        .ifPresent(it -> it.setProgramName(programId));
   }
 }

@@ -82,6 +82,15 @@ class CobolLanguageEngineTest {
             .suggestion("suggestion")
             .severity(ERROR)
             .build();
+    SyntaxError eofError =
+        SyntaxError.syntaxError()
+            .locality(Locality.builder()
+                .uri(URI)
+                .range(new Range(new Position(0, 31), new Position(0, 31)))
+                .token("<EOF>")
+                .build())
+            .severity(ERROR)
+            .build();
 
     ExtendedDocument extendedDocument =
         new ExtendedDocument(
@@ -115,6 +124,11 @@ class CobolLanguageEngineTest {
                             .uri(URI)
                             .range(new Range(new Position(0, 30), new Position(0, 31)))
                             .token(".")
+                            .build(),
+                        Locality.builder()
+                            .uri(URI)
+                            .range(new Range(new Position(0, 31), new Position(0, 31)))
+                            .token("<EOF>")
                             .build()),
                     ImmutableMap.of())),
             ImmutableMap.of());
@@ -147,7 +161,7 @@ class CobolLanguageEngineTest {
                 .constantDefinitions(getConstantDefinitions())
                 .outlineTree(expectedOutlineTree)
                 .build(),
-            ImmutableList.of(error));
+            ImmutableList.of(error, eofError));
 
     ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, PROCESSING_MODE);
 

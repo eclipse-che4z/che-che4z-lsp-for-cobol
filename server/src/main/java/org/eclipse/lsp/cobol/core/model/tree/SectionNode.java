@@ -14,15 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate;
-import org.eclipse.lsp4j.Location;
 
 /**
  * The class represents section context in COBOL.
  */
 public class SectionNode extends Node {
-  public SectionNode(Location location) {
-    super(location, NodeType.SECTION);
+  public SectionNode(Locality locality) {
+    super(locality, NodeType.SECTION);
   }
 
   @Override

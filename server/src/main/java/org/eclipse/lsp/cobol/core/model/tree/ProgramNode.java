@@ -21,7 +21,6 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate;
 import org.eclipse.lsp.cobol.core.visitor.VariableUsageDelegate;
-import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,14 +38,14 @@ public class ProgramNode extends Node {
   /**
    * Use for testing.
    *
-   * @param location the node location.
+   * @param locality the node location.
    */
-  ProgramNode(Location location) {
-    super(location, NodeType.PROGRAM);
+  ProgramNode(Locality locality) {
+    super(locality, NodeType.PROGRAM);
   }
 
-  public ProgramNode(Location location, Map<Token, Locality> positionMapping, MessageService messageService) {
-    super(location, NodeType.PROGRAM);
+  public ProgramNode(Locality locality, Map<Token, Locality> positionMapping, MessageService messageService) {
+    super(locality, NodeType.PROGRAM);
     variableDefinitionDelegate = new VariableDefinitionDelegate(positionMapping, messageService);
     variableUsageDelegate = new VariableUsageDelegate(positionMapping, messageService);
   }
