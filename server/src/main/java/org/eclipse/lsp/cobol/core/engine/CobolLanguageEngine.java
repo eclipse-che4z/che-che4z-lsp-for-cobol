@@ -126,15 +126,21 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
             positionMapping,
             messageService,
             subroutineService);
-    Node rootNode = visitor.visit(tree).get(0);
-    SyntaxTreeEngine syntaxTreeEngine = new SyntaxTreeEngine(rootNode);
-    accumulatedErrors.addAll(syntaxTreeEngine.processTree());
+    List<Node> syntaxTree = visitor.visit(tree);
+    if (syntaxTree.size() == 1) {
+      Node rootNode = syntaxTree.get(0);
+      SyntaxTreeEngine syntaxTreeEngine = new SyntaxTreeEngine(rootNode);
+      accumulatedErrors.addAll(syntaxTreeEngine.processTree());
+    } else
+      LOG.warn("The root node for syntax tree was not constructed");
     SemanticContext context = visitor.finishAnalysis().unwrap(accumulatedErrors::addAll);
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
     accumulatedErrors.addAll(
         collectErrorsForCopybooks(accumulatedErrors, extendedDocument.getCopyStatements()));
 
-    return new ResultWithErrors<>(context, accumulatedErrors);
+    return new ResultWithErrors<>(
+        context,
+        accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
   @CheckThreadInterruption
@@ -191,5 +197,17 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
 
   private Predicate<SyntaxError> shouldRaise() {
     return err -> err.getLocality().getCopybookId() != null;
+  }
+
+  private SyntaxError constructErrorMessage(SyntaxError syntaxError) {
+    String messageTemplate = syntaxError.getMessageTemplate();
+    if (messageTemplate != null) {
+      return syntaxError.toBuilder()
+          .messageTemplate(null)
+          .clearMessageArgs()
+          .suggestion(messageService.getMessage(messageTemplate, syntaxError.getMessageArgs().toArray()))
+          .build();
+    }
+    return syntaxError;
   }
 }

@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp.cobol.core.model.Locality;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -28,17 +28,17 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test {@link Node}
  */
 class NodeTest {
-  private static final Location LOCATION = new Location();
+  private static final Locality LOCALITY = Locality.builder().build();
 
   @Test
   void getDepthFirstStream() {
-    Node rootNode = new RootNode(LOCATION);
-    Node firstProg = new ProgramNode(LOCATION);
-    Node sectionNode = new SectionNode(LOCATION);
-    Node definition = new VariableDefinitionNode(LOCATION);
-    Node nestedProg = new ProgramNode(LOCATION);
-    Node secondProg = new ProgramNode(LOCATION);
-    Node anotherDefinition = new VariableDefinitionNode(LOCATION);
+    Node rootNode = new RootNode(LOCALITY);
+    Node firstProg = new ProgramNode(LOCALITY);
+    Node sectionNode = new SectionNode(LOCALITY);
+    Node definition = new VariableDefinitionNode(LOCALITY);
+    Node nestedProg = new ProgramNode(LOCALITY);
+    Node secondProg = new ProgramNode(LOCALITY);
+    Node anotherDefinition = new VariableDefinitionNode(LOCALITY);
 
     rootNode.addChild(firstProg);
     firstProg.addChild(sectionNode);
@@ -55,14 +55,14 @@ class NodeTest {
 
   @Test
   void getParentByType() {
-    Node rootNode = new RootNode(LOCATION);
-    Node program = new ProgramNode(LOCATION);
+    Node rootNode = new RootNode(LOCALITY);
+    Node program = new ProgramNode(LOCALITY);
     rootNode.addChild(program);
-    Node nestedProgram = new ProgramNode(LOCATION);
+    Node nestedProgram = new ProgramNode(LOCALITY);
     program.addChild(nestedProgram);
-    Node section = new SectionNode(LOCATION);
+    Node section = new SectionNode(LOCALITY);
     nestedProgram.addChild(section);
-    Node definition = new VariableDefinitionNode(LOCATION);
+    Node definition = new VariableDefinitionNode(LOCALITY);
     section.addChild(definition);
 
     assertFalse(rootNode.getNearestParentByType(NodeType.PROGRAM).isPresent());

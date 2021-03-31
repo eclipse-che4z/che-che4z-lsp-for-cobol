@@ -15,30 +15,34 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 /**
  * The class represents a Node in source structure tree.
  */
 public abstract class Node {
-  private final Location location;
+  private static final AtomicLong ID_COUNTER = new AtomicLong();
+  public final long id;
+  private final Locality locality;
   private Node parent;
   private final List<Node> children = new ArrayList<>();
   private final NodeType nodeType;
 
-  protected Node(Location location, NodeType nodeType) {
-    this.location = location;
+  protected Node(Locality location, NodeType nodeType) {
+    id = ID_COUNTER.incrementAndGet();
+    this.locality = location;
     this.nodeType = nodeType;
   }
 
-  public Location getLocation() {
-    return location;
+  public Locality getLocality() {
+    return locality;
   }
 
   public Node getParent() {

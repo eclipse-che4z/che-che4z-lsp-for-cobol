@@ -14,8 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.NonNull;
-import org.eclipse.lsp.cobol.core.messages.MessageService;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -26,16 +25,13 @@ import java.util.List;
 /**
  * The class represents the program end.
  */
+@Slf4j
 public class ProgramEndNode extends Node {
-  private final Locality locality;
-  private final String id;
-  private final MessageService messageService;
+  private final String programId;
 
-  public ProgramEndNode(Locality locality, String id, MessageService messageService) {
-    super(locality.toLocation(), NodeType.PROGRAM_END);
-    this.locality = locality;
-    this.id = id;
-    this.messageService = messageService;
+  public ProgramEndNode(Locality locality, String programId) {
+    super(locality, NodeType.PROGRAM_END);
+    this.programId = programId;
   }
 
   @Override
@@ -45,21 +41,23 @@ public class ProgramEndNode extends Node {
         .map(ProgramNode.class::cast)
         .ifPresent(node -> {
           if (node.getProgramName() == null) {
-            errors.add(constructError("", locality,
-                messageService.getMessage("CobolVisitor.progIDIssueMsg")));
-          } else if (!node.getProgramName().equalsIgnoreCase(id)) {
-            errors.add(constructError(node.getProgramName(), locality,
-                messageService.getMessage("CobolVisitor.identicalProgMsg")));
+            LOG.debug("Syntax error: Program name is empty");
+            errors.add(SyntaxError.syntaxError()
+                .locality(getLocality())
+                .severity(ErrorSeverity.WARNING)
+                .messageTemplate("CobolVisitor.progIDIssueMsg")
+                .build());
+          } else if (!node.getProgramName().equalsIgnoreCase(programId)) {
+            LOG.debug("Syntax error: program name is '{}', but END PROGRAM refers to '{}'",
+                node.getProgramName(), programId);
+            errors.add(SyntaxError.syntaxError()
+                .locality(getLocality())
+                .severity(ErrorSeverity.WARNING)
+                .messageTemplate("CobolVisitor.identicalProgMsg")
+                .messageArg(node.getProgramName())
+                .build());
           }
         });
     return errors;
-  }
-
-  private SyntaxError constructError(String wrongToken, @NonNull Locality locality, String message) {
-    return SyntaxError.syntaxError()
-            .locality(locality)
-            .suggestion(message + wrongToken)
-            .severity(ErrorSeverity.WARNING)
-            .build();
   }
 }

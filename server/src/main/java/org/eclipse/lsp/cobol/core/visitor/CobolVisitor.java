@@ -51,6 +51,7 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.*;
+import java.util.function.Function;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -156,9 +157,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitStartRule(StartRuleContext ctx) {
-    Node rootNode = new RootNode(getRange(ctx).orElse(null));
-    visitChildren(ctx).forEach(rootNode::addChild);
-    return ImmutableList.of(rootNode);
+    // we can skip the other nodes, but not the root
+    return getLocalityRange(ctx).map(locality -> {
+      Node rootNode = new RootNode(locality);
+      visitChildren(ctx).forEach(rootNode::addChild);
+      return ImmutableList.of(rootNode);
+    }).orElse(ImmutableList.of());
   }
 
   @Override
@@ -176,7 +180,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .map(PreprocessorStringUtils::trimQuotes)
         .ifPresent(
             name -> {
-              result.add(new ProgramIdNode(getRange(ctx).orElse(null), name));
+              getLocalityRange(ctx).ifPresent(locality -> result.add(new ProgramIdNode(locality, name)));
               outlineTreeBuilder.renameProgram(name, ctx);
               outlineTreeBuilder.addNode(PROGRAM_ID_PREFIX + name, NodeType.PROGRAM_ID, ctx);
             });
@@ -227,17 +231,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     outlineTreeBuilder.addNode(WORKING_STORAGE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
     variablesDelegate.notifySectionChanged();
-    Node section = new SectionNode(getRange(ctx).orElse(null));
-    visitChildren(ctx).forEach(section::addChild);
-    return ImmutableList.of(section);
+    return addTreeNode(ctx, SectionNode::new);
   }
 
   @Override
   public List<Node> visitProgramUnit(ProgramUnitContext ctx) {
     outlineTreeBuilder.addProgram(ctx);
-    Node program = new ProgramNode(getRange(ctx).orElse(null), positionMapping, messageService);
-    visitChildren(ctx).forEach(program::addChild);
-    return ImmutableList.of(program);
+    return addTreeNode(ctx, locality -> new ProgramNode(locality, positionMapping, messageService));
   }
 
   @Override
@@ -269,6 +269,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private void addParagraphRange(ParserRuleContext ctx) {
     String name = ctx.getStart().getText().toUpperCase();
     getRange(ctx).ifPresent(range -> groupContext.addParagraphRange(name, range));
+  }
+
+  private Optional<Locality> getLocalityRange(ParserRuleContext ctx) {
+    return getLocality(ctx.getStart()).flatMap(start -> getLocality(ctx.getStop()).map(
+        stop -> start.toBuilder().range(new Range(start.getRange().getStart(), stop.getRange().getEnd())).build()
+    ));
   }
 
   private Optional<Location> getRange(ParserRuleContext ctx) {
@@ -320,7 +326,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     Token endProgramNameToken = ctx.programName().getStart();
     String id = PreprocessorStringUtils.trimQuotes(endProgramNameToken.getText());
     areaAWarning(ctx.getStart());
-    return ImmutableList.of(new ProgramEndNode(getLocality(endProgramNameToken).orElse(null), id, messageService));
+    return addTreeNode(ctx.programName(), locality -> new ProgramEndNode(locality, id));
   }
 
   @Override
@@ -346,9 +352,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     outlineTreeBuilder.addNode(FILE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
     variablesDelegate.notifySectionChanged();
-    Node section = new SectionNode(getRange(ctx).orElse(null));
-    visitChildren(ctx).forEach(section::addChild);
-    return ImmutableList.of(section);
+    return addTreeNode(ctx, SectionNode::new);
   }
 
   @Override
@@ -356,9 +360,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     outlineTreeBuilder.addNode(LINKAGE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
     variablesDelegate.notifySectionChanged();
-    Node section = new SectionNode(getRange(ctx).orElse(null));
-    visitChildren(ctx).forEach(section::addChild);
-    return ImmutableList.of(section);
+    return addTreeNode(ctx, SectionNode::new);
   }
 
   @Override
@@ -366,9 +368,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     outlineTreeBuilder.addNode(LOCAL_STORAGE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
     variablesDelegate.notifySectionChanged();
-    Node section = new SectionNode(getRange(ctx).orElse(null));
-    visitChildren(ctx).forEach(section::addChild);
-    return ImmutableList.of(section);
+    return addTreeNode(ctx, SectionNode::new);
   }
 
   @Override
@@ -713,5 +713,16 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     result.addAll(aggregate);
     result.addAll(nextResult);
     return result;
+  }
+
+  private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
+    List<Node> children = visitChildren(ctx);
+    return getLocalityRange(ctx)
+        .map(locality -> {
+          Node node = nodeConstructor.apply(locality);
+          children.forEach(node::addChild);
+          return (List<Node>) ImmutableList.of(node);
+        })
+        .orElse(children);
   }
 }

@@ -14,13 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
 /**
  * The class represents the root. All trees must start with one root node.
  */
 public class RootNode extends Node {
-  public RootNode(Location location) {
-    super(location, NodeType.ROOT);
+  public RootNode(Locality locality) {
+    super(locality, NodeType.ROOT);
   }
 }
