@@ -28,7 +28,7 @@ class TestIndicatorAreaError {
   private static final String TEXT = "qwerty{u|1}{iop|2}";
 
   private static final String MESSAGE_1 = "Unexpected indicator area content";
-  private static final String MESSAGE_2 = "Syntax error on 'iop' expected {ID, IDENTIFICATION}";
+  private static final String MESSAGE_2 = "Syntax error on 'iop' expected {CBL, ID, IDENTIFICATION, PROCESS}";
 
   @Test
   void test() {
