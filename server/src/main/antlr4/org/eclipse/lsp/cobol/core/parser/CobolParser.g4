@@ -995,9 +995,9 @@ statement
     disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement |
     execSqlStatement | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
-    readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement | serviceReloadStatement |
-    serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement | unstringStatement |
-    writeStatement | xmlStatement
+    readStatement | readyResetTraceStatement| receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
+    serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
+    terminateStatement | unstringStatement | writeStatement | xmlStatement
    ;
 
 idmsStatements
@@ -2173,6 +2173,11 @@ readTerminalClause
 // ready statement
 readyStatement
     : READY idms_db_entity_name? (USAGE_MODE IS? (PROTECTED | EXCLUSIVE)? (RETRIEVAL | UPDATE))?
+    ;
+
+// READY/RESET TRACE statement
+readyResetTraceStatement
+    : (READY | RESET) TRACE
     ;
 
 // receive statement
