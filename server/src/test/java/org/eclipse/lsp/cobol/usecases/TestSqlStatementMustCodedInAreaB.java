@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2021 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -15,24 +15,25 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-
-/** This test checks sql include statement if it is defined correctly. */
-class TestSqlIncludeStatementNotDefinedCorrectly {
+/** This test checks if SQL statements coded in Area B */
+class TestSqlStatementMustCodedInAreaB {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*SQLCA} PIC X(10).\n"
-          + "           EXEC  {INCLUDE|1} STRUCT1 END-EXEC.";
+          + "       PROCEDURE DIVISION."
+          + "              EXEC SQL\n"
+          + "         {SELECT|1} * FROM EMP;\n"
+          + "              END-EXEC.\n";
 
   @Test
   void test() {
@@ -43,8 +44,8 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
             "1",
             new Diagnostic(
                 null,
-                "Missing token EXEC or SQL at execSqlStatement",
-                Error,
-                SourceInfoLevels.ERROR.getText())));
+                "The following token must start in Area B: SELECT",
+                DiagnosticSeverity.Warning,
+                SourceInfoLevels.WARNING.getText())));
   }
 }

@@ -28,12 +28,12 @@ class TestSqlBeginDeclareSectionStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL BEGIN DECLARE SECTION END-EXEC.\n"
-          + "          01 {$*WS-STUDENT-REC}.\n"
+          + "           EXEC SQL BEGIN DECLARE SECTION END-EXEC.\n"
+          + "       01 {$*WS-STUDENT-REC}.\n"
           + "             05 {$*WS-STUDENT-ID} PIC 9(4).\n"
           + "             05 {$*WS-STUDENT-NAME} PIC X(25).\n"
           + "             05 {$*WS-STUDENT-ADDR} PIC X(25).\n"
-          + "       EXEC SQL END DECLARE SECTION END-EXEC.\n";
+          + "           EXEC SQL END DECLARE SECTION END-EXEC.\n";
 
   @Test
   void test() {

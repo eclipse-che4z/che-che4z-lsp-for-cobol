@@ -31,13 +31,14 @@ class TestSqlReleaseConnectionStatement {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n";
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n";
 
   private static final String RELEASE_CONNECTION =
-      TEXT + "       EXEC SQL RELEASE TOROLAB1  END-EXEC.\n";
+      TEXT + "           EXEC SQL RELEASE TOROLAB1  END-EXEC.\n";
 
   private static final String RELEASE_CONNECTION2 =
-      TEXT + "       EXEC SQL RELEASE CURRENT  END-EXEC.\n";
+      TEXT + "           EXEC SQL RELEASE CURRENT  END-EXEC.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(RELEASE_CONNECTION, RELEASE_CONNECTION2);

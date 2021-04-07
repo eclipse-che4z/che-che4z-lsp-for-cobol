@@ -28,9 +28,10 @@ class TestSqlExecuteImmediateStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "         EXECUTE IMMEDIATE 'DELETE FROM DSN8C10.DEPT WHERE' || PREDS \n"
-          + "       END-EXEC.\n";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "             EXECUTE IMMEDIATE 'DELETE FROM DSN8C10.DEPT WHERE' || PREDS \n"
+          + "           END-EXEC.\n";
 
   @Test
   void test() {

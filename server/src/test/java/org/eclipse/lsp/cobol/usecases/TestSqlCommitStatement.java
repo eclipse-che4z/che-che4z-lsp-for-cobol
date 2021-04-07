@@ -28,9 +28,10 @@ class TestSqlCommitStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "         COMMIT WORK \n"
-          + "       END-EXEC.\n";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "             COMMIT WORK \n"
+          + "           END-EXEC.\n";
 
   @Test
   void test() {

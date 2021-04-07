@@ -373,12 +373,42 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitStatement(StatementContext ctx) {
-    List<Token> tokenList =
-        tokenStream.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
-    areaBWarning(tokenList);
-
+    areaBWarningCheck(ctx);
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
+  }
+
+  @Override
+  public List<Node> visitExecSqlStatementInProcedureDivision(
+      ExecSqlStatementInProcedureDivisionContext ctx) {
+    areaBWarningCheck(ctx);
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public List<Node> visitExecSqlStatementInWorkingStorage(
+      ExecSqlStatementInWorkingStorageContext ctx) {
+    areaBWarningCheck(ctx);
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public List<Node> visitExecSqlStatementInWorkingStorageAndLinkageSection(
+      ExecSqlStatementInWorkingStorageAndLinkageSectionContext ctx) {
+    areaBWarningCheck(ctx);
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public List<Node> visitExecSqlStatementInDataDivision(ExecSqlStatementInDataDivisionContext ctx) {
+    areaBWarningCheck(ctx);
+    return visitChildren(ctx);
+  }
+
+  private void areaBWarningCheck(ParserRuleContext ctx) {
+    List<Token> tokenList =
+            tokenStream.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
+    areaBWarning(tokenList);
   }
 
   @Override
@@ -650,6 +680,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private void areaAWarning(Token token) {
+    //skip area A check for cics and sql block
+    if (token.getText().startsWith("EXEC")) {
+      return;
+    }
     getLocality(token)
         .filter(it -> it.getRange().getStart().getCharacter() > AREA_A_FINISH)
         .ifPresent(

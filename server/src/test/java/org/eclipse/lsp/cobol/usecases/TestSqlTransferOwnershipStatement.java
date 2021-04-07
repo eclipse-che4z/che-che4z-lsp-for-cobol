@@ -28,45 +28,46 @@ import java.util.stream.Stream;
 class TestSqlTransferOwnershipStatement {
 
   private static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n"
+      "        IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n";
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n";
 
   private static final String TRANSFER_OWNERSHIP1 =
       TEXT
-          + "       EXEC SQL\n"
-          + "         TRANSFER OWNERSHIP OF DATABASE DBCC001 TO USER USRT001  \n"
-          + "         REVOKE PRIVILEGES  \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "            TRANSFER OWNERSHIP OF DATABASE DBCC001 TO USER USRT001  \n"
+          + "            REVOKE PRIVILEGES  \n"
+          + "           END-EXEC.\n";
 
   private static final String TRANSFER_OWNERSHIP2 =
       TEXT
-          + "       EXEC SQL\n"
-          + "         TRANSFER OWNERSHIP OF DATABASE DBCC002 TO ROLE OWNRROLE  \n"
-          + "         REVOKE PRIVILEGES  \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "            TRANSFER OWNERSHIP OF DATABASE DBCC002 TO ROLE OWNRROLE  \n"
+          + "            REVOKE PRIVILEGES  \n"
+          + "           END-EXEC.\n";
 
   private static final String TRANSFER_OWNERSHIP3 =
       TEXT
-          + "       EXEC SQL\n"
-          + "          TRANSFER OWNERSHIP OF DATABASE DBCC003 TO SESSION_USER  \n"
-          + "         REVOKE PRIVILEGES  \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "            TRANSFER OWNERSHIP OF DATABASE DBCC003 TO SESSION_USER  \n"
+          + "            REVOKE PRIVILEGES  \n"
+          + "           END-EXEC.\n";
 
   private static final String TRANSFER_OWNERSHIP4 =
       TEXT
-          + "       EXEC SQL\n"
-          + "          TRANSFER OWNERSHIP OF TABLE EMPLOYEE.DEPT TO ROLE TBOWNR_ROLE  \n"
-          + "         REVOKE PRIVILEGES  \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "            TRANSFER OWNERSHIP OF TABLE EMPLOYEE.DEPT TO ROLE TBOWNR_ROLE  \n"
+          + "            REVOKE PRIVILEGES  \n"
+          + "           END-EXEC.\n";
 
   private static final String TRANSFER_OWNERSHIP5 =
       TEXT
-          + "       EXEC SQL\n"
-          + "          TRANSFER OWNERSHIP OF INDEX EMPLOYEE.SALARYIX TO USER IXOWNER  \n"
-          + "         REVOKE PRIVILEGES  \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "            TRANSFER OWNERSHIP OF INDEX EMPLOYEE.SALARYIX TO USER IXOWNER  \n"
+          + "            REVOKE PRIVILEGES  \n"
+          + "           END-EXEC.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
