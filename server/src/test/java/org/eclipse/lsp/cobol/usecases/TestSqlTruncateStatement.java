@@ -31,32 +31,33 @@ class TestSqlTruncateStatement {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n";
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n";
 
   private static final String TRUNCATE =
       TEXT
-          + "       EXEC SQL\n"
-          + "         TRUNCATE TABLE INVENTORY  \n"
-          + "         DROP STORAGE  \n"
-          + "         IGNORE DELETE TRIGGERS  \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "            TRUNCATE TABLE INVENTORY  \n"
+          + "            DROP STORAGE  \n"
+          + "            IGNORE DELETE TRIGGERS  \n"
+          + "           END-EXEC.\n";
 
   private static final String TRUNCATE2 =
       TEXT
-          + "       EXEC SQL\n"
-          + "         TRUNCATE TABLE INVENTORY  \n"
-          + "         REUSE STORAGE  \n"
-          + "         IGNORE DELETE TRIGGERS  \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "            TRUNCATE TABLE INVENTORY  \n"
+          + "            REUSE STORAGE  \n"
+          + "            IGNORE DELETE TRIGGERS  \n"
+          + "           END-EXEC.\n";
 
   private static final String TRUNCATE3 =
       TEXT
-          + "       EXEC SQL\n"
-          + "         TRUNCATE TABLE INVENTORY  \n"
-          + "         REUSE STORAGE  \n"
-          + "         IGNORE DELETE TRIGGERS  \n"
-          + "         IMMEDIATE  \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "            TRUNCATE TABLE INVENTORY  \n"
+          + "            REUSE STORAGE  \n"
+          + "            IGNORE DELETE TRIGGERS  \n"
+          + "            IMMEDIATE  \n"
+          + "           END-EXEC.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(TRUNCATE, TRUNCATE2, TRUNCATE3);

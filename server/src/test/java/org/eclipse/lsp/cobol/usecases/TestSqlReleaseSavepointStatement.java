@@ -28,9 +28,10 @@ class TestSqlReleaseSavepointStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "         RELEASE SAVEPOINT A \n"
-          + "       END-EXEC.\n";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "             RELEASE SAVEPOINT A \n"
+          + "           END-EXEC.\n";
 
   @Test
   void test() {

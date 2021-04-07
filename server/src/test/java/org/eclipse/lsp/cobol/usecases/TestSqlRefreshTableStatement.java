@@ -31,13 +31,14 @@ class TestSqlRefreshTableStatement {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n";
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n";
 
   private static final String REFRESH =
-      TEXT + "       EXEC SQL REFRESH TABLE SALESCOUNT  END-EXEC.\n";
+      TEXT + "           EXEC SQL REFRESH TABLE SALESCOUNT  END-EXEC.\n";
 
   private static final String REFRESH2 =
-      TEXT + "       EXEC SQL REFRESH TABLE SALESCOUNT QUERYNO 23  END-EXEC.\n";
+      TEXT + "           EXEC SQL REFRESH TABLE SALESCOUNT QUERYNO 23  END-EXEC.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(REFRESH, REFRESH2);

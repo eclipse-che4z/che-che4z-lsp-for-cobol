@@ -31,19 +31,23 @@ class TestSqlSavepointStatement {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n";
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n";
 
   private static final String SAVEPOINT =
-      TEXT + "       EXEC SQL  SAVEPOINT A ON ROLLBACK RETAIN CURSORS END-EXEC.\n";
+      TEXT + "           EXEC SQL  SAVEPOINT A ON ROLLBACK RETAIN CURSORS END-EXEC.\n";
 
   private static final String SAVEPOINT2 =
       TEXT
-          + "       EXEC SQL\n"
-          + "         SAVEPOINT B UNIQUE ON ROLLBACK RETAIN CURSORS  \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "            SAVEPOINT B UNIQUE ON ROLLBACK RETAIN CURSORS  \n"
+          + "           END-EXEC.\n";
 
   private static final String SAVEPOINT3 =
-      TEXT + "       EXEC SQL  SAVEPOINT A UNIQUE ON ROLLBACK RETAIN CURSORS END-EXEC.\n";
+          TEXT
+                  + "           EXEC SQL\n"
+                  + "            SAVEPOINT A UNIQUE ON ROLLBACK RETAIN CURSORS  \n"
+                  + "           END-EXEC.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(SAVEPOINT, SAVEPOINT2, SAVEPOINT3);

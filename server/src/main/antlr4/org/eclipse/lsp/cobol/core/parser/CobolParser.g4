@@ -541,7 +541,7 @@ dataDivision
    ;
 
 dataDivisionSection
-   : fileSection | workingStorageSection | linkageSection | localStorageSection | schemaSection | mapSection
+   : fileSection | workingStorageSection | linkageSection | localStorageSection | schemaSection | mapSection | execSqlStatementInDataDivision
    ;
 
 // -- file section ----------------------------------
@@ -657,13 +657,12 @@ copyIdmsFileEntry
 // -- working storage section ----------------------------------
 
 workingStorageSection
-   : WORKING_STORAGE SECTION DOT_FS dataDescriptionEntry*
+   : WORKING_STORAGE SECTION DOT_FS  dataDescriptionEntryForWorkingStorageSection*
    ;
-
 // -- linkage section ----------------------------------
 
 linkageSection
-   : LINKAGE SECTION DOT_FS dataDescriptionEntry*
+   : LINKAGE SECTION DOT_FS dataDescriptionEntryForWorkingStorageAndLinkageSection*
    ;
 
 // -- local storage section ----------------------------------
@@ -672,12 +671,21 @@ localStorageSection
    : LOCAL_STORAGE SECTION DOT_FS dataDescriptionEntry*
    ;
 
+dataDescriptionEntryForWorkingStorageSection
+   : execSqlStatementInWorkingStorage
+   | dataDescriptionEntryForWorkingStorageAndLinkageSection
+   ;
+
+dataDescriptionEntryForWorkingStorageAndLinkageSection
+   : execSqlStatementInWorkingStorageAndLinkageSection
+   | dataDescriptionEntry
+   ;
+
 dataDescriptionEntry
    : dataDescriptionEntryFormat1
    | dataDescriptionEntryFormat2
    | dataDescriptionEntryFormat1Level77
    | dataDescriptionEntryFormat3
-   | dataDescriptionEntryExecSql
    | dataDescriptionEntryCopyIdms
    ;
 
@@ -707,10 +715,6 @@ dataDescriptionEntryFormat3
 
 entryName
    : (FILLER | dataName1)
-   ;
-
-dataDescriptionEntryExecSql
-   : execSqlStatement+
    ;
 
 dataGroupUsageClause
@@ -993,7 +997,7 @@ sentence
 statement
    : acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
     disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement |
-    execSqlStatement | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
+    execSqlStatementInProcedureDivision | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement | serviceReloadStatement |
     serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement | unstringStatement |
@@ -1582,11 +1586,27 @@ execCicsStatement
    : EXEC CICS allCicsRules END_EXEC DOT_FS?
    ;
 
-// exec sql statement
-execSqlStatement
-   : EXEC_SQL allSqlRules END_EXEC DOT_FS?
-   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} allSqlRules END_EXEC DOT_FS?
+// exec sql statement for specific divisions or sections of COBOL program
+execSqlStatementInProcedureDivision
+   : EXEC_SQL sqlRulesAllowedInProcedureDivision END_EXEC DOT_FS?
+   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} sqlRulesAllowedInProcedureDivision END_EXEC DOT_FS?
    ;
+
+execSqlStatementInWorkingStorage
+   : EXEC_SQL (dbs_declare_variable SEMICOLON_FS?)+ END_EXEC DOT_FS?
+   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} dbs_declare_variable END_EXEC DOT_FS?
+   ;
+
+execSqlStatementInWorkingStorageAndLinkageSection
+   : EXEC_SQL sqlRulesAllowedInWorkingStorageAndLinkageSection END_EXEC DOT_FS?
+   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} sqlRulesAllowedInWorkingStorageAndLinkageSection END_EXEC DOT_FS?
+   ;
+
+execSqlStatementInDataDivision
+   : EXEC_SQL sqlRulesAllowedInDataDivision END_EXEC DOT_FS?
+   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} sqlRulesAllowedInDataDivision END_EXEC DOT_FS?
+   ;
+
 
 // exec sql ims statement
 

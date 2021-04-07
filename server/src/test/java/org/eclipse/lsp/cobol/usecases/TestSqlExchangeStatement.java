@@ -28,9 +28,10 @@ class TestSqlExchangeStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "         EXCHANGE DATA BETWEEN TABLE EMPCLONE AND EMPLOYEE \n"
-          + "       END-EXEC.\n";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "            EXCHANGE DATA BETWEEN TABLE EMPCLONE AND EMPLOYEE \n"
+          + "           END-EXEC.\n";
 
   @Test
   void test() {
