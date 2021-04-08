@@ -24,7 +24,7 @@ import {CopybooksCodeActionProvider} from "./services/copybook/CopybooksCodeActi
 import {CopybooksPathGenerator} from "./services/copybook/CopybooksPathGenerator";
 
 import {CopybookURI} from "./services/copybook/CopybookURI";
-import {AnalysisResult, LanguageClientService} from "./services/LanguageClientService";
+import {LanguageClientService} from "./services/LanguageClientService";
 import {Middleware} from "./services/Middleware";
 import {PathsService} from "./services/PathsService";
 import {ProfileService} from "./services/ProfileService";
@@ -105,7 +105,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // 'export' public api-surface
     return {
-        analysis(uri: string): Promise<AnalysisResult> {
+        analysis(uri: string): Promise<any> {
             return languageClientService.retrieveAnalysis(uri);
         }
     };

@@ -24,6 +24,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -191,7 +192,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitProcedureDivision(ProcedureDivisionContext ctx) {
     areaAWarning(ctx.getStart());
     outlineTreeBuilder.addNode(PROCEDURE_DIVISION, NodeType.DIVISION, ctx);
-    return visitChildren(ctx);
+    return addTreeNode(ctx, ProcedureDivisionNode::new);
   }
 
   @Override
@@ -249,7 +250,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     String name = ctx.getStart().getText().toUpperCase();
     getLocality(ctx.getStart())
         .ifPresent(locality -> groupContext.addSectionDefinition(name, locality));
-    return visitChildren(ctx);
+    return addTreeNode(ctx, locality -> new ProcedureSectionNode(locality, ctx.getStart().getText(), getIntervalText(ctx)));
   }
 
   @Override
@@ -258,7 +259,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     addParagraphRange(ctx);
 
     outlineTreeBuilder.addNode(ctx.getStart().getText(), NodeType.PROCEDURE, ctx);
-    return visitChildren(ctx);
+    String name = ctx.paragraphName().getText();
+    return addTreeNode(ctx, locality -> new ParagraphNode(locality, name, getIntervalText(ctx)));
   }
 
   private void addSectionRange(ParserRuleContext ctx) {
@@ -420,7 +422,25 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitIfElse(IfElseContext ctx) {
     throwWarning(ctx.getStart());
-    return visitChildren(ctx);
+    return addTreeNode(ctx, IfElseNode::new);
+  }
+
+  @Override
+  public List<Node> visitPerformStatement(PerformStatementContext ctx) {
+    final PerformProcedureStatementContext procStatement = ctx.performProcedureStatement();
+    final PerformInlineStatementContext inlineStatement = ctx.performInlineStatement();
+    if (procStatement != null) {
+      ProcedureNameContext procedureNameContext = procStatement.procedureName().get(0);
+      final String section = procedureNameContext.inSection() != null
+              ? procedureNameContext.inSection().sectionName().getText()
+              : null;
+      final String targetName = procedureNameContext.paragraphNameUsage().getText();
+      return addTreeNode(ctx, locality -> new PerformNode(locality, section, targetName));
+    }
+    if (inlineStatement != null) {
+      return addTreeNode(ctx, PerformNode::new);
+    }
+    return super.visitPerformStatement(ctx);
   }
 
   @Override
@@ -432,7 +452,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitSentence(SentenceContext ctx) {
     throwWarning(ctx.getStart());
-    return visitChildren(ctx);
+    return addTreeNode(ctx, SentenceNode::new);
   }
 
   @Override
@@ -619,6 +639,43 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return visitChildren(ctx);
   }
 
+  @Override
+  public List<Node> visitGoToStatement(GoToStatementContext ctx) {
+    List<String> targets = Collections.singletonList(ctx.goToStatementSimple().procedureName().paragraphNameUsage().getText());
+    return addTreeNode(ctx, locality -> new GoToNode(locality, targets));
+  }
+
+  @Override
+  public List<Node> visitExitStatement(ExitStatementContext ctx) {
+    return addTreeNode(ctx, ExitNode::new);
+  }
+
+  @Override
+  public List<Node> visitGobackStatement(GobackStatementContext ctx) {
+    return addTreeNode(ctx, GoBackNode::new);
+  }
+
+  @Override
+  public List<Node> visitStopStatement(StopStatementContext ctx) {
+    return addTreeNode(ctx, StopNode::new);
+  }
+
+  @Override
+  public List<Node> visitEvaluateStatement(EvaluateStatementContext ctx) {
+    return addTreeNode(ctx, EvaluateNode::new);
+  }
+
+  @Override
+  public List<Node> visitEvaluateWhen(EvaluateWhenContext ctx) {
+    return addTreeNode(ctx, EvaluateWhenNode::new);
+  }
+
+  @Override
+  public List<Node> visitIfStatement(IfStatementContext ctx) {
+    return addTreeNode(ctx, locality -> new IfNode(locality, ctx));
+  }
+
+
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {
     SyntaxError error =
         SyntaxError.syntaxError()
@@ -759,4 +816,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         })
         .orElse(children);
   }
+
+  private String getIntervalText(ParserRuleContext ctx) {
+    final int start = ctx.start.getStartIndex();
+    final int stop = ctx.stop.getStopIndex();
+    return ctx.start.getInputStream().getText(new Interval(start, stop));
+  }
+
 }

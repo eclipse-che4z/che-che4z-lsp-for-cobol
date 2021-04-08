@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service.mocks;
 
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
+import org.eclipse.lsp.cobol.service.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.service.CobolTextDocumentService;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
@@ -55,6 +56,7 @@ public class MockTextDocumentService {
         .occurrences(occurrences)
         .formations(formations)
         .executors(new TestThreadPoolExecutor())
+        .cfastBuilder(new CFASTBuilderImpl())
         .build();
   }
 

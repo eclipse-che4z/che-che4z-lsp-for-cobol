@@ -991,7 +991,7 @@ paragraph
    ;
 
 sentence
-   : (statement* DOT_FS | idmsStatements endClause?)+
+   : statement* DOT_FS | idmsStatements endClause?
    ;
 
 statement

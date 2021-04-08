@@ -1,0 +1,102 @@
+[
+  {
+    "type": "program",
+    "name": "SECTST",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 12,
+        "character": 29
+      }
+    },
+    "children": [
+      {
+        "type": "goto",
+        "targetName": [
+          "PARAG1"
+        ]
+      },
+      {
+        "type": "section",
+        "name": "SECT1",
+        "snippet": "SECT1 SECTION.\r\n       PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n           PERFORM PARAG2 OF SECT2.\r\n       ",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 6,
+            "character": 7
+          },
+          "end": {
+            "line": 9,
+            "character": 41
+          }
+        },
+        "children": [
+          {
+            "type": "paragraph",
+            "snippet": "PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n           PERFORM PARAG2 OF SECT2.\r\n       ",
+            "name": "PARAG1",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 7,
+                "character": 7
+              },
+              "end": {
+                "line": 9,
+                "character": 41
+              }
+            },
+            "children": [
+              {
+                "id": 4,
+                "targetId": 6,
+                "targetName": "PARAG2",
+                "targetSectionName": "SECT2",
+                "type": "perform"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "name": "SECT2",
+        "snippet": "SECT2 SECTION.\r\n       PARAG2.\r\n           DISPLAY 'PARAG2'.",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 10,
+            "character": 7
+          },
+          "end": {
+            "line": 12,
+            "character": 34
+          }
+        },
+        "children": [
+          {
+            "type": "paragraph",
+            "snippet": "PARAG2.\r\n           DISPLAY 'PARAG2'.",
+            "name": "PARAG2",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 11,
+                "character": 7
+              },
+              "end": {
+                "line": 12,
+                "character": 34
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

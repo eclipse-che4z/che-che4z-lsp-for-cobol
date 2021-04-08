@@ -127,13 +127,14 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
             messageService,
             subroutineService);
     List<Node> syntaxTree = visitor.visit(tree);
+    SemanticContext context = visitor.finishAnalysis().unwrap(accumulatedErrors::addAll);
     if (syntaxTree.size() == 1) {
       Node rootNode = syntaxTree.get(0);
       SyntaxTreeEngine syntaxTreeEngine = new SyntaxTreeEngine(rootNode);
       accumulatedErrors.addAll(syntaxTreeEngine.processTree());
+      context = context.toBuilder().rootNode(rootNode).build();
     } else
       LOG.warn("The root node for syntax tree was not constructed");
-    SemanticContext context = visitor.finishAnalysis().unwrap(accumulatedErrors::addAll);
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
     accumulatedErrors.addAll(
         collectErrorsForCopybooks(accumulatedErrors, extendedDocument.getCopyStatements()));
