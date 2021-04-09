@@ -14,11 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
 /**
  * The node represents a variable definition. This is a stub and must be rewritten.
  */
+@Value
 public class VariableDefinitionNode extends Node {
   public VariableDefinitionNode(Locality locality) {
     super(locality, NodeType.VARIABLE_DEFINITION);

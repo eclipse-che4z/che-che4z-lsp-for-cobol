@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.engine;
 
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
@@ -160,6 +161,7 @@ class CobolLanguageEngineTest {
             SemanticContext.builder()
                 .constantDefinitions(getConstantDefinitions())
                 .outlineTree(expectedOutlineTree)
+                .rootNode(new RootNode(Locality.builder().build()))
                 .build(),
             ImmutableList.of(error, eofError));
 

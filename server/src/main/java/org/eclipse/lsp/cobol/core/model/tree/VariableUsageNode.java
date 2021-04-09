@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import lombok.Value;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
@@ -21,11 +22,12 @@ import org.eclipse.lsp.cobol.core.model.Locality;
  * The class represents variable usage in COBOL program.
  * This must be extended with a link to variable definition.
  */
+@Value
 public class VariableUsageNode extends Node {
-  private String dataName;
-  private Type variableUsageType;
-  private CobolParser.QualifiedDataNameFormat1Context dataNameFormat1Context;
-  private CobolParser.ConditionNameReferenceContext nameReferenceContext;
+  String dataName;
+  Type variableUsageType;
+  CobolParser.QualifiedDataNameFormat1Context dataNameFormat1Context;
+  CobolParser.ConditionNameReferenceContext nameReferenceContext;
 
   public VariableUsageNode(String dataName,
                            Locality locality,
@@ -34,12 +36,15 @@ public class VariableUsageNode extends Node {
     this.dataName = dataName;
     this.dataNameFormat1Context = dataNameFormat1Context;
     variableUsageType = Type.DATA_NAME;
+    nameReferenceContext = null;
   }
 
   public VariableUsageNode(String dataName, Locality locality) {
     super(locality, NodeType.VARIABLE_USAGE);
     this.dataName = dataName;
     variableUsageType = Type.TABLE_CALL;
+    dataNameFormat1Context = null;
+    nameReferenceContext = null;
   }
 
   public VariableUsageNode(String dataName,
@@ -49,6 +54,7 @@ public class VariableUsageNode extends Node {
     this.dataName = dataName;
     this.nameReferenceContext = nameReferenceContext;
     variableUsageType = Type.CONDITION_CALL;
+    dataNameFormat1Context = null;
   }
 
   @Override

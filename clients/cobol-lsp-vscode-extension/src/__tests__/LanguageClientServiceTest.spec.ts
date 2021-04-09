@@ -18,7 +18,7 @@ import { LanguageClient } from "vscode-languageclient";
 import {CopybookDownloadService} from "../services/copybook/CopybookDownloadService";
 import {CopybookURI} from "../services/copybook/CopybookURI";
 import {JavaCheck} from "../services/JavaCheck";
-import { AnalysisResult, LanguageClientService } from "../services/LanguageClientService";
+import { LanguageClientService } from "../services/LanguageClientService";
 import { Middleware } from "../services/Middleware";
 import { ProfileService } from "../services/ProfileService";
 import {ZoweApi} from "../services/ZoweApi";
@@ -78,7 +78,7 @@ describe("LanguageClientService positive scenario", () => {
 
     test("Test LanguageClientService retrieve analysis passes", async () => {
         let map: Map<string, vscode.Location[]> = new Map();
-        const expectedResult: AnalysisResult = { paragraphRange: map, paragraphUsages: map,  sectionRange: map, sectionUsages: map };
+        const expectedResult = { programs: [] };
 
         LanguageClient.prototype.sendRequest = () => Promise.resolve(expectedResult); 
         expect(await languageClientService.retrieveAnalysis("test")).toBe(expectedResult);

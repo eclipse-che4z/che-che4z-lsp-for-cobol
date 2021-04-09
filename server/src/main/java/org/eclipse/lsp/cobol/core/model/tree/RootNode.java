@@ -14,11 +14,17 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
 /**
  * The class represents the root. All trees must start with one root node.
  */
+@ToString
+@EqualsAndHashCode
+@Value
 public class RootNode extends Node {
   public RootNode(Locality locality) {
     super(locality, NodeType.ROOT);

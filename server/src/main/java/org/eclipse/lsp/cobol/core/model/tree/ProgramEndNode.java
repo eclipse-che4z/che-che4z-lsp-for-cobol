@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -26,8 +27,9 @@ import java.util.List;
  * The class represents the program end.
  */
 @Slf4j
+@Value
 public class ProgramEndNode extends Node {
-  private final String programId;
+  String programId;
 
   public ProgramEndNode(Locality locality, String programId) {
     super(locality, NodeType.PROGRAM_END);

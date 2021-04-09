@@ -14,13 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
 /**
  * The class represents program ID.
  */
+@Value
 public class ProgramIdNode extends Node {
-  private final String programId;
+  String programId;
 
   public ProgramIdNode(Locality locality, String programId) {
     super(locality, NodeType.PROGRAM_ID);

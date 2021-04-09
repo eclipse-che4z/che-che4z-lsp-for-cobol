@@ -66,6 +66,7 @@ public class ServiceModule extends AbstractModule {
     bind(SubroutineService.class).to(SubroutineServiceImpl.class);
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(HoverProvider.class).to(VariableHover.class);
+    bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
 
     bindFormations();
     bindCompletions();

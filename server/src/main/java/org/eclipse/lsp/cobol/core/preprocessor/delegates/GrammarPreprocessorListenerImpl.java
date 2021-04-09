@@ -88,7 +88,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private Deque<List<Pair<String, String>>> recursiveReplaceStmtStack;
 
   @Inject
-  GrammarPreprocessorListenerImpl(
+  public GrammarPreprocessorListenerImpl(
       @Assisted String documentUri,
       @Assisted BufferedTokenStream tokens,
       @Assisted Deque<CopybookUsage> copybookStack,
