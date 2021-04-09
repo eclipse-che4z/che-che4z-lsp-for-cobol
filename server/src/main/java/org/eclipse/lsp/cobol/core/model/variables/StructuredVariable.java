@@ -32,6 +32,11 @@ public abstract class StructuredVariable extends AbstractVariable {
   private List<Variable> children = new ArrayList<>();
 
   StructuredVariable(
+      int levelNumber, String name, Locality definition, boolean global, Variable parent) {
+    super(levelNumber, name, definition, global, parent);
+  }
+
+  StructuredVariable(
       int levelNumber, String name, Locality definition, Variable parent) {
     super(levelNumber, name, definition, parent);
   }

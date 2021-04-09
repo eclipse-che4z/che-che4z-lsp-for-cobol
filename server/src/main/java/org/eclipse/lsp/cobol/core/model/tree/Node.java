@@ -81,15 +81,14 @@ public abstract class Node {
   }
 
   /**
-   * Get nearest parent with specified type starting with this.
-   * Exception: theNode == theNode.getNearestParentByType(theNode.getNodeType()).get();
+   * Get nearest parent with specified type.
    *
    * @param type required node type.
    * @return an optional with requested nearest node.
    */
   public Optional<Node> getNearestParentByType(NodeType type) {
-    if (nodeType == type) return Optional.of(this);
-    return Optional.ofNullable(parent).flatMap(it -> it.getNearestParentByType(type));
+    return Optional.ofNullable(parent)
+        .flatMap(it -> (it.nodeType == type) ? Optional.of(it) : it.getNearestParentByType(type));
   }
 
   /**

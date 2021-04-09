@@ -63,8 +63,8 @@ public class MultiTableDataName extends StructuredVariable implements TableDecla
 
   @Override
   public String getFormattedDisplayLine() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(String.format("%1$02d %2$s OCCURS %3$d TIMES", levelNumber, name, occursTimes));
+    StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
+    stringBuilder.append(String.format(" OCCURS %1$d TIMES", occursTimes));
     if (usageFormat != UsageFormat.UNDEFINED)
       stringBuilder.append(" USAGE ").append(usageFormat);
     return stringBuilder.append(".").toString();

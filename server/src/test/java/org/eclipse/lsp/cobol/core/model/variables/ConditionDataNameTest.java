@@ -22,15 +22,17 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test {@link ConditionDataName}
  */
 class ConditionDataNameTest {
+  private static final Variable PARENT = new GroupItem(1, "Parent", null, false, null);
+
   @Test
   void getFormattedDisplayLine() {
-    ConditionDataName variable = new ConditionDataName("TEST", null, null, "FOO", null);
+    ConditionDataName variable = new ConditionDataName("TEST", null, PARENT, "FOO", null);
     assertEquals("88 TEST VALUE FOO.", variable.getFormattedDisplayLine());
   }
 
   @Test
   void getFormattedDisplayLineWithThru() {
-    ConditionDataName variable = new ConditionDataName("TEST", null, null, "FOO", "BAR");
+    ConditionDataName variable = new ConditionDataName("TEST", null, PARENT, "FOO", "BAR");
     assertEquals("88 TEST VALUE FOO THRU BAR.", variable.getFormattedDisplayLine());
   }
 }

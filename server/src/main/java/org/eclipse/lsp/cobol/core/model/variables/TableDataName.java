@@ -39,13 +39,14 @@ public class TableDataName extends AbstractVariable implements TableDeclaration 
       int levelNumber,
       String name,
       Locality definition,
+      boolean global,
       Variable parent,
       String picClause,
       String value,
       int occursTimes,
       List<IndexItem> indexes,
       UsageFormat usageFormat) {
-    super(levelNumber, name, definition, parent);
+    super(levelNumber, name, definition, global, parent);
     this.picClause = picClause;
     this.value = value;
     this.occursTimes = occursTimes;
@@ -59,6 +60,7 @@ public class TableDataName extends AbstractVariable implements TableDeclaration 
         levelNumber,
         name,
         definition,
+        newParent.global,
         newParent,
         picClause,
         value,
@@ -69,8 +71,8 @@ public class TableDataName extends AbstractVariable implements TableDeclaration 
 
   @Override
   public String getFormattedDisplayLine() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(String.format("%1$02d %2$s OCCURS %3$d TIMES", levelNumber, name, occursTimes));
+    StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
+    stringBuilder.append(String.format(" OCCURS %1$d TIMES", occursTimes));
     if (picClause != null)
       stringBuilder.append(" PIC ").append(picClause);
     if (usageFormat != UsageFormat.UNDEFINED)

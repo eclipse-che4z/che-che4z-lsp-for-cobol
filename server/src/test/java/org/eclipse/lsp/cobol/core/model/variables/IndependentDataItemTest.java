@@ -25,13 +25,25 @@ class IndependentDataItemTest {
 
   @Test
   void getFormattedDisplayLine() {
-    IndependentDataItem variable = new IndependentDataItem("DATA", null, null, null);
+    IndependentDataItem variable = new IndependentDataItem("DATA", null, false, null, null);
     assertEquals("77 DATA.", variable.getFormattedDisplayLine());
   }
 
   @Test
   void getFormattedDisplayLineFull() {
-    IndependentDataItem variable = new IndependentDataItem("DATA", null, "9", "3");
+    IndependentDataItem variable = new IndependentDataItem("DATA", null, false, "9", "3");
     assertEquals("77 DATA PIC 9 VALUE 3.", variable.getFormattedDisplayLine());
+  }
+
+  @Test
+  void getFormattedDisplayLineForGlobal() {
+    IndependentDataItem variable = new IndependentDataItem("DATA", null, true, null, null);
+    assertEquals("77 DATA GLOBAL.", variable.getFormattedDisplayLine());
+  }
+
+  @Test
+  void getFormattedDisplayLineFullForGlobal() {
+    IndependentDataItem variable = new IndependentDataItem("DATA", null, true, "9", "3");
+    assertEquals("77 DATA GLOBAL PIC 9 VALUE 3.", variable.getFormattedDisplayLine());
   }
 }

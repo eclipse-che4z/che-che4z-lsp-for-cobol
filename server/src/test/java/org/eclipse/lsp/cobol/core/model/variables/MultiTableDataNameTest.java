@@ -23,16 +23,17 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test {@link MultiTableDataName}
  */
 class MultiTableDataNameTest {
+  private static final Variable PARENT = new GroupItem(1, "Parent", null, false, null);
 
   @Test
   void getFormattedDisplayLine() {
-    MultiTableDataName variable = new MultiTableDataName(15, "TAB", null, null, 30, ImmutableList.of(), UsageFormat.UNDEFINED);
+    MultiTableDataName variable = new MultiTableDataName(15, "TAB", null, PARENT, 30, ImmutableList.of(), UsageFormat.UNDEFINED);
     assertEquals("15 TAB OCCURS 30 TIMES.", variable.getFormattedDisplayLine());
   }
 
   @Test
   void getFormattedDisplayLineFull() {
-    MultiTableDataName variable = new MultiTableDataName(15, "TAB", null, null, 30, ImmutableList.of(), UsageFormat.COMP);
+    MultiTableDataName variable = new MultiTableDataName(15, "TAB", null, PARENT, 30, ImmutableList.of(), UsageFormat.COMP);
     assertEquals("15 TAB OCCURS 30 TIMES USAGE COMP.", variable.getFormattedDisplayLine());
   }
 }
