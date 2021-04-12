@@ -28,8 +28,4 @@ public class IfNode extends Node {
     super(location, NodeType.IF);
     this.ifStatementContext =  ifStatementContext;
   }
-
-  public CobolParser.IfStatementContext getIfStatementContext() {
-    return ifStatementContext;
-  }
 }

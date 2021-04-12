@@ -641,7 +641,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitGoToStatement(GoToStatementContext ctx) {
-    List<String> targets = Collections.singletonList(ctx.goToStatementSimple().procedureName().paragraphNameUsage().getText());
+    GoToStatementSimpleContext goToStatementSimpleContext = ctx.goToStatementSimple();
+    if(goToStatementSimpleContext == null) {
+      return visitChildren(ctx);
+    }
+    List<String> targets = Collections.singletonList(goToStatementSimpleContext.procedureName().paragraphNameUsage().getText());
     return addTreeNode(ctx, locality -> new GoToNode(locality, targets));
   }
 
