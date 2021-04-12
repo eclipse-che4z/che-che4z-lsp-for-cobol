@@ -171,7 +171,29 @@
                     80
                 ]
             }
-        }
+        },
+        "keybindings": [
+            {
+                "key": "tab",
+                "command": "cobol-lsp.smart-tab",
+                "when": "editorLangId == cobol && !inSnippetMode"
+            },
+            {
+                "key": "tab",
+                "command": "cobol-lsp.smart-tab",
+                "when": "editorLangId == COBOL && !inSnippetMode"
+            },
+            {
+                "key": "shift+tab",
+                "command": "cobol-lsp.smart-outdent",
+                "when": "editorLangId == cobol || && !inSnippetMode"
+            },
+            {
+                "key": "shift+tab",
+                "command": "cobol-lsp.smart-outdent",
+                "when": "editorLangId == COBOL && !inSnippetMode"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
