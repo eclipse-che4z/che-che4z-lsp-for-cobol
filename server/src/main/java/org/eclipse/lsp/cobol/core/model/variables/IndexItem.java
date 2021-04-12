@@ -29,7 +29,9 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = true)
 public class IndexItem extends AbstractVariable {
   public IndexItem(int levelNumber, String name, Locality definition) {
-    super(levelNumber, name, definition, null);
+    // IndexItem is non global when it's initially created.
+    // Later on it will be recreated via {@code} updateParent {@code}.
+    super(levelNumber, name, definition, false, null);
   }
   public IndexItem(int leverNumber, String name, Locality definition, Variable parent) {
     super(leverNumber, name, definition, parent);

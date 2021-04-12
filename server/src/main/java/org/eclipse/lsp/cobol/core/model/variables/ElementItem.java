@@ -37,11 +37,12 @@ public class ElementItem extends AbstractVariable {
       int levelNumber,
       String name,
       Locality definition,
+      boolean global,
       Variable parent,
       String picClause,
       String value,
       UsageFormat usageFormat) {
-    super(levelNumber, name, definition, parent);
+    super(levelNumber, name, definition, global, parent);
     this.picClause = picClause;
     this.value = value;
     this.usageFormat = usageFormat;
@@ -53,6 +54,7 @@ public class ElementItem extends AbstractVariable {
         levelNumber,
         name,
         definition,
+        newParent.global,
         newParent,
         picClause,
         value,
@@ -61,8 +63,7 @@ public class ElementItem extends AbstractVariable {
 
   @Override
   public String getFormattedDisplayLine() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(String.format("%1$02d %2$s", levelNumber, name));
+    StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
     if (picClause != null)
       stringBuilder.append(" PIC ").append(picClause);
     if (usageFormat != UsageFormat.UNDEFINED)

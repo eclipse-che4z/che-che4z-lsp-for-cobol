@@ -75,4 +75,11 @@ public interface Variable extends Renameable, Conditional {
    * @return the string with described variable.
    */
   String getFormattedDisplayLine();
+
+  /**
+   * Return true if the variable is global.
+   *
+   * @return the global status
+   */
+  boolean isGlobal();
 }

@@ -36,16 +36,15 @@ public class IndependentDataItem extends AbstractVariable implements Conditional
   String value;
 
   public IndependentDataItem(
-      String name, Locality definition, String picClause, String value) {
-    super(LEVEL_77, name, definition, null);
+      String name, Locality definition, boolean global, String picClause, String value) {
+    super(LEVEL_77, name, definition, global, null);
     this.picClause = picClause;
     this.value = value;
   }
 
   @Override
   public String getFormattedDisplayLine() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(String.format("%1$02d %2$s", levelNumber, name));
+    StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
     if (picClause != null)
       stringBuilder.append(" PIC ").append(picClause);
     if (StringUtils.isNoneBlank(value))

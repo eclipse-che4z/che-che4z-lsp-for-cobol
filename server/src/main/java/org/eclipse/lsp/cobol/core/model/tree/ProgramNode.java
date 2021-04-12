@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -22,10 +23,8 @@ import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate;
 import org.eclipse.lsp.cobol.core.visitor.VariableUsageDelegate;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class represents program context in COBOL.
@@ -34,6 +33,7 @@ public class ProgramNode extends Node {
   private VariableDefinitionDelegate variableDefinitionDelegate;
   private VariableUsageDelegate variableUsageDelegate;
   private String programName;
+  private Collection<Variable> definedVariables;
 
   /**
    * Use for testing.
@@ -69,8 +69,26 @@ public class ProgramNode extends Node {
   @Override
   public List<SyntaxError> getErrors() {
     List<SyntaxError> errors = new ArrayList<>();
-    Collection<Variable> definedVariables = variableDefinitionDelegate.finishDefinitionAnalysis().unwrap(errors::addAll);
-    errors.addAll(variableUsageDelegate.updateUsageAndGenerateErrors(definedVariables));
+    definedVariables = variableDefinitionDelegate.finishDefinitionAnalysis().unwrap(errors::addAll);
+    Set<String> variableNames = definedVariables.stream().map(Variable::getName).collect(Collectors.toSet());
+    List<Variable> availableVariables = new ArrayList<>(definedVariables);
+    getGlobalVariables().stream()
+        .filter(variable -> !variableNames.contains(variable.getName()))
+        .forEach(availableVariables::add);
+    errors.addAll(variableUsageDelegate.updateUsageAndGenerateErrors(availableVariables));
     return errors;
+  }
+
+  private List<Variable> getGlobalVariables() {
+    List<Variable> globalVariables = definedVariables.stream().filter(Variable::isGlobal).collect(Collectors.toList());
+    Set<String> globalVariablesNames = globalVariables.stream().map(Variable::getName).collect(Collectors.toSet());
+    List<Variable> parentGlobalVariables = getNearestParentByType(NodeType.PROGRAM)
+        .map(ProgramNode.class::cast)
+        .map(ProgramNode::getGlobalVariables)
+        .orElseGet(ImmutableList::of);
+    parentGlobalVariables.stream()
+        .filter(variable -> !globalVariablesNames.contains(variable.getName()))
+        .forEach(globalVariables::add);
+    return globalVariables;
   }
 }

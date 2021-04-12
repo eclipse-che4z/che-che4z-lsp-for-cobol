@@ -65,6 +65,8 @@ public class VariableDefinitionDelegate {
   private static final String CHILD_TO_RENAME_NOT_FOUND = "semantics.childToRenameNotFound";
   private static final String INCORRECT_CHILDREN_ORDER = "semantics.incorrectChildrenOrder";
   private static final String CANNOT_BE_RENAMED = "semantics.cannotBeRenamed";
+  private static final String GLOBAL_NON_01_LEVEL_MSG = "semantics.globalNon01Level";
+  private static final String GLOBAL_TOO_MANY_DEFINITIONS = "semantics.globalTooManyDefinitions";
 
   private static final ErrorSeverity SEVERITY = ERROR;
 
@@ -76,6 +78,7 @@ public class VariableDefinitionDelegate {
   private Deque<StructuredVariable> structureStack = new ArrayDeque<>();
   private Deque<Variable> variables = new ArrayDeque<>();
   private List<SyntaxError> errors = new ArrayList<>();
+  private Map<String, List<VariableDefinitionContext>> globalVariables = new HashMap<>();
 
   private final Map<Token, Locality> positions;
   private final MessageService messages;
@@ -105,6 +108,7 @@ public class VariableDefinitionDelegate {
             .definition(
                 retrieveDefinition(
                     Optional.<ParserRuleContext>ofNullable(ctx.entryName()).orElse(ctx)))
+            .global(!ctx.dataGlobalClause().isEmpty())
             .antlrClass(ctx.getClass())
             .starting(positions.get(ctx.LEVEL_NUMBER().getSymbol()))
             .picClauses(ctx.dataPictureClause())
@@ -121,7 +125,9 @@ public class VariableDefinitionDelegate {
     checkOccursClauseIsSingle(variableDefinitionContext);
     checkValueClauseIsSingle(variableDefinitionContext);
     checkUsageClauseIsSingle(variableDefinitionContext);
+    checkGlobalFlagFor01Level(variableDefinitionContext);
     setValueClauseText(variableDefinitionContext);
+    saveGlobalVariable(variableDefinitionContext);
     // TODO: check the same way that the other clauses are singular or absent
 
     defineVariable(
@@ -150,6 +156,7 @@ public class VariableDefinitionDelegate {
             .definition(
                 retrieveDefinition(
                     Optional.<ParserRuleContext>ofNullable(ctx.entryName()).orElse(ctx)))
+            .global(!ctx.dataGlobalClause().isEmpty())
             .antlrClass(ctx.getClass())
             .starting(positions.get(ctx.LEVEL_NUMBER_77().getSymbol()))
             .picClauses(ctx.dataPictureClause())
@@ -253,6 +260,7 @@ public class VariableDefinitionDelegate {
   @NonNull
   public ResultWithErrors<Collection<Variable>> finishDefinitionAnalysis() {
     closePreviousStructure();
+    checkGlobalVariableDefinitions();
     return new ResultWithErrors<>(new ArrayList<>(variables), new ArrayList<>(errors));
   }
 
@@ -378,6 +386,11 @@ public class VariableDefinitionDelegate {
     checkClauseIsSingle(variable.getDefinition(), variable.getUsageClauses(), "USAGE");
   }
 
+  private void checkGlobalFlagFor01Level(VariableDefinitionContext variable) {
+    if (variable.global && variable.number != 1)
+      addError(messages.getMessage(GLOBAL_NON_01_LEVEL_MSG), variable.definition);
+  }
+
   private void checkClauseIsSingle(
       Locality locality, List<? extends ParserRuleContext> clauses, String clause) {
     if (clauses.size() > 1) {
@@ -452,6 +465,7 @@ public class VariableDefinitionDelegate {
           variable.getNumber(),
           variable.getName(),
           variable.getDefinition(),
+          variable.global,
           structureStack.peek());
     }
     return null;
@@ -465,6 +479,7 @@ public class VariableDefinitionDelegate {
               variable.getNumber(),
               variable.getName(),
               variable.getDefinition(),
+              variable.isGlobal(),
               structureStack.peek(),
               retrievePicText(variable.getPicClauses()),
               variable.getValueClauseTest(),
@@ -484,6 +499,7 @@ public class VariableDefinitionDelegate {
           variable.getNumber(),
           variable.getName(),
           variable.getDefinition(),
+          variable.isGlobal(),
           structureStack.peek(),
           retrievePicText(variable.getPicClauses()),
           variable.getValueClauseTest(),
@@ -501,7 +517,7 @@ public class VariableDefinitionDelegate {
       picClause = retrievePicText(variable.getPicClauses());
     }
     return new IndependentDataItem(
-        variable.getName(), variable.getDefinition(), picClause, variable.getValueClauseTest());
+        variable.getName(), variable.getDefinition(), variable.isGlobal(), picClause, variable.getValueClauseTest());
   }
 
   private Variable conditionalDataNameMatcher(VariableDefinitionContext variable) {
@@ -518,9 +534,13 @@ public class VariableDefinitionDelegate {
   }
 
   private Variable renameItemMatcher(VariableDefinitionContext variable) {
-    RenameItem renameItem = new RenameItem(variable.getName(), variable.getDefinition());
-    List<Variable> renamedVariables =
-        renameVariables(renameItem, extractChildrenToRename(variable));
+    List<Variable> childrenToRename = extractChildrenToRename(variable);
+    boolean isGlobal = !childrenToRename.isEmpty() && childrenToRename.get(0).isGlobal();
+    RenameItem renameItem = new RenameItem(
+        variable.getName(),
+        isGlobal,
+        variable.getDefinition());
+    List<Variable> renamedVariables = renameVariables(renameItem, childrenToRename);
     renamedVariables.forEach(variables::push);
     renamedVariables.forEach(renameItem::addChild);
     return renameItem;
@@ -608,6 +628,19 @@ public class VariableDefinitionDelegate {
     addError(messages.getMessage(CHILD_TO_RENAME_NOT_FOUND, stopName), locality);
   }
 
+  private void saveGlobalVariable(VariableDefinitionContext variableDefinitionContext) {
+    if (variableDefinitionContext.global)
+      globalVariables.computeIfAbsent(variableDefinitionContext.name, k -> new ArrayList<>())
+          .add(variableDefinitionContext);
+  }
+
+  private void checkGlobalVariableDefinitions() {
+    globalVariables.values().stream()
+        .filter(it -> it.size() > 1)
+        .flatMap(List::stream)
+        .forEach(it -> addError(messages.getMessage(GLOBAL_TOO_MANY_DEFINITIONS), it.getDefinition()));
+  }
+
   /** This data class used for temporal storage ANTLR parsed variables. */
   @Data
   @Builder
@@ -615,6 +648,7 @@ public class VariableDefinitionDelegate {
     int number;
     String name;
     Locality definition;
+    boolean global;
     Class<? extends ParserRuleContext> antlrClass;
     Locality starting;
     List<DataPictureClauseContext> picClauses;

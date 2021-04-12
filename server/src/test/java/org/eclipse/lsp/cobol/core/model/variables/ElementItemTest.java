@@ -24,13 +24,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class ElementItemTest {
   @Test
   void getFormattedDisplayLine() {
-    ElementItem variable = new ElementItem(3, "ELEM", null, null, null, "", UsageFormat.UNDEFINED);
+    ElementItem variable = new ElementItem(3, "ELEM", null, false, null, null, "", UsageFormat.UNDEFINED);
     assertEquals("03 ELEM.", variable.getFormattedDisplayLine());
   }
 
   @Test
   void getFormattedDisplayLineFull() {
-    ElementItem variable = new ElementItem(3, "ELEM", null, null, "9(9)", "123", UsageFormat.COMP);
+    ElementItem variable = new ElementItem(3, "ELEM", null, false, null, "9(9)", "123", UsageFormat.COMP);
     assertEquals("03 ELEM PIC 9(9) USAGE COMP VALUE 123.", variable.getFormattedDisplayLine());
   }
 }

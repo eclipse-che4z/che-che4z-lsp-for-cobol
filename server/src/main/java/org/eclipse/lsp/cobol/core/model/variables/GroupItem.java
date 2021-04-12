@@ -31,8 +31,8 @@ import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVE
 public class GroupItem extends StructuredVariable {
 
   public GroupItem(
-      int levelNumber, String name, Locality definition, Variable parent) {
-    super(levelNumber, name, definition, parent);
+      int levelNumber, String name, Locality definition, boolean global, Variable parent) {
+    super(levelNumber, name, definition, global, parent);
   }
 
   @Override
@@ -43,6 +43,7 @@ public class GroupItem extends StructuredVariable {
             levelNumber,
             name,
             definition,
+            newParent.global,
             newParent);
   }
 }
