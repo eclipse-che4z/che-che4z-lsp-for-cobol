@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
@@ -21,6 +22,7 @@ import lombok.Value;
  * which leads to stop of program execution.
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class Stop extends CFASTNode {
   String type = CFASTNodeType.STOP;
 }

@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.eclipse.lsp4j.Position;
 
@@ -21,6 +22,7 @@ import org.eclipse.lsp4j.Position;
  * Data transport object of CF AST. Location type stores location binding of CF AST nodes.
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class Location {
   String uri;
   Position start;

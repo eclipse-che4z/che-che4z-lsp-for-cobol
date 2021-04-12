@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.List;
  * Data transport object of CF AST. GoTo type is GOTO statement node.
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class GoTo extends CFASTNode {
   String type = CFASTNodeType.GOTO;
   /** targetName is list to support conditional goto case */

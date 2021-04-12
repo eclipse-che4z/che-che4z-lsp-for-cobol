@@ -14,12 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
  * Data transport object of CF AST. Paragraph type represents PARAGRAPH of a COBOL program.
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class Paragraph extends CFASTNode {
   String type = CFASTNodeType.PARAGRAPH;
   String snippet;

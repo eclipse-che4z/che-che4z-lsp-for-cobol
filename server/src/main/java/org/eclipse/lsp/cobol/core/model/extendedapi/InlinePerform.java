@@ -14,12 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
  * Data transport object of CF AST. InlinePerform type represents inline PERFORM statement start.
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class InlinePerform extends CFASTNode {
   String type = CFASTNodeType.INLINE_PERFORM;
 }

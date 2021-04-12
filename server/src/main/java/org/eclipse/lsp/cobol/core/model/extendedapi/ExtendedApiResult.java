@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.List;
  * Analysis result for Extended Api call
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class ExtendedApiResult {
   List<Program> controlFlowAST;
 }

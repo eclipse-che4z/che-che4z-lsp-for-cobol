@@ -14,12 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
  * Data transport object of CF AST. When type is branch of evaluate statement conditional execution path.
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class When extends CFASTNode {
   String type = CFASTNodeType.WHEN;
 }

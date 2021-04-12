@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
@@ -21,6 +22,7 @@ import lombok.Value;
  * One file can contain more then one program.
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class Program extends CFASTNode {
   String type = CFASTNodeType.PROGRAM;
   String name;

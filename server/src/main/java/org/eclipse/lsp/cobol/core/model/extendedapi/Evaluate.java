@@ -14,12 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
  * Data transport object of CF AST. Evaluate type represents start of Evaluate statement.
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class Evaluate extends CFASTNode {
   String type = CFASTNodeType.EVALUATE;
 }

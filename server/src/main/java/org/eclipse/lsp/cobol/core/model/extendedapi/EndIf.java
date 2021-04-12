@@ -14,12 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
  * Data transport object of CF AST. EndIf type represents end of current conditional branch of IF statement.
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class EndIf extends CFASTNode {
   String type = CFASTNodeType.ENDIF;
 }
