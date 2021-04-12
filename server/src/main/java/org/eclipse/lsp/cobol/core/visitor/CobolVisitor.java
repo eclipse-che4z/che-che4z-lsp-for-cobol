@@ -381,6 +381,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node>  visitExecCicsStatement(ExecCicsStatementContext ctx) {
+    areaBWarningCheck(ctx);
+    return visitChildren(ctx);
+  }
+
+ @Override
   public List<Node> visitExecSqlStatementInProcedureDivision(
       ExecSqlStatementInProcedureDivisionContext ctx) {
     areaBWarningCheck(ctx);
