@@ -14,13 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
- * Data transport object of CF AST. Program type is a root node of CF AST tree.
- * One file can contain more then one program.
+ * Data transport object of CF AST. Program type is a root node of CF AST tree. One file can contain
+ * more than one program.
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class Program extends CFASTNode {
   String type = CFASTNodeType.PROGRAM;
   String name;

@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
-/**
- * Data transport object of CF AST. Section type represents COBOL program SECTION.
- */
+/** Data transport object of CF AST. Section type represents COBOL program SECTION. */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class Section extends CFASTNode {
   String type = CFASTNodeType.SECTION;
   String name;

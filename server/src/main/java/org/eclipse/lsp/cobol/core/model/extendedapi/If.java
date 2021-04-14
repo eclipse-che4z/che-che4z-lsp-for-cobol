@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
-/**
- * Data transport object of CF AST. If type represents IF statement start.
- */
+/** Data transport object of CF AST. If type represents IF statement start. */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class If extends CFASTNode {
   String type = CFASTNodeType.IF;
 }
