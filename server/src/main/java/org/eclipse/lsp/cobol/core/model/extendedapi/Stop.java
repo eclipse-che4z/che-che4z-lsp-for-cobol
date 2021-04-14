@@ -14,13 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
- * Data transport object of CF AST. Stop type represent all COBOL control statements
- * which leads to stop of program execution.
+ * Data transport object of CF AST. Stop type represent all COBOL control statements which leads to
+ * stop of program execution.
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class Stop extends CFASTNode {
   String type = CFASTNodeType.STOP;
 }

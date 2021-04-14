@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
-/**
- * Data transport object of CF AST ElseIf node. This node type represents branches in CF AST.
- */
+/** Data transport object of CF AST ElseIf node. This node type represents branches in CF AST. */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class ElseIf extends CFASTNode {
   String type = CFASTNodeType.ELSE;
 }

@@ -14,12 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
- * Data transport object of CF AST. EndInlinePerform type represents end of inline perform statement.
+ * Data transport object of CF AST. EndInlinePerform type represents end of inline perform
+ * statement.
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class EndInlinePerform extends CFASTNode {
   String type = CFASTNodeType.END_INLINE_PERFORM;
 }
