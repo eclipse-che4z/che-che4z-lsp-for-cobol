@@ -111,7 +111,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
    */
   @NonNull
   public ResultWithErrors<SemanticContext> finishAnalysis() {
-    Collection<Variable> definedVariables = variablesDelegate.finishDefinitionAnalysis().getResult();
+    Collection<Variable> definedVariables =
+        variablesDelegate.finishDefinitionAnalysis().getResult();
     variableUsageDelegate.updateUsageAndGenerateErrors(definedVariables);
     errors.addAll(groupContext.generateParagraphErrors(messageService));
     return new ResultWithErrors<>(
@@ -159,11 +160,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitStartRule(StartRuleContext ctx) {
     // we can skip the other nodes, but not the root
-    return getLocalityRange(ctx).map(locality -> {
-      Node rootNode = new RootNode(locality);
-      visitChildren(ctx).forEach(rootNode::addChild);
-      return ImmutableList.of(rootNode);
-    }).orElse(ImmutableList.of());
+    return getLocalityRange(ctx)
+        .map(
+            locality -> {
+              Node rootNode = new RootNode(locality);
+              visitChildren(ctx).forEach(rootNode::addChild);
+              return ImmutableList.of(rootNode);
+            })
+        .orElse(ImmutableList.of());
   }
 
   @Override
@@ -181,7 +185,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .map(PreprocessorStringUtils::trimQuotes)
         .ifPresent(
             name -> {
-              getLocalityRange(ctx).ifPresent(locality -> result.add(new ProgramIdNode(locality, name)));
+              getLocalityRange(ctx)
+                  .ifPresent(locality -> result.add(new ProgramIdNode(locality, name)));
               outlineTreeBuilder.renameProgram(name, ctx);
               outlineTreeBuilder.addNode(PROGRAM_ID_PREFIX + name, NodeType.PROGRAM_ID, ctx);
             });
@@ -250,7 +255,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     String name = ctx.getStart().getText().toUpperCase();
     getLocality(ctx.getStart())
         .ifPresent(locality -> groupContext.addSectionDefinition(name, locality));
-    return addTreeNode(ctx, locality -> new ProcedureSectionNode(locality, ctx.getStart().getText(), getIntervalText(ctx)));
+    return addTreeNode(
+        ctx,
+        locality ->
+            new ProcedureSectionNode(locality, ctx.getStart().getText(), getIntervalText(ctx)));
   }
 
   @Override
@@ -274,9 +282,17 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private Optional<Locality> getLocalityRange(ParserRuleContext ctx) {
-    return getLocality(ctx.getStart()).flatMap(start -> getLocality(ctx.getStop()).map(
-        stop -> start.toBuilder().range(new Range(start.getRange().getStart(), stop.getRange().getEnd())).build()
-    ));
+    return getLocality(ctx.getStart())
+        .flatMap(
+            start ->
+                getLocality(ctx.getStop())
+                    .map(
+                        stop ->
+                            start.toBuilder()
+                                .range(
+                                    new Range(
+                                        start.getRange().getStart(), stop.getRange().getEnd()))
+                                .build()));
   }
 
   private Optional<Location> getRange(ParserRuleContext ctx) {
@@ -381,12 +397,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node>  visitExecCicsStatement(ExecCicsStatementContext ctx) {
+  public List<Node> visitExecCicsStatement(ExecCicsStatementContext ctx) {
     areaBWarningCheck(ctx);
     return visitChildren(ctx);
   }
 
- @Override
+  @Override
   public List<Node> visitExecSqlStatementInProcedureDivision(
       ExecSqlStatementInProcedureDivisionContext ctx) {
     areaBWarningCheck(ctx);
@@ -415,7 +431,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private void areaBWarningCheck(ParserRuleContext ctx) {
     List<Token> tokenList =
-            tokenStream.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
+        tokenStream.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex());
     areaBWarning(tokenList);
   }
 
@@ -437,7 +453,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     final PerformInlineStatementContext inlineStatement = ctx.performInlineStatement();
     if (procStatement != null) {
       ProcedureNameContext procedureNameContext = procStatement.procedureName().get(0);
-      final String section = procedureNameContext.inSection() != null
+      final String section =
+          procedureNameContext.inSection() != null
               ? procedureNameContext.inSection().sectionName().getText()
               : null;
       final String targetName = procedureNameContext.paragraphNameUsage().getText();
@@ -647,7 +664,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitGoToStatement(GoToStatementContext ctx) {
-    List<String> targets = Collections.singletonList(ctx.goToStatementSimple().procedureName().paragraphNameUsage().getText());
+    GoToStatementSimpleContext goToStatementSimpleContext = ctx.goToStatementSimple();
+    if (goToStatementSimpleContext == null) {
+      return visitChildren(ctx);
+    }
+    List<String> targets =
+        Collections.singletonList(
+            goToStatementSimpleContext.procedureName().paragraphNameUsage().getText());
     return addTreeNode(ctx, locality -> new GoToNode(locality, targets));
   }
 
@@ -680,7 +703,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitIfStatement(IfStatementContext ctx) {
     return addTreeNode(ctx, locality -> new IfNode(locality, ctx));
   }
-
 
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {
     SyntaxError error =
@@ -743,7 +765,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private void areaAWarning(Token token) {
-    //skip area A check for cics and sql block
+    // skip area A check for cics and sql block
     if (token.getText().startsWith("EXEC")) {
       return;
     }
@@ -815,11 +837,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
     List<Node> children = visitChildren(ctx);
     return getLocalityRange(ctx)
-        .map(locality -> {
-          Node node = nodeConstructor.apply(locality);
-          children.forEach(node::addChild);
-          return (List<Node>) ImmutableList.of(node);
-        })
+        .map(
+            locality -> {
+              Node node = nodeConstructor.apply(locality);
+              children.forEach(node::addChild);
+              return (List<Node>) ImmutableList.of(node);
+            })
         .orElse(children);
   }
 
@@ -828,5 +851,4 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     final int stop = ctx.stop.getStopIndex();
     return ctx.start.getInputStream().getText(new Interval(start, stop));
   }
-
 }
