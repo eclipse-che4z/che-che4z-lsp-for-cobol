@@ -1007,7 +1007,9 @@ statement
 idmsStatements
     : copyIdmsBinds | copyIdmsModule | abendCodeStatement | attachTaskCodeStatement | bindStatement | changePriorityStatement | checkTerminalStatement | commitStatement |
      connectStatement | dcStatement | dequeueStatement | disconnectStatement | endStatement | endpageStatement | enqueueStatement | eraseStatement | findStatement |
-     finishStatement | getStatement | keepStatement | loadStatement | modifyStatement | obtainStatement | postStatement | putStatement | readyStatement |rollbackStatement |
+     finishStatement | getStatement | inquireMapStatement |
+     keepStatement | loadStatement | mapStatement | modifyStatement | obtainStatement |
+     postStatement | putStatement | readyStatement |rollbackStatement | startpageStatement |
      storeStatement
     ;
 
@@ -1815,6 +1817,33 @@ initiateStatement
    : INITIATE reportName+
    ;
 
+// inquire map statement
+
+inquireMapStatement
+   : INQUIRE MAP idms_map_name (MOVE inqMapMovePhrase | IF inqMapIfPhrase)
+   ;
+
+inqMapMovePhrase
+   : (AID TO generalIdentifier) | (CURSOR TO generalIdentifier generalIdentifier) | (IN LENGTH FOR generalIdentifier TO generalIdentifier)
+   ;
+
+inqMapIfPhrase
+   : (INPUT (UNFORMATTED | TRUNCATED | CHANGED | EXTRANEOUS) | (CURSOR AT? DFLD generalIdentifier) |
+   (inqMapWhichFields | inqMapWhichDflds) inqMapFieldTestPhrase) ifThen ifElse?
+   ;
+
+inqMapWhichFields
+   : CURRENT | ALL | NONE | ANY | SOME | ALL BUT CURRENT
+   ;
+
+inqMapWhichDflds
+   : (ALL | NONE | ANY | SOME | ALL BUT)? (DFLD generalIdentifier)+
+   ;
+
+inqMapFieldTestPhrase
+   : DATA IS? (YES | NO | ERASE | TRUNCATED | IDENTICAL | DIFFERENT) | EDIT IS? (ERROR | CORRECT)
+   ;
+
 // inspect statement
 
 inspectStatement
@@ -1927,6 +1956,79 @@ loadDictnameClause
 
 loadLoadlibClause
     : LOADLIB (generalIdentifier | literal)
+    ;
+
+// map statement
+
+mapStatement
+    : MAP (mapInClause | mapOutClause | mapOutInClause)
+    ;
+
+mapInClause
+    : IN USING idms_map_name mapIoInputPhrase? mapDetailPhrase?
+    ;
+
+mapIoInputPhrase
+    : mapInIoPhrase | mapInputPhrase
+    ;
+
+mapInIoPhrase
+    : (IO | (NOIO DATASTREAM idmsDmlFromClause))
+    ;
+
+mapInputPhrase
+    : INPUT DATA IS? (YES | NO)
+    ;
+
+mapDetailPhrase
+    : ((DETAIL mapDetailOptions?) | HEADER ) ((PAGE IS? generalIdentifier) | MODIFIED)*
+    ;
+
+mapDetailOptions
+    : (NEXT | FIRST | (SEQUENCE NUMBER IS? generalIdentifier) | (KEY IS? generalIdentifier))
+    (RETURNKEY IS? generalIdentifier)?
+    ;
+
+mapOutClause
+    : OUT USING idms_map_name  idmsWaitNowaitClause?  mapOutIoPhrase? mapOutputPhrase? mapMessagePhrase? mapOutDetailPhrase?
+    ;
+
+mapOutIoPhrase
+    : (IO | (NOIO DATASTREAM mapOutIntoClause))
+    ;
+
+mapOutIntoClause
+    : INTO? generalIdentifier ((TO generalIdentifier) | (MAX? LENGTH (generalIdentifier | integerLiteral)))
+      (RETURN LENGTH INTO? generalIdentifier)?
+    ;
+
+mapOutputPhrase
+    : OUTPUT ((DATA IS? (YES | NO | ERASE | ATTRIBUTE))? (NEWPAGE | ERASE)? LITERALS?)
+    ;
+
+mapMessagePhrase
+    : MESSAGE IS? generalIdentifier idmsDmlLengthClause
+    ;
+
+mapOutDetailPhrase
+    : (DETAIL (NEW | CURRENT)? (KEY IS? generalIdentifier)?) |
+      (RESUME (PAGE IS? (CURRENT | NEXT | PRIOR | FIRST | LAST | generalIdentifier))?)
+    ;
+
+mapOutInClause
+    : OUTIN USING idms_map_name mapOutputPhrase? mapInputPhrase? mapMessagePhrase?
+    ;
+
+idmsDmlFromClause
+    : FROM generalIdentifier idmsDmlLengthClause
+    ;
+
+idmsDmlLengthClause
+   : ((TO generalIdentifier) | (LENGTH (generalIdentifier | integerLiteral)))
+   ;
+
+idmsWaitNowaitClause
+    : (WAIT | NOWAIT)
     ;
 
 // merge statement
@@ -2425,6 +2527,13 @@ serviceLabelStatement
 serviceReloadStatement
    : SERVICE RELOAD generalIdentifier
    ;
+
+// startpage statement
+
+startpageStatement
+    : STARTPAGE SESSION? idms_map_name (WAIT | NOWAIT | RETURN)? (BACKPAGE | NOBACKPAGE)? (UPDATE | BROWSE)?
+     (AUTODISPLAY | NOAUTODISPLAY)?
+    ;
 
 // sort statement
 
