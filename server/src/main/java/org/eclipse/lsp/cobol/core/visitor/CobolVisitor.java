@@ -495,14 +495,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
     variablesDelegate.defineVariable(ctx);
-    String name =
-        ofNullable(ctx.entryName())
-            .map(EntryNameContext::dataName1)
-            .map(RuleContext::getText)
-            .orElse(FILLER_NAME);
-    String levelNumber = ctx.LEVEL_NUMBER().getText();
-    int level = Integer.parseInt(levelNumber);
-    outlineTreeBuilder.addVariable(level, name, getDataDescriptionNodeType(ctx), ctx);
+    String name = VisitorHelper.getName(ctx.entryName());
+    NodeType nodeType = getDataDescriptionNodeType(ctx);
+    int level = VisitorHelper.getLevel(ctx.LEVEL_NUMBER());
+    outlineTreeBuilder.addVariable(level, name, nodeType, ctx);
     Node node = new AntlrVariableDefinitionNode(ctx);
     visitChildren(ctx).forEach(node::addChild);
     return ImmutableList.of(node);
@@ -534,11 +530,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitDataDescriptionEntryFormat2(DataDescriptionEntryFormat2Context ctx) {
     variablesDelegate.defineVariable(ctx);
-    String name =
-        ofNullable(ctx.entryName())
-            .map(EntryNameContext::dataName1)
-            .map(RuleContext::getText)
-            .orElse(FILLER_NAME);
+    String name = VisitorHelper.getName(ctx.entryName());
     outlineTreeBuilder.addVariable(LEVEL_66, name, NodeType.FIELD_66, ctx);
     Node node = new AntlrVariableDefinitionNode(ctx);
     visitChildren(ctx).forEach(node::addChild);
@@ -548,11 +540,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitDataDescriptionEntryFormat3(DataDescriptionEntryFormat3Context ctx) {
     variablesDelegate.defineVariable(ctx);
-    String name =
-        ofNullable(ctx.entryName())
-            .map(EntryNameContext::dataName1)
-            .map(RuleContext::getText)
-            .orElse(FILLER_NAME);
+    String name = VisitorHelper.getName(ctx.entryName());
     outlineTreeBuilder.addVariable(LEVEL_88, name, NodeType.FIELD_88, ctx);
     Node node = new AntlrVariableDefinitionNode(ctx);
     visitChildren(ctx).forEach(node::addChild);
@@ -563,12 +551,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitDataDescriptionEntryFormat1Level77(
       DataDescriptionEntryFormat1Level77Context ctx) {
     variablesDelegate.defineVariable(ctx);
-    String name =
-        ofNullable(ctx.entryName())
-            .map(EntryNameContext::dataName1)
-            .map(RuleContext::getText)
-            .orElse(FILLER_NAME);
-
+    String name = VisitorHelper.getName(ctx.entryName());
     outlineTreeBuilder.addVariable(LEVEL_77, name, NodeType.FIELD, ctx);
     Node node = new AntlrVariableDefinitionNode(ctx);
     visitChildren(ctx).forEach(node::addChild);
@@ -722,21 +705,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return ofNullable(positionMapping.get(childToken));
   }
 
-  private Locality getIntervalPosition(Locality start, Locality stop) {
-    return Locality.builder()
-        .uri(start.getUri())
-        .range(new Range(start.getRange().getStart(), stop.getRange().getEnd()))
-        .recognizer(CobolVisitor.class)
-        .copybookId(start.getCopybookId())
-        .build();
-  }
-
   private void reportSubroutineNotDefined(String name, Locality locality) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .suggestion(messageService.getMessage("CobolVisitor.subroutineNotFound", name))
             .severity(ErrorSeverity.INFO)
-            .locality(getIntervalPosition(locality, locality))
+            .locality(VisitorHelper.getIntervalPosition(locality, locality))
             .build();
     LOG.debug("Syntax error by CobolVisitor#reportSubroutineNotDefined: {}", error);
     errors.add(error);

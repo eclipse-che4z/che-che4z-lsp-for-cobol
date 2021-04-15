@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.visitor;
 
+import lombok.*;
 import org.eclipse.lsp.cobol.core.CobolParser.*;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
@@ -23,10 +24,6 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.variables.*;
 import org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 import com.google.common.collect.ImmutableList;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -83,6 +80,8 @@ public class VariableDefinitionDelegate {
   private final Map<Token, Locality> positions;
   private final MessageService messages;
 
+  private final Map<String, String> redefinedVariables = new HashMap<>();
+
   /**
    * Create and accumulate a variable of level 01-49 out of the given context. Add errors if the
    * variable definition contains is invalid
@@ -115,6 +114,7 @@ public class VariableDefinitionDelegate {
             .occursClauses(ctx.dataOccursClause())
             .valueClauses(ctx.dataValueClause())
             .usageClauses(ctx.dataUsageClause())
+            .redefinesClauses(ctx.dataRedefinesClause())
             .build();
 
     // TODO: Add check that name does not present in the predefined variables list (? - to check)
@@ -128,10 +128,13 @@ public class VariableDefinitionDelegate {
     checkGlobalFlagFor01Level(variableDefinitionContext);
     setValueClauseText(variableDefinitionContext);
     saveGlobalVariable(variableDefinitionContext);
+    checkRedefinesContainsValue(variableDefinitionContext);
+    checkRedefinesClauseIsSingle(variableDefinitionContext);
     // TODO: check the same way that the other clauses are singular or absent
 
     defineVariable(
         variableDefinitionContext,
+        this::redefinesMatcher,
         this::multiTableDataNameMatcher,
         this::groupItemMatcher,
         // TODO: add check that the following items do not have VALUE:
@@ -163,6 +166,7 @@ public class VariableDefinitionDelegate {
             .valueClauses(ctx.dataValueClause())
             .usageClauses(ctx.dataUsageClause())
             .occursClauses(ctx.dataOccursClause())
+            .redefinesClauses(ctx.dataRedefinesClause())
             .build();
 
     checkStartingArea(variableDefinitionContext);
@@ -171,9 +175,11 @@ public class VariableDefinitionDelegate {
     checkValueClauseIsSingle(variableDefinitionContext);
     checkUsageClauseIsSingle(variableDefinitionContext);
     checkTopElementNumber(variableDefinitionContext);
+    checkRedefinesClauseIsSingle(variableDefinitionContext);
+    checkRedefinesContainsValue(variableDefinitionContext);
     closePreviousStructure();
 
-    defineVariable(variableDefinitionContext, this::independentDataItemMatcher);
+    defineVariable(variableDefinitionContext, this::redefinesMatcher, this::independentDataItemMatcher);
   }
 
   /**
@@ -264,6 +270,38 @@ public class VariableDefinitionDelegate {
     return new ResultWithErrors<>(new ArrayList<>(variables), new ArrayList<>(errors));
   }
 
+  private void handleRedefine(int levelNumber, DataRedefinesClauseContext context) {
+    String redefinesName = VisitorHelper.getName(context.dataName());
+    Locality locality = positions.get(context.dataName().getStart());
+    if (locality == null) {
+      return;
+    }
+
+    boolean notFound = true;
+    Iterator<Variable> iterator = variables.iterator();
+    if (iterator.hasNext()) {
+      while (iterator.hasNext()) {
+        Variable variable = iterator.next();
+        if (redefinesName.equals(variable.getName())) {
+          if (levelNumber != variable.getLevelNumber()) {
+            addError(messages.getMessage("semantics.levelsMustMatch", redefinesName), positions.get(context.getParent().getStart()));
+          }
+          variable.addUsage(locality);
+          notFound = false;
+          break;
+        } else {
+          if (levelNumber == variable.getLevelNumber()
+              && !redefinesName.equals(redefinedVariables.get(variable.getName()))) {
+            break;
+          }
+        }
+      }
+      if (notFound) {
+        addError(messages.getMessage("semantics.redefineImmediatelyFollow", redefinesName), locality);
+      }
+    }
+  }
+
   private String retrieveName(RuleContext context) {
     return ofNullable(context)
         .map(RuleContext::getText)
@@ -345,6 +383,13 @@ public class VariableDefinitionDelegate {
         format("Syntax error defined by %s: %s", getClass().getSimpleName(), error.toString()));
   }
 
+  private void checkRedefinesContainsValue(VariableDefinitionContext variable) {
+    if (!(variable.getRedefinesClauses().isEmpty() || variable.getValueClauses().isEmpty())) {
+      ofNullable(positions.get(variable.getValueClauses().get(0).getStart())).ifPresent(locality ->
+          addError(messages.getMessage("semantics.redefinedContainValue", variable.getName()), locality));
+    }
+  }
+
   private void checkStartingArea(VariableDefinitionContext variable) {
     if ((variable.getNumber() == LEVEL_01 || variable.getNumber() == LEVEL_77)
         && variable.getStarting().getRange().getStart().getCharacter() > AREA_A_FINISH) {
@@ -380,6 +425,10 @@ public class VariableDefinitionDelegate {
 
   private void checkValueClauseIsSingle(VariableDefinitionContext variable) {
     checkClauseIsSingle(variable.getDefinition(), variable.getValueClauses(), "VALUE");
+  }
+
+  private void checkRedefinesClauseIsSingle(VariableDefinitionContext variable) {
+    checkClauseIsSingle(variable.getDefinition(), variable.getRedefinesClauses(), "REDEFINES");
   }
 
   private void checkUsageClauseIsSingle(VariableDefinitionContext variable) {
@@ -504,6 +553,23 @@ public class VariableDefinitionDelegate {
           retrievePicText(variable.getPicClauses()),
           variable.getValueClauseTest(),
           retrieveUsageFormat(variable.getUsageClauses()));
+    }
+    return null;
+  }
+
+  private Variable redefinesMatcher(VariableDefinitionContext context) {
+    if (!context.getRedefinesClauses().isEmpty()) {
+
+      String value = VisitorHelper.getName(context.getRedefinesClauses().get(0).dataName());
+      redefinedVariables.put(context.getName(), value);
+
+      handleRedefine(context.getNumber(), context.getRedefinesClauses().get(0));
+
+      ArrayList<Function<VariableDefinitionContext, Variable>> matchers = new ArrayList<>();
+      matchers.add(this::groupItemMatcher);
+      matchers.add(this::elementItemMatcher);
+      return matchers.stream().map(matcher -> matcher.apply(context))
+          .filter(Objects::nonNull).findFirst().orElse(null);
     }
     return null;
   }
@@ -655,6 +721,7 @@ public class VariableDefinitionDelegate {
     List<DataOccursClauseContext> occursClauses;
     List<DataValueClauseContext> valueClauses;
     List<DataUsageClauseContext> usageClauses;
+    List<DataRedefinesClauseContext> redefinesClauses;
     String valueClauseTest;
     String thruValue;
     Variable container;
