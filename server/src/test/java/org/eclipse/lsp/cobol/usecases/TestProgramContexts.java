@@ -36,7 +36,7 @@ public class TestProgramContexts {
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*VARNAME}  PIC X(2).\n"
           + "       Procedure Division.\n"
-          + "           move 1 to VARNAME.\n"
+          + "           move 1 to {$VARNAME}.\n"
           + "       End program FIRST.\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. SECOND.\n"
@@ -56,7 +56,7 @@ public class TestProgramContexts {
           + "       1 {$*a-content-ptr} pointer.\n"
           + "       Procedure Division.\n"
           + "       {@*Mainline} Section.\n"
-          + "           DISPLAY a-content-ptr.\n"
+          + "           DISPLAY {$a-content-ptr}.\n"
           + "       Identification Division.\n"
           + "        Program-Id. 'ACTDCNVC'.\n"
           + "       Data Division.\n"
@@ -65,7 +65,7 @@ public class TestProgramContexts {
           + "       1 {$*a-content-ptr} pointer.\n"
           + "       Procedure Division.\n"
           + "       {@*Mainline} Section.\n"
-          + "           DISPLAY a-content-ptr.\n"
+          + "           DISPLAY {$a-content-ptr}.\n"
           + "       End Program 'ACTDCNVC'.\n"
           + "       End Program 'ACTDCNVO'.";
 

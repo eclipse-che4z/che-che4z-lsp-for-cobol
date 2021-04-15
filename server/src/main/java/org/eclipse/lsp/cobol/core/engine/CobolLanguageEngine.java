@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.engine;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
@@ -33,6 +35,9 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
@@ -40,15 +45,15 @@ import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp4j.Location;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
@@ -132,7 +137,19 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
       Node rootNode = syntaxTree.get(0);
       SyntaxTreeEngine syntaxTreeEngine = new SyntaxTreeEngine(rootNode);
       accumulatedErrors.addAll(syntaxTreeEngine.processTree());
-      context = context.toBuilder().rootNode(rootNode).build();
+      // This is a temporal solution only for compatibility
+      // Definitions, usages and variables are set here for "Go to definition" feature and others
+      List<Variable> definedVariables = rootNode.getDepthFirstStream()
+          .filter(it -> it.getNodeType() == NodeType.PROGRAM)
+          .map((ProgramNode.class::cast))
+          .map(ProgramNode::getDefinedVariables)
+          .flatMap(Collection::stream)
+          .collect(toList());
+      context = context.toBuilder()
+          .variableDefinitions(collectVariableDefinitions(definedVariables))
+          .variableUsages(collectVariableUsages(definedVariables))
+          .variables(definedVariables)
+          .rootNode(rootNode).build();
     } else
       LOG.warn("The root node for syntax tree was not constructed");
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
@@ -210,5 +227,25 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
           .build();
     }
     return syntaxError;
+  }
+
+  private Map<String, Collection<Location>> collectVariableDefinitions(
+      Collection<Variable> definedVariables) {
+    Multimap<String, Location> definitions = HashMultimap.create();
+    definedVariables.stream()
+        .filter(it -> !FILLER_NAME.equals(it.getName()))
+        .filter(it -> Objects.nonNull(it.getDefinition()))
+        .forEach(it -> definitions.put(it.getName(), it.getDefinition().toLocation()));
+    return definitions.asMap();
+  }
+
+  private Map<String, Collection<Location>> collectVariableUsages(
+      Collection<Variable> definedVariables) {
+    Multimap<String, Location> usages = HashMultimap.create();
+    definedVariables.forEach(
+        it ->
+            usages.putAll(
+                it.getName(), it.getUsages().stream().map(Locality::toLocation).collect(toList())));
+    return usages.asMap();
   }
 }
