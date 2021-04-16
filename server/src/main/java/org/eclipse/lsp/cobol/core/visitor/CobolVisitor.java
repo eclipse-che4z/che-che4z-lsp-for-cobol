@@ -37,7 +37,6 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.*;
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.semantics.GroupContext;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
@@ -56,7 +55,6 @@ import java.util.function.Function;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.eclipse.lsp.cobol.core.CobolParser.*;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.*;
@@ -83,8 +81,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final Map<Token, Locality> positionMapping;
   private final MessageService messageService;
   private final SubroutineService subroutineService;
-  private final VariableDefinitionDelegate variablesDelegate;
-  private final VariableUsageDelegate variableUsageDelegate;
 
   public CobolVisitor(
       @NonNull String documentUri,
@@ -99,8 +95,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     this.messageService = messageService;
     this.subroutineService = subroutineService;
     outlineTreeBuilder = new OutlineTreeBuilder(documentUri, positionMapping);
-    variablesDelegate = new VariableDefinitionDelegate(positionMapping, messageService);
-    variableUsageDelegate = new VariableUsageDelegate(positionMapping, messageService);
   }
 
   /**
@@ -111,14 +105,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
    */
   @NonNull
   public ResultWithErrors<SemanticContext> finishAnalysis() {
-    Collection<Variable> definedVariables =
-        variablesDelegate.finishDefinitionAnalysis().getResult();
-    variableUsageDelegate.updateUsageAndGenerateErrors(definedVariables);
     errors.addAll(groupContext.generateParagraphErrors(messageService));
     return new ResultWithErrors<>(
         SemanticContext.builder()
-            .variableDefinitions(collectVariableDefinitions(definedVariables))
-            .variableUsages(collectVariableUsages(definedVariables))
             .paragraphDefinitions(groupContext.getParagraphDefinitions())
             .paragraphUsages(groupContext.getParagraphUsages())
             .paragraphRanges(groupContext.getParagraphRanges())
@@ -132,29 +121,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .subroutinesDefinitions(getSubroutineDefinition())
             .subroutinesUsages(subroutineUsages.asMap())
             .outlineTree(buildOutlineTree())
-            .variables(definedVariables)
             .build(),
         errors);
-  }
-
-  private Map<String, Collection<Location>> collectVariableDefinitions(
-      Collection<Variable> definedVariables) {
-    Multimap<String, Location> definitions = HashMultimap.create();
-    definedVariables.stream()
-        .filter(it -> !FILLER_NAME.equals(it.getName()))
-        .filter(it -> Objects.nonNull(it.getDefinition()))
-        .forEach(it -> definitions.put(it.getName(), it.getDefinition().toLocation()));
-    return definitions.asMap();
-  }
-
-  private Map<String, Collection<Location>> collectVariableUsages(
-      Collection<Variable> definedVariables) {
-    Multimap<String, Location> usages = HashMultimap.create();
-    definedVariables.forEach(
-        it ->
-            usages.putAll(
-                it.getName(), it.getUsages().stream().map(Locality::toLocation).collect(toList())));
-    return usages.asMap();
   }
 
   @Override
@@ -236,7 +204,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitWorkingStorageSection(WorkingStorageSectionContext ctx) {
     outlineTreeBuilder.addNode(WORKING_STORAGE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
-    variablesDelegate.notifySectionChanged();
     return addTreeNode(ctx, SectionNode::new);
   }
 
@@ -369,7 +336,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitFileSection(FileSectionContext ctx) {
     outlineTreeBuilder.addNode(FILE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
-    variablesDelegate.notifySectionChanged();
     return addTreeNode(ctx, SectionNode::new);
   }
 
@@ -377,7 +343,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitLinkageSection(LinkageSectionContext ctx) {
     outlineTreeBuilder.addNode(LINKAGE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
-    variablesDelegate.notifySectionChanged();
     return addTreeNode(ctx, SectionNode::new);
   }
 
@@ -385,7 +350,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitLocalStorageSection(LocalStorageSectionContext ctx) {
     outlineTreeBuilder.addNode(LOCAL_STORAGE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
-    variablesDelegate.notifySectionChanged();
     return addTreeNode(ctx, SectionNode::new);
   }
 
@@ -494,7 +458,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
-    variablesDelegate.defineVariable(ctx);
     String name = VisitorHelper.getName(ctx.entryName());
     NodeType nodeType = getDataDescriptionNodeType(ctx);
     int level = VisitorHelper.getLevel(ctx.LEVEL_NUMBER());
@@ -519,7 +482,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitEnvironmentSwitchNameClause(EnvironmentSwitchNameClauseContext ctx) {
-    variablesDelegate.defineVariable(ctx);
     String name = ofNullable(ctx.mnemonicName()).map(RuleContext::getText).orElse(FILLER_NAME);
     outlineTreeBuilder.addNode(name, NodeType.MNEMONIC_NAME, ctx);
     Node node = new AntlrVariableDefinitionNode(ctx);
@@ -529,7 +491,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat2(DataDescriptionEntryFormat2Context ctx) {
-    variablesDelegate.defineVariable(ctx);
     String name = VisitorHelper.getName(ctx.entryName());
     outlineTreeBuilder.addVariable(LEVEL_66, name, NodeType.FIELD_66, ctx);
     Node node = new AntlrVariableDefinitionNode(ctx);
@@ -539,7 +500,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat3(DataDescriptionEntryFormat3Context ctx) {
-    variablesDelegate.defineVariable(ctx);
     String name = VisitorHelper.getName(ctx.entryName());
     outlineTreeBuilder.addVariable(LEVEL_88, name, NodeType.FIELD_88, ctx);
     Node node = new AntlrVariableDefinitionNode(ctx);
@@ -550,7 +510,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitDataDescriptionEntryFormat1Level77(
       DataDescriptionEntryFormat1Level77Context ctx) {
-    variablesDelegate.defineVariable(ctx);
     String name = VisitorHelper.getName(ctx.entryName());
     outlineTreeBuilder.addVariable(LEVEL_77, name, NodeType.FIELD, ctx);
     Node node = new AntlrVariableDefinitionNode(ctx);
@@ -579,7 +538,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             locality -> {
               if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
               else {
-                variableUsageDelegate.handleDataName(dataName, locality, ctx);
                 result.add(new VariableUsageNode(dataName, locality, ctx));
               }
             });
@@ -597,7 +555,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             locality -> {
               if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
               else {
-                variableUsageDelegate.handleTableCall(dataName, locality);
                 result.add(new VariableUsageNode(dataName, locality));
               }
             });
@@ -618,7 +575,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             locality -> {
               if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
               else {
-                variableUsageDelegate.handleConditionCall(dataName, locality, ctx);
                 result.add(new VariableUsageNode(dataName, locality, ctx));
               }
             });

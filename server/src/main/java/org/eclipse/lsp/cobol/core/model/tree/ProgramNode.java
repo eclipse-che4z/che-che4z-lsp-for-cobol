@@ -79,6 +79,10 @@ public class ProgramNode extends Node {
     return errors;
   }
 
+  public Collection<Variable> getDefinedVariables() {
+    return definedVariables;
+  }
+
   private List<Variable> getGlobalVariables() {
     List<Variable> globalVariables = definedVariables.stream().filter(Variable::isGlobal).collect(Collectors.toList());
     Set<String> globalVariablesNames = globalVariables.stream().map(Variable::getName).collect(Collectors.toSet());

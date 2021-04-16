@@ -44,7 +44,7 @@ class TestGlobalVariables {
           + "       Identification Division.\n"
           + "       Program-Id. 'P2'.\n"
           + "       Procedure Division.\n"
-          + "           DISPLAY {$FOO|1}.\n"
+          + "           DISPLAY {FOO|1}.\n"
           + "       End Program 'P2'.";
 
   private static final String VARIABLE_SHADOWING =
@@ -56,7 +56,7 @@ class TestGlobalVariables {
           + "        05 {$*BAR} POINTER.\n"
           + "       Procedure Division.\n"
           + "           DISPLAY {$BAR}.\n"
-          + "           DISPLAY FOO.\n"
+          + "           DISPLAY {$FOO}.\n"
           + "           DISPLAY {$BAR} of {$FOO}.\n"
           + "       Identification Division.\n"
           + "       Program-Id. 'P11'.\n"
@@ -65,7 +65,7 @@ class TestGlobalVariables {
           + "       01 {$*FOO} PIC 9.\n"
           + "       Procedure Division.\n"
           + "           DISPLAY {$BAR}.\n"
-          + "           DISPLAY FOO.\n"
+          + "           DISPLAY {$FOO}.\n"
           + "           DISPLAY {$BAR} of {$FOO}.\n"
           + "       End Program 'P11'.\n"
           + "       End Program 'P1'.";
