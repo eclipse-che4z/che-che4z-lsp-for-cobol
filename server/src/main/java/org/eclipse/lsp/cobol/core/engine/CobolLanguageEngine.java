@@ -99,12 +99,16 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
       @NonNull String documentUri,
       @NonNull String text,
       @NonNull CopybookProcessingMode copybookProcessingMode) {
+    Timing.Builder timingBuilder = Timing.builder();
+    timingBuilder.getPreprocessorTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =
         preprocessor
             .process(documentUri, text, copybookProcessingMode)
             .unwrap(accumulatedErrors::addAll);
+    timingBuilder.getPreprocessorTimer().stop();
 
+    timingBuilder.getParserTimer().start();
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(extendedDocument.getText()));
     lexer.removeErrorListeners();
 
@@ -119,10 +123,14 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
     parser.addParseListener(treeListener);
 
     CobolParser.StartRuleContext tree = parser.startRule();
+    timingBuilder.getParserTimer().stop();
 
+    timingBuilder.getMappingTimer().start();
     Map<Token, Locality> positionMapping =
         getPositionMapping(documentUri, extendedDocument, tokens);
+    timingBuilder.getMappingTimer().stop();
 
+    timingBuilder.getVisitorTimer().start();
     CobolVisitor visitor =
         new CobolVisitor(
             documentUri,
@@ -133,7 +141,9 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
             subroutineService);
     List<Node> syntaxTree = visitor.visit(tree);
     SemanticContext context = visitor.finishAnalysis().unwrap(accumulatedErrors::addAll);
+    timingBuilder.getVisitorTimer().stop();
     if (syntaxTree.size() == 1) {
+      timingBuilder.getSyntaxTreeTimer().start();
       Node rootNode = syntaxTree.get(0);
       SyntaxTreeEngine syntaxTreeEngine = new SyntaxTreeEngine(rootNode);
       accumulatedErrors.addAll(syntaxTreeEngine.processTree());
@@ -150,11 +160,22 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
           .variableUsages(collectVariableUsages(definedVariables))
           .variables(definedVariables)
           .rootNode(rootNode).build();
+      timingBuilder.getSyntaxTreeTimer().stop();
     } else
       LOG.warn("The root node for syntax tree was not constructed");
+    timingBuilder.getLateErrorProcessingTimer().start();
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
     accumulatedErrors.addAll(
         collectErrorsForCopybooks(accumulatedErrors, extendedDocument.getCopyStatements()));
+    timingBuilder.getLateErrorProcessingTimer().stop();
+
+    if (LOG.isDebugEnabled()) {
+      Timing timing = timingBuilder.build();
+      LOG.debug("Timing for parsing {}. Preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
+          + "late error processing: {}", documentUri, timing.getPreprocessorTime(), timing.getParserTime(),
+          timing.getMappingTime(), timing.getVisitorTime(), timing.getSyntaxTreeTime(),
+          timing.getLateErrorProcessingTime());
+    }
 
     return new ResultWithErrors<>(
         context,
