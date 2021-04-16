@@ -277,7 +277,7 @@ public class VariableDefinitionDelegate {
       return;
     }
 
-    boolean notFound = true;
+    Variable originalVariable = null;
     Iterator<Variable> iterator = variables.iterator();
     if (iterator.hasNext()) {
       while (iterator.hasNext()) {
@@ -287,7 +287,7 @@ public class VariableDefinitionDelegate {
             addError(messages.getMessage("semantics.levelsMustMatch", redefinesName), positions.get(context.getParent().getStart()));
           }
           variable.addUsage(locality);
-          notFound = false;
+          originalVariable = variable;
           break;
         } else {
           if (levelNumber == variable.getLevelNumber()
@@ -296,8 +296,17 @@ public class VariableDefinitionDelegate {
           }
         }
       }
-      if (notFound) {
+      if (originalVariable == null) {
         addError(messages.getMessage("semantics.redefineImmediatelyFollow", redefinesName), locality);
+      } else {
+        StructuredVariable structuredVariable = structureStack.peek();
+        if (structuredVariable != null && !originalVariable.equals(structuredVariable)) {
+          String originalName = originalVariable.getName();
+          if (structuredVariable.getChildren().stream()
+              .noneMatch(v -> v.getName().equals(originalName))) {
+            addError(messages.getMessage("semantics.redefineSameGroup", redefinesName), locality);
+          }
+        }
       }
     }
   }
