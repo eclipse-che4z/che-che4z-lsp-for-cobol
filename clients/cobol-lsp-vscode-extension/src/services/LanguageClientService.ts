@@ -56,6 +56,7 @@ export class LanguageClientService {
 
     public async retrieveAnalysis(uri: string): Promise<any> {
         const languageClient = this.getLanguageClient();
+        await languageClient.onReady();
         return languageClient.sendRequest("extended/analysis", { uri: uri });
     }
 

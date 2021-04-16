@@ -81,6 +81,7 @@ describe("LanguageClientService positive scenario", () => {
         const expectedResult = { programs: [] };
 
         LanguageClient.prototype.sendRequest = () => Promise.resolve(expectedResult); 
+        LanguageClient.prototype.onReady = () => Promise.resolve(); 
         expect(await languageClientService.retrieveAnalysis("test")).toBe(expectedResult);
     });
 
