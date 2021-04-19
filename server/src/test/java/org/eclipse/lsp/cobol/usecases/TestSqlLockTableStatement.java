@@ -28,9 +28,10 @@ class TestSqlLockTableStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "         LOCK TABLE DSN8C10.EMP IN EXCLUSIVE MODE \n"
-          + "       END-EXEC.\n";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "             LOCK TABLE DSN8C10.EMP IN EXCLUSIVE MODE \n"
+          + "           END-EXEC.\n";
 
   @Test
   void test() {

@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.visitor;
 
+import lombok.*;
 import org.eclipse.lsp.cobol.core.CobolParser.*;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
@@ -23,10 +24,6 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.variables.*;
 import org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 import com.google.common.collect.ImmutableList;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -65,6 +62,8 @@ public class VariableDefinitionDelegate {
   private static final String CHILD_TO_RENAME_NOT_FOUND = "semantics.childToRenameNotFound";
   private static final String INCORRECT_CHILDREN_ORDER = "semantics.incorrectChildrenOrder";
   private static final String CANNOT_BE_RENAMED = "semantics.cannotBeRenamed";
+  private static final String GLOBAL_NON_01_LEVEL_MSG = "semantics.globalNon01Level";
+  private static final String GLOBAL_TOO_MANY_DEFINITIONS = "semantics.globalTooManyDefinitions";
 
   private static final ErrorSeverity SEVERITY = ERROR;
 
@@ -76,9 +75,12 @@ public class VariableDefinitionDelegate {
   private Deque<StructuredVariable> structureStack = new ArrayDeque<>();
   private Deque<Variable> variables = new ArrayDeque<>();
   private List<SyntaxError> errors = new ArrayList<>();
+  private Map<String, List<VariableDefinitionContext>> globalVariables = new HashMap<>();
 
   private final Map<Token, Locality> positions;
   private final MessageService messages;
+
+  private final Map<String, String> redefinedVariables = new HashMap<>();
 
   /**
    * Create and accumulate a variable of level 01-49 out of the given context. Add errors if the
@@ -86,7 +88,7 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link DataDescriptionEntryFormat1Context} to retrieve the variable
    */
-  void defineVariable(@NonNull DataDescriptionEntryFormat1Context ctx) {
+  public void defineVariable(@NonNull DataDescriptionEntryFormat1Context ctx) {
     // TODO: add support for the REDEFINES clause:
     // TODO: 1. redefined variable defined
     // TODO: 2. add variable usage for REDEFINES
@@ -105,12 +107,14 @@ public class VariableDefinitionDelegate {
             .definition(
                 retrieveDefinition(
                     Optional.<ParserRuleContext>ofNullable(ctx.entryName()).orElse(ctx)))
+            .global(!ctx.dataGlobalClause().isEmpty())
             .antlrClass(ctx.getClass())
             .starting(positions.get(ctx.LEVEL_NUMBER().getSymbol()))
             .picClauses(ctx.dataPictureClause())
             .occursClauses(ctx.dataOccursClause())
             .valueClauses(ctx.dataValueClause())
             .usageClauses(ctx.dataUsageClause())
+            .redefinesClauses(ctx.dataRedefinesClause())
             .build();
 
     // TODO: Add check that name does not present in the predefined variables list (? - to check)
@@ -121,11 +125,16 @@ public class VariableDefinitionDelegate {
     checkOccursClauseIsSingle(variableDefinitionContext);
     checkValueClauseIsSingle(variableDefinitionContext);
     checkUsageClauseIsSingle(variableDefinitionContext);
+    checkGlobalFlagFor01Level(variableDefinitionContext);
     setValueClauseText(variableDefinitionContext);
+    saveGlobalVariable(variableDefinitionContext);
+    checkRedefinesContainsValue(variableDefinitionContext);
+    checkRedefinesClauseIsSingle(variableDefinitionContext);
     // TODO: check the same way that the other clauses are singular or absent
 
     defineVariable(
         variableDefinitionContext,
+        this::redefinesMatcher,
         this::multiTableDataNameMatcher,
         this::groupItemMatcher,
         // TODO: add check that the following items do not have VALUE:
@@ -142,7 +151,7 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link DataDescriptionEntryFormat1Level77Context} to retrieve the variable
    */
-  void defineVariable(@NonNull DataDescriptionEntryFormat1Level77Context ctx) {
+  public void defineVariable(@NonNull DataDescriptionEntryFormat1Level77Context ctx) {
     VariableDefinitionContext variableDefinitionContext =
         VariableDefinitionContext.builder()
             .number(LEVEL_77)
@@ -150,12 +159,14 @@ public class VariableDefinitionDelegate {
             .definition(
                 retrieveDefinition(
                     Optional.<ParserRuleContext>ofNullable(ctx.entryName()).orElse(ctx)))
+            .global(!ctx.dataGlobalClause().isEmpty())
             .antlrClass(ctx.getClass())
             .starting(positions.get(ctx.LEVEL_NUMBER_77().getSymbol()))
             .picClauses(ctx.dataPictureClause())
             .valueClauses(ctx.dataValueClause())
             .usageClauses(ctx.dataUsageClause())
             .occursClauses(ctx.dataOccursClause())
+            .redefinesClauses(ctx.dataRedefinesClause())
             .build();
 
     checkStartingArea(variableDefinitionContext);
@@ -164,9 +175,11 @@ public class VariableDefinitionDelegate {
     checkValueClauseIsSingle(variableDefinitionContext);
     checkUsageClauseIsSingle(variableDefinitionContext);
     checkTopElementNumber(variableDefinitionContext);
+    checkRedefinesClauseIsSingle(variableDefinitionContext);
+    checkRedefinesContainsValue(variableDefinitionContext);
     closePreviousStructure();
 
-    defineVariable(variableDefinitionContext, this::independentDataItemMatcher);
+    defineVariable(variableDefinitionContext, this::redefinesMatcher, this::independentDataItemMatcher);
   }
 
   /**
@@ -175,7 +188,7 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link DataDescriptionEntryFormat2Context} to retrieve the variable
    */
-  void defineVariable(@NonNull DataDescriptionEntryFormat2Context ctx) {
+  public void defineVariable(@NonNull DataDescriptionEntryFormat2Context ctx) {
     VariableDefinitionContext variableDefinitionContext =
         VariableDefinitionContext.builder()
             .number(LEVEL_66)
@@ -200,7 +213,7 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link DataDescriptionEntryFormat3Context} to retrieve the variable
    */
-  void defineVariable(@NonNull DataDescriptionEntryFormat3Context ctx) {
+  public void defineVariable(@NonNull DataDescriptionEntryFormat3Context ctx) {
     VariableDefinitionContext variableDefinitionContext =
         VariableDefinitionContext.builder()
             .number(LEVEL_88)
@@ -226,7 +239,7 @@ public class VariableDefinitionDelegate {
    *
    * @param ctx - a {@link EnvironmentSwitchNameClauseContext} to retrieve the variable
    */
-  void defineVariable(EnvironmentSwitchNameClauseContext ctx) {
+  public void defineVariable(EnvironmentSwitchNameClauseContext ctx) {
     String name = retrieveName(ctx.mnemonicName());
     String systemName = ctx.environmentName().getText();
     variables.push(
@@ -241,7 +254,7 @@ public class VariableDefinitionDelegate {
    * Notify the variable delegate that the processing moved to another section in order to track the
    * structure correctness
    */
-  void notifySectionChanged() {
+  public void notifySectionChanged() {
     closePreviousStructure();
   }
 
@@ -251,9 +264,51 @@ public class VariableDefinitionDelegate {
    * @return the defined variables and found errors
    */
   @NonNull
-  ResultWithErrors<Collection<Variable>> finishDefinitionAnalysis() {
+  public ResultWithErrors<Collection<Variable>> finishDefinitionAnalysis() {
     closePreviousStructure();
+    checkGlobalVariableDefinitions();
     return new ResultWithErrors<>(new ArrayList<>(variables), new ArrayList<>(errors));
+  }
+
+  private void handleRedefine(int levelNumber, DataRedefinesClauseContext context) {
+    String redefinesName = VisitorHelper.getName(context.dataName());
+    Locality locality = positions.get(context.dataName().getStart());
+    if (locality == null) {
+      return;
+    }
+
+    Variable originalVariable = null;
+    Iterator<Variable> iterator = variables.iterator();
+    if (iterator.hasNext()) {
+      while (iterator.hasNext()) {
+        Variable variable = iterator.next();
+        if (redefinesName.equals(variable.getName())) {
+          if (levelNumber != variable.getLevelNumber()) {
+            addError(messages.getMessage("semantics.levelsMustMatch", redefinesName), positions.get(context.getParent().getStart()));
+          }
+          variable.addUsage(locality);
+          originalVariable = variable;
+          break;
+        } else {
+          if (levelNumber == variable.getLevelNumber()
+              && !redefinesName.equals(redefinedVariables.get(variable.getName()))) {
+            break;
+          }
+        }
+      }
+      if (originalVariable == null) {
+        addError(messages.getMessage("semantics.redefineImmediatelyFollow", redefinesName), locality);
+      } else {
+        StructuredVariable structuredVariable = structureStack.peek();
+        if (structuredVariable != null && !originalVariable.equals(structuredVariable)) {
+          String originalName = originalVariable.getName();
+          if (structuredVariable.getChildren().stream()
+              .noneMatch(v -> v.getName().equals(originalName))) {
+            addError(messages.getMessage("semantics.redefineSameGroup", redefinesName), locality);
+          }
+        }
+      }
+    }
   }
 
   private String retrieveName(RuleContext context) {
@@ -337,6 +392,13 @@ public class VariableDefinitionDelegate {
         format("Syntax error defined by %s: %s", getClass().getSimpleName(), error.toString()));
   }
 
+  private void checkRedefinesContainsValue(VariableDefinitionContext variable) {
+    if (!(variable.getRedefinesClauses().isEmpty() || variable.getValueClauses().isEmpty())) {
+      ofNullable(positions.get(variable.getValueClauses().get(0).getStart())).ifPresent(locality ->
+          addError(messages.getMessage("semantics.redefinedContainValue", variable.getName()), locality));
+    }
+  }
+
   private void checkStartingArea(VariableDefinitionContext variable) {
     if ((variable.getNumber() == LEVEL_01 || variable.getNumber() == LEVEL_77)
         && variable.getStarting().getRange().getStart().getCharacter() > AREA_A_FINISH) {
@@ -374,8 +436,17 @@ public class VariableDefinitionDelegate {
     checkClauseIsSingle(variable.getDefinition(), variable.getValueClauses(), "VALUE");
   }
 
+  private void checkRedefinesClauseIsSingle(VariableDefinitionContext variable) {
+    checkClauseIsSingle(variable.getDefinition(), variable.getRedefinesClauses(), "REDEFINES");
+  }
+
   private void checkUsageClauseIsSingle(VariableDefinitionContext variable) {
     checkClauseIsSingle(variable.getDefinition(), variable.getUsageClauses(), "USAGE");
+  }
+
+  private void checkGlobalFlagFor01Level(VariableDefinitionContext variable) {
+    if (variable.global && variable.number != 1)
+      addError(messages.getMessage(GLOBAL_NON_01_LEVEL_MSG), variable.definition);
   }
 
   private void checkClauseIsSingle(
@@ -452,6 +523,7 @@ public class VariableDefinitionDelegate {
           variable.getNumber(),
           variable.getName(),
           variable.getDefinition(),
+          variable.global,
           structureStack.peek());
     }
     return null;
@@ -465,6 +537,7 @@ public class VariableDefinitionDelegate {
               variable.getNumber(),
               variable.getName(),
               variable.getDefinition(),
+              variable.isGlobal(),
               structureStack.peek(),
               retrievePicText(variable.getPicClauses()),
               variable.getValueClauseTest(),
@@ -484,10 +557,28 @@ public class VariableDefinitionDelegate {
           variable.getNumber(),
           variable.getName(),
           variable.getDefinition(),
+          variable.isGlobal(),
           structureStack.peek(),
           retrievePicText(variable.getPicClauses()),
           variable.getValueClauseTest(),
           retrieveUsageFormat(variable.getUsageClauses()));
+    }
+    return null;
+  }
+
+  private Variable redefinesMatcher(VariableDefinitionContext context) {
+    if (!context.getRedefinesClauses().isEmpty()) {
+
+      String value = VisitorHelper.getName(context.getRedefinesClauses().get(0).dataName());
+      redefinedVariables.put(context.getName(), value);
+
+      handleRedefine(context.getNumber(), context.getRedefinesClauses().get(0));
+
+      ArrayList<Function<VariableDefinitionContext, Variable>> matchers = new ArrayList<>();
+      matchers.add(this::groupItemMatcher);
+      matchers.add(this::elementItemMatcher);
+      return matchers.stream().map(matcher -> matcher.apply(context))
+          .filter(Objects::nonNull).findFirst().orElse(null);
     }
     return null;
   }
@@ -501,7 +592,7 @@ public class VariableDefinitionDelegate {
       picClause = retrievePicText(variable.getPicClauses());
     }
     return new IndependentDataItem(
-        variable.getName(), variable.getDefinition(), picClause, variable.getValueClauseTest());
+        variable.getName(), variable.getDefinition(), variable.isGlobal(), picClause, variable.getValueClauseTest());
   }
 
   private Variable conditionalDataNameMatcher(VariableDefinitionContext variable) {
@@ -518,9 +609,13 @@ public class VariableDefinitionDelegate {
   }
 
   private Variable renameItemMatcher(VariableDefinitionContext variable) {
-    RenameItem renameItem = new RenameItem(variable.getName(), variable.getDefinition());
-    List<Variable> renamedVariables =
-        renameVariables(renameItem, extractChildrenToRename(variable));
+    List<Variable> childrenToRename = extractChildrenToRename(variable);
+    boolean isGlobal = !childrenToRename.isEmpty() && childrenToRename.get(0).isGlobal();
+    RenameItem renameItem = new RenameItem(
+        variable.getName(),
+        isGlobal,
+        variable.getDefinition());
+    List<Variable> renamedVariables = renameVariables(renameItem, childrenToRename);
     renamedVariables.forEach(variables::push);
     renamedVariables.forEach(renameItem::addChild);
     return renameItem;
@@ -608,6 +703,19 @@ public class VariableDefinitionDelegate {
     addError(messages.getMessage(CHILD_TO_RENAME_NOT_FOUND, stopName), locality);
   }
 
+  private void saveGlobalVariable(VariableDefinitionContext variableDefinitionContext) {
+    if (variableDefinitionContext.global)
+      globalVariables.computeIfAbsent(variableDefinitionContext.name, k -> new ArrayList<>())
+          .add(variableDefinitionContext);
+  }
+
+  private void checkGlobalVariableDefinitions() {
+    globalVariables.values().stream()
+        .filter(it -> it.size() > 1)
+        .flatMap(List::stream)
+        .forEach(it -> addError(messages.getMessage(GLOBAL_TOO_MANY_DEFINITIONS), it.getDefinition()));
+  }
+
   /** This data class used for temporal storage ANTLR parsed variables. */
   @Data
   @Builder
@@ -615,12 +723,14 @@ public class VariableDefinitionDelegate {
     int number;
     String name;
     Locality definition;
+    boolean global;
     Class<? extends ParserRuleContext> antlrClass;
     Locality starting;
     List<DataPictureClauseContext> picClauses;
     List<DataOccursClauseContext> occursClauses;
     List<DataValueClauseContext> valueClauses;
     List<DataUsageClauseContext> usageClauses;
+    List<DataRedefinesClauseContext> redefinesClauses;
     String valueClauseTest;
     String thruValue;
     Variable container;

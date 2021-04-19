@@ -29,7 +29,5 @@ public interface Communications {
 
   void notifyThatDocumentAnalysed(String uri);
 
-  void notifyThatExtensionIsUnsupported(String extension);
-
   void notifyGeneralMessage(MessageType messageType, String errorMessage);
 }

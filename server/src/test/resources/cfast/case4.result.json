@@ -1,0 +1,63 @@
+[
+  {
+    "type": "program",
+    "name": "CASE4",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 15,
+        "character": 8
+      },
+      "end": {
+        "line": 22,
+        "character": 29
+      }
+    },
+    "children": [
+      {
+        "type": "goto",
+        "targetName": [
+          "PARAG1"
+        ]
+      },
+      {
+        "type": "paragraph",
+        "snippet": "PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n           PERFORM PARAG2.\r\n       ",
+        "name": "PARAG1",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 18,
+            "character": 8
+          },
+          "end": {
+            "line": 20,
+            "character": 36
+          }
+        },
+        "children": [
+          {
+            "type": "perform",
+            "targetName": "PARAG2"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "snippet": "PARAG2.\r\n           DISPLAY 'PARAG2'.",
+        "name": "PARAG2",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 21,
+            "character": 8
+          },
+          "end": {
+            "line": 22,
+            "character": 29
+          }
+        }
+      }
+    ]
+  }
+]

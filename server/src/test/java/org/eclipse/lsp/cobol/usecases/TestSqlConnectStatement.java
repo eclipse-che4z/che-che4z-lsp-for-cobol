@@ -28,9 +28,10 @@ class TestSqlConnectStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "         CONNECT TO :LOCNAME USER :USER_AUTHID USING :USER_PASSWORD \n"
-          + "       END-EXEC.\n";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "             CONNECT TO :LOCNAME USER :USER_AUTHID USING :USER_PASSWORD \n"
+          + "           END-EXEC.\n";
 
   @Test
   void test() {

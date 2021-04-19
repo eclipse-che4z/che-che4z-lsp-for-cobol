@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.engine;
 
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
@@ -82,6 +83,15 @@ class CobolLanguageEngineTest {
             .suggestion("suggestion")
             .severity(ERROR)
             .build();
+    SyntaxError eofError =
+        SyntaxError.syntaxError()
+            .locality(Locality.builder()
+                .uri(URI)
+                .range(new Range(new Position(0, 31), new Position(0, 31)))
+                .token("<EOF>")
+                .build())
+            .severity(ERROR)
+            .build();
 
     ExtendedDocument extendedDocument =
         new ExtendedDocument(
@@ -115,6 +125,11 @@ class CobolLanguageEngineTest {
                             .uri(URI)
                             .range(new Range(new Position(0, 30), new Position(0, 31)))
                             .token(".")
+                            .build(),
+                        Locality.builder()
+                            .uri(URI)
+                            .range(new Range(new Position(0, 31), new Position(0, 31)))
+                            .token("<EOF>")
                             .build()),
                     ImmutableMap.of())),
             ImmutableMap.of());
@@ -146,8 +161,9 @@ class CobolLanguageEngineTest {
             SemanticContext.builder()
                 .constantDefinitions(getConstantDefinitions())
                 .outlineTree(expectedOutlineTree)
+                .rootNode(new RootNode(Locality.builder().build()))
                 .build(),
-            ImmutableList.of(error));
+            ImmutableList.of(error, eofError));
 
     ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, PROCESSING_MODE);
 

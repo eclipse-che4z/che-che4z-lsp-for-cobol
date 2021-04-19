@@ -27,15 +27,16 @@ class TestSqlExplainStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "        EXPLAIN PLAN SET QUERYNO = 13\n"
-          + "        FOR SELECT X.ACTNO, X.PROJNO, X.EMPNO, Y.JOB, Y.EDLEVEL\n"
-          + "        FROM DSN8C10.EMPPROJACT X, DSN8C10.EMP Y\n"
-          + "          WHERE X.EMPNO = Y.EMPNO\n"
-          + "             AND X.EMPTIME > 0.5\n"
-          + "             AND (Y.JOB = 'DESIGNER' OR Y.EDLEVEL >= 12)\n"
-          + "          ORDER BY X.ACTNO, X.PROJNO;\n"
-          + "       END-EXEC.";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "            EXPLAIN PLAN SET QUERYNO = 13\n"
+          + "            FOR SELECT X.ACTNO, X.PROJNO, X.EMPNO, Y.JOB, Y.EDLEVEL\n"
+          + "            FROM DSN8C10.EMPPROJACT X, DSN8C10.EMP Y\n"
+          + "              WHERE X.EMPNO = Y.EMPNO\n"
+          + "                 AND X.EMPTIME > 0.5\n"
+          + "                  AND (Y.JOB = 'DESIGNER' OR Y.EDLEVEL >= 12)\n"
+          + "              ORDER BY X.ACTNO, X.PROJNO;\n"
+          + "           END-EXEC.";
 
   @Test
   void test() {

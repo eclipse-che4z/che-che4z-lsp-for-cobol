@@ -27,32 +27,32 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
-import "@eclipse/che-che4z/tests";
+import '@eclipse/che-che4z/tests';
 
 const baseUrl = Cypress.config('baseUrl');
 
 const username = Cypress.env('username');
 const password = Cypress.env('password');
 
-  beforeEach(() => {
-    cy.task('deleteFile', 'test_files/project/.vscode/settings.json');
-    cy.task('deleteFile', 'test_files/project/.theia/settings.json');
-    cy.task('deleteFile', 'test_files/project/testing/BOOK3.cpy');
-    cy.task('deleteFile', 'test_files/project/.vscode/launch.json');
-    cy.task('deleteFile', 'test_files/project/.theia/launch.json');
-    cy.task('deleteFile', 'test_files/project/.copybooks/zowe-profile-1/DATA.SET.PATH2/BOOK3.cpy');
-    cy.task('deleteFile', 'test_files/project/s.cbl');
-    cy.visit('/', {
-      onBeforeLoad: (win) => {
-        win.sessionStorage.clear();
-      },
-    });
-    cy.clearCookies();
-    cy.clearLocalStorage();
-    cy.waitForAppStart();
-    cy.openFileExplorer();
+beforeEach(() => {
+  cy.task('deleteFile', 'test_files/project/.vscode/settings.json');
+  cy.task('deleteFile', 'test_files/project/.theia/settings.json');
+  cy.task('deleteFile', 'test_files/project/testing/BOOK3.cpy');
+  cy.task('deleteFile', 'test_files/project/.vscode/launch.json');
+  cy.task('deleteFile', 'test_files/project/.theia/launch.json');
+  cy.task('deleteFile', 'test_files/project/.copybooks/zowe-profile-1/DATA.SET.PATH2/BOOK3.cpy');
+  cy.task('deleteFile', 'test_files/project/s.cbl');
+  cy.task('deleteFile', 'test_files/project/.c4z/.copybooks');
+  cy.visit('/', {
+    onBeforeLoad: (win) => {
+      win.sessionStorage.clear();
+    },
   });
-
+  cy.clearCookies();
+  cy.clearLocalStorage();
+  cy.waitForAppStart();
+  cy.openFileExplorer();
+});
 
 Cypress.on('uncaught:exception', (err, runnable) => {
   // returning false here prevents Cypress from

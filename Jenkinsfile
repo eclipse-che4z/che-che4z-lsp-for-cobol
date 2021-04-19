@@ -40,7 +40,9 @@ spec:
 """
 
 def projectName = 'lsp-for-cobol'
-def kubeLabelPrefix = "${projectName}_pod_${env.BUILD_NUMBER}_${env.BRANCH_NAME}".replaceAll(/[^a-zA-Z0-9._-]+/,"")
+def kubeLabelPrefix = "${projectName}_pod_${env.BUILD_NUMBER}_${env.BRANCH_NAME}"
+        // cleaning the branch name according K8s restrictions
+        .replaceAll(/[^a-zA-Z0-9._-]+/,"").take(52)
 def kubeBuildLabel = "${kubeLabelPrefix}_build"
 
 pipeline {
@@ -74,10 +76,12 @@ pipeline {
                     steps {
                         container('maven') {
                             dir('server') {
-                                sh 'mvn -version'
-                                sh 'set MAVEN_OPTS=-Xms1024m'
-                                sh 'mvn clean verify --no-transfer-progress'
-                                sh 'cp target/server.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
+                                withMaven {
+                                    sh 'mvn -version'
+                                    sh 'set MAVEN_OPTS=-Xms1024m'
+                                    sh 'mvn clean verify --no-transfer-progress'
+                                    sh 'cp target/server.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
+                                }
                             }
                         }
                     }
@@ -139,7 +143,8 @@ pipeline {
 
                 stage('Client - Change version') {
                     environment {
-                        buildNumber = "$env.BUILD_NUMBER"
+                        // Cleaning the branch name according to https://semver.org/ rules
+                        buildIdentifier = "${env.BRANCH_NAME}.${env.BUILD_NUMBER}".replaceAll(/[^a-zA-Z0-9.-]+/,"")
                     }
                     when {
                         expression { branchName != 'master' }
@@ -147,7 +152,7 @@ pipeline {
                     steps {
                         container('node') {
                             dir('clients/cobol-lsp-vscode-extension') {
-                                sh 'sed -i "s/\\"version\\": \\"\\(.*\\)\\"/\\"version\\": \\"\\1+$branchName.$buildNumber\\"/g" package.json'
+                                sh 'sed -i "s/\\"version\\": \\"\\(.*\\)\\"/\\"version\\": \\"\\1+$buildIdentifier\\"/g" package.json'
                             }
                         }
                     }

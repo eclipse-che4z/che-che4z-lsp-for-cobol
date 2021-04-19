@@ -88,7 +88,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private Deque<List<Pair<String, String>>> recursiveReplaceStmtStack;
 
   @Inject
-  GrammarPreprocessorListenerImpl(
+  public GrammarPreprocessorListenerImpl(
       @Assisted String documentUri,
       @Assisted BufferedTokenStream tokens,
       @Assisted Deque<CopybookUsage> copybookStack,
@@ -122,7 +122,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public ExtendedDocument getResult() {
     if (!replacingClauses.isEmpty()) {
       String replaceableStmt = peek().toString();
-      String content = handleReplace(replaceableStmt, "");
+      String content = handleReplace(replaceableStmt);
       mergeAndUpdateTopTwoElement(content);
     }
     nestedMappings.put(
@@ -130,19 +130,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         new DocumentMapping(
             tokens.getTokens().stream().map(toPosition()).collect(toList()), shifts));
     return new ExtendedDocument(accumulate(), copybooks, nestedMappings, copybookStatements);
-  }
-
-  @Override
-  public void enterCompilerOptions(@NonNull CompilerOptionsContext ctx) {
-    // push a new context for the COMPILER OPTIONS terminals
-    push();
-  }
-
-  @Override
-  public void exitCompilerOptions(@NonNull CompilerOptionsContext ctx) {
-    // throw away COMPILER OPTIONS terminals
-    pop();
-    accumulateExcludedStatementShift(ctx.getSourceInterval());
   }
 
   @Override
@@ -183,7 +170,10 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     String copybookId = randomUUID().toString();
     // In a chain of copy statement, there could be only one replacing phrase
 
-    if (!copyReplacingClauses.isEmpty()) recursiveReplaceStmtStack.add(copyReplacingClauses);
+    if (!copyReplacingClauses.isEmpty()) {
+      recursiveReplaceStmtStack.add(new ArrayList<>(copyReplacingClauses));
+      copyReplacingClauses.clear();
+    }
     if (!recursiveReplaceStmtStack.isEmpty()) {
       for (List<Pair<String, String>> clause : recursiveReplaceStmtStack)
         content = applyReplacing(content, clause);
@@ -273,11 +263,20 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     accumulateExcludedStatementShift(ctx.getSourceInterval());
   }
 
-  private String handleReplace(String replaceableStmt, String replaceOffStmt) {
-    String content = applyReplacing(replaceableStmt, replacingClauses);
-    return content
-        + PreprocessorStringUtils.getMaskedTextPreservingNewLine(
-            replaceOffStmt, ProcessingConstants.WS);
+  @Override
+  public void enterReplaceOffStatement(ReplaceOffStatementContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitReplaceOffStatement(ReplaceOffStatementContext ctx) {
+    replacingClauses.clear();
+    pop();
+    accumulateExcludedStatementShift(ctx.getSourceInterval());
+  }
+
+  private String handleReplace(String replaceableStmt) {
+    return applyReplacing(replaceableStmt, replacingClauses);
   }
 
   @Override

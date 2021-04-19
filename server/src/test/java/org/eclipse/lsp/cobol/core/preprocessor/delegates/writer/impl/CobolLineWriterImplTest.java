@@ -15,9 +15,9 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.impl;
 
 import org.eclipse.lsp.cobol.core.AbstractCobolLinePreprocessorTest;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /** Test to check CobolLineWriterImpl */
 class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
   private static final String TEXT_TO_TEST =
-      "078087                 PERFORM BBAB-MOVE-TO-DETAIL-MAP\r\n"
+      "CBL DATA(24)\r\n"
+          + "078087                 PERFORM BBAB-MOVE-TO-DETAIL-MAP\r\n"
           + "078088                 MOVE -1 TO SNAMEDL\r\n"
           + "078089                 MOVE 'PRESS \"CLEAR\" OR \"ENTER\" TO RETURN TO THE M\r\n"
           + "078089-                     'ENU WHEN \r\n"
@@ -39,7 +40,8 @@ class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
           + "078089-                     NEXT LINE\r\n";
 
   private static final String EXPECTED =
-      "                       PERFORM BBAB-MOVE-TO-DETAIL-MAP\r\n"
+      "CBL DATA(24)\r\n"
+          + "                       PERFORM BBAB-MOVE-TO-DETAIL-MAP\r\n"
           + "                       MOVE -1 TO SNAMEDL\r\n"
           + "                       MOVE 'PRESS \"CLEAR\" OR \"ENTER\" TO RETURN TO THE MENU WHEN FINISHED'\r\n"
           + "\r\n"

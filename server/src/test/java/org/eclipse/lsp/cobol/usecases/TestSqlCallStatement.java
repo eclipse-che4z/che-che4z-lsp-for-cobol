@@ -27,12 +27,13 @@ class TestSqlCallStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "         CONNECT TO BETA;\n"
-          + "         SET v1 = 528671;\n"
-          + "         SET IV = -1;\n"
-          + "         CALL SUMARIZE(:V1,:V2 INDICATOR :IV);\n"
-          + "       END-EXEC.";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "               CONNECT TO BETA;\n"
+          + "               SET v1 = 528671;\n"
+          + "               SET IV = -1;\n"
+          + "               CALL SUMARIZE(:V1,:V2 INDICATOR :IV);\n"
+          + "           END-EXEC.";
 
   @Test
   void test() {

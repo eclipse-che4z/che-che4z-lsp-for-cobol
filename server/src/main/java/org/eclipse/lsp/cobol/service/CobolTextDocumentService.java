@@ -26,10 +26,13 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.annotation.CheckServerShutdownState;
 import org.eclipse.lsp.cobol.core.annotation.DisposableService;
+import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
 import org.eclipse.lsp.cobol.domain.event.model.AnalysisResultEvent;
+import org.eclipse.lsp.cobol.jrpc.ExtendedApi;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
@@ -68,15 +71,13 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 @Singleton
 public class CobolTextDocumentService
-    implements TextDocumentService,
-        DisposableService,
-        ExtendedApiService {
-  private static final List<String> COBOL_IDS = Arrays.asList("cobol", "cbl", "cob");
+    implements TextDocumentService, DisposableService, ExtendedApi {
   private static final String GIT_FS_URI = "gitfs:/";
   private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
   private final Map<String, CobolDocumentModel> docs = new ConcurrentHashMap<>();
   private final Map<String, CompletableFuture<List<DocumentSymbol>>> outlineMap =
-      new ConcurrentHashMap<>();
+          new ConcurrentHashMap<>();
+  private final Map<String, CompletableFuture<Node>> cfAstMap = new ConcurrentHashMap<>();
   private final Map<String, Future<?>> futureMap = new ConcurrentHashMap<>();
   private Communications communications;
   private LanguageEngineFacade engine;
@@ -87,6 +88,7 @@ public class CobolTextDocumentService
   private DataBusBroker dataBus;
   private CustomThreadPoolExecutor executors;
   private HoverProvider hoverProvider;
+  private CFASTBuilder cfastBuilder;
 
   @Inject
   @Builder
@@ -99,7 +101,8 @@ public class CobolTextDocumentService
       DataBusBroker dataBus,
       CodeActions actions,
       CustomThreadPoolExecutor executors,
-      HoverProvider hoverProvider) {
+      HoverProvider hoverProvider,
+      CFASTBuilder cfastBuilder) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -109,6 +112,7 @@ public class CobolTextDocumentService
     this.dataBus = dataBus;
     this.executors = executors;
     this.hoverProvider = hoverProvider;
+    this.cfastBuilder = cfastBuilder;
 
     dataBus.subscribe(this);
   }
@@ -200,13 +204,15 @@ public class CobolTextDocumentService
   public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
     outlineMap.put(uri, new CompletableFuture<>());
+    cfAstMap.put(uri, new CompletableFuture<>());
     // git FS URIs are not currently supported
     if (uri.startsWith(GIT_FS_URI)) {
       LOG.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
     }
 
     String text = params.getTextDocument().getText();
-    registerEngineAndAnalyze(uri, text);
+    communications.notifyThatLoadingInProgress(uri);
+    analyzeDocumentFirstTime(uri, text, false);
   }
 
   @Override
@@ -214,12 +220,10 @@ public class CobolTextDocumentService
   public void didChange(DidChangeTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
     outlineMap.put(uri, new CompletableFuture<>());
+    cfAstMap.put(uri, new CompletableFuture<>());
     String text = params.getContentChanges().get(0).getText();
-    String fileExtension = extractExtension(uri);
-    if (fileExtension != null && isCobolFile(fileExtension)) {
-      interruptAnalysis(uri);
-      analyzeChanges(uri, text);
-    }
+    interruptAnalysis(uri);
+    analyzeChanges(uri, text);
   }
 
   @Override
@@ -263,47 +267,10 @@ public class CobolTextDocumentService
   public CompletableFuture<ExtendedApiResult> analysis(@NonNull JsonObject json) {
     AnalysisResultEvent event = new Gson().fromJson(json.toString(), AnalysisResultEvent.class);
     String uri = Optional.ofNullable(event).map(AnalysisResultEvent::getUri).orElse("");
-    return CompletableFuture.supplyAsync(
-            () ->
-                Optional.ofNullable(docs.get(uri))
-                    .map(CobolDocumentModel::getAnalysisResult)
-                    .map(ar -> new ExtendedApiResult(ar.getParagraphDefinitions(),
-                        ar.getParagraphUsages(),
-                        ar.getParagraphRange(),
-                        ar.getSectionDefinitions(),
-                        ar.getSectionUsages(),
-                        ar.getSectionRange()))
-                    .orElse(null),
-            executors.getThreadPoolExecutor())
-        .whenComplete(
-            reportExceptionIfThrown(createDescriptiveErrorMessage("analysis retrieving", uri)));
-  }
-
-  private void registerEngineAndAnalyze(String uri, String text) {
-    String fileExtension = extractExtension(uri);
-    if (fileExtension != null && !isCobolFile(fileExtension)) {
-      outlineMap.computeIfPresent(
-          uri,
-          (k, v) -> {
-            v.complete(Collections.singletonList(new DocumentSymbol()));
-            return v;
-          });
-      communications.notifyThatExtensionIsUnsupported(fileExtension);
-    } else {
-      communications.notifyThatLoadingInProgress(uri);
-      analyzeDocumentFirstTime(uri, text, false);
-    }
-  }
-
-  private boolean isCobolFile(String identifier) {
-    return COBOL_IDS.contains(identifier.toLowerCase());
-  }
-
-  private String extractExtension(String uri) {
-    return ofNullable(uri)
-        .filter(it -> it.indexOf('.') > -1)
-        .map(it -> it.substring(it.lastIndexOf('.') + 1))
-        .orElse(null);
+    return cfAstMap
+            .get(uri).thenApply(cfastBuilder::build)
+            .whenComplete(
+                    reportExceptionIfThrown(createDescriptiveErrorMessage("analysis retrieving", uri)));
   }
 
   private void clearAnalysedFutureObject(String uri) {
@@ -328,6 +295,7 @@ public class CobolTextDocumentService
                     ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
                     publishResult(uri, result, copybookProcessingMode);
                     outlineMap.get(uri).complete(result.getOutlineTree());
+                    cfAstMap.get(uri).complete(result.getRootNode());
                   } catch (Exception e) {
                     LOG.error(createDescriptiveErrorMessage("analysis", uri), e);
                   } finally {
@@ -357,6 +325,7 @@ public class CobolTextDocumentService
                     registerDocument(uri, new CobolDocumentModel(text, result));
                     communications.publishDiagnostics(result.getDiagnostics());
                     outlineMap.get(uri).complete(result.getOutlineTree());
+                    cfAstMap.get(uri).complete(result.getRootNode());
                   } catch (Exception ex) {
                     LOG.error(createDescriptiveErrorMessage("analysis", uri), ex);
                   } finally {
@@ -397,7 +366,7 @@ public class CobolTextDocumentService
     String uri = params.getTextDocument().getUri();
     return outlineMap
         .get(uri)
-        .thenApply(
+        .<List<Either<SymbolInformation, DocumentSymbol>>>thenApply(
             documentSymbols ->
                 documentSymbols.stream()
                     .map(Either::<SymbolInformation, DocumentSymbol>forRight)

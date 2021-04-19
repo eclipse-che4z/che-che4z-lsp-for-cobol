@@ -29,13 +29,6 @@ import {JavaCheck} from "./JavaCheck";
 import {Middleware} from "./Middleware";
 import {GenericNotificationHandler, GenericRequestHandler} from "vscode-languageserver-protocol";
 
-export type AnalysisResult = {
-    paragraphRange: Map<string, Location[]>;
-    paragraphUsages: Map<string, Location[]>;
-    sectionRange: Map<string, Location[]>;
-    sectionUsages: Map<string, Location[]>;
-}
-
 export class LanguageClientService {
     private readonly jarPath: string;
     private languageClient: LanguageClient;
@@ -61,8 +54,9 @@ export class LanguageClientService {
         this.handlers.push(languageClient => languageClient.onRequest(method, handler));
     }
 
-    public async retrieveAnalysis(uri: string): Promise<AnalysisResult> {
+    public async retrieveAnalysis(uri: string): Promise<any> {
         const languageClient = this.getLanguageClient();
+        await languageClient.onReady();
         return languageClient.sendRequest("extended/analysis", { uri: uri });
     }
 

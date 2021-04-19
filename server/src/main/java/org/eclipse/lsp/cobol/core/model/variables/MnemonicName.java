@@ -32,9 +32,9 @@ import java.util.List;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class MnemonicName extends AbstractVariable {
-  private String systemName;
+  String systemName;
   public MnemonicName(String systemName, String name, Locality definition) {
-    super(-1, name, definition, null);
+    super(-1, name, definition, false, null);
     this.systemName = systemName;
   }
 

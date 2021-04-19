@@ -37,8 +37,8 @@ import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVE
 @EqualsAndHashCode(callSuper = true)
 public class RenameItem extends StructuredVariable {
 
-  public RenameItem(@NonNull String name, @NonNull Locality definition) {
-    super(LEVEL_66, name, definition, null);
+  public RenameItem(@NonNull String name, boolean global, @NonNull Locality definition) {
+    super(LEVEL_66, name, definition, global, null);
   }
 
   @Override

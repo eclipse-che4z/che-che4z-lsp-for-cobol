@@ -28,9 +28,10 @@ class TestSqlFreeLocatorStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "         FREE LOCATOR :LOCRES, :LOCHIST, :LOCPIC \n"
-          + "       END-EXEC.\n";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "             FREE LOCATOR :LOCRES, :LOCHIST, :LOCPIC \n"
+          + "           END-EXEC.\n";
 
   @Test
   void test() {

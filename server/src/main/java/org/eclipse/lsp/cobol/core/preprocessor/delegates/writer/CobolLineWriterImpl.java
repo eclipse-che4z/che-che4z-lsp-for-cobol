@@ -14,17 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
-/**
- * This class serializes a list of COBOL lines into a String
- */
+/** This class serializes a list of COBOL lines into a String */
 public class CobolLineWriterImpl implements CobolLineWriter {
 
   @Override
@@ -40,7 +38,10 @@ public class CobolLineWriterImpl implements CobolLineWriter {
           sb.append(ProcessingConstants.NEWLINE);
         }
         counter = 0;
-        sb.append(ProcessingConstants.BLANK_SEQUENCE_AREA);
+
+        if (line.getType() != CobolLineTypeEnum.PREPROCESSED) {
+          sb.append(ProcessingConstants.BLANK_SEQUENCE_AREA);
+        }
         sb.append(line.getIndicatorArea());
         sb.append(line.getContentArea());
       }
@@ -60,6 +61,7 @@ public class CobolLineWriterImpl implements CobolLineWriter {
 
     return sb.toString();
   }
+
   /**
    * We need to remove the opening quote from a continuation line to concatenate string correctly
    */

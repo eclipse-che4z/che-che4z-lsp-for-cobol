@@ -31,16 +31,17 @@ class TestSqlWheneverStatement {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n";
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n";
 
   private static final String WHENEVER =
-      TEXT + "       EXEC SQL  WHENEVER SQLERROR GOTO HANDLER  END-EXEC.\n";
+      TEXT + "             EXEC SQL  WHENEVER SQLERROR GOTO HANDLER  END-EXEC.\n";
 
   private static final String WHENEVER2 =
-      TEXT + "       EXEC SQL  WHENEVER SQLWARNING CONTINUE   END-EXEC.\n";
+      TEXT + "             EXEC SQL  WHENEVER SQLWARNING CONTINUE   END-EXEC.\n";
 
   private static final String WHENEVER3 =
-      TEXT + "       EXEC SQL  WHENEVER NOT FOUND GO TO ENDDATA  END-EXEC.\n";
+      TEXT + "             EXEC SQL  WHENEVER NOT FOUND GO TO ENDDATA  END-EXEC.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(WHENEVER, WHENEVER2, WHENEVER3);

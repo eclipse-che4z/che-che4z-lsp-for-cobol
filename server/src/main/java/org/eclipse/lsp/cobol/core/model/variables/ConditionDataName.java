@@ -37,7 +37,8 @@ public class ConditionDataName extends AbstractVariable {
   String value;
   String valueTo;
 
-  public ConditionDataName(String name, Locality definition, Variable parent, String value, String valueTo) {
+  public ConditionDataName(String name, Locality definition, Variable parent, String value,
+                           String valueTo) {
     super(LEVEL_88, name, definition, parent);
     this.value = value;
     this.valueTo = valueTo;
@@ -66,7 +67,7 @@ public class ConditionDataName extends AbstractVariable {
   @Override
   public String getFormattedDisplayLine() {
     StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(String.format("%1$02d %2$s VALUE %3$s", levelNumber, name, value));
+    stringBuilder.append(getFormattedSuffix()).append(" VALUE ").append(value);
     if (valueTo != null)
       stringBuilder.append(" THRU ").append(valueTo);
     return stringBuilder.append(".").toString();

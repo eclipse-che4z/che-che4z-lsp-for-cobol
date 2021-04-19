@@ -18,6 +18,56 @@
 /// <reference types="../../support/" />
 
 context('This is a LSP spec', () => {
+  const getCurrentLineSpanWidth = () => {
+    return cy
+      .getCurrentLine()
+      .find('span')
+      .then(($line) => {
+        return $line[0].offsetWidth;
+      });
+  };
+
+  const getRulerOffsetLeft = (index) => {
+    return cy
+      .get('.view-rulers')
+      .children()
+      .eq(index)
+      .then(($ruler) => {
+        return $ruler[0].offsetLeft;
+      });
+  };
+
+  /**
+   * Get hover over the variable
+   *
+   * @example hoverOverVariable(35, 'REC-1-2-1.', '01 REC-1.  05 REC-1-2.    10 REC-1-2-1 PIC 9.');
+   */
+  const hoverOverVariable = (line, text, hierarchy) => {
+    return cy
+      .getLineByNumber(line)
+      .findText(text)
+      .click()
+      .trigger('mousemove')
+      .get('div.monaco-editor-hover-content')
+      .contains(hierarchy);
+  };
+
+  /**
+   * Get hover over the variable in autocomplete
+   *
+   * @example varDifinitionAutocomplete('ADSF', '01 SOMETHING. 03 ADFSF OCCURS 30 TIMES. 05 OL-NO PIC X(8).');;
+   */
+  const varDifinitionAutocomplete = (variable, documentation) => {
+    return cy
+      .getLineByNumber(48)
+      .type('{end}{enter}')
+      .getCurrentLine()
+      .type('{ctrl} ')
+      .type(`${variable}{ctrl} `)
+      .get('.monaco-scrollable-element .docs')
+      .contains(documentation);
+  };
+
   describe.skip('TC152046 Nominal - check syntax Ok message', () => {
     it(
       ['flaky_theia'],
@@ -332,25 +382,6 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC250114 Implement syntax coloring', () => {
-    const getCurrentLineSpanWidth = () => {
-      return cy
-        .getCurrentLine()
-        .find('span')
-        .then(($line) => {
-          return $line[0].offsetWidth;
-        });
-    };
-
-    const getRulerOffsetLeft = (index) => {
-      return cy
-        .get('.view-rulers')
-        .children()
-        .eq(index)
-        .then(($ruler) => {
-          return $ruler[0].offsetLeft;
-        });
-    };
-
     it(['smoke'], 'Lets check the positions of rulers ', () => {
       cy.openFile('TEST.CBL').goToLine(24);
       cy.getCurrentLine().type('{end}{enter}');
@@ -428,7 +459,7 @@ context('This is a LSP spec', () => {
       cy.writeFile('test_files/project/some_text.txt', '');
       cy.openFile('some_text.txt');
       cy.changeLangMode('COBOL');
-      cy.get('.view-lines').eq(1).type('{ctrl}{shift}I');
+      cy.get('.view-lines').type('{ctrl}{shift}I');
       cy.get('.theia-TreeContainer').contains('No outline information available.');
     });
   });
@@ -450,20 +481,6 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC319689 Hover over variable shows its hierarchy definition', () => {
-    /**
-     * Get hover over the variable
-     *
-     * @example hoverOverVariable(35, 'REC-1-2-1.', '01 REC-1.  05 REC-1-2.    10 REC-1-2-1 PIC 9.');
-     */
-    const hoverOverVariable = (line, text, hierarchy) => {
-      return cy
-        .getLineByNumber(line)
-        .findText(text)
-        .click()
-        .trigger('mousemove')
-        .get('div.monaco-editor-hover-content')
-        .contains(hierarchy);
-    };
     it(
       ['smoke'],
       'Checks a variable definition with a snippet of its structure when user hovers over the variable.',
@@ -482,21 +499,6 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC319969 Provide the variables definition as documentation', () => {
-    /**
-     * Get hover over the variable in autocomplete
-     *
-     * @example varDifinitionAutocomplete('ADSF', '01 SOMETHING. 03 ADFSF OCCURS 30 TIMES. 05 OL-NO PIC X(8).');;
-     */
-    const varDifinitionAutocomplete = (variable, documentation) => {
-      return cy
-        .getLineByNumber(48)
-        .type('{end}{enter}')
-        .getCurrentLine()
-        .type('{ctrl} ')
-        .type(`${variable}{ctrl} `)
-        .get('.monaco-scrollable-element .docs')
-        .contains(documentation);
-    };
     it(['smoke'], 'Checks variable definition into VSC autocomplete documentation.', () => {
       cy.openFile('HOVER.CBL');
       varDifinitionAutocomplete('ADSF', '01 SOMETHING. 03 ADFSF OCCURS 30 TIMES. 05 OL-NO PIC X(8).');

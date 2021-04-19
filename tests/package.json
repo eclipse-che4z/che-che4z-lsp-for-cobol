@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@eclipse/che-che4z": "https://github.com/eclipse/che-che4z.git",
-    "cypress": "6.4.0",
+    "cypress": "^7.1.0",
     "typescript": "^4.0.3"
   },
   "scripts": {

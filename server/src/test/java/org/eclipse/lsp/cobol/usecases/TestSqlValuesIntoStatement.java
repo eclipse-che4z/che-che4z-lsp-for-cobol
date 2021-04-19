@@ -32,19 +32,20 @@ class TestSqlValuesIntoStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL \n";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL \n";
 
   private static final String VALUES_INTO =
-      TEXT + "       VALUES(CURRENT PATH) INTO :HV1; END-EXEC.";
+      TEXT + "            VALUES(CURRENT PATH) INTO :HV1; END-EXEC.";
 
   private static final String VALUES_INTO2 =
-      TEXT + "       VALUES(CURRENT MEMBER) INTO :MEM; END-EXEC.";
+      TEXT + "            VALUES(CURRENT MEMBER) INTO :MEM; END-EXEC.";
 
   private static final String VALUES_INTO3 =
-      TEXT + "       VALUES (SUBSTR(:LOB1,1,35)) INTO :DETAILS; END-EXEC.";
+      TEXT + "            VALUES (SUBSTR(:LOB1,1,35)) INTO :DETAILS; END-EXEC.";
 
   private static final String VALUES_INTO4 =
-      TEXT + "       VALUES INTVAR1 INTO MYINTARRAY1[23]; END-EXEC.";
+      TEXT + "            VALUES INTVAR1 INTO MYINTARRAY1[23]; END-EXEC.";
 
   private static Stream<String> textsToTest() {
     return Stream.of(VALUES_INTO, VALUES_INTO2, VALUES_INTO3, VALUES_INTO4);

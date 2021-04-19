@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.engine;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
@@ -32,6 +34,10 @@ import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
@@ -39,15 +45,15 @@ import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp4j.Location;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
@@ -93,12 +99,16 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
       @NonNull String documentUri,
       @NonNull String text,
       @NonNull CopybookProcessingMode copybookProcessingMode) {
+    Timing.Builder timingBuilder = Timing.builder();
+    timingBuilder.getPreprocessorTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =
         preprocessor
             .process(documentUri, text, copybookProcessingMode)
             .unwrap(accumulatedErrors::addAll);
+    timingBuilder.getPreprocessorTimer().stop();
 
+    timingBuilder.getParserTimer().start();
     CobolLexer lexer = new CobolLexer(CharStreams.fromString(extendedDocument.getText()));
     lexer.removeErrorListeners();
 
@@ -113,10 +123,14 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
     parser.addParseListener(treeListener);
 
     CobolParser.StartRuleContext tree = parser.startRule();
+    timingBuilder.getParserTimer().stop();
 
+    timingBuilder.getMappingTimer().start();
     Map<Token, Locality> positionMapping =
         getPositionMapping(documentUri, extendedDocument, tokens);
+    timingBuilder.getMappingTimer().stop();
 
+    timingBuilder.getVisitorTimer().start();
     CobolVisitor visitor =
         new CobolVisitor(
             documentUri,
@@ -125,14 +139,47 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
             positionMapping,
             messageService,
             subroutineService);
-    visitor.visit(tree);
-
+    List<Node> syntaxTree = visitor.visit(tree);
     SemanticContext context = visitor.finishAnalysis().unwrap(accumulatedErrors::addAll);
+    timingBuilder.getVisitorTimer().stop();
+    if (syntaxTree.size() == 1) {
+      timingBuilder.getSyntaxTreeTimer().start();
+      Node rootNode = syntaxTree.get(0);
+      SyntaxTreeEngine syntaxTreeEngine = new SyntaxTreeEngine(rootNode);
+      accumulatedErrors.addAll(syntaxTreeEngine.processTree());
+      // This is a temporal solution only for compatibility
+      // Definitions, usages and variables are set here for "Go to definition" feature and others
+      List<Variable> definedVariables = rootNode.getDepthFirstStream()
+          .filter(it -> it.getNodeType() == NodeType.PROGRAM)
+          .map((ProgramNode.class::cast))
+          .map(ProgramNode::getDefinedVariables)
+          .flatMap(Collection::stream)
+          .collect(toList());
+      context = context.toBuilder()
+          .variableDefinitions(collectVariableDefinitions(definedVariables))
+          .variableUsages(collectVariableUsages(definedVariables))
+          .variables(definedVariables)
+          .rootNode(rootNode).build();
+      timingBuilder.getSyntaxTreeTimer().stop();
+    } else
+      LOG.warn("The root node for syntax tree was not constructed");
+    timingBuilder.getLateErrorProcessingTimer().start();
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
     accumulatedErrors.addAll(
         collectErrorsForCopybooks(accumulatedErrors, extendedDocument.getCopyStatements()));
+    timingBuilder.getLateErrorProcessingTimer().stop();
 
-    return new ResultWithErrors<>(context, accumulatedErrors);
+    if (LOG.isDebugEnabled()) {
+      Timing timing = timingBuilder.build();
+      LOG.debug("Timing for parsing {}. Preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
+          + "late error processing: {}", documentUri, timing.getPreprocessorTime(), timing.getParserTime(),
+          timing.getMappingTime(), timing.getVisitorTime(), timing.getSyntaxTreeTime(),
+          timing.getLateErrorProcessingTime());
+    }
+
+    return new ResultWithErrors<>(
+        context,
+        accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
   @CheckThreadInterruption
@@ -189,5 +236,37 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
 
   private Predicate<SyntaxError> shouldRaise() {
     return err -> err.getLocality().getCopybookId() != null;
+  }
+
+  private SyntaxError constructErrorMessage(SyntaxError syntaxError) {
+    String messageTemplate = syntaxError.getMessageTemplate();
+    if (messageTemplate != null) {
+      return syntaxError.toBuilder()
+          .messageTemplate(null)
+          .clearMessageArgs()
+          .suggestion(messageService.getMessage(messageTemplate, syntaxError.getMessageArgs().toArray()))
+          .build();
+    }
+    return syntaxError;
+  }
+
+  private Map<String, Collection<Location>> collectVariableDefinitions(
+      Collection<Variable> definedVariables) {
+    Multimap<String, Location> definitions = HashMultimap.create();
+    definedVariables.stream()
+        .filter(it -> !FILLER_NAME.equals(it.getName()))
+        .filter(it -> Objects.nonNull(it.getDefinition()))
+        .forEach(it -> definitions.put(it.getName(), it.getDefinition().toLocation()));
+    return definitions.asMap();
+  }
+
+  private Map<String, Collection<Location>> collectVariableUsages(
+      Collection<Variable> definedVariables) {
+    Multimap<String, Location> usages = HashMultimap.create();
+    definedVariables.forEach(
+        it ->
+            usages.putAll(
+                it.getName(), it.getUsages().stream().map(Locality::toLocation).collect(toList())));
+    return usages.asMap();
   }
 }

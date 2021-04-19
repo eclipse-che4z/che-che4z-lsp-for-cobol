@@ -13,22 +13,16 @@
  *
  */
 
-package org.eclipse.lsp.cobol.service;
+package org.eclipse.lsp.cobol.core.model.extendedapi;
 
 import lombok.Value;
-import org.eclipse.lsp4j.Location;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * Analysis result for Extended Api call
  */
 @Value
 public class ExtendedApiResult {
-  Map<String, List<Location>> paragraphDefinitions;
-  Map<String, List<Location>> paragraphUsages;
-  Map<String, List<Location>> paragraphRange;
-  Map<String, List<Location>> sectionDefinitions;
-  Map<String, List<Location>> sectionUsages;
-  Map<String, List<Location>> sectionRange;
+  List<Program> controlFlowAST;
 }

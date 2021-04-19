@@ -27,15 +27,16 @@ class TestSqlOpenStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "       DECLARE C1 CURSOR FOR\n"
-          + "       SELECT DEPTNO, DEPTNAME, MGRNO FROM DSN8C10.DEPT\n"
-          + "       WHERE ADMRDEPT = 'A00';\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "            DECLARE C1 CURSOR FOR\n"
+          + "            SELECT DEPTNO, DEPTNAME, MGRNO FROM DSN8C10.DEPT\n"
+          + "            WHERE ADMRDEPT = 'A00';\n"
           + "\n"
-          + "       OPEN C1;\n"
-          + "       FETCH C1 INTO :DNUM, :DNAME, :MNUM;\n"
-          + "       CLOSE C1;\n"
-          + "       END-EXEC.";
+          + "            OPEN C1;\n"
+          + "            FETCH C1 INTO :DNUM, :DNAME, :MNUM;\n"
+          + "            CLOSE C1;\n"
+          + "           END-EXEC.";
 
   @Test
   void test() {

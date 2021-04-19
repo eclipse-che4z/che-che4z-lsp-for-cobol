@@ -15,7 +15,7 @@
 parser grammar Db2SqlParser;
 options {tokenVocab = Db2SqlLexer; superClass = MessageServiceParser;}
 
-@parser::members {
+@members {
     public void validateValue(String input, String value) {
       if(input!=null && !input.equals(value)) {
             notifyError("db2SqlParser.validValueMsg", input, value);
@@ -29,12 +29,15 @@ options {tokenVocab = Db2SqlLexer; superClass = MessageServiceParser;}
     }
 }
 
-allSqlRules: ((dbs_allocate | dbs_alter | dbs_associate | dbs_begin | dbs_call | dbs_close | dbs_comment | dbs_commit |
-          dbs_connect | dbs_create | dbs_declare | dbs_delete | dbs_describe | dbs_drop | dbs_end | dbs_exchange |
-          dbs_execute | dbs_explain | dbs_fetch | dbs_free | dbs_get | dbs_grant | dbs_hold | dbs_include | dbs_insert |
+/*Allowable SQL statements for COBOL program specific dvisions or sections*/
+sqlRulesAllowedInProcedureDivision: ((dbs_allocate | dbs_alter | dbs_associate | dbs_call | dbs_close | dbs_comment | dbs_commit |
+          dbs_connect | dbs_create | dbs_declare | dbs_declare_cursor | dbs_declare_table | dbs_delete | dbs_describe | dbs_drop | dbs_exchange | dbs_execute | dbs_explain |
+          dbs_fetch | dbs_free | dbs_get | dbs_grant | dbs_hold | dbs_include | dbs_include_sqlda | dbs_insert |
           dbs_label | dbs_lock | dbs_merge | dbs_open | dbs_prepare | dbs_refresh | dbs_release | dbs_rename |
           dbs_revoke | dbs_rollback | dbs_savepoint | dbs_select | dbs_set | dbs_signal | dbs_transfer | dbs_truncate |
           dbs_update | dbs_values | dbs_whenever) SEMICOLON_FS?)+;
+sqlRulesAllowedInDataDivision: ((dbs_declare_cursor | dbs_declare_table | dbs_include) SEMICOLON_FS?)+;
+sqlRulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca ) SEMICOLON_FS?)+;
 
 
 /*ALLOCATE CURSOR */
@@ -532,9 +535,9 @@ dbs_create_view: VIEW dbs_view_name column_loop? AS tbl_expr_loop?  dbs_fullsele
 tbl_expr_loop: WITH dbs_select_statement_common_table_expression COMMACHAR dbs_select_statement_common_table_expression*;
 
 /*DECLARE (all) */
-dbs_declare: DECLARE (dbs_declare_cursor | dbs_declare_global | dbs_declare_statement | dbs_declare_table | dbs_declare_variable);
+dbs_declare: DECLARE (dbs_declare_global | dbs_declare_statement);
 
-dbs_declare_cursor: dbs_cursor_name ((NO|ASENSITIVE|INSENSITIVE|SENSITIVE (DYNAMIC|STATIC)?) SCROLL)? CURSOR ((WITH|WITHOUT) HOLD |
+dbs_declare_cursor: DECLARE dbs_cursor_name ((NO|ASENSITIVE|INSENSITIVE|SENSITIVE (DYNAMIC|STATIC)?) SCROLL)? CURSOR ((WITH|WITHOUT) HOLD |
                     (WITHOUT RETURN|WITH RETURN TO (CALLER|CLIENT)) | (WITH|WITHOUT) ROWSET POSITIONING)* /*random ordering req*/
                     FOR (dbs_select | dbs_statement_name);
 
@@ -563,7 +566,7 @@ dbs_declare_global_identity: (EXCLUDING|INCLUDING) IDENTITY (COLUMN ATTRIBUTES)?
 
 dbs_declare_statement: dbs_statement_name (COMMACHAR dbs_statement_name)* STATEMENT;
 
-dbs_declare_table: (dbs_table_name | dbs_view_name) TABLE LPARENCHAR dbs_declare_table_loop (COMMACHAR dbs_declare_table_loop)* RPARENCHAR;
+dbs_declare_table: DECLARE (dbs_table_name | dbs_view_name) TABLE LPARENCHAR dbs_declare_table_loop (COMMACHAR dbs_declare_table_loop)* RPARENCHAR;
 dbs_declare_table_loop: dbs_column_name (dbs_distinct_type_name | dbs_declare_table_bit) (NOT NULL (WITH DEFAULT)?)?;
 dbs_declare_table_bit: (dbs_declare_table_bit_int | dbs_declare_table_bit_decimal | dbs_declare_table_bit_float | dbs_declare_table_bit_decfloat | dbs_declare_table_bit_char |
                         dbs_declare_table_bit_clob | dbs_declare_table_bit_varchar | dbs_declare_table_bit_graphic | dbs_declare_table_bit_binary | DATE | TIME | TIMESTAMP | ROWID | XML);
@@ -578,8 +581,8 @@ dbs_declare_table_bit_clob: CLOB dbs_declare_table_bit_cloba;
 dbs_declare_table_bit_cloba: (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?;
 dbs_declare_table_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR | DBCLOB (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
 dbs_declare_table_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
-
-dbs_declare_variable: dbs_host_variable (COMMACHAR dbs_host_variable)* VARIABLE (CCSID (dbs_integer_constant | (EBCDIC|ASCII|UNICODE) (FOR (SBCS|MIXED|BIT) DATA)?))?;
+//used in working-storage section of cobol program
+dbs_declare_variable: DECLARE dbs_host_variable (COMMACHAR dbs_host_variable)* VARIABLE (CCSID (dbs_integer_constant | (EBCDIC|ASCII|UNICODE) (FOR (SBCS|MIXED|BIT) DATA)?))?;
 
 /*DELETE */
 dbs_delete: DELETE FROM (dbs_table_name | dbs_view_name) (dbs_delete_period | dbs_delete_noperiod | dbs_delete_positioned);
@@ -735,7 +738,9 @@ dbs_grant_use: USE OF (BUFFERPOOL dbs_bp_name  (COMMACHAR dbs_bp_name)* | ALL BU
 dbs_hold: HOLD LOCATOR dbs_host_variable (COMMACHAR dbs_host_variable)*;
 
 /*INCLUDE */
-dbs_include: INCLUDE (SQLCA | SQLDA | dbs_member_name);
+dbs_include: INCLUDE dbs_member_name;
+dbs_include_sqlca: INCLUDE SQLCA;
+dbs_include_sqlda: INCLUDE SQLDA;
 
 /*INSERT */
 dbs_insert: INSERT INTO (dbs_table_name | dbs_view_name) (LPARENCHAR dbs_column_name (COMMACHAR dbs_column_name)* RPARENCHAR)?
@@ -1488,7 +1493,7 @@ db2sql_only_words: ABSOLUTE | ACCELERATION | ACCELERATOR | ACCESSCTRL | ACCTNG |
                   | PREVIOUS | PRIMARY | PRIOR | PRIQTY | PRIVILEGES | PROTOCOL | PUBLIC | QUALIFIER | QUERYNO | QUOTED_NONE | RANGE
                   | RANK | RATIO_TO_REPORT | READS | RECOMMEND | RECOVERDB | RECOVERY | REFERENCING | REFRESH | REGENERATE | REGISTERS
                   | RENAME | REOPT | REORG | REPAIR | REPEAT | REPLICATED | REQUIRED | RESIDENT | RESIGNAL | RESOLUTION | RESOLVE | RESPECT
-                  | RESTORE | RESTRICT | RESULT_SET_LOCATOR | RETRUN | RETURN_STATUS | RETURNED_SQLSTATE | RETURNS | REUSE | REVOKE
+                  | RESTORE | RESTRICT | RESULT_SET_LOCATOR | RETURN_STATUS | RETURNED_SQLSTATE | RETURNS | REUSE | REVOKE
                   | REXX | ROLLUP | ROTATE | ROUND_CEILING | ROUND_DOWN | ROUND_FLOOR | ROUND_HALF_DOWN | ROUND_HALF_EVEN | ROUND_HALF_UP
                   | ROUND_UP | ROUNDING | ROUTINE | ROW | ROW_COUNT | ROW_NUMBER | ROWID | ROWS | ROWSET | RR | RS | RULES | SAVEPOINT
                   | SBCS | SCALE | SCHEMA | SCRATCHPAD | SCROLL | SECOND | SECQTY | SECURED | SEGSIZE | SELECTIVITY | SENSITIVE | SEQUENCE

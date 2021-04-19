@@ -1,0 +1,17 @@
+[
+  {
+    "type": "program",
+    "name": "CASE1",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 15,
+        "character": 8
+      },
+      "end": {
+        "line": 15,
+        "character": 27
+      }
+    }
+  }
+]

@@ -49,178 +49,179 @@ class TestSqlAllRevokeStatements {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n";
 
   private static final String REVOKE_IN_COLLECTION =
       TEXT
-          + "         REVOKE CREATE IN COLLECTION QAACLONE, \n"
-          + "         DSN8CC61 FROM CLARK;\n"
-          + "       END-EXEC.";
+          + "             REVOKE CREATE IN COLLECTION QAACLONE, \n"
+          + "             DSN8CC61 FROM CLARK;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_IN_COLLECTION2 =
       TEXT
-          + "         REVOKE CREATE IN COLLECTION DSN8CC91 FROM ROLE ROLE1;\n"
-          + "       END-EXEC.";
+          + "             REVOKE CREATE IN COLLECTION DSN8CC91 FROM ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_DATABASE =
       TEXT
-          + "         REVOKE DROP\n"
-          + "          ON DATABASE DSN8D12A\n"
-          + "          FROM PEREZ;\n"
-          + "       END-EXEC.";
+          + "             REVOKE DROP\n"
+          + "              ON DATABASE DSN8D12A\n"
+          + "              FROM PEREZ;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_DATABASE2 =
       TEXT
-          + "         REVOKE REPAIR\n"
-          + "          ON DATABASE DSN8D12A\n"
-          + "          FROM PUBLIC;\n"
-          + "       END-EXEC.";
+          + "             REVOKE REPAIR\n"
+          + "              ON DATABASE DSN8D12A\n"
+          + "              FROM PUBLIC;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_DATABASE3 =
       TEXT
-          + "         REVOKE CREATETAB,LOAD\n"
-          + "         ON DATABASE DSN8D12A\n"
-          + "         FROM WALKER,PIANKA,FUJIMOTO;\n"
-          + "       END-EXEC.";
+          + "             REVOKE CREATETAB,LOAD\n"
+          + "             ON DATABASE DSN8D12A\n"
+          + "             FROM WALKER,PIANKA,FUJIMOTO;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_DATABASE4 =
       TEXT
-          + "         REVOKE LOAD\n"
-          + "         ON DATABASE DSN8D12A\n"
-          + "         FROM ROLE ROLE1;\n"
-          + "       END-EXEC.";
+          + "             REVOKE LOAD\n"
+          + "             ON DATABASE DSN8D12A\n"
+          + "             FROM ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_FUNCTION =
-      TEXT + "        REVOKE EXECUTE ON FUNCTION CALC_SALARY FROM JONES;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE EXECUTE ON FUNCTION CALC_SALARY FROM JONES;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_PROCEDURE =
       TEXT
-          + "        REVOKE EXECUTE ON PROCEDURE VACATION_ACCR FROM PUBLIC;\n"
-          + "       END-EXEC.";
+          + "            REVOKE EXECUTE ON PROCEDURE VACATION_ACCR FROM PUBLIC;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_PACKAGE =
-      TEXT + "        REVOKE COPY ON PACKAGE DSN8CC61.* FROM LEWIS;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE COPY ON PACKAGE DSN8CC61.* FROM LEWIS;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_PACKAGE2 =
-      TEXT + "        REVOKE EXECUTE ON PACKAGE DSN9CC13.* FROM ROLE ROLE1;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE EXECUTE ON PACKAGE DSN9CC13.* FROM ROLE ROLE1;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_PLAN =
-      TEXT + "        REVOKE BIND ON PLAN DSN8IP12 FROM JONES;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE BIND ON PLAN DSN8IP12 FROM JONES;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_PLAN2 =
-      TEXT + "        REVOKE BIND,EXECUTE ON PLAN DSN8CP12 FROM PUBLIC;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE BIND,EXECUTE ON PLAN DSN8CP12 FROM PUBLIC;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_PLAN3 =
-      TEXT + "        REVOKE EXECUTE ON PLAN DSN8CP12 FROM ADAMSON,BROWN;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE EXECUTE ON PLAN DSN8CP12 FROM ADAMSON,BROWN;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_PLAN4 =
-      TEXT + "        REVOKE BIND ON PLAN DSN91PLN FROM ROLE ROLE1;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE BIND ON PLAN DSN91PLN FROM ROLE ROLE1;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_SCHEMA =
-      TEXT + "        REVOKE CREATEIN ON SCHEMA T_SCORES FROM JONES;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE CREATEIN ON SCHEMA T_SCORES FROM JONES;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_SCHEMA2 =
-      TEXT + "        REVOKE CREATEIN ON SCHEMA VAC FROM PUBLIC;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE CREATEIN ON SCHEMA VAC FROM PUBLIC;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_SCHEMA3 =
-      TEXT + "        REVOKE ALTERIN ON SCHEMA DEPT FROM ADMIN_A;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE ALTERIN ON SCHEMA DEPT FROM ADMIN_A;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_SCHEMA4 =
       TEXT
-          + "        REVOKE ALTERIN, DROPIN ON SCHEMA \n"
-          + "        NEW_HIRE, PROMO, RESIGN FROM HR;\n"
-          + "       END-EXEC.";
+          + "            REVOKE ALTERIN, DROPIN ON SCHEMA \n"
+          + "            NEW_HIRE, PROMO, RESIGN FROM HR;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_SCHEMA5 =
-      TEXT + "        REVOKE ALTERIN ON SCHEMA EMPLOYEE FROM ROLE ROLE1;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE ALTERIN ON SCHEMA EMPLOYEE FROM ROLE ROLE1;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_SEQUENCE =
       TEXT
-          + "        REVOKE USAGE\n"
-          + "         ON SEQUENCE MYNUM\n"
-          + "         FROM JONES;\n"
-          + "       END-EXEC.";
+          + "            REVOKE USAGE\n"
+          + "             ON SEQUENCE MYNUM\n"
+          + "             FROM JONES;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_SEQUENCE2 =
       TEXT
-          + "        REVOKE USAGE\n"
-          + "        ON SEQUENCE ORDER_SEQ\n"
-          + "        FROM ROLE ROLE1;\n"
-          + "       END-EXEC.";
+          + "            REVOKE USAGE\n"
+          + "            ON SEQUENCE ORDER_SEQ\n"
+          + "            FROM ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_SYS_PRIVILGES =
-      TEXT + "        REVOKE DISPLAY\n" + "        FROM LUTZ;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE DISPLAY\n" + "            FROM LUTZ;\n" + "           END-EXEC.";
 
   private static final String REVOKE_SYS_PRIVILGES2 =
       TEXT
-          + "        REVOKE BSDS,RECOVER\n"
-          + "        FROM PARKER,SETRIGHT;\n"
-          + "       END-EXEC.";
+          + "            REVOKE BSDS,RECOVER\n"
+          + "            FROM PARKER,SETRIGHT;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_SYS_PRIVILGES3 =
-      TEXT + "        REVOKE TRACE\n" + "        FROM PUBLIC;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE TRACE\n" + "            FROM PUBLIC;\n" + "           END-EXEC.";
 
   private static final String REVOKE_SYS_PRIVILGES4 =
-      TEXT + "        REVOKE ARCHIVE\n" + "         FROM ROLE ROLE1;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE ARCHIVE\n" + "             FROM ROLE ROLE1;\n" + "           END-EXEC.";
 
   private static final String REVOKE_SYS_PRIVILGES5 =
       TEXT
-          + "        REVOKE CREATE_SECURE_OBJECT\n"
-          + "        FROM STEVE BY MARY;\n"
-          + "       END-EXEC.";
+          + "            REVOKE CREATE_SECURE_OBJECT\n"
+          + "            FROM STEVE BY MARY;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_SYS_PRIVILGES6 =
       TEXT
-          + "        REVOKE DBADM ON SYSTEM \n"
-          + "        FROM ROLE ADMINROLE \n"
-          + "        NOT INCLUDING DEPENDENT PRIVILEGES;\n"
-          + "       END-EXEC.";
+          + "            REVOKE DBADM ON SYSTEM \n"
+          + "            FROM ROLE ADMINROLE \n"
+          + "            NOT INCLUDING DEPENDENT PRIVILEGES;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_SYS_PRIVILGES7 =
       TEXT
-          + "        REVOKE DBADM, DATAACCESS, ACCESSCTRL ON SYSTEM \n"
-          + "        FROM ROLE ADMINROLE \n"
-          + "        NOT INCLUDING DEPENDENT PRIVILEGES;\n"
-          + "       END-EXEC.";
+          + "            REVOKE DBADM, DATAACCESS, ACCESSCTRL ON SYSTEM \n"
+          + "            FROM ROLE ADMINROLE \n"
+          + "            NOT INCLUDING DEPENDENT PRIVILEGES;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_TABLE =
-      TEXT + "        REVOKE SELECT ON TABLE DSN8C10.EMP FROM PULASKI;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE SELECT ON TABLE DSN8C10.EMP FROM PULASKI;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_TABLE2 =
-      TEXT + "        REVOKE UPDATE ON TABLE DSN8C10.EMP FROM PUBLIC;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE UPDATE ON TABLE DSN8C10.EMP FROM PUBLIC;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_TABLE3 =
-      TEXT + "        REVOKE ALL ON TABLE DSN8C10.EMP FROM KWAN,THOMPSON;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE ALL ON TABLE DSN8C10.EMP FROM KWAN,THOMPSON;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_TABLE4 =
       TEXT
-          + "        REVOKE SELECT, UPDATE ON TABLE DSN8C10.DEPT\n"
-          + "        FROM PUBLIC;\n"
-          + "       END-EXEC.";
+          + "            REVOKE SELECT, UPDATE ON TABLE DSN8C10.DEPT\n"
+          + "            FROM PUBLIC;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_TABLE5 =
       TEXT
-          + "        REVOKE ALTER ON TABLE DSN8C10.EMP\n"
-          + "        FROM ROLE ROLE1;\n"
-          + "       END-EXEC.";
+          + "            REVOKE ALTER ON TABLE DSN8C10.EMP\n"
+          + "            FROM ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_TYPE =
-      TEXT + "        REVOKE USAGE ON TYPE SHOESIZE FROM JONES;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE USAGE ON TYPE SHOESIZE FROM JONES;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_TYPE2 =
-      TEXT + "        REVOKE USAGE ON TYPE US_DOLLAR FROM PUBLIC;\n" + "       END-EXEC.";
+      TEXT + "            REVOKE USAGE ON TYPE US_DOLLAR FROM PUBLIC;\n" + "           END-EXEC.";
 
   private static final String REVOKE_ON_TYPE3 =
       TEXT
-          + "        REVOKE USAGE ON TYPE CANADIAN_DOLLARS\n"
-          + "         FROM ADMIN_A;\n"
-          + "       END-EXEC.";
+          + "            REVOKE USAGE ON TYPE CANADIAN_DOLLARS\n"
+          + "             FROM ADMIN_A;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_TYPE4 =
       TEXT
-          + "        REVOKE USAGE ON TYPE MILES\n"
-          + "         FROM ROLE ROLE1;\n"
-          + "       END-EXEC.";
+          + "            REVOKE USAGE ON TYPE MILES\n"
+          + "             FROM ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_ON_VARIABLE =
       "       IDENTIFICATION DIVISION.\n"
@@ -230,21 +231,21 @@ class TestSqlAllRevokeStatements {
 
   private static final String REVOKE_USE =
       TEXT
-          + "        REVOKE USE OF BUFFERPOOL BP2\n"
-          + "         FROM MARINO;\n"
-          + "       END-EXEC.";
+          + "            REVOKE USE OF BUFFERPOOL BP2\n"
+          + "             FROM MARINO;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_USE2 =
       TEXT
-          + "        REVOKE USE OF TABLESPACE DSN8D12A.DSN8S12D\n"
-          + "         FROM PUBLIC;\n"
-          + "       END-EXEC.";
+          + "            REVOKE USE OF TABLESPACE DSN8D12A.DSN8S12D\n"
+          + "             FROM PUBLIC;\n"
+          + "           END-EXEC.";
 
   private static final String REVOKE_USE3 =
       TEXT
-          + "        REVOKE USE OF STOGROUP SG1\n"
-          + "        FROM ROLE ROLE1;\n"
-          + "       END-EXEC.";
+          + "            REVOKE USE OF STOGROUP SG1\n"
+          + "            FROM ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

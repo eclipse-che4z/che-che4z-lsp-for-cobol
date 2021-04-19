@@ -14,6 +14,11 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
@@ -23,10 +28,6 @@ import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.eclipse.lsp.cobol.service.mocks.MockTextDocumentService;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -48,12 +49,10 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.*;
 
 /** This test checks the entry points of the {@link TextDocumentService} implementation. */
-@SuppressWarnings("unchecked")
 class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
   private static final String LANGUAGE = "COBOL";
   private static final String EXT_SRC_DOC_URI = "file://workspace/.c4z/.extsrcs/EXTSRC.cbl";
-  private static final String CPY_DOCUMENT_URI = "file:///.copybooks/CPYTEST.cpy";
   private static final String PARENT_CPY_URI = "file:///.copybooks/PARENT.cpy";
   private static final String NESTED_CPY_URI = "file:///.copybooks/NESTED.cpy";
   private static final String TEXT_EXAMPLE = "       IDENTIFICATION DIVISION.";
@@ -104,17 +103,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   }
 
   @Test
-  void testDidChangeOnCpyFiles() {
-    List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
-    textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
-    CobolTextDocumentService spyService = spy(service);
-    spyService.didChange(
-        new DidChangeTextDocumentParams(
-            new VersionedTextDocumentIdentifier(CPY_DOCUMENT_URI, 0), textEdits));
-    verify(spyService, never()).analyzeChanges(any(), any());
-  }
-
-  @Test
   void testDidClose() throws ExecutionException, InterruptedException {
     doNothing().when(communications).publishDiagnostics(anyMap());
     when(engine.analyze(anyString(), anyString(), any(CopybookProcessingMode.class)))
@@ -139,16 +127,6 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
             new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
     service.didSave(saveDocumentParams);
     assertTrue(closeGetter(service).containsKey(UseCaseUtils.DOCUMENT_URI));
-  }
-
-  @Test
-  void testNotAllowedFileExtensionAnalysis() throws ExecutionException, InterruptedException {
-    service.didOpen(
-        new DidOpenTextDocumentParams(
-            new TextDocumentItem(CPY_DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
-    service.getOutlineMap().get(CPY_DOCUMENT_URI).get();
-    assertTrue(service.getOutlineMap().get(CPY_DOCUMENT_URI).isDone());
-    verify(communications).notifyThatExtensionIsUnsupported(anyString());
   }
 
   /**
@@ -178,7 +156,8 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         new DidOpenTextDocumentParams(
             new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
     service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
-    verify(engine).analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.ENABLED));
+    verify(engine)
+        .analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.ENABLED));
   }
 
   /**
@@ -195,7 +174,8 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
             new VersionedTextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI, 0),
             ImmutableList.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
     service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
-    verify(engine).analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.SKIP));
+    verify(engine)
+        .analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.SKIP));
   }
 
   /**
@@ -220,13 +200,17 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
      *  - document URI [correct|incorrect]
      */
 
-    doReturn(resultNoErrors).when(engine)
+    doReturn(resultNoErrors)
+        .when(engine)
         .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
-    doReturn(resultWithErrors).when(engine)
+    doReturn(resultWithErrors)
+        .when(engine)
         .analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
-    doReturn(resultNoErrors).when(engine)
+    doReturn(resultNoErrors)
+        .when(engine)
         .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.SKIP);
-    doReturn(resultWithErrors).when(engine)
+    doReturn(resultWithErrors)
+        .when(engine)
         .analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.SKIP);
 
     // create a service and verify is subscribed to the required event
@@ -329,9 +313,8 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   }
 
   /**
-   * This test verify that when a {@link
-   * CobolTextDocumentService#analysis(JsonObject)} (JsonObject)} is sent from the client to
-   * get analysis result, it processes properly.
+   * This test verify that when a {@link CobolTextDocumentService#analysis(JsonObject)}
+   * (JsonObject)} is sent from the client to get analysis result, it processes properly.
    */
   @Test
   void testAnalysis() throws ExecutionException, InterruptedException {
@@ -390,7 +373,8 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
       String uri) {
     int newVersion = 2;
     service.didChange(
-        new DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier(uri, newVersion),
+        new DidChangeTextDocumentParams(
+            new VersionedTextDocumentIdentifier(uri, newVersion),
             ImmutableList.of(new TextDocumentContentChangeEvent(textToAnalyse))));
     verify(engine).analyze(uri, textToAnalyse, CopybookProcessingMode.SKIP);
     verify(communications, times(2)).publishDiagnostics(diagnostics);
@@ -422,7 +406,8 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testImmediateClosingOfDocumentDoNotCauseNPE() {
     service = getMockedTextDocumentServiceUsingSeparateThread();
 
-    lenient().doAnswer(new AnswersWithDelay(10000, invocation -> AnalysisResult.empty()))
+    lenient()
+        .doAnswer(new AnswersWithDelay(10000, invocation -> AnalysisResult.empty()))
         .when(engine)
         .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
 
@@ -500,10 +485,12 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         new DidOpenTextDocumentParams(
             new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
     service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
-    service.formatting(
-        new DocumentFormattingParams(
-            new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI),
-            new FormattingOptions(1, false))).get();
+    service
+        .formatting(
+            new DocumentFormattingParams(
+                new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI),
+                new FormattingOptions(1, false)))
+        .get();
 
     verify(formations).format(any(CobolDocumentModel.class));
   }
@@ -521,9 +508,11 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         new DidOpenTextDocumentParams(
             new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
     service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
-    service.definition(
-        new TextDocumentPositionParams(
-            new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), new Position())).get();
+    service
+        .definition(
+            new TextDocumentPositionParams(
+                new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), new Position()))
+        .get();
     verify(occurrences)
         .findDefinitions(any(CobolDocumentModel.class), any(TextDocumentPositionParams.class));
   }
