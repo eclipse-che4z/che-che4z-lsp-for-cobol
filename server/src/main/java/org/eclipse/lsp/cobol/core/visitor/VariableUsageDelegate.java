@@ -15,10 +15,7 @@
 package org.eclipse.lsp.cobol.core.visitor;
 
 import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
+import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -89,7 +86,8 @@ public class VariableUsageDelegate {
    * @param definedVariables the collection of COBOL variables
    * @return the list of usage errors
    */
-  public List<SyntaxError> updateUsageAndGenerateErrors(Collection<Variable> definedVariables) {
+  public ResultWithErrors<Map<Locality, Variable>> updateUsageAndGenerateErrors(Collection<Variable> definedVariables) {
+    Map<Locality, Variable> variablesByUsages = new HashMap<>();
     Map<String, List<Variable>> convertedVariables = VariableUsageUtils.convertDefinedVariables(definedVariables);
     List<SyntaxError> errors = new ArrayList<>();
     for (VariableUsage variableUsage : variableUsages) {
@@ -98,12 +96,13 @@ public class VariableUsageDelegate {
       if (foundVariables.size() == 1) {
         Variable variable = foundVariables.get(0);
         variable.addUsage(variableUsage.locality);
+        variablesByUsages.put(variableUsage.locality, variable);
         addParentVariablesUsage(variableUsage.parentVariables, variable);
       } else {
         errors.add(createInvalidDefinition(variableUsage.name, variableUsage.locality));
       }
     }
-    return errors;
+    return new ResultWithErrors<>(variablesByUsages, errors);
   }
 
   private List<String> createPatentsList(List<DataName2Context> hierarchy) {
