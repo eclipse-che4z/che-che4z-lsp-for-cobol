@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.model.tree;
 
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -23,9 +24,7 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * The class represents the program end.
- */
+/** The class represents the program end. */
 @Slf4j
 @Value
 public class ProgramEndNode extends Node {
@@ -41,25 +40,31 @@ public class ProgramEndNode extends Node {
     List<SyntaxError> errors = new ArrayList<>(1);
     getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
-        .ifPresent(node -> {
-          if (node.getProgramName() == null) {
-            LOG.debug("Syntax error: Program name is empty");
-            errors.add(SyntaxError.syntaxError()
-                .locality(getLocality())
-                .severity(ErrorSeverity.WARNING)
-                .messageTemplate("CobolVisitor.progIDIssueMsg")
-                .build());
-          } else if (!node.getProgramName().equalsIgnoreCase(programId)) {
-            LOG.debug("Syntax error: program name is '{}', but END PROGRAM refers to '{}'",
-                node.getProgramName(), programId);
-            errors.add(SyntaxError.syntaxError()
-                .locality(getLocality())
-                .severity(ErrorSeverity.WARNING)
-                .messageTemplate("CobolVisitor.identicalProgMsg")
-                .messageArg(node.getProgramName())
-                .build());
-          }
-        });
+        .ifPresent(
+            node -> {
+              if (node.getProgramName() == null) {
+                LOG.debug("Syntax error: Program name is empty");
+                errors.add(
+                    SyntaxError.syntaxError()
+                        .locality(getLocality())
+                        .severity(ErrorSeverity.WARNING)
+                        .messageTemplate(MessageTemplate.of("CobolVisitor.progIDIssueMsg"))
+                        .build());
+              } else if (!node.getProgramName().equalsIgnoreCase(programId)) {
+                LOG.debug(
+                    "Syntax error: program name is '{}', but END PROGRAM refers to '{}'",
+                    node.getProgramName(),
+                    programId);
+                errors.add(
+                    SyntaxError.syntaxError()
+                        .locality(getLocality())
+                        .severity(ErrorSeverity.WARNING)
+                        .messageTemplate(
+                            MessageTemplate.of(
+                                "CobolVisitor.identicalProgMsg", node.getProgramName()))
+                        .build());
+              }
+            });
     return errors;
   }
 }
