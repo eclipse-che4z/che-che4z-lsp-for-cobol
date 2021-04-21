@@ -14,25 +14,25 @@
  */
 package org.eclipse.lsp.cobol.core.visitor;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
+import org.eclipse.lsp.cobol.core.model.variables.Variable;
 
 import java.util.*;
 
-import static org.eclipse.lsp.cobol.core.CobolParser.*;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.eclipse.lsp.cobol.core.CobolParser.*;
 
 /**
  * This class processes the variable usage contexts. It accumulates usages when they appear in the
@@ -57,6 +57,17 @@ public class VariableUsageDelegate {
     List<String> parents = createPatentsList(hierarchy.stream().map(this::getDataName2Context).collect(toList()));
     Map<String, Token> parentVariables = collectParentVariablesFromDataAndTable(hierarchy);
     variableUsages.add(new VariableUsage(dataName, parents, locality, parentVariables));
+  }
+
+  /**
+   * Accumulate variable appearance for analise its definition later.
+   *
+   * @param dataName the variable name
+   * @param locality the variable text position
+   */
+  public void handleSqlValue(String dataName, Locality locality) {
+    variableUsages.add(
+        new VariableUsage(dataName, Collections.emptyList(), locality, Collections.emptyMap()));
   }
 
   /**

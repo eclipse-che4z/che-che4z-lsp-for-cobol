@@ -41,7 +41,12 @@ class TestSqlAllDeclareStatements {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n";
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*FRED}  PIC X.\n"
+          + "       01 {$*JEAN}  PIC X.\n"
+          + "       01 {$*DAVE}  PIC X.\n"
+          + "       01 {$*PETE}  PIC X.\n"
+          + "       01 {$*AMBER} PIC X.\n";
 
   private static final String DECLARE_CURSOR =
       TEXT
@@ -94,11 +99,11 @@ class TestSqlAllDeclareStatements {
   private static final String DECLARE_VARIABLE =
       TEXT
           + "           EXEC SQL \n"
-          + "             DECLARE :FRED VARIABLE CCSID EBCDIC FOR BIT DATA;\n"
-          + "             DECLARE :JEAN VARIABLE CCSID 1208;\n"
-          + "             DECLARE :DAVE VARIABLE CCSID UNICODE; \n"
-          + "             DECLARE :PETE VARIABLE CCSID 1200;\n"
-          + "             DECLARE :AMBER VARIABLE CCSID UNICODE;\n"
+          + "             DECLARE :{$FRED} VARIABLE CCSID EBCDIC FOR BIT DATA;\n"
+          + "             DECLARE :{$JEAN} VARIABLE CCSID 1208;\n"
+          + "             DECLARE :{$DAVE} VARIABLE CCSID UNICODE; \n"
+          + "             DECLARE :{$PETE} VARIABLE CCSID 1200;\n"
+          + "             DECLARE :{$AMBER} VARIABLE CCSID UNICODE;\n"
           + "           END-EXEC.";
 
   private static Stream<String> textsToTest() {

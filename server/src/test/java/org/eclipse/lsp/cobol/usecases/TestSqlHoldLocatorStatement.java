@@ -28,9 +28,12 @@ class TestSqlHoldLocatorStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*LOCRES}  PIC X  VALUE 'A'.\n"
+          + "       01 {$*LOCHIST}  PIC X  VALUE 'B'.\n"
+          + "       01 {$*LOCPIC}  PIC X  VALUE 'C'.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL\n"
-          + "             HOLD LOCATOR :LOCRES, :LOCHIST, :LOCPIC \n"
+          + "             HOLD LOCATOR :{$LOCRES}, :{$LOCHIST}, :{$LOCPIC} \n"
           + "           END-EXEC.\n";
 
   @Test

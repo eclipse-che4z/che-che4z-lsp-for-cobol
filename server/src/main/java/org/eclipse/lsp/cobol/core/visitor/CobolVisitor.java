@@ -37,6 +37,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.*;
+import org.eclipse.lsp.cobol.core.model.tree.VariableUsageNode.Type;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.semantics.GroupContext;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
@@ -546,6 +547,52 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitDbs_host_variable(Dbs_host_variableContext ctx) {
+    List<Node> result = new ArrayList<>();
+    addSqlValueToUsage(result, ctx);
+    result.addAll(visitChildren(ctx));
+    return result;
+  }
+
+  private void addSqlValueToUsage(List<Node> result, Dbs_host_variableContext hostVariableCtx) {
+    String dataName =
+        ofNullable(hostVariableCtx.dbs_host_variable_val())
+            .map(RuleContext::getText)
+            .map(String::toUpperCase)
+            .orElse("");
+    getLocality(hostVariableCtx.dbs_host_variable_val().getStart())
+        .ifPresent(
+            locality -> {
+              if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
+              else {
+                result.add(new VariableUsageNode(dataName, locality, Type.SQL_VALUE));
+              }
+            });
+  }
+
+  @Override
+  public List<Node> visitDbs_rs_locator_variable(Dbs_rs_locator_variableContext ctx) {
+    String dataName =
+        ofNullable(ctx.dbs_sql_identifier())
+            .map(RuleContext::getText)
+            .map(String::toUpperCase)
+            .orElse("");
+
+    List<Node> result = new ArrayList<>();
+    getLocality(ctx.dbs_sql_identifier().getStart())
+        .ifPresent(
+            locality -> {
+              if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
+              else {
+                result.add(new VariableUsageNode(dataName, locality, Type.SQL_VALUE));
+              }
+            });
+
+    result.addAll(visitChildren(ctx));
+    return result;
+  }
+
+  @Override
   public List<Node> visitTableCall(TableCallContext ctx) {
     String dataName =
         ofNullable(ctx.dataName2()).map(RuleContext::getText).map(String::toUpperCase).orElse("");
@@ -555,7 +602,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             locality -> {
               if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
               else {
-                result.add(new VariableUsageNode(dataName, locality));
+                result.add(new VariableUsageNode(dataName, locality, Type.TABLE_CALL));
               }
             });
     result.addAll(visitChildren(ctx));

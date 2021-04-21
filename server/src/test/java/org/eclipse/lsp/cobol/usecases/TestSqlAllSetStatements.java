@@ -64,6 +64,10 @@ class TestSqlAllSetStatements {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*HV1}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       01 {$*HV2}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       01 {$*RVID}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       01 {$*HVAR1}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL\n";
 
@@ -99,13 +103,13 @@ class TestSqlAllSetStatements {
   private static final String SET_CURRENT_APPLICATION_COMPATIBILITY =
       TEXT
           + "             SET CURRENT APPLICATION COMPATIBILITY = 'V11R1';\n"
-          + "             SET CURRENT APPLICATION COMPATIBILITY = :HV1;\n"
+          + "             SET CURRENT APPLICATION COMPATIBILITY = :{$HV1};\n"
           + "           END-EXEC.";
 
   private static final String SET_CURRENT_ENCODING_SCHEMA =
       TEXT
           + "             SET CURRENT APPLICATION ENCODING SCHEME = 'EBCDIC';\n"
-          + "             SET CURRENT ENCODING SCHEME  = :HV1;\n"
+          + "             SET CURRENT ENCODING SCHEME  = :{$HV1};\n"
           + "           END-EXEC.";
 
   private static final String SET_CURRENT_DEBUG_MODE =
@@ -129,7 +133,7 @@ class TestSqlAllSetStatements {
       TEXT + "             SET CURRENT LOCALE LC_CTYPE = 'En_US';\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_LOCALE_LC_CTYPE2 =
-      TEXT + "             SET CURRENT LOCALE LC_CTYPE = :HV1;\n" + "           END-EXEC.";
+      TEXT + "             SET CURRENT LOCALE LC_CTYPE = :{$HV1};\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_MAINTAINED_TABLE =
       TEXT + "             SET CURRENT MAINTAINED TABLE TYPES ALL;\n" + "           END-EXEC.";
@@ -148,12 +152,12 @@ class TestSqlAllSetStatements {
       TEXT + "             SET CURRENT OPTIMIZATION HINT = '';\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_PACKAGE_PATH =
-      TEXT + "             SET CURRENT PACKAGE PATH :hvar1;\n" + "           END-EXEC.";
+      TEXT + "             SET CURRENT PACKAGE PATH :{$hvar1};\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_PACKAGE_PATH2 =
       TEXT
           + "             SET CURRENT PACKAGE PATH = \n"
-          + "             \"COLL1\",\"COLL#2\",\"COLL3\", :hvar1;\n"
+          + "             \"COLL1\",\"COLL#2\",\"COLL3\", :{$hvar1};\n"
           + "           END-EXEC.";
 
   private static final String SET_CURRENT_PACKAGE_PATH3 =
@@ -181,7 +185,7 @@ class TestSqlAllSetStatements {
       TEXT + "             SET CURRENT REFRESH AGE ANY;\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_ROUTINE_VERSION =
-      TEXT + "             SET CURRENT ROUTINE VERSION = :rvid;\n" + "           END-EXEC.";
+      TEXT + "             SET CURRENT ROUTINE VERSION = :{$rvid};\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_RULES =
       TEXT + "             SET CURRENT RULES = 'DB2';\n" + "           END-EXEC.";
@@ -211,7 +215,7 @@ class TestSqlAllSetStatements {
       TEXT + "             SET ENCRYPTION PASSWORD = :hv1\n" + "           END-EXEC.";
 
   private static final String SET_ENCRYPTION_PASSWORD2 =
-      TEXT + "             SET ENCRYPTION PASSWORD = :hv1 WITH HINT :hv2\n" + "           END-EXEC.";
+      TEXT + "             SET ENCRYPTION PASSWORD = 'somepwd' WITH HINT :{$hv2}\n" + "           END-EXEC.";
 
   private static final String SET_PATH =
       TEXT + "             SET PATH = SCHEMA1,\"SCHEMA#2\", SYSIBM;\n" + "           END-EXEC.";
