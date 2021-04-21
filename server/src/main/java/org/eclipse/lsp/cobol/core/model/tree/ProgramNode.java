@@ -25,7 +25,11 @@ import org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate;
 import org.eclipse.lsp.cobol.core.visitor.VariableUsageDelegate;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
+import static org.eclipse.lsp.cobol.core.model.tree.NodeType.STATEMENT;
 
 /** This class represents program context in COBOL. */
 public class ProgramNode extends Node {
@@ -40,12 +44,12 @@ public class ProgramNode extends Node {
    * @param locality the node location.
    */
   ProgramNode(Locality locality) {
-    super(locality, NodeType.PROGRAM);
+    super(locality, PROGRAM);
   }
 
   public ProgramNode(
       Locality locality, Map<Token, Locality> positionMapping, MessageService messageService) {
-    super(locality, NodeType.PROGRAM);
+    super(locality, PROGRAM);
     variableDefinitionDelegate = new VariableDefinitionDelegate(positionMapping, messageService);
     variableUsageDelegate = new VariableUsageDelegate(positionMapping, messageService);
   }
@@ -70,8 +74,7 @@ public class ProgramNode extends Node {
   public List<SyntaxError> getErrors() {
     List<SyntaxError> errors = new ArrayList<>();
     definedVariables = variableDefinitionDelegate.finishDefinitionAnalysis().unwrap(errors::addAll);
-    Set<String> variableNames =
-        definedVariables.stream().map(Variable::getName).collect(Collectors.toSet());
+    Set<String> variableNames = definedVariables.stream().map(Variable::getName).collect(toSet());
     List<Variable> availableVariables = new ArrayList<>(definedVariables);
     getGlobalVariables().stream()
         .filter(variable -> !variableNames.contains(variable.getName()))
@@ -80,7 +83,7 @@ public class ProgramNode extends Node {
         variableUsageDelegate
             .updateUsageAndGenerateErrors(availableVariables)
             .unwrap(errors::addAll);
-    errors.addAll(validateStatements(getChildren(), variableUsages));
+    errors.addAll(validateStatements(variableUsages));
     return errors;
   }
 
@@ -90,32 +93,25 @@ public class ProgramNode extends Node {
 
   private List<Variable> getGlobalVariables() {
     List<Variable> globalVariables =
-        definedVariables.stream().filter(Variable::isGlobal).collect(Collectors.toList());
+        definedVariables.stream().filter(Variable::isGlobal).collect(toList());
     Set<String> globalVariablesNames =
-        globalVariables.stream().map(Variable::getName).collect(Collectors.toSet());
-    List<Variable> parentGlobalVariables =
-        getNearestParentByType(NodeType.PROGRAM)
-            .map(ProgramNode.class::cast)
-            .map(ProgramNode::getGlobalVariables)
-            .orElseGet(ImmutableList::of);
-    parentGlobalVariables.stream()
+        globalVariables.stream().map(Variable::getName).collect(toSet());
+    getNearestParentByType(PROGRAM)
+        .map(ProgramNode.class::cast)
+        .map(ProgramNode::getGlobalVariables)
+        .orElseGet(ImmutableList::of)
+        .stream()
         .filter(variable -> !globalVariablesNames.contains(variable.getName()))
         .forEach(globalVariables::add);
     return globalVariables;
   }
 
-  private List<SyntaxError> validateStatements(
-      List<Node> children, Map<Locality, Variable> variables) {
-    List<SyntaxError> result = new ArrayList<>();
-    children.stream()
-        .filter(it -> it.getNodeType() == NodeType.STATEMENT)
-        .map(it -> (StatementNode) it)
+  private List<SyntaxError> validateStatements(Map<Locality, Variable> variables) {
+    return getDepthFirstStream()
+        .filter(it -> it.getNodeType() == STATEMENT)
+        .map(StatementNode.class::cast)
         .map(it -> it.validate(variables))
-        .forEach(result::addAll);
-    children.stream()
-        .map(Node::getChildren)
-        .map(it -> validateStatements(it, variables))
-        .forEach(result::addAll);
-    return result;
+        .flatMap(Collection::stream)
+        .collect(toList());
   }
 }
