@@ -52,6 +52,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
 
@@ -149,20 +150,23 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
       accumulatedErrors.addAll(syntaxTreeEngine.processTree());
       // This is a temporal solution only for compatibility
       // Definitions, usages and variables are set here for "Go to definition" feature and others
-      List<Variable> definedVariables = rootNode.getDepthFirstStream()
-          .filter(it -> it.getNodeType() == NodeType.PROGRAM)
-          .map((ProgramNode.class::cast))
-          .map(ProgramNode::getDefinedVariables)
-          .flatMap(Collection::stream)
-          .collect(toList());
-      context = context.toBuilder()
-          .variableDefinitions(collectVariableDefinitions(definedVariables))
-          .variableUsages(collectVariableUsages(definedVariables))
-          .variables(definedVariables)
-          .rootNode(rootNode).build();
+      List<Variable> definedVariables =
+          rootNode
+              .getDepthFirstStream()
+              .filter(it -> it.getNodeType() == NodeType.PROGRAM)
+              .map((ProgramNode.class::cast))
+              .map(ProgramNode::getDefinedVariables)
+              .flatMap(Collection::stream)
+              .collect(toList());
+      context =
+          context.toBuilder()
+              .variableDefinitions(collectVariableDefinitions(definedVariables))
+              .variableUsages(collectVariableUsages(definedVariables))
+              .variables(definedVariables)
+              .rootNode(rootNode)
+              .build();
       timingBuilder.getSyntaxTreeTimer().stop();
-    } else
-      LOG.warn("The root node for syntax tree was not constructed");
+    } else LOG.warn("The root node for syntax tree was not constructed");
     timingBuilder.getLateErrorProcessingTimer().start();
     accumulatedErrors.addAll(finalizeErrors(listener.getErrors(), positionMapping));
     accumulatedErrors.addAll(
@@ -171,15 +175,20 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
 
     if (LOG.isDebugEnabled()) {
       Timing timing = timingBuilder.build();
-      LOG.debug("Timing for parsing {}. Preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
-          + "late error processing: {}", documentUri, timing.getPreprocessorTime(), timing.getParserTime(),
-          timing.getMappingTime(), timing.getVisitorTime(), timing.getSyntaxTreeTime(),
+      LOG.debug(
+          "Timing for parsing {}. Preprocessor: {}, parser: {}, mapping: {}, visitor: {}, syntaxTree: {}, "
+              + "late error processing: {}",
+          documentUri,
+          timing.getPreprocessorTime(),
+          timing.getParserTime(),
+          timing.getMappingTime(),
+          timing.getVisitorTime(),
+          timing.getSyntaxTreeTime(),
           timing.getLateErrorProcessingTime());
     }
 
     return new ResultWithErrors<>(
-        context,
-        accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
+        context, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
   }
 
   @CheckThreadInterruption
@@ -239,15 +248,10 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
   }
 
   private SyntaxError constructErrorMessage(SyntaxError syntaxError) {
-    String messageTemplate = syntaxError.getMessageTemplate();
-    if (messageTemplate != null) {
-      return syntaxError.toBuilder()
-          .messageTemplate(null)
-          .clearMessageArgs()
-          .suggestion(messageService.getMessage(messageTemplate, syntaxError.getMessageArgs().toArray()))
-          .build();
-    }
-    return syntaxError;
+    return ofNullable(syntaxError.getMessageTemplate())
+        .map(messageService::localizeTemplate)
+        .map(message -> syntaxError.toBuilder().messageTemplate(null).suggestion(message).build())
+        .orElse(syntaxError);
   }
 
   private Map<String, Collection<Location>> collectVariableDefinitions(

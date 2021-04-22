@@ -16,11 +16,9 @@ package org.eclipse.lsp.cobol.core.model;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import lombok.Singular;
 import lombok.Value;
 import org.antlr.v4.runtime.Token;
-
-import java.util.List;
+import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 
 /**
  * This value class represents a syntax or semantic error found during the analysis. The finalized
@@ -34,11 +32,8 @@ import java.util.List;
 @Value
 public class SyntaxError {
   Locality locality;
-  String messageTemplate;
-  @Singular
-  List<Object> messageArgs;
-  @EqualsAndHashCode.Exclude
-  Token offendedToken;
+  MessageTemplate messageTemplate;
+  @EqualsAndHashCode.Exclude Token offendedToken;
   String suggestion;
   ErrorSeverity severity;
   ErrorCode errorCode;
