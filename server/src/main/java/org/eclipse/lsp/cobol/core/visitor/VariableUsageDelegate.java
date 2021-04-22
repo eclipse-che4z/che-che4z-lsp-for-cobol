@@ -64,7 +64,7 @@ public class VariableUsageDelegate {
    * @param ctx the ANTLR variable context
    */
   public void handleConditionCall(String dataName, Locality locality, ConditionNameReferenceContext ctx) {
-    List<DataName2Context> hierarchy = ctx.inData().stream().map(InDataContext::dataName2).collect(toList());
+    List<DataNameContext> hierarchy = ctx.inData().stream().map(InDataContext::dataName).collect(toList());
     List<String> parents = createPatentsList(hierarchy);
     Map<String, Token> parentVariables = collectParentVariablesFromInData(hierarchy);
     variableUsages.add(new VariableUsage(dataName, parents, locality, parentVariables));
@@ -105,7 +105,7 @@ public class VariableUsageDelegate {
     return new ResultWithErrors<>(variablesByUsages, errors);
   }
 
-  private List<String> createPatentsList(List<DataName2Context> hierarchy) {
+  private List<String> createPatentsList(List<DataNameContext> hierarchy) {
     return hierarchy.stream()
             .map(RuleContext::getText)
             .map(String::toUpperCase)
@@ -118,7 +118,7 @@ public class VariableUsageDelegate {
         hierarchy.stream()
             .map(QualifiedInDataContext::inData)
             .filter(Objects::nonNull)
-            .map(InDataContext::dataName2)
+            .map(InDataContext::dataName)
             .collect(toMap(it -> it.getText().toUpperCase(), ParserRuleContext::getStart));
 
     parentVariables.putAll(
@@ -130,7 +130,7 @@ public class VariableUsageDelegate {
     return parentVariables;
   }
 
-  private Map<String, Token> collectParentVariablesFromInData(List<DataName2Context> hierarchy) {
+  private Map<String, Token> collectParentVariablesFromInData(List<DataNameContext> hierarchy) {
     return hierarchy.stream()
         .collect(toMap(it -> it.getText().toUpperCase(), ParserRuleContext::getStart));
   }
@@ -145,14 +145,14 @@ public class VariableUsageDelegate {
     }
   }
 
-  private DataName2Context getDataName2Context(QualifiedInDataContext node) {
+  private DataNameContext getDataName2Context(QualifiedInDataContext node) {
     return ofNullable(node.inData())
-        .map(InDataContext::dataName2)
+        .map(InDataContext::dataName)
         .orElseGet(
             () ->
                 ofNullable(node.inTable())
                     .map(InTableContext::tableCall)
-                    .map(TableCallContext::dataName2)
+                    .map(TableCallContext::dataName)
                     .orElse(null));
   }
 
