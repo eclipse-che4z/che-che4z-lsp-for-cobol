@@ -39,10 +39,10 @@ public class VariableUsageNode extends Node {
     nameReferenceContext = null;
   }
 
-  public VariableUsageNode(String dataName, Locality locality) {
+  public VariableUsageNode(String dataName, Locality locality, Type variableUsageType) {
     super(locality, NodeType.VARIABLE_USAGE);
     this.dataName = dataName;
-    variableUsageType = Type.TABLE_CALL;
+    this.variableUsageType = variableUsageType;
     dataNameFormat1Context = null;
     nameReferenceContext = null;
   }
@@ -67,6 +67,9 @@ public class VariableUsageNode extends Node {
             case DATA_NAME:
               variableUsageDelegate.handleDataName(dataName, getLocality(), dataNameFormat1Context);
               break;
+            case SQL_VALUE:
+              variableUsageDelegate.handleSqlValue(dataName, getLocality());
+              break;
             case TABLE_CALL:
               variableUsageDelegate.handleTableCall(dataName, getLocality());
               break;
@@ -83,8 +86,9 @@ public class VariableUsageNode extends Node {
   /**
    * Represents different types of variable usages.
    */
-  private enum Type {
+  public enum Type {
     DATA_NAME,
+    SQL_VALUE,
     TABLE_CALL,
     CONDITION_CALL,
   }

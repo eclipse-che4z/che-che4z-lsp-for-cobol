@@ -1590,7 +1590,8 @@ dbs_global_variable_name: dbs_generic_name | ROWID;
 dbs_graphic_string_constant: GRAPHIC_CONSTANT;
 dbs_history_table_name: dbs_table_name;
 dbs_host_label: IDENTIFIER | HANDLER;
-dbs_host_variable: COLONCHAR? (FILENAME | IDENTIFIER) (INDICATOR? COLONCHAR (FILENAME | IDENTIFIER))? ;
+dbs_host_variable: COLONCHAR? dbs_host_variable_val;
+dbs_host_variable_val: (FILENAME | IDENTIFIER) (INDICATOR? COLONCHAR (FILENAME | IDENTIFIER))?;
 dbs_host_variable_array: IDENTIFIER; // variable array must be defined in the application program
 dbs_host_variable_name: T=dbs_host_var_identifier {validateLength($T.text, "host variable name", 128);};
 dbs_host_var_identifier: COLONCHAR dbs_generic_name (INDICATOR? COLONCHAR dbs_generic_name)?;

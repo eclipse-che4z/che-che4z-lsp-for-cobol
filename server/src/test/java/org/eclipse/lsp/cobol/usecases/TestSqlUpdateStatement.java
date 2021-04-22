@@ -31,6 +31,8 @@ class TestSqlUpdateStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*HV_RESUME}  PIC A  VALUE 'ONAT'.\n"
+          + "       01 {$*HV_EMP_ROWID}  PIC 9  VALUE '44'.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL\n";
 
@@ -75,8 +77,8 @@ class TestSqlUpdateStatement {
       TEXT
           + "            UPDATE EMP1\n"
           + "             SET SALARY = SALARY + 1000,\n"
-          + "              RESUME = UPDATE_RESUME(:HV_RESUME)\n"
-          + "              WHERE EMP_ROWID = :HV_EMP_ROWID; \n"
+          + "              RESUME = UPDATE_RESUME(:{$HV_RESUME})\n"
+          + "              WHERE EMP_ROWID = :{$HV_EMP_ROWID}; \n"
           + "           END-EXEC.\n";
 
   private static final String UPDATE7 =

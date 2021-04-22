@@ -31,6 +31,7 @@ class TestSqlSelectIntoStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*MYINTVAR}  PIC 9  VALUE '23'.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL";
   private static final String SELECT_INTO1 =
@@ -58,7 +59,7 @@ class TestSqlSelectIntoStatement {
   private static final String SELECT_INTO4 =
       TEXT
           + "            SELECT INTCOL1 INTO \n"
-          + "             MYINTARRAY1[INTCOL2+MYINTVAR+1]\n"
+          + "             MYINTARRAY1[INTCOL2+{$MYINTVAR}+1]\n"
           + "             FROM T1\n"
           + "             WHERE INTCOL1 = MYINTARRAY1[INTCOL2]\n"
           + "           END-EXEC.";
