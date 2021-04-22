@@ -48,7 +48,7 @@ public class VisitorHelper {
    */
   public String getName(EntryNameContext context) {
     return ofNullable(context)
-            .map(EntryNameContext::dataName1)
+            .map(EntryNameContext::dataName)
             .map(RuleContext::getText)
             .orElse(FILLER_NAME);
   }

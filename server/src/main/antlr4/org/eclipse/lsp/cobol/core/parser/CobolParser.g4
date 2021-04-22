@@ -714,7 +714,7 @@ dataDescriptionEntryFormat3
    ;
 
 entryName
-   : (FILLER | dataName1)
+   : (FILLER | dataName)
    ;
 
 dataGroupUsageClause
@@ -841,7 +841,7 @@ usageFormat
    ;
 
 dataUsingClause
-   : USING (LANGUAGE | CONVENTION) OF? (cobolWord | dataName)
+   : USING (LANGUAGE | CONVENTION) OF? dataName
    ;
 
 dataValueClause

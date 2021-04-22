@@ -612,9 +612,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitTableCall(TableCallContext ctx) {
     String dataName =
-        ofNullable(ctx.dataName2()).map(RuleContext::getText).map(String::toUpperCase).orElse("");
+        ofNullable(ctx.dataName()).map(RuleContext::getText).map(String::toUpperCase).orElse("");
     List<Node> result = new ArrayList<>();
-    getLocality(ctx.dataName2().getStart())
+    getLocality(ctx.dataName().getStart())
         .ifPresent(
             locality -> {
               if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());

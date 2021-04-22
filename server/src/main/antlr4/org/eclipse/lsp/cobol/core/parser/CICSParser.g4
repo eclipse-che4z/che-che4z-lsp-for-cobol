@@ -1030,7 +1030,7 @@ generalIdentifier
    ;
 
 tableCall
-   : dataName2 (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
+   : dataName (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
    ;
 
 functionCall
@@ -1097,7 +1097,7 @@ specialRegister
 // in ----------------------------------
 
 inData
-   : (IN | OF) dataName2
+   : (IN | OF) dataName
    ;
 
 inFile
@@ -1147,14 +1147,6 @@ conditionName
    ;
 
 dataName
-   : cobolWord
-   ;
-
-dataName1
-   : cobolWord
-   ;
-
-dataName2
    : cobolWord
    ;
 
