@@ -2459,26 +2459,39 @@ sendIdmsLengthClause
 // set statement
 
 setStatement
-   : SET (setToStatement+ | setUpDownByStatement | setAbendExitStatement | setTimerStatement)
+   : SET (setToStatement | setUpDownByStatement | setToOnOff+ | setToBoolean | setToProcedurePointer | setToEntry
+   | setAbendExitStatement | setTimerStatement)
    ;
 
 setToStatement
-   : setTo+ TO setToValue+
+   : receivingField+ TO sendingField
    ;
 
 setUpDownByStatement
-   : setTo+ (UP BY | DOWN BY) setByValue
+   : receivingField+ (UP BY | DOWN BY) sendingField
    ;
 
-setTo
+setToBoolean
+   : receivingField+ TO booleanLiteral
+   ;
+
+setToOnOff
+   : receivingField+ TO (ON | OFF)
+   ;
+
+setToProcedurePointer
+   : receivingField+ TO (NULL | NULLS | SELF)
+   ;
+
+setToEntry
+   : receivingField+ TO ENTRY sendingField
+   ;
+
+receivingField
    : generalIdentifier
    ;
 
-setToValue
-   : ON | OFF | ENTRY (literal | generalIdentifier) | literal | generalIdentifier
-   ;
-
-setByValue
+sendingField
    : literal | generalIdentifier
    ;
 

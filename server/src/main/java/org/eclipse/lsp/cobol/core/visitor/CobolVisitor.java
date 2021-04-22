@@ -38,6 +38,7 @@ import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.VariableUsageNode.Type;
+import org.eclipse.lsp.cobol.core.model.tree.statements.SetUpDownByStatement;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.semantics.GroupContext;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
@@ -56,6 +57,7 @@ import java.util.function.Function;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.eclipse.lsp.cobol.core.CobolParser.*;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.*;
@@ -527,6 +529,21 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private List<DocumentSymbol> buildOutlineTree() {
     return outlineTreeBuilder.build(copybooks.getUsages());
+  }
+
+  @Override
+  public List<Node> visitSetUpDownByStatement(SetUpDownByStatementContext ctx) {
+    List<Locality> receivingFields =
+        ctx.receivingField().stream()
+            .map(ParserRuleContext::getStart)
+            .map(positionMapping::get)
+            .filter(Objects::nonNull)
+            .collect(toList());
+    Locality sendingField = positionMapping.get(ctx.sendingField().getStart());
+    String literal =
+        ofNullable(ctx.sendingField().literal()).map(ParserRuleContext::getText).orElse(null);
+    return addTreeNode(
+        ctx, locality -> new SetUpDownByStatement(locality, receivingFields, sendingField, literal));
   }
 
   @Override

@@ -28,7 +28,7 @@ multiToken
    ;
 
 errorStatement
-   : START (STRINGLITERAL | word | TEXT)? diagnostic* STOP
+   : START (STRINGLITERAL | word | TEXT | NUMBERLITERAL)? diagnostic* STOP
    ;
 
 copybookStatement
@@ -108,7 +108,7 @@ replacement
    ;
 
 identifier
-   : IDENTIFIER
+   : IDENTIFIER | NUMBERLITERAL
    ;
 
 cpyIdentifier
@@ -116,7 +116,7 @@ cpyIdentifier
    ;
 
 cpyName
-   : IDENTIFIER | COPYBOOKNAME | QUOTED_COPYBOOKNAME | STRINGLITERAL
+   : IDENTIFIER | COPYBOOKNAME | QUOTED_COPYBOOKNAME | STRINGLITERAL | NUMBERLITERAL
    ;
 
 START : '{';
@@ -136,6 +136,7 @@ REPLACEMENTSTART : '^';
 MULTITOKENSTART : START + '_';
 MULTITOKENSTOP : '_' + STOP;
 
+NUMBERLITERAL : [\-+0-9.,]+;
 STRINGLITERAL : ['"] ~['"]* ['"];
 IDENTIFIER : [a-zA-Z0-9:]+ ([-_]+ [a-zA-Z0-9:]+)*;
 
