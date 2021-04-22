@@ -37,6 +37,11 @@ class TestEnterCompilerDirective {
           + "       ENTER {.|1}\n"
           + "       Program-Id. control-dir.";
 
+  private static final String TEXT_JAVA_LANG_ROUTINE =
+          "       Identification Division.\n"
+                  + "       ENTER JAVA ROUTINE .\n"
+                  + "       Program-Id. control-dir.";
+
   @Test
   void testNoErrorOnEnterCompilerDirective() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
@@ -54,5 +59,10 @@ class TestEnterCompilerDirective {
                 "LanguageName missing for ENTER compiler directive.",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
+  }
+
+  @Test
+  void testNoErrorOnEnterCompilerDirectiveWithRoutineName() {
+    UseCaseEngine.runTest(TEXT_JAVA_LANG_ROUTINE, ImmutableList.of(), ImmutableMap.of());
   }
 }
