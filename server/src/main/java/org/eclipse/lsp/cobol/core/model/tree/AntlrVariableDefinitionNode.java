@@ -14,17 +14,17 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-
+import lombok.ToString;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate;
 
 import java.util.Optional;
 
 /**
- * The class represents a variable definition.
- * This store ANTLR context to be used in {@link VariableDefinitionDelegate}. This is a temporal solution and must be
- * removed.
+ * The class represents a variable definition. This store ANTLR context to be used in {@link
+ * VariableDefinitionDelegate}. This is a temporal solution and must be removed.
  */
+@ToString(callSuper = true)
 public class AntlrVariableDefinitionNode extends Node {
   private CobolParser.DataDescriptionEntryFormat1Context format1Context;
   private CobolParser.DataDescriptionEntryFormat1Level77Context format1Level77Context;
@@ -32,27 +32,32 @@ public class AntlrVariableDefinitionNode extends Node {
   private CobolParser.DataDescriptionEntryFormat3Context format3Context;
   private CobolParser.EnvironmentSwitchNameClauseContext switchNameClauseContext;
 
-  public AntlrVariableDefinitionNode(CobolParser.DataDescriptionEntryFormat1Context format1Context) {
+  public AntlrVariableDefinitionNode(
+      CobolParser.DataDescriptionEntryFormat1Context format1Context) {
     super(null, NodeType.ANTLR_VARIABLE_DEFINITION);
     this.format1Context = format1Context;
   }
 
-  public AntlrVariableDefinitionNode(CobolParser.DataDescriptionEntryFormat1Level77Context format1Level77Context) {
+  public AntlrVariableDefinitionNode(
+      CobolParser.DataDescriptionEntryFormat1Level77Context format1Level77Context) {
     super(null, NodeType.ANTLR_VARIABLE_DEFINITION);
     this.format1Level77Context = format1Level77Context;
   }
 
-  public AntlrVariableDefinitionNode(CobolParser.DataDescriptionEntryFormat2Context format2Context) {
+  public AntlrVariableDefinitionNode(
+      CobolParser.DataDescriptionEntryFormat2Context format2Context) {
     super(null, NodeType.ANTLR_VARIABLE_DEFINITION);
     this.format2Context = format2Context;
   }
 
-  public AntlrVariableDefinitionNode(CobolParser.DataDescriptionEntryFormat3Context format3Context) {
+  public AntlrVariableDefinitionNode(
+      CobolParser.DataDescriptionEntryFormat3Context format3Context) {
     super(null, NodeType.ANTLR_VARIABLE_DEFINITION);
     this.format3Context = format3Context;
   }
 
-  public AntlrVariableDefinitionNode(CobolParser.EnvironmentSwitchNameClauseContext switchNameClauseContext) {
+  public AntlrVariableDefinitionNode(
+      CobolParser.EnvironmentSwitchNameClauseContext switchNameClauseContext) {
     super(null, NodeType.ANTLR_VARIABLE_DEFINITION);
     this.switchNameClauseContext = switchNameClauseContext;
   }
@@ -62,12 +67,15 @@ public class AntlrVariableDefinitionNode extends Node {
     getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
         .map(ProgramNode::getVariableDefinitionDelegate)
-        .ifPresent(variablesDelegate -> {
-          Optional.ofNullable(format1Context).ifPresent(variablesDelegate::defineVariable);
-          Optional.ofNullable(format1Level77Context).ifPresent(variablesDelegate::defineVariable);
-          Optional.ofNullable(format2Context).ifPresent(variablesDelegate::defineVariable);
-          Optional.ofNullable(format3Context).ifPresent(variablesDelegate::defineVariable);
-          Optional.ofNullable(switchNameClauseContext).ifPresent(variablesDelegate::defineVariable);
-        });
+        .ifPresent(
+            variablesDelegate -> {
+              Optional.ofNullable(format1Context).ifPresent(variablesDelegate::defineVariable);
+              Optional.ofNullable(format1Level77Context)
+                  .ifPresent(variablesDelegate::defineVariable);
+              Optional.ofNullable(format2Context).ifPresent(variablesDelegate::defineVariable);
+              Optional.ofNullable(format3Context).ifPresent(variablesDelegate::defineVariable);
+              Optional.ofNullable(switchNameClauseContext)
+                  .ifPresent(variablesDelegate::defineVariable);
+            });
   }
 }

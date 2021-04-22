@@ -15,6 +15,10 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 
@@ -24,33 +28,24 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
-/**
- * The class represents a Node in source structure tree.
- */
+/** The class represents a Node in source structure tree. */
+@ToString
+@Getter
 public abstract class Node {
   private static final AtomicLong ID_COUNTER = new AtomicLong();
   public final long id;
   private final Locality locality;
-  private Node parent;
   private final List<Node> children = new ArrayList<>();
   private final NodeType nodeType;
+
+  @ToString.Exclude
+  @Setter(AccessLevel.PROTECTED)
+  private Node parent;
 
   protected Node(Locality location, NodeType nodeType) {
     id = ID_COUNTER.incrementAndGet();
     this.locality = location;
     this.nodeType = nodeType;
-  }
-
-  public Locality getLocality() {
-    return locality;
-  }
-
-  public Node getParent() {
-    return parent;
-  }
-
-  public List<Node> getChildren() {
-    return children;
   }
 
   /**
@@ -61,14 +56,6 @@ public abstract class Node {
   public void addChild(Node node) {
     node.setParent(this);
     children.add(node);
-  }
-
-  public NodeType getNodeType() {
-    return nodeType;
-  }
-
-  protected void setParent(Node parent) {
-    this.parent = parent;
   }
 
   /**
@@ -91,14 +78,11 @@ public abstract class Node {
         .flatMap(it -> (it.nodeType == type) ? Optional.of(it) : it.getNearestParentByType(type));
   }
 
-  /**
-   * Updates parents on internal node state after tree construction.
-   */
+  /** Updates parents on internal node state after tree construction. */
   public void process() {}
 
   /**
-   * Return list of errors if any.
-   * Must be called after process.
+   * Return list of errors if any. Must be called after process.
    *
    * @return the list of errors
    */

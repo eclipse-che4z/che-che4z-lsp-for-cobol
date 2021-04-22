@@ -14,12 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.Value;
+import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-/**
- * The class represents else in COBOL.
- */
-@Value
+/** The class represents else in COBOL. */
+@ToString(callSuper = true)
 public class IfElseNode extends Node {
   public IfElseNode(Locality location) {
     super(location, NodeType.IF_ELSE);

@@ -14,13 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.Value;
+import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
-/**
- * The class represents evaluate in COBOL.
- */
-@Value
+/** The class represents evaluate in COBOL. */
+@ToString(callSuper = true)
 public class EvaluateNode extends Node {
   public EvaluateNode(Locality location) {
     super(location, NodeType.EVALUATE);

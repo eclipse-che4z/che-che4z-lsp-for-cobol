@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.Value;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
@@ -26,7 +26,7 @@ import java.util.List;
 
 /** The class represents the program end. */
 @Slf4j
-@Value
+@ToString(callSuper = true)
 public class ProgramEndNode extends Node {
   String programId;
 

@@ -14,16 +14,17 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.Value;
+import lombok.Getter;
+import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
-/**
- * The class represents paragraph in COBOL.
- */
-@Value
+/** The class represents paragraph in COBOL. */
+@ToString(callSuper = true)
+@Getter
 public class ParagraphNode extends Node {
   String name;
   String text;
+
   public ParagraphNode(Locality location, String name, String text) {
     super(location, NodeType.PARAGRAPH);
     this.name = name;
