@@ -38,6 +38,7 @@ import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.VariableUsageNode.Type;
+import org.eclipse.lsp.cobol.core.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToOnOffStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetUpDownByStatement;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
@@ -545,8 +546,17 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitSetToOnOff(SetToOnOffContext ctx) {
-    List<Locality> receivingFields = mapRulesToLocalities(ctx.receivingField());
-    return addTreeNode(ctx, locality -> new SetToOnOffStatement(locality, receivingFields));
+    return addTreeNode(
+        ctx,
+        locality -> new SetToOnOffStatement(locality, mapRulesToLocalities(ctx.receivingField())));
+  }
+
+  @Override
+  public List<Node> visitSetToBoolean(SetToBooleanContext ctx) {
+    return addTreeNode(
+        ctx,
+        locality ->
+            new SetToBooleanStatement(locality, mapRulesToLocalities(ctx.receivingField())));
   }
 
   @Override
