@@ -2459,7 +2459,7 @@ sendIdmsLengthClause
 // set statement
 
 setStatement
-   : SET (setToStatement | setUpDownByStatement | setToOnOff+ | setToBoolean | setToProcedurePointer | setToEntry
+   : SET (setToOnOff+ | setToBoolean | setToStatement | setUpDownByStatement | setToProcedurePointer | setToEntry
    | setAbendExitStatement | setTimerStatement)
    ;
 
