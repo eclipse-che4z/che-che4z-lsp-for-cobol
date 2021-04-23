@@ -15,8 +15,8 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import org.eclipse.lsp.cobol.core.model.Locality;
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,15 +29,14 @@ import static java.util.Collections.unmodifiableList;
  * be variables or also structures.
  */
 public abstract class StructuredVariable extends AbstractVariable {
-  private List<Variable> children = new ArrayList<>();
+  private final List<Variable> children = new ArrayList<>();
 
   StructuredVariable(
       int levelNumber, String name, Locality definition, boolean global, Variable parent) {
     super(levelNumber, name, definition, global, parent);
   }
 
-  StructuredVariable(
-      int levelNumber, String name, Locality definition, Variable parent) {
+  StructuredVariable(int levelNumber, String name, Locality definition, Variable parent) {
     super(levelNumber, name, definition, parent);
   }
 

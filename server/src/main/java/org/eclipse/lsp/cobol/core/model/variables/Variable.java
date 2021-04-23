@@ -14,8 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import org.eclipse.lsp.cobol.core.model.Locality;
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
 import java.util.List;
 
@@ -23,7 +23,6 @@ import java.util.List;
  * This interface describes a COBOL Variable. Variable has a name and a unique definition locality.
  */
 public interface Variable extends Renameable, Conditional {
-
   /**
    * Get level number of the variable
    *
@@ -38,6 +37,13 @@ public interface Variable extends Renameable, Conditional {
    */
   @NonNull
   String getName();
+
+  /**
+   * Get {@link StructureType} of the variable.
+   *
+   * @return the {@link StructureType}
+   */
+  StructureType getStructureType();
 
   /**
    * Get definition locality for this variable. The definition is unique

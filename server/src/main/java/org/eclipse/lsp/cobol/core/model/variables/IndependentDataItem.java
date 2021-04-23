@@ -15,12 +15,13 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
+import static org.eclipse.lsp.cobol.core.model.variables.StructureType.INDEPENDENT_ITEM;
 import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVEL_77;
 
 /**
@@ -32,6 +33,7 @@ import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVE
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class IndependentDataItem extends AbstractVariable implements Conditional {
+
   String picClause;
   String value;
 
@@ -43,12 +45,15 @@ public class IndependentDataItem extends AbstractVariable implements Conditional
   }
 
   @Override
+  public StructureType getStructureType() {
+    return INDEPENDENT_ITEM;
+  }
+
+  @Override
   public String getFormattedDisplayLine() {
     StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
-    if (picClause != null)
-      stringBuilder.append(" PIC ").append(picClause);
-    if (StringUtils.isNoneBlank(value))
-      stringBuilder.append(" VALUE ").append(value);
+    if (picClause != null) stringBuilder.append(" PIC ").append(picClause);
+    if (StringUtils.isNoneBlank(value)) stringBuilder.append(" VALUE ").append(value);
     return stringBuilder.append(".").toString();
   }
 }

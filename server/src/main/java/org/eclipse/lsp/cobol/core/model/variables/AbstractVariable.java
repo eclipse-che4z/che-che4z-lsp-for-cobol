@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import org.eclipse.lsp.cobol.core.model.Locality;
 import lombok.Getter;
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +26,7 @@ import java.util.Optional;
 
 /** This abstract class implements the functionality that is common for all the variables. */
 public abstract class AbstractVariable implements Variable {
+  private static final String GLOBAL_SUFFIX = " GLOBAL";
   @Getter protected final int levelNumber;
   @Getter protected final String name;
   @Getter protected final Locality definition;
@@ -34,9 +35,8 @@ public abstract class AbstractVariable implements Variable {
   private final List<ConditionDataName> conditionChildren = new ArrayList<>();
   private final Variable parent;
 
-  private static final String GLOBAL_SUFFIX = " GLOBAL";
-
-  protected AbstractVariable(int levelNumber, String name, Locality definition, boolean global, Variable parent) {
+  protected AbstractVariable(
+      int levelNumber, String name, Locality definition, boolean global, Variable parent) {
     this.levelNumber = levelNumber;
     this.name = name;
     this.definition = definition;
