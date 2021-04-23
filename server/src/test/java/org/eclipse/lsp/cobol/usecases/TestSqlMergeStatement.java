@@ -31,6 +31,11 @@ class TestSqlMergeStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*HV_ID}  PIC 9  VALUE '63'.\n"
+          + "       01 {$*HV_ACTIVITY}  PIC 9  VALUE '23'.\n"
+          + "       01 {$*HV_AMOUNT}  PIC 9  VALUE '40'.\n"
+          + "       01 {$*HV_DESCRIPTION}  PIC X  VALUE 'Some Description'.\n"
+          + "       01 {$*HV_NROWS}  PIC X.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL";
   private static final String MERGE1 =
@@ -130,8 +135,8 @@ class TestSqlMergeStatement {
   private static final String MERGE6 =
       TEXT
           + "            MERGE INTO RECORDS AR\n"
-          + "              USING (VALUES (:hv_activity, :hv_description)\n"
-          + "                FOR :hv_nrows ROWS)\n"
+          + "              USING (VALUES (:{$hv_activity}, :{$hv_description})\n"
+          + "                FOR :{$hv_nrows} ROWS)\n"
           + "                AS AC (ACTIVITY, DESCRIPTION)\n"
           + "              ON (AR.ACTIVITY = AC.ACTIVITY)\n"
           + "              WHEN MATCHED THEN UPDATE SET DESCRIPTION = AC.DESCRIPTION\n"
@@ -143,7 +148,7 @@ class TestSqlMergeStatement {
   private static final String MERGE7 =
       TEXT
           + "            MERGE INTO ACCOUNT AS A\n"
-          + "              USING (VALUES (:hv_id, :hv_amount) \n"
+          + "              USING (VALUES (:{$hv_id}, :{$hv_amount}) \n"
           + "                FOR 3 ROWS)\n"
           + "                AS T (ID, AMOUNT)\n"
           + "              ON (A.ID = T.ID)\n"

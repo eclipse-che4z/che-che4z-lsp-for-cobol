@@ -29,10 +29,7 @@ class TestSqlCallStatement {
           + "       WORKING-STORAGE SECTION.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL\n"
-          + "               CONNECT TO BETA;\n"
-          + "               SET v1 = 528671;\n"
-          + "               SET IV = -1;\n"
-          + "               CALL SUMARIZE(:V1,:V2 INDICATOR :IV);\n"
+          + "                CALL myProc USING DESCRIPTOR SQLD;\n"
           + "           END-EXEC.";
 
   @Test

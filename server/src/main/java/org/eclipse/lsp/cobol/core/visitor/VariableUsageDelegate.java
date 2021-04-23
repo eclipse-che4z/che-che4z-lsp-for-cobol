@@ -14,25 +14,22 @@
  */
 package org.eclipse.lsp.cobol.core.visitor;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.variables.Variable;
 
 import java.util.*;
 
-import static org.eclipse.lsp.cobol.core.CobolParser.*;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.eclipse.lsp.cobol.core.CobolParser.*;
 
 /**
  * This class processes the variable usage contexts. It accumulates usages when they appear in the
@@ -64,10 +61,21 @@ public class VariableUsageDelegate {
    *
    * @param dataName the variable name
    * @param locality the variable text position
+   */
+  public void handleSqlValue(String dataName, Locality locality) {
+    variableUsages.add(
+        new VariableUsage(dataName, Collections.emptyList(), locality, Collections.emptyMap()));
+  }
+
+  /**
+   * Accumulate variable appearance for analise its definition later.
+   *
+   * @param dataName the variable name
+   * @param locality the variable text position
    * @param ctx the ANTLR variable context
    */
   public void handleConditionCall(String dataName, Locality locality, ConditionNameReferenceContext ctx) {
-    List<DataName2Context> hierarchy = ctx.inData().stream().map(InDataContext::dataName2).collect(toList());
+    List<DataNameContext> hierarchy = ctx.inData().stream().map(InDataContext::dataName).collect(toList());
     List<String> parents = createPatentsList(hierarchy);
     Map<String, Token> parentVariables = collectParentVariablesFromInData(hierarchy);
     variableUsages.add(new VariableUsage(dataName, parents, locality, parentVariables));
@@ -89,7 +97,8 @@ public class VariableUsageDelegate {
    * @param definedVariables the collection of COBOL variables
    * @return the list of usage errors
    */
-  public List<SyntaxError> updateUsageAndGenerateErrors(Collection<Variable> definedVariables) {
+  public ResultWithErrors<Map<Locality, Variable>> updateUsageAndGenerateErrors(Collection<Variable> definedVariables) {
+    Map<Locality, Variable> variablesByUsages = new HashMap<>();
     Map<String, List<Variable>> convertedVariables = VariableUsageUtils.convertDefinedVariables(definedVariables);
     List<SyntaxError> errors = new ArrayList<>();
     for (VariableUsage variableUsage : variableUsages) {
@@ -98,15 +107,16 @@ public class VariableUsageDelegate {
       if (foundVariables.size() == 1) {
         Variable variable = foundVariables.get(0);
         variable.addUsage(variableUsage.locality);
+        variablesByUsages.put(variableUsage.locality, variable);
         addParentVariablesUsage(variableUsage.parentVariables, variable);
       } else {
         errors.add(createInvalidDefinition(variableUsage.name, variableUsage.locality));
       }
     }
-    return errors;
+    return new ResultWithErrors<>(variablesByUsages, errors);
   }
 
-  private List<String> createPatentsList(List<DataName2Context> hierarchy) {
+  private List<String> createPatentsList(List<DataNameContext> hierarchy) {
     return hierarchy.stream()
             .map(RuleContext::getText)
             .map(String::toUpperCase)
@@ -119,7 +129,7 @@ public class VariableUsageDelegate {
         hierarchy.stream()
             .map(QualifiedInDataContext::inData)
             .filter(Objects::nonNull)
-            .map(InDataContext::dataName2)
+            .map(InDataContext::dataName)
             .collect(toMap(it -> it.getText().toUpperCase(), ParserRuleContext::getStart));
 
     parentVariables.putAll(
@@ -131,7 +141,7 @@ public class VariableUsageDelegate {
     return parentVariables;
   }
 
-  private Map<String, Token> collectParentVariablesFromInData(List<DataName2Context> hierarchy) {
+  private Map<String, Token> collectParentVariablesFromInData(List<DataNameContext> hierarchy) {
     return hierarchy.stream()
         .collect(toMap(it -> it.getText().toUpperCase(), ParserRuleContext::getStart));
   }
@@ -146,14 +156,14 @@ public class VariableUsageDelegate {
     }
   }
 
-  private DataName2Context getDataName2Context(QualifiedInDataContext node) {
+  private DataNameContext getDataName2Context(QualifiedInDataContext node) {
     return ofNullable(node.inData())
-        .map(InDataContext::dataName2)
+        .map(InDataContext::dataName)
         .orElseGet(
             () ->
                 ofNullable(node.inTable())
                     .map(InTableContext::tableCall)
-                    .map(TableCallContext::dataName2)
+                    .map(TableCallContext::dataName)
                     .orElse(null));
   }
 

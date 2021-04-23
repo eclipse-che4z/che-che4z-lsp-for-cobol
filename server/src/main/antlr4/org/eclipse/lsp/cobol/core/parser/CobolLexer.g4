@@ -23,6 +23,7 @@ channels{TECHNICAL}
 @lexer::members {
     private static final Pattern titlePattern =
         Pattern.compile("TITLE\\s*(.*?)\\.?\\s\\n.*", Pattern.CASE_INSENSITIVE);
+        private static final int ENTER_LENGTH = 5;
     private void checkTitlePresent()
     {
       String input = _input.getText(Interval.of(_tokenStartCharIndex, _input.index()));
@@ -54,8 +55,8 @@ channels{TECHNICAL}
     {
       String input = _input
                      .getText(Interval.of(_tokenStartCharIndex, _input.index()))
-                     .replace("\r","").replace("\n","").trim();
-      if(StringUtils.isBlank(input.substring(5, input.length()-1)))
+                     .replace("\\R","").replace(".","").trim();
+      if(input.length() <= ENTER_LENGTH || StringUtils.isBlank(input.substring(ENTER_LENGTH, input.length())))
           reportWrongArguments("lexer.langMissingEnterDirective");
     }
 }
@@ -68,7 +69,7 @@ CONTROL_DIRECTIVE: ASTERISKCHAR (CONTROL | CBL) ((' '| COMMACHAR)
                   | IDENTIFIER? {reportWrongArguments("lexer.controlDirectiveWrongArgs");})
                   )+ DOT?-> channel(TECHNICAL);
 
-ENTER_STMT: E N T E R ' '+ IDENTIFIER? {checkLanguageNamePresent();} IDENTIFIER?  DOT -> channel(TECHNICAL);
+ENTER_STMT: ENTER ' '+ IDENTIFIER? {checkLanguageNamePresent();} (' '+ IDENTIFIER)?  ' '* DOT-> channel(TECHNICAL);
 EJECT: E J E C T DOT_FS? -> channel(HIDDEN);
 SKIP1 : S K I P '1' DOT_FS? -> skip;
 SKIP2 : S K I P '2' DOT_FS? -> skip;

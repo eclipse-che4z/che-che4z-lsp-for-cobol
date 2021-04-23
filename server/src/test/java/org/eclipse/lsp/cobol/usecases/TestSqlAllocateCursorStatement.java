@@ -27,9 +27,10 @@ class TestSqlAllocateCursorStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*LOC1}  PIC X.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL\n"
-          + "             ALLOCATE C1 CURSOR FOR RESULT SET :LOC1;\n"
+          + "             ALLOCATE C1 CURSOR FOR RESULT SET :{$LOC1};\n"
           + "           END-EXEC.";
 
   @Test

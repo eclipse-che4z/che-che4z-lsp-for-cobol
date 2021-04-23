@@ -14,9 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-/**
- * Enumeration of Node types.
- */
+/** Enumeration of Node types. */
 public enum NodeType {
   ROOT,
   PROGRAM,
@@ -39,4 +37,5 @@ public enum NodeType {
   IF,
   IF_ELSE,
   SENTENCE,
+  STATEMENT,
 }

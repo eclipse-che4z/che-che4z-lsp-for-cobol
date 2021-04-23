@@ -31,6 +31,8 @@ class TestSqlInsertStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*HV_ENUM}  PIC 9 VALUE '63'.\n"
+          + "       01 {$*TAD}  PIC 9 VALUE '144'.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL";
   private static final String INSERT1 =
@@ -60,20 +62,20 @@ class TestSqlInsertStatement {
       TEXT
           + "            INSERT INTO DSN8C10.EMP_PHOTO_RESUME\n"
           + "            (EMPNO, EMP_ROWID)\n"
-          + "            VALUES (:HV_ENUM, DEFAULT);\n"
+          + "            VALUES (:{$HV_ENUM}, DEFAULT);\n"
           + "           END-EXEC.";
 
   private static final String INSERT5 =
       TEXT
           + "            INSERT INTO DSN8C10.EMP_PHOTO_RESUME\n"
           + "            (EMPNO,EMP_ROWID)\n"
-          + "             VALUES (:HV_ENUM,DEFAULT);\n"
+          + "             VALUES (:{$HV_ENUM},DEFAULT);\n"
           + "           END-EXEC.";
 
   private static final String INSERT6 =
       TEXT
           + "           INSERT INTO ABC INCLUDE (A SMALLINT, \n"
-          + "           B SMALLINT) VALUEs TAD+1;\n"
+          + "           B SMALLINT) VALUEs {$TAD}+1;\n"
           + "           END-EXEC.";
 
   private static Stream<String> textsToTest() {
