@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.core.model.tree.statements;
 
+import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
@@ -22,29 +23,29 @@ import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.variables.ElementItem;
-import org.eclipse.lsp.cobol.core.model.variables.IndexItem;
+import org.eclipse.lsp.cobol.core.model.variables.StructureType;
 import org.eclipse.lsp.cobol.core.model.variables.Variable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-
-import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
+import java.util.Optional;
 
 /** This class implements the logic for SET UP/DOWN BY statement. */
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class SetUpDownByStatement extends StatementNode {
-  private static final MessageTemplate RECEIVING_FIELD_TYPES =
-      MessageTemplate.of("variables.indexName");
+  public static final String INTEGER_LITERAL = "[+-]?\\d+";
+  protected static final String INVALID_RECEIVING_FIELD_TEMPLATE =
+      "statements.invalidReceivingField";
+  protected static final String INVALID_SENDING_FIELD_TEMPLATE = "statements.invalidSendingField";
+  private static final List<StructureType> RECEIVING_FIELD_TYPES =
+      ImmutableList.of(StructureType.INDEX_NAME);
   private static final MessageTemplate[] SENDING_FIELD_TYPES =
       new MessageTemplate[] {
-        MessageTemplate.of("variables.elementaryInteger"),
+        MessageTemplate.of("variables.elementaryWithType", MessageTemplate.of("variables.integer")),
         MessageTemplate.of("variables.nonzeroInteger")
       };
-  public static final String INTEGER_LITERAL = "[+-]?\\d+";
-
   List<Locality> receivingFields;
   Locality sendingField;
   String literal;
@@ -62,31 +63,23 @@ public class SetUpDownByStatement extends StatementNode {
   public List<SyntaxError> validate(Map<Locality, Variable> variableUsages) {
     List<SyntaxError> errors = new ArrayList<>();
     receivingFields.stream()
-        .map(it -> validateReceivingField(variableUsages, it))
-        .filter(Objects::nonNull)
+        .map(
+            validateVariableType(
+                variableUsages, RECEIVING_FIELD_TYPES, INVALID_RECEIVING_FIELD_TEMPLATE))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .forEach(errors::add);
     if (shouldProcessLiteral(literal)) {
       if (literalProducesError(literal)) {
-        errors.add(
-            createSyntaxError(sendingField, "statements.invalidSendingField", SENDING_FIELD_TYPES));
+        errors.add(createError(sendingField, INVALID_SENDING_FIELD_TEMPLATE, SENDING_FIELD_TYPES));
       }
     } else {
       Variable variable = variableUsages.get(sendingField);
       if (variableProducesError(variable)) {
-        errors.add(
-            createSyntaxError(sendingField, "statements.invalidSendingField", SENDING_FIELD_TYPES));
+        errors.add(createError(sendingField, INVALID_SENDING_FIELD_TEMPLATE, SENDING_FIELD_TYPES));
       }
     }
     return errors;
-  }
-
-  private SyntaxError validateReceivingField(
-      Map<Locality, Variable> variableUsages, Locality locality) {
-    Variable variable = variableUsages.get(locality);
-    if (variable == null || variable instanceof IndexItem) {
-      return null;
-    }
-    return createSyntaxError(locality, "statements.invalidReceivingField", RECEIVING_FIELD_TYPES);
   }
 
   private boolean shouldProcessLiteral(String literal) {
@@ -99,14 +92,5 @@ public class SetUpDownByStatement extends StatementNode {
 
   private boolean variableProducesError(Variable variable) {
     return !(variable == null || variable instanceof ElementItem);
-  }
-
-  private SyntaxError createSyntaxError(
-      Locality locality, String message, MessageTemplate... types) {
-    return SyntaxError.syntaxError()
-        .locality(locality)
-        .severity(ERROR)
-        .messageTemplate(MessageTemplate.concatenatingArgs(message, ", ", types))
-        .build();
   }
 }
