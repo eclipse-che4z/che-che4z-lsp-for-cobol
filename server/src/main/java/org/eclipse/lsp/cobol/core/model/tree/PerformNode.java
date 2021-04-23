@@ -14,13 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.Value;
+import lombok.Getter;
+import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
-/**
- * The class represents perform in COBOL.
- */
-@Value
+/** The class represents perform in COBOL. */
+@ToString(callSuper = true)
+@Getter
 public class PerformNode extends Node {
   String section;
   String paragraph;
