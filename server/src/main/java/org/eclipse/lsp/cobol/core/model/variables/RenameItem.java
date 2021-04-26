@@ -15,15 +15,16 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import org.eclipse.lsp.cobol.core.model.Locality;
 import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
 import java.util.List;
 
+import static org.eclipse.lsp.cobol.core.model.variables.StructureType.RENAME_ITEM;
 import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVEL_66;
 
 /**
@@ -36,7 +37,6 @@ import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVE
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class RenameItem extends StructuredVariable {
-
   public RenameItem(@NonNull String name, boolean global, @NonNull Locality definition) {
     super(LEVEL_66, name, definition, global, null);
   }
@@ -54,5 +54,10 @@ public class RenameItem extends StructuredVariable {
   @Override
   public List<ConditionDataName> getConditionNames() {
     return ImmutableList.of();
+  }
+
+  @Override
+  public StructureType getStructureType() {
+    return RENAME_ITEM;
   }
 }

@@ -15,13 +15,16 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import org.eclipse.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.eclipse.lsp.cobol.core.model.variables.StructureType.MULTI_TABLE_ITEM;
 
 /**
  * This value class represents the multi-dimensional Table variable that may have nested variables,
@@ -31,6 +34,8 @@ import java.util.stream.Collectors;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class MultiTableDataName extends StructuredVariable implements TableDeclaration {
+  private static final MessageTemplate TYPE_TEMPLATE =
+      MessageTemplate.of("variables.multiTableDataName");
   int occursTimes;
   List<IndexItem> indexes;
   UsageFormat usageFormat;
@@ -52,21 +57,19 @@ public class MultiTableDataName extends StructuredVariable implements TableDecla
   @Override
   public Variable rename(RenameItem newParent) {
     return new MultiTableDataName(
-        levelNumber,
-        name,
-        definition,
-        newParent,
-        occursTimes,
-        indexes,
-        usageFormat);
+        levelNumber, name, definition, newParent, occursTimes, indexes, usageFormat);
+  }
+
+  @Override
+  public StructureType getStructureType() {
+    return MULTI_TABLE_ITEM;
   }
 
   @Override
   public String getFormattedDisplayLine() {
     StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
     stringBuilder.append(String.format(" OCCURS %1$d TIMES", occursTimes));
-    if (usageFormat != UsageFormat.UNDEFINED)
-      stringBuilder.append(" USAGE ").append(usageFormat);
+    if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat);
     return stringBuilder.append(".").toString();
   }
 }

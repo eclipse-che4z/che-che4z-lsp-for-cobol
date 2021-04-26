@@ -15,10 +15,11 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import org.eclipse.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
+import static org.eclipse.lsp.cobol.core.model.variables.StructureType.GROUP_ITEM;
 import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVEL_01;
 
 /**
@@ -39,11 +40,11 @@ public class GroupItem extends StructuredVariable {
   public Variable rename(RenameItem newParent) {
     return levelNumber == LEVEL_01
         ? null
-        : new GroupItem(
-            levelNumber,
-            name,
-            definition,
-            newParent.global,
-            newParent);
+        : new GroupItem(levelNumber, name, definition, newParent.global, newParent);
+  }
+
+  @Override
+  public StructureType getStructureType() {
+    return GROUP_ITEM;
   }
 }

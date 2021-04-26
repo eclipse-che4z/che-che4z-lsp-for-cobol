@@ -15,10 +15,12 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import org.eclipse.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.model.Locality;
+
+import static org.eclipse.lsp.cobol.core.model.variables.StructureType.INDEX_NAME;
 
 /**
  * This value class represents an Index item. It is defined using INDEXED BY statement in a {@link
@@ -28,11 +30,13 @@ import lombok.Value;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class IndexItem extends AbstractVariable {
+
   public IndexItem(int levelNumber, String name, Locality definition) {
     // IndexItem is non global when it's initially created.
     // Later on it will be recreated via {@code} updateParent {@code}.
     super(levelNumber, name, definition, false, null);
   }
+
   public IndexItem(int leverNumber, String name, Locality definition, Variable parent) {
     super(leverNumber, name, definition, parent);
   }
@@ -45,6 +49,11 @@ public class IndexItem extends AbstractVariable {
    */
   public IndexItem updateParent(Variable parent) {
     return new IndexItem(levelNumber, name, definition, parent);
+  }
+
+  @Override
+  public StructureType getStructureType() {
+    return INDEX_NAME;
   }
 
   @Override
