@@ -51,11 +51,26 @@ public class TestIdmsReadStatement {
           + "            STORAGE INTO {$WK_1} MAX LENGTH {$WK_LENGTH} RETURN LENGTH\r\n"
           + "            INTO {$WK_2}.\r\n";
 
+  private static final String READ_LINE_FROM_TERMINAL =
+      "            READ LINE TERMINAL INTO {$WK_1} MAX LENGTH 30.\r\n";
+
+  private static final String READ_LINE_FROM_TERMINAL_ALL_PARMS_LITERALS =
+      "            READ LINE FROM TERMINAL ECHO NOBACKPAGE INTO {$WK_1} MAX LENGTH\r\n"
+          + "             30 RETURN LENGTH {$WK_2}.\r\n";
+
+  private static final String READ_LINE_FROM_TERMINAL_ALL_PARMS_VARIABLES =
+      "            MOVE 20 TO {$WK_POSITION}. MOVE 80 TO {$WK_LENGTH}\r\n"
+          + "            READ LINE FROM TERMINAL ECHO NOBACKPAGE INTO {$WK_1}\r\n"
+          + "            MAX LENGTH {$WK_LENGTH} RETURN LENGTH INTO {$WK_2}.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + READ_TERMINAL,
         BOILERPLATE + READ_TERMINAL_ALL_PARMS_LITERALS,
-        BOILERPLATE + READ_TERMINAL_ALL_PARMS_VARIABLES);
+        BOILERPLATE + READ_TERMINAL_ALL_PARMS_VARIABLES,
+        BOILERPLATE + READ_LINE_FROM_TERMINAL,
+        BOILERPLATE + READ_LINE_FROM_TERMINAL_ALL_PARMS_LITERALS,
+        BOILERPLATE + READ_LINE_FROM_TERMINAL_ALL_PARMS_VARIABLES);
   }
 
   @ParameterizedTest

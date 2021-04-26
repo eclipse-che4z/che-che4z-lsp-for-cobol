@@ -1007,10 +1007,8 @@ statement
 idmsStatements
     : copyIdmsBinds | copyIdmsModule | abendCodeStatement | attachTaskCodeStatement | bindStatement | changePriorityStatement | checkTerminalStatement | commitStatement |
      connectStatement | dcStatement | dequeueStatement | disconnectStatement | endStatement | endpageStatement | enqueueStatement | eraseStatement | findStatement |
-     finishStatement | getStatement | inquireMapStatement |
-     keepStatement | loadStatement | mapStatement | modifyStatement | obtainStatement |
-     postStatement | putStatement | readyStatement |rollbackStatement | startpageStatement |
-     storeStatement
+     finishStatement | freeStatement | getStatement | inquireMapStatement | keepStatement | loadStatement | mapStatement | modifyStatement | obtainStatement |
+     postStatement | putStatement | readyStatement |rollbackStatement | snapStatement | startpageStatement | storeStatement | transferStatement | waitStatement
     ;
 
 // abend code statement
@@ -1140,15 +1138,11 @@ alterProceedTo
 // accept transaction statistics statement
 
 attachTaskCodeStatement
-    : ATTACH TASK CODE (generalIdentifier | literal) attachTaskCodePriorityClause? attachTaskCodeWaitClause?
+    : ATTACH TASK CODE (generalIdentifier | literal) attachTaskCodePriorityClause? idmsWaitNowaitClause?
     ;
 
 attachTaskCodePriorityClause
     : PRIORITY (integerLiteral | generalIdentifier)
-    ;
-
-attachTaskCodeWaitClause
-    : (WAIT | NOWAIT)
     ;
 
 // bind statement
@@ -1262,7 +1256,7 @@ checkTerminalIntoClause
     ;
 
 checkTerminalMaxLengthClause
-    : MAX LENGTH (generalIdentifier | idms_quoted_number)
+    : MAX LENGTH (generalIdentifier | integerLiteral)
     ;
 
 checkTerminalReturnLengthClause
@@ -1381,7 +1375,7 @@ dcEventClause
 // delete statement
 
 deleteStatement
-   : DELETE (deleteFilenameClause | deleteQueueClause | deleteScratchClause)
+   : DELETE (deleteFilenameClause | deleteQueueClause | deleteScratchClause | deleteTableClause)
    ;
 
 deleteFilenameClause
@@ -1402,6 +1396,10 @@ deleteScratchClause
 
 deleteScratchIdClause
    : AREA ID (generalIdentifier | literal)
+   ;
+
+deleteTableClause
+   : TABLE FROM? (generalIdentifier | idms_table_name) idmsDictnodeClause? idmsDictnameClause? (LOADLIB (generalIdentifier | literal))?
    ;
 
 // dequeue statement
@@ -1495,7 +1493,7 @@ endStatement
    ;
 
 endLineClause
-   : LINE TERMINAL SESSION
+   : LINE TERMINAL SESSION?
    ;
 
 endTransactionClause
@@ -1638,6 +1636,20 @@ findStatement
    : FIND keepClause? findObtainClause
    ;
 
+// free statement
+
+freeStatement
+    : FREE STORAGE (freeStgidClause | freeForClause)
+    ;
+
+freeStgidClause
+    : STGID (generalIdentifier | literal)
+    ;
+
+freeForClause
+    : FOR generalIdentifier (FROM generalIdentifier)?
+    ;
+
 keepClause
     : KEEP EXCLUSIVE?
     ;
@@ -1692,7 +1704,7 @@ getStatement
     ;
 
 getQueueClause
-    : QUEUE (ID (generalIdentifier | literal))? getQueueTypeClause? getStatClause? getQueueLockClause?  getWaitClause? INTO generalIdentifier getLengthClause getReturnClause?
+    : QUEUE (ID (generalIdentifier | literal))? getQueueTypeClause? getStatClause? getQueueLockClause?  idmsWaitNowaitClause? INTO generalIdentifier getLengthClause getReturnClause?
     ;
 
 getQueueTypeClause
@@ -1705,10 +1717,6 @@ getStatClause
 
 getQueueLockClause
     : (LOCK | NOLOCK)
-    ;
-
-getWaitClause
-    : (WAIT | NOWAIT)
     ;
 
 getLengthClause
@@ -1732,7 +1740,7 @@ getScratchNextClause
     ;
 
 getStorageClause
-    : STORAGE FOR generalIdentifier (TO generalIdentifier)? (LENGTH generalIdentifier)? (POINTER generalIdentifier)? getWaitClause? KEEP? (LONG | SHORT)? (USER | SHARED)? (STGID (generalIdentifier | literal))? getStorageValueClause? getStorageLocClause?
+    : STORAGE FOR generalIdentifier (TO generalIdentifier)? (LENGTH generalIdentifier)? (POINTER generalIdentifier)? idmsWaitNowaitClause? KEEP? (LONG | SHORT)? (USER | SHARED)? (STGID (generalIdentifier | literal))? getStorageValueClause? getStorageLocClause?
     ;
 
 getStorageValueClause
@@ -1939,19 +1947,11 @@ keepLongtermTestClause
 // load Statement
 
 loadStatement
-    : LOAD TABLE (generalIdentifier | idms_program_name) INTO generalIdentifier loadLocationClause loadDictnodeClause? loadDictnameClause? loadLoadlibClause? (WAIT | NOWAIT)
+    : LOAD TABLE (generalIdentifier | idms_table_name) INTO generalIdentifier loadLocationClause idmsDictnodeClause? idmsDictnameClause? loadLoadlibClause? idmsWaitNowaitClause
     ;
 
 loadLocationClause
     : (TO | POINTER) generalIdentifier
-    ;
-
-loadDictnodeClause
-    : DICTNODE (generalIdentifier | literal)
-    ;
-
-loadDictnameClause
-    : DICTNAME (generalIdentifier | literal)
     ;
 
 loadLoadlibClause
@@ -2017,6 +2017,15 @@ mapOutDetailPhrase
 
 mapOutInClause
     : OUTIN USING idms_map_name mapOutputPhrase? mapInputPhrase? mapMessagePhrase?
+    ;
+
+idmsDictnameClause
+    : DICTNAME (generalIdentifier | idms_dictionary_name)
+    ;
+
+
+idmsDictnodeClause
+    : DICTNODE (generalIdentifier | idms_node_name)
     ;
 
 idmsDmlFromClause
@@ -2235,11 +2244,7 @@ putStatement
    ;
 
 putQueueStatement
-   : QUEUE (ID (generalIdentifier | literal))? (FIRST | LAST)? FROM generalIdentifier putQueueLengthClause putReturnClause? putRetentionClause?
-   ;
-
-putQueueLengthClause
-   : ((TO generalIdentifier) | (LENGTH (generalIdentifier | integerLiteral)))
+   : QUEUE (ID (generalIdentifier | literal))? (FIRST | LAST)? idmsDmlFromClause putReturnClause? putRetentionClause?
    ;
 
 putReturnClause
@@ -2251,15 +2256,11 @@ putRetentionClause
    ;
 
 putScratchClause
-   : SCRATCH putAreaIdClause? FROM generalIdentifier putScratchLengthClause putRecordClause? putReturnClause
+   : SCRATCH putAreaIdClause? idmsDmlFromClause putRecordClause? putReturnClause
    ;
 
 putAreaIdClause
    : AREA ID (generalIdentifier | literal)
-   ;
-
-putScratchLengthClause
-   : (TO generalIdentifier) | (LENGTH (generalIdentifier | integerLiteral))
    ;
 
 putRecordClause
@@ -2269,7 +2270,7 @@ putRecordClause
 // read statement
 
 readStatement
-   : READ (readFilenameClause | readTerminalClause)
+   : READ (readFilenameClause | readLineFromTerminalClause | readTerminalClause)
    ;
 
 readFilenameClause
@@ -2289,7 +2290,11 @@ readKey
    ;
 
 readTerminalClause
-   : TERMINAL (WAIT | NOWAIT)? (BUFFER | (MODIFIED FROM POSITION (generalIdentifier | literal)))? (GET STORAGE)? INTO? generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral))) (RETURN LENGTH INTO? generalIdentifier)?
+   : TERMINAL idmsWaitNowaitClause? (BUFFER | (MODIFIED FROM POSITION (generalIdentifier | literal)))? (GET STORAGE)? INTO generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral))) (RETURN LENGTH INTO? generalIdentifier)?
+   ;
+
+readLineFromTerminalClause
+   : LINE FROM? TERMINAL ECHO? NOBACKPAGE? INTO generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral))) (RETURN LENGTH INTO? generalIdentifier)?
    ;
 
 // ready statement
@@ -2445,15 +2450,11 @@ sendAdvancingMnemonic
    ;
 
 sendIdmsClause
-   : MESSAGE (ONLY | ALWAYS)? TO sendIdmsToClause FROM generalIdentifier sendIdmsLengthClause
+   : MESSAGE (ONLY | ALWAYS)? TO sendIdmsToClause idmsDmlFromClause
    ;
 
 sendIdmsToClause
    : (DEST ID (generalIdentifier | literal)) | (USER ID generalIdentifier) | (LTERM ID (generalIdentifier | literal))
-   ;
-
-sendIdmsLengthClause
-   : (TO generalIdentifier) | (LENGTH (generalIdentifier | integerLiteral))
    ;
 
 // set statement
@@ -2528,7 +2529,7 @@ setTimerIdClause
    ;
 
 setTimerDataClause
-   : DATA FROM generalIdentifier ((TO generalIdentifier) | (LENGTH (generalIdentifier | integerLiteral)))
+   : DATA idmsDmlFromClause
    ;
 
 // service statement
@@ -2541,12 +2542,11 @@ serviceReloadStatement
    : SERVICE RELOAD generalIdentifier
    ;
 
-// startpage statement
+// snap statement
 
-startpageStatement
-    : STARTPAGE SESSION? idms_map_name (WAIT | NOWAIT | RETURN)? (BACKPAGE | NOBACKPAGE)? (UPDATE | BROWSE)?
-     (AUTODISPLAY | NOAUTODISPLAY)?
-    ;
+snapStatement
+   : (SNAP | SNAP_TITLE IS? generalIdentifier) (ALL | SYSTEM | TASK)? idmsDmlFromClause*
+   ;
 
 // sort statement
 
@@ -2601,6 +2601,13 @@ sortGivingPhrase
 sortGiving
    : fileName (LOCK | SAVE | NO REWIND | CRUNCH | RELEASE | WITH REMOVE CRUNCH)?
    ;
+
+// startpage statement
+
+startpageStatement
+    : STARTPAGE SESSION? idms_map_name (WAIT | NOWAIT | RETURN)? (BACKPAGE | NOBACKPAGE)? (UPDATE | BROWSE)?
+     (AUTODISPLAY | NOAUTODISPLAY)?
+    ;
 
 // startPosition statement
 
@@ -2701,6 +2708,12 @@ terminateStatement
    : TERMINATE reportName
    ;
 
+// transfer statement
+
+transferStatement
+   : TRANSFER CONTROL? TO? (generalIdentifier | idms_program_name) (RETURN | LINK | NORETURN | XCTL)? (USING generalIdentifier+)? endClause
+   ;
+
 // unstring statement
 
 unstringStatement
@@ -2765,10 +2778,28 @@ useDebugOn
    : ALL PROCEDURES | ALL REFERENCES? OF? generalIdentifier | procedureName | fileName
    ;
 
+// wait statement
+
+waitStatement
+   : WAIT (((LONG | SHORT)? (waitEventTypeClause | waitEventListClause+)) | (REDISPATCH (waitEventTypeClause | waitEventListClause+)?))
+   ;
+
+waitEventTypeClause
+   : EVENT NAME (generalIdentifier | literal)
+   ;
+
+waitEventListClause
+   : EVENT generalIdentifier
+   ;
+
 // write statement
 
 writeStatement
-   : WRITE recordName writeFromPhrase? writeAdvancingPhrase? writeAtEndOfPagePhrase? writeNotAtEndOfPagePhrase? invalidKeyPhrase? notInvalidKeyPhrase? END_WRITE?
+   : WRITE (writeStatementClause | writeJournalClause | writeLineClause | writeLogClause | writePrinterClause | writeTerminalClause | writeThenReadClause)
+   ;
+
+writeStatementClause
+   : recordName writeFromPhrase? writeAdvancingPhrase? writeAtEndOfPagePhrase? writeNotAtEndOfPagePhrase? invalidKeyPhrase? notInvalidKeyPhrase? END_WRITE?
    ;
 
 writeFromPhrase
@@ -2797,6 +2828,58 @@ writeAtEndOfPagePhrase
 
 writeNotAtEndOfPagePhrase
    : NOT AT? (END_OF_PAGE | EOP) statement*
+   ;
+
+writeJournalClause
+   : JOURNAL idmsWaitNowaitClause? (SPAN | NOSPAN)? idmsDmlFromClause
+   ;
+
+writeLineClause
+   : LINE TO? TERMINAL idmsWaitNowaitClause? (NEWPAGE | ERASE)? NOBACKPAGE? idmsDmlFromClause (HEADER (generalIdentifier | integerLiteral))?
+   ;
+
+writeLogClause
+   : LOG MESSAGE ID (generalIdentifier | integerLiteral) writeLogParmsClause? writeLogReplyClause? writeLogMessagePrefixClause? writeLogTextClause?
+   ;
+
+writeLogParmsClause
+   : PARMS idmsDmlFromClause+
+   ;
+
+writeLogReplyClause
+   : REPLY INTO generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral)))
+   ;
+
+writeLogMessagePrefixClause
+   : MESSAGE PREFIX IS (generalIdentifier | literal)
+   ;
+
+writeLogTextClause
+   : TEXT INTO? generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral))) (MESSAGE? PREFIX IS? (YES | NO))? (TEXT IS? ONLY)?
+   ;
+
+writePrinterClause
+   : PRINTER (NEWPAGE | ERASE)? ENDRPT? (SCREEN CONTENTS | writePrinterNativeClause) (COPIES (generalIdentifier | integerLiteral))? (REPORT ID (generalIdentifier | integerLiteral))? writePrinterTypeClause? HOLD? KEEP?
+   ;
+
+writePrinterNativeClause
+   : NATIVE? idmsDmlFromClause
+   ;
+
+writePrinterTypeClause
+   : (CLASS (generalIdentifier | integerLiteral)) | (DESTINATION (generalIdentifier | literal) ALL?)
+   ;
+
+writeTerminalClause
+   : TERMINAL idmsWaitNowaitClause? writeTerminalEraseClause? (FREE STORAGE)? idmsDmlFromClause
+   ;
+
+writeTerminalEraseClause
+   : NEWPAGE | ERASE | EAU | (ERASE ALL UNPROTECTED)
+   ;
+
+writeThenReadClause
+   : THEN READ TERMINAL idmsWaitNowaitClause? writeTerminalEraseClause? (FREE STORAGE)? idmsDmlFromClause ((MODIFIED | BUFFER) FROM POSITION (generalIdentifier | literal))? (GET STORAGE)? INTO generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral))) (RETURN LENGTH INTO? generalIdentifier)?
    ;
 
 // xml statement
@@ -2946,8 +3029,20 @@ idms_db_entity_name
     : T=dataName {validateLength($T.text, "db entity name", 16);}
     ;
 
+idms_dictionary_name
+    : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "dictionary name", 8);}
+    ;
+
+idms_node_name
+    : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "node name", 8);}
+    ;
+
 idms_procedure_name
     : T=dataName {validateLength($T.text, "procedure name", 8);}
+    ;
+
+idms_program_name
+    : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "program name", 8);}
     ;
 
 idms_schema_name
@@ -2958,8 +3053,8 @@ idms_subschema_name
     : T=dataName {validateLength($T.text, "subschema name", 8);}
     ;
 
-idms_program_name
-    : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "program name", 8);}
+idms_table_name
+    : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "table name", 8);}
     ;
 
 idms_quoted_number
