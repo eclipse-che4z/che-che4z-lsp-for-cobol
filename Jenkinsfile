@@ -78,8 +78,7 @@ pipeline {
                             dir('server') {
                                 withMaven {
                                     sh 'mvn -version'
-                                    sh 'set MAVEN_OPTS=-Xms1024m'
-                                    sh 'mvn clean verify --no-transfer-progress'
+                                    sh 'MAVEN_OPTS="-Xms1024m -Xmx2560m" mvn clean verify --no-transfer-progress'
                                     sh 'cp target/server.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
                                 }
                             }
