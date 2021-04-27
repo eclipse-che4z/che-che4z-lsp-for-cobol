@@ -1202,7 +1202,7 @@ callByReferencePhrase
    ;
 
 callByReference
-   : ((ADDRESS OF | INTEGER | STRING)? literal | generalIdentifier | fileName) | OMITTED
+   : ((INTEGER | STRING)? literal | generalIdentifier | fileName) | OMITTED
    ;
 
 callByValuePhrase
@@ -1210,7 +1210,7 @@ callByValuePhrase
    ;
 
 callByValue
-   : (ADDRESS OF | LENGTH OF?)? (literal | generalIdentifier)
+   : (literal | generalIdentifier)
    ;
 
 callByContentPhrase
@@ -1218,7 +1218,7 @@ callByContentPhrase
    ;
 
 callByContent
-   : (ADDRESS OF | LENGTH OF?)? literal | generalIdentifier | OMITTED
+   : literal | generalIdentifier | OMITTED
    ;
 
 callGivingPhrase
