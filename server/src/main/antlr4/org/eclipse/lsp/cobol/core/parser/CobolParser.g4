@@ -1841,15 +1841,19 @@ inqMapIfPhrase
    ;
 
 inqMapWhichFields
-   : CURRENT | ALL | NONE | ANY | SOME | ALL BUT CURRENT
+   : CURRENT | ALL | NONE | ANY | SOME | ALL (BUT | EXCEPT) CURRENT
    ;
 
 inqMapWhichDflds
-   : (ALL | NONE | ANY | SOME | ALL BUT)? (DFLD generalIdentifier)+
+   : (ALL | NONE | ANY | SOME | ALL (BUT | EXCEPT))? (DFLD generalIdentifier)+
    ;
 
 inqMapFieldTestPhrase
-   : DATA IS? (YES | NO | ERASE | TRUNCATED | IDENTICAL | DIFFERENT) | EDIT IS? (ERROR | CORRECT)
+   : DATA IS? (YES | NO | ERASE | TRUNCATED | IDENTICAL | DIFFERENT) | mapEditPhrase
+   ;
+
+mapEditPhrase
+   : EDIT IS? (ERROR | CORRECT)
    ;
 
 // inspect statement
@@ -1973,7 +1977,7 @@ mapIoInputPhrase
     ;
 
 mapInIoPhrase
-    : (IO | (NOIO DATASTREAM idmsDmlFromClause))
+    : (IO mapInputPhrase? | (NOIO DATASTREAM idmsDmlFromClause))
     ;
 
 mapInputPhrase
@@ -2084,7 +2088,30 @@ mergeGiving
 
 // modify statement
 modifyStatement
-    : MODIFY idms_db_entity_name
+    : MODIFY  ((MAP modifyMapClause) | idms_db_entity_name )
+    ;
+// modify map statement
+modifyMapClause
+    : idms_map_name (PERMANENT | TEMPORARY)?
+     (CURSOR AT? ((DFLD generalIdentifier) | (generalIdentifier | integerLiteral) (generalIdentifier | integerLiteral)))?
+     (WCC ((RESETMDT | NOMDT) | (RESETKBD | NOKBD) | (ALARM | NOALARM) | (STARTPRT | NOPRT) |
+     (NLCR | FORTYCR | SIXTYFOURCR | EIGHTYCR))+)? (modifyMapForClause modifyMapFieldOptionsClause)?
+    ;
+
+modifyMapForClause
+    : FOR ((ALL ((BUT | EXCEPT) (CURRENT | (DFLD generalIdentifier)+) | (ERROR | CORRECT)? FIELDS)) |
+      (ALL? (DFLD generalIdentifier)+))
+    ;
+
+modifyMapFieldOptionsClause
+    : (BACKSCAN | NOBACKSCAN)? (OUTPUT DATA IS? (YES | NO | ERASE | ATTRIBUTE))? mapInputPhrase?
+    ((RIGHT | LEFT)? JUSTIFY)? (PAD (LOW_VALUE | HIGH_VALUE | (literal | generalIdentifier)))?
+    mapEditPhrase? (REQUIRED | OPTIONAL)? (ERROR MESSAGE IS? (ACTIVE | SUPPRESS))? (ATTRIBUTES (attributeList)+)?
+    ;
+
+attributeList
+    : SKIPCHAR | ALPHANUMERIC | NUMERIC | PROTECTED | UNPROTECTED | DISPLAY | DARK | BRIGHT | DETECT | NOMDT | MDT | BLINK | NOBLINK | REVERSE_VIDEO |
+    NORMAL_VIDEO | UNDERSCORE | NOUNDERSCORE | NOCOLOR | BLUE | RED | PINK | GREEN | TURQUOISE | YELLOW | WHITE
     ;
 
 // move statement
