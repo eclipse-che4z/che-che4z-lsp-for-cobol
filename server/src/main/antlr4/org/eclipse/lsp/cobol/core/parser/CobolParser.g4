@@ -936,27 +936,11 @@ procedureDivisionUsingClause
    ;
 
 procedureDivisionGivingClause
-   : (GIVING | RETURNING) dataName
+   : RETURNING dataName
    ;
 
 procedureDivisionUsingParameter
-   : procedureDivisionByReferencePhrase | procedureDivisionByValuePhrase
-   ;
-
-procedureDivisionByReferencePhrase
-   : (BY? REFERENCE)? procedureDivisionByReference+
-   ;
-
-procedureDivisionByReference
-   : (OPTIONAL? (fileName | generalIdentifier)) | ANY
-   ;
-
-procedureDivisionByValuePhrase
-   : BY? VALUE procedureDivisionByValue+
-   ;
-
-procedureDivisionByValue
-   : literal | generalIdentifier | ANY
+   : BY? (REFERENCE | VALUE)? generalIdentifier
    ;
 
 procedureDeclaratives
@@ -1198,27 +1182,19 @@ callUsingParameter
    ;
 
 callByReferencePhrase
-   : (BY? REFERENCE)? callByReference+
+   : (BY? REFERENCE)? callByReference
    ;
 
 callByReference
-   : ((INTEGER | STRING)? literal | generalIdentifier | fileName) | OMITTED
+   : ((INTEGER | STRING)? literal | generalIdentifier) | OMITTED
    ;
 
 callByValuePhrase
-   : BY? VALUE callByValue+
-   ;
-
-callByValue
-   : (literal | generalIdentifier)
+   : BY? VALUE (literal | generalIdentifier)
    ;
 
 callByContentPhrase
-   : BY? CONTENT callByContent+
-   ;
-
-callByContent
-   : literal | generalIdentifier | OMITTED
+   : BY? CONTENT (literal | generalIdentifier | OMITTED)
    ;
 
 callGivingPhrase
@@ -1679,7 +1655,7 @@ dbkeyClause
     ;
 
 positionClause
-    : (orderClause | (integerLiteral | generalIdentifier)) idms_db_entity_name? WITHIN idms_db_entity_name
+    : (orderClause | integerLiteral | generalIdentifier) idms_db_entity_name? WITHIN idms_db_entity_name
     ;
 
 orderClause
@@ -2487,7 +2463,7 @@ sendIdmsToClause
 // set statement
 
 setStatement
-   : SET (setToOnOff+ | setToBoolean | setToStatement | setUpDownByStatement | setToProcedurePointer | setToEntry
+   : SET (setToOnOff+ | setToBoolean | setToStatement | setUpDownByStatement | setToEntry
    | setAbendExitStatement | setTimerStatement)
    ;
 
@@ -2505,10 +2481,6 @@ setToBoolean
 
 setToOnOff
    : receivingField+ TO (ON | OFF)
-   ;
-
-setToProcedurePointer
-   : receivingField+ TO (NULL | NULLS | SELF)
    ;
 
 setToEntry
@@ -2802,7 +2774,7 @@ useDebugClause
    ;
 
 useDebugOn
-   : ALL PROCEDURES | ALL REFERENCES? OF? generalIdentifier | procedureName | fileName
+   : ALL PROCEDURES | ALL REFERENCES? OF? generalIdentifier | procedureName
    ;
 
 // wait statement
@@ -3002,7 +2974,7 @@ classCondition
    ;
 
 conditionNameReference
-   : conditionName (inData* inFile? conditionNameSubscriptReference* | inMnemonic*)
+   : conditionName inData* conditionNameSubscriptReference*
    ;
 
 conditionNameSubscriptReference
@@ -3012,19 +2984,19 @@ conditionNameSubscriptReference
 // relation ----------------------------------
 
 relationCondition
-   : relationSignCondition | relationArithmeticComparison | relationCombinedComparison
+   : arithmeticExpression (relationSignCondition | relationArithmeticComparison | relationCombinedComparison)
    ;
 
 relationSignCondition
-   : arithmeticExpression IS? NOT? (POSITIVE | NEGATIVE | ZERO)
+   : IS? NOT? (POSITIVE | NEGATIVE | ZERO)
    ;
 
 relationArithmeticComparison
-   : arithmeticExpression relationalOperator arithmeticExpression
+   : relationalOperator arithmeticExpression
    ;
 
 relationCombinedComparison
-   : arithmeticExpression relationalOperator LPARENCHAR relationCombinedCondition RPARENCHAR
+   : relationalOperator LPARENCHAR relationCombinedCondition RPARENCHAR
    ;
 
 relationCombinedCondition

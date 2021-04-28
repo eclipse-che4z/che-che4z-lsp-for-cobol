@@ -1046,7 +1046,7 @@ idms_only_words
     | WCC | WHITE | WITHIN | YELLOW
     ;
 
-cicsWord: NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral | generalIdentifier | cobolWord | cics_cobol_intersected_words;
+cicsWord: NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral | generalIdentifier | cics_cobol_intersected_words;
 name: cicsWord+;
 data_value: cicsWord+;
 data_area: cicsWord+;
@@ -1085,29 +1085,25 @@ length
    ;
 
 subscript
-   : ALL | integerLiteral | qualifiedDataName integerLiteral? | indexName integerLiteral? | arithmeticExpression
+   : ALL | integerLiteral | arithmeticExpression
    ;
 
 argument
-   : literal | generalIdentifier | qualifiedDataName integerLiteral? | indexName integerLiteral? | arithmeticExpression
+   : literal | generalIdentifier | arithmeticExpression
    ;
 
 // qualified data name ----------------------------------
 
 qualifiedDataName
-   : qualifiedDataNameFormat1 | qualifiedDataNameFormat2 | qualifiedDataNameFormat3 | qualifiedDataNameFormat4
+   : qualifiedDataNameFormat1 | qualifiedDataNameFormat2 | qualifiedDataNameFormat4
    ;
 
 qualifiedDataNameFormat1
-   : dataName (qualifiedInData+ inFile? | inFile)?
+   : dataName qualifiedInData*
    ;
 
 qualifiedDataNameFormat2
    : paragraphName inSection
-   ;
-
-qualifiedDataNameFormat3
-   : textName inLibrary
    ;
 
 qualifiedDataNameFormat4
@@ -1145,10 +1141,6 @@ inMnemonic
 
 inSection
    : (IN | OF) sectionName
-   ;
-
-inLibrary
-   : (IN | OF) libraryName
    ;
 
 inTable
