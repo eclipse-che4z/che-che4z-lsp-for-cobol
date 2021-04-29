@@ -63,9 +63,9 @@ class ReplacingServiceImplTest {
         new ResultWithErrors<>(
             Pair.of(
                 "(\\(|:|[.,;]\\s)?(?<=^|[.,;]\\s|\\s|[\\(:])01(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)[\\):,;]?",
-                "05"),
+                "BY"),
             Collections.emptyList()),
-        replacingService.retrievePseudoTextReplacingPattern("==  01  == BY == 05   =="));
+        replacingService.retrievePseudoTextReplacingPattern("==  01  == BY == BY   =="));
     assertEquals(
         new ResultWithErrors<>(Pair.of("", ""), Collections.emptyList()),
         replacingService.retrievePseudoTextReplacingPattern(""));
@@ -80,10 +80,10 @@ class ReplacingServiceImplTest {
     assertEquals(
         new ResultWithErrors<>(
             Pair.of(
-                "(\\(|:|[.,;]\\s)?(?<=^|[.,;]\\s|\\s|[\\(:])1(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)[\\):,;]?",
+                "(\\(|:|[.,;]\\s)?(?<=^|[.,;]\\s|\\s|[\\(:])BY(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)[\\):,;]?",
                 ""),
             Collections.emptyList()),
-        replacingService.retrievePseudoTextReplacingPattern("==1== by ==\n      \r\n   =="));
+        replacingService.retrievePseudoTextReplacingPattern("==BY== by ==\n      \r\n   =="));
   }
 
   /**
