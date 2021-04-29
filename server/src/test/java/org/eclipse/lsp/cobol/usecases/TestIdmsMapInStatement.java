@@ -74,8 +74,10 @@ class TestIdmsMapInStatement {
   private static final String TST9 =
       DEFS + "           MAP IN USING EMPMAP HEADER PAGE IS {$PAG-NUM} MODIFIED.\n";
 
+  private static final String TST10 = DEFS + "           MAP IN USING EMPMAP IO INPUT DATA YES.\n";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7, TST8, TST9);
+    return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7, TST8, TST9, TST10);
   }
 
   @ParameterizedTest

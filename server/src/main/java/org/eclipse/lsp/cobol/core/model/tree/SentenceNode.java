@@ -14,12 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.Value;
+import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
-/**
- * The class represents sentence in COBOL.
- */
-@Value
+/** The class represents sentence in COBOL. */
+@ToString(callSuper = true)
 public class SentenceNode extends Node {
   public SentenceNode(Locality location) {
     super(location, NodeType.SENTENCE);

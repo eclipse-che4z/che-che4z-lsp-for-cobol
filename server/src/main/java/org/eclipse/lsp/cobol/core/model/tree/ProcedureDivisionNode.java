@@ -14,13 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.Value;
+import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
-/**
- * The class represents procedure division in COBOL.
- */
-@Value
+/** The class represents procedure division in COBOL. */
+@ToString(callSuper = true)
 public class ProcedureDivisionNode extends Node {
   public ProcedureDivisionNode(Locality location) {
     super(location, NodeType.PROCEDURE_DIVISION);

@@ -14,24 +14,27 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.Value;
+import lombok.Getter;
+import lombok.ToString;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
 /**
- * The class represents variable usage in COBOL program.
- * This must be extended with a link to variable definition.
+ * The class represents variable usage in COBOL program. This must be extended with a link to
+ * variable definition.
  */
-@Value
+@ToString(callSuper = true)
+@Getter
 public class VariableUsageNode extends Node {
   String dataName;
   Type variableUsageType;
   CobolParser.QualifiedDataNameFormat1Context dataNameFormat1Context;
   CobolParser.ConditionNameReferenceContext nameReferenceContext;
 
-  public VariableUsageNode(String dataName,
-                           Locality locality,
-                           CobolParser.QualifiedDataNameFormat1Context dataNameFormat1Context) {
+  public VariableUsageNode(
+      String dataName,
+      Locality locality,
+      CobolParser.QualifiedDataNameFormat1Context dataNameFormat1Context) {
     super(locality, NodeType.VARIABLE_USAGE);
     this.dataName = dataName;
     this.dataNameFormat1Context = dataNameFormat1Context;
@@ -47,9 +50,10 @@ public class VariableUsageNode extends Node {
     nameReferenceContext = null;
   }
 
-  public VariableUsageNode(String dataName,
-                           Locality locality,
-                           CobolParser.ConditionNameReferenceContext nameReferenceContext) {
+  public VariableUsageNode(
+      String dataName,
+      Locality locality,
+      CobolParser.ConditionNameReferenceContext nameReferenceContext) {
     super(locality, NodeType.VARIABLE_USAGE);
     this.dataName = dataName;
     this.nameReferenceContext = nameReferenceContext;
@@ -62,30 +66,31 @@ public class VariableUsageNode extends Node {
     getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
         .map(ProgramNode::getVariableUsageDelegate)
-        .ifPresent(variableUsageDelegate -> {
-          switch (variableUsageType) {
-            case DATA_NAME:
-              variableUsageDelegate.handleDataName(dataName, getLocality(), dataNameFormat1Context);
-              break;
-            case SQL_VALUE:
-              variableUsageDelegate.handleSqlValue(dataName, getLocality());
-              break;
-            case TABLE_CALL:
-              variableUsageDelegate.handleTableCall(dataName, getLocality());
-              break;
-            case CONDITION_CALL:
-              variableUsageDelegate.handleConditionCall(dataName, getLocality(), nameReferenceContext);
-              break;
-            default:
-              // No other variable usage types exist, this is unreachable, but just in case.
-              break;
-          }
-        });
+        .ifPresent(
+            variableUsageDelegate -> {
+              switch (variableUsageType) {
+                case DATA_NAME:
+                  variableUsageDelegate.handleDataName(
+                      dataName, getLocality(), dataNameFormat1Context);
+                  break;
+                case SQL_VALUE:
+                  variableUsageDelegate.handleSqlValue(dataName, getLocality());
+                  break;
+                case TABLE_CALL:
+                  variableUsageDelegate.handleTableCall(dataName, getLocality());
+                  break;
+                case CONDITION_CALL:
+                  variableUsageDelegate.handleConditionCall(
+                      dataName, getLocality(), nameReferenceContext);
+                  break;
+                default:
+                  // No other variable usage types exist, this is unreachable, but just in case.
+                  break;
+              }
+            });
   }
 
-  /**
-   * Represents different types of variable usages.
-   */
+  /** Represents different types of variable usages. */
   public enum Type {
     DATA_NAME,
     SQL_VALUE,

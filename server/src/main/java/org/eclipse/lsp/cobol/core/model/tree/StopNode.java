@@ -14,13 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.Value;
+import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
-/**
- * The class represents stop in COBOL.
- */
-@Value
+/** The class represents stop in COBOL. */
+@ToString(callSuper = true)
 public class StopNode extends Node {
   public StopNode(Locality location) {
     super(location, NodeType.STOP);

@@ -14,13 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.Value;
+import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
-/**
- * The class represents exit in COBOL.
- */
-@Value
+/** The class represents exit in COBOL. */
+@ToString(callSuper = true)
 public class ExitNode extends Node {
   public ExitNode(Locality location) {
     super(location, NodeType.EXIT);

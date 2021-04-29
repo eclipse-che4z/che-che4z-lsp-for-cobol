@@ -41,15 +41,15 @@ class TestCheckTerminal {
 
   private static final String CHECK_TERMINAL_TO_ALL_PARMS =
       "           CHECK TERMINAL GET STORAGE INTO {$WK_VARB1} TO {$WK_VARB2}\r\n"
-    + "           RETURN LENGTH INTO {$WK_LENGTH}.\r\n";
+          + "           RETURN LENGTH INTO {$WK_LENGTH}.\r\n";
 
   private static final String CHECK_TERMINAL_MAXLENGTH_VARB_ALL_PARMS =
       "           CHECK TERMINAL GET STORAGE INTO {$WK_VARB1} MAX LENGTH {$WK_VARB2}\r\n"
-    + "           RETURN LENGTH INTO {$WK_LENGTH}.\r\n";
+          + "           RETURN LENGTH INTO {$WK_LENGTH}.\r\n";
 
   private static final String CHECK_TERMINAL_MAXLENGTH_LITERAL_ALL_PARMS =
-      "           CHECK TERMINAL GET STORAGE INTO {$WK_VARB1} MAX LENGTH '120'\r\n"
-    + "           RETURN LENGTH INTO {$WK_LENGTH}.\r\n";
+      "           CHECK TERMINAL GET STORAGE INTO {$WK_VARB1} MAX LENGTH 120\r\n"
+          + "           RETURN LENGTH INTO {$WK_LENGTH}.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

@@ -14,14 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.Value;
+import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate;
 
-/**
- * The class represents section in COBOL.
- */
-@Value
+/** The class represents section in COBOL. */
+@ToString(callSuper = true)
 public class SectionNode extends Node {
   public SectionNode(Locality locality) {
     super(locality, NodeType.SECTION);

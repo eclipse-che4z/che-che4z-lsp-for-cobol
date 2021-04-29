@@ -15,6 +15,8 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
+import lombok.Getter;
+import lombok.ToString;
 import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -32,6 +34,8 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.STATEMENT;
 
 /** This class represents program context in COBOL. */
+@ToString(callSuper = true)
+@Getter
 public class ProgramNode extends Node {
   private VariableDefinitionDelegate variableDefinitionDelegate;
   private VariableUsageDelegate variableUsageDelegate;
@@ -75,6 +79,7 @@ public class ProgramNode extends Node {
     List<SyntaxError> errors = new ArrayList<>();
     definedVariables = variableDefinitionDelegate.finishDefinitionAnalysis().unwrap(errors::addAll);
     Set<String> variableNames = definedVariables.stream().map(Variable::getName).collect(toSet());
+
     List<Variable> availableVariables = new ArrayList<>(definedVariables);
     getGlobalVariables().stream()
         .filter(variable -> !variableNames.contains(variable.getName()))
