@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.strategy;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NoArgsConstructor;
@@ -25,11 +26,13 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,28 +46,35 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
   private static final String REPORT_UNWANTED_TOKEN = "reportUnwantedToken";
   private static final String REPORT_MISSING_TOKEN = "reportMissingToken";
   private static final String SPECIAL_TOKEN_HANDLING_FILEPATH = "SpecialTokenHandling.properties";
-  private static final LinkedHashMap<String, String> SPECIAL_TOKEN_HANDLING_MAP;
+  private static Map<String, String> specialTokenHandlingMap;
   private static final String MSG_DELIMITER = ", ";
   private static final String MSG_PREFIX = "{";
   private static final String MSG_SUFFIX = "}";
 
   static {
-    Properties props = new Properties();
-    try (InputStream ins =
-        CobolErrorStrategy.class.getResourceAsStream(SPECIAL_TOKEN_HANDLING_FILEPATH)) {
-      props.load(ins);
-    } catch (IOException exception) {
+    try {
+      specialTokenHandlingMap =
+          Files.readAllLines(
+                  Paths.get(
+                      Objects.requireNonNull(
+                              CobolErrorStrategy.class.getResource(SPECIAL_TOKEN_HANDLING_FILEPATH))
+                          .toURI()))
+              .stream()
+              .filter(it -> !it.isEmpty())
+              .filter(it -> !it.startsWith("#"))
+              .collect(
+                  Collectors.toMap(
+                      it -> it.substring(0, it.indexOf('=')),
+                      it -> it.substring(it.indexOf('=') + 1),
+                      (u, v) -> {
+                        throw new IllegalStateException(String.format("Duplicate key %s", u));
+                      },
+                      LinkedHashMap::new));
+
+    } catch (IOException | URISyntaxException exception) {
       LOG.error("SpecialTokenHandling didn't load.", exception);
-      props.setProperty("_", "-");
+      specialTokenHandlingMap = ImmutableMap.of("_", "-");
     }
-    SPECIAL_TOKEN_HANDLING_MAP =
-        props.entrySet().stream()
-            .collect(
-                Collectors.toMap(
-                    ele -> (String) ele.getKey(),
-                    ele -> (String) ele.getValue(),
-                    (a, b) -> b,
-                    LinkedHashMap::new));
   }
 
   private MessageService messageService;
@@ -111,7 +121,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
             .map(exp -> exp.toString(recognizer.getVocabulary()))
             .orElse("");
 
-    for (Map.Entry<String, String> entry : SPECIAL_TOKEN_HANDLING_MAP.entrySet()) {
+    for (Map.Entry<String, String> entry : specialTokenHandlingMap.entrySet()) {
       expectedTokens = expectedTokens.replace(entry.getKey(), entry.getValue());
     }
 
@@ -185,7 +195,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
       msg = messageService.getMessage("ErrorStrategy.endOfFile");
     } else {
       String tokenName =
-          SPECIAL_TOKEN_HANDLING_MAP.getOrDefault(
+          specialTokenHandlingMap.getOrDefault(
               erroneousToken.substring(1, erroneousToken.length() - 1), getTokenErrorDisplay(t));
       msg =
           parseCustomMessage(
