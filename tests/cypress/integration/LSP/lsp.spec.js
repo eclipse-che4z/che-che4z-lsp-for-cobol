@@ -84,6 +84,10 @@ context('This is a LSP spec', () => {
     it(['smoke'], 'Cobol file is recognized by LSP - Cobol type is shown in status bar', () => {
       cy.openFile('USER1.cbl');
       cy.get('.right.area .hasCommand[title="Select Language Mode"]').should('contain.text', 'COBOL');
+      cy.get('div.monaco-editor-hover-content').should(
+        'not.have.text',
+        'The LSP extension for COBOL language server crashed 5 times in the last 3 minutes. The server will not be restarted.',
+      );
     });
   });
 
