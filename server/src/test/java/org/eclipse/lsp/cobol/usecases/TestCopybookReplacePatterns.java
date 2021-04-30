@@ -55,9 +55,9 @@ class TestCopybookReplacePatterns {
 
   private static final String TEXT4 =
       BASE
-          + "5      COPY {~REPL4} REPLACING TRAILING ==ID== BY == IDS ==.\n"
+          + "5      COPY {~REPL4} REPLACING TRAILING ==ID== BY == BY-IDS ==.\n"
           + "8      PROCEDURE DIVISION.\n"
-          + "9          MOVE 0 TO {$TAG_IDS}.";
+          + "9          MOVE 0 TO {$TAG_BY-IDS}.";
 
   private static final String REPL = "0      01 {$*TAG_ID}        PIC 9.\n";
   private static final String REPL_NAME = "REPL";
@@ -68,7 +68,7 @@ class TestCopybookReplacePatterns {
   private static final String REPL3 = "0      01 {$*TAG_ID^ACC_ID}        PIC 9.\n";
   private static final String REPL3_NAME = "REPL3";
 
-  private static final String REPL4 = "0      01 {$*TAG_ID^TAG_IDS}        PIC 9.\n";
+  private static final String REPL4 = "0      01 {$*TAG_ID^TAG_BY-IDS}        PIC 9.\n";
   private static final String REPL4_NAME = "REPL4";
 
   @Test

@@ -56,6 +56,9 @@ public class ReplacingServiceImpl implements ReplacingService {
   private static final Pattern FUNCTION_IDENTIFIER =
       Pattern.compile("\\s*function\\s+\\w+\\([^)]*+\\)", Pattern.CASE_INSENSITIVE);
 
+  private static final Pattern PSEUDO_TEXT_PATTERN = Pattern.compile("(?s)(?i)(.*?)\\s+BY\\s+(.*)");
+  private static final String EMPTY_PSEUDO_TEXT = "====";
+
   private static final String ERROR_REPLACING = "Error replacing on text: %s with the pattern: %s";
   private static final int INDIVIDUAL_WORD_VALID_LENGTH = 322;
 
@@ -138,7 +141,9 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   @NonNull
   private String[] retrievePattern(@NonNull String clause) {
-    return clause.split("(?i)BY");
+    Matcher matcher = PSEUDO_TEXT_PATTERN.matcher(clause);
+    if (matcher.find()) return new String[] {matcher.group(1), matcher.group(2)};
+    return new String[] {EMPTY_PSEUDO_TEXT};
   }
 
   private boolean isPatternCorrect(@NonNull String[] pattern) {
