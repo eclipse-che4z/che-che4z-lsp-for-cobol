@@ -25,15 +25,13 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStreamReader;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
@@ -46,32 +44,28 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
   private static final String REPORT_UNWANTED_TOKEN = "reportUnwantedToken";
   private static final String REPORT_MISSING_TOKEN = "reportMissingToken";
   private static final String SPECIAL_TOKEN_HANDLING_FILEPATH = "SpecialTokenHandling.properties";
-  private static Map<String, String> specialTokenHandlingMap;
   private static final String MSG_DELIMITER = ", ";
   private static final String MSG_PREFIX = "{";
   private static final String MSG_SUFFIX = "}";
+  private static Map<String, String> specialTokenHandlingMap;
 
   static {
-    try {
-      specialTokenHandlingMap =
-          Files.readAllLines(
-                  Paths.get(
-                      Objects.requireNonNull(
-                              CobolErrorStrategy.class.getResource(SPECIAL_TOKEN_HANDLING_FILEPATH))
-                          .toURI()))
-              .stream()
-              .filter(it -> !it.isEmpty())
-              .filter(it -> !it.startsWith("#"))
-              .collect(
-                  Collectors.toMap(
-                      it -> it.substring(0, it.indexOf('=')),
-                      it -> it.substring(it.indexOf('=') + 1),
-                      (u, v) -> {
-                        throw new IllegalStateException(String.format("Duplicate key %s", u));
-                      },
-                      LinkedHashMap::new));
-
-    } catch (IOException | URISyntaxException exception) {
+    specialTokenHandlingMap = new LinkedHashMap<>();
+    try (BufferedReader br =
+        new BufferedReader(
+            new InputStreamReader(
+                Objects.requireNonNull(
+                    CobolErrorStrategy.class.getResourceAsStream(
+                        SPECIAL_TOKEN_HANDLING_FILEPATH))))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        if (!(line.isEmpty() || line.startsWith("#"))) {
+          int splitIndex = line.indexOf('=');
+          specialTokenHandlingMap.put(
+              line.substring(0, splitIndex), line.substring(splitIndex + 1));
+        }
+      }
+    } catch (IOException exception) {
       LOG.error("SpecialTokenHandling didn't load.", exception);
       specialTokenHandlingMap = ImmutableMap.of("_", "-");
     }
