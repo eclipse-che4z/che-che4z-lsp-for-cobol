@@ -989,10 +989,26 @@ statement
    ;
 
 idmsStatements
-    : copyIdmsBinds | copyIdmsModule | abendCodeStatement | attachTaskCodeStatement | bindStatement | changePriorityStatement | checkTerminalStatement | commitStatement |
+    : idmsStmtsOptTerm endClause? | idmsStmtsOptTermOn endClause? idmsOnClause? | idmsStmtsMandTermOn (SEMICOLON_FS idmsOnClause? | DOT_FS)
+    ;
+
+idmsStmtsOptTerm
+    : copyIdmsBinds | copyIdmsModule
+    ;
+
+idmsStmtsOptTermOn
+    : abendCodeStatement | attachTaskCodeStatement | bindStatement | changePriorityStatement | checkTerminalStatement | commitStatement |
      connectStatement | dcStatement | dequeueStatement | disconnectStatement | endStatement | endpageStatement | enqueueStatement | eraseStatement | findStatement |
      finishStatement | freeStatement | getStatement | inquireMapStatement | keepStatement | loadStatement | mapStatement | modifyStatement | obtainStatement |
-     postStatement | putStatement | readyStatement |rollbackStatement | snapStatement | startpageStatement | storeStatement | transferStatement | waitStatement
+     postStatement | putStatement | readyStatement |rollbackStatement | snapStatement | startpageStatement | storeStatement | waitStatement
+    ;
+
+idmsStmtsMandTermOn
+    : transferStatement
+    ;
+
+idmsOnClause
+    : ON generalIdentifier
     ;
 
 // abend code statement
@@ -1012,7 +1028,7 @@ abendCodeExitClause
 // accept statement
 
 acceptStatement
-   : ACCEPT (acceptIdmsDcClause | acceptIdmsDbClause |
+   : ACCEPT (acceptIdmsDcClause idmsOnClause? | acceptIdmsDbClause idmsOnClause? |
    (generalIdentifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?))
    ;
 
@@ -1351,7 +1367,11 @@ dcEventClause
 // delete statement
 
 deleteStatement
-   : DELETE (deleteFilenameClause | deleteQueueClause | deleteScratchClause | deleteTableClause)
+   : DELETE (deleteFilenameClause | deleteIdmsDCStatement idmsOnClause?)
+   ;
+
+deleteIdmsDCStatement
+   : deleteQueueClause | deleteScratchClause | deleteTableClause
    ;
 
 deleteFilenameClause
@@ -2273,7 +2293,11 @@ putRecordClause
 // read statement
 
 readStatement
-   : READ (readFilenameClause | readLineFromTerminalClause | readTerminalClause)
+   : READ (readFilenameClause | readIdmsDcStatement idmsOnClause?)
+   ;
+
+readIdmsDcStatement
+   : readLineFromTerminalClause | readTerminalClause
    ;
 
 readFilenameClause
@@ -2365,7 +2389,7 @@ releaseStatement
 // return statement
 
 returnStatement
-   : RETURN (cobolReturn | idmsReturn)
+   : RETURN (cobolReturn | idmsReturn idmsOnClause?)
    ;
 
 cobolReturn
@@ -2463,8 +2487,11 @@ sendIdmsToClause
 // set statement
 
 setStatement
-   : SET (setToOnOff+ | setToBoolean | setToStatement | setUpDownByStatement | setToEntry
-   | setAbendExitStatement | setTimerStatement)
+   : SET (setToOnOff+ | setToBoolean | setToStatement | setUpDownByStatement | setToEntry | setIdmsDcStatement idmsOnClause?)
+   ;
+
+setIdmsDcStatement
+   : setAbendExitStatement | setTimerStatement
    ;
 
 setToStatement
@@ -2710,7 +2737,7 @@ terminateStatement
 // transfer statement
 
 transferStatement
-   : TRANSFER CONTROL? TO? (generalIdentifier | idms_program_name) (RETURN | LINK | NORETURN | XCTL)? (USING generalIdentifier+)? endClause
+   : TRANSFER CONTROL? TO? (generalIdentifier | idms_program_name) (RETURN | LINK | NORETURN | XCTL)? (USING generalIdentifier+)?
    ;
 
 // unstring statement
@@ -2794,8 +2821,12 @@ waitEventListClause
 // write statement
 
 writeStatement
-   : WRITE (writeStatementClause | writeJournalClause | writeLineClause | writeLogClause | writePrinterClause | writeTerminalClause | writeThenReadClause)
-   ;
+  : WRITE (writeStatementClause | writeIdmsDCStatement idmsOnClause?)
+  ;
+
+writeIdmsDCStatement
+    : writeJournalClause | writeLineClause | writeLogClause | writePrinterClause | writeTerminalClause | writeThenReadClause
+    ;
 
 writeStatementClause
    : recordName writeFromPhrase? writeAdvancingPhrase? writeAtEndOfPagePhrase? writeNotAtEndOfPagePhrase? invalidKeyPhrase? notInvalidKeyPhrase? END_WRITE?

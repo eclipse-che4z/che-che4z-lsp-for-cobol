@@ -17,7 +17,10 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,6 +29,8 @@ import java.util.stream.Stream;
 
 /** Test IDMS TRANSFER DML statement */
 public class TestIdmsTransferStatement {
+
+  private static final String MESSAGE_1 = "Syntax error on 'DISPLAY' expected {'.', SEMICOLON-FS}";
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -36,6 +41,8 @@ public class TestIdmsTransferStatement {
           + "        01 {$*WK1} PIC X(8).\r\n"
           + "        01 {$*WK2} PIC X(8).\r\n"
           + "        01 {$*WK3} PIC X(8).\r\n"
+          + "        01 {$*ERROR-STATUS} PIC X(4) VALUE '1400'.\n"
+          + "           88 {$*ANY-ERROR-STATUS} VALUE '0001' THRU '9999'.\n"
           + "        PROCEDURE DIVISION. \r\n";
 
   private static final String TRANSFER = "            TRANSFER CONTROL TO 'TSTPROG'.\r\n";
@@ -51,19 +58,34 @@ public class TestIdmsTransferStatement {
   private static final String TRANSFER_ALL =
       "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1};\r\n";
 
+  private static final String TRANSFER_NO_TERM =
+      "           TRANSFER CONTROL TO 'TSTPROG' LINK {DISPLAY|1} 'ERROR'.\r\n";
+
+  private static final String TRANSFER_ON =
+      "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1};\r\n"
+          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'TRANSFER ERROR'.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + TRANSFER,
         BOILERPLATE + TRANSFER_PARMS,
         BOILERPLATE + TRANSFER_PARMS2,
         BOILERPLATE + TRANSFER_USING_PARMS,
-        BOILERPLATE + TRANSFER_ALL);
+        BOILERPLATE + TRANSFER_ALL,
+        BOILERPLATE + TRANSFER_NO_TERM,
+        BOILERPLATE + TRANSFER_ON);
   }
 
   @ParameterizedTest
   @MethodSource("textsToTest")
-  @DisplayName("Parameterized - IDMS read tests")
+  @DisplayName("Parameterized - IDMS transfer tests")
   void test(String text) {
-    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null, MESSAGE_1, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
   }
 }

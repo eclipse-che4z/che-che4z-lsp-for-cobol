@@ -38,6 +38,8 @@ class TestIdmsSetStatement {
           + "        01 {$*WK_AREA1} PIC X(8).\n"
           + "        01 {$*WK_TASK} PIC X(8).\n"
           + "        01 {$*WK_LENGTH} PIC X(8).\n"
+          + "        01 {$*ERROR-STATUS} PIC X(4) VALUE '1400'.\n"
+          + "           88 {$*ANY-ERROR-STATUS} VALUE '0001' THRU '9999'.\n"
           + "        PROCEDURE DIVISION.\n";
 
   private static final String SET_ABEND_LIT = DEFS + "           SET ABEND EXIT PROGRAM 'TSTPROG'.";
@@ -77,6 +79,15 @@ class TestIdmsSetStatement {
           + "           SET TIMER START INTERVAL {$WK_INT} TASK CODE {$WK_TASK}\r\n"
           + "           TIMER ID {$WK_TIMER} DATA FROM {$WK_AREA1} LENGTH 10.";
 
+  private static final String SET_ABEND_ON =
+      DEFS
+          + "           SET ABEND EXIT PROGRAM 'TSTPROG'\r\n"
+          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'SET ERROR'.\r\n";
+  private static final String SET_TIMER_ON =
+      DEFS
+          + "           SET TIMER POST INTERVAL 10 EVENT {$WK_EVENT} TIMER ID {$WK_TIMER} \r\n"
+          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'SET ERROR'.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         SET_ABEND_LIT,
@@ -87,7 +98,9 @@ class TestIdmsSetStatement {
         SET_TIMER_POST_ALL_CLAUSES,
         SET_TIMER_START_LIT,
         SET_TIMER_START_LIT_NO_PRIORITY,
-        SET_TIMER_START_VARIABLE_NO_PRIORITY);
+        SET_TIMER_START_VARIABLE_NO_PRIORITY,
+        SET_ABEND_ON,
+        SET_TIMER_ON);
   }
 
   @ParameterizedTest
