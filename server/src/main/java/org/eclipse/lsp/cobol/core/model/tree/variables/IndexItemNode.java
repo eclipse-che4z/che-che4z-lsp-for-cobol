@@ -12,32 +12,29 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree;
+package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.ToString;
-import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 
 import java.util.List;
 
-/** The class represents program ID. */
-@ToString(callSuper = true)
+/**
+ * This value class represents an Index item. It is defined using INDEXED BY statement in a {@link
+ * TableDataNameNode} declaration.
+ */
 @Getter
-public class ProgramIdNode extends Node {
-  String programId;
-
-  public ProgramIdNode(Locality locality, String programId) {
-    super(locality, NodeType.PROGRAM_ID);
-    this.programId = programId;
+@ToString(callSuper = true)
+public class IndexItemNode extends VariableWithLevelNode {
+  protected IndexItemNode(Locality location, int level, String name) {
+    super(location, level, name, VariableType.INDEX_ITEM);
   }
 
   @Override
   public List<SyntaxError> process() {
-    getNearestParentByType(NodeType.PROGRAM)
-        .map(ProgramNode.class::cast)
-        .ifPresent(it -> it.setProgramName(programId));
     return ImmutableList.of();
   }
 }

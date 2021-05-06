@@ -161,17 +161,17 @@ class TestOutlineTree {
                             NodeType.SECTION,
                             nested(
                                 node("COPY BAR", NodeType.COPYBOOK),
-                                node("User-Num1", NodeType.FIELD),
-                                node("User-Num2", NodeType.FIELD),
+                                node("USER-NUM1", NodeType.FIELD),
+                                node("USER-NUM2", NodeType.FIELD),
                                 node(
-                                    "User-Address",
+                                    "USER-ADDRESS",
                                     NodeType.STRUCT,
                                     nested(
                                         node("COPY BAZ", NodeType.COPYBOOK),
-                                        node("User-City", NodeType.FIELD),
-                                        node("User-Country", NodeType.FIELD),
-                                        node("User-Index", NodeType.FIELD),
-                                        node("User-Phone", NodeType.FIELD))),
+                                        node("USER-CITY", NodeType.FIELD),
+                                        node("USER-COUNTRY", NodeType.FIELD),
+                                        node("USER-INDEX", NodeType.FIELD),
+                                        node("USER-PHONE", NodeType.FIELD))),
                                 node(
                                     "FILLER",
                                     NodeType.STRUCT,

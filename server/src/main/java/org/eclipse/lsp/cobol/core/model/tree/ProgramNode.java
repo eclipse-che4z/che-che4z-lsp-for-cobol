@@ -22,8 +22,9 @@ import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
+import org.eclipse.lsp.cobol.core.model.variables.NodeConverter;
 import org.eclipse.lsp.cobol.core.model.variables.Variable;
-import org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate;
 import org.eclipse.lsp.cobol.core.visitor.VariableUsageDelegate;
 
 import java.util.*;
@@ -37,10 +38,10 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.STATEMENT;
 @ToString(callSuper = true)
 @Getter
 public class ProgramNode extends Node {
-  private VariableDefinitionDelegate variableDefinitionDelegate;
   private VariableUsageDelegate variableUsageDelegate;
   private String programName;
-  private Collection<Variable> definedVariables;
+  private Collection<Variable> definedVariables = new ArrayList<>();
+  private NodeConverter nodeConverter = new NodeConverter();
 
   /**
    * Use for testing.
@@ -54,12 +55,7 @@ public class ProgramNode extends Node {
   public ProgramNode(
       Locality locality, Map<Token, Locality> positionMapping, MessageService messageService) {
     super(locality, PROGRAM);
-    variableDefinitionDelegate = new VariableDefinitionDelegate(positionMapping, messageService);
     variableUsageDelegate = new VariableUsageDelegate(positionMapping, messageService);
-  }
-
-  public VariableDefinitionDelegate getVariableDefinitionDelegate() {
-    return variableDefinitionDelegate;
   }
 
   public VariableUsageDelegate getVariableUsageDelegate() {
@@ -75,9 +71,8 @@ public class ProgramNode extends Node {
   }
 
   @Override
-  public List<SyntaxError> getErrors() {
-    List<SyntaxError> errors = new ArrayList<>();
-    definedVariables = variableDefinitionDelegate.finishDefinitionAnalysis().unwrap(errors::addAll);
+  public List<SyntaxError> process() {
+    List<SyntaxError> errors = super.process();
     Set<String> variableNames = definedVariables.stream().map(Variable::getName).collect(toSet());
 
     List<Variable> availableVariables = new ArrayList<>(definedVariables);
@@ -94,6 +89,15 @@ public class ProgramNode extends Node {
 
   public Collection<Variable> getDefinedVariables() {
     return definedVariables;
+  }
+
+  /**
+   * Add the variable definition to that program context.
+   *
+   * @param node the variable definition node
+   */
+  public void addVariableDefinition(VariableNode node) {
+    definedVariables.add(nodeConverter.convertVariable(node));
   }
 
   private List<Variable> getGlobalVariables() {
@@ -113,7 +117,7 @@ public class ProgramNode extends Node {
 
   private List<SyntaxError> validateStatements(Map<Locality, Variable> variables) {
     return getDepthFirstStream()
-        .filter(it -> it.getNodeType() == STATEMENT)
+        .filter(hasType(STATEMENT))
         .map(StatementNode.class::cast)
         .map(it -> it.validate(variables))
         .flatMap(Collection::stream)

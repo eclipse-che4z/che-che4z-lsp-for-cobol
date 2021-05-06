@@ -12,15 +12,18 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree;
+package org.eclipse.lsp.cobol.core.model.tree.variables;
 
-import lombok.ToString;
-import org.eclipse.lsp.cobol.core.model.Locality;
+import lombok.Value;
 
-/** The class represents section in COBOL. */
-@ToString(callSuper = true)
-public class SectionNode extends Node {
-  public SectionNode(Locality locality) {
-    super(locality, NodeType.SECTION);
-  }
+/**
+ * The class represents value interval in COBOL.
+ * Examples:
+ *   88 SOME values 4. => [from: 4, to: null]
+ *   88 high-school values are 10 through 12. => [from: 10, to: 12]
+ */
+@Value
+public class ValueInterval {
+  String from;
+  String to;
 }

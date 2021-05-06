@@ -39,7 +39,7 @@ class TestRenamesThruNotExists {
           + "          02 {$*VARNAME2} PIC 9.\n"
           + "       66 {$*VARNAME3|1} RENAMES {$VARNAME2} THRU NOT-EXISTS.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           MOVE 0 TO {$VARNAME2} OF {$VARNAME3}.\n";
+          + "           MOVE {$VARNAME2} TO {$VARNAME3}.\n";
 
   @Test
   void test() {

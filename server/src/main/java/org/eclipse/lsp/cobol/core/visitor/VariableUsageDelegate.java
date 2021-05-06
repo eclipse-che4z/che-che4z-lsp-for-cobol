@@ -61,17 +61,6 @@ public class VariableUsageDelegate {
    *
    * @param dataName the variable name
    * @param locality the variable text position
-   */
-  public void handleSqlValue(String dataName, Locality locality) {
-    variableUsages.add(
-        new VariableUsage(dataName, Collections.emptyList(), locality, Collections.emptyMap()));
-  }
-
-  /**
-   * Accumulate variable appearance for analise its definition later.
-   *
-   * @param dataName the variable name
-   * @param locality the variable text position
    * @param ctx the ANTLR variable context
    */
   public void handleConditionCall(String dataName, Locality locality, ConditionNameReferenceContext ctx) {
@@ -86,9 +75,10 @@ public class VariableUsageDelegate {
    *
    * @param dataName the variable name
    * @param locality the variable text position
+   * @param parents the list of variable parents
    */
-  public void handleTableCall(String dataName, Locality locality) {
-    variableUsages.add(new VariableUsage(dataName, Collections.emptyList(), locality, Collections.emptyMap()));
+  public void handleGeneralCall(String dataName, Locality locality, List<String> parents) {
+    variableUsages.add(new VariableUsage(dataName, parents, locality, Collections.emptyMap()));
   }
 
   /**

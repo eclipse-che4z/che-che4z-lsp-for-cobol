@@ -20,7 +20,7 @@ import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
 import static org.eclipse.lsp.cobol.core.model.variables.StructureType.GROUP_ITEM;
-import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVEL_01;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_01;
 
 /**
  * This value class represents a group item COBOL variable. Group elements can have nested

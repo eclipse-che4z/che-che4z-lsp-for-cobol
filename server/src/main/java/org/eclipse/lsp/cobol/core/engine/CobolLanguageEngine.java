@@ -146,8 +146,7 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
     if (syntaxTree.size() == 1) {
       timingBuilder.getSyntaxTreeTimer().start();
       Node rootNode = syntaxTree.get(0);
-      SyntaxTreeEngine syntaxTreeEngine = new SyntaxTreeEngine(rootNode);
-      accumulatedErrors.addAll(syntaxTreeEngine.processTree());
+      accumulatedErrors.addAll(rootNode.process());
       // This is a temporal solution only for compatibility
       // Definitions, usages and variables are set here for "Go to definition" feature and others
       List<Variable> definedVariables =

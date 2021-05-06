@@ -33,8 +33,8 @@ public class TestVariableRedefineLevel {
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*WS-DATA-A} PIC X(20) .\n"
-          + "       {77|1} {$*WS-DATA-B} REDEFINES {$WS-DATA-A} PIC X(20).\n"
+          + "       77 {$*WS-DATA-A} PIC X(20) .\n"
+          + "       {01|1} {$*WS-DATA-B} REDEFINES {$WS-DATA-A} PIC X(20).\n"
           + "       PROCEDURE DIVISION.\n";
 
   private static final String TEXT_LEVEL_5 =
@@ -45,19 +45,7 @@ public class TestVariableRedefineLevel {
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*WS-DATA-A}.\n"
           + "             05 {$*WS-DATA} PIC X(20).\n"
-          + "             {10|1} {$*WS-DATA-RED} REDEFINES {$WS-DATA} PIC X(20).\n"
-          + "       PROCEDURE DIVISION.\n";
-
-  private static final String TEXT_COMPLEX =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. PERFTIMI.\n"
-          + "       ENVIRONMENT DIVISION.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "       01  {$*ABD1}.\n"
-          + "           05  FILLER PIC X(12).\n"
-          + "       {02|1}  {$*ABD2}  REDEFINES {$ABD1}.\n"
-          + "           05  FILLER PIC X(12).\n"
+          + "             {04|1} {$*WS-DATA-RED} REDEFINES {$WS-DATA} PIC X(20).\n"
           + "       PROCEDURE DIVISION.\n";
 
 
@@ -85,20 +73,6 @@ public class TestVariableRedefineLevel {
             new Diagnostic(
                 null,
                 "The redefining and redefined items must have the same level: WS-DATA",
-                DiagnosticSeverity.Error,
-                ERROR.getText())));
-  }
-
-  @Test
-  void testComplex() {
-    UseCaseEngine.runTest(
-        TEXT_COMPLEX,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null,
-                "The redefining and redefined items must have the same level: ABD1",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
   }

@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
 import static org.eclipse.lsp.cobol.core.model.variables.StructureType.INDEPENDENT_ITEM;
-import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVEL_77;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_77;
 
 /**
  * This value class represents an independent element item COBOL variable, that has a level number
