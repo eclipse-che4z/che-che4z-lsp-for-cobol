@@ -99,7 +99,7 @@ describe("Check plugin extension for cobol starts successfully.", () => {
 
     test("extension reruns extended API surface", async() => {
         const extendedApi = await activate(context);
-        extendedApi.analysis("test");
+        extendedApi.analysis("test", "text");
         expect(LanguageClientService.prototype.retrieveAnalysis).toBeCalledTimes(1);
     })
 });

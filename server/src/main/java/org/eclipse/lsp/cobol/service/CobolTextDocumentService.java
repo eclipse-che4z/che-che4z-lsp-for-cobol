@@ -267,6 +267,11 @@ public class CobolTextDocumentService
   public CompletableFuture<ExtendedApiResult> analysis(@NonNull JsonObject json) {
     AnalysisResultEvent event = new Gson().fromJson(json.toString(), AnalysisResultEvent.class);
     String uri = Optional.ofNullable(event).map(AnalysisResultEvent::getUri).orElse("");
+    cfAstMap.computeIfAbsent(uri, (a) -> {
+      analyzeDocumentFirstTime(event.getUri(), event.getText(), false);
+      return new CompletableFuture<>();
+    });
+
     return cfAstMap
             .get(uri).thenApply(cfastBuilder::build)
             .whenComplete(

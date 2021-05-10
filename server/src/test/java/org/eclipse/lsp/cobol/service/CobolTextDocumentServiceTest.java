@@ -328,6 +328,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
     JsonObject json = new JsonObject();
     json.add("uri", new JsonPrimitive(UseCaseUtils.DOCUMENT_URI));
+    json.add("text", new JsonPrimitive(TEXT_EXAMPLE));
 
     ExtendedApiResult result = service.analysis(json).get();
     assertNotNull(result);
