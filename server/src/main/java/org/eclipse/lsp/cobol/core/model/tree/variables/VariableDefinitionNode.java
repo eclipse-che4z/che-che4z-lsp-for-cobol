@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import com.google.common.collect.ImmutableList;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -39,6 +40,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  */
 @Getter
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public final class VariableDefinitionNode extends Node {
   private int level;
   private VariableNameAndLocality variableName;
@@ -46,18 +48,21 @@ public final class VariableDefinitionNode extends Node {
   private List<String> picClauses;
   private List<OccursClause> occursClauses;
   private List<ValueClause> valueClauses;
-  private List<UsageFormat> usageClauses;
+  @Setter private List<UsageFormat> usageClauses;
   private List<VariableNameAndLocality> redefinesClauses;
   private VariableNameAndLocality renamesClause;
   private VariableNameAndLocality renamesThruClause;
   private String systemName;
   private Locality levelLocality;
+  private boolean isBlankWhenZeroPresent;
+  private boolean isSignClausePresent;
 
   private VariableDefinitionNode(Locality location, int level, VariableNameAndLocality variableName, boolean global,
                                  List<String> picClauses, List<OccursClause> occursClauses,
                                  List<ValueClause> valueClauses, List<UsageFormat> usageClauses,
                                  List<VariableNameAndLocality> redefinesClauses, VariableNameAndLocality renamesClause,
-                                 VariableNameAndLocality renamesThruClause, String systemName, Locality levelLocality) {
+                                 VariableNameAndLocality renamesThruClause, String systemName, Locality levelLocality,
+                                 boolean isBlankWhenZeroPresent, boolean isSignClausePresent) {
     super(location, NodeType.VARIABLE_DEFINITION);
     this.level = level;
     this.variableName = variableName;
@@ -71,6 +76,8 @@ public final class VariableDefinitionNode extends Node {
     this.renamesThruClause = renamesThruClause;
     this.systemName = systemName;
     this.levelLocality = levelLocality;
+    this.isBlankWhenZeroPresent = isBlankWhenZeroPresent;
+    this.isSignClausePresent = isSignClausePresent;
   }
 
   /**
@@ -208,7 +215,7 @@ public final class VariableDefinitionNode extends Node {
    * @return true if the variable definition doesn't have usage clause
    */
   public boolean doesntHaveUsage() {
-    return usageClauses.isEmpty();
+    return usageClauses.isEmpty() || usageClauses.contains(UsageFormat.UNDEFINED);
   }
 
   /**
@@ -249,7 +256,7 @@ public final class VariableDefinitionNode extends Node {
   }
 
   private static SyntaxError checkClauseIsSingle(VariableNode variableNode,
-                                                 Supplier<List> clausesGetter,
+                                                 Supplier<List<?>> clausesGetter,
                                                  String clauseName) {
     if (clausesGetter.get().size() > 1)
       return variableNode.getError(MessageTemplate.of(TOO_MANY_CLAUSES_MSG, clauseName));
@@ -284,6 +291,8 @@ public final class VariableDefinitionNode extends Node {
     Locality locality;
     String systemName;
     Locality levelLocality;
+    boolean blankWhenZero;
+    boolean signClause;
 
     private Builder() {
     }
@@ -295,7 +304,8 @@ public final class VariableDefinitionNode extends Node {
      */
     public VariableDefinitionNode build() {
       return new VariableDefinitionNode(locality, level, variableName, global, picClauses, occursClauses,
-          valueClauses, usageClauses, redefinesClauses, renamesClause, renamesThruClause, systemName, levelLocality);
+          valueClauses, usageClauses, redefinesClauses, renamesClause, renamesThruClause, systemName, levelLocality,
+              blankWhenZero, signClause);
     }
   }
 }

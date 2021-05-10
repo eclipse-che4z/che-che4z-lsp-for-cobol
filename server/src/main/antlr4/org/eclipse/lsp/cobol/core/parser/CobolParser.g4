@@ -690,24 +690,26 @@ dataDescriptionEntry
    ;
 
 dataDescriptionEntryFormat1
-   : LEVEL_NUMBER entryName? (dataGroupUsageClause | dataRedefinesClause | dataIntegerStringClause
-   | dataExternalClause | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataPictureClause
-   | dataCommonOwnLocalClause | dataTypeClause | dataUsingClause | dataUsageClause | dataValueClause
-   | dataReceivedByClause | dataOccursClause | dataSignClause | dataSynchronizedClause | dataJustifiedClause
-   | dataBlankWhenZeroClause | dataWithLowerBoundsClause | dataAlignedClause | dataRecordAreaClause)* (DOT_FS|DOT_FS2)
+   : LEVEL_NUMBER entryName? (dataGroupUsageClause | dataRedefinesClause | dataExternalClause
+   | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
+   | dataOccursClause | dataSignClause | dataSynchronizedClause
+   | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
+   (DOT_FS|DOT_FS2)
    ;
+
 
 dataDescriptionEntryFormat2
    : LEVEL_NUMBER_66 entryName? dataRenamesClause DOT_FS
    ;
 
 dataDescriptionEntryFormat1Level77
-   : LEVEL_NUMBER_77 entryName? (dataPictureClause | dataRedefinesClause | dataIntegerStringClause | dataExternalClause
-   | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataCommonOwnLocalClause | dataTypeClause
-   | dataUsingClause | dataUsageClause | dataValueClause | dataReceivedByClause | dataOccursClause | dataSignClause
-   | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause | dataWithLowerBoundsClause
-   | dataAlignedClause | dataRecordAreaClause)* (DOT_FS|DOT_FS2)
+   : LEVEL_NUMBER_77 entryName? (dataGroupUsageClause | dataRedefinesClause | dataExternalClause
+     | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
+     | dataOccursClause | dataSignClause | dataSynchronizedClause
+     | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
+     (DOT_FS|DOT_FS2)
    ;
+
 
 dataDescriptionEntryFormat3
    : LEVEL_NUMBER_88 entryName? dataValueClause DOT_FS
@@ -718,19 +720,11 @@ entryName
    ;
 
 dataGroupUsageClause
-   : GROUP_USAGE IS? NATIONAL
-   ;
-
-dataAlignedClause
-   : ALIGNED
+   : GROUP_USAGE IS? (NATIONAL | UTF_8)
    ;
 
 dataBlankWhenZeroClause
    : BLANK WHEN? (ZERO | ZEROS | ZEROES)
-   ;
-
-dataCommonOwnLocalClause
-   : COMMON | OWN | LOCAL
    ;
 
 dataExternalClause
@@ -739,10 +733,6 @@ dataExternalClause
 
 dataGlobalClause
    : IS? GLOBAL
-   ;
-
-dataIntegerStringClause
-   : INTEGER | STRING
    ;
 
 dataJustifiedClause
@@ -769,12 +759,12 @@ pictureString
    : charString
    ;
 
-dataReceivedByClause
-   : RECEIVED? BY? (CONTENT | REFERENCE | REF)
+dataDynamicLengthClause
+   : DYNAMIC LENGTH? (LIMIT IS? integerLiteral)?
    ;
 
-dataRecordAreaClause
-   : RECORD AREA
+dataVolatileClause
+   : VOLATILE
    ;
 
 dataRedefinesClause
@@ -795,18 +785,6 @@ dataSignClause
 
 dataSynchronizedClause
    : (SYNCHRONIZED | SYNC) (LEFT | RIGHT)?
-   ;
-
-dataThreadLocalClause
-   : IS? THREAD_LOCAL
-   ;
-
-dataTypeClause
-   : TYPE IS? (SHORT_DATE | LONG_DATE | NUMERIC_DATE | NUMERIC_TIME | LONG_TIME | (CLOB | BLOB | DBCLOB) LPARENCHAR integerLiteral RPARENCHAR)
-   ;
-
-dataTypeDefClause
-   : IS? TYPEDEF
    ;
 
 dataUsageClause
@@ -840,10 +818,6 @@ usageFormat
    | FUNCTION_POINTER
    ;
 
-dataUsingClause
-   : USING (LANGUAGE | CONVENTION) OF? dataName
-   ;
-
 dataValueClause
    : ((VALUE | VALUES) (IS | ARE)?) dataValueClauseLiteral
    ;
@@ -862,10 +836,6 @@ dataValueIntervalFrom
 
 dataValueIntervalTo
    : (THROUGH | THRU) literal
-   ;
-
-dataWithLowerBoundsClause
-   : WITH? LOWER BOUNDS
    ;
 
 dataDescriptionEntryCopyIdms

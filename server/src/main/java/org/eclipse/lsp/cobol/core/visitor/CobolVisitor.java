@@ -485,6 +485,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                 .map(DataRedefinesClauseContext::dataName)
                 .map(this::extractNameAndLocality)
                 .collect(toList()))
+            .blankWhenZero(!ctx.dataBlankWhenZeroClause().isEmpty())
+            .signClause(!ctx.dataSignClause().isEmpty())
             .build(),
         visitChildren(ctx)
     );
@@ -572,6 +574,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                 .map(DataRedefinesClauseContext::dataName)
                 .map(this::extractNameAndLocality)
                 .collect(toList()))
+            .blankWhenZero(!ctx.dataBlankWhenZeroClause().isEmpty())
+            .signClause(!ctx.dataSignClause().isEmpty())
             .build(),
         visitChildren(ctx)
     );
