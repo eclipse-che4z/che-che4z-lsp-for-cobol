@@ -39,7 +39,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.antlr.v4.runtime.CharStreams.fromString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This class applies syntax and semantic analysis for COBOL texts using the actual Language Engine.
@@ -265,22 +264,23 @@ public class UseCaseEngine {
 
   private void assertDiagnostics(
       Map<String, List<Diagnostic>> expected, Map<String, List<Diagnostic>> actual) {
-    String message = "Diagnostics: " + actual.toString();
-    assertEquals(expected.size(), actual.size(), message);
-    assertEquals(
-        expected.values().stream().flatMap(Collection::stream).filter(Objects::nonNull).count(),
-        actual.values().stream().mapToLong(Collection::size).sum(),
-        message);
-    expected.forEach(
-        (key, value) ->
-            actual
-                .get(key)
-                .forEach(
-                    actualDiag ->
-                        assertTrue(
-                            value.contains(actualDiag),
-                            "Diagnostic not found: " + actualDiag.toString())));
+    assertEquals(expected.keySet(), actual.keySet(), "Diagnostic documents are not the same");
+    for (String documentUri: expected.keySet()) {
+      List<Diagnostic> expectedDiagnostic = expected.get(documentUri).stream()
+          .sorted(diagnosticComparator).collect(toList());
+      List<Diagnostic> actualDiagnostic = actual.get(documentUri).stream()
+          .sorted(diagnosticComparator).collect(toList());
+      assertEquals(expectedDiagnostic, actualDiagnostic, "Different diagnostics for: " + documentUri);
+    }
   }
+
+  private Comparator<Position> positionComparator = comparing(Position::getLine).thenComparing(Position::getCharacter);
+
+  private Comparator<Range> rangeComparator = comparing(Range::getStart, positionComparator)
+      .thenComparing(Range::getEnd, positionComparator);
+
+  private Comparator<Diagnostic> diagnosticComparator = comparing(Diagnostic::getRange, rangeComparator)
+      .thenComparing(Diagnostic::getMessage);
 
   private void assertResult(
       String message, Map<String, List<Location>> expected, Map<String, List<Location>> actual) {

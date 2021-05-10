@@ -36,7 +36,7 @@ public class ProgramEndNode extends Node {
   }
 
   @Override
-  public List<SyntaxError> getErrors() {
+  public List<SyntaxError> process() {
     List<SyntaxError> errors = new ArrayList<>(1);
     getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)

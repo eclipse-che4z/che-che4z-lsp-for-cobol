@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -35,10 +36,10 @@ class NodeTest {
     Node rootNode = new RootNode(LOCALITY);
     Node firstProg = new ProgramNode(LOCALITY);
     Node sectionNode = new SectionNode(LOCALITY);
-    Node definition = new VariableDefinitionNode(LOCALITY);
+    Node definition = VariableDefinitionNode.builder().build();
     Node nestedProg = new ProgramNode(LOCALITY);
     Node secondProg = new ProgramNode(LOCALITY);
-    Node anotherDefinition = new VariableDefinitionNode(LOCALITY);
+    Node anotherDefinition = VariableDefinitionNode.builder().build();
 
     rootNode.addChild(firstProg);
     firstProg.addChild(sectionNode);
@@ -62,7 +63,7 @@ class NodeTest {
     program.addChild(nestedProgram);
     Node section = new SectionNode(LOCALITY);
     nestedProgram.addChild(section);
-    Node definition = new VariableDefinitionNode(LOCALITY);
+    Node definition = VariableDefinitionNode.builder().build();
     section.addChild(definition);
 
     assertFalse(rootNode.getNearestParentByType(NodeType.PROGRAM).isPresent());

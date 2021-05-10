@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.model.variables.StructureType.CONDITION_ITEM;
-import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVEL_88;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_88;
 
 /**
  * This value class represents a conditional data name entry, that has a level number 88. It cannot
