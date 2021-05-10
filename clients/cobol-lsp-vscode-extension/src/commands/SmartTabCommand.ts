@@ -18,6 +18,7 @@ import { PUNCH_CARD } from "../constants";
 
 const SMART_TAB_COMMAND: string = "cobol-lsp.smart-tab";
 const SMART_OUTDENT_COMMAND: string = "cobol-lsp.smart-outdent";
+const TAB_SPACES: number = 4;
 
 /**
  * Class provides bind-to-command binding functionality
@@ -56,10 +57,24 @@ class SmartTabCommandProvider extends SmartCommandProvider {
 
         for (let selection of editor.selections) {
             const position = selection.active;
-
-            const nextPosition = getNextPosition(editor, position.character);
-            const insertSize = nextPosition - position.character;
-            edit.insert(position, ' '.repeat(insertSize));
+            let column = findNextSolidPosition(editor, position);
+            if (column === -1) {
+                column = position.character;
+                const nextPosition = getNextPosition(editor, column);  
+                const lineLen = getCurrentLine(editor, position.line).length;      
+                if (lineLen < nextPosition) {
+                    const insertSize = nextPosition - lineLen;
+                    edit.insert(position, ' '.repeat(insertSize));
+                }                    
+                column = nextPosition;
+            } else {
+                const nextPosition = getNextPosition(editor, column);
+                const insertSize = nextPosition - column;
+                edit.insert(position, ' '.repeat(insertSize));
+                column = nextPosition - insertSize;
+            }
+            const newPosition: vscode.Position = new vscode.Position(position.line, column);
+            newSelections.push(new vscode.Selection(newPosition, newPosition));
         }
         editor.selections = newSelections;
     }
@@ -72,25 +87,60 @@ class SmartOutdentCommandProvider extends SmartCommandProvider {
         for (let selection of editor.selections) {
             const position = selection.active;
     
-            const firstPosition = this.findFirstPosition(editor, position.line);
-            const prevPosition = getPrevPosition(editor, firstPosition);
-
-            edit.delete(new vscode.Range(new vscode.Position(position.line, prevPosition), new vscode.Position(position.line, firstPosition)));
+            let charPosition = this.findSolidCharPosition(editor, position);
+            if (charPosition === 0) {
+                return;
+            }
+            let prevPosition = getPrevPosition(editor, charPosition);
+            if (this.onlySpaces(getCurrentLine(editor, position.line), prevPosition, charPosition)) {
+                edit.delete(new vscode.Range(new vscode.Position(position.line, prevPosition), new vscode.Position(position.line, charPosition)));
+            } else {
+                let prevSolidPosition = this.findPrevSolidPosition(editor, new vscode.Position(position.line, charPosition - 1));
+                let removeSize = Math.max(0, Math.min(charPosition - prevSolidPosition - 1, TAB_SPACES));
+                edit.delete(new vscode.Range(new vscode.Position(position.line, charPosition - removeSize), new vscode.Position(position.line, charPosition)));
+                prevPosition = charPosition - removeSize;
+            }
             const newPosition: vscode.Position = new vscode.Position(position.line, prevPosition);
             newSelections.push(new vscode.Selection(newPosition, newPosition));
         }
         editor.selections = newSelections;    
     }
 
-    private findFirstPosition(editor: vscode.TextEditor, line: number): number {
-        const textLine: vscode.TextLine = editor.document.lineAt(line);
-        const text = textLine.text;
-        for (let i = 0; i < text.length; i++) {
+    private findSolidCharPosition(editor: vscode.TextEditor, position: vscode.Position) {
+        let result = 0;
+        if (this.isCurrentSpace(editor, position)) {
+            result = findNextSolidPosition(editor, position);
+        } else {
+            result = this.findPrevSolidPosition(editor, position);
+        }
+        if (result === -1) {
+            result = position.character;
+        }
+        return result;
+    }
+
+    private onlySpaces(text: string, start: number, end: number): boolean {
+        for (let i = start; i < end; i++) {
+            if (text.charAt(i) !== ' ') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private isCurrentSpace(editor: vscode.TextEditor, position: vscode.Position) {
+        const text = getCurrentLine(editor, position.line)
+        return text.charAt(position.character) == ' ';
+    }
+
+    private findPrevSolidPosition(editor: vscode.TextEditor, position: vscode.Position): number {
+        const text = getCurrentLine(editor, position.line)
+        for (let i = position.character; i >=0; i--) {
             if (text[i] !== ' ') {
                 return i;
             }
         }
-        return text.length - 1;
+        return 0;
     }
 }
 
@@ -101,6 +151,34 @@ class SmartOutdentCommandProvider extends SmartCommandProvider {
 export function initSmartTab(context: vscode.ExtensionContext) {
     new SmartTabCommandProvider(context, SMART_TAB_COMMAND).init();
     new SmartOutdentCommandProvider(context, SMART_OUTDENT_COMMAND).init();
+}
+
+/**
+ * Find first non-space character from the current cursor position
+ * @param editor is a vscode text editor
+ * @param position is a cursor position
+ * @returns a character number with not space symbol
+ */
+function findNextSolidPosition(editor: vscode.TextEditor, position: vscode.Position): number {
+    const text = getCurrentLine(editor, position.line)
+    for (let i = position.character; i < text.length; i++) {
+        if (text[i] !== ' ') {
+            return i;
+        }
+    }
+    return -1;
+}
+
+
+/**
+ * Retrieve text line for the specified line number
+ * @param editor is a vscode text editor
+ * @param line is a line number
+ * @returns a text string for the line number
+ */
+function getCurrentLine(editor: vscode.TextEditor, line: number): string {
+    const textLine: vscode.TextLine = editor.document.lineAt(line);
+    return textLine.text;
 }
 
 /**

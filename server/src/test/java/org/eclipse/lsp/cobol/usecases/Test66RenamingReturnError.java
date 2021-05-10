@@ -32,13 +32,14 @@ class Test66RenamingReturnError {
           + "       PROGRAM-ID. TESTRENAME.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
+          + "       66 {$*VARNAME4|1} RENAMES VARNAME2.\n"
           + "       01 {$*VARNAME1}.\n"
           + "          02 {$*VARNAME2} PIC 9.\n"
           + "       66 {$*VARNAME3} RENAMES {$VARNAME2}.\n"
-          + "       66 {$*VARNAME4|1} RENAMES {VARNAME2}.\n"
+          + "       66 {$*VARNAME5} RENAMES {$VARNAME2}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           MOVE 0 TO {$VARNAME2} OF {$VARNAME3}.\n"
-          + "           MOVE 0 TO {VARNAME2|2} OF VARNAME4.";
+          + "           MOVE {$VARNAME2} TO {$VARNAME3}.\n"
+          + "           MOVE {$VARNAME3} TO {$VARNAME5}.";
 
   @Test
   void test() {
@@ -50,12 +51,6 @@ class Test66RenamingReturnError {
             new Diagnostic(
                 null,
                 "No data definition entry found for rename",
-                DiagnosticSeverity.Error,
-                ERROR.getText()),
-            "2",
-            new Diagnostic(
-                null,
-                "Invalid definition for: VARNAME2",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
   }

@@ -37,9 +37,8 @@ class TestRenamesClause {
           + "            03 {$*VARNAME8} PIC 9.\n"
           + "       66 {$*VARNAME9} RENAMES {$VARNAME5} THRU {$VARNAME8}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           MOVE 0 TO {$VARNAME2} OF {$VARANME3}.\n"
-          + "           MOVE 0 TO {$VARNAME7} OF {$VARNAME9}.\n"
-          + "           MOVE 0 TO {$VARNAME8} OF {$VARNAME9}.\n";
+          + "           MOVE {$VARNAME2} TO {$VARANME3}.\n"
+          + "           MOVE 0 TO {$VARNAME9}.\n";
 
   @Test
   void test() {

@@ -25,7 +25,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.model.variables.StructureType.RENAME_ITEM;
-import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVEL_66;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_66;
 
 /**
  * This value class represents a renaming data name entry, that has a level number 66. It may be one

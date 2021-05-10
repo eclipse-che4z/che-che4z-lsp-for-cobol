@@ -27,6 +27,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.RuleNode;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolParser;
@@ -37,10 +38,11 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.*;
-import org.eclipse.lsp.cobol.core.model.tree.VariableUsageNode.Type;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToOnOffStatement;
+import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetUpDownByStatement;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode.Builder;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.semantics.GroupContext;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
@@ -62,8 +64,9 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.eclipse.lsp.cobol.core.CobolParser.*;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.*;
-import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.*;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode.Type;
 
 /**
  * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
@@ -467,9 +470,24 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     NodeType nodeType = getDataDescriptionNodeType(ctx);
     int level = VisitorHelper.getLevel(ctx.LEVEL_NUMBER());
     outlineTreeBuilder.addVariable(level, name, nodeType, ctx);
-    Node node = new AntlrVariableDefinitionNode(ctx);
-    visitChildren(ctx).forEach(node::addChild);
-    return ImmutableList.of(node);
+    return addTreeNode(
+        VariableDefinitionNode.builder()
+            .level(level)
+            .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER()))
+            .locality(getLocalityRange(ctx).orElse(null))
+            .variableName(extractNameAndLocality(ctx.entryName()))
+            .global(!ctx.dataGlobalClause().isEmpty())
+            .picClauses(VisitorHelper.retrievePicTexts(ctx.dataPictureClause()))
+            .valueClauses(retrieveValues(ctx.dataValueClause()))
+            .usageClauses(VisitorHelper.retrieveUsageFormat(ctx.dataUsageClause()))
+            .occursClauses(retrieveOccursValues(ctx.dataOccursClause()))
+            .redefinesClauses(ctx.dataRedefinesClause().stream()
+                .map(DataRedefinesClauseContext::dataName)
+                .map(this::extractNameAndLocality)
+                .collect(toList()))
+            .build(),
+        visitChildren(ctx)
+    );
   }
 
   private NodeType getDataDescriptionNodeType(DataDescriptionEntryFormat1Context ctx) {
@@ -487,29 +505,51 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitEnvironmentSwitchNameClause(EnvironmentSwitchNameClauseContext ctx) {
+    Locality locality = getLocality(
+        Optional.<ParserRuleContext>ofNullable(ctx.mnemonicName()).orElse(ctx).getStart()).orElse(null);
     String name = ofNullable(ctx.mnemonicName()).map(RuleContext::getText).orElse(FILLER_NAME);
+    String systemName = ctx.environmentName().getText();
     outlineTreeBuilder.addNode(name, NodeType.MNEMONIC_NAME, ctx);
-    Node node = new AntlrVariableDefinitionNode(ctx);
-    visitChildren(ctx).forEach(node::addChild);
-    return ImmutableList.of(node);
+    return addTreeNode(
+        VariableDefinitionNode.builder()
+            .locality(locality)
+            .variableName(new VariableNameAndLocality(name, locality))
+            .systemName(systemName)
+            .build(),
+        visitChildren(ctx));
   }
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat2(DataDescriptionEntryFormat2Context ctx) {
     String name = VisitorHelper.getName(ctx.entryName());
     outlineTreeBuilder.addVariable(LEVEL_66, name, NodeType.FIELD_66, ctx);
-    Node node = new AntlrVariableDefinitionNode(ctx);
-    visitChildren(ctx).forEach(node::addChild);
-    return ImmutableList.of(node);
+    Builder builder = VariableDefinitionNode.builder()
+        .level(LEVEL_66)
+        .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_66()))
+        .variableName(extractNameAndLocality(ctx.entryName()))
+        .locality(getLocalityRange(ctx).orElse(null))
+        .renamesClause(extractNameAndLocality(ctx.dataRenamesClause().dataName()));
+    ofNullable(ctx.dataRenamesClause().thruDataName())
+        .map(ThruDataNameContext::dataName)
+        .map(this::extractNameAndLocality)
+        .ifPresent(builder::renamesThruClause);
+    return addTreeNode(builder.build(), visitChildren(ctx));
   }
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat3(DataDescriptionEntryFormat3Context ctx) {
     String name = VisitorHelper.getName(ctx.entryName());
     outlineTreeBuilder.addVariable(LEVEL_88, name, NodeType.FIELD_88, ctx);
-    Node node = new AntlrVariableDefinitionNode(ctx);
-    visitChildren(ctx).forEach(node::addChild);
-    return ImmutableList.of(node);
+    return addTreeNode(
+        VariableDefinitionNode.builder()
+            .level(LEVEL_88)
+            .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_88()))
+            .variableName(extractNameAndLocality(ctx.entryName()))
+            .locality(getLocalityRange(ctx).orElse(null))
+            .valueClauses(retrieveValues(ImmutableList.of(ctx.dataValueClause())))
+            .build(),
+        visitChildren(ctx)
+    );
   }
 
   @Override
@@ -517,9 +557,24 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       DataDescriptionEntryFormat1Level77Context ctx) {
     String name = VisitorHelper.getName(ctx.entryName());
     outlineTreeBuilder.addVariable(LEVEL_77, name, NodeType.FIELD, ctx);
-    Node node = new AntlrVariableDefinitionNode(ctx);
-    visitChildren(ctx).forEach(node::addChild);
-    return ImmutableList.of(node);
+    return addTreeNode(
+        VariableDefinitionNode.builder()
+            .level(LEVEL_77)
+            .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_77()))
+            .variableName(extractNameAndLocality(ctx.entryName()))
+            .locality(getLocalityRange(ctx).orElse(null))
+            .global(!ctx.dataGlobalClause().isEmpty())
+            .picClauses(VisitorHelper.retrievePicTexts(ctx.dataPictureClause()))
+            .valueClauses(retrieveValues(ctx.dataValueClause()))
+            .usageClauses(VisitorHelper.retrieveUsageFormat(ctx.dataUsageClause()))
+            .occursClauses(retrieveOccursValues(ctx.dataOccursClause()))
+            .redefinesClauses(ctx.dataRedefinesClause().stream()
+                .map(DataRedefinesClauseContext::dataName)
+                .map(this::extractNameAndLocality)
+                .collect(toList()))
+            .build(),
+        visitChildren(ctx)
+    );
   }
 
   @Override
@@ -862,9 +917,68 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .orElse(children);
   }
 
+  private List<Node> addTreeNode(Node node, List<Node> children) {
+    if (node.getLocality() == null) return children;
+    children.forEach(node::addChild);
+    return ImmutableList.of(node);
+  }
+
   private String getIntervalText(ParserRuleContext ctx) {
     final int start = ctx.start.getStartIndex();
     final int stop = ctx.stop.getStopIndex();
     return ctx.start.getInputStream().getText(new Interval(start, stop));
+  }
+
+  // TODO: Add check that name does not present in the predefined variables list (? - to check)
+  private VariableNameAndLocality extractNameAndLocality(EntryNameContext context) {
+    if (context == null || context.dataName() == null) return null;
+    return extractNameAndLocality(context.dataName());
+  }
+
+  private VariableNameAndLocality extractNameAndLocality(DataNameContext context) {
+    return extractNameAndLocality(context.cobolWord());
+  }
+
+  private VariableNameAndLocality extractNameAndLocality(CobolWordContext context) {
+    return new VariableNameAndLocality(
+        VisitorHelper.getName(context),
+        getLocalityRange(context).orElse(null)
+    );
+  }
+
+  private List<OccursClause> retrieveOccursValues(List<DataOccursClauseContext> contexts) {
+    //TODO: Process OCCURS DEPENDING ON
+    return contexts.stream()
+        .map(context -> new OccursClause(
+            VisitorHelper.getInteger(context.integerLiteral()),
+            ofNullable(context.dataOccursTo())
+                .map(DataOccursToContext::integerLiteral)
+                .map(VisitorHelper::getInteger)
+                .orElse(null),
+            ofNullable(context.indexName())
+                .orElseGet(ImmutableList::of)
+                .stream()
+                .map(IndexNameContext::cobolWord)
+                .map(this::extractNameAndLocality)
+                .collect(toList())
+        ))
+        .collect(toList());
+  }
+
+  private List<ValueClause> retrieveValues(List<DataValueClauseContext> clauses) {
+    return clauses.stream()
+        .map(this::retrieveValue)
+        .collect(toList());
+  }
+
+  private ValueClause retrieveValue(DataValueClauseContext context) {
+    return new ValueClause(
+        VisitorHelper.retrieveValueIntervals(context.dataValueClauseLiteral().dataValueInterval()),
+        positionMapping.get(context.getStart())
+    );
+  }
+
+  private Locality getLevelLocality(TerminalNode terminalNode) {
+    return positionMapping.get(terminalNode.getSymbol());
   }
 }

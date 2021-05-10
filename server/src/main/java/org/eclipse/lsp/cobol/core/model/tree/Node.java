@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import com.google.common.collect.ImmutableList;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -26,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /** The class represents a Node in source structure tree. */
@@ -39,7 +39,7 @@ public abstract class Node {
   private final NodeType nodeType;
 
   @ToString.Exclude
-  @Setter(AccessLevel.PROTECTED)
+  @Setter
   private Node parent;
 
   protected Node(Locality location, NodeType nodeType) {
@@ -56,6 +56,16 @@ public abstract class Node {
   public void addChild(Node node) {
     node.setParent(this);
     children.add(node);
+  }
+
+  /**
+   * Remove a child node.
+   *
+   * @param node a child for remove
+   * @return true if this node contained the specified child
+   */
+  public boolean removeChild(Node node) {
+    return children.remove(node);
   }
 
   /**
@@ -78,15 +88,35 @@ public abstract class Node {
         .flatMap(it -> (it.nodeType == type) ? Optional.of(it) : it.getNearestParentByType(type));
   }
 
-  /** Updates parents on internal node state after tree construction. */
-  public void process() {}
-
   /**
-   * Return list of errors if any. Must be called after process.
+   * Process tree node and its children after tree construction.
    *
    * @return the list of errors
    */
-  public List<SyntaxError> getErrors() {
-    return ImmutableList.of();
+  public List<SyntaxError> process() {
+    return children.stream().map(Node::process).flatMap(List::stream).collect(Collectors.toList());
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Node node = (Node) o;
+    return id == node.id;
+  }
+
+  @Override
+  public int hashCode() {
+    return (int) (id ^ id >>> 32);
+  }
+
+  /**
+   * Construct a predicate for testing that node has specified type.
+   *
+   * @param type the desired type
+   * @return the predicate for testing node
+   */
+  public static Predicate<Node> hasType(NodeType type) {
+    return node -> node.nodeType == type;
   }
 }

@@ -12,12 +12,19 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree;
+package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
+
+import java.util.List;
 
 /**
  * The class represents variable usage in COBOL program. This must be extended with a link to
@@ -26,10 +33,11 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 @ToString(callSuper = true)
 @Getter
 public class VariableUsageNode extends Node {
-  String dataName;
-  Type variableUsageType;
-  CobolParser.QualifiedDataNameFormat1Context dataNameFormat1Context;
-  CobolParser.ConditionNameReferenceContext nameReferenceContext;
+  private String dataName;
+  private Type variableUsageType;
+  private List<String> parents;
+  private CobolParser.QualifiedDataNameFormat1Context dataNameFormat1Context;
+  private CobolParser.ConditionNameReferenceContext nameReferenceContext;
 
   public VariableUsageNode(
       String dataName,
@@ -46,6 +54,16 @@ public class VariableUsageNode extends Node {
     super(locality, NodeType.VARIABLE_USAGE);
     this.dataName = dataName;
     this.variableUsageType = variableUsageType;
+    this.parents = ImmutableList.of();
+    dataNameFormat1Context = null;
+    nameReferenceContext = null;
+  }
+
+  public VariableUsageNode(String dataName, Locality locality, Type variableUsageType, List<String> parents) {
+    super(locality, NodeType.VARIABLE_USAGE);
+    this.dataName = dataName;
+    this.variableUsageType = variableUsageType;
+    this.parents = parents;
     dataNameFormat1Context = null;
     nameReferenceContext = null;
   }
@@ -62,7 +80,7 @@ public class VariableUsageNode extends Node {
   }
 
   @Override
-  public void process() {
+  public List<SyntaxError> process() {
     getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
         .map(ProgramNode::getVariableUsageDelegate)
@@ -74,10 +92,9 @@ public class VariableUsageNode extends Node {
                       dataName, getLocality(), dataNameFormat1Context);
                   break;
                 case SQL_VALUE:
-                  variableUsageDelegate.handleSqlValue(dataName, getLocality());
-                  break;
                 case TABLE_CALL:
-                  variableUsageDelegate.handleTableCall(dataName, getLocality());
+                case GENERAL:
+                  variableUsageDelegate.handleGeneralCall(dataName, getLocality(), parents);
                   break;
                 case CONDITION_CALL:
                   variableUsageDelegate.handleConditionCall(
@@ -88,6 +105,7 @@ public class VariableUsageNode extends Node {
                   break;
               }
             });
+    return ImmutableList.of();
   }
 
   /** Represents different types of variable usages. */
@@ -96,5 +114,6 @@ public class VariableUsageNode extends Node {
     SQL_VALUE,
     TABLE_CALL,
     CONDITION_CALL,
+    GENERAL,
   }
 }

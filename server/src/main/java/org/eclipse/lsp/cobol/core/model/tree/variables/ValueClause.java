@@ -12,15 +12,18 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree;
+package org.eclipse.lsp.cobol.core.model.tree.variables;
 
-import lombok.ToString;
+import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
-/** The class represents section in COBOL. */
-@ToString(callSuper = true)
-public class SectionNode extends Node {
-  public SectionNode(Locality locality) {
-    super(locality, NodeType.SECTION);
-  }
+import java.util.List;
+
+/**
+ * The class represents value clause in COBOL.
+ */
+@Value
+public class ValueClause {
+  List<ValueInterval> valueIntervals;
+  Locality locality;
 }
