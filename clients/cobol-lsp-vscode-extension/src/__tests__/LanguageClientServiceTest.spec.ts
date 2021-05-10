@@ -82,7 +82,7 @@ describe("LanguageClientService positive scenario", () => {
 
         LanguageClient.prototype.sendRequest = () => Promise.resolve(expectedResult); 
         LanguageClient.prototype.onReady = () => Promise.resolve(); 
-        expect(await languageClientService.retrieveAnalysis("test")).toBe(expectedResult);
+        expect(await languageClientService.retrieveAnalysis("test", "text")).toBe(expectedResult);
     });
 
     test("Test LanguageClientService starts language client", () => {

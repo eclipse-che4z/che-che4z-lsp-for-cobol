@@ -50,6 +50,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
 import static java.lang.String.format;
@@ -266,11 +267,19 @@ public class CobolTextDocumentService
   @CheckServerShutdownState
   public CompletableFuture<ExtendedApiResult> analysis(@NonNull JsonObject json) {
     AnalysisResultEvent event = new Gson().fromJson(json.toString(), AnalysisResultEvent.class);
-    String uri = Optional.ofNullable(event).map(AnalysisResultEvent::getUri).orElse("");
-    return cfAstMap
-            .get(uri).thenApply(cfastBuilder::build)
+    AtomicBoolean triggerAnalyze = new AtomicBoolean();
+    cfAstMap.computeIfAbsent(event.getUri(), (ignore) -> {
+      triggerAnalyze.set(true);
+      return new CompletableFuture<>();
+    });
+    if (triggerAnalyze.get()) {
+      analyzeDocumentFirstTime(event.getUri(), event.getText(), false);
+    }
+    CompletableFuture<Node> nodeCompletableFuture = cfAstMap.get(event.getUri());
+    nodeCompletableFuture.thenApply(ignore -> cfAstMap.remove(event.getUri()));
+    return nodeCompletableFuture.thenApply(cfastBuilder::build)
             .whenComplete(
-                    reportExceptionIfThrown(createDescriptiveErrorMessage("analysis retrieving", uri)));
+                    reportExceptionIfThrown(createDescriptiveErrorMessage("analysis retrieving", event.getUri())));
   }
 
   private void clearAnalysedFutureObject(String uri) {
@@ -294,7 +303,10 @@ public class CobolTextDocumentService
                     AnalysisResult result = engine.analyze(uri, text, copybookProcessingMode);
                     ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
                     publishResult(uri, result, copybookProcessingMode);
-                    outlineMap.get(uri).complete(result.getOutlineTree());
+                    outlineMap.computeIfPresent(uri, (key, value) -> {
+                      value.complete(result.getOutlineTree());
+                      return value;
+                    });
                     cfAstMap.get(uri).complete(result.getRootNode());
                   } catch (Exception e) {
                     LOG.error(createDescriptiveErrorMessage("analysis", uri), e);
