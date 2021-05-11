@@ -12,15 +12,17 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree;
+package org.eclipse.lsp.cobol.core.model.tree.variables;
 
-import lombok.ToString;
-import org.eclipse.lsp.cobol.core.model.Locality;
-
-/** The class represents section in COBOL. */
-@ToString(callSuper = true)
-public class SectionNode extends Node {
-  public SectionNode(Locality locality) {
-    super(locality, NodeType.SECTION);
-  }
+/** Enumeration of variable node types */
+public enum VariableType {
+  CONDITION_DATA_NAME,
+  ELEMENTARY_ITEM,
+  GROUP_ITEM,
+  STAND_ALONE_DATA_ITEM,
+  INDEX_ITEM,
+  MNEMONIC_NAME,
+  MULTI_TABLE_DATA_NAME,
+  RENAME_ITEM,
+  TABLE_DATA_NAME,
 }

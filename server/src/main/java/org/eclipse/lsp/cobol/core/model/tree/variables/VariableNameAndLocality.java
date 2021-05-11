@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2021 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,15 +12,14 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.tree;
+package org.eclipse.lsp.cobol.core.model.tree.variables;
 
-import lombok.ToString;
+import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
-/** The node represents a variable definition. This is a stub and must be rewritten. */
-@ToString(callSuper = true)
-public class VariableDefinitionNode extends Node {
-  public VariableDefinitionNode(Locality locality) {
-    super(locality, NodeType.VARIABLE_DEFINITION);
-  }
+/** The class contains a variable name and its locality */
+@Value
+public class VariableNameAndLocality {
+  String name;
+  Locality locality;
 }

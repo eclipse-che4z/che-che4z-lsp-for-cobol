@@ -9,6 +9,11 @@ spec:
     image: maven:3-openjdk-11
     command:
     - cat
+    env:
+    - name: "HOME"
+      value: "/home/jenkins"
+    - name: "MAVEN_OPTS"
+      value: "-Xms1024m -Xmx2560m"
     tty: true
     resources:
       limits:
@@ -17,10 +22,18 @@ spec:
       requests:
         memory: "3Gi"
         cpu: "1"
+    volumeMounts:
+    - name: m2-repo
+      mountPath: /home/jenkins/.m2/repository
+    - name: sonar
+      mountPath: /home/jenkins/.sonar
   - name: node
     image: sonarsource/sonarcloud-scan:1.2.1
     command:
     - cat
+    env:
+    - name: "HOME"
+      value: "/home/jenkins"
     tty: true
     resources:
       limits:
@@ -29,6 +42,9 @@ spec:
       requests:
         memory: "1Gi"
         cpu: "1"
+    volumeMounts:
+    - name: sonar
+      mountPath: /home/jenkins/.sonar
   - name: jnlp
     volumeMounts:
     - name: volume-known-hosts
@@ -37,6 +53,10 @@ spec:
   - name: volume-known-hosts
     configMap:
       name: known-hosts
+  - name: m2-repo
+    emptyDir: {}
+  - name: sonar
+    emptyDir: {}
 """
 
 def projectName = 'lsp-for-cobol'
@@ -78,7 +98,7 @@ pipeline {
                             dir('server') {
                                 withMaven {
                                     sh 'mvn -version'
-                                    sh 'MAVEN_OPTS="-Xms1024m -Xmx2560m" mvn clean verify --no-transfer-progress'
+                                    sh 'mvn clean verify --no-transfer-progress'
                                     sh 'cp target/server.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
                                 }
                             }

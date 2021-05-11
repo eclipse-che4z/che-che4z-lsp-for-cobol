@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -72,20 +73,24 @@ public class TestIdmsTransferStatement {
         BOILERPLATE + TRANSFER_PARMS2,
         BOILERPLATE + TRANSFER_USING_PARMS,
         BOILERPLATE + TRANSFER_ALL,
-        BOILERPLATE + TRANSFER_NO_TERM,
         BOILERPLATE + TRANSFER_ON);
+  }
+
+  @Test
+  void testWithError() {
+    UseCaseEngine.runTest(
+        BOILERPLATE + TRANSFER_NO_TERM,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null, MESSAGE_1, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
   }
 
   @ParameterizedTest
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - IDMS transfer tests")
   void test(String text) {
-    UseCaseEngine.runTest(
-        text,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null, MESSAGE_1, DiagnosticSeverity.Error, SourceInfoLevels.ERROR.getText())));
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
   }
 }

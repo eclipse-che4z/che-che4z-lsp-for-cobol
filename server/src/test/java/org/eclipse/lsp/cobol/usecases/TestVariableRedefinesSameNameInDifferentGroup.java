@@ -17,17 +17,13 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
-
 /**
- * This test checks that redefined variable has the same group
+ * This test checks that redefined variable has correct usage even if names the same.
  */
-public class TestVariableRedefineSameGroup {
-  private static final String REDEFINES_SAME_GROUP =
+public class TestVariableRedefinesSameNameInDifferentGroup {
+  private static final String REDEFINES =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.      EMPPROJ.\n"
           + "       ENVIRONMENT DIVISION.\n"
@@ -36,26 +32,13 @@ public class TestVariableRedefineSameGroup {
           + "         WORKING-STORAGE SECTION.\n"
           + "          01 {$*WS-DESCRIPTION1}.\n"
           + "              05 {$*WS-DATE1} PIC X(20).\n"
+          + "              05 {$*WS-DATE2} REDEFINES {$WS-DATE1} PIC 9(8).\n"
           + "          01 {$*WS-DESCRIPTION2}.\n"
-          + "               05 {$*WS-DATE2} REDEFINES {WS-DATE1|1|2} PIC 9(8).";
+          + "              05 {$*WS-DATE1} PIC X(20).\n"
+          + "              05 {$*WS-DATE2} REDEFINES {$WS-DATE1} PIC 9(8).";
 
   @Test
   void testError() {
-    UseCaseEngine.runTest(
-        REDEFINES_SAME_GROUP,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null,
-                "REDEFINES line must immediately follow redefined item: WS-DATE1",
-                DiagnosticSeverity.Error,
-                ERROR.getText()),
-            "2",
-            new Diagnostic(
-                null,
-                "Invalid definition for: WS-DATE1",
-                DiagnosticSeverity.Error,
-                ERROR.getText())));
+    UseCaseEngine.runTest(REDEFINES, ImmutableList.of(), ImmutableMap.of());
   }
 }
