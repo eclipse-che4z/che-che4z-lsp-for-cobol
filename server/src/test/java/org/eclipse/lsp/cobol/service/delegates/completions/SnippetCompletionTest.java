@@ -35,12 +35,12 @@ class SnippetCompletionTest {
   private static final String DOCUMENTATION_TEXT = "WRITE item";
   private static final String LABEL = "WRITE";
 
-  private SnippetCompletion completion = new SnippetCompletion(new Snippets());
+  private final SnippetCompletion completion = new SnippetCompletion(new Snippets());
 
   @Test
   void testCompletionEmptyResult() {
     assertThat(
-        completion.getCompletionItems(
+            new SnippetCompletion(new Snippets()).getCompletionItems(
             "Wr", new CobolDocumentModel("", AnalysisResult.builder().build())),
         is(createExpected()));
   }
@@ -64,12 +64,12 @@ class SnippetCompletionTest {
     doc.setValue(DOCUMENTATION_TEXT);
     doc.setKind("markdown");
     CompletionItem item = new CompletionItem(LABEL);
-    item.setLabel(LABEL);
+    item.setLabel(DOCUMENTATION_TEXT);
     item.setInsertText(INSERT_TEXT);
     item.setInsertTextFormat(InsertTextFormat.Snippet);
     item.setDocumentation(doc);
     item.setKind(CompletionItemKind.Snippet);
-    item.setSortText("6" + LABEL);
+    item.setSortText("6" + DOCUMENTATION_TEXT);
     return item;
   }
 }
