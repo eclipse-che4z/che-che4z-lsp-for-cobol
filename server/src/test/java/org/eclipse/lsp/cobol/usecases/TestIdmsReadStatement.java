@@ -36,6 +36,8 @@ public class TestIdmsReadStatement {
           + "        01 {$*WK_2} PIC X(80).\n"
           + "        01 {$*WK_POSITION} PIC S9(4) COMP SYNC.\n"
           + "        01 {$*WK_LENGTH} PIC S9(8) COMP SYNC.\n"
+          + "        01 {$*ERROR-STATUS} PIC X(4) VALUE '1400'.\n"
+          + "           88 {$*ANY-ERROR-STATUS} VALUE '0001' THRU '9999'.\n"
           + "        PROCEDURE DIVISION. \r\n";
 
   private static final String READ_TERMINAL =
@@ -63,6 +65,16 @@ public class TestIdmsReadStatement {
           + "            READ LINE FROM TERMINAL ECHO NOBACKPAGE INTO {$WK_1}\r\n"
           + "            MAX LENGTH {$WK_LENGTH} RETURN LENGTH INTO {$WK_2}.\r\n";
 
+  private static final String READ_TERMINAL_ON =
+      "            MOVE 20 TO {$WK_POSITION}. MOVE 80 TO {$WK_LENGTH}\r\n"
+          + "            READ TERMINAL WAIT MODIFIED FROM POSITION {$WK_POSITION} GET\r\n"
+          + "            STORAGE INTO {$WK_1} MAX LENGTH {$WK_LENGTH} RETURN LENGTH\r\n"
+          + "            INTO {$WK_2} ON {$ANY-ERROR-STATUS} DISPLAY 'READ ERROR'.\r\n";
+
+  private static final String READ_LINE_ON =
+      "            READ LINE TERMINAL INTO {$WK_1} MAX LENGTH 30\r\n"
+          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'READ ERROR'.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + READ_TERMINAL,
@@ -70,7 +82,9 @@ public class TestIdmsReadStatement {
         BOILERPLATE + READ_TERMINAL_ALL_PARMS_VARIABLES,
         BOILERPLATE + READ_LINE_FROM_TERMINAL,
         BOILERPLATE + READ_LINE_FROM_TERMINAL_ALL_PARMS_LITERALS,
-        BOILERPLATE + READ_LINE_FROM_TERMINAL_ALL_PARMS_VARIABLES);
+        BOILERPLATE + READ_LINE_FROM_TERMINAL_ALL_PARMS_VARIABLES,
+        BOILERPLATE + READ_TERMINAL_ON,
+        BOILERPLATE + READ_LINE_ON);
   }
 
   @ParameterizedTest

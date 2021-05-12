@@ -44,6 +44,8 @@ public class TestIdmsWriteClause {
           + "        01 {$*WK_MESSAGE} PIC X(8).\r\n"
           + "        01 {$*WK_HEADER} PIC X(8).\r\n"
           + "        01 {$*WK_LENGTH} PIC X(8).\r\n"
+          + "        01 {$*ERROR-STATUS} PIC X(4) VALUE '1400'.\n"
+          + "           88 {$*ANY-ERROR-STATUS} VALUE '0001' THRU '9999'.\n"
           + "        PROCEDURE DIVISION. \r\n";
 
   private static final String WRITE_JOURNAL_1 =
@@ -148,6 +150,16 @@ public class TestIdmsWriteClause {
           + "           FREE STORAGE FROM {$WK1} TO {$WK2} MODIFIED FROM POSITION\n"
           + "           {$WK1} INTO {$WK3} MAX LENGTH {$WK_LENGTH}.\n";
 
+  private static final String WRITE_JOURNAL_ON_1 =
+      "            WRITE JOURNAL WAIT NOSPAN FROM {$WK1} LENGTH 8\r\n"
+          + "           ON {$ANY-ERROR-STATUS} DISPLAY 'WRITE ERROR'.\n";
+
+  private static final String WRITE_THEN_READ_ON_1 =
+      "           WRITE THEN READ TERMINAL WAIT NEWPAGE FREE STORAGE FROM {$WK1}\n"
+          + "           TO {$WK2} BUFFER FROM POSITION '0000000A' GET STORAGE\n"
+          + "           INTO {$WK3} MAX LENGTH 8 RETURN LENGTH {$WK4}\n"
+          + "           ON {$ANY-ERROR-STATUS} DISPLAY 'WRITE ERROR'.\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + WRITE_JOURNAL_1,
@@ -172,7 +184,9 @@ public class TestIdmsWriteClause {
         BOILERPLATE + WRITE_TERMINAL_5,
         BOILERPLATE + WRITE_THEN_READ_1,
         BOILERPLATE + WRITE_THEN_READ_2,
-        BOILERPLATE + WRITE_THEN_READ_3);
+        BOILERPLATE + WRITE_THEN_READ_3,
+        BOILERPLATE + WRITE_JOURNAL_ON_1,
+        BOILERPLATE + WRITE_THEN_READ_ON_1);
   }
 
   @ParameterizedTest
