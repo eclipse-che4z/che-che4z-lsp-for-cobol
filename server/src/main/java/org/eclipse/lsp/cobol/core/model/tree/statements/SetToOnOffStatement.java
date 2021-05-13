@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.statements;
 
 import com.google.common.collect.ImmutableList;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import static java.util.stream.Collectors.toList;
 
 /** This class implements the logic for SET TO ON/OFF statement. */
+@EqualsAndHashCode(callSuper = true)
 public class SetToOnOffStatement extends StatementNode {
   protected static final String INVALID_RECEIVING_FIELD_TEMPLATE =
       "statements.invalidReceivingField";
