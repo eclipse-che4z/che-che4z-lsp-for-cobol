@@ -22,18 +22,15 @@ import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
 /** This value class represents the Table variable that may have an optional index */
 @Getter
 @ToString(callSuper = true)
-public class TableDataNameNode extends VariableWithLevelNode {
-  private String picClause;
+public class TableDataNameNode extends ElementaryNode {
   private String value;
   private int occursTimes;
-  private UsageFormat usageFormat;
 
   public TableDataNameNode(Locality location, int level, String name, boolean global, String picClause, String value,
-                           int occursTimes, UsageFormat usageFormat) {
-    super(location, level, name, VariableType.TABLE_DATA_NAME, global);
-    this.picClause = picClause;
+                           int occursTimes, UsageFormat usageFormat, boolean isBlankWhenZeroPresent, boolean isSignClausePresent) {
+    super(location, level, name, VariableType.TABLE_DATA_NAME, global, isBlankWhenZeroPresent, isSignClausePresent,
+            picClause, usageFormat);
     this.value = value;
     this.occursTimes = occursTimes;
-    this.usageFormat = usageFormat;
   }
 }

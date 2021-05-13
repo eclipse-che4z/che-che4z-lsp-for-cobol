@@ -25,9 +25,9 @@ import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
  */
 @Getter
 @ToString(callSuper = true)
-public class MultiTableDataNameNode extends VariableWithLevelNode {
-  private int occursTimes;
-  private UsageFormat usageFormat;
+public class MultiTableDataNameNode extends VariableWithLevelNode implements UsageClause {
+  private final int occursTimes;
+  private final UsageFormat usageFormat;
 
   public MultiTableDataNameNode(Locality location, int level, String name, int occursTimes, UsageFormat usageFormat) {
     super(location, level, name, VariableType.MULTI_TABLE_DATA_NAME);

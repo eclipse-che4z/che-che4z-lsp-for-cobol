@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -27,18 +28,18 @@ import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
  */
 @Getter
 @ToString(callSuper = true)
-public class ElementaryItemNode extends VariableWithLevelNode {
-  private String picClause;
+@EqualsAndHashCode(callSuper = true)
+public class ElementaryItemNode extends ElementaryNode {
   private String value;
-  private UsageFormat usageFormat;
   private boolean redefines;
 
   public ElementaryItemNode(Locality location, int level, String name, boolean global, String picClause, String value,
-                            UsageFormat usageFormat, boolean redefines) {
-    super(location, level, name, VariableType.ELEMENTARY_ITEM, global);
-    this.picClause = picClause;
+                            UsageFormat usageFormat, boolean redefines, boolean isBlankWhenZeroPresent,
+                            boolean isSignClausePresent) {
+    super(location, level, name, VariableType.ELEMENTARY_ITEM, global, isBlankWhenZeroPresent, isSignClausePresent,
+            picClause, usageFormat);
+
     this.value = value;
-    this.usageFormat = usageFormat;
     this.redefines = redefines;
   }
 }
