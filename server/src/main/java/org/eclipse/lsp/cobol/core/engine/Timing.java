@@ -16,14 +16,13 @@ package org.eclipse.lsp.cobol.core.engine;
 
 import lombok.Value;
 
-/**
- * The collection of timing data.
- */
+/** The collection of timing data. */
 @Value
 class Timing {
   long preprocessorTime;
   long parserTime;
   long mappingTime;
+  long splittingLanguageTimer;
   long visitorTime;
   long syntaxTreeTime;
   long lateErrorProcessingTime;
@@ -32,14 +31,13 @@ class Timing {
     return new Builder();
   }
 
-  /**
-   * The collection of timers.
-   */
+  /** The collection of timers. */
   @Value
   static class Builder {
     Timer preprocessorTimer = new Timer();
     Timer parserTimer = new Timer();
     Timer mappingTimer = new Timer();
+    Timer splittingLanguageTimer = new Timer();
     Timer visitorTimer = new Timer();
     Timer syntaxTreeTimer = new Timer();
     Timer lateErrorProcessingTimer = new Timer();
@@ -49,29 +47,25 @@ class Timing {
           preprocessorTimer.getTotalTime(),
           parserTimer.getTotalTime(),
           mappingTimer.getTotalTime(),
+          splittingLanguageTimer.getTotalTime(),
           visitorTimer.getTotalTime(),
           syntaxTreeTimer.getTotalTime(),
-          lateErrorProcessingTimer.getTotalTime()
-      );
+          lateErrorProcessingTimer.getTotalTime());
     }
   }
 
-  /**
-   * The stop watch timer.
-   */
+  /** The stop watch timer. */
   static class Timer {
     long startTime = 0;
     long totalTime = 0;
 
     void start() {
-      if (startTime != 0)
-        throw new RuntimeException("The timer must starts only once");
+      if (startTime != 0) throw new IllegalStateException("The timer must start only once");
       startTime = System.currentTimeMillis();
     }
 
     void stop() {
-      if (totalTime != 0)
-        throw new RuntimeException("The timer must stops only once");
+      if (totalTime != 0) throw new IllegalStateException("The timer must stop only once");
       totalTime = System.currentTimeMillis() - startTime;
     }
 

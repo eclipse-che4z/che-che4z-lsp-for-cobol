@@ -42,9 +42,9 @@ class TestErrorOnReadyTraceOutsideProcedureDivision {
             "1",
             new Diagnostic(
                 null,
-                "Syntax error on 'READY' expected {<EOF>, CBL, ID, IDENTIFICATION, LOCAL-STORAGE, "
-                    + "WORKING-STORAGE, PROCEDURE, SCHEMA, COPY, END, FILE, LINKAGE, PROCESS, SQL, 'EXEC SQL', "
-                    + "EXEC, MAP, '01-49', '66', '77', '88'}",
+                "Syntax error on 'READY' expected {<EOF>, CBL, IDENTIFICATION, LOCAL-STORAGE, WORKING-STORAGE, "
+                    + "COPY, END, EXEC, FILE, ID, LINKAGE, MAP, PROCEDURE, PROCESS, SCHEMA, SQL, 'EXEC SQL', "
+                    + "'01-49', '66', '77', '88'}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

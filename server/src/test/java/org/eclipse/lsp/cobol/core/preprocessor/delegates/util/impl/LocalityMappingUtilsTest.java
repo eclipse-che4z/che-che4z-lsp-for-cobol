@@ -15,14 +15,14 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.util.impl;
 
-import org.eclipse.lsp.cobol.core.model.DocumentMapping;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.antlr.v4.runtime.Token;
+import org.eclipse.lsp.cobol.core.model.DocumentMapping;
+import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
@@ -48,10 +48,11 @@ class LocalityMappingUtilsTest {
     List<Token> tokens = ImmutableList.of();
     List<Locality> localities = ImmutableList.of();
     Map<Integer, Integer> shifts = ImmutableMap.of();
-    Map<String, DocumentMapping> mappings = ImmutableMap.of(uri, new DocumentMapping(localities, shifts));
+    Map<String, DocumentMapping> mappings =
+        ImmutableMap.of(uri, new DocumentMapping(localities, shifts));
 
     Map<Token, Locality> positionMapping =
-        LocalityMappingUtils.createPositionMapping(tokens, mappings, uri);
+        LocalityMappingUtils.createPositionMapping(tokens, mappings, uri, ImmutableMap.of());
 
     assertTrue(positionMapping.isEmpty());
   }
@@ -125,8 +126,10 @@ class LocalityMappingUtilsTest {
             new DocumentMapping(cpyLocalities, shifts));
 
     Map<Token, Locality> expected =
-        ImmutableMap.of(token0, locality0, token1, locality1, token2, locality2, tokenEOF, localityEOF);
-    Map<Token, Locality> actual = LocalityMappingUtils.createPositionMapping(tokens, mappings, uri);
+        ImmutableMap.of(
+            token0, locality0, token1, locality1, token2, locality2, tokenEOF, localityEOF);
+    Map<Token, Locality> actual =
+        LocalityMappingUtils.createPositionMapping(tokens, mappings, uri, ImmutableMap.of());
 
     assertTrue(Maps.difference(expected, actual).areEqual());
   }

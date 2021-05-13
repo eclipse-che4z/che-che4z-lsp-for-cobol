@@ -15,14 +15,14 @@
 
 package org.eclipse.lsp.cobol.core.visitor;
 
+import com.google.common.collect.ImmutableMap;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.core.utils.CustomToken;
 import org.eclipse.lsp.cobol.service.SubroutineService;
-import com.google.common.collect.ImmutableMap;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
@@ -72,6 +72,7 @@ class VisitorSemanticAnalysisTest {
                     .range(new Range(new Position(0, 0), new Position(0, 0)))
                     .token(WRONG_TOKEN)
                     .build()),
+            ImmutableMap.of(),
             messageService,
             mock(SubroutineService.class));
 

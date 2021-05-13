@@ -41,8 +41,7 @@ public class SemanticContext {
   @Builder.Default Map<String, Collection<Location>> sectionDefinitions = new HashMap<>();
   @Builder.Default Map<String, Collection<Location>> sectionUsages = new HashMap<>();
   @Builder.Default Map<String, Collection<Location>> sectionRanges = new HashMap<>();
-  @Builder.Default Map<String, Collection<Location>> constantDefinitions = new HashMap<>();
-  @Builder.Default Map<String, Collection<Location>> constantUsages = new HashMap<>();
+  @Builder.Default PredefinedVariableContext constants = new PredefinedVariableContext();
   @Builder.Default Map<String, Collection<Location>> copybookDefinitions = new HashMap<>();
   @Builder.Default Map<String, Collection<Location>> copybookUsages = new HashMap<>();
   @Builder.Default Map<String, Collection<Location>> subroutinesDefinitions = new HashMap<>();

@@ -7,7 +7,7 @@
 */
 
 parser grammar CobolParser;
-options {tokenVocab = CobolLexer;  superClass = MessageServiceParser;}
+options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
 
 import CICSParser;
 
@@ -1554,25 +1554,29 @@ execCicsStatement
 
 // exec sql statement for specific divisions or sections of COBOL program
 execSqlStatementInProcedureDivision
-   : EXEC_SQL sqlRulesAllowedInProcedureDivision END_EXEC DOT_FS?
-   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} sqlRulesAllowedInProcedureDivision END_EXEC DOT_FS?
+   : execSqlStatement
    ;
 
 execSqlStatementInWorkingStorage
-   : EXEC_SQL (dbs_declare_variable SEMICOLON_FS?)+ END_EXEC DOT_FS?
-   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} dbs_declare_variable END_EXEC DOT_FS?
+   : execSqlStatement
    ;
 
 execSqlStatementInWorkingStorageAndLinkageSection
-   : EXEC_SQL sqlRulesAllowedInWorkingStorageAndLinkageSection END_EXEC DOT_FS?
-   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} sqlRulesAllowedInWorkingStorageAndLinkageSection END_EXEC DOT_FS?
+   : execSqlStatement
    ;
 
 execSqlStatementInDataDivision
-   : EXEC_SQL sqlRulesAllowedInDataDivision END_EXEC DOT_FS?
-   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} sqlRulesAllowedInDataDivision END_EXEC DOT_FS?
+   : execSqlStatement
    ;
 
+execSqlStatement
+   : EXEC_SQL sqlCode END_EXEC DOT_FS?
+   | {notifyError("cobolParser.missingSqlKeyword");} (EXEC | SQL) sqlCode END_EXEC DOT_FS?
+   ;
+
+sqlCode
+   : ~END_EXEC*?
+   ;
 
 // exec sql ims statement
 
