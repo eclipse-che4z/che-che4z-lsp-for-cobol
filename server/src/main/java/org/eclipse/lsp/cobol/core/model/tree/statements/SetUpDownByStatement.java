@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.core.model.tree.statements;
 import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.Value;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
@@ -32,7 +31,6 @@ import java.util.Map;
 import java.util.Optional;
 
 /** This class implements the logic for SET UP/DOWN BY statement. */
-@Value
 @EqualsAndHashCode(callSuper = true)
 public class SetUpDownByStatement extends StatementNode {
   public static final String INTEGER_LITERAL = "[+-]?\\d+";
