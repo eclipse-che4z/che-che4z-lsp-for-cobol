@@ -39,4 +39,5 @@ public enum NodeType {
   IF_ELSE,
   SENTENCE,
   STATEMENT,
+  EMBEDDED_CODE,
 }

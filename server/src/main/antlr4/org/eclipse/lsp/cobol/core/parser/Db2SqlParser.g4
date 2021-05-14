@@ -15,29 +15,20 @@
 parser grammar Db2SqlParser;
 options {tokenVocab = Db2SqlLexer; superClass = MessageServiceParser;}
 
-@members {
-    public void validateValue(String input, String value) {
-      if(input!=null && !input.equals(value)) {
-            notifyError("db2SqlParser.validValueMsg", input, value);
-      }
-    }
-
-    public void validateLength(String input, String objectType, Integer validLength) {
-      if(input!=null && input.length() > validLength) {
-        notifyError("db2SqlParser.maxLength", validLength.toString(), objectType);
-      }
-    }
-}
-
 /*Allowable SQL statements for COBOL program specific dvisions or sections*/
-sqlRulesAllowedInProcedureDivision: ((dbs_allocate | dbs_alter | dbs_associate | dbs_call | dbs_close | dbs_comment | dbs_commit |
+dataDivisionRules: (dbs_declare_variable | rulesAllowedInDataDivision | rulesAllowedInWorkingStorageAndLinkageSection)+;
+
+procedureDivisionRules: ((dbs_allocate | dbs_alter | dbs_associate | dbs_call | dbs_close | dbs_comment | dbs_commit |
           dbs_connect | dbs_create | dbs_declare | dbs_declare_cursor | dbs_declare_table | dbs_delete | dbs_describe | dbs_drop | dbs_exchange | dbs_execute | dbs_explain |
           dbs_fetch | dbs_free | dbs_get | dbs_grant | dbs_hold | dbs_include | dbs_include_sqlda | dbs_insert |
           dbs_label | dbs_lock | dbs_merge | dbs_open | dbs_prepare | dbs_refresh | dbs_release | dbs_rename |
           dbs_revoke | dbs_rollback | dbs_savepoint | dbs_select | dbs_set | dbs_signal | dbs_transfer | dbs_truncate |
           dbs_update | dbs_values | dbs_whenever) SEMICOLON_FS?)+;
-sqlRulesAllowedInDataDivision: ((dbs_declare_cursor | dbs_declare_table | dbs_include) SEMICOLON_FS?)+;
-sqlRulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca ) SEMICOLON_FS?)+;
+rulesAllowedInDataDivision: ((dbs_declare_cursor | dbs_declare_table | dbs_include) SEMICOLON_FS?)+;
+rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca ) SEMICOLON_FS?)+;
+
+//used in working-storage section of cobol program
+dbs_declare_variable: DECLARE dbs_host_variable (COMMACHAR dbs_host_variable)* VARIABLE (CCSID (dbs_integer_constant | (EBCDIC|ASCII|UNICODE) (FOR (SBCS|MIXED|BIT) DATA)?))? SEMICOLON_FS?;
 
 
 /*ALLOCATE CURSOR */
@@ -581,9 +572,6 @@ dbs_declare_table_bit_clob: CLOB dbs_declare_table_bit_cloba;
 dbs_declare_table_bit_cloba: (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?;
 dbs_declare_table_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR | DBCLOB (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
 dbs_declare_table_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
-//used in working-storage section of cobol program
-dbs_declare_variable: DECLARE dbs_host_variable (COMMACHAR dbs_host_variable)* VARIABLE (CCSID (dbs_integer_constant | (EBCDIC|ASCII|UNICODE) (FOR (SBCS|MIXED|BIT) DATA)?))?;
-
 /*DELETE */
 dbs_delete: DELETE FROM (dbs_table_name | dbs_view_name) (dbs_delete_period | dbs_delete_noperiod | dbs_delete_positioned);
 dbs_delete_period: dbs_delete_period_clause dbs_correlation_name? dbs_delete_include_column? (SET dbs_delete_assignment_clause)?
@@ -1400,7 +1388,7 @@ dbs_OLAP_specification: dbs_ordered_OLAP_specification |
  dbs_numbering_specification |
  dbs_aggregation_specification
 ;
-dbs_table_designator: all_words+; //?
+dbs_table_designator: literal+; //?
 dbs_row_change_expression: ROW CHANGE (TIMESTAMP | TOKEN) FOR dbs_table_designator;
 dbs_sequence_reference: (NEXT| PREVIOUS) VALUE FOR dbs_sequence_name;
 
@@ -1410,7 +1398,7 @@ dbs_sequence_reference: (NEXT| PREVIOUS) VALUE FOR dbs_sequence_name;
 
 
 /////// Variables /////////////
-all_words: NONNUMERICLITERAL | NUMERICLITERAL | INTEGERLITERAL | db2sql_intersected_words | db2sql_only_words;
+literal: NONNUMERICLITERAL | NUMERICLITERAL | INTEGERLITERAL;
 
 db2sql_db_privileges: DBADM | DBCTRL | DBMAINT | CREATETAB | CREATETS | DISPLAYDB | DROP | IMAGCOPY | LOAD | RECOVERDB | REORG | REPAIR | STARTDB | STATS | STOPDB;
 db2sql_system_privileges: ACCESSCTRL | ARCHIVE | BINDADD | BINDAGENT | BSDS | CREATEALIAS | CREATEDBA | CREATEDBC | CREATESG | CREATETMTAB | CREATE_SECURE_OBJECT |
@@ -1418,98 +1406,15 @@ db2sql_system_privileges: ACCESSCTRL | ARCHIVE | BINDADD | BINDAGENT | BSDS | CR
 
 db2sql_table_view_privileges: ALTER | DELETE | INDEX | INSERT | REFERENCES | SELECT | TRIGGER | UPDATE;
 
-db2sql_intersected_words: ACCESS | ALL | ANY | APPLY | ARE | AS | ASCII | AT | AUXILIARY | BEFORE | BINARY |
-                          BY |CALL | CHANGED | CHARACTER | CLOB | COBOL | CONTAINS | CONTINUE | CONTROL | COPY |
-                          CORR | CORRESPONDING | COUNT | CURSOR | DATA | DATE | DAY | DB | DBCLOB | DEFAULT | DEFINITION |
-                          DELETE | DISABLE | DOUBLE | DYNAMIC | EBCDIC | ELSE | ENABLE | END | END_EXEC | ERASE |
-                          ESCAPE | EVENT | EXCEPTION | EXCLUSIVE | EXEC | EXTENDED | EXTERNAL | FALSE |
-                          FILE | FINAL | FIRST | FIRST | FOR | FROM | FUNCTION | GENERATE | GLOBAL | GO | IF | IN |
-                          INDEX | INTEGER | INTO | INVALID | IS | KEY | LANGUAGE | LAST | LEADING | LEFT | LENGTH |
-                          LIBRARY | LIMIT | LOCAL | LOCK | MERGE | MODE | NAMED | NATIONAL | NEXT | NO | NOT | NULL | NULLS |
-                          NUMBER | NUMERIC | OBJECT | OF | OFF | ON | OPTIONAL | OR | ORDER | OUTPUT | PASSWORD |
-                          POSITION | PROCEDURE | PROGRAM | READ | REAL | REF | REFERENCE | REFERENCES | RELATIVE |
-                          RELEASE | REPLACE | RESET | RETURN | RIGHT | RUN | SEARCH | SECTION | SELECT | SELF | SET |
-                          SIZE | SPACE | START | THEN | TIME | TO | TRAILING | TRUE | TYPE | UNTIL | USAGE | USE |
-                          USING | VALUE | VALUES | VARYING | WHEN | WITH | WRITE ;
-
 dbs_inbuild_functions : ASCII  | AVG | BLOB | BIGINT | BINARY | CARDINALITY | CHAR | CHARACTER_LENGTH | CAST
                         | CHAR_LENGTH | CLOB | COALESCE | CONCAT | CONTAINS | CORR | CORRELATION | COUNT | COUNT_BIG
                         | COVARIANCE | CUME_DIST | DATE | DAY | DAYOFMONTH | DAYOFWEEK | DAYOFYEAR | DAYS | DBCLOB
-                        |  DECIMAL | DEC | DECFLOAT | DOUBLE | EXIT | EXTRACT | FLOAT | GRAPHIC | GROUP | GROUPING
+                        | DECIMAL | DEC | DECFLOAT | DOUBLE | EXIT | EXTRACT | FLOAT | GRAPHIC | GROUP | GROUPING
                         | HASH | HEX | HOUR | INSERT | INTEGER | INT | LEFT | LENGTH | LOWER | MAX | MICROSECOND
                         | MIN | MINUTE | MONTH | PERCENT_RANK | POSITION | RANDOM | REAL | REPEAT | REPLACE | RIGHT
                         | ROWID | SECOND | SMALLINT | SPACE | STDDEV | SUBSTR | SUBSTRING | SUM | TIME | TIMESTAMP
                         | ROW_NUMBER | TRANSLATE | TRIM | TRUNCATE | UNICODE | UNPACK | UPPER | VALUE | VARBINARY
                         | VARCHAR | VARGRAPHIC | VARIANCE | XMLNAMESPACES | XMLTABLE | YEAR;
-
-db2sql_only_words: ABSOLUTE | ACCELERATION | ACCELERATOR | ACCESSCTRL | ACCTNG | ACTIVATE | ACTIVE | ADA | AGE | ALGORITHM
-                  | ALIAS | ALLOW | ALTERIN | ALWAYS | APPEND | APPLCOMPAT | APPLICATION | APPLNAME | ARCHIVE | ARRAY | ARRAY_EXISTS | ASC
-                  | ASENSITIVE | ASSEMBLE | ASSERTION | ASSOCIATE | ASUTIME | ATOMIC | AUDIT | AUTHENTICATION | AUTHID | AUTHORIZATION
-                  | AUTOMATIC | AUTONOMOUS | AUX | AVG | BASED | BEGIN | BETWEEN | BIGINT | BINARY_STRING_CONSTANT | BIND | BINDADD
-                  | BINDAGENT | BIT_LENGTH | BLOCKED | BOTH | BSDS | BUFFERPOOL | BUFFERPOOLS | BUSINESS_TIME | CACHE | CALLED | CALLER
-                  | CAPTURE | CARDINALITY | CASCADE | CASCADED | CASE | CAST | CATALOG | CATALOG_NAME | CHANGES | CHAR_LENGTH
-                  | CHARACTER_LENGTH | CHECKED | CLAUSE | CLIENT_ACCTNG | CLIENT_APPLNAME | CLIENT_CORR_TOKEN | CLIENT_USERID
-                  | CLIENT_WRKSTNNAME | CLONE | CLUSTER | COALESCE | CODEUNITS32 | CODEUNITS32 | COLLATE | COLLATION | COLLECT | COLLECTION
-                  | COLLID | COLUMNS | COMMENT | COMMIT | COMMITTED | COMPARISONS | COMPATIBILITY | COMPRESS | CONCAT | CONCENTRATE
-                  | CONCURRENT | CONDITION_NUMBER | CONNECTION | CONNECTION_NAME | CONSERVATIVE | CONSTANT | CONSTRAINT | CONSTRAINTS
-                  | CONTEXT | CONVERT | CORRELATION | COUNT_BIG | COVARIANCE | CPU | CREATE_SECURE_OBJECT | CREATEALIAS | CREATEDBA
-                  | CREATEDBC | CREATEIN | CREATEIN | CREATESG | CREATETAB | CREATETMTAB | CREATETS | CROSS | CS | CUBE | CUME_DIST
-                  | CURRENT_DATE | CURRENT_LC_CTYPE | CURRENT_PATH | CURRENT_SCHEMA | CURRENT_SERVER | CURRENT_SQLID | CURRENT_TIME
-                  | CURRENT_TIMESTAMP | CURRENT_TIMEZONE | CURRENT_USER | CURRENTLY | CURSOR_NAME | CURSORS | CYCLE | DATAACCESS
-                  | DATABASE | DATACLAS | DATALINK | DB2 | DB2_AUTHENTICATION_TYPE | DB2_AUTHORIZATION_ID | DB2_CONNECTION_STATE
-                  | DB2_CONNECTION_STATUS | DB2_ENCRYPTION_TYPE | DB2_ERROR_CODE1 | DB2_ERROR_CODE2 | DB2_ERROR_CODE3 | DB2_ERROR_CODE4
-                  | DB2_GET_DIAGNOSTICS_DIAGNOSTICS | DB2_INTERNAL_ERROR_POINTER | DB2_LAST_ROW | DB2_LINE_NUMBER | DB2_MESSAGE_ID
-                  | DB2_MODULE_DETECTING_ERROR | DB2_NUMBER_PARAMETER_MARKERS | DB2_NUMBER_RESULT_SETS | DB2_NUMBER_ROWS | DB2_ORDINAL_TOKEN1
-                  | DB2_ORDINAL_TOKEN2 | DB2_ORDINAL_TOKEN3 | DB2_ORDINAL_TOKEN4 | DB2_PRODUCT_ID | DB2_REASON_CODE | DB2_RETURN_STATUS
-                  | DB2_RETURNED_SQLCODE | DB2_ROW_NUMBER | DB2_SERVER_CLASS_NAME | DB2_SQL_ATTR_CURSOR_HOLD | DB2_SQL_ATTR_CURSOR_ROWSET
-                  | DB2_SQL_ATTR_CURSOR_SCROLLABLE | DB2_SQL_ATTR_CURSOR_SENSITIVITY | DB2_SQL_ATTR_CURSOR_TYPE | DB2_SQL_NESTING_LEVEL
-                  | DB2_SQLERRD1 | DB2_SQLERRD2 | DB2_SQLERRD3 | DB2_SQLERRD4 | DB2_SQLERRD5 | DB2_SQLERRD6 | DB2_SQLERRD_SET
-                  | DB2_TOKEN_COUNT | DB2DARI | DB2GENERAL | DB2GENRL | DB2SQL | DBADM | DBCTRL | DBINFO | DBMAINT | DEACTIVATE | DEADLOCKS
-                  | DEALLOCATE | DEBUG | DEBUGSESSION | DEC | DEC_ROUND_CEILING | DEC_ROUND_DOWN | DEC_ROUND_FLOOR | DEC_ROUND_HALF_DOWN
-                  | DEC_ROUND_HALF_EVEN | DEC_ROUND_HALF_UP | DEC_ROUND_UP | DECFLOAT | DECIMAL | DECLARE | DEFAULTS | DEFER | DEFERRABLE
-                  | DEFERRED | DEFINEBIND | DEFINER | DEFINERUN | DEGREE | DENSE_RANK | DEPENDENT | DESC | DESCRIBE | DESCRIPTOR
-                  | DETERMINISTIC | DIAGNOSTICS | DIMENSIONS | DISALLOW | DISPATCH | DISPLAYDB | DISTINCT | DISTNCT | DO | DOMAIN
-                  | DOUBLEQUOTE | DPSEGSZ | DROP | DROPIN | DSNDB04 | DSSIZE | DYNAMICRULES | EACH | EDITPROC | ELEMENT | ELIGIBLE
-                  | ELSEIF | EMPTY | ENCODING | ENCRYPTION | ENFORCED | EUR | EXACT | EXCEPT | EXCHANGE | EXCLUDE | EXCLUDING | EXISTS
-                  | EXPLAIN | EXTENSION | EXTRA | FAILBACK | FAILURE | FAILURES | FEDERATED | FENCED | FETCH | FIELDPROC | FIRST_VALUE
-                  | FLOAT | FLUSH | FOLLOWING | FOREIGN | FORMAT | FORTRAN | FOUND | FREEPAGE | FS | FULL | FUNCTION_LEVEL_10
-                  | FUNCTION_LEVEL_11 | FUNCTION_LEVEL_12 | G_CHAR | GBPCACHE | GENERAL | GENERATED | GET_ACCEL_ARCHIVE | GOTO | GRANT
-                  | GRAPHIC | GROUPING | HANDLER | HASH | HAVING | HIDDENCHAR | HIGH | HINT | HISTORY | HOUR | IDENTITY | IMAGCOPY
-                  | IMPLICIT_SCHEMA | IMPLICITLY | INCLUDE | INCLUDING | INCLUSIVE | INDEXBP | INDEXES | INDICATOR | INHERIT
-                  | INITIAL_INSTS | INITIAL_IOS | INITIALLY | INLINE | INNER | INOUT | INSENSITIVE | INSTEAD | INSTS_PER_ARGBYTE
-                  | INSTS_PER_INVOC | INT | INTEGRITY | INTERSECT | INVOKEBIND | INVOKERUN | IOS_PER_ARGBYTE | IOS_PER_INVOC | ISO
-                  | ISOLATION | ITERATE | JAR | JAVA | JIS | JOBNAME | JOIN | K_CHAR | KEYS | LABELS | LAG | LANGUAGE_C | LARGE
-                  | LAST_VALUE | LC_CTYPE | LEAD | LEAVE | LIKE | LINKTYPE | LITERALS | LOB | LOCALE | LOCATION | LOCATION | LOCATOR
-                  | LOCATORS | LOCKED | LOCKMAX | LOCKS | LOCKSIZE | LOGGED | LONG | LONGVAR | LOOP | LOW | LOWER | M_CHAR | MAINTAINED
-                  | MAPPING | MASK | MATCH | MATCHED | MATERIALIZED | MAX | MAXPARTITIONS | MAXROWS | MAXVALUE | MEMBER | MESSAGE_TEXT
-                  | MGMTCLAS | MICROSECOND | MICROSECONDS | MINUTE | MINVALUE | MIXED | MODIFIERS | MODIFIES | MODULE | MONITOR1 | MONITOR2
-                  | MONTHS | MORECHAR | MULTIPLIER | NAMES | NAMESPACE | NATURAL | NCHAR | NEW | NEW_TABLE | NEXTVAL | NICKNAME | NOCACHE
-                  | NOCYCLE | NODE | NODEFER | NOMINVALUE | NOORDER | NTH_VALUE | NULLABLE | NULTERM | NUMPARTS | OBID | OCTETS | OFFSET
-                  | OLD | OLD_TABLE | OLE | OLEDB | ONCE | ONLINE | ONLY | OPTHINT | OPTIMIZATION | OPTIMIZE | OPTION | ORDINALITY | ORGANIZE
-                  | ORIGINAL | OUT | OUTCOME | OUTER | OVER | OVERLAPS | OVERRIDING | OWNERSHIP | PACKADM | PACKAGE | PACKAGE_NAME
-                  | PACKAGE_SCHEMA | PACKAGE_VERSION | PACKAGESET | PAD | PADDED | PARALLEL | PARAMETER | PART | PARTIAL | PARTITION
-                  | PARTITIONED | PARTITIONING | PASCAL | PASSING | PASSTHRU | PCTFREE | PENDING | PERCENT_ARGBYTES | PERCENT_RANK
-                  | PERIOD | PERMISSION | PIECESIZE | PIPE | PLAN | PLI | PORTION | POSITIONING | PRECEDING | PRECISION | PRESERVE
-                  | PREVIOUS | PRIMARY | PRIOR | PRIQTY | PRIVILEGES | PROTOCOL | PUBLIC | QUALIFIER | QUERYNO | QUOTED_NONE | RANGE
-                  | RANK | RATIO_TO_REPORT | READS | RECOMMEND | RECOVERDB | RECOVERY | REFERENCING | REFRESH | REGENERATE | REGISTERS
-                  | RENAME | REOPT | REORG | REPAIR | REPEAT | REPLICATED | REQUIRED | RESIDENT | RESIGNAL | RESOLUTION | RESOLVE | RESPECT
-                  | RESTORE | RESTRICT | RESULT_SET_LOCATOR | RETURN_STATUS | RETURNED_SQLSTATE | RETURNS | REUSE | REVOKE
-                  | REXX | ROLLUP | ROTATE | ROUND_CEILING | ROUND_DOWN | ROUND_FLOOR | ROUND_HALF_DOWN | ROUND_HALF_EVEN | ROUND_HALF_UP
-                  | ROUND_UP | ROUNDING | ROUTINE | ROW | ROW_COUNT | ROW_NUMBER | ROWID | ROWS | ROWSET | RR | RS | RULES | SAVEPOINT
-                  | SBCS | SCALE | SCHEMA | SCRATCHPAD | SCROLL | SECOND | SECQTY | SECURED | SEGSIZE | SELECTIVITY | SENSITIVE | SEQUENCE
-                  | SERIALIZABLE | SERVAUTH | SERVER_NAME | SESSION_USER | SETS | SHARE | SHRLEVEL | SIGNAL | SIMPLE | SKIPCHAR | SMALLINT
-                  | SNAPSHOT | SOME | SPECIAL | SPECIFIC | SQLADM | SQLCA | SQLCODE | SQLD | SQLDA | SQLDABC | SQLERROR | SQLEXCEPTION
-                  | SQLID | SQLN | SQLSTATE | SQLVAR | SQLWARNING | STABILIZED | STACKED | STARTDB | STARTING | STATEMENT | STATEMENTS
-                  | STATIC | STATISTICS | STATS | STAY | STDDEV | STMTCACHE | STMTID | STMTTOKEN | STOGROUP | STOPALL | STOPDB | STORCLAS
-                  | STORED | STORES | STORIES | STOSPACE | STRUCTURE | STYLE | SUB | SUBSTR | SUBSTRING | SUMMARY | SWITCH | SYNONYM
-                  | SYSADM | SYSCTRL | SYSDEFLT | SYSIBM | SYSOPR | SYSTEM | SYSTEM_TIME | SYSTEM_USER | TABLE | TABLE_NAME | TABLESPACE
-                  | TABLESPACES | TABLESPACES | TEMPORAL | TEMPORARY | THREADSAFE | TIMESTAMP | TIMEZONE | TIMEZONE_HOUR | TIMEZONE_MINUTE
-                  | TRACKMOD | TRANSFER | TRANSLATE | TRANSLATION | TREAT | TRIGGERS | TRIM | TRUNCATE | TRUSTED | TYPES | UNBOUNDED
-                  | UNDER | UNDO | UNICODE | UNION | UNIQUE | UNKNOWN | UNNEST | UNPACK | UPPER | UR | USA | USER | V1 | VALIDATE
-                  | VALIDPROC | VARBINARY | VARCHAR | VARGRAPHIC | VARIABLE | VARIANCE | VARIANT | VCAT | VERSION | VERSIONING | VERSIONS
-                  | VIEW | VOLATILE | VOLUMES | WAITFORDATA | WHENEVER | WHERE | WHILE | WITHOUT | WLM | WORK | WORKFILE | WRAPPED
-                  | WRAPPER | WRKSTNNAME | XMLCAST | XMLNAMESPACES | XMLPATTERN | XMLSCHEMA | XMLTABLE | YEARS | YES | ZONE;
-
 
 db2sql_data_types: db2sql_unpack_data_types | VARCHAR | GRAPHIC | VARBINARY CLOB | BLOB | DBCLOB |  INT |
                     FLOAT | DEC | NUMERIC | DECFLOAT | NATIONAL | ASCII | EBCDIC | DBCLOB | ROWID;
@@ -1541,7 +1446,7 @@ dbs_applcompat_value: FUNCTION_LEVEL_10 | FUNCTION_LEVEL_11 | FUNCTION_LEVEL_12;
 dbs_array_index: dbs_integer;
 dbs_array_type_name: dbs_sql_identifier;
 dbs_array_variable: dbs_sql_identifier LSQUAREBRACKET (dbs_expressions) RSQUAREBRACKET;
-dbs_array_variable_name: all_words+;
+dbs_array_variable_name: literal+;
 dbs_attr_host_variable: dbs_hostname_identifier | NUMERICLITERAL ; // VARCHAR(128)
 dbs_authorization_name: dbs_sql_identifier;
 dbs_authorization_specification: IDENTIFIER;
@@ -1558,7 +1463,10 @@ dbs_clone_table_name: T=dbs_sql_identifier {validateLength($T.text, "clone table
 dbs_collection_id: IDENTIFIER;
 dbs_collection_id_package_name: FILENAME;
 dbs_collection_name: T=dbs_sql_identifier {validateLength($T.text, "collection name", 128);}; // SQLIDENTIFIER are case sensitive. allows only uppercase or quoted string as per doc.
-dbs_generic_name: ACTIVITY | ADDRESS |AVG | COLOR | COUNT | COMMENT | DOCUMENT | FILENAME | GROUP | HOUR | HOURS | ID | IN | IDENTIFIER | LOCATION | LOCATOR | MAX | MIN | MONTH | NAME | NONNUMERICLITERAL | YEAR | DATE | DAY | SERVER | STATE | SQLCODE | TRANSACTION | TYPE | V1 ; //TODO try to include all cics_cobol_intersected_words/ cics_only_words
+dbs_generic_name
+    : ADDRESS | AVG | COUNT | COMMENT | FILENAME | GROUP | HOUR | HOURS | ID | IN | IDENTIFIER | LOCATION | LOCATOR
+    | MAX | MIN | MONTH | NAME | NONNUMERICLITERAL | YEAR | DATE | DAY | SERVER | SQLCODE | TRANSACTION | TYPE | V1
+    ;
 dbs_column_name: (dbs_generic_name DOT)? T=dbs_generic_name {validateLength($T.text, "column name", 30);};
 dbs_constant : (dbs_string_constant | dbs_integer_constant | DATELITERAL);
 dbs_constraint_name: T=dbs_sql_identifier {validateLength($T.text, "constraint name", 128);};
@@ -1618,9 +1526,9 @@ dbs_nnnn_m: SINGLEDIGITLITERAL SINGLEDIGITLITERAL? SINGLEDIGITLITERAL? SINGLEDIG
 dbs_non_deterministic_expression: DATA CHANGE OPERATION | dbs_special_register | dbs_session_variable;
 dbs_session_variable : SYSIBM DOT PACKAGE_NAME | SYSIBM DOT PACKAGE_SCHEMA | SYSIBM DOT PACKAGE_VERSION;
 dbs_numeric_constant: dbs_integer;// numeric literal without non-zero digits to the right of the decimal point.
-dbs_obfuscated_statement_text: all_words+ ;
+dbs_obfuscated_statement_text: literal+ ;
 dbs_package_name: NONNUMERICLITERAL {validateLength($NONNUMERICLITERAL.text, "package name", 8);};
-dbs_password_variable: COLONCHAR? (all_words | dbs_generic_name)+;
+dbs_password_variable: COLONCHAR? (literal | dbs_generic_name)+;
 dbs_password_string_constant: IDENTIFIER;
 dbs_package_path: FILENAME+;
 dbs_pageset_pagenum_param: ABSOLUTE | dbs_char_a | RELATIVE | dbs_char_r ;
@@ -1714,7 +1622,7 @@ dbs_values_statement : VALUES  (LPARENCHAR dbs_expression (COMMACHAR dbs_express
 dbs_triggered_sql_statement_adv: dbs_call | dbs_delete | dbs_get | dbs_insert | dbs_merge | dbs_refresh |
                                  dbs_set | dbs_signal | dbs_truncate | dbs_update | dbs_values_into;
 dbs_triggered_sql_statement_basic: dbs_triggered_sql_statement;
-dbs_type_name: IDENTIFIER | DOCUMENT;
+dbs_type_name: IDENTIFIER;
 dbs_value: db2sql_data_value;
 dbs_variable : ( dbs_host_variable | dbs_transition_variable_name | dbs_sql_variable_name | dbs_global_variable_name ) INTEGERLITERAL*;
 dbs_variable_name: dbs_sql_identifier;

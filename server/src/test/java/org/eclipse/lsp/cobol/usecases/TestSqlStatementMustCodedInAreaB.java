@@ -33,6 +33,7 @@ class TestSqlStatementMustCodedInAreaB {
           + "       PROCEDURE DIVISION."
           + "              EXEC SQL\n"
           + "         {SELECT|1} * FROM EMP;\n"
+          + "         {WHERE|2} ID = 0;\n"
           + "              END-EXEC.\n";
 
   @Test
@@ -45,6 +46,12 @@ class TestSqlStatementMustCodedInAreaB {
             new Diagnostic(
                 null,
                 "The following token must start in Area B: SELECT",
+                DiagnosticSeverity.Warning,
+                SourceInfoLevels.WARNING.getText()),
+            "2",
+            new Diagnostic(
+                null,
+                "The following token must start in Area B: WHERE",
                 DiagnosticSeverity.Warning,
                 SourceInfoLevels.WARNING.getText())));
   }

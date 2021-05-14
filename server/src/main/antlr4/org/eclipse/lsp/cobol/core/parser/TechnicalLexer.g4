@@ -19,21 +19,12 @@ lexer grammar TechnicalLexer;
 // The purpose of this file is to allow similar parsing by the preprocessor and parser.
 // All the token declarations that are common to several lexers should belong to CommonCobolLexer.
 
-@lexer::members {
-    boolean sqlFlag = false;
-    String lastTokenText = null;
-    public void emit(Token token) {
-        super.emit(token);
-        lastTokenText = token.getText();
-    }
-}
 // symbols
 AMPCHAR : '&';
 ASTERISKCHAR : '*';
 DOUBLEASTERISKCHAR : '**';
 COLONCHAR : ':';
-COMMA_EOF : ',' EOF {!sqlFlag}? ->skip;
-COMMA_LB : ',' ('\r' | '\n' | '\f' | '\t' | ' ')+ {!sqlFlag}? -> channel(HIDDEN);
+COMMA_EOF : ',' EOF -> skip;
 COMMACHAR : ',';
 COMMENTTAG : '*>';
 COMMENTENTRYTAG : '*>CE';
@@ -66,33 +57,30 @@ LEVEL_NUMBER_88 : '88';
 
 INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+ | LEVEL_NUMBER;
 
-// DECIMAL_CONST : DIGIT DIGIT DIGIT DIGIT DOT DIGIT {sqlFlag}? ;
-SINGLEDIGITLITERAL : DIGIT {sqlFlag}? ;
+SINGLEDIGITLITERAL : DIGIT;
 
 NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
 
 NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
 
-//TXTLITERAL : STRINGLITERAL | IDENTIFIER;
 CHAR_STRING_CONSTANT : HEXNUMBER | STRINGLITERAL;
 
 IDENTIFIER : ([a-zA-Z0-9]+ [-_a-zA-Z0-9]*);
 COPYBOOK_IDENTIFIER : ([a-zA-Z0-9#@$]+ [-_a-zA-Z0-9#@$]*);
 FILENAME : IDENTIFIER+ '.' IDENTIFIER+;
 
-OCTDIGITS : OCT_DIGIT {sqlFlag}? ;
-HEX_NUMBERS : HEXNUMBER {sqlFlag}? ;
+OCTDIGITS : OCT_DIGIT;
+HEX_NUMBERS : HEXNUMBER;
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
 COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*  -> channel(HIDDEN);
 WS : [ \t\f;]+ -> channel(HIDDEN);
-SEPARATOR : ', ' {!sqlFlag}? -> channel(HIDDEN);
 
 //SQL comments
 SQLLINECOMMENT
-	:	SQLLINECOMMENTCHAR ~[\r\n]* NEWLINE {sqlFlag}? -> channel(HIDDEN)
+	:	SQLLINECOMMENTCHAR ~[\r\n]* NEWLINE -> channel(HIDDEN)
 	;
 
 // treat all the non-processed tokens as errors

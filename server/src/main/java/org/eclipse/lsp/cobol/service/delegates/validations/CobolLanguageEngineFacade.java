@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.validations;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
 import org.eclipse.lsp.cobol.core.model.ErrorCode;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
@@ -21,8 +23,6 @@ import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Location;
@@ -30,10 +30,10 @@ import org.eclipse.lsp4j.Location;
 import java.util.*;
 import java.util.function.Function;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult.empty;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
+import static org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult.empty;
 
 /**
  * This class is a facade that maps the result of the syntax and semantic analysis to a model
@@ -93,8 +93,8 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
         convertEntities(context.getSectionDefinitions()),
         convertEntities(context.getSectionUsages()),
         convertEntities(context.getSectionRanges()),
-        convertEntities(context.getConstantDefinitions()),
-        convertEntities(context.getConstantUsages()),
+        convertEntities(context.getConstants().getDefinitions().asMap()),
+        convertEntities(context.getConstants().getUsages().asMap()),
         convertEntities(context.getCopybookDefinitions()),
         convertEntities(context.getCopybookUsages()),
         convertEntities(context.getSubroutinesDefinitions()),

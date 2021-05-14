@@ -15,10 +15,10 @@
 
 package org.eclipse.lsp.cobol.core;
 
-import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import com.google.common.annotations.VisibleForTesting;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.TokenStream;
+import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 
 /**
  * Provide the support of message externalization for Parser.
@@ -56,6 +56,31 @@ public abstract class MessageServiceParser extends Parser {
   @VisibleForTesting
   public void notifyListeners(String message) {
     super.notifyErrorListeners(message);
+  }
+
+  /**
+   * Validate a string and throw an error if it is not equal to the expected value
+   *
+   * @param actual string to check
+   * @param expected expected value of the string
+   */
+  protected void validateValue(String actual, String expected) {
+    if (actual != null && !actual.equals(expected)) {
+      notifyError("parsers.validValueMsg", actual, expected);
+    }
+  }
+
+  /**
+   * Validate a string length and throw an error if it is incorrect
+   *
+   * @param input string to check
+   * @param objectType type of the object to be passed as a message argument
+   * @param validLength expected length for this input
+   */
+  protected void validateLength(String input, String objectType, Integer validLength) {
+    if (input != null && input.length() > validLength) {
+      notifyError("parsers.maxLength", validLength.toString(), objectType);
+    }
   }
 
   private String getMessageForParser(String messageKey, String... parameters) {

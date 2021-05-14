@@ -15,30 +15,26 @@
 
 package org.eclipse.lsp.cobol.core.engine;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
+import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.SubroutineService;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Multimap;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp4j.DocumentSymbol;
-import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -85,11 +81,12 @@ class CobolLanguageEngineTest {
             .build();
     SyntaxError eofError =
         SyntaxError.syntaxError()
-            .locality(Locality.builder()
-                .uri(URI)
-                .range(new Range(new Position(0, 31), new Position(0, 31)))
-                .token("<EOF>")
-                .build())
+            .locality(
+                Locality.builder()
+                    .uri(URI)
+                    .range(new Range(new Position(0, 31), new Position(0, 31)))
+                    .token("<EOF>")
+                    .build())
             .severity(ERROR)
             .build();
 
@@ -159,7 +156,7 @@ class CobolLanguageEngineTest {
     ResultWithErrors<SemanticContext> expected =
         new ResultWithErrors<>(
             SemanticContext.builder()
-                .constantDefinitions(getConstantDefinitions())
+                .constants(new PredefinedVariableContext())
                 .outlineTree(expectedOutlineTree)
                 .rootNode(new RootNode(Locality.builder().build()))
                 .build(),
@@ -168,54 +165,5 @@ class CobolLanguageEngineTest {
     ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, PROCESSING_MODE);
 
     assertEquals(expected, actual);
-  }
-
-  private Map<String, Collection<Location>> getConstantDefinitions() {
-    Location mockLocation = new Location();
-    Multimap<String, Location> result = HashMultimap.create();
-    result.put("EIBAID", mockLocation);
-    result.put("EIBATT", mockLocation);
-    result.put("EIBCALEN", mockLocation);
-    result.put("EIBCOMPL", mockLocation);
-    result.put("EIBCONF", mockLocation);
-    result.put("EIBCPOSN", mockLocation);
-    result.put("EIBDATE", mockLocation);
-    result.put("EIBDS", mockLocation);
-    result.put("EIBEOC", mockLocation);
-    result.put("EIBERR", mockLocation);
-    result.put("EIBERRCD", mockLocation);
-    result.put("EIBFMH", mockLocation);
-    result.put("EIBFN", mockLocation);
-    result.put("EIBFREE", mockLocation);
-    result.put("EIBNODAT", mockLocation);
-    result.put("EIBRCODE", mockLocation);
-    result.put("EIBRECV", mockLocation);
-    result.put("EIBREQID", mockLocation);
-    result.put("EIBRESP", mockLocation);
-    result.put("EIBRESP2", mockLocation);
-    result.put("EIBRLDBK", mockLocation);
-    result.put("EIBRSRCE", mockLocation);
-    result.put("EIBSIG", mockLocation);
-    result.put("EIBSYNC", mockLocation);
-    result.put("EIBSYNRB", mockLocation);
-    result.put("EIBTASKN", mockLocation);
-    result.put("EIBTIME", mockLocation);
-    result.put("EIBTRMID", mockLocation);
-    result.put("EIBTRNID", mockLocation);
-
-    result.put("XML-CODE", mockLocation);
-    result.put("XML-EVENT", mockLocation);
-    result.put("XML-NAMESPACE", mockLocation);
-    result.put("XML-NNAMESPACE", mockLocation);
-    result.put("XML-NAMESPACE-PREFIX", mockLocation);
-    result.put("XML-NNAMESPACE-PREFIX", mockLocation);
-    result.put("XML-NTEXT", mockLocation);
-    result.put("XML-TEXT", mockLocation);
-
-    result.put("JNIENVPTR", mockLocation);
-
-    result.put("JSON-CODE", mockLocation);
-    result.put("JSON-STATUS", mockLocation);
-    return result.asMap();
   }
 }
