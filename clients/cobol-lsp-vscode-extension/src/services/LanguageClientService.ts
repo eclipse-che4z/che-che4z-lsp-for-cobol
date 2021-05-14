@@ -54,10 +54,10 @@ export class LanguageClientService {
         this.handlers.push(languageClient => languageClient.onRequest(method, handler));
     }
 
-    public async retrieveAnalysis(uri: string): Promise<any> {
+    public async retrieveAnalysis(uri: string, text: string): Promise<any> {
         const languageClient = this.getLanguageClient();
         await languageClient.onReady();
-        return languageClient.sendRequest("extended/analysis", { uri: uri });
+        return languageClient.sendRequest("extended/analysis", { uri, text });
     }
 
     public start(): vscode.Disposable {

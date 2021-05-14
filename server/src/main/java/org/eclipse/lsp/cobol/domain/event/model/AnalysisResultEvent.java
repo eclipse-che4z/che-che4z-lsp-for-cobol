@@ -30,4 +30,6 @@ import org.eclipse.lsp4j.jsonrpc.validation.NonNull;
 public class AnalysisResultEvent {
   @NonNull
   private String uri;
+  @NonNull
+  private String text;
 }
