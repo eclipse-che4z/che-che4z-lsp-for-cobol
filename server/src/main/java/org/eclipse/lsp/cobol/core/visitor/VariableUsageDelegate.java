@@ -23,6 +23,7 @@ import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.variables.Variable;
+import org.eclipse.lsp.cobol.core.semantics.ImplicitFields;
 
 import java.util.*;
 
@@ -38,6 +39,16 @@ import static org.eclipse.lsp.cobol.core.CobolParser.*;
 @Slf4j
 @RequiredArgsConstructor
 public class VariableUsageDelegate {
+
+  /** IMPLICIT FIELDS, resolved by DB2 pre-compiler or co-processor */
+  public static final Set<String> IMPLICIT_FIELDS = new HashSet<>();
+
+  static {
+    for (ImplicitFields implicitField : ImplicitFields.values()) {
+      IMPLICIT_FIELDS.add(implicitField.getValue());
+    }
+  }
+
   private final List<VariableUsage> variableUsages = new ArrayList<>();
   private final Map<Token, Locality> positionMapping;
   private final MessageService messageService;
@@ -99,7 +110,7 @@ public class VariableUsageDelegate {
         variable.addUsage(variableUsage.locality);
         variablesByUsages.put(variableUsage.locality, variable);
         addParentVariablesUsage(variableUsage.parentVariables, variable);
-      } else {
+      } else if (isNotImplictlyDefinedVariable(variableUsage.name)) {
         errors.add(createInvalidDefinition(variableUsage.name, variableUsage.locality));
       }
     }
@@ -175,5 +186,16 @@ public class VariableUsageDelegate {
     List<String> parents;
     Locality locality;
     Map<String, Token> parentVariables;
+  }
+
+  /**
+   * This method checks if variableName belongs to IMPLICIT_FIELDS or not.
+   * SQLDA AND SQLCA and all its fields (e.g. SQLCODE, etc.) are implicitly defined by db2 co-processor or pre-processor.
+   *
+   * @param copybookName
+   * @return true if variableName belongs IMPLICIT_FIELDS
+   */
+  private boolean isNotImplictlyDefinedVariable(String variableName) {
+    return !IMPLICIT_FIELDS.contains(variableName);
   }
 }
