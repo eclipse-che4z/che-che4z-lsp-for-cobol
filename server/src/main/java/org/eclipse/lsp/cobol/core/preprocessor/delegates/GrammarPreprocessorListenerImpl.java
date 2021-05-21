@@ -29,7 +29,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
-import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
@@ -53,6 +52,9 @@ import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
 import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.INFO;
+import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.*;
+import static org.eclipse.lsp.cobol.core.semantics.ImplicitFields.SQLCA;
+import static org.eclipse.lsp.cobol.core.semantics.ImplicitFields.SQLDA;
 
 /**
  * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
@@ -163,9 +165,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     String copybookName = retrieveCopybookName(copySource);
     Locality locality = retrievePosition(copySource);
     CopybookModel model = getCopyBookContent(copybookName, locality);
-
     String uri = model.getUri();
     String content = model.getContent();
+    //in case of implicit SQLCA, SQLDA
+    if (content == null) {
+      return;
+    }
 
     String copybookId = randomUUID().toString();
     // In a chain of copy statement, there could be only one replacing phrase
@@ -315,13 +320,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     // throw away COPY terminals
     pop();
     // write copybook beginning trigger
-    write(ProcessingConstants.CPY_ENTER_TAG);
-    write(ProcessingConstants.CPY_URI_OPEN);
+    write(CPY_ENTER_TAG);
+    write(CPY_URI_OPEN);
     write(copybookId);
-    write(ProcessingConstants.CPY_URI_CLOSE);
+    write(CPY_URI_CLOSE);
     write(copybookContent);
     // write copybook closing trigger
-    write(ProcessingConstants.CPY_EXIT_TAG);
+    write(CPY_EXIT_TAG);
   }
 
   private String applyReplacing(String rawContent, List<Pair<String, String>> replacePatterns) {
@@ -340,12 +345,25 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     CopybookModel copybook =
         copybookService.resolve(copybookName, documentUri, copybookProcessingMode);
 
-    if (copybook.getContent() == null) {
+    if (copybook.getContent() == null && isNotImplictlyDefinedCopybook(copybookName)) {
       reportMissingCopybooks(copybookName, locality);
       return emptyModel(copybookName);
     }
 
     return copybook;
+  }
+
+  /**
+   * This method checks if copybook name is implicitly defined or not.
+   *
+   * Application can use SQLCA and SQLDA names to define communication and description areas as copybooks
+   * and both are implicitly defined by either co-processor or pre-processor.
+   *
+   * @param copybookName
+   * @return true if copybookname is not one of SQLDA or SQLCA
+   */
+  private boolean isNotImplictlyDefinedCopybook(String copybookName) {
+    return !(SQLCA.getValue().equals(copybookName) || SQLDA.getValue().equals(copybookName));
   }
 
   private boolean hasRecursion(String copybookName) {

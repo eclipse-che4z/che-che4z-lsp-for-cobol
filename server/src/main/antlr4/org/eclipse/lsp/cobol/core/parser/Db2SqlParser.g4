@@ -20,12 +20,12 @@ dataDivisionRules: (dbs_declare_variable | rulesAllowedInDataDivision | rulesAll
 
 procedureDivisionRules: ((dbs_allocate | dbs_alter | dbs_associate | dbs_call | dbs_close | dbs_comment | dbs_commit |
           dbs_connect | dbs_create | dbs_declare | dbs_declare_cursor | dbs_declare_table | dbs_delete | dbs_describe | dbs_drop | dbs_exchange | dbs_execute | dbs_explain |
-          dbs_fetch | dbs_free | dbs_get | dbs_grant | dbs_hold | dbs_include | dbs_include_sqlda | dbs_insert |
+          dbs_fetch | dbs_free | dbs_get | dbs_grant | dbs_hold | dbs_include | dbs_insert |
           dbs_label | dbs_lock | dbs_merge | dbs_open | dbs_prepare | dbs_refresh | dbs_release | dbs_rename |
           dbs_revoke | dbs_rollback | dbs_savepoint | dbs_select | dbs_set | dbs_signal | dbs_transfer | dbs_truncate |
           dbs_update | dbs_values | dbs_whenever) SEMICOLON_FS?)+;
 rulesAllowedInDataDivision: ((dbs_declare_cursor | dbs_declare_table | dbs_include) SEMICOLON_FS?)+;
-rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca ) SEMICOLON_FS?)+;
+rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca | dbs_include_sqlda) SEMICOLON_FS?)+;
 
 //used in working-storage section of cobol program
 dbs_declare_variable: DECLARE dbs_host_variable (COMMACHAR dbs_host_variable)* VARIABLE (CCSID (dbs_integer_constant | (EBCDIC|ASCII|UNICODE) (FOR (SBCS|MIXED|BIT) DATA)?))? SEMICOLON_FS?;
