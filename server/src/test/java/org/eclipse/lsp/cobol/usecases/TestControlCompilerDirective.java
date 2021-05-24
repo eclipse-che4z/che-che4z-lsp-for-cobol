@@ -73,7 +73,7 @@ class TestControlCompilerDirective {
             "1",
             new Diagnostic(
                 new Range(new Position(2, 7), new Position(2, 21)),
-                "Compiler directives cannot be continued on another line. ",
+                "Compiler directives cannot be continued on another line.",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText()),
             "2",

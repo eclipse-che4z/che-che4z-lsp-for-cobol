@@ -29,15 +29,24 @@ class TestIdmsConDisconnectStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*ERROR-STATUS} PIC X(4) VALUE '1400'.\n"
+          + "           88 {$*DB-REC-NOT-FOUND} VALUE '0326'.\n"
           + "       PROCEDURE DIVISION.\n";
 
   private static final String DISC1 =
       DEFS + "           DISCONNECT EMPLOYEE FROM OFFICE-EMPLOYEE\n";
 
+  private static final String DISC2 =
+      DEFS
+          + "           DISCONNECT EMPLOYEE FROM OFFICE-EMPLOYEE \n"
+          + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.  \n";
+
   private static final String CONN1 = DEFS + "           CONNECT EMPLOYEE TO OFFICE-EMPLOYEE\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(DISC1, CONN1);
+    return Stream.of(DISC1, DISC2, CONN1);
   }
 
   @ParameterizedTest

@@ -34,6 +34,8 @@ class TestIdmsFindObtainStatements {
           + "       01 {$*EMPDBK} PIC S9(8) COMP.\n"
           + "       01 {$*EMPPGI} PIC S9(8) COMP.\n"
           + "       01 {$*EMPL-ID} PIC X(4).\n"
+          + "       01 {$*ERROR-STATUS} PIC X(4) VALUE '1400'.\n"
+          + "           88 {$*DB-END-OF-SET} VALUE '0307'.\n"
           + "        PROCEDURE DIVISION.\n";
 
   private static final String FIND1 = DEFS + "           FIND CALC EMPLOYEE.\n";
@@ -76,10 +78,15 @@ class TestIdmsFindObtainStatements {
   private static final String FIND17 =
       DEFS + "           FIND KEEP EXCLUSIVE DUPLICATE EMPLOYEE.\n";
 
+  private static final String FIND18 =
+      DEFS
+          + "           OBTAIN NEXT EMPLOYEE WITHIN DEPT-EMPLOYEE ON {$DB-END-OF-SET}\n"
+          + "                   DISPLAY 'END OF SET'.\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         FIND1, FIND2, FIND3, FIND4, FIND5, FIND6, FIND7, FIND8, FIND9, FIND10, FIND11, FIND12,
-        FIND13, FIND14, FIND15, FIND16, FIND17);
+        FIND13, FIND14, FIND15, FIND16, FIND17, FIND18);
   }
 
   @ParameterizedTest

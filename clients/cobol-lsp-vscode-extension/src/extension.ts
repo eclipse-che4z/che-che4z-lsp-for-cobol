@@ -108,8 +108,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // 'export' public api-surface
     return {
-        analysis(uri: string): Promise<any> {
-            return languageClientService.retrieveAnalysis(uri);
+        analysis(uri: string, text: string): Promise<any> {
+            return languageClientService.retrieveAnalysis(uri, text);
         }
     };
 }

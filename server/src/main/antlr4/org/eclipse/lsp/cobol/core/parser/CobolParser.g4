@@ -7,7 +7,7 @@
 */
 
 parser grammar CobolParser;
-options {tokenVocab = CobolLexer;  superClass = MessageServiceParser;}
+options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
 
 import CICSParser;
 
@@ -690,24 +690,26 @@ dataDescriptionEntry
    ;
 
 dataDescriptionEntryFormat1
-   : LEVEL_NUMBER entryName? (dataGroupUsageClause | dataRedefinesClause | dataIntegerStringClause
-   | dataExternalClause | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataPictureClause
-   | dataCommonOwnLocalClause | dataTypeClause | dataUsingClause | dataUsageClause | dataValueClause
-   | dataReceivedByClause | dataOccursClause | dataSignClause | dataSynchronizedClause | dataJustifiedClause
-   | dataBlankWhenZeroClause | dataWithLowerBoundsClause | dataAlignedClause | dataRecordAreaClause)* (DOT_FS|DOT_FS2)
+   : LEVEL_NUMBER entryName? (dataGroupUsageClause | dataRedefinesClause | dataExternalClause
+   | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
+   | dataOccursClause | dataSignClause | dataSynchronizedClause
+   | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
+   (DOT_FS|DOT_FS2)
    ;
+
 
 dataDescriptionEntryFormat2
    : LEVEL_NUMBER_66 entryName? dataRenamesClause DOT_FS
    ;
 
 dataDescriptionEntryFormat1Level77
-   : LEVEL_NUMBER_77 entryName? (dataPictureClause | dataRedefinesClause | dataIntegerStringClause | dataExternalClause
-   | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataCommonOwnLocalClause | dataTypeClause
-   | dataUsingClause | dataUsageClause | dataValueClause | dataReceivedByClause | dataOccursClause | dataSignClause
-   | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause | dataWithLowerBoundsClause
-   | dataAlignedClause | dataRecordAreaClause)* (DOT_FS|DOT_FS2)
+   : LEVEL_NUMBER_77 entryName? (dataGroupUsageClause | dataRedefinesClause | dataExternalClause
+     | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
+     | dataOccursClause | dataSignClause | dataSynchronizedClause
+     | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
+     (DOT_FS|DOT_FS2)
    ;
+
 
 dataDescriptionEntryFormat3
    : LEVEL_NUMBER_88 entryName? dataValueClause DOT_FS
@@ -718,19 +720,11 @@ entryName
    ;
 
 dataGroupUsageClause
-   : GROUP_USAGE IS? NATIONAL
-   ;
-
-dataAlignedClause
-   : ALIGNED
+   : GROUP_USAGE IS? (NATIONAL | UTF_8)
    ;
 
 dataBlankWhenZeroClause
    : BLANK WHEN? (ZERO | ZEROS | ZEROES)
-   ;
-
-dataCommonOwnLocalClause
-   : COMMON | OWN | LOCAL
    ;
 
 dataExternalClause
@@ -739,10 +733,6 @@ dataExternalClause
 
 dataGlobalClause
    : IS? GLOBAL
-   ;
-
-dataIntegerStringClause
-   : INTEGER | STRING
    ;
 
 dataJustifiedClause
@@ -769,12 +759,12 @@ pictureString
    : charString
    ;
 
-dataReceivedByClause
-   : RECEIVED? BY? (CONTENT | REFERENCE | REF)
+dataDynamicLengthClause
+   : DYNAMIC LENGTH? (LIMIT IS? integerLiteral)?
    ;
 
-dataRecordAreaClause
-   : RECORD AREA
+dataVolatileClause
+   : VOLATILE
    ;
 
 dataRedefinesClause
@@ -795,18 +785,6 @@ dataSignClause
 
 dataSynchronizedClause
    : (SYNCHRONIZED | SYNC) (LEFT | RIGHT)?
-   ;
-
-dataThreadLocalClause
-   : IS? THREAD_LOCAL
-   ;
-
-dataTypeClause
-   : TYPE IS? (SHORT_DATE | LONG_DATE | NUMERIC_DATE | NUMERIC_TIME | LONG_TIME | (CLOB | BLOB | DBCLOB) LPARENCHAR integerLiteral RPARENCHAR)
-   ;
-
-dataTypeDefClause
-   : IS? TYPEDEF
    ;
 
 dataUsageClause
@@ -840,10 +818,6 @@ usageFormat
    | FUNCTION_POINTER
    ;
 
-dataUsingClause
-   : USING (LANGUAGE | CONVENTION) OF? dataName
-   ;
-
 dataValueClause
    : ((VALUE | VALUES) (IS | ARE)?) dataValueClauseLiteral
    ;
@@ -862,10 +836,6 @@ dataValueIntervalFrom
 
 dataValueIntervalTo
    : (THROUGH | THRU) literal
-   ;
-
-dataWithLowerBoundsClause
-   : WITH? LOWER BOUNDS
    ;
 
 dataDescriptionEntryCopyIdms
@@ -989,10 +959,26 @@ statement
    ;
 
 idmsStatements
-    : copyIdmsBinds | copyIdmsModule | abendCodeStatement | attachTaskCodeStatement | bindStatement | changePriorityStatement | checkTerminalStatement | commitStatement |
+    : idmsStmtsOptTerm endClause? | idmsStmtsOptTermOn endClause? idmsOnClause? | idmsStmtsMandTermOn (SEMICOLON_FS idmsOnClause? | DOT_FS)
+    ;
+
+idmsStmtsOptTerm
+    : copyIdmsBinds | copyIdmsModule
+    ;
+
+idmsStmtsOptTermOn
+    : abendCodeStatement | attachTaskCodeStatement | bindStatement | changePriorityStatement | checkTerminalStatement | commitStatement |
      connectStatement | dcStatement | dequeueStatement | disconnectStatement | endStatement | endpageStatement | enqueueStatement | eraseStatement | findStatement |
      finishStatement | freeStatement | getStatement | inquireMapStatement | keepStatement | loadStatement | mapStatement | modifyStatement | obtainStatement |
-     postStatement | putStatement | readyStatement |rollbackStatement | snapStatement | startpageStatement | storeStatement | transferStatement | waitStatement
+     postStatement | putStatement | readyStatement |rollbackStatement | snapStatement | startpageStatement | storeStatement | waitStatement
+    ;
+
+idmsStmtsMandTermOn
+    : transferStatement
+    ;
+
+idmsOnClause
+    : ON generalIdentifier
     ;
 
 // abend code statement
@@ -1012,7 +998,7 @@ abendCodeExitClause
 // accept statement
 
 acceptStatement
-   : ACCEPT (acceptIdmsDcClause | acceptIdmsDbClause |
+   : ACCEPT (acceptIdmsDcClause idmsOnClause? | acceptIdmsDbClause idmsOnClause? |
    (generalIdentifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?))
    ;
 
@@ -1351,7 +1337,11 @@ dcEventClause
 // delete statement
 
 deleteStatement
-   : DELETE (deleteFilenameClause | deleteQueueClause | deleteScratchClause | deleteTableClause)
+   : DELETE (deleteFilenameClause | deleteIdmsDCStatement idmsOnClause?)
+   ;
+
+deleteIdmsDCStatement
+   : deleteQueueClause | deleteScratchClause | deleteTableClause
    ;
 
 deleteFilenameClause
@@ -1564,25 +1554,29 @@ execCicsStatement
 
 // exec sql statement for specific divisions or sections of COBOL program
 execSqlStatementInProcedureDivision
-   : EXEC_SQL sqlRulesAllowedInProcedureDivision END_EXEC DOT_FS?
-   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} sqlRulesAllowedInProcedureDivision END_EXEC DOT_FS?
+   : execSqlStatement
    ;
 
 execSqlStatementInWorkingStorage
-   : EXEC_SQL (dbs_declare_variable SEMICOLON_FS?)+ END_EXEC DOT_FS?
-   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} dbs_declare_variable END_EXEC DOT_FS?
+   : execSqlStatement
    ;
 
 execSqlStatementInWorkingStorageAndLinkageSection
-   : EXEC_SQL sqlRulesAllowedInWorkingStorageAndLinkageSection END_EXEC DOT_FS?
-   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} sqlRulesAllowedInWorkingStorageAndLinkageSection END_EXEC DOT_FS?
+   : execSqlStatement
    ;
 
 execSqlStatementInDataDivision
-   : EXEC_SQL sqlRulesAllowedInDataDivision END_EXEC DOT_FS?
-   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} sqlRulesAllowedInDataDivision END_EXEC DOT_FS?
+   : execSqlStatement
    ;
 
+execSqlStatement
+   : EXEC_SQL sqlCode END_EXEC DOT_FS?
+   | {notifyError("cobolParser.missingSqlKeyword");} (EXEC | SQL) sqlCode END_EXEC DOT_FS?
+   ;
+
+sqlCode
+   : ~END_EXEC*?
+   ;
 
 // exec sql ims statement
 
@@ -2273,7 +2267,11 @@ putRecordClause
 // read statement
 
 readStatement
-   : READ (readFilenameClause | readLineFromTerminalClause | readTerminalClause)
+   : READ (readFilenameClause | readIdmsDcStatement idmsOnClause?)
+   ;
+
+readIdmsDcStatement
+   : readLineFromTerminalClause | readTerminalClause
    ;
 
 readFilenameClause
@@ -2365,7 +2363,7 @@ releaseStatement
 // return statement
 
 returnStatement
-   : RETURN (cobolReturn | idmsReturn)
+   : RETURN (cobolReturn | idmsReturn idmsOnClause?)
    ;
 
 cobolReturn
@@ -2463,8 +2461,11 @@ sendIdmsToClause
 // set statement
 
 setStatement
-   : SET (setToOnOff+ | setToBoolean | setToStatement | setUpDownByStatement | setToEntry
-   | setAbendExitStatement | setTimerStatement)
+   : SET (setToOnOff+ | setToBoolean | setToStatement | setUpDownByStatement | setToEntry | setIdmsDcStatement idmsOnClause?)
+   ;
+
+setIdmsDcStatement
+   : setAbendExitStatement | setTimerStatement
    ;
 
 setToStatement
@@ -2710,7 +2711,7 @@ terminateStatement
 // transfer statement
 
 transferStatement
-   : TRANSFER CONTROL? TO? (generalIdentifier | idms_program_name) (RETURN | LINK | NORETURN | XCTL)? (USING generalIdentifier+)? endClause
+   : TRANSFER CONTROL? TO? (generalIdentifier | idms_program_name) (RETURN | LINK | NORETURN | XCTL)? (USING generalIdentifier+)?
    ;
 
 // unstring statement
@@ -2794,8 +2795,12 @@ waitEventListClause
 // write statement
 
 writeStatement
-   : WRITE (writeStatementClause | writeJournalClause | writeLineClause | writeLogClause | writePrinterClause | writeTerminalClause | writeThenReadClause)
-   ;
+  : WRITE (writeStatementClause | writeIdmsDCStatement idmsOnClause?)
+  ;
+
+writeIdmsDCStatement
+    : writeJournalClause | writeLineClause | writeLogClause | writePrinterClause | writeTerminalClause | writeThenReadClause
+    ;
 
 writeStatementClause
    : recordName writeFromPhrase? writeAdvancingPhrase? writeAtEndOfPagePhrase? writeNotAtEndOfPagePhrase? invalidKeyPhrase? notInvalidKeyPhrase? END_WRITE?

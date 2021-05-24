@@ -32,8 +32,8 @@ import java.util.Map;
  */
 class DocumentHierarchyLevel {
   private int index;
-  private List<Locality> localities;
-  private Map<Integer, Integer> shifts;
+  private final List<Locality> localities;
+  private final Map<Integer, Integer> shifts;
 
   DocumentHierarchyLevel(@NonNull DocumentMapping documentMapping) {
     index = 0;

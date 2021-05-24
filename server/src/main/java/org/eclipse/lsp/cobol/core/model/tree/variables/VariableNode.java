@@ -14,9 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
+import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
@@ -29,6 +31,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  */
 @Getter
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public abstract class VariableNode extends Node {
   private final VariableType variableType;
   private final String name;
@@ -55,11 +58,22 @@ public abstract class VariableNode extends Node {
    * @return the error with the variable locality
    */
   public SyntaxError getError(MessageTemplate messageTemplate) {
+    return getError(messageTemplate, SEVERITY);
+  }
+
+  /**
+   * Construct an error for that Variable
+   *
+   * @param messageTemplate a message template for error
+   * @param severity  severity of the error
+   * @return the error with the variable locality
+   */
+  public SyntaxError getError(MessageTemplate messageTemplate, ErrorSeverity severity) {
     return SyntaxError.syntaxError()
-        .severity(SEVERITY)
-        .locality(getLocalityForError())
-        .messageTemplate(messageTemplate)
-        .build();
+            .severity(severity)
+            .locality(getLocalityForError())
+            .messageTemplate(messageTemplate)
+            .build();
   }
 
   private Locality getLocalityForError() {

@@ -20,7 +20,10 @@ import com.google.common.collect.Iterables;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
-import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
+import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
@@ -65,6 +68,7 @@ public class VariableDefinitionUtil {
 
   public static final ErrorSeverity SEVERITY = ERROR;
 
+
   /**
    * Process nodes with {@link VariableDefinitionNode} as a child and convert {@link VariableDefinitionNode} into
    * an appropriate {@link VariableNode}.
@@ -100,6 +104,9 @@ public class VariableDefinitionUtil {
       if ((nextLevelNumber < level || nextLevelNumber == LEVEL_66) && level != LEVEL_01) break;
       if (nextLevelNumber == level || nextLevelNumber == LEVEL_66 || nextLevelNumber == LEVEL_MNEMONIC) {
         definitionNode.setParent(rootNode);
+        if (definitionNode.getUsageClauses().isEmpty() && rootNode instanceof UsageClause)
+          definitionNode.setUsageClauses(
+              ImmutableList.of(((UsageClause) rootNode).getUsageFormat()));
         Optional<ResultWithErrors<VariableNode>> convertResult = convert(definitionNode);
         if (convertResult.isPresent()) {
           VariableNode variable = convertResult.get().unwrap(errors::addAll);
@@ -163,10 +170,10 @@ public class VariableDefinitionUtil {
   private ResultWithErrors<VariableNode> renameItemMatcher(VariableDefinitionNode definitionNode) {
     if (definitionNode.getLevel() != LEVEL_66) return null;
     GroupItemNode group = getPrecedingStructureForRename(definitionNode);
-    boolean global = (group == null) ? false : group.isGlobal();
+    boolean global = group != null && group.isGlobal();
     RenameItemNode variable = new RenameItemNode(definitionNode.getLocality(), getName(definitionNode), global);
     createVariableNameNode(variable, definitionNode.getVariableName());
-    return new ResultWithErrors(variable, processRenamesBoundaries(variable, group, definitionNode));
+    return new ResultWithErrors<>(variable, processRenamesBoundaries(variable, group, definitionNode));
   }
 
   private ResultWithErrors<VariableNode> conditionalDataNameMatcher(VariableDefinitionNode definitionNode) {
@@ -179,14 +186,14 @@ public class VariableDefinitionUtil {
     List<SyntaxError> errors = ImmutableList.of();
     if (precedingVariable == null || precedingVariable.getLevel() == LEVEL_66)
       errors = ImmutableList.of(variable.getError(MessageTemplate.of(PREVIOUS_WITHOUT_PIC_FOR_88, variableName)));
-    return new ResultWithErrors(variable, errors);
+    return new ResultWithErrors<>(variable, errors);
   }
 
   private ResultWithErrors<VariableNode> mnemonicNameMatcher(VariableDefinitionNode definitionNode) {
     if (definitionNode.getLevel() != 0) return null;
     MnemonicNameNode variable = new MnemonicNameNode(definitionNode.getLocality(), definitionNode.getSystemName(), getName(definitionNode));
     createVariableNameNode(variable, definitionNode.getVariableName());
-    return new ResultWithErrors(variable, ImmutableList.of());
+    return new ResultWithErrors<>(variable, ImmutableList.of());
   }
 
   private ResultWithErrors<VariableNode> independentDataItemMatcher(VariableDefinitionNode definitionNode) {
@@ -199,7 +206,7 @@ public class VariableDefinitionUtil {
         definitionNode.getValue(),
         definitionNode.hasRedefines());
     createVariableNameNode(variable, definitionNode.getVariableName());
-    return new ResultWithErrors(variable, handleRedefines(variable, definitionNode));
+    return new ResultWithErrors<>(variable, handleRedefines(variable, definitionNode));
   }
 
   private ResultWithErrors<VariableNode> multiTableDataNameMatcher(VariableDefinitionNode definitionNode) {
@@ -217,22 +224,29 @@ public class VariableDefinitionUtil {
       for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes())
         variable.addChild(new IndexItemNode(nameAndLocality.getLocality(), definitionNode.getLevel(),
             nameAndLocality.getName()));
-      return new ResultWithErrors(variable, ImmutableList.of());
+      return new ResultWithErrors<>(variable, ImmutableList.of());
     }
     return null;
   }
 
+  // TODO:
+  // 1. Group Item can have usage clause.
+  // 2. Group Item can't have following:
+  //    2.a- BLANK WHEN ZERO/ DYNAMIC LENGTH/ JUSTIFIED/ OCCURS/ PICTURE/ SYNCHRONIZED
   private ResultWithErrors<VariableNode> groupItemMatcher(VariableDefinitionNode definitionNode) {
-    if (definitionNode.doesntHavePic() && definitionNode.doesntHaveOccurs() && definitionNode.doesntHaveUsage()) {
+    if (definitionNode.doesntHavePic()
+        && definitionNode.doesntHaveOccurs()
+        && !definitionNode.isBlankWhenZeroPresent()) {
       GroupItemNode variable = new GroupItemNode(
           definitionNode.getLocality(),
           definitionNode.getLevel(),
           getName(definitionNode),
           definitionNode.isGlobal(),
-          definitionNode.hasRedefines()
+          definitionNode.hasRedefines(),
+          definitionNode.getUsage()
       );
       createVariableNameNode(variable, definitionNode.getVariableName());
-      return new ResultWithErrors(variable, handleRedefines(variable, definitionNode));
+      return new ResultWithErrors<>(variable, handleRedefines(variable, definitionNode));
     }
     return null;
   }
@@ -248,18 +262,21 @@ public class VariableDefinitionUtil {
           definitionNode.getPic(),
           definitionNode.getValue(),
           definitionNode.getOccursNumber(),
-          definitionNode.getUsage()
+          definitionNode.getUsage(),
+          definitionNode.isBlankWhenZeroPresent(),
+          definitionNode.isSignClausePresent()
       );
       createVariableNameNode(variable, definitionNode.getVariableName());
       for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes())
         variable.addChild(new IndexItemNode(nameAndLocality.getLocality(), definitionNode.getLevel(),
             nameAndLocality.getName()));
-      return new ResultWithErrors(variable, ImmutableList.of());
+      return new ResultWithErrors<>(variable, ImmutableList.of());
     }
     return null;
   }
 
   private ResultWithErrors<VariableNode> elementItemMatcher(VariableDefinitionNode definitionNode) {
+    List<SyntaxError> errors = new ArrayList<>();
     if ((definitionNode.hasPic() || definitionNode.hasUsage()) && definitionNode.doesntHaveOccurs()) {
       ElementaryItemNode variable = new ElementaryItemNode(
           definitionNode.getLocality(),
@@ -269,10 +286,13 @@ public class VariableDefinitionUtil {
           definitionNode.getPic(),
           definitionNode.getValue(),
           definitionNode.getUsage(),
-          definitionNode.hasRedefines()
+          definitionNode.hasRedefines(),
+          definitionNode.isBlankWhenZeroPresent(),
+          definitionNode.isSignClausePresent()
       );
       createVariableNameNode(variable, definitionNode.getVariableName());
-      return new ResultWithErrors(variable, handleRedefines(variable, definitionNode));
+      errors.addAll(handleRedefines(variable, definitionNode));
+      return new ResultWithErrors<>(variable, errors);
     }
     return null;
   }
@@ -291,7 +311,7 @@ public class VariableDefinitionUtil {
 
   private List<SyntaxError> checkGlobalUniqueNames(Node node) {
     return node.getChildren().stream()
-        .filter(it -> it instanceof VariableWithLevelNode)
+        .filter(VariableWithLevelNode.class::isInstance)
         .map(VariableWithLevelNode.class::cast)
         .filter(VariableWithLevelNode::isSpecifiedGlobal)
         .collect(groupingBy(VariableNode::getName))
@@ -306,7 +326,7 @@ public class VariableDefinitionUtil {
 
   private List<SyntaxError> checkTopNumbers(Node node) {
     return node.getChildren().stream()
-        .filter(it -> it instanceof VariableWithLevelNode)
+        .filter(VariableWithLevelNode.class::isInstance)
         .map(VariableWithLevelNode.class::cast)
         .filter(it -> !ALLOWED_TOP_LEVELS.contains(it.getLevel()))
         .map(variable -> variable.getError(MessageTemplate.of(NUMBER_NOT_ALLOWED_AT_TOP, variable.getName())))
@@ -400,7 +420,7 @@ public class VariableDefinitionUtil {
   }
 
   private List<String> collectVariableParentNames(Node parent) {
-    List<String> parents = new ArrayList();
+    List<String> parents = new ArrayList<>();
     while (parent != null && parent.getNodeType() == NodeType.VARIABLE) {
       parents.add(((VariableNode) parent).getName());
       parent = parent.getParent();

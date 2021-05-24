@@ -37,6 +37,8 @@ class TestIdmsReturnStatement {
           + "            03  {$*EMP-LAST}    PIC X(15) VALUE SPACES.\n"
           + "            03  {$*EMP-FIRST}   PIC X(10) VALUE SPACES.\n"
           + "       01 {$*EMPL-KEY} PIC X(25).\n"
+          + "       01 {$*ERROR-STATUS} PIC X(4) VALUE '1400'.\n"
+          + "           88 {$*DB-REC-NOT-FOUND} VALUE '0326'.\n"
           + "        PROCEDURE DIVISION.\n";
 
   private static final String TST1 = DEFS + "           RETURN {$EMPDBK} FROM IX-EMP CURRENCY.\n";
@@ -53,8 +55,18 @@ class TestIdmsReturnStatement {
   private static final String TST5 =
       DEFS + "           RETURN {$EMPDBK} FROM IX-EMP USING {$INDEX-KEY} KEY INTO {$EMPL-KEY}.\n";
 
+  private static final String TST6 =
+      DEFS
+          + "           RETURN {$EMPDBK} FROM IX-EMP USING {$INDEX-KEY}\n"
+          + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
+
+  private static final String TST7 =
+      DEFS
+          + "           RETURN {$EMPDBK} FROM IX-EMP USING {$INDEX-KEY} KEY INTO {$EMPL-KEY}\n"
+          + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(TST1, TST2, TST3, TST4, TST5);
+    return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7);
   }
 
   @ParameterizedTest

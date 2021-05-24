@@ -37,7 +37,7 @@ import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrde
  */
 @Singleton
 public class SnippetCompletion implements Completion {
-  private CompletionStorage snippets;
+  private final CompletionStorage snippets;
 
   @Inject
   SnippetCompletion(@Named("Snippets") CompletionStorage snippets) {
