@@ -33,7 +33,7 @@ context('This is a Copybook spec', () => {
     );
   });
 
-  describe.skip('Copybook - not exist: no syntax ok message', () => {
+  describe('Copybook - not exist: no syntax ok message', () => {
     it(
       ['flaky_theia'],
       'Checks that when opening Cobol file which refers to non-existent copybook, syntax ok message does not appear and copybook is underlined',

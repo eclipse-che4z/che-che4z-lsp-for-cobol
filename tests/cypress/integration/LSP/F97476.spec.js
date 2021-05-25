@@ -225,7 +225,7 @@ context('This is a F97476 spec', () => {
     });
   });
 
-  describe.skip('TC250946 [Mapping] Support building of the extended document - Replace by arithmetic operations', () => {
+  describe('TC250946 [Mapping] Support building of the extended document - Replace by arithmetic operations', () => {
     beforeEach(() => {
       cy.updateConfigs('testing');
     });
@@ -268,7 +268,7 @@ context('This is a F97476 spec', () => {
     });
   });
 
-  describe.skip('TC250951 [Mapping] Show Syntax and Semantic Errors from Copybooks', () => {
+  describe('TC250951 [Mapping] Show Syntax and Semantic Errors from Copybooks', () => {
     beforeEach(() => {
       cy.updateConfigs('testing');
       cy.writeFile('test_files/project/testing/REPL.cpy', 'MOVE.');

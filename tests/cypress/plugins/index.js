@@ -14,6 +14,7 @@
 
 /// <reference types='cypress' />
 /// <reference types='cypress-tags' />
+/// <reference types="@shelex/cypress-allure-plugin" />
 
 // ***********************************************************
 // This example plugins/index.js can be used to load plugins
@@ -57,4 +58,7 @@ module.exports = (on, config) => {
       return fs.existsSync(filename);
     },
   });
+  const allureWriter = require('@shelex/cypress-allure-plugin/writer');
+  allureWriter(on, config);
+  return config;
 };
