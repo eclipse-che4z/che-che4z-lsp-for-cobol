@@ -68,7 +68,7 @@ context('This is a LSP spec', () => {
       .contains(documentation);
   };
 
-  describe.skip('TC152046 Nominal - check syntax Ok message', () => {
+  describe('TC152046 Nominal - check syntax Ok message', () => {
     it(
       ['flaky_theia'],
       'Checks that when opening Cobol file with correct syntax there is an appropriate message is shown',
@@ -125,7 +125,7 @@ context('This is a LSP spec', () => {
     });
   });
 
-  describe.skip('TC152047 Error case - file has syntax errors', () => {
+  describe('TC152047 Error case - file has syntax errors', () => {
     it(
       ['flaky_theia'],
       'Checks that when opening Cobol file with correct syntax there is NO message about correct syntax',
@@ -242,7 +242,7 @@ context('This is a LSP spec', () => {
     });
   });
 
-  describe.skip('TC314392 LOG level', () => {
+  describe('TC314392 LOG level', () => {
     // Theia doesn't show settings.json correctly
     beforeEach(() => {
       cy.updateConfigs('empty');
