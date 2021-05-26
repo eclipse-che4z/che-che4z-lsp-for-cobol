@@ -96,7 +96,7 @@ pipeline {
                     steps {
                         container('maven') {
                             dir('server') {
-                                withMaven {
+                                withMaven(jdk: 'openjdk-8') {
                                     sh 'mvn -version'
                                     sh 'mvn clean verify --no-transfer-progress'
                                     sh 'cp target/server.jar $WORKSPACE/clients/cobol-lsp-vscode-extension/server/'
