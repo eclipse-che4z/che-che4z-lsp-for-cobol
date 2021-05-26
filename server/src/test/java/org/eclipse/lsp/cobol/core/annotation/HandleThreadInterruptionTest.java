@@ -14,33 +14,34 @@
  */
 package org.eclipse.lsp.cobol.core.annotation;
 
-import org.aopalliance.intercept.MethodInvocation;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.Signature;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
-
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /** Tests {@link org.eclipse.lsp.cobol.core.annotation.HandleThreadInterruption} */
 class HandleThreadInterruptionTest {
 
   @Test
-  void whenThreadIsNotInterrupted_thenMethodInvocationProceeds() throws Throwable {
+  void whenThreadIsNotInterrupted_thenNoExceptionIsThrown() {
     HandleThreadInterruption handleThreadInterruption = new HandleThreadInterruption();
-    MethodInvocation methodInvocation = mock(MethodInvocation.class);
-    handleThreadInterruption.invoke(methodInvocation);
-    verify(methodInvocation).proceed();
+      JoinPoint mockJoinPoint = mock(JoinPoint.class);
+    Assertions.assertDoesNotThrow(() -> handleThreadInterruption.beforeAdvice(mockJoinPoint));
   }
 
   @Test
   void whenThreadIsInterrupted_ParseExceptionIsThrown() {
     HandleThreadInterruption handleThreadInterruption = new HandleThreadInterruption();
-    MethodInvocation methodInvocation = mock(MethodInvocation.class);
-    Method mockMethod = this.getClass().getMethods()[0];
-    when(methodInvocation.getMethod()).thenReturn(mockMethod);
+    JoinPoint mockJoinPoint = mock(JoinPoint.class);
+    Signature mockSignature = mock(MethodSignature.class);
+    when(mockSignature.getName()).thenReturn("DUMMY");
+    when(mockJoinPoint.getSignature()).thenReturn(mockSignature);
     Thread.currentThread().interrupt();
     Assertions.assertThrows(
-        InterruptedException.class, () -> handleThreadInterruption.invoke(methodInvocation));
+        InterruptedException.class, () -> handleThreadInterruption.beforeAdvice(mockJoinPoint));
   }
 }

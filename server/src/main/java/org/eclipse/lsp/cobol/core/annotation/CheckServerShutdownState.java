@@ -20,12 +20,6 @@ import java.lang.annotation.*;
 /**
  * Annotation to handle LSP server shutdown state.
  * This annotation only work on a class of type {@link DisposableService}.
- * <p>annotation limitation:
- * 1. Classes must be public or package-private.
- * 2. Classes must be non-final
- * 3. Methods must be public, package-private or protected
- * 4. Methods must be non-final
- * 5. It is not possible to use on instances that aren't constructed by Guice.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

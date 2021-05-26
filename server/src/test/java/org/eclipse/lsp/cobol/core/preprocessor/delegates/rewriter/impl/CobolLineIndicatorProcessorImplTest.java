@@ -34,7 +34,7 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing Debug lines preformatting for Token analysis */
   @Test
   void debugLineTest() {
-    val debugLine = new CobolLine();
+    CobolLine debugLine = new CobolLine();
     debugLine.setType(DEBUG);
     debugLine.setIndicatorArea(ProcessingConstants.WS);
     debugLine.setContentAreaA("    ");
@@ -52,7 +52,7 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing normal lines pre-formatting for Token analysis */
   @Test
   void normalLineTest() {
-    val normalLine = new CobolLine();
+    CobolLine normalLine = new CobolLine();
     normalLine.setType(NORMAL);
     normalLine.setIndicatorArea(ProcessingConstants.WS);
     normalLine.setContentAreaA("    ");
@@ -71,7 +71,7 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing Compiler Directive lines pre-formatting for Token analysis */
   @Test
   void compilerDirectiveTest() {
-    val compilerDirectiveLine = new CobolLine();
+    CobolLine compilerDirectiveLine = new CobolLine();
     compilerDirectiveLine.setType(COMPILER_DIRECTIVE);
     compilerDirectiveLine.setIndicatorArea(ProcessingConstants.WS);
     compilerDirectiveLine.setContentAreaA("    ");
@@ -88,7 +88,7 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing comment lines pre-formatting for Token analysis */
   @Test
   void commentLineTest() {
-    val commentLine = new CobolLine();
+    CobolLine commentLine = new CobolLine();
     commentLine.setType(COMMENT);
     commentLine.setIndicatorArea("*");
     commentLine.setContentAreaA("    ");
@@ -107,19 +107,19 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing normal continuation line pre-formatting for Token analysis */
   @Test
   void continuationLineTest() {
-    val startContinuationLine = new CobolLine();
+    CobolLine startContinuationLine = new CobolLine();
     startContinuationLine.setType(NORMAL);
     startContinuationLine.setIndicatorArea(ProcessingConstants.WS);
     startContinuationLine.setContentAreaA("    ");
     startContinuationLine.setContentAreaB("       \"RANDOM TEXT   ");
 
-    val middleContinuationLine = new CobolLine();
+    CobolLine middleContinuationLine = new CobolLine();
     middleContinuationLine.setType(CONTINUATION);
     middleContinuationLine.setIndicatorArea("-");
     middleContinuationLine.setContentAreaA("    ");
     middleContinuationLine.setContentAreaB("        \"RANDOM TEXT   ");
 
-    val lastContinuationLine = new CobolLine();
+    CobolLine lastContinuationLine = new CobolLine();
     lastContinuationLine.setType(CONTINUATION);
     lastContinuationLine.setIndicatorArea("-");
     lastContinuationLine.setContentAreaA("    ");
@@ -147,13 +147,13 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing empty continuation line pre-formatting for Token analysis */
   @Test
   void emptyContinuationLine() {
-    val continuationLine = new CobolLine();
+    CobolLine continuationLine = new CobolLine();
     continuationLine.setType(NORMAL);
     continuationLine.setIndicatorArea(ProcessingConstants.WS);
     continuationLine.setContentAreaA("    ");
     continuationLine.setContentAreaB("       \"RANDOM TEXT   ");
 
-    val emptyContinuationLine = new CobolLine();
+    CobolLine emptyContinuationLine = new CobolLine();
     emptyContinuationLine.setType(CONTINUATION);
     emptyContinuationLine.setIndicatorArea("-");
     emptyContinuationLine.setContentAreaA("    ");
@@ -176,13 +176,13 @@ class CobolLineIndicatorProcessorImplTest {
   /** Testing continuation lines with trailing comma pre-formatting for Token analysis */
   @Test
   void trailingCommaContinuationLineTest() {
-    val startContinuationLine = new CobolLine();
+    CobolLine startContinuationLine = new CobolLine();
     startContinuationLine.setType(NORMAL);
     startContinuationLine.setIndicatorArea(ProcessingConstants.WS);
     startContinuationLine.setContentAreaA("    ");
     startContinuationLine.setContentAreaB("       \"RANDOM TEXT   ");
 
-    val trailingCommaContinuationLine = new CobolLine();
+    CobolLine trailingCommaContinuationLine = new CobolLine();
     trailingCommaContinuationLine.setType(CONTINUATION);
     trailingCommaContinuationLine.setIndicatorArea("-");
     trailingCommaContinuationLine.setContentAreaA("    ");

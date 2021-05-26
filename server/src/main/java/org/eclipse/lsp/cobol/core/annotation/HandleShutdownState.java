@@ -15,11 +15,13 @@
 
 package org.eclipse.lsp.cobol.core.annotation;
 
-import org.eclipse.lsp.cobol.service.DisposableLanguageServer;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.eclipse.lsp.cobol.service.DisposableLanguageServer;
 import org.eclipse.lsp4j.services.LanguageServer;
 
 import java.util.concurrent.CompletableFuture;
@@ -29,7 +31,8 @@ import java.util.concurrent.CompletableFuture;
  * shutdown state, if yes, it always return SHUTDOWN_RESPONSE.
  */
 @Slf4j
-public class HandleShutdownState implements MethodInterceptor {
+@Aspect
+public class HandleShutdownState {
   private static final String SHUTDOWN_RESPONSE = "InvalidRequest";
   private LanguageServer server;
 
@@ -42,20 +45,21 @@ public class HandleShutdownState implements MethodInterceptor {
    * Check if server is in shutdown state, if yes, it always return SHUTDOWN_RESPONSE. Else,
    * proceeds with actual method call.
    *
-   * @param invocation {@link MethodInvocation}
+   * @param joinPoint {@link ProceedingJoinPoint}
    * @return a fixed string (SHUTDOWN_RESPONSE) if server is in shutdown state. Else, proceeds with
    *     actual method call.
    * @throws Throwable
    */
-  @Override
-  public Object invoke(MethodInvocation invocation) throws Throwable {
+  @Around("@annotation(CheckServerShutdownState) && execution(* *(..))")
+  public Object aroundAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
     if (server instanceof DisposableLanguageServer) {
       DisposableLanguageServer languageServer = (DisposableLanguageServer) server;
       if (languageServer.getExitCode() == DisposableLanguageServer.SHUTDOWN_EXIT_CODE) {
-        LOG.info(invocation.getMethod().getName() + " invoked after shutdown");
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        LOG.info(signature.getMethod().getName() + " invoked after shutdown");
         return CompletableFuture.completedFuture(SHUTDOWN_RESPONSE);
       }
     }
-    return invocation.proceed();
+    return joinPoint.proceed();
   }
 }
