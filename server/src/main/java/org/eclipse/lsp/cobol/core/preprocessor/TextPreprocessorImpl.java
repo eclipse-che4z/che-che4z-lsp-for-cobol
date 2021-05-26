@@ -14,8 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
@@ -24,11 +28,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWri
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ import java.util.List;
  */
 @Slf4j
 @Singleton
-public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAspect {
+public class TextPreprocessorImpl implements TextPreprocessor {
   private GrammarPreprocessor grammarPreprocessor;
   private CobolLineReader reader;
   private CobolLineWriter writer;

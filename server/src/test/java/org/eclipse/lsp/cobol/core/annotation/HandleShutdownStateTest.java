@@ -15,12 +15,12 @@
 
 package org.eclipse.lsp.cobol.core.annotation;
 
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.eclipse.lsp.cobol.service.DisposableLanguageServer;
-import org.aopalliance.intercept.MethodInvocation;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,11 +36,15 @@ class HandleShutdownStateTest {
         mock(LanguageServer.class, withSettings().extraInterfaces(DisposableLanguageServer.class));
     handleShutdownState.setServer(server);
     when(((DisposableLanguageServer) server).getExitCode()).thenReturn(0);
-    MethodInvocation methodInvocation = mock(MethodInvocation.class);
-    Method mockMethod = this.getClass().getMethods()[0];
-    when(methodInvocation.getMethod()).thenReturn(mockMethod);
+    ProceedingJoinPoint mockPJP = mock(ProceedingJoinPoint.class);
+    MethodSignature mockMethodSignature = mock(MethodSignature.class);
+
+    when(mockMethodSignature.getMethod())
+        .thenReturn(this.getClass().getMethods()[0]);
+    when(mockPJP.getSignature()).thenReturn(mockMethodSignature);
+    handleShutdownState.aroundAdvice(mockPJP);
     String response =
-        (String) ((CompletableFuture) handleShutdownState.invoke(methodInvocation)).get();
+            (String) ((CompletableFuture<Object>) handleShutdownState.aroundAdvice(mockPJP)).get();
     assertEquals("InvalidRequest", response);
   }
 
@@ -51,9 +55,9 @@ class HandleShutdownStateTest {
         mock(LanguageServer.class, withSettings().extraInterfaces(DisposableLanguageServer.class));
     handleShutdownState.setServer(server);
     when(((DisposableLanguageServer) server).getExitCode()).thenReturn(1);
-    MethodInvocation methodInvocation = mock(MethodInvocation.class);
-    handleShutdownState.invoke(methodInvocation);
-    verify(methodInvocation).proceed();
+    ProceedingJoinPoint mockPJP = mock(ProceedingJoinPoint.class);
+    handleShutdownState.aroundAdvice(mockPJP);
+    verify(mockPJP).proceed();
   }
 
   @Test
@@ -62,8 +66,8 @@ class HandleShutdownStateTest {
     HandleShutdownState handleShutdownState = new HandleShutdownState();
     LanguageServer server = mock(LanguageServer.class);
     handleShutdownState.setServer(server);
-    MethodInvocation methodInvocation = mock(MethodInvocation.class);
-    handleShutdownState.invoke(methodInvocation);
-    verify(methodInvocation).proceed();
+    ProceedingJoinPoint mockPJP = mock(ProceedingJoinPoint.class);
+    handleShutdownState.aroundAdvice(mockPJP);
+    verify(mockPJP).proceed();
   }
 }

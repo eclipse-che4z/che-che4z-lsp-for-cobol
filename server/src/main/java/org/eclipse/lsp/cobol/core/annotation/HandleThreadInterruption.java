@@ -16,33 +16,30 @@
 package org.eclipse.lsp.cobol.core.annotation;
 
 import lombok.extern.slf4j.Slf4j;
-import org.aopalliance.intercept.Joinpoint;
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.reflect.MethodSignature;
 
-/**
- * Intercepts calls on an {@link ThreadInterruptAspect} on its way to the target.
- *
- * <p>NOTE: Guice dynamically creates a subclass that applies interceptors by overriding methods.
- */
+/** Intercepts calls on an {@link CheckThreadInterruption} annotation on its way to the target. */
 @Slf4j
-public class HandleThreadInterruption implements MethodInterceptor {
+@Aspect
+public class HandleThreadInterruption {
 
   /**
-   * Implement this method to perform extra treatments before and after the invocation. Polite
-   * implementations would certainly like to invoke {@link Joinpoint#proceed()}.
+   * Implement this method to perform extra treatments before the invocation. Checks for the thread
+   * interruption and throws an {@link InterruptedException} in case current thread is interrupted.
+   * Else proceed normally.
    *
-   * @param invocation the method invocation joinpoint
-   * @return the result of the call to {@link Joinpoint#proceed()}, might be intercepted by the
-   *     interceptor.
+   * @param joinPoint joinPoint for aspect
    * @throws Throwable if the interceptors or the target-object throws an exception.
    */
-  @Override
-  public Object invoke(MethodInvocation invocation) throws Throwable {
+  @Before("@annotation(CheckThreadInterruption) && execution(* *(..))")
+  public void beforeAdvice(JoinPoint joinPoint) throws Throwable {
     if (Thread.interrupted()) {
-      LOG.debug(invocation.getMethod().getName() + " is interrupted by user");
+      MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+      LOG.debug(signature.getName() + " is interrupted by user");
       throw new InterruptedException("Parsing interrupted by user.");
     }
-    return invocation.proceed();
   }
 }

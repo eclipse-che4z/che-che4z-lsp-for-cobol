@@ -29,7 +29,6 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
@@ -69,7 +68,7 @@ import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILL
 @Slf4j
 @Singleton
 @SuppressWarnings("WeakerAccess")
-public class CobolLanguageEngine implements ThreadInterruptAspect {
+public class CobolLanguageEngine {
 
   private final TextPreprocessor preprocessor;
   private final DefaultErrorStrategy defaultErrorStrategy;

@@ -26,7 +26,6 @@ import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
@@ -48,7 +47,7 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
  */
 @Slf4j
 @Singleton
-public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspect {
+public class CopybookServiceImpl implements CopybookService {
   private final SettingsService settingsService;
   private final FileSystemService files;
 

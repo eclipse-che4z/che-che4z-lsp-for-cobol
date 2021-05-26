@@ -22,7 +22,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
@@ -40,7 +39,7 @@ import java.util.List;
  * returns an extended document with all the available copybooks included, with their definitions
  * and usages specified, as well as related errors.
  */
-public class GrammarPreprocessorImpl implements GrammarPreprocessor, ThreadInterruptAspect {
+public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   private GrammarPreprocessorListenerFactory listenerFactory;
   private ReplacingService replacingService;
   private MessageService messageService;
