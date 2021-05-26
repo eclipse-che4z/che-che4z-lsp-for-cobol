@@ -88,6 +88,7 @@ class ServerCommunicationsTest {
   void testNotifyThatLoadingInProgress() {
     String data = UUID.randomUUID().toString();
     when(files.decodeURI(data)).thenReturn(data);
+    when(files.getNameFromURI(data)).thenReturn(data);
     when(customExecutor.getScheduledThreadPoolExecutor())
         .thenReturn(Executors.newScheduledThreadPool(5));
 
@@ -111,6 +112,7 @@ class ServerCommunicationsTest {
   void testNotifyThatDocumentAnalysed() {
     String data = UUID.randomUUID().toString();
     when(files.decodeURI(data)).thenReturn(data);
+    when(files.getNameFromURI(data)).thenReturn(data);
     when(messageService.getMessage(anyString(), anyString()))
         .thenReturn("No syntax errors detected in %s");
     communications.notifyThatDocumentAnalysed(data);
@@ -160,6 +162,7 @@ class ServerCommunicationsTest {
     client = mock(CobolLanguageClient.class);
     when(provider.get()).thenReturn(client);
     when(files.decodeURI(uri)).thenReturn(uri);
+    when(files.getNameFromURI(uri)).thenReturn(fileName);
     when(messageService.getMessage(anyString(), anyString()))
         .thenReturn("No syntax errors detected in %s");
     communications.notifyThatDocumentAnalysed(uri);

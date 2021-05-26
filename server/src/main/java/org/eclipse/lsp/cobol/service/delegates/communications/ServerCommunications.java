@@ -79,7 +79,8 @@ public class ServerCommunications implements Communications {
                 showMessage(
                     Info,
                     messageService.getMessage(
-                        "Communications.syntaxAnalysisInProgress", retrieveFileName(decodedUri)));
+                        "Communications.syntaxAnalysisInProgress",
+                        files.getNameFromURI(decodedUri)));
               }
             },
             3,
@@ -98,7 +99,8 @@ public class ServerCommunications implements Communications {
             logMessage(
                 Info,
                 messageService.getMessage(
-                    "Communications.noSyntaxError", retrieveFileName(files.decodeURI(uri)))));
+                    "Communications.noSyntaxError",
+                    files.getNameFromURI(files.decodeURI(uri)))));
   }
 
   /**
@@ -146,11 +148,6 @@ public class ServerCommunications implements Communications {
 
   private CobolLanguageClient getClient() {
     return provider.get();
-  }
-
-  private String retrieveFileName(String uri) {
-    if (uri.indexOf('/') == -1) return uri;
-    return uri.substring(uri.lastIndexOf('/') + 1);
   }
 
   private List<Diagnostic> clean(Collection<Diagnostic> diagnostics) {
