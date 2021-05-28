@@ -43,7 +43,7 @@ const copybookProfile = new CopybookProfile("copybook", profile, false);
 const zoweGeneralError = new ZoweError("zowe error", Type.General);
 const downloadQueueLockedErrorMsg = DOWNLOAD_QUEUE_LOCKED_ERROR_MSG.replace(PROFILE_NAME_PLACEHOLDER, wrongCredProfile);
 
-vscode.workspace.workspaceFolders = [{} as any];
+(vscode.workspace.workspaceFolders as any) = [{} as any];
 vscode.window.showInformationMessage = () => Promise.resolve("Download Copybooks");
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
     get: jest.fn().mockReturnValue(undefined),

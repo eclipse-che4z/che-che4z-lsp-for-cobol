@@ -26,7 +26,7 @@ describe("CopybooksPathGenerator tests", () => {
     const profile = "profile";
     const dataset = "dataset";
     beforeEach(() => {
-        vscode.workspace.workspaceFolders = [{uri: {fsPath}} as any];
+        (vscode.workspace.workspaceFolders as any) = [{uri: {fsPath}} as any];
     });
 
     it("creates copybook path", () => {
@@ -38,7 +38,7 @@ describe("CopybooksPathGenerator tests", () => {
     });
     it("check workspace", () => {
         expect(checkWorkspace()).toEqual(true);
-        vscode.workspace.workspaceFolders = [];
+        (vscode.workspace.workspaceFolders as any) = [];
         expect(checkWorkspace()).toEqual(false);
     });
 

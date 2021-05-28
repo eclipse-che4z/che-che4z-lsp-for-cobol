@@ -18,9 +18,9 @@ import {ProfileService} from "../services/ProfileService";
 describe("Profile Service tests", () => {
     const programName = "programName.cbl";
     const profileName = "profileName";
-    vscode.workspace.textDocuments = [];
-    vscode.workspace.textDocuments.push({fileName: "skip.file"} as any);
-    vscode.workspace.textDocuments.push({fileName: "skip.cbl"} as any);
+    (vscode.workspace.textDocuments as any) = [];
+    (vscode.workspace.textDocuments as any).push({fileName: "skip.file"} as any);
+    (vscode.workspace.textDocuments as any).push({fileName: "skip.cbl"} as any);
     const textDocument: any = {fileName: path.join(profileName, programName)};
 
     function setupScenario(zProfileObject: any, profileNameFromSettings: string, textDocumentItem?: any) {
@@ -29,7 +29,7 @@ describe("Profile Service tests", () => {
         });
 
         if (textDocumentItem) {
-            vscode.workspace.textDocuments.push(textDocumentItem);
+            (vscode.workspace.textDocuments as any).push(textDocumentItem);
         }
 
         const zoweApi: any = {
