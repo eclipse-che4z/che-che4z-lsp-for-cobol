@@ -17,9 +17,9 @@ package org.eclipse.lsp.cobol.service.utils;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -60,12 +60,7 @@ public class WorkspaceFileService implements FileSystemService {
   @Nullable
   @Override
   public String getNameFromURI(@NonNull String uri) {
-    try {
-      return FilenameUtils.getBaseName(Paths.get(new URI(uri)).getFileName().toString());
-    } catch (URISyntaxException e) {
-      LOG.error("Cannot get file name from: " + uri, e);
-      return null;
-    }
+    return new File(uri).getName().replaceFirst("\\?.*$", "");
   }
 
   @Nullable
