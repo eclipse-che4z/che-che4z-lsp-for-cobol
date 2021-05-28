@@ -8,7 +8,7 @@
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
-        "vscode": "^1.30.0"
+        "vscode": "^1.56.0"
     },
     "repository": {
         "type": "git",
@@ -199,24 +199,26 @@
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "jest -w 1 --unhandled-rejections=strict",
         "coverage": "jest --coverage --runInBand"
     },
     "dependencies": {
-        "@zowe/imperative": "4.7.4",
+        "@zowe/imperative": "4.13.1",
+        "vscode-extension-telemetry": "0.1.6",
         "vscode-languageclient": "5.2.1",
-        "vscode-extension-telemetry": "0.1.6"
+
+        "lodash": "4.17.21",
+        "json-schema": "v0.3.0"
     },
     "devDependencies": {
-        "@types/jest": "^24.0.18",
+        "@types/jest": "^26.0.0",
         "@types/node": "^12.6.2",
-        "jest": "^24.9.0",
+        "@types/vscode": "^1.56.0",
+        "jest": "^27.0.0",
         "jest-sonar-reporter": "^2.0.0",
-        "ts-jest": "^24.0.2",
+        "ts-jest": "^27.0.0",
         "tslint": "^5.18.0",
         "tslint-sonarts": "^1.9.0",
-        "typescript": "^3.5.3",
-        "vscode": "^1.1.33"
+        "typescript": "^3.5.3"
     }
 }
