@@ -28,8 +28,6 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
@@ -69,7 +67,7 @@ import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILL
 @Slf4j
 @Singleton
 @SuppressWarnings("WeakerAccess")
-public class CobolLanguageEngine implements ThreadInterruptAspect {
+public class CobolLanguageEngine {
 
   private final TextPreprocessor preprocessor;
   private final DefaultErrorStrategy defaultErrorStrategy;
@@ -101,11 +99,11 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
    *     the client
    */
   @NonNull
-  @CheckThreadInterruption
   public ResultWithErrors<SemanticContext> run(
       @NonNull String documentUri,
       @NonNull String text,
       @NonNull CopybookProcessingMode copybookProcessingMode) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
     timingBuilder.getPreprocessorTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
@@ -210,17 +208,18 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
     return embeddedLanguagesListener.getEmbeddedCodeParts();
   }
 
-  @CheckThreadInterruption
   CobolParser getCobolParser(CommonTokenStream tokens) {
+
+    ThreadInterruptionUtil.checkThreadInterrupted();
     return new CobolParser(tokens);
   }
 
-  @CheckThreadInterruption
   Map<Token, Locality> getPositionMapping(
       String documentUri,
       ExtendedDocument extendedDocument,
       CommonTokenStream tokens,
       Map<Token, EmbeddedCode> embeddedCodeParts) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     return LocalityMappingUtils.createPositionMapping(
         tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri, embeddedCodeParts);
   }

@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.service.mocks;
 
-import org.eclipse.lsp.cobol.service.DisposableLanguageServer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.eclipse.lsp4j.InitializeParams;
@@ -27,8 +26,7 @@ import java.util.concurrent.CompletableFuture;
 
 /** Mock implementation of language server. Only for testing purposes. */
 @Singleton
-public class TestLanguageServer implements LanguageServer, DisposableLanguageServer {
-  private int exitCode = 1;
+public class TestLanguageServer implements LanguageServer {
 
   @Inject
   public TestLanguageServer() {}
@@ -40,7 +38,6 @@ public class TestLanguageServer implements LanguageServer, DisposableLanguageSer
 
   @Override
   public CompletableFuture<Object> shutdown() {
-    exitCode = 0;
     return null;
   }
 
@@ -59,15 +56,4 @@ public class TestLanguageServer implements LanguageServer, DisposableLanguageSer
     return null;
   }
 
-  @Override
-  public int getExitCode() {
-    return exitCode;
-  }
-
-  /**
-   * Revoke shutdown for testing purpose.
-   */
-  public void revokeShutdown() {
-    exitCode = 1;
-  }
 }

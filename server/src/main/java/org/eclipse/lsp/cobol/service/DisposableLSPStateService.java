@@ -15,11 +15,13 @@
 
 package org.eclipse.lsp.cobol.service;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Contract for the server which can have multiple running state. And an exit code would determine
  * the actual status of server.
  */
-public interface DisposableLanguageServer {
+public interface DisposableLSPStateService {
   int SHUTDOWN_EXIT_CODE = 0;
 
   /**
@@ -28,4 +30,15 @@ public interface DisposableLanguageServer {
    * @return int
    */
   int getExitCode();
+
+  /** Signals the server to shutdown by updating the server state to SHUTDOWN_EXIT_CODE */
+  void shutdown();
+
+  /** Revoke shutdown for testing purpose. */
+  @VisibleForTesting
+  void revokeShutdown();
+
+  default boolean isServerShutdown() {
+    return this.getExitCode() == DisposableLSPStateService.SHUTDOWN_EXIT_CODE;
+  }
 }

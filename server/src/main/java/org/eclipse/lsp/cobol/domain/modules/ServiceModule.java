@@ -14,7 +14,9 @@
  */
 package org.eclipse.lsp.cobol.domain.modules;
 
-import org.eclipse.lsp.cobol.core.annotation.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.*;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActionProvider;
@@ -28,7 +30,8 @@ import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp.cobol.service.delegates.formations.TrimFormation;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
-import org.eclipse.lsp.cobol.service.delegates.references.*;
+import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
+import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
@@ -36,10 +39,6 @@ import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
-import com.google.inject.AbstractModule;
-import com.google.inject.matcher.Matchers;
-import com.google.inject.multibindings.Multibinder;
-import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
@@ -54,6 +53,7 @@ public class ServiceModule extends AbstractModule {
   protected void configure() {
     bind(CustomThreadPoolExecutor.class).to(CustomThreadPoolExecutorService.class);
     bind(LanguageServer.class).to(CobolLanguageServer.class);
+    bind(DisposableLSPStateService.class).to(CobolLSPServerStateService.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(CopybookService.class).to(CopybookServiceImpl.class);
     bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
@@ -71,18 +71,6 @@ public class ServiceModule extends AbstractModule {
     bindFormations();
     bindCompletions();
     bindCodeActions();
-
-    bindInterceptor(
-        Matchers.subclassesOf(ThreadInterruptAspect.class),
-        Matchers.annotatedWith(CheckThreadInterruption.class),
-        new HandleThreadInterruption());
-
-    HandleShutdownState handleShutdownState = new HandleShutdownState();
-    requestInjection(handleShutdownState);
-    bindInterceptor(
-        Matchers.subclassesOf(DisposableService.class),
-            (new NonSyntheticMethodMatcher()).and(Matchers.annotatedWith(CheckServerShutdownState.class)),
-        handleShutdownState);
   }
 
   private void bindFormations() {

@@ -46,7 +46,7 @@ import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
  */
 @Slf4j
 @Singleton
-public class CobolLanguageServer implements LanguageServer, DisposableLanguageServer {
+public class CobolLanguageServer implements LanguageServer {
 
   private TextDocumentService textService;
   private WorkspaceService workspaceService;
@@ -54,7 +54,7 @@ public class CobolLanguageServer implements LanguageServer, DisposableLanguageSe
   private SettingsService settingsService;
   private LocaleStore localeStore;
   private CustomThreadPoolExecutor customThreadPoolExecutor;
-  private int exitCode = 1;
+  private final DisposableLSPStateService disposableLSPStateService;
 
   @Inject
   CobolLanguageServer(
@@ -63,13 +63,15 @@ public class CobolLanguageServer implements LanguageServer, DisposableLanguageSe
       WatcherService watchingService,
       SettingsService settingsService,
       LocaleStore localeStore,
-      CustomThreadPoolExecutor customThreadPoolExecutor) {
+      CustomThreadPoolExecutor customThreadPoolExecutor,
+      DisposableLSPStateService disposableLSPStateService) {
     this.textService = textService;
     this.workspaceService = workspaceService;
     this.watchingService = watchingService;
     this.settingsService = settingsService;
     this.localeStore = localeStore;
     this.customThreadPoolExecutor = customThreadPoolExecutor;
+    this.disposableLSPStateService = disposableLSPStateService;
   }
 
   @Override
@@ -80,11 +82,6 @@ public class CobolLanguageServer implements LanguageServer, DisposableLanguageSe
   @Override
   public WorkspaceService getWorkspaceService() {
     return workspaceService;
-  }
-
-  @Override
-  public int getExitCode() {
-    return exitCode;
   }
 
   @Override
@@ -142,10 +139,11 @@ public class CobolLanguageServer implements LanguageServer, DisposableLanguageSe
     LOG.info("COBOL LS received shutdown request");
     try {
       cancelAllProcessing();
-      exitCode = 0;
+      disposableLSPStateService.shutdown();
     } catch (Exception exception) {
       return CompletableFuture.completedFuture(new ShutdownResponse(null, exception.getMessage()));
     }
+    int exitCode = disposableLSPStateService.getExitCode();
     return CompletableFuture.completedFuture(new ShutdownResponse(null, String.valueOf(exitCode)));
   }
 
@@ -177,6 +175,7 @@ public class CobolLanguageServer implements LanguageServer, DisposableLanguageSe
 
   @Override
   public void exit() {
+    int exitCode = disposableLSPStateService.getExitCode();
     LOG.info("COBOL LS server exits with code: " + exitCode);
     System.exit(exitCode);
   }

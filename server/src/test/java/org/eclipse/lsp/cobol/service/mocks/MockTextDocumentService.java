@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service.mocks;
 
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.service.CFASTBuilderImpl;
+import org.eclipse.lsp.cobol.service.CobolLSPServerStateService;
 import org.eclipse.lsp.cobol.service.CobolTextDocumentService;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
@@ -43,8 +44,8 @@ public class MockTextDocumentService {
   @Mock protected Formations formations;
 
   /**
-   * Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing.
-   * All tasks run synchronously.
+   * Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing. All tasks run
+   * synchronously.
    */
   protected CobolTextDocumentService getMockedTextDocumentServiceUsingSameThread() {
     return CobolTextDocumentService.builder()
@@ -57,12 +58,13 @@ public class MockTextDocumentService {
         .formations(formations)
         .executors(new TestThreadPoolExecutor())
         .cfastBuilder(new CFASTBuilderImpl())
+        .disposableLSPStateService(new CobolLSPServerStateService())
         .build();
   }
 
   /**
-   * Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing.
-   * Tasks run in the separate thread.
+   * Give a dummy {@link CobolTextDocumentService} with mocked attributes for testing. Tasks run in
+   * the separate thread.
    */
   protected CobolTextDocumentService getMockedTextDocumentServiceUsingSeparateThread() {
     return CobolTextDocumentService.builder()
@@ -73,6 +75,7 @@ public class MockTextDocumentService {
         .actions(actions)
         .occurrences(occurrences)
         .formations(formations)
+        .disposableLSPStateService(new CobolLSPServerStateService())
         .executors(new CustomThreadPoolExecutorService(1, 1, 60, 1))
         .build();
   }
