@@ -15,15 +15,12 @@
 
 package org.eclipse.lsp.cobol.domain.modules;
 
-import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorListenerFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
@@ -38,26 +35,18 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingServiceIm
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
-import org.eclipse.lsp.cobol.core.visitor.InterruptingTreeListener;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.communications.ServerCommunications;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
-import com.google.inject.AbstractModule;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 import static com.google.inject.name.Names.named;
 
 /** This module provides DI bindings for COBOL language engine part. */
-public class EngineModule extends AbstractModule {
+public class EngineModule extends ProxyEngineProviders {
   @Override
   protected void configure() {
     bind(CustomThreadPoolExecutor.class).to(CustomThreadPoolExecutorService.class);
-    bind(CobolLanguageEngine.class);
-    bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
-    bind(GrammarPreprocessor.class).to(GrammarPreprocessorImpl.class);
     install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));
     bind(ReplacingService.class).to(ReplacingServiceImpl.class);
     bind(CobolLineReader.class).to(CobolLineReaderImpl.class);
@@ -67,7 +56,6 @@ public class EngineModule extends AbstractModule {
     bind(MessageService.class).to(PropertiesMessageService.class);
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(Communications.class).to(ServerCommunications.class);
-    bind(ParseTreeListener.class).to(InterruptingTreeListener.class);
     bind(String.class)
         .annotatedWith(named("resourceFileLocation"))
         .toInstance("resourceBundles/messages");

@@ -19,13 +19,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.annotation.CheckServerShutdownState;
-import org.eclipse.lsp.cobol.core.annotation.DisposableService;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
@@ -44,9 +42,13 @@ import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -68,11 +70,17 @@ import static java.util.stream.Collectors.toList;
  * <p>For the maintainers: Please, add logging for exceptions if you run any asynchronous operation.
  * Also, you perform any communication with the client, do it a using {@link Communications}
  * instance.
+ *
+ * <p>NOTE: Guice binding is done through {@link com.google.inject.Provides}.<br>
+ * <br>
+ * Check {@link
+ * org.eclipse.lsp.cobol.domain.modules.ProxyServiceProviders#getTextDocumentService(Communications,
+ * LanguageEngineFacade, Formations, Completions, Occurrences, DataBusBroker, CodeActions,
+ * CustomThreadPoolExecutor, HoverProvider, CFASTBuilder, LanguageServer)}
  */
 @Slf4j
 @Singleton
-public class CobolTextDocumentService
-    implements TextDocumentService, DisposableService, ExtendedApi {
+public class CobolTextDocumentService implements TextDocumentService, ExtendedApi {
   private static final String GIT_FS_URI = "gitfs:/";
   private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
   private final Map<String, CobolDocumentModel> docs = new ConcurrentHashMap<>();
@@ -91,7 +99,6 @@ public class CobolTextDocumentService
   private HoverProvider hoverProvider;
   private CFASTBuilder cfastBuilder;
 
-  @Inject
   @Builder
   CobolTextDocumentService(
       Communications communications,

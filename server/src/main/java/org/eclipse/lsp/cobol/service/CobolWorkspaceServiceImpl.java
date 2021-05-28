@@ -14,41 +14,47 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import com.google.inject.Singleton;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.annotation.CheckServerShutdownState;
-import org.eclipse.lsp.cobol.core.annotation.DisposableService;
 import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.messages.LogLevelUtils;
 import org.eclipse.lsp.cobol.core.model.ErrorCode;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.ExecuteCommandParams;
+import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
-import lombok.NonNull;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
 /**
  * This class is responsible to watch for any changes into the copybook folder and to fetch updated
  * settings coming from the client
+ *
+ * <p>NOTE: Guice binding is done through {@link com.google.inject.Provides}.<br>
+ * <br>
+ * Check {@link
+ * org.eclipse.lsp.cobol.domain.modules.ProxyServiceProviders#getWorkspaceService(DataBusBroker,
+ * SettingsService, WatcherService, CopybookService, LocaleStore, SubroutineService,
+ * LanguageServer)}
  */
 @Slf4j
 @Singleton
-public class CobolWorkspaceServiceImpl implements WorkspaceService, DisposableService {
+public class CobolWorkspaceServiceImpl implements WorkspaceService {
   private DataBusBroker dataBus;
   private SettingsService settingsService;
   private WatcherService watchingService;
@@ -56,7 +62,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService, DisposableSe
   private LocaleStore localeStore;
   private SubroutineService subroutineService;
 
-  @Inject
   public CobolWorkspaceServiceImpl(
       DataBusBroker dataBus,
       SettingsService settingsService,

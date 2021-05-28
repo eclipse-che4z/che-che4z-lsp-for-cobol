@@ -15,18 +15,22 @@
 
 package org.eclipse.lsp.cobol.core.visitor;
 
-import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
+import org.eclipse.lsp.cobol.domain.modules.ProxyEngineProviders;
 
 /**
  * This class used to implicitly check if the current interrupted while the parsing by the main
  * grammar.
+ *
+ * <p>NOTE: Guice binding is done through {@link com.google.inject.Provides}.<br>
+ * <br>
+ * Check {@link ProxyEngineProviders#getParseTreeListener()}
  */
-public class InterruptingTreeListener implements ParseTreeListener, ThreadInterruptAspect {
+public class InterruptingTreeListener implements ParseTreeListener {
 
   @Override
   @CheckThreadInterruption

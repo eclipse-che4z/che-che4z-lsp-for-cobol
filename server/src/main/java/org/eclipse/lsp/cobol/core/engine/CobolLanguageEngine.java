@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.engine;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,6 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
@@ -65,11 +63,17 @@ import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILL
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
  * Its run method used by the service facade layer CobolLanguageEngineFacade.
+ *
+ * <p>NOTE: Guice binding is done through {@link com.google.inject.Provides}.<br>
+ * <br>
+ * Check {@link
+ * org.eclipse.lsp.cobol.domain.modules.ProxyEngineProviders#createCobolLanguageEngine(TextPreprocessor,
+ * DefaultErrorStrategy, MessageService, ParseTreeListener, SubroutineService)}
  */
 @Slf4j
 @Singleton
 @SuppressWarnings("WeakerAccess")
-public class CobolLanguageEngine implements ThreadInterruptAspect {
+public class CobolLanguageEngine {
 
   private final TextPreprocessor preprocessor;
   private final DefaultErrorStrategy defaultErrorStrategy;
@@ -77,7 +81,6 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
   private final ParseTreeListener treeListener;
   private final SubroutineService subroutineService;
 
-  @Inject
   public CobolLanguageEngine(
       TextPreprocessor preprocessor,
       DefaultErrorStrategy defaultErrorStrategy,

@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates;
 
-import com.google.inject.Inject;
 import lombok.NonNull;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -22,7 +21,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
@@ -39,13 +37,16 @@ import java.util.List;
  * This class runs pre-processing for COBOL using CobolPreprocessor.g4 grammar file. As a result, it
  * returns an extended document with all the available copybooks included, with their definitions
  * and usages specified, as well as related errors.
+ *
+ * <p>NOTE: Guice binding is done through {@link com.google.inject.Provides}.<br><br> Check {@link
+ * org.eclipse.lsp.cobol.domain.modules.ProxyEngineProviders#createGrammarPreprocessor(GrammarPreprocessorListenerFactory,
+ * ReplacingService, MessageService)}
  */
-public class GrammarPreprocessorImpl implements GrammarPreprocessor, ThreadInterruptAspect {
+public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   private GrammarPreprocessorListenerFactory listenerFactory;
   private ReplacingService replacingService;
   private MessageService messageService;
 
-  @Inject
   public GrammarPreprocessorImpl(
       GrammarPreprocessorListenerFactory listenerFactory,
       ReplacingService replacingService,

@@ -15,17 +15,27 @@
 
 package org.eclipse.lsp.cobol.core.annotation;
 
-import java.lang.annotation.*;
+import org.eclipse.lsp.cobol.core.messages.LocaleStore;
+import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
+import org.eclipse.lsp.cobol.service.CopybookService;
+import org.eclipse.lsp.cobol.service.SettingsService;
+import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp.cobol.service.WatcherService;
+import org.eclipse.lsp4j.services.LanguageServer;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Annotation to handle LSP server shutdown state.
- * This annotation only work on a class of type {@link DisposableService}.
- * <p>annotation limitation:
- * 1. Classes must be public or package-private.
- * 2. Classes must be non-final
- * 3. Methods must be public, package-private or protected
- * 4. Methods must be non-final
- * 5. It is not possible to use on instances that aren't constructed by Guice.
+ *
+ * <p>NOTE: Annotation works only when binding to guice is provided using {@link ProxyUtil}.
+ * </br>For example : check {@link
+ * org.eclipse.lsp.cobol.domain.modules.ServiceModule#getWorkspaceService(DataBusBroker,
+ * SettingsService, WatcherService, CopybookService, LocaleStore, SubroutineService,
+ * LanguageServer)}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
