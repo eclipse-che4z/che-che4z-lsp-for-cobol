@@ -77,13 +77,13 @@ Check this page: https://docs.cypress.io/guides/guides/test-retries.html#Introdu
 
 ## 5. Generate report
 
-To generate a HTML report after you run the test. 
+We are using [Allure Report](https://github.com/allure-framework/allure2). The project has integration with Cypress using [cypress-allure-plugin]( https://github.com/Shelex/cypress-allure-plugin). 
 
-Run `npm run generate:html:report` for final test report.`generate:html:report` combines the 2 commands: `merge:reports` abd `create:html:report` into one. 
-
-The `merge:reports` command will merge all the json files from our `cypress/report` directory and store them in a new file called `cypress-tests-report.json`. 
-
-The `create:html:report` command will generate the html report from `cypress-tests-report.json` and save it a new directory `cypress/reports/final_report`.
+* Clear previous output: `allure:clear`
+* Generate Allure report: `allure:report`
+* Open the generated report: `allure:open`
+* Generate and open report: `allure:open:report`
+* Historical data is preserved: `allure:history`
 
 ## 6. Test tags
 We are using custom tags to slice up Cypress test runs. Check the tags bellow in the table

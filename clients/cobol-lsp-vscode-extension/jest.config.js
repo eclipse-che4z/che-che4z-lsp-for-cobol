@@ -17,6 +17,7 @@ module.exports = {
         "!**/coverage/**",
         "!src/__tests__/*.ts"
      ],
+    "testRunner" : 'jasmine2',
     "testResultsProcessor": "jest-sonar-reporter",
      "coverageThreshold": {
       "global": {

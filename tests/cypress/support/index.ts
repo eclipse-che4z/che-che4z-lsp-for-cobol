@@ -28,6 +28,7 @@
 // ***********************************************************
 
 import '@eclipse/che-che4z/tests';
+import '@shelex/cypress-allure-plugin';
 
 const baseUrl = Cypress.config('baseUrl');
 
