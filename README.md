@@ -40,11 +40,9 @@ COBOL Language Support provides the following COBOL syntax awareness features:
 ### Autocomplete
 Autocomplete speeds up the coding process by intuitively suggesting the most likely variables or paragraphs to follow existing code. The extension provides live suggestions while you type for:
 
-- COBOL keywords
-- COBOL variables
-- COBOL paragraphs
-- CICS keywords
-- DB2 SQL keywords
+- COBOL keywords, variables and paragraphs
+- CA IDMS DML statements
+- CICS and DB2 SQL keywords
 - Code Snippets
 - Copybook variable and paragraph names
 - Names of copybooks that are used in the program
