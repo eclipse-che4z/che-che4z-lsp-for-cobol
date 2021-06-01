@@ -15,40 +15,39 @@
 
 package org.eclipse.lsp.cobol.core.visitor;
 
-import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 
 /**
  * This class used to implicitly check if the current interrupted while the parsing by the main
  * grammar.
  */
-public class InterruptingTreeListener implements ParseTreeListener, ThreadInterruptAspect {
+public class InterruptingTreeListener implements ParseTreeListener {
 
   @Override
-  @CheckThreadInterruption
   public void visitTerminal(TerminalNode node) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     // Implicitly checks if the thread interrupted
   }
 
   @Override
-  @CheckThreadInterruption
   public void visitErrorNode(ErrorNode node) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     // Implicitly checks if the thread interrupted
   }
 
   @Override
-  @CheckThreadInterruption
   public void enterEveryRule(ParserRuleContext ctx) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     // Implicitly checks if the thread interrupted
   }
 
   @Override
-  @CheckThreadInterruption
   public void exitEveryRule(ParserRuleContext ctx) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     // Implicitly checks if the thread interrupted
   }
 }

@@ -25,8 +25,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
+import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
@@ -48,7 +47,7 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
  */
 @Slf4j
 @Singleton
-public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspect {
+public class CopybookServiceImpl implements CopybookService {
   private final SettingsService settingsService;
   private final FileSystemService files;
 
@@ -93,11 +92,11 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
    * @param copybookProcessingMode - text document synchronization type
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
-  @CheckThreadInterruption
   public CopybookModel resolve(
       @NonNull String copybookName,
       @NonNull String documentUri,
       @NonNull CopybookProcessingMode copybookProcessingMode) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     try {
       return copybookCache.get(
           copybookName, () -> resolveSync(copybookName, documentUri, copybookProcessingMode));
@@ -112,12 +111,12 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
     copybookCache.put(copybookModel.getName(), copybookModel);
   }
 
-  @CheckThreadInterruption
   CopybookModel resolveSync(
       @NonNull String copybookName,
       @NonNull String documentUri,
       @NonNull CopybookProcessingMode copybookProcessingMode)
       throws ExecutionException, InterruptedException {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     String cobolFileName = files.getNameFromURI(documentUri);
     String uri =
         retrieveURI(
@@ -126,7 +125,9 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
                 .get());
     if (uri.isEmpty()) {
       if (copybookProcessingMode.download && cobolFileName != null) {
-        Optional.ofNullable(copybooksForDownloading.computeIfAbsent(cobolFileName, s -> ConcurrentHashMap.newKeySet()))
+        Optional.ofNullable(
+                copybooksForDownloading.computeIfAbsent(
+                    cobolFileName, s -> ConcurrentHashMap.newKeySet()))
             .ifPresent(it -> it.add(copybookName));
       }
       return new CopybookModel(copybookName, null, null);
