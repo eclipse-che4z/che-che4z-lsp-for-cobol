@@ -157,42 +157,42 @@ context('This is a F96117 spec', () => {
       cy.get('div.monaco-editor-hover-content').contains('BOOK3: Copybook not found');
     });
   });
-  describe('TC247996 - Nested copybooks with "no extension" are supported', () => {
-    afterEach(() => {
-      cy.openFile('A.cpy').goToLine(14);
-      cy.getMainEditor()
-        .type('{backspace}{backspace}{backspace}{backspace}')
-        .type('B. ', { delay: 100 })
-        .type('{ctrl}{c}')
-        .closeCurrentTab();
-      cy.get('.theia-button.main').click();
-      cy.closeCurrentTab();
-      cy.closeFolder('testing');
-    });
-    it(['flaky'], 'Nested copybooks with "no extension" are supported', () => {
-      cy.openFile('TEST.CBL');
+  // describe('TC247996 - Nested copybooks with "no extension" are supported', () => {
+  //   afterEach(() => {
+  //     cy.openFile('A.cpy').goToLine(14);
+  //     cy.getMainEditor()
+  //       .type('{backspace}{backspace}{backspace}{backspace}')
+  //       .type('B. ', { delay: 100 })
+  //       .type('{ctrl}{c}')
+  //       .closeCurrentTab();
+  //     cy.get('.theia-button.main').click();
+  //     cy.closeCurrentTab();
+  //     cy.closeFolder('testing');
+  //   });
+  //   it(['flaky'], 'Nested copybooks with "no extension" are supported', () => {
+  //     cy.openFile('TEST.CBL');
 
-      // Check that variable is available
-      cy.goToLine(21);
-      cy.getMainEditor().type('{ctrl} ').type('       PROGRAM');
-      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('PROGRAM-STATUS');
-      cy.closeCurrentTab();
+  //     // Check that variable is available
+  //     cy.goToLine(21);
+  //     cy.getMainEditor().type('{ctrl} ').type('       PROGRAM');
+  //     cy.get('[widgetid="editor.widget.suggestWidget"]').contains('PROGRAM-STATUS');
+  //     cy.closeCurrentTab();
 
-      //change in A.cpy to 'COPY CA.'
-      cy.openFolder('testing').openFile('A.cpy').wait(500).goToLine(14);
-      cy.getMainEditor()
-        .type('{backspace}')
-        .type('{backspace}')
-        .type('{backspace}')
-        .type('CA. ', { delay: 100 })
-        .type('{ctrl}{c}')
-        .closeCurrentTab();
-      cy.get('.theia-button.main').click();
+  //     //change in A.cpy to 'COPY CA.'
+  //     cy.openFolder('testing').openFile('A.cpy').wait(500).goToLine(14);
+  //     cy.getMainEditor()
+  //       .type('{backspace}')
+  //       .type('{backspace}')
+  //       .type('{backspace}')
+  //       .type('CA. ', { delay: 100 })
+  //       .type('{ctrl}{c}')
+  //       .closeCurrentTab();
+  //     cy.get('.theia-button.main').click();
 
-      // Open file and check that vriable is not available
-      cy.openFile('TEST.CBL').goToLine(21).type('{end}{enter}');
-      cy.getMainEditor().type('{ctrl} ');
-      cy.get('[widgetid="editor.widget.suggestWidget"]').should('not.have.text', 'PROGRAM-STATUS');
-    });
-  });
+  //     // Open file and check that vriable is not available
+  //     cy.openFile('TEST.CBL').goToLine(21).type('{end}{enter}');
+  //     cy.getMainEditor().type('{ctrl} ');
+  //     cy.get('[widgetid="editor.widget.suggestWidget"]').should('not.have.text', 'PROGRAM-STATUS');
+  //   });
+  // });
 });

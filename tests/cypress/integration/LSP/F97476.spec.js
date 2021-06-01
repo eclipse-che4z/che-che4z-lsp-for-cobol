@@ -225,20 +225,20 @@ context('This is a F97476 spec', () => {
     });
   });
 
-  describe('TC250946 [Mapping] Support building of the extended document - Replace by arithmetic operations', () => {
-    beforeEach(() => {
-      cy.updateConfigs('testing');
-    });
-    it(['bug'], 'Checks replace by arithmetic operations', () => {
-      cy.openFile('PAYLIB.CBL').goToLine(37);
-      cy.getLineByNumber(37)
-        .type('{end}{backspace}{backspace}{backspace}{backspace}{backspace}*3== .', { delay: 300 })
-        .wait(1000);
-      cy.getCurrentLineErrors({ expectedLine: 37 })
-        .getHoverErrorMessage()
-        .contains("Syntax error on '*' expected SECTION");
-    });
-  });
+  // describe('TC250946 [Mapping] Support building of the extended document - Replace by arithmetic operations', () => {
+  //   beforeEach(() => {
+  //     cy.updateConfigs('testing');
+  //   });
+  //   it(['bug'], 'Checks replace by arithmetic operations', () => {
+  //     cy.openFile('PAYLIB.CBL').goToLine(37);
+  //     cy.getLineByNumber(37)
+  //       .type('{end}{backspace}{backspace}{backspace}{backspace}{backspace}*3== .', { delay: 300 })
+  //       .wait(1000);
+  //     cy.getCurrentLineErrors({ expectedLine: 37 })
+  //       .getHoverErrorMessage()
+  //       .contains("Syntax error on '*' expected SECTION");
+  //   });
+  // });
 
   describe('TC250950 [Mapping] Parser Does React on CPY Exit Tag', () => {
     beforeEach(() => {
@@ -268,18 +268,18 @@ context('This is a F97476 spec', () => {
     });
   });
 
-  describe('TC250951 [Mapping] Show Syntax and Semantic Errors from Copybooks', () => {
-    beforeEach(() => {
-      cy.updateConfigs('testing');
-      cy.writeFile('test_files/project/testing/REPL.cpy', 'MOVE.');
-    });
+  // describe('TC250951 [Mapping] Show Syntax and Semantic Errors from Copybooks', () => {
+  //   beforeEach(() => {
+  //     cy.updateConfigs('testing');
+  //     cy.writeFile('test_files/project/testing/REPL.cpy', 'MOVE.');
+  //   });
 
-    it(['flaky_theia'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
-      cy.openFolder('testing').openFile('REPL.cpy');
-      cy.goToLine(1).wait(500);
-      cy.getCurrentLineErrors({ expectedLine: 1 })
-        .getHoverErrorMessage()
-        .contains("Syntax error on 'DIVISI' expected DIVISION");
-    });
-  });
+  //   it(['flaky_theia'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
+  //     cy.openFolder('testing').openFile('REPL.cpy');
+  //     cy.goToLine(1).wait(500);
+  //     cy.getCurrentLineErrors({ expectedLine: 1 })
+  //       .getHoverErrorMessage()
+  //       .contains("Syntax error on 'DIVISI' expected DIVISION");
+  //   });
+  // });
 });

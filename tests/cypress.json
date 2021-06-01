@@ -22,12 +22,5 @@
     "runMode": 2,
     "openMode": 2
   },
-  "supportFile": "cypress/support/index.ts",
-  "reporter": "mochawesome",
-  "reporterOptions": {
-    "reportDir": "cypress/reports",
-    "overwrite": false,
-    "html": false,
-    "json": true
-  }
+  "supportFile": "cypress/support/index.ts"
 }
