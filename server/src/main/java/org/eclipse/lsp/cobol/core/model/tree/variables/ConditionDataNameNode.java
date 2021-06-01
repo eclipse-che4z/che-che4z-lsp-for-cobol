@@ -30,8 +30,8 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
 public class ConditionDataNameNode extends VariableWithLevelNode {
   private ValueInterval valueInterval;
 
-  public ConditionDataNameNode(Locality location, String name, ValueInterval valueInterval) {
-    super(location, LEVEL_88, name, VariableType.CONDITION_DATA_NAME);
+  public ConditionDataNameNode(Locality location, String name, boolean redefines, ValueInterval valueInterval) {
+    super(location, LEVEL_88, name, redefines, VariableType.CONDITION_DATA_NAME);
     this.valueInterval = valueInterval;
   }
 }

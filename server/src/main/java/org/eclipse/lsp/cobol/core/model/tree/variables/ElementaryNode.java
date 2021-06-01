@@ -51,13 +51,14 @@ abstract class ElementaryNode extends VariableWithLevelNode implements UsageClau
       Locality location,
       int level,
       String name,
+      boolean redefines,
       VariableType variableType,
       boolean global,
       boolean isBlankWhenZeroPresent,
       boolean isSignClausePresent,
       String picClause,
       UsageFormat usageFormat) {
-    super(location, level, name, variableType, global);
+    super(location, level, name, redefines, variableType, global);
     this.isBlankWhenZeroPresent = isBlankWhenZeroPresent;
     this.isSignClausePresent = isSignClausePresent;
     this.picClause = picClause;

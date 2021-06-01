@@ -54,6 +54,21 @@ public class TestVariableRedefineAsap {
           + "                 10 {$*WS-DATE} PIC X(2).\n"
           + "               05 {$*WS-DATE2} REDEFINES {$WS-DATE1} PIC 9(8).";
 
+  private static final String CORRECT2 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.      EMPPROJ.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION. \n"
+          + "         WORKING-STORAGE SECTION.\n"
+          + "          01  {$*SUBSCHEMA}.\n"
+          + "            03  {$*IDBMSCOM-AREA}    PIC X(100)\n"
+          + "                                     VALUE  LOW-VALUE .\n"
+          + "            03 {$*IDBMSCOM}          REDEFINES {$IDBMSCOM-AREA}\n"
+          + "                                     PIC X OCCURS 100.\n"
+          + "            03  {$*RIDBMSCOM}        REDEFINES {$IDBMSCOM-AREA}.\n"
+          + "                05  {$*DB-SUB-ADDR}  PIC X(4).\n"
+          + "                05  {$*DB-SUB-FILLER}       PIC X(96).\n";
+
   @Test
   void testError() {
     UseCaseEngine.runTest(
@@ -71,5 +86,10 @@ public class TestVariableRedefineAsap {
   @Test
   void test() {
     UseCaseEngine.runTest(CORRECT, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void test2() {
+    UseCaseEngine.runTest(CORRECT2, ImmutableList.of(), ImmutableMap.of());
   }
 }

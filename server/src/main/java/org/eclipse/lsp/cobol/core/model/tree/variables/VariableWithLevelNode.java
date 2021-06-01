@@ -35,19 +35,23 @@ abstract class VariableWithLevelNode extends VariableNode {
   private final int level;
   private boolean global;
   private final boolean specifiedGlobal;
+  private final boolean redefines;
 
 
-  protected VariableWithLevelNode(Locality location, int level, String name, VariableType variableType,
-                                  boolean global) {
+  protected VariableWithLevelNode(Locality location, int level, String name, boolean redefines,
+                                  VariableType variableType, boolean global) {
     super(location, name, variableType);
     this.level = level;
+    this.redefines = redefines;
     this.global = global;
     this.specifiedGlobal = global;
   }
 
-  protected VariableWithLevelNode(Locality location, int level, String name, VariableType variableType) {
+  protected VariableWithLevelNode(Locality location, int level, String name, boolean redefines,
+                                  VariableType variableType) {
     super(location, name, variableType);
     this.level = level;
+    this.redefines = redefines;
     this.global = false;
     this.specifiedGlobal = false;
   }

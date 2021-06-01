@@ -31,15 +31,13 @@ import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
 @EqualsAndHashCode(callSuper = true)
 public class ElementaryItemNode extends ElementaryNode {
   private String value;
-  private boolean redefines;
 
   public ElementaryItemNode(Locality location, int level, String name, boolean global, String picClause, String value,
                             UsageFormat usageFormat, boolean redefines, boolean isBlankWhenZeroPresent,
                             boolean isSignClausePresent) {
-    super(location, level, name, VariableType.ELEMENTARY_ITEM, global, isBlankWhenZeroPresent, isSignClausePresent,
-            picClause, usageFormat);
+    super(location, level, name, redefines, VariableType.ELEMENTARY_ITEM, global, isBlankWhenZeroPresent,
+        isSignClausePresent, picClause, usageFormat);
 
     this.value = value;
-    this.redefines = redefines;
   }
 }
