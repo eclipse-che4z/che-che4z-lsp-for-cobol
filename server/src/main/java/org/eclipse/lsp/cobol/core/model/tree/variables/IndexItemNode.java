@@ -29,8 +29,8 @@ import java.util.List;
 @Getter
 @ToString(callSuper = true)
 public class IndexItemNode extends VariableWithLevelNode {
-  protected IndexItemNode(Locality location, int level, String name) {
-    super(location, level, name, VariableType.INDEX_ITEM);
+  protected IndexItemNode(Locality location, int level, String name, boolean redefines) {
+    super(location, level, name, redefines, VariableType.INDEX_ITEM);
   }
 
   @Override

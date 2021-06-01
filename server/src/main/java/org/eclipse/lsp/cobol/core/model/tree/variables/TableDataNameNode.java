@@ -26,10 +26,11 @@ public class TableDataNameNode extends ElementaryNode {
   private String value;
   private int occursTimes;
 
-  public TableDataNameNode(Locality location, int level, String name, boolean global, String picClause, String value,
-                           int occursTimes, UsageFormat usageFormat, boolean isBlankWhenZeroPresent, boolean isSignClausePresent) {
-    super(location, level, name, VariableType.TABLE_DATA_NAME, global, isBlankWhenZeroPresent, isSignClausePresent,
-            picClause, usageFormat);
+  public TableDataNameNode(Locality location, int level, String name, boolean redefines, boolean global,
+                           String picClause, String value, int occursTimes, UsageFormat usageFormat,
+                           boolean isBlankWhenZeroPresent, boolean isSignClausePresent) {
+    super(location, level, name, redefines, VariableType.TABLE_DATA_NAME, global, isBlankWhenZeroPresent,
+        isSignClausePresent, picClause, usageFormat);
     this.value = value;
     this.occursTimes = occursTimes;
   }

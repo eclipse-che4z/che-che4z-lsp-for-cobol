@@ -141,13 +141,17 @@ public class VariableDefinitionUtil {
     return matchers.stream()
         .map(matcher -> matcher.apply(definitionNode))
         .filter(Objects::nonNull)
-        .map(result -> {
-          List<SyntaxError> errors = new ArrayList<>(result.getErrors());
-          VariableNode variableNode = result.getResult();
-          errors.addAll(definitionNode.getErrors(variableNode));
-          return new ResultWithErrors<>(variableNode, errors);
-        })
+        .map(result -> handleGeneralErrors(result, definitionNode))
+        .map(result -> handleRedefines(result, definitionNode))
         .findFirst();
+  }
+
+  private ResultWithErrors<VariableNode> handleGeneralErrors(ResultWithErrors<VariableNode> result,
+                                                             VariableDefinitionNode definitionNode) {
+    List<SyntaxError> errors = new ArrayList<>(result.getErrors());
+    VariableNode variableNode = result.getResult();
+    errors.addAll(definitionNode.getErrors(variableNode));
+    return new ResultWithErrors<>(variableNode, errors);
   }
 
   private final List<Function<VariableDefinitionNode, ResultWithErrors<VariableNode>>> matchers = ImmutableList.of(
@@ -171,7 +175,8 @@ public class VariableDefinitionUtil {
     if (definitionNode.getLevel() != LEVEL_66) return null;
     GroupItemNode group = getPrecedingStructureForRename(definitionNode);
     boolean global = group != null && group.isGlobal();
-    RenameItemNode variable = new RenameItemNode(definitionNode.getLocality(), getName(definitionNode), global);
+    RenameItemNode variable = new RenameItemNode(definitionNode.getLocality(), getName(definitionNode),
+        definitionNode.hasRedefines(), global);
     createVariableNameNode(variable, definitionNode.getVariableName());
     return new ResultWithErrors<>(variable, processRenamesBoundaries(variable, group, definitionNode));
   }
@@ -180,7 +185,7 @@ public class VariableDefinitionUtil {
     if (definitionNode.getLevel() != LEVEL_88) return null;
     String variableName = getName(definitionNode);
     ConditionDataNameNode variable = new ConditionDataNameNode(definitionNode.getLocality(), variableName,
-        definitionNode.getValueInterval());
+        definitionNode.hasRedefines(), definitionNode.getValueInterval());
     createVariableNameNode(variable, definitionNode.getVariableName());
     VariableWithLevelNode precedingVariable = getVariableForConditional(definitionNode);
     List<SyntaxError> errors = ImmutableList.of();
@@ -206,7 +211,7 @@ public class VariableDefinitionUtil {
         definitionNode.getValue(),
         definitionNode.hasRedefines());
     createVariableNameNode(variable, definitionNode.getVariableName());
-    return new ResultWithErrors<>(variable, handleRedefines(variable, definitionNode));
+    return new ResultWithErrors<>(variable, ImmutableList.of());
   }
 
   private ResultWithErrors<VariableNode> multiTableDataNameMatcher(VariableDefinitionNode definitionNode) {
@@ -217,13 +222,14 @@ public class VariableDefinitionUtil {
           definitionNode.getLocality(),
           definitionNode.getLevel(),
           getName(definitionNode),
+          definitionNode.hasRedefines(),
           definitionNode.getOccursNumber(),
           definitionNode.getUsage()
       );
       createVariableNameNode(variable, definitionNode.getVariableName());
       for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes())
         variable.addChild(new IndexItemNode(nameAndLocality.getLocality(), definitionNode.getLevel(),
-            nameAndLocality.getName()));
+            nameAndLocality.getName(), definitionNode.hasRedefines()));
       return new ResultWithErrors<>(variable, ImmutableList.of());
     }
     return null;
@@ -246,7 +252,7 @@ public class VariableDefinitionUtil {
           definitionNode.getUsage()
       );
       createVariableNameNode(variable, definitionNode.getVariableName());
-      return new ResultWithErrors<>(variable, handleRedefines(variable, definitionNode));
+      return new ResultWithErrors<>(variable, ImmutableList.of());
     }
     return null;
   }
@@ -258,6 +264,7 @@ public class VariableDefinitionUtil {
           definitionNode.getLocality(),
           definitionNode.getLevel(),
           getName(definitionNode),
+          definitionNode.hasRedefines(),
           definitionNode.isGlobal(),
           definitionNode.getPic(),
           definitionNode.getValue(),
@@ -269,7 +276,7 @@ public class VariableDefinitionUtil {
       createVariableNameNode(variable, definitionNode.getVariableName());
       for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes())
         variable.addChild(new IndexItemNode(nameAndLocality.getLocality(), definitionNode.getLevel(),
-            nameAndLocality.getName()));
+            nameAndLocality.getName(), definitionNode.hasRedefines()));
       return new ResultWithErrors<>(variable, ImmutableList.of());
     }
     return null;
@@ -291,7 +298,6 @@ public class VariableDefinitionUtil {
           definitionNode.isSignClausePresent()
       );
       createVariableNameNode(variable, definitionNode.getVariableName());
-      errors.addAll(handleRedefines(variable, definitionNode));
       return new ResultWithErrors<>(variable, errors);
     }
     return null;
@@ -383,11 +389,12 @@ public class VariableDefinitionUtil {
     return null;
   }
 
-  // TODO: 5. 66 and 88 cannot be redefined
-  private List<SyntaxError> handleRedefines(VariableNode variableNode,
-                                                   VariableDefinitionNode definitionNode) {
-    if (definitionNode.doesntHaveRedefines()) return ImmutableList.of();
-    List<SyntaxError> errors = new ArrayList<>();
+  // TODO: 66 and 88 cannot be redefined
+  private ResultWithErrors<VariableNode> handleRedefines(ResultWithErrors<VariableNode> result,
+                                            VariableDefinitionNode definitionNode) {
+    if (definitionNode.doesntHaveRedefines()) return result;
+    VariableNode variableNode = result.getResult();
+    List<SyntaxError> errors = new ArrayList<>(result.getErrors());
     VariableNameAndLocality redefinesNameAndLocality = definitionNode.getRedefines();
     String redefinesName = redefinesNameAndLocality.getName();
     Locality redefinesLocality = redefinesNameAndLocality.getLocality();
@@ -416,7 +423,7 @@ public class VariableDefinitionUtil {
             .messageTemplate(MessageTemplate.of(REDEFINED_CONTAIN_VALUE, variableNode.getName()))
             .build());
     }
-    return errors;
+    return new ResultWithErrors<>(variableNode, errors);
   }
 
   private List<String> collectVariableParentNames(Node parent) {
