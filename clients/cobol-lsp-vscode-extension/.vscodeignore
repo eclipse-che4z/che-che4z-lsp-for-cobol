@@ -36,3 +36,6 @@ releaseScripts
 .scannerwork
 _/**
 ?/**
+# For BlackDuck
+node_modules/lodash/fp
+node_modules/jsonschema/schema
