@@ -18,6 +18,8 @@ package org.eclipse.lsp.cobol.service.utils;
 import lombok.NonNull;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
 
@@ -72,4 +74,14 @@ public interface FileSystemService {
    */
   @NonNull
   String decodeURI(@NonNull String uri);
+
+  /**
+   * Converts inputStream to text
+   *
+   * @param inputStream
+   * @return text
+   * @throws IOException
+   */
+  @NonNull
+  String readFromInputStream(InputStream inputStream) throws IOException;
 }

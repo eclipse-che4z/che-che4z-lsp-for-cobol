@@ -18,9 +18,10 @@ package org.eclipse.lsp.cobol.service;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import org.eclipse.lsp.cobol.ConfigurableTest;
+import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
-import org.eclipse.lsp.cobol.service.mocks.TestLanguageClient;
+import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -79,7 +80,8 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
           + "       End program ProgramId.";
   @Inject TextDocumentService service;
   @Inject LanguageServer server;
-  @Inject TestLanguageClient client;
+  @Inject CobolLanguageClient cobolLanguageClient;
+  @Inject MockLanguageClient client;
   @Inject CopybookService copybookService;
   @Inject DisposableLSPStateService stateService;
 
@@ -108,7 +110,7 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     TextDocumentPositionParams positionParams =
         new TextDocumentPositionParams(testTextDocumentIdentifier, position);
     ReferenceParams referenceParams = mock(ReferenceParams.class);
-    //params.getTextDocument().getUri()
+    // params.getTextDocument().getUri()
     TextDocumentIdentifier mockTextIdentifier = mock(TextDocumentIdentifier.class);
     when(mockTextIdentifier.getUri()).thenReturn("<TEST-URI>");
     when(referenceParams.getTextDocument()).thenReturn(mockTextIdentifier);
@@ -116,14 +118,12 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     DocumentFormattingParams mockFormattingParam = mock(DocumentFormattingParams.class);
     when(mockFormattingParam.getTextDocument()).thenReturn(mockTextIdentifier);
 
-
     assertEquals(SHUTDOWN_RESPONSE, service.codeAction(params).get()); // NOSONAR
     assertEquals(SHUTDOWN_RESPONSE, service.definition(positionParams).get()); // NOSONAR
     assertEquals(SHUTDOWN_RESPONSE, service.completion(completionParams).get()); // NOSONAR
     assertEquals(SHUTDOWN_RESPONSE, service.references(referenceParams).get()); // NOSONAR
     assertEquals(SHUTDOWN_RESPONSE, service.documentHighlight(positionParams).get()); // NOSONAR
-    assertEquals(
-        SHUTDOWN_RESPONSE, service.formatting(mockFormattingParam).get()); // NOSONAR
+    assertEquals(SHUTDOWN_RESPONSE, service.formatting(mockFormattingParam).get()); // NOSONAR
 
     List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
@@ -158,7 +158,8 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
 
   private void setUpCopybook() throws ExecutionException, InterruptedException {
     client.clean();
-    ImmutableList.of(new CobolText("CPYBK1", COPYBOOK1), new CobolText("CPYBK2", COPYBOOK2)).stream()
+    ImmutableList.of(new CobolText("CPYBK1", COPYBOOK1), new CobolText("CPYBK2", COPYBOOK2))
+        .stream()
         .map(UseCaseUtils::toCopybookModel)
         .forEach(copybookService::store);
     service.didOpen(

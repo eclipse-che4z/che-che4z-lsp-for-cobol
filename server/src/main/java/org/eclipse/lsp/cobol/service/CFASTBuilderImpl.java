@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * CF tree builder iplementation
+ * CF tree builder implementation
  */
 public class CFASTBuilderImpl implements CFASTBuilder {
   private static final int SNIPPET_LENGTH = 10;

@@ -31,13 +31,13 @@ public interface CopybookService {
    *
    * @param copybookName - the name of the copybook to be retrieved
    * @param documentUri - the currently processing document that contains the copy statement
-   * @param copybookProcessingMode - text document synchronization type
+   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql server
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   CopybookModel resolve(
       @NonNull String copybookName,
       @NonNull String documentUri,
-      @NonNull CopybookProcessingMode copybookProcessingMode);
+      @NonNull CopybookConfig copybookConfig);
 
   /**
    * Store the copybookModel in cache.

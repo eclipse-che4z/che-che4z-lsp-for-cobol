@@ -29,7 +29,8 @@ public enum SettingsParametersEnum {
   SUBROUTINE_LOCAL_PATHS("subroutine-manager.paths-local"),
   LSP_PREFIX("cobol-lsp"),
   LOCALE("locale"),
-  LOGGING_LEVEL("logging.level.root");
+  LOGGING_LEVEL("logging.level.root"),
+  TARGET_SQL_BACKEND("target-sql-backend");
 
   public final String label;
 

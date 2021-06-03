@@ -14,11 +14,11 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.references;
 
+import lombok.NonNull;
+import lombok.Value;
 import org.eclipse.lsp.cobol.core.semantics.outline.RangeUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import lombok.NonNull;
-import lombok.Value;
 import org.eclipse.lsp4j.*;
 
 import javax.annotation.Nullable;
@@ -72,7 +72,18 @@ public class ElementOccurrences implements Occurrences {
             .map(Supplier::get)
             .filter(Optional::isPresent)
             .map(Optional::get)
+            .map(ElementOccurrences::constructElementsExcludingImplicits)
             .findFirst().orElse(new Element(Collections.emptyList(), Collections.emptyList()));
+    }
+
+    private static Element constructElementsExcludingImplicits(Element e) {
+        List<Location> definitions = e.definitions.stream().filter(uriNotImplicit()).collect(Collectors.toList());
+        List<Location> usages = e.usages.stream().filter(uriNotImplicit()).collect(Collectors.toList());
+        return new Element(definitions, usages);
+    }
+
+    private static Predicate<Location> uriNotImplicit() {
+        return i -> !i.getUri().startsWith("implicit:");
     }
 
     @Value

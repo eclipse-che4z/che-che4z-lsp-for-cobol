@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum;
 
 import java.util.List;
@@ -49,4 +50,18 @@ public interface SettingsService {
    * @return objects converted to strings
    */
   List<String> toStrings(List<Object> objects);
+
+  /**
+   * Gets config data as string
+   *
+   * @param result
+   * @return string value
+   */
+  static String getValueAsString(List<Object> result) {
+    if (result == null || result.isEmpty()) return "";
+    Object obj = result.get(0);
+    if (!(obj instanceof JsonPrimitive)) return "";
+
+    return ((JsonPrimitive) obj).getAsString();
+  }
 }

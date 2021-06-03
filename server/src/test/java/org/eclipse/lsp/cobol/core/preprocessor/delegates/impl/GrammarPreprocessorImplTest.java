@@ -28,7 +28,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorList
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorListenerImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingServiceImpl;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
@@ -43,6 +43,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
+import static  org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
+
 /**
  * This test checks the logic of {@link GrammarPreprocessorImpl}, including building the extended
  * document, and merging the nested copybooks mappings.
@@ -52,7 +55,6 @@ class GrammarPreprocessorImplTest {
   private static final String DOCUMENT = "document";
   private static final String TEXT = "COPY CPYNAME.";
   private static final String RESULT = "RESULT";
-  private static final CopybookProcessingMode PROCESSING_MODE = CopybookProcessingMode.ENABLED;
   private static final String CPYNAME = "CPYNAME";
 
   private static final Locality RESULT_POS =
@@ -96,11 +98,13 @@ class GrammarPreprocessorImplTest {
             ImmutableMap.of(DOCUMENT, mainMapping, CPYNAME, cpyMapping),
             ImmutableMap.of());
 
+    CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER);
+
     when(factory.create(
             eq(DOCUMENT),
             any(BufferedTokenStream.class),
             eq(copybookStack),
-            eq(PROCESSING_MODE),
+            eq(cpyConfig),
             eq(replaceStmtStack),
             eq(new ArrayList<>())))
         .thenReturn(listener);
@@ -113,14 +117,14 @@ class GrammarPreprocessorImplTest {
     ArrayList<Pair<String, String>> replacingClauses = new ArrayList<>();
     ResultWithErrors<ExtendedDocument> extendedDocument =
         preprocessor.buildExtendedDocument(
-            DOCUMENT, TEXT, copybookStack, PROCESSING_MODE, replaceStmtStack, replacingClauses);
+            DOCUMENT, TEXT, copybookStack, cpyConfig, replaceStmtStack, replacingClauses);
 
     verify(factory)
         .create(
             eq(DOCUMENT),
             any(BufferedTokenStream.class),
             eq(copybookStack),
-            eq(PROCESSING_MODE),
+            eq(cpyConfig),
             eq(replaceStmtStack),
             eq(replacingClauses));
     assertEquals(RESULT, extendedDocument.getResult().getText());

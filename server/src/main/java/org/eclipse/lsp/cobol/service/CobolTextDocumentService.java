@@ -24,6 +24,7 @@ import com.google.inject.Singleton;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
@@ -51,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
@@ -60,6 +62,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.TARGET_SQL_BACKEND;
 
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
@@ -92,6 +95,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private CustomThreadPoolExecutor executors;
   private HoverProvider hoverProvider;
   private CFASTBuilder cfastBuilder;
+  private SettingsService settingsService;
 
   @Inject
   @Builder
@@ -106,7 +110,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       CustomThreadPoolExecutor executors,
       HoverProvider hoverProvider,
       CFASTBuilder cfastBuilder,
-      DisposableLSPStateService disposableLSPStateService) {
+      DisposableLSPStateService disposableLSPStateService,
+      SettingsService settingsService) {
     this.communications = communications;
     this.engine = engine;
     this.formations = formations;
@@ -117,6 +122,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.executors = executors;
     this.hoverProvider = hoverProvider;
     this.cfastBuilder = cfastBuilder;
+    this.settingsService = settingsService;
     this.disposableLSPStateService = disposableLSPStateService;
 
     dataBus.subscribe(this);
@@ -312,7 +318,12 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                             userRequest
                                 ? CopybookProcessingMode.ENABLED_VERBOSE
                                 : CopybookProcessingMode.ENABLED);
-                    AnalysisResult result = engine.analyze(uri, text, copybookProcessingMode);
+
+                    AnalysisResult result =
+                        engine.analyze(
+                            uri,
+                            text,
+                            new CopybookConfig(copybookProcessingMode, getTargetSqlBackend()));
                     ofNullable(docs.get(uri)).ifPresent(doc -> doc.setAnalysisResult(result));
                     publishResult(uri, result, copybookProcessingMode);
                     outlineMap.computeIfPresent(
@@ -331,6 +342,21 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     registerToFutureMap(uri, docAnalysisFuture);
   }
 
+  private SQLBackend getTargetSqlBackend() {
+    try {
+      String sqlServer =
+          SettingsService.getValueAsString(
+              settingsService.getConfiguration(TARGET_SQL_BACKEND.label).get());
+      if (StringUtils.isEmpty(sqlServer)) {
+        return SQLBackend.DB2_SERVER;
+      }
+      return SQLBackend.valueOf(sqlServer);
+    } catch (ExecutionException | InterruptedException e) {
+      LOG.error("Can't get config-data for ", TARGET_SQL_BACKEND, e);
+      return SQLBackend.DB2_SERVER;
+    }
+  }
+
   private void registerToFutureMap(String uri, Future<?> docAnalysisFuture) {
     futureMap.put(uri, docAnalysisFuture);
   }
@@ -346,8 +372,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                         engine.analyze(
                             uri,
                             text,
-                            CopybookProcessingMode.getCopybookProcessingMode(
-                                uri, CopybookProcessingMode.SKIP));
+                            new CopybookConfig(
+                                CopybookProcessingMode.getCopybookProcessingMode(
+                                    uri, CopybookProcessingMode.SKIP),
+                                getTargetSqlBackend()));
                     registerDocument(uri, new CobolDocumentModel(text, result));
                     communications.publishDiagnostics(result.getDiagnostics());
                     outlineMap.get(uri).complete(result.getOutlineTree());
