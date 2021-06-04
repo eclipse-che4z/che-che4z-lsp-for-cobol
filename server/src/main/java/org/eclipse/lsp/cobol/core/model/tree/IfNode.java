@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 
 /** The class represents if in COBOL. */
 @ToString(callSuper = true)
+@SuppressWarnings("squid:S2160")
 public class IfNode extends Node {
   CobolParser.IfStatementContext ifStatementContext;
 

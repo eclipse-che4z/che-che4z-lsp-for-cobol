@@ -25,8 +25,9 @@ import org.eclipse.lsp.cobol.core.model.Locality;
  */
 @Getter
 @ToString(callSuper = true)
+@SuppressWarnings("squid:S2160")
 public class MnemonicNameNode extends VariableNode {
-  private String systemName;
+  private final String systemName;
 
   public MnemonicNameNode(Locality location, String systemName, String name) {
     super(location, name, VariableType.MNEMONIC_NAME);

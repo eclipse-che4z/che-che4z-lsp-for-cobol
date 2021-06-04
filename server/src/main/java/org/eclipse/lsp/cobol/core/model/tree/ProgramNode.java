@@ -37,11 +37,12 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.STATEMENT;
 /** This class represents program context in COBOL. */
 @ToString(callSuper = true)
 @Getter
+@SuppressWarnings("squid:S2160")
 public class ProgramNode extends Node {
+  private final Collection<Variable> definedVariables = new ArrayList<>();
+  private final NodeConverter nodeConverter = new NodeConverter();
   private VariableUsageDelegate variableUsageDelegate;
   private String programName;
-  private Collection<Variable> definedVariables = new ArrayList<>();
-  private NodeConverter nodeConverter = new NodeConverter();
 
   /**
    * Use for testing.

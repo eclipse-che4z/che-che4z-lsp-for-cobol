@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
  */
 @Getter
 @ToString(callSuper = true)
+@SuppressWarnings("squid:S2160")
 public class MultiTableDataNameNode extends VariableWithLevelNode implements UsageClause {
   private final int occursTimes;
   private final UsageFormat usageFormat;

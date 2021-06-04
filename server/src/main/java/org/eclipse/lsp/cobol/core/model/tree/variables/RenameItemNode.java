@@ -26,6 +26,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  * operations.
  */
 @ToString(callSuper = true)
+@SuppressWarnings("squid:S2160")
 public class RenameItemNode extends VariableWithLevelNode {
   public RenameItemNode(Locality location, String name, boolean redefines, boolean global) {
     super(location, LEVEL_66, name, redefines, VariableType.RENAME_ITEM, global);

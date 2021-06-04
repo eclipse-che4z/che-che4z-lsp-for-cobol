@@ -53,8 +53,9 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  */
 @Getter
 @ToString(callSuper = true)
+@SuppressWarnings("squid:S2160")
 public class GroupItemNode extends VariableWithLevelNode implements UsageClause {
-  private UsageFormat usageFormat;
+  private final UsageFormat usageFormat;
 
   public GroupItemNode(
       Locality location,

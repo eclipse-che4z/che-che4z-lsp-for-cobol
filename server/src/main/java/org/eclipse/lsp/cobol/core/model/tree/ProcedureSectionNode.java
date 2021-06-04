@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 /** The class represents procedure section in COBOL. */
 @ToString(callSuper = true)
 @Getter
+@SuppressWarnings("squid:S2160")
 public class ProcedureSectionNode extends Node {
   String name;
   String text;
