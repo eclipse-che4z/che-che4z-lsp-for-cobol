@@ -38,14 +38,22 @@ public abstract class Node {
   private final List<Node> children = new ArrayList<>();
   private final NodeType nodeType;
 
-  @ToString.Exclude
-  @Setter
-  private Node parent;
+  @ToString.Exclude @Setter private Node parent;
 
   protected Node(Locality location, NodeType nodeType) {
     id = ID_COUNTER.incrementAndGet();
     this.locality = location;
     this.nodeType = nodeType;
+  }
+
+  /**
+   * Construct a predicate for testing that node has specified type.
+   *
+   * @param type the desired type
+   * @return the predicate for testing node
+   */
+  public static Predicate<Node> hasType(NodeType type) {
+    return node -> node.nodeType == type;
   }
 
   /**
@@ -108,15 +116,5 @@ public abstract class Node {
   @Override
   public int hashCode() {
     return (int) (id ^ id >>> 32);
-  }
-
-  /**
-   * Construct a predicate for testing that node has specified type.
-   *
-   * @param type the desired type
-   * @return the predicate for testing node
-   */
-  public static Predicate<Node> hasType(NodeType type) {
-    return node -> node.nodeType == type;
   }
 }

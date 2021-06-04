@@ -32,12 +32,14 @@ import java.util.List;
  */
 @ToString(callSuper = true)
 @Getter
+@SuppressWarnings("squid:S2160")
 public class VariableUsageNode extends Node {
-  private String dataName;
-  private Type variableUsageType;
+  private final String dataName;
+  private final Type variableUsageType;
+  private final CobolParser.QualifiedDataNameFormat1Context dataNameFormat1Context;
+  private final CobolParser.ConditionNameReferenceContext nameReferenceContext;
+
   private List<String> parents;
-  private CobolParser.QualifiedDataNameFormat1Context dataNameFormat1Context;
-  private CobolParser.ConditionNameReferenceContext nameReferenceContext;
 
   public VariableUsageNode(
       String dataName,
@@ -59,7 +61,8 @@ public class VariableUsageNode extends Node {
     nameReferenceContext = null;
   }
 
-  public VariableUsageNode(String dataName, Locality locality, Type variableUsageType, List<String> parents) {
+  public VariableUsageNode(
+      String dataName, Locality locality, Type variableUsageType, List<String> parents) {
     super(locality, NodeType.VARIABLE_USAGE);
     this.dataName = dataName;
     this.variableUsageType = variableUsageType;

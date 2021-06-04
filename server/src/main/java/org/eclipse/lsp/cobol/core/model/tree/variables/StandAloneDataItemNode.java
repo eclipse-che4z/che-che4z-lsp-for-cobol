@@ -33,12 +33,18 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  */
 @Getter
 @ToString(callSuper = true)
+@SuppressWarnings("squid:S2160")
 public class StandAloneDataItemNode extends VariableWithLevelNode {
-  private String picClause;
-  private String value;
+  private final String picClause;
+  private final String value;
 
-  public StandAloneDataItemNode(Locality location, String name, boolean global, String picClause, String value,
-                                boolean redefines) {
+  public StandAloneDataItemNode(
+      Locality location,
+      String name,
+      boolean global,
+      String picClause,
+      String value,
+      boolean redefines) {
     super(location, LEVEL_77, name, redefines, VariableType.STAND_ALONE_DATA_ITEM, global);
     this.picClause = picClause;
     this.value = value;

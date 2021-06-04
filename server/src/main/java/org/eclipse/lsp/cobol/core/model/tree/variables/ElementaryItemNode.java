@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -28,15 +27,32 @@ import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
  */
 @Getter
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
+@SuppressWarnings({"squid:S2160", "squid:S107"})
 public class ElementaryItemNode extends ElementaryNode {
-  private String value;
+  private final String value;
 
-  public ElementaryItemNode(Locality location, int level, String name, boolean global, String picClause, String value,
-                            UsageFormat usageFormat, boolean redefines, boolean isBlankWhenZeroPresent,
-                            boolean isSignClausePresent) {
-    super(location, level, name, redefines, VariableType.ELEMENTARY_ITEM, global, isBlankWhenZeroPresent,
-        isSignClausePresent, picClause, usageFormat);
+  public ElementaryItemNode(
+      Locality location,
+      int level,
+      String name,
+      boolean global,
+      String picClause,
+      String value,
+      UsageFormat usageFormat,
+      boolean redefines,
+      boolean isBlankWhenZeroPresent,
+      boolean isSignClausePresent) {
+    super(
+        location,
+        level,
+        name,
+        redefines,
+        VariableType.ELEMENTARY_ITEM,
+        global,
+        isBlankWhenZeroPresent,
+        isSignClausePresent,
+        picClause,
+        usageFormat);
 
     this.value = value;
   }

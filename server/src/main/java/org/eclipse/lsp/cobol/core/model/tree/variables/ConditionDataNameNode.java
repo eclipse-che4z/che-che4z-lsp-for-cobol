@@ -27,10 +27,12 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  */
 @Getter
 @ToString(callSuper = true)
+@SuppressWarnings("squid:S2160")
 public class ConditionDataNameNode extends VariableWithLevelNode {
-  private ValueInterval valueInterval;
+  private final ValueInterval valueInterval;
 
-  public ConditionDataNameNode(Locality location, String name, boolean redefines, ValueInterval valueInterval) {
+  public ConditionDataNameNode(
+      Locality location, String name, boolean redefines, ValueInterval valueInterval) {
     super(location, LEVEL_88, name, redefines, VariableType.CONDITION_DATA_NAME);
     this.valueInterval = valueInterval;
   }
