@@ -14,16 +14,16 @@
  */
 package org.eclipse.lsp.cobol;
 
-import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
-import org.eclipse.lsp.cobol.domain.modules.EngineModule;
-import org.eclipse.lsp.cobol.domain.modules.ServiceModule;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
+import org.eclipse.lsp.cobol.domain.modules.EngineModule;
+import org.eclipse.lsp.cobol.domain.modules.ServiceModule;
+import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -84,6 +84,7 @@ public class LangServerBootstrap {
     }
   }
 
+  @SuppressWarnings("squid:S106")
   Launcher<CobolLanguageClient> launchServer(@NonNull String[] args, @NonNull LanguageServer server)
       throws IOException {
     return isPipeEnabled(args)
@@ -95,6 +96,7 @@ public class LangServerBootstrap {
     return args.length > 0 && PIPE_ARG.equals(args[0]);
   }
 
+  @SuppressWarnings("resource")
   Launcher<CobolLanguageClient> createServerLauncherWithSocket(@NonNull LanguageServer server)
       throws IOException {
     try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
