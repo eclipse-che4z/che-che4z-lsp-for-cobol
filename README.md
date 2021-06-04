@@ -63,7 +63,7 @@ This feature is also enabled for CICS and DB2 SQL keywords and variables.
 The extension enables syntax highlighting for COBOL code.
 	
 ### Syntax Coloring
-Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, and paragraphs.
+Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, paragraphs and sections.
 
 ### Outline View and Breadcrumb View
 The extension enables outline view and breadcrumb view, which show the structure of elements within the program and allow easy navigation between them.
