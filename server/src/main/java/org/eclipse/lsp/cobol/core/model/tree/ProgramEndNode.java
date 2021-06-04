@@ -27,6 +27,7 @@ import java.util.List;
 /** The class represents the program end. */
 @Slf4j
 @ToString(callSuper = true)
+@SuppressWarnings("squid:S2160")
 public class ProgramEndNode extends Node {
   String programId;
 

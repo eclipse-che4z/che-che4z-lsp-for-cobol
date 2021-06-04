@@ -28,6 +28,7 @@ import java.util.List;
  */
 @Getter
 @ToString(callSuper = true)
+@SuppressWarnings("squid:S2160")
 public class IndexItemNode extends VariableWithLevelNode {
   protected IndexItemNode(Locality location, int level, String name, boolean redefines) {
     super(location, level, name, redefines, VariableType.INDEX_ITEM);

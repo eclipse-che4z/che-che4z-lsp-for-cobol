@@ -26,20 +26,24 @@ import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
 
-/**
- * The abstract class for variables with level number.
- */
+/** The abstract class for variables with level number. */
 @Getter
 @ToString(callSuper = true)
+@SuppressWarnings("squid:S2160")
 abstract class VariableWithLevelNode extends VariableNode {
   private final int level;
-  private boolean global;
   private final boolean specifiedGlobal;
   private final boolean redefines;
 
+  private boolean global;
 
-  protected VariableWithLevelNode(Locality location, int level, String name, boolean redefines,
-                                  VariableType variableType, boolean global) {
+  protected VariableWithLevelNode(
+      Locality location,
+      int level,
+      String name,
+      boolean redefines,
+      VariableType variableType,
+      boolean global) {
     super(location, name, variableType);
     this.level = level;
     this.redefines = redefines;
@@ -47,8 +51,8 @@ abstract class VariableWithLevelNode extends VariableNode {
     this.specifiedGlobal = global;
   }
 
-  protected VariableWithLevelNode(Locality location, int level, String name, boolean redefines,
-                                  VariableType variableType) {
+  protected VariableWithLevelNode(
+      Locality location, int level, String name, boolean redefines, VariableType variableType) {
     super(location, name, variableType);
     this.level = level;
     this.redefines = redefines;
@@ -65,7 +69,8 @@ abstract class VariableWithLevelNode extends VariableNode {
   @Override
   public List<SyntaxError> process() {
     List<SyntaxError> errors = new ArrayList<>();
-    if ((level == LEVEL_01 || level == LEVEL_77) && getLocality().getRange().getStart().getCharacter() > AREA_A_FINISH)
+    if ((level == LEVEL_01 || level == LEVEL_77)
+        && getLocality().getRange().getStart().getCharacter() > AREA_A_FINISH)
       errors.add(getError(MessageTemplate.of(AREA_A_WARNING, getName())));
     if (specifiedGlobal && level != LEVEL_01)
       errors.add(getError(MessageTemplate.of(GLOBAL_NON_01_LEVEL_MSG)));
