@@ -73,6 +73,7 @@ import static java.util.stream.Collectors.toList;
  */
 @Slf4j
 @Singleton
+@SuppressWarnings("UnstableApiUsage")
 public class CobolTextDocumentService implements TextDocumentService, ExtendedApi {
   private static final String GIT_FS_URI = "gitfs:/";
   private static final String GITFS_URI_NOT_SUPPORTED = "GITFS URI not supported";
@@ -81,20 +82,21 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       new ConcurrentHashMap<>();
   private final Map<String, CompletableFuture<Node>> cfAstMap = new ConcurrentHashMap<>();
   private final Map<String, Future<?>> futureMap = new ConcurrentHashMap<>();
+  private final Communications communications;
+  private final LanguageEngineFacade engine;
+  private final Formations formations;
+  private final Completions completions;
+  private final Occurrences occurrences;
+  private final CodeActions actions;
+  private final DataBusBroker dataBus;
+  private final CustomThreadPoolExecutor executors;
+  private final HoverProvider hoverProvider;
+  private final CFASTBuilder cfastBuilder;
   private DisposableLSPStateService disposableLSPStateService;
-  private Communications communications;
-  private LanguageEngineFacade engine;
-  private Formations formations;
-  private Completions completions;
-  private Occurrences occurrences;
-  private CodeActions actions;
-  private DataBusBroker dataBus;
-  private CustomThreadPoolExecutor executors;
-  private HoverProvider hoverProvider;
-  private CFASTBuilder cfastBuilder;
 
   @Inject
   @Builder
+  @SuppressWarnings("squid:S107")
   CobolTextDocumentService(
       Communications communications,
       LanguageEngineFacade engine,
@@ -132,6 +134,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     return new HashMap<>(docs);
   }
 
+  @SuppressWarnings("squid:S1452")
   @VisibleForTesting
   Map<String, Future<?>> getFutureMap() {
     return new HashMap<>(futureMap);
@@ -146,7 +149,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
       CompletionParams params) {
     String uri = params.getTextDocument().getUri();
-    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(disposableLSPStateService,
+    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
+            disposableLSPStateService,
             () ->
                 Either.<List<CompletionItem>, CompletionList>forRight(
                     completions.collectFor(docs.get(uri), params)),
@@ -159,9 +163,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<List<? extends Location>> definition(
       TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
-    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(disposableLSPStateService,
+    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
+            disposableLSPStateService,
             (Supplier<List<? extends Location>>)
-                    () -> occurrences.findDefinitions(docs.get(uri), position),
+                () -> occurrences.findDefinitions(docs.get(uri), position),
             executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("definitions resolving", uri)));
@@ -170,9 +175,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   @Override
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
     String uri = params.getTextDocument().getUri();
-    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(disposableLSPStateService,
+    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
+            disposableLSPStateService,
             (Supplier<List<? extends Location>>)
-                    () -> occurrences.findReferences(docs.get(uri), params, params.getContext()),
+                () -> occurrences.findReferences(docs.get(uri), params, params.getContext()),
             executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("references resolving", uri)));
@@ -182,9 +188,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
       TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
-    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(disposableLSPStateService,
+    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
+            disposableLSPStateService,
             (Supplier<List<? extends DocumentHighlight>>)
-                    () -> occurrences.findHighlights(docs.get(uri), position),
+                () -> occurrences.findHighlights(docs.get(uri), position),
             executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(createDescriptiveErrorMessage("document highlighting", uri)));
@@ -194,7 +201,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
     String uri = params.getTextDocument().getUri();
     CobolDocumentModel model = docs.get(uri);
-    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(disposableLSPStateService,
+    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
+            disposableLSPStateService,
             (Supplier<List<? extends TextEdit>>) () -> formations.format(model),
             executors.getThreadPoolExecutor())
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("formatting", uri)));
@@ -202,8 +210,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Override
   public CompletableFuture<List<Either<Command, CodeAction>>> codeAction(CodeActionParams params) {
-    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(disposableLSPStateService,
-            () -> actions.collect(params), executors.getThreadPoolExecutor())
+    return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
+            disposableLSPStateService,
+            () -> actions.collect(params),
+            executors.getThreadPoolExecutor())
         .whenComplete(
             reportExceptionIfThrown(
                 createDescriptiveErrorMessage(
@@ -274,11 +284,13 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Override
   public CompletableFuture<ExtendedApiResult> analysis(@NonNull JsonObject json) {
-    AnalysisResultEvent event = new Gson().fromJson(json.toString(), AnalysisResultEvent.class);
+    AnalysisResultEvent event =
+        ofNullable(new Gson().fromJson(json.toString(), AnalysisResultEvent.class))
+            .orElseGet(() -> new AnalysisResultEvent("", ""));
     AtomicBoolean triggerAnalyze = new AtomicBoolean();
     cfAstMap.computeIfAbsent(
         event.getUri(),
-        (ignore) -> {
+        ignore -> {
           triggerAnalyze.set(true);
           return new CompletableFuture<>();
         });
@@ -392,7 +404,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     String uri = params.getTextDocument().getUri();
     return outlineMap
         .get(uri)
-        .<List<Either<SymbolInformation, DocumentSymbol>>>thenApply(
+        .thenApply(
             documentSymbols ->
                 documentSymbols.stream()
                     .map(Either::<SymbolInformation, DocumentSymbol>forRight)
@@ -404,7 +416,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   @Override
   public CompletableFuture<Hover> hover(TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
-    return CompletableFuture.<Hover>supplyAsync(
+    return CompletableFuture.supplyAsync(
             () -> hoverProvider.getHover(docs.get(uri), position),
             executors.getThreadPoolExecutor())
         .whenComplete(reportExceptionIfThrown(createDescriptiveErrorMessage("getting hover", uri)));
