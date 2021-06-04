@@ -170,7 +170,7 @@
                         "DB2_SERVER  - IBM DB2 SQL Server",
                         "DATACOM_SERVER - CA DATACOM Server"
                     ],
-                    "description": "The target sql backend server which will be used in mainframe"
+                    "description": "The target SQL backend server which will be used in mainframe"
                 }
             }
         },

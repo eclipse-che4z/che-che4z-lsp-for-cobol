@@ -50,11 +50,9 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 @Singleton
 public class CopybookServiceImpl implements CopybookService {
 
-  private static final String SQLCA = "SQLCA";
-  private static final String SQLDA = "SQLDA";
-  private static final String SQLCA_DATACOM_PATH = "/implicitCopybooks/SQLCA_DATACOM.cpy";
-  private static final String SQLCA_DB2_PATH = "/implicitCopybooks/SQLCA_DB2.cpy";
-  private static final String SQLDA_DB2_PATH = "/implicitCopybooks/SQLDA.cpy";
+  public static final String SQLCA = "SQLCA";
+  public static final String SQLDA = "SQLDA";
+  public static final String PREF_IMPLICIT = "implicit://";
 
   private final SettingsService settingsService;
   private final FileSystemService files;
@@ -118,7 +116,7 @@ public class CopybookServiceImpl implements CopybookService {
     copybookCache.put(copybookModel.getName(), copybookModel);
   }
 
-  CopybookModel resolveSync(
+  private CopybookModel resolveSync(
       @NonNull String copybookName,
       @NonNull String documentUri,
       @NonNull CopybookConfig copybookConfig)
@@ -134,7 +132,7 @@ public class CopybookServiceImpl implements CopybookService {
       if (isImplictlyDefinedCopybook(copybookName)) {
         uri = getUriForImplicitCopybook(copybookName, copybookConfig);
         return new CopybookModel(
-            copybookName, "implicit://" + uri, getContentForImplicitCopybook(uri));
+            copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri));
       } else if (copybookConfig.getCopybookProcessingMode().download && cobolFileName != null) {
         Optional.ofNullable(
                 copybooksForDownloading.computeIfAbsent(
@@ -153,7 +151,7 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   /**
-   * This method checks if copybook name is implicitly (no explicit copybook file) defined or not.
+   * Checks if copybook name is implicitly (no explicit copybook file) defined or not.
    *
    * <p>Application can use SQLCA and SQLDA names to define communication and description areas as
    * copybooks and both are implicitly defined by either co-processor or pre-processor.
@@ -168,15 +166,11 @@ public class CopybookServiceImpl implements CopybookService {
   private String getUriForImplicitCopybook(String copybookName, CopybookConfig copybookConfig) {
     if (SQLCA.equals(copybookName)) {
       if (SQLBackend.DATACOM_SERVER.equals(copybookConfig.getSqlBackend())) {
-        return SQLCA_DATACOM_PATH;
+        return "/implicitCopybooks/SQLCA_DATACOM.cpy";
       }
-      return SQLCA_DB2_PATH;
+      return "/implicitCopybooks/SQLCA_DB2.cpy";
     }
-    return SQLDA_DB2_PATH;
-  }
-
-  private String getContentForImplicitCopybook(String uri) {
-    return readContentForImplicitCopybook(uri);
+    return "/implicitCopybooks/SQLDA.cpy";
   }
 
   private String readContentForImplicitCopybook(String resourcePath) {

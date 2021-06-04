@@ -29,6 +29,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.eclipse.lsp.cobol.service.CopybookServiceImpl.PREF_IMPLICIT;
+
 /**
  * This occurrences provider resolves the requests for the semantic elements based on its positions.
  */
@@ -83,7 +85,7 @@ public class ElementOccurrences implements Occurrences {
     }
 
     private static Predicate<Location> uriNotImplicit() {
-        return i -> !i.getUri().startsWith("implicit:");
+        return i -> !i.getUri().startsWith(PREF_IMPLICIT);
     }
 
     @Value

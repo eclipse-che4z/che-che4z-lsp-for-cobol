@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +35,9 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.SKIP;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
+import static org.eclipse.lsp.cobol.service.CopybookServiceImpl.SQLCA;
 import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_2_URI;
+import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_3_URI;
 import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -120,7 +123,8 @@ class CopybookServiceTest {
   @Test
   void testRequestWhenUriNotFoundProcessed() {
     CopybookService copybookService = createCopybookService();
-    CopybookModel copybookModel = copybookService.resolve(INVALID_CPY_NAME, DOCUMENT_URI, cpyConfig);
+    CopybookModel copybookModel =
+        copybookService.resolve(INVALID_CPY_NAME, DOCUMENT_URI, cpyConfig);
 
     assertEquals(new CopybookModel(INVALID_CPY_NAME, null, null), copybookModel);
     verify(files).getNameFromURI(DOCUMENT_URI);
@@ -133,8 +137,10 @@ class CopybookServiceTest {
   @Test
   void testNoNewClientCallsOnDidChange() {
     CopybookService copybookService = createCopybookService();
-    CopybookModel copybookModelEnabled = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, cpyConfig);
-    CopybookModel copybookModelSkipped = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, new CopybookConfig(SKIP, DB2_SERVER));
+    CopybookModel copybookModelEnabled =
+        copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, cpyConfig);
+    CopybookModel copybookModelSkipped =
+        copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, new CopybookConfig(SKIP, DB2_SERVER));
 
     verify(files, times(1)).getContentByPath(cpyPath);
     verify(files, times(1)).getNameFromURI(DOCUMENT_URI);
@@ -197,7 +203,8 @@ class CopybookServiceTest {
     CopybookModel invalidCpy = copybookService.resolve(INVALID_CPY_NAME, DOCUMENT_URI, cpyConfig);
     CopybookModel validCpy = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, cpyConfig);
     // Second document parsed
-    CopybookModel invalidCpy2 = copybookService.resolve(INVALID_2_CPY_NAME, DOCUMENT_2_URI, cpyConfig);
+    CopybookModel invalidCpy2 =
+        copybookService.resolve(INVALID_2_CPY_NAME, DOCUMENT_2_URI, cpyConfig);
 
     // Check that all copybook models are correct
     assertEquals(new CopybookModel(VALID_CPY_NAME, VALID_CPY_URI, CONTENT), validCpy);
@@ -233,6 +240,31 @@ class CopybookServiceTest {
             .build());
     verify(settingsService, times(1))
         .getConfigurations(singletonList("copybook-download.quiet.document2.INVALID_2"));
+  }
+
+  /** Tests copybook config nullity */
+  @Test
+  void whenNullCpyConfigPassed_thenThrowException() {
+    CopybookServiceImpl copybookService = createCopybookService();
+
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> copybookService.resolve(SQLCA, DOCUMENT_URI, null));
+  }
+
+  /** Tests if implicit copybook is resolved. For simplicitly we consider content is null.
+   * Full use case test is in {@link TestSqlIncludeStatementForImplicitlyDefinedCpy}*/
+  @Test
+  void testServiceResolvesImplicitCopybook() {
+    CopybookServiceImpl copybookService = createCopybookService();
+    verify(broker).subscribe(copybookService);
+
+    when(files.getNameFromURI(DOCUMENT_3_URI)).thenReturn("document2");
+    when(settingsService.getConfiguration("copybook-resolve", "document2", SQLCA))
+            .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
+    CopybookModel cpy = copybookService.resolve(SQLCA, DOCUMENT_3_URI, cpyConfig);
+
+    assertEquals(new CopybookModel(SQLCA, DOCUMENT_3_URI, null), cpy);
   }
 
   /**
@@ -276,12 +308,12 @@ class CopybookServiceTest {
 
     verify(settingsService, times(1))
         .getConfigurations(
-            asList("copybook-download.quiet.document.nested", "copybook-download.quiet.document.INVALID"));
+            asList(
+                "copybook-download.quiet.document.nested",
+                "copybook-download.quiet.document.INVALID"));
   }
 
-  /**
-   * Test the service will work correctly in case the middleware throw an error.
-   */
+  /** Test the service will work correctly in case the middleware throw an error. */
   @Test
   void testResolveGetsStubWhenConfigurationThrowAnError() {
     when(settingsService.getConfiguration("copybook-resolve", "document", VALID_CPY_NAME))

@@ -19,7 +19,6 @@ import com.google.gson.JsonPrimitive;
 import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -70,14 +69,14 @@ public class MockLanguageClient implements CobolLanguageClient {
   }
 
   /**
-   * Returns mock-config value used in server integration test
+   * Returns mock-config values used in server integration test
    *
    * @param configurationParams
    * @return - config value
    */
-  @JsonRequest("workspace/configuration")
   public CompletableFuture<List<Object>> configuration(ConfigurationParams configurationParams) {
-    return CompletableFuture.completedFuture(ImmutableList.of(new JsonPrimitive("DB2_SERVER")));
+    return CompletableFuture.completedFuture(
+        ImmutableList.of("DB2_SERVER", new JsonPrimitive("DB2_SERVER")));
   }
 
   /** Clean the client state. */

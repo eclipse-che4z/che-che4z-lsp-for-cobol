@@ -83,7 +83,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
             uri,
             tokens,
             copybookStack,
-                copybookConfig,
+            copybookConfig,
             recursiveReplaceStmtStack,
             replacingClauses);
     walker.walk(listener, startRule);

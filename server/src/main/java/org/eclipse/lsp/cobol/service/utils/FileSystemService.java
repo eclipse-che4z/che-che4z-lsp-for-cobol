@@ -76,7 +76,7 @@ public interface FileSystemService {
   String decodeURI(@NonNull String uri);
 
   /**
-   * Converts inputStream to text
+   * Reads the bytes from the input stream and after that converts it to text
    *
    * @param inputStream
    * @return text

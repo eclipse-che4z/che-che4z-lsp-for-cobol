@@ -46,6 +46,7 @@ import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 public class UseCaseUtils {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
   public static final String DOCUMENT_2_URI = "file:///c%3A/workspace/document2.cbl";
+  public static final String DOCUMENT_3_URI = "implicit:///implicitCopybooks/SQLCA_DB2.cpy";
 
   private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.c4z/.copybooks/";
   private static final String CPY_URI_SUFFIX = ".cpy";

@@ -351,10 +351,13 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
         return SQLBackend.DB2_SERVER;
       }
       return SQLBackend.valueOf(sqlServer);
-    } catch (ExecutionException | InterruptedException e) {
+    } catch (InterruptedException e) {
+      LOG.error("InterruptedException when getting ", TARGET_SQL_BACKEND, e);
+      Thread.currentThread().interrupt();
+    } catch (ExecutionException e) {
       LOG.error("Can't get config-data for ", TARGET_SQL_BACKEND, e);
-      return SQLBackend.DB2_SERVER;
     }
+    return SQLBackend.DB2_SERVER;
   }
 
   private void registerToFutureMap(String uri, Future<?> docAnalysisFuture) {

@@ -37,12 +37,13 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
+import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
-import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 
 /**
  * This test checks the logic of {@link CobolLanguageEngine}. It should first run {@link
@@ -165,7 +166,11 @@ class CobolLanguageEngineTest {
             ImmutableList.of(error, eofError));
 
     ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, cpyConfig);
-
     assertEquals(expected, actual);
+
+    // test nullity
+    assertThrows(IllegalArgumentException.class, () -> engine.run(null, TEXT, cpyConfig));
+    assertThrows(IllegalArgumentException.class, () -> engine.run(URI, null, cpyConfig));
+    assertThrows(IllegalArgumentException.class, () -> engine.run(URI, TEXT, null));
   }
 }

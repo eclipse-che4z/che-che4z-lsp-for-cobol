@@ -40,11 +40,12 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
-import static  org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
+import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 
 /**
  * This test checks the logic of {@link GrammarPreprocessorImpl}, including building the extended
@@ -132,5 +133,51 @@ class GrammarPreprocessorImplTest {
     assertEquals(mainMapping, expectedDocument.getDocumentMapping().get(DOCUMENT));
     assertEquals(cpyMapping, expectedDocument.getDocumentMapping().get(CPYNAME));
     assertEquals(errors, extendedDocument.getErrors());
+
+    // test nullity
+    testNullity(copybookStack, replaceStmtStack, cpyConfig, preprocessor, replacingClauses);
+  }
+
+  private void testNullity(
+      ArrayDeque<CopybookUsage> copybookStack,
+      Deque<List<Pair<String, String>>> replaceStmtStack,
+      CopybookConfig cpyConfig,
+      GrammarPreprocessor preprocessor,
+      ArrayList<Pair<String, String>> replacingClauses) {
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            preprocessor.buildExtendedDocument(
+                null, TEXT, copybookStack, cpyConfig, replaceStmtStack, replacingClauses));
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            preprocessor.buildExtendedDocument(
+                DOCUMENT, null, copybookStack, cpyConfig, replaceStmtStack, replacingClauses));
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            preprocessor.buildExtendedDocument(
+                DOCUMENT, TEXT, null, cpyConfig, replaceStmtStack, replacingClauses));
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            preprocessor.buildExtendedDocument(
+                DOCUMENT, TEXT, copybookStack, null, replaceStmtStack, replacingClauses));
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            preprocessor.buildExtendedDocument(
+                DOCUMENT, TEXT, copybookStack, cpyConfig, null, replacingClauses));
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            preprocessor.buildExtendedDocument(
+                DOCUMENT, TEXT, copybookStack, cpyConfig, replaceStmtStack, null));
   }
 }

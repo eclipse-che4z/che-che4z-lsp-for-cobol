@@ -54,14 +54,17 @@ class TestUndefinedParentVariableUnderlined {
   void assertCopybookProcessingModeNotChangesLogic() {
     Assertions.assertEquals(
         UseCaseUtils.analyze(
-            UseCaseUtils.DOCUMENT_URI, TEXT, ImmutableList.of(), ImmutableList.of(),
-                new CopybookConfig(ENABLED, DB2_SERVER)),
+            UseCaseUtils.DOCUMENT_URI,
+            TEXT,
+            ImmutableList.of(),
+            ImmutableList.of(),
+            new CopybookConfig(ENABLED, DB2_SERVER)),
         UseCaseUtils.analyze(
             UseCaseUtils.DOCUMENT_URI,
             TEXT,
             ImmutableList.of(),
             ImmutableList.of(),
-                new CopybookConfig(DISABLED, DB2_SERVER)));
+            new CopybookConfig(DISABLED, DB2_SERVER)));
   }
 
   @Test

@@ -360,7 +360,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
                 uri,
                 content,
                 copybookStack,
-                    copybookConfig,
+                copybookConfig,
                 recursiveReplaceStmtStack,
                 replacingClauses)
             .unwrap(errors::addAll);
