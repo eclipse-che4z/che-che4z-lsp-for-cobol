@@ -28,7 +28,7 @@ import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -60,7 +60,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
       @NonNull String uri,
       @NonNull String code,
       @NonNull Deque<CopybookUsage> copybookStack,
-      @NonNull CopybookProcessingMode copybookProcessingMode,
+      @NonNull CopybookConfig copybookConfig,
       @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
       @NonNull List<Pair<String, String>> replacingClauses) {
     ThreadInterruptionUtil.checkThreadInterrupted();
@@ -83,7 +83,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
             uri,
             tokens,
             copybookStack,
-            copybookProcessingMode,
+            copybookConfig,
             recursiveReplaceStmtStack,
             replacingClauses);
     walker.walk(listener, startRule);

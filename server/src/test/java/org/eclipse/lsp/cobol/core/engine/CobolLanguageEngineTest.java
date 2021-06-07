@@ -27,7 +27,7 @@ import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
@@ -37,7 +37,10 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
+import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -51,7 +54,6 @@ class CobolLanguageEngineTest {
 
   private static final String TEXT = "       IDENTIFICATION DIVISION.";
   private static final String URI = "document.cbl";
-  private static final CopybookProcessingMode PROCESSING_MODE = CopybookProcessingMode.ENABLED;
 
   @Test
   void testLanguageEngineRun() {
@@ -131,7 +133,8 @@ class CobolLanguageEngineTest {
                     ImmutableMap.of())),
             ImmutableMap.of());
 
-    when(preprocessor.process(URI, TEXT, PROCESSING_MODE))
+    CopybookConfig cpyConfig = new CopybookConfig(ENABLED, DB2_SERVER);
+    when(preprocessor.process(URI, TEXT, cpyConfig))
         .thenReturn(new ResultWithErrors<>(extendedDocument, ImmutableList.of(error)));
 
     Range outlineRange =
@@ -162,8 +165,12 @@ class CobolLanguageEngineTest {
                 .build(),
             ImmutableList.of(error, eofError));
 
-    ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, PROCESSING_MODE);
-
+    ResultWithErrors<SemanticContext> actual = engine.run(URI, TEXT, cpyConfig);
     assertEquals(expected, actual);
+
+    // test nullity
+    assertThrows(IllegalArgumentException.class, () -> engine.run(null, TEXT, cpyConfig));
+    assertThrows(IllegalArgumentException.class, () -> engine.run(URI, null, cpyConfig));
+    assertThrows(IllegalArgumentException.class, () -> engine.run(URI, TEXT, null));
   }
 }

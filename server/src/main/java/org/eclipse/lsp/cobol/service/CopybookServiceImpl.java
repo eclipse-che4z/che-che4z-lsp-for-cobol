@@ -19,7 +19,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
-import com.google.gson.JsonPrimitive;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -31,6 +30,8 @@ import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,6 +49,11 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 @Slf4j
 @Singleton
 public class CopybookServiceImpl implements CopybookService {
+
+  public static final String SQLCA = "SQLCA";
+  public static final String SQLDA = "SQLDA";
+  public static final String PREF_IMPLICIT = "implicit://";
+
   private final SettingsService settingsService;
   private final FileSystemService files;
 
@@ -89,17 +95,16 @@ public class CopybookServiceImpl implements CopybookService {
    *
    * @param copybookName - the name of the copybook to be retrieved
    * @param documentUri - the currently processing document that contains the copy statement
-   * @param copybookProcessingMode - text document synchronization type
+   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql server
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   public CopybookModel resolve(
       @NonNull String copybookName,
       @NonNull String documentUri,
-      @NonNull CopybookProcessingMode copybookProcessingMode) {
-    ThreadInterruptionUtil.checkThreadInterrupted();
+      @NonNull CopybookConfig copybookConfig) {
     try {
       return copybookCache.get(
-          copybookName, () -> resolveSync(copybookName, documentUri, copybookProcessingMode));
+          copybookName, () -> resolveSync(copybookName, documentUri, copybookConfig));
     } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
       return new CopybookModel(copybookName, null, null);
@@ -111,20 +116,24 @@ public class CopybookServiceImpl implements CopybookService {
     copybookCache.put(copybookModel.getName(), copybookModel);
   }
 
-  CopybookModel resolveSync(
+  private CopybookModel resolveSync(
       @NonNull String copybookName,
       @NonNull String documentUri,
-      @NonNull CopybookProcessingMode copybookProcessingMode)
+      @NonNull CopybookConfig copybookConfig)
       throws ExecutionException, InterruptedException {
     ThreadInterruptionUtil.checkThreadInterrupted();
     String cobolFileName = files.getNameFromURI(documentUri);
     String uri =
-        retrieveURI(
+        SettingsService.getValueAsString(
             settingsService
                 .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
                 .get());
     if (uri.isEmpty()) {
-      if (copybookProcessingMode.download && cobolFileName != null) {
+      if (isImplictlyDefinedCopybook(copybookName)) {
+        uri = getUriForImplicitCopybook(copybookName, copybookConfig);
+        return new CopybookModel(
+            copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri));
+      } else if (copybookConfig.getCopybookProcessingMode().download && cobolFileName != null) {
         Optional.ofNullable(
                 copybooksForDownloading.computeIfAbsent(
                     cobolFileName, s -> ConcurrentHashMap.newKeySet()))
@@ -132,12 +141,47 @@ public class CopybookServiceImpl implements CopybookService {
       }
       return new CopybookModel(copybookName, null, null);
     }
+
     Path file = files.getPathFromURI(uri);
     if (files.fileExists(file)) {
       return new CopybookModel(copybookName, uri, files.getContentByPath(file));
     } else {
       return new CopybookModel(copybookName, null, null);
     }
+  }
+
+  /**
+   * Checks if copybook name is implicitly (no explicit copybook file) defined or not.
+   *
+   * <p>Application can use SQLCA and SQLDA names to define communication and description areas as
+   * copybooks and both are implicitly defined by either co-processor or pre-processor.
+   *
+   * @param copybookName
+   * @return true if copybookname is one of SQLDA or SQLCA
+   */
+  private boolean isImplictlyDefinedCopybook(String copybookName) {
+    return SQLCA.equals(copybookName) || SQLDA.equals(copybookName);
+  }
+
+  private String getUriForImplicitCopybook(String copybookName, CopybookConfig copybookConfig) {
+    if (SQLCA.equals(copybookName)) {
+      if (SQLBackend.DATACOM_SERVER.equals(copybookConfig.getSqlBackend())) {
+        return "/implicitCopybooks/SQLCA_DATACOM.cpy";
+      }
+      return "/implicitCopybooks/SQLCA_DB2.cpy";
+    }
+    return "/implicitCopybooks/SQLDA.cpy";
+  }
+
+  private String readContentForImplicitCopybook(String resourcePath) {
+    InputStream inputStream = CopybookServiceImpl.class.getResourceAsStream(resourcePath);
+    String content = null;
+    try {
+      content = files.readFromInputStream(Objects.requireNonNull(inputStream));
+    } catch (IOException e) {
+      LOG.error("Implicit copybook is not loaded. ", e);
+    }
+    return content;
   }
 
   /**
@@ -178,13 +222,5 @@ public class CopybookServiceImpl implements CopybookService {
 
   private String getUserInteractionType(CopybookProcessingMode copybookProcessingMode) {
     return copybookProcessingMode.userInteraction ? VERBOSE.label : QUIET.label;
-  }
-
-  private String retrieveURI(List<Object> result) {
-    if (result == null || result.isEmpty()) return "";
-    Object obj = result.get(0);
-    if (!(obj instanceof JsonPrimitive)) return "";
-
-    return ((JsonPrimitive) obj).getAsString();
   }
 }

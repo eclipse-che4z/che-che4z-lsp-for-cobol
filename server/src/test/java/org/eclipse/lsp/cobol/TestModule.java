@@ -37,8 +37,8 @@ import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.service.mocks.TestLanguageClient;
-import org.eclipse.lsp.cobol.service.mocks.TestLanguageServer;
+import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
+import org.eclipse.lsp.cobol.service.mocks.MockLanguageServer;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
@@ -59,8 +59,8 @@ public class TestModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(CustomThreadPoolExecutor.class).to(CustomThreadPoolExecutorService.class);
-    bind(CobolLanguageClient.class).to(TestLanguageClient.class);
-    bind(LanguageServer.class).to(TestLanguageServer.class);
+    bind(CobolLanguageClient.class).to(MockLanguageClient.class);
+    bind(LanguageServer.class).to(MockLanguageServer.class);
     bind(DisposableLSPStateService.class).to(CobolLSPServerStateService.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);

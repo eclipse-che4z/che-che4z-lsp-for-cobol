@@ -42,11 +42,15 @@ import java.util.concurrent.ExecutionException;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.*;
+import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.*;
+import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
 /** This test checks the entry points of the {@link TextDocumentService} implementation. */
 class CobolTextDocumentServiceTest extends MockTextDocumentService {
@@ -61,16 +65,24 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
       "file:///c%3A/workspace/incorrect_document.cbl";
 
   private CobolTextDocumentService service;
+  private CopybookConfig cpyConfigEnabledMode;
+  private CopybookConfig cpyConfigDisabledMode;
+  private CopybookConfig cpyConfigSkipMode;
 
   @BeforeEach
   void setupService() {
     service = getMockedTextDocumentServiceUsingSameThread();
+    cpyConfigEnabledMode = new CopybookConfig(ENABLED, DB2_SERVER);
+    cpyConfigDisabledMode = new CopybookConfig(DISABLED, DB2_SERVER);
+    cpyConfigSkipMode = new CopybookConfig(SKIP, DB2_SERVER);
   }
 
   @Test
   void testCompletion() {
     doNothing().when(communications).notifyThatDocumentAnalysed(anyString());
-    when(engine.analyze(anyString(), anyString(), any(CopybookProcessingMode.class)))
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
+    when(engine.analyze(anyString(), anyString(), any(CopybookConfig.class)))
         .thenReturn(AnalysisResult.empty());
 
     CompletionItem completionItem = new CompletionItem();
@@ -92,20 +104,24 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
     doNothing().when(communications).publishDiagnostics(anyMap());
-    when(engine.analyze(anyString(), anyString(), any(CopybookProcessingMode.class)))
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
+    when(engine.analyze(anyString(), anyString(), any(CopybookConfig.class)))
         .thenReturn(AnalysisResult.empty());
     service.didChange(
         new DidChangeTextDocumentParams(
             new VersionedTextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI, 0), textEdits));
     service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
-    verify(engine).analyze(anyString(), anyString(), any(CopybookProcessingMode.class));
+    verify(engine).analyze(anyString(), anyString(), any(CopybookConfig.class));
     verify(communications).publishDiagnostics(anyMap());
   }
 
   @Test
   void testDidClose() throws ExecutionException, InterruptedException {
     doNothing().when(communications).publishDiagnostics(anyMap());
-    when(engine.analyze(anyString(), anyString(), any(CopybookProcessingMode.class)))
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
+    when(engine.analyze(anyString(), anyString(), any(CopybookConfig.class)))
         .thenReturn(AnalysisResult.empty());
     openDocument(service);
     service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
@@ -135,13 +151,15 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    */
   @Test
   void disableCopybookAnalysisOnExtendedDoc() throws ExecutionException, InterruptedException {
-    when(engine.analyze(anyString(), anyString(), any(CopybookProcessingMode.class)))
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
+    when(engine.analyze(anyString(), anyString(), any(CopybookConfig.class)))
         .thenReturn(AnalysisResult.empty());
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(EXT_SRC_DOC_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
     service.getFutureMap().get(EXT_SRC_DOC_URI).get();
-    verify(engine).analyze(eq(EXT_SRC_DOC_URI), anyString(), eq(CopybookProcessingMode.DISABLED));
+    verify(engine).analyze(eq(EXT_SRC_DOC_URI), anyString(), eq(cpyConfigDisabledMode));
   }
 
   /**
@@ -150,14 +168,15 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    */
   @Test
   void enableCopybooksOnDidOpenTest() throws ExecutionException, InterruptedException {
-    when(engine.analyze(anyString(), anyString(), any(CopybookProcessingMode.class)))
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
+    when(engine.analyze(anyString(), anyString(), any(CopybookConfig.class)))
         .thenReturn(AnalysisResult.empty());
     service.didOpen(
         new DidOpenTextDocumentParams(
             new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
     service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
-    verify(engine)
-        .analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.ENABLED));
+    verify(engine).analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(cpyConfigEnabledMode));
   }
 
   /**
@@ -166,7 +185,9 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    */
   @Test
   void enableCopybooksOnDidChangeTest() throws ExecutionException, InterruptedException {
-    when(engine.analyze(anyString(), anyString(), any(CopybookProcessingMode.class)))
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
+    when(engine.analyze(anyString(), anyString(), any(CopybookConfig.class)))
         .thenReturn(AnalysisResult.empty());
     doNothing().when(communications).publishDiagnostics(anyMap());
     service.didChange(
@@ -174,8 +195,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
             new VersionedTextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI, 0),
             ImmutableList.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
     service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
-    verify(engine)
-        .analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(CopybookProcessingMode.SKIP));
+    verify(engine).analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(cpyConfigSkipMode));
   }
 
   /**
@@ -199,19 +219,20 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
      *  - text document sync state: [DID_OPEN|DID_CHANGE]
      *  - document URI [correct|incorrect]
      */
-
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
     doReturn(resultNoErrors)
         .when(engine)
-        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
+        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode);
     doReturn(resultWithErrors)
         .when(engine)
-        .analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
+        .analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, cpyConfigEnabledMode);
     doReturn(resultNoErrors)
         .when(engine)
-        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.SKIP);
+        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigSkipMode);
     doReturn(resultWithErrors)
         .when(engine)
-        .analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, CopybookProcessingMode.SKIP);
+        .analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, cpyConfigSkipMode);
 
     // create a service and verify is subscribed to the required event
     CobolTextDocumentService service = verifyServiceStart();
@@ -318,9 +339,11 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
    */
   @Test
   void testAnalysis() throws ExecutionException, InterruptedException {
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
     doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.empty()))
         .when(engine)
-        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
+        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode);
 
     service.didOpen(
         new DidOpenTextDocumentParams(
@@ -352,7 +375,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     service.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(uri, LANGUAGE, 0, textToAnalyse)));
     verify(communications).notifyThatLoadingInProgress(uri);
-    verify(engine).analyze(uri, textToAnalyse, CopybookProcessingMode.ENABLED);
+    verify(engine).analyze(uri, textToAnalyse, cpyConfigEnabledMode);
     verify(dataBus)
         .postData(
             AnalysisFinishedEvent.builder()
@@ -377,7 +400,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         new DidChangeTextDocumentParams(
             new VersionedTextDocumentIdentifier(uri, newVersion),
             ImmutableList.of(new TextDocumentContentChangeEvent(textToAnalyse))));
-    verify(engine).analyze(uri, textToAnalyse, CopybookProcessingMode.SKIP);
+    verify(engine).analyze(uri, textToAnalyse, cpyConfigSkipMode);
     verify(communications, times(2)).publishDiagnostics(diagnostics);
   }
 
@@ -389,9 +412,9 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
       String uri) {
 
     // for didOpen and after RunAnalysisEvent
-    verify(engine, times(2)).analyze(uri, text, CopybookProcessingMode.ENABLED);
+    verify(engine, times(2)).analyze(uri, text, cpyConfigEnabledMode);
     // for didChange
-    verify(engine, times(1)).analyze(uri, text, CopybookProcessingMode.SKIP);
+    verify(engine, times(1)).analyze(uri, text, cpyConfigSkipMode);
     // all three above produces the same diagnostics
     verify(communications, times(3)).publishDiagnostics(diagnostics);
   }
@@ -410,7 +433,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     lenient()
         .doAnswer(new AnswersWithDelay(10000, invocation -> AnalysisResult.empty()))
         .when(engine)
-        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED);
+        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode);
 
     service.didOpen(
         new DidOpenTextDocumentParams(
@@ -460,8 +483,10 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     copybookUsages.put("PARENT", asList(parentLocation, parentLocation));
     copybookUsages.put("NESTED", singletonList(nestedLocation));
     copybookUsages.put("NESTED2", singletonList(nested2Location));
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
 
-    when(engine.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, CopybookProcessingMode.ENABLED))
+    when(engine.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode))
         .thenReturn(AnalysisResult.empty().toBuilder().copybookUsages(copybookUsages).build());
 
     service.didOpen(
@@ -479,7 +504,9 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
   @Test
   void testFormatCallDelegatesToFormationsObject() throws ExecutionException, InterruptedException {
-    when(engine.analyze(anyString(), anyString(), any(CopybookProcessingMode.class)))
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
+    when(engine.analyze(anyString(), anyString(), any(CopybookConfig.class)))
         .thenReturn(AnalysisResult.empty());
     when(formations.format(any(CobolDocumentModel.class))).thenReturn(emptyList());
     service.didOpen(
@@ -499,7 +526,9 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   @Test
   void testDefinitionCallDelegatesToOccurrencesObject()
       throws ExecutionException, InterruptedException {
-    when(engine.analyze(anyString(), anyString(), any(CopybookProcessingMode.class)))
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
+    when(engine.analyze(anyString(), anyString(), any(CopybookConfig.class)))
         .thenReturn(AnalysisResult.empty());
 
     when(occurrences.findDefinitions(
@@ -521,7 +550,9 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   @Test
   void testReferenceCallDelegatesToOccurrencesObject()
       throws ExecutionException, InterruptedException {
-    when(engine.analyze(anyString(), anyString(), any(CopybookProcessingMode.class)))
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
+    when(engine.analyze(anyString(), anyString(), any(CopybookConfig.class)))
         .thenReturn(AnalysisResult.empty());
 
     when(occurrences.findReferences(

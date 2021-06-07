@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol;
 
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.CobolLanguageServer;
-import org.eclipse.lsp.cobol.service.mocks.TestLanguageServer;
+import org.eclipse.lsp.cobol.service.mocks.MockLanguageServer;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import com.google.inject.Injector;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
@@ -42,7 +42,7 @@ class LangServerBootstrapTest {
 
   @BeforeEach
   void setUp() {
-    server = new TestLanguageServer();
+    server = new MockLanguageServer();
   }
 
   @Test

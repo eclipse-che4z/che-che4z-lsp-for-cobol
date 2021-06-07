@@ -26,10 +26,10 @@ import java.util.concurrent.CompletableFuture;
 
 /** Mock implementation of language server. Only for testing purposes. */
 @Singleton
-public class TestLanguageServer implements LanguageServer {
+public class MockLanguageServer implements LanguageServer {
 
   @Inject
-  public TestLanguageServer() {}
+  public MockLanguageServer() {}
 
   @Override
   public CompletableFuture<InitializeResult> initialize(InitializeParams params) {

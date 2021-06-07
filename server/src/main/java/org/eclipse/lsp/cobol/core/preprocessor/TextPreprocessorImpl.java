@@ -27,7 +27,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -75,7 +75,7 @@ public class TextPreprocessorImpl implements TextPreprocessor {
    *
    * @param documentUri - URI of the processing document
    * @param cobolSourceCode - source code to analyze
-   * @param copybookProcessingMode - settings to control the copybook processing
+   * @param copybookConfig contains config info like: copybook processing mode, backend server
    * @return - the extended document of that text and all the found errors
    */
   @NonNull
@@ -83,12 +83,12 @@ public class TextPreprocessorImpl implements TextPreprocessor {
   public ResultWithErrors<ExtendedDocument> process(
       @NonNull String documentUri,
       @NonNull String cobolSourceCode,
-      CopybookProcessingMode copybookProcessingMode) {
+      @NonNull CopybookConfig copybookConfig) {
     return process(
         documentUri,
         cobolSourceCode,
         new ArrayDeque<>(),
-        copybookProcessingMode,
+        copybookConfig,
         new ArrayDeque<>(),
         new ArrayList<>());
   }
@@ -100,7 +100,7 @@ public class TextPreprocessorImpl implements TextPreprocessor {
    * @param documentUri - URI of the processing document
    * @param cobolCode - source code to analyze
    * @param copybookStack - stack that contains the previous document hierarchy
-   * @param copybookProcessingMode - settings to control the copybook processing
+   * @param copybookConfig contains config info like: copybook processing mode, backend server
    * @return - the extended document of that text and all the found errors
    */
   @NonNull
@@ -109,7 +109,7 @@ public class TextPreprocessorImpl implements TextPreprocessor {
       @NonNull String documentUri,
       @NonNull String cobolCode,
       @NonNull Deque<CopybookUsage> copybookStack,
-      @NonNull CopybookProcessingMode copybookProcessingMode,
+      @NonNull CopybookConfig copybookConfig,
       @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
       @NonNull List<Pair<String, String>> replacingClauses) {
     ThreadInterruptionUtil.checkThreadInterrupted();
@@ -127,7 +127,7 @@ public class TextPreprocessorImpl implements TextPreprocessor {
                 documentUri,
                 code,
                 copybookStack,
-                copybookProcessingMode,
+                copybookConfig,
                 recursiveReplaceStmtStack,
                 replacingClauses)
             .unwrap(errors::addAll);

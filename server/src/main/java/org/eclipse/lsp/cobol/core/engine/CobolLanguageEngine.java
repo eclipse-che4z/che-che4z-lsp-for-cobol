@@ -41,7 +41,7 @@ import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.EmbeddedLanguagesListener;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp4j.Location;
 
@@ -94,7 +94,7 @@ public class CobolLanguageEngine {
    *
    * @param documentUri unique resource identifier of the processed document
    * @param text the content of the document that should be processed
-   * @param copybookProcessingMode the trigger for copybook scan (ENABLED|DISABLED)
+   * @param copybookConfig  contains config info like: copybook processing mode, backend server
    * @return Semantic information wrapper object and list of syntax error that might send back to
    *     the client
    */
@@ -102,14 +102,14 @@ public class CobolLanguageEngine {
   public ResultWithErrors<SemanticContext> run(
       @NonNull String documentUri,
       @NonNull String text,
-      @NonNull CopybookProcessingMode copybookProcessingMode) {
+      @NonNull CopybookConfig copybookConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
     timingBuilder.getPreprocessorTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =
         preprocessor
-            .process(documentUri, text, copybookProcessingMode)
+            .process(documentUri, text, copybookConfig)
             .unwrap(accumulatedErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
 
