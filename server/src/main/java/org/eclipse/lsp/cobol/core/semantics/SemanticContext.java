@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.semantics;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.variables.Variable;
@@ -48,5 +49,5 @@ public class SemanticContext {
   @Builder.Default Map<String, Collection<Location>> subroutinesUsages = new HashMap<>();
   @Builder.Default List<DocumentSymbol> outlineTree = new ArrayList<>();
   @Builder.Default Collection<Variable> variables = new ArrayList<>();
-  Node rootNode;
+  @EqualsAndHashCode.Exclude Node rootNode;
 }

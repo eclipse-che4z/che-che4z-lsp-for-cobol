@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.service.delegates.validations;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.variables.Variable;
@@ -48,7 +49,7 @@ public class AnalysisResult {
   @Builder.Default Map<String, List<Location>> subroutineUsages = new HashMap<>();
   @Builder.Default List<DocumentSymbol> outlineTree = new ArrayList<>();
   @Builder.Default Collection<Variable> variables = new ArrayList<>();
-  Node rootNode;
+  @EqualsAndHashCode.Exclude Node rootNode;
 
   /**
    * Construct empty AnalysisResult.

@@ -36,6 +36,7 @@ public class IndexItemNode extends VariableWithLevelNode {
 
   @Override
   public List<SyntaxError> process() {
+    super.process();
     return ImmutableList.of();
   }
 }

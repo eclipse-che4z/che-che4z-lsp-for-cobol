@@ -28,8 +28,7 @@ import static java.util.stream.Collectors.toList;
 /** The class represents the root. All trees must start with one root node. */
 @ToString(callSuper = true)
 @Getter
-@SuppressWarnings("squid:S2160")
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class RootNode extends Node {
   public RootNode(Locality locality) {
     super(locality, NodeType.ROOT);
