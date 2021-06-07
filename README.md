@@ -40,11 +40,9 @@ COBOL Language Support provides the following COBOL syntax awareness features:
 ### Autocomplete
 Autocomplete speeds up the coding process by intuitively suggesting the most likely variables or paragraphs to follow existing code. The extension provides live suggestions while you type for:
 
-- COBOL keywords
-- COBOL variables
-- COBOL paragraphs
-- CICS keywords
-- DB2 SQL keywords
+- COBOL keywords, variables, paragraphs and sections
+- CA IDMS DML keywords
+- CICS and DB2 SQL keywords
 - Code Snippets
 - Copybook variable and paragraph names
 - Names of copybooks that are used in the program
@@ -65,7 +63,7 @@ This feature is also enabled for CICS and DB2 SQL keywords and variables.
 The extension enables syntax highlighting for COBOL code.
 	
 ### Syntax Coloring
-Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, and paragraphs.
+Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, paragraphs and sections.
 
 ### Outline View and Breadcrumb View
 The extension enables outline view and breadcrumb view, which show the structure of elements within the program and allow easy navigation between them.
