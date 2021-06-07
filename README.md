@@ -109,6 +109,8 @@ You can use copybooks stored in local folders, mainframe data sets or both. To e
 
 Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
 
+Configuring copybook support on COBOL Language Support also enables copybook support features of the [COBOL Control Flow](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.ccf) extension.
+
 ### Storing Copybooks Locally
 
 You can store your copybooks locally in folders in your workspace and specify those folder paths in your workspace extension settings.
