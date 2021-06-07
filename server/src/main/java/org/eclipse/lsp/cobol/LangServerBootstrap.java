@@ -70,11 +70,13 @@ public class LangServerBootstrap {
   private void start(
       @NonNull String[] args, @NonNull LanguageServer server, @NonNull ClientProvider provider)
       throws IOException, InterruptedException, ExecutionException {
+    LOG.info("Java version: " + System.getProperty("java.version"));
     try {
-      Launcher<CobolLanguageClient> launcher = launchServer(args, server);
-      provider.setClient(launcher.getRemoteProxy());
-      // suspend the main thread on listening
-      launcher.startListening().get();
+      if (isPipeEnabled(args)) {
+        launchServerWithPipes(server, provider);
+      } else {
+        launchServerWithSocket(server, provider);
+      }
     } catch (ExecutionException e) {
       LOG.error("An error occurred while starting a language server", e);
       throw e;
@@ -84,28 +86,35 @@ public class LangServerBootstrap {
     }
   }
 
+  private void launchServerWithSocket(LanguageServer server, ClientProvider provider)
+      throws IOException, InterruptedException, ExecutionException {
+    try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
+      LOG.info("Language server started using socket communication on port [{}]", LSP_PORT);
+      // wait for clients to connect
+      Socket socket = serverSocket.accept();
+      try (InputStream input = socket.getInputStream();
+          OutputStream output = socket.getOutputStream()) {
+        Launcher<CobolLanguageClient> launcher = createServerLauncher(server, input, output);
+        provider.setClient(launcher.getRemoteProxy());
+        // suspend the main thread on listening
+        launcher.startListening().get();
+      }
+    }
+  }
+
   @SuppressWarnings("squid:S106")
-  Launcher<CobolLanguageClient> launchServer(@NonNull String[] args, @NonNull LanguageServer server)
-      throws IOException {
-    return isPipeEnabled(args)
-        ? createServerLauncher(server, System.in, System.out)
-        : createServerLauncherWithSocket(server);
+  private void launchServerWithPipes(
+      @NonNull LanguageServer server, @NonNull ClientProvider provider)
+      throws InterruptedException, ExecutionException {
+    LOG.info("Language server started using pipe communication");
+    Launcher<CobolLanguageClient> launcher = createServerLauncher(server, System.in, System.out);
+    provider.setClient(launcher.getRemoteProxy());
+    // suspend the main thread on listening
+    launcher.startListening().get();
   }
 
   boolean isPipeEnabled(@NonNull String[] args) {
     return args.length > 0 && PIPE_ARG.equals(args[0]);
-  }
-
-  @SuppressWarnings("resource")
-  Launcher<CobolLanguageClient> createServerLauncherWithSocket(@NonNull LanguageServer server)
-      throws IOException {
-    try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
-      LOG.info("Language server started using socket communication on port [{}]", LSP_PORT);
-      LOG.info("Java version: " + System.getProperty("java.version"));
-      // wait for clients to connect
-      Socket socket = serverSocket.accept();
-      return createServerLauncher(server, socket.getInputStream(), socket.getOutputStream());
-    }
   }
 
   Launcher<CobolLanguageClient> createServerLauncher(
