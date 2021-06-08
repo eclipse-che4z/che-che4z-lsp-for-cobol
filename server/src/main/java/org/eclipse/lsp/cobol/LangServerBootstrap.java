@@ -88,17 +88,16 @@ public class LangServerBootstrap {
 
   private void launchServerWithSocket(LanguageServer server, ClientProvider provider)
       throws IOException, InterruptedException, ExecutionException {
-    try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
-      LOG.info("Language server started using socket communication on port [{}]", LSP_PORT);
-      // wait for clients to connect
-      Socket socket = serverSocket.accept();
-      try (InputStream input = socket.getInputStream();
-          OutputStream output = socket.getOutputStream()) {
-        Launcher<CobolLanguageClient> launcher = createServerLauncher(server, input, output);
-        provider.setClient(launcher.getRemoteProxy());
-        // suspend the main thread on listening
-        launcher.startListening().get();
-      }
+    LOG.info("Language server awaiting socket communication on port [{}]", LSP_PORT);
+    try (ServerSocket serverSocket = new ServerSocket(LSP_PORT);
+        Socket socket = serverSocket.accept();
+        InputStream input = socket.getInputStream();
+        OutputStream output = socket.getOutputStream()) {
+      LOG.info("Connection established successfully");
+      Launcher<CobolLanguageClient> launcher = createServerLauncher(server, input, output);
+      provider.setClient(launcher.getRemoteProxy());
+      // suspend the main thread on listening
+      launcher.startListening().get();
     }
   }
 
