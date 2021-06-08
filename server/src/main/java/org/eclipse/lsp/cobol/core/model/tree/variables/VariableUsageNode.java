@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import com.google.common.collect.ImmutableList;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.CobolParser;
@@ -32,7 +33,7 @@ import java.util.List;
  */
 @ToString(callSuper = true)
 @Getter
-@SuppressWarnings("squid:S2160")
+@EqualsAndHashCode(callSuper = true)
 public class VariableUsageNode extends Node {
   private final String dataName;
   private final Type variableUsageType;

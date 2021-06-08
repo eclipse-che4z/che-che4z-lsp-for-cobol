@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -23,7 +24,8 @@ import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 /**
  * The class represents the name of variable definition.
  *
- * Example:
+ * <p>Example:
+ *
  * <pre>
  * 01 FIRST.
  *   05 SECOND PIC 9.
@@ -42,7 +44,7 @@ import org.eclipse.lsp.cobol.core.model.tree.NodeType;
  */
 @Getter
 @ToString(callSuper = true)
-@SuppressWarnings("squid:S2160")
+@EqualsAndHashCode(callSuper = true)
 public class VariableDefinitionNameNode extends Node {
   private final String name;
 

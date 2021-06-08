@@ -36,12 +36,9 @@ import static org.eclipse.lsp.cobol.core.model.variables.UsageFormat.*;
 @UtilityClass
 public class UsageFormatUtils {
 
-  private final String picAndUsageConflict = "semantics.picAndUsageConflict";
-
   final List<UsageFormat> blankAndSignNotAllowedUsage = ImmutableList.of(UTF_8, NATIONAL);
-  final ImmutableList<UsageFormat> stringUsageFormat = ImmutableList.of(NATIONAL, DISPLAY_1, UTF_8, DISPLAY);
-  private final List<EffectiveDataType> numericDataTypes = ImmutableList.of(REAL, INTEGER);
-
+  final ImmutableList<UsageFormat> stringUsageFormat =
+      ImmutableList.of(NATIONAL, DISPLAY_1, UTF_8, DISPLAY);
   final ImmutableList<UsageFormat> numericDatatypeUsageFormat =
       ImmutableList.of(
           COMP_1,
@@ -58,7 +55,6 @@ public class UsageFormatUtils {
           COMPUTATIONAL_5,
           NATIONAL,
           DISPLAY);
-
   final List<UsageFormat> noPicClauseUsage =
       ImmutableList.of(
           INDEX,
@@ -71,8 +67,8 @@ public class UsageFormatUtils {
           COMP_2,
           COMPUTATIONAL_1,
           COMPUTATIONAL_2);
-
-
+  private final String picAndUsageConflict = "semantics.picAndUsageConflict";
+  private final List<EffectiveDataType> numericDataTypes = ImmutableList.of(REAL, INTEGER);
   private final Function<ElementaryNode, List<SyntaxError>> checkStringUsage =
       variableNode -> {
         if (isStringNode(variableNode))
@@ -92,13 +88,12 @@ public class UsageFormatUtils {
         return Collections.emptyList();
       };
 
-  Map<EffectiveDataType, Function<ElementaryNode, List<SyntaxError>>>
-          picAndUsageClauseValidator =
-          new EnumMap<>(
-              ImmutableMap.of(
-                  STRING, checkStringUsage,
-                  REAL, checkNumericUsage,
-                  INTEGER, checkNumericUsage));
+  Map<EffectiveDataType, Function<ElementaryNode, List<SyntaxError>>> picAndUsageClauseValidator =
+      new EnumMap<>(
+          ImmutableMap.of(
+              STRING, checkStringUsage,
+              REAL, checkNumericUsage,
+              INTEGER, checkNumericUsage));
 
   private boolean isStringNode(ElementaryNode variableNode) {
     return !stringUsageFormat.contains(variableNode.getUsageFormat())

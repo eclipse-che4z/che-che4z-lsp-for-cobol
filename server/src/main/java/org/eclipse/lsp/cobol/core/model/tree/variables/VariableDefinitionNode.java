@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import com.google.common.collect.ImmutableList;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -37,7 +38,8 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
 /** The node represents a variable definition. */
 @Getter
 @ToString(callSuper = true)
-@SuppressWarnings({"squid:S2160", "squid:S107"})
+@SuppressWarnings("squid:S107")
+@EqualsAndHashCode(callSuper = true)
 public final class VariableDefinitionNode extends Node {
   private final int level;
   private final VariableNameAndLocality variableName;
@@ -85,6 +87,22 @@ public final class VariableDefinitionNode extends Node {
     this.levelLocality = levelLocality;
     this.isBlankWhenZeroPresent = isBlankWhenZeroPresent;
     this.isSignClausePresent = isSignClausePresent;
+  }
+
+  private static SyntaxError checkClauseIsSingle(
+      VariableNode variableNode, Supplier<List<?>> clausesGetter, String clauseName) {
+    if (clausesGetter.get().size() > 1)
+      return variableNode.getError(MessageTemplate.of(TOO_MANY_CLAUSES_MSG, clauseName));
+    return null;
+  }
+
+  /**
+   * Construct a new builder for {@link}VariableDefinitionNode{@link}.
+   *
+   * @return the builder
+   */
+  public static Builder builder() {
+    return new Builder();
   }
 
   /**
@@ -261,22 +279,6 @@ public final class VariableDefinitionNode extends Node {
             )
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
-  }
-
-  private static SyntaxError checkClauseIsSingle(
-      VariableNode variableNode, Supplier<List<?>> clausesGetter, String clauseName) {
-    if (clausesGetter.get().size() > 1)
-      return variableNode.getError(MessageTemplate.of(TOO_MANY_CLAUSES_MSG, clauseName));
-    return null;
-  }
-
-  /**
-   * Construct a new builder for {@link}VariableDefinitionNode{@link}.
-   *
-   * @return the builder
-   */
-  public static Builder builder() {
-    return new Builder();
   }
 
   /** The builder for {@link}VariableDefinitionNode{@link}. */

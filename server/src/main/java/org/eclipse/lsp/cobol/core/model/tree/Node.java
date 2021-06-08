@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -23,7 +24,6 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,17 +31,15 @@ import java.util.stream.Stream;
 /** The class represents a Node in source structure tree. */
 @ToString
 @Getter
+@EqualsAndHashCode
 public abstract class Node {
-  private static final AtomicLong ID_COUNTER = new AtomicLong();
-  public final long id;
   private final Locality locality;
-  private final List<Node> children = new ArrayList<>();
   private final NodeType nodeType;
 
-  @ToString.Exclude @Setter private Node parent;
+  @EqualsAndHashCode.Exclude private final List<Node> children = new ArrayList<>();
+  @EqualsAndHashCode.Exclude @ToString.Exclude @Setter private Node parent;
 
   protected Node(Locality location, NodeType nodeType) {
-    id = ID_COUNTER.incrementAndGet();
     this.locality = location;
     this.nodeType = nodeType;
   }
@@ -103,18 +101,5 @@ public abstract class Node {
    */
   public List<SyntaxError> process() {
     return children.stream().map(Node::process).flatMap(List::stream).collect(Collectors.toList());
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    Node node = (Node) o;
-    return id == node.id;
-  }
-
-  @Override
-  public int hashCode() {
-    return (int) (id ^ id >>> 32);
   }
 }

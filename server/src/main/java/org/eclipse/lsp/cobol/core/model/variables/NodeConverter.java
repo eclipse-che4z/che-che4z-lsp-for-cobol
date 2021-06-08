@@ -28,7 +28,7 @@ import java.util.Map;
  * This is temporal converter and must be removed at the end of SyntaxTree migration.
  */
 public class NodeConverter {
-  private Map<Long, Variable> convertedVariables = new HashMap<>();
+  private Map<VariableNode, Variable> convertedVariables = new HashMap<>();
 
   /**
    * Convert Variable node into the variable.
@@ -38,7 +38,7 @@ public class NodeConverter {
    */
   public Variable convertVariable(VariableNode variableNode) {
     Variable variable = convert(variableNode);
-    convertedVariables.put(variableNode.getId(), variable);
+    convertedVariables.put(variableNode, variable);
     return variable;
   }
 
@@ -153,7 +153,7 @@ public class NodeConverter {
   }
 
   private Variable getParent(VariableNode variableNode) {
-    return convertedVariables.get(variableNode.getParent().getId());
+    return convertedVariables.get(variableNode.getParent());
   }
 
   private Locality getDefinitionLocality(VariableNode variableNode) {

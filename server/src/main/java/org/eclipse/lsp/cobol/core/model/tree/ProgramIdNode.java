@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -25,7 +26,7 @@ import java.util.List;
 /** The class represents program ID. */
 @ToString(callSuper = true)
 @Getter
-@SuppressWarnings("squid:S2160")
+@EqualsAndHashCode(callSuper = true)
 public class ProgramIdNode extends Node {
   String programId;
 

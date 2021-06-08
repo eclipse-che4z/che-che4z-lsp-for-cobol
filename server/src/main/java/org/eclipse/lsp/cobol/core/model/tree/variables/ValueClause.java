@@ -19,9 +19,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 
 import java.util.List;
 
-/**
- * The class represents value clause in COBOL.
- */
+/** The class represents value clause in COBOL. */
 @Value
 public class ValueClause {
   List<ValueInterval> valueIntervals;
