@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -28,8 +27,6 @@ import static java.util.stream.Collectors.toList;
 /** The class represents the root. All trees must start with one root node. */
 @ToString(callSuper = true)
 @Getter
-@SuppressWarnings("squid:S2160")
-@EqualsAndHashCode(callSuper = false)
 public class RootNode extends Node {
   public RootNode(Locality locality) {
     super(locality, NodeType.ROOT);

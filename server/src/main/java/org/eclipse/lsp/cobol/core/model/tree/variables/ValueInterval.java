@@ -17,10 +17,8 @@ package org.eclipse.lsp.cobol.core.model.tree.variables;
 import lombok.Value;
 
 /**
- * The class represents value interval in COBOL.
- * Examples:
- *   88 SOME values 4. => [from: 4, to: null]
- *   88 high-school values are 10 through 12. => [from: 10, to: 12]
+ * The class represents value interval in COBOL. Examples: 88 SOME values 4. => [from: 4, to: null]
+ * 88 high-school values are 10 through 12. => [from: 10, to: 12]
  */
 @Value
 public class ValueInterval {

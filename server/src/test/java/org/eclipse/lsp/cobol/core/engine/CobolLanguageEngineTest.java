@@ -161,7 +161,13 @@ class CobolLanguageEngineTest {
             SemanticContext.builder()
                 .constants(new PredefinedVariableContext())
                 .outlineTree(expectedOutlineTree)
-                .rootNode(new RootNode(Locality.builder().build()))
+                .rootNode(
+                    new RootNode(
+                        Locality.builder()
+                            .uri(URI)
+                            .range(new Range(new Position(0, 7), new Position(0, 31)))
+                            .token("IDENTIFICATION")
+                            .build()))
                 .build(),
             ImmutableList.of(error, eofError));
 

@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -33,7 +34,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.EMBEDDED_CODE;
 /** This class represents embedded code parts in COBOL program, e.g. EXEC CICS and EXEC SQL */
 @Getter
 @ToString(callSuper = true)
-@SuppressWarnings("squid:S2160")
+@EqualsAndHashCode(callSuper = true)
 public class EmbeddedCodeNode extends Node {
   TokenStream tokens;
   ParserRuleContext tree;

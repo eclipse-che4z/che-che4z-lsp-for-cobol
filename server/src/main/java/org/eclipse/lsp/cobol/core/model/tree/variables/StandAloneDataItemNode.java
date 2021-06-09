@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
@@ -33,7 +34,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  */
 @Getter
 @ToString(callSuper = true)
-@SuppressWarnings("squid:S2160")
+@EqualsAndHashCode(callSuper = true)
 public class StandAloneDataItemNode extends VariableWithLevelNode {
   private final String picClause;
   private final String value;

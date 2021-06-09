@@ -14,13 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
 /** The class represents if in COBOL. */
 @ToString(callSuper = true)
-@SuppressWarnings("squid:S2160")
+@EqualsAndHashCode(callSuper = true)
 public class IfNode extends Node {
   CobolParser.IfStatementContext ifStatementContext;
 

@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -21,7 +22,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 /** The class represents perform in COBOL. */
 @ToString(callSuper = true)
 @Getter
-@SuppressWarnings("squid:S2160")
+@EqualsAndHashCode(callSuper = true)
 public class PerformNode extends Node {
   String section;
   String paragraph;
