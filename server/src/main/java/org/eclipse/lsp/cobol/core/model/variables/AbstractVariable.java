@@ -26,6 +26,7 @@ import java.util.Optional;
 
 /** This abstract class implements the functionality that is common for all the variables. */
 public abstract class AbstractVariable implements Variable {
+  public static final int DEFAULT_LEVEL = -1;
   private static final String GLOBAL_SUFFIX = " GLOBAL";
   @Getter protected final int levelNumber;
   @Getter protected final String name;

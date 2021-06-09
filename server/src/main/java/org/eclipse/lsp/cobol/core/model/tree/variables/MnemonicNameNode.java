@@ -31,7 +31,7 @@ public class MnemonicNameNode extends VariableNode {
   private final String systemName;
 
   public MnemonicNameNode(Locality location, String systemName, String name) {
-    super(location, name, VariableType.MNEMONIC_NAME);
+    super(location, name, VariableType.MNEMONIC_NAME, false);
     this.systemName = systemName;
   }
 }

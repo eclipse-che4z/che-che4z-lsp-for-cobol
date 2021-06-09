@@ -36,10 +36,6 @@ public abstract class StructuredVariable extends AbstractVariable {
     super(levelNumber, name, definition, global, parent);
   }
 
-  StructuredVariable(int levelNumber, String name, Locality definition, Variable parent) {
-    super(levelNumber, name, definition, parent);
-  }
-
   /**
    * Add a new nested variable to this structure
    *

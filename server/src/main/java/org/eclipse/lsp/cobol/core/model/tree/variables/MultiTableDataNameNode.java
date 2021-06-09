@@ -37,8 +37,9 @@ public class MultiTableDataNameNode extends VariableWithLevelNode implements Usa
       String name,
       boolean redefines,
       int occursTimes,
-      UsageFormat usageFormat) {
-    super(location, level, name, redefines, VariableType.MULTI_TABLE_DATA_NAME);
+      UsageFormat usageFormat,
+      boolean global) {
+    super(location, level, name, redefines, VariableType.MULTI_TABLE_DATA_NAME, global);
     this.occursTimes = occursTimes;
     this.usageFormat = usageFormat;
   }

@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.variables;
 
 import com.google.common.collect.ImmutableList;
+import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
@@ -28,7 +29,7 @@ import java.util.Map;
  * This is temporal converter and must be removed at the end of SyntaxTree migration.
  */
 public class NodeConverter {
-  private Map<VariableNode, Variable> convertedVariables = new HashMap<>();
+  private final Map<Node, Variable> convertedVariables = new HashMap<>();
 
   /**
    * Convert Variable node into the variable.
@@ -102,9 +103,9 @@ public class NodeConverter {
 
   private IndexItem convert(IndexItemNode variableNode) {
     return new IndexItem(
-        variableNode.getLevel(),
         variableNode.getName(),
         getDefinitionLocality(variableNode),
+        variableNode.isGlobal(),
         getParent(variableNode)
     );
   }
@@ -125,8 +126,8 @@ public class NodeConverter {
         getParent(variableNode),
         variableNode.getOccursTimes(),
         ImmutableList.of(),
-        variableNode.getUsageFormat()
-    );
+        variableNode.getUsageFormat(),
+        variableNode.isGlobal());
   }
 
   private RenameItem convert(RenameItemNode variableNode) {
@@ -152,7 +153,7 @@ public class NodeConverter {
     );
   }
 
-  private Variable getParent(VariableNode variableNode) {
+  private Variable getParent(@NonNull VariableNode variableNode) {
     return convertedVariables.get(variableNode.getParent());
   }
 
