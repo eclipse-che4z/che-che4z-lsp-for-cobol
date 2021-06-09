@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import com.google.common.collect.ImmutableList;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -29,10 +28,9 @@ import java.util.List;
  */
 @Getter
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class IndexItemNode extends VariableWithLevelNode {
-  protected IndexItemNode(Locality location, int level, String name, boolean redefines) {
-    super(location, level, name, redefines, VariableType.INDEX_ITEM);
+public class IndexItemNode extends VariableNode {
+  protected IndexItemNode(Locality location, String name) {
+    super(location, name, VariableType.INDEX_ITEM);
   }
 
   @Override

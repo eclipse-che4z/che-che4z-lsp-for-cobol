@@ -264,9 +264,7 @@ public class VariableDefinitionUtil {
         variable.addChild(
             new IndexItemNode(
                 nameAndLocality.getLocality(),
-                definitionNode.getLevel(),
-                nameAndLocality.getName(),
-                definitionNode.hasRedefines()));
+                nameAndLocality.getName()));
       return new ResultWithErrors<>(variable, ImmutableList.of());
     }
     return null;
@@ -315,9 +313,7 @@ public class VariableDefinitionUtil {
         variable.addChild(
             new IndexItemNode(
                 nameAndLocality.getLocality(),
-                definitionNode.getLevel(),
-                nameAndLocality.getName(),
-                definitionNode.hasRedefines()));
+                nameAndLocality.getName()));
       return new ResultWithErrors<>(variable, ImmutableList.of());
     }
     return null;
