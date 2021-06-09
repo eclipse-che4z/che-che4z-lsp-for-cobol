@@ -36,8 +36,6 @@ abstract class VariableWithLevelNode extends VariableNode {
   private final boolean specifiedGlobal;
   private final boolean redefines;
 
-  private boolean global;
-
   protected VariableWithLevelNode(
       Locality location,
       int level,
@@ -45,26 +43,25 @@ abstract class VariableWithLevelNode extends VariableNode {
       boolean redefines,
       VariableType variableType,
       boolean global) {
-    super(location, name, variableType);
+    super(location, name, variableType, global);
     this.level = level;
     this.redefines = redefines;
-    this.global = global;
     this.specifiedGlobal = global;
   }
 
   protected VariableWithLevelNode(
       Locality location, int level, String name, boolean redefines, VariableType variableType) {
-    super(location, name, variableType);
+    super(location, name, variableType, false);
     this.level = level;
     this.redefines = redefines;
-    this.global = false;
     this.specifiedGlobal = false;
   }
 
   @Override
   public void setParent(Node parent) {
     super.setParent(parent);
-    if (parent instanceof VariableWithLevelNode) global = ((VariableWithLevelNode) parent).global;
+    if (parent instanceof VariableWithLevelNode)
+      setGlobal(((VariableWithLevelNode) parent).isGlobal());
   }
 
   @Override

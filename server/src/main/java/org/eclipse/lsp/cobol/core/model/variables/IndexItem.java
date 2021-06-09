@@ -31,14 +31,14 @@ import static org.eclipse.lsp.cobol.core.model.variables.StructureType.INDEX_NAM
 @EqualsAndHashCode(callSuper = true)
 public class IndexItem extends AbstractVariable {
 
-  public IndexItem(String name, Locality definition) {
+  public IndexItem(String name, boolean global, Locality definition) {
     // IndexItem is non global when it's initially created.
     // Later on it will be recreated via {@code} updateParent {@code}.
-    super(-1, name, definition, false, null);
+    super(DEFAULT_LEVEL, name, definition, global, null);
   }
 
-  public IndexItem(String name, Locality definition, Variable parent) {
-    super(-1, name, definition, parent);
+  public IndexItem(String name, Locality definition, boolean global, Variable parent) {
+    super(DEFAULT_LEVEL, name, definition, global, parent);
   }
 
   /**
@@ -48,7 +48,7 @@ public class IndexItem extends AbstractVariable {
    * @return the new instance with updated parent
    */
   public IndexItem updateParent(Variable parent) {
-    return new IndexItem(name, definition, parent);
+    return new IndexItem(name, definition, global, parent);
   }
 
   @Override

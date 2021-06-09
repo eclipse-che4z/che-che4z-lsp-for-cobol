@@ -37,7 +37,7 @@ public class MnemonicName extends AbstractVariable {
   String systemName;
 
   public MnemonicName(String systemName, String name, Locality definition) {
-    super(-1, name, definition, false, null);
+    super(DEFAULT_LEVEL, name, definition, false, null);
     this.systemName = systemName;
   }
 

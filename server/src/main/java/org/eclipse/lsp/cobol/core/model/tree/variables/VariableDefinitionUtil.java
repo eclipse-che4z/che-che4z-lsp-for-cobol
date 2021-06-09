@@ -258,13 +258,15 @@ public class VariableDefinitionUtil {
               getName(definitionNode),
               definitionNode.hasRedefines(),
               definitionNode.getOccursNumber(),
-              definitionNode.getUsage());
+              definitionNode.getUsage(),
+              definitionNode.isGlobal());
       createVariableNameNode(variable, definitionNode.getVariableName());
       for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes())
         variable.addChild(
             new IndexItemNode(
                 nameAndLocality.getLocality(),
-                nameAndLocality.getName()));
+                nameAndLocality.getName(),
+                variable.isGlobal()));
       return new ResultWithErrors<>(variable, ImmutableList.of());
     }
     return null;
@@ -313,7 +315,8 @@ public class VariableDefinitionUtil {
         variable.addChild(
             new IndexItemNode(
                 nameAndLocality.getLocality(),
-                nameAndLocality.getName()));
+                nameAndLocality.getName(),
+                variable.isGlobal()));
       return new ResultWithErrors<>(variable, ImmutableList.of());
     }
     return null;

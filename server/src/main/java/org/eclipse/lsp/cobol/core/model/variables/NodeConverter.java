@@ -105,6 +105,7 @@ public class NodeConverter {
     return new IndexItem(
         variableNode.getName(),
         getDefinitionLocality(variableNode),
+        variableNode.isGlobal(),
         getParent(variableNode)
     );
   }
@@ -125,8 +126,8 @@ public class NodeConverter {
         getParent(variableNode),
         variableNode.getOccursTimes(),
         ImmutableList.of(),
-        variableNode.getUsageFormat()
-    );
+        variableNode.getUsageFormat(),
+        variableNode.isGlobal());
   }
 
   private RenameItem convert(RenameItemNode variableNode) {

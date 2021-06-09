@@ -17,23 +17,25 @@ package org.eclipse.lsp.cobol.core.model.variables;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Test {@link MultiTableDataName}
- */
+/** Test {@link MultiTableDataName} */
 class MultiTableDataNameTest {
   private static final Variable PARENT = new GroupItem(1, "Parent", null, false, null);
 
   @Test
   void getFormattedDisplayLine() {
-    MultiTableDataName variable = new MultiTableDataName(15, "TAB", null, PARENT, 30, ImmutableList.of(), UsageFormat.UNDEFINED);
+    MultiTableDataName variable =
+        new MultiTableDataName(
+            15, "TAB", null, PARENT, 30, ImmutableList.of(), UsageFormat.UNDEFINED, false);
     assertEquals("15 TAB OCCURS 30 TIMES.", variable.getFormattedDisplayLine());
   }
 
   @Test
   void getFormattedDisplayLineFull() {
-    MultiTableDataName variable = new MultiTableDataName(15, "TAB", null, PARENT, 30, ImmutableList.of(), UsageFormat.COMP);
-    assertEquals("15 TAB OCCURS 30 TIMES USAGE COMP.", variable.getFormattedDisplayLine());
+    MultiTableDataName variable =
+        new MultiTableDataName(
+            15, "TAB", null, null, 30, ImmutableList.of(), UsageFormat.COMP, true);
+    assertEquals("15 TAB GLOBAL OCCURS 30 TIMES USAGE COMP.", variable.getFormattedDisplayLine());
   }
 }

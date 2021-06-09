@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
@@ -33,11 +34,14 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
 public abstract class VariableNode extends Node {
   private final VariableType variableType;
   private final String name;
+  @Setter private boolean global;
 
-  protected VariableNode(Locality location, String name, VariableType variableType) {
+  protected VariableNode(
+      Locality location, String name, VariableType variableType, boolean global) {
     super(location, NodeType.VARIABLE);
     this.name = name;
     this.variableType = variableType;
+    this.global = global;
   }
 
   /**

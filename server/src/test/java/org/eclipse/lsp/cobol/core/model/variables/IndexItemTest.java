@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class IndexItemTest {
   @Test
   void getFormattedDisplayLine() {
-    IndexItem variable = new IndexItem("INDX", null);
+    IndexItem variable = new IndexItem("INDX", false, null);
     assertEquals("INDEXED BY INDX", variable.getFormattedDisplayLine());
   }
 }
