@@ -27,12 +27,16 @@ class TestSqlAssociateLocatorsStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "       CONNECT TO SITE2;\n"
-          + "       CALL SITE2.MYSCHEMA.P1;\n"
-          + "       ASSOCIATE LOCATORS (:LOC1, :LOC2)\n"
-          + "            WITH PROCEDURE :HV1;\n"
-          + "       END-EXEC.";
+          + "       01 {$*LOC1}  PIC X  VALUE 'A1'.\n"
+          + "       01 {$*LOC2}  PIC X  VALUE 'A2'.\n"
+          + "       01 {$*HV1}  PIC X  VALUE 'A3'.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "            CONNECT TO SITE2;\n"
+          + "            CALL SITE2.MYSCHEMA.P1;\n"
+          + "            ASSOCIATE LOCATORS (:{$LOC1}, :{$LOC2})\n"
+          + "                WITH PROCEDURE :{$HV1};\n"
+          + "           END-EXEC.";
 
   @Test
   void test() {

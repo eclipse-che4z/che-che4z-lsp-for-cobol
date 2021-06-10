@@ -44,7 +44,7 @@ class TestExecCicsSendStatementsArgumentsOrder {
           + "           05  {$*FORMATTED-TIME}          PIC X(8).\n"
           + "       01  {$*ABD1}.\n"
           + "           05  FILLER                             PIC X(12).\n"
-          + "       01  {$*ABD2}  REDEFINES ABD1.\n"
+          + "       01  {$*ABD2}  REDEFINES {$ABD1}.\n"
           + "           05  FILLER                             PIC X(12).\n"
           + "       01  {$*WS-CICS-WORK-VARIABLES}.\n"
           + "           03  {$*WS-RESP}                     PIC S9(08)  COMP VALUE ZEROS.\n"

@@ -14,73 +14,59 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.CompletionItemKind;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.List;
 
-import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** Test to check VariableCompletion */
+/**
+ * This test {@link VariableCompletion} asserts that filtration and preparing the variable
+ * completion suggestions works correctly
+ */
 class VariableCompletionTest {
-  private static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. ID1.\n"
-          + "       AUTHOR. Author."
-          + "       ENVIRONMENT DIVISION.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "       01 TBPARM1      PIC 99 VALUE 5.\n"
-          + "       01 TBPARM2      PIC 99 VALUE 0.\n"
-          + "       01 ATCDEM4      PIC X(7) VALUE 'ATCDEM4'.\n"
-          + "       01 P1PARM1      PIC 99 VALUE 0.\n"
-          + "       PROCEDURE DIVISION.\n"
-          + "       PROGB.\n"
-          + "           PERFORM WITH TEST BEFORE UNTIL TBPARM1 = 0\n"
-          + "             SUBTRACT 1 FROM T\n"
-          + "             CALL 'ATCDEM4' \n"
-          + "           END-PERFORM\n"
-          + "       END PROGRAM ID1.";
+  private Completion completion = new VariableCompletion();
 
   @Test
-  void testVariableCompletion() {
-    CobolDocumentModel document = createModel();
-    Set<Completion> completionSet = new HashSet<>();
-    completionSet.add(new VariableCompletion());
-    Completions completions = new Completions(completionSet);
-    List<CompletionItem> completionItems =
-        completions.collectFor(document, createCompletionParams()).getItems();
-
-    assertEquals(2, completionItems.size());
-    assertEquals("TBPARM1", completionItems.get(0).getLabel());
-    assertEquals(CompletionItemKind.Variable, completionItems.get(0).getKind());
+  void testCompletionEmptyResult() {
+    assertThat(
+        completion.getCompletionItems(
+            "smth",
+            new CobolDocumentModel(
+                "", AnalysisResult.builder().constantDefinitions(ImmutableMap.of()).build())),
+        is(empty()));
   }
 
-  private CompletionParams createCompletionParams() {
-    return new CompletionParams(new TextDocumentIdentifier("id"), new Position(12, 30));
+  @Test
+  void testCompletionNull() {
+    assertThat(completion.getCompletionItems("smth", null), is(empty()));
   }
 
-  private CobolDocumentModel createModel() {
-    Map<String, List<Location>> variableDefinitions = new HashMap<>();
-    variableDefinitions.put(
-        "TBPARM1",
-        singletonList(new Location(null, new Range(new Position(5, 9), new Position(5, 16)))));
-    variableDefinitions.put(
-        "TBPARM2",
-        singletonList(new Location(null, new Range(new Position(6, 9), new Position(6, 16)))));
-    variableDefinitions.put(
-        "ATCDEM4",
-        singletonList(new Location(null, new Range(new Position(7, 9), new Position(7, 16)))));
-    variableDefinitions.put(
-        "P1PARM1",
-        singletonList(new Location(null, new Range(new Position(8, 9), new Position(8, 16)))));
+  @Test
+  void testCompletionMock() {
+    assertEquals(createExpected(), completion.getCompletionItems("va", MockCompletionModel.MODEL));
+  }
 
-    AnalysisResult result =
-        AnalysisResult.empty().toBuilder().variableDefinitions(variableDefinitions).build();
+  private List<CompletionItem> createExpected() {
+    return ImmutableList.of(createItem("var1", "expected1"), createItem("VAR2", "expected2"));
+  }
 
-    return new CobolDocumentModel(TEXT, result);
+  private CompletionItem createItem(String name, String desc) {
+    CompletionItem item = new CompletionItem(name);
+    item.setLabel(name);
+    item.setInsertText(name);
+    item.setDocumentation(desc);
+    item.setKind(CompletionItemKind.Variable);
+    item.setSortText("0" + name);
+    return item;
   }
 }

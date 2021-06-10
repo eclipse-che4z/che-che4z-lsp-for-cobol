@@ -16,9 +16,11 @@
 package org.eclipse.lsp.cobol.service.utils;
 
 import lombok.NonNull;
+
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 /** This interface represents API for low-level file systems access */
@@ -37,12 +39,11 @@ public interface FileSystemService {
   Path getPathFromURI(@NonNull String uri);
 
   /**
-   * This method extracts the name of a file from a valid {@link URI} and return the name back to
-   * the client as String or null in case of error.
+   * Extract the name and extension of a file from a valid {@link URI} and return the name back to
+   * the client as String or an empty string.
    *
    * @param uri the reference of the file from where extract the name
-   * @return the String representation of the file name or null if any {@link URISyntaxException} is
-   *     caught.
+   * @return the String representation of the file name and extension or an empty string
    */
   @Nullable
   String getNameFromURI(@NonNull String uri);
@@ -73,4 +74,14 @@ public interface FileSystemService {
    */
   @NonNull
   String decodeURI(@NonNull String uri);
+
+  /**
+   * Reads the bytes from the input stream and after that converts it to text
+   *
+   * @param inputStream
+   * @return text
+   * @throws IOException
+   */
+  @NonNull
+  String readFromInputStream(InputStream inputStream) throws IOException;
 }

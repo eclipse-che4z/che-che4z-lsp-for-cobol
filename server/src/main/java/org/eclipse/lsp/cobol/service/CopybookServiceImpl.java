@@ -14,34 +14,33 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
-import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
-import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
-import org.eclipse.lsp.cobol.domain.event.model.AnalysisFinishedEvent;
-import org.eclipse.lsp.cobol.domain.event.model.DataEvent;
-import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
-import com.google.gson.JsonPrimitive;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
+import org.eclipse.lsp.cobol.core.model.CopybookModel;
+import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
+import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
+import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static org.eclipse.lsp.cobol.domain.event.model.DataEventType.ANALYSIS_FINISHED_EVENT;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
 /**
  * This service processes copybook requests and returns content by its name. The service also caches
@@ -49,7 +48,12 @@ import static java.util.stream.Collectors.toList;
  */
 @Slf4j
 @Singleton
-public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspect {
+public class CopybookServiceImpl implements CopybookService {
+
+  public static final String SQLCA = "SQLCA";
+  public static final String SQLDA = "SQLDA";
+  public static final String PREF_IMPLICIT = "implicit://";
+
   private final SettingsService settingsService;
   private final FileSystemService files;
 
@@ -73,7 +77,7 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
             .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName))
             .maximumSize(cacheSize)
             .build();
-    dataBus.subscribe(ANALYSIS_FINISHED_EVENT, this);
+    dataBus.subscribe(this);
   }
 
   @Override
@@ -91,17 +95,16 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
    *
    * @param copybookName - the name of the copybook to be retrieved
    * @param documentUri - the currently processing document that contains the copy statement
-   * @param copybookProcessingMode - text document synchronization type
+   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql server
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
-  @CheckThreadInterruption
   public CopybookModel resolve(
       @NonNull String copybookName,
       @NonNull String documentUri,
-      @NonNull CopybookProcessingMode copybookProcessingMode) {
+      @NonNull CopybookConfig copybookConfig) {
     try {
       return copybookCache.get(
-          copybookName, () -> resolveSync(copybookName, documentUri, copybookProcessingMode));
+          copybookName, () -> resolveSync(copybookName, documentUri, copybookConfig));
     } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
       return new CopybookModel(copybookName, null, null);
@@ -113,25 +116,32 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
     copybookCache.put(copybookModel.getName(), copybookModel);
   }
 
-  @CheckThreadInterruption
-  CopybookModel resolveSync(
+  private CopybookModel resolveSync(
       @NonNull String copybookName,
       @NonNull String documentUri,
-      @NonNull CopybookProcessingMode copybookProcessingMode)
+      @NonNull CopybookConfig copybookConfig)
       throws ExecutionException, InterruptedException {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     String cobolFileName = files.getNameFromURI(documentUri);
     String uri =
-        retrieveURI(
+        SettingsService.getValueAsString(
             settingsService
                 .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
                 .get());
     if (uri.isEmpty()) {
-      if (copybookProcessingMode.download && cobolFileName != null) {
-        Optional.ofNullable(copybooksForDownloading.computeIfAbsent(cobolFileName, s -> ConcurrentHashMap.newKeySet()))
+      if (isImplictlyDefinedCopybook(copybookName)) {
+        uri = getUriForImplicitCopybook(copybookName, copybookConfig);
+        return new CopybookModel(
+            copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri));
+      } else if (copybookConfig.getCopybookProcessingMode().download && cobolFileName != null) {
+        Optional.ofNullable(
+                copybooksForDownloading.computeIfAbsent(
+                    cobolFileName, s -> ConcurrentHashMap.newKeySet()))
             .ifPresent(it -> it.add(copybookName));
       }
       return new CopybookModel(copybookName, null, null);
     }
+
     Path file = files.getPathFromURI(uri);
     if (files.fileExists(file)) {
       return new CopybookModel(copybookName, uri, files.getContentByPath(file));
@@ -141,17 +151,37 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
   }
 
   /**
-   * Depends on DataEvent type it will be handled with {@link #handleAnalysisFinishedEvent} handler.
+   * Checks if copybook name is implicitly (no explicit copybook file) defined or not.
    *
-   * @param event the instance of {@link AnalysisFinishedEvent}
+   * <p>Application can use SQLCA and SQLDA names to define communication and description areas as
+   * copybooks and both are implicitly defined by either co-processor or pre-processor.
+   *
+   * @param copybookName
+   * @return true if copybookname is one of SQLDA or SQLCA
    */
-  @Override
-  public void observerCallback(DataEvent event) {
-    if (event instanceof AnalysisFinishedEvent) {
-      handleAnalysisFinishedEvent((AnalysisFinishedEvent) event);
-    } else {
-      LOG.error("Unexpected DataEvent: {}", event);
+  private boolean isImplictlyDefinedCopybook(String copybookName) {
+    return SQLCA.equals(copybookName) || SQLDA.equals(copybookName);
+  }
+
+  private String getUriForImplicitCopybook(String copybookName, CopybookConfig copybookConfig) {
+    if (SQLCA.equals(copybookName)) {
+      if (SQLBackend.DATACOM_SERVER.equals(copybookConfig.getSqlBackend())) {
+        return "/implicitCopybooks/SQLCA_DATACOM.cpy";
+      }
+      return "/implicitCopybooks/SQLCA_DB2.cpy";
     }
+    return "/implicitCopybooks/SQLDA.cpy";
+  }
+
+  private String readContentForImplicitCopybook(String resourcePath) {
+    InputStream inputStream = CopybookServiceImpl.class.getResourceAsStream(resourcePath);
+    String content = null;
+    try {
+      content = files.readFromInputStream(Objects.requireNonNull(inputStream));
+    } catch (IOException e) {
+      LOG.error("Implicit copybook is not loaded. ", e);
+    }
+    return content;
   }
 
   /**
@@ -161,7 +191,8 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
    *
    * @param event - document analysis done
    */
-  private void handleAnalysisFinishedEvent(AnalysisFinishedEvent event) {
+  @Subscribe
+  public void handleAnalysisFinishedEvent(AnalysisFinishedEvent event) {
     Set<String> uris = new HashSet<>(event.getCopybookUris());
     String documentUri = event.getDocumentUri();
     uris.add(documentUri);
@@ -191,13 +222,5 @@ public class CopybookServiceImpl implements CopybookService, ThreadInterruptAspe
 
   private String getUserInteractionType(CopybookProcessingMode copybookProcessingMode) {
     return copybookProcessingMode.userInteraction ? VERBOSE.label : QUIET.label;
-  }
-
-  private String retrieveURI(List<Object> result) {
-    if (result == null || result.isEmpty()) return "";
-    Object obj = result.get(0);
-    if (!(obj instanceof JsonPrimitive)) return "";
-
-    return ((JsonPrimitive) obj).getAsString();
   }
 }

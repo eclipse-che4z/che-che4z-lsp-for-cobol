@@ -15,15 +15,16 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import org.eclipse.lsp.cobol.core.model.Locality;
 import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
 import java.util.List;
 
-import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVEL_88;
+import static org.eclipse.lsp.cobol.core.model.variables.StructureType.CONDITION_ITEM;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_88;
 
 /**
  * This value class represents a conditional data name entry, that has a level number 88. It cannot
@@ -37,7 +38,8 @@ public class ConditionDataName extends AbstractVariable {
   String value;
   String valueTo;
 
-  public ConditionDataName(String name, Locality definition, Variable parent, String value, String valueTo) {
+  public ConditionDataName(
+      String name, Locality definition, Variable parent, String value, String valueTo) {
     super(LEVEL_88, name, definition, parent);
     this.value = value;
     this.valueTo = valueTo;
@@ -64,11 +66,15 @@ public class ConditionDataName extends AbstractVariable {
   }
 
   @Override
+  public StructureType getStructureType() {
+    return CONDITION_ITEM;
+  }
+
+  @Override
   public String getFormattedDisplayLine() {
     StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(String.format("%1$02d %2$s VALUE %3$s", levelNumber, name, value));
-    if (valueTo != null)
-      stringBuilder.append(" THRU ").append(valueTo);
+    stringBuilder.append(getFormattedSuffix()).append(" VALUE ").append(value);
+    if (valueTo != null) stringBuilder.append(" THRU ").append(valueTo);
     return stringBuilder.append(".").toString();
   }
 }

@@ -24,6 +24,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * This class represents a storage for static completion content, e.g. keywords. It provides
+ * elements as strings and documentation for them if provided.
+ */
 @Slf4j
 public abstract class CompletionStorage {
   private Map<String, String> storage = new HashMap<>();
@@ -67,11 +71,10 @@ public abstract class CompletionStorage {
                     entry -> processDescription(entry.getValue().toString())));
   }
   /**
-   * If description consist of several rows, then line breaks symbols should be replaced with actual
-   * ones.
+   * Replace line break tags with actual line breaks
    *
-   * @param desc - Raw description retrieved from storage
-   * @return THe description properly split in lines
+   * @param desc - raw description retrieved from storage
+   * @return the description properly split in lines
    */
   private String processDescription(String desc) {
     return desc.replace("<br>", "\r\n\r\n");

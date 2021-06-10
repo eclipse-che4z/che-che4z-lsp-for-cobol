@@ -29,7 +29,7 @@ import static java.util.Comparator.comparingInt;
 @UtilityClass
 class MisspelledKeywordDistance {
 
-  private static final KeywordSuggestions KEYWORDS = new KeywordSuggestions();
+  public static final KeywordSuggestions KEYWORDS = new KeywordSuggestions();
   private static final LevenshteinDistance DISTANCE = LevenshteinDistance.getDefaultInstance();
 
   /**

@@ -14,7 +14,8 @@
  */
 package org.eclipse.lsp.cobol;
 
-import org.eclipse.lsp.cobol.core.annotation.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
@@ -32,18 +33,16 @@ import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp.cobol.service.delegates.formations.TrimFormation;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
-import org.eclipse.lsp.cobol.service.delegates.references.*;
+import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
+import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.service.mocks.TestLanguageClient;
-import org.eclipse.lsp.cobol.service.mocks.TestLanguageServer;
+import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
+import org.eclipse.lsp.cobol.service.mocks.MockLanguageServer;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutorService;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
-import com.google.inject.AbstractModule;
-import com.google.inject.matcher.Matchers;
-import com.google.inject.multibindings.Multibinder;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
@@ -60,8 +59,9 @@ public class TestModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(CustomThreadPoolExecutor.class).to(CustomThreadPoolExecutorService.class);
-    bind(CobolLanguageClient.class).to(TestLanguageClient.class);
-    bind(LanguageServer.class).to(TestLanguageServer.class);
+    bind(CobolLanguageClient.class).to(MockLanguageClient.class);
+    bind(LanguageServer.class).to(MockLanguageServer.class);
+    bind(DisposableLSPStateService.class).to(CobolLSPServerStateService.class);
     bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
     bind(WorkspaceService.class).to(CobolWorkspaceServiceImpl.class);
     bind(CopybookService.class).to(CopybookServiceImpl.class);
@@ -82,22 +82,11 @@ public class TestModule extends AbstractModule {
     bind(SubroutineService.class).to(SubroutineServiceImpl.class);
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(HoverProvider.class).to(VariableHover.class);
+    bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
 
     bindFormations();
     bindCompletions();
     bindCodeActions();
-
-    bindInterceptor(
-        Matchers.subclassesOf(ThreadInterruptAspect.class),
-        Matchers.annotatedWith(CheckThreadInterruption.class),
-        new HandleThreadInterruption());
-
-    HandleShutdownState handleShutdownState = new HandleShutdownState();
-    requestInjection(handleShutdownState);
-    bindInterceptor(
-        Matchers.subclassesOf(DisposableService.class),
-            (new NonSyntheticMethodMatcher()).and(Matchers.annotatedWith(CheckServerShutdownState.class)),
-        handleShutdownState);
   }
 
   private void bindFormations() {

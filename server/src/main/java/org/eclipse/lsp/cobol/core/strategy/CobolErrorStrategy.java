@@ -14,21 +14,24 @@
  */
 package org.eclipse.lsp.cobol.core.strategy;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.io.InputStreamReader;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Singleton
@@ -41,28 +44,31 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
   private static final String REPORT_UNWANTED_TOKEN = "reportUnwantedToken";
   private static final String REPORT_MISSING_TOKEN = "reportMissingToken";
   private static final String SPECIAL_TOKEN_HANDLING_FILEPATH = "SpecialTokenHandling.properties";
-  private static final LinkedHashMap<String, String> SPECIAL_TOKEN_HANDLING_MAP;
   private static final String MSG_DELIMITER = ", ";
   private static final String MSG_PREFIX = "{";
   private static final String MSG_SUFFIX = "}";
+  private static Map<String, String> specialTokenHandlingMap;
 
   static {
-    Properties props = new Properties();
-    try (InputStream ins =
-        CobolErrorStrategy.class.getResourceAsStream(SPECIAL_TOKEN_HANDLING_FILEPATH)) {
-      props.load(ins);
+    specialTokenHandlingMap = new LinkedHashMap<>();
+    try (BufferedReader br =
+        new BufferedReader(
+            new InputStreamReader(
+                Objects.requireNonNull(
+                    CobolErrorStrategy.class.getResourceAsStream(
+                        SPECIAL_TOKEN_HANDLING_FILEPATH))))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        if (!(line.isEmpty() || line.startsWith("#"))) {
+          int splitIndex = line.indexOf('=');
+          specialTokenHandlingMap.put(
+              line.substring(0, splitIndex), line.substring(splitIndex + 1));
+        }
+      }
     } catch (IOException exception) {
       LOG.error("SpecialTokenHandling didn't load.", exception);
-      props.setProperty("_", "-");
+      specialTokenHandlingMap = ImmutableMap.of("_", "-");
     }
-    SPECIAL_TOKEN_HANDLING_MAP =
-        props.entrySet().stream()
-            .collect(
-                Collectors.toMap(
-                    ele -> (String) ele.getKey(),
-                    ele -> (String) ele.getValue(),
-                    (a, b) -> b,
-                    LinkedHashMap::new));
   }
 
   private MessageService messageService;
@@ -78,11 +84,10 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
 
   private String parseCustomMessage(String methodName, String rule, Object... params) {
     String messageKey = "ErrorStrategy.".concat(rule.concat(methodName));
-    try {
-      return messageService.getMessage(messageKey, params);
-    } catch (MissingResourceException e1) {
+    String message = messageService.getMessage(messageKey, params);
+    if (message.equals(messageKey))
       return messageService.getMessage("ErrorStrategy.".concat(methodName), params);
-    }
+    return message;
   }
 
   private String getOffendingToken(InputMismatchException e) {
@@ -110,7 +115,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
             .map(exp -> exp.toString(recognizer.getVocabulary()))
             .orElse("");
 
-    for (Map.Entry<String, String> entry : SPECIAL_TOKEN_HANDLING_MAP.entrySet()) {
+    for (Map.Entry<String, String> entry : specialTokenHandlingMap.entrySet()) {
       expectedTokens = expectedTokens.replace(entry.getKey(), entry.getValue());
     }
 
@@ -184,7 +189,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
       msg = messageService.getMessage("ErrorStrategy.endOfFile");
     } else {
       String tokenName =
-          SPECIAL_TOKEN_HANDLING_MAP.getOrDefault(
+          specialTokenHandlingMap.getOrDefault(
               erroneousToken.substring(1, erroneousToken.length() - 1), getTokenErrorDisplay(t));
       msg =
           parseCustomMessage(

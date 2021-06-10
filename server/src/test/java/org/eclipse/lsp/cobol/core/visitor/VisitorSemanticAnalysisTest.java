@@ -15,14 +15,14 @@
 
 package org.eclipse.lsp.cobol.core.visitor;
 
+import com.google.common.collect.ImmutableMap;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.core.utils.CustomToken;
 import org.eclipse.lsp.cobol.service.SubroutineService;
-import com.google.common.collect.ImmutableMap;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
@@ -44,39 +44,6 @@ import static org.mockito.Mockito.when;
 class VisitorSemanticAnalysisTest {
   private static final String WRONG_TOKEN = "MOVES";
   private static final String INVALID_VARIABLE = "invalid";
-
-  /**
-   * Check if there is an error shown the processing token if a variable do not present in the
-   * semantic context.
-   */
-  @Test
-  void testVariableDefinitionNotFound() {
-    CustomToken token = createNewToken(INVALID_VARIABLE);
-    MessageService mockMessageService = mock(MessageService.class);
-    when(mockMessageService.getMessage(
-            matches("CobolVisitor.invalidDefMsg"), matches(INVALID_VARIABLE.toUpperCase())))
-        .thenReturn("Invalid definition for: INVALID");
-    CobolVisitor visitor =
-        new CobolVisitor(
-            "",
-            new NamedSubContext(),
-            mock(CommonTokenStream.class),
-            ImmutableMap.of(
-                token,
-                Locality.builder()
-                    .range(new Range(new Position(0, 0), new Position(0, 0)))
-                    .token(WRONG_TOKEN)
-                    .build()),
-            mockMessageService,
-            mock(SubroutineService.class));
-
-    visitor.visitQualifiedDataNameFormat1(mockMethod(token));
-
-    List<SyntaxError> errors = visitor.finishAnalysis().getErrors();
-    assertEquals(1, errors.size());
-    assertEquals(
-        "Invalid definition for: " + INVALID_VARIABLE.toUpperCase(), errors.get(0).getSuggestion());
-  }
 
   /**
    * Check if visitor calculates distance between a wrong token and a keyword and returns a
@@ -105,6 +72,7 @@ class VisitorSemanticAnalysisTest {
                     .range(new Range(new Position(0, 0), new Position(0, 0)))
                     .token(WRONG_TOKEN)
                     .build()),
+            ImmutableMap.of(),
             messageService,
             mock(SubroutineService.class));
 

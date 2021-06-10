@@ -30,7 +30,7 @@ context('This is a F97476 spec', () => {
       cy.openFile('REPLACING.CBL');
       cy.goToLine(22);
       cy.getCurrentLineErrors({ expectedLine: 22 }).getHoverErrorMessage().contains('Invalid definition for: ABC-ID');
-      cy.getLineByNumber(19).contains('COPY REPL.').type('{end}{backspace} REPLACING ==TAG== BY ==ABC== .', {
+      cy.getLineByNumber(19).contains('COPY REPL.').type('{end}{backspace} REPLACING LEADING ==TAG== BY ==ABC== .', {
         delay: 100,
       });
 
@@ -58,7 +58,9 @@ context('This is a F97476 spec', () => {
         });
       cy.getLineByNumber(19)
         .contains('COPY REPL.')
-        .type('{end}{backspace} REPLACING ==TAG== BY ==ABC== {enter}       ==ABC== by ==XYZ==.', { delay: 100 });
+        .type('{end}{backspace} REPLACING LEADING ==TAG== BY ==ABC== {enter}       LEADING ==ABC== by ==XYZ==.', {
+          delay: 100,
+        });
       cy.getLineByNumber(23)
         .contains('ABC-ID')
         .type('{end}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace} XYZ-ID.', {
@@ -98,7 +100,9 @@ context('This is a F97476 spec', () => {
         });
       cy.getLineByNumber(19)
         .contains('COPY REPL.')
-        .type('{end}{backspace}  REPLACING ==TAG== BY ==ABC== {enter} ==TAR== by ==XYZ==.', { delay: 100 });
+        .type('{end}{backspace}  REPLACING LEADING ==TAG== BY ==ABC== {enter} LEADING ==TAR== by ==XYZ==.', {
+          delay: 100,
+        });
       cy.getLineByNumber(23).contains('MOVE 0 TO ABC-ID.').type('{end}{enter} MOVE 0 TO XYZ-ID.');
       cy.get('.squiggly-error').should('not.exist');
 
@@ -132,7 +136,7 @@ context('This is a F97476 spec', () => {
       cy.getLineByNumber(19)
         .contains('COPY REPL.')
         .type(
-          '{end}{backspace}  REPLACING ==TAG== BY ==ABC== {enter}==TAR== by ==XYZ==. {enter}COPY REPL REPLACING ==TAG== BY ==DEF==.',
+          '{end}{backspace}  REPLACING LEADING ==TAG== BY ==ABC== {enter} LEADING ==TAR== by ==XYZ==. {enter}COPY REPL REPLACING LEADING ==TAG== BY ==DEF==.',
           { delay: 100 },
         );
       cy.getLineByNumber(24)
@@ -155,7 +159,7 @@ context('This is a F97476 spec', () => {
       cy.getCurrentLine().contains('05 TAG-ID PIC 9.').closeCurrentTab();
 
       cy.getLineByNumber(21)
-        .contains('COPY REPL REPLACING ==TAG== BY ==DEF==.')
+        .contains('COPY REPL REPLACING LEADING ==TAG== BY ==DEF==.')
         .type('{end}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}==DEF==.');
       cy.getLineByNumber(26).findText('DEF-ID').goToDefinition();
       cy.getCurrentTab().should('have.text', 'REPL');
@@ -187,6 +191,11 @@ context('This is a F97476 spec', () => {
   describe('TC248135 REPLACING - check paragraph present', () => {
     beforeEach(() => {
       cy.updateConfigs('testing');
+      cy.writeFile('test_files/project/testing/MORECOOL.CPY', '       IDENTIFICATION DIVISION.');
+    });
+
+    afterEach(() => {
+      cy.task('deleteFile', 'test_files/project/testing/MORECOOL.CPY');
     });
     it('Check completion suggestions for variables(paragraphs) being replaced', () => {
       cy.openFile('REPLA.CBL').goToLine(21);
@@ -202,8 +211,7 @@ context('This is a F97476 spec', () => {
     });
     it('Check completion suggestions for variables(paragraphs) being replaced', () => {
       cy.openFile('PAYLIB.CBL').goToLine(33);
-      cy.getCurrentLine().type('{end}{backspace}{enter}', { delay: 200 });
-      cy.getCurrentLine().type('ASTRO', { delay: 200 });
+      cy.getCurrentLine().type('{end}{backspace}{enter}ASTRO', { delay: 200 });
       cy.goToLine(36);
       cy.getCurrentLineErrors({ expectedLine: 36, errorType: 'error' })
         .getHoverErrorMessage()
@@ -217,20 +225,20 @@ context('This is a F97476 spec', () => {
     });
   });
 
-  describe.skip('TC250946 [Mapping] Support building of the extended document - Replace by arithmetic operations', () => {
-    beforeEach(() => {
-      cy.updateConfigs('testing');
-    });
-    it(['bug'], 'Checks replace by arithmetic operations', () => {
-      cy.openFile('PAYLIB.CBL').goToLine(37);
-      cy.getLineByNumber(37)
-        .type('{end}{backspace}{backspace}{backspace}{backspace}{backspace}*3== .', { delay: 300 })
-        .wait(1000);
-      cy.getCurrentLineErrors({ expectedLine: 37 })
-        .getHoverErrorMessage()
-        .contains("Syntax error on '*' expected SECTION");
-    });
-  });
+  // describe('TC250946 [Mapping] Support building of the extended document - Replace by arithmetic operations', () => {
+  //   beforeEach(() => {
+  //     cy.updateConfigs('testing');
+  //   });
+  //   it(['bug'], 'Checks replace by arithmetic operations', () => {
+  //     cy.openFile('PAYLIB.CBL').goToLine(37);
+  //     cy.getLineByNumber(37)
+  //       .type('{end}{backspace}{backspace}{backspace}{backspace}{backspace}*3== .', { delay: 300 })
+  //       .wait(1000);
+  //     cy.getCurrentLineErrors({ expectedLine: 37 })
+  //       .getHoverErrorMessage()
+  //       .contains("Syntax error on '*' expected SECTION");
+  //   });
+  // });
 
   describe('TC250950 [Mapping] Parser Does React on CPY Exit Tag', () => {
     beforeEach(() => {
@@ -260,18 +268,18 @@ context('This is a F97476 spec', () => {
     });
   });
 
-  describe.skip('TC250951 [Mapping] Show Syntax and Semantic Errors from Copybooks', () => {
-    beforeEach(() => {
-      cy.updateConfigs('testing');
-      cy.writeFile('test_files/project/testing/REPL.cpy', 'MOVE.');
-    });
+  // describe('TC250951 [Mapping] Show Syntax and Semantic Errors from Copybooks', () => {
+  //   beforeEach(() => {
+  //     cy.updateConfigs('testing');
+  //     cy.writeFile('test_files/project/testing/REPL.cpy', 'MOVE.');
+  //   });
 
-    it(['flaky_theia'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
-      cy.openFolder('testing').openFile('REPL.cpy');
-      cy.goToLine(1).wait(500);
-      cy.getCurrentLineErrors({ expectedLine: 1 })
-        .getHoverErrorMessage()
-        .contains("Syntax error on 'DIVISI' expected DIVISION");
-    });
-  });
+  //   it(['flaky_theia'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
+  //     cy.openFolder('testing').openFile('REPL.cpy');
+  //     cy.goToLine(1).wait(500);
+  //     cy.getCurrentLineErrors({ expectedLine: 1 })
+  //       .getHoverErrorMessage()
+  //       .contains("Syntax error on 'DIVISI' expected DIVISION");
+  //   });
+  // });
 });

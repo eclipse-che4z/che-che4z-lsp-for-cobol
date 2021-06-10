@@ -15,10 +15,12 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.core.model.Locality;
+
+import static org.eclipse.lsp.cobol.core.model.variables.StructureType.ELEMENT_ITEM;
 
 /**
  * This value class represents an element item COBOL variable. It has a PIC clause representing its
@@ -29,6 +31,7 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class ElementItem extends AbstractVariable {
+
   String picClause;
   String value;
   UsageFormat usageFormat;
@@ -37,11 +40,12 @@ public class ElementItem extends AbstractVariable {
       int levelNumber,
       String name,
       Locality definition,
+      boolean global,
       Variable parent,
       String picClause,
       String value,
       UsageFormat usageFormat) {
-    super(levelNumber, name, definition, parent);
+    super(levelNumber, name, definition, global, parent);
     this.picClause = picClause;
     this.value = value;
     this.usageFormat = usageFormat;
@@ -50,25 +54,20 @@ public class ElementItem extends AbstractVariable {
   @Override
   public Variable rename(RenameItem newParent) {
     return new ElementItem(
-        levelNumber,
-        name,
-        definition,
-        newParent,
-        picClause,
-        value,
-        usageFormat);
+        levelNumber, name, definition, newParent.global, newParent, picClause, value, usageFormat);
+  }
+
+  @Override
+  public StructureType getStructureType() {
+    return ELEMENT_ITEM;
   }
 
   @Override
   public String getFormattedDisplayLine() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(String.format("%1$02d %2$s", levelNumber, name));
-    if (picClause != null)
-      stringBuilder.append(" PIC ").append(picClause);
-    if (usageFormat != UsageFormat.UNDEFINED)
-      stringBuilder.append(" USAGE ").append(usageFormat);
-    if (StringUtils.isNoneBlank(value))
-      stringBuilder.append(" VALUE ").append(value);
+    StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
+    if (picClause != null) stringBuilder.append(" PIC ").append(picClause);
+    if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat);
+    if (StringUtils.isNoneBlank(value)) stringBuilder.append(" VALUE ").append(value);
     return stringBuilder.append(".").toString();
   }
 }

@@ -14,42 +14,39 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.google.inject.Singleton;
+import lombok.NonNull;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 
-import lombok.NonNull;
+import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.COPYBOOKS;
 
-/** implementation for adding copybook names in the autocomplete list as identified by the parser */
+/** This class provides completion suggestions for copybook usages in the document */
 @Singleton
 public class CopybookCompletion implements Completion {
 
-  @NonNull
   @Override
-  public Collection<String> getCompletionSource(CobolDocumentModel document) {
-    return Optional.ofNullable(document)
-        .map(CobolDocumentModel::getAnalysisResult)
-        .map(AnalysisResult::getCopybookUsages)
-        .map(Map::keySet)
-        .orElse(Collections.emptySet());
+  public @NonNull Collection<CompletionItem> getCompletionItems(
+      @NonNull String token, @Nullable CobolDocumentModel document) {
+    if (document == null) return emptyList();
+    return document.getAnalysisResult().getCopybookUsages().keySet().stream()
+        .filter(DocumentationUtils.startsWithIgnoreCase(token))
+        .map(this::toCopybookCompletion)
+        .collect(toList());
   }
 
-  @NonNull
-  @Override
-  public String getSortOrderPrefix() {
-    return COPYBOOKS.prefix;
-  }
-
-  @NonNull
-  @Override
-  public CompletionItemKind getKind() {
-    return CompletionItemKind.Class;
+  private CompletionItem toCopybookCompletion(String name) {
+    CompletionItem item = new CompletionItem(name);
+    item.setLabel(name);
+    item.setInsertText(name);
+    item.setSortText(COPYBOOKS.prefix + name);
+    item.setKind(CompletionItemKind.Class);
+    return item;
   }
 }

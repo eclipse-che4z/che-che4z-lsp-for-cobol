@@ -29,6 +29,10 @@ class TestIdmsKeepStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        DATA DIVISION. \r\n"
+          + "        WORKING-STORAGE SECTION. \r\n"
+          + "        01 {$*WK_ID} PIC X(8).\n"
+          + "        01 {$*WK_LOC} PIC S9(8) COMP.\n"
           + "        PROCEDURE DIVISION.\n";
 
   private static final String KEEP1 = DEFS + "           KEEP CURRENT EMPLOYEE.\n";
@@ -37,8 +41,21 @@ class TestIdmsKeepStatement {
 
   private static final String KEEP3 = DEFS + "           KEEP CURRENT.\n";
 
+  private static final String KEEP_LONGTERM_RELEASE =
+      DEFS + "           KEEP LONGTERM ALL RELEASE.\n";
+
+  private static final String KEEP_LONGTERM_TEST =
+      DEFS + "           KEEP LONGTERM 'TSTID' TEST RETURN NOTIFICATION {$WK_LOC}.\n";
+
+  private static final String KEEP_LOCK_UPGRADE =
+      DEFS
+          + "           MOVE 'TSTID' TO {$WK_ID}.\r\n"
+          + "           KEEP LONGTERM {$WK_ID} UPGRADE EXCLUSIVE RETURN NOTIFICATION\r\n"
+          + "           INTO {$WK_LOC}.\n";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(KEEP1, KEEP2, KEEP3);
+    return Stream.of(
+        KEEP1, KEEP2, KEEP3, KEEP_LONGTERM_RELEASE, KEEP_LONGTERM_TEST, KEEP_LOCK_UPGRADE);
   }
 
   @ParameterizedTest

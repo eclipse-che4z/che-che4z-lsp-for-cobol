@@ -31,22 +31,23 @@ class TestSqlRenameStatement {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n";
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n";
 
   private static final String RENAME =
-      TEXT + "       EXEC SQL RENAME TABLE EMP TO EMPLOYEE  END-EXEC.\n";
+      TEXT + "           EXEC SQL RENAME TABLE EMP TO EMPLOYEE  END-EXEC.\n";
 
   private static final String RENAME2 =
       TEXT
-          + "       EXEC SQL\n"
-          + "         RENAME TABLE EMP_USA_HIS2002 TO EMPLOYEE_UNITEDSTATES_HISTORY2002 \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "             RENAME TABLE EMP_USA_HIS2002 TO EMPLOYEE_UNITEDSTATES_HISTORY2002 \n"
+          + "           END-EXEC.\n";
 
   private static final String RENAME3 =
       TEXT
-          + "       EXEC SQL\n"
-          + "         RENAME INDEX COMPANY.EMPINDX1 TO EMPLOYEE_INDEX \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "             RENAME INDEX COMPANY.EMPINDX1 TO EMPLOYEE_INDEX \n"
+          + "           END-EXEC.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(RENAME, RENAME2, RENAME3);

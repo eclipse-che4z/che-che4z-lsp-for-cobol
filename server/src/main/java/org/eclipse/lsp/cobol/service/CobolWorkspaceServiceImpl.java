@@ -14,33 +14,31 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import org.eclipse.lsp.cobol.core.annotation.CheckServerShutdownState;
-import org.eclipse.lsp.cobol.core.annotation.DisposableService;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.LocaleStore;
 import org.eclipse.lsp.cobol.core.messages.LogLevelUtils;
 import org.eclipse.lsp.cobol.core.model.ErrorCode;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
-import org.eclipse.lsp.cobol.domain.event.model.RunAnalysisEvent;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.domain.databus.model.RunAnalysisEvent;
+import org.eclipse.lsp.cobol.service.utils.ShutdownCheckUtil;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.ExecuteCommandParams;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
-import lombok.NonNull;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.util.Optional.ofNullable;
-import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
 /**
  * This class is responsible to watch for any changes into the copybook folder and to fetch updated
@@ -48,13 +46,14 @@ import static java.util.stream.Collectors.toList;
  */
 @Slf4j
 @Singleton
-public class CobolWorkspaceServiceImpl implements WorkspaceService, DisposableService {
-  private DataBusBroker dataBus;
-  private SettingsService settingsService;
-  private WatcherService watchingService;
-  private CopybookService copybookService;
-  private LocaleStore localeStore;
-  private SubroutineService subroutineService;
+public class CobolWorkspaceServiceImpl implements WorkspaceService {
+  private final DataBusBroker dataBus;
+  private final SettingsService settingsService;
+  private final WatcherService watchingService;
+  private final CopybookService copybookService;
+  private final LocaleStore localeStore;
+  private final SubroutineService subroutineService;
+  private final DisposableLSPStateService disposableLSPStateService;
 
   @Inject
   public CobolWorkspaceServiceImpl(
@@ -63,13 +62,15 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService, DisposableSe
       WatcherService watchingService,
       CopybookService copybookService,
       LocaleStore localeStore,
-      SubroutineService subroutineService) {
+      SubroutineService subroutineService,
+      DisposableLSPStateService disposableLSPStateService) {
     this.dataBus = dataBus;
     this.settingsService = settingsService;
     this.watchingService = watchingService;
     this.copybookService = copybookService;
     this.localeStore = localeStore;
     this.subroutineService = subroutineService;
+    this.disposableLSPStateService = disposableLSPStateService;
   }
 
   /**
@@ -82,11 +83,12 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService, DisposableSe
    */
   @NonNull
   @Override
-  @CheckServerShutdownState
   public CompletableFuture<Object> executeCommand(@NonNull ExecuteCommandParams params) {
-    runAsync(executeCopybookFix(params)).whenComplete(reportExceptionIfFound(params));
+    if (!disposableLSPStateService.isServerShutdown()) {
+      runAsync(executeCopybookFix(params)).whenComplete(reportExceptionIfFound(params));
+    }
 
-    return completedFuture(null);
+    return ShutdownCheckUtil.checkServerState(disposableLSPStateService);
   }
 
   private Runnable executeCopybookFix(@NonNull ExecuteCommandParams params) {
@@ -105,14 +107,16 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService, DisposableSe
    * @param params - LSPSpecification -> The actual changed settings; Actually -> null all the time.
    */
   @Override
-  @CheckServerShutdownState
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
+    if (disposableLSPStateService.isServerShutdown()) return;
     settingsService
         .getConfiguration(CPY_LOCAL_PATHS.label)
         .thenAccept(it -> acceptSettingsChange(settingsService.toStrings(it)));
 
     settingsService.getConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
-    settingsService.getConfiguration(LOGGING_LEVEL.label).thenAccept(LogLevelUtils.updateLogLevel());
+    settingsService
+        .getConfiguration(LOGGING_LEVEL.label)
+        .thenAccept(LogLevelUtils.updateLogLevel());
   }
 
   private void acceptSettingsChange(List<String> localFolders) {
@@ -137,8 +141,8 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService, DisposableSe
    *     sent from the client to the server.
    */
   @Override
-  @CheckServerShutdownState
   public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) {
+    if (disposableLSPStateService.isServerShutdown()) return;
     rerunAnalysis(false);
   }
 
@@ -156,8 +160,6 @@ public class CobolWorkspaceServiceImpl implements WorkspaceService, DisposableSe
         ofNullable(ex)
             .ifPresent(
                 it ->
-                    LOG.error(
-                        "Cannot execute command " + params.getCommand() + ": " + params.toString(),
-                        ex));
+                    LOG.error("Cannot execute command " + params.getCommand() + ": " + params, ex));
   }
 }

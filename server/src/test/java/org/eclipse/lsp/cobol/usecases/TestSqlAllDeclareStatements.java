@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -42,68 +42,69 @@ class TestSqlAllDeclareStatements {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n";
+          + "       01 {$*FRED}  PIC X.\n"
+          + "       01 {$*JEAN}  PIC X.\n"
+          + "       01 {$*DAVE}  PIC X.\n"
+          + "       01 {$*PETE}  PIC X.\n"
+          + "       01 {$*AMBER} PIC X.\n";
 
   private static final String DECLARE_CURSOR =
       TEXT
-          + "       DECLARE C1 CURSOR FOR\n"
-          + "       SELECT DEPTNO, DEPTNAME, MGRNO\n"
-          + "       FROM DSN8C10.DEPT\n"
-          + "       WHERE ADMRDEPT = 'A00';\n"
-          + "       END-EXEC.";
+          + "           EXEC SQL\n"
+          + "            DECLARE C1 CURSOR FOR\n"
+          + "            SELECT DEPTNO, DEPTNAME, MGRNO\n"
+          + "            FROM DSN8C10.DEPT\n"
+          + "            WHERE ADMRDEPT = 'A00';\n"
+          + "           END-EXEC.";
 
   private static final String DECLARE_GLOBAL_TEMP_TABLE =
       TEXT
-          + "        DECLARE GLOBAL TEMPORARY TABLE SESSION.TEMP_EMP\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "            EXEC SQL\n"
+          + "            DECLARE GLOBAL TEMPORARY TABLE SESSION.TEMP_EMP\n"
           + "              (EMPNO     CHAR(6)   NOT NULL,\n"
           + "               SALARY    DECIMAL(9, 2),\n"
           + "               BONUS     DECIMAL(9, 2),\n"
           + "               COMM      DECIMAL(9, 2))\n"
           + "               CCSID EBCDIC\n"
           + "               ON COMMIT PRESERVE ROWS;\n"
-          + "       END-EXEC.";
-
-  private static final String DECLARE_STATEMENT =
-      TEXT
-          + "        DECLARE OBJECT_STATEMENT STATEMENT;\n"
-          + "        INCLUDE SQLDA;\n"
-          + "        DECLARE C1 CURSOR FOR OBJECT_STATEMENT;\n"
-          + "        PREPARE OBJECT_STATEMENT FROM SOURCE_STATEMENT;\n"
-          + "        DESCRIBE OBJECT_STATEMENT INTO SQLDA;\n"
-          + "        OPEN C1;\n"
-          + "        FETCH C1 USING DESCRIPTOR SQLDA;\n"
-          + "        CLOSE C1;\n"
-          + "       END-EXEC.";
+          + "           END-EXEC.";
 
   private static final String DECLARE_TABLE =
       TEXT
-          + "        DECLARE DSN8C10.EMP TABLE\n"
-          + "             (EMPNO     CHAR(6)     NOT NULL,\n"
-          + "              FIRSTNME  VARCHAR(12) NOT NULL,\n"
-          + "              MIDINIT   CHAR(1)     NOT NULL,\n"
-          + "              LASTNAME  VARCHAR(15) NOT NULL,\n"
-          + "              WORKDEPT  CHAR(3)             ,\n"
-          + "              PHONENO   CHAR(4)             ,\n"
-          + "              HIREDATE  DATE                ,\n"
-          + "              JOB       CHAR(8)             ,\n"
-          + "              EDLEVEL   SMALLINT            ,\n"
-          + "              SEX       CHAR(1)             ,\n"
-          + "              BIRTHDATE DATE                ,\n"
-          + "              SALARY    DECIMAL(9,2)        ,\n"
-          + "              BONUS     DECIMAL(9,2)        ,\n"
-          + "              COMM      DECIMAL(9,2)        );\n"
-          + "       END-EXEC.";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "             DECLARE DSN8C10.EMP TABLE\n"
+          + "              (EMPNO     CHAR(6)     NOT NULL,\n"
+          + "               FIRSTNME  VARCHAR(12) NOT NULL,\n"
+          + "               MIDINIT   CHAR(1)     NOT NULL,\n"
+          + "               LASTNAME  VARCHAR(15) NOT NULL,\n"
+          + "               WORKDEPT  CHAR(3)             ,\n"
+          + "               PHONENO   CHAR(4)             ,\n"
+          + "               HIREDATE  DATE                ,\n"
+          + "               JOB       CHAR(8)             ,\n"
+          + "               EDLEVEL   SMALLINT            ,\n"
+          + "               SEX       CHAR(1)             ,\n"
+          + "               BIRTHDATE DATE                ,\n"
+          + "               SALARY    DECIMAL(9,2)        ,\n"
+          + "               BONUS     DECIMAL(9,2)        ,\n"
+          + "               COMM      DECIMAL(9,2)        );\n"
+          + "             END-EXEC.";
+
+  private static final String DECLARE_STATEMENT =
+      TEXT
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL DECLARE OBJECT_STATEMENT STATEMENT; END-EXEC.";
 
   private static final String DECLARE_VARIABLE =
       TEXT
-          + "        BEGIN DECLARE SECTION;\n"
-          + "        DECLARE :FRED VARIABLE CCSID EBCDIC FOR BIT DATA;\n"
-          + "        DECLARE :JEAN VARIABLE CCSID 1208;\n"
-          + "        DECLARE :DAVE VARIABLE CCSID UNICODE; \n"
-          + "        DECLARE :PETE VARIABLE CCSID 1200;\n"
-          + "        DECLARE :AMBER VARIABLE CCSID UNICODE;\n"
-          + "        END DECLARE SECTION;\n"
-          + "       END-EXEC.";
+          + "           EXEC SQL \n"
+          + "             DECLARE :{$FRED} VARIABLE CCSID EBCDIC FOR BIT DATA;\n"
+          + "             DECLARE :{$JEAN} VARIABLE CCSID 1208;\n"
+          + "             DECLARE :{$DAVE} VARIABLE CCSID UNICODE; \n"
+          + "             DECLARE :{$PETE} VARIABLE CCSID 1200;\n"
+          + "             DECLARE :{$AMBER} VARIABLE CCSID UNICODE;\n"
+          + "           END-EXEC.";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

@@ -18,8 +18,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import java.util.Arrays;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.stream.Stream;
+
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 
 /**
  * This class is an properties file implementation of {@link MessageService} . It loads messages
@@ -28,8 +34,8 @@ import java.util.ResourceBundle;
 @Singleton
 public class PropertiesMessageService implements MessageService {
 
-  private String baseName;
-  private LocaleStore localeStore;
+  private final String baseName;
+  private final LocaleStore localeStore;
   private ResourceBundle resourceBundle;
 
   @Inject
@@ -50,16 +56,31 @@ public class PropertiesMessageService implements MessageService {
     resourceBundle = ResourceBundle.getBundle(baseName, locale);
   }
 
-  /**
-   * This method return an {@link String} based on passes key and params.
-   *
-   * @param key Unique ID for each message in externalized message file.
-   * @param parameters Arguments referenced by the format specifiers in the format * string in
-   *     externalized message file.
-   * @return {@link String}
-   */
   @Override
   public String getMessage(String key, Object... parameters) {
-    return String.format(resourceBundle.getString(key), parameters);
+    try {
+      return String.format(resourceBundle.getString(key), parameters);
+    } catch (MissingResourceException e) {
+      return key;
+    }
+  }
+
+  @Override
+  public String localizeTemplate(MessageTemplate template) {
+    Object[] parameters = processArgs(template.getArgs());
+    return getMessage(
+        template.getTemplate(),
+        ofNullable(template.getDelimiter())
+            .map(
+                delimiter ->
+                    Arrays.stream(parameters).map(Object::toString).collect(joining(delimiter)))
+            .map(it -> new Object[] {it})
+            .orElse(parameters));
+  }
+
+  private Object[] processArgs(Object[] args) {
+    return Stream.of(args)
+        .map(arg -> arg instanceof MessageTemplate ? localizeTemplate((MessageTemplate) arg) : arg)
+        .toArray();
   }
 }

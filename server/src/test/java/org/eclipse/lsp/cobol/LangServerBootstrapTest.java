@@ -15,22 +15,18 @@
 
 package org.eclipse.lsp.cobol;
 
+import com.google.inject.Injector;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.CobolLanguageServer;
-import org.eclipse.lsp.cobol.service.mocks.TestLanguageServer;
+import org.eclipse.lsp.cobol.service.mocks.MockLanguageServer;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
-import com.google.inject.Injector;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.net.Socket;
-
 import static com.google.inject.Key.get;
 import static com.google.inject.name.Names.named;
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** This test check the logic of the application bootstrap */
@@ -42,7 +38,7 @@ class LangServerBootstrapTest {
 
   @BeforeEach
   void setUp() {
-    server = new TestLanguageServer();
+    server = new MockLanguageServer();
   }
 
   @Test
@@ -79,34 +75,10 @@ class LangServerBootstrapTest {
   }
 
   @Test
-  void createServerLauncherWithSocket() throws IOException {
-    newSingleThreadExecutor()
-        .submit(
-            () -> {
-              try {
-                Socket socket = new Socket("127.0.0.1", 1044);
-                assertTrue(socket.isConnected());
-              } catch (IOException e) {
-                fail(e.getMessage());
-              }
-            });
-    Launcher<CobolLanguageClient> launcher = LangServerBootstrap.createServerLauncherWithSocket(server);
-
-    assertNotNull(launcher.getRemoteProxy());
-  }
-
-  @Test
   void createServerLauncher() {
     Launcher<CobolLanguageClient> launcher =
         LangServerBootstrap.createServerLauncher(server, System.in, System.out);
 
-    assertNotNull(launcher.getRemoteProxy());
-  }
-
-  @Test
-  void startServer() throws IOException {
-    Launcher<CobolLanguageClient> launcher =
-        LangServerBootstrap.launchServer(new String[] {PIPES}, server);
     assertNotNull(launcher.getRemoteProxy());
   }
 }

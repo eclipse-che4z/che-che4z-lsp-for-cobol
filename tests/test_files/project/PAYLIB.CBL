@@ -12,7 +12,7 @@
       *   Broadcom, Inc. - initial API and implementation            *
       ****************************************************************
        COPY MORECOOL.
-
+      
        PROGRAM-ID. TESTREPL.
        DATA DIVISION.
        WORKING-STORAGE SECTION.
@@ -22,10 +22,10 @@
       * COPY REPL REPLACING ==TAG== BY ==ABC==
       * ==TAR== by ==XYZ==.
       * COPY REPL REPLACING ==TAG== BY DEF.
-       COPY PAYLIB REPLACING  A BY PAYROLL1
-                         B BY PAY-CODE
-                         C BY GROSS-PAY
-                         D BY HOURS.
+       COPY PAYLIB REPLACING A BY PAYROLL1
+                          B BY PAY-CODE
+                          C BY GROSS-PAY
+                          D BY HOURS.
 
        PROCEDURE DIVISION.
        MAINLINE.
@@ -34,5 +34,5 @@
            MOVE 0 TO ABCD OF PARENT.
            MOVE 0 TO ABC-ID.
            MOVE 0 TO DEF-ID.
-       COPY NEW REPLACING ==NAME2== BY ==NAME3== .
+       COPY NEW REPLACING LEADING ==NAME2== BY ==NAME3== .
            GOBACK.

@@ -21,5 +21,6 @@ public enum CobolLineTypeEnum {
   COMPILER_DIRECTIVE,
   CONTINUATION,
   DEBUG,
-  NORMAL
+  NORMAL,
+  PREPROCESSED
 }

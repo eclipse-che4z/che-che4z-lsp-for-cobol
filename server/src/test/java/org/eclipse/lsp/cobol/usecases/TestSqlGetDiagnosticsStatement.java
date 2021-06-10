@@ -27,13 +27,11 @@ class TestSqlGetDiagnosticsStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "        GET CURRENT DIAGNOSTICS CONDITION 1 \n"
-          + "            msg_text = MESSAGE_TEXT;\n"
-          + "        \n"
-          + "        GET STACKED DIAGNOSTICS CONDITION 1 \n"
-          + "             divide_error = MESSAGE_TEXT;\n"
-          + "       END-EXEC.";
+          + "       01 {$*rcount}  PIC 9.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "            GET DIAGNOSTICS :{$rcount} = ROW_COUNT;\n"
+          + "           END-EXEC.";
 
   @Test
   void test() {

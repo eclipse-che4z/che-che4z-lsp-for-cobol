@@ -25,7 +25,7 @@ let c4zPath: string;
 let filePath: string;
 
 beforeAll(() => {
-    vscode.workspace.workspaceFolders = [{uri: {fsPath}} as any];
+    (vscode.workspace.workspaceFolders as any) = [{uri: {fsPath}} as any];
     wsPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath);
     c4zPath = path.join(wsPath, C4Z_FOLDER);
     filePath = path.join(c4zPath, GITIGNORE_FILE);
@@ -58,7 +58,7 @@ describe(".gitignore file in .c4z folder tests", () => {
     });
 
     it("workspace not exist", () => {
-        vscode.workspace.workspaceFolders = [];
+        (vscode.workspace.workspaceFolders as any) = [];
         const createFile = jest.fn();
         createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
 
@@ -70,7 +70,7 @@ describe(".gitignore file in .c4z folder tests", () => {
 describe("Validate URI generation for a given workspace folder", () => {
     test("With a valid workspace folder, the method return a valid URI representation", () => {
         const path = "/ws-vscode";
-        vscode.workspace.workspaceFolders = [{uri: {path, scheme}} as any];
+        (vscode.workspace.workspaceFolders as any) = [{uri: {path, scheme}} as any];
         expect(SettingsUtils.getWorkspacesURI()[0]).toBe("file:///ws-vscode");
     });
 });

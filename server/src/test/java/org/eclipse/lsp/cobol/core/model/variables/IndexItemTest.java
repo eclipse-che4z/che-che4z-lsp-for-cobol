@@ -16,15 +16,13 @@ package org.eclipse.lsp.cobol.core.model.variables;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Test {@link IndexItem}
- */
+/** Test {@link IndexItem} */
 class IndexItemTest {
   @Test
   void getFormattedDisplayLine() {
-    IndexItem variable = new IndexItem(33, "INDX", null);
+    IndexItem variable = new IndexItem("INDX", false, null);
     assertEquals("INDEXED BY INDX", variable.getFormattedDisplayLine());
   }
 }

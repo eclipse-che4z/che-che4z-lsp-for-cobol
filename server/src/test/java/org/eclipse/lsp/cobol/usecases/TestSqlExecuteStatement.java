@@ -28,10 +28,12 @@ class TestSqlExecuteStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL INSERT INTO DSN8C10.DEPT VALUES('s1val') END-EXEC.\n"
-          + "       EXEC SQL\n"
-          + "         EXECUTE DEPT_INSERT USING :SS \n"
-          + "       END-EXEC.\n";
+          + "       01 {$*SS}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL INSERT INTO DSN8C10.DEPT VALUES('s1val') END-EXEC.\n"
+          + "           EXEC SQL\n"
+          + "             EXECUTE DEPT_INSERT USING :{$SS} \n"
+          + "           END-EXEC.\n";
 
   @Test
   void test() {

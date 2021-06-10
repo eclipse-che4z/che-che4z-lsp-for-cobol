@@ -15,69 +15,58 @@
 
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** This test checks the logic of the constant completion resolution */
+/**
+ * This test {@link ConstantCompletion} asserts that filtration and preparing the constant
+ * completion suggestions works correctly
+ */
 class ConstantCompletionTest {
-  private ConstantCompletion completion = new ConstantCompletion();
+  private Completion completion = new ConstantCompletion();
 
   @Test
-  void getCompletionSourceEmptyAnalysisResult() {
+  void testCompletionEmptyResult() {
     assertThat(
-        completion.getCompletionSource(
+        completion.getCompletionItems(
+            "smth",
             new CobolDocumentModel(
                 "", AnalysisResult.builder().constantDefinitions(ImmutableMap.of()).build())),
         is(empty()));
   }
 
   @Test
-  void getCompletionSource() {
-    assertEquals(
-        completion.getCompletionSource(
-            new CobolDocumentModel(
-                "",
-                AnalysisResult.builder()
-                    .constantDefinitions(
-                        ImmutableMap.of(
-                            "expected1",
-                            ImmutableList.of(
-                                new Location(
-                                    "uri", new Range(new Position(0, 1), new Position(1, 2))),
-                                new Location(
-                                    "uri2", new Range(new Position(3, 4), new Position(5, 6)))),
-                            "expected2",
-                            ImmutableList.of()))
-                    .constantUsages(
-                        ImmutableMap.of(
-                            "non-expected",
-                            ImmutableList.of(
-                                new Location(
-                                    "uri", new Range(new Position(0, 1), new Position(1, 2))))))
-                    .build())),
-        ImmutableSet.of("expected2", "expected1"));
+  void testCompletionNull() {
+    assertThat(completion.getCompletionItems("smth", null), is(empty()));
   }
 
   @Test
-  void getSortOrderPrefix() {
-    assertEquals("5", completion.getSortOrderPrefix());
+  void testCompletionMock() {
+    assertEquals(createExpected(), completion.getCompletionItems("co", MockCompletionModel.MODEL));
   }
 
-  @Test
-  void getKind() {
-    assertEquals(CompletionItemKind.Constant, completion.getKind());
+  private List<CompletionItem> createExpected() {
+    return ImmutableList.of(createItem("constD1"), createItem("ConstD2"));
+  }
+
+  private CompletionItem createItem(String name) {
+    CompletionItem item = new CompletionItem(name);
+    item.setLabel(name);
+    item.setInsertText(name);
+    item.setKind(CompletionItemKind.Constant);
+    item.setSortText("5" + name);
+    return item;
   }
 }

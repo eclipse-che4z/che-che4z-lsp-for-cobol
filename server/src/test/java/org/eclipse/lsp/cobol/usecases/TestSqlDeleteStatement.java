@@ -27,7 +27,8 @@ class TestSqlDeleteStatement {
                   + "       PROGRAM-ID. HELLO-SQL.\n"
                   + "       DATA DIVISION.\n"
                   + "       WORKING-STORAGE SECTION.\n"
-                  + "       EXEC SQL DELETE FROM EMP WHERE CURRENT OF C1 END-EXEC.\n";
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           EXEC SQL DELETE FROM EMP WHERE CURRENT OF C1 END-EXEC.\n";
 
   @Test
   void test() {

@@ -26,14 +26,14 @@ class TableDataNameTest {
 
   @Test
   void getFormattedDisplayLine() {
-    TableDataName variable = new TableDataName(5, "TBL", null, null, null, "",
+    TableDataName variable = new TableDataName(5, "TBL", null, false, null, null, "",
         3, ImmutableList.of(), UsageFormat.UNDEFINED);
     assertEquals("05 TBL OCCURS 3 TIMES.", variable.getFormattedDisplayLine());
   }
 
   @Test
   void getFormattedDisplayLineFull() {
-    TableDataName variable = new TableDataName(5, "TBL", null, null, "9(9)", "123",
+    TableDataName variable = new TableDataName(5, "TBL", null, false, null, "9(9)", "123",
         3, ImmutableList.of(), UsageFormat.BINARY);
     assertEquals("05 TBL OCCURS 3 TIMES PIC 9(9) USAGE BINARY VALUE 123.", variable.getFormattedDisplayLine());
   }

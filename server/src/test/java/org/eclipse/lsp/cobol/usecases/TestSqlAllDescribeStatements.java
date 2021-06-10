@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -42,40 +42,32 @@ class TestSqlAllDescribeStatements {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n";
+          + "       01 {$*HOSTVAR}  PIC X.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n";
 
   private static final String DESCRIBE_CURSOR =
-      TEXT + "        DESCRIBE CURSOR C1 INTO :sqlda1\n" + "       END-EXEC.";
+      TEXT + "            DESCRIBE CURSOR C1 INTO SQLDA\n" + "           END-EXEC.";
 
   private static final String DESCRIBE_INPUT =
       TEXT
-          + "        PREPARE STMT1_NAME FROM :STMT1_STR;\n"
-          + "        DESCRIBE INPUT STMT1_NAME INTO :SQLDA;\n"
-          + "       END-EXEC.";
+          + "            DESCRIBE INPUT STMT1_NAME INTO SQLDA;\n"
+          + "           END-EXEC.";
 
   private static final String DESCRIBE_OUTPUT =
-      TEXT
-          + "        BEGIN DECLARE SECTION;\n"
-          + "        END DECLARE SECTION;\n"
-          + "        INCLUDE SQLDA;\n"
-          + "        DECLARE DYN_CURSOR CURSOR FOR STMT1_NAME;\n"
-          + "        PREPARE STMT1_NAME FROM :STMT1_STR;\n"
-          + "        DESCRIBE STMT1_NAME INTO :SQLDA;\n"
-          + "        DESCRIBE STMT1_NAME INTO :SQLDA;\n"
-          + "        OPEN DYN_CURSOR;\n"
-          + "        FETCH DYN_CURSOR USING DESCRIPTOR :SQLDA;\n"
-          + "       END-EXEC.";
+          TEXT
+                  + "            DESCRIBE OUTPUT STMT1_NAME INTO SQLDA USING LABELS;\n"
+                  + "           END-EXEC.";
 
   private static final String DESCRIBE_PROCEDURE =
       TEXT
-          + "        CONNECT TO SITE2;\n"
-          + "        CALL SITE2.MYSCHEMA.P1;\n"
-          + "        ASSOCIATE LOCATORS (:LOC1, :LOC2)\n"
-          + "            WITH PROCEDURE :HV1;\n"
-          + "       END-EXEC.";
+              + "           DESCRIBE PROCEDURE MyProc INTO procDesc;\n"
+              + "           END-EXEC.";
 
   private static final String DESCRIBE_TABLE =
-      TEXT + "        DESCRIBE TABLE MySchemaName.MyTableName INTO holder;\n" + "       END-EXEC.";
+      TEXT
+          + "            DESCRIBE TABLE {$HOSTVAR} INTO tabDesc USING BOTH;\n"
+          + "           END-EXEC.";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.core.messages;
 public interface MessageService {
 
   /**
-   * This method return an {@link String} based on passes key and params.
+   * Return a localized {@link String} based on passed key and params.
    *
    * @param key Unique ID for each message in externalized message file.
    * @param parameters Arguments referenced by the format specifiers in the format * string in
@@ -26,4 +26,13 @@ public interface MessageService {
    * @return {@link String}
    */
   String getMessage(String key, Object... parameters);
+
+  /**
+   * Localize the template and return it as a string. If the arguments of the template are instances
+   * of the {@link MessageTemplate} too, they also will be localized.
+   *
+   * @param template a {@link MessageTemplate} to localize
+   * @return localized string
+   */
+  String localizeTemplate(MessageTemplate template);
 }

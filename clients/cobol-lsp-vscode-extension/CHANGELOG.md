@@ -1,5 +1,36 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
+Changelog:
+
+## [0.19.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.18.0...0.19.0) (2021-06-10)
+
+#### Added
+* Expanded support for IDMS DML commands
+* IDMS DML keyword descriptions
+* Validation of variable types on some statements
+* Custom TAB button functionality
+* Support for compiler directives
+* Support for REDEFINES clause
+* "Go to definition" support for SQL hosted variables
+* Integration with COBOL Control Flow extension
+* Global variable support
+* Support for Datacom SQLDA and SQLCA implicit fields
+
+#### Changed
+* Variable definition shown as documentation
+* Analysis works regardless of file extension
+* Readme update
+
+#### Fixed
+* Compiler options syntax analysis
+* Performance issues
+* Color scheme issues
+* Variable REDEFINES clause bugs
+* Parsing of nested programs
+* Replacement when replacing or replaced text contains "BY"
+* Incorrect processing of URIs provided by Explorer for Endevor
+* Incorrect descriptions for some tokens
+* Issue with two COPY REPLACING statements in a row
 
 ## [0.18.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.17.1...0.18.0) (2021-03-12)
 

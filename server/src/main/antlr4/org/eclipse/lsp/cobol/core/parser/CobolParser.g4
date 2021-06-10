@@ -7,7 +7,7 @@
 */
 
 parser grammar CobolParser;
-options {tokenVocab = CobolLexer;  superClass = MessageServiceParser;}
+options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
 
 import CICSParser;
 
@@ -18,11 +18,139 @@ compilationUnit
    ;
 
 programUnit
-   : identificationDivision environmentDivision? dataDivision? procedureDivision? programUnit* endProgramStatement?
+   : compilerOptions* identificationDivision environmentDivision? dataDivision? procedureDivision? programUnit* endProgramStatement?
    ;
 
 endProgramStatement
    : END PROGRAM programName DOT_FS
+   ;
+
+// compiler options
+compilerOptions
+   : (PROCESS | CBL) (COMMACHAR? compilerOption | compilerXOpts)+
+   ;
+
+compilerXOpts
+   : XOPTS LPARENCHAR compilerOption (COMMACHAR? compilerOption)* RPARENCHAR
+   ;
+
+compilerOption
+   : ADATA | ADV | APOST | AWO
+   | (ARITH | AR) LPARENCHAR (EXTEND | E_CHAR | COMPAT | C_CHAR) RPARENCHAR
+   | BLOCK0
+   | (BUFSIZE | BUF) LPARENCHAR literal RPARENCHAR
+   | CBLCARD
+   | CICS (LPARENCHAR literal RPARENCHAR)?
+   | COBOL2 | COBOL3
+   | (CODEPAGE | CP) LPARENCHAR literal RPARENCHAR
+   | (COMPILE | C_CHAR)
+   | CPP | CPSM
+   | (CURRENCY | CURR) LPARENCHAR literal RPARENCHAR
+   | DATA LPARENCHAR literal RPARENCHAR
+   | (DATEPROC | DP) (LPARENCHAR (FLAG | NOFLAG)? COMMACHAR? (TRIG | NOTRIG)? RPARENCHAR)?
+   | DBCS
+   | (DECK | D_CHAR)
+   | DEBUG
+   | (DIAGTRUNC | DTR)
+   | DLL
+   | (DUMP | DU)
+   | (DYNAM | DYN)
+   | EDF | EPILOG
+   | EXIT
+   | (EXPORTALL | EXP)
+   | (FASTSRT | FSRT)
+   | FEPI
+   | (FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (COMMACHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR
+   | FLAGSTD LPARENCHAR (M_CHAR | I_CHAR | H_CHAR) (COMMACHAR (D_CHAR | DD | N_CHAR | NN | S_CHAR | SS))? RPARENCHAR
+   | GDS | GRAPHIC
+   | INTDATE LPARENCHAR (ANSI | LILIAN) RPARENCHAR
+   | (LANGUAGE | LANG) LPARENCHAR (ENGLISH | CS | EN | JA | JP | KA | UE) RPARENCHAR
+   | LEASM | LENGTH | LIB | LIN
+   | (LINECOUNT | LC) LPARENCHAR literal RPARENCHAR
+   | LINKAGE | LIST
+   | MAP
+   | MARGINS LPARENCHAR literal COMMACHAR literal (COMMACHAR literal)? RPARENCHAR
+   | (MDECK | MD) (LPARENCHAR (C_CHAR | COMPILE | NOC | NOCOMPILE) RPARENCHAR)?
+   | NAME (LPARENCHAR (ALIAS | NOALIAS) RPARENCHAR)?
+   | NATLANG LPARENCHAR (CS | EN | KA) RPARENCHAR
+   | NOADATA | NOADV | NOAWO
+   | NOBLOCK0
+   | NOCBLCARD | NOCICS | NOCMPR2
+   | (NOCOMPILE | NOC) (LPARENCHAR (S_CHAR | E_CHAR | W_CHAR) RPARENCHAR)?
+   | NOCPSM
+   | (NOCURRENCY | NOCURR)
+   | (NODATEPROC | NODP)
+   | NODBCS | NODEBUG
+   | (NODECK | NOD)
+   | NODLL | NODE
+   | (NODUMP | NODU)
+   | (NODIAGTRUNC | NODTR)
+   | (NODYNAM | NODYN)
+   | NOEDF | NOEPILOG | NOEXIT
+   | (NOEXPORTALL | NOEXP)
+   | (NOFASTSRT | NOFSRT)
+   | NOFEPI
+   | (NOFLAG | NOF)
+   | NOFLAGMIG | NOFLAGSTD
+   | NOGRAPHIC
+   | NOLENGTH | NOLIB | NOLINKAGE | NOLIST
+   | NOMAP
+   | (NOMDECK | NOMD)
+   | NONAME
+   | (NONUMBER | NONUM)
+   | (NOOBJECT | NOOBJ)
+   | (NOOFFSET | NOOFF)
+   | NOOPSEQUENCE
+   | (NOOPTIMIZE | NOOPT)
+   | NOOPTIONS
+   | NOP | NOPROLOG
+   | NORENT
+   | (NOSEQUENCE | NOSEQ)
+   | (NOSOURCE | NOS)
+   | NOSPIE | NOSQL
+   | (NOSQLCCSID | NOSQLC)
+   | (NOSSRANGE | NOSSR)
+   | NOSTDTRUNC
+   | (NOTERMINAL | NOTERM) | NOTEST | NOTHREAD
+   | NOVBREF
+   | (NOWORD | NOWD)
+   | NSEQ
+   | (NSYMBOL | NS) LPARENCHAR (NATIONAL | NAT | DBCS) RPARENCHAR
+   | (NOXREF | NOX)
+   | NOZWB
+   | (NUMBER | NUM)
+   | NUMPROC LPARENCHAR (MIG | NOPFD | PFD) RPARENCHAR
+   | (OBJECT | OBJ)
+   | (OFFSET | OFF)
+   | OPMARGINS LPARENCHAR literal COMMACHAR literal (COMMACHAR literal)? RPARENCHAR
+   | OPSEQUENCE LPARENCHAR literal COMMACHAR literal RPARENCHAR
+   | (OPTIMIZE | OPT) (LPARENCHAR (FULL | STD) RPARENCHAR)?
+   | OPTFILE | OPTIONS | OP
+   | (OUTDD | OUT) LPARENCHAR cobolWord RPARENCHAR
+   | (PGMNAME | PGMN) LPARENCHAR (CO | COMPAT | LM | LONGMIXED | LONGUPPER | LU | M_CHAR | MIXED | U_CHAR | UPPER) RPARENCHAR
+   | PROLOG
+   | (QUOTE | Q_CHAR)
+   | RENT | RES | RMODE LPARENCHAR (ANY | AUTO | literal) RPARENCHAR
+   | (SEQUENCE | SEQ) (LPARENCHAR literal COMMACHAR literal RPARENCHAR)?
+   | (SIZE | SZ) LPARENCHAR (MAX | literal) RPARENCHAR
+   | (SOURCE | S_CHAR)
+   | SP
+   | SPACE LPARENCHAR literal RPARENCHAR
+   | SPIE
+   | SQL (LPARENCHAR literal RPARENCHAR)?
+   | (SQLCCSID | SQLC)
+   | (SSRANGE | SSR)
+   | SYSEIB
+   | (TERMINAL | TERM)
+   | TEST (LPARENCHAR (HOOK | NOHOOK)? COMMACHAR? (SEP | SEPARATE | NOSEP | NOSEPARATE)? COMMACHAR? (EJPD | NOEJPD)? RPARENCHAR)?
+   | THREAD
+   | TRUNC LPARENCHAR (BIN | OPT | STD) RPARENCHAR
+   | VBREF
+   | (WORD | WD) LPARENCHAR cobolWord RPARENCHAR
+   | (XMLPARSE | XP) LPARENCHAR (COMPAT | C_CHAR | XMLSS | X_CHAR) RPARENCHAR
+   | (XREF | X_CHAR) (LPARENCHAR (FULL | SHORT)? RPARENCHAR)?
+   | (YEARWINDOW | YW) LPARENCHAR literal RPARENCHAR
+   | ZWB
    ;
 
 // --- identification division --------------------------------------------------------------------
@@ -413,7 +541,7 @@ dataDivision
    ;
 
 dataDivisionSection
-   : fileSection | workingStorageSection | linkageSection | localStorageSection | schemaSection | mapSection
+   : fileSection | workingStorageSection | linkageSection | localStorageSection | schemaSection | mapSection | execSqlStatementInDataDivision
    ;
 
 // -- file section ----------------------------------
@@ -529,13 +657,12 @@ copyIdmsFileEntry
 // -- working storage section ----------------------------------
 
 workingStorageSection
-   : WORKING_STORAGE SECTION DOT_FS dataDescriptionEntry*
+   : WORKING_STORAGE SECTION DOT_FS  dataDescriptionEntryForWorkingStorageSection*
    ;
-
 // -- linkage section ----------------------------------
 
 linkageSection
-   : LINKAGE SECTION DOT_FS dataDescriptionEntry*
+   : LINKAGE SECTION DOT_FS dataDescriptionEntryForWorkingStorageAndLinkageSection*
    ;
 
 // -- local storage section ----------------------------------
@@ -544,61 +671,60 @@ localStorageSection
    : LOCAL_STORAGE SECTION DOT_FS dataDescriptionEntry*
    ;
 
+dataDescriptionEntryForWorkingStorageSection
+   : execSqlStatementInWorkingStorage
+   | dataDescriptionEntryForWorkingStorageAndLinkageSection
+   ;
+
+dataDescriptionEntryForWorkingStorageAndLinkageSection
+   : execSqlStatementInWorkingStorageAndLinkageSection
+   | dataDescriptionEntry
+   ;
+
 dataDescriptionEntry
    : dataDescriptionEntryFormat1
    | dataDescriptionEntryFormat2
    | dataDescriptionEntryFormat1Level77
    | dataDescriptionEntryFormat3
-   | dataDescriptionEntryExecSql
    | dataDescriptionEntryCopyIdms
    ;
 
 dataDescriptionEntryFormat1
-   : LEVEL_NUMBER entryName? (dataGroupUsageClause | dataRedefinesClause | dataIntegerStringClause
-   | dataExternalClause | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataPictureClause
-   | dataCommonOwnLocalClause | dataTypeClause | dataUsingClause | dataUsageClause | dataValueClause
-   | dataReceivedByClause | dataOccursClause | dataSignClause | dataSynchronizedClause | dataJustifiedClause
-   | dataBlankWhenZeroClause | dataWithLowerBoundsClause | dataAlignedClause | dataRecordAreaClause)* (DOT_FS|DOT_FS2)
+   : LEVEL_NUMBER entryName? (dataGroupUsageClause | dataRedefinesClause | dataExternalClause
+   | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
+   | dataOccursClause | dataSignClause | dataSynchronizedClause
+   | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
+   (DOT_FS|DOT_FS2)
    ;
+
 
 dataDescriptionEntryFormat2
    : LEVEL_NUMBER_66 entryName? dataRenamesClause DOT_FS
    ;
 
 dataDescriptionEntryFormat1Level77
-   : LEVEL_NUMBER_77 entryName? (dataPictureClause | dataRedefinesClause | dataIntegerStringClause | dataExternalClause
-   | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataCommonOwnLocalClause | dataTypeClause
-   | dataUsingClause | dataUsageClause | dataValueClause | dataReceivedByClause | dataOccursClause | dataSignClause
-   | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause | dataWithLowerBoundsClause
-   | dataAlignedClause | dataRecordAreaClause)* (DOT_FS|DOT_FS2)
+   : LEVEL_NUMBER_77 entryName? (dataGroupUsageClause | dataRedefinesClause | dataExternalClause
+     | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
+     | dataOccursClause | dataSignClause | dataSynchronizedClause
+     | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
+     (DOT_FS|DOT_FS2)
    ;
+
 
 dataDescriptionEntryFormat3
    : LEVEL_NUMBER_88 entryName? dataValueClause DOT_FS
    ;
 
 entryName
-   : (FILLER | dataName1)
-   ;
-
-dataDescriptionEntryExecSql
-   : execSqlStatement+
+   : (FILLER | dataName)
    ;
 
 dataGroupUsageClause
-   : GROUP_USAGE IS? NATIONAL
-   ;
-
-dataAlignedClause
-   : ALIGNED
+   : GROUP_USAGE IS? (NATIONAL | UTF_8)
    ;
 
 dataBlankWhenZeroClause
    : BLANK WHEN? (ZERO | ZEROS | ZEROES)
-   ;
-
-dataCommonOwnLocalClause
-   : COMMON | OWN | LOCAL
    ;
 
 dataExternalClause
@@ -607,10 +733,6 @@ dataExternalClause
 
 dataGlobalClause
    : IS? GLOBAL
-   ;
-
-dataIntegerStringClause
-   : INTEGER | STRING
    ;
 
 dataJustifiedClause
@@ -637,12 +759,12 @@ pictureString
    : charString
    ;
 
-dataReceivedByClause
-   : RECEIVED? BY? (CONTENT | REFERENCE | REF)
+dataDynamicLengthClause
+   : DYNAMIC LENGTH? (LIMIT IS? integerLiteral)?
    ;
 
-dataRecordAreaClause
-   : RECORD AREA
+dataVolatileClause
+   : VOLATILE
    ;
 
 dataRedefinesClause
@@ -663,18 +785,6 @@ dataSignClause
 
 dataSynchronizedClause
    : (SYNCHRONIZED | SYNC) (LEFT | RIGHT)?
-   ;
-
-dataThreadLocalClause
-   : IS? THREAD_LOCAL
-   ;
-
-dataTypeClause
-   : TYPE IS? (SHORT_DATE | LONG_DATE | NUMERIC_DATE | NUMERIC_TIME | LONG_TIME | (CLOB | BLOB | DBCLOB) LPARENCHAR integerLiteral RPARENCHAR)
-   ;
-
-dataTypeDefClause
-   : IS? TYPEDEF
    ;
 
 dataUsageClause
@@ -708,10 +818,6 @@ usageFormat
    | FUNCTION_POINTER
    ;
 
-dataUsingClause
-   : USING (LANGUAGE | CONVENTION) OF? (cobolWord | dataName)
-   ;
-
 dataValueClause
    : ((VALUE | VALUES) (IS | ARE)?) dataValueClauseLiteral
    ;
@@ -730,10 +836,6 @@ dataValueIntervalFrom
 
 dataValueIntervalTo
    : (THROUGH | THRU) literal
-   ;
-
-dataWithLowerBoundsClause
-   : WITH? LOWER BOUNDS
    ;
 
 dataDescriptionEntryCopyIdms
@@ -804,27 +906,11 @@ procedureDivisionUsingClause
    ;
 
 procedureDivisionGivingClause
-   : (GIVING | RETURNING) dataName
+   : RETURNING dataName
    ;
 
 procedureDivisionUsingParameter
-   : procedureDivisionByReferencePhrase | procedureDivisionByValuePhrase
-   ;
-
-procedureDivisionByReferencePhrase
-   : (BY? REFERENCE)? procedureDivisionByReference+
-   ;
-
-procedureDivisionByReference
-   : (OPTIONAL? (fileName | generalIdentifier)) | ANY
-   ;
-
-procedureDivisionByValuePhrase
-   : BY? VALUE procedureDivisionByValue+
-   ;
-
-procedureDivisionByValue
-   : literal | generalIdentifier | ANY
+   : BY? (REFERENCE | VALUE)? generalIdentifier
    ;
 
 procedureDeclaratives
@@ -859,23 +945,40 @@ paragraph
    ;
 
 sentence
-   : (statement* DOT_FS | idmsStatements endClause?)+
+   : statement* DOT_FS | idmsStatements endClause?
    ;
 
 statement
    : acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
     disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement |
-    execSqlStatement | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
+    execSqlStatementInProcedureDivision | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
-    readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement | serviceReloadStatement |
-    serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement | unstringStatement |
-    writeStatement | xmlStatement
+    readStatement | readyResetTraceStatement| receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
+    serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
+    terminateStatement | unstringStatement | writeStatement | xmlStatement
    ;
 
 idmsStatements
-    : copyIdmsBinds | copyIdmsModule | abendCodeStatement | attachTaskCodeStatement | bindStatement | changePriorityStatement | checkTerminalStatement | commitStatement |
-     connectStatement | disconnectStatement | endStatement | endpageStatement | eraseStatement | findStatement | finishStatement | getStatement | keepStatement |
-     modifyStatement | obtainStatement | readyStatement | rollbackStatement | storeStatement
+    : idmsStmtsOptTerm endClause? | idmsStmtsOptTermOn endClause? idmsOnClause? | idmsStmtsMandTermOn (SEMICOLON_FS idmsOnClause? | DOT_FS)
+    ;
+
+idmsStmtsOptTerm
+    : copyIdmsBinds | copyIdmsModule
+    ;
+
+idmsStmtsOptTermOn
+    : abendCodeStatement | attachTaskCodeStatement | bindStatement | changePriorityStatement | checkTerminalStatement | commitStatement |
+     connectStatement | dcStatement | dequeueStatement | disconnectStatement | endStatement | endpageStatement | enqueueStatement | eraseStatement | findStatement |
+     finishStatement | freeStatement | getStatement | inquireMapStatement | keepStatement | loadStatement | mapStatement | modifyStatement | obtainStatement |
+     postStatement | putStatement | readyStatement |rollbackStatement | snapStatement | startpageStatement | storeStatement | waitStatement
+    ;
+
+idmsStmtsMandTermOn
+    : transferStatement
+    ;
+
+idmsOnClause
+    : ON generalIdentifier
     ;
 
 // abend code statement
@@ -895,7 +998,8 @@ abendCodeExitClause
 // accept statement
 
 acceptStatement
-   : ACCEPT (acceptIdmsDcClause | (generalIdentifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?))
+   : ACCEPT (acceptIdmsDcClause idmsOnClause? | acceptIdmsDbClause idmsOnClause? |
+   (generalIdentifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?))
    ;
 
 acceptFromDateStatement
@@ -932,6 +1036,23 @@ acceptTransactionStatisticsIntoClause
 
 acceptTransactionStatisticsLengthClause
     : LENGTH (integerLiteral | generalIdentifier)
+    ;
+
+acceptIdmsDbClause
+    : generalIdentifier ((FROM acceptIdmsDbOptions) | FOR idms_db_entity_name)
+    ;
+
+acceptIdmsDbOptions
+    : (idms_procedure_name PROCEDURE) | currencyPageInfo | (idms_db_entity_name acceptIdmsTypes) |
+     (IDMS_STATISTICS (EXTENDED generalIdentifier)?)
+    ;
+
+acceptIdmsTypes
+    : (BIND | ((NEXT | PRIOR |OWNER)? currencyPageInfo))
+    ;
+
+currencyPageInfo
+    : CURRENCY (PAGE_INFO generalIdentifier)?
     ;
 
 // add statement
@@ -987,25 +1108,17 @@ alterProceedTo
 // accept transaction statistics statement
 
 attachTaskCodeStatement
-    : ATTACH TASK CODE (generalIdentifier | literal) attachTaskCodePriorityClause? attachTaskCodeWaitClause?
+    : ATTACH TASK CODE (generalIdentifier | literal) attachTaskCodePriorityClause? idmsWaitNowaitClause?
     ;
 
 attachTaskCodePriorityClause
-    : PRIORITY (numericLiteral | generalIdentifier)
-    ;
-
-attachTaskCodeWaitClause
-    : (WAIT | NOWAIT)
-    ;
-
-priorityLiteral
-    : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
+    : PRIORITY (integerLiteral | generalIdentifier)
     ;
 
 // bind statement
 
 bindStatement
-    : BIND (bindTaskClause | bindTransactionClause | bindRunUnitClause | bindMapClause | bindProcedureClause)
+    : BIND (bindTaskClause | bindTransactionClause | bindRunUnitClause | bindMapClause | bindProcedureClause |bindRecordClause)
     ;
 
 bindMapClause
@@ -1032,6 +1145,10 @@ bindRunUnitClause
     : RUN_UNIT (FOR generalIdentifier)? (DBNODE bindDbNodeName)? (DBNAME bindDbNodeName)? (DICTNODE bindDbNodeName)? (DICTNAME bindDbNodeName)?
     ;
 
+bindRecordClause
+    : (idms_db_entity_name (TO generalIdentifier)?) | (generalIdentifier WITH idms_db_entity_name)
+    ;
+
 bindDbNodeName
     : literal | generalIdentifier
     ;
@@ -1051,27 +1168,19 @@ callUsingParameter
    ;
 
 callByReferencePhrase
-   : (BY? REFERENCE)? callByReference+
+   : (BY? REFERENCE)? callByReference
    ;
 
 callByReference
-   : ((ADDRESS OF | INTEGER | STRING)? literal | generalIdentifier | fileName) | OMITTED
+   : ((INTEGER | STRING)? literal | generalIdentifier) | OMITTED
    ;
 
 callByValuePhrase
-   : BY? VALUE callByValue+
-   ;
-
-callByValue
-   : (ADDRESS OF | LENGTH OF?)? (literal | generalIdentifier)
+   : BY? VALUE (literal | generalIdentifier)
    ;
 
 callByContentPhrase
-   : BY? CONTENT callByContent+
-   ;
-
-callByContent
-   : (ADDRESS OF | LENGTH OF?)? literal | generalIdentifier | OMITTED
+   : BY? CONTENT (literal | generalIdentifier | OMITTED)
    ;
 
 callGivingPhrase
@@ -1091,11 +1200,7 @@ cancelCall
 // change priority statement
 
 changePriorityStatement
-    : CHANGE PRIORITY TO? (numericLiteral | generalIdentifier)
-    ;
-
-changePriorityLiteral
-    : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
+    : CHANGE PRIORITY TO? (integerLiteral | generalIdentifier)
     ;
 
 // check terminal statement
@@ -1113,11 +1218,7 @@ checkTerminalIntoClause
     ;
 
 checkTerminalMaxLengthClause
-    : MAX LENGTH (generalIdentifier | checkTerminalMaxLengthLiteral)
-    ;
-
-checkTerminalMaxLengthLiteral
-    : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
+    : MAX LENGTH (generalIdentifier | integerLiteral)
     ;
 
 checkTerminalReturnLengthClause
@@ -1199,10 +1300,48 @@ copyIdmsModule
     : COPY IDMS MODULE? idms_copy_entity_name versionClause? endClause?
     ;
 
+// dc statement
+
+dcStatement
+    : DC RETURN dcNextTaskCodeClause? dcOptionClause? dcTimeoutClause? dcNextTaskIntervalClause?
+    ;
+
+dcNextTaskCodeClause
+    : NEXT TASK CODE (generalIdentifier | literal)
+    ;
+
+dcOptionClause
+    : (NORMAL | ABORT | CONTINUE | IMMEDIATE)
+    ;
+
+dcTimeoutClause
+    : TIMEOUT (dcIntervalClause | dcProgramClause)*
+    ;
+
+dcNextTaskIntervalClause
+    : NEXT TASK INTERVAL (generalIdentifier | integerLiteral) EVENT TYPE (INTERNAL | EXTERNAL) dcEventClause?
+    ;
+
+dcIntervalClause
+    : INTERVAL (generalIdentifier | integerLiteral)
+    ;
+
+dcProgramClause
+    : PROGRAM (generalIdentifier | literal)
+    ;
+
+dcEventClause
+    : (EVENT generalIdentifier) | (EVENT NAME (generalIdentifier | literal))
+    ;
+
 // delete statement
 
 deleteStatement
-   : DELETE (deleteFilenameClause | deleteQueueClause | deleteScratchClause)
+   : DELETE (deleteFilenameClause | deleteIdmsDCStatement idmsOnClause?)
+   ;
+
+deleteIdmsDCStatement
+   : deleteQueueClause | deleteScratchClause | deleteTableClause
    ;
 
 deleteFilenameClause
@@ -1224,6 +1363,20 @@ deleteScratchClause
 deleteScratchIdClause
    : AREA ID (generalIdentifier | literal)
    ;
+
+deleteTableClause
+   : TABLE FROM? (generalIdentifier | idms_table_name) idmsDictnodeClause? idmsDictnameClause? (LOADLIB (generalIdentifier | literal))?
+   ;
+
+// dequeue statement
+
+dequeueStatement
+    : DEQUEUE (ALL | dequeueNameStatement+)
+    ;
+
+dequeueNameStatement
+    : NAME generalIdentifier LENGTH (generalIdentifier | integerLiteral)
+    ;
 
 // disable statement
 
@@ -1302,13 +1455,43 @@ enableStatement
 // end statement
 
 endStatement
-   : END LINE TERMINAL SESSION
+   : END (endLineClause | endTransactionClause)
+   ;
+
+endLineClause
+   : LINE TERMINAL SESSION?
+   ;
+
+endTransactionClause
+   : TRANSACTION STATISTICS endTransactionWriteClause? endTransactionIntoClause? endTransactionLengthClause?
+   ;
+
+endTransactionWriteClause
+   : (WRITE | NOWRITE)
+   ;
+
+endTransactionIntoClause
+   : INTO generalIdentifier
+   ;
+
+endTransactionLengthClause
+   : LENGTH (generalIdentifier | integerLiteral)
    ;
 
 // endpage statement
 
 endpageStatement
    : ENDPAGE SESSION?
+   ;
+
+// enqueue statement
+
+enqueueStatement
+   : ENQUEUE (WAIT | NOWAIT | TEST)? enqueueNameClause*
+   ;
+
+enqueueNameClause
+   : NAME generalIdentifier LENGTH (generalIdentifier | integerLiteral) (EXCLUSIVE | SHARED)?
    ;
 
 // entry statement
@@ -1366,13 +1549,33 @@ evaluateValue
 
 // exec cics statement
 execCicsStatement
-   : EXEC CICS allRules END_EXEC DOT_FS?
+   : EXEC CICS allCicsRules END_EXEC DOT_FS?
    ;
 
-// exec sql statement
+// exec sql statement for specific divisions or sections of COBOL program
+execSqlStatementInProcedureDivision
+   : execSqlStatement
+   ;
+
+execSqlStatementInWorkingStorage
+   : execSqlStatement
+   ;
+
+execSqlStatementInWorkingStorageAndLinkageSection
+   : execSqlStatement
+   ;
+
+execSqlStatementInDataDivision
+   : execSqlStatement
+   ;
+
 execSqlStatement
-   : EXEC_SQL allSqlRules END_EXEC DOT_FS?
-   | (EXEC | SQL) {notifyError("cobolParser.missingSqlKeyword");} allSqlRules END_EXEC DOT_FS?
+   : EXEC_SQL sqlCode END_EXEC DOT_FS?
+   | {notifyError("cobolParser.missingSqlKeyword");} (EXEC | SQL) sqlCode END_EXEC DOT_FS?
+   ;
+
+sqlCode
+   : ~END_EXEC*?
    ;
 
 // exec sql ims statement
@@ -1403,6 +1606,20 @@ findStatement
    : FIND keepClause? findObtainClause
    ;
 
+// free statement
+
+freeStatement
+    : FREE STORAGE (freeStgidClause | freeForClause)
+    ;
+
+freeStgidClause
+    : STGID (generalIdentifier | literal)
+    ;
+
+freeForClause
+    : FOR generalIdentifier (FROM generalIdentifier)?
+    ;
+
 keepClause
     : KEEP EXCLUSIVE?
     ;
@@ -1432,7 +1649,11 @@ dbkeyClause
     ;
 
 positionClause
-    : (NEXT | PRIOR | FIRST | LAST | (integerLiteral | generalIdentifier)) idms_db_entity_name? WITHIN idms_db_entity_name
+    : (orderClause | integerLiteral | generalIdentifier) idms_db_entity_name? WITHIN idms_db_entity_name
+    ;
+
+orderClause
+    : ( NEXT | PRIOR | FIRST | LAST )
     ;
 
 // finish statement
@@ -1449,7 +1670,63 @@ generateStatement
 
 // get statement
 getStatement
-    : GET idms_db_entity_name?
+    : GET (idms_db_entity_name | getQueueClause | getScratchClause | getStorageClause | getTimeClause)?
+    ;
+
+getQueueClause
+    : QUEUE (ID (generalIdentifier | literal))? getQueueTypeClause? getStatClause? getQueueLockClause?  idmsWaitNowaitClause? INTO generalIdentifier getLengthClause getReturnClause?
+    ;
+
+getQueueTypeClause
+    : (NEXT | FIRST | LAST | PRIOR | (SEQUENCE (generalIdentifier | integerLiteral)) | (RECORD ID (generalIdentifier | literal)))
+    ;
+
+getStatClause
+    : (DELETE | KEEP)
+    ;
+
+getQueueLockClause
+    : (LOCK | NOLOCK)
+    ;
+
+getLengthClause
+    : ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | literal)))
+    ;
+
+getReturnClause
+    : RETURN LENGTH INTO generalIdentifier
+    ;
+
+getScratchClause
+    : SCRATCH getScratchAreaClause? getScratchNextClause? getStatClause? INTO generalIdentifier getLengthClause getReturnClause?
+    ;
+
+getScratchAreaClause
+    : AREA ID (generalIdentifier | literal)?
+    ;
+
+getScratchNextClause
+    : (NEXT | FIRST | LAST | PRIOR | CURRENT | (RECORD ID generalIdentifier))
+    ;
+
+getStorageClause
+    : STORAGE FOR generalIdentifier (TO generalIdentifier)? (LENGTH generalIdentifier)? (POINTER generalIdentifier)? idmsWaitNowaitClause? KEEP? (LONG | SHORT)? (USER | SHARED)? (STGID (generalIdentifier | literal))? getStorageValueClause? getStorageLocClause?
+    ;
+
+getStorageValueClause
+    : VALUE IS (LOW_VALUE | HIGH_VALUE | generalIdentifier)
+    ;
+
+getStorageLocClause
+    : LOCATION IS? (ANY | BELOW)?
+    ;
+
+getTimeClause
+    : TIME getTimeIntoClause? (DATE INTO generalIdentifier)?
+    ;
+
+getTimeIntoClause
+    : INTO generalIdentifier (COMP | COMP_3 | EDIT)
     ;
 
 // goback statement
@@ -1475,7 +1752,7 @@ goToDependingOnStatement
 // if statement
 
 ifStatement
-   : IF condition ifThen ifElse? END_IF?
+   : IF (idmsIfCondition | condition) ifThen ifElse? END_IF?
    ;
 
 ifThen
@@ -1485,6 +1762,18 @@ ifThen
 ifElse
    : ELSE (NEXT SENTENCE | statement+?)
    ;
+
+idmsIfCondition
+   : (idms_db_entity_name idmsIfEmpty) | (idmsIfMember)
+   ;
+
+idmsIfEmpty
+    : IS? NOT? EMPTY
+    ;
+
+idmsIfMember
+    : NOT? idms_db_entity_name MEMBER
+    ;
 
 // initialize statement
 
@@ -1504,6 +1793,37 @@ initializeReplacingBy
 
 initiateStatement
    : INITIATE reportName+
+   ;
+
+// inquire map statement
+
+inquireMapStatement
+   : INQUIRE MAP idms_map_name (MOVE inqMapMovePhrase | IF inqMapIfPhrase)
+   ;
+
+inqMapMovePhrase
+   : (AID TO generalIdentifier) | (CURSOR TO generalIdentifier generalIdentifier) | (IN LENGTH FOR generalIdentifier TO generalIdentifier)
+   ;
+
+inqMapIfPhrase
+   : (INPUT (UNFORMATTED | TRUNCATED | CHANGED | EXTRANEOUS) | (CURSOR AT? DFLD generalIdentifier) |
+   (inqMapWhichFields | inqMapWhichDflds) inqMapFieldTestPhrase) ifThen ifElse?
+   ;
+
+inqMapWhichFields
+   : CURRENT | ALL | NONE | ANY | SOME | ALL (BUT | EXCEPT) CURRENT
+   ;
+
+inqMapWhichDflds
+   : (ALL | NONE | ANY | SOME | ALL (BUT | EXCEPT))? (DFLD generalIdentifier)+
+   ;
+
+inqMapFieldTestPhrase
+   : DATA IS? (YES | NO | ERASE | TRUNCATED | IDENTICAL | DIFFERENT) | mapEditPhrase
+   ;
+
+mapEditPhrase
+   : EDIT IS? (ERROR | CORRECT)
    ;
 
 // inspect statement
@@ -1571,7 +1891,127 @@ inspectBeforeAfter
 // keep statement
 
 keepStatement
-    : KEEP EXCLUSIVE? currentClause
+    : KEEP (keepCurrentClause | keepLongtermClause)
+    ;
+
+keepCurrentClause
+    :  EXCLUSIVE? currentClause
+    ;
+
+keepLongtermClause
+    : LONGTERM (ALL | (generalIdentifier | literal)) keepLongtermRestClause
+    ;
+
+keepLongtermRestClause
+    : (keepLongtermNotifyClause | keepLongtermLockClause | keepLongtermTestClause | RELEASE)
+    ;
+
+keepLongtermNotifyClause
+    : NOTIFY CURRENT idms_db_entity_name
+    ;
+
+keepLongtermLockClause
+    : ((UPGRADE (SHARE | EXCLUSIVE) (RETURN NOTIFICATION INTO? generalIdentifier)) | ((SHARE | EXCLUSIVE) CURRENT idms_db_entity_name)) (WAIT | NOWAIT | NODEADLOCK)?
+    ;
+
+keepLongtermTestClause
+    : TEST (RETURN NOTIFICATION INTO? generalIdentifier)?
+    ;
+
+// load Statement
+
+loadStatement
+    : LOAD TABLE (generalIdentifier | idms_table_name) INTO generalIdentifier loadLocationClause idmsDictnodeClause? idmsDictnameClause? loadLoadlibClause? idmsWaitNowaitClause
+    ;
+
+loadLocationClause
+    : (TO | POINTER) generalIdentifier
+    ;
+
+loadLoadlibClause
+    : LOADLIB (generalIdentifier | literal)
+    ;
+
+// map statement
+
+mapStatement
+    : MAP (mapInClause | mapOutClause | mapOutInClause)
+    ;
+
+mapInClause
+    : IN USING idms_map_name mapIoInputPhrase? mapDetailPhrase?
+    ;
+
+mapIoInputPhrase
+    : mapInIoPhrase | mapInputPhrase
+    ;
+
+mapInIoPhrase
+    : (IO mapInputPhrase? | (NOIO DATASTREAM idmsDmlFromClause))
+    ;
+
+mapInputPhrase
+    : INPUT DATA IS? (YES | NO)
+    ;
+
+mapDetailPhrase
+    : ((DETAIL mapDetailOptions?) | HEADER ) ((PAGE IS? generalIdentifier) | MODIFIED)*
+    ;
+
+mapDetailOptions
+    : (NEXT | FIRST | (SEQUENCE NUMBER IS? generalIdentifier) | (KEY IS? generalIdentifier))
+    (RETURNKEY IS? generalIdentifier)?
+    ;
+
+mapOutClause
+    : OUT USING idms_map_name  idmsWaitNowaitClause?  mapOutIoPhrase? mapOutputPhrase? mapMessagePhrase? mapOutDetailPhrase?
+    ;
+
+mapOutIoPhrase
+    : (IO | (NOIO DATASTREAM mapOutIntoClause))
+    ;
+
+mapOutIntoClause
+    : INTO? generalIdentifier ((TO generalIdentifier) | (MAX? LENGTH (generalIdentifier | integerLiteral)))
+      (RETURN LENGTH INTO? generalIdentifier)?
+    ;
+
+mapOutputPhrase
+    : OUTPUT ((DATA IS? (YES | NO | ERASE | ATTRIBUTE))? (NEWPAGE | ERASE)? LITERALS?)
+    ;
+
+mapMessagePhrase
+    : MESSAGE IS? generalIdentifier idmsDmlLengthClause
+    ;
+
+mapOutDetailPhrase
+    : (DETAIL (NEW | CURRENT)? (KEY IS? generalIdentifier)?) |
+      (RESUME (PAGE IS? (CURRENT | NEXT | PRIOR | FIRST | LAST | generalIdentifier))?)
+    ;
+
+mapOutInClause
+    : OUTIN USING idms_map_name mapOutputPhrase? mapInputPhrase? mapMessagePhrase?
+    ;
+
+idmsDictnameClause
+    : DICTNAME (generalIdentifier | idms_dictionary_name)
+    ;
+
+
+idmsDictnodeClause
+    : DICTNODE (generalIdentifier | idms_node_name)
+    ;
+
+idmsDmlFromClause
+    : FROM generalIdentifier idmsDmlLengthClause
+    ;
+
+idmsDmlLengthClause
+   : ((TO generalIdentifier) | (LENGTH (generalIdentifier | integerLiteral)))
+   ;
+
+idmsWaitNowaitClause
+    : (WAIT | NOWAIT)
     ;
 
 // merge statement
@@ -1618,7 +2058,30 @@ mergeGiving
 
 // modify statement
 modifyStatement
-    : MODIFY idms_db_entity_name
+    : MODIFY  ((MAP modifyMapClause) | idms_db_entity_name )
+    ;
+// modify map statement
+modifyMapClause
+    : idms_map_name (PERMANENT | TEMPORARY)?
+     (CURSOR AT? ((DFLD generalIdentifier) | (generalIdentifier | integerLiteral) (generalIdentifier | integerLiteral)))?
+     (WCC ((RESETMDT | NOMDT) | (RESETKBD | NOKBD) | (ALARM | NOALARM) | (STARTPRT | NOPRT) |
+     (NLCR | FORTYCR | SIXTYFOURCR | EIGHTYCR))+)? (modifyMapForClause modifyMapFieldOptionsClause)?
+    ;
+
+modifyMapForClause
+    : FOR ((ALL ((BUT | EXCEPT) (CURRENT | (DFLD generalIdentifier)+) | (ERROR | CORRECT)? FIELDS)) |
+      (ALL? (DFLD generalIdentifier)+))
+    ;
+
+modifyMapFieldOptionsClause
+    : (BACKSCAN | NOBACKSCAN)? (OUTPUT DATA IS? (YES | NO | ERASE | ATTRIBUTE))? mapInputPhrase?
+    ((RIGHT | LEFT)? JUSTIFY)? (PAD (LOW_VALUE | HIGH_VALUE | (literal | generalIdentifier)))?
+    mapEditPhrase? (REQUIRED | OPTIONAL)? (ERROR MESSAGE IS? (ACTIVE | SUPPRESS))? (ATTRIBUTES (attributeList)+)?
+    ;
+
+attributeList
+    : SKIPCHAR | ALPHANUMERIC | NUMERIC | PROTECTED | UNPROTECTED | DISPLAY | DARK | BRIGHT | DETECT | NOMDT | MDT | BLINK | NOBLINK | REVERSE_VIDEO |
+    NORMAL_VIDEO | UNDERSCORE | NOUNDERSCORE | NOCOLOR | BLUE | RED | PINK | GREEN | TURQUOISE | YELLOW | WHITE
     ;
 
 // move statement
@@ -1759,16 +2222,60 @@ performTestClause
    : WITH? TEST (BEFORE | AFTER)
    ;
 
+// IDMS post statement
+
+postStatement
+   : POST ((EVENT generalIdentifier) | (EVENT NAME (generalIdentifier | literal) CLEAR?))
+   ;
+
 // purge statement
 
 purgeStatement
    : PURGE cdName+
    ;
 
+// IDMS put statement
+
+putStatement
+   : PUT (putQueueStatement | putScratchClause)
+   ;
+
+putQueueStatement
+   : QUEUE (ID (generalIdentifier | literal))? (FIRST | LAST)? idmsDmlFromClause putReturnClause? putRetentionClause?
+   ;
+
+putReturnClause
+   : RETURN RECORD ID INTO generalIdentifier?
+   ;
+
+putRetentionClause
+   : RETENTION (generalIdentifier | integerLiteral)
+   ;
+
+putScratchClause
+   : SCRATCH putAreaIdClause? idmsDmlFromClause putRecordClause? putReturnClause
+   ;
+
+putAreaIdClause
+   : AREA ID (generalIdentifier | literal)
+   ;
+
+putRecordClause
+   : RECORD ID (generalIdentifier | integerLiteral) REPLACE?
+   ;
+
 // read statement
 
 readStatement
-   : READ fileName NEXT? RECORD? readInto? readWith? readKey? invalidKeyPhrase? notInvalidKeyPhrase? atEndPhrase? notAtEndPhrase? END_READ?
+   : READ (readFilenameClause | readIdmsDcStatement idmsOnClause?)
+   ;
+
+readIdmsDcStatement
+   : readLineFromTerminalClause | readTerminalClause
+   ;
+
+readFilenameClause
+   : fileName NEXT? RECORD? readInto? readWith? readKey? invalidKeyPhrase? notInvalidKeyPhrase? atEndPhrase? notAtEndPhrase? END_READ?
    ;
 
 readInto
@@ -1783,9 +2290,22 @@ readKey
    : KEY IS? qualifiedDataName
    ;
 
+readTerminalClause
+   : TERMINAL idmsWaitNowaitClause? (BUFFER | (MODIFIED FROM POSITION (generalIdentifier | literal)))? (GET STORAGE)? INTO generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral))) (RETURN LENGTH INTO? generalIdentifier)?
+   ;
+
+readLineFromTerminalClause
+   : LINE FROM? TERMINAL ECHO? NOBACKPAGE? INTO generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral))) (RETURN LENGTH INTO? generalIdentifier)?
+   ;
+
 // ready statement
 readyStatement
     : READY idms_db_entity_name? (USAGE_MODE IS? (PROTECTED | EXCLUSIVE)? (RETRIEVAL | UPDATE))?
+    ;
+
+// READY/RESET TRACE statement
+readyResetTraceStatement
+    : (READY | RESET) TRACE
     ;
 
 // receive statement
@@ -1843,12 +2363,21 @@ releaseStatement
 // return statement
 
 returnStatement
-   : RETURN fileName RECORD? returnInto? atEndPhrase notAtEndPhrase? END_RETURN?
+   : RETURN (cobolReturn | idmsReturn idmsOnClause?)
+   ;
+
+cobolReturn
+   : fileName RECORD? returnInto? atEndPhrase notAtEndPhrase? END_RETURN?
    ;
 
 returnInto
    : INTO qualifiedDataName
    ;
+
+idmsReturn
+    : generalIdentifier FROM idms_db_entity_name (CURRENCY | orderClause CURRENCY? | USING generalIdentifier)
+      (KEY INTO? generalIdentifier)?
+    ;
 
 // rewrite statement
 
@@ -1882,7 +2411,7 @@ searchWhen
 // send statement
 
 sendStatement
-   : SEND (sendStatementSync | sendStatementAsync) onExceptionClause? notOnExceptionClause?
+   : SEND (((sendStatementSync | sendStatementAsync) onExceptionClause? notOnExceptionClause?) | sendIdmsClause)
    ;
 
 sendStatementSync
@@ -1921,30 +2450,86 @@ sendAdvancingMnemonic
    : mnemonicName
    ;
 
+sendIdmsClause
+   : MESSAGE (ONLY | ALWAYS)? TO sendIdmsToClause idmsDmlFromClause
+   ;
+
+sendIdmsToClause
+   : (DEST ID (generalIdentifier | literal)) | (USER ID generalIdentifier) | (LTERM ID (generalIdentifier | literal))
+   ;
+
 // set statement
 
 setStatement
-   : SET (setToStatement+ | setUpDownByStatement)
+   : SET (setToOnOff+ | setToBoolean | setToStatement | setUpDownByStatement | setToEntry | setIdmsDcStatement idmsOnClause?)
+   ;
+
+setIdmsDcStatement
+   : setAbendExitStatement | setTimerStatement
    ;
 
 setToStatement
-   : setTo+ TO setToValue+
+   : receivingField+ TO sendingField
    ;
 
 setUpDownByStatement
-   : setTo+ (UP BY | DOWN BY) setByValue
+   : receivingField+ (UP BY | DOWN BY) sendingField
    ;
 
-setTo
+setToBoolean
+   : receivingField+ TO booleanLiteral
+   ;
+
+setToOnOff
+   : receivingField+ TO (ON | OFF)
+   ;
+
+setToEntry
+   : receivingField+ TO ENTRY sendingField
+   ;
+
+receivingField
    : generalIdentifier
    ;
 
-setToValue
-   : ON | OFF | ENTRY (literal | generalIdentifier) | literal | generalIdentifier
+sendingField
+   : literal | generalIdentifier
    ;
 
-setByValue
-   : literal | generalIdentifier
+setAbendExitStatement
+   : ABEND EXIT ((ON? PROGRAM (generalIdentifier | literal)) | OFF)
+   ;
+
+setTimerStatement
+   : TIMER (setTimerWaitClause | setTimerPostClause | setTimerStartClause | (CANCEL setTimerIdClause))
+   ;
+
+setTimerWaitClause
+   : WAIT setTimerIntervalClause
+   ;
+
+setTimerPostClause
+   : POST setTimerIntervalClause setTimerEventClause? setTimerIdClause?
+   ;
+
+setTimerStartClause
+   : START setTimerIntervalClause (TASK CODE (generalIdentifier | literal) (PRIORITY (generalIdentifier | integerLiteral))?)? setTimerIdClause? setTimerDataClause?
+   ;
+
+setTimerIntervalClause
+   : INTERVAL (generalIdentifier | integerLiteral) SECONDS?
+   ;
+
+setTimerEventClause
+   : EVENT generalIdentifier
+   ;
+
+setTimerIdClause
+   : TIMER ID generalIdentifier
+   ;
+
+setTimerDataClause
+   : DATA idmsDmlFromClause
    ;
 
 // service statement
@@ -1955,6 +2540,12 @@ serviceLabelStatement
 
 serviceReloadStatement
    : SERVICE RELOAD generalIdentifier
+   ;
+
+// snap statement
+
+snapStatement
+   : (SNAP | SNAP_TITLE IS? generalIdentifier) (ALL | SYSTEM | TASK)? idmsDmlFromClause*
    ;
 
 // sort statement
@@ -2010,6 +2601,13 @@ sortGivingPhrase
 sortGiving
    : fileName (LOCK | SAVE | NO REWIND | CRUNCH | RELEASE | WITH REMOVE CRUNCH)?
    ;
+
+// startpage statement
+
+startpageStatement
+    : STARTPAGE SESSION? idms_map_name (WAIT | NOWAIT | RETURN)? (BACKPAGE | NOBACKPAGE)? (UPDATE | BROWSE)?
+     (AUTODISPLAY | NOAUTODISPLAY)?
+    ;
 
 // startPosition statement
 
@@ -2110,6 +2708,12 @@ terminateStatement
    : TERMINATE reportName
    ;
 
+// transfer statement
+
+transferStatement
+   : TRANSFER CONTROL? TO? (generalIdentifier | idms_program_name) (RETURN | LINK | NORETURN | XCTL)? (USING generalIdentifier+)?
+   ;
+
 // unstring statement
 
 unstringStatement
@@ -2171,13 +2775,35 @@ useDebugClause
    ;
 
 useDebugOn
-   : ALL PROCEDURES | ALL REFERENCES? OF? generalIdentifier | procedureName | fileName
+   : ALL PROCEDURES | ALL REFERENCES? OF? generalIdentifier | procedureName
+   ;
+
+// wait statement
+
+waitStatement
+   : WAIT (((LONG | SHORT)? (waitEventTypeClause | waitEventListClause+)) | (REDISPATCH (waitEventTypeClause | waitEventListClause+)?))
+   ;
+
+waitEventTypeClause
+   : EVENT NAME (generalIdentifier | literal)
+   ;
+
+waitEventListClause
+   : EVENT generalIdentifier
    ;
 
 // write statement
 
 writeStatement
-   : WRITE recordName writeFromPhrase? writeAdvancingPhrase? writeAtEndOfPagePhrase? writeNotAtEndOfPagePhrase? invalidKeyPhrase? notInvalidKeyPhrase? END_WRITE?
+  : WRITE (writeStatementClause | writeIdmsDCStatement idmsOnClause?)
+  ;
+
+writeIdmsDCStatement
+    : writeJournalClause | writeLineClause | writeLogClause | writePrinterClause | writeTerminalClause | writeThenReadClause
+    ;
+
+writeStatementClause
+   : recordName writeFromPhrase? writeAdvancingPhrase? writeAtEndOfPagePhrase? writeNotAtEndOfPagePhrase? invalidKeyPhrase? notInvalidKeyPhrase? END_WRITE?
    ;
 
 writeFromPhrase
@@ -2206,6 +2832,58 @@ writeAtEndOfPagePhrase
 
 writeNotAtEndOfPagePhrase
    : NOT AT? (END_OF_PAGE | EOP) statement*
+   ;
+
+writeJournalClause
+   : JOURNAL idmsWaitNowaitClause? (SPAN | NOSPAN)? idmsDmlFromClause
+   ;
+
+writeLineClause
+   : LINE TO? TERMINAL idmsWaitNowaitClause? (NEWPAGE | ERASE)? NOBACKPAGE? idmsDmlFromClause (HEADER (generalIdentifier | integerLiteral))?
+   ;
+
+writeLogClause
+   : LOG MESSAGE ID (generalIdentifier | integerLiteral) writeLogParmsClause? writeLogReplyClause? writeLogMessagePrefixClause? writeLogTextClause?
+   ;
+
+writeLogParmsClause
+   : PARMS idmsDmlFromClause+
+   ;
+
+writeLogReplyClause
+   : REPLY INTO generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral)))
+   ;
+
+writeLogMessagePrefixClause
+   : MESSAGE PREFIX IS (generalIdentifier | literal)
+   ;
+
+writeLogTextClause
+   : TEXT INTO? generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral))) (MESSAGE? PREFIX IS? (YES | NO))? (TEXT IS? ONLY)?
+   ;
+
+writePrinterClause
+   : PRINTER (NEWPAGE | ERASE)? ENDRPT? (SCREEN CONTENTS | writePrinterNativeClause) (COPIES (generalIdentifier | integerLiteral))? (REPORT ID (generalIdentifier | integerLiteral))? writePrinterTypeClause? HOLD? KEEP?
+   ;
+
+writePrinterNativeClause
+   : NATIVE? idmsDmlFromClause
+   ;
+
+writePrinterTypeClause
+   : (CLASS (generalIdentifier | integerLiteral)) | (DESTINATION (generalIdentifier | literal) ALL?)
+   ;
+
+writeTerminalClause
+   : TERMINAL idmsWaitNowaitClause? writeTerminalEraseClause? (FREE STORAGE)? idmsDmlFromClause
+   ;
+
+writeTerminalEraseClause
+   : NEWPAGE | ERASE | EAU | (ERASE ALL UNPROTECTED)
+   ;
+
+writeThenReadClause
+   : THEN READ TERMINAL idmsWaitNowaitClause? writeTerminalEraseClause? (FREE STORAGE)? idmsDmlFromClause ((MODIFIED | BUFFER) FROM POSITION (generalIdentifier | literal))? (GET STORAGE)? INTO generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral))) (RETURN LENGTH INTO? generalIdentifier)?
    ;
 
 // xml statement
@@ -2301,7 +2979,7 @@ classCondition
    ;
 
 conditionNameReference
-   : conditionName (inData* inFile? conditionNameSubscriptReference* | inMnemonic*)
+   : conditionName inData* conditionNameSubscriptReference*
    ;
 
 conditionNameSubscriptReference
@@ -2311,19 +2989,19 @@ conditionNameSubscriptReference
 // relation ----------------------------------
 
 relationCondition
-   : relationSignCondition | relationArithmeticComparison | relationCombinedComparison
+   : arithmeticExpression (relationSignCondition | relationArithmeticComparison | relationCombinedComparison)
    ;
 
 relationSignCondition
-   : arithmeticExpression IS? NOT? (POSITIVE | NEGATIVE | ZERO)
+   : IS? NOT? (POSITIVE | NEGATIVE | ZERO)
    ;
 
 relationArithmeticComparison
-   : arithmeticExpression relationalOperator arithmeticExpression
+   : relationalOperator arithmeticExpression
    ;
 
 relationCombinedComparison
-   : arithmeticExpression relationalOperator LPARENCHAR relationCombinedCondition RPARENCHAR
+   : relationalOperator LPARENCHAR relationCombinedCondition RPARENCHAR
    ;
 
 relationCombinedCondition
@@ -2355,8 +3033,20 @@ idms_db_entity_name
     : T=dataName {validateLength($T.text, "db entity name", 16);}
     ;
 
+idms_dictionary_name
+    : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "dictionary name", 8);}
+    ;
+
+idms_node_name
+    : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "node name", 8);}
+    ;
+
 idms_procedure_name
     : T=dataName {validateLength($T.text, "procedure name", 8);}
+    ;
+
+idms_program_name
+    : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "program name", 8);}
     ;
 
 idms_schema_name
@@ -2366,3 +3056,12 @@ idms_schema_name
 idms_subschema_name
     : T=dataName {validateLength($T.text, "subschema name", 8);}
     ;
+
+idms_table_name
+    : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "table name", 8);}
+    ;
+
+idms_quoted_number
+    : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
+    ;
+

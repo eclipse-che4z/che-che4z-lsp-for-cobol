@@ -31,22 +31,23 @@ class TestSqlLabelStatement {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n";
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n";
 
   private static final String LABEL1 =
       TEXT
-          + "       EXEC SQL\n"
-          + "         LABEL ON COLUMN DSN8C10.DEPT.DEPTNO \n"
-          + "         IS 'DEPARTMENT NUMBER' \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "             LABEL ON COLUMN DSN8C10.DEPT.DEPTNO \n"
+          + "             IS 'DEPARTMENT NUMBER' \n"
+          + "           END-EXEC.\n";
 
   private static final String LABEL2 =
       TEXT
-          + "       EXEC SQL\n"
-          + "         LABEL ON DSN8C10.DEPT \n"
-          + "         (MGRNO IS 'EMPLOYEE NUMBER FOR THE MANAGER',\n"
-          + "         ADMRDEPT IS 'ADMINISTERING DEPARTMENT') \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "             LABEL ON DSN8C10.DEPT \n"
+          + "             (MGRNO IS 'EMPLOYEE NUMBER FOR THE MANAGER',\n"
+          + "             ADMRDEPT IS 'ADMINISTERING DEPARTMENT') \n"
+          + "           END-EXEC.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(LABEL1, LABEL2);

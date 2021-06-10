@@ -31,15 +31,16 @@ class TestSqlRollbackStatement {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n";
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n";
 
-  private static final String ROLLBACK = TEXT + "       EXEC SQL  ROLLBACK WORK END-EXEC.\n";
+  private static final String ROLLBACK = TEXT + "           EXEC SQL  ROLLBACK WORK END-EXEC.\n";
 
   private static final String ROLLBACK2 =
       TEXT
-          + "       EXEC SQL\n"
-          + "         ROLLBACK WORK TO SAVEPOINT A  \n"
-          + "       END-EXEC.\n";
+          + "           EXEC SQL\n"
+          + "             ROLLBACK WORK TO SAVEPOINT A  \n"
+          + "           END-EXEC.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(ROLLBACK, ROLLBACK2);

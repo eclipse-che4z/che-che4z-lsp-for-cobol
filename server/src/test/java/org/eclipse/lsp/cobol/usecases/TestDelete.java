@@ -35,6 +35,12 @@ class TestDelete {
           + "        01 {$*WK_AREAID} PIC X(8) SYNC.\r\n"
           + "        01 {$*WK_RECORDID_1} PIC X(8) SYNC.\r\n"
           + "        01 {$*WK_RECORDID_2} PIC X(8) SYNC.\r\n"
+          + "        01 {$*WK1} PIC X(8).\r\n"
+          + "        01 {$*WK2} PIC X(8).\r\n"
+          + "        01 {$*WK3} PIC X(8).\r\n"
+          + "        01 {$*WK4} PIC X(8).\r\n"
+          + "        01 {$*ERROR-STATUS} PIC X(4) VALUE '1400'.\n"
+          + "           88 {$*ANY-ERROR-STATUS} VALUE '0001' THRU '9999'.\n"
           + "        PROCEDURE DIVISION. \r\n";
 
   private static final String DELETE_QUEUE = "           DELETE QUEUE.\r\n";
@@ -63,6 +69,28 @@ class TestDelete {
 
   private static final String DELETE_SCRATCH_PRIOR = "           DELETE SCRATCH PRIOR.\r\n";
 
+  private static final String DELETE_TABLE = "           DELETE TABLE FROM {$WK1}.\r\n";
+
+  private static final String DELETE_TABLE_ALL_PARMS =
+      "           DELETE TABLE {$WK1} DICTNODE {$WK2} DICTNAME {$WK3} LOADLIB {$WK4}.\r\n";
+
+  private static final String DELETE_TABLE_ALL_PARMS_LITERAL =
+      "           DELETE TABLE 'TSTTABLE' DICTNODE 'TSTNODE' DICTNAME 'TSTNAME'\r\n"
+          + "           LOADLIB 'TEST.TEST.TEST.LOADLIB'.\r\n";
+
+  private static final String DELETE_QUEUE_ON =
+      "           DELETE QUEUE \r\n"
+          + "           ON {$ANY-ERROR-STATUS} DISPLAY 'DELETE ERROR'.\r\n";
+
+  private static final String DELETE_SCRATCH_ON =
+      "           DELETE SCRATCH AREA ID {$WK_AREAID} RECORD ID {$WK_RECORDID_1} \n"
+          + "             RETURN RECORD ID INTO {$WK_RECORDID_2}\r\n"
+          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'DELETE ERROR'.\r\n";
+
+  private static final String DELETE_TABLE_ON =
+      "           DELETE TABLE FROM {$WK1}\r\n"
+          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'DELETE ERROR'.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + DELETE_QUEUE,
@@ -74,7 +102,13 @@ class TestDelete {
         BOILERPLATE + DELETE_SCRATCH_AREA_ID_LITERAL,
         BOILERPLATE + DELETE_SCRATCH_AREA_ID_VARIABLE,
         BOILERPLATE + DELETE_SCRATCH_ALL_PARMS,
-        BOILERPLATE + DELETE_SCRATCH_PRIOR);
+        BOILERPLATE + DELETE_SCRATCH_PRIOR,
+        BOILERPLATE + DELETE_TABLE,
+        BOILERPLATE + DELETE_TABLE_ALL_PARMS,
+        BOILERPLATE + DELETE_TABLE_ALL_PARMS_LITERAL,
+        BOILERPLATE + DELETE_QUEUE_ON,
+        BOILERPLATE + DELETE_SCRATCH_ON,
+        BOILERPLATE + DELETE_TABLE_ON);
   }
 
   @ParameterizedTest

@@ -35,7 +35,7 @@ import org.eclipse.lsp4j.Range;
  * creating a range for a locality.
  */
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class Locality {
   private String uri;
   private Range range;

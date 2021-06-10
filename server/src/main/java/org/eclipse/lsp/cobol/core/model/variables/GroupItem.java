@@ -15,11 +15,12 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import org.eclipse.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
-import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVEL_01;
+import static org.eclipse.lsp.cobol.core.model.variables.StructureType.GROUP_ITEM;
+import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_01;
 
 /**
  * This value class represents a group item COBOL variable. Group elements can have nested
@@ -31,18 +32,19 @@ import static org.eclipse.lsp.cobol.core.visitor.VariableDefinitionDelegate.LEVE
 public class GroupItem extends StructuredVariable {
 
   public GroupItem(
-      int levelNumber, String name, Locality definition, Variable parent) {
-    super(levelNumber, name, definition, parent);
+      int levelNumber, String name, Locality definition, boolean global, Variable parent) {
+    super(levelNumber, name, definition, global, parent);
   }
 
   @Override
   public Variable rename(RenameItem newParent) {
     return levelNumber == LEVEL_01
         ? null
-        : new GroupItem(
-            levelNumber,
-            name,
-            definition,
-            newParent);
+        : new GroupItem(levelNumber, name, definition, newParent.global, newParent);
+  }
+
+  @Override
+  public StructureType getStructureType() {
+    return GROUP_ITEM;
   }
 }

@@ -27,10 +27,11 @@ class TestSqlSignalStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "        SIGNAL SQLSTATE '75002'\n"
-          + "         SET MESSAGE_TEXT = 'Customer number is not known';\n"
-          + "       END-EXEC.";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "            SIGNAL SQLSTATE '75002'\n"
+          + "            SET MESSAGE_TEXT = 'Customer number is not known';\n"
+          + "           END-EXEC.";
 
   @Test
   void test() {

@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GroupItemTest {
   @Test
   void getFormattedDisplayLine() {
-    GroupItem variable = new GroupItem(5, "GROUP", null, null);
+    GroupItem variable = new GroupItem(5, "GROUP", null, false, null);
     assertEquals("05 GROUP.", variable.getFormattedDisplayLine());
   }
 }

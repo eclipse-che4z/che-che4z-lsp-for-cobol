@@ -15,14 +15,16 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.core.model.Locality;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.eclipse.lsp.cobol.core.model.variables.StructureType.TABLE_ITEM;
 
 /** This value class represents the Table variable that may have an optional index */
 @Value
@@ -39,13 +41,14 @@ public class TableDataName extends AbstractVariable implements TableDeclaration 
       int levelNumber,
       String name,
       Locality definition,
+      boolean global,
       Variable parent,
       String picClause,
       String value,
       int occursTimes,
       List<IndexItem> indexes,
       UsageFormat usageFormat) {
-    super(levelNumber, name, definition, parent);
+    super(levelNumber, name, definition, global, parent);
     this.picClause = picClause;
     this.value = value;
     this.occursTimes = occursTimes;
@@ -59,6 +62,7 @@ public class TableDataName extends AbstractVariable implements TableDeclaration 
         levelNumber,
         name,
         definition,
+        newParent.global,
         newParent,
         picClause,
         value,
@@ -68,15 +72,17 @@ public class TableDataName extends AbstractVariable implements TableDeclaration 
   }
 
   @Override
+  public StructureType getStructureType() {
+    return TABLE_ITEM;
+  }
+
+  @Override
   public String getFormattedDisplayLine() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(String.format("%1$02d %2$s OCCURS %3$d TIMES", levelNumber, name, occursTimes));
-    if (picClause != null)
-      stringBuilder.append(" PIC ").append(picClause);
-    if (usageFormat != UsageFormat.UNDEFINED)
-      stringBuilder.append(" USAGE ").append(usageFormat);
-    if (StringUtils.isNoneBlank(value))
-      stringBuilder.append(" VALUE ").append(value);
+    StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
+    stringBuilder.append(String.format(" OCCURS %1$d TIMES", occursTimes));
+    if (picClause != null) stringBuilder.append(" PIC ").append(picClause);
+    if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat);
+    if (StringUtils.isNoneBlank(value)) stringBuilder.append(" VALUE ").append(value);
     return stringBuilder.append(".").toString();
   }
 }

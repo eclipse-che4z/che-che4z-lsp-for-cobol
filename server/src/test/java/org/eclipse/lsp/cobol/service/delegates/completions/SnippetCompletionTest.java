@@ -14,71 +14,62 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.InsertTextFormat;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.eclipse.lsp4j.MarkupContent;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collection;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Test to check SnippetCompletion */
 class SnippetCompletionTest {
   private static final String INSERT_TEXT = "WRITE ${1:item}";
   private static final String DOCUMENTATION_TEXT = "WRITE item";
   private static final String LABEL = "WRITE";
-  private SnippetCompletion provider;
 
-  @BeforeEach
-  void prepareProvider() {
-    provider = new SnippetCompletion(new Snippets());
+  private final SnippetCompletion completion = new SnippetCompletion(new Snippets());
+
+  @Test
+  void testCompletionEmptyResult() {
+    assertThat(
+            new SnippetCompletion(new Snippets()).getCompletionItems(
+            "Wr", new CobolDocumentModel("", AnalysisResult.builder().build())),
+        is(createExpected()));
   }
 
   @Test
-  void testGetCompletionSource() {
-    Collection<String> strings = provider.getCompletionSource(null);
-    assertFalse(strings.isEmpty());
-    assertTrue(strings.contains(LABEL));
+  void testCompletionNull() {
+    assertThat(completion.getCompletionItems("WR", null), is(createExpected()));
   }
 
   @Test
-  void testTryResolvePositive() {
-    assertEquals(DOCUMENTATION_TEXT, provider.tryResolve(LABEL));
+  void testCompletionMock() {
+    assertEquals(createExpected(), completion.getCompletionItems("wr", MockCompletionModel.MODEL));
   }
 
-  @Test
-  void testTryResolveNegative() {
-    assertNull(provider.tryResolve("non-existing string"));
+  private List<CompletionItem> createExpected() {
+    return ImmutableList.of(createItem());
   }
 
-  @Test
-  void testTryResolveNull() {
-    Assertions.assertThrows(
-            IllegalArgumentException.class,
-        () -> {
-          provider.tryResolve(null);
-        });
-  }
-
-  @Test
-  void testGetSortOrderPrefix() {
-    assertEquals("6", provider.getSortOrderPrefix());
-  }
-
-  @Test
-  void testGetKind() {
-    assertEquals(CompletionItemKind.Snippet, provider.getKind());
-  }
-
-  @Test
-  void testCustomize() {
+  private CompletionItem createItem() {
+    MarkupContent doc = new MarkupContent();
+    doc.setValue(DOCUMENTATION_TEXT);
+    doc.setKind("markdown");
     CompletionItem item = new CompletionItem(LABEL);
-    CompletionItem actual = provider.customize(item);
-    assertEquals(LABEL, actual.getLabel());
-    assertEquals(INSERT_TEXT, actual.getInsertText());
-    assertEquals(InsertTextFormat.Snippet, actual.getInsertTextFormat());
+    item.setLabel(DOCUMENTATION_TEXT);
+    item.setInsertText(INSERT_TEXT);
+    item.setInsertTextFormat(InsertTextFormat.Snippet);
+    item.setDocumentation(doc);
+    item.setKind(CompletionItemKind.Snippet);
+    item.setSortText("6" + DOCUMENTATION_TEXT);
+    return item;
   }
 }

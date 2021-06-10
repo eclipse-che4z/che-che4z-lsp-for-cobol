@@ -57,7 +57,7 @@ class VariableHoverTest {
         Locality.builder()
             .uri(DOCUMENT_URI)
             .range(new Range(new Position(4, 1), new Position(4, 7)))
-            .build(), null, "9", "", UsageFormat.UNDEFINED);
+            .build(), false, null, "9", "", UsageFormat.UNDEFINED);
     CobolDocumentModel model = getModelWithVariables(ImmutableList.of(var));
     assertNull(variableHover.getHover(model, position5and5));
   }
@@ -68,7 +68,7 @@ class VariableHoverTest {
         Locality.builder()
             .uri(DOCUMENT_URI)
             .range(new Range(new Position(5, 1), new Position(5, 7)))
-            .build(), null, "9", "", UsageFormat.UNDEFINED);
+            .build(), false, null, "9", "", UsageFormat.UNDEFINED);
     CobolDocumentModel model = getModelWithVariables(ImmutableList.of(var));
     Hover hover = variableHover.getHover(model, position5and5);
     assertNotNull(hover);
@@ -90,12 +90,12 @@ class VariableHoverTest {
         .uri(DOCUMENT_URI)
         .range(new Range(new Position(1, 1), new Position(2, 2)))
         .build();
-    GroupItem top = new GroupItem(1, "TOP", otherLocality, null);
-    GroupItem middle1 = new GroupItem(5, "MIDDLE-1", otherLocality, top);
+    GroupItem top = new GroupItem(1, "TOP", otherLocality, false, null);
+    GroupItem middle1 = new GroupItem(5, "MIDDLE-1", otherLocality, false, top);
     top.addChild(middle1);
-    GroupItem middle2 = new GroupItem(5, "MIDDLE-2", targetLocality, top);
+    GroupItem middle2 = new GroupItem(5, "MIDDLE-2", targetLocality, false, top);
     top.addChild(middle2);
-    ElementItem leaf2 = new ElementItem(10, "LEAF-2", otherLocality, middle2, "9", "", UsageFormat.UNDEFINED);
+    ElementItem leaf2 = new ElementItem(10, "LEAF-2", otherLocality, false, middle2, "9", "", UsageFormat.UNDEFINED);
     middle2.addChild(leaf2);
     CobolDocumentModel model = getModelWithVariables(ImmutableList.of(top, middle1, middle2, leaf2));
     Hover hover = variableHover.getHover(model, position5and5);

@@ -15,8 +15,6 @@
 package org.eclipse.lsp.cobol.service;
 
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
-import org.eclipse.lsp.cobol.domain.event.api.EventObserver;
-import org.eclipse.lsp.cobol.domain.event.model.DataEvent;
 
 import lombok.NonNull;
 
@@ -24,7 +22,7 @@ import lombok.NonNull;
  * Provide API definition to search for copybooks files. The service also caches copybook to reduce
  * filesystem load.
  */
-public interface CopybookService extends EventObserver<DataEvent> {
+public interface CopybookService {
   /** Remove all the stored copybook. */
   void invalidateCache();
 
@@ -33,13 +31,13 @@ public interface CopybookService extends EventObserver<DataEvent> {
    *
    * @param copybookName - the name of the copybook to be retrieved
    * @param documentUri - the currently processing document that contains the copy statement
-   * @param copybookProcessingMode - text document synchronization type
+   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql server
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   CopybookModel resolve(
       @NonNull String copybookName,
       @NonNull String documentUri,
-      @NonNull CopybookProcessingMode copybookProcessingMode);
+      @NonNull CopybookConfig copybookConfig);
 
   /**
    * Store the copybookModel in cache.

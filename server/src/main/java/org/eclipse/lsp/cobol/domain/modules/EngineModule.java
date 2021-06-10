@@ -26,9 +26,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorListenerFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderDelegate;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CompilerDirectivesTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolCommentEntriesMarkerImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolInlineCommentEntriesNormalizerImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
@@ -63,7 +61,6 @@ public class EngineModule extends AbstractModule {
     install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));
     bind(ReplacingService.class).to(ReplacingServiceImpl.class);
     bind(CobolLineReader.class).to(CobolLineReaderImpl.class);
-    bind(CobolLineReaderDelegate.class).to(CompilerDirectivesTransformation.class);
     bind(CobolLineWriter.class).to(CobolLineWriterImpl.class);
     bind(CobolLinesTransformation.class).to(ContinuationLineTransformation.class);
     bind(DefaultErrorStrategy.class).to(CobolErrorStrategy.class);

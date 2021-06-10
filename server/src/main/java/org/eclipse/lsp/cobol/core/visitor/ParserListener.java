@@ -30,7 +30,7 @@ import java.util.List;
 @Slf4j
 public class ParserListener extends BaseErrorListener {
 
-  @Getter private List<SyntaxError> errors = new ArrayList<>();
+  @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
   @Override
   public void syntaxError(
@@ -47,7 +47,7 @@ public class ParserListener extends BaseErrorListener {
             .suggestion(msg)
             .severity(ErrorSeverity.ERROR)
             .build();
-    LOG.debug("Syntax error by CobolParser: " + error.toString());
+    LOG.debug("Syntax error by ParserListener " + error.toString());
     errors.add(error);
   }
 }

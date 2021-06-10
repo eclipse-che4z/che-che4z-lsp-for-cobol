@@ -28,9 +28,13 @@ class TestSqlConnectStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "         CONNECT TO :LOCNAME USER :USER_AUTHID USING :USER_PASSWORD \n"
-          + "       END-EXEC.\n";
+          + "       01 {$*LOCNAME}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       01 {$*USER_AUTHID}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       01 {$*USER_PASSWORD}  PIC X  VALUE 'EMPLOYEE_ADDR'.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "             CONNECT TO :{$LOCNAME} USER :{$USER_AUTHID} USING :{$USER_PASSWORD} \n"
+          + "           END-EXEC.\n";
 
   @Test
   void test() {

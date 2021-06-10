@@ -1,0 +1,8 @@
+host: zowe
+protocol: http
+port: 8080
+user: foo
+password: foo
+rejectUnauthorized: false
+encoding: 0
+responseTimeout: 0
