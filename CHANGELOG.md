@@ -2,7 +2,7 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 Changelog:
 
-## [0.19.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.18.0...0.19.0) (2021-06-08)
+## [0.19.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.18.0...0.19.0) (2021-06-10)
 
 ### Bug Fixes
 * Fix coloring for one-char keywords ([bb2040d](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/bb2040d9e8f34293039e6c069bc56947dbdf2298)), closes [#815](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/815)
