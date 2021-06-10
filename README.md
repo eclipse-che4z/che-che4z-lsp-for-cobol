@@ -17,7 +17,7 @@ COBOL Language Support recognizes files with the extensions `.cob` and `.cbl` as
 
 This extension is a part of the [Che4z](https://github.com/eclipse/che-che4z) open-source project. Feel free to contribute right here.
 
-COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.code4z-extension-pack), an all-round package that offers a modern experience for mainframe application developers, including [HLASM Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.hlasm-language-support), [Explorer for Endevor](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.explorer-for-endevor), [Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=Zowe.vscode-extension-for-zowe) and [Debugger for Mainframe](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.debugger-for-mainframe) extensions.
+COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.code4z-extension-pack), an all-round package that offers a modern experience for mainframe application developers, including [HLASM Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.hlasm-language-support), [Explorer for Endevor](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.explorer-for-endevor), [Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=Zowe.vscode-extension-for-zowe), [COBOL Control Flow](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.ccf) and [Debugger for Mainframe](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.debugger-for-mainframe) extensions.
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ COBOL Language Support is also part of [Code4z](https://marketplace.visualstudio
 
 The COBOL Language Support extension is supported on Visual Studio Code and Eclipse Che.
 
-This extension is not compatible with other extensions that provide COBOL support. We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
+This extension is not compatible with other extensions that provide COBOL support except [COBOL Control Flow](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.ccf). We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Support functions correctly.
 
 The COBOL Language Support extension only supports IBM Enterprise COBOL. Other versions of COBOL are not supported.
 
@@ -159,8 +159,6 @@ The extension includes the following copybook support features:
 Syntax and semantic analysis are enabled for keywords, variables, and paragraphs across all copybooks used in the COBOL file, to ensure and maintain compatibility of copybooks called in code.
 
 The semantic analysis feature takes into account `COPY REPLACING` statements which alter the content of copybooks when checking for errors.
-
-![Semantic check before and after a REPLACING statement](/docs/images/CPYReplacing.gif)
 
 #### Syntax Coloring
 
