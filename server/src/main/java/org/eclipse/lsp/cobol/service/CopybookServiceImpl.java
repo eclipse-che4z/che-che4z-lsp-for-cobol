@@ -32,6 +32,7 @@ import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,6 +49,7 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
  */
 @Slf4j
 @Singleton
+@SuppressWarnings("UnstableApiUsage")
 public class CopybookServiceImpl implements CopybookService {
 
   public static final String SQLCA = "SQLCA";
@@ -95,7 +97,8 @@ public class CopybookServiceImpl implements CopybookService {
    *
    * @param copybookName - the name of the copybook to be retrieved
    * @param documentUri - the currently processing document that contains the copy statement
-   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql server
+   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql
+   *     server
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
   public CopybookModel resolve(
@@ -134,7 +137,7 @@ public class CopybookServiceImpl implements CopybookService {
         return new CopybookModel(
             copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri));
       } else if (copybookConfig.getCopybookProcessingMode().download && cobolFileName != null) {
-        Optional.ofNullable(
+        Optional.of(
                 copybooksForDownloading.computeIfAbsent(
                     cobolFileName, s -> ConcurrentHashMap.newKeySet()))
             .ifPresent(it -> it.add(copybookName));
@@ -144,20 +147,21 @@ public class CopybookServiceImpl implements CopybookService {
 
     Path file = files.getPathFromURI(uri);
     if (files.fileExists(file)) {
-      return new CopybookModel(copybookName, uri, files.getContentByPath(file));
+      return new CopybookModel(
+          copybookName, uri, files.getContentByPath(Objects.requireNonNull(file)));
     } else {
       return new CopybookModel(copybookName, null, null);
     }
   }
 
   /**
-   * Checks if copybook name is implicitly (no explicit copybook file) defined or not.
+   * Check if the copybook name is implicitly (no explicit copybook file) defined or not.
    *
    * <p>Application can use SQLCA and SQLDA names to define communication and description areas as
    * copybooks and both are implicitly defined by either co-processor or pre-processor.
    *
-   * @param copybookName
-   * @return true if copybookname is one of SQLDA or SQLCA
+   * @param copybookName - the name of copybook to check
+   * @return true if copybook name is one of SQLDA or SQLCA
    */
   private boolean isImplictlyDefinedCopybook(String copybookName) {
     return SQLCA.equals(copybookName) || SQLDA.equals(copybookName);
@@ -177,7 +181,8 @@ public class CopybookServiceImpl implements CopybookService {
     InputStream inputStream = CopybookServiceImpl.class.getResourceAsStream(resourcePath);
     String content = null;
     try {
-      content = files.readFromInputStream(Objects.requireNonNull(inputStream));
+      content =
+          files.readFromInputStream(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
     } catch (IOException e) {
       LOG.error("Implicit copybook is not loaded. ", e);
     }

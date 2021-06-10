@@ -37,6 +37,7 @@ import org.eclipse.usecase.UseCasePreprocessorParser.StartRuleContext;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Function;
 
@@ -113,18 +114,19 @@ public class UseCaseEngine {
    * contains implicitly (If not content is explicitly provided for SQLCA and SQLDA) defined
    * copybooks.
    *
-   * @param text
-   * @param expectedDiagnostics
-   * @param implictCopybookNames
-   * @param sqlBackend
+   * @param text COBOL text to analyse
+   * @param expectedDiagnostics the map of id to the Diagnostic that should present in the analysis
+   *     result
+   * @param implicitCopybookNames the names of the implicit copybooks used in this test
+   * @param sqlBackend the options to be used for SQL copybooks processing
    */
   public void runTest(
       String text,
       Map<String, Diagnostic> expectedDiagnostics,
-      List<String> implictCopybookNames,
+      List<String> implicitCopybookNames,
       SQLBackend sqlBackend) {
     List<CobolText> copybooks = new ArrayList<>();
-    implictCopybookNames.forEach(
+    implicitCopybookNames.forEach(
         i -> {
           String uri = getUriForImplicitCopybook(i, sqlBackend);
           copybooks.add(new CobolText(i, readContentForImplicitCopybook(uri)));
@@ -237,7 +239,9 @@ public class UseCaseEngine {
     InputStream inputStream = CopybookServiceImpl.class.getResourceAsStream(resourcePath);
     String content = null;
     try {
-      content = new WorkspaceFileService().readFromInputStream(Objects.requireNonNull(inputStream));
+      content =
+          new WorkspaceFileService()
+              .readFromInputStream(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
     } catch (IOException e) {
       LOG.error("Implicit copybook is not loaded. ", e);
     }
@@ -350,14 +354,14 @@ public class UseCaseEngine {
     }
   }
 
-  private Comparator<Position> positionComparator =
+  private final Comparator<Position> positionComparator =
       comparing(Position::getLine).thenComparing(Position::getCharacter);
 
-  private Comparator<Range> rangeComparator =
+  private final Comparator<Range> rangeComparator =
       comparing(Range::getStart, positionComparator)
           .thenComparing(Range::getEnd, positionComparator);
 
-  private Comparator<Diagnostic> diagnosticComparator =
+  private final Comparator<Diagnostic> diagnosticComparator =
       comparing(Diagnostic::getRange, rangeComparator).thenComparing(Diagnostic::getMessage);
 
   private void assertResult(

@@ -23,6 +23,7 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,7 +52,7 @@ public class WorkspaceFileService implements FileSystemService {
       return URLDecoder.decode(uri, StandardCharsets.UTF_8.toString());
     } catch (UnsupportedEncodingException e) {
       LOG.error("Can't decode URI", e);
-      throw new RuntimeException("UTF-8 charset is unsupported", e);
+      throw new IllegalArgumentException("UTF-8 charset is unsupported", e);
     }
   }
 
@@ -67,7 +68,7 @@ public class WorkspaceFileService implements FileSystemService {
     try (Stream<String> stream = Files.lines(path)) {
       return stream.reduce((s1, s2) -> s1 + lineSeparator() + s2).orElse("");
     } catch (IOException e) {
-      LOG.error("Cannot get content of: " + path.toString(), e);
+      LOG.error("Cannot get content of: {}", path, e);
       return null;
     }
   }
@@ -78,7 +79,7 @@ public class WorkspaceFileService implements FileSystemService {
     try {
       return Paths.get(new URI(uri).normalize());
     } catch (URISyntaxException e) {
-      LOG.error("Cannot find file by given URI: " + uri, e);
+      LOG.error("Cannot find file by given URI: {}", uri, e);
       return null;
     }
   }
@@ -96,9 +97,10 @@ public class WorkspaceFileService implements FileSystemService {
   }
 
   @Override
-  public String readFromInputStream(InputStream inputStream) throws IOException {
+  @NonNull
+  public String readFromInputStream(InputStream inputStream, Charset charset) throws IOException {
     StringBuilder resultStringBuilder = new StringBuilder();
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, charset))) {
       String line;
       while ((line = br.readLine()) != null) {
         resultStringBuilder.append(line).append("\n");
