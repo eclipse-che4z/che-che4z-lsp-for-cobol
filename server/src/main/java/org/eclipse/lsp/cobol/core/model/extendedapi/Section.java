@@ -21,8 +21,14 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class Section extends CFASTNode {
-  String type = CFASTNodeType.SECTION;
   String name;
   String snippet;
   Location location;
+
+  public Section(String name, String snippet, Location location) {
+    super(CFASTNodeType.SECTION.getValue());
+    this.name = name;
+    this.snippet = snippet;
+    this.location = location;
+  }
 }

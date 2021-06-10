@@ -14,25 +14,25 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
-import lombok.experimental.UtilityClass;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-/**
- * Control Flow Nodes type constant collection.
- */
-@UtilityClass
-public final class CFASTNodeType {
-  static final String PROGRAM = "program";
-  static final String PARAGRAPH = "paragraph";
-  static final String GOTO = "goto";
-  static final String PERFORM = "perform";
-  static final String SECTION = "section";
-  static final String STOP = "stop";
-  static final String IF = "if";
-  static final String ELSE = "else";
-  static final String ENDIF = "endif";
-  static final String EVALUATE = "evaluate";
-  static final String WHEN = "when";
-  static final String END_EVALUATE = "endevaluate";
-  static final String INLINE_PERFORM = "inlineperform";
-  static final String END_INLINE_PERFORM = "endinlineperform";
+/** Control Flow Nodes type constant collection. */
+@AllArgsConstructor
+public enum CFASTNodeType {
+  PROGRAM("program"),
+  PARAGRAPH("paragraph"),
+  GOTO("goto"),
+  PERFORM("perform"),
+  SECTION("section"),
+  STOP("stop"),
+  IF("if"),
+  ELSE("else"),
+  ENDIF("endif"),
+  EVALUATE("evaluate"),
+  WHEN("when"),
+  END_EVALUATE("endevaluate"),
+  INLINE_PERFORM("inlineperform"),
+  END_INLINE_PERFORM("endinlineperform");
+  @Getter final String value;
 }

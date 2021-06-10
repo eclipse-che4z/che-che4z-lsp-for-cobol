@@ -21,7 +21,12 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class Perform extends CFASTNode {
-  String type = CFASTNodeType.PERFORM;
   String targetName;
   String targetSectionName;
+
+  public Perform(String targetName, String targetSectionName) {
+    super(CFASTNodeType.PERFORM.getValue());
+    this.targetName = targetName;
+    this.targetSectionName = targetSectionName;
+  }
 }

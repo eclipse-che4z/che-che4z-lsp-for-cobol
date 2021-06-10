@@ -23,7 +23,12 @@ import java.util.List;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class GoTo extends CFASTNode {
-  String type = CFASTNodeType.GOTO;
+
   /** targetName is list to support conditional goto case */
   List<String> targetName;
+
+  public GoTo(List<String> targetName) {
+    super(CFASTNodeType.GOTO.getValue());
+    this.targetName = targetName;
+  }
 }
