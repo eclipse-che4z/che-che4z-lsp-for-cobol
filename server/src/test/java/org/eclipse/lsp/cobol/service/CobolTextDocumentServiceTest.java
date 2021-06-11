@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.awaitility.Awaitility;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
 import org.eclipse.lsp.cobol.domain.databus.model.AnalysisFinishedEvent;
@@ -26,13 +27,11 @@ import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.eclipse.lsp.cobol.service.mocks.MockTextDocumentService;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.stubbing.answers.AnswersWithDelay;
 
@@ -43,14 +42,15 @@ import java.util.concurrent.ExecutionException;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.*;
+import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
+import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.TARGET_SQL_BACKEND;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.*;
-import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.*;
-import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 
 /** This test checks the entry points of the {@link TextDocumentService} implementation. */
 class CobolTextDocumentServiceTest extends MockTextDocumentService {
@@ -94,8 +94,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
     CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion =
         service.completion(
-            new CompletionParams(
-                new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), new Position(0, 8)));
+            new CompletionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Position(0, 8)));
     assertCompletionCorrect(completion);
   }
 
@@ -110,8 +109,8 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         .thenReturn(AnalysisResult.empty());
     service.didChange(
         new DidChangeTextDocumentParams(
-            new VersionedTextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI, 0), textEdits));
-    service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
+            new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0), textEdits));
+    service.getFutureMap().get(DOCUMENT_URI).get();
     verify(engine).analyze(anyString(), anyString(), any(CopybookConfig.class));
     verify(communications).publishDiagnostics(anyMap());
   }
@@ -124,9 +123,9 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     when(engine.analyze(anyString(), anyString(), any(CopybookConfig.class)))
         .thenReturn(AnalysisResult.empty());
     openDocument(service);
-    service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
+    service.getFutureMap().get(DOCUMENT_URI).get();
     assertEquals(1, closeGetter(service).size());
-    TextDocumentIdentifier testDocument = new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI);
+    TextDocumentIdentifier testDocument = new TextDocumentIdentifier(DOCUMENT_URI);
     DidCloseTextDocumentParams closedDocument = new DidCloseTextDocumentParams(testDocument);
     service.didClose(closedDocument);
     assertEquals(Collections.EMPTY_MAP, closeGetter(service));
@@ -134,15 +133,18 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
   @Test
   void testDidSave() {
-    TextDocumentIdentifier saveDocumentIdentifier =
-        new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI);
+    TextDocumentIdentifier saveDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
     DidSaveTextDocumentParams saveDocumentParams =
         new DidSaveTextDocumentParams(saveDocumentIdentifier);
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(CompletableFuture.completedFuture(ImmutableList.of("")));
+    when(engine.analyze(eq(DOCUMENT_URI), eq(TEXT_EXAMPLE), any()))
+        .thenReturn(AnalysisResult.empty());
     service.didOpen(
         new DidOpenTextDocumentParams(
-            new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
     service.didSave(saveDocumentParams);
-    assertTrue(closeGetter(service).containsKey(UseCaseUtils.DOCUMENT_URI));
+    assertTrue(closeGetter(service).containsKey(DOCUMENT_URI));
   }
 
   /**
@@ -174,9 +176,9 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         .thenReturn(AnalysisResult.empty());
     service.didOpen(
         new DidOpenTextDocumentParams(
-            new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
-    service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
-    verify(engine).analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(cpyConfigEnabledMode));
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+    service.getFutureMap().get(DOCUMENT_URI).get();
+    verify(engine).analyze(eq(DOCUMENT_URI), anyString(), eq(cpyConfigEnabledMode));
   }
 
   /**
@@ -192,10 +194,10 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     doNothing().when(communications).publishDiagnostics(anyMap());
     service.didChange(
         new DidChangeTextDocumentParams(
-            new VersionedTextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI, 0),
+            new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0),
             ImmutableList.of(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE))));
-    service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
-    verify(engine).analyze(eq(UseCaseUtils.DOCUMENT_URI), anyString(), eq(cpyConfigSkipMode));
+    service.getFutureMap().get(DOCUMENT_URI).get();
+    verify(engine).analyze(eq(DOCUMENT_URI), anyString(), eq(cpyConfigSkipMode));
   }
 
   /**
@@ -221,15 +223,11 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
      */
     when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
-    doReturn(resultNoErrors)
-        .when(engine)
-        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode);
+    doReturn(resultNoErrors).when(engine).analyze(DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode);
     doReturn(resultWithErrors)
         .when(engine)
         .analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, cpyConfigEnabledMode);
-    doReturn(resultNoErrors)
-        .when(engine)
-        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigSkipMode);
+    doReturn(resultNoErrors).when(engine).analyze(DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigSkipMode);
     doReturn(resultWithErrors)
         .when(engine)
         .analyze(DOCUMENT_WITH_ERRORS_URI, INCORRECT_TEXT_EXAMPLE, cpyConfigSkipMode);
@@ -238,13 +236,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     CobolTextDocumentService service = verifyServiceStart();
     // simulate the call to the didOpen for two different document one with and one without errors
     verifyDidOpen(
-        communications,
-        engine,
-        broker,
-        diagnosticsNoErrors,
-        service,
-        TEXT_EXAMPLE,
-        UseCaseUtils.DOCUMENT_URI);
+        communications, engine, broker, diagnosticsNoErrors, service, TEXT_EXAMPLE, DOCUMENT_URI);
     verifyDidOpen(
         communications,
         engine,
@@ -255,12 +247,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         DOCUMENT_WITH_ERRORS_URI);
 
     verifyDidChange(
-        communications,
-        engine,
-        diagnosticsNoErrors,
-        service,
-        TEXT_EXAMPLE,
-        UseCaseUtils.DOCUMENT_URI);
+        communications, engine, diagnosticsNoErrors, service, TEXT_EXAMPLE, DOCUMENT_URI);
     verifyDidChange(
         communications,
         engine,
@@ -278,8 +265,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
             - analysis invoked two times (because two documents opened previously)
             - the diagnostic published exactly 2 times after the syntax/semantic analysis invoked.
             */
-    verifyCallback(
-        communications, engine, diagnosticsNoErrors, TEXT_EXAMPLE, UseCaseUtils.DOCUMENT_URI);
+    verifyCallback(communications, engine, diagnosticsNoErrors, TEXT_EXAMPLE, DOCUMENT_URI);
     verifyCallback(
         communications,
         engine,
@@ -297,7 +283,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   @Test
   void testCodeActionsEndpoint() {
     CodeActionParams params =
-        new CodeActionParams(new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), null, null);
+        new CodeActionParams(new TextDocumentIdentifier(DOCUMENT_URI), null, null);
     List<Either<Command, CodeAction>> expected = emptyList();
     when(actions.collect(params)).thenReturn(expected);
     try {
@@ -310,7 +296,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
   private Map<String, List<Diagnostic>> createDefaultDiagnostics() {
     return singletonMap(
-        UseCaseUtils.DOCUMENT_URI,
+        DOCUMENT_URI,
         singletonList(
             new Diagnostic(
                 new Range(new Position(0, 0), new Position(0, INCORRECT_TEXT_EXAMPLE.length())),
@@ -325,12 +311,12 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testDidCloseDisposeDiagnostics() {
     Communications spyCommunications = spy(Communications.class);
     DidCloseTextDocumentParams closedDocument =
-        new DidCloseTextDocumentParams(new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI));
+        new DidCloseTextDocumentParams(new TextDocumentIdentifier(DOCUMENT_URI));
     service.didClose(closedDocument);
 
     assertEquals(Collections.EMPTY_MAP, closeGetter(service));
     verify(spyCommunications, atMost(1))
-        .publishDiagnostics(ImmutableMap.of(UseCaseUtils.DOCUMENT_URI, ImmutableList.of()));
+        .publishDiagnostics(ImmutableMap.of(DOCUMENT_URI, ImmutableList.of()));
   }
 
   /**
@@ -343,14 +329,14 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
     doAnswer(new AnswersWithDelay(1000, invocation -> AnalysisResult.empty()))
         .when(engine)
-        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode);
+        .analyze(DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode);
 
     service.didOpen(
         new DidOpenTextDocumentParams(
-            new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
 
     JsonObject json = new JsonObject();
-    json.add("uri", new JsonPrimitive(UseCaseUtils.DOCUMENT_URI));
+    json.add("uri", new JsonPrimitive(DOCUMENT_URI));
     json.add("text", new JsonPrimitive(TEXT_EXAMPLE));
 
     ExtendedApiResult result = service.analysis(json).get();
@@ -429,44 +415,55 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   @Test
   void testImmediateClosingOfDocumentDoNotCauseNPE() {
     service = getMockedTextDocumentServiceUsingSeparateThread();
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode))
+        .thenReturn(AnalysisResult.empty());
 
-    lenient()
-        .doAnswer(new AnswersWithDelay(10000, invocation -> AnalysisResult.empty()))
-        .when(engine)
-        .analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode);
-
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(CompletableFuture.completedFuture(ImmutableList.of("")));
     service.didOpen(
         new DidOpenTextDocumentParams(
-            new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
 
     assertThat(service.getDocs().entrySet(), hasSize(1));
-    assertThat(service.getFutureMap().entrySet(), hasSize(1));
 
-    service.didClose(
-        new DidCloseTextDocumentParams(new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI)));
+    service.didClose(new DidCloseTextDocumentParams(new TextDocumentIdentifier(DOCUMENT_URI)));
 
     assertThat(service.getDocs().entrySet(), hasSize(0));
     assertThat(service.getFutureMap().entrySet(), hasSize(0));
 
-    verify(communications, timeout(2000)).cancelProgressNotification(UseCaseUtils.DOCUMENT_URI);
+    verify(communications, timeout(2000).atLeastOnce()).cancelProgressNotification(DOCUMENT_URI);
   }
 
-  @Disabled("Not implemented yet")
   @Test
   void testHover() {
+    service = getMockedTextDocumentServiceUsingSeparateThread();
     TextDocumentItem testHoverDocument =
-        new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE);
+        new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE);
+
+    AnalysisResult analysisResult =
+        AnalysisResult.builder()
+            .variableDefinitions(ImmutableMap.of("var1", ImmutableList.of(new Location())))
+            .build();
+    when(engine.analyze(eq(DOCUMENT_URI), eq(TEXT_EXAMPLE), any(CopybookConfig.class)))
+        .thenReturn(analysisResult);
+
+    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+        .thenReturn(CompletableFuture.completedFuture(ImmutableList.of("")));
+
     service.didOpen(new DidOpenTextDocumentParams(testHoverDocument));
+
     Position testHoverPosition = new Position(0, 2);
-    TextDocumentIdentifier testTextDocumentIdentifier =
-        new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI);
+    TextDocumentIdentifier testTextDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
     TextDocumentPositionParams testHoverPositionParams =
         new TextDocumentPositionParams(testTextDocumentIdentifier, testHoverPosition);
-    try {
-      assertNotNull(service.hover(testHoverPositionParams).get());
-    } catch (InterruptedException | ExecutionException e) {
-      fail(e.getMessage());
-    }
+
+    Awaitility.await()
+        .until(
+            () -> service.getDocs().get(DOCUMENT_URI).getAnalysisResult().equals(analysisResult));
+    service.hover(testHoverPositionParams);
+
+    verify(hoverProvider, timeout(2000))
+        .getHover(new CobolDocumentModel(TEXT_EXAMPLE, analysisResult), testHoverPositionParams);
   }
 
   /**
@@ -477,7 +474,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   void testAnalysisFinishedNotification() {
 
     Map<String, List<Location>> copybookUsages = new HashMap<>();
-    Location parentLocation = new Location(UseCaseUtils.DOCUMENT_URI, null);
+    Location parentLocation = new Location(DOCUMENT_URI, null);
     Location nestedLocation = new Location(PARENT_CPY_URI, null);
     Location nested2Location = new Location(NESTED_CPY_URI, null);
     copybookUsages.put("PARENT", asList(parentLocation, parentLocation));
@@ -486,18 +483,18 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
         .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive("DB2_SERVER"))));
 
-    when(engine.analyze(UseCaseUtils.DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode))
+    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode))
         .thenReturn(AnalysisResult.empty().toBuilder().copybookUsages(copybookUsages).build());
 
     service.didOpen(
         new DidOpenTextDocumentParams(
-            new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
 
     verify(broker)
         .postData(
             AnalysisFinishedEvent.builder()
-                .documentUri(UseCaseUtils.DOCUMENT_URI)
-                .copybookUris(asList(NESTED_CPY_URI, UseCaseUtils.DOCUMENT_URI, PARENT_CPY_URI))
+                .documentUri(DOCUMENT_URI)
+                .copybookUris(asList(NESTED_CPY_URI, DOCUMENT_URI, PARENT_CPY_URI))
                 .copybookProcessingMode(CopybookProcessingMode.ENABLED)
                 .build());
   }
@@ -511,13 +508,12 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
     when(formations.format(any(CobolDocumentModel.class))).thenReturn(emptyList());
     service.didOpen(
         new DidOpenTextDocumentParams(
-            new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
-    service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
+    service.getFutureMap().get(DOCUMENT_URI).get();
     service
         .formatting(
             new DocumentFormattingParams(
-                new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI),
-                new FormattingOptions(1, false)))
+                new TextDocumentIdentifier(DOCUMENT_URI), new FormattingOptions(1, false)))
         .get();
 
     verify(formations).format(any(CobolDocumentModel.class));
@@ -536,12 +532,12 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
         .thenReturn(emptyList());
     service.didOpen(
         new DidOpenTextDocumentParams(
-            new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
-    service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
+    service.getFutureMap().get(DOCUMENT_URI).get();
     service
         .definition(
             new TextDocumentPositionParams(
-                new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), new Position()))
+                new TextDocumentIdentifier(DOCUMENT_URI), new Position()))
         .get();
     verify(occurrences)
         .findDefinitions(any(CobolDocumentModel.class), any(TextDocumentPositionParams.class));
@@ -563,11 +559,11 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
 
     service.didOpen(
         new DidOpenTextDocumentParams(
-            new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
-    service.getFutureMap().get(UseCaseUtils.DOCUMENT_URI).get();
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 0, TEXT_EXAMPLE)));
+    service.getFutureMap().get(DOCUMENT_URI).get();
     ReferenceParams referenceParams = new ReferenceParams();
     referenceParams.setContext(new ReferenceContext(true));
-    referenceParams.setTextDocument(new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI));
+    referenceParams.setTextDocument(new TextDocumentIdentifier(DOCUMENT_URI));
     service.references(referenceParams).get();
     verify(occurrences)
         .findReferences(
@@ -579,7 +575,7 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   private void openDocument(TextDocumentService service) {
     service.didOpen(
         new DidOpenTextDocumentParams(
-            new TextDocumentItem(UseCaseUtils.DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
+            new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT_EXAMPLE)));
   }
 
   private void assertCompletionCorrect(
