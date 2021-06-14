@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 /** This interface represents API for low-level file systems access */
@@ -76,12 +77,13 @@ public interface FileSystemService {
   String decodeURI(@NonNull String uri);
 
   /**
-   * Reads the bytes from the input stream and after that converts it to text
+   * Read the bytes from the input stream and convert it to text
    *
-   * @param inputStream
-   * @return text
-   * @throws IOException
+   * @param inputStream the stream to read from
+   * @param charset the charset of the file
+   * @return the content from the inputStream
+   * @throws IOException in case if file is not found or cannot be loaded
    */
   @NonNull
-  String readFromInputStream(InputStream inputStream) throws IOException;
+  String readFromInputStream(InputStream inputStream, Charset charset) throws IOException;
 }

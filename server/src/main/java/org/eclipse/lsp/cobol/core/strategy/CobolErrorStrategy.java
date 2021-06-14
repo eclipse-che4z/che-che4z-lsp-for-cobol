@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.core.messages.MessageService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -38,7 +39,6 @@ import java.util.Optional;
 // for test
 @NoArgsConstructor
 public class CobolErrorStrategy extends DefaultErrorStrategy {
-
   private static final String REPORT_INPUT_MISMATCH = "reportInputMismatch";
   private static final String REPORT_NO_VIABLE_ALTERNATIVE = "reportNoViableAlternative";
   private static final String REPORT_UNWANTED_TOKEN = "reportUnwantedToken";
@@ -55,8 +55,8 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
         new BufferedReader(
             new InputStreamReader(
                 Objects.requireNonNull(
-                    CobolErrorStrategy.class.getResourceAsStream(
-                        SPECIAL_TOKEN_HANDLING_FILEPATH))))) {
+                    CobolErrorStrategy.class.getResourceAsStream(SPECIAL_TOKEN_HANDLING_FILEPATH)),
+                StandardCharsets.UTF_8))) {
       String line;
       while ((line = br.readLine()) != null) {
         if (!(line.isEmpty() || line.startsWith("#"))) {

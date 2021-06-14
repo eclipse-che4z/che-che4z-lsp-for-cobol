@@ -19,5 +19,5 @@ package org.eclipse.lsp.cobol.service;
  */
 public enum SQLBackend {
   DB2_SERVER,
-  DATACOM_SERVER;
+  DATACOM_SERVER
 }
