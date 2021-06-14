@@ -85,18 +85,18 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       new ConcurrentHashMap<>();
   private final Map<String, CompletableFuture<Node>> cfAstMap = new ConcurrentHashMap<>();
   private final Map<String, Future<?>> futureMap = new ConcurrentHashMap<>();
+  private final Communications communications;
+  private final LanguageEngineFacade engine;
+  private final Formations formations;
+  private final Completions completions;
+  private final Occurrences occurrences;
+  private final CodeActions actions;
+  private final DataBusBroker dataBus;
+  private final CustomThreadPoolExecutor executors;
+  private final HoverProvider hoverProvider;
+  private final CFASTBuilder cfastBuilder;
+  private final SettingsService settingsService;
   private DisposableLSPStateService disposableLSPStateService;
-  private Communications communications;
-  private LanguageEngineFacade engine;
-  private Formations formations;
-  private Completions completions;
-  private Occurrences occurrences;
-  private CodeActions actions;
-  private DataBusBroker dataBus;
-  private CustomThreadPoolExecutor executors;
-  private HoverProvider hoverProvider;
-  private CFASTBuilder cfastBuilder;
-  private SettingsService settingsService;
 
   @Inject
   @Builder
@@ -166,6 +166,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   }
 
   @Override
+  @SuppressWarnings("cast")
   public CompletableFuture<List<? extends Location>> definition(
       TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
@@ -179,6 +180,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   }
 
   @Override
+  @SuppressWarnings("cast")
   public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
     String uri = params.getTextDocument().getUri();
     return ShutdownCheckUtil.supplyAsyncAndCheckShutdown(
@@ -191,6 +193,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   }
 
   @Override
+  @SuppressWarnings("cast")
   public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
       TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
@@ -204,6 +207,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   }
 
   @Override
+  @SuppressWarnings("cast")
   public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
     String uri = params.getTextDocument().getUri();
     CobolDocumentModel model = docs.get(uri);
@@ -364,10 +368,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       }
       return SQLBackend.valueOf(sqlServer);
     } catch (InterruptedException e) {
-      LOG.error("InterruptedException when getting ", TARGET_SQL_BACKEND, e);
+      LOG.error("InterruptedException when getting {}:\n {}", TARGET_SQL_BACKEND, e);
       Thread.currentThread().interrupt();
     } catch (ExecutionException e) {
-      LOG.error("Can't get config-data for ", TARGET_SQL_BACKEND, e);
+      LOG.error("Can't get config-data for {}: \n {}", TARGET_SQL_BACKEND, e);
     }
     return SQLBackend.DB2_SERVER;
   }

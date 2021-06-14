@@ -1,6 +1,5 @@
 [
   {
-    "type": "program",
     "name": "GTKW",
     "location": {
       "uri": "fake/path",
@@ -13,15 +12,15 @@
         "character": 29
       }
     },
+    "type": "program",
     "children": [
       {
-        "type": "goto",
         "targetName": [
           "OPTIONS"
-        ]
+        ],
+        "type": "goto"
       },
       {
-        "type": "paragraph",
         "snippet": "OPTIONS.\r\n           DISPLAY 'OPTION'.",
         "name": "OPTIONS",
         "location": {
@@ -34,7 +33,8 @@
             "line": 19,
             "character": 29
           }
-        }
+        },
+        "type": "paragraph"
       }
     ]
   }

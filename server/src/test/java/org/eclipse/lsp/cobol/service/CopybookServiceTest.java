@@ -46,7 +46,6 @@ import static org.mockito.Mockito.*;
  * This unit tests check the of the {@link CopybookServiceImpl} how it resolves the copybook
  * requests.
  */
-@SuppressWarnings("unchecked")
 class CopybookServiceTest {
   private static final String VALID_CPY_NAME = "VALIDNAME";
   private static final String VALID_CPY_URI =
@@ -59,11 +58,11 @@ class CopybookServiceTest {
   private static final String NESTED_CPY_NAME = "nested";
   private static final String CONTENT = "content";
 
-  private DataBusBroker broker = mock(DataBusBroker.class);
-  private SettingsService settingsService = mock(SettingsService.class);
-  private FileSystemService files = mock(FileSystemService.class);
-  private Path cpyPath = mock(Path.class);
-  private Path parentPath = mock(Path.class);
+  private final DataBusBroker broker = mock(DataBusBroker.class);
+  private final SettingsService settingsService = mock(SettingsService.class);
+  private final FileSystemService files = mock(FileSystemService.class);
+  private final Path cpyPath = mock(Path.class);
+  private final Path parentPath = mock(Path.class);
   private CopybookConfig cpyConfig;
 
   @BeforeEach
@@ -244,6 +243,7 @@ class CopybookServiceTest {
 
   /** Tests copybook config nullity */
   @Test
+  @SuppressWarnings("ConstantConditions")
   void whenNullCpyConfigPassed_thenThrowException() {
     CopybookServiceImpl copybookService = createCopybookService();
 
@@ -252,8 +252,8 @@ class CopybookServiceTest {
         () -> copybookService.resolve(SQLCA, DOCUMENT_URI, null));
   }
 
-  /** Tests if implicit copybook is resolved. For simplicitly we consider content is null.
-   * Full use case test is in {@link TestSqlIncludeStatementForImplicitlyDefinedCpy}*/
+  /** Tests if implicit copybook is resolved. For simplicity we consider content is null.
+   * Full use case test is in  TestSqlIncludeStatementForImplicitlyDefinedCpy*/
   @Test
   void testServiceResolvesImplicitCopybook() {
     CopybookServiceImpl copybookService = createCopybookService();

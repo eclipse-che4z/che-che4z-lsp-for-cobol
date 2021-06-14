@@ -1,6 +1,5 @@
 [
   {
-    "type": "program",
     "name": "CONDS2",
     "location": {
       "uri": "fake/path",
@@ -13,9 +12,9 @@
         "character": 21
       }
     },
+    "type": "program",
     "children": [
       {
-        "type": "paragraph",
         "snippet": "A000-PARA.\r\n           IF NOT WS-NUM1 > WS-NUM2\r\n              DISPLAY 'HELLO'\r\n              IF WS-NUM1 > WS-NUM2\r\n                  GO TO A000-PARA\r\n              END-IF\r\n           END-IF\r\n           PERFORM A000-PARA.\r\n           STOP RUN.",
         "name": "A000-PARA",
         "location": {
@@ -29,6 +28,7 @@
             "character": 21
           }
         },
+        "type": "paragraph",
         "children": [
           {
             "type": "if"
@@ -37,8 +37,8 @@
             "type": "if"
           },
           {
-            "type": "goto",
-            "targetName": ["A000-PARA"]
+            "targetName": ["A000-PARA"],
+            "type": "goto"
           },
           {
             "type": "endif"
@@ -47,8 +47,8 @@
             "type": "endif"
           },
           {
-            "type": "perform",
-            "targetName": "A000-PARA"
+            "targetName": "A000-PARA",
+            "type": "perform"
           },
           {
             "type": "stop"

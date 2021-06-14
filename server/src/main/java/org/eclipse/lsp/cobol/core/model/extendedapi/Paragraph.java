@@ -21,8 +21,14 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class Paragraph extends CFASTNode {
-  String type = CFASTNodeType.PARAGRAPH;
   String snippet;
   String name;
   Location location;
+
+  public Paragraph(String snippet, String name, Location location) {
+    super(CFASTNodeType.PARAGRAPH.getValue());
+    this.snippet = snippet;
+    this.name = name;
+    this.location = location;
+  }
 }

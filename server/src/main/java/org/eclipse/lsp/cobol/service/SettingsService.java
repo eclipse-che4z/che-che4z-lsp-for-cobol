@@ -52,14 +52,14 @@ public interface SettingsService {
   List<String> toStrings(List<Object> objects);
 
   /**
-   * Gets config data as string
+   * Get config data as string
    *
-   * @param result
+   * @param data config response
    * @return string value
    */
-  static String getValueAsString(List<Object> result) {
-    if (result == null || result.isEmpty()) return "";
-    Object obj = result.get(0);
+  static String getValueAsString(List<Object> data) {
+    if (data == null || data.isEmpty()) return "";
+    Object obj = data.get(0);
     if (!(obj instanceof JsonPrimitive)) return "";
 
     return ((JsonPrimitive) obj).getAsString();
