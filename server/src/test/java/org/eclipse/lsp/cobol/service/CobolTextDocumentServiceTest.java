@@ -415,10 +415,12 @@ class CobolTextDocumentServiceTest extends MockTextDocumentService {
   @Test
   void testImmediateClosingOfDocumentDoNotCauseNPE() {
     service = getMockedTextDocumentServiceUsingSeparateThread();
-    when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode))
+    lenient()
+        .when(engine.analyze(DOCUMENT_URI, TEXT_EXAMPLE, cpyConfigEnabledMode))
         .thenReturn(AnalysisResult.empty());
 
-    when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
+    lenient()
+        .when(settingsService.getConfiguration(TARGET_SQL_BACKEND.label))
         .thenReturn(CompletableFuture.completedFuture(ImmutableList.of("")));
     service.didOpen(
         new DidOpenTextDocumentParams(
