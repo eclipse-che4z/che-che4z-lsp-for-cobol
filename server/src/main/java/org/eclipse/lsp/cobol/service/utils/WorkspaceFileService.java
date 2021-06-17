@@ -24,14 +24,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
-import static java.lang.System.lineSeparator;
 
 /**
  * This service implements API for low-level file systems access. It mainly oriented to work with
@@ -65,8 +63,18 @@ public class WorkspaceFileService implements FileSystemService {
   @Nullable
   @Override
   public String getContentByPath(@NonNull Path path) {
-    try (Stream<String> stream = Files.lines(path)) {
-      return stream.reduce((s1, s2) -> s1 + lineSeparator() + s2).orElse("");
+    CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
+    decoder.onMalformedInput(CodingErrorAction.REPLACE);
+    try (FileInputStream input = new FileInputStream(path.toFile());
+        InputStreamReader reader = new InputStreamReader(input, decoder);
+        BufferedReader bufferedReader = new BufferedReader(reader)) {
+      StringBuilder sb = new StringBuilder();
+      String line = bufferedReader.readLine();
+      while (line != null) {
+        sb.append(line).append("\n");
+        line = bufferedReader.readLine();
+      }
+      return sb.toString();
     } catch (IOException e) {
       LOG.error("Cannot get content of: {}", path, e);
       return null;
