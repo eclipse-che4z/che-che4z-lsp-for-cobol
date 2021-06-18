@@ -350,7 +350,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                         });
                     cfAstMap.get(uri).complete(result.getRootNode());
                   } catch (Exception e) {
-                    cfAstMap.get(uri).completeExceptionally(e);
                     LOG.error(createDescriptiveErrorMessage("analysis", uri), e);
                   } finally {
                     clearAnalysedFutureObject(uri);
@@ -401,7 +400,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
                     outlineMap.get(uri).complete(result.getOutlineTree());
                     cfAstMap.get(uri).complete(result.getRootNode());
                   } catch (Exception ex) {
-                    cfAstMap.get(uri).completeExceptionally(ex);
                     LOG.error(createDescriptiveErrorMessage("analysis", uri), ex);
                   } finally {
                     clearAnalysedFutureObject(uri);
