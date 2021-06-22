@@ -173,24 +173,6 @@ context('This is a F97476 spec', () => {
   describe('TC248135 REPLACING - check paragraph present', () => {
     beforeEach(() => {
       cy.updateConfigs('testing');
-    });
-    afterEach(() => {
-      cy.writeFile('test_files/project/testing/REPL', '       05 TAG-ID PIC 9.');
-    });
-    it('Checks REPLACING feature with paragraphs', () => {
-      cy.openFolder('testing').openFile('REPL');
-      cy.getLineByNumber(1).type('{end}{enter}       05 TAR-ID PIC 9. {ctrl}{c}').closeCurrentTab();
-      cy.get('.theia-button.main').click();
-
-      cy.openFile('REPLA.CBL');
-      cy.getLineByNumber(21).contains('REPLACING').type('{end}{enter}{ctrl} ');
-      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('NAME3').closeCurrentTab();
-    });
-  });
-
-  describe('TC248135 REPLACING - check paragraph present', () => {
-    beforeEach(() => {
-      cy.updateConfigs('testing');
       cy.writeFile('test_files/project/testing/MORECOOL.CPY', '       IDENTIFICATION DIVISION.');
     });
 
@@ -208,6 +190,10 @@ context('This is a F97476 spec', () => {
   describe('TC250747 [Mapping] Support building of the extended document - Basic Scenario', () => {
     beforeEach(() => {
       cy.updateConfigs('testing');
+      cy.writeFile('test_files/project/testing/MORECOOL.CPY', '       IDENTIFICATION DIVISION.');
+    });
+    afterEach(() => {
+      cy.task('deleteFile', 'test_files/project/testing/MORECOOL.CPY');
     });
     it('Check completion suggestions for variables(paragraphs) being replaced', () => {
       cy.openFile('PAYLIB.CBL').goToLine(33);

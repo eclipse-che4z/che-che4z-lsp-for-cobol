@@ -44,6 +44,7 @@ beforeEach(() => {
   cy.task('deleteFile', 'test_files/project/.copybooks/zowe-profile-1/DATA.SET.PATH2/BOOK3.cpy');
   cy.task('deleteFile', 'test_files/project/s.cbl');
   cy.task('deleteFile', 'test_files/project/.c4z/.copybooks');
+  cy.task('deleteFile', 'test_files/project/testing/UTF8');
   cy.visit('/', {
     onBeforeLoad: (win) => {
       win.sessionStorage.clear();
