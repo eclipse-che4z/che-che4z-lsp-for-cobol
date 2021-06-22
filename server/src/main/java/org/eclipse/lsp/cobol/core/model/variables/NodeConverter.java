@@ -40,6 +40,10 @@ public class NodeConverter {
   public Variable convertVariable(VariableNode variableNode) {
     Variable variable = convert(variableNode);
     convertedVariables.put(variableNode, variable);
+    Variable parent = variable.getParent();
+    if (parent instanceof StructuredVariable) {
+      ((StructuredVariable) parent).addChild(variable);
+    }
     return variable;
   }
 
