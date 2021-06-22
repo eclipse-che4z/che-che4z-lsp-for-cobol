@@ -414,7 +414,7 @@ context('This is a LSP spec', () => {
     it(['smoke'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
       cy.getCurrentLine().type('{selectall}shell').wait(500);
-      cy.get('.suggest-widget.visible').click();
+      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('shell').click();
       cy.getLineByNumber(2).contains(`PROGRAM-ID. ${fileName}.`);
       cy.getLineByNumber(8).contains('DATA DIVISION.');
       cy.getLineByNumber(16).contains('STOP RUN.');
@@ -431,7 +431,7 @@ context('This is a LSP spec', () => {
     it('Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
       cy.getCurrentLine().type('{selectall}shell').wait(500);
-      cy.get('.suggest-widget.visible').click();
+      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('shell').click();
       cy.goToLine(15).getCurrentLine().type('COPY ABC.');
       cy.getCurrentLineErrors({ expectedLine: 15 }).eq(0).getHoverErrorMessage().contains('ABC: Copybook not found');
       cy.getCurrentLine().type('{end}{enter}');

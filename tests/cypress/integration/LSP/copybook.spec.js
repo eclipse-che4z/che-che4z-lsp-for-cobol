@@ -427,4 +427,49 @@ context('This is a Copybook spec', () => {
       copyBookNotFound();
     });
   });
+
+  describe('Fix loading copybooks with any encoding', () => {
+    const copyBookNotFound = (copybook) => {
+      return cy
+        .openFile('TEST.CBL')
+        .getLineByNumber(21)
+        .type(`           COPY ${copybook}.`)
+        .getCurrentLineErrors({ expectedLine: 21 })
+        .eq(0)
+        .getHoverErrorMessage()
+        .contains(`${copybook}: Copybook not found`);
+    };
+    afterEach(() => {
+      cy.closeFolder('.copybooks');
+    });
+
+    [
+      {
+        test: 'Fix loading copybooks with any encoding - EN',
+        input: 'TEST ME',
+      },
+      {
+        test: 'Fix loading copybooks with any encoding - UA',
+        input: 'Перевір мене',
+      },
+      {
+        test: 'Fix loading copybooks with any encoding - AM',
+        input: 'փորձիր ինձ',
+      },
+    ].forEach((parameters) => {
+      it(parameters.test, () => {
+        copyBookNotFound('UTF8');
+        cy.writeFile('test_files/project/testing/UTF8', `            MOVE "${parameters.input}" TO ABC.`, {
+          encoding: 'utf-8',
+        });
+        cy.getLineByNumber(21).findText('UTF8').click().type('{ctrl}{.}');
+        cy.get('.p-Widget.p-Menu').contains('Resolve copybook').click();
+        cy.goToLine(21);
+        cy.getCurrentLineErrors({ expectedLine: 21 })
+          .eq(0)
+          .getHoverErrorMessage()
+          .contains('Invalid definition for: ABC');
+      });
+    });
+  });
 });
