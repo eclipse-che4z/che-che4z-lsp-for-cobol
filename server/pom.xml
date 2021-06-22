@@ -32,7 +32,7 @@
         <commons.text.version>1.6</commons.text.version>
         <concurrentunit.version>0.4.6</concurrentunit.version>
         <exclude.tests>nothing.to.exclude</exclude.tests>
-        <google.guava.version>29.0-jre</google.guava.version>
+        <google.guava.version>30.1.1-jre</google.guava.version>
         <guice.version>4.2.2</guice.version>
         <java.version>8</java.version>
         <junit-jupiter.version>5.6.0</junit-jupiter.version>
