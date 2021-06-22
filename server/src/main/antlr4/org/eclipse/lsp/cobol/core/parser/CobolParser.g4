@@ -160,43 +160,55 @@ identificationDivision
    ;
 
 identificationDivisionBody
-   : authorParagraph | installationParagraph | dateWrittenParagraph | dateCompiledParagraph | securityParagraph
+   : authorParagraph | installationParagraph | dateWrittenParagraph | dateCompiledParagraph | securityParagraph | remarksParagraph
    ;
 
 // - program id paragraph ----------------------------------
 
 programIdParagraph
-   : PROGRAM_ID DOT_FS programName (IS? (COMMON | INITIAL | LIBRARY | DEFINITION | RECURSIVE) PROGRAM?)? DOT_FS? commentEntry?
+   : PROGRAM_ID DOT_FS programName (IS? (COMMON | INITIAL | LIBRARY | DEFINITION | RECURSIVE) PROGRAM?)? DOT_FS?
    ;
 
 // - author paragraph ----------------------------------
 
 authorParagraph
-   : AUTHOR DOT_FS commentEntry?
+   : AUTHOR DOT_FS? optionalParagraphTermination
    ;
 
 // - installation paragraph ----------------------------------
 
 installationParagraph
-   : INSTALLATION DOT_FS commentEntry?
+   : INSTALLATION DOT_FS? optionalParagraphTermination
    ;
 
 // - date written paragraph ----------------------------------
 
 dateWrittenParagraph
-   : DATE_WRITTEN DOT_FS commentEntry?
+   : DATE_WRITTEN DOT_FS? optionalParagraphTermination
    ;
 
 // - date compiled paragraph ----------------------------------
 
 dateCompiledParagraph
-   : DATE_COMPILED DOT_FS commentEntry?
+   : DATE_COMPILED DOT_FS? optionalParagraphTermination
    ;
 
 // - security paragraph ----------------------------------
 
 securityParagraph
-   : SECURITY DOT_FS commentEntry?
+   : SECURITY DOT_FS? optionalParagraphTermination
+   ;
+
+// remarks paragraph
+
+remarksParagraph
+   : {notifyError("cobolParser.remarksUnsupported");} REMARKS DOT_FS? optionalParagraphTermination
+   ;
+
+// - end of comment entry
+optionalParagraphTermination
+   : ~(AUTHOR | CBL| DATE_COMPILED | DATE_WRITTEN | IDENTIFICATION | INSTALLATION
+   | DATA | END | ENVIRONMENT | ID | PROCEDURE | PROCESS | SECURITY | REMARKS)*?
    ;
 
 // --- environment division --------------------------------------------------------------------
@@ -3014,11 +3026,6 @@ relationalOperator
 
 abbreviation
    : NOT? relationalOperator? (arithmeticExpression | LPARENCHAR arithmeticExpression abbreviation RPARENCHAR)
-   ;
-
-// comment entry
-commentEntry
-   : COMMENTENTRYLINE+
    ;
 
 idms_map_name

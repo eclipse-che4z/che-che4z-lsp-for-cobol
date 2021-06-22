@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2021 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -23,23 +23,18 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/**
- * This test checks that the remarks section is not marked as a comment, and the syntax analysis
- * applied.
- *
- * <p>The REMARKS is an old syntax that is not supported anymore, so it should be marked as error.
- */
-class TestRemarksSectionIsUnsupported {
+/** This test checks that unexpected text in ID DIVISION is flagged */
+class TestUnexpectedTextInIdentificationDivision {
 
   private static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. TEST1.\n"
-          + "       AUTHOR.     SE.\n"
-          + "           {REMARKS|unsupported}.\n"
-          + "              PURPOSE.\n"
-          + "              THIS PROGRAM IS DEFINED TO TEST A NUMBER OF THE\n"
-          + "              APPLICATION TESTING COLLECTION AND DEBUG TOOL FUNCTIONS\n"
-          + "       ENVIRONMENT DIVISION.";
+      "       identification division.\n"
+          + "       program-id. test.\n"
+          + "       {DISPLAY|1} \"HELLO\".\n"
+          + "       data division.\n"
+          + "       working-storage section.\n"
+          + "       01 VARNAME PIC X(3) VALUE \"ABC\".\n"
+          + "       procedure division.\n"
+          + "           DISPLAY VARNAME.";
 
   @Test
   void test() {
@@ -47,10 +42,11 @@ class TestRemarksSectionIsUnsupported {
         TEXT,
         ImmutableList.of(),
         ImmutableMap.of(
-            "unsupported",
+            "1",
             new Diagnostic(
                 null,
-                "REMARKS paragraph is deprecated and not supported",
+                "Syntax error on 'DISPLAY' expected {<EOF>, AUTHOR, CBL, DATE-COMPILED, DATE-WRITTEN,"
+                    + " IDENTIFICATION, INSTALLATION, REMARKS, DATA, END, ENVIRONMENT, ID, PROCEDURE, PROCESS, SECURITY}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

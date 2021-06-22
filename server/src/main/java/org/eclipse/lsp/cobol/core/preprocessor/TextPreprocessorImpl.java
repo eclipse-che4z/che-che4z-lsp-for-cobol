@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.preprocessor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -47,8 +46,6 @@ public class TextPreprocessorImpl implements TextPreprocessor {
   private final CobolLineReader reader;
   private final CobolLineWriter writer;
   private final CobolLinesTransformation transformation;
-  private final CobolLineReWriter entriesMarker;
-  private final CobolLineReWriter entriesNormalizer;
   private final CobolLineReWriter indicatorProcessor;
 
   @Inject
@@ -57,15 +54,11 @@ public class TextPreprocessorImpl implements TextPreprocessor {
       CobolLineReader reader,
       CobolLineWriter writer,
       CobolLinesTransformation transformation,
-      @Named("entriesMarker") CobolLineReWriter entriesMarker,
-      @Named("entriesNormalizer") CobolLineReWriter entriesNormalizer,
-      @Named("indicatorProcessor") CobolLineReWriter indicatorProcessor) {
+      CobolLineReWriter indicatorProcessor) {
     this.grammarPreprocessor = grammarPreprocessor;
     this.reader = reader;
     this.writer = writer;
     this.transformation = transformation;
-    this.entriesMarker = entriesMarker;
-    this.entriesNormalizer = entriesNormalizer;
     this.indicatorProcessor = indicatorProcessor;
   }
 
@@ -149,9 +142,6 @@ public class TextPreprocessorImpl implements TextPreprocessor {
    * have a unified line format.
    */
   private List<CobolLine> rewriteLines(List<CobolLine> lines) {
-    List<CobolLine> lineIndicatorProcessedLines = indicatorProcessor.processLines(lines);
-    List<CobolLine> normalizedInlineCommentEntriesLines =
-        entriesNormalizer.processLines(lineIndicatorProcessedLines);
-    return entriesMarker.processLines(normalizedInlineCommentEntriesLines);
+    return indicatorProcessor.processLines(lines);
   }
 }
