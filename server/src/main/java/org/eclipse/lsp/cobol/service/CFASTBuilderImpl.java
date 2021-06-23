@@ -65,6 +65,9 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       addChild(parent, new CFASTNode(CFASTNodeType.END_EVALUATE.getValue()));
     } else if (node instanceof EvaluateWhenNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.WHEN.getValue()));
+    } else if (node instanceof EvaluateWhenOtherNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.WHEN_OTHER.getValue()));
+      node.getChildren().forEach(child -> traverse(parent, child));
     } else if (node instanceof IfNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.IF.getValue()));
       node.getChildren().forEach(child -> traverse(parent, child));

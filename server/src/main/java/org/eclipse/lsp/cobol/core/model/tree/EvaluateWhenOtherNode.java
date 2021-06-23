@@ -17,10 +17,10 @@ package org.eclipse.lsp.cobol.core.model.tree;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
-/** The class represents evaluateWhen in COBOL. */
+/** The class represents evaluateWhenOther in COBOL. */
 @ToString(callSuper = true)
-public class EvaluateWhenNode extends Node {
-  public EvaluateWhenNode(Locality location) {
-    super(location, NodeType.EVALUATE_WHEN);
+public class EvaluateWhenOtherNode extends Node {
+  public EvaluateWhenOtherNode(Locality location) {
+    super(location, NodeType.EVALUATE_WHEN_OTHER);
   }
 }
