@@ -153,7 +153,7 @@ public class VariableDefinitionUtil {
         } else LOG.error("Unknown variable definition: {}", definitionNode.getLocality());
         definitionNodes.removeFirst();
       } else {
-        Node parentFotNextLevel =
+        Node parentForNextLevel =
             Optional.ofNullable(lastVariableOnTheLevel)
                 .filter(
                     it ->
@@ -163,7 +163,7 @@ public class VariableDefinitionUtil {
                 .map(Node.class::cast)
                 .orElse(rootNode);
         errors.addAll(
-            processDefinition(parentFotNextLevel, definitionNode.getLevel(), definitionNodes));
+            processDefinition(parentForNextLevel, definitionNode.getLevel(), definitionNodes));
       }
     }
     return errors;
