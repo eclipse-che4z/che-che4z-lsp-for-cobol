@@ -80,7 +80,7 @@ class TestCopybookReplacePatterns {
             "1",
             new Diagnostic(
                 null,
-                "Invalid definition for: ACC_ID",
+                "Variable ACC_ID is not defined",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

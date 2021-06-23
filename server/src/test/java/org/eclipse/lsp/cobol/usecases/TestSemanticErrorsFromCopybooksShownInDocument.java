@@ -51,6 +51,6 @@ class TestSemanticErrorsFromCopybooksShownInDocument {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null, "Invalid definition for: SMTH", DiagnosticSeverity.Error, ERROR.getText())));
+                null, "Variable SMTH is not defined", DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

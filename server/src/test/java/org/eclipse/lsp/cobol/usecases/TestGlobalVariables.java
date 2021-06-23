@@ -23,9 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
-/**
- * Test Global variables errors.
- */
+/** Test Global variables errors. */
 class TestGlobalVariables {
   private static final String GLOBAL_USAGE =
       "       Identification Division.\n"
@@ -90,9 +88,13 @@ class TestGlobalVariables {
 
   @Test
   void globalVariableUsage() {
-    UseCaseEngine.runTest(GLOBAL_USAGE, ImmutableList.of(), ImmutableMap.of(
-        "1", new Diagnostic(null, "Invalid definition for: FOO", DiagnosticSeverity.Error, ERROR.getText())
-    ));
+    UseCaseEngine.runTest(
+        GLOBAL_USAGE,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null, "Variable FOO is not defined", DiagnosticSeverity.Error, ERROR.getText())));
   }
 
   @Test
@@ -102,15 +104,29 @@ class TestGlobalVariables {
 
   @Test
   void twoGlobalsWithSameName() {
-    UseCaseEngine.runTest(TWO_GLOBALS, ImmutableList.of(), ImmutableMap.of(
-        "1", new Diagnostic(null, "Global variable must have a unique name", DiagnosticSeverity.Error, ERROR.getText())
-    ));
+    UseCaseEngine.runTest(
+        TWO_GLOBALS,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "Global variable must have a unique name",
+                DiagnosticSeverity.Error,
+                ERROR.getText())));
   }
 
   @Test
   void globalOnWrongLevel() {
-    UseCaseEngine.runTest(GLOBAL_ON_WRONG_LEVEL, ImmutableList.of(), ImmutableMap.of(
-        "1", new Diagnostic(null, "GLOBAL can only be used on level 01", DiagnosticSeverity.Error, ERROR.getText())
-    ));
+    UseCaseEngine.runTest(
+        GLOBAL_ON_WRONG_LEVEL,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                null,
+                "GLOBAL can only be used on level 01",
+                DiagnosticSeverity.Error,
+                ERROR.getText())));
   }
 }

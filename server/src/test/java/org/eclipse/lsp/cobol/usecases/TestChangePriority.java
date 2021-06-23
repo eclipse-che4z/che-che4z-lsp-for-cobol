@@ -14,10 +14,10 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 /** These test for variations of valid CHANGE PRIORITY statements */
 class TestChangePriority {
 
-  private static final String MESSAGE_1 = "Invalid definition for: 1X3";
+  private static final String MESSAGE_1 = "Variable 1X3 is not defined";
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -43,8 +43,7 @@ class TestChangePriority {
       "           MOVE 123 TO {$WK_PRIORITY}.\r\n"
           + "            CHANGE PRIORITY TO {$WK_PRIORITY}.\r\n";
 
-  private static final String CHANGE_PRIORITY_TO_LITERAL =
-      "           CHANGE PRIORITY TO 123.\r\n";
+  private static final String CHANGE_PRIORITY_TO_LITERAL = "           CHANGE PRIORITY TO 123.\r\n";
 
   private static final String CHANGE_PRIORITY_TO_LITERAL_INVALID =
       "           CHANGE PRIORITY TO {1X3|1}.\r\n";

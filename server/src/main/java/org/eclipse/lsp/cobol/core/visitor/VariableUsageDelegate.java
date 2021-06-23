@@ -50,9 +50,11 @@ public class VariableUsageDelegate {
    * @param locality the variable text position
    * @param ctx the ANTLR variable context
    */
-  public void handleDataName(String dataName, Locality locality, QualifiedDataNameFormat1Context ctx) {
+  public void handleDataName(
+      String dataName, Locality locality, QualifiedDataNameFormat1Context ctx) {
     List<QualifiedInDataContext> hierarchy = ctx.qualifiedInData();
-    List<String> parents = createPatentsList(hierarchy.stream().map(this::getDataName2Context).collect(toList()));
+    List<String> parents =
+        createPatentsList(hierarchy.stream().map(this::getDataName2Context).collect(toList()));
     Map<String, Token> parentVariables = collectParentVariablesFromDataAndTable(hierarchy);
     variableUsages.add(new VariableUsage(dataName, parents, locality, parentVariables));
   }
@@ -64,8 +66,10 @@ public class VariableUsageDelegate {
    * @param locality the variable text position
    * @param ctx the ANTLR variable context
    */
-  public void handleConditionCall(String dataName, Locality locality, ConditionNameReferenceContext ctx) {
-    List<DataNameContext> hierarchy = ctx.inData().stream().map(InDataContext::dataName).collect(toList());
+  public void handleConditionCall(
+      String dataName, Locality locality, ConditionNameReferenceContext ctx) {
+    List<DataNameContext> hierarchy =
+        ctx.inData().stream().map(InDataContext::dataName).collect(toList());
     List<String> parents = createPatentsList(hierarchy);
     Map<String, Token> parentVariables = collectParentVariablesFromInData(hierarchy);
     variableUsages.add(new VariableUsage(dataName, parents, locality, parentVariables));
@@ -88,30 +92,32 @@ public class VariableUsageDelegate {
    * @param definedVariables the collection of COBOL variables
    * @return the list of usage errors
    */
-  public ResultWithErrors<Map<Locality, Variable>> updateUsageAndGenerateErrors(Collection<Variable> definedVariables) {
+  public ResultWithErrors<Map<Locality, Variable>> updateUsageAndGenerateErrors(
+      Collection<Variable> definedVariables) {
     Map<Locality, Variable> variablesByUsages = new HashMap<>();
-    Map<String, List<Variable>> convertedVariables = VariableUsageUtils.convertDefinedVariables(definedVariables);
+    Map<String, List<Variable>> convertedVariables =
+        VariableUsageUtils.convertDefinedVariables(definedVariables);
     List<SyntaxError> errors = new ArrayList<>();
     for (VariableUsage variableUsage : variableUsages) {
       List<Variable> foundVariables =
-          VariableUsageUtils.findVariables(convertedVariables, variableUsage.name, variableUsage.parents);
+          VariableUsageUtils.findVariables(
+              convertedVariables, variableUsage.name, variableUsage.parents);
       if (foundVariables.size() == 1) {
         Variable variable = foundVariables.get(0);
         variable.addUsage(variableUsage.locality);
         variablesByUsages.put(variableUsage.locality, variable);
         addParentVariablesUsage(variableUsage.parentVariables, variable);
       } else {
-        errors.add(createInvalidDefinition(variableUsage.name, variableUsage.locality));
+        String message =
+            foundVariables.isEmpty() ? "semantics.notDefined" : "semantics.duplicated";
+        errors.add(createInvalidDefinition(variableUsage.name, variableUsage.locality, message));
       }
     }
     return new ResultWithErrors<>(variablesByUsages, errors);
   }
 
   private List<String> createPatentsList(List<DataNameContext> hierarchy) {
-    return hierarchy.stream()
-            .map(RuleContext::getText)
-            .map(String::toUpperCase)
-            .collect(toList());
+    return hierarchy.stream().map(RuleContext::getText).map(String::toUpperCase).collect(toList());
   }
 
   private Map<String, Token> collectParentVariablesFromDataAndTable(
@@ -158,14 +164,14 @@ public class VariableUsageDelegate {
                     .orElse(null));
   }
 
-  private SyntaxError createInvalidDefinition(String dataName, Locality locality) {
+  private SyntaxError createInvalidDefinition(String dataName, Locality locality, String message) {
     SyntaxError error =
         SyntaxError.syntaxError()
-            .suggestion(messageService.getMessage("CobolVisitor.invalidDefMsg", dataName))
+            .suggestion(messageService.getMessage(message, dataName))
             .severity(ErrorSeverity.ERROR)
             .locality(locality)
             .build();
-    LOG.debug("Syntax error by CobolVisitor#reportInvalidDefinition: " + error.toString());
+    LOG.debug("Syntax error by VariableUsageDelegate#createInvalidDefinition: " + error.toString());
     return error;
   }
 

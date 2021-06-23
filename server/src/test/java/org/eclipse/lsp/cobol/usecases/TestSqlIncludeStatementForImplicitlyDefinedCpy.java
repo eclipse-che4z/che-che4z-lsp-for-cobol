@@ -87,7 +87,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
           + "           DISPLAY  {$SQLCABC} .\n"
           + "           DISPLAY  {$SQLD}.\n";
 
-  private static final String ERR_MESSAGE = "Invalid definition for: ";
+  private static final String ERR_MESSAGE = "Variable %s is not defined";
 
   @Test
   void test1() {
@@ -113,9 +113,17 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         TEXT_ERR_PRG,
         ImmutableMap.of(
             "err1",
-            new Diagnostic(null, ERR_MESSAGE + "SQLCODE", Error, SourceInfoLevels.ERROR.getText()),
+            new Diagnostic(
+                null,
+                String.format(ERR_MESSAGE, "SQLCODE"),
+                Error,
+                SourceInfoLevels.ERROR.getText()),
             "err2",
-            new Diagnostic(null, ERR_MESSAGE + "SQLEXT", Error, SourceInfoLevels.ERROR.getText())),
+            new Diagnostic(
+                null,
+                String.format(ERR_MESSAGE, "SQLEXT"),
+                Error,
+                SourceInfoLevels.ERROR.getText())),
         ImmutableList.of("SQLCA", "SQLDA"),
         SQLBackend.DATACOM_SERVER);
   }
