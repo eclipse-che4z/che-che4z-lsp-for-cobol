@@ -22,11 +22,9 @@ import org.eclipse.lsp4j.Range;
 import java.util.ArrayList;
 import java.util.List;
 
-/** CF tree builder iplementation */
+/** CF tree builder implementation */
 public class CFASTBuilderImpl implements CFASTBuilder {
   private static final int SNIPPET_LENGTH = 10;
-  //  IF statement without END_IF workaround. Should be removed after grammar fixed.
-  private boolean needCloseIf;
 
   @Override
   public ExtendedApiResult build(Node rootNode) {
@@ -68,18 +66,9 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     } else if (node instanceof IfNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.IF.getValue()));
       node.getChildren().forEach(child -> traverse(parent, child));
-      if (isIfHasEnd((IfNode) node)) {
-        needCloseIf = false;
-        addChild(parent, new CFASTNode(CFASTNodeType.ENDIF.getValue()));
-      } else {
-        needCloseIf = true;
-      }
+      addChild(parent, new CFASTNode(CFASTNodeType.ENDIF.getValue()));
     } else if (node instanceof SentenceNode) {
       node.getChildren().forEach(child -> traverse(parent, child));
-      if (needCloseIf) {
-        addChild(parent, new CFASTNode(CFASTNodeType.ENDIF.getValue()));
-        needCloseIf = false;
-      }
     } else if (node instanceof IfElseNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.ELSE.getValue()));
       node.getChildren().forEach(child -> traverse(parent, child));
@@ -96,10 +85,6 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     } else if (node instanceof ExitNode || node instanceof GoBackNode || node instanceof StopNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.STOP.getValue()));
     }
-  }
-
-  private boolean isIfHasEnd(IfNode node) {
-    return node.getIfStatementContext().END_IF() != null;
   }
 
   private void traverse(ProgramNode node, List<Program> programs) {
