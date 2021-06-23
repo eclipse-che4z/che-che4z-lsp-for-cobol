@@ -35,6 +35,7 @@ public enum NodeType {
   STOP,
   EVALUATE,
   EVALUATE_WHEN,
+  EVALUATE_WHEN_OTHER,
   IF,
   IF_ELSE,
   SENTENCE,

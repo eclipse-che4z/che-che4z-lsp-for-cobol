@@ -420,7 +420,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitEvaluateWhenOther(EvaluateWhenOtherContext ctx) {
     throwWarning(ctx.getStart());
-    return visitChildren(ctx);
+    return addTreeNode(ctx, EvaluateWhenOtherNode::new);
   }
 
   @Override
