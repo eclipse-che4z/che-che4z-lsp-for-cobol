@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree;
 
 import com.google.common.collect.ImmutableList;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.antlr.v4.runtime.Token;
@@ -37,11 +38,12 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.STATEMENT;
 /** This class represents program context in COBOL. */
 @ToString(callSuper = true)
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public class ProgramNode extends Node {
-  private VariableUsageDelegate variableUsageDelegate;
+  private final Collection<Variable> definedVariables = new ArrayList<>();
+  @EqualsAndHashCode.Exclude private final NodeConverter nodeConverter = new NodeConverter();
+  @EqualsAndHashCode.Exclude private VariableUsageDelegate variableUsageDelegate;
   private String programName;
-  private Collection<Variable> definedVariables = new ArrayList<>();
-  private NodeConverter nodeConverter = new NodeConverter();
 
   /**
    * Use for testing.

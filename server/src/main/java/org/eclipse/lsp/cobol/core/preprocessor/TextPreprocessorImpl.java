@@ -14,21 +14,19 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
-import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
+import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -43,14 +41,12 @@ import java.util.List;
  */
 @Slf4j
 @Singleton
-public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAspect {
-  private GrammarPreprocessor grammarPreprocessor;
-  private CobolLineReader reader;
-  private CobolLineWriter writer;
-  private CobolLinesTransformation transformation;
-  private CobolLineReWriter entriesMarker;
-  private CobolLineReWriter entriesNormalizer;
-  private CobolLineReWriter indicatorProcessor;
+public class TextPreprocessorImpl implements TextPreprocessor {
+  private final GrammarPreprocessor grammarPreprocessor;
+  private final CobolLineReader reader;
+  private final CobolLineWriter writer;
+  private final CobolLinesTransformation transformation;
+  private final CobolLineReWriter indicatorProcessor;
 
   @Inject
   public TextPreprocessorImpl(
@@ -58,15 +54,11 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
       CobolLineReader reader,
       CobolLineWriter writer,
       CobolLinesTransformation transformation,
-      @Named("entriesMarker") CobolLineReWriter entriesMarker,
-      @Named("entriesNormalizer") CobolLineReWriter entriesNormalizer,
-      @Named("indicatorProcessor") CobolLineReWriter indicatorProcessor) {
+      CobolLineReWriter indicatorProcessor) {
     this.grammarPreprocessor = grammarPreprocessor;
     this.reader = reader;
     this.writer = writer;
     this.transformation = transformation;
-    this.entriesMarker = entriesMarker;
-    this.entriesNormalizer = entriesNormalizer;
     this.indicatorProcessor = indicatorProcessor;
   }
 
@@ -76,7 +68,7 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
    *
    * @param documentUri - URI of the processing document
    * @param cobolSourceCode - source code to analyze
-   * @param copybookProcessingMode - settings to control the copybook processing
+   * @param copybookConfig contains config info like: copybook processing mode, backend server
    * @return - the extended document of that text and all the found errors
    */
   @NonNull
@@ -84,9 +76,14 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
   public ResultWithErrors<ExtendedDocument> process(
       @NonNull String documentUri,
       @NonNull String cobolSourceCode,
-      CopybookProcessingMode copybookProcessingMode) {
-    return process(documentUri, cobolSourceCode, new ArrayDeque<>(), copybookProcessingMode, new ArrayDeque<>(),
-            new ArrayList<>());
+      @NonNull CopybookConfig copybookConfig) {
+    return process(
+        documentUri,
+        cobolSourceCode,
+        new ArrayDeque<>(),
+        copybookConfig,
+        new ArrayDeque<>(),
+        new ArrayList<>());
   }
 
   /**
@@ -96,19 +93,19 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
    * @param documentUri - URI of the processing document
    * @param cobolCode - source code to analyze
    * @param copybookStack - stack that contains the previous document hierarchy
-   * @param copybookProcessingMode - settings to control the copybook processing
+   * @param copybookConfig contains config info like: copybook processing mode, backend server
    * @return - the extended document of that text and all the found errors
    */
   @NonNull
   @Override
-  @CheckThreadInterruption
   public ResultWithErrors<ExtendedDocument> process(
       @NonNull String documentUri,
       @NonNull String cobolCode,
       @NonNull Deque<CopybookUsage> copybookStack,
-      @NonNull CopybookProcessingMode copybookProcessingMode,
+      @NonNull CopybookConfig copybookConfig,
       @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
       @NonNull List<Pair<String, String>> replacingClauses) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     List<SyntaxError> errors = new ArrayList<>();
 
     List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
@@ -119,8 +116,13 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
 
     ExtendedDocument parsedDocument =
         grammarPreprocessor
-            .buildExtendedDocument(documentUri, code, copybookStack, copybookProcessingMode,
-                    recursiveReplaceStmtStack, replacingClauses)
+            .buildExtendedDocument(
+                documentUri,
+                code,
+                copybookStack,
+                copybookConfig,
+                recursiveReplaceStmtStack,
+                replacingClauses)
             .unwrap(errors::addAll);
 
     return new ResultWithErrors<>(parsedDocument, errors);
@@ -140,9 +142,6 @@ public class TextPreprocessorImpl implements TextPreprocessor, ThreadInterruptAs
    * have a unified line format.
    */
   private List<CobolLine> rewriteLines(List<CobolLine> lines) {
-    List<CobolLine> lineIndicatorProcessedLines = indicatorProcessor.processLines(lines);
-    List<CobolLine> normalizedInlineCommentEntriesLines =
-        entriesNormalizer.processLines(lineIndicatorProcessedLines);
-    return entriesMarker.processLines(normalizedInlineCommentEntriesLines);
+    return indicatorProcessor.processLines(lines);
   }
 }

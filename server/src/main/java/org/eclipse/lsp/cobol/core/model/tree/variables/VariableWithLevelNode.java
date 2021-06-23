@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
@@ -26,42 +27,48 @@ import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
 
-/**
- * The abstract class for variables with level number.
- */
+/** The abstract class for variables with level number. */
 @Getter
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 abstract class VariableWithLevelNode extends VariableNode {
   private final int level;
-  private boolean global;
   private final boolean specifiedGlobal;
+  private final boolean redefines;
 
-
-  protected VariableWithLevelNode(Locality location, int level, String name, VariableType variableType,
-                                  boolean global) {
-    super(location, name, variableType);
+  protected VariableWithLevelNode(
+      Locality location,
+      int level,
+      String name,
+      boolean redefines,
+      VariableType variableType,
+      boolean global) {
+    super(location, name, variableType, global);
     this.level = level;
-    this.global = global;
+    this.redefines = redefines;
     this.specifiedGlobal = global;
   }
 
-  protected VariableWithLevelNode(Locality location, int level, String name, VariableType variableType) {
-    super(location, name, variableType);
+  protected VariableWithLevelNode(
+      Locality location, int level, String name, boolean redefines, VariableType variableType) {
+    super(location, name, variableType, false);
     this.level = level;
-    this.global = false;
+    this.redefines = redefines;
     this.specifiedGlobal = false;
   }
 
   @Override
   public void setParent(Node parent) {
     super.setParent(parent);
-    if (parent instanceof VariableWithLevelNode) global = ((VariableWithLevelNode) parent).global;
+    if (parent instanceof VariableWithLevelNode)
+      setGlobal(((VariableWithLevelNode) parent).isGlobal());
   }
 
   @Override
   public List<SyntaxError> process() {
     List<SyntaxError> errors = new ArrayList<>();
-    if ((level == LEVEL_01 || level == LEVEL_77) && getLocality().getRange().getStart().getCharacter() > AREA_A_FINISH)
+    if ((level == LEVEL_01 || level == LEVEL_77)
+        && getLocality().getRange().getStart().getCharacter() > AREA_A_FINISH)
       errors.add(getError(MessageTemplate.of(AREA_A_WARNING, getName())));
     if (specifiedGlobal && level != LEVEL_01)
       errors.add(getError(MessageTemplate.of(GLOBAL_NON_01_LEVEL_MSG)));

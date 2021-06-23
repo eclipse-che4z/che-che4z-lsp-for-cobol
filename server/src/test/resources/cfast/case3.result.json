@@ -1,6 +1,5 @@
 [
   {
-    "type": "program",
     "name": "CASE3",
     "location": {
       "uri": "fake/path",
@@ -13,9 +12,9 @@
         "character": 29
       }
     },
+    "type": "program",
     "children": [
       {
-        "type": "paragraph",
         "snippet": "PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n       ",
         "name": "PARAG1",
         "location": {
@@ -28,10 +27,10 @@
             "line": 18,
             "character": 38
           }
-        }
+        },
+        "type": "paragraph"
       },
       {
-        "type": "paragraph",
         "snippet": "PARAG2.\r\n           DISPLAY 'PARAG2'.",
         "name": "PARAG2",
         "location": {
@@ -44,7 +43,8 @@
             "line": 20,
             "character": 29
           }
-        }
+        },
+        "type": "paragraph"
       }
     ]
   }

@@ -18,7 +18,10 @@ package org.eclipse.lsp.cobol.service.utils;
 import lombok.NonNull;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 /** This interface represents API for low-level file systems access */
@@ -72,4 +75,15 @@ public interface FileSystemService {
    */
   @NonNull
   String decodeURI(@NonNull String uri);
+
+  /**
+   * Read the bytes from the input stream and convert it to text
+   *
+   * @param inputStream the stream to read from
+   * @param charset the charset of the file
+   * @return the content from the inputStream
+   * @throws IOException in case if file is not found or cannot be loaded
+   */
+  @NonNull
+  String readFromInputStream(InputStream inputStream, Charset charset) throws IOException;
 }

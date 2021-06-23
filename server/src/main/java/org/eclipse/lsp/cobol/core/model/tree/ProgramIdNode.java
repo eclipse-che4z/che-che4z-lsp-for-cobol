@@ -14,9 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import com.google.common.collect.ImmutableList;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 
@@ -25,6 +26,7 @@ import java.util.List;
 /** The class represents program ID. */
 @ToString(callSuper = true)
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public class ProgramIdNode extends Node {
   String programId;
 

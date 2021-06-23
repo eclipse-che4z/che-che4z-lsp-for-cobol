@@ -34,40 +34,44 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-/**
- * Test for @link({@link org.eclipse.lsp.cobol.service.CFASTBuilderImpl}.
- */
+/** Test for @link({@link org.eclipse.lsp.cobol.service.CFASTBuilderImpl}. */
 @Slf4j
-public class CFASTBuilderTest {
+class CFASTBuilderTest {
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
   static Stream<Arguments> casesToTest() throws IOException {
     return Files.list(Paths.get("src", "test", "resources", "cfast"))
-            .filter(p -> p.toString().endsWith(".cbl"))
-            .map(CFASTBuilderTest::toArguments);
+        .filter(p -> p.toString().endsWith(".cbl"))
+        .map(CFASTBuilderTest::toArguments);
   }
 
   /**
    * Test that each file is processed into expected CF AST.
    *
-   * @param src      cobol program.
+   * @param src cobol program.
    * @param jsonTree expected cf tree in json format.
    * @param caseName test name
    */
   @ParameterizedTest(name = "Test CFAST Builder: {2}")
   @MethodSource("casesToTest")
-  public void cfastBuilderTest(String src, String jsonTree, String caseName) {
+  void cfastBuilderTest(String src, String jsonTree, String caseName) {
     AnalysisResult analysisResult = UseCaseUtils.analyze("fake/path", src, Collections.emptyList());
     CFASTBuilder builder = new CFASTBuilderImpl();
-    Assertions.assertEquals(GSON.toJson(GSON.fromJson(jsonTree, List.class)),
-            GSON.toJson(GSON.fromJson(GSON.toJson(builder.build(analysisResult.getRootNode()).getControlFlowAST()), List.class)));
+    Assertions.assertEquals(
+        GSON.toJson(GSON.fromJson(jsonTree, List.class)),
+        GSON.toJson(
+            GSON.fromJson(
+                GSON.toJson(builder.build(analysisResult.getRootNode()).getControlFlowAST()),
+                List.class)));
   }
 
   private static Arguments toArguments(Path p) {
     try {
       final String resultName = p.getFileName().toString().replace(".cbl", ".result.json");
-      final String resultContent = new String(Files.readAllBytes(p.getParent().resolve(resultName)));
-      return Arguments.arguments(new String(Files.readAllBytes(p)), resultContent, p.getFileName().toString());
+      final String resultContent =
+          new String(Files.readAllBytes(p.getParent().resolve(resultName)));
+      return Arguments.arguments(
+          new String(Files.readAllBytes(p)), resultContent, p.getFileName().toString());
     } catch (IOException e) {
       LOG.error(e.getMessage(), e);
     }

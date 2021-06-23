@@ -12,17 +12,12 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.extendedapi;
-
-import lombok.EqualsAndHashCode;
-import lombok.Value;
+package org.eclipse.lsp.cobol.service;
 
 /**
- * Data transport object of CF AST. Stop type represent all COBOL control statements which leads to
- * stop of program execution.
+ * This enum class defines two options which can be used to choose target backend sql server (DB2 or DATACOM)
  */
-@Value
-@EqualsAndHashCode(callSuper = true)
-public class Stop extends CFASTNode {
-  String type = CFASTNodeType.STOP;
+public enum SQLBackend {
+  DB2_SERVER,
+  DATACOM_SERVER
 }

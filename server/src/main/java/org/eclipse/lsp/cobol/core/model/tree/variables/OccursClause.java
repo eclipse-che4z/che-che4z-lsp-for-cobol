@@ -18,9 +18,7 @@ import lombok.Value;
 
 import java.util.List;
 
-/**
- * The class represents occurs clause in COBOL.
- */
+/** The class represents occurs clause in COBOL. */
 @Value
 public class OccursClause {
   Integer from;

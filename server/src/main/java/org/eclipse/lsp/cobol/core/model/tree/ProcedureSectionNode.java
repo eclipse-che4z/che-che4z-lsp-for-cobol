@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -21,6 +22,7 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 /** The class represents procedure section in COBOL. */
 @ToString(callSuper = true)
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public class ProcedureSectionNode extends Node {
   String name;
   String text;

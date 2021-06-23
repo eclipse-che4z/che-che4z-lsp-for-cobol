@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
@@ -33,17 +34,21 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  */
 @Getter
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class StandAloneDataItemNode extends VariableWithLevelNode {
-  private String picClause;
-  private String value;
-  private boolean redefines;
+  private final String picClause;
+  private final String value;
 
-  public StandAloneDataItemNode(Locality location, String name, boolean global, String picClause, String value,
-                                boolean redefines) {
-    super(location, LEVEL_77, name, VariableType.STAND_ALONE_DATA_ITEM, global);
+  public StandAloneDataItemNode(
+      Locality location,
+      String name,
+      boolean global,
+      String picClause,
+      String value,
+      boolean redefines) {
+    super(location, LEVEL_77, name, redefines, VariableType.STAND_ALONE_DATA_ITEM, global);
     this.picClause = picClause;
     this.value = value;
-    this.redefines = redefines;
   }
 
   @Override

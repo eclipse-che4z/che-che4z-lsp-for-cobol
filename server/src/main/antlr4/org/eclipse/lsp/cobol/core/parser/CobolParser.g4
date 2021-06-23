@@ -160,43 +160,55 @@ identificationDivision
    ;
 
 identificationDivisionBody
-   : authorParagraph | installationParagraph | dateWrittenParagraph | dateCompiledParagraph | securityParagraph
+   : authorParagraph | installationParagraph | dateWrittenParagraph | dateCompiledParagraph | securityParagraph | remarksParagraph
    ;
 
 // - program id paragraph ----------------------------------
 
 programIdParagraph
-   : PROGRAM_ID DOT_FS programName (IS? (COMMON | INITIAL | LIBRARY | DEFINITION | RECURSIVE) PROGRAM?)? DOT_FS? commentEntry?
+   : PROGRAM_ID DOT_FS programName (IS? (COMMON | INITIAL | LIBRARY | DEFINITION | RECURSIVE) PROGRAM?)? DOT_FS?
    ;
 
 // - author paragraph ----------------------------------
 
 authorParagraph
-   : AUTHOR DOT_FS commentEntry?
+   : AUTHOR DOT_FS? optionalParagraphTermination
    ;
 
 // - installation paragraph ----------------------------------
 
 installationParagraph
-   : INSTALLATION DOT_FS commentEntry?
+   : INSTALLATION DOT_FS? optionalParagraphTermination
    ;
 
 // - date written paragraph ----------------------------------
 
 dateWrittenParagraph
-   : DATE_WRITTEN DOT_FS commentEntry?
+   : DATE_WRITTEN DOT_FS? optionalParagraphTermination
    ;
 
 // - date compiled paragraph ----------------------------------
 
 dateCompiledParagraph
-   : DATE_COMPILED DOT_FS commentEntry?
+   : DATE_COMPILED DOT_FS? optionalParagraphTermination
    ;
 
 // - security paragraph ----------------------------------
 
 securityParagraph
-   : SECURITY DOT_FS commentEntry?
+   : SECURITY DOT_FS? optionalParagraphTermination
+   ;
+
+// remarks paragraph
+
+remarksParagraph
+   : {notifyError("cobolParser.remarksUnsupported");} REMARKS DOT_FS? optionalParagraphTermination
+   ;
+
+// - end of comment entry
+optionalParagraphTermination
+   : ~(AUTHOR | CBL| DATE_COMPILED | DATE_WRITTEN | IDENTIFICATION | INSTALLATION
+   | DATA | END | ENVIRONMENT | ID | PROCEDURE | PROCESS | SECURITY | REMARKS)*?
    ;
 
 // --- environment division --------------------------------------------------------------------
@@ -948,6 +960,10 @@ sentence
    : statement* DOT_FS | idmsStatements endClause?
    ;
 
+conditionalStatementCall
+   : statement | idmsStatements
+   ;
+
 statement
    : acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
     disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement |
@@ -1520,7 +1536,7 @@ evaluateAlsoSelect
    ;
 
 evaluateWhenPhrase
-   : evaluateWhen+ statement*
+   : evaluateWhen+ conditionalStatementCall*
    ;
 
 evaluateWhen
@@ -1540,7 +1556,7 @@ evaluateAlsoCondition
    ;
 
 evaluateWhenOther
-   : WHEN OTHER statement*
+   : WHEN OTHER conditionalStatementCall*
    ;
 
 evaluateValue
@@ -1756,11 +1772,11 @@ ifStatement
    ;
 
 ifThen
-   : THEN? (NEXT SENTENCE | statement+?)
+   : THEN? (NEXT SENTENCE | conditionalStatementCall+)
    ;
 
 ifElse
-   : ELSE (NEXT SENTENCE | statement+?)
+   : ELSE (NEXT SENTENCE | conditionalStatementCall+)
    ;
 
 idmsIfCondition
@@ -2175,7 +2191,7 @@ performStatement
    ;
 
 performInlineStatement
-   : performType? statement* END_PERFORM
+   : performType? conditionalStatementCall* END_PERFORM
    ;
 
 performProcedureStatement
@@ -2327,11 +2343,11 @@ receiveIntoStatement
    ;
 
 receiveNoData
-   : NO DATA statement*
+   : NO DATA conditionalStatementCall*
    ;
 
 receiveWithData
-   : WITH DATA statement*
+   : WITH DATA conditionalStatementCall*
    ;
 
 receiveBefore
@@ -2405,7 +2421,7 @@ searchVarying
    ;
 
 searchWhen
-   : WHEN condition (NEXT SENTENCE | statement*)
+   : WHEN condition (NEXT SENTENCE | conditionalStatementCall*)
    ;
 
 // send statement
@@ -2827,11 +2843,11 @@ writeAdvancingMnemonic
    ;
 
 writeAtEndOfPagePhrase
-   : AT? (END_OF_PAGE | EOP) statement*
+   : AT? (END_OF_PAGE | EOP) conditionalStatementCall*
    ;
 
 writeNotAtEndOfPagePhrase
-   : NOT AT? (END_OF_PAGE | EOP) statement*
+   : NOT AT? (END_OF_PAGE | EOP) conditionalStatementCall*
    ;
 
 writeJournalClause
@@ -2915,45 +2931,45 @@ xmlProcessinProcedure
 // statement phrases ----------------------------------
 
 atEndPhrase
-   : AT? END statement*
+   : AT? END conditionalStatementCall*
    ;
 
 notAtEndPhrase
-   : NOT AT? END statement*
+   : NOT AT? END conditionalStatementCall*
    ;
 
 invalidKeyPhrase
-   : INVALID KEY? statement*
+   : INVALID KEY? conditionalStatementCall*
    ;
 
 notInvalidKeyPhrase
-   : NOT INVALID KEY? statement*
+   : NOT INVALID KEY? conditionalStatementCall*
    ;
 
 onOverflowPhrase
-   : ON? OVERFLOW statement*
+   : ON? OVERFLOW conditionalStatementCall*
    ;
 
 notOnOverflowPhrase
-   : NOT ON? OVERFLOW statement*
+   : NOT ON? OVERFLOW conditionalStatementCall*
    ;
 
 onSizeErrorPhrase
-   : ON? SIZE ERROR statement*
+   : ON? SIZE ERROR conditionalStatementCall*
    ;
 
 notOnSizeErrorPhrase
-   : NOT ON? SIZE ERROR statement*
+   : NOT ON? SIZE ERROR conditionalStatementCall*
    ;
 
 // statement clauses ----------------------------------
 
 onExceptionClause
-   : ON? EXCEPTION statement*
+   : ON? EXCEPTION conditionalStatementCall*
    ;
 
 notOnExceptionClause
-   : NOT ON? EXCEPTION statement*
+   : NOT ON? EXCEPTION conditionalStatementCall*
    ;
 
 // condition ----------------------------------
@@ -3014,11 +3030,6 @@ relationalOperator
 
 abbreviation
    : NOT? relationalOperator? (arithmeticExpression | LPARENCHAR arithmeticExpression abbreviation RPARENCHAR)
-   ;
-
-// comment entry
-commentEntry
-   : COMMENTENTRYLINE+
    ;
 
 idms_map_name

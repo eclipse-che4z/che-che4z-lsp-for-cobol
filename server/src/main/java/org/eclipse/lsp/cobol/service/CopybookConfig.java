@@ -12,17 +12,16 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.model.extendedapi;
+package org.eclipse.lsp.cobol.service;
 
-import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
- * Data transport object of CF AST. When type is branch of evaluate statement conditional execution
- * path.
+ * This dto class is used to hold config data for copybook like: copybook procassing mode, and which
+ * backend database server is planned to be used
  */
 @Value
-@EqualsAndHashCode(callSuper = true)
-public class When extends CFASTNode {
-  String type = CFASTNodeType.WHEN;
+public class CopybookConfig {
+  private CopybookProcessingMode copybookProcessingMode;
+  private SQLBackend sqlBackend;
 }

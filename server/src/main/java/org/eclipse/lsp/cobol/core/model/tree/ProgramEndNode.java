@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
@@ -27,6 +28,7 @@ import java.util.List;
 /** The class represents the program end. */
 @Slf4j
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class ProgramEndNode extends Node {
   String programId;
 

@@ -41,7 +41,7 @@ spec:
         cpu: "1"
       requests:
         memory: "1Gi"
-        cpu: "1"
+        cpu: "800m"
     volumeMounts:
     - name: sonar
       mountPath: /home/jenkins/.sonar

@@ -15,17 +15,19 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /** This abstract class implements the functionality that is common for all the variables. */
+@EqualsAndHashCode
 public abstract class AbstractVariable implements Variable {
+  public static final int DEFAULT_LEVEL = -1;
   private static final String GLOBAL_SUFFIX = " GLOBAL";
   @Getter protected final int levelNumber;
   @Getter protected final String name;
@@ -33,7 +35,7 @@ public abstract class AbstractVariable implements Variable {
   @Getter protected final boolean global;
   private final List<Locality> usages = new ArrayList<>();
   private final List<ConditionDataName> conditionChildren = new ArrayList<>();
-  private final Variable parent;
+  @EqualsAndHashCode.Exclude private final Variable parent;
 
   protected AbstractVariable(
       int levelNumber, String name, Locality definition, boolean global, Variable parent) {
@@ -89,24 +91,5 @@ public abstract class AbstractVariable implements Variable {
   @Override
   public List<ConditionDataName> getConditionNames() {
     return conditionChildren;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    AbstractVariable that = (AbstractVariable) o;
-    return levelNumber == that.levelNumber
-        && Objects.equals(name, that.name)
-        && Objects.equals(definition, that.definition)
-        && global == that.global
-        && Objects.equals(usages, that.usages)
-        && Objects.equals(conditionChildren, that.conditionChildren)
-        && Objects.equals(parent, that.parent);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(levelNumber, name, definition, global, usages, conditionChildren, parent);
   }
 }

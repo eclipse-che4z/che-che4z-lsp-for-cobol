@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Location;
@@ -57,17 +57,16 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
    *
    * @param uri - URI of the processing document to define positions and errors properly
    * @param text of document opened in the client editor
-   * @param copybookProcessingMode reflect the copybook processing status of the document (ENABLED,
-   *     DISABLED, SKIP)
+   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql server
    * @return a model containing full analysis result, e.g. errors and semantic elements
    */
   @Override
   public AnalysisResult analyze(
-      String uri, String text, CopybookProcessingMode copybookProcessingMode) {
+      String uri, String text, CopybookConfig copybookConfig) {
     if (isEmpty(text)) {
       return empty();
     }
-    return toAnalysisResult(engine.run(uri, text, copybookProcessingMode), uri);
+    return toAnalysisResult(engine.run(uri, text, copybookConfig), uri);
   }
 
   /**

@@ -36,3 +36,8 @@ releaseScripts
 .scannerwork
 _/**
 ?/**
+# For BlackDuck
+node_modules/lodash/fp
+node_modules/jsonschema/schema
+node_modules/isarray/
+node_modules/promise-retry/

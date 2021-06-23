@@ -21,15 +21,14 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
-import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
+import org.eclipse.lsp.cobol.core.engine.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -40,10 +39,10 @@ import java.util.List;
  * returns an extended document with all the available copybooks included, with their definitions
  * and usages specified, as well as related errors.
  */
-public class GrammarPreprocessorImpl implements GrammarPreprocessor, ThreadInterruptAspect {
-  private GrammarPreprocessorListenerFactory listenerFactory;
-  private ReplacingService replacingService;
-  private MessageService messageService;
+public class GrammarPreprocessorImpl implements GrammarPreprocessor {
+  private final GrammarPreprocessorListenerFactory listenerFactory;
+  private final ReplacingService replacingService;
+  private final MessageService messageService;
 
   @Inject
   public GrammarPreprocessorImpl(
@@ -57,14 +56,14 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor, ThreadInter
 
   @NonNull
   @Override
-  @CheckThreadInterruption
   public ResultWithErrors<ExtendedDocument> buildExtendedDocument(
       @NonNull String uri,
       @NonNull String code,
       @NonNull Deque<CopybookUsage> copybookStack,
-      @NonNull CopybookProcessingMode copybookProcessingMode,
+      @NonNull CopybookConfig copybookConfig,
       @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
       @NonNull List<Pair<String, String>> replacingClauses) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     ReplacePreProcessorListener replaceListener = handleReplaceClauses(code, uri, replacingClauses);
     code = replaceListener.getResult().getText();
     List<SyntaxError> errors = new ArrayList<>(replaceListener.getErrors());
@@ -84,7 +83,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor, ThreadInter
             uri,
             tokens,
             copybookStack,
-            copybookProcessingMode,
+            copybookConfig,
             recursiveReplaceStmtStack,
             replacingClauses);
     walker.walk(listener, startRule);

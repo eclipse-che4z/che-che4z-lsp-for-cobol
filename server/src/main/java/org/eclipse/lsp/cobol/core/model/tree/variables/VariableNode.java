@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
@@ -26,20 +27,21 @@ import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.SEVERITY;
 
-/**
- * The abstract class for all variable definitions.
- */
+/** The abstract class for all variable definitions. */
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public abstract class VariableNode extends Node {
   private final VariableType variableType;
   private final String name;
+  @Setter private boolean global;
 
-  protected VariableNode(Locality location, String name, VariableType variableType) {
+  protected VariableNode(
+      Locality location, String name, VariableType variableType, boolean global) {
     super(location, NodeType.VARIABLE);
     this.name = name;
     this.variableType = variableType;
+    this.global = global;
   }
 
   /**
@@ -65,15 +67,15 @@ public abstract class VariableNode extends Node {
    * Construct an error for that Variable
    *
    * @param messageTemplate a message template for error
-   * @param severity  severity of the error
+   * @param severity severity of the error
    * @return the error with the variable locality
    */
   public SyntaxError getError(MessageTemplate messageTemplate, ErrorSeverity severity) {
     return SyntaxError.syntaxError()
-            .severity(severity)
-            .locality(getLocalityForError())
-            .messageTemplate(messageTemplate)
-            .build();
+        .severity(severity)
+        .locality(getLocalityForError())
+        .messageTemplate(messageTemplate)
+        .build();
   }
 
   private Locality getLocalityForError() {
@@ -83,5 +85,4 @@ public abstract class VariableNode extends Node {
         .map(Node::getLocality)
         .orElseGet(this::getLocality);
   }
-
 }

@@ -1,6 +1,5 @@
 [
   {
-    "type": "program",
     "name": "SECTST",
     "location": {
       "uri": "fake/path",
@@ -13,15 +12,15 @@
         "character": 29
       }
     },
+    "type": "program",
     "children": [
       {
-        "type": "goto",
         "targetName": [
           "PARAG1"
-        ]
+        ],
+        "type": "goto"
       },
       {
-        "type": "section",
         "name": "SECT1",
         "snippet": "SECT1 SECTION.\r\n       PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n           PERFORM PARAG2 OF SECT2.\r\n       ",
         "location": {
@@ -35,9 +34,9 @@
             "character": 45
           }
         },
+        "type": "section",
         "children": [
           {
-            "type": "paragraph",
             "snippet": "PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n           PERFORM PARAG2 OF SECT2.\r\n       ",
             "name": "PARAG1",
             "location": {
@@ -51,18 +50,18 @@
                 "character": 45
               }
             },
+            "type": "paragraph",
             "children": [
               {
-                "type": "perform",
                 "targetName": "PARAG2",
-                "targetSectionName": "SECT2"
+                "targetSectionName": "SECT2",
+                "type": "perform"
               }
             ]
           }
         ]
       },
       {
-        "type": "section",
         "name": "SECT2",
         "snippet": "SECT2 SECTION.\r\n       PARAG2.\r\n           DISPLAY 'PARAG2'.",
         "location": {
@@ -76,9 +75,9 @@
             "character": 29
           }
         },
+        "type": "section",
         "children": [
           {
-            "type": "paragraph",
             "snippet": "PARAG2.\r\n           DISPLAY 'PARAG2'.",
             "name": "PARAG2",
             "location": {
@@ -91,7 +90,8 @@
                 "line": 24,
                 "character": 29
               }
-            }
+            },
+            "type": "paragraph"
           }
         ]
       }

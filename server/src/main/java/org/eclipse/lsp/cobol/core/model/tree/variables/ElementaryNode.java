@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
 import com.google.common.collect.ImmutableList;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,8 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.EffectiveDataType.
  */
 @Getter
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@SuppressWarnings("squid:S107")
 abstract class ElementaryNode extends VariableWithLevelNode implements UsageClause {
   private static final String SEMANTICS_NO_PIC_CLAUSE = "semantics.noPicClause";
   private static final String SEMANTIC_IMPROPER_USE_BLANK_WHEN_ZERO_AND_SIGN_CLAUSE =
@@ -51,13 +54,14 @@ abstract class ElementaryNode extends VariableWithLevelNode implements UsageClau
       Locality location,
       int level,
       String name,
+      boolean redefines,
       VariableType variableType,
       boolean global,
       boolean isBlankWhenZeroPresent,
       boolean isSignClausePresent,
       String picClause,
       UsageFormat usageFormat) {
-    super(location, level, name, variableType, global);
+    super(location, level, name, redefines, variableType, global);
     this.isBlankWhenZeroPresent = isBlankWhenZeroPresent;
     this.isSignClausePresent = isSignClausePresent;
     this.picClause = picClause;

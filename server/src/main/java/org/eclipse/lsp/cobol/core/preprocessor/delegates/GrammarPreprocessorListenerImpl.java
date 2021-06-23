@@ -34,7 +34,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorString
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.TokenUtils;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.CopybookService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -53,8 +53,6 @@ import static org.eclipse.lsp.cobol.core.model.ErrorCode.MISSING_COPYBOOK;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.INFO;
 import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.*;
-import static org.eclipse.lsp.cobol.core.semantics.ImplicitFields.SQLCA;
-import static org.eclipse.lsp.cobol.core.semantics.ImplicitFields.SQLDA;
 
 /**
  * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
@@ -81,7 +79,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   private String documentUri;
   private BufferedTokenStream tokens;
-  private CopybookProcessingMode copybookProcessingMode;
+  private CopybookConfig copybookConfig;
   private TextPreprocessor preprocessor;
   private CopybookService copybookService;
   private Deque<CopybookUsage> copybookStack;
@@ -94,7 +92,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       @Assisted String documentUri,
       @Assisted BufferedTokenStream tokens,
       @Assisted Deque<CopybookUsage> copybookStack,
-      @Assisted CopybookProcessingMode copybookProcessingMode,
+      @Assisted CopybookConfig copybookConfig,
       @Assisted Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
       @Assisted List<Pair<String, String>> replacingClauses,
       TextPreprocessor preprocessor,
@@ -104,7 +102,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     this.documentUri = documentUri;
     this.tokens = tokens;
     this.copybookStack = copybookStack;
-    this.copybookProcessingMode = copybookProcessingMode;
+    this.copybookConfig = copybookConfig;
     this.preprocessor = preprocessor;
     this.copybookService = copybookService;
     this.replacingService = replacingService;
@@ -158,19 +156,15 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
 
   private void collectAndAccumulateCopybookData(
       CopySourceContext copySource, Locality copybookStatementPosition, Interval sourceInterval) {
-    if (!copybookProcessingMode.analyze) {
+    if (!copybookConfig.getCopybookProcessingMode().analyze) {
       pop();
       return;
     }
     String copybookName = retrieveCopybookName(copySource);
     Locality locality = retrievePosition(copySource);
-    CopybookModel model = getCopyBookContent(copybookName, locality);
+    CopybookModel model = getCopyBookContent(copybookName, locality, copybookConfig);
     String uri = model.getUri();
     String content = model.getContent();
-    //in case of implicit SQLCA, SQLDA
-    if (content == null) {
-      return;
-    }
 
     String copybookId = randomUUID().toString();
     // In a chain of copy statement, there could be only one replacing phrase
@@ -333,7 +327,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     return replacingService.applyReplacing(rawContent, replacePatterns);
   }
 
-  private CopybookModel getCopyBookContent(String copybookName, Locality locality) {
+  private CopybookModel getCopyBookContent(String copybookName, Locality locality, CopybookConfig copybookConfig) {
 
     if (copybookName.isEmpty()) return emptyModel(copybookName);
 
@@ -343,9 +337,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     }
 
     CopybookModel copybook =
-        copybookService.resolve(copybookName, documentUri, copybookProcessingMode);
-
-    if (copybook.getContent() == null && isNotImplictlyDefinedCopybook(copybookName)) {
+        copybookService.resolve(copybookName, documentUri, copybookConfig);
+    if (copybook.getContent() == null) {
       reportMissingCopybooks(copybookName, locality);
       return emptyModel(copybookName);
     }
@@ -353,18 +346,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     return copybook;
   }
 
-  /**
-   * This method checks if copybook name is implicitly defined or not.
-   *
-   * Application can use SQLCA and SQLDA names to define communication and description areas as copybooks
-   * and both are implicitly defined by either co-processor or pre-processor.
-   *
-   * @param copybookName
-   * @return true if copybookname is not one of SQLDA or SQLCA
-   */
-  private boolean isNotImplictlyDefinedCopybook(String copybookName) {
-    return !(SQLCA.getValue().equals(copybookName) || SQLDA.getValue().equals(copybookName));
-  }
 
   private boolean hasRecursion(String copybookName) {
     return copybookStack.stream().map(CopybookUsage::getName).anyMatch(copybookName::equals);
@@ -379,7 +360,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
                 uri,
                 content,
                 copybookStack,
-                copybookProcessingMode,
+                copybookConfig,
                 recursiveReplaceStmtStack,
                 replacingClauses)
             .unwrap(errors::addAll);

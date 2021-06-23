@@ -35,34 +35,43 @@ import java.util.stream.Stream;
 
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.TOO_MANY_CLAUSES_MSG;
 
-/**
- * The node represents a variable definition.
- */
+/** The node represents a variable definition. */
 @Getter
 @ToString(callSuper = true)
+@SuppressWarnings("squid:S107")
 @EqualsAndHashCode(callSuper = true)
 public final class VariableDefinitionNode extends Node {
-  private int level;
-  private VariableNameAndLocality variableName;
-  private boolean global;
-  private List<String> picClauses;
-  private List<OccursClause> occursClauses;
-  private List<ValueClause> valueClauses;
+  private final int level;
+  private final VariableNameAndLocality variableName;
+  private final boolean global;
+  private final List<String> picClauses;
+  private final List<OccursClause> occursClauses;
+  private final List<ValueClause> valueClauses;
+  private final List<VariableNameAndLocality> redefinesClauses;
+  private final VariableNameAndLocality renamesClause;
+  private final VariableNameAndLocality renamesThruClause;
+  private final String systemName;
+  private final Locality levelLocality;
+  private final boolean isBlankWhenZeroPresent;
+  private final boolean isSignClausePresent;
   @Setter private List<UsageFormat> usageClauses;
-  private List<VariableNameAndLocality> redefinesClauses;
-  private VariableNameAndLocality renamesClause;
-  private VariableNameAndLocality renamesThruClause;
-  private String systemName;
-  private Locality levelLocality;
-  private boolean isBlankWhenZeroPresent;
-  private boolean isSignClausePresent;
 
-  private VariableDefinitionNode(Locality location, int level, VariableNameAndLocality variableName, boolean global,
-                                 List<String> picClauses, List<OccursClause> occursClauses,
-                                 List<ValueClause> valueClauses, List<UsageFormat> usageClauses,
-                                 List<VariableNameAndLocality> redefinesClauses, VariableNameAndLocality renamesClause,
-                                 VariableNameAndLocality renamesThruClause, String systemName, Locality levelLocality,
-                                 boolean isBlankWhenZeroPresent, boolean isSignClausePresent) {
+  private VariableDefinitionNode(
+      Locality location,
+      int level,
+      VariableNameAndLocality variableName,
+      boolean global,
+      List<String> picClauses,
+      List<OccursClause> occursClauses,
+      List<ValueClause> valueClauses,
+      List<UsageFormat> usageClauses,
+      List<VariableNameAndLocality> redefinesClauses,
+      VariableNameAndLocality renamesClause,
+      VariableNameAndLocality renamesThruClause,
+      String systemName,
+      Locality levelLocality,
+      boolean isBlankWhenZeroPresent,
+      boolean isSignClausePresent) {
     super(location, NodeType.VARIABLE_DEFINITION);
     this.level = level;
     this.variableName = variableName;
@@ -78,6 +87,22 @@ public final class VariableDefinitionNode extends Node {
     this.levelLocality = levelLocality;
     this.isBlankWhenZeroPresent = isBlankWhenZeroPresent;
     this.isSignClausePresent = isSignClausePresent;
+  }
+
+  private static SyntaxError checkClauseIsSingle(
+      VariableNode variableNode, Supplier<List<?>> clausesGetter, String clauseName) {
+    if (clausesGetter.get().size() > 1)
+      return variableNode.getError(MessageTemplate.of(TOO_MANY_CLAUSES_MSG, clauseName));
+    return null;
+  }
+
+  /**
+   * Construct a new builder for {@link}VariableDefinitionNode{@link}.
+   *
+   * @return the builder
+   */
+  public static Builder builder() {
+    return new Builder();
   }
 
   /**
@@ -121,6 +146,7 @@ public final class VariableDefinitionNode extends Node {
 
   /**
    * Return occurs indexes
+   *
    * @return the occurs indexes
    */
   public List<VariableNameAndLocality> getOccursIndexes() {
@@ -244,37 +270,18 @@ public final class VariableDefinitionNode extends Node {
    */
   public List<SyntaxError> getErrors(VariableNode variableNode) {
     return Stream.of(
-        checkClauseIsSingle(variableNode, this::getPicClauses, "PICTURE"),
-        checkClauseIsSingle(variableNode, this::getOccursClauses, "OCCURS"),
-        checkClauseIsSingle(variableNode, this::getValueClauses, "VALUE"),
-        checkClauseIsSingle(variableNode, this::getRedefinesClauses, "REDEFINES"),
-        checkClauseIsSingle(variableNode, this::getUsageClauses, "USAGE")
-        // TODO: check the same way that the other clauses are singular or absent
-    )
+            checkClauseIsSingle(variableNode, this::getPicClauses, "PICTURE"),
+            checkClauseIsSingle(variableNode, this::getOccursClauses, "OCCURS"),
+            checkClauseIsSingle(variableNode, this::getValueClauses, "VALUE"),
+            checkClauseIsSingle(variableNode, this::getRedefinesClauses, "REDEFINES"),
+            checkClauseIsSingle(variableNode, this::getUsageClauses, "USAGE")
+            // TODO: check the same way that the other clauses are singular or absent
+            )
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
   }
 
-  private static SyntaxError checkClauseIsSingle(VariableNode variableNode,
-                                                 Supplier<List<?>> clausesGetter,
-                                                 String clauseName) {
-    if (clausesGetter.get().size() > 1)
-      return variableNode.getError(MessageTemplate.of(TOO_MANY_CLAUSES_MSG, clauseName));
-    return null;
-  }
-
-  /**
-   * Construct a new builder for {@link}VariableDefinitionNode{@link}.
-   *
-   * @return the builder
-   */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  /**
-   * The builder for {@link}VariableDefinitionNode{@link}.
-   */
+  /** The builder for {@link}VariableDefinitionNode{@link}. */
   @Accessors(chain = true, fluent = true)
   @Setter
   public static final class Builder {
@@ -294,8 +301,7 @@ public final class VariableDefinitionNode extends Node {
     boolean blankWhenZero;
     boolean signClause;
 
-    private Builder() {
-    }
+    private Builder() {}
 
     /**
      * Build the VariableDefinitionNode.
@@ -303,9 +309,22 @@ public final class VariableDefinitionNode extends Node {
      * @return the VariableDefinitionNode
      */
     public VariableDefinitionNode build() {
-      return new VariableDefinitionNode(locality, level, variableName, global, picClauses, occursClauses,
-          valueClauses, usageClauses, redefinesClauses, renamesClause, renamesThruClause, systemName, levelLocality,
-              blankWhenZero, signClause);
+      return new VariableDefinitionNode(
+          locality,
+          level,
+          variableName,
+          global,
+          picClauses,
+          occursClauses,
+          valueClauses,
+          usageClauses,
+          redefinesClauses,
+          renamesClause,
+          renamesThruClause,
+          systemName,
+          levelLocality,
+          blankWhenZero,
+          signClause);
     }
   }
 }

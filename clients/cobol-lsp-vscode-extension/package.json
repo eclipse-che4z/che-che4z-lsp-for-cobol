@@ -4,7 +4,7 @@
     "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "0.18.0",
+    "version": "0.19.0",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
@@ -158,6 +158,19 @@
                         "ALL level is used to turn on all logging"
                     ],
                     "description": "The logging level for COBOL LS backend"
+                },
+                "cobol-lsp.target-sql-backend": {
+                    "type": "string",
+                    "default": "DB2_SERVER",
+                    "enum": [
+                        "DB2_SERVER",
+                        "DATACOM_SERVER"
+                    ],
+                    "enumDescriptions": [
+                        "DB2_SERVER  - IBM DB2 SQL Server",
+                        "DATACOM_SERVER - CA DATACOM Server"
+                    ],
+                    "description": "The target SQL backend server which will be used in mainframe"
                 }
             }
         },
@@ -205,10 +218,7 @@
     "dependencies": {
         "@zowe/imperative": "4.13.1",
         "vscode-extension-telemetry": "0.1.6",
-        "vscode-languageclient": "5.2.1",
-
-        "lodash": "4.17.21",
-        "json-schema": "v0.3.0"
+        "vscode-languageclient": "5.2.1"
     },
     "devDependencies": {
         "@types/jest": "^26.0.0",

@@ -19,11 +19,15 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * Data transport object of CF AST.
- * CFASTNode is root of CF ASF node hierarchy.
- * It contains list of possible children of CF AST node.
+ * Data transport object of CF AST. CFASTNode is root of CF ASF node hierarchy. It contains list of
+ * possible children of CF AST node.
  */
 @Data
 public class CFASTNode {
+  final String type;
   List<CFASTNode> children;
+
+  public CFASTNode(String type) {
+    this.type = type;
+  }
 }

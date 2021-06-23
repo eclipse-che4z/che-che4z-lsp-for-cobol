@@ -24,7 +24,12 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class Program extends CFASTNode {
-  String type = CFASTNodeType.PROGRAM;
   String name;
   Location location;
+
+  public Program(String name, Location location) {
+    super(CFASTNodeType.PROGRAM.getValue());
+    this.name = name;
+    this.location = location;
+  }
 }

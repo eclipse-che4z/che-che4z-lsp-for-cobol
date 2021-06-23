@@ -50,8 +50,7 @@ class TestRemarksSectionIsUnsupported {
             "unsupported",
             new Diagnostic(
                 null,
-                "Syntax error on 'REMARKS' expected {<EOF>, AUTHOR, CBL, DATE-COMPILED, DATE-WRITTEN, IDENTIFICATION, "
-                    + "INSTALLATION, DATA, END, ENVIRONMENT, ID, PROCEDURE, PROCESS, SECURITY}",
+                "REMARKS paragraph is deprecated and not supported",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

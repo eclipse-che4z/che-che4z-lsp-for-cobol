@@ -14,16 +14,16 @@
  */
 package org.eclipse.lsp.cobol;
 
-import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
-import org.eclipse.lsp.cobol.domain.modules.EngineModule;
-import org.eclipse.lsp.cobol.domain.modules.ServiceModule;
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
+import org.eclipse.lsp.cobol.domain.modules.EngineModule;
+import org.eclipse.lsp.cobol.domain.modules.ServiceModule;
+import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -70,11 +70,13 @@ public class LangServerBootstrap {
   private void start(
       @NonNull String[] args, @NonNull LanguageServer server, @NonNull ClientProvider provider)
       throws IOException, InterruptedException, ExecutionException {
+    LOG.info("Java version: " + System.getProperty("java.version"));
     try {
-      Launcher<CobolLanguageClient> launcher = launchServer(args, server);
-      provider.setClient(launcher.getRemoteProxy());
-      // suspend the main thread on listening
-      launcher.startListening().get();
+      if (isPipeEnabled(args)) {
+        launchServerWithPipes(server, provider);
+      } else {
+        launchServerWithSocket(server, provider);
+      }
     } catch (ExecutionException e) {
       LOG.error("An error occurred while starting a language server", e);
       throw e;
@@ -84,26 +86,34 @@ public class LangServerBootstrap {
     }
   }
 
-  Launcher<CobolLanguageClient> launchServer(@NonNull String[] args, @NonNull LanguageServer server)
-      throws IOException {
-    return isPipeEnabled(args)
-        ? createServerLauncher(server, System.in, System.out)
-        : createServerLauncherWithSocket(server);
+  private void launchServerWithSocket(LanguageServer server, ClientProvider provider)
+      throws IOException, InterruptedException, ExecutionException {
+    LOG.info("Language server awaiting socket communication on port [{}]", LSP_PORT);
+    try (ServerSocket serverSocket = new ServerSocket(LSP_PORT);
+        Socket socket = serverSocket.accept();
+        InputStream input = socket.getInputStream();
+        OutputStream output = socket.getOutputStream()) {
+      LOG.info("Connection established successfully");
+      Launcher<CobolLanguageClient> launcher = createServerLauncher(server, input, output);
+      provider.setClient(launcher.getRemoteProxy());
+      // suspend the main thread on listening
+      launcher.startListening().get();
+    }
+  }
+
+  @SuppressWarnings("squid:S106")
+  private void launchServerWithPipes(
+      @NonNull LanguageServer server, @NonNull ClientProvider provider)
+      throws InterruptedException, ExecutionException {
+    LOG.info("Language server started using pipe communication");
+    Launcher<CobolLanguageClient> launcher = createServerLauncher(server, System.in, System.out);
+    provider.setClient(launcher.getRemoteProxy());
+    // suspend the main thread on listening
+    launcher.startListening().get();
   }
 
   boolean isPipeEnabled(@NonNull String[] args) {
     return args.length > 0 && PIPE_ARG.equals(args[0]);
-  }
-
-  Launcher<CobolLanguageClient> createServerLauncherWithSocket(@NonNull LanguageServer server)
-      throws IOException {
-    try (ServerSocket serverSocket = new ServerSocket(LSP_PORT)) {
-      LOG.info("Language server started using socket communication on port [{}]", LSP_PORT);
-      LOG.info("Java version: " + System.getProperty("java.version"));
-      // wait for clients to connect
-      Socket socket = serverSocket.accept();
-      return createServerLauncher(server, socket.getInputStream(), socket.getOutputStream());
-    }
   }
 
   Launcher<CobolLanguageClient> createServerLauncher(

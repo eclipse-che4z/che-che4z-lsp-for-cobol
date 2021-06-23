@@ -28,8 +28,6 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.core.annotation.CheckThreadInterruption;
-import org.eclipse.lsp.cobol.core.annotation.ThreadInterruptAspect;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.model.tree.EmbeddedCodeNode;
@@ -43,7 +41,7 @@ import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.core.visitor.EmbeddedLanguagesListener;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
 import org.eclipse.lsp4j.Location;
 
@@ -69,7 +67,7 @@ import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILL
 @Slf4j
 @Singleton
 @SuppressWarnings("WeakerAccess")
-public class CobolLanguageEngine implements ThreadInterruptAspect {
+public class CobolLanguageEngine {
 
   private final TextPreprocessor preprocessor;
   private final DefaultErrorStrategy defaultErrorStrategy;
@@ -96,22 +94,22 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
    *
    * @param documentUri unique resource identifier of the processed document
    * @param text the content of the document that should be processed
-   * @param copybookProcessingMode the trigger for copybook scan (ENABLED|DISABLED)
+   * @param copybookConfig  contains config info like: copybook processing mode, backend server
    * @return Semantic information wrapper object and list of syntax error that might send back to
    *     the client
    */
   @NonNull
-  @CheckThreadInterruption
   public ResultWithErrors<SemanticContext> run(
       @NonNull String documentUri,
       @NonNull String text,
-      @NonNull CopybookProcessingMode copybookProcessingMode) {
+      @NonNull CopybookConfig copybookConfig) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
     timingBuilder.getPreprocessorTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =
         preprocessor
-            .process(documentUri, text, copybookProcessingMode)
+            .process(documentUri, text, copybookConfig)
             .unwrap(accumulatedErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
 
@@ -210,17 +208,18 @@ public class CobolLanguageEngine implements ThreadInterruptAspect {
     return embeddedLanguagesListener.getEmbeddedCodeParts();
   }
 
-  @CheckThreadInterruption
   CobolParser getCobolParser(CommonTokenStream tokens) {
+
+    ThreadInterruptionUtil.checkThreadInterrupted();
     return new CobolParser(tokens);
   }
 
-  @CheckThreadInterruption
   Map<Token, Locality> getPositionMapping(
       String documentUri,
       ExtendedDocument extendedDocument,
       CommonTokenStream tokens,
       Map<Token, EmbeddedCode> embeddedCodeParts) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     return LocalityMappingUtils.createPositionMapping(
         tokens.getTokens(), extendedDocument.getDocumentMapping(), documentUri, embeddedCodeParts);
   }

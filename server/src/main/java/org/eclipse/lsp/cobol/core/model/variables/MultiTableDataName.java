@@ -47,8 +47,9 @@ public class MultiTableDataName extends StructuredVariable implements TableDecla
       Variable parent,
       int occursTimes,
       List<IndexItem> indexes,
-      UsageFormat usageFormat) {
-    super(levelNumber, name, definition, parent);
+      UsageFormat usageFormat,
+      boolean global) {
+    super(levelNumber, name, definition, global, parent);
     this.occursTimes = occursTimes;
     this.indexes = indexes.stream().map(it -> it.updateParent(this)).collect(Collectors.toList());
     this.usageFormat = usageFormat;
@@ -57,7 +58,7 @@ public class MultiTableDataName extends StructuredVariable implements TableDecla
   @Override
   public Variable rename(RenameItem newParent) {
     return new MultiTableDataName(
-        levelNumber, name, definition, newParent, occursTimes, indexes, usageFormat);
+        levelNumber, name, definition, newParent, occursTimes, indexes, usageFormat, global);
   }
 
   @Override

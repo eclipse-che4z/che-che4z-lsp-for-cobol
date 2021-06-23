@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -23,12 +22,11 @@ import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
 
 import java.util.List;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 
 /** The class represents the root. All trees must start with one root node. */
 @ToString(callSuper = true)
 @Getter
-@EqualsAndHashCode(callSuper = false)
 public class RootNode extends Node {
   public RootNode(Locality locality) {
     super(locality, NodeType.ROOT);
@@ -36,10 +34,12 @@ public class RootNode extends Node {
 
   /**
    * Process tree node and its children after tree construction.
-   * <p>
-   * Root node processing consists of two steps: <p>
-   * - convert all VariableDefinitionNode into appropriate VariableNode <p>
-   * - process all tree nodes
+   *
+   * <p>Root node processing consists of two steps:
+   *
+   * <p>- convert all VariableDefinitionNode into appropriate VariableNode
+   *
+   * <p>- process all tree nodes
    *
    * @return the list of errors for all syntax tree
    */
@@ -51,11 +51,12 @@ public class RootNode extends Node {
   }
 
   private List<SyntaxError> processVariableDefinition() {
-    List<Node> nodesWithVariableDefinitions = getDepthFirstStream()
-        .filter(hasType(NodeType.VARIABLE_DEFINITION))
-        .map(Node::getParent)
-        .distinct()
-        .collect(toList());
+    List<Node> nodesWithVariableDefinitions =
+        getDepthFirstStream()
+            .filter(hasType(NodeType.VARIABLE_DEFINITION))
+            .map(Node::getParent)
+            .distinct()
+            .collect(toList());
     return nodesWithVariableDefinitions.stream()
         .map(VariableDefinitionUtil::processNodeWithVariableDefinitions)
         .flatMap(List::stream)

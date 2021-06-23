@@ -22,9 +22,7 @@ import org.eclipse.lsp4j.Range;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * CF tree builder iplementation
- */
+/** CF tree builder iplementation */
 public class CFASTBuilderImpl implements CFASTBuilder {
   private static final int SNIPPET_LENGTH = 10;
   //  IF statement without END_IF workaround. Should be removed after grammar fixed.
@@ -44,13 +42,17 @@ public class CFASTBuilderImpl implements CFASTBuilder {
 
   private void traverse(CFASTNode parent, Node node) {
     if (node instanceof ParagraphNode) {
-      Paragraph paragraph = new Paragraph(cutSnippet(((ParagraphNode) node).getText()),
+      Paragraph paragraph =
+          new Paragraph(
+              cutSnippet(((ParagraphNode) node).getText()),
               ((ParagraphNode) node).getName(),
               convertLocation(node));
       addChild(parent, paragraph);
       node.getChildren().forEach(child -> traverse(paragraph, child));
     } else if (node instanceof ProcedureSectionNode) {
-      Section section = new Section(((ProcedureSectionNode) node).getName(),
+      Section section =
+          new Section(
+              ((ProcedureSectionNode) node).getName(),
               cutSnippet(((ProcedureSectionNode) node).getText()),
               convertLocation(node));
       addChild(parent, section);
@@ -58,39 +60,41 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     } else if (node instanceof GoToNode) {
       addChild(parent, new GoTo(((GoToNode) node).getTargets()));
     } else if (node instanceof EvaluateNode) {
-      addChild(parent, new Evaluate());
+      addChild(parent, new CFASTNode(CFASTNodeType.EVALUATE.getValue()));
       node.getChildren().forEach(child -> traverse(parent, child));
-      addChild(parent, new EndEvaluate());
+      addChild(parent, new CFASTNode(CFASTNodeType.END_EVALUATE.getValue()));
     } else if (node instanceof EvaluateWhenNode) {
-      addChild(parent, new When());
+      addChild(parent, new CFASTNode(CFASTNodeType.WHEN.getValue()));
     } else if (node instanceof IfNode) {
-      addChild(parent, new If());
+      addChild(parent, new CFASTNode(CFASTNodeType.IF.getValue()));
       node.getChildren().forEach(child -> traverse(parent, child));
       if (isIfHasEnd((IfNode) node)) {
         needCloseIf = false;
-        addChild(parent, new EndIf());
+        addChild(parent, new CFASTNode(CFASTNodeType.ENDIF.getValue()));
       } else {
         needCloseIf = true;
       }
     } else if (node instanceof SentenceNode) {
       node.getChildren().forEach(child -> traverse(parent, child));
       if (needCloseIf) {
-        addChild(parent, new EndIf());
+        addChild(parent, new CFASTNode(CFASTNodeType.ENDIF.getValue()));
         needCloseIf = false;
       }
     } else if (node instanceof IfElseNode) {
-      addChild(parent, new ElseIf());
+      addChild(parent, new CFASTNode(CFASTNodeType.ELSE.getValue()));
       node.getChildren().forEach(child -> traverse(parent, child));
     } else if (node instanceof PerformNode) {
       if (((PerformNode) node).isInline()) {
-        addChild(parent, new InlinePerform());
+        addChild(parent, new CFASTNode(CFASTNodeType.INLINE_PERFORM.getValue()));
         node.getChildren().forEach(child -> traverse(parent, child));
-        addChild(parent, new EndInlinePerform());
+        addChild(parent, new CFASTNode(CFASTNodeType.END_INLINE_PERFORM.getValue()));
       } else {
-        addChild(parent, new Perform(((PerformNode) node).getParagraph(), ((PerformNode) node).getSection()));
+        addChild(
+            parent,
+            new Perform(((PerformNode) node).getParagraph(), ((PerformNode) node).getSection()));
       }
     } else if (node instanceof ExitNode || node instanceof GoBackNode || node instanceof StopNode) {
-      addChild(parent, new Stop());
+      addChild(parent, new CFASTNode(CFASTNodeType.STOP.getValue()));
     }
   }
 
@@ -99,12 +103,16 @@ public class CFASTBuilderImpl implements CFASTBuilder {
   }
 
   private void traverse(ProgramNode node, List<Program> programs) {
-    node.getChildren().stream().filter(ProcedureDivisionNode.class::isInstance).findFirst().ifPresent(n -> {
-      Program program = new Program(node.getProgramName(), convertLocation(n));
-      n.getChildren().forEach(child -> traverse(program, child));
-      traverse(program, n);
-      programs.add(program);
-    });
+    node.getChildren().stream()
+        .filter(ProcedureDivisionNode.class::isInstance)
+        .findFirst()
+        .ifPresent(
+            n -> {
+              Program program = new Program(node.getProgramName(), convertLocation(n));
+              n.getChildren().forEach(child -> traverse(program, child));
+              traverse(program, n);
+              programs.add(program);
+            });
   }
 
   private void addChild(CFASTNode target, CFASTNode child) {

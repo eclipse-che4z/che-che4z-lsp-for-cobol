@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
@@ -53,9 +54,9 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  */
 @Getter
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class GroupItemNode extends VariableWithLevelNode implements UsageClause {
-  private boolean redefines;
-  private UsageFormat usageFormat;
+  private final UsageFormat usageFormat;
 
   public GroupItemNode(
       Locality location,
@@ -64,8 +65,7 @@ public class GroupItemNode extends VariableWithLevelNode implements UsageClause 
       boolean global,
       boolean redefines,
       UsageFormat usageFormat) {
-    super(location, level, name, VariableType.GROUP_ITEM, global);
-    this.redefines = redefines;
+    super(location, level, name, redefines, VariableType.GROUP_ITEM, global);
     this.usageFormat = usageFormat;
   }
 

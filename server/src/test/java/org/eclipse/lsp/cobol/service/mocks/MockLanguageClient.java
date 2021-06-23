@@ -14,8 +14,10 @@
  */
 package org.eclipse.lsp.cobol.service.mocks;
 
-import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
+import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonPrimitive;
 import com.google.inject.Singleton;
+import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp4j.*;
 
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ import java.util.concurrent.CompletableFuture;
  * from the server. May respond on the showMessageRequest using the given messages in the Iterator.
  */
 @Singleton
-public class TestLanguageClient implements CobolLanguageClient {
+public class MockLanguageClient implements CobolLanguageClient {
   private List<Object> receivedTelemetry = new ArrayList<>();
   private List<PublishDiagnosticsParams> receivedDiagnostics = new ArrayList<>();
   private List<MessageParams> messagesToShow = new ArrayList<>();
@@ -67,8 +69,17 @@ public class TestLanguageClient implements CobolLanguageClient {
   }
 
   /**
-   * Clean the client state.
+   * Returns mock-config values used in server integration test
+   *
+   * @param configurationParams
+   * @return - config value
    */
+  public CompletableFuture<List<Object>> configuration(ConfigurationParams configurationParams) {
+    return CompletableFuture.completedFuture(
+        ImmutableList.of("DB2_SERVER", new JsonPrimitive("DB2_SERVER")));
+  }
+
+  /** Clean the client state. */
   public void clean() {
     receivedTelemetry.clear();
     receivedDiagnostics.clear();

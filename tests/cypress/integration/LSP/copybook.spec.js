@@ -21,29 +21,29 @@ context('This is a Copybook spec', () => {
     cy.updateConfigs('basic');
   });
 
-  describe('TC174655 Copybook - Nominal', () => {
-    it(
-      ['flaky_theia'],
-      'Checks that when opening Cobol file with correct reference to copybook, there is syntax ok message shown',
-      () => {
-        cy.openFile('USER1.cbl');
-        cy.openFile('USERC1N1.cbl');
-        cy.wait(2000).getLSPOutput().should('contain.text', 'No syntax errors detected in USERC1N1.cbl');
-      },
-    );
-  });
+  // describe('TC174655 Copybook - Nominal', () => {
+  //   it(
+  //     ['flaky_theia'],
+  //     'Checks that when opening Cobol file with correct reference to copybook, there is syntax ok message shown',
+  //     () => {
+  //       cy.openFile('USER1.cbl');
+  //       cy.openFile('USERC1N1.cbl');
+  //       cy.wait(2000).getLSPOutput().should('contain.text', 'No syntax errors detected in USERC1N1.cbl');
+  //     },
+  //   );
+  // });
 
-  describe('Copybook - not exist: no syntax ok message', () => {
-    it(
-      ['flaky_theia'],
-      'Checks that when opening Cobol file which refers to non-existent copybook, syntax ok message does not appear and copybook is underlined',
-      () => {
-        cy.openFile('USERC1N1.cbl').wait(1000);
-        cy.openFile('USERC1F.cbl');
-        cy.getLSPOutput().should('not.have.text', 'No syntax errors detected in USERC1F.cbl');
-      },
-    );
-  });
+  // describe('Copybook - not exist: no syntax ok message', () => {
+  //   it(
+  //     ['flaky_theia'],
+  //     'Checks that when opening Cobol file which refers to non-existent copybook, syntax ok message does not appear and copybook is underlined',
+  //     () => {
+  //       cy.openFile('USERC1N1.cbl').wait(1000);
+  //       cy.openFile('USERC1F.cbl');
+  //       cy.getLSPOutput().should('not.have.text', 'No syntax errors detected in USERC1F.cbl');
+  //     },
+  //   );
+  // });
 
   describe('TC174956 Copybook - not exist: error underlined', () => {
     it(['smoke'], 'Checks that error lines are marked in a file', () => {
@@ -316,21 +316,21 @@ context('This is a Copybook spec', () => {
     });
   });
 
-  describe.skip('TC312878 Edit missing copybook and resolve', () => {
-    // Theia doesn't show the pop-up
-    it(['flaky_theia'], 'Edits missing copybook and resolves', () => {
-      cy.openFile('USERC1F.cbl');
-      cy.goToLine(19);
-      cy.getCurrentLine().type('{end}{backspace}{backspace}123.');
-      cy.getCurrentLineErrors({ expectedLine: 19 })
-        .eq(0)
-        .getHoverErrorMessage()
-        .find('.action span[title^="Quick Fix"]')
-        .click();
-      cy.get('.p-Menu-itemLabel').contains('Resolve copybook').click();
-      cy.get('.theia-notification-message').should('contain.text', 'Missing copybooks: BOOK123');
-    });
-  });
+  // describe('TC312878 Edit missing copybook and resolve', () => {
+  //   // Theia doesn't show the pop-up
+  //   it(['flaky_theia'], 'Edits missing copybook and resolves', () => {
+  //     cy.openFile('USERC1F.cbl');
+  //     cy.goToLine(19);
+  //     cy.getCurrentLine().type('{end}{backspace}{backspace}123.');
+  //     cy.getCurrentLineErrors({ expectedLine: 19 })
+  //       .eq(0)
+  //       .getHoverErrorMessage()
+  //       .find('.action span[title^="Quick Fix"]')
+  //       .click();
+  //     cy.get('.p-Menu-itemLabel').contains('Resolve copybook').click();
+  //     cy.get('.theia-notification-message').should('contain.text', 'Missing copybooks: BOOK123');
+  //   });
+  // });
 
   describe('TC314393 Variable usage should be found in a CALL statement', () => {
     it(['smoke'], 'The variable used in a CALL statement should be found in the references list.', () => {
@@ -352,20 +352,20 @@ context('This is a Copybook spec', () => {
     });
   });
 
-  describe('TC314935 Copybook with Name in Quotes is Recognized', () => {
-    it(['flaky'], 'Copybook with Name in Quotes is Recognized', () => {
-      cy.openFile('VAR.cbl');
-      cy.goToLine(21);
-      cy.getLineByNumber(21).type("{end}{enter}COPY 'BBB'.").wait(500);
-      cy.getCurrentLineErrors({ expectedLine: 22 }).eq(0).getHoverErrorMessage().contains('BBB: Copybook not found');
-      cy.getLineByNumber(22).type('{end}{enter}COPY "BBB".').wait(500);
-      cy.getCurrentLineErrors({ expectedLine: 23 }).eq(0).getHoverErrorMessage().contains('BBB: Copybook not found');
-      cy.getLineByNumber(23).type('{end}{enter}COPY "NEW".').wait(500);
-      cy.getCurrentLine().should('not.have.class', '.squiggly-error');
-      cy.getLineByNumber(24).type("{end}{enter}COPY 'NEW'.").wait(500);
-      cy.getCurrentLine().should('not.have.class', '.squiggly-error');
-    });
-  });
+  // describe('TC314935 Copybook with Name in Quotes is Recognized', () => {
+  //   it(['flaky'], 'Copybook with Name in Quotes is Recognized', () => {
+  //     cy.openFile('VAR.cbl');
+  //     cy.goToLine(21);
+  //     cy.getLineByNumber(21).type("{end}{enter}COPY 'BBB'.").wait(500);
+  //     cy.getCurrentLineErrors({ expectedLine: 22 }).eq(0).getHoverErrorMessage().contains('BBB: Copybook not found');
+  //     cy.getLineByNumber(22).type('{end}{enter}COPY "BBB".').wait(500);
+  //     cy.getCurrentLineErrors({ expectedLine: 23 }).eq(0).getHoverErrorMessage().contains('BBB: Copybook not found');
+  //     cy.getLineByNumber(23).type('{end}{enter}COPY "NEW".').wait(500);
+  //     cy.getCurrentLine().should('not.have.class', '.squiggly-error');
+  //     cy.getLineByNumber(24).type("{end}{enter}COPY 'NEW'.").wait(500);
+  //     cy.getCurrentLine().should('not.have.class', '.squiggly-error');
+  //   });
+  // });
 
   describe("TC315293 program ID - 'COBOL Copybook'", () => {
     it(
@@ -425,6 +425,51 @@ context('This is a Copybook spec', () => {
     it(['smoke'], 'specify copybooks outside the current workspace ./test/files', () => {
       setPathsLocalSetting('./test/files');
       copyBookNotFound();
+    });
+  });
+
+  describe('Fix loading copybooks with any encoding', () => {
+    const copyBookNotFound = (copybook) => {
+      return cy
+        .openFile('TEST.CBL')
+        .getLineByNumber(21)
+        .type(`           COPY ${copybook}.`)
+        .getCurrentLineErrors({ expectedLine: 21 })
+        .eq(0)
+        .getHoverErrorMessage()
+        .contains(`${copybook}: Copybook not found`);
+    };
+    afterEach(() => {
+      cy.closeFolder('.copybooks');
+    });
+
+    [
+      {
+        test: 'Fix loading copybooks with any encoding - EN',
+        input: 'TEST ME',
+      },
+      {
+        test: 'Fix loading copybooks with any encoding - UA',
+        input: 'Перевір мене',
+      },
+      {
+        test: 'Fix loading copybooks with any encoding - AM',
+        input: 'փորձիր ինձ',
+      },
+    ].forEach((parameters) => {
+      it(parameters.test, () => {
+        copyBookNotFound('UTF8');
+        cy.writeFile('test_files/project/testing/UTF8', `            MOVE "${parameters.input}" TO ABC.`, {
+          encoding: 'utf-8',
+        });
+        cy.getLineByNumber(21).findText('UTF8').click().type('{ctrl}{.}');
+        cy.get('.p-Widget.p-Menu').contains('Resolve copybook').click();
+        cy.goToLine(21);
+        cy.getCurrentLineErrors({ expectedLine: 21 })
+          .eq(0)
+          .getHoverErrorMessage()
+          .contains('Invalid definition for: ABC');
+      });
     });
   });
 });

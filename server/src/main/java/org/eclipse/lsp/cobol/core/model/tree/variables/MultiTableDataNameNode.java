@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
@@ -25,12 +26,20 @@ import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
  */
 @Getter
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class MultiTableDataNameNode extends VariableWithLevelNode implements UsageClause {
   private final int occursTimes;
   private final UsageFormat usageFormat;
 
-  public MultiTableDataNameNode(Locality location, int level, String name, int occursTimes, UsageFormat usageFormat) {
-    super(location, level, name, VariableType.MULTI_TABLE_DATA_NAME);
+  public MultiTableDataNameNode(
+      Locality location,
+      int level,
+      String name,
+      boolean redefines,
+      int occursTimes,
+      UsageFormat usageFormat,
+      boolean global) {
+    super(location, level, name, redefines, VariableType.MULTI_TABLE_DATA_NAME, global);
     this.occursTimes = occursTimes;
     this.usageFormat = usageFormat;
   }

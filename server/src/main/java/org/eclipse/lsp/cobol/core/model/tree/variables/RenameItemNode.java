@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
@@ -26,8 +27,9 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
  * operations.
  */
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class RenameItemNode extends VariableWithLevelNode {
-  public RenameItemNode(Locality location, String name, boolean global) {
-    super(location, LEVEL_66, name, VariableType.RENAME_ITEM, global);
+  public RenameItemNode(Locality location, String name, boolean redefines, boolean global) {
+    super(location, LEVEL_66, name, redefines, VariableType.RENAME_ITEM, global);
   }
 }

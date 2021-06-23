@@ -28,18 +28,34 @@ import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
  */
 @Getter
 @ToString(callSuper = true)
+@SuppressWarnings("squid:S107")
 @EqualsAndHashCode(callSuper = true)
 public class ElementaryItemNode extends ElementaryNode {
-  private String value;
-  private boolean redefines;
+  private final String value;
 
-  public ElementaryItemNode(Locality location, int level, String name, boolean global, String picClause, String value,
-                            UsageFormat usageFormat, boolean redefines, boolean isBlankWhenZeroPresent,
-                            boolean isSignClausePresent) {
-    super(location, level, name, VariableType.ELEMENTARY_ITEM, global, isBlankWhenZeroPresent, isSignClausePresent,
-            picClause, usageFormat);
+  public ElementaryItemNode(
+      Locality location,
+      int level,
+      String name,
+      boolean global,
+      String picClause,
+      String value,
+      UsageFormat usageFormat,
+      boolean redefines,
+      boolean isBlankWhenZeroPresent,
+      boolean isSignClausePresent) {
+    super(
+        location,
+        level,
+        name,
+        redefines,
+        VariableType.ELEMENTARY_ITEM,
+        global,
+        isBlankWhenZeroPresent,
+        isSignClausePresent,
+        picClause,
+        usageFormat);
 
     this.value = value;
-    this.redefines = redefines;
   }
 }
