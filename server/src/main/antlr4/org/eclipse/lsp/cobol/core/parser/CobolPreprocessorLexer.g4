@@ -30,7 +30,6 @@ IN: I N;
 INCLUDE: I N C L U D E;
 LEADING: L E A D I N G;
 LIST: L I S T;
-MAID: M A I D;
 MAP: M A P;
 NO: N O;
 OF: O F;
