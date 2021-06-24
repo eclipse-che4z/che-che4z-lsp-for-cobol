@@ -106,7 +106,7 @@ class TestSetUpDownBy {
     DIAGNOSTICS.put(
         "6",
         new Diagnostic(
-            null, "Invalid definition for: IND4", DiagnosticSeverity.Error, ERROR.getText()));
+            null, "Variable IND4 is not defined", DiagnosticSeverity.Error, ERROR.getText()));
   }
 
   @Test

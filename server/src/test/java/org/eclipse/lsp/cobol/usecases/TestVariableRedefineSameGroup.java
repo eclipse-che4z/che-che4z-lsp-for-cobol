@@ -23,9 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
-/**
- * This test checks that redefined variable has the same group
- */
+/** This test checks that redefined variable has the same group */
 public class TestVariableRedefineSameGroup {
   private static final String REDEFINES_SAME_GROUP =
       "       IDENTIFICATION DIVISION.\n"
@@ -54,7 +52,7 @@ public class TestVariableRedefineSameGroup {
             "2",
             new Diagnostic(
                 null,
-                "Invalid definition for: WS-DATE1",
+                "Variable WS-DATE1 is not defined",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
   }

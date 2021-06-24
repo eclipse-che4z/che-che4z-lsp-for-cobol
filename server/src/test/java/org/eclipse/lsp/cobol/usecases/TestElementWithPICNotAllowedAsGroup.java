@@ -15,18 +15,16 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
-/**
- * This test checks that a variable definition with PIC cannot contain nested elements
- */
+/** This test checks that a variable definition with PIC cannot contain nested elements */
 class TestElementWithPICNotAllowedAsGroup {
 
   private static final String TEXT =
@@ -54,7 +52,7 @@ class TestElementWithPICNotAllowedAsGroup {
             "2",
             new Diagnostic(
                 null,
-                "Invalid definition for: CHILD1",
+                "Variable CHILD1 is not defined",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
   }

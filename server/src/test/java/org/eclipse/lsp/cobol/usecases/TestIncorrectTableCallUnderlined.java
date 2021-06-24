@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
@@ -46,11 +46,11 @@ class TestIncorrectTableCallUnderlined {
             "1",
             new Diagnostic(
                 null,
-                "Invalid definition for: OL-ACCT-NO",
+                "Variable OL-ACCT-NO is not defined",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "2",
             new Diagnostic(
-                null, "Invalid definition for: SUB1", DiagnosticSeverity.Error, ERROR.getText())));
+                null, "Variable SUB1 is not defined", DiagnosticSeverity.Error, ERROR.getText())));
   }
 }
