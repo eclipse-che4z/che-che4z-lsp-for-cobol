@@ -67,7 +67,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private static final String SYNTAX_ERROR_CHECK_COPYBOOK_NAME =
       "Syntax error by GrammarPreprocessorListenerImpl#checkCopybookName: ";
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
-
   private final Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
   private final List<Pair<String, String>> copyReplacingClauses = new ArrayList<>();
   private final List<Pair<String, String>> replacingClauses;
@@ -130,6 +129,17 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         new DocumentMapping(
             tokens.getTokens().stream().map(toPosition()).collect(toList()), shifts));
     return new ExtendedDocument(accumulate(), copybooks, nestedMappings, copybookStatements);
+  }
+
+  @Override
+  public void enterCopyMaidStatement(CopyMaidStatementContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitCopyMaidStatement(CopyMaidStatementContext ctx) {
+    collectAndAccumulateCopybookData(
+        ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval());
   }
 
   @Override
