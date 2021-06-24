@@ -15,15 +15,18 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
+import com.google.common.base.Splitter;
 import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +38,7 @@ import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 import static java.util.regex.Matcher.quoteReplacement;
+import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.END_INDEX_AREA_B;
 
 /**
  * This service applies replacing for given text by replace clauses and tokens. It may work with
@@ -209,10 +213,88 @@ public class ReplacingServiceImpl implements ReplacingService {
     String result = text;
     try {
       result = Pattern.compile(pattern.getLeft()).matcher(text).replaceAll(pattern.getRight());
+      List<String> fixedStrings = validateAndFix(result, text);
+      result = String.join(System.lineSeparator(), fixedStrings);
     } catch (IndexOutOfBoundsException e) {
-      LOG.error(format(ERROR_REPLACING, text, pattern.toString()), e);
+      LOG.error(format(ERROR_REPLACING, text, pattern), e);
     }
     return result;
+  }
+
+  private List<String> validateAndFix(String result, String referenceText) {
+    List<String> referenceStringList =
+        new ArrayList<>(Arrays.asList(referenceText.split(System.lineSeparator())));
+    List<String> resultStringList =
+        new ArrayList<>(Arrays.asList(result.split(System.lineSeparator())));
+    int resultIndex = 0;
+    for (int refIndex = 0; refIndex < referenceStringList.size(); refIndex++) {
+      int lengthDiff =
+          resultStringList.get(resultIndex).length() - referenceStringList.get(refIndex).length();
+
+      if (lengthDiff == 0) {
+        resultIndex++;
+        continue;
+      }
+      if (resultStringList.get(resultIndex).length() > END_INDEX_AREA_B) {
+
+        String sequence =
+            referenceStringList.get(refIndex).length() > END_INDEX_AREA_B
+                ? referenceStringList.get(refIndex).substring(END_INDEX_AREA_B)
+                : "";
+        if (lengthDiff < 0 && StringUtils.isNumeric(sequence)) {
+          resultStringList.set(
+              resultIndex, adjustSequenceNoPresentInAreaB(resultStringList, resultIndex, sequence));
+        } else {
+          int prevSize = resultStringList.size();
+          adjustExtraLength(resultStringList, refIndex, resultIndex, sequence);
+          resultIndex = resultIndex + resultStringList.size() - prevSize;
+        }
+      }
+      resultIndex++;
+    }
+    return resultStringList;
+  }
+
+  private String adjustSequenceNoPresentInAreaB(
+      List<String> resultStringList, int j, String sequence) {
+    return StringUtils.join(
+        StringUtils.rightPad(
+            StringUtils.substring(
+                resultStringList.get(j), 0, resultStringList.get(j).length() - sequence.length()),
+            END_INDEX_AREA_B),
+        sequence);
+  }
+
+  private void adjustExtraLength(
+      List<String> resultStringList, int refIndex, int resultIndex, String sequence) {
+    String addedString =
+        resultStringList
+            .get(resultIndex)
+            .substring(
+                END_INDEX_AREA_B, resultStringList.get(resultIndex).length() - sequence.length());
+    resultStringList.set(
+        refIndex,
+        StringUtils.join(
+            StringUtils.substring(resultStringList.get(resultIndex), 0, END_INDEX_AREA_B),
+            sequence));
+    if (!StringUtils.isBlank(addedString)) {
+      List<String> adjustedExtraCharInContinuationLine =
+          splitStringByLength(
+              addedString, END_INDEX_AREA_B - ProcessingConstants.CONTINUATION_PREFIX.length());
+      resultStringList.addAll(resultIndex + 1, adjustedExtraCharInContinuationLine);
+    }
+  }
+
+  private List<String> splitStringByLength(String actualStr, int fixedLength) {
+    List<String> splitReplacement = new ArrayList<>();
+    Splitter.fixedLength(fixedLength)
+        .split(actualStr)
+        .forEach(
+            ele -> {
+              if (!StringUtils.isBlank(ele))
+                splitReplacement.add(ProcessingConstants.CONTINUATION_PREFIX + ele);
+            });
+    return splitReplacement;
   }
 
   private Function<String, Boolean> checkContainWord(String check) {

@@ -71,7 +71,7 @@ public class WorkspaceFileService implements FileSystemService {
       StringBuilder sb = new StringBuilder();
       String line = bufferedReader.readLine();
       while (line != null) {
-        sb.append(line).append("\n");
+        sb.append(line).append(System.lineSeparator());
         line = bufferedReader.readLine();
       }
       return sb.toString();
@@ -111,7 +111,7 @@ public class WorkspaceFileService implements FileSystemService {
     try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, charset))) {
       String line;
       while ((line = br.readLine()) != null) {
-        resultStringBuilder.append(line).append("\n");
+        resultStringBuilder.append(line).append(System.lineSeparator());
       }
     }
     return resultStringBuilder.toString();
