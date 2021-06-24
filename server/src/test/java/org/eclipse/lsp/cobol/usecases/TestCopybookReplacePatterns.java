@@ -56,20 +56,57 @@ class TestCopybookReplacePatterns {
   private static final String TEXT4 =
       BASE
           + "5      COPY {~REPL4} REPLACING TRAILING ==ID== BY == BY-IDS ==.\n"
-          + "8      PROCEDURE DIVISION.\n"
+          + "8      PROCEDURE DIVISION.\r\n"
           + "9          MOVE 0 TO {$TAG_BY-IDS}.";
+  private static final String TEXT5 =
+      BASE
+          + "       01  {$*LOGA}.  \r\n"
+          + "       COPY {~REPL5}  \r\n"
+          + "            REPLACING  ==LDAY== BY ==DMAN123000000000000000000000000000000005900\n"
+          + "      -    0000000000000000011111111111111111111111111111111111111111111\n"
+          + "      -    00000000000000000000000== .\r\n";
 
-  private static final String REPL = "0      01 {$*TAG_ID}        PIC 9.\n";
+  private static final String TEXT6 =
+      BASE
+          + "5      COPY {~REPL6} REPLACING ==:TAG:== BY == A ==.\r\n"
+          + "8      PROCEDURE DIVISION.\r\n"
+          + "9          MOVE 0 TO {$A_ID}.";
+
+  private static final String TEXT7 =
+      BASE
+          + "       01  {$*LOGA}.  \r\n"
+          + "       COPY {~REPL7}  \r\n"
+          + "            REPLACING  ==LDAY== BY ==DMAN123000000000000000000000000000000005900\n"
+          + "      -    0000000000000000011111111111111111111111111111111111111111111\n"
+          + "      -    00000000000000000000000== .\r\n";
+
+  private static final String REPL = "0      01 {$*TAG_ID}        PIC 9.\r\n";
   private static final String REPL_NAME = "REPL";
 
-  private static final String REPL1 = "0      01 {$*:TAG:_ID^ACC_ID}        PIC 9.\n";
+  private static final String REPL1 = "0      01 {$*:TAG:_ID^ACC_ID}        PIC 9.\r\n";
   private static final String REPL1_NAME = "REPL1";
 
-  private static final String REPL3 = "0      01 {$*TAG_ID^ACC_ID}        PIC 9.\n";
+  private static final String REPL3 = "0      01 {$*TAG_ID^ACC_ID}        PIC 9.\r\n";
   private static final String REPL3_NAME = "REPL3";
 
-  private static final String REPL4 = "0      01 {$*TAG_ID^TAG_BY-IDS}        PIC 9.\n";
+  private static final String REPL4 = "0      01 {$*TAG_ID^TAG_BY-IDS}        PIC 9.\r\n";
   private static final String REPL4_NAME = "REPL4";
+
+  private static final String REPL5 =
+      "      ***************************************************************** 09700000\r\n"
+          + "         02  {$*LOGHDR}.                                                    18000000\r\n"
+          + "           03  {$*LDAY^DMAN1230000000000000000000000000000000000000000000001111111111111111111111111111111111111111111100000000000000000000000}           PIC S9(7) COMP-3.                         24000000";
+  private static final String REPL5_NAME = "REPL5";
+
+  private static final String REPL6 =
+      "0      01 {$*:TAG:_ID^A_ID}        PIC 9.                                        00007100";
+  private static final String REPL6_NAME = "REPL6";
+
+  private static final String REPL7 =
+      "      ***************************************************************** 09700000\r\n"
+          + "         02  {$*LOGHDR}.                                                    18000000\r\n"
+          + "           03  {$*LDAY^DMAN1230000000000000000000000000000000000000000000001111111111111111111111111111111111111111111100000000000000000000000}           PIC S9(7) COMP-3.";
+  private static final String REPL7_NAME = "REPL7";
 
   @Test
   void testPartialTextAreNotReplaced() {
@@ -101,5 +138,23 @@ class TestCopybookReplacePatterns {
   void testPartialTextReplaceableWithTrailingClause() {
     UseCaseEngine.runTest(
         TEXT4, ImmutableList.of(new CobolText(REPL4_NAME, REPL4)), ImmutableMap.of());
+  }
+
+  @Test
+  void testWhenReplacedLengthIsMoreThanReplaceable() {
+    UseCaseEngine.runTest(
+        TEXT5, ImmutableList.of(new CobolText(REPL5_NAME, REPL5)), ImmutableMap.of());
+  }
+
+  @Test
+  void testWhenReplacedLengthIsLessThanReplaceable() {
+    UseCaseEngine.runTest(
+        TEXT6, ImmutableList.of(new CobolText(REPL6_NAME, REPL6)), ImmutableMap.of());
+  }
+
+  @Test
+  void testWhenReplacedLengthIsMoreThanReplaceableAndCopybookHasNoSequence() {
+    UseCaseEngine.runTest(
+        TEXT7, ImmutableList.of(new CobolText(REPL7_NAME, REPL7)), ImmutableMap.of());
   }
 }
