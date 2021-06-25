@@ -2,6 +2,19 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 Changelog:
 
+## [0.19.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.0...0.19.1) (2021-06-25)
+
+#### Changed
+* Error message for invalid variable definition
+* Analysis exceptions propagated to Extended API responses
+
+#### Fixed
+* IDMS statements in conditional blocks
+* Access to undefined element if there is no workspace open
+* Error on multiline optional paragraphs
+* Hover for group items
+* Error when loading copybooks with one-byte national encoding
+
 ## [0.19.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.18.0...0.19.0) (2021-06-10)
 
 #### Added
