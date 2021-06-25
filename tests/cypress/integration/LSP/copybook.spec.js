@@ -472,4 +472,15 @@ context('This is a Copybook spec', () => {
       });
     });
   });
+
+  describe('Load resource file', () => {
+    it(['smoke'], 'Checks loading of resource file', () => {
+      cy.openFile('RES.cbl');
+      cy.goToLine(6);
+      cy.getCurrentLineErrors({ expectedLine: 6 })
+        .eq(0)
+        .getHoverErrorMessage()
+        .contains("Syntax error on 'FILE-CONTROsL'");
+    });
+  });
 });
