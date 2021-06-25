@@ -477,7 +477,9 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
             .get(documentUri)
             .add(
                 new Diagnostic(
-                    range, it.getMessage(), it.getSeverity(), it.getSource(), it.getCode()));
+                        // honour the range provided by tester.
+                   Objects.nonNull(it.getRange()) ? it.getRange() : range, it.getMessage(), it.getSeverity(), it.getSource(),
+                        it.getCode()));
   }
 
   private Range retrieveRange(ParserRuleContext ctx, String text) {

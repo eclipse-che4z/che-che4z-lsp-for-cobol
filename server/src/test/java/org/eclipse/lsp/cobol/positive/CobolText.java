@@ -21,4 +21,9 @@ import lombok.Value;
 public class CobolText {
   private String fileName;
   private String fullText;
+
+  @Override
+  public String toString() {
+    return fileName;
+  }
 }

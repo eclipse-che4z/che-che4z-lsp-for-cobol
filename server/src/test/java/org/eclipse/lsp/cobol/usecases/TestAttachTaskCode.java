@@ -14,10 +14,10 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.DisplayName;
@@ -29,8 +29,7 @@ import java.util.stream.Stream;
 /** These test for variations of valid ATTACH statements */
 class TestAttachTaskCode {
 
-  private static final String MESSAGE_1 =
-      "Invalid definition for: 1XX";
+  private static final String MESSAGE_1 = "Variable 1XX is not defined";
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"

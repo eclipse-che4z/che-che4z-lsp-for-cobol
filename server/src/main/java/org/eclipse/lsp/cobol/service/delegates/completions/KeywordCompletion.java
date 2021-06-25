@@ -14,19 +14,21 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import org.eclipse.lsp4j.CompletionItemKind;
-
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp4j.CompletionItem;
+
 import javax.annotation.Nullable;
 import java.util.Collection;
 
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.KEYWORDS;
+import static org.eclipse.lsp4j.CompletionItemKind.Keyword;
 
-/** implementation for adding keywords in the autocomplete list */
+/** This completion provider resolves keywords and documentation for them as static content */
 @Singleton
 public class KeywordCompletion implements Completion {
   private CompletionStorage keywords;
@@ -36,27 +38,22 @@ public class KeywordCompletion implements Completion {
     this.keywords = keywords;
   }
 
-  @NonNull
   @Override
-  public Collection<String> getCompletionSource(CobolDocumentModel document) {
-    return keywords.getLabels();
+  public @NonNull Collection<CompletionItem> getCompletionItems(
+      @NonNull String token, @Nullable CobolDocumentModel document) {
+    return keywords.getLabels().stream()
+        .filter(DocumentationUtils.startsWithIgnoreCase(token))
+        .map(this::toKeywordCompletion)
+        .collect(toList());
   }
 
-  @Nullable
-  @Override
-  public String tryResolve(@NonNull String label) {
-    return keywords.getInformationFor(label);
-  }
-
-  @NonNull
-  @Override
-  public String getSortOrderPrefix() {
-    return KEYWORDS.prefix;
-  }
-
-  @NonNull
-  @Override
-  public CompletionItemKind getKind() {
-    return CompletionItemKind.Keyword;
+  private CompletionItem toKeywordCompletion(String name) {
+    CompletionItem item = new CompletionItem(name);
+    item.setLabel(name);
+    item.setInsertText(name);
+    item.setDocumentation(DocumentationUtils.wrapWithMarkup(keywords.getInformationFor(name)));
+    item.setSortText(KEYWORDS.prefix + name);
+    item.setKind(Keyword);
+    return item;
   }
 }

@@ -24,7 +24,7 @@ import {CopybooksCodeActionProvider} from "./services/copybook/CopybooksCodeActi
 import {CopybooksPathGenerator} from "./services/copybook/CopybooksPathGenerator";
 
 import {CopybookURI} from "./services/copybook/CopybookURI";
-import {AnalysisResult, LanguageClientService} from "./services/LanguageClientService";
+import {LanguageClientService} from "./services/LanguageClientService";
 import {Middleware} from "./services/Middleware";
 import {PathsService} from "./services/PathsService";
 import {ProfileService} from "./services/ProfileService";
@@ -32,6 +32,7 @@ import {TelemetryService} from "./services/reporter/TelemetryService";
 import {createFileWithGivenPath} from "./services/Settings";
 import {ZoweApi} from "./services/ZoweApi";
 import {resolveSubroutineURI} from "./services/util/SubroutineUtils";
+import {initSmartTab} from "./commands/SmartTabCommand";
 
 let zoweApi: ZoweApi;
 let profileService: ProfileService;
@@ -88,6 +89,8 @@ export async function activate(context: vscode.ExtensionContext) {
         gotoCopybookSettings();
     }));
 
+    initSmartTab(context);
+
     // Custom client handlers
     languageClientService.addRequestHandler("cobol/resolveSubroutine", resolveSubroutineURI);
 
@@ -105,8 +108,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // 'export' public api-surface
     return {
-        analysis(uri: string): Promise<AnalysisResult> {
-            return languageClientService.retrieveAnalysis(uri);
+        analysis(uri: string, text: string): Promise<any> {
+            return languageClientService.retrieveAnalysis(uri, text);
         }
     };
 }

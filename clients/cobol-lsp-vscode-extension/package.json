@@ -4,11 +4,11 @@
     "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
     "author": "Broadcom",
     "license": "EPL-2.0",
-    "version": "0.17.1",
+    "version": "0.19.0",
     "preview": false,
     "publisher": "BroadcomMFD",
     "engines": {
-        "vscode": "^1.30.0"
+        "vscode": "^1.56.0"
     },
     "repository": {
         "type": "git",
@@ -158,6 +158,19 @@
                         "ALL level is used to turn on all logging"
                     ],
                     "description": "The logging level for COBOL LS backend"
+                },
+                "cobol-lsp.target-sql-backend": {
+                    "type": "string",
+                    "default": "DB2_SERVER",
+                    "enum": [
+                        "DB2_SERVER",
+                        "DATACOM_SERVER"
+                    ],
+                    "enumDescriptions": [
+                        "DB2_SERVER  - IBM DB2 SQL Server",
+                        "DATACOM_SERVER - CA DATACOM Server"
+                    ],
+                    "description": "The target SQL backend server which will be used in mainframe"
                 }
             }
         },
@@ -171,30 +184,51 @@
                     80
                 ]
             }
-        }
+        },
+        "keybindings": [
+            {
+                "key": "tab",
+                "command": "cobol-lsp.smart-tab",
+                "when": "editorLangId == cobol && !inSnippetMode"
+            },
+            {
+                "key": "tab",
+                "command": "cobol-lsp.smart-tab",
+                "when": "editorLangId == COBOL && !inSnippetMode"
+            },
+            {
+                "key": "shift+tab",
+                "command": "cobol-lsp.smart-outdent",
+                "when": "editorLangId == cobol || && !inSnippetMode"
+            },
+            {
+                "key": "shift+tab",
+                "command": "cobol-lsp.smart-outdent",
+                "when": "editorLangId == COBOL && !inSnippetMode"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "jest -w 1 --unhandled-rejections=strict",
         "coverage": "jest --coverage --runInBand"
     },
     "dependencies": {
-        "@zowe/imperative": "4.7.4",
-        "vscode-languageclient": "5.2.1",
-        "vscode-extension-telemetry": "0.1.6"
+        "@zowe/imperative": "4.13.1",
+        "vscode-extension-telemetry": "0.1.6",
+        "vscode-languageclient": "5.2.1"
     },
     "devDependencies": {
-        "@types/jest": "^24.0.18",
+        "@types/jest": "^26.0.0",
         "@types/node": "^12.6.2",
-        "jest": "^24.9.0",
+        "@types/vscode": "^1.56.0",
+        "jest": "^27.0.0",
         "jest-sonar-reporter": "^2.0.0",
-        "ts-jest": "^24.0.2",
+        "ts-jest": "^27.0.0",
         "tslint": "^5.18.0",
         "tslint-sonarts": "^1.9.0",
-        "typescript": "^3.5.3",
-        "vscode": "^1.1.33"
+        "typescript": "^3.5.3"
     }
 }

@@ -30,11 +30,11 @@ public abstract class AbstractCobolLinePreprocessorTest {
 
   protected ResultWithErrors<List<CobolLine>> processText(String text) {
     MessageService mockMessageService = mock(MessageService.class);
-    CobolLineReader reader = new CobolLineReaderImpl(line -> line, mockMessageService);
+    CobolLineReader reader = new CobolLineReaderImpl(mockMessageService);
     when(mockMessageService.getMessage(matches("CobolLineReaderImpl.incorrectLineFormat")))
         .thenReturn("Unexpected indicator area content");
     when(mockMessageService.getMessage(matches("CobolLineReaderImpl.longLineMsg")))
-            .thenReturn("Source text cannot go past column 80");
+        .thenReturn("Source text cannot go past column 80");
     return reader.processLines("", text);
   }
 

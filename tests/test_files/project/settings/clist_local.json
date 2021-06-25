@@ -1,0 +1,4 @@
+{
+    "cobol-lsp.cpy-manager.profiles": "local",
+    "cobol-lsp.cpy-manager.paths-dsn": ["CLIST"]
+}

@@ -14,40 +14,39 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.google.inject.Singleton;
-import org.eclipse.lsp4j.CompletionItemKind;
-
 import lombok.NonNull;
-import java.util.Collection;
-import java.util.Collections;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp4j.CompletionItem;
 
-import static java.util.Optional.ofNullable;
+import javax.annotation.Nullable;
+import java.util.Collection;
+
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.CONSTANTS;
 import static org.eclipse.lsp4j.CompletionItemKind.Constant;
 
 /** This class resolves the predefined variables' completion requests */
 @Singleton
 public class ConstantCompletion implements Completion {
 
-  @NonNull
   @Override
-  public Collection<String> getCompletionSource(CobolDocumentModel document) {
-    return ofNullable(document)
-        .map(CobolDocumentModel::getAnalysisResult)
-        .map(AnalysisResult::getConstants)
-        .orElse(Collections.emptySet());
+  public @NonNull Collection<CompletionItem> getCompletionItems(
+      @NonNull String token, @Nullable CobolDocumentModel document) {
+    if (document == null) return emptyList();
+    return document.getAnalysisResult().getConstants().stream()
+        .filter(DocumentationUtils.startsWithIgnoreCase(token))
+        .map(this::toConstantCompletion)
+        .collect(toList());
   }
 
-  @NonNull
-  @Override
-  public String getSortOrderPrefix() {
-    return CompletionOrder.CONSTANTS.prefix;
-  }
-
-  @NonNull
-  @Override
-  public CompletionItemKind getKind() {
-    return Constant;
+  private CompletionItem toConstantCompletion(String name) {
+    CompletionItem item = new CompletionItem(name);
+    item.setLabel(name);
+    item.setInsertText(name);
+    item.setSortText(CONSTANTS.prefix + name);
+    item.setKind(Constant);
+    return item;
   }
 }

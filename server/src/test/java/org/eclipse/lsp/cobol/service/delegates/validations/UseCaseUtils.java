@@ -38,12 +38,15 @@ import static java.util.stream.Collectors.toList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.*;
+import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 
 /** This utility class provides methods to run use cases with COBOL code examples. */
 @UtilityClass
 public class UseCaseUtils {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
   public static final String DOCUMENT_2_URI = "file:///c%3A/workspace/document2.cbl";
+  public static final String DOCUMENT_3_URI = "implicit:///implicitCopybooks/SQLCA_DB2.cpy";
 
   private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.c4z/.copybooks/";
   private static final String CPY_URI_SUFFIX = ".cpy";
@@ -100,7 +103,8 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(String fileName, String text, List<CobolText> copybooks) {
-    return analyze(fileName, text, copybooks, ImmutableList.of(), CopybookProcessingMode.ENABLED);
+    return analyze(
+        fileName, text, copybooks, ImmutableList.of(), new CopybookConfig(ENABLED, DB2_SERVER));
   }
 
   /**
@@ -115,7 +119,8 @@ public class UseCaseUtils {
    */
   public static AnalysisResult analyze(
       String fileName, String text, List<CobolText> copybooks, List<String> subroutineNames) {
-    return analyze(fileName, text, copybooks, subroutineNames, CopybookProcessingMode.ENABLED);
+    return analyze(
+        fileName, text, copybooks, subroutineNames, new CopybookConfig(ENABLED, DB2_SERVER));
   }
 
   /**
@@ -126,7 +131,7 @@ public class UseCaseUtils {
    * @param text - text to analyze
    * @param copybooks - list of copybooks required for the analysis
    * @param subroutineNames - list of available subroutine names
-   * @param copybookProcessingMode - sync type for the analysis
+   * @param copybookConfig - contains config info like: copybook processing mode, backend server
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(
@@ -134,7 +139,7 @@ public class UseCaseUtils {
       String text,
       List<CobolText> copybooks,
       List<String> subroutineNames,
-      CopybookProcessingMode copybookProcessingMode) {
+      CopybookConfig copybookConfig) {
     SettingsService mockSettingsService = mock(SettingsService.class);
     when(mockSettingsService.getConfiguration(any()))
         .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
@@ -165,7 +170,7 @@ public class UseCaseUtils {
 
     return injector
         .getInstance(CobolLanguageEngineFacade.class)
-        .analyze(fileName, text, copybookProcessingMode);
+        .analyze(fileName, text, copybookConfig);
   }
 
   /**

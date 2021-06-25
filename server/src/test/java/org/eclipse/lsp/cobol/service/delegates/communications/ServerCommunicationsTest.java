@@ -15,13 +15,13 @@
 
 package org.eclipse.lsp.cobol.service.delegates.communications;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Provider;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Provider;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,6 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
-import static org.eclipse.lsp4j.MessageType.Error;
 import static org.eclipse.lsp4j.MessageType.Info;
 import static org.mockito.Mockito.*;
 
@@ -89,6 +88,7 @@ class ServerCommunicationsTest {
   void testNotifyThatLoadingInProgress() {
     String data = UUID.randomUUID().toString();
     when(files.decodeURI(data)).thenReturn(data);
+    when(files.getNameFromURI(data)).thenReturn(data);
     when(customExecutor.getScheduledThreadPoolExecutor())
         .thenReturn(Executors.newScheduledThreadPool(5));
 
@@ -112,6 +112,7 @@ class ServerCommunicationsTest {
   void testNotifyThatDocumentAnalysed() {
     String data = UUID.randomUUID().toString();
     when(files.decodeURI(data)).thenReturn(data);
+    when(files.getNameFromURI(data)).thenReturn(data);
     when(messageService.getMessage(anyString(), anyString()))
         .thenReturn("No syntax errors detected in %s");
     communications.notifyThatDocumentAnalysed(data);
@@ -120,23 +121,6 @@ class ServerCommunicationsTest {
             eq(
                 new MessageParams(
                     Info, messageService.getMessage("Communications.noSyntaxError", data))));
-  }
-
-  /**
-   * Method {@link ServerCommunications#notifyThatExtensionIsUnsupported(String)} should
-   * asynchronously call logging on the client for a specific message with an extension
-   */
-  @Test
-  void testNotifyThatExtensionIsUnsupported() {
-    String data = UUID.randomUUID().toString();
-    when(messageService.getMessage(anyString(), anyString()))
-        .thenReturn("The given document extension is unsupported: %s");
-    communications.notifyThatExtensionIsUnsupported(data);
-    verify(client, timeout(TEST_TIMEOUT))
-        .logMessage(
-            eq(
-                new MessageParams(
-                    Error, messageService.getMessage("Communications.extUnsupported", data))));
   }
 
   /**
@@ -178,6 +162,7 @@ class ServerCommunicationsTest {
     client = mock(CobolLanguageClient.class);
     when(provider.get()).thenReturn(client);
     when(files.decodeURI(uri)).thenReturn(uri);
+    when(files.getNameFromURI(uri)).thenReturn(fileName);
     when(messageService.getMessage(anyString(), anyString()))
         .thenReturn("No syntax errors detected in %s");
     communications.notifyThatDocumentAnalysed(uri);

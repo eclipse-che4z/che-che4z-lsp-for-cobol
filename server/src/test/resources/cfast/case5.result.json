@@ -1,0 +1,100 @@
+[
+  {
+    "name": "SECTST",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 15,
+        "character": 8
+      },
+      "end": {
+        "line": 24,
+        "character": 29
+      }
+    },
+    "type": "program",
+    "children": [
+      {
+        "targetName": [
+          "PARAG1"
+        ],
+        "type": "goto"
+      },
+      {
+        "name": "SECT1",
+        "snippet": "SECT1 SECTION.\r\n       PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n           PERFORM PARAG2 OF SECT2.\r\n       ",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 18,
+            "character": 8
+          },
+          "end": {
+            "line": 21,
+            "character": 45
+          }
+        },
+        "type": "section",
+        "children": [
+          {
+            "snippet": "PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n           PERFORM PARAG2 OF SECT2.\r\n       ",
+            "name": "PARAG1",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 19,
+                "character": 8
+              },
+              "end": {
+                "line": 21,
+                "character": 45
+              }
+            },
+            "type": "paragraph",
+            "children": [
+              {
+                "targetName": "PARAG2",
+                "targetSectionName": "SECT2",
+                "type": "perform"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "SECT2",
+        "snippet": "SECT2 SECTION.\r\n       PARAG2.\r\n           DISPLAY 'PARAG2'.",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 22,
+            "character": 8
+          },
+          "end": {
+            "line": 24,
+            "character": 29
+          }
+        },
+        "type": "section",
+        "children": [
+          {
+            "snippet": "PARAG2.\r\n           DISPLAY 'PARAG2'.",
+            "name": "PARAG2",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 23,
+                "character": 8
+              },
+              "end": {
+                "line": 24,
+                "character": 29
+              }
+            },
+            "type": "paragraph"
+          }
+        ]
+      }
+    ]
+  }
+]

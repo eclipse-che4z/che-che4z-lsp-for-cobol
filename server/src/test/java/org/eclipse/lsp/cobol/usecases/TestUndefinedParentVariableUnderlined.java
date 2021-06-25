@@ -15,16 +15,19 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.DISABLED;
+import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
+import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /**
@@ -45,19 +48,23 @@ class TestUndefinedParentVariableUnderlined {
           + "9           MOVE 10 TO {MAMA|1} OF AGE OF BORROWE.\r\n"
           + "10      END PROGRAM TEST1.";
 
-  private static final String MESSAGE = "Invalid definition for: MAMA";
+  private static final String MESSAGE = "Variable MAMA is not defined";
 
   @Test
   void assertCopybookProcessingModeNotChangesLogic() {
     Assertions.assertEquals(
         UseCaseUtils.analyze(
-            UseCaseUtils.DOCUMENT_URI, TEXT, ImmutableList.of(), ImmutableList.of(), CopybookProcessingMode.ENABLED),
+            UseCaseUtils.DOCUMENT_URI,
+            TEXT,
+            ImmutableList.of(),
+            ImmutableList.of(),
+            new CopybookConfig(ENABLED, DB2_SERVER)),
         UseCaseUtils.analyze(
             UseCaseUtils.DOCUMENT_URI,
             TEXT,
             ImmutableList.of(),
             ImmutableList.of(),
-            CopybookProcessingMode.DISABLED));
+            new CopybookConfig(DISABLED, DB2_SERVER)));
   }
 
   @Test
@@ -65,6 +72,7 @@ class TestUndefinedParentVariableUnderlined {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(),
-        ImmutableMap.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
+        ImmutableMap.of(
+            "1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

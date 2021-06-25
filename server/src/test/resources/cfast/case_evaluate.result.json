@@ -1,0 +1,55 @@
+[
+  {
+    "name": "EVAL",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 18,
+        "character": 8
+      },
+      "end": {
+        "line": 26,
+        "character": 21
+      }
+    },
+    "type": "program",
+    "children": [
+      {
+        "type": "evaluate"
+      },
+      {
+        "type": "when"
+      },
+      {
+        "targetName": ["PAR1"],
+        "type": "goto"
+      },
+      {
+        "type": "when"
+      },
+      {
+        "targetName": ["PAR1"],
+        "type": "goto"
+      },
+      {
+        "type": "endevaluate"
+      },
+      {
+        "snippet": "PAR1.\r\n           CONTINUE.",
+        "name": "PAR1",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 25,
+            "character": 8
+          },
+          "end": {
+            "line": 26,
+            "character": 21
+          }
+        },
+        "type": "paragraph"
+      }
+    ]
+  }
+]

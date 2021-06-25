@@ -17,22 +17,19 @@ package org.eclipse.lsp.cobol.service.utils;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
-import static java.lang.System.lineSeparator;
 
 /**
  * This service implements API for low-level file systems access. It mainly oriented to work with
@@ -53,28 +50,33 @@ public class WorkspaceFileService implements FileSystemService {
       return URLDecoder.decode(uri, StandardCharsets.UTF_8.toString());
     } catch (UnsupportedEncodingException e) {
       LOG.error("Can't decode URI", e);
-      throw new RuntimeException("UTF-8 charset is unsupported", e);
+      throw new IllegalArgumentException("UTF-8 charset is unsupported", e);
     }
   }
 
   @Nullable
   @Override
   public String getNameFromURI(@NonNull String uri) {
-    try {
-      return FilenameUtils.getBaseName(Paths.get(new URI(uri)).getFileName().toString());
-    } catch (URISyntaxException e) {
-      LOG.error("Cannot get file name from: " + uri, e);
-      return null;
-    }
+    return new File(uri).getName().replaceFirst("\\?.*$", "");
   }
 
   @Nullable
   @Override
   public String getContentByPath(@NonNull Path path) {
-    try (Stream<String> stream = Files.lines(path)) {
-      return stream.reduce((s1, s2) -> s1 + lineSeparator() + s2).orElse("");
+    CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
+    decoder.onMalformedInput(CodingErrorAction.REPLACE);
+    try (FileInputStream input = new FileInputStream(path.toFile());
+        InputStreamReader reader = new InputStreamReader(input, decoder);
+        BufferedReader bufferedReader = new BufferedReader(reader)) {
+      StringBuilder sb = new StringBuilder();
+      String line = bufferedReader.readLine();
+      while (line != null) {
+        sb.append(line).append("\n");
+        line = bufferedReader.readLine();
+      }
+      return sb.toString();
     } catch (IOException e) {
-      LOG.error("Cannot get content of: " + path.toString(), e);
+      LOG.error("Cannot get content of: {}", path, e);
       return null;
     }
   }
@@ -85,7 +87,7 @@ public class WorkspaceFileService implements FileSystemService {
     try {
       return Paths.get(new URI(uri).normalize());
     } catch (URISyntaxException e) {
-      LOG.error("Cannot find file by given URI: " + uri, e);
+      LOG.error("Cannot find file by given URI: {}", uri, e);
       return null;
     }
   }
@@ -100,5 +102,18 @@ public class WorkspaceFileService implements FileSystemService {
   public static boolean isFileUnderExtendedSourceFolder(String uri) {
     // the regex will match resources in the format [file://<FOLDER>/.c4z/.extsrcs/<DOCUMENT>]
     return Pattern.matches("file://.*?\\.c4z/\\.extsrcs/.+", uri);
+  }
+
+  @Override
+  @NonNull
+  public String readFromInputStream(InputStream inputStream, Charset charset) throws IOException {
+    StringBuilder resultStringBuilder = new StringBuilder();
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, charset))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        resultStringBuilder.append(line).append("\n");
+      }
+    }
+    return resultStringBuilder.toString();
   }
 }

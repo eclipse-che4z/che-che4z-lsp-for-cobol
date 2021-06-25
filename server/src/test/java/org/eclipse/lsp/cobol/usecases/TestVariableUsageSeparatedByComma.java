@@ -34,7 +34,7 @@ class TestVariableUsageSeparatedByComma {
           + "        01 {$*VAR-TEST4} PIC 9.\n"
           + "       PROCEDURE DIVISION.\n"
           + "            CALL {%\"smth\"} USING {$VAR-TEST1},{$VAR-TEST2} BY VALUE {$VAR-TEST3}, \n"
-          + "            BY CONTENT {$VAR-TEST4} BY CONTENT ADDRESS OF TRUE.\n"
+          + "            BY CONTENT {$VAR-TEST4} BY CONTENT ADDRESS OF {$VAR-TEST4},TRUE.\n"
           + "       END PROGRAM programID.\n";
 
   @Test

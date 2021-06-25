@@ -15,10 +15,10 @@
 package org.eclipse.lsp.cobol.core.model;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.antlr.v4.runtime.Token;
-
-import java.util.List;
+import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
 
 /**
  * This value class represents a syntax or semantic error found during the analysis. The finalized
@@ -26,30 +26,15 @@ import java.util.List;
  * after the {@link org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine} finishes analysis, then
  * this error is invalid.
  */
+// Please, don't use static imports for this method:
+// https://github.com/rzwitserloot/lombok/issues/2044
+@Builder(builderMethodName = "syntaxError", toBuilder = true)
 @Value
 public class SyntaxError {
   Locality locality;
-  List<String> ruleStack;
-  Token offendedToken;
+  MessageTemplate messageTemplate;
+  @EqualsAndHashCode.Exclude Token offendedToken;
   String suggestion;
   ErrorSeverity severity;
   ErrorCode errorCode;
-
-  // Please, don't use static imports for this method:
-  // https://github.com/rzwitserloot/lombok/issues/2044
-  @Builder(builderMethodName = "syntaxError", toBuilder = true)
-  public SyntaxError(
-      Locality locality,
-      List<String> ruleStack,
-      Token offendedToken,
-      String suggestion,
-      ErrorSeverity severity,
-      ErrorCode errorCode) {
-    this.locality = locality;
-    this.ruleStack = ruleStack;
-    this.offendedToken = offendedToken;
-    this.suggestion = suggestion;
-    this.severity = severity;
-    this.errorCode = errorCode;
-  }
 }

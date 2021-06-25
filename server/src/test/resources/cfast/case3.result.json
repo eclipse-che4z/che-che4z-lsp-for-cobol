@@ -1,0 +1,51 @@
+[
+  {
+    "name": "CASE3",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 15,
+        "character": 8
+      },
+      "end": {
+        "line": 20,
+        "character": 29
+      }
+    },
+    "type": "program",
+    "children": [
+      {
+        "snippet": "PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n       ",
+        "name": "PARAG1",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 17,
+            "character": 8
+          },
+          "end": {
+            "line": 18,
+            "character": 38
+          }
+        },
+        "type": "paragraph"
+      },
+      {
+        "snippet": "PARAG2.\r\n           DISPLAY 'PARAG2'.",
+        "name": "PARAG2",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 19,
+            "character": 8
+          },
+          "end": {
+            "line": 20,
+            "character": 29
+          }
+        },
+        "type": "paragraph"
+      }
+    ]
+  }
+]

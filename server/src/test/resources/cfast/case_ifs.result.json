@@ -1,0 +1,80 @@
+[
+  {
+    "name": "CONDS",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 23,
+        "character": 8
+      },
+      "end": {
+        "line": 40,
+        "character": 21
+      }
+    },
+    "type": "program",
+    "children": [
+      {
+        "snippet": "A000-PARA.\r\n           MOVE 25 TO WS-NUM1 WS-NUM3.\r\n           MOVE 15 TO WS-NUM2 WS-NUM4.\r\n       \r\n           IF WS-NUM1 > WS-NUM2 THEN\r\n               DISPLAY 'IN LOOP 1 - IF BLOCK'\r\n       \r\n               IF WS-NUM3 = WS-NUM4 THEN\r\n                   DISPLAY 'IN LOOP 2 - IF BLOCK'\r\n               ELSE",
+        "name": "A000-PARA",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 24,
+            "character": 8
+          },
+          "end": {
+            "line": 38,
+            "character": 28
+          }
+        },
+        "type": "paragraph",
+        "children": [
+          {
+            "type": "if"
+          },
+          {
+            "type": "if"
+          },
+          {
+            "type": "else"
+          },
+          {
+            "type": "endif"
+          },
+          {
+            "type": "else"
+          },
+          {
+            "targetName": ["A001-PARA"],
+            "type": "goto"
+          },
+          {
+            "type": "endif"
+          }
+        ]
+      },
+      {
+        "snippet": "A001-PARA.\r\n           STOP RUN.",
+        "name": "A001-PARA",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 39,
+            "character": 8
+          },
+          "end": {
+            "line": 40,
+            "character": 21
+          }
+        },
+        "type": "paragraph",
+        "children": [
+          {
+            "type": "stop"
+          }
+        ]
+      }
+    ]
+  }
+]

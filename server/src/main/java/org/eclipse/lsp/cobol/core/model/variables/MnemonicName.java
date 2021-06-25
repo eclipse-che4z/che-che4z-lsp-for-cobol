@@ -15,13 +15,15 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import org.eclipse.lsp.cobol.core.model.Locality;
 import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.model.Locality;
 
 import java.util.List;
+
+import static org.eclipse.lsp.cobol.core.model.variables.StructureType.MNEMONIC_NAME;
 
 /**
  * This value class represents a special name. They may substitute environment names in the
@@ -32,9 +34,10 @@ import java.util.List;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class MnemonicName extends AbstractVariable {
-  private String systemName;
+  String systemName;
+
   public MnemonicName(String systemName, String name, Locality definition) {
-    super(-1, name, definition, null);
+    super(DEFAULT_LEVEL, name, definition, false, null);
     this.systemName = systemName;
   }
 
@@ -51,6 +54,11 @@ public class MnemonicName extends AbstractVariable {
   @Override
   public List<ConditionDataName> getConditionNames() {
     return ImmutableList.of();
+  }
+
+  @Override
+  public StructureType getStructureType() {
+    return MNEMONIC_NAME;
   }
 
   @Override

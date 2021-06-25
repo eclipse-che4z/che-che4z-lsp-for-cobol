@@ -14,62 +14,61 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import lombok.NonNull;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.InsertTextFormat;
+import org.eclipse.lsp4j.MarkupContent;
 
-import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Optional;
 
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.SNIPPETS;
 
-/** implementation for adding snippets in the autocomplete list */
+/**
+ * This completion provider resolves static server-side snippets, and their human-readable
+ * representation as documentation
+ */
 @Singleton
 public class SnippetCompletion implements Completion {
-  private CompletionStorage snippets;
+  private final CompletionStorage snippets;
 
   @Inject
   SnippetCompletion(@Named("Snippets") CompletionStorage snippets) {
     this.snippets = snippets;
   }
 
-  @NonNull
   @Override
-  public Collection<String> getCompletionSource(CobolDocumentModel document) {
-    return snippets.getLabels();
+  public @NonNull Collection<CompletionItem> getCompletionItems(
+      @NonNull String token, @Nullable CobolDocumentModel document) {
+    return snippets.getLabels().stream()
+        .filter(DocumentationUtils.startsWithIgnoreCase(token))
+        .map(this::toSnippetCompletions)
+        .collect(toList());
   }
 
-  @Nullable
-  @Override
-  public String tryResolve(@NonNull String label) {
-    return Optional.ofNullable(snippets.getInformationFor(label))
-        .map(string -> string.replaceAll("[${\\d:}]", ""))
-        .orElse(null);
-  }
-
-  @NonNull
-  @Override
-  public String getSortOrderPrefix() {
-    return SNIPPETS.prefix;
-  }
-
-  @NonNull
-  @Override
-  public CompletionItem customize(@NonNull CompletionItem item) {
+  private CompletionItem toSnippetCompletions(String name) {
+    CompletionItem item = new CompletionItem(name);
+    item.setLabel(name);
     item.setInsertText(snippets.getInformationFor(item.getLabel()));
+    item.setDocumentation(retrieveDocumentation(name));
     item.setInsertTextFormat(InsertTextFormat.Snippet);
+    item.setSortText(SNIPPETS.prefix + name);
+    item.setKind(CompletionItemKind.Snippet);
     return item;
   }
 
   @NonNull
-  @Override
-  public CompletionItemKind getKind() {
-    return CompletionItemKind.Snippet;
+  private MarkupContent retrieveDocumentation(String label) {
+    return DocumentationUtils.wrapWithMarkup(
+        Optional.ofNullable(snippets.getInformationFor(label))
+            .map(string -> string.replaceAll("[${\\d:}]", ""))
+            .orElse(""));
   }
 }

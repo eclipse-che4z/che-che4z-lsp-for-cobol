@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /** This class provides keywords that are used for suggestions during the syntax check. */
 @Slf4j
@@ -35,7 +36,7 @@ class KeywordSuggestions {
         KeywordSuggestions.class.getResourceAsStream(
             "/org/eclipse/lsp/cobol/service/delegates/completions/LanguageKeywords.txt")) {
       props.load(keywords);
-      suggestions = props.stringPropertyNames();
+      suggestions = props.stringPropertyNames().stream().map(String::toUpperCase).collect(Collectors.toSet());
     } catch (IOException e) {
       LOG.error("Cannot load list of the suggested keywords", e);
     }

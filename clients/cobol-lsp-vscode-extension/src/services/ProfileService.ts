@@ -99,7 +99,7 @@ export class ProfileService implements Disposable {
             if (!ProfileService.isCobolProgram(docPath)) {
                 continue;
             }
-            const openName = path.basename(docPath, path.extname(docPath));
+            const openName = path.basename(docPath);
             if (programName === openName) {
                 const profile = await this.tryGetProfileFromDocumentPath(docPath);
                 if (profile) {

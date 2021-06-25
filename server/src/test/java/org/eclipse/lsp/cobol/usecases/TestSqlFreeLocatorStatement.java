@@ -28,9 +28,13 @@ class TestSqlFreeLocatorStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n"
-          + "         FREE LOCATOR :LOCRES, :LOCHIST, :LOCPIC \n"
-          + "       END-EXEC.\n";
+          + "       01 {$*LOCRES}  PIC X  VALUE 'A1'.\n"
+          + "       01 {$*LOCHIST}  PIC X  VALUE 'A1'.\n"
+          + "       01 {$*LOCPIC}  PIC X  VALUE 'A1'.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "             FREE LOCATOR :{$LOCRES}, :{$LOCHIST}, :{$LOCPIC} \n"
+          + "           END-EXEC.\n";
 
   @Test
   void test() {

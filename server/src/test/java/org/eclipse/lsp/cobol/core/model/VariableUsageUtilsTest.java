@@ -100,7 +100,7 @@ class VariableUsageUtilsTest {
   private static Function<Variable, List<Variable>> var(String name, Function<Variable, List<Variable>>... factories) {
     return (Variable parent) -> {
       List<Variable> result = new ArrayList<>();
-      Variable it = new ElementItem(1, name, Locality.builder().build(), parent, "", "", null);
+      Variable it = new ElementItem(1, name, Locality.builder().build(), false, parent, "", "", null);
       result.add(it);
       for (Function<Variable, List<Variable>> factory: factories)
         result.addAll(factory.apply(it));

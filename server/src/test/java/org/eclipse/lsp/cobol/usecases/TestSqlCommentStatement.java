@@ -32,37 +32,38 @@ class TestSqlCommentStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n";
 
   private static final String COMMENT1 =
       TEXT
-          + "         COMMENT ON TABLE DSN8C10.EMP\n"
-          + "          IS 'REFLECTS 1ST QTR 81 REORG';\n"
-          + "       END-EXEC.";
+          + "             COMMENT ON TABLE DSN8C10.EMP\n"
+          + "              IS 'REFLECTS 1ST QTR 81 REORG';\n"
+          + "           END-EXEC.";
 
   private static final String COMMENT2 =
       TEXT
-          + "         COMMENT ON COLUMN DSN8C10.DEPT.DEPTNO\n"
-          + "         IS 'DEPARTMENT ID - UNIQUE';\n"
-          + "       END-EXEC.";
+          + "             COMMENT ON COLUMN DSN8C10.DEPT.DEPTNO\n"
+          + "             IS 'DEPARTMENT ID - UNIQUE';\n"
+          + "           END-EXEC.";
 
   private static final String COMMENT3 =
       TEXT
-          + "         COMMENT ON FUNCTION CHEM.ATOMIC_WEIGHT\n"
-          + "         IS 'TAKES ATOMIC NUMBER AND GIVES ATOMIC WEIGHT';\n"
-          + "       END-EXEC.";
+          + "             COMMENT ON FUNCTION CHEM.ATOMIC_WEIGHT\n"
+          + "             IS 'TAKES ATOMIC NUMBER AND GIVES ATOMIC WEIGHT';\n"
+          + "           END-EXEC.";
 
   private static final String COMMENT4 =
       TEXT
-          + "         COMMENT ON PROCEDURE BIOLOGY.OSMOSIS\n"
-          + "         IS 'CALCULATIONS THAT MODEL OSMOSIS'\n"
-          + "       END-EXEC.";
+          + "             COMMENT ON PROCEDURE BIOLOGY.OSMOSIS\n"
+          + "             IS 'CALCULATIONS THAT MODEL OSMOSIS'\n"
+          + "           END-EXEC.";
 
   private static final String COMMENT5 =
       TEXT
-          + "       COMMENT ON ROLE ROLE1 \n"
-          + "       IS 'Role defined for trusted context, ctx1';\n"
-          + "       END-EXEC.";
+          + "           COMMENT ON ROLE ROLE1 \n"
+          + "           IS 'Role defined for trusted context, ctx1';\n"
+          + "           END-EXEC.";
 
   private static Stream<String> textsToTest() {
     return Stream.of(COMMENT1, COMMENT2, COMMENT3, COMMENT4, COMMENT5);

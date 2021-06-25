@@ -15,11 +15,11 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
@@ -54,18 +54,48 @@ class TestErrorsInDifferentFiles {
         TEXT,
         ImmutableList.of(new CobolText(ASDASD_NAME, ASDASD)),
         new ImmutableMap.Builder<String, Diagnostic>()
-            .put("invalid", new Diagnostic(
-                null, "Invalid definition for: CHILD1", Error, SourceInfoLevels.ERROR.getText()))
-            .put("pic", new Diagnostic(
-                null, "Syntax error on 'PIC' expected SECTION", Error, SourceInfoLevels.ERROR.getText()))
-            .put("child1", new Diagnostic(
-                null, "Syntax error on 'CHILD1' expected SECTION", Error, SourceInfoLevels.ERROR.getText()))
-            .put("is", new Diagnostic(
-                null, "Syntax error on 'IS' expected SECTION", Error, SourceInfoLevels.ERROR.getText()))
-            .put("areaA1", new Diagnostic(
-                null, "The following token must start in Area A: 03", Warning, SourceInfoLevels.WARNING.getText()))
-            .put("areaA2", new Diagnostic(
-                null, "The following token must start in Area A: CHILD1", Warning, SourceInfoLevels.WARNING.getText()))
+            .put(
+                "invalid",
+                new Diagnostic(
+                    null,
+                    "Variable CHILD1 is not defined",
+                    Error,
+                    SourceInfoLevels.ERROR.getText()))
+            .put(
+                "pic",
+                new Diagnostic(
+                    null,
+                    "Syntax error on 'PIC' expected SECTION",
+                    Error,
+                    SourceInfoLevels.ERROR.getText()))
+            .put(
+                "child1",
+                new Diagnostic(
+                    null,
+                    "Syntax error on 'CHILD1' expected SECTION",
+                    Error,
+                    SourceInfoLevels.ERROR.getText()))
+            .put(
+                "is",
+                new Diagnostic(
+                    null,
+                    "Syntax error on 'IS' expected SECTION",
+                    Error,
+                    SourceInfoLevels.ERROR.getText()))
+            .put(
+                "areaA1",
+                new Diagnostic(
+                    null,
+                    "The following token must start in Area A: 03",
+                    Warning,
+                    SourceInfoLevels.WARNING.getText()))
+            .put(
+                "areaA2",
+                new Diagnostic(
+                    null,
+                    "The following token must start in Area A: CHILD1",
+                    Warning,
+                    SourceInfoLevels.WARNING.getText()))
             .build());
   }
 }

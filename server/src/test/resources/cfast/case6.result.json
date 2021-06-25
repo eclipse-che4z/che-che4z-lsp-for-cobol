@@ -1,0 +1,22 @@
+[
+  {
+    "name": "STPRG",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 15,
+        "character": 8
+      },
+      "end": {
+        "line": 16,
+        "character": 21
+      }
+    },
+    "type": "program",
+    "children": [
+      {
+        "type": "stop"
+      }
+    ]
+  }
+]

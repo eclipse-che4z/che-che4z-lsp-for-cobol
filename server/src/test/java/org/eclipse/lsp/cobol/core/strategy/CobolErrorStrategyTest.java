@@ -14,14 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.strategy;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.MissingResourceException;
 
 import static org.mockito.Mockito.*;
 
@@ -43,7 +42,7 @@ class CobolErrorStrategyTest {
     CobolErrorStrategy strategy = new CobolErrorStrategy(messageService);
     when(messageService.getMessage(
             matches("ErrorStrategy.rulereportNoViableAlternative"), anyString()))
-        .thenThrow(MissingResourceException.class);
+        .thenReturn("ErrorStrategy.rulereportNoViableAlternative");
     when(messageService.getMessage(matches("ErrorStrategy.reportNoViableAlternative"), anyString()))
         .thenReturn("No viable alternative at input text");
 
@@ -74,7 +73,7 @@ class CobolErrorStrategyTest {
     when(errorMock.getOffendingToken()).thenReturn(token);
     when(messageService.getMessage(
             matches("ErrorStrategy.rulereportInputMismatch"), anyString(), anyString()))
-        .thenThrow(MissingResourceException.class);
+        .thenReturn("ErrorStrategy.rulereportInputMismatch");
     when(messageService.getMessage(
             matches("ErrorStrategy.reportInputMismatch"), anyString(), anyString()))
         .thenReturn("Syntax error on '<0>' expected text");

@@ -14,25 +14,22 @@
  */
 package org.eclipse.lsp.cobol.core.visitor;
 
-import org.eclipse.lsp.cobol.core.messages.MessageService;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.Locality;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
-import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
+import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.variables.Variable;
 
 import java.util.*;
 
-import static org.eclipse.lsp.cobol.core.CobolParser.*;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.eclipse.lsp.cobol.core.CobolParser.*;
 
 /**
  * This class processes the variable usage contexts. It accumulates usages when they appear in the
@@ -40,7 +37,8 @@ import static java.util.stream.Collectors.toMap;
  */
 @Slf4j
 @RequiredArgsConstructor
-class VariableUsageDelegate {
+public class VariableUsageDelegate {
+
   private final List<VariableUsage> variableUsages = new ArrayList<>();
   private final Map<Token, Locality> positionMapping;
   private final MessageService messageService;
@@ -52,9 +50,11 @@ class VariableUsageDelegate {
    * @param locality the variable text position
    * @param ctx the ANTLR variable context
    */
-  void handleDataName(String dataName, Locality locality, QualifiedDataNameFormat1Context ctx) {
+  public void handleDataName(
+      String dataName, Locality locality, QualifiedDataNameFormat1Context ctx) {
     List<QualifiedInDataContext> hierarchy = ctx.qualifiedInData();
-    List<String> parents = createPatentsList(hierarchy.stream().map(this::getDataName2Context).collect(toList()));
+    List<String> parents =
+        createPatentsList(hierarchy.stream().map(this::getDataName2Context).collect(toList()));
     Map<String, Token> parentVariables = collectParentVariablesFromDataAndTable(hierarchy);
     variableUsages.add(new VariableUsage(dataName, parents, locality, parentVariables));
   }
@@ -66,8 +66,10 @@ class VariableUsageDelegate {
    * @param locality the variable text position
    * @param ctx the ANTLR variable context
    */
-  void handleConditionCall(String dataName, Locality locality, ConditionNameReferenceContext ctx) {
-    List<DataName2Context> hierarchy = ctx.inData().stream().map(InDataContext::dataName2).collect(toList());
+  public void handleConditionCall(
+      String dataName, Locality locality, ConditionNameReferenceContext ctx) {
+    List<DataNameContext> hierarchy =
+        ctx.inData().stream().map(InDataContext::dataName).collect(toList());
     List<String> parents = createPatentsList(hierarchy);
     Map<String, Token> parentVariables = collectParentVariablesFromInData(hierarchy);
     variableUsages.add(new VariableUsage(dataName, parents, locality, parentVariables));
@@ -78,9 +80,10 @@ class VariableUsageDelegate {
    *
    * @param dataName the variable name
    * @param locality the variable text position
+   * @param parents the list of variable parents
    */
-  void handleTableCall(String dataName, Locality locality) {
-    variableUsages.add(new VariableUsage(dataName, Collections.emptyList(), locality, Collections.emptyMap()));
+  public void handleGeneralCall(String dataName, Locality locality, List<String> parents) {
+    variableUsages.add(new VariableUsage(dataName, parents, locality, Collections.emptyMap()));
   }
 
   /**
@@ -89,28 +92,32 @@ class VariableUsageDelegate {
    * @param definedVariables the collection of COBOL variables
    * @return the list of usage errors
    */
-  List<SyntaxError> updateUsageAndGenerateErrors(Collection<Variable> definedVariables) {
-    Map<String, List<Variable>> convertedVariables = VariableUsageUtils.convertDefinedVariables(definedVariables);
+  public ResultWithErrors<Map<Locality, Variable>> updateUsageAndGenerateErrors(
+      Collection<Variable> definedVariables) {
+    Map<Locality, Variable> variablesByUsages = new HashMap<>();
+    Map<String, List<Variable>> convertedVariables =
+        VariableUsageUtils.convertDefinedVariables(definedVariables);
     List<SyntaxError> errors = new ArrayList<>();
     for (VariableUsage variableUsage : variableUsages) {
       List<Variable> foundVariables =
-          VariableUsageUtils.findVariables(convertedVariables, variableUsage.name, variableUsage.parents);
+          VariableUsageUtils.findVariables(
+              convertedVariables, variableUsage.name, variableUsage.parents);
       if (foundVariables.size() == 1) {
         Variable variable = foundVariables.get(0);
         variable.addUsage(variableUsage.locality);
+        variablesByUsages.put(variableUsage.locality, variable);
         addParentVariablesUsage(variableUsage.parentVariables, variable);
       } else {
-        errors.add(createInvalidDefinition(variableUsage.name, variableUsage.locality));
+        String message =
+            foundVariables.isEmpty() ? "semantics.notDefined" : "semantics.duplicated";
+        errors.add(createInvalidDefinition(variableUsage.name, variableUsage.locality, message));
       }
     }
-    return errors;
+    return new ResultWithErrors<>(variablesByUsages, errors);
   }
 
-  private List<String> createPatentsList(List<DataName2Context> hierarchy) {
-    return hierarchy.stream()
-            .map(RuleContext::getText)
-            .map(String::toUpperCase)
-            .collect(toList());
+  private List<String> createPatentsList(List<DataNameContext> hierarchy) {
+    return hierarchy.stream().map(RuleContext::getText).map(String::toUpperCase).collect(toList());
   }
 
   private Map<String, Token> collectParentVariablesFromDataAndTable(
@@ -119,7 +126,7 @@ class VariableUsageDelegate {
         hierarchy.stream()
             .map(QualifiedInDataContext::inData)
             .filter(Objects::nonNull)
-            .map(InDataContext::dataName2)
+            .map(InDataContext::dataName)
             .collect(toMap(it -> it.getText().toUpperCase(), ParserRuleContext::getStart));
 
     parentVariables.putAll(
@@ -131,7 +138,7 @@ class VariableUsageDelegate {
     return parentVariables;
   }
 
-  private Map<String, Token> collectParentVariablesFromInData(List<DataName2Context> hierarchy) {
+  private Map<String, Token> collectParentVariablesFromInData(List<DataNameContext> hierarchy) {
     return hierarchy.stream()
         .collect(toMap(it -> it.getText().toUpperCase(), ParserRuleContext::getStart));
   }
@@ -146,25 +153,25 @@ class VariableUsageDelegate {
     }
   }
 
-  private DataName2Context getDataName2Context(QualifiedInDataContext node) {
+  private DataNameContext getDataName2Context(QualifiedInDataContext node) {
     return ofNullable(node.inData())
-        .map(InDataContext::dataName2)
+        .map(InDataContext::dataName)
         .orElseGet(
             () ->
                 ofNullable(node.inTable())
                     .map(InTableContext::tableCall)
-                    .map(TableCallContext::dataName2)
+                    .map(TableCallContext::dataName)
                     .orElse(null));
   }
 
-  private SyntaxError createInvalidDefinition(String dataName, Locality locality) {
+  private SyntaxError createInvalidDefinition(String dataName, Locality locality, String message) {
     SyntaxError error =
         SyntaxError.syntaxError()
-            .suggestion(messageService.getMessage("CobolVisitor.invalidDefMsg", dataName))
+            .suggestion(messageService.getMessage(message, dataName))
             .severity(ErrorSeverity.ERROR)
             .locality(locality)
             .build();
-    LOG.debug("Syntax error by CobolVisitor#reportInvalidDefinition: " + error.toString());
+    LOG.debug("Syntax error by VariableUsageDelegate#createInvalidDefinition: " + error.toString());
     return error;
   }
 

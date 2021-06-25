@@ -45,6 +45,6 @@ class TestVariableInFileControl {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null, "Invalid definition for: BAZ", DiagnosticSeverity.Error, ERROR.getText())));
+                null, "Variable BAZ is not defined", DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

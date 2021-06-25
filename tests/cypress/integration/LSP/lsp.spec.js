@@ -13,21 +13,72 @@
  */
 
 /// <reference types="Cypress" />
+
 //@ts-ignore
 /// <reference types="../../support/" />
 
 context('This is a LSP spec', () => {
-  describe.skip('TC152046 Nominal - check syntax Ok message', () => {
-    it(
-      ['flaky_theia'],
-      'Checks that when opening Cobol file with correct syntax there is an appropriate message is shown',
-      () => {
-        cy.openFileExplorer();
-        cy.openFile('USER1.cbl');
-        cy.getLSPOutput().contains('No syntax errors detected in USER1.cbl');
-      },
-    );
-  });
+  const getCurrentLineSpanWidth = () => {
+    return cy
+      .getCurrentLine()
+      .find('span')
+      .then(($line) => {
+        return $line[0].offsetWidth;
+      });
+  };
+
+  const getRulerOffsetLeft = (index) => {
+    return cy
+      .get('.view-rulers')
+      .children()
+      .eq(index)
+      .then(($ruler) => {
+        return $ruler[0].offsetLeft;
+      });
+  };
+
+  /**
+   * Get hover over the variable
+   *
+   * @example hoverOverVariable(35, 'REC-1-2-1.', '01 REC-1.  05 REC-1-2.    10 REC-1-2-1 PIC 9.');
+   */
+  const hoverOverVariable = (line, text, hierarchy) => {
+    return cy
+      .getLineByNumber(line)
+      .findText(text)
+      .click()
+      .trigger('mousemove')
+      .get('div.monaco-editor-hover-content')
+      .contains(hierarchy);
+  };
+
+  /**
+   * Get hover over the variable in autocomplete
+   *
+   * @example varDifinitionAutocomplete('ADSF', '01 SOMETHING. 03 ADFSF OCCURS 30 TIMES. 05 OL-NO PIC X(8).');;
+   */
+  const varDifinitionAutocomplete = (variable, documentation) => {
+    return cy
+      .getLineByNumber(48)
+      .type('{end}{enter}')
+      .getCurrentLine()
+      .type('{ctrl} ')
+      .type(`${variable}{ctrl} `)
+      .get('.monaco-scrollable-element .docs')
+      .contains(documentation);
+  };
+
+  // describe('TC152046 Nominal - check syntax Ok message', () => {
+  //   it(
+  //     ['flaky_theia'],
+  //     'Checks that when opening Cobol file with correct syntax there is an appropriate message is shown',
+  //     () => {
+  //       cy.openFileExplorer();
+  //       cy.openFile('USER1.cbl');
+  //       cy.getLSPOutput().contains('No syntax errors detected in USER1.cbl');
+  //     },
+  //   );
+  // });
 
   describe('TC152048 Cobol file is recognized by LSP', () => {
     it(['smoke'], 'Cobol file is recognized by LSP - Cobol type is shown in status bar', () => {
@@ -74,17 +125,17 @@ context('This is a LSP spec', () => {
     });
   });
 
-  describe.skip('TC152047 Error case - file has syntax errors', () => {
-    it(
-      ['flaky_theia'],
-      'Checks that when opening Cobol file with correct syntax there is NO message about correct syntax',
-      () => {
-        cy.openFile('USER1.cbl').wait(4000);
-        cy.openFile('USER2.cbl');
-        cy.getLSPOutput().should('not.have.text', 'No syntax errors detected in USER2.cbl');
-      },
-    );
-  });
+  // describe('TC152047 Error case - file has syntax errors', () => {
+  //   it(
+  //     ['flaky_theia'],
+  //     'Checks that when opening Cobol file with correct syntax there is NO message about correct syntax',
+  //     () => {
+  //       cy.openFile('USER1.cbl').wait(4000);
+  //       cy.openFile('USER2.cbl');
+  //       cy.getLSPOutput().should('not.have.text', 'No syntax errors detected in USER2.cbl');
+  //     },
+  //   );
+  // });
 
   describe('TC152052 Syntax Errors are marked in file', () => {
     it(['smoke'], 'Checks that error lines are marked in a file', () => {
@@ -136,7 +187,7 @@ context('This is a LSP spec', () => {
           expect(lineNumber).to.be.equal(40);
           cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
         });
-      cy.get('div.monaco-editor-hover-content').contains('Invalid definition for: USER-CITY1');
+      cy.get('div.monaco-editor-hover-content').contains('Variable USER-CITY1 is not defined');
     });
   });
 
@@ -191,33 +242,33 @@ context('This is a LSP spec', () => {
     });
   });
 
-  describe.skip('TC314392 LOG level', () => {
-    // Theia doesn't show settings.json correctly
-    beforeEach(() => {
-      cy.updateConfigs('empty');
-    });
-    afterEach(() => {
-      cy.closeFolder('.theia');
-    });
+  // describe('TC314392 LOG level', () => {
+  //   // Theia doesn't show settings.json correctly
+  //   beforeEach(() => {
+  //     cy.updateConfigs('empty');
+  //   });
+  //   afterEach(() => {
+  //     cy.closeFolder('.theia');
+  //   });
 
-    it(['flaky_theia'], 'Lets check structure in settings.json file ', () => {
-      cy.openFolder('.theia').openFile('settings.json').goToLine(4);
-      cy.getCurrentLine().type('{end}{enter}').wait(500);
-      cy.getCurrentLine().type('"cobol-lsp.logging.level.root": "ERROR"');
-      cy.getCurrentLine().should('not.have.class', '.squiggly-info');
-      cy.getCurrentLine().type('{end}{backspace}1"');
-      cy.getMainEditor()
-        .getCurrentLineOverlay()
-        .find('.squiggly-info')
-        .then(($error) => {
-          cy.wrap($error).getElementLineNumber().should('eq', 4);
-          cy.getCurrentLine().trigger('mousemove', $error[0].offsetLeft, $error[0].offsetTop);
-        });
-      cy.get('div.monaco-editor-hover-content').contains(
-        'Value is not accepted. Valid values: "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL".',
-      );
-    });
-  });
+  //   it(['flaky_theia'], 'Lets check structure in settings.json file ', () => {
+  //     cy.openFolder('.theia').openFile('settings.json').goToLine(4);
+  //     cy.getCurrentLine().type('{end}{enter}').wait(500);
+  //     cy.getCurrentLine().type('"cobol-lsp.logging.level.root": "ERROR"');
+  //     cy.getCurrentLine().should('not.have.class', '.squiggly-info');
+  //     cy.getCurrentLine().type('{end}{backspace}1"');
+  //     cy.getMainEditor()
+  //       .getCurrentLineOverlay()
+  //       .find('.squiggly-info')
+  //       .then(($error) => {
+  //         cy.wrap($error).getElementLineNumber().should('eq', 4);
+  //         cy.getCurrentLine().trigger('mousemove', $error[0].offsetLeft, $error[0].offsetTop);
+  //       });
+  //     cy.get('div.monaco-editor-hover-content').contains(
+  //       'Value is not accepted. Valid values: "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL".',
+  //     );
+  //   });
+  // });
 
   describe('TC266094 Underline the entire incorrect variable structure', () => {
     it(['smoke'], 'This test checks that parser can find and underline an incorrect variable structure.', () => {
@@ -229,7 +280,7 @@ context('This is a LSP spec', () => {
           cy.wrap($info).getElementLineNumber().should('eq', 23);
           cy.getCurrentLine().trigger('mousemove', $info[0].offsetLeft, $info[0].offsetTop);
         });
-      cy.get('div.monaco-editor-hover-content').contains('Invalid definition for: CHILD1');
+      cy.get('div.monaco-editor-hover-content').contains('Variable CHILD1 is not defined');
       cy.goToLine(24).wait(2000);
       cy.getMainEditor()
         .getCurrentLineOverlay()
@@ -239,7 +290,7 @@ context('This is a LSP spec', () => {
           cy.getCurrentLine().trigger('mousemove', $info[0].offsetLeft, $info[0].offsetTop);
         });
       cy.get('div.monaco-editor-hover-content').should(($content) => {
-        ['Invalid definition for: CHILD2'].forEach((message) => {
+        ['Variable CHILD2 is not defined'].forEach((message) => {
           expect($content).to.contain.text(message);
         });
       });
@@ -250,7 +301,7 @@ context('This is a LSP spec', () => {
         .then(($info) => {
           cy.wrap($info).getElementLineNumber().should('eq', 24);
           cy.getCurrentLine().type('{end}').trigger('mousemove', $info[0].offsetLeft, $info[0].offsetTop);
-          cy.get('div.monaco-editor-hover-content').contains('Invalid definition for: CHILD2');
+          cy.get('div.monaco-editor-hover-content').contains('Variable CHILD2 is not defined');
         });
     });
   });
@@ -331,25 +382,6 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC250114 Implement syntax coloring', () => {
-    const getCurrentLineSpanWidth = () => {
-      return cy
-        .getCurrentLine()
-        .find('span')
-        .then(($line) => {
-          return $line[0].offsetWidth;
-        });
-    };
-
-    const getRulerOffsetLeft = (index) => {
-      return cy
-        .get('.view-rulers')
-        .children()
-        .eq(index)
-        .then(($ruler) => {
-          return $ruler[0].offsetLeft;
-        });
-    };
-
     it(['smoke'], 'Lets check the positions of rulers ', () => {
       cy.openFile('TEST.CBL').goToLine(24);
       cy.getCurrentLine().type('{end}{enter}');
@@ -382,7 +414,7 @@ context('This is a LSP spec', () => {
     it(['smoke'], 'Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
       cy.getCurrentLine().type('{selectall}shell').wait(500);
-      cy.get('.suggest-widget.visible').click();
+      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('shell').click();
       cy.getLineByNumber(2).contains(`PROGRAM-ID. ${fileName}.`);
       cy.getLineByNumber(8).contains('DATA DIVISION.');
       cy.getLineByNumber(16).contains('STOP RUN.');
@@ -399,7 +431,7 @@ context('This is a LSP spec', () => {
     it('Checks Syntax and Semantic Errors from Copybooks', () => {
       cy.openFile('CALC-DATA.cbl').wait(500).goToLine(1);
       cy.getCurrentLine().type('{selectall}shell').wait(500);
-      cy.get('.suggest-widget.visible').click();
+      cy.get('[widgetid="editor.widget.suggestWidget"]').contains('shell').click();
       cy.goToLine(15).getCurrentLine().type('COPY ABC.');
       cy.getCurrentLineErrors({ expectedLine: 15 }).eq(0).getHoverErrorMessage().contains('ABC: Copybook not found');
       cy.getCurrentLine().type('{end}{enter}');
@@ -427,7 +459,7 @@ context('This is a LSP spec', () => {
       cy.writeFile('test_files/project/some_text.txt', '');
       cy.openFile('some_text.txt');
       cy.changeLangMode('COBOL');
-      cy.get('.view-lines').eq(1).type('{ctrl}{shift}I');
+      cy.get('.view-lines').type('{ctrl}{shift}I');
       cy.get('.theia-TreeContainer').contains('No outline information available.');
     });
   });
@@ -449,20 +481,6 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC319689 Hover over variable shows its hierarchy definition', () => {
-    /**
-     * Get hover over the variable
-     *
-     * @example hoverOverVariable(35, 'REC-1-2-1.', '01 REC-1.  05 REC-1-2.    10 REC-1-2-1 PIC 9.');
-     */
-    const hoverOverVariable = (line, text, hierarchy) => {
-      return cy
-        .getLineByNumber(line)
-        .findText(text)
-        .click()
-        .trigger('mousemove')
-        .get('div.monaco-editor-hover-content')
-        .contains(hierarchy);
-    };
     it(
       ['smoke'],
       'Checks a variable definition with a snippet of its structure when user hovers over the variable.',
@@ -478,5 +496,22 @@ context('This is a LSP spec', () => {
         hoverOverVariable(44, 'SUPPLr', '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9. 88 SUPPLR VALUE 2 THRU 4.');
       },
     );
+  });
+
+  describe('TC319969 Provide the variables definition as documentation', () => {
+    it(['smoke'], 'Checks variable definition into VSC autocomplete documentation.', () => {
+      cy.openFile('HOVER.CBL');
+      varDifinitionAutocomplete('ADSF', '01 SOMETHING. 03 ADFSF OCCURS 30 TIMES. 05 OL-NO PIC X(8).');
+      varDifinitionAutocomplete('FILE-RECORD', '01 FILE-RECORD PIC X(113).');
+      varDifinitionAutocomplete('FILLER', '01 TERMS-RECORD. 05 FILLER PIC X(69).');
+      varDifinitionAutocomplete('HEADER', '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9. 88 HEADER VALUE 1 THRU 4.');
+      varDifinitionAutocomplete('REC-1', '01 REC-1. 05 REC-1-1 PIC 9(6). 05 REC-1-2.');
+      varDifinitionAutocomplete('REC-1-1', '01 REC-1. 05 REC-1-1 PIC 9(6).');
+      varDifinitionAutocomplete(
+        'REC-1-2',
+        '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9. 88 HEADER VALUE 1 THRU 4. 88 SUPPLR VALUE 2 THRU 4. 88 WREHOUSE VALUE 3.',
+      );
+      varDifinitionAutocomplete('TOP-OF-PAGE', 'C01 IS TOP-OF-PAGE.');
+    });
   });
 });

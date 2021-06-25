@@ -24,7 +24,7 @@ import java.util.List;
  * ANTLR listener, which builds an extended document from the given COBOL program by executing COPY
  * and REPLACE statements and removing non-processable sections starting with EXEC statements.
  */
-public interface GrammarPreprocessorListener extends CobolPreprocessorListener {
+public interface GrammarPreprocessorListener extends CobolPreprocessorListener, PreprocessorStack {
 
   /**
    * Get list of found syntax errors during building the extended document.

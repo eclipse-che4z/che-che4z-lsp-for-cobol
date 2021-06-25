@@ -17,12 +17,14 @@ import {changeDefaultZoweProfile} from "../commands/ChangeDefaultZoweProfile";
 import {editDatasetPaths} from "../commands/EditDatasetPaths";
 import {fetchCopybookCommand} from "../commands/FetchCopybookCommand";
 import {gotoCopybookSettings} from "../commands/OpenSettingsCommand";
+import {initSmartTab} from "../commands/SmartTabCommand";
 import {activate} from "../extension";
 import {CopybooksCodeActionProvider} from "../services/copybook/CopybooksCodeActionProvider";
 import {LanguageClientService} from "../services/LanguageClientService";
 import {TelemetryService} from "../services/reporter/TelemetryService";
 import {createFileWithGivenPath} from "../services/Settings";
 
+jest.mock("../commands/SmartTabCommand");
 jest.mock("../commands/ChangeDefaultZoweProfile");
 jest.mock("../commands/EditDatasetPaths");
 jest.mock("../commands/FetchCopybookCommand");
@@ -86,6 +88,7 @@ describe("Check plugin extension for cobol starts successfully.", () => {
         expect(changeDefaultZoweProfile).toHaveBeenCalled();
         expect(editDatasetPaths).toHaveBeenCalled();
         expect(gotoCopybookSettings).toHaveBeenCalled();
+        expect(initSmartTab).toHaveBeenCalled();
 
         expect(createFileWithGivenPath).toHaveBeenCalledTimes(1);
 
@@ -96,7 +99,7 @@ describe("Check plugin extension for cobol starts successfully.", () => {
 
     test("extension reruns extended API surface", async() => {
         const extendedApi = await activate(context);
-        extendedApi.analysis("test");
+        extendedApi.analysis("test", "text");
         expect(LanguageClientService.prototype.retrieveAnalysis).toBeCalledTimes(1);
     })
 });

@@ -31,41 +31,42 @@ class TestSqlDropStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n";
 
-  private static final String DROP1 = TEXT + "        DROP TABLE DSN8C10.DEPT END-EXEC.\n";
+  private static final String DROP1 = TEXT + "            DROP TABLE DSN8C10.DEPT END-EXEC.\n";
 
   private static final String DROP2 =
-      TEXT + "        DROP TABLESPACE DSN8D12A.DSN8S12D END-EXEC.\n";
+      TEXT + "            DROP TABLESPACE DSN8D12A.DSN8S12D END-EXEC.\n";
 
-  private static final String DROP3 = TEXT + "        DROP VIEW DSN8C10.VPROJRE1 END-EXEC.\n";
+  private static final String DROP3 = TEXT + "            DROP VIEW DSN8C10.VPROJRE1 END-EXEC.\n";
 
   private static final String DROP4 =
-      TEXT + "        DROP PACKAGE DSN8CC61.DSN8CC0 VERSION VERSZZZZ END-EXEC.\n";
+      TEXT + "            DROP PACKAGE DSN8CC61.DSN8CC0 VERSION VERSZZZZ END-EXEC.\n";
 
   private static final String DROP5 =
-      TEXT + "        DROP PACKAGE DSN8.CC0 VERSION '1994sw3' END-EXEC.\n";
+      TEXT + "            DROP PACKAGE DSN8.CC0 VERSION '1994sw3' END-EXEC.\n";
 
-  private static final String DROP6 = TEXT + "        DROP TYPE DOCUMENT END-EXEC.\n";
+  private static final String DROP6 = TEXT + "            DROP TYPE DOCUMENT END-EXEC.\n";
 
-  private static final String DROP7 = TEXT + "        DROP FUNCTION CHEM.ATOMIC_WEIGHT END-EXEC.\n";
+  private static final String DROP7 = TEXT + "            DROP FUNCTION CHEM.ATOMIC_WEIGHT END-EXEC.\n";
 
   private static final String DROP8 =
-      TEXT + "        DROP FUNCTION CENTER(INTEGER, FLOAT) END-EXEC.\n";
+      TEXT + "            DROP FUNCTION CENTER(INTEGER, FLOAT) END-EXEC.\n";
 
   private static final String DROP9 =
-      TEXT + "        DROP SPECIFIC FUNCTION JOHNSON.FOCUS97 END-EXEC.\n";
+      TEXT + "            DROP SPECIFIC FUNCTION JOHNSON.FOCUS97 END-EXEC.\n";
 
-  private static final String DROP10 = TEXT + "        DROP PROCEDURE BIOLOGY.OSMOSIS END-EXEC.\n";
+  private static final String DROP10 = TEXT + "            DROP PROCEDURE BIOLOGY.OSMOSIS END-EXEC.\n";
 
-  private static final String DROP11 = TEXT + "        DROP TRIGGER BONUS END-EXEC.\n";
+  private static final String DROP11 = TEXT + "            DROP TRIGGER BONUS END-EXEC.\n";
 
-  private static final String DROP12 = TEXT + "        DROP ROLE CTXROLE END-EXEC.\n";
+  private static final String DROP12 = TEXT + "            DROP ROLE CTXROLE END-EXEC.\n";
 
-  private static final String DROP13 = TEXT + "        DROP TRUSTED CONTEXT CTX1 END-EXEC.\n";
+  private static final String DROP13 = TEXT + "            DROP TRUSTED CONTEXT CTX1 END-EXEC.\n";
 
   private static final String DROP14 =
-      TEXT + "        DROP PUBLIC ALIAS PUBALIAS1 FOR SEQUENCE END-EXEC.\n";
+      TEXT + "            DROP PUBLIC ALIAS PUBALIAS1 FOR SEQUENCE END-EXEC.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

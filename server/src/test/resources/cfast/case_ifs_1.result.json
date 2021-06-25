@@ -1,0 +1,50 @@
+[
+  {
+    "name": "CONDS1",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 21,
+        "character": 8
+      },
+      "end": {
+        "line": 26,
+        "character": 21
+      }
+    },
+    "type": "program",
+    "children": [
+      {
+        "snippet": "A000-PARA.\r\n           IF NOT WS-NUM1 > WS-NUM2\r\n              DISPLAY 'HELLO'\r\n              GO TO A000-PARA.\r\n           STOP RUN.",
+        "name": "A000-PARA",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 22,
+            "character": 8
+          },
+          "end": {
+            "line": 26,
+            "character": 21
+          }
+        },
+        "type": "paragraph",
+        "children": [
+          {
+            "type": "if"
+          },
+          {
+            "targetName": ["A000-PARA"],
+            "type": "goto"
+          },
+          {
+            "type": "endif"
+          },
+          {
+            "type": "stop"
+          }
+        ]
+      }
+    ]
+  }
+]

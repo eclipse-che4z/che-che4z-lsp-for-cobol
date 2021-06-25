@@ -14,41 +14,39 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.SECTIONS;
 
-/**
- * Provide completion functionality for sections
- */
+/** Provides completion functionality for sections */
 @Singleton
 public class SectionCompletion implements Completion {
 
   @Override
-  public Collection<String> getCompletionSource(CobolDocumentModel document) {
-    return Optional.ofNullable(document)
-        .map(CobolDocumentModel::getAnalysisResult)
-        .map(AnalysisResult::getSections)
-        .orElse(Collections.emptySet());
+  public @NonNull Collection<CompletionItem> getCompletionItems(
+      @NonNull String token, @Nullable CobolDocumentModel document) {
+    if (document == null) return emptyList();
+    return document.getAnalysisResult().getSections().stream()
+        .filter(DocumentationUtils.startsWithIgnoreCase(token))
+        .map(this::toSectionCompletion)
+        .collect(toList());
   }
 
-  @NonNull
-  @Override
-  public String getSortOrderPrefix() {
-    return SECTIONS.prefix;
-  }
-
-  @NonNull
-  @Override
-  public CompletionItemKind getKind() {
-    return CompletionItemKind.Function;
+  private CompletionItem toSectionCompletion(String name) {
+    CompletionItem item = new CompletionItem(name);
+    item.setLabel(name);
+    item.setInsertText(name);
+    item.setSortText(SECTIONS.prefix + name);
+    item.setKind(CompletionItemKind.Function);
+    return item;
   }
 }

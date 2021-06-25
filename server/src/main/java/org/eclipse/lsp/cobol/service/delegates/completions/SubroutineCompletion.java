@@ -14,20 +14,21 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.SubroutineService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
-import org.eclipse.lsp4j.CompletionItemKind;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.SubroutineService;
+import org.eclipse.lsp4j.CompletionItem;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.SUBROUTINES;
+import static org.eclipse.lsp4j.CompletionItemKind.File;
 
-/**
- * Provide completion functionality for subroutines.
- */
+/** Provide completion functionality for subroutines. */
 @Singleton
 public class SubroutineCompletion implements Completion {
   private final SubroutineService subroutineService;
@@ -38,17 +39,20 @@ public class SubroutineCompletion implements Completion {
   }
 
   @Override
-  public @NonNull Collection<String> getCompletionSource(CobolDocumentModel document) {
-    return subroutineService.getNames();
+  public @NonNull Collection<CompletionItem> getCompletionItems(
+      @NonNull String token, @Nullable CobolDocumentModel document) {
+    return subroutineService.getNames().stream()
+        .filter(DocumentationUtils.startsWithIgnoreCase(token))
+        .map(this::toSubroutineCompletionItem)
+        .collect(toList());
   }
 
-  @Override
-  public @NonNull String getSortOrderPrefix() {
-    return SUBROUTINES.prefix;
-  }
-
-  @Override
-  public @NonNull CompletionItemKind getKind() {
-    return CompletionItemKind.File;
+  private CompletionItem toSubroutineCompletionItem(String it) {
+    CompletionItem item = new CompletionItem(it);
+    item.setLabel(it);
+    item.setInsertText(it);
+    item.setSortText(SUBROUTINES.prefix + it);
+    item.setKind(File);
+    return item;
   }
 }

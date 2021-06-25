@@ -57,8 +57,15 @@ class TestIdmsBindStatement {
 
   private static final String BIND9 = DEFS + "           BIND PROCEDURE FOR ABCPROC TO {$DB1}.\n";
 
+  private static final String BIND10 = DEFS + "          BIND EMPLOYEE\n";
+
+  private static final String BIND11 = DEFS + "          BIND EMPLOYEE TO {$DB1}.\n";
+
+  private static final String BIND12 = DEFS + "          BIND {$DB1} WITH EMPLOYEE\n";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(BIND1, BIND2, BIND3, BIND4, BIND5, BIND6, BIND7, BIND8, BIND9);
+    return Stream.of(
+        BIND1, BIND2, BIND3, BIND4, BIND5, BIND6, BIND7, BIND8, BIND9, BIND10, BIND11, BIND12);
   }
 
   @ParameterizedTest

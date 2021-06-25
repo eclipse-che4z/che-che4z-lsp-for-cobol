@@ -1,7 +1,52 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
+Changelog:
 
-# [0.18.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.17.1...0.18.0) (2021-03-12)
+## [0.19.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.0...0.19.1) (2021-06-25)
+
+### Bug Fixes
+* Allow IDMS statements in conditional blocks [#952](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/952) ([5b2ea84](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/5b2ea84f9b3368c56a82062d49767755426ba39b))
+* Clarify error message for invalid definition ([4918a18](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/4918a18ae5682242b1328075fe2a84eee9089156)), closes [#979](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/979)
+* Fix access to undefined element error in no workspace case [#957](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/957) ([0554b52](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/0554b5229f3144d5471e5c89f46232f2c480871b))
+* Fix error on multiline optional paragraphs ([77b562e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/77b562e6e2974497366847bbb4d62b15809b3a85)), closes [#953](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/953)
+* Fix hover for group items [#970](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/970) ([1894fc5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/1894fc5aeb3d72a648140c4f1ec2b07298f17db0))
+* Fix incorrect IF statement parsing [#828](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/828) ([04484d7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/04484d72b3a6d7925f3794c6e8d44718d39b2f5a))
+* Fix loading copybooks with any encoding [#956](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/956) ([b6f00e8](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/b6f00e832246439e4aa5d27e92496cf10cccc1ae))
+* Make analyse exceptions propagate to Extended API responses [#960](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/960) ([91fae1b](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/91fae1b5fea4983e7a9a9d4dad9ca08fdde5d238))
+* Add new node type to CFAST to fix the conditional stop issue ([9894793](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9894793608b93fbf61edf810ebb190743dd4d301))
+
+## [0.19.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.18.0...0.19.0) (2021-06-10)
+
+### Bug Fixes
+* Fix coloring for one-char keywords ([bb2040d](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/bb2040d9e8f34293039e6c069bc56947dbdf2298)), closes [#815](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/815)
+* Fix coloring for string literal in continuation line ([58dc321](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/58dc3218446801ee1fad96564b44a1abb8d6b14b))
+* Fix error positions for compiler directives ([ebae2dd](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ebae2dd76c4188af998cee8b8c2e7bada49bce23)), closes [#116](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/116)
+* Fix syntax analysis for compiler directives ([bb392a0](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/bb392a0882461a0388834965f99d46caad443b43))
+* Fix incorrect documentation for some tokens ([cff6848](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/cff684818feb7fd9cb79af637aec6ad18cb281c5)), closes [#916](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/916)
+* Fix nested program parsing ([86b8784](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/86b87842777b2893c060b9ba997e0b971e97d2a6)), closes [#730](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/730) [#596](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/596)
+* Fix REPLACE clause when replacing or replaced text contains "BY" [#900](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/900) ([7d88dc7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/7d88dc70c5a32f4116fc7dac302722c21ed93e44))
+* Fix syntax error on READY/RESET TRACE ([5871b0b](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/5871b0bc161e2c1d8a834c6ee4f07784fe396977))
+* Fix integration with Explorer for Endevor [#922](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/922) ([398dc49](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/398dc49447219603c4bc5119e972ab8265313f24))
+* Fix the bug with two COPY REPLACING statements in a row ([035b661](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/035b661fb0d0f0dcad41a50c4837cf99a5380b51))
+* Fix color scheme ([3a383be](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/3a383be7f96ece655637b8c212be8a30069f9790))
+* Fix performance issues
+
+### Features
+* Add integration with COBOL Control Flow extension [#801](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/801) ([1d9a2e6](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/1d9a2e66f7f0c6af9b28f2fbf14d1371dd21be8f))
+* Add global variable support ([91e9b59](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/91e9b5957ebc59b51507d6473577b81293e011d9)), closes [#730](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/730)
+* Add IDMS DML starting keyword descriptions [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([45baa15](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/45baa1527ed578662602368d012bee5547e83605))
+* Expand support for IDMS DML commands [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([e908c8f](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/e908c8f1466b0497fd8b238cdb193ad2d5947577)) ([286c42e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/286c42ef50eb91da4aa826aba07a93158b1026df))  ([ca0cf91](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ca0cf9120128f29892a226d2e587c0a098e31e74)) ([91646a4](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/91646a441ce94104c29c4a64820ef021f3d58072)) ([f55cdfc](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f55cdfc059b4834c9e7a5c163e00a09947341827)) ([05020f9](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/05020f9d0b2558024fb8ce07885b6f5902aaf4f8))
+* Add support for Datacom SQLDA and SQLCA implicit fields [#885](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/885) ([e6944d3](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/e6944d3340e65fa9f93a154c8f86ff92854c54e8)) ([90a78fd](https://github.com/eclipse/che-che4z-lsp-for-cobol/pull/937))
+* Customize TAB button action [#841](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/841) ([29cdaed](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/29cdaedc213cc71e179a9c6d4e55e4aabd7ef603))
+* Add "Go to Definition" support for SQL hosted variables [#714](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/714) ([95c4b34](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/95c4b347f875245ac08fc933bde35857d08be050))
+* Show variable definition as documentation ([284ea9a](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/284ea9a193f2cf8d702bddf9891f11538995481d))
+* Support REDEFINES clause [#867](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/867) ([561ba66](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/561ba66be8a4401b77f3922f6efd6cb55ac15ca6))
+* Support REPLACE statements [#116](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/116) ([cf71f2a](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/cf71f2ad9f575a03c148fce8d9e4ea76d835a33d))
+* Support compiler directive statements [#116](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/116) ([c89d65b](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/c89d65b07a65e6754c67875cafa512b5f13260ca)) ([6baec08](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/6baec08918c4a623c231cc9d19432b7389564675))
+* Validate variable types in SET statements [#373](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/373) ([3802683](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/3802683fc52ad6a50b686b532f706326122867e0))
+* Allow analysis regardless file extension ([f3b8051](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f3b80513d53084093f859f76c5f80d99dbf07828)), closes [#832](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/832)
+
+## [0.18.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.17.1...0.18.0) (2021-03-12)
 
 ### Bug Fixes
 * Add color to hover message ([f15e867](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f15e867c0d3af03f75012b40ca6c83360e04f35e))

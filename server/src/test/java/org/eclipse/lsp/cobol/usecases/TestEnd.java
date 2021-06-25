@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.usecases;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -32,15 +31,30 @@ class TestEnd {
           + "        PROGRAM-ID. test1. \r\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
+          + "        01 {$*WK_INTO} PIC X(8) SYNC.\n"
+          + "        01 {$*WK_LENGTH} PIC X(8) SYNC.\n"
           + "        PROCEDURE DIVISION. \r\n";
 
   private static final String END_LINE = "           END LINE TERMINAL SESSION.\r\n";
 
+  private static final String END_TRANSACTION = "           END TRANSACTION STATISTICS.\r\n";
+
+  private static final String END_TRANSACTION_WITH_ALL_VARIABLES =
+      "           MOVE 388 TO {$WK_LENGTH}.\r\n"
+          + "           END TRANSACTION STATISTICS WRITE INTO {$WK_INTO} LENGTH\r\n"
+          + "           {$WK_LENGTH}.\r\n";
+
+  private static final String END_TRANSACTION_WITH_ALL_LITERALS =
+      "           END TRANSACTION STATISTICS WRITE INTO {$WK_INTO} LENGTH\r\n"
+          + "           390.\r\n";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(BOILERPLATE + END_LINE);
+    return Stream.of(
+        BOILERPLATE + END_LINE,
+        BOILERPLATE + END_TRANSACTION,
+        BOILERPLATE + END_TRANSACTION_WITH_ALL_VARIABLES);
   }
 
-  @Disabled("#760")
   @ParameterizedTest
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - varying tests")

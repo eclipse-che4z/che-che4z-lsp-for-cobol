@@ -49,187 +49,188 @@ class TestSqlAllGrantStatements {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       EXEC SQL\n";
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n";
 
   private static final String GRANT_ON_COLLECTION =
-      TEXT + "        GRANT CREATE IN COLLECTION DSN8CC91 TO ROLE ROLE1;\n" + "       END-EXEC.";
+      TEXT + "            GRANT CREATE IN COLLECTION DSN8CC91 TO ROLE ROLE1;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_COLLECTION2 =
       TEXT
-          + "        GRANT CREATE IN COLLECTION QAACLONE, DSN8CC61 TO CLARK;\n"
-          + "       END-EXEC.";
+          + "            GRANT CREATE IN COLLECTION QAACLONE, DSN8CC61 TO CLARK;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_DATABASE =
       TEXT
-          + "        GRANT DROP\n"
-          + "             ON DATABASE DSN8D12A\n"
-          + "             TO PEREZ;\n"
-          + "       END-EXEC.";
+          + "            GRANT DROP\n"
+          + "                 ON DATABASE DSN8D12A\n"
+          + "                 TO PEREZ;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_DATABASE2 =
       TEXT
-          + "        GRANT REPAIR\n"
-          + "             ON DATABASE DSN8D12A\n"
-          + "             TO PUBLIC;\n"
-          + "       END-EXEC.";
+          + "            GRANT REPAIR\n"
+          + "                 ON DATABASE DSN8D12A\n"
+          + "                 TO PUBLIC;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_DATABASE3 =
       TEXT
-          + "        GRANT CREATETAB,LOAD\n"
-          + "         ON DATABASE DSN8D12A\n"
-          + "         TO WALKER,PIANKA,FUJIMOTO\n"
-          + "         WITH GRANT OPTION;\n"
-          + "       END-EXEC.";
+          + "            GRANT CREATETAB,LOAD\n"
+          + "             ON DATABASE DSN8D12A\n"
+          + "             TO WALKER,PIANKA,FUJIMOTO\n"
+          + "             WITH GRANT OPTION;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_DATABASE4 =
       TEXT
-          + "        GRANT LOAD \n"
-          + "         ON DATABASE DSN9D91A \n"
-          + "         TO ROLE ROLE1;\n"
-          + "       END-EXEC.";
+          + "            GRANT LOAD \n"
+          + "             ON DATABASE DSN9D91A \n"
+          + "             TO ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_FUNCTION =
-      TEXT + "        GRANT EXECUTE ON FUNCTION CALC_SALARY TO JONES;\n" + "       END-EXEC.";
+      TEXT + "            GRANT EXECUTE ON FUNCTION CALC_SALARY TO JONES;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_SPECIFIC_FUNCTION =
-      TEXT + "        GRANT EXECUTE ON PROCEDURE VACATION_ACCR TO PUBLIC;\n" + "       END-EXEC.";
+      TEXT + "            GRANT EXECUTE ON PROCEDURE VACATION_ACCR TO PUBLIC;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_PROCEDURE =
       TEXT
-          + "        GRANT EXECUTE ON SPECIFIC FUNCTION DEPT85_TOT TO ADMIN_A\n"
-          + "         WITH GRANT OPTION;\n"
-          + "       END-EXEC.";
+          + "            GRANT EXECUTE ON SPECIFIC FUNCTION DEPT85_TOT TO ADMIN_A\n"
+          + "             WITH GRANT OPTION;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_PACKAGE =
-      TEXT + "        GRANT COPY ON PACKAGE DSN8CC61.* TO LEWIS;\n" + "       END-EXEC.";
+      TEXT + "            GRANT COPY ON PACKAGE DSN8CC61.* TO LEWIS;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_PACKAGE2 =
-      TEXT + "        GRANT ALL ON PACKAGE CLCT1.PKG1, CLCT2.PKG2 TO JONES;\n" + "       END-EXEC.";
+      TEXT + "            GRANT ALL ON PACKAGE CLCT1.PKG1, CLCT2.PKG2 TO JONES;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_PACKAGE3 =
-      TEXT + "        GRANT EXECUTE ON PACKAGE DSN9CC13.* TO ROLE ROLE1;\n" + "       END-EXEC.";
+      TEXT + "            GRANT EXECUTE ON PACKAGE DSN9CC13.* TO ROLE ROLE1;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_PLAN =
-      TEXT + "        GRANT BIND ON PLAN DSN8IP12 TO JONES;\n" + "       END-EXEC.";
+      TEXT + "            GRANT BIND ON PLAN DSN8IP12 TO JONES;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_PLAN2 =
-      TEXT + "        GRANT BIND,EXECUTE ON PLAN DSN8CP12 TO PUBLIC;\n" + "       END-EXEC.";
+      TEXT + "            GRANT BIND,EXECUTE ON PLAN DSN8CP12 TO PUBLIC;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_PLAN3 =
       TEXT
-          + "        GRANT EXECUTE ON PLAN DSN8CP12 TO ADAMSON,\n"
-          + "        BROWN WITH GRANT OPTION;\n"
-          + "       END-EXEC.";
+          + "            GRANT EXECUTE ON PLAN DSN8CP12 TO ADAMSON,\n"
+          + "            BROWN WITH GRANT OPTION;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_PLAN4 =
-      TEXT + "        GRANT BIND ON PLAN DSN91PLN TO ROLE ROLE1;\n" + "       END-EXEC.";
+      TEXT + "            GRANT BIND ON PLAN DSN91PLN TO ROLE ROLE1;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_SCHEMA =
-      TEXT + "        GRANT CREATEIN ON SCHEMA T_SCORES TO JONES;\n" + "       END-EXEC.";
+      TEXT + "            GRANT CREATEIN ON SCHEMA T_SCORES TO JONES;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_SCHEMA2 =
       TEXT
-          + "        GRANT ALTERIN ON SCHEMA DEPT TO ADMIN_A\n"
-          + "         WITH GRANT OPTION;\n"
-          + "       END-EXEC.";
+          + "            GRANT ALTERIN ON SCHEMA DEPT TO ADMIN_A\n"
+          + "             WITH GRANT OPTION;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_SCHEMA3 =
       TEXT
-          + "        GRANT CREATEIN, ALTERIN, \n"
-          + "        DROPIN ON SCHEMA NEW_HIRE, PROMO, RESIGN TO HR;\n"
-          + "       END-EXEC.";
+          + "            GRANT CREATEIN, ALTERIN, \n"
+          + "            DROPIN ON SCHEMA NEW_HIRE, PROMO, RESIGN TO HR;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_SCHEMA4 =
-      TEXT + "        GRANT ALTERIN ON SCHEMA EMPLOYEE TO ROLE ROLE1;\n" + "       END-EXEC.";
+      TEXT + "            GRANT ALTERIN ON SCHEMA EMPLOYEE TO ROLE ROLE1;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_SEQUENCE =
       TEXT
-          + "        GRANT USAGE\n"
-          + "        ON SEQUENCE MYNUM\n"
-          + "        TO JONES;\n"
-          + "       END-EXEC.";
+          + "            GRANT USAGE\n"
+          + "            ON SEQUENCE MYNUM\n"
+          + "            TO JONES;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_SEQUENCE2 =
-      TEXT + "        GRANT USAGE ON SEQUENCE ORDER_SEQ TO ROLE ROLE1;\n" + "       END-EXEC.";
+      TEXT + "            GRANT USAGE ON SEQUENCE ORDER_SEQ TO ROLE ROLE1;\n" + "           END-EXEC.";
 
   private static final String GRANT_SYS_PRIVILGES =
-      TEXT + "        GRANT DISPLAY\n" + "        TO LUTZ;\n" + "       END-EXEC.";
+      TEXT + "            GRANT DISPLAY\n" + "            TO LUTZ;\n" + "           END-EXEC.";
 
   private static final String GRANT_SYS_PRIVILGES2 =
       TEXT
-          + "        GRANT BSDS,RECOVER\n"
-          + "        TO PARKER,SETRIGHT\n"
-          + "        WITH GRANT OPTION;\n"
-          + "       END-EXEC.";
+          + "            GRANT BSDS,RECOVER\n"
+          + "            TO PARKER,SETRIGHT\n"
+          + "            WITH GRANT OPTION;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_SYS_PRIVILGES3 =
-      TEXT + "        GRANT TRACE\n" + "        TO PUBLIC;\n" + "       END-EXEC.";
+      TEXT + "            GRANT TRACE\n" + "            TO PUBLIC;\n" + "           END-EXEC.";
 
   private static final String GRANT_SYS_PRIVILGES4 =
-      TEXT + "        GRANT ARCHIVE TO ROLE ROLE1;\n" + "       END-EXEC.";
+      TEXT + "            GRANT ARCHIVE TO ROLE ROLE1;\n" + "           END-EXEC.";
 
   private static final String GRANT_SYS_PRIVILGES5 =
-      TEXT + "        GRANT CREATE_SECURE_OBJECT \n" + "        TO STEVE;\n" + "       END-EXEC.";
+      TEXT + "            GRANT CREATE_SECURE_OBJECT \n" + "            TO STEVE;\n" + "           END-EXEC.";
 
   private static final String GRANT_SYS_PRIVILGES6 =
       TEXT
-          + "         GRANT DBADM ON SYSTEM \n"
-          + "          TO ROLE ADMINROLE;\n"
-          + "         GRANT DBADM, ACCESSCTRL, DATAACCESS \n"
-          + "         ON SYSTEM \n"
-          + "         TO SALLY;\n"
-          + "       END-EXEC.";
+          + "             GRANT DBADM ON SYSTEM \n"
+          + "              TO ROLE ADMINROLE;\n"
+          + "             GRANT DBADM, ACCESSCTRL, DATAACCESS \n"
+          + "             ON SYSTEM \n"
+          + "             TO SALLY;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_SYS_PRIVILGES7 =
       TEXT
-          + "         GRANT DBADM WITHOUT ACCESSCTRL \n"
-          + "         WITHOUT DATAACCESS \n"
-          + "         ON SYSTEM \n"
-          + "         TO JOHN;\n"
-          + "       END-EXEC.";
+          + "             GRANT DBADM WITHOUT ACCESSCTRL \n"
+          + "             WITHOUT DATAACCESS \n"
+          + "             ON SYSTEM \n"
+          + "             TO JOHN;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_TABLE =
-      TEXT + "         GRANT SELECT ON DSN8C10.EMP TO PULASKI;\n" + "       END-EXEC.";
+      TEXT + "             GRANT SELECT ON DSN8C10.EMP TO PULASKI;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_TABLE2 =
       TEXT
-          + "         GRANT ALL ON TABLE DSN8C10.EMP TO KWAN,\n"
-          + "         THOMPSON WITH GRANT OPTION;\n"
-          + "       END-EXEC.";
+          + "             GRANT ALL ON TABLE DSN8C10.EMP TO KWAN,\n"
+          + "             THOMPSON WITH GRANT OPTION;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_TABLE3 =
       TEXT
-          + "         GRANT ALTER ON TABLE DSN9910.EMP \n"
-          + "         TO ROLE ROLE1;\n"
-          + "       END-EXEC.";
+          + "             GRANT ALTER ON TABLE DSN9910.EMP \n"
+          + "             TO ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_TYPE =
-      TEXT + "         GRANT USAGE ON TYPE SHOE_SIZE TO JONES;\n" + "       END-EXEC.";
+      TEXT + "             GRANT USAGE ON TYPE SHOE_SIZE TO JONES;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_TYPE2 =
-      TEXT + "         GRANT USAGE ON TYPE US_DOLLAR TO PUBLIC;\n" + "       END-EXEC.";
+      TEXT + "             GRANT USAGE ON TYPE US_DOLLAR TO PUBLIC;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_TYPE3 =
       TEXT
-          + "         GRANT USAGE ON TYPE MILES\n"
-          + "         TO ROLE ROLE1;\n"
-          + "       END-EXEC.";
+          + "             GRANT USAGE ON TYPE MILES\n"
+          + "             TO ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_VARIABLE =
-      TEXT + "         GRANT READ ON VARIABLE ACCOUNTNO TO JONES;\n" + "       END-EXEC.";
+      TEXT + "             GRANT READ ON VARIABLE ACCOUNTNO TO JONES;\n" + "           END-EXEC.";
 
   private static final String GRANT_ON_VARIABLE2 =
       TEXT
-          + "         GRANT USE OF TABLESPACE\n"
-          + "          DSN8D12A.DSN8S12D\n"
-          + "          TO PUBLIC;\n"
-          + "       END-EXEC.";
+          + "             GRANT USE OF TABLESPACE\n"
+          + "              DSN8D12A.DSN8S12D\n"
+          + "              TO PUBLIC;\n"
+          + "           END-EXEC.";
 
   private static final String GRANT_ON_VARIABLE3 =
       TEXT
-          + "         GRANT USE OF STOGROUP SG1\n"
-          + "         TO ROLE ROLE1;\n"
-          + "       END-EXEC.";
+          + "             GRANT USE OF STOGROUP SG1\n"
+          + "             TO ROLE ROLE1;\n"
+          + "           END-EXEC.";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

@@ -19,7 +19,7 @@ Automate functional tests running on Theia with Cypress.io in COBOL LS.
 
    <code> yarn install --frozen-lockfile</code>
 
-- Add commands files from https://github.com/eclipse/che-che4z/tree/master/tests (check instructions in README). For some reason it is not working as expected [installation](https://github.com/eclipse/che-che4z/blob/ab4789702b0ca6ec7061c0eb5417c4c45bcdf32d/tests/package.json#L12), so we should do it manually:
+- Add commands files from https://github.com/eclipse/che-che4z/tree/master/tests (check instructions in README). For some reason it is not working as expected [installation](https://github.com/eclipse/che-che4z/blob/c4970580c6a839c9e87f6bdbe5915d67eabcc43f/tests/package.json#L12), so we should do it manually:
 
   <code> npm run ts:build </code>
 
@@ -39,7 +39,7 @@ If you are using VS Code, you can reload the window. Go to `View > Command Palet
 Beside the workpsace loading, also we need to mount the `test` folder in order to run `TC318696`. 
   #### Run Theia in docker:
 
-  <code>sudo docker run -it --rm -p 3000:3000 -v /home/$USER/$project/plugins/:/home/theia/plugins -v /home/$USER/che-che4z-lsp-for-cobol/tests/test_files/project/:/home/project -v /home/$USER/che-che4z-lsp-for-cobol/tests/test_files/test:/home/test --name theia theiaide/theia-{java or full}:1.5.0</code>
+  <code>sudo docker run -it --rm -p 3000:3000 -v /home/$USER/$project/plugins/:/home/theia/plugins -v /home/$USER/che-che4z-lsp-for-cobol/tests/test_files/project/:/home/project -v /home/$USER/che-che4z-lsp-for-cobol/tests/test_files/test:/home/test --name theia theiaide/theia-{java or full}:1.5.0 -v  /home/$USER/che-che4z-lsp-for-cobol/tests/test_files/zowe:/home/theia/.zowe </code>
 
   OR
 
@@ -77,13 +77,13 @@ Check this page: https://docs.cypress.io/guides/guides/test-retries.html#Introdu
 
 ## 5. Generate report
 
-To generate a HTML report after you run the test. 
+We are using [Allure Report](https://github.com/allure-framework/allure2). The project has integration with Cypress using [cypress-allure-plugin]( https://github.com/Shelex/cypress-allure-plugin). 
 
-Run `npm run generate:html:report` for final test report.`generate:html:report` combines the 2 commands: `merge:reports` abd `create:html:report` into one. 
-
-The `merge:reports` command will merge all the json files from our `cypress/report` directory and store them in a new file called `cypress-tests-report.json`. 
-
-The `create:html:report` command will generate the html report from `cypress-tests-report.json` and save it a new directory `cypress/reports/final_report`.
+* Clear previous output: `allure:clear`
+* Generate Allure report: `allure:report`
+* Open the generated report: `allure:open`
+* Generate and open report: `allure:open:report`
+* Historical data is preserved: `allure:history`
 
 ## 6. Test tags
 We are using custom tags to slice up Cypress test runs. Check the tags bellow in the table

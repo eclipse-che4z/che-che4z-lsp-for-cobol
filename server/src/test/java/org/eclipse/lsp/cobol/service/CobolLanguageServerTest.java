@@ -15,27 +15,28 @@
 
 package org.eclipse.lsp.cobol.service;
 
-import org.eclipse.lsp.cobol.core.messages.LocaleStore;
-import org.eclipse.lsp.cobol.core.model.ErrorCode;
-import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
+import org.eclipse.lsp.cobol.core.messages.LocaleStore;
+import org.eclipse.lsp.cobol.core.model.ErrorCode;
+import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
-import static org.eclipse.lsp.cobol.core.model.ErrorCode.values;
-import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.model.ErrorCode.values;
+import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -43,6 +44,7 @@ import static org.mockito.Mockito.*;
 class CobolLanguageServerTest {
 
   private static CustomThreadPoolExecutor customExecutor;
+  private DisposableLSPStateService stateService;
 
   @BeforeAll
   static void init() {
@@ -50,6 +52,11 @@ class CobolLanguageServerTest {
     when(customExecutor.getThreadPoolExecutor()).thenReturn(Executors.newFixedThreadPool(3));
     when(customExecutor.getScheduledThreadPoolExecutor())
         .thenReturn(Executors.newSingleThreadScheduledExecutor());
+  }
+
+  @BeforeEach
+  void getStateService() {
+    stateService = new CobolLSPServerStateService();
   }
 
   /**
@@ -78,7 +85,13 @@ class CobolLanguageServerTest {
         .thenReturn(completedFuture(ImmutableList.of("INFO")));
     CobolLanguageServer server =
         new CobolLanguageServer(
-            null, null, watchingService, settingsService, localeStore, customExecutor);
+            null,
+            null,
+            watchingService,
+            settingsService,
+            localeStore,
+            customExecutor,
+            stateService);
 
     server.initialized(new InitializedParams());
 
@@ -98,7 +111,7 @@ class CobolLanguageServerTest {
   @Test
   void initialize() {
     CobolLanguageServer server =
-        new CobolLanguageServer(null, null, null, null, null, customExecutor);
+        new CobolLanguageServer(null, null, null, null, null, customExecutor, stateService);
     InitializeParams initializeParams = new InitializeParams();
 
     List<WorkspaceFolder> workspaceFolders = singletonList(new WorkspaceFolder("uri", "name"));
@@ -117,16 +130,16 @@ class CobolLanguageServerTest {
   void shutdown() {
     TextDocumentService textDocumentService = mock(CobolTextDocumentService.class);
     CobolLanguageServer server =
-        new CobolLanguageServer(textDocumentService, null, null, null, null, customExecutor);
-    assertEquals(1, server.getExitCode());
+        new CobolLanguageServer(
+            textDocumentService, null, null, null, null, customExecutor, stateService);
+    assertEquals(1, stateService.getExitCode());
     server.shutdown();
-    assertEquals(0, server.getExitCode());
+    assertEquals(0, stateService.getExitCode());
   }
 
   private void checkOnlySupportedCapabilitiesAreSet(ServerCapabilities capabilities) {
     assertEquals(TextDocumentSyncKind.Full, capabilities.getTextDocumentSync().getLeft());
     assertTrue(capabilities.getWorkspace().getWorkspaceFolders().getSupported());
-    assertTrue(capabilities.getCompletionProvider().getResolveProvider());
     assertTrue(capabilities.getDefinitionProvider());
     assertTrue(capabilities.getReferencesProvider());
     assertTrue(capabilities.getDocumentFormattingProvider());
@@ -137,6 +150,7 @@ class CobolLanguageServerTest {
         stream(values()).map(ErrorCode::name).collect(toList()),
         capabilities.getExecuteCommandProvider().getCommands());
 
+    assertFalse(capabilities.getCompletionProvider().getResolveProvider());
     assertNull(capabilities.getWorkspace().getWorkspaceFolders().getChangeNotifications());
     assertNull(capabilities.getDocumentRangeFormattingProvider());
     assertTrue(capabilities.getHoverProvider());

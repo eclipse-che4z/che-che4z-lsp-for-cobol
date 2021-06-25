@@ -14,9 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
-import lombok.experimental.UtilityClass;
-
 import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 
 /** This utility class provides functions that are useful for pre-processing a COBOL document */
 @UtilityClass

@@ -48,7 +48,7 @@ class TestReplacingForSeveralTokensInOneLine {
       "              MOVE 10 TO {:TAG:-CHILD^ABCDE-CHILD|invalid} OF {:TAG:-PARENT^ABCDE-PARENT}";
 
   private static final String REPL_NAME = "REPL";
-  private static final String MESSAGE = "Invalid definition for: ABCDE-CHILD";
+  private static final String MESSAGE = "Variable ABCDE-CHILD is not defined";
 
   @Test
   void test() {

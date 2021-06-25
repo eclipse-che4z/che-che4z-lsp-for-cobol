@@ -15,31 +15,38 @@
 
 package org.eclipse.lsp.cobol.usecases.engine;
 
-import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
-import org.eclipse.usecase.UseCasePreprocessorLexer;
-import org.eclipse.usecase.UseCasePreprocessorParser;
-import org.eclipse.usecase.UseCasePreprocessorParser.StartRuleContext;
 import com.google.common.collect.ImmutableList;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.eclipse.lsp.cobol.positive.CobolText;
+import org.eclipse.lsp.cobol.service.CopybookConfig;
+import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.service.CopybookServiceImpl;
+import org.eclipse.lsp.cobol.service.SQLBackend;
+import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
+import org.eclipse.lsp.cobol.service.utils.WorkspaceFileService;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.eclipse.usecase.UseCasePreprocessorLexer;
+import org.eclipse.usecase.UseCasePreprocessorParser;
+import org.eclipse.usecase.UseCasePreprocessorParser.StartRuleContext;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Function;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.antlr.v4.runtime.CharStreams.fromString;
+import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This class applies syntax and semantic analysis for COBOL texts using the actual Language Engine.
@@ -93,8 +100,41 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *     compared with expected one. Notice, that while checking lists, the order of elements doesn't
  *     matter.
  */
+@Slf4j
 @UtilityClass
 public class UseCaseEngine {
+
+  private static final String SQLCA = "SQLCA";
+  private static final String SQLCA_DATACOM_PATH = "/implicitCopybooks/SQLCA_DATACOM.cpy";
+  private static final String SQLCA_DB2_PATH = "/implicitCopybooks/SQLCA_DB2.cpy";
+  private static final String SQLDA_DB2_PATH = "/implicitCopybooks/SQLDA.cpy";
+
+  /**
+   * Checks if language engine applies required syntax and semantic checks correctly once code
+   * contains implicitly (If not content is explicitly provided for SQLCA and SQLDA) defined
+   * copybooks.
+   *
+   * @param text COBOL text to analyse
+   * @param expectedDiagnostics the map of id to the Diagnostic that should present in the analysis
+   *     result
+   * @param implicitCopybookNames the names of the implicit copybooks used in this test
+   * @param sqlBackend the options to be used for SQL copybooks processing
+   */
+  public void runTest(
+      String text,
+      Map<String, Diagnostic> expectedDiagnostics,
+      List<String> implicitCopybookNames,
+      SQLBackend sqlBackend) {
+    List<CobolText> copybooks = new ArrayList<>();
+    implicitCopybookNames.forEach(
+        i -> {
+          String uri = getUriForImplicitCopybook(i, sqlBackend);
+          copybooks.add(new CobolText(i, readContentForImplicitCopybook(uri)));
+        });
+
+    runTest(
+        text, copybooks, expectedDiagnostics, ImmutableList.of(), CopybookProcessingMode.ENABLED);
+  }
 
   /**
    * Check if the language engine applies required syntax and semantic checks. All the semantic
@@ -114,7 +154,8 @@ public class UseCaseEngine {
    */
   public void runTest(
       String text, List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics) {
-    runTest(text, copybooks, expectedDiagnostics, ImmutableList.of(), CopybookProcessingMode.ENABLED);
+    runTest(
+        text, copybooks, expectedDiagnostics, ImmutableList.of(), CopybookProcessingMode.ENABLED);
   }
 
   /**
@@ -170,18 +211,50 @@ public class UseCaseEngine {
 
     PreprocessedDocument document = prepareDocument(text, copybooks, expectedDiagnostics);
     AnalysisResult actual =
-        analyze(DOCUMENT_URI, document.getText(), document.getCopybooks(), subroutineNames, processingMode);
-    TestData expected = document.getTestData().toBuilder()
-        .subroutineDefinitions(makeSubroutinesDefinitions(subroutineNames))
-        .build();
+        analyze(
+            DOCUMENT_URI,
+            document.getText(),
+            document.getCopybooks(),
+            subroutineNames,
+            new CopybookConfig(processingMode, SQLBackend.DB2_SERVER));
+    TestData expected =
+        document.getTestData().toBuilder()
+            .subroutineDefinitions(makeSubroutinesDefinitions(subroutineNames))
+            .build();
     assertResultEquals(actual, expected);
     return actual;
+  }
+
+  private String getUriForImplicitCopybook(String copybookName, SQLBackend sqlBackend) {
+    if (SQLCA.equals(copybookName)) {
+      if (SQLBackend.DATACOM_SERVER.equals(sqlBackend)) {
+        return SQLCA_DATACOM_PATH;
+      }
+      return SQLCA_DB2_PATH;
+    }
+    return SQLDA_DB2_PATH;
+  }
+
+  private String readContentForImplicitCopybook(String resourcePath) {
+    InputStream inputStream = CopybookServiceImpl.class.getResourceAsStream(resourcePath);
+    String content = null;
+    try {
+      content =
+          new WorkspaceFileService()
+              .readFromInputStream(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      LOG.error("Implicit copybook is not loaded. ", e);
+    }
+    return content;
   }
 
   private Map<String, List<Location>> makeSubroutinesDefinitions(List<String> subroutineNames) {
     Range fileStart = new Range(new Position(0, 0), new Position(0, 0));
     return subroutineNames.stream()
-        .collect(toMap(Function.identity(), name -> ImmutableList.of(new Location("URI:" + name, fileStart))));
+        .collect(
+            toMap(
+                Function.identity(),
+                name -> ImmutableList.of(new Location("URI:" + name, fileStart))));
   }
 
   private PreprocessedDocument prepareDocument(
@@ -252,35 +325,44 @@ public class UseCaseEngine {
     assertResult("Constant usages:", expected.getConstantUsages(), actual.getConstantUsages());
 
     assertResult(
-        "Paragraph definition:", expected.getParagraphDefinitions(), actual.getParagraphDefinitions());
+        "Paragraph definition:",
+        expected.getParagraphDefinitions(),
+        actual.getParagraphDefinitions());
     assertResult("Paragraph usages:", expected.getParagraphUsages(), actual.getParagraphUsages());
 
     assertResult(
         "Section definition:", expected.getSectionDefinitions(), actual.getSectionDefinitions());
     assertResult("Section usages:", expected.getSectionUsages(), actual.getSectionUsages());
 
-    assertResult("Subroutine definitions: ", expected.getSubroutineDefinitions(), actual.getSubroutineDefinitions());
+    assertResult(
+        "Subroutine definitions: ",
+        expected.getSubroutineDefinitions(),
+        actual.getSubroutineDefinitions());
     assertResult("Subroutine usage:", expected.getSubroutineUsages(), actual.getSubroutineUsages());
   }
 
   private void assertDiagnostics(
       Map<String, List<Diagnostic>> expected, Map<String, List<Diagnostic>> actual) {
-    String message = "Diagnostics: " + actual.toString();
-    assertEquals(expected.size(), actual.size(), message);
-    assertEquals(
-        expected.values().stream().flatMap(Collection::stream).filter(Objects::nonNull).count(),
-        actual.values().stream().mapToLong(Collection::size).sum(),
-        message);
-    expected.forEach(
-        (key, value) ->
-            actual
-                .get(key)
-                .forEach(
-                    actualDiag ->
-                        assertTrue(
-                            value.contains(actualDiag),
-                            "Diagnostic not found: " + actualDiag.toString())));
+    assertEquals(expected.keySet(), actual.keySet(), "Diagnostic documents are not the same");
+    for (String documentUri : expected.keySet()) {
+      List<Diagnostic> expectedDiagnostic =
+          expected.get(documentUri).stream().sorted(diagnosticComparator).collect(toList());
+      List<Diagnostic> actualDiagnostic =
+          actual.get(documentUri).stream().sorted(diagnosticComparator).collect(toList());
+      assertEquals(
+          expectedDiagnostic, actualDiagnostic, "Different diagnostics for: " + documentUri);
+    }
   }
+
+  private final Comparator<Position> positionComparator =
+      comparing(Position::getLine).thenComparing(Position::getCharacter);
+
+  private final Comparator<Range> rangeComparator =
+      comparing(Range::getStart, positionComparator)
+          .thenComparing(Range::getEnd, positionComparator);
+
+  private final Comparator<Diagnostic> diagnosticComparator =
+      comparing(Diagnostic::getRange, rangeComparator).thenComparing(Diagnostic::getMessage);
 
   private void assertResult(
       String message, Map<String, List<Location>> expected, Map<String, List<Location>> actual) {
