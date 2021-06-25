@@ -29,7 +29,9 @@ context('This is a F97476 spec', () => {
     it(['smoke'], 'Checks basic REPLACING feature', () => {
       cy.openFile('REPLACING.CBL');
       cy.goToLine(22);
-      cy.getCurrentLineErrors({ expectedLine: 22 }).getHoverErrorMessage().contains('Invalid definition for: ABC-ID');
+      cy.getCurrentLineErrors({ expectedLine: 22 })
+          .getHoverErrorMessage()
+          .contains('Variable ABC-ID is not defined');
       cy.getLineByNumber(19).contains('COPY REPL.').type('{end}{backspace} REPLACING LEADING ==TAG== BY ==ABC== .', {
         delay: 100,
       });
@@ -201,13 +203,13 @@ context('This is a F97476 spec', () => {
       cy.goToLine(36);
       cy.getCurrentLineErrors({ expectedLine: 36, errorType: 'error' })
         .getHoverErrorMessage()
-        .contains('Invalid definition for: ABC-ID');
+        .contains('Variable ABC-ID is not defined');
       cy.goToLine(14);
       cy.getCurrentLine().type('{home}PROCESS NODYNAM{enter}');
       cy.goToLine(37);
       cy.getCurrentLineErrors({ expectedLine: 37, errorType: 'error' })
         .getHoverErrorMessage()
-        .contains('Invalid definition for: ABC-ID');
+        .contains('Variable ABC-ID is not defined');
     });
   });
 
