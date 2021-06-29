@@ -132,6 +132,18 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
+  public void enterCopyIdmsStatement(CopyIdmsStatementContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitCopyIdmsStatement(@NonNull CopyIdmsStatementContext ctx) {
+
+    collectAndAccumulateCopybookData(
+            ctx.copyIdmsOptions().copyIdmsSource().copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval());
+  }
+
+  @Override
   public void enterCopyMaidStatement(CopyMaidStatementContext ctx) {
     push();
   }
@@ -139,7 +151,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyMaidStatement(CopyMaidStatementContext ctx) {
     collectAndAccumulateCopybookData(
-        ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval());
+            ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval());
   }
 
   @Override
