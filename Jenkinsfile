@@ -59,14 +59,50 @@ spec:
     emptyDir: {}
 """
 
+def kubernetes_test_config = """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: theia
+    image: theiaide/theia-java:1.5.0
+    tty: true
+    command: [ "/bin/bash", "-c", "--" ]
+    args: [ "while true; do sleep 1000; done;" ]
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "800m"
+      requests:
+        memory: "2Gi"
+        cpu: "800m"
+  - name: cypress
+    image: cypress/included:7.1.0
+    tty: true
+    command: [ "/bin/bash", "-c", "--" ]
+    args: [ "while true; do sleep 1000; done;" ]
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "800m"
+      requests:
+        memory: "2Gi"
+        cpu: "800m"
+"""
+
 def projectName = 'lsp-for-cobol'
 def kubeLabelPrefix = "${projectName}_pod_${env.BUILD_NUMBER}_${env.BRANCH_NAME}"
         // cleaning the branch name according K8s restrictions
         .replaceAll(/[^a-zA-Z0-9._-]+/,"").take(52)
 def kubeBuildLabel = "${kubeLabelPrefix}_build"
+def kubeTestLabel = "${kubeLabelPrefix}_test"
 
 pipeline {
     agent none
+    parameters {
+        booleanParam(defaultValue: false, description: 'Run build.', name: 'build')
+        booleanParam(defaultValue: true, description: 'Run integration tests.', name: 'integrationTests')
+    }
     options {
         disableConcurrentBuilds()
         timestamps()
@@ -79,6 +115,10 @@ pipeline {
     }
     stages {
         stage('Build a package') {
+            when {
+                expression { params.build }
+                beforeAgent true
+            }
             agent {
                 kubernetes {
                     label kubeBuildLabel
@@ -228,6 +268,81 @@ pipeline {
                                 '''
                                 echo "Deployed to https://$url"
                             }
+                        }
+                    }
+                }
+            }
+        }
+        stage('Integration testing') {
+            when {
+                expression { params.integrationTests }
+                beforeAgent true
+            }
+            agent {
+                kubernetes {
+                    label kubeTestLabel
+                    yaml kubernetes_test_config
+                }
+            }
+            environment {
+                THEIA_HOME = "$env.WORKSPACE/tests/theia/home"
+                THEIA_PLUGINS = "$env.WORKSPACE/tests/theia/plugins"
+                PROJECT_FOLDER = "$env.WORKSPACE/tests/test_files/project"
+                CYPRESS_HOME = "$env.WORKSPACE/tests/cypress/home"
+            }
+            steps {
+                checkout scm
+                container('theia') {
+                    dir('tests') {
+                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}'
+                        // copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
+                        sh 'mkdir -p $THEIA_HOME'
+                        sh 'cp -r test_files/zowe theia/home/.zowe'
+                        sh 'mkdir -p $THEIA_PLUGINS'
+                        sh 'mv *.vsix $THEIA_PLUGINS'
+                        sh '''#!/bin/bash
+                            cd /home/theia
+                            export HOME=$THEIA_HOME
+                            node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=local-dir:$THEIA_PLUGINS > $THEIA_HOME/theia.log &
+                        '''
+//                        echo "Waiting for Theia starting..."
+//                        sh 'sleep 3'
+//                        sh 'ls $THEIA_HOME'
+//                        sh 'cat $THEIA_HOME/theia.log'
+//                        sh '''#!/bin/bash
+//                            sed '/Deploy plugins list took/q' <(tail -n 0 -f $THEIA_HOME/theia.log) > /dev/null
+//                        '''
+//                        echo "Theia ready!"
+//                        sh 'cat $THEIA_HOME/theia.log'
+                    }
+                }
+                container('cypress') {
+                    dir('tests') {
+                        sh '''#!/bin/bash
+                            export HOME=$CYPRESS_HOME
+                            mkdir -p $CYPRESS_HOME 
+                            yarn install
+                            yarn add https://github.com/eclipse/che-che4z.git 
+                            npm run ts:build
+                            NO_COLOR=1 npm run cy:run -- --spec cypress/integration/LSP/F101836.spec.js --browser chrome --headless --config video=true
+                            npm run allure:report 
+                        '''
+                    }
+                }
+            }
+            post {
+                always {
+                    container('theia') {
+                        dir('tests') {
+                            archiveArtifacts "theia/home/theia.log"
+                            archiveArtifacts "theia/home/LSPCobol/**/*.*"
+                        }
+                    }
+                    container('cypress') {
+                        dir('tests') {
+                            archiveArtifacts "cypress/screenshots/**/*.*"
+                            archiveArtifacts "cypress/videos/**/*.*"
+                            archiveArtifacts "allure-report/**/*.*"
                         }
                     }
                 }
