@@ -588,6 +588,21 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitIdms_map_name(Idms_map_nameContext ctx) {
+    return addVariableUsage(ctx.dataName(), ctx);
+  }
+
+  @Override
+  public List<Node> visitIdms_db_entity_name(Idms_db_entity_nameContext ctx) {
+    return addVariableUsage(ctx.dataName(), ctx);
+  }
+
+  @Override
+  public List<Node> visitIdms_procedure_name(Idms_procedure_nameContext ctx) {
+    return addVariableUsage(ctx.dataName(), ctx);
+  }
+
+  @Override
   public List<Node> visitTableCall(TableCallContext ctx) {
     return addVariableUsage(ctx.dataName(), ctx);
   }
