@@ -31,6 +31,7 @@ public enum CFASTNodeType {
   ENDIF("endif"),
   EVALUATE("evaluate"),
   WHEN("when"),
+  WHEN_OTHER("whenother"),
   END_EVALUATE("endevaluate"),
   INLINE_PERFORM("inlineperform"),
   END_INLINE_PERFORM("endinlineperform");

@@ -2,6 +2,19 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 Changelog:
 
+## [0.19.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.0...0.19.1) (2021-06-25)
+
+### Bug Fixes
+* Allow IDMS statements in conditional blocks [#952](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/952) ([5b2ea84](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/5b2ea84f9b3368c56a82062d49767755426ba39b))
+* Clarify error message for invalid definition ([4918a18](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/4918a18ae5682242b1328075fe2a84eee9089156)), closes [#979](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/979)
+* Fix access to undefined element error in no workspace case [#957](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/957) ([0554b52](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/0554b5229f3144d5471e5c89f46232f2c480871b))
+* Fix error on multiline optional paragraphs ([77b562e](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/77b562e6e2974497366847bbb4d62b15809b3a85)), closes [#953](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/953)
+* Fix hover for group items [#970](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/970) ([1894fc5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/1894fc5aeb3d72a648140c4f1ec2b07298f17db0))
+* Fix incorrect IF statement parsing [#828](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/828) ([04484d7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/04484d72b3a6d7925f3794c6e8d44718d39b2f5a))
+* Fix loading copybooks with any encoding [#956](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/956) ([b6f00e8](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/b6f00e832246439e4aa5d27e92496cf10cccc1ae))
+* Make analyse exceptions propagate to Extended API responses [#960](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/960) ([91fae1b](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/91fae1b5fea4983e7a9a9d4dad9ca08fdde5d238))
+* Add new node type to CFAST to fix the conditional stop issue ([9894793](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9894793608b93fbf61edf810ebb190743dd4d301))
+
 ## [0.19.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.18.0...0.19.0) (2021-06-10)
 
 ### Bug Fixes

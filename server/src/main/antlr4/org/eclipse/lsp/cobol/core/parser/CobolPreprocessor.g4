@@ -11,7 +11,7 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((copyStatement | includeStatement | replaceAreaStart | replaceOffStatement )+ .*?)* EOF
+   : .*? ((includeStatement | copyStatement | copyIdmsStatement | copyMaidStatement | replaceAreaStart | replaceOffStatement )+ .*?)* EOF
    ;
 
 // copy statement
@@ -23,6 +23,30 @@ copyStatement
 includeStatement
    :EXEC_SQL INCLUDE copySource END_EXEC DOT_FS
    ;
+
+// copy idms statement
+copyIdmsStatement
+    : LEVEL_NUMBER? COPY IDMS copyIdmsOptions DOT_FS?
+    ;
+
+copyIdmsOptions
+    : (RECORD copyIdmsSource versionClause? (REDEFINES cobolWord)?) |
+    (FILE copyIdmsSource versionClause?) |
+    ((MAP | MAP_CONTROL) copyIdmsSource) |
+    (MODULE? copyIdmsSource versionClause?)
+    ;
+
+copyIdmsSource
+    : copySource
+    ;
+
+versionClause
+    : VERSION integerLiteral
+    ;
+// copy maid statement
+copyMaidStatement
+    : LEVEL_NUMBER? COPY MAID copySource DOT_FS?
+    ;
 
 copySource
    : (literal | cobolWord) ((OF | IN) copyLibrary)?
@@ -94,10 +118,14 @@ charDataLine
    ;
 
 cobolWord
-   : COPYBOOK_IDENTIFIER | IDENTIFIER
+   : COPYBOOK_IDENTIFIER | IDENTIFIER | MAID
    ;
 
 literal
    : NONNUMERICLITERAL | NUMERICLITERAL | INTEGERLITERAL | LEVEL_NUMBER |LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88
+   ;
+
+integerLiteral
+   : INTEGERLITERAL | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88
    ;
 

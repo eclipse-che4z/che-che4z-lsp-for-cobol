@@ -25,8 +25,8 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
- * This test checks that the second program in one file can use the same name for
- * variable declaration as the first program.
+ * This test checks that the second program in one file can use the same name for variable
+ * declaration as the first program.
  */
 public class TestProgramContexts {
   private static final String TEXT_SEQUENTIAL_PROGRAMS =
@@ -71,13 +71,16 @@ public class TestProgramContexts {
 
   @Test
   void testSequential() {
-    UseCaseEngine.runTest(TEXT_SEQUENTIAL_PROGRAMS, ImmutableList.of(), ImmutableMap.of(
-        "1",
-        new Diagnostic(
-            new Range(new Position(15, 21), new Position(15, 28)),
-            "Invalid definition for: VARNAME",
-            DiagnosticSeverity.Error,
-            SourceInfoLevels.ERROR.getText())));
+    UseCaseEngine.runTest(
+        TEXT_SEQUENTIAL_PROGRAMS,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(new Position(15, 21), new Position(15, 28)),
+                "Duplicated definition for VARNAME",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 
   @Test

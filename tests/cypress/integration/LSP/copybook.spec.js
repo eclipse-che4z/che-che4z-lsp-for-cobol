@@ -140,7 +140,7 @@ context('This is a Copybook spec', () => {
             expect(lineNumber).to.be.equal(52);
             cy.getLineByNumber(lineNumber).find('span').eq(-1).click().trigger('mousemove');
           });
-        cy.get('div.monaco-editor-hover-content').contains('Invalid definition for: USER-PHONE-MOBILE1');
+        cy.get('div.monaco-editor-hover-content').contains('Variable USER-PHONE-MOBILE1 is not defined');
       },
     );
   });
@@ -468,8 +468,19 @@ context('This is a Copybook spec', () => {
         cy.getCurrentLineErrors({ expectedLine: 21 })
           .eq(0)
           .getHoverErrorMessage()
-          .contains('Invalid definition for: ABC');
+          .contains('Variable ABC is not defined');
       });
+    });
+  });
+
+  describe('Load resource file', () => {
+    it(['smoke'], 'Checks loading of resource file', () => {
+      cy.openFile('RES.cbl');
+      cy.goToLine(6);
+      cy.getCurrentLineErrors({ expectedLine: 6 })
+        .eq(0)
+        .getHoverErrorMessage()
+        .contains("Syntax error on 'FILE-CONTROsL'");
     });
   });
 });

@@ -60,6 +60,6 @@ class TestSetOnOff {
                 ERROR.getText()),
             "2",
             new Diagnostic(
-                null, "Invalid definition for: ABCDE", DiagnosticSeverity.Error, ERROR.getText())));
+                null, "Variable ABCDE is not defined", DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

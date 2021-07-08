@@ -48,7 +48,7 @@ class TestUndefinedParentVariableUnderlined {
           + "9           MOVE 10 TO {MAMA|1} OF AGE OF BORROWE.\r\n"
           + "10      END PROGRAM TEST1.";
 
-  private static final String MESSAGE = "Invalid definition for: MAMA";
+  private static final String MESSAGE = "Variable MAMA is not defined";
 
   @Test
   void assertCopybookProcessingModeNotChangesLogic() {
@@ -72,6 +72,7 @@ class TestUndefinedParentVariableUnderlined {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(),
-        ImmutableMap.of("1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
+        ImmutableMap.of(
+            "1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
   }
 }
