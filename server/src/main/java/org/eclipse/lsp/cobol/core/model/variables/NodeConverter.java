@@ -43,6 +43,8 @@ public class NodeConverter {
     Variable parent = variable.getParent();
     if (parent instanceof StructuredVariable) {
       ((StructuredVariable) parent).addChild(variable);
+    } else if (variable instanceof ConditionDataName && parent.isConditional()) {
+      parent.addConditionName((ConditionDataName) variable);
     }
     return variable;
   }
