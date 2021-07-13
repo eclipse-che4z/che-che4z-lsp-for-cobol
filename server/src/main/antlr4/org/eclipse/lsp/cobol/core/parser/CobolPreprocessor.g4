@@ -26,7 +26,7 @@ includeStatement
 
 // copy idms statement
 copyIdmsStatement
-    : LEVEL_NUMBER? COPY IDMS copyIdmsOptions DOT_FS?
+    : LEVEL_NUMBER? COPY IDMS copyIdmsOptions (DOT_FS | SEMICOLON_FS)?
     ;
 
 copyIdmsOptions
@@ -87,7 +87,7 @@ pseudoReplaceable
 
 openingPseudoTextDelimiter: DOUBLEEQUALCHAR;
 
-closingPseudoTextDelimiter: DOUBLEEQUALCHAR (COMMACHAR | DOT| DOT_FS | SEMICOLON | SEMICOLON_FS)?;
+closingPseudoTextDelimiter: DOUBLEEQUALCHAR (COMMACHAR | DOT | DOT_FS | SEMICOLON_FS)?;
 
 pseudoReplacement
    : (openingPseudoTextDelimiter ~DOUBLEEQUALCHAR*? closingPseudoTextDelimiter) | EMPTYPSEUDOTEXT
