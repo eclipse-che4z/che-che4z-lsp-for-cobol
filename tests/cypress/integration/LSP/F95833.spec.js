@@ -52,21 +52,21 @@ context('This is F95833 spec', () => {
     });
   });
 
-  // describe('TC312738 CICS variables and paragraphs support', () => {
-  //   it(['investigation'], "Try 'Go to Definition' on variables and paragraphs", () => {
-  //     cy.openFile('ADSORT.cbl').goToLine(59);
-  //     cy.getLineByNumber(59).findText('XCTL1').goToDefinition();
-  //     cy.getCurrentLineNumber().should('eq', 28);
-  //     cy.getCurrentLine().contains('XCTL1');
-  //     cy.getLineByNumber(59).type('{end}{enter}');
-  //     cy.getLineByNumber(60).type('EXEC CICS XCTL RESP(XCTL1) PROGRAM (XCTL1) END-EXEC.');
-  //     cy.pause();
-  //     cy.getLineByNumber(60).findText('XCTL1').goToDefinition();
-  //     cy.getCurrentLineNumber().should('eq', 28);
+  describe('TC312738 CICS variables and paragraphs support', () => {
+    it(['investigation'], "Try 'Go to Definition' on variables and paragraphs", () => {
+      cy.openFile('ADSORT.cbl').goToLine(59);
+      cy.getLineByNumber(59).findText('XCTL1').goToDefinition();
+      cy.getCurrentLineNumber().should('eq', 28);
+      cy.getCurrentLine().contains('XCTL1');
+      cy.getLineByNumber(59).type('{end}{enter}');
+      cy.getLineByNumber(60).type('EXEC CICS XCTL RESP(XCTL1) PROGRAM (XCTL1) END-EXEC.');
+      cy.pause();
+      cy.getLineByNumber(60).findText('XCTL1').goToDefinition();
+      cy.getCurrentLineNumber().should('eq', 28);
 
-  //     cy.getCurrentLine().contains('XCTL1');
-  //   });
-  // });
+      cy.getCurrentLine().contains('XCTL1');
+    });
+  });
 
   describe('TC312753 Check EXEC CICS allows free arguments order', () => {
     it("Try 'Go to Definition' on variables and paragraphs", () => {
