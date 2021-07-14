@@ -45,7 +45,7 @@ versionClause
     ;
 // copy maid statement
 copyMaidStatement
-    : LEVEL_NUMBER? COPY MAID copySource DOT_FS?
+    : LEVEL_NUMBER? COPY MAID copySource qualifier? DOT_FS?
     ;
 
 copySource
@@ -53,6 +53,10 @@ copySource
    ;
 
 copyLibrary
+   : literal | cobolWord
+   ;
+
+qualifier
    : literal | cobolWord
    ;
 

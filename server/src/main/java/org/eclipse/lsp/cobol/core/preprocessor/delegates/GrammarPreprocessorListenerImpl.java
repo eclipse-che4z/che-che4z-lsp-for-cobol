@@ -154,7 +154,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyMaidStatement(CopyMaidStatementContext ctx) {
     collectAndAccumulateCopybookData(
-        ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval(), true);
+        ctx.copySource(), retrieveCopybookStatementPosition(ctx), ctx.getSourceInterval(), false);
   }
 
   @Override
