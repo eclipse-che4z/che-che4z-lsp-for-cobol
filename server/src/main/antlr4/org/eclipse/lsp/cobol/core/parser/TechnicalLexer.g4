@@ -43,8 +43,7 @@ MORETHANCHAR : '>';
 MORETHANOREQUAL : '>=';
 NOTEQUALCHAR : '<>';
 PLUSCHAR : '+';
-SEMICOLON : ';';
-SEMICOLON_FS : ';' ('\r' | '\n' | '\f' | '\t' | ' ')+ | ';' EOF;
+SEMICOLON_FS : ';' EOF?;
 SINGLEQUOTE : '\'';
 RPARENCHAR : ')';
 SLASHCHAR : '/';
@@ -76,7 +75,7 @@ HEX_NUMBERS : HEXNUMBER;
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
 COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*  -> channel(HIDDEN);
-WS : [ \t\f;]+ -> channel(HIDDEN);
+WS : [ \t\f]+ -> channel(HIDDEN);
 
 //SQL comments
 SQLLINECOMMENT

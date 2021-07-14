@@ -145,7 +145,7 @@ QUOTED_COPYBOOKNAME : '\'' + COPYBOOKNAME + '\'';
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
-WS : [ \t\f;]+ -> channel(HIDDEN);
+WS : [ \t\f]+ -> channel(HIDDEN);
 TEXT : ~('\n' | '\r');
 SEPARATOR : ', ' -> channel(HIDDEN);
 
