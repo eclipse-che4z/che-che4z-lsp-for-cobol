@@ -483,4 +483,28 @@ context('This is a Copybook spec', () => {
         .contains("Syntax error on 'FILE-CONTROsL'");
     });
   });
+
+  describe('TC327253 Support COPY MAID statements', () => {
+    beforeEach(() => {
+      cy.updateConfigs('testing');
+    });
+    it(['smoke'], 'Support COPY MAID statements', () => {
+      cy.openFile('TEST.CBL');
+      cy.goToLine(20);
+      cy.getLineByNumber(20).type('{end}{enter}    COPY MAID A.');
+      cy.goToLine(21);
+      cy.getCurrentLineErrors({ expectedLine: 21 })
+        .eq(0)
+        .getHoverErrorMessage()
+        .contains("Syntax error on 'WORK-VARIABLES' expected SECTION");
+      cy.getLineByNumber(21).type('{end}{enter}COPY MAID NEW.');
+      cy.getLineByNumber(22).should('not.have.class', '.squiggly-error');
+      cy.getLineByNumber(22).type('{end}{enter}COPY MAID REPL.');
+      cy.goToLine(23);
+      cy.getCurrentLineErrors({ expectedLine: 23 })
+        .eq(0)
+        .getHoverErrorMessage()
+        .contains("Syntax error on 'TAG-ID' expected SECTION");
+    });
+  });
 });
