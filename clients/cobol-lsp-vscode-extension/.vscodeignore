@@ -41,3 +41,4 @@ node_modules/lodash/fp
 node_modules/jsonschema/schema
 node_modules/isarray/
 node_modules/promise-retry/
+node_modules/stack-trace/
