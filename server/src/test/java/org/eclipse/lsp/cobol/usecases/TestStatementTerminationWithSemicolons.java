@@ -30,6 +30,7 @@ class TestStatementTerminationWithSemicolons {
           + "       01 {$*CARRIAGE-CONTROL} PIC 9.\n"
           + "       01 {$*LINE-SPACING} PIC 9.\n"
           + "       01 {$*REPORT-TITLE} PIC X(100).\n"
+          + "       01 {$*MC} PIC X(100).\n"
           + "       01 {$*PROGRAM-WORK-FIELDS}.\n"
           + "             88  {$*NEW-PAGE}      VALUE 30.\n"
           + "          02 {$*PAGE-COUNT}        PIC 9(3).\n"
@@ -46,7 +47,7 @@ class TestStatementTerminationWithSemicolons {
           + "           ADD 1 TO {$PAGE-COUNT};\n"
           + "           MOVE 'TITLE' TO {$REPORT-TITLE}.\n"
           + "           IF {$NEW-PAGE}\n"
-          + "              MODIFY MAP MC FOR DFLD {$ITENUM} EDIT ERROR\n"
+          + "              MODIFY MAP {$MC} FOR DFLD {$ITENUM} EDIT ERROR\n"
           + "              CALL {%'spacing'} USING {$LINE-SPACING};\n"
           + "              MOVE '  '  TO {$LINE-SPACING}\n"
           + "           END-IF.";
