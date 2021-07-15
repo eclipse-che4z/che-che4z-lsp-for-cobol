@@ -514,4 +514,34 @@ context('This is a LSP spec', () => {
       varDifinitionAutocomplete('TOP-OF-PAGE', 'C01 IS TOP-OF-PAGE.');
     });
   });
+
+  describe('Show 88 Items On Hover', () => {
+    it(['smoke'], 'Show 88 Items On Hover', () => {
+      cy.openFile('TEST.CBL');
+      cy.goToLine(19);
+      cy.getLineByNumber(20).type('{home}{enter}');
+      cy.getLineByNumber(20).type(
+        '01 TOP.{enter} \
+      05 MIDDLE-2.{enter} \
+        10 LEAF-2 PIC 9.{enter} \
+          88 COND-ITEM1 VALUE 0.{enter} \
+          88 COND-ITEM2 VALUE 1.{enter}',
+      );
+      hoverOverVariable(
+        21,
+        'MIDDLE-2',
+        '01 TOP. 05 MIDDLE-2. 10 LEAF-2 PIC 9. 88 COND-ITEM1 VALUE 0. 88 COND-ITEM2 VALUE 1.',
+      );
+      hoverOverVariable(23, 'COND-ITEM1', '01 TOP. 05 MIDDLE-2. 10 LEAF-2 PIC 9. 88 COND-ITEM1 VALUE 0.');
+      hoverOverVariable(24, 'COND-ITEM2', '01 TOP. 05 MIDDLE-2. 10 LEAF-2 PIC 9. 88 COND-ITEM2 VALUE 1.');
+    });
+  });
+
+  describe('TC327254 Semicolon as a Separators Not Produces Error', () => {
+    it(['smoke'], 'Semicolon as a Separators Not Produces Error', () => {
+      cy.openFile('TEST.CBL');
+      cy.goToLine(23).getLineByNumber(23).type('{end}{backspace};');
+      cy.getLineByNumber(23).should('not.have.class', '.squiggly-error');
+    });
+  });
 });
