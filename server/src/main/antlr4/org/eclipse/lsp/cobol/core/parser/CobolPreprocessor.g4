@@ -26,7 +26,7 @@ includeStatement
 
 // copy idms statement
 copyIdmsStatement
-    : LEVEL_NUMBER? COPY IDMS copyIdmsOptions DOT_FS?
+    : LEVEL_NUMBER? COPY IDMS copyIdmsOptions (DOT_FS | SEMICOLON_FS)?
     ;
 
 copyIdmsOptions
@@ -45,7 +45,7 @@ versionClause
     ;
 // copy maid statement
 copyMaidStatement
-    : LEVEL_NUMBER? COPY MAID copySource DOT_FS?
+    : LEVEL_NUMBER? COPY MAID copySource qualifier? DOT_FS?
     ;
 
 copySource
@@ -53,6 +53,10 @@ copySource
    ;
 
 copyLibrary
+   : literal | cobolWord
+   ;
+
+qualifier
    : literal | cobolWord
    ;
 
@@ -87,7 +91,7 @@ pseudoReplaceable
 
 openingPseudoTextDelimiter: DOUBLEEQUALCHAR;
 
-closingPseudoTextDelimiter: DOUBLEEQUALCHAR (COMMACHAR | DOT| DOT_FS | SEMICOLON | SEMICOLON_FS)?;
+closingPseudoTextDelimiter: DOUBLEEQUALCHAR (COMMACHAR | DOT | DOT_FS | SEMICOLON_FS)?;
 
 pseudoReplacement
    : (openingPseudoTextDelimiter ~DOUBLEEQUALCHAR*? closingPseudoTextDelimiter) | EMPTYPSEUDOTEXT

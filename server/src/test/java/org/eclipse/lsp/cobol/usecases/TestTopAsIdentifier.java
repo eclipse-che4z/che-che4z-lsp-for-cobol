@@ -12,6 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
+
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
@@ -19,17 +20,17 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** Test IDMS Modify DML statements */
-class TestIdmsModifyStatement {
-
+/** TOP is allowed as a name for variables, paragraphs, etc. */
+class TestTopAsIdentifier {
   private static final String TEXT =
-      "        IDENTIFICATION DIVISION.\n"
-          + "        PROGRAM-ID. test1.\n"
-          + "        DATA DIVISION.\n"
-          + "        WORKING-STORAGE SECTION.\n"
-          + "        01 {$*EMPLOYEE} PIC X(8).\n"
-          + "       PROCEDURE DIVISION.\n"
-          + "       MODIFY {$EMPLOYEE}.\n";
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       working-storage section.\n"
+          + "       01 {$*TOP} PIC 9.\n"
+          + "       procedure division.\n"
+          + "       {#*TOP}.\n"
+          + "           MOVE 0 TO {$TOP}.";
 
   @Test
   void test() {

@@ -922,11 +922,11 @@ paragraph
    ;
 
 sentence
-   : statement* DOT_FS | idmsStatements endClause?
+   : statement* endClause | idmsStatements endClause?
    ;
 
 conditionalStatementCall
-   : statement | idmsStatements
+   : (statement | idmsStatements) SEMICOLON_FS?
    ;
 
 statement
@@ -2947,7 +2947,7 @@ classCondition
    ;
 
 conditionNameReference
-   : conditionName inData* conditionNameSubscriptReference*
+   : dataName inData* conditionNameSubscriptReference*
    ;
 
 conditionNameSubscriptReference
