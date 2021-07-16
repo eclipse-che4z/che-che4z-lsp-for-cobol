@@ -826,7 +826,19 @@ usageFormat
    ;
 
 dataValueClause
-   : ((VALUE | VALUES) (IS | ARE)?) dataValueClauseLiteral
+   : valueIsToken dataValueClauseLiteral
+   ;
+
+valueIsToken
+   : valueToken isAreToken?
+   ;
+
+valueToken
+   : VALUE | VALUES
+   ;
+
+isAreToken
+   : IS | ARE
    ;
 
 dataValueClauseLiteral
@@ -842,7 +854,11 @@ dataValueIntervalFrom
    ;
 
 dataValueIntervalTo
-   : (THROUGH | THRU) literal
+   : thruToken literal
+   ;
+
+thruToken
+   : (THROUGH | THRU)
    ;
 
 // -- schema section ----------------------------------

@@ -508,8 +508,18 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .variableName(extractNameAndLocality(ctx.entryName()))
             .locality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
             .valueClauses(retrieveValues(ImmutableList.of(ctx.dataValueClause())))
+            .valueToken(retrieveValueToken(ctx.dataValueClause().valueIsToken()))
             .build(),
         visitChildren(ctx));
+  }
+
+  private String retrieveValueToken(ValueIsTokenContext ctx) {
+    return ctx.valueToken().getText().toUpperCase()
+        + Optional.ofNullable(ctx.isAreToken())
+            .map(ParserRuleContext::getText)
+            .map(String::toUpperCase)
+            .map(" "::concat)
+            .orElse("");
   }
 
   @Override

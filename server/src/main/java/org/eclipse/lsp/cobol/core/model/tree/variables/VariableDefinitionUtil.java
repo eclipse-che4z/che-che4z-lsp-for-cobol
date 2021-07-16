@@ -209,7 +209,8 @@ public class VariableDefinitionUtil {
             definitionNode.getLocality(),
             variableName,
             definitionNode.hasRedefines(),
-            definitionNode.getValueInterval());
+            definitionNode.getValueIntervals(),
+            definitionNode.getValueToken());
     createVariableNameNode(variable, definitionNode.getVariableName());
     VariableWithLevelNode precedingVariable = getVariableForConditional(definitionNode);
     List<SyntaxError> errors = ImmutableList.of();
