@@ -65,7 +65,7 @@ kind: Pod
 spec:
   containers:
   - name: theia
-    image: theiaide/theia-java:1.5.0
+    image: theiaide/theia-java:1.10.0
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
@@ -77,7 +77,7 @@ spec:
         memory: "2Gi"
         cpu: "800m"
   - name: cypress
-    image: cypress/included:7.1.0
+    image: cypress/included:7.7.0
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
