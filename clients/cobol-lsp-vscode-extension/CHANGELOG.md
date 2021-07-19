@@ -2,6 +2,20 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 Changelog:
 
+## [0.20.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.1...0.20.0) (2021-07-19)
+
+#### Added
+* Resolving copybooks with COPY IDMS
+* Support for COPY MAID statement
+* Semantic analysis for variables in IDMS statements
+* Description on hover for condition names (88-level variables)
+
+#### Changed
+* Semicolons allowed as statement terminators
+
+#### Fixed
+* TOP allowed as a valid variable name
+
 ## [0.19.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.0...0.19.1) (2021-06-25)
 
 #### Changed
