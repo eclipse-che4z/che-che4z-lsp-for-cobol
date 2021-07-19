@@ -140,7 +140,13 @@ public class VisitorHelper {
                 new ValueInterval(
                     context.dataValueIntervalFrom().getText(),
                     ofNullable(context.dataValueIntervalTo())
-                        .map(DataValueIntervalToContext::getText)
+                        .map(DataValueIntervalToContext::literal)
+                        .map(ParserRuleContext::getText)
+                        .orElse(null),
+                    ofNullable(context.dataValueIntervalTo())
+                        .map(DataValueIntervalToContext::thruToken)
+                        .map(ParserRuleContext::getText)
+                        .map(String::toUpperCase)
                         .orElse(null)))
         .collect(toList());
   }

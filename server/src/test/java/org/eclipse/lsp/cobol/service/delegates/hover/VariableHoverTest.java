@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service.delegates.hover;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.variables.ValueInterval;
 import org.eclipse.lsp.cobol.core.model.variables.*;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -94,7 +95,8 @@ class VariableHoverTest {
             + "  05 MIDDLE-2.\n"
             + "    10 LEAF-2 PIC 9.\n"
             + "      88 COND-ITEM1 VALUE 0.\n"
-            + "      88 COND-ITEM2 VALUE 1.";
+            + "      88 COND-ITEM2 VALUES 1 THRU 3\n"
+            + "                           4 THROUGH 5.";
     Locality targetLocality =
         Locality.builder()
             .uri(DOCUMENT_URI)
@@ -114,9 +116,22 @@ class VariableHoverTest {
         new ElementItem(
             10, "LEAF-2", otherLocality, false, middle2, "9", "", UsageFormat.UNDEFINED);
     middle2.addChild(leaf2);
-    ConditionDataName cond1 = new ConditionDataName("COND-ITEM1", otherLocality, leaf2, "0", null);
+    ConditionDataName cond1 =
+        new ConditionDataName(
+            "COND-ITEM1",
+            otherLocality,
+            leaf2,
+            ImmutableList.of(new ValueInterval("0", null, null)),
+            "VALUE");
     leaf2.addConditionName(cond1);
-    ConditionDataName cond2 = new ConditionDataName("COND-ITEM2", otherLocality, leaf2, "1", null);
+    ConditionDataName cond2 =
+        new ConditionDataName(
+            "COND-ITEM2",
+            otherLocality,
+            leaf2,
+            ImmutableList.of(
+                new ValueInterval("1", "3", "THRU"), new ValueInterval("4", "5", "THROUGH")),
+            "VALUES");
     leaf2.addConditionName(cond2);
 
     CobolDocumentModel model =
