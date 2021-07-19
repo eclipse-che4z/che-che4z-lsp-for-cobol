@@ -65,7 +65,7 @@ kind: Pod
 spec:
   containers:
   - name: theia
-    image: theiaide/theia-java:1.10.0
+    image: theiaide/theia-full:1.10.0
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
