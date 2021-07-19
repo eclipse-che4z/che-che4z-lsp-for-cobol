@@ -324,7 +324,7 @@ pipeline {
                             yarn install
                             yarn add https://github.com/eclipse/che-che4z.git 
                             npm run ts:build
-                            NO_COLOR=1 npm run cy:run -- --spec cypress/integration/LSP/F101836.spec.js --browser chrome --headless --config video=true
+                            NO_COLOR=1 CYPRESS_INCLUDE_TAGS=CI npm run cy:run -- --browser chrome --headless --config video=true
                             npm run allure:report 
                         '''
                     }

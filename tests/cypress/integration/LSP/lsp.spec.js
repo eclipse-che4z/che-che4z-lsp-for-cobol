@@ -81,14 +81,14 @@ context('This is a LSP spec', () => {
   // });
 
   describe('TC152048 Cobol file is recognized by LSP', () => {
-    it(['smoke'], 'Cobol file is recognized by LSP - Cobol type is shown in status bar', () => {
+    it(['smoke', 'CI'], 'Cobol file is recognized by LSP - Cobol type is shown in status bar', () => {
       cy.openFile('USER1.cbl');
       cy.get('.right.area .hasCommand[title="Select Language Mode"]').should('contain.text', 'COBOL');
     });
   });
 
   describe('TC152049 Navigate through definitions', () => {
-    it(['smoke'], 'Checks behavior of go to definition action', () => {
+    it(['smoke', 'CI'], 'Checks behavior of go to definition action', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(29).findText('100-Print-User.').goToDefinition();
       cy.getCurrentLineNumber().should('eq', 32);
