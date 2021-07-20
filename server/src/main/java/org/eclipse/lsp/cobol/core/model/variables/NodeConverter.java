@@ -69,9 +69,8 @@ public class NodeConverter {
         variableNode.getName(),
         getDefinitionLocality(variableNode),
         getParent(variableNode),
-        variableNode.getValueInterval().getFrom(),
-        variableNode.getValueInterval().getTo()
-    );
+        variableNode.getValueIntervals(),
+        variableNode.getValueToken());
   }
 
   private ElementItem convert(ElementaryItemNode variableNode) {

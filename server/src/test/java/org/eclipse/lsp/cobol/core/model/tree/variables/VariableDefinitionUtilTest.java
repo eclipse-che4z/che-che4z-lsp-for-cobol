@@ -143,7 +143,8 @@ class VariableDefinitionUtilTest {
   @Test
   void level88() {
     List<ValueClause> valueClauses =
-        ImmutableList.of(new ValueClause(ImmutableList.of(new ValueInterval("", "")), LOCALITY));
+        ImmutableList.of(
+            new ValueClause(ImmutableList.of(new ValueInterval("", "", "thru")), LOCALITY));
     Node programNode = new ProgramNode(LOCALITY, null);
     // 01 Level-01
     //      88 Cond-1

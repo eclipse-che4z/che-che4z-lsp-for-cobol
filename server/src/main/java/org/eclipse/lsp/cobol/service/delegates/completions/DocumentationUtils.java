@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.core.model.variables.ConditionDataName;
 import org.eclipse.lsp.cobol.core.model.variables.StructuredVariable;
 import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp4j.MarkupContent;
@@ -26,6 +25,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /** This utility class contains methods specific for preparing completion suggestion */
 @UtilityClass
@@ -69,10 +69,10 @@ public class DocumentationUtils {
     StringBuilder prefix = new StringBuilder();
     List<String> lines = new ArrayList<>();
     for (String parentLine : parentsDescriptions(variable.getParent())) {
-      lines.add(prefix + parentLine);
+      lines.add(prepend(prefix.toString(), parentLine));
       prefix.append(PREFIX);
     }
-    lines.add(prefix + variable.getFormattedDisplayLine());
+    lines.add(prepend(prefix.toString(), variable.getFormattedDisplayLine()));
     prefix.append(PREFIX);
     lines.addAll(childrenDescriptions(variable, prefix.toString()));
     return String.join("\n", lines);
@@ -90,22 +90,28 @@ public class DocumentationUtils {
     if (variable instanceof StructuredVariable) {
       ((StructuredVariable) variable)
           .getChildren().stream()
-              .map(it -> childDescription(it, prefix))
+              .map(it -> childDescription(prefix, it))
               .forEach(description::addAll);
     }
-    variable.getConditionNames().stream()
-        .map(ConditionDataName::getFormattedDisplayLine)
-        .forEach(it -> description.add(prefix + it));
+    description.addAll(collectConditionNames(variable.getConditionNames(), prefix));
     return description;
   }
 
-  private List<String> childDescription(Variable variable, String prefix) {
-    String nextPrefix = prefix + PREFIX;
+  private List<String> childDescription(String prefix, Variable variable) {
     List<String> description = new ArrayList<>();
-    description.add(prefix + variable.getFormattedDisplayLine());
-    variable.getConditionNames().stream()
-        .map(Variable::getFormattedDisplayLine)
-        .forEach(it -> description.add(nextPrefix + it));
+    description.add(prepend(prefix, variable.getFormattedDisplayLine()));
+    description.addAll(collectConditionNames(variable.getConditionNames(), prefix + PREFIX));
     return description;
+  }
+
+  private List<String> collectConditionNames(List<? extends Variable> variables, String prefix) {
+    return variables.stream()
+        .map(Variable::getFormattedDisplayLine)
+        .map(it -> prepend(prefix, it))
+        .collect(Collectors.toList());
+  }
+
+  private String prepend(String prefix, String text) {
+    return prefix + text.replace("\n", "\n" + prefix);
   }
 }
