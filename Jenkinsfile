@@ -70,9 +70,6 @@ spec:
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
     resources:
-      limits:
-        memory: "2Gi"
-        cpu: "1"
       requests:
         memory: "2Gi"
         cpu: "800m"
@@ -82,9 +79,6 @@ spec:
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
     resources:
-      limits:
-        memory: "2Gi"
-        cpu: "1200m"
       requests:
         memory: "2Gi"
         cpu: "1"
