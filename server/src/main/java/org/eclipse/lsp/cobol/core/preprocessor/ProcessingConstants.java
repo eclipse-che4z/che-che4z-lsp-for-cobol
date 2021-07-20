@@ -25,8 +25,7 @@ public final class ProcessingConstants {
   public static final String WS = " ";
   public static final String CONT_LINE_NO_AREA_A_REGEX = "^(.{6})([-]{1})( ){4}(.*)";
   public static final String BLANK_SEQUENCE_AREA = "      ";
-  public static final String CPY_ENTER_TAG = "*>CPYENTER";
-  public static final String CPY_URI_OPEN = "<URI>";
+  public static final String CPY_ENTER_TAG = " *>CPYENTER<URI>";
   public static final String CPY_URI_CLOSE = "</URI>";
   public static final String CPY_EXIT_TAG = NEWLINE + "*>CPYEXIT" + NEWLINE;
   public static final int START_INDEX_AREA_A = 4;

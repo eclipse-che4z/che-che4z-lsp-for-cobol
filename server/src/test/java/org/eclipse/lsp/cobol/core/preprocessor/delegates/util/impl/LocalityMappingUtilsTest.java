@@ -90,7 +90,6 @@ class LocalityMappingUtilsTest {
     when(enter.getText())
         .thenReturn(
             ProcessingConstants.CPY_ENTER_TAG
-                + ProcessingConstants.CPY_URI_OPEN
                 + copybook
                 + ProcessingConstants.CPY_URI_CLOSE);
     // COPYEXIT should move the previous to the previous document level

@@ -343,7 +343,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     pop();
     // write copybook beginning trigger
     write(CPY_ENTER_TAG);
-    write(CPY_URI_OPEN);
     write(copybookId);
     write(CPY_URI_CLOSE);
     write(copybookContent);
