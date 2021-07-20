@@ -14,10 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.reader;
 
+import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 
-import lombok.NonNull;
 import java.util.List;
 
 /**
@@ -34,4 +35,16 @@ public interface CobolLineReader {
    */
   @NonNull
   ResultWithErrors<List<CobolLine>> processLines(@NonNull String uri, @NonNull String lines);
+
+  /**
+   * Convert String with COBOL code into CobolLines that are used further in the parsing.
+   *
+   * @param uri - URI of the currently open document
+   * @param lines - a String to be converted into CobolLine list
+   * @param replacements - a list with all replacement done to original code.
+   * @return List of COBOL lines with a list of errors if found, or an empty list
+   */
+  @NonNull
+  ResultWithErrors<List<CobolLine>> processLines(
+      @NonNull String uri, @NonNull String lines, List<ReplacingService.Replacement> replacements);
 }

@@ -156,12 +156,11 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener
     String replaceOffStmt = pop();
     String content = applyReplacing(read(), replacingClauses);
     replacingClauses.clear();
-    mergeAndUpdateTopTwoElement(
-        content + replaceOffStmt);
+    mergeAndUpdateTopTwoElement(content + replaceOffStmt);
   }
 
   private String applyReplacing(String rawContent, List<Pair<String, String>> replacePatterns) {
-    return replacingService.applyReplacing(rawContent, replacePatterns);
+    return replacingService.applyReplacing(rawContent, replacePatterns).getReplacedCode();
   }
 
   @Override

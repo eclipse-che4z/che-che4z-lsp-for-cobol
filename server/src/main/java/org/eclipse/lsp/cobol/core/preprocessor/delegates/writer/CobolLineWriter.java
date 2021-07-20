@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer;
 
 import org.eclipse.lsp.cobol.core.model.CobolLine;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 
 import java.util.List;
 
@@ -31,4 +32,13 @@ public interface CobolLineWriter {
    * @return a string representation of the COBOL program
    */
   String serialize(List<CobolLine> lines);
+
+  /**
+   * Convert a list of COBOL lines into one string
+   *
+   * @param lines - list of lines
+   * @param replacements - list of replacements
+   * @return a string representation of the COBOL program
+   */
+  String serialize(List<CobolLine> lines, List<ReplacingService.Replacement> replacements);
 }

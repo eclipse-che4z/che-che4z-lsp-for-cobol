@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 import static java.util.regex.Matcher.quoteReplacement;
+import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.END_INDEX_AREA_B;
 
 /**
  * This service applies replacing for given text by replace clauses and tokens. It may work with
@@ -64,9 +65,17 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   @NonNull
   @Override
-  public String applyReplacing(
+  public ReplacementResponse applyReplacing(
       @NonNull String text, @NonNull List<Pair<String, String>> replacePatterns) {
-    return replacePatterns.stream().reduce(text, this::replace, (str1, str2) -> str2);
+    return replacePatterns.stream()
+        .map(pattern -> this.replace(text, pattern))
+        .reduce(
+            (response1, response2) -> {
+              response2.getReplacements().addAll(response1.getReplacements());
+              return new ReplacementResponse(
+                  response2.getReplacements(), response2.getReplacedCode());
+            })
+        .orElse(new ReplacementResponse(new ArrayList<>(), text));
   }
 
   @NonNull
@@ -205,14 +214,34 @@ public class ReplacingServiceImpl implements ReplacingService {
   }
 
   @NonNull
-  private String replace(@NonNull String text, @NonNull Pair<String, String> pattern) {
+  private ReplacementResponse replace(@NonNull String text, @NonNull Pair<String, String> pattern) {
     String result = text;
+    List<Replacement> replacements = new ArrayList<>();
     try {
-      result = Pattern.compile(pattern.getLeft()).matcher(text).replaceAll(pattern.getRight());
+      List<String> referenceStringList =
+          new ArrayList<>(Arrays.asList(text.split(System.lineSeparator())));
+      for (int i = 0; i < referenceStringList.size(); i++) {
+        String refStr = getRefStr(referenceStringList, i);
+        if (Pattern.compile(pattern.getLeft()).matcher(refStr).find()) {
+          String replacedStr =
+              Pattern.compile(pattern.getLeft()).matcher(refStr).replaceAll(pattern.getRight());
+          replacements.add(new Replacement(i, refStr, replacedStr));
+          referenceStringList.set(i, replacedStr);
+        }
+      }
+      result = String.join(System.lineSeparator(), referenceStringList);
     } catch (IndexOutOfBoundsException e) {
-      LOG.error(format(ERROR_REPLACING, text, pattern.toString()), e);
+      LOG.error(format(ERROR_REPLACING, text, pattern), e);
     }
-    return result;
+    return new ReplacementResponse(replacements, result);
+  }
+
+  private String getRefStr(List<String> referenceStringList, int i) {
+    String refStr = referenceStringList.get(i);
+    if (refStr.length() > END_INDEX_AREA_B) {
+      refStr = refStr.substring(0, END_INDEX_AREA_B);
+    }
+    return refStr;
   }
 
   private Function<String, Boolean> checkContainWord(String check) {

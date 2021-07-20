@@ -32,4 +32,5 @@ public final class ProcessingConstants {
   public static final int START_INDEX_AREA_A = 4;
   public static final int END_INDEX_CONTENT_AREA_A = 10;
   public static final int INDICATOR_AREA = 7;
+  public static final int END_INDEX_AREA_B = 72;
 }

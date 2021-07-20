@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -73,6 +74,15 @@ public class CobolLineReaderImpl implements CobolLineReader {
   @Override
   public ResultWithErrors<List<CobolLine>> processLines(
       @NonNull String documentURI, @NonNull String lines) {
+    return processLines(documentURI, lines, Collections.emptyList());
+  }
+
+  @NonNull
+  @Override
+  public ResultWithErrors<List<CobolLine>> processLines(
+      @NonNull String documentURI,
+      @NonNull String lines,
+      @NonNull List<ReplacingService.Replacement> replacements) {
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     List<CobolLine> result = new ArrayList<>();
     try (Scanner scanner = new Scanner(lines)) {
@@ -82,8 +92,18 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
       while (scanner.hasNextLine()) {
         currentLine = scanner.nextLine();
-        CobolLine currentCobolLine =
-            parseLine(currentLine, documentURI, lineNumber).unwrap(accumulatedErrors::addAll);
+        int finalLineNumber = lineNumber;
+        CobolLine currentCobolLine;
+        Optional<ReplacingService.Replacement> replacementMatch =
+            replacements.stream().filter((ele -> ele.getIndex() == finalLineNumber)).findFirst();
+        if (replacementMatch.isPresent()) {
+          currentCobolLine =
+              parseLine(replacementMatch.get().getPrevStr(), documentURI, lineNumber)
+                  .unwrap(accumulatedErrors::addAll);
+        } else {
+          currentCobolLine =
+              parseLine(currentLine, documentURI, lineNumber).unwrap(accumulatedErrors::addAll);
+        }
 
         currentCobolLine.setPredecessor(lastCobolLine);
         result.add(currentCobolLine);

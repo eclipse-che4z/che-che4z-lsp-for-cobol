@@ -18,6 +18,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.model.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 
 import java.util.Deque;
@@ -39,4 +40,13 @@ public interface TextPreprocessor {
       CopybookConfig copybookConfig,
       Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
       List<Pair<String, String>> replacingClauses);
+
+  ResultWithErrors<ExtendedDocument> process(
+      String documentUri,
+      String cobolCode,
+      Deque<CopybookUsage> semanticContext,
+      CopybookConfig copybookConfig,
+      Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
+      List<Pair<String, String>> replacingClauses,
+      List<ReplacingService.Replacement> replacements);
 }

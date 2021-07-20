@@ -122,7 +122,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public ExtendedDocument getResult() {
     if (!replacingClauses.isEmpty()) {
       String replaceableStmt = peek().toString();
-      String content = handleReplace(replaceableStmt);
+      String content = handleReplace(replaceableStmt).getReplacedCode();
       mergeAndUpdateTopTwoElement(content);
     }
     nestedMappings.put(
@@ -193,6 +193,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     CopybookModel model = getCopyBookContent(copybookName, locality, copybookConfig);
     String uri = model.getUri();
     String content = model.getContent();
+    ReplacingService.ReplacementResponse replacementResponse = null;
 
     String copybookId = randomUUID().toString();
     // In a chain of copy statement, there could be only one replacing phrase
@@ -202,14 +203,23 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       copyReplacingClauses.clear();
     }
     if (!recursiveReplaceStmtStack.isEmpty()) {
-      for (List<Pair<String, String>> clause : recursiveReplaceStmtStack)
-        content = applyReplacing(content, clause);
+      for (List<Pair<String, String>> clause : recursiveReplaceStmtStack) {
+        replacementResponse = applyReplacing(content, clause);
+      }
     }
 
     checkRecursiveReplaceStatement(recursiveReplaceStmtStack.size(), copybookName, locality);
 
     ExtendedDocument copybookDocument =
-        processCopybook(copybookName, uri, copybookId, content, locality);
+        processCopybook(
+            copybookName,
+            uri,
+            copybookId,
+            Objects.isNull(replacementResponse) ? content : replacementResponse.getReplacedCode(),
+            locality,
+            Objects.isNull(replacementResponse)
+                ? Collections.emptyList()
+                : replacementResponse.getReplacements());
     String copybookContent = copybookDocument.getText();
 
     checkCopybookName(copybookName, locality, checkCopybookNameLength);
@@ -302,7 +312,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     accumulateExcludedStatementShift(ctx.getSourceInterval());
   }
 
-  private String handleReplace(String replaceableStmt) {
+  private ReplacingService.@NonNull ReplacementResponse handleReplace(String replaceableStmt) {
     return applyReplacing(replaceableStmt, replacingClauses);
   }
 
@@ -351,7 +361,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     write(CPY_EXIT_TAG);
   }
 
-  private String applyReplacing(String rawContent, List<Pair<String, String>> replacePatterns) {
+  private ReplacingService.@NonNull ReplacementResponse applyReplacing(
+      String rawContent, List<Pair<String, String>> replacePatterns) {
     return replacingService.applyReplacing(rawContent, replacePatterns);
   }
 
@@ -379,7 +390,12 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   private ExtendedDocument processCopybook(
-      String copybookName, String uri, String copybookId, String content, Locality locality) {
+      String copybookName,
+      String uri,
+      String copybookId,
+      String content,
+      Locality locality,
+      List<ReplacingService.Replacement> replacements) {
     copybookStack.push(new CopybookUsage(copybookName, copybookId, locality));
     ExtendedDocument result =
         preprocessor
@@ -389,7 +405,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
                 copybookStack,
                 copybookConfig,
                 recursiveReplaceStmtStack,
-                replacingClauses)
+                replacingClauses,
+                replacements)
             .unwrap(errors::addAll);
     copybookStack.pop();
     if (Objects.nonNull(recursiveReplaceStmtStack.peek())) recursiveReplaceStmtStack.pop();

@@ -15,9 +15,9 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import lombok.NonNull;
+import lombok.Value;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
 
 import java.util.List;
@@ -32,7 +32,8 @@ public interface ReplacingService {
    * @return a String with all the patterns applied one by one
    */
   @NonNull
-  String applyReplacing(@NonNull String text, @NonNull List<Pair<String, String>> replacePatterns);
+  ReplacementResponse applyReplacing(
+      @NonNull String text, @NonNull List<Pair<String, String>> replacePatterns);
 
   /**
    * Retrieve pseudo-text replacing pattern from the given string. If the pseudo text consist of
@@ -54,4 +55,19 @@ public interface ReplacingService {
    */
   @NonNull
   Pair<String, String> retrieveTokenReplacingPattern(@NonNull String clause);
+
+  /** A response object returned by @{@link ReplacingService} */
+  @Value
+  class ReplacementResponse {
+    List<ReplacingService.Replacement> replacements;
+    String replacedCode;
+  }
+
+  /** Object to hold mapping of Replacements done to a source code. */
+  @Value
+  class Replacement {
+    int index;
+    String prevStr;
+    String replacedStr;
+  }
 }

@@ -25,13 +25,11 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class re-writes the content of the analyzing file to simplify the processing by the grammar,
@@ -105,14 +103,35 @@ public class TextPreprocessorImpl implements TextPreprocessor {
       @NonNull CopybookConfig copybookConfig,
       @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
       @NonNull List<Pair<String, String>> replacingClauses) {
+    return process(
+        documentUri,
+        cobolCode,
+        copybookStack,
+        copybookConfig,
+        recursiveReplaceStmtStack,
+        replacingClauses,
+        Collections.emptyList());
+  }
+
+  @NonNull
+  @Override
+  public ResultWithErrors<ExtendedDocument> process(
+      @NonNull String documentUri,
+      @NonNull String cobolCode,
+      @NonNull Deque<CopybookUsage> copybookStack,
+      @NonNull CopybookConfig copybookConfig,
+      @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
+      @NonNull List<Pair<String, String>> replacingClauses,
+      @NonNull List<ReplacingService.Replacement> replacements) {
+
     ThreadInterruptionUtil.checkThreadInterrupted();
     List<SyntaxError> errors = new ArrayList<>();
 
-    List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
+    List<CobolLine> lines = readLines(cobolCode, documentUri, replacements).unwrap(errors::addAll);
     List<CobolLine> transformedLines = transformLines(documentUri, lines).unwrap(errors::addAll);
     List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
 
-    String code = writer.serialize(rewrittenLines);
+    String code = writer.serialize(rewrittenLines, replacements);
 
     ExtendedDocument parsedDocument =
         grammarPreprocessor
@@ -128,8 +147,9 @@ public class TextPreprocessorImpl implements TextPreprocessor {
     return new ResultWithErrors<>(parsedDocument, errors);
   }
 
-  private ResultWithErrors<List<CobolLine>> readLines(String cobolCode, String documentURI) {
-    return reader.processLines(documentURI, cobolCode);
+  private ResultWithErrors<List<CobolLine>> readLines(
+      String cobolCode, String documentURI, List<ReplacingService.Replacement> replacements) {
+    return reader.processLines(documentURI, cobolCode, replacements);
   }
 
   private ResultWithErrors<List<CobolLine>> transformLines(

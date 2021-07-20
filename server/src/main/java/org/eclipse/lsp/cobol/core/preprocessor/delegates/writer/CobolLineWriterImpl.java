@@ -18,8 +18,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.CobolLine;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.ReplacingService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 /** This class serializes a list of COBOL lines into a String */
@@ -27,6 +30,11 @@ public class CobolLineWriterImpl implements CobolLineWriter {
 
   @Override
   public String serialize(final List<CobolLine> lines) {
+    return serialize(lines, Collections.emptyList());
+  }
+
+  @Override
+  public String serialize(List<CobolLine> lines, List<ReplacingService.Replacement> replacements) {
     final StringBuilder sb = new StringBuilder();
     int counter = 0;
 
@@ -43,7 +51,13 @@ public class CobolLineWriterImpl implements CobolLineWriter {
           sb.append(ProcessingConstants.BLANK_SEQUENCE_AREA);
         }
         sb.append(line.getIndicatorArea());
-        sb.append(line.getContentArea());
+        Optional<ReplacingService.Replacement> replacementMatch =
+            replacements.stream().filter(ele -> ele.getIndex() == line.getNumber()).findFirst();
+        if (replacementMatch.isPresent()) {
+          sb.append(replacementMatch.get().getReplacedStr());
+        } else {
+          sb.append(line.getContentArea());
+        }
       }
 
       /*
