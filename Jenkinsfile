@@ -72,7 +72,7 @@ spec:
     resources:
       limits:
         memory: "2Gi"
-        cpu: "800m"
+        cpu: "1"
       requests:
         memory: "2Gi"
         cpu: "800m"
@@ -84,10 +84,10 @@ spec:
     resources:
       limits:
         memory: "2Gi"
-        cpu: "800m"
+        cpu: "1200m"
       requests:
         memory: "2Gi"
-        cpu: "800m"
+        cpu: "1"
 """
 
 def projectName = 'lsp-for-cobol'
