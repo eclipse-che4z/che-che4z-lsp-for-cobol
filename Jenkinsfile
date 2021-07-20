@@ -319,8 +319,11 @@ pipeline {
                 container('cypress') {
                     dir('tests') {
                         sh '''#!/bin/bash
-                            export HOME=/root
-                            #mkdir -p $CYPRESS_HOME 
+                            export HOME=$CYPRESS_HOME
+                            mkdir -p $CYPRESS_HOME 
+                            cp -r /root/.cache $CYPRESS_HOME 
+                            cp -r /root/.local $CYPRESS_HOME 
+                            cp -r /root/.npm $CYPRESS_HOME 
                             yarn install
                             yarn add https://github.com/eclipse/che-che4z.git 
                             npm run ts:build
