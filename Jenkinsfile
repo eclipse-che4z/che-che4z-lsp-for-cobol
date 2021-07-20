@@ -320,6 +320,7 @@ pipeline {
                     dir('tests') {
                         sh '''#!/bin/bash
                             export HOME=$CYPRESS_HOME
+                            export CYPRESS_CACHE_FOLDER=$CYPRESS_HOME/.cache/Cypress
                             mkdir -p $CYPRESS_HOME 
                             cp -r /root/.cache $CYPRESS_HOME 
                             cp -r /root/.local $CYPRESS_HOME 
