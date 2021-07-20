@@ -17,10 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.positive.CobolText;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,7 +28,9 @@ class TestIdmsCopy {
   private static final String TEXT =
       "        IDENTIFICATION DIVISION. \n"
           + "        PROGRAM-ID. test1.\n"
-          + "        DATA DIVISION.\n";
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        01 {$*EMPLOYEE} PIC X(10).\n";
 
   private static final String COPY_IDMS_FILE =
       "        FILE SECTION.\n" + "            COPY IDMS FILE {~FL002} VERSION 1.\n";
@@ -44,7 +43,7 @@ class TestIdmsCopy {
 
   private static final String COPY_IDMS_WS2 =
       "        WORKING-STORAGE SECTION.\n"
-          + "             COPY IDMS {~SUBSCHEMA-RECORDS|1}\n"
+          + "             COPY IDMS {~SUBSCHEMA-RECORDS}\n"
           + "       PROCEDURE DIVISION.\n"
           + "           MOVE 'JAVA' TO {$SKILL-NAME-0455}.";
 
@@ -67,7 +66,7 @@ class TestIdmsCopy {
           + "           MOVE 'ABC' TO {$MRB-ABCMAP-ID}.\n";
 
   private static final String COPY_IDMS_PD1 =
-      "        PROCEDURE DIVISION.\n" + "           COPY IDMS {~SUBSCHEMA-BINDS|1}\n";
+      "        PROCEDURE DIVISION.\n" + "           COPY IDMS {~SUBSCHEMA-BINDS}\n";
 
   private static final String COPY_IDMS_PD2 =
       "        PROCEDURE DIVISION.\n" + "           COPY IDMS {~ABCD} VERSION 103.\n";
@@ -92,7 +91,8 @@ class TestIdmsCopy {
 
   private static final String CB_NAME4 = "SUBSCHEMA-BINDS";
   private static final String CB_NAME4A = "ABCD";
-  private static final String CB4 = "           BIND RUN-UNIT.\n" + "            BIND EMPLOYEE.\n";
+  private static final String CB4 =
+      "           BIND RUN-UNIT.\n" + "            BIND {$EMPLOYEE}.\n";
 
   private static final String CB_NAME5 = "FL002";
   private static final String CB5 = "       FD EMP-FILE.\n" + "       RECORD CONTAINS 80.\n";
@@ -106,15 +106,7 @@ class TestIdmsCopy {
   @Test
   void testIdmsCopyWS2() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_WS2,
-        ImmutableList.of(new CobolText(CB_NAME2, CB2)),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null,
-                "Copybook declaration has more than 8 characters for: SUBSCHEMA-RECORDS",
-                DiagnosticSeverity.Information,
-                SourceInfoLevels.INFO.getText())));
+        TEXT + COPY_IDMS_WS2, ImmutableList.of(new CobolText(CB_NAME2, CB2)), ImmutableMap.of());
   }
 
   @Test
@@ -138,15 +130,7 @@ class TestIdmsCopy {
   @Test
   void testIdmsCopyPD1() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_PD1,
-        ImmutableList.of(new CobolText(CB_NAME4, CB4)),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null,
-                "Copybook declaration has more than 8 characters for: SUBSCHEMA-BINDS",
-                DiagnosticSeverity.Information,
-                SourceInfoLevels.INFO.getText())));
+        TEXT + COPY_IDMS_PD1, ImmutableList.of(new CobolText(CB_NAME4, CB4)), ImmutableMap.of());
   }
 
   @Test

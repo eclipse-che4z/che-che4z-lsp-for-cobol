@@ -991,7 +991,7 @@ cobolWord
    | KEEP | KEPT | KEYBOARD
    | LANGUAGE | LAST | LIBRARY | LINK | LIST | LOCAL | LONG
    | LONG_DATE | LONG_TIME | LOWER | LR | LTERM | LOCATION
-   | MAP | MAX | MESSAGE | MMDDYYYY
+   | MAID | MAP | MAX | MESSAGE | MMDDYYYY
    | NAME | NAMED | NATIONAL | NATIONAL_EDITED | NATIVE | NETWORK | NEXT
    | NODUMP | NOWAIT | NOWRITE | NUMERIC_DATE
    | NUMERIC_TIME
@@ -1001,7 +1001,7 @@ cobolWord
    | SAVE | SCHEMA | SCRATCH | SCREENSIZE | SESSION | SHARED | SHORT_DATE | SNAP | SQL | START | STATISTICS
    | STATS | STORAGE | SYMBOL | SYSVERSION | SYSTEM
    | TASK | TERMINAL | TEXT | THEN | THREAD | THREAD_LOCAL | TIMEOUT | TIMER
-   | TODAYS_DATE | TODAYS_NAME | TRANSFER
+   | TODAYS_DATE | TODAYS_NAME | TOP | TRANSFER
    | TRANSACTION | TRUNCATED | TYPEDEF
    | UPDATE | USER | UTF_8
    | VERSION | VIRTUAL
@@ -1097,7 +1097,7 @@ qualifiedDataName
    ;
 
 qualifiedDataNameFormat1
-   : dataName qualifiedInData*
+   : dataName (inData | inTable)*
    ;
 
 qualifiedDataNameFormat2
@@ -1106,10 +1106,6 @@ qualifiedDataNameFormat2
 
 qualifiedDataNameFormat4
    : LINAGE_COUNTER inFile
-   ;
-
-qualifiedInData
-   : inData | inTable
    ;
 
 specialRegister
@@ -1165,10 +1161,6 @@ className
 
 computerName
    : systemName
-   ;
-
-conditionName
-   : cobolWord
    ;
 
 dataName

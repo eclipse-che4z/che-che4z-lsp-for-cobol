@@ -25,9 +25,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
+import java.util.stream.Collectors;
 
 /** This utility class contains methods specific for preparing completion suggestion */
 @UtilityClass
@@ -71,12 +69,12 @@ public class DocumentationUtils {
     StringBuilder prefix = new StringBuilder();
     List<String> lines = new ArrayList<>();
     for (String parentLine : parentsDescriptions(variable.getParent())) {
-      lines.add(prefix + parentLine);
+      lines.add(prepend(prefix.toString(), parentLine));
       prefix.append(PREFIX);
     }
-    lines.add(prefix + variable.getFormattedDisplayLine());
+    lines.add(prepend(prefix.toString(), variable.getFormattedDisplayLine()));
     prefix.append(PREFIX);
-    for (String childLine : childrenDescriptions(variable)) lines.add(prefix + childLine);
+    lines.addAll(childrenDescriptions(variable, prefix.toString()));
     return String.join("\n", lines);
   }
 
@@ -87,10 +85,33 @@ public class DocumentationUtils {
     return result;
   }
 
-  private List<String> childrenDescriptions(Variable variable) {
-    if (variable instanceof StructuredVariable)
-      return ((StructuredVariable) variable)
-          .getChildren().stream().map(Variable::getFormattedDisplayLine).collect(toList());
-    else return emptyList();
+  private List<String> childrenDescriptions(Variable variable, String prefix) {
+    List<String> description = new ArrayList<>();
+    if (variable instanceof StructuredVariable) {
+      ((StructuredVariable) variable)
+          .getChildren().stream()
+              .map(it -> childDescription(prefix, it))
+              .forEach(description::addAll);
+    }
+    description.addAll(collectConditionNames(variable.getConditionNames(), prefix));
+    return description;
+  }
+
+  private List<String> childDescription(String prefix, Variable variable) {
+    List<String> description = new ArrayList<>();
+    description.add(prepend(prefix, variable.getFormattedDisplayLine()));
+    description.addAll(collectConditionNames(variable.getConditionNames(), prefix + PREFIX));
+    return description;
+  }
+
+  private List<String> collectConditionNames(List<? extends Variable> variables, String prefix) {
+    return variables.stream()
+        .map(Variable::getFormattedDisplayLine)
+        .map(it -> prepend(prefix, it))
+        .collect(Collectors.toList());
+  }
+
+  private String prepend(String prefix, String text) {
+    return prefix + text.replace("\n", "\n" + prefix);
   }
 }
