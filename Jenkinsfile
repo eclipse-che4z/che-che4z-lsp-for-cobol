@@ -328,7 +328,8 @@ pipeline {
                             yarn install
                             yarn add https://github.com/eclipse/che-che4z.git 
                             npm run ts:build
-                            DEBUG=* NO_COLOR=1 CYPRESS_INCLUDE_TAGS=CI npm run cy:run -- --browser chrome --headless --config video=true
+                            # To enable debug add this: DEBUG=*
+                            NO_COLOR=1 CYPRESS_INCLUDE_TAGS=CI npm run cy:run -- --browser chrome --headless --config video=true
                             npm run allure:report 
                         '''
                     }
