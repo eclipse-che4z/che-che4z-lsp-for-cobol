@@ -61,9 +61,9 @@ TITLESTATEMENT : (TITLE ' '+ .*? NEWLINE)  ;
 
 CONTROL_DIRECTIVE: ASTERISKCHAR (CONTROL | CBL) ((' '| COMMACHAR)
                   (SOURCE | NO SOURCE | LIST | NO LIST | MAP | NO MAP
-                  | IDENTIFIER? ))+  DOT?;
+                  | IDENTIFIER? ))+  DOT_FS?;
 
-ENTER_STMT: ENTER ' '+ IDENTIFIER? (' '+ IDENTIFIER)? ' '* DOT;
+ENTER_STMT: ENTER ' '+ IDENTIFIER? (' '+ IDENTIFIER)? ' '* DOT_FS;
 
 // symbols
 DOUBLEEQUALCHAR : '==';

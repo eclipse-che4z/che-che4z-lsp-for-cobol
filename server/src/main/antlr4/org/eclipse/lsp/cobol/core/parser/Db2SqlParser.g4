@@ -195,7 +195,7 @@ dbs_alter_tablespace: TABLESPACE dbs_database_name? dbs_table_space_name (DROP P
                       | NOT? LOGGED | MAXROWS dbs_integer | MAXPARTITIONS dbs_integer |
                       MEMBER CLUSTER (YES|NO) | TRACKMOD (YES|NO) | dbs_alter_tablespace_using | dbs_alter_tablespace_free | dbs_alter_tablespace_gbpcache)+) dbs_alter_tablespace_alter?;
 
-dbs_alter_tablespace_move: MOVE TABLE dbs_table_name TO TABLESPACE (dbs_database_name DOT)? dbs_table_space_name;
+dbs_alter_tablespace_move: MOVE TABLE dbs_table_name TO TABLESPACE (dbs_database_name DOT_FS)? dbs_table_space_name;
 dbs_alter_tablespace_using: (USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name) | (PRIQTY | SECQTY) dbs_integer | ERASE (YES|NO))+;
 dbs_alter_tablespace_free: (FREEPAGE dbs_integer | PCTFREE dbs_smallint? (FOR UPDATE dbs_smallint)?)+;
 dbs_alter_tablespace_gbpcache: GBPCACHE (CHANGED | ALL | SYSTEM | NONE);
@@ -266,7 +266,7 @@ dbs_comment_multiple_column_list: (dbs_table_name | dbs_view_name) LPARENCHAR db
 dbs_comment_alias_designator: (dbs_comment_public_alias_designator | dbs_comment_nonpub_alias_designator);
 dbs_comment_public_alias_designator: PUBLIC ALIAS dbs_alias_name FOR SEQUENCE;
 dbs_comment_nonpub_alias_designator: ALIAS dbs_alias_name (FOR (TABLE | SEQUENCE))?;
-dbs_comment_column: COLUMN (dbs_table_name | dbs_view_name) DOT dbs_column_name;
+dbs_comment_column: COLUMN (dbs_table_name | dbs_view_name) DOT_FS dbs_column_name;
 dbs_comment_function: dbs_comment_function_designator (ACTIVE VERSION | VERSION dbs_routine_version_id)?;
 dbs_comment_function_designator: (FUNCTION dbs_function_name (LPARENCHAR dbs_comment_parameter_type
                                  (COMMACHAR dbs_comment_parameter_type)* RPARENCHAR)? | SPECIFIC FUNCTION dbs_specific_name);
@@ -441,7 +441,7 @@ as_row_transaction_timestamp_clause: AS ROW (BEGIN | START | END);
 as_generated_expression_clause: AS LPARENCHAR non_deterministic_expression RPARENCHAR;
 non_deterministic_expression: DATA CHANGE OPERATION | special_register | session_variable;
 special_register: CURRENT CLIENT_ACCTNG | CURRENT CLIENT_APPLNAME | CURRENT CLIENT_CORR_TOKEN | CURRENT CLIENT_USERID | CURRENT CLIENT_WRKSTNNAME | CURRENT SERVER | CURRENT SQLID | SESSION_USER | USER;
-session_variable: SYSIBM DOT (PACKAGE_NAME | PACKAGE_SCHEMA | PACKAGE_VERSION);
+session_variable: SYSIBM DOT_FS (PACKAGE_NAME | PACKAGE_SCHEMA | PACKAGE_VERSION);
 default_options: default_options_vals | dbs_cast_function_name LPARENCHAR default_options_vals RPARENCHAR;
 default_options_vals: dbs_constant | (SESSION_USER | USER) | CURRENT | CURRENT SQLID | NULL;
 column_constraint: CONSTRAINT dbs_constraint_name (PRIMARY KEY | UNIQUE | common_reference_clause | CHECK LPARENCHAR  dbs_search_condition RPARENCHAR)?;
@@ -717,7 +717,7 @@ dbs_grant_table: (ALL PRIVILEGES? | db2sql_table_view_privileges (COMMACHAR db2s
 dbs_grant_type: USAGE ON (TYPE dbs_type_name (COMMACHAR dbs_type_name)* | JAR dbs_jar_name (COMMACHAR dbs_jar_name)*) TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
 dbs_grant_variable: (ALL PRIVILEGES? | (READ|WRITE) (COMMACHAR (READ|WRITE))*) ON VARIABLE dbs_variable_name TO dbs_grant_authloop (COMMACHAR dbs_grant_authloop)* (WITH GRANT OPTION)?;
 dbs_grant_use: USE OF (BUFFERPOOL dbs_bp_name  (COMMACHAR dbs_bp_name)* | ALL BUFFERPOOLS | STOGROUP dbs_stogroup_name (COMMACHAR dbs_stogroup_name)* |
-                TABLESPACE (dbs_database_name DOT)? dbs_table_space_name (COMMACHAR (dbs_database_name DOT)? dbs_table_space_name)*)
+                TABLESPACE (dbs_database_name DOT_FS)? dbs_table_space_name (COMMACHAR (dbs_database_name DOT_FS)? dbs_table_space_name)*)
                 TO (dbs_authorization_name | ROLE dbs_role_name | PUBLIC) (COMMACHAR (dbs_authorization_name | ROLE dbs_role_name | PUBLIC))*
                 (WITH GRANT OPTION)?;
 
@@ -751,7 +751,7 @@ dbs_label: LABEL ON (dbs_label_sing | dbs_label_loop);
 dbs_label_sing: (dbs_label_table | dbs_label_alias | dbs_label_column) IS dbs_string_constant;
 dbs_label_table: TABLE (dbs_table_name | dbs_view_name);
 dbs_label_alias: ALIAS dbs_alias_name;
-dbs_label_column: COLUMN (dbs_table_name | dbs_view_name) DOT dbs_column_name;
+dbs_label_column: COLUMN (dbs_table_name | dbs_view_name) DOT_FS dbs_column_name;
 dbs_label_loop: (dbs_table_name | dbs_view_name) LPARENCHAR dbs_column_name IS dbs_string_constant (COMMACHAR dbs_column_name IS dbs_string_constant)* RPARENCHAR;
 
 /*LOCK TABLE */
@@ -869,7 +869,7 @@ dbs_revoke_use_prvg: USE OF (BUFFERPOOL bpname_loop | ALL BUFFERPOOLS | STOGROUP
 bpname_loop: dbs_bp_name (COMMACHAR dbs_bp_name)*;
 stogroup_name_loop: dbs_stogroup_name (COMMACHAR dbs_stogroup_name)*;
 tblspace_name_loop: tblspace_name_name (COMMACHAR tblspace_name_name)*;
-tblspace_name_name: (dbs_database_name DOT)? dbs_table_space_name;
+tblspace_name_name: (dbs_database_name DOT_FS)? dbs_table_space_name;
 
 /*ROLLBACK */
 dbs_rollback: ROLLBACK WORK? (TO SAVEPOINT dbs_savepoint_name?)?;
@@ -883,7 +883,7 @@ dbs_savepoint: SAVEPOINT dbs_savepoint_name UNIQUE? ON ROLLBACK RETAIN (CURSORS 
 dbs_select: dbs_select_unpack_function_invocation | dbs_fullselect;
 
 /*Queries Subselects (all)*/
-dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCHAR DOT ASTERISKCHAR AS LPARENCHAR dbs_field_name db2sql_data_types (COMMACHAR dbs_field_name db2sql_data_types)* RPARENCHAR;
+dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCHAR DOT_FS ASTERISKCHAR AS LPARENCHAR dbs_field_name db2sql_data_types (COMMACHAR dbs_field_name db2sql_data_types)* RPARENCHAR;
 dbs_select_row_fullselect: (NONNUMERICLITERAL | NUMERICLITERAL)+ ;
 dbs_subselect: dbs_select_clause dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause?
 dbs_orderby_clause? dbs_offset_clause? dbs_fetch_clause?;
@@ -1437,9 +1437,9 @@ CURRENT TEMPORAL BUSINESS_TIME | CURRENT TEMPORAL SYSTEM_TIME | (CURRENT TIME | 
 
 db2sql_data_value: DATELITERAL;
 dbs_accelerator_name: IDENTIFIER; // - 1
-dbs_hostname_identifier : (IDENTIFIER | (DOT | COLONCHAR | SLASHCHAR))+;
+dbs_hostname_identifier : (IDENTIFIER | (DOT_FS | COLONCHAR | SLASHCHAR))+;
 dbs_quad: (ZERO_DIGIT  HEX_NUMBERS+ | ZERO_DIGIT OCTDIGITS+) | INTEGERLITERAL;
-dbs_ip4: dbs_quad DOT dbs_quad DOT dbs_quad DOT dbs_quad+;
+dbs_ip4: dbs_quad DOT_FS dbs_quad DOT_FS dbs_quad DOT_FS dbs_quad+;
 dbs_address_value: dbs_ip4 | dbs_hostname_identifier | NONNUMERICLITERAL ;
 dbs_alias_name: T=dbs_sql_identifier { validateLength($T.text, "alias name", 128); }; //must not be an alias that exists at the current server
 dbs_applcompat_value: FUNCTION_LEVEL_10 | FUNCTION_LEVEL_11 | FUNCTION_LEVEL_12;
@@ -1467,7 +1467,7 @@ dbs_generic_name
     : ADDRESS | AVG | COUNT | COMMENT | FILENAME | GROUP | HOUR | HOURS | ID | IN | IDENTIFIER | LOCATION | LOCATOR
     | MAX | MIN | MONTH | NAME | NONNUMERICLITERAL | YEAR | DATE | DAY | SERVER | SQLCODE | TRANSACTION | TYPE | V1
     ;
-dbs_column_name: (dbs_generic_name DOT)? T=dbs_generic_name {validateLength($T.text, "column name", 30);};
+dbs_column_name: (dbs_generic_name DOT_FS)? T=dbs_generic_name {validateLength($T.text, "column name", 30);};
 dbs_constant : (dbs_string_constant | dbs_integer_constant | DATELITERAL);
 dbs_constraint_name: T=dbs_sql_identifier {validateLength($T.text, "constraint name", 128);};
 dbs_context: dbs_sql_identifier;
@@ -1522,9 +1522,9 @@ dbs_mc_name: IDENTIFIER;// must be 1-8 characters in length
 dbs_member_name: dbs_sql_identifier;
 dbs_name: dbs_sql_identifier; // name of the WLM environment is an SQL identifier
 dbs_namespace_name: VARCHAR;
-dbs_nnnn_m: SINGLEDIGITLITERAL SINGLEDIGITLITERAL? SINGLEDIGITLITERAL? SINGLEDIGITLITERAL? DOT SINGLEDIGITLITERAL;
+dbs_nnnn_m: SINGLEDIGITLITERAL SINGLEDIGITLITERAL? SINGLEDIGITLITERAL? SINGLEDIGITLITERAL? DOT_FS SINGLEDIGITLITERAL;
 dbs_non_deterministic_expression: DATA CHANGE OPERATION | dbs_special_register | dbs_session_variable;
-dbs_session_variable : SYSIBM DOT PACKAGE_NAME | SYSIBM DOT PACKAGE_SCHEMA | SYSIBM DOT PACKAGE_VERSION;
+dbs_session_variable : SYSIBM DOT_FS PACKAGE_NAME | SYSIBM DOT_FS PACKAGE_SCHEMA | SYSIBM DOT_FS PACKAGE_VERSION;
 dbs_numeric_constant: dbs_integer;// numeric literal without non-zero digits to the right of the decimal point.
 dbs_obfuscated_statement_text: literal+ ;
 dbs_package_name: NONNUMERICLITERAL {validateLength($NONNUMERICLITERAL.text, "package name", 8);};
@@ -1631,7 +1631,7 @@ dbs_version_name: IDENTIFIER | FILENAME;
 dbs_view_name: dbs_hostname_identifier? T=dbs_sql_identifier {validateLength($T.text, "view name", 128);};
 dbs_volume_id: IDENTIFIER;
 dbs_pieceSize : IDENTIFIER {if(!$IDENTIFIER.text.matches("\\d+[MmGgKk]")) { notifyError( "db2SqlParser.piecesize", $IDENTIFIER.text);}};
-dbs_sql_identifier: NONNUMERICLITERAL | IDENTIFIER | FILENAME | FILENAME (DOT IDENTIFIER)* | DSNDB04 | TRANSACTION | RECORDS;
+dbs_sql_identifier: NONNUMERICLITERAL | IDENTIFIER | FILENAME | FILENAME (DOT_FS IDENTIFIER)* | DSNDB04 | TRANSACTION | RECORDS;
 
 dbs_integer0: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "0");};
 dbs_integer1: LEVEL_NUMBER  {validateValue($LEVEL_NUMBER.text, "1");};
