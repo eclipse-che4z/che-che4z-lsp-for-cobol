@@ -91,7 +91,7 @@ context('This is a LSP spec', () => {
     it(['smoke', 'CI'], 'Checks behavior of go to definition action', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(29).findText('100-Print-User.').goToDefinition();
-      cy.getCurrentLineNumber().should('eq', 32);
+      cy.wait(1000).getCurrentLineNumber().should('eq', 32);
     });
   });
 
