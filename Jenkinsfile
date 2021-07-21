@@ -330,7 +330,9 @@ pipeline {
                             npm run ts:build
                             # To enable debug add this: DEBUG=*
                             NO_COLOR=1 npm run cy:run:ci
-                            npm run merge-reports 
+                            TEST_STATUS=$?
+                            npm run merge-reports
+                            exit $TEST_STATUS
                         '''
                     }
                 }
