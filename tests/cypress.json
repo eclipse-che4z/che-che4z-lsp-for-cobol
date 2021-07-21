@@ -1,7 +1,7 @@
 {
   "baseUrl": "http://localhost:3000/",
   "defaultCommandTimeout": 60000,
-  "video": false,
+  "video": true,
   "env": {
       "appLoadTimeout": 60000,
       "username": "",
@@ -19,7 +19,7 @@
       "dap_cb": ""
   },
   "retries":  {
-    "runMode": 2,
+    "runMode": 0,
     "openMode": 2
   },
   "supportFile": "cypress/support/index.ts",

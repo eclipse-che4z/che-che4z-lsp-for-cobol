@@ -65,17 +65,17 @@ kind: Pod
 spec:
   containers:
   - name: theia
-    image: theiaide/theia-full:1.10.0
+    image: theiaide/theia-full:1.5.0
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
     resources:
       limits:
         memory: "2Gi"
-        cpu: "800m"
+        cpu: "1"
       requests:
         memory: "2Gi"
-        cpu: "800m"
+        cpu: "1"
   - name: cypress
     image: cypress/included:7.7.0
     tty: true
@@ -84,10 +84,10 @@ spec:
     resources:
       limits:
         memory: "2Gi"
-        cpu: "1"
+        cpu: "800m"
       requests:
         memory: "2Gi"
-        cpu: "1"
+        cpu: "800m"
 """
 
 def projectName = 'lsp-for-cobol'
