@@ -339,15 +339,15 @@ pipeline {
                 always {
                     container('theia') {
                         dir('tests') {
-                            archiveArtifacts "theia/home/theia.log"
-                            archiveArtifacts "theia/home/LSPCobol/**/*.*"
+                            archiveArtifacts artifacts: "theia/home/theia.log", allowEmptyArchive: true
+                            archiveArtifacts artifacts: "theia/home/LSPCobol/**/*.*", allowEmptyArchive: true
                         }
                     }
                     container('cypress') {
                         dir('tests') {
-                            archiveArtifacts "cypress/screenshots/**/*.*"
-                            archiveArtifacts "cypress/videos/**/*.*"
-                            archiveArtifacts "combined.xml"
+                            archiveArtifacts artifacts: "cypress/screenshots/**/*.*", allowEmptyArchive: true
+                            archiveArtifacts artifacts: "cypress/videos/**/*.*", allowEmptyArchive: true
+                            archiveArtifacts artifacts: "combined.xml", allowEmptyArchive: true
                         }
                     }
                 }
