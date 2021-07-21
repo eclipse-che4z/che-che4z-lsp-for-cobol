@@ -457,7 +457,7 @@ context('This is a Copybook spec', () => {
         input: 'փորձիր ինձ',
       },
     ].forEach((parameters) => {
-      it(parameters.test, () => {
+      it('smoke', parameters.test, () => {
         copyBookNotFound('UTF8');
         cy.writeFile('test_files/project/testing/UTF8', `            MOVE "${parameters.input}" TO ABC.`, {
           encoding: 'utf-8',
