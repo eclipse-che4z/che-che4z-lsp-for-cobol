@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
@@ -206,11 +207,12 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   @NonNull
   private String replace(@NonNull String text, @NonNull Pair<String, String> pattern) {
+    if (StringUtils.isBlank(text)) return text;
     String result = text;
     try {
       result = Pattern.compile(pattern.getLeft()).matcher(text).replaceAll(pattern.getRight());
     } catch (IndexOutOfBoundsException e) {
-      LOG.error(format(ERROR_REPLACING, text, pattern.toString()), e);
+      LOG.error(format(ERROR_REPLACING, text, pattern), e);
     }
     return result;
   }

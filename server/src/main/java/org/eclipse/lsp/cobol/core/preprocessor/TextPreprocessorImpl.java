@@ -77,13 +77,19 @@ public class TextPreprocessorImpl implements TextPreprocessor {
       @NonNull String documentUri,
       @NonNull String cobolSourceCode,
       @NonNull CopybookConfig copybookConfig) {
-    return process(
-        documentUri,
-        cobolSourceCode,
-        new ArrayDeque<>(),
-        copybookConfig,
-        new ArrayDeque<>(),
-        new ArrayList<>());
+    ThreadInterruptionUtil.checkThreadInterrupted();
+    List<SyntaxError> errors = new ArrayList<>();
+    String cleanUpCode = cleanUpCode(documentUri, cobolSourceCode).unwrap(errors::addAll);
+    ExtendedDocument extendedDocument =
+        processCleanCode(
+                documentUri,
+                cleanUpCode,
+                new ArrayDeque<>(),
+                copybookConfig,
+                new ArrayDeque<>(),
+                new ArrayList<>())
+            .unwrap(errors::addAll);
+    return new ResultWithErrors<>(extendedDocument, errors);
   }
 
   /**
@@ -98,27 +104,19 @@ public class TextPreprocessorImpl implements TextPreprocessor {
    */
   @NonNull
   @Override
-  public ResultWithErrors<ExtendedDocument> process(
+  public ResultWithErrors<ExtendedDocument> processCleanCode(
       @NonNull String documentUri,
       @NonNull String cobolCode,
       @NonNull Deque<CopybookUsage> copybookStack,
       @NonNull CopybookConfig copybookConfig,
       @NonNull Deque<List<Pair<String, String>>> recursiveReplaceStmtStack,
       @NonNull List<Pair<String, String>> replacingClauses) {
-    ThreadInterruptionUtil.checkThreadInterrupted();
     List<SyntaxError> errors = new ArrayList<>();
-
-    List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
-    List<CobolLine> transformedLines = transformLines(documentUri, lines).unwrap(errors::addAll);
-    List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
-
-    String code = writer.serialize(rewrittenLines);
-
     ExtendedDocument parsedDocument =
         grammarPreprocessor
             .buildExtendedDocument(
                 documentUri,
-                code,
+                cobolCode,
                 copybookStack,
                 copybookConfig,
                 recursiveReplaceStmtStack,
@@ -126,6 +124,17 @@ public class TextPreprocessorImpl implements TextPreprocessor {
             .unwrap(errors::addAll);
 
     return new ResultWithErrors<>(parsedDocument, errors);
+  }
+
+  @Override
+  public ResultWithErrors<String> cleanUpCode(String documentUri, String cobolCode) {
+    List<SyntaxError> errors = new ArrayList<>();
+    List<CobolLine> lines = readLines(cobolCode, documentUri).unwrap(errors::addAll);
+    List<CobolLine> transformedLines = transformLines(documentUri, lines).unwrap(errors::addAll);
+    List<CobolLine> rewrittenLines = rewriteLines(transformedLines);
+
+    String code = writer.serialize(rewrittenLines);
+    return new ResultWithErrors<>(code, errors);
   }
 
   private ResultWithErrors<List<CobolLine>> readLines(String cobolCode, String documentURI) {
