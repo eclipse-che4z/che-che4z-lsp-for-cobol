@@ -325,7 +325,7 @@ pipeline {
                             cp -r /root/.cache $CYPRESS_HOME 
                             cp -r /root/.local $CYPRESS_HOME 
                             cp -r /root/.npm $CYPRESS_HOME 
-                            yarn install
+                            yarn install --frozen-lockfile
                             yarn add https://github.com/eclipse/che-che4z.git 
                             npm run ts:build
                             # To enable debug add this: DEBUG=*
