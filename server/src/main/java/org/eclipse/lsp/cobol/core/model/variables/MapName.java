@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2021 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -16,35 +16,31 @@
 package org.eclipse.lsp.cobol.core.model.variables;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
-import static org.eclipse.lsp.cobol.core.model.variables.StructureType.MNEMONIC_NAME;
+import static org.eclipse.lsp.cobol.core.model.variables.StructureType.MAP_NAME;
 
-/**
- * This value class represents a special name. They may substitute environment names in the
- * SPECIAL-NAMES paragraph. They should are a special type of variable, allowed in certain
- * statements.
- */
+/** This value clause represents IDMS MAP name variable */
 @Value
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class MnemonicName extends SpecialVariable {
-  String systemName;
+public class MapName extends SpecialVariable {
+  @Getter private static final StructureType STRUCTURE_TYPE = MAP_NAME;
 
-  public MnemonicName(String systemName, String name, Locality definition) {
+  public MapName(String name, Locality definition) {
     super(DEFAULT_LEVEL, name, definition, false, null);
-    this.systemName = systemName;
   }
 
   @Override
   public StructureType getStructureType() {
-    return MNEMONIC_NAME;
+    return MAP_NAME;
   }
 
   @Override
   public String getFormattedDisplayLine() {
-    return String.format("%1$s IS %2$s.", systemName, name);
+    return String.format("MAP %S.", name);
   }
 }

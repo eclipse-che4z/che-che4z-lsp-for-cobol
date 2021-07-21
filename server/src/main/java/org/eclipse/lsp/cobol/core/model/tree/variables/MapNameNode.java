@@ -14,16 +14,17 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
-/** Enumeration of variable node types */
-public enum VariableType {
-  CONDITION_DATA_NAME,
-  ELEMENTARY_ITEM,
-  GROUP_ITEM,
-  STAND_ALONE_DATA_ITEM,
-  INDEX_ITEM,
-  MNEMONIC_NAME,
-  MULTI_TABLE_DATA_NAME,
-  RENAME_ITEM,
-  TABLE_DATA_NAME,
-  MAP_NAME
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import org.eclipse.lsp.cobol.core.model.Locality;
+
+/** This node represents IDMS MAP name variable */
+@Getter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class MapNameNode extends VariableNode {
+  public MapNameNode(Locality location, String name) {
+    super(location, name, VariableType.MAP_NAME, false);
+  }
 }

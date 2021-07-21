@@ -30,7 +30,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This test checks that Outline tree has correct lines numbers for elements */
-public class TestOutlineTreeLineNumbers {
+class TestOutlineTreeLineNumbers {
   private static final String TEXT =
       "00     IDENTIFICATION DIVISION.\n"
           + "01     DATA DIVISION.\n"
@@ -67,7 +67,7 @@ public class TestOutlineTreeLineNumbers {
   }
 
   @Value
-  private class LineRange {
+  private static class LineRange {
     int start;
     int stop;
   }

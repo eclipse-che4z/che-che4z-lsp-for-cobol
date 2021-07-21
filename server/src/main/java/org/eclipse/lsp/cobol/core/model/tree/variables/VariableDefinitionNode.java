@@ -289,7 +289,7 @@ public final class VariableDefinitionNode extends Node {
   @Setter
   public static final class Builder {
     int level;
-    VariableNameAndLocality variableName;
+    VariableNameAndLocality variableNameAndLocality;
     boolean global;
     List<String> picClauses = ImmutableList.of();
     List<OccursClause> occursClauses = ImmutableList.of();
@@ -298,7 +298,7 @@ public final class VariableDefinitionNode extends Node {
     List<VariableNameAndLocality> redefinesClauses = ImmutableList.of();
     VariableNameAndLocality renamesClause;
     VariableNameAndLocality renamesThruClause;
-    Locality locality;
+    Locality statementLocality;
     String systemName;
     Locality levelLocality;
     boolean blankWhenZero;
@@ -314,9 +314,9 @@ public final class VariableDefinitionNode extends Node {
      */
     public VariableDefinitionNode build() {
       return new VariableDefinitionNode(
-          locality,
+          statementLocality,
           level,
-          variableName,
+          variableNameAndLocality,
           global,
           picClauses,
           occursClauses,

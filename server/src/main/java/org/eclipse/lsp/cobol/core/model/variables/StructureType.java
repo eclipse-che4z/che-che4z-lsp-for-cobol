@@ -32,7 +32,8 @@ public enum StructureType {
   MNEMONIC_NAME("variables.mnemonicName"),
   INDEX_NAME("variables.indexName"),
   GROUP_ITEM("variables.groupItem"),
-  INDEPENDENT_ITEM("variables.independent");
+  INDEPENDENT_ITEM("variables.independent"),
+  MAP_NAME("variables.mapName");
 
   @Getter private final MessageTemplate template;
 
