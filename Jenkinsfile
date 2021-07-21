@@ -100,7 +100,7 @@ def kubeTestLabel = "${kubeLabelPrefix}_test"
 pipeline {
     agent none
     parameters {
-        booleanParam(defaultValue: false, description: 'Run build.', name: 'build')
+        booleanParam(defaultValue: true, description: 'Run build.', name: 'build')
         booleanParam(defaultValue: true, description: 'Run integration tests.', name: 'integrationTests')
     }
     options {
