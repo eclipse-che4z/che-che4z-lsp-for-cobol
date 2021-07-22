@@ -7,6 +7,8 @@ Changelog:
 ### Bug Fixes
 * Allow semicolons as statement terminators ([127d7b8](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/127d7b8f76bd4152dfdfffaf43a17be1127a164e)), closes [#998](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/998)
 * Allow TOP as an identifier [#1004](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1004) ([95d02be](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/95d02be8584a0284f336513645b70b347e5ffef7))
+* Fix syntax analysis with misplaced indicators ([52aced7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/52aced7016da3e9b517e264a0c81f222e5bf6728)), closes [#1013](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1013)
+* Maintain string length while replacing [#974](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/974) ([4d2ae8b](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/4d2ae8b6f7b5cdfbf6132473b9be957b31b856e8))
 
 ### Features
 * Add support for IDMS COPY statements [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([fbbc52f](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/fbbc52f7b9b6facb7df7465af75169ccda8db48c))

@@ -9,12 +9,14 @@ Changelog:
 * Support for COPY MAID statement
 * Semantic analysis for variables in IDMS statements
 * Description on hover for condition names (88-level variables)
+* Maintaining of string length while copybook replacing
 
 #### Changed
 * Semicolons allowed as statement terminators
 
 #### Fixed
 * TOP allowed as a valid variable name
+* Failure of syntax analysis with misplaced indicators
 
 ## [0.19.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.0...0.19.1) (2021-06-25)
 
