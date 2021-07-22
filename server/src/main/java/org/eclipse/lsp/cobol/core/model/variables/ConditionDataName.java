@@ -15,7 +15,6 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
@@ -39,7 +38,7 @@ import static org.eclipse.lsp.cobol.core.model.variables.StructureType.CONDITION
 @Value
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ConditionDataName extends AbstractVariable {
+public class ConditionDataName extends SpecialVariable {
   List<ValueInterval> valueIntervals;
   String valueToken;
 
@@ -49,24 +48,9 @@ public class ConditionDataName extends AbstractVariable {
       Variable parent,
       List<ValueInterval> valueIntervals,
       String valueToken) {
-    super(LEVEL_88, name, definition, parent);
+    super(LEVEL_88, name, definition, false, parent);
     this.valueIntervals = valueIntervals;
     this.valueToken = valueToken;
-  }
-
-  @Override
-  public boolean isConditional() {
-    return false;
-  }
-
-  @Override
-  public void addConditionName(ConditionDataName variable) {
-    throw new UnsupportedOperationException("This variable is not conditional");
-  }
-
-  @Override
-  public List<ConditionDataName> getConditionNames() {
-    return ImmutableList.of();
   }
 
   @Override
