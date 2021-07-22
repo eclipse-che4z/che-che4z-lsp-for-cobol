@@ -21,29 +21,29 @@ context('This is a Copybook spec', () => {
     cy.updateConfigs('basic');
   });
 
-  // describe('TC174655 Copybook - Nominal', () => {
-  //   it(
-  //     ['flaky_theia'],
-  //     'Checks that when opening Cobol file with correct reference to copybook, there is syntax ok message shown',
-  //     () => {
-  //       cy.openFile('USER1.cbl');
-  //       cy.openFile('USERC1N1.cbl');
-  //       cy.wait(2000).getLSPOutput().should('contain.text', 'No syntax errors detected in USERC1N1.cbl');
-  //     },
-  //   );
-  // });
+  describe('TC174655 Copybook - Nominal', () => {
+    it(
+      ['flaky_theia'],
+      'Checks that when opening Cobol file with correct reference to copybook, there is syntax ok message shown',
+      () => {
+        cy.openFile('USER1.cbl');
+        cy.openFile('USERC1N1.cbl');
+        cy.wait(2000).getLSPOutput().should('contain.text', 'No syntax errors detected in USERC1N1.cbl');
+      },
+    );
+  });
 
-  // describe('Copybook - not exist: no syntax ok message', () => {
-  //   it(
-  //     ['flaky_theia'],
-  //     'Checks that when opening Cobol file which refers to non-existent copybook, syntax ok message does not appear and copybook is underlined',
-  //     () => {
-  //       cy.openFile('USERC1N1.cbl').wait(1000);
-  //       cy.openFile('USERC1F.cbl');
-  //       cy.getLSPOutput().should('not.have.text', 'No syntax errors detected in USERC1F.cbl');
-  //     },
-  //   );
-  // });
+  describe('Copybook - not exist: no syntax ok message', () => {
+    it(
+      ['flaky_theia'],
+      'Checks that when opening Cobol file which refers to non-existent copybook, syntax ok message does not appear and copybook is underlined',
+      () => {
+        cy.openFile('USERC1N1.cbl').wait(1000);
+        cy.openFile('USERC1F.cbl');
+        cy.getLSPOutput().should('not.have.text', 'No syntax errors detected in USERC1F.cbl');
+      },
+    );
+  });
 
   describe('TC174956 Copybook - not exist: error underlined', () => {
     it(['smoke'], 'Checks that error lines are marked in a file', () => {
@@ -316,21 +316,21 @@ context('This is a Copybook spec', () => {
     });
   });
 
-  // describe('TC312878 Edit missing copybook and resolve', () => {
-  //   // Theia doesn't show the pop-up
-  //   it(['flaky_theia'], 'Edits missing copybook and resolves', () => {
-  //     cy.openFile('USERC1F.cbl');
-  //     cy.goToLine(19);
-  //     cy.getCurrentLine().type('{end}{backspace}{backspace}123.');
-  //     cy.getCurrentLineErrors({ expectedLine: 19 })
-  //       .eq(0)
-  //       .getHoverErrorMessage()
-  //       .find('.action span[title^="Quick Fix"]')
-  //       .click();
-  //     cy.get('.p-Menu-itemLabel').contains('Resolve copybook').click();
-  //     cy.get('.theia-notification-message').should('contain.text', 'Missing copybooks: BOOK123');
-  //   });
-  // });
+  describe('TC312878 Edit missing copybook and resolve', () => {
+    // Theia doesn't show the pop-up
+    it(['flaky_theia'], 'Edits missing copybook and resolves', () => {
+      cy.openFile('USERC1F.cbl');
+      cy.goToLine(19);
+      cy.getCurrentLine().type('{end}{backspace}{backspace}123.');
+      cy.getCurrentLineErrors({ expectedLine: 19 })
+        .eq(0)
+        .getHoverErrorMessage()
+        .find('.action span[title^="Quick Fix"]')
+        .click();
+      cy.get('.p-Menu-itemLabel').contains('Resolve copybook').click();
+      cy.get('.theia-notification-message').should('contain.text', 'Missing copybooks: BOOK123');
+    });
+  });
 
   describe('TC314393 Variable usage should be found in a CALL statement', () => {
     it(['smoke'], 'The variable used in a CALL statement should be found in the references list.', () => {
@@ -352,20 +352,20 @@ context('This is a Copybook spec', () => {
     });
   });
 
-  // describe('TC314935 Copybook with Name in Quotes is Recognized', () => {
-  //   it(['flaky'], 'Copybook with Name in Quotes is Recognized', () => {
-  //     cy.openFile('VAR.cbl');
-  //     cy.goToLine(21);
-  //     cy.getLineByNumber(21).type("{end}{enter}COPY 'BBB'.").wait(500);
-  //     cy.getCurrentLineErrors({ expectedLine: 22 }).eq(0).getHoverErrorMessage().contains('BBB: Copybook not found');
-  //     cy.getLineByNumber(22).type('{end}{enter}COPY "BBB".').wait(500);
-  //     cy.getCurrentLineErrors({ expectedLine: 23 }).eq(0).getHoverErrorMessage().contains('BBB: Copybook not found');
-  //     cy.getLineByNumber(23).type('{end}{enter}COPY "NEW".').wait(500);
-  //     cy.getCurrentLine().should('not.have.class', '.squiggly-error');
-  //     cy.getLineByNumber(24).type("{end}{enter}COPY 'NEW'.").wait(500);
-  //     cy.getCurrentLine().should('not.have.class', '.squiggly-error');
-  //   });
-  // });
+  describe('TC314935 Copybook with Name in Quotes is Recognized', () => {
+    it(['flaky'], 'Copybook with Name in Quotes is Recognized', () => {
+      cy.openFile('VAR.cbl');
+      cy.goToLine(21);
+      cy.getLineByNumber(21).type("{end}{enter}COPY 'BBB'.").wait(500);
+      cy.getCurrentLineErrors({ expectedLine: 22 }).eq(0).getHoverErrorMessage().contains('BBB: Copybook not found');
+      cy.getLineByNumber(22).type('{end}{enter}COPY "BBB".').wait(500);
+      cy.getCurrentLineErrors({ expectedLine: 23 }).eq(0).getHoverErrorMessage().contains('BBB: Copybook not found');
+      cy.getLineByNumber(23).type('{end}{enter}COPY "NEW".').wait(500);
+      cy.getCurrentLine().should('not.have.class', '.squiggly-error');
+      cy.getLineByNumber(24).type("{end}{enter}COPY 'NEW'.").wait(500);
+      cy.getCurrentLine().should('not.have.class', '.squiggly-error');
+    });
+  });
 
   describe("TC315293 program ID - 'COBOL Copybook'", () => {
     it(
@@ -470,6 +470,41 @@ context('This is a Copybook spec', () => {
           .getHoverErrorMessage()
           .contains('Variable ABC is not defined');
       });
+    });
+  });
+
+  describe('Load resource file', () => {
+    it(['smoke'], 'Checks loading of resource file', () => {
+      cy.openFile('RES.cbl');
+      cy.goToLine(6);
+      cy.getCurrentLineErrors({ expectedLine: 6 })
+        .eq(0)
+        .getHoverErrorMessage()
+        .contains("Syntax error on 'FILE-CONTROsL'");
+    });
+  });
+
+  describe('TC327253 Support COPY MAID statements', () => {
+    beforeEach(() => {
+      cy.updateConfigs('testing');
+    });
+    it(['smoke'], 'Support COPY MAID statements', () => {
+      cy.openFile('TEST.CBL');
+      cy.goToLine(20);
+      cy.getLineByNumber(20).type('{end}{enter}    COPY MAID A.');
+      cy.goToLine(21);
+      cy.getCurrentLineErrors({ expectedLine: 21 })
+        .eq(0)
+        .getHoverErrorMessage()
+        .contains("Syntax error on 'WORK-VARIABLES' expected SECTION");
+      cy.getLineByNumber(21).type('{end}{enter}COPY MAID NEW.');
+      cy.getLineByNumber(22).should('not.have.class', '.squiggly-error');
+      cy.getLineByNumber(22).type('{end}{enter}COPY MAID REPL.');
+      cy.goToLine(23);
+      cy.getCurrentLineErrors({ expectedLine: 23 })
+        .eq(0)
+        .getHoverErrorMessage()
+        .contains("Syntax error on 'TAG-ID' expected SECTION");
     });
   });
 });

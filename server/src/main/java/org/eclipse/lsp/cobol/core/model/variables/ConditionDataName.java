@@ -15,16 +15,20 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.variables.ValueInterval;
 
 import java.util.List;
+import java.util.function.Function;
 
-import static org.eclipse.lsp.cobol.core.model.variables.StructureType.CONDITION_ITEM;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.LEVEL_88;
+import static org.eclipse.lsp.cobol.core.model.variables.StructureType.CONDITION_ITEM;
 
 /**
  * This value class represents a conditional data name entry, that has a level number 88. It cannot
@@ -34,35 +38,24 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
 @Value
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ConditionDataName extends AbstractVariable {
-  String value;
-  String valueTo;
+public class ConditionDataName extends SpecialVariable {
+  List<ValueInterval> valueIntervals;
+  String valueToken;
 
   public ConditionDataName(
-      String name, Locality definition, Variable parent, String value, String valueTo) {
-    super(LEVEL_88, name, definition, parent);
-    this.value = value;
-    this.valueTo = valueTo;
-  }
-
-  @Override
-  public boolean isConditional() {
-    return false;
-  }
-
-  @Override
-  public void addConditionName(ConditionDataName variable) {
-    throw new UnsupportedOperationException("This variable is not conditional");
-  }
-
-  @Override
-  public List<ConditionDataName> getConditionNames() {
-    return ImmutableList.of();
+      String name,
+      Locality definition,
+      Variable parent,
+      List<ValueInterval> valueIntervals,
+      String valueToken) {
+    super(LEVEL_88, name, definition, false, parent);
+    this.valueIntervals = valueIntervals;
+    this.valueToken = valueToken;
   }
 
   @Override
   public Variable rename(RenameItem newParent) {
-    return new ConditionDataName(name, definition, newParent, value, valueTo);
+    return new ConditionDataName(name, definition, newParent, valueIntervals, valueToken);
   }
 
   @Override
@@ -72,9 +65,25 @@ public class ConditionDataName extends AbstractVariable {
 
   @Override
   public String getFormattedDisplayLine() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(getFormattedSuffix()).append(" VALUE ").append(value);
-    if (valueTo != null) stringBuilder.append(" THRU ").append(valueTo);
-    return stringBuilder.append(".").toString();
+    final String formattedSuffix = getFormattedSuffix();
+    int thruPadding = formattedSuffix.length() + valueToken.length() + 2; // number of spaces
+
+    return String.format(
+        "%s %s %s.",
+        formattedSuffix,
+        valueToken,
+        valueIntervals.stream()
+            .map(intervalToText())
+            .collect(joining("\n" + StringUtils.repeat(' ', thruPadding))));
+  }
+
+  private Function<ValueInterval, String> intervalToText() {
+    return it -> it.getFrom() + ofNullable(it.getTo()).map(addThru(it)).orElse("");
+  }
+
+  private Function<String, String> addThru(ValueInterval interval) {
+    return it ->
+        ofNullable(interval.getThruToken()).map(thru -> " " + thru + " ").orElse("")
+            + interval.getTo();
   }
 }

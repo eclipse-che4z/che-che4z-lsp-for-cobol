@@ -14,25 +14,33 @@
  */
 package org.eclipse.lsp.cobol.core.model.variables;
 
+import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.core.model.tree.variables.ValueInterval;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Test {@link ConditionDataName}
- */
+/** Test {@link ConditionDataName} */
 class ConditionDataNameTest {
   private static final Variable PARENT = new GroupItem(1, "Parent", null, false, null);
 
   @Test
   void getFormattedDisplayLine() {
-    ConditionDataName variable = new ConditionDataName("TEST", null, PARENT, "FOO", null);
+    ConditionDataName variable =
+        new ConditionDataName(
+            "TEST", null, PARENT, ImmutableList.of(new ValueInterval("FOO", null, null)), "VALUE");
     assertEquals("88 TEST VALUE FOO.", variable.getFormattedDisplayLine());
   }
 
   @Test
   void getFormattedDisplayLineWithThru() {
-    ConditionDataName variable = new ConditionDataName("TEST", null, PARENT, "FOO", "BAR");
-    assertEquals("88 TEST VALUE FOO THRU BAR.", variable.getFormattedDisplayLine());
+    ConditionDataName variable =
+        new ConditionDataName(
+            "TEST",
+            null,
+            PARENT,
+            ImmutableList.of(new ValueInterval("FOO", "BAR", "THRU")),
+            "VALUES");
+    assertEquals("88 TEST VALUES FOO THRU BAR.", variable.getFormattedDisplayLine());
   }
 }

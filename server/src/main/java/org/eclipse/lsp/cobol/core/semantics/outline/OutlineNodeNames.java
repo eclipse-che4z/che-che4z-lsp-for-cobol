@@ -17,9 +17,7 @@ package org.eclipse.lsp.cobol.core.semantics.outline;
 
 import lombok.experimental.UtilityClass;
 
-/**
- * The class collects constants with various outline nodes names.
- */
+/** The class collects constants with various outline nodes names. */
 @UtilityClass
 public class OutlineNodeNames {
   public static final String IDENTIFICATION_DIVISION = "IDENTIFICATION DIVISION";
@@ -34,4 +32,5 @@ public class OutlineNodeNames {
   public static final String FILE_SECTION = "FILE SECTION";
   public static final String LINKAGE_SECTION = "LINKAGE SECTION";
   public static final String LOCAL_STORAGE_SECTION = "LOCAL STORAGE SECTION";
+  public static final String MAP_SECTION = "MAP SECTION";
 }

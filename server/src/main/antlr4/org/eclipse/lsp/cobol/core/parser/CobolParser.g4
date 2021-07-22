@@ -563,7 +563,7 @@ fileSection
    ;
 
 fileSectionParagraph
-    : (fileDescriptionEntry | copyIdmsFileEntry)+
+    : (fileDescriptionEntry)+
     ;
 
 fileDescriptionEntry
@@ -662,10 +662,6 @@ reportClause
    : (REPORT IS? | REPORTS ARE?) reportName+
    ;
 
-copyIdmsFileEntry
-    : COPY IDMS FILE idms_copy_entity_name versionClause? DOT_FS?
-    ;
-
 // -- working storage section ----------------------------------
 
 workingStorageSection
@@ -698,7 +694,6 @@ dataDescriptionEntry
    | dataDescriptionEntryFormat2
    | dataDescriptionEntryFormat1Level77
    | dataDescriptionEntryFormat3
-   | dataDescriptionEntryCopyIdms
    ;
 
 dataDescriptionEntryFormat1
@@ -831,7 +826,19 @@ usageFormat
    ;
 
 dataValueClause
-   : ((VALUE | VALUES) (IS | ARE)?) dataValueClauseLiteral
+   : valueIsToken dataValueClauseLiteral
+   ;
+
+valueIsToken
+   : valueToken isAreToken?
+   ;
+
+valueToken
+   : VALUE | VALUES
+   ;
+
+isAreToken
+   : IS | ARE
    ;
 
 dataValueClauseLiteral
@@ -847,38 +854,13 @@ dataValueIntervalFrom
    ;
 
 dataValueIntervalTo
-   : (THROUGH | THRU) literal
+   : thruToken literal
    ;
 
-dataDescriptionEntryCopyIdms
-    : LEVEL_NUMBER? COPY IDMS (copyIdmsEntity | copyIdmsRecordName | copyIdmsLrName |
-    copyIdmsLrCtrl| copyMapName)+
-    ;
+thruToken
+   : (THROUGH | THRU)
+   ;
 
-copyIdmsEntity
-    : (SUBSCHEMA_AREANAMES | SUBSCHEMA_CONTROL | SUBSCHEMA_CTRL | SUBSCHEMA_DESCRIPTION |
-    SUBSCHEMA_DML_LR_DESCRIPTION | SUBSCHEMA_LR_CONTROL | SUBSCHEMA_LR_DESCRIPTION |
-    SUBSCHEMA_LR_NAMES | SUBSCHEMA_LR_RECORDS | SUBSCHEMA_NAMES | SUBSCHEMA_RECNAMES |
-    SUBSCHEMA_RECORDS | SUBSCHEMA_SETNAMES | SUBSCHEMA_NAME | MAPS | MAP CONTROLS |
-    MAP RECORDS) DOT_FS?
-    ;
-
-copyIdmsRecordName
-    : RECORD? idms_copy_entity_name (versionClause | dataRedefinesClause)* DOT_FS?
-    ;
-
-copyIdmsLrName
-    : LR idms_copy_entity_name dataRedefinesClause? DOT_FS?
-    ;
-
-copyIdmsLrCtrl
-    : SUBSCHEMA_LR_CTRL (SIZE IS? integerLiteral)? DOT_FS?
-    ;
-
-copyMapName
-    : MAP (CONTROL idms_copy_entity_name | idms_copy_entity_name) DOT_FS?
-    ;
-//TODO: Throw an error if the rules is triggered on the COPY IDMS MAP without data name specified".
 // -- schema section ----------------------------------
 
 schemaSection
@@ -900,7 +882,7 @@ maxFieldListClause
    ;
 
 mapClause
-    : MAP idms_map_name versionClause? (TYPE IS? (STANDARD | EXTENDED) PAGING?)? DOT_FS?
+    : MAP idms_map_name_definition versionClause? (TYPE IS? (STANDARD | EXTENDED) PAGING?)? DOT_FS?
     ;
 
 versionClause
@@ -930,9 +912,8 @@ procedureDeclaratives
    ;
 
 procedureDeclarative
-     : procedureSectionHeader DOT_FS (useStatement DOT_FS | copyIdmsModule) paragraphs |
-     copyIdmsModule
-     ;
+   : procedureSectionHeader DOT_FS (useStatement DOT_FS) paragraphs
+   ;
 
 procedureSectionHeader
    : sectionName SECTION integerLiteral?
@@ -957,11 +938,11 @@ paragraph
    ;
 
 sentence
-   : statement* DOT_FS | idmsStatements endClause?
+   : statement* endClause | idmsStatements endClause?
    ;
 
 conditionalStatementCall
-   : statement | idmsStatements
+   : (statement | idmsStatements) SEMICOLON_FS?
    ;
 
 statement
@@ -975,11 +956,7 @@ statement
    ;
 
 idmsStatements
-    : idmsStmtsOptTerm endClause? | idmsStmtsOptTermOn endClause? idmsOnClause? | idmsStmtsMandTermOn (SEMICOLON_FS idmsOnClause? | DOT_FS)
-    ;
-
-idmsStmtsOptTerm
-    : copyIdmsBinds | copyIdmsModule
+    : idmsStmtsOptTermOn endClause? idmsOnClause? | idmsStmtsMandTermOn (SEMICOLON_FS idmsOnClause? | DOT_FS)
     ;
 
 idmsStmtsOptTermOn
@@ -1306,15 +1283,6 @@ connectStatement
 continueStatement
    : CONTINUE
    ;
-
-// copy idms statement in procedure section
-copyIdmsBinds
-    : COPY IDMS (SUBSCHEMA_BINDS | SUBSCHEMA_RECORD_BINDS | MAP_BINDS ) endClause?
-    ;
-
-copyIdmsModule
-    : COPY IDMS MODULE? idms_copy_entity_name versionClause? endClause?
-    ;
 
 // dc statement
 
@@ -2995,7 +2963,7 @@ classCondition
    ;
 
 conditionNameReference
-   : conditionName inData* conditionNameSubscriptReference*
+   : dataName inData* conditionNameSubscriptReference*
    ;
 
 conditionNameSubscriptReference
@@ -3036,8 +3004,8 @@ idms_map_name
     : T=dataName {validateLength($T.text, "map name", 8);}
     ;
 
-idms_copy_entity_name
-    : T=dataName {validateLength($T.text, "copy entity name", 32);}
+idms_map_name_definition
+    : T=dataName {validateLength($T.text, "map name", 8);}
     ;
 
 idms_db_entity_name
@@ -3071,8 +3039,3 @@ idms_subschema_name
 idms_table_name
     : T=literal {validateLength($T.text.substring(1, $T.text.length() -1), "table name", 8);}
     ;
-
-idms_quoted_number
-    : {_input.LT(1).getText().matches("'\\d+'")}? NONNUMERICLITERAL
-    ;
-

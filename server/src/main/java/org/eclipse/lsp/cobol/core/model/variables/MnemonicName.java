@@ -15,13 +15,10 @@
 
 package org.eclipse.lsp.cobol.core.model.variables;
 
-import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.model.Locality;
-
-import java.util.List;
 
 import static org.eclipse.lsp.cobol.core.model.variables.StructureType.MNEMONIC_NAME;
 
@@ -33,27 +30,12 @@ import static org.eclipse.lsp.cobol.core.model.variables.StructureType.MNEMONIC_
 @Value
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class MnemonicName extends AbstractVariable {
+public class MnemonicName extends SpecialVariable {
   String systemName;
 
   public MnemonicName(String systemName, String name, Locality definition) {
     super(DEFAULT_LEVEL, name, definition, false, null);
     this.systemName = systemName;
-  }
-
-  @Override
-  public boolean isConditional() {
-    return false;
-  }
-
-  @Override
-  public void addConditionName(ConditionDataName variable) {
-    throw new UnsupportedOperationException("This variable is not conditional");
-  }
-
-  @Override
-  public List<ConditionDataName> getConditionNames() {
-    return ImmutableList.of();
   }
 
   @Override

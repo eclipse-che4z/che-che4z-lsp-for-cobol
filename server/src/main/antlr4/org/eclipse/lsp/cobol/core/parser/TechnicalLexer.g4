@@ -32,8 +32,7 @@ DOLLARCHAR : '$';
 DOUBLEQUOTE : '"';
 
 // period full stopPosition
-DOT_FS : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ | '.' EOF;
-DOT : '.';
+DOT_FS : '.' EOF?;
 EQUALCHAR : '=';
 LESSTHANCHAR : '<';
 LESSTHANOREQUAL : '<=';
@@ -43,8 +42,7 @@ MORETHANCHAR : '>';
 MORETHANOREQUAL : '>=';
 NOTEQUALCHAR : '<>';
 PLUSCHAR : '+';
-SEMICOLON : ';';
-SEMICOLON_FS : ';' ('\r' | '\n' | '\f' | '\t' | ' ')+ | ';' EOF;
+SEMICOLON_FS : ';' EOF?;
 SINGLEQUOTE : '\'';
 RPARENCHAR : ')';
 SLASHCHAR : '/';
@@ -59,7 +57,7 @@ INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+ | LEVEL_NUMBER;
 
 SINGLEDIGITLITERAL : DIGIT;
 
-NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
+NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT_FS | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
 
 NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
 
@@ -76,7 +74,7 @@ HEX_NUMBERS : HEXNUMBER;
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
 COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*  -> channel(HIDDEN);
-WS : [ \t\f;]+ -> channel(HIDDEN);
+WS : [ \t\f]+ -> channel(HIDDEN);
 
 //SQL comments
 SQLLINECOMMENT

@@ -2,6 +2,20 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 Changelog:
 
+## [0.20.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.1...0.20.0) (2021-07-19)
+
+### Bug Fixes
+* Allow semicolons as statement terminators ([127d7b8](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/127d7b8f76bd4152dfdfffaf43a17be1127a164e)), closes [#998](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/998)
+* Allow TOP as an identifier [#1004](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1004) ([95d02be](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/95d02be8584a0284f336513645b70b347e5ffef7))
+* Fix syntax analysis with misplaced indicators ([52aced7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/52aced7016da3e9b517e264a0c81f222e5bf6728)), closes [#1013](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1013)
+* Maintain string length while replacing [#974](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/974) ([4d2ae8b](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/4d2ae8b6f7b5cdfbf6132473b9be957b31b856e8))
+
+### Features
+* Add support for IDMS COPY statements [#704](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/704) ([fbbc52f](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/fbbc52f7b9b6facb7df7465af75169ccda8db48c))
+* Add support for COPY MAID statements [#986](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/986) ([ab29eb5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ab29eb5cfab4f5d5f4124ad9044c4e2f6b387838))
+* Add variable support in IDMS statements [#963](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/963) ([b1b04c6](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/b1b04c669da5926d15aebaf46cbca1bfd45a8de5))
+* Show condition names in variable description ([d9049d7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d9049d728da3af36ec5739c28bcd5e6093603ede)), closes [#994](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/994)
+
 ## [0.19.1](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.0...0.19.1) (2021-06-25)
 
 ### Bug Fixes

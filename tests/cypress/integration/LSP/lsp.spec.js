@@ -68,17 +68,17 @@ context('This is a LSP spec', () => {
       .contains(documentation);
   };
 
-  // describe('TC152046 Nominal - check syntax Ok message', () => {
-  //   it(
-  //     ['flaky_theia'],
-  //     'Checks that when opening Cobol file with correct syntax there is an appropriate message is shown',
-  //     () => {
-  //       cy.openFileExplorer();
-  //       cy.openFile('USER1.cbl');
-  //       cy.getLSPOutput().contains('No syntax errors detected in USER1.cbl');
-  //     },
-  //   );
-  // });
+  describe('TC152046 Nominal - check syntax Ok message', () => {
+    it(
+      ['flaky_theia'],
+      'Checks that when opening Cobol file with correct syntax there is an appropriate message is shown',
+      () => {
+        cy.openFileExplorer();
+        cy.openFile('USER1.cbl');
+        cy.getLSPOutput().contains('No syntax errors detected in USER1.cbl');
+      },
+    );
+  });
 
   describe('TC152048 Cobol file is recognized by LSP', () => {
     it(['smoke'], 'Cobol file is recognized by LSP - Cobol type is shown in status bar', () => {
@@ -125,17 +125,17 @@ context('This is a LSP spec', () => {
     });
   });
 
-  // describe('TC152047 Error case - file has syntax errors', () => {
-  //   it(
-  //     ['flaky_theia'],
-  //     'Checks that when opening Cobol file with correct syntax there is NO message about correct syntax',
-  //     () => {
-  //       cy.openFile('USER1.cbl').wait(4000);
-  //       cy.openFile('USER2.cbl');
-  //       cy.getLSPOutput().should('not.have.text', 'No syntax errors detected in USER2.cbl');
-  //     },
-  //   );
-  // });
+  describe('TC152047 Error case - file has syntax errors', () => {
+    it(
+      ['flaky_theia'],
+      'Checks that when opening Cobol file with correct syntax there is NO message about correct syntax',
+      () => {
+        cy.openFile('USER1.cbl').wait(4000);
+        cy.openFile('USER2.cbl');
+        cy.getLSPOutput().should('not.have.text', 'No syntax errors detected in USER2.cbl');
+      },
+    );
+  });
 
   describe('TC152052 Syntax Errors are marked in file', () => {
     it(['smoke'], 'Checks that error lines are marked in a file', () => {
@@ -242,33 +242,33 @@ context('This is a LSP spec', () => {
     });
   });
 
-  // describe('TC314392 LOG level', () => {
-  //   // Theia doesn't show settings.json correctly
-  //   beforeEach(() => {
-  //     cy.updateConfigs('empty');
-  //   });
-  //   afterEach(() => {
-  //     cy.closeFolder('.theia');
-  //   });
+  describe('TC314392 LOG level', () => {
+    // Theia doesn't show settings.json correctly
+    beforeEach(() => {
+      cy.updateConfigs('empty');
+    });
+    afterEach(() => {
+      cy.closeFolder('.theia');
+    });
 
-  //   it(['flaky_theia'], 'Lets check structure in settings.json file ', () => {
-  //     cy.openFolder('.theia').openFile('settings.json').goToLine(4);
-  //     cy.getCurrentLine().type('{end}{enter}').wait(500);
-  //     cy.getCurrentLine().type('"cobol-lsp.logging.level.root": "ERROR"');
-  //     cy.getCurrentLine().should('not.have.class', '.squiggly-info');
-  //     cy.getCurrentLine().type('{end}{backspace}1"');
-  //     cy.getMainEditor()
-  //       .getCurrentLineOverlay()
-  //       .find('.squiggly-info')
-  //       .then(($error) => {
-  //         cy.wrap($error).getElementLineNumber().should('eq', 4);
-  //         cy.getCurrentLine().trigger('mousemove', $error[0].offsetLeft, $error[0].offsetTop);
-  //       });
-  //     cy.get('div.monaco-editor-hover-content').contains(
-  //       'Value is not accepted. Valid values: "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL".',
-  //     );
-  //   });
-  // });
+    it(['flaky_theia'], 'Lets check structure in settings.json file ', () => {
+      cy.openFolder('.theia').openFile('settings.json').goToLine(4);
+      cy.getCurrentLine().type('{end}{enter}').wait(500);
+      cy.getCurrentLine().type('"cobol-lsp.logging.level.root": "ERROR"');
+      cy.getCurrentLine().should('not.have.class', '.squiggly-info');
+      cy.getCurrentLine().type('{end}{backspace}1"');
+      cy.getMainEditor()
+        .getCurrentLineOverlay()
+        .find('.squiggly-info')
+        .then(($error) => {
+          cy.wrap($error).getElementLineNumber().should('eq', 4);
+          cy.getCurrentLine().trigger('mousemove', $error[0].offsetLeft, $error[0].offsetTop);
+        });
+      cy.get('div.monaco-editor-hover-content').contains(
+        'Value is not accepted. Valid values: "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL".',
+      );
+    });
+  });
 
   describe('TC266094 Underline the entire incorrect variable structure', () => {
     it(['smoke'], 'This test checks that parser can find and underline an incorrect variable structure.', () => {
@@ -512,6 +512,36 @@ context('This is a LSP spec', () => {
         '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9. 88 HEADER VALUE 1 THRU 4. 88 SUPPLR VALUE 2 THRU 4. 88 WREHOUSE VALUE 3.',
       );
       varDifinitionAutocomplete('TOP-OF-PAGE', 'C01 IS TOP-OF-PAGE.');
+    });
+  });
+
+  describe('Show 88 Items On Hover', () => {
+    it(['smoke'], 'Show 88 Items On Hover', () => {
+      cy.openFile('TEST.CBL');
+      cy.goToLine(19);
+      cy.getLineByNumber(20).type('{home}{enter}');
+      cy.getLineByNumber(20).type(
+        '01 TOP.{enter} \
+      05 MIDDLE-2.{enter} \
+        10 LEAF-2 PIC 9.{enter} \
+          88 COND-ITEM1 VALUE 0.{enter} \
+          88 COND-ITEM2 VALUE 1.{enter}',
+      );
+      hoverOverVariable(
+        21,
+        'MIDDLE-2',
+        '01 TOP. 05 MIDDLE-2. 10 LEAF-2 PIC 9. 88 COND-ITEM1 VALUE 0. 88 COND-ITEM2 VALUE 1.',
+      );
+      hoverOverVariable(23, 'COND-ITEM1', '01 TOP. 05 MIDDLE-2. 10 LEAF-2 PIC 9. 88 COND-ITEM1 VALUE 0.');
+      hoverOverVariable(24, 'COND-ITEM2', '01 TOP. 05 MIDDLE-2. 10 LEAF-2 PIC 9. 88 COND-ITEM2 VALUE 1.');
+    });
+  });
+
+  describe('TC327254 Semicolon as a Separators Not Produces Error', () => {
+    it(['smoke'], 'Semicolon as a Separators Not Produces Error', () => {
+      cy.openFile('TEST.CBL');
+      cy.goToLine(23).getLineByNumber(23).type('{end}{backspace};');
+      cy.getLineByNumber(23).should('not.have.class', '.squiggly-error');
     });
   });
 });

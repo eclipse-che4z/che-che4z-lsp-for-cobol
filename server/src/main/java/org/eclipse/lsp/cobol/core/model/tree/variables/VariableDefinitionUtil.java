@@ -27,7 +27,6 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode.Type;
 import org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames;
 
 import java.util.*;
@@ -42,6 +41,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 @UtilityClass
 @Slf4j
 public class VariableDefinitionUtil {
+  public static final int LEVEL_MAP_NAME = -1;
   public static final int LEVEL_MNEMONIC = 0;
   public static final int LEVEL_01 = 1;
   public static final int LEVEL_66 = 66;
@@ -74,7 +74,8 @@ public class VariableDefinitionUtil {
           VariableDefinitionUtil::multiTableDataNameMatcher,
           VariableDefinitionUtil::groupItemMatcher,
           VariableDefinitionUtil::tableDataNameMatcher,
-          VariableDefinitionUtil::elementItemMatcher
+          VariableDefinitionUtil::elementItemMatcher,
+          VariableDefinitionUtil::mapNameMatcher
           // TODO: add check that the following items do not have VALUE:
           // TODO: 1. JUSTIFIED
           // TODO: 2. SYNCHRONIZED
@@ -89,7 +90,7 @@ public class VariableDefinitionUtil {
    * Process nodes with {@link VariableDefinitionNode} as a child and convert {@link
    * VariableDefinitionNode} into an appropriate {@link VariableNode}.
    *
-   * <p>The method do the following things:
+   * <p>The method does the following things:
    *
    * <p>- delete all VariableDefinitionNode from the node
    *
@@ -210,7 +211,8 @@ public class VariableDefinitionUtil {
             definitionNode.getLocality(),
             variableName,
             definitionNode.hasRedefines(),
-            definitionNode.getValueInterval());
+            definitionNode.getValueIntervals(),
+            definitionNode.getValueToken());
     createVariableNameNode(variable, definitionNode.getVariableName());
     VariableWithLevelNode precedingVariable = getVariableForConditional(definitionNode);
     List<SyntaxError> errors = ImmutableList.of();
@@ -223,12 +225,25 @@ public class VariableDefinitionUtil {
 
   private ResultWithErrors<VariableNode> mnemonicNameMatcher(
       VariableDefinitionNode definitionNode) {
-    if (definitionNode.getLevel() != 0) return null;
-    MnemonicNameNode variable =
-        new MnemonicNameNode(
-            definitionNode.getLocality(), definitionNode.getSystemName(), getName(definitionNode));
-    createVariableNameNode(variable, definitionNode.getVariableName());
-    return new ResultWithErrors<>(variable, ImmutableList.of());
+    if (definitionNode.getLevel() == LEVEL_MNEMONIC) {
+      MnemonicNameNode variable =
+          new MnemonicNameNode(
+              definitionNode.getLocality(),
+              definitionNode.getSystemName(),
+              getName(definitionNode));
+      createVariableNameNode(variable, definitionNode.getVariableName());
+      return new ResultWithErrors<>(variable, ImmutableList.of());
+    }
+    return null;
+  }
+
+  private ResultWithErrors<VariableNode> mapNameMatcher(VariableDefinitionNode definitionNode) {
+    if (definitionNode.getLevel() == LEVEL_MAP_NAME) {
+      MapNameNode variable = new MapNameNode(definitionNode.getLocality(), getName(definitionNode));
+      createVariableNameNode(variable, definitionNode.getVariableName());
+      return new ResultWithErrors<>(variable, ImmutableList.of());
+    }
+    return null;
   }
 
   private ResultWithErrors<VariableNode> independentDataItemMatcher(
@@ -248,7 +263,8 @@ public class VariableDefinitionUtil {
 
   private ResultWithErrors<VariableNode> multiTableDataNameMatcher(
       VariableDefinitionNode definitionNode) {
-    if (definitionNode.doesntHavePic()
+    if (definitionNode.getLevel() >= LEVEL_01
+        && definitionNode.doesntHavePic()
         && definitionNode.hasOccurs()
         && definitionNode.doesntHaveUsage()) {
       MultiTableDataNameNode variable =
@@ -264,9 +280,7 @@ public class VariableDefinitionUtil {
       for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes())
         variable.addChild(
             new IndexItemNode(
-                nameAndLocality.getLocality(),
-                nameAndLocality.getName(),
-                variable.isGlobal()));
+                nameAndLocality.getLocality(), nameAndLocality.getName(), variable.isGlobal()));
       return new ResultWithErrors<>(variable, ImmutableList.of());
     }
     return null;
@@ -277,7 +291,8 @@ public class VariableDefinitionUtil {
   // 2. Group Item can't have following:
   //    2.a- BLANK WHEN ZERO/ DYNAMIC LENGTH/ JUSTIFIED/ OCCURS/ PICTURE/ SYNCHRONIZED
   private ResultWithErrors<VariableNode> groupItemMatcher(VariableDefinitionNode definitionNode) {
-    if (definitionNode.doesntHavePic()
+    if (definitionNode.getLevel() >= LEVEL_01
+        && definitionNode.doesntHavePic()
         && definitionNode.doesntHaveOccurs()
         && !definitionNode.isBlankWhenZeroPresent()) {
       GroupItemNode variable =
@@ -296,7 +311,9 @@ public class VariableDefinitionUtil {
 
   private ResultWithErrors<VariableNode> tableDataNameMatcher(
       VariableDefinitionNode definitionNode) {
-    if ((definitionNode.hasPic() || definitionNode.hasUsage()) && definitionNode.hasOccurs()) {
+    if (definitionNode.getLevel() >= LEVEL_01
+        && (definitionNode.hasPic() || definitionNode.hasUsage())
+        && definitionNode.hasOccurs()) {
       TableDataNameNode variable =
           new TableDataNameNode(
               definitionNode.getLocality(),
@@ -314,9 +331,7 @@ public class VariableDefinitionUtil {
       for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes())
         variable.addChild(
             new IndexItemNode(
-                nameAndLocality.getLocality(),
-                nameAndLocality.getName(),
-                variable.isGlobal()));
+                nameAndLocality.getLocality(), nameAndLocality.getName(), variable.isGlobal()));
       return new ResultWithErrors<>(variable, ImmutableList.of());
     }
     return null;
@@ -324,7 +339,8 @@ public class VariableDefinitionUtil {
 
   private ResultWithErrors<VariableNode> elementItemMatcher(VariableDefinitionNode definitionNode) {
     List<SyntaxError> errors = new ArrayList<>();
-    if ((definitionNode.hasPic() || definitionNode.hasUsage())
+    if (definitionNode.getLevel() >= LEVEL_01
+        && (definitionNode.hasPic() || definitionNode.hasUsage())
         && definitionNode.doesntHaveOccurs()) {
       ElementaryItemNode variable =
           new ElementaryItemNode(
@@ -429,7 +445,8 @@ public class VariableDefinitionUtil {
     String renamesName = renames.getName();
     int renamesIndex = Iterables.indexOf(nodesForRenaming, it -> renamesName.equals(it.getName()));
     if (renamesIndex != -1)
-      variable.addChild(new VariableUsageNode(renamesName, renames.getLocality(), Type.GENERAL));
+      variable.addChild(
+          new VariableUsageNode(renamesName, renames.getLocality(), ImmutableList.of()));
     else
       errors =
           ImmutableList.of(
@@ -456,8 +473,8 @@ public class VariableDefinitionUtil {
         new VariableUsageNode(
             redefinesName,
             redefinesLocality,
-            Type.GENERAL,
-            collectVariableParentNames(definitionNode.getParent())));
+            collectVariableParentNames(definitionNode.getParent()),
+            VariableUsageNode.ReferenceType.CONTEXT));
     VariableWithLevelNode variableForRedefine =
         getPrecedingVariableForRedefine(definitionNode, redefinesName);
     if (variableForRedefine == null || !variableForRedefine.getName().equals(redefinesName)) {
@@ -489,13 +506,17 @@ public class VariableDefinitionUtil {
     return new ResultWithErrors<>(variableNode, errors);
   }
 
-  private List<String> collectVariableParentNames(Node parent) {
-    List<String> parents = new ArrayList<>();
+  private List<VariableNameAndLocality> collectVariableParentNames(Node parent) {
+    List<VariableNameAndLocality> parents = new ArrayList<>();
     while (parent != null && parent.getNodeType() == NodeType.VARIABLE) {
-      parents.add(((VariableNode) parent).getName());
+      parents.add(convertVariableNode((VariableNode) parent));
       parent = parent.getParent();
     }
     return parents;
+  }
+
+  private VariableNameAndLocality convertVariableNode(VariableNode node) {
+    return new VariableNameAndLocality(node.getName(), node.getLocality());
   }
 
   private VariableWithLevelNode getPrecedingVariableForRedefine(

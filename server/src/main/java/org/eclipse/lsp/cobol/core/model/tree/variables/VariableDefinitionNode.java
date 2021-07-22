@@ -54,6 +54,7 @@ public final class VariableDefinitionNode extends Node {
   private final Locality levelLocality;
   private final boolean isBlankWhenZeroPresent;
   private final boolean isSignClausePresent;
+  private final String valueToken;
   @Setter private List<UsageFormat> usageClauses;
 
   private VariableDefinitionNode(
@@ -71,7 +72,8 @@ public final class VariableDefinitionNode extends Node {
       String systemName,
       Locality levelLocality,
       boolean isBlankWhenZeroPresent,
-      boolean isSignClausePresent) {
+      boolean isSignClausePresent,
+      String valueToken) {
     super(location, NodeType.VARIABLE_DEFINITION);
     this.level = level;
     this.variableName = variableName;
@@ -87,6 +89,7 @@ public final class VariableDefinitionNode extends Node {
     this.levelLocality = levelLocality;
     this.isBlankWhenZeroPresent = isBlankWhenZeroPresent;
     this.isSignClausePresent = isSignClausePresent;
+    this.valueToken = valueToken;
   }
 
   private static SyntaxError checkClauseIsSingle(
@@ -116,13 +119,13 @@ public final class VariableDefinitionNode extends Node {
   }
 
   /**
-   * Get value interval
+   * Get value intervals
    *
-   * @return the interval or null
+   * @return the intervals or empty list
    */
-  public ValueInterval getValueInterval() {
-    if (valueClauses.isEmpty()) return null;
-    return valueClauses.get(0).getValueIntervals().get(0);
+  public List<ValueInterval> getValueIntervals() {
+    if (valueClauses.isEmpty()) return ImmutableList.of();
+    return valueClauses.get(0).getValueIntervals();
   }
 
   /**
@@ -286,7 +289,7 @@ public final class VariableDefinitionNode extends Node {
   @Setter
   public static final class Builder {
     int level;
-    VariableNameAndLocality variableName;
+    VariableNameAndLocality variableNameAndLocality;
     boolean global;
     List<String> picClauses = ImmutableList.of();
     List<OccursClause> occursClauses = ImmutableList.of();
@@ -295,11 +298,12 @@ public final class VariableDefinitionNode extends Node {
     List<VariableNameAndLocality> redefinesClauses = ImmutableList.of();
     VariableNameAndLocality renamesClause;
     VariableNameAndLocality renamesThruClause;
-    Locality locality;
+    Locality statementLocality;
     String systemName;
     Locality levelLocality;
     boolean blankWhenZero;
     boolean signClause;
+    String valueToken;
 
     private Builder() {}
 
@@ -310,9 +314,9 @@ public final class VariableDefinitionNode extends Node {
      */
     public VariableDefinitionNode build() {
       return new VariableDefinitionNode(
-          locality,
+          statementLocality,
           level,
-          variableName,
+          variableNameAndLocality,
           global,
           picClauses,
           occursClauses,
@@ -324,7 +328,8 @@ public final class VariableDefinitionNode extends Node {
           systemName,
           levelLocality,
           blankWhenZero,
-          signClause);
+          signClause,
+          valueToken);
     }
   }
 }

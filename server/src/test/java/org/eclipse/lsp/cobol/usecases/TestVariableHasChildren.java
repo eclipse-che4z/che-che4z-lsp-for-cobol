@@ -26,13 +26,14 @@ import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /** This test checks that the variable structure is built correctly */
-class TestVariablesHasChildren {
+class TestVariableHasChildren {
   private static final String TEXT =
       "000010 IDENTIFICATION DIVISION.\n"
           + "000020 PROGRAM-ID.            VARIABLES.\n"
@@ -61,7 +62,7 @@ class TestVariablesHasChildren {
             .orElse(null);
 
     final ImmutableList<ElementItem> expected = expectedGroupItemChildren();
-    Assertions.assertEquals(expected, actualGroupItemChildren);
+    assertEquals(expected, actualGroupItemChildren);
   }
 
   private ImmutableList<ElementItem> expectedGroupItemChildren() {
@@ -98,7 +99,7 @@ class TestVariablesHasChildren {
             "FILLER",
             Locality.builder()
                 .uri(UseCaseUtils.DOCUMENT_URI)
-                .range(new Range(new Position(6, 11), new Position(6, 73)))
+                .range(new Range(new Position(6, 11), new Position(6, 64)))
                 .token("05")
                 .recognizer(GrammarPreprocessorListenerImpl.class)
                 .build(),
