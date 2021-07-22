@@ -47,7 +47,7 @@ import static org.eclipse.lsp.cobol.core.CobolLexer.COPYEXIT;
 public class LocalityMappingUtils {
 
   private static final int URI_PREFIX_LENGTH =
-      ProcessingConstants.CPY_ENTER_TAG.length() + ProcessingConstants.CPY_URI_OPEN.length();
+      ProcessingConstants.CPY_ENTER_TAG.length();
   private static final int URI_SUFFIX_LENGTH = ProcessingConstants.CPY_URI_CLOSE.length();
 
   /**

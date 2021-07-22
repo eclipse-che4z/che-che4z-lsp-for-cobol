@@ -22,7 +22,7 @@
       },
       {
         "name": "SECT1",
-        "snippet": "SECT1 SECTION.\r\n       PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n           PERFORM PARAG2 OF SECT2.\r\n       ",
+        "snippet": "SECT1 SECTION.\r\n       PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n           PERFORM PARAG2 OF SECT2.",
         "location": {
           "uri": "fake/path",
           "start": {
@@ -31,13 +31,13 @@
           },
           "end": {
             "line": 21,
-            "character": 45
+            "character": 36
           }
         },
         "type": "section",
         "children": [
           {
-            "snippet": "PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n           PERFORM PARAG2 OF SECT2.\r\n       ",
+            "snippet": "PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n           PERFORM PARAG2 OF SECT2.",
             "name": "PARAG1",
             "location": {
               "uri": "fake/path",
@@ -47,7 +47,7 @@
               },
               "end": {
                 "line": 21,
-                "character": 45
+                "character": 36
               }
             },
             "type": "paragraph",
