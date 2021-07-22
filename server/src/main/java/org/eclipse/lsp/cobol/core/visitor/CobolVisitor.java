@@ -328,6 +328,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitMapSection(MapSectionContext ctx) {
+    outlineTreeBuilder.addNode(MAP_SECTION, NodeType.SECTION, ctx);
+    outlineTreeBuilder.initVariables();
+    return addTreeNode(ctx, SectionNode::new);
+  }
+
+  @Override
   public List<Node> visitFileSection(FileSectionContext ctx) {
     outlineTreeBuilder.addNode(FILE_SECTION, NodeType.SECTION, ctx);
     outlineTreeBuilder.initVariables();
@@ -434,6 +441,20 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitMapClause(MapClauseContext ctx) {
+    VariableNameAndLocality variableName =
+        extractNameAndLocality(ctx.idms_map_name_definition().dataName());
+    outlineTreeBuilder.addNode(variableName.getName(), NodeType.MAP_NAME, ctx);
+    return addTreeNode(
+        VariableDefinitionNode.builder()
+            .level(LEVEL_MAP_NAME)
+            .variableNameAndLocality(variableName)
+            .statementLocality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
+            .build(),
+        visitChildren(ctx));
+  }
+
+  @Override
   public List<Node> visitDataDescriptionEntryFormat1(DataDescriptionEntryFormat1Context ctx) {
     String name = getName(ctx.entryName());
     NodeType nodeType = getDataDescriptionNodeType(ctx);
@@ -443,8 +464,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         VariableDefinitionNode.builder()
             .level(level)
             .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER()))
-            .locality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
-            .variableName(extractNameAndLocality(ctx.entryName()))
+            .statementLocality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
+            .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
             .global(!ctx.dataGlobalClause().isEmpty())
             .picClauses(retrievePicTexts(ctx.dataPictureClause()))
             .valueClauses(retrieveValues(ctx.dataValueClause()))
@@ -472,8 +493,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     outlineTreeBuilder.addNode(name, NodeType.MNEMONIC_NAME, ctx);
     return addTreeNode(
         VariableDefinitionNode.builder()
-            .locality(locality)
-            .variableName(new VariableNameAndLocality(name, locality))
+            .statementLocality(locality)
+            .variableNameAndLocality(new VariableNameAndLocality(name, locality))
             .systemName(systemName)
             .build(),
         visitChildren(ctx));
@@ -487,8 +508,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         VariableDefinitionNode.builder()
             .level(LEVEL_66)
             .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_66()))
-            .variableName(extractNameAndLocality(ctx.entryName()))
-            .locality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
+            .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
+            .statementLocality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
             .renamesClause(extractNameAndLocality(ctx.dataRenamesClause().dataName()));
     ofNullable(ctx.dataRenamesClause().thruDataName())
         .map(ThruDataNameContext::dataName)
@@ -505,8 +526,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         VariableDefinitionNode.builder()
             .level(LEVEL_88)
             .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_88()))
-            .variableName(extractNameAndLocality(ctx.entryName()))
-            .locality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
+            .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
+            .statementLocality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
             .valueClauses(retrieveValues(ImmutableList.of(ctx.dataValueClause())))
             .valueToken(retrieveValueToken(ctx.dataValueClause().valueIsToken()))
             .build(),
@@ -531,8 +552,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         VariableDefinitionNode.builder()
             .level(LEVEL_77)
             .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_77()))
-            .variableName(extractNameAndLocality(ctx.entryName()))
-            .locality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
+            .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
+            .statementLocality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
             .global(!ctx.dataGlobalClause().isEmpty())
             .picClauses(retrievePicTexts(ctx.dataPictureClause()))
             .valueClauses(retrieveValues(ctx.dataValueClause()))
