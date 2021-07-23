@@ -297,7 +297,7 @@ pipeline {
                         // copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}'
                         copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
                         sh 'mkdir -p $THEIA_HOME'
-                        sh 'cp -r test_files/zowe theia/home/.zowe'
+                        // sh 'cp -r test_files/zowe theia/home/.zowe'
                         sh 'mkdir -p $THEIA_PLUGINS'
                         sh 'mv *.vsix $THEIA_PLUGINS'
                         sh '''#!/bin/bash
