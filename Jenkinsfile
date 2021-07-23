@@ -303,7 +303,7 @@ pipeline {
                         sh '''#!/bin/bash
                             cd /home/theia
                             export HOME=$THEIA_HOME
-                            node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=local-dir:$THEIA_PLUGINS > $THEIA_HOME/theia.log &
+                            node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=local-dir:$THEIA_PLUGINS > $THEIA_HOME/theia.log 2>&1 &
                         '''
 //                        echo "Waiting for Theia starting..."
 //                        sh 'sleep 3'
