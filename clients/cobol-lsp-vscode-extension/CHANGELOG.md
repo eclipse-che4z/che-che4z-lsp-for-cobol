@@ -2,7 +2,7 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 Changelog:
 
-## [0.20.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.1...0.20.0) (2021-07-19)
+## [0.20.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.1...0.20.0) (2021-07-22)
 
 #### Added
 * Resolving copybooks with COPY IDMS

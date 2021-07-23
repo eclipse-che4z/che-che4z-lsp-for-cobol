@@ -2,7 +2,7 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 Changelog:
 
-## [0.20.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.1...0.20.0) (2021-07-19)
+## [0.20.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.1...0.20.0) (2021-07-22)
 
 ### Bug Fixes
 * Allow semicolons as statement terminators ([127d7b8](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/127d7b8f76bd4152dfdfffaf43a17be1127a164e)), closes [#998](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/998)
