@@ -297,12 +297,15 @@ pipeline {
                         // copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}'
                         copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
                         sh 'mkdir -p $THEIA_HOME'
-                        // sh 'cp -r test_files/zowe theia/home/.zowe'
+                        sh 'cp -r test_files/zowe theia/home/.zowe'
                         sh 'mkdir -p $THEIA_PLUGINS'
                         sh 'mv *.vsix $THEIA_PLUGINS'
                         sh '''#!/bin/bash
                             cd /home/theia
+                            # Set user HOME for theia.
                             export HOME=$THEIA_HOME
+                            # Set user HOME for LSP server. Is not work with just $HOME for some reason.
+                            export _JAVA_OPTIONS=-Duser.home=$THEIA_HOME
                             node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=local-dir:$THEIA_PLUGINS > $THEIA_HOME/theia.log 2>&1 &
                         '''
 //                        echo "Waiting for Theia starting..."
