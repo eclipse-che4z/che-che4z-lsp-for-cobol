@@ -65,7 +65,7 @@ kind: Pod
 spec:
   containers:
   - name: theia
-    image: theiaide/theia-full:1.5.0
+    image: theiaide/theia-full:1.15.0
     tty: true
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 1000; done;" ]
@@ -353,6 +353,7 @@ pipeline {
                             archiveArtifacts artifacts: "cypress/screenshots/**/*.*", allowEmptyArchive: true
                             archiveArtifacts artifacts: "cypress/videos/**/*.*", allowEmptyArchive: true
                             archiveArtifacts artifacts: "combined.xml", allowEmptyArchive: true
+                            archiveArtifacts artifacts: "logs/*.*", allowEmptyArchive: true
                         }
                     }
                 }
