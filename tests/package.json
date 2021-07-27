@@ -15,6 +15,7 @@
     "cypress-iframe": "^1.0.1",
     "cypress-multi-reporters": "^1.4.0",
     "cypress-tags": "^0.2.0",
+    "cypress-terminal-report": "^3.2.2",
     "cypress-xpath": "^1.6.1",
     "debug": "^4.3.2",
     "eslint": "^7.6.0",
@@ -48,7 +49,7 @@
     "allure:history": "mv -f allure-report/history allure-results/history && rm -r allure-report || true",
     "delete:reports": "rm cypress/results/* || true",
     "prereport": "npm run delete:reports",
-    "merge-reports": "jrm combined.xml \"results/*.xml\"",
-    "cy:run:ci": "npm run prereport && cross-env CYPRESS_INCLUDE_TAGS=CI cypress run -b chrome --headless --reporter mocha-junit-reporter"
+    "merge-reports": "jrm ui_tests_complete_logs.xml \"results/*.xml\"",
+    "cy:run:ci": "npm run prereport && cross-env CYPRESS_INCLUDE_TAGS=CI cypress run -b chrome --headless --reporter mocha-junit-reporter --config defaultCommandTimeout=100000 --env appLoadTimeout=100000"
   }
 }

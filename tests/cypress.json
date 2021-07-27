@@ -1,9 +1,9 @@
 {
   "baseUrl": "http://localhost:3000/",
-  "defaultCommandTimeout": 80000,
+  "defaultCommandTimeout": 30000,
   "video": false,
   "env": {
-      "appLoadTimeout": 80000,
+      "appLoadTimeout": 30000,
       "username": "",
       "password": "",
       "plugin": "",

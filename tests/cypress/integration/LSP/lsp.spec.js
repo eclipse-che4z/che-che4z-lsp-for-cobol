@@ -94,7 +94,7 @@ context('This is a LSP spec', () => {
     beforeEach(() => {
       cy.updateConfigs('basic');
     });
-    it(['smoke', 'CI'], 'Checks behavior of go to definition action', () => {
+    it(['smoke'], 'Checks behavior of go to definition action', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(29).findText('100-Print-User.').wait(5000).goToDefinition().wait(10000);
       cy.getCurrentLineNumber().should('eq', 32);
@@ -212,7 +212,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152058 Autocomplete functionality with snippets navigation', () => {
-    it(['smoke'], 'Checks auto complete functionality, also with navigation by snippets', () => {
+    it(['smoke', 'CI'], 'Checks auto complete functionality, also with navigation by snippets', () => {
       cy.openFile('USER2.cbl');
       cy.goToLine(40);
       cy.getCurrentLine().type('{end}{enter}');
