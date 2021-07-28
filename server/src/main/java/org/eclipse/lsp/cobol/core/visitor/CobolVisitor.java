@@ -442,16 +442,21 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitMapClause(MapClauseContext ctx) {
-    VariableNameAndLocality variableName =
-        extractNameAndLocality(ctx.idms_map_name_definition().dataName());
-    outlineTreeBuilder.addNode(variableName.getName(), NodeType.MAP_NAME, ctx);
-    return addTreeNode(
-        VariableDefinitionNode.builder()
-            .level(LEVEL_MAP_NAME)
-            .variableNameAndLocality(variableName)
-            .statementLocality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
-            .build(),
-        visitChildren(ctx));
+    return ofNullable(ctx.idms_map_name_definition())
+        .map(Idms_map_name_definitionContext::dataName)
+        .map(this::extractNameAndLocality)
+        .map(
+            varName -> {
+              outlineTreeBuilder.addNode(varName.getName(), NodeType.MAP_NAME, ctx);
+              return addTreeNode(
+                  VariableDefinitionNode.builder()
+                      .level(LEVEL_MAP_NAME)
+                      .variableNameAndLocality(varName)
+                      .statementLocality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
+                      .build(),
+                  visitChildren(ctx));
+            })
+        .orElse(visitChildren(ctx));
   }
 
   @Override
