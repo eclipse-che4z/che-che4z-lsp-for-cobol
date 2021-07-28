@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 
 /** This test checks that the usage of XML special registers does not produce syntax errors */
-class TextXmlSpecialRegisters {
+class TestXmlSpecialRegisters {
 
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
