@@ -24,7 +24,7 @@ context('This is F96125 spec', () => {
   });
 
   describe('TC250107 Test Area A', () => {
-    it(['smoke'], 'Check for DIVISION warning when not in Area A', () => {
+    it(['smoke', 'CI'], 'Check for DIVISION warning when not in Area A', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(14)
         .as('currentLine')
@@ -64,7 +64,7 @@ context('This is F96125 spec', () => {
             });
         });
     });
-    it(['smoke'], 'Check paragraph name warning when not in Area A', () => {
+    it(['smoke', 'CI'], 'Check paragraph name warning when not in Area A', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(32)
         .as('currentLine')
@@ -77,7 +77,7 @@ context('This is F96125 spec', () => {
             .contains('The following token must start in Area A: 100-Print-User');
         });
     });
-    it(['smoke'], 'Check FD/SD level data', () => {
+    it(['smoke', 'CI'], 'Check FD/SD level data', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(17).type('{enter}FILE SECTION.{enter}{ctrl}z{enter}', {
         delay: 100,
@@ -93,7 +93,7 @@ context('This is F96125 spec', () => {
   });
 
   describe('TC250109 Test Area B', () => {
-    it(['smoke'], 'Check statement warning when not in Area B', () => {
+    it(['smoke', 'CI'], 'Check statement warning when not in Area B', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(33)
         .as('currentLine')
