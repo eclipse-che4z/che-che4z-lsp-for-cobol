@@ -327,7 +327,7 @@ pipeline {
                             cp -r /root/.npm $CYPRESS_HOME 
                             yarn install --frozen-lockfile
                             npm run ts:build
-                            # To enable debug add this: DEBUG=*
+                            # To enable debug add this: DEBUG=* test
                             NO_COLOR=1 npm run cy:run:ci
                             TEST_STATUS=$?
                             npm run merge-reports
