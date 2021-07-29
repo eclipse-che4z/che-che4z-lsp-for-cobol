@@ -81,6 +81,9 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152048 Cobol file is recognized by LSP', () => {
+    beforeEach(() => {
+      cy.updateConfigs('basic');
+    });
     it(['smoke', 'CI'], 'Cobol file is recognized by LSP - Cobol type is shown in status bar', () => {
       cy.openFile('USER1.cbl');
       cy.get('.right.area .hasCommand[title="Select Language Mode"]').should('contain.text', 'COBOL');
@@ -88,9 +91,12 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152049 Navigate through definitions', () => {
-    it(['smoke', 'CI'], 'Checks behavior of go to definition action', () => {
+    beforeEach(() => {
+      cy.updateConfigs('basic');
+    });
+    it(['smoke'], 'Checks behavior of go to definition action', () => {
       cy.openFile('USER1.cbl');
-      cy.getLineByNumber(29).findText('100-Print-User.').wait(5000).goToDefinition();
+      cy.getLineByNumber(29).findText('100-Print-User.').wait(5000).goToDefinition().wait(10000);
       cy.getCurrentLineNumber().should('eq', 32);
     });
   });
@@ -151,7 +157,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152051 Syntax Errors have more detailed hints', () => {
-    it(['smoke'], 'Syntax Errors have more detailed hints', () => {
+    it(['smoke', 'CI'], 'Syntax Errors have more detailed hints', () => {
       cy.openFile('USER2.cbl');
       cy.get('.squiggly-error')
         .getElementLineNumber()
@@ -164,7 +170,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152050 Semantic Errors also marked in file', () => {
-    it(['smoke'], 'Checks that Semantic Errors also marked in file', () => {
+    it(['smoke', 'CI'], 'Checks that Semantic Errors also marked in file', () => {
       cy.openFile('USER2.cbl');
       cy.goToLine(40);
       cy.get('.squiggly-error')
@@ -178,7 +184,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152053 Semantic Errors also have hints', () => {
-    it(['smoke'], 'Checks that semantic errors have detailed hints', () => {
+    it(['smoke', 'CI'], 'Checks that semantic errors have detailed hints', () => {
       cy.openFile('USER2.cbl');
       cy.goToLine(40);
       cy.get('.squiggly-error')
@@ -206,7 +212,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152058 Autocomplete functionality with snippets navigation', () => {
-    it(['smoke'], 'Checks auto complete functionality, also with navigation by snippets', () => {
+    it(['smoke', 'CI'], 'Checks auto complete functionality, also with navigation by snippets', () => {
       cy.openFile('USER2.cbl');
       cy.goToLine(40);
       cy.getCurrentLine().type('{end}{enter}');

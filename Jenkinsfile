@@ -329,7 +329,6 @@ pipeline {
                             cp -r /root/.local $CYPRESS_HOME 
                             cp -r /root/.npm $CYPRESS_HOME 
                             yarn install --frozen-lockfile
-                            yarn add https://github.com/eclipse/che-che4z.git 
                             npm run ts:build
                             # To enable debug add this: DEBUG=*
                             NO_COLOR=1 npm run cy:run:ci
@@ -352,7 +351,7 @@ pipeline {
                         dir('tests') {
                             archiveArtifacts artifacts: "cypress/screenshots/**/*.*", allowEmptyArchive: true
                             archiveArtifacts artifacts: "cypress/videos/**/*.*", allowEmptyArchive: true
-                            archiveArtifacts artifacts: "combined.xml", allowEmptyArchive: true
+                            archiveArtifacts artifacts: "ui_tests_complete_logs.xml", allowEmptyArchive: true
                             archiveArtifacts artifacts: "logs/*.*", allowEmptyArchive: true
                         }
                     }
