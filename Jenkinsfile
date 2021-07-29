@@ -110,7 +110,8 @@ pipeline {
         booleanParam(defaultValue: false, description: 'Run integration tests.', name: 'integrationTests')
     }
     triggers {
-        cron('20 22 * * 1-5')
+        // Only development branch has nightly builds
+        cron(env.BRANCH_NAME == 'development' ? '20 22 * * 1-5' : '')
     }
     options {
         disableConcurrentBuilds()
@@ -135,7 +136,6 @@ pipeline {
                     steps {
                         deleteDir()
                         checkout scm
-                        echo "CHANGE_AUTHOR is ${CHANGE_AUTHOR}"
                     }
                 }
                 stage('Build LSP server part') {
@@ -281,7 +281,8 @@ pipeline {
         }
         stage('Integration testing') {
             when {
-                expression { params.integrationTests || isTimeTriggeredBuild() }
+                // Integration testing runs on each PR from "nalmabrcom" user.
+                expression { params.integrationTests || isTimeTriggeredBuild() || env.CHANGE_AUTHOR == "nalmabrcom" }
                 beforeAgent true
             }
             agent {
