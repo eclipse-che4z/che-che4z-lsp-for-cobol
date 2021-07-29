@@ -20,16 +20,16 @@
 
 context('This is a F96117 spec', () => {
   describe('TC247497 - Local Copybooks - check .gitignore file and hidden folders under c4z', () => {
-    it(['smoke'], 'Finds .gitignore file under .c4z', () => {
+    it(['smoke', 'CI'], 'Finds .gitignore file under .c4z', () => {
       cy.openFolder('.c4z');
       cy.openFile('.gitignore');
       cy.get('.view-line').findText('/**');
     });
-    it('Delete .c4z folder and refresh', () => {
+    it(['smoke', 'CI'], 'Delete .c4z folder and refresh', () => {
       cy.deleteFile('.c4z');
     });
 
-    it(['smoke'], 'Check .c4z/.gitignore', () => {
+    it(['smoke', 'CI'], 'Check .c4z/.gitignore', () => {
       cy.openFile('USER1.cbl');
       cy.openFolder('.c4z');
       cy.openFile('.gitignore');
