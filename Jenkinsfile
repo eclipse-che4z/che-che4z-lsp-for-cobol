@@ -97,11 +97,20 @@ def kubeLabelPrefix = "${projectName}_pod_${env.BUILD_NUMBER}_${env.BRANCH_NAME}
 def kubeBuildLabel = "${kubeLabelPrefix}_build"
 def kubeTestLabel = "${kubeLabelPrefix}_test"
 
+boolean isTimeTriggeredBuild() {
+    for (currentBuildCause in currentBuild.buildCauses) {
+        return currentBuildCause._class == 'hudson.triggers.TimerTrigger$TimerTriggerCause'
+    }
+    return false
+}
+
 pipeline {
     agent none
     parameters {
-        booleanParam(defaultValue: true, description: 'Run build.', name: 'build')
-        booleanParam(defaultValue: true, description: 'Run integration tests.', name: 'integrationTests')
+        booleanParam(defaultValue: false, description: 'Run integration tests.', name: 'integrationTests')
+    }
+    triggers {
+        cron('20 22 * * 1-5')
     }
     options {
         disableConcurrentBuilds()
@@ -115,10 +124,6 @@ pipeline {
     }
     stages {
         stage('Build a package') {
-            when {
-                expression { params.build }
-                beforeAgent true
-            }
             agent {
                 kubernetes {
                     label kubeBuildLabel
@@ -130,6 +135,7 @@ pipeline {
                     steps {
                         deleteDir()
                         checkout scm
+                        echo "CHANGE_AUTHOR is ${CHANGE_AUTHOR}"
                     }
                 }
                 stage('Build LSP server part') {
@@ -275,7 +281,7 @@ pipeline {
         }
         stage('Integration testing') {
             when {
-                expression { params.integrationTests }
+                expression { params.integrationTests || isTimeTriggeredBuild() }
                 beforeAgent true
             }
             agent {
@@ -294,7 +300,6 @@ pipeline {
                 checkout scm
                 container('theia') {
                     dir('tests') {
-                        // copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}'
                         copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
                         sh 'mkdir -p $THEIA_HOME'
                         sh 'cp -r test_files/zowe theia/home/.zowe'
@@ -308,15 +313,6 @@ pipeline {
                             export _JAVA_OPTIONS=-Duser.home=$THEIA_HOME
                             node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=local-dir:$THEIA_PLUGINS > $THEIA_HOME/theia.log 2>&1 &
                         '''
-//                        echo "Waiting for Theia starting..."
-//                        sh 'sleep 3'
-//                        sh 'ls $THEIA_HOME'
-//                        sh 'cat $THEIA_HOME/theia.log'
-//                        sh '''#!/bin/bash
-//                            sed '/Deploy plugins list took/q' <(tail -n 0 -f $THEIA_HOME/theia.log) > /dev/null
-//                        '''
-//                        echo "Theia ready!"
-//                        sh 'cat $THEIA_HOME/theia.log'
                     }
                 }
                 container('cypress') {
@@ -341,6 +337,13 @@ pipeline {
             }
             post {
                 always {
+                    container('cypress') {
+                        dir('tests') {
+                            archiveArtifacts artifacts: "ui_tests_complete_logs.xml", allowEmptyArchive: true
+                        }
+                    }
+                }
+                failure {
                     container('theia') {
                         dir('tests') {
                             archiveArtifacts artifacts: "theia/home/theia.log", allowEmptyArchive: true
@@ -351,7 +354,6 @@ pipeline {
                         dir('tests') {
                             archiveArtifacts artifacts: "cypress/screenshots/**/*.*", allowEmptyArchive: true
                             archiveArtifacts artifacts: "cypress/videos/**/*.*", allowEmptyArchive: true
-                            archiveArtifacts artifacts: "ui_tests_complete_logs.xml", allowEmptyArchive: true
                             archiveArtifacts artifacts: "logs/*.*", allowEmptyArchive: true
                         }
                     }
