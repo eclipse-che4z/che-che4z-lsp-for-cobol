@@ -45,14 +45,7 @@ spec:
     volumeMounts:
     - name: sonar
       mountPath: /home/jenkins/.sonar
-  - name: jnlp
-    volumeMounts:
-    - name: volume-known-hosts
-      mountPath: /home/jenkins/.ssh
   volumes:
-  - name: volume-known-hosts
-    configMap:
-      name: known-hosts
   - name: m2-repo
     emptyDir: {}
   - name: sonar
@@ -249,30 +242,6 @@ pipeline {
                             dir('clients/cobol-lsp-vscode-extension') {
                                 sh 'npx vsce package'
                                 archiveArtifacts "*.vsix"
-                            }
-                        }
-                    }
-                }
-
-                stage('Deploy') {
-                    environment {
-                        sshChe4z = "genie.che4z@projects-storage.eclipse.org"
-                        project = "download.eclipse.org/che4z/snapshots/$projectName"
-                        url = "$project/$branchName"
-                        deployPath = "/home/data/httpd/$url"
-                    }
-                    when {
-                        expression { branchName == 'master' || branchName == 'development' }
-                    }
-                    steps {
-                        container('jnlp') {
-                            sshagent(['projects-storage.eclipse.org-bot-ssh']) {
-                                sh '''
-                                ssh $sshChe4z rm -rf $deployPath
-                                ssh $sshChe4z mkdir -p $deployPath
-                                scp -r $WORKSPACE/clients/cobol-lsp-vscode-extension/*.vsix $sshChe4z:$deployPath
-                                '''
-                                echo "Deployed to https://$url"
                             }
                         }
                     }
