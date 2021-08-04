@@ -64,7 +64,7 @@ context('This is F96125 spec', () => {
             });
         });
     });
-    it(['smoke', 'CI'], 'Check paragraph name warning when not in Area A', () => {
+    it(['smoke'], 'Check paragraph name warning when not in Area A', () => {
       cy.openFile('USER1.cbl');
       cy.getLineByNumber(32)
         .as('currentLine')
