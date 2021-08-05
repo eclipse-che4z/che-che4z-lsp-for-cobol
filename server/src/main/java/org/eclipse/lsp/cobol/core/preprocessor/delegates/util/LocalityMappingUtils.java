@@ -113,10 +113,10 @@ public class LocalityMappingUtils {
       Map<String, DocumentMapping> documentPositions,
       Map<Token, Locality> result,
       Deque<DocumentHierarchyLevel> documentHierarchyStack) {
-    if (token.getType() == COPYENTRY) {
+    if (token.getType() == COPYENTRY && token.getTokenSource() instanceof CobolLexer) {
       enterDocument(
           extractCopybookName(token.getText()), documentPositions, documentHierarchyStack);
-    } else if (token.getType() == COPYEXIT) {
+    } else if (token.getType() == COPYEXIT && token.getTokenSource() instanceof CobolLexer) {
       exitDocument(documentHierarchyStack);
     } else {
       mapTokenToPosition(token, result, documentHierarchyStack);
