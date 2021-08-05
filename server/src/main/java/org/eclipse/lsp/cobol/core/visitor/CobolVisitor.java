@@ -40,7 +40,6 @@ import org.eclipse.lsp.cobol.core.model.tree.statements.SetUpDownByStatement;
 import org.eclipse.lsp.cobol.core.model.tree.variables.*;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode.Builder;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
-import org.eclipse.lsp.cobol.core.semantics.GroupContext;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
@@ -77,7 +76,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private final List<SyntaxError> errors = new ArrayList<>();
   private final PredefinedVariableContext constants = new PredefinedVariableContext();
-  private final GroupContext groupContext = new GroupContext();
   private final Multimap<String, Location> subroutineUsages = HashMultimap.create();
   private final NamedSubContext copybooks;
   private final CommonTokenStream tokenStream;
@@ -112,15 +110,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
    */
   @NonNull
   public ResultWithErrors<SemanticContext> finishAnalysis() {
-    errors.addAll(groupContext.generateParagraphErrors(messageService));
     return new ResultWithErrors<>(
         SemanticContext.builder()
-            .paragraphDefinitions(groupContext.getParagraphDefinitions())
-            .paragraphUsages(groupContext.getParagraphUsages())
-            .paragraphRanges(groupContext.getParagraphRanges())
-            .sectionDefinitions(groupContext.getSectionDefinitions())
-            .sectionUsages(groupContext.getSectionUsages())
-            .sectionRanges(groupContext.getSectionRanges())
             .constants(constants)
             .copybookDefinitions(copybooks.getDefinitions().asMap())
             .copybookUsages(copybooks.getUsages().asMap())
@@ -222,47 +213,31 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitProcedureSection(ProcedureSectionContext ctx) {
     throwWarning(ctx.getStart());
-    addSectionRange(ctx);
-    outlineTreeBuilder.addNode(ctx.getStart().getText(), NodeType.PROCEDURE_SECTION, ctx);
 
     String name = ctx.getStart().getText().toUpperCase();
-    getLocality(ctx.getStart())
-        .ifPresent(locality -> groupContext.addSectionDefinition(name, locality));
-    return addTreeNode(
-        ctx,
-        locality ->
-            new ProcedureSectionNode(locality, ctx.getStart().getText(), getIntervalText(ctx)));
+    outlineTreeBuilder.addNode(name, NodeType.PROCEDURE_SECTION, ctx);
+    return getLocality(ctx.getStart())
+        .map(
+            def ->
+                addTreeNode(
+                    ctx,
+                    locality ->
+                        new ProcedureSectionNode(locality, name, getIntervalText(ctx), def)))
+        .orElseGet(() -> visitChildren(ctx));
   }
 
   @Override
   public List<Node> visitParagraph(ParagraphContext ctx) {
     areaAWarning(ctx.getStart());
-    addParagraphRange(ctx);
 
-    outlineTreeBuilder.addNode(ctx.getStart().getText(), NodeType.PROCEDURE, ctx);
-    String name = ctx.paragraphName().getText();
-    return addTreeNode(ctx, locality -> new ParagraphNode(locality, name, getIntervalText(ctx)));
-  }
-
-  private void addSectionRange(ParserRuleContext ctx) {
-    String name = ctx.getStart().getText().toUpperCase();
-    getRange(ctx).ifPresent(range -> groupContext.addSectionRange(name, range));
-  }
-
-  private void addParagraphRange(ParserRuleContext ctx) {
-    String name = ctx.getStart().getText().toUpperCase();
-    getRange(ctx).ifPresent(range -> groupContext.addParagraphRange(name, range));
-  }
-
-  private Optional<Location> getRange(ParserRuleContext ctx) {
-    Optional<Locality> start = getLocality(ctx.getStart());
-    Optional<Locality> end = getLocality(ctx.getStop());
-
-    if (start.isPresent() && end.isPresent()) {
-      Range range = new Range(start.get().getRange().getStart(), end.get().getRange().getEnd());
-      return Optional.of(new Location(start.get().getUri(), range));
-    }
-    return Optional.empty();
+    String name = ctx.paragraphDefinitionName().getText().toUpperCase();
+    outlineTreeBuilder.addNode(name, NodeType.PROCEDURE, ctx);
+    return getLocality(ctx.getStart())
+        .map(
+            def ->
+                addTreeNode(
+                    ctx, locality -> new ParagraphNode(locality, name, getIntervalText(ctx), def)))
+        .orElseGet(() -> visitChildren(ctx));
   }
 
   @Override
@@ -435,9 +410,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitParagraphName(ParagraphNameContext ctx) {
     String name = ctx.getText().toUpperCase();
-    getLocality(ctx.getStart())
-        .ifPresent(locality -> groupContext.addParagraphDefinition(name, locality));
-    return visitChildren(ctx);
+    return addTreeNode(ctx, locality -> new CodeBlockUsageNode(locality, name));
   }
 
   @Override
@@ -456,7 +429,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                       .build(),
                   visitChildren(ctx));
             })
-        .orElse(visitChildren(ctx));
+        .orElseGet(() -> visitChildren(ctx));
   }
 
   @Override
@@ -573,13 +546,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .signClause(!ctx.dataSignClause().isEmpty())
             .build(),
         visitChildren(ctx));
-  }
-
-  @Override
-  public List<Node> visitParagraphNameUsage(ParagraphNameUsageContext ctx) {
-    String name = ctx.getText().toUpperCase();
-    getLocality(ctx.getStart()).ifPresent(l -> groupContext.addCandidateUsage(name, l));
-    return visitChildren(ctx);
   }
 
   private List<DocumentSymbol> buildOutlineTree() {
@@ -712,7 +678,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     }
     List<String> targets =
         Collections.singletonList(
-            goToStatementSimpleContext.procedureName().paragraphNameUsage().getText());
+            goToStatementSimpleContext.procedureName().paragraphName().getText());
     return addTreeNode(ctx, locality -> new GoToNode(locality, targets));
   }
 

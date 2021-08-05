@@ -934,7 +934,7 @@ paragraphs
    ;
 
 paragraph
-   : paragraphName DOT_FS (alteredGoTo | sentence*)
+   : paragraphDefinitionName DOT_FS (alteredGoTo | sentence*)
    ;
 
 sentence

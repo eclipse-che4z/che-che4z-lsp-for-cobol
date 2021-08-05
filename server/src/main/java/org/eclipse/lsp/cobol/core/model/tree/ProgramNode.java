@@ -19,6 +19,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
+import org.eclipse.lsp.cobol.core.messages.MessageTemplate;
+import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.statements.StatementNode;
@@ -40,6 +42,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.NodeType.STATEMENT;
 @EqualsAndHashCode(callSuper = true)
 public class ProgramNode extends Node {
   private final Collection<Variable> definedVariables = new ArrayList<>();
+  private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
   @EqualsAndHashCode.Exclude private final NodeConverter nodeConverter = new NodeConverter();
   @EqualsAndHashCode.Exclude private VariableUsageDelegate variableUsageDelegate;
   private String programName;
@@ -73,6 +76,12 @@ public class ProgramNode extends Node {
   @Override
   public List<SyntaxError> process() {
     List<SyntaxError> errors = super.process();
+    errors.addAll(processVariables());
+    return errors;
+  }
+
+  private List<SyntaxError> processVariables() {
+    List<SyntaxError> errors = new ArrayList<>();
     Set<String> variableNames = definedVariables.stream().map(Variable::getName).collect(toSet());
 
     List<Variable> availableVariables = new ArrayList<>(definedVariables);
@@ -87,10 +96,6 @@ public class ProgramNode extends Node {
     return errors;
   }
 
-  public Collection<Variable> getDefinedVariables() {
-    return definedVariables;
-  }
-
   /**
    * Add the variable definition to that program context.
    *
@@ -98,6 +103,40 @@ public class ProgramNode extends Node {
    */
   public void addVariableDefinition(VariableNode node) {
     definedVariables.add(nodeConverter.convertVariable(node));
+  }
+
+  /**
+   * Add a paragraph defined in the program context.
+   *
+   * @param node - the paragraph node
+   * @return syntax error if the code block duplicates
+   */
+  public SyntaxError registerCodeBlock(CodeBlockDefinitionNode node) {
+    codeBlocks.add(node);
+    // TODO: add uniqueness check for paragraphs
+    return null;
+  }
+
+  /**
+   * Add the usage of a code block defined in this program. Returns an optional syntax error if the
+   * paragraph is not defined.
+   *
+   * @param node the usage node to register
+   * @return Optional error if the paragraph or section with the given name is not defined
+   */
+  public Optional<SyntaxError> registerCodeBlockUsage(CodeBlockUsageNode node) {
+    final Optional<CodeBlockDefinitionNode> definition =
+        codeBlocks.stream().filter(it -> it.getName().equals(node.getName())).findAny();
+    definition.ifPresent(it -> it.addUsage(node.getLocality()));
+    return definition.isPresent()
+        ? Optional.empty()
+        : Optional.of(
+            SyntaxError.syntaxError()
+                .messageTemplate(
+                    MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
+                .severity(ErrorSeverity.ERROR)
+                .locality(node.getLocality())
+                .build());
   }
 
   private List<Variable> getGlobalVariables() {

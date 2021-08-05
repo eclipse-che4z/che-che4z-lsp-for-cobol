@@ -14,18 +14,19 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.model.tree.Node;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.service.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -48,13 +49,23 @@ class TestSectionRange {
 
   @Test
   void test() {
-      AnalysisResult analysisResult = UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), CopybookProcessingMode.ENABLED);
-      Map<String, List<Location>> ranges = analysisResult.getSectionRange();
-      assertThat(ranges.size(), equalTo(1));
+    AnalysisResult analysisResult =
+        UseCaseEngine.runTest(
+            TEXT,
+            ImmutableList.of(),
+            ImmutableMap.of(),
+            ImmutableList.of(),
+            CopybookProcessingMode.ENABLED);
+    List<Node> sections =
+        analysisResult
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(it -> it.getNodeType().equals(NodeType.PROCEDURE_SECTION))
+            .collect(Collectors.toList());
+    assertThat(sections.size(), equalTo(1));
 
-      Location location = ranges.get("GET-DATA").get(0);
-      assertEquals(new Position(7, 10), location.getRange().getStart());
-      assertEquals(new Position(10, 23), location.getRange().getEnd());
+    Location location = sections.get(0).getLocality().toLocation();
+    assertEquals(new Position(7, 10), location.getRange().getStart());
+    assertEquals(new Position(10, 23), location.getRange().getEnd());
   }
-
 }
