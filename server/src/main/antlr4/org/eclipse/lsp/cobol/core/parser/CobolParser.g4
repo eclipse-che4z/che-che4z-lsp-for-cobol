@@ -2159,7 +2159,7 @@ performStatement
    ;
 
 performInlineStatement
-   : performType? conditionalStatementCall* END_PERFORM
+   : performType? conditionalStatementCall* {validateEndPerform(_input.LT(1));} END_PERFORM?
    ;
 
 performProcedureStatement
