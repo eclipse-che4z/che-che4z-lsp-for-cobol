@@ -21,7 +21,7 @@
         "type": "goto"
       },
       {
-        "snippet": "PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n           PERFORM PARAG2.\r\n       ",
+        "snippet": "PARAG1.\r\n           DISPLAY 'PARAG1'.\r\n           PERFORM PARAG2.",
         "name": "PARAG1",
         "location": {
           "uri": "fake/path",
@@ -31,7 +31,7 @@
           },
           "end": {
             "line": 20,
-            "character": 36
+            "character": 27
           }
         },
         "type": "paragraph",

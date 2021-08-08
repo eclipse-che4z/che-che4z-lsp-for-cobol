@@ -45,7 +45,8 @@ public enum NodeType {
   COPYBOOK(File),
   PROCEDURE(Method),
   PROCEDURE_SECTION(Method),
-  FILE(File);
+  FILE(File),
+  MAP_NAME(Variable);
 
   private final SymbolKind symbolKind;
 

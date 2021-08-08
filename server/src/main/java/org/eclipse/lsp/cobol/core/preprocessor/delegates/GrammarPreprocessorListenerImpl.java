@@ -201,6 +201,10 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       recursiveReplaceStmtStack.add(new ArrayList<>(copyReplacingClauses));
       copyReplacingClauses.clear();
     }
+
+    // Do preprocessor cleanup, before replacements.
+    content = preprocessor.cleanUpCode(uri, content).unwrap(errors::addAll);
+
     if (!recursiveReplaceStmtStack.isEmpty()) {
       for (List<Pair<String, String>> clause : recursiveReplaceStmtStack)
         content = applyReplacing(content, clause);
@@ -343,7 +347,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     pop();
     // write copybook beginning trigger
     write(CPY_ENTER_TAG);
-    write(CPY_URI_OPEN);
     write(copybookId);
     write(CPY_URI_CLOSE);
     write(copybookContent);
@@ -383,7 +386,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     copybookStack.push(new CopybookUsage(copybookName, copybookId, locality));
     ExtendedDocument result =
         preprocessor
-            .process(
+            .processCleanCode(
                 uri,
                 content,
                 copybookStack,

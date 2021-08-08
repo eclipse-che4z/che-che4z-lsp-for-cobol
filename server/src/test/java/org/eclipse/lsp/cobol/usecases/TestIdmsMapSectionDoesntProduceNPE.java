@@ -20,20 +20,21 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/** This use case checks that there is no NullPointerException thrown if END-PERFORM missing. */
-class TestPerformWithoutEndNotCauseNPE {
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
+
+/** This test checks that there are no NPE thrown while typing in MAP SECTION. */
+class TestIdmsMapSectionDoesntProduceNPE {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. TEST1.\n"
+          + "       PROGRAM-ID.    EMPRPT.\n"
           + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*PARENT}.\n"
-          + "         02 {$*CHILD} PIC 9. \n"
-          + "       PROCEDURE DIVISION.\n"
-          + "           PERFORM MOVE 0 TO CHILD {OF|1} PARENT{.|2|3}";
+          + "       MAP SECTION.\n"
+          + "           MAX {FILE|1|2} {LIST|3} 30.\n"
+          + "           {MAP|4} {MCAR100|5}.\n"
+          + "       FILE SECTION.";
 
   @Test
   void test() {
@@ -44,20 +45,32 @@ class TestPerformWithoutEndNotCauseNPE {
             "1",
             new Diagnostic(
                 null,
-                "Variable OF is not defined",
-                DiagnosticSeverity.Error,
+                "Syntax error on 'FILE' expected FIELD",
+                Error,
                 SourceInfoLevels.ERROR.getText()),
             "2",
             new Diagnostic(
                 null,
-                "No viable alternative at input PARENT.",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
+                "The following token must start in Area A: FILE",
+                Warning,
+                SourceInfoLevels.WARNING.getText()),
             "3",
             new Diagnostic(
                 null,
-                "No viable alternative at input CHILD OF PARENT.",
-                DiagnosticSeverity.Error,
+                "Syntax error on 'LIST' expected SECTION",
+                Error,
+                SourceInfoLevels.ERROR.getText()),
+            "4",
+            new Diagnostic(
+                null,
+                "The following token must start in Area A: MAP",
+                Warning,
+                SourceInfoLevels.WARNING.getText()),
+            "5",
+            new Diagnostic(
+                null,
+                "Syntax error on 'MCAR100' expected SECTION",
+                Error,
                 SourceInfoLevels.ERROR.getText())));
   }
 }

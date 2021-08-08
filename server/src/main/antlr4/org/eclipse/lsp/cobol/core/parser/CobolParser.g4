@@ -882,7 +882,7 @@ maxFieldListClause
    ;
 
 mapClause
-    : MAP idms_map_name versionClause? (TYPE IS? (STANDARD | EXTENDED) PAGING?)? DOT_FS?
+    : MAP idms_map_name_definition versionClause? (TYPE IS? (STANDARD | EXTENDED) PAGING?)? DOT_FS?
     ;
 
 versionClause
@@ -3001,6 +3001,10 @@ abbreviation
    ;
 
 idms_map_name
+    : T=dataName {validateLength($T.text, "map name", 8);}
+    ;
+
+idms_map_name_definition
     : T=dataName {validateLength($T.text, "map name", 8);}
     ;
 

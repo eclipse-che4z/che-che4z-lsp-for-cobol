@@ -44,32 +44,32 @@ class VariableDefinitionUtilTest {
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
-            .variableName(new VariableNameAndLocality("Level-01-order-1", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-01-order-1", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
-            .variableName(new VariableNameAndLocality("Level-01-order-2", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-01-order-2", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
-            .variableName(new VariableNameAndLocality("Level-05-order-1", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-05-order-1", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(10)
-            .variableName(new VariableNameAndLocality("Level-10-order-1", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-10-order-1", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
-            .variableName(new VariableNameAndLocality("Level-05-order-2", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-05-order-2", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
-            .variableName(new VariableNameAndLocality("Level-01-order-3", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-01-order-3", LOCALITY))
             .build());
     VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
     List<VariableNode> nodesLevel01 = getVariables(programNode);
@@ -90,22 +90,22 @@ class VariableDefinitionUtilTest {
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
-            .variableName(new VariableNameAndLocality("Level-05", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-05", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
-            .variableName(new VariableNameAndLocality("Level-01", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-01", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(10)
-            .variableName(new VariableNameAndLocality("Level-10", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-10", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(7)
-            .variableName(new VariableNameAndLocality("Level-07", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-07", LOCALITY))
             .build());
     VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
     List<VariableNode> nodesLowLevel = getVariables(programNode);
@@ -123,17 +123,17 @@ class VariableDefinitionUtilTest {
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
-            .variableName(new VariableNameAndLocality("Level-01", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-01", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
-            .variableName(new VariableNameAndLocality("Level-05", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-05", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(66)
-            .variableName(new VariableNameAndLocality("Level-66", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-66", LOCALITY))
             .build());
     VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
     List<VariableNode> nodesLevel01 = getVariables(programNode);
@@ -154,29 +154,29 @@ class VariableDefinitionUtilTest {
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
-            .variableName(new VariableNameAndLocality("Level-01", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-01", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(88)
-            .variableName(new VariableNameAndLocality("Cond-1", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Cond-1", LOCALITY))
             .valueClauses(valueClauses)
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
-            .variableName(new VariableNameAndLocality("Level-05-1", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-05-1", LOCALITY))
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(88)
-            .variableName(new VariableNameAndLocality("Cond-2", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Cond-2", LOCALITY))
             .valueClauses(valueClauses)
             .build());
     programNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
-            .variableName(new VariableNameAndLocality("Level-05-2", LOCALITY))
+            .variableNameAndLocality(new VariableNameAndLocality("Level-05-2", LOCALITY))
             .build());
     VariableDefinitionUtil.processNodeWithVariableDefinitions(programNode);
     List<VariableNode> nodesLevel01 = getVariables(programNode);

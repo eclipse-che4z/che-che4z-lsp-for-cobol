@@ -14,11 +14,11 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.semantics.outline.NodeType;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
 import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
-import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.junit.jupiter.api.Test;
 
@@ -39,6 +39,10 @@ class TestOutlineTree {
           + "000030 Program-id.  HELLO-WORLD       .\n"
           + "000040\n"
           + "000050 Data Division.\n"
+          + "000051 MAP SECTION.\n"
+          + "000052     MAX FIELD LIST IS 12 \n"
+          + "000053     MAP MAP1 TYPE IS EXTENDED PAGING.\n"
+          + "000054     MAP EMPMAP.\n"
           + "000060 Working-Storage Section.\n"
           + "000070     COPY BAR.\n"
           + "000080     01 User-Num1 PIC 9(9).\n"
@@ -156,6 +160,10 @@ class TestOutlineTree {
                     "DATA DIVISION",
                     NodeType.DIVISION,
                     nested(
+                        node(
+                            "MAP SECTION",
+                            NodeType.SECTION,
+                            nested(node("MAP1", NodeType.FIELD), node("EMPMAP", NodeType.FIELD))),
                         node(
                             "WORKING-STORAGE SECTION",
                             NodeType.SECTION,

@@ -67,9 +67,9 @@ TITLESTATEMENT : (TITLE ' '+ .*? NEWLINE) {checkTitlePresent();} -> channel(TECH
 CONTROL_DIRECTIVE: ASTERISKCHAR (CONTROL | CBL) ((' '| COMMACHAR)
                   (SOURCE | NO SOURCE | LIST | NO LIST | MAP | NO MAP
                   | IDENTIFIER? {reportWrongArguments("lexer.controlDirectiveWrongArgs");})
-                  )+ DOT?-> channel(TECHNICAL);
+                  )+ DOT_FS?-> channel(TECHNICAL);
 
-ENTER_STMT: ENTER ' '+ IDENTIFIER? {checkLanguageNamePresent();} (' '+ IDENTIFIER)?  ' '* DOT-> channel(TECHNICAL);
+ENTER_STMT: ENTER ' '+ IDENTIFIER? {checkLanguageNamePresent();} (' '+ IDENTIFIER)?  ' '* DOT_FS-> channel(TECHNICAL);
 EJECT: E J E C T DOT_FS? -> channel(HIDDEN);
 SKIP1 : S K I P '1' DOT_FS? -> skip;
 SKIP2 : S K I P '2' DOT_FS? -> skip;
@@ -167,7 +167,7 @@ CONTROLS : C O N T R O L S;
 CONVENTION : C O N V E N T I O N;
 CONVERTING : C O N V E R T I N G;
 COPIES : C O P I E S;
-COPYENTRY : ('*>CPYENTER<URI>' .*? '</URI>') -> channel(TECHNICAL);
+COPYENTRY : (' *>CPYENTER<URI>' .*? '</URI>') -> channel(TECHNICAL);
 COPYEXIT : '*>CPYEXIT' + NEWLINE -> channel(TECHNICAL);
 CORRECT : C O R R E C T;
 CPP : C P P;

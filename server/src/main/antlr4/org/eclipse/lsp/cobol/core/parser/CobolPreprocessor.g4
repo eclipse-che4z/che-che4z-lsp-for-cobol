@@ -91,7 +91,7 @@ pseudoReplaceable
 
 openingPseudoTextDelimiter: DOUBLEEQUALCHAR;
 
-closingPseudoTextDelimiter: DOUBLEEQUALCHAR (COMMACHAR | DOT | DOT_FS | SEMICOLON_FS)?;
+closingPseudoTextDelimiter: DOUBLEEQUALCHAR (COMMACHAR | DOT_FS | SEMICOLON_FS)?;
 
 pseudoReplacement
    : (openingPseudoTextDelimiter ~DOUBLEEQUALCHAR*? closingPseudoTextDelimiter) | EMPTYPSEUDOTEXT
@@ -118,7 +118,7 @@ replacement
    ;
 
 charDataLine
-   : (FILENAME | DOT | LPARENCHAR | RPARENCHAR)+
+   : (FILENAME | DOT_FS | LPARENCHAR | RPARENCHAR)+
    ;
 
 cobolWord

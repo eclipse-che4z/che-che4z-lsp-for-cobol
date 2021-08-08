@@ -17,46 +17,43 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/** This use case checks that there is no NullPointerException thrown if END-PERFORM missing. */
-class TestPerformWithoutEndNotCauseNPE {
+/**
+ * This test checks that the an asterisk out of indicator area before the COPY statement doesn't
+ * break syntax analysis
+ */
+class TestAsteriskBeforeCopyDoesntBreakAnalysis {
+
   private static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. TEST1.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*PARENT}.\n"
-          + "         02 {$*CHILD} PIC 9. \n"
-          + "       PROCEDURE DIVISION.\n"
-          + "           PERFORM MOVE 0 TO CHILD {OF|1} PARENT{.|2|3}";
+      "        IDENTIFICATION DIVISION.\r\n"
+          + "        PROGRAM-ID. test1.\r\n"
+          + "        DATA DIVISION.\r\n"
+          + "        WORKING-STORAGE SECTION.\r\n"
+          + "        {*|1} COPY {~CPY}.\n\n"
+          + "      * COPY CPY.\n\n"
+          + "        PROCEDURE DIVISION.\n\n";
+
+  private static final String CPY = "        01 ABC PIC 9.";
+  private static final String CPY_NAME = "CPY";
 
   @Test
   void test() {
+
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(),
+        ImmutableList.of(new CobolText(CPY_NAME, CPY)),
         ImmutableMap.of(
             "1",
             new Diagnostic(
                 null,
-                "Variable OF is not defined",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
-            "2",
-            new Diagnostic(
-                null,
-                "No viable alternative at input PARENT.",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
-            "3",
-            new Diagnostic(
-                null,
-                "No viable alternative at input CHILD OF PARENT.",
+                "Syntax error on '*' expected {<EOF>, CBL, IDENTIFICATION, LOCAL-STORAGE, WORKING-STORAGE, END, "
+                    + "EXEC, FILE, ID, LINKAGE, MAP, PROCEDURE, PROCESS, SCHEMA, SQL, 'EXEC SQL', '01-49', '66', '77', '88'}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

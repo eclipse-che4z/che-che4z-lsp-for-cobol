@@ -58,6 +58,17 @@ module.exports = (on, config) => {
       return fs.existsSync(filename);
     },
   });
+
+  const options = {
+    outputRoot: config.projectRoot + '/logs/',
+    outputTarget: {
+      'out.txt': 'txt',
+      'out.json': 'json',
+    },
+  };
+
+  require('cypress-terminal-report/src/installLogsPrinter')(on, options);
+
   const allureWriter = require('@shelex/cypress-allure-plugin/writer');
   allureWriter(on, config);
   return config;
