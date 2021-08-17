@@ -48,8 +48,6 @@ class TestUndefinedParentVariableUnderlined {
           + "9           MOVE 10 TO {MAMA|1} OF AGE OF BORROWE.\r\n"
           + "10      END PROGRAM TEST1.";
 
-  private static final String MESSAGE = "Variable MAMA is not defined";
-
   @Test
   void assertCopybookProcessingModeNotChangesLogic() {
     Assertions.assertEquals(
@@ -73,6 +71,8 @@ class TestUndefinedParentVariableUnderlined {
         TEXT,
         ImmutableList.of(),
         ImmutableMap.of(
-            "1", new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ERROR.getText())));
+            "1",
+            new Diagnostic(
+                null, "Variable MAMA is not defined", DiagnosticSeverity.Error, ERROR.getText())));
   }
 }

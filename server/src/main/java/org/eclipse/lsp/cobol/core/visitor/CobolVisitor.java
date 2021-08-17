@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.core.visitor;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Streams;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -340,7 +339,16 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitExecCicsStatement(ExecCicsStatementContext ctx) {
     areaBWarning(ctx);
-    return visitChildren(ctx);
+    EmbeddedCode code = embeddedCodeParts.get(ctx.cicsRules().getStart());
+    // apply area B check for tokens provided by a specific lexer
+    areaBWarning(code.getTokens());
+    return getLocality(ctx.getStart())
+        .<List<Node>>map(
+            it ->
+                ImmutableList.of(
+                    new EmbeddedCodeNode(
+                        it, code.getTokenStream(), code.getTree(), EmbeddedCodeNode.Language.CICS)))
+        .orElse(ImmutableList.of());
   }
 
   @Override
@@ -371,28 +379,19 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitPerformStatement(PerformStatementContext ctx) {
-    final PerformProcedureStatementContext procStatement = ctx.performProcedureStatement();
-    final PerformInlineStatementContext inlineStatement = ctx.performInlineStatement();
-    if (procStatement != null) {
-      ProcedureNameContext procedureNameContext = procStatement.procedureName().get(0);
-      final String section =
-          procedureNameContext.inSection() != null
-              ? procedureNameContext.inSection().sectionName().getText()
-              : null;
-      final String targetName = procedureNameContext.paragraphNameUsage().getText();
-      return addTreeNode(ctx, locality -> new PerformNode(locality, section, targetName));
-    }
-    if (inlineStatement != null) {
-      return addTreeNode(ctx, PerformNode::new);
-    }
-    return super.visitPerformStatement(ctx);
+  public List<Node> visitPerformInlineStatement(PerformInlineStatementContext ctx) {
+    return addTreeNode(ctx, PerformNode::new);
   }
 
   @Override
-  public List<Node> visitPerformInlineStatement(PerformInlineStatementContext ctx) {
-    throwWarning(ctx.getStart());
-    return visitChildren(ctx);
+  public List<Node> visitPerformProcedureStatement(PerformProcedureStatementContext ctx) {
+    ProcedureNameContext procedureNameContext = ctx.procedureName().get(0);
+    final String section =
+        procedureNameContext.inSection() != null
+            ? procedureNameContext.inSection().sectionName().getText()
+            : null;
+    final String targetName = procedureNameContext.paragraphName().getText();
+    return addTreeNode(ctx, locality -> new PerformNode(locality, section, targetName));
   }
 
   @Override
@@ -638,7 +637,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .map(
             it ->
                 getLocality(it.getStart())
-                    .map(loc -> new VariableNameAndLocality(it.getText().toUpperCase(), loc))
+                    .map(loc -> new VariableNameAndLocality(getName(it), loc))
                     .orElse(null))
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
@@ -646,7 +645,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private Stream<DataNameContext> retrieveDataNames(
       List<InDataContext> inData, List<InTableContext> inTable) {
-    return Streams.concat(
+    return Stream.concat(
         inData.stream().map(InDataContext::dataName),
         inTable.stream().map(InTableContext::tableCall).map(TableCallContext::dataName));
   }
