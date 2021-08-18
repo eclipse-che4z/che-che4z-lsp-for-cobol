@@ -2802,7 +2802,7 @@ writeFromPhrase
    ;
 
 writeAdvancingPhrase
-   : (BEFORE | AFTER) ADVANCING? (writeAdvancingPage | writeAdvancingLines | writeAdvancingMnemonic)
+   : (BEFORE | AFTER) ADVANCING? (writeAdvancingPage | writeAdvancingLines)
    ;
 
 writeAdvancingPage
@@ -2811,10 +2811,6 @@ writeAdvancingPage
 
 writeAdvancingLines
    : (literal | generalIdentifier) (LINE | LINES)?
-   ;
-
-writeAdvancingMnemonic
-   : mnemonicName
    ;
 
 writeAtEndOfPagePhrase
