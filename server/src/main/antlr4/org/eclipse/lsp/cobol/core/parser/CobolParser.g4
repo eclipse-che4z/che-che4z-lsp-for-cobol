@@ -1385,7 +1385,7 @@ displayAt
    ;
 
 displayUpon
-   : UPON (mnemonicName | environmentName)
+   : UPON cobolWord
    ;
 
 displayWith
