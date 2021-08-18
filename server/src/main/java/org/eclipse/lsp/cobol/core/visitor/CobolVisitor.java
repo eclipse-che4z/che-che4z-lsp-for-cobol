@@ -53,7 +53,6 @@ import org.eclipse.lsp4j.Range;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -578,14 +577,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitQualifiedDataNameFormat1(QualifiedDataNameFormat1Context ctx) {
-    return addVariableUsage(ctx.dataName(), ctx, createParentsList(ctx.inData(), ctx.inTable()));
-  }
-
-  @Override
-  public List<Node> visitConditionNameReference(ConditionNameReferenceContext ctx) {
-    return addVariableUsage(
-        ctx.dataName(), ctx, createParentsList(ctx.inData(), ImmutableList.of()));
+  public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
+    return addVariableUsage(ctx.dataName(), ctx, createParentsList(ctx.inData()));
   }
 
   @Override
@@ -600,11 +593,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitIdms_procedure_name(Idms_procedure_nameContext ctx) {
-    return addVariableUsage(ctx.dataName(), ctx);
-  }
-
-  @Override
-  public List<Node> visitTableCall(TableCallContext ctx) {
     return addVariableUsage(ctx.dataName(), ctx);
   }
 
@@ -631,9 +619,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return result;
   }
 
-  private List<VariableNameAndLocality> createParentsList(
-      List<InDataContext> inData, List<InTableContext> inTable) {
-    return retrieveDataNames(inData, inTable)
+  private List<VariableNameAndLocality> createParentsList(List<InDataContext> inData) {
+
+    return inData.stream()
+        .map(InDataContext::dataName)
         .map(
             it ->
                 getLocality(it.getStart())
@@ -641,13 +630,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                     .orElse(null))
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
-  }
-
-  private Stream<DataNameContext> retrieveDataNames(
-      List<InDataContext> inData, List<InTableContext> inTable) {
-    return Stream.concat(
-        inData.stream().map(InDataContext::dataName),
-        inTable.stream().map(InTableContext::tableCall).map(TableCallContext::dataName));
   }
 
   @Override

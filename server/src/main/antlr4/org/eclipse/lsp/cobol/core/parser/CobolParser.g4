@@ -2970,7 +2970,7 @@ classCondition
    ;
 
 conditionNameReference
-   : dataName inData* conditionNameSubscriptReference*
+   : generalIdentifier conditionNameSubscriptReference*
    ;
 
 conditionNameSubscriptReference
@@ -3050,11 +3050,7 @@ idms_table_name
 // identifier ----------------------------------
 
 generalIdentifier
-   : specialRegister | qualifiedDataName | tableCall | functionCall
-   ;
-
-tableCall
-   : dataName (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
+   : specialRegister | qualifiedDataName | functionCall
    ;
 
 functionCall
@@ -3084,15 +3080,11 @@ argument
 // qualified data name ----------------------------------
 
 qualifiedDataName
-   : qualifiedDataNameFormat1 | qualifiedDataNameFormat4
+   : dataName tableCall? referenceModifier? inData*
    ;
 
-qualifiedDataNameFormat1
-   : dataName (inData | inTable)*
-   ;
-
-qualifiedDataNameFormat4
-   : LINAGE_COUNTER inFile
+tableCall
+   : LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR
    ;
 
 specialRegister
@@ -3109,19 +3101,11 @@ specialRegister
 // in ----------------------------------
 
 inData
-   : (IN | OF) dataName
-   ;
-
-inFile
-   : (IN | OF) fileName
+   : (IN | OF) dataName tableCall? referenceModifier?
    ;
 
 inSection
    : (IN | OF) sectionName
-   ;
-
-inTable
-   : (IN | OF) tableCall
    ;
 
 // names ----------------------------------
@@ -3271,7 +3255,7 @@ power
    ;
 
 basis
-   : LPARENCHAR arithmeticExpression RPARENCHAR | literal | generalIdentifier
+   : generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
    ;
 
 cobolCompilerDirectivesKeywords
