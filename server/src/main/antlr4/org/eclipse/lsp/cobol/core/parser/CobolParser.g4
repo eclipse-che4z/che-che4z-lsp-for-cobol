@@ -216,7 +216,7 @@ environmentDivision
    ;
 
 environmentDivisionBody
-   : configurationSection | specialNamesParagraph | inputOutputSection | idmsControlSection
+   : configurationSection | inputOutputSection | idmsControlSection
    ;
 
 // -- configuration section ----------------------------------
@@ -257,7 +257,7 @@ diskSizeClause
    ;
 
 collatingSequenceClause
-   : PROGRAM? COLLATING? SEQUENCE (IS? alphabetName+) collatingSequenceClauseAlphanumeric? collatingSequenceClauseNational?
+   : PROGRAM? COLLATING? SEQUENCE IS? alphabetName+ collatingSequenceClauseAlphanumeric? collatingSequenceClauseNational?
    ;
 
 collatingSequenceClauseAlphanumeric
@@ -279,37 +279,34 @@ characterSetClause
 // - special names paragraph ----------------------------------
 
 specialNamesParagraph
-   : SPECIAL_NAMES DOT_FS (specialNameClause+ DOT_FS)?
+   : SPECIAL_NAMES DOT_FS (specialNameClause* DOT_FS)?
    ;
 
 specialNameClause
    : channelClause | odtClause | alphabetClause | classClause | currencySignClause
    | decimalPointClause | symbolicCharactersClause | environmentSwitchNameClause
-   | defaultDisplaySignClause | defaultComputationalSignClause | reserveNetworkClause
+   | environmentSwitchNameSpecialNamesStatusPhrase | defaultDisplaySignClause | defaultComputationalSignClause
+   | reserveNetworkClause
    ;
 
 alphabetClause
-   : alphabetClauseFormat1 | alphabetClauseFormat2
+   : ALPHABET (alphabetClauseFormat1 | alphabetClauseFormat2)
    ;
 
 alphabetClauseFormat1
-   : ALPHABET alphabetName (FOR ALPHANUMERIC)? IS? (EBCDIC | ASCII | STANDARD_1 | STANDARD_2 | NATIVE | cobolWord | alphabetLiterals+)
+   : alphabetName (FOR ALPHANUMERIC)? IS? (EBCDIC | ASCII | STANDARD_1 | STANDARD_2 | NATIVE | cobolWord | alphabetLiterals+)
    ;
 
 alphabetLiterals
-   : literal (alphabetThrough | alphabetAlso+)?
+   : literal (alphabetThrough | (ALSO? literal)+)?
    ;
 
 alphabetThrough
    : (THROUGH | THRU) literal
    ;
 
-alphabetAlso
-   : ALSO literal+
-   ;
-
 alphabetClauseFormat2
-   : ALPHABET alphabetName FOR? NATIONAL IS? (NATIVE | CCSVERSION literal)
+   : alphabetName FOR? NATIONAL IS? (NATIVE | CCSVERSION literal)
    ;
 
 channelClause
@@ -349,11 +346,11 @@ defaultDisplaySignClause
    ;
 
 environmentSwitchNameClause
-   : environmentName IS? mnemonicName environmentSwitchNameSpecialNamesStatusPhrase? | environmentSwitchNameSpecialNamesStatusPhrase
+   : environmentName IS? mnemonicName
    ;
 
 environmentSwitchNameSpecialNamesStatusPhrase
-   : ON STATUS? IS? condition (OFF STATUS? IS? condition)? | OFF STATUS? IS? condition (ON STATUS? IS? condition)?
+   : (ON | OFF) STATUS? IS? condition
    ;
 
 odtClause
@@ -387,11 +384,11 @@ inputOutputSectionParagraph
 // - file control paragraph ----------------------------------
 
 fileControlParagraph
-   : FILE_CONTROL? (DOT_FS? fileControlEntry)* DOT_FS
+   : FILE_CONTROL DOT_FS (fileControlEntry)*
    ;
 
 fileControlEntry
-   : selectClause fileControlClause*
+   : selectClause fileControlClause* DOT_FS
    ;
 
 selectClause
@@ -399,7 +396,7 @@ selectClause
    ;
 
 fileControlClause
-   : assignClause | reserveClause | organizationClause | paddingCharacterClause | recordDelimiterClause | accessModeClause | recordKeyClause | alternateRecordKeyClause | fileStatusClause | passwordClause | relativeKeyClause
+   : assignClause | reserveClause | organizationClause | paddingCharacterClause | accessModeClause | recordClause | alternateRecordKeyClause | fileStatusClause | passwordClause | relativeKeyClause
    ;
 
 assignClause
@@ -418,8 +415,12 @@ paddingCharacterClause
    : PADDING CHARACTER? IS? (qualifiedDataName | literal)
    ;
 
+recordClause
+   : RECORD (recordDelimiterClause | recordKeyClause)
+   ;
+
 recordDelimiterClause
-   : RECORD DELIMITER IS? (STANDARD_1 | IMPLICIT | assignmentName)
+   : DELIMITER IS? (STANDARD_1 | IMPLICIT | assignmentName)
    ;
 
 accessModeClause
@@ -427,7 +428,7 @@ accessModeClause
    ;
 
 recordKeyClause
-   : RECORD KEY? IS? qualifiedDataName passwordClause? (WITH? DUPLICATES)?
+   : KEY? IS? qualifiedDataName passwordClause? (WITH? DUPLICATES)?
    ;
 
 alternateRecordKeyClause
@@ -557,12 +558,8 @@ dataDivisionSection
 // -- file section ----------------------------------
 
 fileSection
-   : FILE SECTION DOT_FS fileSectionParagraph*
+   : FILE SECTION DOT_FS fileDescriptionEntry*
    ;
-
-fileSectionParagraph
-    : (fileDescriptionEntry)+
-    ;
 
 fileDescriptionEntry
    : (FD | SD) fileName (DOT_FS? fileDescriptionEntryClause)* DOT_FS dataDescriptionEntry*
