@@ -1724,15 +1724,7 @@ gobackStatement
 // goto statement
 
 goToStatement
-   : GO TO? (goToStatementSimple | goToDependingOnStatement)
-   ;
-
-goToStatementSimple
-   : procedureName
-   ;
-
-goToDependingOnStatement
-   : procedureName+ (DEPENDING ON? generalIdentifier)? | MORE_LABELS
+   : GO TO? procedureName+ (DEPENDING ON? generalIdentifier)?
    ;
 
 // if statement
