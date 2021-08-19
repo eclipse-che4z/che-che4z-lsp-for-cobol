@@ -1492,7 +1492,7 @@ evaluateStatement
    ;
 
 evaluateSelect
-   : literal | arithmeticExpression | condition | generalIdentifier
+   : arithmeticExpression | condition
    ;
 
 evaluateAlsoSelect
@@ -1524,7 +1524,7 @@ evaluateWhenOther
    ;
 
 evaluateValue
-   : literal | arithmeticExpression | generalIdentifier
+   : arithmeticExpression
    ;
 
 // exec cics statement
@@ -1734,11 +1734,11 @@ ifStatement
    ;
 
 ifThen
-   : THEN? (NEXT SENTENCE | conditionalStatementCall (COMMACHAR? conditionalStatementCall)*)
+   : THEN? (NEXT SENTENCE | conditionalStatementCall+)
    ;
 
 ifElse
-   : ELSE (NEXT SENTENCE | conditionalStatementCall (COMMACHAR? conditionalStatementCall)*)
+   : ELSE (NEXT SENTENCE | conditionalStatementCall+)
    ;
 
 idmsIfCondition
@@ -2935,61 +2935,31 @@ notOnExceptionClause
 // condition ----------------------------------
 
 condition
-   : combinableCondition andOrCondition*
-   ;
-
-andOrCondition
-   : (AND | OR) (combinableCondition | abbreviation+)
-   ;
-
-combinableCondition
-   : NOT? simpleCondition
+   :  NOT? (simpleCondition | nestedCondition)
+    ((AND | OR) NOT? (simpleCondition | nestedCondition | relationCombinedComparison))*
    ;
 
 simpleCondition
-   : LPARENCHAR condition RPARENCHAR | relationCondition | classCondition | conditionNameReference
+   : arithmeticExpression (relationCombinedComparison | fixedComparison)?
    ;
 
-classCondition
-   : generalIdentifier IS? NOT? (NUMERIC | ALPHABETIC | ALPHABETIC_LOWER | ALPHABETIC_UPPER | DBCS | KANJI | className)
-   ;
-
-conditionNameReference
-   : generalIdentifier conditionNameSubscriptReference*
-   ;
-
-conditionNameSubscriptReference
-   : LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR
-   ;
-
-// relation ----------------------------------
-
-relationCondition
-   : arithmeticExpression (relationSignCondition | relationArithmeticComparison | relationCombinedComparison)
-   ;
-
-relationSignCondition
-   : IS? NOT? (POSITIVE | NEGATIVE | ZERO)
-   ;
-
-relationArithmeticComparison
-   : relationalOperator arithmeticExpression
+nestedCondition
+   : LPARENCHAR condition RPARENCHAR
    ;
 
 relationCombinedComparison
-   : relationalOperator LPARENCHAR relationCombinedCondition RPARENCHAR
+   : relationalOperator (arithmeticExpression
+   | LPARENCHAR arithmeticExpression ((AND | OR) arithmeticExpression)+ RPARENCHAR)
    ;
 
-relationCombinedCondition
-   : arithmeticExpression ((AND | OR) arithmeticExpression)+
+fixedComparison
+   : IS? NOT? (NUMERIC | ALPHABETIC | ALPHABETIC_LOWER | ALPHABETIC_UPPER | DBCS | KANJI | POSITIVE | NEGATIVE | ZERO
+   | className)
    ;
 
 relationalOperator
-   : (IS | ARE)? (NOT? (GREATER THAN? | MORETHANCHAR | LESS THAN? | LESSTHANCHAR | EQUAL TO? | EQUALCHAR) | NOTEQUALCHAR | GREATER THAN? OR EQUAL TO? | MORETHANOREQUAL | LESS THAN? OR EQUAL TO? | LESSTHANOREQUAL)
-   ;
-
-abbreviation
-   : NOT? relationalOperator? (arithmeticExpression | LPARENCHAR arithmeticExpression abbreviation RPARENCHAR)
+   : (IS | ARE)? (NOT? (GREATER THAN? | MORETHANCHAR | LESS THAN? | LESSTHANCHAR | EQUAL TO? | EQUALCHAR)
+   | NOTEQUALCHAR | GREATER THAN? OR EQUAL TO? | MORETHANOREQUAL | LESS THAN? OR EQUAL TO? | LESSTHANOREQUAL)
    ;
 
 idms_map_name
@@ -3054,12 +3024,8 @@ length
    : arithmeticExpression
    ;
 
-subscript
-   : ALL | integerLiteral | arithmeticExpression
-   ;
-
 argument
-   : literal | generalIdentifier | arithmeticExpression
+   : arithmeticExpression
    ;
 
 // qualified data name ----------------------------------
@@ -3069,7 +3035,7 @@ qualifiedDataName
    ;
 
 tableCall
-   : LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR
+   : LPARENCHAR (ALL | arithmeticExpression) (COMMACHAR? (ALL | arithmeticExpression))* RPARENCHAR
    ;
 
 specialRegister
@@ -3180,7 +3146,7 @@ symbolicCharacter
    ;
 
 figurativeConstant
-   : ALL literal | HIGH_VALUE | HIGH_VALUES | LOW_VALUE | LOW_VALUES | NULL | NULLS | QUOTE | QUOTES | SPACE | SPACES | ZERO | ZEROS | ZEROES
+   : ALL literal | HIGH_VALUE | HIGH_VALUES | LOW_VALUE | LOW_VALUES | NULL | NULLS | QUOTE | QUOTES | SPACE | SPACES | ZEROS | ZEROES
    ;
 
 booleanLiteral
