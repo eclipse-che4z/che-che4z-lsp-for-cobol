@@ -23,6 +23,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 
 import java.io.BufferedReader;
@@ -180,12 +181,14 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     Token t = recognizer.getCurrentToken();
     String erroneousToken = getTokenErrorDisplay(t);
     String msg;
-    if (t.getType() == EOF) {
+    String tokenName =
+        specialTokenHandlingMap.getOrDefault(
+            erroneousToken.substring(1, erroneousToken.length() - 1), getTokenErrorDisplay(t));
+    if (recognizer.getContext().getRuleIndex() == CobolParser.RULE_performInlineStatement) {
+      msg = messageService.getMessage("parsers.performMissingEnd", tokenName);
+    } else if (t.getType() == EOF) {
       msg = messageService.getMessage("ErrorStrategy.endOfFile");
     } else {
-      String tokenName =
-          specialTokenHandlingMap.getOrDefault(
-              erroneousToken.substring(1, erroneousToken.length() - 1), getTokenErrorDisplay(t));
       msg =
           parseCustomMessage(REPORT_UNWANTED_TOKEN, tokenName, getExpectedToken(recognizer, null));
     }

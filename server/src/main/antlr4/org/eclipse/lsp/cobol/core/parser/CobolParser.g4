@@ -2149,11 +2149,11 @@ openExtendStatement
 // perform statement
 
 performStatement
-   : PERFORM (performInlineStatement | performProcedureStatement)
+   : PERFORM (performProcedureStatement | performInlineStatement)
    ;
 
 performInlineStatement
-   : performType? conditionalStatementCall* {validateEndPerform(_input.LT(1));} END_PERFORM?
+   : performType? conditionalStatementCall*? END_PERFORM
    ;
 
 performProcedureStatement
@@ -2891,45 +2891,45 @@ xmlProcessinProcedure
 // statement phrases ----------------------------------
 
 atEndPhrase
-   : AT? END (COMMACHAR? conditionalStatementCall)*
+   : AT? END (COMMACHAR? conditionalStatementCall)+
    ;
 
 notAtEndPhrase
-   : NOT AT? END (COMMACHAR? conditionalStatementCall)*
+   : NOT AT? END (COMMACHAR? conditionalStatementCall)+
    ;
 
 invalidKeyPhrase
-   : INVALID KEY? (COMMACHAR? conditionalStatementCall)*
+   : INVALID KEY? (COMMACHAR? conditionalStatementCall)+
    ;
 
 notInvalidKeyPhrase
-   : NOT INVALID KEY? (COMMACHAR? conditionalStatementCall)*
+   : NOT INVALID KEY? (COMMACHAR? conditionalStatementCall)+
    ;
 
 onOverflowPhrase
-   : ON? OVERFLOW (COMMACHAR? conditionalStatementCall)*
+   : ON? OVERFLOW (COMMACHAR? conditionalStatementCall)+
    ;
 
 notOnOverflowPhrase
-   : NOT ON? OVERFLOW (COMMACHAR? conditionalStatementCall)*
+   : NOT ON? OVERFLOW (COMMACHAR? conditionalStatementCall)+
    ;
 
 onSizeErrorPhrase
-   : ON? SIZE ERROR (COMMACHAR? conditionalStatementCall)*
+   : ON? SIZE ERROR (COMMACHAR? conditionalStatementCall)+
    ;
 
 notOnSizeErrorPhrase
-   : NOT ON? SIZE ERROR (COMMACHAR? conditionalStatementCall)*
+   : NOT ON? SIZE ERROR (COMMACHAR? conditionalStatementCall)+
    ;
 
 // statement clauses ----------------------------------
 
 onExceptionClause
-   : ON? EXCEPTION (COMMACHAR? conditionalStatementCall)*
+   : ON? EXCEPTION (COMMACHAR? conditionalStatementCall)+
    ;
 
 notOnExceptionClause
-   : NOT ON? EXCEPTION (COMMACHAR? conditionalStatementCall)*
+   : NOT ON? EXCEPTION (COMMACHAR? conditionalStatementCall)+
    ;
 
 // condition ----------------------------------
