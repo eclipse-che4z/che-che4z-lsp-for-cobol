@@ -2935,7 +2935,7 @@ notOnExceptionClause
 // condition ----------------------------------
 
 condition
-   :  NOT? (simpleCondition | nestedCondition)
+   : NOT? (simpleCondition | nestedCondition)
     ((AND | OR) NOT? (simpleCondition | nestedCondition | relationCombinedComparison))*
    ;
 
@@ -3209,6 +3209,12 @@ basis
    : generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
    ;
 
+cobolWord
+   : IDENTIFIER | idms_only_words | cobolCompilerDirectivesKeywords
+   | YYYYMMDD | YYYYDDD | TIMER | TODAYS_DATE | MMDDYYYY | TODAYS_NAME | YEAR
+   | COUNT | PRINTER | ADDRESS | TOP | FIRST | REMARKS | RESUME | ABEND | UPDATE | CHECK | LINK | HEADER | BUFFER | FIELD
+   ;
+
 cobolCompilerDirectivesKeywords
    : ADATA | ADV | ANSI | APOST | AR | ARITH | AWO | ALIAS | ANY | AUTO
    | BIN | BLOCK0 | BUF | BUFSIZE
@@ -3260,14 +3266,6 @@ cobolCompilerDirectivesKeywords
    | ZWB
    ;
 
-
-cobolWord
-   : IDENTIFIER | idms_only_words | cobolCompilerDirectivesKeywords
-   | DATE |YYYYMMDD | DAY | YYYYDDD | DAY_OF_WEEK | TIME | TIMER | TODAYS_DATE | MMDDYYYY | TODAYS_NAME | YEAR
-   | YYYYMMDD | YYYYDDD | COUNT | PRINTER | ADDRESS | TOP | FIRST | REMARKS | RESUME | ABEND | UPDATE | CHECK | LINK | HEADER | BUFFER | FIELD
-
-   ;
-
 idms_only_words
     : ATTRIBUTE | AUTODISPLAY
     | BACKPAGE | BACKSCAN | BLINK
@@ -3293,7 +3291,7 @@ idms_only_words
     | NORMAL_VIDEO | NOSPAN | NOTIFICATION | NOTIFY | NOUNDERSCORE
     | OBTAIN | OUTIN | OWNER
     | PAGE_INFO | PARMS | PERMANENT | PINK | PROTECTED
-    | READY | RED | REDISPATCH | RESETKBD | RESETMDT | RETENTION | RETRIEVAL | REPLY
+    | RED | REDISPATCH | RESETKBD | RESETMDT | RETENTION | RETRIEVAL | REPLY
     | RETURNKEY | REVERSE_VIDEO | RUN_UNIT
     | SCREEN | SELECTIVE | SHORT | SIXTYFOURCR | SPAN
     | STARTPAGE | STARTPRT | STGID | STORE | SCHEMA
