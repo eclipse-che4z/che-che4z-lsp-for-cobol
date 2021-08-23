@@ -26,13 +26,15 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.ValueInterval;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
+import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp4j.Range;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -42,7 +44,7 @@ import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILL
 /** Utility class for visitor and delegates classes with useful methods */
 @Slf4j
 @UtilityClass
-public class VisitorHelper {
+class VisitorHelper {
 
   /**
    * Get variable level from TerminalNode object
@@ -50,7 +52,7 @@ public class VisitorHelper {
    * @param terminalNode is a TerminalNode
    * @return a level of defined variable
    */
-  public int getLevel(TerminalNode terminalNode) {
+  int getLevel(TerminalNode terminalNode) {
     String levelNumber = terminalNode.getText();
     return Integer.parseInt(levelNumber);
   }
@@ -61,31 +63,11 @@ public class VisitorHelper {
    * @param context is a statement context object
    * @return a text of the statement
    */
-  public String getName(EntryNameContext context) {
+  String getName(EntryNameContext context) {
     return ofNullable(context)
         .map(EntryNameContext::dataName)
         .map(VisitorHelper::getName)
         .orElse(FILLER_NAME);
-  }
-
-  /**
-   * Get name of the DataNameContext
-   *
-   * @param context is a statement context
-   * @return a text of statement context
-   */
-  public String getName(DataNameContext context) {
-    return getName(context.cobolWord());
-  }
-
-  /**
-   * Get name of the CobolWordContext
-   *
-   * @param context is a statement context
-   * @return a text of statement context
-   */
-  public String getName(CobolWordContext context) {
-    return context.getText().toUpperCase();
   }
 
   /**
@@ -94,7 +76,7 @@ public class VisitorHelper {
    * @param context is a statement context
    * @return a text of statement context
    */
-  public String getName(ParserRuleContext context) {
+  String getName(ParserRuleContext context) {
     return ofNullable(context).map(RuleContext::getText).map(String::toUpperCase).orElse("");
   }
 
@@ -105,7 +87,7 @@ public class VisitorHelper {
    * @param stop is end position
    * @return Locality with interval position
    */
-  public Locality getIntervalPosition(Locality start, Locality stop) {
+  Locality getIntervalPosition(Locality start, Locality stop) {
     return Locality.builder()
         .uri(start.getUri())
         .range(new Range(start.getRange().getStart(), stop.getRange().getEnd()))
@@ -120,7 +102,7 @@ public class VisitorHelper {
    * @param clauses a list of ANTLR picture clauses
    * @return the list of picture texts
    */
-  public List<String> retrievePicTexts(List<DataPictureClauseContext> clauses) {
+  List<String> retrievePicTexts(List<DataPictureClauseContext> clauses) {
     return clauses.stream()
         .map(clause -> clause.getText().replaceAll(clause.getStart().getText(), "").trim())
         .collect(toList());
@@ -133,7 +115,7 @@ public class VisitorHelper {
    * @param contexts a list of ANTLR value intervals
    * @return the list of value intervals
    */
-  public List<ValueInterval> retrieveValueIntervals(List<DataValueIntervalContext> contexts) {
+  List<ValueInterval> retrieveValueIntervals(List<DataValueIntervalContext> contexts) {
     return contexts.stream()
         .map(
             context ->
@@ -142,6 +124,7 @@ public class VisitorHelper {
                     ofNullable(context.dataValueIntervalTo())
                         .map(DataValueIntervalToContext::literal)
                         .map(ParserRuleContext::getText)
+                        .map(String::toUpperCase)
                         .orElse(null),
                     ofNullable(context.dataValueIntervalTo())
                         .map(DataValueIntervalToContext::thruToken)
@@ -157,7 +140,7 @@ public class VisitorHelper {
    * @param contexts a list of ANTLR usage clauses
    * @return the list of usage formats
    */
-  public List<UsageFormat> retrieveUsageFormat(List<DataUsageClauseContext> contexts) {
+  List<UsageFormat> retrieveUsageFormat(List<DataUsageClauseContext> contexts) {
     return contexts.stream()
         .map(DataUsageClauseContext::usageFormat)
         .map(UsageFormatContext::getStart)
@@ -172,7 +155,7 @@ public class VisitorHelper {
    * @param context the IntegerLiteralContext
    * @return converted Integer
    */
-  public Integer getInteger(IntegerLiteralContext context) {
+  Integer getInteger(IntegerLiteralContext context) {
     return Integer.parseInt(context.getText());
   }
 
@@ -183,7 +166,7 @@ public class VisitorHelper {
    * @param ctx the rule context that contains the required tokens
    * @return a string representation of the given context
    */
-  public String getIntervalText(ParserRuleContext ctx) {
+  String getIntervalText(ParserRuleContext ctx) {
     int start = ctx.getStart().getStartIndex();
     int stop = ctx.getStop().getStopIndex();
     return ctx.getStart().getInputStream().getText(new Interval(start, stop));
@@ -196,8 +179,7 @@ public class VisitorHelper {
    * @param positions map of exact positions
    * @return locality which has a range from the start to the end of the rule
    */
-  public Optional<Locality> retrieveRangeLocality(
-      ParserRuleContext ctx, Map<Token, Locality> positions) {
+  Optional<Locality> retrieveRangeLocality(ParserRuleContext ctx, Map<Token, Locality> positions) {
     return ofNullable(positions.get(ctx.getStart()))
         .flatMap(
             start ->
@@ -218,7 +200,7 @@ public class VisitorHelper {
    * @param children list of child nodes of the parser rule
    * @return a node for semantic analysis
    */
-  public Function<Locality, List<Node>> constructNode(
+  Function<Locality, List<Node>> constructNode(
       Function<Locality, Node> nodeConstructor, List<Node> children) {
     return locality -> {
       Node node = nodeConstructor.apply(locality);
@@ -231,10 +213,83 @@ public class VisitorHelper {
    * Check if the current thread was interrupted and stop the further analysis by throwing a
    * specific exception
    */
-  public void checkInterruption() {
+  void checkInterruption() {
     if (Thread.interrupted()) {
       LOG.debug("Parsing interrupted by user");
       throw new ParseCancellationException("Parsing interrupted by user");
     }
+  }
+
+  /**
+   * Create a tree node from the given context
+   *
+   * @param positions map of localities
+   * @param constants predefined variable context
+   * @param nameContext context of name rule
+   * @param children children nodes
+   * @param hierarchy stream of parent variables
+   * @return list of variable nodes
+   */
+  List<Node> createVariableUsage(
+      Map<Token, Locality> positions,
+      PredefinedVariableContext constants,
+      ParserRuleContext nameContext,
+      List<Node> children,
+      Stream<ParserRuleContext> hierarchy) {
+    String dataName = getName(nameContext);
+    List<Node> result = new ArrayList<>();
+    getLocality(positions, nameContext.getStart())
+        .ifPresent(
+            locality -> {
+              if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
+              else {
+                result.add(
+                    new VariableUsageNode(
+                        dataName, locality, createParentsList(positions, hierarchy)));
+              }
+            });
+    result.addAll(children);
+    return result;
+  }
+
+  /**
+   * Create a tree node from the given context
+   *
+   * @param positions map of localities
+   * @param children children nodes
+   * @param ctx to retrieve the locality range
+   * @param nodeConstructor function to create the node
+   * @return list of nodes
+   */
+  List<Node> createTreeNode(
+      Map<Token, Locality> positions,
+      List<Node> children,
+      ParserRuleContext ctx,
+      Function<Locality, Node> nodeConstructor) {
+    return retrieveRangeLocality(ctx, positions)
+        .map(constructNode(nodeConstructor, children))
+        .orElse(children);
+  }
+  /**
+   * Retrieve a locality from the given mapping
+   *
+   * @param positions map of localities
+   * @param childToken token to retrieve
+   * @return optional of locality
+   */
+  Optional<Locality> getLocality(Map<Token, Locality> positions, Token childToken) {
+    return ofNullable(positions.get(childToken));
+  }
+
+  private List<VariableNameAndLocality> createParentsList(
+      Map<Token, Locality> positions, Stream<ParserRuleContext> hierarchy) {
+    return hierarchy
+        .map(
+            it ->
+                getLocality(positions, it.getStart())
+                    .map(loc -> new VariableNameAndLocality(getName(it), loc))
+                    .orElse(null))
+        .filter(Objects::nonNull)
+        .collect(toList());
   }
 }
