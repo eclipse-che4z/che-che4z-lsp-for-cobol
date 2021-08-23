@@ -3122,7 +3122,7 @@ procedureName
    ;
 
 programName
-   : NONNUMERICLITERAL | cobolWord | OR | AND
+   : literal | cobolWord | OR | AND
    ;
 
 recordName
