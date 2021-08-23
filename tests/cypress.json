@@ -19,7 +19,7 @@
       "dap_cb": ""
   },
   "retries":  {
-    "runMode": 0,
+    "runMode": 2,
     "openMode": 2
   },
   "supportFile": "cypress/support/index.ts",
