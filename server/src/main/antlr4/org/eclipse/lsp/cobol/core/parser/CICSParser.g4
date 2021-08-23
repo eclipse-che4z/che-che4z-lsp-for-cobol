@@ -846,11 +846,11 @@ empty_parens: LPARENCHAR RPARENCHAR;
 
 cicsWord:
     IDENTIFIER | ERROR | ABORT | ADDRESS | AFTER | ALTER | AS | ASSIGN | AT | BINARY | CANCEL | CHANNEL | CLASS | CLOSE
-    | CONTROL | COPY | DATA | DATE | DELETE | DELIMITER | DETAIL | END | ENTER | ENTRY | EQUAL | ERASE | EVENT
-    | EXCEPTION | EXTERNAL | FILE | FOR | FROM | INPUT | INTO | INVOKE | LABEL | LAST | LENGTH | LINE | LIST | MESSAGE
+    | CONTROL | COPY | DATA | DELETE | DELIMITER | DETAIL | END | ENTER | ENTRY | EQUAL | ERASE | EVENT
+    | EXCEPTION | EXTERNAL | FOR | FROM | INPUT | INTO | INVOKE | LABEL | LAST | LENGTH | LINE | LIST | MESSAGE
     | MMDDYYYY | MODE | ORGANIZATION | OUTPUT | PAGE | PARSE | PASSWORD | PROCESS
     | PROGRAM | PURGE | RECEIVE | RECORD | RELEASE | REPLACE | RESET | RETURN | REWIND | REWRITE
-    | RUN | SECURITY | SEND | SERVICE | SHARED | START | STATUS | SYMBOL | TASK | TERMINAL | TEST | TEXT | TIME
+    | RUN | SECURITY | SEND | SERVICE | SHARED | START | STATUS | SYMBOL | TASK | TERMINAL | TEST | TEXT
     | TIMER | TITLE | TYPE | VALUE | WAIT | YEAR | YYYYDDD | YYYYMMDD | COMMAREA
     ;
 
@@ -863,34 +863,6 @@ ptr_value: variableNameUsage+;
 cics_document_set_symbollist: variableNameUsage+;
 hhmmss: variableNameUsage+;
 
-cicsDfhRespLiteral
-   : DFHRESP LPARENCHAR (cics_conditions | cicsWord | literal) RPARENCHAR
-   ;
-
-cicsDfhValueLiteral
-   : DFHVALUE LPARENCHAR (cics_conditions | cicsWord | literal) RPARENCHAR
-   ;
-
-literal
-   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | cicsDfhRespLiteral | cicsDfhValueLiteral
-   ;
-
-figurativeConstant
-   : ALL literal | HIGH_VALUE | HIGH_VALUES | LOW_VALUE | LOW_VALUES | NULL | NULLS | QUOTE | QUOTES | SPACE | SPACES | ZERO | ZEROS | ZEROES
-   ;
-
-booleanLiteral
-   : TRUE | FALSE
-   ;
-
-numericLiteral
-   : NUMERICLITERAL | ZERO | integerLiteral
-   ;
-
-integerLiteral
-   : INTEGERLITERAL | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88
-   ;
-
 paragraphNameUsage
    : cicsWord | integerLiteral
    ;
@@ -901,11 +873,7 @@ variableNameUsage
 // identifier ----------------------------------
 
 generalIdentifier
-   : specialRegister | qualifiedDataName | tableCall | functionCall
-   ;
-
-tableCall
-   : dataName (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
+   : specialRegister | qualifiedDataName | functionCall
    ;
 
 functionCall
@@ -924,26 +892,18 @@ length
    : arithmeticExpression
    ;
 
-subscript
-   : ALL | integerLiteral | arithmeticExpression
-   ;
-
 argument
-   : literal | generalIdentifier | arithmeticExpression
+   : arithmeticExpression
    ;
 
 // qualified data name ----------------------------------
 
 qualifiedDataName
-   : qualifiedDataNameFormat1 | qualifiedDataNameFormat4
+   : dataName tableCall? referenceModifier? inData*
    ;
 
-qualifiedDataNameFormat1
-   : dataName (inData | inTable)*
-   ;
-
-qualifiedDataNameFormat4
-   : LINAGE_COUNTER inFile
+tableCall
+   : LPARENCHAR (ALL | arithmeticExpression) (COMMACHAR? (ALL | arithmeticExpression))* RPARENCHAR
    ;
 
 specialRegister
@@ -960,29 +920,43 @@ specialRegister
 // in ----------------------------------
 
 inData
-   : (IN | OF) dataName
+   : (IN | OF) dataName tableCall? referenceModifier?
    ;
-
-inFile
-   : (IN | OF) fileName
-   ;
-
-inTable
-   : (IN | OF) tableCall
-   ;
-
-// names ----------------------------------
 
 dataName
    : cicsWord
    ;
 
-fileName
-   : cicsWord
-   ;
-
 functionName
    : INTEGER | LENGTH | RANDOM | SUM | WHEN_COMPILED | cicsWord
+   ;
+
+figurativeConstant
+   : ALL literal | HIGH_VALUE | HIGH_VALUES | LOW_VALUE | LOW_VALUES | NULL | NULLS | QUOTE | QUOTES | SPACE | SPACES | ZEROS | ZEROES
+   ;
+
+booleanLiteral
+   : TRUE | FALSE
+   ;
+
+numericLiteral
+   : NUMERICLITERAL | ZERO | integerLiteral
+   ;
+
+integerLiteral
+   : INTEGERLITERAL | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88
+   ;
+
+cicsDfhRespLiteral
+   : DFHRESP LPARENCHAR (cics_conditions | cicsWord | literal) RPARENCHAR
+   ;
+
+cicsDfhValueLiteral
+   : DFHVALUE LPARENCHAR (cics_conditions | cicsWord | literal) RPARENCHAR
+   ;
+
+literal
+   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | cicsDfhRespLiteral | cicsDfhValueLiteral
    ;
 
 // arithmetic expression ----------------------------------

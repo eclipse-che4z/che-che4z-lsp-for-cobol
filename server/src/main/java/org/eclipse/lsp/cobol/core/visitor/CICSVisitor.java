@@ -48,13 +48,20 @@ public class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   private final PredefinedVariableContext constants;
 
   @Override
-  public List<Node> visitQualifiedDataNameFormat1(CICSParser.QualifiedDataNameFormat1Context ctx) {
-    return addVariableUsage(ctx.dataName(), ctx, createParentsList(ctx.inData(), ctx.inTable()));
+  public List<Node> visitQualifiedDataName(CICSParser.QualifiedDataNameContext ctx) {
+    return addVariableUsage(ctx.dataName(), ctx, createParentsList(ctx.inData()));
   }
 
-  @Override
-  public List<Node> visitTableCall(CICSParser.TableCallContext ctx) {
-    return addVariableUsage(ctx.dataName(), ctx);
+  private List<VariableNameAndLocality> createParentsList(List<CICSParser.InDataContext> inData) {
+    return inData.stream()
+        .map(CICSParser.InDataContext::dataName)
+        .map(
+            it ->
+                getLocality(it.getStart())
+                    .map(loc -> new VariableNameAndLocality(VisitorHelper.getName(it), loc))
+                    .orElse(null))
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
   }
 
   private List<Node> addVariableUsage(
@@ -78,27 +85,6 @@ public class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
             });
     result.addAll(visitChildren(parentContext));
     return result;
-  }
-
-  private List<VariableNameAndLocality> createParentsList(
-      List<CICSParser.InDataContext> inData, List<CICSParser.InTableContext> inTable) {
-    return retrieveDataNames(inData, inTable)
-        .map(
-            it ->
-                getLocality(it.getStart())
-                    .map(loc -> new VariableNameAndLocality(VisitorHelper.getName(it), loc))
-                    .orElse(null))
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
-  }
-
-  private Stream<CICSParser.DataNameContext> retrieveDataNames(
-      List<CICSParser.InDataContext> inData, List<CICSParser.InTableContext> inTable) {
-    return Stream.concat(
-        inData.stream().map(CICSParser.InDataContext::dataName),
-        inTable.stream()
-            .map(CICSParser.InTableContext::tableCall)
-            .map(CICSParser.TableCallContext::dataName));
   }
 
   @Override
