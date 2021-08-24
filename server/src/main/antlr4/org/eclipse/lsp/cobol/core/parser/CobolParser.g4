@@ -1529,7 +1529,7 @@ evaluateValue
 
 // exec cics statement
 execCicsStatement
-   : EXEC CICS cicsRules END_EXEC DOT_FS?
+   : EXEC CICS cicsRules END_EXEC
    ;
 
 cicsRules
@@ -1542,20 +1542,20 @@ execSqlStatementInProcedureDivision
    ;
 
 execSqlStatementInWorkingStorage
-   : execSqlStatement
+   : execSqlStatement DOT_FS
    ;
 
 execSqlStatementInWorkingStorageAndLinkageSection
-   : execSqlStatement
+   : execSqlStatement DOT_FS
    ;
 
 execSqlStatementInDataDivision
-   : execSqlStatement
+   : execSqlStatement DOT_FS
    ;
 
 execSqlStatement
-   : EXEC_SQL sqlCode END_EXEC DOT_FS?
-   | {notifyError("cobolParser.missingSqlKeyword");} (EXEC | SQL) sqlCode END_EXEC DOT_FS?
+   : EXEC_SQL sqlCode END_EXEC
+   | {notifyError("cobolParser.missingSqlKeyword");} (EXEC | SQL) sqlCode END_EXEC
    ;
 
 sqlCode
