@@ -3,6 +3,8 @@
   "patterns" : [ {
     "include" : "#comment-line"
   }, {
+    "include" : "#comment-floating"
+  }, {
     "include" : "#number-constant"
   }, {
     "include" : "#string-quoted-constant"
@@ -32,6 +34,10 @@
           "name" : "comment.line.cobol.fixed"
         }
       }
+    },
+    "comment-floating": {
+      "match": "\\s\\*>\\s.*",
+      "name": "comment.line.cobol.floating"
     },
     "number-constant" : {
       "match" : "(?<![\\+\\-\\w])(\\+|\\-)?\\d+(\\.\\d+)?([Ee](\\-|\\+)\\d+)?(?![\\-\\w])",
