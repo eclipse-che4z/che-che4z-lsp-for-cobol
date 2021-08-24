@@ -3210,9 +3210,12 @@ basis
    ;
 
 cobolWord
-   : IDENTIFIER | idms_only_words | cobolCompilerDirectivesKeywords
-   | YYYYMMDD | YYYYDDD | TIMER | TODAYS_DATE | MMDDYYYY | TODAYS_NAME | YEAR
-   | COUNT | PRINTER | ADDRESS | TOP | FIRST | REMARKS | RESUME | ABEND | UPDATE | CHECK | LINK | HEADER | BUFFER | FIELD | BOTTOM | CR
+   : IDENTIFIER | idms_only_words | cobolCompilerDirectivesKeywords | cobolKeywords
+   ;
+
+cobolKeywords
+   : ABEND | ADDRESS | BOTTOM | BUFFER | CHECK | COUNT | CR | FIELD | FIRST | HEADER | LINK | MMDDYYYY | PRINTER
+   | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | TOP | UPDATE | YEAR | YYYYDDD | YYYYMMDD
    ;
 
 cobolCompilerDirectivesKeywords
