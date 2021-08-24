@@ -29,7 +29,16 @@ class TestDelete {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "       ENVIRONMENT DIVISION.\r\n"
+          + "       INPUT-OUTPUT SECTION.\r\n"
+          + "       FILE-CONTROL.\r\n"
+          + "             SELECT {$SCRATCH} ASSIGN TO TEST \r\n"
+          + "             ORGANIZATION IS LINE SEQUENTIAL \r\n"
+          + "             ACCESS MODE IS SEQUENTIAL. \r\n"
           + "        DATA DIVISION. \r\n"
+          + "        FILE SECTION.\r\n"
+          + "        FD  {$*SCRATCH} \r\n"
+          + "           LABEL RECORDS ARE STANDARD. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_QUEUEID} PIC X(8) SYNC.\r\n"
           + "        01 {$*WK_AREAID} PIC X(8) SYNC.\r\n"
@@ -55,7 +64,13 @@ class TestDelete {
 
   private static final String DELETE_QUEUE_NO_ID = "           DELETE QUEUE CURRENT.\r\n";
 
-  private static final String DELETE_SCRATCH = "           DELETE SCRATCH.\r\n";
+  /**
+   * ref - https://www.ibm.com/docs/hu/cobol-zos/4.2?topic=statements-delete-statement
+   * file-name-1 :
+   * Must be defined in an FD entry in the data division and must be the name of an indexed or
+   * relative file.
+   */
+  private static final String DELETE_SCRATCH = "           DELETE {$SCRATCH}.\r\n";
 
   private static final String DELETE_SCRATCH_AREA_ID_LITERAL =
       "           DELETE SCRATCH AREA ID 'TEST'.\r\n";
@@ -108,7 +123,8 @@ class TestDelete {
         BOILERPLATE + DELETE_TABLE_ALL_PARMS_LITERAL,
         BOILERPLATE + DELETE_QUEUE_ON,
         BOILERPLATE + DELETE_SCRATCH_ON,
-        BOILERPLATE + DELETE_TABLE_ON);
+        BOILERPLATE + DELETE_TABLE_ON
+    );
   }
 
   @ParameterizedTest

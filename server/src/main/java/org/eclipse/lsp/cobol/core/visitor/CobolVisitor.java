@@ -27,6 +27,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolParser;
@@ -86,6 +87,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final Map<Token, EmbeddedCode> embeddedCodeParts;
   private final MessageService messageService;
   private final SubroutineService subroutineService;
+  private Map<String, FileControlEntryContext> fileControls = null;
 
   public CobolVisitor(
       @NonNull String documentUri,
@@ -216,6 +218,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitProgramUnit(ProgramUnitContext ctx) {
     outlineTreeBuilder.addProgram(ctx);
+    fileControls = new HashMap<>();
     return addTreeNode(ctx, locality -> new ProgramNode(locality, messageService));
   }
 
@@ -268,8 +271,23 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitFileDescriptionEntry(FileDescriptionEntryContext ctx) {
     areaAWarning(ctx.getStart());
-    outlineTreeBuilder.addNode(ctx.fileName().getText(), NodeType.FILE, ctx);
-    return visitChildren(ctx);
+    String fileControlClause = "";
+    String fileName = getName(ctx.fileDescriptionEntryClauses().cobolWord());
+    if (fileControls.containsKey(fileName)) {
+      FileControlEntryContext fileControlEntryContext = fileControls.remove(fileName);
+      fileControlClause = getIntervalText(fileControlEntryContext.fileControlClauses());
+    }
+    outlineTreeBuilder.addNode(ctx.fileDescriptionEntryClauses().cobolWord().getText(), NodeType.FILE, ctx);
+    return addTreeNode(
+        VariableDefinitionNode.builder()
+            .level(LEVEL_FD_SD)
+            .variableNameAndLocality(extractNameAndLocality(ctx.fileDescriptionEntryClauses().cobolWord()))
+            .statementLocality(retrieveRangeLocality(ctx.fileDescriptionEntryClauses().cobolWord(), positionMapping).orElse(null))
+            .fileDescriptor(getIntervalText(ctx.fileDescriptionEntryClauses()))
+            .fileControlClause(fileControlClause)
+            .isSortDescription(Objects.nonNull(ctx.fileDescriptionEntryClauses().SD()))
+            .build(),
+        visitChildren(ctx));
   }
 
   /**
@@ -322,9 +340,33 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitSelectClause(SelectClauseContext ctx) {
-    outlineTreeBuilder.addNode(ctx.fileName().getText(), NodeType.FILE, ctx);
+  public List<Node> visitFileControlEntry(FileControlEntryContext ctx) {
+    String filename = VisitorHelper.getName(ctx.selectClause().fileName());
+    if (StringUtils.isNotBlank(filename)) {
+      outlineTreeBuilder.addNode(filename, NodeType.FILE, ctx);
+      checkFileControlUniqueness(ctx, filename);
+    }
     return visitChildren(ctx);
+  }
+
+  private void checkFileControlUniqueness(FileControlEntryContext ctx, String filename) {
+    getLocality(ctx.selectClause().fileName().getStart())
+        .ifPresent(
+            locality -> {
+              if (fileControls.containsKey(filename.toUpperCase())) {
+                SyntaxError error =
+                    SyntaxError.syntaxError()
+                        .suggestion(
+                            messageService.getMessage("CobolVisitor.duplicateFileName", filename))
+                        .severity(ErrorSeverity.ERROR)
+                        .locality(locality)
+                        .build();
+                errors.add(error);
+                LOG.debug("Syntax error by CobolVisitor#visitSelectClause: {}", error);
+              } else {
+                fileControls.put(filename.toUpperCase(), ctx);
+              }
+            });
   }
 
   @Override
@@ -948,5 +990,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private Locality getLevelLocality(TerminalNode terminalNode) {
     return positionMapping.get(terminalNode.getSymbol());
+  }
+
+  @Override
+  public List<Node> visitFileName(FileNameContext ctx) {
+    return addVariableUsage(ctx.cobolWord(), ctx);
   }
 }

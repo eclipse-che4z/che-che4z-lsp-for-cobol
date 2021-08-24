@@ -71,6 +71,9 @@ public class NodeConverter {
         return convert((TableDataNameNode) variableNode);
       case MAP_NAME:
         return convert((MapNameNode) variableNode);
+      case SD:
+      case FD:
+        return convert((FileDescriptionNode) variableNode);
       default:
         throw new IllegalArgumentException("Unexpected variable type");
     }
@@ -161,6 +164,10 @@ public class NodeConverter {
 
   private MapName convert(MapNameNode variableNode) {
     return new MapName(variableNode.getName(), getDefinitionLocality(variableNode));
+  }
+
+  private FileDescriptorName convert(FileDescriptionNode variableNode) {
+    return new FileDescriptorName(variableNode.getName(), getDefinitionLocality(variableNode), variableNode.getFileDescriptorText(), variableNode.getFileControlClause(), variableNode.getVariableType());
   }
 
   private Variable getParent(@NonNull VariableNode variableNode) {

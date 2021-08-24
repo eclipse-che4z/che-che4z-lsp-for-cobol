@@ -393,7 +393,11 @@ fileControlParagraph
    ;
 
 fileControlEntry
-   : selectClause fileControlClause*
+   : selectClause fileControlClauses
+   ;
+
+fileControlClauses
+   : fileControlClause*
    ;
 
 selectClause
@@ -567,7 +571,11 @@ fileSectionParagraph
     ;
 
 fileDescriptionEntry
-   : (FD | SD) fileName (DOT_FS? fileDescriptionEntryClause)* DOT_FS dataDescriptionEntry*
+   :  fileDescriptionEntryClauses dataDescriptionEntry*
+   ;
+
+fileDescriptionEntryClauses
+   : (FD | SD) cobolWord (DOT_FS? fileDescriptionEntryClause)* DOT_FS
    ;
 
 fileDescriptionEntryClause
@@ -611,7 +619,7 @@ recordContainsTo
    ;
 
 labelRecordsClause
-   : LABEL (RECORD IS? | RECORDS ARE?) (OMITTED | STANDARD | dataName+)
+   : LABEL (RECORD IS? | RECORDS ARE?) (OMITTED | STANDARD | dataName*)
    ;
 
 valueOfClause
