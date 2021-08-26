@@ -111,10 +111,10 @@ public class ProgramNode extends Node {
    * @param node - the paragraph node
    * @return syntax error if the code block duplicates
    */
-  public SyntaxError registerCodeBlock(CodeBlockDefinitionNode node) {
+  public Optional<SyntaxError> registerCodeBlock(CodeBlockDefinitionNode node) {
     codeBlocks.add(node);
     // TODO: add uniqueness check for paragraphs
-    return null;
+    return Optional.empty();
   }
 
   /**

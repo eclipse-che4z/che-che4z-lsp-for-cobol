@@ -23,7 +23,7 @@ import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
@@ -43,14 +43,14 @@ public class CodeBlockDefinitionUtils {
         .filter(hasType(NodeType.PARAGRAPH).or(hasType(NodeType.PROCEDURE_SECTION)))
         .map(CodeBlockDefinitionNode.class::cast)
         .map(CodeBlockDefinitionUtils::register)
-        .filter(Objects::nonNull)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(toList());
   }
 
-  private SyntaxError register(CodeBlockDefinitionNode node) {
+  private Optional<SyntaxError> register(CodeBlockDefinitionNode node) {
     return node.getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
-        .map(parent -> parent.registerCodeBlock(node))
-        .orElse(null);
+        .flatMap(parent -> parent.registerCodeBlock(node));
   }
 }
