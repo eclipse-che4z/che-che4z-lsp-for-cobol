@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 
@@ -81,17 +80,6 @@ public abstract class MessageServiceParser extends Parser {
   protected void validateLength(String input, String objectType, Integer validLength) {
     if (input != null && input.length() > validLength) {
       notifyError("parsers.maxLength", validLength.toString(), objectType);
-    }
-  }
-
-  /**
-   * Validate the end token of PERFORM statement and throw an error if it is not END-PERFORM
-   *
-   * @param endToken - the token that terminates the PERFORM statement
-   */
-  protected void validateEndPerform(Token endToken) {
-    if (endToken.getType() != CobolLexer.END_PERFORM) {
-      notifyError("parsers.performMissingEnd", endToken.getText());
     }
   }
 
