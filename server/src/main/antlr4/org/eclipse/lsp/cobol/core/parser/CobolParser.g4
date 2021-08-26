@@ -279,7 +279,7 @@ characterSetClause
 // - special names paragraph ----------------------------------
 
 specialNamesParagraph
-   : SPECIAL_NAMES DOT_FS (specialNameClause* DOT_FS)?
+   : SPECIAL_NAMES DOT_FS (specialNameClause+ DOT_FS)?
    ;
 
 specialNameClause
@@ -384,7 +384,7 @@ inputOutputSectionParagraph
 // - file control paragraph ----------------------------------
 
 fileControlParagraph
-   : FILE_CONTROL DOT_FS (fileControlEntry)*
+   : FILE_CONTROL DOT_FS fileControlEntry*
    ;
 
 fileControlEntry
@@ -454,7 +454,7 @@ relativeKeyClause
 // - io control paragraph ----------------------------------
 
 ioControlParagraph
-   : I_O_CONTROL DOT_FS (fileName DOT_FS)? (ioControlClause* DOT_FS)?
+   : I_O_CONTROL DOT_FS (fileName DOT_FS)? (ioControlClause+ DOT_FS)?
    ;
 
 ioControlClause
@@ -505,7 +505,11 @@ idmsControlSection
 
 // - idms control section paragraph ----------------------------------
 idmsControlSectionParagraph
-   : protocolParagraph (ssNamesLengthParagraph | idmsRecordLocationParagraph | COMMACHAR)*
+   : protocolParagraph (protocolParagraphs COMMACHAR?)*
+   ;
+
+protocolParagraphs
+   : ssNamesLengthParagraph | idmsRecordLocationParagraph
    ;
 
 protocolParagraph
@@ -566,7 +570,7 @@ fileSection
    ;
 
 fileDescriptionEntry
-   :  fileDescriptionEntryClauses dataDescriptionEntry*
+   : fileDescriptionEntryClauses dataDescriptionEntry*
    ;
 
 fileDescriptionEntryClauses
