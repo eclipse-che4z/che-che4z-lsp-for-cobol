@@ -410,8 +410,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitParagraphName(ParagraphNameContext ctx) {
-    String name = ctx.getText().toUpperCase();
-    return addTreeNode(ctx, locality -> new CodeBlockUsageNode(locality, name));
+    return addTreeNode(
+        ctx, locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx)));
   }
 
   @Override
@@ -799,10 +799,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
-    List<Node> children = visitChildren(ctx);
-    return retrieveRangeLocality(ctx, positions)
-        .map(constructNode(nodeConstructor, children))
-        .orElse(children);
+    return VisitorHelper.createTreeNode(positions, visitChildren(ctx), ctx, nodeConstructor);
   }
 
   private List<Node> addTreeNode(Node node, List<Node> children) {
