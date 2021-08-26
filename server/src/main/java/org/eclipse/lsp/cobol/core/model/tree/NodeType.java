@@ -41,4 +41,5 @@ public enum NodeType {
   SENTENCE,
   STATEMENT,
   EMBEDDED_CODE,
+  CODE_BLOCK_USAGE
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,30 +12,35 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
+
 package org.eclipse.lsp.cobol.usecases;
 
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * This test checks that redefined item can not be redefined
- */
-class TestVariableRedefineRedefined {
+/** This test checks that the usage of XML special registers does not produce syntax errors */
+class TestXmlSpecialRegisters {
+
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. PERFTIMI.\n"
+          + "       PROGRAM-ID. TEST1.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*WS-DATA-A} PIC X(20) .\n"
-          + "       01 {$*WS-DATA-RED} REDEFINES {$WS-DATA-A} PIC X(20).\n"
-          + "       01 {$*WS-DATA-B} REDEFINES {$WS-DATA-RED} PIC X(20).\n"
-          + "       PROCEDURE DIVISION.\n";
+          + "       01  {$*LOCAL-NAME-LEN} PIC 99.\n"
+          + "       01  {$*XML-NAT-CHAR} PIC X(9).\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       {#*MAINLINE}.\n"
+          + "           MOVE -1 TO {&XML-CODE}.\n"
+          + "           MOVE {&XML-NTEXT} TO {$XML-NAT-CHAR}\n"
+          + "           COMPUTE {$LOCAL-NAME-LEN}\n"
+          + "            = FUNCTION LENGTH ({&XML-TEXT})\n"
+          + "           GOBACK.";
 
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-   }
+  }
 }

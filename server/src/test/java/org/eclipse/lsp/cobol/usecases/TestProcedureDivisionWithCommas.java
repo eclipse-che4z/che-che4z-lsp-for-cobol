@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -19,23 +19,22 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * This test checks that redefined item can not be redefined
- */
-class TestVariableRedefineRedefined {
+/** Check that commas in the PROCEDURE DIVISION USING statement don't cause syntax errors */
+class TestProcedureDivisionWithCommas {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. PERFTIMI.\n"
-          + "       ENVIRONMENT DIVISION.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*WS-DATA-A} PIC X(20) .\n"
-          + "       01 {$*WS-DATA-RED} REDEFINES {$WS-DATA-A} PIC X(20).\n"
-          + "       01 {$*WS-DATA-B} REDEFINES {$WS-DATA-RED} PIC X(20).\n"
-          + "       PROCEDURE DIVISION.\n";
+          + "          PROGRAM-ID. TEST1.\n"
+          + "          DATA DIVISION.\n"
+          + "          LINKAGE SECTION.\n"
+          + "          01  {$*var1}  PIC X(1).\n"
+          + "          01  {$*var2}  PIC X(1).\n"
+          + "          01  {$*var3}  PIC X(1).\n"
+          + "          01  {$*var4}  PIC X(1).\n"
+          + "          PROCEDURE DIVISION USING {$var1}, {$var2},\n"
+          + "           {$var3}, {$var4}.";
 
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-   }
+  }
 }

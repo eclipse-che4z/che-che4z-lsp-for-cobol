@@ -26,7 +26,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 /** Test IDMS SNAP DML statement */
-public class TestIdmsSnapStatement {
+class TestIdmsSnapStatement {
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"

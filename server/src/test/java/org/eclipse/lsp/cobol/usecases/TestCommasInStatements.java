@@ -12,6 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
+
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
@@ -19,23 +20,26 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * This test checks that redefined item can not be redefined
- */
-class TestVariableRedefineRedefined {
+/** Test that commas in statements don't produce errors */
+class TestCommasInStatements {
+
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. PERFTIMI.\n"
-          + "       ENVIRONMENT DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*WS-DATA-A} PIC X(20) .\n"
-          + "       01 {$*WS-DATA-RED} REDEFINES {$WS-DATA-A} PIC X(20).\n"
-          + "       01 {$*WS-DATA-B} REDEFINES {$WS-DATA-RED} PIC X(20).\n"
-          + "       PROCEDURE DIVISION.\n";
+          + "       01  {$*A1} PIC 9.\n"
+          + "       01  {$*A2} PIC 9.\n"
+          + "       01  {$*A3} PIC 9.\n"
+          + "       01  {$*A4} PIC 9.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           MOVE 0 TO {$A1}, {$A2}, {$A3}.\n"
+          + "           ADD {$A1}, {$A2} TO {$A3}, {$A4}.\n"
+          + "           ADD 0 TO {$A1}, {$A2} GIVING {$A3}, {$A4}.\n"
+          + "           DISPLAY {$A1}, {$A2}.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-   }
+  }
 }

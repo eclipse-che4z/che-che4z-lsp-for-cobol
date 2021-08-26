@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 
 /** This test checks that the JNIENVPTR doesn't produce a syntax error */
-class TextJniEnvSpecialRegister {
+class TestJniEnvSpecialRegister {
 
   private static final String TEXT =
       "       Identification Division. \n"

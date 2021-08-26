@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * 1. Hover shows the File Description and File control data.
  * 2. FD are checked before the use of file variable.
  */
-public class TestFileDescriptor {
+class TestFileDescriptor {
   private static final String TEXT =
       "      *****************************************************************\n"
           + "       IDENTIFICATION DIVISION.\n"
@@ -142,7 +142,7 @@ public class TestFileDescriptor {
           + "       ENVIRONMENT DIVISION.\n"
           + "       INPUT-OUTPUT SECTION.\n"
           + "       FILE-CONTROL.\n"
-          + "             SELECT {$INFILE} ASSIGN TO \"c:\\infile.dat\"..\n"
+          + "             SELECT {$INFILE} ASSIGN TO \"c:\\infile.dat\".\n"
           + "             select {$INFILE|1} assign DUMMY.\n"
           + "       DATA DIVISION.\n"
           + "       FILE SECTION.\n"

@@ -46,8 +46,7 @@ import static org.eclipse.lsp.cobol.core.CobolLexer.COPYEXIT;
 @UtilityClass
 public class LocalityMappingUtils {
 
-  private static final int URI_PREFIX_LENGTH =
-      ProcessingConstants.CPY_ENTER_TAG.length();
+  private static final int URI_PREFIX_LENGTH = ProcessingConstants.CPY_ENTER_TAG.length();
   private static final int URI_SUFFIX_LENGTH = ProcessingConstants.CPY_URI_CLOSE.length();
 
   /**
@@ -113,10 +112,11 @@ public class LocalityMappingUtils {
       Map<String, DocumentMapping> documentPositions,
       Map<Token, Locality> result,
       Deque<DocumentHierarchyLevel> documentHierarchyStack) {
-    if (token.getType() == COPYENTRY) {
+    // Check that this token is copy entry as defined in CobolLexer
+    if (token.getType() == COPYENTRY && token.getTokenSource() instanceof CobolLexer) {
       enterDocument(
           extractCopybookName(token.getText()), documentPositions, documentHierarchyStack);
-    } else if (token.getType() == COPYEXIT) {
+    } else if (token.getType() == COPYEXIT && token.getTokenSource() instanceof CobolLexer) {
       exitDocument(documentHierarchyStack);
     } else {
       mapTokenToPosition(token, result, documentHierarchyStack);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,6 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
+
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
@@ -19,23 +20,26 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * This test checks that redefined item can not be redefined
- */
-class TestVariableRedefineRedefined {
+/** Check that GO TO statement works according to the specification */
+class TestGoToRules {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. PERFTIMI.\n"
-          + "       ENVIRONMENT DIVISION.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*WS-DATA-A} PIC X(20) .\n"
-          + "       01 {$*WS-DATA-RED} REDEFINES {$WS-DATA-A} PIC X(20).\n"
-          + "       01 {$*WS-DATA-B} REDEFINES {$WS-DATA-RED} PIC X(20).\n"
-          + "       PROCEDURE DIVISION.\n";
+          + "        PROGRAM-ID. test1.\n"
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        01 {$*PARENT}.\n"
+          + "             05 {$*CHILD} PIC 9.\n"
+          + "        PROCEDURE DIVISION. \n"
+          + "           GO TO {#ABC}.\n"
+          + "        {#*ABC}.\n"
+          + "           GO {#CDE} {#FGH} DEPENDING ON {$CHILD} OF {$PARENT}.\n"
+          + "        {#*CDE}.\n"
+          + "           DISPLAY 'asdf'.\n"
+          + "        {#*FGH}.\n"
+          + "           DISPLAY 'asdf'.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-   }
+  }
 }

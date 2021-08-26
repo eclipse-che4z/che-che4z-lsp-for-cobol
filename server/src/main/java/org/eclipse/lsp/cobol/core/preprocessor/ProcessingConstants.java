@@ -19,7 +19,6 @@ import lombok.experimental.UtilityClass;
 /** The constants in this class used while the processing of COBOL code lines. */
 @UtilityClass
 public final class ProcessingConstants {
-  public static final String COMMENT_ENTRY_TAG = "*>CE";
   public static final String COMMENT_TAG = "*>";
   public static final String NEWLINE = "\r\n";
   public static final String WS = " ";

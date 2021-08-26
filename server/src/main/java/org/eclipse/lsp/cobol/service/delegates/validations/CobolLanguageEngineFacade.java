@@ -14,13 +14,13 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.validations;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
-import org.eclipse.lsp.cobol.core.model.ErrorCode;
-import org.eclipse.lsp.cobol.core.model.ErrorSeverity;
-import org.eclipse.lsp.cobol.core.model.ResultWithErrors;
-import org.eclipse.lsp.cobol.core.model.SyntaxError;
+import org.eclipse.lsp.cobol.core.model.*;
+import org.eclipse.lsp.cobol.core.model.tree.CodeBlockDefinitionNode;
+import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp4j.Diagnostic;
@@ -29,6 +29,8 @@ import org.eclipse.lsp4j.Location;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -57,12 +59,12 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
    *
    * @param uri - URI of the processing document to define positions and errors properly
    * @param text of document opened in the client editor
-   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql server
+   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql
+   *     server
    * @return a model containing full analysis result, e.g. errors and semantic elements
    */
   @Override
-  public AnalysisResult analyze(
-      String uri, String text, CopybookConfig copybookConfig) {
+  public AnalysisResult analyze(String uri, String text, CopybookConfig copybookConfig) {
     if (isEmpty(text)) {
       return empty();
     }
@@ -81,26 +83,59 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
 
   private AnalysisResult toAnalysisResult(ResultWithErrors<SemanticContext> result, String uri) {
     SemanticContext context = result.getResult();
-    return new AnalysisResult(
-        collectDiagnosticsForAffectedDocuments(
-            convertErrors(result.getErrors()), context.getCopybookDefinitions(), uri),
-        convertEntities(context.getVariableDefinitions()),
-        convertEntities(context.getVariableUsages()),
-        convertEntities(context.getParagraphDefinitions()),
-        convertEntities(context.getParagraphUsages()),
-        convertEntities(context.getParagraphRanges()),
-        convertEntities(context.getSectionDefinitions()),
-        convertEntities(context.getSectionUsages()),
-        convertEntities(context.getSectionRanges()),
-        convertEntities(context.getConstants().getDefinitions().asMap()),
-        convertEntities(context.getConstants().getUsages().asMap()),
-        convertEntities(context.getCopybookDefinitions()),
-        convertEntities(context.getCopybookUsages()),
-        convertEntities(context.getSubroutinesDefinitions()),
-        convertEntities(context.getSubroutinesUsages()),
-        context.getOutlineTree(),
-        context.getVariables(),
-        context.getRootNode());
+    final List<CodeBlockDefinitionNode> paragraphNodes =
+        collectCodeBlockNodes(context, NodeType.PARAGRAPH);
+    final List<CodeBlockDefinitionNode> sectionNodes =
+        collectCodeBlockNodes(context, NodeType.PROCEDURE_SECTION);
+    return AnalysisResult.builder()
+        .diagnostics(
+            collectDiagnosticsForAffectedDocuments(
+                convertErrors(result.getErrors()), context.getCopybookDefinitions(), uri))
+        .variableDefinitions(convertEntities(context.getVariableDefinitions()))
+        .variableUsages(convertEntities(context.getVariableUsages()))
+        .constantDefinitions(convertEntities(context.getConstants().getDefinitions().asMap()))
+        .constantUsages(convertEntities(context.getConstants().getUsages().asMap()))
+        .copybookDefinitions(convertEntities(context.getCopybookDefinitions()))
+        .copybookUsages(convertEntities(context.getCopybookUsages()))
+        .subroutineDefinitions(convertEntities(context.getSubroutinesDefinitions()))
+        .subroutineUsages(convertEntities(context.getSubroutinesUsages()))
+        .paragraphDefinitions(retrieveDefinitions(paragraphNodes))
+        .paragraphUsages(retrieveUsages(paragraphNodes))
+        .sectionDefinitions(retrieveDefinitions(sectionNodes))
+        .sectionUsages(retrieveUsages(sectionNodes))
+        .outlineTree(context.getOutlineTree())
+        .variables(context.getVariables())
+        .rootNode(context.getRootNode())
+        .build();
+  }
+
+  private List<CodeBlockDefinitionNode> collectCodeBlockNodes(
+      SemanticContext context, NodeType nodeType) {
+    return context
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(it -> it.getNodeType().equals(nodeType))
+        .map(CodeBlockDefinitionNode.class::cast)
+        .collect(toList());
+  }
+
+  private Map<String, List<Location>> retrieveDefinitions(List<CodeBlockDefinitionNode> nodes) {
+    return nodes.stream()
+        .collect(
+            Collectors.toMap(
+                CodeBlockDefinitionNode::getName,
+                it -> ImmutableList.of(it.getDefinition().toLocation()),
+                (x, y) -> Stream.concat(x.stream(), y.stream()).collect(toList())));
+  }
+
+  private Map<String, List<Location>> retrieveUsages(List<CodeBlockDefinitionNode> node) {
+    return node.stream()
+        .filter(it -> !it.getUsages().isEmpty())
+        .collect(
+            Collectors.toMap(
+                CodeBlockDefinitionNode::getName,
+                it -> it.getUsages().stream().map(Locality::toLocation).collect(toList()),
+                (x, y) -> Stream.concat(x.stream(), y.stream()).collect(toList())));
   }
 
   /**

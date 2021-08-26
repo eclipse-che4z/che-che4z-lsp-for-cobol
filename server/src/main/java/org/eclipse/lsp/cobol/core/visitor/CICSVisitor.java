@@ -20,8 +20,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.RuleNode;
-import org.eclipse.lsp.cobol.core.Db2SqlParserBaseVisitor;
+import org.eclipse.lsp.cobol.core.CICSParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 
@@ -30,29 +31,34 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.Db2SqlParser.Dbs_host_variableContext;
-import static org.eclipse.lsp.cobol.core.Db2SqlParser.Dbs_rs_locator_variableContext;
+import static org.eclipse.lsp.cobol.core.CICSParser.*;
 
 /**
- * This visitor analyzes the parser tree for DB2 SQL and returns its semantic context as a syntax
- * tree
+ * This visitor analyzes the parser tree for CICS and returns its semantic context as a syntax tree
  */
 @Slf4j
 @AllArgsConstructor
-public class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
+public class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   private final Map<Token, Locality> positions;
   private final PredefinedVariableContext constants;
 
   @Override
-  public List<Node> visitDbs_host_variable(Dbs_host_variableContext ctx) {
+  public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
     return VisitorHelper.createVariableUsage(
-        positions, constants, ctx.dbs_host_variable_val(), visitChildren(ctx), Stream.empty());
+        positions,
+        constants,
+        ctx.dataName(),
+        visitChildren(ctx),
+        ctx.inData().stream().map(InDataContext::dataName));
   }
 
   @Override
-  public List<Node> visitDbs_rs_locator_variable(Dbs_rs_locator_variableContext ctx) {
-    return VisitorHelper.createVariableUsage(
-        positions, constants, ctx.dbs_sql_identifier(), visitChildren(ctx), Stream.empty());
+  public List<Node> visitParagraphNameUsage(ParagraphNameUsageContext ctx) {
+    return VisitorHelper.createTreeNode(
+        positions,
+        visitChildren(ctx),
+        ctx,
+        locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx)));
   }
 
   // NOTE: Visitor is not managed by Guice DI, so can't use annotation here.

@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This test checks that redefined variable has correct usage even if names the same.
  */
-public class TestVariableRedefinesSameNameInDifferentGroup {
+class TestVariableRedefinesSameNameInDifferentGroup {
   private static final String REDEFINES =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.      EMPPROJ.\n"

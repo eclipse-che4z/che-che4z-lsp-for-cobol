@@ -12,6 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
+
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
@@ -19,23 +20,31 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * This test checks that redefined item can not be redefined
- */
-class TestVariableRedefineRedefined {
+/** This test checks that the DEFINE TIMER statements are parsed correctly */
+class TestCicsDefineTimer {
+
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. PERFTIMI.\n"
-          + "       ENVIRONMENT DIVISION.\n"
+          + "       PROGRAM-ID. HELLO-CICS.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*WS-DATA-A} PIC X(20) .\n"
-          + "       01 {$*WS-DATA-RED} REDEFINES {$WS-DATA-A} PIC X(20).\n"
-          + "       01 {$*WS-DATA-B} REDEFINES {$WS-DATA-RED} PIC X(20).\n"
-          + "       PROCEDURE DIVISION.\n";
+          + "       01 {$*abc} PIC x VALUE 'a'.\n"
+          + "       01 {$*def} PIC x VALUE 'b'.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC CICS\n"
+          + "           DEFINE TIMER({$abc}) EVENT({$def}) AT HOURS(15)\n"
+          + "           END-EXEC.\n"
+          + "           EXEC CICS\n"
+          + "           DEFINE TIMER({$abc}) EVENT({$def}) AT HOURS(15)\n"
+          + "            ON YEAR(2001) MONTH(11) DAYOFMONTH(3)\n"
+          + "           END-EXEC.\n"
+          + "           EXEC CICS\n"
+          + "           DEFINE TIMER({$abc}) EVENT({$def}) AT HOURS(8)\n"
+          + "            ON YEAR(1997) MONTH(1) DAYOFMONTH(1)\n"
+          + "           END-EXEC.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-   }
+  }
 }

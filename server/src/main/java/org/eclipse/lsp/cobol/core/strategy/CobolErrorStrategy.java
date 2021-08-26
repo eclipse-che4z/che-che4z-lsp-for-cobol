@@ -23,6 +23,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 
 import java.io.BufferedReader;
@@ -33,6 +34,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import static org.eclipse.lsp.cobol.core.CobolLexer.EOF;
 
 @Slf4j
 @Singleton
@@ -82,12 +85,8 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     return recognizer.getRuleInvocationStack().get(0);
   }
 
-  private String parseCustomMessage(String methodName, String rule, Object... params) {
-    String messageKey = "ErrorStrategy.".concat(rule.concat(methodName));
-    String message = messageService.getMessage(messageKey, params);
-    if (message.equals(messageKey))
-      return messageService.getMessage("ErrorStrategy.".concat(methodName), params);
-    return message;
+  private String parseCustomMessage(String methodName, Object... params) {
+    return messageService.getMessage("ErrorStrategy.".concat(methodName), params);
   }
 
   private String getOffendingToken(InputMismatchException e) {
@@ -154,10 +153,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
   protected void reportInputMismatch(Parser recognizer, InputMismatchException e) {
     String msg =
         parseCustomMessage(
-            REPORT_INPUT_MISMATCH,
-            getRule(recognizer),
-            getOffendingToken(e),
-            getExpectedToken(recognizer, e));
+            REPORT_INPUT_MISMATCH, getOffendingToken(e), getExpectedToken(recognizer, e));
     recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
   }
 
@@ -172,7 +168,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
       input = "<unknown input>";
     }
 
-    String msg = parseCustomMessage(REPORT_NO_VIABLE_ALTERNATIVE, getRule(recognizer), input);
+    String msg = parseCustomMessage(REPORT_NO_VIABLE_ALTERNATIVE, input);
     recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
   }
 
@@ -185,18 +181,16 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     Token t = recognizer.getCurrentToken();
     String erroneousToken = getTokenErrorDisplay(t);
     String msg;
-    if (erroneousToken.equals("'<EOF>'")) {
+    String tokenName =
+        specialTokenHandlingMap.getOrDefault(
+            erroneousToken.substring(1, erroneousToken.length() - 1), getTokenErrorDisplay(t));
+    if (recognizer.getContext().getRuleIndex() == CobolParser.RULE_performInlineStatement) {
+      msg = messageService.getMessage("parsers.performMissingEnd", tokenName);
+    } else if (t.getType() == EOF) {
       msg = messageService.getMessage("ErrorStrategy.endOfFile");
     } else {
-      String tokenName =
-          specialTokenHandlingMap.getOrDefault(
-              erroneousToken.substring(1, erroneousToken.length() - 1), getTokenErrorDisplay(t));
       msg =
-          parseCustomMessage(
-              REPORT_UNWANTED_TOKEN,
-              getRule(recognizer),
-              tokenName,
-              getExpectedToken(recognizer, null));
+          parseCustomMessage(REPORT_UNWANTED_TOKEN, tokenName, getExpectedToken(recognizer, null));
     }
     recognizer.notifyErrorListeners(t, msg, null);
   }
@@ -209,8 +203,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     beginErrorCondition(recognizer);
     Token t = recognizer.getCurrentToken();
     String rule = getRule(recognizer);
-    String msg =
-        parseCustomMessage(REPORT_MISSING_TOKEN, rule, getExpectedToken(recognizer, null), rule);
+    String msg = parseCustomMessage(REPORT_MISSING_TOKEN, getExpectedToken(recognizer, null), rule);
     recognizer.notifyErrorListeners(t, msg, null);
   }
 }
