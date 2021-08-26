@@ -388,7 +388,11 @@ fileControlParagraph
    ;
 
 fileControlEntry
-   : selectClause fileControlClause* DOT_FS
+   : selectClause fileControlClauses DOT_FS
+   ;
+
+fileControlClauses
+   : fileControlClause*
    ;
 
 selectClause
@@ -562,7 +566,11 @@ fileSection
    ;
 
 fileDescriptionEntry
-   : (FD | SD) fileName (DOT_FS? fileDescriptionEntryClause)* DOT_FS dataDescriptionEntry*
+   :  fileDescriptionEntryClauses dataDescriptionEntry*
+   ;
+
+fileDescriptionEntryClauses
+   : (FD | SD) cobolWord (DOT_FS? fileDescriptionEntryClause)* DOT_FS
    ;
 
 fileDescriptionEntryClause
@@ -606,7 +614,7 @@ recordContainsTo
    ;
 
 labelRecordsClause
-   : LABEL (RECORD IS? | RECORDS ARE?) (OMITTED | STANDARD | dataName+)
+   : LABEL (RECORD IS? | RECORDS ARE?) (OMITTED | STANDARD | dataName*)
    ;
 
 valueOfClause
@@ -3296,7 +3304,7 @@ idms_only_words
     | PAGE_INFO | PARMS | PERMANENT | PINK | PROTECTED
     | RED | REDISPATCH | RESETKBD | RESETMDT | RETENTION | RETRIEVAL | REPLY
     | RETURNKEY | REVERSE_VIDEO | RUN_UNIT
-    | SCREEN | SELECTIVE | SHORT | SIXTYFOURCR | SPAN
+    | SCREEN | SELECTIVE | SHORT | SIXTYFOURCR | SPAN | SCRATCH
     | STARTPAGE | STARTPRT | STGID | STORE | SCHEMA
     | TURQUOISE
     | UNDERSCORE | UNFORMATTED | UNPROTECTED

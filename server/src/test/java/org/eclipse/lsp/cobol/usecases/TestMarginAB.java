@@ -31,6 +31,12 @@ class TestMarginAB {
       "000000       IDENTIFICATION DIVISION.\n" // starting area B instead of A
           + "000000  PROGRAM-ID.    FILETOTEST.\n"
           + "000000  AUTHOR. SERGIU ILIE.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        INPUT-OUTPUT SECTION.\n"
+          + "        FILE-CONTROL.\n"
+          + "             SELECT TRANS-FILE-IN ASSIGN TO TEST \n"
+          + "             ORGANIZATION IS LINE SEQUENTIAL \n"
+          + "             ACCESS MODE IS SEQUENTIAL. \n"
           + "000000     DATA DIVISION.\n" // starting area B instead of A
           + "000000 FILE SECTION.\n"
           + "000000     FD  TRANS-FILE-IN\n" // FD starting in area B instead of A

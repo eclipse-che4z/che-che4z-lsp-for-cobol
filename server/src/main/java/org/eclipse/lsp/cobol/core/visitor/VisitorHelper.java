@@ -173,6 +173,17 @@ class VisitorHelper {
   }
 
   /**
+   * Retrieve the text in the initial representation including the hidden tokens from the passed interval.
+   *
+   * @param ctx the rule context that contains the required tokens
+   * @param interval the interval for the required string in the passed context.
+   * @return a string representation of the given context
+   */
+  public String getIntervalText(ParserRuleContext ctx, Interval interval) {
+    return ctx.getStart().getInputStream().getText(interval);
+  }
+
+  /**
    * Retrieve a locality from the given context with a range from the start to the end
    *
    * @param ctx ParserRuleContext to extract locality

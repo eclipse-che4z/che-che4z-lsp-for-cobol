@@ -1,4 +1,5 @@
 {
+    "cobol-lsp.logging.level.root": "DEBUG",
     "cobol-lsp.cpy-manager.profiles": "",
     "cobol-lsp.cpy-manager.paths-local": [
         ".copybooks/zowe-profile-1/DATA.SET.PATH1",

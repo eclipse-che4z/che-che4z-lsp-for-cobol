@@ -46,7 +46,7 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC174956 Copybook - not exist: error underlined', () => {
-    it(['smoke'], 'Checks that error lines are marked in a file', () => {
+    it(['smoke', 'CI'], 'Checks that error lines are marked in a file', () => {
       cy.openFile('USERC1F.cbl');
       cy.goToLine(19);
       cy.get('.squiggly-error')
@@ -76,7 +76,7 @@ context('This is a Copybook spec', () => {
 
   describe('TC174916 Copybook - recursive error', () => {
     it(
-      ['smoke'],
+      ['smoke', 'CI'],
       'Checks that when opening Cobol file which recursively refers to copybooks, copybook is underlined with an error',
       () => {
         cy.openFile('USERC1R.cbl');
@@ -128,7 +128,7 @@ context('This is a Copybook spec', () => {
 
   describe('TC174933 Copybook - invalid definition hint', () => {
     it(
-      ['smoke'],
+      ['smoke', 'CI'],
       'Checks that when opening Cobol file which uses invalid definition from copybook, has detailed hint on mouse hover',
       () => {
         cy.openFile('USERC1N2.cbl');
@@ -204,7 +204,7 @@ context('This is a Copybook spec', () => {
       cy.closeFolder('.copybooks');
     });
     it(
-      ['smoke'],
+      ['smoke', 'CI'],
       'Checks that LSP can dynamically detect appearance of copybook and rescan cobol file on the fly',
       () => {
         cy.readFile('test_files/project/.copybooks/zowe-profile-1/DATA.SET.PATH2/BOOK3T.cpy').then((text) => {
@@ -227,7 +227,7 @@ context('This is a Copybook spec', () => {
     });
 
     it(
-      ['smoke'],
+      ['smoke', 'CI'],
       'Checks that LSP can dynamically detect definitions from an appeared copybook and rescan cobol file on the fly',
       () => {
         cy.openFile('USERC1F.cbl').goToLine(42);
@@ -457,7 +457,7 @@ context('This is a Copybook spec', () => {
         input: 'փորձիր ինձ',
       },
     ].forEach((parameters) => {
-      it(parameters.test, () => {
+      it(['smoke'], parameters.test, () => {
         copyBookNotFound('UTF8');
         cy.writeFile('test_files/project/testing/UTF8', `            MOVE "${parameters.input}" TO ABC.`, {
           encoding: 'utf-8',
@@ -474,7 +474,7 @@ context('This is a Copybook spec', () => {
   });
 
   describe('Load resource file', () => {
-    it(['smoke'], 'Checks loading of resource file', () => {
+    it(['smoke', 'CI'], 'Checks loading of resource file', () => {
       cy.openFile('RES.cbl');
       cy.goToLine(6);
       cy.getCurrentLineErrors({ expectedLine: 6 })

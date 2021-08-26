@@ -29,8 +29,12 @@ class TestVaryingSupportForFileAssignment {
           + "       ENVIRONMENT DIVISION.\n"
           + "       INPUT-OUTPUT SECTION.\n"
           + "       FILE-CONTROL.\n"
-          + "           SELECT FICIN  ASSIGN TO VARYING Ficin-Name\n"
-          + "           ORGANIZATION sequential.\n";
+          + "           SELECT {$FICIN}  ASSIGN TO VARYING Ficin-Name\n"
+          + "           ORGANIZATION sequential.\n"
+          + "        DATA DIVISION. \n"
+          + "        FILE SECTION.\n"
+          + "        FD  {$*FICIN} \n"
+          + "           LABEL RECORDS ARE STANDARD. \n";
 
   @Test
   void test() {
