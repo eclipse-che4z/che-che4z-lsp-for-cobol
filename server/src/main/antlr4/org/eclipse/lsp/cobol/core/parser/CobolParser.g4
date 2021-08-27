@@ -2535,7 +2535,7 @@ serviceReloadStatement
 // snap statement
 
 snapStatement
-   : (SNAP | SNAP_TITLE IS? generalIdentifier) (ALL | SYSTEM | TASK)? idmsDmlFromClause*
+   : SNAP (TITLE IS? generalIdentifier)? (ALL | SYSTEM | TASK)? idmsDmlFromClause*
    ;
 
 // sort statement

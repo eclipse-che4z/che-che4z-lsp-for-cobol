@@ -133,6 +133,17 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
+  public void enterTitle(TitleContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitTitle(TitleContext ctx) {
+    pop();
+    accumulateExcludedStatementShift(ctx.getSourceInterval());
+  }
+
+  @Override
   public void enterCopyIdmsStatement(CopyIdmsStatementContext ctx) {
     push();
   }
