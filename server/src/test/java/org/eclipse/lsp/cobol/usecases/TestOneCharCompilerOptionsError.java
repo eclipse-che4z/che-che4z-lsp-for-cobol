@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 /** The test checks that missing one char compiler options produce a correct error message */
 class TestOneCharCompilerOptionsError {
   private static final String TEXT =
-      "   CBL NUMPROC(MIG),FLAG({)|1},RENT\n"
+      "   CBL ZONEDATA(MIG),FLAG({)|1},RENT\n"
           + "       ID DIVISION.\n"
           + "       PROGRAM-ID. EPSCSMRT.\n"
           + "       DATA DIVISION.\n"

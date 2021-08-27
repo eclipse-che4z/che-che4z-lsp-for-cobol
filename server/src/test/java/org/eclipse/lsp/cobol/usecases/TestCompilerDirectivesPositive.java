@@ -32,10 +32,10 @@ class TestCompilerDirectivesPositive {
 
   private static final String PROCESS_WITHOUT_NUMBER = "PROCESS DATA(24),RMODE(24),NODYNAM\r\n";
   private static final String PROCESS_WITH_NUMBER = "012345 PROCESS DATA(24),RMODE(24),NODYNAM\r\n";
-  private static final String CBL_WITHOUT_NUMBERS = "  cbl LIB,QUOTE,NODYNAM,TEST(SEP)\r\n";
+  private static final String CBL_WITHOUT_NUMBERS = "  cbl LIST,QUOTE,NODYNAM,TEST(SEP)\r\n";
   private static final String CBL_WITH_NUMBER = "012345 CBL DATA(24),RMODE(24),NODYNAM\r\n";
   private static final String CBL_WITH_LONG_LINE =
-      "  CBL LIB,QUOTE,NODYNAM,TEST(SEP)                                       00010003\r\n";
+      "  CBL LIST,QUOTE,NODYNAM,TEST(SEP)                                      00010003\r\n";
 
   private static final String FOLLOWING_TEXT =
       "000000 Identification DIVISION.                                         23323232\r\n"

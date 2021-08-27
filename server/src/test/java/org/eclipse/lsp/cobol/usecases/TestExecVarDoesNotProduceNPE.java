@@ -51,9 +51,9 @@ class TestExecVarDoesNotProduceNPE {
                 "Syntax error on 'EXEC' expected {BINARY, BLANK, COMP, COMPUTATIONAL, COMPUTATIONAL-1, "
                     + "COMPUTATIONAL-2, COMPUTATIONAL-3, COMPUTATIONAL-4, COMPUTATIONAL-5, COMP-1, COMP-2, COMP-3, "
                     + "COMP-4, COMP-5, DISPLAY, DISPLAY-1, DYNAMIC, EXTERNAL, FILLER, FUNCTION-POINTER, GLOBAL, "
-                    + "GROUP-USAGE, INDEX, IS, JUST, JUSTIFIED, LEADING, NATIONAL, OCCURS, PACKED-DECIMAL, PIC, "
-                    + "PICTURE, POINTER, POINTER-32, PROCEDURE-POINTER, REDEFINES, SIGN, SYNC, SYNCHRONIZED, "
-                    + "TRAILING, USAGE, UTF-8, VALUE, VALUES, VOLATILE, '.', IDENTIFIER}",
+                    + "GROUP-USAGE, INDEX, IS, JUST, JUSTIFIED, LEADING, OCCURS, PACKED-DECIMAL, PIC, PICTURE, "
+                    + "POINTER, POINTER-32, PROCEDURE-POINTER, REDEFINES, SIGN, SYNC, SYNCHRONIZED, TRAILING, USAGE, "
+                    + "UTF-8, VALUE, VALUES, '.', IDENTIFIER}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText()),
             "3",
