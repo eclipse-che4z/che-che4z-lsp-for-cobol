@@ -33,7 +33,7 @@ class TestPerformWithoutEndNotCauseNPE {
           + "       01 {$*PARENT}.\n"
           + "         02 {$*CHILD} PIC 9. \n"
           + "       PROCEDURE DIVISION.\n"
-          + "           PERFORM MOVE 0 TO CHILD {OF|1} PARENT{.|2|3}";
+          + "           PERFORM MOVE 0 TO {$CHILD} OF {$PARENT}{.|1}";
 
   @Test
   void test() {
@@ -44,19 +44,7 @@ class TestPerformWithoutEndNotCauseNPE {
             "1",
             new Diagnostic(
                 null,
-                "Variable OF is not defined",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
-            "2",
-            new Diagnostic(
-                null,
-                "No viable alternative at input PARENT.",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
-            "3",
-            new Diagnostic(
-                null,
-                "No viable alternative at input CHILD OF PARENT.",
+                "Extraneous input '.' expected END-PERFORM",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

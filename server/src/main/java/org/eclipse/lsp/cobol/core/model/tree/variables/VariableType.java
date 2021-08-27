@@ -25,5 +25,7 @@ public enum VariableType {
   MULTI_TABLE_DATA_NAME,
   RENAME_ITEM,
   TABLE_DATA_NAME,
-  MAP_NAME
+  MAP_NAME,
+  FD,
+  SD
 }

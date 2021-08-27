@@ -52,8 +52,9 @@ class TestAsteriskBeforeCopyDoesntBreakAnalysis {
             "1",
             new Diagnostic(
                 null,
-                "Syntax error on '*' expected {<EOF>, CBL, IDENTIFICATION, LOCAL-STORAGE, WORKING-STORAGE, END, "
-                    + "EXEC, FILE, ID, LINKAGE, MAP, PROCEDURE, PROCESS, SCHEMA, SQL, 'EXEC SQL', '01-49', '66', '77', '88'}",
+                "Syntax error on '*' expected {<EOF>, CBL, END, EXEC, 'EXEC SQL', FILE, ID, "
+                    + "IDENTIFICATION, LINKAGE, LOCAL-STORAGE, MAP, PROCEDURE, PROCESS, SCHEMA, SQL, "
+                    + "WORKING-STORAGE, '01-49', '66', '77', '88'}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

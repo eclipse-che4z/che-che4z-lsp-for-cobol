@@ -17,17 +17,14 @@ lexer grammar TechnicalLexer;
 // This grammar should not contains any explicit token declaration.
 // There should be only symbols, literal patterns, and fragments.
 // The purpose of this file is to allow similar parsing by the preprocessor and parser.
-// All the token declarations that are common to several lexers should belong to CommonCobolLexer.
+// All the token declarations that are common to several lexers should be duplicated to the appropriate lexers.
 
 // symbols
-AMPCHAR : '&';
 ASTERISKCHAR : '*';
 DOUBLEASTERISKCHAR : '**';
 COLONCHAR : ':';
-COMMA_EOF : ',' EOF -> skip;
 COMMACHAR : ',';
 COMMENTTAG : '*>';
-COMMENTENTRYTAG : '*>CE';
 DOLLARCHAR : '$';
 DOUBLEQUOTE : '"';
 
@@ -73,7 +70,6 @@ HEX_NUMBERS : HEXNUMBER;
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
-COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*  -> channel(HIDDEN);
 WS : [ \t\f]+ -> channel(HIDDEN);
 
 //SQL comments

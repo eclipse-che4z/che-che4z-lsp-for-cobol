@@ -33,7 +33,8 @@ public enum StructureType {
   INDEX_NAME("variables.indexName"),
   GROUP_ITEM("variables.groupItem"),
   INDEPENDENT_ITEM("variables.independent"),
-  MAP_NAME("variables.mapName");
+  MAP_NAME("variables.mapName"),
+  FILE_DESCRIPTOR_NAME("variable.fdSd");
 
   @Getter private final MessageTemplate template;
 

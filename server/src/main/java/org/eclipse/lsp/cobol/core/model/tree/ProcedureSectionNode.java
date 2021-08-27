@@ -23,13 +23,8 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class ProcedureSectionNode extends Node {
-  String name;
-  String text;
-
-  public ProcedureSectionNode(Locality location, String name, String text) {
-    super(location, NodeType.PROCEDURE_SECTION);
-    this.name = name;
-    this.text = text;
+public class ProcedureSectionNode extends CodeBlockDefinitionNode {
+  public ProcedureSectionNode(Locality location, String name, String text, Locality definition) {
+    super(location, name, text, definition, NodeType.PROCEDURE_SECTION);
   }
 }

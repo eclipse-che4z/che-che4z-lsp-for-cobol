@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.antlr.v4.runtime.Token;
+import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.model.DocumentMapping;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
@@ -92,6 +93,7 @@ class LocalityMappingUtilsTest {
             ProcessingConstants.CPY_ENTER_TAG
                 + copybook
                 + ProcessingConstants.CPY_URI_CLOSE);
+    when(enter.getTokenSource()).thenReturn(new CobolLexer(null));
     // COPYEXIT should move the previous to the previous document level
     when(exit.getType()).thenReturn(COPYEXIT);
 

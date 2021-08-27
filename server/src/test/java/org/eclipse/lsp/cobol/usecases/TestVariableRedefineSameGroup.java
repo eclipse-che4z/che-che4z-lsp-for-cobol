@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels.ERROR;
 
 /** This test checks that redefined variable has the same group */
-public class TestVariableRedefineSameGroup {
+class TestVariableRedefineSameGroup {
   private static final String REDEFINES_SAME_GROUP =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.      EMPPROJ.\n"

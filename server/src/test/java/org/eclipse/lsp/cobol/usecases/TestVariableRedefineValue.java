@@ -26,7 +26,7 @@ import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLeve
 /**
  * This test checks that redefined variable can not contain VALUE clause
  */
-public class TestVariableRedefineValue {
+class TestVariableRedefineValue {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. PERFTIMI.\n"

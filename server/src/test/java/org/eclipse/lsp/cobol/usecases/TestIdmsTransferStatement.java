@@ -29,9 +29,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 /** Test IDMS TRANSFER DML statement */
-public class TestIdmsTransferStatement {
+class TestIdmsTransferStatement {
 
-  private static final String MESSAGE_1 = "Syntax error on 'DISPLAY' expected {'.', SEMICOLON-FS}";
+  private static final String MESSAGE_1 = "Syntax error on 'DISPLAY' expected {'.', ';'}";
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"

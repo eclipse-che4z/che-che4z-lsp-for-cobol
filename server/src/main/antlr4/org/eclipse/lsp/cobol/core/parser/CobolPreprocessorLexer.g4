@@ -56,9 +56,6 @@ SKIP1 : S K I P '1' DOT_FS? -> channel(HIDDEN);
 SKIP2 : S K I P '2' DOT_FS? -> channel(HIDDEN);
 SKIP3 : S K I P '3' DOT_FS? -> channel(HIDDEN);
 
-// compiler directive tokens
-TITLESTATEMENT : (TITLE ' '+ .*? NEWLINE)  ;
-
 CONTROL_DIRECTIVE: ASTERISKCHAR (CONTROL | CBL) ((' '| COMMACHAR)
                   (SOURCE | NO SOURCE | LIST | NO LIST | MAP | NO MAP
                   | IDENTIFIER? ))+  DOT_FS?;
@@ -92,4 +89,3 @@ LParIntegralRPar: LPARENCHAR INTEGERLITERAL RPARENCHAR;
 fragment PICTUREPeriodAcceptables: ('0'|'9'|B|Z|CR|DB|ASTERISKCHAR|COMMACHAR|MINUSCHAR|PLUSCHAR|SLASHCHAR);
 fragment PICTURECharAcceptedMultipleTime: (A|G|N|P|X|DOLLARCHAR|PICTUREPeriodAcceptables);
 fragment PICTURECharAcceptedOneTime: (V|E|S|CR|DB);
-fragment SSMinusChar: S U B S C H E M A MINUSCHAR;

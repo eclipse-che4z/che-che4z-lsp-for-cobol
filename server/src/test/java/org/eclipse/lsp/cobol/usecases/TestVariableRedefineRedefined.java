@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This test checks that redefined item can not be redefined
  */
-public class TestVariableRedefineRedefined {
+class TestVariableRedefineRedefined {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. PERFTIMI.\n"

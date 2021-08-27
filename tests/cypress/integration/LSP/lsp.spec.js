@@ -550,4 +550,46 @@ context('This is a LSP spec', () => {
       cy.getLineByNumber(23).should('not.have.class', '.squiggly-error');
     });
   });
+
+  describe('TC328483 support floating comment indicators (*>)', () => {
+    function checkForErrors(lineNumber) {
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      return cy
+        .goToLine(lineNumber)
+        .getLineByNumber(lineNumber)
+        .should('not.have.class', '.squiggly-error')
+        .getLineByNumber(lineNumber)
+        .should('not.have.class', '.squiggly-warning');
+    }
+
+    function expectErrors(lineNumber) {
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      return cy.goToLine(lineNumber).getCurrentLineErrors({ expectedLine: lineNumber });
+    }
+
+    function addComment(lineNumber, comment) {
+      return cy.openFile('USER2.cbl').getLineByNumber(lineNumber).type(comment);
+    }
+    it(['smoke'], 'support floating comment indicators (*>) - with space', () => {
+      addComment(26, "      *> ---- Let's have a comment with space");
+      checkForErrors(26);
+    });
+    it(['smoke'], 'support floating comment indicators (*>) - without space', () => {
+      addComment(26, "      *>---- Let's have a comment without space");
+      checkForErrors(26);
+    });
+
+    it(['smoke'], 'support floating comment indicators (*>) - comment in non-empty string', () => {
+      addComment(29, '{end} *> here');
+      checkForErrors(29);
+    });
+    it(['smoke'], 'support floating comment indicators (*>) - comment in non-empty string with expected error', () => {
+      addComment(29, '{end} *>');
+      expectErrors(29);
+    });
+    it(['smoke'], 'support floating comment indicators (*>) - out of 80 characters', () => {
+      addComment(29, '{end} *> ddddddddddddddddddddddddddddddddddddddddddd');
+      expectErrors(29);
+    });
+  });
 });

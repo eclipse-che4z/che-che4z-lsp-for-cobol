@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.core.visitor;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Streams;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -27,6 +26,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.core.CobolParser;
@@ -37,10 +37,12 @@ import org.eclipse.lsp.cobol.core.model.tree.*;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetToOnOffStatement;
 import org.eclipse.lsp.cobol.core.model.tree.statements.SetUpDownByStatement;
-import org.eclipse.lsp.cobol.core.model.tree.variables.*;
+import org.eclipse.lsp.cobol.core.model.tree.variables.OccursClause;
+import org.eclipse.lsp.cobol.core.model.tree.variables.ValueClause;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNode.Builder;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
-import org.eclipse.lsp.cobol.core.semantics.GroupContext;
 import org.eclipse.lsp.cobol.core.semantics.NamedSubContext;
 import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
@@ -54,7 +56,6 @@ import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
@@ -77,31 +78,31 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private final List<SyntaxError> errors = new ArrayList<>();
   private final PredefinedVariableContext constants = new PredefinedVariableContext();
-  private final GroupContext groupContext = new GroupContext();
   private final Multimap<String, Location> subroutineUsages = HashMultimap.create();
   private final NamedSubContext copybooks;
   private final CommonTokenStream tokenStream;
   private final OutlineTreeBuilder outlineTreeBuilder;
-  private final Map<Token, Locality> positionMapping;
+  private final Map<Token, Locality> positions;
   private final Map<Token, EmbeddedCode> embeddedCodeParts;
   private final MessageService messageService;
   private final SubroutineService subroutineService;
+  private Map<String, FileControlEntryContext> fileControls = null;
 
   public CobolVisitor(
       @NonNull String documentUri,
       @NonNull NamedSubContext copybooks,
       @NonNull CommonTokenStream tokenStream,
-      @NonNull Map<Token, Locality> positionMapping,
+      @NonNull Map<Token, Locality> positions,
       Map<Token, EmbeddedCode> embeddedCodeParts,
       MessageService messageService,
       SubroutineService subroutineService) {
     this.copybooks = copybooks;
-    this.positionMapping = positionMapping;
+    this.positions = positions;
     this.embeddedCodeParts = embeddedCodeParts;
     this.tokenStream = tokenStream;
     this.messageService = messageService;
     this.subroutineService = subroutineService;
-    outlineTreeBuilder = new OutlineTreeBuilder(documentUri, positionMapping);
+    outlineTreeBuilder = new OutlineTreeBuilder(documentUri, positions);
   }
 
   /**
@@ -112,15 +113,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
    */
   @NonNull
   public ResultWithErrors<SemanticContext> finishAnalysis() {
-    errors.addAll(groupContext.generateParagraphErrors(messageService));
     return new ResultWithErrors<>(
         SemanticContext.builder()
-            .paragraphDefinitions(groupContext.getParagraphDefinitions())
-            .paragraphUsages(groupContext.getParagraphUsages())
-            .paragraphRanges(groupContext.getParagraphRanges())
-            .sectionDefinitions(groupContext.getSectionDefinitions())
-            .sectionUsages(groupContext.getSectionUsages())
-            .sectionRanges(groupContext.getSectionRanges())
             .constants(constants)
             .copybookDefinitions(copybooks.getDefinitions().asMap())
             .copybookUsages(copybooks.getUsages().asMap())
@@ -134,7 +128,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitStartRule(StartRuleContext ctx) {
     // we can skip the other nodes, but not the root
-    return retrieveRangeLocality(ctx, positionMapping)
+    return retrieveRangeLocality(ctx, positions)
         .map(
             locality -> {
               Node rootNode = new RootNode(locality);
@@ -159,7 +153,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         .map(PreprocessorStringUtils::trimQuotes)
         .ifPresent(
             name -> {
-              retrieveRangeLocality(ctx, positionMapping)
+              retrieveRangeLocality(ctx, positions)
                   .ifPresent(locality -> result.add(new ProgramIdNode(locality, name)));
               outlineTreeBuilder.renameProgram(name, ctx);
               outlineTreeBuilder.addNode(PROGRAM_ID_PREFIX + name, NodeType.PROGRAM_ID, ctx);
@@ -216,60 +210,64 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitProgramUnit(ProgramUnitContext ctx) {
     outlineTreeBuilder.addProgram(ctx);
+    fileControls = new HashMap<>();
     return addTreeNode(ctx, locality -> new ProgramNode(locality, messageService));
   }
 
   @Override
   public List<Node> visitProcedureSection(ProcedureSectionContext ctx) {
     throwWarning(ctx.getStart());
-    addSectionRange(ctx);
-    outlineTreeBuilder.addNode(ctx.getStart().getText(), NodeType.PROCEDURE_SECTION, ctx);
 
     String name = ctx.getStart().getText().toUpperCase();
-    getLocality(ctx.getStart())
-        .ifPresent(locality -> groupContext.addSectionDefinition(name, locality));
-    return addTreeNode(
-        ctx,
-        locality ->
-            new ProcedureSectionNode(locality, ctx.getStart().getText(), getIntervalText(ctx)));
+    outlineTreeBuilder.addNode(name, NodeType.PROCEDURE_SECTION, ctx);
+    return getLocality(ctx.getStart())
+        .map(
+            def ->
+                addTreeNode(
+                    ctx,
+                    locality ->
+                        new ProcedureSectionNode(locality, name, getIntervalText(ctx), def)))
+        .orElseGet(() -> visitChildren(ctx));
   }
 
   @Override
   public List<Node> visitParagraph(ParagraphContext ctx) {
     areaAWarning(ctx.getStart());
-    addParagraphRange(ctx);
 
-    outlineTreeBuilder.addNode(ctx.getStart().getText(), NodeType.PROCEDURE, ctx);
-    String name = ctx.paragraphName().getText();
-    return addTreeNode(ctx, locality -> new ParagraphNode(locality, name, getIntervalText(ctx)));
-  }
-
-  private void addSectionRange(ParserRuleContext ctx) {
-    String name = ctx.getStart().getText().toUpperCase();
-    getRange(ctx).ifPresent(range -> groupContext.addSectionRange(name, range));
-  }
-
-  private void addParagraphRange(ParserRuleContext ctx) {
-    String name = ctx.getStart().getText().toUpperCase();
-    getRange(ctx).ifPresent(range -> groupContext.addParagraphRange(name, range));
-  }
-
-  private Optional<Location> getRange(ParserRuleContext ctx) {
-    Optional<Locality> start = getLocality(ctx.getStart());
-    Optional<Locality> end = getLocality(ctx.getStop());
-
-    if (start.isPresent() && end.isPresent()) {
-      Range range = new Range(start.get().getRange().getStart(), end.get().getRange().getEnd());
-      return Optional.of(new Location(start.get().getUri(), range));
-    }
-    return Optional.empty();
+    String name = ctx.paragraphDefinitionName().getText().toUpperCase();
+    outlineTreeBuilder.addNode(name, NodeType.PROCEDURE, ctx);
+    return getLocality(ctx.getStart())
+        .map(
+            def ->
+                addTreeNode(
+                    ctx, locality -> new ParagraphNode(locality, name, getIntervalText(ctx), def)))
+        .orElseGet(() -> visitChildren(ctx));
   }
 
   @Override
   public List<Node> visitFileDescriptionEntry(FileDescriptionEntryContext ctx) {
     areaAWarning(ctx.getStart());
-    outlineTreeBuilder.addNode(ctx.fileName().getText(), NodeType.FILE, ctx);
-    return visitChildren(ctx);
+    String fileControlClause = "";
+    String fileName = getName(ctx.fileDescriptionEntryClauses().cobolWord());
+    if (fileControls.containsKey(fileName)) {
+      FileControlEntryContext fileControlEntryContext = fileControls.remove(fileName);
+      fileControlClause = getIntervalText(fileControlEntryContext.fileControlClauses());
+    }
+    outlineTreeBuilder.addNode(
+        ctx.fileDescriptionEntryClauses().cobolWord().getText(), NodeType.FILE, ctx);
+    return addTreeNode(
+        VariableDefinitionNode.builder()
+            .level(LEVEL_FD_SD)
+            .variableNameAndLocality(
+                extractNameAndLocality(ctx.fileDescriptionEntryClauses().cobolWord()))
+            .statementLocality(
+                retrieveRangeLocality(ctx.fileDescriptionEntryClauses().cobolWord(), positions)
+                    .orElse(null))
+            .fileDescriptor(getIntervalText(ctx.fileDescriptionEntryClauses()))
+            .fileControlClause(fileControlClause)
+            .isSortDescription(Objects.nonNull(ctx.fileDescriptionEntryClauses().SD()))
+            .build(),
+        visitChildren(ctx));
   }
 
   /**
@@ -322,9 +320,33 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitSelectClause(SelectClauseContext ctx) {
-    outlineTreeBuilder.addNode(ctx.fileName().getText(), NodeType.FILE, ctx);
+  public List<Node> visitFileControlEntry(FileControlEntryContext ctx) {
+    String filename = VisitorHelper.getName(ctx.selectClause().fileName());
+    if (StringUtils.isNotBlank(filename)) {
+      outlineTreeBuilder.addNode(filename, NodeType.FILE, ctx);
+      checkFileControlUniqueness(ctx, filename);
+    }
     return visitChildren(ctx);
+  }
+
+  private void checkFileControlUniqueness(FileControlEntryContext ctx, String filename) {
+    getLocality(ctx.selectClause().fileName().getStart())
+        .ifPresent(
+            locality -> {
+              if (fileControls.containsKey(filename.toUpperCase())) {
+                SyntaxError error =
+                    SyntaxError.syntaxError()
+                        .suggestion(
+                            messageService.getMessage("CobolVisitor.duplicateFileName", filename))
+                        .severity(ErrorSeverity.ERROR)
+                        .locality(locality)
+                        .build();
+                errors.add(error);
+                LOG.debug("Syntax error by CobolVisitor#visitSelectClause: {}", error);
+              } else {
+                fileControls.put(filename.toUpperCase(), ctx);
+              }
+            });
   }
 
   @Override
@@ -365,7 +387,16 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitExecCicsStatement(ExecCicsStatementContext ctx) {
     areaBWarning(ctx);
-    return visitChildren(ctx);
+    EmbeddedCode code = embeddedCodeParts.get(ctx.cicsRules().getStart());
+    // apply area B check for tokens provided by a specific lexer
+    areaBWarning(code.getTokens());
+    return getLocality(ctx.getStart())
+        .<List<Node>>map(
+            it ->
+                ImmutableList.of(
+                    new EmbeddedCodeNode(
+                        it, code.getTokenStream(), code.getTree(), EmbeddedCodeNode.Language.CICS)))
+        .orElse(ImmutableList.of());
   }
 
   @Override
@@ -396,28 +427,19 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitPerformStatement(PerformStatementContext ctx) {
-    final PerformProcedureStatementContext procStatement = ctx.performProcedureStatement();
-    final PerformInlineStatementContext inlineStatement = ctx.performInlineStatement();
-    if (procStatement != null) {
-      ProcedureNameContext procedureNameContext = procStatement.procedureName().get(0);
-      final String section =
-          procedureNameContext.inSection() != null
-              ? procedureNameContext.inSection().sectionName().getText()
-              : null;
-      final String targetName = procedureNameContext.paragraphNameUsage().getText();
-      return addTreeNode(ctx, locality -> new PerformNode(locality, section, targetName));
-    }
-    if (inlineStatement != null) {
-      return addTreeNode(ctx, PerformNode::new);
-    }
-    return super.visitPerformStatement(ctx);
+  public List<Node> visitPerformInlineStatement(PerformInlineStatementContext ctx) {
+    return addTreeNode(ctx, PerformNode::new);
   }
 
   @Override
-  public List<Node> visitPerformInlineStatement(PerformInlineStatementContext ctx) {
-    throwWarning(ctx.getStart());
-    return visitChildren(ctx);
+  public List<Node> visitPerformProcedureStatement(PerformProcedureStatementContext ctx) {
+    ProcedureNameContext procedureNameContext = ctx.procedureName().get(0);
+    final String section =
+        procedureNameContext.inSection() != null
+            ? procedureNameContext.inSection().sectionName().getText()
+            : null;
+    final String targetName = procedureNameContext.paragraphName().getText();
+    return addTreeNode(ctx, locality -> new PerformNode(locality, section, targetName));
   }
 
   @Override
@@ -434,10 +456,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitParagraphName(ParagraphNameContext ctx) {
-    String name = ctx.getText().toUpperCase();
-    getLocality(ctx.getStart())
-        .ifPresent(locality -> groupContext.addParagraphDefinition(name, locality));
-    return visitChildren(ctx);
+    return addTreeNode(
+        ctx, locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx)));
   }
 
   @Override
@@ -452,11 +472,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                   VariableDefinitionNode.builder()
                       .level(LEVEL_MAP_NAME)
                       .variableNameAndLocality(varName)
-                      .statementLocality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
+                      .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null))
                       .build(),
                   visitChildren(ctx));
             })
-        .orElse(visitChildren(ctx));
+        .orElseGet(() -> visitChildren(ctx));
   }
 
   @Override
@@ -469,7 +489,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         VariableDefinitionNode.builder()
             .level(level)
             .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER()))
-            .statementLocality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
+            .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null))
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
             .global(!ctx.dataGlobalClause().isEmpty())
             .picClauses(retrievePicTexts(ctx.dataPictureClause()))
@@ -514,7 +534,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .level(LEVEL_66)
             .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_66()))
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
-            .statementLocality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
+            .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null))
             .renamesClause(extractNameAndLocality(ctx.dataRenamesClause().dataName()));
     ofNullable(ctx.dataRenamesClause().thruDataName())
         .map(ThruDataNameContext::dataName)
@@ -532,7 +552,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .level(LEVEL_88)
             .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_88()))
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
-            .statementLocality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
+            .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null))
             .valueClauses(retrieveValues(ImmutableList.of(ctx.dataValueClause())))
             .valueToken(retrieveValueToken(ctx.dataValueClause().valueIsToken()))
             .build(),
@@ -558,7 +578,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .level(LEVEL_77)
             .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_77()))
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
-            .statementLocality(retrieveRangeLocality(ctx, positionMapping).orElse(null))
+            .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null))
             .global(!ctx.dataGlobalClause().isEmpty())
             .picClauses(retrievePicTexts(ctx.dataPictureClause()))
             .valueClauses(retrieveValues(ctx.dataValueClause()))
@@ -575,13 +595,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         visitChildren(ctx));
   }
 
-  @Override
-  public List<Node> visitParagraphNameUsage(ParagraphNameUsageContext ctx) {
-    String name = ctx.getText().toUpperCase();
-    getLocality(ctx.getStart()).ifPresent(l -> groupContext.addCandidateUsage(name, l));
-    return visitChildren(ctx);
-  }
-
   private List<DocumentSymbol> buildOutlineTree() {
     return outlineTreeBuilder.build(copybooks.getUsages());
   }
@@ -589,7 +602,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitSetUpDownByStatement(SetUpDownByStatementContext ctx) {
     List<Locality> receivingFields = mapRulesToLocalities(ctx.receivingField());
-    Locality sendingField = positionMapping.get(ctx.sendingField().getStart());
+    Locality sendingField = positions.get(ctx.sendingField().getStart());
     String literal =
         ofNullable(ctx.sendingField().literal()).map(ParserRuleContext::getText).orElse(null);
     return addTreeNode(
@@ -613,76 +626,34 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitQualifiedDataNameFormat1(QualifiedDataNameFormat1Context ctx) {
-    return addVariableUsage(ctx.dataName(), ctx, createParentsList(ctx.inData(), ctx.inTable()));
-  }
-
-  @Override
-  public List<Node> visitConditionNameReference(ConditionNameReferenceContext ctx) {
+  public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
     return addVariableUsage(
-        ctx.dataName(), ctx, createParentsList(ctx.inData(), ImmutableList.of()));
+        ctx.dataName(), visitChildren(ctx), ctx.inData().stream().map(InDataContext::dataName));
   }
 
   @Override
   public List<Node> visitIdms_map_name(Idms_map_nameContext ctx) {
-    return addVariableUsage(ctx.dataName(), ctx);
+    return addVariableUsage(ctx.dataName(), visitChildren(ctx), Stream.empty());
   }
 
   @Override
   public List<Node> visitIdms_db_entity_name(Idms_db_entity_nameContext ctx) {
-    return addVariableUsage(ctx.dataName(), ctx);
+    return addVariableUsage(ctx.dataName(), visitChildren(ctx), Stream.empty());
   }
 
   @Override
   public List<Node> visitIdms_procedure_name(Idms_procedure_nameContext ctx) {
-    return addVariableUsage(ctx.dataName(), ctx);
+    return addVariableUsage(ctx.dataName(), visitChildren(ctx), Stream.empty());
   }
 
   @Override
-  public List<Node> visitTableCall(TableCallContext ctx) {
-    return addVariableUsage(ctx.dataName(), ctx);
+  public List<Node> visitFileName(FileNameContext ctx) {
+    return addVariableUsage(ctx.cobolWord(), visitChildren(ctx), Stream.empty());
   }
 
   private List<Node> addVariableUsage(
-      ParserRuleContext nameContext, ParserRuleContext parentContext) {
-    return addVariableUsage(nameContext, parentContext, ImmutableList.of());
-  }
-
-  private List<Node> addVariableUsage(
-      ParserRuleContext nameContext,
-      ParserRuleContext parentContext,
-      List<VariableNameAndLocality> hierarchy) {
-    String dataName = getName(nameContext);
-    List<Node> result = new ArrayList<>();
-    getLocality(nameContext.getStart())
-        .ifPresent(
-            locality -> {
-              if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
-              else {
-                result.add(new VariableUsageNode(dataName, locality, hierarchy));
-              }
-            });
-    result.addAll(visitChildren(parentContext));
-    return result;
-  }
-
-  private List<VariableNameAndLocality> createParentsList(
-      List<InDataContext> inData, List<InTableContext> inTable) {
-    return retrieveDataNames(inData, inTable)
-        .map(
-            it ->
-                getLocality(it.getStart())
-                    .map(loc -> new VariableNameAndLocality(it.getText().toUpperCase(), loc))
-                    .orElse(null))
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
-  }
-
-  private Stream<DataNameContext> retrieveDataNames(
-      List<InDataContext> inData, List<InTableContext> inTable) {
-    return Streams.concat(
-        inData.stream().map(InDataContext::dataName),
-        inTable.stream().map(InTableContext::tableCall).map(TableCallContext::dataName));
+      ParserRuleContext ctx, List<Node> children, Stream<ParserRuleContext> hierarchy) {
+    return VisitorHelper.createVariableUsage(positions, constants, ctx, children, hierarchy);
   }
 
   @Override
@@ -706,14 +677,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitGoToStatement(GoToStatementContext ctx) {
-    GoToStatementSimpleContext goToStatementSimpleContext = ctx.goToStatementSimple();
-    if (goToStatementSimpleContext == null) {
-      return visitChildren(ctx);
-    }
-    List<String> targets =
-        Collections.singletonList(
-            goToStatementSimpleContext.procedureName().paragraphNameUsage().getText());
-    return addTreeNode(ctx, locality -> new GoToNode(locality, targets));
+    return addTreeNode(
+        ctx,
+        locality ->
+            new GoToNode(
+                locality,
+                ctx.procedureName().stream()
+                    .map(ProcedureNameContext::paragraphName)
+                    .map(ParserRuleContext::getText)
+                    .collect(toList())));
   }
 
   @Override
@@ -789,7 +761,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private Optional<Locality> getLocality(Token childToken) {
-    return ofNullable(positionMapping.get(childToken));
+    return ofNullable(positions.get(childToken));
   }
 
   private void reportSubroutineNotDefined(String name, Locality locality) {
@@ -878,10 +850,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
-    List<Node> children = visitChildren(ctx);
-    return retrieveRangeLocality(ctx, positionMapping)
-        .map(constructNode(nodeConstructor, children))
-        .orElse(children);
+    return VisitorHelper.createTreeNode(positions, visitChildren(ctx), ctx, nodeConstructor);
   }
 
   private List<Node> addTreeNode(Node node, List<Node> children) {
@@ -915,7 +884,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private VariableNameAndLocality extractNameAndLocality(CobolWordContext context) {
     return new VariableNameAndLocality(
-        getName(context), retrieveRangeLocality(context, positionMapping).orElse(null));
+        getName(context), retrieveRangeLocality(context, positions).orElse(null));
   }
 
   private List<OccursClause> retrieveOccursValues(List<DataOccursClauseContext> contexts) {
@@ -943,10 +912,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private ValueClause retrieveValue(DataValueClauseContext context) {
     return new ValueClause(
         retrieveValueIntervals(context.dataValueClauseLiteral().dataValueInterval()),
-        positionMapping.get(context.getStart()));
+        positions.get(context.getStart()));
   }
 
   private Locality getLevelLocality(TerminalNode terminalNode) {
-    return positionMapping.get(terminalNode.getSymbol());
+    return positions.get(terminalNode.getSymbol());
   }
 }

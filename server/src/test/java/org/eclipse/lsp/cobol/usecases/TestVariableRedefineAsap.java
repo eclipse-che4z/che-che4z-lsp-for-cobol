@@ -26,7 +26,7 @@ import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLeve
 /**
  * This test checks that redefined variable should immediately follow
  */
-public class TestVariableRedefineAsap {
+class TestVariableRedefineAsap {
   private static final String REDEFINES_SHOULD_FOLLOW =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. PERFTIMI.\n"

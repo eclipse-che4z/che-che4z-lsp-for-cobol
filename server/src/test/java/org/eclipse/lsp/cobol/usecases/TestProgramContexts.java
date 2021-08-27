@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  * This test checks that the second program in one file can use the same name for variable
  * declaration as the first program.
  */
-public class TestProgramContexts {
+class TestProgramContexts {
   private static final String TEXT_SEQUENTIAL_PROGRAMS =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. FIRST.\n"

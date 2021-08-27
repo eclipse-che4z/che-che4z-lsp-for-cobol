@@ -29,9 +29,8 @@ import java.util.Collection;
 @Value
 public class NamedSubContext implements SubContext<String> {
 
-  private final Multimap<String, Location> definitions = HashMultimap.create();
-
-  private final Multimap<String, Location> usages = HashMultimap.create();
+  Multimap<String, Location> definitions = HashMultimap.create();
+  Multimap<String, Location> usages = HashMultimap.create();
 
   @Override
   public void define(String name, Location location) {

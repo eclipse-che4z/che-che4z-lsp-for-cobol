@@ -41,6 +41,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 @UtilityClass
 @Slf4j
 public class VariableDefinitionUtil {
+  public static final int LEVEL_FD_SD = -2;
   public static final int LEVEL_MAP_NAME = -1;
   public static final int LEVEL_MNEMONIC = 0;
   public static final int LEVEL_01 = 1;
@@ -49,6 +50,7 @@ public class VariableDefinitionUtil {
   public static final int LEVEL_88 = 88;
   public static final int AREA_A_FINISH = 10;
 
+  public static final String FD_WITHOUT_FILE_CONTROL = "semantics.noFileControl";
   public static final String EMPTY_STRUCTURE_MSG = "semantics.emptyStructure";
   public static final String TOO_MANY_CLAUSES_MSG = "semantics.tooManyClauses";
   public static final String PREVIOUS_WITHOUT_PIC_FOR_88 = "semantics.previousWithoutPicFor88";
@@ -67,6 +69,7 @@ public class VariableDefinitionUtil {
   public static final ErrorSeverity SEVERITY = ERROR;
   private final List<Function<VariableDefinitionNode, ResultWithErrors<VariableNode>>> matchers =
       ImmutableList.of(
+          VariableDefinitionUtil::fdMatcher,
           VariableDefinitionUtil::renameItemMatcher,
           VariableDefinitionUtil::conditionalDataNameMatcher,
           VariableDefinitionUtil::mnemonicNameMatcher,
@@ -200,6 +203,16 @@ public class VariableDefinitionUtil {
     createVariableNameNode(variable, definitionNode.getVariableName());
     return new ResultWithErrors<>(
         variable, processRenamesBoundaries(variable, group, definitionNode));
+  }
+
+  private ResultWithErrors<VariableNode> fdMatcher(VariableDefinitionNode definitionNode) {
+    if (definitionNode.getLevel() == LEVEL_FD_SD) {
+      FileDescriptionNode variable =
+          new FileDescriptionNode(
+              definitionNode.getLocality(), getName(definitionNode), definitionNode.isSortDescription() ? VariableType.SD : VariableType.FD, false, definitionNode.getFileDescriptor(), definitionNode.getFileControlClause());
+      return new ResultWithErrors<>(variable, Collections.emptyList());
+    }
+    return null;
   }
 
   private ResultWithErrors<VariableNode> conditionalDataNameMatcher(
