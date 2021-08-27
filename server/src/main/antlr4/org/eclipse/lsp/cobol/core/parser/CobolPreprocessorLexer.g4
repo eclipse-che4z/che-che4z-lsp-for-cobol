@@ -56,9 +56,6 @@ SKIP1 : S K I P '1' DOT_FS? -> channel(HIDDEN);
 SKIP2 : S K I P '2' DOT_FS? -> channel(HIDDEN);
 SKIP3 : S K I P '3' DOT_FS? -> channel(HIDDEN);
 
-// compiler directive tokens
-TITLESTATEMENT : (TITLE ' '+ .*? NEWLINE)  ;
-
 CONTROL_DIRECTIVE: ASTERISKCHAR (CONTROL | CBL) ((' '| COMMACHAR)
                   (SOURCE | NO SOURCE | LIST | NO LIST | MAP | NO MAP
                   | IDENTIFIER? ))+  DOT_FS?;

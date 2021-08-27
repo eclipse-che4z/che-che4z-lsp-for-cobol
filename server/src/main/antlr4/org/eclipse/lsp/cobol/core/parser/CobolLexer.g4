@@ -21,19 +21,8 @@ channels{TECHNICAL}
   import org.apache.commons.lang3.StringUtils;
 }
 @lexer::members {
-    private static final Pattern titlePattern =
-        Pattern.compile("TITLE\\s*(.*?)\\.?\\s\\n.*", Pattern.CASE_INSENSITIVE);
-        private static final int ENTER_LENGTH = 5;
-    private void checkTitlePresent()
-    {
-      String input = _input.getText(Interval.of(_tokenStartCharIndex, _input.index()));
-      if (input!=null)
-      {
-        Matcher matcher = titlePattern.matcher(input);
-          if(matcher.matches() && matcher.group(1).isEmpty())
-           reportWrongArguments("lexer.titleCompilerDirective");
-      }
-    }
+    private static final int ENTER_LENGTH = 5;
+
     private void reportWrongArguments(String msg) {
         ANTLRErrorListener listener = getErrorListenerDispatch();
         String text = _input.getText(Interval.of(_tokenStartCharIndex, _input.index()));
@@ -60,9 +49,6 @@ channels{TECHNICAL}
           reportWrongArguments("lexer.langMissingEnterDirective");
     }
 }
-
-// compiler directive tokens
-TITLESTATEMENT : (TITLE ' '+ .*? NEWLINE) {checkTitlePresent();} -> channel(TECHNICAL);
 
 CONTROL_DIRECTIVE: ASTERISKCHAR (CONTROL | CBL) ((' '| COMMACHAR)
                   (SOURCE | NO SOURCE | LIST | NO LIST | MAP | NO MAP
@@ -824,7 +810,6 @@ SIXTYFOURCR: '6' '4' C R;
 SIZE : S I Z E;
 SKIPCHAR : S K I P;
 SNAP : S N A P;
-SNAP_TITLE : S N A P WS T I T L E;
 SOME : S O M E;
 SORT : S O R T;
 SORT_CONTROL : S O R T MINUSCHAR C O N T R O L;
