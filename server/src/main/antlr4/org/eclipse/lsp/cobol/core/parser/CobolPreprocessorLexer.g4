@@ -13,6 +13,7 @@
  */
 
 lexer grammar CobolPreprocessorLexer;
+channels{COMMENTS}
 import TechnicalLexer;
 // compiler only keywords
 CBL : C B L;

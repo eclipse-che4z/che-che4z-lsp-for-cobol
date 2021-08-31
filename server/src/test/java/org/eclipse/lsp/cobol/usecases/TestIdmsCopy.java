@@ -32,7 +32,6 @@ class TestIdmsCopy {
           + "        WORKING-STORAGE SECTION.\n"
           + "        01 {$*EMPLOYEE} PIC X(10).\n";
 
-  //TODO: Check with IDMS team if the FILE-CONTROL is required for the FD statement introduced by COPY IDMS FILE
   private static final String TEXT_IDMS_COPY_FILE =
       "        IDENTIFICATION DIVISION. \n"
           + "        PROGRAM-ID. test1.\n"

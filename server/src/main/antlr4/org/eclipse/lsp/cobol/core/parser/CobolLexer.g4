@@ -13,6 +13,7 @@
  */
     
 lexer grammar CobolLexer;
+channels{COMMENTS}
 import TechnicalLexer;
 channels{TECHNICAL}
 @header {

@@ -13,7 +13,7 @@
  */
 
 lexer grammar TechnicalLexer;
-
+channels{COMMENTS}
 // This grammar should not contains any explicit token declaration.
 // There should be only symbols, literal patterns, and fragments.
 // The purpose of this file is to allow similar parsing by the preprocessor and parser.
@@ -69,7 +69,7 @@ HEX_NUMBERS : HEXNUMBER;
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
-COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
+COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(COMMENTS);
 WS : [ \t\f]+ -> channel(HIDDEN);
 
 //SQL comments
