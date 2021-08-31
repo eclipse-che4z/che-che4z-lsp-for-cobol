@@ -135,7 +135,7 @@ To resolve copybook names manually, hover over the copybook name with the error 
 
 You can also set up automatic copybook retrieval from the mainframe to download copybooks from mainframe data sets to your workspace. 
 
-**Note:** This feature will not function if you have the [Secure Credentials Store plug-in for Zowe CLI](https://docs.zowe.org/stable/user-guide/cli-scsplugin/) enabled. Disable or uninstall the Secure Credentials Store plug-in before you set up automatic copybook retrieval from the mainframe.
+**Note:** Ensure that you do not have the [Secure Credentials Store plug-in for Zowe CLI](https://docs.zowe.org/stable/user-guide/cli-scsplugin/) enabled before you use this feature.
 
 **Follow these steps:**
 
