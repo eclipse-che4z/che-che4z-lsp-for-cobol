@@ -109,7 +109,7 @@ class TestPseudoTextContentConstraint {
             "1",
             new Diagnostic(
                 null,
-                "Compiler directives cannot be continued on another line.",
+                "Compiler directives cannot be continued on another line",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

@@ -65,7 +65,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private static final String HYPHEN = "-";
   private static final String UNDERSCORE = "_";
   private static final String SYNTAX_ERROR_CHECK_COPYBOOK_NAME =
-      "Syntax error by GrammarPreprocessorListenerImpl#checkCopybookName: ";
+      "Syntax error by checkCopybookName: {}";
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
   private final Deque<StringBuilder> textAccumulator = new ArrayDeque<>();
   private final List<Pair<String, String>> copyReplacingClauses = new ArrayList<>();
@@ -133,13 +133,50 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void enterTitle(TitleContext ctx) {
+  public void enterTitleDirective(TitleDirectiveContext ctx) {
     push();
   }
 
   @Override
-  public void exitTitle(TitleContext ctx) {
+  public void exitTitleDirective(TitleDirectiveContext ctx) {
     pop();
+    accumulateExcludedStatementShift(ctx.getSourceInterval());
+  }
+
+  @Override
+  public void enterEnterDirective(EnterDirectiveContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitEnterDirective(EnterDirectiveContext ctx) {
+    pop();
+    final LanguageNameContext languageNameContext = ctx.languageName();
+    if (languageNameContext == null) {
+      final SyntaxError error =
+          SyntaxError.syntaxError()
+              .locality(retrievePosition(ctx))
+              .severity(ERROR)
+              .suggestion(
+                  messageService.getMessage(
+                      "GrammarPreprocessorListener.langMissingEnterDirective"))
+              .build();
+      LOG.debug("Syntax error by exitEnterDirective: {}", error);
+      errors.add(error);
+    }
+
+    accumulateExcludedStatementShift(ctx.getSourceInterval());
+  }
+
+  @Override
+  public void enterControlDirective(ControlDirectiveContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitControlDirective(ControlDirectiveContext ctx) {
+    pop();
+    if (ctx.controlOptions().isEmpty()) reportInvalidArgument(ctx.controlCbl());
     accumulateExcludedStatementShift(ctx.getSourceInterval());
   }
 
@@ -275,21 +312,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         copyReplacingClauses.add(clauseResponse.getResult());
       else replacingClauses.add(clauseResponse.getResult());
     } else {
-      clauseResponse
-          .getErrors()
-          .forEach(
-              error -> {
-                Locality locality = retrievePosition(ctx);
-                errors.add(
-                    SyntaxError.syntaxError()
-                        .severity(ERROR)
-                        .suggestion(
-                            messageService.getMessage(
-                                clauseResponse.getErrors().get(0).getSuggestion()))
-                        .locality(locality)
-                        .build());
-                LOG.error("pseudo text can't have COPY ");
-              });
+      clauseResponse.getErrors().forEach(it -> reportPseudoTextError(ctx, it));
     }
     pop();
   }
@@ -490,13 +513,37 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
   }
 
+  private void reportPseudoTextError(ReplacePseudoTextContext ctx, SyntaxError it) {
+    final SyntaxError error =
+        SyntaxError.syntaxError()
+            .severity(ERROR)
+            .suggestion(messageService.getMessage(it.getSuggestion()))
+            .locality(retrievePosition(ctx))
+            .build();
+    errors.add(error);
+    LOG.debug("Syntax error by reportPseudoTextError: {}", error.toString());
+  }
+
+  private void reportInvalidArgument(ControlCblContext ctx) {
+    SyntaxError error =
+        SyntaxError.syntaxError()
+            .severity(ERROR)
+            .suggestion(
+                messageService.getMessage(
+                    "GrammarPreprocessorListener.controlDirectiveWrongArgs", ctx.getText()))
+            .locality(retrievePosition(ctx))
+            .build();
+    errors.add(error);
+    LOG.debug("Syntax error by reportInvalidArgument: {}", error.toString());
+  }
+
   private void reportRecursiveCopybook(CopybookUsage usage) {
     addCopybookError(
         usage.getName(),
         usage.getLocality(),
         ERROR,
         "GrammarPreprocessorListener.recursionDetected",
-        "Syntax error by GrammarPreprocessorListenerImpl#reportRecursiveCopybook: ");
+        "Syntax error by reportRecursiveCopybook: {}");
   }
 
   private void reportMissingCopybooks(String copybookName, Locality locality) {
@@ -509,9 +556,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             .severity(ERROR)
             .errorCode(MISSING_COPYBOOK)
             .build();
-    LOG.debug(
-        "Syntax error by GrammarPreprocessorListenerImpl#reportMissingCopybooks: "
-            + error.toString());
+    LOG.debug("Syntax error by reportMissingCopybooks: {}", error.toString());
     errors.add(error);
   }
 
