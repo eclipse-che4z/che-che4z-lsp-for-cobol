@@ -85,12 +85,11 @@ class TestSetUpDownBy {
             "3",
             new Diagnostic(
                 null,
-                "Extraneous input 'IND3' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, COMPUTE, CONTINUE,"
-                    + " DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, 'EXEC SQL', EXHIBIT, EXIT,"
-                    + " GENERATE, GO, GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, "
-                    + "PERFORM, PURGE, READ, READY, RECEIVE, RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, "
-                    + "SERVICE, SET, SORT, SQL, START, STOP, STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, "
-                    + "'.', ';'}",
+                "Extraneous input 'IND3' expected {ACCEPT, ADD, ALTER, CALL, CANCEL, CLOSE, COMPUTE, CONTINUE, "
+                    + "DELETE, DISABLE, DISPLAY, DIVIDE, ENABLE, ENTRY, EVALUATE, EXEC, EXHIBIT, EXIT, GENERATE, "
+                    + "GO, GOBACK, IF, INITIALIZE, INITIATE, INSPECT, MERGE, MOVE, MULTIPLY, OPEN, PERFORM, PURGE, "
+                    + "READ, READY, RECEIVE, RELEASE, RESET, RETURN, REWRITE, SEARCH, SEND, SERVICE, SET, SORT, "
+                    + "START, STOP, STRING, SUBTRACT, TERMINATE, UNSTRING, WRITE, XML, '.', ';'}",
                 DiagnosticSeverity.Error,
                 ERROR.getText()),
             "4",

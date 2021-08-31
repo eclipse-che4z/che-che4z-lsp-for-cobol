@@ -1566,8 +1566,7 @@ execSqlStatementInDataDivision
    ;
 
 execSqlStatement
-   : EXEC_SQL sqlCode END_EXEC
-   | {notifyError("cobolParser.missingSqlKeyword");} (EXEC | SQL) sqlCode END_EXEC
+   : EXEC SQL sqlCode END_EXEC
    ;
 
 sqlCode
