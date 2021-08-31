@@ -55,6 +55,7 @@ class TestFileDescriptor {
           + "       FD  {$*INFILE}\n"
           + "           LABEL RECORDS ARE STANDARD\n"
           + "           DATA RECORD IS InputRec\n"
+          + "      * ------- some comments ,dont expect this on hover\n"
           + "           RECORD CONTAINS 80 CHARACTERS\n"
           + "           RECORDING MODE IS F\n"
           + "           BLOCK CONTAINS 0 RECORDS.\n"

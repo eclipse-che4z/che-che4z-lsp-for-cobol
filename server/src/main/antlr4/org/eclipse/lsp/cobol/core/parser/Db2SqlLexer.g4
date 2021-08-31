@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 lexer grammar Db2SqlLexer;
+channels{COMMENTS}
 import TechnicalLexer;
 
 // DB2 SQL Reserved Keywords

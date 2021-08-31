@@ -13,6 +13,7 @@
  */
 
 lexer grammar CICSLexer;
+channels{COMMENTS}
 import TechnicalLexer;
 
 ABCODE : A B C O D E;
