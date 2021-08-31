@@ -14,22 +14,22 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil;
+import org.eclipse.lsp.cobol.core.semantics.CodeBlockDefinitionUtils;
 
 import java.util.List;
 
-/** The class represents section in COBOL. */
-@ToString(callSuper = true)
-public class SectionNode extends Node {
-  public SectionNode(Locality locality) {
-    super(locality, NodeType.SECTION);
+/**
+ * The class represents procedureDivisionBody rule in COBOL grammar.
+ */
+public class ProcedureDivisionBodyNode extends Node {
+  public ProcedureDivisionBodyNode(Locality location) {
+    super(location, NodeType.CODE_BLOCK_PARENT);
   }
 
   @Override
   protected List<SyntaxError> processNode() {
-    return VariableDefinitionUtil.processNodeWithVariableDefinitions(this);
+    return CodeBlockDefinitionUtils.defineCodeBlock(this);
   }
 }
