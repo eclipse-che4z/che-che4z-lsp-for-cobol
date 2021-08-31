@@ -52,7 +52,7 @@ class TestEnterCompilerDirective {
 
   @Test
   void testNoErrorOnEnterCobolCompilerDirective() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(TEXT_COBOL, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
