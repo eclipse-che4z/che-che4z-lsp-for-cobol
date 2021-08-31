@@ -19,10 +19,9 @@ import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.core.model.Locality;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Predicate;
-
-import static org.antlr.v4.runtime.Lexer.HIDDEN;
 
 /**
  * Utilities for finding tokens that cannot be retrieved from the mapping. For example, embedded
@@ -31,30 +30,36 @@ import static org.antlr.v4.runtime.Lexer.HIDDEN;
 @UtilityClass
 public class LocalityFindingUtils {
 
-  private static final int LOOK_BACK_ATTEMPTS_NUMBER = 5;
+  private static final int RANGE_LOOK_BACK_TOKENS = 5;
   /**
    * Find previous visible token before the given one and return its locality or null if not found.
-   * It takes not more than 5 attempts to find the location to avoid the deep recursion.
+   * Checks at most RANGE_LOOK_BACK_TOKENS previous tokens.
    *
    * @param token to find previous visible locality
    * @param mapping A Map of Token to Locality for a document in analysis.
    * @return Locality for a passed token or null
    */
   public Locality findPreviousVisibleLocality(Token token, Map<Token, Locality> mapping) {
-    return mapping.computeIfAbsent(
-        token, it -> lookBackLocality(it.getTokenIndex(), mapping, LOOK_BACK_ATTEMPTS_NUMBER));
+    return mapping.computeIfAbsent(token, it -> lookBackLocality(it.getTokenIndex(), mapping));
   }
 
-  private Locality lookBackLocality(int index, Map<Token, Locality> mapping, int attemptsLeft) {
-    if (attemptsLeft <= 0 || index < 0) return null;
+  private Locality lookBackLocality(int index, Map<Token, Locality> mapping) {
+    if (index < 0) return null;
     return mapping.entrySet().stream()
-        .filter(indexMatchesAndIsVisible(index))
-        .findAny()
+        .filter(previousIndexes(index))
+        .filter(isNotHidden())
+        .max(Comparator.comparingInt(it -> it.getKey().getTokenIndex()))
         .map(Map.Entry::getValue)
-        .orElseGet(() -> lookBackLocality(index - 1, mapping, attemptsLeft - 1));
+        .orElse(null);
   }
 
-  private Predicate<Map.Entry<Token, Locality>> indexMatchesAndIsVisible(int index) {
-    return it -> it.getKey().getTokenIndex() == index && it.getKey().getChannel() != HIDDEN;
+  private Predicate<Map.Entry<Token, Locality>> isNotHidden() {
+    return it -> it.getKey().getChannel() != Token.HIDDEN_CHANNEL;
+  }
+
+  private Predicate<Map.Entry<Token, Locality>> previousIndexes(int index) {
+    return it ->
+        it.getKey().getTokenIndex() <= index
+            && it.getKey().getTokenIndex() >= index - RANGE_LOOK_BACK_TOKENS;
   }
 }
