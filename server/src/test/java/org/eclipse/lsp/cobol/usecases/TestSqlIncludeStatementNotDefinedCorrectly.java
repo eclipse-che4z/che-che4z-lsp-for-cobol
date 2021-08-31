@@ -42,6 +42,9 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                null, "Missing token EXEC or SQL", Error, SourceInfoLevels.ERROR.getText())));
+                null,
+                "Missing token SQL at execSqlStatement",
+                Error,
+                SourceInfoLevels.ERROR.getText())));
   }
 }

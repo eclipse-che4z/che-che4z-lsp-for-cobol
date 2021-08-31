@@ -15,14 +15,12 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This class test the *CONTROL (*CBL) compiler directives. */
@@ -36,13 +34,14 @@ class TestControlCompilerDirective {
 
   private static final String TEXT_WRONG_ARG =
       "       Identification Division.\n"
-          + "       *CONTROL {MAP1|1}\n"
+          + "       *{CONTROL|1} {MAP1|2}\n"
+          + "       *{CBL|3} MAP1\n"
           + "       Program-Id. control-dir.";
 
   private static final String TEXT_CONTINUATION_FOR_COMPILER_DIR =
       "       Identification Division.\n"
-          + "       *CONTROL {_MAP|1|2_}\n"
-          + "      -     NOSOURCE.\n"
+          + "       *CONTROL MA\n"
+          + "      -{_P.|1_}\n"
           + "       Program-Id. control-dir.";
 
   @Test
@@ -58,8 +57,20 @@ class TestControlCompilerDirective {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(new Position(1, 7), new Position(1, 20)),
-                "Invalid argument for CONTROL compiler directives.",
+                null,
+                "No arguments found for *CONTROL",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "2",
+            new Diagnostic(
+                null,
+                "Syntax error on 'MAP1' expected PROGRAM-ID",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "3",
+            new Diagnostic(
+                null,
+                "No arguments found for *CBL",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }
@@ -71,16 +82,10 @@ class TestControlCompilerDirective {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
-            new Diagnostic(
-                new Range(new Position(2, 7), new Position(2, 21)),
-                "Compiler directives cannot be continued on another line.",
+            new Diagnostic(null,
+                "Compiler directives cannot be continued on another line",
                 DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText()),
-            "2",
-            new Diagnostic(
-                new Range(new Position(1, 7), new Position(1, 28)),
-                "Invalid argument for CONTROL compiler directives.",
-                DiagnosticSeverity.Error,
-                SourceInfoLevels.ERROR.getText())));
+                SourceInfoLevels.ERROR.getText())
+            ));
   }
 }

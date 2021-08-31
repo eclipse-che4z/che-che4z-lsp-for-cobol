@@ -15,14 +15,12 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** This class test the ENTER compiler directive. */
@@ -32,19 +30,29 @@ class TestEnterCompilerDirective {
           + "       ENTER ABC.\n"
           + "       Program-Id. control-dir.";
 
+  private static final String TEXT_COBOL =
+      "       Identification Division.\n"
+          + "       ENTER COBOL.\n"
+          + "       Program-Id. control-dir.";
+
   private static final String TEXT_NO_LANGUAGE =
       "       Identification Division.\n"
-          + "       ENTER {.|1}\n"
+          + "       {_ENTER .|1_}\n"
           + "       Program-Id. control-dir.";
 
   private static final String TEXT_JAVA_LANG_ROUTINE =
-          "       Identification Division.\n"
-                  + "       ENTER JAVA ROUTINE .\n"
-                  + "       Program-Id. control-dir.";
+      "       Identification Division.\n"
+          + "       ENTER JAVA ROUTINE .\n"
+          + "       Program-Id. control-dir.";
 
   @Test
   void testNoErrorOnEnterCompilerDirective() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testNoErrorOnEnterCobolCompilerDirective() {
+    UseCaseEngine.runTest(TEXT_COBOL, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
@@ -55,8 +63,8 @@ class TestEnterCompilerDirective {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(new Position(1, 7), new Position(1, 14)),
-                "LanguageName missing for ENTER compiler directive.",
+                null,
+                "Language name missing for ENTER compiler directive",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

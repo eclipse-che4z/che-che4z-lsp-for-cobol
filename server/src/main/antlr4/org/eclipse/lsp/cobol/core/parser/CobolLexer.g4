@@ -16,47 +16,7 @@ lexer grammar CobolLexer;
 channels{COMMENTS}
 import TechnicalLexer;
 channels{TECHNICAL}
-@header {
-  import java.util.regex.Matcher;
-  import java.util.regex.Pattern;
-  import org.apache.commons.lang3.StringUtils;
-}
-@lexer::members {
-    private static final int ENTER_LENGTH = 5;
 
-    private void reportWrongArguments(String msg) {
-        ANTLRErrorListener listener = getErrorListenerDispatch();
-        String text = _input.getText(Interval.of(_tokenStartCharIndex, _input.index()));
-	    int stop = _input.index();
-	    if(text.contains("\r")) {
-		   stop--;
-	    }
-        CommonToken lspToken = new CommonTokenFactory().create(_tokenFactorySourcePair, _type, text,
-	         					_channel, _input.index()-text.length()+1,
-	         					stop,
-	        					_tokenStartLine, _tokenStartCharPositionInLine);
-        lspToken.setTokenIndex(_tokenStartCharPositionInLine);
-        lspToken.setText(text.replace("\r","").replace("\n",""));
-        listener.syntaxError(this, lspToken, _tokenStartLine,
-         	         _tokenStartCharPositionInLine, msg, null);
-    }
-
-    private void checkLanguageNamePresent()
-    {
-      String input = _input
-                     .getText(Interval.of(_tokenStartCharIndex, _input.index()))
-                     .replace("\\R","").replace(".","").trim();
-      if(input.length() <= ENTER_LENGTH || StringUtils.isBlank(input.substring(ENTER_LENGTH, input.length())))
-          reportWrongArguments("lexer.langMissingEnterDirective");
-    }
-}
-
-CONTROL_DIRECTIVE: ASTERISKCHAR (CONTROL | CBL) ((' '| COMMACHAR)
-                  (SOURCE | NO SOURCE | LIST | NO LIST | MAP | NO MAP
-                  | IDENTIFIER? {reportWrongArguments("lexer.controlDirectiveWrongArgs");})
-                  )+ DOT_FS?-> channel(TECHNICAL);
-
-ENTER_STMT: ENTER ' '+ IDENTIFIER? {checkLanguageNamePresent();} (' '+ IDENTIFIER)?  ' '* DOT_FS-> channel(TECHNICAL);
 EJECT: E J E C T DOT_FS? -> channel(HIDDEN);
 SKIP1 : S K I P '1' DOT_FS? -> skip;
 SKIP2 : S K I P '2' DOT_FS? -> skip;
@@ -334,7 +294,6 @@ EXCEPT : E X C E P T;
 EXCEPTION : E X C E P T I O N;
 EXCLUSIVE : E X C L U S I V E;
 EXEC : E X E C;
-EXEC_SQL: EXEC WS SQL;
 EXHIBIT : E X H I B I T;
 EXIT : E X I T;
 EXITS : E X I T S;
