@@ -16,11 +16,11 @@ package org.eclipse.lsp.cobol.positive;
 
 import lombok.Value;
 
-/** This class used to represent a COBOL program text. */
+/** This class is used to represent a COBOL program text. */
 @Value
 public class CobolText {
-  private String fileName;
-  private String fullText;
+  String fileName;
+  String fullText;
 
   @Override
   public String toString() {
