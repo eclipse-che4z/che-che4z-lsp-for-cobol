@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2021 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -17,34 +17,28 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLevels;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+/** OBTAIN ANY after a number of MOVE statements should be parsed as a statement, not variables. */
+class TestObtainAnyAfterMoveParsedCorrectly {
 
-/** This test checks sql include statement if it is defined correctly. */
-class TestSqlIncludeStatementNotDefinedCorrectly {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. HELLO-SQL.\n"
+          + "       PROGRAM-ID. VARIABLES.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*SQLCA} PIC X(10).\n"
-          + "           {EXEC|1} INCLUDE STRUCT1 END-EXEC.";
+          + "       01  {$*A1} PIC 9.\n"
+          + "       01  {$*A2} PIC 9.\n"
+          + "       01  {$*A3} PIC 9.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           IF {$A1} = ZERO\n"
+          + "              MOVE 1 TO  {$A1}\n"
+          + "              MOVE 1 TO  {$A2}\n"
+          + "              OBTAIN ANY {$A3}.\n";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                null,
-                "Missing token SQL at execSqlStatement",
-                Error,
-                SourceInfoLevels.ERROR.getText())));
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 }

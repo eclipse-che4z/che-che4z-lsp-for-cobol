@@ -1062,11 +1062,11 @@ addStatement
    ;
 
 addToStatement
-   : addFrom (COMMACHAR? addFrom)* TO addTo (COMMACHAR? addTo)*
+   : addFrom (COMMACHAR? addFrom)* TO addTo (COMMACHAR? addTo)*?
    ;
 
 addToGivingStatement
-   : addFrom (COMMACHAR? addFrom)* (TO addToGiving (COMMACHAR? addToGiving)*)? GIVING addGiving (COMMACHAR? addGiving)*
+   : addFrom (COMMACHAR? addFrom)* (TO addToGiving (COMMACHAR? addToGiving)*)? GIVING addGiving (COMMACHAR? addGiving)*?
    ;
 
 addCorrespondingStatement
@@ -1228,7 +1228,7 @@ checkTerminalReturnLengthClause
 // close statement
 
 closeStatement
-   : CLOSE closeFile (COMMACHAR? closeFile)*
+   : CLOSE closeFile (COMMACHAR? closeFile)*?
    ;
 
 closeFile
@@ -1385,7 +1385,7 @@ disconnectStatement
 // display statement
 
 displayStatement
-   : DISPLAY displayOperand (COMMACHAR? displayOperand)* displayAt? displayUpon? displayWith?
+   : DISPLAY displayOperand (COMMACHAR? displayOperand)*? displayAt? displayUpon? displayWith?
    ;
 
 displayOperand
@@ -1489,7 +1489,7 @@ enqueueNameClause
 // entry statement
 
 entryStatement
-   : ENTRY literal (USING generalIdentifier (COMMACHAR? generalIdentifier)*)?
+   : ENTRY literal (USING generalIdentifier (COMMACHAR? generalIdentifier)*?)?
    ;
 // erase statement
 
@@ -1566,8 +1566,7 @@ execSqlStatementInDataDivision
    ;
 
 execSqlStatement
-   : EXEC_SQL sqlCode END_EXEC
-   | {notifyError("cobolParser.missingSqlKeyword");} (EXEC | SQL) sqlCode END_EXEC
+   : EXEC SQL sqlCode END_EXEC
    ;
 
 sqlCode
@@ -1583,7 +1582,7 @@ execSqlImsStatement
 // exhibit statement
 
 exhibitStatement
-   : EXHIBIT NAMED? CHANGED? exhibitOperand+
+   : EXHIBIT NAMED? CHANGED? exhibitOperand+?
    ;
 
 exhibitOperand
@@ -1768,7 +1767,7 @@ idmsIfMember
 // initialize statement
 
 initializeStatement
-   : INITIALIZE generalIdentifier (COMMACHAR? generalIdentifier)* initializeReplacingPhrase?
+   : INITIALIZE generalIdentifier (COMMACHAR? generalIdentifier)*? initializeReplacingPhrase?
    ;
 
 initializeReplacingPhrase
@@ -1805,7 +1804,7 @@ inqMapWhichFields
    ;
 
 inqMapWhichDflds
-   : (ALL | NONE | ANY | SOME | ALL (BUT | EXCEPT))? (DFLD generalIdentifier)+
+   : (ALL | NONE | ANY | SOME | ALL (BUT | EXCEPT))? (DFLD generalIdentifier)+?
    ;
 
 inqMapFieldTestPhrase
@@ -2011,11 +2010,11 @@ mergeStatement
    ;
 
 mergeOnKeyClause
-   : ON? (ASCENDING | DESCENDING) KEY? qualifiedDataName+
+   : ON? (ASCENDING | DESCENDING) KEY? qualifiedDataName+?
    ;
 
 mergeCollatingSequencePhrase
-   : COLLATING? SEQUENCE IS? alphabetName+ mergeCollatingAlphanumeric? mergeCollatingNational?
+   : COLLATING? SEQUENCE IS? alphabetName+? mergeCollatingAlphanumeric? mergeCollatingNational?
    ;
 
 mergeCollatingAlphanumeric
@@ -2039,7 +2038,7 @@ mergeOutputThrough
    ;
 
 mergeGivingPhrase
-   : GIVING mergeGiving+
+   : GIVING mergeGiving+?
    ;
 
 mergeGiving
@@ -2081,7 +2080,7 @@ moveStatement
    ;
 
 moveToStatement
-   : moveToSendingArea TO generalIdentifier (COMMACHAR? generalIdentifier)*
+   : moveToSendingArea TO generalIdentifier (COMMACHAR? generalIdentifier)*?
    ;
 
 moveToSendingArea
@@ -2089,7 +2088,7 @@ moveToSendingArea
    ;
 
 moveCorrespondingToStatement
-   : (CORRESPONDING | CORR) moveCorrespondingToSendingArea TO generalIdentifier (COMMACHAR? generalIdentifier)*
+   : (CORRESPONDING | CORR) moveCorrespondingToSendingArea TO generalIdentifier (COMMACHAR? generalIdentifier)*?
    ;
 
 moveCorrespondingToSendingArea
@@ -2103,7 +2102,7 @@ multiplyStatement
    ;
 
 multiplyRegular
-   : multiplyRegularOperand+
+   : multiplyRegularOperand+?
    ;
 
 multiplyRegularOperand
@@ -2111,7 +2110,7 @@ multiplyRegularOperand
    ;
 
 multiplyGiving
-   : multiplyGivingOperand GIVING multiplyGivingResult+
+   : multiplyGivingOperand GIVING multiplyGivingResult+?
    ;
 
 multiplyGivingOperand
@@ -2135,7 +2134,7 @@ openStatement
    ;
 
 openInputStatement
-   : INPUT openInput (COMMACHAR? openInput)*
+   : INPUT openInput (COMMACHAR? openInput)*?
    ;
 
 openInput
@@ -2143,7 +2142,7 @@ openInput
    ;
 
 openOutputStatement
-   : OUTPUT openOutput (COMMACHAR? openOutput)*
+   : OUTPUT openOutput (COMMACHAR? openOutput)*?
    ;
 
 openOutput
@@ -2151,11 +2150,11 @@ openOutput
    ;
 
 openIOStatement
-   : I_O fileName (COMMACHAR? fileName)*
+   : I_O fileName (COMMACHAR? fileName)*?
    ;
 
 openExtendStatement
-   : EXTEND fileName (COMMACHAR? fileName)*
+   : EXTEND fileName (COMMACHAR? fileName)*?
    ;
 
 // perform statement
@@ -2281,11 +2280,14 @@ readKey
    ;
 
 readTerminalClause
-   : TERMINAL idmsWaitNowaitClause? (BUFFER | (MODIFIED FROM POSITION (generalIdentifier | literal)))? (GET STORAGE)? INTO generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral))) (RETURN LENGTH INTO? generalIdentifier)?
+   : TERMINAL idmsWaitNowaitClause? (BUFFER | (MODIFIED FROM POSITION (generalIdentifier | literal)))?
+   (GET STORAGE)? INTO generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral)))
+   (RETURN LENGTH INTO? generalIdentifier)?
    ;
 
 readLineFromTerminalClause
-   : LINE FROM? TERMINAL ECHO? NOBACKPAGE? INTO generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral))) (RETURN LENGTH INTO? generalIdentifier)?
+   : LINE FROM? TERMINAL ECHO? NOBACKPAGE? INTO generalIdentifier ((TO generalIdentifier)
+   | (MAX LENGTH (generalIdentifier | integerLiteral))) (RETURN LENGTH INTO? generalIdentifier)?
    ;
 
 // ready statement
@@ -2317,11 +2319,11 @@ receiveIntoStatement
    ;
 
 receiveNoData
-   : NO DATA conditionalStatementCall (COMMACHAR? conditionalStatementCall)
+   : NO DATA conditionalStatementCall (COMMACHAR? conditionalStatementCall)*?
    ;
 
 receiveWithData
-   : WITH DATA conditionalStatementCall (COMMACHAR? conditionalStatementCall)
+   : WITH DATA conditionalStatementCall (COMMACHAR? conditionalStatementCall)*?
    ;
 
 receiveBefore
@@ -2395,7 +2397,7 @@ searchVarying
    ;
 
 searchWhen
-   : WHEN condition (NEXT SENTENCE | conditionalStatementCall (COMMACHAR? conditionalStatementCall)*)
+   : WHEN condition (NEXT SENTENCE | conditionalStatementCall (COMMACHAR? conditionalStatementCall)*?)
    ;
 
 // send statement
@@ -2545,7 +2547,7 @@ sortStatement
    ;
 
 sortOnKeyClause
-   : ON? (ASCENDING | DESCENDING) KEY? qualifiedDataName+
+   : ON? (ASCENDING | DESCENDING) KEY? qualifiedDataName+?
    ;
 
 sortDuplicatesPhrase
@@ -2573,7 +2575,7 @@ sortInputThrough
    ;
 
 sortUsing
-   : USING fileName+
+   : USING fileName+?
    ;
 
 sortOutputProcedurePhrase
@@ -2585,7 +2587,7 @@ sortOutputThrough
    ;
 
 sortGivingPhrase
-   : GIVING sortGiving+
+   : GIVING sortGiving+?
    ;
 
 sortGiving
@@ -2631,7 +2633,7 @@ stringStatement
    ;
 
 stringSendingPhrase
-   : stringSending (COMMACHAR? stringSending)* (stringDelimitedByPhrase | stringForPhrase)
+   : stringSending (COMMACHAR? stringSending)*? (stringDelimitedByPhrase | stringForPhrase)
    ;
 
 stringSending
@@ -2661,11 +2663,11 @@ subtractStatement
    ;
 
 subtractFromStatement
-   : subtractSubtrahend (COMMACHAR? subtractSubtrahend)* FROM subtractMinuend (COMMACHAR? subtractMinuend)*
+   : subtractSubtrahend (COMMACHAR? subtractSubtrahend)* FROM subtractMinuend (COMMACHAR? subtractMinuend)*?
    ;
 
 subtractFromGivingStatement
-   : subtractSubtrahend (COMMACHAR? subtractSubtrahend)* FROM subtractMinuendGiving GIVING subtractGiving (COMMACHAR? subtractGiving)*
+   : subtractSubtrahend (COMMACHAR? subtractSubtrahend)* FROM subtractMinuendGiving GIVING subtractGiving (COMMACHAR? subtractGiving)*?
    ;
 
 subtractCorrespondingStatement
@@ -2702,7 +2704,7 @@ terminateStatement
 
 transferStatement
    : TRANSFER CONTROL? TO? (generalIdentifier | idms_program_name) (RETURN | LINK | NORETURN | XCTL)?
-   (USING generalIdentifier (COMMACHAR? generalIdentifier)*)?
+   (USING generalIdentifier (COMMACHAR? generalIdentifier)*?)?
    ;
 
 // unstring statement
@@ -2725,7 +2727,7 @@ unstringOrAllPhrase
    ;
 
 unstringIntoPhrase
-   : INTO unstringInto (COMMACHAR? unstringInto)*
+   : INTO unstringInto (COMMACHAR? unstringInto)*?
    ;
 
 unstringInto
@@ -2759,7 +2761,7 @@ useAfterClause
    ;
 
 useAfterOn
-   : INPUT | OUTPUT | I_O | EXTEND | fileName (COMMACHAR? fileName)*
+   : INPUT | OUTPUT | I_O | EXTEND | fileName (COMMACHAR? fileName)*?
    ;
 
 useDebugClause
@@ -2773,7 +2775,8 @@ useDebugOn
 // wait statement
 
 waitStatement
-   : WAIT (((LONG | SHORT)? (waitEventTypeClause | waitEventListClause (COMMACHAR? waitEventListClause)*)) | (REDISPATCH (waitEventTypeClause | waitEventListClause (COMMACHAR? waitEventListClause)*)?))
+   : WAIT (((LONG | SHORT)? (waitEventTypeClause | waitEventListClause (COMMACHAR? waitEventListClause)*))
+   | (REDISPATCH (waitEventTypeClause | waitEventListClause (COMMACHAR? waitEventListClause)*)?))
    ;
 
 waitEventTypeClause
@@ -2847,11 +2850,14 @@ writeLogMessagePrefixClause
    ;
 
 writeLogTextClause
-   : TEXT INTO? generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral))) (MESSAGE? PREFIX IS? (YES | NO))? (TEXT IS? ONLY)?
+   : TEXT INTO? generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral)))
+   (MESSAGE? PREFIX IS? (YES | NO))? (TEXT IS? ONLY)?
    ;
 
 writePrinterClause
-   : PRINTER (NEWPAGE | ERASE)? ENDRPT? (SCREEN CONTENTS | writePrinterNativeClause) (COPIES (generalIdentifier | integerLiteral))? (REPORT ID (generalIdentifier | integerLiteral))? writePrinterTypeClause? HOLD? KEEP?
+   : PRINTER (NEWPAGE | ERASE)? ENDRPT? (SCREEN CONTENTS | writePrinterNativeClause)
+   (COPIES (generalIdentifier | integerLiteral))? (REPORT ID (generalIdentifier | integerLiteral))?
+   writePrinterTypeClause? HOLD? KEEP?
    ;
 
 writePrinterNativeClause
@@ -2871,13 +2877,16 @@ writeTerminalEraseClause
    ;
 
 writeThenReadClause
-   : THEN READ TERMINAL idmsWaitNowaitClause? writeTerminalEraseClause? (FREE STORAGE)? idmsDmlFromClause ((MODIFIED | BUFFER) FROM POSITION (generalIdentifier | literal))? (GET STORAGE)? INTO generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral))) (RETURN LENGTH INTO? generalIdentifier)?
+   : THEN READ TERMINAL idmsWaitNowaitClause? writeTerminalEraseClause? (FREE STORAGE)?
+   idmsDmlFromClause ((MODIFIED | BUFFER) FROM POSITION (generalIdentifier | literal))? (GET STORAGE)?
+   INTO generalIdentifier ((TO generalIdentifier) | (MAX LENGTH (generalIdentifier | integerLiteral)))
+   (RETURN LENGTH INTO? generalIdentifier)?
    ;
 
 // xml statement
 
 xmlStatement
-   : XML PARSE generalIdentifier xmlEncoding?  xmlNational?  xmlValidating? xmlProcessinProcedure xmlThru?  onExceptionClause?  notOnExceptionClause? END_XML?
+   : XML PARSE generalIdentifier xmlEncoding? xmlNational? xmlValidating? xmlProcessinProcedure xmlThru? onExceptionClause? notOnExceptionClause? END_XML?
    ;
 
 xmlEncoding

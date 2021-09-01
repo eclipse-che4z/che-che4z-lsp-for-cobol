@@ -35,6 +35,7 @@ import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityFindingUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
@@ -94,23 +95,19 @@ public class CobolLanguageEngine {
    *
    * @param documentUri unique resource identifier of the processed document
    * @param text the content of the document that should be processed
-   * @param copybookConfig  contains config info like: copybook processing mode, backend server
+   * @param copybookConfig contains config info like: copybook processing mode, backend server
    * @return Semantic information wrapper object and list of syntax error that might send back to
    *     the client
    */
   @NonNull
   public ResultWithErrors<SemanticContext> run(
-      @NonNull String documentUri,
-      @NonNull String text,
-      @NonNull CopybookConfig copybookConfig) {
+      @NonNull String documentUri, @NonNull String text, @NonNull CopybookConfig copybookConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
     timingBuilder.getPreprocessorTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =
-        preprocessor
-            .process(documentUri, text, copybookConfig)
-            .unwrap(accumulatedErrors::addAll);
+        preprocessor.process(documentUri, text, copybookConfig).unwrap(accumulatedErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
 
     timingBuilder.getParserTimer().start();
@@ -248,10 +245,7 @@ public class CobolLanguageEngine {
     return err ->
         err.toBuilder()
             .locality(
-                mapping.getOrDefault(
-                    err.getOffendedToken(),
-                    LocalityMappingUtils.getNearestLocality(err.getOffendedToken(), mapping)
-                        .orElse(null)))
+                LocalityFindingUtils.findPreviousVisibleLocality(err.getOffendedToken(), mapping))
             .suggestion(messageService.getMessage(err.getSuggestion()))
             .build();
   }
