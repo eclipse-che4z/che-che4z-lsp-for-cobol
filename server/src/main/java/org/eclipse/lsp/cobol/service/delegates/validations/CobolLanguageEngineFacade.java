@@ -110,13 +110,13 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
   }
 
   private List<CodeBlockDefinitionNode> collectCodeBlockNodes(
-      SemanticContext context, NodeType nodeType) {
-    return context
-        .getRootNode()
-        .getDepthFirstStream()
-        .filter(it -> it.getNodeType().equals(nodeType))
-        .map(CodeBlockDefinitionNode.class::cast)
-        .collect(toList());
+          SemanticContext context, NodeType nodeType) {
+    return Objects.isNull(context.getRootNode()) ? emptyList() : context
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(it -> it.getNodeType().equals(nodeType))
+            .map(CodeBlockDefinitionNode.class::cast)
+            .collect(toList());
   }
 
   private Map<String, List<Location>> retrieveDefinitions(List<CodeBlockDefinitionNode> nodes) {
