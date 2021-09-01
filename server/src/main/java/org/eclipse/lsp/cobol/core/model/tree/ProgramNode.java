@@ -46,6 +46,7 @@ public class ProgramNode extends Node {
   @EqualsAndHashCode.Exclude private final NodeConverter nodeConverter = new NodeConverter();
   @EqualsAndHashCode.Exclude private VariableUsageDelegate variableUsageDelegate;
   private String programName;
+  private NodeState nodeState = NodeState.NEW;
 
   /**
    * Use for testing.
@@ -53,11 +54,11 @@ public class ProgramNode extends Node {
    * @param locality the node location.
    */
   ProgramNode(Locality locality) {
-    super(locality, PROGRAM);
+    super(locality, PROGRAM, false);
   }
 
   public ProgramNode(Locality locality, MessageService messageService) {
-    super(locality, PROGRAM);
+    super(locality, PROGRAM, false);
     variableUsageDelegate = new VariableUsageDelegate(messageService);
   }
 
@@ -74,10 +75,20 @@ public class ProgramNode extends Node {
   }
 
   @Override
-  public List<SyntaxError> process() {
-    List<SyntaxError> errors = super.process();
-    errors.addAll(processVariables());
-    return errors;
+  protected List<SyntaxError> processNode() {
+    switch (nodeState) {
+      case NEW:
+        nodeState = NodeState.WAIT_FOR_VARIABLES;
+        break;
+      case WAIT_FOR_VARIABLES:
+        nodeState = NodeState.DONE;
+        setNodeProcessed();
+        return processVariables();
+      case DONE:
+      default:
+        break;
+    }
+    return ImmutableList.of();
   }
 
   private List<SyntaxError> processVariables() {
@@ -161,5 +172,9 @@ public class ProgramNode extends Node {
         .map(it -> it.validate(variables))
         .flatMap(Collection::stream)
         .collect(toList());
+  }
+
+  private enum NodeState {
+    NEW, WAIT_FOR_VARIABLES, DONE;
   }
 }

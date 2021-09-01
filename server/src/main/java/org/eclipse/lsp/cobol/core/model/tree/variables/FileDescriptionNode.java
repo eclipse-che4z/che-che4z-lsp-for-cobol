@@ -51,11 +51,12 @@ public class FileDescriptionNode extends VariableNode {
   }
 
   @Override
-  public List<SyntaxError> process() {
+  public List<SyntaxError> processNode() {
     List<SyntaxError> errors = new ArrayList<>();
     if (StringUtils.isBlank(this.fileControlClause)) {
       errors.add(getError(MessageTemplate.of(FD_WITHOUT_FILE_CONTROL, getName()), ErrorSeverity.ERROR));
     }
+    errors.addAll(VariableDefinitionUtil.processNodeWithVariableDefinitions(this));
     return errors;
   }
 }

@@ -57,7 +57,7 @@ public class VariableUsageNode extends Node {
   }
 
   @Override
-  public List<SyntaxError> process() {
+  public List<SyntaxError> processNode() {
     getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
         .map(ProgramNode::getVariableUsageDelegate)

@@ -31,14 +31,31 @@ import java.util.Optional;
 @EqualsAndHashCode(callSuper = true)
 public class CodeBlockUsageNode extends Node {
   String name;
+  private NodeState nodeState = NodeState.NEW;
 
   public CodeBlockUsageNode(Locality location, String name) {
-    super(location, NodeType.CODE_BLOCK_USAGE);
+    super(location, NodeType.CODE_BLOCK_USAGE, false);
     this.name = name;
   }
 
   @Override
-  public List<SyntaxError> process() {
+  protected List<SyntaxError> processNode() {
+    switch (nodeState) {
+      case NEW:
+        nodeState = NodeState.WAIT_FOR_BLOCKS;
+        break;
+      case WAIT_FOR_BLOCKS:
+        nodeState = NodeState.DONE;
+        setNodeProcessed();
+        return registerNode();
+      case DONE:
+      default:
+        break;
+    }
+    return ImmutableList.of();
+  }
+
+  private List<SyntaxError> registerNode() {
     return getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
         .map(program -> program.registerCodeBlockUsage(this))
@@ -46,5 +63,9 @@ public class CodeBlockUsageNode extends Node {
         .map(Optional::get)
         .map(ImmutableList::of)
         .orElse(ImmutableList.of());
+  }
+
+  private enum NodeState {
+    NEW, WAIT_FOR_BLOCKS, DONE;
   }
 }
