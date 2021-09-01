@@ -22,41 +22,34 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 /**
- * This test checks that the files in the positive test set don't produce any {@link
- * RuntimeException} while analyzing them char by char. Disabled by default, to enable provide
- * <code>-Dtests.typing=true
- * </code> as a system property for the run configuration.
+ * This test collects the time that the Language Engine needs to parse the given text from the
+ * positive tests set. The result outputs to the console in the form "TEST.cbl 100 10" where
+ * "TEST.cbl" is a file name, "100" is the length of the file in chars and "10" is the parsing time.
+ * Disabled by default, to enable provide <code>-Dtests.perf=true</code> as a system property for the run
+ * configuration.
  */
-class TypingTest extends FileBasedTest {
-  private static final String MODE_PROPERTY_NAME = "tests.typing";
+class PerformanceTest extends FileBasedTest {
+  private static final String MODE_PROPERTY_NAME = "tests.perf";
   private static final String TEST_MODE = System.getProperty(MODE_PROPERTY_NAME);
 
   @ParameterizedTest
   @MethodSource("org.eclipse.lsp.cobol.positive.FileBasedTest#getTextsToTest")
-  @DisplayName("Typing test")
+  @DisplayName("Performance test")
   @NullSource
-  void typingTest(CobolText text) {
+  void performanceTest(CobolText text) {
     if (!Boolean.TRUE.toString().equals(TEST_MODE) || text == null) return;
 
     String name = text.getFileName();
     String fullText = text.getFullText();
 
-    StringBuilder currentText = new StringBuilder();
-    List<Diagnostic> result = new ArrayList<>();
-    try {
-      for (char c : fullText.toCharArray()) {
-        currentText.append(c);
-        if (c == ' ') continue;
-        UseCaseUtils.analyzeForErrors(name, currentText.toString(), getCopybooks());
-      }
-    } catch (RuntimeException e) {
-      fail(String.format("Text that produced the error:\n%s", currentText), e);
-    }
+    long start = System.currentTimeMillis();
+    List<Diagnostic> result = UseCaseUtils.analyzeForErrors(name, fullText, getCopybooks());
+    long stop = System.currentTimeMillis();
+
+    assertNoSyntaxErrorsFound(result, name);
+    System.out.printf("%s %d %d\n", name, fullText.length(), stop - start);
   }
 }
