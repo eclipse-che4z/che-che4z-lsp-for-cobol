@@ -50,6 +50,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
   private static final String MSG_DELIMITER = ", ";
   private static final String MSG_PREFIX = "{";
   private static final String MSG_SUFFIX = "}";
+  private static final String END_OF_FILE_MESSAGE = "ErrorStrategy.endOfFile";
   private static Map<String, String> specialTokenHandlingMap;
 
   static {
@@ -151,10 +152,13 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
 
   @Override
   protected void reportInputMismatch(Parser recognizer, InputMismatchException e) {
+    Token token = e.getOffendingToken();
     String msg =
-        parseCustomMessage(
-            REPORT_INPUT_MISMATCH, getOffendingToken(e), getExpectedToken(recognizer, e));
-    recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
+        token.getType() == EOF
+            ? messageService.getMessage(END_OF_FILE_MESSAGE)
+            : parseCustomMessage(
+                REPORT_INPUT_MISMATCH, getOffendingToken(e), getExpectedToken(recognizer, e));
+    recognizer.notifyErrorListeners(token, msg, e);
   }
 
   @Override
@@ -187,7 +191,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
     if (recognizer.getContext().getRuleIndex() == CobolParser.RULE_performInlineStatement) {
       msg = messageService.getMessage("parsers.performMissingEnd", tokenName);
     } else if (t.getType() == EOF) {
-      msg = messageService.getMessage("ErrorStrategy.endOfFile");
+      msg = messageService.getMessage(END_OF_FILE_MESSAGE);
     } else {
       msg =
           parseCustomMessage(REPORT_UNWANTED_TOKEN, tokenName, getExpectedToken(recognizer, null));

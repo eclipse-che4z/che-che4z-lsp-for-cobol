@@ -48,7 +48,7 @@ class TestTypingOccursDoesNotProduceNumberFormatException {
             "2",
             new Diagnostic(
                 null,
-                "Syntax error on '<EOF>' expected {'01-49', '66', '77', '88', INTEGERLITERAL}",
+                "Unexpected end of file",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }
