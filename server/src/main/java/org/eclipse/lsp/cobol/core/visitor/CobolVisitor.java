@@ -387,30 +387,30 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitExecCicsStatement(ExecCicsStatementContext ctx) {
     areaBWarning(ctx);
-    EmbeddedCode code = embeddedCodeParts.get(ctx.cicsRules().getStart());
-    // apply area B check for tokens provided by a specific lexer
-    areaBWarning(code.getTokens());
-    return getLocality(ctx.getStart())
-        .<List<Node>>map(
-            it ->
-                ImmutableList.of(
-                    new EmbeddedCodeNode(
-                        it, code.getTokenStream(), code.getTree(), EmbeddedCodeNode.Language.CICS)))
-        .orElse(ImmutableList.of());
+    return processEmbeddedNodes(ctx, ctx.cicsRules(), EmbeddedCodeNode.Language.CICS);
   }
 
   @Override
   public List<Node> visitExecSqlStatement(ExecSqlStatementContext ctx) {
     areaBWarning(ctx);
-    EmbeddedCode code = embeddedCodeParts.get(ctx.sqlCode().getStart());
+    return processEmbeddedNodes(ctx, ctx.sqlCode(), EmbeddedCodeNode.Language.SQL);
+  }
+
+  private List<Node> processEmbeddedNodes(
+      ParserRuleContext parent, ParserRuleContext ctx, EmbeddedCodeNode.Language language) {
+    final Optional<EmbeddedCode> embeddedCode =
+        ofNullable(ctx).map(ParserRuleContext::getStart).map(embeddedCodeParts::get);
     // apply area B check for tokens provided by a specific lexer
-    areaBWarning(code.getTokens());
-    return getLocality(ctx.getStart())
-        .<List<Node>>map(
-            it ->
-                ImmutableList.of(
-                    new EmbeddedCodeNode(
-                        it, code.getTokenStream(), code.getTree(), EmbeddedCodeNode.Language.SQL)))
+    embeddedCode.map(EmbeddedCode::getTokens).ifPresent(this::areaBWarning);
+    return embeddedCode
+        .flatMap(
+            code ->
+                getLocality(parent.getStart())
+                    .<List<Node>>map(
+                        it ->
+                            ImmutableList.of(
+                                new EmbeddedCodeNode(
+                                    it, code.getTokenStream(), code.getTree(), language))))
         .orElse(ImmutableList.of());
   }
 

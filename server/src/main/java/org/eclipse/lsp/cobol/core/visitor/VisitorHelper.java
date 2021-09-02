@@ -32,6 +32,7 @@ import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
 import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp4j.Range;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -167,41 +168,39 @@ class VisitorHelper {
    * @return a string representation of the given context
    */
   String getIntervalText(ParserRuleContext ctx) {
+    return ofNullable(ctx).map(VisitorHelper::retrieveIntervalText).orElse("");
+  }
+
+  private String retrieveIntervalText(@Nonnull ParserRuleContext ctx) {
     int start = ctx.getStart().getStartIndex();
     int stop = ctx.getStop().getStopIndex();
     return ctx.getStart().getInputStream().getText(new Interval(start, stop));
   }
 
   /**
-   * Retrieve the text in the initial representation including the hidden tokens from the passed interval.
-   *
-   * @param ctx the rule context that contains the required tokens
-   * @param interval the interval for the required string in the passed context.
-   * @return a string representation of the given context
-   */
-  public String getIntervalText(ParserRuleContext ctx, Interval interval) {
-    return ctx.getStart().getInputStream().getText(interval);
-  }
-
-  /**
    * Retrieve a locality from the given context with a range from the start to the end
    *
-   * @param ctx ParserRuleContext to extract locality
+   * @param context ParserRuleContext to extract locality
    * @param positions map of exact positions
    * @return locality which has a range from the start to the end of the rule
    */
-  Optional<Locality> retrieveRangeLocality(ParserRuleContext ctx, Map<Token, Locality> positions) {
-    return ofNullable(positions.get(ctx.getStart()))
+  Optional<Locality> retrieveRangeLocality(
+      ParserRuleContext context, Map<Token, Locality> positions) {
+    return ofNullable(context)
         .flatMap(
-            start ->
-                ofNullable(positions.get(ctx.getStop()))
-                    .map(
-                        stop ->
-                            start.toBuilder()
-                                .range(
-                                    new Range(
-                                        start.getRange().getStart(), stop.getRange().getEnd()))
-                                .build()));
+            ctx ->
+                ofNullable(positions.get(ctx.getStart()))
+                    .flatMap(
+                        start ->
+                            ofNullable(positions.get(ctx.getStop()))
+                                .map(
+                                    stop ->
+                                        start.toBuilder()
+                                            .range(
+                                                new Range(
+                                                    start.getRange().getStart(),
+                                                    stop.getRange().getEnd()))
+                                            .build())));
   }
 
   /**
