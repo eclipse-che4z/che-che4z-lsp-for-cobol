@@ -36,7 +36,7 @@ public class ProgramIdNode extends Node {
   }
 
   @Override
-  public List<SyntaxError> process() {
+  public List<SyntaxError> processNode() {
     getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
         .ifPresent(it -> it.setProgramName(programId));

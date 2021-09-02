@@ -87,6 +87,8 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       }
     } else if (node instanceof ExitNode || node instanceof GoBackNode || node instanceof StopNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.STOP.getValue()));
+    } else if (node instanceof ParagraphsNode || node instanceof ProcedureDivisionBodyNode) {
+      node.getChildren().forEach(child -> traverse(parent, child));
     }
   }
 

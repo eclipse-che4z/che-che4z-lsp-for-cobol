@@ -310,7 +310,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitConfigurationSection(ConfigurationSectionContext ctx) {
     outlineTreeBuilder.addNode(CONFIGURATION_SECTION, NodeType.SECTION, ctx);
-    return visitChildren(ctx);
+    return addTreeNode(ctx, SectionNode::new);
   }
 
   @Override
@@ -717,6 +717,17 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitIfStatement(IfStatementContext ctx) {
     return addTreeNode(ctx, locality -> new IfNode(locality, ctx));
   }
+
+  @Override
+  public List<Node> visitParagraphs(ParagraphsContext ctx) {
+    return addTreeNode(ctx, ParagraphsNode::new);
+  }
+
+  @Override
+  public List<Node> visitProcedureDivisionBody(ProcedureDivisionBodyContext ctx) {
+    return addTreeNode(ctx, ProcedureDivisionBodyNode::new);
+  }
+
   // NOTE: CobolVisitor is not managed by Guice DI, so can't use annotation here.
   @Override
   public List<Node> visitChildren(RuleNode node) {

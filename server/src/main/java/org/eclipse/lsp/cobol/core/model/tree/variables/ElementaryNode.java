@@ -82,10 +82,10 @@ abstract class ElementaryNode extends VariableWithLevelNode implements UsageClau
    * @return SyntaxError
    */
   @Override
-  public List<SyntaxError> process() {
+  public List<SyntaxError> processNode() {
     List<SyntaxError> errors = new ArrayList<>(validatePicClauseUsage());
     errors.addAll(validateCompatibleUsageClause());
-    errors.addAll(super.process());
+    errors.addAll(super.processNode());
     return errors;
   }
 

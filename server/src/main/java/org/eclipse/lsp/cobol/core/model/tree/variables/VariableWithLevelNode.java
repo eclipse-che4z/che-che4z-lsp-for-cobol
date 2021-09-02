@@ -65,14 +65,13 @@ abstract class VariableWithLevelNode extends VariableNode {
   }
 
   @Override
-  public List<SyntaxError> process() {
+  protected List<SyntaxError> processNode() {
     List<SyntaxError> errors = new ArrayList<>();
     if ((level == LEVEL_01 || level == LEVEL_77)
         && getLocality().getRange().getStart().getCharacter() > AREA_A_FINISH)
       errors.add(getError(MessageTemplate.of(AREA_A_WARNING, getName())));
     if (specifiedGlobal && level != LEVEL_01)
       errors.add(getError(MessageTemplate.of(GLOBAL_NON_01_LEVEL_MSG)));
-    errors.addAll(super.process());
     return errors;
   }
 }

@@ -52,11 +52,11 @@ public class StandAloneDataItemNode extends VariableWithLevelNode {
   }
 
   @Override
-  public List<SyntaxError> process() {
+  public List<SyntaxError> processNode() {
     List<SyntaxError> errors = new ArrayList<>();
     if (picClause.isEmpty())
       errors.add(getError(MessageTemplate.of(EMPTY_STRUCTURE_MSG, getName())));
-    errors.addAll(super.process());
+    errors.addAll(super.processNode());
     return errors;
   }
 }

@@ -75,6 +75,7 @@ public class CobolLanguageEngine {
   private final MessageService messageService;
   private final ParseTreeListener treeListener;
   private final SubroutineService subroutineService;
+  private static final int PROCESS_CALLS_THRESHOLD = 10;
 
   @Inject
   public CobolLanguageEngine(
@@ -153,14 +154,14 @@ public class CobolLanguageEngine {
       timingBuilder.getSyntaxTreeTimer().start();
       analyzeEmbeddedCode(syntaxTree, positionMapping, context.getConstants());
       Node rootNode = syntaxTree.get(0);
-      accumulatedErrors.addAll(rootNode.process());
+      accumulatedErrors.addAll(processSyntaxTree(rootNode));
       // This is a temporal solution only for compatibility
       // Definitions, usages and variables are set here for "Go to definition" feature and others
       List<Variable> definedVariables =
           rootNode
               .getDepthFirstStream()
               .filter(hasType(PROGRAM))
-              .map((ProgramNode.class::cast))
+              .map(ProgramNode.class::cast)
               .map(ProgramNode::getDefinedVariables)
               .flatMap(Collection::stream)
               .collect(toList());
@@ -195,6 +196,17 @@ public class CobolLanguageEngine {
 
     return new ResultWithErrors<>(
         context, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
+  }
+
+  private List<SyntaxError> processSyntaxTree(Node rootNode) {
+    List<SyntaxError> errors = new ArrayList<>();
+    int processCalls = 0;
+    do {
+      errors.addAll(rootNode.process());
+      processCalls++;
+      if (processCalls > PROCESS_CALLS_THRESHOLD) throw new RuntimeException("Infinity loop in tree processing");
+    } while (!rootNode.isProcessed());
+    return errors;
   }
 
   private Map<Token, EmbeddedCode> extractEmbeddedCode(
