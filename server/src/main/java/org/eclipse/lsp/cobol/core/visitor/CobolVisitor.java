@@ -547,16 +547,21 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitDataDescriptionEntryFormat3(DataDescriptionEntryFormat3Context ctx) {
     String name = getName(ctx.entryName());
     outlineTreeBuilder.addVariable(LEVEL_88, name, NodeType.FIELD_88, ctx);
-    return addTreeNode(
-        VariableDefinitionNode.builder()
-            .level(LEVEL_88)
-            .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_88()))
-            .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
-            .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null))
-            .valueClauses(retrieveValues(ImmutableList.of(ctx.dataValueClause())))
-            .valueToken(retrieveValueToken(ctx.dataValueClause().valueIsToken()))
-            .build(),
-        visitChildren(ctx));
+    return ofNullable(ctx.dataValueClause())
+        .map(DataValueClauseContext::valueIsToken)
+        .map(
+            valueToken ->
+                addTreeNode(
+                    VariableDefinitionNode.builder()
+                        .level(LEVEL_88)
+                        .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_88()))
+                        .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
+                        .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null))
+                        .valueClauses(retrieveValues(ImmutableList.of(ctx.dataValueClause())))
+                        .valueToken(retrieveValueToken(valueToken))
+                        .build(),
+                    visitChildren(ctx)))
+        .orElse(ImmutableList.of());
   }
 
   private String retrieveValueToken(ValueIsTokenContext ctx) {
