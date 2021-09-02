@@ -27,6 +27,7 @@ COMMACHAR : ',';
 COMMENTTAG : '*>';
 DOLLARCHAR : '$';
 DOUBLEQUOTE : '"';
+DOUBLEEQUALCHAR : '==';
 
 // period full stopPosition
 DOT_FS : '.' EOF?;
