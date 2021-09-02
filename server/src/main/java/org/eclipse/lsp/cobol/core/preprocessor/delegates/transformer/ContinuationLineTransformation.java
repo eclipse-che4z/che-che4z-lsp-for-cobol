@@ -27,7 +27,6 @@ import org.eclipse.lsp4j.Range;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -46,10 +45,8 @@ import static org.eclipse.lsp.cobol.core.model.ErrorSeverity.ERROR;
  */
 @Slf4j
 public class ContinuationLineTransformation implements CobolLinesTransformation {
-  private static final Pattern CONTINUATION_LINE_PATTERN =
-      Pattern.compile(ProcessingConstants.CONT_LINE_NO_AREA_A_REGEX);
   private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("\\s*");
-  private static final String PSEUDO_TEXT_DELIMITER = "==";
+  private static final String PSEUDO_TEXT_DELIMITER = "=";
   private final MessageService messageService;
 
   @Inject
@@ -130,30 +127,12 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
         || isPseudoDelimiterContinued(line, predecessorContentArea);
   }
 
-  private boolean isPseudoDelimiterContinued(CobolLine line, String predecessorContentArea) {
-    if (!isStringContinuedLine(line)) {
-      String inspectionText =
-          StringUtils.normalizeSpace(line.getContentArea()).charAt(0)
-              + getLastValidChar(predecessorContentArea);
-      return inspectionText.equals(PSEUDO_TEXT_DELIMITER);
-    }
-    return false;
-  }
-
   // REF - https://www.ibm.com/support/knowledgecenter/SS6SG3_6.1.0/lr/ref/rlfmtcon.html
   // topic - Continuation of alphanumeric and national literals
-  private boolean isStringContinuedLine(CobolLine line) {
-    return line.getContentArea().startsWith("\"");
-  }
-
-  private String getLastValidChar(String predecessorContentArea) {
-    String normalizedContent = StringUtils.normalizeSpace(predecessorContentArea);
-    String lastValidChar = normalizedContent.substring(normalizedContent.length() - 1);
-
-    // consider delimiters in a continue line.
-    if (StringUtils.endsWithAny(normalizedContent, ",", ";"))
-      lastValidChar = predecessorContentArea.substring(normalizedContent.length() - 2);
-    return lastValidChar;
+  private boolean isPseudoDelimiterContinued(CobolLine line, String predecessorContentArea) {
+    return StringUtils.stripEnd(StringUtils.normalizeSpace(predecessorContentArea), ",;")
+        .endsWith(PSEUDO_TEXT_DELIMITER)
+        && StringUtils.normalizeSpace(line.getContentArea()).startsWith(PSEUDO_TEXT_DELIMITER);
   }
 
   private void adjustBlankOrCommentLines(CobolLine cobolLine) {
@@ -184,20 +163,21 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
    */
   private SyntaxError checkContentAreaAWithContinuationLine(
       CobolLine cobolLine, String uri, int lineNumber) {
-    String line = cobolLine.toString();
-    Matcher continuationLineMatcher = CONTINUATION_LINE_PATTERN.matcher(line);
-    if (!continuationLineMatcher.matches()) {
-      return registerContinuationLineError(uri, lineNumber, countAreaASpaces(line));
+    if (cobolLine.getType() == CobolLineTypeEnum.CONTINUATION && !StringUtils.isBlank(cobolLine.getContentAreaA())) {
+      return registerContinuationLineError(uri, lineNumber, countLeadingSpaces(cobolLine.getContentAreaA()));
     }
     return null;
   }
 
   /** Count number of spaces between INDICATOR_AREA and CONTENT_AREA_A */
-  private int countAreaASpaces(String line) {
-    return line.substring(
-            ProcessingConstants.START_INDEX_AREA_A, ProcessingConstants.END_INDEX_CONTENT_AREA_A)
-        .replaceAll("[^ ]", "")
-        .length();
+  private int countLeadingSpaces(String line) {
+    int spaces = 0;
+    for (char c : line.toCharArray())
+      if (c == ' ')
+        spaces++;
+      else
+        break;
+    return spaces;
   }
 
   /**
@@ -286,9 +266,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   }
 
   private SyntaxError registerContinuationLineError(String uri, int lineNumber, int countingSpace) {
-    int startPosition =
-        ProcessingConstants.END_INDEX_CONTENT_AREA_A
-            - (ProcessingConstants.START_INDEX_AREA_A - countingSpace);
+    int startPosition = ProcessingConstants.INDICATOR_AREA + countingSpace;
     SyntaxError error =
         SyntaxError.syntaxError()
             .locality(
@@ -296,9 +274,9 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
                     .uri(uri)
                     .range(
                         new Range(
-                            new Position(lineNumber - 1, startPosition),
+                            new Position(lineNumber, startPosition),
                             new Position(
-                                lineNumber - 1, ProcessingConstants.END_INDEX_CONTENT_AREA_A)))
+                                lineNumber, ProcessingConstants.START_INDEX_AREA_B)))
                     .recognizer(ContinuationLineTransformation.class)
                     .build())
             .suggestion(
