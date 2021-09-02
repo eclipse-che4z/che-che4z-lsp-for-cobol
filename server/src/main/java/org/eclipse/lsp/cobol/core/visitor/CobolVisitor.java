@@ -906,6 +906,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private List<OccursClause> retrieveOccursValues(List<DataOccursClauseContext> contexts) {
     // TODO: Process OCCURS DEPENDING ON
     return contexts.stream()
+        .filter(it -> textPresents(it.integerLiteral()))
         .map(
             context ->
                 new OccursClause(
@@ -933,5 +934,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private Locality getLevelLocality(TerminalNode terminalNode) {
     return positions.get(terminalNode.getSymbol());
+  }
+
+  private boolean textPresents(ParserRuleContext ctx) {
+    return !ctx.getText().isEmpty();
   }
 }

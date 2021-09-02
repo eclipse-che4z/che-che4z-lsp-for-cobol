@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -23,16 +23,15 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.Test;
 
-/** Typing the variable definition of 88 level should not produce NPE */
-class TestIncomplete88DoesNotProduceNPE {
+/** Typing a variable definition with OCCURS statement should not produce a NumberFormatException */
+class TestTypingOccursDoesNotProduceNumberFormatException {
 
   private static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. TEST1.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "       01  {$*A1} PIC 9.\n"
-          + "           88{|1}\n";
+      "        IDENTIFICATION DIVISION.\n"
+          + "        PROGRAM-ID. TEST1.\n"
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        01 {$*A1|1} OCCURS{|2}\n";
 
   @Test
   void test() {
@@ -41,6 +40,12 @@ class TestIncomplete88DoesNotProduceNPE {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
+            new Diagnostic(
+                null,
+                "A \"PICTURE\" clause was not found for elementary item A1",
+                DiagnosticSeverity.Error,
+                SourceInfoLevels.ERROR.getText()),
+            "2",
             new Diagnostic(
                 null,
                 "Unexpected end of file",
