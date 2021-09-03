@@ -303,10 +303,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitEndProgramStatement(EndProgramStatementContext ctx) {
-    Token endProgramNameToken = ctx.programName().getStart();
-    String id = PreprocessorStringUtils.trimQuotes(endProgramNameToken.getText());
     areaAWarning(ctx.getStart());
-    return addTreeNode(ctx.programName(), locality -> new ProgramEndNode(locality, id));
+    return ofNullable(ctx.programName())
+        .map(ParserRuleContext::getStart)
+        .map(Token::getText)
+        .map(PreprocessorStringUtils::trimQuotes)
+        .map(id -> addTreeNode(ctx.programName(), locality -> new ProgramEndNode(locality, id)))
+        .orElse(ImmutableList.of());
   }
 
   @Override
