@@ -56,12 +56,14 @@ import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.antlr.v4.runtime.Lexer.HIDDEN;
 import static org.eclipse.lsp.cobol.core.CobolParser.*;
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.*;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.*;
@@ -387,30 +389,30 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitExecCicsStatement(ExecCicsStatementContext ctx) {
     areaBWarning(ctx);
-    EmbeddedCode code = embeddedCodeParts.get(ctx.cicsRules().getStart());
-    // apply area B check for tokens provided by a specific lexer
-    areaBWarning(code.getTokens());
-    return getLocality(ctx.getStart())
-        .<List<Node>>map(
-            it ->
-                ImmutableList.of(
-                    new EmbeddedCodeNode(
-                        it, code.getTokenStream(), code.getTree(), EmbeddedCodeNode.Language.CICS)))
-        .orElse(ImmutableList.of());
+    return processEmbeddedNodes(ctx, ctx.cicsRules(), EmbeddedCodeNode.Language.CICS);
   }
 
   @Override
   public List<Node> visitExecSqlStatement(ExecSqlStatementContext ctx) {
     areaBWarning(ctx);
-    EmbeddedCode code = embeddedCodeParts.get(ctx.sqlCode().getStart());
+    return processEmbeddedNodes(ctx, ctx.sqlCode(), EmbeddedCodeNode.Language.SQL);
+  }
+
+  private List<Node> processEmbeddedNodes(
+      ParserRuleContext parent, ParserRuleContext ctx, EmbeddedCodeNode.Language language) {
+    final Optional<EmbeddedCode> embeddedCode =
+        ofNullable(ctx).map(ParserRuleContext::getStart).map(embeddedCodeParts::get);
     // apply area B check for tokens provided by a specific lexer
-    areaBWarning(code.getTokens());
-    return getLocality(ctx.getStart())
-        .<List<Node>>map(
-            it ->
-                ImmutableList.of(
-                    new EmbeddedCodeNode(
-                        it, code.getTokenStream(), code.getTree(), EmbeddedCodeNode.Language.SQL)))
+    embeddedCode.map(EmbeddedCode::getTokens).ifPresent(this::areaBWarning);
+    return embeddedCode
+        .flatMap(
+            code ->
+                getLocality(parent.getStart())
+                    .<List<Node>>map(
+                        it ->
+                            ImmutableList.of(
+                                new EmbeddedCodeNode(
+                                    it, code.getTokenStream(), code.getTree(), language))))
         .orElse(ImmutableList.of());
   }
 
@@ -829,24 +831,31 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private void areaBWarning(ParserRuleContext ctx) {
+    final int start = ctx.getStart().getTokenIndex();
+    final int stop = ctx.getStop().getTokenIndex();
+
     areaBWarning(
-        tokenStream.getTokens(ctx.getStart().getTokenIndex(), ctx.getStop().getTokenIndex()));
+        start < stop ? tokenStream.getTokens(start, stop) : ImmutableList.of(ctx.getStart()));
   }
 
   private void areaBWarning(@NonNull List<Token> tokenList) {
     tokenList.forEach(
         token ->
             getLocality(token)
+                .filter(startsInAreaA(token))
                 .ifPresent(
-                    locality -> {
-                      int charPosition = locality.getRange().getStart().getCharacter();
-                      if (charPosition > 6 && charPosition < 11 && token.getChannel() != 1) {
+                    locality ->
                         throwException(
                             token.getText(),
                             locality,
-                            messageService.getMessage("CobolVisitor.AreaBWarningMsg"));
-                      }
-                    }));
+                            messageService.getMessage("CobolVisitor.AreaBWarningMsg"))));
+  }
+
+  private Predicate<Locality> startsInAreaA(Token token) {
+    return it -> {
+      int charPosition = it.getRange().getStart().getCharacter();
+      return charPosition > 6 && charPosition < 11 && token.getChannel() != HIDDEN;
+    };
   }
 
   private Map<String, Collection<Location>> getSubroutineDefinition() {
