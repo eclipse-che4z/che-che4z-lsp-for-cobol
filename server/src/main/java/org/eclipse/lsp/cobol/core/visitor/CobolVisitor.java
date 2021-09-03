@@ -539,9 +539,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .level(LEVEL_66)
             .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_66()))
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
-            .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null))
-            .renamesClause(extractNameAndLocality(ctx.dataRenamesClause().dataName()));
-    ofNullable(ctx.dataRenamesClause().thruDataName())
+            .statementLocality(retrieveRangeLocality(ctx, positions).orElse(null));
+    ofNullable(ctx.dataRenamesClause())
+        .map(DataRenamesClauseContext::dataName)
+        .map(this::extractNameAndLocality)
+        .ifPresent(builder::renamesClause);
+    ofNullable(ctx.dataRenamesClause())
+        .map(DataRenamesClauseContext::thruDataName)
         .map(ThruDataNameContext::dataName)
         .map(this::extractNameAndLocality)
         .ifPresent(builder::renamesThruClause);
