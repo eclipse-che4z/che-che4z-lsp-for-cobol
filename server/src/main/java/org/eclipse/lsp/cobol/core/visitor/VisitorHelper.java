@@ -144,6 +144,7 @@ class VisitorHelper {
   List<UsageFormat> retrieveUsageFormat(List<DataUsageClauseContext> contexts) {
     return contexts.stream()
         .map(DataUsageClauseContext::usageFormat)
+        .filter(Objects::nonNull)
         .map(UsageFormatContext::getStart)
         .map(Token::getText)
         .map(UsageFormat::of)
