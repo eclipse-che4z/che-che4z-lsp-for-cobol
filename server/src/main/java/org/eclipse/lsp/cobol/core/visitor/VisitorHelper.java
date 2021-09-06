@@ -154,11 +154,15 @@ class VisitorHelper {
   /**
    * Convert IntegerLiteralContext into an Integer
    *
-   * @param context the IntegerLiteralContext
-   * @return converted Integer
+   * @param context the IntegerLiteralContext, may be null
+   * @return converted Integer or null if the context is empty
    */
   Integer getInteger(IntegerLiteralContext context) {
-    return Integer.parseInt(context.getText());
+    return ofNullable(context)
+        .map(ParserRuleContext::getText)
+        .filter(it -> !it.isEmpty())
+        .map(Integer::parseInt)
+        .orElse(null);
   }
 
   /**
