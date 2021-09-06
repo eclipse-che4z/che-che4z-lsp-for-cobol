@@ -932,20 +932,31 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private List<OccursClause> retrieveOccursValues(List<DataOccursClauseContext> contexts) {
     // TODO: Process OCCURS DEPENDING ON
     return contexts.stream()
-        .filter(it -> textPresents(it.integerLiteral()))
-        .map(
-            context ->
-                new OccursClause(
-                    getInteger(context.integerLiteral()),
-                    ofNullable(context.dataOccursTo())
-                        .map(DataOccursToContext::integerLiteral)
-                        .map(VisitorHelper::getInteger)
-                        .orElse(null),
-                    ofNullable(context.indexName()).orElseGet(ImmutableList::of).stream()
-                        .map(IndexNameContext::cobolWord)
-                        .map(this::extractNameAndLocality)
-                        .collect(toList())))
+        .map(this::toOccursClause)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(toList());
+  }
+
+  private Optional<OccursClause> toOccursClause(DataOccursClauseContext ctx) {
+    return ofNullable(VisitorHelper.getInteger(ctx.integerLiteral()))
+        .map(
+            intLit ->
+                new OccursClause(intLit, retrieveOccursToValue(ctx), retrieveIndexNames(ctx)));
+  }
+
+  private List<VariableNameAndLocality> retrieveIndexNames(DataOccursClauseContext ctx) {
+    return ofNullable(ctx.indexName()).orElseGet(ImmutableList::of).stream()
+        .map(IndexNameContext::cobolWord)
+        .map(this::extractNameAndLocality)
+        .collect(toList());
+  }
+
+  private Integer retrieveOccursToValue(DataOccursClauseContext ctx) {
+    return ofNullable(ctx.dataOccursTo())
+        .map(DataOccursToContext::integerLiteral)
+        .map(VisitorHelper::getInteger)
+        .orElse(null);
   }
 
   private List<ValueClause> retrieveValues(List<DataValueClauseContext> clauses) {
@@ -960,9 +971,5 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private Locality getLevelLocality(TerminalNode terminalNode) {
     return positions.get(terminalNode.getSymbol());
-  }
-
-  private boolean textPresents(ParserRuleContext ctx) {
-    return !ctx.getText().isEmpty();
   }
 }
