@@ -283,21 +283,25 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitProcedureDeclaratives(ProcedureDeclarativesContext ctx) {
     Token firstDeclarative = ctx.getStart();
     int firstDeclLine = firstDeclarative.getLine();
-    Token declarativeBody = ctx.procedureDeclarative(0).getStart();
-    Token endToken = ctx.END().getSymbol();
 
-    if (firstDeclLine == declarativeBody.getLine()) {
-      getLocality(declarativeBody)
-          .ifPresent(
-              locality ->
-                  throwException(
-                      declarativeBody.getText(),
-                      locality,
-                      messageService.getMessage("CobolVisitor.declarativeSameMsg")));
+    if (!ctx.procedureDeclarative().isEmpty()) {
+      Token declarativeBody = ctx.procedureDeclarative(0).getStart();
+      if (firstDeclLine == declarativeBody.getLine()) {
+        getLocality(declarativeBody)
+            .ifPresent(
+                locality ->
+                    throwException(
+                        declarativeBody.getText(),
+                        locality,
+                        messageService.getMessage("CobolVisitor.declarativeSameMsg")));
+      }
     }
 
     areaAWarning(firstDeclarative);
-    areaAWarning(endToken);
+
+    ofNullable(ctx.END())
+        .map(TerminalNode::getSymbol)
+        .ifPresent(endToken -> areaAWarning(endToken));
     return visitChildren(ctx);
   }
 
