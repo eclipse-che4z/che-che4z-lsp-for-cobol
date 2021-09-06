@@ -612,12 +612,18 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitSetUpDownByStatement(SetUpDownByStatementContext ctx) {
     List<Locality> receivingFields = mapRulesToLocalities(ctx.receivingField());
-    Locality sendingField = positions.get(ctx.sendingField().getStart());
-    String literal =
-        ofNullable(ctx.sendingField().literal()).map(ParserRuleContext::getText).orElse(null);
-    return addTreeNode(
-        ctx,
-        locality -> new SetUpDownByStatement(locality, receivingFields, sendingField, literal));
+    return ofNullable(ctx.sendingField())
+        .map(
+            it ->
+                addTreeNode(
+                    ctx,
+                    locality ->
+                        new SetUpDownByStatement(
+                            locality,
+                            receivingFields,
+                            positions.get(it.getStart()),
+                            ofNullable(it.literal()).map(ParserRuleContext::getText).orElse(null))))
+        .orElseGet(ImmutableList::of);
   }
 
   @Override
