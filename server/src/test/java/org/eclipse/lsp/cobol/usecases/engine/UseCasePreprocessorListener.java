@@ -348,7 +348,7 @@ public class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener
     int stopMarkLen = closingOfMultiToken.getText().length();
     int stop = closingOfMultiToken.getCharPositionInLine() + stopMarkLen - lineShifts[line];
     int start = stop - affectedTokens.length();
-    lineShifts[line] += stopMarkLen;
+    lineShifts[line] += ctx.getStop().getText().length();
 
     registerDiagnostics(
         new Range(new Position(line, start), new Position(line, stop)), ctx.diagnostic());
