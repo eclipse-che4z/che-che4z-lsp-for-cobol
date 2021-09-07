@@ -16,16 +16,11 @@
 package org.eclipse.lsp.cobol.positive;
 
 import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
-import org.eclipse.lsp4j.Diagnostic;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This test checks that the files in the positive test set don't produce any {@link
@@ -37,26 +32,42 @@ class TypingTest extends FileBasedTest {
   private static final String MODE_PROPERTY_NAME = "tests.typing";
   private static final String TEST_MODE = System.getProperty(MODE_PROPERTY_NAME);
 
-  @ParameterizedTest
-  @MethodSource("org.eclipse.lsp.cobol.positive.FileBasedTest#getTextsToTest")
-  @DisplayName("Typing test")
-  @NullSource
-  void typingTest(CobolText text) {
-    if (!Boolean.TRUE.toString().equals(TEST_MODE) || text == null) return;
+  @Test
+  void typingTest() {
+    if (!Boolean.TRUE.toString().equals(TEST_MODE)) return;
+    List<CobolText> textsToTest = getTextsToTest();
+    AtomicInteger counter = new AtomicInteger();
+    final int size = textsToTest.size();
 
+    textsToTest.parallelStream()
+        .filter(Objects::nonNull)
+        .forEach(text -> analyze(text, counter, size));
+  }
+
+  private void analyze(CobolText text, AtomicInteger counter, int size) {
     String name = text.getFileName();
     String fullText = text.getFullText();
 
-    StringBuilder currentText = new StringBuilder();
-    List<Diagnostic> result = new ArrayList<>();
+    System.out.printf("Analyzing %s\n", name);
+
+    final long start = System.currentTimeMillis();
+    analyze(name, fullText);
+    final double time = (System.currentTimeMillis() - start) / 1000.0;
+
+    System.out.printf(
+        "%s analyzed successfully in %.3f seconds. Progress: %s/%s\n",
+        name, time, counter.incrementAndGet(), size);
+  }
+
+  private void analyze(String name, String fullText) {
+    String accumulator = "";
     try {
       for (char c : fullText.toCharArray()) {
-        currentText.append(c);
-        if (c == ' ') continue;
-        UseCaseUtils.analyzeForErrors(name, currentText.toString(), getCopybooks());
+        accumulator += c;
+        if (c != ' ') UseCaseUtils.analyzeForErrors(name, accumulator, getCopybooks());
       }
     } catch (RuntimeException e) {
-      fail(String.format("Text that produced the error:\n%s", currentText), e);
+      System.out.printf("Text that produced the error:\n%s\n\n%s", accumulator, e);
     }
   }
 }
