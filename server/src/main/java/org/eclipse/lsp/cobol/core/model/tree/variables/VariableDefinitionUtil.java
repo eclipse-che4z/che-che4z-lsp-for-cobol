@@ -65,6 +65,7 @@ public class VariableDefinitionUtil {
   public static final String REDEFINE_IMMEDIATELY_FOLLOW = "semantics.redefineImmediatelyFollow";
   public static final String LEVELS_MUST_MATCH = "semantics.levelsMustMatch";
   public static final String REDEFINED_CONTAIN_VALUE = "semantics.redefinedContainValue";
+  public static final String UNKNOWN_VARIABLE_DEFINITION = "semantics.unknownVariableDefinition";
 
   public static final ErrorSeverity SEVERITY = ERROR;
   private final List<Function<VariableDefinitionNode, ResultWithErrors<VariableNode>>> matchers =
@@ -154,7 +155,15 @@ public class VariableDefinitionUtil {
               .getNearestParentByType(NodeType.PROGRAM)
               .map(ProgramNode.class::cast)
               .ifPresent(programNode -> variables.forEach(programNode::addVariableDefinition));
-        } else LOG.error("Unknown variable definition: {}", definitionNode.getLocality());
+        } else {
+          SyntaxError error = SyntaxError.syntaxError()
+              .severity(SEVERITY)
+              .locality(definitionNode.getLocality())
+              .messageTemplate(MessageTemplate.of(UNKNOWN_VARIABLE_DEFINITION))
+              .build();
+          errors.add(error);
+          LOG.debug("Syntax error by VariableDefinitionUtil " + error.toString());
+        }
         definitionNodes.removeFirst();
       } else {
         Node parentForNextLevel =
