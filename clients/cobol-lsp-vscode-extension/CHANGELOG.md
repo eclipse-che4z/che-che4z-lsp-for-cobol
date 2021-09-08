@@ -2,6 +2,20 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 Changelog:
 
+## [0.21.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.20.0...0.21.0) (2021-09-08)
+
+#### Added
+Support for FD and SD definitions
+
+#### Changed
+Optimization of language engine and other performance improvements
+
+#### Fixed
+Coloring for floating comments
+Parsing keywords as variables in complicated sentences
+Incorrect error messages on EXEC-CICS and END-PERFORM statement clauses
+Many cases of server freeze
+
 ## [0.20.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.1...0.20.0) (2021-07-22)
 
 #### Added

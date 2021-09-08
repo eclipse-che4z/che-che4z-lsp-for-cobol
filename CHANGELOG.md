@@ -1,6 +1,43 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
-Changelog:
+
+## [0.21.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.20.0...0.21.0) (2021-09-08)
+
+### Bug Fixes
+* Fix consuming of extra tokens by statements ([c81c25d](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/c81c25d724fb5337ba758f9f11eee71c072d87b9)), closes [#1020](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1020)
+* Fix an exception on EXEC variable name ([f684dc5](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/f684dc5c34d7d2b8cb00d529c2ee6ee88ae515fd)), closes [#1077](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1077)
+* Fix an exception on OCCURS clause ([fcbeaf2](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/fcbeaf250145123b676d82ed9d5209a5930d5047)), closes [#1071](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1071)
+* Fix an exception on incomplete 88 definition ([5486dbf](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/5486dbfac49da55eae4064f22981898576d288af)), closes [#1070](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1070)
+* Fix an exception on empty USAGE clause ([24abd6f](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/24abd6f4d41bbb9ef51755f2046e1cd4af5d8d28)), closes [#1074](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1074)
+* Fix an exception on END token ([35ab62c](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/35ab62c18f950254e2cf6aadd447c474daa23916)), closes [#1072](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1072) [#1075](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1075)
+* Fix an exception on incomplete EXEC statement ([02ab9fa](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/02ab9fa8f4caba04ce96a8b9d07b654e0d7c7d56)), closes [#1076](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1076)
+* Fix an exception on incomplete OCCURS TO clause ([4f09357](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/4f09357f4face1580b048c2d20dcef709e83a183))
+* Fix an exception on incomplete SET UP statement ([a88d0f4](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a88d0f41f3c4635bc2ab812a33ec957f05ea1631)), closes [#1093](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1093)
+* Fix an exception on SNAP TITLE statement [#1011](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1011) ([a3581ad](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/a3581ad4be78734d50168550d53ec9a499a64a67))
+* Fix an exception on empty continuation line ([d96b2f7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/d96b2f77500ba4f01c2191b94ef8e4cceb7e2bd5)), closes [#1078](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1078)
+* Fix an exception on incomplete DECLARATIVES Section ([574cdd4](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/574cdd4d1cb3cdccc059856b55ec8657f7606c3e)), closes [#1095](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1095)
+* Fix an exception on incomplete COPY REPLACING statement [#1080](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1080) ([9935151](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9935151ae6f8ac070be3ece61aa4745ef8e555be))
+* Fix an exception on incomplete variable definition ([00ec825](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/00ec8252633350bf9ea225945fd826ba7faf2b7e)), closes [#1079](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1079)
+* Fix incorrect error message on EXEC CICS [#965](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/965) ([0333af6](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/0333af6ca777b53d55588c7ca3a063043ab13480))
+* Fix server freeze on typos in MAP SECTION ([e54f322](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/e54f322a0b55b67f62882324667af8a325107138)), closes [#1035](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1035)
+* Fix syntax check for missing END-PERFORM ([c28f5c7](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/c28f5c7d4caee82becf9ce514965c65fa28a47cf))
+
+### Features
+* Support coloring for floating comment ([7d27b66](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/7d27b6640227ca609fe764fbf34bbab95abe9e77)), closes [#1039](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1039)
+* Support FD and SD definitions ([8c8109f](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/8c8109f91a0c7e7d4859cfd8726f1c77d460f80b))
+
+### Performance Improvements
+* Avoid recursion in position lookup ([9232d47](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/9232d4793239b295639cf970dfe7d17fd655f4f8))
+* Optimize identifier rule in CobolParser([494dc1d](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/494dc1ddfd6523be717a06078a82f33cd57fc223))
+* Optimize identifier rules in CICSParser ([994e195](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/994e1957f8cfa0e20515a4d69e0e59f5cb473646))
+* Optimize PERFORM statement ([bd9dedd](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/bd9deddb3f21dac309d646152258f8df96c78130))
+* Remove ambiguities in CONFIGURATION section ([ef954f2](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/ef954f266eef8de0ac47c7d70bbce228d1360eb8))
+* Remove ambiguity in GO TO statement ([75da39c](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/75da39c8ad844dae1c903942d0d14fca5d910d4d))
+* Remove context dependency on EXEC statements ([72ecfa0](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/72ecfa0504b3d2d6978b515bedb766108010027a))
+* Simplify condition rules ([7aaa3c9](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/7aaa3c9591a52e4024dc2d650894b07013ca1126))
+* Simplify DISPLAY statement grammar ([b0b8568](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/b0b8568791bd1cd8ada2f50e83563b6475ec2c4a))
+* Simplify table calls to decrease ambiguity ([bd7e921](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/bd7e921bd1badb855f547f8668dfd38a7783a443))
+* Simplify WRITE statements ([63b4bbc](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/63b4bbc451b8386d9169585486abb66995d48f29))
 
 ## [0.20.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.19.1...0.20.0) (2021-07-22)
 
