@@ -24,7 +24,8 @@
         "z/os",
         "zos",
         "language-server",
-        "jcl"
+        "jcl",
+        "zowe"
     ],
     "categories": [
         "Programming Languages"
