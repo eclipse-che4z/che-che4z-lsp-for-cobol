@@ -284,11 +284,11 @@ context('This is a Copybook spec', () => {
         cy.writeFile('test_files/project/.c4z/.extsrcs/USER1.cbl', context);
       });
       cy.openFolder('.c4z/.extsrcs').openFile('USER1.cbl');
-      cy.goToLine(40);
+      cy.goToLine(26);
       cy.getCurrentLine().type('           COPY ABC.');
       cy.getCurrentLineOverlay().children().should('not.have.class', '.squiggly-error');
       cy.getCurrentLine().type('{end}{backspace}');
-      cy.getCurrentLineErrors({ expectedLine: 40 })
+      cy.getCurrentLineErrors({ expectedLine: 26 })
         .eq(0)
         .getHoverErrorMessage()
         .contains("Syntax error on 'COPY' expected");
