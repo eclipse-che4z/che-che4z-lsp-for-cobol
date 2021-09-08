@@ -60,6 +60,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.EMBEDDED_CODE;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
+import static org.eclipse.lsp.cobol.service.CopybookServiceImpl.PREF_IMPLICIT;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
@@ -169,7 +170,7 @@ public class CobolLanguageEngine {
           context.toBuilder()
               .variableDefinitions(collectVariableDefinitions(definedVariables))
               .variableUsages(collectVariableUsages(definedVariables))
-              .variables(definedVariables)
+              .variables(collectVariables(definedVariables))
               .rootNode(rootNode)
               .build();
       timingBuilder.getSyntaxTreeTimer().stop();
@@ -296,6 +297,7 @@ public class CobolLanguageEngine {
     Multimap<String, Location> definitions = HashMultimap.create();
     definedVariables.stream()
         .filter(it -> !FILLER_NAME.equals(it.getName()))
+        .filter(it -> !it.getDefinition().getUri().startsWith(PREF_IMPLICIT))
         .forEach(it -> definitions.put(it.getName(), it.getDefinition().toLocation()));
     return definitions.asMap();
   }
@@ -308,5 +310,12 @@ public class CobolLanguageEngine {
             usages.putAll(
                 it.getName(), it.getUsages().stream().map(Locality::toLocation).collect(toList())));
     return usages.asMap();
+  }
+
+  private List<Variable> collectVariables(Collection<Variable> definedVariables) {
+    return definedVariables.stream()
+        .filter(it -> !FILLER_NAME.equals(it.getName()))
+        .filter(it -> !it.getDefinition().getUri().startsWith(PREF_IMPLICIT))
+        .collect(toList());
   }
 }

@@ -34,7 +34,7 @@ class VariableDefinitionUtilTest {
 
   @Test
   void simpleStructureTest() {
-    Node programNode = new ProgramNode(LOCALITY, null);
+    Node programNode = new ProgramNode(LOCALITY);
     // 01 Level-01-order-1
     // 01 Level-01-order-2
     //    05 Level-05-order-1
@@ -82,7 +82,7 @@ class VariableDefinitionUtilTest {
 
   @Test
   void nonCorrectStructures() {
-    Node programNode = new ProgramNode(LOCALITY, null);
+    Node programNode = new ProgramNode(LOCALITY);
     // 05 Level-05
     // 01 Level-01
     //   10 Level-10
@@ -116,7 +116,7 @@ class VariableDefinitionUtilTest {
 
   @Test
   void moveLevel66ToTop() {
-    Node programNode = new ProgramNode(LOCALITY, null);
+    Node programNode = new ProgramNode(LOCALITY);
     // 01 Level-01
     //    05 Level-05
     // 66 Level-66
@@ -145,7 +145,7 @@ class VariableDefinitionUtilTest {
     List<ValueClause> valueClauses =
         ImmutableList.of(
             new ValueClause(ImmutableList.of(new ValueInterval("", "", "thru")), LOCALITY));
-    Node programNode = new ProgramNode(LOCALITY, null);
+    Node programNode = new ProgramNode(LOCALITY);
     // 01 Level-01
     //      88 Cond-1
     //    05 Level-05-1

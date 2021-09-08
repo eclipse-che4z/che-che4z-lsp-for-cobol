@@ -25,6 +25,9 @@ import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.SEVERITY;
 
 /** The abstract class for all variable definitions. */
@@ -35,6 +38,7 @@ public abstract class VariableNode extends Node {
   private final VariableType variableType;
   private final String name;
   @Setter private boolean global;
+  @EqualsAndHashCode.Exclude private final List<VariableUsageNode> usages = new ArrayList<>();
 
   protected VariableNode(
       Locality location, String name, VariableType variableType, boolean global) {
@@ -76,6 +80,17 @@ public abstract class VariableNode extends Node {
         .locality(getLocalityForError())
         .messageTemplate(messageTemplate)
         .build();
+  }
+
+  /**
+   * Add usage node to this variable definition.
+   * The method also updates definition for the usage node.
+   *
+   * @param usageNode a variable usage node
+   */
+  public void addUsage(VariableUsageNode usageNode) {
+    usages.add(usageNode);
+    usageNode.setDefinition(this);
   }
 
   private Locality getLocalityForError() {

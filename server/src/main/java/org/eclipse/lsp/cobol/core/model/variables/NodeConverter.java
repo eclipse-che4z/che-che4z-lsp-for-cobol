@@ -49,6 +49,18 @@ public class NodeConverter {
     return variable;
   }
 
+  /**
+   * Update usages for variables.
+   *
+   * @param variableNode a variable node
+   */
+  public void updateUsage(VariableNode variableNode) {
+    Variable variable = convertedVariables.get(variableNode);
+    for (VariableUsageNode usageNode: variableNode.getUsages()) {
+      variable.addUsage(usageNode.getLocality());
+    }
+  }
+
   private Variable convert(VariableNode variableNode) {
     switch (variableNode.getVariableType()) {
       case CONDITION_DATA_NAME:

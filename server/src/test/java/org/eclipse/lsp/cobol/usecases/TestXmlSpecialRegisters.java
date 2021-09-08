@@ -33,10 +33,10 @@ class TestXmlSpecialRegisters {
           + "       01  {$*XML-NAT-CHAR} PIC X(9).\n"
           + "       PROCEDURE DIVISION.\n"
           + "       {#*MAINLINE}.\n"
-          + "           MOVE -1 TO {&XML-CODE}.\n"
-          + "           MOVE {&XML-NTEXT} TO {$XML-NAT-CHAR}\n"
+          + "           MOVE -1 TO {$XML-CODE}.\n"
+          + "           MOVE {$XML-NTEXT} TO {$XML-NAT-CHAR}\n"
           + "           COMPUTE {$LOCAL-NAME-LEN}\n"
-          + "            = FUNCTION LENGTH ({&XML-TEXT})\n"
+          + "            = FUNCTION LENGTH ({$XML-TEXT})\n"
           + "           GOBACK.";
 
   @Test

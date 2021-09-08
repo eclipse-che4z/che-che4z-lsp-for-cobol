@@ -43,7 +43,7 @@ class TestRenamingIncludesOnlyRequiredVariable {
           + "          02 {$*VARNAME5} PIC 9.\n"
           + "       66 {$*VARNAME6} RENAMES {$VARNAME2} THRU {$VARNAME4}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           MOVE 0 TO {VARNAME5|1} OF VARNAME6.\n";
+          + "           MOVE 0 TO {_VARNAME5 OF VARNAME6|1_}.\n";
 
   @Test
   void test() {
