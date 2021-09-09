@@ -35,6 +35,7 @@ import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.variables.Variable;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityFindingUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityMappingUtils;
 import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp.cobol.core.semantics.SemanticContext;
@@ -74,6 +75,7 @@ public class CobolLanguageEngine {
   private final MessageService messageService;
   private final ParseTreeListener treeListener;
   private final SubroutineService subroutineService;
+  private static final int PROCESS_CALLS_THRESHOLD = 10;
 
   @Inject
   public CobolLanguageEngine(
@@ -94,23 +96,19 @@ public class CobolLanguageEngine {
    *
    * @param documentUri unique resource identifier of the processed document
    * @param text the content of the document that should be processed
-   * @param copybookConfig  contains config info like: copybook processing mode, backend server
+   * @param copybookConfig contains config info like: copybook processing mode, backend server
    * @return Semantic information wrapper object and list of syntax error that might send back to
    *     the client
    */
   @NonNull
   public ResultWithErrors<SemanticContext> run(
-      @NonNull String documentUri,
-      @NonNull String text,
-      @NonNull CopybookConfig copybookConfig) {
+      @NonNull String documentUri, @NonNull String text, @NonNull CopybookConfig copybookConfig) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     Timing.Builder timingBuilder = Timing.builder();
     timingBuilder.getPreprocessorTimer().start();
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     ExtendedDocument extendedDocument =
-        preprocessor
-            .process(documentUri, text, copybookConfig)
-            .unwrap(accumulatedErrors::addAll);
+        preprocessor.process(documentUri, text, copybookConfig).unwrap(accumulatedErrors::addAll);
     timingBuilder.getPreprocessorTimer().stop();
 
     timingBuilder.getParserTimer().start();
@@ -156,14 +154,14 @@ public class CobolLanguageEngine {
       timingBuilder.getSyntaxTreeTimer().start();
       analyzeEmbeddedCode(syntaxTree, positionMapping, context.getConstants());
       Node rootNode = syntaxTree.get(0);
-      accumulatedErrors.addAll(rootNode.process());
+      accumulatedErrors.addAll(processSyntaxTree(rootNode));
       // This is a temporal solution only for compatibility
       // Definitions, usages and variables are set here for "Go to definition" feature and others
       List<Variable> definedVariables =
           rootNode
               .getDepthFirstStream()
               .filter(hasType(PROGRAM))
-              .map((ProgramNode.class::cast))
+              .map(ProgramNode.class::cast)
               .map(ProgramNode::getDefinedVariables)
               .flatMap(Collection::stream)
               .collect(toList());
@@ -198,6 +196,17 @@ public class CobolLanguageEngine {
 
     return new ResultWithErrors<>(
         context, accumulatedErrors.stream().map(this::constructErrorMessage).collect(toList()));
+  }
+
+  private List<SyntaxError> processSyntaxTree(Node rootNode) {
+    List<SyntaxError> errors = new ArrayList<>();
+    int processCalls = 0;
+    do {
+      errors.addAll(rootNode.process());
+      processCalls++;
+      if (processCalls > PROCESS_CALLS_THRESHOLD) throw new RuntimeException("Infinity loop in tree processing");
+    } while (!rootNode.isProcessed());
+    return errors;
   }
 
   private Map<Token, EmbeddedCode> extractEmbeddedCode(
@@ -248,10 +257,7 @@ public class CobolLanguageEngine {
     return err ->
         err.toBuilder()
             .locality(
-                mapping.getOrDefault(
-                    err.getOffendedToken(),
-                    LocalityMappingUtils.getNearestLocality(err.getOffendedToken(), mapping)
-                        .orElse(null)))
+                LocalityFindingUtils.findPreviousVisibleLocality(err.getOffendedToken(), mapping))
             .suggestion(messageService.getMessage(err.getSuggestion()))
             .build();
   }

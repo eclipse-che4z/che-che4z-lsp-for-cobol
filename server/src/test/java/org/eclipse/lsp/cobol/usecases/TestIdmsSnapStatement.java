@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,7 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 /** Test IDMS SNAP DML statement */
-public class TestIdmsSnapStatement {
+class TestIdmsSnapStatement {
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
@@ -68,8 +67,6 @@ public class TestIdmsSnapStatement {
         BOILERPLATE + SNAP_ALL_PARMS_LITERAL);
   }
 
-  // TODO: TITLE statement needs to be reworked. Tests using TITLE as a token fail
-  @Disabled("Requires rework of TITLE statement")
   @ParameterizedTest
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - IDMS read tests")

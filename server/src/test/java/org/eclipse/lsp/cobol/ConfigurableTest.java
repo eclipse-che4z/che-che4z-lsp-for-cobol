@@ -14,13 +14,13 @@
  */
 package org.eclipse.lsp.cobol;
 
+import com.google.inject.Guice;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.positive.CobolTextRegistry;
 import org.eclipse.lsp.cobol.positive.FolderTextRegistry;
 import org.eclipse.lsp.cobol.service.ClientServerIntegrationTest;
 import org.eclipse.lsp.cobol.service.utils.CustomThreadPoolExecutor;
-import com.google.inject.Guice;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 
@@ -34,13 +34,12 @@ import static org.mockito.Mockito.when;
 /**
  * Provide following configuration for test classes:
  *
- * <p>1. guice DI mechanism for test classes. For usage refer {@link
- * ClientServerIntegrationTest}
+ * <p>1. guice DI mechanism for test classes. For usage refer {@link ClientServerIntegrationTest}
  *
- * 2. Text registry for actual cobol files for test classes.
- * For usage refer {@link org.eclipse.lsp.cobol.positive.PositiveTest}
+ * <p>2. Text registry for actual cobol files for test classes. For usage refer {@link
+ * org.eclipse.lsp.cobol.positive.PositiveTest}
  *
- * 3. CustomThreadPoolExecutor for test classes.
+ * <p>3. CustomThreadPoolExecutor for test classes.
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class ConfigurableTest {

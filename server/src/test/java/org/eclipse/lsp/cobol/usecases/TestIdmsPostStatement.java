@@ -25,7 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 /** Test IDMS Post DML statement */
-public class TestIdmsPostStatement {
+class TestIdmsPostStatement {
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"

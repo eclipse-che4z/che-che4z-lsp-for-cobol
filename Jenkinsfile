@@ -45,18 +45,42 @@ spec:
     volumeMounts:
     - name: sonar
       mountPath: /home/jenkins/.sonar
-  - name: jnlp
-    volumeMounts:
-    - name: volume-known-hosts
-      mountPath: /home/jenkins/.ssh
   volumes:
-  - name: volume-known-hosts
-    configMap:
-      name: known-hosts
   - name: m2-repo
     emptyDir: {}
   - name: sonar
     emptyDir: {}
+"""
+
+def kubernetes_test_config = """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: theia
+    image: theiaide/theia-full:1.15.0
+    tty: true
+    command: [ "/bin/bash", "-c", "--" ]
+    args: [ "while true; do sleep 1000; done;" ]
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+      requests:
+        memory: "2Gi"
+        cpu: "1"
+  - name: cypress
+    image: cypress/included:7.7.0
+    tty: true
+    command: [ "/bin/bash", "-c", "--" ]
+    args: [ "while true; do sleep 1000; done;" ]
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "800m"
+      requests:
+        memory: "2Gi"
+        cpu: "800m"
 """
 
 def projectName = 'lsp-for-cobol'
@@ -64,9 +88,24 @@ def kubeLabelPrefix = "${projectName}_pod_${env.BUILD_NUMBER}_${env.BRANCH_NAME}
         // cleaning the branch name according K8s restrictions
         .replaceAll(/[^a-zA-Z0-9._-]+/,"").take(52)
 def kubeBuildLabel = "${kubeLabelPrefix}_build"
+def kubeTestLabel = "${kubeLabelPrefix}_test"
+
+boolean isTimeTriggeredBuild() {
+    for (currentBuildCause in currentBuild.buildCauses) {
+        return currentBuildCause._class == 'hudson.triggers.TimerTrigger$TimerTriggerCause'
+    }
+    return false
+}
 
 pipeline {
     agent none
+    parameters {
+        booleanParam(defaultValue: false, description: 'Run integration tests.', name: 'integrationTests')
+    }
+    triggers {
+        // Only development branch has nightly builds
+        cron(env.BRANCH_NAME == 'development' ? '20 22 * * 1-5' : '')
+    }
     options {
         disableConcurrentBuilds()
         timestamps()
@@ -207,27 +246,85 @@ pipeline {
                         }
                     }
                 }
-
-                stage('Deploy') {
-                    environment {
-                        sshChe4z = "genie.che4z@projects-storage.eclipse.org"
-                        project = "download.eclipse.org/che4z/snapshots/$projectName"
-                        url = "$project/$branchName"
-                        deployPath = "/home/data/httpd/$url"
+            }
+        }
+        stage('Integration testing') {
+            when {
+                // Integration testing runs on each PR from "nalmabrcom" user.
+                expression { params.integrationTests || isTimeTriggeredBuild() || env.CHANGE_AUTHOR == "nalmabrcom" }
+                beforeAgent true
+            }
+            agent {
+                kubernetes {
+                    label kubeTestLabel
+                    yaml kubernetes_test_config
+                }
+            }
+            environment {
+                THEIA_HOME = "$env.WORKSPACE/tests/theia/home"
+                THEIA_PLUGINS = "$env.WORKSPACE/tests/theia/plugins"
+                PROJECT_FOLDER = "$env.WORKSPACE/tests/test_files/project"
+                CYPRESS_HOME = "$env.WORKSPACE/tests/cypress/home"
+            }
+            steps {
+                checkout scm
+                container('theia') {
+                    dir('tests') {
+                        copyArtifacts filter: '*.vsix', projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
+                        sh 'mkdir -p $THEIA_HOME'
+                        sh 'cp -r test_files/zowe theia/home/.zowe'
+                        sh 'mkdir -p $THEIA_PLUGINS'
+                        sh 'mv *.vsix $THEIA_PLUGINS'
+                        sh '''#!/bin/bash
+                            cd /home/theia
+                            # Set user HOME for theia.
+                            export HOME=$THEIA_HOME
+                            # Set user HOME for LSP server. Is not work with just $HOME for some reason.
+                            export _JAVA_OPTIONS=-Duser.home=$THEIA_HOME
+                            node /home/theia/src-gen/backend/main.js $PROJECT_FOLDER --hostname=0.0.0.0 --plugins=local-dir:$THEIA_PLUGINS > $THEIA_HOME/theia.log 2>&1 &
+                        '''
                     }
-                    when {
-                        expression { branchName == 'master' || branchName == 'development' }
+                }
+                container('cypress') {
+                    dir('tests') {
+                        sh '''#!/bin/bash
+                            export HOME=$CYPRESS_HOME
+                            export CYPRESS_CACHE_FOLDER=$CYPRESS_HOME/.cache/Cypress
+                            mkdir -p $CYPRESS_HOME 
+                            cp -r /root/.cache $CYPRESS_HOME 
+                            cp -r /root/.local $CYPRESS_HOME 
+                            cp -r /root/.npm $CYPRESS_HOME 
+                            yarn install --frozen-lockfile
+                            npm run ts:build
+                            # To enable debug add this: DEBUG=*
+                            NO_COLOR=1 npm run cy:run:ci
+                            TEST_STATUS=$?
+                            npm run merge-reports
+                            exit $TEST_STATUS
+                        '''
                     }
-                    steps {
-                        container('jnlp') {
-                            sshagent(['projects-storage.eclipse.org-bot-ssh']) {
-                                sh '''
-                                ssh $sshChe4z rm -rf $deployPath
-                                ssh $sshChe4z mkdir -p $deployPath
-                                scp -r $WORKSPACE/clients/cobol-lsp-vscode-extension/*.vsix $sshChe4z:$deployPath
-                                '''
-                                echo "Deployed to https://$url"
-                            }
+                }
+            }
+            post {
+                always {
+                    container('cypress') {
+                        dir('tests') {
+                            archiveArtifacts artifacts: "ui_tests_complete_logs.xml", allowEmptyArchive: true
+                        }
+                    }
+                }
+                failure {
+                    container('theia') {
+                        dir('tests') {
+                            archiveArtifacts artifacts: "theia/home/theia.log", allowEmptyArchive: true
+                            archiveArtifacts artifacts: "theia/home/LSPCobol/**/*.*", allowEmptyArchive: true
+                        }
+                    }
+                    container('cypress') {
+                        dir('tests') {
+                            archiveArtifacts artifacts: "cypress/screenshots/**/*.*", allowEmptyArchive: true
+                            archiveArtifacts artifacts: "cypress/videos/**/*.*", allowEmptyArchive: true
+                            archiveArtifacts artifacts: "logs/*.*", allowEmptyArchive: true
                         }
                     }
                 }

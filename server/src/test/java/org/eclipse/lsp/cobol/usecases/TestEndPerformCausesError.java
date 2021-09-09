@@ -50,7 +50,7 @@ class TestEndPerformCausesError {
             "1",
             new Diagnostic(
                 null,
-                "Extraneous input '.' expected END TERMINATOR",
+                "Extraneous input '.' expected END-PERFORM",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

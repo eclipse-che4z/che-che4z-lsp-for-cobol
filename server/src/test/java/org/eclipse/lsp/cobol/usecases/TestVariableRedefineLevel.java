@@ -26,7 +26,7 @@ import static org.eclipse.lsp.cobol.service.delegates.validations.SourceInfoLeve
 /**
  * This test checks that redefined variable has the same level as original
  */
-public class TestVariableRedefineLevel {
+class TestVariableRedefineLevel {
   private static final String TEXT_HIGHEST_LEVEL =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. PERFTIMI.\n"

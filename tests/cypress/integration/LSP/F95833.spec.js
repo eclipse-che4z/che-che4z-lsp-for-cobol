@@ -20,13 +20,16 @@
 
 context('This is F95833 spec', () => {
   describe('TC312735 Check EXEC CICS is in Procedure Division', () => {
-    it(['smoke'], 'Checks that EXEC CICS could be run *only* under Procedure Division.', () => {
+    it(['smoke', 'CI'], 'Checks that EXEC CICS could be run *only* under Procedure Division.', () => {
       cy.openFile('ADSORT.cbl').goToLine(59);
       cy.getCurrentLine().should('not.have.class', '.squiggly-error');
       cy.getCurrentLine().type('{selectall}{backspace}');
       cy.goToLine(35);
       cy.getCurrentLine().type('           EXEC CICS XCTL PROGRAM (XCTL1) END-EXEC.').wait(500);
-      cy.getCurrentLineErrors({ expectedLine: 35 }).getHoverErrorMessage().contains('Missing token EXEC or SQL');
+      cy.goToLine(35);
+      cy.getCurrentLineErrors({ expectedLine: 35 })
+        .getHoverErrorMessage()
+        .contains('Missing token SQL at execSqlStatement');
     });
   });
 

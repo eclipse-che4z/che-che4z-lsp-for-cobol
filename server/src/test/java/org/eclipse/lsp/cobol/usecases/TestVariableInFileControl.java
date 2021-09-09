@@ -31,9 +31,14 @@ class TestVariableInFileControl {
           + "       ENVIRONMENT DIVISION.\n"
           + "       INPUT-OUTPUT SECTION.\n"
           + "       FILE-CONTROL.\n"
-          + "           SELECT FOO FILE STATUS IS {$BAR}.\n"
-          + "           SELECT FOO FILE STATUS IS {BAZ|1}.\n"
+          + "           SELECT {$FOO} FILE STATUS IS {$BAR}.\n"
+          + "           SELECT {$FOO1} FILE STATUS IS {BAZ|1}.\n"
           + "       DATA DIVISION.\n"
+          + "        FILE SECTION.\n"
+          + "        FD  {$*FOO} \n"
+          + "           LABEL RECORDS ARE STANDARD. \n"
+          + "        FD  {$*FOO1} \n"
+          + "           LABEL RECORDS ARE STANDARD. \n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*BAR}  PIC  X(2).";
 

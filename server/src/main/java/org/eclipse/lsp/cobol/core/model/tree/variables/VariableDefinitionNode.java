@@ -41,6 +41,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
 @SuppressWarnings("squid:S107")
 @EqualsAndHashCode(callSuper = true)
 public final class VariableDefinitionNode extends Node {
+  private static final String SPACES_AFTER_NEWLINE_REGEX = "[\\r\\n|\\r|\\n]\\s+";
   private final int level;
   private final VariableNameAndLocality variableName;
   private final boolean global;
@@ -55,6 +56,9 @@ public final class VariableDefinitionNode extends Node {
   private final boolean isBlankWhenZeroPresent;
   private final boolean isSignClausePresent;
   private final String valueToken;
+  private final String fileDescriptor;
+  private final String fileControlClause;
+  private final boolean isSortDescription;
   @Setter private List<UsageFormat> usageClauses;
 
   private VariableDefinitionNode(
@@ -73,7 +77,10 @@ public final class VariableDefinitionNode extends Node {
       Locality levelLocality,
       boolean isBlankWhenZeroPresent,
       boolean isSignClausePresent,
-      String valueToken) {
+      String valueToken,
+      String fileDescriptor,
+      String fileControlClause,
+      boolean isSortDescription) {
     super(location, NodeType.VARIABLE_DEFINITION);
     this.level = level;
     this.variableName = variableName;
@@ -90,6 +97,9 @@ public final class VariableDefinitionNode extends Node {
     this.isBlankWhenZeroPresent = isBlankWhenZeroPresent;
     this.isSignClausePresent = isSignClausePresent;
     this.valueToken = valueToken;
+    this.fileDescriptor = fileDescriptor;
+    this.fileControlClause = fileControlClause;
+    this.isSortDescription = isSortDescription;
   }
 
   private static SyntaxError checkClauseIsSingle(
@@ -284,6 +294,30 @@ public final class VariableDefinitionNode extends Node {
         .collect(Collectors.toList());
   }
 
+  /**
+   * Returns file Description text for the FD / SD variable
+   * @return String
+   */
+  public String getFileDescriptor() {
+    return fileDescriptor.replaceAll(SPACES_AFTER_NEWLINE_REGEX, System.lineSeparator());
+  }
+
+  /**
+   * Returns file control text for a FD / SD variable.
+   * @return String
+   */
+  public String getFileControlClause() {
+    return fileControlClause.replaceAll(SPACES_AFTER_NEWLINE_REGEX, System.lineSeparator());
+  }
+
+  /**
+   * Returns True if variable is SD, false otherwise
+   * @return boolean
+   */
+  public boolean isSortDescription() {
+    return isSortDescription;
+  }
+
   /** The builder for {@link}VariableDefinitionNode{@link}. */
   @Accessors(chain = true, fluent = true)
   @Setter
@@ -304,6 +338,9 @@ public final class VariableDefinitionNode extends Node {
     boolean blankWhenZero;
     boolean signClause;
     String valueToken;
+    String fileDescriptor;
+    String fileControlClause;
+    boolean isSortDescription;
 
     private Builder() {}
 
@@ -329,7 +366,10 @@ public final class VariableDefinitionNode extends Node {
           levelLocality,
           blankWhenZero,
           signClause,
-          valueToken);
+          valueToken,
+          fileDescriptor,
+          fileControlClause,
+          isSortDescription);
     }
   }
 }

@@ -11,7 +11,8 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((includeStatement | copyStatement | copyIdmsStatement | copyMaidStatement | replaceAreaStart | replaceOffStatement )+ .*?)* EOF
+   : .*? ((includeStatement | copyStatement | copyIdmsStatement | copyMaidStatement | replaceAreaStart | replaceOffStatement
+   | titleDirective | enterDirective | controlDirective)+ .*?)* EOF
    ;
 
 // copy statement
@@ -21,7 +22,7 @@ copyStatement
 
 // sql include statement
 includeStatement
-   :EXEC_SQL INCLUDE copySource END_EXEC DOT_FS
+   : EXEC SQL INCLUDE copySource END_EXEC DOT_FS
    ;
 
 // copy idms statement
@@ -60,6 +61,35 @@ qualifier
    : literal | cobolWord
    ;
 
+// Compiler directives
+titleDirective
+   : TITLE literal DOT_FS?
+   ;
+
+enterDirective
+   : ENTER languageName? routineName? DOT_FS
+   ;
+
+routineName
+   : cobolWord
+   ;
+
+languageName
+   : cobolWord
+   ;
+
+controlDirective
+   : ASTERISKCHAR controlCbl controlOptions* DOT_FS?
+   ;
+
+controlCbl
+   : (CONTROL | CBL)
+   ;
+
+controlOptions
+   : (SOURCE | NOSOURCE | LIST | NOLIST | MAP | NOMAP)
+   ;
+
 // replace statement
 replacingPhrase
    : REPLACING replaceClause+
@@ -89,12 +119,16 @@ pseudoReplaceable
    : (openingPseudoTextDelimiter ~DOUBLEEQUALCHAR*? closingPseudoTextDelimiter)
    ;
 
-openingPseudoTextDelimiter: DOUBLEEQUALCHAR;
-
-closingPseudoTextDelimiter: DOUBLEEQUALCHAR (COMMACHAR | DOT_FS | SEMICOLON_FS)?;
-
 pseudoReplacement
    : (openingPseudoTextDelimiter ~DOUBLEEQUALCHAR*? closingPseudoTextDelimiter) | EMPTYPSEUDOTEXT
+   ;
+
+openingPseudoTextDelimiter
+   : DOUBLEEQUALCHAR
+   ;
+
+closingPseudoTextDelimiter
+   : DOUBLEEQUALCHAR (COMMACHAR | DOT_FS | SEMICOLON_FS)?
    ;
 
 replaceable
@@ -122,7 +156,7 @@ charDataLine
    ;
 
 cobolWord
-   : COPYBOOK_IDENTIFIER | IDENTIFIER | MAID
+   : COPYBOOK_IDENTIFIER | IDENTIFIER | MAID | SOURCE | NOSOURCE | LIST | NOLIST | MAP | NOMAP
    ;
 
 literal

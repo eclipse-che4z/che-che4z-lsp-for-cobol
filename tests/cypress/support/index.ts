@@ -29,6 +29,8 @@
 
 import '@eclipse/che-che4z/tests';
 import '@shelex/cypress-allure-plugin';
+/* eslint @typescript-eslint/no-var-requires: "off" */
+require('cypress-terminal-report/src/installLogsCollector')();
 
 const baseUrl = Cypress.config('baseUrl');
 

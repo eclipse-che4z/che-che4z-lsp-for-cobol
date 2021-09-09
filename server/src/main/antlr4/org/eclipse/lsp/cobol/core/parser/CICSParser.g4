@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 parser grammar CICSParser;
-options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
+options {tokenVocab = CICSLexer; superClass = MessageServiceParser;}
 
 allCicsRules: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
           cics_build | cics_cancel | cics_change | cics_change_task | cics_check | cics_connect | cics_converttime |
@@ -221,7 +221,7 @@ cics_check_activity: (ACQPROCESS | ACTIVITY cics_data_value | ACQACTIVITY | COMP
                      ABPROGRAM cics_data_area | MODE cics_cvda | SUSPSTATUS cics_cvda | cics_resp)+;
 cics_check_timer: TIMER cics_data_value cics_resp? STATUS cics_cvda cics_resp?;
 
-cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN ;
+cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN | ERROR | DUPREC;
 
 /** CONNECT PROCESS */
 cics_connect: CONNECT PROCESS (CONVID cics_name | SESSION cics_name | PROCNAME cics_data_area |
@@ -246,10 +246,10 @@ cics_define_dcounter: DCOUNTER cics_name (POOL cics_name | cics_define_value | M
 cics_define_input: INPUT (EVENT cics_data_value | cics_resp)+;
 cics_define_process: PROCESS cics_data_value (PROCESSTYPE cics_data_value | TRANSID cics_data_value |
                      PROGRAM cics_data_value | USERID cics_data_value | NOCHECK | cics_resp)+;
-cics_define_timer: DEFINE (TIMER cics_data_value EVENT cics_data_value | cics_define_after | cics_define_at)+;
+cics_define_timer: (TIMER cics_data_value EVENT cics_data_value | cics_define_after | cics_define_at)+;
 cics_define_after: AFTER (DAYS cics_data_value | HOURS cics_data_value | MINUTES cics_data_value |
                    SECONDS cics_data_value | cics_resp)+;
-cics_define_at: AT (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value | today | cics_define_on | cics_resp)+;
+cics_define_at: AT (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value | cics_resp)+ cics_define_on? cics_resp?;
 cics_define_on: ON YEAR cics_data_value (MONTH cics_data_value DAYOFMONTH cics_data_value | DAYOFYEAR cics_data_value) cics_resp?;
 
 /** DELAY */
@@ -417,14 +417,14 @@ cics_handle_abend: ABEND (CANCEL | PROGRAM cics_name | LABEL cics_label | RESET 
 cics_handle_aid: AID (ANYKEY (cics_label)? | CLEAR (empty_parens | cics_label)? | CLRPARTN (cics_label)? | ENTER (cics_label)? |
                  LIGHTPEN (cics_label)? | OPERID  (cics_label)? | pa_option (cics_label)? | pf_option (cics_label)? |
                  TRIGGER  (cics_label)? | cics_resp)*;
-cics_handle_condition: CONDITION ((cics_conditions | mama) cics_label? | cics_resp)+;
+cics_handle_condition: CONDITION ((cics_conditions | cicsWord) cics_label? | cics_resp)+;
 
 pa_option: PA1 | PA2 | PA3;
 pf_option: PF1 | PF2 | PF3 | PF4 | PF5 | PF6 | PF7 | PF8 | PF9 | PF10 | PF11 | PF12 | PF13 | PF14 | PF15 | PF16 | PF17 |
            PF18 | PF19 | PF20 | PF21 | PF22 | PF23 | PF24;
 
 /** IGNORE CONDITION */
-cics_ignore: IGNORE CONDITION (cics_conditions | mama | cics_resp)+;
+cics_ignore: IGNORE CONDITION (cics_conditions | cicsWord | cics_resp)+;
 
 /** INQUIRE ACTIVITYID / CONTAINER / EVENT / PROCESS / TIMER */
 cics_inquire: INQUIRE (cics_inquire_activityid | cics_inquire_container | cics_inquire_event | cics_inquire_process |
@@ -829,241 +829,51 @@ cics_xctl: XCTL (PROGRAM cics_name | COMMAREA cics_data_area | LENGTH cics_data_
            INPUTMSGLEN cics_data_value | cics_resp)+;
 
 /** FILE or DATASET */
-cics_file_name: (FILE | DATASET) cics_mama;
+cics_file_name: (FILE | DATASET) cics_name;
 
 /** RESP **/
 cics_resp: (RESP | RESP2) cics_data_area;
-
-cics_only_words: ABCODE | ABDUMP | ABEND | ABPROGRAM | ABSTIME | ACEE | ACQACTIVITY | ACQPROCESS | ACQUACTIVITY | ACTION
-           | ACTIVITY | ACTIVITYID | AID | ALLOCATE | ALTSCRNHT | ALTSCRNWD | ANYKEY | APLKYBD | APLTEXT | APPLID
-           | ASA | ASKTIME | ASRAINTRPT | ASRAKEY | ASRAPSW | ASRAREGS | ASRASPC | ASRASTG | ASYNCHRONOUS | ATTACH
-           | ATTACHID | ATTRIBUTES | AUTHENTICATE | AUXILIARY | BASE64 | BASICAUTH | BELOW | BIF | BODYCHARSET
-           | BOOKMARK | BRDATA | BRDATALENGTH | BREXIT | BRIDGE | BROWSETOKEN | BTRANS | BUFFER | BUILD
-           | BURGEABILITY | CADDRLENGTH | CARD | CCSID | CERTIFICATE | CHANGE | CHANGETIME | CHAR | CHARACTERSET
-           | CHECK | CHUNKEND | CHUNKING | CHUNKNO | CHUNKYES | CICS | CICSDATAKEY | CIPHERS | CLEAR | CLICONVERT | CLIENT
-           | CLIENTADDR | CLIENTADDRNU | CLIENTCONV | CLIENTNAME | CLNTADDR6NU | CLNTIPFAMILY | CLOSESTATUS
-           | CLRPARTN | CMDSEC | CNAMELENGTH | CODEPAGE | COLOR | COMMAREA | COMMONNAME | COMMONNAMLEN
-           | COMPAREMAX | COMPAREMIN | COMPLETE | COMPOSITE | COMPSTATUS | CONDITION | CONFIRM | CONFIRMATION
-           | CONNECT | CONSISTENT | CONSOLE | CONTAINER | CONTEXTTYPE | CONVDATA | CONVERSE | CONVERTST
-           | CONVERTTIME | CONVID | COUNTER | COUNTRY | COUNTRYLEN | CREATE | CRITICAL | CTLCHAR | CWA
-           | CWALENG | DATA1 | DATA2 | DATALENGTH | DATALENTH | DATAONLY | DATAPOINTER | DATASTR | DATATOXML
-           | DATATYPE | DATCONTAINER | DATEFORM | DATESEP | DATESTRING | DAYCOUNT | DAYOFMONTH | DAYOFWEEK
-           | DAYOFYEAR | DAYS | DAYSLEFT | DCOUNTER | DDMMYY | DDMMYYYY | DEBKEY | DEBREC | DEEDIT | DEFINE
-           | DEFRESP | DEFSCRNHT | DEFSCRNWD | DELAY | DELETEQ | DEQ | DESTCOUNT | DESTID | DESTIDLENG
-           | DETAILLENGTH | DIGEST | DIGESTTYPE | DISCONNECT | DOCDELETE | DOCSIZE | DOCSTATUS | DOCTOKEN
-           | DOCUMENT | DS3270 | DSSCS | DUMP | DUMPCODE | DUMPID | ECADDR | ECBLIST | EIB | ELEMNAME | ELEMNAMELEN
-           | ELEMNS | ELEMNSLEN | ENDACTIVITY | ENDBR | ENDBROWSE | ENDFILE | ENDOUTPUT | ENQ | ENTRYNAME | EODS
-           | EPRFIELD | EPRFROM | EPRINTO | EPRLENGTH | EPRSET | EPRTYPE | ERASEAUP | ERRTERM | ESMREASON | ESMRESP
-           | EVENTTYPE | EVENTUAL | EWASUPP | EXPECT | EXPIRYTIME | EXTDS | EXTRACT | FACILITY | FACILITYTOKN
-           | FAULTACTLEN | FAULTACTOR | FAULTCODE | FAULTCODELEN | FAULTCODESTR | FAULTSTRING | FAULTSTRLEN
-           | FCI | FCT | FIELD | FIRESTATUS | FLENGTH | FMH | FORCE | FORMATTIME | FORMFIELD | FREE | FREEMAIN
-           | FROMACTIVITY | FROMCCSID | FROMCHANNEL | FROMCODEPAGE | FROMDOC | FROMLENGTH | FROMPROCESS | FULLDATE
-           | GCHARS | GCODES | GDS | GENERIC | GET | GETMAIN | GETNEXT | GMMI | GROUPID | GTEC | GTEQ | HANDLE
-           | HEAD | HEX | HILIGHT | HOLD | HOST | HOSTCODEPAGE | HOSTLENGTH | HOSTTYPE | HOURS | HTTPHEADER
-           | HTTPMETHOD | HTTPRNUM | HTTPVERSION | HTTPVNUM | IGNORE | IMMEDIATE | INCREMENT | INITIMG | INITPARM
-           | INITPARMLEN | INPARTN | INPUTEVENT | INPUTMSG | INPUTMSGLEN | INQUIRE | INSERT | INTERVAL | INTOCCSID
-           | INTOCODEPAGE | INVALIDCOUNT | INVITE | INVOKINGPROG | ISSUE | ISSUER | ITEM | IUTYPE | JOURNALNAME
-           | JTYPEID | KATAKANA | KEEP | KEYLENGTH | KEYNUMBER | LANGINUSE | LANGUAGECODE | LASTUSETIME | LDC
-           | LDCMNEM | LDCNUM | LENGTHLIST | LEVEL | LIGHTPEN | LINK | LISTLENGTH | LLID | LOAD | LOCALITY
-           | LOCALITYLEN | LOGMESSAGE | LOGMODE | LOGONLOGMODE | LOGONMSG | LUNAME | MAIN | MAPCOLUMN | MAPHEIGHT
-           | MAPLINE | MAPWIDTH | MASSINSERT | MAXDATALEN | MAXFLENGTH | MAXIMUM | MAXLENGTH | MAXLIFETIME
-           | MAXPROCLEN | MCC | MEDIATYPE | MESSAGEID | METADATA | METADATALEN | METHOD | METHODLENGTH
-           | MILLISECONDS | MINIMUM | MINUTES | MMDDYY | MODENAME | MONITOR | MONTH | MONTHOFYEAR | MSRCONTROL
-           | NAME | NAMELENGTH | NATLANG | NATLANGINUSE | NETNAME | NEWPASSWORD | NEWPHRASE | NEWPHRASELEN
-           | NEXTTRANSID | NLEOM | NOCC | NOCHECK | NOCLICONVERT | NOCLOSE | NODATA | NODE | NODOCDELETE | NODUMP
-           | NOHANDLE | NOINCONVERT | NONE | NOOUTCONERT | NOQUEUE | NOQUIESCE | NOSRVCONVERT | NOSUSPEND | NOTE
-           | NOTPURGEABLE | NOTRUNCATE | NOWAIT | NSCONTAINER | NUMCIPHERS | NUMEVENTS | NUMITEMS | NUMREC
-           | NUMROUTES | NUMSEGMENTS | NUMTAB | OIDCARD | OPCLASS | OPERATION | OPERATOR | OPERID | OPERKEYS
-           | OPID | OPSECURITY | OPTIONS | ORGABCODE | ORGANIZATLEN | ORGUNIT | ORGUNITLEN | OUTDESCR | OUTLINE
-           | OWNER | PA | PAGENUM | PARTNER | PARTNPAGE | PARTNS | PARTNSET | PASS | PASSWORDLEN | PATH | PATHLENGTH
-           | PCT | PFXLENG | PHRASE | PHRASELEN | PIPLENGTH | PIPLIST | POINT | POOL | POP | PORTNUMBER | PORTNUMNU
-           | POST | PPT | PREDICATE | PREFIX | PREPARE | PRINCONVID | PRINSYSID | PRINT | PRIORITY | PRIVACY
-           | PROCESSTYPE | PROCLENGTH | PROCNAME | PROFILE | PROTECT | PS | PUNCH | PURGEABLE | PUSH | PUT | QNAME
-           | QUERY | QUERYPARM | QUERYSTRING | QUERYSTRLEN | RBA | RBN | READNEXT | READPREV | READQ | REATTACH
-           | RECEIVER | RECFM | RECORDLEN | RECORDLENGTH | REDUCE | REFPARMS | REFPARMSLEN | RELATESINDEX
-           | RELATESTYPE | RELATESURI | REPEATABLE | REPETABLE | REPLY | REPLYLENGTH | REQID | REQUESTTYPE
-           | RESCLASS | RESETBR | RESID | RESIDLENGTH | RESOURCE | RESP | RESP2 | RESSEC | RESTART | RESTYPE
-           | RESULT | RESUME | RETCODE | RETCORD | RETRIECE | RETRIEVE | RETURNPROG | RIDFLD | ROLE | ROLELENGTH
-           | ROLLBACK | ROUTE | ROUTECODES | RPROCESS | RRESOURCE | RRN | RTERMID | RTRANSID | SADDRLENGTH | SCHEME
-           | SCHEMENAME | SCOPE | SCOPELEN | SCRNHT | SCRNWD | SECONDS | SEGMENTLIST | SENDER | SERIALNUM | SERIALNUMLEN
-           | SERVER | SERVERADDR | SERVERADDRNU | SERVERCONV | SERVERNAME | SESSION | SESSTOKEN | SIGDATA | SIGNAL
-           | SIGNOFF | SIGNON | SIT | SNAMELENGTH | SOAPFAULT | SOSI | SPOOLCLOSE | SPOOLOPEN | SPOOLREAD | SPOOLWRITE
-           | SRVCONVERT | SRVRADDR6NU | SRVRIPFAMILY | SSLTYPE | STARTBR | STARTBROWSE | STARTCODE | STATE | STATELEN
-           | STATIONID | STATUSCODE | STATUSLEN | STATUSTEXT | STORAGE | STRINGFORMAT | SUBADDR | SUBCODELEN | SUBCODESTR
-           | SUBEVENT | SUSPEND | SUSPSTATUS | SYMBOLLIST | SYNCHRONOUS | SYNCLEVEL | SYNCONRETURN | SYNCPOINT | SYSID
-           | TABLES | TASKPRIORITY | TCPIP | TCPIPSERVICE | TCT | TCTUA | TCTUALENG | TD | TELLERID | TEMPLATE | TERMCODE
-           | TERMID | TERMPRIORITY | TEXTKYBD | TEXTLENGTH | TEXTPRINT | TIMEOUT | TIMESEP | TOACTIVITY | TOCHANNEL
-           | TOCONTAINER | TOFLENGTH | TOKEN | TOLENGTH | TOPROCESS | TRACE | TRACENUM | TRANPRIORITY | TRANSACTION
-           | TRANSFORM | TRANSID | TRIGGER | TRT | TS | TWA | TWALENG | TYPENAME | TYPENAMELEN | TYPENS | TYPENSLEN
-           | UNATTEND | UNCOMMITTED | UNESCAPED | UNLOCK | UOW | UPDATE | URI | URIMAP | URL | URLLENGTH
-           | USERDATAKEY | USERID | USERNAME | USERNAMELEN | USERPRIORITY | VALIDATION | VALUELENGTH | VERIFY
-           | VERSIONLEN | VOLUME | VOLUMELENG | WAITCICS | WEB | WPMEDIA | WRAP | WRITEQ | WSACONTEXT | WSAEPR | XCTL
-           | XMLCONTAINER | XMLTODATA | XMLTRANSFORM | XRBA | YYDDD | YYDDMM | YYYYDDMM | ZERO_DIGITAL | PASSBK
-           | CNOTCOMPL | CBUFF | FORMFEED | OUTPARTN | FREEKB | ALARM | FRSET | ACTPARTN | MSR | PAGING | L80 | L40
-           | HONEOM | NOAUTOPAGE | NOFLUSH | MAPONLY | ACCUM | AUTOPAGE | CURRENT | FMHPARM | NOEDIT | MAPPED | RETAIN
-           | MAPSET | MAPPINGDEV | MAP | L64 | HEADER | JUSTIFY | JUSLAST | OPERPURGE | JUSFIRST | TRAILER | PARTN
-           ;
-
-cics_cobol_intersected_words
-    : ABORT | ADD | ADDRESS | AFTER | ALTER | AND | AS | ASSIGN | AT | BINARY | CANCEL | CHANNEL | CLASS | CLOSE
-    | CONTROL | COPY | DATA | DATE | DELETE | DELIMITER | DETAIL | END | ENTER | ENTRY | EQUAL | ERASE | ERROR | EVENT
-    | EXCEPTION | EXTERNAL | FILE | FOR | FROM | INPUT | INTO | INVOKE | LABEL | LAST | LENGTH | LINE | LIST | MESSAGE
-    | MMDDYYYY | MODE | MOVE | NEXT | ON | OPEN | OR | ORGANIZATION | OUTPUT | PAGE | PARSE | PASSWORD | PF | PROCESS
-    | PROGRAM | PURGE | QUEUE | READ | RECEIVE | RECORD | RELEASE | REMOVE | REPLACE | RESET | RETURN | REWIND | REWRITE
-    | RUN | SECURITY | SEND | SERVICE | SET | SHARED | START | STATUS | SYMBOL | TASK | TERMINAL | TEST | TEXT | TIME
-    | TIMER | TITLE | TO | TYPE | UNTIL | USING | VALUE | WAIT | WRITE | YEAR | YYYYDDD | YYYYMMDD
-    ;
-
-cobolCompilerDirectivesKeywords
-   : ADATA | ADV | ANSI | APOST | AR | ARITH | AWO | ALIAS | ANY | AUTO
-   | BIN | BLOCK0 | BUF | BUFSIZE
-   | C_CHAR | CBLCARD | CO | COBOL2 | COBOL3 | CODEPAGE | COMPAT | COMPILE | CP | CPP | CPSM | CICS | CS | CURR | CURRENCY
-   | D_CHAR | DATEPROC | DBCS | DD | DEBUG | DECK | DIAGTRUNC | DLL | DP | DTR | DU | DUMP | DYNAM | DYN
-   | E_CHAR | EDF | EJPD | EN | ENGLISH | EPILOG | EXTEND | EXIT | EXP | EXPORTALL
-   | F_CHAR | FASTSRT | FEPI | FLAG | FLAGSTD | FSRT | FULL
-   | G_CHAR | GDS | GRAPHIC
-   | H_CHAR | HOOK
-   | I_CHAR | INTDATE
-   | JA | JP
-   | K_CHAR | KA
-   | LANG | LANGUAGE | LC | LEASM | LILIAN | LIN | LINECOUNT | LIST | LM | LONGMIXED | LONGUPPER | LU
-   | M_CHAR | MAP | MARGINS | MAX | MDECK | MD | MIG | MIXED
-   | N_CHAR | NAME | NAT | NATLANG | NN | NS | NSEQ | NSYMBOL
-   | NOALIAS | NOADATA | NOADV | NOAWO
-   | NOBLOCK0
-   | NOC | NOCOMPILE | NOCBLCARD | NOCICS | NOCMPR2 | NOCPSM | NOCURRENCY | NOCURR
-   | NODATEPROC | NODP | NODBCS | NODEBUG | NODECK | NOD | NODLL | NODE| NODUMP | NODU | NODIAGTRUNC | NODTR | NODYNAM | NODYN
-   | NOEDF | NOEPILOG | NOEXIT | NOEXPORTALL | NOEXP | NOEJPD
-   | NOFLAG | NOFASTSRT | NOFSRT | NOFEPI | NOF | NOFLAGMIG | NOFLAGSTD
-   | NOGRAPHIC
-   | NOHOOK
-   | NOLENGTH | NOLIB | NOLINKAGE | NOLIST
-   | NOMAP | NOMDECK | NOMD | NONUMBER | NONUM
-   | NONAME
-   | NOOBJECT | NOOBJ | NOOFFSET | NOOFF | NOOPSEQUENCE | NOOPTIMIZE | NOOPT | NOOPTIONS | NOP
-   | NOPROLOG | NOPFD
-   | NORENT
-   | NOSEQUENCE | NOSEQ | NOSOURCE | NOS | NOSPIE | NOSQL | NOSQLCCSID | NOSQLC | NOSSRANGE | NOSSR | NOSTDTRUNC
-   | NOTRIG | NOTERMINAL | NOTERM | NOTEST | NOTHREAD
-   | NOVBREF
-   | NOWORD | NOWD
-   | NOXREF | NOX
-   | NOZWB
-   | NUMBER | NUM | NUMPROC
-   | OBJECT | OBJ | OFFSET | OFF | OPMARGINS | OPSEQUENCE | OPTIMIZE | OPT | OPTFILE | OPTIONS | OP | OUTDD | OUT
-   | PFD | PGMNAME | PGMN | PROLOG
-   | RENT | RES | RMODE
-   | S_CHAR | SS | SP | SZ | STD | SSR | SEQ | SEP
-   | SOURCE | SPIE | SQLCCSID | SQLC | SSRANGE | SYSEIB | SEQUENCE| SIZE | SEPARATE | SHORT
-   | Q_CHAR | QUOTE
-   | TRIG | TERMINAL | TERM | TEST | THREAD | TRUNC
-   | U_CHAR | UE | UPPER
-   | VBREF
-   | W_CHAR | WORD | WD
-   | X_CHAR | XMLPARSE | XMLSS | XP | XREF
-   | YEARWINDOW | YW
-   | ZWB
-   ;
 
 cics_data_area: LPARENCHAR data_area RPARENCHAR;
 cics_data_value: LPARENCHAR data_value RPARENCHAR;
 cics_cvda: LPARENCHAR cvda RPARENCHAR;
 cics_name: LPARENCHAR name RPARENCHAR;
 cics_ref: LPARENCHAR ptr_ref RPARENCHAR;
-cics_mama: LPARENCHAR mama RPARENCHAR;
 cics_hhmmss: LPARENCHAR hhmmss RPARENCHAR;
 cics_label: LPARENCHAR paragraphNameUsage RPARENCHAR;
 cics_value: LPARENCHAR ptr_value RPARENCHAR;
 empty_parens: LPARENCHAR RPARENCHAR;
 
-cobolWord
-   : IDENTIFIER | cics_only_words | idms_only_words | cobolCompilerDirectivesKeywords
-   | ABEND | ABORT | ALARM | ALL | ALWAYS | AS | ASCII | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | ATTACH
-   | BINARY | BIND | BIT | BLOB | BOUNDS
-   | CANCEL | CAPABLE | CCSVERSION | CHANGE | CHANGED | CHANNEL | CHECK | CLASS | CLOB | CLOSE_DISPOSITION
-   | COBOL | CODE | COMMIT | COMMITMENT | CONNECT | CONVENTION | COUNT | CRUNCH | CURRENT | CURSOR
-   | DATA | DBCLOB
-   | DEFAULT | DEFAULT_DISPLAY | DEFINITION | DFHRESP | DFHVALUE | DIFFERENT
-   | DISCONNECT | DISK | DOUBLE | DUMP
-   | EBCDIC | ENTER | ERASE | ESCAPE | EVENT | EXCLUSIVE | EXIT | EXTENDED
-   | FINISH | FIRST | FREE | FUNCTION_POINTER | GET | HEADER | HOLD
-   | ID | IGNORED | IMPLICIT | INTEGER | INTERVAL | INVOKED | IN | INTO | IO
-   | KEEP | KEPT | KEYBOARD
-   | LANGUAGE | LAST | LIBRARY | LINK | LIST | LOCAL | LONG
-   | LONG_DATE | LONG_TIME | LOWER | LR | LTERM | LOCATION
-   | MAID | MAP | MAX | MESSAGE | MMDDYYYY
-   | NAME | NAMED | NATIONAL | NATIONAL_EDITED | NATIVE | NETWORK | NEXT
-   | NODUMP | NOWAIT | NOWRITE | NUMERIC_DATE
-   | NUMERIC_TIME
-   | OBJECT | ODT | OF | OFF | ONLY | ORDERLY | OWN | POINTER_32
-   | PASSWORD | PORT | POSITION | POST | PRINTER | PRIOR | PRIORITY | PROCEDURE | PROCESS | PROGRAM | PTERM
-   | READ | READER | REAL | RECEIVED | RECURSIVE | REF | REMOTE | REMOVE | REPLY | REPORT | ROLLBACK | REMARKS
-   | SAVE | SCHEMA | SCRATCH | SCREENSIZE | SESSION | SHARED | SHORT_DATE | SNAP | SQL | START | STATISTICS
-   | STATS | STORAGE | SYMBOL | SYSVERSION | SYSTEM
-   | TASK | TERMINAL | TEXT | THEN | THREAD | THREAD_LOCAL | TIMEOUT | TIMER
-   | TODAYS_DATE | TODAYS_NAME | TOP | TRANSFER
-   | TRANSACTION | TRUNCATED | TYPEDEF
-   | UPDATE | USER | UTF_8
-   | VERSION | VIRTUAL
-   | WAIT | XCTL
-   | YEAR | YYYYMMDD | YYYYDDD
-   ;
-
-idms_only_words
-    : ATTRIBUTE | AUTODISPLAY
-    | BACKPAGE | BACKSCAN | BLINK
-    | BLUE | BRIGHT | BROWSE | BUT
-    | CALC | CONTENTS | COPIES | CORRECT
-    | DARK | DATASTREAM
-    | DBNAME | DBNODE | DB_KEY
-    | DC | DEQUEUE | DEST | DETECT | DFLD
-    | DICTNAME | DICTNODE | DIFFERENT | DUPLICATE
-    | EAU | ECHO | EDIT | EIGHTYCR | ENDPAGE | ENDRPT
-    | ENQUEUE | EXITS | EXTRANEOUS
-    | FIELDS | FIND | FORTYCR
-    | GREEN
-    | IDENTICAL | IDMS | INTERNAL
-    | JOURNAL
-    | LOADLIB | LOG | LONGTERM
-    | MAPS | MDT | MEMBERS
-    | MODIFIED | MODIFY
-    | NEWPAGE | NOALARM | NOAUTODISPLAY
-    | NOBACKPAGE | NOBACKSCAN | NOBLINK | NOCOLOR | NODEADLOCK
-    | NODENAME | NOIO | NOKBD | NOLOCK | NOMDT
-    | NOPRT | NORETURN | NORMAL
-    | NORMAL_VIDEO | NOSPAN | NOTIFICATION | NOTIFY | NOUNDERSCORE
-    | OBTAIN | OUTIN | OWNER
-    | PAGE_INFO | PARMS | PERMANENT | PINK | PROTECTED
-    | READY | RED | REDISPATCH | RESETKBD | RESETMDT | RETENTION | RETRIEVAL
-    | RETURNKEY | REVERSE_VIDEO | RUN_UNIT
-    | SCREEN | SELECTIVE | SHORT | SIXTYFOURCR | SPAN
-    | STARTPAGE | STARTPRT | STGID | STORE
-    | TURQUOISE
-    | UNDERSCORE | UNFORMATTED | UNPROTECTED
-    | UPGRADE | USAGE_MODE
-    | WCC | WHITE | WITHIN | YELLOW
+cicsWord:
+    IDENTIFIER | ERROR | ABORT | ADDRESS | AFTER | ALTER | AS | ASSIGN | AT | BINARY | CANCEL | CHANNEL | CLASS | CLOSE
+    | CONTROL | COPY | DATA | DELETE | DELIMITER | DETAIL | END | ENTER | ENTRY | EQUAL | ERASE | EVENT
+    | EXCEPTION | EXTERNAL | FOR | FROM | INPUT | INTO | INVOKE | LABEL | LAST | LENGTH | LINE | LIST | MESSAGE
+    | MMDDYYYY | MODE | ORGANIZATION | OUTPUT | PAGE | PARSE | PASSWORD | PROCESS
+    | PROGRAM | PURGE | RECEIVE | RECORD | RELEASE | REPLACE | RESET | RETURN | REWIND | REWRITE
+    | RUN | SECURITY | SEND | SERVICE | SHARED | START | STATUS | SYMBOL | TASK | TERMINAL | TEST | TEXT
+    | TIMER | TITLE | TYPE | VALUE | WAIT | YEAR | YYYYDDD | YYYYMMDD | COMMAREA
     ;
 
-cicsWord: NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral | generalIdentifier | cics_cobol_intersected_words;
-name: cicsWord+;
-data_value: cicsWord+;
-data_area: cicsWord+;
-cvda: cicsWord+;
-ptr_ref: cicsWord+;
-ptr_value: cicsWord+;
-cics_document_set_symbollist: cicsWord+;
-mama: cicsWord+;
-hhmmss: cicsWord+;
-today: cicsWord+;
+name: variableNameUsage+;
+data_value: variableNameUsage+;
+data_area: variableNameUsage+;
+cvda: variableNameUsage+;
+ptr_ref: variableNameUsage+;
+ptr_value: variableNameUsage+;
+cics_document_set_symbollist: variableNameUsage+;
+hhmmss: variableNameUsage+;
 
+paragraphNameUsage
+   : cicsWord | integerLiteral
+   ;
+
+variableNameUsage
+   : generalIdentifier | NONNUMERICLITERAL | NUMERICLITERAL | integerLiteral
+   ;
 // identifier ----------------------------------
 
 generalIdentifier
-   : qualifiedDataName | tableCall | functionCall | specialRegister
-   ;
-
-tableCall
-   : dataName (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
+   : specialRegister | qualifiedDataName | functionCall
    ;
 
 functionCall
@@ -1082,30 +892,18 @@ length
    : arithmeticExpression
    ;
 
-subscript
-   : ALL | integerLiteral | arithmeticExpression
-   ;
-
 argument
-   : literal | generalIdentifier | arithmeticExpression
+   : arithmeticExpression
    ;
 
 // qualified data name ----------------------------------
 
 qualifiedDataName
-   : qualifiedDataNameFormat1 | qualifiedDataNameFormat2 | qualifiedDataNameFormat4
+   : dataName tableCall? referenceModifier? inData*
    ;
 
-qualifiedDataNameFormat1
-   : dataName (inData | inTable)*
-   ;
-
-qualifiedDataNameFormat2
-   : paragraphName inSection
-   ;
-
-qualifiedDataNameFormat4
-   : LINAGE_COUNTER inFile
+tableCall
+   : LPARENCHAR (ALL | arithmeticExpression) (COMMACHAR? (ALL | arithmeticExpression))* RPARENCHAR
    ;
 
 specialRegister
@@ -1122,125 +920,19 @@ specialRegister
 // in ----------------------------------
 
 inData
-   : (IN | OF) dataName
-   ;
-
-inFile
-   : (IN | OF) fileName
-   ;
-
-inMnemonic
-   : (IN | OF) mnemonicName
-   ;
-
-inSection
-   : (IN | OF) sectionName
-   ;
-
-inTable
-   : (IN | OF) tableCall
-   ;
-
-// names ----------------------------------
-
-alphabetName
-   : cobolWord
-   ;
-
-assignmentName
-   : systemName
-   ;
-
-cdName
-   : cobolWord
-   ;
-
-className
-   : cobolWord
-   ;
-
-computerName
-   : systemName
+   : (IN | OF) dataName tableCall? referenceModifier?
    ;
 
 dataName
-   : cobolWord
-   ;
-
-dataDescName
-   : FILLER | CURSOR | dataName
-   ;
-
-environmentName
-   : systemName
-   ;
-
-fileName
-   : cobolWord
+   : cicsWord
    ;
 
 functionName
-   : INTEGER | LENGTH | RANDOM | SUM | WHEN_COMPILED | cobolWord
-   ;
-
-indexName
-   : cobolWord
-   ;
-
-libraryName
-   : cobolWord
-   ;
-
-mnemonicName
-   : cobolWord
-   ;
-
-paragraphName
-   : cobolWord | integerLiteral
-   ;
-
-paragraphNameUsage
-   : cobolWord | integerLiteral
-   ;
-
-procedureName
-   : paragraphNameUsage inSection?
-   ;
-
-programName
-   : NONNUMERICLITERAL | cobolWord | cics_cobol_intersected_words
-   ;
-
-recordName
-   : qualifiedDataName
-   ;
-
-reportName
-   : qualifiedDataName
-   ;
-
-screenName
-   : cobolWord
-   ;
-
-sectionName
-   : cobolWord | integerLiteral
-   ;
-
-systemName
-   : cobolWord
-   ;
-
-symbolicCharacter
-   : cobolWord
-   ;
-
-textName
-   : cobolWord
+   : INTEGER | LENGTH | RANDOM | SUM | WHEN_COMPILED | cicsWord
    ;
 
 figurativeConstant
-   : ALL literal | HIGH_VALUE | HIGH_VALUES | LOW_VALUE | LOW_VALUES | NULL | NULLS | QUOTE | QUOTES | SPACE | SPACES | ZERO | ZEROS | ZEROES
+   : ALL literal | HIGH_VALUE | HIGH_VALUES | LOW_VALUE | LOW_VALUES | NULL | NULLS | QUOTE | QUOTES | SPACE | SPACES | ZEROS | ZEROES
    ;
 
 booleanLiteral
@@ -1251,24 +943,20 @@ numericLiteral
    : NUMERICLITERAL | ZERO | integerLiteral
    ;
 
-cicsDfhRespLiteral
-   : DFHRESP LPARENCHAR (cics_conditions | cobolWord | literal) RPARENCHAR
-   ;
-
-cicsDfhValueLiteral
-   : DFHVALUE LPARENCHAR (cics_conditions | cobolWord | literal) RPARENCHAR
-   ;
-
 integerLiteral
    : INTEGERLITERAL | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88
    ;
 
-literal
-   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | cicsDfhRespLiteral | cicsDfhValueLiteral | charString
+cicsDfhRespLiteral
+   : DFHRESP LPARENCHAR (cics_conditions | cicsWord | literal) RPARENCHAR
    ;
 
-charString
-   : FINALCHARSTRING
+cicsDfhValueLiteral
+   : DFHVALUE LPARENCHAR (cics_conditions | cicsWord | literal) RPARENCHAR
+   ;
+
+literal
+   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | cicsDfhRespLiteral | cicsDfhValueLiteral
    ;
 
 // arithmetic expression ----------------------------------

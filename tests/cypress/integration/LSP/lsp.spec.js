@@ -81,16 +81,22 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152048 Cobol file is recognized by LSP', () => {
-    it(['smoke'], 'Cobol file is recognized by LSP - Cobol type is shown in status bar', () => {
+    beforeEach(() => {
+      cy.updateConfigs('basic');
+    });
+    it(['smoke', 'CI'], 'Cobol file is recognized by LSP - Cobol type is shown in status bar', () => {
       cy.openFile('USER1.cbl');
       cy.get('.right.area .hasCommand[title="Select Language Mode"]').should('contain.text', 'COBOL');
     });
   });
 
   describe('TC152049 Navigate through definitions', () => {
+    beforeEach(() => {
+      cy.updateConfigs('basic');
+    });
     it(['smoke'], 'Checks behavior of go to definition action', () => {
       cy.openFile('USER1.cbl');
-      cy.getLineByNumber(29).findText('100-Print-User.').goToDefinition();
+      cy.getLineByNumber(29).findText('100-Print-User.').wait(5000).goToDefinition().wait(10000);
       cy.getCurrentLineNumber().should('eq', 32);
     });
   });
@@ -151,7 +157,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152051 Syntax Errors have more detailed hints', () => {
-    it(['smoke'], 'Syntax Errors have more detailed hints', () => {
+    it(['smoke', 'CI'], 'Syntax Errors have more detailed hints', () => {
       cy.openFile('USER2.cbl');
       cy.get('.squiggly-error')
         .getElementLineNumber()
@@ -164,7 +170,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152050 Semantic Errors also marked in file', () => {
-    it(['smoke'], 'Checks that Semantic Errors also marked in file', () => {
+    it(['smoke', 'CI'], 'Checks that Semantic Errors also marked in file', () => {
       cy.openFile('USER2.cbl');
       cy.goToLine(40);
       cy.get('.squiggly-error')
@@ -178,7 +184,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152053 Semantic Errors also have hints', () => {
-    it(['smoke'], 'Checks that semantic errors have detailed hints', () => {
+    it(['smoke', 'CI'], 'Checks that semantic errors have detailed hints', () => {
       cy.openFile('USER2.cbl');
       cy.goToLine(40);
       cy.get('.squiggly-error')
@@ -206,7 +212,7 @@ context('This is a LSP spec', () => {
   });
 
   describe('TC152058 Autocomplete functionality with snippets navigation', () => {
-    it(['smoke'], 'Checks auto complete functionality, also with navigation by snippets', () => {
+    it(['smoke', 'CI'], 'Checks auto complete functionality, also with navigation by snippets', () => {
       cy.openFile('USER2.cbl');
       cy.goToLine(40);
       cy.getCurrentLine().type('{end}{enter}');
@@ -493,7 +499,7 @@ context('This is a LSP spec', () => {
         hoverOverVariable(31, 'filler', '01 TERMS-RECORD. 05 FILLER PIC X(68).');
         hoverOverVariable(35, 'filler', '01 TERMS-RECORD. 05 FILLER PIC X(69).');
         hoverOverVariable(39, 'REC-1.', '01 REC-1. 05 REC-1-1 PIC 9(6). 05 REC-1-2.');
-        hoverOverVariable(44, 'SUPPLr', '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9. 88 SUPPLR VALUE 2 THRU 4.');
+        hoverOverVariable(44, 'SUPPLr', '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9. 88 SUPPLR VALUE 2 THROUGH 4.');
       },
     );
   });
@@ -501,7 +507,7 @@ context('This is a LSP spec', () => {
   describe('TC319969 Provide the variables definition as documentation', () => {
     it(['smoke'], 'Checks variable definition into VSC autocomplete documentation.', () => {
       cy.openFile('HOVER.CBL');
-      varDifinitionAutocomplete('ADSF', '01 SOMETHING. 03 ADFSF OCCURS 30 TIMES. 05 OL-NO PIC X(8).');
+      varDifinitionAutocomplete('ADSF', '01 SOMETHING. 03 ADFSF OCCURS 30 TIMES. INDEXED BY INDX 05 OL-NO PIC X(8).');
       varDifinitionAutocomplete('FILE-RECORD', '01 FILE-RECORD PIC X(113).');
       varDifinitionAutocomplete('FILLER', '01 TERMS-RECORD. 05 FILLER PIC X(69).');
       varDifinitionAutocomplete('HEADER', '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9. 88 HEADER VALUE 1 THRU 4.');
@@ -509,7 +515,7 @@ context('This is a LSP spec', () => {
       varDifinitionAutocomplete('REC-1-1', '01 REC-1. 05 REC-1-1 PIC 9(6).');
       varDifinitionAutocomplete(
         'REC-1-2',
-        '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9. 88 HEADER VALUE 1 THRU 4. 88 SUPPLR VALUE 2 THRU 4. 88 WREHOUSE VALUE 3.',
+        '01 REC-1. 05 REC-1-2. 10 REC-1-2-1 PIC 9. 88 HEADER VALUE 1 THRU 4. 88 SUPPLR VALUE 2 THROUGH 4. 88 WREHOUSE VALUE 3.',
       );
       varDifinitionAutocomplete('TOP-OF-PAGE', 'C01 IS TOP-OF-PAGE.');
     });
@@ -542,6 +548,48 @@ context('This is a LSP spec', () => {
       cy.openFile('TEST.CBL');
       cy.goToLine(23).getLineByNumber(23).type('{end}{backspace};');
       cy.getLineByNumber(23).should('not.have.class', '.squiggly-error');
+    });
+  });
+
+  describe('TC328483 support floating comment indicators (*>)', () => {
+    function checkForErrors(lineNumber) {
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      return cy
+        .goToLine(lineNumber)
+        .getLineByNumber(lineNumber)
+        .should('not.have.class', '.squiggly-error')
+        .getLineByNumber(lineNumber)
+        .should('not.have.class', '.squiggly-warning');
+    }
+
+    function expectErrors(lineNumber) {
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      return cy.goToLine(lineNumber).getCurrentLineErrors({ expectedLine: lineNumber });
+    }
+
+    function addComment(lineNumber, comment) {
+      return cy.openFile('USER2.cbl').getLineByNumber(lineNumber).type(comment);
+    }
+    it(['smoke'], 'support floating comment indicators (*>) - with space', () => {
+      addComment(26, "      *> ---- Let's have a comment with space");
+      checkForErrors(26);
+    });
+    it(['smoke'], 'support floating comment indicators (*>) - without space', () => {
+      addComment(26, "      *>---- Let's have a comment without space");
+      checkForErrors(26);
+    });
+
+    it(['smoke'], 'support floating comment indicators (*>) - comment in non-empty string', () => {
+      addComment(29, '{end} *> here');
+      checkForErrors(29);
+    });
+    it(['smoke'], 'support floating comment indicators (*>) - comment in non-empty string with expected error', () => {
+      addComment(29, '{end} *>');
+      expectErrors(29);
+    });
+    it(['smoke'], 'support floating comment indicators (*>) - out of 80 characters', () => {
+      addComment(29, '{end} *> ddddddddddddddddddddddddddddddddddddddddddd');
+      expectErrors(29);
     });
   });
 });

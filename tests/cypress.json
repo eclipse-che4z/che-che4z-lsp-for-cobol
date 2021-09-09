@@ -22,5 +22,10 @@
     "runMode": 2,
     "openMode": 2
   },
-  "supportFile": "cypress/support/index.ts"
+  "supportFile": "cypress/support/index.ts",
+    "reporter": "mocha-junit-reporter",
+    "reporterOptions": {
+      "testsuitesTitle": true,
+      "mochaFile": "results/my-test-output-[hash].xml"
+    }
 }

@@ -19,16 +19,13 @@ import lombok.experimental.UtilityClass;
 /** The constants in this class used while the processing of COBOL code lines. */
 @UtilityClass
 public final class ProcessingConstants {
-  public static final String COMMENT_ENTRY_TAG = "*>CE";
   public static final String COMMENT_TAG = "*>";
   public static final String NEWLINE = "\r\n";
   public static final String WS = " ";
-  public static final String CONT_LINE_NO_AREA_A_REGEX = "^(.{6})([-]{1})( ){4}(.*)";
   public static final String BLANK_SEQUENCE_AREA = "      ";
   public static final String CPY_ENTER_TAG = " *>CPYENTER<URI>";
   public static final String CPY_URI_CLOSE = "</URI>";
   public static final String CPY_EXIT_TAG = NEWLINE + "*>CPYEXIT" + NEWLINE;
-  public static final int START_INDEX_AREA_A = 4;
-  public static final int END_INDEX_CONTENT_AREA_A = 10;
+  public static final int START_INDEX_AREA_B = 11;
   public static final int INDICATOR_AREA = 7;
 }

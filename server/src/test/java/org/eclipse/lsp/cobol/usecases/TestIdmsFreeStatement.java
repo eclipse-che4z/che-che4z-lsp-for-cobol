@@ -25,7 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 /** Test IDMS FREE DML statement */
-public class TestIdmsFreeStatement {
+class TestIdmsFreeStatement {
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \n"

@@ -15,29 +15,29 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** This test checks that the usage of XML special registers does not produce syntax errors */
-class TextXmlSpecialRegisters {
-
+/** WRITE AFTER ADVANCING statement with variables should be parsed correctly */
+class TestWriteAfterAdvancingParsedCorrectly {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. TEST1.\n"
+          + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       ENVIRONMENT DIVISION.\n"
+          + "       CONFIGURATION SECTION.\n"
+          + "       SPECIAL-NAMES.   C01 IS {$*TOP-OF-PAGE}.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01  {$*LOCAL-NAME-LEN} PIC 99.\n"
-          + "       01  {$*XML-NAT-CHAR} PIC X(9).\n"
+          + "       01  {$*LADING-RECORD} PIC X(133).\n"
+          + "       01  {$*PRINT-HEADER}.\n"
+          + "           05  FILLER PIC X.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "       {#*MAINLINE}.\n"
-          + "           MOVE -1 TO {&XML-CODE}.\n"
-          + "           MOVE {&XML-NTEXT} TO {$XML-NAT-CHAR}\n"
-          + "           COMPUTE {$LOCAL-NAME-LEN}\n"
-          + "            = FUNCTION LENGTH ({&XML-TEXT})\n"
-          + "           GOBACK.";
+          + "             WRITE {$LADING-RECORD} FROM {$PRINT-HEADER}\n"
+          + "                      AFTER ADVANCING {$TOP-OF-PAGE}\n"
+          + "             WRITE {$LADING-RECORD} FROM {$PRINT-HEADER}\n"
+          + "                      AFTER ADVANCING 3 LINES.\n";
 
   @Test
   void test() {

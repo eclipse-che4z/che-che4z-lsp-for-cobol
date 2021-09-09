@@ -25,7 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 /** Test IDMS WRITE DML statement */
-public class TestIdmsWriteClause {
+class TestIdmsWriteClause {
 
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"

@@ -188,8 +188,8 @@ class TestOutlineTree {
                     "PROCEDURE DIVISION",
                     NodeType.DIVISION,
                     nested(
-                        node("000-Main-Logic", NodeType.PROCEDURE),
-                        node("100-Print-User", NodeType.PROCEDURE))))),
+                        node("000-MAIN-LOGIC", NodeType.PROCEDURE),
+                        node("100-PRINT-USER", NodeType.PROCEDURE))))),
         node(
             "PROGRAM: OUTLINE",
             NodeType.PROGRAM,

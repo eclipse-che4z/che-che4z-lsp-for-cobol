@@ -32,6 +32,19 @@ class TestIdmsCopy {
           + "        WORKING-STORAGE SECTION.\n"
           + "        01 {$*EMPLOYEE} PIC X(10).\n";
 
+  private static final String TEXT_IDMS_COPY_FILE =
+      "        IDENTIFICATION DIVISION. \n"
+          + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "       INPUT-OUTPUT SECTION.\n"
+          + "       FILE-CONTROL.\n"
+          + "             SELECT {$EMP-FILE} ASSIGN TO DUMMY\n"
+          + "             ORGANIZATION IS LINE SEQUENTIAL\n"
+          + "             ACCESS MODE IS SEQUENTIAL.\n"
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        01 {$*EMPLOYEE} PIC X(10).\n";
+
   private static final String COPY_IDMS_FILE =
       "        FILE SECTION.\n" + "            COPY IDMS FILE {~FL002} VERSION 1.\n";
 
@@ -95,7 +108,7 @@ class TestIdmsCopy {
       "           BIND RUN-UNIT.\n" + "            BIND {$EMPLOYEE}.\n";
 
   private static final String CB_NAME5 = "FL002";
-  private static final String CB5 = "       FD EMP-FILE.\n" + "       RECORD CONTAINS 80.\n";
+  private static final String CB5 = "       FD {$*EMP-FILE}.\n" + "       RECORD CONTAINS 80.\n";
 
   @Test
   void testIdmsCopyWS1() {
@@ -148,6 +161,6 @@ class TestIdmsCopy {
   @Test
   void testIdmsCopyFile() {
     UseCaseEngine.runTest(
-        TEXT + COPY_IDMS_FILE, ImmutableList.of(new CobolText(CB_NAME5, CB5)), ImmutableMap.of());
+            TEXT_IDMS_COPY_FILE + COPY_IDMS_FILE, ImmutableList.of(new CobolText(CB_NAME5, CB5)), ImmutableMap.of());
   }
 }
