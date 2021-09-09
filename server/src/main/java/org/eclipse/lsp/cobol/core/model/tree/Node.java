@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /** The class represents a Node in source structure tree. */
@@ -35,22 +35,14 @@ import java.util.stream.Stream;
 public abstract class Node {
   private final Locality locality;
   private final NodeType nodeType;
-  private final boolean oneRun;
 
   @EqualsAndHashCode.Exclude private final List<Node> children = new ArrayList<>();
   @EqualsAndHashCode.Exclude @ToString.Exclude @Setter private Node parent;
-  @EqualsAndHashCode.Exclude private boolean processed = false;
+  @EqualsAndHashCode.Exclude private Optional<Supplier<List<SyntaxError>>> nextProcessingStep = Optional.empty();
 
   protected Node(Locality location, NodeType nodeType) {
     this.locality = location;
     this.nodeType = nodeType;
-    this.oneRun = true;
-  }
-
-  protected Node(Locality location, NodeType nodeType, boolean oneRun) {
-    this.locality = location;
-    this.nodeType = nodeType;
-    this.oneRun = oneRun;
   }
 
   /**
@@ -109,22 +101,14 @@ public abstract class Node {
    * @return the list of errors
    */
   public final List<SyntaxError> process() {
+    Optional<Supplier<List<SyntaxError>>> processTmp = nextProcessingStep;
+    nextProcessingStep = Optional.empty();
     List<SyntaxError> errors = new ArrayList<>();
-    if (!processed) errors.addAll(processNode());
-    if (oneRun) setNodeProcessed();
+    processTmp.map(Supplier::get).ifPresent(errors::addAll);
     children.stream().map(Node::process).forEach(errors::addAll);
     return errors;
   }
 
-  /**
-   * Process this tree node only.
-   * The node processing will be done before processing the node children.
-   *
-   * @return the list of errors
-   */
-  protected List<SyntaxError> processNode() {
-    return ImmutableList.of();
-  }
 
   /**
    * Return true if this node and all its children was fully processed and there is no need to do extra `process`
@@ -133,13 +117,25 @@ public abstract class Node {
    * @return true if no more `process` calls is needed
    */
   public final boolean isProcessed() {
-    return processed && children.stream().allMatch(Node::isProcessed);
+    return !nextProcessingStep.isPresent() && children.stream().allMatch(Node::isProcessed);
   }
 
   /**
-   * Set processed flag to true.
+   * Add step for processing.
+   * See {@see NodeProcessingTest} for examples
+   *
+   * @param processCall the method for processing
    */
-  protected void setNodeProcessed() {
-    processed = true;
+  protected final void addProcessStep(Supplier<List<SyntaxError>> processCall) {
+    if (nextProcessingStep.isPresent()) {
+      Supplier<List<SyntaxError>> previousProcessIt = nextProcessingStep.get();
+      nextProcessingStep = Optional.of(() -> {
+        List<SyntaxError> errors = new ArrayList<>(previousProcessIt.get());
+        errors.addAll(processCall.get());
+        return errors;
+      });
+    } else {
+      nextProcessingStep = Optional.of(processCall);
+    }
   }
 }

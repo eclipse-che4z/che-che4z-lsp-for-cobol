@@ -26,10 +26,10 @@ import java.util.List;
 public class ProcedureDivisionBodyNode extends Node {
   public ProcedureDivisionBodyNode(Locality location) {
     super(location, NodeType.CODE_BLOCK_PARENT);
+    addProcessStep(this::processNode);
   }
 
-  @Override
-  protected List<SyntaxError> processNode() {
+  private List<SyntaxError> processNode() {
     return CodeBlockDefinitionUtils.defineCodeBlock(this);
   }
 }

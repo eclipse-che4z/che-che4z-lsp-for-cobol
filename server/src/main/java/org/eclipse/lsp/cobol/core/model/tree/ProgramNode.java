@@ -46,7 +46,6 @@ public class ProgramNode extends Node {
   @EqualsAndHashCode.Exclude private final NodeConverter nodeConverter = new NodeConverter();
   @EqualsAndHashCode.Exclude private VariableUsageDelegate variableUsageDelegate;
   private String programName;
-  private NodeState nodeState = NodeState.NEW;
 
   /**
    * Use for testing.
@@ -54,12 +53,14 @@ public class ProgramNode extends Node {
    * @param locality the node location.
    */
   ProgramNode(Locality locality) {
-    super(locality, PROGRAM, false);
+    super(locality, PROGRAM);
+    addProcessStep(this::waitForVariableDefinition);
   }
 
   public ProgramNode(Locality locality, MessageService messageService) {
-    super(locality, PROGRAM, false);
+    super(locality, PROGRAM);
     variableUsageDelegate = new VariableUsageDelegate(messageService);
+    addProcessStep(this::waitForVariableDefinition);
   }
 
   public VariableUsageDelegate getVariableUsageDelegate() {
@@ -74,20 +75,8 @@ public class ProgramNode extends Node {
     this.programName = programName;
   }
 
-  @Override
-  protected List<SyntaxError> processNode() {
-    switch (nodeState) {
-      case NEW:
-        nodeState = NodeState.WAIT_FOR_VARIABLES;
-        break;
-      case WAIT_FOR_VARIABLES:
-        nodeState = NodeState.DONE;
-        setNodeProcessed();
-        return processVariables();
-      case DONE:
-      default:
-        break;
-    }
+  private List<SyntaxError> waitForVariableDefinition() {
+    addProcessStep(this::processVariables);
     return ImmutableList.of();
   }
 
@@ -172,9 +161,5 @@ public class ProgramNode extends Node {
         .map(it -> it.validate(variables))
         .flatMap(Collection::stream)
         .collect(toList());
-  }
-
-  private enum NodeState {
-    NEW, WAIT_FOR_VARIABLES, DONE;
   }
 }
