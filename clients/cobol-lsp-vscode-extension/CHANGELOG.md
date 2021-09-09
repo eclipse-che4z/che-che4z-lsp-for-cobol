@@ -2,7 +2,7 @@
 All notable changes to the COBOL Language Support extension are documented in this file.
 Changelog:
 
-## [0.21.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.20.0...0.21.0) (2021-09-08)
+## [0.21.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.20.0...0.21.0) (2021-09-09)
 
 #### Added
 Support for FD and SD definitions
