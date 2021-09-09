@@ -48,10 +48,10 @@ public class FileDescriptionNode extends VariableNode {
     super(location, name, variableType, global);
     this.fileDescriptorText = fileDescriptorText;
     this.fileControlClause = fileControlClause;
+    addProcessStep(this::processNode);
   }
 
-  @Override
-  public List<SyntaxError> processNode() {
+  private List<SyntaxError> processNode() {
     List<SyntaxError> errors = new ArrayList<>();
     if (StringUtils.isBlank(this.fileControlClause)) {
       errors.add(getError(MessageTemplate.of(FD_WITHOUT_FILE_CONTROL, getName()), ErrorSeverity.ERROR));

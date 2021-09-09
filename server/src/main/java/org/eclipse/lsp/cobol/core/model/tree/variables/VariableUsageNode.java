@@ -54,10 +54,10 @@ public class VariableUsageNode extends Node {
     this.dataName = dataName;
     this.parents = parents;
     this.type = type;
+    addProcessStep(this::processNode);
   }
 
-  @Override
-  public List<SyntaxError> processNode() {
+  private List<SyntaxError> processNode() {
     getNearestParentByType(NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
         .map(ProgramNode::getVariableUsageDelegate)

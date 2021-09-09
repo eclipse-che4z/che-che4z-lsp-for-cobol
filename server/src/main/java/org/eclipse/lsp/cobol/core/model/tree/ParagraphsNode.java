@@ -26,10 +26,10 @@ import java.util.List;
 public class ParagraphsNode extends Node {
   public ParagraphsNode(Locality location) {
     super(location, NodeType.CODE_BLOCK_PARENT);
+    addProcessStep(this::processNode);
   }
 
-  @Override
-  protected List<SyntaxError> processNode() {
+  private List<SyntaxError> processNode() {
     return CodeBlockDefinitionUtils.defineCodeBlock(this);
   }
 }

@@ -26,10 +26,10 @@ import java.util.List;
 public class SectionNode extends Node {
   public SectionNode(Locality locality) {
     super(locality, NodeType.SECTION);
+    addProcessStep(this::processNode);
   }
 
-  @Override
-  protected List<SyntaxError> processNode() {
+  private List<SyntaxError> processNode() {
     return VariableDefinitionUtil.processNodeWithVariableDefinitions(this);
   }
 }
