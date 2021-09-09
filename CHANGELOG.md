@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [0.21.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.20.0...0.21.0) (2021-09-08)
+## [0.21.0](https://github.com/eclipse/che-che4z-lsp-for-cobol/compare/0.20.0...0.21.0) (2021-09-09)
 
 ### Bug Fixes
 * Fix consuming of extra tokens by statements ([c81c25d](https://github.com/eclipse/che-che4z-lsp-for-cobol/commit/c81c25d724fb5337ba758f9f11eee71c072d87b9)), closes [#1020](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues/1020)
