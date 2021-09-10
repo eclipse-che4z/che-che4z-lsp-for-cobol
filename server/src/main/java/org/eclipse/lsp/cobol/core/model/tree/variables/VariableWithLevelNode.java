@@ -47,7 +47,7 @@ abstract class VariableWithLevelNode extends VariableNode {
     this.level = level;
     this.redefines = redefines;
     this.specifiedGlobal = global;
-    addProcessStep(this::processNode);
+    addProcessStep(this::checkLevel);
   }
 
   protected VariableWithLevelNode(
@@ -56,7 +56,7 @@ abstract class VariableWithLevelNode extends VariableNode {
     this.level = level;
     this.redefines = redefines;
     this.specifiedGlobal = false;
-    addProcessStep(this::processNode);
+    addProcessStep(this::checkLevel);
   }
 
   @Override
@@ -66,7 +66,7 @@ abstract class VariableWithLevelNode extends VariableNode {
       setGlobal(((VariableWithLevelNode) parent).isGlobal());
   }
 
-  private List<SyntaxError> processNode() {
+  private List<SyntaxError> checkLevel() {
     List<SyntaxError> errors = new ArrayList<>();
     if ((level == LEVEL_01 || level == LEVEL_77)
         && getLocality().getRange().getStart().getCharacter() > AREA_A_FINISH)
