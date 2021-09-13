@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
  * intended
  */
 class CobolErrorStrategyTest {
-  private MessageService messageService = mock(MessageService.class);
+  private final MessageService messageService = mock(MessageService.class);
 
   @Test
   void noViableAltExceptionTest() {

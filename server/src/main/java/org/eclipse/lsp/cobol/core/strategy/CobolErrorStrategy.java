@@ -14,12 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.strategy;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.eclipse.lsp.cobol.core.CobolParser;
@@ -29,13 +31,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.CobolLexer.EOF;
 
+/**
+ * This implementation of the error strategy customizes error messages that are extracted from the
+ * parsing exceptions
+ */
 @Slf4j
 @Singleton
 // for test
@@ -54,6 +59,8 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
   private static final String MSG_SUFFIX = "}";
 
   private static final Map<String, String> SPECIAL_TOKEN_MAPPING;
+  private static final Map<Class<? extends Parser>, Set<String>> IDENTIFIER_TOKENS =
+      IdentifierReplacing.retrieveTokenToRemove();
 
   @Getter @Setter private MessageService messageService;
 
@@ -74,9 +81,6 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
 
   private static void addPredefinedMappings() {
     SPECIAL_TOKEN_MAPPING.put("_", "-");
-    SPECIAL_TOKEN_MAPPING.put(", ,", ", ");
-    SPECIAL_TOKEN_MAPPING.put("{ ,", "{");
-    SPECIAL_TOKEN_MAPPING.put(", }", "}");
   }
 
   private static void loadTokenMapping(BufferedReader br) throws IOException {
@@ -186,11 +190,25 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
 
   private String getExpectedText(Parser recognizer, IntervalSet interval) {
     String expectedTokens = interval.toString(recognizer.getVocabulary());
+    String replace = expectedTokens.replace(MSG_PREFIX, "").replace(MSG_SUFFIX, "");
 
-    for (Map.Entry<String, String> entry : SPECIAL_TOKEN_MAPPING.entrySet()) {
-      expectedTokens = expectedTokens.replace(entry.getKey(), entry.getValue());
-    }
-    return expectedTokens;
+    final Set<String> identifierTokens =
+        IDENTIFIER_TOKENS.getOrDefault(recognizer.getClass(), ImmutableSet.of());
+    final List<String> collect = Arrays.stream(replace.split(MSG_DELIMITER)).collect(toList());
+
+    if (collect.containsAll(identifierTokens)) collect.removeAll(identifierTokens);
+
+    final String newMessage =
+        collect.stream()
+            .map(
+                it -> {
+                  for (Map.Entry<String, String> entry : SPECIAL_TOKEN_MAPPING.entrySet()) {
+                    it = it.replace(entry.getKey(), entry.getValue());
+                  }
+                  return it;
+                })
+            .collect(joining(MSG_DELIMITER));
+    return interval.size() > 1 ? String.format("{%s}", newMessage) : newMessage;
   }
 
   private static String getRule(Parser recognizer) {
