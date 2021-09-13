@@ -86,7 +86,7 @@ class TestExecVarDoesNotProduceNPE {
                     + "THREAD, TIMER, TODAYS-DATE, TODAYS-NAME, TOP, TRAILING, TRIG, TRUNC, TURQUOISE, UE, "
                     + "UNDERSCORE, UNFORMATTED, UNPROTECTED, UPDATE, UPGRADE, UPPER, USAGE, USAGE-MODE, UTF-8, U, "
                     + "VALUE, VALUES, VBREF, VOLATILE, WCC, WD, WHITE, WITHIN, WORD, W, XMLPARSE, XMLSS, XP, XREF, "
-                    + "X, YEAR, YEARWINDOW, YELLOW, YW, YYYYDDD, YYYYMMDD, ZWB, '.', IDENTIFIER, '.'2}",
+                    + "X, YEAR, YEARWINDOW, YELLOW, YW, YYYYDDD, YYYYMMDD, ZWB, '.', IDENTIFIER}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText()),
             "3",
