@@ -34,11 +34,9 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.SKIP;
+import static org.eclipse.lsp.cobol.service.SQLBackend.DATACOM_SERVER;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
-import static org.eclipse.lsp.cobol.service.CopybookServiceImpl.SQLCA;
-import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_2_URI;
-import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_3_URI;
-import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -57,6 +55,8 @@ class CopybookServiceTest {
   private static final String PARENT_CONTENT = "         COPY NESTED.";
   private static final String NESTED_CPY_NAME = "nested";
   private static final String CONTENT = "content";
+  private static final String SQLCA = "SQLCA";
+  private static final String SQLDA = "SQLDA";
 
   private final DataBusBroker broker = mock(DataBusBroker.class);
   private final SettingsService settingsService = mock(SettingsService.class);
@@ -248,12 +248,13 @@ class CopybookServiceTest {
     CopybookServiceImpl copybookService = createCopybookService();
 
     Assertions.assertThrows(
-        IllegalArgumentException.class,
-        () -> copybookService.resolve(SQLCA, DOCUMENT_URI, null));
+        IllegalArgumentException.class, () -> copybookService.resolve(SQLCA, DOCUMENT_URI, null));
   }
 
-  /** Tests if implicit copybook is resolved. For simplicity we consider content is null.
-   * Full use case test is in  TestSqlIncludeStatementForImplicitlyDefinedCpy*/
+  /**
+   * Test if implicit copybook SQLCA for DB2 is resolved. For simplicity, we consider content is
+   * null. Full use case test is in TestSqlIncludeStatementForImplicitlyDefinedCpy
+   */
   @Test
   void testServiceResolvesImplicitCopybook() {
     CopybookServiceImpl copybookService = createCopybookService();
@@ -261,10 +262,42 @@ class CopybookServiceTest {
 
     when(files.getNameFromURI(DOCUMENT_3_URI)).thenReturn("document2");
     when(settingsService.getConfiguration("copybook-resolve", "document2", SQLCA))
-            .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
     CopybookModel cpy = copybookService.resolve(SQLCA, DOCUMENT_3_URI, cpyConfig);
 
     assertEquals(new CopybookModel(SQLCA, DOCUMENT_3_URI, null), cpy);
+  }
+
+  /** Test if implicit copybook SQLCA for DATACOM is resolved. */
+  @Test
+  void testServiceResolvesImplicitCopybookForDataCom() {
+    CopybookServiceImpl copybookService = createCopybookService();
+    verify(broker).subscribe(copybookService);
+
+    when(files.getNameFromURI(DOCUMENT_URI)).thenReturn("document2");
+    when(settingsService.getConfiguration("copybook-resolve", "document2", SQLCA))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
+    CopybookModel cpy =
+        copybookService.resolve(SQLCA, DOCUMENT_URI, new CopybookConfig(ENABLED, DATACOM_SERVER));
+
+    assertEquals(
+        new CopybookModel(SQLCA, "implicit:///implicitCopybooks/SQLCA_DATACOM.cpy", null), cpy);
+  }
+
+  /** Test that the service resolves the SQLDA predefined copybook */
+  @Test
+  void testSqldaCopybookResolutionDoesNotRelyOnBackend() {
+
+    CopybookServiceImpl copybookService = createCopybookService();
+    verify(broker).subscribe(copybookService);
+
+    when(files.getNameFromURI(DOCUMENT_URI)).thenReturn("document2");
+    when(settingsService.getConfiguration("copybook-resolve", "document2", SQLDA))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
+
+    assertEquals(
+        copybookService.resolve(SQLDA, DOCUMENT_URI, new CopybookConfig(ENABLED, DATACOM_SERVER)),
+        copybookService.resolve(SQLDA, DOCUMENT_URI, new CopybookConfig(ENABLED, DB2_SERVER)));
   }
 
   /**
@@ -317,9 +350,11 @@ class CopybookServiceTest {
   @Test
   void testResolveGetsStubWhenConfigurationThrowAnError() {
     when(settingsService.getConfiguration("copybook-resolve", "document", VALID_CPY_NAME))
-        .thenReturn(CompletableFuture.supplyAsync(() -> {
-          throw new NullPointerException();
-        }));
+        .thenReturn(
+            CompletableFuture.supplyAsync(
+                () -> {
+                  throw new NullPointerException();
+                }));
     CopybookService copybookService = createCopybookService();
     CopybookModel copybookModel = copybookService.resolve(VALID_CPY_NAME, DOCUMENT_URI, cpyConfig);
 

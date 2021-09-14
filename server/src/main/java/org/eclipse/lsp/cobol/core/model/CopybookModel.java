@@ -23,7 +23,7 @@ import lombok.Value;
  */
 @Value
 public class CopybookModel {
-  private String name;
-  private String uri;
-  private String content;
+  String name;
+  String uri;
+  String content;
 }

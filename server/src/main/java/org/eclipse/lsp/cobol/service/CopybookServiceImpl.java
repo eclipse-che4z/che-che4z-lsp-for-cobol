@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
@@ -51,9 +52,8 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 @Singleton
 @SuppressWarnings("UnstableApiUsage")
 public class CopybookServiceImpl implements CopybookService {
-
-  public static final String SQLCA = "SQLCA";
-  public static final String SQLDA = "SQLDA";
+  private static final Map<String, PredefinedCopybooks> PREDEFINED_COPYBOOKS =
+      ImmutableMap.of("SQLCA", PredefinedCopybooks.SQLCA, "SQLDA", PredefinedCopybooks.SQLDA);
   public static final String PREF_IMPLICIT = "implicit://";
 
   private final SettingsService settingsService;
@@ -89,7 +89,7 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   /**
-   * Retrieve and return the copybook by its name. Copybook may cached to limit interactions with
+   * Retrieve and return the copybook by its name. Copybook may be cached to limit interactions with
    * the file system.
    *
    * <p>Resolving works in synchronous way. Resolutions with different copybook names will not block
@@ -131,34 +131,39 @@ public class CopybookServiceImpl implements CopybookService {
             settingsService
                 .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
                 .get())
-        .map(uri -> loadCopybook(uri, copybookName))
+        .map(uri -> loadCopybook(uri, copybookName, cobolFileName))
         .orElseGet(() -> processEmptyUri(copybookName, copybookConfig, cobolFileName));
   }
 
   private CopybookModel processEmptyUri(
       String copybookName, CopybookConfig copybookConfig, String cobolFileName) {
-    if (isImplictlyDefinedCopybook(copybookName)) {
-      String uri = getUriForImplicitCopybook(copybookName, copybookConfig);
-      return new CopybookModel(
-          copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri));
-    } else if (copybookConfig.getCopybookProcessingMode().download && cobolFileName != null) {
-      Optional.of(
-              copybooksForDownloading.computeIfAbsent(
-                  cobolFileName, s -> ConcurrentHashMap.newKeySet()))
-          .ifPresent(it -> it.add(copybookName));
-    }
+    return retrievePredefinedCopybook(copybookName)
+        .map(it -> it.uriForBackend(copybookConfig.getSqlBackend()))
+        .map(
+            uri ->
+                new CopybookModel(
+                    copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri)))
+        .orElseGet(() -> registerForDownloading(copybookName, cobolFileName));
+  }
+
+  private CopybookModel registerForDownloading(String copybookName, String cobolFileName) {
+    Optional.of(
+            copybooksForDownloading.computeIfAbsent(
+                cobolFileName, s -> ConcurrentHashMap.newKeySet()))
+        .ifPresent(it -> it.add(copybookName));
     return new CopybookModel(copybookName, null, null);
   }
 
-  private CopybookModel loadCopybook(String uri, String copybookName) {
+  private CopybookModel loadCopybook(String uri, String copybookName, String cobolFileName) {
     Path file = files.getPathFromURI(uri);
     return files.fileExists(file)
         ? new CopybookModel(copybookName, uri, files.getContentByPath(Objects.requireNonNull(file)))
-        : new CopybookModel(copybookName, null, null);
+        : registerForDownloading(copybookName, cobolFileName);
   }
 
   /**
-   * Check if the copybook name is implicitly (not an explicit copybook file) defined or not.
+   * Retrieve optional {@link PredefinedCopybooks} for the given name. Checks if the copybook name
+   * is implicitly (not an explicit copybook file) defined.
    *
    * <p>Application can use SQLCA and SQLDA names to define communication and description areas as
    * copybooks and both are implicitly defined by either co-processor or pre-processor.
@@ -166,18 +171,8 @@ public class CopybookServiceImpl implements CopybookService {
    * @param copybookName - the name of copybook to check
    * @return true if copybook name is one of SQLDA or SQLCA
    */
-  private boolean isImplictlyDefinedCopybook(String copybookName) {
-    return SQLCA.equals(copybookName) || SQLDA.equals(copybookName);
-  }
-
-  private String getUriForImplicitCopybook(String copybookName, CopybookConfig copybookConfig) {
-    if (SQLCA.equals(copybookName)) {
-      if (SQLBackend.DATACOM_SERVER.equals(copybookConfig.getSqlBackend())) {
-        return "/implicitCopybooks/SQLCA_DATACOM.cpy";
-      }
-      return "/implicitCopybooks/SQLCA_DB2.cpy";
-    }
-    return "/implicitCopybooks/SQLDA.cpy";
+  private Optional<PredefinedCopybooks> retrievePredefinedCopybook(String copybookName) {
+    return Optional.ofNullable(PREDEFINED_COPYBOOKS.get(copybookName));
   }
 
   private String readContentForImplicitCopybook(String resourcePath) {
@@ -193,7 +188,7 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   /**
-   * Sends downloading requests to the Client for copybooks not presented locally, if any.
+   * Send downloading requests to the Client for copybooks not presented locally, if any.
    *
    * <p>A list of missed copybooks grouped by document URI, including nested copybooks.
    *
@@ -230,5 +225,31 @@ public class CopybookServiceImpl implements CopybookService {
 
   private String getUserInteractionType(CopybookProcessingMode copybookProcessingMode) {
     return copybookProcessingMode.userInteraction ? VERBOSE.label : QUIET.label;
+  }
+
+  /** Enumeration of predefined copybooks */
+  private enum PredefinedCopybooks {
+    SQLCA {
+      @Override
+      String uriForBackend(SQLBackend backend) {
+        return backend == SQLBackend.DATACOM_SERVER
+            ? "/implicitCopybooks/SQLCA_DATACOM.cpy"
+            : "/implicitCopybooks/SQLCA_DB2.cpy";
+      }
+    },
+    SQLDA {
+      @Override
+      String uriForBackend(SQLBackend backend) {
+        return "/implicitCopybooks/SQLDA.cpy";
+      }
+    };
+
+    /**
+     * Retrieve the uri of this predefined copybook using the given SQL backend
+     *
+     * @param backend SQL backend for the program
+     * @return uri of the predefined copybook
+     */
+    abstract String uriForBackend(SQLBackend backend);
   }
 }
