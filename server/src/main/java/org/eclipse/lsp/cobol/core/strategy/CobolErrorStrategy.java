@@ -14,28 +14,29 @@
  */
 package org.eclipse.lsp.cobol.core.strategy;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.messages.MessageService;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.CobolLexer.EOF;
 
+/**
+ * This implementation of the error strategy customizes error messages that are extracted from the
+ * parsing exceptions
+ */
 @Slf4j
 @Singleton
 // for test
@@ -46,48 +47,18 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
       "ErrorStrategy.reportNoViableAlternative";
   private static final String REPORT_UNWANTED_TOKEN = "ErrorStrategy.reportUnwantedToken";
   private static final String REPORT_MISSING_TOKEN = "ErrorStrategy.reportMissingToken";
-  private static final String SPECIAL_TOKEN_HANDLING_FILEPATH = "SpecialTokenHandling.properties";
   private static final String END_OF_FILE_MESSAGE = "ErrorStrategy.endOfFile";
   private static final String PERFORM_MISSING_END = "ErrorStrategy.performMissingEnd";
   private static final String MSG_DELIMITER = ", ";
   private static final String MSG_PREFIX = "{";
   private static final String MSG_SUFFIX = "}";
 
-  private static final Map<String, String> SPECIAL_TOKEN_MAPPING;
+  private static final Map<String, String> SPECIAL_TOKEN_MAPPING =
+      SpecialTokenReplacing.loadSpecialTokenMapping();
+  private static final Map<Class<? extends Parser>, Set<String>> IDENTIFIER_TOKENS =
+      IdentifierReplacing.retrieveTokenToRemove();
 
   @Getter @Setter private MessageService messageService;
-
-  static {
-    SPECIAL_TOKEN_MAPPING = new LinkedHashMap<>();
-    try (BufferedReader br =
-        new BufferedReader(
-            new InputStreamReader(
-                Objects.requireNonNull(
-                    CobolErrorStrategy.class.getResourceAsStream(SPECIAL_TOKEN_HANDLING_FILEPATH)),
-                StandardCharsets.UTF_8))) {
-      loadTokenMapping(br);
-    } catch (IOException exception) {
-      LOG.error("SpecialTokenHandling didn't load.", exception);
-    }
-    addPredefinedMappings();
-  }
-
-  private static void addPredefinedMappings() {
-    SPECIAL_TOKEN_MAPPING.put("_", "-");
-    SPECIAL_TOKEN_MAPPING.put(", ,", ", ");
-    SPECIAL_TOKEN_MAPPING.put("{ ,", "{");
-    SPECIAL_TOKEN_MAPPING.put(", }", "}");
-  }
-
-  private static void loadTokenMapping(BufferedReader br) throws IOException {
-    String line;
-    while ((line = br.readLine()) != null) {
-      if (!(line.isEmpty() || line.startsWith("#"))) {
-        int splitIndex = line.indexOf('=');
-        SPECIAL_TOKEN_MAPPING.put(line.substring(0, splitIndex), line.substring(splitIndex + 1));
-      }
-    }
-  }
 
   @Inject
   public CobolErrorStrategy(MessageService messageService) {
@@ -185,12 +156,35 @@ public class CobolErrorStrategy extends DefaultErrorStrategy {
   }
 
   private String getExpectedText(Parser recognizer, IntervalSet interval) {
-    String expectedTokens = interval.toString(recognizer.getVocabulary());
+    final String newMessage =
+        buildErrorMessage(
+            removeIdentifierTokens(recognizer, collectErrorTokens(recognizer, interval)));
+    return interval.size() > 1 ? String.format("{%s}", newMessage) : newMessage;
+  }
 
-    for (Map.Entry<String, String> entry : SPECIAL_TOKEN_MAPPING.entrySet()) {
-      expectedTokens = expectedTokens.replace(entry.getKey(), entry.getValue());
-    }
-    return expectedTokens;
+  private String buildErrorMessage(List<String> tokens) {
+    return tokens.stream()
+        .map(it -> SPECIAL_TOKEN_MAPPING.getOrDefault(it, it))
+        .filter(it -> !it.isEmpty())
+        .map(it -> it.replace("_", "-"))
+        .collect(joining(MSG_DELIMITER));
+  }
+
+  private List<String> removeIdentifierTokens(Parser recognizer, List<String> tokens) {
+    final Set<String> identifierTokens =
+        IDENTIFIER_TOKENS.getOrDefault(recognizer.getClass(), ImmutableSet.of());
+    if (tokens.containsAll(identifierTokens)) tokens.removeAll(identifierTokens);
+    return tokens;
+  }
+
+  private List<String> collectErrorTokens(Parser recognizer, IntervalSet interval) {
+    return Arrays.stream(
+            interval
+                .toString(recognizer.getVocabulary())
+                .replace(MSG_PREFIX, "")
+                .replace(MSG_SUFFIX, "")
+                .split(MSG_DELIMITER))
+        .collect(toList());
   }
 
   private static String getRule(Parser recognizer) {

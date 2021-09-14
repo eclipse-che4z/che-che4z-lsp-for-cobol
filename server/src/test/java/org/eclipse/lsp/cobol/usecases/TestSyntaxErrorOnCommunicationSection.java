@@ -42,7 +42,7 @@ class TestSyntaxErrorOnCommunicationSection {
             "1",
             new Diagnostic(
                 null,
-                "Syntax error on 'COMMUNICATION' expected {<EOF>, CBL, END, EXEC, FILE, ID, IDENTIFICATION, "
+                "Syntax error on 'COMMUNICATION' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, "
                     + "LINKAGE, LOCAL-STORAGE, MAP, PROCEDURE, PROCESS, SCHEMA, WORKING-STORAGE}",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));

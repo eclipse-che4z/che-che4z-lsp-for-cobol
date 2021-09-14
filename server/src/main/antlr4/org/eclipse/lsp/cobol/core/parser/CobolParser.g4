@@ -708,7 +708,7 @@ dataDescriptionEntryFormat1
    | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
    | dataOccursClause | dataSignClause | dataSynchronizedClause
    | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
-   (DOT_FS|DOT_FS2)
+   DOT_FS
    ;
 
 
@@ -721,7 +721,7 @@ dataDescriptionEntryFormat1Level77
      | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
      | dataOccursClause | dataSignClause | dataSynchronizedClause
      | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
-     (DOT_FS|DOT_FS2)
+     DOT_FS
    ;
 
 
@@ -766,7 +766,7 @@ dataOccursSort
    ;
 
 dataPictureClause
-   : (PICTURE | PIC) IS2? pictureString+
+   : (PICTURE | PIC) IS? pictureString+
    ;
 
 pictureString

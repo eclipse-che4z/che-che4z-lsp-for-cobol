@@ -60,8 +60,8 @@ class TestRemarksAreUnsupported {
             "unsupported",
             new Diagnostic(
                 null,
-                "Syntax error on 'INPUT' expected {<EOF>, AUTHOR, CBL, DATA, DATE-COMPILED, DATE-WRITTEN, "
-                    + "END, ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, PROCESS, REMARKS, SECURITY}",
+                "Syntax error on 'INPUT' expected {AUTHOR, CBL, DATA, DATE-COMPILED, DATE-WRITTEN, "
+                    + "END, ENVIRONMENT, ID, IDENTIFICATION, INSTALLATION, PROCEDURE, PROCESS, SECURITY}",
                 DiagnosticSeverity.Error,
                 SourceInfoLevels.ERROR.getText())));
   }

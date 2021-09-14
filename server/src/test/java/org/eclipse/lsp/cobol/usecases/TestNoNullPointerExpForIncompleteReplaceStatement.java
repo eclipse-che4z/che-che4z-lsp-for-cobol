@@ -53,7 +53,7 @@ class TestNoNullPointerExpForIncompleteReplaceStatement {
                 "1",
                 new Diagnostic(
                         null,
-                        "Syntax error on 'copy' expected {<EOF>, CBL, END, EXEC, FD, FILE, ID, "
+                        "Syntax error on 'copy' expected {CBL, END, EXEC, FD, FILE, ID, "
                                 + "IDENTIFICATION, LINKAGE, LOCAL-STORAGE, MAP, PROCEDURE, PROCESS, SCHEMA, SD, "
                                 + "WORKING-STORAGE, '01-49', '66', '77', '88'}",
                         DiagnosticSeverity.Error,
@@ -66,7 +66,7 @@ class TestNoNullPointerExpForIncompleteReplaceStatement {
                 "1",
                 new Diagnostic(
                         null,
-                        "Syntax error on 'copy' expected {<EOF>, CBL, END, EXEC, FD, FILE, ID, "
+                        "Syntax error on 'copy' expected {CBL, END, EXEC, FD, FILE, ID, "
                                 + "IDENTIFICATION, LINKAGE, LOCAL-STORAGE, MAP, PROCEDURE, PROCESS, SCHEMA, SD, "
                                 + "WORKING-STORAGE, '01-49', '66', '77', '88'}",
                         DiagnosticSeverity.Error,
