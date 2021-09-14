@@ -14,6 +14,11 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.validations;
 
+import com.google.common.collect.ImmutableList;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
@@ -21,11 +26,6 @@ import org.eclipse.lsp.cobol.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.positive.CobolText;
 import org.eclipse.lsp.cobol.service.*;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
-import com.google.common.collect.ImmutableList;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import lombok.experimental.UtilityClass;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 
@@ -35,18 +35,16 @@ import java.util.concurrent.CompletableFuture;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
+import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.*;
-import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
 
 /** This utility class provides methods to run use cases with COBOL code examples. */
 @UtilityClass
 public class UseCaseUtils {
   public static final String DOCUMENT_URI = "file:///c%3A/workspace/document.cbl";
-  public static final String DOCUMENT_2_URI = "file:///c%3A/workspace/document2.cbl";
-  public static final String DOCUMENT_3_URI = "implicit:///implicitCopybooks/SQLCA_DB2.cpy";
 
   private static final String CPY_URI_PREFIX = "file:///c%3A/workspace/.c4z/.copybooks/";
   private static final String CPY_URI_SUFFIX = ".cpy";

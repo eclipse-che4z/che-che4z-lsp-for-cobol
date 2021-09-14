@@ -53,7 +53,13 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 @SuppressWarnings("UnstableApiUsage")
 public class CopybookServiceImpl implements CopybookService {
   private static final Map<String, PredefinedCopybooks> PREDEFINED_COPYBOOKS =
-      ImmutableMap.of("SQLCA", PredefinedCopybooks.SQLCA, "SQLDA", PredefinedCopybooks.SQLDA);
+      ImmutableMap.of(
+          "SQLCA",
+          PredefinedCopybooks.SQLCA,
+          "SQLDA",
+          PredefinedCopybooks.SQLDA,
+          "DFHEIBLK",
+          PredefinedCopybooks.DFHEIBLK);
   public static final String PREF_IMPLICIT = "implicit://";
 
   private final SettingsService settingsService;
@@ -241,6 +247,12 @@ public class CopybookServiceImpl implements CopybookService {
       @Override
       String uriForBackend(SQLBackend backend) {
         return "/implicitCopybooks/SQLDA.cpy";
+      }
+    },
+    DFHEIBLK {
+      @Override
+      String uriForBackend(SQLBackend backend) {
+        return "/implicitCopybooks/DFHEIBLK.cpy";
       }
     };
 

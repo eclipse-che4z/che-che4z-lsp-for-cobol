@@ -36,7 +36,7 @@ import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.SKIP;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DATACOM_SERVER;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
-import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.*;
+import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -57,6 +57,9 @@ class CopybookServiceTest {
   private static final String CONTENT = "content";
   private static final String SQLCA = "SQLCA";
   private static final String SQLDA = "SQLDA";
+  private static final String DFHEIBLK = "DFHEIBLK";
+  private static final String DOCUMENT_2_URI = "file:///c%3A/workspace/document2.cbl";
+  private static final String DOCUMENT_3_URI = "implicit:///implicitCopybooks/SQLCA_DB2.cpy";
 
   private final DataBusBroker broker = mock(DataBusBroker.class);
   private final SettingsService settingsService = mock(SettingsService.class);
@@ -298,6 +301,24 @@ class CopybookServiceTest {
     assertEquals(
         copybookService.resolve(SQLDA, DOCUMENT_URI, new CopybookConfig(ENABLED, DATACOM_SERVER)),
         copybookService.resolve(SQLDA, DOCUMENT_URI, new CopybookConfig(ENABLED, DB2_SERVER)));
+  }
+
+  /**
+   * Test if implicit copybook SQLCA for DB2 is resolved. For simplicity, we consider content is
+   * null. Full use case test is in TestSqlIncludeStatementForImplicitlyDefinedCpy
+   */
+  @Test
+  void testDfheiblkIsResolved() {
+    CopybookServiceImpl copybookService = createCopybookService();
+    verify(broker).subscribe(copybookService);
+
+    when(files.getNameFromURI(DOCUMENT_3_URI)).thenReturn("document2");
+    when(settingsService.getConfiguration("copybook-resolve", "document2", DFHEIBLK))
+        .thenReturn(supplyAsync(() -> singletonList(new JsonPrimitive(""))));
+    CopybookModel cpy = copybookService.resolve(DFHEIBLK, DOCUMENT_3_URI, cpyConfig);
+
+    assertEquals(
+        new CopybookModel(DFHEIBLK, "implicit:///implicitCopybooks/DFHEIBLK.cpy", null), cpy);
   }
 
   /**
