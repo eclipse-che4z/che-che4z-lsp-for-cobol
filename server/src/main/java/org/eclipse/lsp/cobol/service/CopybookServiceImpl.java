@@ -126,36 +126,39 @@ public class CopybookServiceImpl implements CopybookService {
       throws ExecutionException, InterruptedException {
     ThreadInterruptionUtil.checkThreadInterrupted();
     String cobolFileName = files.getNameFromURI(documentUri);
-    String uri =
-        SettingsService.getValueAsString(
+
+    return SettingsService.getValueAsString(
             settingsService
                 .getConfiguration(COPYBOOK_RESOLVE.label, cobolFileName, copybookName)
-                .get());
-    if (uri.isEmpty()) {
-      if (isImplictlyDefinedCopybook(copybookName)) {
-        uri = getUriForImplicitCopybook(copybookName, copybookConfig);
-        return new CopybookModel(
-            copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri));
-      } else if (copybookConfig.getCopybookProcessingMode().download && cobolFileName != null) {
-        Optional.of(
-                copybooksForDownloading.computeIfAbsent(
-                    cobolFileName, s -> ConcurrentHashMap.newKeySet()))
-            .ifPresent(it -> it.add(copybookName));
-      }
-      return new CopybookModel(copybookName, null, null);
-    }
+                .get())
+        .map(uri -> loadCopybook(uri, copybookName))
+        .orElseGet(() -> processEmptyUri(copybookName, copybookConfig, cobolFileName));
+  }
 
-    Path file = files.getPathFromURI(uri);
-    if (files.fileExists(file)) {
+  private CopybookModel processEmptyUri(
+      String copybookName, CopybookConfig copybookConfig, String cobolFileName) {
+    if (isImplictlyDefinedCopybook(copybookName)) {
+      String uri = getUriForImplicitCopybook(copybookName, copybookConfig);
       return new CopybookModel(
-          copybookName, uri, files.getContentByPath(Objects.requireNonNull(file)));
-    } else {
-      return new CopybookModel(copybookName, null, null);
+          copybookName, PREF_IMPLICIT + uri, readContentForImplicitCopybook(uri));
+    } else if (copybookConfig.getCopybookProcessingMode().download && cobolFileName != null) {
+      Optional.of(
+              copybooksForDownloading.computeIfAbsent(
+                  cobolFileName, s -> ConcurrentHashMap.newKeySet()))
+          .ifPresent(it -> it.add(copybookName));
     }
+    return new CopybookModel(copybookName, null, null);
+  }
+
+  private CopybookModel loadCopybook(String uri, String copybookName) {
+    Path file = files.getPathFromURI(uri);
+    return files.fileExists(file)
+        ? new CopybookModel(copybookName, uri, files.getContentByPath(Objects.requireNonNull(file)))
+        : new CopybookModel(copybookName, null, null);
   }
 
   /**
-   * Check if the copybook name is implicitly (no explicit copybook file) defined or not.
+   * Check if the copybook name is implicitly (not an explicit copybook file) defined or not.
    *
    * <p>Application can use SQLCA and SQLDA names to define communication and description areas as
    * copybooks and both are implicitly defined by either co-processor or pre-processor.
