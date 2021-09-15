@@ -24,7 +24,6 @@ import com.google.inject.Singleton;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.domain.databus.api.DataBusBroker;
@@ -361,13 +360,10 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   private SQLBackend getTargetSqlBackend() {
     try {
-      String sqlServer =
-          SettingsService.getValueAsString(
-              settingsService.getConfiguration(TARGET_SQL_BACKEND.label).get());
-      if (StringUtils.isEmpty(sqlServer)) {
-        return SQLBackend.DB2_SERVER;
-      }
-      return SQLBackend.valueOf(sqlServer);
+      return SettingsService.getValueAsString(
+              settingsService.getConfiguration(TARGET_SQL_BACKEND.label).get())
+          .map(SQLBackend::valueOf)
+          .orElse(SQLBackend.DB2_SERVER);
     } catch (InterruptedException e) {
       LOG.error("InterruptedException when getting {}:\n {}", TARGET_SQL_BACKEND, e);
       Thread.currentThread().interrupt();

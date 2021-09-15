@@ -22,6 +22,6 @@ import lombok.Value;
  */
 @Value
 public class CopybookConfig {
-  private CopybookProcessingMode copybookProcessingMode;
-  private SQLBackend sqlBackend;
+  CopybookProcessingMode copybookProcessingMode;
+  SQLBackend sqlBackend;
 }

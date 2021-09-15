@@ -18,6 +18,7 @@ import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -52,16 +53,16 @@ public interface SettingsService {
   List<String> toStrings(List<Object> objects);
 
   /**
-   * Get config data as string
+   * Get config data as optional string
    *
    * @param data config response
-   * @return string value
+   * @return optional string value
    */
-  static String getValueAsString(List<Object> data) {
-    if (data == null || data.isEmpty()) return "";
+  static Optional<String> getValueAsString(List<Object> data) {
+    if (data == null || data.isEmpty()) return Optional.empty();
     Object obj = data.get(0);
-    if (!(obj instanceof JsonPrimitive)) return "";
+    if (!(obj instanceof JsonPrimitive)) return Optional.empty();
 
-    return ((JsonPrimitive) obj).getAsString();
+    return Optional.of(((JsonPrimitive) obj).getAsString()).filter(it -> !it.isEmpty());
   }
 }
