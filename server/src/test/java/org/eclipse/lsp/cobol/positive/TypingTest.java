@@ -15,11 +15,16 @@
 
 package org.eclipse.lsp.cobol.positive;
 
+import com.google.common.util.concurrent.SimpleTimeLimiter;
 import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -61,13 +66,37 @@ class TypingTest extends FileBasedTest {
 
   private void analyze(String name, String fullText) {
     String accumulator = "";
+    ExecutorService es = Executors.newSingleThreadExecutor();
+    SimpleTimeLimiter timeLimiter = SimpleTimeLimiter.create(es);
     try {
       for (char c : fullText.toCharArray()) {
         accumulator += c;
-        if (c != ' ') UseCaseUtils.analyzeForErrors(name, accumulator, getCopybooks());
+        UseCaseRun useCaseRun = new UseCaseRun(name, accumulator, getCopybooks());
+        if (c != ' ')
+          timeLimiter.callWithTimeout(useCaseRun, 30, TimeUnit.SECONDS);
       }
-    } catch (RuntimeException e) {
+    } catch (Exception e) {
       System.out.printf("Text that produced the error:\n%s\n\n%s", accumulator, e);
+    } finally {
+      es.shutdown();
+    }
+  }
+
+  private final class UseCaseRun implements Callable<Void> {
+    private final String fileName;
+    private final String text;
+    private final List<CobolText> copybooks;
+
+    private UseCaseRun(String fileName, String text, List<CobolText> copybooks) {
+      this.fileName = fileName;
+      this.text = text;
+      this.copybooks = copybooks;
+    }
+
+    @Override
+    public Void call() {
+      UseCaseUtils.analyzeForErrors(fileName, text, copybooks);
+      return null;
     }
   }
 }
