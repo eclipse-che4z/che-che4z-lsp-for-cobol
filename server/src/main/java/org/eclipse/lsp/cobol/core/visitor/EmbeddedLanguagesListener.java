@@ -126,6 +126,6 @@ public class EmbeddedLanguagesListener extends CobolParserBaseListener {
 
   private int calculateShift(ParserRuleContext ctx) {
     Interval interval = ctx.getSourceInterval();
-    return interval.b - interval.a;
+    return Math.max(interval.b - interval.a, 0);
   }
 }

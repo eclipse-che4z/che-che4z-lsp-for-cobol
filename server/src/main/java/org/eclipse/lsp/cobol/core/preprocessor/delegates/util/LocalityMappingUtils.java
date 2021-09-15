@@ -88,7 +88,7 @@ public class LocalityMappingUtils {
 
     for (int i = 0; i < tokens.size(); i++) {
       Token token = tokens.get(i);
-      if (embeddedCodeParts.containsKey(token)) {
+      if (embeddedCodeParts.containsKey(token) && token.getType() != Token.EOF) {
         EmbeddedCode embeddedCode = embeddedCodeParts.get(token);
         List<Token> nestedTokens = embeddedCode.getTokens();
         mapTokens(
