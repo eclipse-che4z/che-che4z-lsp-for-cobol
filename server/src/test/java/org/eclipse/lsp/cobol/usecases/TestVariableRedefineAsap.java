@@ -37,7 +37,7 @@ class TestVariableRedefineAsap {
           + "       01 {$*WS-DATA-RED} REDEFINES {$WS-DATA-A} PIC X(20).\n"
           + "       01 {$*WS-DATA-RED2} REDEFINES {$WS-DATA-A} PIC X(20).\n"
           + "       01 {$*WS-DATA-B} PIC X(20) .\n"
-          + "       01 {$*WS-DATA-RED3} REDEFINES {$WS-DATA-A|1} PIC X(20).\n"
+          + "       01 {$*WS-DATA-RED3} REDEFINES {WS-DATA-A|1} PIC X(20).\n"
           + "       PROCEDURE DIVISION.\n";
 
   private static final String CORRECT =

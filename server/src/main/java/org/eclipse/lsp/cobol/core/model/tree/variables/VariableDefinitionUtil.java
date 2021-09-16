@@ -466,10 +466,12 @@ public class VariableDefinitionUtil {
     if (renames == null) return new ResultWithErrors<>(-1, errors);
     String renamesName = renames.getName();
     int renamesIndex = Iterables.indexOf(nodesForRenaming, it -> renamesName.equals(it.getName()));
-    if (renamesIndex != -1)
-      variable.addChild(
-          new VariableUsageNode(renamesName, renames.getLocality(), ImmutableList.of()));
-    else
+    if (renamesIndex != -1) {
+      QualifiedReferenceNode qualifiedReferenceNode = new QualifiedReferenceNode(renames.getLocality());
+      VariableUsageNode variableUsageNode = new VariableUsageNode(renamesName, renames.getLocality());
+      qualifiedReferenceNode.addChild(variableUsageNode);
+      variable.addChild(qualifiedReferenceNode);
+    } else
       errors =
           ImmutableList.of(
               variable.getError(MessageTemplate.of(CHILD_TO_RENAME_NOT_FOUND, renamesName)));
@@ -491,14 +493,9 @@ public class VariableDefinitionUtil {
     VariableNameAndLocality redefinesNameAndLocality = definitionNode.getRedefines();
     String redefinesName = redefinesNameAndLocality.getName();
     Locality redefinesLocality = redefinesNameAndLocality.getLocality();
-    variableNode.addChild(
-        new VariableUsageNode(
-            redefinesName,
-            redefinesLocality,
-            collectVariableParentNames(definitionNode.getParent()),
-            VariableUsageNode.ReferenceType.CONTEXT));
-    VariableWithLevelNode variableForRedefine =
-        getPrecedingVariableForRedefine(definitionNode, redefinesName);
+    VariableUsageNode redefineUsage = new VariableUsageNode(redefinesName, redefinesLocality);
+    variableNode.addChild(redefineUsage);
+    VariableWithLevelNode variableForRedefine = getPrecedingVariableForRedefine(definitionNode, redefinesName);
     if (variableForRedefine == null || !variableForRedefine.getName().equals(redefinesName)) {
       errors.add(
           SyntaxError.syntaxError()
@@ -506,13 +503,16 @@ public class VariableDefinitionUtil {
               .messageTemplate(MessageTemplate.of(REDEFINE_IMMEDIATELY_FOLLOW, redefinesName))
               .locality(redefinesLocality)
               .build());
-    } else if (variableForRedefine.getLevel() != definitionNode.getLevel()) {
-      errors.add(
-          SyntaxError.syntaxError()
-              .severity(SEVERITY)
-              .messageTemplate(MessageTemplate.of(LEVELS_MUST_MATCH, redefinesName))
-              .locality(definitionNode.getLevelLocality())
-              .build());
+    } else {
+      variableForRedefine.addUsage(redefineUsage);
+      if (variableForRedefine.getLevel() != definitionNode.getLevel()) {
+        errors.add(
+            SyntaxError.syntaxError()
+                .severity(SEVERITY)
+                .messageTemplate(MessageTemplate.of(LEVELS_MUST_MATCH, redefinesName))
+                .locality(definitionNode.getLevelLocality())
+                .build());
+      }
     }
     if (definitionNode.hasValue()) {
       Locality valueLocality = definitionNode.getValueLocality();
@@ -526,19 +526,6 @@ public class VariableDefinitionUtil {
                 .build());
     }
     return new ResultWithErrors<>(variableNode, errors);
-  }
-
-  private List<VariableNameAndLocality> collectVariableParentNames(Node parent) {
-    List<VariableNameAndLocality> parents = new ArrayList<>();
-    while (parent != null && parent.getNodeType() == NodeType.VARIABLE) {
-      parents.add(convertVariableNode((VariableNode) parent));
-      parent = parent.getParent();
-    }
-    return parents;
-  }
-
-  private VariableNameAndLocality convertVariableNode(VariableNode node) {
-    return new VariableNameAndLocality(node.getName(), node.getLocality());
   }
 
   private VariableWithLevelNode getPrecedingVariableForRedefine(

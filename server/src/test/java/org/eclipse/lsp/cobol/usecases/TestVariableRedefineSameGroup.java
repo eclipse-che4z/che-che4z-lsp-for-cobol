@@ -35,7 +35,7 @@ class TestVariableRedefineSameGroup {
           + "          01 {$*WS-DESCRIPTION1}.\n"
           + "              05 {$*WS-DATE1} PIC X(20).\n"
           + "          01 {$*WS-DESCRIPTION2}.\n"
-          + "               05 {$*WS-DATE2} REDEFINES {WS-DATE1|1|2} PIC 9(8).";
+          + "               05 {$*WS-DATE2} REDEFINES {WS-DATE1|1} PIC 9(8).";
 
   @Test
   void testError() {
@@ -47,12 +47,6 @@ class TestVariableRedefineSameGroup {
             new Diagnostic(
                 null,
                 "REDEFINES line must immediately follow redefined item: WS-DATE1",
-                DiagnosticSeverity.Error,
-                ERROR.getText()),
-            "2",
-            new Diagnostic(
-                null,
-                "Variable WS-DATE1 is not defined",
                 DiagnosticSeverity.Error,
                 ERROR.getText())));
   }

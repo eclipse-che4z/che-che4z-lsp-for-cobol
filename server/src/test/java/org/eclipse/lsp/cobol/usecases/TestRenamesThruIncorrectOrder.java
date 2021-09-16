@@ -37,8 +37,8 @@ class TestRenamesThruIncorrectOrder {
           + "          02 {$*VARNAME3} PIC 9.\n"
           + "       66 {$*VARANME4|1} RENAMES {$VARNAME3} THROUGH {$VARNAME2}.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           MOVE 0 TO {VARNAME2|2} OF VARANME4.\n"
-          + "           MOVE 0 TO {VARNAME3|3} OF VARANME4.\n";
+          + "           MOVE 0 TO {_VARNAME2 OF VARANME4|2_}.\n"
+          + "           MOVE 0 TO {_VARNAME3 OF VARANME4|3_}.\n";
 
   @Test
   void test() {

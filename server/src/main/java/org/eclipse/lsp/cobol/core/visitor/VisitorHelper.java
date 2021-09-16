@@ -26,16 +26,12 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.variables.ValueInterval;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNameAndLocality;
-import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.model.variables.UsageFormat;
-import org.eclipse.lsp.cobol.core.semantics.PredefinedVariableContext;
 import org.eclipse.lsp4j.Range;
 
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -239,38 +235,6 @@ class VisitorHelper {
    * Create a tree node from the given context
    *
    * @param positions map of localities
-   * @param constants predefined variable context
-   * @param nameContext context of name rule
-   * @param children children nodes
-   * @param hierarchy stream of parent variables
-   * @return list of variable nodes
-   */
-  List<Node> createVariableUsage(
-      Map<Token, Locality> positions,
-      PredefinedVariableContext constants,
-      ParserRuleContext nameContext,
-      List<Node> children,
-      Stream<ParserRuleContext> hierarchy) {
-    String dataName = getName(nameContext);
-    List<Node> result = new ArrayList<>();
-    getLocality(positions, nameContext.getStart())
-        .ifPresent(
-            locality -> {
-              if (constants.contains(dataName)) constants.addUsage(dataName, locality.toLocation());
-              else {
-                result.add(
-                    new VariableUsageNode(
-                        dataName, locality, createParentsList(positions, hierarchy)));
-              }
-            });
-    result.addAll(children);
-    return result;
-  }
-
-  /**
-   * Create a tree node from the given context
-   *
-   * @param positions map of localities
    * @param children children nodes
    * @param ctx to retrieve the locality range
    * @param nodeConstructor function to create the node
@@ -294,17 +258,5 @@ class VisitorHelper {
    */
   Optional<Locality> getLocality(Map<Token, Locality> positions, Token childToken) {
     return ofNullable(positions.get(childToken));
-  }
-
-  private List<VariableNameAndLocality> createParentsList(
-      Map<Token, Locality> positions, Stream<ParserRuleContext> hierarchy) {
-    return hierarchy
-        .map(
-            it ->
-                getLocality(positions, it.getStart())
-                    .map(loc -> new VariableNameAndLocality(getName(it), loc))
-                    .orElse(null))
-        .filter(Objects::nonNull)
-        .collect(toList());
   }
 }
