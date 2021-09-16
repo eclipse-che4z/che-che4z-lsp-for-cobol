@@ -71,6 +71,17 @@ public abstract class MessageServiceParser extends Parser {
   }
 
   /**
+   * Validate that the subschema name is 16 or 18
+   *
+   * @param input string to check
+   */
+  protected void validateSubSchemaNameLength(String input) {
+    if (input != null && !input.matches("16|18")) {
+      notifyError("cobolParser.subSchemaNameLength", input);
+    }
+  }
+
+  /**
    * Validate a string length and throw an error if it is incorrect
    *
    * @param input string to check

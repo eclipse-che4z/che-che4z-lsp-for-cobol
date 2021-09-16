@@ -549,9 +549,8 @@ endClause
     ;
 
 ss_names_length
-       : {if(!_input.LT(1).getText().matches("16|18")) { notifyError("cobolParser.subSchemaNameLength", _input.LT(1).getText());}}
-       LEVEL_NUMBER
-       ;
+    : {validateSubSchemaNameLength(_input.LT(1).getText());} LEVEL_NUMBER
+    ;
 
 // --- data division --------------------------------------------------------------------
 
