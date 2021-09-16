@@ -16,6 +16,8 @@
 package org.eclipse.lsp.cobol.positive;
 
 import com.google.common.util.concurrent.SimpleTimeLimiter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <code>-Dtests.typing=true
  * </code> as a system property for the run configuration.
  */
+@Slf4j
 class TypingTest extends FileBasedTest {
   private static final String MODE_PROPERTY_NAME = "tests.typing";
   private static final String TEST_MODE = System.getProperty(MODE_PROPERTY_NAME);
@@ -53,15 +56,16 @@ class TypingTest extends FileBasedTest {
     String name = text.getFileName();
     String fullText = text.getFullText();
 
-    System.out.printf("Analyzing %s\n", name);
+    LOG.info("Analyzing {}", name);
 
     final long start = System.currentTimeMillis();
     analyze(name, fullText);
-    final double time = (System.currentTimeMillis() - start) / 1000.0;
+    final long duration = System.currentTimeMillis() - start;
 
-    System.out.printf(
-        "%s analyzed successfully in %.3f seconds. Progress: %s/%s\n",
-        name, time, counter.incrementAndGet(), size);
+    LOG.info("{} analyzed in {}. Progress: {}/{}.",
+        name,
+        DurationFormatUtils.formatDurationHMS(duration),
+        counter.incrementAndGet(), size);
   }
 
   private void analyze(String name, String fullText) {
@@ -76,7 +80,7 @@ class TypingTest extends FileBasedTest {
           timeLimiter.callWithTimeout(useCaseRun, 30, TimeUnit.SECONDS);
       }
     } catch (Exception e) {
-      System.out.printf("Text that produced the error:\n%s\n\n%s", accumulator, e);
+      LOG.error("Text that produced the error:\n{}", accumulator, e);
     } finally {
       es.shutdown();
     }
