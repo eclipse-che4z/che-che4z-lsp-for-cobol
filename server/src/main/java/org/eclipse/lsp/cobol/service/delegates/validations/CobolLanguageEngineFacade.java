@@ -91,8 +91,6 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
         .diagnostics(
             collectDiagnosticsForAffectedDocuments(
                 convertErrors(result.getErrors()), context.getCopybookDefinitions(), uri))
-        .variableDefinitions(convertEntities(context.getVariableDefinitions()))
-        .variableUsages(convertEntities(context.getVariableUsages()))
         .constantDefinitions(convertEntities(context.getConstants().getDefinitions().asMap()))
         .constantUsages(convertEntities(context.getConstants().getUsages().asMap()))
         .copybookDefinitions(convertEntities(context.getCopybookDefinitions()))

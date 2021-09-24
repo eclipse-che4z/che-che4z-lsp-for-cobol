@@ -118,7 +118,37 @@ public class VariableDefinitionUtil {
     errors.addAll(processDefinition(node, 1, variableDefinitionNodes));
     errors.addAll(checkGlobalUniqueNames(node));
     errors.addAll(checkTopNumbers(node));
+    reshapeVariablesLocality(node);
+    registerVariablesInProgram(node);
     return errors;
+  }
+
+  /**
+   * In case of group variable the definition's locality contains only one line, but must contain all children.
+   *
+   * @param node the node with Variable definitions
+   */
+  private void reshapeVariablesLocality(Node node) {
+    List<Node> children = node.getChildren();
+    if (children.isEmpty())
+      return;
+    children.forEach(VariableDefinitionUtil::reshapeVariablesLocality);
+    if (node.getNodeType() == NodeType.VARIABLE)
+      ((VariableNode) node).extendLocality(children.get(children.size() - 1).getLocality().getRange().getEnd());
+  }
+
+  private void registerVariablesInProgram(Node node) {
+    // The variable can have nested variable definitions (like IndexItemNode), we need to
+    // collect them
+    List<VariableNode> variables = node.getChildren().stream()
+            .flatMap(Node::getDepthFirstStream)
+            .filter(hasType(NodeType.VARIABLE))
+            .map(VariableNode.class::cast)
+            .collect(Collectors.toList());
+    node
+        .getNearestParentByType(NodeType.PROGRAM)
+        .map(ProgramNode.class::cast)
+        .ifPresent(programNode -> variables.forEach(programNode::addVariableDefinition));
   }
 
   private List<SyntaxError> processDefinition(
@@ -143,18 +173,6 @@ public class VariableDefinitionUtil {
           rootNode.addChild(variable);
           // Reassign all children from definition node to converted variable definition node
           definitionNode.getChildren().forEach(variable::addChild);
-          // The variable can have nested variable definitions (like IndexItemNode), we need to
-          // collect them
-          List<VariableNode> variables =
-              variable
-                  .getDepthFirstStream()
-                  .filter(hasType(NodeType.VARIABLE))
-                  .map(VariableNode.class::cast)
-                  .collect(Collectors.toList());
-          definitionNode
-              .getNearestParentByType(NodeType.PROGRAM)
-              .map(ProgramNode.class::cast)
-              .ifPresent(programNode -> variables.forEach(programNode::addVariableDefinition));
         } else {
           SyntaxError error = SyntaxError.syntaxError()
               .severity(SEVERITY)
@@ -218,7 +236,13 @@ public class VariableDefinitionUtil {
     if (definitionNode.getLevel() == LEVEL_FD_SD) {
       FileDescriptionNode variable =
           new FileDescriptionNode(
-              definitionNode.getLocality(), getName(definitionNode), definitionNode.isSortDescription() ? VariableType.SD : VariableType.FD, false, definitionNode.getFileDescriptor(), definitionNode.getFileControlClause());
+              definitionNode.getLocality(),
+              getName(definitionNode),
+              definitionNode.isSortDescription() ? VariableType.SD : VariableType.FD,
+              false,
+              definitionNode.getFileDescriptor(),
+              definitionNode.getFileControlClause());
+      createVariableNameNode(variable, definitionNode.getVariableName());
       return new ResultWithErrors<>(variable, Collections.emptyList());
     }
     return null;
@@ -467,10 +491,9 @@ public class VariableDefinitionUtil {
     String renamesName = renames.getName();
     int renamesIndex = Iterables.indexOf(nodesForRenaming, it -> renamesName.equals(it.getName()));
     if (renamesIndex != -1) {
-      QualifiedReferenceNode qualifiedReferenceNode = new QualifiedReferenceNode(renames.getLocality());
       VariableUsageNode variableUsageNode = new VariableUsageNode(renamesName, renames.getLocality());
-      qualifiedReferenceNode.addChild(variableUsageNode);
-      variable.addChild(qualifiedReferenceNode);
+      variable.addChild(variableUsageNode);
+      nodesForRenaming.get(renamesIndex).addUsage(variableUsageNode);
     } else
       errors =
           ImmutableList.of(

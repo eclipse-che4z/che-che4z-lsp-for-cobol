@@ -16,6 +16,12 @@ package org.eclipse.lsp.cobol.service.delegates.references;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.RootNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.MnemonicNameNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionNameNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableNode;
+import org.eclipse.lsp.cobol.core.model.tree.variables.VariableUsageNode;
 import org.eclipse.lsp.cobol.core.semantics.outline.RangeUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.delegates.validations.AnalysisResult;
@@ -47,21 +53,41 @@ class ElementOccurrencesTest {
     Location usageInOtherFile = new Location(URI2, new Range(new Position(3, 0), new Position(3, 5)));
     Position insideDefinition = new Position(1, 5);
     Position insideUsage = new Position(3, 1);
+    Locality rootLocality = Locality.builder()
+        .uri(URI)
+        .range(new Range(new Position(1, 1), new Position(5, 1)))
+        .build();
+    VariableNode variableNodeInOneFile = createDefinitionNode(ELEMENT_NAME, definition.getUri(), definition.getRange());
+    VariableUsageNode variableUsageNodeInOneFile = createUsageNode(variableNodeInOneFile, usage.getUri(), usage.getRange());
+    RootNode rootNodeForOneFile = new RootNode(rootLocality);
+    rootNodeForOneFile.addChild(variableNodeInOneFile);
+    rootNodeForOneFile.addChild(variableUsageNodeInOneFile);
+    VariableNode variableNodeInTwoFiles = createDefinitionNode(ELEMENT_NAME, definition.getUri(), definition.getRange());
+    VariableUsageNode variableUsageNodeInTwoFiles = createUsageNode(variableNodeInTwoFiles, usageInOtherFile.getUri(), usageInOtherFile.getRange());
+    RootNode rootNodeForTwoFiles = new RootNode(rootLocality);
+    rootNodeForTwoFiles.addChild(variableNodeInTwoFiles);
+    rootNodeForTwoFiles.addChild(variableUsageNodeInTwoFiles);
+    VariableNode variableNodeWithTwoUsages = createDefinitionNode(ELEMENT_NAME, definition.getUri(), definition.getRange());
+    VariableUsageNode variableUsageNode1 = createUsageNode(variableNodeWithTwoUsages, usage.getUri(), usage.getRange());
+    VariableUsageNode variableUsageNode2 = createUsageNode(variableNodeWithTwoUsages, usageInOtherFile.getUri(), usageInOtherFile.getRange());
+    RootNode rootNodeWithTwoUsages = new RootNode(rootLocality);
+    rootNodeWithTwoUsages.addChild(variableNodeWithTwoUsages);
+    rootNodeWithTwoUsages.addChild(variableUsageNode1);
+    rootNodeWithTwoUsages.addChild(variableUsageNode2);
     return Stream.of(
         // find variables usage by usage position
         Arguments.of(
-            AnalysisResult.builder().variableDefinitions(definitionMap).variableUsages(usageMap).build(),
+            AnalysisResult.builder().rootNode(rootNodeForOneFile).build(),
             insideUsage,
             ImmutableList.of(usage)),
         // find variables usage by definition position
         Arguments.of(
-            AnalysisResult.builder().variableDefinitions(definitionMap).variableUsages(usageMap).build(),
+            AnalysisResult.builder().rootNode(rootNodeForOneFile).build(),
             insideDefinition,
             ImmutableList.of(usage)),
         // same position from other URI
         Arguments.of(
-            AnalysisResult.builder().variableDefinitions(definitionMap)
-                .variableUsages(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(usageInOtherFile))).build(),
+            AnalysisResult.builder().rootNode(rootNodeForTwoFiles).build(),
             insideUsage,
             ImmutableList.of()),
         // find paragraph usage by usage position
@@ -116,16 +142,13 @@ class ElementOccurrencesTest {
             ImmutableList.of(usage)),
         // find all variables usages in all files by usage position
         Arguments.of(
-            AnalysisResult.builder().variableDefinitions(definitionMap).variableUsages(
-                ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(usage, usageInOtherFile))
-            ).build(),
+            AnalysisResult.builder().rootNode(rootNodeWithTwoUsages).build(),
             insideUsage,
             ImmutableList.of(usage, usageInOtherFile)),
         // give only needed usage even if other kind use the same name
         Arguments.of(
             AnalysisResult.builder()
-                .variableDefinitions(definitionMap)
-                .variableUsages(usageMap)
+                .rootNode(rootNodeForOneFile)
                 .paragraphUsages(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(usageInOtherFile)))
                 .build(),
             insideUsage,
@@ -160,12 +183,21 @@ class ElementOccurrencesTest {
 
   @Test
   void simpleCaseOfDefinitionsAndUsages() {
-    Location definition = new Location(URI, new Range(new Position(1, 2), new Position(2, 5)));
-    Location usage = new Location(URI, new Range(new Position(3, 0), new Position(3, 5)));
+    VariableNode definitionNode = createDefinitionNode(ELEMENT_NAME, URI,
+        new Range(new Position(1, 2), new Position(2, 5)));
+    Location definition = definitionNode.getLocality().toLocation();
+    VariableUsageNode usageNode = createUsageNode(definitionNode, URI,
+        new Range(new Position(3, 0), new Position(3, 5)));
+    Location usage = usageNode.getLocality().toLocation();
     Position insideUsage = new Position(3, 1);
+    RootNode rootNode = new RootNode(Locality.builder()
+        .uri(URI)
+        .range(new Range(new Position(1, 1), new Position(5, 1)))
+        .build());
+    rootNode.addChild(definitionNode);
+    rootNode.addChild(usageNode);
     AnalysisResult analysisResult = AnalysisResult.builder()
-        .variableDefinitions(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(definition)))
-        .variableUsages(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(usage)))
+        .rootNode(rootNode)
         .build();
     CobolDocumentModel cobolDocumentModel = new CobolDocumentModel("", analysisResult);
     TextDocumentPositionParams textDocumentPositionParams =
@@ -182,14 +214,21 @@ class ElementOccurrencesTest {
   @Test
   void findHighlights() {
     Range definitionRange = new Range(new Position(1, 2), new Position(2, 5));
-    Location definition = new Location(URI, definitionRange);
+    VariableNode definitionNode = createDefinitionNode(ELEMENT_NAME, URI, definitionRange);
     Range usageRange = new Range(new Position(3, 0), new Position(3, 5));
-    Location usage = new Location(URI, usageRange);
-    Location usageInOtherFile = new Location(URI2, new Range(new Position(3, 0), new Position(3, 5)));
+    VariableUsageNode variableUsageNode = createUsageNode(definitionNode, URI, usageRange);
+    VariableUsageNode variableUsageNodeInOtherFile = createUsageNode(definitionNode, URI2,
+        new Range(new Position(3, 0), new Position(3, 5)));
     Position insideUsage = new Position(3, 1);
+    RootNode rootNode = new RootNode(Locality.builder()
+        .uri(URI)
+        .range(new Range(new Position(1, 1), new Position(5, 1)))
+        .build());
+    rootNode.addChild(definitionNode);
+    rootNode.addChild(variableUsageNode);
+    rootNode.addChild(variableUsageNodeInOtherFile);
     AnalysisResult analysisResult = AnalysisResult.builder()
-        .variableDefinitions(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(definition)))
-        .variableUsages(ImmutableMap.of(ELEMENT_NAME, ImmutableList.of(usage, usageInOtherFile)))
+        .rootNode(rootNode)
         .build();
     List<DocumentHighlight> highlights = new ElementOccurrences().findHighlights(
         new CobolDocumentModel("", analysisResult),
@@ -219,4 +258,23 @@ class ElementOccurrencesTest {
         location));
   }
 
+  private static VariableNode createDefinitionNode(String name, String uri, Range range) {
+    VariableNode definitionNode = new MnemonicNameNode(Locality.builder()
+        .uri(uri)
+        .range(range)
+        .build(), "systemName", name);
+    VariableDefinitionNameNode varNameNode = new VariableDefinitionNameNode(definitionNode.getLocality(), name);
+    definitionNode.addChild(varNameNode);
+    return definitionNode;
+  }
+
+  private static VariableUsageNode createUsageNode(VariableNode variableNode, String uri, Range range) {
+    VariableUsageNode usageNode = new VariableUsageNode(variableNode.getName(),
+        Locality.builder()
+            .uri(uri)
+            .range(range)
+            .build());
+    variableNode.addUsage(usageNode);
+    return usageNode;
+  }
 }

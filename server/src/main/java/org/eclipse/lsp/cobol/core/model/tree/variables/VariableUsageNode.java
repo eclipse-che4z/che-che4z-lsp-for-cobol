@@ -14,22 +14,26 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.variables;
 
+import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
+import org.eclipse.lsp.cobol.core.model.tree.Context;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
- * The class represents variable usage in COBOL program. This must be extended with a link to
- * variable definition.
+ * The class represents variable usage in COBOL program.
  */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class VariableUsageNode extends Node {
+public class VariableUsageNode extends Node implements Context {
   private final String dataName;
   @Setter
   @EqualsAndHashCode.Exclude @ToString.Exclude private VariableNode definition;
@@ -39,5 +43,19 @@ public class VariableUsageNode extends Node {
       Locality locality) {
     super(locality, NodeType.VARIABLE_USAGE);
     this.dataName = dataName;
+  }
+
+  @Override
+  public List<Node> getDefinitions() {
+    return Optional.ofNullable(definition)
+        .map(VariableNode::getDefinitions)
+        .orElseGet(ImmutableList::of);
+  }
+
+  @Override
+  public List<? extends Node> getUsages() {
+    return Optional.ofNullable(definition)
+        .map(VariableNode::getUsages)
+        .orElseGet(ImmutableList::of);
   }
 }

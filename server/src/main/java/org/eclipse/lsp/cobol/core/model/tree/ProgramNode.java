@@ -50,6 +50,7 @@ public class ProgramNode extends Node {
   @EqualsAndHashCode.Exclude @ToString.Exclude private final NodeConverter nodeConverter = new NodeConverter();
   private final Multimap<String, VariableNode> variables = ArrayListMultimap.create();
   private final Collection<Variable> definedVariables = new ArrayList<>();
+  private final List<VariableNode> variablesForConvert = new ArrayList<>();
   private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
   private String programName;
 
@@ -78,6 +79,9 @@ public class ProgramNode extends Node {
   }
 
   private List<SyntaxError> processVariables() {
+    for (VariableNode variableForConvert: variablesForConvert)
+      definedVariables.add(nodeConverter.convertVariable(variableForConvert));
+    variablesForConvert.clear();
     for (VariableNode node: variables.values())
       nodeConverter.updateUsage(node);
     Map<Locality, Variable> variableUsages = new HashMap<>();
@@ -94,7 +98,7 @@ public class ProgramNode extends Node {
    */
   public void addVariableDefinition(VariableNode node) {
     variables.put(node.getName(), node);
-    definedVariables.add(nodeConverter.convertVariable(node));
+    variablesForConvert.add(node);
   }
 
   /**
