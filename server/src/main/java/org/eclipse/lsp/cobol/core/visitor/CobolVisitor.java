@@ -651,10 +651,23 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitCobolWord(CobolWordContext ctx) {
+  public List<Node> visitVariableUsageName(VariableUsageNameContext ctx) {
     return addTreeNode(
         ctx,
         locality -> new VariableUsageNode(getName(ctx), locality)
+    );
+  }
+
+  @Override
+  public List<Node> visitFileName(FileNameContext ctx) {
+    return addTreeNode(
+        ctx,
+        locality -> {
+          Node usage = new VariableUsageNode(getName(ctx), locality);
+          Node reference = new QualifiedReferenceNode(locality);
+          reference.addChild(usage);
+          return reference;
+        }
     );
   }
 
@@ -670,11 +683,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitIdms_procedure_name(Idms_procedure_nameContext ctx) {
-    return addTreeNode(ctx, QualifiedReferenceNode::new);
-  }
-
-  @Override
-  public List<Node> visitFileName(FileNameContext ctx) {
     return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 

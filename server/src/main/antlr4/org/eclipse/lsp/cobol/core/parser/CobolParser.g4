@@ -2983,7 +2983,7 @@ relationalOperator
    ;
 
 idms_map_name
-    : T=dataName {validateLength($T.text, "map name", 8);}
+    : T=variableUsageName {validateLength($T.text, "map name", 8);}
     ;
 
 idms_map_name_definition
@@ -2991,7 +2991,7 @@ idms_map_name_definition
     ;
 
 idms_db_entity_name
-    : T=dataName {validateLength($T.text, "db entity name", 16);}
+    : T=variableUsageName {validateLength($T.text, "db entity name", 16);}
     ;
 
 idms_dictionary_name
@@ -3003,7 +3003,7 @@ idms_node_name
     ;
 
 idms_procedure_name
-    : T=dataName {validateLength($T.text, "procedure name", 8);}
+    : T=variableUsageName {validateLength($T.text, "procedure name", 8);}
     ;
 
 idms_program_name
@@ -3051,7 +3051,7 @@ argument
 // qualified data name ----------------------------------
 
 qualifiedDataName
-   : dataName tableCall? referenceModifier? inData*
+   : variableUsageName tableCall? referenceModifier? inData*
    ;
 
 tableCall
@@ -3072,7 +3072,7 @@ specialRegister
 // in ----------------------------------
 
 inData
-   : (IN | OF) dataName tableCall? referenceModifier?
+   : (IN | OF) variableUsageName tableCall? referenceModifier?
    ;
 
 inSection
@@ -3102,6 +3102,10 @@ computerName
    ;
 
 dataName
+   : cobolWord
+   ;
+
+variableUsageName
    : cobolWord
    ;
 

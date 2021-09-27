@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.engine;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
@@ -44,7 +42,6 @@ import org.eclipse.lsp.cobol.core.visitor.EmbeddedLanguagesListener;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.service.CopybookConfig;
 import org.eclipse.lsp.cobol.service.SubroutineService;
-import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -168,8 +165,6 @@ public class CobolLanguageEngine {
               .collect(toList());
       context =
           context.toBuilder()
-              .variableDefinitions(collectVariableDefinitions(definedVariables))
-              .variableUsages(collectVariableUsages(definedVariables))
               .variables(collectVariables(definedVariables))
               .rootNode(rootNode)
               .build();
@@ -290,26 +285,6 @@ public class CobolLanguageEngine {
         .map(messageService::localizeTemplate)
         .map(message -> syntaxError.toBuilder().messageTemplate(null).suggestion(message).build())
         .orElse(syntaxError);
-  }
-
-  private Map<String, Collection<Location>> collectVariableDefinitions(
-      Collection<Variable> definedVariables) {
-    Multimap<String, Location> definitions = HashMultimap.create();
-    definedVariables.stream()
-        .filter(it -> !FILLER_NAME.equals(it.getName()))
-        .filter(it -> !it.getDefinition().getUri().startsWith(PREF_IMPLICIT))
-        .forEach(it -> definitions.put(it.getName(), it.getDefinition().toLocation()));
-    return definitions.asMap();
-  }
-
-  private Map<String, Collection<Location>> collectVariableUsages(
-      Collection<Variable> definedVariables) {
-    Multimap<String, Location> usages = HashMultimap.create();
-    definedVariables.forEach(
-        it ->
-            usages.putAll(
-                it.getName(), it.getUsages().stream().map(Locality::toLocation).collect(toList())));
-    return usages.asMap();
   }
 
   private List<Variable> collectVariables(Collection<Variable> definedVariables) {

@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 @Getter
 @EqualsAndHashCode
 public abstract class Node {
-  private final Locality locality;
+  protected Locality locality;
   private final NodeType nodeType;
 
   @EqualsAndHashCode.Exclude private final List<Node> children = new ArrayList<>();

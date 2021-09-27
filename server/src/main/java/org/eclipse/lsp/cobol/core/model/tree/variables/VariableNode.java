@@ -24,9 +24,13 @@ import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.SyntaxError;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
+import org.eclipse.lsp.cobol.core.semantics.outline.RangeUtils;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinitionUtil.SEVERITY;
 
@@ -93,11 +97,29 @@ public abstract class VariableNode extends Node {
     usageNode.setDefinition(this);
   }
 
+  public List<Node> getDefinitions() {
+    return getChildren().stream()
+            .filter(hasType(NodeType.VARIABLE_DEFINITION_NAME))
+            .collect(Collectors.toList());
+  }
+
   private Locality getLocalityForError() {
     return getChildren().stream()
         .filter(hasType(NodeType.VARIABLE_DEFINITION_NAME))
         .findAny()
         .map(Node::getLocality)
         .orElseGet(this::getLocality);
+  }
+
+  /**
+   * Change locality end position if the new end is bigger than current end.
+   *
+   * @param newEndPosition the new end position
+   */
+  public void extendLocality(Position newEndPosition) {
+    if (RangeUtils.isAfter(locality.getRange().getEnd(), newEndPosition))
+      locality = locality.toBuilder()
+          .range(new Range(locality.getRange().getStart(), newEndPosition))
+          .build();
   }
 }
