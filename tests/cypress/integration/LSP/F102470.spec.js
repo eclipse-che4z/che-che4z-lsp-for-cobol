@@ -34,13 +34,14 @@ context('This is F102470 spec', () => {
         .contains('SUB2: Subroutine not found');
     });
 
-    it(['smoke'], 'Go to definition for subroutine', () => {
+    it(['smoke', 'CI'], 'Go to definition for subroutine', () => {
       cy.openFile('CALL.cbl').goToLine(21);
       cy.getLineByNumber(21).findText('SUB1').goToDefinition();
       cy.getCurrentTab().should('contain.text', 'SUB1.cob');
     });
 
     it(['smoke'], 'Autocomplete contains only locally available subroutines', () => {
+      cy.updateConfigs('subroutines');
       cy.openFile('CALL.cbl');
       cy.goToLine(23);
       cy.getCurrentLine().type('{end}{enter}');

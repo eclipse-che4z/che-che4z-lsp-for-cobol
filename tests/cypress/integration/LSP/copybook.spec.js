@@ -60,7 +60,7 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC174658 Copybook - not exist: detailed hint', () => {
-    it(['smoke'], 'Checks that error lines for missing copybook have detailed hints', () => {
+    it(['smoke', 'CI'], 'Checks that error lines for missing copybook have detailed hints', () => {
       cy.openFile('USERC1F.cbl');
       cy.get('.squiggly-error')
         .getElementLineNumber()
@@ -93,7 +93,7 @@ context('This is a Copybook spec', () => {
 
   describe('TC174917 Copybook - recursive detailed hint', () => {
     it(
-      ['smoke'],
+      ['smoke', 'CI'],
       'Checks that when opening Cobol file which recursively refers to copybooks, have detailed error hint',
       () => {
         cy.openFile('USERC1R.cbl');
@@ -110,7 +110,7 @@ context('This is a Copybook spec', () => {
 
   describe('TC174932 Copybook - invalid definition', () => {
     it(
-      ['smoke'],
+      ['smoke', 'CI'],
       'Checks that when opening Cobol file which uses invalid definition from copybook, this definition is underlined as a semantic error',
       () => {
         cy.openFile('USERC1N2.cbl');
@@ -149,13 +149,17 @@ context('This is a Copybook spec', () => {
     afterEach(() => {
       cy.closeFolder('.copybooks');
     });
-    it(['smoke'], 'Checks that Peek Definition functionality works in theia in cobol file via context menu', () => {
-      cy.openFile('USERC1N1.cbl');
-      cy.getLineByNumber(42).findText('User-Phone-Mobile.').goToDefinition();
-      cy.getCurrentTab().should('contain.text', 'BOOK2N.cpy');
-      cy.getCurrentLineNumber().should('eq', 19);
-      cy.getCurrentLine().contains('05 User-Phone-Mobile PIC 9(6).');
-    });
+    it(
+      ['smoke', 'CI'],
+      'Checks that Peek Definition functionality works in theia in cobol file via context menu',
+      () => {
+        cy.openFile('USERC1N1.cbl').wait(3000);
+        cy.getLineByNumber(42).findText('User-Phone-Mobile.').goToDefinition();
+        cy.getCurrentTab().should('contain.text', 'BOOK2N.cpy');
+        cy.getCurrentLineNumber().should('eq', 19);
+        cy.getCurrentLine().contains('05 User-Phone-Mobile PIC 9(6).');
+      },
+    );
   });
 
   describe('TC174930 Copybook - Ctrl+Click on definition', () => {
@@ -279,7 +283,7 @@ context('This is a Copybook spec', () => {
   });
 
   describe('TC266074 LSP analysis for extended sources - basic scenario', () => {
-    it(['smoke'], 'If extended sources are places under .c4z/.extsrcs, then ignore COPY instructions', () => {
+    it(['smoke', 'CI'], 'If extended sources are places under .c4z/.extsrcs, then ignore COPY instructions', () => {
       cy.readFile('test_files/project/USER1.cbl').then((context) => {
         cy.writeFile('test_files/project/.c4z/.extsrcs/USER1.cbl', context);
       });
@@ -296,7 +300,7 @@ context('This is a Copybook spec', () => {
       cy.getCurrentLineOverlay().children().should('not.have.class', '.squiggly-warning');
     });
 
-    it(['smoke'], '.c4z', () => {
+    it(['smoke', 'CI'], '.c4z', () => {
       cy.readFile('test_files/project/.c4z/.extsrcs/USER1.cbl').then((context) => {
         cy.writeFile('test_files/project/.c4z/USER1.cbl', context);
       });
@@ -369,7 +373,7 @@ context('This is a Copybook spec', () => {
 
   describe("TC315293 program ID - 'COBOL Copybook'", () => {
     it(
-      ['smoke'],
+      ['smoke', 'CI'],
       "New program ID - 'COBOL copybook' is used in the following development for limited syntax awareness for the copybooks.",
       () => {
         cy.openFile('USERC1N1.cbl');
@@ -488,7 +492,7 @@ context('This is a Copybook spec', () => {
     beforeEach(() => {
       cy.updateConfigs('testing');
     });
-    it(['smoke'], 'Support COPY MAID statements', () => {
+    it(['smoke', 'CI'], 'Support COPY MAID statements', () => {
       cy.openFile('TEST.CBL');
       cy.goToLine(20);
       cy.getLineByNumber(20).type('{end}{enter}    COPY MAID A.');
