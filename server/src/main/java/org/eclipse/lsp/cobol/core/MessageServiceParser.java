@@ -20,12 +20,16 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.TokenStream;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 
+import java.util.regex.Pattern;
+
 /**
  * Provide the support of message externalization for Parser.
  *
  * <p>Usage: options { superClass = MessageServiceParser;}
  */
 public abstract class MessageServiceParser extends Parser {
+
+  private static final Pattern ALPHANUMERIC = Pattern.compile("[a-zA-Z0-9]+");
 
   /** @param input {@link TokenStream} */
   MessageServiceParser(TokenStream input) {
@@ -83,9 +87,58 @@ public abstract class MessageServiceParser extends Parser {
     }
   }
 
+  /**
+   * Validate a string for alphanumeric characters and throw an error if it is incorrect
+   *
+   * @param input string to check
+   * @param objectType type of the object to be passed as a message argument
+   */
+  protected void validateAlphaNumericPattern(String input, String objectType) {
+    if (input != null && !ALPHANUMERIC.matcher(input).matches()) {
+      notifyError("parsers.alphaNumeric", objectType);
+    }
+  }
+
+  /**
+   * Validate exact string length and throw an error if it is incorrect
+   *
+   * @param input string to check
+   * @param objectType type of the object to be passed as a message argument
+   * @param validLength expected length for this input
+   */
+  protected void validateExactLength(String input, String objectType, Integer validLength) {
+    if (input != null && input.length() != validLength) {
+      notifyError("parsers.exactLength", objectType, validLength.toString());
+    }
+  }
+
+  /**
+   * Validate integer value against range and throw an error if it is incorrect
+   *
+   * @param input integer to check
+   * @param minValue allowed integer value
+   * @param maxValue allowed integer value
+   */
+  protected void validateIntegerRange(String input, Integer minValue, Integer maxValue) {
+    Integer intInputValue = tryParseInt(input);
+    if (intInputValue != null && !(intInputValue >= minValue && intInputValue <= maxValue)) {
+      notifyError("parsers.intRangeValue", minValue.toString(), maxValue.toString());
+    }
+  }
+
   private String getMessageForParser(String messageKey, String... parameters) {
     return ((CobolErrorStrategy) this.getErrorHandler())
         .getMessageService()
         .getMessage(messageKey, parameters);
+  }
+
+  private Integer tryParseInt(String input) {
+    Integer parsedValue;
+    try {
+      parsedValue = Integer.parseInt(input);
+    } catch (Exception ex) {
+      parsedValue = null;
+    }
+    return parsedValue;
   }
 }
