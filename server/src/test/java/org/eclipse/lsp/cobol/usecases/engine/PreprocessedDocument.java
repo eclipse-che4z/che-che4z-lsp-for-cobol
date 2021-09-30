@@ -15,8 +15,8 @@
 
 package org.eclipse.lsp.cobol.usecases.engine;
 
-import org.eclipse.lsp.cobol.positive.CobolText;
 import lombok.Value;
+import org.eclipse.lsp.cobol.positive.CobolText;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Value
 class PreprocessedDocument {
-  private String text;
-  private List<CobolText> copybooks;
-  private TestData testData;
+  String text;
+  List<CobolText> copybooks;
+  TestData testData;
 }

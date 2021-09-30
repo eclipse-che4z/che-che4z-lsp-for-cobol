@@ -36,7 +36,7 @@ import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.ENABLED;
 import static org.eclipse.lsp.cobol.service.CopybookProcessingMode.SKIP;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DATACOM_SERVER;
 import static org.eclipse.lsp.cobol.service.SQLBackend.DB2_SERVER;
-import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 

@@ -18,7 +18,8 @@ package org.eclipse.lsp.cobol.positive;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import org.eclipse.lsp.cobol.usecases.engine.UseCase;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -62,10 +63,12 @@ class TypingTest extends FileBasedTest {
     analyze(name, fullText);
     final long duration = System.currentTimeMillis() - start;
 
-    LOG.info("{} analyzed in {}. Progress: {}/{}.",
+    LOG.info(
+        "{} analyzed in {}. Progress: {}/{}.",
         name,
         DurationFormatUtils.formatDurationHMS(duration),
-        counter.incrementAndGet(), size);
+        counter.incrementAndGet(),
+        size);
   }
 
   private void analyze(String name, String fullText) {
@@ -76,8 +79,7 @@ class TypingTest extends FileBasedTest {
       for (char c : fullText.toCharArray()) {
         accumulator += c;
         UseCaseRun useCaseRun = new UseCaseRun(name, accumulator, getCopybooks());
-        if (c != ' ')
-          timeLimiter.callWithTimeout(useCaseRun, 30, TimeUnit.SECONDS);
+        if (c != ' ') timeLimiter.callWithTimeout(useCaseRun, 30, TimeUnit.SECONDS);
       }
     } catch (Exception e) {
       LOG.error("Text that produced the error:\n{}", accumulator, e);
@@ -99,7 +101,8 @@ class TypingTest extends FileBasedTest {
 
     @Override
     public Void call() {
-      UseCaseUtils.analyzeForErrors(fileName, text, copybooks);
+      UseCaseUtils.analyzeForErrors(
+          UseCase.builder().fileName(fileName).text(text).copybooks(getCopybooks()).build());
       return null;
     }
   }

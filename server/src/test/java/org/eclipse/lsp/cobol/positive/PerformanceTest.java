@@ -15,7 +15,8 @@
 
 package org.eclipse.lsp.cobol.positive;
 
-import org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils;
+import org.eclipse.lsp.cobol.usecases.engine.UseCase;
+import org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,8 +29,8 @@ import java.util.List;
  * This test collects the time that the Language Engine needs to parse the given text from the
  * positive tests set. The result outputs to the console in the form "TEST.cbl 100 10" where
  * "TEST.cbl" is a file name, "100" is the length of the file in chars and "10" is the parsing time.
- * Disabled by default, to enable provide <code>-Dtests.perf=true</code> as a system property for the run
- * configuration.
+ * Disabled by default, to enable provide <code>-Dtests.perf=true</code> as a system property for
+ * the run configuration.
  */
 class PerformanceTest extends FileBasedTest {
   private static final String MODE_PROPERTY_NAME = "tests.perf";
@@ -46,7 +47,9 @@ class PerformanceTest extends FileBasedTest {
     String fullText = text.getFullText();
 
     long start = System.currentTimeMillis();
-    List<Diagnostic> result = UseCaseUtils.analyzeForErrors(name, fullText, getCopybooks());
+    List<Diagnostic> result =
+        UseCaseUtils.analyzeForErrors(
+            UseCase.builder().fileName(name).text(fullText).copybooks(getCopybooks()).build());
     long stop = System.currentTimeMillis();
 
     assertNoSyntaxErrorsFound(result, name);

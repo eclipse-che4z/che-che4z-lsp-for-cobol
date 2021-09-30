@@ -57,7 +57,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.EMBEDDED_CODE;
 import static org.eclipse.lsp.cobol.core.model.tree.NodeType.PROGRAM;
 import static org.eclipse.lsp.cobol.core.semantics.outline.OutlineNodeNames.FILLER_NAME;
-import static org.eclipse.lsp.cobol.service.CopybookServiceImpl.PREF_IMPLICIT;
+import static org.eclipse.lsp.cobol.service.PredefinedCopybooks.PREF_IMPLICIT;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.

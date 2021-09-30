@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
-import static org.eclipse.lsp.cobol.service.delegates.validations.UseCaseUtils.DOCUMENT_URI;
+import static org.eclipse.lsp.cobol.usecases.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp4j.MessageType.Info;
 import static org.mockito.Mockito.*;
 
