@@ -438,6 +438,7 @@ context('This is a Copybook spec', () => {
         .openFile('TEST.CBL')
         .getLineByNumber(21)
         .type(`           COPY ${copybook}.`)
+        .wait(500)
         .getCurrentLineErrors({ expectedLine: 21 })
         .eq(0)
         .getHoverErrorMessage()
