@@ -173,7 +173,6 @@ context('This is a LSP spec', () => {
     it(['smoke', 'CI'], 'Checks that Semantic Errors also marked in file', () => {
       cy.openFile('USER2.cbl');
       cy.goToLine(40);
-      console.log();
       cy.get('.squiggly-error')
         .should('have.length', 1)
         .getElementLineNumber()
