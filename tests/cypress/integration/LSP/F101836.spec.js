@@ -18,7 +18,7 @@
 
 //F101836 - COBOL LS: Improve user experience and reduce clashing errors by removing BitLang Dependency
 
-function expandOutlineElementUpdated(name) {
+function expandOutlineElement(name) {
   cy.get(`[data-node-id="${name}_0"]`).click();
 }
 
@@ -28,13 +28,13 @@ context('This is F101836 spec', () => {
       cy.openFile('outline.cbl');
       cy.openOutlineView();
       cy.getOutlineViewTreeContainer().contains('PROGRAM: ABCDEF');
-      expandOutlineElementUpdated('IDENTIFICATION DIVISION');
+      expandOutlineElement('IDENTIFICATION DIVISION');
       cy.getOutlineViewTreeContainer().contains('PROGRAM-ID ABCDEF');
-      expandOutlineElementUpdated('DATA DIVISION');
+      expandOutlineElement('DATA DIVISION');
       cy.get('[id="WORKING-STORAGE SECTION_0"]').click();
       cy.getOutlineViewTreeContainer().contains('PARENT');
       cy.getOutlineViewTreeContainer().contains('COPY AST');
-      expandOutlineElementUpdated('PROCEDURE DIVISION');
+      expandOutlineElement('PROCEDURE DIVISION');
       cy.getOutlineViewTreeContainer().contains('MAINLINE');
       cy.goToLine(18);
       cy.getCurrentLine().type('{end}{leftArrow}{backspace}{backspace}BC', { delay: 200 });
