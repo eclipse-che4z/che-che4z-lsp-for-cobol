@@ -21,6 +21,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Context;
+import org.eclipse.lsp.cobol.core.model.tree.Describable;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 
@@ -33,7 +34,7 @@ import java.util.Optional;
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class VariableUsageNode extends Node implements Context {
+public class VariableUsageNode extends Node implements Context, Describable {
   private final String dataName;
   @Setter
   @EqualsAndHashCode.Exclude @ToString.Exclude private VariableNode definition;
@@ -57,5 +58,12 @@ public class VariableUsageNode extends Node implements Context {
     return Optional.ofNullable(definition)
         .map(VariableNode::getUsages)
         .orElseGet(ImmutableList::of);
+  }
+
+  @Override
+  public String getFormattedDisplayString() {
+    return Optional.ofNullable(definition)
+        .map(VariableNode::getFullVariableDescription)
+        .orElse("");
   }
 }

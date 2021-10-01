@@ -43,4 +43,12 @@ public class MultiTableDataNameNode extends VariableWithLevelNode implements Usa
     this.occursTimes = occursTimes;
     this.usageFormat = usageFormat;
   }
+
+  @Override
+  protected String getVariableDisplayString() {
+    StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
+    stringBuilder.append(String.format(" OCCURS %1$d TIMES", occursTimes));
+    if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat);
+    return stringBuilder.append(".").toString();
+  }
 }

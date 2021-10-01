@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.core.model.Locality;
 import org.eclipse.lsp.cobol.core.model.tree.Context;
+import org.eclipse.lsp.cobol.core.model.tree.Describable;
 import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.tree.NodeType;
 
@@ -49,7 +50,7 @@ import java.util.List;
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class VariableDefinitionNameNode extends Node implements Context {
+public class VariableDefinitionNameNode extends Node implements Context, Describable {
   private final String name;
 
   public VariableDefinitionNameNode(Locality location, String name) {
@@ -68,5 +69,13 @@ public class VariableDefinitionNameNode extends Node implements Context {
         .map(VariableNode.class::cast)
         .map(VariableNode::getUsages)
         .orElseGet(ImmutableList::of);
+  }
+
+  @Override
+  public String getFormattedDisplayString() {
+    return getNearestParentByType(NodeType.VARIABLE)
+        .map(VariableNode.class::cast)
+        .map(VariableNode::getFullVariableDescription)
+        .orElse("");
   }
 }

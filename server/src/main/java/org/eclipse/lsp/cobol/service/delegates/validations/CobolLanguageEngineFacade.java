@@ -103,7 +103,6 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
         .sectionDefinitions(retrieveDefinitions(sectionNodes))
         .sectionUsages(retrieveUsages(sectionNodes))
         .outlineTree(context.getOutlineTree())
-        .variables(context.getVariables())
         .rootNode(context.getRootNode())
         .build();
   }

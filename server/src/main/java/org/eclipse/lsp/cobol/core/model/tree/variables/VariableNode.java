@@ -39,6 +39,7 @@ import static org.eclipse.lsp.cobol.core.model.tree.variables.VariableDefinition
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public abstract class VariableNode extends Node {
+  public static final String PREFIX = "  ";
   private final VariableType variableType;
   private final String name;
   @Setter private boolean global;
@@ -117,9 +118,66 @@ public abstract class VariableNode extends Node {
    * @param newEndPosition the new end position
    */
   public void extendLocality(Position newEndPosition) {
-    if (RangeUtils.isAfter(locality.getRange().getEnd(), newEndPosition))
+    if (RangeUtils.isBefore(locality.getRange().getEnd(), newEndPosition))
       locality = locality.toBuilder()
           .range(new Range(locality.getRange().getStart(), newEndPosition))
           .build();
+  }
+
+  protected abstract String getVariableDisplayString();
+
+  /**
+   * Get user friendly variable description.
+   *
+   * @return the string with described variable.
+   */
+  public String getFullVariableDescription() {
+    StringBuilder prefix = new StringBuilder();
+    List<String> lines = new ArrayList<>();
+    for (String parentLine: parentsDescription()) {
+      lines.add(prepend(prefix.toString(), parentLine));
+      prefix.append(PREFIX);
+    }
+    lines.add(prepend(prefix.toString(), getVariableDisplayString()));
+    prefix.append(PREFIX);
+    lines.addAll(getChildrenDescription(prefix.toString()));
+    return String.join("\n", lines);
+  }
+
+  private List<String> parentsDescription() {
+    return getNearestParentByType(NodeType.VARIABLE)
+        .map(VariableNode.class::cast)
+        .map(variableNode -> {
+          List<String> result = variableNode.parentsDescription();
+          result.add(variableNode.getVariableDisplayString());
+          return result;
+        })
+        .orElseGet(ArrayList::new);
+  }
+
+  protected List<String> getChildrenDescription(String prefix) {
+    return getChildren().stream()
+        .filter(hasType(NodeType.VARIABLE))
+        .map(VariableNode.class::cast)
+        .map(VariableNode::getDisplayStringWithConditionals)
+        .map(description -> prepend(prefix, description))
+        .collect(Collectors.toList());
+  }
+
+  private String getDisplayStringWithConditionals() {
+    List<String> result = new ArrayList<>();
+    result.add(getVariableDisplayString());
+    getChildren().stream()
+        .filter(hasType(NodeType.VARIABLE))
+        .map(VariableNode.class::cast)
+        .filter(variableNode -> variableNode.variableType == VariableType.CONDITION_DATA_NAME)
+        .map(VariableNode::getVariableDisplayString)
+        .map(displayString -> prepend(PREFIX, displayString))
+        .forEach(result::add);
+    return String.join("\n", result);
+  }
+
+  private static String prepend(String prefix, String text) {
+    return prefix + text.replace("\n", "\n" + prefix);
   }
 }
